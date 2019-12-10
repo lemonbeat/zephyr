@@ -56,9 +56,13 @@
 
 &usart0 {
 	current-speed = <115200>;
+	/* Virtual COM port setting for SLSTK3402A, see user guide UG257 */
 	location-rx = <GECKO_LOCATION(0) GECKO_PORT_A GECKO_PIN(1)>;
 	location-tx = <GECKO_LOCATION(0) GECKO_PORT_A GECKO_PIN(0)>;
+	location-rts = <GECKO_LOCATION(30) GECKO_PORT_A GECKO_PIN(3)>;
+	location-cts = <GECKO_LOCATION(30) GECKO_PORT_A GECKO_PIN(2)>;
 	status = "okay";
+	hw-flow-control;
 };
 
 &leuart0 {
