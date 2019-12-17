@@ -214,6 +214,11 @@ static int send_conn_le_param_update(struct bt_conn *conn,
 	       conn->le.features[0], param->interval_min,
 	       param->interval_max, param->latency, param->timeout);
 
+	/* Proceed only if connection parameters contains valid values*/
+	if (!bt_le_conn_params_valid(param)) {
+		return -EINVAL;
+	}
+
 	/* Use LE connection parameter request if both local and remote support
 	 * it; or if local role is master then use LE connection update.
 	 */
@@ -326,34 +331,38 @@ static void conn_update_timeout(struct k_work *work)
 		return;
 	}
 
-#if defined (CONFIG_BT_GAP_PERIPHERAL_PREF_PARAMS)
-	/* if application set own params use those, otherwise use defaults */
-	if (atomic_test_and_clear_bit(conn->flags, BT_CONN_SLAVE_PARAM_SET)) {
-		param = BT_LE_CONN_PARAM(conn->le.interval_min,
-					 conn->le.interval_max,
-					 conn->le.pending_latency,
-					 conn->le.pending_timeout);
-
-		send_conn_le_param_update(conn, param);
-	} else {
-		param = BT_LE_CONN_PARAM(CONFIG_BT_PERIPHERAL_PREF_MIN_INT,
-					 CONFIG_BT_PERIPHERAL_PREF_MAX_INT,
-					 CONFIG_BT_PERIPHERAL_PREF_SLAVE_LATENCY,
-					 CONFIG_BT_PERIPHERAL_PREF_TIMEOUT);
-
-		send_conn_le_param_update(conn, param);
-	}
+	if (IS_ENABLED(CONFIG_BT_GAP_AUTO_UPDATE_CONN_PARAMS)) {
+#if defined(CONFIG_BT_GAP_PERIPHERAL_PREF_PARAMS)
+		/* if application set own params use those, otherwise
+		 * use defaults
+		 */
+		if (atomic_test_and_clear_bit(conn->flags,
+					      BT_CONN_SLAVE_PARAM_SET)) {
+			param = BT_LE_CONN_PARAM(conn->le.interval_min,
+						conn->le.interval_max,
+						conn->le.pending_latency,
+						conn->le.pending_timeout);
+			send_conn_le_param_update(conn, param);
+		} else {
+			param = BT_LE_CONN_PARAM(
+					CONFIG_BT_PERIPHERAL_PREF_MIN_INT,
+					CONFIG_BT_PERIPHERAL_PREF_MAX_INT,
+					CONFIG_BT_PERIPHERAL_PREF_SLAVE_LATENCY,
+					CONFIG_BT_PERIPHERAL_PREF_TIMEOUT);
+			send_conn_le_param_update(conn, param);
+		}
 #else
-	/* update only if application set own params */
-	if (atomic_test_and_clear_bit(conn->flags, BT_CONN_SLAVE_PARAM_SET)) {
-		param = BT_LE_CONN_PARAM(conn->le.interval_min,
-					 conn->le.interval_max,
-					 conn->le.latency,
-					 conn->le.timeout);
-
-		send_conn_le_param_update(conn, param);
-	}
+		/* update only if application set own params */
+		if (atomic_test_and_clear_bit(conn->flags,
+					      BT_CONN_SLAVE_PARAM_SET)) {
+			param = BT_LE_CONN_PARAM(conn->le.interval_min,
+						conn->le.interval_max,
+						conn->le.latency,
+						conn->le.timeout);
+			send_conn_le_param_update(conn, param);
+		}
 #endif
+	}
 
 	atomic_set_bit(conn->flags, BT_CONN_SLAVE_PARAM_UPDATE);
 }
@@ -1197,6 +1206,10 @@ void bt_conn_recv(struct bt_conn *conn, struct net_buf *buf, u8_t flags)
 
 		break;
 	default:
+		/* BT_ACL_START_NO_FLUSH and BT_ACL_COMPLETE are not allowed on
+		 * LE-U from Controller to Host.
+		 * Only BT_ACL_POINT_TO_POINT is supported.
+		 */
 		BT_ERR("Unexpected ACL flags (0x%02x)", flags);
 		bt_conn_reset_rx_state(conn);
 		net_buf_unref(buf);
@@ -1372,11 +1385,7 @@ static struct net_buf *create_frag(struct bt_conn *conn, struct net_buf *buf)
 	struct net_buf *frag;
 	u16_t frag_len;
 
-#if CONFIG_BT_L2CAP_TX_FRAG_COUNT > 0
-	frag = bt_conn_create_pdu(&frag_pool, 0);
-#else
-	frag = bt_conn_create_pdu(NULL, 0);
-#endif
+	frag = bt_conn_create_frag(0);
 
 	if (conn->state != BT_CONN_CONNECTED) {
 		net_buf_unref(frag);
@@ -2044,10 +2053,6 @@ int bt_conn_create_auto_le(const struct bt_le_conn_param *param)
 		return -EALREADY;
 	}
 
-	if (!bt_dev.le.wl_entries) {
-		return -EINVAL;
-	}
-
 	/* Don't start initiator if we have general discovery procedure. */
 	conn = bt_conn_lookup_state_le(NULL, BT_CONN_CONNECT_SCAN);
 	if (conn) {
@@ -2163,6 +2168,10 @@ int bt_le_set_auto_conn(const bt_addr_le_t *addr,
 			const struct bt_le_conn_param *param)
 {
 	struct bt_conn *conn;
+
+	if (!atomic_test_bit(bt_dev.flags, BT_DEV_READY)) {
+		return -EAGAIN;
+	}
 
 	if (param && !bt_le_conn_params_valid(param)) {
 		return -EINVAL;
@@ -2292,8 +2301,35 @@ int bt_conn_le_conn_update(struct bt_conn *conn,
 	return bt_hci_cmd_send_sync(BT_HCI_OP_LE_CONN_UPDATE, buf, NULL);
 }
 
+#if defined(CONFIG_NET_BUF_LOG)
+struct net_buf *bt_conn_create_frag_timeout_debug(size_t reserve, s32_t timeout,
+						  const char *func, int line)
+#else
+struct net_buf *bt_conn_create_frag_timeout(size_t reserve, s32_t timeout)
+#endif
+{
+	struct net_buf_pool *pool = NULL;
+
+#if CONFIG_BT_L2CAP_TX_FRAG_COUNT > 0
+	pool = &frag_pool;
+#endif
+
+#if defined(CONFIG_NET_BUF_LOG)
+	return bt_conn_create_pdu_timeout_debug(pool, reserve, timeout,
+						func, line);
+#else
+	return bt_conn_create_pdu_timeout(pool, reserve, timeout);
+#endif /* CONFIG_NET_BUF_LOG */
+}
+
+#if defined(CONFIG_NET_BUF_LOG)
+struct net_buf *bt_conn_create_pdu_timeout_debug(struct net_buf_pool *pool,
+						 size_t reserve, s32_t timeout,
+						 const char *func, int line)
+#else
 struct net_buf *bt_conn_create_pdu_timeout(struct net_buf_pool *pool,
 					   size_t reserve, s32_t timeout)
+#endif
 {
 	struct net_buf *buf;
 
@@ -2308,13 +2344,27 @@ struct net_buf *bt_conn_create_pdu_timeout(struct net_buf_pool *pool,
 	}
 
 	if (IS_ENABLED(CONFIG_BT_DEBUG_CONN)) {
+#if defined(CONFIG_NET_BUF_LOG)
+		buf = net_buf_alloc_fixed_debug(pool, K_NO_WAIT, func, line);
+#else
 		buf = net_buf_alloc(pool, K_NO_WAIT);
+#endif
 		if (!buf) {
 			BT_WARN("Unable to allocate buffer with K_NO_WAIT");
+#if defined(CONFIG_NET_BUF_LOG)
+			buf = net_buf_alloc_fixed_debug(pool, timeout, func,
+							line);
+#else
 			buf = net_buf_alloc(pool, timeout);
+#endif
 		}
 	} else {
+#if defined(CONFIG_NET_BUF_LOG)
+		buf = net_buf_alloc_fixed_debug(pool, timeout, func,
+							line);
+#else
 		buf = net_buf_alloc(pool, timeout);
+#endif
 	}
 
 	if (!buf) {

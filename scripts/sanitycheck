@@ -193,6 +193,11 @@ from collections import OrderedDict
 from itertools import islice
 from pathlib import Path
 from distutils.spawn import find_executable
+try:
+    from anytree import Node, RenderTree, find
+except ImportError:
+    print("Install the anytree module to use the --test-tree option")
+
 
 ZEPHYR_BASE = os.getenv("ZEPHYR_BASE")
 if not ZEPHYR_BASE:
@@ -532,6 +537,16 @@ class BinaryHandler(Handler):
             except ProcessLookupError:
                 pass
 
+    def terminate(self, proc):
+        # encapsulate terminate functionality so we do it consistently where ever
+        # we might want to terminate the proc.  We need try_kill_process_by_pid
+        # because of both how newer ninja (1.6.0 or greater) and .NET / renode
+        # work.  Newer ninja's don't seem to pass SIGTERM down to the children
+        # so we need to use try_kill_process_by_pid.
+        self.try_kill_process_by_pid()
+        proc.terminate()
+        self.terminated = True
+
     def _output_reader(self, proc, harness):
         log_out_fp = open(self.log, "wt")
         for line in iter(proc.stdout.readline, b''):
@@ -545,8 +560,7 @@ class BinaryHandler(Handler):
                     #so let's give it up to 100ms to do so
                     proc.wait(0.1)
                 except subprocess.TimeoutExpired:
-                    proc.terminate()
-                    self.terminated = True
+                    self.terminate(proc)
                 break
 
         log_out_fp.close()
@@ -591,9 +605,7 @@ class BinaryHandler(Handler):
             t.start()
             t.join(self.timeout)
             if t.is_alive():
-                self.try_kill_process_by_pid()
-                proc.terminate()
-                self.terminated = True
+                self.terminate(proc)
                 t.join()
             proc.wait()
             self.returncode = proc.returncode
@@ -1580,6 +1592,15 @@ class TestCase(object):
                     subcases += _subcases
             except ValueError as e:
                 error("%s: can't find: %s" % (filename, e))
+        for filename in glob.glob(os.path.join(path, "*.c")):
+            try:
+                _subcases, warnings = self.scan_file(filename)
+                if warnings:
+                    error("%s: %s" % (filename, warnings))
+                if _subcases:
+                    subcases += _subcases
+            except ValueError as e:
+                error("%s: can't find: %s" % (filename, e))
         return subcases
 
     def parse_subcases(self, test_path):
@@ -1826,6 +1847,9 @@ class CMake():
                 '-DEXTRA_LDFLAGS="{}'.format(ldflags),
                 '-G{}'.format(get_generator()[1])
                 ]
+
+        if options.cmake_only:
+            cmake_args.append("-DCMAKE_EXPORT_COMPILE_COMMANDS=1")
 
         args = ["-D{}".format(a.replace('"', '')) for a in args]
         cmake_args.extend(args)
@@ -3117,15 +3141,6 @@ Artificially long but functional example:
         help="""Create a report with a custom name.
         """)
 
-    parser.add_argument("--detailed-report",
-        action="store",
-        metavar="FILENAME",
-        help="""Generate a junit report with detailed testcase results.
-        Unlike the CSV file produced by --testcase-report, this XML
-        report includes only tests which have run and none which were
-        merely built. If an image with multiple tests crashes early then
-        later tests are not accounted for either.""")
-
     parser.add_argument("--report-excluded",
             action="store_true",
             help="""List all tests that are never run based on current scope and
@@ -3165,6 +3180,9 @@ Artificially long but functional example:
         not their directories. For instance net.socket.getaddrinfo_ok
         and net.socket.fd_set belong to different directories.
         """)
+
+    case_select.add_argument("--test-tree", action="store_true",
+        help="""Output the testsuite in a tree form""")
 
     case_select.add_argument("--list-test-duplicates", action="store_true",
         help="""List tests with duplicate identifiers.
@@ -3412,6 +3430,9 @@ structure in the main Zephyr tree: boards/<arch>/<board_name>/""")
                         help="Path to the gcov tool to use for code coverage "
                         "reports")
 
+    parser.add_argument("--coverage-tool", choices=['lcov', 'gcovr'], default='lcov',
+                        help="Tool to use to generate coverage report.")
+
     return parser.parse_args()
 
 
@@ -3462,110 +3483,194 @@ def size_report(sc):
          (sc.rom_size, sc.ram_size))
     info("")
 
-def retrieve_gcov_data(intput_file):
-    if VERBOSE:
-        print("Working on %s" %intput_file)
-    extracted_coverage_info = {}
-    capture_data = False
-    capture_complete = False
-    with open(intput_file, 'r') as fp:
-        for line in fp.readlines():
-            if re.search("GCOV_COVERAGE_DUMP_START", line):
-                capture_data = True
-                continue
-            if re.search("GCOV_COVERAGE_DUMP_END", line):
-                capture_complete = True
-                break
-            # Loop until the coverage data is found.
-            if not capture_data:
-                continue
-            if line.startswith("*"):
-                sp = line.split("<")
-                if len(sp) > 1:
-                    # Remove the leading delimiter "*"
-                    file_name = sp[0][1:]
-                    # Remove the trailing new line char
-                    hex_dump = sp[1][:-1]
+class CoverageTool:
+    """ Base class for every supported coverage tool
+    """
+
+    def __init__(self):
+        self.gcov_tool = options.gcov_tool
+
+    @staticmethod
+    def factory(tool):
+        if tool == 'lcov':
+            return Lcov()
+        if tool == 'gcovr':
+            return Gcovr()
+        error("Unsupported coverage tool specified: {}".format(tool))
+
+    @staticmethod
+    def retrieve_gcov_data(intput_file):
+        if VERBOSE:
+            print("Working on %s" %intput_file)
+        extracted_coverage_info = {}
+        capture_data = False
+        capture_complete = False
+        with open(intput_file, 'r') as fp:
+            for line in fp.readlines():
+                if re.search("GCOV_COVERAGE_DUMP_START", line):
+                    capture_data = True
+                    continue
+                if re.search("GCOV_COVERAGE_DUMP_END", line):
+                    capture_complete = True
+                    break
+                # Loop until the coverage data is found.
+                if not capture_data:
+                    continue
+                if line.startswith("*"):
+                    sp = line.split("<")
+                    if len(sp) > 1:
+                        # Remove the leading delimiter "*"
+                        file_name = sp[0][1:]
+                        # Remove the trailing new line char
+                        hex_dump = sp[1][:-1]
+                    else:
+                        continue
                 else:
                     continue
-            else:
+                extracted_coverage_info.update({file_name:hex_dump})
+        if not capture_data:
+            capture_complete = True
+        return {'complete': capture_complete, 'data': extracted_coverage_info}
+
+    @staticmethod
+    def create_gcda_files(extracted_coverage_info):
+        if VERBOSE:
+            print("Generating gcda files")
+        for filename, hexdump_val in extracted_coverage_info.items():
+            # if kobject_hash is given for coverage gcovr fails
+            # hence skipping it problem only in gcovr v4.1
+            if "kobject_hash" in filename:
+                filename = (filename[:-4]) +"gcno"
+                try:
+                    os.remove(filename)
+                except Exception:
+                    pass
                 continue
-            extracted_coverage_info.update({file_name:hex_dump})
-    if not capture_data:
-        capture_complete = True
-    return {'complete': capture_complete, 'data': extracted_coverage_info}
 
-def create_gcda_files(extracted_coverage_info):
-    if VERBOSE:
-        print("Generating gcda files")
-    for filename, hexdump_val in extracted_coverage_info.items():
-        # if kobject_hash is given for coverage gcovr fails
-        # hence skipping it problem only in gcovr v4.1
-        if "kobject_hash" in filename:
-            filename = (filename[:-4]) +"gcno"
-            try:
-                os.remove(filename)
-            except Exception:
-                pass
-            continue
+            with open(filename, 'wb') as fp:
+                fp.write(bytes.fromhex(hexdump_val))
 
-        with open(filename, 'wb') as fp:
-            fp.write(bytes.fromhex(hexdump_val))
 
-def generate_coverage(outdir, ignores):
+    def generate(self, outdir):
+        for filename in glob.glob("%s/**/handler.log" % outdir, recursive=True):
+            gcov_data = self.__class__.retrieve_gcov_data(filename)
+            capture_complete = gcov_data['complete']
+            extracted_coverage_info = gcov_data['data']
+            if capture_complete:
+                self.__class__.create_gcda_files(extracted_coverage_info)
+                verbose("Gcov data captured: {}".format(filename))
+            else:
+                error("Gcov data capture incomplete: {}".format(filename))
 
-    for filename in glob.glob("%s/**/handler.log" %outdir, recursive=True):
-        gcov_data = retrieve_gcov_data(filename)
-        capture_complete = gcov_data['complete']
-        extracted_coverage_info = gcov_data['data']
-        if capture_complete:
-            create_gcda_files(extracted_coverage_info)
-            verbose("Gcov data captured: {}".format(filename))
-        else:
-            error("Gcov data capture incomplete: {}".format(filename))
+        with open(os.path.join(outdir, "coverage.log"), "a") as coveragelog:
+            ret = self._generate(outdir, coveragelog)
+            if ret == 0:
+                info("HTML report generated: {}".format(
+                    os.path.join(outdir, "coverage", "index.html")))
 
-    gcov_tool = options.gcov_tool
 
-    with open(os.path.join(outdir, "coverage.log"), "a") as coveragelog:
+class Lcov(CoverageTool):
+
+    def __init__(self):
+        super().__init__()
+        self.ignores = []
+
+    def add_ignore_file(self, pattern):
+        self.ignores.append('*' + pattern + '*')
+
+    def add_ignore_directory(self, pattern):
+        self.ignores.append(pattern + '/*')
+
+    def _generate(self, outdir, coveragelog):
         coveragefile = os.path.join(outdir, "coverage.info")
         ztestfile = os.path.join(outdir, "ztest.info")
-        subprocess.call(["lcov", "--gcov-tool", gcov_tool,
-                            "--capture", "--directory", outdir,
-                            "--rc", "lcov_branch_coverage=1",
-                            "--output-file", coveragefile], stdout=coveragelog)
+        subprocess.call(["lcov", "--gcov-tool", self.gcov_tool,
+                         "--capture", "--directory", outdir,
+                         "--rc", "lcov_branch_coverage=1",
+                         "--output-file", coveragefile], stdout=coveragelog)
         # We want to remove tests/* and tests/ztest/test/* but save tests/ztest
-        subprocess.call(["lcov", "--gcov-tool", gcov_tool, "--extract", coveragefile,
+        subprocess.call(["lcov", "--gcov-tool", self.gcov_tool, "--extract",
+                         coveragefile,
                          os.path.join(ZEPHYR_BASE, "tests", "ztest", "*"),
                          "--output-file", ztestfile,
                          "--rc", "lcov_branch_coverage=1"], stdout=coveragelog)
 
         if os.path.exists(ztestfile) and os.path.getsize(ztestfile) > 0:
-            subprocess.call(["lcov", "--gcov-tool", gcov_tool, "--remove", ztestfile,
+            subprocess.call(["lcov", "--gcov-tool", self.gcov_tool, "--remove",
+                             ztestfile,
                              os.path.join(ZEPHYR_BASE, "tests/ztest/test/*"),
                              "--output-file", ztestfile,
                              "--rc", "lcov_branch_coverage=1"],
-                             stdout=coveragelog)
+                            stdout=coveragelog)
             files = [coveragefile, ztestfile]
         else:
             files = [coveragefile]
 
-        for i in ignores:
+        for i in self.ignores:
             subprocess.call(
-                ["lcov", "--gcov-tool", gcov_tool, "--remove",
-                    coveragefile, i, "--output-file",
-                    coveragefile, "--rc", "lcov_branch_coverage=1"],
+                ["lcov", "--gcov-tool", self.gcov_tool, "--remove",
+                 coveragefile, i, "--output-file",
+                 coveragefile, "--rc", "lcov_branch_coverage=1"],
                 stdout=coveragelog)
 
-        #The --ignore-errors source option is added to avoid it exiting due to
-        #samples/application_development/external_lib/
-        ret = subprocess.call(["genhtml", "--legend", "--branch-coverage",
-                               "--ignore-errors", "source",
-                               "-output-directory",
-                               os.path.join(outdir, "coverage")] + files,
+        # The --ignore-errors source option is added to avoid it exiting due to
+        # samples/application_development/external_lib/
+        return subprocess.call(["genhtml", "--legend", "--branch-coverage",
+                                "--ignore-errors", "source",
+                                "-output-directory",
+                                os.path.join(outdir, "coverage")] + files,
                                stdout=coveragelog)
-        if ret==0:
-            info("HTML report generated: %s"%
-                 os.path.join(outdir, "coverage","index.html"))
+
+
+class Gcovr(CoverageTool):
+
+    def __init__(self):
+        super().__init__()
+        self.ignores = []
+
+    def add_ignore_file(self, pattern):
+        self.ignores.append('.*' + pattern + '.*')
+
+    def add_ignore_directory(self, pattern):
+        self.ignores.append(pattern + '/.*')
+
+    @staticmethod
+    def _interleave_list(prefix, list):
+        tuple_list = [(prefix, item) for item in list]
+        return [item for sublist in tuple_list for item in sublist]
+
+    def _generate(self, outdir, coveragelog):
+        coveragefile = os.path.join(outdir, "coverage.json")
+        ztestfile = os.path.join(outdir, "ztest.json")
+
+        excludes = Gcovr._interleave_list("-e", self.ignores)
+
+        # We want to remove tests/* and tests/ztest/test/* but save tests/ztest
+        subprocess.call(["gcovr", "-r", ZEPHYR_BASE, "--gcov-executable",
+                         self.gcov_tool, "-e", "tests/*"] + excludes +
+                        ["--json", "-o", coveragefile, outdir],
+                        stdout=coveragelog)
+
+        subprocess.call(["gcovr", "-r", ZEPHYR_BASE, "--gcov-executable",
+                         self.gcov_tool, "-f", "tests/ztest", "-e",
+                         "tests/ztest/test/*", "--json", "-o", ztestfile,
+                         outdir], stdout=coveragelog)
+
+        if os.path.exists(ztestfile) and os.path.getsize(ztestfile) > 0:
+            files = [coveragefile, ztestfile]
+        else:
+            files = [coveragefile]
+
+        subdir = os.path.join(outdir, "coverage")
+        os.makedirs(subdir, exist_ok=True)
+
+        tracefiles = self._interleave_list("--add-tracefile", files)
+
+        return subprocess.call(["gcovr", "-r", ZEPHYR_BASE, "--html",
+                                "--html-details"] + tracefiles +
+                               ["-o", os.path.join(subdir, "index.html")],
+                               stdout=coveragelog)
+
 
 def get_generator():
     if options.ninja:
@@ -3743,6 +3848,9 @@ def main():
         options.testcase_root = [os.path.join(ZEPHYR_BASE, "tests"),
                               os.path.join(ZEPHYR_BASE, "samples")]
 
+    if options.show_footprint or options.compare_report or options.release:
+        options.enable_size_report = True
+
     suite = TestSuite(options.board_root, options.testcase_root, options.outdir)
     suite.add_testcases()
     suite.add_configurations()
@@ -3789,7 +3897,7 @@ def main():
     if options.test:
         run_individual_tests = options.test
 
-    if options.list_tests or options.list_test_duplicates or options.sub_test:
+    if options.list_tests or options.test_tree or options.list_test_duplicates or options.sub_test:
         cnt = 0
         all_tests = suite.get_all_tests()
 
@@ -3820,11 +3928,46 @@ def main():
                 info("Tests not found")
                 return
 
-        elif options.list_tests:
-            for test in all_tests:
+        elif options.list_tests or options.test_tree:
+            if options.test_tree:
+                testsuite = Node("Testsuite")
+                samples = Node("Samples", parent=testsuite)
+                tests = Node("Tests", parent=testsuite)
+
+            for test in sorted(all_tests):
                 cnt = cnt + 1
-                print(" - {}".format(test))
-            print("{} total.".format(cnt))
+                if options.list_tests:
+                    print(" - {}".format(test))
+
+                if options.test_tree:
+                    if test.startswith("sample."):
+                        sec = test.split(".")
+                        area = find(samples, lambda node: node.name == sec[1] and node.parent == samples)
+                        if not area:
+                            area = Node(sec[1], parent=samples)
+
+                        t = Node(test, parent=area)
+                    else:
+                        sec = test.split(".")
+                        area = find(tests, lambda node: node.name == sec[0] and node.parent == tests)
+                        if not area:
+                            area = Node(sec[0], parent=tests)
+
+                        if area and len(sec) > 2:
+                            subarea = find(area, lambda node: node.name == sec[1] and node.parent == area)
+                            if not subarea:
+                                subarea = Node(sec[1], parent=area)
+
+                            t = Node(test, parent=subarea)
+
+            if options.list_tests:
+                print("{} total.".format(cnt))
+
+            if options.test_tree:
+                for pre, _, node in RenderTree(testsuite):
+                    print("%s%s" % (pre, node.name))
+
+
             return
 
     discards = []
@@ -3947,7 +4090,11 @@ def main():
                     "i586-zephyr-elf/bin/i586-zephyr-elf-gcov")
 
         info("Generating coverage files...")
-        generate_coverage(options.outdir, ["*generated*", "tests/*", "samples/*"])
+        coverage_tool = CoverageTool.factory(options.coverage_tool)
+        coverage_tool.add_ignore_file('generated')
+        coverage_tool.add_ignore_directory('tests')
+        coverage_tool.add_ignore_directory('samples')
+        coverage_tool.generate(options.outdir)
 
     if options.device_testing:
         print("\nHardware distribution summary:\n")

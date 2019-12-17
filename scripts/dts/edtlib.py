@@ -1604,11 +1604,6 @@ def _check_prop_type_and_default(prop_name, prop_type, required, default,
     if default is None:
         return
 
-    if required:
-        _err("'default:' for '{}' in 'properties:' in {} is meaningless in "
-             "combination with 'required: true'"
-             .format(prop_name, binding_path))
-
     if prop_type in {"boolean", "compound", "phandle", "phandles",
                      "phandle-array"}:
         _err("'default:' can't be combined with 'type: {}' for '{}' in "
@@ -2060,7 +2055,8 @@ def _check_dt(dt):
 
     # Check that 'status' has one of the values given in the devicetree spec.
 
-    ok_status = {"okay", "disabled", "reserved", "fail", "fail-sss"}
+    # Accept "ok" for backwards compatibility
+    ok_status = {"ok", "okay", "disabled", "reserved", "fail", "fail-sss"}
 
     for node in dt.node_iter():
         if "status" in node.props:

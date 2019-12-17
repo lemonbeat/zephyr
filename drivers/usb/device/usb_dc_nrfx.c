@@ -452,7 +452,7 @@ static inline struct usbd_event *usbd_evt_alloc(void)
 	if (ret < 0) {
 		LOG_ERR("USBD event allocation failed!");
 
-		/* This should NOT happen in a properly designed system.
+		/*
 		 * Allocation may fail if workqueue thread is starved or event
 		 * queue size is too small (CONFIG_USB_NRFX_EVT_QUEUE_SIZE).
 		 * Wipe all events, free the space and schedule
@@ -464,9 +464,6 @@ static inline struct usbd_event *usbd_evt_alloc(void)
 					       sizeof(struct usbd_event),
 					       K_NO_WAIT);
 		if (ret < 0) {
-			/* This should never fail in a properly
-			 * operating system.
-			 */
 			LOG_ERR("USBD event memory corrupted");
 			__ASSERT_NO_MSG(0);
 			return NULL;
@@ -1246,6 +1243,7 @@ static void usbd_work_handler(struct k_work *item)
 	while ((ev = usbd_evt_get()) != NULL) {
 		if (!dev_ready() && ev->evt_type != USBD_EVT_POWER) {
 			/* Drop non-power events when cable is detached. */
+			usbd_evt_free(ev);
 			continue;
 		}
 
