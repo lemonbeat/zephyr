@@ -65,8 +65,10 @@ struct ppp_driver_context {
 
 	enum ppp_driver_state state;
 
+#if defined(CONFIG_PPP_CLIENT_CLIENTSERVER)
 	/* correctly received CLIENT bytes */
 	u8_t client_index;
+#endif
 
 	u8_t init_done : 1;
 	u8_t next_escaped : 1;
@@ -196,6 +198,7 @@ static int ppp_send_bytes(struct ppp_driver_context *ppp,
 	return off;
 }
 
+#if defined(CONFIG_PPP_CLIENT_CLIENTSERVER)
 static void ppp_handle_client(struct ppp_driver_context *ppp, u8_t byte)
 {
 	static const char *client = "CLIENT";
@@ -223,6 +226,7 @@ static void ppp_handle_client(struct ppp_driver_context *ppp, u8_t byte)
 	}
 
 }
+#endif
 
 static int ppp_input_byte(struct ppp_driver_context *ppp, u8_t byte)
 {
@@ -235,8 +239,10 @@ static int ppp_input_byte(struct ppp_driver_context *ppp, u8_t byte)
 			/* Note that we do not save the sync flag */
 			LOG_DBG("Sync byte (0x%02x) start", byte);
 			ppp_change_state(ppp, STATE_HDLC_FRAME_ADDRESS);
+#if defined(CONFIG_PPP_CLIENT_CLIENTSERVER)
 		} else {
 			ppp_handle_client(ppp, byte);
+#endif
 		}
 
 		break;
