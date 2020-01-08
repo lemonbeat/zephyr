@@ -65,6 +65,9 @@ struct ppp_driver_context {
 
 	enum ppp_driver_state state;
 
+	/* correctly received CLIENT bytes */
+	u8_t client_index;
+
 	u8_t init_done : 1;
 	u8_t next_escaped : 1;
 };
@@ -193,6 +196,34 @@ static int ppp_send_bytes(struct ppp_driver_context *ppp,
 	return off;
 }
 
+static void ppp_handle_client(struct ppp_driver_context *ppp, u8_t byte)
+{
+	static const char *client = "CLIENT";
+	static const char *clientserver = "CLIENTSERVER";
+	int offset;
+
+	if (ppp->client_index >= strlen(client)) {
+		ppp->client_index = 0;
+	}
+
+	if (byte != client[ppp->client_index]) {
+		ppp->client_index = 0;
+		if (byte != client[ppp->client_index]) {
+			return;
+		}
+	}
+
+	++ppp->client_index;
+	if (ppp->client_index >= strlen(client)) {
+		LOG_DBG("Received complete CLIENT string");
+		offset = ppp_send_bytes(ppp, clientserver, strlen(clientserver),
+					0);
+		(void)ppp_send_flush(ppp, offset);
+		ppp->client_index = 0;
+	}
+
+}
+
 static int ppp_input_byte(struct ppp_driver_context *ppp, u8_t byte)
 {
 	int ret = -EAGAIN;
@@ -204,6 +235,8 @@ static int ppp_input_byte(struct ppp_driver_context *ppp, u8_t byte)
 			/* Note that we do not save the sync flag */
 			LOG_DBG("Sync byte (0x%02x) start", byte);
 			ppp_change_state(ppp, STATE_HDLC_FRAME_ADDRESS);
+		} else {
+			ppp_handle_client(ppp, byte);
 		}
 
 		break;
@@ -574,6 +607,7 @@ static int ppp_driver_init(struct device *dev)
 
 	ppp->pkt = NULL;
 	ppp_change_state(ppp, STATE_HDLC_FRAME_START);
+	ppp->client_index = 0;
 
 	return 0;
 }
