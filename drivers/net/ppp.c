@@ -168,6 +168,31 @@ static void ppp_change_state(struct ppp_driver_context *ctx,
 	ctx->state = new_state;
 }
 
+static int ppp_send_flush(struct ppp_driver_context *ppp, int off)
+{
+	if (!IS_ENABLED(CONFIG_NET_TEST)) {
+		uart_pipe_send(ppp->send_buf, off);
+	}
+
+	return 0;
+}
+
+static int ppp_send_bytes(struct ppp_driver_context *ppp,
+			  const u8_t *data, int len, int off)
+{
+	int i;
+
+	for (i = 0; i < len; i++) {
+		ppp->send_buf[off++] = data[i];
+
+		if (off >= sizeof(ppp->send_buf)) {
+			off = ppp_send_flush(ppp, off);
+		}
+	}
+
+	return off;
+}
+
 static int ppp_input_byte(struct ppp_driver_context *ppp, u8_t byte)
 {
 	int ret = -EAGAIN;
@@ -432,31 +457,6 @@ static bool calc_fcs(struct net_pkt *pkt, u16_t *fcs, u16_t protocol)
 	*fcs = crc;
 
 	return true;
-}
-
-static int ppp_send_flush(struct ppp_driver_context *ppp, int off)
-{
-	if (!IS_ENABLED(CONFIG_NET_TEST)) {
-		uart_pipe_send(ppp->send_buf, off);
-	}
-
-	return 0;
-}
-
-static int ppp_send_bytes(struct ppp_driver_context *ppp,
-			  const u8_t *data, int len, int off)
-{
-	int i;
-
-	for (i = 0; i < len; i++) {
-		ppp->send_buf[off++] = data[i];
-
-		if (off >= sizeof(ppp->send_buf)) {
-			off = ppp_send_flush(ppp, off);
-		}
-	}
-
-	return off;
 }
 
 static u16_t ppp_escape_byte(u8_t byte, int *offset)
