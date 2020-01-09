@@ -90,7 +90,7 @@ struct bt_l2cap_chan {
 	/** Channel connection reference */
 	struct bt_conn			*conn;
 	/** Channel operations reference */
-	struct bt_l2cap_chan_ops	*ops;
+	const struct bt_l2cap_chan_ops	*ops;
 	sys_snode_t			node;
 	bt_l2cap_chan_destroy_t		destroy;
 	/* Response Timeout eXpired (RTX) timer */
@@ -118,7 +118,7 @@ struct bt_l2cap_le_endpoint {
 	/** Endpoint initial credits */
 	u16_t				init_credits;
 	/** Endpoint credits */
-	struct k_sem			credits;
+	atomic_t			credits;
 };
 
 /** @brief LE L2CAP Channel structure. */

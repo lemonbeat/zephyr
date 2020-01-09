@@ -4935,7 +4935,7 @@ static inline void isr_radio_state_close(void)
 
 	event_inactive(0, 0, 0, NULL);
 
-	err = clock_control_off(_radio.hf_clock, NULL);
+	err = clock_control_off(_radio.hf_clock, CLOCK_CONTROL_NRF_SUBSYS_HF);
 	if (!err) {
 		DEBUG_RADIO_XTAL(0);
 	}
@@ -5216,7 +5216,7 @@ static void mayfly_xtal_start(void *params)
 	ARG_UNUSED(params);
 
 	/* turn on 16MHz clock, non-blocking mode. */
-	err = clock_control_on(_radio.hf_clock, NULL);
+	err = clock_control_on(_radio.hf_clock, CLOCK_CONTROL_NRF_SUBSYS_HF);
 	LL_ASSERT(!err || (err == -EINPROGRESS));
 
 	DEBUG_RADIO_XTAL(1);
@@ -5247,7 +5247,7 @@ static void mayfly_xtal_stop(void *params)
 
 	ARG_UNUSED(params);
 
-	err = clock_control_off(_radio.hf_clock, NULL);
+	err = clock_control_off(_radio.hf_clock, CLOCK_CONTROL_NRF_SUBSYS_HF);
 	if (!err) {
 		DEBUG_RADIO_XTAL(0);
 	}
@@ -5264,12 +5264,12 @@ static void k32src_wait(void)
 	}
 	done = true;
 
-	struct device *lf_clock = device_get_binding(
-		DT_INST_0_NORDIC_NRF_CLOCK_LABEL "_32K");
+	struct device *clock = device_get_binding(
+		DT_INST_0_NORDIC_NRF_CLOCK_LABEL);
 
-	LL_ASSERT(lf_clock);
+	LL_ASSERT(clock);
 
-	while (clock_control_on(lf_clock, (void *)CLOCK_CONTROL_NRF_K32SRC)) {
+	while (clock_control_on(clock, CLOCK_CONTROL_NRF_SUBSYS_LF)) {
 		DEBUG_CPU_SLEEP(1);
 		cpu_sleep();
 		DEBUG_CPU_SLEEP(0);
@@ -6603,7 +6603,7 @@ again:
 	 * It shall not be a sequence that differs from the advertising channel
 	 * packets Access Address by only one bit.
 	 */
-	adv_aa_check = access_addr ^ 0x8e89bed6;
+	adv_aa_check = access_addr ^ PDU_AC_ACCESS_ADDR;
 	if (util_ones_count_get((u8_t *)&adv_aa_check,
 				sizeof(adv_aa_check)) <= 1) {
 		goto again;
@@ -6719,7 +6719,7 @@ static void event_adv(u32_t ticks_at_expire, u32_t remainder,
 		      u16_t lazy, void *context)
 {
 	u32_t remainder_us;
-	u32_t aa = 0x8e89bed6;
+	u32_t aa = PDU_AC_ACCESS_ADDR;
 
 	ARG_UNUSED(remainder);
 	ARG_UNUSED(lazy);
@@ -7151,7 +7151,7 @@ static void event_scan(u32_t ticks_at_expire, u32_t remainder, u16_t lazy,
 {
 	u32_t remainder_us;
 	u32_t ret;
-	u32_t aa = 0x8e89bed6;
+	u32_t aa = PDU_AC_ACCESS_ADDR;
 
 	ARG_UNUSED(remainder);
 	ARG_UNUSED(lazy);
@@ -7915,12 +7915,8 @@ static inline void event_fex_prep(struct connection *conn)
 		pdu_ctrl_rx->llctrl.opcode = PDU_DATA_LLCTRL_TYPE_FEATURE_RSP;
 		(void)memset(&pdu_ctrl_rx->llctrl.feature_rsp.features[0], 0x00,
 			     sizeof(pdu_ctrl_rx->llctrl.feature_rsp.features));
-		pdu_ctrl_rx->llctrl.feature_req.features[0] =
-			conn->llcp_feature.features & 0xFF;
-		pdu_ctrl_rx->llctrl.feature_req.features[1] =
-			(conn->llcp_feature.features >> 8) & 0xFF;
-		pdu_ctrl_rx->llctrl.feature_req.features[2] =
-			(conn->llcp_feature.features >> 16) & 0xFF;
+		sys_put_le24(conn->llcp_feature.features,
+			     pdu_ctrl_rx->llctrl.feature_req.features);
 
 		/* enqueue feature rsp structure into rx queue */
 		packet_rx_enqueue();
@@ -7950,12 +7946,8 @@ static inline void event_fex_prep(struct connection *conn)
 		(void)memset(&pdu_ctrl_tx->llctrl.feature_req.features[0],
 			     0x00,
 			     sizeof(pdu_ctrl_tx->llctrl.feature_req.features));
-		pdu_ctrl_tx->llctrl.feature_req.features[0] =
-			conn->llcp_feature.features & 0xFF;
-		pdu_ctrl_tx->llctrl.feature_req.features[1] =
-			(conn->llcp_feature.features >> 8) & 0xFF;
-		pdu_ctrl_tx->llctrl.feature_req.features[2] =
-			(conn->llcp_feature.features >> 16) & 0xFF;
+		sys_put_le24(conn->llcp_feature.features,
+			     pdu_ctrl_tx->llctrl.feature_req.features);
 
 		ctrl_tx_enqueue(conn, node_tx);
 
@@ -8405,8 +8397,13 @@ static inline int event_len_prep(struct connection *conn)
 		   ) {
 			lr->max_rx_time =
 				RADIO_PKT_TIME(LL_LENGTH_OCTETS_RX_MAX, 0);
+#if defined(CONFIG_BT_CTLR_PHY)
+			lr->max_tx_time = conn->default_tx_time;
+#else /* !CONFIG_BT_CTLR_PHY */
 			lr->max_tx_time =
 				RADIO_PKT_TIME(conn->default_tx_octets, 0);
+#endif /* !CONFIG_BT_CTLR_PHY */
+
 #if defined(CONFIG_BT_CTLR_PHY)
 #if defined(CONFIG_BT_CTLR_PHY_CODED)
 		} else if (conn->llcp_feature.features &
@@ -10846,12 +10843,8 @@ static u8_t feature_rsp_send(struct connection *conn,
 	pdu_ctrl_tx->llctrl.opcode = PDU_DATA_LLCTRL_TYPE_FEATURE_RSP;
 	(void)memset(&pdu_ctrl_tx->llctrl.feature_rsp.features[0], 0x00,
 		     sizeof(pdu_ctrl_tx->llctrl.feature_rsp.features));
-	pdu_ctrl_tx->llctrl.feature_req.features[0] =
-		conn->llcp_feature.features & 0xFF;
-	pdu_ctrl_tx->llctrl.feature_req.features[1] =
-		(conn->llcp_feature.features >> 8) & 0xFF;
-	pdu_ctrl_tx->llctrl.feature_req.features[2] =
-		(conn->llcp_feature.features >> 16) & 0xFF;
+	sys_put_le24(conn->llcp_feature.features,
+		     pdu_ctrl_tx->llctrl.feature_req.features);
 
 	ctrl_tx_sec_enqueue(conn, node_tx);
 

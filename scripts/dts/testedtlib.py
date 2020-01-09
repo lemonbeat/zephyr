@@ -42,6 +42,7 @@ def run():
     verify_eq(warnings.getvalue(), """\
 warning: The 'properties: compatible: constraint: ...' way of specifying the compatible in test-bindings/deprecated.yaml is deprecated. Put 'compatible: "deprecated"' at the top level of the binding instead.
 warning: the 'inherits:' syntax in test-bindings/deprecated.yaml is deprecated and will be removed - please use 'include: foo.yaml' or 'include: [foo.yaml, bar.yaml]' instead
+warning: 'title:' in test-bindings/deprecated.yaml is deprecated and will be removed (and was never used). Just put a 'description:' that describes the device instead. Use other bindings as a reference, and note that all bindings were updated recently. Think about what information would be useful to other people (e.g. explanations of acronyms, or datasheet links), and put that in as well. The description text shows up as a comment in the generated header. See yaml-multiline.info for how to deal with multiple lines. You probably want 'description: |'.
 warning: please put 'required: true' instead of 'category: required' in properties: required: ...' in test-bindings/deprecated.yaml - 'category' will be removed
 warning: please put 'required: false' instead of 'category: optional' in properties: optional: ...' in test-bindings/deprecated.yaml - 'category' will be removed
 warning: 'sub-node: properties: ...' in test-bindings/deprecated.yaml is deprecated and will be removed - please give a full binding for the child node in 'child-binding:' instead (see binding-template.yaml)
@@ -118,14 +119,32 @@ warning: "#cells:" in test-bindings/deprecated.yaml is deprecated and will be re
                  "OrderedDict([('foo', <Property, name: foo, type: int, value: 0>), ('bar', <Property, name: bar, type: int, value: 1>), ('baz', <Property, name: baz, type: int, value: 2>), ('qaz', <Property, name: qaz, type: int, value: 3>)])")
 
     #
-    # Test 'child/parent-bus:'
+    # Test 'bus:' and 'on-bus:'
     #
 
+    verify_eq(edt.get_node("/buses/foo-bus").bus, "foo")
+    # foo-bus does not itself appear on a bus
+    verify_eq(edt.get_node("/buses/foo-bus").on_bus, None)
+    verify_eq(edt.get_node("/buses/foo-bus").bus_node, None)
+
+    # foo-bus/node is not a bus node...
+    verify_eq(edt.get_node("/buses/foo-bus/node").bus, None)
+    # ...but is on a bus
+    verify_eq(edt.get_node("/buses/foo-bus/node").on_bus, "foo")
+    verify_eq(edt.get_node("/buses/foo-bus/node").bus_node.path,
+                           "/buses/foo-bus")
+
+    # Same compatible string, but different bindings from being on different
+    # buses
     verify_streq(edt.get_node("/buses/foo-bus/node").binding_path,
                  "test-bindings/device-on-foo-bus.yaml")
-
     verify_streq(edt.get_node("/buses/bar-bus/node").binding_path,
                  "test-bindings/device-on-bar-bus.yaml")
+
+    # foo-bus/node/nested also appears on the foo-bus bus
+    verify_eq(edt.get_node("/buses/foo-bus/node/nested").on_bus, "foo")
+    verify_streq(edt.get_node("/buses/foo-bus/node/nested").binding_path,
+                 "test-bindings/device-on-foo-bus.yaml")
 
     #
     # Test 'child-binding:'
@@ -191,6 +210,9 @@ warning: "#cells:" in test-bindings/deprecated.yaml is deprecated and will be re
 
     verify_streq(edt.get_node("/props").props["foo-gpios"],
                  "<Property, name: foo-gpios, type: phandle-array, value: [<ControllerAndData, controller: <Node /props/ctrl-1 in 'test.dts', binding test-bindings/phandle-array-controller-1.yaml>, data: OrderedDict([('gpio-one', 1)])>]>")
+
+    verify_streq(edt.get_node("/props").props["path"],
+                 "<Property, name: path, type: path, value: <Node /props/ctrl-1 in 'test.dts', binding test-bindings/phandle-array-controller-1.yaml>>")
 
     #
     # Test <prefix>-map, via gpio-map (the most common case)

@@ -1061,9 +1061,6 @@ if(CONFIG_USERSPACE)
   if(CONFIG_NEWLIB_LIBC_NANO)
     set(NEWLIB_PART -l libc_nano.a z_libc_partition)
   endif()
-  if(CONFIG_MBEDTLS)
-    set(MBEDTLS_PART -l lib..__modules__crypto__mbedtls.a k_mbedtls_partition)
-  endif()
 
   add_custom_command(
     OUTPUT ${APP_SMEM_UNALIGNED_LD}
@@ -1071,7 +1068,7 @@ if(CONFIG_USERSPACE)
     ${ZEPHYR_BASE}/scripts/gen_app_partitions.py
     -d ${OBJ_FILE_DIR}
     -o ${APP_SMEM_UNALIGNED_LD}
-    ${NEWLIB_PART} ${MBEDTLS_PART}
+    ${NEWLIB_PART}
     $<TARGET_PROPERTY:zephyr_property_target,COMPILE_OPTIONS>
     $<$<BOOL:${CMAKE_VERBOSE_MAKEFILE}>:--verbose>
     DEPENDS
@@ -1122,7 +1119,7 @@ if(CONFIG_USERSPACE)
     ${ZEPHYR_BASE}/scripts/gen_app_partitions.py
     -e $<TARGET_FILE:app_smem_unaligned_prebuilt>
     -o ${APP_SMEM_ALIGNED_LD}
-    ${NEWLIB_PART} ${MBEDTLS_PART}
+    ${NEWLIB_PART}
     $<TARGET_PROPERTY:zephyr_property_target,COMPILE_OPTIONS>
     $<$<BOOL:${CMAKE_VERBOSE_MAKEFILE}>:--verbose>
     DEPENDS
@@ -1482,6 +1479,8 @@ if(HEX_FILES_TO_MERGE)
 
   add_custom_target(mergehex ALL DEPENDS ${MERGED_HEX_NAME})
   list(APPEND FLASH_DEPS mergehex)
+
+  message(VERBOSE "Merging hex files: ${HEX_FILES_TO_MERGE}")
 endif()
 
 if(EMU_PLATFORM)
@@ -1502,12 +1501,7 @@ add_subdirectory(cmake/reports)
 
 if(NOT CONFIG_TEST)
 if(CONFIG_ASSERT AND (NOT CONFIG_FORCE_NO_ASSERT))
-  message(WARNING "
-      ------------------------------------------------------------
-      --- WARNING:  __ASSERT() statements are globally ENABLED ---
-      --- The kernel will run more slowly and use more memory  ---
-      ------------------------------------------------------------"
-  )
+  message(WARNING "__ASSERT() statements are globally ENABLED")
 endif()
 endif()
 
@@ -1527,7 +1521,7 @@ set(build_types None Debug Release RelWithDebInfo MinSizeRel)
 if((CMAKE_BUILD_TYPE IN_LIST build_types) AND (NOT NO_BUILD_TYPE_WARNING))
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_uppercase)
 
-  if(NOT (${OPTIMIZATION_FLAG} IN_LIST ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE_uppercase}}))
+  if(NOT (${OPTIMIZATION_FLAG} IN_LIST CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE_uppercase}))
     message(WARNING "
       The CMake build type was set to '${CMAKE_BUILD_TYPE}', but the optimization flag was set to '${OPTIMIZATION_FLAG}'.
       This may be intentional and the warning can be turned off by setting the CMake variable 'NO_BUILD_TYPE_WARNING'"

@@ -1,7 +1,7 @@
 /* buf.c - Buffer management */
 
 /*
- * Copyright (c) 2015 Intel Corporation
+ * Copyright (c) 2015-2019 Intel Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,17 +26,15 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define NET_BUF_ERR(fmt, ...) LOG_ERR(fmt, ##__VA_ARGS__)
 #define NET_BUF_WARN(fmt, ...) LOG_WRN(fmt, ##__VA_ARGS__)
 #define NET_BUF_INFO(fmt, ...) LOG_INF(fmt, ##__VA_ARGS__)
-#define NET_BUF_ASSERT(cond) do { if (!(cond)) {			  \
-			NET_BUF_ERR("assert: '" #cond "' failed"); \
-		} } while (0)
 #else
 
 #define NET_BUF_DBG(fmt, ...)
 #define NET_BUF_ERR(fmt, ...)
 #define NET_BUF_WARN(fmt, ...)
 #define NET_BUF_INFO(fmt, ...)
-#define NET_BUF_ASSERT(cond)
 #endif /* CONFIG_NET_BUF_LOG */
+
+#define NET_BUF_ASSERT(cond, ...) __ASSERT(cond, "" __VA_ARGS__)
 
 #if CONFIG_NET_BUF_WARN_ALLOC_INTERVAL > 0
 #define WARN_ALLOC_INTERVAL K_SECONDS(CONFIG_NET_BUF_WARN_ALLOC_INTERVAL)
@@ -313,6 +311,9 @@ success:
 	NET_BUF_DBG("allocated buf %p", buf);
 
 	if (size) {
+#if __ASSERT_ON
+		size_t req_size = size;
+#endif
 		if (timeout != K_NO_WAIT && timeout != K_FOREVER) {
 			u32_t diff = k_uptime_get_32() - alloc_start;
 
@@ -326,6 +327,8 @@ success:
 			net_buf_destroy(buf);
 			return NULL;
 		}
+
+		NET_BUF_ASSERT(req_size <= size);
 	} else {
 		buf->__buf = NULL;
 	}
@@ -340,7 +343,6 @@ success:
 	pool->avail_count--;
 	NET_BUF_ASSERT(pool->avail_count >= 0);
 #endif
-
 	return buf;
 }
 
@@ -904,6 +906,62 @@ void net_buf_simple_push_u8(struct net_buf_simple *buf, u8_t val)
 	u8_t *data = net_buf_simple_push(buf, 1);
 
 	*data = val;
+}
+
+void net_buf_simple_push_le24(struct net_buf_simple *buf, u32_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %u", buf, val);
+
+	sys_put_le24(val, net_buf_simple_push(buf, 3));
+}
+
+void net_buf_simple_push_be24(struct net_buf_simple *buf, u32_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %u", buf, val);
+
+	sys_put_be24(val, net_buf_simple_push(buf, 3));
+}
+
+void net_buf_simple_push_le32(struct net_buf_simple *buf, u32_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %u", buf, val);
+
+	sys_put_le32(val, net_buf_simple_push(buf, sizeof(val)));
+}
+
+void net_buf_simple_push_be32(struct net_buf_simple *buf, u32_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %u", buf, val);
+
+	sys_put_be32(val, net_buf_simple_push(buf, sizeof(val)));
+}
+
+void net_buf_simple_push_le48(struct net_buf_simple *buf, u64_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %" PRIu64, buf, val);
+
+	sys_put_le48(val, net_buf_simple_push(buf, 6));
+}
+
+void net_buf_simple_push_be48(struct net_buf_simple *buf, u64_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %" PRIu64, buf, val);
+
+	sys_put_be48(val, net_buf_simple_push(buf, 6));
+}
+
+void net_buf_simple_push_le64(struct net_buf_simple *buf, u64_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %" PRIu64, buf, val);
+
+	sys_put_le64(val, net_buf_simple_push(buf, sizeof(val)));
+}
+
+void net_buf_simple_push_be64(struct net_buf_simple *buf, u64_t val)
+{
+	NET_BUF_SIMPLE_DBG("buf %p val %" PRIu64, buf, val);
+
+	sys_put_be64(val, net_buf_simple_push(buf, sizeof(val)));
 }
 
 void *net_buf_simple_pull(struct net_buf_simple *buf, size_t len)

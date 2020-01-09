@@ -644,14 +644,44 @@ typedef void (*k_thread_user_cb_t)(const struct k_thread *thread,
  * @param user_data Pointer to user data.
  *
  * @note CONFIG_THREAD_MONITOR must be set for this function
- * to be effective. Also this API uses irq_lock to protect the
- * _kernel.threads list which means creation of new threads and
- * terminations of existing threads are blocked until this
- * API returns.
+ * to be effective.
+ * @note This API uses @ref k_spin_lock to protect the _kernel.threads
+ * list which means creation of new threads and terminations of existing
+ * threads are blocked until this API returns.
  *
  * @return N/A
  */
 extern void k_thread_foreach(k_thread_user_cb_t user_cb, void *user_data);
+
+/**
+ * @brief Iterate over all the threads in the system without locking.
+ *
+ * This routine works exactly the same like @ref k_thread_foreach
+ * but unlocks interrupts when user_cb is executed.
+ *
+ * @param user_cb Pointer to the user callback function.
+ * @param user_data Pointer to user data.
+ *
+ * @note CONFIG_THREAD_MONITOR must be set for this function
+ * to be effective.
+ * @note This API uses @ref k_spin_lock only when accessing the _kernel.threads
+ * queue elements. It unlocks it during user callback function processing.
+ * If a new task is created when this @c foreach function is in progress,
+ * the added new task would not be included in the enumeration.
+ * If a task is aborted during this enumeration, there would be a race here
+ * and there is a possibility that this aborted task would be included in the
+ * enumeration.
+ * @note If the task is aborted and the memory occupied by its @c k_thread
+ * structure is reused when this @c k_thread_foreach_unlocked is in progress
+ * it might even lead to the system behave unstable.
+ * This function may never return, as it would follow some @c next task
+ * pointers treating given pointer as a pointer to the k_thread structure
+ * while it is something different right now.
+ * Do not reuse the memory that was occupied by k_thread structure of aborted
+ * task if it was aborted after this function was called in any context.
+ */
+extern void k_thread_foreach_unlocked(
+	k_thread_user_cb_t user_cb, void *user_data);
 
 /** @} */
 
@@ -1264,6 +1294,24 @@ extern bool k_is_in_isr(void);
  * @return Non-zero if invoked by a preemptible thread.
  */
 __syscall int k_is_preempt_thread(void);
+
+/**
+ * @brief Test whether startup is in the before-main-task phase.
+ *
+ * This routine allows the caller to customize its actions, depending on
+ * whether it being invoked before the kernel is fully active.
+ *
+ * @note Can be called by ISRs.
+ *
+ * @return true if invoked before post-kernel initialization
+ * @return false if invoked during/after post-kernel initialization
+ */
+static inline bool k_is_pre_kernel(void)
+{
+	extern bool z_sys_post_kernel; /* in init.c */
+
+	return !z_sys_post_kernel;
+}
 
 /**
  * @}
@@ -3624,7 +3672,7 @@ void k_msgq_init(struct k_msgq *q, char *buffer, size_t msg_size,
  * k_msgq_cleanup(), or if userspace is enabled and the msgq object loses
  * all of its references.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  * @param msg_size Message size (in bytes).
  * @param max_msgs Maximum number of messages that can be queued.
  *
@@ -3633,16 +3681,18 @@ void k_msgq_init(struct k_msgq *q, char *buffer, size_t msg_size,
  *	an integer overflow.
  * @req K-MSGQ-002
  */
-__syscall int k_msgq_alloc_init(struct k_msgq *q, size_t msg_size,
+__syscall int k_msgq_alloc_init(struct k_msgq *msgq, size_t msg_size,
 				u32_t max_msgs);
 
 /**
- * @brief Cleanup message queue
+ * @brief Release allocated buffer for a queue
  *
  * Releases memory allocated for the ring buffer.
- * @param q
+ *
+ * @param msgq message queue to cleanup
+ *
  */
-void k_msgq_cleanup(struct k_msgq *q);
+void k_msgq_cleanup(struct k_msgq *msgq);
 
 /**
  * @brief Send a message to a message queue.
@@ -3651,7 +3701,7 @@ void k_msgq_cleanup(struct k_msgq *q);
  *
  * @note Can be called by ISRs.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  * @param data Pointer to the message.
  * @param timeout Non-negative waiting period to add the message (in
  *                milliseconds), or one of the special values K_NO_WAIT and
@@ -3662,7 +3712,7 @@ void k_msgq_cleanup(struct k_msgq *q);
  * @retval -EAGAIN Waiting period timed out.
  * @req K-MSGQ-002
  */
-__syscall int k_msgq_put(struct k_msgq *q, void *data, s32_t timeout);
+__syscall int k_msgq_put(struct k_msgq *msgq, void *data, s32_t timeout);
 
 /**
  * @brief Receive a message from a message queue.
@@ -3672,7 +3722,7 @@ __syscall int k_msgq_put(struct k_msgq *q, void *data, s32_t timeout);
  *
  * @note Can be called by ISRs, but @a timeout must be set to K_NO_WAIT.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  * @param data Address of area to hold the received message.
  * @param timeout Non-negative waiting period to receive the message (in
  *                milliseconds), or one of the special values K_NO_WAIT and
@@ -3683,7 +3733,7 @@ __syscall int k_msgq_put(struct k_msgq *q, void *data, s32_t timeout);
  * @retval -EAGAIN Waiting period timed out.
  * @req K-MSGQ-002
  */
-__syscall int k_msgq_get(struct k_msgq *q, void *data, s32_t timeout);
+__syscall int k_msgq_get(struct k_msgq *msgq, void *data, s32_t timeout);
 
 /**
  * @brief Peek/read a message from a message queue.
@@ -3693,14 +3743,14 @@ __syscall int k_msgq_get(struct k_msgq *q, void *data, s32_t timeout);
  *
  * @note Can be called by ISRs.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  * @param data Address of area to hold the message read from the queue.
  *
  * @retval 0 Message read.
  * @retval -ENOMSG Returned when the queue has no message.
  * @req K-MSGQ-002
  */
-__syscall int k_msgq_peek(struct k_msgq *q, void *data);
+__syscall int k_msgq_peek(struct k_msgq *msgq, void *data);
 
 /**
  * @brief Purge a message queue.
@@ -3709,12 +3759,12 @@ __syscall int k_msgq_peek(struct k_msgq *q, void *data);
  * buffer. Any threads that are blocked waiting to send a message to the
  * message queue are unblocked and see an -ENOMSG error code.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  *
  * @return N/A
  * @req K-MSGQ-002
  */
-__syscall void k_msgq_purge(struct k_msgq *q);
+__syscall void k_msgq_purge(struct k_msgq *msgq);
 
 /**
  * @brief Get the amount of free space in a message queue.
@@ -3722,30 +3772,31 @@ __syscall void k_msgq_purge(struct k_msgq *q);
  * This routine returns the number of unused entries in a message queue's
  * ring buffer.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  *
  * @return Number of unused ring buffer entries.
  * @req K-MSGQ-002
  */
-__syscall u32_t k_msgq_num_free_get(struct k_msgq *q);
+__syscall u32_t k_msgq_num_free_get(struct k_msgq *msgq);
 
 /**
  * @brief Get basic attributes of a message queue.
  *
  * This routine fetches basic attributes of message queue into attr argument.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  * @param attrs pointer to message queue attribute structure.
  *
  * @return N/A
  * @req K-MSGQ-003
  */
-__syscall void  k_msgq_get_attrs(struct k_msgq *q, struct k_msgq_attrs *attrs);
+__syscall void  k_msgq_get_attrs(struct k_msgq *msgq,
+				 struct k_msgq_attrs *attrs);
 
 
-static inline u32_t z_impl_k_msgq_num_free_get(struct k_msgq *q)
+static inline u32_t z_impl_k_msgq_num_free_get(struct k_msgq *msgq)
 {
-	return q->max_msgs - q->used_msgs;
+	return msgq->max_msgs - msgq->used_msgs;
 }
 
 /**
@@ -3753,16 +3804,16 @@ static inline u32_t z_impl_k_msgq_num_free_get(struct k_msgq *q)
  *
  * This routine returns the number of messages in a message queue's ring buffer.
  *
- * @param q Address of the message queue.
+ * @param msgq Address of the message queue.
  *
  * @return Number of messages.
  * @req K-MSGQ-002
  */
-__syscall u32_t k_msgq_num_used_get(struct k_msgq *q);
+__syscall u32_t k_msgq_num_used_get(struct k_msgq *msgq);
 
-static inline u32_t z_impl_k_msgq_num_used_get(struct k_msgq *q)
+static inline u32_t z_impl_k_msgq_num_used_get(struct k_msgq *msgq)
 {
-	return q->used_msgs;
+	return msgq->used_msgs;
 }
 
 /** @} */
@@ -5241,6 +5292,7 @@ extern void k_mem_domain_remove_thread(k_tid_t thread);
 
 /** @} */
 
+#ifdef CONFIG_PRINTK
 /**
  * @brief Emit a character buffer to the console device
  *
@@ -5250,6 +5302,7 @@ extern void k_mem_domain_remove_thread(k_tid_t thread);
  * @req K-MISC-006
  */
 __syscall void k_str_out(char *c, size_t n);
+#endif
 
 /**
  * @brief Disable preservation of floating point context information.

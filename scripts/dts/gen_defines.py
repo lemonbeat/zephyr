@@ -68,7 +68,6 @@ def main():
         out("COMPAT_{}".format(str2ident(compat)), 1)
 
     # Derived from /chosen
-    write_addr_size(edt, "zephyr,sram", "SRAM")
     write_addr_size(edt, "zephyr,ccm", "CCM")
     write_addr_size(edt, "zephyr,dtcm", "DTCM")
     write_addr_size(edt, "zephyr,ipc_shm", "IPC_SHM")
@@ -77,6 +76,8 @@ def main():
 
     print("Devicetree configuration written to " + args.conf_out)
 
+    conf_file.close()
+    header_file.close()
 
 def parse_args():
     # Returns parsed command-line arguments
@@ -169,19 +170,22 @@ def relativize(path):
 def write_regs(node):
     # Writes address/size output for the registers in the node's 'reg' property
 
-    def reg_addr_name_alias(reg):
-        return str2ident(reg.name) + "_BASE_ADDRESS" if reg.name else None
+    def write_reg(reg, base_ident, val):
+        # Drop '_0' from the identifier if there's a single register, for
+        # backwards compatibility
+        if len(reg.node.regs) > 1:
+            ident = "{}_{}".format(base_ident, reg.node.regs.index(reg))
+        else:
+            ident = base_ident
 
-    def reg_size_name_alias(reg):
-        return str2ident(reg.name) + "_SIZE" if reg.name else None
+        out_dev(node, ident, val,
+                # Name alias from 'reg-names = ...'
+                str2ident(reg.name) + "_" + base_ident if reg.name else None)
 
     for reg in node.regs:
-        out_dev(node, reg_addr_ident(reg), hex(reg.addr),
-                name_alias=reg_addr_name_alias(reg))
-
+        write_reg(reg, "BASE_ADDRESS", hex(reg.addr))
         if reg.size:
-            out_dev(node, reg_size_ident(reg), reg.size,
-                    name_alias=reg_size_name_alias(reg))
+            write_reg(reg, "SIZE", reg.size)
 
 
 def write_props(node):
@@ -244,18 +248,18 @@ def write_props(node):
 def write_bus(node):
     # Generate bus-related #defines
 
-    if not node.bus:
+    if not node.bus_node:
         return
 
-    if node.parent.label is None:
-        err("missing 'label' property on {!r}".format(node.parent))
+    if node.bus_node.label is None:
+        err("missing 'label' property on bus node {!r}".format(node.bus_node))
 
     # #define DT_<DEV-IDENT>_BUS_NAME <BUS-LABEL>
-    out_dev_s(node, "BUS_NAME", str2ident(node.parent.label))
+    out_dev_s(node, "BUS_NAME", str2ident(node.bus_node.label))
 
     for compat in node.compats:
         # #define DT_<COMPAT>_BUS_<BUS-TYPE> 1
-        out("{}_BUS_{}".format(str2ident(compat), str2ident(node.bus)), 1)
+        out("{}_BUS_{}".format(str2ident(compat), str2ident(node.on_bus)), 1)
 
 
 def write_existence_flags(node):
@@ -270,34 +274,6 @@ def write_existence_flags(node):
                                 str2ident(compat)), 1)
 
 
-def reg_addr_ident(reg):
-    # Returns the identifier (e.g., macro name) to be used for the address of
-    # 'reg' in the output
-
-    node = reg.node
-
-    # NOTE: to maintain compat wit the old script we special case if there's
-    # only a single register (we drop the '_0').
-    if len(node.regs) > 1:
-        return "BASE_ADDRESS_{}".format(node.regs.index(reg))
-    else:
-        return "BASE_ADDRESS"
-
-
-def reg_size_ident(reg):
-    # Returns the identifier (e.g., macro name) to be used for the size of
-    # 'reg' in the output
-
-    node = reg.node
-
-    # NOTE: to maintain compat wit the old script we special case if there's
-    # only a single register (we drop the '_0').
-    if len(node.regs) > 1:
-        return "SIZE_{}".format(node.regs.index(reg))
-    else:
-        return "SIZE"
-
-
 def dev_ident(node):
     # Returns an identifier for the device given by 'node'. Used when building
     # e.g. macro names.
@@ -307,9 +283,9 @@ def dev_ident(node):
 
     ident = ""
 
-    if node.bus:
+    if node.bus_node:
         ident += "{}_{:X}_".format(
-            str2ident(node.parent.matching_compat), node.parent.unit_addr)
+            str2ident(node.bus_node.matching_compat), node.bus_node.unit_addr)
 
     ident += "{}_".format(str2ident(node.matching_compat))
 
@@ -415,8 +391,8 @@ def write_flash_node(edt):
         err("expected zephyr,flash to have a single register, has {}"
             .format(len(node.regs)))
 
-    if node.bus == "spi" and len(node.parent.regs) == 2:
-        reg = node.parent.regs[1]  # QSPI flash
+    if node.on_bus == "spi" and len(node.bus_node.regs) == 2:
+        reg = node.bus_node.regs[1]  # QSPI flash
     else:
         reg = node.regs[0]
 

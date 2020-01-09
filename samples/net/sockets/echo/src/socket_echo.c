@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 
 #ifndef __ZEPHYR__
@@ -28,10 +29,6 @@ void main(void)
 	int serv;
 	struct sockaddr_in bind_addr;
 	static int counter;
-
-	if (IS_ENABLED(CONFIG_NET_TEST_PROTOCOL)) {
-		exit(1);
-	}
 
 	serv = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -82,10 +79,6 @@ void main(void)
 					printf("error: recv: %d\n", errno);
 				}
 				break;
-			}
-
-			if (IS_ENABLED(CONFIG_NET_TCP2)) {
-				printf("recv: %d byte(s)\n", len);
 			}
 
 			p = buf;

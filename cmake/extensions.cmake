@@ -851,10 +851,10 @@ function(zephyr_check_compiler_flag lang option check)
 endfunction()
 
 function(zephyr_check_compiler_flag_hardcoded lang option check exists)
-  # -Werror=implicit-int is not supported for CXX and we are not able
-  # to automatically test for it because it produces a warning
-  # instead of an error during the test.
-  if((${lang} STREQUAL CXX) AND ("${option}" STREQUAL -Werror=implicit-int))
+  # Various flags that are not supported for CXX may not be testable
+  # because they would produce a warning instead of an error during
+  # the test.  Exclude them by toolchain-specific blacklist.
+  if((${lang} STREQUAL CXX) AND ("${option}" IN_LIST CXX_EXCLUDED_OPTIONS))
     set(check 0 PARENT_SCOPE)
     set(exists 1 PARENT_SCOPE)
   else()
@@ -863,7 +863,7 @@ function(zephyr_check_compiler_flag_hardcoded lang option check exists)
   endif()
 endfunction(zephyr_check_compiler_flag_hardcoded)
 
-# zephyr_linker_sources(<location> <files>)
+# zephyr_linker_sources(<location> [SORT_KEY <sort_key>] <files>)
 #
 # <files> is one or more .ld formatted files whose contents will be
 #    copied/included verbatim into the given <location> in the global linker.ld.
@@ -873,15 +873,20 @@ endfunction(zephyr_check_compiler_flag_hardcoded)
 #    NOINIT       Inside the noinit output section.
 #    RWDATA       Inside the data output section.
 #    RODATA       Inside the rodata output section.
+#    TEXT_START   At the beginning of the text section, i.e. the beginning of
+#                 the image.
 #    RAM_SECTIONS Inside the RAMABLE_REGION GROUP.
 #    SECTIONS     Near the end of the file. Don't use this when linking into
 #                 RAMABLE_REGION, use RAM_SECTIONS instead.
+# <sort_key> is an optional key to sort by inside of each location. The key must
+#    be alphanumeric, and the keys are sorted alphabetically. If no key is
+#    given, the key 'default' is used. Keys are case-sensitive.
 #
 # Use NOINIT, RWDATA, and RODATA unless they don't work for your use case.
 #
-# When placing into NOINIT, RWDATA, or RODATA, the contents of the files will be
-# placed inside an output section, so assume the section definition is already
-# present, e.g.:
+# When placing into NOINIT, RWDATA, RODATA, or TEXT_START the contents of the files
+# will be placed inside an output section, so assume the section definition is
+# already present, e.g.:
 #    _mysection_start = .;
 #    KEEP(*(.mysection));
 #    _mysection_end = .;
@@ -909,6 +914,7 @@ function(zephyr_linker_sources location)
   set(snippet_base      "${__build_dir}/include/generated")
   set(sections_path     "${snippet_base}/snippets-sections.ld")
   set(ram_sections_path "${snippet_base}/snippets-ram-sections.ld")
+  set(text_start_path   "${snippet_base}/snippets-text-start.ld")
   set(noinit_path       "${snippet_base}/snippets-noinit.ld")
   set(rwdata_path       "${snippet_base}/snippets-rwdata.ld")
   set(rodata_path       "${snippet_base}/snippets-rodata.ld")
@@ -918,6 +924,7 @@ function(zephyr_linker_sources location)
   if (NOT DEFINED cleared)
     file(WRITE ${sections_path} "")
     file(WRITE ${ram_sections_path} "")
+    file(WRITE ${text_start_path} "")
     file(WRITE ${noinit_path} "")
     file(WRITE ${rwdata_path} "")
     file(WRITE ${rodata_path} "")
@@ -929,6 +936,8 @@ function(zephyr_linker_sources location)
     set(snippet_path "${sections_path}")
   elseif("${location}" STREQUAL "RAM_SECTIONS")
     set(snippet_path "${ram_sections_path}")
+  elseif("${location}" STREQUAL "TEXT_START")
+    set(snippet_path "${text_start_path}")
   elseif("${location}" STREQUAL "NOINIT")
     set(snippet_path "${noinit_path}")
   elseif("${location}" STREQUAL "RWDATA")
@@ -939,7 +948,13 @@ function(zephyr_linker_sources location)
     message(fatal_error "Must choose valid location for linker snippet.")
   endif()
 
-  foreach(file IN ITEMS ${ARGN})
+  cmake_parse_arguments(L "" "SORT_KEY" "" ${ARGN})
+  set(SORT_KEY default)
+  if(DEFINED L_SORT_KEY)
+    set(SORT_KEY ${L_SORT_KEY})
+  endif()
+
+  foreach(file IN ITEMS ${L_UNPARSED_ARGUMENTS})
     # Resolve path.
     if(IS_ABSOLUTE ${file})
       set(path ${file})
@@ -951,11 +966,18 @@ function(zephyr_linker_sources location)
       message(FATAL_ERROR "zephyr_linker_sources() was called on a directory")
     endif()
 
-    # Append the file contents to the relevant destination file.
-    file(READ ${path} snippet)
-    file(RELATIVE_PATH relpath ${ZEPHYR_BASE} ${path})
-    file(APPEND ${snippet_path}
-             "\n/* From \${ZEPHYR_BASE}/${relpath}: */\n" "${snippet}\n")
+    # Find the relative path to the linker file from the include folder.
+    file(RELATIVE_PATH relpath ${ZEPHYR_BASE}/include ${path})
+
+    # Create strings to be written into the file
+    set (include_str "/* Sort key: \"${SORT_KEY}\" */#include \"${relpath}\"")
+
+    # Add new line to existing lines, sort them, and write them back.
+    file(STRINGS ${snippet_path} lines) # Get current lines (without newlines).
+    list(APPEND lines ${include_str})
+    list(SORT lines)
+    string(REPLACE ";" "\n;" lines "${lines}") # Add newline to each line.
+    file(WRITE ${snippet_path} ${lines} "\n")
   endforeach()
 endfunction(zephyr_linker_sources)
 

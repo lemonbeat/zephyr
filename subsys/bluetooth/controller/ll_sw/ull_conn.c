@@ -2695,12 +2695,8 @@ static inline void event_fex_prep(struct ll_conn *conn)
 		pdu->llctrl.opcode = PDU_DATA_LLCTRL_TYPE_FEATURE_RSP;
 		(void)memset(&pdu->llctrl.feature_rsp.features[0], 0x00,
 			sizeof(pdu->llctrl.feature_rsp.features));
-		pdu->llctrl.feature_req.features[0] =
-			conn->llcp_feature.features & 0xFF;
-		pdu->llctrl.feature_req.features[1] =
-			(conn->llcp_feature.features >> 8) & 0xFF;
-		pdu->llctrl.feature_req.features[2] =
-			(conn->llcp_feature.features >> 16) & 0xFF;
+		sys_put_le24(conn->llcp_feature.features,
+			     pdu->llctrl.feature_req.features);
 
 		/* enqueue feature rsp structure into rx queue */
 		ll_rx_put(rx->hdr.link, rx);
@@ -2729,12 +2725,8 @@ static inline void event_fex_prep(struct ll_conn *conn)
 		(void)memset(&pdu->llctrl.feature_req.features[0],
 			     0x00,
 			     sizeof(pdu->llctrl.feature_req.features));
-		pdu->llctrl.feature_req.features[0] =
-			conn->llcp_feature.features & 0xFF;
-		pdu->llctrl.feature_req.features[1] =
-			(conn->llcp_feature.features >> 8) & 0xFF;
-		pdu->llctrl.feature_req.features[2] =
-			(conn->llcp_feature.features >> 16) & 0xFF;
+		sys_put_le24(conn->llcp_feature.features,
+			     pdu->llctrl.feature_req.features);
 
 		ctrl_tx_enqueue(conn, tx);
 
@@ -3182,7 +3174,11 @@ static inline void event_len_prep(struct ll_conn *conn)
 #endif /* !CONFIG_BT_CTLR_PHY */
 		   ) {
 			u16_t rx_time = PKT_US(LL_LENGTH_OCTETS_RX_MAX, 0);
+#if defined(CONFIG_BT_CTLR_PHY)
+			u16_t tx_time = conn->default_tx_time;
+#else /* !CONFIG_BT_CTLR_PHY */
 			u16_t tx_time = PKT_US(conn->default_tx_octets, 0);
+#endif /* !CONFIG_BT_CTLR_PHY */
 
 			lr->max_rx_time = sys_cpu_to_le16(rx_time);
 			lr->max_tx_time = sys_cpu_to_le16(tx_time);
@@ -3983,12 +3979,8 @@ static int feature_rsp_send(struct ll_conn *conn, struct node_rx_pdu *rx,
 	pdu_tx->llctrl.opcode = PDU_DATA_LLCTRL_TYPE_FEATURE_RSP;
 	(void)memset(&pdu_tx->llctrl.feature_rsp.features[0], 0x00,
 		     sizeof(pdu_tx->llctrl.feature_rsp.features));
-	pdu_tx->llctrl.feature_req.features[0] =
-		conn->llcp_feature.features & 0xFF;
-	pdu_tx->llctrl.feature_req.features[1] =
-		(conn->llcp_feature.features >> 8) & 0xFF;
-	pdu_tx->llctrl.feature_req.features[2] =
-		(conn->llcp_feature.features >> 16) & 0xFF;
+	sys_put_le24(conn->llcp_feature.features,
+		     pdu_tx->llctrl.feature_req.features);
 
 	ctrl_tx_sec_enqueue(conn, tx);
 

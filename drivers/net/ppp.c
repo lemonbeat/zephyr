@@ -199,13 +199,17 @@ static int ppp_send_bytes(struct ppp_driver_context *ppp,
 }
 
 #if defined(CONFIG_PPP_CLIENT_CLIENTSERVER)
+
+#define CLIENT "CLIENT"
+#define CLIENTSERVER "CLIENTSERVER"
+
 static void ppp_handle_client(struct ppp_driver_context *ppp, u8_t byte)
 {
-	static const char *client = "CLIENT";
-	static const char *clientserver = "CLIENTSERVER";
+	static const char *client = CLIENT;
+	static const char *clientserver = CLIENTSERVER;
 	int offset;
 
-	if (ppp->client_index >= strlen(client)) {
+	if (ppp->client_index >= (sizeof(CLIENT) - 1)) {
 		ppp->client_index = 0;
 	}
 
@@ -217,10 +221,10 @@ static void ppp_handle_client(struct ppp_driver_context *ppp, u8_t byte)
 	}
 
 	++ppp->client_index;
-	if (ppp->client_index >= strlen(client)) {
+	if (ppp->client_index >= (sizeof(CLIENT) - 1)) {
 		LOG_DBG("Received complete CLIENT string");
-		offset = ppp_send_bytes(ppp, clientserver, strlen(clientserver),
-					0);
+		offset = ppp_send_bytes(ppp, clientserver,
+					sizeof(CLIENTSERVER) - 1, 0);
 		(void)ppp_send_flush(ppp, offset);
 		ppp->client_index = 0;
 	}
@@ -613,7 +617,9 @@ static int ppp_driver_init(struct device *dev)
 
 	ppp->pkt = NULL;
 	ppp_change_state(ppp, STATE_HDLC_FRAME_START);
+#if defined(CONFIG_PPP_CLIENT_CLIENTSERVER)
 	ppp->client_index = 0;
+#endif
 
 	return 0;
 }

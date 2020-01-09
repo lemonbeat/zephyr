@@ -29,7 +29,7 @@ manifest:
       revision: 5690f5b84495c8b657ff204c5c827df1ab9e12e3
       path: modules/hal/atmel
     - name: ci-tools
-      revision: c083680dd5e281218ddb47d0ceac5c5fd5619749
+      revision: 081d80d6e25366a311015f00418898a94bff6b64
       path: tools/ci-tools
     - name: civetweb
       revision: 99129c5efc907ea613c4b73ccff07581feb58a7a
@@ -44,7 +44,7 @@ manifest:
       revision: a12d92816a53a521d79cefcf5c38b9dc8a4fed6e
       path: modules/hal/cypress
     - name: hal_nordic
-      revision: 64f3473398f9fba11059dd0c7ae969e74f74f356
+      revision: 8506c348b6da91a9f53bcbb181ecd82b752b9eed
       path: modules/hal/nordic
     - name: hal_openisa
       revision: 6416140c00f7e663752bd420ba89e3caefc1d70e
@@ -71,7 +71,7 @@ manifest:
       revision: 74fc2e753a997bd71cefa34dd9c56dcb954b42e2
       path: modules/lib/gui/lvgl
     - name: mbedtls
-      revision: 4f1e8f5a78dc08aa42a47cc1ad059cce558c26c3
+      revision: 3776c158fe138a72c97c187e4d31c81c37884be9
       path: modules/crypto/mbedtls
     - name: mcuboot
       revision: c2bd757332bfde11c27019f937b0c61d5e9b9fd9
@@ -86,13 +86,16 @@ manifest:
       revision: 00dd4fab1a00f2f6e995ef3f2e7c3814689f8885
       path: modules/fs/nffs
     - name: hal_nxp
-      revision: ef000ff5d902c938e3d4763155b0511b043017c8
+      revision: 1e6520c0b06b674190f4a574761dd9c5f4b02142
       path: modules/hal/nxp
     - name: open-amp
       revision: 9b591b289e1f37339bd038b5a1f0e6c8ad39c63a
       path: modules/lib/open-amp
+    - name: loramac-node
+      revision: 29e516ec585b1a909af2b5f1c60d83e7d4d563e3
+      path: modules/lib/loramac-node
     - name: openthread
-      revision: 5496d9df4866e7761f3d06e5ea284d4acdeb4544
+      revision: 05aaccc6e0db0fe17ac4beed2a2aacc9a9af167c
       path: modules/lib/openthread
     - name: segger
       revision: 6fcf61606d6012d2c44129edc033f59331e268bc
@@ -109,6 +112,12 @@ manifest:
     - name: nrf_hw_models
       path: modules/bsim_hw_models/nrf_hw_models
       revision: fec69703cb1ca06fcdab6d5fde01274f0fc5c759
+    - name: hal_xtensa
+      revision: 382b309b481adc85dd517d50b8a458bcb86f15d4
+      path: modules/hal/xtensa
+    - name: edtt
+      path: tools/edtt
+      revision: dd4dd502ef2fbeced6ef7faaba562a7ddca45632
 
   self:
     path: zephyr

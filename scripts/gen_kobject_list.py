@@ -19,7 +19,7 @@ validate accesses to kernel objects to make the following assertions:
 
     - The calling thread has sufficient permissions on the object
 
-For more details see the "Kernel Objects" section in the documentation.
+For more details see the :ref:`kernelobjects` section in the documentation.
 
 The zephyr build generates an intermediate ELF binary, zephyr_prebuilt.elf,
 which this script scans looking for kernel objects by examining the DWARF
@@ -113,6 +113,7 @@ subsystems = [
     "can_driver_api",
     "ptp_clock_driver_api",
     "eeprom_driver_api",
+    "wdt_driver_api",
 
     # Fake 'sample driver' subsystem, used by tests/samples
     "sample_driver_api"

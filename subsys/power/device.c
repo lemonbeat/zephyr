@@ -57,8 +57,26 @@ int sys_pm_suspend_devices(void)
 						DEVICE_PM_SUSPEND_STATE,
 						NULL, NULL);
 		if (device_retval[i]) {
-			LOG_ERR("%s suspend operation failed\n",
+			LOG_DBG("%s did not enter suspend state",
 					pm_device_list[idx].config->name);
+			return device_retval[i];
+		}
+	}
+
+	return 0;
+}
+
+int sys_pm_low_power_devices(void)
+{
+	for (int i = device_count - 1; i >= 0; i--) {
+		int idx = device_ordered_list[i];
+
+		device_retval[i] = device_set_power_state(&pm_device_list[idx],
+						DEVICE_PM_LOW_POWER_STATE,
+						NULL, NULL);
+		if (device_retval[i]) {
+			LOG_DBG("%s did not enter low power state",
+				pm_device_list[idx].config->name);
 			return device_retval[i];
 		}
 	}
@@ -75,7 +93,7 @@ int sys_pm_force_suspend_devices(void)
 					DEVICE_PM_FORCE_SUSPEND_STATE,
 					NULL, NULL);
 		if (device_retval[i]) {
-			LOG_ERR("%s force suspend operation failed\n",
+			LOG_ERR("%s force suspend operation failed",
 				pm_device_list[idx].config->name);
 			return device_retval[i];
 		}

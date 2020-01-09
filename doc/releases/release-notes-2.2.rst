@@ -27,6 +27,28 @@ Deprecated in this release
 Stable API changes in this release
 ==================================
 
+* PWM
+
+  * The pwm_pin_set_cycles(), pwm_pin_set_usec(), and
+    pwm_pin_set_nsec() functions now take a flags parameter. The newly
+    introduced flags are PWM_POLARITY_NORMAL and PWM_POLARITY_INVERTED
+    for specifying the polarity of the PWM signal. The flags parameter
+    can be set to 0 if no flags are required (the default is
+    PWM_POLARITY_NORMAL).
+  * Similarly, the pwm_pin_set_t PWM driver API function function now
+    takes a flags parameter. The PWM controller driver must check the
+    value of the flags parameter and return -ENOTSUP if any
+    unsupported flag is set.
+
+* USB
+
+  * The usb_enable() function, which was previously invoked automatically
+    by the USB stack, now needs to be explicitly called by the application
+    in order to enable the USB subsystem.
+  * The usb_enable() function now takes a parameter, usb_dc_status_callback
+    which can be set by the application to a callback to receive status events
+    from the USB stack. The parameter can also be set to NULL if no callback is required.
+
 Removed APIs in this release
 ============================
 
@@ -237,7 +259,9 @@ Bluetooth
 Build and Infrastructure
 ************************
 
-* <TBD>
+* The minimum Python version supported by Zephyr's build system and tools is
+  now 3.6.
+* <Other items TBD>
 
 Libraries / Subsystems
 ***********************

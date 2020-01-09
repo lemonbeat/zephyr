@@ -55,6 +55,24 @@ void k_thread_foreach(k_thread_user_cb_t user_cb, void *user_data)
 #endif
 }
 
+void k_thread_foreach_unlocked(k_thread_user_cb_t user_cb, void *user_data)
+{
+#if defined(CONFIG_THREAD_MONITOR)
+	struct k_thread *thread;
+	k_spinlock_key_t key;
+
+	__ASSERT(user_cb != NULL, "user_cb can not be NULL");
+
+	key = k_spin_lock(&lock);
+	for (thread = _kernel.threads; thread; thread = thread->next_thread) {
+		k_spin_unlock(&lock, key);
+		user_cb(thread, user_data);
+		key = k_spin_lock(&lock);
+	}
+	k_spin_unlock(&lock, key);
+#endif
+}
+
 bool k_is_in_isr(void)
 {
 	return arch_is_in_isr();
@@ -281,30 +299,31 @@ const char *k_thread_state_str(k_tid_t thread_id)
 }
 
 #ifdef CONFIG_USERSPACE
-static inline int z_vrfy_k_thread_name_copy(k_tid_t t, char *buf, size_t size)
+static inline int z_vrfy_k_thread_name_copy(k_tid_t thread,
+					    char *buf, size_t size)
 {
 #ifdef CONFIG_THREAD_NAME
 	size_t len;
-	struct _k_object *ko = z_object_find(t);
+	struct _k_object *ko = z_object_find(thread);
 
 	/* Special case: we allow reading the names of initialized threads
 	 * even if we don't have permission on them
 	 */
-	if (t == NULL || ko->type != K_OBJ_THREAD ||
+	if (thread == NULL || ko->type != K_OBJ_THREAD ||
 	    (ko->flags & K_OBJ_FLAG_INITIALIZED) == 0) {
 		return -EINVAL;
 	}
 	if (Z_SYSCALL_MEMORY_WRITE(buf, size) != 0) {
 		return -EFAULT;
 	}
-	len = strlen(t->name);
+	len = strlen(thread->name);
 	if (len + 1 > size) {
 		return -ENOSPC;
 	}
 
-	return z_user_to_copy((void *)buf, t->name, len + 1);
+	return z_user_to_copy((void *)buf, thread->name, len + 1);
 #else
-	ARG_UNUSED(t);
+	ARG_UNUSED(thread);
 	ARG_UNUSED(buf);
 	ARG_UNUSED(size);
 	return -ENOSYS;
@@ -652,20 +671,7 @@ k_tid_t z_vrfy_k_thread_create(struct k_thread *new_thread,
 #endif /* CONFIG_USERSPACE */
 #endif /* CONFIG_MULTITHREADING */
 
-void z_thread_single_suspend(struct k_thread *thread)
-{
-	if (z_is_thread_ready(thread)) {
-		z_remove_thread_from_ready_q(thread);
-	}
-
-	(void)z_abort_thread_timeout(thread);
-
-	z_mark_thread_as_suspended(thread);
-
-	if (thread == _current) {
-		z_reschedule_unlocked();
-	}
-}
+extern void z_thread_single_suspend(struct k_thread *thread);
 
 void z_impl_k_thread_suspend(struct k_thread *thread)
 {
@@ -715,43 +721,6 @@ static inline void z_vrfy_k_thread_resume(struct k_thread *thread)
 }
 #include <syscalls/k_thread_resume_mrsh.c>
 #endif
-
-void z_thread_single_abort(struct k_thread *thread)
-{
-	if (thread->fn_abort != NULL) {
-		thread->fn_abort();
-	}
-
-	if (IS_ENABLED(CONFIG_SMP)) {
-		z_sched_abort(thread);
-	}
-
-	if (z_is_thread_ready(thread)) {
-		z_remove_thread_from_ready_q(thread);
-	} else {
-		if (z_is_thread_pending(thread)) {
-			z_unpend_thread_no_timeout(thread);
-		}
-		if (z_is_thread_timeout_active(thread)) {
-			(void)z_abort_thread_timeout(thread);
-		}
-	}
-
-	thread->base.thread_state |= _THREAD_DEAD;
-
-	sys_trace_thread_abort(thread);
-
-#ifdef CONFIG_USERSPACE
-	/* Clear initialized state so that this thread object may be re-used
-	 * and triggers errors if API calls are made on it from user threads
-	 */
-	z_object_uninit(thread->stack_obj);
-	z_object_uninit(thread);
-
-	/* Revoke permissions on thread's ID so that it may be recycled */
-	z_thread_perms_all_clear(thread);
-#endif
-}
 
 #ifdef CONFIG_MULTITHREADING
 #ifdef CONFIG_USERSPACE
@@ -853,7 +822,7 @@ FUNC_NORETURN void k_thread_user_mode_enter(k_thread_entry_t entry,
 /* These spinlock assertion predicates are defined here because having
  * them in spinlock.h is a giant header ordering headache.
  */
-#ifdef SPIN_VALIDATE
+#ifdef CONFIG_SPIN_VALIDATE
 bool z_spin_lock_valid(struct k_spinlock *l)
 {
 	uintptr_t thread_cpu = l->thread_cpu;
@@ -879,8 +848,7 @@ void z_spin_lock_set_owner(struct k_spinlock *l)
 {
 	l->thread_cpu = _current_cpu->id | (uintptr_t)_current;
 }
-
-#endif
+#endif /* CONFIG_SPIN_VALIDATE */
 
 int z_impl_k_float_disable(struct k_thread *thread)
 {
