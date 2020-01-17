@@ -342,7 +342,11 @@ enum net_verdict net_if_send_data(struct net_if *iface, struct net_pkt *pkt)
 		goto done;
 	}
 #endif
-
+#if defined(CONFIG_NET_L2_LEMONBEAT)
+	if (net_if_l2(iface) == &NET_L2_GET_NAME(LEMONBEAT)) {
+		goto done;
+	}
+#endif
 	/* If the ll dst address is not set check if it is present in the nbr
 	 * cache.
 	 */
