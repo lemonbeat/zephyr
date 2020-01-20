@@ -790,19 +790,27 @@ int net_route_packet(struct net_pkt *pkt, struct in6_addr *nexthop)
 	 */
 	if (net_if_l2(net_pkt_iface(pkt)) != &NET_L2_GET_NAME(DUMMY)) {
 #endif
-		if (!net_pkt_lladdr_src(pkt)->addr) {
-			NET_DBG("Link layer source address not set");
-			return -EINVAL;
-		}
+#if defined(CONFIG_NET_L2_PPP)
+		/* PPP does not populate the lladdr_src field */
+		if (net_if_l2(net_pkt_iface(pkt)) != &NET_L2_GET_NAME(PPP)) {
+#endif
+			if (!net_pkt_lladdr_src(pkt)->addr) {
+				NET_DBG("Link layer source address not set");
+				return -EINVAL;
+			}
 
-		/* Sanitycheck: If src and dst ll addresses are going to be
-		 * same, then something went wrong in route lookup.
-		 */
-		if (!memcmp(net_pkt_lladdr_src(pkt)->addr, lladdr->addr,
-			    lladdr->len)) {
-			NET_ERR("Src ll and Dst ll are same");
-			return -EINVAL;
+			/* Sanitycheck: If src and dst ll addresses are going
+			 * to be same, then something went wrong in route
+			 * lookup.
+			 */
+			if (!memcmp(net_pkt_lladdr_src(pkt)->addr, lladdr->addr,
+				    lladdr->len)) {
+				NET_ERR("Src ll and Dst ll are same");
+				return -EINVAL;
+			}
+#if defined(CONFIG_NET_L2_PPP)
 		}
+#endif
 #if defined(CONFIG_NET_L2_DUMMY)
 	}
 #endif
@@ -821,6 +829,24 @@ int net_route_packet(struct net_pkt *pkt, struct in6_addr *nexthop)
 	net_pkt_lladdr_dst(pkt)->len = lladdr->len;
 
 	net_pkt_set_iface(pkt, nbr->iface);
+
+	return net_send_data(pkt);
+}
+
+int net_route_packet_if(struct net_pkt *pkt, struct net_if *iface)
+{
+	/* The destination is reachable via iface. But since no valid nexthop
+	 * is known, net_pkt_lladdr_dst(pkt) cannot be set here.
+	 */
+
+	net_pkt_set_orig_iface(pkt, net_pkt_iface(pkt));
+	net_pkt_set_iface(pkt, iface);
+
+	net_pkt_set_forwarding(pkt, true);
+
+	net_pkt_lladdr_src(pkt)->addr = net_pkt_lladdr_if(pkt)->addr;
+	net_pkt_lladdr_src(pkt)->type = net_pkt_lladdr_if(pkt)->type;
+	net_pkt_lladdr_src(pkt)->len = net_pkt_lladdr_if(pkt)->len;
 
 	return net_send_data(pkt);
 }
