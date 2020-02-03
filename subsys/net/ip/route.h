@@ -186,12 +186,25 @@ struct net_route_entry_mcast {
 	/** Routing entry lifetime in seconds. */
 	u32_t lifetime;
 
-	/** Is this entry in user or not */
+	/** Is this entry in use or not */
 	bool is_used;
 };
 
 typedef void (*net_route_mcast_cb_t)(struct net_route_entry_mcast *entry,
 				     void *user_data);
+
+/**
+ * @brief Forwards a multicast packet by checking the local multicast
+ * routing table
+ *
+ * @param pkt The original received ipv6 packet to forward
+ * @param hdr The IPv6 header of the packet
+ *
+ * @return Number of interfaces which forwarded the packet, or a negative
+ * value in case of an error.
+ */
+int net_route_mcast_forward_packet(const struct net_pkt *pkt,
+				   const struct net_ipv6_hdr *hdr);
 
 /**
  * @brief Go through all the multicast routing entries and call callback
