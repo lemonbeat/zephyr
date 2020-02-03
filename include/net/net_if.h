@@ -194,6 +194,12 @@ enum net_if_flag {
 	 */
 	NET_IF_NO_AUTO_START,
 
+	/** Flag defines if received multicasts of other interface are
+	 * forwarded on this interface. This activates multicast
+	 * routing / forwarding for this interface.
+	 */
+	NET_IF_FORWARD_MULTICASTS,
+
 /** @cond INTERNAL_HIDDEN */
 	/* Total number of flags - must be at the end of the enum */
 	NET_IF_NUM_FLAGS

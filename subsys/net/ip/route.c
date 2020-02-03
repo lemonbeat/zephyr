@@ -46,10 +46,8 @@ static void net_route_nexthop_remove(struct net_nbr *nbr)
 /*
  * This pool contains information next hop neighbors.
  */
-NET_NBR_POOL_INIT(net_route_nexthop_pool,
-		  CONFIG_NET_MAX_NEXTHOPS,
-		  sizeof(struct net_route_nexthop),
-		  net_route_nexthop_remove,
+NET_NBR_POOL_INIT(net_route_nexthop_pool, CONFIG_NET_MAX_NEXTHOPS,
+		  sizeof(struct net_route_nexthop), net_route_nexthop_remove,
 		  0);
 
 static inline struct net_route_nexthop *net_nexthop_data(struct net_nbr *nbr)
@@ -59,11 +57,12 @@ static inline struct net_route_nexthop *net_nexthop_data(struct net_nbr *nbr)
 
 static inline struct net_nbr *get_nexthop_nbr(struct net_nbr *start, int idx)
 {
-	NET_ASSERT(idx < CONFIG_NET_MAX_NEXTHOPS, "idx %d >= max %d",
-		   idx, CONFIG_NET_MAX_NEXTHOPS);
+	NET_ASSERT(idx < CONFIG_NET_MAX_NEXTHOPS, "idx %d >= max %d", idx,
+		   CONFIG_NET_MAX_NEXTHOPS);
 
 	return (struct net_nbr *)((u8_t *)start +
-			((sizeof(struct net_nbr) + start->size) * idx));
+				  ((sizeof(struct net_nbr) + start->size) *
+				   idx));
 }
 
 static struct net_nbr *get_nexthop_route(void)
@@ -99,10 +98,8 @@ static void net_route_entries_table_clear(struct net_nbr_table *table)
 /*
  * This pool contains routing table entries.
  */
-NET_NBR_POOL_INIT(net_route_entries_pool,
-		  CONFIG_NET_MAX_ROUTES,
-		  sizeof(struct net_route_entry),
-		  net_route_entry_remove,
+NET_NBR_POOL_INIT(net_route_entries_pool, CONFIG_NET_MAX_ROUTES,
+		  sizeof(struct net_route_entry), net_route_entry_remove,
 		  NET_ROUTE_EXTRA_DATA_SIZE);
 
 NET_NBR_TABLE_INIT(NET_NBR_LOCAL, nbr_routes, net_route_entries_pool,
@@ -154,17 +151,16 @@ void net_routes_print(void)
 			continue;
 		}
 
-		NET_DBG("[%d] %p %d addr %s/%d",
-			i, nbr, nbr->ref,
+		NET_DBG("[%d] %p %d addr %s/%d", i, nbr, nbr->ref,
 			log_strdup(net_sprint_ipv6_addr(
-					   &net_route_data(nbr)->addr)),
+				&net_route_data(nbr)->addr)),
 			net_route_data(nbr)->prefix_len);
-		NET_DBG("    iface %p idx %d ll %s",
-			nbr->iface, nbr->idx,
-			nbr->idx == NET_NBR_LLADDR_UNKNOWN ? "?" :
-			log_strdup(net_sprint_ll_addr(
-				net_nbr_get_lladdr(nbr->idx)->addr,
-				net_nbr_get_lladdr(nbr->idx)->len)));
+		NET_DBG("    iface %p idx %d ll %s", nbr->iface, nbr->idx,
+			nbr->idx == NET_NBR_LLADDR_UNKNOWN ?
+				"?" :
+				log_strdup(net_sprint_ll_addr(
+					net_nbr_get_lladdr(nbr->idx)->addr,
+					net_nbr_get_lladdr(nbr->idx)->len)));
 	}
 }
 
@@ -175,8 +171,7 @@ static inline void nbr_free(struct net_nbr *nbr)
 	net_nbr_unref(nbr);
 }
 
-static struct net_nbr *nbr_new(struct net_if *iface,
-			       struct in6_addr *addr,
+static struct net_nbr *nbr_new(struct net_if *iface, struct in6_addr *addr,
 			       u8_t prefix_len)
 {
 	struct net_nbr *nbr = net_nbr_get(&net_nbr_routes.table);
@@ -190,8 +185,7 @@ static struct net_nbr *nbr_new(struct net_if *iface,
 	net_ipaddr_copy(&net_route_data(nbr)->addr, addr);
 	net_route_data(nbr)->prefix_len = prefix_len;
 
-	NET_DBG("[%d] nbr %p iface %p IPv6 %s/%d",
-		nbr->idx, nbr, iface,
+	NET_DBG("[%d] nbr %p iface %p IPv6 %s/%d", nbr->idx, nbr, iface,
 		log_strdup(net_sprint_ipv6_addr(&net_route_data(nbr)->addr)),
 		prefix_len);
 
@@ -218,8 +212,7 @@ static struct net_nbr *nbr_nexthop_get(struct net_if *iface,
 
 	net_nbr_ref(nbr);
 
-	NET_DBG("[%d] nbr %p iface %p IPv6 %s",
-		nbr->idx, nbr, iface,
+	NET_DBG("[%d] nbr %p iface %p IPv6 %s", nbr->idx, nbr, iface,
 		log_strdup(net_sprint_ipv6_addr(addr)));
 
 	return nbr;
@@ -236,19 +229,19 @@ static int nbr_nexthop_put(struct net_nbr *nbr)
 	return 0;
 }
 
-
-#define net_route_info(str, route, dst)					\
-	do {								\
-	if (CONFIG_NET_ROUTE_LOG_LEVEL >= LOG_LEVEL_DBG) {		\
-		struct in6_addr *naddr = net_route_get_nexthop(route);	\
-									\
-		NET_ASSERT(naddr, "Unknown nexthop address");	\
-									\
-		NET_DBG("%s route to %s via %s (iface %p)", str,	\
-			log_strdup(net_sprint_ipv6_addr(dst)),		\
-			log_strdup(net_sprint_ipv6_addr(naddr)),	\
-			route->iface);					\
-	} } while (0)
+#define net_route_info(str, route, dst)                                        \
+	do {                                                                   \
+		if (CONFIG_NET_ROUTE_LOG_LEVEL >= LOG_LEVEL_DBG) {             \
+			struct in6_addr *naddr = net_route_get_nexthop(route); \
+                                                                               \
+			NET_ASSERT(naddr, "Unknown nexthop address");          \
+                                                                               \
+			NET_DBG("%s route to %s via %s (iface %p)", str,       \
+				log_strdup(net_sprint_ipv6_addr(dst)),         \
+				log_strdup(net_sprint_ipv6_addr(naddr)),       \
+				route->iface);                                 \
+		}                                                              \
+	} while (0)
 
 /* Route was accessed, so place it in front of the routes list */
 static inline void update_route_access(struct net_route_entry *route)
@@ -278,8 +271,7 @@ struct net_route_entry *net_route_lookup(struct net_if *iface,
 		route = net_route_data(nbr);
 
 		if (route->prefix_len >= longest_match &&
-		    net_ipv6_is_prefix((u8_t *)dst,
-				       (u8_t *)&route->addr,
+		    net_ipv6_is_prefix((u8_t *)dst, (u8_t *)&route->addr,
 				       route->prefix_len)) {
 			found = route;
 			longest_match = route->prefix_len;
@@ -296,8 +288,7 @@ struct net_route_entry *net_route_lookup(struct net_if *iface,
 }
 
 struct net_route_entry *net_route_add(struct net_if *iface,
-				      struct in6_addr *addr,
-				      u8_t prefix_len,
+				      struct in6_addr *addr, u8_t prefix_len,
 				      struct in6_addr *nexthop)
 {
 	struct net_linkaddr_storage *nexthop_lladdr;
@@ -305,7 +296,7 @@ struct net_route_entry *net_route_add(struct net_if *iface,
 	struct net_route_nexthop *nexthop_route;
 	struct net_route_entry *route;
 #if defined(CONFIG_NET_MGMT_EVENT_INFO)
-       struct net_event_ipv6_route info;
+	struct net_event_ipv6_route info;
 #endif
 
 	NET_ASSERT(addr);
@@ -357,9 +348,7 @@ struct net_route_entry *net_route_add(struct net_if *iface,
 
 		sys_slist_find_and_remove(&routes, last);
 
-		route = CONTAINER_OF(last,
-				     struct net_route_entry,
-				     node);
+		route = CONTAINER_OF(last, struct net_route_entry, node);
 
 		if (CONFIG_NET_ROUTE_LOG_LEVEL >= LOG_LEVEL_DBG) {
 			struct in6_addr *tmp;
@@ -373,11 +362,11 @@ struct net_route_entry *net_route_add(struct net_if *iface,
 				NET_DBG("Removing the oldest route %s "
 					"via %s [%s]",
 					log_strdup(net_sprint_ipv6_addr(
-							   &route->addr)),
+						&route->addr)),
 					log_strdup(net_sprint_ipv6_addr(tmp)),
 					log_strdup(net_sprint_ll_addr(
-							   llstorage->addr,
-							   llstorage->len)));
+						llstorage->addr,
+						llstorage->len)));
 			}
 		}
 
@@ -419,8 +408,8 @@ struct net_route_entry *net_route_add(struct net_if *iface,
 	net_ipaddr_copy(&info.nexthop, nexthop);
 	info.prefix_len = prefix_len;
 
-	net_mgmt_event_notify_with_info(NET_EVENT_IPV6_ROUTE_ADD,
-					iface, (void *) &info,
+	net_mgmt_event_notify_with_info(NET_EVENT_IPV6_ROUTE_ADD, iface,
+					(void *)&info,
 					sizeof(struct net_event_ipv6_route));
 #else
 	net_mgmt_event_notify(NET_EVENT_IPV6_ROUTE_ADD, iface);
@@ -434,7 +423,7 @@ int net_route_del(struct net_route_entry *route)
 	struct net_nbr *nbr;
 	struct net_route_nexthop *nexthop_route;
 #if defined(CONFIG_NET_MGMT_EVENT_INFO)
-       struct net_event_ipv6_route info;
+	struct net_event_ipv6_route info;
 #endif
 
 	if (!route) {
@@ -444,11 +433,10 @@ int net_route_del(struct net_route_entry *route)
 #if defined(CONFIG_NET_MGMT_EVENT_INFO)
 	net_ipaddr_copy(&info.addr, &route->addr);
 	info.prefix_len = route->prefix_len;
-	net_ipaddr_copy(&info.nexthop,
-			net_route_get_nexthop(route));
+	net_ipaddr_copy(&info.nexthop, net_route_get_nexthop(route));
 
-	net_mgmt_event_notify_with_info(NET_EVENT_IPV6_ROUTE_DEL,
-					route->iface, (void *) &info,
+	net_mgmt_event_notify_with_info(NET_EVENT_IPV6_ROUTE_DEL, route->iface,
+					(void *)&info,
 					sizeof(struct net_event_ipv6_route));
 #else
 	net_mgmt_event_notify(NET_EVENT_IPV6_ROUTE_DEL, route->iface);
@@ -463,7 +451,7 @@ int net_route_del(struct net_route_entry *route)
 
 	net_route_info("Deleted", route, &route->addr);
 
-	SYS_SLIST_FOR_EACH_CONTAINER(&route->nexthop, nexthop_route, node) {
+	SYS_SLIST_FOR_EACH_CONTAINER (&route->nexthop, nexthop_route, node) {
 		if (!nexthop_route->nbr) {
 			continue;
 		}
@@ -496,8 +484,8 @@ int net_route_del_by_nexthop(struct net_if *iface, struct in6_addr *nexthop)
 			continue;
 		}
 
-		SYS_SLIST_FOR_EACH_CONTAINER(&route->nexthop, nexthop_route,
-					     node) {
+		SYS_SLIST_FOR_EACH_CONTAINER (&route->nexthop, nexthop_route,
+					      node) {
 			if (nexthop_route->nbr == nbr_nexthop) {
 				/* This route contains this nexthop */
 				ret = net_route_del(route);
@@ -521,8 +509,7 @@ int net_route_del_by_nexthop(struct net_if *iface, struct in6_addr *nexthop)
 }
 
 int net_route_del_by_nexthop_data(struct net_if *iface,
-				  struct in6_addr *nexthop,
-				  void *data)
+				  struct in6_addr *nexthop, void *data)
 {
 	int count = 0, status = 0;
 	struct net_nbr *nbr_nexthop;
@@ -541,8 +528,8 @@ int net_route_del_by_nexthop_data(struct net_if *iface,
 		struct net_nbr *nbr = get_nbr(i);
 		struct net_route_entry *route = net_route_data(nbr);
 
-		SYS_SLIST_FOR_EACH_CONTAINER(&route->nexthop, nexthop_route,
-					     node) {
+		SYS_SLIST_FOR_EACH_CONTAINER (&route->nexthop, nexthop_route,
+					      node) {
 			void *extra_data;
 
 			if (nexthop_route->nbr != nbr_nexthop) {
@@ -588,7 +575,7 @@ struct in6_addr *net_route_get_nexthop(struct net_route_entry *route)
 		return NULL;
 	}
 
-	SYS_SLIST_FOR_EACH_CONTAINER(&route->nexthop, nexthop_route, node) {
+	SYS_SLIST_FOR_EACH_CONTAINER (&route->nexthop, nexthop_route, node) {
 		struct in6_addr *addr;
 
 		NET_ASSERT(nexthop_route->nbr->idx != NET_NBR_LLADDR_UNKNOWN);
@@ -641,11 +628,44 @@ int net_route_foreach(net_route_cb_t cb, void *user_data)
 /*
  * This array contains multicast routing entries.
  */
-static
-struct net_route_entry_mcast route_mcast_entries[CONFIG_NET_MAX_MCAST_ROUTES];
+static struct net_route_entry_mcast
+	route_mcast_entries[CONFIG_NET_MAX_MCAST_ROUTES];
 
-int net_route_mcast_foreach(net_route_mcast_cb_t cb,
-			    struct in6_addr *skip,
+int net_route_mcast_forward_packet(const struct net_pkt *pkt,
+				   const struct net_ipv6_hdr *hdr)
+{
+	int i, ret = 0, err = 0;
+
+	for (i = 0; i < CONFIG_NET_MAX_MCAST_ROUTES; ++i) {
+		struct net_route_entry_mcast *route = &route_mcast_entries[i];
+
+		if (!route->is_used) {
+			continue;
+		}
+		if (!net_if_flag_is_set(route->iface,
+					NET_IF_FORWARD_MULTICASTS) ||
+		    !net_ipv6_is_same_mcast_scope(&hdr->dst, &route->group) ||
+		    (pkt->iface == route->iface)) {
+			continue;
+		}
+		struct net_pkt *pkt_cpy = net_pkt_shallow_clone(pkt, 0);
+
+		if (pkt_cpy == NULL) {
+			err--;
+			continue;
+		}
+		net_pkt_set_forwarding(pkt_cpy, true);
+		net_pkt_set_iface(pkt_cpy, route->iface);
+		if (net_send_data(pkt_cpy) >= 0) {
+			++ret;
+		} else {
+			--err;
+		}
+	}
+	return (err == 0) ? ret : err;
+}
+
+int net_route_mcast_foreach(net_route_mcast_cb_t cb, struct in6_addr *skip,
 			    void *user_data)
 {
 	int i, ret = 0;
@@ -653,15 +673,16 @@ int net_route_mcast_foreach(net_route_mcast_cb_t cb,
 	for (i = 0; i < CONFIG_NET_MAX_MCAST_ROUTES; i++) {
 		struct net_route_entry_mcast *route = &route_mcast_entries[i];
 
-		if (route->is_used) {
-			if (skip && net_ipv6_addr_cmp(skip, &route->group)) {
-				continue;
-			}
-
-			cb(route, user_data);
-
-			ret++;
+		if (!route->is_used) {
+			continue;
 		}
+		if (skip && net_ipv6_addr_cmp(skip, &route->group)) {
+			continue;
+		}
+
+		cb(route, user_data);
+
+		ret++;
 	}
 
 	return ret;
@@ -672,17 +693,19 @@ struct net_route_entry_mcast *net_route_mcast_add(struct net_if *iface,
 {
 	int i;
 
+	if (!net_if_flag_is_set(iface, NET_IF_FORWARD_MULTICASTS)) {
+		return NULL;
+	}
 	for (i = 0; i < CONFIG_NET_MAX_MCAST_ROUTES; i++) {
 		struct net_route_entry_mcast *route = &route_mcast_entries[i];
 
-		if (!route->is_used) {
-			net_ipaddr_copy(&route->group, group);
-
-			route->iface = iface;
-			route->is_used = true;
-
-			return route;
+		if (route->is_used) {
+			continue;
 		}
+		net_ipaddr_copy(&route->group, group);
+		route->iface = iface;
+		route->is_used = true;
+		return route;
 	}
 
 	return NULL;
@@ -704,8 +727,7 @@ bool net_route_mcast_del(struct net_route_entry_mcast *route)
 	return true;
 }
 
-struct net_route_entry_mcast *
-net_route_mcast_lookup(struct in6_addr *group)
+struct net_route_entry_mcast *net_route_mcast_lookup(struct in6_addr *group)
 {
 	int i;
 
@@ -713,9 +735,10 @@ net_route_mcast_lookup(struct in6_addr *group)
 		struct net_route_entry_mcast *route = &route_mcast_entries[i];
 
 		if (!route->is_used) {
-			if (net_ipv6_addr_cmp(group, &route->group)) {
-				return route;
-			}
+			continue;
+		}
+		if (net_ipv6_addr_cmp(group, &route->group)) {
+			return route;
 		}
 	}
 
@@ -723,8 +746,7 @@ net_route_mcast_lookup(struct in6_addr *group)
 }
 #endif /* CONFIG_NET_ROUTE_MCAST */
 
-bool net_route_get_info(struct net_if *iface,
-			struct in6_addr *dst,
+bool net_route_get_info(struct net_if *iface, struct in6_addr *dst,
 			struct net_route_entry **route,
 			struct in6_addr **nexthop)
 {
