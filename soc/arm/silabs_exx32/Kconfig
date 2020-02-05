@@ -164,6 +164,16 @@ config CMU_LFXO_FREQ
 	  Set the external low frequency oscillator frequency in Hz. This should be set by the
 	  board's defconfig.
 
+config CMU_HFRCO_FREQ
+	int "Internal high frequency RC oscillator frequency"
+	default 0
+	help
+	  Set the internal high frequency RC oscillator frequency in Hz. This should be set by the
+	  board's defconfig. Only supported values may be used here. Setting this to 0, skips the
+	  configuration of the high frequency RC oscillator completely. This may be desired, if
+	  the bootloader already configured it properly or the device's default clock source should
+	  be used with it's default configuration.
+
 endif # SOC_GECKO_CMU
 
 config SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION
