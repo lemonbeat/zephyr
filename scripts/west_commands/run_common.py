@@ -122,7 +122,7 @@ def add_parser_common(parser_adder, command):
     # This is how we detect if the user provided them or not when
     # overriding values from the cached configuration.
 
-    command_verb = "flash" if command == "flash" else "debug"
+    command_verb = "flash" if command.name == "flash" else "debug"
 
     group.add_argument('--board-dir',
                        help='Zephyr board directory')
@@ -295,6 +295,12 @@ def do_run_common(command, args, runner_args, cached_runner_var):
     except MissingProgram as e:
         log.die('required program', e.filename,
                 'not found; install it or add its location to PATH')
+    except RuntimeError as re:
+        if not args.verbose:
+            log.die(re)
+        else:
+            log.err('verbose mode enabled, dumping stack:', fatal=True)
+            raise
 
 
 #

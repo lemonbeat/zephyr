@@ -657,6 +657,8 @@ static int cmd_advertise(const struct shell *shell, size_t argc, char *argv[])
 			param.options |= BT_LE_ADV_OPT_FILTER_SCAN_REQ;
 		} else if (!strcmp(arg, "wl-conn")) {
 			param.options |= BT_LE_ADV_OPT_FILTER_CONN;
+		} else if (!strcmp(arg, "identity")) {
+			param.options |= BT_LE_ADV_OPT_USE_IDENTITY;
 		} else {
 			goto fail;
 		}
@@ -1389,6 +1391,21 @@ static void auth_pincode_entry(struct bt_conn *conn, bool highsec)
 }
 #endif
 
+#if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
+enum bt_security_err pairing_accept(
+	struct bt_conn *conn, const struct bt_conn_pairing_feat *const feat)
+{
+	shell_print(ctx_shell, "Remote pairing features: "
+			       "IO: 0x%02x, OOB: %d, AUTH: 0x%02x, Key: %d, "
+			       "Init Kdist: 0x%02x, Resp Kdist: 0x%02x",
+			       feat->io_capability, feat->oob_data_flag,
+			       feat->auth_req, feat->max_enc_key_size,
+			       feat->init_key_dist, feat->resp_key_dist);
+
+	return BT_SECURITY_ERR_SUCCESS;
+}
+#endif /* CONFIG_BT_SMP_APP_PAIRING_ACCEPT */
+
 static struct bt_conn_auth_cb auth_cb_display = {
 	.passkey_display = auth_passkey_display,
 	.passkey_entry = NULL,
@@ -1401,6 +1418,9 @@ static struct bt_conn_auth_cb auth_cb_display = {
 	.pairing_confirm = auth_pairing_confirm,
 	.pairing_failed = auth_pairing_failed,
 	.pairing_complete = auth_pairing_complete,
+#if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
+	.pairing_accept = pairing_accept,
+#endif
 };
 
 static struct bt_conn_auth_cb auth_cb_display_yes_no = {
@@ -1415,6 +1435,9 @@ static struct bt_conn_auth_cb auth_cb_display_yes_no = {
 	.pairing_confirm = auth_pairing_confirm,
 	.pairing_failed = auth_pairing_failed,
 	.pairing_complete = auth_pairing_complete,
+#if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
+	.pairing_accept = pairing_accept,
+#endif
 };
 
 static struct bt_conn_auth_cb auth_cb_input = {
@@ -1429,6 +1452,9 @@ static struct bt_conn_auth_cb auth_cb_input = {
 	.pairing_confirm = auth_pairing_confirm,
 	.pairing_failed = auth_pairing_failed,
 	.pairing_complete = auth_pairing_complete,
+#if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
+	.pairing_accept = pairing_accept,
+#endif
 };
 
 static struct bt_conn_auth_cb auth_cb_confirm = {
@@ -1440,6 +1466,9 @@ static struct bt_conn_auth_cb auth_cb_confirm = {
 	.pairing_confirm = auth_pairing_confirm,
 	.pairing_failed = auth_pairing_failed,
 	.pairing_complete = auth_pairing_complete,
+#if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
+	.pairing_accept = pairing_accept,
+#endif
 };
 
 static struct bt_conn_auth_cb auth_cb_all = {
@@ -1454,6 +1483,9 @@ static struct bt_conn_auth_cb auth_cb_all = {
 	.pairing_confirm = auth_pairing_confirm,
 	.pairing_failed = auth_pairing_failed,
 	.pairing_complete = auth_pairing_complete,
+#if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
+	.pairing_accept = pairing_accept,
+#endif
 };
 
 static struct bt_conn_auth_cb auth_cb_oob = {
@@ -1468,6 +1500,9 @@ static struct bt_conn_auth_cb auth_cb_oob = {
 	.pairing_confirm = NULL,
 	.pairing_failed = auth_pairing_failed,
 	.pairing_complete = auth_pairing_complete,
+#if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
+	.pairing_accept = pairing_accept,
+#endif
 };
 
 
@@ -1696,8 +1731,8 @@ SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
 #if defined(CONFIG_BT_BROADCASTER)
 	SHELL_CMD_ARG(advertise, NULL,
 		      "<type: off, on, scan, nconn> [mode: discov, non_discov] "
-		      "[whitelist: wl, wl-scan, wl-conn]",
-		      cmd_advertise, 2, 2),
+		      "[whitelist: wl, wl-scan, wl-conn] [identity]",
+		      cmd_advertise, 2, 3),
 #if defined(CONFIG_BT_PERIPHERAL)
 	SHELL_CMD_ARG(directed-adv, NULL, HELP_ADDR_LE " [mode: low]",
 		      cmd_directed_adv, 3, 1),

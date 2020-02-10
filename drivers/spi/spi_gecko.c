@@ -20,8 +20,7 @@ LOG_MODULE_REGISTER(spi_gecko);
 #include <stdbool.h>
 
 #ifndef CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION
-#error "This EFM32 USART SPI driver is only implemented for devices that \
- support individual pin locations"
+#error "Individual pin location support is required"
 #endif
 
 #define CLOCK_USART(id) _CONCAT(cmuClock_USART, id)

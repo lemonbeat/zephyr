@@ -65,7 +65,7 @@ a .dts file to parse and a list of paths to directories containing bindings.
 # - Please use ""-quoted strings instead of ''-quoted strings, just to make
 #   things consistent (''-quoting is more common otherwise in Python)
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import os
 import re
 import sys
@@ -82,6 +82,9 @@ from dtlib import DT, DTError, to_num, to_nums, TYPE_EMPTY, TYPE_NUMS, \
                   TYPE_PHANDLE, TYPE_PHANDLES_AND_NUMS
 from grutils import Graph
 
+
+dtc_flags = ""
+
 #
 # Public classes
 #
@@ -96,8 +99,31 @@ class EDT:
     nodes:
       A list of Node objects for the nodes that appear in the devicetree
 
+    compat2enabled:
+      A collections.defaultdict that maps each 'compatible' string that appears
+      on some enabled Node to a list of enabled Nodes.
+
+      For example, edt.compat2enabled["bar"] would include the 'foo' and 'bar'
+      nodes below.
+
+        foo {
+                compatible = "bar";
+                status = "okay";
+                ...
+        };
+        bar {
+                compatible = "foo", "bar", "baz";
+                status = "okay";
+                ...
+        };
+
+
     dts_path:
       The .dts path passed to __init__()
+
+    dts_source:
+      The final DTS source code of the loaded devicetree after merging nodes
+      and processing /delete-node/ and /delete-property/, as a string
 
     bindings_dirs:
       The bindings directory paths passed to __init__()
@@ -128,6 +154,7 @@ class EDT:
 
         self._init_compat2binding(bindings_dirs)
         self._init_nodes()
+        self._init_compat2enabled()
 
         self._define_order()
 
@@ -157,6 +184,10 @@ class EDT:
 
         # to_path() checks that the node exists
         return self._node2enode[chosen.props[name].to_path()]
+
+    @property
+    def dts_source(self):
+        return f"{self._dt}"
 
     def __repr__(self):
         return "<EDT for '{}', binding directories '{}'>".format(
@@ -443,7 +474,6 @@ class EDT:
             node.bus_node = node._bus_node()
             node._init_binding()
             node._init_regs()
-            node._set_instance_no()
 
             self.nodes.append(node)
             self._node2enode[dt_node] = node
@@ -455,6 +485,15 @@ class EDT:
             node._init_props()
             node._init_interrupts()
             node._init_pinctrls()
+
+    def _init_compat2enabled(self):
+        # Creates self.compat2enabled
+
+        self.compat2enabled = defaultdict(list)
+        for node in self.nodes:
+            if node.enabled:
+                for compat in node.compats:
+                    self.compat2enabled[compat].append(node)
 
     def _check_binding(self, binding, binding_path):
         # Does sanity checking on 'binding'. Only takes 'self' for the sake of
@@ -689,16 +728,6 @@ class Node:
     read_only:
       True if the node has a 'read-only' property, and False otherwise
 
-    instance_no:
-      Dictionary that maps each 'compatible' string for the node to a unique
-      index among all nodes that have that 'compatible' string.
-
-      As an example, 'instance_no["foo,led"] == 3' can be read as "this is the
-      fourth foo,led node".
-
-      Only enabled nodes (status != "disabled") are counted. 'instance_no' is
-      meaningless for disabled nodes.
-
     matching_compat:
       The 'compatible' string for the binding that matched the node, or None if
       the node has no binding
@@ -750,6 +779,8 @@ class Node:
       The flash controller for the node. Only meaningful for nodes representing
       flash partitions.
     """
+    global dtc_flags
+
     @property
     def name(self):
         "See the class docstring"
@@ -771,9 +802,12 @@ class Node:
 
         addr = _translate(addr, self._node)
 
-        if self.regs and self.regs[0].addr != addr:
-            self.edt._warn("unit-address and first reg (0x{:x}) don't match "
-                           "for {}".format(self.regs[0].addr, self.name))
+        # This code is redundant, it checks the same thing as simple_bus_reg in
+        # dtc, we disable it in python if it's suppressed in dtc.
+        if "-Wno-simple_bus_reg" not in dtc_flags:
+            if self.regs and self.regs[0].addr != addr:
+                self.edt._warn("unit-address and first reg (0x{:x}) don't match "
+                               "for {}".format(self.regs[0].addr, self.name))
 
         return addr
 
@@ -1157,7 +1191,9 @@ class Node:
         address_cells = _address_cells(node)
         size_cells = _size_cells(node)
 
-        for raw_reg in _slice(node, "reg", 4*(address_cells + size_cells)):
+        for raw_reg in _slice(node, "reg", 4*(address_cells + size_cells),
+                              "4*(<#address-cells> (= {}) + <#size-cells> (= {}))"
+                              .format(address_cells, size_cells)):
             reg = Register()
             reg.node = self
             reg.addr = _translate(to_num(raw_reg[:4*address_cells]), node)
@@ -1294,17 +1330,6 @@ class Node:
                          len(data_list)))
 
         return OrderedDict(zip(cell_names, data_list))
-
-    def _set_instance_no(self):
-        # Initializes self.instance_no
-
-        self.instance_no = {}
-
-        for compat in self.compats:
-            self.instance_no[compat] = 0
-            for other_node in self.edt.nodes:
-                if compat in other_node.compats and other_node.enabled:
-                    self.instance_no[compat] += 1
 
 
 class Register:
@@ -1735,7 +1760,12 @@ def _translate(addr, node):
     # Number of cells for one translation 3-tuple in 'ranges'
     entry_cells = child_address_cells + parent_address_cells + child_size_cells
 
-    for raw_range in _slice(node.parent, "ranges", 4*entry_cells):
+    for raw_range in _slice(node.parent, "ranges", 4*entry_cells,
+                            "4*(<#address-cells> (= {}) + "
+                            "<#address-cells for parent> (= {}) + "
+                            "<#size-cells> (= {}))"
+                            .format(child_address_cells, parent_address_cells,
+                                    child_size_cells)):
         child_addr = to_num(raw_range[:4*child_address_cells])
         raw_range = raw_range[4*child_address_cells:]
 
@@ -1815,7 +1845,8 @@ def _interrupts(node):
         interrupt_cells = _interrupt_cells(iparent)
 
         return [_map_interrupt(node, iparent, raw)
-                for raw in _slice(node, "interrupts", 4*interrupt_cells)]
+                for raw in _slice(node, "interrupts", 4*interrupt_cells,
+                                  "4*<#interrupt-cells>")]
 
     return []
 
@@ -2104,15 +2135,19 @@ def _interrupt_cells(node):
     return node.props["#interrupt-cells"].to_num()
 
 
-def _slice(node, prop_name, size):
+def _slice(node, prop_name, size, size_hint):
     # Splits node.props[prop_name].value into 'size'-sized chunks, returning a
     # list of chunks. Raises EDTError if the length of the property is not
-    # evenly divisible by 'size'.
+    # evenly divisible by 'size'. 'size_hint' is a string shown on errors that
+    # gives a hint on how 'size' was calculated.
 
     raw = node.props[prop_name].value
     if len(raw) % size:
         _err("'{}' property in {!r} has length {}, which is not evenly "
-             "divisible by {}".format(prop_name, node, len(raw), size))
+             "divisible by {} (= {}). Note that #*-cells "
+             "properties come either from the parent node or from the "
+             "controller (in the case of 'interrupts')."
+             .format(prop_name, node, len(raw), size, size_hint))
 
     return [raw[i:i + size] for i in range(0, len(raw), size)]
 

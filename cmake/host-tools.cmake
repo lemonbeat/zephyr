@@ -47,7 +47,7 @@ else()
   endif()
 endif()
 
-# Search for the must-have program dtc on PATH and in
+# dtc is an optional dependency. Search for it on PATH and in
 # TOOLCHAIN_HOME. Usually DTC will be provided by an SDK, but for
 # SDK-less projects like gnuarmemb, it is up to the user to install
 # dtc.
@@ -55,10 +55,8 @@ find_program(
   DTC
   dtc
   )
-if(${DTC} STREQUAL DTC-NOTFOUND)
-  message(FATAL_ERROR "Unable to find dtc")
-endif()
 
+if(DTC)
 # Parse the 'dtc --version' and make sure it is at least MIN_DTC_VERSION
 set(MIN_DTC_VERSION 1.4.6)
 execute_process(
@@ -75,14 +73,13 @@ if(${CMAKE_MATCH_1} VERSION_LESS ${MIN_DTC_VERSION})
     for how to use the SDK's dtc alongside a custom toolchain."
   )
 endif()
+endif(DTC)
 
+# gperf is an optional dependency
 find_program(
   GPERF
   gperf
   )
-if(${GPERF} STREQUAL GPERF-NOTFOUND)
-  message(FATAL_ERROR "Unable to find gperf")
-endif()
 
 # openocd is an optional dependency
 find_program(

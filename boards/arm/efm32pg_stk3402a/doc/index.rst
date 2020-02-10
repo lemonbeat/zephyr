@@ -59,6 +59,8 @@ The efm32pg_stk3402a board configuration supports the following hardware feature
 +-----------+------------+-------------------------------------+
 | I2C       | on-chip    | i2c port-polling                    |
 +-----------+------------+-------------------------------------+
+| WATCHDOG  | on-chip    | watchdog                            |
++-----------+------------+-------------------------------------+
 
 The default configuration can be found in the defconfig file:
 
@@ -76,9 +78,9 @@ EFM32 Jade Gecko SoC
 
 The EFM32 Pearl Gecko Starter Kit EFM32PG-STK3402A can also be used to evaluate
 the EFM32 Jade Gecko SoC (EFM32JG12B). The only difference between the Pearl
-Gecko and the Jade Gecko is their core. The memory, peripherals etc are the
-same. The Pearl Gecko contains contains an ARM® Cortex®-M4F core, the Jade Gecko
-an ARM® Cortex®-M3 core.
+Gecko and the Jade Gecko is their core. The Pearl Gecko contains an ARM®
+Cortex®-M4F core, and the Jade Gecko an ARM® Cortex®-M3 core. Other features
+such as memory and peripherals are the same.
 
 Code that is built for the Jade Gecko also runs on an equivalent Pearl Gecko.
 
