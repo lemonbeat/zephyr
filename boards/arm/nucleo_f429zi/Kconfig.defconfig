@@ -15,16 +15,6 @@ config UART_3
 
 endif # UART_CONSOLE
 
-if NETWORKING
-
-config NET_L2_ETHERNET
-	default y
-
-config ETH_STM32_HAL
-	default y
-
-endif # NETWORKING
-
 if SERIAL
 
 config UART_6
