@@ -203,7 +203,7 @@ typedef void (*net_route_mcast_cb_t)(struct net_route_entry_mcast *entry,
  * @return Number of interfaces which forwarded the packet, or a negative
  * value in case of an error.
  */
-int net_route_mcast_forward_packet(const struct net_pkt *pkt,
+int net_route_mcast_forward_packet(struct net_pkt *pkt,
 				   const struct net_ipv6_hdr *hdr);
 
 /**

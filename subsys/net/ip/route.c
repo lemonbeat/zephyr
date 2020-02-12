@@ -631,7 +631,7 @@ int net_route_foreach(net_route_cb_t cb, void *user_data)
 static struct net_route_entry_mcast
 	route_mcast_entries[CONFIG_NET_MAX_MCAST_ROUTES];
 
-int net_route_mcast_forward_packet(const struct net_pkt *pkt,
+int net_route_mcast_forward_packet(struct net_pkt *pkt,
 				   const struct net_ipv6_hdr *hdr)
 {
 	int i, ret = 0, err = 0;
