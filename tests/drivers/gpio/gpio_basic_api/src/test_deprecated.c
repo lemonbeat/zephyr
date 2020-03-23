@@ -21,6 +21,7 @@ static int cb_cnt;
 static void callback(struct device *dev,
 		     struct gpio_callback *gpio_cb, u32_t pins)
 {
+	int rc;
 	const struct drv_data *dd = CONTAINER_OF(gpio_cb,
 						 struct drv_data, gpio_cb);
 
@@ -35,7 +36,18 @@ static void callback(struct device *dev,
 	}
 	if (cb_cnt >= MAX_INT_CNT) {
 		gpio_pin_write(dev, PIN_OUT, dd->aux);
-		gpio_pin_enable_callback(dev, PIN_IN);
+
+		/* NB: The legacy idiom for disabling interrupts is to
+		 * pass GPIO_DIR_IN without any interrupt-related
+		 * flags.  In the new API this leaves the interrupt
+		 * configuration of the pin unchanged, which causes
+		 * level interrupts to repeat forever.  To prevent hangs
+		 * it's necessary to explicitly disable the interrupt.
+		 */
+		rc = gpio_pin_configure(dev, PIN_IN, GPIO_DIR_IN
+					| GPIO_INT_DISABLE);
+		zassert_equal(rc, 0,
+			      "disable interrupts failed: %d", rc);
 	}
 }
 
@@ -67,9 +79,12 @@ static int test_callback(gpio_flags_t int_flags)
 				GPIO_DIR_IN | GPIO_INT
 				| GPIO_INT_DEBOUNCE
 				| int_flags);
-	if (rc != 0) {
+	if (rc == -ENOTSUP) {
+		TC_PRINT("interrupt configuration not supported\n");
+		return TC_PASS;
+	} else if (rc != 0) {
 		TC_ERROR("config PIN_IN fail: %d\n", rc);
-		goto err_exit;
+		return TC_FAIL;
 	}
 
 	drv_data->mode = int_flags;
@@ -90,7 +105,7 @@ static int test_callback(gpio_flags_t int_flags)
 		TC_PRINT("Mode %x not supported\n", int_flags);
 		goto pass_exit;
 	} else if (rc != 0) {
-		TC_ERROR("config PIN_IN interrupt fail: %d\n", rc);
+		TC_ERROR("enable PIN_IN interrupt fail: %d\n", rc);
 		goto err_exit;
 	}
 	k_sleep(K_MSEC(100));

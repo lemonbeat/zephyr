@@ -16,12 +16,14 @@ file(TO_CMAKE_PATH "$ENV{ZEPHYR_BASE}" ZEPHYR_BASE)
 
 message(STATUS "Zephyr base: ${ZEPHYR_BASE}")
 if(DEFINED WEST)
-  message(STATUS "West: ${WEST}")
+  execute_process(COMMAND west --version
+    OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE WEST_VERSION)
+  message(STATUS "West: ${WEST} (west --version: \"${WEST_VERSION}\")")
 else()
   message(STATUS "West: not found")
 endif()
 
-find_package(PythonInterp 3.4)
+find_package(PythonInterp 3.6 REQUIRED)
 set(DOXYGEN_SKIP_DOT True)
 find_package(Doxygen REQUIRED)
 find_package(LATEX)

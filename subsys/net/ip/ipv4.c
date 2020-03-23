@@ -23,10 +23,6 @@ LOG_MODULE_REGISTER(net_ipv4, CONFIG_NET_IPV4_LOG_LEVEL);
 #include "udp_internal.h"
 #include "tcp_internal.h"
 #include "ipv4.h"
-#ifdef CONFIG_NET_TCP2
-#include "tcp2.h"
-#endif
-#include "tp.h"
 
 /* Timeout for various buffer allocations in this file. */
 #define NET_BUF_TIMEOUT K_MSEC(50)
@@ -116,7 +112,7 @@ int net_ipv4_parse_hdr_options(struct net_pkt *pkt,
 {
 	struct net_pkt_cursor cur;
 	u8_t opt_data[NET_IPV4_HDR_OPTNS_MAX_LEN];
-	u8_t opts_len;
+	u8_t total_opts_len;
 
 	if (!cb) {
 		return -EINVAL;
@@ -129,9 +125,9 @@ int net_ipv4_parse_hdr_options(struct net_pkt *pkt,
 		return -EINVAL;
 	}
 
-	opts_len = net_pkt_ipv4_opts_len(pkt);
+	total_opts_len = net_pkt_ipv4_opts_len(pkt);
 
-	while (opts_len) {
+	while (total_opts_len) {
 		u8_t opt_len = 0U;
 		u8_t opt_type;
 
@@ -139,7 +135,7 @@ int net_ipv4_parse_hdr_options(struct net_pkt *pkt,
 			return -EINVAL;
 		}
 
-		opts_len--;
+		total_opts_len--;
 
 		if (!(opt_type == NET_IPV4_OPTS_EO ||
 		      opt_type == NET_IPV4_OPTS_NOP)) {
@@ -147,11 +143,15 @@ int net_ipv4_parse_hdr_options(struct net_pkt *pkt,
 				return -EINVAL;
 			}
 
+			if (opt_len < 2U || total_opts_len < 1U) {
+				return -EINVAL;
+			}
+
 			opt_len -= 2U;
-			opts_len--;
+			total_opts_len--;
 		}
 
-		if (opt_len > opts_len) {
+		if (opt_len > total_opts_len) {
 			return -EINVAL;
 		}
 
@@ -163,7 +163,7 @@ int net_ipv4_parse_hdr_options(struct net_pkt *pkt,
 			/* Options length should be zero, when cursor reachs to
 			 * End of options.
 			 */
-			if (opts_len) {
+			if (total_opts_len) {
 				return -EINVAL;
 			}
 
@@ -187,7 +187,7 @@ int net_ipv4_parse_hdr_options(struct net_pkt *pkt,
 			break;
 		}
 
-		opts_len -= opt_len;
+		total_opts_len -= opt_len;
 	}
 
 	net_pkt_cursor_restore(pkt, &cur);
@@ -218,18 +218,6 @@ enum net_verdict net_ipv4_input(struct net_pkt *pkt)
 		goto drop;
 	}
 
-#if defined(CONFIG_NET_TCP2) && defined(CONFIG_NET_TEST_PROTOCOL)
-	if (hdr->proto == IPPROTO_TCP) {
-		tcp_input(pkt);
-		goto drop;
-	}
-#endif
-#if defined(CONFIG_NET_TEST_PROTOCOL)
-	if (hdr->proto == IPPROTO_UDP) {
-		tp_input(pkt);
-		goto drop;
-	}
-#endif
 	hdr_len = (hdr->vhl & NET_IPV4_IHL_MASK) * 4U;
 	if (hdr_len < sizeof(struct net_ipv4_hdr)) {
 		NET_DBG("DROP: Invalid hdr length");
@@ -239,6 +227,10 @@ enum net_verdict net_ipv4_input(struct net_pkt *pkt)
 	net_pkt_set_ip_hdr_len(pkt, sizeof(struct net_ipv4_hdr));
 
 	opts_len = hdr_len - sizeof(struct net_ipv4_hdr);
+	if (opts_len > NET_IPV4_HDR_OPTNS_MAX_LEN) {
+		return -EINVAL;
+	}
+
 	net_pkt_set_ipv4_opts_len(pkt, opts_len);
 
 	pkt_len = ntohs(hdr->len);

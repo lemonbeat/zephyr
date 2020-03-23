@@ -63,6 +63,7 @@ static ALWAYS_INLINE void clock_init(void)
 	 * This is the default clock, the controller starts with
 	 */
 
+#ifdef CONFIG_SOC_GECKO_HAS_HFRCO_FREQRANGE
 	if (CONFIG_CMU_HFRCO_FREQ) {
 		/* Setting system HFRCO frequency */
 		CMU_HFRCOBandSet(CONFIG_CMU_HFRCO_FREQ);
@@ -70,6 +71,7 @@ static ALWAYS_INLINE void clock_init(void)
 		/* Using HFRCO as high frequency clock, HFCLK */
 		CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO);
 	}
+#endif
 #else
 #error "Unsupported clock source for HFCLK selected"
 #endif

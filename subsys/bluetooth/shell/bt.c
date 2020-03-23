@@ -303,6 +303,10 @@ static void bt_ready(int err)
 		settings_load();
 	}
 
+	if (IS_ENABLED(CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY)) {
+		bt_set_oob_data_flag(true);
+	}
+
 #if defined(CONFIG_BT_CONN)
 	default_conn = NULL;
 
@@ -1050,7 +1054,7 @@ static int cmd_oob_remote(const struct shell *shell, size_t argc,
 			sizeof(oob_remote.le_sc_data.c));
 		bt_set_oob_data_flag(true);
 	} else {
-		shell_error(shell, "legacy not implemented (%d)", argc);
+		shell_help(shell);
 		return -ENOEXEC;
 	}
 
@@ -1269,6 +1273,7 @@ static void auth_pairing_confirm(struct bt_conn *conn)
 	shell_print(ctx_shell, "Confirm pairing for %s", addr);
 }
 
+#if !defined(CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY)
 static const char *oob_config_str(int oob_config)
 {
 	switch (oob_config) {
@@ -1283,6 +1288,7 @@ static const char *oob_config_str(int oob_config)
 		return "no";
 	}
 }
+#endif /* !defined(CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY) */
 
 static void auth_pairing_oob_data_request(struct bt_conn *conn,
 					  struct bt_conn_oob_info *oob_info)
@@ -1296,6 +1302,7 @@ static void auth_pairing_oob_data_request(struct bt_conn *conn,
 		return;
 	}
 
+#if !defined(CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY)
 	if (oob_info->type == BT_CONN_OOB_LE_SC) {
 		struct bt_le_oob_sc_data *oobd_local =
 			oob_info->lesc.oob_config != BT_CONN_OOB_REMOTE_ONLY
@@ -1331,10 +1338,12 @@ static void auth_pairing_oob_data_request(struct bt_conn *conn,
 		bt_addr_le_to_str(info.le.dst, addr, sizeof(addr));
 		shell_print(ctx_shell, "Set %s OOB SC data for %s, ",
 			    oob_config_str(oob_info->lesc.oob_config), addr);
-	} else {
-		shell_print(ctx_shell, "Legacy OOB not supported");
-		bt_conn_auth_cancel(conn);
+		return;
 	}
+#endif /* CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY */
+
+	bt_addr_le_to_str(info.le.dst, addr, sizeof(addr));
+	shell_print(ctx_shell, "Legacy OOB TK requested from remote %s", addr);
 }
 
 static void auth_pairing_complete(struct bt_conn *conn, bool bonded)
@@ -1633,6 +1642,7 @@ static int cmd_wl_clear(const struct shell *shell, size_t argc, char *argv[])
 	return 0;
 }
 
+#if defined(CONFIG_BT_CENTRAL)
 static int cmd_wl_connect(const struct shell *shell, size_t argc, char *argv[])
 {
 	int err;
@@ -1656,6 +1666,7 @@ static int cmd_wl_connect(const struct shell *shell, size_t argc, char *argv[])
 
 	return 0;
 }
+#endif /* CONFIG_BT_CENTRAL */
 #endif /* defined(CONFIG_BT_WHITELIST) */
 
 #if defined(CONFIG_BT_FIXED_PASSKEY)
@@ -1691,6 +1702,7 @@ static int cmd_auth_passkey(const struct shell *shell,
 			    size_t argc, char *argv[])
 {
 	unsigned int passkey;
+	int err;
 
 	if (!default_conn) {
 		shell_print(shell, "Not connected");
@@ -1703,9 +1715,37 @@ static int cmd_auth_passkey(const struct shell *shell,
 		return -EINVAL;
 	}
 
-	bt_conn_auth_passkey_entry(default_conn, passkey);
+	err = bt_conn_auth_passkey_entry(default_conn, passkey);
+	if (err) {
+		shell_error(shell, "Failed to set passkey (%d)", err);
+		return err;
+	}
+
 	return 0;
 }
+
+#if !defined(CONFIG_BT_SMP_SC_PAIR_ONLY)
+static int cmd_auth_oob_tk(const struct shell *shell, size_t argc, char *argv[])
+{
+	u8_t tk[16];
+	size_t len;
+	int err;
+
+	len = hex2bin(argv[1], strlen(argv[1]), tk, sizeof(tk));
+	if (len != sizeof(tk)) {
+		shell_error(shell, "TK should be 16 bytes");
+		return -EINVAL;
+	}
+
+	err = bt_le_oob_set_legacy_tk(default_conn, tk);
+	if (err) {
+		shell_error(shell, "Failed to set TK (%d)", err);
+		return err;
+	}
+
+	return 0;
+}
+#endif /* !defined(CONFIG_BT_SMP_SC_PAIR_ONLY) */
 #endif /* CONFIG_BT_SMP) || CONFIG_BT_BREDR */
 
 
@@ -1713,7 +1753,7 @@ static int cmd_auth_passkey(const struct shell *shell,
 #define HELP_ADDR_LE "<address: XX:XX:XX:XX:XX:XX> <type: (public|random)>"
 
 SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
-	SHELL_CMD_ARG(init, NULL, HELP_ADDR_LE, cmd_init, 1, 0),
+	SHELL_CMD_ARG(init, NULL, HELP_NONE, cmd_init, 1, 0),
 #if defined(CONFIG_BT_HCI)
 	SHELL_CMD_ARG(hci-cmd, NULL, "<ogf> <ocf> [data]", cmd_hci_cmd, 3, 1),
 #endif
@@ -1774,6 +1814,9 @@ SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
 		      cmd_auth_passkey_confirm, 1, 0),
 	SHELL_CMD_ARG(auth-pairing-confirm, NULL, HELP_NONE,
 		      cmd_auth_pairing_confirm, 1, 0),
+#if !defined(CONFIG_BT_SMP_SC_PAIR_ONLY)
+	SHELL_CMD_ARG(auth-oob-tk, NULL, "<tk>", cmd_auth_oob_tk, 2, 0),
+#endif /* !defined(CONFIG_BT_SMP_SC_PAIR_ONLY) */
 	SHELL_CMD_ARG(oob-remote, NULL,
 		      HELP_ADDR_LE" <oob rand> <oob confirm>",
 		      cmd_oob_remote, 3, 2),
@@ -1782,7 +1825,9 @@ SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
 	SHELL_CMD_ARG(wl-add, NULL, HELP_ADDR_LE, cmd_wl_add, 3, 0),
 	SHELL_CMD_ARG(wl-rem, NULL, HELP_ADDR_LE, cmd_wl_rem, 3, 0),
 	SHELL_CMD_ARG(wl-clear, NULL, HELP_NONE, cmd_wl_clear, 1, 0),
+#if defined(CONFIG_BT_CENTRAL)
 	SHELL_CMD_ARG(wl-connect, NULL, "<on, off>", cmd_wl_connect, 2, 0),
+#endif /* CONFIG_BT_CENTRAL */
 #endif /* defined(CONFIG_BT_WHITELIST) */
 #if defined(CONFIG_BT_FIXED_PASSKEY)
 	SHELL_CMD_ARG(fixed-passkey, NULL, "[passkey]", cmd_fixed_passkey,

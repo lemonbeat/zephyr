@@ -16,10 +16,6 @@
 #include <ksched.h>
 #include <wait_q.h>
 
-#ifdef CONFIG_USERSPACE
-extern u8_t *z_priv_stack_find(void *obj);
-#endif
-
 /* An initial context, to be "restored" by z_arm_pendsv(), is put at the other
  * end of the stack, and thus reusable by the stack when not needed anymore.
  *
@@ -135,9 +131,13 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
 	thread->callee_saved.psp = (u32_t)pInitCtx;
 #if defined(CONFIG_CPU_CORTEX_R)
 	pInitCtx->basic.lr = (u32_t)pInitCtx->basic.pc;
-	thread->callee_saved.spsr = A_BIT | T_BIT | MODE_SYS;
-	thread->callee_saved.lr = (u32_t)pInitCtx->basic.pc;
+	thread->callee_saved.spsr = A_BIT | MODE_SYS;
+#if defined(CONFIG_COMPILER_ISA_THUMB2)
+	thread->callee_saved.spsr |= T_BIT;
 #endif
+
+	thread->callee_saved.lr = (u32_t)pInitCtx->basic.pc;
+#endif /* CONFIG_CPU_CORTEX_R */
 	thread->arch.basepri = 0;
 
 #if defined(CONFIG_USERSPACE) || defined(CONFIG_FP_SHARING)
@@ -170,11 +170,11 @@ FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry,
 	 * buffer area accordingly.
 	 */
 #if defined(CONFIG_FLOAT) && defined(CONFIG_FP_SHARING)
-	 _current->arch.priv_stack_start +=
+	_current->arch.priv_stack_start +=
 		(_current->base.user_options & K_FP_REGS) ?
 		MPU_GUARD_ALIGN_AND_SIZE_FLOAT : MPU_GUARD_ALIGN_AND_SIZE;
 #else
-	 _current->arch.priv_stack_start += MPU_GUARD_ALIGN_AND_SIZE;
+	_current->arch.priv_stack_start += MPU_GUARD_ALIGN_AND_SIZE;
 #endif /* CONFIG_FLOAT && CONFIG_FP_SHARING */
 #endif /* CONFIG_MPU_STACK_GUARD */
 
@@ -205,11 +205,20 @@ void configure_builtin_stack_guard(struct k_thread *thread)
 		 * User threads executing in user mode do not require a stack
 		 * limit protection.
 		 */
+		__set_PSPLIM(0);
 		return;
 	}
-	u32_t guard_start = thread->arch.priv_stack_start ?
-			    (u32_t)thread->arch.priv_stack_start :
-			    (u32_t)thread->stack_obj;
+	/* Only configure PSPLIM to guard the privileged stack area, if
+	 * the thread is currently using it, otherwise guard the default
+	 * thread stack. Note that the conditional check relies on the
+	 * thread privileged stack being allocated in higher memory area
+	 * than the default thread stack (ensured by design).
+	 */
+	u32_t guard_start =
+		((thread->arch.priv_stack_start) &&
+			(__get_PSP() >= thread->arch.priv_stack_start)) ?
+		(u32_t)thread->arch.priv_stack_start :
+		(u32_t)thread->stack_obj;
 
 	__ASSERT(thread->stack_info.start == ((u32_t)thread->stack_obj),
 		"stack_info.start does not point to the start of the"

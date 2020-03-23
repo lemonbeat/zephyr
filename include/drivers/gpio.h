@@ -267,6 +267,7 @@ extern "C" {
  * @deprecated Replace with `GPIO_INPUT`.
  */
 /* Deprecated in 2.2 release */
+#undef GPIO_DIR_IN
 #define GPIO_DIR_IN __DEPRECATED_MACRO			GPIO_INPUT
 
 /** Legacy flag indicating pin is configured as output.
@@ -544,7 +545,7 @@ enum gpio_int_trig {
 	GPIO_INT_TRIG_BOTH = GPIO_INT_LOW_0 | GPIO_INT_HIGH_1,
 };
 
-struct gpio_driver_api {
+__subsystem struct gpio_driver_api {
 	int (*pin_configure)(struct device *port, gpio_pin_t pin, gpio_flags_t flags);
 	int (*port_get_raw)(struct device *port, gpio_port_value_t *value);
 	int (*port_set_masked_raw)(struct device *port, gpio_port_pins_t mask,

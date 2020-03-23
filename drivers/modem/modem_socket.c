@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2019 Foundries.io
+ * Copyright (c) 2019-2020 Foundries.io
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -18,6 +18,24 @@
 /*
  * Packet Size Support Functions
  */
+
+u16_t modem_socket_next_packet_size(struct modem_socket_config *cfg,
+				    struct modem_socket *sock)
+{
+	u16_t total = 0U;
+
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+
+	if (!sock || !sock->packet_count) {
+		goto exit;
+	}
+
+	total = sock->packet_sizes[0];
+
+exit:
+	k_sem_give(&cfg->sem_lock);
+	return total;
+}
 
 static u16_t modem_socket_packet_get_total(struct modem_socket *sock)
 {
@@ -62,6 +80,8 @@ int modem_socket_packet_size_update(struct modem_socket_config *cfg,
 		return -EINVAL;
 	}
 
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+
 	if (new_total < 0) {
 		new_total += modem_socket_packet_get_total(sock);
 	}
@@ -70,6 +90,7 @@ int modem_socket_packet_size_update(struct modem_socket_config *cfg,
 		/* reset outstanding value here */
 		sock->packet_count = 0U;
 		sock->packet_sizes[0] = 0U;
+		k_sem_give(&cfg->sem_lock);
 		return 0;
 	}
 
@@ -82,6 +103,12 @@ int modem_socket_packet_size_update(struct modem_socket_config *cfg,
 	if (new_total < old_total) {
 		/* remove packets that are not included in new_size */
 		while (old_total > new_total && sock->packet_count > 0) {
+			/* handle partial read */
+			if (old_total - new_total < sock->packet_sizes[0]) {
+				sock->packet_sizes[0] -= old_total - new_total;
+				break;
+			}
+
 			old_total -= sock->packet_sizes[0];
 			modem_socket_packet_drop_first(sock);
 		}
@@ -91,6 +118,7 @@ int modem_socket_packet_size_update(struct modem_socket_config *cfg,
 
 	/* new packet to add */
 	if (sock->packet_count >= CONFIG_MODEM_SOCKET_PACKET_COUNT) {
+		k_sem_give(&cfg->sem_lock);
 		return -ENOMEM;
 	}
 
@@ -98,10 +126,12 @@ int modem_socket_packet_size_update(struct modem_socket_config *cfg,
 		sock->packet_sizes[sock->packet_count] = new_total - old_total;
 		sock->packet_count++;
 	} else {
+		k_sem_give(&cfg->sem_lock);
 		return -EINVAL;
 	}
 
 data_ready:
+	k_sem_give(&cfg->sem_lock);
 	return new_total;
 }
 
@@ -114,6 +144,8 @@ int modem_socket_get(struct modem_socket_config *cfg,
 {
 	int i;
 
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+
 	for (i = 0; i < cfg->sockets_len; i++) {
 		if (cfg->sockets[i].id < cfg->base_socket_num) {
 			break;
@@ -121,12 +153,14 @@ int modem_socket_get(struct modem_socket_config *cfg,
 	}
 
 	if (i >= cfg->sockets_len) {
+		k_sem_give(&cfg->sem_lock);
 		return -ENOMEM;
 	}
 
 	/* FIXME: 4 fds max now due to POSIX_OS conflict */
 	cfg->sockets[i].sock_fd = z_reserve_fd();
 	if (cfg->sockets[i].sock_fd < 0) {
+		k_sem_give(&cfg->sem_lock);
 		return -errno;
 	}
 
@@ -138,6 +172,7 @@ int modem_socket_get(struct modem_socket_config *cfg,
 	z_finalize_fd(cfg->sockets[i].sock_fd, &cfg->sockets[i],
 		      (const struct fd_op_vtable *)cfg->vtable);
 
+	k_sem_give(&cfg->sem_lock);
 	return cfg->sockets[i].sock_fd;
 }
 
@@ -146,11 +181,16 @@ struct modem_socket *modem_socket_from_fd(struct modem_socket_config *cfg,
 {
 	int i;
 
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+
 	for (i = 0; i < cfg->sockets_len; i++) {
 		if (cfg->sockets[i].sock_fd == sock_fd) {
+			k_sem_give(&cfg->sem_lock);
 			return &cfg->sockets[i];
 		}
 	}
+
+	k_sem_give(&cfg->sem_lock);
 
 	return NULL;
 }
@@ -164,11 +204,16 @@ struct modem_socket *modem_socket_from_id(struct modem_socket_config *cfg,
 		return NULL;
 	}
 
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+
 	for (i = 0; i < cfg->sockets_len; i++) {
 		if (cfg->sockets[i].id == id) {
+			k_sem_give(&cfg->sem_lock);
 			return &cfg->sockets[i];
 		}
 	}
+
+	k_sem_give(&cfg->sem_lock);
 
 	return NULL;
 }
@@ -186,11 +231,18 @@ void modem_socket_put(struct modem_socket_config *cfg, int sock_fd)
 		return;
 	}
 
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+
 	z_free_fd(sock->sock_fd);
 	sock->id = cfg->base_socket_num - 1;
 	sock->sock_fd = -1;
+	sock->is_waiting = false;
+	sock->is_polled = false;
+	sock->is_connected = false;
 	(void)memset(&sock->src, 0, sizeof(struct sockaddr));
 	(void)memset(&sock->dst, 0, sizeof(struct sockaddr));
+
+	k_sem_give(&cfg->sem_lock);
 }
 
 /*
@@ -262,12 +314,42 @@ int modem_socket_poll(struct modem_socket_config *cfg,
 	return found_count;
 }
 
+void modem_socket_wait_data(struct modem_socket_config *cfg,
+			    struct modem_socket *sock)
+{
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+	sock->is_waiting = true;
+	k_sem_give(&cfg->sem_lock);
+
+	k_sem_take(&sock->sem_data_ready, K_FOREVER);
+}
+
+void modem_socket_data_ready(struct modem_socket_config *cfg,
+			     struct modem_socket *sock)
+{
+	k_sem_take(&cfg->sem_lock, K_FOREVER);
+
+	if (sock->is_waiting) {
+		/* unblock sockets waiting on recv() */
+		sock->is_waiting = false;
+		k_sem_give(&sock->sem_data_ready);
+	}
+
+	if (sock->is_polled) {
+		/* unblock poll() */
+		k_sem_give(&cfg->sem_poll);
+	}
+
+	k_sem_give(&cfg->sem_lock);
+}
+
 int modem_socket_init(struct modem_socket_config *cfg,
 		      const struct socket_op_vtable *vtable)
 {
 	int i;
 
 	k_sem_init(&cfg->sem_poll, 0, 1);
+	k_sem_init(&cfg->sem_lock, 1, 1);
 	for (i = 0; i < cfg->sockets_len; i++) {
 		k_sem_init(&cfg->sockets[i].sem_data_ready, 0, 1);
 		cfg->sockets[i].id = cfg->base_socket_num - 1;

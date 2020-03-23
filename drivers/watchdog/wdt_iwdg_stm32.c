@@ -114,17 +114,20 @@ static int iwdg_stm32_install_timeout(struct device *dev,
 
 	tickstart = k_uptime_get_32();
 
-	while (LL_IWDG_IsReady(iwdg) == 0) {
-		/* Wait until WVU, RVU, PVU are reset before updating  */
+	LL_IWDG_EnableWriteAccess(iwdg);
+
+	LL_IWDG_SetPrescaler(iwdg, prescaler);
+	LL_IWDG_SetReloadCounter(iwdg, reload);
+
+	/* Wait for the update operation completed */
+	while (LL_IWDG_IsReady(iwdg) != 0) {
 		if ((k_uptime_get_32() - tickstart) > IWDG_DEFAULT_TIMEOUT) {
 			return -ENODEV;
 		}
 	}
 
-	LL_IWDG_EnableWriteAccess(iwdg);
-
-	LL_IWDG_SetPrescaler(iwdg, prescaler);
-	LL_IWDG_SetReloadCounter(iwdg, reload);
+	/* Reload counter just before leaving */
+	LL_IWDG_ReloadCounter(iwdg);
 
 	return 0;
 }
@@ -148,7 +151,7 @@ static const struct wdt_driver_api iwdg_stm32_api = {
 
 static int iwdg_stm32_init(struct device *dev)
 {
-#ifdef CONFIG_IWDG_STM32_START_AT_BOOT
+#ifndef CONFIG_WDT_DISABLE_AT_BOOT
 	IWDG_TypeDef *iwdg = IWDG_STM32_STRUCT(dev);
 	struct wdt_timeout_cfg config = {
 		.window.max = CONFIG_IWDG_STM32_TIMEOUT / USEC_PER_MSEC,

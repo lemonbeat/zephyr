@@ -6,6 +6,7 @@ Build Overview
 The Zephyr build process can be divided into two main phases: a configuration
 phase (driven by CMake) and a build phase (driven by Make or Ninja).
 
+.. _build_configuration_phase:
 
 Configuration Phase
 *******************
@@ -50,7 +51,7 @@ Devicetree
    from ``dtc`` is unused otherwise.
 
    The above is just a brief overview. For more information on devicetree, see
-   :ref:`the devicetree section of the manual <device-tree>`.
+   :ref:`devicetree`.
 
 Devicetree fixups
    Files named :file:`dts_fixup.h` from the target’s architecture, SoC, board,
@@ -152,7 +153,7 @@ Final binary
 
 In some configurations, the binary from the previous stage is
 incomplete, with empty and/or placeholder sections that must be filled
-in by, essentially, reflection. When :ref:`usermode` is enabled:
+in by, essentially, reflection. When :ref:`usermode_api` is enabled:
 
 Kernel object hashing
    The *gen_kobject_list.py* scans the *ELF DWARF*
@@ -226,15 +227,6 @@ The following is a detailed description of the scripts used during the build pro
 
 
 .. include:: ../../../scripts/parse_syscalls.py
-   :start-after: """
-   :end-before: """
-
-.. _gen_priv_stacks.py:
-
-:zephyr_file:`scripts/gen_priv_stacks.py`
-==========================================
-
-.. include:: ../../../scripts/gen_priv_stacks.py
    :start-after: """
    :end-before: """
 

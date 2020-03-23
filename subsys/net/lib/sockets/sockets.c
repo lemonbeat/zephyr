@@ -425,6 +425,7 @@ int zsock_accept_ctx(struct net_context *parent, struct sockaddr *addr,
 
 	ctx = k_fifo_get(&parent->accept_q, timeout);
 	if (ctx == NULL) {
+		z_free_fd(fd);
 		errno = EAGAIN;
 		return -1;
 	}
@@ -434,6 +435,7 @@ int zsock_accept_ctx(struct net_context *parent, struct sockaddr *addr,
 	if (last_pkt) {
 		if (net_pkt_eof(last_pkt)) {
 			sock_set_eof(ctx);
+			z_free_fd(fd);
 			errno = ECONNABORTED;
 			return -1;
 		}
@@ -441,6 +443,7 @@ int zsock_accept_ctx(struct net_context *parent, struct sockaddr *addr,
 
 	if (net_context_is_closing(ctx)) {
 		errno = ECONNABORTED;
+		z_free_fd(fd);
 		return -1;
 	}
 
@@ -462,6 +465,7 @@ int zsock_accept_ctx(struct net_context *parent, struct sockaddr *addr,
 		} else if (ctx->remote.sa_family == AF_INET6) {
 			*addrlen = sizeof(struct sockaddr_in6);
 		} else {
+			z_free_fd(fd);
 			errno = ENOTSUP;
 			return -1;
 		}
@@ -765,7 +769,7 @@ static inline ssize_t zsock_recv_dgram(struct net_context *ctx,
 					   src_addr, *addrlen);
 		if (rv < 0) {
 			errno = -rv;
-			return -1;
+			goto fail;
 		}
 
 		/* addrlen is a value-result argument, set to actual
@@ -777,7 +781,7 @@ static inline ssize_t zsock_recv_dgram(struct net_context *ctx,
 			*addrlen = sizeof(struct sockaddr_in6);
 		} else {
 			errno = ENOTSUP;
-			return -1;
+			goto fail;
 		}
 	}
 
@@ -788,7 +792,7 @@ static inline ssize_t zsock_recv_dgram(struct net_context *ctx,
 
 	if (net_pkt_read(pkt, buf, recv_len)) {
 		errno = ENOBUFS;
-		return -1;
+		goto fail;
 	}
 
 	net_stats_update_tc_rx_time(net_pkt_iface(pkt),
@@ -803,6 +807,13 @@ static inline ssize_t zsock_recv_dgram(struct net_context *ctx,
 	}
 
 	return recv_len;
+
+fail:
+	if (!(flags & ZSOCK_MSG_PEEK)) {
+		net_pkt_unref(pkt);
+	}
+
+	return -1;
 }
 
 static inline ssize_t zsock_recv_stream(struct net_context *ctx,

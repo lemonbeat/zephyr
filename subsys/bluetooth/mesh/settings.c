@@ -2260,6 +2260,7 @@ void bt_mesh_store_cdb_node(const struct bt_mesh_cdb_node *node)
 	}
 
 	free_slot->addr = node->addr;
+	free_slot->clear = false;
 
 	schedule_cdb_store(BT_MESH_CDB_NODES_PENDING);
 }
@@ -2298,7 +2299,7 @@ static struct key_update *cdb_key_update_find(bool app_key, u16_t key_idx,
 	match = NULL;
 	*free_slot = NULL;
 
-	for (i = 0; i < ARRAY_SIZE(key_updates); i++) {
+	for (i = 0; i < ARRAY_SIZE(cdb_key_updates); i++) {
 		struct key_update *update = &cdb_key_updates[i];
 
 		if (!update->valid) {

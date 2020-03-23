@@ -6,13 +6,6 @@ if BOARD_MEC15XXEVB_ASSY6853
 config BOARD
 	default "mec15xxevb_assy6853"
 
-if UART_NS16550
-
-config UART_NS16550_PORT_2
-	default y if UART_CONSOLE
-
-endif
-
 if PINMUX_XEC
 
 config PINMUX_XEC_GPIO000_036
@@ -58,12 +51,9 @@ config GPIO_XEC_GPIO240_276
 
 endif # GPIO_XEC
 
-if ESPI
-
 config ESPI_XEC
 	default y
-
-endif # ESPI
+	depends on ESPI
 
 if RTOS_TIMER
 
@@ -120,6 +110,10 @@ config SPI_0_OP_MODES
 endif # SPI_XEC_QMSPI
 
 endif # SPI
+
+config TACH_XEC
+	default y
+	depends on SENSOR
 
 # power management stuff
 if SYS_POWER_MANAGEMENT

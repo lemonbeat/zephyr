@@ -1150,7 +1150,12 @@ int net_pkt_alloc_buffer(struct net_pkt *pkt,
 #endif
 
 	if (!buf) {
-		NET_ERR("Data buffer allocation failed.");
+#if NET_LOG_LEVEL >= LOG_LEVEL_DBG
+		NET_ERR("Data buffer (%zd) allocation failed (%s:%d)",
+			alloc_len, caller, line);
+#else
+		NET_ERR("Data buffer (%zd) allocation failed.", alloc_len);
+#endif
 		return -ENOMEM;
 	}
 
@@ -1724,6 +1729,7 @@ struct net_pkt *net_pkt_clone(struct net_pkt *pkt, s32_t timeout)
 {
 	size_t cursor_offset = net_pkt_get_current_offset(pkt);
 	struct net_pkt *clone_pkt;
+	struct net_pkt_cursor backup;
 
 	clone_pkt = net_pkt_alloc_with_buffer(net_pkt_iface(pkt),
 					      net_pkt_get_len(pkt),
@@ -1732,10 +1738,12 @@ struct net_pkt *net_pkt_clone(struct net_pkt *pkt, s32_t timeout)
 		return NULL;
 	}
 
+	net_pkt_cursor_backup(pkt, &backup);
 	net_pkt_cursor_init(pkt);
 
 	if (net_pkt_copy(clone_pkt, pkt, net_pkt_get_len(pkt))) {
 		net_pkt_unref(clone_pkt);
+		net_pkt_cursor_restore(pkt, &backup);
 		return NULL;
 	}
 
@@ -1758,6 +1766,8 @@ struct net_pkt *net_pkt_clone(struct net_pkt *pkt, s32_t timeout)
 		net_pkt_set_overwrite(clone_pkt, true);
 		net_pkt_skip(clone_pkt, cursor_offset);
 	}
+
+	net_pkt_cursor_restore(pkt, &backup);
 
 	NET_DBG("Cloned %p to %p", pkt, clone_pkt);
 
