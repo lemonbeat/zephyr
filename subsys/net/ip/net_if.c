@@ -358,17 +358,23 @@ enum net_verdict net_if_send_data(struct net_if *iface, struct net_pkt *pkt)
 		goto done;
 	}
 #endif
-#if defined(CONFIG_NET_L2_LEMONBEAT)
-	if (net_if_l2(iface) == &NET_L2_GET_NAME(LEMONBEAT)) {
-		goto done;
-	}
-#endif
 	/* If the ll dst address is not set check if it is present in the nbr
 	 * cache.
 	 */
 	if (IS_ENABLED(CONFIG_NET_IPV6) && net_pkt_family(pkt) == AF_INET6) {
 		verdict = net_ipv6_prepare_for_send(pkt);
 	}
+
+#if defined(CONFIG_NET_L2_LEMONBEAT)
+	/* net_ipv6_prepare_for_send() might select a different iface for
+	 * sending (e.g. ppp) based on routing, so this block MUST be behind
+	 * net_ipv6_prepare_for_send().
+	 */
+	if (net_if_l2(iface) == &NET_L2_GET_NAME(LEMONBEAT)) {
+		verdict = NET_OK;
+		goto done;
+	}
+#endif
 
 done:
 	/*   NET_OK in which case packet has checked successfully. In this case
