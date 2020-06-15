@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT bosch_bma280
+
 #include <device.h>
 #include <drivers/i2c.h>
 #include <sys/util.h>
@@ -21,7 +23,7 @@ static inline void setup_int1(struct device *dev,
 	struct bma280_data *data = dev->driver_data;
 
 	gpio_pin_interrupt_configure(data->gpio,
-				     DT_INST_0_BOSCH_BMA280_INT1_GPIOS_PIN,
+				     DT_INST_GPIO_PIN(0, int1_gpios),
 				     (enable
 				      ? GPIO_INT_EDGE_TO_ACTIVE
 				      : GPIO_INT_DISABLE));
@@ -33,7 +35,7 @@ int bma280_attr_set(struct device *dev,
 		    const struct sensor_value *val)
 {
 	struct bma280_data *drv_data = dev->driver_data;
-	u64_t slope_th;
+	uint64_t slope_th;
 
 	if (chan != SENSOR_CHAN_ACCEL_XYZ) {
 		return -ENOTSUP;
@@ -41,10 +43,10 @@ int bma280_attr_set(struct device *dev,
 
 	if (attr == SENSOR_ATTR_SLOPE_TH) {
 		/* slope_th = (val * 10^6 * 2^10) / BMA280_PMU_FULL_RAGE */
-		slope_th = (u64_t)val->val1 * 1000000U + (u64_t)val->val2;
+		slope_th = (uint64_t)val->val1 * 1000000U + (uint64_t)val->val2;
 		slope_th = (slope_th * (1 << 10)) / BMA280_PMU_FULL_RANGE;
 		if (i2c_reg_write_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-				       BMA280_REG_SLOPE_TH, (u8_t)slope_th)
+				       BMA280_REG_SLOPE_TH, (uint8_t)slope_th)
 				       < 0) {
 			LOG_DBG("Could not set slope threshold");
 			return -EIO;
@@ -66,7 +68,7 @@ int bma280_attr_set(struct device *dev,
 }
 
 static void bma280_gpio_callback(struct device *dev,
-				 struct gpio_callback *cb, u32_t pins)
+				 struct gpio_callback *cb, uint32_t pins)
 {
 	struct bma280_data *drv_data =
 		CONTAINER_OF(cb, struct bma280_data, gpio_cb);
@@ -86,7 +88,7 @@ static void bma280_thread_cb(void *arg)
 {
 	struct device *dev = arg;
 	struct bma280_data *drv_data = dev->driver_data;
-	u8_t status = 0U;
+	uint8_t status = 0U;
 	int err = 0;
 
 	/* check for data ready */
@@ -222,21 +224,21 @@ int bma280_init_interrupt(struct device *dev)
 
 	/* setup data ready gpio interrupt */
 	drv_data->gpio =
-		device_get_binding(DT_INST_0_BOSCH_BMA280_INT1_GPIOS_CONTROLLER);
+		device_get_binding(DT_INST_GPIO_LABEL(0, int1_gpios));
 	if (drv_data->gpio == NULL) {
 		LOG_DBG("Cannot get pointer to %s device",
-		    DT_INST_0_BOSCH_BMA280_INT1_GPIOS_CONTROLLER);
+		    DT_INST_GPIO_LABEL(0, int1_gpios));
 		return -EINVAL;
 	}
 
 	gpio_pin_configure(drv_data->gpio,
-			   DT_INST_0_BOSCH_BMA280_INT1_GPIOS_PIN,
-			   DT_INST_0_BOSCH_BMA280_INT1_GPIOS_FLAGS
+			   DT_INST_GPIO_PIN(0, int1_gpios),
+			   DT_INST_GPIO_FLAGS(0, int1_gpios)
 			   | GPIO_INPUT);
 
 	gpio_init_callback(&drv_data->gpio_cb,
 			   bma280_gpio_callback,
-			   BIT(DT_INST_0_BOSCH_BMA280_INT1_GPIOS_PIN));
+			   BIT(DT_INST_GPIO_PIN(0, int1_gpios)));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
 		LOG_DBG("Could not set gpio callback");

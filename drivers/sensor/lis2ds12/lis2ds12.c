@@ -8,6 +8,8 @@
  * https://www.st.com/resource/en/datasheet/lis2ds12.pdf
  */
 
+#define DT_DRV_COMPAT st_lis2ds12
+
 #include <drivers/sensor.h>
 #include <kernel.h>
 #include <device.h>
@@ -24,25 +26,25 @@ LOG_MODULE_REGISTER(LIS2DS12, CONFIG_SENSOR_LOG_LEVEL);
 static struct lis2ds12_data lis2ds12_data;
 
 static struct lis2ds12_config lis2ds12_config = {
-	.comm_master_dev_name = DT_INST_0_ST_LIS2DS12_BUS_NAME,
-#if defined(DT_ST_LIS2DS12_BUS_SPI)
+	.comm_master_dev_name = DT_INST_BUS_LABEL(0),
+#if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
 	.bus_init = lis2ds12_spi_init,
-#elif defined(DT_ST_LIS2DS12_BUS_I2C)
+#elif DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	.bus_init = lis2ds12_i2c_init,
 #else
 #error "BUS MACRO NOT DEFINED IN DTS"
 #endif
 #ifdef CONFIG_LIS2DS12_TRIGGER
-	.irq_port	= DT_INST_0_ST_LIS2DS12_IRQ_GPIOS_CONTROLLER,
-	.irq_pin	= DT_INST_0_ST_LIS2DS12_IRQ_GPIOS_PIN,
-	.irq_flags	= DT_INST_0_ST_LIS2DS12_IRQ_GPIOS_FLAGS,
+	.irq_port	= DT_INST_GPIO_LABEL(0, irq_gpios),
+	.irq_pin	= DT_INST_GPIO_PIN(0, irq_gpios),
+	.irq_flags	= DT_INST_GPIO_FLAGS(0, irq_gpios),
 #endif
 };
 
 #if defined(LIS2DS12_ODR_RUNTIME)
-static const u16_t lis2ds12_hr_odr_map[] = {0, 12, 25, 50, 100, 200, 400, 800};
+static const uint16_t lis2ds12_hr_odr_map[] = {0, 12, 25, 50, 100, 200, 400, 800};
 
-static int lis2ds12_freq_to_odr_val(u16_t freq)
+static int lis2ds12_freq_to_odr_val(uint16_t freq)
 {
 	size_t i;
 
@@ -55,7 +57,7 @@ static int lis2ds12_freq_to_odr_val(u16_t freq)
 	return -EINVAL;
 }
 
-static int lis2ds12_accel_odr_set(struct device *dev, u16_t freq)
+static int lis2ds12_accel_odr_set(struct device *dev, uint16_t freq)
 {
 	struct lis2ds12_data *data = dev->driver_data;
 	int odr;
@@ -78,10 +80,10 @@ static int lis2ds12_accel_odr_set(struct device *dev, u16_t freq)
 #endif
 
 #ifdef LIS2DS12_FS_RUNTIME
-static const u16_t lis2ds12_accel_fs_map[] = {2, 16, 4, 8};
-static const u16_t lis2ds12_accel_fs_sens[] = {1, 8, 2, 4};
+static const uint16_t lis2ds12_accel_fs_map[] = {2, 16, 4, 8};
+static const uint16_t lis2ds12_accel_fs_sens[] = {1, 8, 2, 4};
 
-static int lis2ds12_accel_range_to_fs_val(s32_t range)
+static int lis2ds12_accel_range_to_fs_val(int32_t range)
 {
 	size_t i;
 
@@ -94,7 +96,7 @@ static int lis2ds12_accel_range_to_fs_val(s32_t range)
 	return -EINVAL;
 }
 
-static int lis2ds12_accel_range_set(struct device *dev, s32_t range)
+static int lis2ds12_accel_range_set(struct device *dev, int32_t range)
 {
 	int fs;
 	struct lis2ds12_data *data = dev->driver_data;
@@ -156,7 +158,7 @@ static int lis2ds12_attr_set(struct device *dev, enum sensor_channel chan,
 static int lis2ds12_sample_fetch_accel(struct device *dev)
 {
 	struct lis2ds12_data *data = dev->driver_data;
-	u8_t buf[6];
+	uint8_t buf[6];
 
 	if (data->hw_tf->read_data(data, LIS2DS12_REG_OUTX_L,
 				   buf, sizeof(buf)) < 0) {
@@ -164,9 +166,9 @@ static int lis2ds12_sample_fetch_accel(struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_x = (s16_t)((u16_t)(buf[0]) | ((u16_t)(buf[1]) << 8));
-	data->sample_y = (s16_t)((u16_t)(buf[2]) | ((u16_t)(buf[3]) << 8));
-	data->sample_z = (s16_t)((u16_t)(buf[4]) | ((u16_t)(buf[5]) << 8));
+	data->sample_x = (int16_t)((uint16_t)(buf[0]) | ((uint16_t)(buf[1]) << 8));
+	data->sample_y = (int16_t)((uint16_t)(buf[2]) | ((uint16_t)(buf[3]) << 8));
+	data->sample_z = (int16_t)((uint16_t)(buf[4]) | ((uint16_t)(buf[5]) << 8));
 
 	return 0;
 }
@@ -198,11 +200,11 @@ static int lis2ds12_sample_fetch(struct device *dev, enum sensor_channel chan)
 static inline void lis2ds12_convert(struct sensor_value *val, int raw_val,
 				    float gain)
 {
-	s64_t dval;
+	int64_t dval;
 
 	/* Gain is in mg/LSB */
 	/* Convert to m/s^2 */
-	dval = ((s64_t)raw_val * gain * SENSOR_G) / 1000;
+	dval = ((int64_t)raw_val * gain * SENSOR_G) / 1000;
 	val->val1 = dval / 1000000LL;
 	val->val2 = dval % 1000000LL;
 }
@@ -254,9 +256,9 @@ static const struct sensor_driver_api lis2ds12_api_funcs = {
 
 static int lis2ds12_init(struct device *dev)
 {
-	const struct lis2ds12_config * const config = dev->config->config_info;
+	const struct lis2ds12_config * const config = dev->config_info;
 	struct lis2ds12_data *data = dev->driver_data;
-	u8_t chip_id;
+	uint8_t chip_id;
 
 	data->comm_master = device_get_binding(config->comm_master_dev_name);
 	if (!data->comm_master) {
@@ -316,6 +318,6 @@ static int lis2ds12_init(struct device *dev)
 	return 0;
 }
 
-DEVICE_AND_API_INIT(lis2ds12, DT_INST_0_ST_LIS2DS12_LABEL, lis2ds12_init,
+DEVICE_AND_API_INIT(lis2ds12, DT_INST_LABEL(0), lis2ds12_init,
 		    &lis2ds12_data, &lis2ds12_config, POST_KERNEL,
 		    CONFIG_SENSOR_INIT_PRIORITY, &lis2ds12_api_funcs);

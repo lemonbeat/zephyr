@@ -11,10 +11,10 @@
 #include "settings_priv.h"
 #include <storage/flash_map.h>
 
-u8_t val8;
-u8_t val8_un;
-u32_t val32;
-u64_t val64;
+uint8_t val8;
+uint8_t val8_un;
+uint32_t val32;
+uint64_t val64;
 
 int test_get_called;
 int test_set_called;
@@ -187,7 +187,7 @@ void config_wipe_fcb(struct flash_sector *fs, int cnt)
 	int rc;
 	int i;
 
-	rc = flash_area_open(DT_FLASH_AREA_STORAGE_ID, &fap);
+	rc = flash_area_open(FLASH_AREA_ID(storage), &fap);
 
 	for (i = 0; i < cnt; i++) {
 		rc = flash_area_erase(fap, fs[i].fs_off, fs[i].fs_size);
@@ -345,9 +345,9 @@ void tests_settings_check_target(void)
 {
 	const struct flash_area *fap;
 	int rc;
-	u8_t wbs;
+	uint8_t wbs;
 
-	rc = flash_area_open(DT_FLASH_AREA_STORAGE_ID, &fap);
+	rc = flash_area_open(FLASH_AREA_ID(storage), &fap);
 	zassert_true(rc == 0, "Can't open storage flash area");
 
 	wbs = flash_area_align(fap);

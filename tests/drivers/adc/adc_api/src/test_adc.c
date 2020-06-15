@@ -17,10 +17,19 @@
 #include <zephyr.h>
 #include <ztest.h>
 
-#if defined(CONFIG_BOARD_NRF51_PCA10028)
+#if defined(CONFIG_SHIELD_MIKROE_ADC_CLICK)
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, microchip_mcp3204))
+#define ADC_RESOLUTION		12
+#define ADC_GAIN		ADC_GAIN_1
+#define ADC_REFERENCE		ADC_REF_EXTERNAL0
+#define ADC_ACQUISITION_TIME	ADC_ACQ_TIME_DEFAULT
+#define ADC_1ST_CHANNEL_ID	0
+#define ADC_2ND_CHANNEL_ID	1
+
+#elif defined(CONFIG_BOARD_NRF51DK_NRF51422)
 
 #include <hal/nrf_adc.h>
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nordic_nrf_adc))
 #define ADC_RESOLUTION		10
 #define ADC_GAIN		ADC_GAIN_1_3
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -30,17 +39,19 @@
 #define ADC_2ND_CHANNEL_ID	2
 #define ADC_2ND_CHANNEL_INPUT	NRF_ADC_CONFIG_INPUT_3
 
-#elif defined(CONFIG_BOARD_NRF52_PCA10040) || \
-      defined(CONFIG_BOARD_NRF52840_PCA10056) || \
-      defined(CONFIG_BOARD_NRF52840_BLIP) || \
-      defined(CONFIG_BOARD_NRF52840_PAPYR) || \
-      defined(CONFIG_BOARD_NRF52833_PCA10100) || \
-      defined(CONFIG_BOARD_BL652_DVK) || \
-      defined(CONFIG_BOARD_BL654_DVK) || \
-      defined(CONFIG_BOARD_DEGU_EVK)
+#elif defined(CONFIG_BOARD_NRF52DK_NRF52832) || \
+	defined(CONFIG_BOARD_NRF52840DK_NRF52840) || \
+	defined(CONFIG_BOARD_NRF52840DONGLE_NRF52840) || \
+	defined(CONFIG_BOARD_NRF52840_BLIP) || \
+	defined(CONFIG_BOARD_NRF52840_PAPYR) || \
+	defined(CONFIG_BOARD_NRF52833DK_NRF52833) || \
+	defined(CONFIG_BOARD_BL652_DVK) || \
+	defined(CONFIG_BOARD_BL654_DVK) || \
+	defined(CONFIG_BOARD_DEGU_EVK) || \
+	defined(CONFIG_BOARD_ADAFRUIT_FEATHER_NRF52840)
 
 #include <hal/nrf_saadc.h>
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nordic_nrf_saadc))
 #define ADC_RESOLUTION		10
 #define ADC_GAIN		ADC_GAIN_1_6
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -52,7 +63,7 @@
 
 #elif defined(CONFIG_BOARD_FRDM_K22F)
 
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc16))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -62,16 +73,25 @@
 
 #elif defined(CONFIG_BOARD_FRDM_K64F)
 
-#define ADC_DEVICE_NAME		DT_ADC_1_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc16))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
 #define ADC_ACQUISITION_TIME	ADC_ACQ_TIME_DEFAULT
 #define ADC_1ST_CHANNEL_ID	14
 
+#elif defined(CONFIG_BOARD_FRDM_K82F)
+
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc16))
+#define ADC_RESOLUTION		12
+#define ADC_GAIN		ADC_GAIN_1
+#define ADC_REFERENCE		ADC_REF_INTERNAL
+#define ADC_ACQUISITION_TIME	ADC_ACQ_TIME_DEFAULT
+#define ADC_1ST_CHANNEL_ID	15
+
 #elif defined(CONFIG_BOARD_FRDM_KL25Z)
 
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc16))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -80,7 +100,7 @@
 
 #elif defined(CONFIG_BOARD_FRDM_KW41Z)
 
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc16))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -89,7 +109,7 @@
 
 #elif defined(CONFIG_BOARD_HEXIWEAR_K64)
 
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc16))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -98,7 +118,7 @@
 
 #elif defined(CONFIG_BOARD_HEXIWEAR_KW40Z)
 
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc16))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -108,7 +128,7 @@
 #elif defined(CONFIG_BOARD_SAM_E70_XPLAINED) || \
 	defined(CONFIG_BOARD_SAM_V71_XULT)
 
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, atmel_sam_afec))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_EXTERNAL0
@@ -117,7 +137,7 @@
 
 #elif defined(CONFIG_SOC_FAMILY_SAM0)
 #include <soc.h>
-#define ADC_DEVICE_NAME         DT_INST_0_ATMEL_SAM0_ADC_LABEL
+#define ADC_DEVICE_NAME         DT_LABEL(DT_INST(0, atmel_sam0_adc))
 #define ADC_RESOLUTION          12
 #define ADC_GAIN                ADC_GAIN_1
 #define ADC_REFERENCE           ADC_REF_INTERNAL
@@ -132,8 +152,11 @@
 	defined(CONFIG_BOARD_NUCLEO_F746ZG) || \
 	defined(CONFIG_BOARD_NUCLEO_L073RZ) || \
 	defined(CONFIG_BOARD_NUCLEO_WB55RG) || \
-	defined(CONFIG_BOARD_NUCLEO_L152RE)
-#define ADC_DEVICE_NAME		DT_ADC_1_NAME
+	defined(CONFIG_BOARD_NUCLEO_L152RE) || \
+	defined(CONFIG_BOARD_96B_AEROCORE2) || \
+	defined(CONFIG_BOARD_STM32_MIN_DEV_BLUE) || \
+	defined(CONFIG_BOARD_STM32_MIN_DEV_BLACK)
+#define ADC_DEVICE_NAME         DT_LABEL(DT_INST(0, st_stm32_adc))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -141,7 +164,7 @@
 #define ADC_1ST_CHANNEL_ID	0
 
 #elif defined(CONFIG_BOARD_NUCLEO_F302R8)
-#define ADC_DEVICE_NAME		DT_ADC_1_NAME
+#define ADC_DEVICE_NAME         DT_LABEL(DT_INST(0, st_stm32_adc))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -150,15 +173,23 @@
 #define ADC_1ST_CHANNEL_ID	1
 
 #elif defined(CONFIG_BOARD_NUCLEO_L476RG)
-#define ADC_DEVICE_NAME		DT_ADC_1_NAME
+#define ADC_DEVICE_NAME         DT_LABEL(DT_INST(0, st_stm32_adc))
 #define ADC_RESOLUTION		10
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
 #define ADC_ACQUISITION_TIME	ADC_ACQ_TIME_DEFAULT
 #define ADC_1ST_CHANNEL_ID	1
 
+#elif defined(CONFIG_BOARD_NUCLEO_H743ZI)
+#define ADC_DEVICE_NAME         DT_LABEL(DT_INST(0, st_stm32_adc))
+#define ADC_RESOLUTION		16
+#define ADC_GAIN		ADC_GAIN_1
+#define ADC_REFERENCE		ADC_REF_INTERNAL
+#define ADC_ACQUISITION_TIME	ADC_ACQ_TIME_DEFAULT
+#define ADC_1ST_CHANNEL_ID	0
+
 #elif defined(CONFIG_BOARD_TWR_KE18F)
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, nxp_kinetis_adc12))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -168,7 +199,7 @@
 
 #elif defined(CONFIG_BOARD_MEC15XXEVB_ASSY6853) || \
 	defined(CONFIG_BOARD_MEC1501MODULAR_ASSY6885)
-#define ADC_DEVICE_NAME		DT_ADC_0_NAME
+#define ADC_DEVICE_NAME		DT_LABEL(DT_INST(0, microchip_xec_adc))
 #define ADC_RESOLUTION		12
 #define ADC_GAIN		ADC_GAIN_1
 #define ADC_REFERENCE		ADC_REF_INTERNAL
@@ -181,7 +212,7 @@
 #endif
 
 #define BUFFER_SIZE  6
-static ZTEST_BMEM s16_t m_sample_buffer[BUFFER_SIZE];
+static ZTEST_BMEM int16_t m_sample_buffer[BUFFER_SIZE];
 
 static const struct adc_channel_cfg m_1st_channel_cfg = {
 	.gain             = ADC_GAIN,
@@ -237,7 +268,7 @@ static void check_samples(int expected_count)
 
 	TC_PRINT("Samples read: ");
 	for (i = 0; i < BUFFER_SIZE; i++) {
-		s16_t sample_value = m_sample_buffer[i];
+		int16_t sample_value = m_sample_buffer[i];
 
 		TC_PRINT("0x%04x ", sample_value);
 		if (i < expected_count) {
@@ -380,7 +411,7 @@ void test_adc_asynchronous_call(void)
 static enum adc_action sample_with_interval_callback(
 				struct device *dev,
 				const struct adc_sequence *sequence,
-				u16_t sampling_index)
+				uint16_t sampling_index)
 {
 	TC_PRINT("%s: sampling %d\n", __func__, sampling_index);
 	return ADC_ACTION_CONTINUE;
@@ -424,11 +455,11 @@ void test_adc_sample_with_interval(void)
 /*
  * test_adc_repeated_samplings
  */
-static u8_t m_samplings_done;
+static uint8_t m_samplings_done;
 static enum adc_action repeated_samplings_callback(
 				struct device *dev,
 				const struct adc_sequence *sequence,
-				u16_t sampling_index)
+				uint16_t sampling_index)
 {
 	++m_samplings_done;
 	TC_PRINT("%s: done %d\n", __func__, m_samplings_done);

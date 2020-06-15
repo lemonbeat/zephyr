@@ -9,7 +9,7 @@
 #include <tc_util.h>
 #include <sw_isr_table.h>
 
-extern u32_t _irq_vector_table[];
+extern uint32_t _irq_vector_table[];
 
 #if defined(ARCH_IRQ_DIRECT_CONNECT) && defined(CONFIG_GEN_IRQ_VECTOR_TABLE)
 #define HAS_DIRECT_IRQS
@@ -31,6 +31,14 @@ extern u32_t _irq_vector_table[];
 #define ISR4_OFFSET	3
 #define ISR5_OFFSET	4
 #define ISR6_OFFSET	5
+
+#if defined(CONFIG_SOC_ARC_EMSDP)
+/* ARC EMSDP' console will use irq 108 / irq 107, will conflict
+ * with isr used here, so add a workaround
+ */
+#undef CONFIG_NUM_IRQS
+#define CONFIG_NUM_IRQS 105
+#endif
 
 #define IRQ_LINE(offset)	(CONFIG_NUM_IRQS - ((offset) + 1))
 #define TABLE_INDEX(offset)	(IRQ_TABLE_SIZE - ((offset) + 1))
@@ -59,7 +67,7 @@ void trigger_irq(int irq)
 #elif defined(CONFIG_RISCV)
 void trigger_irq(int irq)
 {
-	u32_t mip;
+	uint32_t mip;
 
 	__asm__ volatile ("csrrs %0, mip, %1\n"
 			  : "=r" (mip)
@@ -160,7 +168,7 @@ static int check_vector(void *isr, int offset)
 	TC_PRINT("Checking _irq_vector_table entry %d for irq %d\n",
 		 TABLE_INDEX(offset), IRQ_LINE(offset));
 
-	if (_irq_vector_table[TABLE_INDEX(offset)] != (u32_t)isr) {
+	if (_irq_vector_table[TABLE_INDEX(offset)] != (uint32_t)isr) {
 		TC_PRINT("bad entry %d in vector table\n", TABLE_INDEX(offset));
 		return -1;
 	}
@@ -174,7 +182,7 @@ static int check_vector(void *isr, int offset)
 #endif
 
 #ifdef CONFIG_GEN_SW_ISR_TABLE
-static int check_sw_isr(void *isr, u32_t arg, int offset)
+static int check_sw_isr(void *isr, uint32_t arg, int offset)
 {
 	struct _isr_table_entry *e = &_sw_isr_table[TABLE_INDEX(offset)];
 #ifdef CONFIG_GEN_IRQ_VECTOR_TABLE

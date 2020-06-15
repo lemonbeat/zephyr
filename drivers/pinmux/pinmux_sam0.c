@@ -11,9 +11,9 @@ struct pinmux_sam0_config {
 	PortGroup *regs;
 };
 
-static int pinmux_sam0_set(struct device *dev, u32_t pin, u32_t func)
+static int pinmux_sam0_set(struct device *dev, uint32_t pin, uint32_t func)
 {
-	const struct pinmux_sam0_config *cfg = dev->config->config_info;
+	const struct pinmux_sam0_config *cfg = dev->config_info;
 	bool odd_pin = pin & 1;
 	int idx = pin / 2U;
 
@@ -31,9 +31,9 @@ static int pinmux_sam0_set(struct device *dev, u32_t pin, u32_t func)
 	return 0;
 }
 
-static int pinmux_sam0_get(struct device *dev, u32_t pin, u32_t *func)
+static int pinmux_sam0_get(struct device *dev, uint32_t pin, uint32_t *func)
 {
-	const struct pinmux_sam0_config *cfg = dev->config->config_info;
+	const struct pinmux_sam0_config *cfg = dev->config_info;
 	bool odd_pin = pin & 1;
 	int idx = pin / 2U;
 
@@ -46,12 +46,12 @@ static int pinmux_sam0_get(struct device *dev, u32_t pin, u32_t *func)
 	return 0;
 }
 
-static int pinmux_sam0_pullup(struct device *dev, u32_t pin, u8_t func)
+static int pinmux_sam0_pullup(struct device *dev, uint32_t pin, uint8_t func)
 {
 	return -ENOTSUP;
 }
 
-static int pinmux_sam0_input(struct device *dev, u32_t pin, u8_t func)
+static int pinmux_sam0_input(struct device *dev, uint32_t pin, uint8_t func)
 {
 	return -ENOTSUP;
 }
@@ -69,45 +69,45 @@ const struct pinmux_driver_api pinmux_sam0_api = {
 	.input = pinmux_sam0_input,
 };
 
-#if DT_ATMEL_SAM0_PINMUX_PINMUX_A_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_a), okay)
 static const struct pinmux_sam0_config pinmux_sam0_config_0 = {
-	.regs = (PortGroup *)DT_ATMEL_SAM0_PINMUX_PINMUX_A_BASE_ADDRESS,
+	.regs = (PortGroup *)DT_REG_ADDR(DT_NODELABEL(pinmux_a)),
 };
 
-DEVICE_AND_API_INIT(pinmux_sam0_0, DT_ATMEL_SAM0_PINMUX_PINMUX_A_LABEL,
+DEVICE_AND_API_INIT(pinmux_sam0_0, DT_LABEL(DT_NODELABEL(pinmux_a)),
 		    pinmux_sam0_init, NULL, &pinmux_sam0_config_0,
 		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
 		    &pinmux_sam0_api);
 #endif
 
-#if DT_ATMEL_SAM0_PINMUX_PINMUX_B_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_b), okay)
 static const struct pinmux_sam0_config pinmux_sam0_config_1 = {
-	.regs = (PortGroup *)DT_ATMEL_SAM0_PINMUX_PINMUX_B_BASE_ADDRESS,
+	.regs = (PortGroup *)DT_REG_ADDR(DT_NODELABEL(pinmux_b)),
 };
 
-DEVICE_AND_API_INIT(pinmux_sam0_1, DT_ATMEL_SAM0_PINMUX_PINMUX_B_LABEL,
+DEVICE_AND_API_INIT(pinmux_sam0_1, DT_LABEL(DT_NODELABEL(pinmux_b)),
 		    pinmux_sam0_init, NULL, &pinmux_sam0_config_1,
 		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
 		    &pinmux_sam0_api);
 #endif
 
-#if DT_ATMEL_SAM0_PINMUX_PINMUX_C_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_c), okay)
 static const struct pinmux_sam0_config pinmux_sam0_config_2 = {
-	.regs = (PortGroup *)DT_ATMEL_SAM0_PINMUX_PINMUX_C_BASE_ADDRESS,
+	.regs = (PortGroup *)DT_REG_ADDR(DT_NODELABEL(pinmux_c)),
 };
 
-DEVICE_AND_API_INIT(pinmux_sam0_2, DT_ATMEL_SAM0_PINMUX_PINMUX_C_LABEL,
+DEVICE_AND_API_INIT(pinmux_sam0_2, DT_LABEL(DT_NODELABEL(pinmux_c)),
 		    pinmux_sam0_init, NULL, &pinmux_sam0_config_2,
 		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
 		    &pinmux_sam0_api);
 #endif
 
-#if DT_ATMEL_SAM0_PINMUX_PINMUX_D_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_d), okay)
 static const struct pinmux_sam0_config pinmux_sam0_config_3 = {
-	.regs = (PortGroup *)DT_ATMEL_SAM0_PINMUX_PINMUX_D_BASE_ADDRESS,
+	.regs = (PortGroup *)DT_REG_ADDR(DT_NODELABEL(pinmux_d)),
 };
 
-DEVICE_AND_API_INIT(pinmux_sam0_3, DT_ATMEL_SAM0_PINMUX_PINMUX_D_LABEL,
+DEVICE_AND_API_INIT(pinmux_sam0_3, DT_LABEL(DT_NODELABEL(pinmux_d)),
 		    pinmux_sam0_init, NULL, &pinmux_sam0_config_3,
 		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
 		    &pinmux_sam0_api);

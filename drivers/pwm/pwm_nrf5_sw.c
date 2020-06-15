@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nordic_nrf_sw_pwm
+
 #include <soc.h>
 
 #include <drivers/pwm.h>
@@ -14,37 +16,37 @@
 LOG_MODULE_REGISTER(pwm_nrf5_sw);
 
 /* One compare channel is needed to set the PWM period, hence +1. */
-#if ((DT_INST_0_NORDIC_NRF_SW_PWM_CHANNEL_COUNT + 1) > \
+#if ((DT_INST_PROP(0, channel_count) + 1) > \
 	(_CONCAT( \
-		_CONCAT(TIMER, DT_INST_0_NORDIC_NRF_SW_PWM_TIMER_INSTANCE), \
+		_CONCAT(TIMER, DT_INST_PROP(0, timer_instance)), \
 		_CC_NUM)))
 #error "Invalid number of PWM channels configured."
 #endif
-#define PWM_0_MAP_SIZE DT_INST_0_NORDIC_NRF_SW_PWM_CHANNEL_COUNT
+#define PWM_0_MAP_SIZE DT_INST_PROP(0, channel_count)
 
 struct pwm_config {
 	NRF_TIMER_Type *timer;
-	u8_t gpiote_base;
-	u8_t ppi_base;
-	u8_t map_size;
-	u8_t prescaler;
+	uint8_t gpiote_base;
+	uint8_t ppi_base;
+	uint8_t map_size;
+	uint8_t prescaler;
 };
 
 struct chan_map {
-	u32_t pwm;
-	u32_t pulse_cycles;
+	uint32_t pwm;
+	uint32_t pulse_cycles;
 };
 
 struct pwm_data {
-	u32_t period_cycles;
+	uint32_t period_cycles;
 	struct chan_map map[PWM_0_MAP_SIZE];
 };
 
-static u32_t pwm_period_check(struct pwm_data *data, u8_t map_size,
-				 u32_t pwm, u32_t period_cycles,
-				 u32_t pulse_cycles)
+static uint32_t pwm_period_check(struct pwm_data *data, uint8_t map_size,
+				 uint32_t pwm, uint32_t period_cycles,
+				 uint32_t pulse_cycles)
 {
-	u8_t i;
+	uint8_t i;
 
 	/* allow 0% and 100% duty cycle, as it does not use PWM. */
 	if ((pulse_cycles == 0U) || (pulse_cycles == period_cycles)) {
@@ -63,10 +65,10 @@ static u32_t pwm_period_check(struct pwm_data *data, u8_t map_size,
 	return 0;
 }
 
-static u8_t pwm_channel_map(struct pwm_data *data, u8_t map_size,
-			       u32_t pwm)
+static uint8_t pwm_channel_map(struct pwm_data *data, uint8_t map_size,
+			       uint32_t pwm)
 {
-	u8_t i;
+	uint8_t i;
 
 	/* find pin, if already present */
 	for (i = 0U; i < map_size; i++) {
@@ -86,19 +88,19 @@ static u8_t pwm_channel_map(struct pwm_data *data, u8_t map_size,
 	return i;
 }
 
-static int pwm_nrf5_sw_pin_set(struct device *dev, u32_t pwm,
-			       u32_t period_cycles, u32_t pulse_cycles,
+static int pwm_nrf5_sw_pin_set(struct device *dev, uint32_t pwm,
+			       uint32_t period_cycles, uint32_t pulse_cycles,
 			       pwm_flags_t flags)
 {
-	struct pwm_config *config;
+	const struct pwm_config *config;
 	NRF_TIMER_Type *timer;
 	struct pwm_data *data;
-	u8_t ppi_index;
-	u8_t channel;
-	u16_t div;
-	u32_t ret;
+	uint8_t ppi_index;
+	uint8_t channel;
+	uint16_t div;
+	uint32_t ret;
 
-	config = (struct pwm_config *)dev->config->config_info;
+	config = (const struct pwm_config *)dev->config_info;
 	timer = config->timer;
 	data = dev->driver_data;
 
@@ -170,14 +172,14 @@ static int pwm_nrf5_sw_pin_set(struct device *dev, u32_t pwm,
 							    (pwm << 8);
 
 	/* setup PPI */
-	NRF_PPI->CH[ppi_index].EEP = (u32_t)
+	NRF_PPI->CH[ppi_index].EEP = (uint32_t)
 				     &(timer->EVENTS_COMPARE[channel]);
-	NRF_PPI->CH[ppi_index].TEP = (u32_t)
+	NRF_PPI->CH[ppi_index].TEP = (uint32_t)
 				     &(NRF_GPIOTE->TASKS_OUT[channel]);
-	NRF_PPI->CH[ppi_index + 1].EEP = (u32_t)
+	NRF_PPI->CH[ppi_index + 1].EEP = (uint32_t)
 					 &(timer->EVENTS_COMPARE[
 							 config->map_size]);
-	NRF_PPI->CH[ppi_index + 1].TEP = (u32_t)
+	NRF_PPI->CH[ppi_index + 1].TEP = (uint32_t)
 					 &(NRF_GPIOTE->TASKS_OUT[channel]);
 	NRF_PPI->CHENSET = BIT(ppi_index) | BIT(ppi_index + 1);
 
@@ -211,12 +213,12 @@ pin_set_pwm_off:
 	return 0;
 }
 
-static int pwm_nrf5_sw_get_cycles_per_sec(struct device *dev, u32_t pwm,
-					  u64_t *cycles)
+static int pwm_nrf5_sw_get_cycles_per_sec(struct device *dev, uint32_t pwm,
+					  uint64_t *cycles)
 {
-	struct pwm_config *config;
+	const struct pwm_config *config;
 
-	config = (struct pwm_config *)dev->config->config_info;
+	config = (const struct pwm_config *)dev->config_info;
 
 	/* HF timer frequency is derived from 16MHz source with a prescaler */
 	*cycles = 16000000UL / BIT(config->prescaler);
@@ -231,10 +233,10 @@ static const struct pwm_driver_api pwm_nrf5_sw_drv_api_funcs = {
 
 static int pwm_nrf5_sw_init(struct device *dev)
 {
-	struct pwm_config *config;
+	const struct pwm_config *config;
 	NRF_TIMER_Type *timer;
 
-	config = (struct pwm_config *)dev->config->config_info;
+	config = (const struct pwm_config *)dev->config_info;
 	timer = config->timer;
 
 	/* setup HF timer */
@@ -251,17 +253,17 @@ static int pwm_nrf5_sw_init(struct device *dev)
 }
 
 static const struct pwm_config pwm_nrf5_sw_0_config = {
-	.timer = _CONCAT(NRF_TIMER, DT_INST_0_NORDIC_NRF_SW_PWM_TIMER_INSTANCE),
-	.ppi_base = DT_INST_0_NORDIC_NRF_SW_PWM_PPI_BASE,
-	.gpiote_base = DT_INST_0_NORDIC_NRF_SW_PWM_GPIOTE_BASE,
+	.timer = _CONCAT(NRF_TIMER, DT_INST_PROP(0, timer_instance)),
+	.ppi_base = DT_INST_PROP(0, ppi_base),
+	.gpiote_base = DT_INST_PROP(0, gpiote_base),
 	.map_size = PWM_0_MAP_SIZE,
-	.prescaler = DT_INST_0_NORDIC_NRF_SW_PWM_CLOCK_PRESCALER,
+	.prescaler = DT_INST_PROP(0, clock_prescaler),
 };
 
 static struct pwm_data pwm_nrf5_sw_0_data;
 
 DEVICE_AND_API_INIT(pwm_nrf5_sw_0,
-		    DT_INST_0_NORDIC_NRF_SW_PWM_LABEL,
+		    DT_INST_LABEL(0),
 		    pwm_nrf5_sw_init,
 		    &pwm_nrf5_sw_0_data,
 		    &pwm_nrf5_sw_0_config,

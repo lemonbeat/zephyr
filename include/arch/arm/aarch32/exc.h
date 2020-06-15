@@ -15,10 +15,13 @@
 #ifndef ZEPHYR_INCLUDE_ARCH_ARM_AARCH32_EXC_H_
 #define ZEPHYR_INCLUDE_ARCH_ARM_AARCH32_EXC_H_
 
+#if defined(CONFIG_CPU_CORTEX_M)
 #include <devicetree.h>
 
+#include <arch/arm/aarch32/cortex_m/nvic.h>
+
 /* for assembler, only works with constants */
-#define Z_EXC_PRIO(pri) (((pri) << (8 - DT_NUM_IRQ_PRIO_BITS)) & 0xff)
+#define Z_EXC_PRIO(pri) (((pri) << (8 - NUM_IRQ_PRIO_BITS)) & 0xff)
 
 /*
  * In architecture variants with non-programmable fault exceptions
@@ -59,6 +62,7 @@
 /* Use lowest possible priority level for PendSV */
 #define _EXC_PENDSV_PRIO 0xff
 #define _EXC_PENDSV_PRIO_MASK Z_EXC_PRIO(_EXC_PENDSV_PRIO)
+#endif /* CONFIG_CPU_CORTEX_M */
 
 #ifdef _ASMLANGUAGE
 GTEXT(z_arm_exc_exit);
@@ -78,18 +82,22 @@ struct __esf {
 		sys_define_gpr_with_alias(ip, r12);
 		sys_define_gpr_with_alias(lr, r14);
 		sys_define_gpr_with_alias(pc, r15);
-		u32_t xpsr;
+		uint32_t xpsr;
 	} basic;
-#if defined(CONFIG_FLOAT) && defined(CONFIG_FP_SHARING)
+#if defined(CONFIG_FPU) && defined(CONFIG_FPU_SHARING)
 	float s[16];
-	u32_t fpscr;
-	u32_t undefined;
+	uint32_t fpscr;
+	uint32_t undefined;
 #endif
 };
 
 typedef struct __esf z_arch_esf_t;
 
+#ifdef CONFIG_CPU_CORTEX_M
 extern void z_arm_exc_exit(void);
+#else
+extern void z_arm_exc_exit(bool fatal);
+#endif
 
 #ifdef __cplusplus
 }

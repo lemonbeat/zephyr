@@ -39,7 +39,7 @@ static inline int ieee802154_cca(struct net_if *iface)
 	return radio->cca(net_if_get_device(iface));
 }
 
-static inline int ieee802154_set_channel(struct net_if *iface, u16_t channel)
+static inline int ieee802154_set_channel(struct net_if *iface, uint16_t channel)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -51,7 +51,7 @@ static inline int ieee802154_set_channel(struct net_if *iface, u16_t channel)
 	return radio->set_channel(net_if_get_device(iface), channel);
 }
 
-static inline int ieee802154_set_tx_power(struct net_if *iface, s16_t dbm)
+static inline int ieee802154_set_tx_power(struct net_if *iface, int16_t dbm)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -64,7 +64,9 @@ static inline int ieee802154_set_tx_power(struct net_if *iface, s16_t dbm)
 }
 
 static inline int ieee802154_tx(struct net_if *iface,
-				struct net_pkt *pkt, struct net_buf *buf)
+				enum ieee802154_tx_mode mode,
+				struct net_pkt *pkt,
+				struct net_buf *buf)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -73,7 +75,7 @@ static inline int ieee802154_tx(struct net_if *iface,
 		return -ENOENT;
 	}
 
-	return radio->tx(net_if_get_device(iface), pkt, buf);
+	return radio->tx(net_if_get_device(iface), mode, pkt, buf);
 }
 
 static inline int ieee802154_start(struct net_if *iface)
@@ -101,7 +103,7 @@ static inline int ieee802154_stop(struct net_if *iface)
 }
 
 static inline void ieee802154_filter_ieee_addr(struct net_if *iface,
-					       u8_t *ieee_addr)
+					       uint8_t *ieee_addr)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -121,7 +123,7 @@ static inline void ieee802154_filter_ieee_addr(struct net_if *iface,
 }
 
 static inline void ieee802154_filter_short_addr(struct net_if *iface,
-						u16_t short_addr)
+						uint16_t short_addr)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -141,7 +143,7 @@ static inline void ieee802154_filter_short_addr(struct net_if *iface,
 }
 
 static inline void ieee802154_filter_pan_id(struct net_if *iface,
-					    u16_t pan_id)
+					    uint16_t pan_id)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -161,7 +163,7 @@ static inline void ieee802154_filter_pan_id(struct net_if *iface,
 }
 
 static inline void ieee802154_filter_src_ieee_addr(struct net_if *iface,
-						   u8_t *ieee_addr)
+						   uint8_t *ieee_addr)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -181,7 +183,7 @@ static inline void ieee802154_filter_src_ieee_addr(struct net_if *iface,
 }
 
 static inline void ieee802154_filter_src_short_addr(struct net_if *iface,
-						    u16_t short_addr)
+						    uint16_t short_addr)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -201,7 +203,7 @@ static inline void ieee802154_filter_src_short_addr(struct net_if *iface,
 }
 
 static inline void ieee802154_remove_src_ieee_addr(struct net_if *iface,
-						   u8_t *ieee_addr)
+						   uint8_t *ieee_addr)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -221,7 +223,7 @@ static inline void ieee802154_remove_src_ieee_addr(struct net_if *iface,
 }
 
 static inline void ieee802154_remove_src_short_addr(struct net_if *iface,
-						    u16_t short_addr)
+						    uint16_t short_addr)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->driver_api;
@@ -241,7 +243,7 @@ static inline void ieee802154_remove_src_short_addr(struct net_if *iface,
 }
 
 static inline bool ieee802154_verify_channel(struct net_if *iface,
-					     u16_t channel)
+					     uint16_t channel)
 {
 	if (channel == IEEE802154_NO_CHANNEL) {
 		return false;

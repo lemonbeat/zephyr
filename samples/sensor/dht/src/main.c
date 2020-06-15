@@ -12,7 +12,7 @@
 static const char *now_str(void)
 {
 	static char buf[16]; /* ...HH:MM:SS.MMM */
-	u32_t now = k_uptime_get_32();
+	uint32_t now = k_uptime_get_32();
 	unsigned int ms = now % MSEC_PER_SEC;
 	unsigned int s;
 	unsigned int min;
@@ -32,7 +32,7 @@ static const char *now_str(void)
 
 void main(void)
 {
-	const char *const label = DT_INST_0_AOSONG_DHT_LABEL;
+	const char *const label = DT_LABEL(DT_INST(0, aosong_dht));
 	struct device *dht22 = device_get_binding(label);
 
 	if (!dht22) {

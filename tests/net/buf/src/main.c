@@ -21,18 +21,18 @@ struct bt_data {
 	void *hci_sync;
 
 	union {
-		u16_t hci_opcode;
-		u16_t acl_handle;
+		uint16_t hci_opcode;
+		uint16_t acl_handle;
 	};
 
-	u8_t type;
+	uint8_t type;
 };
 
 struct in6_addr {
 	union {
-		u8_t		u6_addr8[16];
-		u16_t	u6_addr16[8]; /* In big endian */
-		u32_t	u6_addr32[4]; /* In big endian */
+		uint8_t		u6_addr8[16];
+		uint16_t	u6_addr16[8]; /* In big endian */
+		uint32_t	u6_addr32[4]; /* In big endian */
 	} in6_u;
 #define s6_addr			in6_u.u6_addr8
 #define s6_addr16		in6_u.u6_addr16
@@ -40,21 +40,21 @@ struct in6_addr {
 };
 
 struct ipv6_hdr {
-	u8_t vtc;
-	u8_t tcflow;
-	u16_t flow;
-	u8_t len[2];
-	u8_t nexthdr;
-	u8_t hop_limit;
+	uint8_t vtc;
+	uint8_t tcflow;
+	uint16_t flow;
+	uint8_t len[2];
+	uint8_t nexthdr;
+	uint8_t hop_limit;
 	struct in6_addr src;
 	struct in6_addr dst;
 } __attribute__((__packed__));
 
 struct udp_hdr {
-	u16_t src_port;
-	u16_t dst_port;
-	u16_t len;
-	u16_t chksum;
+	uint16_t src_port;
+	uint16_t dst_port;
+	uint16_t len;
+	uint16_t chksum;
 } __attribute__((__packed__));
 
 static int destroy_called;
@@ -98,7 +98,7 @@ static const char example_data[] = "0123456789"
 				   "abcdefghijklmnopqrstuvxyz"
 				   "!#¤%&/()=?";
 
-static void net_buf_test_1(void)
+static void test_net_buf_1(void)
 {
 	struct net_buf *bufs[bufs_pool.buf_count];
 	struct net_buf *buf;
@@ -118,7 +118,7 @@ static void net_buf_test_1(void)
 		     "Incorrect destroy callback count");
 }
 
-static void net_buf_test_2(void)
+static void test_net_buf_2(void)
 {
 	struct net_buf *frag, *head;
 	struct k_fifo fifo;
@@ -165,7 +165,7 @@ static void test_3_thread(void *arg1, void *arg2, void *arg3)
 
 static K_THREAD_STACK_DEFINE(test_3_thread_stack, 1024);
 
-static void net_buf_test_3(void)
+static void test_net_buf_3(void)
 {
 	static struct k_thread test_3_thread_data;
 	struct net_buf *frag, *head;
@@ -200,7 +200,7 @@ static void net_buf_test_3(void)
 		    "Timeout while waiting for semaphore");
 }
 
-static void net_buf_test_4(void)
+static void test_net_buf_4(void)
 {
 	struct net_buf *frags[bufs_pool.buf_count - 1];
 	struct net_buf *buf, *frag;
@@ -310,7 +310,7 @@ static void net_buf_test_4(void)
 		     "Incorrect frag destroy callback count");
 }
 
-static void net_buf_test_big_buf(void)
+static void test_net_buf_big_buf(void)
 {
 	struct net_buf *big_frags[bufs_pool.buf_count];
 	struct net_buf *buf, *frag;
@@ -340,7 +340,7 @@ static void net_buf_test_big_buf(void)
 	}
 
 	ipv6 = (struct ipv6_hdr *)(frag->data - net_buf_headroom(frag));
-	udp = (struct udp_hdr *)((u8_t *)ipv6 + sizeof(*ipv6));
+	udp = (struct udp_hdr *)((uint8_t *)ipv6 + sizeof(*ipv6));
 
 	net_buf_frag_add(buf, frag);
 	net_buf_unref(buf);
@@ -348,7 +348,7 @@ static void net_buf_test_big_buf(void)
 	zassert_equal(destroy_called, 2, "Incorrect destroy callback count");
 }
 
-static void net_buf_test_multi_frags(void)
+static void test_net_buf_multi_frags(void)
 {
 	struct net_buf *frags[bufs_pool.buf_count];
 	struct net_buf *buf;
@@ -393,7 +393,7 @@ static void net_buf_test_multi_frags(void)
 	}
 
 	ipv6 = (struct ipv6_hdr *)(frags[i]->data - net_buf_headroom(frags[i]));
-	udp = (struct udp_hdr *)((u8_t *)ipv6 + sizeof(*ipv6));
+	udp = (struct udp_hdr *)((uint8_t *)ipv6 + sizeof(*ipv6));
 
 	net_buf_unref(buf);
 
@@ -401,7 +401,7 @@ static void net_buf_test_multi_frags(void)
 		     "Incorrect frag destroy callback count");
 }
 
-static void net_buf_test_clone(void)
+static void test_net_buf_clone(void)
 {
 	struct net_buf *buf, *clone;
 
@@ -420,7 +420,7 @@ static void net_buf_test_clone(void)
 	zassert_equal(destroy_called, 2, "Incorrect destroy callback count");
 }
 
-static void net_buf_test_fixed_pool(void)
+static void test_net_buf_fixed_pool(void)
 {
 	struct net_buf *buf;
 
@@ -434,7 +434,7 @@ static void net_buf_test_fixed_pool(void)
 	zassert_equal(destroy_called, 1, "Incorrect destroy callback count");
 }
 
-static void net_buf_test_var_pool(void)
+static void test_net_buf_var_pool(void)
 {
 	struct net_buf *buf1, *buf2, *buf3;
 
@@ -457,22 +457,22 @@ static void net_buf_test_var_pool(void)
 	zassert_equal(destroy_called, 3, "Incorrect destroy callback count");
 }
 
-static void net_buf_test_byte_order(void)
+static void test_net_buf_byte_order(void)
 {
 	struct net_buf *buf;
-	u8_t le16[2] = { 0x02, 0x01 };
-	u8_t be16[2] = { 0x01, 0x02 };
-	u8_t le24[3] = { 0x03, 0x02, 0x01 };
-	u8_t be24[3] = { 0x01, 0x02, 0x03 };
-	u8_t le32[4] = { 0x04, 0x03, 0x02, 0x01 };
-	u8_t be32[4] = { 0x01, 0x02, 0x03, 0x04 };
-	u8_t le48[6] = { 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
-	u8_t be48[6] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-	u8_t le64[8] = { 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
-	u8_t be64[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-	u16_t u16;
-	u32_t u32;
-	u64_t u64;
+	uint8_t le16[2] = { 0x02, 0x01 };
+	uint8_t be16[2] = { 0x01, 0x02 };
+	uint8_t le24[3] = { 0x03, 0x02, 0x01 };
+	uint8_t be24[3] = { 0x01, 0x02, 0x03 };
+	uint8_t le32[4] = { 0x04, 0x03, 0x02, 0x01 };
+	uint8_t be32[4] = { 0x01, 0x02, 0x03, 0x04 };
+	uint8_t le48[6] = { 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
+	uint8_t be48[6] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
+	uint8_t le64[8] = { 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01 };
+	uint8_t be64[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+	uint16_t u16;
+	uint32_t u32;
+	uint64_t u64;
 
 	buf = net_buf_alloc_len(&fixed_pool, 16, K_FOREVER);
 	zassert_not_null(buf, "Failed to get buffer");
@@ -575,18 +575,18 @@ static void net_buf_test_byte_order(void)
 
 void test_main(void)
 {
-	ztest_test_suite(net_buf_test,
-			 ztest_unit_test(net_buf_test_1),
-			 ztest_unit_test(net_buf_test_2),
-			 ztest_unit_test(net_buf_test_3),
-			 ztest_unit_test(net_buf_test_4),
-			 ztest_unit_test(net_buf_test_big_buf),
-			 ztest_unit_test(net_buf_test_multi_frags),
-			 ztest_unit_test(net_buf_test_clone),
-			 ztest_unit_test(net_buf_test_fixed_pool),
-			 ztest_unit_test(net_buf_test_var_pool),
-			 ztest_unit_test(net_buf_test_byte_order)
+	ztest_test_suite(test_net_buf,
+			 ztest_unit_test(test_net_buf_1),
+			 ztest_unit_test(test_net_buf_2),
+			 ztest_unit_test(test_net_buf_3),
+			 ztest_unit_test(test_net_buf_4),
+			 ztest_unit_test(test_net_buf_big_buf),
+			 ztest_unit_test(test_net_buf_multi_frags),
+			 ztest_unit_test(test_net_buf_clone),
+			 ztest_unit_test(test_net_buf_fixed_pool),
+			 ztest_unit_test(test_net_buf_var_pool),
+			 ztest_unit_test(test_net_buf_byte_order)
 			 );
 
-	ztest_run_test_suite(net_buf_test);
+	ztest_run_test_suite(test_net_buf);
 }

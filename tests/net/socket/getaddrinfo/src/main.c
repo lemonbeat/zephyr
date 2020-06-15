@@ -24,9 +24,9 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_SOCKETS_LOG_LEVEL);
 #define MAX_BUF_SIZE 128
 #define STACK_SIZE (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
 #define THREAD_PRIORITY K_PRIO_COOP(8)
-#define WAIT_TIME 250
+#define WAIT_TIME K_MSEC(250)
 
-static u8_t recv_buf[MAX_BUF_SIZE];
+static uint8_t recv_buf[MAX_BUF_SIZE];
 
 static int sock_v4;
 static int sock_v6;
@@ -41,7 +41,7 @@ static ZTEST_BMEM SYS_MUTEX_DEFINE(wait_data);
 
 NET_BUF_POOL_DEFINE(test_dns_msg_pool, 1, 512, 0, NULL);
 
-static bool check_dns_query(u8_t *buf, int buf_len)
+static bool check_dns_query(uint8_t *buf, int buf_len)
 {
 	struct dns_msg_t dns_msg;
 	struct net_buf *result;
@@ -165,7 +165,7 @@ static int process_dns(void)
 
 K_THREAD_DEFINE(dns_server_thread_id, STACK_SIZE,
 		process_dns, NULL, NULL, NULL,
-		THREAD_PRIORITY, 0, K_FOREVER);
+		THREAD_PRIORITY, 0, -1);
 
 void test_getaddrinfo_setup(void)
 {

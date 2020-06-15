@@ -78,7 +78,7 @@
 &timers1 {
 	status = "okay";
 
-	pwm {
+	pwm1: pwm {
 		status = "okay";
 	};
 };
@@ -88,6 +88,10 @@
 };
 
 &iwdg {
+	status = "okay";
+};
+
+&rng {
 	status = "okay";
 };
 

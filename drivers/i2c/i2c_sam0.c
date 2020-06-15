@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT atmel_sam0_i2c
 
 #include <errno.h>
 #include <device.h>
@@ -23,28 +24,29 @@ LOG_MODULE_REGISTER(i2c_sam0, CONFIG_I2C_LOG_LEVEL);
 
 struct i2c_sam0_dev_config {
 	SercomI2cm *regs;
-	u32_t bitrate;
+	uint32_t bitrate;
 #ifdef MCLK
 	volatile uint32_t *mclk;
-	u32_t mclk_mask;
-	u16_t gclk_core_id;
+	uint32_t mclk_mask;
+	uint16_t gclk_core_id;
 #else
-	u32_t pm_apbcmask;
-	u16_t gclk_clkctrl_id;
+	uint32_t pm_apbcmask;
+	uint16_t gclk_clkctrl_id;
 #endif
 	void (*irq_config_func)(struct device *dev);
 
 #ifdef CONFIG_I2C_SAM0_DMA_DRIVEN
-	u8_t write_dma_request;
-	u8_t read_dma_request;
-	u8_t dma_channel;
+	char *dma_dev;
+	uint8_t write_dma_request;
+	uint8_t read_dma_request;
+	uint8_t dma_channel;
 #endif
 };
 
 struct i2c_sam0_msg {
-	u8_t *buffer;
-	u32_t size;
-	u32_t status;
+	uint8_t *buffer;
+	uint32_t size;
+	uint32_t status;
 };
 
 struct i2c_sam0_dev_data {
@@ -56,9 +58,9 @@ struct i2c_sam0_dev_data {
 #endif
 };
 
-#define DEV_NAME(dev) ((dev)->config->name)
+#define DEV_NAME(dev) ((dev)->name)
 #define DEV_CFG(dev) \
-	((const struct i2c_sam0_dev_config *const)(dev)->config->config_info)
+	((const struct i2c_sam0_dev_config *const)(dev)->config_info)
 #define DEV_DATA(dev) \
 	((struct i2c_sam0_dev_data *const)(dev)->driver_data)
 
@@ -132,7 +134,7 @@ static void i2c_sam0_isr(void *arg)
 	SercomI2cm *i2c = cfg->regs;
 
 	/* Get present interrupts and clear them */
-	u32_t status = i2c->INTFLAG.reg;
+	uint32_t status = i2c->INTFLAG.reg;
 
 	i2c->INTFLAG.reg = status;
 
@@ -179,7 +181,7 @@ static void i2c_sam0_isr(void *arg)
 
 #ifdef CONFIG_I2C_SAM0_DMA_DRIVEN
 
-static void i2c_sam0_dma_write_done(void *arg, u32_t id, int error_code)
+static void i2c_sam0_dma_write_done(void *arg, uint32_t id, int error_code)
 {
 	struct device *dev = arg;
 	struct i2c_sam0_dev_data *data = DEV_DATA(dev);
@@ -251,8 +253,8 @@ static bool i2c_sam0_dma_write_start(struct device *dev)
 	dma_cfg.dma_slot = cfg->write_dma_request;
 
 	dma_blk.block_size = data->msg.size;
-	dma_blk.source_address = (u32_t)data->msg.buffer;
-	dma_blk.dest_address = (u32_t)(&(i2c->DATA.reg));
+	dma_blk.source_address = (uint32_t)data->msg.buffer;
+	dma_blk.dest_address = (uint32_t)(&(i2c->DATA.reg));
 	dma_blk.dest_addr_adj = DMA_ADDR_ADJ_NO_CHANGE;
 
 	retval = dma_config(data->dma, cfg->dma_channel, &dma_cfg);
@@ -272,7 +274,7 @@ static bool i2c_sam0_dma_write_start(struct device *dev)
 	return true;
 }
 
-static void i2c_sam0_dma_read_done(void *arg, u32_t id, int error_code)
+static void i2c_sam0_dma_read_done(void *arg, uint32_t id, int error_code)
 {
 	struct device *dev = arg;
 	struct i2c_sam0_dev_data *data = DEV_DATA(dev);
@@ -346,8 +348,8 @@ static bool i2c_sam0_dma_read_start(struct device *dev)
 	dma_cfg.dma_slot = cfg->read_dma_request;
 
 	dma_blk.block_size = data->msg.size - 1;
-	dma_blk.dest_address = (u32_t)data->msg.buffer;
-	dma_blk.source_address = (u32_t)(&(i2c->DATA.reg));
+	dma_blk.dest_address = (uint32_t)data->msg.buffer;
+	dma_blk.source_address = (uint32_t)(&(i2c->DATA.reg));
 	dma_blk.source_addr_adj = DMA_ADDR_ADJ_NO_CHANGE;
 
 	retval = dma_config(data->dma, cfg->dma_channel, &dma_cfg);
@@ -370,12 +372,12 @@ static bool i2c_sam0_dma_read_start(struct device *dev)
 #endif
 
 static int i2c_sam0_transfer(struct device *dev, struct i2c_msg *msgs,
-			     u8_t num_msgs, u16_t addr)
+			     uint8_t num_msgs, uint16_t addr)
 {
 	struct i2c_sam0_dev_data *data = DEV_DATA(dev);
 	const struct i2c_sam0_dev_config *const cfg = DEV_CFG(dev);
 	SercomI2cm *i2c = cfg->regs;
-	u32_t addr_reg;
+	uint32_t addr_reg;
 
 	if (!num_msgs) {
 		return 0;
@@ -501,15 +503,15 @@ static int i2c_sam0_transfer(struct device *dev, struct i2c_msg *msgs,
 	return 0;
 }
 
-static int i2c_sam0_set_apply_bitrate(struct device *dev, u32_t config)
+static int i2c_sam0_set_apply_bitrate(struct device *dev, uint32_t config)
 {
 	const struct i2c_sam0_dev_config *const cfg = DEV_CFG(dev);
 	SercomI2cm *i2c = cfg->regs;
-	u32_t baud;
-	u32_t baud_low;
-	u32_t baud_high;
+	uint32_t baud;
+	uint32_t baud_low;
+	uint32_t baud_high;
 
-	u32_t CTRLA = i2c->CTRLA.reg;
+	uint32_t CTRLA = i2c->CTRLA.reg;
 
 #ifdef SERCOM_I2CM_CTRLA_SPEED_Msk
 	CTRLA &= ~SERCOM_I2CM_CTRLA_SPEED_Msk;
@@ -635,7 +637,7 @@ static int i2c_sam0_set_apply_bitrate(struct device *dev, u32_t config)
 	return 0;
 }
 
-static int i2c_sam0_configure(struct device *dev, u32_t config)
+static int i2c_sam0_configure(struct device *dev, uint32_t config)
 {
 	const struct i2c_sam0_dev_config *const cfg = DEV_CFG(dev);
 	SercomI2cm *i2c = cfg->regs;
@@ -710,7 +712,7 @@ static int i2c_sam0_initialize(struct device *dev)
 
 #ifdef CONFIG_I2C_SAM0_DMA_DRIVEN
 
-	data->dma = device_get_binding(CONFIG_DMA_0_NAME);
+	data->dma = device_get_binding(cfg->dma_dev);
 
 #endif
 
@@ -731,51 +733,25 @@ static const struct i2c_driver_api i2c_sam0_driver_api = {
 };
 
 #ifdef CONFIG_I2C_SAM0_DMA_DRIVEN
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_0_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_0_DMA 0xFF
-#endif
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_1_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_1_DMA 0xFF
-#endif
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_2_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_2_DMA 0xFF
-#endif
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_3_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_3_DMA 0xFF
-#endif
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_4_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_4_DMA 0xFF
-#endif
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_5_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_5_DMA 0xFF
-#endif
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_6_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_6_DMA 0xFF
-#endif
-#ifndef DT_ATMEL_SAM0_I2C_SERCOM_7_DMA
-#define DT_ATMEL_SAM0_I2C_SERCOM_7_DMA 0xFF
-#endif
-
-#define I2C_SAM0_DMA_CHANNELS(n)		     \
-	.write_dma_request = SERCOM##n##_DMAC_ID_TX, \
-	.read_dma_request = SERCOM##n##_DMAC_ID_RX,  \
-	.dma_channel = DT_ATMEL_SAM0_I2C_SERCOM_##n##_DMA,
+#define I2C_SAM0_DMA_CHANNELS(n)					\
+	.dma_dev = ATMEL_SAM0_DT_INST_DMA_NAME(n, tx),			\
+	.write_dma_request = ATMEL_SAM0_DT_INST_DMA_TRIGSRC(n, tx),	\
+	.read_dma_request = ATMEL_SAM0_DT_INST_DMA_TRIGSRC(n, rx),	\
+	.dma_channel = ATMEL_SAM0_DT_INST_DMA_CHANNEL(n, rx),
 #else
 #define I2C_SAM0_DMA_CHANNELS(n)
 #endif
 
-#define DT_ATMEL_SAM0_I2C_SERCOM_IRQ(n, m) DT_ATMEL_SAM0_I2C_SERCOM_ ## n ## _IRQ_ ## m
-#define DT_ATMEL_SAM0_I2C_SERCOM_IRQ_PRIORITY(n, m) DT_ATMEL_SAM0_I2C_SERCOM_ ## n ## _IRQ_ ## m ## _PRIORITY
-
 #define SAM0_I2C_IRQ_CONNECT(n, m)					\
 	do {								\
-	IRQ_CONNECT(DT_ATMEL_SAM0_I2C_SERCOM_IRQ(n, m),			\
-		    DT_ATMEL_SAM0_I2C_SERCOM_IRQ_PRIORITY(n, m),	\
-		    i2c_sam0_isr, DEVICE_GET(i2c_sam0_##n), 0);		\
-	irq_enable(DT_ATMEL_SAM0_I2C_SERCOM_IRQ(n, m));			\
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, m, irq),		\
+			    DT_INST_IRQ_BY_IDX(n, m, priority),		\
+			    i2c_sam0_isr,				\
+			    DEVICE_GET(i2c_sam0_##n), 0);		\
+		irq_enable(DT_INST_IRQ_BY_IDX(n, m, irq));		\
 	} while (0)
 
-#ifdef DT_INST_0_ATMEL_SAM0_I2C_IRQ_3
+#if DT_INST_IRQ_HAS_IDX(0, 3)
 #define I2C_SAM0_IRQ_HANDLER(n)						\
 static void i2c_sam0_irq_config_##n(struct device *dev)			\
 {									\
@@ -793,67 +769,39 @@ static void i2c_sam0_irq_config_##n(struct device *dev)			\
 #endif
 
 #ifdef MCLK
-#define I2C_SAM0_CONFIG(n)                                                  \
-	static const struct i2c_sam0_dev_config i2c_sam0_dev_config_##n = { \
-		.regs = (SercomI2cm *)DT_ATMEL_SAM0_I2C_SERCOM_##n##_BASE_ADDRESS, \
-		.bitrate = DT_ATMEL_SAM0_I2C_SERCOM_##n##_CLOCK_FREQUENCY,  \
-		.mclk = MCLK_SERCOM##n,                                     \
-		.mclk_mask = MCLK_SERCOM##n##_MASK,                         \
-		.gclk_core_id = SERCOM##n##_GCLK_ID_CORE,                   \
-		.irq_config_func = &i2c_sam0_irq_config_##n                 \
-		I2C_SAM0_DMA_CHANNELS(n)				    \
-	}
+#define I2C_SAM0_CONFIG(n)						\
+static const struct i2c_sam0_dev_config i2c_sam0_dev_config_##n = {	\
+	.regs = (SercomI2cm *)DT_INST_REG_ADDR(n),			\
+	.bitrate = DT_INST_PROP(n, clock_frequency),			\
+	.mclk = (volatile uint32_t *)MCLK_MASK_DT_INT_REG_ADDR(n),	\
+	.mclk_mask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(n, mclk, bit)),	\
+	.gclk_core_id = DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, periph_ch),\
+	.irq_config_func = &i2c_sam0_irq_config_##n			\
+	I2C_SAM0_DMA_CHANNELS(n)					\
+}
 #else /* !MCLK */
-#define I2C_SAM0_CONFIG(n)                                                  \
-	static const struct i2c_sam0_dev_config i2c_sam0_dev_config_##n = { \
-		.regs = (SercomI2cm *)DT_ATMEL_SAM0_I2C_SERCOM_##n##_BASE_ADDRESS, \
-		.bitrate = DT_ATMEL_SAM0_I2C_SERCOM_##n##_CLOCK_FREQUENCY,  \
-		.pm_apbcmask = PM_APBCMASK_SERCOM##n,			    \
-		.gclk_clkctrl_id = GCLK_CLKCTRL_ID_SERCOM##n##_CORE,	    \
-		.irq_config_func = &i2c_sam0_irq_config_##n,		    \
-		I2C_SAM0_DMA_CHANNELS(n)				    \
-	}
+#define I2C_SAM0_CONFIG(n)						\
+static const struct i2c_sam0_dev_config i2c_sam0_dev_config_##n = {	\
+	.regs = (SercomI2cm *)DT_INST_REG_ADDR(n),			\
+	.bitrate = DT_INST_PROP(n, clock_frequency),			\
+	.pm_apbcmask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(n, pm, bit)),	\
+	.gclk_clkctrl_id = DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, clkctrl_id),\
+	.irq_config_func = &i2c_sam0_irq_config_##n,			\
+	I2C_SAM0_DMA_CHANNELS(n)					\
+}
 #endif
 
-#define I2C_SAM0_DEVICE(n)						    \
-	static void i2c_sam0_irq_config_##n(struct device *dev);	    \
-	I2C_SAM0_CONFIG(n);						    \
-	static struct i2c_sam0_dev_data i2c_sam0_dev_data_##n;		    \
-	DEVICE_AND_API_INIT(i2c_sam0_##n,				    \
-			    DT_ATMEL_SAM0_I2C_SERCOM_##n##_LABEL,	    \
-			    &i2c_sam0_initialize, &i2c_sam0_dev_data_##n,   \
-			    &i2c_sam0_dev_config_##n, POST_KERNEL,	    \
-			    CONFIG_I2C_INIT_PRIORITY, &i2c_sam0_driver_api);\
+#define I2C_SAM0_DEVICE(n)						\
+	static void i2c_sam0_irq_config_##n(struct device *dev);	\
+	I2C_SAM0_CONFIG(n);						\
+	static struct i2c_sam0_dev_data i2c_sam0_dev_data_##n;		\
+	DEVICE_AND_API_INIT(i2c_sam0_##n,				\
+			    DT_INST_LABEL(n),				\
+			    &i2c_sam0_initialize,			\
+			    &i2c_sam0_dev_data_##n,			\
+			    &i2c_sam0_dev_config_##n, POST_KERNEL,	\
+			    CONFIG_I2C_INIT_PRIORITY,			\
+			    &i2c_sam0_driver_api);			\
 	I2C_SAM0_IRQ_HANDLER(n)
 
-#if DT_ATMEL_SAM0_I2C_SERCOM_0_BASE_ADDRESS
-I2C_SAM0_DEVICE(0);
-#endif
-
-#if DT_ATMEL_SAM0_I2C_SERCOM_1_BASE_ADDRESS
-I2C_SAM0_DEVICE(1);
-#endif
-
-#if DT_ATMEL_SAM0_I2C_SERCOM_2_BASE_ADDRESS
-I2C_SAM0_DEVICE(2);
-#endif
-
-#if DT_ATMEL_SAM0_I2C_SERCOM_3_BASE_ADDRESS
-I2C_SAM0_DEVICE(3);
-#endif
-
-#if DT_ATMEL_SAM0_I2C_SERCOM_4_BASE_ADDRESS
-I2C_SAM0_DEVICE(4);
-#endif
-
-#if DT_ATMEL_SAM0_I2C_SERCOM_5_BASE_ADDRESS
-I2C_SAM0_DEVICE(5);
-#endif
-
-#if DT_ATMEL_SAM0_I2C_SERCOM_6_BASE_ADDRESS
-I2C_SAM0_DEVICE(6);
-#endif
-
-#if DT_ATMEL_SAM0_I2C_SERCOM_7_BASE_ADDRESS
-I2C_SAM0_DEVICE(7);
-#endif
+DT_INST_FOREACH_STATUS_OKAY(I2C_SAM0_DEVICE)

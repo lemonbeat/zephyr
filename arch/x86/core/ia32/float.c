@@ -13,11 +13,11 @@
  * in a thread's stack region when a preemptive context switch occurs.
  *
  * Note: If the kernel has been built without floating point register sharing
- * support (CONFIG_FP_SHARING), the floating point registers can still be used
+ * support (CONFIG_FPU_SHARING), the floating point registers can still be used
  * safely by one or more cooperative threads OR by a single preemptive thread,
  * but not by both.
  *
- * This code is not necessary for systems with CONFIG_EAGER_FP_SHARING, as
+ * This code is not necessary for systems with CONFIG_EAGER_FPU_SHARING, as
  * the floating point context is unconditionally saved/restored with every
  * context switch.
  *
@@ -47,7 +47,7 @@
 #include <kernel_internal.h>
 
 /* SSE control/status register default value (used by assembler code) */
-extern u32_t _sse_mxcsr_default_value;
+extern uint32_t _sse_mxcsr_default_value;
 
 /**
  *
@@ -190,7 +190,7 @@ void k_float_enable(struct k_thread *thread, unsigned int options)
 
 	/* Indicate thread requires floating point context saving */
 
-	thread->base.user_options |= (u8_t)options;
+	thread->base.user_options |= (uint8_t)options;
 
 	/*
 	 * The current thread might not allow FP instructions, so clear CR0[TS]

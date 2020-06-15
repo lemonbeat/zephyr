@@ -40,7 +40,7 @@ extern "C" {
  *  @param _size Maximum data storage for the buffer.
  */
 #define NET_BUF_SIMPLE_DEFINE(_name, _size)     \
-	u8_t net_buf_data_##_name[_size];       \
+	uint8_t net_buf_data_##_name[_size];       \
 	struct net_buf_simple _name = {         \
 		.data   = net_buf_data_##_name, \
 		.len    = 0,                    \
@@ -59,7 +59,7 @@ extern "C" {
  * @param _size Maximum data storage for the buffer.
  */
 #define NET_BUF_SIMPLE_DEFINE_STATIC(_name, _size)        \
-	static __noinit u8_t net_buf_data_##_name[_size]; \
+	static __noinit uint8_t net_buf_data_##_name[_size]; \
 	static struct net_buf_simple _name = {            \
 		.data   = net_buf_data_##_name,           \
 		.len    = 0,                              \
@@ -82,18 +82,18 @@ extern "C" {
  */
 struct net_buf_simple {
 	/** Pointer to the start of data in the buffer. */
-	u8_t *data;
+	uint8_t *data;
 
 	/** Length of the data behind the data pointer. */
-	u16_t len;
+	uint16_t len;
 
 	/** Amount of data that this buffer can store. */
-	u16_t size;
+	uint16_t size;
 
 	/** Start of the data storage. Not to be accessed directly
 	 *  (the data pointer should be used instead).
 	 */
-	u8_t *__buf;
+	uint8_t *__buf;
 };
 
 /**
@@ -115,7 +115,7 @@ struct net_buf_simple {
 #define NET_BUF_SIMPLE(_size)                        \
 	((struct net_buf_simple *)(&(struct {        \
 		struct net_buf_simple buf;           \
-		u8_t data[_size];                    \
+		uint8_t data[_size];                    \
 	}) {                                         \
 		.buf.size = _size,                   \
 	}))
@@ -133,7 +133,7 @@ static inline void net_buf_simple_init(struct net_buf_simple *buf,
 				       size_t reserve_head)
 {
 	if (!buf->__buf) {
-		buf->__buf = (u8_t *)buf + sizeof(*buf);
+		buf->__buf = (uint8_t *)buf + sizeof(*buf);
 	}
 
 	buf->data = buf->__buf + reserve_head;
@@ -217,7 +217,7 @@ void *net_buf_simple_add_mem(struct net_buf_simple *buf, const void *mem,
  *
  * @return Pointer to the value added
  */
-u8_t *net_buf_simple_add_u8(struct net_buf_simple *buf, u8_t val);
+uint8_t *net_buf_simple_add_u8(struct net_buf_simple *buf, uint8_t val);
 
 /**
  * @brief Add 16-bit value at the end of the buffer
@@ -229,7 +229,7 @@ u8_t *net_buf_simple_add_u8(struct net_buf_simple *buf, u8_t val);
  * @param buf Buffer to update.
  * @param val 16-bit value to be added.
  */
-void net_buf_simple_add_le16(struct net_buf_simple *buf, u16_t val);
+void net_buf_simple_add_le16(struct net_buf_simple *buf, uint16_t val);
 
 /**
  * @brief Add 16-bit value at the end of the buffer
@@ -241,7 +241,7 @@ void net_buf_simple_add_le16(struct net_buf_simple *buf, u16_t val);
  * @param buf Buffer to update.
  * @param val 16-bit value to be added.
  */
-void net_buf_simple_add_be16(struct net_buf_simple *buf, u16_t val);
+void net_buf_simple_add_be16(struct net_buf_simple *buf, uint16_t val);
 
 /**
  * @brief Add 24-bit value at the end of the buffer
@@ -253,7 +253,7 @@ void net_buf_simple_add_be16(struct net_buf_simple *buf, u16_t val);
  * @param buf Buffer to update.
  * @param val 24-bit value to be added.
  */
-void net_buf_simple_add_le24(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_add_le24(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Add 24-bit value at the end of the buffer
@@ -265,7 +265,7 @@ void net_buf_simple_add_le24(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 24-bit value to be added.
  */
-void net_buf_simple_add_be24(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_add_be24(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Add 32-bit value at the end of the buffer
@@ -277,7 +277,7 @@ void net_buf_simple_add_be24(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 32-bit value to be added.
  */
-void net_buf_simple_add_le32(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_add_le32(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Add 32-bit value at the end of the buffer
@@ -289,7 +289,7 @@ void net_buf_simple_add_le32(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 32-bit value to be added.
  */
-void net_buf_simple_add_be32(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_add_be32(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Add 48-bit value at the end of the buffer
@@ -301,7 +301,7 @@ void net_buf_simple_add_be32(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 48-bit value to be added.
  */
-void net_buf_simple_add_le48(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_add_le48(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Add 48-bit value at the end of the buffer
@@ -313,7 +313,7 @@ void net_buf_simple_add_le48(struct net_buf_simple *buf, u64_t val);
  * @param buf Buffer to update.
  * @param val 48-bit value to be added.
  */
-void net_buf_simple_add_be48(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_add_be48(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Add 64-bit value at the end of the buffer
@@ -325,7 +325,7 @@ void net_buf_simple_add_be48(struct net_buf_simple *buf, u64_t val);
  * @param buf Buffer to update.
  * @param val 64-bit value to be added.
  */
-void net_buf_simple_add_le64(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_add_le64(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Add 64-bit value at the end of the buffer
@@ -337,7 +337,7 @@ void net_buf_simple_add_le64(struct net_buf_simple *buf, u64_t val);
  * @param buf Buffer to update.
  * @param val 64-bit value to be added.
  */
-void net_buf_simple_add_be64(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_add_be64(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Push data to the beginning of the buffer.
@@ -361,7 +361,7 @@ void *net_buf_simple_push(struct net_buf_simple *buf, size_t len);
  * @param buf Buffer to update.
  * @param val 16-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_le16(struct net_buf_simple *buf, u16_t val);
+void net_buf_simple_push_le16(struct net_buf_simple *buf, uint16_t val);
 
 /**
  * @brief Push 16-bit value to the beginning of the buffer
@@ -372,7 +372,7 @@ void net_buf_simple_push_le16(struct net_buf_simple *buf, u16_t val);
  * @param buf Buffer to update.
  * @param val 16-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_be16(struct net_buf_simple *buf, u16_t val);
+void net_buf_simple_push_be16(struct net_buf_simple *buf, uint16_t val);
 
 /**
  * @brief Push 8-bit value to the beginning of the buffer
@@ -382,7 +382,7 @@ void net_buf_simple_push_be16(struct net_buf_simple *buf, u16_t val);
  * @param buf Buffer to update.
  * @param val 8-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_u8(struct net_buf_simple *buf, u8_t val);
+void net_buf_simple_push_u8(struct net_buf_simple *buf, uint8_t val);
 
 /**
  * @brief Push 24-bit value to the beginning of the buffer
@@ -393,7 +393,7 @@ void net_buf_simple_push_u8(struct net_buf_simple *buf, u8_t val);
  * @param buf Buffer to update.
  * @param val 24-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_le24(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_push_le24(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Push 24-bit value to the beginning of the buffer
@@ -404,7 +404,7 @@ void net_buf_simple_push_le24(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 24-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_be24(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_push_be24(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Push 32-bit value to the beginning of the buffer
@@ -415,7 +415,7 @@ void net_buf_simple_push_be24(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 32-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_le32(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_push_le32(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Push 32-bit value to the beginning of the buffer
@@ -426,7 +426,7 @@ void net_buf_simple_push_le32(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 32-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_be32(struct net_buf_simple *buf, u32_t val);
+void net_buf_simple_push_be32(struct net_buf_simple *buf, uint32_t val);
 
 /**
  * @brief Push 48-bit value to the beginning of the buffer
@@ -437,7 +437,7 @@ void net_buf_simple_push_be32(struct net_buf_simple *buf, u32_t val);
  * @param buf Buffer to update.
  * @param val 48-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_le48(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_push_le48(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Push 48-bit value to the beginning of the buffer
@@ -448,7 +448,7 @@ void net_buf_simple_push_le48(struct net_buf_simple *buf, u64_t val);
  * @param buf Buffer to update.
  * @param val 48-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_be48(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_push_be48(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Push 64-bit value to the beginning of the buffer
@@ -459,7 +459,7 @@ void net_buf_simple_push_be48(struct net_buf_simple *buf, u64_t val);
  * @param buf Buffer to update.
  * @param val 64-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_le64(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_push_le64(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Push 64-bit value to the beginning of the buffer
@@ -470,7 +470,7 @@ void net_buf_simple_push_le64(struct net_buf_simple *buf, u64_t val);
  * @param buf Buffer to update.
  * @param val 64-bit value to be pushed to the buffer.
  */
-void net_buf_simple_push_be64(struct net_buf_simple *buf, u64_t val);
+void net_buf_simple_push_be64(struct net_buf_simple *buf, uint64_t val);
 
 /**
  * @brief Remove data from the beginning of the buffer.
@@ -508,7 +508,7 @@ void *net_buf_simple_pull_mem(struct net_buf_simple *buf, size_t len);
  *
  * @return The 8-bit removed value
  */
-u8_t net_buf_simple_pull_u8(struct net_buf_simple *buf);
+uint8_t net_buf_simple_pull_u8(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 16 bits from the beginning of the buffer.
@@ -520,7 +520,7 @@ u8_t net_buf_simple_pull_u8(struct net_buf_simple *buf);
  *
  * @return 16-bit value converted from little endian to host endian.
  */
-u16_t net_buf_simple_pull_le16(struct net_buf_simple *buf);
+uint16_t net_buf_simple_pull_le16(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 16 bits from the beginning of the buffer.
@@ -532,7 +532,7 @@ u16_t net_buf_simple_pull_le16(struct net_buf_simple *buf);
  *
  * @return 16-bit value converted from big endian to host endian.
  */
-u16_t net_buf_simple_pull_be16(struct net_buf_simple *buf);
+uint16_t net_buf_simple_pull_be16(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 24 bits from the beginning of the buffer.
@@ -544,7 +544,7 @@ u16_t net_buf_simple_pull_be16(struct net_buf_simple *buf);
  *
  * @return 24-bit value converted from little endian to host endian.
  */
-u32_t net_buf_simple_pull_le24(struct net_buf_simple *buf);
+uint32_t net_buf_simple_pull_le24(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 24 bits from the beginning of the buffer.
@@ -556,7 +556,7 @@ u32_t net_buf_simple_pull_le24(struct net_buf_simple *buf);
  *
  * @return 24-bit value converted from big endian to host endian.
  */
-u32_t net_buf_simple_pull_be24(struct net_buf_simple *buf);
+uint32_t net_buf_simple_pull_be24(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 32 bits from the beginning of the buffer.
@@ -568,7 +568,7 @@ u32_t net_buf_simple_pull_be24(struct net_buf_simple *buf);
  *
  * @return 32-bit value converted from little endian to host endian.
  */
-u32_t net_buf_simple_pull_le32(struct net_buf_simple *buf);
+uint32_t net_buf_simple_pull_le32(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 32 bits from the beginning of the buffer.
@@ -580,7 +580,7 @@ u32_t net_buf_simple_pull_le32(struct net_buf_simple *buf);
  *
  * @return 32-bit value converted from big endian to host endian.
  */
-u32_t net_buf_simple_pull_be32(struct net_buf_simple *buf);
+uint32_t net_buf_simple_pull_be32(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 48 bits from the beginning of the buffer.
@@ -592,7 +592,7 @@ u32_t net_buf_simple_pull_be32(struct net_buf_simple *buf);
  *
  * @return 48-bit value converted from little endian to host endian.
  */
-u64_t net_buf_simple_pull_le48(struct net_buf_simple *buf);
+uint64_t net_buf_simple_pull_le48(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 48 bits from the beginning of the buffer.
@@ -604,7 +604,7 @@ u64_t net_buf_simple_pull_le48(struct net_buf_simple *buf);
  *
  * @return 48-bit value converted from big endian to host endian.
  */
-u64_t net_buf_simple_pull_be48(struct net_buf_simple *buf);
+uint64_t net_buf_simple_pull_be48(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 64 bits from the beginning of the buffer.
@@ -616,7 +616,7 @@ u64_t net_buf_simple_pull_be48(struct net_buf_simple *buf);
  *
  * @return 64-bit value converted from little endian to host endian.
  */
-u64_t net_buf_simple_pull_le64(struct net_buf_simple *buf);
+uint64_t net_buf_simple_pull_le64(struct net_buf_simple *buf);
 
 /**
  * @brief Remove and convert 64 bits from the beginning of the buffer.
@@ -628,7 +628,7 @@ u64_t net_buf_simple_pull_le64(struct net_buf_simple *buf);
  *
  * @return 64-bit value converted from big endian to host endian.
  */
-u64_t net_buf_simple_pull_be64(struct net_buf_simple *buf);
+uint64_t net_buf_simple_pull_be64(struct net_buf_simple *buf);
 
 /**
  * @brief Get the tail pointer for a buffer.
@@ -639,7 +639,7 @@ u64_t net_buf_simple_pull_be64(struct net_buf_simple *buf);
  *
  * @return Tail pointer for the buffer.
  */
-static inline u8_t *net_buf_simple_tail(struct net_buf_simple *buf)
+static inline uint8_t *net_buf_simple_tail(struct net_buf_simple *buf)
 {
 	return buf->data + buf->len;
 }
@@ -675,9 +675,9 @@ size_t net_buf_simple_tailroom(struct net_buf_simple *buf);
  */
 struct net_buf_simple_state {
 	/** Offset of the data pointer from the beginning of the storage */
-	u16_t offset;
+	uint16_t offset;
 	/** Length of data */
-	u16_t len;
+	uint16_t len;
 };
 
 /**
@@ -748,13 +748,13 @@ struct net_buf {
 	};
 
 	/** Reference count. */
-	u8_t ref;
+	uint8_t ref;
 
 	/** Bit-field of buffer flags. */
-	u8_t flags;
+	uint8_t flags;
 
 	/** Where the buffer should go when freed up. */
-	u8_t pool_id;
+	uint8_t pool_id;
 
 	/* Union for convenience access to the net_buf_simple members, also
 	 * preserving the old API.
@@ -763,32 +763,32 @@ struct net_buf {
 		/* The ABI of this struct must match net_buf_simple */
 		struct {
 			/** Pointer to the start of data in the buffer. */
-			u8_t *data;
+			uint8_t *data;
 
 			/** Length of the data behind the data pointer. */
-			u16_t len;
+			uint16_t len;
 
 			/** Amount of data that this buffer can store. */
-			u16_t size;
+			uint16_t size;
 
 			/** Start of the data storage. Not to be accessed
 			 *  directly (the data pointer should be used
 			 *  instead).
 			 */
-			u8_t *__buf;
+			uint8_t *__buf;
 		};
 
 		struct net_buf_simple b;
 	};
 
 	/** System metadata for this buffer. */
-	u8_t user_data[CONFIG_NET_BUF_USER_DATA_SIZE] __net_buf_align;
+	uint8_t user_data[CONFIG_NET_BUF_USER_DATA_SIZE] __net_buf_align;
 };
 
 struct net_buf_data_cb {
-	u8_t * (*alloc)(struct net_buf *buf, size_t *size, s32_t timeout);
-	u8_t * (*ref)(struct net_buf *buf, u8_t *data);
-	void   (*unref)(struct net_buf *buf, u8_t *data);
+	uint8_t * (*alloc)(struct net_buf *buf, size_t *size, k_timeout_t timeout);
+	uint8_t * (*ref)(struct net_buf *buf, uint8_t *data);
+	void   (*unref)(struct net_buf *buf, uint8_t *data);
 };
 
 struct net_buf_data_alloc {
@@ -806,17 +806,17 @@ struct net_buf_pool {
 	struct k_lifo free;
 
 	/** Number of buffers in pool */
-	const u16_t buf_count;
+	const uint16_t buf_count;
 
 	/** Number of uninitialized buffers */
-	u16_t uninit_count;
+	uint16_t uninit_count;
 
 #if defined(CONFIG_NET_BUF_POOL_USAGE)
 	/** Amount of available buffers in the pool. */
-	s16_t avail_count;
+	int16_t avail_count;
 
 	/** Total size of the pool. */
-	const u16_t pool_size;
+	const uint16_t pool_size;
 
 	/** Name of the pool. Used when printing pool information. */
 	const char *name;
@@ -837,7 +837,7 @@ struct net_buf_pool {
 #define NET_BUF_POOL_INITIALIZER(_pool, _alloc, _bufs, _count, _destroy) \
 	{                                                                    \
 		.alloc = _alloc,                                             \
-		.free = _K_LIFO_INITIALIZER(_pool.free),                     \
+		.free = Z_LIFO_INITIALIZER(_pool.free),                     \
 		.__bufs = _bufs,                                             \
 		.buf_count = _count,                                         \
 		.uninit_count = _count,                                      \
@@ -849,7 +849,7 @@ struct net_buf_pool {
 #define NET_BUF_POOL_INITIALIZER(_pool, _alloc, _bufs, _count, _destroy)     \
 	{                                                                    \
 		.alloc = _alloc,                                             \
-		.free = _K_LIFO_INITIALIZER(_pool.free),                     \
+		.free = Z_LIFO_INITIALIZER(_pool.free),                     \
 		.__bufs = _bufs,                                             \
 		.buf_count = _count,                                         \
 		.uninit_count = _count,                                      \
@@ -895,7 +895,7 @@ extern const struct net_buf_data_alloc net_buf_heap_alloc;
 
 struct net_buf_pool_fixed {
 	size_t data_size;
-	u8_t *data_pool;
+	uint8_t *data_pool;
 };
 
 /** @cond INTERNAL_HIDDEN */
@@ -931,10 +931,10 @@ extern const struct net_buf_data_cb net_buf_fixed_cb;
  */
 #define NET_BUF_POOL_FIXED_DEFINE(_name, _count, _data_size, _destroy)        \
 	static struct net_buf net_buf_##_name[_count] __noinit;               \
-	static u8_t __noinit net_buf_data_##_name[_count][_data_size];        \
+	static uint8_t __noinit net_buf_data_##_name[_count][_data_size];        \
 	static const struct net_buf_pool_fixed net_buf_fixed_##_name = {      \
 		.data_size = _data_size,                                      \
-		.data_pool = (u8_t *)net_buf_data_##_name,                    \
+		.data_pool = (uint8_t *)net_buf_data_##_name,                    \
 	};                                                                    \
 	static const struct net_buf_data_alloc net_buf_fixed_alloc_##_name = {\
 		.cb = &net_buf_fixed_cb,                                      \
@@ -1038,22 +1038,23 @@ int net_buf_id(struct net_buf *buf);
  * @param pool Which pool to allocate the buffer from.
  * @param timeout Affects the action taken should the pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out. Note that some types
- *        of data allocators do not support blocking (such as the HEAP
- *        type). In this case it's still possible for net_buf_alloc() to
- *        fail (return NULL) even if it was given K_FOREVER.
+ *        wait as long as necessary. Otherwise, wait until the specified
+ *        timeout. Note that some types of data allocators do not support
+ *        blocking (such as the HEAP type). In this case it's still possible
+ *        for net_buf_alloc() to fail (return NULL) even if it was given
+ *        K_FOREVER.
  *
  * @return New buffer or NULL if out of buffers.
  */
 #if defined(CONFIG_NET_BUF_LOG)
 struct net_buf *net_buf_alloc_fixed_debug(struct net_buf_pool *pool,
-					  s32_t timeout, const char *func,
+					  k_timeout_t timeout, const char *func,
 					  int line);
 #define net_buf_alloc_fixed(_pool, _timeout) \
 	net_buf_alloc_fixed_debug(_pool, _timeout, __func__, __LINE__)
 #else
-struct net_buf *net_buf_alloc_fixed(struct net_buf_pool *pool, s32_t timeout);
+struct net_buf *net_buf_alloc_fixed(struct net_buf_pool *pool,
+				    k_timeout_t timeout);
 #endif
 
 /**
@@ -1070,23 +1071,23 @@ struct net_buf *net_buf_alloc_fixed(struct net_buf_pool *pool, s32_t timeout);
  * @param size Amount of data the buffer must be able to fit.
  * @param timeout Affects the action taken should the pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out. Note that some types
- *        of data allocators do not support blocking (such as the HEAP
- *        type). In this case it's still possible for net_buf_alloc() to
- *        fail (return NULL) even if it was given K_FOREVER.
+ *        wait as long as necessary. Otherwise, wait until the specified
+ *        timeout. Note that some types of data allocators do not support
+ *        blocking (such as the HEAP type). In this case it's still possible
+ *        for net_buf_alloc() to fail (return NULL) even if it was given
+ *        K_FOREVER.
  *
  * @return New buffer or NULL if out of buffers.
  */
 #if defined(CONFIG_NET_BUF_LOG)
 struct net_buf *net_buf_alloc_len_debug(struct net_buf_pool *pool, size_t size,
-					s32_t timeout, const char *func,
+					k_timeout_t timeout, const char *func,
 					int line);
 #define net_buf_alloc_len(_pool, _size, _timeout) \
 	net_buf_alloc_len_debug(_pool, _size, _timeout, __func__, __LINE__)
 #else
 struct net_buf *net_buf_alloc_len(struct net_buf_pool *pool, size_t size,
-				  s32_t timeout);
+				  k_timeout_t timeout);
 #endif
 
 /**
@@ -1100,26 +1101,26 @@ struct net_buf *net_buf_alloc_len(struct net_buf_pool *pool, size_t size,
  * @param size Amount of data the pointed data buffer if able to fit.
  * @param timeout Affects the action taken should the pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out. Note that some types
- *        of data allocators do not support blocking (such as the HEAP
- *        type). In this case it's still possible for net_buf_alloc() to
- *        fail (return NULL) even if it was given K_FOREVER.
+ *        wait as long as necessary. Otherwise, wait until the specified
+ *        timeout. Note that some types of data allocators do not support
+ *        blocking (such as the HEAP type). In this case it's still possible
+ *        for net_buf_alloc() to fail (return NULL) even if it was given
+ *        K_FOREVER.
  *
  * @return New buffer or NULL if out of buffers.
  */
 #if defined(CONFIG_NET_BUF_LOG)
 struct net_buf *net_buf_alloc_with_data_debug(struct net_buf_pool *pool,
 					      void *data, size_t size,
-					      s32_t timeout, const char *func,
-					      int line);
+					      k_timeout_t timeout,
+					      const char *func, int line);
 #define net_buf_alloc_with_data(_pool, _data_, _size, _timeout)		\
 	net_buf_alloc_with_data_debug(_pool, _data_, _size, _timeout,	\
 				      __func__, __LINE__)
 #else
 struct net_buf *net_buf_alloc_with_data(struct net_buf_pool *pool,
 					void *data, size_t size,
-					s32_t timeout);
+					k_timeout_t timeout);
 #endif
 
 /**
@@ -1128,18 +1129,17 @@ struct net_buf *net_buf_alloc_with_data(struct net_buf_pool *pool,
  * @param fifo Which FIFO to take the buffer from.
  * @param timeout Affects the action taken should the FIFO be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then wait as
- *        long as necessary. Otherwise, wait up to the specified number of
- *        milliseconds before timing out.
+ *        long as necessary. Otherwise, wait until the specified timeout.
  *
  * @return New buffer or NULL if the FIFO is empty.
  */
 #if defined(CONFIG_NET_BUF_LOG)
-struct net_buf *net_buf_get_debug(struct k_fifo *fifo, s32_t timeout,
+struct net_buf *net_buf_get_debug(struct k_fifo *fifo, k_timeout_t timeout,
 				  const char *func, int line);
 #define	net_buf_get(_fifo, _timeout) \
 	net_buf_get_debug(_fifo, _timeout, __func__, __LINE__)
 #else
-struct net_buf *net_buf_get(struct k_fifo *fifo, s32_t timeout);
+struct net_buf *net_buf_get(struct k_fifo *fifo, k_timeout_t timeout);
 #endif
 
 /**
@@ -1243,12 +1243,12 @@ struct net_buf *net_buf_ref(struct net_buf *buf);
  * @param buf A valid pointer on a buffer
  * @param timeout Affects the action taken should the pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out.
+ *        wait as long as necessary. Otherwise, wait until the specified
+ *        timeout.
  *
  * @return Cloned buffer or NULL if out of buffers.
  */
-struct net_buf *net_buf_clone(struct net_buf *buf, s32_t timeout);
+struct net_buf *net_buf_clone(struct net_buf *buf, k_timeout_t timeout);
 
 /**
  * @brief Get a pointer to the user data of a buffer.
@@ -1882,12 +1882,13 @@ size_t net_buf_linearize(void *dst, size_t dst_len,
  *
  * @param timeout Affects the action taken should the net buf pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out.
+ *        wait as long as necessary. Otherwise, wait until the specified
+ *        timeout.
  * @param user_data The user data given in net_buf_append_bytes call.
  * @return pointer to allocated net_buf or NULL on error.
  */
-typedef struct net_buf *(*net_buf_allocator_cb)(s32_t timeout, void *user_data);
+typedef struct net_buf *(*net_buf_allocator_cb)(k_timeout_t timeout,
+						void *user_data);
 
 /**
  * @brief Append data to a list of net_buf
@@ -1910,7 +1911,7 @@ typedef struct net_buf *(*net_buf_allocator_cb)(s32_t timeout, void *user_data);
  *         were no free fragments in a pool to accommodate all data.
  */
 size_t net_buf_append_bytes(struct net_buf *buf, size_t len,
-			    const void *value, s32_t timeout,
+			    const void *value, k_timeout_t timeout,
 			    net_buf_allocator_cb allocate_cb, void *user_data);
 
 /**

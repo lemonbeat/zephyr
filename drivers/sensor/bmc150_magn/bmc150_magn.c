@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT bosch_bmc150_magn
+
 #include <drivers/sensor.h>
 #include <kernel.h>
 #include <device.h>
@@ -25,7 +27,7 @@ LOG_MODULE_REGISTER(BMC150_MAGN, CONFIG_SENSOR_LOG_LEVEL);
 
 static const struct {
 	int freq;
-	u8_t reg_val;
+	uint8_t reg_val;
 } bmc150_magn_samp_freq_table[] = { {2, 0x01},
 				    {6, 0x02},
 				    {8, 0x03},
@@ -36,9 +38,9 @@ static const struct {
 				    {30, 0x07} };
 
 static const struct bmc150_magn_preset {
-	u8_t rep_xy;
-	u8_t rep_z;
-	u8_t odr;
+	uint8_t rep_xy;
+	uint8_t rep_z;
+	uint8_t odr;
 } bmc150_magn_presets_table[] = {
 	[LOW_POWER_PRESET] = {3, 3, 10},
 	[REGULAR_PRESET] = {9, 15, 10},
@@ -51,7 +53,7 @@ static int bmc150_magn_set_power_mode(struct device *dev,
 				      int state)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
+	const struct bmc150_magn_config *config = dev->config_info;
 
 	switch (mode) {
 	case BMC150_MAGN_POWER_MODE_SUSPEND:
@@ -86,11 +88,11 @@ static int bmc150_magn_set_power_mode(struct device *dev,
 	return -ENOTSUP;
 }
 
-static int bmc150_magn_set_odr(struct device *dev, u8_t val)
+static int bmc150_magn_set_odr(struct device *dev, uint8_t val)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
-	u8_t i;
+	const struct bmc150_magn_config *config = dev->config_info;
+	uint8_t i;
 
 	for (i = 0U; i < ARRAY_SIZE(bmc150_magn_samp_freq_table); ++i) {
 		if (val <= bmc150_magn_samp_freq_table[i].freq) {
@@ -111,8 +113,8 @@ static int bmc150_magn_set_odr(struct device *dev, u8_t val)
 static int bmc150_magn_read_rep_xy(struct device *dev)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
-	u8_t reg_val;
+	const struct bmc150_magn_config *config = dev->config_info;
+	uint8_t reg_val;
 
 	if (i2c_reg_read_byte(data->i2c_master, config->i2c_slave_addr,
 			      BMC150_MAGN_REG_REP_XY, &reg_val) < 0) {
@@ -127,8 +129,8 @@ static int bmc150_magn_read_rep_xy(struct device *dev)
 static int bmc150_magn_read_rep_z(struct device *dev)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
-	u8_t reg_val;
+	const struct bmc150_magn_config *config = dev->config_info;
+	uint8_t reg_val;
 
 	if (i2c_reg_read_byte(data->i2c_master, config->i2c_slave_addr,
 			      BMC150_MAGN_REG_REP_Z, &reg_val) < 0) {
@@ -173,8 +175,8 @@ static int bmc150_magn_compute_max_odr(struct device *dev, int rep_xy,
 static int bmc150_magn_read_odr(struct device *dev)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
-	u8_t i, odr_val, reg_val;
+	const struct bmc150_magn_config *config = dev->config_info;
+	uint8_t i, odr_val, reg_val;
 
 	if (i2c_reg_read_byte(data->i2c_master, config->i2c_slave_addr,
 			      BMC150_MAGN_REG_OPMODE_ODR, &reg_val) < 0) {
@@ -198,7 +200,7 @@ static int bmc150_magn_read_odr(struct device *dev)
 static int bmc150_magn_write_rep_xy(struct device *dev, int val)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
+	const struct bmc150_magn_config *config = dev->config_info;
 
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				BMC150_MAGN_REG_REP_XY,
@@ -217,7 +219,7 @@ static int bmc150_magn_write_rep_xy(struct device *dev, int val)
 static int bmc150_magn_write_rep_z(struct device *dev, int val)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
+	const struct bmc150_magn_config *config = dev->config_info;
 
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				BMC150_MAGN_REG_REP_Z,
@@ -236,11 +238,11 @@ static int bmc150_magn_write_rep_z(struct device *dev, int val)
  * Datasheet part 4.3.4, provided by Bosch here:
  * https://github.com/BoschSensortec/BMM050_driver
  */
-static s32_t bmc150_magn_compensate_xy(struct bmc150_magn_trim_regs *tregs,
-					s16_t xy, u16_t rhall, bool is_x)
+static int32_t bmc150_magn_compensate_xy(struct bmc150_magn_trim_regs *tregs,
+					int16_t xy, uint16_t rhall, bool is_x)
 {
-	s8_t txy1, txy2;
-	s16_t val;
+	int8_t txy1, txy2;
+	int16_t val;
 
 	if (xy == BMC150_MAGN_XY_OVERFLOW_VAL) {
 		return INT32_MIN;
@@ -258,30 +260,30 @@ static s32_t bmc150_magn_compensate_xy(struct bmc150_magn_trim_regs *tregs,
 		txy2 = tregs->y2;
 	}
 
-	val = ((s16_t)(((u16_t)((((s32_t)tregs->xyz1) << 14) / rhall)) -
-	      ((u16_t)0x4000)));
-	val = ((s16_t)((((s32_t)xy) * ((((((((s32_t)tregs->xy2) *
-	      ((((s32_t)val) * ((s32_t)val)) >> 7)) + (((s32_t)val) *
-	      ((s32_t)(((s16_t)tregs->xy1) << 7)))) >> 9) +
-	      ((s32_t)0x100000)) * ((s32_t)(((s16_t)txy2) +
-	      ((s16_t)0xA0)))) >> 12)) >> 13)) + (((s16_t)txy1) << 3);
+	val = ((int16_t)(((uint16_t)((((int32_t)tregs->xyz1) << 14) / rhall)) -
+	      ((uint16_t)0x4000)));
+	val = ((int16_t)((((int32_t)xy) * ((((((((int32_t)tregs->xy2) *
+	      ((((int32_t)val) * ((int32_t)val)) >> 7)) + (((int32_t)val) *
+	      ((int32_t)(((int16_t)tregs->xy1) << 7)))) >> 9) +
+	      ((int32_t)0x100000)) * ((int32_t)(((int16_t)txy2) +
+	      ((int16_t)0xA0)))) >> 12)) >> 13)) + (((int16_t)txy1) << 3);
 
-	return (s32_t)val;
+	return (int32_t)val;
 }
 
-static s32_t bmc150_magn_compensate_z(struct bmc150_magn_trim_regs *tregs,
-					s16_t z, u16_t rhall)
+static int32_t bmc150_magn_compensate_z(struct bmc150_magn_trim_regs *tregs,
+					int16_t z, uint16_t rhall)
 {
-	s32_t val;
+	int32_t val;
 
 	if (z == BMC150_MAGN_Z_OVERFLOW_VAL) {
 		return INT32_MIN;
 	}
 
-	val = (((((s32_t)(z - tregs->z4)) << 15) - ((((s32_t)tregs->z3) *
-	      ((s32_t)(((s16_t)rhall) - ((s16_t)tregs->xyz1)))) >> 2)) /
-	      (tregs->z2 + ((s16_t)(((((s32_t)tregs->z1) *
-	      ((((s16_t)rhall) << 1))) + (1 << 15)) >> 16))));
+	val = (((((int32_t)(z - tregs->z4)) << 15) - ((((int32_t)tregs->z3) *
+	      ((int32_t)(((int16_t)rhall) - ((int16_t)tregs->xyz1)))) >> 2)) /
+	      (tregs->z2 + ((int16_t)(((((int32_t)tregs->z1) *
+	      ((((int16_t)rhall) << 1))) + (1 << 15)) >> 16))));
 
 	return val;
 }
@@ -290,26 +292,26 @@ static int bmc150_magn_sample_fetch(struct device *dev,
 				    enum sensor_channel chan)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
-	u16_t values[BMC150_MAGN_AXIS_XYZR_MAX];
-	s16_t raw_x, raw_y, raw_z;
-	u16_t rhall;
+	const struct bmc150_magn_config *config = dev->config_info;
+	uint16_t values[BMC150_MAGN_AXIS_XYZR_MAX];
+	int16_t raw_x, raw_y, raw_z;
+	uint16_t rhall;
 
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL ||
 			chan == SENSOR_CHAN_MAGN_XYZ);
 
 	if (i2c_burst_read(data->i2c_master, config->i2c_slave_addr,
-			   BMC150_MAGN_REG_X_L, (u8_t *)values,
+			   BMC150_MAGN_REG_X_L, (uint8_t *)values,
 			   sizeof(values)) < 0) {
 		LOG_ERR("failed to read sample");
 		return -EIO;
 	}
 
-	raw_x = (s16_t)sys_le16_to_cpu(values[BMC150_MAGN_AXIS_X]) >>
+	raw_x = (int16_t)sys_le16_to_cpu(values[BMC150_MAGN_AXIS_X]) >>
 		BMC150_MAGN_SHIFT_XY_L;
-	raw_y = (s16_t)sys_le16_to_cpu(values[BMC150_MAGN_AXIS_Y]) >>
+	raw_y = (int16_t)sys_le16_to_cpu(values[BMC150_MAGN_AXIS_Y]) >>
 		BMC150_MAGN_SHIFT_XY_L;
-	raw_z = (s16_t)sys_le16_to_cpu(values[BMC150_MAGN_AXIS_Z]) >>
+	raw_z = (int16_t)sys_le16_to_cpu(values[BMC150_MAGN_AXIS_Z]) >>
 		BMC150_MAGN_SHIFT_Z_L;
 	rhall = sys_le16_to_cpu(values[BMC150_MAGN_RHALL]) >>
 		BMC150_MAGN_SHIFT_RHALL_L;
@@ -327,7 +329,7 @@ static void bmc150_magn_convert(struct sensor_value *val, int raw_val)
 {
 	/* val = raw_val / 1600 */
 	val->val1 = raw_val / 1600;
-	val->val2 = ((s32_t)raw_val * (1000000 / 1600)) % 1000000;
+	val->val2 = ((int32_t)raw_val * (1000000 / 1600)) % 1000000;
 }
 
 static int bmc150_magn_channel_get(struct device *dev,
@@ -451,7 +453,7 @@ static int bmc150_magn_attr_set(struct device *dev,
 			return -ENOTSUP;
 		}
 
-		if (bmc150_magn_set_odr(dev, (u8_t)(val->val1)) < 0) {
+		if (bmc150_magn_set_odr(dev, (uint8_t)(val->val1)) < 0) {
 			return -EIO;
 		}
 		break;
@@ -483,8 +485,8 @@ static const struct sensor_driver_api bmc150_magn_api_funcs = {
 static int bmc150_magn_init_chip(struct device *dev)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
-	u8_t chip_id;
+	const struct bmc150_magn_config *config = dev->config_info;
+	uint8_t chip_id;
 	struct bmc150_magn_preset preset;
 
 	bmc150_magn_set_power_mode(dev, BMC150_MAGN_POWER_MODE_NORMAL, 0);
@@ -538,7 +540,7 @@ static int bmc150_magn_init_chip(struct device *dev)
 	}
 
 	if (i2c_burst_read(data->i2c_master, config->i2c_slave_addr,
-			   BMC150_MAGN_REG_TRIM_START, (u8_t *)&data->tregs,
+			   BMC150_MAGN_REG_TRIM_START, (uint8_t *)&data->tregs,
 			   sizeof(data->tregs)) < 0) {
 		LOG_ERR("failed to read trim regs");
 		goto err_poweroff;
@@ -569,7 +571,7 @@ err_poweroff:
 static int bmc150_magn_init(struct device *dev)
 {
 	const struct bmc150_magn_config * const config =
-					  dev->config->config_info;
+					  dev->config_info;
 	struct bmc150_magn_data *data = dev->driver_data;
 
 	data->i2c_master = device_get_binding(config->i2c_master_dev_name);
@@ -595,16 +597,16 @@ static int bmc150_magn_init(struct device *dev)
 
 static const struct bmc150_magn_config bmc150_magn_config = {
 #if defined(CONFIG_BMC150_MAGN_TRIGGER_DRDY)
-	.gpio_drdy_dev_name = DT_INST_0_BOSCH_BMC150_MAGN_DRDY_GPIOS_CONTROLLER,
-	.gpio_drdy_int_pin = DT_INST_0_BOSCH_BMC150_MAGN_DRDY_GPIOS_PIN,
-	.gpio_drdy_int_flags = DT_INST_0_BOSCH_BMC150_MAGN_DRDY_GPIOS_FLAGS,
+	.gpio_drdy_dev_name = DT_INST_GPIO_LABEL(0, drdy_gpios),
+	.gpio_drdy_int_pin = DT_INST_GPIO_PIN(0, drdy_gpios),
+	.gpio_drdy_int_flags = DT_INST_GPIO_FLAGS(0, drdy_gpios),
 #endif
-	.i2c_master_dev_name = DT_INST_0_BOSCH_BMC150_MAGN_BUS_NAME,
+	.i2c_master_dev_name = DT_INST_BUS_LABEL(0),
 	.i2c_slave_addr = BMC150_MAGN_I2C_ADDR,
 };
 
 static struct bmc150_magn_data bmc150_magn_data;
 
-DEVICE_AND_API_INIT(bmc150_magn, DT_INST_0_BOSCH_BMC150_MAGN_LABEL, bmc150_magn_init,
+DEVICE_AND_API_INIT(bmc150_magn, DT_INST_LABEL(0), bmc150_magn_init,
 	    &bmc150_magn_data, &bmc150_magn_config, POST_KERNEL,
 	    CONFIG_SENSOR_INIT_PRIORITY, &bmc150_magn_api_funcs);

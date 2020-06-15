@@ -30,14 +30,14 @@ static int fake_cca(struct device *dev)
 	return 0;
 }
 
-static int fake_set_channel(struct device *dev, u16_t channel)
+static int fake_set_channel(struct device *dev, uint16_t channel)
 {
 	NET_INFO("Channel %u\n", channel);
 
 	return 0;
 }
 
-static int fake_set_txpower(struct device *dev, s16_t dbm)
+static int fake_set_txpower(struct device *dev, int16_t dbm)
 {
 	NET_INFO("TX power %d dbm\n", dbm);
 
@@ -60,6 +60,7 @@ static inline void insert_frag(struct net_pkt *pkt, struct net_buf *frag)
 }
 
 static int fake_tx(struct device *dev,
+		   enum ieee802154_tx_mode mode,
 		   struct net_pkt *pkt,
 		   struct net_buf *frag)
 {
@@ -94,7 +95,7 @@ static int fake_stop(struct device *dev)
 static void fake_iface_init(struct net_if *iface)
 {
 	struct ieee802154_context *ctx = net_if_l2_data(iface);
-	static u8_t mac[8] = { 0x00, 0x12, 0x4b, 0x00,
+	static uint8_t mac[8] = { 0x00, 0x12, 0x4b, 0x00,
 				  0x00, 0x9e, 0xa3, 0xc2 };
 
 	net_if_set_link_addr(iface, mac, 8, NET_LINK_IEEE802154);
@@ -126,7 +127,7 @@ static struct ieee802154_radio_api fake_radio_api = {
 };
 
 NET_DEVICE_INIT(fake, "fake_ieee802154",
-		fake_init, NULL, NULL,
+		fake_init, device_pm_control_nop, NULL, NULL,
 		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		&fake_radio_api, IEEE802154_L2,
 		NET_L2_GET_CTX_TYPE(IEEE802154_L2), 125);

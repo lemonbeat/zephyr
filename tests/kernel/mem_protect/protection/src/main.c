@@ -42,7 +42,7 @@ static int __attribute__((noinline)) add_one(int i)
 	return (i + 1);
 }
 
-static void execute_from_buffer(u8_t *dst)
+static void execute_from_buffer(uint8_t *dst)
 {
 	void *src = FUNC_TO_PTR(add_one);
 	int (*func)(int i) = PTR_TO_FUNC(dst);
@@ -74,9 +74,9 @@ static void execute_from_buffer(u8_t *dst)
  *
  * @ingroup kernel_memprotect_tests
  */
-static void write_ro(void)
+static void test_write_ro(void)
 {
-	u32_t *ptr = (u32_t *)&rodata_var;
+	uint32_t *ptr = (uint32_t *)&rodata_var;
 
 	/*
 	 * Try writing to rodata.  Optimally, this triggers a fault.
@@ -103,7 +103,7 @@ static void write_ro(void)
  *
  * @ingroup kernel_memprotect_tests
  */
-static void write_text(void)
+static void test_write_text(void)
 {
 	void *src = FUNC_TO_PTR(add_one);
 	void *dst = FUNC_TO_PTR(overwrite_target);
@@ -134,7 +134,7 @@ static void write_text(void)
  *
  * @ingroup kernel_memprotect_tests
  */
-static void exec_data(void)
+static void test_exec_data(void)
 {
 	execute_from_buffer(data_buf);
 	zassert_unreachable("Execute from data did not fault");
@@ -145,9 +145,9 @@ static void exec_data(void)
  *
  * @ingroup kernel_memprotect_tests
  */
-static void exec_stack(void)
+static void test_exec_stack(void)
 {
-	u8_t stack_buf[BUF_SIZE] __aligned(sizeof(int));
+	uint8_t stack_buf[BUF_SIZE] __aligned(sizeof(int));
 
 	execute_from_buffer(stack_buf);
 	zassert_unreachable("Execute from stack did not fault");
@@ -159,16 +159,16 @@ static void exec_stack(void)
  * @ingroup kernel_memprotect_tests
  */
 #if (CONFIG_HEAP_MEM_POOL_SIZE > 0)
-static void exec_heap(void)
+static void test_exec_heap(void)
 {
-	u8_t *heap_buf = k_malloc(BUF_SIZE);
+	uint8_t *heap_buf = k_malloc(BUF_SIZE);
 
 	execute_from_buffer(heap_buf);
 	k_free(heap_buf);
 	zassert_unreachable("Execute from heap did not fault");
 }
 #else
-static void exec_heap(void)
+static void test_exec_heap(void)
 {
 	ztest_test_skip();
 }
@@ -177,11 +177,11 @@ static void exec_heap(void)
 void test_main(void)
 {
 	ztest_test_suite(protection,
-			 ztest_unit_test(exec_data),
-			 ztest_unit_test(exec_stack),
-			 ztest_unit_test(exec_heap),
-			 ztest_unit_test(write_ro),
-			 ztest_unit_test(write_text)
+			 ztest_unit_test(test_exec_data),
+			 ztest_unit_test(test_exec_stack),
+			 ztest_unit_test(test_exec_heap),
+			 ztest_unit_test(test_write_ro),
+			 ztest_unit_test(test_write_text)
 		);
 	ztest_run_test_suite(protection);
 }

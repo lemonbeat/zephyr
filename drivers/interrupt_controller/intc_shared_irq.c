@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT shared_irq
+
 #include <errno.h>
 
 #include <kernel.h>
@@ -26,8 +28,8 @@ static int isr_register(struct device *dev, isr_t isr_func,
 				 struct device *isr_dev)
 {
 	struct shared_irq_runtime *clients = dev->driver_data;
-	const struct shared_irq_config *config = dev->config->config_info;
-	u32_t i;
+	const struct shared_irq_config *config = dev->config_info;
+	uint32_t i;
 
 	for (i = 0U; i < config->client_count; i++) {
 		if (!clients->client[i].isr_dev) {
@@ -47,8 +49,8 @@ static int isr_register(struct device *dev, isr_t isr_func,
 static inline int enable(struct device *dev, struct device *isr_dev)
 {
 	struct shared_irq_runtime *clients = dev->driver_data;
-	const struct shared_irq_config *config = dev->config->config_info;
-	u32_t i;
+	const struct shared_irq_config *config = dev->config_info;
+	uint32_t i;
 
 	for (i = 0U; i < config->client_count; i++) {
 		if (clients->client[i].isr_dev == isr_dev) {
@@ -62,7 +64,7 @@ static inline int enable(struct device *dev, struct device *isr_dev)
 
 static int last_enabled_isr(struct shared_irq_runtime *clients, int count)
 {
-	u32_t i;
+	uint32_t i;
 
 	for (i = 0U; i < count; i++) {
 		if (clients->client[i].enabled) {
@@ -79,8 +81,8 @@ static int last_enabled_isr(struct shared_irq_runtime *clients, int count)
 static inline int disable(struct device *dev, struct device *isr_dev)
 {
 	struct shared_irq_runtime *clients = dev->driver_data;
-	const struct shared_irq_config *config = dev->config->config_info;
-	u32_t i;
+	const struct shared_irq_config *config = dev->config_info;
+	uint32_t i;
 
 	for (i = 0U; i < config->client_count; i++) {
 		if (clients->client[i].isr_dev == isr_dev) {
@@ -97,8 +99,8 @@ static inline int disable(struct device *dev, struct device *isr_dev)
 void shared_irq_isr(struct device *dev)
 {
 	struct shared_irq_runtime *clients = dev->driver_data;
-	const struct shared_irq_config *config = dev->config->config_info;
-	u32_t i;
+	const struct shared_irq_config *config = dev->config_info;
+	uint32_t i;
 
 	for (i = 0U; i < config->client_count; i++) {
 		if (clients->client[i].isr_dev) {
@@ -116,7 +118,7 @@ static const struct shared_irq_driver_api api_funcs = {
 
 int shared_irq_initialize(struct device *dev)
 {
-	const struct shared_irq_config *config = dev->config->config_info;
+	const struct shared_irq_config *config = dev->config_info;
 	config->config();
 	return 0;
 }
@@ -125,24 +127,24 @@ int shared_irq_initialize(struct device *dev)
 void shared_irq_config_0_irq(void);
 
 const struct shared_irq_config shared_irq_config_0 = {
-	.irq_num = DT_INST_0_SHARED_IRQ_IRQ_0,
+	.irq_num = DT_INST_IRQN(0),
 	.client_count = CONFIG_SHARED_IRQ_NUM_CLIENTS,
 	.config = shared_irq_config_0_irq
 };
 
 struct shared_irq_runtime shared_irq_0_runtime;
 
-DEVICE_AND_API_INIT(shared_irq_0, DT_INST_0_SHARED_IRQ_LABEL,
+DEVICE_AND_API_INIT(shared_irq_0, DT_INST_LABEL(0),
 		shared_irq_initialize, &shared_irq_0_runtime,
 		&shared_irq_config_0, POST_KERNEL,
 		CONFIG_SHARED_IRQ_INIT_PRIORITY, &api_funcs);
 
 void shared_irq_config_0_irq(void)
 {
-	IRQ_CONNECT(DT_INST_0_SHARED_IRQ_IRQ_0,
-		    DT_INST_0_SHARED_IRQ_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+		    DT_INST_IRQ(0, priority),
 		    shared_irq_isr, DEVICE_GET(shared_irq_0),
-		    DT_INST_0_SHARED_IRQ_IRQ_0_SENSE);
+		    DT_INST_IRQ(0, sense));
 }
 
 #endif /* CONFIG_SHARED_IRQ_0 */
@@ -151,24 +153,24 @@ void shared_irq_config_0_irq(void)
 void shared_irq_config_1_irq(void);
 
 const struct shared_irq_config shared_irq_config_1 = {
-	.irq_num = DT_INST_1_SHARED_IRQ_IRQ_0,
+	.irq_num = DT_INST_IRQN(1),
 	.client_count = CONFIG_SHARED_IRQ_NUM_CLIENTS,
 	.config = shared_irq_config_1_irq
 };
 
 struct shared_irq_runtime shared_irq_1_runtime;
 
-DEVICE_AND_API_INIT(shared_irq_1, DT_INST_1_SHARED_IRQ_LABEL,
+DEVICE_AND_API_INIT(shared_irq_1, DT_INST_LABEL(1),
 		shared_irq_initialize, &shared_irq_1_runtime,
 		&shared_irq_config_1, POST_KERNEL,
 		CONFIG_SHARED_IRQ_INIT_PRIORITY, &api_funcs);
 
 void shared_irq_config_1_irq(void)
 {
-	IRQ_CONNECT(DT_INST_1_SHARED_IRQ_IRQ_0,
-		    DT_INST_1_SHARED_IRQ_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(1),
+		    DT_INST_IRQ(1, priority),
 		    shared_irq_isr, DEVICE_GET(shared_irq_1),
-		    DT_INST_1_SHARED_IRQ_IRQ_0_SENSE);
+		    DT_INST_IRQ(1, sense));
 }
 
 #endif /* CONFIG_SHARED_IRQ_1 */

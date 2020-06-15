@@ -44,7 +44,7 @@ SAMPLE_INSTANCE_DEFINE(app_part, inst2);
 #include <soc.h>
 #endif
 
-static u32_t timestamp_get(void)
+static uint32_t timestamp_get(void)
 {
 #ifdef CONFIG_SOC_FAMILY_NRF
 	return NRF_RTC1->COUNTER;
@@ -53,7 +53,7 @@ static u32_t timestamp_get(void)
 #endif
 }
 
-static u32_t timestamp_freq(void)
+static uint32_t timestamp_freq(void)
 {
 #ifdef CONFIG_SOC_FAMILY_NRF
 	return 32768 / (NRF_RTC1->PRESCALER + 1);
@@ -200,11 +200,11 @@ static void log_strdup_showcase(void)
  */
 static void performance_showcase(void)
 {
-	volatile u32_t current_timestamp;
-	volatile u32_t start_timestamp;
-	u32_t per_sec;
-	u32_t cnt = 0U;
-	u32_t window = 2U;
+	volatile uint32_t current_timestamp;
+	volatile uint32_t start_timestamp;
+	uint32_t per_sec;
+	uint32_t cnt = 0U;
+	uint32_t window = 2U;
 
 	printk("Logging performance showcase.\n");
 
@@ -313,4 +313,4 @@ static void log_demo_supervisor(void *p1, void *p2, void *p3)
 
 K_THREAD_DEFINE(log_demo_thread_id, STACKSIZE, log_demo_supervisor,
 		NULL, NULL, NULL,
-		K_LOWEST_APPLICATION_THREAD_PRIO, 0, K_MSEC(1));
+		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 1);

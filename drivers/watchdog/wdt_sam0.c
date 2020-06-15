@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT atmel_sam0_watchdog
+
 #include <soc.h>
 #include <drivers/watchdog.h>
 
@@ -12,7 +14,7 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(wdt_sam0);
 
-#define WDT_REGS ((Wdt *)DT_INST_0_ATMEL_SAM0_WATCHDOG_BASE_ADDRESS)
+#define WDT_REGS ((Wdt *)DT_INST_REG_ADDR(0))
 
 #ifndef WDT_CONFIG_PER_8_Val
 #define WDT_CONFIG_PER_8_Val WDT_CONFIG_PER_CYC8_Val
@@ -29,7 +31,7 @@ struct wdt_sam0_dev_data {
 	bool timeout_valid;
 };
 
-static struct device DEVICE_NAME_GET(wdt_sam0);
+DEVICE_DECLARE(wdt_sam0);
 
 static struct wdt_sam0_dev_data wdt_sam0_data = { 0 };
 
@@ -62,10 +64,10 @@ static inline bool wdt_sam0_is_enabled(void)
 #endif
 }
 
-static u32_t wdt_sam0_timeout_to_wdt_period(u32_t timeout_ms)
+static uint32_t wdt_sam0_timeout_to_wdt_period(uint32_t timeout_ms)
 {
-	u32_t next_pow2;
-	u32_t cycles;
+	uint32_t next_pow2;
+	uint32_t cycles;
 
 	/* Calculate number of clock cycles @ 1.024 kHz input clock */
 	cycles = (timeout_ms * 1024U) / 1000;
@@ -91,7 +93,7 @@ static void wdt_sam0_isr(struct device *dev)
 	}
 }
 
-static int wdt_sam0_setup(struct device *dev, u8_t options)
+static int wdt_sam0_setup(struct device *dev, uint8_t options)
 {
 	struct wdt_sam0_dev_data *data = dev->driver_data;
 
@@ -125,7 +127,6 @@ static int wdt_sam0_setup(struct device *dev, u8_t options)
 static int wdt_sam0_disable(struct device *dev)
 {
 	if (!wdt_sam0_is_enabled()) {
-		LOG_ERR("Watchdog not enabled");
 		return -EFAULT;
 	}
 
@@ -139,7 +140,7 @@ static int wdt_sam0_install_timeout(struct device *dev,
 				const struct wdt_timeout_cfg *cfg)
 {
 	struct wdt_sam0_dev_data *data = dev->driver_data;
-	u32_t window, per;
+	uint32_t window, per;
 
 	/* CONFIG is enable protected, error out if already enabled */
 	if (wdt_sam0_is_enabled()) {
@@ -262,16 +263,16 @@ static int wdt_sam0_init(struct device *dev)
 		| GCLK_CLKCTRL_CLKEN;
 #endif
 
-	IRQ_CONNECT(DT_INST_0_ATMEL_SAM0_WATCHDOG_IRQ_0,
-		    DT_INST_0_ATMEL_SAM0_WATCHDOG_IRQ_0_PRIORITY, wdt_sam0_isr,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+		    DT_INST_IRQ(0, priority), wdt_sam0_isr,
 		    DEVICE_GET(wdt_sam0), 0);
-	irq_enable(DT_INST_0_ATMEL_SAM0_WATCHDOG_IRQ_0);
+	irq_enable(DT_INST_IRQN(0));
 
 	return 0;
 }
 
 static struct wdt_sam0_dev_data wdt_sam0_data;
 
-DEVICE_AND_API_INIT(wdt_sam0, DT_INST_0_ATMEL_SAM0_WATCHDOG_LABEL, wdt_sam0_init,
+DEVICE_AND_API_INIT(wdt_sam0, DT_INST_LABEL(0), wdt_sam0_init,
 		    &wdt_sam0_data, NULL, PRE_KERNEL_1,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &wdt_sam0_api);

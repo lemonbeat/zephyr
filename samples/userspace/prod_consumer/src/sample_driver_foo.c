@@ -27,7 +27,7 @@ struct sample_driver_foo_dev_data {
 	sample_driver_callback_t cb;
 	void *cb_context;
 	struct k_timer timer; /* to fake 'interrupts' */
-	u32_t count;
+	uint32_t count;
 };
 
 static int sample_driver_foo_write(struct device *dev, void *buf)
@@ -59,7 +59,7 @@ static int sample_driver_foo_state_set(struct device *dev, bool active)
 
 	data->timer.user_data = dev;
 	if (active) {
-		k_timer_start(&data->timer, K_MSEC(1000), K_MSEC(1000));
+		k_timer_start(&data->timer, K_MSEC(100), K_MSEC(100));
 	} else {
 		k_timer_stop(&data->timer);
 	}

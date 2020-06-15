@@ -17,6 +17,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Bluetooth device address definitions and utilities.
+ * @defgroup bt_addr Device Address
+ * @ingroup bluetooth
+ * @{
+ */
+
 #define BT_ADDR_LE_PUBLIC       0x00
 #define BT_ADDR_LE_RANDOM       0x01
 #define BT_ADDR_LE_PUBLIC_ID    0x02
@@ -24,12 +31,12 @@ extern "C" {
 
 /** Bluetooth Device Address */
 typedef struct {
-	u8_t  val[6];
+	uint8_t  val[6];
 } bt_addr_t;
 
 /** Bluetooth LE Device Address */
 typedef struct {
-	u8_t      type;
+	uint8_t      type;
 	bt_addr_t a;
 } bt_addr_le_t;
 
@@ -88,6 +95,10 @@ static inline bool bt_addr_le_is_identity(const bt_addr_le_t *addr)
 
 	return BT_ADDR_IS_STATIC(&addr->a);
 }
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

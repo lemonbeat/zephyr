@@ -21,7 +21,7 @@ config I2C_SHELL
 	help
 	  Enable I2C Shell.
 
-	  The I2C shell currently support scanning.
+	  The I2C shell currently support scanning and bus recovery.
 
 # Include these first so that any properties (e.g. defaults) below can be
 # overridden (by defining symbols in multiple locations)
@@ -97,6 +97,12 @@ config I2C_MCUX
 	depends on HAS_MCUX
 	help
 	  Enable the mcux I2C driver.
+
+config I2C_MCUX_FLEXCOMM
+	bool "MCUX FLEXCOMM I2C driver"
+	depends on HAS_MCUX_FLEXCOMM
+	help
+	  Enable the mcux flexcomm i2c driver.
 
 config I2C_MCUX_LPI2C
 	bool "MCUX LPI2C driver"

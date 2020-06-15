@@ -14,7 +14,7 @@
 #include <offsets_short.h>
 #include <arch/cpu.h>
 #include <sw_isr_table.h>
-#include "macro.inc"
+#include "macro_priv.inc"
 
 _ASM_FILE_PROLOGUE
 
@@ -54,12 +54,18 @@ SECTION_FUNC(TEXT, _isr_wrapper)
 	stp x0, x1, [sp, #-16]!
 	lsl x0, x0, #4 /* table is 16-byte wide */
 
-	/* Call interrupt service routine */
+	/* Retrieve the interrupt service routine */
 	ldr	x1, =_sw_isr_table
 	add	x1, x1, x0
 	ldp	x0, x3, [x1] /* arg in x0, ISR in x3 */
 
+	/*
+	 * Call the ISR. Unmask and mask again the IRQs to support nested
+	 * exception handlers
+	 */
+	msr	daifclr, #(DAIFSET_IRQ)
 	blr	x3
+	msr	daifset, #(DAIFSET_IRQ)
 
 	/* Signal end-of-interrupt */
 	ldp x0, x1, [sp], #16
@@ -79,6 +85,9 @@ SECTION_FUNC(TEXT, _isr_wrapper)
 	sub	x2, x2, #1
 	str	x2, [x1, #_kernel_offset_to_nested]
 
+	cmp	x2, #0
+	bne	exit
+
 	/* Check if we need to context switch */
 	ldr	x2, [x1, #_kernel_offset_to_current]
 	ldr	x3, [x1, #_kernel_offset_to_ready_q_cache]
@@ -86,14 +95,14 @@ SECTION_FUNC(TEXT, _isr_wrapper)
 	beq	exit
 
 	/* Switch thread */
-	bl	z_arm64_pendsv
+	bl	z_arm64_context_switch
 
 	/* We return here in two cases:
 	 *
 	 * - The ISR was taken and no context switch was performed.
 	 * - A context-switch was performed during the ISR in the past and now
 	 *   the thread has been switched in again and we return here from the
-	 *   ret in z_arm64_pendsv() because x30 was saved and restored.
+	 *   ret in z_arm64_context_switch() because x30 was saved and restored.
 	 */
 exit:
 #ifdef CONFIG_STACK_SENTINEL

@@ -37,10 +37,12 @@
 	 (((cavs_irq + 1) & CAVS_IRQ_NUM_MASK) << CAVS_IRQ_NUM_SHIFT) \
 	)
 
-#define CAVS_L2_AGG_INT_LEVEL2			DT_CAVS_ICTL_0_IRQ
-#define CAVS_L2_AGG_INT_LEVEL3			DT_CAVS_ICTL_1_IRQ
-#define CAVS_L2_AGG_INT_LEVEL4			DT_CAVS_ICTL_2_IRQ
-#define CAVS_L2_AGG_INT_LEVEL5			DT_CAVS_ICTL_3_IRQ
+#define CAVS_L2_AGG_INT_LEVEL2			DT_IRQN(DT_INST(0, intel_cavs_intc))
+#define CAVS_L2_AGG_INT_LEVEL3			DT_IRQN(DT_INST(1, intel_cavs_intc))
+#define CAVS_L2_AGG_INT_LEVEL4			DT_IRQN(DT_INST(2, intel_cavs_intc))
+#define CAVS_L2_AGG_INT_LEVEL5			DT_IRQN(DT_INST(3, intel_cavs_intc))
+
+#define CAVS_ICTL_INT_CPU_OFFSET(x)		(0x40 * x)
 
 #define IOAPIC_EDGE				0
 #define IOAPIC_HIGH				0
@@ -103,9 +105,9 @@
 #define SOC_MDIVXR_SET_DIVIDER_BYPASS		BIT_MASK(12)
 
 struct soc_mclk_control_regs {
-	u32_t	mdivctrl;
-	u32_t	reserved[31];
-	u32_t	mdivxr[SOC_NUM_MCLK_OUTPUTS];
+	uint32_t	mdivctrl;
+	uint32_t	reserved[31];
+	uint32_t	mdivxr[SOC_NUM_MCLK_OUTPUTS];
 };
 
 #define PDM_BASE				0x00010000
@@ -131,11 +133,11 @@ struct soc_mclk_control_regs {
 
 struct soc_resource_alloc_regs {
 	union {
-		u16_t	lpgpdmacxo[SOC_NUM_LPGPDMAC];
-		u16_t	reserved[4];
+		uint16_t	lpgpdmacxo[SOC_NUM_LPGPDMAC];
+		uint16_t	reserved[4];
 	};
-	u32_t	dspiopo;
-	u32_t	geno;
+	uint32_t	dspiopo;
+	uint32_t	geno;
 };
 
 /* DMIC SHIM Registers */
@@ -144,8 +146,8 @@ struct soc_resource_alloc_regs {
 #define SOC_DMIC_SHIM_DMICLCTL_CPA		BIT(8)
 
 struct soc_dmic_shim_regs {
-	u32_t	dmiclcap;
-	u32_t	dmiclctl;
+	uint32_t	dmiclcap;
+	uint32_t	dmiclctl;
 };
 
 /* SOC DSP SHIM Registers */
@@ -198,22 +200,48 @@ struct soc_dmic_shim_regs {
 #define SOC_PWRCTL_DISABLE_PWR_GATING_DSP0	BIT(0)
 #define SOC_PWRCTL_DISABLE_PWR_GATING_DSP1	BIT(1)
 
+/* DSP Wall Clock Timers (0 and 1) */
+#define DSP_WCT_IRQ(x) \
+	SOC_AGGREGATE_IRQ((22 + x), CAVS_L2_AGG_INT_LEVEL2)
+
+#define DSP_WCT_CS_TA(x)			BIT(x)
+#define DSP_WCT_CS_TT(x)			BIT(4 + x)
+
 struct soc_dsp_shim_regs {
-	u32_t	reserved[8];
-	u64_t	walclk;
-	u64_t	dspwctcs;
-	u64_t	dspwct0c;
-	u64_t	dspwct1c;
-	u32_t	reserved1[14];
-	u32_t	clkctl;
-	u32_t	clksts;
-	u32_t	reserved2[4];
-	u16_t	pwrctl;
-	u16_t	pwrsts;
-	u32_t	lpsctl;
-	u32_t	lpsdmas0;
-	u32_t	lpsdmas1;
-	u32_t	reserved3[22];
+	uint32_t	reserved[8];
+	union {
+		struct {
+			uint32_t walclk32_lo;
+			uint32_t walclk32_hi;
+		};
+		uint64_t	walclk;
+	};
+	uint32_t	dspwctcs;
+	uint32_t	reserved1[1];
+	union {
+		struct {
+			uint32_t dspwct0c32_lo;
+			uint32_t dspwct0c32_hi;
+		};
+		uint64_t	dspwct0c;
+	};
+	union {
+		struct {
+			uint32_t dspwct1c32_lo;
+			uint32_t dspwct1c32_hi;
+		};
+		uint64_t	dspwct1c;
+	};
+	uint32_t	reserved2[14];
+	uint32_t	clkctl;
+	uint32_t	clksts;
+	uint32_t	reserved3[4];
+	uint16_t	pwrctl;
+	uint16_t	pwrsts;
+	uint32_t	lpsctl;
+	uint32_t	lpsdmas0;
+	uint32_t	lpsdmas1;
+	uint32_t	reserved4[22];
 };
 
 /* macros for data cache operations */
@@ -222,8 +250,8 @@ struct soc_dsp_shim_regs {
 #define SOC_DCACHE_INVALIDATE(addr, size)	\
 	xthal_dcache_region_invalidate((addr), (size))
 
-extern void z_soc_irq_enable(u32_t irq);
-extern void z_soc_irq_disable(u32_t irq);
+extern void z_soc_irq_enable(uint32_t irq);
+extern void z_soc_irq_disable(uint32_t irq);
 extern int z_soc_irq_is_enabled(unsigned int irq);
 
 #endif /* __INC_SOC_H */

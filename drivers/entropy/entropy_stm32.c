@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT st_stm32_rng
+
 #include <kernel.h>
 #include <device.h>
 #include <drivers/entropy.h>
@@ -16,14 +18,6 @@
 #include <sys/printk.h>
 #include <drivers/clock_control.h>
 #include <drivers/clock_control/stm32_clock_control.h>
-
-#if !defined(CONFIG_SOC_SERIES_STM32L4X) && !defined(CONFIG_SOC_SERIES_STM32F4X) && !defined(CONFIG_SOC_SERIES_STM32F7X) && !defined(CONFIG_SOC_SERIES_STM32G4X)
-#error RNG only available on STM32F4, STM32F7, STM32L4 and STM32G4 series
-#elif defined(CONFIG_SOC_STM32F401XE)
-#error RNG not available on STM32F401 based SoCs
-#elif defined(CONFIG_SOC_STM32F411XE)
-#error RNG not available on STM32F411 based SoCs
-#else
 
 struct entropy_stm32_rng_dev_cfg {
 	struct stm32_pclken pclken;
@@ -38,7 +32,7 @@ struct entropy_stm32_rng_dev_data {
 	((struct entropy_stm32_rng_dev_data *)(dev)->driver_data)
 
 #define DEV_CFG(dev) \
-	((struct entropy_stm32_rng_dev_cfg *)(dev)->config->config_info)
+	((const struct entropy_stm32_rng_dev_cfg *)(dev)->config_info)
 
 static void entropy_stm32_rng_reset(RNG_TypeDef *rng)
 {
@@ -105,11 +99,11 @@ static int entropy_stm32_wait_ready(RNG_TypeDef *rng)
 	}
 }
 
-static int entropy_stm32_rng_get_entropy(struct device *dev, u8_t *buffer,
-					 u16_t length)
+static int entropy_stm32_rng_get_entropy(struct device *dev, uint8_t *buffer,
+					 uint16_t length)
 {
 	struct entropy_stm32_rng_dev_data *dev_data;
-	int n = sizeof(u32_t);
+	int n = sizeof(uint32_t);
 	int res;
 
 	__ASSERT_NO_MSG(dev != NULL);
@@ -125,8 +119,8 @@ static int entropy_stm32_rng_get_entropy(struct device *dev, u8_t *buffer,
 	}
 
 	while (length > 0) {
-		u32_t rndbits;
-		u8_t *p_rndbits = (u8_t *)&rndbits;
+		uint32_t rndbits;
+		uint8_t *p_rndbits = (uint8_t *)&rndbits;
 
 		res = entropy_stm32_wait_ready(dev_data->rng);
 		if (res < 0)
@@ -134,7 +128,7 @@ static int entropy_stm32_rng_get_entropy(struct device *dev, u8_t *buffer,
 
 		rndbits = LL_RNG_ReadRandData32(dev_data->rng);
 
-		if (length < sizeof(u32_t))
+		if (length < sizeof(uint32_t))
 			n = length;
 
 		for (int i = 0; i < n; i++) {
@@ -150,7 +144,7 @@ static int entropy_stm32_rng_get_entropy(struct device *dev, u8_t *buffer,
 static int entropy_stm32_rng_init(struct device *dev)
 {
 	struct entropy_stm32_rng_dev_data *dev_data;
-	struct entropy_stm32_rng_dev_cfg *dev_cfg;
+	const struct entropy_stm32_rng_dev_cfg *dev_cfg;
 	int res;
 
 	__ASSERT_NO_MSG(dev != NULL);
@@ -182,7 +176,17 @@ static int entropy_stm32_rng_init(struct device *dev)
 	 *  Linear Feedback Shift Register
 	 */
 	 LL_RCC_SetRNGClockSource(LL_RCC_RNG_CLKSOURCE_PLLSAI1);
-#elif CONFIG_SOC_SERIES_STM32G4X
+#elif defined(RCC_HSI48_SUPPORT)
+
+#if CONFIG_SOC_SERIES_STM32L0X
+	/* We need SYSCFG to control VREFINT, so make sure it is clocked */
+	if (!LL_APB2_GRP1_IsEnabledClock(LL_APB2_GRP1_PERIPH_SYSCFG)) {
+		return -EINVAL;
+	}
+	/* HSI48 requires VREFINT (see RM0376 section 7.2.4). */
+	LL_SYSCFG_VREFINT_EnableHSI48();
+#endif /* CONFIG_SOC_SERIES_STM32L0X */
+
 	/* Use the HSI48 for the RNG */
 	LL_RCC_HSI48_Enable();
 	while (!LL_RCC_HSI48_IsReady()) {
@@ -209,18 +213,16 @@ static const struct entropy_driver_api entropy_stm32_rng_api = {
 };
 
 static const struct entropy_stm32_rng_dev_cfg entropy_stm32_rng_config = {
-	.pclken	= { .bus = STM32_CLOCK_BUS_AHB2,
-		    .enr = LL_AHB2_GRP1_PERIPH_RNG },
+	.pclken	= { .bus = DT_INST_CLOCKS_CELL(0, bus),
+		    .enr = DT_INST_CLOCKS_CELL(0, bits) },
 };
 
 static struct entropy_stm32_rng_dev_data entropy_stm32_rng_data = {
-	.rng = RNG,
+	.rng = (RNG_TypeDef *)DT_INST_REG_ADDR(0),
 };
 
-DEVICE_AND_API_INIT(entropy_stm32_rng, CONFIG_ENTROPY_NAME,
+DEVICE_AND_API_INIT(entropy_stm32_rng, DT_INST_LABEL(0),
 		    entropy_stm32_rng_init,
 		    &entropy_stm32_rng_data, &entropy_stm32_rng_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_stm32_rng_api);
-
-#endif

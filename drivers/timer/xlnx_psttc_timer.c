@@ -5,16 +5,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT xlnx_ttcps
+
 #include <soc.h>
 #include <drivers/timer/system_timer.h>
 #include "xlnx_psttc_timer_priv.h"
 
 #define TIMER_INDEX		CONFIG_XLNX_PSTTC_TIMER_INDEX
-#define TIMER_DT(v)		UTIL_CAT(UTIL_CAT(DT_INST_, TIMER_INDEX), _##v)
 
-#define TIMER_IRQ		TIMER_DT(XLNX_TTCPS_IRQ_0)
-#define TIMER_BASE_ADDR		TIMER_DT(XLNX_TTCPS_BASE_ADDRESS)
-#define TIMER_CLOCK_FREQUECY	TIMER_DT(XLNX_TTCPS_CLOCK_FREQUENCY)
+#define TIMER_IRQ		DT_INST_IRQN(0)
+#define TIMER_BASE_ADDR		DT_INST_REG_ADDR(0)
+#define TIMER_CLOCK_FREQUECY	DT_INST_PROP(0, clock_frequency)
 
 #define TICKS_PER_SEC		CONFIG_SYS_CLOCK_TICKS_PER_SEC
 #define CYCLES_PER_SEC		TIMER_CLOCK_FREQUECY
@@ -28,32 +29,32 @@
 #define CYCLES_NEXT_MIN		(10000)
 #define CYCLES_NEXT_MAX		(XTTC_MAX_INTERVAL_COUNT)
 
-BUILD_ASSERT_MSG(TIMER_DT(XLNX_TTCPS_CLOCK_FREQUENCY) ==
+BUILD_ASSERT(TIMER_CLOCK_FREQUECY ==
 			CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC,
-		 "Configured system timer frequency does not match the TTC "
-		 "clock frequency in the device tree");
+	     "Configured system timer frequency does not match the TTC "
+	     "clock frequency in the device tree");
 
-BUILD_ASSERT_MSG(CYCLES_PER_SEC >= TICKS_PER_SEC,
-		 "Timer clock frequency must be greater than the system tick "
-		 "frequency");
+BUILD_ASSERT(CYCLES_PER_SEC >= TICKS_PER_SEC,
+	     "Timer clock frequency must be greater than the system tick "
+	     "frequency");
 
-BUILD_ASSERT_MSG((CYCLES_PER_SEC % TICKS_PER_SEC) == 0,
-		 "Timer clock frequency is not divisible by the system tick "
-		 "frequency");
+BUILD_ASSERT((CYCLES_PER_SEC % TICKS_PER_SEC) == 0,
+	     "Timer clock frequency is not divisible by the system tick "
+	     "frequency");
 
 #ifdef CONFIG_TICKLESS_KERNEL
-static u32_t last_cycles;
+static uint32_t last_cycles;
 #endif
 
-static u32_t read_count(void)
+static uint32_t read_count(void)
 {
 	/* Read current counter value */
 	return sys_read32(TIMER_BASE_ADDR + XTTCPS_COUNT_VALUE_OFFSET);
 }
 
-static void update_match(u32_t cycles, u32_t match)
+static void update_match(uint32_t cycles, uint32_t match)
 {
-	u32_t delta = match - cycles;
+	uint32_t delta = match - cycles;
 
 	/* Ensure that the match value meets the minimum timing requirements */
 	if (delta < CYCLES_NEXT_MIN) {
@@ -66,8 +67,8 @@ static void update_match(u32_t cycles, u32_t match)
 
 static void ttc_isr(void *arg)
 {
-	u32_t cycles;
-	u32_t ticks;
+	uint32_t cycles;
+	uint32_t ticks;
 
 	ARG_UNUSED(arg);
 
@@ -97,7 +98,7 @@ static void ttc_isr(void *arg)
 
 int z_clock_driver_init(struct device *device)
 {
-	u32_t reg_val;
+	uint32_t reg_val;
 
 	/* Stop timer */
 	sys_write32(XTTCPS_CNT_CNTRL_DIS_MASK,
@@ -151,20 +152,20 @@ int z_clock_driver_init(struct device *device)
 	return 0;
 }
 
-void z_clock_set_timeout(s32_t ticks, bool idle)
+void z_clock_set_timeout(int32_t ticks, bool idle)
 {
 #ifdef CONFIG_TICKLESS_KERNEL
-	u32_t cycles;
-	u32_t next_cycles;
+	uint32_t cycles;
+	uint32_t next_cycles;
 
 	/* Read counter value */
 	cycles = read_count();
 
 	/* Calculate timeout counter value */
-	if (ticks == K_FOREVER) {
+	if (ticks == K_TICKS_FOREVER) {
 		next_cycles = cycles + CYCLES_NEXT_MAX;
 	} else {
-		next_cycles = cycles + ((u32_t)ticks * CYCLES_PER_TICK);
+		next_cycles = cycles + ((uint32_t)ticks * CYCLES_PER_TICK);
 	}
 
 	/* Set match value for the next interrupt */
@@ -172,10 +173,10 @@ void z_clock_set_timeout(s32_t ticks, bool idle)
 #endif
 }
 
-u32_t z_clock_elapsed(void)
+uint32_t z_clock_elapsed(void)
 {
 #ifdef CONFIG_TICKLESS_KERNEL
-	u32_t cycles;
+	uint32_t cycles;
 
 	/* Read counter value */
 	cycles = read_count();
@@ -188,7 +189,7 @@ u32_t z_clock_elapsed(void)
 #endif
 }
 
-u32_t z_timer_cycle_get_32(void)
+uint32_t z_timer_cycle_get_32(void)
 {
 	/* Return the current counter value */
 	return read_count();

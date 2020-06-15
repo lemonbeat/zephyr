@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT snps_designware_dma
+
 #include <errno.h>
 
 #include <stdio.h>
@@ -32,23 +34,23 @@ LOG_MODULE_REGISTER(dma_dw);
 /* default initial setup register values */
 #define DW_CFG_LOW_DEF			0x0
 
-#define DEV_NAME(dev) ((dev)->config->name)
+#define DEV_NAME(dev) ((dev)->name)
 #define DEV_DATA(dev) ((struct dw_dma_dev_data *const)(dev)->driver_data)
 #define DEV_CFG(dev) \
-	((const struct dw_dma_dev_cfg *const)(dev)->config->config_info)
+	((const struct dw_dma_dev_cfg *const)(dev)->config_info)
 
 /* number of tries to wait for reset */
 #define DW_DMA_CFG_TRIES	10000
 #define INT_MASK_ALL		0xFF00
 
-static ALWAYS_INLINE void dw_write(u32_t dma_base, u32_t reg, u32_t value)
+static ALWAYS_INLINE void dw_write(uint32_t dma_base, uint32_t reg, uint32_t value)
 {
-	*((volatile u32_t*)(dma_base + reg)) = value;
+	*((volatile uint32_t*)(dma_base + reg)) = value;
 }
 
-static ALWAYS_INLINE u32_t dw_read(u32_t dma_base, u32_t reg)
+static ALWAYS_INLINE uint32_t dw_read(uint32_t dma_base, uint32_t reg)
 {
-	return *((volatile u32_t*)(dma_base + reg));
+	return *((volatile uint32_t*)(dma_base + reg));
 }
 
 static void dw_dma_isr(void *arg)
@@ -58,11 +60,11 @@ static void dw_dma_isr(void *arg)
 	struct dw_dma_dev_data *const dev_data = DEV_DATA(dev);
 	struct dma_chan_data *chan_data;
 
-	u32_t status_tfr = 0U;
-	u32_t status_block = 0U;
-	u32_t status_err = 0U;
-	u32_t status_intr;
-	u32_t channel;
+	uint32_t status_tfr = 0U;
+	uint32_t status_block = 0U;
+	uint32_t status_err = 0U;
+	uint32_t status_intr;
+	uint32_t channel;
 
 	status_intr = dw_read(dev_cfg->base, DW_INTR_STATUS);
 	if (!status_intr) {
@@ -112,16 +114,16 @@ static void dw_dma_isr(void *arg)
 	}
 }
 
-static int dw_dma_config(struct device *dev, u32_t channel,
+static int dw_dma_config(struct device *dev, uint32_t channel,
 			 struct dma_config *cfg)
 {
 	struct dw_dma_dev_data *const dev_data = DEV_DATA(dev);
 	const struct dw_dma_dev_cfg *const dev_cfg = DEV_CFG(dev);
 	struct dma_chan_data *chan_data;
 	struct dma_block_config *cfg_blocks;
-	u32_t m_size;
-	u32_t tr_width;
-	u32_t ctrl_lo;
+	uint32_t m_size;
+	uint32_t tr_width;
+	uint32_t ctrl_lo;
 
 	if (channel >= DW_MAX_CHAN) {
 		return -EINVAL;
@@ -246,8 +248,8 @@ static int dw_dma_config(struct device *dev, u32_t channel,
 	return 0;
 }
 
-static int dw_dma_reload(struct device *dev, u32_t channel,
-		u32_t src, u32_t dst, size_t size)
+static int dw_dma_reload(struct device *dev, uint32_t channel,
+		uint32_t src, uint32_t dst, size_t size)
 {
 	struct dw_dma_dev_data *const dev_data = DEV_DATA(dev);
 	const struct dw_dma_dev_cfg *const dev_cfg = DEV_CFG(dev);
@@ -265,7 +267,7 @@ static int dw_dma_reload(struct device *dev, u32_t channel,
 	return 0;
 }
 
-static int dw_dma_transfer_start(struct device *dev, u32_t channel)
+static int dw_dma_transfer_start(struct device *dev, uint32_t channel)
 {
 	const struct dw_dma_dev_cfg *const dev_cfg = DEV_CFG(dev);
 
@@ -279,7 +281,7 @@ static int dw_dma_transfer_start(struct device *dev, u32_t channel)
 	return 0;
 }
 
-static int dw_dma_transfer_stop(struct device *dev, u32_t channel)
+static int dw_dma_transfer_stop(struct device *dev, uint32_t channel)
 {
 	const struct dw_dma_dev_cfg *const dev_cfg = DEV_CFG(dev);
 
@@ -357,189 +359,70 @@ static const struct dma_driver_api dw_dma_driver_api = {
 	.stop = dw_dma_transfer_stop,
 };
 
-#if defined(DT_INST_0_SNPS_DESIGNWARE_DMA)
+#define DW_DMAC_INIT(inst)						\
+									\
+	DEVICE_DECLARE(dw_dma##inst);		\
+									\
+	static struct dw_drv_plat_data dmac##inst = {			\
+		.chan[0] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+		.chan[1] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+		.chan[2] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+		.chan[3] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+		.chan[4] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+		.chan[5] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+		.chan[6] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+		.chan[7] = {						\
+			.class  = 6,					\
+			.weight = 0,					\
+		},							\
+	};								\
+									\
+	static void dw_dma##inst##_irq_config(void);			\
+									\
+	static const struct dw_dma_dev_cfg dw_dma##inst##_config = {	\
+		.base = DT_INST_REG_ADDR(inst),				\
+		.irq_config = dw_dma##inst##_irq_config			\
+	};								\
+									\
+	static struct dw_dma_dev_data dw_dma##inst##_data = {		\
+		.channel_data = &dmac##inst,				\
+	};								\
+									\
+	DEVICE_AND_API_INIT(dw_dma##inst, DT_INST_LABEL(inst),		\
+			    &dw_dma_init,				\
+			    &dw_dma##inst##_data,			\
+			    &dw_dma##inst##_config, POST_KERNEL,	\
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
+			    &dw_dma_driver_api);			\
+									\
+	static void dw_dma##inst##_irq_config(void)			\
+	{								\
+		IRQ_CONNECT(DT_INST_IRQN(inst),				\
+			    DT_INST_IRQ(inst, priority), dw_dma_isr,	\
+			    DEVICE_GET(dw_dma##inst),			\
+			    DT_INST_IRQ(inst, sense));			\
+		irq_enable(DT_INST_IRQN(inst));				\
+	}
 
-static struct device DEVICE_NAME_GET(dw_dma0);
-
-static void dw_dma0_irq_config(void)
-{
-	IRQ_CONNECT(DT_INST_0_SNPS_DESIGNWARE_DMA_IRQ_0,
-		    DT_INST_0_SNPS_DESIGNWARE_DMA_IRQ_0_PRIORITY, dw_dma_isr,
-		    DEVICE_GET(dw_dma0),
-		    DT_INST_0_SNPS_DESIGNWARE_DMA_IRQ_0_SENSE);
-	irq_enable(DT_INST_0_SNPS_DESIGNWARE_DMA_IRQ_0);
-}
-
-static struct dw_drv_plat_data dmac0 = {
-	.chan[0] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[1] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[2] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[3] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[4] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[5] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[6] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[7] = {
-		.class  = 6,
-		.weight = 0,
-	},
-};
-
-static const struct dw_dma_dev_cfg dw_dma0_config = {
-	.base = DT_INST_0_SNPS_DESIGNWARE_DMA_BASE_ADDRESS,
-	.irq_config = dw_dma0_irq_config
-};
-
-static struct dw_dma_dev_data dw_dma0_data = {
-	.channel_data = &dmac0,
-};
-
-DEVICE_AND_API_INIT(dw_dma0, DT_INST_0_SNPS_DESIGNWARE_DMA_LABEL, &dw_dma_init,
-		    &dw_dma0_data, &dw_dma0_config, POST_KERNEL,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &dw_dma_driver_api);
-#endif /* DT_INST_0_SNPS_DESIGNWARE_DMA */
-
-
-#if defined(DT_INST_1_SNPS_DESIGNWARE_DMA)
-
-static struct device DEVICE_NAME_GET(dw_dma2);
-
-static void dw_dma1_irq_config(void)
-{
-	IRQ_CONNECT(DT_INST_1_SNPS_DESIGNWARE_DMA_IRQ_0,
-		    DT_INST_1_SNPS_DESIGNWARE_DMA_IRQ_0_PRIORITY, dw_dma_isr,
-		    DEVICE_GET(dw_dma0),
-		    DT_INST_1_SNPS_DESIGNWARE_DMA_IRQ_0_SENSE);
-	irq_enable(DT_INST_1_SNPS_DESIGNWARE_DMA_IRQ_0);
-}
-
-static struct dw_drv_plat_data dmac1 = {
-	.chan[0] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[1] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[2] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[3] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[4] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[5] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[6] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[7] = {
-		.class  = 6,
-		.weight = 0,
-	},
-};
-
-static const struct dw_dma_dev_cfg dw_dma1_config = {
-	.base = DT_INST_1_SNPS_DESIGNWARE_DMA_BASE_ADDRESS,
-	.irq_config = dw_dma1_irq_config
-};
-
-static struct dw_dma_dev_data dw_dma1_data = {
-	.channel_data = &dmac1,
-};
-
-DEVICE_AND_API_INIT(dw_dma1, DT_INST_1_SNPS_DESIGNWARE_DMA_LABEL, &dw_dma_init,
-		    &dw_dma1_data, &dw_dma1_config, POST_KERNEL,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &dw_dma_driver_api);
-#endif /* DT_INST_1_SNPS_DESIGNWARE_DMA */
-
-#if defined(DT_INST_2_SNPS_DESIGNWARE_DMA)
-
-static struct device DEVICE_NAME_GET(dw_dma2);
-
-static void dw_dma2_irq_config(void)
-{
-	IRQ_CONNECT(DT_INST_2_SNPS_DESIGNWARE_DMA_IRQ_0,
-		    DT_INST_2_SNPS_DESIGNWARE_DMA_IRQ_0_PRIORITY, dw_dma_isr,
-		    DEVICE_GET(dw_dma0),
-		    DT_INST_2_SNPS_DESIGNWARE_DMA_IRQ_0_SENSE);
-	irq_enable(DT_INST_2_SNPS_DESIGNWARE_DMA_IRQ_0);
-}
-
-static struct dw_drv_plat_data dmac2 = {
-	.chan[0] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[1] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[2] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[3] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[4] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[5] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[6] = {
-		.class  = 6,
-		.weight = 0,
-	},
-	.chan[7] = {
-		.class  = 6,
-		.weight = 0,
-	},
-};
-
-static const struct dw_dma_dev_cfg dw_dma2_config = {
-	.base = DT_INST_2_SNPS_DESIGNWARE_DMA_BASE_ADDRESS,
-	.irq_config = dw_dma2_irq_config
-};
-
-static struct dw_dma_dev_data dw_dma2_data = {
-	.channel_data = &dmac2,
-};
-
-DEVICE_AND_API_INIT(dw_dma2, DT_INST_2_SNPS_DESIGNWARE_DMA_LABEL, &dw_dma_init,
-		    &dw_dma2_data, &dw_dma2_config, POST_KERNEL,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &dw_dma_driver_api);
-#endif /* DT_INST_2_SNPS_DESIGNWARE_DMA */
+DT_INST_FOREACH_STATUS_OKAY(DW_DMAC_INIT)

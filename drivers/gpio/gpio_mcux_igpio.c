@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nxp_imx_gpio
+
 #include <errno.h>
 #include <device.h>
 #include <drivers/gpio.h>
@@ -25,13 +27,13 @@ struct mcux_igpio_data {
 	/* port ISR callback routine address */
 	sys_slist_t callbacks;
 	/* pin callback routine enable flags, by pin number */
-	u32_t pin_callback_enables;
+	uint32_t pin_callback_enables;
 };
 
 static int mcux_igpio_configure(struct device *dev,
 				gpio_pin_t pin, gpio_flags_t flags)
 {
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	GPIO_Type *base = config->base;
 
 	if (((flags & GPIO_INPUT) != 0) && ((flags & GPIO_OUTPUT) != 0)) {
@@ -59,9 +61,9 @@ static int mcux_igpio_configure(struct device *dev,
 	return 0;
 }
 
-static int mcux_igpio_port_get_raw(struct device *dev, u32_t *value)
+static int mcux_igpio_port_get_raw(struct device *dev, uint32_t *value)
 {
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	GPIO_Type *base = config->base;
 
 	*value = base->DR;
@@ -69,10 +71,10 @@ static int mcux_igpio_port_get_raw(struct device *dev, u32_t *value)
 	return 0;
 }
 
-static int mcux_igpio_port_set_masked_raw(struct device *dev, u32_t mask,
-		u32_t value)
+static int mcux_igpio_port_set_masked_raw(struct device *dev, uint32_t mask,
+		uint32_t value)
 {
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	GPIO_Type *base = config->base;
 
 	base->DR = (base->DR & ~mask) | (mask & value);
@@ -80,9 +82,9 @@ static int mcux_igpio_port_set_masked_raw(struct device *dev, u32_t mask,
 	return 0;
 }
 
-static int mcux_igpio_port_set_bits_raw(struct device *dev, u32_t mask)
+static int mcux_igpio_port_set_bits_raw(struct device *dev, uint32_t mask)
 {
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	GPIO_Type *base = config->base;
 
 	base->DR_SET = mask;
@@ -90,9 +92,9 @@ static int mcux_igpio_port_set_bits_raw(struct device *dev, u32_t mask)
 	return 0;
 }
 
-static int mcux_igpio_port_clear_bits_raw(struct device *dev, u32_t mask)
+static int mcux_igpio_port_clear_bits_raw(struct device *dev, uint32_t mask)
 {
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	GPIO_Type *base = config->base;
 
 	base->DR_CLEAR = mask;
@@ -100,9 +102,9 @@ static int mcux_igpio_port_clear_bits_raw(struct device *dev, u32_t mask)
 	return 0;
 }
 
-static int mcux_igpio_port_toggle_bits(struct device *dev, u32_t mask)
+static int mcux_igpio_port_toggle_bits(struct device *dev, uint32_t mask)
 {
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	GPIO_Type *base = config->base;
 
 	base->DR_TOGGLE = mask;
@@ -114,12 +116,23 @@ static int mcux_igpio_pin_interrupt_configure(struct device *dev,
 		gpio_pin_t pin, enum gpio_int_mode mode,
 		enum gpio_int_trig trig)
 {
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	struct mcux_igpio_data *data = dev->driver_data;
 	GPIO_Type *base = config->base;
 	unsigned int key;
-	u8_t icr;
+	uint8_t icr;
 	int shift;
+
+	if (mode == GPIO_INT_MODE_DISABLED) {
+		key = irq_lock();
+
+		WRITE_BIT(base->IMR, pin, 0);
+		WRITE_BIT(data->pin_callback_enables, pin, 0);
+
+		irq_unlock(key);
+
+		return 0;
+	}
 
 	if ((mode == GPIO_INT_MODE_EDGE) && (trig == GPIO_INT_TRIG_LOW)) {
 		icr = 3;
@@ -146,10 +159,9 @@ static int mcux_igpio_pin_interrupt_configure(struct device *dev,
 	key = irq_lock();
 
 	WRITE_BIT(base->EDGE_SEL, pin, trig == GPIO_INT_TRIG_BOTH);
-	WRITE_BIT(base->ISR, pin, mode != GPIO_INT_MODE_DISABLED);
-	WRITE_BIT(base->IMR, pin, mode != GPIO_INT_MODE_DISABLED);
-	WRITE_BIT(data->pin_callback_enables, pin,
-		  mode != GPIO_INT_MODE_DISABLED);
+	WRITE_BIT(base->ISR, pin, 1);
+	WRITE_BIT(base->IMR, pin, 1);
+	WRITE_BIT(data->pin_callback_enables, pin, 1);
 
 	irq_unlock(key);
 
@@ -187,10 +199,10 @@ static int mcux_igpio_disable_callback(struct device *dev,
 static void mcux_igpio_port_isr(void *arg)
 {
 	struct device *dev = (struct device *)arg;
-	const struct mcux_igpio_config *config = dev->config->config_info;
+	const struct mcux_igpio_config *config = dev->config_info;
 	struct mcux_igpio_data *data = dev->driver_data;
 	GPIO_Type *base = config->base;
-	u32_t enabled_int, int_flags;
+	uint32_t enabled_int, int_flags;
 
 	int_flags = base->ISR;
 	enabled_int = int_flags & data->pin_callback_enables;
@@ -212,192 +224,44 @@ static const struct gpio_driver_api mcux_igpio_driver_api = {
 	.disable_callback = mcux_igpio_disable_callback,
 };
 
-#ifdef CONFIG_GPIO_MCUX_IGPIO_1
-static int mcux_igpio_1_init(struct device *dev);
+#define MCUX_IGPIO_IRQ_INIT(n, i)					\
+	do {								\
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, i, irq),		\
+			    DT_INST_IRQ_BY_IDX(n, i, priority),		\
+			    mcux_igpio_port_isr,			\
+			    DEVICE_GET(mcux_igpio_##n), 0);		\
+									\
+		irq_enable(DT_INST_IRQ_BY_IDX(n, i, irq));		\
+	} while (0)
 
-static const struct mcux_igpio_config mcux_igpio_1_config = {
-	.common = {
-		.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(DT_INST_0_NXP_IMX_GPIO_NGPIOS),
-	},
-	.base = (GPIO_Type *)DT_NXP_IMX_GPIO_GPIO_1_BASE_ADDRESS,
-};
+#define MCUX_IGPIO_INIT(n)						\
+	static int mcux_igpio_##n##_init(struct device *dev);		\
+									\
+	static const struct mcux_igpio_config mcux_igpio_##n##_config = {\
+		.common = {						\
+			.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_DT_INST(n),\
+		},							\
+		.base = (GPIO_Type *)DT_INST_REG_ADDR(n),		\
+	};								\
+									\
+	static struct mcux_igpio_data mcux_igpio_##n##_data;		\
+									\
+	DEVICE_AND_API_INIT(mcux_igpio_##n, DT_INST_LABEL(n),		\
+			    mcux_igpio_##n##_init,			\
+			    &mcux_igpio_##n##_data,			\
+			    &mcux_igpio_##n##_config,			\
+			    POST_KERNEL,				\
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	\
+			    &mcux_igpio_driver_api);			\
+									\
+	static int mcux_igpio_##n##_init(struct device *dev)		\
+	{								\
+		MCUX_IGPIO_IRQ_INIT(n, 0);				\
+									\
+		IF_ENABLED(DT_INST_IRQ_HAS_IDX(n, 1),			\
+			   (MCUX_IGPIO_IRQ_INIT(n, 1);))		\
+									\
+		return 0;						\
+	}
 
-static struct mcux_igpio_data mcux_igpio_1_data;
-
-DEVICE_AND_API_INIT(mcux_igpio_1, DT_NXP_IMX_GPIO_GPIO_1_LABEL,
-		    mcux_igpio_1_init,
-		    &mcux_igpio_1_data, &mcux_igpio_1_config,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &mcux_igpio_driver_api);
-
-static int mcux_igpio_1_init(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_1_IRQ_0,
-		    DT_NXP_IMX_GPIO_GPIO_1_IRQ_0_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_1), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_1_IRQ_0);
-
-#if defined(DT_NXP_IMX_GPIO_GPIO_1_IRQ_1) && defined(DT_NXP_IMX_GPIO_GPIO_1_IRQ_1_PRIORITY)
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_1_IRQ_1,
-		    DT_NXP_IMX_GPIO_GPIO_1_IRQ_1_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_1), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_1_IRQ_1);
-#endif
-
-	return 0;
-}
-#endif /* CONFIG_GPIO_MCUX_IGPIO_1 */
-
-#ifdef CONFIG_GPIO_MCUX_IGPIO_2
-static int mcux_igpio_2_init(struct device *dev);
-
-static const struct mcux_igpio_config mcux_igpio_2_config = {
-	.common = {
-		.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(DT_INST_1_NXP_IMX_GPIO_NGPIOS),
-	},
-	.base = (GPIO_Type *)DT_NXP_IMX_GPIO_GPIO_2_BASE_ADDRESS,
-};
-
-static struct mcux_igpio_data mcux_igpio_2_data;
-
-DEVICE_AND_API_INIT(mcux_igpio_2, DT_NXP_IMX_GPIO_GPIO_2_LABEL,
-		    mcux_igpio_2_init,
-		    &mcux_igpio_2_data, &mcux_igpio_2_config,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &mcux_igpio_driver_api);
-
-static int mcux_igpio_2_init(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_2_IRQ_0,
-		    DT_NXP_IMX_GPIO_GPIO_2_IRQ_0_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_2), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_2_IRQ_0);
-
-#if defined(DT_NXP_IMX_GPIO_GPIO_2_IRQ_1) && defined(DT_NXP_IMX_GPIO_GPIO_2_IRQ_1_PRIORITY)
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_2_IRQ_1,
-		    DT_NXP_IMX_GPIO_GPIO_2_IRQ_1_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_2), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_2_IRQ_1);
-#endif
-
-	return 0;
-}
-#endif /* CONFIG_GPIO_MCUX_IGPIO_2 */
-
-#ifdef CONFIG_GPIO_MCUX_IGPIO_3
-static int mcux_igpio_3_init(struct device *dev);
-
-static const struct mcux_igpio_config mcux_igpio_3_config = {
-	.common = {
-		.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(DT_INST_2_NXP_IMX_GPIO_NGPIOS),
-	},
-	.base = (GPIO_Type *)DT_NXP_IMX_GPIO_GPIO_3_BASE_ADDRESS,
-};
-
-static struct mcux_igpio_data mcux_igpio_3_data;
-
-DEVICE_AND_API_INIT(mcux_igpio_3, DT_NXP_IMX_GPIO_GPIO_3_LABEL,
-		    mcux_igpio_3_init,
-		    &mcux_igpio_3_data, &mcux_igpio_3_config,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &mcux_igpio_driver_api);
-
-static int mcux_igpio_3_init(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_3_IRQ_0,
-		    DT_NXP_IMX_GPIO_GPIO_3_IRQ_0_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_3), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_3_IRQ_0);
-
-#if defined(DT_NXP_IMX_GPIO_GPIO_3_IRQ_1) && defined(DT_NXP_IMX_GPIO_GPIO_3_IRQ_1_PRIORITY)
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_3_IRQ_1,
-		    DT_NXP_IMX_GPIO_GPIO_3_IRQ_1_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_3), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_3_IRQ_1);
-#endif
-
-	return 0;
-}
-#endif /* CONFIG_GPIO_MCUX_IGPIO_3 */
-
-#ifdef CONFIG_GPIO_MCUX_IGPIO_4
-static int mcux_igpio_4_init(struct device *dev);
-
-static const struct mcux_igpio_config mcux_igpio_4_config = {
-	.common = {
-		.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(DT_INST_3_NXP_IMX_GPIO_NGPIOS),
-	},
-	.base = (GPIO_Type *)DT_NXP_IMX_GPIO_GPIO_4_BASE_ADDRESS,
-};
-
-static struct mcux_igpio_data mcux_igpio_4_data;
-
-DEVICE_AND_API_INIT(mcux_igpio_4, DT_NXP_IMX_GPIO_GPIO_4_LABEL,
-		    mcux_igpio_4_init,
-		    &mcux_igpio_4_data, &mcux_igpio_4_config,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &mcux_igpio_driver_api);
-
-static int mcux_igpio_4_init(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_4_IRQ_0,
-		    DT_NXP_IMX_GPIO_GPIO_4_IRQ_0_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_4), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_4_IRQ_0);
-
-#if defined(DT_NXP_IMX_GPIO_GPIO_4_IRQ_1) && defined(DT_NXP_IMX_GPIO_GPIO_4_IRQ_1_PRIORITY)
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_4_IRQ_1,
-		    DT_NXP_IMX_GPIO_GPIO_4_IRQ_1_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_4), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_4_IRQ_1);
-#endif
-
-	return 0;
-}
-#endif /* CONFIG_GPIO_MCUX_IGPIO_4 */
-
-#ifdef CONFIG_GPIO_MCUX_IGPIO_5
-static int mcux_igpio_5_init(struct device *dev);
-
-static const struct mcux_igpio_config mcux_igpio_5_config = {
-	.common = {
-		.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(DT_INST_4_NXP_IMX_GPIO_NGPIOS),
-	},
-	.base = (GPIO_Type *)DT_NXP_IMX_GPIO_GPIO_5_BASE_ADDRESS,
-};
-
-static struct mcux_igpio_data mcux_igpio_5_data;
-
-DEVICE_AND_API_INIT(mcux_igpio_5, DT_NXP_IMX_GPIO_GPIO_5_LABEL,
-		    mcux_igpio_5_init,
-		    &mcux_igpio_5_data, &mcux_igpio_5_config,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &mcux_igpio_driver_api);
-
-static int mcux_igpio_5_init(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_5_IRQ_0,
-		    DT_NXP_IMX_GPIO_GPIO_5_IRQ_0_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_5), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_5_IRQ_0);
-
-#if defined(DT_NXP_IMX_GPIO_GPIO_5_IRQ_1) && defined(DT_NXP_IMX_GPIO_GPIO_5_IRQ_1_PRIORITY)
-	IRQ_CONNECT(DT_NXP_IMX_GPIO_GPIO_5_IRQ_1,
-		    DT_NXP_IMX_GPIO_GPIO_5_IRQ_1_PRIORITY,
-		    mcux_igpio_port_isr, DEVICE_GET(mcux_igpio_5), 0);
-
-	irq_enable(DT_NXP_IMX_GPIO_GPIO_5_IRQ_1);
-#endif
-
-	return 0;
-}
-#endif /* CONFIG_GPIO_MCUX_IGPIO_5 */
+DT_INST_FOREACH_STATUS_OKAY(MCUX_IGPIO_INIT)

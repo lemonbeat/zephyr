@@ -122,7 +122,7 @@ enum can_state {
  * bit 30	: remote transmission request flag (1 = rtr frame)
  * bit 31	: frame format flag (0 = standard 11 bit, 1 = extended 29 bit)
  */
-typedef u32_t canid_t;
+typedef uint32_t canid_t;
 
 /**
  * @brief CAN frame structure that is compatible with Linux. This is mainly
@@ -136,16 +136,16 @@ struct can_frame {
 	canid_t can_id;
 
 	/** The length of the message */
-	u8_t can_dlc;
+	uint8_t can_dlc;
 
 	/** @cond INTERNAL_HIDDEN */
-	u8_t pad;   /* padding */
-	u8_t res0;  /* reserved / padding */
-	u8_t res1;  /* reserved / padding */
+	uint8_t pad;   /* padding */
+	uint8_t res0;  /* reserved / padding */
+	uint8_t res1;  /* reserved / padding */
 	/** @endcond */
 
 	/** The message data */
-	u8_t data[CAN_MAX_DLEN];
+	uint8_t data[CAN_MAX_DLEN];
 };
 
 /**
@@ -170,29 +170,29 @@ struct zcan_frame {
 	/** Indicates the identifier type (standard or extended)
 	 * use can_ide enum for assignment
 	 */
-	u32_t id_type : 1;
+	uint32_t id_type : 1;
 	/** Set the message to a transmission request instead of data frame
 	 * use can_rtr enum for assignment
 	 */
-	u32_t rtr     : 1;
+	uint32_t rtr     : 1;
 	/** Message identifier*/
 	union {
-		u32_t std_id  : 11;
-		u32_t ext_id  : 29;
+		uint32_t std_id  : 11;
+		uint32_t ext_id  : 29;
 	};
 	/** The length of the message (max. 8) in byte */
-	u8_t dlc;
+	uint8_t dlc;
 	/** The message data*/
 	union {
-		u8_t data[8];
-		u32_t data_32[2];
+		uint8_t data[8];
+		uint32_t data_32[2];
 	};
 #if defined(CONFIG_CAN_RX_TIMESTAMP)
 	/** Timer value of the CAN free running timer.
 	 * The timer is incremented every bit time and captured at the start
 	 * of frame bit (SOF).
 	 */
-	u16_t timestamp;
+	uint16_t timestamp;
 #endif
 } __packed;
 
@@ -209,20 +209,20 @@ struct zcan_filter {
 	/** Indicates the identifier type (standard or extended)
 	 * use can_ide enum for assignment
 	 */
-	u32_t id_type      : 1;
+	uint32_t id_type      : 1;
 	/** target state of the rtr bit */
-	u32_t rtr          : 1;
+	uint32_t rtr          : 1;
 	/** target state of the identifier */
 	union {
-		u32_t std_id   : 11;
-		u32_t ext_id   : 29;
+		uint32_t std_id   : 11;
+		uint32_t ext_id   : 29;
 	};
 	/** rtr bit mask */
-	u32_t rtr_mask     : 1;
+	uint32_t rtr_mask     : 1;
 	/** identifier mask*/
 	union {
-		u32_t std_id_mask  : 11;
-		u32_t ext_id_mask  : 29;
+		uint32_t std_id_mask  : 11;
+		uint32_t ext_id_mask  : 29;
 	};
 } __packed;
 
@@ -232,8 +232,8 @@ struct zcan_filter {
  * Used to pass the bus error counters to userspace
  */
 struct can_bus_err_cnt {
-	u8_t tx_err_cnt;
-	u8_t rx_err_cnt;
+	uint8_t tx_err_cnt;
+	uint8_t rx_err_cnt;
 };
 
 /**
@@ -243,7 +243,7 @@ struct can_bus_err_cnt {
  * @param error_flags status of the performed send operation
  * @param arg argument that was passed when the message was sent
  */
-typedef void (*can_tx_callback_t)(u32_t error_flags, void *arg);
+typedef void (*can_tx_callback_t)(uint32_t error_flags, void *arg);
 
 /**
  * @typedef can_rx_callback_t
@@ -266,10 +266,10 @@ typedef void(*can_state_change_isr_t)(enum can_state state,
 					  struct can_bus_err_cnt err_cnt);
 
 typedef int (*can_configure_t)(struct device *dev, enum can_mode mode,
-				u32_t bitrate);
+				uint32_t bitrate);
 
 typedef int (*can_send_t)(struct device *dev, const struct zcan_frame *msg,
-			  s32_t timeout, can_tx_callback_t callback_isr,
+			  k_timeout_t timeout, can_tx_callback_t callback_isr,
 			  void *callback_arg);
 
 
@@ -282,7 +282,7 @@ typedef int (*can_attach_isr_t)(struct device *dev, can_rx_callback_t isr,
 
 typedef void (*can_detach_t)(struct device *dev, int filter_id);
 
-typedef int (*can_recover_t)(struct device *dev, s32_t timeout);
+typedef int (*can_recover_t)(struct device *dev, k_timeout_t timeout);
 
 typedef enum can_state (*can_get_state_t)(struct device *dev,
 					  struct can_bus_err_cnt *err_cnt);
@@ -295,8 +295,8 @@ typedef void(*can_register_state_change_isr_t)(struct device *dev,
 #endif
 struct can_frame_buffer {
 	struct zcan_frame buf[CONFIG_CAN_WORKQ_FRAMES_BUF_CNT];
-	u16_t head;
-	u16_t tail;
+	uint16_t head;
+	uint16_t tail;
 };
 
 /**
@@ -333,7 +333,7 @@ __subsystem struct can_driver_api {
  * *
  * @param dev          Pointer to the device structure for the driver instance.
  * @param msg          Message to transfer.
- * @param timeout      Waiting for empty tx mailbox timeout in ms or K_FOREVER.
+ * @param timeout      Waiting for empty tx mailbox timeout or K_FOREVER.
  * @param callback_isr Is called when message was sent or a transmission error
  *                     occurred. If NULL, this function is blocking until
  *                     message is sent. This must be NULL if called from user
@@ -344,12 +344,13 @@ __subsystem struct can_driver_api {
  * @retval CAN_TX_* on failure.
  */
 __syscall int can_send(struct device *dev, const struct zcan_frame *msg,
-		       s32_t timeout, can_tx_callback_t callback_isr,
+		       k_timeout_t timeout, can_tx_callback_t callback_isr,
 		       void *callback_arg);
 
 static inline int z_impl_can_send(struct device *dev,
 				 const struct zcan_frame *msg,
-				 s32_t timeout, can_tx_callback_t callback_isr,
+				 k_timeout_t timeout,
+				 can_tx_callback_t callback_isr,
 				 void *callback_arg)
 {
 	const struct can_driver_api *api =
@@ -372,14 +373,14 @@ static inline int z_impl_can_send(struct device *dev,
  * @param length Number of bytes to write (max. 8).
  * @param id  Identifier of the can message.
  * @param rtr Send remote transmission request or data frame
- * @param timeout Waiting for empty tx mailbox timeout in ms or K_FOREVER
+ * @param timeout Waiting for empty tx mailbox timeout or K_FOREVER
  *
  * @retval 0 If successful.
  * @retval -EIO General input / output error.
  * @retval -EINVAL if length > 8.
  */
-static inline int can_write(struct device *dev, const u8_t *data, u8_t length,
-			    u32_t id, enum can_rtr rtr, s32_t timeout)
+static inline int can_write(struct device *dev, const uint8_t *data, uint8_t length,
+			    uint32_t id, enum can_rtr rtr, k_timeout_t timeout)
 {
 	struct zcan_frame msg;
 
@@ -514,10 +515,10 @@ static inline void z_impl_can_detach(struct device *dev, int filter_id)
  * @retval -EIO General input / output error, failed to configure device.
  */
 __syscall int can_configure(struct device *dev, enum can_mode mode,
-			    u32_t bitrate);
+			    uint32_t bitrate);
 
 static inline int z_impl_can_configure(struct device *dev, enum can_mode mode,
-				      u32_t bitrate)
+				      uint32_t bitrate)
 {
 	const struct can_driver_api *api =
 		(const struct can_driver_api *)dev->driver_api;
@@ -554,15 +555,15 @@ enum can_state z_impl_can_get_state(struct device *dev,
  * Recover the CAN controller from bus-off state to error-active state.
  *
  * @param dev     Pointer to the device structure for the driver instance.
- * @param timeout Timeout for waiting for the recovery.
+ * @param timeout Timeout for waiting for the recovery or K_FOREVER.
  *
  * @retval 0 on success.
  * @retval CAN_TIMEOUT on timeout.
  */
 #ifndef CONFIG_CAN_AUTO_BUS_OFF_RECOVERY
-__syscall int can_recover(struct device *dev, s32_t timeout);
+__syscall int can_recover(struct device *dev, k_timeout_t timeout);
 
-static inline int z_impl_can_recover(struct device *dev, s32_t timeout)
+static inline int z_impl_can_recover(struct device *dev, k_timeout_t timeout)
 {
 	const struct can_driver_api *api =
 		(const struct can_driver_api *)dev->driver_api;
@@ -571,7 +572,7 @@ static inline int z_impl_can_recover(struct device *dev, s32_t timeout)
 }
 #else
 /* This implementation prevents inking errors for auto recovery */
-static inline int z_impl_can_recover(struct device *dev, s32_t timeout)
+static inline int z_impl_can_recover(struct device *dev, k_timeout_t timeout)
 {
 	return 0;
 }

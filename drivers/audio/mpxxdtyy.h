@@ -20,7 +20,7 @@ extern "C" {
 #define MPXXDTYY_MAX_PDM_FREQ		3250000 /* 3.25MHz */
 
 #define DEV_CFG(dev) \
-	((struct mpxxdtyy_config *const)(dev)->config->config_info)
+	((const struct mpxxdtyy_config *const)(dev)->config_info)
 #define DEV_DATA(dev) \
 	((struct mpxxdtyy_data *const)(dev)->driver_data)
 
@@ -32,17 +32,17 @@ struct mpxxdtyy_data {
 	struct k_mem_slab	*pcm_mem_slab;
 };
 
-u16_t sw_filter_lib_init(struct device *dev, struct dmic_cfg *cfg);
+uint16_t sw_filter_lib_init(struct device *dev, struct dmic_cfg *cfg);
 int sw_filter_lib_run(TPDMFilter_InitStruct *pdm_filter,
 		      void *pdm_block, void *pcm_block,
 		      size_t pdm_size, size_t pcm_size);
 
-#ifdef DT_ST_MPXXDTYY_BUS_I2S
-int mpxxdtyy_i2s_read(struct device *dev, u8_t stream, void **buffer,
-		      size_t *size, s32_t timeout);
+#if DT_ANY_INST_ON_BUS_STATUS_OKAY(i2s)
+int mpxxdtyy_i2s_read(struct device *dev, uint8_t stream, void **buffer,
+		      size_t *size, int32_t timeout);
 int mpxxdtyy_i2s_trigger(struct device *dev, enum dmic_trigger cmd);
 int mpxxdtyy_i2s_configure(struct device *dev, struct dmic_cfg *cfg);
-#endif /* DT_ST_MPXXDTYY_BUS_I2S */
+#endif /* DT_ANY_INST_ON_BUS_STATUS_OKAY(i2s) */
 
 #ifdef __cplusplus
 }

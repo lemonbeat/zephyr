@@ -49,7 +49,7 @@
 
 struct ccs811_data {
 	struct device *i2c;
-#ifdef DT_INST_0_AMS_CCS811_IRQ_GPIOS_CONTROLLER
+#if DT_INST_NODE_HAS_PROP(0, irq_gpios)
 	struct device *irq_gpio;
 #ifdef CONFIG_CCS811_TRIGGER
 	struct device *dev;
@@ -68,26 +68,26 @@ struct ccs811_data {
 #elif defined(CONFIG_CCS811_TRIGGER_GLOBAL_THREAD)
 	struct k_work work;
 #endif
-	u16_t co2_l2m;
-	u16_t co2_m2h;
+	uint16_t co2_l2m;
+	uint16_t co2_m2h;
 #endif /* CONFIG_CCS811_TRIGGER */
 #endif
-#ifdef DT_INST_0_AMS_CCS811_RESET_GPIOS_CONTROLLER
+#if DT_INST_NODE_HAS_PROP(0, reset_gpios)
 	struct device *reset_gpio;
 #endif
-#ifdef DT_INST_0_AMS_CCS811_WAKE_GPIOS_CONTROLLER
+#if DT_INST_NODE_HAS_PROP(0, wake_gpios)
 	struct device *wake_gpio;
 #endif
 	struct ccs811_result_type result;
-	u8_t mode;
-	u8_t app_fw_ver;
+	uint8_t mode;
+	uint8_t app_fw_ver;
 };
 
 #ifdef CONFIG_CCS811_TRIGGER
 
 int ccs811_mutate_meas_mode(struct device *dev,
-			    u8_t set,
-			    u8_t clear);
+			    uint8_t set,
+			    uint8_t clear);
 
 int ccs811_set_thresholds(struct device *dev);
 

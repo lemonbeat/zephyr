@@ -31,18 +31,11 @@
 /** Memory alignment of the RX/TX Buffer Descriptor List */
 #define GMAC_DESC_ALIGNMENT             4
 /** Total number of queues supported by GMAC hardware module */
-#if defined(CONFIG_SOC_ATMEL_SAME70_REVB) || \
-	defined(CONFIG_SOC_ATMEL_SAMV71_REVB)
-#define GMAC_QUEUE_NUM                  6
-#elif !defined(CONFIG_SOC_SERIES_SAM4E)
-#define GMAC_QUEUE_NUM                  3
-#else
-#define GMAC_QUEUE_NUM                  1
-#endif
+#define GMAC_QUEUE_NUM                  DT_INST_PROP(0, num_queues)
 #define GMAC_PRIORITY_QUEUE_NUM         (GMAC_QUEUE_NUM - 1)
 #if (GMAC_PRIORITY_QUEUE_NUM >= 1)
-BUILD_ASSERT_MSG(ARRAY_SIZE(GMAC->GMAC_TBQBAPQ) + 1 == GMAC_QUEUE_NUM,
-		 "GMAC_QUEUE_NUM doesn't match soc header");
+BUILD_ASSERT(ARRAY_SIZE(GMAC->GMAC_TBQBAPQ) + 1 == GMAC_QUEUE_NUM,
+	     "GMAC_QUEUE_NUM doesn't match soc header");
 #endif
 /** Number of priority queues used */
 #define GMAC_ACTIVE_QUEUE_NUM           (CONFIG_ETH_SAM_GMAC_QUEUES)
@@ -179,6 +172,18 @@ BUILD_ASSERT_MSG(ARRAY_SIZE(GMAC->GMAC_TBQBAPQ) + 1 == GMAC_QUEUE_NUM,
 		(GMAC_IERPQ_RCOMP | GMAC_INTPQ_RX_ERR_BITS | \
 		 GMAC_IERPQ_TCOMP | GMAC_INTPQ_TX_ERR_BITS | GMAC_IERPQ_HRESP)
 
+/** GMAC Priority Queues DMA flags */
+#if GMAC_PRIORITY_QUEUE_NUM >= 1
+	/* 4 kB Receiver Packet Buffer Memory Size */
+	/* 4 kB Transmitter Packet Buffer Memory Size */
+	/* Transmitter Checksum Generation Offload Enable */
+#define GMAC_DMA_QUEUE_FLAGS \
+		(GMAC_DCFGR_RXBMS_FULL | GMAC_DCFGR_TXPBMS | \
+		 GMAC_DCFGR_TXCOEN)
+#else
+#define GMAC_DMA_QUEUE_FLAGS (0)
+#endif
+
 /** List of GMAC queues */
 enum queue_idx {
 	GMAC_QUE_0,  /** Main queue */
@@ -189,26 +194,39 @@ enum queue_idx {
 	GMAC_QUE_5,  /** Priority queue 5 */
 };
 
+#if (DT_INST_PROP(0, max_frame_size) == 1518)
+	/* Maximum frame length is 1518 bytes */
+#define GMAC_MAX_FRAME_SIZE 0
+#elif (DT_INST_PROP(0, max_frame_size) == 1536)
+	/* Enable Max Frame Size of 1536 */
+#define GMAC_MAX_FRAME_SIZE GMAC_NCFGR_MAXFS
+#elif (DT_INST_PROP(0, max_frame_size) == 10240)
+	/* Jumbo Frame Enable */
+#define GMAC_MAX_FRAME_SIZE GMAC_NCFGR_JFRAME
+#else
+#error "GMAC_MAX_FRAME_SIZE is invalid, fix it at device tree."
+#endif
+
 /** Minimal ring buffer implementation */
 struct ring_buf {
-	u32_t *buf;
-	u16_t len;
-	u16_t head;
-	u16_t tail;
+	uint32_t *buf;
+	uint16_t len;
+	uint16_t head;
+	uint16_t tail;
 };
 
 /** Receive/transmit buffer descriptor */
 struct gmac_desc {
-	u32_t w0;
-	u32_t w1;
+	uint32_t w0;
+	uint32_t w1;
 };
 
 /** Ring list of receive/transmit buffer descriptors */
 struct gmac_desc_list {
 	struct gmac_desc *buf;
-	u16_t len;
-	u16_t head;
-	u16_t tail;
+	uint16_t len;
+	uint16_t head;
+	uint16_t tail;
 };
 
 /** GMAC Queue data */
@@ -231,11 +249,11 @@ struct gmac_queue {
 #endif
 
 	/** Number of RX frames dropped by the driver */
-	volatile u32_t err_rx_frames_dropped;
+	volatile uint32_t err_rx_frames_dropped;
 	/** Number of times receive queue was flushed */
-	volatile u32_t err_rx_flushed_count;
+	volatile uint32_t err_rx_flushed_count;
 	/** Number of times transmit queue was flushed */
-	volatile u32_t err_tx_flushed_count;
+	volatile uint32_t err_tx_flushed_count;
 
 	enum queue_idx que_idx;
 };
@@ -243,9 +261,9 @@ struct gmac_queue {
 /* Device constant configuration parameters */
 struct eth_sam_dev_cfg {
 	Gmac *regs;
-	u32_t periph_id;
+	uint32_t periph_id;
 	const struct soc_gpio_pin *pin_list;
-	u32_t pin_list_size;
+	uint32_t pin_list_size;
 	void (*config_func)(void);
 	struct phy_sam_gmac_dev phy;
 };
@@ -256,14 +274,14 @@ struct eth_sam_dev_data {
 #if defined(CONFIG_PTP_CLOCK_SAM_GMAC)
 	struct device *ptp_clock;
 #endif
-	u8_t mac_addr[6];
+	uint8_t mac_addr[6];
 	struct k_delayed_work monitor_work;
 	bool link_up;
 	struct gmac_queue queue_list[GMAC_QUEUE_NUM];
 };
 
 #define DEV_CFG(dev) \
-	((const struct eth_sam_dev_cfg *const)(dev)->config->config_info)
+	((const struct eth_sam_dev_cfg *const)(dev)->config_info)
 #define DEV_DATA(dev) \
 	((struct eth_sam_dev_data *const)(dev)->driver_data)
 

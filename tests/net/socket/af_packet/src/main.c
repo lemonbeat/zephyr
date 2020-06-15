@@ -20,12 +20,12 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_SOCKETS_LOG_LEVEL);
 #define DBG(fmt, ...)
 #endif
 
-static u8_t lladdr1[] = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
-static u8_t lladdr2[] = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 };
+static uint8_t lladdr1[] = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
+static uint8_t lladdr2[] = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 };
 
 struct eth_fake_context {
 	struct net_if *iface;
-	u8_t *mac_address;
+	uint8_t *mac_address;
 };
 
 static struct eth_fake_context eth_fake_data1 = {
@@ -67,12 +67,14 @@ static int eth_fake_init(struct device *dev)
 	return 0;
 }
 
-ETH_NET_DEVICE_INIT(eth_fake1, "eth_fake1", eth_fake_init, &eth_fake_data1,
-		    NULL, CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs,
+ETH_NET_DEVICE_INIT(eth_fake1, "eth_fake1", eth_fake_init,
+		    device_pm_control_nop, &eth_fake_data1, NULL,
+		    CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs,
 		    NET_ETH_MTU);
 
-ETH_NET_DEVICE_INIT(eth_fake2, "eth_fake2", eth_fake_init, &eth_fake_data2,
-		    NULL, CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs,
+ETH_NET_DEVICE_INIT(eth_fake2, "eth_fake2", eth_fake_init,
+		    device_pm_control_nop, &eth_fake_data2, NULL,
+		    CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs,
 		    NET_ETH_MTU);
 
 static int setup_socket(struct net_if *iface)

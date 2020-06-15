@@ -18,10 +18,7 @@
 #include "common/log.h"
 #include "hal/debug.h"
 
-#if defined(CONFIG_BT_LL_SW_LEGACY)
-#define MAYFLY_CALL_ID_WORKER MAYFLY_CALL_ID_0
-#define MAYFLY_CALL_ID_JOB    MAYFLY_CALL_ID_1
-#elif defined(CONFIG_BT_LL_SW_SPLIT)
+#if defined(CONFIG_BT_LL_SW_SPLIT)
 #include "ll_sw/lll.h"
 #define MAYFLY_CALL_ID_LLL    TICKER_USER_ID_LLL
 #define MAYFLY_CALL_ID_WORKER TICKER_USER_ID_ULL_HIGH
@@ -30,7 +27,7 @@
 #error Unknown LL variant.
 #endif
 
-void mayfly_enable_cb(u8_t caller_id, u8_t callee_id, u8_t enable)
+void mayfly_enable_cb(uint8_t caller_id, uint8_t callee_id, uint8_t enable)
 {
 	(void)caller_id;
 
@@ -43,7 +40,7 @@ void mayfly_enable_cb(u8_t caller_id, u8_t callee_id, u8_t enable)
 	}
 }
 
-u32_t mayfly_is_enabled(u8_t caller_id, u8_t callee_id)
+uint32_t mayfly_is_enabled(uint8_t caller_id, uint8_t callee_id)
 {
 	(void)caller_id;
 
@@ -67,17 +64,10 @@ u32_t mayfly_is_enabled(u8_t caller_id, u8_t callee_id)
 	return 0;
 }
 
-u32_t mayfly_prio_is_equal(u8_t caller_id, u8_t callee_id)
+uint32_t mayfly_prio_is_equal(uint8_t caller_id, uint8_t callee_id)
 {
 	return (caller_id == callee_id) ||
-#if defined(CONFIG_BT_LL_SW_LEGACY)
-#if (CONFIG_BT_CTLR_WORKER_PRIO == CONFIG_BT_CTLR_JOB_PRIO)
-	       ((caller_id == MAYFLY_CALL_ID_WORKER) &&
-		(callee_id == MAYFLY_CALL_ID_JOB)) ||
-	       ((caller_id == MAYFLY_CALL_ID_JOB) &&
-		(callee_id == MAYFLY_CALL_ID_WORKER)) ||
-#endif
-#elif defined(CONFIG_BT_LL_SW_SPLIT)
+#if defined(CONFIG_BT_LL_SW_SPLIT)
 #if (CONFIG_BT_CTLR_LLL_PRIO == CONFIG_BT_CTLR_ULL_HIGH_PRIO)
 	       ((caller_id == MAYFLY_CALL_ID_LLL) &&
 		(callee_id == MAYFLY_CALL_ID_WORKER)) ||
@@ -100,7 +90,7 @@ u32_t mayfly_prio_is_equal(u8_t caller_id, u8_t callee_id)
 	       0;
 }
 
-void mayfly_pend(u8_t caller_id, u8_t callee_id)
+void mayfly_pend(uint8_t caller_id, uint8_t callee_id)
 {
 	(void)caller_id;
 

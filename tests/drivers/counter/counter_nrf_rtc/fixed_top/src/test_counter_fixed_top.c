@@ -11,16 +11,16 @@
 #include <hal/nrf_rtc.h>
 LOG_MODULE_REGISTER(test);
 
-static volatile u32_t top_cnt;
+static volatile uint32_t top_cnt;
 
 const char *devices[] = {
 #ifdef CONFIG_COUNTER_RTC0
 	/* Nordic RTC0 may be reserved for Bluetooth */
-	DT_NORDIC_NRF_RTC_RTC_0_LABEL,
+	DT_LABEL(DT_NODELABEL(rtc0)),
 #endif
 	/* Nordic RTC1 is used for the system clock */
 #ifdef CONFIG_COUNTER_RTC2
-	DT_NORDIC_NRF_RTC_RTC_2_LABEL,
+	DT_LABEL(DT_NODELABEL(rtc2)),
 #endif
 
 };
@@ -84,7 +84,7 @@ static void top_handler(struct device *dev, void *user_data)
 void test_top_handler_on_instance(const char *dev_name)
 {
 	struct device *dev;
-	u32_t tmp_top_cnt;
+	uint32_t tmp_top_cnt;
 	int err;
 	struct counter_top_cfg top_cfg = {
 		.callback = top_handler,

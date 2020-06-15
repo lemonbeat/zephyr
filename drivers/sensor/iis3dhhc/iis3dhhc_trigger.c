@@ -8,6 +8,8 @@
  * https://www.st.com/resource/en/datasheet/iis3dhhc.pdf
  */
 
+#define DT_DRV_COMPAT st_iis3dhhc
+
 #include <kernel.h>
 #include <drivers/sensor.h>
 #include <drivers/gpio.h>
@@ -67,7 +69,7 @@ static void iis3dhhc_handle_interrupt(void *arg)
 	struct sensor_trigger drdy_trigger = {
 		.type = SENSOR_TRIG_DATA_READY,
 	};
-	const struct iis3dhhc_config *cfg = dev->config->config_info;
+	const struct iis3dhhc_config *cfg = dev->config_info;
 
 	if (iis3dhhc->handler_drdy != NULL) {
 		iis3dhhc->handler_drdy(dev, &drdy_trigger);
@@ -78,11 +80,11 @@ static void iis3dhhc_handle_interrupt(void *arg)
 }
 
 static void iis3dhhc_gpio_callback(struct device *dev,
-				    struct gpio_callback *cb, u32_t pins)
+				    struct gpio_callback *cb, uint32_t pins)
 {
 	struct iis3dhhc_data *iis3dhhc =
 		CONTAINER_OF(cb, struct iis3dhhc_data, gpio_cb);
-	const struct iis3dhhc_config *cfg = dev->config->config_info;
+	const struct iis3dhhc_config *cfg = dev->config_info;
 
 	ARG_UNUSED(pins);
 
@@ -124,7 +126,7 @@ static void iis3dhhc_work_cb(struct k_work *work)
 int iis3dhhc_init_interrupt(struct device *dev)
 {
 	struct iis3dhhc_data *iis3dhhc = dev->driver_data;
-	const struct iis3dhhc_config *cfg = dev->config->config_info;
+	const struct iis3dhhc_config *cfg = dev->config_info;
 	int ret;
 
 	/* setup data ready gpio interrupt (INT1 or INT2) */

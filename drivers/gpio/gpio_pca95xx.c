@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nxp_pca95xx
+
 /**
  * @file Driver for PCA95XX I2C-based GPIO driver.
  */
@@ -61,9 +63,9 @@ struct gpio_pca95xx_config {
 	const char * const i2c_master_dev_name;
 
 	/** The slave address of the chip */
-	u16_t i2c_slave_addr;
+	uint16_t i2c_slave_addr;
 
-	u8_t capabilities;
+	uint8_t capabilities;
 };
 
 /** Runtime driver data */
@@ -75,10 +77,10 @@ struct gpio_pca95xx_drv_data {
 	struct device *i2c_master;
 
 	struct {
-		u16_t output;
-		u16_t dir;
-		u16_t pud_en;
-		u16_t pud_sel;
+		uint16_t output;
+		uint16_t dir;
+		uint16_t pud_en;
+		uint16_t pud_sel;
 	} reg_cache;
 
 	struct k_sem lock;
@@ -95,19 +97,19 @@ struct gpio_pca95xx_drv_data {
  *
  * @return 0 if successful, failed otherwise.
  */
-static int read_port_regs(struct device *dev, u8_t reg, u16_t *buf)
+static int read_port_regs(struct device *dev, uint8_t reg, uint16_t *buf)
 {
 	const struct gpio_pca95xx_config * const config =
-		dev->config->config_info;
+		dev->config_info;
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
 	struct device * const i2c_master = drv_data->i2c_master;
-	u16_t i2c_addr = config->i2c_slave_addr;
-	u16_t port_data;
+	uint16_t i2c_addr = config->i2c_slave_addr;
+	uint16_t port_data;
 	int ret;
 
 	ret = i2c_burst_read(i2c_master, i2c_addr, reg,
-			     (u8_t *)&port_data, sizeof(port_data));
+			     (uint8_t *)&port_data, sizeof(port_data));
 	if (ret != 0) {
 		LOG_ERR("PCA95XX[0x%X]: error reading register 0x%X (%d)",
 			i2c_addr, reg, ret);
@@ -134,16 +136,16 @@ static int read_port_regs(struct device *dev, u8_t reg, u16_t *buf)
  *
  * @return 0 if successful, failed otherwise.
  */
-static int write_port_regs(struct device *dev, u8_t reg,
-			   u16_t *cache, u16_t value)
+static int write_port_regs(struct device *dev, uint8_t reg,
+			   uint16_t *cache, uint16_t value)
 {
 	const struct gpio_pca95xx_config * const config =
-		dev->config->config_info;
+		dev->config_info;
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
 	struct device * const i2c_master = drv_data->i2c_master;
-	u16_t i2c_addr = config->i2c_slave_addr;
-	u16_t port_data;
+	uint16_t i2c_addr = config->i2c_slave_addr;
+	uint16_t port_data;
 	int ret;
 
 	LOG_DBG("PCA95XX[0x%X]: Write: REG[0x%X] = 0x%X, REG[0x%X] = "
@@ -153,7 +155,7 @@ static int write_port_regs(struct device *dev, u8_t reg,
 	port_data = sys_cpu_to_le16(value);
 
 	ret = i2c_burst_write(i2c_master, i2c_addr, reg,
-			      (u8_t *)&port_data, sizeof(port_data));
+			      (uint8_t *)&port_data, sizeof(port_data));
 	if (ret == 0) {
 		*cache = value;
 	} else {
@@ -164,7 +166,7 @@ static int write_port_regs(struct device *dev, u8_t reg,
 	return ret;
 }
 
-static inline int update_output_regs(struct device *dev, u16_t value)
+static inline int update_output_regs(struct device *dev, uint16_t value)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
@@ -173,7 +175,7 @@ static inline int update_output_regs(struct device *dev, u16_t value)
 			       &drv_data->reg_cache.output, value);
 }
 
-static inline int update_direction_regs(struct device *dev, u16_t value)
+static inline int update_direction_regs(struct device *dev, uint16_t value)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
@@ -182,7 +184,7 @@ static inline int update_direction_regs(struct device *dev, u16_t value)
 			       &drv_data->reg_cache.dir, value);
 }
 
-static inline int update_pul_sel_regs(struct device *dev, u16_t value)
+static inline int update_pul_sel_regs(struct device *dev, uint16_t value)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
@@ -191,7 +193,7 @@ static inline int update_pul_sel_regs(struct device *dev, u16_t value)
 			       &drv_data->reg_cache.pud_sel, value);
 }
 
-static inline int update_pul_en_regs(struct device *dev, u16_t value)
+static inline int update_pul_en_regs(struct device *dev, uint16_t value)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
@@ -209,12 +211,12 @@ static inline int update_pul_en_regs(struct device *dev, u16_t value)
  *
  * @return 0 if successful, failed otherwise
  */
-static int setup_pin_dir(struct device *dev, u32_t pin, int flags)
+static int setup_pin_dir(struct device *dev, uint32_t pin, int flags)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
-	u16_t reg_dir = drv_data->reg_cache.dir;
-	u16_t reg_out = drv_data->reg_cache.output;
+	uint16_t reg_dir = drv_data->reg_cache.dir;
+	uint16_t reg_out = drv_data->reg_cache.output;
 	int ret;
 
 	/* For each pin, 0 == output, 1 == input */
@@ -248,13 +250,13 @@ static int setup_pin_dir(struct device *dev, u32_t pin, int flags)
  *
  * @return 0 if successful, failed otherwise
  */
-static int setup_pin_pullupdown(struct device *dev, u32_t pin, int flags)
+static int setup_pin_pullupdown(struct device *dev, uint32_t pin, int flags)
 {
 	const struct gpio_pca95xx_config * const config =
-		dev->config->config_info;
+		dev->config_info;
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
-	u16_t reg_pud;
+	uint16_t reg_pud;
 	int ret;
 
 	if ((config->capabilities & PCA_HAS_PUD) == 0) {
@@ -315,8 +317,8 @@ static int gpio_pca95xx_config(struct device *dev,
 
 #if (CONFIG_GPIO_LOG_LEVEL >= LOG_LEVEL_DEBUG)
 	const struct gpio_pca95xx_config * const config =
-		dev->config->config_info;
-	u16_t i2c_addr = config->i2c_slave_addr;
+		dev->config_info;
+	uint16_t i2c_addr = config->i2c_slave_addr;
 #endif
 
 	/* Does not support disconnected pin */
@@ -357,11 +359,11 @@ done:
 	return ret;
 }
 
-static int gpio_pca95xx_port_get_raw(struct device *dev, u32_t *value)
+static int gpio_pca95xx_port_get_raw(struct device *dev, uint32_t *value)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
-	u16_t buf;
+	uint16_t buf;
 	int ret;
 
 	/* Can't do I2C bus operations from an ISR */
@@ -384,11 +386,11 @@ done:
 }
 
 static int gpio_pca95xx_port_set_masked_raw(struct device *dev,
-					      u32_t mask, u32_t value)
+					      uint32_t mask, uint32_t value)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
-	u16_t reg_out;
+	uint16_t reg_out;
 	int ret;
 
 	/* Can't do I2C bus operations from an ISR */
@@ -408,21 +410,21 @@ static int gpio_pca95xx_port_set_masked_raw(struct device *dev,
 	return ret;
 }
 
-static int gpio_pca95xx_port_set_bits_raw(struct device *dev, u32_t mask)
+static int gpio_pca95xx_port_set_bits_raw(struct device *dev, uint32_t mask)
 {
 	return gpio_pca95xx_port_set_masked_raw(dev, mask, mask);
 }
 
-static int gpio_pca95xx_port_clear_bits_raw(struct device *dev, u32_t mask)
+static int gpio_pca95xx_port_clear_bits_raw(struct device *dev, uint32_t mask)
 {
 	return gpio_pca95xx_port_set_masked_raw(dev, mask, 0);
 }
 
-static int gpio_pca95xx_port_toggle_bits(struct device *dev, u32_t mask)
+static int gpio_pca95xx_port_toggle_bits(struct device *dev, uint32_t mask)
 {
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
-	u16_t reg_out;
+	uint16_t reg_out;
 	int ret;
 
 	/* Can't do I2C bus operations from an ISR */
@@ -469,7 +471,7 @@ static const struct gpio_driver_api gpio_pca95xx_drv_api_funcs = {
 static int gpio_pca95xx_init(struct device *dev)
 {
 	const struct gpio_pca95xx_config * const config =
-		dev->config->config_info;
+		dev->config_info;
 	struct gpio_pca95xx_drv_data * const drv_data =
 		(struct gpio_pca95xx_drv_data * const)dev->driver_data;
 	struct device *i2c_master;
@@ -489,12 +491,12 @@ static int gpio_pca95xx_init(struct device *dev)
 #define GPIO_PCA95XX_DEVICE_INSTANCE(inst)				\
 static const struct gpio_pca95xx_config gpio_pca95xx_##inst##_cfg = {	\
 	.common = {							\
-		.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(DT_INST_##inst##_NXP_PCA95XX_NGPIOS), \
+		.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_DT_INST(inst),	\
 	},								\
-	.i2c_master_dev_name = DT_INST_##inst##_NXP_PCA95XX_BUS_NAME,	\
-	.i2c_slave_addr = DT_INST_##inst##_NXP_PCA95XX_BASE_ADDRESS,	\
+	.i2c_master_dev_name = DT_INST_BUS_LABEL(inst),	\
+	.i2c_slave_addr = DT_INST_REG_ADDR(inst),	\
 	.capabilities =							\
-		(DT_INST_##inst##_NXP_PCA95XX_HAS_PUD ?			\
+		(DT_INST_PROP(inst, has_pud) ?			\
 			PCA_HAS_PUD : 0) |				\
 		0,							\
 };									\
@@ -507,26 +509,11 @@ static struct gpio_pca95xx_drv_data gpio_pca95xx_##inst##_drvdata = {	\
 };									\
 									\
 DEVICE_AND_API_INIT(gpio_pca95xx_##inst,				\
-	DT_INST_##inst##_NXP_PCA95XX_LABEL,				\
+	DT_INST_LABEL(inst),				\
 	gpio_pca95xx_init,						\
 	&gpio_pca95xx_##inst##_drvdata,					\
 	&gpio_pca95xx_##inst##_cfg,					\
 	POST_KERNEL, CONFIG_GPIO_PCA95XX_INIT_PRIORITY,			\
-	&gpio_pca95xx_drv_api_funcs)
+	&gpio_pca95xx_drv_api_funcs);
 
-
-#ifdef DT_INST_0_NXP_PCA95XX
-GPIO_PCA95XX_DEVICE_INSTANCE(0);
-#endif /* DT_INST_0_NXP_PCA95XX */
-
-#ifdef DT_INST_1_NXP_PCA95XX
-GPIO_PCA95XX_DEVICE_INSTANCE(1);
-#endif /* DT_INST_1_NXP_PCA95XX */
-
-#ifdef DT_INST_2_NXP_PCA95XX
-GPIO_PCA95XX_DEVICE_INSTANCE(2);
-#endif /* DT_INST_2_NXP_PCA95XX */
-
-#ifdef DT_INST_3_NXP_PCA95XX
-GPIO_PCA95XX_DEVICE_INSTANCE(3);
-#endif /* DT_INST_3_NXP_PCA95XX */
+DT_INST_FOREACH_STATUS_OKAY(GPIO_PCA95XX_DEVICE_INSTANCE)

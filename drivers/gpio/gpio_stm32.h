@@ -132,6 +132,16 @@
 #define STM32_PERIPH_GPIOG LL_AHB2_GRP1_PERIPH_GPIOG
 #define STM32_PERIPH_GPIOH LL_AHB2_GRP1_PERIPH_GPIOH
 #define STM32_PERIPH_GPIOI LL_AHB2_GRP1_PERIPH_GPIOI
+#elif CONFIG_SOC_SERIES_STM32L5X
+#define STM32_CLOCK_BUS_GPIO STM32_CLOCK_BUS_AHB2
+#define STM32_PERIPH_GPIOA LL_AHB2_GRP1_PERIPH_GPIOA
+#define STM32_PERIPH_GPIOB LL_AHB2_GRP1_PERIPH_GPIOB
+#define STM32_PERIPH_GPIOC LL_AHB2_GRP1_PERIPH_GPIOC
+#define STM32_PERIPH_GPIOD LL_AHB2_GRP1_PERIPH_GPIOD
+#define STM32_PERIPH_GPIOE LL_AHB2_GRP1_PERIPH_GPIOE
+#define STM32_PERIPH_GPIOF LL_AHB2_GRP1_PERIPH_GPIOF
+#define STM32_PERIPH_GPIOG LL_AHB2_GRP1_PERIPH_GPIOG
+#define STM32_PERIPH_GPIOH LL_AHB2_GRP1_PERIPH_GPIOH
 #elif CONFIG_SOC_SERIES_STM32MP1X
 #define STM32_CLOCK_BUS_GPIO STM32_CLOCK_BUS_AHB4
 #define STM32_PERIPH_GPIOA LL_AHB4_GRP1_PERIPH_GPIOA
@@ -196,7 +206,7 @@ struct gpio_stm32_config {
 	/* gpio_driver_config needs to be first */
 	struct gpio_driver_config common;
 	/* port base address */
-	u32_t *base;
+	uint32_t *base;
 	/* IO port */
 	int port;
 	struct stm32_pclken pclken;
@@ -209,7 +219,7 @@ struct gpio_stm32_data {
 	/* gpio_driver_data needs to be first */
 	struct gpio_driver_data common;
 	/* Enabled INT pins generating a cb */
-	u32_t cb_pins;
+	uint32_t cb_pins;
 	/* user ISR cb */
 	sys_slist_t cb;
 };
@@ -222,6 +232,6 @@ struct gpio_stm32_data {
  * @param func GPIO mode
  * @param altf Alternate function
  */
-int gpio_stm32_configure(u32_t *base_addr, int pin, int conf, int altf);
+int gpio_stm32_configure(uint32_t *base_addr, int pin, int conf, int altf);
 
 #endif /* ZEPHYR_DRIVERS_GPIO_GPIO_STM32_H_ */

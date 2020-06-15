@@ -1,5 +1,7 @@
 /* stellarisUartDrv.c - Stellaris UART driver */
 
+#define DT_DRV_COMPAT ti_stellaris_uart
+
 /*
  * Copyright (c) 2013-2015 Wind River Systems, Inc.
  *
@@ -30,44 +32,44 @@
 
 /* Stellaris UART module */
 struct _uart {
-	u32_t dr;
+	uint32_t dr;
 	union {
-		u32_t _sr;
-		u32_t _cr;
+		uint32_t _sr;
+		uint32_t _cr;
 	} u1;
-	u8_t _res1[0x010];
-	u32_t fr;
-	u8_t _res2[0x04];
-	u32_t ilpr;
-	u32_t ibrd;
-	u32_t fbrd;
-	u32_t lcrh;
-	u32_t ctl;
-	u32_t ifls;
-	u32_t im;
-	u32_t ris;
-	u32_t mis;
-	u32_t icr;
-	u8_t _res3[0xf8c];
+	uint8_t _res1[0x010];
+	uint32_t fr;
+	uint8_t _res2[0x04];
+	uint32_t ilpr;
+	uint32_t ibrd;
+	uint32_t fbrd;
+	uint32_t lcrh;
+	uint32_t ctl;
+	uint32_t ifls;
+	uint32_t im;
+	uint32_t ris;
+	uint32_t mis;
+	uint32_t icr;
+	uint8_t _res3[0xf8c];
 
-	u32_t peripd_id4;
-	u32_t peripd_id5;
-	u32_t peripd_id6;
-	u32_t peripd_id7;
-	u32_t peripd_id0;
-	u32_t peripd_id1;
-	u32_t peripd_id2;
-	u32_t peripd_id3;
+	uint32_t peripd_id4;
+	uint32_t peripd_id5;
+	uint32_t peripd_id6;
+	uint32_t peripd_id7;
+	uint32_t peripd_id0;
+	uint32_t peripd_id1;
+	uint32_t peripd_id2;
+	uint32_t peripd_id3;
 
-	u32_t p_cell_id0;
-	u32_t p_cell_id1;
-	u32_t p_cell_id2;
-	u32_t p_cell_id3;
+	uint32_t p_cell_id0;
+	uint32_t p_cell_id1;
+	uint32_t p_cell_id2;
+	uint32_t p_cell_id3;
 };
 
 /* Device data structure */
 struct uart_stellaris_dev_data_t {
-	u32_t baud_rate;	/* Baud rate */
+	uint32_t baud_rate;	/* Baud rate */
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	uart_irq_callback_user_data_t cb;	/**< Callback function pointer */
@@ -78,41 +80,41 @@ struct uart_stellaris_dev_data_t {
 /* convenience defines */
 
 #define DEV_CFG(dev) \
-	((const struct uart_device_config * const)(dev)->config->config_info)
+	((const struct uart_device_config * const)(dev)->config_info)
 #define DEV_DATA(dev) \
 	((struct uart_stellaris_dev_data_t * const)(dev)->driver_data)
 #define UART_STRUCT(dev) \
 	((volatile struct _uart *)(DEV_CFG(dev))->base)
 
 /* registers */
-#define UARTDR(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x000)))
-#define UARTSR(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x004)))
-#define UARTCR(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x004)))
-#define UARTFR(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x018)))
-#define UARTILPR(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x020)))
-#define UARTIBRD(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x024)))
-#define UARTFBRD(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x028)))
-#define UARTLCRH(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x02C)))
-#define UARTCTL(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x030)))
-#define UARTIFLS(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x034)))
-#define UARTIM(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x038)))
-#define UARTRIS(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x03C)))
-#define UARTMIS(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x040)))
-#define UARTICR(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0x044)))
+#define UARTDR(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x000)))
+#define UARTSR(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x004)))
+#define UARTCR(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x004)))
+#define UARTFR(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x018)))
+#define UARTILPR(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x020)))
+#define UARTIBRD(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x024)))
+#define UARTFBRD(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x028)))
+#define UARTLCRH(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x02C)))
+#define UARTCTL(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x030)))
+#define UARTIFLS(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x034)))
+#define UARTIM(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x038)))
+#define UARTRIS(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x03C)))
+#define UARTMIS(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x040)))
+#define UARTICR(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0x044)))
 
 /* ID registers: UARTPID = UARTPeriphID, UARTPCID = UARTPCellId */
-#define UARTPID4(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFD0)))
-#define UARTPID5(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFD4)))
-#define UARTPID6(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFD8)))
-#define UARTPID7(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFDC)))
-#define UARTPID0(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFE0)))
-#define UARTPID1(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFE4)))
-#define UARTPID2(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFE8)))
-#define UARTPID3(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFEC)))
-#define UARTPCID0(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFF0)))
-#define UARTPCID1(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFF4)))
-#define UARTPCID2(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFF8)))
-#define UARTPCID3(dev) (*((volatile u32_t *)(DEV_CFG(dev)->base + 0xFFC)))
+#define UARTPID4(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFD0)))
+#define UARTPID5(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFD4)))
+#define UARTPID6(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFD8)))
+#define UARTPID7(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFDC)))
+#define UARTPID0(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFE0)))
+#define UARTPID1(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFE4)))
+#define UARTPID2(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFE8)))
+#define UARTPID3(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFEC)))
+#define UARTPCID0(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFF0)))
+#define UARTPCID1(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFF4)))
+#define UARTPCID2(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFF8)))
+#define UARTPCID3(dev) (*((volatile uint32_t *)(DEV_CFG(dev)->base + 0xFFC)))
 
 /* muxed UART registers */
 #define sr u1._sr /* Read: receive status */
@@ -158,10 +160,10 @@ static const struct uart_driver_api uart_stellaris_driver_api;
  * @return N/A
  */
 static void baudrate_set(struct device *dev,
-			 u32_t baudrate, u32_t sys_clk_freq_hz)
+			 uint32_t baudrate, uint32_t sys_clk_freq_hz)
 {
 	volatile struct _uart *uart = UART_STRUCT(dev);
-	u32_t brdi, brdf, div, rem;
+	uint32_t brdi, brdf, div, rem;
 
 	/* upon reset, the system clock uses the intenal OSC @ 12MHz */
 
@@ -181,8 +183,8 @@ static void baudrate_set(struct device *dev,
 	 * those registers are 32-bit, but the reserved bits should be
 	 * preserved
 	 */
-	uart->ibrd = (u16_t)(brdi & 0xffff); /* 16 bits */
-	uart->fbrd = (u8_t)(brdf & 0x3f);    /* 6 bits */
+	uart->ibrd = (uint16_t)(brdi & 0xffff); /* 16 bits */
+	uart->fbrd = (uint8_t)(brdf & 0x3f);    /* 6 bits */
 }
 
 /**
@@ -332,7 +334,7 @@ static void uart_stellaris_poll_out(struct device *dev,
 	}
 
 	/* send a character */
-	uart->dr = (u32_t)c;
+	uart->dr = (uint32_t)c;
 }
 
 #if CONFIG_UART_INTERRUPT_DRIVEN
@@ -346,14 +348,14 @@ static void uart_stellaris_poll_out(struct device *dev,
  *
  * @return Number of bytes sent
  */
-static int uart_stellaris_fifo_fill(struct device *dev, const u8_t *tx_data,
+static int uart_stellaris_fifo_fill(struct device *dev, const uint8_t *tx_data,
 				    int len)
 {
 	volatile struct _uart *uart = UART_STRUCT(dev);
-	u8_t num_tx = 0U;
+	uint8_t num_tx = 0U;
 
 	while ((len - num_tx > 0) && ((uart->fr & UARTFR_TXFF) == 0U)) {
-		uart->dr = (u32_t)tx_data[num_tx++];
+		uart->dr = (uint32_t)tx_data[num_tx++];
 	}
 
 	return (int)num_tx;
@@ -368,14 +370,14 @@ static int uart_stellaris_fifo_fill(struct device *dev, const u8_t *tx_data,
  *
  * @return Number of bytes read
  */
-static int uart_stellaris_fifo_read(struct device *dev, u8_t *rx_data,
+static int uart_stellaris_fifo_read(struct device *dev, uint8_t *rx_data,
 				    const int size)
 {
 	volatile struct _uart *uart = UART_STRUCT(dev);
-	u8_t num_rx = 0U;
+	uint8_t num_rx = 0U;
 
 	while ((size - num_rx > 0) && ((uart->fr & UARTFR_RXFE) == 0U)) {
-		rx_data[num_rx++] = (u8_t)uart->dr;
+		rx_data[num_rx++] = (uint8_t)uart->dr;
 	}
 
 	return num_rx;
@@ -390,11 +392,11 @@ static int uart_stellaris_fifo_read(struct device *dev, u8_t *rx_data,
  */
 static void uart_stellaris_irq_tx_enable(struct device *dev)
 {
-	static u8_t first_time =
+	static uint8_t first_time =
 		1U;	   /* used to allow the first transmission */
-	u32_t saved_ctl;  /* saved UARTCTL (control) register */
-	u32_t saved_ibrd; /* saved UARTIBRD (integer baud rate) register */
-	u32_t saved_fbrd; /* saved UARTFBRD (fractional baud rate) register
+	uint32_t saved_ctl;  /* saved UARTCTL (control) register */
+	uint32_t saved_ibrd; /* saved UARTIBRD (integer baud rate) register */
+	uint32_t saved_fbrd; /* saved UARTFBRD (fractional baud rate) register
 				*/
 	volatile struct _uart *uart = UART_STRUCT(dev);
 
@@ -633,8 +635,8 @@ static void irq_config_func_0(struct device *port);
 #endif
 
 static const struct uart_device_config uart_stellaris_dev_cfg_0 = {
-	.base = (u8_t *)DT_INST_0_TI_STELLARIS_UART_BASE_ADDRESS,
-	.sys_clk_freq = DT_INST_0_TI_STELLARIS_UART_CLOCKS_CLOCK_FREQUENCY,
+	.base = (uint8_t *)DT_INST_REG_ADDR(0),
+	.sys_clk_freq = DT_INST_PROP_BY_PHANDLE(0, clocks, clock_frequency),
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	.irq_config_func = irq_config_func_0,
@@ -642,10 +644,10 @@ static const struct uart_device_config uart_stellaris_dev_cfg_0 = {
 };
 
 static struct uart_stellaris_dev_data_t uart_stellaris_dev_data_0 = {
-	.baud_rate = DT_INST_0_TI_STELLARIS_UART_CURRENT_SPEED,
+	.baud_rate = DT_INST_PROP(0, current_speed),
 };
 
-DEVICE_AND_API_INIT(uart_stellaris0, DT_INST_0_TI_STELLARIS_UART_LABEL,
+DEVICE_AND_API_INIT(uart_stellaris0, DT_INST_LABEL(0),
 		    &uart_stellaris_init,
 		    &uart_stellaris_dev_data_0, &uart_stellaris_dev_cfg_0,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
@@ -654,11 +656,11 @@ DEVICE_AND_API_INIT(uart_stellaris0, DT_INST_0_TI_STELLARIS_UART_LABEL,
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 static void irq_config_func_0(struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_0_TI_STELLARIS_UART_IRQ_0,
-		    DT_INST_0_TI_STELLARIS_UART_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+		    DT_INST_IRQ(0, priority),
 		    uart_stellaris_isr, DEVICE_GET(uart_stellaris0),
 		    0);
-	irq_enable(DT_INST_0_TI_STELLARIS_UART_IRQ_0);
+	irq_enable(DT_INST_IRQN(0));
 }
 #endif
 
@@ -671,8 +673,8 @@ static void irq_config_func_1(struct device *port);
 #endif
 
 static struct uart_device_config uart_stellaris_dev_cfg_1 = {
-	.base = (u8_t *)DT_INST_1_TI_STELLARIS_UART_BASE_ADDRESS,
-	.sys_clk_freq = DT_INST_1_TI_STELLARIS_UART_CLOCKS_CLOCK_FREQUENCY,
+	.base = (uint8_t *)DT_INST_REG_ADDR(1),
+	.sys_clk_freq = DT_INST_PROP_BY_PHANDLE(1, clocks, clock_frequency),
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	.irq_config_func = irq_config_func_1,
@@ -680,10 +682,10 @@ static struct uart_device_config uart_stellaris_dev_cfg_1 = {
 };
 
 static struct uart_stellaris_dev_data_t uart_stellaris_dev_data_1 = {
-	.baud_rate = DT_INST_1_TI_STELLARIS_UART_CURRENT_SPEED,
+	.baud_rate = DT_INST_PROP(1, current_speed),
 };
 
-DEVICE_AND_API_INIT(uart_stellaris1, DT_INST_1_TI_STELLARIS_UART_LABEL,
+DEVICE_AND_API_INIT(uart_stellaris1, DT_INST_LABEL(1),
 		    &uart_stellaris_init,
 		    &uart_stellaris_dev_data_1, &uart_stellaris_dev_cfg_1,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
@@ -692,11 +694,11 @@ DEVICE_AND_API_INIT(uart_stellaris1, DT_INST_1_TI_STELLARIS_UART_LABEL,
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 static void irq_config_func_1(struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_1_TI_STELLARIS_UART_IRQ_0,
-		    DT_INST_1_TI_STELLARIS_UART_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(1),
+		    DT_INST_IRQ(1, priority),
 		    uart_stellaris_isr, DEVICE_GET(uart_stellaris1),
 		    0);
-	irq_enable(DT_INST_1_TI_STELLARIS_UART_IRQ_0);
+	irq_enable(DT_INST_IRQN(1));
 }
 #endif
 
@@ -709,8 +711,8 @@ static void irq_config_func_2(struct device *port);
 #endif
 
 static const struct uart_device_config uart_stellaris_dev_cfg_2 = {
-	.base = (u8_t *)DT_INST_2_TI_STELLARIS_UART_BASE_ADDRESS,
-	.sys_clk_freq = DT_INST_2_TI_STELLARIS_UART_CLOCKS_CLOCK_FREQUENCY,
+	.base = (uint8_t *)DT_INST_REG_ADDR(2),
+	.sys_clk_freq = DT_INST_PROP_BY_PHANDLE(2, clocks, clock_frequency),
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	.irq_config_func = irq_config_func_2,
@@ -718,10 +720,10 @@ static const struct uart_device_config uart_stellaris_dev_cfg_2 = {
 };
 
 static struct uart_stellaris_dev_data_t uart_stellaris_dev_data_2 = {
-	.baud_rate = DT_INST_2_TI_STELLARIS_UART_CURRENT_SPEED,
+	.baud_rate = DT_INST_PROP(2, current_speed),
 };
 
-DEVICE_AND_API_INIT(uart_stellaris2, DT_INST_2_TI_STELLARIS_UART_LABEL,
+DEVICE_AND_API_INIT(uart_stellaris2, DT_INST_LABEL(2),
 		    &uart_stellaris_init,
 		    &uart_stellaris_dev_data_2, &uart_stellaris_dev_cfg_2,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
@@ -730,11 +732,11 @@ DEVICE_AND_API_INIT(uart_stellaris2, DT_INST_2_TI_STELLARIS_UART_LABEL,
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 static void irq_config_func_2(struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_2_TI_STELLARIS_UART_IRQ_0,
-		    DT_INST_2_TI_STELLARIS_UART_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(2),
+		    DT_INST_IRQ(2, priority),
 		    uart_stellaris_isr, DEVICE_GET(uart_stellaris2),
 		    0);
-	irq_enable(DT_INST_2_TI_STELLARIS_UART_IRQ_0);
+	irq_enable(DT_INST_IRQN(2));
 }
 #endif
 

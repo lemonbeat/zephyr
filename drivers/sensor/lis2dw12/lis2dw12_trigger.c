@@ -8,6 +8,8 @@
  * https://www.st.com/resource/en/datasheet/lis2dw12.pdf
  */
 
+#define DT_DRV_COMPAT st_lis2dw12
+
 #include <kernel.h>
 #include <drivers/sensor.h>
 #include <drivers/gpio.h>
@@ -23,7 +25,7 @@ LOG_MODULE_DECLARE(LIS2DW12, CONFIG_SENSOR_LOG_LEVEL);
 static int lis2dw12_enable_int(struct device *dev,
 			       enum sensor_trigger_type type, int enable)
 {
-	const struct lis2dw12_device_config *cfg = dev->config->config_info;
+	const struct lis2dw12_device_config *cfg = dev->config_info;
 	struct lis2dw12_data *lis2dw12 = dev->driver_data;
 	lis2dw12_reg_t int_route;
 
@@ -166,7 +168,7 @@ static void lis2dw12_handle_interrupt(void *arg)
 {
 	struct device *dev = (struct device *)arg;
 	struct lis2dw12_data *lis2dw12 = dev->driver_data;
-	const struct lis2dw12_device_config *cfg = dev->config->config_info;
+	const struct lis2dw12_device_config *cfg = dev->config_info;
 	lis2dw12_all_sources_t sources;
 
 	lis2dw12_all_sources_get(lis2dw12->ctx, &sources);
@@ -188,7 +190,7 @@ static void lis2dw12_handle_interrupt(void *arg)
 }
 
 static void lis2dw12_gpio_callback(struct device *dev,
-				    struct gpio_callback *cb, u32_t pins)
+				    struct gpio_callback *cb, uint32_t pins)
 {
 	struct lis2dw12_data *lis2dw12 =
 		CONTAINER_OF(cb, struct lis2dw12_data, gpio_cb);
@@ -235,7 +237,7 @@ static void lis2dw12_work_cb(struct k_work *work)
 int lis2dw12_init_interrupt(struct device *dev)
 {
 	struct lis2dw12_data *lis2dw12 = dev->driver_data;
-	const struct lis2dw12_device_config *cfg = dev->config->config_info;
+	const struct lis2dw12_device_config *cfg = dev->config_info;
 	int ret;
 
 	/* setup data ready gpio interrupt (INT1 or INT2) */

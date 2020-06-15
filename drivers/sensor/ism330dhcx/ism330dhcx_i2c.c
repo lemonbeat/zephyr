@@ -8,31 +8,33 @@
  * https://www.st.com/resource/en/datasheet/ism330dhcx.pdf
  */
 
+#define DT_DRV_COMPAT st_ism330dhcx
+
 #include <string.h>
 #include <drivers/i2c.h>
 #include <logging/log.h>
 
 #include "ism330dhcx.h"
 
-#ifdef DT_ST_ISM330DHCX_BUS_I2C
+#if DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 
 LOG_MODULE_DECLARE(ISM330DHCX, CONFIG_SENSOR_LOG_LEVEL);
 
-static int ism330dhcx_i2c_read(struct device *dev, u8_t reg_addr,
-			    u8_t *value, u8_t len)
+static int ism330dhcx_i2c_read(struct device *dev, uint8_t reg_addr,
+			    uint8_t *value, uint8_t len)
 {
 	struct ism330dhcx_data *data = dev->driver_data;
-	const struct ism330dhcx_config *cfg = dev->config->config_info;
+	const struct ism330dhcx_config *cfg = dev->config_info;
 
 	return i2c_burst_read(data->bus, cfg->i2c_slv_addr,
 			      reg_addr, value, len);
 }
 
-static int ism330dhcx_i2c_write(struct device *dev, u8_t reg_addr,
-			     u8_t *value, u8_t len)
+static int ism330dhcx_i2c_write(struct device *dev, uint8_t reg_addr,
+			     uint8_t *value, uint8_t len)
 {
 	struct ism330dhcx_data *data = dev->driver_data;
-	const struct ism330dhcx_config *cfg = dev->config->config_info;
+	const struct ism330dhcx_config *cfg = dev->config_info;
 
 	return i2c_burst_write(data->bus, cfg->i2c_slv_addr,
 			       reg_addr, value, len);
@@ -50,4 +52,4 @@ int ism330dhcx_i2c_init(struct device *dev)
 
 	return 0;
 }
-#endif /* DT_ST_ISM330DHCX_BUS_I2C */
+#endif /* DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c) */

@@ -11,13 +11,15 @@ pyelftools>=0.24
 PyYAML>=5.1
 
 # used by west_commands
+canopen
 packaging
+progress
 
 # intelhex used by mergehex.py
 intelhex
 
 # it's west
-west>=0.6.2
+west>=0.7.2
 
 # used for windows based 'menuconfig'
 # "win32" is used for 64-bit Windows as well

@@ -3,6 +3,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+
+#define DT_DRV_COMPAT microchip_xec_tach
+
 #include <errno.h>
 #include <device.h>
 #include <drivers/sensor.h>
@@ -12,26 +15,28 @@
 LOG_MODULE_REGISTER(tach_xec, CONFIG_SENSOR_LOG_LEVEL);
 
 struct tach_xec_config {
-	u32_t base_address;
+	uint32_t base_address;
 };
 
 struct tach_xec_data {
-	u16_t count;
+	uint16_t count;
 };
 
 #define FAN_STOPPED		0xFFFFU
 #define COUNT_100KHZ_SEC	100000U
 #define SEC_TO_MINUTE		60U
 #define PIN_STS_TIMEOUT		20U
+#define TACH_CTRL_EDGES	        (CONFIG_TACH_XEC_EDGES << \
+				MCHP_TACH_CTRL_NUM_EDGES_POS)
 
 #define TACH_XEC_REG_BASE(_dev)				\
 	((TACH_Type *)					\
 	 ((const struct tach_xec_config * const)	\
-	  _dev->config->config_info)->base_address)
+	  _dev->config_info)->base_address)
 
 #define TACH_XEC_CONFIG(_dev)				\
 	(((const struct counter_xec_config * const)	\
-	  _dev->config->config_info))
+	  _dev->config_info))
 
 #define TACH_XEC_DATA(_dev)				\
 	((struct tach_xec_data *)dev->driver_data)
@@ -43,7 +48,7 @@ int tach_xec_sample_fetch(struct device *dev, enum sensor_channel chan)
 
 	TACH_Type *tach = TACH_XEC_REG_BASE(dev);
 	struct tach_xec_data *data = TACH_XEC_DATA(dev);
-	u8_t poll_count = 0;
+	uint8_t poll_count = 0;
 
 	while (poll_count < PIN_STS_TIMEOUT) {
 		/* See whether internal counter is already latched */
@@ -99,7 +104,7 @@ static int tach_xec_init(struct device *dev)
 	TACH_Type *tach = TACH_XEC_REG_BASE(dev);
 
 	tach->CONTROL = MCHP_TACH_CTRL_READ_MODE_100K_CLOCK	|
-			MCHP_TACH_CTRL_EDGES_5			|
+			TACH_CTRL_EDGES	                        |
 			MCHP_TACH_CTRL_FILTER_EN		|
 			MCHP_TACH_CTRL_EN;
 
@@ -114,32 +119,18 @@ static const struct sensor_driver_api tach_xec_driver_api = {
 #define TACH_XEC_DEVICE(id)						\
 	static const struct tach_xec_config tach_xec_dev_config##id = {	\
 		.base_address =						\
-		DT_INST_##id##_MICROCHIP_XEC_TACH_BASE_ADDRESS,		\
+		DT_INST_REG_ADDR(id),		\
 	};								\
 									\
 	static struct tach_xec_data tach_xec_dev_data##id;		\
 									\
 	DEVICE_AND_API_INIT(tach##id,					\
-			    DT_INST_##id##_MICROCHIP_XEC_TACH_LABEL,	\
+			    DT_INST_LABEL(id),	\
 			    tach_xec_init,				\
 			    &tach_xec_dev_data##id,			\
 			    &tach_xec_dev_config##id,			\
 			    POST_KERNEL,				\
 			    CONFIG_SENSOR_INIT_PRIORITY,		\
-			    &tach_xec_driver_api)			\
+			    &tach_xec_driver_api);
 
-#ifdef DT_INST_0_MICROCHIP_XEC_TACH
-TACH_XEC_DEVICE(0);
-#endif
-
-#ifdef DT_INST_1_MICROCHIP_XEC_TACH
-TACH_XEC_DEVICE(1);
-#endif
-
-#ifdef DT_INST_2_MICROCHIP_XEC_TACH
-TACH_XEC_DEVICE(2);
-#endif
-
-#ifdef DT_INST_3_MICROCHIP_XEC_TACH
-TACH_XEC_DEVICE(3);
-#endif
+DT_INST_FOREACH_STATUS_OKAY(TACH_XEC_DEVICE)

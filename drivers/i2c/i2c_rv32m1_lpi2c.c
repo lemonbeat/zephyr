@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT openisa_rv32m1_lpi2c
+
 #include <drivers/i2c.h>
 #include <drivers/clock_control.h>
 #include <fsl_lpi2c.h>
@@ -21,8 +23,8 @@ struct rv32m1_lpi2c_config {
 	char *clock_controller;
 	clock_control_subsys_t clock_subsys;
 	clock_ip_name_t clock_ip_name;
-	u32_t clock_ip_src;
-	u32_t bitrate;
+	uint32_t clock_ip_src;
+	uint32_t bitrate;
 	void (*irq_config_func)(struct device *dev);
 };
 
@@ -33,12 +35,12 @@ struct rv32m1_lpi2c_data {
 	status_t completion_status;
 };
 
-static int rv32m1_lpi2c_configure(struct device *dev, u32_t dev_config)
+static int rv32m1_lpi2c_configure(struct device *dev, uint32_t dev_config)
 {
-	const struct rv32m1_lpi2c_config *config = dev->config->config_info;
+	const struct rv32m1_lpi2c_config *config = dev->config_info;
 	struct device *clk;
-	u32_t baudrate;
-	u32_t clk_freq;
+	uint32_t baudrate;
+	uint32_t clk_freq;
 	int err;
 
 	if (!(I2C_MODE_MASTER & dev_config)) {
@@ -109,9 +111,9 @@ static void rv32m1_lpi2c_master_transfer_callback(LPI2C_Type *base,
 	k_sem_give(&data->completion_sync);
 }
 
-static u32_t rv32m1_lpi2c_convert_flags(int msg_flags)
+static uint32_t rv32m1_lpi2c_convert_flags(int msg_flags)
 {
-	u32_t flags = 0U;
+	uint32_t flags = 0U;
 
 	if (!(msg_flags & I2C_MSG_STOP)) {
 		flags |= kLPI2C_TransferNoStopFlag;
@@ -125,9 +127,9 @@ static u32_t rv32m1_lpi2c_convert_flags(int msg_flags)
 }
 
 static int rv32m1_lpi2c_transfer(struct device *dev, struct i2c_msg *msgs,
-				 u8_t num_msgs, u16_t addr)
+				 uint8_t num_msgs, uint16_t addr)
 {
-	const struct rv32m1_lpi2c_config *config = dev->config->config_info;
+	const struct rv32m1_lpi2c_config *config = dev->config_info;
 	struct rv32m1_lpi2c_data *data = dev->driver_data;
 	lpi2c_master_transfer_t transfer;
 	status_t status;
@@ -200,7 +202,7 @@ out:
 static void rv32m1_lpi2c_isr(void *arg)
 {
 	struct device *dev = (struct device *)arg;
-	const struct rv32m1_lpi2c_config *config = dev->config->config_info;
+	const struct rv32m1_lpi2c_config *config = dev->config_info;
 	struct rv32m1_lpi2c_data *data = dev->driver_data;
 
 	LPI2C_MasterTransferHandleIRQ(config->base, &data->handle);
@@ -208,11 +210,11 @@ static void rv32m1_lpi2c_isr(void *arg)
 
 static int rv32m1_lpi2c_init(struct device *dev)
 {
-	const struct rv32m1_lpi2c_config *config = dev->config->config_info;
+	const struct rv32m1_lpi2c_config *config = dev->config_info;
 	struct rv32m1_lpi2c_data *data = dev->driver_data;
 	lpi2c_master_config_t master_config;
 	struct device *clk;
-	u32_t clk_freq, dev_cfg;
+	uint32_t clk_freq, dev_cfg;
 	int err;
 
 	CLOCK_SetIpSrc(config->clock_ip_name, config->clock_ip_src);
@@ -263,15 +265,13 @@ static const struct i2c_driver_api rv32m1_lpi2c_driver_api = {
 	static void rv32m1_lpi2c_irq_config_func_##id(struct device *dev);     \
 	static const struct rv32m1_lpi2c_config rv32m1_lpi2c_##id##_config = { \
 		.base =                                                        \
-		(LPI2C_Type *)DT_OPENISA_RV32M1_LPI2C_I2C_##id##_BASE_ADDRESS, \
-		.clock_controller =                                            \
-			DT_OPENISA_RV32M1_LPI2C_I2C_##id##_CLOCK_CONTROLLER,   \
+		(LPI2C_Type *)DT_INST_REG_ADDR(id),                            \
+		.clock_controller = DT_INST_CLOCKS_LABEL(id),                  \
 		.clock_subsys =                                                \
-			(clock_control_subsys_t)                               \
-			DT_OPENISA_RV32M1_LPI2C_I2C_##id##_CLOCK_NAME,         \
-		.clock_ip_name = kCLOCK_Lpi2c##id,                             \
+			(clock_control_subsys_t) DT_INST_CLOCKS_CELL(id, name),\
+		.clock_ip_name = INST_DT_CLOCK_IP_NAME(id),                    \
 		.clock_ip_src  = kCLOCK_IpSrcFircAsync,                        \
-		.bitrate = DT_OPENISA_RV32M1_LPI2C_I2C_##id##_CLOCK_FREQUENCY, \
+		.bitrate = DT_INST_PROP(id, clock_frequency),                  \
 		.irq_config_func = rv32m1_lpi2c_irq_config_func_##id,          \
 	};                                                                     \
 	static struct rv32m1_lpi2c_data rv32m1_lpi2c_##id##_data = {           \
@@ -281,7 +281,7 @@ static const struct i2c_driver_api rv32m1_lpi2c_driver_api = {
 			rv32m1_lpi2c_##id##_data.completion_sync, 0, 1),       \
 	};                                                                     \
 	DEVICE_AND_API_INIT(rv32m1_lpi2c_##id,                                 \
-			    DT_OPENISA_RV32M1_LPI2C_I2C_##id##_LABEL,          \
+			    DT_INST_LABEL(id),                                 \
 			    &rv32m1_lpi2c_init,                                \
 			    &rv32m1_lpi2c_##id##_data,                         \
 			    &rv32m1_lpi2c_##id##_config,                       \
@@ -289,25 +289,11 @@ static const struct i2c_driver_api rv32m1_lpi2c_driver_api = {
 			    &rv32m1_lpi2c_driver_api);	                       \
 	static void rv32m1_lpi2c_irq_config_func_##id(struct device *dev)      \
 	{                                                                      \
-		IRQ_CONNECT(DT_OPENISA_RV32M1_LPI2C_I2C_##id##_IRQ_0,          \
+		IRQ_CONNECT(DT_INST_IRQN(id),                                  \
 			    0,						       \
 			    rv32m1_lpi2c_isr, DEVICE_GET(rv32m1_lpi2c_##id),   \
 			    0);                                                \
-		irq_enable(DT_OPENISA_RV32M1_LPI2C_I2C_##id##_IRQ_0);          \
+		irq_enable(DT_INST_IRQN(id));                                  \
 	}                                                                      \
 
-#ifdef CONFIG_I2C_0
-RV32M1_LPI2C_DEVICE(0)
-#endif
-
-#ifdef CONFIG_I2C_1
-RV32M1_LPI2C_DEVICE(1)
-#endif
-
-#ifdef CONFIG_I2C_2
-RV32M1_LPI2C_DEVICE(2)
-#endif
-
-#ifdef CONFIG_I2C_3
-RV32M1_LPI2C_DEVICE(3)
-#endif
+DT_INST_FOREACH_STATUS_OKAY(RV32M1_LPI2C_DEVICE)

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT litex_eth0
+
 #define LOG_MODULE_NAME eth_liteeth
 #define LOG_LEVEL CONFIG_ETHERNET_LOG_LEVEL
 
@@ -20,26 +22,28 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 #include <sys/printk.h>
 
+#include "eth.h"
+
 /* flags */
 #define LITEETH_EV_TX		0x1
 #define LITEETH_EV_RX		0x1
 
 /* slots */
-#define LITEETH_SLOT_BASE	DT_INST_0_LITEX_ETH0_BUFFERS_BASE_ADDRESS
+#define LITEETH_SLOT_BASE	DT_INST_REG_ADDR_BY_NAME(0, buffers)
 #define LITEETH_SLOT_RX0	((LITEETH_SLOT_BASE) + 0x0000)
 #define LITEETH_SLOT_RX1	((LITEETH_SLOT_BASE) + 0x0800)
 #define LITEETH_SLOT_TX0	((LITEETH_SLOT_BASE) + 0x1000)
 #define LITEETH_SLOT_TX1	((LITEETH_SLOT_BASE) + 0x1800)
 
 /* sram - rx */
-#define LITEETH_RX_BASE		DT_INST_0_LITEX_ETH0_CONTROL_BASE_ADDRESS
+#define LITEETH_RX_BASE		DT_INST_REG_ADDR_BY_NAME(0, control)
 #define LITEETH_RX_SLOT		((LITEETH_RX_BASE) + 0x00)
 #define LITEETH_RX_LENGTH	((LITEETH_RX_BASE) + 0x04)
 #define LITEETH_RX_EV_PENDING	((LITEETH_RX_BASE) + 0x28)
 #define LITEETH_RX_EV_ENABLE	((LITEETH_RX_BASE) + 0x2c)
 
 /* sram - tx */
-#define LITEETH_TX_BASE		((DT_INST_0_LITEX_ETH0_CONTROL_BASE_ADDRESS) + 0x30)
+#define LITEETH_TX_BASE		((DT_INST_REG_ADDR_BY_NAME(0, control)) + 0x30)
 #define LITEETH_TX_START	((LITEETH_TX_BASE) + 0x00)
 #define LITEETH_TX_READY	((LITEETH_TX_BASE) + 0x04)
 #define LITEETH_TX_SLOT		((LITEETH_TX_BASE) + 0x0c)
@@ -47,21 +51,21 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define LITEETH_TX_EV_PENDING	((LITEETH_TX_BASE) + 0x1c)
 
 /* irq */
-#define LITEETH_IRQ		DT_INST_0_LITEX_ETH0_IRQ_0
+#define LITEETH_IRQ		DT_INST_IRQN(0)
 #define LITEETH_IRQ_PRIORITY	CONFIG_ETH_LITEETH_0_IRQ_PRI
 
 /* label */
-#define LITEETH_LABEL		DT_INST_0_LITEX_ETH0_LABEL
+#define LITEETH_LABEL		DT_INST_LABEL(0)
 
 struct eth_liteeth_dev_data {
 	struct net_if *iface;
-	u8_t mac_addr[6];
+	uint8_t mac_addr[6];
 
-	u8_t txslot;
-	u8_t rxslot;
+	uint8_t txslot;
+	uint8_t rxslot;
 
-	u8_t *tx_buf[2];
-	u8_t *rx_buf[2];
+	uint8_t *tx_buf[2];
+	uint8_t *rx_buf[2];
 };
 
 struct eth_liteeth_config {
@@ -70,7 +74,7 @@ struct eth_liteeth_config {
 
 static int eth_initialize(struct device *dev)
 {
-	const struct eth_liteeth_config *config = dev->config->config_info;
+	const struct eth_liteeth_config *config = dev->config_info;
 
 	config->config_func();
 
@@ -80,7 +84,7 @@ static int eth_initialize(struct device *dev)
 static int eth_tx(struct device *dev, struct net_pkt *pkt)
 {
 	int key;
-	u16_t len;
+	uint16_t len;
 	struct eth_liteeth_dev_data *context = dev->driver_data;
 
 	key = irq_lock();
@@ -115,7 +119,7 @@ static void eth_rx(struct device *port)
 	struct eth_liteeth_dev_data *context = port->driver_data;
 
 	unsigned int key, r;
-	u16_t len = 0;
+	uint16_t len = 0;
 
 	key = irq_lock();
 
@@ -173,24 +177,10 @@ static void eth_irq_handler(struct device *port)
 	}
 }
 
-#ifdef CONFIG_ETH_LITEETH_0_RANDOM_MAC
-static void generate_mac(u8_t *mac_addr)
-{
-	u32_t entropy;
-
-	entropy = sys_rand32_get();
-
-	mac_addr[3] = entropy >> 8;
-	mac_addr[4] = entropy >> 16;
-	/* Locally administered, unicast */
-	mac_addr[5] = ((entropy >> 0) & 0xfc) | 0x02;
-}
-#endif
-
 #ifdef CONFIG_ETH_LITEETH_0
 
 static struct eth_liteeth_dev_data eth_data = {
-	.mac_addr =  DT_INST_0_LITEX_ETH0_LOCAL_MAC_ADDRESS
+	.mac_addr =  DT_INST_PROP(0, local_mac_address)
 };
 
 static void eth_irq_config(void);
@@ -215,9 +205,9 @@ static void eth_iface_init(struct net_if *iface)
 	/* initialize ethernet L2 */
 	ethernet_init(iface);
 
-#ifdef CONFIG_ETH_LITEETH_0_RANDOM_MAC
+#if DT_INST_PROP(0, zephyr_random_mac_address)
 	/* generate random MAC address */
-	generate_mac(context->mac_addr);
+	gen_random_mac(context->mac_addr, 0x10, 0xe2, 0xd5);
 #endif
 
 	/* set MAC address */
@@ -230,13 +220,13 @@ static void eth_iface_init(struct net_if *iface)
 
 	/* setup tx slots */
 	context->txslot = 0;
-	context->tx_buf[0] = (u8_t *)LITEETH_SLOT_TX0;
-	context->tx_buf[1] = (u8_t *)LITEETH_SLOT_TX1;
+	context->tx_buf[0] = (uint8_t *)LITEETH_SLOT_TX0;
+	context->tx_buf[1] = (uint8_t *)LITEETH_SLOT_TX1;
 
 	/* setup rx slots */
 	context->rxslot = 0;
-	context->rx_buf[0] = (u8_t *)LITEETH_SLOT_RX0;
-	context->rx_buf[1] = (u8_t *)LITEETH_SLOT_RX1;
+	context->rx_buf[0] = (uint8_t *)LITEETH_SLOT_RX0;
+	context->rx_buf[1] = (uint8_t *)LITEETH_SLOT_RX1;
 
 	init_done = true;
 }
@@ -254,9 +244,9 @@ static const struct ethernet_api eth_api = {
 	.send = eth_tx
 };
 
-NET_DEVICE_INIT(eth0, LITEETH_LABEL, eth_initialize, &eth_data, &eth_config,
-		CONFIG_ETH_INIT_PRIORITY, &eth_api, ETHERNET_L2,
-		NET_L2_GET_CTX_TYPE(ETHERNET_L2), NET_ETH_MTU);
+NET_DEVICE_INIT(eth0, LITEETH_LABEL, eth_initialize, device_pm_control_nop,
+		&eth_data, &eth_config, CONFIG_ETH_INIT_PRIORITY, &eth_api,
+		ETHERNET_L2, NET_L2_GET_CTX_TYPE(ETHERNET_L2), NET_ETH_MTU);
 
 static void eth_irq_config(void)
 {

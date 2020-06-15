@@ -11,6 +11,10 @@
 #include <dt-bindings/i2c/i2c.h>
 
 / {
+	chosen {
+		zephyr,flash-controller = &flash;
+	};
+
 	cpus {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -53,6 +57,24 @@
 			interrupts = <39 0>;
 			status = "disabled";
 			label = "UART_3";
+		};
+
+		uart4: serial@40004c00 {
+			compatible = "st,stm32-uart";
+			reg = <0x40004c00 0x400>;
+			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00080000>;
+			interrupts = <48 0>;
+			status = "disabled";
+			label = "UART_4";
+		};
+
+		uart5: serial@40005000 {
+			compatible = "st,stm32-uart";
+			reg = <0x40005000 0x400>;
+			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00100000>;
+			interrupts = <49 0>;
+			status = "disabled";
+			label = "UART_5";
 		};
 
 		i2c1: i2c@40005400 {
@@ -119,6 +141,15 @@
 			interrupts = <18 0>;
 			status = "disabled";
 			label = "ADC_1";
+			#io-channel-cells = <1>;
+		};
+
+		dac1: dac@40007400 {
+			compatible = "st,stm32-dac";
+			reg = <0x40007400 0x400>;
+			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x20000000>;
+			status = "disabled";
+			label = "DAC_1";
 			#io-channel-cells = <1>;
 		};
 
@@ -206,8 +237,8 @@
 			label = "STM32_CLK_RCC";
 		};
 
-		flash-controller@40023c00 {
-			compatible = "st,stm32l1-flash-controller";
+		flash: flash-controller@40023c00 {
+			compatible = "st,stm32-flash-controller", "st,stm32l1-flash-controller";
 			label = "FLASH_CTRL";
 			reg = <0x40023c00 0x400>;
 			interrupts = <4 0>;

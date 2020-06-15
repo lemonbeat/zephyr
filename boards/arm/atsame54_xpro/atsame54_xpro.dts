@@ -22,6 +22,7 @@
 	aliases {
 		led0 = &led0;
 		sw0 = &button0;
+		i2c-0 = &sercom7;
 	};
 
 	leds {
@@ -80,4 +81,9 @@
 
 &usb0 {
 	status = "okay";
+};
+
+&gmac {
+	status = "okay";
+	zephyr,random-mac-address;
 };

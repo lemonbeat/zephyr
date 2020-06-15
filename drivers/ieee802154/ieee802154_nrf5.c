@@ -25,6 +25,7 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include <soc.h>
 #include <device.h>
 #include <init.h>
+#include <debug/stack.h>
 #include <net/net_if.h>
 #include <net/net_pkt.h>
 
@@ -47,18 +48,21 @@ struct nrf5_802154_config {
 
 static struct nrf5_802154_data nrf5_data;
 
-#define ACK_TIMEOUT K_MSEC(10)
+#define ACK_REQUEST_BYTE 1
+#define ACK_REQUEST_BIT (1 << 5)
+#define FRAME_PENDING_BYTE 1
+#define FRAME_PENDING_BIT (1 << 4)
 
 /* Convenience defines for RADIO */
 #define NRF5_802154_DATA(dev) \
 	((struct nrf5_802154_data * const)(dev)->driver_data)
 
 #define NRF5_802154_CFG(dev) \
-	((struct nrf5_802154_config * const)(dev)->config->config_info)
+	((const struct nrf5_802154_config * const)(dev)->config_info)
 
-static void nrf5_get_eui64(u8_t *mac)
+static void nrf5_get_eui64(uint8_t *mac)
 {
-	memcpy(mac, (const u32_t *)&NRF_FICR->DEVICEID, 8);
+	memcpy(mac, (const uint32_t *)&NRF_FICR->DEVICEID, 8);
 }
 
 static void nrf5_rx_thread(void *arg1, void *arg2, void *arg3)
@@ -67,7 +71,7 @@ static void nrf5_rx_thread(void *arg1, void *arg2, void *arg3)
 	struct nrf5_802154_data *nrf5_radio = NRF5_802154_DATA(dev);
 	struct net_pkt *pkt;
 	struct nrf5_802154_rx_frame *rx_frame;
-	u8_t pkt_len;
+	uint8_t pkt_len;
 
 	ARG_UNUSED(arg2);
 	ARG_UNUSED(arg3);
@@ -110,6 +114,17 @@ static void nrf5_rx_thread(void *arg1, void *arg2, void *arg3)
 
 		net_pkt_set_ieee802154_lqi(pkt, rx_frame->lqi);
 		net_pkt_set_ieee802154_rssi(pkt, rx_frame->rssi);
+		net_pkt_set_ieee802154_ack_fpb(pkt, rx_frame->ack_fpb);
+
+#if defined(CONFIG_NET_PKT_TIMESTAMP)
+		struct net_ptp_time timestamp = {
+			.second = rx_frame->time / USEC_PER_SEC,
+			.nanosecond =
+				(rx_frame->time % USEC_PER_SEC) * NSEC_PER_USEC
+		};
+
+		net_pkt_set_timestamp(pkt, &timestamp);
+#endif
 
 		LOG_DBG("Caught a packet (%u) (LQI: %u)",
 			 pkt_len, rx_frame->lqi);
@@ -142,11 +157,10 @@ drop:
 
 static enum ieee802154_hw_caps nrf5_get_capabilities(struct device *dev)
 {
-	return IEEE802154_HW_FCS | IEEE802154_HW_2_4_GHZ |
-	       IEEE802154_HW_TX_RX_ACK | IEEE802154_HW_FILTER |
-	       IEEE802154_HW_ENERGY_SCAN;
+	return IEEE802154_HW_FCS | IEEE802154_HW_FILTER |
+	       IEEE802154_HW_CSMA | IEEE802154_HW_2_4_GHZ |
+	       IEEE802154_HW_TX_RX_ACK | IEEE802154_HW_ENERGY_SCAN;
 }
-
 
 static int nrf5_cca(struct device *dev)
 {
@@ -167,7 +181,7 @@ static int nrf5_cca(struct device *dev)
 	return nrf5_radio->channel_free ? 0 : -EBUSY;
 }
 
-static int nrf5_set_channel(struct device *dev, u16_t channel)
+static int nrf5_set_channel(struct device *dev, uint16_t channel)
 {
 	ARG_UNUSED(dev);
 
@@ -182,9 +196,8 @@ static int nrf5_set_channel(struct device *dev, u16_t channel)
 	return 0;
 }
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
 static int nrf5_energy_scan_start(struct device *dev,
-				  u16_t duration,
+				  uint16_t duration,
 				  energy_scan_done_cb_t done_cb)
 {
 	int err = 0;
@@ -204,11 +217,10 @@ static int nrf5_energy_scan_start(struct device *dev,
 
 	return err;
 }
-#endif /* CONFIG_NET_L2_OPENTHREAD */
 
-static int nrf5_set_pan_id(struct device *dev, u16_t pan_id)
+static int nrf5_set_pan_id(struct device *dev, uint16_t pan_id)
 {
-	u8_t pan_id_le[2];
+	uint8_t pan_id_le[2];
 
 	ARG_UNUSED(dev);
 
@@ -220,9 +232,9 @@ static int nrf5_set_pan_id(struct device *dev, u16_t pan_id)
 	return 0;
 }
 
-static int nrf5_set_short_addr(struct device *dev, u16_t short_addr)
+static int nrf5_set_short_addr(struct device *dev, uint16_t short_addr)
 {
-	u8_t short_addr_le[2];
+	uint8_t short_addr_le[2];
 
 	ARG_UNUSED(dev);
 
@@ -234,7 +246,7 @@ static int nrf5_set_short_addr(struct device *dev, u16_t short_addr)
 	return 0;
 }
 
-static int nrf5_set_ieee_addr(struct device *dev, const u8_t *ieee_addr)
+static int nrf5_set_ieee_addr(struct device *dev, const uint8_t *ieee_addr)
 {
 	ARG_UNUSED(dev);
 
@@ -268,7 +280,7 @@ static int nrf5_filter(struct device *dev, bool set,
 	return -ENOTSUP;
 }
 
-static int nrf5_set_txpower(struct device *dev, s16_t dbm)
+static int nrf5_set_txpower(struct device *dev, int16_t dbm)
 {
 	ARG_UNUSED(dev);
 
@@ -281,7 +293,7 @@ static int nrf5_set_txpower(struct device *dev, s16_t dbm)
 
 static int handle_ack(struct nrf5_802154_data *nrf5_radio)
 {
-	u8_t ack_len = nrf5_radio->ack_frame.psdu[0] - NRF5_FCS_LENGTH;
+	uint8_t ack_len = nrf5_radio->ack_frame.psdu[0] - NRF5_FCS_LENGTH;
 	struct net_pkt *ack_pkt;
 	int err = 0;
 
@@ -322,13 +334,27 @@ free_nrf_ack:
 	return err;
 }
 
+static void nrf5_tx_started(struct device *dev,
+			    struct net_pkt *pkt,
+			    struct net_buf *frag)
+{
+	ARG_UNUSED(pkt);
+
+	if (nrf5_data.event_handler) {
+		nrf5_data.event_handler(dev, IEEE802154_EVENT_TX_STARTED,
+					(void *)frag);
+	}
+}
+
 static int nrf5_tx(struct device *dev,
+		   enum ieee802154_tx_mode mode,
 		   struct net_pkt *pkt,
 		   struct net_buf *frag)
 {
 	struct nrf5_802154_data *nrf5_radio = NRF5_802154_DATA(dev);
-	u8_t payload_len = frag->len;
-	u8_t *payload = frag->data;
+	uint8_t payload_len = frag->len;
+	uint8_t *payload = frag->data;
+	bool ret = true;
 
 	LOG_DBG("%p (%u)", payload, payload_len);
 
@@ -338,24 +364,35 @@ static int nrf5_tx(struct device *dev,
 	/* Reset semaphore in case ACK was received after timeout */
 	k_sem_reset(&nrf5_radio->tx_wait);
 
-	if (!nrf_802154_transmit_raw(nrf5_radio->tx_psdu, false)) {
+	switch (mode) {
+	case IEEE802154_TX_MODE_DIRECT:
+		ret = nrf_802154_transmit_raw(nrf5_radio->tx_psdu, false);
+		break;
+	case IEEE802154_TX_MODE_CCA:
+		ret = nrf_802154_transmit_raw(nrf5_radio->tx_psdu, true);
+		break;
+	case IEEE802154_TX_MODE_CSMA_CA:
+		nrf_802154_transmit_csma_ca_raw(nrf5_radio->tx_psdu);
+		break;
+	case IEEE802154_TX_MODE_TXTIME:
+	case IEEE802154_TX_MODE_TXTIME_CCA:
+	default:
+		NET_ERR("TX mode %d not supported", mode);
+		return -ENOTSUP;
+	}
+
+	if (!ret) {
 		LOG_ERR("Cannot send frame");
 		return -EIO;
 	}
 
+	nrf5_tx_started(dev, pkt, frag);
+
 	LOG_DBG("Sending frame (ch:%d, txpower:%d)",
 		nrf_802154_channel_get(), nrf_802154_tx_power_get());
 
-	/* Wait for ack to be received */
-	if (k_sem_take(&nrf5_radio->tx_wait, ACK_TIMEOUT)) {
-		LOG_DBG("ACK not received");
-
-		if (!nrf_802154_receive()) {
-			LOG_ERR("Failed to switch back to receive state");
-		}
-
-		return -EIO;
-	}
+	/* Wait for the callback from the radio driver. */
+	k_sem_take(&nrf5_radio->tx_wait, K_FOREVER);
 
 	LOG_DBG("Result: %d", nrf5_data.tx_result);
 
@@ -401,20 +438,24 @@ static int nrf5_stop(struct device *dev)
 	return 0;
 }
 
+#ifndef CONFIG_IEEE802154_NRF5_EXT_IRQ_MGMT
 static void nrf5_radio_irq(void *arg)
 {
 	ARG_UNUSED(arg);
 
 	nrf_802154_radio_irq_handler();
 }
+#endif
 
 static void nrf5_irq_config(struct device *dev)
 {
 	ARG_UNUSED(dev);
 
+#ifndef CONFIG_IEEE802154_NRF5_EXT_IRQ_MGMT
 	IRQ_CONNECT(RADIO_IRQn, NRF_802154_IRQ_PRIORITY,
 		    nrf5_radio_irq, NULL, 0);
 	irq_enable(RADIO_IRQn);
+#endif
 }
 
 static int nrf5_init(struct device *dev)
@@ -435,7 +476,7 @@ static int nrf5_init(struct device *dev)
 			nrf5_rx_thread, dev, NULL, NULL,
 			K_PRIO_COOP(2), 0, K_NO_WAIT);
 
-	k_thread_name_set(&nrf5_radio->rx_thread, "802154 RX");
+	k_thread_name_set(&nrf5_radio->rx_thread, "nrf5_rx");
 
 	LOG_INF("nRF5 802154 radio initialized");
 
@@ -456,13 +497,30 @@ static void nrf5_iface_init(struct net_if *iface)
 	ieee802154_init(iface);
 }
 
-int nrf5_configure(struct device *dev, enum ieee802154_config_type type,
-		   const struct ieee802154_config *config)
+static int nrf5_configure(struct device *dev, enum ieee802154_config_type type,
+			  const struct ieee802154_config *config)
 {
 	ARG_UNUSED(dev);
 
 	switch (type) {
 	case IEEE802154_CONFIG_AUTO_ACK_FPB:
+		if (config->auto_ack_fpb.enabled) {
+			switch (config->auto_ack_fpb.mode) {
+			case IEEE802154_FPB_ADDR_MATCH_THREAD:
+				nrf_802154_src_addr_matching_method_set(
+					NRF_802154_SRC_ADDR_MATCH_THREAD);
+				break;
+
+			case IEEE802154_FPB_ADDR_MATCH_ZIGBEE:
+				nrf_802154_src_addr_matching_method_set(
+					NRF_802154_SRC_ADDR_MATCH_ZIGBEE);
+				break;
+
+			default:
+				return -EINVAL;
+			}
+		}
+
 		nrf_802154_auto_pending_bit_set(config->auto_ack_fpb.enabled);
 		break;
 
@@ -490,6 +548,17 @@ int nrf5_configure(struct device *dev, enum ieee802154_config_type type,
 
 		break;
 
+	case IEEE802154_CONFIG_PAN_COORDINATOR:
+		nrf_802154_pan_coord_set(config->pan_coordinator);
+		break;
+
+	case IEEE802154_CONFIG_PROMISCUOUS:
+		nrf_802154_promiscuous_set(config->promiscuous);
+		break;
+
+	case IEEE802154_CONFIG_EVENT_HANDLER:
+		nrf5_data.event_handler = config->event_handler;
+
 	default:
 		return -EINVAL;
 	}
@@ -499,16 +568,27 @@ int nrf5_configure(struct device *dev, enum ieee802154_config_type type,
 
 /* nRF5 radio driver callbacks */
 
-void nrf_802154_received_raw(uint8_t *data, int8_t power, uint8_t lqi)
+void nrf_802154_received_timestamp_raw(uint8_t *data, int8_t power, uint8_t lqi,
+				       uint32_t time)
 {
-	for (u32_t i = 0; i < ARRAY_SIZE(nrf5_data.rx_frames); i++) {
+	for (uint32_t i = 0; i < ARRAY_SIZE(nrf5_data.rx_frames); i++) {
 		if (nrf5_data.rx_frames[i].psdu != NULL) {
 			continue;
 		}
 
 		nrf5_data.rx_frames[i].psdu = data;
+		nrf5_data.rx_frames[i].time = time;
 		nrf5_data.rx_frames[i].rssi = power;
 		nrf5_data.rx_frames[i].lqi = lqi;
+
+		if (data[ACK_REQUEST_BYTE] & ACK_REQUEST_BIT) {
+			nrf5_data.rx_frames[i].ack_fpb =
+						nrf5_data.last_frame_ack_fpb;
+		} else {
+			nrf5_data.rx_frames[i].ack_fpb = false;
+		}
+
+		nrf5_data.last_frame_ack_fpb = false;
 
 		k_fifo_put(&nrf5_data.rx_fifo, &nrf5_data.rx_frames[i]);
 
@@ -520,7 +600,13 @@ void nrf_802154_received_raw(uint8_t *data, int8_t power, uint8_t lqi)
 
 void nrf_802154_receive_failed(nrf_802154_rx_error_t error)
 {
-	/* Intentionally empty. */
+	nrf5_data.last_frame_ack_fpb = false;
+}
+
+void nrf_802154_tx_ack_started(const uint8_t *data)
+{
+	nrf5_data.last_frame_ack_fpb =
+				data[FRAME_PENDING_BYTE] & FRAME_PENDING_BIT;
 }
 
 void nrf_802154_transmitted_raw(const uint8_t *frame, uint8_t *ack,
@@ -567,7 +653,7 @@ void nrf_802154_cca_failed(nrf_802154_cca_error_t error)
 void nrf_802154_energy_detected(uint8_t result)
 {
 	if (nrf5_data.energy_scan_done != NULL) {
-		s16_t dbm;
+		int16_t dbm;
 		energy_scan_done_cb_t callback = nrf5_data.energy_scan_done;
 
 		nrf5_data.energy_scan_done = NULL;
@@ -601,9 +687,7 @@ static struct ieee802154_radio_api nrf5_radio_api = {
 	.start = nrf5_start,
 	.stop = nrf5_stop,
 	.tx = nrf5_tx,
-#ifdef CONFIG_NET_L2_OPENTHREAD
 	.ed_scan = nrf5_energy_scan_start,
-#endif /* CONFIG_NET_L2_OPENTHREAD */
 	.configure = nrf5_configure,
 };
 
@@ -619,7 +703,7 @@ static struct ieee802154_radio_api nrf5_radio_api = {
 
 #if defined(CONFIG_NET_L2_IEEE802154) || defined(CONFIG_NET_L2_OPENTHREAD)
 NET_DEVICE_INIT(nrf5_154_radio, CONFIG_IEEE802154_NRF5_DRV_NAME,
-		nrf5_init, &nrf5_data, &nrf5_radio_cfg,
+		nrf5_init, device_pm_control_nop, &nrf5_data, &nrf5_radio_cfg,
 		CONFIG_IEEE802154_NRF5_INIT_PRIO,
 		&nrf5_radio_api, L2,
 		L2_CTX_TYPE, MTU);

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT sifive_spi0
+
 #define LOG_LEVEL CONFIG_SPI_LOG_LEVEL
 #include <logging/log.h>
 LOG_MODULE_REGISTER(spi_sifive);
@@ -14,9 +16,9 @@ LOG_MODULE_REGISTER(spi_sifive);
 
 /* Helper Functions */
 
-static inline void sys_set_mask(mem_addr_t addr, u32_t mask, u32_t value)
+static inline void sys_set_mask(mem_addr_t addr, uint32_t mask, uint32_t value)
 {
-	u32_t temp = sys_read32(addr);
+	uint32_t temp = sys_read32(addr);
 
 	temp &= ~(mask);
 	temp |= value;
@@ -24,10 +26,10 @@ static inline void sys_set_mask(mem_addr_t addr, u32_t mask, u32_t value)
 	sys_write32(temp, addr);
 }
 
-int spi_config(struct device *dev, u32_t frequency, u16_t operation)
+int spi_config(struct device *dev, uint32_t frequency, uint16_t operation)
 {
-	u32_t div;
-	u32_t fmt_len;
+	uint32_t div;
+	uint32_t fmt_len;
 
 	if (SPI_OP_MODE_GET(operation) != SPI_OP_MODE_MASTER) {
 		return -ENOTSUP;
@@ -91,35 +93,35 @@ int spi_config(struct device *dev, u32_t frequency, u16_t operation)
 	return 0;
 }
 
-void spi_sifive_send(struct device *dev, u16_t frame)
+void spi_sifive_send(struct device *dev, uint16_t frame)
 {
-	while (SPI_REG(dev, REG_TXDATA) & SF_TXDATA_FULL) {
+	while (sys_read32(SPI_REG(dev, REG_TXDATA)) & SF_TXDATA_FULL) {
 	}
 
-	sys_write32((u32_t) frame, SPI_REG(dev, REG_TXDATA));
+	sys_write32((uint32_t) frame, SPI_REG(dev, REG_TXDATA));
 }
 
-u16_t spi_sifive_recv(struct device *dev)
+uint16_t spi_sifive_recv(struct device *dev)
 {
-	u32_t val;
+	uint32_t val;
 
 	while ((val = sys_read32(SPI_REG(dev, REG_RXDATA))) & SF_RXDATA_EMPTY) {
 	}
 
-	return (u16_t) val;
+	return (uint16_t) val;
 }
 
 void spi_sifive_xfer(struct device *dev, const bool hw_cs_control)
 {
 	struct spi_context *ctx = &SPI_DATA(dev)->ctx;
 
-	u32_t send_len = spi_context_longest_current_buf(ctx);
+	uint32_t send_len = spi_context_longest_current_buf(ctx);
 
-	for (u32_t i = 0; i < send_len; i++) {
+	for (uint32_t i = 0; i < send_len; i++) {
 
 		/* Send a frame */
 		if (i < ctx->tx_len) {
-			spi_sifive_send(dev, (u16_t) (ctx->tx_buf)[i]);
+			spi_sifive_send(dev, (uint16_t) (ctx->tx_buf)[i]);
 		} else {
 			/* Send dummy bytes */
 			spi_sifive_send(dev, 0);
@@ -127,7 +129,7 @@ void spi_sifive_xfer(struct device *dev, const bool hw_cs_control)
 
 		/* Receive a frame */
 		if (i < ctx->rx_len) {
-			ctx->rx_buf[i] = (u8_t) spi_sifive_recv(dev);
+			ctx->rx_buf[i] = (uint8_t) spi_sifive_recv(dev);
 		} else {
 			/* Discard returned value */
 			spi_sifive_recv(dev);
@@ -241,11 +243,11 @@ static struct spi_driver_api spi_sifive_api = {
 		SPI_CONTEXT_INIT_SYNC(spi_sifive_data_##n, ctx), \
 	}; \
 	static struct spi_sifive_cfg spi_sifive_cfg_##n = { \
-		.base = DT_INST_##n##_SIFIVE_SPI0_CONTROL_BASE_ADDRESS, \
-		.f_sys = DT_INST_##n##_SIFIVE_SPI0_CLOCK_FREQUENCY, \
+		.base = DT_INST_REG_ADDR_BY_NAME(n, control), \
+		.f_sys = DT_INST_PROP(n, clock_frequency), \
 	}; \
 	DEVICE_AND_API_INIT(spi_##n, \
-			DT_INST_##n##_SIFIVE_SPI0_LABEL, \
+			DT_INST_LABEL(n), \
 			spi_sifive_init, \
 			&spi_sifive_data_##n, \
 			&spi_sifive_cfg_##n, \
@@ -254,21 +256,21 @@ static struct spi_driver_api spi_sifive_api = {
 			&spi_sifive_api)
 
 #ifndef CONFIG_SIFIVE_SPI_0_ROM
-#ifdef DT_INST_0_SIFIVE_SPI0_LABEL
+#if DT_INST_NODE_HAS_PROP(0, label)
 
 SPI_INIT(0);
 
-#endif /* DT_INST_0_SIFIVE_SPI0_LABEL */
+#endif /* DT_INST_NODE_HAS_PROP(0, label) */
 #endif /* !CONFIG_SIFIVE_SPI_0_ROM */
 
-#ifdef DT_INST_1_SIFIVE_SPI0_LABEL
+#if DT_INST_NODE_HAS_PROP(1, label)
 
 SPI_INIT(1);
 
-#endif /* DT_INST_1_SIFIVE_SPI0_LABEL */
+#endif /* DT_INST_NODE_HAS_PROP(1, label) */
 
-#ifdef DT_INST_2_SIFIVE_SPI0_LABEL
+#if DT_INST_NODE_HAS_PROP(2, label)
 
 SPI_INIT(2);
 
-#endif /* DT_INST_2_SIFIVE_SPI0_LABEL */
+#endif /* DT_INST_NODE_HAS_PROP(2, label) */

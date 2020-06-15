@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT intel_e1000
+
 #define LOG_MODULE_NAME eth_e1000
 #define LOG_LEVEL CONFIG_ETHERNET_LOG_LEVEL
 #include <logging/log.h>
@@ -109,7 +111,7 @@ static struct net_pkt *e1000_rx(struct e1000_dev *dev)
 		goto out;
 	}
 
-	buf = INT_TO_POINTER((u32_t)dev->rx.addr);
+	buf = INT_TO_POINTER((uint32_t)dev->rx.addr);
 	len = dev->rx.len - 4;
 
 	if (len <= 0) {
@@ -139,7 +141,7 @@ out:
 static void e1000_isr(struct device *device)
 {
 	struct e1000_dev *dev = device->driver_data;
-	u32_t icr = ior32(dev, ICR); /* Cleared upon read */
+	uint32_t icr = ior32(dev, ICR); /* Cleared upon read */
 
 	icr &= ~(ICR_TXDW | ICR_TXQE);
 
@@ -180,18 +182,18 @@ int e1000_probe(struct device *device)
 	return retval;
 }
 
-static struct device DEVICE_NAME_GET(eth_e1000);
+DEVICE_DECLARE(eth_e1000);
 
 static void e1000_init(struct net_if *iface)
 {
 	struct e1000_dev *dev = net_if_get_device(iface)->driver_data;
-	u32_t ral, rah;
+	uint32_t ral, rah;
 
 	dev->iface = iface;
 
 	/* Setup TX descriptor */
 
-	iow32(dev, TDBAL, (u32_t) &dev->tx);
+	iow32(dev, TDBAL, (uint32_t) &dev->tx);
 	iow32(dev, TDBAH, 0);
 	iow32(dev, TDLEN, 1*16);
 
@@ -205,7 +207,7 @@ static void e1000_init(struct net_if *iface)
 	dev->rx.addr = POINTER_TO_INT(dev->rxb);
 	dev->rx.len = sizeof(dev->rxb);
 
-	iow32(dev, RDBAL, (u32_t) &dev->rx);
+	iow32(dev, RDBAL, (uint32_t) &dev->rx);
 	iow32(dev, RDBAH, 0);
 	iow32(dev, RDLEN, 1*16);
 
@@ -225,12 +227,12 @@ static void e1000_init(struct net_if *iface)
 	net_if_set_link_addr(iface, dev->mac, sizeof(dev->mac),
 				NET_LINK_ETHERNET);
 
-	IRQ_CONNECT(DT_INST_0_INTEL_E1000_IRQ_0,
-			DT_INST_0_INTEL_E1000_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+			DT_INST_IRQ(0, priority),
 			e1000_isr, DEVICE_GET(eth_e1000),
-			DT_INST_0_INTEL_E1000_IRQ_0_SENSE);
+			DT_INST_IRQ(0, sense));
 
-	irq_enable(DT_INST_0_INTEL_E1000_IRQ_0);
+	irq_enable(DT_INST_IRQN(0));
 
 	iow32(dev, CTRL, CTRL_SLU); /* Set link up */
 
@@ -250,6 +252,7 @@ static const struct ethernet_api e1000_api = {
 NET_DEVICE_INIT(eth_e1000,
 		"ETH_0",
 		e1000_probe,
+		device_pm_control_nop,
 		&e1000_dev,
 		NULL,
 		CONFIG_ETH_INIT_PRIORITY,

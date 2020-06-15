@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <logging/log.h>
-LOG_MODULE_REGISTER(net_ppp_mgmt, CONFIG_NET_L2_PPP_LOG_LEVEL);
-
 #include <net/ppp.h>
 
 void ppp_mgmt_raise_carrier_on_event(struct net_if *iface)

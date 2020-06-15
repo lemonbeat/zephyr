@@ -17,11 +17,17 @@ LOG_MODULE_DECLARE(espi, CONFIG_ESPI_LOG_LEVEL);
 /* eSPI host entity address  */
 #define DEST_SLV_ADDR         0x02u
 #define SRC_SLV_ADDR          0x21u
+
 /* Temperature command opcode */
 #define OOB_CMDCODE           0x01u
 
 /* Maximum bytes for OOB transactions */
 #define MAX_RESP_SIZE         20u
+
+/* eSPI flash parameters */
+#define MAX_TEST_BUF_SIZE     1024u
+#define MAX_FLASH_REQUEST     64u
+#define TARGET_FLASH_REGION   0x72000ul
 
 /* 20 MHz */
 #define MIN_ESPI_FREQ         20u
@@ -36,15 +42,15 @@ LOG_MODULE_DECLARE(espi, CONFIG_ESPI_LOG_LEVEL);
 #define EVENT_DETAILS(x)      ((x & EVENT_DETAILS_MASK) >> EVENT_DETAILS_POS)
 
 struct oob_header {
-	u8_t dest_slave_addr;
-	u8_t oob_cmd_code;
-	u8_t byte_cnt;
-	u8_t src_slave_addr;
+	uint8_t dest_slave_addr;
+	uint8_t oob_cmd_code;
+	uint8_t byte_cnt;
+	uint8_t src_slave_addr;
 };
 
 struct oob_response {
 	struct oob_header hdr;
-	u8_t buf[MAX_RESP_SIZE];
+	uint8_t buf[MAX_RESP_SIZE];
 };
 
 #ifdef CONFIG_ESPI_GPIO_DEV_NEEDED
@@ -59,8 +65,14 @@ static struct espi_callback vw_rdy_cb;
 static struct espi_callback vw_cb;
 static struct espi_callback p80_cb;
 
-static u8_t espi_rst_sts;
-static void host_warn_handler(u32_t signal, u32_t status)
+static uint8_t espi_rst_sts;
+
+#ifdef CONFIG_ESPI_FLASH_CHANNEL
+static uint8_t flash_write_buf[MAX_TEST_BUF_SIZE];
+static uint8_t flash_read_buf[MAX_TEST_BUF_SIZE];
+#endif
+
+static void host_warn_handler(uint32_t signal, uint32_t status)
 {
 	switch (signal) {
 	case ESPI_VWIRE_SIGNAL_HOST_RST_WARN:
@@ -103,6 +115,8 @@ static void espi_ch_handler(struct device *dev, struct espi_callback *cb,
 	if (event.evt_type == ESPI_BUS_EVENT_CHANNEL_READY) {
 		if (event.evt_details == ESPI_CHANNEL_VWIRE) {
 			LOG_INF("VW channel is ready");
+		} else if (event.evt_details == ESPI_CHANNEL_FLASH) {
+			LOG_INF("Flash channel is ready");
 		}
 	}
 }
@@ -134,8 +148,8 @@ static void vwire_handler(struct device *dev, struct espi_callback *cb,
 static void periph_handler(struct device *dev, struct espi_callback *cb,
 			   struct espi_event event)
 {
-	u8_t periph_type;
-	u8_t periph_index;
+	uint8_t periph_type;
+	uint8_t periph_index;
 
 	periph_type = EVENT_TYPE(event.evt_details);
 	periph_index = EVENT_DETAILS(event.evt_details);
@@ -166,9 +180,19 @@ int espi_init(void)
 		MIN_ESPI_FREQ,
 	};
 
+	/* If eSPI driver supports additional capabilities use them */
+#ifdef CONFIG_ESPI_OOB_CHANNEL
+	cfg.channel_caps |= ESPI_CHANNEL_OOB;
+#endif
+#ifdef CONFIG_ESPI_FLASH_CHANNEL
+	cfg.channel_caps |= ESPI_CHANNEL_FLASH;
+#endif
+
 	ret = espi_config(espi_dev, &cfg);
 	if (ret) {
-		LOG_WRN("Failed to configure eSPI slave! error (%d)", ret);
+		LOG_ERR("Failed to configure eSPI slave channels:%x err: %d",
+			cfg.channel_caps, ret);
+		return ret;
 	} else {
 		LOG_INF("eSPI slave configured successfully!");
 	}
@@ -193,11 +217,11 @@ int espi_init(void)
 	return ret;
 }
 
-static int wait_for_pin(struct device *dev, u8_t pin, u16_t timeout,
-			u32_t exp_level)
+static int wait_for_pin(struct device *dev, uint8_t pin, uint16_t timeout,
+			int exp_level)
 {
-	u16_t loop_cnt = timeout;
-	u32_t level;
+	uint16_t loop_cnt = timeout;
+	int level;
 
 	do {
 		level = gpio_pin_get(dev, pin);
@@ -225,16 +249,16 @@ static int wait_for_pin(struct device *dev, u8_t pin, u16_t timeout,
 
 static int wait_for_vwire(struct device *espi_dev,
 			  enum espi_vwire_signal signal,
-			  u16_t timeout, u8_t exp_level)
+			  uint16_t timeout, uint8_t exp_level)
 {
 	int ret;
-	u8_t level;
-	u16_t loop_cnt = timeout;
+	uint8_t level;
+	uint16_t loop_cnt = timeout;
 
 	do {
 		ret = espi_receive_vwire(espi_dev, signal, &level);
 		if (ret) {
-			LOG_WRN("Failed to read %x %d", signal, ret);
+			LOG_ERR("Failed to read %x %d", signal, ret);
 			return -EIO;
 		}
 
@@ -247,16 +271,16 @@ static int wait_for_vwire(struct device *espi_dev,
 	} while (loop_cnt > 0);
 
 	if (loop_cnt == 0) {
-		LOG_WRN("VWIRE %d is %x", signal, level);
+		LOG_ERR("VWIRE %d is %x", signal, level);
 		return -ETIMEDOUT;
 	}
 
 	return 0;
 }
 
-static int wait_for_espi_reset(u8_t exp_sts)
+static int wait_for_espi_reset(uint8_t exp_sts)
 {
-	u16_t loop_cnt = CONFIG_ESPI_VIRTUAL_WIRE_TIMEOUT;
+	uint16_t loop_cnt = CONFIG_ESPI_VIRTUAL_WIRE_TIMEOUT;
 
 	do {
 		if (exp_sts == espi_rst_sts) {
@@ -281,7 +305,7 @@ int espi_handshake(void)
 	ret = wait_for_vwire(espi_dev, ESPI_VWIRE_SIGNAL_SUS_WARN,
 			     CONFIG_ESPI_VIRTUAL_WIRE_TIMEOUT, 1);
 	if (ret) {
-		LOG_WRN("SUS_WARN Timeout");
+		LOG_ERR("SUS_WARN Timeout");
 		return ret;
 	}
 
@@ -289,27 +313,147 @@ int espi_handshake(void)
 	ret = wait_for_vwire(espi_dev, ESPI_VWIRE_SIGNAL_SLP_S5,
 			     CONFIG_ESPI_VIRTUAL_WIRE_TIMEOUT, 1);
 	if (ret) {
-		LOG_WRN("SLP_S5 Timeout");
+		LOG_ERR("SLP_S5 Timeout");
 		return ret;
 	}
 
 	ret = wait_for_vwire(espi_dev, ESPI_VWIRE_SIGNAL_SLP_S4,
 			     CONFIG_ESPI_VIRTUAL_WIRE_TIMEOUT, 1);
 	if (ret) {
-		LOG_WRN("SLP_S4 Timeout");
+		LOG_ERR("SLP_S4 Timeout");
 		return ret;
 	}
 
 	ret = wait_for_vwire(espi_dev, ESPI_VWIRE_SIGNAL_SLP_S3,
 			     CONFIG_ESPI_VIRTUAL_WIRE_TIMEOUT, 1);
 	if (ret) {
-		LOG_WRN("SLP_S3 Timeout");
+		LOG_ERR("SLP_S3 Timeout");
 		return ret;
 	}
 
 	LOG_INF("2nd phase completed");
+
+	ret = wait_for_vwire(espi_dev, ESPI_VWIRE_SIGNAL_PLTRST,
+			     CONFIG_ESPI_VIRTUAL_WIRE_TIMEOUT, 1);
+	if (ret) {
+		LOG_ERR("PLT_RST Timeout");
+		return ret;
+	}
+
+	LOG_INF("3rd phase completed");
+
 	return 0;
 }
+
+#ifdef CONFIG_ESPI_FLASH_CHANNEL
+int read_test_block(uint8_t *buf, uint32_t start_flash_adr, uint16_t block_len)
+{
+	uint8_t i = 0;
+	uint32_t flash_addr = start_flash_adr;
+	uint16_t transactions = block_len/MAX_FLASH_REQUEST;
+	int ret = 0;
+	struct espi_flash_packet pckt;
+
+	for (i = 0; i < transactions; i++) {
+		pckt.buf = buf;
+		pckt.flash_addr = flash_addr;
+		pckt.len = MAX_FLASH_REQUEST;
+
+		ret = espi_read_flash(espi_dev, &pckt);
+		if (ret) {
+			LOG_ERR("espi_read_flash failed: %d", ret);
+			return ret;
+		}
+
+		buf += MAX_FLASH_REQUEST;
+		flash_addr += MAX_FLASH_REQUEST;
+	}
+
+	LOG_INF("%d read flash transactions completed", transactions);
+	return 0;
+}
+
+int write_test_block(uint8_t *buf, uint32_t start_flash_adr, uint16_t block_len)
+{
+	uint8_t i = 0;
+	uint32_t flash_addr = start_flash_adr;
+	uint16_t transactions = block_len/MAX_FLASH_REQUEST;
+	int ret = 0;
+	struct espi_flash_packet pckt;
+
+	/* Split operation in multiple MAX_FLASH_REQ transactions */
+	for (i = 0; i < transactions; i++) {
+		pckt.buf = buf;
+		pckt.flash_addr = flash_addr;
+		pckt.len = MAX_FLASH_REQUEST;
+
+		ret = espi_write_flash(espi_dev, &pckt);
+		if (ret) {
+			LOG_ERR("espi_write_flash failed: %d", ret);
+			return ret;
+		}
+
+		buf += MAX_FLASH_REQUEST;
+		flash_addr += MAX_FLASH_REQUEST;
+	}
+
+	LOG_INF("%d write flash transactions completed", transactions);
+	return 0;
+}
+
+static int espi_flash_test(uint32_t start_flash_addr, uint8_t blocks)
+{
+	uint8_t i;
+	uint8_t pattern;
+	uint32_t flash_addr;
+	int ret = 0;
+
+	LOG_INF("Test eSPI write flash");
+	flash_addr = start_flash_addr;
+	pattern = 0x99;
+	for (i = 0; i <= blocks; i++) {
+		memset(flash_write_buf, pattern++, sizeof(flash_write_buf));
+		ret = write_test_block(flash_write_buf, flash_addr,
+				       sizeof(flash_write_buf));
+		if (ret) {
+			LOG_ERR("Failed to write to eSPI");
+			return ret;
+		}
+
+		flash_addr += sizeof(flash_write_buf);
+	}
+
+	LOG_INF("Test eSPI read flash");
+	flash_addr = start_flash_addr;
+	pattern = 0x99;
+	for (i = 0; i <= blocks; i++) {
+		/* Set expected content */
+		memset(flash_write_buf, pattern, sizeof(flash_write_buf));
+		/* Clear last read content */
+		memset(flash_read_buf, 0, sizeof(flash_read_buf));
+		ret = read_test_block(flash_read_buf, flash_addr,
+				      sizeof(flash_read_buf));
+		if (ret) {
+			LOG_ERR("Failed to read from eSPI");
+			return ret;
+		}
+
+		/* Compare buffers  */
+		int cmp = memcmp(flash_write_buf, flash_read_buf,
+				 sizeof(flash_write_buf));
+
+		if (cmp != 0) {
+			LOG_ERR("eSPI read mismmatch at %d expected %x",
+				cmp, pattern);
+		}
+
+		flash_addr += sizeof(flash_read_buf);
+		pattern++;
+	}
+
+	return 0;
+}
+#endif /* CONFIG_ESPI_FLASH_CHANNEL */
 
 int get_pch_temp(struct device *dev)
 {
@@ -327,23 +471,24 @@ int get_pch_temp(struct device *dev)
 	oob_hdr.src_slave_addr = SRC_SLV_ADDR;
 
 	/* Packetize OOB request */
-	req_pckt.buf = (u8_t *)&oob_hdr;
+	req_pckt.buf = (uint8_t *)&oob_hdr;
 	req_pckt.len = sizeof(struct oob_header);
-	resp_pckt.buf = (u8_t *)&rsp;
+	resp_pckt.buf = (uint8_t *)&rsp;
 	resp_pckt.len = MAX_RESP_SIZE;
 
-	ret = espi_send_oob(dev, req_pckt);
+	ret = espi_send_oob(dev, &req_pckt);
 	if (ret) {
 		LOG_ERR("OOB Tx failed %d", ret);
 		return ret;
 	}
 
-	ret = espi_receive_oob(dev, resp_pckt);
+	ret = espi_receive_oob(dev, &resp_pckt);
 	if (ret) {
 		LOG_ERR("OOB Rx failed %d", ret);
 		return ret;
 	}
 
+	LOG_INF("OOB transaction completed rcvd: %d bytes", resp_pckt.len);
 	for (int i = 0; i < resp_pckt.len; i++) {
 		LOG_INF("%x ", rsp.buf[i]);
 	}
@@ -354,6 +499,11 @@ int get_pch_temp(struct device *dev)
 int espi_test(void)
 {
 	int ret;
+
+	/* Account for the time serial port is detected so log messages can
+	 * be seen
+	 */
+	k_sleep(K_SECONDS(1));
 
 #ifdef CONFIG_ESPI_GPIO_DEV_NEEDED
 	gpio_dev0 = device_get_binding(CONFIG_ESPI_GPIO_DEV0);
@@ -416,18 +566,45 @@ int espi_test(void)
 #endif
 	ret = wait_for_espi_reset(1);
 	if (ret) {
-		LOG_ERR("ESPI_RESET timeout");
+		LOG_INF("ESPI_RESET timeout");
 		return ret;
 	}
 
+#ifdef CONFIG_ESPI_FLASH_CHANNEL
+	/* Flash operation need to be perform before VW handshake or
+	 * after eSPI host completes full initialization.
+	 * This sample code can't assume a full initialized eSPI host
+	 * so flash operations are perform here.
+	 */
+	bool flash_sts;
+
+	do {
+		flash_sts = espi_get_channel_status(espi_dev,
+						    ESPI_CHANNEL_FLASH);
+		k_busy_wait(100);
+	} while (!flash_sts);
+
+	/* eSPI flash test can fail and rest of operation can continue */
+	ret = espi_flash_test(TARGET_FLASH_REGION, 1);
+	if (ret) {
+		LOG_INF("eSPI flash test failed %d", ret);
+	}
+#endif
+
+	/* Showcase VW channel by exchanging virtual wires with eSPI host */
 	ret = espi_handshake();
 	if (ret) {
-		LOG_ERR("eSPI handshake failed %d", ret);
+		LOG_ERR("eSPI VW handshake failed %d", ret);
 		return ret;
 	}
 
-	/*  Attempt anyways to test failure case */
-	get_pch_temp(espi_dev);
+	/*  Attempt to use OOB channel to read temperature, regardless of
+	 * if is enabled or not.
+	 */
+	ret = get_pch_temp(espi_dev);
+	if (ret)  {
+		LOG_ERR("eSPI OOB transaction failed %d", ret);
+	}
 
 	/* Cleanup */
 	k_sleep(K_SECONDS(1));
@@ -435,7 +612,9 @@ int espi_test(void)
 	espi_remove_callback(espi_dev, &vw_rdy_cb);
 	espi_remove_callback(espi_dev, &vw_cb);
 
-	return 0;
+	LOG_INF("eSPI sample completed err: %d", ret);
+
+	return ret;
 }
 
 void main(void)

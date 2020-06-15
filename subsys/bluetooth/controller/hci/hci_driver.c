@@ -62,16 +62,11 @@ static K_THREAD_STACK_DEFINE(prio_recv_thread_stack,
 struct k_thread recv_thread_data;
 static K_THREAD_STACK_DEFINE(recv_thread_stack, CONFIG_BT_RX_STACK_SIZE);
 
-#if defined(CONFIG_INIT_STACKS) && defined(CONFIG_THREAD_STACK_INFO)
-static u32_t prio_ts;
-static u32_t rx_ts;
-#endif
-
 #if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)
 static struct k_poll_signal hbuf_signal =
 		K_POLL_SIGNAL_INITIALIZER(hbuf_signal);
 static sys_slist_t hbuf_pend;
-static s32_t hbuf_count;
+static int32_t hbuf_count;
 #endif
 
 static struct net_buf *process_prio_evt(struct node_rx_pdu *node_rx)
@@ -93,8 +88,8 @@ static void prio_recv_thread(void *p1, void *p2, void *p3)
 	while (1) {
 		struct node_rx_pdu *node_rx;
 		struct net_buf *buf;
-		u8_t num_cmplt;
-		u16_t handle;
+		uint8_t num_cmplt;
+		uint16_t handle;
 
 		/* While there are completed rx nodes */
 		while ((num_cmplt = ll_rx_get((void *)&node_rx, &handle))) {
@@ -120,9 +115,6 @@ static void prio_recv_thread(void *p1, void *p2, void *p3)
 
 			buf = process_prio_evt(node_rx);
 			if (buf) {
-#if defined(CONFIG_BT_LL_SW_LEGACY)
-				radio_rx_fc_set(node_rx->hdr.handle, 0);
-#endif /* CONFIG_BT_LL_SW_LEGACY */
 
 				node_rx->hdr.next = NULL;
 				ll_rx_mem_release((void **)&node_rx);
@@ -153,18 +145,11 @@ static void prio_recv_thread(void *p1, void *p2, void *p3)
 		k_sem_take(&sem_prio_recv, K_FOREVER);
 		/* Now, ULL mayfly has something to give to us */
 		BT_DBG("sem taken");
-
-#if defined(CONFIG_INIT_STACKS) && defined(CONFIG_THREAD_STACK_INFO)
-		if (k_uptime_get_32() - prio_ts > K_SECONDS(5)) {
-			log_stack_usage(&prio_recv_thread_data);
-			prio_ts = k_uptime_get_32();
-		}
-#endif
 	}
 }
 
 static inline struct net_buf *encode_node(struct node_rx_pdu *node_rx,
-					  s8_t class)
+					  int8_t class)
 {
 	struct net_buf *buf = NULL;
 
@@ -196,10 +181,6 @@ static inline struct net_buf *encode_node(struct node_rx_pdu *node_rx,
 		break;
 	}
 
-#if defined(CONFIG_BT_LL_SW_LEGACY)
-	radio_rx_fc_set(node_rx->hdr.handle, 0);
-#endif /* CONFIG_BT_LL_SW_LEGACY */
-
 	node_rx->hdr.next = NULL;
 	ll_rx_mem_release((void **)&node_rx);
 
@@ -208,7 +189,7 @@ static inline struct net_buf *encode_node(struct node_rx_pdu *node_rx,
 
 static inline struct net_buf *process_node(struct node_rx_pdu *node_rx)
 {
-	u8_t class = node_rx->hdr.user_meta;
+	uint8_t class = node_rx->hdr.user_meta;
 	struct net_buf *buf = NULL;
 
 #if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)
@@ -250,9 +231,9 @@ static inline struct net_buf *process_hbuf(struct node_rx_pdu *n)
 {
 	/* shadow total count in case of preemption */
 	struct node_rx_pdu *node_rx = NULL;
-	s32_t hbuf_total = hci_hbuf_total;
+	int32_t hbuf_total = hci_hbuf_total;
 	struct net_buf *buf = NULL;
-	u8_t class;
+	uint8_t class;
 	int reset;
 
 	reset = atomic_test_and_clear_bit(&hci_state_mask, HCI_STATE_BIT_RESET);
@@ -367,7 +348,7 @@ static void recv_thread(void *p1, void *p2, void *p3)
 			events[0].signal->signaled = 0U;
 		} else if (events[1].state ==
 			   K_POLL_STATE_FIFO_DATA_AVAILABLE) {
-			node_rx = k_fifo_get(events[1].fifo, 0);
+			node_rx = k_fifo_get(events[1].fifo, K_NO_WAIT);
 		}
 
 		events[0].state = K_POLL_STATE_NOT_READY;
@@ -397,13 +378,6 @@ static void recv_thread(void *p1, void *p2, void *p3)
 		}
 
 		k_yield();
-
-#if defined(CONFIG_INIT_STACKS) && defined(CONFIG_THREAD_STACK_INFO)
-		if (k_uptime_get_32() - rx_ts > K_SECONDS(5)) {
-			log_stack_usage(&recv_thread_data);
-			rx_ts = k_uptime_get_32();
-		}
-#endif
 	}
 }
 
@@ -445,7 +419,7 @@ static int acl_handle(struct net_buf *buf)
 
 static int hci_driver_send(struct net_buf *buf)
 {
-	u8_t type;
+	uint8_t type;
 	int err;
 
 	BT_DBG("enter");
@@ -481,7 +455,7 @@ static int hci_driver_send(struct net_buf *buf)
 
 static int hci_driver_open(void)
 {
-	u32_t err;
+	uint32_t err;
 
 	DEBUG_INIT();
 

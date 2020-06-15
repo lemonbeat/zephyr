@@ -28,7 +28,8 @@ extern const struct socket_op_vtable sock_fd_op_vtable;
 
 static const struct socket_op_vtable packet_sock_fd_op_vtable;
 
-static inline int k_fifo_wait_non_empty(struct k_fifo *fifo, int32_t timeout)
+static inline int k_fifo_wait_non_empty(struct k_fifo *fifo,
+					k_timeout_t timeout)
 {
 	struct k_poll_event events[] = {
 		K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_FIFO_DATA_AVAILABLE,
@@ -67,14 +68,6 @@ static int zpacket_socket(int family, int type, int proto)
 
 	/* recv_q and accept_q are in union */
 	k_fifo_init(&ctx->recv_q);
-
-#ifdef CONFIG_USERSPACE
-	/* Set net context object as initialized and grant access to the
-	 * calling thread (and only the calling thread)
-	 */
-	z_object_recycle(ctx);
-#endif
-
 	z_finalize_fd(fd, ctx,
 		      (const struct fd_op_vtable *)&packet_sock_fd_op_vtable);
 
@@ -146,7 +139,7 @@ ssize_t zpacket_sendto_ctx(struct net_context *ctx, const void *buf, size_t len,
 			   int flags, const struct sockaddr *dest_addr,
 			   socklen_t addrlen)
 {
-	s32_t timeout = K_FOREVER;
+	k_timeout_t timeout = K_FOREVER;
 	int status;
 
 	if (!dest_addr) {
@@ -179,12 +172,31 @@ ssize_t zpacket_sendto_ctx(struct net_context *ctx, const void *buf, size_t len,
 	return status;
 }
 
+ssize_t zpacket_sendmsg_ctx(struct net_context *ctx, const struct msghdr *msg,
+			    int flags)
+{
+	k_timeout_t timeout = K_FOREVER;
+	int status;
+
+	if ((flags & ZSOCK_MSG_DONTWAIT) || sock_is_nonblock(ctx)) {
+		timeout = K_NO_WAIT;
+	}
+
+	status = net_context_sendmsg(ctx, msg, flags, NULL, timeout, NULL);
+	if (status < 0) {
+		errno = -status;
+		return -1;
+	}
+
+	return status;
+}
+
 ssize_t zpacket_recvfrom_ctx(struct net_context *ctx, void *buf, size_t max_len,
 			     int flags, struct sockaddr *src_addr,
 			     socklen_t *addrlen)
 {
 	size_t recv_len = 0;
-	s32_t timeout = K_FOREVER;
+	k_timeout_t timeout = K_FOREVER;
 	struct net_pkt *pkt;
 
 	if ((flags & ZSOCK_MSG_DONTWAIT) || sock_is_nonblock(ctx)) {
@@ -314,6 +326,12 @@ static ssize_t packet_sock_sendto_vmeth(void *obj, const void *buf, size_t len,
 	return zpacket_sendto_ctx(obj, buf, len, flags, dest_addr, addrlen);
 }
 
+static ssize_t packet_sock_sendmsg_vmeth(void *obj, const struct msghdr *msg,
+					 int flags)
+{
+	return zpacket_sendmsg_ctx(obj, msg, flags);
+}
+
 static ssize_t packet_sock_recvfrom_vmeth(void *obj, void *buf, size_t max_len,
 					  int flags, struct sockaddr *src_addr,
 					  socklen_t *addrlen)
@@ -345,6 +363,7 @@ static const struct socket_op_vtable packet_sock_fd_op_vtable = {
 	.listen = packet_sock_listen_vmeth,
 	.accept = packet_sock_accept_vmeth,
 	.sendto = packet_sock_sendto_vmeth,
+	.sendmsg = packet_sock_sendmsg_vmeth,
 	.recvfrom = packet_sock_recvfrom_vmeth,
 	.getsockopt = packet_sock_getsockopt_vmeth,
 	.setsockopt = packet_sock_setsockopt_vmeth,

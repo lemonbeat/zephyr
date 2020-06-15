@@ -13,6 +13,7 @@ from runners.core import ZephyrBinaryRunner, MissingProgram
 # Keep this list sorted by runner name.
 from runners import blackmagicprobe
 from runners import bossac
+from runners import canopen_program
 from runners import dediprog
 from runners import dfu
 from runners import esp32
@@ -28,6 +29,7 @@ from runners import pyocd
 from runners import qemu
 from runners import stm32flash
 from runners import xtensa
+from runners import mdb
 
 def get_runner_cls(runner):
     '''Get a runner's class object, given its name.'''

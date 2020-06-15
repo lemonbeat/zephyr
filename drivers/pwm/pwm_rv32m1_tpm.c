@@ -7,6 +7,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT openisa_rv32m1_tpm
+
 #include <drivers/clock_control.h>
 #include <errno.h>
 #include <drivers/pwm.h>
@@ -26,23 +28,23 @@ struct rv32m1_tpm_config {
 	clock_control_subsys_t clock_subsys;
 	tpm_clock_source_t tpm_clock_source;
 	tpm_clock_prescale_t prescale;
-	u8_t channel_count;
+	uint8_t channel_count;
 	tpm_pwm_mode_t mode;
 };
 
 struct rv32m1_tpm_data {
-	u32_t clock_freq;
-	u32_t period_cycles;
+	uint32_t clock_freq;
+	uint32_t period_cycles;
 	tpm_chnl_pwm_signal_param_t channel[MAX_CHANNELS];
 };
 
-static int rv32m1_tpm_pin_set(struct device *dev, u32_t pwm,
-			      u32_t period_cycles, u32_t pulse_cycles,
+static int rv32m1_tpm_pin_set(struct device *dev, uint32_t pwm,
+			      uint32_t period_cycles, uint32_t pulse_cycles,
 			      pwm_flags_t flags)
 {
-	const struct rv32m1_tpm_config *config = dev->config->config_info;
+	const struct rv32m1_tpm_config *config = dev->config_info;
 	struct rv32m1_tpm_data *data = dev->driver_data;
-	u8_t duty_cycle;
+	uint8_t duty_cycle;
 
 	if ((period_cycles == 0U) || (pulse_cycles > period_cycles)) {
 		LOG_ERR("Invalid combination: period_cycles=%d, "
@@ -68,7 +70,7 @@ static int rv32m1_tpm_pin_set(struct device *dev, u32_t pwm,
 		pulse_cycles, period_cycles, duty_cycle, flags);
 
 	if (period_cycles != data->period_cycles) {
-		u32_t pwm_freq;
+		uint32_t pwm_freq;
 		status_t status;
 
 		if (data->period_cycles != 0) {
@@ -76,7 +78,7 @@ static int rv32m1_tpm_pin_set(struct device *dev, u32_t pwm,
 			LOG_WRN("Changing period cycles from %d to %d"
 				" affects all %d channels in %s",
 				data->period_cycles, period_cycles,
-				config->channel_count, dev->config->name);
+				config->channel_count, dev->name);
 		}
 
 		data->period_cycles = period_cycles;
@@ -113,10 +115,10 @@ static int rv32m1_tpm_pin_set(struct device *dev, u32_t pwm,
 	return 0;
 }
 
-static int rv32m1_tpm_get_cycles_per_sec(struct device *dev, u32_t pwm,
-					 u64_t *cycles)
+static int rv32m1_tpm_get_cycles_per_sec(struct device *dev, uint32_t pwm,
+					 uint64_t *cycles)
 {
-	const struct rv32m1_tpm_config *config = dev->config->config_info;
+	const struct rv32m1_tpm_config *config = dev->config_info;
 	struct rv32m1_tpm_data *data = dev->driver_data;
 
 	*cycles = data->clock_freq >> config->prescale;
@@ -126,7 +128,7 @@ static int rv32m1_tpm_get_cycles_per_sec(struct device *dev, u32_t pwm,
 
 static int rv32m1_tpm_init(struct device *dev)
 {
-	const struct rv32m1_tpm_config *config = dev->config->config_info;
+	const struct rv32m1_tpm_config *config = dev->config_info;
 	struct rv32m1_tpm_data *data = dev->driver_data;
 	tpm_chnl_pwm_signal_param_t *channel = data->channel;
 	struct device *clock_dev;
@@ -179,37 +181,23 @@ static const struct pwm_driver_api rv32m1_tpm_driver_api = {
 #define TPM_DEVICE(n) \
 	static const struct rv32m1_tpm_config rv32m1_tpm_config_##n = { \
 		.base =	(TPM_Type *) \
-			DT_INST_##n##_OPENISA_RV32M1_TPM_BASE_ADDRESS, \
+			DT_INST_REG_ADDR(n), \
 		.clock_name = \
-			DT_INST_##n##_OPENISA_RV32M1_TPM_CLOCK_CONTROLLER, \
+			DT_INST_CLOCKS_LABEL(n), \
 		.clock_subsys = (clock_control_subsys_t) \
-			DT_INST_##n##_OPENISA_RV32M1_TPM_CLOCK_NAME, \
+			DT_INST_CLOCKS_CELL(n, name), \
 		.tpm_clock_source = kTPM_SystemClock, \
 		.prescale = kTPM_Prescale_Divide_16, \
 		.channel_count = FSL_FEATURE_TPM_CHANNEL_COUNTn((TPM_Type *) \
-			DT_INST_##n##_OPENISA_RV32M1_TPM_BASE_ADDRESS), \
+			DT_INST_REG_ADDR(n)), \
 		.mode = kTPM_EdgeAlignedPwm, \
 	}; \
 	static struct rv32m1_tpm_data rv32m1_tpm_data_##n; \
 	DEVICE_AND_API_INIT(rv32m1_tpm_##n, \
-			    DT_INST_##n##_OPENISA_RV32M1_TPM_LABEL, \
+			    DT_INST_LABEL(n), \
 			    &rv32m1_tpm_init, &rv32m1_tpm_data_##n, \
 			    &rv32m1_tpm_config_##n, \
 			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
-			    &rv32m1_tpm_driver_api)
+			    &rv32m1_tpm_driver_api);
 
-#if DT_INST_0_OPENISA_RV32M1_TPM
-TPM_DEVICE(0);
-#endif /* DT_INST_0_OPENISA_RV32M1_TPM */
-
-#if DT_INST_1_OPENISA_RV32M1_TPM
-TPM_DEVICE(1);
-#endif /* DT_INST_1_OPENISA_RV32M1_TPM */
-
-#if DT_INST_2_OPENISA_RV32M1_TPM
-TPM_DEVICE(2);
-#endif /* DT_INST_2_OPENISA_RV32M1_TPM */
-
-#if DT_INST_3_OPENISA_RV32M1_TPM
-TPM_DEVICE(3);
-#endif /* DT_INST_3_OPENISA_RV32M1_TPM */
+DT_INST_FOREACH_STATUS_OKAY(TPM_DEVICE)

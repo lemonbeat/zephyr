@@ -67,7 +67,7 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
 	/* Align downward.  The API as specified requires a runtime check. */
 	top = (char *)(((unsigned int)top) & ~3);
 
-	z_new_thread_init(thread, base, sz, prio, opts);
+	z_new_thread_init(thread, base, sz);
 
 	thread->switch_handle = xtensa_init_stack((void *)top, entry,
 						  p1, p2, p3);
@@ -139,7 +139,7 @@ static inline unsigned int get_bits(int offset, int num_bits, unsigned int val)
 #define DEF_INT_C_HANDLER(l)				\
 void *xtensa_int##l##_c(void *interrupted_stack)	\
 {							   \
-	u32_t irqs, intenable, m;			   \
+	uint32_t irqs, intenable, m;			   \
 	__asm__ volatile("rsr.interrupt %0" : "=r"(irqs)); \
 	__asm__ volatile("rsr.intenable %0" : "=r"(intenable)); \
 	irqs &= intenable;					\
@@ -188,7 +188,7 @@ void *xtensa_excint1_c(int *interrupted_stack)
 		bsa[BSA_PC_OFF/4] += 3;
 
 	} else {
-		u32_t ps = bsa[BSA_PS_OFF/4];
+		uint32_t ps = bsa[BSA_PS_OFF/4];
 
 		__asm__ volatile("rsr.excvaddr %0" : "=r"(vaddr));
 
@@ -219,7 +219,7 @@ void *xtensa_excint1_c(int *interrupted_stack)
 
 int z_xtensa_irq_is_enabled(unsigned int irq)
 {
-	u32_t ie;
+	uint32_t ie;
 
 	__asm__ volatile("rsr.intenable %0" : "=r"(ie));
 

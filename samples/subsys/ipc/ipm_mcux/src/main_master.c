@@ -12,7 +12,7 @@
 struct device *ipm;
 int gcounter;
 
-void ping_ipm_callback(void *context, u32_t id, volatile void *data)
+void ping_ipm_callback(void *context, uint32_t id, volatile void *data)
 {
 	gcounter = *(int *)data;
 	/* Show current ping-pong counter value */
@@ -33,7 +33,7 @@ void main(void)
 	printk("Hello World from MASTER! %s\n", CONFIG_ARCH);
 
 	/* Get IPM device handle */
-	ipm = device_get_binding(DT_INST_0_NXP_LPC_MAILBOX_LABEL);
+	ipm = device_get_binding(DT_LABEL(DT_INST(0, nxp_lpc_mailbox)));
 	if (!ipm) {
 		printk("Could not get IPM device handle!\n");
 		while (1) {

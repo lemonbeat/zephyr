@@ -32,20 +32,14 @@ extern PowerCC26X2_ModuleState PowerCC26X2_module;
 /* PM Policy based on SoC/Platform residency requirements */
 static const unsigned int pm_min_residency[] = {
 #ifdef CONFIG_SYS_POWER_SLEEP_STATES
-#ifdef CONFIG_HAS_SYS_POWER_STATE_SLEEP_1
 	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_1 * SECS_TO_TICKS / MSEC_PER_SEC,
-#endif
-
-#ifdef CONFIG_HAS_SYS_POWER_STATE_SLEEP_2
 	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 * SECS_TO_TICKS / MSEC_PER_SEC,
-#endif
-
 #endif /* CONFIG_SYS_POWER_SLEEP_STATES */
 };
 
-enum power_states sys_pm_policy_next_state(s32_t ticks)
+enum power_states sys_pm_policy_next_state(int32_t ticks)
 {
-	u32_t constraints;
+	uint32_t constraints;
 	bool disallowed = false;
 	int i;
 
@@ -55,7 +49,7 @@ enum power_states sys_pm_policy_next_state(s32_t ticks)
 	/* query the declared constraints */
 	constraints = Power_getConstraintMask();
 
-	if ((ticks != K_FOREVER) && (ticks < pm_min_residency[0])) {
+	if ((ticks != K_TICKS_FOREVER) && (ticks < pm_min_residency[0])) {
 		LOG_DBG("Not enough time for PM operations: %d", ticks);
 		return SYS_POWER_STATE_ACTIVE;
 	}
@@ -66,7 +60,7 @@ enum power_states sys_pm_policy_next_state(s32_t ticks)
 			continue;
 		}
 #endif
-		if ((ticks == K_FOREVER) ||
+		if ((ticks == K_TICKS_FOREVER) ||
 		    (ticks >= pm_min_residency[i])) {
 			/* Verify if Power module has constraints set to
 			 * disallow a state
@@ -88,7 +82,7 @@ enum power_states sys_pm_policy_next_state(s32_t ticks)
 				    CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 > 1,
 				    "CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 must "
 				    "be greater than 1.");
-				if (ticks != K_FOREVER) {
+				if (ticks != K_TICKS_FOREVER) {
 					/* NOTE: Ideally we'd like to set a
 					 * timer to wake up just a little
 					 * earlier to take care of the wakeup
@@ -139,4 +133,13 @@ enum power_states sys_pm_policy_next_state(s32_t ticks)
 
 	LOG_DBG("No suitable power state found!");
 	return SYS_POWER_STATE_ACTIVE;
+}
+
+__weak bool sys_pm_policy_low_power_devices(enum power_states pm_state)
+{
+#ifdef CONFIG_SYS_POWER_SLEEP_STATES
+	return (pm_state == SYS_POWER_STATE_SLEEP_2);
+#else
+	return false;
+#endif
 }

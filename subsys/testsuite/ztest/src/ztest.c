@@ -16,6 +16,10 @@
 static struct k_thread ztest_thread;
 #endif
 
+#ifdef CONFIG_ARCH_POSIX
+#include <unistd.h>
+#endif
+
 /* ZTEST_DMEM and ZTEST_BMEM are used for the application shared memory test  */
 
 ZTEST_DMEM enum {
@@ -26,6 +30,31 @@ ZTEST_DMEM enum {
 } phase = TEST_PHASE_FRAMEWORK;
 
 static ZTEST_BMEM int test_status;
+
+/**
+ * @brief Try to shorten a filename by removing the current directory
+ *
+ * This helps to reduce the very long filenames in assertion failures. It
+ * removes the current directory from the filename and returns the rest.
+ * This makes assertions a lot more readable, and sometimes they fit on one
+ * line.
+ *
+ * @param file Filename to check
+ * @returns Shortened filename, or @file if it could not be shortened
+ */
+const char *ztest_relative_filename(const char *file)
+{
+#ifdef CONFIG_ARCH_POSIX
+	const char *cwd;
+	char buf[200];
+
+	cwd = getcwd(buf, sizeof(buf));
+	if (cwd && strlen(file) > strlen(cwd) &&
+	    !strncmp(file, cwd, strlen(cwd)))
+		return file + strlen(cwd) + 1; /* move past the trailing '/' */
+#endif
+	return file;
+}
 
 static int cleanup_test(struct unit_test *test)
 {
@@ -79,7 +108,7 @@ static void cpu_hold(void *arg1, void *arg2, void *arg3)
 	ARG_UNUSED(arg2);
 	ARG_UNUSED(arg3);
 	unsigned int key = arch_irq_lock();
-	u32_t dt, start_ms = k_uptime_get_32();
+	uint32_t dt, start_ms = k_uptime_get_32();
 
 	k_sem_give(&cpuhold_sem);
 
@@ -241,33 +270,30 @@ K_THREAD_STACK_DEFINE(ztest_thread_stack, CONFIG_ZTEST_STACKSIZE +
 		      CONFIG_TEST_EXTRA_STACKSIZE);
 static ZTEST_BMEM int test_result;
 
-static struct k_sem test_end_signal;
-
 void ztest_test_fail(void)
 {
 	test_result = -1;
-	k_sem_give(&test_end_signal);
+	k_thread_abort(&ztest_thread);
 	k_thread_abort(k_current_get());
 }
 
 void ztest_test_pass(void)
 {
 	test_result = 0;
-	k_sem_give(&test_end_signal);
+	k_thread_abort(&ztest_thread);
 	k_thread_abort(k_current_get());
 }
 
 void ztest_test_skip(void)
 {
 	test_result = -2;
-	k_sem_give(&test_end_signal);
+	k_thread_abort(&ztest_thread);
 	k_thread_abort(k_current_get());
 }
 
 static void init_testing(void)
 {
-	k_sem_init(&test_end_signal, 0, 1);
-	k_object_access_all_grant(&test_end_signal);
+	k_object_access_all_grant(&ztest_thread);
 }
 
 static void test_cb(void *a, void *dummy2, void *dummy)
@@ -280,8 +306,6 @@ static void test_cb(void *a, void *dummy2, void *dummy)
 	test_result = 1;
 	run_test_functions(test);
 	test_result = 0;
-
-	k_sem_give(&test_end_signal);
 }
 
 static int run_test(struct unit_test *test)
@@ -295,20 +319,8 @@ static int run_test(struct unit_test *test)
 			NULL, NULL, CONFIG_ZTEST_THREAD_PRIORITY,
 			test->thread_options | K_INHERIT_PERMS,
 				K_NO_WAIT);
-	/*
-	 * There is an implicit expectation here that the thread that was
-	 * spawned is still higher priority than the current thread.
-	 *
-	 * If that is not the case, it will have given the semaphore, which
-	 * will have caused the current thread to run, _if_ the test case
-	 * thread is preemptible, since it is higher priority. If there is
-	 * another test case to be run after the current one finishes, the
-	 * thread_stack will be reused for that new test case while the current
-	 * test case has not finished running yet (it has given the semaphore,
-	 * but has _not_ gone back to z_thread_entry() and completed it's "abort
-	 * phase": this will corrupt the kernel ready queue.
-	 */
-	k_sem_take(&test_end_signal, K_FOREVER);
+
+	k_thread_join(&ztest_thread, K_FOREVER);
 
 	phase = TEST_PHASE_TEARDOWN;
 	test->teardown();
@@ -414,10 +426,10 @@ void main(void)
 	end_report();
 	if (IS_ENABLED(CONFIG_ZTEST_RETEST_IF_PASSED)) {
 		static __noinit struct {
-			u32_t magic;
-			u32_t boots;
+			uint32_t magic;
+			uint32_t boots;
 		} state;
-		const u32_t magic = 0x152ac523;
+		const uint32_t magic = 0x152ac523;
 
 		if (state.magic != magic) {
 			state.magic = magic;
@@ -427,7 +439,7 @@ void main(void)
 		if (test_status == 0) {
 			PRINT("Reset board #%u to test again\n",
 				state.boots);
-			k_sleep(K_MSEC(10));
+			k_msleep(10);
 			sys_reboot(SYS_REBOOT_COLD);
 		} else {
 			PRINT("Failed after %u attempts\n", state.boots);

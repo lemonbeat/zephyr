@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT atmel_sam0_nvmctrl
+
 #define LOG_LEVEL CONFIG_FLASH_LOG_LEVEL
 #include <logging/log.h>
 LOG_MODULE_REGISTER(flash_sam0);
@@ -30,7 +32,7 @@ LOG_MODULE_REGISTER(flash_sam0);
  * Number of lock regions.  The number is fixed and the region size
  * grows with the flash size.
  */
-#define LOCK_REGIONS DT_INST_0_ATMEL_SAM0_NVMCTRL_LOCK_REGIONS
+#define LOCK_REGIONS DT_INST_PROP(0, lock_regions)
 #define LOCK_REGION_SIZE (FLASH_SIZE / LOCK_REGIONS)
 
 #if defined(NVMCTRL_BLOCK_SIZE)
@@ -41,11 +43,11 @@ LOG_MODULE_REGISTER(flash_sam0);
 
 #define PAGES_PER_ROW (ROW_SIZE / FLASH_PAGE_SIZE)
 
-#define FLASH_MEM(_a) ((u32_t *)((u8_t *)((_a) + CONFIG_FLASH_BASE_ADDRESS)))
+#define FLASH_MEM(_a) ((uint32_t *)((uint8_t *)((_a) + CONFIG_FLASH_BASE_ADDRESS)))
 
 struct flash_sam0_data {
 #if CONFIG_SOC_FLASH_SAM0_EMULATE_BYTE_PAGES
-	u8_t buf[ROW_SIZE];
+	uint8_t buf[ROW_SIZE];
 	off_t offset;
 #endif
 
@@ -131,9 +133,9 @@ static int flash_sam0_check_status(off_t offset)
 static int flash_sam0_write_page(struct device *dev, off_t offset,
 				 const void *data)
 {
-	const u32_t *src = data;
-	const u32_t *end = src + FLASH_PAGE_SIZE / sizeof(*src);
-	u32_t *dst = FLASH_MEM(offset);
+	const uint32_t *src = data;
+	const uint32_t *end = src + FLASH_PAGE_SIZE / sizeof(*src);
+	uint32_t *dst = FLASH_MEM(offset);
 	int err;
 
 #ifdef NVMCTRL_CTRLA_CMD_PBC
@@ -145,7 +147,7 @@ static int flash_sam0_write_page(struct device *dev, off_t offset,
 
 	/* Ensure writes happen 32 bits at a time. */
 	for (; src != end; src++, dst++) {
-		*dst = *src;
+		*dst = UNALIGNED_GET((uint32_t *)src);
 	}
 
 #ifdef NVMCTRL_CTRLA_CMD_WP
@@ -214,7 +216,7 @@ static int flash_sam0_write(struct device *dev, off_t offset,
 			    const void *data, size_t len)
 {
 	struct flash_sam0_data *ctx = dev->driver_data;
-	const u8_t *pdata = data;
+	const uint8_t *pdata = data;
 	off_t addr;
 	int err;
 
@@ -251,7 +253,7 @@ static int flash_sam0_write(struct device *dev, off_t offset,
 static int flash_sam0_write(struct device *dev, off_t offset,
 			    const void *data, size_t len)
 {
-	const u8_t *pdata = data;
+	const uint8_t *pdata = data;
 	int err;
 	size_t idx;
 
@@ -297,7 +299,7 @@ static int flash_sam0_read(struct device *dev, off_t offset, void *data,
 		return err;
 	}
 
-	memcpy(data, (u8_t *)CONFIG_FLASH_BASE_ADDRESS + offset, len);
+	memcpy(data, (uint8_t *)CONFIG_FLASH_BASE_ADDRESS + offset, len);
 
 	return 0;
 }
@@ -415,11 +417,15 @@ static const struct flash_driver_api flash_sam0_api = {
 #ifdef CONFIG_FLASH_PAGE_LAYOUT
 	.page_layout = flash_sam0_page_layout,
 #endif
+#if CONFIG_SOC_FLASH_SAM0_EMULATE_BYTE_PAGES
+	.write_block_size = 1,
+#else
 	.write_block_size = FLASH_PAGE_SIZE,
+#endif
 };
 
 static struct flash_sam0_data flash_sam0_data_0;
 
-DEVICE_AND_API_INIT(flash_sam0, DT_INST_0_ATMEL_SAM0_NVMCTRL_LABEL,
+DEVICE_AND_API_INIT(flash_sam0, DT_INST_LABEL(0),
 		    flash_sam0_init, &flash_sam0_data_0, NULL, POST_KERNEL,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &flash_sam0_api);

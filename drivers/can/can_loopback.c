@@ -46,7 +46,7 @@ static void dispatch_frame(const struct zcan_frame *frame,
 static inline int check_filter_match(const struct zcan_frame *frame,
 				     const struct zcan_filter *filter)
 {
-	u32_t id, mask, frame_id;
+	uint32_t id, mask, frame_id;
 
 	frame_id = frame->id_type == CAN_STANDARD_IDENTIFIER ?
 			frame->std_id : frame->ext_id;
@@ -89,7 +89,7 @@ void tx_thread(void *data_arg, void *arg2, void *arg3)
 }
 
 int can_loopback_send(struct device *dev, const struct zcan_frame *frame,
-		      s32_t timeout, can_tx_callback_t callback,
+		      k_timeout_t timeout, can_tx_callback_t callback,
 		      void *callback_arg)
 {
 	struct can_loopback_data *data = DEV_DATA(dev);
@@ -98,7 +98,7 @@ int can_loopback_send(struct device *dev, const struct zcan_frame *frame,
 	struct k_sem tx_sem;
 
 	LOG_DBG("Sending %d bytes on %s. Id: 0x%x, ID type: %s %s",
-		frame->dlc, dev->config->name,
+		frame->dlc, dev->name,
 		frame->id_type == CAN_STANDARD_IDENTIFIER ?
 				  frame->std_id : frame->ext_id,
 		frame->id_type == CAN_STANDARD_IDENTIFIER ?
@@ -193,7 +193,7 @@ void can_loopback_detach(struct device *dev, int filter_id)
 }
 
 int can_loopback_configure(struct device *dev, enum can_mode mode,
-				u32_t bitrate)
+				uint32_t bitrate)
 {
 	struct can_loopback_data *data = DEV_DATA(dev);
 
@@ -217,7 +217,7 @@ static enum can_state can_loopback_get_state(struct device *dev,
 }
 
 #ifndef CONFIG_CAN_AUTO_BUS_OFF_RECOVERY
-int can_loopback_recover(struct device *dev, s32_t timeout)
+int can_loopback_recover(struct device *dev, k_timeout_t timeout)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(timeout);
@@ -267,11 +267,10 @@ static int can_loopback_init(struct device *dev)
 		return -1;
 	}
 
-	LOG_INF("Init of %s done", dev->config->name);
+	LOG_INF("Init of %s done", dev->name);
+
 	return 0;
 }
-
-#ifdef CONFIG_CAN_1
 
 static struct can_loopback_data can_loopback_dev_data_1;
 
@@ -292,7 +291,7 @@ static int socket_can_init_1(struct device *dev)
 	struct socket_can_context *socket_context = dev->driver_data;
 
 	LOG_DBG("Init socket CAN device %p (%s) for dev %p (%s)",
-		dev, dev->config->name, can_dev, can_dev->config->name);
+		dev, dev->name, can_dev, can_dev->name);
 
 	socket_context->can_dev = can_dev;
 	socket_context->msgq = &socket_can_msgq;
@@ -308,11 +307,9 @@ static int socket_can_init_1(struct device *dev)
 }
 
 NET_DEVICE_INIT(socket_can_loopback_1, SOCKET_CAN_NAME_1, socket_can_init_1,
-		&socket_can_context_1, NULL,
+		device_pm_control_nop, &socket_can_context_1, NULL,
 		CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		&socket_can_api,
 		CANBUS_RAW_L2, NET_L2_GET_CTX_TYPE(CANBUS_RAW_L2), CAN_MTU);
 
 #endif /* CONFIG_NET_SOCKETS_CAN */
-
-#endif /*CONFIG_CAN_1*/

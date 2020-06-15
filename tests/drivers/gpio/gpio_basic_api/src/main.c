@@ -22,13 +22,13 @@
 
 static void board_setup(void)
 {
-#ifdef DT_INST_0_TEST_GPIO_BASIC_API
+#if DT_NODE_HAS_STATUS(DT_INST(0, test_gpio_basic_api), okay)
 	/* PIN_IN and PIN_OUT must be on same controller. */
-	if (strcmp(DT_INST_0_TEST_GPIO_BASIC_API_OUT_GPIOS_CONTROLLER,
-		   DT_INST_0_TEST_GPIO_BASIC_API_IN_GPIOS_CONTROLLER) != 0) {
+	if (strcmp(DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), out_gpios),
+		   DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), in_gpios)) != 0) {
 		printk("FATAL: output controller %s != input controller %s\n",
-		       DT_INST_0_TEST_GPIO_BASIC_API_OUT_GPIOS_CONTROLLER,
-		       DT_INST_0_TEST_GPIO_BASIC_API_IN_GPIOS_CONTROLLER);
+		       DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), out_gpios),
+		       DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), in_gpios));
 		k_panic();
 	}
 #endif
@@ -100,7 +100,7 @@ static void board_setup(void)
 	/* Assumes ARDUINO pins are mapped on PORT0 on all boards*/
 	struct device *port0 =
 		device_get_binding(CONFIG_PINMUX_MCUX_LPC_PORT0_NAME);
-	const u32_t pin_config = (
+	const uint32_t pin_config = (
 			IOCON_PIO_FUNC0 |
 			IOCON_PIO_INV_DI |
 			IOCON_PIO_DIGITAL_EN |
@@ -110,7 +110,7 @@ static void board_setup(void)
 	pinmux_pin_set(port0, PIN_IN,  pin_config);
 	pinmux_pin_set(port0, PIN_OUT, pin_config);
 #elif defined(CONFIG_BOARD_RV32M1_VEGA)
-	const char *pmx_name = CONFIG_PINMUX_RV32M1_PORTA_NAME;
+	const char *pmx_name = DT_LABEL(DT_NODELABEL(porta));
 	struct device *pmx = device_get_binding(pmx_name);
 
 	pinmux_pin_set(pmx, PIN_OUT, PORT_PCR_MUX(kPORT_MuxAsGpio));

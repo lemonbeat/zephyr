@@ -34,8 +34,8 @@
 #include <tracing/tracing.h>
 #include <stdbool.h>
 #include <debug/gcov.h>
+#include <kswap.h>
 
-#define IDLE_THREAD_NAME	"idle"
 #define LOG_LEVEL CONFIG_KERNEL_LOG_LEVEL
 #include <logging/log.h>
 LOG_MODULE_REGISTER(os);
@@ -52,8 +52,8 @@ LOG_MODULE_REGISTER(os);
 /* boot time measurement items */
 
 #ifdef CONFIG_BOOT_TIME_MEASUREMENT
-u32_t __noinit z_timestamp_main;  /* timestamp when main task starts */
-u32_t __noinit z_timestamp_idle;  /* timestamp when CPU goes idle */
+uint32_t __noinit z_timestamp_main;  /* timestamp when main task starts */
+uint32_t __noinit z_timestamp_idle;  /* timestamp when CPU goes idle */
 #endif
 
 /* init/main and idle threads */
@@ -106,13 +106,13 @@ extern void idle(void *unused1, void *unused2, void *unused3);
 void z_bss_zero(void)
 {
 	(void)memset(__bss_start, 0, __bss_end - __bss_start);
-#ifdef DT_CCM_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_ccm), okay)
 	(void)memset(&__ccm_bss_start, 0,
-		     ((u32_t) &__ccm_bss_end - (u32_t) &__ccm_bss_start));
+		     ((uint32_t) &__ccm_bss_end - (uint32_t) &__ccm_bss_start));
 #endif
-#ifdef DT_DTCM_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_dtcm), okay)
 	(void)memset(&__dtcm_bss_start, 0,
-		     ((u32_t) &__dtcm_bss_end - (u32_t) &__dtcm_bss_start));
+		     ((uint32_t) &__dtcm_bss_end - (uint32_t) &__dtcm_bss_start));
 #endif
 #ifdef CONFIG_CODE_DATA_RELOCATION
 	extern void bss_zeroing_relocation(void);
@@ -121,7 +121,7 @@ void z_bss_zero(void)
 #endif	/* CONFIG_CODE_DATA_RELOCATION */
 #ifdef CONFIG_COVERAGE_GCOV
 	(void)memset(&__gcov_bss_start, 0,
-		 ((u32_t) &__gcov_bss_end - (u32_t) &__gcov_bss_start));
+		 ((uint32_t) &__gcov_bss_end - (uint32_t) &__gcov_bss_start));
 #endif
 }
 
@@ -147,11 +147,11 @@ void z_data_copy(void)
 	(void)memcpy(&_ramfunc_ram_start, &_ramfunc_rom_start,
 		 (uintptr_t) &_ramfunc_ram_size);
 #endif /* CONFIG_ARCH_HAS_RAMFUNC_SUPPORT */
-#ifdef DT_CCM_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_ccm), okay)
 	(void)memcpy(&__ccm_data_start, &__ccm_data_rom_start,
 		 __ccm_data_end - __ccm_data_start);
 #endif
-#ifdef DT_DTCM_BASE_ADDRESS
+#if DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_dtcm), okay)
 	(void)memcpy(&__dtcm_data_start, &__dtcm_data_rom_start,
 		 __dtcm_data_end - __dtcm_data_start);
 #endif
@@ -169,9 +169,9 @@ void z_data_copy(void)
 	 * value gets set later in z_cstart().
 	 */
 	uintptr_t guard_copy = __stack_chk_guard;
-	u8_t *src = (u8_t *)&_app_smem_rom_start;
-	u8_t *dst = (u8_t *)&_app_smem_start;
-	u32_t count = _app_smem_end - _app_smem_start;
+	uint8_t *src = (uint8_t *)&_app_smem_rom_start;
+	uint8_t *dst = (uint8_t *)&_app_smem_start;
+	uint32_t count = _app_smem_end - _app_smem_start;
 
 	guard_copy = __stack_chk_guard;
 	while (count > 0) {
@@ -214,7 +214,7 @@ static void bg_thread_main(void *unused1, void *unused2, void *unused3)
 
 	z_sys_post_kernel = true;
 
-	z_sys_device_do_config_level(_SYS_INIT_LEVEL_POST_KERNEL);
+	z_sys_init_run_level(_SYS_INIT_LEVEL_POST_KERNEL);
 #if CONFIG_STACK_POINTER_RANDOM
 	z_stack_adjust_initialized = 1;
 #endif
@@ -234,9 +234,6 @@ static void bg_thread_main(void *unused1, void *unused2, void *unused3)
 #endif
 #endif
 
-	/* Final init level before app starts */
-	z_sys_device_do_config_level(_SYS_INIT_LEVEL_APPLICATION);
-
 #ifdef CONFIG_CPLUSPLUS
 	/* Process the .ctors and .init_array sections */
 	extern void __do_global_ctors_aux(void);
@@ -245,10 +242,14 @@ static void bg_thread_main(void *unused1, void *unused2, void *unused3)
 	__do_init_array_aux();
 #endif
 
+	/* Final init level before app starts */
+	z_sys_init_run_level(_SYS_INIT_LEVEL_APPLICATION);
+
 	z_init_static_threads();
 
 #ifdef CONFIG_SMP
 	z_smp_init();
+	z_sys_init_run_level(_SYS_INIT_LEVEL_SMP);
 #endif
 
 #ifdef CONFIG_BOOT_TIME_MEASUREMENT
@@ -279,11 +280,22 @@ void __weak main(void)
 /* LCOV_EXCL_STOP */
 
 #if defined(CONFIG_MULTITHREADING)
-static void init_idle_thread(struct k_thread *thread, k_thread_stack_t *stack)
+static void init_idle_thread(int i)
 {
+	struct k_thread *thread = &z_idle_threads[i];
+	k_thread_stack_t *stack = z_idle_stacks[i];
+
+#ifdef CONFIG_THREAD_NAME
+	char tname[8];
+
+	snprintk(tname, 8, "idle %02d", i);
+#else
+	char *tname = NULL;
+#endif /* CONFIG_THREAD_NAME */
+
 	z_setup_new_thread(thread, stack,
 			  CONFIG_IDLE_STACK_SIZE, idle, NULL, NULL, NULL,
-			  K_LOWEST_THREAD_PRIO, K_ESSENTIAL, IDLE_THREAD_NAME);
+			  K_LOWEST_THREAD_PRIO, K_ESSENTIAL, tname);
 	z_mark_thread_as_started(thread);
 
 #ifdef CONFIG_SMP
@@ -305,30 +317,8 @@ static void init_idle_thread(struct k_thread *thread, k_thread_stack_t *stack)
  * @return N/A
  */
 #ifdef CONFIG_MULTITHREADING
-static void prepare_multithreading(struct k_thread *dummy_thread)
+static void prepare_multithreading(void)
 {
-#ifdef CONFIG_ARCH_HAS_CUSTOM_SWAP_TO_MAIN
-	ARG_UNUSED(dummy_thread);
-#else
-
-	/*
-	 * Initialize the current execution thread to permit a level of
-	 * debugging output if an exception should happen during kernel
-	 * initialization.  However, don't waste effort initializing the
-	 * fields of the dummy thread beyond those needed to identify it as a
-	 * dummy thread.
-	 */
-	dummy_thread->base.user_options = K_ESSENTIAL;
-	dummy_thread->base.thread_state = _THREAD_DUMMY;
-#ifdef CONFIG_THREAD_STACK_INFO
-	dummy_thread->stack_info.start = 0U;
-	dummy_thread->stack_info.size = 0U;
-#endif
-#ifdef CONFIG_USERSPACE
-	dummy_thread->mem_domain_info.mem_domain = 0;
-#endif
-#endif /* CONFIG_ARCH_HAS_CUSTOM_SWAP_TO_MAIN */
-
 	/* _kernel.ready_q is all zeroes */
 	z_sched_init();
 
@@ -353,7 +343,7 @@ static void prepare_multithreading(struct k_thread *dummy_thread)
 	z_ready_thread(&z_main_thread);
 
 	for (int i = 0; i < CONFIG_MP_NUM_CPUS; i++) {
-		init_idle_thread(&z_idle_threads[i], z_idle_stacks[i]);
+		init_idle_thread(i);
 		_kernel.cpus[i].idle_thread = &z_idle_threads[i];
 		_kernel.cpus[i].id = i;
 		_kernel.cpus[i].irq_stack =
@@ -383,11 +373,11 @@ static FUNC_NORETURN void switch_to_main_thread(void)
 #endif /* CONFIG_MULTITHREADING */
 
 #if defined(CONFIG_ENTROPY_HAS_DRIVER) || defined(CONFIG_TEST_RANDOM_GENERATOR)
-void z_early_boot_rand_get(u8_t *buf, size_t length)
+void z_early_boot_rand_get(uint8_t *buf, size_t length)
 {
-	int n = sizeof(u32_t);
+	int n = sizeof(uint32_t);
 #ifdef CONFIG_ENTROPY_HAS_DRIVER
-	struct device *entropy = device_get_binding(CONFIG_ENTROPY_NAME);
+	struct device *entropy = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
 	int rc;
 
 	if (entropy == NULL) {
@@ -420,12 +410,12 @@ sys_rand_fallback:
 	 */
 
 	while (length > 0) {
-		u32_t rndbits;
-		u8_t *p_rndbits = (u8_t *)&rndbits;
+		uint32_t rndbits;
+		uint8_t *p_rndbits = (uint8_t *)&rndbits;
 
 		rndbits = sys_rand32_get();
 
-		if (length < sizeof(u32_t)) {
+		if (length < sizeof(uint32_t)) {
 			n = length;
 		}
 
@@ -453,10 +443,6 @@ sys_rand_fallback:
  */
 FUNC_NORETURN void z_cstart(void)
 {
-#ifdef CONFIG_STACK_CANARIES
-	uintptr_t stack_guard;
-#endif	/* CONFIG_STACK_CANARIES */
-
 	/* gcov hook needed to get the coverage report.*/
 	gcov_static_init();
 
@@ -465,29 +451,29 @@ FUNC_NORETURN void z_cstart(void)
 	/* perform any architecture-specific initialization */
 	arch_kernel_init();
 
-#ifdef CONFIG_MULTITHREADING
-	struct k_thread dummy_thread = {
-		 .base.thread_state = _THREAD_DUMMY,
-# ifdef CONFIG_SCHED_CPU_MASK
-		 .base.cpu_mask = -1,
-# endif
-	};
+#if defined(CONFIG_MULTITHREADING)
+	/* Note: The z_ready_thread() call in prepare_multithreading() requires
+	 * a dummy thread even if CONFIG_ARCH_HAS_CUSTOM_SWAP_TO_MAIN=y
+	 */
+	struct k_thread dummy_thread;
 
-	_current_cpu->current = &dummy_thread;
+	z_dummy_thread_init(&dummy_thread);
 #endif
 
 	/* perform basic hardware initialization */
-	z_sys_device_do_config_level(_SYS_INIT_LEVEL_PRE_KERNEL_1);
-	z_sys_device_do_config_level(_SYS_INIT_LEVEL_PRE_KERNEL_2);
+	z_sys_init_run_level(_SYS_INIT_LEVEL_PRE_KERNEL_1);
+	z_sys_init_run_level(_SYS_INIT_LEVEL_PRE_KERNEL_2);
 
 #ifdef CONFIG_STACK_CANARIES
-	z_early_boot_rand_get((u8_t *)&stack_guard, sizeof(stack_guard));
+	uintptr_t stack_guard;
+
+	z_early_boot_rand_get((uint8_t *)&stack_guard, sizeof(stack_guard));
 	__stack_chk_guard = stack_guard;
 	__stack_chk_guard <<= 8;
 #endif	/* CONFIG_STACK_CANARIES */
 
 #ifdef CONFIG_MULTITHREADING
-	prepare_multithreading(&dummy_thread);
+	prepare_multithreading();
 	switch_to_main_thread();
 #else
 	bg_thread_main(NULL, NULL, NULL);

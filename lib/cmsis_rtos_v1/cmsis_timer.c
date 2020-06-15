@@ -16,7 +16,7 @@ static void zephyr_timer_wrapper(struct k_timer *timer);
 struct timer_obj {
 	struct k_timer ztimer;
 	os_timer_type type;
-	u32_t status;
+	uint32_t status;
 	void (*callback_function)(void const *argument);
 	void *arg;
 };
@@ -80,9 +80,10 @@ osStatus osTimerStart(osTimerId timer_id, uint32_t millisec)
 	}
 
 	if (timer->type == osTimerOnce) {
-		k_timer_start(&timer->ztimer, millisec, K_NO_WAIT);
+		k_timer_start(&timer->ztimer, K_MSEC(millisec), K_NO_WAIT);
 	} else if (timer->type == osTimerPeriodic) {
-		k_timer_start(&timer->ztimer, K_NO_WAIT, millisec);
+		k_timer_start(&timer->ztimer, K_MSEC(millisec),
+			      K_MSEC(millisec));
 	}
 
 	timer->status = ACTIVE;

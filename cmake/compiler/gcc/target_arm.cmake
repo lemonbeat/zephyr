@@ -1,11 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 if(CONFIG_ARM64)
-  list(APPEND TOOLCHAIN_C_FLAGS
-    -mcpu=${GCC_M_CPU}
-    )
-  list(APPEND TOOLCHAIN_LD_FLAGS
-    -mcpu=${GCC_M_CPU}
-    )
+  list(APPEND TOOLCHAIN_C_FLAGS   -mcpu=${GCC_M_CPU})
+  list(APPEND TOOLCHAIN_LD_FLAGS  -mcpu=${GCC_M_CPU})
+
+  list(APPEND TOOLCHAIN_C_FLAGS   -mabi=lp64)
+  list(APPEND TOOLCHAIN_LD_FLAGS  -mabi=lp64)
 else()
   list(APPEND TOOLCHAIN_C_FLAGS   -mcpu=${GCC_M_CPU})
   list(APPEND TOOLCHAIN_LD_FLAGS  -mcpu=${GCC_M_CPU})
@@ -14,6 +13,9 @@ else()
     list(APPEND TOOLCHAIN_C_FLAGS   -mthumb)
     list(APPEND TOOLCHAIN_LD_FLAGS  -mthumb)
   endif()
+
+  list(APPEND TOOLCHAIN_C_FLAGS -mabi=aapcs)
+  list(APPEND TOOLCHAIN_LD_FLAGS -mabi=aapcs)
 
   # Defines a mapping from GCC_M_CPU to FPU
 
@@ -27,7 +29,7 @@ else()
   set(FPU_FOR_cortex-m7      fpv5-${PRECISION_TOKEN}d16)
   set(FPU_FOR_cortex-m33     fpv5-${PRECISION_TOKEN}d16)
 
-  if(CONFIG_FLOAT)
+  if(CONFIG_FPU)
     list(APPEND TOOLCHAIN_C_FLAGS   -mfpu=${FPU_FOR_${GCC_M_CPU}})
     list(APPEND TOOLCHAIN_LD_FLAGS  -mfpu=${FPU_FOR_${GCC_M_CPU}})
     if    (CONFIG_FP_SOFTABI)

@@ -27,10 +27,10 @@
 #include <xtensa/config/core.h>
 #include <arch/common/addr_types.h>
 
-#define STACK_ALIGN 16
+#define ARCH_STACK_PTR_ALIGN 16
 
 /* Xtensa GPRs are often designated by two different names */
-#define sys_define_gpr_with_alias(name1, name2) union { u32_t name1, name2; }
+#define sys_define_gpr_with_alias(name1, name2) union { uint32_t name1, name2; }
 
 #include <arch/xtensa/exc.h>
 
@@ -39,22 +39,21 @@ extern "C" {
 #endif
 
 /* internal routine documented in C file, needed by IRQ_CONNECT() macro */
-extern void z_irq_priority_set(u32_t irq, u32_t prio, u32_t flags);
+extern void z_irq_priority_set(uint32_t irq, uint32_t prio, uint32_t flags);
 
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-({ \
+{ \
 	Z_ISR_DECLARE(irq_p, flags_p, isr_p, isr_param_p); \
-	irq_p; \
-})
+}
 
 /* Spurious interrupt handler. Throws an error if called */
 extern void z_irq_spurious(void *unused);
 
 #define XTENSA_ERR_NORET
 
-extern u32_t z_timer_cycle_get_32(void);
+extern uint32_t z_timer_cycle_get_32(void);
 
-static inline u32_t arch_k_cycle_get_32(void)
+static inline uint32_t arch_k_cycle_get_32(void)
 {
 	return z_timer_cycle_get_32();
 }

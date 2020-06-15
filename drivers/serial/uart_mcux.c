@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nxp_kinetis_uart
+
 #include <errno.h>
 #include <device.h>
 #include <drivers/uart.h>
@@ -15,8 +17,8 @@ struct uart_mcux_config {
 	UART_Type *base;
 	char *clock_name;
 	clock_control_subsys_t clock_subsys;
-	u32_t baud_rate;
-	u8_t hw_flow_control;
+	uint32_t baud_rate;
+	uint8_t hw_flow_control;
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	void (*irq_config_func)(struct device *dev);
 #endif
@@ -31,8 +33,8 @@ struct uart_mcux_data {
 
 static int uart_mcux_poll_in(struct device *dev, unsigned char *c)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t flags = UART_GetStatusFlags(config->base);
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t flags = UART_GetStatusFlags(config->base);
 	int ret = -1;
 
 	if (flags & kUART_RxDataRegFullFlag) {
@@ -45,7 +47,7 @@ static int uart_mcux_poll_in(struct device *dev, unsigned char *c)
 
 static void uart_mcux_poll_out(struct device *dev, unsigned char c)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
+	const struct uart_mcux_config *config = dev->config_info;
 
 	while (!(UART_GetStatusFlags(config->base) & kUART_TxDataRegEmptyFlag)) {
 	}
@@ -55,8 +57,8 @@ static void uart_mcux_poll_out(struct device *dev, unsigned char c)
 
 static int uart_mcux_err_check(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t flags = UART_GetStatusFlags(config->base);
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t flags = UART_GetStatusFlags(config->base);
 	int err = 0;
 
 	if (flags & kUART_RxOverrunFlag) {
@@ -79,11 +81,11 @@ static int uart_mcux_err_check(struct device *dev)
 }
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static int uart_mcux_fifo_fill(struct device *dev, const u8_t *tx_data,
+static int uart_mcux_fifo_fill(struct device *dev, const uint8_t *tx_data,
 			       int len)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u8_t num_tx = 0U;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint8_t num_tx = 0U;
 
 	while ((len - num_tx > 0) &&
 	       (UART_GetStatusFlags(config->base) & kUART_TxDataRegEmptyFlag)) {
@@ -94,11 +96,11 @@ static int uart_mcux_fifo_fill(struct device *dev, const u8_t *tx_data,
 	return num_tx;
 }
 
-static int uart_mcux_fifo_read(struct device *dev, u8_t *rx_data,
+static int uart_mcux_fifo_read(struct device *dev, uint8_t *rx_data,
 			       const int len)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u8_t num_rx = 0U;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint8_t num_rx = 0U;
 
 	while ((len - num_rx > 0) &&
 	       (UART_GetStatusFlags(config->base) & kUART_RxDataRegFullFlag)) {
@@ -111,65 +113,66 @@ static int uart_mcux_fifo_read(struct device *dev, u8_t *rx_data,
 
 static void uart_mcux_irq_tx_enable(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_TxDataRegEmptyInterruptEnable;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_TxDataRegEmptyInterruptEnable;
 
 	UART_EnableInterrupts(config->base, mask);
 }
 
 static void uart_mcux_irq_tx_disable(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_TxDataRegEmptyInterruptEnable;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_TxDataRegEmptyInterruptEnable;
 
 	UART_DisableInterrupts(config->base, mask);
 }
 
 static int uart_mcux_irq_tx_complete(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t flags = UART_GetStatusFlags(config->base);
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t flags = UART_GetStatusFlags(config->base);
 
-	return (flags & kUART_TxDataRegEmptyFlag) != 0U;
+	return (flags & kUART_TransmissionCompleteFlag) != 0U;
 }
 
 static int uart_mcux_irq_tx_ready(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_TxDataRegEmptyInterruptEnable;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_TxDataRegEmptyInterruptEnable;
+	uint32_t flags = UART_GetStatusFlags(config->base);
 
 	return (UART_GetEnabledInterrupts(config->base) & mask)
-		&& uart_mcux_irq_tx_complete(dev);
+		&& (flags & kUART_TxDataRegEmptyFlag);
 }
 
 static void uart_mcux_irq_rx_enable(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_RxDataRegFullInterruptEnable;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_RxDataRegFullInterruptEnable;
 
 	UART_EnableInterrupts(config->base, mask);
 }
 
 static void uart_mcux_irq_rx_disable(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_RxDataRegFullInterruptEnable;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_RxDataRegFullInterruptEnable;
 
 	UART_DisableInterrupts(config->base, mask);
 }
 
 static int uart_mcux_irq_rx_full(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t flags = UART_GetStatusFlags(config->base);
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t flags = UART_GetStatusFlags(config->base);
 
 	return (flags & kUART_RxDataRegFullFlag) != 0U;
 }
 
 static int uart_mcux_irq_rx_ready(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_RxDataRegFullInterruptEnable;
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_RxDataRegFullInterruptEnable;
 
 	return (UART_GetEnabledInterrupts(config->base) & mask)
 		&& uart_mcux_irq_rx_full(dev);
@@ -177,8 +180,8 @@ static int uart_mcux_irq_rx_ready(struct device *dev)
 
 static void uart_mcux_irq_err_enable(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_NoiseErrorInterruptEnable |
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_NoiseErrorInterruptEnable |
 			kUART_FramingErrorInterruptEnable |
 			kUART_ParityErrorInterruptEnable;
 
@@ -187,8 +190,8 @@ static void uart_mcux_irq_err_enable(struct device *dev)
 
 static void uart_mcux_irq_err_disable(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
-	u32_t mask = kUART_NoiseErrorInterruptEnable |
+	const struct uart_mcux_config *config = dev->config_info;
+	uint32_t mask = kUART_NoiseErrorInterruptEnable |
 			kUART_FramingErrorInterruptEnable |
 			kUART_ParityErrorInterruptEnable;
 
@@ -228,10 +231,10 @@ static void uart_mcux_isr(void *arg)
 
 static int uart_mcux_init(struct device *dev)
 {
-	const struct uart_mcux_config *config = dev->config->config_info;
+	const struct uart_mcux_config *config = dev->config_info;
 	uart_config_t uart_config;
 	struct device *clock_dev;
-	u32_t clock_freq;
+	uint32_t clock_freq;
 
 	clock_dev = device_get_binding(config->clock_name);
 	if (clock_dev == NULL) {
@@ -283,266 +286,59 @@ static const struct uart_driver_api uart_mcux_driver_api = {
 #endif
 };
 
-#ifdef CONFIG_UART_MCUX_0
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_0(struct device *dev);
-#endif
-
-static const struct uart_mcux_config uart_mcux_0_config = {
-	.base = UART0,
-	.clock_name = DT_NXP_KINETIS_UART_UART_0_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_NXP_KINETIS_UART_UART_0_CLOCK_NAME,
-	.baud_rate = DT_NXP_KINETIS_UART_UART_0_CURRENT_SPEED,
-	.hw_flow_control = DT_NXP_KINETIS_UART_UART_0_HW_FLOW_CONTROL,
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = uart_mcux_config_func_0,
-#endif
-};
-
-static struct uart_mcux_data uart_mcux_0_data;
-
-DEVICE_AND_API_INIT(uart_0, DT_NXP_KINETIS_UART_UART_0_LABEL,
-		    &uart_mcux_init,
-		    &uart_mcux_0_data, &uart_mcux_0_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &uart_mcux_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_0(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_0_IRQ_STATUS,
-		    DT_NXP_KINETIS_UART_UART_0_IRQ_STATUS_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_0), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_0_IRQ_STATUS);
-
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_0_IRQ_ERROR,
-		    DT_NXP_KINETIS_UART_UART_0_IRQ_ERROR_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_0), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_0_IRQ_ERROR);
+#define UART_MCUX_DECLARE_CFG(n, IRQ_FUNC_INIT)				\
+static const struct uart_mcux_config uart_mcux_##n##_config = {		\
+	.base = (UART_Type *)DT_INST_REG_ADDR(n),			\
+	.clock_name = DT_INST_CLOCKS_LABEL(n),				\
+	.clock_subsys = (clock_control_subsys_t)DT_INST_CLOCKS_CELL(n, name),\
+	.baud_rate = DT_INST_PROP(n, current_speed),			\
+	.hw_flow_control = DT_INST_PROP(n, hw_flow_control),		\
+	IRQ_FUNC_INIT							\
 }
-#endif
-
-#endif /* CONFIG_UART_MCUX_0 */
-
-#ifdef CONFIG_UART_MCUX_1
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_1(struct device *dev);
+#define UART_MCUX_CONFIG_FUNC(n)					\
+	static void uart_mcux_config_func_##n(struct device *dev)	\
+	{								\
+		IRQ_CONNECT(DT_INST_IRQ_BY_NAME(n, status, irq),	\
+			    DT_INST_IRQ_BY_NAME(n, status, priority),	\
+			    uart_mcux_isr, DEVICE_GET(uart_##n), 0);	\
+									\
+		irq_enable(DT_INST_IRQ_BY_NAME(n, status, irq));	\
+									\
+		IRQ_CONNECT(DT_INST_IRQ_BY_NAME(n, error, irq),		\
+			    DT_INST_IRQ_BY_NAME(n, error, priority),	\
+			    uart_mcux_isr, DEVICE_GET(uart_##n), 0);	\
+									\
+		irq_enable(DT_INST_IRQ_BY_NAME(n, error, irq));		\
+	}
+#define UART_MCUX_IRQ_CFG_FUNC_INIT(n)					\
+	.irq_config_func = uart_mcux_config_func_##n
+#define UART_MCUX_INIT_CFG(n)						\
+	UART_MCUX_DECLARE_CFG(n, UART_MCUX_IRQ_CFG_FUNC_INIT(n))
+#else
+#define UART_MCUX_CONFIG_FUNC(n)
+#define UART_MCUX_IRQ_CFG_FUNC_INIT
+#define UART_MCUX_INIT_CFG(n)						\
+	UART_MCUX_DECLARE_CFG(n, UART_MCUX_IRQ_CFG_FUNC_INIT)
 #endif
 
-static const struct uart_mcux_config uart_mcux_1_config = {
-	.base = UART1,
-	.clock_name = DT_NXP_KINETIS_UART_UART_1_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_NXP_KINETIS_UART_UART_1_CLOCK_NAME,
-	.baud_rate = DT_NXP_KINETIS_UART_UART_1_CURRENT_SPEED,
-	.hw_flow_control = DT_NXP_KINETIS_UART_UART_1_HW_FLOW_CONTROL,
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = uart_mcux_config_func_1,
-#endif
-};
+#define UART_MCUX_INIT(n)						\
+									\
+	static struct uart_mcux_data uart_mcux_##n##_data;		\
+									\
+	static const struct uart_mcux_config uart_mcux_##n##_config;	\
+									\
+	DEVICE_AND_API_INIT(uart_##n, DT_INST_LABEL(n),			\
+			    &uart_mcux_init,				\
+			    &uart_mcux_##n##_data,			\
+			    &uart_mcux_##n##_config,			\
+			    PRE_KERNEL_1,				\
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
+			    &uart_mcux_driver_api);			\
+									\
+	UART_MCUX_CONFIG_FUNC(n)					\
+									\
+	UART_MCUX_INIT_CFG(n);
 
-static struct uart_mcux_data uart_mcux_1_data;
-
-DEVICE_AND_API_INIT(uart_1, DT_NXP_KINETIS_UART_UART_1_LABEL,
-		    &uart_mcux_init,
-		    &uart_mcux_1_data, &uart_mcux_1_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &uart_mcux_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_1(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_1_IRQ_STATUS,
-		    DT_NXP_KINETIS_UART_UART_1_IRQ_STATUS_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_1), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_1_IRQ_STATUS);
-
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_1_IRQ_ERROR,
-		    DT_NXP_KINETIS_UART_UART_1_IRQ_ERROR_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_1), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_1_IRQ_ERROR);
-}
-#endif
-
-#endif /* CONFIG_UART_MCUX_1 */
-
-#ifdef CONFIG_UART_MCUX_2
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_2(struct device *dev);
-#endif
-
-static const struct uart_mcux_config uart_mcux_2_config = {
-	.base = UART2,
-	.clock_name = DT_NXP_KINETIS_UART_UART_2_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_NXP_KINETIS_UART_UART_2_CLOCK_NAME,
-	.baud_rate = DT_NXP_KINETIS_UART_UART_2_CURRENT_SPEED,
-	.hw_flow_control = DT_NXP_KINETIS_UART_UART_2_HW_FLOW_CONTROL,
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = uart_mcux_config_func_2,
-#endif
-};
-
-static struct uart_mcux_data uart_mcux_2_data;
-
-DEVICE_AND_API_INIT(uart_2, DT_NXP_KINETIS_UART_UART_2_LABEL,
-		    &uart_mcux_init,
-		    &uart_mcux_2_data, &uart_mcux_2_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &uart_mcux_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_2(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_2_IRQ_STATUS,
-		    DT_NXP_KINETIS_UART_UART_2_IRQ_STATUS_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_2), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_2_IRQ_STATUS);
-
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_2_IRQ_ERROR,
-		    DT_NXP_KINETIS_UART_UART_2_IRQ_ERROR_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_2), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_2_IRQ_ERROR);
-}
-#endif
-
-#endif /* CONFIG_UART_MCUX_2 */
-
-#ifdef CONFIG_UART_MCUX_3
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_3(struct device *dev);
-#endif
-
-static const struct uart_mcux_config uart_mcux_3_config = {
-	.base = UART3,
-	.clock_name = DT_NXP_KINETIS_UART_UART_3_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_NXP_KINETIS_UART_UART_3_CLOCK_NAME,
-	.baud_rate = DT_NXP_KINETIS_UART_UART_3_CURRENT_SPEED,
-	.hw_flow_control = DT_NXP_KINETIS_UART_UART_3_HW_FLOW_CONTROL,
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = uart_mcux_config_func_3,
-#endif
-};
-
-static struct uart_mcux_data uart_mcux_3_data;
-
-DEVICE_AND_API_INIT(uart_3, DT_NXP_KINETIS_UART_UART_3_LABEL,
-		    &uart_mcux_init,
-		    &uart_mcux_3_data, &uart_mcux_3_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &uart_mcux_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_3(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_3_IRQ_STATUS,
-		    DT_NXP_KINETIS_UART_UART_3_IRQ_STATUS_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_3), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_3_IRQ_STATUS);
-
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_3_IRQ_ERROR,
-		    DT_NXP_KINETIS_UART_UART_3_IRQ_ERROR_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_3), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_3_IRQ_ERROR);
-}
-#endif
-
-#endif /* CONFIG_UART_MCUX_3 */
-
-#ifdef CONFIG_UART_MCUX_4
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_4(struct device *dev);
-#endif
-
-static const struct uart_mcux_config uart_mcux_4_config = {
-	.base = UART4,
-	.clock_name = DT_NXP_KINETIS_UART_UART_4_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_NXP_KINETIS_UART_UART_4_CLOCK_NAME,
-	.baud_rate = DT_NXP_KINETIS_UART_UART_4_CURRENT_SPEED,
-	.hw_flow_control = DT_NXP_KINETIS_UART_UART_4_HW_FLOW_CONTROL,
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = uart_mcux_config_func_4,
-#endif
-};
-
-static struct uart_mcux_data uart_mcux_4_data;
-
-DEVICE_AND_API_INIT(uart_4, DT_NXP_KINETIS_UART_UART_4_LABEL,
-		    &uart_mcux_init,
-		    &uart_mcux_4_data, &uart_mcux_4_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &uart_mcux_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_4(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_4_IRQ_STATUS,
-		    DT_NXP_KINETIS_UART_UART_4_IRQ_STATUS_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_4), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_4_IRQ_STATUS);
-
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_4_IRQ_ERROR,
-		    DT_NXP_KINETIS_UART_UART_4_IRQ_ERROR_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_4), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_4_IRQ_ERROR);
-}
-#endif
-
-#endif /* CONFIG_UART_MCUX_4 */
-
-#ifdef CONFIG_UART_MCUX_5
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_5(struct device *dev);
-#endif
-
-static const struct uart_mcux_config uart_mcux_5_config = {
-	.base = UART5,
-	.clock_name = DT_NXP_KINETIS_UART_UART_5_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_NXP_KINETIS_UART_UART_5_CLOCK_NAME,
-	.baud_rate = DT_NXP_KINETIS_UART_UART_5_CURRENT_SPEED,
-	.hw_flow_control = DT_NXP_KINETIS_UART_UART_5_HW_FLOW_CONTROL,
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = uart_mcux_config_func_5,
-#endif
-};
-
-static struct uart_mcux_data uart_mcux_5_data;
-
-DEVICE_AND_API_INIT(uart_5, DT_NXP_KINETIS_UART_UART_5_LABEL,
-		    &uart_mcux_init,
-		    &uart_mcux_5_data, &uart_mcux_5_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &uart_mcux_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void uart_mcux_config_func_5(struct device *dev)
-{
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_5_IRQ_STATUS,
-		    DT_NXP_KINETIS_UART_UART_5_IRQ_STATUS_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_5), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_5_IRQ_STATUS);
-
-	IRQ_CONNECT(DT_NXP_KINETIS_UART_UART_5_IRQ_ERROR,
-		    DT_NXP_KINETIS_UART_UART_5_IRQ_ERROR_PRIORITY,
-		    uart_mcux_isr, DEVICE_GET(uart_5), 0);
-
-	irq_enable(DT_NXP_KINETIS_UART_UART_5_IRQ_ERROR);
-}
-#endif
-
-#endif /* CONFIG_UART_MCUX_5 */
+DT_INST_FOREACH_STATUS_OKAY(UART_MCUX_INIT)

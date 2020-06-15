@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nxp_kinetis_ftm_pwm
+
 #include <drivers/clock_control.h>
 #include <errno.h>
 #include <drivers/pwm.h>
@@ -23,21 +25,21 @@ struct mcux_ftm_config {
 	clock_control_subsys_t clock_subsys;
 	ftm_clock_source_t ftm_clock_source;
 	ftm_clock_prescale_t prescale;
-	u8_t channel_count;
+	uint8_t channel_count;
 	ftm_pwm_mode_t mode;
 };
 
 struct mcux_ftm_data {
-	u32_t clock_freq;
-	u32_t period_cycles;
+	uint32_t clock_freq;
+	uint32_t period_cycles;
 	ftm_chnl_pwm_config_param_t channel[MAX_CHANNELS];
 };
 
-static int mcux_ftm_pin_set(struct device *dev, u32_t pwm,
-			    u32_t period_cycles, u32_t pulse_cycles,
+static int mcux_ftm_pin_set(struct device *dev, uint32_t pwm,
+			    uint32_t period_cycles, uint32_t pulse_cycles,
 			    pwm_flags_t flags)
 {
-	const struct mcux_ftm_config *config = dev->config->config_info;
+	const struct mcux_ftm_config *config = dev->config_info;
 	struct mcux_ftm_data *data = dev->driver_data;
 	status_t status;
 
@@ -69,7 +71,7 @@ static int mcux_ftm_pin_set(struct device *dev, u32_t pwm,
 			LOG_WRN("Changing period cycles from %d to %d"
 				" affects all %d channels in %s",
 				data->period_cycles, period_cycles,
-				config->channel_count, dev->config->name);
+				config->channel_count, dev->name);
 		}
 
 		data->period_cycles = period_cycles;
@@ -93,10 +95,10 @@ static int mcux_ftm_pin_set(struct device *dev, u32_t pwm,
 	return 0;
 }
 
-static int mcux_ftm_get_cycles_per_sec(struct device *dev, u32_t pwm,
-				       u64_t *cycles)
+static int mcux_ftm_get_cycles_per_sec(struct device *dev, uint32_t pwm,
+				       uint64_t *cycles)
 {
-	const struct mcux_ftm_config *config = dev->config->config_info;
+	const struct mcux_ftm_config *config = dev->config_info;
 	struct mcux_ftm_data *data = dev->driver_data;
 
 	*cycles = data->clock_freq >> config->prescale;
@@ -106,7 +108,7 @@ static int mcux_ftm_get_cycles_per_sec(struct device *dev, u32_t pwm,
 
 static int mcux_ftm_init(struct device *dev)
 {
-	const struct mcux_ftm_config *config = dev->config->config_info;
+	const struct mcux_ftm_config *config = dev->config_info;
 	struct mcux_ftm_data *data = dev->driver_data;
 	ftm_chnl_pwm_config_param_t *channel = data->channel;
 	struct device *clock_dev;
@@ -151,37 +153,25 @@ static const struct pwm_driver_api mcux_ftm_driver_api = {
 	.get_cycles_per_sec = mcux_ftm_get_cycles_per_sec,
 };
 
+#define TO_FTM_PRESCALE_DIVIDE(val) _DO_CONCAT(kFTM_Prescale_Divide_, val)
+
 #define FTM_DEVICE(n) \
 	static const struct mcux_ftm_config mcux_ftm_config_##n = { \
-		.base = (FTM_Type *)DT_INST_##n##_NXP_KINETIS_FTM_BASE_ADDRESS,\
-		.clock_name = DT_INST_##n##_NXP_KINETIS_FTM_CLOCK_CONTROLLER, \
+		.base = (FTM_Type *)DT_INST_REG_ADDR(n),\
+		.clock_name = DT_INST_CLOCKS_LABEL(n), \
 		.clock_subsys = (clock_control_subsys_t) \
-			DT_INST_##n##_NXP_KINETIS_FTM_CLOCK_NAME, \
+			DT_INST_CLOCKS_CELL(n, name), \
 		.ftm_clock_source = kFTM_FixedClock, \
-		.prescale = kFTM_Prescale_Divide_16, \
+		.prescale = TO_FTM_PRESCALE_DIVIDE(DT_INST_PROP(n, prescaler)),\
 		.channel_count = FSL_FEATURE_FTM_CHANNEL_COUNTn((FTM_Type *) \
-			DT_INST_##n##_NXP_KINETIS_FTM_BASE_ADDRESS), \
+			DT_INST_REG_ADDR(n)), \
 		.mode = kFTM_EdgeAlignedPwm, \
 	}; \
 	static struct mcux_ftm_data mcux_ftm_data_##n; \
-	DEVICE_AND_API_INIT(mcux_ftm_##n, DT_INST_##n##_NXP_KINETIS_FTM_LABEL, \
+	DEVICE_AND_API_INIT(mcux_ftm_##n, DT_INST_LABEL(n), \
 			    &mcux_ftm_init, &mcux_ftm_data_##n, \
 			    &mcux_ftm_config_##n, \
 			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
-			    &mcux_ftm_driver_api)
+			    &mcux_ftm_driver_api);
 
-#if DT_INST_0_NXP_KINETIS_FTM
-FTM_DEVICE(0);
-#endif /* DT_INST_0_NXP_KINETIS_FTM */
-
-#if DT_INST_1_NXP_KINETIS_FTM
-FTM_DEVICE(1);
-#endif /* DT_INST_1_NXP_KINETIS_FTM */
-
-#if DT_INST_2_NXP_KINETIS_FTM
-FTM_DEVICE(2);
-#endif /* DT_INST_2_NXP_KINETIS_FTM */
-
-#if DT_INST_3_NXP_KINETIS_FTM
-FTM_DEVICE(3);
-#endif /* DT_INST_3_NXP_KINETIS_FTM */
+DT_INST_FOREACH_STATUS_OKAY(FTM_DEVICE)

@@ -31,13 +31,9 @@ static inline bool arch_is_in_isr(void)
 	__asm__ volatile ("popf");
 	return ret;
 #else
-	return _kernel.nested != 0U;
+	return _kernel.cpus[0].nested != 0U;
 #endif
 }
-
-/* stack alignment related macros: STACK_ALIGN is defined in arch.h */
-#define STACK_ROUND_UP(x) ROUND_UP(x, STACK_ALIGN)
-#define STACK_ROUND_DOWN(x) ROUND_DOWN(x, STACK_ALIGN)
 
 struct multiboot_info;
 
@@ -91,7 +87,7 @@ void z_x86_page_fault_handler(z_arch_esf_t *esf);
  * @param cs Code segment of faulting context
  * @return true if addr/size region is not within the thread stack
  */
-bool z_x86_check_stack_bounds(uintptr_t addr, size_t size, u16_t cs);
+bool z_x86_check_stack_bounds(uintptr_t addr, size_t size, uint16_t cs);
 #endif /* CONFIG_THREAD_STACK_INFO */
 
 #ifdef CONFIG_USERSPACE

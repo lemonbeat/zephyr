@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT st_stm32_ipcc_mailbox
+
 #include <drivers/clock_control.h>
 #include <device.h>
 #include <errno.h>
@@ -17,7 +19,7 @@ LOG_MODULE_REGISTER(ipm_stm32_ipcc, CONFIG_IPM_LOG_LEVEL);
 
 /* convenience defines */
 #define DEV_CFG(dev)							\
-	((const struct stm32_ipcc_mailbox_config * const)(dev)->config->config_info)
+	((const struct stm32_ipcc_mailbox_config * const)(dev)->config_info)
 #define DEV_DATA(dev)							\
 	((struct stm32_ipcc_mbx_data * const)(dev)->driver_data)
 #define MBX_STRUCT(dev)					\
@@ -92,7 +94,7 @@ struct stm32_ipcc_mailbox_config {
 };
 
 struct stm32_ipcc_mbx_data {
-	u32_t num_ch;
+	uint32_t num_ch;
 	ipm_callback_t callback;
 	void *callback_ctx;
 };
@@ -105,7 +107,7 @@ static void stm32_ipcc_mailbox_rx_isr(void *arg)
 	struct stm32_ipcc_mbx_data *data = DEV_DATA(dev);
 	const struct stm32_ipcc_mailbox_config *cfg = DEV_CFG(dev);
 	unsigned int value = 0;
-	u32_t mask, i;
+	uint32_t mask, i;
 
 	mask = (~IPCC_ReadReg(cfg->ipcc, MR)) & IPCC_ALL_MR_RXO_CH_MASK;
 	mask &= IPCC_ReadOtherInstReg_SR(cfg->ipcc) & IPCC_ALL_SR_CH_MASK;
@@ -133,7 +135,7 @@ static void stm32_ipcc_mailbox_tx_isr(void *arg)
 	struct device *dev = arg;
 	struct stm32_ipcc_mbx_data *data = DEV_DATA(dev);
 	const struct stm32_ipcc_mailbox_config *cfg = DEV_CFG(dev);
-	u32_t mask, i;
+	uint32_t mask, i;
 
 	mask = (~IPCC_ReadReg(cfg->ipcc, MR)) & IPCC_ALL_MR_TXF_CH_MASK;
 	mask = mask >> IPCC_C1MR_CH1FM_Pos;
@@ -150,7 +152,7 @@ static void stm32_ipcc_mailbox_tx_isr(void *arg)
 	}
 }
 
-static int stm32_ipcc_mailbox_ipm_send(struct device *dev, int wait, u32_t id,
+static int stm32_ipcc_mailbox_ipm_send(struct device *dev, int wait, uint32_t id,
 				       const void *buff, int size)
 {
 	struct stm32_ipcc_mbx_data *data = dev->driver_data;
@@ -192,7 +194,7 @@ static int stm32_ipcc_mailbox_ipm_max_data_size_get(struct device *dev)
 	return 0;
 }
 
-static u32_t stm32_ipcc_mailbox_ipm_max_id_val_get(struct device *d)
+static uint32_t stm32_ipcc_mailbox_ipm_max_id_val_get(struct device *d)
 {
 	struct stm32_ipcc_mbx_data *data = DEV_DATA(d);
 
@@ -213,7 +215,7 @@ static int stm32_ipcc_mailbox_ipm_set_enabled(struct device *dev, int enable)
 {
 	struct stm32_ipcc_mbx_data *data = DEV_DATA(dev);
 	const struct stm32_ipcc_mailbox_config *cfg = DEV_CFG(dev);
-	u32_t i;
+	uint32_t i;
 
 	/* For now: nothing to be done */
 	LOG_DBG("%s %s mailbox\r\n", __func__, enable ? "enable" : "disable");
@@ -242,7 +244,7 @@ static int stm32_ipcc_mailbox_init(struct device *dev)
 	struct stm32_ipcc_mbx_data *data = DEV_DATA(dev);
 	const struct stm32_ipcc_mailbox_config *cfg = DEV_CFG(dev);
 	struct device *clk;
-	u32_t i;
+	uint32_t i;
 
 	clk = device_get_binding(STM32_CLOCK_CONTROL_NAME);
 	__ASSERT_NO_MSG(clk);
@@ -285,14 +287,14 @@ static void stm32_ipcc_mailbox_config_func(struct device *dev);
 /* Config MAILBOX 0 */
 static const struct stm32_ipcc_mailbox_config stm32_ipcc_mailbox_0_config = {
 	.irq_config_func = stm32_ipcc_mailbox_config_func,
-	.ipcc = (IPCC_TypeDef *)DT_INST_0_ST_STM32_IPCC_MAILBOX_BASE_ADDRESS,
-	.pclken = { .bus = DT_INST_0_ST_STM32_IPCC_MAILBOX_CLOCK_BUS,
-		    .enr = DT_INST_0_ST_STM32_IPCC_MAILBOX_CLOCK_BITS
+	.ipcc = (IPCC_TypeDef *)DT_INST_REG_ADDR(0),
+	.pclken = { .bus = DT_INST_CLOCKS_CELL(0, bus),
+		    .enr = DT_INST_CLOCKS_CELL(0, bits)
 	},
 
 };
 
-DEVICE_AND_API_INIT(mailbox_0, DT_INST_0_ST_STM32_IPCC_MAILBOX_LABEL,
+DEVICE_AND_API_INIT(mailbox_0, DT_INST_LABEL(0),
 		    &stm32_ipcc_mailbox_init,
 		    &stm32_IPCC_data, &stm32_ipcc_mailbox_0_config,
 		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
@@ -300,14 +302,14 @@ DEVICE_AND_API_INIT(mailbox_0, DT_INST_0_ST_STM32_IPCC_MAILBOX_LABEL,
 
 static void stm32_ipcc_mailbox_config_func(struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_0_ST_STM32_IPCC_MAILBOX_IRQ_RXO,
-		    DT_INST_0_ST_STM32_IPCC_MAILBOX_IRQ_RXO_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, rxo, irq),
+		    DT_INST_IRQ_BY_NAME(0, rxo, priority),
 		    stm32_ipcc_mailbox_rx_isr, DEVICE_GET(mailbox_0), 0);
 
-	IRQ_CONNECT(DT_INST_0_ST_STM32_IPCC_MAILBOX_IRQ_TXF,
-		    DT_INST_0_ST_STM32_IPCC_MAILBOX_IRQ_TXF_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, txf, irq),
+		    DT_INST_IRQ_BY_NAME(0, txf, priority),
 		    stm32_ipcc_mailbox_tx_isr, DEVICE_GET(mailbox_0), 0);
 
-	irq_enable(DT_INST_0_ST_STM32_IPCC_MAILBOX_IRQ_RXO);
-	irq_enable(DT_INST_0_ST_STM32_IPCC_MAILBOX_IRQ_TXF);
+	irq_enable(DT_INST_IRQ_BY_NAME(0, rxo, irq));
+	irq_enable(DT_INST_IRQ_BY_NAME(0, txf, irq));
 }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT espressif_esp32_watchdog
+
 /* Include esp-idf headers first to avoid redefining BIT() macro */
 #include <soc/rtc_cntl_reg.h>
 #include <soc/timer_group_reg.h>
@@ -18,19 +20,19 @@
  * That's why the type name starts with `timer` not `wdt`
  */
 struct timer_esp32_irq_regs_t {
-	u32_t *timer_int_ena;
-	u32_t *timer_int_clr;
+	uint32_t *timer_int_ena;
+	uint32_t *timer_int_clr;
 };
 
 struct wdt_esp32_regs_t {
-	u32_t config0;
-	u32_t config1;
-	u32_t config2;
-	u32_t config3;
-	u32_t config4;
-	u32_t config5;
-	u32_t feed;
-	u32_t wprotect;
+	uint32_t config0;
+	uint32_t config1;
+	uint32_t config2;
+	uint32_t config3;
+	uint32_t config4;
+	uint32_t config5;
+	uint32_t feed;
+	uint32_t wprotect;
 };
 
 enum wdt_mode {
@@ -39,7 +41,7 @@ enum wdt_mode {
 };
 
 struct wdt_esp32_data {
-	u32_t timeout;
+	uint32_t timeout;
 	enum wdt_mode mode;
 	wdt_callback_t callback;
 };
@@ -56,7 +58,7 @@ struct wdt_esp32_config {
 };
 
 #define DEV_CFG(dev) \
-	((const struct wdt_esp32_config *const)(dev)->config->config_info)
+	((const struct wdt_esp32_config *const)(dev)->config_info)
 #define DEV_DATA(dev) \
 	((struct wdt_esp32_data *)(dev)->driver_data)
 #define DEV_BASE(dev) \
@@ -94,7 +96,7 @@ static int wdt_esp32_disable(struct device *dev)
 	return 0;
 }
 
-static void adjust_timeout(struct device *dev, u32_t timeout)
+static void adjust_timeout(struct device *dev, uint32_t timeout)
 {
 	/* MWDT ticks every 12.5ns.  Set the prescaler to 40000, so the
 	 * counter for each watchdog stage is decremented every 0.5ms.
@@ -128,10 +130,10 @@ static void set_interrupt_enabled(struct device *dev, bool setting)
 	}
 }
 
-static int wdt_esp32_set_config(struct device *dev, u8_t options)
+static int wdt_esp32_set_config(struct device *dev, uint8_t options)
 {
 	struct wdt_esp32_data *data = DEV_DATA(dev);
-	u32_t v = DEV_BASE(dev)->config0;
+	uint32_t v = DEV_BASE(dev)->config0;
 
 	if (!data) {
 		return -EINVAL;
@@ -237,10 +239,10 @@ static const struct wdt_driver_api wdt_api = {
 													   \
 	static struct wdt_esp32_data wdt##idx##_data;							   \
 	static struct wdt_esp32_config wdt_esp32_config##idx = {					   \
-		.base = (struct wdt_esp32_regs_t *) DT_INST_##idx##_ESPRESSIF_ESP32_WATCHDOG_BASE_ADDRESS, \
+		.base = (struct wdt_esp32_regs_t *) DT_INST_REG_ADDR(idx), \
 		.irq_regs = {										   \
-			.timer_int_ena = (u32_t *)TIMG_INT_ENA_TIMERS_REG(idx),				   \
-			.timer_int_clr = (u32_t *)TIMG_INT_CLR_TIMERS_REG(idx),				   \
+			.timer_int_ena = (uint32_t *)TIMG_INT_ENA_TIMERS_REG(idx),				   \
+			.timer_int_clr = (uint32_t *)TIMG_INT_CLR_TIMERS_REG(idx),				   \
 		},											   \
 		.irq = {										   \
 			.source =  ETS_TG##idx##_WDT_LEVEL_INTR_SOURCE,					   \
@@ -249,7 +251,7 @@ static const struct wdt_driver_api wdt_api = {
 		.connect_irq = wdt_esp32_connect_irq_func##idx						   \
 	};												   \
 													   \
-	DEVICE_AND_API_INIT(wdt_esp32_##idx, DT_INST_##idx##_ESPRESSIF_ESP32_WATCHDOG_LABEL,		   \
+	DEVICE_AND_API_INIT(wdt_esp32_##idx, DT_INST_LABEL(idx),		   \
 			    wdt_esp32_init,								   \
 			    &wdt##idx##_data,								   \
 			    &wdt_esp32_config##idx,							   \
@@ -268,10 +270,10 @@ static void wdt_esp32_isr(struct device *dev)
 }
 
 
-#ifdef DT_INST_0_ESPRESSIF_ESP32_WATCHDOG
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(wdt0), okay)
 ESP32_WDT_INIT(0);
 #endif
 
-#ifdef DT_INST_1_ESPRESSIF_ESP32_WATCHDOG
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(wdt1), okay)
 ESP32_WDT_INIT(1);
 #endif

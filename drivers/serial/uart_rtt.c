@@ -12,12 +12,12 @@ struct uart_rtt_config {
 	size_t up_size;
 	void *down_buffer;
 	size_t down_size;
-	u8_t channel;
+	uint8_t channel;
 };
 
 static inline const struct uart_rtt_config *get_dev_config(struct device *dev)
 {
-	return dev->config->config_info;
+	return dev->config_info;
 }
 
 static int uart_rtt_init(struct device *dev)
@@ -30,10 +30,10 @@ static int uart_rtt_init(struct device *dev)
 	if (get_dev_config(dev)) {
 		const struct uart_rtt_config *cfg = get_dev_config(dev);
 
-		SEGGER_RTT_ConfigUpBuffer(cfg->channel, dev->config->name,
+		SEGGER_RTT_ConfigUpBuffer(cfg->channel, dev->name,
 					  cfg->up_buffer, cfg->up_size,
 					  SEGGER_RTT_MODE_NO_BLOCK_SKIP);
-		SEGGER_RTT_ConfigDownBuffer(cfg->channel, dev->config->name,
+		SEGGER_RTT_ConfigDownBuffer(cfg->channel, dev->name,
 					    cfg->down_buffer, cfg->down_size,
 					    SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 	}
@@ -87,9 +87,9 @@ DEVICE_AND_API_INIT(uart_rtt0, "RTT_0", uart_rtt_init, NULL, NULL,
 #endif
 
 #define UART_RTT_CHANNEL(n)                                                    \
-	static u8_t                                                            \
+	static uint8_t                                                            \
 		uart_rtt##n##_tx_buffer[CONFIG_UART_RTT_##n##_TX_BUFFER_SIZE]; \
-	static u8_t                                                            \
+	static uint8_t                                                            \
 		uart_rtt##n##_rx_buffer[CONFIG_UART_RTT_##n##_RX_BUFFER_SIZE]; \
 									       \
 	static const char uart_rtt##n##_name[] = "RTT_" #n "\0";               \

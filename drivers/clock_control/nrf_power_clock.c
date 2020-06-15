@@ -14,6 +14,8 @@
 
 LOG_MODULE_REGISTER(clock_control, CONFIG_CLOCK_CONTROL_LOG_LEVEL);
 
+#define DT_DRV_COMPAT nordic_nrf_clock
+
 /* Helper logging macros which prepends subsys name to the log. */
 #ifdef CONFIG_LOG
 #define CLOCK_LOG(lvl, dev, subsys, ...) \
@@ -33,7 +35,7 @@ LOG_MODULE_REGISTER(clock_control, CONFIG_CLOCK_CONTROL_LOG_LEVEL);
 /* Clock subsys structure */
 struct nrf_clock_control_sub_data {
 	sys_slist_t list;	/* List of users requesting callback */
-	u8_t ref;		/* Users counter */
+	uint8_t ref;		/* Users counter */
 	bool started;		/* Indicated that clock is started */
 };
 
@@ -62,7 +64,7 @@ static void clkstarted_handle(struct device *dev,
 /* Return true if given event has enabled interrupt and is triggered. Event
  * is cleared.
  */
-static bool clock_event_check_and_clean(nrf_clock_event_t evt, u32_t intmask)
+static bool clock_event_check_and_clean(nrf_clock_event_t evt, uint32_t intmask)
 {
 	bool ret = nrf_clock_event_check(NRF_CLOCK, evt) &&
 			nrf_clock_int_enable_check(NRF_CLOCK, intmask);
@@ -111,7 +113,7 @@ static const struct nrf_clock_control_sub_config *get_sub_config(
 					enum clock_control_nrf_type type)
 {
 	const struct nrf_clock_control_config *config =
-						dev->config->config_info;
+						dev->config_info;
 
 	return &config->subsys[type];
 }
@@ -232,7 +234,7 @@ static int clock_async_start(struct device *dev,
 	const struct nrf_clock_control_sub_config *config;
 	struct nrf_clock_control_sub_data *clk_data;
 	int key;
-	u8_t ref;
+	uint8_t ref;
 
 	__ASSERT_NO_MSG(type < CLOCK_CONTROL_NRF_TYPE_COUNT);
 	config = get_sub_config(dev, type);
@@ -300,11 +302,10 @@ void nrf_power_clock_isr(void *arg);
 
 static int clk_init(struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_0_NORDIC_NRF_CLOCK_IRQ_0,
-		    DT_INST_0_NORDIC_NRF_CLOCK_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
 		    nrf_power_clock_isr, 0, 0);
 
-	irq_enable(DT_INST_0_NORDIC_NRF_CLOCK_IRQ_0);
+	irq_enable(DT_INST_IRQN(0));
 
 	nrf_clock_lf_src_set(NRF_CLOCK, CLOCK_CONTROL_NRF_K32SRC);
 
@@ -347,8 +348,7 @@ static const struct nrf_clock_control_config config = {
 	}
 };
 
-DEVICE_AND_API_INIT(clock_nrf,
-		    DT_INST_0_NORDIC_NRF_CLOCK_LABEL,
+DEVICE_AND_API_INIT(clock_nrf, DT_INST_LABEL(0),
 		    clk_init, &data, &config, PRE_KERNEL_1,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &clock_control_api);
@@ -369,7 +369,7 @@ static void clkstarted_handle(struct device *dev,
 }
 
 #if defined(CONFIG_USB_NRFX)
-static bool power_event_check_and_clean(nrf_power_event_t evt, u32_t intmask)
+static bool power_event_check_and_clean(nrf_power_event_t evt, uint32_t intmask)
 {
 	bool ret = nrf_power_event_check(NRF_POWER, evt) &&
 			nrf_power_int_enable_check(NRF_POWER, intmask);
@@ -441,7 +441,7 @@ void nrf_power_clock_isr(void *arg)
 #ifdef CONFIG_USB_NRFX
 void nrf5_power_usb_power_int_enable(bool enable)
 {
-	u32_t mask;
+	uint32_t mask;
 
 	mask = NRF_POWER_INT_USBDETECTED_MASK |
 	       NRF_POWER_INT_USBREMOVED_MASK |
@@ -449,7 +449,7 @@ void nrf5_power_usb_power_int_enable(bool enable)
 
 	if (enable) {
 		nrf_power_int_enable(NRF_POWER, mask);
-		irq_enable(DT_INST_0_NORDIC_NRF_CLOCK_IRQ_0);
+		irq_enable(DT_INST_IRQN(0));
 	} else {
 		nrf_power_int_disable(NRF_POWER, mask);
 	}

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT ti_tlv320dac
+
 #include <errno.h>
 
 #include <sys/util.h>
@@ -25,10 +27,10 @@ LOG_MODULE_REGISTER(tlv320dac310x);
 struct codec_driver_config {
 	struct device	*i2c_device;
 	const char	*i2c_dev_name;
-	u8_t		i2c_address;
+	uint8_t		i2c_address;
 	struct device	*gpio_device;
 	const char	*gpio_dev_name;
-	u32_t		gpio_pin;
+	uint32_t		gpio_pin;
 	int		gpio_flags;
 };
 
@@ -38,23 +40,23 @@ struct codec_driver_data {
 
 static struct codec_driver_config codec_device_config = {
 	.i2c_device	= NULL,
-	.i2c_dev_name	= DT_INST_0_TI_TLV320DAC_BUS_NAME,
-	.i2c_address	= DT_INST_0_TI_TLV320DAC_BASE_ADDRESS,
+	.i2c_dev_name	= DT_INST_BUS_LABEL(0),
+	.i2c_address	= DT_INST_REG_ADDR(0),
 	.gpio_device	= NULL,
-	.gpio_dev_name	= DT_INST_0_TI_TLV320DAC_RESET_GPIOS_CONTROLLER,
-	.gpio_pin	= DT_INST_0_TI_TLV320DAC_RESET_GPIOS_PIN,
-	.gpio_flags	= DT_INST_0_TI_TLV320DAC_RESET_GPIOS_FLAGS,
+	.gpio_dev_name	= DT_INST_GPIO_LABEL(0, reset_gpios),
+	.gpio_pin	= DT_INST_GPIO_PIN(0, reset_gpios),
+	.gpio_flags	= DT_INST_GPIO_FLAGS(0, reset_gpios),
 };
 
 static struct codec_driver_data codec_device_data;
 
 #define DEV_CFG(dev) \
-	((struct codec_driver_config *const)(dev)->config->config_info)
+	((struct codec_driver_config *const)(dev)->config_info)
 #define DEV_DATA(dev) \
 	((struct codec_driver_data *const)(dev)->driver_data)
 
-static void codec_write_reg(struct device *dev, struct reg_addr reg, u8_t val);
-static void codec_read_reg(struct device *dev, struct reg_addr reg, u8_t *val);
+static void codec_write_reg(struct device *dev, struct reg_addr reg, uint8_t val);
+static void codec_read_reg(struct device *dev, struct reg_addr reg, uint8_t *val);
 static void codec_soft_reset(struct device *dev);
 static int codec_configure_dai(struct device *dev, audio_dai_cfg_t *cfg);
 static int codec_configure_clocks(struct device *dev,
@@ -193,7 +195,7 @@ static int codec_apply_properties(struct device *dev)
 	return 0;
 }
 
-static void codec_write_reg(struct device *dev, struct reg_addr reg, u8_t val)
+static void codec_write_reg(struct device *dev, struct reg_addr reg, uint8_t val)
 {
 	struct codec_driver_data *const dev_data = DEV_DATA(dev);
 	struct codec_driver_config *const dev_cfg = DEV_CFG(dev);
@@ -211,7 +213,7 @@ static void codec_write_reg(struct device *dev, struct reg_addr reg, u8_t val)
 			reg.page, reg.reg_addr, val);
 }
 
-static void codec_read_reg(struct device *dev, struct reg_addr reg, u8_t *val)
+static void codec_read_reg(struct device *dev, struct reg_addr reg, uint8_t *val)
 {
 	struct codec_driver_data *const dev_data = DEV_DATA(dev);
 	struct codec_driver_config *const dev_cfg = DEV_CFG(dev);
@@ -237,7 +239,7 @@ static void codec_soft_reset(struct device *dev)
 
 static int codec_configure_dai(struct device *dev, audio_dai_cfg_t *cfg)
 {
-	u8_t val;
+	uint8_t val;
 
 	/* configure I2S interface */
 	val = IF_CTRL_IFTYPE(IF_CTRL_IFTYPE_I2S);
@@ -350,11 +352,11 @@ static int codec_configure_clocks(struct device *dev,
 
 	/* set NDAC, then MDAC, followed by OSR */
 	codec_write_reg(dev, NDAC_DIV_ADDR,
-			(u8_t)(NDAC_DIV(ndac) | NDAC_POWER_UP_MASK));
+			(uint8_t)(NDAC_DIV(ndac) | NDAC_POWER_UP_MASK));
 	codec_write_reg(dev, MDAC_DIV_ADDR,
-			(u8_t)(MDAC_DIV(mdac) | MDAC_POWER_UP_MASK));
-	codec_write_reg(dev, OSR_MSB_ADDR, (u8_t)((osr >> 8) & OSR_MSB_MASK));
-	codec_write_reg(dev, OSR_LSB_ADDR, (u8_t)(osr & OSR_LSB_MASK));
+			(uint8_t)(MDAC_DIV(mdac) | MDAC_POWER_UP_MASK));
+	codec_write_reg(dev, OSR_MSB_ADDR, (uint8_t)((osr >> 8) & OSR_MSB_MASK));
+	codec_write_reg(dev, OSR_LSB_ADDR, (uint8_t)(osr & OSR_LSB_MASK));
 
 	if (i2s->options & I2S_OPT_BIT_CLK_MASTER) {
 		codec_write_reg(dev, BCLK_DIV_ADDR,
@@ -413,7 +415,7 @@ static enum osr_multiple codec_get_osr_multiple(audio_dai_cfg_t *cfg)
 
 static void codec_configure_output(struct device *dev)
 {
-	u8_t val;
+	uint8_t val;
 
 	/*
 	 * set common mode voltage to 1.65V (half of AVDD)
@@ -453,16 +455,16 @@ static void codec_configure_output(struct device *dev)
 
 static int codec_set_output_volume(struct device *dev, int vol)
 {
-	u8_t vol_val;
+	uint8_t vol_val;
 	int vol_index;
-	u8_t vol_array[] = {
+	uint8_t vol_array[] = {
 		107, 108, 110, 113, 116, 120, 125, 128, 132, 138, 144
 	};
 
 	if ((vol > CODEC_OUTPUT_VOLUME_MAX) ||
 			(vol < CODEC_OUTPUT_VOLUME_MIN)) {
 		LOG_ERR("Invalid volume %d.%d dB",
-				vol >> 1, ((u32_t)vol & 1) ? 5 : 0);
+				vol >> 1, ((uint32_t)vol & 1) ? 5 : 0);
 		return -EINVAL;
 	}
 
@@ -481,7 +483,7 @@ static int codec_set_output_volume(struct device *dev, int vol)
 		}
 		vol_val = HPX_ANA_VOL_LOW_THRESH + vol_index + 1;
 	} else {
-		vol_val = (u8_t)vol;
+		vol_val = (uint8_t)vol;
 	}
 
 	codec_write_reg(dev, HPL_ANA_VOL_CTRL_ADDR, HPX_ANA_VOL(vol_val));
@@ -492,7 +494,7 @@ static int codec_set_output_volume(struct device *dev, int vol)
 #if (LOG_LEVEL >= LOG_LEVEL_DEBUG)
 static void codec_read_all_regs(struct device *dev)
 {
-	u8_t val;
+	uint8_t val;
 
 	codec_read_reg(dev, SOFT_RESET_ADDR, &val);
 	codec_read_reg(dev, NDAC_DIV_ADDR, &val);
@@ -534,6 +536,6 @@ static const struct audio_codec_api codec_driver_api = {
 	.apply_properties	= codec_apply_properties,
 };
 
-DEVICE_AND_API_INIT(tlv320dac310x, DT_INST_0_TI_TLV320DAC_LABEL, codec_initialize,
+DEVICE_AND_API_INIT(tlv320dac310x, DT_INST_LABEL(0), codec_initialize,
 		&codec_device_data, &codec_device_config, POST_KERNEL,
 		CONFIG_AUDIO_CODEC_INIT_PRIORITY, &codec_driver_api);

@@ -24,13 +24,13 @@ LOG_MODULE_REGISTER(net_google_iot_mqtt, LOG_LEVEL_INF);
 #include <time.h>
 #include <inttypes.h>
 
-s64_t time_base;
+int64_t time_base;
 
 void do_sntp(struct addrinfo *addr)
 {
 	struct sntp_ctx ctx;
 	int rc;
-	s64_t stamp;
+	int64_t stamp;
 	struct sntp_time sntp_time;
 	char time_str[sizeof("1970-01-01T00:00:00")];
 
@@ -43,7 +43,7 @@ void do_sntp(struct addrinfo *addr)
 		return;
 	}
 
-	rc = sntp_query(&ctx, K_FOREVER, &sntp_time);
+	rc = sntp_query(&ctx, SYS_FOREVER_MS, &sntp_time);
 	if (rc == 0) {
 		stamp = k_uptime_get();
 		time_base = sntp_time.seconds * MSEC_PER_SEC - stamp;

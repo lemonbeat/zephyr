@@ -43,8 +43,8 @@ static void turn_off_clock(struct device *dev, clock_control_subsys_t subsys)
 /* Function tests if during given time expected number of calibrations and
  * skips occurs.
  */
-static void test_calibration(u32_t exp_cal, u32_t exp_skip,
-				u32_t sleep_ms, u32_t line)
+static void test_calibration(uint32_t exp_cal, uint32_t exp_skip,
+				uint32_t sleep_ms, uint32_t line)
 {
 	int cal_cnt;
 	int skip_cnt;
@@ -70,7 +70,7 @@ static void test_calibration(u32_t exp_cal, u32_t exp_skip,
  */
 static void sync_just_after_calibration(void)
 {
-	u32_t cal_cnt = z_nrf_clock_calibration_count();
+	uint32_t cal_cnt = z_nrf_clock_calibration_count();
 
 	/* wait until calibration is performed. */
 	while (z_nrf_clock_calibration_count() == cal_cnt) {
@@ -99,7 +99,7 @@ static void test_basic_clock_calibration(void)
 static void test_calibration_after_enabling_lfclk(void)
 {
 	struct device *clk_dev =
-		device_get_binding(DT_INST_0_NORDIC_NRF_CLOCK_LABEL);
+		device_get_binding(DT_LABEL(DT_INST(0, nordic_nrf_clock)));
 	struct sensor_value value = { .val1 = 0, .val2 = 0 };
 
 	mock_temp_nrf5_value_set(&value);

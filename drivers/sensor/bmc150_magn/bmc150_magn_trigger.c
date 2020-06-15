@@ -20,7 +20,7 @@ static inline void setup_drdy(struct device *dev,
 {
 	struct bmc150_magn_data *data = dev->driver_data;
 	const struct bmc150_magn_config *const cfg =
-		dev->config->config_info;
+		dev->config_info;
 
 	gpio_pin_interrupt_configure(data->gpio_drdy,
 				     cfg->gpio_drdy_int_pin,
@@ -36,8 +36,8 @@ int bmc150_magn_trigger_set(struct device *dev,
 {
 	struct bmc150_magn_data *data = dev->driver_data;
 	const struct bmc150_magn_config * const config =
-					dev->config->config_info;
-	u8_t state;
+					dev->config_info;
+	uint8_t state;
 
 #if defined(CONFIG_BMC150_MAGN_TRIGGER_DRDY)
 	if (trig->type == SENSOR_TRIG_DATA_READY) {
@@ -70,7 +70,7 @@ int bmc150_magn_trigger_set(struct device *dev,
 
 static void bmc150_magn_gpio_drdy_callback(struct device *dev,
 					   struct gpio_callback *cb,
-					   u32_t pins)
+					   uint32_t pins)
 {
 	struct bmc150_magn_data *data =
 		CONTAINER_OF(cb, struct bmc150_magn_data, gpio_cb);
@@ -86,8 +86,8 @@ static void bmc150_magn_thread_main(void *arg1, void *arg2, void *arg3)
 {
 	struct device *dev = (struct device *) arg1;
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
-	u8_t reg_val;
+	const struct bmc150_magn_config *config = dev->config_info;
+	uint8_t reg_val;
 
 	while (1) {
 		k_sem_take(&data->sem, K_FOREVER);
@@ -110,7 +110,7 @@ static void bmc150_magn_thread_main(void *arg1, void *arg2, void *arg3)
 static int bmc150_magn_set_drdy_polarity(struct device *dev, int state)
 {
 	struct bmc150_magn_data *data = dev->driver_data;
-	const struct bmc150_magn_config *config = dev->config->config_info;
+	const struct bmc150_magn_config *config = dev->config_info;
 
 	if (state) {
 		state = 1;
@@ -125,7 +125,7 @@ static int bmc150_magn_set_drdy_polarity(struct device *dev, int state)
 int bmc150_magn_init_interrupt(struct device *dev)
 {
 	const struct bmc150_magn_config * const config =
-						dev->config->config_info;
+						dev->config_info;
 	struct bmc150_magn_data *data = dev->driver_data;
 
 

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nxp_fxas21002
+
 #include "fxas21002.h"
 #include <sys/util.h>
 #include <sys/__assert.h>
@@ -12,16 +14,16 @@
 LOG_MODULE_REGISTER(FXAS21002, CONFIG_SENSOR_LOG_LEVEL);
 
 /* Sample period in microseconds, indexed by output data rate encoding (DR) */
-static const u32_t sample_period[] = {
+static const uint32_t sample_period[] = {
 	1250, 2500, 5000, 10000, 20000, 40000, 80000, 80000
 };
 
 static int fxas21002_sample_fetch(struct device *dev, enum sensor_channel chan)
 {
-	const struct fxas21002_config *config = dev->config->config_info;
+	const struct fxas21002_config *config = dev->config_info;
 	struct fxas21002_data *data = dev->driver_data;
-	u8_t buffer[FXAS21002_MAX_NUM_BYTES];
-	s16_t *raw;
+	uint8_t buffer[FXAS21002_MAX_NUM_BYTES];
+	int16_t *raw;
 	int ret = 0;
 	int i;
 
@@ -56,10 +58,10 @@ exit:
 	return ret;
 }
 
-static void fxas21002_convert(struct sensor_value *val, s16_t raw,
+static void fxas21002_convert(struct sensor_value *val, int16_t raw,
 			      enum fxas21002_range range)
 {
-	s32_t micro_rad;
+	int32_t micro_rad;
 
 	/* Convert units to micro radians per second.*/
 	micro_rad = (raw * 62500) >> range;
@@ -71,11 +73,11 @@ static void fxas21002_convert(struct sensor_value *val, s16_t raw,
 static int fxas21002_channel_get(struct device *dev, enum sensor_channel chan,
 				 struct sensor_value *val)
 {
-	const struct fxas21002_config *config = dev->config->config_info;
+	const struct fxas21002_config *config = dev->config_info;
 	struct fxas21002_data *data = dev->driver_data;
 	int start_channel;
 	int num_channels;
-	s16_t *raw;
+	int16_t *raw;
 	int ret;
 	int i;
 
@@ -130,9 +132,9 @@ static int fxas21002_channel_get(struct device *dev, enum sensor_channel chan,
 
 int fxas21002_get_power(struct device *dev, enum fxas21002_power *power)
 {
-	const struct fxas21002_config *config = dev->config->config_info;
+	const struct fxas21002_config *config = dev->config_info;
 	struct fxas21002_data *data = dev->driver_data;
-	u8_t val = *power;
+	uint8_t val = *power;
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
 			      FXAS21002_REG_CTRLREG1,
@@ -148,7 +150,7 @@ int fxas21002_get_power(struct device *dev, enum fxas21002_power *power)
 
 int fxas21002_set_power(struct device *dev, enum fxas21002_power power)
 {
-	const struct fxas21002_config *config = dev->config->config_info;
+	const struct fxas21002_config *config = dev->config_info;
 	struct fxas21002_data *data = dev->driver_data;
 
 	return i2c_reg_update_byte(data->i2c, config->i2c_address,
@@ -157,11 +159,11 @@ int fxas21002_set_power(struct device *dev, enum fxas21002_power power)
 				   power);
 }
 
-u32_t fxas21002_get_transition_time(enum fxas21002_power start,
+uint32_t fxas21002_get_transition_time(enum fxas21002_power start,
 				       enum fxas21002_power end,
-				       u8_t dr)
+				       uint8_t dr)
 {
-	u32_t transition_time;
+	uint32_t transition_time;
 
 	/* If not transitioning to active mode, then don't need to wait */
 	if (end != FXAS21002_POWER_ACTIVE) {
@@ -184,11 +186,11 @@ u32_t fxas21002_get_transition_time(enum fxas21002_power start,
 
 static int fxas21002_init(struct device *dev)
 {
-	const struct fxas21002_config *config = dev->config->config_info;
+	const struct fxas21002_config *config = dev->config_info;
 	struct fxas21002_data *data = dev->driver_data;
-	u32_t transition_time;
-	u8_t whoami;
-	u8_t ctrlreg1;
+	uint32_t transition_time;
+	uint8_t whoami;
+	uint8_t ctrlreg1;
 
 	/* Get the I2C device */
 	data->i2c = device_get_binding(config->i2c_name);
@@ -284,27 +286,27 @@ static const struct sensor_driver_api fxas21002_driver_api = {
 };
 
 static const struct fxas21002_config fxas21002_config = {
-	.i2c_name = DT_INST_0_NXP_FXAS21002_BUS_NAME,
-	.i2c_address = DT_INST_0_NXP_FXAS21002_BASE_ADDRESS,
+	.i2c_name = DT_INST_BUS_LABEL(0),
+	.i2c_address = DT_INST_REG_ADDR(0),
 	.whoami = CONFIG_FXAS21002_WHOAMI,
 	.range = CONFIG_FXAS21002_RANGE,
 	.dr = CONFIG_FXAS21002_DR,
 #ifdef CONFIG_FXAS21002_TRIGGER
 #ifdef CONFIG_FXAS21002_DRDY_INT1
-	.gpio_name = DT_INST_0_NXP_FXAS21002_INT1_GPIOS_CONTROLLER,
-	.gpio_pin = DT_INST_0_NXP_FXAS21002_INT1_GPIOS_PIN,
-	.gpio_flags = DT_INST_0_NXP_FXAS21002_INT1_GPIOS_FLAGS,
+	.gpio_name = DT_INST_GPIO_LABEL(0, int1_gpios),
+	.gpio_pin = DT_INST_GPIO_PIN(0, int1_gpios),
+	.gpio_flags = DT_INST_GPIO_FLAGS(0, int1_gpios),
 #else
-	.gpio_name = DT_INST_0_NXP_FXAS21002_INT2_GPIOS_CONTROLLER,
-	.gpio_pin = DT_INST_0_NXP_FXAS21002_INT2_GPIOS_PIN,
-	.gpio_flags = DT_INST_0_NXP_FXAS21002_INT2_GPIOS_FLAGS,
+	.gpio_name = DT_INST_GPIO_LABEL(0, int2_gpios),
+	.gpio_pin = DT_INST_GPIO_PIN(0, int2_gpios),
+	.gpio_flags = DT_INST_GPIO_FLAGS(0, int2_gpios),
 #endif
 #endif
 };
 
 static struct fxas21002_data fxas21002_data;
 
-DEVICE_AND_API_INIT(fxas21002, DT_INST_0_NXP_FXAS21002_LABEL, fxas21002_init,
+DEVICE_AND_API_INIT(fxas21002, DT_INST_LABEL(0), fxas21002_init,
 		    &fxas21002_data, &fxas21002_config,
 		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &fxas21002_driver_api);

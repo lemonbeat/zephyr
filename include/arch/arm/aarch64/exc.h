@@ -26,7 +26,9 @@ extern "C" {
 
 struct __esf {
 	struct __basic_sf {
-		u64_t regs[20];
+		uint64_t regs[20];
+		uint64_t spsr;
+		uint64_t elr;
 	} basic;
 };
 

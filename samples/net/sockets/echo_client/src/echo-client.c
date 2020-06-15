@@ -121,7 +121,7 @@ static void wait(void)
 	/* Wait for event on any socket used. Once event occurs,
 	 * we'll check them all.
 	 */
-	if (poll(fds, nfds, K_FOREVER) < 0) {
+	if (poll(fds, nfds, -1) < 0) {
 		LOG_ERR("Error in poll:%d", errno);
 	}
 }
@@ -188,7 +188,7 @@ static void stop_udp_and_tcp(void)
 }
 
 static void event_handler(struct net_mgmt_event_callback *cb,
-			  u32_t mgmt_event, struct net_if *iface)
+			  uint32_t mgmt_event, struct net_if *iface)
 {
 	if ((mgmt_event & EVENT_MASK) != mgmt_event) {
 		return;

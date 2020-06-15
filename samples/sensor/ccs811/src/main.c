@@ -17,7 +17,7 @@ static bool app_fw_2;
 static const char *now_str(void)
 {
 	static char buf[16]; /* ...HH:MM:SS.MMM */
-	u32_t now = k_uptime_get_32();
+	uint32_t now = k_uptime_get_32();
 	unsigned int ms = now % MSEC_PER_SEC;
 	unsigned int s;
 	unsigned int min;
@@ -106,13 +106,13 @@ static void do_main(struct device *dev)
 			printk("Timed fetch failed: %d\n", rc);
 			break;
 		}
-		k_sleep(1000);
+		k_msleep(1000);
 	}
 }
 
 void main(void)
 {
-	struct device *dev = device_get_binding(DT_INST_0_AMS_CCS811_LABEL);
+	struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, ams_ccs811)));
 	struct ccs811_configver_type cfgver;
 	int rc;
 
@@ -121,7 +121,7 @@ void main(void)
 		return;
 	}
 
-	printk("device is %p, name is %s\n", dev, dev->config->name);
+	printk("device is %p, name is %s\n", dev, dev->name);
 
 	rc = ccs811_configver_fetch(dev, &cfgver);
 	if (rc == 0) {

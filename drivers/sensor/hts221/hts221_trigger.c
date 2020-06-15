@@ -19,7 +19,7 @@ static inline void setup_drdy(struct device *dev,
 			      bool enable)
 {
 	struct hts221_data *data = dev->driver_data;
-	const struct hts221_config *cfg = dev->config->config_info;
+	const struct hts221_config *cfg = dev->config_info;
 	unsigned int flags = enable
 		? GPIO_INT_EDGE_TO_ACTIVE
 		: GPIO_INT_DISABLE;
@@ -58,7 +58,7 @@ int hts221_trigger_set(struct device *dev,
 		       sensor_trigger_handler_t handler)
 {
 	struct hts221_data *data = dev->driver_data;
-	const struct hts221_config *cfg = dev->config->config_info;
+	const struct hts221_config *cfg = dev->config_info;
 
 	__ASSERT_NO_MSG(trig->type == SENSOR_TRIG_DATA_READY);
 
@@ -84,7 +84,7 @@ int hts221_trigger_set(struct device *dev,
 }
 
 static void hts221_drdy_callback(struct device *dev,
-				 struct gpio_callback *cb, u32_t pins)
+				 struct gpio_callback *cb, uint32_t pins)
 {
 	struct hts221_data *data =
 		CONTAINER_OF(cb, struct hts221_data, drdy_cb);
@@ -122,7 +122,7 @@ static void hts221_work_cb(struct k_work *work)
 int hts221_init_interrupt(struct device *dev)
 {
 	struct hts221_data *data = dev->driver_data;
-	const struct hts221_config *cfg = dev->config->config_info;
+	const struct hts221_config *cfg = dev->config_info;
 
 	data->dev = dev;
 

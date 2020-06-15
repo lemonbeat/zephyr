@@ -56,7 +56,7 @@ typedef void (*k_thread_entry_t)(void *p1, void *p2, void *p3);
  *
  * @see k_cycle_get_32()
  */
-static inline u32_t arch_k_cycle_get_32(void);
+static inline uint32_t arch_k_cycle_get_32(void);
 
 /** @} */
 
@@ -108,8 +108,15 @@ static inline u32_t arch_k_cycle_get_32(void);
  * @see K_THREAD_STACK_RESERVED
  */
 
+/**
+ * @def ARCH_STACK_PTR_ALIGN
+ *
+ * Required alignment of the CPU's stack pointer register value, dictated by
+ * hardware constraints and the ABI calling convention.
+ *
+ * @see Z_STACK_PTR_ALIGN
+ */
 /** @} */
-
 
 /**
  * @addtogroup arch-pm
@@ -257,7 +264,7 @@ int arch_irq_is_enabled(unsigned int irq);
  */
 int arch_irq_connect_dynamic(unsigned int irq, unsigned int priority,
 			     void (*routine)(void *parameter),
-			     void *parameter, u32_t flags);
+			     void *parameter, uint32_t flags);
 
 /**
  * @def ARCH_IRQ_CONNECT(irq, pri, isr, arg, flags)
@@ -536,7 +543,7 @@ void arch_mem_domain_thread_remove(struct k_thread *thread);
  * @param partition_id The partition index that needs to be deleted
  */
 void arch_mem_domain_partition_remove(struct k_mem_domain *domain,
-				      u32_t partition_id);
+				      uint32_t partition_id);
 
 /**
  * @brief Add a partition to the memory domain
@@ -548,7 +555,7 @@ void arch_mem_domain_partition_remove(struct k_mem_domain *domain,
  * @param partition_id The partition that needs to be added
  */
 void arch_mem_domain_partition_add(struct k_mem_domain *domain,
-				   u32_t partition_id);
+				   uint32_t partition_id);
 
 /**
  * @brief Remove the memory domain
@@ -654,16 +661,16 @@ size_t arch_user_string_nlen(const char *s, size_t maxsize, int *err);
  */
 
 #ifdef CONFIG_EXECUTION_BENCHMARKING
-extern u64_t arch_timing_swap_start;
-extern u64_t arch_timing_swap_end;
-extern u64_t arch_timing_irq_start;
-extern u64_t arch_timing_irq_end;
-extern u64_t arch_timing_tick_start;
-extern u64_t arch_timing_tick_end;
-extern u64_t arch_timing_user_mode_end;
-extern u32_t arch_timing_value_swap_end;
-extern u64_t arch_timing_value_swap_common;
-extern u64_t arch_timing_value_swap_temp;
+extern uint64_t arch_timing_swap_start;
+extern uint64_t arch_timing_swap_end;
+extern uint64_t arch_timing_irq_start;
+extern uint64_t arch_timing_irq_end;
+extern uint64_t arch_timing_tick_start;
+extern uint64_t arch_timing_tick_end;
+extern uint64_t arch_timing_user_mode_end;
+extern uint32_t arch_timing_value_swap_end;
+extern uint64_t arch_timing_value_swap_common;
+extern uint64_t arch_timing_value_swap_temp;
 #endif /* CONFIG_EXECUTION_BENCHMARKING */
 
 /** @} */

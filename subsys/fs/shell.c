@@ -36,7 +36,7 @@ FS_LITTLEFS_DECLARE_DEFAULT_CONFIG(lfs_data);
 static struct fs_mount_t littlefs_mnt = {
 	.type = FS_LITTLEFS,
 	.fs_data = &lfs_data,
-	.storage_dev = (void *)DT_FLASH_AREA_STORAGE_ID,
+	.storage_dev = (void *)FLASH_AREA_ID(storage),
 };
 #endif
 
@@ -295,7 +295,7 @@ static int cmd_read(const struct shell *shell, size_t argc, char **argv)
 
 	while (count > 0) {
 		ssize_t read;
-		u8_t buf[16];
+		uint8_t buf[16];
 		int i;
 
 		read = fs_read(&file, buf, MIN(count, sizeof(buf)));
@@ -354,8 +354,8 @@ static int cmd_statvfs(const struct shell *shell, size_t argc, char **argv)
 static int cmd_write(const struct shell *shell, size_t argc, char **argv)
 {
 	char path[MAX_PATH_LEN];
-	u8_t buf[BUF_CNT];
-	u8_t buf_len;
+	uint8_t buf[BUF_CNT];
+	uint8_t buf_len;
 	int arg_offset;
 	struct fs_file_t file;
 	off_t offset = -1;
@@ -423,8 +423,7 @@ static char *mntpt_prepare(char *mntpt)
 
 	cpy_mntpt = k_malloc(strlen(mntpt) + 1);
 	if (cpy_mntpt) {
-		((u8_t *)mntpt)[strlen(mntpt)] = '\0';
-		memcpy(cpy_mntpt, mntpt, strlen(mntpt));
+		strcpy(cpy_mntpt, mntpt);
 	}
 	return cpy_mntpt;
 }

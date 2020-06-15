@@ -54,12 +54,12 @@ static int ctr_drbg_initialize(void)
 	/* Only one entropy device exists, so this is safe even
 	 * if the whole operation isn't atomic.
 	 */
-	entropy_driver = device_get_binding(CONFIG_ENTROPY_NAME);
+	entropy_driver = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
 	if (!entropy_driver) {
 		__ASSERT((entropy_driver != NULL),
-			"Device driver for %s (CONFIG_ENTROPY_NAME) not found. "
+			"Device driver for %s (DT_CHOSEN_ZEPHYR_ENTROPY_LABEL) not found. "
 			"Check your build configuration!",
-			CONFIG_ENTROPY_NAME);
+			DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
 		return -EINVAL;
 	}
 
@@ -80,7 +80,7 @@ static int ctr_drbg_initialize(void)
 
 #elif defined(CONFIG_TINYCRYPT)
 
-	u8_t entropy[TC_AES_KEY_SIZE + TC_AES_BLOCK_SIZE];
+	uint8_t entropy[TC_AES_KEY_SIZE + TC_AES_BLOCK_SIZE];
 
 	ret = entropy_get_entropy(entropy_driver, (void *)&entropy,
 				  sizeof(entropy));
@@ -104,7 +104,7 @@ static int ctr_drbg_initialize(void)
 }
 
 
-int sys_csrand_get(void *dst, u32_t outlen)
+int sys_csrand_get(void *dst, uint32_t outlen)
 {
 	int ret;
 	unsigned int key = irq_lock();
@@ -122,7 +122,7 @@ int sys_csrand_get(void *dst, u32_t outlen)
 
 #elif defined(CONFIG_TINYCRYPT)
 
-	u8_t entropy[TC_AES_KEY_SIZE + TC_AES_BLOCK_SIZE];
+	uint8_t entropy[TC_AES_KEY_SIZE + TC_AES_BLOCK_SIZE];
 
 	ret = tc_ctr_prng_generate(&ctr_ctx, 0, 0, (uint8_t *)dst, outlen);
 

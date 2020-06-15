@@ -5,6 +5,8 @@
  *SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT avago_apds9960
+
 /* @file
  * @brief driver for APDS9960 ALS/RGB/gesture/proximity sensor
  */
@@ -35,7 +37,7 @@ static void apds9960_handle_cb(struct apds9960_data *drv_data)
 }
 
 static void apds9960_gpio_callback(struct device *dev,
-				  struct gpio_callback *cb, u32_t pins)
+				  struct gpio_callback *cb, uint32_t pins)
 {
 	struct apds9960_data *drv_data =
 		CONTAINER_OF(cb, struct apds9960_data, gpio_cb);
@@ -45,9 +47,9 @@ static void apds9960_gpio_callback(struct device *dev,
 
 static int apds9960_sample_fetch(struct device *dev, enum sensor_channel chan)
 {
-	const struct apds9960_config *config = dev->config->config_info;
+	const struct apds9960_config *config = dev->config_info;
 	struct apds9960_data *data = dev->driver_data;
-	u8_t tmp;
+	uint8_t tmp;
 
 	if (chan != SENSOR_CHAN_ALL) {
 		LOG_ERR("Unsupported sensor channel");
@@ -87,7 +89,7 @@ static int apds9960_sample_fetch(struct device *dev, enum sensor_channel chan)
 	if (tmp & APDS9960_STATUS_AINT) {
 		if (i2c_burst_read(data->i2c, config->i2c_address,
 				   APDS9960_CDATAL_REG,
-				   (u8_t *)&data->sample_crgb,
+				   (uint8_t *)&data->sample_crgb,
 				   sizeof(data->sample_crgb))) {
 			return -EIO;
 		}
@@ -149,7 +151,7 @@ static int apds9960_channel_get(struct device *dev,
 
 static int apds9960_proxy_setup(struct device *dev)
 {
-	const struct apds9960_config *config = dev->config->config_info;
+	const struct apds9960_config *config = dev->config_info;
 	struct apds9960_data *data = dev->driver_data;
 
 	if (i2c_reg_write_byte(data->i2c, config->i2c_address,
@@ -221,9 +223,9 @@ static int apds9960_proxy_setup(struct device *dev)
 #ifdef CONFIG_APDS9960_ENABLE_ALS
 static int apds9960_ambient_setup(struct device *dev)
 {
-	const struct apds9960_config *config = dev->config->config_info;
+	const struct apds9960_config *config = dev->config_info;
 	struct apds9960_data *data = dev->driver_data;
-	u16_t th;
+	uint16_t th;
 
 	/* ADC value */
 	if (i2c_reg_write_byte(data->i2c, config->i2c_address,
@@ -244,7 +246,7 @@ static int apds9960_ambient_setup(struct device *dev)
 	th = sys_cpu_to_le16(APDS9960_DEFAULT_AILT);
 	if (i2c_burst_write(data->i2c, config->i2c_address,
 			    APDS9960_INT_AILTL_REG,
-			    (u8_t *)&th, sizeof(th))) {
+			    (uint8_t *)&th, sizeof(th))) {
 		LOG_ERR("ALS low threshold not set");
 		return -EIO;
 	}
@@ -252,7 +254,7 @@ static int apds9960_ambient_setup(struct device *dev)
 	th = sys_cpu_to_le16(APDS9960_DEFAULT_AIHT);
 	if (i2c_burst_write(data->i2c, config->i2c_address,
 			    APDS9960_INT_AIHTL_REG,
-			    (u8_t *)&th, sizeof(th))) {
+			    (uint8_t *)&th, sizeof(th))) {
 		LOG_ERR("ALS low threshold not set");
 		return -EIO;
 	}
@@ -271,9 +273,9 @@ static int apds9960_ambient_setup(struct device *dev)
 
 static int apds9960_sensor_setup(struct device *dev)
 {
-	const struct apds9960_config *config = dev->config->config_info;
+	const struct apds9960_config *config = dev->config_info;
 	struct apds9960_data *data = dev->driver_data;
-	u8_t chip_id;
+	uint8_t chip_id;
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
 			      APDS9960_ID_REG, &chip_id)) {
@@ -356,7 +358,7 @@ static int apds9960_sensor_setup(struct device *dev)
 
 static int apds9960_init_interrupt(struct device *dev)
 {
-	const struct apds9960_config *config = dev->config->config_info;
+	const struct apds9960_config *config = dev->config_info;
 	struct apds9960_data *drv_data = dev->driver_data;
 
 	/* setup gpio interrupt */
@@ -405,15 +407,15 @@ static int apds9960_init_interrupt(struct device *dev)
 }
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-static int apds9960_device_ctrl(struct device *dev, u32_t ctrl_command,
+static int apds9960_device_ctrl(struct device *dev, uint32_t ctrl_command,
 				void *context, device_pm_cb cb, void *arg)
 {
-	const struct apds9960_config *config = dev->config->config_info;
+	const struct apds9960_config *config = dev->config_info;
 	struct apds9960_data *data = dev->driver_data;
 	int ret = 0;
 
 	if (ctrl_command == DEVICE_PM_SET_POWER_STATE) {
-		u32_t device_pm_state = *(u32_t *)context;
+		uint32_t device_pm_state = *(uint32_t *)context;
 
 		if (device_pm_state == DEVICE_PM_ACTIVE_STATE) {
 			if (i2c_reg_update_byte(data->i2c, config->i2c_address,
@@ -438,7 +440,7 @@ static int apds9960_device_ctrl(struct device *dev, u32_t ctrl_command,
 		}
 
 	} else if (ctrl_command == DEVICE_PM_GET_POWER_STATE) {
-		*((u32_t *)context) = DEVICE_PM_ACTIVE_STATE;
+		*((uint32_t *)context) = DEVICE_PM_ACTIVE_STATE;
 	}
 
 	if (cb) {
@@ -451,7 +453,7 @@ static int apds9960_device_ctrl(struct device *dev, u32_t ctrl_command,
 
 static int apds9960_init(struct device *dev)
 {
-	const struct apds9960_config *config = dev->config->config_info;
+	const struct apds9960_config *config = dev->config_info;
 	struct apds9960_data *data = dev->driver_data;
 
 	/* Initialize time 5.7ms */
@@ -490,11 +492,11 @@ static const struct sensor_driver_api apds9960_driver_api = {
 };
 
 static const struct apds9960_config apds9960_config = {
-	.i2c_name = DT_INST_0_AVAGO_APDS9960_BUS_NAME,
-	.i2c_address = DT_INST_0_AVAGO_APDS9960_BASE_ADDRESS,
-	.gpio_name = DT_INST_0_AVAGO_APDS9960_INT_GPIOS_CONTROLLER,
-	.gpio_pin = DT_INST_0_AVAGO_APDS9960_INT_GPIOS_PIN,
-	.gpio_flags = DT_INST_0_AVAGO_APDS9960_INT_GPIOS_FLAGS,
+	.i2c_name = DT_INST_BUS_LABEL(0),
+	.i2c_address = DT_INST_REG_ADDR(0),
+	.gpio_name = DT_INST_GPIO_LABEL(0, int_gpios),
+	.gpio_pin = DT_INST_GPIO_PIN(0, int_gpios),
+	.gpio_flags = DT_INST_GPIO_FLAGS(0, int_gpios),
 #if CONFIG_APDS9960_PGAIN_8X
 	.pgain = APDS9960_PGAIN_8X,
 #elif CONFIG_APDS9960_PGAIN_4X
@@ -540,11 +542,11 @@ static const struct apds9960_config apds9960_config = {
 static struct apds9960_data apds9960_data;
 
 #ifndef CONFIG_DEVICE_POWER_MANAGEMENT
-DEVICE_AND_API_INIT(apds9960, DT_INST_0_AVAGO_APDS9960_LABEL, &apds9960_init,
+DEVICE_AND_API_INIT(apds9960, DT_INST_LABEL(0), &apds9960_init,
 		    &apds9960_data, &apds9960_config, POST_KERNEL,
 		    CONFIG_SENSOR_INIT_PRIORITY, &apds9960_driver_api);
 #else
-DEVICE_DEFINE(apds9960, DT_INST_0_AVAGO_APDS9960_LABEL, apds9960_init,
+DEVICE_DEFINE(apds9960, DT_INST_LABEL(0), apds9960_init,
 	      apds9960_device_ctrl, &apds9960_data, &apds9960_config,
 	      POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &apds9960_driver_api);
 #endif

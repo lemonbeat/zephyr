@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT grove_temperature
+
 #include <drivers/adc.h>
 #include <device.h>
 #include <math.h>
@@ -27,13 +29,13 @@ LOG_MODULE_REGISTER(grove_temp, CONFIG_SENSOR_LOG_LEVEL);
 struct gts_data {
 	struct device *adc;
 	struct adc_channel_cfg ch_cfg;
-	u16_t raw;
+	uint16_t raw;
 };
 
 struct gts_config {
 	const char *adc_label;
-	s16_t b_const;
-	u8_t adc_channel;
+	int16_t b_const;
+	uint8_t adc_channel;
 };
 
 static struct adc_sequence_options options = {
@@ -57,7 +59,7 @@ static int gts_channel_get(struct device *dev,
 			   struct sensor_value *val)
 {
 	struct gts_data *drv_data = dev->driver_data;
-	const struct gts_config *cfg = dev->config->config_info;
+	const struct gts_config *cfg = dev->config_info;
 	double dval;
 
 	/*
@@ -71,8 +73,8 @@ static int gts_channel_get(struct device *dev,
 		     / cfg->b_const
 		     + (1 / 298.15)))
 		- 273.15;
-	val->val1 = (s32_t)dval;
-	val->val2 = ((s32_t)(dval * 1000000)) % 1000000;
+	val->val1 = (int32_t)dval;
+	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
 
 	return 0;
 }
@@ -85,7 +87,7 @@ static const struct sensor_driver_api gts_api = {
 static int gts_init(struct device *dev)
 {
 	struct gts_data *drv_data = dev->driver_data;
-	const struct gts_config *cfg = dev->config->config_info;
+	const struct gts_config *cfg = dev->config_info;
 
 	drv_data->adc = device_get_binding(cfg->adc_label);
 	if (drv_data->adc == NULL) {
@@ -115,13 +117,13 @@ static int gts_init(struct device *dev)
 
 static struct gts_data gts_data;
 static const struct gts_config gts_cfg = {
-	.adc_label = DT_INST_0_GROVE_TEMPERATURE_IO_CHANNELS_CONTROLLER,
-	.b_const = (IS_ENABLED(DT_INST_0_GROVE_TEMPERATURE_V1P0)
+	.adc_label = DT_INST_IO_CHANNELS_LABEL(0),
+	.b_const = (IS_ENABLED(DT_INST_PROP(0, v1p0))
 		    ? 3975
 		    : 4250),
-	.adc_channel = DT_INST_0_GROVE_TEMPERATURE_IO_CHANNELS_INPUT,
+	.adc_channel = DT_INST_IO_CHANNELS_INPUT(0),
 };
 
-DEVICE_AND_API_INIT(gts_dev, DT_INST_0_GROVE_TEMPERATURE_LABEL, &gts_init,
+DEVICE_AND_API_INIT(gts_dev, DT_INST_LABEL(0), &gts_init,
 		&gts_data, &gts_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		&gts_api);

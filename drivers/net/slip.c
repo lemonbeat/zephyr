@@ -49,27 +49,27 @@ struct slip_context {
 	bool first;		/* SLIP received it's byte or not after
 				 * driver initialization or SLIP_END byte.
 				 */
-	u8_t buf[1];		/* SLIP data is read into this buf */
+	uint8_t buf[1];		/* SLIP data is read into this buf */
 	struct net_pkt *rx;	/* and then placed into this net_pkt */
 	struct net_buf *last;	/* Pointer to last buffer in the list */
-	u8_t *ptr;		/* Where in net_pkt to add data */
+	uint8_t *ptr;		/* Where in net_pkt to add data */
 	struct net_if *iface;
-	u8_t state;
+	uint8_t state;
 
-	u8_t mac_addr[6];
+	uint8_t mac_addr[6];
 	struct net_linkaddr ll_addr;
 
 #if defined(CONFIG_SLIP_STATISTICS)
 #define SLIP_STATS(statement)
 #else
-	u16_t garbage;
+	uint16_t garbage;
 #define SLIP_STATS(statement) statement
 #endif
 };
 
 static inline void slip_writeb(unsigned char c)
 {
-	u8_t buf[1] = { c };
+	uint8_t buf[1] = { c };
 
 	uart_pipe_send(&buf[0], 1);
 }
@@ -108,9 +108,9 @@ static void slip_writeb_esc(unsigned char c)
 static int slip_send(struct device *dev, struct net_pkt *pkt)
 {
 	struct net_buf *buf;
-	u8_t *ptr;
-	u16_t i;
-	u8_t c;
+	uint8_t *ptr;
+	uint16_t i;
+	uint8_t c;
 
 	ARG_UNUSED(dev);
 
@@ -153,7 +153,7 @@ static struct net_pkt *slip_poll_handler(struct slip_context *slip)
 }
 
 static inline struct net_if *get_iface(struct slip_context *context,
-				       u16_t vlan_tag)
+				       uint16_t vlan_tag)
 {
 #if defined(CONFIG_NET_VLAN)
 	struct net_if *iface;
@@ -173,7 +173,7 @@ static inline struct net_if *get_iface(struct slip_context *context,
 
 static void process_msg(struct slip_context *slip)
 {
-	u16_t vlan_tag = NET_VLAN_TAG_UNSPEC;
+	uint16_t vlan_tag = NET_VLAN_TAG_UNSPEC;
 	struct net_pkt *pkt;
 
 	pkt = slip_poll_handler(slip);
@@ -316,7 +316,7 @@ static inline int slip_input_byte(struct slip_context *slip,
 	return 0;
 }
 
-static u8_t *recv_cb(u8_t *buf, size_t *off)
+static uint8_t *recv_cb(uint8_t *buf, size_t *off)
 {
 	struct slip_context *slip =
 		CONTAINER_OF(buf, struct slip_context, buf);
@@ -338,7 +338,7 @@ static u8_t *recv_cb(u8_t *buf, size_t *off)
 				while (bytes && buf) {
 					char msg[8 + 1];
 
-					snprintf(msg, sizeof(msg),
+					snprintk(msg, sizeof(msg),
 						 ">slip %2d", count);
 
 					LOG_HEXDUMP_DBG(buf->data, buf->len,
@@ -455,9 +455,11 @@ static const struct ethernet_api slip_if_api = {
 #define _SLIP_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(ETHERNET_L2)
 #define _SLIP_MTU 1500
 
-ETH_NET_DEVICE_INIT(slip, CONFIG_SLIP_DRV_NAME, slip_init, &slip_context_data,
-		    NULL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &slip_if_api,
-		    _SLIP_MTU);
+ETH_NET_DEVICE_INIT(slip, CONFIG_SLIP_DRV_NAME,
+		    slip_init, device_pm_control_nop,
+		    &slip_context_data, NULL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    &slip_if_api, _SLIP_MTU);
 #else
 
 static const struct dummy_api slip_if_api = {
@@ -470,7 +472,7 @@ static const struct dummy_api slip_if_api = {
 #define _SLIP_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 #define _SLIP_MTU 576
 
-NET_DEVICE_INIT(slip, CONFIG_SLIP_DRV_NAME, slip_init, &slip_context_data,
-		NULL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &slip_if_api,
-		_SLIP_L2_LAYER, _SLIP_L2_CTX_TYPE, _SLIP_MTU);
+NET_DEVICE_INIT(slip, CONFIG_SLIP_DRV_NAME, slip_init, device_pm_control_nop,
+		&slip_context_data, NULL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		&slip_if_api, _SLIP_L2_LAYER, _SLIP_L2_CTX_TYPE, _SLIP_MTU);
 #endif

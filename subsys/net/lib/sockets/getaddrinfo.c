@@ -34,8 +34,8 @@ struct getaddrinfo_state {
 	const struct zsock_addrinfo *hints;
 	struct k_sem sem;
 	int status;
-	u16_t idx;
-	u16_t port;
+	uint16_t idx;
+	uint16_t port;
 	struct zsock_addrinfo *ai_arr;
 };
 
@@ -216,8 +216,8 @@ int z_impl_z_zsock_getaddrinfo_internal(const char *host, const char *service,
 		 * we do not need to start to cancel any pending DNS queries.
 		 */
 		int ret = k_sem_take(&ai_state.sem,
-				     CONFIG_NET_SOCKETS_DNS_TIMEOUT +
-				     K_MSEC(100));
+				     K_MSEC(CONFIG_NET_SOCKETS_DNS_TIMEOUT +
+					    100));
 		if (ret == -EAGAIN) {
 			return DNS_EAI_AGAIN;
 		}
@@ -243,9 +243,9 @@ int z_impl_z_zsock_getaddrinfo_internal(const char *host, const char *service,
 	if (family == AF_UNSPEC && IS_ENABLED(CONFIG_NET_IPV6)) {
 		ret = exec_query(host, AF_INET6, &ai_state);
 		if (ret == 0) {
-			int ret = k_sem_take(&ai_state.sem,
-					     CONFIG_NET_SOCKETS_DNS_TIMEOUT +
-					     K_MSEC(100));
+			int ret = k_sem_take(
+				&ai_state.sem,
+				K_MSEC(CONFIG_NET_SOCKETS_DNS_TIMEOUT + 100));
 			if (ret == -EAGAIN) {
 				return DNS_EAI_AGAIN;
 			}
@@ -284,7 +284,7 @@ static inline int z_vrfy_z_zsock_getaddrinfo_internal(const char *host,
 {
 	struct zsock_addrinfo hints_copy;
 	char *host_copy = NULL, *service_copy = NULL;
-	u32_t ret;
+	uint32_t ret;
 
 	if (hints) {
 		Z_OOPS(z_user_from_copy(&hints_copy, (void *)hints,

@@ -17,12 +17,12 @@ void Timer2_Callback(void const *arg);
 osTimerDef(Timer1, Timer1_Callback);
 osTimerDef(Timer2, Timer2_Callback);
 
-u32_t num_oneshots_executed;
-u32_t num_periods_executed;
+uint32_t num_oneshots_executed;
+uint32_t num_periods_executed;
 
 void Timer1_Callback(void const *arg)
 {
-	u32_t Tmr = *(u32_t *)arg;
+	uint32_t Tmr = *(uint32_t *)arg;
 
 	num_oneshots_executed++;
 	TC_PRINT("oneshot_callback (Timer %d) = %d\n",
@@ -31,7 +31,7 @@ void Timer1_Callback(void const *arg)
 
 void Timer2_Callback(void const *arg)
 {
-	u32_t Tmr = *(u32_t *)arg;
+	uint32_t Tmr = *(uint32_t *)arg;
 
 	num_periods_executed++;
 	TC_PRINT("periodic_callback (Timer %d) = %d\n",
@@ -42,10 +42,10 @@ void test_timer(void)
 {
 	osTimerId id1;
 	osTimerId id2;
-	u32_t  exec1;
-	u32_t  exec2;
+	uint32_t  exec1;
+	uint32_t  exec2;
 	osStatus status;
-	u32_t timerDelay;
+	uint32_t timerDelay;
 
 	/* Create one-shot timer */
 	exec1 = 1U;
@@ -89,10 +89,7 @@ void test_timer(void)
 	 */
 	osDelay(timerDelay*NUM_PERIODS + 100);
 
-	/* The first firing of the timer should be ignored.
-	 * Hence checking for NUM_PERIODS + 1.
-	 */
-	zassert_true(num_periods_executed == NUM_PERIODS + 1,
+	zassert_true(num_periods_executed == NUM_PERIODS,
 			"error setting up periodic timer");
 
 	/* Delete the timer before stop */

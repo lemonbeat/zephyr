@@ -18,7 +18,7 @@ no longer optimal or supported by the underlying platforms.
     API Life Cycle
 
 An up-to-date table of all APIs and their maturity level can be found in the
-:ref:`api_stability` page.
+:ref:`api_overview` page.
 
 Experimental
 *************
@@ -87,7 +87,7 @@ An API can be declared ``stable`` after fulfilling the following requirements:
 In order to declare an API ``stable``, the following steps need to be followed:
 
 #. A Pull Request must be opened that changes the corresponding entry in the
-   :ref:`api_stability` table
+   :ref:`api_overview` table
 #. An email must be sent to the ``devel`` mailing list announcing the API
    upgrade request
 #. The Pull Request must be submitted for discussion in the next
@@ -198,7 +198,11 @@ The following are the requirements for deprecating an existing API:
   where an API is deprecated sooner.
 - What is required when deprecating:
 
-  - Mark as deprecated
+  - Mark as deprecated. This can be done by using the compiler itself
+    (``__deprecated`` for  function declarations and ``__DEPRECATED_MACRO`` for
+    macro definitions), or by introducing a Kconfig option (typically one that
+    contains the ``DEPRECATED`` word in it) that, when enabled, reverts the APIs
+    back to their previous form
   - Document the deprecation
   - Include the deprecation in the "API Changes" of the release notes for the
     next upcoming release

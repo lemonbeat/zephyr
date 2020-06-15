@@ -31,7 +31,7 @@ struct k_mem_slab *_trace_list_k_mem_slab;
  */
 static int create_free_list(struct k_mem_slab *slab)
 {
-	u32_t j;
+	uint32_t j;
 	char *p;
 
 	/* blocks must be word aligned */
@@ -80,7 +80,7 @@ SYS_INIT(init_mem_slab_module, PRE_KERNEL_1,
 	 CONFIG_KERNEL_INIT_PRIORITY_OBJECTS);
 
 int k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
-		    size_t block_size, u32_t num_blocks)
+		    size_t block_size, uint32_t num_blocks)
 {
 	int rc = 0;
 
@@ -101,7 +101,7 @@ out:
 	return rc;
 }
 
-int k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, s32_t timeout)
+int k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, k_timeout_t timeout)
 {
 	k_spinlock_key_t key = k_spin_lock(&lock);
 	int result;
@@ -112,7 +112,7 @@ int k_mem_slab_alloc(struct k_mem_slab *slab, void **mem, s32_t timeout)
 		slab->free_list = *(char **)(slab->free_list);
 		slab->num_used++;
 		result = 0;
-	} else if (timeout == K_NO_WAIT) {
+	} else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		/* don't wait for a free block to become available */
 		*mem = NULL;
 		result = -ENOMEM;

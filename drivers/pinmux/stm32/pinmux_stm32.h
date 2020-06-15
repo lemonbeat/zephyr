@@ -32,7 +32,7 @@ typedef int stm32_pin_func_t;
  * in @funcs array
  */
 struct stm32_pinmux_conf {
-	u32_t pin;                      /* pin ID */
+	uint32_t pin;                      /* pin ID */
 	const stm32_pin_func_t *funcs;  /* functions array, indexed with
 					 * (stm32_pin_alt_func - 1)
 					 */
@@ -77,7 +77,7 @@ clock_control_subsys_t stm32_get_port_clock(int port);
  * @param clk clock control device, for enabling/disabling clock gate
  * for the port
  */
-int z_pinmux_stm32_set(u32_t pin, u32_t func,
+int z_pinmux_stm32_set(uint32_t pin, uint32_t func,
 		      struct device *clk);
 
 /**
@@ -123,6 +123,8 @@ void stm32_setup_pins(const struct pin_config *pinconf,
 #include "pinmux_stm32l1x.h"
 #elif CONFIG_SOC_SERIES_STM32L4X
 #include "pinmux_stm32l4x.h"
+#elif CONFIG_SOC_SERIES_STM32L5X
+#include "pinmux_stm32l5x.h"
 #elif CONFIG_SOC_SERIES_STM32MP1X
 #include "pinmux_stm32mp1x.h"
 #elif CONFIG_SOC_SERIES_STM32WBX

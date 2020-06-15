@@ -43,7 +43,7 @@ extern int arch_irq_is_enabled(unsigned int irq);
 
 /* internal routine documented in C file, needed by IRQ_CONNECT() macro */
 extern void z_arm_irq_priority_set(unsigned int irq, unsigned int prio,
-				   u32_t flags);
+				   uint32_t flags);
 
 #else
 
@@ -106,18 +106,16 @@ extern void z_arm_interrupt_init(void);
  * runtime.
  */
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-({ \
+{ \
 	Z_ISR_DECLARE(irq_p, 0, isr_p, isr_param_p); \
 	z_arm_irq_priority_set(irq_p, priority_p, flags_p); \
-	irq_p; \
-})
+}
 
 #define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p) \
-({ \
+{ \
 	Z_ISR_DECLARE(irq_p, ISR_FLAG_DIRECT, isr_p, NULL); \
 	z_arm_irq_priority_set(irq_p, priority_p, flags_p); \
-	irq_p; \
-})
+}
 
 #ifdef CONFIG_SYS_POWER_MANAGEMENT
 extern void _arch_isr_direct_pm(void);

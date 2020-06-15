@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT microchip_xec_peci
+
 #include <errno.h>
 #include <device.h>
 #include <drivers/peci.h>
@@ -28,7 +30,7 @@ LOG_MODULE_REGISTER(peci_mchp_xec, CONFIG_PECI_LOG_LEVEL);
 
 struct peci_xec_config {
 	PECI_Type *base;
-	u8_t irq_num;
+	uint8_t irq_num;
 };
 
 struct peci_xec_data {
@@ -40,13 +42,13 @@ static struct peci_xec_data peci_data;
 #endif
 
 static const struct peci_xec_config peci_xec_config = {
-	.base = (PECI_Type *) DT_INST_0_MICROCHIP_XEC_PECI_BASE_ADDRESS,
-	.irq_num = DT_INST_0_MICROCHIP_XEC_PECI_IRQ_0,
+	.base = (PECI_Type *) DT_INST_REG_ADDR(0),
+	.irq_num = DT_INST_IRQN(0),
 };
 
 static int check_bus_idle(PECI_Type *base)
 {
-	u8_t delay_cnt = PECI_IDLE_TIMEOUT;
+	uint8_t delay_cnt = PECI_IDLE_TIMEOUT;
 
 	/* Wait until PECI bus becomes idle.
 	 * Note that when IDLE bit in the status register changes, HW do not
@@ -64,12 +66,12 @@ static int check_bus_idle(PECI_Type *base)
 	return 0;
 }
 
-static int peci_xec_configure(struct device *dev, u32_t bitrate)
+static int peci_xec_configure(struct device *dev, uint32_t bitrate)
 {
 	ARG_UNUSED(dev);
 
 	PECI_Type *base = peci_xec_config.base;
-	u16_t value;
+	uint16_t value;
 
 	/* Power down PECI interface */
 	base->CONTROL = MCHP_PECI_CTRL_PD;
@@ -127,7 +129,7 @@ static int peci_xec_write(struct device *dev, struct peci_msg *msg)
 	int ret;
 
 #ifndef CONFIG_PECI_INTERRUPT_DRIVEN
-	u8_t wait_timeout;
+	uint8_t wait_timeout;
 #endif
 	struct peci_buf *tx_buf = &msg->tx_buffer;
 	struct peci_buf *rx_buf = &msg->rx_buffer;
@@ -192,8 +194,8 @@ static int peci_xec_read(struct device *dev, struct peci_msg *msg)
 	ARG_UNUSED(dev);
 	int i;
 	int ret;
-	u8_t tx_fcs;
-	u8_t bytes_rcvd;
+	uint8_t tx_fcs;
+	uint8_t bytes_rcvd;
 	struct peci_buf *rx_buf = &msg->rx_buffer;
 	PECI_Type *base = peci_xec_config.base;
 
@@ -242,6 +244,7 @@ static int peci_xec_transfer(struct device *dev, struct peci_msg *msg)
 	ARG_UNUSED(dev);
 	int ret;
 	PECI_Type *base = peci_xec_config.base;
+	uint8_t err_val = base->ERROR;
 
 	ret = peci_xec_write(dev, msg);
 	if (ret) {
@@ -264,7 +267,7 @@ static int peci_xec_transfer(struct device *dev, struct peci_msg *msg)
 	}
 
 	/* Check for error conditions and perform bus recovery if necessary */
-	if (base->ERROR) {
+	if (err_val) {
 		if (base->ERROR & MCHP_PECI_ERR_RDOV) {
 			LOG_WRN("Read buffer is not empty\n");
 		}
@@ -277,10 +280,14 @@ static int peci_xec_transfer(struct device *dev, struct peci_msg *msg)
 			LOG_WRN("Write buffer is not empty\n");
 		}
 
-		base->ERROR = base->ERROR;
 		LOG_WRN("Transaction error %x\n", base->ERROR);
 		return -EIO;
 	}
+
+	/* ERROR is a clear-on-write register, need to clear errors occurred
+	 * at the end of a transaction.
+	 */
+	base->ERROR = err_val;
 
 	return 0;
 }
@@ -342,13 +349,13 @@ static int peci_xec_init(struct device *dev)
 
 	/* Direct NVIC */
 	IRQ_CONNECT(peci_xec_config.irq_num,
-		    DT_INST_0_MICROCHIP_XEC_PECI_IRQ_0_PRIORITY,
+		    DT_INST_IRQ(0, priority),
 		    peci_xec_isr, NULL, 0);
 #endif
 	return 0;
 }
 
-DEVICE_AND_API_INIT(peci_xec, DT_INST_0_MICROCHIP_XEC_PECI_LABEL,
+DEVICE_AND_API_INIT(peci_xec, DT_INST_LABEL(0),
 		    &peci_xec_init,
 		    NULL, NULL,
 		    POST_KERNEL, CONFIG_PECI_INIT_PRIORITY,

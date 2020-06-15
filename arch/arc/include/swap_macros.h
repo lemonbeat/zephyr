@@ -63,7 +63,7 @@
 	st r59, [sp, ___callee_saved_stack_t_r59_OFFSET]
 #endif
 
-#ifdef CONFIG_FP_SHARING
+#ifdef CONFIG_FPU_SHARING
 	ld_s r13, [r2, ___thread_base_t_user_options_OFFSET]
 	/* K_FP_REGS is bit 1 */
 	bbit0 r13, 1, 1f
@@ -99,7 +99,7 @@
 	ld r59, [sp, ___callee_saved_stack_t_r59_OFFSET]
 #endif
 
-#ifdef CONFIG_FP_SHARING
+#ifdef CONFIG_FPU_SHARING
 	ld_s r13, [r2, ___thread_base_t_user_options_OFFSET]
 	/* K_FP_REGS is bit 1 */
 	bbit0 r13, 1, 2f
@@ -307,13 +307,13 @@
 	ld \reg2, [\reg1, ___cpu_t_nested_OFFSET]
 #else
 	mov \reg1, _kernel
-	ld \reg2, [\reg1, ___kernel_t_nested_OFFSET]
+	ld \reg2, [\reg1, _kernel_offset_to_nested]
 #endif
 	add \reg2, \reg2, 1
 #ifdef CONFIG_SMP
 	st \reg2, [\reg1, ___cpu_t_nested_OFFSET]
 #else
-	st \reg2, [\reg1, ___kernel_t_nested_OFFSET]
+	st \reg2, [\reg1, _kernel_offset_to_nested]
 #endif
 	cmp \reg2, 1
 .endm
@@ -329,13 +329,13 @@
 	ld \reg2, [\reg1, ___cpu_t_nested_OFFSET]
 #else
 	mov \reg1, _kernel
-	ld \reg2, [\reg1, ___kernel_t_nested_OFFSET]
+	ld \reg2, [\reg1, _kernel_offset_to_nested]
 #endif
 	sub \reg2, \reg2, 1
 #ifdef CONFIG_SMP
 	st \reg2, [\reg1, ___cpu_t_nested_OFFSET]
 #else
-	st \reg2, [\reg1, ___kernel_t_nested_OFFSET]
+	st \reg2, [\reg1, _kernel_offset_to_nested]
 #endif
 .endm
 
@@ -407,12 +407,21 @@
 .macro _irq_store_old_thread_callee_regs
 #if defined(CONFIG_USERSPACE)
 /*
+ * when USERSPACE is enabled, according to ARCv2 ISA, SP will be switched
+ * if interrupt comes out in user mode, and will be recorded in bit 31
+ * (U bit) of IRQ_ACT. when interrupt exits, SP will be switched back
+ * according to U bit.
+ *
  * need to remember the user/kernel status of interrupted thread, will be
  * restored when thread switched back
+ *
  */
-	lr r3, [_ARC_V2_AUX_IRQ_ACT]
-	and r3, r3, 0x80000000
+	lr r1, [_ARC_V2_AUX_IRQ_ACT]
+	and r3, r1, 0x80000000
 	push_s r3
+
+	bclr r1, r1, 31
+	sr r1, [_ARC_V2_AUX_IRQ_ACT]
 #endif
 	_store_old_thread_callee_regs
 .endm
@@ -440,22 +449,6 @@
 
 /* when switch to thread caused by coop, some status regs need to set */
 .macro _set_misc_regs_irq_switch_from_coop
-#if defined(CONFIG_USERSPACE)
-/*
- * when USERSPACE is enabled, according to ARCv2 ISA, SP will be switched
- * if interrupt comes out in user mode, and will be recorded in bit 31
- * (U bit) of IRQ_ACT. when interrupt exits, SP will be switched back
- * according to U bit.
- *
- * For the case that context switches in interrupt, the target sp must be
- * thread's kernel stack, no need to do hardware sp switch. so, U bit should
- * be cleared.
- */
-	lr r0, [_ARC_V2_AUX_IRQ_ACT]
-	bclr r0, r0, 31
-	sr r0, [_ARC_V2_AUX_IRQ_ACT]
-#endif
-
 #ifdef CONFIG_ARC_SECURE_FIRMWARE
 	/* must return to secure mode, so set IRM bit to 1 */
 	lr r0, [_ARC_V2_SEC_STAT]

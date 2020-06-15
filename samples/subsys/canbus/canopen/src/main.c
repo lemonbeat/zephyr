@@ -15,28 +15,28 @@
 LOG_MODULE_REGISTER(app);
 
 
-#define CAN_INTERFACE DT_ALIAS_CAN_PRIMARY_LABEL
-#define CAN_BITRATE (DT_ALIAS_CAN_PRIMARY_BUS_SPEED / 1000)
-#if !defined(DT_ALIAS_CAN_PRIMARY_LABEL)
+#define CAN_INTERFACE DT_CHOSEN_ZEPHYR_CAN_PRIMARY_LABEL
+#define CAN_BITRATE (DT_PROP(DT_CHOSEN(zephyr_can_primary), bus_speed) / 1000)
+#if !defined(DT_CHOSEN_ZEPHYR_CAN_PRIMARY_LABEL)
 #error CANopen CAN interface not set
 #endif
 
-#ifdef DT_ALIAS_GREEN_LED_GPIOS_CONTROLLER
-#define LED_GREEN_PORT  DT_ALIAS_GREEN_LED_GPIOS_CONTROLLER
-#define LED_GREEN_PIN   DT_ALIAS_GREEN_LED_GPIOS_PIN
-#define LED_GREEN_FLAGS DT_ALIAS_GREEN_LED_GPIOS_FLAGS
+#if DT_NODE_HAS_PROP(DT_ALIAS(green_led), gpios)
+#define LED_GREEN_PORT  DT_GPIO_LABEL(DT_ALIAS(green_led), gpios)
+#define LED_GREEN_PIN   DT_GPIO_PIN(DT_ALIAS(green_led), gpios)
+#define LED_GREEN_FLAGS DT_GPIO_FLAGS(DT_ALIAS(green_led), gpios)
 #endif
 
-#ifdef DT_ALIAS_RED_LED_GPIOS_CONTROLLER
-#define LED_RED_PORT  DT_ALIAS_RED_LED_GPIOS_CONTROLLER
-#define LED_RED_PIN   DT_ALIAS_RED_LED_GPIOS_PIN
-#define LED_RED_FLAGS DT_ALIAS_RED_LED_GPIOS_FLAGS
+#if DT_NODE_HAS_PROP(DT_ALIAS(red_led), gpios)
+#define LED_RED_PORT  DT_GPIO_LABEL(DT_ALIAS(red_led), gpios)
+#define LED_RED_PIN   DT_GPIO_PIN(DT_ALIAS(red_led), gpios)
+#define LED_RED_FLAGS DT_GPIO_FLAGS(DT_ALIAS(red_led), gpios)
 #endif
 
-#ifdef DT_ALIAS_SW0_GPIOS_CONTROLLER
-#define BUTTON_PORT  DT_ALIAS_SW0_GPIOS_CONTROLLER
-#define BUTTON_PIN   DT_ALIAS_SW0_GPIOS_PIN
-#define BUTTON_FLAGS DT_ALIAS_SW0_GPIOS_FLAGS
+#if DT_NODE_HAS_PROP(DT_ALIAS(sw0), gpios)
+#define BUTTON_PORT  DT_GPIO_LABEL(DT_ALIAS(sw0), gpios)
+#define BUTTON_PIN   DT_GPIO_PIN(DT_ALIAS(sw0), gpios)
+#define BUTTON_FLAGS DT_GPIO_FLAGS(DT_ALIAS(sw0), gpios)
 static struct gpio_callback button_callback;
 #endif
 
@@ -47,7 +47,7 @@ struct led_indicator {
 
 static struct led_indicator led_green;
 static struct led_indicator led_red;
-static u32_t counter;
+static uint32_t counter;
 
 /**
  * @brief Callback for setting LED indicator state.
@@ -113,7 +113,7 @@ static void config_leds(CO_NMT_t *nmt)
  */
 static CO_SDO_abortCode_t odf_2102(CO_ODF_arg_t *odf_arg)
 {
-	u32_t value;
+	uint32_t value;
 
 	value = CO_getUint32(odf_arg->data);
 
@@ -127,7 +127,7 @@ static CO_SDO_abortCode_t odf_2102(CO_ODF_arg_t *odf_arg)
 
 	if (value != 0) {
 		/* Preserve old value */
-		memcpy(odf_arg->data, odf_arg->ODdataStorage, sizeof(u32_t));
+		memcpy(odf_arg->data, odf_arg->ODdataStorage, sizeof(uint32_t));
 		return CO_SDO_AB_DATA_TRANSF;
 	}
 
@@ -146,7 +146,7 @@ static CO_SDO_abortCode_t odf_2102(CO_ODF_arg_t *odf_arg)
  */
 #ifdef BUTTON_PORT
 static void button_isr_callback(struct device *port, struct gpio_callback *cb,
-				u32_t pins)
+				uint32_t pins)
 {
 	counter++;
 }
@@ -202,9 +202,9 @@ void main(void)
 	CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
 	CO_ReturnError_t err;
 	struct device *can;
-	u16_t timeout;
-	u32_t elapsed;
-	s64_t timestamp;
+	uint16_t timeout;
+	uint32_t elapsed;
+	int64_t timestamp;
 	int ret;
 
 	can = device_get_binding(CAN_INTERFACE);
@@ -246,6 +246,11 @@ void main(void)
 		CO_OD_configure(CO->SDO[0], OD_2102_buttonPressCounter,
 				odf_2102, NULL, 0U, 0U);
 
+		if (IS_ENABLED(CONFIG_CANOPEN_PROGRAM_DOWNLOAD)) {
+			canopen_program_download_attach(CO->NMT, CO->SDO[0],
+							CO->em);
+		}
+
 		CO_CANsetNormalMode(CO->CANmodule[0]);
 
 		while (true) {
@@ -273,7 +278,7 @@ void main(void)
 				 * exact time elapsed.
 				 */
 				k_sleep(K_MSEC(timeout));
-				elapsed = k_uptime_delta_32(&timestamp);
+				elapsed = (uint32_t)k_uptime_delta(&timestamp);
 			} else {
 				/*
 				 * Do not sleep, more processing to be

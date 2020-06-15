@@ -33,10 +33,19 @@
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 /* Configuration defines */
+#if !DT_HAS_CHOSEN(zephyr_ipc_shm)
+#error "Sample requires definition of shared memory for rpmsg"
+#endif
 
-#define SHM_START_ADDR      (DT_IPC_SHM_BASE_ADDRESS + 0x400)
+#define SHM_NODE            DT_CHOSEN(zephyr_ipc_shm)
+#define SHM_BASE_ADDRESS    DT_REG_ADDR(SHM_NODE)
+#define SHM_START_ADDR      (SHM_BASE_ADDRESS + 0x400)
 #define SHM_SIZE            0x7c00
 #define SHM_DEVICE_NAME     "sram0.shm"
+
+BUILD_ASSERT((SHM_START_ADDR + SHM_SIZE - SHM_BASE_ADDRESS)
+		<= DT_REG_SIZE(SHM_NODE),
+	"Allocated size exceeds available shared memory reserved for IPC");
 
 #define VRING_COUNT         2
 #define VRING_TX_ADDRESS    (SHM_START_ADDR + SHM_SIZE - 0x400)
@@ -44,7 +53,7 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define VRING_ALIGNMENT     4
 #define VRING_SIZE          16
 
-#define VDEV_STATUS_ADDR    DT_IPC_SHM_BASE_ADDRESS
+#define VDEV_STATUS_ADDR    SHM_BASE_ADDRESS
 
 /* End of configuration defines */
 
@@ -82,7 +91,7 @@ static unsigned char virtio_get_status(struct virtio_device *vdev)
 	return sys_read8(VDEV_STATUS_ADDR);
 }
 
-static u32_t virtio_get_features(struct virtio_device *vdev)
+static uint32_t virtio_get_features(struct virtio_device *vdev)
 {
 	return BIT(VIRTIO_RPMSG_F_NS);
 }
@@ -114,7 +123,7 @@ static void ipm_callback_process(struct k_work *work)
 	virtqueue_notification(vq[1]);
 }
 
-static void ipm_callback(void *context, u32_t id, volatile void *data)
+static void ipm_callback(void *context, uint32_t id, volatile void *data)
 {
 	LOG_INF("Got callback of id %u", id);
 	k_work_submit(&ipm_work);
@@ -127,29 +136,6 @@ static void rpmsg_service_unbind(struct rpmsg_endpoint *ep)
 
 static K_THREAD_STACK_DEFINE(tx_thread_stack, CONFIG_BT_HCI_TX_STACK_SIZE);
 static struct k_thread tx_thread_data;
-
-/* HCI command buffers */
-#define CMD_BUF_SIZE BT_BUF_RX_SIZE
-NET_BUF_POOL_FIXED_DEFINE(cmd_tx_pool, CONFIG_BT_HCI_CMD_COUNT, CMD_BUF_SIZE,
-			  NULL);
-
-#if defined(CONFIG_BT_CTLR_TX_BUFFER_SIZE)
-#define BT_L2CAP_MTU (CONFIG_BT_CTLR_TX_BUFFER_SIZE - BT_L2CAP_HDR_SIZE)
-#else
-#define BT_L2CAP_MTU 65 /* 64-byte public key + opcode */
-#endif /* CONFIG_BT_CTLR */
-
-/** Data size needed for ACL buffers */
-#define BT_BUF_ACL_SIZE BT_L2CAP_BUF_SIZE(BT_L2CAP_MTU)
-
-#if defined(CONFIG_BT_CTLR_TX_BUFFERS)
-#define TX_BUF_COUNT CONFIG_BT_CTLR_TX_BUFFERS
-#else
-#define TX_BUF_COUNT 6
-#endif
-
-NET_BUF_POOL_FIXED_DEFINE(acl_tx_pool, TX_BUF_COUNT, BT_BUF_ACL_SIZE, NULL);
-
 static K_FIFO_DEFINE(tx_queue);
 
 #define HCI_RPMSG_CMD 0x01
@@ -157,67 +143,57 @@ static K_FIFO_DEFINE(tx_queue);
 #define HCI_RPMSG_SCO 0x03
 #define HCI_RPMSG_EVT 0x04
 
-static struct net_buf *hci_rpmsg_cmd_recv(u8_t *data, size_t remaining)
+static struct net_buf *hci_rpmsg_cmd_recv(uint8_t *data, size_t remaining)
 {
-	struct bt_hci_cmd_hdr hdr;
+	struct bt_hci_cmd_hdr *hdr = (void *)data;
 	struct net_buf *buf;
 
-	if (remaining < sizeof(hdr)) {
+	if (remaining < sizeof(*hdr)) {
 		LOG_ERR("Not enought data for command header");
 		return NULL;
 	}
 
-	buf = net_buf_alloc(&cmd_tx_pool, K_NO_WAIT);
+	buf = bt_buf_get_tx(BT_BUF_CMD, K_NO_WAIT, hdr, sizeof(*hdr));
 	if (buf) {
-		bt_buf_set_type(buf, BT_BUF_CMD);
-
-		memcpy((void *)&hdr, data, sizeof(hdr));
-		data += sizeof(hdr);
-		remaining -= sizeof(hdr);
-
-		net_buf_add_mem(buf, &hdr, sizeof(hdr));
+		data += sizeof(*hdr);
+		remaining -= sizeof(*hdr);
 	} else {
 		LOG_ERR("No available command buffers!");
 		return NULL;
 	}
 
-	if (remaining != hdr.param_len) {
+	if (remaining != hdr->param_len) {
 		LOG_ERR("Command payload length is not correct");
 		net_buf_unref(buf);
 		return NULL;
 	}
 
-	LOG_DBG("len %u", hdr.param_len);
+	LOG_DBG("len %u", hdr->param_len);
 	net_buf_add_mem(buf, data, remaining);
 
 	return buf;
 }
 
-static struct net_buf *hci_rpmsg_acl_recv(u8_t *data, size_t remaining)
+static struct net_buf *hci_rpmsg_acl_recv(uint8_t *data, size_t remaining)
 {
-	struct bt_hci_acl_hdr hdr;
+	struct bt_hci_acl_hdr *hdr = (void *)data;
 	struct net_buf *buf;
 
-	if (remaining < sizeof(hdr)) {
+	if (remaining < sizeof(*hdr)) {
 		LOG_ERR("Not enought data for ACL header");
 		return NULL;
 	}
 
-	buf = net_buf_alloc(&acl_tx_pool, K_NO_WAIT);
+	buf = bt_buf_get_tx(BT_BUF_ACL_OUT, K_NO_WAIT, hdr, sizeof(*hdr));
 	if (buf) {
-		bt_buf_set_type(buf, BT_BUF_ACL_OUT);
-
-		memcpy((void *)&hdr, data, sizeof(hdr));
-		data += sizeof(hdr);
-		remaining -= sizeof(hdr);
-
-		net_buf_add_mem(buf, &hdr, sizeof(hdr));
+		data += sizeof(*hdr);
+		remaining -= sizeof(*hdr);
 	} else {
 		LOG_ERR("No available ACL buffers!");
 		return NULL;
 	}
 
-	if (remaining != sys_le16_to_cpu(hdr.len)) {
+	if (remaining != sys_le16_to_cpu(hdr->len)) {
 		LOG_ERR("ACL payload length is not correct");
 		net_buf_unref(buf);
 		return NULL;
@@ -229,9 +205,9 @@ static struct net_buf *hci_rpmsg_acl_recv(u8_t *data, size_t remaining)
 	return buf;
 }
 
-static void hci_rpmsg_rx(u8_t *data, size_t len)
+static void hci_rpmsg_rx(uint8_t *data, size_t len)
 {
-	u8_t pkt_indicator;
+	uint8_t pkt_indicator;
 	struct net_buf *buf = NULL;
 	size_t remaining = len;
 
@@ -285,7 +261,7 @@ static void tx_thread(void *p1, void *p2, void *p3)
 
 static int hci_rpmsg_send(struct net_buf *buf)
 {
-	u8_t pkt_indicator;
+	uint8_t pkt_indicator;
 
 	LOG_DBG("buf %p type %u len %u", buf, bt_buf_get_type(buf),
 		buf->len);
@@ -315,17 +291,17 @@ static int hci_rpmsg_send(struct net_buf *buf)
 }
 
 #if defined(CONFIG_BT_CTLR_ASSERT_HANDLER)
-void bt_ctlr_assert_handle(char *file, u32_t line)
+void bt_ctlr_assert_handle(char *file, uint32_t line)
 {
 	LOG_ERR("Controller assert in: %s at %d", file, line);
 }
 #endif /* CONFIG_BT_CTLR_ASSERT_HANDLER */
 
-int endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len, u32_t src,
+int endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len, uint32_t src,
 		void *priv)
 {
 	LOG_INF("Received message of %u bytes.", len);
-	hci_rpmsg_rx((u8_t *) data, len);
+	hci_rpmsg_rx((uint8_t *) data, len);
 
 	return RPMSG_SUCCESS;
 }

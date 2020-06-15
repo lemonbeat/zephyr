@@ -44,7 +44,7 @@ static struct in6_addr in6addr_my = MY_IP6ADDR;
 K_THREAD_STACK_DEFINE(thread_stack, STACKSIZE);
 static struct k_thread thread_data;
 
-static u8_t buf_tx[NET_IPV6_MTU];
+static uint8_t buf_tx[NET_IPV6_MTU];
 
 #define MAX_DBG_PRINT 64
 
@@ -160,7 +160,7 @@ static inline bool get_context(struct net_context **udp_recv6,
 
 static int build_reply(const char *name,
 		       struct net_pkt *pkt,
-		       u8_t *buf)
+		       uint8_t *buf)
 {
 	int reply_len = net_pkt_remaining_data(pkt);
 	int ret;
@@ -238,7 +238,7 @@ static void setup_udp_recv(struct net_context *udp_recv6)
 {
 	int ret;
 
-	ret = net_context_recv(udp_recv6, udp_received, 0, NULL);
+	ret = net_context_recv(udp_recv6, udp_received, K_NO_WAIT, NULL);
 	if (ret < 0) {
 		LOG_ERR("Cannot receive IPv6 UDP packets");
 	}
@@ -293,7 +293,7 @@ static void tcp_accepted(struct net_context *context,
 
 	net_context_set_accepting(context, false);
 
-	ret = net_context_recv(context, tcp_received, 0, NULL);
+	ret = net_context_recv(context, tcp_received, K_NO_WAIT, NULL);
 	if (ret < 0) {
 		LOG_ERR("Cannot receive TCP packet (family %d)",
 			net_context_get_family(context));

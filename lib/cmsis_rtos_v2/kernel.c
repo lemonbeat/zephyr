@@ -9,21 +9,14 @@
 #include <kernel.h>
 #include <cmsis_os2.h>
 
-/* Currently the timing implementations for timeouts and osDelay
- * assume that the arguments are in Zephyr ticks, even though ARM
- * documentation and at least some of our test code assume they are
- * milliseconds.  They must match for now.
- */
-BUILD_ASSERT(CONFIG_SYS_CLOCK_TICKS_PER_SEC == 1000);
-
-extern u32_t z_tick_get_32(void);
+extern uint32_t z_tick_get_32(void);
 
 /**
  * @brief Get RTOS Kernel Information.
  */
 osStatus_t osKernelGetInfo(osVersion_t *version, char *id_buf, uint32_t id_size)
 {
-	u32_t ver = sys_kernel_version_get();
+	uint32_t ver = sys_kernel_version_get();
 
 	if (version != NULL) {
 		version->api = ver;
@@ -132,7 +125,7 @@ osStatus_t osDelay(uint32_t ticks)
 		return osErrorISR;
 	}
 
-	k_sleep(k_ticks_to_ms_floor64(ticks));
+	k_sleep(K_TICKS(ticks));
 
 	return osOK;
 }
@@ -142,14 +135,14 @@ osStatus_t osDelay(uint32_t ticks)
  */
 osStatus_t osDelayUntil(uint32_t ticks)
 {
-	u32_t ticks_elapsed;
+	uint32_t ticks_elapsed;
 
 	if (k_is_in_isr()) {
 		return osErrorISR;
 	}
 
 	ticks_elapsed = osKernelGetTickCount();
-	k_sleep(k_ticks_to_ms_floor64(ticks - ticks_elapsed));
+	k_sleep(K_TICKS(ticks - ticks_elapsed));
 
 	return osOK;
 }

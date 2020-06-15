@@ -12,7 +12,7 @@
 static const char *now_str(void)
 {
 	static char buf[16]; /* ...HH:MM:SS.MMM */
-	u32_t now = k_uptime_get_32();
+	uint32_t now = k_uptime_get_32();
 	unsigned int ms = now % MSEC_PER_SEC;
 	unsigned int s;
 	unsigned int min;
@@ -86,7 +86,7 @@ static void handle_mpu6050_drdy(struct device *dev,
 
 void main(void)
 {
-	const char *const label = DT_INST_0_INVENSENSE_MPU6050_LABEL;
+	const char *const label = DT_LABEL(DT_INST(0, invensense_mpu6050));
 	struct device *mpu6050 = device_get_binding(label);
 
 	if (!mpu6050) {

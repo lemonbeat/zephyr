@@ -11,15 +11,17 @@
 #include <drivers/i2c.h>
 #include <stdbool.h>
 
-#if DT_INST_0_SNPS_DESIGNWARE_I2C_PCIE || \
-	DT_INST_1_SNPS_DESIGNWARE_I2C_PCIE || \
-	DT_INST_2_SNPS_DESIGNWARE_I2C_PCIE || \
-	DT_INST_3_SNPS_DESIGNWARE_I2C_PCIE || \
-	DT_INST_4_SNPS_DESIGNWARE_I2C_PCIE || \
-	DT_INST_5_SNPS_DESIGNWARE_I2C_PCIE || \
-	DT_INST_6_SNPS_DESIGNWARE_I2C_PCIE || \
-	DT_INST_7_SNPS_DESIGNWARE_I2C_PCIE
-BUILD_ASSERT_MSG(IS_ENABLED(CONFIG_PCIE), "DW I2C in DT needs CONFIG_PCIE");
+#define DT_DRV_COMPAT snps_designware_i2c
+
+#if DT_INST_PROP(0, pcie) || \
+	DT_INST_PROP(1, pcie) || \
+	DT_INST_PROP(2, pcie) || \
+	DT_INST_PROP(3, pcie) || \
+	DT_INST_PROP(4, pcie) || \
+	DT_INST_PROP(5, pcie) || \
+	DT_INST_PROP(6, pcie) || \
+	DT_INST_PROP(7, pcie)
+BUILD_ASSERT(IS_ENABLED(CONFIG_PCIE), "DW I2C in DT needs CONFIG_PCIE");
 #define I2C_DW_PCIE_ENABLED
 #include <drivers/pcie/pcie.h>
 #endif
@@ -94,7 +96,7 @@ typedef void (*i2c_isr_cb_t)(struct device *port);
 
 struct i2c_dw_rom_config {
 	i2c_isr_cb_t	config_func;
-	u32_t		bitrate;
+	uint32_t		bitrate;
 #ifdef I2C_DW_PCIE_ENABLED
 	bool		pcie;
 	pcie_bdf_t	pcie_bdf;
@@ -105,19 +107,19 @@ struct i2c_dw_rom_config {
 struct i2c_dw_dev_config {
 	struct i2c_dw_registers *regs;
 	struct k_sem		device_sync_sem;
-	u32_t app_config;
+	uint32_t app_config;
 
 
-	u8_t			*xfr_buf;
-	u32_t		xfr_len;
-	u32_t		rx_pending;
+	uint8_t			*xfr_buf;
+	uint32_t		xfr_len;
+	uint32_t		rx_pending;
 
-	u16_t		hcnt;
-	u16_t		lcnt;
+	uint16_t		hcnt;
+	uint16_t		lcnt;
 
-	volatile u8_t	state;  /* last direction of transfer */
-	u8_t			request_bytes;
-	u8_t			xfr_flags;
+	volatile uint8_t	state;  /* last direction of transfer */
+	uint8_t			request_bytes;
+	uint8_t			xfr_flags;
 	bool			support_hs_mode;
 };
 

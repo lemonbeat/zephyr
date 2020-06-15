@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT adi_adxl345
+
 #include <drivers/sensor.h>
 #include <init.h>
 #include <drivers/gpio.h>
@@ -19,8 +21,8 @@ static int adxl345_read_sample(struct device *dev,
 			       struct adxl345_sample *sample)
 {
 	struct adxl345_dev_data *data = dev->driver_data;
-	s16_t raw_x, raw_y, raw_z;
-	u8_t axis_data[6];
+	int16_t raw_x, raw_y, raw_z;
+	uint8_t axis_data[6];
 
 	int rc = i2c_burst_read(data->i2c_master,
 				data->i2c_addr,
@@ -44,7 +46,7 @@ static int adxl345_read_sample(struct device *dev,
 	return 0;
 }
 
-static void adxl345_accel_convert(struct sensor_value *val, unsigned int sample)
+static void adxl345_accel_convert(struct sensor_value *val, int16_t sample)
 {
 	if (sample & BIT(9)) {
 		sample |= ADXL345_COMPLEMENT;
@@ -58,20 +60,20 @@ static int adxl345_sample_fetch(struct device *dev, enum sensor_channel chan)
 {
 	struct adxl345_dev_data *data = dev->driver_data;
 	struct adxl345_sample sample;
-	u8_t samples_count;
+	uint8_t samples_count;
 	int rc;
 
 	data->sample_number = 0;
-	rc = i2c_reg_read_byte(dev, data->i2c_addr, ADXL345_FIFO_STATUS_REG,
-			&samples_count);
+	rc = i2c_reg_read_byte(data->i2c_master, data->i2c_addr,
+		ADXL345_FIFO_STATUS_REG, &samples_count);
 	if (rc < 0) {
 		LOG_ERR("Failed to read FIFO status rc = %d\n", rc);
 		return rc;
 	}
 
-	__ASSERT_NO_MSG(samples_count < ADXL345_MAX_FIFO_SIZE);
+	__ASSERT_NO_MSG(samples_count <= ARRAY_SIZE(data->bufx));
 
-	for (u8_t s = 0; s < samples_count; s++) {
+	for (uint8_t s = 0; s < samples_count; s++) {
 		rc = adxl345_read_sample(dev, &sample);
 		if (rc < 0) {
 			LOG_ERR("Failed to fetch sample rc=%d\n", rc);
@@ -91,7 +93,7 @@ static int adxl345_channel_get(struct device *dev,
 {
 	struct adxl345_dev_data *data = dev->driver_data;
 
-	if (data->sample_number > 32) {
+	if (data->sample_number >= ARRAY_SIZE(data->bufx)) {
 		data->sample_number = 0;
 	}
 
@@ -130,8 +132,8 @@ static int adxl345_init(struct device *dev)
 {
 	int rc;
 	struct adxl345_dev_data *data = dev->driver_data;
-	const struct adxl345_dev_config *cfg = dev->config->config_info;
-	u8_t dev_id;
+	const struct adxl345_dev_config *cfg = dev->config_info;
+	uint8_t dev_id;
 
 	data->sample_number = 0;
 	data->i2c_master = device_get_binding(cfg->i2c_master_name);
@@ -142,36 +144,36 @@ static int adxl345_init(struct device *dev)
 		return -ENODEV;
 	}
 
-	rc = i2c_reg_read_byte(dev, data->i2c_addr, ADXL345_DEVICE_ID_REG,
-			&dev_id);
+	rc = i2c_reg_read_byte(data->i2c_master, data->i2c_addr,
+		ADXL345_DEVICE_ID_REG, &dev_id);
 	if (rc < 0 || dev_id != ADXL345_PART_ID) {
 		LOG_ERR("Read PART ID failed: 0x%x\n", rc);
 		return -ENODEV;
 	}
 
-	rc = i2c_reg_write_byte(dev, data->i2c_addr, ADXL345_FIFO_CTL_REG,
-			ADXL345_FIFO_STREAM_MODE);
+	rc = i2c_reg_write_byte(data->i2c_master, data->i2c_addr,
+		ADXL345_FIFO_CTL_REG, ADXL345_FIFO_STREAM_MODE);
 	if (rc < 0) {
 		LOG_ERR("FIFO enable failed\n");
 		return -EIO;
 	}
 
-	rc = i2c_reg_write_byte(dev, data->i2c_addr, ADXL345_DATA_FORMAT_REG,
-			ADXL345_RANGE_16G);
+	rc = i2c_reg_write_byte(data->i2c_master, data->i2c_addr,
+		ADXL345_DATA_FORMAT_REG, ADXL345_RANGE_16G);
 	if (rc < 0) {
 		LOG_ERR("Data format set failed\n");
 		return -EIO;
 	}
 
-	rc = i2c_reg_write_byte(dev, data->i2c_addr, ADXL345_RATE_REG,
-			ADXL345_RATE_25HZ);
+	rc = i2c_reg_write_byte(data->i2c_master, data->i2c_addr,
+		ADXL345_RATE_REG, ADXL345_RATE_25HZ);
 	if (rc < 0) {
 		LOG_ERR("Rate setting failed\n");
 		return -EIO;
 	}
 
-	rc = i2c_reg_write_byte(dev, data->i2c_addr, ADXL345_POWER_CTL_REG,
-			ADXL345_ENABLE_MEASURE_BIT);
+	rc = i2c_reg_write_byte(data->i2c_master, data->i2c_addr,
+		ADXL345_POWER_CTL_REG, ADXL345_ENABLE_MEASURE_BIT);
 	if (rc < 0) {
 		LOG_ERR("Enable measure bit failed\n");
 		return -EIO;
@@ -183,10 +185,10 @@ static int adxl345_init(struct device *dev)
 static struct adxl345_dev_data adxl345_data;
 
 static const struct adxl345_dev_config adxl345_config = {
-	.i2c_master_name = DT_INST_0_ADI_ADXL345_BUS_NAME,
-	.i2c_addr = DT_INST_0_ADI_ADXL345_BASE_ADDRESS,
+	.i2c_master_name = DT_INST_BUS_LABEL(0),
+	.i2c_addr = DT_INST_REG_ADDR(0),
 };
 
-DEVICE_AND_API_INIT(adxl345, DT_INST_0_ADI_ADXL345_LABEL, adxl345_init,
+DEVICE_AND_API_INIT(adxl345, DT_INST_LABEL(0), adxl345_init,
 		    &adxl345_data, &adxl345_config, POST_KERNEL,
 		    CONFIG_SENSOR_INIT_PRIORITY, &adxl345_api_funcs);

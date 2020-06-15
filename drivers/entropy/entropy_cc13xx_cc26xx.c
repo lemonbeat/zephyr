@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT ti_cc13xx_cc26xx_trng
+
 #include <kernel.h>
 #include <device.h>
 #include <drivers/entropy.h>
@@ -18,7 +20,7 @@ struct entropy_cc13xx_cc26xx_data {
 	struct k_sem lock;
 	struct k_sem sync;
 	struct ring_buf pool;
-	u8_t data[CONFIG_ENTROPY_CC13XX_CC26XX_POOL_SIZE];
+	uint8_t data[CONFIG_ENTROPY_CC13XX_CC26XX_POOL_SIZE];
 };
 
 DEVICE_DECLARE(entropy_cc13xx_cc26xx);
@@ -29,11 +31,11 @@ get_dev_data(struct device *dev)
 	return dev->driver_data;
 }
 
-static int entropy_cc13xx_cc26xx_get_entropy(struct device *dev, u8_t *buf,
-					     u16_t len)
+static int entropy_cc13xx_cc26xx_get_entropy(struct device *dev, uint8_t *buf,
+					     uint16_t len)
 {
 	struct entropy_cc13xx_cc26xx_data *data = get_dev_data(dev);
-	u32_t cnt;
+	uint32_t cnt;
 
 	TRNGIntEnable(TRNG_NUMBER_READY);
 
@@ -56,8 +58,8 @@ static int entropy_cc13xx_cc26xx_get_entropy(struct device *dev, u8_t *buf,
 static void entropy_cc13xx_cc26xx_isr(void *arg)
 {
 	struct entropy_cc13xx_cc26xx_data *data = get_dev_data(arg);
-	u32_t src, cnt, off;
-	u32_t num[2];
+	uint32_t src, cnt, off;
+	uint32_t num[2];
 
 	/* Interrupt service routine as described in TRM section 18.6.1.3.2 */
 	src = TRNGStatusGet();
@@ -67,7 +69,7 @@ static void entropy_cc13xx_cc26xx_isr(void *arg)
 		num[1] = TRNGNumberGet(TRNG_HI_WORD);
 		num[0] = TRNGNumberGet(TRNG_LOW_WORD);
 
-		cnt = ring_buf_put(&data->pool, (u8_t *)num, sizeof(num));
+		cnt = ring_buf_put(&data->pool, (uint8_t *)num, sizeof(num));
 
 		/* When pool is full disable interrupt and stop reading numbers */
 		if (cnt != sizeof(num)) {
@@ -146,11 +148,11 @@ static int entropy_cc13xx_cc26xx_init(struct device *dev)
 	TRNGEnable();
 	TRNGIntEnable(TRNG_NUMBER_READY | TRNG_FRO_SHUTDOWN);
 
-	IRQ_CONNECT(DT_INST_0_TI_CC13XX_CC26XX_TRNG_IRQ_0,
-		    DT_INST_0_TI_CC13XX_CC26XX_TRNG_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+		    DT_INST_IRQ(0, priority),
 		    entropy_cc13xx_cc26xx_isr,
 		    DEVICE_GET(entropy_cc13xx_cc26xx), 0);
-	irq_enable(DT_INST_0_TI_CC13XX_CC26XX_TRNG_IRQ_0);
+	irq_enable(DT_INST_IRQN(0));
 
 	return 0;
 }
@@ -164,7 +166,7 @@ static struct entropy_cc13xx_cc26xx_data entropy_cc13xx_cc26xx_data = {
 	.sync = Z_SEM_INITIALIZER(entropy_cc13xx_cc26xx_data.sync, 0, 1),
 };
 
-DEVICE_AND_API_INIT(entropy_cc13xx_cc26xx, DT_INST_0_TI_CC13XX_CC26XX_TRNG_LABEL,
+DEVICE_AND_API_INIT(entropy_cc13xx_cc26xx, DT_INST_LABEL(0),
 		    entropy_cc13xx_cc26xx_init, &entropy_cc13xx_cc26xx_data,
 		    NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_cc13xx_cc26xx_driver_api);

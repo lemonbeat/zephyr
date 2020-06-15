@@ -37,6 +37,12 @@ extern "C" {
  * If the device ID is smaller then length, the rest of the buffer is left unchanged.
  * The ID depends on the hardware and is not guaranteed unique.
  *
+ * Drivers are responsible for ensuring that the ID data structure is a
+ * sequence of bytes.  The returned ID value is not supposed to be interpreted
+ * based on vendor-specific assumptions of byte order. It should express the
+ * identifier as a raw byte sequence, doing any endian conversion necessary so
+ * that a hex representation of the bytes produces the intended serial number.
+ *
  * @param buffer  Buffer to write the ID to.
  * @param length  Max length of the buffer.
  *
@@ -44,9 +50,9 @@ extern "C" {
  * @retval -ENOTSUP if there is no implementation for the particular device.
  * @retval any negative value on driver specific errors.
  */
-__syscall ssize_t hwinfo_get_device_id(u8_t *buffer, size_t length);
+__syscall ssize_t hwinfo_get_device_id(uint8_t *buffer, size_t length);
 
-ssize_t z_impl_hwinfo_get_device_id(u8_t *buffer, size_t length);
+ssize_t z_impl_hwinfo_get_device_id(uint8_t *buffer, size_t length);
 
 /**
  * @}

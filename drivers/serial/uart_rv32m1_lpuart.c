@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT openisa_rv32m1_lpuart
+
 #include <errno.h>
 #include <device.h>
 #include <drivers/uart.h>
@@ -17,9 +19,9 @@ struct rv32m1_lpuart_config {
 	char *clock_name;
 	clock_control_subsys_t clock_subsys;
 	clock_ip_name_t clock_ip_name;
-	u32_t clock_ip_src;
-	u32_t baud_rate;
-	u8_t hw_flow_control;
+	uint32_t clock_ip_src;
+	uint32_t baud_rate;
+	uint8_t hw_flow_control;
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	void (*irq_config_func)(struct device *dev);
 #endif
@@ -34,8 +36,8 @@ struct rv32m1_lpuart_data {
 
 static int rv32m1_lpuart_poll_in(struct device *dev, unsigned char *c)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t flags = LPUART_GetStatusFlags(config->base);
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t flags = LPUART_GetStatusFlags(config->base);
 	int ret = -1;
 
 	if (flags & kLPUART_RxDataRegFullFlag) {
@@ -48,7 +50,7 @@ static int rv32m1_lpuart_poll_in(struct device *dev, unsigned char *c)
 
 static void rv32m1_lpuart_poll_out(struct device *dev, unsigned char c)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
 
 	while (!(LPUART_GetStatusFlags(config->base)
 		& kLPUART_TxDataRegEmptyFlag)) {
@@ -59,8 +61,8 @@ static void rv32m1_lpuart_poll_out(struct device *dev, unsigned char c)
 
 static int rv32m1_lpuart_err_check(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t flags = LPUART_GetStatusFlags(config->base);
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t flags = LPUART_GetStatusFlags(config->base);
 	int err = 0;
 
 	if (flags & kLPUART_RxOverrunFlag) {
@@ -83,11 +85,11 @@ static int rv32m1_lpuart_err_check(struct device *dev)
 }
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static int rv32m1_lpuart_fifo_fill(struct device *dev, const u8_t *tx_data,
+static int rv32m1_lpuart_fifo_fill(struct device *dev, const uint8_t *tx_data,
 			       int len)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u8_t num_tx = 0U;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint8_t num_tx = 0U;
 
 	while ((len - num_tx > 0) &&
 	       (LPUART_GetStatusFlags(config->base)
@@ -99,11 +101,11 @@ static int rv32m1_lpuart_fifo_fill(struct device *dev, const u8_t *tx_data,
 	return num_tx;
 }
 
-static int rv32m1_lpuart_fifo_read(struct device *dev, u8_t *rx_data,
+static int rv32m1_lpuart_fifo_read(struct device *dev, uint8_t *rx_data,
 			       const int len)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u8_t num_rx = 0U;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint8_t num_rx = 0U;
 
 	while ((len - num_rx > 0) &&
 	       (LPUART_GetStatusFlags(config->base)
@@ -117,32 +119,32 @@ static int rv32m1_lpuart_fifo_read(struct device *dev, u8_t *rx_data,
 
 static void rv32m1_lpuart_irq_tx_enable(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_TxDataRegEmptyInterruptEnable;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_TxDataRegEmptyInterruptEnable;
 
 	LPUART_EnableInterrupts(config->base, mask);
 }
 
 static void rv32m1_lpuart_irq_tx_disable(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_TxDataRegEmptyInterruptEnable;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_TxDataRegEmptyInterruptEnable;
 
 	LPUART_DisableInterrupts(config->base, mask);
 }
 
 static int rv32m1_lpuart_irq_tx_complete(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t flags = LPUART_GetStatusFlags(config->base);
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t flags = LPUART_GetStatusFlags(config->base);
 
 	return (flags & kLPUART_TxDataRegEmptyFlag) != 0U;
 }
 
 static int rv32m1_lpuart_irq_tx_ready(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_TxDataRegEmptyInterruptEnable;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_TxDataRegEmptyInterruptEnable;
 
 	return (LPUART_GetEnabledInterrupts(config->base) & mask)
 		&& rv32m1_lpuart_irq_tx_complete(dev);
@@ -150,32 +152,32 @@ static int rv32m1_lpuart_irq_tx_ready(struct device *dev)
 
 static void rv32m1_lpuart_irq_rx_enable(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_RxDataRegFullInterruptEnable;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_RxDataRegFullInterruptEnable;
 
 	LPUART_EnableInterrupts(config->base, mask);
 }
 
 static void rv32m1_lpuart_irq_rx_disable(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_RxDataRegFullInterruptEnable;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_RxDataRegFullInterruptEnable;
 
 	LPUART_DisableInterrupts(config->base, mask);
 }
 
 static int rv32m1_lpuart_irq_rx_full(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t flags = LPUART_GetStatusFlags(config->base);
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t flags = LPUART_GetStatusFlags(config->base);
 
 	return (flags & kLPUART_RxDataRegFullFlag) != 0U;
 }
 
 static int rv32m1_lpuart_irq_rx_ready(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_RxDataRegFullInterruptEnable;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_RxDataRegFullInterruptEnable;
 
 	return (LPUART_GetEnabledInterrupts(config->base) & mask)
 		&& rv32m1_lpuart_irq_rx_full(dev);
@@ -183,8 +185,8 @@ static int rv32m1_lpuart_irq_rx_ready(struct device *dev)
 
 static void rv32m1_lpuart_irq_err_enable(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_NoiseErrorInterruptEnable |
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_NoiseErrorInterruptEnable |
 			kLPUART_FramingErrorInterruptEnable |
 			kLPUART_ParityErrorInterruptEnable;
 
@@ -193,8 +195,8 @@ static void rv32m1_lpuart_irq_err_enable(struct device *dev)
 
 static void rv32m1_lpuart_irq_err_disable(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
-	u32_t mask = kLPUART_NoiseErrorInterruptEnable |
+	const struct rv32m1_lpuart_config *config = dev->config_info;
+	uint32_t mask = kLPUART_NoiseErrorInterruptEnable |
 			kLPUART_FramingErrorInterruptEnable |
 			kLPUART_ParityErrorInterruptEnable;
 
@@ -235,10 +237,10 @@ static void rv32m1_lpuart_isr(void *arg)
 
 static int rv32m1_lpuart_init(struct device *dev)
 {
-	const struct rv32m1_lpuart_config *config = dev->config->config_info;
+	const struct rv32m1_lpuart_config *config = dev->config_info;
 	lpuart_config_t uart_config;
 	struct device *clock_dev;
-	u32_t clock_freq;
+	uint32_t clock_freq;
 
 	/* set clock source */
 	/* TODO: Don't change if another core has configured */
@@ -294,166 +296,54 @@ static const struct uart_driver_api rv32m1_lpuart_driver_api = {
 #endif
 };
 
-#ifdef CONFIG_UART_RV32M1_LPUART_0
+#define RV32M1_LPUART_DECLARE_CFG(n, IRQ_FUNC_INIT)			\
+	static const struct rv32m1_lpuart_config rv32m1_lpuart_##n##_cfg = {\
+		.base = (LPUART_Type *)DT_INST_REG_ADDR(n),		\
+		.clock_name = DT_INST_CLOCKS_LABEL(n),			\
+		.clock_subsys =						\
+			(clock_control_subsys_t)DT_INST_CLOCKS_CELL(n, name),\
+		.clock_ip_name = INST_DT_CLOCK_IP_NAME(n),		\
+		.clock_ip_src = kCLOCK_IpSrcFircAsync,			\
+		.baud_rate = DT_INST_PROP(n, current_speed),		\
+		.hw_flow_control = DT_INST_PROP(n, hw_flow_control),	\
+		IRQ_FUNC_INIT						\
+	}
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_0(struct device *dev);
+#define RV32M1_LPUART_CONFIG_FUNC(n)					\
+	static void rv32m1_lpuart_config_func_##n(struct device *dev)	\
+	{								\
+		IRQ_CONNECT(DT_INST_IRQN(n), 0, rv32m1_lpuart_isr,	\
+			    DEVICE_GET(uart_0), 0);			\
+									\
+		irq_enable(DT_INST_IRQN(n));				\
+	}
+#define RV32M1_LPUART_IRQ_CFG_FUNC_INIT(n)				\
+	.irq_config_func = rv32m1_lpuart_config_func_##n,
+#define RV32M1_LPUART_INIT_CFG(n)					\
+	RV32M1_LPUART_DECLARE_CFG(n, RV32M1_LPUART_IRQ_CFG_FUNC_INIT(n))
+#else
+#define RV32M1_LPUART_CONFIG_FUNC(n)
+#define RV32M1_LPUART_IRQ_CFG_FUNC_INIT
+#define RV32M1_LPUART_INIT_CFG(n)					\
+	RV32M1_LPUART_DECLARE_CFG(n, RV32M1_LPUART_IRQ_CFG_FUNC_INIT)
 #endif
 
-static const struct rv32m1_lpuart_config rv32m1_lpuart_0_config = {
-	.base = (LPUART_Type *)DT_OPENISA_RV32M1_LPUART_UART_0_BASE_ADDRESS,
-	.clock_name = DT_OPENISA_RV32M1_LPUART_UART_0_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_OPENISA_RV32M1_LPUART_UART_0_CLOCK_NAME,
-	.clock_ip_name = kCLOCK_Lpuart0,
-	.clock_ip_src = kCLOCK_IpSrcFircAsync,
-	.baud_rate = DT_OPENISA_RV32M1_LPUART_UART_0_CURRENT_SPEED,
-#ifdef DT_OPENISA_RV32M1_LPUART_UART_0_HW_FLOW_CONTROL
-	.hw_flow_control = DT_OPENISA_RV32M1_LPUART_UART_0_HW_FLOW_CONTROL,
-#endif
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = rv32m1_lpuart_config_func_0,
-#endif
-};
+#define RV32M1_LPUART_INIT(n)						\
+	static struct rv32m1_lpuart_data rv32m1_lpuart_##n##_data;	\
+									\
+	static const struct rv32m1_lpuart_config rv32m1_lpuart_##n##_cfg;\
+									\
+	DEVICE_AND_API_INIT(uart_##n, DT_INST_LABEL(n),			\
+			    &rv32m1_lpuart_init,			\
+			    &rv32m1_lpuart_##n##_data,			\
+			    &rv32m1_lpuart_##n##_cfg,			\
+			    PRE_KERNEL_1,				\
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
+			    &rv32m1_lpuart_driver_api);			\
+									\
+	RV32M1_LPUART_CONFIG_FUNC(n)					\
+									\
+	RV32M1_LPUART_INIT_CFG(n);
 
-static struct rv32m1_lpuart_data rv32m1_lpuart_0_data;
-
-DEVICE_AND_API_INIT(uart_0, DT_OPENISA_RV32M1_LPUART_UART_0_LABEL,
-		    &rv32m1_lpuart_init,
-		    &rv32m1_lpuart_0_data, &rv32m1_lpuart_0_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &rv32m1_lpuart_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_0(struct device *dev)
-{
-	IRQ_CONNECT(DT_OPENISA_RV32M1_LPUART_UART_0_IRQ_0, 0, rv32m1_lpuart_isr,
-		    DEVICE_GET(uart_0), 0);
-
-	irq_enable(DT_OPENISA_RV32M1_LPUART_UART_0_IRQ_0);
-}
-#endif
-
-#endif /* CONFIG_UART_RV32M1_LPUART_0 */
-
-#ifdef CONFIG_UART_RV32M1_LPUART_1
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_1(struct device *dev);
-#endif
-
-static const struct rv32m1_lpuart_config rv32m1_lpuart_1_config = {
-	.base = (LPUART_Type *)DT_OPENISA_RV32M1_LPUART_UART_1_BASE_ADDRESS,
-	.clock_name = DT_OPENISA_RV32M1_LPUART_UART_1_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_OPENISA_RV32M1_LPUART_UART_1_CLOCK_NAME,
-	.clock_ip_name = kCLOCK_Lpuart1,
-	.clock_ip_src = kCLOCK_IpSrcFircAsync,
-	.baud_rate = DT_OPENISA_RV32M1_LPUART_UART_1_CURRENT_SPEED,
-#ifdef DT_OPENISA_RV32M1_LPUART_UART_1_HW_FLOW_CONTROL
-	.hw_flow_control = DT_OPENISA_RV32M1_LPUART_UART_1_HW_FLOW_CONTROL,
-#endif
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = rv32m1_lpuart_config_func_1,
-#endif
-};
-
-static struct rv32m1_lpuart_data rv32m1_lpuart_1_data;
-
-DEVICE_AND_API_INIT(uart_1, DT_OPENISA_RV32M1_LPUART_UART_1_LABEL,
-		    &rv32m1_lpuart_init,
-		    &rv32m1_lpuart_1_data, &rv32m1_lpuart_1_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &rv32m1_lpuart_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_1(struct device *dev)
-{
-	IRQ_CONNECT(DT_OPENISA_RV32M1_LPUART_UART_1_IRQ_0, 0, rv32m1_lpuart_isr,
-		    DEVICE_GET(uart_1), 0);
-
-	irq_enable(DT_OPENISA_RV32M1_LPUART_UART_1_IRQ_0);
-}
-#endif
-
-#endif /* CONFIG_UART_RV32M1_LPUART_1 */
-
-#ifdef CONFIG_UART_RV32M1_LPUART_2
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_2(struct device *dev);
-#endif
-
-static const struct rv32m1_lpuart_config rv32m1_lpuart_2_config = {
-	.base = (LPUART_Type *)DT_OPENISA_RV32M1_LPUART_UART_2_BASE_ADDRESS,
-	.clock_name = DT_OPENISA_RV32M1_LPUART_UART_2_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_OPENISA_RV32M1_LPUART_UART_2_CLOCK_NAME,
-	.clock_ip_name = kCLOCK_Lpuart2,
-	.clock_ip_src = kCLOCK_IpSrcFircAsync,
-	.baud_rate = DT_OPENISA_RV32M1_LPUART_UART_2_CURRENT_SPEED,
-#ifdef DT_OPENISA_RV32M1_LPUART_UART_2_HW_FLOW_CONTROL
-	.hw_flow_control = DT_OPENISA_RV32M1_LPUART_UART_2_HW_FLOW_CONTROL,
-#endif
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = rv32m1_lpuart_config_func_2,
-#endif
-};
-
-static struct rv32m1_lpuart_data rv32m1_lpuart_2_data;
-
-DEVICE_AND_API_INIT(uart_2, DT_OPENISA_RV32M1_LPUART_UART_2_LABEL,
-		    &rv32m1_lpuart_init,
-		    &rv32m1_lpuart_2_data, &rv32m1_lpuart_2_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &rv32m1_lpuart_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_2(struct device *dev)
-{
-	IRQ_CONNECT(DT_OPENISA_RV32M1_LPUART_UART_2_IRQ_0, 0, rv32m1_lpuart_isr,
-		    DEVICE_GET(uart_2), 0);
-
-	irq_enable(DT_OPENISA_RV32M1_LPUART_UART_2_IRQ_0);
-}
-#endif
-
-#endif /* CONFIG_UART_RV32M1_LPUART_2 */
-
-#ifdef CONFIG_UART_RV32M1_LPUART_3
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_3(struct device *dev);
-#endif
-
-static const struct rv32m1_lpuart_config rv32m1_lpuart_3_config = {
-	.base = (LPUART_Type *)DT_OPENISA_RV32M1_LPUART_UART_3_BASE_ADDRESS,
-	.clock_name = DT_OPENISA_RV32M1_LPUART_UART_3_CLOCK_CONTROLLER,
-	.clock_subsys = (clock_control_subsys_t)DT_OPENISA_RV32M1_LPUART_UART_3_CLOCK_NAME,
-	.clock_ip_name = kCLOCK_Lpuart3,
-	.clock_ip_src = kCLOCK_IpSrcFircAsync,
-	.baud_rate = DT_OPENISA_RV32M1_LPUART_UART_3_CURRENT_SPEED,
-#ifdef DT_OPENISA_RV32M1_LPUART_UART_3_HW_FLOW_CONTROL
-	.hw_flow_control = DT_OPENISA_RV32M1_LPUART_UART_3_HW_FLOW_CONTROL,
-#endif
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.irq_config_func = rv32m1_lpuart_config_func_3,
-#endif
-};
-
-static struct rv32m1_lpuart_data rv32m1_lpuart_3_data;
-
-DEVICE_AND_API_INIT(uart_3, DT_OPENISA_RV32M1_LPUART_3_LABEL,
-		    &rv32m1_lpuart_init,
-		    &rv32m1_lpuart_3_data, &rv32m1_lpuart_3_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &rv32m1_lpuart_driver_api);
-
-#ifdef CONFIG_UART_INTERRUPT_DRIVEN
-static void rv32m1_lpuart_config_func_3(struct device *dev)
-{
-	IRQ_CONNECT(DT_OPENISA_RV32M1_LPUART_UART_3_IRQ_0, 0, rv32m1_lpuart_isr,
-		    DEVICE_GET(uart_3), 0);
-
-	irq_enable(DT_OPENISA_RV32M1_LPUART_UART_3_IRQ_0);
-}
-#endif
-
-#endif /* CONFIG_UART_RV32M1_LPUART_3 */
+DT_INST_FOREACH_STATUS_OKAY(RV32M1_LPUART_INIT)

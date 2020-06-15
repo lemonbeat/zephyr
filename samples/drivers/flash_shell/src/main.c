@@ -27,11 +27,11 @@ LOG_MODULE_REGISTER(app);
 #define PR_WARNING(shell, fmt, ...)				\
 	shell_fprintf(shell, SHELL_WARNING, fmt, ##__VA_ARGS__)
 /*
- * When DT_FLASH_DEV_NAME is available, we use it here. Otherwise,
- * the device can be set at runtime with the set_device command.
+ * When DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL is available, we use it here.
+ * Otherwise the device can be set at runtime with the set_device command.
  */
-#ifndef DT_FLASH_DEV_NAME
-#define DT_FLASH_DEV_NAME ""
+#ifndef DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL
+#define DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL ""
 #endif
 
 /* Command usage info. */
@@ -93,10 +93,10 @@ static int check_flash_device(const struct shell *shell)
 	return 0;
 }
 
-static void dump_buffer(const struct shell *shell, u8_t *buf, size_t size)
+static void dump_buffer(const struct shell *shell, uint8_t *buf, size_t size)
 {
 	bool newline = false;
-	u8_t *p = buf;
+	uint8_t *p = buf;
 
 	while (size >= 8) {
 		PR_SHELL(shell, "%02x %02x %02x %02x | %02x %02x %02x %02x\n",
@@ -135,21 +135,21 @@ static int parse_ul(const char *str, unsigned long *result)
 	return 0;
 }
 
-static int parse_u8(const char *str, u8_t *result)
+static int parse_u8(const char *str, uint8_t *result)
 {
 	unsigned long val;
 
 	if (parse_ul(str, &val) || val > 0xff) {
 		return -EINVAL;
 	}
-	*result = (u8_t)val;
+	*result = (uint8_t)val;
 	return 0;
 }
 
 /* Read bytes, dumping contents to console and printing on error. */
 static int do_read(const struct shell *shell, off_t offset, size_t len)
 {
-	u8_t buf[64];
+	uint8_t buf[64];
 	int ret;
 
 	while (len > sizeof(buf)) {
@@ -198,7 +198,7 @@ static int do_erase(const struct shell *shell, off_t offset, size_t size)
 }
 
 /* Write bytes, handling write protection and printing on error. */
-static int do_write(const struct shell *shell, off_t offset, u8_t *buf,
+static int do_write(const struct shell *shell, off_t offset, uint8_t *buf,
 		    size_t len, bool read_back)
 {
 	int ret;
@@ -298,7 +298,7 @@ exit:
 static int cmd_write(const struct shell *shell, size_t argc, char **argv)
 {
 	unsigned long int i, offset;
-	u8_t buf[ARGC_MAX];
+	uint8_t buf[ARGC_MAX];
 
 	int err = check_flash_device(shell);
 
@@ -516,7 +516,7 @@ static int cmd_page_write(const struct shell *shell, size_t argc, char **argv)
 {
 	struct flash_pages_info info;
 	unsigned long int page, off;
-	u8_t buf[ARGC_MAX];
+	uint8_t buf[ARGC_MAX];
 	size_t i;
 	int ret;
 
@@ -570,7 +570,7 @@ static int cmd_set_dev(const struct shell *shell, size_t argc, char **argv)
 	}
 	if (flash_device) {
 		PR_SHELL(shell, "Leaving behind device %s\n",
-			 flash_device->config->name);
+			 flash_device->name);
 	}
 	flash_device = dev;
 
@@ -579,12 +579,14 @@ static int cmd_set_dev(const struct shell *shell, size_t argc, char **argv)
 
 void main(void)
 {
-	flash_device = device_get_binding(DT_FLASH_DEV_NAME);
+	flash_device =
+		device_get_binding(DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 	if (flash_device) {
-		printk("Found flash device %s.\n", DT_FLASH_DEV_NAME);
+		printk("Found flash controller %s.\n",
+			DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 		printk("Flash I/O commands can be run.\n");
 	} else {
-		printk("**No flash device found!**\n");
+		printk("**No flash controller found!**\n");
 		printk("Run set_device <name> to specify one "
 		       "before using other commands.\n");
 	}

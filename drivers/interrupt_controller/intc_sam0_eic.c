@@ -4,15 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT atmel_sam0_eic
+
 #include <device.h>
 #include <soc.h>
 #include <drivers/interrupt_controller/sam0_eic.h>
 #include "intc_sam0_eic_priv.h"
 
 struct sam0_eic_line_assignment {
-	u8_t pin : 5;
-	u8_t port : 2;
-	u8_t enabled : 1;
+	uint8_t pin : 5;
+	uint8_t port : 2;
+	uint8_t enabled : 1;
 };
 
 struct sam0_eic_port_data {
@@ -55,8 +57,8 @@ static void sam0_eic_isr(void *arg)
 {
 	struct device *dev = (struct device *)arg;
 	struct sam0_eic_data *const dev_data = DEV_DATA(dev);
-	u16_t bits = EIC->INTFLAG.reg;
-	u32_t line_index;
+	uint16_t bits = EIC->INTFLAG.reg;
+	uint32_t line_index;
 
 	/* Acknowledge all interrupts */
 	EIC->INTFLAG.reg = bits;
@@ -104,12 +106,12 @@ int sam0_eic_acquire(int port, int pin, enum sam0_eic_trigger trigger,
 	struct sam0_eic_data *dev_data = dev->driver_data;
 	struct sam0_eic_port_data *port_data;
 	struct sam0_eic_line_assignment *line_assignment;
-	u32_t mask;
+	uint32_t mask;
 	int line_index;
 	int config_index;
 	int config_shift;
 	int key;
-	u32_t config;
+	uint32_t config;
 
 	line_index = sam0_eic_map_to_line(port, pin);
 	if (line_index < 0) {
@@ -211,7 +213,7 @@ int sam0_eic_release(int port, int pin)
 {
 	struct device *dev = DEVICE_GET(sam0_eic);
 	struct sam0_eic_data *dev_data = dev->driver_data;
-	u32_t mask;
+	uint32_t mask;
 	int line_index;
 	int config_index;
 	int config_shift;
@@ -258,7 +260,7 @@ done:
 
 int sam0_eic_enable_interrupt(int port, int pin)
 {
-	u32_t mask;
+	uint32_t mask;
 	int line_index;
 
 	line_index = sam0_eic_map_to_line(port, pin);
@@ -279,7 +281,7 @@ int sam0_eic_enable_interrupt(int port, int pin)
 
 int sam0_eic_disable_interrupt(int port, int pin)
 {
-	u32_t mask;
+	uint32_t mask;
 	int line_index;
 
 	line_index = sam0_eic_map_to_line(port, pin);
@@ -298,13 +300,13 @@ int sam0_eic_disable_interrupt(int port, int pin)
 	return 0;
 }
 
-u32_t sam0_eic_interrupt_pending(int port)
+uint32_t sam0_eic_interrupt_pending(int port)
 {
 	struct device *dev = DEVICE_GET(sam0_eic);
 	struct sam0_eic_data *dev_data = dev->driver_data;
 	struct sam0_eic_line_assignment *line_assignment;
-	u32_t set = EIC->INTFLAG.reg;
-	u32_t mask = 0;
+	uint32_t set = EIC->INTFLAG.reg;
+	uint32_t mask = 0;
 
 	for (int line_index = 0; line_index < EIC_EXTINT_NUM; line_index++) {
 		line_assignment = &dev_data->lines[line_index];
@@ -330,10 +332,10 @@ u32_t sam0_eic_interrupt_pending(int port)
 
 #define SAM0_EIC_IRQ_CONNECT(n)						\
 	do {								\
-		IRQ_CONNECT(DT_INST_0_ATMEL_SAM0_EIC_IRQ_ ## n,		\
-			    DT_INST_0_ATMEL_SAM0_EIC_IRQ_ ## n ## _PRIORITY,	\
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(0, n, irq),		\
+			    DT_INST_IRQ_BY_IDX(0, n, priority),		\
 			    sam0_eic_isr, DEVICE_GET(sam0_eic), 0);	\
-		irq_enable(DT_INST_0_ATMEL_SAM0_EIC_IRQ_ ## n);		\
+		irq_enable(DT_INST_IRQ_BY_IDX(0, n, irq));		\
 	} while (0)
 
 static int sam0_eic_init(struct device *dev)
@@ -356,52 +358,52 @@ static int sam0_eic_init(struct device *dev)
 			    GCLK_CLKCTRL_CLKEN;
 #endif
 
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_0
+#if DT_INST_IRQ_HAS_CELL(0, irq)
 	SAM0_EIC_IRQ_CONNECT(0);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_1
+#if DT_INST_IRQ_HAS_IDX(0, 1)
 	SAM0_EIC_IRQ_CONNECT(1);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_2
+#if DT_INST_IRQ_HAS_IDX(0, 2)
 	SAM0_EIC_IRQ_CONNECT(2);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_3
+#if DT_INST_IRQ_HAS_IDX(0, 3)
 	SAM0_EIC_IRQ_CONNECT(3);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_4
+#if DT_INST_IRQ_HAS_IDX(0, 4)
 	SAM0_EIC_IRQ_CONNECT(4);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_5
+#if DT_INST_IRQ_HAS_IDX(0, 5)
 	SAM0_EIC_IRQ_CONNECT(5);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_6
+#if DT_INST_IRQ_HAS_IDX(0, 6)
 	SAM0_EIC_IRQ_CONNECT(6);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_7
+#if DT_INST_IRQ_HAS_IDX(0, 7)
 	SAM0_EIC_IRQ_CONNECT(7);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_8
+#if DT_INST_IRQ_HAS_IDX(0, 8)
 	SAM0_EIC_IRQ_CONNECT(8);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_9
+#if DT_INST_IRQ_HAS_IDX(0, 9)
 	SAM0_EIC_IRQ_CONNECT(9);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_10
+#if DT_INST_IRQ_HAS_IDX(0, 10)
 	SAM0_EIC_IRQ_CONNECT(10);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_11
+#if DT_INST_IRQ_HAS_IDX(0, 11)
 	SAM0_EIC_IRQ_CONNECT(11);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_12
+#if DT_INST_IRQ_HAS_IDX(0, 12)
 	SAM0_EIC_IRQ_CONNECT(12);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_13
+#if DT_INST_IRQ_HAS_IDX(0, 13)
 	SAM0_EIC_IRQ_CONNECT(13);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_14
+#if DT_INST_IRQ_HAS_IDX(0, 14)
 	SAM0_EIC_IRQ_CONNECT(14);
 #endif
-#ifdef DT_INST_0_ATMEL_SAM0_EIC_IRQ_15
+#if DT_INST_IRQ_HAS_IDX(0, 15)
 	SAM0_EIC_IRQ_CONNECT(15);
 #endif
 
@@ -412,6 +414,6 @@ static int sam0_eic_init(struct device *dev)
 }
 
 static struct sam0_eic_data eic_data;
-DEVICE_INIT(sam0_eic, DT_INST_0_ATMEL_SAM0_EIC_LABEL, sam0_eic_init,
+DEVICE_INIT(sam0_eic, DT_INST_LABEL(0), sam0_eic_init,
 	    &eic_data, NULL,
 	    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

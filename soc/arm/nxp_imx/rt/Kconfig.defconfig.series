@@ -58,6 +58,16 @@ config SPI_MCUX_LPSPI
 	default y if HAS_MCUX_LPSPI
 	depends on SPI
 
+if CODE_SEMC
+
+config FLASH_SIZE
+	default $(dt_node_reg_size_int,/memory@80000000,0,K)
+
+config FLASH_BASE_ADDRESS
+	default $(dt_node_reg_addr_hex,/memory@80000000)
+
+endif # CODE_SEMC
+
 if CODE_ITCM
 
 config FLASH_SIZE
@@ -111,10 +121,10 @@ endif # DATA_SEMC
 if DATA_OCRAM
 
 config SRAM_SIZE
-	default $(dt_node_reg_size_int,/memory@20200000,0,K)
+	default $(dt_node_reg_size_int,/soc/flexram@400b0000/ocram@20200000,0,K)
 
 config SRAM_BASE_ADDRESS
-	default $(dt_node_reg_addr_hex,/memory@20200000)
+	default $(dt_node_reg_addr_hex,/soc/flexram@400b0000/ocram@20200000)
 
 endif # DATA_OCRAM
 
@@ -125,6 +135,10 @@ config USB_DC_NXP_EHCI
 config VIDEO_MCUX_CSI
 	default y if HAS_MCUX_CSI
 	depends on VIDEO
+
+config DMA_MCUX_EDMA
+	default y if HAS_MCUX_EDMA
+	depends on DMA
 
 source "soc/arm/nxp_imx/rt/Kconfig.defconfig.mimxrt*"
 

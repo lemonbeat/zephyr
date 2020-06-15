@@ -177,7 +177,7 @@ typedef struct s_isrList {
  * between the vector and the IRQ line as well as triggering flags
  */
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-({ \
+{ \
 	__asm__ __volatile__(							\
 		".pushsection .intList\n\t" \
 		".long %c[isr]_irq%c[irq]_stub\n\t"	/* ISR_LIST.fnc */ \
@@ -202,28 +202,34 @@ typedef struct s_isrList {
 		  [irq] "i" (irq_p)); \
 	z_irq_controller_irq_config(Z_IRQ_TO_INTERRUPT_VECTOR(irq_p), (irq_p), \
 				   (flags_p)); \
-	Z_IRQ_TO_INTERRUPT_VECTOR(irq_p); \
-})
+}
 
+/* Direct interrupts won't work as expected with KPTI turned on, because
+ * all non-user accessible pages in the page table are marked non-present.
+ * It's likely possible to add logic to ARCH_ISR_DIRECT_HEADER/FOOTER to do
+ * the necessary trampolining to switch page tables / stacks, but this
+ * probably loses all the latency benefits that direct interrupts provide
+ * and one might as well use a regular interrupt anyway.
+ */
+#ifndef CONFIG_X86_KPTI
 #define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p) \
-({ \
+{ \
 	NANO_CPU_INT_REGISTER(isr_p, irq_p, priority_p, -1, 0); \
 	z_irq_controller_irq_config(Z_IRQ_TO_INTERRUPT_VECTOR(irq_p), (irq_p), \
 				   (flags_p)); \
-	Z_IRQ_TO_INTERRUPT_VECTOR(irq_p); \
-})
+}
 
 #ifdef CONFIG_SYS_POWER_MANAGEMENT
 /*
  * FIXME: z_sys_power_save_idle_exit is defined in kernel.h, which cannot be
  *	  included here due to circular dependency
  */
-extern void z_sys_power_save_idle_exit(s32_t ticks);
+extern void z_sys_power_save_idle_exit(int32_t ticks);
 
 static inline void arch_irq_direct_pm(void)
 {
 	if (_kernel.idle) {
-		s32_t idle_val = _kernel.idle;
+		int32_t idle_val = _kernel.idle;
 
 		_kernel.idle = 0;
 		z_sys_power_save_idle_exit(idle_val);
@@ -255,7 +261,7 @@ static inline void arch_isr_direct_header(void)
 	/* We're not going to unlock IRQs, but we still need to increment this
 	 * so that arch_is_in_isr() works
 	 */
-	++_kernel.nested;
+	++_kernel.cpus[0].nested;
 }
 
 /*
@@ -271,7 +277,7 @@ static inline void arch_isr_direct_footer(int swap)
 #if defined(CONFIG_TRACING)
 	sys_trace_isr_exit();
 #endif
-	--_kernel.nested;
+	--_kernel.cpus[0].nested;
 
 	/* Call swap if all the following is true:
 	 *
@@ -279,7 +285,7 @@ static inline void arch_isr_direct_footer(int swap)
 	 * 2) We are not in a nested interrupt
 	 * 3) Next thread to run in the ready queue is not this thread
 	 */
-	if (swap != 0 && _kernel.nested == 0 &&
+	if (swap != 0 && _kernel.cpus[0].nested == 0 &&
 	    _kernel.ready_q.cache != _current) {
 		unsigned int flags;
 
@@ -307,6 +313,7 @@ static inline void arch_isr_direct_footer(int swap)
 		ISR_DIRECT_FOOTER(check_reschedule); \
 	} \
 	static inline int name##_body(void)
+#endif /* !CONFIG_X86_KPTI */
 
 /**
  * @brief Exception Stack Frame
@@ -338,13 +345,13 @@ typedef struct nanoEsf {
 
 
 struct _x86_syscall_stack_frame {
-	u32_t eip;
-	u32_t cs;
-	u32_t eflags;
+	uint32_t eip;
+	uint32_t cs;
+	uint32_t eflags;
 
 	/* These are only present if cs = USER_CODE_SEG */
-	u32_t esp;
-	u32_t ss;
+	uint32_t esp;
+	uint32_t ss;
 };
 
 static ALWAYS_INLINE unsigned int arch_irq_lock(void)

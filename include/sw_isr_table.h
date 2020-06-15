@@ -46,9 +46,9 @@ extern struct _isr_table_entry _sw_isr_table[];
  */
 struct _isr_list {
 	/** IRQ line number */
-	s32_t irq;
+	int32_t irq;
 	/** Flags for this IRQ, see ISR_FLAG_* definitions */
-	s32_t flags;
+	int32_t flags;
 	/** ISR to call */
 	void *func;
 	/** Parameter for non-direct IRQs */
@@ -58,7 +58,8 @@ struct _isr_list {
 /** This interrupt gets put directly in the vector table */
 #define ISR_FLAG_DIRECT BIT(0)
 
-#define _MK_ISR_NAME(x, y) __isr_ ## x ## _irq_ ## y
+#define _MK_ISR_NAME(x, y) __MK_ISR_NAME(x, y)
+#define __MK_ISR_NAME(x, y) __isr_ ## x ## _irq_ ## y
 
 /* Create an instance of struct _isr_list which gets put in the .intList
  * section. This gets consumed by gen_isr_tables.py which creates the vector
@@ -67,7 +68,7 @@ struct _isr_list {
 #define Z_ISR_DECLARE(irq, flags, func, param) \
 	static Z_DECL_ALIGN(struct _isr_list) Z_GENERIC_SECTION(.intList) \
 		__used _MK_ISR_NAME(func, __COUNTER__) = \
-			{irq, flags, &func, (void *)param}
+			{irq, flags, (void *)&func, (void *)param}
 
 #define IRQ_TABLE_SIZE (CONFIG_NUM_IRQS - CONFIG_GEN_IRQ_START_VECTOR)
 

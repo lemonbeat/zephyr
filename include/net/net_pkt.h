@@ -50,7 +50,7 @@ struct net_pkt_cursor {
 	/** Current net_buf pointer by the cursor */
 	struct net_buf *buf;
 	/** Current position in the data buffer of the net_buf */
-	u8_t *pos;
+	uint8_t *pos;
 };
 
 /**
@@ -117,7 +117,7 @@ struct net_pkt {
 #endif /* CONFIG_NET_PKT_TIMESTAMP */
 #if defined(CONFIG_NET_PKT_TXTIME)
 		/** Network packet TX time in the future (in nanoseconds) */
-		u64_t txtime;
+		uint64_t txtime;
 #endif /* CONFIG_NET_PKT_TXTIME */
 	};
 #endif /* CONFIG_NET_PKT_TIMESTAMP || CONFIG_NET_PKT_TXTIME */
@@ -138,69 +138,68 @@ struct net_pkt {
 	};
 #endif
 
-	u8_t ip_hdr_len;	/* pre-filled in order to avoid func call */
+	uint8_t ip_hdr_len;	/* pre-filled in order to avoid func call */
 
-	u8_t overwrite  : 1;	/* Is packet content being overwritten? */
+	uint8_t overwrite  : 1;	/* Is packet content being overwritten? */
 
-	u8_t sent_or_eof: 1;	/* For outgoing packet: is this sent or not
+	uint8_t sent_or_eof: 1;	/* For outgoing packet: is this sent or not
 				 * For incoming packet of a socket: last
 				 * packet before EOF
 				 * Used only if defined(CONFIG_NET_TCP)
 				 */
 	union {
-		u8_t pkt_queued: 1; /* For outgoing packet: is this packet
+		uint8_t pkt_queued: 1; /* For outgoing packet: is this packet
 				     * queued to be sent but has not reached
 				     * the driver yet.
 				     * Used only if defined(CONFIG_NET_TCP)
 				     */
-		u8_t gptp_pkt: 1; /* For outgoing packet: is this packet
+		uint8_t gptp_pkt: 1; /* For outgoing packet: is this packet
 				   * a GPTP packet.
 				   * Used only if defined (CONFIG_NET_GPTP)
 				   */
 	};
 
-	u8_t forwarding : 1;	/* Are we forwarding this pkt
+	uint8_t forwarding : 1;	/* Are we forwarding this pkt
 				 * Used only if defined(CONFIG_NET_ROUTE)
 				 */
-	u8_t family     : 3;	/* IPv4 vs IPv6 */
+	uint8_t family     : 3;	/* IPv4 vs IPv6 */
 
 	union {
-		u8_t ipv4_auto_arp_msg : 1; /* Is this pkt IPv4 autoconf ARP
+		uint8_t ipv4_auto_arp_msg : 1; /* Is this pkt IPv4 autoconf ARP
 					     * message. Used only if
 					     * defined(CONFIG_NET_IPV4_AUTO).
 					     * Note: family needs to be
 					     * AF_INET.
 					     */
-		u8_t lldp_pkt          : 1; /* Is this pkt an LLDP message.
+		uint8_t lldp_pkt          : 1; /* Is this pkt an LLDP message.
 					     * Used only if
 					     * defined(CONFIG_NET_LLDP).
 					     * Note: family needs to be
 					     * AF_UNSPEC.
 					     */
-		u8_t ppp_msg           : 1; /* This is a PPP message */
-
-		u8_t tcp_first_msg     : 1; /* Is this the first time this
-					     * pkt is sent, or is this resend
-					     * of a TCP message.
-					     * Used only if
-					     * defined(CONFIG_NET_TCP)
-					     */
+		uint8_t ppp_msg           : 1; /* This is a PPP message */
 	};
+
+#if defined(CONFIG_NET_TCP)
+	uint8_t tcp_first_msg     : 1; /* Is this the first time this pkt is sent,
+				     * or is this a resend of a TCP segment.
+				     */
+#endif
 
 	union {
 		/* IPv6 hop limit or IPv4 ttl for this network packet.
 		 * The value is shared between IPv6 and IPv4.
 		 */
-		u8_t ipv6_hop_limit;
-		u8_t ipv4_ttl;
+		uint8_t ipv6_hop_limit;
+		uint8_t ipv4_ttl;
 	};
 
 	union {
 #if defined(CONFIG_NET_IPV4)
-		u8_t ipv4_opts_len; /* Length if IPv4 Header Options */
+		uint8_t ipv4_opts_len; /* Length if IPv4 Header Options */
 #endif
 #if defined(CONFIG_NET_IPV6)
-		u16_t ipv6_ext_len; /* length of extension headers */
+		uint16_t ipv6_ext_len; /* length of extension headers */
 #endif
 	};
 
@@ -208,7 +207,7 @@ struct net_pkt {
 	/** Network packet priority, can be left out in which case packet
 	 * is not prioritised.
 	 */
-	u8_t priority;
+	uint8_t priority;
 #endif
 
 #if defined(CONFIG_NET_VLAN)
@@ -217,7 +216,7 @@ struct net_pkt {
 	 * Identifier (VID, called more commonly VLAN tag). This value is
 	 * kept in host byte order.
 	 */
-	u16_t vlan_tci;
+	uint16_t vlan_tci;
 #endif /* CONFIG_NET_VLAN */
 
 #if defined(CONFIG_NET_IPV6)
@@ -226,21 +225,22 @@ struct net_pkt {
 	 * packet. Note that this value should be updated by who ever
 	 * adds IPv6 extension headers to the network packet.
 	 */
-	u16_t ipv6_prev_hdr_start;
+	uint16_t ipv6_prev_hdr_start;
 
 #if defined(CONFIG_NET_IPV6_FRAGMENT)
-	u16_t ipv6_fragment_offset;	/* Fragment offset of this packet */
-	u32_t ipv6_fragment_id;	/* Fragment id */
-	u16_t ipv6_frag_hdr_start;	/* Where starts the fragment header */
+	uint16_t ipv6_fragment_offset;	/* Fragment offset of this packet */
+	uint32_t ipv6_fragment_id;	/* Fragment id */
+	uint16_t ipv6_frag_hdr_start;	/* Where starts the fragment header */
 #endif /* CONFIG_NET_IPV6_FRAGMENT */
 
-	u8_t ipv6_ext_opt_len; /* IPv6 ND option length */
-	u8_t ipv6_next_hdr;	/* What is the very first next header */
+	uint8_t ipv6_ext_opt_len; /* IPv6 ND option length */
+	uint8_t ipv6_next_hdr;	/* What is the very first next header */
 #endif /* CONFIG_NET_IPV6 */
 
 #if defined(CONFIG_IEEE802154)
-	u8_t ieee802154_rssi; /* Received Signal Strength Indication */
-	u8_t ieee802154_lqi;  /* Link Quality Indicator */
+	uint8_t ieee802154_rssi; /* Received Signal Strength Indication */
+	uint8_t ieee802154_lqi;  /* Link Quality Indicator */
+	uint8_t ieee802154_ack_fpb : 1; /* Frame Pending Bit was set in the ACK */
 #endif
 #if defined(CONFIG_NET_L2_CANBUS)
 	union {
@@ -311,12 +311,12 @@ static inline void net_pkt_set_orig_iface(struct net_pkt *pkt,
 #endif
 }
 
-static inline u8_t net_pkt_family(struct net_pkt *pkt)
+static inline uint8_t net_pkt_family(struct net_pkt *pkt)
 {
 	return pkt->family;
 }
 
-static inline void net_pkt_set_family(struct net_pkt *pkt, u8_t family)
+static inline void net_pkt_set_family(struct net_pkt *pkt, uint8_t family)
 {
 	pkt->family = family;
 }
@@ -331,17 +331,17 @@ static inline void net_pkt_set_gptp(struct net_pkt *pkt, bool is_gptp)
 	pkt->gptp_pkt = is_gptp;
 }
 
-static inline u8_t net_pkt_ip_hdr_len(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ip_hdr_len(struct net_pkt *pkt)
 {
 	return pkt->ip_hdr_len;
 }
 
-static inline void net_pkt_set_ip_hdr_len(struct net_pkt *pkt, u8_t len)
+static inline void net_pkt_set_ip_hdr_len(struct net_pkt *pkt, uint8_t len)
 {
 	pkt->ip_hdr_len = len;
 }
 
-static inline u8_t net_pkt_sent(struct net_pkt *pkt)
+static inline uint8_t net_pkt_sent(struct net_pkt *pkt)
 {
 	return pkt->sent_or_eof;
 }
@@ -351,7 +351,7 @@ static inline void net_pkt_set_sent(struct net_pkt *pkt, bool sent)
 	pkt->sent_or_eof = sent;
 }
 
-static inline u8_t net_pkt_queued(struct net_pkt *pkt)
+static inline uint8_t net_pkt_queued(struct net_pkt *pkt)
 {
 	return pkt->pkt_queued;
 }
@@ -361,18 +361,27 @@ static inline void net_pkt_set_queued(struct net_pkt *pkt, bool send)
 	pkt->pkt_queued = send;
 }
 
-static inline u8_t net_pkt_tcp_1st_msg(struct net_pkt *pkt)
+static inline uint8_t net_pkt_tcp_1st_msg(struct net_pkt *pkt)
 {
+#if defined(CONFIG_NET_TCP)
 	return pkt->tcp_first_msg;
+#else
+	return true;
+#endif
 }
 
 static inline void net_pkt_set_tcp_1st_msg(struct net_pkt *pkt, bool is_1st)
 {
+#if defined(CONFIG_NET_TCP)
 	pkt->tcp_first_msg = is_1st;
+#else
+	ARG_UNUSED(pkt);
+	ARG_UNUSED(is_1st);
+#endif
 }
 
 #if defined(CONFIG_NET_SOCKETS)
-static inline u8_t net_pkt_eof(struct net_pkt *pkt)
+static inline uint8_t net_pkt_eof(struct net_pkt *pkt)
 {
 	return pkt->sent_or_eof;
 }
@@ -401,29 +410,29 @@ static inline bool net_pkt_forwarding(struct net_pkt *pkt)
 #endif
 
 #if defined(CONFIG_NET_IPV4)
-static inline u8_t net_pkt_ipv4_ttl(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv4_ttl(struct net_pkt *pkt)
 {
 	return pkt->ipv4_ttl;
 }
 
 static inline void net_pkt_set_ipv4_ttl(struct net_pkt *pkt,
-					u8_t ttl)
+					uint8_t ttl)
 {
 	pkt->ipv4_ttl = ttl;
 }
 
-static inline u8_t net_pkt_ipv4_opts_len(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv4_opts_len(struct net_pkt *pkt)
 {
 	return pkt->ipv4_opts_len;
 }
 
 static inline void net_pkt_set_ipv4_opts_len(struct net_pkt *pkt,
-					     u8_t opts_len)
+					     uint8_t opts_len)
 {
 	pkt->ipv4_opts_len = opts_len;
 }
 #else
-static inline u8_t net_pkt_ipv4_ttl(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv4_ttl(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
@@ -431,20 +440,20 @@ static inline u8_t net_pkt_ipv4_ttl(struct net_pkt *pkt)
 }
 
 static inline void net_pkt_set_ipv4_ttl(struct net_pkt *pkt,
-					u8_t ttl)
+					uint8_t ttl)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(ttl);
 }
 
-static inline u8_t net_pkt_ipv4_opts_len(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv4_opts_len(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 	return 0;
 }
 
 static inline void net_pkt_set_ipv4_opts_len(struct net_pkt *pkt,
-					     u8_t opts_len)
+					     uint8_t opts_len)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(opts_len);
@@ -452,60 +461,60 @@ static inline void net_pkt_set_ipv4_opts_len(struct net_pkt *pkt,
 #endif
 
 #if defined(CONFIG_NET_IPV6)
-static inline u8_t net_pkt_ipv6_ext_opt_len(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv6_ext_opt_len(struct net_pkt *pkt)
 {
 	return pkt->ipv6_ext_opt_len;
 }
 
 static inline void net_pkt_set_ipv6_ext_opt_len(struct net_pkt *pkt,
-						u8_t len)
+						uint8_t len)
 {
 	pkt->ipv6_ext_opt_len = len;
 }
 
-static inline u8_t net_pkt_ipv6_next_hdr(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv6_next_hdr(struct net_pkt *pkt)
 {
 	return pkt->ipv6_next_hdr;
 }
 
-static inline void net_pkt_set_ipv6_next_hdr(struct net_pkt *pkt, u8_t next_hdr)
+static inline void net_pkt_set_ipv6_next_hdr(struct net_pkt *pkt, uint8_t next_hdr)
 {
 	pkt->ipv6_next_hdr = next_hdr;
 }
 
-static inline u16_t net_pkt_ipv6_ext_len(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_ext_len(struct net_pkt *pkt)
 {
 	return pkt->ipv6_ext_len;
 }
 
-static inline void net_pkt_set_ipv6_ext_len(struct net_pkt *pkt, u16_t len)
+static inline void net_pkt_set_ipv6_ext_len(struct net_pkt *pkt, uint16_t len)
 {
 	pkt->ipv6_ext_len = len;
 }
 
-static inline u16_t net_pkt_ipv6_hdr_prev(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_hdr_prev(struct net_pkt *pkt)
 {
 	return pkt->ipv6_prev_hdr_start;
 }
 
 static inline void net_pkt_set_ipv6_hdr_prev(struct net_pkt *pkt,
-					     u16_t offset)
+					     uint16_t offset)
 {
 	pkt->ipv6_prev_hdr_start = offset;
 }
 
-static inline u8_t net_pkt_ipv6_hop_limit(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv6_hop_limit(struct net_pkt *pkt)
 {
 	return pkt->ipv6_hop_limit;
 }
 
 static inline void net_pkt_set_ipv6_hop_limit(struct net_pkt *pkt,
-					      u8_t hop_limit)
+					      uint8_t hop_limit)
 {
 	pkt->ipv6_hop_limit = hop_limit;
 }
 #else /* CONFIG_NET_IPV6 */
-static inline u8_t net_pkt_ipv6_ext_opt_len(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv6_ext_opt_len(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
@@ -513,39 +522,39 @@ static inline u8_t net_pkt_ipv6_ext_opt_len(struct net_pkt *pkt)
 }
 
 static inline void net_pkt_set_ipv6_ext_opt_len(struct net_pkt *pkt,
-						u8_t len)
+						uint8_t len)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(len);
 }
 
-static inline u8_t net_pkt_ipv6_next_hdr(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv6_next_hdr(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
 	return 0;
 }
 
-static inline void net_pkt_set_ipv6_next_hdr(struct net_pkt *pkt, u8_t next_hdr)
+static inline void net_pkt_set_ipv6_next_hdr(struct net_pkt *pkt, uint8_t next_hdr)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(next_hdr);
 }
 
-static inline u16_t net_pkt_ipv6_ext_len(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_ext_len(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
 	return 0;
 }
 
-static inline void net_pkt_set_ipv6_ext_len(struct net_pkt *pkt, u16_t len)
+static inline void net_pkt_set_ipv6_ext_len(struct net_pkt *pkt, uint16_t len)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(len);
 }
 
-static inline u16_t net_pkt_ipv6_hdr_prev(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_hdr_prev(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
@@ -553,13 +562,13 @@ static inline u16_t net_pkt_ipv6_hdr_prev(struct net_pkt *pkt)
 }
 
 static inline void net_pkt_set_ipv6_hdr_prev(struct net_pkt *pkt,
-					     u16_t offset)
+					     uint16_t offset)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(offset);
 }
 
-static inline u8_t net_pkt_ipv6_hop_limit(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ipv6_hop_limit(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
@@ -567,14 +576,14 @@ static inline u8_t net_pkt_ipv6_hop_limit(struct net_pkt *pkt)
 }
 
 static inline void net_pkt_set_ipv6_hop_limit(struct net_pkt *pkt,
-					      u8_t hop_limit)
+					      uint8_t hop_limit)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(hop_limit);
 }
 #endif /* CONFIG_NET_IPV6 */
 
-static inline u16_t net_pkt_ip_opts_len(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ip_opts_len(struct net_pkt *pkt)
 {
 #if defined(CONFIG_NET_IPV6)
 	return pkt->ipv6_ext_len;
@@ -588,40 +597,40 @@ static inline u16_t net_pkt_ip_opts_len(struct net_pkt *pkt)
 }
 
 #if defined(CONFIG_NET_IPV6_FRAGMENT)
-static inline u16_t net_pkt_ipv6_fragment_start(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_fragment_start(struct net_pkt *pkt)
 {
 	return pkt->ipv6_frag_hdr_start;
 }
 
 static inline void net_pkt_set_ipv6_fragment_start(struct net_pkt *pkt,
-						   u16_t start)
+						   uint16_t start)
 {
 	pkt->ipv6_frag_hdr_start = start;
 }
 
-static inline u16_t net_pkt_ipv6_fragment_offset(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_fragment_offset(struct net_pkt *pkt)
 {
 	return pkt->ipv6_fragment_offset;
 }
 
 static inline void net_pkt_set_ipv6_fragment_offset(struct net_pkt *pkt,
-						    u16_t offset)
+						    uint16_t offset)
 {
 	pkt->ipv6_fragment_offset = offset;
 }
 
-static inline u32_t net_pkt_ipv6_fragment_id(struct net_pkt *pkt)
+static inline uint32_t net_pkt_ipv6_fragment_id(struct net_pkt *pkt)
 {
 	return pkt->ipv6_fragment_id;
 }
 
 static inline void net_pkt_set_ipv6_fragment_id(struct net_pkt *pkt,
-						u32_t id)
+						uint32_t id)
 {
 	pkt->ipv6_fragment_id = id;
 }
 #else /* CONFIG_NET_IPV6_FRAGMENT */
-static inline u16_t net_pkt_ipv6_fragment_start(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_fragment_start(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
@@ -629,13 +638,13 @@ static inline u16_t net_pkt_ipv6_fragment_start(struct net_pkt *pkt)
 }
 
 static inline void net_pkt_set_ipv6_fragment_start(struct net_pkt *pkt,
-						   u16_t start)
+						   uint16_t start)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(start);
 }
 
-static inline u16_t net_pkt_ipv6_fragment_offset(struct net_pkt *pkt)
+static inline uint16_t net_pkt_ipv6_fragment_offset(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
@@ -643,13 +652,13 @@ static inline u16_t net_pkt_ipv6_fragment_offset(struct net_pkt *pkt)
 }
 
 static inline void net_pkt_set_ipv6_fragment_offset(struct net_pkt *pkt,
-						    u16_t offset)
+						    uint16_t offset)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(offset);
 }
 
-static inline u32_t net_pkt_ipv6_fragment_id(struct net_pkt *pkt)
+static inline uint32_t net_pkt_ipv6_fragment_id(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
@@ -657,7 +666,7 @@ static inline u32_t net_pkt_ipv6_fragment_id(struct net_pkt *pkt)
 }
 
 static inline void net_pkt_set_ipv6_fragment_id(struct net_pkt *pkt,
-						u32_t id)
+						uint32_t id)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(id);
@@ -665,18 +674,18 @@ static inline void net_pkt_set_ipv6_fragment_id(struct net_pkt *pkt,
 #endif /* CONFIG_NET_IPV6_FRAGMENT */
 
 #if NET_TC_COUNT > 1
-static inline u8_t net_pkt_priority(struct net_pkt *pkt)
+static inline uint8_t net_pkt_priority(struct net_pkt *pkt)
 {
 	return pkt->priority;
 }
 
 static inline void net_pkt_set_priority(struct net_pkt *pkt,
-					u8_t priority)
+					uint8_t priority)
 {
 	pkt->priority = priority;
 }
 #else /* NET_TC_COUNT == 1 */
-static inline u8_t net_pkt_priority(struct net_pkt *pkt)
+static inline uint8_t net_pkt_priority(struct net_pkt *pkt)
 {
 	return 0;
 }
@@ -686,23 +695,23 @@ static inline u8_t net_pkt_priority(struct net_pkt *pkt)
 #endif /* NET_TC_COUNT > 1 */
 
 #if defined(CONFIG_NET_VLAN)
-static inline u16_t net_pkt_vlan_tag(struct net_pkt *pkt)
+static inline uint16_t net_pkt_vlan_tag(struct net_pkt *pkt)
 {
 	return net_eth_vlan_get_vid(pkt->vlan_tci);
 }
 
-static inline void net_pkt_set_vlan_tag(struct net_pkt *pkt, u16_t tag)
+static inline void net_pkt_set_vlan_tag(struct net_pkt *pkt, uint16_t tag)
 {
 	pkt->vlan_tci = net_eth_vlan_set_vid(pkt->vlan_tci, tag);
 }
 
-static inline u8_t net_pkt_vlan_priority(struct net_pkt *pkt)
+static inline uint8_t net_pkt_vlan_priority(struct net_pkt *pkt)
 {
 	return net_eth_vlan_get_pcp(pkt->vlan_tci);
 }
 
 static inline void net_pkt_set_vlan_priority(struct net_pkt *pkt,
-					     u8_t priority)
+					     uint8_t priority)
 {
 	pkt->vlan_tci = net_eth_vlan_set_pcp(pkt->vlan_tci, priority);
 }
@@ -717,28 +726,28 @@ static inline void net_pkt_set_vlan_dei(struct net_pkt *pkt, bool dei)
 	pkt->vlan_tci = net_eth_vlan_set_dei(pkt->vlan_tci, dei);
 }
 
-static inline void net_pkt_set_vlan_tci(struct net_pkt *pkt, u16_t tci)
+static inline void net_pkt_set_vlan_tci(struct net_pkt *pkt, uint16_t tci)
 {
 	pkt->vlan_tci = tci;
 }
 
-static inline u16_t net_pkt_vlan_tci(struct net_pkt *pkt)
+static inline uint16_t net_pkt_vlan_tci(struct net_pkt *pkt)
 {
 	return pkt->vlan_tci;
 }
 #else
-static inline u16_t net_pkt_vlan_tag(struct net_pkt *pkt)
+static inline uint16_t net_pkt_vlan_tag(struct net_pkt *pkt)
 {
 	return NET_VLAN_TAG_UNSPEC;
 }
 
-static inline void net_pkt_set_vlan_tag(struct net_pkt *pkt, u16_t tag)
+static inline void net_pkt_set_vlan_tag(struct net_pkt *pkt, uint16_t tag)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(tag);
 }
 
-static inline u8_t net_pkt_vlan_priority(struct net_pkt *pkt)
+static inline uint8_t net_pkt_vlan_priority(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 	return 0;
@@ -755,12 +764,12 @@ static inline void net_pkt_set_vlan_dei(struct net_pkt *pkt, bool dei)
 	ARG_UNUSED(dei);
 }
 
-static inline u16_t net_pkt_vlan_tci(struct net_pkt *pkt)
+static inline uint16_t net_pkt_vlan_tci(struct net_pkt *pkt)
 {
 	return NET_VLAN_TAG_UNSPEC; /* assumes priority is 0 */
 }
 
-static inline void net_pkt_set_vlan_tci(struct net_pkt *pkt, u16_t tci)
+static inline void net_pkt_set_vlan_tci(struct net_pkt *pkt, uint16_t tci)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(tci);
@@ -796,24 +805,24 @@ static inline void net_pkt_set_timestamp(struct net_pkt *pkt,
 #endif /* CONFIG_NET_PKT_TIMESTAMP */
 
 #if defined(CONFIG_NET_PKT_TXTIME)
-static inline u64_t net_pkt_txtime(struct net_pkt *pkt)
+static inline uint64_t net_pkt_txtime(struct net_pkt *pkt)
 {
 	return pkt->txtime;
 }
 
-static inline void net_pkt_set_txtime(struct net_pkt *pkt, u64_t txtime)
+static inline void net_pkt_set_txtime(struct net_pkt *pkt, uint64_t txtime)
 {
 	pkt->txtime = txtime;
 }
 #else
-static inline u64_t net_pkt_txtime(struct net_pkt *pkt)
+static inline uint64_t net_pkt_txtime(struct net_pkt *pkt)
 {
 	ARG_UNUSED(pkt);
 
 	return 0;
 }
 
-static inline void net_pkt_set_txtime(struct net_pkt *pkt, u64_t txtime)
+static inline void net_pkt_set_txtime(struct net_pkt *pkt, uint64_t txtime)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(txtime);
@@ -825,12 +834,12 @@ static inline size_t net_pkt_get_len(struct net_pkt *pkt)
 	return net_buf_frags_len(pkt->frags);
 }
 
-static inline u8_t *net_pkt_data(struct net_pkt *pkt)
+static inline uint8_t *net_pkt_data(struct net_pkt *pkt)
 {
 	return pkt->frags->data;
 }
 
-static inline u8_t *net_pkt_ip_data(struct net_pkt *pkt)
+static inline uint8_t *net_pkt_ip_data(struct net_pkt *pkt)
 {
 	return pkt->frags->data;
 }
@@ -847,7 +856,7 @@ static inline struct net_linkaddr *net_pkt_lladdr_dst(struct net_pkt *pkt)
 
 static inline void net_pkt_lladdr_swap(struct net_pkt *pkt)
 {
-	u8_t *addr = net_pkt_lladdr_src(pkt)->addr;
+	uint8_t *addr = net_pkt_lladdr_src(pkt)->addr;
 
 	net_pkt_lladdr_src(pkt)->addr = net_pkt_lladdr_dst(pkt)->addr;
 	net_pkt_lladdr_dst(pkt)->addr = addr;
@@ -860,26 +869,37 @@ static inline void net_pkt_lladdr_clear(struct net_pkt *pkt)
 }
 
 #if defined(CONFIG_IEEE802154) || defined(CONFIG_IEEE802154_RAW_MODE)
-static inline u8_t net_pkt_ieee802154_rssi(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ieee802154_rssi(struct net_pkt *pkt)
 {
 	return pkt->ieee802154_rssi;
 }
 
 static inline void net_pkt_set_ieee802154_rssi(struct net_pkt *pkt,
-					       u8_t rssi)
+					       uint8_t rssi)
 {
 	pkt->ieee802154_rssi = rssi;
 }
 
-static inline u8_t net_pkt_ieee802154_lqi(struct net_pkt *pkt)
+static inline uint8_t net_pkt_ieee802154_lqi(struct net_pkt *pkt)
 {
 	return pkt->ieee802154_lqi;
 }
 
 static inline void net_pkt_set_ieee802154_lqi(struct net_pkt *pkt,
-					      u8_t lqi)
+					      uint8_t lqi)
 {
 	pkt->ieee802154_lqi = lqi;
+}
+
+static inline bool net_pkt_ieee802154_ack_fpb(struct net_pkt *pkt)
+{
+	return pkt->ieee802154_ack_fpb;
+}
+
+static inline void net_pkt_set_ieee802154_ack_fpb(struct net_pkt *pkt,
+						  bool fpb)
+{
+	pkt->ieee802154_ack_fpb = fpb;
 }
 #endif
 
@@ -1034,27 +1054,27 @@ static inline bool net_pkt_is_being_overwritten(struct net_pkt *pkt)
  */
 
 struct net_buf *net_pkt_get_reserve_data_debug(struct net_buf_pool *pool,
-					       s32_t timeout,
+					       k_timeout_t timeout,
 					       const char *caller,
 					       int line);
 
 #define net_pkt_get_reserve_data(pool, timeout)				\
 	net_pkt_get_reserve_data_debug(pool, timeout, __func__, __LINE__)
 
-struct net_buf *net_pkt_get_reserve_rx_data_debug(s32_t timeout,
+struct net_buf *net_pkt_get_reserve_rx_data_debug(k_timeout_t timeout,
 						  const char *caller,
 						  int line);
 #define net_pkt_get_reserve_rx_data(timeout)				\
 	net_pkt_get_reserve_rx_data_debug(timeout, __func__, __LINE__)
 
-struct net_buf *net_pkt_get_reserve_tx_data_debug(s32_t timeout,
+struct net_buf *net_pkt_get_reserve_tx_data_debug(k_timeout_t timeout,
 						  const char *caller,
 						  int line);
 #define net_pkt_get_reserve_tx_data(timeout)				\
 	net_pkt_get_reserve_tx_data_debug(timeout, __func__, __LINE__)
 
 struct net_buf *net_pkt_get_frag_debug(struct net_pkt *pkt,
-				       s32_t timeout,
+				       k_timeout_t timeout,
 				       const char *caller, int line);
 #define net_pkt_get_frag(pkt, timeout)					\
 	net_pkt_get_frag_debug(pkt, timeout, __func__, __LINE__)
@@ -1118,13 +1138,12 @@ void net_pkt_print_frags(struct net_pkt *pkt);
  *
  * @param timeout Affects the action taken should the net buf pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out.
+ *        wait as long as necessary. Otherwise, wait up to the specified time.
  *
  * @return Network buffer if successful, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_buf *net_pkt_get_reserve_rx_data(s32_t timeout);
+struct net_buf *net_pkt_get_reserve_rx_data(k_timeout_t timeout);
 #endif
 
 /**
@@ -1136,13 +1155,12 @@ struct net_buf *net_pkt_get_reserve_rx_data(s32_t timeout);
  *
  * @param timeout Affects the action taken should the net buf pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out.
+ *        wait as long as necessary. Otherwise, wait up to the specified time.
  *
  * @return Network buffer if successful, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_buf *net_pkt_get_reserve_tx_data(s32_t timeout);
+struct net_buf *net_pkt_get_reserve_tx_data(k_timeout_t timeout);
 #endif
 
 /**
@@ -1152,13 +1170,12 @@ struct net_buf *net_pkt_get_reserve_tx_data(s32_t timeout);
  * @param pkt Network packet.
  * @param timeout Affects the action taken should the net buf pool be empty.
  *        If K_NO_WAIT, then return immediately. If K_FOREVER, then
- *        wait as long as necessary. Otherwise, wait up to the specified
- *        number of milliseconds before timing out.
+ *        wait as long as necessary. Otherwise, wait up to the specified time.
  *
  * @return Network buffer if successful, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_buf *net_pkt_get_frag(struct net_pkt *pkt, s32_t timeout);
+struct net_buf *net_pkt_get_frag(struct net_pkt *pkt, k_timeout_t timeout);
 #endif
 
 /**
@@ -1299,31 +1316,31 @@ const char *net_pkt_pool2str(struct net_buf_pool *pool);
  */
 #if defined(NET_PKT_DEBUG_ENABLED)
 
-struct net_pkt *net_pkt_alloc_debug(s32_t timeout,
+struct net_pkt *net_pkt_alloc_debug(k_timeout_t timeout,
 				    const char *caller, int line);
 #define net_pkt_alloc(_timeout)					\
 	net_pkt_alloc_debug(_timeout, __func__, __LINE__)
 
 struct net_pkt *net_pkt_alloc_from_slab_debug(struct k_mem_slab *slab,
-					      s32_t timeout,
+					      k_timeout_t timeout,
 					      const char *caller, int line);
 #define net_pkt_alloc_from_slab(_slab, _timeout)			\
 	net_pkt_alloc_from_slab_debug(_slab, _timeout, __func__, __LINE__)
 
-struct net_pkt *net_pkt_rx_alloc_debug(s32_t timeout,
+struct net_pkt *net_pkt_rx_alloc_debug(k_timeout_t timeout,
 				       const char *caller, int line);
 #define net_pkt_rx_alloc(_timeout)				\
 	net_pkt_rx_alloc_debug(_timeout, __func__, __LINE__)
 
 struct net_pkt *net_pkt_alloc_on_iface_debug(struct net_if *iface,
-					     s32_t timeout,
+					     k_timeout_t timeout,
 					     const char *caller,
 					     int line);
 #define net_pkt_alloc_on_iface(_iface, _timeout)			\
 	net_pkt_alloc_on_iface_debug(_iface, _timeout, __func__, __LINE__)
 
 struct net_pkt *net_pkt_rx_alloc_on_iface_debug(struct net_if *iface,
-						s32_t timeout,
+						k_timeout_t timeout,
 						const char *caller,
 						int line);
 #define net_pkt_rx_alloc_on_iface(_iface, _timeout)			\
@@ -1333,7 +1350,7 @@ struct net_pkt *net_pkt_rx_alloc_on_iface_debug(struct net_if *iface,
 int net_pkt_alloc_buffer_debug(struct net_pkt *pkt,
 			       size_t size,
 			       enum net_ip_protocol proto,
-			       s32_t timeout,
+			       k_timeout_t timeout,
 			       const char *caller, int line);
 #define net_pkt_alloc_buffer(_pkt, _size, _proto, _timeout)		\
 	net_pkt_alloc_buffer_debug(_pkt, _size, _proto, _timeout,	\
@@ -1343,7 +1360,7 @@ struct net_pkt *net_pkt_alloc_with_buffer_debug(struct net_if *iface,
 						size_t size,
 						sa_family_t family,
 						enum net_ip_protocol proto,
-						s32_t timeout,
+						k_timeout_t timeout,
 						const char *caller,
 						int line);
 #define net_pkt_alloc_with_buffer(_iface, _size, _family,		\
@@ -1356,7 +1373,7 @@ struct net_pkt *net_pkt_rx_alloc_with_buffer_debug(struct net_if *iface,
 						   size_t size,
 						   sa_family_t family,
 						   enum net_ip_protocol proto,
-						   s32_t timeout,
+						   k_timeout_t timeout,
 						   const char *caller,
 						   int line);
 #define net_pkt_rx_alloc_with_buffer(_iface, _size, _family,		\
@@ -1373,12 +1390,12 @@ struct net_pkt *net_pkt_rx_alloc_with_buffer_debug(struct net_if *iface,
  * @details for the time being, 2 pools are used. One for TX and one for RX.
  *          This allocator has to be used for TX.
  *
- * @param timeout Maximum time in milliseconds to wait for an allocation.
+ * @param timeout Maximum time to wait for an allocation.
  *
  * @return a pointer to a newly allocated net_pkt on success, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_pkt *net_pkt_alloc(s32_t timeout);
+struct net_pkt *net_pkt_alloc(k_timeout_t timeout);
 #endif
 
 /**
@@ -1391,13 +1408,13 @@ struct net_pkt *net_pkt_alloc(s32_t timeout);
  *          then buffer on its local slab/pool (if any).
  *
  * @param slab    The slab to use for allocating the packet
- * @param timeout Maximum time in milliseconds to wait for an allocation.
+ * @param timeout Maximum time to wait for an allocation.
  *
  * @return a pointer to a newly allocated net_pkt on success, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
 struct net_pkt *net_pkt_alloc_from_slab(struct k_mem_slab *slab,
-					s32_t timeout);
+					k_timeout_t timeout);
 #endif
 
 /**
@@ -1406,27 +1423,29 @@ struct net_pkt *net_pkt_alloc_from_slab(struct k_mem_slab *slab,
  * @details for the time being, 2 pools are used. One for TX and one for RX.
  *          This allocator has to be used for RX.
  *
- * @param timeout Maximum time in milliseconds to wait for an allocation.
+ * @param timeout Maximum time to wait for an allocation.
  *
  * @return a pointer to a newly allocated net_pkt on success, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_pkt *net_pkt_rx_alloc(s32_t timeout);
+struct net_pkt *net_pkt_rx_alloc(k_timeout_t timeout);
 #endif
 
 /**
  * @brief Allocate a network packet for a specific network interface.
  *
  * @param iface The network interface the packet is supposed to go through.
- * @param timeout Maximum time in milliseconds to wait for an allocation.
+ * @param timeout Maximum time to wait for an allocation.
  *
  * @return a pointer to a newly allocated net_pkt on success, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_pkt *net_pkt_alloc_on_iface(struct net_if *iface, s32_t timeout);
+struct net_pkt *net_pkt_alloc_on_iface(struct net_if *iface,
+				       k_timeout_t timeout);
 
 /* Same as above but specifically for RX packet */
-struct net_pkt *net_pkt_rx_alloc_on_iface(struct net_if *iface, s32_t timeout);
+struct net_pkt *net_pkt_rx_alloc_on_iface(struct net_if *iface,
+					  k_timeout_t timeout);
 #endif
 
 /**
@@ -1440,7 +1459,7 @@ struct net_pkt *net_pkt_rx_alloc_on_iface(struct net_if *iface, s32_t timeout);
  * @param pkt     The network packet requiring buffer to be allocated.
  * @param size    The size of buffer being requested.
  * @param proto   The IP protocol type (can be 0 for none).
- * @param timeout Maximum time in milliseconds to wait for an allocation.
+ * @param timeout Maximum time to wait for an allocation.
  *
  * @return 0 on success, negative errno code otherwise.
  */
@@ -1448,7 +1467,7 @@ struct net_pkt *net_pkt_rx_alloc_on_iface(struct net_if *iface, s32_t timeout);
 int net_pkt_alloc_buffer(struct net_pkt *pkt,
 			 size_t size,
 			 enum net_ip_protocol proto,
-			 s32_t timeout);
+			 k_timeout_t timeout);
 #endif
 
 /**
@@ -1458,7 +1477,7 @@ int net_pkt_alloc_buffer(struct net_pkt *pkt,
  * @param size    The size of buffer.
  * @param family  The family to which the packet belongs.
  * @param proto   The IP protocol type (can be 0 for none).
- * @param timeout Maximum time in milliseconds to wait for an allocation.
+ * @param timeout Maximum time to wait for an allocation.
  *
  * @return a pointer to a newly allocated net_pkt on success, NULL otherwise.
  */
@@ -1467,14 +1486,14 @@ struct net_pkt *net_pkt_alloc_with_buffer(struct net_if *iface,
 					  size_t size,
 					  sa_family_t family,
 					  enum net_ip_protocol proto,
-					  s32_t timeout);
+					  k_timeout_t timeout);
 
 /* Same as above but specifically for RX packet */
 struct net_pkt *net_pkt_rx_alloc_with_buffer(struct net_if *iface,
 					     size_t size,
 					     sa_family_t family,
 					     enum net_ip_protocol proto,
-					     s32_t timeout);
+					     k_timeout_t timeout);
 #endif
 
 /**
@@ -1629,7 +1648,7 @@ int net_pkt_copy(struct net_pkt *pkt_dst,
  *
  * @return NULL if error, cloned packet otherwise.
  */
-struct net_pkt *net_pkt_clone(struct net_pkt *pkt, s32_t timeout);
+struct net_pkt *net_pkt_clone(struct net_pkt *pkt, k_timeout_t timeout);
 
 /**
  * @brief Clone pkt and increase the refcount of its buffer.
@@ -1639,7 +1658,8 @@ struct net_pkt *net_pkt_clone(struct net_pkt *pkt, s32_t timeout);
  *
  * @return NULL if error, cloned packet otherwise.
  */
-struct net_pkt *net_pkt_shallow_clone(struct net_pkt *pkt, s32_t timeout);
+struct net_pkt *net_pkt_shallow_clone(struct net_pkt *pkt,
+				      k_timeout_t timeout);
 
 /**
  * @brief Read some data from a net_pkt
@@ -1656,53 +1676,53 @@ struct net_pkt *net_pkt_shallow_clone(struct net_pkt *pkt, s32_t timeout);
  */
 int net_pkt_read(struct net_pkt *pkt, void *data, size_t length);
 
-/* Read u8_t data data a net_pkt */
-static inline int net_pkt_read_u8(struct net_pkt *pkt, u8_t *data)
+/* Read uint8_t data data a net_pkt */
+static inline int net_pkt_read_u8(struct net_pkt *pkt, uint8_t *data)
 {
 	return net_pkt_read(pkt, data, 1);
 }
 
 /**
- * @brief Read u16_t big endian data from a net_pkt
+ * @brief Read uint16_t big endian data from a net_pkt
  *
  * @details net_pkt's cursor should be properly initialized and,
  *          if needed, positioned using net_pkt_skip.
  *          Cursor position will be updated after the operation.
  *
  * @param pkt  The network packet from where to read
- * @param data The destination u16_t where to copy the data
+ * @param data The destination uint16_t where to copy the data
  *
  * @return 0 on success, negative errno code otherwise.
  */
-int net_pkt_read_be16(struct net_pkt *pkt, u16_t *data);
+int net_pkt_read_be16(struct net_pkt *pkt, uint16_t *data);
 
 /**
- * @brief Read u16_t little endian data from a net_pkt
+ * @brief Read uint16_t little endian data from a net_pkt
  *
  * @details net_pkt's cursor should be properly initialized and,
  *          if needed, positioned using net_pkt_skip.
  *          Cursor position will be updated after the operation.
  *
  * @param pkt  The network packet from where to read
- * @param data The destination u16_t where to copy the data
+ * @param data The destination uint16_t where to copy the data
  *
  * @return 0 on success, negative errno code otherwise.
  */
-int net_pkt_read_le16(struct net_pkt *pkt, u16_t *data);
+int net_pkt_read_le16(struct net_pkt *pkt, uint16_t *data);
 
 /**
- * @brief Read u32_t big endian data from a net_pkt
+ * @brief Read uint32_t big endian data from a net_pkt
  *
  * @details net_pkt's cursor should be properly initialized and,
  *          if needed, positioned using net_pkt_skip.
  *          Cursor position will be updated after the operation.
  *
  * @param pkt  The network packet from where to read
- * @param data The destination u32_t where to copy the data
+ * @param data The destination uint32_t where to copy the data
  *
  * @return 0 on success, negative errno code otherwise.
  */
-int net_pkt_read_be32(struct net_pkt *pkt, u32_t *data);
+int net_pkt_read_be32(struct net_pkt *pkt, uint32_t *data);
 
 /**
  * @brief Write data into a net_pkt
@@ -1719,42 +1739,42 @@ int net_pkt_read_be32(struct net_pkt *pkt, u32_t *data);
  */
 int net_pkt_write(struct net_pkt *pkt, const void *data, size_t length);
 
-/* Write u8_t data into a net_pkt. */
-static inline int net_pkt_write_u8(struct net_pkt *pkt, u8_t data)
+/* Write uint8_t data into a net_pkt. */
+static inline int net_pkt_write_u8(struct net_pkt *pkt, uint8_t data)
 {
-	return net_pkt_write(pkt, &data, sizeof(u8_t));
+	return net_pkt_write(pkt, &data, sizeof(uint8_t));
 }
 
-/* Write u16_t big endian data into a net_pkt. */
-static inline int net_pkt_write_be16(struct net_pkt *pkt, u16_t data)
+/* Write uint16_t big endian data into a net_pkt. */
+static inline int net_pkt_write_be16(struct net_pkt *pkt, uint16_t data)
 {
-	u16_t data_be16 = htons(data);
+	uint16_t data_be16 = htons(data);
 
-	return net_pkt_write(pkt, &data_be16, sizeof(u16_t));
+	return net_pkt_write(pkt, &data_be16, sizeof(uint16_t));
 }
 
-/* Write u32_t big endian data into a net_pkt. */
-static inline int net_pkt_write_be32(struct net_pkt *pkt, u32_t data)
+/* Write uint32_t big endian data into a net_pkt. */
+static inline int net_pkt_write_be32(struct net_pkt *pkt, uint32_t data)
 {
-	u32_t data_be32 = htonl(data);
+	uint32_t data_be32 = htonl(data);
 
-	return net_pkt_write(pkt, &data_be32, sizeof(u32_t));
+	return net_pkt_write(pkt, &data_be32, sizeof(uint32_t));
 }
 
-/* Write u32_t little endian data into a net_pkt. */
-static inline int net_pkt_write_le32(struct net_pkt *pkt, u32_t data)
+/* Write uint32_t little endian data into a net_pkt. */
+static inline int net_pkt_write_le32(struct net_pkt *pkt, uint32_t data)
 {
-	u32_t data_le32 = sys_cpu_to_le32(data);
+	uint32_t data_le32 = sys_cpu_to_le32(data);
 
-	return net_pkt_write(pkt, &data_le32, sizeof(u32_t));
+	return net_pkt_write(pkt, &data_le32, sizeof(uint32_t));
 }
 
-/* Write u16_t little endian data into a net_pkt. */
-static inline int net_pkt_write_le16(struct net_pkt *pkt, u16_t data)
+/* Write uint16_t little endian data into a net_pkt. */
+static inline int net_pkt_write_le16(struct net_pkt *pkt, uint16_t data)
 {
-	u16_t data_le16 = sys_cpu_to_le16(data);
+	uint16_t data_le16 = sys_cpu_to_le16(data);
 
-	return net_pkt_write(pkt, &data_le16, sizeof(u16_t));
+	return net_pkt_write(pkt, &data_le16, sizeof(uint16_t));
 }
 
 /**
@@ -1785,6 +1805,7 @@ int net_pkt_update_length(struct net_pkt *pkt, size_t length);
  *
  * @details net_pkt's cursor should be properly initialized and,
  *          eventually, properly positioned using net_pkt_skip/read/write.
+ *          Note that net_pkt's cursor is reset by this function.
  *
  * @param pkt    Network packet
  * @param length Number of bytes to be removed
@@ -1801,7 +1822,7 @@ int net_pkt_pull(struct net_pkt *pkt, size_t length);
  * @return a valid offset on success, 0 otherwise as there is nothing that
  *         can be done to evaluate the offset.
  */
-u16_t net_pkt_get_current_offset(struct net_pkt *pkt);
+uint16_t net_pkt_get_current_offset(struct net_pkt *pkt);
 
 /**
  * @brief Check if a data size could fit contiguously

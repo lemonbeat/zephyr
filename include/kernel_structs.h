@@ -21,10 +21,12 @@
 #define ZEPHYR_KERNEL_INCLUDE_KERNEL_STRUCTS_H_
 
 #if !defined(_ASMLANGUAGE)
+#include <sys/atomic.h>
 #include <zephyr/types.h>
 #include <sched_priq.h>
 #include <sys/dlist.h>
 #include <sys/util.h>
+#include <sys/sys_heap.h>
 #endif
 
 #define K_NUM_PRIORITIES \
@@ -99,7 +101,7 @@ typedef struct _ready_q _ready_q_t;
 
 struct _cpu {
 	/* nested interrupt count */
-	u32_t nested;
+	uint32_t nested;
 
 	/* interrupt stack pointer base */
 	char *irq_stack;
@@ -120,36 +122,18 @@ struct _cpu {
 	int slice_ticks;
 #endif
 
-	u8_t id;
+	uint8_t id;
 
 #ifdef CONFIG_SMP
 	/* True when _current is allowed to context switch */
-	u8_t swap_ok;
+	uint8_t swap_ok;
 #endif
 };
 
 typedef struct _cpu _cpu_t;
 
 struct z_kernel {
-	/* For compatibility with pre-SMP code, union the first CPU
-	 * record with the legacy fields so code can continue to use
-	 * the "_kernel.XXX" expressions and assembly offsets.
-	 */
-	union {
-		struct _cpu cpus[CONFIG_MP_NUM_CPUS];
-#ifndef CONFIG_SMP
-		struct {
-			/* nested interrupt count */
-			u32_t nested;
-
-			/* interrupt stack pointer base */
-			char *irq_stack;
-
-			/* currently scheduled thread */
-			struct k_thread *current;
-		};
-#endif
-	};
+	struct _cpu cpus[CONFIG_MP_NUM_CPUS];
 
 #ifdef CONFIG_SYS_CLOCK_EXISTS
 	/* queue of timeouts */
@@ -157,7 +141,7 @@ struct z_kernel {
 #endif
 
 #ifdef CONFIG_SYS_POWER_MANAGEMENT
-	s32_t idle; /* Number of ticks for kernel idling */
+	int32_t idle; /* Number of ticks for kernel idling */
 #endif
 
 	/*
@@ -166,7 +150,7 @@ struct z_kernel {
 	 */
 	struct _ready_q ready_q;
 
-#ifdef CONFIG_FP_SHARING
+#ifdef CONFIG_FPU_SHARING
 	/*
 	 * A 'current_sse' field does not exist in addition to the 'current_fp'
 	 * field since it's not possible to divide the IA-32 non-integer
@@ -202,10 +186,84 @@ bool z_smp_cpu_mobile(void);
 
 #else
 #define _current_cpu (&_kernel.cpus[0])
-#define _current _kernel.current
+#define _current _kernel.cpus[0].current
 #endif
 
 #define _timeout_q _kernel.timeout_q
+
+/* kernel wait queue record */
+
+#ifdef CONFIG_WAITQ_SCALABLE
+
+typedef struct {
+	struct _priq_rb waitq;
+} _wait_q_t;
+
+extern bool z_priq_rb_lessthan(struct rbnode *a, struct rbnode *b);
+
+#define Z_WAIT_Q_INIT(wait_q) { { { .lessthan_fn = z_priq_rb_lessthan } } }
+
+#else
+
+typedef struct {
+	sys_dlist_t waitq;
+} _wait_q_t;
+
+#define Z_WAIT_Q_INIT(wait_q) { SYS_DLIST_STATIC_INIT(&(wait_q)->waitq) }
+
+#endif
+
+/* kernel timeout record */
+
+struct _timeout;
+typedef void (*_timeout_func_t)(struct _timeout *t);
+
+struct _timeout {
+	sys_dnode_t node;
+	int32_t dticks;
+	_timeout_func_t fn;
+};
+
+/* kernel spinlock type */
+
+struct k_spinlock {
+#ifdef CONFIG_SMP
+	atomic_t locked;
+#endif
+
+#ifdef CONFIG_SPIN_VALIDATE
+	/* Stores the thread that holds the lock with the locking CPU
+	 * ID in the bottom two bits.
+	 */
+	uintptr_t thread_cpu;
+#endif
+
+#if defined(CONFIG_CPLUSPLUS) && !defined(CONFIG_SMP) && \
+	!defined(CONFIG_SPIN_VALIDATE)
+	/* If CONFIG_SMP and CONFIG_SPIN_VALIDATE are both not defined
+	 * the k_spinlock struct will have no members. The result
+	 * is that in C sizeof(k_spinlock) is 0 and in C++ it is 1.
+	 *
+	 * This size difference causes problems when the k_spinlock
+	 * is embedded into another struct like k_msgq, because C and
+	 * C++ will have different ideas on the offsets of the members
+	 * that come after the k_spinlock member.
+	 *
+	 * To prevent this we add a 1 byte dummy member to k_spinlock
+	 * when the user selects C++ support and k_spinlock would
+	 * otherwise be empty.
+	 */
+	char dummy;
+#endif
+};
+
+/* kernel synchronized heap struct */
+
+struct k_heap {
+	struct sys_heap heap;
+	_wait_q_t wait_q;
+	struct k_spinlock lock;
+};
 
 #endif /* _ASMLANGUAGE */
 

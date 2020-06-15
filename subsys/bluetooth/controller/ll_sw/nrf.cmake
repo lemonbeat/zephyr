@@ -1,57 +1,34 @@
 # SPDX-License-Identifier: Apache-2.0
 
-if(CONFIG_BT_LL_SW_LEGACY)
-  zephyr_library_sources(
-    ll_sw/ctrl.c
-    ll_sw/ll.c
-    )
-  zephyr_library_sources_ifdef(
-    CONFIG_BT_BROADCASTER
-    ll_sw/ll_adv.c
-    )
-  zephyr_library_sources_ifdef(
-    CONFIG_BT_OBSERVER
-    ll_sw/ll_scan.c
-    )
-  zephyr_library_sources_ifdef(
-    CONFIG_BT_CTLR_FILTER
-    ll_sw/ll_filter.c
-    )
-  zephyr_library_sources_ifdef(
-    CONFIG_BT_CENTRAL
-    ll_sw/ll_master.c
-    )
-  zephyr_library_sources_ifdef(
-    CONFIG_BT_CTLR_ADV_EXT
-    ll_sw/ll_adv_aux.c
-    )
-  zephyr_library_sources_ifdef(
-    CONFIG_BT_HCI_MESH_EXT
-    ll_sw/ll_mesh.c
-    )
-  zephyr_library_sources_ifdef(
-    CONFIG_BT_CTLR_DTM
-    ll_sw/ll_test.c
-    )
-endif()
-
 if(CONFIG_BT_LL_SW_SPLIT)
   zephyr_library_sources(
     ll_sw/nordic/lll/lll.c
+    ll_sw/nordic/lll/lll_clock.c
     )
   if(CONFIG_BT_BROADCASTER)
     zephyr_library_sources(
       ll_sw/nordic/lll/lll_adv.c
+      )
+    zephyr_library_sources_ifdef(
+      CONFIG_BT_CTLR_ADV_EXT
+      ll_sw/nordic/lll/lll_adv_aux.c
+      )
+    zephyr_library_sources_ifdef(
+      CONFIG_BT_CTLR_ADV_PERIODIC
+      ll_sw/nordic/lll/lll_adv_sync.c
       )
   endif()
   if(CONFIG_BT_OBSERVER)
     zephyr_library_sources(
       ll_sw/nordic/lll/lll_scan.c
       )
+    zephyr_library_sources_ifdef(
+      CONFIG_BT_CTLR_ADV_EXT
+      ll_sw/nordic/lll/lll_scan_aux.c
+      )
   endif()
   if(CONFIG_BT_CONN)
     zephyr_library_sources(
-      ll_sw/nordic/lll/lll_clock.c
       ll_sw/nordic/lll/lll_conn.c
       )
     zephyr_library_sources_ifdef(

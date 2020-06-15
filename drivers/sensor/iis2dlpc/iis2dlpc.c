@@ -8,15 +8,17 @@
  * https://www.st.com/resource/en/datasheet/iis2dlpc.pdf
  */
 
+#define DT_DRV_COMPAT st_iis2dlpc
+
 #include <init.h>
 #include <sys/__assert.h>
 #include <sys/byteorder.h>
 #include <logging/log.h>
 #include <drivers/sensor.h>
 
-#if defined(DT_ST_IIS2DLPC_BUS_SPI)
+#if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
 #include <drivers/spi.h>
-#elif defined(DT_ST_IIS2DLPC_BUS_I2C)
+#elif DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 #include <drivers/i2c.h>
 #endif
 
@@ -29,13 +31,13 @@ LOG_MODULE_REGISTER(IIS2DLPC, CONFIG_SENSOR_LOG_LEVEL);
  * @dev: Pointer to instance of struct device (I2C or SPI)
  * @range: Full scale range (2, 4, 8 and 16 G)
  */
-static int iis2dlpc_set_range(struct device *dev, u16_t range)
+static int iis2dlpc_set_range(struct device *dev, uint16_t range)
 {
 	int err;
 	struct iis2dlpc_data *iis2dlpc = dev->driver_data;
-	const struct iis2dlpc_device_config *cfg = dev->config->config_info;
-	u8_t shift_gain = 0U;
-	u8_t fs = IIS2DLPC_FS_TO_REG(range);
+	const struct iis2dlpc_device_config *cfg = dev->config_info;
+	uint8_t shift_gain = 0U;
+	uint8_t fs = IIS2DLPC_FS_TO_REG(range);
 
 	err = iis2dlpc_full_scale_set(iis2dlpc->ctx, fs);
 
@@ -58,10 +60,10 @@ static int iis2dlpc_set_range(struct device *dev, u16_t range)
  * @dev: Pointer to instance of struct device (I2C or SPI)
  * @odr: Output data rate
  */
-static int iis2dlpc_set_odr(struct device *dev, u16_t odr)
+static int iis2dlpc_set_odr(struct device *dev, uint16_t odr)
 {
 	struct iis2dlpc_data *iis2dlpc = dev->driver_data;
-	u8_t val;
+	uint8_t val;
 
 	/* check if power off */
 	if (odr == 0U) {
@@ -81,11 +83,11 @@ static int iis2dlpc_set_odr(struct device *dev, u16_t odr)
 static inline void iis2dlpc_convert(struct sensor_value *val, int raw_val,
 				    float gain)
 {
-	s64_t dval;
+	int64_t dval;
 
 	/* Gain is in ug/LSB */
 	/* Convert to m/s^2 */
-	dval = ((s64_t)raw_val * gain * SENSOR_G) / 1000000LL;
+	dval = ((int64_t)raw_val * gain * SENSOR_G) / 1000000LL;
 	val->val1 = dval / 1000000LL;
 	val->val2 = dval % 1000000LL;
 }
@@ -95,7 +97,7 @@ static inline void iis2dlpc_channel_get_acc(struct device *dev,
 					     struct sensor_value *val)
 {
 	int i;
-	u8_t ofs_start, ofs_stop;
+	uint8_t ofs_start, ofs_stop;
 	struct iis2dlpc_data *iis2dlpc = dev->driver_data;
 	struct sensor_value *pval = val;
 
@@ -176,8 +178,8 @@ static int iis2dlpc_attr_set(struct device *dev, enum sensor_channel chan,
 static int iis2dlpc_sample_fetch(struct device *dev, enum sensor_channel chan)
 {
 	struct iis2dlpc_data *iis2dlpc = dev->driver_data;
-	const struct iis2dlpc_device_config *cfg = dev->config->config_info;
-	u8_t shift;
+	const struct iis2dlpc_device_config *cfg = dev->config_info;
+	uint8_t shift;
 	union axis3bit16_t buf;
 
 	/* fetch raw data sample */
@@ -212,7 +214,7 @@ static const struct sensor_driver_api iis2dlpc_driver_api = {
 static int iis2dlpc_init_interface(struct device *dev)
 {
 	struct iis2dlpc_data *iis2dlpc = dev->driver_data;
-	const struct iis2dlpc_device_config *cfg = dev->config->config_info;
+	const struct iis2dlpc_device_config *cfg = dev->config_info;
 
 	iis2dlpc->bus = device_get_binding(cfg->bus_name);
 	if (!iis2dlpc->bus) {
@@ -220,9 +222,9 @@ static int iis2dlpc_init_interface(struct device *dev)
 		return -EINVAL;
 	}
 
-#if defined(DT_ST_IIS2DLPC_BUS_SPI)
+#if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
 	iis2dlpc_spi_init(dev);
-#elif defined(DT_ST_IIS2DLPC_BUS_I2C)
+#elif DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	iis2dlpc_i2c_init(dev);
 #else
 #error "BUS MACRO NOT DEFINED IN DTS"
@@ -234,7 +236,7 @@ static int iis2dlpc_init_interface(struct device *dev)
 static int iis2dlpc_set_power_mode(struct iis2dlpc_data *iis2dlpc,
 				    iis2dlpc_mode_t pm)
 {
-	u8_t regval = IIS2DLPC_CONT_LOW_PWR_12bit;
+	uint8_t regval = IIS2DLPC_CONT_LOW_PWR_12bit;
 
 	switch (pm) {
 	case IIS2DLPC_CONT_LOW_PWR_2:
@@ -254,8 +256,8 @@ static int iis2dlpc_set_power_mode(struct iis2dlpc_data *iis2dlpc,
 static int iis2dlpc_init(struct device *dev)
 {
 	struct iis2dlpc_data *iis2dlpc = dev->driver_data;
-	const struct iis2dlpc_device_config *cfg = dev->config->config_info;
-	u8_t wai;
+	const struct iis2dlpc_device_config *cfg = dev->config_info;
+	uint8_t wai;
 
 	if (iis2dlpc_init_interface(dev)) {
 		return -EINVAL;
@@ -371,12 +373,12 @@ static int iis2dlpc_init(struct device *dev)
 }
 
 const struct iis2dlpc_device_config iis2dlpc_cfg = {
-	.bus_name = DT_INST_0_ST_IIS2DLPC_BUS_NAME,
+	.bus_name = DT_INST_BUS_LABEL(0),
 	.pm = CONFIG_IIS2DLPC_POWER_MODE,
 #ifdef CONFIG_IIS2DLPC_TRIGGER
-	.int_gpio_port = DT_INST_0_ST_IIS2DLPC_DRDY_GPIOS_CONTROLLER,
-	.int_gpio_pin = DT_INST_0_ST_IIS2DLPC_DRDY_GPIOS_PIN,
-	.int_gpio_flags = DT_INST_0_ST_IIS2DLPC_DRDY_GPIOS_FLAGS,
+	.int_gpio_port = DT_INST_GPIO_LABEL(0, drdy_gpios),
+	.int_gpio_pin = DT_INST_GPIO_PIN(0, drdy_gpios),
+	.int_gpio_flags = DT_INST_GPIO_FLAGS(0, drdy_gpios),
 #if defined(CONFIG_IIS2DLPC_INT_PIN_1)
 	.int_pin = 1,
 #elif defined(CONFIG_IIS2DLPC_INT_PIN_2)
@@ -401,6 +403,6 @@ const struct iis2dlpc_device_config iis2dlpc_cfg = {
 
 struct iis2dlpc_data iis2dlpc_data;
 
-DEVICE_AND_API_INIT(iis2dlpc, DT_INST_0_ST_IIS2DLPC_LABEL, iis2dlpc_init,
+DEVICE_AND_API_INIT(iis2dlpc, DT_INST_LABEL(0), iis2dlpc_init,
 	     &iis2dlpc_data, &iis2dlpc_cfg, POST_KERNEL,
 	     CONFIG_SENSOR_INIT_PRIORITY, &iis2dlpc_driver_api);

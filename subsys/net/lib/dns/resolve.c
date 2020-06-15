@@ -34,7 +34,7 @@ LOG_MODULE_REGISTER(net_dns_resolve, CONFIG_DNS_RESOLVER_LOG_LEVEL);
 #define LLMNR_IPV4_ADDR "224.0.0.252:5355"
 #define LLMNR_IPV6_ADDR "[ff02::1:3]:5355"
 
-#define DNS_BUF_TIMEOUT 500 /* ms */
+#define DNS_BUF_TIMEOUT K_MSEC(500) /* ms */
 
 /* RFC 1035, 3.1. Name space definitions
  * To simplify implementations, the total length of a domain name (i.e.,
@@ -343,8 +343,8 @@ static inline int get_cb_slot(struct dns_resolve_context *ctx)
 }
 
 static inline int get_slot_by_id(struct dns_resolve_context *ctx,
-				 u16_t dns_id,
-				 u16_t query_hash)
+				 uint16_t dns_id,
+				 uint16_t query_hash)
 {
 	int i;
 
@@ -362,15 +362,15 @@ static inline int get_slot_by_id(struct dns_resolve_context *ctx,
 static int dns_read(struct dns_resolve_context *ctx,
 		    struct net_pkt *pkt,
 		    struct net_buf *dns_data,
-		    u16_t *dns_id,
+		    uint16_t *dns_id,
 		    struct net_buf *dns_cname,
-		    u16_t *query_hash)
+		    uint16_t *query_hash)
 {
 	struct dns_addrinfo info = { 0 };
 	/* Helper struct to track the dns msg received from the server */
 	struct dns_msg_t dns_msg;
-	u32_t ttl; /* RR ttl, so far it is not passed to caller */
-	u8_t *src, *addr;
+	uint32_t ttl; /* RR ttl, so far it is not passed to caller */
+	uint8_t *src, *addr;
 	const char *query_name;
 	int address_size;
 	/* index that points to the current answer being analyzed */
@@ -403,6 +403,14 @@ static int dns_read(struct dns_resolve_context *ctx,
 
 	if (dns_header_rcode(dns_msg.msg) == DNS_HEADER_REFUSED) {
 		ret = DNS_EAI_FAIL;
+		goto quit;
+	}
+
+	/* We might receive a query while we are waiting for a response, in that
+	 * case we just ignore the query instead of making the resolving fail.
+	 */
+	if (dns_header_qr(dns_msg.msg) == DNS_QUERY) {
+		ret = 0;
 		goto quit;
 	}
 
@@ -477,7 +485,7 @@ static int dns_read(struct dns_resolve_context *ctx,
 				}
 
 				address_size = DNS_IPV4_LEN;
-				addr = (u8_t *)&net_sin(&info.ai_addr)->
+				addr = (uint8_t *)&net_sin(&info.ai_addr)->
 								sin_addr;
 				info.ai_family = AF_INET;
 				info.ai_addr.sa_family = AF_INET;
@@ -498,7 +506,7 @@ static int dns_read(struct dns_resolve_context *ctx,
 				 */
 #if defined(CONFIG_NET_IPV6)
 				address_size = DNS_IPV6_LEN;
-				addr = (u8_t *)&net_sin6(&info.ai_addr)->
+				addr = (uint8_t *)&net_sin6(&info.ai_addr)->
 								sin6_addr;
 				info.ai_family = AF_INET6;
 				info.ai_addr.sa_family = AF_INET6;
@@ -566,7 +574,7 @@ static int dns_read(struct dns_resolve_context *ctx,
 	 */
 	if (items == 0) {
 		if (dns_msg.response_type == DNS_RESPONSE_CNAME_NO_IP) {
-			u16_t pos = dns_msg.response_position;
+			uint16_t pos = dns_msg.response_position;
 
 			ret = dns_copy_qname(dns_cname->data, &dns_cname->len,
 					     dns_cname->size, &dns_msg, pos);
@@ -619,8 +627,8 @@ static void cb_recv(struct net_context *net_ctx,
 	struct dns_resolve_context *ctx = user_data;
 	struct net_buf *dns_cname = NULL;
 	struct net_buf *dns_data = NULL;
-	u16_t query_hash = 0U;
-	u16_t dns_id = 0U;
+	uint16_t query_hash = 0U;
+	uint16_t dns_id = 0U;
 	int ret, i;
 
 	ARG_UNUSED(net_ctx);
@@ -718,7 +726,7 @@ static int dns_write(struct dns_resolve_context *ctx,
 	struct net_context *net_ctx;
 	struct sockaddr *server;
 	int server_addr_len;
-	u16_t dns_id;
+	uint16_t dns_id;
 	int ret;
 
 	net_ctx = ctx->servers[server_idx].net_ctx;
@@ -764,17 +772,13 @@ static int dns_write(struct dns_resolve_context *ctx,
 				    ctx->queries[query_idx].timeout);
 	if (ret < 0) {
 		NET_DBG("[%u] cannot submit work to server idx %d for id %u "
-			"timeout %u ret %d",
-			query_idx, server_idx, dns_id,
-			ctx->queries[query_idx].timeout, ret);
+			"ret %d", query_idx, server_idx, dns_id, ret);
 		return ret;
 	}
 
 	NET_DBG("[%u] submitting work to server idx %d for id %u "
-		"hash %u timeout %u",
-		query_idx, server_idx, dns_id,
-		ctx->queries[query_idx].query_hash,
-		ctx->queries[query_idx].timeout);
+		"hash %u", query_idx, server_idx, dns_id,
+		ctx->queries[query_idx].query_hash);
 
 	ret = net_context_sendto(net_ctx, dns_data->data, dns_data->len,
 				 server, server_addr_len, NULL,
@@ -788,8 +792,8 @@ static int dns_write(struct dns_resolve_context *ctx,
 }
 
 static int dns_resolve_cancel_with_hash(struct dns_resolve_context *ctx,
-					u16_t dns_id,
-					u16_t query_hash,
+					uint16_t dns_id,
+					uint16_t query_hash,
 					const char *query_name)
 {
 	int i;
@@ -814,15 +818,15 @@ static int dns_resolve_cancel_with_hash(struct dns_resolve_context *ctx,
 }
 
 int dns_resolve_cancel_with_name(struct dns_resolve_context *ctx,
-				 u16_t dns_id,
+				 uint16_t dns_id,
 				 const char *query_name,
 				 enum dns_query_type query_type)
 {
-	u16_t query_hash = 0;
+	uint16_t query_hash = 0;
 
 	if (query_name) {
 		struct net_buf *buf;
-		u16_t len;
+		uint16_t len;
 		int ret;
 
 		/* Use net_buf as a temporary buffer to store the packed
@@ -861,7 +865,7 @@ int dns_resolve_cancel_with_name(struct dns_resolve_context *ctx,
 					    query_name);
 }
 
-int dns_resolve_cancel(struct dns_resolve_context *ctx, u16_t dns_id)
+int dns_resolve_cancel(struct dns_resolve_context *ctx, uint16_t dns_id)
 {
 	return dns_resolve_cancel_with_name(ctx, dns_id, NULL, 0);
 }
@@ -883,26 +887,29 @@ static void query_timeout(struct k_work *work)
 int dns_resolve_name(struct dns_resolve_context *ctx,
 		     const char *query,
 		     enum dns_query_type type,
-		     u16_t *dns_id,
+		     uint16_t *dns_id,
 		     dns_resolve_cb_t cb,
 		     void *user_data,
-		     s32_t timeout)
+		     int32_t timeout)
 {
+	k_timeout_t tout;
 	struct net_buf *dns_data = NULL;
 	struct net_buf *dns_qname = NULL;
 	struct sockaddr addr;
 	int ret, i = -1, j = 0;
 	int failure = 0;
 	bool mdns_query = false;
-	u8_t hop_limit;
+	uint8_t hop_limit;
 
 	if (!ctx || !ctx->is_used || !query || !cb) {
 		return -EINVAL;
 	}
 
+	tout = SYS_TIMEOUT_MS(timeout);
+
 	/* Timeout cannot be 0 as we cannot resolve name that fast.
 	 */
-	if (timeout == K_NO_WAIT) {
+	if (K_TIMEOUT_EQ(tout, K_NO_WAIT)) {
 		return -EINVAL;
 	}
 
@@ -963,7 +970,7 @@ try_resolve:
 	}
 
 	ctx->queries[i].cb = cb;
-	ctx->queries[i].timeout = timeout;
+	ctx->queries[i].timeout = tout;
 	ctx->queries[i].query = query;
 	ctx->queries[i].query_type = type;
 	ctx->queries[i].user_data = user_data;

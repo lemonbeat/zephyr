@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT ti_stellaris_ethernet
+
 #define LOG_MODULE_NAME eth_stellaris
 #define LOG_LEVEL CONFIG_ETHERNET_LOG_LEVEL
 #include <logging/log.h>
@@ -20,8 +22,8 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 static void eth_stellaris_assign_mac(struct device *dev)
 {
-	u8_t mac_addr[6] = DT_INST_0_TI_STELLARIS_ETHERNET_LOCAL_MAC_ADDRESS;
-	u32_t value = 0x0;
+	uint8_t mac_addr[6] = DT_INST_PROP(0, local_mac_address);
+	uint32_t value = 0x0;
 
 	value |= mac_addr[0];
 	value |= mac_addr[1] << 8;
@@ -46,7 +48,7 @@ static void eth_stellaris_flush(struct device *dev)
 	}
 }
 
-static void eth_stellaris_send_byte(struct device *dev, u8_t byte)
+static void eth_stellaris_send_byte(struct device *dev, uint8_t byte)
 {
 	struct eth_stellaris_runtime *dev_data = DEV_DATA(dev);
 
@@ -63,7 +65,7 @@ static int eth_stellaris_send(struct device *dev, struct net_pkt *pkt)
 {
 	struct eth_stellaris_runtime *dev_data = DEV_DATA(dev);
 	struct net_buf *frag;
-	u16_t i, data_len;
+	uint16_t i, data_len;
 
 	/* Frame transmission
 	 *
@@ -103,7 +105,7 @@ static int eth_stellaris_send(struct device *dev, struct net_pkt *pkt)
 static void eth_stellaris_rx_error(struct net_if *iface)
 {
 	struct device *dev = net_if_get_device(iface);
-	u32_t val;
+	uint32_t val;
 
 	eth_stats_update_errors_rx(iface);
 
@@ -121,9 +123,9 @@ static struct net_pkt *eth_stellaris_rx_pkt(struct device *dev,
 {
 	int frame_len, bytes_left;
 	struct net_pkt *pkt;
-	u32_t reg_val;
-	u16_t count;
-	u8_t *data;
+	uint32_t reg_val;
+	uint16_t count;
+	uint8_t *data;
 
 	/*
 	 * The Ethernet frame received from the hardware has the
@@ -153,7 +155,7 @@ static struct net_pkt *eth_stellaris_rx_pkt(struct device *dev,
 	 * ethernet frame.
 	 */
 	count = 2U;
-	data = (u8_t *)&reg_val + 2;
+	data = (uint8_t *)&reg_val + 2;
 	if (net_pkt_write(pkt, data, count)) {
 		goto error;
 	}
@@ -165,7 +167,7 @@ static struct net_pkt *eth_stellaris_rx_pkt(struct device *dev,
 	for (; bytes_left > 7; bytes_left -= 4) {
 		reg_val = sys_read32(REG_MACDATA);
 		count = 4U;
-		data = (u8_t *)&reg_val;
+		data = (uint8_t *)&reg_val;
 		if (net_pkt_write(pkt, data, count)) {
 			goto error;
 		}
@@ -183,7 +185,7 @@ static struct net_pkt *eth_stellaris_rx_pkt(struct device *dev,
 		}
 
 		count = bytes_left - 4;
-		data = (u8_t *)&reg_val;
+		data = (uint8_t *)&reg_val;
 		if (net_pkt_write(pkt, data, count)) {
 			goto error;
 		}
@@ -231,7 +233,7 @@ static void eth_stellaris_isr(void *arg)
 	struct device *dev = (struct device *)arg;
 	struct eth_stellaris_runtime *dev_data = DEV_DATA(dev);
 	int isr_val = sys_read32(REG_MACRIS);
-	u32_t lock;
+	uint32_t lock;
 
 	lock = irq_lock();
 
@@ -270,7 +272,7 @@ static void eth_stellaris_isr(void *arg)
 static void eth_stellaris_init(struct net_if *iface)
 {
 	struct device *dev = net_if_get_device(iface);
-	struct eth_stellaris_config *dev_conf = DEV_CFG(dev);
+	const struct eth_stellaris_config *dev_conf = DEV_CFG(dev);
 	struct eth_stellaris_runtime *dev_data = DEV_DATA(dev);
 
 	dev_data->iface = iface;
@@ -297,7 +299,7 @@ static struct net_stats_eth *eth_stellaris_stats(struct device *dev)
 
 static int eth_stellaris_dev_init(struct device *dev)
 {
-	u32_t value;
+	uint32_t value;
 
 	/* Assign MAC address to Hardware */
 	eth_stellaris_assign_mac(dev);
@@ -318,24 +320,24 @@ static int eth_stellaris_dev_init(struct device *dev)
 	return 0;
 }
 
-static struct device DEVICE_NAME_GET(eth_stellaris);
+DEVICE_DECLARE(eth_stellaris);
 
 static void eth_stellaris_irq_config(struct device *dev)
 {
 	/* Enable Interrupt. */
-	IRQ_CONNECT(DT_INST_0_TI_STELLARIS_ETHERNET_IRQ_0,
-		    DT_INST_0_TI_STELLARIS_ETHERNET_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+		    DT_INST_IRQ(0, priority),
 		    eth_stellaris_isr, DEVICE_GET(eth_stellaris), 0);
-	irq_enable(DT_INST_0_TI_STELLARIS_ETHERNET_IRQ_0);
+	irq_enable(DT_INST_IRQN(0));
 }
 
 struct eth_stellaris_config eth_cfg = {
-	.mac_base = DT_INST_0_TI_STELLARIS_ETHERNET_BASE_ADDRESS,
+	.mac_base = DT_INST_REG_ADDR(0),
 	.config_func = eth_stellaris_irq_config,
 };
 
 struct eth_stellaris_runtime eth_data = {
-	.mac_addr = DT_INST_0_TI_STELLARIS_ETHERNET_LOCAL_MAC_ADDRESS,
+	.mac_addr = DT_INST_PROP(0, local_mac_address),
 	.tx_err = false,
 	.tx_word = 0,
 	.tx_pos = 0,
@@ -349,8 +351,8 @@ static const struct ethernet_api eth_stellaris_apis = {
 #endif
 };
 
-NET_DEVICE_INIT(eth_stellaris, DT_INST_0_TI_STELLARIS_ETHERNET_LABEL,
-		eth_stellaris_dev_init, &eth_data, &eth_cfg,
-		CONFIG_ETH_INIT_PRIORITY,
+NET_DEVICE_INIT(eth_stellaris, DT_INST_LABEL(0),
+		eth_stellaris_dev_init, device_pm_control_nop,
+		&eth_data, &eth_cfg, CONFIG_ETH_INIT_PRIORITY,
 		&eth_stellaris_apis, ETHERNET_L2,
 		NET_L2_GET_CTX_TYPE(ETHERNET_L2), NET_ETH_MTU);

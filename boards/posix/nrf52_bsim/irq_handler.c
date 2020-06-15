@@ -122,7 +122,7 @@ static inline void vector_to_irq(int irq_nbr, int *may_swap)
  */
 void posix_irq_handler(void)
 {
-	u64_t irq_lock;
+	uint64_t irq_lock;
 	int irq_nbr;
 	static int may_swap;
 
@@ -133,11 +133,11 @@ void posix_irq_handler(void)
 		return;
 	}
 
-	if (_kernel.nested == 0) {
+	if (_kernel.cpus[0].nested == 0) {
 		may_swap = 0;
 	}
 
-	_kernel.nested++;
+	_kernel.cpus[0].nested++;
 
 	while ((irq_nbr = hw_irq_ctrl_get_highest_prio_irq()) != -1) {
 		int last_current_running_prio = hw_irq_ctrl_get_cur_prio();
@@ -153,7 +153,7 @@ void posix_irq_handler(void)
 		hw_irq_ctrl_set_cur_prio(last_current_running_prio);
 	}
 
-	_kernel.nested--;
+	_kernel.cpus[0].nested--;
 
 	/* Call swap if all the following is true:
 	 * 1) may_swap was enabled
@@ -365,29 +365,6 @@ void posix_irq_offload(void (*routine)(void *), void *parameter)
 }
 #endif
 
-/**
- * Replacement for ARMs NVIC_SetPendingIRQ()
- *
- * Sets the interrupt IRQn as pending
- * Note:
- * This will interrupt immediately if the interrupt
- * is not masked and irqs are not locked, and this interrupt is higher
- * priority than a possibly currently running interrupt
- */
-void NVIC_SetPendingIRQ(IRQn_Type IRQn)
-{
-	hw_irq_ctrl_raise_im_from_sw(IRQn);
-}
-
-/**
- *  Replacement for ARMs NVIC_ClearPendingIRQ()
- *  Clear pending interrupt IRQn
- */
-void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
-{
-	hw_irq_ctrl_clear_irq(IRQn);
-}
-
 /*
  * Very simple model of the WFE and SEV ARM instructions
  * which seems good enough for the Nordic controller
@@ -402,6 +379,11 @@ void __WFE(void)
 		CPU_will_be_awaken_from_WFE = false;
 	}
 	CPU_event_set_flag = false;
+}
+
+void __WFI(void)
+{
+	__WFE();
 }
 
 void __SEV(void)

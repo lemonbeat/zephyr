@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nordic_nrf_ipc
+
 #include <string.h>
 #include <drivers/ipm.h>
 #include <nrfx_ipc.h>
@@ -21,15 +23,15 @@ struct ipm_nrf_data {
 static struct ipm_nrf_data nrfx_ipm_data;
 
 static void gipm_init(void);
-static void gipm_send(u32_t id);
+static void gipm_send(uint32_t id);
 
 #if IS_ENABLED(CONFIG_IPM_NRF_SINGLE_INSTANCE)
 
-static void nrfx_ipc_handler(u32_t event_mask, void *p_context)
+static void nrfx_ipc_handler(uint32_t event_mask, void *p_context)
 {
 	if (nrfx_ipm_data.callback) {
 		while (event_mask) {
-			u8_t event_idx = __CLZ(__RBIT(event_mask));
+			uint8_t event_idx = __CLZ(__RBIT(event_mask));
 
 			__ASSERT(event_idx < NRFX_IPC_ID_MAX_VALUE,
 				 "Illegal event_idx: %d", event_idx);
@@ -41,7 +43,7 @@ static void nrfx_ipc_handler(u32_t event_mask, void *p_context)
 	}
 }
 
-static int ipm_nrf_send(struct device *dev, int wait, u32_t id,
+static int ipm_nrf_send(struct device *dev, int wait, uint32_t id,
 			const void *data, int size)
 {
 	if (id > NRFX_IPC_ID_MAX_VALUE) {
@@ -63,7 +65,7 @@ static int ipm_nrf_max_data_size_get(struct device *dev)
 	return 0;
 }
 
-static u32_t ipm_nrf_max_id_val_get(struct device *dev)
+static uint32_t ipm_nrf_max_id_val_get(struct device *dev)
 {
 	ARG_UNUSED(dev);
 
@@ -82,10 +84,10 @@ static int ipm_nrf_set_enabled(struct device *dev, int enable)
 {
 	/* Enable configured channels */
 	if (enable) {
-		irq_enable(DT_INST_0_NORDIC_NRF_IPC_IRQ_0);
+		irq_enable(DT_INST_IRQN(0));
 		nrfx_ipc_receive_event_group_enable((uint32_t)IPC_EVENT_BITS);
 	} else {
-		irq_disable(DT_INST_0_NORDIC_NRF_IPC_IRQ_0);
+		irq_disable(DT_INST_IRQN(0));
 		nrfx_ipc_receive_event_group_disable((uint32_t)IPC_EVENT_BITS);
 	}
 	return 0;
@@ -105,7 +107,7 @@ static const struct ipm_driver_api ipm_nrf_driver_api = {
 	.set_enabled = ipm_nrf_set_enabled
 };
 
-DEVICE_AND_API_INIT(ipm_nrf, DT_INST_0_NORDIC_NRF_IPC_LABEL,
+DEVICE_AND_API_INIT(ipm_nrf, DT_INST_LABEL(0),
 		    ipm_nrf_init, NULL, NULL,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &ipm_nrf_driver_api);
@@ -121,10 +123,10 @@ struct vipm_nrf_data {
 
 static struct vipm_nrf_data nrfx_vipm_data;
 
-static void vipm_dispatcher(u32_t event_mask, void *p_context)
+static void vipm_dispatcher(uint32_t event_mask, void *p_context)
 {
 	while (event_mask) {
-		u8_t event_idx = __CLZ(__RBIT(event_mask));
+		uint8_t event_idx = __CLZ(__RBIT(event_mask));
 
 		__ASSERT(event_idx < NRFX_IPC_ID_MAX_VALUE,
 			 "Illegal event_idx: %d", event_idx);
@@ -143,7 +145,7 @@ static int vipm_nrf_max_data_size_get(struct device *dev)
 	return ipm_max_data_size_get(dev);
 }
 
-static u32_t vipm_nrf_max_id_val_get(struct device *dev)
+static uint32_t vipm_nrf_max_id_val_get(struct device *dev)
 {
 	ARG_UNUSED(dev);
 
@@ -161,7 +163,7 @@ static int vipm_nrf_init(struct device *dev)
 
 #define VIPM_DEVICE_1(_idx)						\
 static int vipm_nrf_##_idx##_send(struct device *dev, int wait,		\
-				  u32_t id, const void *data, int size)	\
+				  uint32_t id, const void *data, int size)	\
 {									\
 	if (!IS_ENABLED(CONFIG_IPM_MSG_CH_##_idx##_TX)) {		\
 		LOG_ERR("IPM_" #_idx " is RX message channel");		\
@@ -205,7 +207,7 @@ static int vipm_nrf_##_idx##_set_enabled(struct device *dev, int enable)\
 		LOG_ERR("IPM_" #_idx " is TX message channel");		\
 		return -EINVAL;						\
 	} else if (enable) {						\
-		irq_enable(DT_INST_0_NORDIC_NRF_IPC_IRQ_0);		\
+		irq_enable(DT_INST_IRQN(0));		\
 		nrfx_ipc_receive_event_enable(_idx);			\
 	} else if (!enable) {						\
 		nrfx_ipc_receive_event_disable(_idx);			\
@@ -241,15 +243,15 @@ static void gipm_init(void)
 #else
 	nrfx_ipc_init(0, vipm_dispatcher, (void *)&nrfx_ipm_data);
 #endif
-	IRQ_CONNECT(DT_INST_0_NORDIC_NRF_IPC_IRQ_0,
-		    DT_INST_0_NORDIC_NRF_IPC_IRQ_0_PRIORITY,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+		    DT_INST_IRQ(0, priority),
 		    nrfx_isr, nrfx_ipc_irq_handler, 0);
 
 	/* Set up signals and channels */
 	nrfx_ipc_config_load(&ipc_cfg);
 }
 
-static void gipm_send(u32_t id)
+static void gipm_send(uint32_t id)
 {
 	nrfx_ipc_signal(id);
 }

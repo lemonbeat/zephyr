@@ -3,13 +3,6 @@
 # Copyright (c) 2019 Carlo Caione <ccaione@baylibre.com>
 # SPDX-License-Identifier: Apache-2.0
 
-if ARM64
-
-config CPU_CORTEX
-	bool
-	help
-	  This option signifies the use of a CPU of the Cortex family.
-
 config CPU_CORTEX_A
 	bool
 	select CPU_CORTEX
@@ -23,6 +16,13 @@ config CPU_CORTEX_A53
 	select ARMV8_A
 	help
 	  This option signifies the use of a Cortex-A53 CPU
+
+config CPU_CORTEX_A72
+	bool
+	select CPU_CORTEX_A
+	select ARMV8_A
+	help
+	  This option signifies the use of a Cortex-A72 CPU
 
 config SWITCH_TO_EL1
 	bool "Switch to EL1 at boot"
@@ -47,9 +47,6 @@ config TEST_EXTRA_STACKSIZE
 	default 2048
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-	default 4096
-
-config OFFLOAD_WORKQUEUE_STACK_SIZE
 	default 4096
 
 config CMSIS_THREAD_MAX_STACK_SIZE
@@ -167,8 +164,6 @@ config ARM64_PA_BITS
 	default 42 if ARM64_PA_BITS_42
 	default 48 if ARM64_PA_BITS_48
 
-endif #ARM_MMU
+endif # ARM_MMU
 
 endif # CPU_CORTEX_A
-
-endif # ARM64

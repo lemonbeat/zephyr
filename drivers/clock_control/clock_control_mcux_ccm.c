@@ -3,6 +3,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+
+#define DT_DRV_COMPAT nxp_imx_ccm
 #include <errno.h>
 #include <soc.h>
 #include <drivers/clock_control.h>
@@ -34,9 +36,9 @@ static int mcux_ccm_off(struct device *dev,
 
 static int mcux_ccm_get_subsys_rate(struct device *dev,
 				    clock_control_subsys_t sub_system,
-				    u32_t *rate)
+				    uint32_t *rate)
 {
-	u32_t clock_name = (u32_t) sub_system;
+	uint32_t clock_name = (uint32_t) sub_system;
 
 	switch (clock_name) {
 
@@ -55,7 +57,7 @@ static int mcux_ccm_get_subsys_rate(struct device *dev,
 
 	case IMX_CCM_LPSPI_CLK:
 	{
-		u32_t lpspi_mux = CLOCK_GetMux(kCLOCK_LpspiMux);
+		uint32_t lpspi_mux = CLOCK_GetMux(kCLOCK_LpspiMux);
 		clock_name_t lpspi_clock = lpspi_clocks[lpspi_mux];
 
 		*rate = CLOCK_GetFreq(lpspi_clock)
@@ -87,6 +89,12 @@ static int mcux_ccm_get_subsys_rate(struct device *dev,
 				(CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
 		break;
 #endif
+
+#ifdef CONFIG_DMA_MCUX_EDMA
+	case IMX_CCM_EDMA_CLK:
+		*rate = CLOCK_GetIpgFreq();
+		break;
+#endif
 	}
 
 	return 0;
@@ -103,7 +111,7 @@ static const struct clock_control_driver_api mcux_ccm_driver_api = {
 	.get_rate = mcux_ccm_get_subsys_rate,
 };
 
-DEVICE_AND_API_INIT(mcux_ccm, DT_INST_0_NXP_IMX_CCM_LABEL,
+DEVICE_AND_API_INIT(mcux_ccm, DT_INST_LABEL(0),
 		    &mcux_ccm_init,
 		    NULL, NULL,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,

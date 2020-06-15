@@ -6,6 +6,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT st_stm32_watchdog
+
 #include <drivers/watchdog.h>
 #include <soc.h>
 #include <errno.h>
@@ -37,16 +39,16 @@
  * @param prescaler Pointer to prescaler value.
  * @param reload Pointer to reload value.
  */
-static void iwdg_stm32_convert_timeout(u32_t timeout,
-				       u32_t *prescaler,
-				       u32_t *reload)
+static void iwdg_stm32_convert_timeout(uint32_t timeout,
+				       uint32_t *prescaler,
+				       uint32_t *reload)
 {
 
-	u16_t divider = 0U;
-	u8_t shift = 0U;
+	uint16_t divider = 0U;
+	uint8_t shift = 0U;
 
 	/* Convert timeout to seconds. */
-	u32_t m_timeout = (u64_t)timeout * LSI_VALUE / 1000000;
+	uint32_t m_timeout = (uint64_t)timeout * LSI_VALUE / 1000000;
 
 	do {
 		divider = 4 << shift;
@@ -58,10 +60,10 @@ static void iwdg_stm32_convert_timeout(u32_t timeout,
 	 * defines of LL_IWDG_PRESCALER_XX type.
 	 */
 	*prescaler = --shift;
-	*reload = (u32_t)(m_timeout / divider) - 1;
+	*reload = (uint32_t)(m_timeout / divider) - 1;
 }
 
-static int iwdg_stm32_setup(struct device *dev, u8_t options)
+static int iwdg_stm32_setup(struct device *dev, uint8_t options)
 {
 	IWDG_TypeDef *iwdg = IWDG_STM32_STRUCT(dev);
 
@@ -95,10 +97,10 @@ static int iwdg_stm32_install_timeout(struct device *dev,
 				      const struct wdt_timeout_cfg *config)
 {
 	IWDG_TypeDef *iwdg = IWDG_STM32_STRUCT(dev);
-	u32_t timeout = config->window.max * USEC_PER_MSEC;
-	u32_t prescaler = 0U;
-	u32_t reload = 0U;
-	u32_t tickstart;
+	uint32_t timeout = config->window.max * USEC_PER_MSEC;
+	uint32_t prescaler = 0U;
+	uint32_t reload = 0U;
+	uint32_t tickstart;
 
 	if (config->callback != NULL) {
 		return -ENOTSUP;
@@ -175,10 +177,10 @@ static int iwdg_stm32_init(struct device *dev)
 }
 
 static struct iwdg_stm32_data iwdg_stm32_dev_data = {
-	.Instance = (IWDG_TypeDef *)DT_INST_0_ST_STM32_WATCHDOG_BASE_ADDRESS
+	.Instance = (IWDG_TypeDef *)DT_INST_REG_ADDR(0)
 };
 
-DEVICE_AND_API_INIT(iwdg_stm32, DT_INST_0_ST_STM32_WATCHDOG_LABEL,
+DEVICE_AND_API_INIT(iwdg_stm32, DT_INST_LABEL(0),
 		    iwdg_stm32_init, &iwdg_stm32_dev_data, NULL,
 		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &iwdg_stm32_api);

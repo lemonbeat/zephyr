@@ -16,9 +16,12 @@
 
 #include <soc.h>
 
+#include <arch/arm/aarch32/cortex_m/nvic.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /* CP10 Access Bits */
 #define CPACR_CP10_Pos          20U
@@ -36,9 +39,9 @@ extern "C" {
 #define CPACR_CP11_RESERVED     (2UL << CPACR_CP11_Pos)
 #define CPACR_CP11_FULL_ACCESS  (3UL << CPACR_CP11_Pos)
 
-#define SCB_UFSR  (*((__IOM u16_t *) &SCB->CFSR + 1))
-#define SCB_BFSR  (*((__IOM u8_t *) &SCB->CFSR + 1))
-#define SCB_MMFSR (*((__IOM u8_t *) &SCB->CFSR))
+#define SCB_UFSR  (*((__IOM uint16_t *) &SCB->CFSR + 1))
+#define SCB_BFSR  (*((__IOM uint8_t *) &SCB->CFSR + 1))
+#define SCB_MMFSR (*((__IOM uint8_t *) &SCB->CFSR))
 
 /* Fill in CMSIS required values for non-CMSIS compliant SoCs.
  * Use __NVIC_PRIO_BITS as it is required and simple to check, but
@@ -84,12 +87,12 @@ typedef enum {
 #ifndef __MPU_PRESENT
 #define __MPU_PRESENT             0U
 #endif
-#define __NVIC_PRIO_BITS               DT_NUM_IRQ_PRIO_BITS
+#define __NVIC_PRIO_BITS               NUM_IRQ_PRIO_BITS
 #define __Vendor_SysTickConfig         0 /* Default to standard SysTick */
 #endif /* __NVIC_PRIO_BITS */
 
-#if __NVIC_PRIO_BITS != DT_NUM_IRQ_PRIO_BITS
-#error "DT_NUM_IRQ_PRIO_BITS and __NVIC_PRIO_BITS are not set to the same value"
+#if __NVIC_PRIO_BITS != NUM_IRQ_PRIO_BITS
+#error "NUM_IRQ_PRIO_BITS and __NVIC_PRIO_BITS are not set to the same value"
 #endif
 
 #ifdef __cplusplus

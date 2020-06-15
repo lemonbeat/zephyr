@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT adi_adxl362
+
 #include <device.h>
 #include <drivers/gpio.h>
 #include <sys/util.h>
@@ -19,7 +21,7 @@ static void adxl362_thread_cb(void *arg)
 {
 	struct device *dev = arg;
 	struct adxl362_data *drv_data = dev->driver_data;
-	u8_t status_buf;
+	uint8_t status_buf;
 
 	/* Clears activity and inactivity interrupt */
 	if (adxl362_get_status(dev, &status_buf)) {
@@ -43,7 +45,7 @@ static void adxl362_thread_cb(void *arg)
 }
 
 static void adxl362_gpio_callback(struct device *dev,
-				  struct gpio_callback *cb, u32_t pins)
+				  struct gpio_callback *cb, uint32_t pins)
 {
 	struct adxl362_data *drv_data =
 		CONTAINER_OF(cb, struct adxl362_data, gpio_cb);
@@ -83,7 +85,7 @@ int adxl362_trigger_set(struct device *dev,
 			sensor_trigger_handler_t handler)
 {
 	struct adxl362_data *drv_data = dev->driver_data;
-	u8_t int_mask, int_en, status_buf;
+	uint8_t int_mask, int_en, status_buf;
 
 	switch (trig->type) {
 	case SENSOR_TRIG_THRESHOLD:
@@ -121,7 +123,7 @@ int adxl362_trigger_set(struct device *dev,
 int adxl362_init_interrupt(struct device *dev)
 {
 	struct adxl362_data *drv_data = dev->driver_data;
-	const struct adxl362_config *cfg = dev->config->config_info;
+	const struct adxl362_config *cfg = dev->config_info;
 	int ret;
 
 	k_mutex_init(&drv_data->trigger_mutex);

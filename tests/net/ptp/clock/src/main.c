@@ -72,7 +72,7 @@ static K_SEM_DEFINE(wait_data, 0, UINT_MAX);
 
 struct eth_context {
 	struct net_if *iface;
-	u8_t mac_addr[6];
+	uint8_t mac_addr[6];
 
 	struct net_ptp_time time;
 	struct device *ptp_clock;
@@ -135,7 +135,7 @@ static struct ethernet_api api_funcs = {
 	.send = eth_tx,
 };
 
-static void generate_mac(u8_t *mac_addr)
+static void generate_mac(uint8_t *mac_addr)
 {
 	/* 00-00-5E-00-53-xx Documentation RFC 7042 */
 	mac_addr[0] = 0x00;
@@ -155,19 +155,19 @@ static int eth_init(struct device *dev)
 	return 0;
 }
 
-ETH_NET_DEVICE_INIT(eth_test_1, "eth_test_1", eth_init, &eth_context_1, NULL,
-		    CONFIG_ETH_INIT_PRIORITY, &api_funcs,
+ETH_NET_DEVICE_INIT(eth_test_1, "eth_test_1", eth_init, device_pm_control_nop,
+		    &eth_context_1, NULL, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
 		    NET_ETH_MTU);
 
-ETH_NET_DEVICE_INIT(eth_test_2, "eth_test_2", eth_init, &eth_context_2, NULL,
-		    CONFIG_ETH_INIT_PRIORITY, &api_funcs,
+ETH_NET_DEVICE_INIT(eth_test_2, "eth_test_2", eth_init, device_pm_control_nop,
+		    &eth_context_2, NULL, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
 		    NET_ETH_MTU);
 
-ETH_NET_DEVICE_INIT(eth_test_3, "eth_test_3", eth_init, &eth_context_3, NULL,
-		    CONFIG_ETH_INIT_PRIORITY, &api_funcs,
+ETH_NET_DEVICE_INIT(eth_test_3, "eth_test_3", eth_init, device_pm_control_nop,
+		    &eth_context_3, NULL, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
 		    NET_ETH_MTU);
 
-static u64_t timestamp_to_nsec(struct net_ptp_time *ts)
+static uint64_t timestamp_to_nsec(struct net_ptp_time *ts)
 {
 	if (!ts) {
 		return 0;
@@ -313,7 +313,7 @@ static void iface_cb(struct net_if *iface, void *user_data)
 	ud->total_if_count++;
 }
 
-static void check_interfaces(void)
+static void test_check_interfaces(void)
 {
 	struct user_data ud = { 0 };
 
@@ -333,7 +333,7 @@ static void check_interfaces(void)
  * relevant for this testing. Anyway, set the IP addresses to the interfaces so
  * we have a real life scenario.
  */
-static void address_setup(void)
+static void test_address_setup(void)
 {
 	struct net_if_addr *ifaddr;
 	struct net_if *iface1, *iface2, *iface3;
@@ -426,7 +426,7 @@ static void test_ptp_clock_iface(int idx)
 		.nanosecond = 1,
 	};
 	struct device *clk;
-	u64_t orig, new_value;
+	uint64_t orig, new_value;
 
 	clk = net_eth_get_ptp_clock(eth_interfaces[idx]);
 
@@ -556,8 +556,8 @@ void test_main(void)
 	}
 
 	ztest_test_suite(ptp_clock_test,
-			 ztest_unit_test(check_interfaces),
-			 ztest_unit_test(address_setup),
+			 ztest_unit_test(test_check_interfaces),
+			 ztest_unit_test(test_address_setup),
 			 ztest_unit_test(test_ptp_clock_interfaces),
 			 ztest_unit_test(test_ptp_clock_iface_1),
 			 ztest_unit_test(test_ptp_clock_iface_2),

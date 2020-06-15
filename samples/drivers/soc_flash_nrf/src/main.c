@@ -7,14 +7,15 @@
 
 #include <zephyr.h>
 #include <drivers/flash.h>
+#include <storage/flash_map.h>
 #include <device.h>
 #include <stdio.h>
 
 
 #ifdef CONFIG_TRUSTED_EXECUTION_NONSECURE
-#define FLASH_TEST_OFFSET DT_FLASH_AREA_IMAGE_1_NONSECURE_OFFSET
+#define FLASH_TEST_OFFSET FLASH_AREA_OFFSET(image_1_nonsecure)
 #else
-#define FLASH_TEST_OFFSET DT_FLASH_AREA_IMAGE_1_OFFSET
+#define FLASH_TEST_OFFSET FLASH_AREA_OFFSET(image_1)
 #endif
 
 #define FLASH_PAGE_SIZE   4096
@@ -29,21 +30,22 @@
 void main(void)
 {
 	struct device *flash_dev;
-	u32_t buf_array_1[4] = { TEST_DATA_WORD_0, TEST_DATA_WORD_1,
+	uint32_t buf_array_1[4] = { TEST_DATA_WORD_0, TEST_DATA_WORD_1,
 				    TEST_DATA_WORD_2, TEST_DATA_WORD_3 };
-	u32_t buf_array_2[4] = { TEST_DATA_WORD_3, TEST_DATA_WORD_1,
+	uint32_t buf_array_2[4] = { TEST_DATA_WORD_3, TEST_DATA_WORD_1,
 				    TEST_DATA_WORD_2, TEST_DATA_WORD_0 };
-	u32_t buf_array_3[8] = { TEST_DATA_WORD_0, TEST_DATA_WORD_1,
+	uint32_t buf_array_3[8] = { TEST_DATA_WORD_0, TEST_DATA_WORD_1,
 				    TEST_DATA_WORD_2, TEST_DATA_WORD_3,
 				    TEST_DATA_WORD_0, TEST_DATA_WORD_1,
 				    TEST_DATA_WORD_2, TEST_DATA_WORD_3 };
-	u32_t buf_word = 0U;
-	u32_t i, offset;
+	uint32_t buf_word = 0U;
+	uint32_t i, offset;
 
 	printf("\nNordic nRF5 Flash Testing\n");
 	printf("=========================\n");
 
-	flash_dev = device_get_binding(DT_FLASH_DEV_NAME);
+	flash_dev =
+		device_get_binding(DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 
 	if (!flash_dev) {
 		printf("Nordic nRF5 flash driver was not found!\n");
@@ -65,13 +67,13 @@ void main(void)
 		printf("   Attempted to write %x at 0x%x\n", buf_array_1[i],
 				offset);
 		if (flash_write(flash_dev, offset, &buf_array_1[i],
-					sizeof(u32_t)) != 0) {
+					sizeof(uint32_t)) != 0) {
 			printf("   Flash write failed!\n");
 			return;
 		}
 		printf("   Attempted to read 0x%x\n", offset);
 		if (flash_read(flash_dev, offset, &buf_word,
-					sizeof(u32_t)) != 0) {
+					sizeof(uint32_t)) != 0) {
 			printf("   Flash read failed!\n");
 			return;
 		}
@@ -98,13 +100,13 @@ void main(void)
 		printf("   Attempted to write %x at 0x%x\n", buf_array_2[i],
 				offset);
 		if (flash_write(flash_dev, offset, &buf_array_2[i],
-					sizeof(u32_t)) != 0) {
+					sizeof(uint32_t)) != 0) {
 			printf("   Flash write failed!\n");
 			return;
 		}
 		printf("   Attempted to read 0x%x\n", offset);
 		if (flash_read(flash_dev, offset, &buf_word,
-					sizeof(u32_t)) != 0) {
+					sizeof(uint32_t)) != 0) {
 			printf("   Flash read failed!\n");
 			return;
 		}
@@ -130,13 +132,13 @@ void main(void)
 		printf("   Attempted to write %x at 0x%x\n", buf_array_3[i],
 				offset);
 		if (flash_write(flash_dev, offset, &buf_array_3[i],
-					sizeof(u32_t)) != 0) {
+					sizeof(uint32_t)) != 0) {
 			printf("   Flash write failed!\n");
 			return;
 		}
 		printf("   Attempted to read 0x%x\n", offset);
 		if (flash_read(flash_dev, offset, &buf_word,
-					sizeof(u32_t)) != 0) {
+					sizeof(uint32_t)) != 0) {
 			printf("   Flash read failed!\n");
 			return;
 		}

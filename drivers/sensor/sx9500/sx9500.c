@@ -6,6 +6,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT semtech_sx9500
+
 #include <errno.h>
 
 #include <kernel.h>
@@ -20,7 +22,7 @@
 
 LOG_MODULE_REGISTER(SX9500, CONFIG_SENSOR_LOG_LEVEL);
 
-static u8_t sx9500_reg_defaults[] = {
+static uint8_t sx9500_reg_defaults[] = {
 	/*
 	 * First number is register address to write to.  The chip
 	 * auto-increments the address for subsequent values in a single
@@ -79,7 +81,7 @@ static const struct sensor_driver_api sx9500_api_funcs = {
 static int sx9500_init_chip(struct device *dev)
 {
 	struct sx9500_data *data = (struct sx9500_data *) dev->driver_data;
-	u8_t val;
+	uint8_t val;
 
 	if (i2c_write(data->i2c_master, sx9500_reg_defaults,
 		      sizeof(sx9500_reg_defaults), data->i2c_slave_addr)
@@ -110,14 +112,14 @@ int sx9500_init(struct device *dev)
 {
 	struct sx9500_data *data = dev->driver_data;
 
-	data->i2c_master = device_get_binding(DT_INST_0_SEMTECH_SX9500_BUS_NAME);
+	data->i2c_master = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (!data->i2c_master) {
 		LOG_DBG("sx9500: i2c master not found: %s",
-		    DT_INST_0_SEMTECH_SX9500_BUS_NAME);
+		    DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
-	data->i2c_slave_addr = DT_INST_0_SEMTECH_SX9500_BASE_ADDRESS;
+	data->i2c_slave_addr = DT_INST_REG_ADDR(0);
 
 	if (sx9500_init_chip(dev) < 0) {
 		LOG_DBG("sx9500: failed to initialize chip");
@@ -134,6 +136,6 @@ int sx9500_init(struct device *dev)
 
 struct sx9500_data sx9500_data;
 
-DEVICE_AND_API_INIT(sx9500, DT_INST_0_SEMTECH_SX9500_LABEL, sx9500_init, &sx9500_data,
+DEVICE_AND_API_INIT(sx9500, DT_INST_LABEL(0), sx9500_init, &sx9500_data,
 		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &sx9500_api_funcs);

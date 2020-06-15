@@ -11,6 +11,7 @@ zephyr_library_sources_ifdef(CONFIG_I2C_GPIO		i2c_gpio.c)
 zephyr_library_sources_ifdef(CONFIG_I2C_IMX		i2c_imx.c)
 zephyr_library_sources_ifdef(CONFIG_I2C_XEC		i2c_mchp_xec.c)
 zephyr_library_sources_ifdef(CONFIG_I2C_MCUX		i2c_mcux.c)
+zephyr_library_sources_ifdef(CONFIG_I2C_MCUX_FLEXCOMM	i2c_mcux_flexcomm.c)
 zephyr_library_sources_ifdef(CONFIG_I2C_MCUX_LPI2C	i2c_mcux_lpi2c.c)
 zephyr_library_sources_ifdef(CONFIG_NRFX_TWI		i2c_nrfx_twi.c)
 zephyr_library_sources_ifdef(CONFIG_NRFX_TWIM		i2c_nrfx_twim.c)
@@ -36,13 +37,11 @@ zephyr_library_sources_ifdef(CONFIG_I2C_STM32_V2
 if(CONFIG_I2C_DW)
   zephyr_library_sources(i2c_dw.c)
   foreach(NUM RANGE 0 7)
-    if(CONFIG_I2C_${NUM})
-      configure_file(
-        i2c_dw_port_x.h
-        ${PROJECT_BINARY_DIR}/include/generated/i2c_dw_port_${NUM}.h
-        @ONLY
-        )
-    endif()
+    configure_file(
+      i2c_dw_port_x.h
+      ${PROJECT_BINARY_DIR}/include/generated/i2c_dw_port_${NUM}.h
+      @ONLY
+      )
   endforeach(NUM)
 endif()
 

@@ -15,9 +15,9 @@
 
 #include <ztest.h>
 
-static u8_t mac_addr[sizeof(struct net_eth_addr)];
+static uint8_t mac_addr[sizeof(struct net_eth_addr)];
 static struct net_if *eth_if;
-static u8_t small_buffer[512];
+static uint8_t small_buffer[512];
 
 /************************\
  * FAKE ETHERNET DEVICE *
@@ -73,7 +73,7 @@ static const struct dummy_api fake_dev_api = {
 #endif
 
 NET_DEVICE_INIT(fake_dev, "fake_dev",
-		fake_dev_init, NULL, NULL,
+		fake_dev_init, device_pm_control_nop, NULL, NULL,
 		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		&fake_dev_api, _ETH_L2_LAYER, _ETH_L2_CTX_TYPE,
 		NET_ETH_MTU);
@@ -209,7 +209,7 @@ static void test_net_pkt_basics_of_rw(void)
 {
 	struct net_pkt_cursor backup;
 	struct net_pkt *pkt;
-	u16_t value16;
+	uint16_t value16;
 	int ret;
 
 	pkt = net_pkt_alloc_with_buffer(eth_if, 512,
@@ -457,7 +457,7 @@ void test_net_pkt_advanced_basics(void)
 	 * position in the buffer and cast it to the type you want.
 	 */
 	{
-		u32_t *val = (u32_t *)net_pkt_cursor_get_pos(pkt);
+		uint32_t *val = (uint32_t *)net_pkt_cursor_get_pos(pkt);
 
 		*val = 0U;
 		/* etc... */
@@ -534,7 +534,7 @@ void test_net_pkt_easier_rw_usage(void)
 		     "Pkt not properly unreferenced");
 }
 
-u8_t b5_data[10] = "qrstuvwxyz";
+uint8_t b5_data[10] = "qrstuvwxyz";
 struct net_buf b5 = {
 	.ref   = 1,
 	.data  = b5_data,
@@ -542,7 +542,7 @@ struct net_buf b5 = {
 	.size  = 0,
 };
 
-u8_t b4_data[4] = "mnop";
+uint8_t b4_data[4] = "mnop";
 struct net_buf b4 = {
 	.frags = &b5,
 	.ref   = 1,
@@ -556,7 +556,7 @@ struct net_buf b3 = {
 	.ref   = 1,
 };
 
-u8_t b2_data[8] = "efghijkl";
+uint8_t b2_data[8] = "efghijkl";
 struct net_buf b2 = {
 	.frags = &b3,
 	.ref   = 1,
@@ -565,7 +565,7 @@ struct net_buf b2 = {
 	.size  = sizeof(b2_data),
 };
 
-u8_t b1_data[4] = "abcd";
+uint8_t b1_data[4] = "abcd";
 struct net_buf b1 = {
 	.frags = &b2,
 	.ref   = 1,
@@ -634,10 +634,12 @@ void test_net_pkt_copy(void)
 void test_net_pkt_pull(void)
 {
 	const int PULL_AMOUNT = 8;
+	const int LARGE_PULL_AMOUNT = 200;
 	struct net_pkt *dummy_pkt;
-	static u8_t pkt_data[PULL_TEST_PKT_DATA_SIZE];
-	static u8_t pkt_data_readback[PULL_TEST_PKT_DATA_SIZE];
-	int i;
+	static uint8_t pkt_data[PULL_TEST_PKT_DATA_SIZE];
+	static uint8_t pkt_data_readback[PULL_TEST_PKT_DATA_SIZE];
+	size_t len;
+	int i, ret;
 
 	for (i = 0; i < PULL_TEST_PKT_DATA_SIZE; ++i) {
 		pkt_data[i] = i & 0xff;
@@ -669,12 +671,83 @@ void test_net_pkt_pull(void)
 			  PULL_TEST_PKT_DATA_SIZE - PULL_AMOUNT,
 			  "Packet data changed");
 
+	net_pkt_cursor_init(dummy_pkt);
+	net_pkt_pull(dummy_pkt, LARGE_PULL_AMOUNT);
+	zassert_equal(net_pkt_get_len(dummy_pkt),
+		      PULL_TEST_PKT_DATA_SIZE - PULL_AMOUNT -
+		      LARGE_PULL_AMOUNT,
+		      "Large pull failed to set new size (%d vs %d)",
+		      net_pkt_get_len(dummy_pkt),
+		      PULL_TEST_PKT_DATA_SIZE - PULL_AMOUNT -
+		      LARGE_PULL_AMOUNT);
+
+	net_pkt_cursor_init(dummy_pkt);
+	net_pkt_pull(dummy_pkt, net_pkt_get_len(dummy_pkt));
+	zassert_equal(net_pkt_get_len(dummy_pkt), 0,
+		      "Full pull failed to set new size (%d)",
+		      net_pkt_get_len(dummy_pkt));
+
+	net_pkt_cursor_init(dummy_pkt);
+	ret = net_pkt_pull(dummy_pkt, 1);
+	zassert_equal(ret, -ENOBUFS, "Did not return error");
+	zassert_equal(net_pkt_get_len(dummy_pkt), 0,
+		      "Empty pull set new size (%d)",
+		      net_pkt_get_len(dummy_pkt));
+
+	net_pkt_unref(dummy_pkt);
+
+	dummy_pkt = net_pkt_alloc_with_buffer(eth_if,
+					      PULL_TEST_PKT_DATA_SIZE,
+					      AF_UNSPEC,
+					      0,
+					      K_NO_WAIT);
+	zassert_true(dummy_pkt != NULL, "Pkt not allocated");
+
+	zassert_true(net_pkt_write(dummy_pkt,
+				   pkt_data,
+				   PULL_TEST_PKT_DATA_SIZE) == 0,
+		     "Write packet failed");
+
+	net_pkt_cursor_init(dummy_pkt);
+	ret = net_pkt_pull(dummy_pkt, net_pkt_get_len(dummy_pkt) + 1);
+	zassert_equal(ret, -ENOBUFS, "Did not return error");
+	zassert_equal(net_pkt_get_len(dummy_pkt), 0,
+		      "Not empty after full pull (%d)",
+		      net_pkt_get_len(dummy_pkt));
+
+	net_pkt_unref(dummy_pkt);
+
+	dummy_pkt = net_pkt_alloc_with_buffer(eth_if,
+					      PULL_TEST_PKT_DATA_SIZE,
+					      AF_UNSPEC,
+					      0,
+					      K_NO_WAIT);
+	zassert_true(dummy_pkt != NULL, "Pkt not allocated");
+
+	zassert_true(net_pkt_write(dummy_pkt,
+				   pkt_data,
+				   PULL_TEST_PKT_DATA_SIZE) == 0,
+		     "Write packet failed");
+
+	net_pkt_cursor_init(dummy_pkt);
+	len = net_pkt_get_len(dummy_pkt);
+
+	for (i = 0; i < len; i++) {
+		ret = net_pkt_pull(dummy_pkt, 1);
+		zassert_equal(ret, 0, "Did return error");
+	}
+
+	ret = net_pkt_pull(dummy_pkt, 1);
+	zassert_equal(ret, -ENOBUFS, "Did not return error");
+
+	zassert_equal(dummy_pkt->buffer, NULL, "buffer list not empty");
+
 	net_pkt_unref(dummy_pkt);
 }
 
 void test_net_pkt_clone(void)
 {
-	u8_t buf[26] = {"abcdefghijklmnopqrstuvwxyz"};
+	uint8_t buf[26] = {"abcdefghijklmnopqrstuvwxyz"};
 	struct net_pkt *pkt;
 	struct net_pkt *cloned_pkt;
 	int ret;

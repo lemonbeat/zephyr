@@ -7,11 +7,11 @@
 
 #include "fcb_test.h"
 
-void fcb_test_len(void)
+void test_fcb_len(void)
 {
-	u8_t buf[3];
-	u16_t len;
-	u16_t len2;
+	uint8_t buf[3];
+	uint16_t len;
+	uint16_t len2;
 	int rc;
 	int rc2;
 

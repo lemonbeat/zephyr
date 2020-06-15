@@ -6,6 +6,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT st_lps25hb_press
+
 #include <drivers/sensor.h>
 #include <kernel.h>
 #include <device.h>
@@ -18,10 +20,10 @@
 
 LOG_MODULE_REGISTER(LPS25HB, CONFIG_SENSOR_LOG_LEVEL);
 
-static inline int lps25hb_power_ctrl(struct device *dev, u8_t value)
+static inline int lps25hb_power_ctrl(struct device *dev, uint8_t value)
 {
 	struct lps25hb_data *data = dev->driver_data;
-	const struct lps25hb_config *config = dev->config->config_info;
+	const struct lps25hb_config *config = dev->config_info;
 
 	return i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				   LPS25HB_REG_CTRL_REG1,
@@ -29,10 +31,10 @@ static inline int lps25hb_power_ctrl(struct device *dev, u8_t value)
 				   value << LPS25HB_SHIFT_CTRL_REG1_PD);
 }
 
-static inline int lps25hb_set_odr_raw(struct device *dev, u8_t odr)
+static inline int lps25hb_set_odr_raw(struct device *dev, uint8_t odr)
 {
 	struct lps25hb_data *data = dev->driver_data;
-	const struct lps25hb_config *config = dev->config->config_info;
+	const struct lps25hb_config *config = dev->config_info;
 
 	return i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				   LPS25HB_REG_CTRL_REG1,
@@ -44,8 +46,8 @@ static int lps25hb_sample_fetch(struct device *dev,
 				enum sensor_channel chan)
 {
 	struct lps25hb_data *data = dev->driver_data;
-	const struct lps25hb_config *config = dev->config->config_info;
-	u8_t out[5];
+	const struct lps25hb_config *config = dev->config_info;
+	uint8_t out[5];
 	int offset;
 
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);
@@ -59,30 +61,30 @@ static int lps25hb_sample_fetch(struct device *dev,
 		}
 	}
 
-	data->sample_press = (s32_t)((u32_t)(out[0]) |
-					((u32_t)(out[1]) << 8) |
-					((u32_t)(out[2]) << 16));
-	data->sample_temp = (s16_t)((u16_t)(out[3]) |
-					((u16_t)(out[4]) << 8));
+	data->sample_press = (int32_t)((uint32_t)(out[0]) |
+					((uint32_t)(out[1]) << 8) |
+					((uint32_t)(out[2]) << 16));
+	data->sample_temp = (int16_t)((uint16_t)(out[3]) |
+					((uint16_t)(out[4]) << 8));
 
 	return 0;
 }
 
 static inline void lps25hb_press_convert(struct sensor_value *val,
-					 s32_t raw_val)
+					 int32_t raw_val)
 {
 	/* val = raw_val / 40960 */
 	val->val1 = raw_val / 40960;
-	val->val2 = ((s32_t)raw_val * 1000000 / 40960) % 1000000;
+	val->val2 = ((int32_t)raw_val * 1000000 / 40960) % 1000000;
 }
 
 static inline void lps25hb_temp_convert(struct sensor_value *val,
-					s16_t raw_val)
+					int16_t raw_val)
 {
-	s32_t uval;
+	int32_t uval;
 
 	/* val = raw_val / 480 + 42.5 */
-	uval = (s32_t)raw_val * 1000000 / 480 + 42500000;
+	uval = (int32_t)raw_val * 1000000 / 480 + 42500000;
 	val->val1 = (raw_val * 10 / 480 + 425) / 10;
 	val->val2 = uval % 1000000;
 }
@@ -112,8 +114,8 @@ static const struct sensor_driver_api lps25hb_api_funcs = {
 static int lps25hb_init_chip(struct device *dev)
 {
 	struct lps25hb_data *data = dev->driver_data;
-	const struct lps25hb_config *config = dev->config->config_info;
-	u8_t chip_id;
+	const struct lps25hb_config *config = dev->config_info;
+	uint8_t chip_id;
 
 	lps25hb_power_ctrl(dev, 0);
 	k_busy_wait(USEC_PER_MSEC * 50U);
@@ -160,7 +162,7 @@ err_poweroff:
 
 static int lps25hb_init(struct device *dev)
 {
-	const struct lps25hb_config * const config = dev->config->config_info;
+	const struct lps25hb_config * const config = dev->config_info;
 	struct lps25hb_data *data = dev->driver_data;
 
 	data->i2c_master = device_get_binding(config->i2c_master_dev_name);
@@ -179,12 +181,12 @@ static int lps25hb_init(struct device *dev)
 }
 
 static const struct lps25hb_config lps25hb_config = {
-	.i2c_master_dev_name = DT_INST_0_ST_LPS25HB_PRESS_BUS_NAME,
-	.i2c_slave_addr = DT_INST_0_ST_LPS25HB_PRESS_BASE_ADDRESS,
+	.i2c_master_dev_name = DT_INST_BUS_LABEL(0),
+	.i2c_slave_addr = DT_INST_REG_ADDR(0),
 };
 
 static struct lps25hb_data lps25hb_data;
 
-DEVICE_AND_API_INIT(lps25hb, DT_INST_0_ST_LPS25HB_PRESS_LABEL, lps25hb_init,
+DEVICE_AND_API_INIT(lps25hb, DT_INST_LABEL(0), lps25hb_init,
 		    &lps25hb_data, &lps25hb_config, POST_KERNEL,
 		    CONFIG_SENSOR_INIT_PRIORITY, &lps25hb_api_funcs);

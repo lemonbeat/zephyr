@@ -35,6 +35,7 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include <net/lldp.h>
 
 #include "eth_native_posix_priv.h"
+#include "eth.h"
 
 #define NET_BUF_TIMEOUT K_MSEC(100)
 
@@ -45,9 +46,9 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #endif
 
 struct eth_context {
-	u8_t recv[NET_ETH_MTU + ETH_HDR_LEN];
-	u8_t send[NET_ETH_MTU + ETH_HDR_LEN];
-	u8_t mac_addr[6];
+	uint8_t recv[NET_ETH_MTU + ETH_HDR_LEN];
+	uint8_t send[NET_ETH_MTU + ETH_HDR_LEN];
+	uint8_t mac_addr[6];
 	struct net_linkaddr ll_addr;
 	struct net_if *iface;
 	const char *if_name;
@@ -86,7 +87,7 @@ static struct gptp_hdr *check_gptp_msg(struct net_if *iface,
 				       struct net_pkt *pkt,
 				       bool is_tx)
 {
-	u8_t *msg_start = net_pkt_data(pkt);
+	uint8_t *msg_start = net_pkt_data(pkt);
 	struct gptp_hdr *gptp_hdr;
 	int eth_hlen;
 
@@ -211,7 +212,7 @@ static struct net_linkaddr *eth_get_mac(struct eth_context *ctx)
 }
 
 static inline struct net_if *get_iface(struct eth_context *ctx,
-				       u16_t vlan_tag)
+				       uint16_t vlan_tag)
 {
 #if defined(CONFIG_NET_VLAN)
 	struct net_if *iface;
@@ -231,11 +232,11 @@ static inline struct net_if *get_iface(struct eth_context *ctx,
 
 #if defined(CONFIG_NET_VLAN)
 static struct net_pkt *prepare_vlan_pkt(struct eth_context *ctx,
-					int count, u16_t *vlan_tag, int *status)
+					int count, uint16_t *vlan_tag, int *status)
 {
 	struct net_eth_vlan_hdr *hdr = (struct net_eth_vlan_hdr *)ctx->recv;
 	struct net_pkt *pkt;
-	u8_t pos;
+	uint8_t pos;
 
 	if (IS_ENABLED(CONFIG_ETH_NATIVE_POSIX_VLAN_TAG_STRIP)) {
 		count -= NET_ETH_VLAN_HDR_SIZE;
@@ -316,7 +317,7 @@ static struct net_pkt *prepare_non_vlan_pkt(struct eth_context *ctx,
 
 static int read_data(struct eth_context *ctx, int fd)
 {
-	u16_t vlan_tag = NET_VLAN_TAG_UNSPEC;
+	uint16_t vlan_tag = NET_VLAN_TAG_UNSPEC;
 	struct net_if *iface;
 	struct net_pkt *pkt = NULL;
 	int status;
@@ -415,12 +416,10 @@ static void eth_iface_init(struct net_if *iface)
 
 #if defined(CONFIG_ETH_NATIVE_POSIX_RANDOM_MAC)
 	/* 00-00-5E-00-53-xx Documentation RFC 7042 */
-	ctx->mac_addr[0] = 0x00;
-	ctx->mac_addr[1] = 0x00;
-	ctx->mac_addr[2] = 0x5E;
+	gen_random_mac(ctx->mac_addr, 0x00, 0x00, 0x5E);
+
 	ctx->mac_addr[3] = 0x00;
 	ctx->mac_addr[4] = 0x53;
-	ctx->mac_addr[5] = sys_rand32_get();
 
 	/* The TUN/TAP setup script will by default set the MAC address of host
 	 * interface to 00:00:5E:00:53:FF so do not allow that.
@@ -528,7 +527,7 @@ static int set_config(struct device *dev,
 
 #if defined(CONFIG_NET_VLAN)
 static int vlan_setup(struct device *dev, struct net_if *iface,
-		      u16_t tag, bool enable)
+		      uint16_t tag, bool enable)
 {
 	if (enable) {
 		net_lldp_set_lldpdu(iface);
@@ -584,7 +583,7 @@ static const struct ethernet_api eth_if_api = {
 };
 
 ETH_NET_DEVICE_INIT(eth_native_posix, ETH_NATIVE_POSIX_DRV_NAME,
-		    eth_init, &eth_context_data, NULL,
+		    eth_init, device_pm_control_nop, &eth_context_data, NULL,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &eth_if_api,
 		    NET_ETH_MTU);
 

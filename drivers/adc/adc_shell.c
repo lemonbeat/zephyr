@@ -10,6 +10,26 @@
 #include <ctype.h>
 #include <sys/util.h>
 
+#if DT_HAS_COMPAT_STATUS_OKAY(atmel_sam_afec)
+#define DT_DRV_COMPAT atmel_sam_afec
+#elif DT_HAS_COMPAT_STATUS_OKAY(atmel_sam0_adc)
+#define DT_DRV_COMPAT atmel_sam0_adc
+#elif DT_HAS_COMPAT_STATUS_OKAY(microchip_xec_adc)
+#define DT_DRV_COMPAT microchip_xec_adc
+#elif DT_HAS_COMPAT_STATUS_OKAY(nordic_nrf_adc)
+#define DT_DRV_COMPAT nordic_nrf_adc
+#elif DT_HAS_COMPAT_STATUS_OKAY(nordic_nrf_saadc)
+#define DT_DRV_COMPAT nordic_nrf_saadc
+#elif DT_HAS_COMPAT_STATUS_OKAY(nxp_kinetis_adc12)
+#define DT_DRV_COMPAT nxp_kinetis_adc12
+#elif DT_HAS_COMPAT_STATUS_OKAY(nxp_kinetis_adc16)
+#define DT_DRV_COMPAT nxp_kinetis_adc16
+#elif DT_HAS_COMPAT_STATUS_OKAY(st_stm32_adc)
+#define DT_DRV_COMPAT st_stm32_adc
+#else
+#error No known devicetree compatible match for ADC shell
+#endif
+
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <logging/log.h>
 LOG_MODULE_REGISTER(adc_shell);
@@ -17,62 +37,51 @@ LOG_MODULE_REGISTER(adc_shell);
 struct adc_hdl {
 	char *device_name;
 	struct adc_channel_cfg channel_config;
-	u8_t resolution;
+	uint8_t resolution;
 };
 
+#define ADC_HDL_LIST_ENTRY(inst)					\
+	{								\
+		.device_name = DT_INST_LABEL(inst),			\
+		.channel_config = {					\
+			.gain = ADC_GAIN_1,				\
+			.reference = ADC_REF_INTERNAL,			\
+			.acquisition_time = ADC_ACQ_TIME_DEFAULT,	\
+			.channel_id = 0,				\
+		},							\
+		.resolution = 0,					\
+	}
+
+/*
+ * TODO generalize with a more flexible for-each macro that doesn't
+ * assume a semicolon separator.
+ */
 struct adc_hdl adc_list[] = {
-#ifdef CONFIG_ADC_0
-	{
-		.device_name = DT_ADC_0_NAME,
-		.channel_config = {
-			.gain = ADC_GAIN_1,
-			.reference = ADC_REF_INTERNAL,
-			.acquisition_time = ADC_ACQ_TIME_DEFAULT,
-			.channel_id = 0,
-		},
-		.resolution = 0,
-	},
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(0), okay)
+	ADC_HDL_LIST_ENTRY(0),
 #endif
-#ifdef CONFIG_ADC_1
-	{
-		.device_name = DT_ADC_1_NAME,
-		.channel_config = {
-			.gain = ADC_GAIN_1,
-			.reference = ADC_REF_INTERNAL,
-			.acquisition_time = ADC_ACQ_TIME_DEFAULT,
-			.channel_id = 0,
-		},
-		.resolution = 0,
-	},
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay)
+	ADC_HDL_LIST_ENTRY(1),
 #endif
-#ifdef CONFIG_ADC_2
-	{
-		.device_name = DT_ADC_2_NAME,
-		.channel_config = {
-			.gain = ADC_GAIN_1,
-			.reference = ADC_REF_INTERNAL,
-			.acquisition_time = ADC_ACQ_TIME_DEFAULT,
-			.channel_id = 0,
-		},
-		.resolution = 0,
-	},
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(2), okay)
+	ADC_HDL_LIST_ENTRY(2),
 #endif
 };
 
 struct args_index {
-	s8_t adc;
-	s8_t parent_adc;
-	u8_t channel;
-	u8_t conf;
-	u8_t acq_unit;
+	int8_t adc;
+	int8_t parent_adc;
+	uint8_t channel;
+	uint8_t conf;
+	uint8_t acq_unit;
 };
 
 struct args_number {
-	u8_t help;
-	u8_t channel;
-	u8_t acq_time;
-	u8_t resolution;
-	u8_t read;
+	uint8_t help;
+	uint8_t channel;
+	uint8_t acq_time;
+	uint8_t resolution;
+	uint8_t read;
 };
 
 static const struct args_index args_indx = {
@@ -134,7 +143,7 @@ static int cmd_adc_channel(const struct shell *shell, size_t argc, char **argv)
 		return -EINVAL;
 	}
 	adc_list[chosen_adc].channel_config.channel_id =
-		(u8_t)strtol(argv[args_indx.conf], NULL, 10);
+		(uint8_t)strtol(argv[args_indx.conf], NULL, 10);
 	retval = adc_channel_setup(adc_dev,
 			&adc_list[chosen_adc].channel_config);
 	LOG_DBG("Channel setup returned %i\n", retval);
@@ -200,7 +209,7 @@ static int cmd_adc_acq(const struct shell *shell, size_t argc, char **argv)
 	int retval = 0;
 	struct device *adc_dev;
 	int chosen_adc;
-	u16_t acq_time;
+	uint16_t acq_time;
 
 	if (argc != args_no.acq_time) {
 		shell_fprintf(shell, SHELL_NORMAL,
@@ -224,7 +233,7 @@ static int cmd_adc_acq(const struct shell *shell, size_t argc, char **argv)
 		shell_error(shell, "<time> must be digits");
 		return -EINVAL;
 	}
-	acq_time = (u16_t)strtol(argv[args_indx.conf], NULL, 10);
+	acq_time = (uint16_t)strtol(argv[args_indx.conf], NULL, 10);
 	if (!strcmp(argv[args_indx.acq_unit], "us")) {
 		adc_list[chosen_adc].channel_config.acquisition_time =
 			ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, acq_time);
@@ -272,7 +281,7 @@ static int cmd_adc_reso(const struct shell *shell, size_t argc, char **argv)
 		return -EINVAL;
 	}
 	adc_list[chosen_adc].resolution =
-		(u8_t)strtol(argv[args_indx.conf], NULL, 10);
+		(uint8_t)strtol(argv[args_indx.conf], NULL, 10);
 	retval = adc_channel_setup(adc_dev,
 			&adc_list[chosen_adc].channel_config);
 	return retval;
@@ -331,7 +340,7 @@ static int cmd_adc_read(const struct shell *shell, size_t argc, char **argv)
 	int retval = 0;
 	int chosen_adc = -1;
 	struct device *adc_dev;
-	u16_t m_sample_buffer[BUFFER_SIZE];
+	uint16_t m_sample_buffer[BUFFER_SIZE];
 
 	if (argc != args_no.read) {
 		shell_fprintf(shell, SHELL_NORMAL,
@@ -343,7 +352,7 @@ static int cmd_adc_read(const struct shell *shell, size_t argc, char **argv)
 		shell_error(shell, "Device not in device list");
 		return 0;
 	}
-	u8_t adc_channel_id = strtol(argv[args_indx.channel], NULL, 10);
+	uint8_t adc_channel_id = strtol(argv[args_indx.channel], NULL, 10);
 
 	adc_dev = device_get_binding(adc_list[chosen_adc].device_name);
 	if (adc_dev == NULL) {
@@ -372,9 +381,9 @@ static int cmd_adc_print(const struct shell *shell, size_t argc, char **argv)
 	int i;
 	char *gain = "1";
 	char *ref = "INTERNAL";
-	u16_t acq_time;
-	u8_t channel_id;
-	u8_t resolution;
+	uint16_t acq_time;
+	uint8_t channel_id;
+	uint8_t resolution;
 
 	chosen_adc = get_adc_from_list(argv[args_indx.adc]);
 	if (chosen_adc < 0) {
@@ -455,18 +464,25 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_adc_cmds,
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_adc,
-#ifdef CONFIG_ADC_0
-	SHELL_CMD(ADC_0, &sub_adc_cmds, "ADC_0", NULL),
+#define ADC_SHELL_COMMAND(inst) \
+	SHELL_CMD(ADC_##inst, &sub_adc_cmds, "ADC_" #inst, NULL)
+
+/*
+ * TODO generalize with a more flexible for-each macro that doesn't
+ * assume a semicolon separator.
+ */
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_adc,
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(0), okay)
+	ADC_SHELL_COMMAND(0),
 #endif
-#ifdef CONFIG_ADC_1
-	SHELL_CMD(ADC_1, &sub_adc_cmds, "ADC_1", NULL),
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay)
+	ADC_SHELL_COMMAND(1),
 #endif
-#ifdef CONFIG_ADC_2
-	SHELL_CMD(ADC_2, &sub_adc_cmds, "ADC_2", NULL),
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(2), okay)
+	ADC_SHELL_COMMAND(2),
 #endif
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );
-
 
 SHELL_CMD_REGISTER(adc, &sub_adc, "ADC commands", NULL);

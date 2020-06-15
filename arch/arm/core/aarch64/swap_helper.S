@@ -17,7 +17,7 @@
 #include <offsets_short.h>
 #include <arch/cpu.h>
 #include <syscall.h>
-#include "macro.inc"
+#include "macro_priv.inc"
 
 _ASM_FILE_PROLOGUE
 
@@ -25,22 +25,14 @@ GDATA(_kernel)
 GDATA(_k_neg_eagain)
 
 /**
- * @brief PendSV exception handler, handling context switches
+ * @brief Routine to handle context switches
  *
- * The PendSV exception is the only execution context in the system that can
- * perform context switching. When an execution context finds out it has to
- * switch contexts, it pends the PendSV exception.
- *
- * When PendSV is pended, the decision that a context switch must happen has
- * already been taken. In other words, when z_arm64_pendsv() runs, we *know* we
- * have to swap *something*.
- *
- * For Cortex-A, PendSV exception is not supported by the architecture and this
- * function is directly called either by _isr_wrapper() in case of preemption,
- * or z_arm64_svc() in case of cooperative switching.
+ * This function is directly called either by _isr_wrapper() in case of
+ * preemption, or z_arm64_svc() in case of cooperative switching.
  */
-GTEXT(z_arm64_pendsv)
-SECTION_FUNC(TEXT, z_arm64_pendsv)
+
+GTEXT(z_arm64_context_switch)
+SECTION_FUNC(TEXT, z_arm64_context_switch)
 #ifdef CONFIG_TRACING
 	stp	xzr, x30, [sp, #-16]!
 	bl	sys_trace_thread_switched_in
@@ -54,28 +46,13 @@ SECTION_FUNC(TEXT, z_arm64_pendsv)
 	ldr	x0, =_thread_offset_to_callee_saved
 	add	x0, x0, x2
 
-	/* Store rest of process context including x30, SPSR_ELn and ELR_ELn */
+	/* Store rest of process context including x30 */
 	stp	x19, x20, [x0], #16
 	stp	x21, x22, [x0], #16
 	stp	x23, x24, [x0], #16
 	stp	x25, x26, [x0], #16
 	stp	x27, x28, [x0], #16
 	stp	x29, x30, [x0], #16
-
-	switch_el x3, 3f, 2f, 1f
-3:
-	mrs	x4, spsr_el3
-	mrs	x5, elr_el3
-	b	0f
-2:
-	mrs	x4, spsr_el2
-	mrs	x5, elr_el2
-	b	0f
-1:
-	mrs	x4, spsr_el1
-	mrs	x5, elr_el1
-0:
-	stp	x4, x5, [x0], #16
 
 	/* Save the current SP */
 	mov	x6, sp
@@ -85,15 +62,11 @@ SECTION_FUNC(TEXT, z_arm64_pendsv)
 	ldr	x2, [x1, #_kernel_offset_to_ready_q_cache]
 	str	x2, [x1, #_kernel_offset_to_current]
 
-	/* load _kernel into x1 and current k_thread into x2 */
-	ldr	x1, =_kernel
-	ldr	x2, [x1, #_kernel_offset_to_current]
-
 	/* addr of callee-saved regs in thread in x0 */
 	ldr	x0, =_thread_offset_to_callee_saved
 	add	x0, x0, x2
 
-	/* Restore x19-x29 plus x30, SPSR_ELn and ELR_ELn */
+	/* Restore x19-x29 plus x30 */
 	ldp	x19, x20, [x0], #16
 	ldp	x21, x22, [x0], #16
 	ldp	x23, x24, [x0], #16
@@ -101,21 +74,6 @@ SECTION_FUNC(TEXT, z_arm64_pendsv)
 	ldp	x27, x28, [x0], #16
 	ldp	x29, x30, [x0], #16
 
-	ldp	x4, x5, [x0], #16
-
-	switch_el x3, 3f, 2f, 1f
-3:
-	msr	spsr_el3, x4
-	msr	elr_el3, x5
-	b	0f
-2:
-	msr	spsr_el2, x4
-	msr	elr_el2, x5
-	b	0f
-1:
-	msr	spsr_el1, x4
-	msr	elr_el1, x5
-0:
 	ldr	x6, [x0]
 	mov	sp, x6
 
@@ -128,14 +86,14 @@ SECTION_FUNC(TEXT, z_arm64_pendsv)
 	/* We restored x30 from the process stack. There are three possible
 	 * cases:
 	 *
-	 * - We return to z_arm64_svc() when swappin in a thread that was
+	 * - We return to z_arm64_svc() when swapping in a thread that was
 	 *   swapped out by z_arm64_svc() before jumping into
 	 *   z_arm64_exit_exc()
-	 * - We return to _isr_wrapper() when swappin in a thread that was
+	 * - We return to _isr_wrapper() when swapping in a thread that was
 	 *   swapped out by _isr_wrapper() before jumping into
 	 *   z_arm64_exit_exc()
 	 * - We return (jump) into z_thread_entry_wrapper() for new threads
-	 * (see thread.c)
+	 *   (see thread.c)
 	 */
 	ret
 
@@ -148,6 +106,24 @@ SECTION_FUNC(TEXT, z_arm64_pendsv)
 
 GTEXT(z_thread_entry_wrapper)
 SECTION_FUNC(TEXT, z_thread_entry_wrapper)
+	/*
+	 * Restore SPSR_ELn and ELR_ELn saved in the temporary stack by
+	 * arch_new_thread()
+	 */
+	ldp	x0, x1, [sp], #16
+	switch_el x3, 3f, 2f, 1f
+3:
+	msr	spsr_el3, x0
+	msr	elr_el3, x1
+	b	0f
+2:
+	msr	spsr_el2, x0
+	msr	elr_el2, x1
+	b	0f
+1:
+	msr	spsr_el1, x0
+	msr	elr_el1, x1
+0:
 	/*
 	 * z_thread_entry_wrapper is called for every new thread upon the return
 	 * of arch_swap() or ISR. Its address, as well as its input function
@@ -173,6 +149,7 @@ SECTION_FUNC(TEXT, z_thread_entry_wrapper)
  *
  * @return N/A
  */
+
 GTEXT(z_arm64_svc)
 SECTION_FUNC(TEXT, z_arm64_svc)
 	z_arm64_enter_exc
@@ -220,7 +197,15 @@ offload:
 	b	inv
 
 context_switch:
-	bl	z_arm64_pendsv
+	/* Check if we need to context switch */
+	ldr	x1, =_kernel
+	ldr	x2, [x1, #_kernel_offset_to_current]
+	ldr	x3, [x1, #_kernel_offset_to_ready_q_cache]
+	cmp	x2, x3
+	beq	exit
+
+	/* Switch thread */
+	bl	z_arm64_context_switch
 
 exit:
 	z_arm64_exit_exc

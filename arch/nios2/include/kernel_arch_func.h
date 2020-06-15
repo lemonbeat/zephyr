@@ -43,7 +43,7 @@ FUNC_NORETURN void z_nios2_fatal_error(unsigned int reason,
 
 static inline bool arch_is_in_isr(void)
 {
-	return _kernel.nested != 0U;
+	return _kernel.cpus[0].nested != 0U;
 }
 
 #ifdef CONFIG_IRQ_OFFLOAD
@@ -58,7 +58,7 @@ void z_nios2_icache_flush_all(void);
 
 #if ALT_CPU_DCACHE_SIZE > 0
 void z_nios2_dcache_flush_all(void);
-void z_nios2_dcache_flush_no_writeback(void *start, u32_t len);
+void z_nios2_dcache_flush_no_writeback(void *start, uint32_t len);
 #else
 #define z_nios2_dcache_flush_all() do { } while (0)
 #define z_nios2_dcache_flush_no_writeback(x, y) do { } while (0)

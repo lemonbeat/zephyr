@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nxp_lpc_mailbox
+
 #include <errno.h>
 #include <device.h>
 #include <drivers/ipm.h>
@@ -36,12 +38,12 @@ static void mcux_mailbox_isr(void *arg)
 {
 	struct device *dev = arg;
 	struct mcux_mailbox_data *data = dev->driver_data;
-	const struct mcux_mailbox_config *config = dev->config->config_info;
+	const struct mcux_mailbox_config *config = dev->config_info;
 	mailbox_cpu_id_t cpu_id;
 
 	cpu_id = MAILBOX_ID_THIS_CPU;
 
-	volatile u32_t value = MAILBOX_GetValue(config->base, cpu_id);
+	volatile uint32_t value = MAILBOX_GetValue(config->base, cpu_id);
 
 	__ASSERT(value, "spurious MAILBOX interrupt");
 
@@ -62,13 +64,13 @@ static void mcux_mailbox_isr(void *arg)
 }
 
 
-static int mcux_mailbox_ipm_send(struct device *d, int wait, u32_t id,
+static int mcux_mailbox_ipm_send(struct device *d, int wait, uint32_t id,
 			const void *data, int size)
 {
-	const struct mcux_mailbox_config *config = d->config->config_info;
+	const struct mcux_mailbox_config *config = d->config_info;
 	MAILBOX_Type *base = config->base;
-	u32_t data32[MCUX_IPM_DATA_REGS]; /* Until we change API
-					   * to u32_t array
+	uint32_t data32[MCUX_IPM_DATA_REGS]; /* Until we change API
+					   * to uint32_t array
 					   */
 	unsigned int flags;
 	int i;
@@ -79,7 +81,7 @@ static int mcux_mailbox_ipm_send(struct device *d, int wait, u32_t id,
 		return -EINVAL;
 	}
 
-	if (size > MCUX_IPM_DATA_REGS * sizeof(u32_t)) {
+	if (size > MCUX_IPM_DATA_REGS * sizeof(uint32_t)) {
 		return -EMSGSIZE;
 	}
 
@@ -102,11 +104,11 @@ static int mcux_mailbox_ipm_max_data_size_get(struct device *d)
 {
 	ARG_UNUSED(d);
 	/* Only a single 32-bit register available */
-	return MCUX_IPM_DATA_REGS*sizeof(u32_t);
+	return MCUX_IPM_DATA_REGS*sizeof(uint32_t);
 }
 
 
-static u32_t mcux_mailbox_ipm_max_id_val_get(struct device *d)
+static uint32_t mcux_mailbox_ipm_max_id_val_get(struct device *d)
 {
 	ARG_UNUSED(d);
 	/* Only a single instance of MAILBOX available for this platform */
@@ -133,7 +135,7 @@ static int mcux_mailbox_ipm_set_enabled(struct device *d, int enable)
 
 static int mcux_mailbox_init(struct device *dev)
 {
-	const struct mcux_mailbox_config *config = dev->config->config_info;
+	const struct mcux_mailbox_config *config = dev->config_info;
 
 	MAILBOX_Init(config->base);
 	config->irq_config_func(dev);
@@ -154,13 +156,13 @@ static const struct ipm_driver_api mcux_mailbox_driver_api = {
 static void mcux_mailbox_config_func_0(struct device *dev);
 
 static const struct mcux_mailbox_config mcux_mailbox_0_config = {
-	.base = (MAILBOX_Type *)DT_MAILBOX_MCUX_MAILBOX_0_BASE_ADDRESS,
+	.base = (MAILBOX_Type *)DT_INST_REG_ADDR(0),
 	.irq_config_func = mcux_mailbox_config_func_0,
 };
 
 static struct mcux_mailbox_data mcux_mailbox_0_data;
 
-DEVICE_AND_API_INIT(mailbox_0, DT_MAILBOX_MCUX_MAILBOX_0_NAME,
+DEVICE_AND_API_INIT(mailbox_0, DT_INST_LABEL(0),
 		    &mcux_mailbox_init,
 		    &mcux_mailbox_0_data, &mcux_mailbox_0_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
@@ -169,9 +171,9 @@ DEVICE_AND_API_INIT(mailbox_0, DT_MAILBOX_MCUX_MAILBOX_0_NAME,
 
 static void mcux_mailbox_config_func_0(struct device *dev)
 {
-	IRQ_CONNECT(DT_MAILBOX_MCUX_MAILBOX_0_IRQ,
-		    DT_MAILBOX_MCUX_MAILBOX_0_IRQ_PRI,
+	IRQ_CONNECT(DT_INST_IRQN(0),
+		    DT_INST_IRQ(0, priority),
 		    mcux_mailbox_isr, DEVICE_GET(mailbox_0), 0);
 
-	irq_enable(DT_MAILBOX_MCUX_MAILBOX_0_IRQ);
+	irq_enable(DT_INST_IRQN(0));
 }

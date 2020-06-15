@@ -42,21 +42,21 @@ struct mcast_filter_mapping *can_get_mcast_filter(struct net_can_context *ctx,
 	return NULL;
 }
 
-static inline u8_t can_get_frame_datalength(struct zcan_frame *frame)
+static inline uint8_t can_get_frame_datalength(struct zcan_frame *frame)
 {
 	/* TODO: Needs update when CAN FD support is added */
 	return frame->dlc;
 }
 
-static inline u16_t can_get_lladdr_src(struct zcan_frame *frame)
+static inline uint16_t can_get_lladdr_src(struct zcan_frame *frame)
 {
 	return (frame->ext_id >> CAN_NET_IF_ADDR_SRC_POS) &
 	       CAN_NET_IF_ADDR_MASK;
 }
 
-static inline u16_t can_get_lladdr_dest(struct zcan_frame *frame)
+static inline uint16_t can_get_lladdr_dest(struct zcan_frame *frame)
 {
-	u16_t addr = (frame->ext_id >> CAN_NET_IF_ADDR_DEST_POS) &
+	uint16_t addr = (frame->ext_id >> CAN_NET_IF_ADDR_DEST_POS) &
 		     CAN_NET_IF_ADDR_MASK;
 
 	if (frame->ext_id & CAN_NET_IF_ADDR_MCAST_MASK) {
@@ -78,18 +78,18 @@ static inline void can_set_lladdr(struct net_pkt *pkt, struct zcan_frame *frame)
 	net_pkt_lladdr_dst(pkt)->len = sizeof(struct net_canbus_lladdr);
 	net_pkt_lladdr_dst(pkt)->type = NET_LINK_CANBUS;
 	net_buf_add_be16(buf, can_get_lladdr_dest(frame));
-	net_buf_pull(buf, sizeof(u16_t));
+	net_buf_pull(buf, sizeof(uint16_t));
 
 	/* Do the same as above for the source address */
 	net_pkt_lladdr_src(pkt)->addr = buf->data;
 	net_pkt_lladdr_src(pkt)->len = sizeof(struct net_canbus_lladdr);
 	net_pkt_lladdr_src(pkt)->type = NET_LINK_CANBUS;
 	net_buf_add_be16(buf, can_get_lladdr_src(frame));
-	net_buf_pull(buf, sizeof(u16_t));
+	net_buf_pull(buf, sizeof(uint16_t));
 }
 
 static int net_can_send(struct device *dev, const struct zcan_frame *frame,
-			can_tx_callback_t cb, void *cb_arg, s32_t timeout)
+			can_tx_callback_t cb, void *cb_arg, k_timeout_t timeout)
 {
 	struct net_can_context *ctx = dev->driver_data;
 
@@ -149,7 +149,7 @@ static inline int attach_mcast_filter(struct net_can_context *ctx,
 		.ext_id_mask = CAN_NET_IF_ADDR_MCAST_MASK |
 			       CAN_NET_IF_ADDR_DEST_MASK
 	};
-	const u16_t group =
+	const uint16_t group =
 		sys_be16_to_cpu(UNALIGNED_GET((&addr->s6_addr16[7])));
 	int filter_id;
 
@@ -243,8 +243,8 @@ static inline int can_attach_unicast_filter(struct net_can_context *ctx)
 		.rtr_mask = 1,
 		.ext_id_mask = CAN_NET_IF_ADDR_DEST_MASK
 	};
-	const u8_t *link_addr = net_if_get_link_addr(ctx->iface)->addr;
-	const u16_t dest = sys_be16_to_cpu(UNALIGNED_GET((u16_t *) link_addr));
+	const uint8_t *link_addr = net_if_get_link_addr(ctx->iface)->addr;
+	const uint16_t dest = sys_be16_to_cpu(UNALIGNED_GET((uint16_t *) link_addr));
 	int filter_id;
 
 	filter.ext_id = (dest << CAN_NET_IF_ADDR_DEST_POS);
@@ -372,8 +372,10 @@ static struct net_can_api net_can_api_inst = {
 
 static int net_can_init(struct device *dev)
 {
-	struct device *can_dev = device_get_binding(DT_ALIAS_CAN_PRIMARY_LABEL);
+	struct device *can_dev;
 	struct net_can_context *ctx = dev->driver_data;
+
+	can_dev = device_get_binding(DT_CHOSEN_ZEPHYR_CAN_PRIMARY_LABEL);
 
 	ctx->recv_filter_id = CAN_NET_FILTER_NOT_SET;
 #ifdef CONFIG_NET_L2_CANBUS_ETH_TRANSLATOR
@@ -383,12 +385,12 @@ static int net_can_init(struct device *dev)
 
 	if (!can_dev) {
 		NET_ERR("Can't get binding to CAN device %s",
-			DT_ALIAS_CAN_PRIMARY_LABEL);
+			DT_CHOSEN_ZEPHYR_CAN_PRIMARY_LABEL);
 		return -EIO;
 	}
 
 	NET_DBG("Init net CAN device %p (%s) for dev %p (%s)",
-		dev, dev->config->name, can_dev, can_dev->config->name);
+		dev, dev->name, can_dev, can_dev->name);
 
 	ctx->can_dev = can_dev;
 
@@ -398,7 +400,7 @@ static int net_can_init(struct device *dev)
 static struct net_can_context net_can_context_1;
 
 NET_DEVICE_INIT(net_can_1, CONFIG_CAN_NET_NAME, net_can_init,
-		&net_can_context_1, NULL,
+		device_pm_control_nop, &net_can_context_1, NULL,
 		CONFIG_CAN_NET_INIT_PRIORITY,
 		&net_can_api_inst,
 		CANBUS_L2, NET_L2_GET_CTX_TYPE(CANBUS_L2), NET_CAN_MTU);

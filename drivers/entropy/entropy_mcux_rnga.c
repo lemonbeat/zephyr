@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#define DT_DRV_COMPAT nxp_kinetis_rnga
+
 #include <device.h>
 #include <drivers/entropy.h>
 #include <random/rand32.h>
@@ -11,10 +13,10 @@
 
 #include "fsl_rnga.h"
 
-static u8_t entropy_mcux_rnga_get_uint8(void)
+static uint8_t entropy_mcux_rnga_get_uint8(void)
 {
-	u32_t random;
-	u8_t output = 0U;
+	uint32_t random;
+	uint8_t output = 0U;
 	int i;
 
 	RNGA_SetMode(RNG, kRNGA_ModeNormal);
@@ -36,8 +38,8 @@ static u8_t entropy_mcux_rnga_get_uint8(void)
 	return output;
 }
 
-static int entropy_mcux_rnga_get_entropy(struct device *dev, u8_t *buffer,
-					u16_t length)
+static int entropy_mcux_rnga_get_entropy(struct device *dev, uint8_t *buffer,
+					uint16_t length)
 {
 	int i;
 
@@ -56,14 +58,14 @@ static const struct entropy_driver_api entropy_mcux_rnga_api_funcs = {
 
 static int entropy_mcux_rnga_init(struct device *);
 
-DEVICE_AND_API_INIT(entropy_mcux_rnga, CONFIG_ENTROPY_NAME,
+DEVICE_AND_API_INIT(entropy_mcux_rnga, DT_INST_LABEL(0),
 		    entropy_mcux_rnga_init, NULL, NULL,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_mcux_rnga_api_funcs);
 
 static int entropy_mcux_rnga_init(struct device *dev)
 {
-	u32_t seed = k_cycle_get_32();
+	uint32_t seed = k_cycle_get_32();
 
 	ARG_UNUSED(dev);
 

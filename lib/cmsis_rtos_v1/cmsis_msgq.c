@@ -43,7 +43,8 @@ osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec)
 	} else if (millisec == osWaitForever) {
 		retval = k_msgq_put(queue_def->msgq, (void *)&info, K_FOREVER);
 	} else {
-		retval = k_msgq_put(queue_def->msgq, (void *)&info, millisec);
+		retval = k_msgq_put(queue_def->msgq, (void *)&info,
+				    K_MSEC(millisec));
 	}
 
 	if (retval == 0) {
@@ -61,7 +62,7 @@ osStatus osMessagePut(osMessageQId queue_id, uint32_t info, uint32_t millisec)
 osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec)
 {
 	osMessageQDef_t *queue_def = (osMessageQDef_t *)queue_id;
-	u32_t info;
+	uint32_t info;
 	osEvent evt = {0};
 	int retval;
 
@@ -75,7 +76,7 @@ osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec)
 	} else if (millisec == osWaitForever) {
 		retval = k_msgq_get(queue_def->msgq, &info, K_FOREVER);
 	} else {
-		retval = k_msgq_get(queue_def->msgq, &info, millisec);
+		retval = k_msgq_get(queue_def->msgq, &info, K_MSEC(millisec));
 	}
 
 	if (retval == 0) {

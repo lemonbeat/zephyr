@@ -12,7 +12,7 @@ devices labeled as Feathers or FeatherWings. The board is equipped
 with a lithium ion battery charger, native USB C connector, 2MB of
 external flash memory, and SD card socket.
 
-.. image:: img/f405feather.jpg
+.. image:: img/adafruit_feather_stm32f405.jpg
      :width: 640px
      :align: center
      :alt: Adafruit Feather STM32F405 Express
@@ -87,6 +87,9 @@ SPI Port
 
 The STM32F405 SPI2 peripheral is available on the SCK (PB13), MI
 (PB14) and MO (PB15) pins.
+
+SPI1 uses SCK (PB3), MI (PB4), MO (PB5) and SS (PA15) pins and is
+dedicated to the 2 MB SPI Flash chip.
 
 Programming and Debugging
 *************************

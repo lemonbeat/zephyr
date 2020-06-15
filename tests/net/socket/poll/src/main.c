@@ -38,7 +38,7 @@ void test_poll(void)
 	struct sockaddr_in6 s_addr;
 	struct pollfd pollfds[2];
 	struct pollfd pollout[1];
-	u32_t tstamp;
+	uint32_t tstamp;
 	ssize_t len;
 	char buf[10];
 
@@ -124,8 +124,8 @@ void test_poll(void)
 	zassert_equal(res, 0, "");
 
 	tstamp = k_uptime_get_32();
-	res = poll(pollout, ARRAY_SIZE(pollout), K_MSEC(200));
-	zassert_true(k_uptime_get_32() - tstamp < K_MSEC(100), "");
+	res = poll(pollout, ARRAY_SIZE(pollout), 200);
+	zassert_true(k_uptime_get_32() - tstamp < 100, "");
 	zassert_equal(res, 1, "");
 	zassert_equal(pollout[0].revents, POLLOUT, "");
 
@@ -146,8 +146,8 @@ void test_poll(void)
 	zassert_equal(res, 0, "");
 
 	tstamp = k_uptime_get_32();
-	res = poll(pollout, ARRAY_SIZE(pollout), K_MSEC(200));
-	zassert_true(k_uptime_get_32() - tstamp < K_MSEC(100), "");
+	res = poll(pollout, ARRAY_SIZE(pollout), 200);
+	zassert_true(k_uptime_get_32() - tstamp < 100, "");
 	zassert_equal(res, 1, "");
 	zassert_equal(pollout[0].revents, POLLOUT, "");
 

@@ -50,7 +50,7 @@ static int eswifi_off_listen(struct net_context *context, int backlog)
 	__select_socket(eswifi, socket->index);
 
 	/* Set backlog */
-	snprintf(eswifi->buf, sizeof(eswifi->buf), "P8=%d\r", backlog);
+	snprintk(eswifi->buf, sizeof(eswifi->buf), "P8=%d\r", backlog);
 	err = eswifi_at_cmd(eswifi, eswifi->buf);
 	if (err < 0) {
 		LOG_ERR("Unable to start set listen backlog");
@@ -100,7 +100,7 @@ static int eswifi_off_connect(struct net_context *context,
 			      const struct sockaddr *addr,
 			      socklen_t addrlen,
 			      net_context_connect_cb_t cb,
-			      s32_t timeout,
+			      int32_t timeout,
 			      void *user_data)
 {
 	struct eswifi_off_socket *socket = context->offload_context;
@@ -126,7 +126,7 @@ static int eswifi_off_connect(struct net_context *context,
 	socket->conn_cb = cb;
 	socket->state = ESWIFI_SOCKET_STATE_CONNECTING;
 
-	if (timeout == K_NO_WAIT) {
+	if (timeout == 0) {
 		/* async */
 		k_work_submit_to_queue(&eswifi->work_q, &socket->connect_work);
 		eswifi_unlock(eswifi);
@@ -150,7 +150,7 @@ static int eswifi_off_connect(struct net_context *context,
 }
 
 static int eswifi_off_accept(struct net_context *context,
-			     net_tcp_accept_cb_t cb, s32_t timeout,
+			     net_tcp_accept_cb_t cb, int32_t timeout,
 			     void *user_data)
 {
 	struct eswifi_off_socket *socket = context->offload_context;
@@ -171,11 +171,11 @@ static int eswifi_off_accept(struct net_context *context,
 
 	eswifi_unlock(eswifi);
 
-	if (timeout == K_NO_WAIT) {
+	if (timeout == 0) {
 		return 0;
 	}
 
-	return k_sem_take(&socket->accept_sem, timeout);
+	return k_sem_take(&socket->accept_sem, K_MSEC(timeout));
 }
 
 static int __eswifi_off_send_pkt(struct eswifi_dev *eswifi,
@@ -196,7 +196,7 @@ static int __eswifi_off_send_pkt(struct eswifi_dev *eswifi,
 	__select_socket(eswifi, socket->index);
 
 	/* header */
-	snprintf(eswifi->buf, sizeof(eswifi->buf), "S3=%u\r", bytes);
+	snprintk(eswifi->buf, sizeof(eswifi->buf), "S3=%u\r", bytes);
 	offset = strlen(eswifi->buf);
 
 	/* copy payload */
@@ -248,7 +248,7 @@ static void eswifi_off_send_work(struct k_work *work)
 
 static int eswifi_off_send(struct net_pkt *pkt,
 			   net_context_send_cb_t cb,
-			   s32_t timeout,
+			   int32_t timeout,
 			   void *user_data)
 {
 	struct eswifi_off_socket *socket = pkt->context->offload_context;
@@ -270,7 +270,7 @@ static int eswifi_off_send(struct net_pkt *pkt,
 	}
 	socket->tx_pkt = pkt;
 
-	if (timeout == K_NO_WAIT) {
+	if (timeout == 0) {
 		socket->send_data = user_data;
 		socket->send_cb = cb;
 
@@ -297,7 +297,7 @@ static int eswifi_off_sendto(struct net_pkt *pkt,
 			     const struct sockaddr *dst_addr,
 			     socklen_t addrlen,
 			     net_context_send_cb_t cb,
-			     s32_t timeout,
+			     int32_t timeout,
 			     void *user_data)
 {
 	struct eswifi_off_socket *socket = pkt->context->offload_context;
@@ -326,7 +326,7 @@ static int eswifi_off_sendto(struct net_pkt *pkt,
 		socket->state = ESWIFI_SOCKET_STATE_CONNECTED;
 	}
 
-	if (timeout == K_NO_WAIT) {
+	if (timeout == 0) {
 		socket->send_data = user_data;
 		socket->send_cb = cb;
 
@@ -351,7 +351,7 @@ static int eswifi_off_sendto(struct net_pkt *pkt,
 
 static int eswifi_off_recv(struct net_context *context,
 			   net_context_recv_cb_t cb,
-			   s32_t timeout,
+			   int32_t timeout,
 			   void *user_data)
 {
 	struct eswifi_off_socket *socket = context->offload_context;
@@ -367,11 +367,11 @@ static int eswifi_off_recv(struct net_context *context,
 	k_sem_reset(&socket->read_sem);
 	eswifi_unlock(eswifi);
 
-	if (timeout == K_NO_WAIT) {
+	if (timeout == 0) {
 		return 0;
 	}
 
-	err = k_sem_take(&socket->read_sem, timeout);
+	err = k_sem_take(&socket->read_sem, K_MSEC(timeout));
 
 	/* Unregister cakkback */
 	eswifi_lock(eswifi);
@@ -447,8 +447,8 @@ void eswifi_offload_async_msg(struct eswifi_dev *eswifi, char *msg, size_t len)
 	if (!strncmp(msg, msg_tcp_accept, sizeof(msg_tcp_accept) - 1)) {
 		struct eswifi_off_socket *socket = NULL;
 		struct in_addr *sin_addr;
-		u8_t ip[4];
-		u16_t port = 0;
+		uint8_t ip[4];
+		uint16_t port = 0;
 		char *str;
 		int i = 0;
 
@@ -484,10 +484,18 @@ void eswifi_offload_async_msg(struct eswifi_dev *eswifi, char *msg, size_t len)
 			return;
 		}
 
-		sin_addr = &net_sin(&socket->peer_addr)->sin_addr;
+		struct sockaddr_in *peer = net_sin(&socket->peer_addr);
+
+		sin_addr = &peer->sin_addr;
 		memcpy(&sin_addr->s4_addr, ip, 4);
+		peer->sin_port = htons(port);
 		socket->state = ESWIFI_SOCKET_STATE_CONNECTED;
 		socket->usage++;
+
+		/* Save information about remote. */
+		socket->context->flags |= NET_CONTEXT_REMOTE_ADDR_SET;
+		memcpy(&socket->context->remote, &socket->peer_addr,
+		       sizeof(struct sockaddr));
 
 		LOG_DBG("%u.%u.%u.%u connected to port %u",
 			ip[0], ip[1], ip[2], ip[3], port);

@@ -20,8 +20,8 @@ static struct acpi_madt *madt;
 
 static bool validate_checksum(void *buf, int len)
 {
-	u8_t *cp = buf;
-	u8_t checksum = 0;
+	uint8_t *cp = buf;
+	uint8_t checksum = 0;
 
 	while (len--) {
 		checksum += *(cp++);
@@ -45,15 +45,15 @@ void z_acpi_init(void)
 	struct acpi_rsdp *rsdp = NULL;
 
 	static const struct {
-		u32_t base;
-		u32_t top;
+		uintptr_t base;
+		uintptr_t top;
 	} area[] = {
 		{ 0x000E0000, 0x00100000 },	/* BIOS ROM */
 		{ 0, 0 }
 	};
 
 	for (int i = 0; area[i].base && area[i].top && !rsdp; ++i) {
-		u32_t addr = area[i].base;
+		uintptr_t addr = area[i].base;
 
 		while (addr < area[i].top) {
 			struct acpi_rsdp *probe = UINT_TO_POINTER(addr);
@@ -88,7 +88,7 @@ void z_acpi_init(void)
 	 * If it's valid, then remember it for later.
 	 */
 
-	int nr_sdts = (rsdt->sdt.length - sizeof(rsdt)) / sizeof(u32_t);
+	int nr_sdts = (rsdt->sdt.length - sizeof(rsdt)) / sizeof(uint32_t);
 	for (int i = 0; i < nr_sdts; ++i) {
 		struct acpi_sdt *sdt = UINT_TO_POINTER(rsdt->sdts[i]);
 
@@ -106,8 +106,8 @@ void z_acpi_init(void)
 
 struct acpi_cpu *z_acpi_get_cpu(int n)
 {
-	u32_t base = POINTER_TO_UINT(madt);
-	u32_t offset;
+	uintptr_t base = POINTER_TO_UINT(madt);
+	uintptr_t offset;
 
 	if (madt) {
 		offset = POINTER_TO_UINT(madt->entries) - base;

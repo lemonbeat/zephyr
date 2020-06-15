@@ -16,7 +16,7 @@ LOG_MODULE_REGISTER(conn_mgr, CONFIG_NET_CONNECTION_MANAGER_LOG_LEVEL);
 
 #include <conn_mgr.h>
 
-u16_t iface_states[CONN_MGR_IFACE_MAX];
+uint16_t iface_states[CONN_MGR_IFACE_MAX];
 
 K_SEM_DEFINE(conn_mgr_lock, 1, UINT_MAX);
 
@@ -172,7 +172,7 @@ static void conn_mgr(void)
 
 K_THREAD_DEFINE(conn_mgr_thread, CONFIG_NET_CONNECTION_MANAGER_STACK_SIZE,
 		(k_thread_entry_t)conn_mgr, NULL, NULL, NULL,
-		K_PRIO_COOP(2), 0, K_NO_WAIT);
+		K_PRIO_COOP(2), 0, 0);
 
 void net_conn_mgr_resend_status(void)
 {

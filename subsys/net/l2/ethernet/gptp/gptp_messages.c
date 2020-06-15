@@ -174,7 +174,7 @@ static struct net_pkt *setup_gptp_frame(struct net_if *iface,
 	net_pkt_lladdr_src(pkt)->addr = net_if_get_link_addr(iface)->addr;
 	net_pkt_lladdr_src(pkt)->len = net_if_get_link_addr(iface)->len;
 
-	net_pkt_lladdr_dst(pkt)->addr = (u8_t *)&gptp_multicast_eth_addr;
+	net_pkt_lladdr_dst(pkt)->addr = (uint8_t *)&gptp_multicast_eth_addr;
 	net_pkt_lladdr_dst(pkt)->len = sizeof(struct net_eth_addr);
 
 	return pkt;
@@ -595,8 +595,8 @@ void gptp_handle_sync(int port, struct net_pkt *pkt)
 	struct gptp_sync_rcv_state *state;
 	struct gptp_port_ds *port_ds;
 	struct gptp_hdr *hdr;
-	u64_t upstream_sync_itv;
-	s32_t duration;
+	uint64_t upstream_sync_itv;
+	k_timeout_t duration;
 
 	state = &GPTP_PORT_STATE(port)->sync_rcv;
 	port_ds = GPTP_PORT_DS(port);
@@ -605,7 +605,7 @@ void gptp_handle_sync(int port, struct net_pkt *pkt)
 	upstream_sync_itv = NSEC_PER_SEC * GPTP_POW2(hdr->log_msg_interval);
 
 	/* Convert ns to ms. */
-	duration = (upstream_sync_itv / 1000000U);
+	duration = K_MSEC((upstream_sync_itv / 1000000U));
 
 	/* Start timeout timer. */
 	k_timer_start(&state->follow_up_discard_timer, duration, K_NO_WAIT);

@@ -19,7 +19,7 @@ int mpu6050_trigger_set(struct device *dev,
 			sensor_trigger_handler_t handler)
 {
 	struct mpu6050_data *drv_data = dev->driver_data;
-	const struct mpu6050_config *cfg = dev->config->config_info;
+	const struct mpu6050_config *cfg = dev->config_info;
 
 	if (trig->type != SENSOR_TRIG_DATA_READY) {
 		return -ENOTSUP;
@@ -42,11 +42,11 @@ int mpu6050_trigger_set(struct device *dev,
 }
 
 static void mpu6050_gpio_callback(struct device *dev,
-				  struct gpio_callback *cb, u32_t pins)
+				  struct gpio_callback *cb, uint32_t pins)
 {
 	struct mpu6050_data *drv_data =
 		CONTAINER_OF(cb, struct mpu6050_data, gpio_cb);
-	const struct mpu6050_config *cfg = drv_data->dev->config->config_info;
+	const struct mpu6050_config *cfg = drv_data->dev->config_info;
 
 	ARG_UNUSED(pins);
 
@@ -64,7 +64,7 @@ static void mpu6050_thread_cb(void *arg)
 {
 	struct device *dev = arg;
 	struct mpu6050_data *drv_data = dev->driver_data;
-	const struct mpu6050_config *cfg = dev->config->config_info;
+	const struct mpu6050_config *cfg = dev->config_info;
 
 	if (drv_data->data_ready_handler != NULL) {
 		drv_data->data_ready_handler(dev,
@@ -104,7 +104,7 @@ static void mpu6050_work_cb(struct k_work *work)
 int mpu6050_init_interrupt(struct device *dev)
 {
 	struct mpu6050_data *drv_data = dev->driver_data;
-	const struct mpu6050_config *cfg = dev->config->config_info;
+	const struct mpu6050_config *cfg = dev->config_info;
 
 	/* setup data ready gpio interrupt */
 	drv_data->gpio = device_get_binding(cfg->int_label);

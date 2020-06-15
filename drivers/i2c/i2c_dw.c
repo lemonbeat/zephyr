@@ -37,10 +37,10 @@ LOG_MODULE_REGISTER(i2c_dw);
 static inline void i2c_dw_data_ask(struct device *dev)
 {
 	struct i2c_dw_dev_config * const dw = dev->driver_data;
-	u32_t data;
-	u8_t tx_empty;
-	s8_t rx_empty;
-	u8_t cnt;
+	uint32_t data;
+	uint8_t tx_empty;
+	int8_t rx_empty;
+	uint8_t cnt;
 
 	volatile struct i2c_dw_registers * const regs = dw->regs;
 
@@ -120,7 +120,7 @@ static void i2c_dw_data_read(struct device *dev)
 static int i2c_dw_data_send(struct device *dev)
 {
 	struct i2c_dw_dev_config * const dw = dev->driver_data;
-	u32_t data = 0U;
+	uint32_t data = 0U;
 
 	volatile struct i2c_dw_registers * const regs = dw->regs;
 
@@ -164,7 +164,7 @@ static int i2c_dw_data_send(struct device *dev)
 static inline void i2c_dw_transfer_complete(struct device *dev)
 {
 	struct i2c_dw_dev_config * const dw = dev->driver_data;
-	u32_t value;
+	uint32_t value;
 
 	volatile struct i2c_dw_registers * const regs = dw->regs;
 
@@ -179,7 +179,7 @@ static void i2c_dw_isr(void *arg)
 	struct device *port = (struct device *)arg;
 	struct i2c_dw_dev_config * const dw = port->driver_data;
 	union ic_interrupt_register intr_stat;
-	u32_t value;
+	uint32_t value;
 	int ret = 0;
 
 	volatile struct i2c_dw_registers * const regs = dw->regs;
@@ -255,10 +255,10 @@ done:
 }
 
 
-static int i2c_dw_setup(struct device *dev, u16_t slave_address)
+static int i2c_dw_setup(struct device *dev, uint16_t slave_address)
 {
 	struct i2c_dw_dev_config * const dw = dev->driver_data;
-	u32_t value;
+	uint32_t value;
 	union ic_con_register ic_con;
 	volatile struct i2c_dw_registers * const regs = dw->regs;
 
@@ -378,13 +378,13 @@ static int i2c_dw_setup(struct device *dev, u16_t slave_address)
 }
 
 static int i2c_dw_transfer(struct device *dev,
-			   struct i2c_msg *msgs, u8_t num_msgs,
-			   u16_t slave_address)
+			   struct i2c_msg *msgs, uint8_t num_msgs,
+			   uint16_t slave_address)
 {
 	struct i2c_dw_dev_config * const dw = dev->driver_data;
 	struct i2c_msg *cur_msg = msgs;
-	u8_t msg_left = num_msgs;
-	u8_t pflags;
+	uint8_t msg_left = num_msgs;
+	uint8_t pflags;
 	int ret;
 
 	volatile struct i2c_dw_registers * const regs = dw->regs;
@@ -489,11 +489,11 @@ static int i2c_dw_transfer(struct device *dev,
 	return ret;
 }
 
-static int i2c_dw_runtime_configure(struct device *dev, u32_t config)
+static int i2c_dw_runtime_configure(struct device *dev, uint32_t config)
 {
 	struct i2c_dw_dev_config * const dw = dev->driver_data;
-	u32_t	value = 0U;
-	u32_t	rc = 0U;
+	uint32_t	value = 0U;
+	uint32_t	rc = 0U;
 
 	volatile struct i2c_dw_registers * const regs = dw->regs;
 
@@ -600,7 +600,7 @@ static const struct i2c_driver_api funcs = {
 
 static int i2c_dw_initialize(struct device *dev)
 {
-	const struct i2c_dw_rom_config * const rom = dev->config->config_info;
+	const struct i2c_dw_rom_config * const rom = dev->config_info;
 	struct i2c_dw_dev_config * const dw = dev->driver_data;
 	volatile struct i2c_dw_registers *regs;
 
@@ -654,34 +654,34 @@ static int i2c_dw_initialize(struct device *dev)
 	return 0;
 }
 
-#if CONFIG_I2C_0
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(0), okay)
 #include <i2c_dw_port_0.h>
 #endif
 
-#if CONFIG_I2C_1
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay)
 #include <i2c_dw_port_1.h>
 #endif
 
-#if CONFIG_I2C_2
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(2), okay)
 #include <i2c_dw_port_2.h>
 #endif
 
-#if CONFIG_I2C_3
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(3), okay)
 #include <i2c_dw_port_3.h>
 #endif
 
-#if CONFIG_I2C_4
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(4), okay)
 #include <i2c_dw_port_4.h>
 #endif
 
-#if CONFIG_I2C_5
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(5), okay)
 #include <i2c_dw_port_5.h>
 #endif
 
-#if CONFIG_I2C_6
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(6), okay)
 #include <i2c_dw_port_6.h>
 #endif
 
-#if CONFIG_I2C_7
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(7), okay)
 #include <i2c_dw_port_7.h>
 #endif

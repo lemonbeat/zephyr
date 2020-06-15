@@ -11,7 +11,7 @@
 
 struct device *ipm;
 
-void ping_ipm_callback(void *context, u32_t id, volatile void *data)
+void ping_ipm_callback(void *context, uint32_t id, volatile void *data)
 {
 	ipm_send(ipm, 1, 0, (const void *)data, 4);
 }
@@ -20,7 +20,7 @@ void ping_ipm_callback(void *context, u32_t id, volatile void *data)
 
 void main(void)
 {
-	ipm = device_get_binding(DT_INST_0_NXP_LPC_MAILBOX_LABEL);
+	ipm = device_get_binding(DT_LABEL(DT_INST(0, nxp_lpc_mailbox)));
 	if (!ipm) {
 		while (1) {
 		}

@@ -22,6 +22,8 @@ LOG_MODULE_REGISTER(net_l2_openthread, CONFIG_OPENTHREAD_L2_LOG_LEVEL);
 #include <openthread/cli.h>
 #include <openthread/ip6.h>
 #include <openthread/link.h>
+#include <openthread/link_raw.h>
+#include <openthread/ncp.h>
 #include <openthread/message.h>
 #include <openthread/platform/diag.h>
 #include <openthread/tasklet.h>
@@ -36,12 +38,36 @@ LOG_MODULE_REGISTER(net_l2_openthread, CONFIG_OPENTHREAD_L2_LOG_LEVEL);
 #include "openthread_utils.h"
 
 #define OT_STACK_SIZE (CONFIG_OPENTHREAD_THREAD_STACK_SIZE)
-#define OT_PRIORITY K_PRIO_COOP(CONFIG_OPENTHREAD_THREAD_PRIORITY)
 
+#if defined(CONFIG_OPENTHREAD_THREAD_PREEMPTIVE)
+#define OT_PRIORITY K_PRIO_PREEMPT(CONFIG_OPENTHREAD_THREAD_PRIORITY)
+#else
+#define OT_PRIORITY K_PRIO_COOP(CONFIG_OPENTHREAD_THREAD_PRIORITY)
+#endif
+
+#if defined(CONFIG_OPENTHREAD_NETWORK_NAME)
 #define OT_NETWORK_NAME CONFIG_OPENTHREAD_NETWORK_NAME
+#else
+#define OT_NETWORK_NAME ""
+#endif
+
+#if defined(CONFIG_OPENTHREAD_CHANNEL)
 #define OT_CHANNEL CONFIG_OPENTHREAD_CHANNEL
+#else
+#define OT_CHANNEL 0
+#endif
+
+#if defined(CONFIG_OPENTHREAD_PANID)
 #define OT_PANID CONFIG_OPENTHREAD_PANID
+#else
+#define OT_PANID 0
+#endif
+
+#if defined(CONFIG_OPENTHREAD_XPANID)
 #define OT_XPANID CONFIG_OPENTHREAD_XPANID
+#else
+#define OT_XPANID ""
+#endif
 
 #if defined(CONFIG_OPENTHREAD_JOINER_PSKD)
 #define OT_JOINER_PSKD CONFIG_OPENTHREAD_JOINER_PSKD
@@ -81,7 +107,7 @@ k_tid_t openthread_thread_id_get(void)
 }
 
 static void ipv6_addr_event_handler(struct net_mgmt_event_callback *cb,
-				    u32_t mgmt_event, struct net_if *iface)
+				    uint32_t mgmt_event, struct net_if *iface)
 {
 	struct openthread_context *ot_context = net_if_l2_data(iface);
 
@@ -145,8 +171,8 @@ void ot_receive_handler(otMessage *aMessage, void *context)
 {
 	struct openthread_context *ot_context = context;
 
-	u16_t offset = 0U;
-	u16_t read_len;
+	uint16_t offset = 0U;
+	uint16_t read_len;
 	struct net_pkt *pkt;
 	struct net_buf *pkt_buf;
 
@@ -188,15 +214,20 @@ void ot_receive_handler(otMessage *aMessage, void *context)
 	}
 
 	if (!pkt_list_is_full(ot_context)) {
-		if (net_recv_data(ot_context->iface, pkt) < 0) {
-			NET_ERR("net_recv_data failed");
+		if (pkt_list_add(ot_context, pkt) != 0) {
+			NET_ERR("pkt_list_add failed");
 			goto out;
 		}
 
-		pkt_list_add(ot_context, pkt);
+		if (net_recv_data(ot_context->iface, pkt) < 0) {
+			NET_ERR("net_recv_data failed");
+			pkt_list_remove_first(ot_context);
+			goto out;
+		}
+
 		pkt = NULL;
 	} else {
-		NET_INFO("Pacet list is full");
+		NET_INFO("Packet list is full");
 	}
 out:
 	if (pkt) {
@@ -254,29 +285,14 @@ static enum net_verdict openthread_recv(struct net_if *iface,
 
 	NET_DBG("Got 802.15.4 packet, sending to OT");
 
-	otRadioFrame recv_frame;
-
-	recv_frame.mPsdu = net_buf_frag_last(pkt->buffer)->data;
-	/* Length inc. CRC. */
-	recv_frame.mLength = net_buf_frags_len(pkt->buffer);
-	recv_frame.mChannel = platformRadioChannelGet(ot_context->instance);
-	recv_frame.mInfo.mRxInfo.mLqi = net_pkt_ieee802154_lqi(pkt);
-	recv_frame.mInfo.mRxInfo.mRssi = net_pkt_ieee802154_rssi(pkt);
-
-
 	if (IS_ENABLED(CONFIG_OPENTHREAD_L2_DEBUG_DUMP_IPV6)) {
 		net_pkt_hexdump(pkt, "Received 802.15.4 frame");
 	}
 
-	if (IS_ENABLED(OPENTHREAD_ENABLE_DIAG) && otPlatDiagModeGet()) {
-		otPlatDiagRadioReceiveDone(ot_context->instance,
-					   &recv_frame, OT_ERROR_NONE);
-	} else {
-		otPlatRadioReceiveDone(ot_context->instance,
-				       &recv_frame, OT_ERROR_NONE);
+	if (notify_new_rx_frame(pkt) != 0) {
+		NET_ERR("Failed to queue RX packet for OpenThread");
+		return NET_DROP;
 	}
-
-	net_pkt_unref(pkt);
 
 	return NET_OK;
 }
@@ -327,6 +343,11 @@ static void openthread_start(struct openthread_context *ot_context)
 {
 	otInstance *ot_instance = ot_context->instance;
 	otError error;
+
+	if (IS_ENABLED(CONFIG_OPENTHREAD_MANUAL_START)) {
+		NET_DBG("OpenThread manual start.");
+		return;
+	}
 
 	/* Sleepy End Device specific configuration. */
 	if (IS_ENABLED(CONFIG_OPENTHREAD_MTD_SED)) {
@@ -401,13 +422,25 @@ static int openthread_init(struct net_if *iface)
 		platformShellInit(ot_context->instance);
 	}
 
-	otIp6SetEnabled(ot_context->instance, true);
+	if (IS_ENABLED(CONFIG_OPENTHREAD_NCP)) {
+		otNcpInit(ot_context->instance);
+	}
 
-	otIp6SetReceiveFilterEnabled(ot_context->instance, true);
-	otIp6SetReceiveCallback(ot_context->instance,
-				ot_receive_handler, ot_context);
-	otSetStateChangedCallback(ot_context->instance,
-				  &ot_state_changed_handler, ot_context);
+	if (IS_ENABLED(CONFIG_OPENTHREAD_RAW)) {
+		otLinkRawSetEnable(ot_context->instance, true);
+	} else {
+		otIp6SetEnabled(ot_context->instance, true);
+	}
+
+	if (!IS_ENABLED(CONFIG_OPENTHREAD_NCP)) {
+		otIp6SetReceiveFilterEnabled(ot_context->instance, true);
+		otIp6SetReceiveCallback(ot_context->instance,
+					ot_receive_handler, ot_context);
+		otSetStateChangedCallback(
+					ot_context->instance,
+					&ot_state_changed_handler,
+					ot_context);
+	}
 
 	ll_addr = net_if_get_link_addr(iface);
 
@@ -430,12 +463,41 @@ static int openthread_init(struct net_if *iface)
 
 void ieee802154_init(struct net_if *iface)
 {
+	if (IS_ENABLED(CONFIG_IEEE802154_NET_IF_NO_AUTO_START)) {
+		LOG_DBG("Interface auto start disabled.");
+		net_if_flag_set(iface, NET_IF_NO_AUTO_START);
+	}
+
 	openthread_init(iface);
 }
 
 static enum net_l2_flags openthread_flags(struct net_if *iface)
 {
 	return NET_L2_MULTICAST;
+}
+
+struct otInstance *openthread_get_default_instance(void)
+{
+	struct otInstance *instance = NULL;
+	struct net_if *iface;
+	struct openthread_context *ot_context;
+
+	iface = net_if_get_first_by_type(&NET_L2_GET_NAME(OPENTHREAD));
+	if (!iface) {
+		NET_ERR("There is no net interface for OpenThread");
+		goto exit;
+	}
+
+	ot_context = net_if_l2_data(iface);
+	if (!ot_context) {
+		NET_ERR("There is no Openthread context in net interface data");
+		goto exit;
+	}
+
+	instance = ot_context->instance;
+
+exit:
+	return instance;
 }
 
 NET_L2_INIT(OPENTHREAD_L2, openthread_recv, openthread_send,

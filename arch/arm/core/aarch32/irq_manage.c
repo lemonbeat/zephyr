@@ -61,7 +61,7 @@ int arch_irq_is_enabled(unsigned int irq)
  *
  * @return N/A
  */
-void z_arm_irq_priority_set(unsigned int irq, unsigned int prio, u32_t flags)
+void z_arm_irq_priority_set(unsigned int irq, unsigned int prio, uint32_t flags)
 {
 	/* The kernel may reserve some of the highest priority levels.
 	 * So we offset the requested priority level with the number
@@ -88,10 +88,10 @@ void z_arm_irq_priority_set(unsigned int irq, unsigned int prio, u32_t flags)
 	 * affecting performance (can still be useful on systems with a
 	 * reduced set of priorities, like Cortex-M0/M0+).
 	 */
-	__ASSERT(prio <= (BIT(DT_NUM_IRQ_PRIO_BITS) - 1),
+	__ASSERT(prio <= (BIT(NUM_IRQ_PRIO_BITS) - 1),
 		 "invalid priority %d! values must be less than %lu\n",
 		 prio - _IRQ_PRIO_OFFSET,
-		 BIT(DT_NUM_IRQ_PRIO_BITS) - (_IRQ_PRIO_OFFSET));
+		 BIT(NUM_IRQ_PRIO_BITS) - (_IRQ_PRIO_OFFSET));
 	NVIC_SetPriority((IRQn_Type)irq, prio);
 }
 
@@ -135,7 +135,7 @@ int arch_irq_is_enabled(unsigned int irq)
  *
  * @return N/A
  */
-void z_arm_irq_priority_set(unsigned int irq, unsigned int prio, u32_t flags)
+void z_arm_irq_priority_set(unsigned int irq, unsigned int prio, uint32_t flags)
 {
 	arm_gic_irq_set_priority(irq, prio, flags);
 }
@@ -181,7 +181,7 @@ void _arch_isr_direct_pm(void)
 #endif /* CONFIG_ARMV6_M_ARMV8_M_BASELINE */
 
 	if (_kernel.idle) {
-		s32_t idle_val = _kernel.idle;
+		int32_t idle_val = _kernel.idle;
 
 		_kernel.idle = 0;
 		z_sys_power_save_idle_exit(idle_val);
@@ -258,7 +258,7 @@ int irq_target_state_is_secure(unsigned int irq)
 #ifdef CONFIG_DYNAMIC_INTERRUPTS
 int arch_irq_connect_dynamic(unsigned int irq, unsigned int priority,
 			     void (*routine)(void *parameter), void *parameter,
-			     u32_t flags)
+			     uint32_t flags)
 {
 	z_isr_install(irq, routine, parameter);
 	z_arm_irq_priority_set(irq, priority, flags);
@@ -268,7 +268,7 @@ int arch_irq_connect_dynamic(unsigned int irq, unsigned int priority,
 #ifdef CONFIG_DYNAMIC_DIRECT_INTERRUPTS
 static inline void z_arm_irq_dynamic_direct_isr_dispatch(void)
 {
-	u32_t irq = __get_IPSR() - 16;
+	uint32_t irq = __get_IPSR() - 16;
 
 	if (irq < IRQ_TABLE_SIZE) {
 		struct _isr_table_entry *isr_entry = &_sw_isr_table[irq];

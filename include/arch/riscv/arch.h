@@ -26,7 +26,7 @@
 #include <devicetree.h>
 
 /* stacks, for RISCV architecture stack should be 16byte-aligned */
-#define STACK_ALIGN  16
+#define ARCH_STACK_PTR_ALIGN  16
 
 #ifdef CONFIG_64BIT
 #define RV_OP_LOADREG ld
@@ -40,13 +40,24 @@
 #define RV_REGSHIFT 2
 #endif
 
+#ifdef CONFIG_CPU_HAS_FPU_DOUBLE_PRECISION
+#define RV_OP_LOADFPREG fld
+#define RV_OP_STOREFPREG fsd
+#else
+#define RV_OP_LOADFPREG flw
+#define RV_OP_STOREFPREG fsw
+#endif
+
 /* Common mstatus bits. All supported cores today have the same
  * layouts.
  */
 
-#define MSTATUS_IEN	(1UL << 3)
-#define MSTATUS_MPP_M	(3UL << 11)
+#define MSTATUS_IEN     (1UL << 3)
+#define MSTATUS_MPP_M   (3UL << 11)
 #define MSTATUS_MPIE_EN (1UL << 7)
+#define MSTATUS_FS_INIT (1UL << 13)
+#define MSTATUS_FS_MASK ((1UL << 13) | (1UL << 14))
+
 
 /* This comes from openisa_rv32m1, but doesn't seem to hurt on other
  * platforms:
@@ -65,8 +76,7 @@
 extern "C" {
 #endif
 
-#define STACK_ROUND_UP(x) ROUND_UP(x, STACK_ALIGN)
-#define STACK_ROUND_DOWN(x) ROUND_DOWN(x, STACK_ALIGN)
+#define STACK_ROUND_UP(x) ROUND_UP(x, ARCH_STACK_PTR_ALIGN)
 
 /* macros convert value of its argument to a string */
 #define DO_TOSTR(s) #s
@@ -80,7 +90,7 @@ extern "C" {
  * SOC-specific function to get the IRQ number generating the interrupt.
  * __soc_get_irq returns a bitfield of pending IRQs.
  */
-extern u32_t __soc_get_irq(void);
+extern uint32_t __soc_get_irq(void);
 
 void arch_irq_enable(unsigned int irq);
 void arch_irq_disable(unsigned int irq);
@@ -90,17 +100,15 @@ void z_irq_spurious(void *unused);
 
 #if defined(CONFIG_RISCV_HAS_PLIC)
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-({ \
+{ \
 	Z_ISR_DECLARE(irq_p, 0, isr_p, isr_param_p); \
 	arch_irq_priority_set(irq_p, priority_p); \
-	irq_p; \
-})
+}
 #else
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-({ \
+{ \
 	Z_ISR_DECLARE(irq_p, 0, isr_p, isr_param_p); \
-	irq_p; \
-})
+}
 #endif
 
 /*
@@ -152,9 +160,9 @@ static ALWAYS_INLINE void arch_nop(void)
 	__asm__ volatile("nop");
 }
 
-extern u32_t z_timer_cycle_get_32(void);
+extern uint32_t z_timer_cycle_get_32(void);
 
-static inline u32_t arch_k_cycle_get_32(void)
+static inline uint32_t arch_k_cycle_get_32(void)
 {
 	return z_timer_cycle_get_32();
 }

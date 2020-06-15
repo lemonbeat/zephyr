@@ -24,7 +24,7 @@ K_TIMER_DEFINE(inherit_timer, dummy_start, dummy_end);
 K_MSGQ_DEFINE(inherit_msgq, MSG_Q_SIZE, MSG_Q_MAX_NUM_MSGS, MSG_Q_ALIGN);
 struct k_thread test_1_tid;
 
-u8_t MEM_DOMAIN_ALIGNMENT inherit_buf[MEM_REGION_ALLOC]; /* for mem domain */
+uint8_t MEM_DOMAIN_ALIGNMENT inherit_buf[MEM_REGION_ALLOC]; /* for mem domain */
 
 K_MEM_PARTITION_DEFINE(inherit_memory_partition,
 		       inherit_buf,
@@ -39,9 +39,9 @@ struct k_mem_partition *inherit_memory_partition_array[] = {
 struct k_mem_domain inherit_mem_domain;
 
 /* generic function to do check the access permissions. */
-void access_test(void)
+static void access_test(void)
 {
-	u32_t msg_q_data = 0xA5A5;
+	uint32_t msg_q_data = 0xA5A5;
 
 	/* check for all accesses  */
 	k_sem_give(&inherit_sem);
@@ -52,16 +52,15 @@ void access_test(void)
 	inherit_buf[10] = 0xA5;
 }
 
-void test_thread_1_for_user(void *p1, void *p2, void *p3)
+static void test_thread_1_for_user(void *p1, void *p2, void *p3)
 {
 	access_test();
 	ztest_test_pass();
 }
 
-void test_thread_1_for_SU(void *p1, void *p2, void *p3)
+static void test_thread_1_for_SU(void *p1, void *p2, void *p3)
 {
-	valid_fault = false;
-	USERSPACE_BARRIER;
+	set_fault_valid(false);
 
 	access_test();
 
@@ -99,5 +98,5 @@ void test_permission_inheritance(void *p1, void *p2, void *p3)
 			NULL, NULL, NULL,
 			0, K_INHERIT_PERMS, K_NO_WAIT);
 
-	k_sem_take(&sync_sem, SYNC_SEM_TIMEOUT);
+	k_thread_join(&test_1_tid, K_FOREVER);
 }

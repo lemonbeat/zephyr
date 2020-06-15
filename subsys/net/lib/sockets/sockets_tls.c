@@ -55,17 +55,17 @@ struct sec_tag_list {
 /** Timer context for DTLS. */
 struct dtls_timing_context {
 	/** Current time, stored during timer set. */
-	u32_t snapshot;
+	uint32_t snapshot;
 
 	/** Intermediate delay value. For details, refer to mbedTLS API
 	 *  documentation (mbedtls_ssl_set_timer_t).
 	 */
-	u32_t int_ms;
+	uint32_t int_ms;
 
 	/** Final delay value. For details, refer to mbedTLS API documentation
 	 *  (mbedtls_ssl_set_timer_t).
 	 */
-	u32_t fin_ms;
+	uint32_t fin_ms;
 };
 
 /** TLS context information. */
@@ -98,10 +98,10 @@ struct tls_context {
 		bool is_hostname_set;
 
 		/** Peer verification level. */
-		s8_t verify_level;
+		int8_t verify_level;
 
 		/** DTLS role, client by default. */
-		s8_t role;
+		int8_t role;
 	} options;
 
 #if defined(CONFIG_NET_SOCKETS_ENABLE_DTLS)
@@ -185,11 +185,11 @@ static int tls_entropy_func(void *ctx, unsigned char *buf, size_t len)
 	ARG_UNUSED(ctx);
 
 	size_t i = len / 4;
-	u32_t val;
+	uint32_t val;
 
 	while (i--) {
 		val = sys_rand32_get();
-		UNALIGNED_PUT(val, (u32_t *)buf);
+		UNALIGNED_PUT(val, (uint32_t *)buf);
 		buf += 4;
 	}
 
@@ -260,7 +260,7 @@ static int tls_init(struct device *unused)
 	struct device *dev = NULL;
 
 #if defined(CONFIG_ENTROPY_HAS_DRIVER)
-	dev = device_get_binding(CONFIG_ENTROPY_NAME);
+	dev = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
 
 	if (!dev) {
 		NET_ERR("Failed to obtain entropy device");
@@ -399,9 +399,9 @@ static int tls_release(struct tls_context *tls)
 	return 0;
 }
 
-static inline int time_left(u32_t start, u32_t timeout)
+static inline int time_left(uint32_t start, uint32_t timeout)
 {
-	u32_t elapsed = k_uptime_get_32() - start;
+	uint32_t elapsed = k_uptime_get_32() - start;
 
 	return timeout - elapsed;
 }
@@ -475,13 +475,15 @@ static int dtls_tx(void *ctx, const unsigned char *buf, size_t len)
 	return sent;
 }
 
-static int dtls_rx(void *ctx, unsigned char *buf, size_t len, uint32_t timeout)
+static int dtls_rx(void *ctx, unsigned char *buf, size_t len,
+		   uint32_t dtls_timeout)
 {
 	struct net_context *net_ctx = ctx;
 	bool is_block = !((net_ctx->tls->flags & ZSOCK_MSG_DONTWAIT) ||
 			  sock_is_nonblock(net_ctx));
-	int remaining_time = (timeout == 0U) ? K_FOREVER : timeout;
-	u32_t entry_time = k_uptime_get_32();
+	k_timeout_t timeout = (dtls_timeout == 0U) ? K_FOREVER :
+						     K_MSEC(dtls_timeout);
+	uint64_t end = z_timeout_end_calc(timeout);
 	socklen_t addrlen = sizeof(struct sockaddr);
 	struct sockaddr addr;
 	int err;
@@ -501,7 +503,7 @@ static int dtls_rx(void *ctx, unsigned char *buf, size_t len, uint32_t timeout)
 			pev.mode = K_POLL_MODE_NOTIFY_ONLY;
 			pev.state = K_POLL_STATE_NOT_READY;
 
-			if (k_poll(&pev, 1, remaining_time) == -EAGAIN) {
+			if (k_poll(&pev, 1, timeout) == -EAGAIN) {
 				return MBEDTLS_ERR_SSL_TIMEOUT;
 			}
 		}
@@ -539,12 +541,15 @@ static int dtls_rx(void *ctx, unsigned char *buf, size_t len, uint32_t timeout)
 			/* Received data from different peer, ignore it. */
 			retry = true;
 
-			if (remaining_time != K_FOREVER) {
+			if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
 				/* Recalculate the timeout value. */
-				remaining_time = time_left(entry_time, timeout);
-				if (remaining_time <= 0) {
+				int64_t remaining = end - z_tick_get();
+
+				if (remaining <= 0) {
 					return MBEDTLS_ERR_SSL_TIMEOUT;
 				}
+
+				timeout = Z_TIMEOUT_TICKS(remaining);
 			}
 		}
 	} while (retry);
@@ -1154,13 +1159,6 @@ static int ztls_socket(int family, int type, int proto)
 	/* recv_q and accept_q are in union */
 	k_fifo_init(&ctx->recv_q);
 
-#ifdef CONFIG_USERSPACE
-	/* Set net context object as initialized and grant access to the
-	 * calling thread (and only the calling thread)
-	 */
-	z_object_recycle(ctx);
-#endif
-
 	if (tls_proto != 0) {
 		/* If TLS protocol is used, allocate TLS context */
 		ctx->tls = tls_alloc();
@@ -1279,10 +1277,6 @@ int ztls_accept_ctx(struct net_context *parent, struct sockaddr *addr,
 	}
 
 	child = k_fifo_get(&parent->accept_q, K_FOREVER);
-
-	#ifdef CONFIG_USERSPACE
-		z_object_recycle(child);
-	#endif
 
 	if (addr != NULL && addrlen != NULL) {
 		int len = MIN(*addrlen, sizeof(child->remote));

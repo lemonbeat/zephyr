@@ -12,10 +12,11 @@
 #include <timestamp.h>
 #include "utils.h"
 #include <tc_util.h>
+#include "timing_info.h"
 
 #define STACK_SIZE (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
 
-u32_t tm_off;        /* time necessary to read the time */
+uint32_t tm_off;        /* time necessary to read the time */
 int error_count;        /* track number of errors */
 
 
@@ -31,6 +32,7 @@ void test_thread(void *arg1, void *arg2, void *arg3)
 	PRINT_TIME_BANNER();
 
 	bench_test_init();
+	benchmark_timer_init();
 
 	int_to_thread();
 	print_dash_line();
@@ -55,7 +57,7 @@ void test_thread(void *arg1, void *arg2, void *arg3)
 
 K_THREAD_DEFINE(tt_id, STACK_SIZE,
 		test_thread, NULL, NULL, NULL,
-		10, 0, K_NO_WAIT);
+		10, 0, 0);
 
 
 void main(void)
