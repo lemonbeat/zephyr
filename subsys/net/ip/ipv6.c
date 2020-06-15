@@ -389,6 +389,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 	NET_PKT_DATA_ACCESS_CONTIGUOUS_DEFINE(ipv6_access, struct net_ipv6_hdr);
 	NET_PKT_DATA_ACCESS_DEFINE(udp_access, struct net_udp_hdr);
 	NET_PKT_DATA_ACCESS_DEFINE(tcp_access, struct net_tcp_hdr);
+	struct net_if *pkt_iface = net_pkt_iface(pkt);
 	enum net_verdict verdict = NET_DROP;
 	int real_len = net_pkt_get_len(pkt);
 	uint8_t ext_bitmap = 0U;
@@ -399,7 +400,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 	union net_ip_header ip;
 	int pkt_len;
 
-	net_stats_update_ipv6_recv(net_pkt_iface(pkt));
+	net_stats_update_ipv6_recv(pkt_iface);
 
 	hdr = (struct net_ipv6_hdr *)net_pkt_get_data(pkt, &ipv6_access);
 	if (!hdr) {
@@ -469,27 +470,36 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 		}
 	}
 
-	if (!net_ipv6_is_my_addr(&hdr->dst) &&
-	    !net_ipv6_is_my_maddr(&hdr->dst) &&
-	    !net_ipv6_is_addr_mcast(&hdr->dst)) {
-		if (ipv6_route_packet(pkt, hdr) == NET_OK) {
-			return NET_OK;
+	if (net_ipv6_is_addr_mcast(&hdr->dst)) {
+		/* Does the destination multicast address match one of the
+		 * registered multicast groups on the originating interface
+		 * of the packet?
+		 */
+		if (!net_if_ipv6_maddr_lookup(&hdr->dst, &pkt_iface)) {
+			NET_DBG("DROP: packet for unjoined multicast");
+			goto drop;
+		}
+	} else {
+		/* Destination address is a unicast address. */
+		if (!net_ipv6_is_my_addr(&hdr->dst)) {
+			if (ipv6_route_packet(pkt, hdr) == NET_OK) {
+				return NET_OK;
+			}
+
+			goto drop;
 		}
 
-		goto drop;
-	}
-
-	/* If we receive a packet with ll source address fe80: and destination
-	 * address is one of ours, and if the packet would cross interface
-	 * boundary, then drop the packet. RFC 4291 ch 2.5.6
-	 */
-	if (IS_ENABLED(CONFIG_NET_ROUTING) &&
-	    net_ipv6_is_ll_addr(&hdr->src) &&
-	    !net_ipv6_is_addr_mcast(&hdr->dst) &&
-	    !net_if_ipv6_addr_lookup_by_iface(net_pkt_iface(pkt),
-					      &hdr->dst)) {
-		ipv6_no_route_info(pkt, &hdr->src, &hdr->dst);
-		goto drop;
+		/* If we receive a packet with ll source address fe80: and
+		 * destination address is one of ours, and if the packet would
+		 * cross interface boundary, then drop the packet.
+		 * RFC 4291 ch 2.5.6
+		 */
+		if (IS_ENABLED(CONFIG_NET_ROUTING) &&
+		    net_ipv6_is_ll_addr(&hdr->src) &&
+		    !net_if_ipv6_addr_lookup_by_iface(pkt_iface, &hdr->dst)) {
+			ipv6_no_route_info(pkt, &hdr->src, &hdr->dst);
+			goto drop;
+		}
 	}
 
 	net_pkt_acknowledge_data(pkt, &ipv6_access);
@@ -604,7 +614,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 	}
 
 drop:
-	net_stats_update_ipv6_drop(net_pkt_iface(pkt));
+	net_stats_update_ipv6_drop(pkt_iface);
 	return NET_DROP;
 
 bad_hdr:
@@ -614,7 +624,7 @@ bad_hdr:
 			      net_pkt_get_current_offset(pkt) - 1);
 
 	NET_DBG("DROP: Unknown/wrong nexthdr type");
-	net_stats_update_ip_errors_protoerr(net_pkt_iface(pkt));
+	net_stats_update_ip_errors_protoerr(pkt_iface);
 
 	return NET_DROP;
 }
