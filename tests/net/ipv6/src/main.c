@@ -22,6 +22,7 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_IPV6_LOG_LEVEL);
 #include <net/net_pkt.h>
 #include <net/net_ip.h>
 #include <net/ethernet.h>
+#include <net/dummy.h>
 #include <net/udp.h>
 
 #include "icmpv6.h"
@@ -272,6 +273,7 @@ out:
 	return 0;
 }
 
+/* Ethernet interface (interface under test) */
 struct net_test_ipv6 net_test_data;
 
 static const struct ethernet_api net_test_if_api = {
@@ -288,6 +290,30 @@ NET_DEVICE_INIT(net_test_ipv6, "net_test_ipv6",
 		&net_test_if_api, _ETH_L2_LAYER, _ETH_L2_CTX_TYPE,
 		127);
 
+/* dummy interface for multi-interface tests */
+static int dummy_send(struct device *dev, struct net_pkt *pkt)
+{
+	ARG_UNUSED(dev);
+	ARG_UNUSED(pkt);
+
+	return 0;
+}
+
+struct net_test_ipv6 net_dummy_data;
+
+static const struct dummy_api net_dummy_if_api = {
+		.iface_api.init = net_test_iface_init,
+		.send = dummy_send,
+};
+
+#define _DUMMY_L2_LAYER DUMMY_L2
+#define _DUMMY_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
+
+NET_DEVICE_INIT(net_dummy_ipv6, "net_dummy_ipv6",
+		net_test_dev_init, &net_dummy_data, NULL,
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		&net_dummy_if_api, _DUMMY_L2_LAYER, _DUMMY_L2_CTX_TYPE,
+		127);
 
 /**
  * @brief IPv6 Init
@@ -1347,6 +1373,82 @@ static void test_dst_iface_scope_mcast_send(void)
 	net_context_put(ctx);
 }
 
+static void test_dst_unknown_group_multicast_recv(void)
+{
+	struct in6_addr mcast_unknown_group = {
+		{ { 0xff, 0x02, 0, 0, 0, 0, 0, 0, 0x01, 0x02, 0x03, 0x04, 0x05,
+		    0x06, 0x07, 0x08 } }
+	};
+	struct in6_addr in6_addr_any = IN6ADDR_ANY_INIT;
+	struct in6_addr addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0,
+				     0, 0, 0, 0, 0, 0x1 } } };
+	struct net_context *ctx;
+	enum net_verdict verdict;
+
+	/* Create listening socket that is bound to all incoming traffic. */
+	net_ctx_create(&ctx);
+	net_ctx_bind_mcast(ctx, &in6_addr_any);
+	net_ctx_listen(ctx);
+	net_ctx_recv(ctx);
+
+	/* Don't join multicast group before receiving packet.
+	 * Expectation: packet should be dropped by receiving interface on IP
+	 * Layer and not be received in listening socket.
+	 */
+	verdict = recv_msg(&addr, &mcast_unknown_group);
+
+	/* Clean-up before evaluating verdict, otherwise subsequent tests
+	 * cannot bind to a similar network context.
+	 */
+	net_context_put(ctx);
+
+	zassert_equal(verdict, NET_DROP,
+		      "Packet sent to unknown multicast group was not dropped");
+}
+
+static void test_dst_is_other_iface_multicast_recv(void)
+{
+	struct in6_addr mcast_iface2 = { { { 0xff, 0x02, 0, 0, 0, 0, 0, 0, 0x01,
+					     0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+					     0x08 } } };
+	struct in6_addr in6_addr_any = IN6ADDR_ANY_INIT;
+	struct in6_addr addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0,
+				     0, 0, 0, 0, 0, 0x1 } } };
+	struct net_if_mcast_addr *maddr;
+	struct net_context *ctx;
+	enum net_verdict verdict;
+
+	/* Create listening socket that is bound to all incoming traffic. */
+	net_ctx_create(&ctx);
+	net_ctx_bind_mcast(ctx, &in6_addr_any);
+	net_ctx_listen(ctx);
+	net_ctx_recv(ctx);
+
+	/* Join multicast group on second interface. */
+	maddr = net_if_ipv6_maddr_add(
+		net_if_get_first_by_type(&NET_L2_GET_NAME(DUMMY)),
+		&mcast_iface2);
+	zassert_not_null(maddr, "Cannot add multicast address to interface");
+
+	/* Receive multicast on first interface that did not join the group.
+	 * Expectation: packet should be dropped by first interface on IP
+	 * Layer and not be received in listening socket.
+	 *
+	 * Furthermore, multicast scope is link-local thus it should not cross
+	 * interface boundaries.
+	 */
+	verdict = recv_msg(&addr, &mcast_iface2);
+
+	/* Clean-up before evaluating verdict, otherwise subsequent tests
+	 * cannot bind to a similar network context.
+	 */
+	net_context_put(ctx);
+
+	zassert_equal(verdict, NET_DROP,
+		      "Packet sent to multicast group joined by second "
+		      "interface not dropped");
+}
+
 void test_main(void)
 {
 	ztest_test_suite(test_ipv6_fn,
@@ -1376,7 +1478,9 @@ void test_main(void)
 			 ztest_unit_test(test_dst_zero_scope_mcast_recv),
 			 ztest_unit_test(test_dst_site_scope_mcast_recv_drop),
 			 ztest_unit_test(test_dst_site_scope_mcast_recv_ok),
-			 ztest_unit_test(test_dst_org_scope_mcast_recv)
+			 ztest_unit_test(test_dst_org_scope_mcast_recv),
+			 ztest_unit_test(test_dst_unknown_group_multicast_recv),
+			 ztest_unit_test(test_dst_is_other_iface_multicast_recv)
 			 );
 	ztest_run_test_suite(test_ipv6_fn);
 }
