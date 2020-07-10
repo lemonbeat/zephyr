@@ -42,6 +42,8 @@
 #define FLASH_SIMULATOR_FLASH_SIZE DT_REG_SIZE(SOC_NV_FLASH_NODE)
 
 #define FLASH_SIMULATOR_DEV_NAME DT_INST_LABEL(0)
+#define FLASH_SIMULATOR_ERASE_VALUE \
+		DT_PROP(DT_PARENT(SOC_NV_FLASH_NODE), erase_value)
 
 #define FLASH_SIMULATOR_PAGE_COUNT (FLASH_SIMULATOR_FLASH_SIZE / \
 				    FLASH_SIMULATOR_ERASE_UNIT)
@@ -79,7 +81,7 @@
 #define FLASH_SIMULATOR_FLASH_PAGE_COUNT CONFIG_FLASH_SIMULATOR_STAT_PAGE_COUNT
 #endif
 
-/* simulator statistcs */
+/* simulator statistics */
 STATS_SECT_START(flash_sim_stats)
 STATS_SECT_ENTRY32(bytes_read)		/* total bytes read */
 STATS_SECT_ENTRY32(bytes_written)       /* total bytes written */
@@ -139,6 +141,11 @@ static bool write_protection;
 
 static const struct flash_driver_api flash_sim_api;
 
+static const struct flash_parameters flash_sim_parameters = {
+	.write_block_size = FLASH_SIMULATOR_PROG_UNIT,
+	.erase_value = FLASH_SIMULATOR_ERASE_VALUE
+};
+
 static int flash_range_is_valid(struct device *dev, off_t offset, size_t len)
 {
 	ARG_UNUSED(dev);
@@ -197,6 +204,7 @@ static int flash_sim_read(struct device *dev, const off_t offset, void *data,
 static int flash_sim_write(struct device *dev, const off_t offset,
 			   const void *data, const size_t len)
 {
+	uint8_t buf[FLASH_SIMULATOR_PROG_UNIT];
 	ARG_UNUSED(dev);
 
 	if (!flash_range_is_valid(dev, offset, len)) {
@@ -215,11 +223,8 @@ static int flash_sim_write(struct device *dev, const off_t offset,
 	STATS_INC(flash_sim_stats, flash_write_calls);
 
 	/* check if any unit has been already programmed */
+	memset(buf, FLASH_SIMULATOR_ERASE_VALUE, sizeof(buf));
 	for (uint32_t i = 0; i < len; i += FLASH_SIMULATOR_PROG_UNIT) {
-
-		uint8_t buf[FLASH_SIMULATOR_PROG_UNIT];
-
-		memset(buf, 0xFF, sizeof(buf));
 		if (memcmp(buf, FLASH(offset + i), sizeof(buf))) {
 			STATS_INC(flash_sim_stats, double_writes);
 #if !CONFIG_FLASH_SIMULATOR_DOUBLE_WRITES
@@ -252,7 +257,11 @@ static int flash_sim_write(struct device *dev, const off_t offset,
 		}
 
 		/* only pull bits to zero */
+#if FLASH_SIMULATOR_ERASE_VALUE == 0xFF
 		*(FLASH(offset + i)) &= *((uint8_t *)data + i);
+#else
+		*(FLASH(offset + i)) = *((uint8_t *)data + i);
+#endif
 	}
 
 	STATS_INCN(flash_sim_stats, bytes_written, len);
@@ -272,11 +281,8 @@ static void unit_erase(const uint32_t unit)
 	const off_t unit_addr = FLASH_SIMULATOR_BASE_OFFSET +
 				(unit * FLASH_SIMULATOR_ERASE_UNIT);
 
-	/* byte pattern to fill the flash with */
-	uint8_t byte_pattern = 0xFF;
-
-	/* erase the memory unit by pulling all bits to one */
-	memset(FLASH(unit_addr), byte_pattern,
+	/* erase the memory unit by setting it to erase value */
+	memset(FLASH(unit_addr), FLASH_SIMULATOR_ERASE_VALUE,
 	       FLASH_SIMULATOR_ERASE_UNIT);
 }
 
@@ -343,12 +349,20 @@ static void flash_sim_page_layout(struct device *dev,
 }
 #endif
 
+static const struct flash_parameters *
+flash_sim_get_parameters(const struct device *dev)
+{
+	ARG_UNUSED(dev);
+
+	return &flash_sim_parameters;
+}
+
 static const struct flash_driver_api flash_sim_api = {
 	.read = flash_sim_read,
 	.write = flash_sim_write,
 	.erase = flash_sim_erase,
 	.write_protection = flash_wp_set,
-	.write_block_size = FLASH_SIMULATOR_PROG_UNIT,
+	.get_parameters = flash_sim_get_parameters,
 #ifdef CONFIG_FLASH_PAGE_LAYOUT
 	.page_layout = flash_sim_page_layout,
 #endif
@@ -399,7 +413,8 @@ static int flash_mock_init(struct device *dev)
 
 	if (f_stat.st_size == 0) {
 		/* erase the memory unit by pulling all bits to one */
-		(void)memset(mock_flash, 0xff, FLASH_SIMULATOR_FLASH_SIZE);
+		(void)memset(mock_flash, FLASH_SIMULATOR_ERASE_VALUE,
+			     FLASH_SIMULATOR_FLASH_SIZE);
 	}
 
 	return 0;
@@ -409,7 +424,7 @@ static int flash_mock_init(struct device *dev)
 
 static int flash_mock_init(struct device *dev)
 {
-	memset(mock_flash, 0xFF, ARRAY_SIZE(mock_flash));
+	memset(mock_flash, FLASH_SIMULATOR_ERASE_VALUE, ARRAY_SIZE(mock_flash));
 	return 0;
 }
 

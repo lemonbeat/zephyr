@@ -88,7 +88,7 @@ struct bt_mesh_net bt_mesh = {
 	},
 };
 
-static uint32_t dup_cache[4];
+static uint32_t dup_cache[CONFIG_BT_MESH_MSG_CACHE_SIZE];
 static int   dup_cache_next;
 
 static bool check_dup(struct net_buf_simple *data)
@@ -1211,11 +1211,6 @@ int bt_mesh_net_decode(struct net_buf_simple *data, enum bt_mesh_net_if net_if,
 	if (net_if != BT_MESH_NET_IF_PROXY_CFG &&
 	    rx->ctx.recv_dst == BT_MESH_ADDR_UNASSIGNED) {
 		BT_ERR("Destination address is unassigned; dropping packet");
-		return -EBADMSG;
-	}
-
-	if (BT_MESH_ADDR_IS_RFU(rx->ctx.recv_dst)) {
-		BT_ERR("Destination address is RFU; dropping packet");
 		return -EBADMSG;
 	}
 

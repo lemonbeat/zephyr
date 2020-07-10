@@ -272,7 +272,7 @@ struct uart_ns16550_device_config {
 /** Device data structure */
 struct uart_ns16550_dev_data_t {
 #ifdef UART_NS16550_PCIE_ENABLED
-	struct uart_device_config devconf;
+	uint64_t pcimem;
 #endif
 	struct uart_config uart_config;
 	struct k_spinlock lock;
@@ -290,11 +290,11 @@ struct uart_ns16550_dev_data_t {
 
 static const struct uart_driver_api uart_ns16550_driver_api;
 
-static inline uint32_t get_port(struct device *dev)
+static inline uintptr_t get_port(struct device *dev)
 {
 #ifdef UART_NS16550_PCIE_ENABLED
 	if (DEV_CFG(dev)->pcie) {
-		return DEV_DATA(dev)->devconf.port;
+		return (uintptr_t) DEV_DATA(dev)->pcimem;
 	}
 #endif /* UART_NS16550_PCIE_ENABLED */
 
@@ -352,7 +352,7 @@ static int uart_ns16550_configure(struct device *dev,
 			goto out;
 		}
 
-		dev_data->devconf.port = pcie_get_mbar(dev_cfg->pcie_bdf, 0);
+		dev_data->pcimem = pcie_get_mbar(dev_cfg->pcie_bdf, 0);
 		pcie_set_cmd(dev_cfg->pcie_bdf, PCIE_CONF_CMDSTAT_MEM, true);
 	}
 #endif
@@ -511,19 +511,10 @@ static int uart_ns16550_poll_in(struct device *dev, unsigned char *c)
 	int ret = -1;
 	k_spinlock_key_t key = k_spin_lock(&DEV_DATA(dev)->lock);
 
-	while (1) {
-
-		if ((INBYTE(LSR(dev)) & LSR_RXRDY) != 0) {
-			/* got a character */
-			*c = INBYTE(RDR(dev));
-			ret = 0;
-		}
-
-		if ((INBYTE(LSR(dev)) & LSR_RXRDY) != 0) {
-			continue;
-		}
-
-		break;
+	if ((INBYTE(LSR(dev)) & LSR_RXRDY) != 0) {
+		/* got a character */
+		*c = INBYTE(RDR(dev));
+		ret = 0;
 	}
 
 	k_spin_unlock(&DEV_DATA(dev)->lock, key);
@@ -548,16 +539,10 @@ static void uart_ns16550_poll_out(struct device *dev,
 {
 	k_spinlock_key_t key = k_spin_lock(&DEV_DATA(dev)->lock);
 
-	while (1) {
-		/* wait for transmitter to ready to accept a character */
-		if ((INBYTE(LSR(dev)) & LSR_THRE) == 0) {
-			continue;
-		}
-
-		OUTBYTE(THR(dev), c);
-
-		break;
+	while ((INBYTE(LSR(dev)) & LSR_THRE) == 0) {
 	}
+
+	OUTBYTE(THR(dev), c);
 
 	k_spin_unlock(&DEV_DATA(dev)->lock, key);
 }

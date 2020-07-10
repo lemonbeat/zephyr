@@ -26,6 +26,8 @@
 /* Add include for DTS generated information */
 #include <devicetree.h>
 
+#include <stm32wbxx_ll_hsem.h>
+
 #ifdef CONFIG_GPIO_STM32
 #include <stm32wbxx_ll_gpio.h>
 #endif
@@ -85,6 +87,10 @@
 #ifdef CONFIG_DMAMUX_STM32
 #include <stm32wbxx_ll_dmamux.h>
 #endif
+
+#ifdef CONFIG_PWM_STM32
+#include <stm32wbxx_ll_tim.h>
+#endif /* CONFIG_PWM_STM32 */
 
 #endif /* !_ASMLANGUAGE */
 

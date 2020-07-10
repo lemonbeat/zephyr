@@ -42,6 +42,16 @@
 
 #define PAXB_OARR_VALID			BIT(0)
 
+#define PCIE_DEV_CTRL_OFFSET		0x4d8
+#define FLR_IN_PROGRESS			BIT(27)
+
+#define PCIE_TL_CTRL0_OFFSET		0x800
+#define AUTO_CLR_FLR_AFTER_DELAY	BIT(13) /* Clears FLR after 55ms */
+#define AUTO_CLR_CRS_POST_FLR		BIT(14)
+
+#define PCIE0_FLR_INTR			BIT(20)
+#define PCIE0_FLR_PERST_INTR		BIT(21)
+
 enum pcie_outbound_map {
 	PCIE_MAP_LOWMEM_IDX,
 	PCIE_MAP_HIGHMEM_IDX,
@@ -62,6 +72,10 @@ struct iproc_pcie_ep_ctx {
 	struct k_spinlock raise_irq_lock;
 	bool highmem_in_use;
 	bool lowmem_in_use;
+	/* Callback function for reset interrupt */
+	pcie_ep_reset_callback_t reset_cb[PCIE_RESET_MAX];
+	/* Callback data for reset interrupt */
+	void *reset_data[PCIE_RESET_MAX];
 };
 
 #endif /* ZEPHYR_INCLUDE_DRIVERS_PCIE_EP_BCM_IPROC_H_ */

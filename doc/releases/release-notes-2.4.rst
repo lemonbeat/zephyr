@@ -37,6 +37,15 @@ API Changes
 * Moved to using C99 integer types and deprecate Zephyr integer types.  The
   Zephyr types can be enabled by Kconfig DEPRECATED_ZEPHYR_INT_TYPES option.
 
+* The ``<sys/util.h>`` header has been promoted to a documented API with
+  :ref:`experimental stability <api_lifecycle>`. See :ref:`util_api` for an API
+  reference.
+
+* The :c:func:`wdt_feed` function will now return ``-EAGAIN`` if
+  issuing a feed would stall the caller.  Application code may need to
+  ignore this diagnostic result or initiate another feed operation
+  later.
+
 Deprecated in this release
 ==========================
 
@@ -44,6 +53,10 @@ Deprecated in this release
 Removed APIs in this release
 ============================
 
+* Other
+
+  * The deprecated ``MACRO_MAP`` macro has been removed from the
+    :ref:`util_api`. Use ``FOR_EACH`` instead.
 
 Stable API changes in this release
 ==================================
@@ -225,6 +238,11 @@ Bluetooth
 
 * BLE split software Controller:
 
+* HCI Driver:
+
+  * bt_hci_evt_is_prio() removed, use bt_hci_evt_get_flags() instead when
+    CONFIG_BT_RECV_IS_RX_THREAD is defined and call bt_recv and bt_recv_prio
+    when their flag is set, otherwise always call bt_recv().
 
 Build and Infrastructure
 ************************

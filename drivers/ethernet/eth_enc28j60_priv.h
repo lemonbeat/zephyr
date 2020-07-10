@@ -99,12 +99,12 @@
 #define ENC28J60_REG_MIRDH    0x2219
 
 /* Bank 3 Registers */
-#define ENC28J60_REG_MAADR1   0x1300
-#define ENC28J60_REG_MAADR0   0x1301
+#define ENC28J60_REG_MAADR5   0x1300
+#define ENC28J60_REG_MAADR6   0x1301
 #define ENC28J60_REG_MAADR3   0x1302
-#define ENC28J60_REG_MAADR2   0x1303
-#define ENC28J60_REG_MAADR5   0x1304
-#define ENC28J60_REG_MAADR4   0x1305
+#define ENC28J60_REG_MAADR4   0x1303
+#define ENC28J60_REG_MAADR1   0x1304
+#define ENC28J60_REG_MAADR2   0x1305
 #define ENC28J60_REG_EBSTSD   0x0306
 #define ENC28J60_REG_EBSTCON  0x0307
 #define ENC28J60_REG_EBSTCSL  0x0308
@@ -218,7 +218,8 @@ struct eth_enc28j60_config {
 	uint8_t gpio_pin;
 	gpio_dt_flags_t gpio_flags;
 	const char *spi_port;
-	uint8_t spi_cs_pin;
+	gpio_pin_t spi_cs_pin;
+	gpio_dt_flags_t spi_cs_dt_flags;
 	const char *spi_cs_port;
 	uint32_t spi_freq;
 	uint8_t spi_slave;

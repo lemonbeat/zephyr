@@ -56,11 +56,14 @@ manifest:
       revision: f1fa8241f8786198ba41155413243de36ed878a5
       path: modules/hal/infineon
     - name: hal_nordic
-      revision: 00580f43b9d48f2079d611ce12f0fbc78d3040f1
+      revision: cb9e75ebfea8a8312678b2359c6b41b051a95177
       path: modules/hal/nordic
     - name: hal_openisa
       revision: 40d049f69c50b58ea20473bee14cf93f518bf262
       path: modules/hal/openisa
+    - name: hal_nuvoton
+      revision: b4d31f33238713a568e23618845702fadd67386f
+      path: modules/hal/nuvoton
     - name: hal_microchip
       revision: aad89bf0531a30dcd6c87e4065f1b973fb31c11f
       path: modules/hal/microchip
@@ -71,7 +74,7 @@ manifest:
       revision: 5b3ec3e182d4310e8943cc34c6c70ae57d9711da
       path: modules/hal/st
     - name: hal_stm32
-      revision: 6812113dc58d134b74acdeebbffb4f80b8eeab75
+      revision: 6b330f0af95c867bf27534b3b58be03c0fb9e7ad
       path: modules/hal/stm32
     - name: hal_ti
       revision: aabc6a04a8e871cbb01e02c22bb409f68001dc64
@@ -86,7 +89,7 @@ manifest:
       path: modules/crypto/mbedtls
       revision: 4bf099f1254332d16dcd931ccea0a88d24a7d3c7
     - name: mcuboot
-      revision: 032eb725c79268c2e111eff3f05663b1c0ff34cb
+      revision: d52aff5065ab5995f785877a834112461ff93526
       path: bootloader/mcuboot
     - name: mcumgr
       revision: 898a5a7f5224be8345e58eca3b9a84389ed61d15
@@ -95,16 +98,16 @@ manifest:
       revision: 1c4fdba512b268033a4cf926bddd323866c3261a
       path: tools/net-tools
     - name: hal_nxp
-      revision: a239b33c64db9ce5c8809ba54d50ade0d1864411
+      revision: 478f03a71256aeb2890e685ebf5a1dc6832a6b5f
       path: modules/hal/nxp
     - name: open-amp
       revision: 724f7e2a4519d7e1d40ef330042682dea950c991
       path: modules/lib/open-amp
     - name: loramac-node
-      revision: 29e516ec585b1a909af2b5f1c60d83e7d4d563e3
+      revision: 170a2579dd890f78f5056f0959cdb9c9bea259a1
       path: modules/lib/loramac-node
     - name: openthread
-      revision: 1db7e9ebe5bbf701ca1ff8cad623892ec48fb0f0
+      revision: e3b80d6e4c8d368c856dfce774bc792ffde54cfe
       path: modules/lib/openthread
     - name: segger
       revision: 6fcf61606d6012d2c44129edc033f59331e268bc
@@ -117,7 +120,7 @@ manifest:
       revision: 3e9a49d2672ec01435ffbf0d788db6d95ef28de0
     - name: littlefs
       path: modules/fs/littlefs
-      revision: 0aefdda69d236cb01f932117c1f32e9da09c0ec3
+      revision: 9e4498d1c73009acd84bb36036ee5e2869112a6c
     - name: mipi-sys-t
       path: modules/debug/mipi-sys-t
       revision: 957d46bc3ce0d5f628f0d525196bb4db207672ee
@@ -132,7 +135,7 @@ manifest:
       revision: c39888ff74acf421eeff9a7514fa9b172c3373f7
     - name: trusted-firmware-m
       path: modules/tee/tfm
-      revision: 7de2daa1967b2dc12cbe0fcc0171ac3064ea596b
+      revision: 58c70aeb9937c3b6b97a07cc654e48b2c56c258a
 
   self:
     path: zephyr

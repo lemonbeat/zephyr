@@ -46,6 +46,11 @@ struct flash_sam_dev_data {
 	struct k_sem sem;
 };
 
+static const struct flash_parameters flash_sam_parameters = {
+	.write_block_size = FLASH_WRITE_BLK_SZ,
+	.erase_value = 0xff,
+};
+
 #define DEV_CFG(dev) \
 	((const struct flash_sam_dev_cfg *const)(dev)->config_info)
 
@@ -330,6 +335,14 @@ void flash_sam_page_layout(struct device *dev,
 }
 #endif
 
+static const struct flash_parameters *
+flash_sam_get_parameters(const struct device *dev)
+{
+	ARG_UNUSED(dev);
+
+	return &flash_sam_parameters;
+}
+
 static int flash_sam_init(struct device *dev)
 {
 	struct flash_sam_dev_data *const data = DEV_DATA(dev);
@@ -344,10 +357,10 @@ static const struct flash_driver_api flash_sam_api = {
 	.erase = flash_sam_erase,
 	.write = flash_sam_write,
 	.read = flash_sam_read,
+	.get_parameters = flash_sam_get_parameters,
 #ifdef CONFIG_FLASH_PAGE_LAYOUT
 	.page_layout = flash_sam_page_layout,
 #endif
-	.write_block_size = FLASH_WRITE_BLK_SZ,
 };
 
 static const struct flash_sam_dev_cfg flash_sam_cfg = {

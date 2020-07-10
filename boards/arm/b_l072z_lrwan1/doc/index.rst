@@ -141,6 +141,10 @@ The Zephyr B-L072Z-LRWAN1 Discovery board configuration supports the following h
 +-----------+------------+-------------------------------------+
 | USB       | on-chip    | usb                                 |
 +-----------+------------+-------------------------------------+
+| FLASH     | on-chip    | flash                               |
++-----------+------------+-------------------------------------+
+| LoRa      | on-module  | sx1276                              |
++-----------+------------+-------------------------------------+
 
 Other hardware features are not yet supported on this Zephyr port.
 

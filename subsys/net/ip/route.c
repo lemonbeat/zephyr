@@ -829,7 +829,7 @@ int net_route_packet(struct net_pkt *pkt, struct in6_addr *nexthop)
 	if (net_if_l2(net_pkt_iface(pkt)) != &NET_L2_GET_NAME(DUMMY)) {
 #endif
 #if defined(CONFIG_NET_L2_PPP)
-		/* PPP does not populate the lladdr_src field */
+		/* PPP does not populate the lladdr fields */
 		if (net_if_l2(net_pkt_iface(pkt)) != &NET_L2_GET_NAME(PPP)) {
 #endif
 			if (!net_pkt_lladdr_src(pkt)->addr) {

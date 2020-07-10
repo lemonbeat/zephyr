@@ -297,6 +297,7 @@ struct adxl372_data {
 	struct sensor_trigger th_trigger;
 	sensor_trigger_handler_t drdy_handler;
 	struct sensor_trigger drdy_trigger;
+	struct device *dev;
 
 #if defined(CONFIG_ADXL372_TRIGGER_OWN_THREAD)
 	K_THREAD_STACK_MEMBER(thread_stack, CONFIG_ADXL372_THREAD_STACK_SIZE);
@@ -304,7 +305,6 @@ struct adxl372_data {
 	struct k_thread thread;
 #elif defined(CONFIG_ADXL372_TRIGGER_GLOBAL_THREAD)
 	struct k_work work;
-	struct device *dev;
 #endif
 #endif /* CONFIG_ADXL372_TRIGGER */
 };
@@ -321,6 +321,7 @@ struct adxl372_dev_config {
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
 	const char *gpio_cs_port;
 	gpio_pin_t cs_gpio;
+	gpio_dt_flags_t cs_flags;
 #endif
 #endif /* CONFIG_ADXL372_SPI */
 #ifdef CONFIG_ADXL372_TRIGGER

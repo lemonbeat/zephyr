@@ -470,7 +470,6 @@ static void ipcp_up(struct ppp_fsm *fsm)
 	NET_DBG("PPP up with address %s", log_strdup(addr_str));
 	ppp_network_up(ctx, PPP_IP);
 
-	ctx->is_network_up = true;
 	ctx->is_ipcp_up = true;
 
 	NET_DBG("[%s/%p] Current state %s (%d)", fsm->name, fsm,
@@ -482,11 +481,17 @@ static void ipcp_down(struct ppp_fsm *fsm)
 	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
 					       ipcp.fsm);
 
-	if (!ctx->is_network_up) {
+	memset(&ctx->ipcp.my_options.address, 0,
+	       sizeof(ctx->ipcp.my_options.address));
+	memset(&ctx->ipcp.my_options.dns1_address, 0,
+	       sizeof(ctx->ipcp.my_options.dns1_address));
+	memset(&ctx->ipcp.my_options.dns2_address, 0,
+	       sizeof(ctx->ipcp.my_options.dns2_address));
+
+	if (!ctx->is_ipcp_up) {
 		return;
 	}
 
-	ctx->is_network_up = false;
 	ctx->is_ipcp_up = false;
 
 	ppp_network_down(ctx, PPP_IP);

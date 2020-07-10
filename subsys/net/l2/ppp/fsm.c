@@ -11,6 +11,7 @@ LOG_MODULE_DECLARE(net_l2_ppp, CONFIG_NET_L2_PPP_LOG_LEVEL);
 #include <net/net_pkt.h>
 
 #include <net/ppp.h>
+#include <random/rand32.h>
 
 #include "net_private.h"
 
@@ -417,13 +418,14 @@ int ppp_send_pkt(struct ppp_fsm *fsm, struct net_if *iface,
 
 	case PPP_TERMINATE_REQ:
 	case PPP_TERMINATE_ACK:
+		len = sizeof(ppp);
 		break;
 
 	default:
 		break;
 	}
 
-	if (len == 0) {
+	if (len < sizeof(ppp)) {
 		return -EINVAL;
 	}
 

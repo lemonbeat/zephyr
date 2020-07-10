@@ -15,7 +15,7 @@ class MdbBinaryRunner(ZephyrBinaryRunner):
 
     def __init__(self, cfg, cores=1, jtag='digilent', nsim_args='',
                 dig_device=''):
-        super(MdbBinaryRunner, self).__init__(cfg)
+        super().__init__(cfg)
         self.jtag = jtag
         self.cores = int(cores)
         if nsim_args != '':
@@ -58,7 +58,7 @@ class MdbBinaryRunner(ZephyrBinaryRunner):
                              targets are connected''')
 
     @classmethod
-    def create(cls, cfg, args):
+    def do_create(cls, cfg, args):
         return MdbBinaryRunner(
             cfg,
             cores=args.cores,

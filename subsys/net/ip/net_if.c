@@ -10,6 +10,7 @@ LOG_MODULE_REGISTER(net_if, CONFIG_NET_IF_LOG_LEVEL);
 #include <init.h>
 #include <kernel.h>
 #include <linker/sections.h>
+#include <random/rand32.h>
 #include <syscall_handler.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2358,7 +2359,8 @@ static struct in6_addr *net_if_ipv6_get_best_match(struct net_if *iface,
 			/* Mesh local address can only be selected for the same
 			 * subnet.
 			 */
-			if (ipv6->unicast[i].is_mesh_local && len < 64) {
+			if (ipv6->unicast[i].is_mesh_local && len < 64 &&
+			    !net_ipv6_is_addr_mcast_mesh(dst)) {
 				continue;
 			}
 
@@ -2377,8 +2379,8 @@ const struct in6_addr *net_if_ipv6_select_src_addr(struct net_if *dst_iface,
 	uint8_t best_match = 0U;
 	struct net_if *iface;
 
-	if (!net_ipv6_is_ll_addr(dst) && !net_ipv6_is_addr_mcast(dst)) {
-
+	if (!net_ipv6_is_ll_addr(dst) && (!net_ipv6_is_addr_mcast(dst) ||
+	    net_ipv6_is_addr_mcast_mesh(dst))) {
 		for (iface = __net_if_start;
 		     !dst_iface && iface != __net_if_end;
 		     iface++) {

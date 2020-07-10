@@ -110,6 +110,8 @@ static inline const char *state2str(bt_conn_state_t state)
 	switch (state) {
 	case BT_CONN_DISCONNECTED:
 		return "disconnected";
+	case BT_CONN_DISCONNECT_COMPLETE:
+		return "disconnect-complete";
 	case BT_CONN_CONNECT_SCAN:
 		return "connect-scan";
 	case BT_CONN_CONNECT_DIR_ADV:
@@ -362,14 +364,6 @@ static void conn_update_timeout(struct k_work *work)
 		 * state transition.
 		 */
 		bt_conn_unref(conn);
-
-		/* A new reference likely to have been released here,
-		 * Resume advertising.
-		 */
-		if (IS_ENABLED(CONFIG_BT_PERIPHERAL)) {
-			bt_le_adv_resume();
-		}
-
 		return;
 	}
 
@@ -1088,7 +1082,16 @@ void bt_conn_security_changed(struct bt_conn *conn, enum bt_security_err err)
 	}
 #if IS_ENABLED(CONFIG_BT_KEYS_OVERWRITE_OLDEST)
 	if (!err && conn->sec_level >= BT_SECURITY_L2) {
-		bt_keys_update_usage(conn->id, bt_conn_get_dst(conn));
+		if (conn->type == BT_CONN_TYPE_LE) {
+			bt_keys_update_usage(conn->id, bt_conn_get_dst(conn));
+		}
+
+#if defined(CONFIG_BT_BREDR)
+		if (conn->type == BT_CONN_TYPE_BR) {
+			bt_keys_link_key_update_usage(&conn->br.dst);
+		}
+#endif /* CONFIG_BT_BREDR */
+
 	}
 #endif
 }
@@ -1716,9 +1719,7 @@ void bt_conn_set_state(struct bt_conn *conn, bt_conn_state_t state)
 		 * running.
 		 */
 		switch (old_state) {
-		case BT_CONN_CONNECTED:
-		case BT_CONN_DISCONNECT:
-			process_unack_tx(conn);
+		case BT_CONN_DISCONNECT_COMPLETE:
 			tx_notify(conn);
 
 			/* Cancel Connection Update if it is pending */
@@ -1774,8 +1775,11 @@ void bt_conn_set_state(struct bt_conn *conn, bt_conn_state_t state)
 			 */
 			bt_conn_unref(conn);
 			break;
+		case BT_CONN_CONNECTED:
+		case BT_CONN_DISCONNECT:
 		case BT_CONN_DISCONNECTED:
-			/* Cannot happen, no transition. */
+			/* Cannot happen. */
+			BT_WARN("Invalid (%u) old state", state);
 			break;
 		}
 		break;
@@ -1804,6 +1808,9 @@ void bt_conn_set_state(struct bt_conn *conn, bt_conn_state_t state)
 		break;
 	case BT_CONN_DISCONNECT:
 		break;
+	case BT_CONN_DISCONNECT_COMPLETE:
+		process_unack_tx(conn);
+		break;
 	default:
 		BT_WARN("no valid (%u) state was set", state);
 
@@ -1821,8 +1828,7 @@ struct bt_conn *bt_conn_lookup_handle(uint16_t handle)
 		}
 
 		/* We only care about connections with a valid handle */
-		if (conns[i].state != BT_CONN_CONNECTED &&
-		    conns[i].state != BT_CONN_DISCONNECT) {
+		if (!bt_conn_is_handle_valid(&conns[i])) {
 			continue;
 		}
 
@@ -1838,8 +1844,7 @@ struct bt_conn *bt_conn_lookup_handle(uint16_t handle)
 		}
 
 		/* We only care about connections with a valid handle */
-		if (sco_conns[i].state != BT_CONN_CONNECTED &&
-		    sco_conns[i].state != BT_CONN_DISCONNECT) {
+		if (!bt_conn_is_handle_valid(&conns[i])) {
 			continue;
 		}
 
@@ -1964,6 +1969,11 @@ void bt_conn_unref(struct bt_conn *conn)
 
 	BT_DBG("handle %u ref %u -> %u", conn->handle, old,
 	       atomic_get(&conn->ref));
+
+	if (IS_ENABLED(CONFIG_BT_PERIPHERAL) &&
+	    atomic_get(&conn->ref) == 0) {
+		bt_le_adv_resume();
+	}
 }
 
 const bt_addr_le_t *bt_conn_get_dst(const struct bt_conn *conn)
@@ -2118,17 +2128,35 @@ int bt_conn_le_data_len_update(struct bt_conn *conn,
 int bt_conn_le_phy_update(struct bt_conn *conn,
 			  const struct bt_conn_le_phy_param *param)
 {
-	if (conn->le.phy.tx_phy == param->pref_tx_phy &&
-	    conn->le.phy.rx_phy == param->pref_rx_phy) {
-		return -EALREADY;
-	}
+	uint8_t phy_opts, all_phys;
 
 	if (IS_ENABLED(CONFIG_BT_AUTO_PHY_UPDATE) &&
 	    !atomic_test_bit(conn->flags, BT_CONN_AUTO_PHY_COMPLETE)) {
 		return -EAGAIN;
 	}
 
-	return bt_le_set_phy(conn, param->pref_tx_phy, param->pref_rx_phy);
+	if ((param->options & BT_CONN_LE_PHY_OPT_CODED_S2) &&
+	    (param->options & BT_CONN_LE_PHY_OPT_CODED_S8)) {
+		phy_opts = BT_HCI_LE_PHY_CODED_ANY;
+	} else if (param->options & BT_CONN_LE_PHY_OPT_CODED_S2) {
+		phy_opts = BT_HCI_LE_PHY_CODED_S2;
+	} else if (param->options & BT_CONN_LE_PHY_OPT_CODED_S8) {
+		phy_opts = BT_HCI_LE_PHY_CODED_S8;
+	} else {
+		phy_opts = BT_HCI_LE_PHY_CODED_ANY;
+	}
+
+	all_phys = 0U;
+	if (param->pref_tx_phy == BT_GAP_LE_PHY_NONE) {
+		all_phys |= BT_HCI_LE_PHY_TX_ANY;
+	}
+
+	if (param->pref_rx_phy == BT_GAP_LE_PHY_NONE) {
+		all_phys |= BT_HCI_LE_PHY_RX_ANY;
+	}
+
+	return bt_le_set_phy(conn, all_phys, param->pref_tx_phy,
+			     param->pref_rx_phy, phy_opts);
 }
 #endif
 

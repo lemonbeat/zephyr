@@ -43,7 +43,8 @@
 #define XACT_SEG_DATA(_seg) (&link.rx.buf->data[20 + ((_seg - 1) * 23)])
 #define XACT_SEG_RECV(_seg) (link.rx.seg &= ~(1 << (_seg)))
 
-#define XACT_NVAL 0xff
+#define XACT_ID_MAX  0x7f
+#define XACT_ID_NVAL 0xff
 
 #define RETRANSMIT_TIMEOUT  K_MSEC(500)
 #define BUF_TIMEOUT         K_MSEC(400)
@@ -169,7 +170,7 @@ static void free_segments(void)
 
 static uint8_t next_transaction_id(uint8_t id)
 {
-	return (((id + 1) & 0x7f) | (id & 0x80));
+	return (((id + 1) & XACT_ID_MAX) | (id & (XACT_ID_MAX+1)));
 }
 
 static void prov_clear_tx(void)
@@ -188,12 +189,21 @@ static void reset_adv_link(void)
 
 	k_delayed_work_cancel(&link.prot_timer);
 
-	/* Clear everything except the retransmit and protocol timer
-	 * delayed work objects.
-	 */
-	(void)memset(&link, 0, offsetof(struct pb_adv, tx.retransmit));
-	link.rx.id = XACT_NVAL;
-	link.tx.pending_ack = XACT_NVAL;
+	if (atomic_test_bit(link.flags, PROVISIONER)) {
+		/* Clear everything except the retransmit and protocol timer
+		 * delayed work objects.
+		 */
+		(void)memset(&link, 0, offsetof(struct pb_adv, tx.retransmit));
+		link.rx.id = XACT_ID_NVAL;
+	} else {
+		/* Accept another provisioning attempt */
+		link.id = 0;
+		atomic_clear(link.flags);
+		link.rx.id = XACT_ID_MAX;
+		link.tx.id = XACT_ID_NVAL;
+	}
+
+	link.tx.pending_ack = XACT_ID_NVAL;
 	link.rx.buf = &rx_buf;
 	net_buf_simple_reset(link.rx.buf);
 }
@@ -595,6 +605,7 @@ static int bearer_ctl_send(uint8_t op, const void *data, uint8_t data_len,
 	BT_DBG("op 0x%02x data_len %u", op, data_len);
 
 	prov_clear_tx();
+	k_delayed_work_submit(&link.prot_timer, PROTOCOL_TIMEOUT);
 
 	buf = adv_buf_create(reliable ? RETRANSMITS_RELIABLE :
 					RETRANSMITS_UNRELIABLE);
@@ -613,6 +624,7 @@ static int bearer_ctl_send(uint8_t op, const void *data, uint8_t data_len,
 		send_reliable();
 	} else {
 		bt_mesh_adv_send(buf, &buf_sent_cb, NULL);
+		net_buf_unref(buf);
 	}
 
 	return 0;
@@ -699,7 +711,7 @@ static void link_open(struct prov_rx *rx, struct net_buf_simple *buf)
 
 	if (atomic_test_bit(link.flags, LINK_ACTIVE)) {
 		/* Send another link ack if the provisioner missed the last */
-		if (link.id == rx->link_id && link.tx.id == 0x7F) {
+		if (link.id == rx->link_id) {
 			BT_DBG("Resending link ack");
 			bearer_ctl_send(LINK_ACK, NULL, 0, false);
 		} else {
@@ -791,8 +803,8 @@ static int prov_link_open(const uint8_t uuid[16], k_timeout_t timeout,
 	atomic_set_bit(link.flags, PROVISIONER);
 
 	bt_rand(&link.id, sizeof(link.id));
-	link.tx.id = 0x7F;
-	link.rx.id = 0xFF;
+	link.tx.id = XACT_ID_MAX;
+	link.rx.id = XACT_ID_NVAL;
 	link.cb = cb;
 	link.cb_data = cb_data;
 
@@ -809,8 +821,8 @@ static int prov_link_accept(const struct prov_bearer_cb *cb, void *cb_data)
 		return -EBUSY;
 	}
 
-	link.rx.id = 0x7F;
-	link.tx.id = 0xFF;
+	link.rx.id = XACT_ID_MAX;
+	link.tx.id = XACT_ID_NVAL;
 	link.cb = cb;
 	link.cb_data = cb_data;
 
@@ -835,6 +847,11 @@ void pb_adv_init(void)
 {
 	k_delayed_work_init(&link.prot_timer, protocol_timeout);
 	k_delayed_work_init(&link.tx.retransmit, prov_retransmit);
+}
+
+void pb_adv_reset(void)
+{
+	reset_adv_link();
 }
 
 const struct prov_bearer pb_adv = {

@@ -99,6 +99,7 @@ static void *irq_cb_data; /**< Callback function arg */
  * to accept a new byte.
  */
 static volatile uint8_t uart_sw_event_txdrdy;
+static volatile bool disable_tx_irq;
 
 #endif /* CONFIG_UART_0_INTERRUPT_DRIVEN */
 
@@ -693,6 +694,11 @@ static void rxto_isr(void)
 {
 	nrf_uart_event_clear(uart0_addr, NRF_UART_EVENT_RXTO);
 
+	/* Send rxrdy if there is any data pending. */
+	if (uart0_cb.rx_counter - uart0_cb.rx_offset) {
+		rx_rdy_evt();
+	}
+
 	buf_released_evt();
 	if (uart0_cb.rx_secondary_buffer_length) {
 		uart0_cb.rx_buffer = uart0_cb.rx_secondary_buffer;
@@ -800,6 +806,8 @@ static void uart_nrfx_irq_tx_enable(struct device *dev)
 {
 	uint32_t key;
 
+	disable_tx_irq = false;
+
 	/* Indicate that this device started a transaction that should not be
 	 * interrupted by putting the SoC into the deep sleep mode.
 	 */
@@ -827,17 +835,8 @@ static void uart_nrfx_irq_tx_enable(struct device *dev)
 /** Interrupt driven transfer disabling function */
 static void uart_nrfx_irq_tx_disable(struct device *dev)
 {
-	nrf_uart_int_disable(uart0_addr, NRF_UART_INT_MASK_TXDRDY);
-
-	/* Deactivate the transmitter so that it does not needlessly consume
-	 * power.
-	 */
-	nrf_uart_task_trigger(uart0_addr, NRF_UART_TASK_STOPTX);
-
-	/* The transaction is over. It is okay to enter the deep sleep mode
-	 * if needed.
-	 */
-	device_busy_clear(dev);
+	/* Disable TX interrupt in uart_nrfx_isr() when transmission is done. */
+	disable_tx_irq = true;
 }
 
 /** Interrupt driven receiver enabling function */
@@ -855,7 +854,15 @@ static void uart_nrfx_irq_rx_disable(struct device *dev)
 /** Interrupt driven transfer empty function */
 static int uart_nrfx_irq_tx_ready_complete(struct device *dev)
 {
-	return event_txdrdy_check();
+	/* Signal TX readiness only when the TX interrupt is enabled and there
+	 * is no pending request to disable it. Note that this function may get
+	 * called after the TX interrupt is requested to be disabled but before
+	 * the disabling is actually performed (in the IRQ handler).
+	 */
+	return nrf_uart_int_enable_check(uart0_addr,
+					 NRF_UART_INT_MASK_TXDRDY) &&
+	       !disable_tx_irq &&
+	       event_txdrdy_check();
 }
 
 /** Interrupt driven receiver ready function */
@@ -881,7 +888,7 @@ static int uart_nrfx_irq_is_pending(struct device *dev)
 {
 	return ((nrf_uart_int_enable_check(uart0_addr,
 					   NRF_UART_INT_MASK_TXDRDY) &&
-		 event_txdrdy_check())
+		 uart_nrfx_irq_tx_ready_complete(dev))
 		||
 		(nrf_uart_int_enable_check(uart0_addr,
 					   NRF_UART_INT_MASK_RXDRDY) &&
@@ -915,7 +922,26 @@ static void uart_nrfx_irq_callback_set(struct device *dev,
  */
 static void uart_nrfx_isr(void *arg)
 {
-	ARG_UNUSED(arg);
+	struct device *dev = arg;
+
+	if (disable_tx_irq &&
+	    nrf_uart_event_check(uart0_addr, NRF_UART_EVENT_TXDRDY)) {
+		nrf_uart_int_disable(uart0_addr, NRF_UART_INT_MASK_TXDRDY);
+
+		/* Deactivate the transmitter so that it does not needlessly
+		 * consume power.
+		 */
+		nrf_uart_task_trigger(uart0_addr, NRF_UART_TASK_STOPTX);
+
+		/* The transaction is over. It is okay to enter the deep sleep
+		 * mode if needed.
+		 */
+		device_busy_clear(dev);
+
+		disable_tx_irq = false;
+
+		return;
+	}
 
 	if (nrf_uart_event_check(uart0_addr, NRF_UART_EVENT_ERROR)) {
 		nrf_uart_event_clear(uart0_addr, NRF_UART_EVENT_ERROR);

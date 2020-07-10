@@ -6,6 +6,7 @@
 
 #include <drivers/flash.h>
 #include <drivers/spi.h>
+#include <sys/byteorder.h>
 #include <logging/log.h>
 
 LOG_MODULE_REGISTER(spi_flash_at45, CONFIG_FLASH_LOG_LEVEL);
@@ -63,7 +64,8 @@ struct spi_flash_at45_config {
 	const char *spi_bus;
 	struct spi_config spi_cfg;
 	const char *cs_gpio;
-	int cs_pin;
+	gpio_pin_t cs_pin;
+	gpio_dt_flags_t cs_dt_flags;
 #if IS_ENABLED(CONFIG_FLASH_PAGE_LAYOUT)
 	struct flash_pages_layout pages_layout;
 #endif
@@ -74,6 +76,11 @@ struct spi_flash_at45_config {
 	uint16_t t_exit_dpd;  /* in microseconds */
 	bool use_udpd;
 	uint8_t jedec_id[3];
+};
+
+static const struct flash_parameters flash_at45_parameters = {
+	.write_block_size = 1,
+	.erase_value = 0xff,
 };
 
 static struct spi_flash_at45_data *get_dev_data(struct device *dev)
@@ -349,6 +356,7 @@ static int spi_flash_at45_write(struct device *dev, off_t offset,
 			break;
 		}
 
+		data    = (uint8_t *)data + chunk_len;
 		offset += chunk_len;
 		len    -= chunk_len;
 	}
@@ -423,7 +431,7 @@ static int perform_erase_op(struct device *dev, uint8_t opcode, off_t offset)
 static int spi_flash_at45_erase(struct device *dev, off_t offset, size_t size)
 {
 	const struct spi_flash_at45_config *cfg = get_dev_config(dev);
-	int err;
+	int err = 0;
 
 	if (!is_valid_request(offset, size, cfg->chip_size)) {
 		return -ENODEV;
@@ -551,6 +559,7 @@ static int spi_flash_at45_init(struct device *dev)
 		}
 
 		dev_data->spi_cs.gpio_pin = dev_config->cs_pin;
+		dev_data->spi_cs.gpio_dt_flags = dev_config->cs_dt_flags;
 		dev_data->spi_cs.delay = 0;
 	}
 
@@ -624,20 +633,28 @@ static int spi_flash_at45_pm_control(struct device *dev, uint32_t ctrl_command,
 }
 #endif /* IS_ENABLED(CONFIG_DEVICE_POWER_MANAGEMENT) */
 
+static const struct flash_parameters *
+flash_at45_get_parameters(const struct device *dev)
+{
+	ARG_UNUSED(dev);
+
+	return &flash_at45_parameters;
+}
+
 static const struct flash_driver_api spi_flash_at45_api = {
 	.read = spi_flash_at45_read,
 	.write = spi_flash_at45_write,
 	.erase = spi_flash_at45_erase,
 	.write_protection = spi_flash_at45_write_protection,
+	.get_parameters = flash_at45_get_parameters,
 #if IS_ENABLED(CONFIG_FLASH_PAGE_LAYOUT)
 	.page_layout = spi_flash_at45_pages_layout,
 #endif
-	.write_block_size = 1,
 };
 
 #define DT_DRV_COMPAT atmel_at45
 
-#define SPI_FLASH_AT45_INST(idx, _)					     \
+#define SPI_FLASH_AT45_INST(idx)					     \
 	enum {								     \
 		INST_##idx##_BYTES = (DT_INST_PROP(idx, size) / 8),	     \
 		INST_##idx##_PAGES = (INST_##idx##_BYTES /		     \
@@ -659,7 +676,8 @@ static const struct flash_driver_api spi_flash_at45_api = {
 		},							     \
 		IF_ENABLED(DT_INST_SPI_DEV_HAS_CS_GPIOS(idx), (		     \
 			.cs_gpio = DT_INST_SPI_DEV_CS_GPIOS_LABEL(idx),      \
-			.cs_pin  = DT_INST_SPI_DEV_CS_GPIOS_PIN(idx),))	     \
+			.cs_pin  = DT_INST_SPI_DEV_CS_GPIOS_PIN(idx),	     \
+			.cs_dt_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(idx),)) \
 		IF_ENABLED(CONFIG_FLASH_PAGE_LAYOUT, (			     \
 			.pages_layout = {				     \
 				.pages_count = INST_##idx##_PAGES,	     \
@@ -690,4 +708,4 @@ static const struct flash_driver_api spi_flash_at45_api = {
 		      POST_KERNEL, CONFIG_SPI_FLASH_AT45_INIT_PRIORITY,      \
 		      &spi_flash_at45_api);
 
-UTIL_LISTIFY(DT_NUM_INST(DT_DRV_COMPAT), SPI_FLASH_AT45_INST, _)
+DT_INST_FOREACH_STATUS_OKAY(SPI_FLASH_AT45_INST)

@@ -290,9 +290,6 @@ out:
 					    NULL, 0U, false);
 	k_sem_give(&dev->cmd_handler_data.sem_tx_lock);
 
-	net_pkt_unref(sock->tx_pkt);
-	sock->tx_pkt = NULL;
-
 	return ret;
 }
 
@@ -315,6 +312,9 @@ static void esp_send_work(struct k_work *work)
 		LOG_ERR("Failed to send data: link %d, ret %d", sock->link_id,
 			ret);
 	}
+
+	net_pkt_unref(sock->tx_pkt);
+	sock->tx_pkt = NULL;
 
 	if (sock->send_cb) {
 		sock->send_cb(sock->context, ret, sock->send_user_data);
@@ -392,10 +392,14 @@ static int esp_sendto(struct net_pkt *pkt,
 	ret = _sock_send(dev, sock);
 	k_sched_unlock();
 
-	if (ret < 0) {
+	if (ret == 0) {
+		net_pkt_unref(sock->tx_pkt);
+	} else {
 		LOG_ERR("Failed to send data: link %d, ret %d", sock->link_id,
 			ret);
 	}
+
+	sock->tx_pkt = NULL;
 
 	if (cb) {
 		cb(context, ret, user_data);
@@ -448,8 +452,9 @@ MODEM_CMD_DIRECT_DEFINE(on_cmd_ciprecvdata)
 	} else if (*endptr == 0) {
 		ret = -EAGAIN;
 		goto out;
-	} else if (*endptr != ':') {
-		LOG_ERR("Invalid end of cmd: 0x%02x != 0x%02x", *endptr, ':');
+	} else if (*endptr != _CIPRECVDATA_END) {
+		LOG_ERR("Invalid end of cmd: 0x%02x != 0x%02x", *endptr,
+			_CIPRECVDATA_END);
 		ret = len;
 		goto out;
 	}
@@ -489,7 +494,7 @@ static void esp_recvdata_work(struct k_work *work)
 	int len = CIPRECVDATA_MAX_LEN, ret;
 	char cmd[32];
 	struct modem_cmd cmds[] = {
-		MODEM_CMD_DIRECT("+CIPRECVDATA,", on_cmd_ciprecvdata),
+		MODEM_CMD_DIRECT(_CIPRECVDATA, on_cmd_ciprecvdata),
 	};
 
 	sock = CONTAINER_OF(work, struct esp_socket, recvdata_work);

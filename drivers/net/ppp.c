@@ -31,6 +31,7 @@ LOG_MODULE_REGISTER(net_ppp, LOG_LEVEL);
 #include <sys/crc.h>
 #include <drivers/uart.h>
 #include <drivers/console/uart_mux.h>
+#include <random/rand32.h>
 
 #include "../../subsys/net/ip/net_stats.h"
 #include "../../subsys/net/ip/net_private.h"
@@ -632,10 +633,8 @@ static int ppp_send(struct device *dev, struct net_pkt *pkt)
 }
 
 #if !defined(CONFIG_NET_TEST)
-static void ppp_isr_cb_work(struct k_work *work)
+static int ppp_consume_ringbuf(struct ppp_driver_context *ppp)
 {
-	struct ppp_driver_context *ppp =
-		CONTAINER_OF(work, struct ppp_driver_context, cb_work);
 	uint8_t *data;
 	size_t len, tmp;
 	int ret;
@@ -644,7 +643,7 @@ static void ppp_isr_cb_work(struct k_work *work)
 				 CONFIG_NET_PPP_RINGBUF_SIZE);
 	if (len == 0) {
 		LOG_DBG("Ringbuf %p is empty!", &ppp->rx_ringbuf);
-		return;
+		return 0;
 	}
 
 	/* This will print too much data, enable only if really needed */
@@ -659,7 +658,6 @@ static void ppp_isr_cb_work(struct k_work *work)
 			/* Ignore empty or too short frames */
 			if (ppp->pkt && net_pkt_get_len(ppp->pkt) > 3) {
 				ppp_process_msg(ppp);
-				break;
 			}
 		}
 	} while (--tmp);
@@ -667,6 +665,19 @@ static void ppp_isr_cb_work(struct k_work *work)
 	ret = ring_buf_get_finish(&ppp->rx_ringbuf, len);
 	if (ret < 0) {
 		LOG_DBG("Cannot flush ring buffer (%d)", ret);
+	}
+
+	return -EAGAIN;
+}
+
+static void ppp_isr_cb_work(struct k_work *work)
+{
+	struct ppp_driver_context *ppp =
+		CONTAINER_OF(work, struct ppp_driver_context, cb_work);
+	int ret = -EAGAIN;
+
+	while (ret == -EAGAIN) {
+		ret = ppp_consume_ringbuf(ppp);
 	}
 }
 #endif /* !CONFIG_NET_TEST */

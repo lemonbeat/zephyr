@@ -40,6 +40,14 @@
 #define ESPI_XEC_PORT80_BAR_ADDRESS 0x00800000
 #define ESPI_XEC_PORT81_BAR_ADDRESS 0x00810000
 
+/* Espi peripheral has 3 uart ports */
+#define ESPI_PERIPHERAL_UART_PORT0  0
+#define ESPI_PERIPHERAL_UART_PORT1  1
+#define ESPI_PERIPHERAL_UART_PORT2  2
+
+#define UART_DEFAULT_IRQ_POS	    2u
+#define UART_DEFAULT_IRQ	    BIT(UART_DEFAULT_IRQ_POS)
+
 #define MAX_OOB_BUFFER_SIZE         128ul
 #define MAX_SLAVE_BUFFER_SIZE       128ul
 
@@ -782,6 +790,14 @@ static void config_sub_devices(struct device *dev)
 	ESPI_EIO_BAR_REGS->EC_BAR_MBOX = ESPI_XEC_MBOX_BAR_ADDRESS |
 		MCHP_ESPI_IO_BAR_HOST_VALID;
 #endif
+#ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT
+	ESPI_EIO_BAR_REGS->EC_BAR_ACPI_EC_1 =
+	       CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT_PORT_NUM |
+		MCHP_ESPI_IO_BAR_HOST_VALID;
+	ESPI_EIO_BAR_REGS->EC_BAR_MBOX = ESPI_XEC_MBOX_BAR_ADDRESS |
+		MCHP_ESPI_IO_BAR_HOST_VALID;
+#endif
+
 #ifdef CONFIG_ESPI_PERIPHERAL_DEBUG_PORT_80
 	ESPI_EIO_BAR_REGS->EC_BAR_P80CAP_0 = ESPI_XEC_PORT80_BAR_ADDRESS |
 		MCHP_ESPI_IO_BAR_HOST_VALID;
@@ -795,7 +811,17 @@ static void config_sub_devices(struct device *dev)
 static void configure_sirq(void)
 {
 #ifdef CONFIG_ESPI_PERIPHERAL_UART
-	ESPI_SIRQ_REGS->UART_1_SIRQ = 0x04;
+	switch (CONFIG_ESPI_PERIPHERAL_UART_SOC_MAPPING) {
+	case ESPI_PERIPHERAL_UART_PORT0:
+		ESPI_SIRQ_REGS->UART_0_SIRQ = UART_DEFAULT_IRQ;
+		break;
+	case ESPI_PERIPHERAL_UART_PORT1:
+		ESPI_SIRQ_REGS->UART_1_SIRQ = UART_DEFAULT_IRQ;
+		break;
+	case ESPI_PERIPHERAL_UART_PORT2:
+		ESPI_SIRQ_REGS->UART_2_SIRQ = UART_DEFAULT_IRQ;
+		break;
+	}
 #endif
 #ifdef CONFIG_ESPI_PERIPHERAL_8042_KBC
 	ESPI_SIRQ_REGS->KBC_SIRQ_0 = 0x01;
@@ -1052,6 +1078,20 @@ static void ibf_isr(struct device *dev)
 	espi_send_callbacks(&data->callbacks, dev, evt);
 }
 
+#ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT
+static void ibf_pvt_isr(struct device *dev)
+{
+	struct espi_xec_data *data = (struct espi_xec_data *)(dev->driver_data);
+	struct espi_event evt = {
+		.evt_type = ESPI_BUS_PERIPHERAL_NOTIFICATION,
+		.evt_details = ESPI_PERIPHERAL_HOST_IO_PVT,
+		.evt_data = ESPI_PERIPHERAL_NODATA
+	};
+
+	espi_send_callbacks(&data->callbacks, dev, evt);
+}
+#endif
+
 static void ibf_kbc_isr(struct device *dev)
 {
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->driver_data);
@@ -1134,6 +1174,9 @@ const struct espi_isr m2s_vwires_isr[] = {
 
 const struct espi_isr peripherals_isr[] = {
 	{MCHP_ACPI_EC_0_IBF_GIRQ, ibf_isr},
+#ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT
+	{MCHP_ACPI_EC_1_IBF_GIRQ, ibf_pvt_isr},
+#endif
 	{MCHP_KBC_IBF_GIRQ, ibf_kbc_isr},
 	{MCHP_PORT80_DEBUG0_GIRQ_VAL, port80_isr},
 	{MCHP_PORT80_DEBUG1_GIRQ_VAL, port81_isr},
@@ -1310,8 +1353,10 @@ static int espi_xec_init(struct device *dev)
 #endif
 #ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO
 	MCHP_GIRQ_ENSET(config->pc_girq_id) = MCHP_ACPI_EC_0_IBF_GIRQ;
-	MCHP_GIRQ_ENSET(config->pc_girq_id) = MCHP_ACPI_EC_1_IBF_GIRQ;
 	MCHP_GIRQ_ENSET(config->pc_girq_id) = MCHP_ACPI_EC_2_IBF_GIRQ;
+#endif
+#ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT
+	MCHP_GIRQ_ENSET(config->pc_girq_id) = MCHP_ACPI_EC_1_IBF_GIRQ;
 #endif
 #ifdef CONFIG_ESPI_PERIPHERAL_DEBUG_PORT_80
 	MCHP_GIRQ_ENSET(config->pc_girq_id) = MCHP_PORT80_DEBUG0_GIRQ_VAL |

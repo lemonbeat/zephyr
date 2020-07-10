@@ -15,10 +15,8 @@
 #include <spinlock.h>
 #include <sys/math_extras.h>
 #include <sys_clock.h>
-#include <drivers/timer/system_timer.h>
 #include <ksched.h>
 #include <wait_q.h>
-#include <sys/atomic.h>
 #include <syscall_handler.h>
 #include <kernel_internal.h>
 #include <kswap.h>
@@ -28,6 +26,7 @@
 #include <stdbool.h>
 #include <irq_offload.h>
 #include <sys/check.h>
+#include <random/rand32.h>
 
 #ifdef CONFIG_THREAD_MONITOR
 /* This lock protects the linked list of active threads; i.e. the

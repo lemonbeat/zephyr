@@ -776,7 +776,7 @@ static size_t get_objlnk(struct lwm2m_input_context *in,
 	size = get_s32(in, &value_s32);
 
 	value->obj_id = (value_s32 >> 16) & 0xFFFF;
-	value->obj_inst = value_s32 && 0xFFFF;
+	value->obj_inst = value_s32 & 0xFFFF;
 
 	return size;
 }
@@ -992,6 +992,8 @@ int do_write_op_tlv(struct lwm2m_message *msg)
 			       msg->operation == LWM2M_OP_CREATE))) {
 				return ret;
 			}
+		} else {
+			return -ENOTSUP;
 		}
 	}
 

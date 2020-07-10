@@ -86,15 +86,13 @@ struct device *z_impl_device_get_binding(const char *name)
 	 * performed. Reserve string comparisons for a fallback.
 	 */
 	for (dev = __device_start; dev != __device_end; dev++) {
-		if ((dev->driver_api != NULL) &&
-		    (dev->name == name)) {
+		if (z_device_ready(dev) && (dev->name == name)) {
 			return dev;
 		}
 	}
 
 	for (dev = __device_start; dev != __device_end; dev++) {
-		if ((dev->driver_api != NULL) &&
-		    (strcmp(name, dev->name) == 0)) {
+		if (z_device_ready(dev) && (strcmp(name, dev->name) == 0)) {
 			return dev;
 		}
 	}
@@ -117,6 +115,12 @@ static inline struct device *z_vrfy_device_get_binding(const char *name)
 #include <syscalls/device_get_binding_mrsh.c>
 #endif /* CONFIG_USERSPACE */
 
+size_t z_device_get_all_static(struct device **devices)
+{
+	*devices = __device_start;
+	return __device_end - __device_start;
+}
+
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
 int device_pm_control_nop(struct device *unused_device,
 		       uint32_t unused_ctrl_command,
@@ -126,14 +130,6 @@ int device_pm_control_nop(struct device *unused_device,
 {
 	return -ENOTSUP;
 }
-
-void device_list_get(struct device **device_list, int *device_count)
-{
-
-	*device_list = __device_start;
-	*device_count = __device_end - __device_start;
-}
-
 
 int device_any_busy_check(void)
 {

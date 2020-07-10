@@ -613,7 +613,7 @@ int bt_mesh_input_string(const char *str)
 		return -EINVAL;
 	}
 
-	strncpy(link.auth, str, prov->input_size);
+	strncpy((char *)link.auth, str, prov->input_size);
 
 	send_input_complete();
 
@@ -1064,15 +1064,15 @@ static void prov_recv(const struct prov_bearer *bearer, void *cb_data,
 
 	BT_DBG("type 0x%02x len %u", type, buf->len);
 
-	if (type != PROV_FAILED && type != link.expect) {
-		BT_WARN("Unexpected msg 0x%02x != 0x%02x", type, link.expect);
-		prov_fail(PROV_ERR_UNEXP_PDU);
+	if (type >= ARRAY_SIZE(prov_handlers)) {
+		BT_ERR("Unknown provisioning PDU type 0x%02x", type);
+		prov_fail(PROV_ERR_NVAL_FMT);
 		return;
 	}
 
-	if (type >= ARRAY_SIZE(prov_handlers)) {
-		BT_ERR("Unknown provisioning PDU type 0x%02x", type);
-		prov_fail(PROV_ERR_NVAL_PDU);
+	if (type != PROV_FAILED && type != link.expect) {
+		BT_WARN("Unexpected msg 0x%02x != 0x%02x", type, link.expect);
+		prov_fail(PROV_ERR_UNEXP_PDU);
 		return;
 	}
 
@@ -1247,6 +1247,16 @@ void bt_mesh_prov_complete(uint16_t net_idx, uint16_t addr)
 
 void bt_mesh_prov_reset(void)
 {
+	if (IS_ENABLED(CONFIG_BT_MESH_PB_ADV)) {
+		pb_adv_reset();
+	}
+
+	if (IS_ENABLED(CONFIG_BT_MESH_PB_GATT)) {
+		pb_gatt_reset();
+	}
+
+	reset_state();
+
 	if (prov->reset) {
 		prov->reset();
 	}

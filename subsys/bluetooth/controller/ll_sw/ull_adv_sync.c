@@ -103,7 +103,7 @@ uint8_t ll_adv_sync_param_set(uint8_t handle, uint16_t interval, uint16_t flags)
 		err = util_aa_le32(lll_sync->access_addr);
 		LL_ASSERT(!err);
 
-		util_rand(lll_sync->crc_init, sizeof(lll_sync->crc_init));
+		lll_csrand_get(lll_sync->crc_init, sizeof(lll_sync->crc_init));
 
 		lll_sync->latency_prepare = 0;
 		lll_sync->latency_event = 0;
@@ -462,8 +462,8 @@ uint8_t ll_adv_sync_param_set(uint8_t handle, uint16_t interval, uint16_t flags)
 	return 0;
 }
 
-uint8_t ll_adv_sync_ad_data_set(uint8_t handle, uint8_t op, uint8_t frag_pref,
-				uint8_t len, uint8_t const *const data)
+uint8_t ll_adv_sync_ad_data_set(uint8_t handle, uint8_t op, uint8_t len,
+				uint8_t const *const data)
 {
 	/* TODO */
 	return BT_HCI_ERR_CMD_DISALLOWED;

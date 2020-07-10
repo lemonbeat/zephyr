@@ -32,6 +32,7 @@ LOG_MODULE_REGISTER(gd7965, CONFIG_DISPLAY_LOG_LEVEL);
 #define GD7965_DC_FLAGS DT_INST_GPIO_FLAGS(0, dc_gpios)
 #define GD7965_DC_CNTRL DT_INST_GPIO_LABEL(0, dc_gpios)
 #define GD7965_CS_PIN DT_INST_SPI_DEV_CS_GPIOS_PIN(0)
+#define GD7965_CS_FLAGS DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0)
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
 #define GD7965_CS_CNTRL DT_INST_SPI_DEV_CS_GPIOS_LABEL(0)
 #endif
@@ -104,7 +105,7 @@ static inline void gd7965_busy_wait(struct gd7965_data *driver)
 	while (pin > 0) {
 		__ASSERT(pin >= 0, "Failed to get pin level");
 		LOG_DBG("wait %u", pin);
-		k_sleep(GD7965_BUSY_DELAY);
+		k_sleep(K_MSEC(GD7965_BUSY_DELAY));
 		pin = gpio_pin_get(driver->busy, GD7965_BUSY_PIN);
 	}
 }
@@ -118,7 +119,7 @@ static int gd7965_update_display(const struct device *dev)
 		return -EIO;
 	}
 
-	k_sleep(GD7965_BUSY_DELAY);
+	k_sleep(K_MSEC(GD7965_BUSY_DELAY));
 
 	return 0;
 }
@@ -317,9 +318,9 @@ static int gd7965_controller_init(struct device *dev)
 	uint8_t tmp[GD7965_TRES_REG_LENGTH];
 
 	gpio_pin_set(driver->reset, GD7965_RESET_PIN, 1);
-	k_sleep(GD7965_RESET_DELAY);
+	k_sleep(K_MSEC(GD7965_RESET_DELAY));
 	gpio_pin_set(driver->reset, GD7965_RESET_PIN, 0);
-	k_sleep(GD7965_RESET_DELAY);
+	k_sleep(K_MSEC(GD7965_RESET_DELAY));
 	gd7965_busy_wait(driver);
 
 	LOG_DBG("Initialize GD7965 controller");
@@ -339,7 +340,7 @@ static int gd7965_controller_init(struct device *dev)
 		return -EIO;
 	}
 
-	k_sleep(GD7965_PON_DELAY);
+	k_sleep(K_MSEC(GD7965_PON_DELAY));
 	gd7965_busy_wait(driver);
 
 	/* Pannel settings, KW mode */
@@ -441,6 +442,7 @@ static int gd7965_init(struct device *dev)
 	}
 
 	driver->cs_ctrl.gpio_pin = GD7965_CS_PIN;
+	driver->cs_ctrl.gpio_dt_flags = GD7965_CS_FLAGS;
 	driver->cs_ctrl.delay = 0U;
 	driver->spi_config.cs = &driver->cs_ctrl;
 #endif

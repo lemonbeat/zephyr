@@ -219,6 +219,13 @@ static void spi_sam0_fast_rx(SercomSpi *regs, const struct spi_buf *rx_buf)
 	regs->DATA.reg = 0;
 	len--;
 
+	/* Ensure the data register has shifted to the shift register before
+	 * continuing.	Later writes are synchronised by waiting for the receive
+	 * to complete.
+	 */
+	while (!regs->INTFLAG.bit.DRE) {
+	}
+
 	while (len) {
 		/* Load byte N+1 into the transmit register */
 		regs->DATA.reg = 0;
@@ -362,10 +369,6 @@ static bool spi_sam0_is_regular(const struct spi_buf_set *tx_bufs,
 	if (rx_bufs) {
 		rx = rx_bufs->buffers;
 		rx_count = rx_bufs->count;
-	}
-
-	if (!tx || !rx) {
-		return false;
 	}
 
 	while (tx_count != 0 && rx_count != 0) {

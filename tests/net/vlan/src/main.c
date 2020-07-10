@@ -18,6 +18,7 @@ LOG_MODULE_REGISTER(net_test, NET_LOG_LEVEL);
 #include <errno.h>
 #include <sys/printk.h>
 #include <linker/sections.h>
+#include <random/rand32.h>
 
 #include <ztest.h>
 
@@ -339,11 +340,11 @@ static void test_vlan_setup(void)
 
 	/* One extra eth interface without vlan support */
 	zassert_equal(ud.eth_if_count, NET_VLAN_MAX_COUNT,
-		      "Invalid numer of VLANs %d vs %d\n",
+		      "Invalid number of VLANs %d vs %d\n",
 		      ud.eth_if_count, NET_VLAN_MAX_COUNT);
 
 	zassert_equal(ud.total_if_count, NET_VLAN_MAX_COUNT + 1 + 2,
-		      "Invalid numer of interfaces");
+		      "Invalid number of interfaces");
 
 	/* Put the extra non-vlan ethernet interface to last */
 	eth_interfaces[4] = extra_eth;

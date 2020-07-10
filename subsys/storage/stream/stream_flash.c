@@ -115,7 +115,7 @@ int stream_flash_buffered_write(struct stream_flash_ctx *ctx, const uint8_t *dat
 	size_t fill_length;
 	uint8_t filler;
 
-	if (!ctx || !data) {
+	if (!ctx) {
 		return -EFAULT;
 	}
 
@@ -215,7 +215,7 @@ int stream_flash_init(struct stream_flash_ctx *ctx, struct device *fdev,
 	}
 
 	if ((offset + size) > total_size ||
-	    offset % api->write_block_size) {
+	    offset % flash_get_write_block_size(fdev)) {
 		LOG_ERR("Incorrect parameter");
 		return -EFAULT;
 	}

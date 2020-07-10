@@ -27,6 +27,11 @@
 #define SYNC_UNLOCK()
 #endif
 
+static const struct flash_parameters flash_wb_parameters = {
+	.write_block_size = 1,
+	.erase_value = 0xff,
+};
+
 static int spi_flash_wb_access(struct spi_flash_data *ctx,
 			       uint8_t cmd, bool addressed, off_t offset,
 			       void *data, size_t length, bool write)
@@ -388,15 +393,23 @@ static void flash_wb_pages_layout(struct device *dev,
 }
 #endif /* CONFIG_FLASH_PAGE_LAYOUT */
 
+static const struct flash_parameters *
+flash_wb_get_parameters(const struct device *dev)
+{
+	ARG_UNUSED(dev);
+
+	return &flash_wb_parameters;
+}
+
 static const struct flash_driver_api spi_flash_api = {
 	.read = spi_flash_wb_read,
 	.write = spi_flash_wb_write,
 	.erase = spi_flash_wb_erase,
 	.write_protection = spi_flash_wb_write_protection_set,
+	.get_parameters = flash_wb_get_parameters,
 #if defined(CONFIG_FLASH_PAGE_LAYOUT)
 	.page_layout = flash_wb_pages_layout,
 #endif
-	.write_block_size = 1,
 };
 
 static int spi_flash_wb_configure(struct device *dev)
@@ -420,6 +433,7 @@ static int spi_flash_wb_configure(struct device *dev)
 	}
 
 	data->cs_ctrl.gpio_pin = DT_INST_SPI_DEV_CS_GPIOS_PIN(0);
+	data->cs_ctrl.gpio_dt_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0);
 	data->cs_ctrl.delay = CONFIG_SPI_FLASH_W25QXXDV_GPIO_CS_WAIT_DELAY;
 
 	data->spi_cfg.cs = &data->cs_ctrl;

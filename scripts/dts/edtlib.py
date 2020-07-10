@@ -150,6 +150,9 @@ class EDT:
 
     bindings_dirs:
       The bindings directory paths passed to __init__()
+
+    The standard library's pickle module can be used to marshal and
+    unmarshal EDT objects.
     """
     def __init__(self, dts, bindings_dirs, warn_file=None,
                  warn_reg_unit_address_mismatch=True,
@@ -182,8 +185,9 @@ class EDT:
           to None.  This allows 'fixed-partitions' binding to match regardless
           of the bus the 'fixed-partition' is under.
         """
-        # Do this indirection with None in case sys.stderr is deliberately
-        # overridden
+        # Do this indirection with None in case sys.stderr is
+        # deliberately overridden. We'll only hold on to this file
+        # while we're initializing.
         self._warn_file = sys.stderr if warn_file is None else warn_file
 
         self._warn_reg_unit_address_mismatch = warn_reg_unit_address_mismatch
@@ -201,6 +205,11 @@ class EDT:
         self._init_luts()
 
         self._define_order()
+
+        # Drop the reference to the open warn file. This is necessary
+        # to make this object pickleable, but also allows it to get
+        # garbage collected and closed if nobody else is using it.
+        self._warn_file = None
 
     def get_node(self, path):
         """
@@ -345,7 +354,23 @@ class EDT:
                            "valid YAML: {}".format(binding_path, e))
                 continue
 
-            binding_compat = self._binding_compat(binding, binding_path)
+
+            # Returns the string listed in 'compatible:' in 'binding', or None if
+            # no compatible is found.
+
+            if binding is None or "compatible" not in binding:
+                # Empty file, binding fragment, spurious file, or old-style
+                # compat
+                binding_compat = None
+            else:
+                binding_compat = binding["compatible"]
+                if not isinstance(binding_compat, str):
+                    _err("malformed 'compatible: {}' field in {} - "
+                         "should be a string, not {}"
+                         .format(binding_compat, binding_path,
+                                 type(binding_compat).__name__))
+
+
             if binding_compat not in dt_compats:
                 # Either not a binding (binding_compat is None -- might be a
                 # binding fragment or a spurious file), or a binding whose
@@ -374,64 +399,9 @@ class EDT:
 
             self._compat2binding[binding_compat, on_bus] = (binding, binding_path)
 
-    def _binding_compat(self, binding, binding_path):
-        # Returns the string listed in 'compatible:' in 'binding', or None if
-        # no compatible is found. Only takes 'self' for the sake of
-        # self._warn().
-        #
-        # Also searches for legacy compatibles on the form
-        #
-        #   properties:
-        #       compatible:
-        #           constraint: <string>
-
-        def new_style_compat():
-            # New-style 'compatible: "foo"' compatible
-
-            if binding is None or "compatible" not in binding:
-                # Empty file, binding fragment, spurious file, or old-style
-                # compat
-                return None
-
-            compatible = binding["compatible"]
-            if not isinstance(compatible, str):
-                _err("malformed 'compatible: {}' field in {} - "
-                     "should be a string, not {}"
-                     .format(compatible, binding_path,
-                             type(compatible).__name__))
-
-            return compatible
-
-        def old_style_compat():
-            # Old-style 'constraint: "foo"' compatible
-
-            try:
-                return binding["properties"]["compatible"]["constraint"]
-            except Exception:
-                return None
-
-        new_compat = new_style_compat()
-        old_compat = old_style_compat()
-        if old_compat:
-            self._warn("The 'properties: compatible: constraint: ...' way of "
-                       "specifying the compatible in {} is deprecated. Put "
-                       "'compatible: \"{}\"' at the top level of the binding "
-                       "instead.".format(binding_path, old_compat))
-
-            if new_compat:
-                _err("compatibles for {} should be specified with either "
-                     "'compatible:' at the top level or with the legacy "
-                     "'properties: compatible: constraint: ...' field, not "
-                     "both".format(binding_path))
-
-            return old_compat
-
-        return new_compat
-
     def _merge_included_bindings(self, binding, binding_path):
         # Merges any bindings listed in the 'include:' section of 'binding'
-        # into the top level of 'binding'. Also supports the legacy
-        # 'inherits: !include ...' syntax for including bindings.
+        # into the top level of 'binding'.
         #
         # Properties in 'binding' take precedence over properties from included
         # bindings.
@@ -453,19 +423,6 @@ class EDT:
 
         if "child-binding" in binding and "include" in binding["child-binding"]:
             self._merge_included_bindings(binding["child-binding"], binding_path)
-
-        # Legacy syntax
-        if "inherits" in binding:
-            self._warn("the 'inherits:' syntax in {} is deprecated and will "
-                       "be removed - please use 'include: foo.yaml' or "
-                       "'include: [foo.yaml, bar.yaml]' instead"
-                       .format(binding_path))
-
-            inherits = binding.pop("inherits")
-            if not isinstance(inherits, list) or \
-               not all(isinstance(elm, str) for elm in inherits):
-                _err("malformed 'inherits:' in " + binding_path)
-            fnames += inherits
 
         if not fnames:
             return binding
@@ -547,6 +504,14 @@ class EDT:
             node._init_interrupts()
             node._init_pinctrls()
 
+        if self._warn_reg_unit_address_mismatch:
+            # This warning matches the simple_bus_reg warning in dtc
+            for node in self.nodes:
+                if node.regs and node.regs[0].addr != node.unit_addr:
+                    self._warn("unit address and first address in 'reg' "
+                               f"(0x{node.regs[0].addr:x}) don't match for "
+                               f"{node.path}")
+
     def _init_luts(self):
         # Initialize node lookup tables (LUTs).
 
@@ -572,21 +537,6 @@ class EDT:
         # Does sanity checking on 'binding'. Only takes 'self' for the sake of
         # self._warn().
 
-        if "title" in binding:
-            # This message is the message that people copy-pasting the old
-            # format will see in practice
-            self._warn("'title:' in {} is deprecated and will be removed (and "
-                       "was never used). Just put a 'description:' that "
-                       "describes the device instead. Use other bindings as "
-                       "a reference, and note that all bindings were updated "
-                       "recently. Think about what information would be "
-                       "useful to other people (e.g. explanations of "
-                       "acronyms, or datasheet links), and put that in as "
-                       "well. The description text shows up as a comment "
-                       "in the generated header. See yaml-multiline.info for "
-                       "how to deal with multiple lines. You probably want "
-                       "'description: |'.".format(binding_path))
-
         if "description" not in binding:
             _err("missing 'description' property in " + binding_path)
 
@@ -611,43 +561,6 @@ class EDT:
                 _err("malformed '{}:' value in {}, expected string"
                      .format(bus_key, binding_path))
 
-        # There are two legacy syntaxes for 'bus:' and 'on-bus:':
-        #
-        #     child/parent-bus: foo
-        #     child/parent: bus: foo
-        #
-        # We support both, with deprecation warnings.
-        for pc in "parent", "child":
-            # Legacy 'parent/child-bus:' keys
-            bus_key = pc + "-bus"
-            if bus_key in binding:
-                self._warn("'{}:' in {} is deprecated and will be removed - "
-                           "please use a top-level '{}:' key instead (see "
-                           "binding-template.yaml)"
-                           .format(bus_key, binding_path,
-                                   "bus" if bus_key == "child-bus" else "on-bus"))
-
-                if not isinstance(binding[bus_key], str):
-                    _err("malformed '{}:' value in {}, expected string"
-                         .format(bus_key, binding_path))
-
-            # Legacy 'child/parent: bus: ...' keys
-            if pc in binding:
-                self._warn("'{}: bus: ...' in {} is deprecated and will be "
-                           "removed - please use a top-level '{}' key instead "
-                           "(see binding-template.yaml)"
-                           .format(pc, binding_path,
-                                   "bus" if pc == "child" else "on-bus:"))
-
-                # Just 'bus:' is expected
-                if binding[pc].keys() != {"bus"}:
-                    _err("expected (just) 'bus:' in '{}:' in {}"
-                         .format(pc, binding_path))
-
-                if not isinstance(binding[pc]["bus"], str):
-                    _err("malformed '{}: bus:' value in {}, expected string"
-                         .format(pc, binding_path))
-
         self._check_binding_properties(binding, binding_path)
 
         if "child-binding" in binding:
@@ -656,25 +569,6 @@ class EDT:
                      "(dictionary with keys/values)".format(binding_path))
 
             self._check_binding(binding["child-binding"], binding_path)
-
-        if "sub-node" in binding:
-            self._warn("'sub-node: properties: ...' in {} is deprecated and "
-                       "will be removed - please give a full binding for the "
-                       "child node in 'child-binding:' instead (see "
-                       "binding-template.yaml)".format(binding_path))
-
-            if binding["sub-node"].keys() != {"properties"}:
-                _err("expected (just) 'properties:' in 'sub-node:' in {}"
-                     .format(binding_path))
-
-            self._check_binding_properties(binding["sub-node"], binding_path)
-
-        if "#cells" in binding:
-            self._warn('"#cells:" in {} is deprecated and will be removed - '
-                       "please put 'interrupt-cells:', 'pwm-cells:', "
-                       "'gpio-cells:', etc., instead. The name should match "
-                       "the name of the corresponding phandle-array property "
-                       "(see binding-template.yaml)".format(binding_path))
 
         def ok_cells_val(val):
             # Returns True if 'val' is an okay value for '*-cells:' (or the
@@ -697,7 +591,7 @@ class EDT:
             return
 
         ok_prop_keys = {"description", "type", "required", "category",
-                        "constraint", "enum", "const", "default"}
+                        "enum", "const", "default"}
 
         for prop_name, options in binding["properties"].items():
             for key in options:
@@ -740,7 +634,10 @@ class EDT:
                      .format(binding_path, prop_name))
 
     def _warn(self, msg):
-        print("warning: " + msg, file=self._warn_file)
+        if self._warn_file is not None:
+            print("warning: " + msg, file=self._warn_file)
+        else:
+            raise _err("can't _warn() outside of EDT.__init__")
 
 
 class Node:
@@ -892,16 +789,7 @@ class Node:
         except ValueError:
             _err("{!r} has non-hex unit address".format(self))
 
-        addr = _translate(addr, self._node)
-
-        # Matches the simple_bus_reg warning in dtc
-        if self.edt._warn_reg_unit_address_mismatch and \
-           self.regs and self.regs[0].addr != addr:
-            self.edt._warn("unit address and first address in 'reg' "
-                           f"(0x{self.regs[0].addr:x}) don't match for "
-                           f"{self.path}")
-
-        return addr
+        return _translate(addr, self._node)
 
     @property
     def description(self):

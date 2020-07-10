@@ -10,6 +10,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(iproc_pcie);
 
+#include <soc.h>
+
 #include "pcie_ep_bcm_iproc.h"
 #include "pcie_ep_bcm_iproc_regs.h"
 
@@ -238,6 +240,155 @@ static int iproc_pcie_raise_irq(struct device *dev,
 	return ret;
 }
 
+static int iproc_pcie_register_reset_cb(struct device *dev,
+					enum pcie_reset reset,
+					pcie_ep_reset_callback_t cb, void *arg)
+{
+	struct iproc_pcie_ep_ctx *ctx = dev->driver_data;
+
+	if (reset < PCIE_PERST || reset >= PCIE_RESET_MAX)
+		return -EINVAL;
+
+	LOG_DBG("Registering the callback for reset %d", reset);
+	ctx->reset_cb[reset] = cb;
+	ctx->reset_data[reset] = arg;
+
+	return 0;
+}
+
+#if DT_INST_IRQ_HAS_NAME(0, perst)
+static void iproc_pcie_perst(void *arg)
+{
+	struct device *dev = arg;
+	struct iproc_pcie_ep_ctx *ctx = dev->driver_data;
+	void *reset_data;
+	uint32_t data;
+
+	data = sys_read32(CRMU_MCU_EXTRA_EVENT_STATUS);
+
+	if (data & PCIE0_PERST_INTR) {
+		LOG_DBG("PERST interrupt [0x%x]", data);
+		sys_write32(PCIE0_PERST_INTR, CRMU_MCU_EXTRA_EVENT_CLEAR);
+
+		if (ctx->reset_cb[PCIE_PERST] != NULL) {
+			reset_data = ctx->reset_data[PCIE_PERST];
+			ctx->reset_cb[PCIE_PERST](reset_data);
+		}
+	}
+}
+#endif
+
+#if DT_INST_IRQ_HAS_NAME(0, perst_inband)
+static void iproc_pcie_hot_reset(void *arg)
+{
+	struct device *dev = arg;
+	struct iproc_pcie_ep_ctx *ctx = dev->driver_data;
+	void *reset_data;
+	uint32_t data;
+
+	data = sys_read32(CRMU_MCU_EXTRA_EVENT_STATUS);
+
+	if (data & PCIE0_PERST_INB_INTR) {
+		LOG_DBG("INBAND PERST interrupt [0x%x]", data);
+		sys_write32(PCIE0_PERST_INB_INTR, CRMU_MCU_EXTRA_EVENT_CLEAR);
+
+		if (ctx->reset_cb[PCIE_PERST_INB] != NULL) {
+			reset_data = ctx->reset_data[PCIE_PERST_INB];
+			ctx->reset_cb[PCIE_PERST_INB](reset_data);
+		}
+	}
+}
+#endif
+
+#if DT_INST_IRQ_HAS_NAME(0, flr)
+static void iproc_pcie_flr(void *arg)
+{
+	struct device *dev = arg;
+	const struct iproc_pcie_ep_config *cfg = dev->config_info;
+	struct iproc_pcie_ep_ctx *ctx = dev->driver_data;
+	void *reset_data;
+	uint32_t data;
+
+	data = pcie_read32(&cfg->base->paxb_paxb_intr_status);
+
+	if (data & PCIE0_FLR_INTR) {
+		LOG_DBG("FLR interrupt[0x%x]", data);
+		pcie_write32(PCIE0_FLR_INTR, &cfg->base->paxb_paxb_intr_clear);
+
+		if (ctx->reset_cb[PCIE_FLR] != NULL) {
+			reset_data = ctx->reset_data[PCIE_FLR];
+			ctx->reset_cb[PCIE_FLR](reset_data);
+		}
+	} else {
+		/*
+		 * Other interrupts like PAXB ECC Error interrupt
+		 * could show up at the beginning which are harmless.
+		 * So simply clearing those interrupts here
+		 */
+		LOG_DBG("PAXB interrupt[0x%x]", data);
+		pcie_write32(data, &cfg->base->paxb_paxb_intr_clear);
+	}
+
+	/* Clear FLR in Progress bit */
+	iproc_pcie_conf_read(dev, PCIE_DEV_CTRL_OFFSET, &data);
+	data |= FLR_IN_PROGRESS;
+	iproc_pcie_conf_write(dev, PCIE_DEV_CTRL_OFFSET, data);
+}
+#endif
+
+DEVICE_DECLARE(iproc_pcie_ep_0);
+
+static void iproc_pcie_reset_config(struct device *dev)
+{
+	uint32_t data;
+	const struct iproc_pcie_ep_config *cfg = dev->config_info;
+
+	/* Clear any possible prior pending interrupts */
+	sys_write32(PCIE0_PERST_INTR | PCIE0_PERST_INB_INTR,
+		    CRMU_MCU_EXTRA_EVENT_CLEAR);
+	pcie_write32(PCIE0_FLR_INTR, &cfg->base->paxb_paxb_intr_clear);
+
+	/* Enable PERST and Inband PERST interrupts */
+	data = sys_read32(PCIE_PERSTB_INTR_CTL_STS);
+	data |= (PCIE0_PERST_FE_INTR | PCIE0_PERST_INB_FE_INTR);
+	sys_write32(data, PCIE_PERSTB_INTR_CTL_STS);
+
+	data = sys_read32(CRMU_MCU_EXTRA_EVENT_MASK);
+	data &= ~(PCIE0_PERST_INTR | PCIE0_PERST_INB_INTR);
+	sys_write32(data, CRMU_MCU_EXTRA_EVENT_MASK);
+
+	/* Set auto clear FLR and auto clear CRS post FLR */
+	iproc_pcie_conf_read(dev, PCIE_TL_CTRL0_OFFSET, &data);
+	data |= (AUTO_CLR_CRS_POST_FLR | AUTO_CLR_FLR_AFTER_DELAY);
+	iproc_pcie_conf_write(dev, PCIE_TL_CTRL0_OFFSET, data);
+
+	/* Enable Function Level Reset */
+	data = pcie_read32(&cfg->base->paxb_paxb_intr_en);
+	data |= PCIE0_FLR_INTR;
+	pcie_write32(data, &cfg->base->paxb_paxb_intr_en);
+
+#if DT_INST_IRQ_HAS_NAME(0, perst)
+	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, perst, irq),
+		    DT_INST_IRQ_BY_NAME(0, perst, priority),
+		    iproc_pcie_perst, DEVICE_GET(iproc_pcie_ep_0), 0);
+	irq_enable(DT_INST_IRQ_BY_NAME(0, perst, irq));
+#endif
+
+#if DT_INST_IRQ_HAS_NAME(0, perst_inband)
+	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, perst_inband, irq),
+		    DT_INST_IRQ_BY_NAME(0, perst_inband, priority),
+		    iproc_pcie_hot_reset, DEVICE_GET(iproc_pcie_ep_0), 0);
+	irq_enable(DT_INST_IRQ_BY_NAME(0, perst_inband, irq));
+#endif
+
+#if DT_INST_IRQ_HAS_NAME(0, flr)
+	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, flr, irq),
+		    DT_INST_IRQ_BY_NAME(0, flr, priority),
+		    iproc_pcie_flr, DEVICE_GET(iproc_pcie_ep_0), 0);
+	irq_enable(DT_INST_IRQ_BY_NAME(0, flr, irq));
+#endif
+}
+
 #ifdef CONFIG_PCIE_EP_BCM_IPROC_INIT_CFG
 static void iproc_pcie_msix_config(struct device *dev)
 {
@@ -300,6 +451,8 @@ static int iproc_pcie_ep_init(struct device *dev)
 	iproc_pcie_msix_config(dev);
 #endif
 
+	iproc_pcie_reset_config(dev);
+
 	ctx->highmem_in_use = false;
 	ctx->lowmem_in_use = false;
 	LOG_INF("PCIe initialized successfully\n");
@@ -326,6 +479,7 @@ static struct pcie_ep_driver_api iproc_pcie_ep_api = {
 	.map_addr = iproc_pcie_map_addr,
 	.unmap_addr = iproc_pcie_unmap_addr,
 	.raise_irq = iproc_pcie_raise_irq,
+	.register_reset_cb = iproc_pcie_register_reset_cb,
 };
 
 DEVICE_AND_API_INIT(iproc_pcie_ep_0, DT_INST_LABEL(0),

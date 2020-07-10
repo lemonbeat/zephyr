@@ -8,6 +8,7 @@
 #include <zephyr.h>
 
 #include <shell/shell.h>
+#include <sys/util.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,10 +18,7 @@
 #define BUF_ARRAY_CNT 16
 #define TEST_ARR_SIZE 0x1000
 
-extern struct device __device_start[];
-extern struct device __device_end[];
-
-static uint8_t test_arr[TEST_ARR_SIZE];
+static uint8_t __aligned(4) test_arr[TEST_ARR_SIZE];
 
 static int parse_helper(const struct shell *shell, size_t *argc,
 		char **argv[], struct device **flash_dev, uint32_t *addr)
@@ -139,6 +137,8 @@ static int cmd_read(const struct shell *shell, size_t argc, char *argv[])
 {
 	struct device *flash_dev;
 	uint32_t addr;
+	int todo;
+	int upto;
 	int cnt;
 	int ret;
 
@@ -153,16 +153,17 @@ static int cmd_read(const struct shell *shell, size_t argc, char *argv[])
 		cnt = 1;
 	}
 
-	while (cnt--) {
-		uint32_t data;
+	for (upto = 0; upto < cnt; upto += todo) {
+		uint8_t data[SHELL_HEXDUMP_BYTES_IN_LINE];
 
-		ret = flash_read(flash_dev, addr, &data, sizeof(data));
+		todo = MIN(cnt - upto, SHELL_HEXDUMP_BYTES_IN_LINE);
+		ret = flash_read(flash_dev, addr, data, todo);
 		if (ret != 0) {
 			shell_error(shell, "Read ERROR!");
 			return -EIO;
 		}
-		shell_print(shell, "0x%08x ", data);
-		addr += sizeof(data);
+		shell_hexdump_line(shell, addr, data, todo);
+		addr += todo;
 	}
 
 	shell_print(shell, "");
@@ -225,24 +226,12 @@ SHELL_DYNAMIC_CMD_CREATE(dsub_device_name, device_name_get);
 
 static void device_name_get(size_t idx, struct shell_static_entry *entry)
 {
-	int device_idx = 0;
-	struct device *dev;
+	struct device *dev = shell_device_lookup(idx, NULL);
 
-	entry->syntax = NULL;
+	entry->syntax = (dev != NULL) ? dev->name : NULL;
 	entry->handler = NULL;
 	entry->help  = NULL;
 	entry->subcmd = &dsub_device_name;
-
-	for (dev = __device_start; dev != __device_end; dev++) {
-		if ((dev->driver_api != NULL) &&
-		strcmp(dev->name, "") && (dev->name != NULL)) {
-			if (idx == device_idx) {
-				entry->syntax = dev->name;
-				break;
-			}
-			device_idx++;
-		}
-	}
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(flash_cmds,

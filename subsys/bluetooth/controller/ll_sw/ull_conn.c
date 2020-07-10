@@ -7,7 +7,6 @@
 #include <stddef.h>
 #include <zephyr.h>
 #include <device.h>
-#include <drivers/entropy.h>
 #include <bluetooth/bluetooth.h>
 #include <sys/byteorder.h>
 
@@ -168,8 +167,6 @@ static uint8_t default_phy_rx;
 static struct ll_conn conn_pool[CONFIG_BT_MAX_CONN];
 static struct ll_conn *conn_upd_curr;
 static void *conn_free;
-
-static struct device *entropy;
 
 struct ll_conn *ll_conn_acquire(void)
 {
@@ -606,11 +603,6 @@ uint8_t ll_apto_set(uint16_t handle, uint16_t apto)
 int ull_conn_init(void)
 {
 	int err;
-
-	entropy = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
-	if (!entropy) {
-		return -ENODEV;
-	}
 
 	err = init_reset();
 	if (err) {
@@ -3850,9 +3842,9 @@ static void enc_req_reused_send(struct ll_conn *conn, struct node_tx **tx)
 		     sizeof(pdu_ctrl_tx->llctrl.enc_req.skdm)));
 
 	/* NOTE: if not sufficient random numbers, ignore waiting */
-	entropy_get_entropy_isr(entropy, pdu_ctrl_tx->llctrl.enc_req.skdm,
-				sizeof(pdu_ctrl_tx->llctrl.enc_req.skdm) +
-				sizeof(pdu_ctrl_tx->llctrl.enc_req.ivm), 0);
+	lll_csrand_isr_get(pdu_ctrl_tx->llctrl.enc_req.skdm,
+			   sizeof(pdu_ctrl_tx->llctrl.enc_req.skdm) +
+			   sizeof(pdu_ctrl_tx->llctrl.enc_req.ivm));
 
 	ctrl_tx_enqueue(conn, *tx);
 
@@ -3887,9 +3879,9 @@ static int enc_rsp_send(struct ll_conn *conn)
 		     sizeof(pdu_ctrl_tx->llctrl.enc_rsp.skds)));
 
 	/* NOTE: if not sufficient random numbers, ignore waiting */
-	entropy_get_entropy_isr(entropy, pdu_ctrl_tx->llctrl.enc_rsp.skds,
-				sizeof(pdu_ctrl_tx->llctrl.enc_rsp.skds) +
-				sizeof(pdu_ctrl_tx->llctrl.enc_rsp.ivs), 0);
+	lll_csrand_isr_get(pdu_ctrl_tx->llctrl.enc_rsp.skds,
+			   sizeof(pdu_ctrl_tx->llctrl.enc_rsp.skds) +
+			   sizeof(pdu_ctrl_tx->llctrl.enc_rsp.ivs));
 
 	/* things from slave stored for session key calculation */
 	memcpy(&conn->llcp.encryption.skd[8],
@@ -5855,10 +5847,14 @@ static inline int ctrl_rx(memq_link_t *link, struct node_rx_pdu **rx,
 			goto ull_conn_rx_unknown_rsp_send;
 		}
 
+		struct pdu_data_llctrl *llctrl = (void *)&pdu_rx->llctrl;
+
 		if (0) {
 #if defined(CONFIG_BT_CTLR_CONN_PARAM_REQ)
-		} else if (conn->llcp_conn_param.ack !=
-			   conn->llcp_conn_param.req) {
+		} else if ((conn->llcp_conn_param.ack !=
+			    conn->llcp_conn_param.req) &&
+			   (llctrl->unknown_rsp.type ==
+			    PDU_DATA_LLCTRL_TYPE_CONN_PARAM_REQ)) {
 			struct lll_conn *lll = &conn->lll;
 			struct node_rx_cu *cu;
 
@@ -5920,7 +5916,9 @@ static inline int ctrl_rx(memq_link_t *link, struct node_rx_pdu **rx,
 #endif /* CONFIG_BT_CTLR_CONN_PARAM_REQ */
 
 #if defined(CONFIG_BT_CTLR_DATA_LENGTH)
-		} else if (conn->llcp_length.req != conn->llcp_length.ack) {
+		} else if ((conn->llcp_length.req != conn->llcp_length.ack) &&
+			   (llctrl->unknown_rsp.type ==
+			    PDU_DATA_LLCTRL_TYPE_LENGTH_REQ)) {
 			/* Mark length update as unsupported */
 			conn->llcp_length.disabled = 1U;
 
@@ -5933,8 +5931,9 @@ static inline int ctrl_rx(memq_link_t *link, struct node_rx_pdu **rx,
 #endif /* CONFIG_BT_CTLR_DATA_LENGTH */
 
 #if defined(CONFIG_BT_CTLR_PHY)
-		} else if (conn->llcp_phy.req !=
-			   conn->llcp_phy.ack) {
+		} else if ((conn->llcp_phy.req != conn->llcp_phy.ack) &&
+			   (llctrl->unknown_rsp.type ==
+			    PDU_DATA_LLCTRL_TYPE_PHY_REQ)) {
 			struct lll_conn *lll = &conn->lll;
 
 			/* Mark phy update as unsupported */
@@ -5965,9 +5964,6 @@ static inline int ctrl_rx(memq_link_t *link, struct node_rx_pdu **rx,
 #endif /* CONFIG_BT_CTLR_PHY */
 
 		} else {
-			struct pdu_data_llctrl *llctrl;
-
-			llctrl = (void *)&pdu_rx->llctrl;
 			switch (llctrl->unknown_rsp.type) {
 
 #if defined(CONFIG_BT_CTLR_LE_PING)

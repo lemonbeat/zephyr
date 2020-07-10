@@ -16,9 +16,6 @@
 	"when no channels are provided. Syntax:\n" \
 	"<device_name> <channel name 0> .. <channel name N>"
 
-extern struct device __device_start[];
-extern struct device __device_end[];
-
 const char *sensor_channel_name[SENSOR_CHAN_ALL] = {
 	[SENSOR_CHAN_ACCEL_X] =		"accel_x",
 	[SENSOR_CHAN_ACCEL_Y] =		"accel_y",
@@ -173,24 +170,12 @@ SHELL_DYNAMIC_CMD_CREATE(dsub_device_name, device_name_get);
 
 static void device_name_get(size_t idx, struct shell_static_entry *entry)
 {
-	int device_idx = 0;
-	struct device *dev;
+	struct device *dev = shell_device_lookup(idx, NULL);
 
-	entry->syntax = NULL;
+	entry->syntax = (dev != NULL) ? dev->name : NULL;
 	entry->handler = NULL;
 	entry->help  = NULL;
 	entry->subcmd = &dsub_channel_name;
-
-	for (dev = __device_start; dev != __device_end; dev++) {
-		if ((dev->driver_api != NULL) &&
-		strcmp(dev->name, "") && (dev->name != NULL)) {
-			if (idx == device_idx) {
-				entry->syntax = dev->name;
-				break;
-			}
-			device_idx++;
-		}
-	}
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_sensor,

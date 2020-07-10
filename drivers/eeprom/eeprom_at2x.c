@@ -39,7 +39,8 @@ struct eeprom_at2x_config {
 	uint16_t bus_addr;
 	uint32_t max_freq;
 	const char *spi_cs_dev_name;
-	uint8_t spi_cs_pin;
+	gpio_pin_t spi_cs_pin;
+	gpio_dt_flags_t spi_cs_dt_flags;
 	gpio_pin_t wp_gpio_pin;
 	gpio_dt_flags_t wp_gpio_flags;
 	const char *wp_gpio_name;
@@ -218,15 +219,16 @@ static int eeprom_at24_read(struct device *dev, off_t offset, void *buf,
 	 * until the current write cycle should be completed.
 	 */
 	timeout = k_uptime_get() + config->timeout;
-	do {
+	while (1) {
+		int64_t now = k_uptime_get();
 		err = i2c_write_read(data->bus_dev, config->bus_addr,
 				     addr, config->addr_width / 8,
 				     buf, len);
-		if (!err) {
+		if (!err || now > timeout) {
 			break;
 		}
 		k_sleep(K_MSEC(1));
-	} while (timeout > k_uptime_get());
+	}
 
 	return err;
 }
@@ -259,15 +261,15 @@ static int eeprom_at24_write(struct device *dev, off_t offset,
 	 * completed.
 	 */
 	timeout = k_uptime_get() + config->timeout;
-	do {
+	while (1) {
+		int64_t now = k_uptime_get();
 		err = i2c_write(data->bus_dev, block, sizeof(block),
 				config->bus_addr);
-		if (!err) {
+		if (!err || now > timeout) {
 			break;
 		}
-
 		k_sleep(K_MSEC(1));
-	} while (timeout > k_uptime_get());
+	}
 
 	if (err < 0) {
 		return err;
@@ -317,7 +319,8 @@ static int eeprom_at25_wait_for_idle(struct device *dev)
 	int err;
 
 	timeout = k_uptime_get() + config->timeout;
-	do {
+	while (1) {
+		int64_t now = k_uptime_get();
 		err = eeprom_at25_rdsr(dev, &status);
 		if (err) {
 			LOG_ERR("Could not read status register (err %d)", err);
@@ -327,8 +330,11 @@ static int eeprom_at25_wait_for_idle(struct device *dev)
 		if (!(status & EEPROM_AT25_STATUS_WIP)) {
 			return 0;
 		}
+		if (now > timeout) {
+			break;
+		}
 		k_sleep(K_MSEC(1));
-	} while (timeout > k_uptime_get());
+	}
 
 	return -EBUSY;
 }
@@ -505,6 +511,7 @@ static int eeprom_at2x_init(struct device *dev)
 		}
 
 		data->spi_cs.gpio_pin = config->spi_cs_pin;
+		data->spi_cs.gpio_dt_flags = config->spi_cs_dt_flags;
 		data->spi_cfg.cs = &data->spi_cs;
 	}
 #endif /* CONFIG_EEPROM_AT25 */
@@ -571,6 +578,9 @@ static const struct eeprom_driver_api eeprom_at2x_api = {
 		.spi_cs_pin = UTIL_AND( \
 			DT_SPI_DEV_HAS_CS_GPIOS(INST_DT_AT2X(n, t)), \
 			DT_SPI_DEV_CS_GPIOS_PIN(INST_DT_AT2X(n, t))), \
+		.spi_cs_dt_flags = UTIL_AND( \
+			DT_SPI_DEV_HAS_CS_GPIOS(INST_DT_AT2X(n, t)), \
+			DT_SPI_DEV_CS_GPIOS_DT_FLAGS(INST_DT_AT2X(n, t))), \
 		.wp_gpio_pin = UTIL_AND( \
 			DT_NODE_HAS_PROP(INST_DT_AT2X(n, t), wp_gpios), \
 			DT_GPIO_PIN(INST_DT_AT2X(n, t), wp_gpios)), \

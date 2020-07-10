@@ -15,7 +15,7 @@ from mock import call, patch, MagicMock
 ZEPHYR_BASE = os.getenv("ZEPHYR_BASE")
 sys.path.insert(0, os.path.join(ZEPHYR_BASE, "scripts/sanity_chk"))
 
-from sanitylib import TestCase, TestSuite, Platform
+from sanitylib import TestCase, TestSuite, TestInstance, Platform
 
 def test_testsuite_add_testcases(class_testsuite):
     """ Testing add_testcase function of Testsuite class in sanitycheck """
@@ -58,11 +58,9 @@ def test_add_configurations(test_data, class_testsuite, board_root_dir):
 def test_get_all_testcases(class_testsuite, all_testcases_dict):
     """ Testing get_all_testcases function of TestSuite class in Sanitycheck """
     class_testsuite.testcases = all_testcases_dict
-    expected_tests = ['test_b.check_1', 'test_b.check_2',
-                      'test_c.check_1', 'test_c.check_2',
-                      'test_a.check_1', 'test_a.check_2',
-                      'sample_test.app']
-    assert len(class_testsuite.get_all_tests()) == 7
+    expected_tests = ['sample_test.app', 'test_a.check_1.1a', 'test_a.check_1.1c',
+                    'test_a.check_1.2a', 'test_a.check_1.2b', 'test_a.check_1.Unit_1c', 'test_a.check_1.unit_1a', 'test_a.check_1.unit_1b', 'test_a.check_2.1a', 'test_a.check_2.1c', 'test_a.check_2.2a', 'test_a.check_2.2b', 'test_a.check_2.Unit_1c', 'test_a.check_2.unit_1a', 'test_a.check_2.unit_1b', 'test_b.check_1', 'test_b.check_2', 'test_c.check_1', 'test_c.check_2']
+    assert len(class_testsuite.get_all_tests()) == 19
     assert sorted(class_testsuite.get_all_tests()) == sorted(expected_tests)
 
 def test_get_toolchain(class_testsuite, monkeypatch, capsys):
@@ -165,7 +163,7 @@ def test_apply_filters_part1(class_testsuite, all_testcases_dict, platforms_list
                              tc_attribute, tc_value, plat_attribute, plat_value, expected_discards):
     """ Testing apply_filters function of TestSuite class in Sanitycheck
     Part 1: Response of apply_filters function (discard dictionary) have
-    appropriate values according to the filters
+            appropriate values according to the filters
     """
     if tc_attribute is None and plat_attribute is None:
         discards = class_testsuite.apply_filters()
@@ -236,7 +234,7 @@ def test_apply_filters_part2(class_testsuite, all_testcases_dict,
                              platforms_list, extra_filter, extra_filter_value, expected_discards):
     """ Testing apply_filters function of TestSuite class in Sanitycheck
     Part 2 : Response of apply_filters function (discard dictionary) have
-    appropriate values according to the filters
+             appropriate values according to the filters
     """
     class_testsuite.platforms = platforms_list
     class_testsuite.testcases = all_testcases_dict
@@ -272,3 +270,23 @@ def test_apply_filters_part3(class_testsuite, all_testcases_dict, platforms_list
     discards = class_testsuite.apply_filters(exclude_platform=['demo_board_1'],
                                              platform=['demo_board_2'])
     assert not discards
+
+def test_add_instances(test_data, class_testsuite, all_testcases_dict, platforms_list):
+    """ Testing add_instances() function of TestSuite class in Sanitycheck
+    Test 1: instances dictionary keys have expected values (Platform Name + Testcase Name)
+    Test 2: Values of 'instances' dictionary in Testsuite class are an
+	        instance of 'TestInstance' class
+    Test 3: Values of 'instances' dictionary have expected values.
+    """
+    class_testsuite.outdir = test_data
+    class_testsuite.platforms = platforms_list
+    platform = class_testsuite.get_platform("demo_board_2")
+    instance_list = []
+    for _, testcase in all_testcases_dict.items():
+        instance = TestInstance(testcase, platform, class_testsuite.outdir)
+        instance_list.append(instance)
+    class_testsuite.add_instances(instance_list)
+    assert list(class_testsuite.instances.keys()) == \
+		   [platform.name + '/' + s for s in list(all_testcases_dict.keys())]
+    assert all(isinstance(n, TestInstance) for n in list(class_testsuite.instances.values()))
+    assert list(class_testsuite.instances.values()) == instance_list
