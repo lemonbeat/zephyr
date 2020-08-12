@@ -109,7 +109,7 @@ void lll_adv_prepare(void *param)
 	int err;
 
 	err = lll_hfclock_on();
-	LL_ASSERT(!err || err == -EINPROGRESS);
+	LL_ASSERT(err >= 0);
 
 	err = lll_prepare(is_abort_cb, abort_cb, prepare_cb, 0, p);
 	LL_ASSERT(!err || err == -EINPROGRESS);
@@ -139,7 +139,7 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 		int err;
 
 		err = lll_hfclock_off();
-		LL_ASSERT(!err || err == -EBUSY);
+		LL_ASSERT(err >= 0);
 
 		lll_done(NULL);
 
@@ -274,7 +274,7 @@ static int is_abort_cb(void *next, int prio, void *curr,
 
 			/* Retain HF clk */
 			err = lll_hfclock_on();
-			LL_ASSERT(!err || err == -EINPROGRESS);
+			LL_ASSERT(err >= 0);
 
 			return -EAGAIN;
 #endif /* CONFIG_BT_PERIPHERAL */
@@ -312,7 +312,7 @@ static void abort_cb(struct lll_prepare_param *prepare_param, void *param)
 	 * currently in preparation pipeline.
 	 */
 	err = lll_hfclock_off();
-	LL_ASSERT(!err || err == -EBUSY);
+	LL_ASSERT(err >= 0);
 
 	lll_done(param);
 }
@@ -553,6 +553,15 @@ static void isr_done(void *param)
 #else /* !CONFIG_BT_CTLR_ADV_INDICATION */
 	ARG_UNUSED(node_rx);
 #endif /* !CONFIG_BT_CTLR_ADV_INDICATION */
+
+#if defined(CONFIG_BT_CTLR_ADV_EXT)
+	struct event_done_extra *extra;
+
+	extra = ull_event_done_extra_get();
+	LL_ASSERT(extra);
+
+	extra->type = EVENT_DONE_EXTRA_TYPE_ADV;
+#endif  /* CONFIG_BT_CTLR_ADV_EXT */
 
 	lll_isr_cleanup(param);
 }

@@ -5,13 +5,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/*
- * @addtogroup test_adc_basic_operations
- * @{
- * @defgroup t_adc_basic_basic_operations test_adc_sample
- * @brief TestPurpose: verify ADC driver handles different sampling scenarios
- * @}
- */
 
 #include <drivers/adc.h>
 #include <zephyr.h>
@@ -154,6 +147,7 @@
 	defined(CONFIG_BOARD_NUCLEO_L073RZ) || \
 	defined(CONFIG_BOARD_NUCLEO_WB55RG) || \
 	defined(CONFIG_BOARD_NUCLEO_L152RE) || \
+	defined(CONFIG_BOARD_OLIMEX_STM32_H103) || \
 	defined(CONFIG_BOARD_96B_AEROCORE2) || \
 	defined(CONFIG_BOARD_STM32_MIN_DEV_BLUE) || \
 	defined(CONFIG_BOARD_STM32_MIN_DEV_BLACK) || \
@@ -174,7 +168,8 @@
 /* Some F3 series SOCs do not have channel 0 connected to an external GPIO. */
 #define ADC_1ST_CHANNEL_ID	1
 
-#elif defined(CONFIG_BOARD_NUCLEO_L476RG)
+#elif defined(CONFIG_BOARD_NUCLEO_L476RG) || \
+	defined(CONFIG_BOARD_BLACKPILL_F411CE)
 #define ADC_DEVICE_NAME         DT_LABEL(DT_INST(0, st_stm32_adc))
 #define ADC_RESOLUTION		10
 #define ADC_GAIN		ADC_GAIN_1

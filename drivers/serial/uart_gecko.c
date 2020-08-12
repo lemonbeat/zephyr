@@ -24,24 +24,20 @@
 #define HW_FLOWCONTROL_IS_SUPPORTED_BY_SOC
 #endif
 
+#define HAS_HFC_OR(inst) DT_INST_NODE_HAS_PROP(inst, hw_flow_control) ||
+
 #define DT_DRV_COMPAT silabs_gecko_uart
 
-#if (DT_INST_PROP(0, hw_flow_control) || \
-	DT_INST_PROP(1, hw_flow_control))
-#define UART_GECKO_UART_HW_FLOW_CONTROL_ENABLED
-#endif
+/* Has any enabled uart instance hw-flow-control enabled? */
+#define UART_GECKO_UART_HW_FLOW_CONTROL_ENABLED \
+	DT_INST_FOREACH_STATUS_OKAY(HAS_HFC_OR) 0
 
 #undef DT_DRV_COMPAT
 #define DT_DRV_COMPAT silabs_gecko_usart
 
-#if (DT_INST_PROP(0, hw_flow_control) ||    \
-	DT_INST_PROP(1, hw_flow_control) || \
-	DT_INST_PROP(2, hw_flow_control) || \
-	DT_INST_PROP(3, hw_flow_control) || \
-	DT_INST_PROP(4, hw_flow_control) || \
-	DT_INST_PROP(5, hw_flow_control))
-#define UART_GECKO_USART_HW_FLOW_CONTROL_ENABLED
-#endif
+/* Has any enabled usart instance hw-flow-control enabled? */
+#define UART_GECKO_USART_HW_FLOW_CONTROL_ENABLED  \
+	DT_INST_FOREACH_STATUS_OKAY(HAS_HFC_OR) 0
 
 #if defined(UART_GECKO_USART_HW_FLOW_CONTROL_ENABLED) || \
 	defined(UART_GECKO_UART_HW_FLOW_CONTROL_ENABLED)
@@ -55,15 +51,9 @@
 but not supported by this SOC"
 #endif
 
-/**
- * @brief Maps init value for hw_flowcontrol
- *
- * @param fc_enabled Bool to enable hardware flow control
- * @return Mapped value according to enum USART_HwFlowControl_TypeDef
- */
-#ifdef HW_FLOWCONTROL_IS_SUPPORTED_BY_SOC
-#define MAP_HW_FLOWCONTROL_INIT_VAL(fc_enabled) \
-	(fc_enabled == 1 ? usartHwFlowControlCtsAndRts : usartHwFlowControlNone)
+#if defined(UART_GECKO_HW_FLOW_CONTROL) && \
+	(!defined(CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION))
+#error "Driver not supporting hardware flow control for this SOC"
 #endif
 
 /**
@@ -74,7 +64,7 @@ struct uart_gecko_config {
 	CMU_Clock_TypeDef clock;
 	uint32_t baud_rate;
 #ifdef UART_GECKO_HW_FLOW_CONTROL
-	USART_HwFlowControl_TypeDef hw_flowcontrol;
+	bool hw_flowcontrol;
 #endif
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	void (*irq_config_func)(struct device *dev);
@@ -117,7 +107,7 @@ struct uart_gecko_data {
  */
 static int uart_gecko_poll_in(struct device *dev, unsigned char *c)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t flags = USART_StatusGet(config->base);
 
 	if (flags & USART_STATUS_RXDATAV) {
@@ -136,7 +126,7 @@ static int uart_gecko_poll_in(struct device *dev, unsigned char *c)
  */
 static void uart_gecko_poll_out(struct device *dev, unsigned char c)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 
 	USART_Tx(config->base, c);
 }
@@ -149,7 +139,7 @@ static void uart_gecko_poll_out(struct device *dev, unsigned char c)
  */
 static int uart_gecko_err_check(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t flags = USART_IntGet(config->base);
 	int err = 0;
 
@@ -181,7 +171,7 @@ static int uart_gecko_err_check(struct device *dev)
 static int uart_gecko_fifo_fill(struct device *dev, const uint8_t *tx_data,
 			       int len)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint8_t num_tx = 0U;
 
 	while ((len - num_tx > 0) &&
@@ -196,7 +186,7 @@ static int uart_gecko_fifo_fill(struct device *dev, const uint8_t *tx_data,
 static int uart_gecko_fifo_read(struct device *dev, uint8_t *rx_data,
 			       const int len)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint8_t num_rx = 0U;
 
 	while ((len - num_rx > 0) &&
@@ -210,7 +200,7 @@ static int uart_gecko_fifo_read(struct device *dev, uint8_t *rx_data,
 
 static void uart_gecko_irq_tx_enable(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t mask = USART_IEN_TXBL | USART_IEN_TXC;
 
 	USART_IntEnable(config->base, mask);
@@ -218,7 +208,7 @@ static void uart_gecko_irq_tx_enable(struct device *dev)
 
 static void uart_gecko_irq_tx_disable(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t mask = USART_IEN_TXBL | USART_IEN_TXC;
 
 	USART_IntDisable(config->base, mask);
@@ -226,7 +216,7 @@ static void uart_gecko_irq_tx_disable(struct device *dev)
 
 static int uart_gecko_irq_tx_complete(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t flags = USART_IntGet(config->base);
 
 	USART_IntClear(config->base, USART_IF_TXC);
@@ -236,15 +226,15 @@ static int uart_gecko_irq_tx_complete(struct device *dev)
 
 static int uart_gecko_irq_tx_ready(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
-	uint32_t flags = USART_IntGet(config->base);
+	const struct uart_gecko_config *config = dev->config;
+	uint32_t flags = USART_IntGetEnabled(config->base);
 
 	return (flags & USART_IF_TXBL) != 0U;
 }
 
 static void uart_gecko_irq_rx_enable(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t mask = USART_IEN_RXDATAV;
 
 	USART_IntEnable(config->base, mask);
@@ -252,7 +242,7 @@ static void uart_gecko_irq_rx_enable(struct device *dev)
 
 static void uart_gecko_irq_rx_disable(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t mask = USART_IEN_RXDATAV;
 
 	USART_IntDisable(config->base, mask);
@@ -260,7 +250,7 @@ static void uart_gecko_irq_rx_disable(struct device *dev)
 
 static int uart_gecko_irq_rx_full(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t flags = USART_IntGet(config->base);
 
 	return (flags & USART_IF_RXDATAV) != 0U;
@@ -268,7 +258,7 @@ static int uart_gecko_irq_rx_full(struct device *dev)
 
 static int uart_gecko_irq_rx_ready(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	uint32_t mask = USART_IEN_RXDATAV;
 
 	return (config->base->IEN & mask)
@@ -277,7 +267,7 @@ static int uart_gecko_irq_rx_ready(struct device *dev)
 
 static void uart_gecko_irq_err_enable(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 
 	USART_IntEnable(config->base, USART_IF_RXOF |
 			 USART_IF_PERR |
@@ -286,7 +276,7 @@ static void uart_gecko_irq_err_enable(struct device *dev)
 
 static void uart_gecko_irq_err_disable(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 
 	USART_IntDisable(config->base, USART_IF_RXOF |
 			 USART_IF_PERR |
@@ -307,7 +297,7 @@ static void uart_gecko_irq_callback_set(struct device *dev,
 				       uart_irq_callback_user_data_t cb,
 				       void *cb_data)
 {
-	struct uart_gecko_data *data = dev->driver_data;
+	struct uart_gecko_data *data = dev->data;
 
 	data->callback = cb;
 	data->cb_data = cb_data;
@@ -316,10 +306,10 @@ static void uart_gecko_irq_callback_set(struct device *dev,
 static void uart_gecko_isr(void *arg)
 {
 	struct device *dev = arg;
-	struct uart_gecko_data *data = dev->driver_data;
+	struct uart_gecko_data *data = dev->data;
 
 	if (data->callback) {
-		data->callback(data->cb_data);
+		data->callback(dev, data->cb_data);
 	}
 }
 /** @} */ /* end of uart_gecko_group2 */
@@ -332,53 +322,63 @@ static void uart_gecko_isr(void *arg)
  */
 static void uart_gecko_init_pins(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 
-	/* configure pins (port, pin, mode, out) */
+	/* Configure RX and TX */
 	soc_gpio_configure(&config->pin_rx);
 	soc_gpio_configure(&config->pin_tx);
 
 #ifdef CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION
-	/*
-	 * For SOCs with configurable pin locations (set in SOC Kconfig)
-	 */
+	/* For SOCs with configurable pin locations (set in SOC Kconfig) */
 	config->base->ROUTEPEN = USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_TXPEN;
 	config->base->ROUTELOC0 =
 		(config->loc_tx << _USART_ROUTELOC0_TXLOC_SHIFT) |
 		(config->loc_rx << _USART_ROUTELOC0_RXLOC_SHIFT);
 	config->base->ROUTELOC1 = _USART_ROUTELOC1_RESETVALUE;
-#else
-	/*
-	 * For olders SOCs with only one pin location
-	 */
+#elif defined(USART_ROUTE_RXPEN) && defined(USART_ROUTE_TXPEN)
+	/* For olders SOCs with only one pin location */
 	config->base->ROUTE = USART_ROUTE_RXPEN | USART_ROUTE_TXPEN
 		| (config->loc << 8);
+#elif defined(GPIO_USART_ROUTEEN_RXPEN) && defined(GPIO_USART_ROUTEEN_TXPEN)
+	GPIO->USARTROUTE[USART_NUM(config->base)].ROUTEEN =
+		GPIO_USART_ROUTEEN_TXPEN | GPIO_USART_ROUTEEN_RXPEN;
+	GPIO->USARTROUTE[USART_NUM(config->base)].TXROUTE =
+		(config->pin_tx.pin << _GPIO_USART_TXROUTE_PIN_SHIFT) |
+		(config->pin_tx.port << _GPIO_USART_TXROUTE_PORT_SHIFT);
+	GPIO->USARTROUTE[USART_NUM(config->base)].RXROUTE =
+		(config->pin_rx.pin << _GPIO_USART_RXROUTE_PIN_SHIFT) |
+		(config->pin_rx.port << _GPIO_USART_RXROUTE_PORT_SHIFT);
 #endif /* CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION */
 
 #ifdef UART_GECKO_HW_FLOW_CONTROL
-	/* configure HW flow control (RTS, CTS) */
-	if (config->hw_flowcontrol == usartHwFlowControlCtsAndRts) {
-		/* activate flow control in general */
+	/* Configure HW flow control (RTS, CTS) */
+	if (config->hw_flowcontrol) {
 		soc_gpio_configure(&config->pin_rts);
 		soc_gpio_configure(&config->pin_cts);
 
 #ifdef CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION
-		/*
-		 * set enable flag in USARTn_ROUTEPEN
-		 * (I/O Routing Pin Enable Register)
-		 */
 		config->base->ROUTEPEN =
 			USART_ROUTEPEN_RXPEN  |
 			USART_ROUTEPEN_TXPEN  |
 			USART_ROUTEPEN_RTSPEN |
 			USART_ROUTEPEN_CTSPEN;
-		/*
-		 * set location of RTS/CTS in USARTn_ROUTELOC1
-		 * (I/O Routing Location Register)
-		 */
+
 		config->base->ROUTELOC1 =
 			(config->loc_rts << _USART_ROUTELOC1_RTSLOC_SHIFT) |
 			(config->loc_cts << _USART_ROUTELOC1_CTSLOC_SHIFT);
+#elif defined(GPIO_USART_ROUTEEN_RTSPEN) && defined(GPIO_USART_ROUTEEN_CTSPEN)
+	GPIO->USARTROUTE[USART_NUM(config->base)].ROUTEEN =
+		GPIO_USART_ROUTEEN_TXPEN |
+		GPIO_USART_ROUTEEN_RXPEN |
+		GPIO_USART_ROUTEPEN_RTSPEN |
+		GPIO_USART_ROUTEPEN_CTSPEN;
+
+	GPIO->USARTROUTE[USART_NUM(config->base)].RTSROUTE =
+		(config->pin_rts.pin << _GPIO_USART_RTSROUTE_PIN_SHIFT) |
+		(config->pin_rts.port << _GPIO_USART_RTSROUTE_PORT_SHIFT);
+	GPIO->USARTROUTE[USART_NUM(config->base)].CTSROUTE =
+		(config->pin_cts.pin << _GPIO_USART_CTSROUTE_PIN_SHIFT) |
+		(config->pin_cts.port << _GPIO_USART_CTSROUTE_PORT_SHIFT);
 #endif /* CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION */
 	}
 #endif /* UART_GECKO_HW_FLOW_CONTROL */
@@ -392,7 +392,7 @@ static void uart_gecko_init_pins(struct device *dev)
  */
 static int uart_gecko_init(struct device *dev)
 {
-	const struct uart_gecko_config *config = dev->config_info;
+	const struct uart_gecko_config *config = dev->config;
 	USART_InitAsync_TypeDef usartInit = USART_INITASYNC_DEFAULT;
 
 	/* The peripheral and gpio clock are already enabled from soc and gpio
@@ -405,7 +405,8 @@ static int uart_gecko_init(struct device *dev)
 	/* Init USART */
 	usartInit.baudrate = config->baud_rate;
 #ifdef UART_GECKO_HW_FLOW_CONTROL
-	usartInit.hwFlowControl = config->hw_flowcontrol;
+	usartInit.hwFlowControl = config->hw_flowcontrol ?
+		usartHwFlowControlCtsAndRts : usartHwFlowControlNone;
 #endif
 	USART_InitAsync(config->base, &usartInit);
 
@@ -506,47 +507,48 @@ static const struct uart_driver_api uart_gecko_driver_api = {
 
 #ifdef CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION
 #define GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx)				       \
-	.loc_rts = COND_CODE_1(DT_INST_NODE_HAS_PROP(idx, location_rts),       \
-			       (DT_INST_PROP_BY_IDX(idx, location_rts, 0)),    \
-			       (0)),					       \
-	.loc_cts = COND_CODE_1(DT_INST_NODE_HAS_PROP(idx, location_rts),       \
-			       (DT_INST_PROP_BY_IDX(idx, location_cts, 0)),    \
-			       (0)),
-#define VALIDATE_GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx)
-#else /* CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION */
-#define GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx)
+	.loc_rts = COND_CODE_1(DT_INST_PROP(idx, hw_flow_control),	       \
+		   (DT_INST_PROP_BY_IDX(idx, location_rts, 0)),		       \
+		   (0)),						       \
+	.loc_cts = COND_CODE_1(DT_INST_PROP(idx, hw_flow_control),	       \
+		   (DT_INST_PROP_BY_IDX(idx, location_cts, 0)),		       \
+		   (0)),
 #define VALIDATE_GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx)			       \
-	BUILD_ASSERT(DT_INST_PROP_BY_IDX(idx, location_rts, 0) ==	       \
-		      DT_INST_PROP_BY_IDX(idx, location_cts, 0),	       \
-		     "DTS location-* properties must have identical value")
-
+	COND_CODE_1(DT_INST_PROP(idx, hw_flow_control),			       \
+		    (BUILD_ASSERT(DT_INST_NODE_HAS_PROP(idx, location_rts) &&  \
+				  DT_INST_NODE_HAS_PROP(idx, location_cts),    \
+			"DTS location-rts and location-cts are mandatory")),   \
+		    ())
+#else /* CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION */
+/* Hardware flow control not supported for these SOCs */
+#define GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx)
+#define VALIDATE_GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx)
 #endif /* CONFIG_SOC_GECKO_HAS_INDIVIDUAL_PIN_LOCATION */
 
 #define PIN_UART_RTS(idx)						       \
-	COND_CODE_1(DT_INST_NODE_HAS_PROP(idx, location_rts),		       \
+	COND_CODE_1(DT_INST_PROP(idx, hw_flow_control),			       \
 	({								       \
 		DT_INST_PROP_BY_IDX(idx, location_rts, 1),		       \
 			DT_INST_PROP_BY_IDX(idx, location_rts, 2),	       \
 			gpioModePushPull, 1				       \
 	}),								       \
-	({}))
+	({0}))
 
 #define PIN_UART_CTS(idx)						       \
-	COND_CODE_1(DT_INST_NODE_HAS_PROP(idx, location_cts),		       \
+	COND_CODE_1(DT_INST_PROP(idx, hw_flow_control),			       \
 	({								       \
 		DT_INST_PROP_BY_IDX(idx, location_cts, 1),		       \
 			DT_INST_PROP_BY_IDX(idx, location_cts, 2),	       \
 			gpioModeInput, 1				       \
 	}),								       \
-	({}))
+	({0}))
 
 #define GECKO_UART_RTS_CTS_PINS(idx)					       \
 	.pin_rts = PIN_UART_RTS(idx),					       \
 	.pin_cts = PIN_UART_CTS(idx),
 
 #define GECKO_UART_HW_FLOW_CONTROL(idx)					       \
-	.hw_flowcontrol = MAP_HW_FLOWCONTROL_INIT_VAL(			       \
-					DT_INST_PROP(idx, hw_flow_control)),
+	.hw_flowcontrol = DT_INST_PROP(idx, hw_flow_control),
 
 #else /* UART_GECKO_HW_FLOW_CONTROL */
 
@@ -558,6 +560,9 @@ static const struct uart_driver_api uart_gecko_driver_api = {
 #endif /* UART_GECKO_HW_FLOW_CONTROL */
 
 #define GECKO_UART_INIT(idx)						       \
+	VALIDATE_GECKO_UART_RX_TX_PIN_LOCATIONS(idx);			       \
+	VALIDATE_GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx);			       \
+									       \
 	GECKO_UART_IRQ_HANDLER_DECL(idx);				       \
 									       \
 	static const struct uart_gecko_config uart_gecko_cfg_##idx = {	       \
@@ -580,8 +585,6 @@ static const struct uart_driver_api uart_gecko_driver_api = {
 			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		       \
 			    &uart_gecko_driver_api);			       \
 									       \
-	VALIDATE_GECKO_UART_RX_TX_PIN_LOCATIONS(idx);			       \
-	VALIDATE_GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx);			       \
 									       \
 	GECKO_UART_IRQ_HANDLER(idx)
 
@@ -615,6 +618,9 @@ DT_INST_FOREACH_STATUS_OKAY(GECKO_UART_INIT)
 #endif
 
 #define GECKO_USART_INIT(idx)						       \
+	VALIDATE_GECKO_UART_RX_TX_PIN_LOCATIONS(idx);			       \
+	VALIDATE_GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx);			       \
+									       \
 	GECKO_USART_IRQ_HANDLER_DECL(idx);				       \
 									       \
 	static const struct uart_gecko_config usart_gecko_cfg_##idx = {	       \
@@ -636,9 +642,6 @@ DT_INST_FOREACH_STATUS_OKAY(GECKO_UART_INIT)
 			    &usart_gecko_cfg_##idx, PRE_KERNEL_1,	       \
 			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		       \
 			    &uart_gecko_driver_api);			       \
-									       \
-	VALIDATE_GECKO_UART_RX_TX_PIN_LOCATIONS(idx);			       \
-	VALIDATE_GECKO_UART_RTS_CTS_PIN_LOCATIONS(idx);			       \
 									       \
 	GECKO_USART_IRQ_HANDLER(idx)
 

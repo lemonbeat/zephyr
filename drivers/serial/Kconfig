@@ -82,8 +82,6 @@ source "drivers/serial/Kconfig.stellaris"
 
 source "drivers/serial/Kconfig.native_posix"
 
-source "drivers/serial/Kconfig.nsim"
-
 source "drivers/serial/Kconfig.usart_sam"
 
 source "drivers/serial/Kconfig.uart_sam"
@@ -127,5 +125,7 @@ source "drivers/serial/Kconfig.rtt"
 source "drivers/serial/Kconfig.xlnx"
 
 source "drivers/serial/Kconfig.xmc4xxx"
+
+source "drivers/serial/Kconfig.lpc11u6x"
 
 endif # SERIAL

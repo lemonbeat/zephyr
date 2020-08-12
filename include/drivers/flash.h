@@ -95,9 +95,8 @@ __subsystem struct flash_driver_api {
 /**
  *  @brief  Read data from flash
  *
- *  Most of flash drivers support unaligned flash access, but some have
- *  restrictions on the read offset or/and the read size. Please refer to
- *  the driver implementation to get details on the read alignment requirement.
+ *  All flash drivers support reads without alignment restrictions on
+ *  the read offset, the read size, or the destination address.
  *
  *  @param  dev             : flash dev
  *  @param  offset          : Offset (byte aligned) to read
@@ -113,13 +112,17 @@ static inline int z_impl_flash_read(struct device *dev, off_t offset, void *data
 			     size_t len)
 {
 	const struct flash_driver_api *api =
-		(const struct flash_driver_api *)dev->driver_api;
+		(const struct flash_driver_api *)dev->api;
 
 	return api->read(dev, offset, data, len);
 }
 
 /**
  *  @brief  Write buffer into flash memory.
+ *
+ *  All flash drivers support a source buffer located either in RAM or
+ *  SoC flash, without alignment restrictions on the source address, or
+ *  write size or offset.
  *
  *  Prior to the invocation of this API, the flash_write_protection_set needs
  *  to be called first to disable the write protection.
@@ -138,7 +141,7 @@ static inline int z_impl_flash_write(struct device *dev, off_t offset,
 				    const void *data, size_t len)
 {
 	const struct flash_driver_api *api =
-		(const struct flash_driver_api *)dev->driver_api;
+		(const struct flash_driver_api *)dev->api;
 
 	return api->write(dev, offset, data, len);
 }
@@ -170,7 +173,7 @@ static inline int z_impl_flash_erase(struct device *dev, off_t offset,
 				    size_t size)
 {
 	const struct flash_driver_api *api =
-		(const struct flash_driver_api *)dev->driver_api;
+		(const struct flash_driver_api *)dev->api;
 
 	return api->erase(dev, offset, size);
 }
@@ -214,7 +217,7 @@ static inline int z_impl_flash_write_protection_set(struct device *dev,
 						   bool enable)
 {
 	const struct flash_driver_api *api =
-		(const struct flash_driver_api *)dev->driver_api;
+		(const struct flash_driver_api *)dev->api;
 
 	return api->write_protection(dev, enable);
 }
@@ -302,7 +305,7 @@ __syscall size_t flash_get_write_block_size(struct device *dev);
 static inline size_t z_impl_flash_get_write_block_size(struct device *dev)
 {
 	const struct flash_driver_api *api =
-		(const struct flash_driver_api *)dev->driver_api;
+		(const struct flash_driver_api *)dev->api;
 
 	return api->get_parameters(dev)->write_block_size;
 }
@@ -324,7 +327,7 @@ __syscall const struct flash_parameters *flash_get_parameters(const struct devic
 static inline const struct flash_parameters *z_impl_flash_get_parameters(const struct device *dev)
 {
 	const struct flash_driver_api *api =
-		(const struct flash_driver_api *)dev->driver_api;
+		(const struct flash_driver_api *)dev->api;
 
 	return api->get_parameters(dev);
 }

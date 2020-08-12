@@ -6,6 +6,7 @@ import abc
 import argparse
 import os
 import pathlib
+import pickle
 import shutil
 import subprocess
 import sys
@@ -20,9 +21,8 @@ from zcmake import CMakeCache
 from zephyr_ext_common import Forceable, cached_runner_config, \
     ZEPHYR_SCRIPTS
 
+# This is needed to load edt.pickle files.
 sys.path.append(str(ZEPHYR_SCRIPTS / 'dts'))
-
-import edtlib
 
 SIGN_DESCRIPTION = '''\
 This command automates some of the drudgery of creating signed Zephyr
@@ -32,10 +32,7 @@ In the simplest usage, run this from your build directory:
 
    west sign -t your_tool -- ARGS_FOR_YOUR_TOOL
 
-Assuming your binary was properly built for processing and handling by
-tool "your_tool", this creates zephyr.signed.bin and zephyr.signed.hex
-files (if supported by "your_tool") which are ready for use by your
-bootloader. The "ARGS_FOR_YOUR_TOOL" value can be any additional
+The "ARGS_FOR_YOUR_TOOL" value can be any additional
 arguments you want to pass to the tool, such as the location of a
 signing key, a version identifier, etc.
 
@@ -45,20 +42,34 @@ SIGN_EPILOG = '''\
 imgtool
 -------
 
-Currently, MCUboot's 'imgtool' tool is supported. To build a signed
-binary you can load with MCUboot using imgtool, run this from your
-build directory:
+To build a signed binary you can load with MCUboot using imgtool,
+run this from your build directory:
 
    west sign -t imgtool -- --key YOUR_SIGNING_KEY.pem
 
 For this to work, either imgtool must be installed (e.g. using pip3),
 or you must pass the path to imgtool.py using the -p option.
 
+Assuming your binary was properly built for processing and handling by
+imgtool, this creates zephyr.signed.bin and zephyr.signed.hex
+files which are ready for use by your bootloader.
+
 The image header size, alignment, and slot sizes are determined from
 the build directory using .config and the device tree. A default
 version number of 0.0.0+0 is used (which can be overridden by passing
 "--version x.y.z+w" after "--key"). As shown above, extra arguments
-after a '--' are passed to imgtool directly.'''
+after a '--' are passed to imgtool directly.
+
+rimage
+------
+
+To create a signed binary with the rimage tool, run this from your build
+directory:
+
+   west sign -t rimage -- -k YOUR_SIGNING_KEY.pem
+
+For this to work, either rimage must be installed or you must pass
+the path to rimage using the -p option.'''
 
 
 class ToggleAction(argparse.Action):
@@ -208,7 +219,7 @@ class ImgtoolSigner(Signer):
         vtoff = self.get_cfg(command, bcfg, 'CONFIG_ROM_START_OFFSET')
         # Flash device write alignment and the partition's slot size
         # come from devicetree:
-        flash = self.edt_flash_node(b, cache)
+        flash = self.edt_flash_node(b)
         align, addr, size = self.edt_flash_params(flash)
 
         runner_config = cached_runner_config(build_dir, cache)
@@ -280,30 +291,21 @@ class ImgtoolSigner(Signer):
             return None
 
     @staticmethod
-    def edt_flash_node(b, cache):
+    def edt_flash_node(b):
         # Get the EDT Node corresponding to the zephyr,flash chosen DT
-        # node.
-
-        # Retrieve the list of devicetree bindings from cache.
-        try:
-            bindings = cache.get_list('CACHED_DTS_ROOT_BINDINGS')
-            log.dbg('DTS bindings:', bindings, level=log.VERBOSE_VERY)
-        except KeyError:
-            log.die('CMake cache has no CACHED_DTS_ROOT_BINDINGS.'
-                    '\n  Try again after re-building your application.')
+        # node; 'b' is the build directory as a pathlib object.
 
         # Ensure the build directory has a compiled DTS file
         # where we expect it to be.
-        dts = b / 'zephyr' / (cache['CACHED_BOARD'] + '.dts.pre.tmp')
-        if not dts.is_file():
-            log.die("can't find DTS; expected:", dts)
+        dts = b / 'zephyr' / 'zephyr.dts'
         log.dbg('DTS file:', dts, level=log.VERBOSE_VERY)
+        edt_pickle = b / 'zephyr' / 'edt.pickle'
+        if not edt_pickle.is_file():
+            log.die("can't load devicetree; expected to find:", edt_pickle)
 
-        # Parse the devicetree using bindings from cache.
-        try:
-            edt = edtlib.EDT(dts, bindings)
-        except edtlib.EDTError as e:
-            log.die("can't parse devicetree:", e)
+        # Load the devicetree.
+        with open(edt_pickle, 'rb') as f:
+            edt = pickle.load(f)
 
         # By convention, the zephyr,flash chosen node contains the
         # partition information about the zephyr image to sign.
