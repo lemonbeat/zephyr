@@ -473,20 +473,6 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 		}
 	}
 
-	if (IS_ENABLED(CONFIG_NET_ROUTE_MCAST) &&
-		net_ipv6_is_addr_mcast(&hdr->dst)) {
-		/* If the packet is a multicast packet and multicast routing
-		 * is activated, we give the packet to the routing engine.
-		 *
-		 * But we only drop the packet if an error occurs, otherwise
-		 * it might be eminent to respond on the packet on application
-		 * layer.
-		 */
-		if (ipv6_forward_mcast_packet(pkt, hdr) == NET_DROP) {
-			goto drop;
-		}
-	}
-
 	if (net_ipv6_is_addr_mcast(&hdr->dst)) {
 		/* Does the destination multicast address match one of the
 		 * registered multicast groups on the originating interface
