@@ -266,7 +266,6 @@ config NET_MAX_NEXTHOPS
 
 config NET_ROUTE_MCAST
 	bool "Enable Multicast Routing / Forwarding"
-	default n
 	depends on NET_ROUTE
 	help
 	  Activates multicast routing/forwarding

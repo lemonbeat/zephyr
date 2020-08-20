@@ -947,6 +947,20 @@ static inline bool net_ipv6_is_addr_mcast_iface(const struct in6_addr *addr)
 }
 
 /**
+ * @brief Check if the IPv6 address is a link local scope multicast
+ * address (FFx2::).
+ *
+ * @param addr IPv6 address.
+ *
+ * @return True if the address is a link local scope multicast address,
+ * false otherwise.
+ */
+static inline bool net_ipv6_is_addr_mcast_link(const struct in6_addr *addr)
+{
+	return net_ipv6_is_addr_mcast_scope(addr, 0x02);
+}
+
+/**
  * @brief Check if the IPv6 address is a mesh-local scope multicast
  * address (FFx3::).
  *

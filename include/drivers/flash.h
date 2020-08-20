@@ -81,6 +81,10 @@ typedef void (*flash_api_pages_layout)(struct device *dev,
 				       size_t *layout_size);
 #endif /* CONFIG_FLASH_PAGE_LAYOUT */
 
+typedef int (*flash_api_sfdp_read)(struct device *dev, off_t offset,
+				   void *data, size_t len);
+typedef int (*flash_api_read_jedec_id)(struct device *dev, uint8_t *id);
+
 __subsystem struct flash_driver_api {
 	flash_api_read read;
 	flash_api_write write;
@@ -90,6 +94,10 @@ __subsystem struct flash_driver_api {
 #if defined(CONFIG_FLASH_PAGE_LAYOUT)
 	flash_api_pages_layout page_layout;
 #endif /* CONFIG_FLASH_PAGE_LAYOUT */
+#if defined(CONFIG_FLASH_JESD216_API)
+	flash_api_sfdp_read sfdp_read;
+	flash_api_read_jedec_id read_jedec_id;
+#endif /* CONFIG_FLASH_JESD216_API */
 };
 
 /**
@@ -288,6 +296,69 @@ typedef bool (*flash_page_cb)(const struct flash_pages_info *info, void *data);
  */
 void flash_page_foreach(struct device *dev, flash_page_cb cb, void *data);
 #endif /* CONFIG_FLASH_PAGE_LAYOUT */
+
+#if defined(CONFIG_FLASH_JESD216_API)
+/**
+ * @brief Read data from Serial Flash Discoverable Parameters
+ *
+ * This routine reads data from a serial flash device compatible with
+ * the JEDEC JESD216 standard for encoding flash memory
+ * characteristics.
+ *
+ * Availability of this API is conditional on selecting
+ * @c CONFIG_FLASH_JESD216_API and support of that functionality in
+ * the driver underlying @p dev.
+ *
+ * @param dev device from which parameters will be read
+ * @param offset address within the SFDP region containing data of interest
+ * @param data where the data to be read will be placed
+ * @param len the number of bytes of data to be read
+ *
+ * @retval 0 on success
+ * @retval -ENOTSUP if the flash driver does not support SFDP access
+ * @retval negative values for other errors.
+ */
+__syscall int flash_sfdp_read(struct device *dev, off_t offset,
+			      void *data, size_t len);
+
+static inline int z_impl_flash_sfdp_read(struct device *dev, off_t offset,
+					 void *data, size_t len)
+{
+	int rv = -ENOTSUP;
+	const struct flash_driver_api *api =
+		(const struct flash_driver_api *)dev->api;
+
+	if (api->sfdp_read != NULL) {
+		rv = api->sfdp_read(dev, offset, data, len);
+	}
+	return rv;
+}
+
+/**
+ * @brief Read the JEDEC ID from a compatible flash device.
+ *
+ * @param dev device from which id will be read
+ * @param id pointer to a buffer of at least 3 bytes into which id
+ * will be stored
+ *
+ * @retval 0 on successful store of 3-byte JEDEC id
+ * @retval -ENOTSUP if flash driver doesn't support this function
+ * @retval negative values for other errors
+ */
+__syscall int flash_read_jedec_id(struct device *dev, uint8_t *id);
+
+static inline int z_impl_flash_read_jedec_id(struct device *dev, uint8_t *id)
+{
+	int rv = -ENOTSUP;
+	const struct flash_driver_api *api =
+		(const struct flash_driver_api *)dev->api;
+
+	if (api->read_jedec_id != NULL) {
+		rv = api->read_jedec_id(dev, id);
+	}
+	return rv;
+}
+#endif /* CONFIG_FLASH_JESD216_API */
 
 /**
  *  @brief  Get the minimum write block size supported by the driver

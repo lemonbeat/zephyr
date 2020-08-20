@@ -24,7 +24,7 @@
 #define HW_FLOWCONTROL_IS_SUPPORTED_BY_SOC
 #endif
 
-#define HAS_HFC_OR(inst) DT_INST_NODE_HAS_PROP(inst, hw_flow_control) ||
+#define HAS_HFC_OR(inst) DT_INST_PROP(inst, hw_flow_control) ||
 
 #define DT_DRV_COMPAT silabs_gecko_uart
 
@@ -39,8 +39,8 @@
 #define UART_GECKO_USART_HW_FLOW_CONTROL_ENABLED  \
 	DT_INST_FOREACH_STATUS_OKAY(HAS_HFC_OR) 0
 
-#if defined(UART_GECKO_USART_HW_FLOW_CONTROL_ENABLED) || \
-	defined(UART_GECKO_UART_HW_FLOW_CONTROL_ENABLED)
+#if UART_GECKO_USART_HW_FLOW_CONTROL_ENABLED || \
+	UART_GECKO_UART_HW_FLOW_CONTROL_ENABLED
 #define UART_GECKO_HW_FLOW_CONTROL
 #endif
 
@@ -94,17 +94,6 @@ struct uart_gecko_data {
 #endif
 };
 
-/** @defgroup uart_gecko_group1 Polling-based UART
- *  This is a part of the UART driver using polling.
- *  @{
- */
-
-/**
- * @brief get received data for polling-based operation
- *
- * @param dev The device to read from
- * @param c Pointer to received data
- */
 static int uart_gecko_poll_in(struct device *dev, unsigned char *c)
 {
 	const struct uart_gecko_config *config = dev->config;
@@ -118,12 +107,6 @@ static int uart_gecko_poll_in(struct device *dev, unsigned char *c)
 	return -1;
 }
 
-/**
- * @brief write data for polling-based operation
- *
- * @param dev The device to write to
- * @param c Data to be transmitted
- */
 static void uart_gecko_poll_out(struct device *dev, unsigned char c)
 {
 	const struct uart_gecko_config *config = dev->config;
@@ -131,12 +114,6 @@ static void uart_gecko_poll_out(struct device *dev, unsigned char c)
 	USART_Tx(config->base, c);
 }
 
-/**
- * @brief Check if a device has errors
- *
- * @param dev The device to be checked
- * @return Status of type uart_rx_stop_reason (enum)
- */
 static int uart_gecko_err_check(struct device *dev)
 {
 	const struct uart_gecko_config *config = dev->config;
@@ -161,13 +138,8 @@ static int uart_gecko_err_check(struct device *dev)
 
 	return err;
 }
-/** @} */ /* end of uart_gecko_group1 */
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-/** @defgroup uart_gecko_group2 Interrupt-driven UART
- *  This is a part of the UART driver using Interrupts.
- *  @{
- */
 static int uart_gecko_fifo_fill(struct device *dev, const uint8_t *tx_data,
 			       int len)
 {
@@ -312,7 +284,6 @@ static void uart_gecko_isr(void *arg)
 		data->callback(dev, data->cb_data);
 	}
 }
-/** @} */ /* end of uart_gecko_group2 */
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 
 /**
@@ -420,9 +391,6 @@ static int uart_gecko_init(struct device *dev)
 	return 0;
 }
 
-/**
- * @brief Main configuration of driver API for polling- or IR-based operation
- */
 static const struct uart_driver_api uart_gecko_driver_api = {
 	.poll_in = uart_gecko_poll_in,
 	.poll_out = uart_gecko_poll_out,

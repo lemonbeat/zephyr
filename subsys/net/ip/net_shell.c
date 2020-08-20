@@ -641,8 +641,9 @@ static void route_mcast_cb(struct net_route_entry_mcast *entry,
 	PR("==========================================================="
 	   "%s\n", extra);
 
-	PR("IPv6 group : %s\n", net_sprint_ipv6_addr(&entry->group));
-	PR("Lifetime   : %u\n", entry->lifetime);
+	PR("IPv6 group     : %s\n", net_sprint_ipv6_addr(&entry->group));
+	PR("IPv6 group len : %d\n", entry->prefix_len);
+	PR("Lifetime       : %u\n", entry->lifetime);
 }
 
 static void iface_per_mcast_route_cb(struct net_if *iface, void *user_data)
@@ -1888,6 +1889,8 @@ static int cmd_net_dns(const struct shell *shell, size_t argc, char *argv[])
 }
 
 #if defined(CONFIG_NET_GPTP)
+static const char *selected_role_str(int port);
+
 static void gptp_port_cb(int port, struct net_if *iface, void *user_data)
 {
 	struct net_shell_user_data *data = user_data;
@@ -1895,12 +1898,13 @@ static void gptp_port_cb(int port, struct net_if *iface, void *user_data)
 	int *count = data->user_data;
 
 	if (*count == 0) {
-		PR("Port Interface\n");
+		PR("Port Interface  \tRole\n");
 	}
 
 	(*count)++;
 
-	PR("%2d   %p\n", port, iface);
+	PR("%2d   %p [%d]  \t%s\n", port, iface, net_if_get_by_iface(iface),
+	   selected_role_str(port));
 }
 
 static const char *pdelay_req2str(enum gptp_pdelay_req_states state)
@@ -2153,7 +2157,12 @@ static void gptp_print_port_info(const struct shell *shell, int port)
 		return;
 	}
 
-	PR("Port id    : %d\n", port_ds->port_id.port_number);
+	NET_ASSERT(port == port_ds->port_id.port_number,
+		   "Port number mismatch! (%d vs %d)", port,
+		   port_ds->port_id.port_number);
+
+	PR("Port id    : %d (%s)\n", port_ds->port_id.port_number,
+	   selected_role_str(port_ds->port_id.port_number));
 	PR("Interface  : %p [%d]\n", iface, net_if_get_by_iface(iface));
 	PR("Clock id   : ");
 	for (i = 0; i < sizeof(port_ds->port_id.clk_id); i++) {
@@ -3570,6 +3579,17 @@ static int cmd_net_ppp_status(const struct shell *shell, size_t argc,
 	PR("IPv6CP ACK received : %s\n", ctx->ipv6cp.fsm.ack_received ?
 								"yes" : "no");
 #endif /* CONFIG_NET_IPV6 */
+
+#if defined(CONFIG_NET_L2_PPP_PAP)
+	PR("PAP state           : %s (%d)\n",
+	   ppp_state_str(ctx->pap.fsm.state), ctx->pap.fsm.state);
+	PR("PAP retransmits     : %u\n", ctx->pap.fsm.retransmits);
+	PR("PAP NACK loops      : %u\n", ctx->pap.fsm.nack_loops);
+	PR("PAP NACKs recv      : %u\n", ctx->pap.fsm.recv_nack_loops);
+	PR("PAP current id      : %d\n", ctx->pap.fsm.id);
+	PR("PAP ACK received    : %s\n", ctx->pap.fsm.ack_received ?
+								"yes" : "no");
+#endif /* CONFIG_NET_L2_PPP_PAP */
 
 #else
 	PR_INFO("Set %s to enable %s support.\n",

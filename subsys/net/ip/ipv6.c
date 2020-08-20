@@ -367,6 +367,8 @@ static enum net_verdict ipv6_forward_mcast_packet(struct net_pkt *pkt,
 						 struct net_ipv6_hdr *hdr)
 {
 #if defined(CONFIG_NET_ROUTE_MCAST)
+	int routed;
+
 	/* check if routing loop could be created or if the destination is of
 	 * interface local scope or if from link local source
 	 */
@@ -375,7 +377,8 @@ static enum net_verdict ipv6_forward_mcast_packet(struct net_pkt *pkt,
 	       net_ipv6_is_ll_addr(&hdr->src)) {
 		return NET_CONTINUE;
 	}
-	int routed = net_route_mcast_forward_packet(pkt, hdr);
+
+	routed = net_route_mcast_forward_packet(pkt, hdr);
 
 	if (routed < 0) {
 		return NET_DROP;
@@ -455,6 +458,20 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 	net_pkt_set_ip_hdr_len(pkt, sizeof(struct net_ipv6_hdr));
 	net_pkt_set_ipv6_hop_limit(pkt, NET_IPV6_HDR(pkt)->hop_limit);
 	net_pkt_set_family(pkt, PF_INET6);
+
+	if (IS_ENABLED(CONFIG_NET_ROUTE_MCAST) &&
+		net_ipv6_is_addr_mcast(&hdr->dst)) {
+		/* If the packet is a multicast packet and multicast routing
+		 * is activated, we give the packet to the routing engine.
+		 *
+		 * But we only drop the packet if an error occurs, otherwise
+		 * it might be eminent to respond on the packet on application
+		 * layer.
+		 */
+		if (ipv6_forward_mcast_packet(pkt, hdr) == NET_DROP) {
+			goto drop;
+		}
+	}
 
 	if (IS_ENABLED(CONFIG_NET_ROUTE_MCAST) &&
 		net_ipv6_is_addr_mcast(&hdr->dst)) {

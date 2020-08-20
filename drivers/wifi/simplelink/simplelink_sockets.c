@@ -281,8 +281,9 @@ exit:
 	return retval;
 }
 
-static int simplelink_close(int sd)
+static int simplelink_close(void *obj)
 {
+	int sd = OBJ_TO_SD(obj);
 	int retval;
 
 	retval = sl_Close(sd);
@@ -1129,10 +1130,6 @@ static int simplelink_ioctl(void *obj, unsigned int request, va_list args)
 	int sd = OBJ_TO_SD(obj);
 
 	switch (request) {
-	/* Handle close specifically. */
-	case ZFD_IOCTL_CLOSE:
-		return simplelink_close(sd);
-
 	case ZFD_IOCTL_POLL_PREPARE:
 		return -EXDEV;
 
@@ -1174,6 +1171,7 @@ static const struct socket_op_vtable simplelink_socket_fd_op_vtable = {
 	.fd_vtable = {
 		.read = simplelink_read,
 		.write = simplelink_write,
+		.close = simplelink_close,
 		.ioctl = simplelink_ioctl,
 	},
 	.bind = simplelink_bind,

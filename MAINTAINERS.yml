@@ -340,7 +340,7 @@ Documentation:
         - drivers/can/
         - dts/bindings/can/
         - include/drivers/can.h
-        - samples/drivers/CAN/
+        - samples/drivers/can/
         - tests/drivers/can/
     labels:
         - "area: CAN"
@@ -506,7 +506,6 @@ Documentation:
         - drivers/i2c/
         - dts/bindings/i2c/
         - include/drivers/i2c.h
-        - include/drivers/i2c/
     labels:
         - "area: I2C"
 
@@ -805,7 +804,7 @@ Little FS:
     files:
         - subsys/fs/Kconfig.littlefs
         - subsys/fs/littlefs_fs.c
-        - tests/subsys/fs/littlefs
+        - tests/subsys/fs/littlefs/
     description: >-
        Little FS
 

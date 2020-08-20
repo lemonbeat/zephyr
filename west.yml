@@ -47,7 +47,7 @@ manifest:
       revision: 6835bfc741bf15e98fb7971293913f770df6081f
       path: modules/hal/esp-idf
     - name: fatfs
-      revision: 9ee6b9b9511151d0d64a74d532d39c6f2bbd4f16
+      revision: 13697783bf653dfdf17c57129ce8e181634e5970
       path: modules/fs/fatfs
     - name: hal_cypress
       revision: a12d92816a53a521d79cefcf5c38b9dc8a4fed6e
@@ -56,7 +56,7 @@ manifest:
       revision: f1fa8241f8786198ba41155413243de36ed878a5
       path: modules/hal/infineon
     - name: hal_nordic
-      revision: 8139a8445900ddbf495f65de21ddeab31ac97951
+      revision: b69c5a7c25007fbc111a0cbda6e2a6a945a6ae9a
       path: modules/hal/nordic
     - name: hal_openisa
       revision: 40d049f69c50b58ea20473bee14cf93f518bf262
@@ -89,7 +89,7 @@ manifest:
       path: modules/crypto/mbedtls
       revision: 4bf099f1254332d16dcd931ccea0a88d24a7d3c7
     - name: mcuboot
-      revision: 813d29ca7ce2aeb388d945f7889e6711b97c33c7
+      revision: 0f2c585552a888b990abd2d5b699b57fe946d5fc
       path: bootloader/mcuboot
     - name: mcumgr
       revision: cfe5eb98a9493017448846fd1a44a9340bd0a22f
@@ -98,7 +98,7 @@ manifest:
       revision: 1c4fdba512b268033a4cf926bddd323866c3261a
       path: tools/net-tools
     - name: hal_nxp
-      revision: 7276046215cfcd4ed3d6723f16f7aeb868b0fb60
+      revision: 727b36cfe9e2f2aa5eb88d608e6334c8d548cee9
       path: modules/hal/nxp
     - name: open-amp
       revision: 724f7e2a4519d7e1d40ef330042682dea950c991
@@ -107,7 +107,7 @@ manifest:
       revision: 170a2579dd890f78f5056f0959cdb9c9bea259a1
       path: modules/lib/loramac-node
     - name: openthread
-      revision: e294e1d5073f40d7d735b40bda5bfbe05dbf7a8a
+      revision: 656802a76acd2920b74ee4d49363f70aeb3b9621
       path: modules/lib/openthread
     - name: segger
       revision: 6fcf61606d6012d2c44129edc033f59331e268bc

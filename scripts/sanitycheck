@@ -978,6 +978,7 @@ def main():
         suite.selected_platforms = set(p.platform.name for p in suite.instances.values())
     elif options.test_only:
         suite.load_from_file(last_run, filter_status=['skipped'])
+        suite.selected_platforms = set(p.platform.name for p in suite.instances.values())
     else:
         discards = suite.apply_filters(
             build_only=options.build_only,
@@ -1078,7 +1079,7 @@ def main():
         return
 
     logger.info("%d test configurations selected, %d configurations discarded due to filters." %
-                (len(suite.instances), len(discards) - suite.total_skipped))
+                (len(suite.instances), len(discards)))
 
     if options.device_testing:
         print("\nDevice testing on:")
@@ -1093,7 +1094,7 @@ def main():
     retries = options.retry_failed + 1
     completed = 0
 
-    suite.update()
+    suite.update_counting()
     suite.start_time = start_time
 
     while True:
@@ -1116,6 +1117,7 @@ def main():
                        options.all_deltas, options.footprint_threshold, options.last_metrics)
 
     suite.duration = time.time() - start_time
+    suite.update_counting()
     suite.summary(options.disable_unrecognized_section_test)
 
     if options.coverage:

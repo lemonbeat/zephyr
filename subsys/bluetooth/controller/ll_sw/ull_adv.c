@@ -80,6 +80,84 @@ static struct ll_adv_set ll_adv[BT_CTLR_ADV_SET];
 static struct ticker_ext ll_adv_ticker_ext[BT_CTLR_ADV_SET];
 #endif /* CONFIG_BT_TICKER_EXT */
 
+#if defined(CONFIG_BT_HCI_RAW) && defined(CONFIG_BT_CTLR_ADV_EXT)
+static uint8_t ll_adv_cmds;
+
+int ll_adv_cmds_set(uint8_t adv_cmds)
+{
+	if (!ll_adv_cmds) {
+		ll_adv_cmds = adv_cmds;
+
+		if (adv_cmds == LL_ADV_CMDS_LEGACY) {
+			struct ll_adv_set *adv = &ll_adv[0];
+
+#if defined(CONFIG_BT_CTLR_HCI_ADV_HANDLE_MAPPING)
+			adv->hci_handle = 0;
+#endif
+			adv->is_created = 1;
+		}
+	}
+
+	if (ll_adv_cmds != adv_cmds) {
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+int ll_adv_cmds_is_ext(void)
+{
+	return ll_adv_cmds == LL_ADV_CMDS_EXT;
+}
+#endif
+
+#if defined(CONFIG_BT_CTLR_HCI_ADV_HANDLE_MAPPING)
+uint8_t ll_adv_set_by_hci_handle_get(uint8_t hci_handle, uint8_t *handle)
+{
+	struct ll_adv_set *adv;
+	uint8_t idx;
+
+	adv =  &ll_adv[0];
+
+	for (idx = 0U; idx < BT_CTLR_ADV_SET; idx++, adv++) {
+		if (adv->is_created && (adv->hci_handle == hci_handle)) {
+			*handle = idx;
+			return 0;
+		}
+	}
+
+	return BT_HCI_ERR_UNKNOWN_ADV_IDENTIFIER;
+}
+
+uint8_t ll_adv_set_by_hci_handle_get_or_new(uint8_t hci_handle, uint8_t *handle)
+{
+	struct ll_adv_set *adv, *adv_empty;
+	uint8_t idx;
+
+	adv =  &ll_adv[0];
+	adv_empty = NULL;
+
+	for (idx = 0U; idx < BT_CTLR_ADV_SET; idx++, adv++) {
+		if (adv->is_created) {
+			if (adv->hci_handle == hci_handle) {
+				*handle = idx;
+				return 0;
+			}
+		} else if (!adv_empty) {
+			adv_empty = adv;
+		}
+	}
+
+	if (adv_empty) {
+		adv_empty->hci_handle = hci_handle;
+		*handle = ull_adv_handle_get(adv_empty);
+		return 0;
+	}
+
+	return BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
+}
+#endif
+
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 uint8_t ll_adv_params_set(uint8_t handle, uint16_t evt_prop, uint32_t interval,
 		       uint8_t adv_type, uint8_t own_addr_type,
@@ -159,16 +237,11 @@ uint8_t ll_adv_params_set(uint16_t interval, uint8_t adv_type,
 
 			adv->lll.phy_p = phy_p;
 		}
-
-		/* Mark the adv set as created by extended advertising cmd */
-		adv->is_created = ULL_ADV_CREATED_BITMASK_CREATED |
-				  ULL_ADV_CREATED_BITMASK_EXTENDED;
 	} else {
 		adv->lll.phy_p = PHY_1M;
-
-		/* Mark the adv set as created by legacy advertising cmd */
-		adv->is_created = ULL_ADV_CREATED_BITMASK_CREATED;
 	}
+
+	adv->is_created = 1;
 #endif /* CONFIG_BT_CTLR_ADV_EXT */
 
 	/* remember params so that set adv/scan data and adv enable
@@ -605,9 +678,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 		if (!priv) {
 			uint8_t const *tx_addr;
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
-			if ((adv->is_created &
-			     ULL_ADV_CREATED_BITMASK_EXTENDED) &&
-			    pdu_adv->tx_addr) {
+			if (ll_adv_cmds_is_ext() && pdu_adv->tx_addr) {
 				tx_addr = ll_adv_aux_random_addr_get(adv, NULL);
 			} else
 #endif /* CONFIG_BT_CTLR_ADV_EXT */
@@ -817,7 +888,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 	}
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
-	if (adv->is_created & ULL_ADV_CREATED_BITMASK_EXTENDED) {
+	if (ll_adv_cmds_is_ext()) {
 		struct node_rx_pdu *node_rx_adv_term;
 		void *link_adv_term;
 
@@ -1219,6 +1290,11 @@ int ull_adv_reset(void)
 	int err;
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
+
+#if defined(CONFIG_BT_HCI_RAW)
+	ll_adv_cmds = LL_ADV_CMDS_ANY;
+#endif
+
 #if defined(CONFIG_BT_CTLR_ADV_AUX_SET)
 	if (CONFIG_BT_CTLR_ADV_AUX_SET > 0) {
 		err = ull_adv_aux_reset();
@@ -1279,21 +1355,13 @@ inline struct ll_adv_set *ull_adv_is_enabled_get(uint8_t handle)
 	return adv;
 }
 
-uint32_t ull_adv_is_enabled(uint8_t handle)
+int ull_adv_is_enabled(uint8_t handle)
 {
 	struct ll_adv_set *adv;
 
 	adv = ull_adv_is_enabled_get(handle);
-	if (!adv) {
-		return 0;
-	}
 
-#if defined(CONFIG_BT_CTLR_ADV_EXT)
-	return ULL_ADV_ENABLED_BITMASK_ENABLED |
-	       ((uint32_t)adv->is_created << 1);
-#else /* !CONFIG_BT_CTLR_ADV_EXT */
-	return ULL_ADV_ENABLED_BITMASK_ENABLED;
-#endif /* !CONFIG_BT_CTLR_ADV_EXT */
+	return adv != NULL;
 }
 
 uint32_t ull_adv_filter_pol_get(uint8_t handle)

@@ -311,8 +311,8 @@ static const struct dummy_api net_dummy_if_api = {
 #define _DUMMY_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
 NET_DEVICE_INIT(net_dummy_ipv6, "net_dummy_ipv6",
-		net_test_dev_init, &net_dummy_data, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		net_test_dev_init, device_pm_control_nop, &net_dummy_data,
+		NULL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		&net_dummy_if_api, _DUMMY_L2_LAYER, _DUMMY_L2_CTX_TYPE,
 		127);
 
@@ -1036,6 +1036,8 @@ static void test_change_ll_addr(void)
 	zassert_false(ret < 0, "Cannot send NA 1");
 
 	nbr = net_ipv6_nbr_lookup(iface, &peer_addr);
+	zassert_not_null(nbr, "Neighbor %s not found in cache\n",
+			 net_sprint_ipv6_addr(&peer_addr));
 	ll = net_nbr_get_lladdr(nbr->idx);
 
 	ll_iface = net_if_get_link_addr(iface);
@@ -1053,6 +1055,8 @@ static void test_change_ll_addr(void)
 	zassert_false(ret < 0, "Cannot send NA 2");
 
 	nbr = net_ipv6_nbr_lookup(iface, &peer_addr);
+	zassert_not_null(nbr, "Neighbor %s not found in cache\n",
+			 net_sprint_ipv6_addr(&peer_addr));
 	ll = net_nbr_get_lladdr(nbr->idx);
 
 	zassert_true(memcmp(ll->addr, ll_iface->addr, ll->len) != 0,
