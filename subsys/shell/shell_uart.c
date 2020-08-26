@@ -41,6 +41,14 @@ static void uart_rx_handle(struct device *dev,
 
 		if (len > 0) {
 			rd_len = uart_fifo_read(dev, data, len);
+
+			/* If there is any new data to be either taken into
+			 * ring buffer or consumed by the SMP, signal the
+			 * shell_thread.
+			 */
+			if (rd_len > 0) {
+				new_data = true;
+			}
 #ifdef CONFIG_MCUMGR_SMP_SHELL
 			/* Divert bytes from shell handling if it is
 			 * part of an mcumgr frame.
@@ -55,15 +63,11 @@ static void uart_rx_handle(struct device *dev,
 			}
 
 			rd_len -= i;
-			new_data = true;
+
 			if (rd_len) {
 				for (uint32_t j = 0; j < rd_len; j++) {
 					data[j] = data[i + j];
 				}
-			}
-#else
-			if (rd_len > 0) {
-				new_data = true;
 			}
 #endif /* CONFIG_MCUMGR_SMP_SHELL */
 			int err = ring_buf_put_finish(sh_uart->rx_ringbuf,
@@ -78,10 +82,13 @@ static void uart_rx_handle(struct device *dev,
 
 			rd_len = uart_fifo_read(dev, &dummy, 1);
 #ifdef CONFIG_MCUMGR_SMP_SHELL
-			/* Divert this byte from shell handling if it
-			 * is part of an mcumgr frame.
+			/* If successful in getting byte from the fifo, try
+			 * feeding it to SMP as a part of mcumgr frame.
 			 */
-			smp_shell_rx_byte(&sh_uart->ctrl_blk->smp, dummy);
+			if ((rd_len != 0) &&
+			    smp_shell_rx_byte(&sh_uart->ctrl_blk->smp, dummy)) {
+				new_data = true;
+			}
 #endif /* CONFIG_MCUMGR_SMP_SHELL */
 		}
 	} while (rd_len && (rd_len == len));

@@ -38,6 +38,7 @@ extern void test_threads_cpu_mask(void);
 extern void test_threads_suspend_timeout(void);
 extern void test_threads_suspend(void);
 extern void test_abort_from_isr(void);
+extern void test_essential_thread_abort(void);
 
 struct k_thread tdata;
 #define STACK_SIZE (512 + CONFIG_TEST_EXTRA_STACKSIZE)
@@ -345,7 +346,7 @@ int join_scenario(enum control_method m)
 		break;
 	case OTHER_ABORT_TIMEOUT:
 		timeout = K_MSEC(JOIN_TIMEOUT_MS);
-		/* Fall through */
+		__fallthrough;
 	case OTHER_ABORT:
 		printk("ztest_thread: create control_thread\n");
 		k_thread_create(&control_thread, control_stack, STACK_SIZE,
@@ -487,6 +488,7 @@ void test_main(void)
 			 ztest_unit_test(test_abort_handler),
 			 ztest_1cpu_unit_test(test_delayed_thread_abort),
 			 ztest_unit_test(test_essential_thread_operation),
+			 ztest_unit_test(test_essential_thread_abort),
 			 ztest_unit_test(test_systhreads_main),
 			 ztest_unit_test(test_systhreads_idle),
 			 ztest_1cpu_unit_test(test_customdata_get_set_coop),

@@ -107,7 +107,7 @@ struct bt_conn_le_phy_param {
  */
 #define BT_CONN_LE_PHY_PARAM_INIT(_pref_tx_phy, _pref_rx_phy) \
 { \
-	.option = BT_CONN_LE_PHY_OPT_NONE, \
+	.options = BT_CONN_LE_PHY_OPT_NONE, \
 	.pref_tx_phy = (_pref_tx_phy), \
 	.pref_rx_phy = (_pref_rx_phy), \
 }
@@ -704,6 +704,12 @@ typedef enum __packed {
  *
  *  This function may return error if the pairing procedure has already been
  *  initiated by the local device or the peer device.
+ *
+ *  @note When :option:`CONFIG_BT_SMP_SC_ONLY` is enabled then the security
+ *        level will always be level 4.
+ *
+ *  @note When :option:`CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY` is enabled then the
+ *        security level will always be level 3.
  *
  *  @param conn Connection object.
  *  @param sec Requested security level.

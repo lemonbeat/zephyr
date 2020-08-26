@@ -762,6 +762,13 @@ class QEMUHandler(Handler):
 
         self.pid_fn = os.path.join(instance.build_dir, "qemu.pid")
 
+        if "ignore_qemu_crash" in instance.testcase.tags:
+            self.ignore_qemu_crash = True
+            self.ignore_unexpected_eof = True
+        else:
+            self.ignore_qemu_crash = False
+            self.ignore_unexpected_eof = False
+
     @staticmethod
     def _get_cpu_time(pid):
         """get process CPU time.
@@ -775,7 +782,8 @@ class QEMUHandler(Handler):
         return cpu_time.user + cpu_time.system
 
     @staticmethod
-    def _thread(handler, timeout, outdir, logfile, fifo_fn, pid_fn, results, harness):
+    def _thread(handler, timeout, outdir, logfile, fifo_fn, pid_fn, results, harness,
+                ignore_unexpected_eof=False):
         fifo_in = fifo_fn + ".in"
         fifo_out = fifo_fn + ".out"
 
@@ -840,7 +848,8 @@ class QEMUHandler(Handler):
 
             if c == "":
                 # EOF, this shouldn't happen unless QEMU crashes
-                out_state = "unexpected eof"
+                if not ignore_unexpected_eof:
+                    out_state = "unexpected eof"
                 break
             line = line + c
             if c != "\n":
@@ -925,7 +934,8 @@ class QEMUHandler(Handler):
         self.thread = threading.Thread(name=self.name, target=QEMUHandler._thread,
                                        args=(self, self.timeout, self.build_dir,
                                              self.log_fn, self.fifo_fn,
-                                             self.pid_fn, self.results, harness))
+                                             self.pid_fn, self.results, harness,
+                                             self.ignore_unexpected_eof))
 
         self.instance.results = harness.tests
         self.thread.daemon = True
@@ -961,15 +971,20 @@ class QEMUHandler(Handler):
                     proc.kill()
                     self.returncode = proc.returncode
             else:
-                logger.debug(f"No timeout, return code from qemu: {self.returncode}")
+                logger.debug(f"No timeout, return code from qemu: {proc.returncode}")
                 self.returncode = proc.returncode
+
+            # Need to wait for harness to finish processing
+            # output from QEMU. Otherwise it might miss some
+            # error messages.
+            self.thread.join()
 
             if os.path.exists(self.pid_fn):
                 os.unlink(self.pid_fn)
 
         logger.debug(f"return code from qemu: {self.returncode}")
 
-        if self.returncode != 0 or not harness.state:
+        if (self.returncode != 0 and not self.ignore_qemu_crash) or not harness.state:
             self.set_state("failed", 0)
             self.instance.reason = "Exited with {}".format(self.returncode)
 
@@ -1006,8 +1021,9 @@ class SizeCalculator:
         "k_msgq_area",
         "k_mbox_area",
         "k_pipe_area",
-        "net_if",
-        "net_if_dev",
+        "net_if_area",
+        "net_if_dev_area",
+        "net_l2_area",
         "net_l2_data",
         "k_queue_area",
         "_net_buf_pool_area",
@@ -1030,7 +1046,9 @@ class SizeCalculator:
         "priv_stacks_noinit",
         "_GCOV_BSS_SECTION_NAME",
         "gcov",
-        "nocache"
+        "nocache",
+        "devices",
+        "k_heap_area",
     ]
 
     # These get copied into RAM only on non-XIP
@@ -1042,19 +1060,19 @@ class SizeCalculator:
         "reset",
         "z_object_assignment_area",
         "rodata",
-        "devconfig",
         "net_l2",
         "vector",
         "sw_isr_table",
         "settings_handler_static_area",
-        "bt_l2cap_fixed_chan",
-        "bt_l2cap_br_fixec_chan",
-        "bt_gatt_service_static",
+        "bt_l2cap_fixed_chan_area",
+        "bt_l2cap_br_fixed_chan_area",
+        "bt_gatt_service_static_area",
         "vectors",
         "net_socket_register_area",
         "net_ppp_proto",
         "shell_area",
         "tracing_backend_area",
+        "ppp_protocol_handler_area",
     ]
 
     def __init__(self, filename, extra_sections):

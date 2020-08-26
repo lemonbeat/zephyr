@@ -3408,7 +3408,7 @@ int bt_gatt_discover(struct bt_conn *conn,
 		     !bt_uuid_cmp(params->uuid, BT_UUID_GATT_CHRC))) {
 			return -EINVAL;
 		}
-	 /* Fallthrough. */
+		__fallthrough;
 	case BT_GATT_DISCOVER_ATTRIBUTE:
 		return gatt_find_info(conn, params);
 	default:
@@ -4511,34 +4511,6 @@ static int bt_gatt_store_cf(struct bt_conn *conn)
 
 }
 
-void bt_gatt_disconnected(struct bt_conn *conn)
-{
-	BT_DBG("conn %p", conn);
-	bt_gatt_foreach_attr(0x0001, 0xffff, disconnected_cb, conn);
-
-#if defined(CONFIG_BT_SETTINGS_CCC_STORE_ON_WRITE)
-	gatt_ccc_conn_unqueue(conn);
-
-	if (gatt_ccc_conn_queue_is_empty()) {
-		k_delayed_work_cancel(&gatt_ccc_store.work);
-	}
-#endif
-
-	if (IS_ENABLED(CONFIG_BT_SETTINGS) &&
-	    bt_addr_le_is_bonded(conn->id, &conn->le.dst)) {
-		bt_gatt_store_ccc(conn->id, &conn->le.dst);
-		bt_gatt_store_cf(conn);
-	}
-
-#if defined(CONFIG_BT_GATT_CLIENT)
-	remove_subscriptions(conn);
-#endif /* CONFIG_BT_GATT_CLIENT */
-
-#if defined(CONFIG_BT_GATT_CACHING)
-	remove_cf_cfg(conn);
-#endif
-}
-
 static struct gatt_cf_cfg *find_cf_cfg_by_addr(uint8_t id,
 					       const bt_addr_le_t *addr)
 {
@@ -4986,4 +4958,44 @@ int bt_gatt_clear(uint8_t id, const bt_addr_le_t *addr)
 	}
 
 	return 0;
+}
+
+void bt_gatt_disconnected(struct bt_conn *conn)
+{
+	BT_DBG("conn %p", conn);
+	bt_gatt_foreach_attr(0x0001, 0xffff, disconnected_cb, conn);
+
+#if defined(CONFIG_BT_SETTINGS_CCC_STORE_ON_WRITE)
+	gatt_ccc_conn_unqueue(conn);
+
+	if (gatt_ccc_conn_queue_is_empty()) {
+		k_delayed_work_cancel(&gatt_ccc_store.work);
+	}
+#endif
+
+	if (IS_ENABLED(CONFIG_BT_SETTINGS) &&
+	    bt_addr_le_is_bonded(conn->id, &conn->le.dst)) {
+		bt_gatt_store_ccc(conn->id, &conn->le.dst);
+		bt_gatt_store_cf(conn);
+	}
+
+	/* Make sure to clear the CCC entry when using lazy loading */
+	if (IS_ENABLED(CONFIG_BT_SETTINGS_CCC_LAZY_LOADING) &&
+	    bt_addr_le_is_bonded(conn->id, &conn->le.dst)) {
+		struct addr_with_id addr_with_id = {
+			.addr = &conn->le.dst,
+			.id = conn->id,
+		};
+		bt_gatt_foreach_attr(0x0001, 0xffff,
+				     remove_peer_from_attr,
+				     &addr_with_id);
+	}
+
+#if defined(CONFIG_BT_GATT_CLIENT)
+	remove_subscriptions(conn);
+#endif /* CONFIG_BT_GATT_CLIENT */
+
+#if defined(CONFIG_BT_GATT_CACHING)
+	remove_cf_cfg(conn);
+#endif
 }

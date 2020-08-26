@@ -1378,7 +1378,7 @@ static void test_dst_iface_scope_mcast_send(void)
 	net_context_put(ctx);
 }
 
-static void test_dst_unknown_group_multicast_recv(void)
+static void test_dst_unknown_group_mcast_recv(void)
 {
 	struct in6_addr mcast_unknown_group = {
 		{ { 0xff, 0x02, 0, 0, 0, 0, 0, 0, 0x01, 0x02, 0x03, 0x04, 0x05,
@@ -1402,16 +1402,57 @@ static void test_dst_unknown_group_multicast_recv(void)
 	 */
 	verdict = recv_msg(&addr, &mcast_unknown_group);
 
-	/* Clean-up before evaluating verdict, otherwise subsequent tests
-	 * cannot bind to a similar network context.
-	 */
-	net_context_put(ctx);
-
 	zassert_equal(verdict, NET_DROP,
 		      "Packet sent to unknown multicast group was not dropped");
+
+	net_context_put(ctx);
 }
 
-static void test_dst_is_other_iface_multicast_recv(void)
+static void test_dst_unjoined_group_mcast_recv(void)
+{
+	struct in6_addr mcast_unjoined_group = {
+		{ { 0xff, 0x02, 0, 0, 0, 0, 0, 0, 0x42, 0x42, 0x42, 0x42, 0x42,
+		    0x42, 0x42, 0x42 } }
+	};
+	struct in6_addr in6_addr_any = IN6ADDR_ANY_INIT;
+	struct in6_addr addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0,
+				     0, 0, 0, 0, 0, 0x1 } } };
+	struct net_if_mcast_addr *maddr;
+	struct net_context *ctx;
+	enum net_verdict verdict;
+
+	/* Create listening socket that is bound to all incoming traffic. */
+	net_ctx_create(&ctx);
+	net_ctx_bind_mcast(ctx, &in6_addr_any);
+	net_ctx_listen(ctx);
+	net_ctx_recv(ctx);
+
+	/* add multicast address to interface but do not join the group yet */
+	maddr = net_if_ipv6_maddr_add(net_if_get_default(),
+				      &mcast_unjoined_group);
+
+	/* receive multicast on interface that did not join the group yet.
+	 * Expectation: packet should be dropped by first interface on IP
+	 * Layer and not be received in listening socket.
+	 */
+	verdict = recv_msg(&addr, &mcast_unjoined_group);
+
+	zassert_equal(verdict, NET_DROP,
+		      "Packet sent to unjoined multicast group was not "
+		      "dropped.");
+
+	/* now join the multicast group and attempt to receive again */
+	net_if_ipv6_maddr_join(maddr);
+	verdict = recv_msg(&addr, &mcast_unjoined_group);
+
+	zassert_equal(verdict, NET_OK,
+		      "Packet sent to joined multicast group was not "
+		      "received.");
+
+	net_context_put(ctx);
+}
+
+static void test_dst_is_other_iface_mcast_recv(void)
 {
 	struct in6_addr mcast_iface2 = { { { 0xff, 0x02, 0, 0, 0, 0, 0, 0, 0x01,
 					     0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -1434,6 +1475,7 @@ static void test_dst_is_other_iface_multicast_recv(void)
 		net_if_get_first_by_type(&NET_L2_GET_NAME(DUMMY)),
 		&mcast_iface2);
 	zassert_not_null(maddr, "Cannot add multicast address to interface");
+	net_if_ipv6_maddr_join(maddr);
 
 	/* Receive multicast on first interface that did not join the group.
 	 * Expectation: packet should be dropped by first interface on IP
@@ -1444,14 +1486,11 @@ static void test_dst_is_other_iface_multicast_recv(void)
 	 */
 	verdict = recv_msg(&addr, &mcast_iface2);
 
-	/* Clean-up before evaluating verdict, otherwise subsequent tests
-	 * cannot bind to a similar network context.
-	 */
-	net_context_put(ctx);
-
 	zassert_equal(verdict, NET_DROP,
 		      "Packet sent to multicast group joined by second "
 		      "interface not dropped");
+
+	net_context_put(ctx);
 }
 
 void test_main(void)
@@ -1484,8 +1523,9 @@ void test_main(void)
 			 ztest_unit_test(test_dst_site_scope_mcast_recv_drop),
 			 ztest_unit_test(test_dst_site_scope_mcast_recv_ok),
 			 ztest_unit_test(test_dst_org_scope_mcast_recv),
-			 ztest_unit_test(test_dst_unknown_group_multicast_recv),
-			 ztest_unit_test(test_dst_is_other_iface_multicast_recv)
+			 ztest_unit_test(test_dst_unknown_group_mcast_recv),
+			 ztest_unit_test(test_dst_unjoined_group_mcast_recv),
+			 ztest_unit_test(test_dst_is_other_iface_mcast_recv)
 			 );
 	ztest_run_test_suite(test_ipv6_fn);
 }

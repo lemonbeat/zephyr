@@ -154,7 +154,7 @@ static inline bool ipv6_drop_on_unknown_option(struct net_pkt *pkt,
 			break;
 		}
 
-		/* passthrough */
+		__fallthrough;
 	case 0x80:
 		net_icmpv6_send_error(pkt, NET_ICMPV6_PARAM_PROBLEM,
 				      NET_ICMPV6_PARAM_PROB_OPTION,
@@ -400,6 +400,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 	uint8_t nexthdr, next_nexthdr, prev_hdr_offset;
 	union net_proto_header proto_hdr;
 	struct net_ipv6_hdr *hdr;
+	struct net_if_mcast_addr *if_mcast_addr;
 	union net_ip_header ip;
 	int pkt_len;
 
@@ -473,17 +474,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 		}
 	}
 
-	if (net_ipv6_is_addr_mcast(&hdr->dst)) {
-		/* Does the destination multicast address match one of the
-		 * registered multicast groups on the originating interface
-		 * of the packet?
-		 */
-		if (!net_if_ipv6_maddr_lookup(&hdr->dst, &pkt_iface)) {
-			NET_DBG("DROP: packet for unjoined multicast");
-			goto drop;
-		}
-	} else {
-		/* Destination address is a unicast address. */
+	if (!net_ipv6_is_addr_mcast(&hdr->dst)) {
 		if (!net_ipv6_is_my_addr(&hdr->dst)) {
 			if (ipv6_route_packet(pkt, hdr) == NET_OK) {
 				return NET_OK;
@@ -501,6 +492,28 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 		    net_ipv6_is_ll_addr(&hdr->src) &&
 		    !net_if_ipv6_addr_lookup_by_iface(pkt_iface, &hdr->dst)) {
 			ipv6_no_route_info(pkt, &hdr->src, &hdr->dst);
+			goto drop;
+		}
+	}
+
+	if (net_ipv6_is_addr_mcast(&hdr->dst) &&
+	    !(net_ipv6_is_addr_mcast_iface(&hdr->dst) ||
+	      net_ipv6_is_addr_mcast_link_all_nodes(&hdr->dst))) {
+		/* If we receive a packet with a interface-local or
+		 * link-local all-nodes multicast destination address we
+		 * always have to pass it to the upper layer.
+		 *
+		 * For all other destination multicast addresses we have to
+		 * check if one of the joined multicast groups on the
+		 * originating interface of the packet matches. Otherwise the
+		 * packet will be dropped.
+		 * RFC4291 ch 2.7.1, ch 2.8
+		 */
+		if_mcast_addr = net_if_ipv6_maddr_lookup(&hdr->dst, &pkt_iface);
+
+		if (!if_mcast_addr ||
+		    !net_if_ipv6_maddr_is_joined(if_mcast_addr)) {
+			NET_DBG("DROP: packet for unjoined multicast address");
 			goto drop;
 		}
 	}

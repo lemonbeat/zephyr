@@ -4303,15 +4303,13 @@ int bt_le_scan_update(bool fast_scan)
 
 		conn = bt_conn_lookup_state_le(BT_ID_DEFAULT, NULL,
 					       BT_CONN_CONNECT_SCAN);
-		if (!conn) {
-			return 0;
+		if (conn) {
+			atomic_set_bit(bt_dev.flags, BT_DEV_SCAN_FILTER_DUP);
+
+			bt_conn_unref(conn);
+
+			return start_passive_scan(fast_scan);
 		}
-
-		atomic_set_bit(bt_dev.flags, BT_DEV_SCAN_FILTER_DUP);
-
-		bt_conn_unref(conn);
-
-		return start_passive_scan(fast_scan);
 	}
 
 #if defined(CONFIG_BT_PER_ADV_SYNC)
@@ -4683,16 +4681,14 @@ static void le_per_adv_sync_lost(struct net_buf *buf)
 	term_info.addr = &per_adv_sync->addr;
 	term_info.sid = per_adv_sync->sid;
 
-	/* Clearing bit before callback, so the caller will be able to restart
+	/* Deleting before callback, so the caller will be able to restart
 	 * sync in the callback
 	 */
-	atomic_clear_bit(per_adv_sync->flags, BT_PER_ADV_SYNC_SYNCED);
+	per_adv_sync_delete(per_adv_sync);
 
 	if (per_adv_sync->cb && per_adv_sync->cb->term) {
 		per_adv_sync->cb->term(per_adv_sync, &term_info);
 	}
-
-	per_adv_sync_delete(per_adv_sync);
 }
 #endif /* defined(CONFIG_BT_PER_ADV_SYNC) */
 #endif /* defined(CONFIG_BT_EXT_ADV) */
@@ -7184,10 +7180,6 @@ int bt_le_per_adv_sync_create(const struct bt_le_per_adv_sync_param *param,
 		   param->skip > BT_GAP_PER_ADV_MAX_MAX_SKIP ||
 		   param->timeout > BT_GAP_PER_ADV_MAX_MAX_TIMEOUT) {
 		return -EINVAL;
-	}
-
-	if (atomic_test_bit(bt_dev.flags, BT_DEV_EXPLICIT_SCAN)) {
-		return -EBUSY;
 	}
 
 	per_adv_sync = per_adv_sync_new();

@@ -198,6 +198,7 @@
 /drivers/ipm/ipm_mhu*                     @karl-zh
 /drivers/ipm/Kconfig.nrfx                 @masz-nordic @ioannisg
 /drivers/ipm/Kconfig.nrfx_ipc_channel     @masz-nordic @ioannisg
+/drivers/ipm/ipm_intel_adsp.c             @finikorg
 /drivers/ipm/ipm_cavs_idc*                @dcpleung
 /drivers/ipm/ipm_nrfx_ipc.c               @masz-nordic @ioannisg
 /drivers/ipm/ipm_nrfx_ipc.h               @masz-nordic @ioannisg
@@ -353,6 +354,7 @@
 /include/canbus/                          @alexanderwachter
 /include/tracing/                         @wentongwu @nashif
 /include/debug/                           @nashif
+/include/debug/coredump.h                 @dcpleung
 /include/device.h                         @wentongwu @nashif
 /include/devicetree.h                     @galak
 /include/display/                         @vanwinkeljan
@@ -425,6 +427,7 @@
 /samples/userspace/                       @andrewboie
 /scripts/coccicheck                       @himanshujha199640 @JuliaLawall
 /scripts/coccinelle/                      @himanshujha199640 @JuliaLawall
+/scripts/coredump/                        @dcpleung
 /scripts/kconfig/                         @ulfalizer
 /scripts/sanity_chk/expr_parser.py        @nashif
 /scripts/gen_app_partitions.py            @andrewboie
@@ -459,6 +462,7 @@
 /subsys/canbus/                           @alexanderwachter
 /subsys/cpp/                              @pabigot @vanwinkeljan
 /subsys/debug/                            @nashif
+/subsys/debug/coredump/                   @dcpleung
 /subsys/dfu/                              @nvlsianpu
 /subsys/tracing/                          @nashif @wentongwu
 /subsys/debug/asan_hacks.c                @vanwinkeljan @aescolar @daor-oti
@@ -496,6 +500,7 @@
 /subsys/random/                           @dleach02
 /subsys/settings/                         @nvlsianpu
 /subsys/shell/                            @jakub-uC @nordic-krch
+/subsys/stats/                            @nvlsianpu
 /subsys/storage/                          @nvlsianpu
 /subsys/testsuite/                        @nashif
 /subsys/usb/                              @jfischer-phytec-iot @finikorg
@@ -529,6 +534,7 @@
 /tests/net/lib/coap/                      @rveerama1
 /tests/net/socket/socketpair/             @cfriedt
 /tests/net/socket/                        @jukkar @tbursztyka @pfalcon
+/tests/subsys/debug/coredump/             @dcpleung
 /tests/subsys/fs/                         @nashif @wentongwu
 /tests/subsys/settings/                   @nvlsianpu
 /tests/subsys/shell/                      @jakub-uC @nordic-krch
