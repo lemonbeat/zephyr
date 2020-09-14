@@ -26,7 +26,7 @@ LOG_MODULE_REGISTER(sdhc_spi, CONFIG_DISK_LOG_LEVEL);
 #warning NO SDHC slot specified on board
 #else
 struct sdhc_spi_data {
-	struct device *spi;
+	const struct device *spi;
 	struct spi_config cfg;
 #if DT_SPI_DEV_HAS_CS_GPIOS(SPI_SDHC_NODE)
 	struct spi_cs_control cs;
@@ -748,9 +748,88 @@ error:
 	return err;
 }
 
-static int disk_spi_sdhc_init(struct device *dev);
+/* this function is optimized to write multiple blocks */
+static int sdhc_spi_write_multi(struct sdhc_spi_data *data,
+	const uint8_t *buf, uint32_t sector, uint32_t count)
+{
+	int err;
+	uint32_t addr;
+	uint8_t block[SDHC_CRC16_SIZE];
 
-static int sdhc_spi_init(struct device *dev)
+	err = sdhc_map_disk_status(data->status);
+	if (err != 0) {
+		return err;
+	}
+
+	if (data->high_capacity) {
+		addr = sector;
+	} else {
+		addr = sector * SDMMC_DEFAULT_BLOCK_SIZE;
+	}
+
+	err = sdhc_spi_cmd_r1(data, SDHC_WRITE_MULTIPLE_BLOCK, addr);
+	if (err < 0) {
+		goto exit;
+	}
+
+	/* Write the blocks */
+	for (; count != 0U; count--) {
+		/* Start the block */
+		block[0] = SDHC_TOKEN_MULTI_WRITE;
+		err = sdhc_spi_tx(data, block, 1);
+		if (err != 0) {
+			goto exit;
+		}
+
+		/* Write the payload */
+		err = sdhc_spi_tx(data, buf, SDMMC_DEFAULT_BLOCK_SIZE);
+		if (err != 0) {
+			goto exit;
+		}
+
+		/* Build and write the trailing CRC */
+		sys_put_be16(crc16_itu_t(0, buf, SDMMC_DEFAULT_BLOCK_SIZE),
+			     block);
+
+		err = sdhc_spi_tx(data, block, sizeof(block));
+		if (err != 0) {
+			goto exit;
+		}
+
+		err = sdhc_map_data_status(sdhc_spi_rx_u8(data));
+		if (err != 0) {
+			goto exit;
+		}
+
+		/* Wait for the card to finish programming */
+		err = sdhc_spi_skip_until_ready(data);
+		if (err != 0) {
+			goto exit;
+		}
+
+		buf += SDMMC_DEFAULT_BLOCK_SIZE;
+		sector++;
+	}
+
+	/* Stop the transmission */
+	sdhc_spi_tx_cmd(data, SDHC_STOP_TRANSMISSION, 0);
+
+	/* Wait for the card to finish operation */
+	err = sdhc_spi_skip_until_ready(data);
+	if (err != 0) {
+		goto exit;
+	}
+
+	err = 0;
+exit:
+	spi_release(data->spi, &data->cfg);
+
+	return err;
+}
+
+static int disk_spi_sdhc_init(const struct device *dev);
+
+static int sdhc_spi_init(const struct device *dev)
 {
 	struct sdhc_spi_data *data = dev->data;
 
@@ -777,7 +856,7 @@ static int sdhc_spi_init(struct device *dev)
 
 static int disk_spi_sdhc_access_status(struct disk_info *disk)
 {
-	struct device *dev = disk->dev;
+	const struct device *dev = disk->dev;
 	struct sdhc_spi_data *data = dev->data;
 
 	return data->status;
@@ -786,7 +865,7 @@ static int disk_spi_sdhc_access_status(struct disk_info *disk)
 static int disk_spi_sdhc_access_read(struct disk_info *disk,
 	uint8_t *buf, uint32_t sector, uint32_t count)
 {
-	struct device *dev = disk->dev;
+	const struct device *dev = disk->dev;
 	struct sdhc_spi_data *data = dev->data;
 	int err;
 
@@ -804,25 +883,35 @@ static int disk_spi_sdhc_access_read(struct disk_info *disk,
 static int disk_spi_sdhc_access_write(struct disk_info *disk,
 	const uint8_t *buf, uint32_t sector, uint32_t count)
 {
-	struct device *dev = disk->dev;
+	const struct device *dev = disk->dev;
 	struct sdhc_spi_data *data = dev->data;
 	int err;
 
-	LOG_DBG("sector=%u count=%u", sector, count);
+	/* for more than 2 blocks the multiple block is preferred */
+	if (count > 2) {
+		LOG_DBG("multi block sector=%u count=%u", sector, count);
 
-	err = sdhc_spi_write(data, buf, sector, count);
-	if (err != 0 && sdhc_is_retryable(err)) {
-		sdhc_spi_recover(data);
+		err = sdhc_spi_write_multi(data, buf, sector, count);
+		if (err != 0 && sdhc_is_retryable(err)) {
+			sdhc_spi_recover(data);
+			err = sdhc_spi_write_multi(data, buf, sector, count);
+		}
+	} else {
+		LOG_DBG("sector=%u count=%u", sector, count);
+
 		err = sdhc_spi_write(data, buf, sector, count);
+		if (err != 0 && sdhc_is_retryable(err)) {
+			sdhc_spi_recover(data);
+			err = sdhc_spi_write(data, buf, sector, count);
+		}
 	}
-
 	return err;
 }
 
 static int disk_spi_sdhc_access_ioctl(struct disk_info *disk,
 	uint8_t cmd, void *buf)
 {
-	struct device *dev = disk->dev;
+	const struct device *dev = disk->dev;
 	struct sdhc_spi_data *data = dev->data;
 	int err;
 
@@ -852,7 +941,7 @@ static int disk_spi_sdhc_access_ioctl(struct disk_info *disk,
 
 static int disk_spi_sdhc_access_init(struct disk_info *disk)
 {
-	struct device *dev = disk->dev;
+	const struct device *dev = disk->dev;
 	struct sdhc_spi_data *data = dev->data;
 	int err;
 
@@ -875,7 +964,7 @@ static struct disk_info spi_sdhc_disk = {
 	.ops = &spi_sdhc_disk_ops,
 };
 
-static int disk_spi_sdhc_init(struct device *dev)
+static int disk_spi_sdhc_init(const struct device *dev)
 {
 	struct sdhc_spi_data *data = dev->data;
 

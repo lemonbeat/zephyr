@@ -8,13 +8,15 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#include <zephyr/types.h>
+#include <zephyr.h>
+#include <soc.h>
 #include <device.h>
 #include <drivers/entropy.h>
 #include <bluetooth/hci.h>
 
-#include "hal/cntr.h"
+#include "hal/cpu.h"
 #include "hal/ccm.h"
+#include "hal/cntr.h"
 #include "hal/ticker.h"
 
 #include "util/util.h"
@@ -752,9 +754,8 @@ void ll_rx_dequeue(void)
 
 #if defined(CONFIG_BT_CTLR_USER_EXT)
 	case NODE_RX_TYPE_USER_START ... NODE_RX_TYPE_USER_END:
-#endif /* CONFIG_BT_CTLR_USER_EXT */
-
 		__fallthrough;
+#endif /* CONFIG_BT_CTLR_USER_EXT */
 
 	/* Ensure that at least one 'case' statement is present for this
 	 * code block.

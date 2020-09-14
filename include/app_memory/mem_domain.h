@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <sys/dlist.h>
+#include <toolchain.h>
 
 /* Forward declaration */
 struct k_thread;
@@ -91,6 +92,18 @@ struct k_mem_domain {
 	struct arch_mem_domain arch;
 #endif /* CONFIG_ARCH_MEM_DOMAIN_DATA */
 };
+
+/**
+ * Default memory domain
+ *
+ * All threads are a member of some memory domain, even if running in
+ * supervisor mode. Threads belong to this default memory domain if they
+ * haven't been added to or inherited membership from some other domain.
+ *
+ * This memory domain has the z_libc_partition partition for the C library
+ * added to it if exists.
+ */
+extern struct k_mem_domain k_mem_domain_default;
 #else
 /* To support use of IS_ENABLED for the APIs below */
 struct k_mem_domain;
@@ -118,6 +131,7 @@ extern void k_mem_domain_init(struct k_mem_domain *domain, uint8_t num_parts,
  *
  * @param domain The memory domain to be destroyed.
  */
+__deprecated
 extern void k_mem_domain_destroy(struct k_mem_domain *domain);
 
 /**
@@ -162,7 +176,8 @@ extern void k_mem_domain_remove_partition(struct k_mem_domain *domain,
 /**
  * @brief Add a thread into a memory domain.
  *
- * Add a thread into a memory domain.
+ * Add a thread into a memory domain. It will be removed from whatever
+ * memory domain it previously belonged to.
  *
  * @param domain The memory domain that the thread is going to be added into.
  * @param thread ID of thread going to be added into the memory domain.
@@ -174,10 +189,12 @@ extern void k_mem_domain_add_thread(struct k_mem_domain *domain,
 /**
  * @brief Remove a thread from its memory domain.
  *
- * Remove a thread from its memory domain.
+ * Remove a thread from its memory domain. It will be reassigned to the
+ * default memory domain.
  *
  * @param thread ID of thread going to be removed from its memory domain.
  */
+__deprecated
 extern void k_mem_domain_remove_thread(k_tid_t thread);
 
 /** @} */

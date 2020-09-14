@@ -11,6 +11,7 @@
 #include <sys/__assert.h>
 #include <stdbool.h>
 #include <spinlock.h>
+#include <sys/libc-hooks.h>
 
 #define LOG_LEVEL CONFIG_KERNEL_LOG_LEVEL
 #include <logging/log.h>
@@ -18,6 +19,8 @@ LOG_MODULE_DECLARE(os);
 
 static struct k_spinlock lock;
 static uint8_t max_partitions;
+
+struct k_mem_domain k_mem_domain_default;
 
 #if __ASSERT_ON
 static bool check_add_partition(struct k_mem_domain *domain,
@@ -143,7 +146,9 @@ void k_mem_domain_destroy(struct k_mem_domain *domain)
 
 	key = k_spin_lock(&lock);
 
+#ifdef CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API
 	arch_mem_domain_destroy(domain);
+#endif
 
 	SYS_DLIST_FOR_EACH_NODE_SAFE(&domain->mem_domain_q, node, next_node) {
 		struct k_thread *thread =
@@ -178,13 +183,18 @@ void k_mem_domain_add_partition(struct k_mem_domain *domain,
 	__ASSERT(p_idx < max_partitions,
 		 "no free partition slots available");
 
+	LOG_DBG("add partition base %lx size %zu to domain %p\n",
+		part->start, part->size, domain);
+
 	domain->partitions[p_idx].start = part->start;
 	domain->partitions[p_idx].size = part->size;
 	domain->partitions[p_idx].attr = part->attr;
 
 	domain->num_partitions++;
 
+#ifdef CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API
 	arch_mem_domain_partition_add(domain, p_idx);
+#endif
 	k_spin_unlock(&lock, key);
 }
 
@@ -209,7 +219,12 @@ void k_mem_domain_remove_partition(struct k_mem_domain *domain,
 
 	__ASSERT(p_idx < max_partitions, "no matching partition found");
 
+	LOG_DBG("remove partition base %lx size %zu from domain %p\n",
+		part->start, part->size, domain);
+
+#ifdef CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API
 	arch_mem_domain_partition_remove(domain, p_idx);
+#endif
 
 	/* A zero-sized partition denotes it's a free partition */
 	domain->partitions[p_idx].size = 0U;
@@ -225,38 +240,35 @@ void k_mem_domain_add_thread(struct k_mem_domain *domain, k_tid_t thread)
 
 	__ASSERT_NO_MSG(domain != NULL);
 	__ASSERT_NO_MSG(thread != NULL);
-	__ASSERT(thread->mem_domain_info.mem_domain == NULL,
-		 "thread %p belongs to a different memory domain %p",
-		 thread, thread->mem_domain_info.mem_domain);
 
 	key = k_spin_lock(&lock);
+	if (thread->mem_domain_info.mem_domain != NULL) {
+		LOG_DBG("remove thread %p from memory domain %p\n",
+			thread, thread->mem_domain_info.mem_domain);
+		sys_dlist_remove(&thread->mem_domain_info.mem_domain_q_node);
+#ifdef CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API
+		arch_mem_domain_thread_remove(thread);
+#endif
+	}
 
+	LOG_DBG("add thread %p to domain %p\n", thread, domain);
 	sys_dlist_append(&domain->mem_domain_q,
 			 &thread->mem_domain_info.mem_domain_q_node);
 	thread->mem_domain_info.mem_domain = domain;
 
+#ifdef CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API
 	arch_mem_domain_thread_add(thread);
+#endif
 
 	k_spin_unlock(&lock, key);
 }
 
 void k_mem_domain_remove_thread(k_tid_t thread)
 {
-	k_spinlock_key_t key;
-
-	__ASSERT_NO_MSG(thread != NULL);
-	__ASSERT(thread->mem_domain_info.mem_domain != NULL,
-		 "thread does not belong to a memory domain");
-
-	key = k_spin_lock(&lock);
-	arch_mem_domain_thread_remove(thread);
-
-	sys_dlist_remove(&thread->mem_domain_info.mem_domain_q_node);
-	thread->mem_domain_info.mem_domain = NULL;
-	k_spin_unlock(&lock, key);
+	k_mem_domain_add_thread(&k_mem_domain_default, thread);
 }
 
-static int init_mem_domain_module(struct device *arg)
+static int init_mem_domain_module(const struct device *arg)
 {
 	ARG_UNUSED(arg);
 
@@ -267,6 +279,11 @@ static int init_mem_domain_module(struct device *arg)
 	 * out of bounds error.
 	 */
 	__ASSERT(max_partitions <= CONFIG_MAX_DOMAIN_PARTITIONS, "");
+
+	k_mem_domain_init(&k_mem_domain_default, 0, NULL);
+#ifdef Z_LIBC_PARTITION_EXISTS
+	k_mem_domain_add_partition(&k_mem_domain_default, &z_libc_partition);
+#endif /* Z_LIBC_PARTITION_EXISTS */
 
 	return 0;
 }

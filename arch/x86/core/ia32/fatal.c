@@ -78,42 +78,42 @@ FUNC_NORETURN __used static void handle_exc_##vector(const z_arch_esf_t *pEsf) \
 	generic_exc_handle(vector, pEsf); \
 }
 
-#define Z_EXC_FUNC_CODE(vector) \
+#define Z_EXC_FUNC_CODE(vector, dpl) \
 	_EXC_FUNC(vector) \
-	_EXCEPTION_CONNECT_CODE(handle_exc_##vector, vector)
+	_EXCEPTION_CONNECT_CODE(handle_exc_##vector, vector, dpl)
 
-#define Z_EXC_FUNC_NOCODE(vector) \
+#define Z_EXC_FUNC_NOCODE(vector, dpl)	\
 	_EXC_FUNC(vector) \
-	_EXCEPTION_CONNECT_NOCODE(handle_exc_##vector, vector)
+	_EXCEPTION_CONNECT_NOCODE(handle_exc_##vector, vector, dpl)
 
 /* Necessary indirection to ensure 'vector' is expanded before we expand
  * the handle_exc_##vector
  */
-#define EXC_FUNC_NOCODE(vector) \
-	Z_EXC_FUNC_NOCODE(vector)
+#define EXC_FUNC_NOCODE(vector, dpl)		\
+	Z_EXC_FUNC_NOCODE(vector, dpl)
 
-#define EXC_FUNC_CODE(vector) \
-	Z_EXC_FUNC_CODE(vector)
+#define EXC_FUNC_CODE(vector, dpl)		\
+	Z_EXC_FUNC_CODE(vector, dpl)
 
-EXC_FUNC_NOCODE(IV_DIVIDE_ERROR);
-EXC_FUNC_NOCODE(IV_NON_MASKABLE_INTERRUPT);
-EXC_FUNC_NOCODE(IV_OVERFLOW);
-EXC_FUNC_NOCODE(IV_BOUND_RANGE);
-EXC_FUNC_NOCODE(IV_INVALID_OPCODE);
-EXC_FUNC_NOCODE(IV_DEVICE_NOT_AVAILABLE);
+EXC_FUNC_NOCODE(IV_DIVIDE_ERROR, 0);
+EXC_FUNC_NOCODE(IV_NON_MASKABLE_INTERRUPT, 0);
+EXC_FUNC_NOCODE(IV_OVERFLOW, 0);
+EXC_FUNC_NOCODE(IV_BOUND_RANGE, 0);
+EXC_FUNC_NOCODE(IV_INVALID_OPCODE, 0);
+EXC_FUNC_NOCODE(IV_DEVICE_NOT_AVAILABLE, 0);
 #ifndef CONFIG_X86_ENABLE_TSS
-EXC_FUNC_NOCODE(IV_DOUBLE_FAULT);
+EXC_FUNC_NOCODE(IV_DOUBLE_FAULT, 0);
 #endif
-EXC_FUNC_CODE(IV_INVALID_TSS);
-EXC_FUNC_CODE(IV_SEGMENT_NOT_PRESENT);
-EXC_FUNC_CODE(IV_STACK_FAULT);
-EXC_FUNC_CODE(IV_GENERAL_PROTECTION);
-EXC_FUNC_NOCODE(IV_X87_FPU_FP_ERROR);
-EXC_FUNC_CODE(IV_ALIGNMENT_CHECK);
-EXC_FUNC_NOCODE(IV_MACHINE_CHECK);
+EXC_FUNC_CODE(IV_INVALID_TSS, 0);
+EXC_FUNC_CODE(IV_SEGMENT_NOT_PRESENT, 0);
+EXC_FUNC_CODE(IV_STACK_FAULT, 0);
+EXC_FUNC_CODE(IV_GENERAL_PROTECTION, 0);
+EXC_FUNC_NOCODE(IV_X87_FPU_FP_ERROR, 0);
+EXC_FUNC_CODE(IV_ALIGNMENT_CHECK, 0);
+EXC_FUNC_NOCODE(IV_MACHINE_CHECK, 0);
 #endif
 
-_EXCEPTION_CONNECT_CODE(z_x86_page_fault_handler, IV_PAGE_FAULT);
+_EXCEPTION_CONNECT_CODE(z_x86_page_fault_handler, IV_PAGE_FAULT, 0);
 
 #ifdef CONFIG_X86_ENABLE_TSS
 static __noinit volatile z_arch_esf_t _df_esf;
@@ -151,7 +151,7 @@ struct task_state_segment _df_tss = {
 	.es = DATA_SEG,
 	.ss = DATA_SEG,
 	.eip = (uint32_t)df_handler_top,
-	.cr3 = Z_MEM_PHYS_ADDR((uint32_t)&z_x86_kernel_ptables)
+	.cr3 = (uint32_t)&z_x86_kernel_ptables
 };
 
 static __used void df_handler_bottom(void)
@@ -199,7 +199,7 @@ static FUNC_NORETURN __used void df_handler_top(void)
 	_main_tss.es = DATA_SEG;
 	_main_tss.ss = DATA_SEG;
 	_main_tss.eip = (uint32_t)df_handler_bottom;
-	_main_tss.cr3 = z_mem_phys_addr(&z_x86_kernel_ptables);
+	_main_tss.cr3 = (uint32_t)(&z_x86_kernel_ptables);
 	_main_tss.eflags = 0U;
 
 	/* NT bit is set in EFLAGS so we will task switch back to _main_tss

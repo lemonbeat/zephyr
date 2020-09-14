@@ -114,7 +114,7 @@ static void send_fw_ready(void)
 	ipc_write(IPC_DIPCI, (0x80000000 | ADSP_IPC_FW_READY));
 }
 
-static int adsp_init(struct device *dev)
+static int adsp_init(const struct device *dev)
 {
 	prepare_host_windows();
 
@@ -123,4 +123,5 @@ static int adsp_init(struct device *dev)
 	return 0;
 }
 
-SYS_INIT(adsp_init, APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+/* Init after IPM initialization and before logging (uses memory windows) */
+SYS_INIT(adsp_init, PRE_KERNEL_2, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

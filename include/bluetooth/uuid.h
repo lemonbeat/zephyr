@@ -964,7 +964,7 @@ struct bt_uuid_128 {
  *  @brief OTS Object Size Characteristic
  */
 #define BT_UUID_OTS_SIZE \
-	BT_UUID_DECLARE_16(BT_UUID_OTS_SIZE)
+	BT_UUID_DECLARE_16(BT_UUID_OTS_SIZE_VAL)
 /** @def BT_UUID_OTS_FIRST_CREATED_VAL
  *  @brief OTS Object First-Created Characteristic UUID value
  */
@@ -1037,6 +1037,24 @@ struct bt_uuid_128 {
  */
 #define BT_UUID_OTS_CHANGED \
 	BT_UUID_DECLARE_16(BT_UUID_OTS_CHANGED_VAL)
+/** @def BT_UUID_OTS_TYPE_UNSPECIFIED_VAL
+ *  @brief OTS Unspecified Object Type UUID value
+ */
+#define BT_UUID_OTS_TYPE_UNSPECIFIED_VAL 0x2aca
+/** @def BT_UUID_OTS_TYPE_UNSPECIFIED
+ *  @brief OTS Unspecified Object Type
+ */
+#define BT_UUID_OTS_TYPE_UNSPECIFIED \
+	BT_UUID_DECLARE_16(BT_UUID_OTS_TYPE_UNSPECIFIED_VAL)
+/** @def BT_UUID_OTS_DIRECTORY_LISTING_VAL
+ *  @brief OTS Directory Listing UUID value
+ */
+#define BT_UUID_OTS_DIRECTORY_LISTING_VAL 0x2acb
+/** @def BT_UUID_OTS_DIRECTORY_LISTING
+ *  @brief OTS Directory Listing
+ */
+#define BT_UUID_OTS_DIRECTORY_LISTING \
+	BT_UUID_DECLARE_16(BT_UUID_OTS_DIRECTORY_LISTING_VAL)
 /** @def BT_UUID_MESH_PROV_DATA_IN_VAL
  *  @brief Mesh Provisioning Data In UUID value
  */
@@ -1126,7 +1144,7 @@ struct bt_uuid_128 {
 #define BT_UUID_FTP_VAL               0x000a
 #define BT_UUID_FTP                   BT_UUID_DECLARE_16(BT_UUID_FTP_VAL)
 #define BT_UUID_HTTP_VAL              0x000c
-#define BT_UUID_HTTP                  BT_UUID_DECLARE_16(BT_UUID_HTTP)
+#define BT_UUID_HTTP                  BT_UUID_DECLARE_16(BT_UUID_HTTP_VAL)
 #define BT_UUID_BNEP_VAL              0x000f
 #define BT_UUID_BNEP                  BT_UUID_DECLARE_16(BT_UUID_BNEP_VAL)
 #define BT_UUID_UPNP_VAL              0x0010

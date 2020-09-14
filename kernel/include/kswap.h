@@ -64,11 +64,6 @@ static ALWAYS_INLINE unsigned int do_swap(unsigned int key,
 	ARG_UNUSED(lock);
 	struct k_thread *new_thread, *old_thread;
 
-#ifdef CONFIG_EXECUTION_BENCHMARKING
-	extern void read_timer_start_of_swap(void);
-	read_timer_start_of_swap();
-#endif
-
 	old_thread = _current;
 
 	z_check_stack_sentinel();
@@ -117,7 +112,7 @@ static ALWAYS_INLINE unsigned int do_swap(unsigned int key,
 		wait_for_switch(new_thread);
 		arch_switch(new_thread->switch_handle,
 			     &old_thread->switch_handle);
-		sys_trace_thread_switched_in();
+
 	}
 
 	if (is_spinlock) {
@@ -197,7 +192,7 @@ static inline void z_dummy_thread_init(struct k_thread *dummy_thread)
 	dummy_thread->stack_info.size = 0U;
 #endif
 #ifdef CONFIG_USERSPACE
-	dummy_thread->mem_domain_info.mem_domain = 0;
+	dummy_thread->mem_domain_info.mem_domain = &k_mem_domain_default;
 #endif
 
 	_current_cpu->current = dummy_thread;

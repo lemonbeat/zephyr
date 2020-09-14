@@ -280,8 +280,8 @@ int arch_irq_is_enabled(unsigned int irq);
  * @return The vector assigned to this interrupt
  */
 int arch_irq_connect_dynamic(unsigned int irq, unsigned int priority,
-			     void (*routine)(void *parameter),
-			     void *parameter, uint32_t flags);
+			     void (*routine)(const void *parameter),
+			     const void *parameter, uint32_t flags);
 
 /**
  * @def ARCH_IRQ_CONNECT(irq, pri, isr, arg, flags)
@@ -351,7 +351,7 @@ int arch_irq_connect_dynamic(unsigned int irq, unsigned int priority,
  * @param routine Function to run in interrupt context
  * @param parameter Value to pass to the function when invoked
  */
-void arch_irq_offload(irq_offload_routine_t routine, void *parameter);
+void arch_irq_offload(irq_offload_routine_t routine, const void *parameter);
 #endif /* CONFIG_IRQ_OFFLOAD */
 
 /** @} */
@@ -540,6 +540,7 @@ int arch_mem_domain_max_partitions_get(void);
 int arch_mem_domain_init(struct k_mem_domain *domain);
 #endif /* CONFIG_ARCH_MEM_DOMAIN_DATA */
 
+#ifdef CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API
 /**
  * @brief Add a thread to a memory domain (arch-specific)
  *
@@ -606,6 +607,7 @@ void arch_mem_domain_partition_add(struct k_mem_domain *domain,
  * @param domain The memory domain structure which needs to be deleted.
  */
 void arch_mem_domain_destroy(struct k_mem_domain *domain);
+#endif /* CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API */
 
 /**
  * @brief Check memory region permissions
@@ -692,24 +694,41 @@ size_t arch_user_string_nlen(const char *s, size_t maxsize, int *err);
 /** @} */
 
 /**
- * @defgroup arch-benchmarking Architecture-specific benchmarking globals
+ * @defgroup arch-gdbstub Architecture-specific gdbstub APIs
  * @ingroup arch-interface
  * @{
  */
 
-#ifdef CONFIG_EXECUTION_BENCHMARKING
-extern uint64_t arch_timing_swap_start;
-extern uint64_t arch_timing_swap_end;
-extern uint64_t arch_timing_irq_start;
-extern uint64_t arch_timing_irq_end;
-extern uint64_t arch_timing_tick_start;
-extern uint64_t arch_timing_tick_end;
-extern uint64_t arch_timing_user_mode_end;
-extern uint32_t arch_timing_value_swap_end;
-extern uint64_t arch_timing_value_swap_common;
-extern uint64_t arch_timing_value_swap_temp;
-#endif /* CONFIG_EXECUTION_BENCHMARKING */
+/**
+ * @def ARCH_GDB_NUM_REGISTERS
+ *
+ * ARCH_GDB_NUM_REGISTERS is architecure specific and
+ * this symbol must be defined in architecure specific header
+ */
 
+#ifdef CONFIG_GDBSTUB
+/**
+ * @brief Architecture layer debug start
+ *
+ * This function is called by @c gdb_init()
+ */
+void arch_gdb_init(void);
+
+/**
+ * @brief Continue running program
+ *
+ * Continue software execution.
+ */
+void arch_gdb_continue(void);
+
+/**
+ * @brief Continue with one step
+ *
+ * Continue software execution until reaches the next statement.
+ */
+void arch_gdb_step(void);
+
+#endif
 /** @} */
 
 /**

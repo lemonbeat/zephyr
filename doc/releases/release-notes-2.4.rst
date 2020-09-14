@@ -77,6 +77,26 @@ API Changes
   This renaming was done to get rid of legacy names, for which the reasons
   do no longer apply.
 
+* All device instances got a const qualifier. So this applies to all APIs
+  manipulating ``struct device *`` (ADC, GPIO, I2C, ...). In order to avoid
+  const qualifier loss on ISRs, all ISRs now take a ``const *void`` as a
+  paremeter as well.
+
+* Formerly ``device_get_binding()`` would return the device pointer if
+  invoked before the corresponding device was initialized.  As of this
+  release it only returns the pointer if the device successfully
+  initialized.  A behavior change can be observed if initialization for
+  a device fetches (but does not use) the pointer for a device it
+  depends on before that device has been initialized.
+
+* The ``_gatt_`` and ``_GATT_`` infixes have been removed for the HRS, DIS
+  and BAS APIs and the Kconfig options.
+
+* ``<include/bluetooth/gatt.h>`` callback :c:func:`bt_gatt_attr_func_t` used by
+  :c:func:`bt_gatt_foreach_attr` and :c:func:`bt_gatt_foreach_attr_type` has
+  been changed to always pass the original pointer of attributes along with its
+  resolved handle.
+
 Deprecated in this release
 ==========================
 
@@ -98,6 +118,10 @@ Removed APIs in this release
 Stable API changes in this release
 ==================================
 
+* USB
+
+  * HID class callbacks now takes a parameter ``const struct device*`` which
+    is the HID device for which callback was called.
 
 Kernel
 ******
@@ -111,9 +135,28 @@ Architectures
 
 * ARM:
 
-  * Interrupt vector relaying feature support is extended to Cortex-M Mainline
-    architecture variants
+  * AARCH32
 
+    * Added support for ARM Cortex-M1 architecture.
+    * Implemented the timing API in Cortex-M architecture using the Data
+      Watchpoint and Trace (DWT) unit.
+    * The interrupt vector relaying feature support was extended to Cortex-M
+      Mainline architecture variants.
+    * Cortex-M fault handling implementation was enhanced by adding an option to
+      generate and supply the full register state to the kernel fatal error
+      handling mechanism.
+    * Fixed Cortex-M boot sequence for single-threaded applications
+      (CONFIG_MULTITHREADING=n).
+    * Added thread safety to Non-Secure entry function calls in ARMv8-M
+      architecture.
+    * Fixed stack randomization for main thread.
+    * Fixed exception vector table alignment in Cortex-M architecture
+    * Increased test coverage in QEMU for ARMv6-M architecture variant.
+    * Removed the implementation of arch_mem_domain_* APIs for Cortex-M
+
+  * AARCH64
+
+    * Re-implemented thread context-switch to use the _arch_switch() API
 
 * POSIX:
 
@@ -185,6 +228,7 @@ Drivers and Sensors
 
 * EEPROM
 
+  * Added driver supporting the on-chip EEPROM found on NXP LPC11U6X MCUs.
 
 * Entropy
 
@@ -194,8 +238,21 @@ Drivers and Sensors
 
 * Ethernet
 
+  * Added VLAN support to Intel e1000 driver.
+  * Added Ethernet support to stm32h7 based boards.
+  * Added support for setting fixed configuration and read from device tree
+    for ENET ETH interface and PHY in mcux driver.
+  * Added support for device that do not use SMI for PHY setup in mcux driver.
+  * Added support for multiport gPTP in native_posix driver. This allows gPTP
+    bridging testing.
+  * Fixed MAC registers in enc28j60 driver to the latest Microchip reference manual.
 
 * Flash
+
+  * The driver selected by ``CONFIG_SPI_FLASH_W25QXXDV`` has been
+    removed as it is unmaintained and all its functionality is available
+    through ``CONFIG_SPI_NOR``.  Out of tree uses should convert to the
+    supported driver using the ``jedec,spi-nor`` compatible.
 
 
 * GPIO
@@ -206,12 +263,24 @@ Drivers and Sensors
 
 * I2C
 
+  * Introduced new driver for NXP LPC11U6x SoCs.  See
+    :option:`CONFIG_I2C_LPC11U6X`.
+
+  * Introduced new driver for emulated I2C devices, where I2C operations
+    are forwarded to a module that emulates responses from hardware.
+    This enables testing without hardware and allows unusual conditions
+    to be synthesized to test driver behavior.  See
+    :option:`CONFIG_I2C_EMUL`.
+
 
 * I2S
 
 
 * IEEE 802.15.4
 
+  * Allow user to disable auto-start of IEEE 802.15.4 network interface.
+    By default the IEEE 802.15.4 network interface is automatically started.
+  * Added support for setting TX power in rf2xx driver.
 
 * Interrupt Controller
 
@@ -233,6 +302,8 @@ Drivers and Sensors
 
 * Modem
 
+  * Added option to query the IMSI and ICCID from the SIM.
+  * Added support for offloaded Sierra Wireless HL7800 modem.
 
 * PECI
 
@@ -288,10 +359,72 @@ Drivers and Sensors
 
 * WiFi
 
+  * Added IPv6 support to Simplelink driver.
+  * Added DNS offloading support to eswifi driver.
+  * Fixed esp driver offload protocol parsing.
+  * Fixed esp driver GPIO reset control logic.
+  * Fixed eswifi driver offloading packet parsing.
 
 
 Networking
 **********
+
+* The new TCP stack is enabled by default. The legacy TCP stack is not yet
+  removed and can be used if needed.
+* The network interface is made a kernel object. This allows better access
+  control handling when usermode is enabled.
+* The kernel stacks are used in network related threads to save memory when
+  usermode is enabled.
+* Network statistics collection can be enabled in key points of the network
+  stack. This can be used to get information where time is spent in RX or TX.
+* The BSD socket sendmsg() can now be used with AF_PACKET type sockets.
+* Added support for enabling OpenThread reference device.
+* Added support for enabling MQTT persistent sessions.
+* Added "net tcp recv" command to net shell to enable TCP RX in manual testing.
+* Added ObjLnk resource type support to LWM2M.
+* Added userspace support to MQTT publisher, echo-server and echo-client
+  sample applications.
+* Added support to rejecting received and unsupported PPP options.
+* Added support for select() when using socket offloading.
+* Added support for IPv6 multicast packet routing.
+* Added support to SOCK_DGRAM type sockets for AF_PACKET family.
+* Added support for using TLS sockets when using socket offloading.
+* Added additonal checks in IPv6 to ensure that multicasts are only passed to the
+  upper layer if the originating interface actually joined the destination
+  multicast group.
+* Allow user to specify TCP port number in HTTP request.
+* Allow application to initialize the network config library instead of network
+  stack calling initialization at startup. This enables better control of
+  network resources but requires application to call net_config_init_app()
+  manually.
+* Allow using wildcards in CoAP resource path description.
+* Allow user to specify used network interface in net-shell ping command.
+* Allow user to select a custom mbedtls library in OpenThread.
+* Removed dependency to :option:`CONFIG_NET_SOCKETS_POSIX_NAMES` from offloaded
+  WiFi device drivers.
+* Print more gPTP status information in gptp net shell.
+* Fixed the network traffic class statistics collection.
+* Fixed WiFi shell when doing a scan.
+* Fixed IPv6 routes when nexthop is link local address of the connected peer.
+* Fixed IPv6 Router Solicitation message handling.
+* Fixed BSD socket lib and set errno to EBADF if socket descriptor is invalid.
+* Fixed received DNS packet parsing.
+* Fixed DNS resolving by ignoring incoming queries while we are resolving a name.
+* Fixed CoAP zero length option parsing.
+* Fixed gPTP port numbering to start from 1.
+* Fixed gPTP BMCA priority vector calculation.
+* Fixed multiple interface bound socket recv() for AF_PACKET sockets.
+* Fixed PPP Term-Req and Term-Ack packet length when sending them.
+* Fixed PPP ipv6cp and ipcp Configure-Rej handling.
+* Fixed PPP option parsing and negotiation handling.
+* Fixed PPP ipcp option handling when the protocol goes down.
+* Fixed PPP ipv6cp and ipcp network address removal when connection goes down.
+* Fixed LWM2M FOTA socket closing.
+* Fixed LWM2M block transfer retransmissions.
+* Fixed LWM2M opaque data transfer in block mode.
+* Fixed LWM2M Security and Server object instance matching.
+* Fixed LWM2M updating lifetime on Register Update event.
+* Fixed MQTT double CONNACK event notification on server reject.
 
 
 Bluetooth
@@ -349,18 +482,22 @@ Libraries / Subsystems
     will likely require some porting work. Refer to `LVGL 7 Release notes
     <https://github.com/lvgl/lvgl/releases/tag/v7.0.0>`_ for more information.
 
+  * LVGL Kconfig option names have been aligned with LVGL. All LVGL
+    configuration options ``LV_[A-Z0-9_]`` have a matching Zephyr Kconfig
+    option named as ``CONFIG_LVGL_[A-Z0-9_]``.
+
   * LVGL Kconfig constants have been aligned with upstream suggested defaults.
     If your application relies on any of the following Kconfig defaults consider
     checking if the new values are good or they need to be adjusted:
 
-    * :option:`CONFIG_LVGL_HOR_RES`
-    * :option:`CONFIG_LVGL_VER_RES`
+    * :option:`CONFIG_LVGL_HOR_RES_MAX`
+    * :option:`CONFIG_LVGL_VER_RES_MAX`
     * :option:`CONFIG_LVGL_DPI`
-    * :option:`CONFIG_LVGL_SCREEN_REFRESH_PERIOD`
-    * :option:`CONFIG_LVGL_INPUT_REFRESH_PERIOD`
-    * :option:`CONFIG_LVGL_INPUT_DRAG_THROW_SLOW_DOWN`
-    * :option:`CONFIG_LVGL_TEXT_LINE_BREAK_LONG_LEN`
-    * :option:`CONFIG_LVGL_OBJ_CHART_AXIS_TICK_LABEL_MAX_LEN`
+    * :option:`CONFIG_LVGL_DISP_DEF_REFR_PERIOD`
+    * :option:`CONFIG_LVGL_INDEV_DEF_READ_PERIOD`
+    * :option:`CONFIG_LVGL_INDEV_DEF_DRAG_THROW`
+    * :option:`CONFIG_LVGL_TXT_LINE_BREAK_LONG_LEN`
+    * :option:`CONFIG_LVGL_CHART_AXIS_TICK_LABEL_MAX_LEN`
 
   * Note that ROM usage is significantly higher on v7 for minimal
     configurations. This is in part due to new features such as the new drawing

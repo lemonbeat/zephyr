@@ -1179,6 +1179,18 @@ next_state:
 			tcp_out(conn, ACK);
 			next = TCP_CLOSE_WAIT;
 			break;
+		} else if (th && FL(&fl, ==, (FIN | ACK | PSH),
+				    th_seq(th) == conn->ack)) {
+			if (len) {
+				if (tcp_data_get(conn, pkt) < 0) {
+					break;
+				}
+			}
+
+			conn_ack(conn, + len + 1);
+			tcp_out(conn, FIN | ACK);
+			next = TCP_LAST_ACK;
+			break;
 		}
 
 		if (th && net_tcp_seq_cmp(th_ack(th), conn->seq) > 0) {
@@ -1308,7 +1320,8 @@ int net_tcp_put(struct net_context *context)
 	if (conn && conn->state == TCP_ESTABLISHED) {
 		k_mutex_lock(&conn->lock, K_FOREVER);
 
-		tcp_out(conn, FIN | ACK);
+		tcp_out_ext(conn, FIN | ACK, NULL,
+			    conn->seq + conn->unacked_len);
 		conn_seq(conn, + 1);
 
 		conn_state(conn, TCP_FIN_WAIT_1);

@@ -40,6 +40,7 @@
 #include "ecc.h"
 
 #include "conn_internal.h"
+#include "audio/iso_internal.h"
 #include "l2cap_internal.h"
 #include "gatt_internal.h"
 #include "smp.h"
@@ -3875,6 +3876,15 @@ static void bt_hci_evt_read_remote_version_complete(struct net_buf *buf)
 }
 #endif /* CONFIG_BT_REMOTE_VERSION */
 
+static void hci_hardware_error(struct net_buf *buf)
+{
+	struct bt_hci_evt_hardware_error *evt;
+
+	evt = net_buf_pull_mem(buf, sizeof(*evt));
+
+	BT_ERR("Hardware error, hardware code: %d", evt->hardware_code);
+}
+
 #if defined(CONFIG_BT_SMP)
 static void le_ltk_neg_reply(uint16_t handle)
 {
@@ -4534,7 +4544,6 @@ static void le_adv_ext_report(struct net_buf *buf)
 static void per_adv_sync_delete(struct bt_le_per_adv_sync *per_adv_sync)
 {
 	atomic_clear(per_adv_sync->flags);
-	per_adv_sync->cb = NULL; /* disable callbacks */
 }
 
 static struct bt_le_per_adv_sync *get_pending_per_adv_sync(void)
@@ -4667,8 +4676,8 @@ static void le_per_adv_sync_lost(struct net_buf *buf)
 {
 	struct bt_hci_evt_le_per_adv_sync_lost *evt =
 		(struct bt_hci_evt_le_per_adv_sync_lost *)buf->data;
-	struct bt_le_per_adv_sync *per_adv_sync;
 	struct bt_le_per_adv_sync_term_info term_info;
+	struct bt_le_per_adv_sync *per_adv_sync;
 
 	per_adv_sync = get_per_adv_sync(sys_le16_to_cpu(evt->handle));
 
@@ -4966,6 +4975,12 @@ static const struct event_handler meta_events[] = {
 		      sizeof(struct bt_hci_evt_le_per_adv_sync_lost)),
 #endif /* defined(CONFIG_BT_PER_ADV_SYNC) */
 #endif /* defined(CONFIG_BT_EXT_ADV) */
+#if defined(CONFIG_BT_ISO)
+	EVENT_HANDLER(BT_HCI_EVT_LE_CIS_ESTABLISHED, hci_le_cis_estabilished,
+		      sizeof(struct bt_hci_evt_le_cis_established)),
+	EVENT_HANDLER(BT_HCI_EVT_LE_CIS_REQ, hci_le_cis_req,
+		      sizeof(struct bt_hci_evt_le_cis_req)),
+#endif /* (CONFIG_BT_ISO) */
 };
 
 static void hci_le_meta_event(struct net_buf *buf)
@@ -5048,6 +5063,8 @@ static const struct event_handler normal_events[] = {
 		      bt_hci_evt_read_remote_version_complete,
 		      sizeof(struct bt_hci_evt_remote_version_info)),
 #endif /* CONFIG_BT_REMOTE_VERSION */
+	EVENT_HANDLER(BT_HCI_EVT_HARDWARE_ERROR, hci_hardware_error,
+		      sizeof(struct bt_hci_evt_hardware_error)),
 };
 
 static void hci_event(struct net_buf *buf)
@@ -5136,12 +5153,17 @@ static void process_events(struct k_poll_event *ev, int count)
 }
 
 #if defined(CONFIG_BT_CONN)
+#if defined(CONFIG_BT_ISO)
+/* command FIFO + conn_change signal + MAX_CONN + MAX_ISO_CONN */
+#define EV_COUNT (2 + CONFIG_BT_MAX_CONN + CONFIG_BT_MAX_ISO_CONN)
+#else
 /* command FIFO + conn_change signal + MAX_CONN */
 #define EV_COUNT (2 + CONFIG_BT_MAX_CONN)
+#endif /* CONFIG_BT_ISO */
 #else
 /* command FIFO */
 #define EV_COUNT 1
-#endif
+#endif /* CONFIG_BT_CONN */
 
 static void hci_tx_thread(void *p1, void *p2, void *p3)
 {
@@ -5225,16 +5247,16 @@ static void read_buffer_size_complete(struct net_buf *buf)
 	BT_DBG("status 0x%02x", rp->status);
 
 	/* If LE-side has buffers we can ignore the BR/EDR values */
-	if (bt_dev.le.mtu) {
+	if (bt_dev.le.acl_mtu) {
 		return;
 	}
 
-	bt_dev.le.mtu = sys_le16_to_cpu(rp->acl_max_len);
+	bt_dev.le.acl_mtu = sys_le16_to_cpu(rp->acl_max_len);
 	pkts = sys_le16_to_cpu(rp->acl_max_num);
 
-	BT_DBG("ACL BR/EDR buffers: pkts %u mtu %u", pkts, bt_dev.le.mtu);
+	BT_DBG("ACL BR/EDR buffers: pkts %u mtu %u", pkts, bt_dev.le.acl_mtu);
 
-	k_sem_init(&bt_dev.le.pkts, pkts, pkts);
+	k_sem_init(&bt_dev.le.acl_pkts, pkts, pkts);
 }
 #endif
 
@@ -5245,16 +5267,72 @@ static void le_read_buffer_size_complete(struct net_buf *buf)
 
 	BT_DBG("status 0x%02x", rp->status);
 
-	bt_dev.le.mtu = sys_le16_to_cpu(rp->le_max_len);
-	if (!bt_dev.le.mtu) {
+	bt_dev.le.acl_mtu = sys_le16_to_cpu(rp->le_max_len);
+	if (!bt_dev.le.acl_mtu) {
 		return;
 	}
 
-	BT_DBG("ACL LE buffers: pkts %u mtu %u", rp->le_max_num, bt_dev.le.mtu);
+	BT_DBG("ACL LE buffers: pkts %u mtu %u", rp->le_max_num,
+	       bt_dev.le.acl_mtu);
 
-	k_sem_init(&bt_dev.le.pkts, rp->le_max_num, rp->le_max_num);
+	k_sem_init(&bt_dev.le.acl_pkts, rp->le_max_num, rp->le_max_num);
 }
-#endif
+
+static void read_buffer_size_v2_complete(struct net_buf *buf)
+{
+#if defined(CONFIG_BT_ISO)
+	struct bt_hci_rp_le_read_buffer_size_v2 *rp = (void *)buf->data;
+	uint8_t max_num;
+
+	BT_DBG("status %u", rp->status);
+
+	bt_dev.le.acl_mtu = sys_le16_to_cpu(rp->acl_mtu);
+	if (!bt_dev.le.acl_mtu) {
+		return;
+	}
+
+	BT_DBG("ACL LE buffers: pkts %u mtu %u", rp->acl_max_pkt,
+		bt_dev.le.acl_mtu);
+
+	max_num = MIN(rp->acl_max_pkt, CONFIG_BT_CONN_TX_MAX);
+	k_sem_init(&bt_dev.le.acl_pkts, max_num, max_num);
+
+	bt_dev.le.iso_mtu = sys_le16_to_cpu(rp->iso_mtu);
+	if (!bt_dev.le.iso_mtu) {
+		BT_ERR("ISO buffer size not set");
+		return;
+	}
+
+	BT_DBG("ISO buffers: pkts %u mtu %u", rp->iso_max_pkt,
+		bt_dev.le.iso_mtu);
+
+	max_num = MIN(rp->iso_max_pkt, CONFIG_BT_ISO_TX_BUF_COUNT);
+	k_sem_init(&bt_dev.le.iso_pkts, max_num, max_num);
+#endif /* CONFIG_BT_ISO */
+}
+
+static int le_set_host_feature(uint8_t bit_number, uint8_t bit_value)
+{
+#if defined(CONFIG_BT_ISO)
+	struct bt_hci_cp_le_set_host_feature *cp;
+	struct net_buf *buf;
+
+	buf = bt_hci_cmd_create(BT_HCI_OP_LE_SET_HOST_FEATURE, sizeof(*cp));
+	if (!buf) {
+		return -ENOBUFS;
+	}
+
+	cp = net_buf_add(buf, sizeof(*cp));
+	cp->bit_number = bit_number;
+	cp->bit_value = bit_value;
+
+	return bt_hci_cmd_send_sync(BT_HCI_OP_LE_SET_HOST_FEATURE, buf, NULL);
+#else
+	return -ENOTSUP;
+#endif /* CONFIG_BT_ISO */
+}
+
+#endif /* CONFIG_BT_CONN */
 
 static void read_supported_commands_complete(struct net_buf *buf)
 {
@@ -5444,6 +5522,18 @@ static int le_set_event_mask(void)
 		mask |= BT_EVT_MASK_LE_GENERATE_DHKEY_COMPLETE;
 	}
 
+	/*
+	 * Enable CIS events only if ISO connections are enabled and controller
+	 * support them.
+	 */
+	if (IS_ENABLED(CONFIG_BT_ISO) &&
+	    BT_FEAT_LE_CIS(bt_dev.le.features)) {
+		mask |= BT_EVT_MASK_LE_CIS_ESTABLISHED;
+		if (BT_FEAT_LE_CIS_SLAVE(bt_dev.le.features)) {
+			mask |= BT_EVT_MASK_LE_CIS_REQ;
+		}
+	}
+
 	sys_put_le64(mask, cp_mask->events);
 	return bt_hci_cmd_send_sync(BT_HCI_OP_LE_SET_EVENT_MASK, buf, NULL);
 }
@@ -5471,15 +5561,32 @@ static int le_init(void)
 	net_buf_unref(rsp);
 
 #if defined(CONFIG_BT_CONN)
-	/* Read LE Buffer Size */
-	err = bt_hci_cmd_send_sync(BT_HCI_OP_LE_READ_BUFFER_SIZE,
-				   NULL, &rsp);
-	if (err) {
-		return err;
+	if (IS_ENABLED(CONFIG_BT_ISO) &&
+	    BT_FEAT_LE_ISO(bt_dev.le.features)) {
+		/* Set Isochronus Channels - Host support */
+		err = le_set_host_feature(BT_LE_FEAT_BIT_ISO_CHANNELS, 1);
+		if (err) {
+			return err;
+		}
+		/* Read ISO Buffer Size V2 */
+		err = bt_hci_cmd_send_sync(BT_HCI_OP_LE_READ_BUFFER_SIZE_V2,
+					   NULL, &rsp);
+		if (err) {
+			return err;
+		}
+		read_buffer_size_v2_complete(rsp);
+		net_buf_unref(rsp);
+	} else {
+		/* Read LE Buffer Size */
+		err = bt_hci_cmd_send_sync(BT_HCI_OP_LE_READ_BUFFER_SIZE,
+					   NULL, &rsp);
+		if (err) {
+			return err;
+		}
+		le_read_buffer_size_complete(rsp);
+		net_buf_unref(rsp);
 	}
-	le_read_buffer_size_complete(rsp);
-	net_buf_unref(rsp);
-#endif
+#endif /* CONFIG_BT_CONN */
 
 	if (BT_FEAT_BREDR(bt_dev.features)) {
 		buf = bt_hci_cmd_create(BT_HCI_OP_LE_WRITE_LE_HOST_SUPP,
@@ -5516,35 +5623,28 @@ static int le_init(void)
 	    IS_ENABLED(CONFIG_BT_DATA_LEN_UPDATE) &&
 	    IS_ENABLED(CONFIG_BT_AUTO_DATA_LEN_UPDATE) &&
 	    BT_FEAT_LE_DLE(bt_dev.le.features)) {
-		if (!IS_BT_QUIRK_NO_AUTO_DLE(&bt_dev)) {
-			struct bt_hci_cp_le_write_default_data_len *cp;
-			uint16_t tx_octets, tx_time;
+		struct bt_hci_cp_le_write_default_data_len *cp;
+		uint16_t tx_octets, tx_time;
 
-			err = hci_le_read_max_data_len(&tx_octets, &tx_time);
-			if (err) {
-				return err;
-			}
+		err = hci_le_read_max_data_len(&tx_octets, &tx_time);
+		if (err) {
+			return err;
+		}
 
-			buf = bt_hci_cmd_create(BT_HCI_OP_LE_WRITE_DEFAULT_DATA_LEN,
-						sizeof(*cp));
-			if (!buf) {
-				return -ENOBUFS;
-			}
+		buf = bt_hci_cmd_create(BT_HCI_OP_LE_WRITE_DEFAULT_DATA_LEN,
+					sizeof(*cp));
+		if (!buf) {
+			return -ENOBUFS;
+		}
 
-			cp = net_buf_add(buf, sizeof(*cp));
-			cp->max_tx_octets = sys_cpu_to_le16(tx_octets);
-			cp->max_tx_time = sys_cpu_to_le16(tx_time);
+		cp = net_buf_add(buf, sizeof(*cp));
+		cp->max_tx_octets = sys_cpu_to_le16(tx_octets);
+		cp->max_tx_time = sys_cpu_to_le16(tx_time);
 
-			err = bt_hci_cmd_send_sync(BT_HCI_OP_LE_WRITE_DEFAULT_DATA_LEN,
-						   buf, NULL);
-			if (err) {
-				return err;
-			}
-		} else {
-			/* No need to set default data length.
-			 * The host needs to explicitly initiate
-			 * a Data Length procedure.
-			 */
+		err = bt_hci_cmd_send_sync(BT_HCI_OP_LE_WRITE_DEFAULT_DATA_LEN,
+					   buf, NULL);
+		if (err) {
+			return err;
 		}
 	}
 
@@ -5772,7 +5872,7 @@ static int br_init(void)
 	struct net_buf *rsp;
 	int err;
 
-	if (bt_dev.le.mtu) {
+	if (bt_dev.le.acl_mtu) {
 		return 0;
 	}
 
@@ -6247,7 +6347,17 @@ int bt_recv(struct net_buf *buf)
 		}
 #endif
 		return 0;
+
 	}
+#if defined(CONFIG_BT_ISO)
+	case BT_BUF_ISO_IN:
+#if defined(CONFIG_BT_RECV_IS_RX_THREAD)
+		hci_iso(buf);
+#else
+		net_buf_put(&bt_dev.rx_queue, buf);
+#endif
+		return 0;
+#endif /* CONFIG_BT_ISO */
 	default:
 		BT_ERR("Invalid buf type %u", bt_buf_get_type(buf));
 		net_buf_unref(buf);
@@ -6362,6 +6472,11 @@ static void hci_rx_thread(void)
 			hci_acl(buf);
 			break;
 #endif /* CONFIG_BT_CONN */
+#if defined(CONFIG_BT_ISO)
+		case BT_BUF_ISO_IN:
+			hci_iso(buf);
+			break;
+#endif /* CONFIG_BT_ISO */
 		case BT_BUF_EVT:
 			hci_event(buf);
 			break;
@@ -8237,7 +8352,16 @@ int bt_le_ext_adv_start(struct bt_le_ext_adv *adv,
 	atomic_set_bit_to(adv->flags, BT_ADV_LIMITED, param &&
 			  (param->timeout > 0 || param->num_events > 0));
 
-	le_adv_set_private_addr(adv);
+	if (atomic_test_bit(adv->flags, BT_ADV_CONNECTABLE)) {
+		if (IS_ENABLED(CONFIG_BT_PRIVACY) &&
+		    !atomic_test_bit(adv->flags, BT_ADV_USE_IDENTITY)) {
+			le_adv_set_private_addr(adv);
+		}
+	} else {
+		if (!atomic_test_bit(adv->flags, BT_ADV_USE_IDENTITY)) {
+			le_adv_set_private_addr(adv);
+		}
+	}
 
 	if (atomic_test_bit(adv->flags, BT_ADV_INCLUDE_NAME) &&
 	    !atomic_test_bit(adv->flags, BT_ADV_DATA_SET)) {
@@ -8594,8 +8718,12 @@ struct net_buf *bt_buf_get_rx(enum bt_buf_type type, k_timeout_t timeout)
 {
 	struct net_buf *buf;
 
-	__ASSERT(type == BT_BUF_EVT || type == BT_BUF_ACL_IN,
-		 "Invalid buffer type requested");
+	__ASSERT(type == BT_BUF_EVT || type == BT_BUF_ACL_IN ||
+		 type == BT_BUF_ISO_IN, "Invalid buffer type requested");
+
+	if (IS_ENABLED(CONFIG_BT_ISO) && type == BT_BUF_ISO_IN) {
+		return bt_iso_get_rx(timeout);
+	}
 
 #if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)
 	if (type == BT_BUF_EVT) {
@@ -9016,7 +9144,8 @@ int bt_le_oob_get_local(uint8_t id, struct bt_le_oob *oob)
 		bt_addr_le_copy(&oob->addr, &bt_dev.id_addr[id]);
 	}
 
-	if (IS_ENABLED(CONFIG_BT_SMP)) {
+	if (IS_ENABLED(CONFIG_BT_SMP) &&
+	    !IS_ENABLED(CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY)) {
 		err = bt_smp_le_oob_generate_sc_data(&oob->le_sc_data);
 		if (err) {
 			return err;

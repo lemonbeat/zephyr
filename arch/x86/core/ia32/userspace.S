@@ -50,7 +50,7 @@ SECTION_FUNC(TEXT, z_x86_trampoline_to_kernel)
 	pushl	%edi
 
 	/* Switch to kernel page table */
-	movl	$Z_MEM_PHYS_ADDR(z_x86_kernel_ptables), %esi
+	movl	$z_x86_kernel_ptables, %esi
 	movl	%esi, %cr3
 
 	/* Save old trampoline stack pointer in %edi */
@@ -155,7 +155,7 @@ SECTION_FUNC(TEXT, z_x86_syscall_entry_stub)
 	pushl	%edi
 
 	/* Switch to kernel page table */
-	movl	$Z_MEM_PHYS_ADDR(z_x86_kernel_ptables), %esi
+	movl	$z_x86_kernel_ptables, %esi
 	movl	%esi, %cr3
 
 	/* Save old trampoline stack pointer in %edi */
@@ -373,19 +373,6 @@ SECTION_FUNC(TEXT, z_x86_userspace_enter)
 	pushfl			/* EFLAGS */
 	push	$USER_CODE_SEG	/* CS */
 	push	$z_thread_entry	/* EIP */
-
-#ifdef CONFIG_EXECUTION_BENCHMARKING
-	/* Save the eax and edx registers before reading the time stamp
-	* once done pop the values.
-	*/
-	push %eax
-	push %edx
-	rdtsc
-	mov %eax,arch_timing_enter_user_mode_end
-	mov %edx,arch_timing_enter_user_mode_end+4
-	pop %edx
-	pop %eax
-#endif
 
 	/* We will land in z_thread_entry() in user mode after this */
 	KPTI_IRET_USER

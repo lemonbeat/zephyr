@@ -501,7 +501,7 @@ static int hci_driver_open(void)
 	k_thread_create(&prio_recv_thread_data, prio_recv_thread_stack,
 			K_KERNEL_STACK_SIZEOF(prio_recv_thread_stack),
 			prio_recv_thread, NULL, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BT_CTLR_RX_PRIO), 0, K_NO_WAIT);
+			K_PRIO_COOP(CONFIG_BT_DRIVER_RX_HIGH_PRIO), 0, K_NO_WAIT);
 	k_thread_name_set(&prio_recv_thread_data, "BT RX pri");
 
 	k_thread_create(&recv_thread_data, recv_thread_stack,
@@ -523,7 +523,7 @@ static const struct bt_hci_driver drv = {
 	.send	= hci_driver_send,
 };
 
-static int hci_driver_init(struct device *unused)
+static int hci_driver_init(const struct device *unused)
 {
 	ARG_UNUSED(unused);
 
