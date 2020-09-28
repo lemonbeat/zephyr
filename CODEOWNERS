@@ -133,6 +133,7 @@
 /boards/xtensa/odroid_go/                 @ydamigos
 # All cmake related files
 /cmake/                                   @tejlmand @nashif
+/cmake/*/arcmwdt/                         @abrodkin @evgeniy-paltsev @tejlmand
 /CMakeLists.txt                           @tejlmand @nashif
 /doc/                                     @dbkinder
 /doc/guides/coccinelle.rst                @himanshujha199640 @JuliaLawall
@@ -144,6 +145,7 @@
 /doc/reference/devicetree/                @galak @mbolivar-nordic
 /doc/reference/resource_management/       @pabigot
 /doc/reference/networking/can*            @alexanderwachter
+/doc/security/                            @ceolin @d3zd3z
 /drivers/debug/                           @nashif
 /drivers/*/*cc13xx_cc26xx*                @bwitherspoon
 /drivers/*/*mcux*                         @MaureenHelm
@@ -370,6 +372,7 @@
 /include/tracing/                         @wentongwu @nashif
 /include/debug/                           @nashif
 /include/debug/coredump.h                 @dcpleung
+/include/debug/gdbstub.h                  @ceolin
 /include/device.h                         @wentongwu @nashif
 /include/devicetree.h                     @galak
 /include/display/                         @vanwinkeljan
@@ -392,7 +395,7 @@
 /include/net/                             @jukkar @tbursztyka @pfalcon
 /include/net/buf.h                        @jukkar @jhedberg @tbursztyka @pfalcon
 /include/posix/                           @pfalcon
-/include/power/power.h                    @wentongwu @nashif
+/include/power/power.h                    @wentongwu @nashif @ceolin
 /include/ptp_clock.h                      @jukkar
 /include/shared_irq.h                     @andrewboie @andyross
 /include/shell/                           @jakub-uC @nordic-krch
@@ -439,7 +442,7 @@
 /samples/subsys/mgmt/updatehub/           @nandojve @otavio
 /samples/subsys/mgmt/osdp/                @cbsiddharth
 /samples/subsys/usb/                      @jfischer-phytec-iot @finikorg
-/samples/subsys/power/                    @wentongwu @pabigot
+/samples/subsys/power/                    @wentongwu @pabigot @ceolin
 /samples/userspace/                       @andrewboie
 /scripts/coccicheck                       @himanshujha199640 @JuliaLawall
 /scripts/coccinelle/                      @himanshujha199640 @JuliaLawall
@@ -479,6 +482,8 @@
 /subsys/cpp/                              @pabigot @vanwinkeljan
 /subsys/debug/                            @nashif
 /subsys/debug/coredump/                   @dcpleung
+/subsys/debug/gdbstub/                    @ceolin
+/subsys/debug/gdbstub.c                   @ceolin
 /subsys/dfu/                              @nvlsianpu
 /subsys/tracing/                          @nashif @wentongwu
 /subsys/debug/asan_hacks.c                @vanwinkeljan @aescolar @daor-oti
@@ -515,7 +520,7 @@
 /subsys/net/l2/                           @jukkar @tbursztyka
 /subsys/net/l2/canbus/                    @alexanderwachter @jukkar
 /subsys/net/*/openthread/                 @rlubos
-/subsys/power/                            @wentongwu @pabigot
+/subsys/power/                            @wentongwu @pabigot @ceolin
 /subsys/random/                           @dleach02
 /subsys/settings/                         @nvlsianpu
 /subsys/shell/                            @jakub-uC @nordic-krch

@@ -520,6 +520,7 @@ breathe_domain_by_extension = {
     "h": "c",
     "c": "c",
 }
+breathe_separate_member_pages = True
 
 # Qualifiers to a function are causing Sphihx/Breathe to warn about
 # Error when parsing function declaration and more.  This is a list
@@ -541,6 +542,7 @@ html_context = {
     'theme_logo_only': False,
     'current_version': version,
     'versions': (("latest", "/"),
+                 ("2.4.0", "/2.4.0/"),
                  ("2.3.0", "/2.3.0/"),
                  ("2.2.0", "/2.2.0/"),
                  ("2.1.0", "/2.1.0/"),

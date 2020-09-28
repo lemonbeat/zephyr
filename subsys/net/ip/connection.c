@@ -149,8 +149,9 @@ static struct net_conn *conn_find_handler(uint16_t proto, uint8_t family,
 					  uint16_t local_port)
 {
 	struct net_conn *conn;
+	struct net_conn *tmp;
 
-	SYS_SLIST_FOR_EACH_CONTAINER(&conn_used, conn, node) {
+	SYS_SLIST_FOR_EACH_CONTAINER_SAFE(&conn_used, conn, tmp, node) {
 		if (conn->proto != proto) {
 			continue;
 		}
@@ -512,6 +513,7 @@ enum net_verdict net_conn_input(struct net_pkt *pkt,
 	struct net_if *pkt_iface = net_pkt_iface(pkt);
 	struct net_conn *best_match = NULL;
 	bool is_mcast_pkt = false, mcast_pkt_delivered = false;
+	bool is_bcast_pkt = false;
 	bool raw_pkt_delivered = false;
 	int16_t best_rank = -1;
 	struct net_conn *conn;
@@ -563,6 +565,9 @@ enum net_verdict net_conn_input(struct net_pkt *pkt,
 	if (IS_ENABLED(CONFIG_NET_IPV4) && net_pkt_family(pkt) == AF_INET) {
 		if (net_ipv4_is_addr_mcast(&ip_hdr->ipv4->dst)) {
 			is_mcast_pkt = true;
+		} else if (net_if_ipv4_is_addr_bcast(pkt_iface,
+						     &ip_hdr->ipv4->dst)) {
+			is_bcast_pkt = true;
 		}
 	} else if (IS_ENABLED(CONFIG_NET_IPV6) &&
 					   net_pkt_family(pkt) == AF_INET6) {
@@ -745,7 +750,8 @@ enum net_verdict net_conn_input(struct net_pkt *pkt,
 	    net_pkt_family(pkt) == AF_INET6 && is_mcast_pkt) {
 		;
 	} else if (IS_ENABLED(CONFIG_NET_IPV4) &&
-		   net_pkt_family(pkt) == AF_INET && is_mcast_pkt) {
+		   net_pkt_family(pkt) == AF_INET &&
+		   (is_mcast_pkt || is_bcast_pkt)) {
 		;
 	} else if (IS_ENABLED(CONFIG_NET_SOCKETS_PACKET) &&
 		    net_pkt_family(pkt) == AF_PACKET) {

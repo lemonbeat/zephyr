@@ -217,7 +217,7 @@ function(zephyr_get_system_include_directories_for_lang lang i)
 
   process_flags(${lang} flags output_list)
   string(REPLACE ";" "$<SEMICOLON>" genexp_output_list "${output_list}")
-  set(result_output_list "-isystem$<JOIN:${genexp_output_list}, -isystem>")
+  set(result_output_list "$<$<BOOL:${genexp_output_list}>:-isystem$<JOIN:${genexp_output_list}, -isystem>>")
 
   set(${i} ${result_output_list} PARENT_SCOPE)
 endfunction()
@@ -1745,4 +1745,31 @@ Relative paths are only allowed with `-D${ARGV1}=<path>`")
     # This updates the provided argument in parent scope (callers scope)
     set(${ARGV1} ${${ARGV1}} PARENT_SCOPE)
   endif()
+endfunction()
+
+# Usage:
+#   zephyr_get_targets(<directory> <types> <targets>)
+#
+# Get build targets for a given directory and sub-directories.
+#
+# This functions will traverse the build tree, starting from <directory>.
+# It will read the `BUILDSYSTEM_TARGETS` for each directory in the build tree
+# and return the build types matching the <types> list.
+# Example of types: OBJECT_LIBRARY, STATIC_LIBRARY, INTERFACE_LIBRARY, UTILITY.
+#
+# returns a list of targets in <targets> matching the required <types>.
+function(zephyr_get_targets directory types targets)
+    get_property(sub_directories DIRECTORY ${directory} PROPERTY SUBDIRECTORIES)
+    get_property(dir_targets DIRECTORY ${directory} PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(dir_target ${dir_targets})
+      get_property(target_type TARGET ${dir_target} PROPERTY TYPE)
+      if(${target_type} IN_LIST types)
+        list(APPEND ${targets} ${dir_target})
+      endif()
+    endforeach()
+
+    foreach(directory ${sub_directories})
+        zephyr_get_targets(${directory} "${types}" ${targets})
+    endforeach()
+    set(${targets} ${${targets}} PARENT_SCOPE)
 endfunction()

@@ -36,7 +36,7 @@ manifest:
       path: modules/hal/altera
     - name: canopennode
       path: modules/lib/canopennode
-      revision: 5c6b0566d56264efd4bf23ed58bc7cb8b32fe063
+      revision: 468d350028a975b96563e58344de48281a0ab371
     - name: ci-tools
       revision: da9a2df574094f52d87a03f6393928bdc7dce17c
       path: tools/ci-tools
@@ -56,7 +56,7 @@ manifest:
       revision: f1fa8241f8786198ba41155413243de36ed878a5
       path: modules/hal/infineon
     - name: hal_nordic
-      revision: e71035877db9f4e194463c30964c69f2b935a62c
+      revision: d8a6ea9695ddf792bb18bb6035c13b1daac5d79c
       path: modules/hal/nordic
     - name: hal_openisa
       revision: 40d049f69c50b58ea20473bee14cf93f518bf262
@@ -90,10 +90,10 @@ manifest:
       revision: 928b61c7c8ef5f770f10e6fd36d4fea0cf375b5e
       path: modules/lib/gui/lvgl
     - name: mbedtls
-      revision: 9638398d3c319074ae3878035138ef8a76001e5b
+      revision: aef137b1af8aa7a0f43345c82459254b8832262e
       path: modules/crypto/mbedtls
     - name: mcuboot
-      revision: 480421999ec2d8d2a20091e4f3a0393db04de5c4
+      revision: a5d79cf8ccb2c71e68ef32a71d6a2716e831d12e
       path: bootloader/mcuboot
     - name: mcumgr
       revision: 5051f9d900bbb194a23d4ce80f3c6dc6d6780cc2
@@ -102,7 +102,7 @@ manifest:
       revision: 1c4fdba512b268033a4cf926bddd323866c3261a
       path: tools/net-tools
     - name: hal_nxp
-      revision: e13b23c06850530c6c34208905d58e7a6a12cdd5
+      revision: 68bbdbdec1153355b14386d8f095058a496f66f4
       path: modules/hal/nxp
     - name: open-amp
       revision: 724f7e2a4519d7e1d40ef330042682dea950c991
@@ -111,7 +111,7 @@ manifest:
       revision: 3f545d76a2e6d1db83a470ccdb5bebd1f484e137
       path: modules/lib/loramac-node
     - name: openthread
-      revision: f23165fde96ae8bd710b08c6d77879465ed92cac
+      revision: 07f430dac6c400abdd358ba1173c0f94b94a5a80
       path: modules/lib/openthread
     - name: segger
       revision: 874d9e9696b00c09f9eeefe839028dc25fe44983

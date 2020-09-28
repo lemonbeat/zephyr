@@ -920,9 +920,10 @@ class QEMUHandler(Handler):
 
         # We pass this to QEMU which looks for fifos with .in and .out
         # suffixes.
-        self.fifo_fn = os.path.join(self.instance.build_dir, "qemu-fifo")
 
+        self.fifo_fn = os.path.join(self.instance.build_dir, "qemu-fifo")
         self.pid_fn = os.path.join(self.instance.build_dir, "qemu.pid")
+
         if os.path.exists(self.pid_fn):
             os.unlink(self.pid_fn)
 
@@ -947,14 +948,18 @@ class QEMUHandler(Handler):
         command = [self.generator_cmd]
         command += ["-C", self.build_dir, "run"]
 
+        is_timeout = False
+
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self.build_dir) as proc:
             logger.debug("Spawning QEMUHandler Thread for %s" % self.name)
             try:
                 proc.wait(self.timeout)
             except subprocess.TimeoutExpired:
-                #sometimes QEMU can't handle SIGTERM signal correctly
-                #in that case kill -9 QEMU process directly and leave
-                #sanitycheck judge testing result by console output
+                # sometimes QEMU can't handle SIGTERM signal correctly
+                # in that case kill -9 QEMU process directly and leave
+                # sanitycheck to judge testing result by console output
+
+                is_timeout = True
                 if os.path.exists(self.pid_fn):
                     qemu_pid = int(open(self.pid_fn).read())
                     try:
@@ -986,7 +991,10 @@ class QEMUHandler(Handler):
 
         if (self.returncode != 0 and not self.ignore_qemu_crash) or not harness.state:
             self.set_state("failed", 0)
-            self.instance.reason = "Exited with {}".format(self.returncode)
+            if is_timeout:
+                self.instance.reason = "Timeout"
+            else:
+                self.instance.reason = "Exited with {}".format(self.returncode)
 
     def get_fifo(self):
         return self.fifo_fn
@@ -2600,6 +2608,9 @@ class TestSuite(DisablePyTestCollectionMixin):
                 try:
                     platform = Platform()
                     platform.load(file)
+                    if platform.name in [p.name for p in self.platforms]:
+                        logger.error(f"Duplicate platform {platform.name} in {file}")
+                        raise Exception(f"Duplicate platform identifier {platform.name} found")
                     if platform.sanitycheck:
                         self.platforms.append(platform)
                         if platform.default:

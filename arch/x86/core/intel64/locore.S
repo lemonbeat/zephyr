@@ -204,8 +204,9 @@ enter_code64:
 #ifdef CONFIG_INIT_STACKS
 	movq $0xAAAAAAAAAAAAAAAA, %rax
 	movq %rsp, %rdi
-	subq $CONFIG_ISR_STACK_SIZE, %rdi
-	movq $(CONFIG_ISR_STACK_SIZE >> 3), %rcx
+	subq __x86_cpuboot_t_stack_size_OFFSET(%rbp), %rdi
+	movq __x86_cpuboot_t_stack_size_OFFSET(%rbp), %rcx
+	shr $3, %rcx /* moving 8 bytes a time, so fewer repeats */
 	rep stosq
 #endif
 
@@ -323,17 +324,23 @@ z_x86_switch:
  */
 
 __resume:
-#ifdef CONFIG_USERSPACE
-#ifndef CONFIG_X86_KPTI
+#if (!defined(CONFIG_X86_KPTI) && defined(CONFIG_USERSPACE)) \
+		|| defined(CONFIG_TRACING)
+	pushq %rdi	/* Caller-saved, stash it */
+#if !defined(CONFIG_X86_KPTI) && defined(CONFIG_USERSPACE)
 	/* If KPTI is enabled we're always on the kernel's page tables in
 	 * this context and the appropriate page table switch takes place
 	 * when trampolining back to user mode
 	 */
-	pushq %rdi	/* Caller-saved, stash it */
 	call z_x86_swap_update_page_tables
+#endif
+#ifdef CONFIG_TRACING
+	call sys_trace_thread_switched_in
+#endif
 	popq %rdi
-#endif /* CONFIG_X86_KPTI */
+#endif /* (!CONFIG_X86_KPTI && CONFIG_USERSPACE) || CONFIG_TRACING */
 
+#ifdef CONFIG_USERSPACE
 	/* Set up exception return stack frame */
 	pushq _thread_offset_to_ss(%rdi)	/* SS */
 #else
@@ -401,7 +408,6 @@ __resume:
 	/* swapgs variant of Spectre V1. Disable speculation past this point */
 	lfence
 #endif /* CONFIG_X86_BOUNDS_CHECK_BYPASS_MITIGATION */
-
 	iretq
 
 
@@ -695,7 +701,7 @@ irq_dispatch:
 	wrmsr
 #else /* xAPIC */
 	movq z_loapic_regs, %rdx
-	movq %rax, LOAPIC_EOI(%rdx)
+	movl %eax, LOAPIC_EOI(%rdx)
 #endif /* CONFIG_X2APIC */
 
 	movq %gs:__x86_tss64_t_cpu_OFFSET, %rsi

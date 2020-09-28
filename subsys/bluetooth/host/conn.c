@@ -876,20 +876,17 @@ void bt_conn_cb_register(struct bt_conn_cb *cb)
 
 void bt_conn_reset_rx_state(struct bt_conn *conn)
 {
-	if (!conn->rx_len) {
+	if (!conn->rx) {
 		return;
 	}
 
 	net_buf_unref(conn->rx);
 	conn->rx = NULL;
-	conn->rx_len = 0U;
 }
 
 void bt_conn_recv(struct bt_conn *conn, struct net_buf *buf, uint8_t flags)
 {
-	struct bt_l2cap_hdr *hdr;
-	uint16_t len;
-
+	uint16_t acl_total_len;
 	/* Make sure we notify any pending TX callbacks before processing
 	 * new data for this connection.
 	 */
@@ -906,40 +903,30 @@ void bt_conn_recv(struct bt_conn *conn, struct net_buf *buf, uint8_t flags)
 	/* Check packet boundary flags */
 	switch (flags) {
 	case BT_ACL_START:
-		hdr = (void *)buf->data;
-		len = sys_le16_to_cpu(hdr->len);
-
-		BT_DBG("First, len %u final %u", buf->len, len);
-
-		if (conn->rx_len) {
+		if (conn->rx) {
 			BT_ERR("Unexpected first L2CAP frame");
 			bt_conn_reset_rx_state(conn);
 		}
 
-		conn->rx_len = (sizeof(*hdr) + len) - buf->len;
-		BT_DBG("rx_len %u", conn->rx_len);
-		if (conn->rx_len) {
-			conn->rx = buf;
-			return;
-		}
+		BT_DBG("First, len %u final %u", buf->len,
+		       (buf->len < sizeof(uint16_t)) ?
+		       0 : sys_get_le16(buf->data));
 
+		conn->rx = buf;
 		break;
 	case BT_ACL_CONT:
-		if (!conn->rx_len) {
+		if (!conn->rx) {
 			BT_ERR("Unexpected L2CAP continuation");
 			bt_conn_reset_rx_state(conn);
 			net_buf_unref(buf);
 			return;
 		}
 
-		if (buf->len > conn->rx_len) {
-			BT_ERR("L2CAP data overflow");
-			bt_conn_reset_rx_state(conn);
+		if (!buf->len) {
+			BT_DBG("Empty ACL_CONT");
 			net_buf_unref(buf);
 			return;
 		}
-
-		BT_DBG("Cont, len %u rx_len %u", buf->len, conn->rx_len);
 
 		if (buf->len > net_buf_tailroom(conn->rx)) {
 			BT_ERR("Not enough buffer space for L2CAP data");
@@ -949,17 +936,7 @@ void bt_conn_recv(struct bt_conn *conn, struct net_buf *buf, uint8_t flags)
 		}
 
 		net_buf_add_mem(conn->rx, buf->data, buf->len);
-		conn->rx_len -= buf->len;
 		net_buf_unref(buf);
-
-		if (conn->rx_len) {
-			return;
-		}
-
-		buf = conn->rx;
-		conn->rx = NULL;
-		conn->rx_len = 0U;
-
 		break;
 	default:
 		/* BT_ACL_START_NO_FLUSH and BT_ACL_COMPLETE are not allowed on
@@ -972,17 +949,32 @@ void bt_conn_recv(struct bt_conn *conn, struct net_buf *buf, uint8_t flags)
 		return;
 	}
 
-	hdr = (void *)buf->data;
-	len = sys_le16_to_cpu(hdr->len);
-
-	if (sizeof(*hdr) + len != buf->len) {
-		BT_ERR("ACL len mismatch (%u != %u)", len, buf->len);
-		net_buf_unref(buf);
+	if (conn->rx->len < sizeof(uint16_t)) {
+		/* Still not enough data recieved to retrieve the L2CAP header
+		 * length field.
+		 */
 		return;
 	}
 
-	BT_DBG("Successfully parsed %u byte L2CAP packet", buf->len);
+	acl_total_len = sys_get_le16(conn->rx->data) + sizeof(struct bt_l2cap_hdr);
 
+	if (conn->rx->len < acl_total_len) {
+		/* L2CAP frame not complete. */
+		return;
+	}
+
+	if (conn->rx->len > acl_total_len) {
+		BT_ERR("ACL len mismatch (%u > %u)",
+		       conn->rx->len, acl_total_len);
+		bt_conn_reset_rx_state(conn);
+		return;
+	}
+
+	/* L2CAP frame complete. */
+	buf = conn->rx;
+	conn->rx = NULL;
+
+	BT_DBG("Successfully parsed %u byte L2CAP packet", buf->len);
 	bt_l2cap_recv(conn, buf);
 }
 
@@ -1573,6 +1565,7 @@ void bt_conn_set_state(struct bt_conn *conn, bt_conn_state_t state)
 				bt_iso_disconnected(iso);
 				bt_iso_cleanup(iso);
 				bt_conn_unref(iso);
+				break;
 			}
 		}
 

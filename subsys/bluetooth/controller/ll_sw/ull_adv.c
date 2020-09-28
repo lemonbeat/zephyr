@@ -896,6 +896,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 			return BT_HCI_ERR_HW_FAILURE;
 		}
 	}
+#endif /* CONFIG_BT_PERIPHERAL */
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 	if (ll_adv_cmds_is_ext()) {
@@ -932,10 +933,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 		node_rx_adv_term->hdr.link = (void *)link_adv_term;
 		adv->lll.node_rx_adv_term = (void *)node_rx_adv_term;
 	}
-#endif  /* CONFIG_BT_CTLR_ADV_EXT */
-#endif /* CONFIG_BT_PERIPHERAL */
 
-#if defined(CONFIG_BT_CTLR_ADV_EXT)
 	const uint8_t phy = lll->phy_p;
 
 	adv->event_counter = 0;
@@ -1841,7 +1839,7 @@ static inline uint8_t disable(uint8_t handle)
 				  ull_ticker_status_give, (void *)&ret_cb);
 		ret = ull_ticker_status_take(ret, &ret_cb);
 		if (ret) {
-			mark = ull_disable_mark(adv);
+			mark = ull_disable_unmark(adv);
 			LL_ASSERT(mark == adv);
 
 			return BT_HCI_ERR_CMD_DISALLOWED;
@@ -1855,7 +1853,7 @@ static inline uint8_t disable(uint8_t handle)
 			  ull_ticker_status_give, (void *)&ret_cb);
 	ret = ull_ticker_status_take(ret, &ret_cb);
 	if (ret) {
-		mark = ull_disable_mark(adv);
+		mark = ull_disable_unmark(adv);
 		LL_ASSERT(mark == adv);
 
 		return BT_HCI_ERR_CMD_DISALLOWED;
