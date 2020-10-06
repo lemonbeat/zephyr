@@ -26,9 +26,7 @@
  *
  * @see http://howardhinnant.github.io/date_algorithms.html#days_from_civil
  */
-static int64_t time_days_from_civil(int64_t y,
-				  unsigned int m,
-				  unsigned int d)
+static int64_t time_days_from_civil(int64_t y, unsigned int m, unsigned int d)
 {
 	y -= m <= 2;
 
@@ -60,9 +58,8 @@ time_t timeutil_timegm(const struct tm *tm)
 	time_t rv = (time_t)time;
 
 	errno = 0;
-	if ((sizeof(rv) == sizeof(int32_t))
-	    && ((time < (int64_t)INT32_MIN)
-		|| (time > (int64_t)INT32_MAX))) {
+	if ((sizeof(rv) == sizeof(int32_t)) &&
+	    ((time < (int64_t)INT32_MIN) || (time > (int64_t)INT32_MAX))) {
 		errno = ERANGE;
 		rv = -1;
 	}

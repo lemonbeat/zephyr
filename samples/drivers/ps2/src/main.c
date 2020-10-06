@@ -25,8 +25,8 @@ static void to_port_60_thread(void *dummy1, void *dummy2, void *dummy3);
 static void saturate_ps2(struct k_timer *timer);
 static bool host_blocked;
 
-K_THREAD_DEFINE(aux_thread_id, TASK_STACK_SIZE, to_port_60_thread,
-		NULL, NULL, NULL, PRIORITY, 0, 0);
+K_THREAD_DEFINE(aux_thread_id, TASK_STACK_SIZE, to_port_60_thread, NULL, NULL,
+		NULL, PRIORITY, 0, 0);
 K_SEM_DEFINE(p60_sem, 0, 1);
 K_MSGQ_DEFINE(aux_to_host_queue, sizeof(uint8_t), 8, 4);
 

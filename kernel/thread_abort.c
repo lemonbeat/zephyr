@@ -40,8 +40,8 @@ FUNC_NORETURN void z_self_abort(void)
 	__ASSERT(cpu->pending_abort == NULL, "already have a thread to abort");
 	cpu->pending_abort = _current;
 
-	LOG_DBG("%p self-aborting, handle on idle thread %p",
-		_current, cpu->idle_thread);
+	LOG_DBG("%p self-aborting, handle on idle thread %p", _current,
+		cpu->idle_thread);
 
 	k_thread_suspend(_current);
 	z_swap_irqlock(key);

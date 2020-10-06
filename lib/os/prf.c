@@ -17,7 +17,7 @@
 #include <sys/util.h>
 
 #ifndef EOF
-#define EOF  -1
+#define EOF -1
 #endif
 
 #ifdef CONFIG_MINIMAL_LIBC_LL_PRINTF
@@ -64,7 +64,8 @@ static int _to_x(char *buf, unsigned VALTYPE n, unsigned int base)
 	return len;
 }
 
-static int _to_hex(char *buf, unsigned VALTYPE value, bool alt_form, char prefix)
+static int _to_hex(char *buf, unsigned VALTYPE value, bool alt_form,
+		   char prefix)
 {
 	int len;
 	char *buf0 = buf;
@@ -118,7 +119,7 @@ static int _to_dec(char *buf, VALTYPE value, bool fplus, bool fspace)
 	return (buf + _to_udec(buf, value)) - start;
 }
 
-static	void _rlrshift(uint64_t *v)
+static void _rlrshift(uint64_t *v)
 {
 	*v = (*v & 1) + (*v >> 1);
 }
@@ -163,7 +164,7 @@ static void _ldiv5(uint64_t *v)
 	*v = quot;
 }
 
-static	char _get_digit(uint64_t *fr, int *digit_count)
+static char _get_digit(uint64_t *fr, int *digit_count)
 {
 	char rval;
 
@@ -202,13 +203,15 @@ static	char _get_digit(uint64_t *fr, int *digit_count)
  *	stage (pulling the resulting decimal digits outs).
  */
 
-#define	MAXFP1	0xFFFFFFFF	/* Largest # if first fp format */
-#define HIGHBIT64 (1ull<<63)
+#define MAXFP1 0xFFFFFFFF /* Largest # if first fp format */
+#define HIGHBIT64 (1ull << 63)
 
-struct zero_padding { int predot, postdot, trail; };
+struct zero_padding {
+	int predot, postdot, trail;
+};
 
-static int _to_float(char *buf, uint64_t double_temp, char c,
-		     bool falt, bool fplus, bool fspace, int precision,
+static int _to_float(char *buf, uint64_t double_temp, char c, bool falt,
+		     bool fplus, bool fspace, int precision,
 		     struct zero_padding *zp)
 {
 	int decexp;
@@ -269,7 +272,7 @@ static int _to_float(char *buf, uint64_t double_temp, char c,
 				exp--;
 			}
 		}
-		exp -= (1023 - 1);	/* +1 since .1 vs 1. */
+		exp -= (1023 - 1); /* +1 since .1 vs 1. */
 		fract |= HIGHBIT64;
 	}
 
@@ -305,10 +308,10 @@ static int _to_float(char *buf, uint64_t double_temp, char c,
 	}
 
 	if (precision < 0) {
-		precision = 6;		/* Default precision if none given */
+		precision = 6; /* Default precision if none given */
 	}
 
-	prune_zero = false;		/* Assume trailing 0's allowed     */
+	prune_zero = false; /* Assume trailing 0's allowed     */
 	if ((c == 'g') || (c == 'G')) {
 		if (decexp < (-4 + 1) || decexp > precision) {
 			c += 'e' - 'g';
@@ -454,7 +457,11 @@ int z_prf(int (*func)(), void *dest, const char *format, va_list vargs)
 	struct zero_padding zero;
 	VALTYPE val;
 
-#define PUTC(c)	do { if ((*func)(c, dest) == EOF) return EOF; } while (false)
+#define PUTC(c)                              \
+	do {                                 \
+		if ((*func)(c, dest) == EOF) \
+			return EOF;          \
+	} while (false)
 
 	count = 0;
 
@@ -502,7 +509,7 @@ int z_prf(int (*func)(), void *dest, const char *format, va_list vargs)
 			} else if (!isdigit((int)c)) {
 				width = 0;
 			} else {
-				width = _atoi(&format);	/* Find width */
+				width = _atoi(&format); /* Find width */
 				c = *format++;
 			}
 
@@ -583,8 +590,7 @@ int z_prf(int (*func)(), void *dest, const char *format, va_list vargs)
 			case 'f':
 			case 'F':
 			case 'g':
-			case 'G':
-			{
+			case 'G': {
 				uint64_t double_val;
 
 				/* standard platforms which supports double */
@@ -637,7 +643,7 @@ int z_prf(int (*func)(), void *dest, const char *format, va_list vargs)
 				continue;
 
 			case 'p':
-				val = (uintptr_t) va_arg(vargs, void *);
+				val = (uintptr_t)va_arg(vargs, void *);
 				clen = _to_hex(buf, val, true, 'x');
 				prefix = 2;
 				break;

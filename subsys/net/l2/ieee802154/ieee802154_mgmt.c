@@ -90,8 +90,8 @@ static int ieee802154_scan(uint32_t mgmt_request, struct net_if *iface,
 	int ret;
 
 	NET_DBG("%s scan requested",
-		mgmt_request == NET_REQUEST_IEEE802154_ACTIVE_SCAN ?
-		"Active" : "Passive");
+		mgmt_request == NET_REQUEST_IEEE802154_ACTIVE_SCAN ? "Active" :
+									   "Passive");
 
 	if (ctx->scan_ctx) {
 		return -EALREADY;
@@ -217,8 +217,7 @@ enum net_verdict ieee802154_handle_mac_command(struct net_if *iface,
 		}
 	}
 
-	NET_DBG("Drop MAC command, unsupported CFI: 0x%x",
-		mpdu->command->cfi);
+	NET_DBG("Drop MAC command, unsupported CFI: 0x%x", mpdu->command->cfi);
 
 	return NET_DROP;
 }
@@ -287,8 +286,8 @@ static int ieee802154_associate(uint32_t mgmt_request, struct net_if *iface,
 		if (ctx->coord_addr_len == IEEE802154_SHORT_ADDR_LENGTH) {
 			ctx->coord.short_addr = req->short_addr;
 		} else {
-			memcpy(ctx->coord.ext_addr,
-			       req->addr, IEEE802154_EXT_ADDR_LENGTH);
+			memcpy(ctx->coord.ext_addr, req->addr,
+			       IEEE802154_EXT_ADDR_LENGTH);
 		}
 	} else {
 		ret = -EACCES;
@@ -334,8 +333,8 @@ static int ieee802154_disassociate(uint32_t mgmt_request, struct net_if *iface,
 	cmd = ieee802154_get_mac_command(pkt);
 	cmd->disassoc_note.reason = IEEE802154_DRF_DEVICE_WISH;
 
-	ieee802154_mac_cmd_finalize(
-		pkt, IEEE802154_CFI_DISASSOCIATION_NOTIFICATION);
+	ieee802154_mac_cmd_finalize(pkt,
+				    IEEE802154_CFI_DISASSOCIATION_NOTIFICATION);
 
 	if (net_if_send_data(iface, pkt)) {
 		net_pkt_unref(pkt);
@@ -374,8 +373,8 @@ NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_IEEE802154_UNSET_ACK,
 				  ieee802154_set_ack);
 
 static int ieee802154_set_parameters(uint32_t mgmt_request,
-				     struct net_if *iface,
-				     void *data, size_t len)
+				     struct net_if *iface, void *data,
+				     size_t len)
 {
 	struct ieee802154_context *ctx = net_if_l2_data(iface);
 	uint16_t value;
@@ -390,7 +389,7 @@ static int ieee802154_set_parameters(uint32_t mgmt_request,
 		return -EINVAL;
 	}
 
-	value = *((uint16_t *) data);
+	value = *((uint16_t *)data);
 
 	if (mgmt_request == NET_REQUEST_IEEE802154_SET_CHANNEL) {
 		if (ctx->channel != value) {
@@ -450,8 +449,8 @@ NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_IEEE802154_SET_TX_POWER,
 				  ieee802154_set_parameters);
 
 static int ieee802154_get_parameters(uint32_t mgmt_request,
-				     struct net_if *iface,
-				     void *data, size_t len)
+				     struct net_if *iface, void *data,
+				     size_t len)
 {
 	struct ieee802154_context *ctx = net_if_l2_data(iface);
 	uint16_t *value;
@@ -502,8 +501,8 @@ NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_IEEE802154_GET_TX_POWER,
 #ifdef CONFIG_NET_L2_IEEE802154_SECURITY
 
 static int ieee802154_set_security_settings(uint32_t mgmt_request,
-					    struct net_if *iface,
-					    void *data, size_t len)
+					    struct net_if *iface, void *data,
+					    size_t len)
 {
 	struct ieee802154_context *ctx = net_if_l2_data(iface);
 	struct ieee802154_security_params *params;
@@ -512,8 +511,7 @@ static int ieee802154_set_security_settings(uint32_t mgmt_request,
 		return -EBUSY;
 	}
 
-	if (len != sizeof(struct ieee802154_security_params) ||
-	    !data) {
+	if (len != sizeof(struct ieee802154_security_params) || !data) {
 		return -EINVAL;
 	}
 
@@ -533,14 +531,13 @@ NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_IEEE802154_SET_SECURITY_SETTINGS,
 				  ieee802154_set_security_settings);
 
 static int ieee802154_get_security_settings(uint32_t mgmt_request,
-					    struct net_if *iface,
-					    void *data, size_t len)
+					    struct net_if *iface, void *data,
+					    size_t len)
 {
 	struct ieee802154_context *ctx = net_if_l2_data(iface);
 	struct ieee802154_security_params *params;
 
-	if (len != sizeof(struct ieee802154_security_params) ||
-	    !data) {
+	if (len != sizeof(struct ieee802154_security_params) || !data) {
 		return -EINVAL;
 	}
 

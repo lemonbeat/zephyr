@@ -169,8 +169,9 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 #if defined(CONFIG_BT_CTLR_XTAL_ADVANCED) && \
 	(EVENT_OVERHEAD_PREEMPT_US <= EVENT_OVERHEAD_PREEMPT_MIN_US)
 	/* check if preempt to start has changed */
-	if (lll_preempt_calc(evt, (TICKER_ID_ADV_SYNC_BASE +
-				   ull_adv_sync_lll_handle_get(lll)),
+	if (lll_preempt_calc(evt,
+			     (TICKER_ID_ADV_SYNC_BASE +
+			      ull_adv_sync_lll_handle_get(lll)),
 			     ticks_at_event)) {
 		radio_isr_set(lll_isr_abort, lll);
 		radio_disable();

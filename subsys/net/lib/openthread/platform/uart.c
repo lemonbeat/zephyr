@@ -35,10 +35,10 @@ struct openthread_uart {
 	atomic_t tx_finished;
 };
 
-#define OT_UART_DEFINE(_name, _ringbuf_size) \
+#define OT_UART_DEFINE(_name, _ringbuf_size)                 \
 	RING_BUF_DECLARE(_name##_rx_ringbuf, _ringbuf_size); \
-	static struct openthread_uart _name = { \
-		.rx_ringbuf = &_name##_rx_ringbuf, \
+	static struct openthread_uart _name = {              \
+		.rx_ringbuf = &_name##_rx_ringbuf,           \
 	}
 
 OT_UART_DEFINE(ot_uart, CONFIG_OPENTHREAD_NCP_UART_RING_BUFFER_SIZE);
@@ -57,17 +57,16 @@ static void uart_rx_handle(const struct device *dev)
 	bool new_data = false;
 
 	do {
-		len = ring_buf_put_claim(
-			ot_uart.rx_ringbuf, &data,
-			ot_uart.rx_ringbuf->size);
+		len = ring_buf_put_claim(ot_uart.rx_ringbuf, &data,
+					 ot_uart.rx_ringbuf->size);
 		if (len > 0) {
 			rd_len = uart_fifo_read(dev, data, len);
 			if (rd_len > 0) {
 				new_data = true;
 			}
 
-			int err = ring_buf_put_finish(
-				ot_uart.rx_ringbuf, rd_len);
+			int err =
+				ring_buf_put_finish(ot_uart.rx_ringbuf, rd_len);
 			(void)err;
 			__ASSERT_NO_MSG(err == 0);
 		} else {
@@ -106,7 +105,6 @@ static void uart_callback(const struct device *dev, void *user_data)
 	ARG_UNUSED(user_data);
 
 	while (uart_irq_update(dev) && uart_irq_is_pending(dev)) {
-
 		if (uart_irq_rx_ready(dev)) {
 			uart_rx_handle(dev);
 		}
@@ -123,16 +121,12 @@ void platformUartProcess(otInstance *aInstance)
 	const uint8_t *data;
 
 	/* Process UART RX */
-	while ((len = ring_buf_get_claim(
-			ot_uart.rx_ringbuf,
-			(uint8_t **)&data,
-			ot_uart.rx_ringbuf->size)) > 0) {
+	while ((len = ring_buf_get_claim(ot_uart.rx_ringbuf, (uint8_t **)&data,
+					 ot_uart.rx_ringbuf->size)) > 0) {
 		int err;
 
 		otPlatUartReceived(data, len);
-		err = ring_buf_get_finish(
-				ot_uart.rx_ringbuf,
-				len);
+		err = ring_buf_get_finish(ot_uart.rx_ringbuf, len);
 		(void)err;
 		__ASSERT_NO_MSG(err == 0);
 	}
@@ -155,8 +149,7 @@ otError otPlatUartEnable(void)
 		return OT_ERROR_FAILED;
 	}
 
-	uart_irq_callback_user_data_set(ot_uart.dev,
-					uart_callback,
+	uart_irq_callback_user_data_set(ot_uart.dev, uart_callback,
 					(void *)&ot_uart);
 	uart_irq_rx_enable(ot_uart.dev);
 
@@ -177,7 +170,6 @@ otError otPlatUartDisable(void)
 	uart_irq_rx_disable(ot_uart.dev);
 	return OT_ERROR_NONE;
 };
-
 
 otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
@@ -208,7 +200,7 @@ otError otPlatUartFlush(void)
 
 	if (write_length) {
 		for (size_t i = 0; i < write_length; i++) {
-			uart_poll_out(ot_uart.dev, *(write_buffer+i));
+			uart_poll_out(ot_uart.dev, *(write_buffer + i));
 		}
 	}
 

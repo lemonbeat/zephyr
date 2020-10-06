@@ -40,10 +40,12 @@
  * thread of equal priority).  But only one metairq, as it isn't
  * technically legal to have more than one at the same priority.
  */
-const enum { METAIRQ, COOP, PREEMPTIBLE } worker_priorities[] = {
+const enum {
 	METAIRQ,
-	COOP, COOP,
-	PREEMPTIBLE, PREEMPTIBLE,
+	COOP,
+	PREEMPTIBLE
+} worker_priorities[] = {
+	METAIRQ, COOP, COOP, PREEMPTIBLE, PREEMPTIBLE,
 };
 
 #define NUM_THREADS ARRAY_SIZE(worker_priorities)
@@ -102,16 +104,16 @@ void wakeup_src_thread(int id)
 	for (int i = 0; i < NUM_THREADS; i++) {
 		k_tid_t th = &worker_threads[i];
 
-		zassert_equal(strcmp(k_thread_state_str(th), "pending"),
-				0, "worker thread %d not pending?", i);
+		zassert_equal(strcmp(k_thread_state_str(th), "pending"), 0,
+			      "worker thread %d not pending?", i);
 	}
 
 	/* Wake the src worker up */
 	last_thread = NULL;
 	k_sem_give(&worker_sems[id]);
 
-	while (do_sleep
-	       && !(worker_threads[id].base.thread_state & _THREAD_PENDING)) {
+	while (do_sleep &&
+	       !(worker_threads[id].base.thread_state & _THREAD_PENDING)) {
 		/* spin, waiting on the sleep timeout */
 #if defined(CONFIG_ARCH_POSIX)
 		/**
@@ -135,7 +137,6 @@ void manager(void *p1, void *p2, void *p3)
 {
 	for (int src = 0; src < NUM_THREADS; src++) {
 		for (target = 0; target < NUM_THREADS; target++) {
-
 			if (src == target) {
 				continue;
 			}
@@ -183,13 +184,15 @@ void validate_wakeup(int src, int target, k_tid_t last_thread)
 
 	if (do_yield) {
 		if (preempted) {
-			zassert_false(src_wins,
-				      "src (pri %d) should not have yielded to tgt (%d)",
-				      PRI(src), PRI(target));
+			zassert_false(
+				src_wins,
+				"src (pri %d) should not have yielded to tgt (%d)",
+				PRI(src), PRI(target));
 		} else {
-			zassert_true(src_wins,
-				      "src (pri %d) should have yielded to tgt (%d)",
-				      PRI(src), PRI(target));
+			zassert_true(
+				src_wins,
+				"src (pri %d) should have yielded to tgt (%d)",
+				PRI(src), PRI(target));
 		}
 
 		return;
@@ -200,18 +203,19 @@ void validate_wakeup(int src, int target, k_tid_t last_thread)
 	}
 
 	if (PRI(target) == METAIRQ) {
-		zassert_true(preempted,
-			     "metairq threads must always preempt");
+		zassert_true(preempted, "metairq threads must always preempt");
 	} else {
-		zassert_false(do_lock && preempted,
-			      "threads holding scheduler lock must not be preempted");
+		zassert_false(
+			do_lock && preempted,
+			"threads holding scheduler lock must not be preempted");
 
 		zassert_false(preempted && src_wins,
 			      "lower priority threads must never preempt");
 
 		if (!do_lock) {
-			zassert_false(!preempted && target_wins,
-				      "higher priority thread should have preempted");
+			zassert_false(
+				!preempted && target_wins,
+				"higher priority thread should have preempted");
 
 			/* The scheudler implements a 'first added to
 			 * queue' policy for threads within a single
@@ -317,8 +321,8 @@ void test_preempt(void)
 		if (worker_priorities[i] == METAIRQ) {
 			priority = K_HIGHEST_THREAD_PRIO;
 		} else if (worker_priorities[i] == COOP) {
-			priority = K_HIGHEST_THREAD_PRIO
-				+ CONFIG_NUM_METAIRQ_PRIORITIES;
+			priority = K_HIGHEST_THREAD_PRIO +
+				   CONFIG_NUM_METAIRQ_PRIORITIES;
 
 			zassert_true(priority < K_PRIO_PREEMPT(0), "");
 		} else {
@@ -327,15 +331,14 @@ void test_preempt(void)
 			zassert_true(priority >= K_PRIO_PREEMPT(0), "");
 		}
 
-		k_thread_create(&worker_threads[i],
-				worker_stacks[i], STACK_SIZE,
-				worker, INT_TO_POINTER(i), NULL, NULL,
-				priority, 0, K_NO_WAIT);
+		k_thread_create(&worker_threads[i], worker_stacks[i],
+				STACK_SIZE, worker, INT_TO_POINTER(i), NULL,
+				NULL, priority, 0, K_NO_WAIT);
 	}
 
-	k_thread_create(&manager_thread, manager_stack, STACK_SIZE,
-			manager, NULL, NULL, NULL,
-			K_LOWEST_APPLICATION_THREAD_PRIO, 0, K_NO_WAIT);
+	k_thread_create(&manager_thread, manager_stack, STACK_SIZE, manager,
+			NULL, NULL, NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0,
+			K_NO_WAIT);
 
 	/* We don't control the priority of this thread so can't make
 	 * it part of the test.  Just get out of the way until the
@@ -346,7 +349,6 @@ void test_preempt(void)
 
 void test_main(void)
 {
-	ztest_test_suite(suite_preempt,
-			 ztest_unit_test(test_preempt));
+	ztest_test_suite(suite_preempt, ztest_unit_test(test_preempt));
 	ztest_run_test_suite(suite_preempt);
 }

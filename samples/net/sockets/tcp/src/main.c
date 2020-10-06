@@ -17,11 +17,11 @@
 
 #define UDP_PORT 4242
 
-#define perror(fmt, args...)						\
-do {									\
-	printf("Error: " fmt "(): %s\n" ## args, strerror(errno));	\
-	exit(errno);							\
-} while (0)								\
+#define perror(fmt, args...)                                             \
+	do {                                                             \
+		printf("Error: " fmt "(): %s\n"##args, strerror(errno)); \
+		exit(errno);                                             \
+	} while (0)
 
 /*
  * This application is used together with the TTCN-3 based sanity check

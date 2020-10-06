@@ -13,49 +13,49 @@
 #include <sys/util.h>
 
 /* registers */
-#define ITDS_REG_TEMP_L			0x0d
-#define ITDS_REG_DEV_ID			0x0f
-#define ITDS_REG_CTRL1			0x20
-#define ITDS_REG_CTRL2			0x21
-#define ITDS_REG_CTRL3			0x22
-#define ITDS_REG_CTRL4			0x23
-#define ITDS_REG_CTRL5			0x24
-#define ITDS_REG_CTRL6			0x25
-#define ITDS_REG_STATUS			0x27
-#define ITDS_REG_X_OUT_L		0x28
-#define ITDS_REG_Y_OUT_L		0x2a
-#define ITDS_REG_Z_OUT_L		0x2c
-#define ITDS_REG_FIFO_CTRL		0x2e
-#define ITDS_REG_FIFO_SAMPLES		0x2f
-#define ITDS_REG_STATUS_DETECT		0x37
-#define ITDS_REG_WAKEUP_EVENT		0x38
-#define ITDS_REG_CTRL7			0x3f
+#define ITDS_REG_TEMP_L 0x0d
+#define ITDS_REG_DEV_ID 0x0f
+#define ITDS_REG_CTRL1 0x20
+#define ITDS_REG_CTRL2 0x21
+#define ITDS_REG_CTRL3 0x22
+#define ITDS_REG_CTRL4 0x23
+#define ITDS_REG_CTRL5 0x24
+#define ITDS_REG_CTRL6 0x25
+#define ITDS_REG_STATUS 0x27
+#define ITDS_REG_X_OUT_L 0x28
+#define ITDS_REG_Y_OUT_L 0x2a
+#define ITDS_REG_Z_OUT_L 0x2c
+#define ITDS_REG_FIFO_CTRL 0x2e
+#define ITDS_REG_FIFO_SAMPLES 0x2f
+#define ITDS_REG_STATUS_DETECT 0x37
+#define ITDS_REG_WAKEUP_EVENT 0x38
+#define ITDS_REG_CTRL7 0x3f
 
 /* bitfields */
-#define ITDS_MASK_SCALE			GENMASK(5, 4)
-#define ITDS_MASK_BDU_INC_ADD		GENMASK(3, 2)
-#define ITDS_MASK_FIFOTH		GENMASK(4, 0)
-#define ITDS_MASK_FIFOMODE		GENMASK(7, 5)
-#define ITDS_MASK_MODE			GENMASK(3, 0)
-#define ITDS_MASK_SAMPLES_COUNT		GENMASK(5, 0)
-#define ITDS_MASK_ODR			GENMASK(7, 4)
-#define ITDS_MASK_INT_DRDY		BIT(0)
-#define ITDS_MASK_INT_FIFOTH		BIT(1)
-#define ITDS_MASK_INT_EN		BIT(5)
+#define ITDS_MASK_SCALE GENMASK(5, 4)
+#define ITDS_MASK_BDU_INC_ADD GENMASK(3, 2)
+#define ITDS_MASK_FIFOTH GENMASK(4, 0)
+#define ITDS_MASK_FIFOMODE GENMASK(7, 5)
+#define ITDS_MASK_MODE GENMASK(3, 0)
+#define ITDS_MASK_SAMPLES_COUNT GENMASK(5, 0)
+#define ITDS_MASK_ODR GENMASK(7, 4)
+#define ITDS_MASK_INT_DRDY BIT(0)
+#define ITDS_MASK_INT_FIFOTH BIT(1)
+#define ITDS_MASK_INT_EN BIT(5)
 
-#define ITDS_EVENT_DRDY			BIT(0)
-#define ITDS_EVENT_DRDY_T		BIT(6)
-#define ITDS_EVENT_FIFO_TH		BIT(7)
-#define ITDS_FIFO_MODE_BYPASS		0
-#define ITDS_FIFO_MODE_FIFO		BIT(5)
-#define ITDS_DEVICE_ID			0x44
-#define ITDS_ACCL_FIFO_SIZE		32
-#define ITDS_TEMP_OFFSET		25
+#define ITDS_EVENT_DRDY BIT(0)
+#define ITDS_EVENT_DRDY_T BIT(6)
+#define ITDS_EVENT_FIFO_TH BIT(7)
+#define ITDS_FIFO_MODE_BYPASS 0
+#define ITDS_FIFO_MODE_FIFO BIT(5)
+#define ITDS_DEVICE_ID 0x44
+#define ITDS_ACCL_FIFO_SIZE 32
+#define ITDS_TEMP_OFFSET 25
 
 enum operation_mode {
-	ITDS_OP_MODE_LOW_POWER	= BIT(0),
-	ITDS_OP_MODE_NORMAL	= BIT(1),
-	ITDS_OP_MODE_HIGH_PERF	= BIT(2),
+	ITDS_OP_MODE_LOW_POWER = BIT(0),
+	ITDS_OP_MODE_NORMAL = BIT(1),
+	ITDS_OP_MODE_HIGH_PERF = BIT(2),
 };
 
 enum itds_accel_range_const {
@@ -100,10 +100,10 @@ struct itds_device_config {
 	int def_op_mode;
 };
 
-#define ITDS_SAMPLE_SIZE	3
+#define ITDS_SAMPLE_SIZE 3
 struct itds_device_data {
 	const struct device *i2c;
-#ifdef	CONFIG_ITDS_TRIGGER
+#ifdef CONFIG_ITDS_TRIGGER
 	const struct device *gpio;
 	struct gpio_callback gpio_cb;
 	struct k_work work;

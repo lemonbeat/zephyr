@@ -74,8 +74,8 @@ void arch_busy_wait(uint32_t usec_to_wait);
  * @param p3 3rd entry point parameter
  */
 void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
-		     char *stack_ptr, k_thread_entry_t entry,
-		     void *p1, void *p2, void *p3);
+		     char *stack_ptr, k_thread_entry_t entry, void *p1,
+		     void *p2, void *p3);
 
 #ifdef CONFIG_USE_SWITCH
 /**
@@ -147,8 +147,8 @@ int arch_swap(unsigned int key);
  * @param thread Pointer to thread object
  * @param value value to set as return value
  */
-static ALWAYS_INLINE void
-arch_thread_return_value_set(struct k_thread *thread, unsigned int value);
+static ALWAYS_INLINE void arch_thread_return_value_set(struct k_thread *thread,
+						       unsigned int value);
 #endif /* CONFIG_USE_SWITCH i*/
 
 #ifdef CONFIG_ARCH_HAS_CUSTOM_SWAP_TO_MAIN
@@ -193,7 +193,6 @@ int arch_float_disable(struct k_thread *thread);
 FUNC_NORETURN void arch_system_halt(unsigned int reason);
 
 /** @} */
-
 
 /**
  * @defgroup arch-irq Architecture-specific IRQ APIs

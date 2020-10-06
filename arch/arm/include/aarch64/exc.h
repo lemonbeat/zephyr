@@ -37,7 +37,6 @@ static ALWAYS_INLINE bool arch_is_in_isr(void)
 	return _kernel.cpus[0].nested != 0U;
 }
 
-
 extern void z_arm64_call_svc(void *switch_to, void **switched_from);
 
 #ifdef __cplusplus

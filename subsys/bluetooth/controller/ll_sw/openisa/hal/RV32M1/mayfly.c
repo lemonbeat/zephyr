@@ -20,9 +20,9 @@
 
 #if defined(CONFIG_BT_LL_SW_SPLIT)
 #include "ll_sw/lll.h"
-#define MAYFLY_CALL_ID_LLL    TICKER_USER_ID_LLL
+#define MAYFLY_CALL_ID_LLL TICKER_USER_ID_LLL
 #define MAYFLY_CALL_ID_WORKER TICKER_USER_ID_ULL_HIGH
-#define MAYFLY_CALL_ID_JOB    TICKER_USER_ID_ULL_LOW
+#define MAYFLY_CALL_ID_JOB TICKER_USER_ID_ULL_LOW
 #else
 #error Unknown LL variant.
 #endif

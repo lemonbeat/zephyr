@@ -22,23 +22,29 @@ LOG_MODULE_DECLARE(LOG_MODULE_NAME);
 
 #include "simplelink_support.h"
 
-#define SET_STATUS_BIT(status, bit) {status |= (1 << (bit)); }
-#define CLR_STATUS_BIT(status, bit) {status &= ~(1 << (bit)); }
+#define SET_STATUS_BIT(status, bit)     \
+	{                               \
+		status |= (1 << (bit)); \
+	}
+#define CLR_STATUS_BIT(status, bit)      \
+	{                                \
+		status &= ~(1 << (bit)); \
+	}
 #define GET_STATUS_BIT(status, bit) (0 != (status & (1 << (bit))))
 
-#define SL_STOP_TIMEOUT	 (200)
+#define SL_STOP_TIMEOUT (200)
 
 #undef ASSERT_ON_ERROR
 #define ASSERT_ON_ERROR(ret, e) __ASSERT(ret >= 0, e)
-#define DEVICE_ERROR	 "See \"DEVICE ERRORS CODES\" in SimpleLink errors.h"
-#define WLAN_ERROR	 "See \"WLAN ERRORS CODES\" in SimpleLink errors.h"
-#define NETAPP_ERROR	 "See \"NETAPP ERRORS CODES\" in SimpleLink errors.h"
+#define DEVICE_ERROR "See \"DEVICE ERRORS CODES\" in SimpleLink errors.h"
+#define WLAN_ERROR "See \"WLAN ERRORS CODES\" in SimpleLink errors.h"
+#define NETAPP_ERROR "See \"NETAPP ERRORS CODES\" in SimpleLink errors.h"
 
-#define CHANNEL_MASK_ALL	    (0x1FFF)
-#define RSSI_TH_MAX		    (-95)
+#define CHANNEL_MASK_ALL (0x1FFF)
+#define RSSI_TH_MAX (-95)
 
-#define SLNET_IF_WIFI_PRIO                    (5)
-#define SLNET_IF_WIFI_NAME                    "CC32xx"
+#define SLNET_IF_WIFI_PRIO (5)
+#define SLNET_IF_WIFI_NAME "CC32xx"
 
 enum status_bits {
 	/* Network Processor is powered up */
@@ -58,8 +64,8 @@ struct nwp_status {
 	simplelink_wifi_cb_t cb;
 
 	/* Status Variables */
-	uint32_t status;	/* The state of the NWP */
-	uint32_t role;	/* The device's role (STA, P2P or AP) */
+	uint32_t status; /* The state of the NWP */
+	uint32_t role; /* The device's role (STA, P2P or AP) */
 
 	/* Scan results table: */
 	SlWlanNetworkEntry_t net_entries[CONFIG_WIFI_SIMPLELINK_SCAN_COUNT];
@@ -127,8 +133,8 @@ static int32_t configure_simplelink(void)
 
 	/* Use Fast Connect Policy, to automatically connect to last AP: */
 	retval = sl_WlanPolicySet(SL_WLAN_POLICY_CONNECTION,
-				  SL_WLAN_CONNECTION_POLICY(1, 1, 0, 0),
-				  NULL, 0);
+				  SL_WLAN_CONNECTION_POLICY(1, 1, 0, 0), NULL,
+				  0);
 	ASSERT_ON_ERROR(retval, WLAN_ERROR);
 
 	/* Disable Auto Provisioning*/
@@ -141,15 +147,13 @@ static int32_t configure_simplelink(void)
 	ASSERT_ON_ERROR(retval, WLAN_ERROR);
 
 #if defined(CONFIG_NET_IPV4) && defined(CONFIG_NET_CONFIG_MY_IPV4_ADDR)
-	if (net_addr_pton(AF_INET, CONFIG_NET_CONFIG_MY_IPV4_ADDR, &addr4)
-			< 0) {
+	if (net_addr_pton(AF_INET, CONFIG_NET_CONFIG_MY_IPV4_ADDR, &addr4) <
+	    0) {
 		LOG_ERR("Invalid CONFIG_NET_CONFIG_MY_IPV4_ADDR");
 		return -1;
 	}
-	ipV4.Ip = (_u32)SL_IPV4_VAL(addr4.s4_addr[0],
-				    addr4.s4_addr[1],
-				    addr4.s4_addr[2],
-				    addr4.s4_addr[3]);
+	ipV4.Ip = (_u32)SL_IPV4_VAL(addr4.s4_addr[0], addr4.s4_addr[1],
+				    addr4.s4_addr[2], addr4.s4_addr[3]);
 
 #if defined(CONFIG_NET_CONFIG_MY_IPV4_GW)
 	if (strcmp(CONFIG_NET_CONFIG_MY_IPV4_GW, "") != 0) {
@@ -158,10 +162,9 @@ static int32_t configure_simplelink(void)
 			LOG_ERR("Invalid CONFIG_NET_CONFIG_MY_IPV4_GW");
 			return -1;
 		}
-		ipV4.IpGateway = (_u32)SL_IPV4_VAL(addr4.s4_addr[0],
-						   addr4.s4_addr[1],
-						   addr4.s4_addr[2],
-						   addr4.s4_addr[3]);
+		ipV4.IpGateway =
+			(_u32)SL_IPV4_VAL(addr4.s4_addr[0], addr4.s4_addr[1],
+					  addr4.s4_addr[2], addr4.s4_addr[3]);
 	}
 #endif
 
@@ -172,21 +175,20 @@ static int32_t configure_simplelink(void)
 			LOG_ERR("Invalid CONFIG_NET_CONFIG_MY_IPV4_NETMASK");
 			return -1;
 		}
-		ipV4.IpMask = (_u32)SL_IPV4_VAL(addr4.s4_addr[0],
-						addr4.s4_addr[1],
-						addr4.s4_addr[2],
-						addr4.s4_addr[3]);
+		ipV4.IpMask =
+			(_u32)SL_IPV4_VAL(addr4.s4_addr[0], addr4.s4_addr[1],
+					  addr4.s4_addr[2], addr4.s4_addr[3]);
 	}
 #endif
 
 	retval = sl_NetCfgSet(SL_NETCFG_IPV4_STA_ADDR_MODE,
-			      SL_NETCFG_ADDR_STATIC,
-			      sizeof(SlNetCfgIpV4Args_t), (_u8 *)&ipV4);
+			      SL_NETCFG_ADDR_STATIC, sizeof(SlNetCfgIpV4Args_t),
+			      (_u8 *)&ipV4);
 	ASSERT_ON_ERROR(retval, NETAPP_ERROR);
 #else
 	/* enable DHCP client */
-	retval = sl_NetCfgSet(SL_NETCFG_IPV4_STA_ADDR_MODE,
-			      SL_NETCFG_ADDR_DHCP, 0, 0);
+	retval = sl_NetCfgSet(SL_NETCFG_IPV4_STA_ADDR_MODE, SL_NETCFG_ADDR_DHCP,
+			      0, 0);
 	ASSERT_ON_ERROR(retval, NETAPP_ERROR);
 #endif
 
@@ -194,8 +196,8 @@ static int32_t configure_simplelink(void)
 	if_bitmap = ~0;
 #else
 	/* Disable ipv6 */
-	if_bitmap = !(SL_NETCFG_IF_IPV6_STA_LOCAL |
-		      SL_NETCFG_IF_IPV6_STA_GLOBAL);
+	if_bitmap =
+		!(SL_NETCFG_IF_IPV6_STA_LOCAL | SL_NETCFG_IF_IPV6_STA_GLOBAL);
 #endif
 	retval = sl_NetCfgSet(SL_NETCFG_IF, SL_NETCFG_IF_STATE,
 			      sizeof(if_bitmap),
@@ -274,7 +276,7 @@ static int32_t configure_simplelink(void)
  */
 void SimpleLinkWlanEventHandler(SlWlanEvent_t *wlan_event)
 {
-	SlWlanEventDisconnect_t	 *event_data = NULL;
+	SlWlanEventDisconnect_t *event_data = NULL;
 
 	if (!wlan_event) {
 		return;
@@ -293,9 +295,8 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *wlan_event)
 		LOG_INF("[WLAN EVENT] STA Connected to the AP: %s, "
 			"BSSID: %x:%x:%x:%x:%x:%x",
 			log_strdup(sl_conn.ssid), sl_conn.bssid[0],
-			sl_conn.bssid[1], sl_conn.bssid[2],
-			sl_conn.bssid[3], sl_conn.bssid[4],
-			sl_conn.bssid[5]);
+			sl_conn.bssid[1], sl_conn.bssid[2], sl_conn.bssid[3],
+			sl_conn.bssid[4], sl_conn.bssid[5]);
 
 		/* Continue the notification callback chain... */
 		sl_conn.error = 0;
@@ -318,20 +319,19 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *wlan_event)
 				"Device disconnected from the AP: %s",
 				log_strdup(event_data->SsidName));
 			LOG_INF("BSSID: %x:%x:%x:%x:%x:%x on application's"
-				" request", event_data->Bssid[0],
-				event_data->Bssid[1], event_data->Bssid[2],
-				event_data->Bssid[3], event_data->Bssid[4],
-				event_data->Bssid[5]);
+				" request",
+				event_data->Bssid[0], event_data->Bssid[1],
+				event_data->Bssid[2], event_data->Bssid[3],
+				event_data->Bssid[4], event_data->Bssid[5]);
 			sl_conn.error = 0;
 		} else {
 			LOG_ERR("[WLAN ERROR] "
 				"Device disconnected from the AP: %s",
 				log_strdup(event_data->SsidName));
 			LOG_ERR("BSSID: %x:%x:%x:%x:%x:%x on error: %d",
-				event_data->Bssid[0],
-				event_data->Bssid[1], event_data->Bssid[2],
-				event_data->Bssid[3], event_data->Bssid[4],
-				event_data->Bssid[5],
+				event_data->Bssid[0], event_data->Bssid[1],
+				event_data->Bssid[2], event_data->Bssid[3],
+				event_data->Bssid[4], event_data->Bssid[5],
 				event_data->ReasonCode);
 			sl_conn.error = event_data->ReasonCode;
 		}
@@ -348,18 +348,16 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *wlan_event)
 		       SL_WLAN_BSSID_LENGTH);
 		LOG_INF("[WLAN EVENT] STA was added to AP: "
 			"BSSID: %x:%x:%x:%x:%x:%x",
-			sl_conn.bssid[0], sl_conn.bssid[1],
-			sl_conn.bssid[2], sl_conn.bssid[3],
-			sl_conn.bssid[4], sl_conn.bssid[5]);
+			sl_conn.bssid[0], sl_conn.bssid[1], sl_conn.bssid[2],
+			sl_conn.bssid[3], sl_conn.bssid[4], sl_conn.bssid[5]);
 		break;
 	case SL_WLAN_EVENT_STA_REMOVED:
 		memcpy(&(sl_conn.bssid), wlan_event->Data.STAAdded.Mac,
 		       SL_WLAN_BSSID_LENGTH);
 		LOG_INF("[WLAN EVENT] STA was removed from AP: "
 			"BSSID: %x:%x:%x:%x:%x:%x",
-			sl_conn.bssid[0], sl_conn.bssid[1],
-			sl_conn.bssid[2], sl_conn.bssid[3],
-			sl_conn.bssid[4], sl_conn.bssid[5]);
+			sl_conn.bssid[0], sl_conn.bssid[1], sl_conn.bssid[2],
+			sl_conn.bssid[3], sl_conn.bssid[4], sl_conn.bssid[5]);
 
 		(void)memset(&(sl_conn.bssid), 0x0, sizeof(sl_conn.bssid));
 		break;
@@ -419,7 +417,7 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *netapp_event)
 
 		for (i = 0U; i < 4; i++) {
 			sl_conn.ipv6_addr[i] =
-			  netapp_event->Data.IpAcquiredV6.Ip[i];
+				netapp_event->Data.IpAcquiredV6.Ip[i];
 		}
 
 		if (LOG_LEVEL >= LOG_LEVEL_INF) {
@@ -433,7 +431,6 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *netapp_event)
 				sl_conn.ipv6_addr[2] & 0xffff,
 				((sl_conn.ipv6_addr[3] >> 16) & 0xffff),
 				sl_conn.ipv6_addr[3] & 0xffff);
-
 		}
 
 		nwp.cb(SIMPLELINK_WIFI_CB_IPV6ACQUIRED, &sl_conn);
@@ -464,7 +461,7 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *netapp_event)
 	}
 
 	if ((netapp_event->Id == SL_NETAPP_EVENT_IPV4_ACQUIRED) ||
-		(netapp_event->Id == SL_NETAPP_EVENT_IPV6_ACQUIRED)) {
+	    (netapp_event->Id == SL_NETAPP_EVENT_IPV6_ACQUIRED)) {
 		/* Initialize SlNetSock layer for getaddrinfo */
 		SlNetIf_init(0);
 		/*
@@ -472,7 +469,8 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *netapp_event)
 		 * for the WiFi interface, so hardcoding the interface
 		 * id to 1 here.
 		 */
-		SlNetIf_add(SLNETIF_ID_1, SLNET_IF_WIFI_NAME,
+		SlNetIf_add(
+			SLNETIF_ID_1, SLNET_IF_WIFI_NAME,
 			(const SlNetIf_Config_t *)&slnetifwifi_config_zephyr,
 			SLNET_IF_WIFI_PRIO);
 
@@ -498,8 +496,7 @@ void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *dev_event)
 	}
 
 	LOG_INF("[GENERAL EVENT] - ID=[%d] Sender=[%d]",
-		dev_event->Data.Error.Code,
-		dev_event->Data.Error.Source);
+		dev_event->Data.Error.Code, dev_event->Data.Error.Source);
 }
 
 /**
@@ -510,7 +507,6 @@ void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *dev_event)
  */
 void SimpleLinkFatalErrorEventHandler(SlDeviceFatal_t *fatal_err_event)
 {
-
 	switch (fatal_err_event->Id) {
 	case SL_DEVICE_EVENT_FATAL_DEVICE_ABORT:
 		LOG_ERR("[ERROR] - FATAL ERROR: "
@@ -562,7 +558,6 @@ void SimpleLinkHttpServerEventHandler(SlNetAppHttpServerEvent_t *http_event,
 	ARG_UNUSED(http_resp);
 }
 
-
 /* Unused, but must be defined to link.	 */
 void SimpleLinkNetAppRequestEventHandler(SlNetAppRequest_t *netapp_request,
 					 SlNetAppResponse_t *netapp_response)
@@ -583,7 +578,7 @@ void SimpleLinkNetAppRequestMemFreeEventHandler(uint8_t *buffer)
  * - Other types of security
  */
 void z_simplelink_get_scan_result(int index,
-				 struct wifi_scan_result *scan_result)
+				  struct wifi_scan_result *scan_result)
 {
 	SlWlanNetworkEntry_t *net_entry;
 	int sec_bmp;
@@ -632,8 +627,8 @@ void z_simplelink_get_mac(unsigned char *mac)
 	uint16_t mac_len = SL_MAC_ADDR_LEN;
 	uint16_t config_opt = 0U;
 
-	sl_NetCfgGet(SL_NETCFG_MAC_ADDRESS_GET, &config_opt,
-		     &mac_len, (uint8_t *)mac);
+	sl_NetCfgGet(SL_NETCFG_MAC_ADDRESS_GET, &config_opt, &mac_len,
+		     (uint8_t *)mac);
 }
 
 int z_simplelink_connect(struct wifi_connect_req_params *params)

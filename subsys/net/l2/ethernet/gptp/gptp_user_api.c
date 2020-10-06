@@ -44,8 +44,7 @@ void gptp_call_phase_dis_cb(void)
 		struct gptp_phase_dis_cb *phase_dis =
 			CONTAINER_OF(sn, struct gptp_phase_dis_cb, node);
 
-		phase_dis->cb(gm_id,
-			      &global_ds->gm_time_base_indicator,
+		phase_dis->cb(gm_id, &global_ds->gm_time_base_indicator,
 			      &global_ds->clk_src_last_gm_phase_change,
 			      &global_ds->clk_src_last_gm_freq_change);
 	}
@@ -57,7 +56,7 @@ int gptp_event_capture(struct net_ptp_time *slave_time, bool *gm_present)
 	const struct device *clk;
 
 	key = irq_lock();
-	*gm_present =  GPTP_GLOBAL_DS()->gm_present;
+	*gm_present = GPTP_GLOBAL_DS()->gm_present;
 
 	for (port = GPTP_PORT_START; port <= GPTP_PORT_END; port++) {
 		/* Get first available clock, or slave clock if GM present. */
@@ -76,7 +75,8 @@ int gptp_event_capture(struct net_ptp_time *slave_time, bool *gm_present)
 	return -EAGAIN;
 }
 
-char *gptp_sprint_clock_id(const uint8_t *clk_id, char *output, size_t output_len)
+char *gptp_sprint_clock_id(const uint8_t *clk_id, char *output,
+			   size_t output_len)
 {
 	return net_sprint_ll_addr_buf(clk_id, 8, output, output_len);
 }

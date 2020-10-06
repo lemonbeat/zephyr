@@ -29,4 +29,4 @@ static inline int poll(struct pollfd *fds, int nfds, int timeout)
 }
 #endif
 
-#endif	/* ZEPHYR_INCLUDE_POSIX_POLL_H_ */
+#endif /* ZEPHYR_INCLUDE_POSIX_POLL_H_ */

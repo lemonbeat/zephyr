@@ -55,14 +55,13 @@ void sdl_handle_events(void)
 			break;
 		}
 	}
-
 }
 
 static void sdl_init(void)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		posix_print_error_and_exit("Error on SDL_Init (%s)\n",
-				SDL_GetError());
+					   SDL_GetError());
 	}
 }
 

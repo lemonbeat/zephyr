@@ -119,11 +119,10 @@ static ALWAYS_INLINE void z_arm_exc_setup(void)
 	 * NMI and Bus Faults targeting the Secure state will
 	 * escalate to a SecureFault or SecureHardFault.
 	 */
-	SCB->AIRCR =
-		(SCB->AIRCR & (~(SCB_AIRCR_VECTKEY_Msk)))
-		| SCB_AIRCR_BFHFNMINS_Msk
-		| ((AIRCR_VECT_KEY_PERMIT_WRITE << SCB_AIRCR_VECTKEY_Pos) &
-			SCB_AIRCR_VECTKEY_Msk);
+	SCB->AIRCR = (SCB->AIRCR & (~(SCB_AIRCR_VECTKEY_Msk))) |
+		     SCB_AIRCR_BFHFNMINS_Msk |
+		     ((AIRCR_VECT_KEY_PERMIT_WRITE << SCB_AIRCR_VECTKEY_Pos) &
+		      SCB_AIRCR_VECTKEY_Msk);
 	/* Note: Fault conditions that would generate a SecureFault
 	 * in a PE with the Main Extension instead generate a
 	 * SecureHardFault in a PE without the Main Extension.
@@ -143,8 +142,7 @@ static ALWAYS_INLINE void z_arm_clear_faults(void)
 #if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE)
 #elif defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
 	/* Reset all faults */
-	SCB->CFSR = SCB_CFSR_USGFAULTSR_Msk |
-		    SCB_CFSR_MEMFAULTSR_Msk |
+	SCB->CFSR = SCB_CFSR_USGFAULTSR_Msk | SCB_CFSR_MEMFAULTSR_Msk |
 		    SCB_CFSR_BUSFAULTSR_Msk;
 
 	/* Clear all Hard Faults - HFSR is write-one-to-clear */

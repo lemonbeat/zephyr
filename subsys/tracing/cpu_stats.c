@@ -9,11 +9,7 @@
 #include <kernel_internal.h>
 #include <ksched.h>
 
-enum cpu_state {
-	CPU_STATE_IDLE,
-	CPU_STATE_NON_IDLE,
-	CPU_STATE_SCHEDULER
-};
+enum cpu_state { CPU_STATE_IDLE, CPU_STATE_NON_IDLE, CPU_STATE_SCHEDULER };
 
 static enum cpu_state last_cpu_state = CPU_STATE_SCHEDULER;
 static enum cpu_state cpu_state_before_interrupts;
@@ -75,8 +71,8 @@ uint32_t cpu_stats_non_idle_and_sched_get_percent(void)
 	cpu_stats_update_counters();
 	irq_unlock(key);
 	return ((stats_hw_tick.non_idle + stats_hw_tick.sched) * 100) /
-		(stats_hw_tick.idle + stats_hw_tick.non_idle +
-		 stats_hw_tick.sched);
+	       (stats_hw_tick.idle + stats_hw_tick.non_idle +
+		stats_hw_tick.sched);
 }
 
 void cpu_stats_reset_counters(void)

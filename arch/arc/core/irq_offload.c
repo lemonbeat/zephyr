@@ -22,12 +22,11 @@ void z_irq_do_offload(void)
 
 void arch_irq_offload(irq_offload_routine_t routine, const void *parameter)
 {
-
 	offload_routine = routine;
 	offload_param = parameter;
 
-	__asm__ volatile ("trap_s %[id]"
-		:
-		: [id] "i"(_TRAP_S_SCALL_IRQ_OFFLOAD) : );
-
+	__asm__ volatile("trap_s %[id]"
+			 :
+			 : [id] "i"(_TRAP_S_SCALL_IRQ_OFFLOAD)
+			 :);
 }

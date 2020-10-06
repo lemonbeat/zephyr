@@ -54,7 +54,7 @@ static void setup_stack_vars(struct k_thread *thread)
 		thread->arch.priv_stack_start =
 			(uint32_t)z_priv_stack_find(thread->stack_obj);
 #else
-		thread->arch.priv_stack_start =	(uint32_t)(thread->stack_obj);
+		thread->arch.priv_stack_start = (uint32_t)(thread->stack_obj);
 #endif /* CONFIG_GEN_PRIV_STACKS */
 		thread->arch.priv_stack_start += Z_ARC_STACK_GUARD_SIZE;
 	} else {
@@ -69,14 +69,14 @@ static void setup_stack_vars(struct k_thread *thread)
 		thread->arch.k_stack_base = (thread->arch.priv_stack_start +
 					     CONFIG_PRIVILEGED_STACK_SIZE);
 		thread->arch.u_stack_top = thread->stack_info.start;
-		thread->arch.u_stack_base = (thread->stack_info.start +
-					     thread->stack_info.size);
+		thread->arch.u_stack_base =
+			(thread->stack_info.start + thread->stack_info.size);
 	} else
 #endif /* CONFIG_USERSPACE */
 	{
 		thread->arch.k_stack_top = (uint32_t)thread->stack_info.start;
-		thread->arch.k_stack_base = (uint32_t)(thread->stack_info.start +
-						    thread->stack_info.size);
+		thread->arch.k_stack_base = (uint32_t)(
+			thread->stack_info.start + thread->stack_info.size);
 #ifdef CONFIG_USERSPACE
 		thread->arch.u_stack_top = 0;
 		thread->arch.u_stack_base = 0;
@@ -98,9 +98,10 @@ static struct init_stack_frame *get_iframe(struct k_thread *thread,
 		 */
 		struct user_init_stack_frame *uframe;
 
-		uframe = Z_STACK_PTR_TO_FRAME(struct user_init_stack_frame,
-					      thread->arch.priv_stack_start +
-					      CONFIG_PRIVILEGED_STACK_SIZE);
+		uframe = Z_STACK_PTR_TO_FRAME(
+			struct user_init_stack_frame,
+			thread->arch.priv_stack_start +
+				CONFIG_PRIVILEGED_STACK_SIZE);
 		uframe->user_sp = (uint32_t)stack_ptr;
 		return &uframe->iframe;
 	}
@@ -114,8 +115,8 @@ static struct init_stack_frame *get_iframe(struct k_thread *thread,
  * and status register.
  */
 void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
-		     char *stack_ptr, k_thread_entry_t entry,
-		     void *p1, void *p2, void *p3)
+		     char *stack_ptr, k_thread_entry_t entry, void *p1,
+		     void *p2, void *p3)
 {
 	struct init_stack_frame *iframe;
 
@@ -169,14 +170,14 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
 
 void *z_arch_get_next_switch_handle(struct k_thread **old_thread)
 {
-	*old_thread =  _current;
+	*old_thread = _current;
 
 	return z_get_next_switch_handle(*old_thread);
 }
 
 #ifdef CONFIG_USERSPACE
-FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry,
-					void *p1, void *p2, void *p3)
+FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry, void *p1,
+					void *p2, void *p3)
 {
 	setup_stack_vars(_current);
 
@@ -184,10 +185,10 @@ FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry,
 	/* need to lock cpu here ? */
 	configure_mpu_thread(_current);
 
-	z_arc_userspace_enter(user_entry, p1, p2, p3,
-			      (uint32_t)_current->stack_info.start,
-			      (_current->stack_info.size -
-			       _current->stack_info.delta), _current);
+	z_arc_userspace_enter(
+		user_entry, p1, p2, p3, (uint32_t)_current->stack_info.start,
+		(_current->stack_info.size - _current->stack_info.delta),
+		_current);
 	CODE_UNREACHABLE;
 }
 #endif
@@ -208,7 +209,6 @@ int arch_float_disable(struct k_thread *thread)
 
 	return 0;
 }
-
 
 int arch_float_enable(struct k_thread *thread)
 {

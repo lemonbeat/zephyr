@@ -43,16 +43,16 @@
 
 #define FLASH_SIMULATOR_DEV_NAME DT_INST_LABEL(0)
 #define FLASH_SIMULATOR_ERASE_VALUE \
-		DT_PROP(DT_PARENT(SOC_NV_FLASH_NODE), erase_value)
+	DT_PROP(DT_PARENT(SOC_NV_FLASH_NODE), erase_value)
 
-#define FLASH_SIMULATOR_PAGE_COUNT (FLASH_SIMULATOR_FLASH_SIZE / \
-				    FLASH_SIMULATOR_ERASE_UNIT)
+#define FLASH_SIMULATOR_PAGE_COUNT \
+	(FLASH_SIMULATOR_FLASH_SIZE / FLASH_SIMULATOR_ERASE_UNIT)
 
 #if (FLASH_SIMULATOR_ERASE_UNIT % FLASH_SIMULATOR_PROG_UNIT)
 #error "Erase unit must be a multiple of program unit"
 #endif
 
-#define FLASH(addr) (mock_flash + (addr) - FLASH_SIMULATOR_BASE_OFFSET)
+#define FLASH(addr) (mock_flash + (addr)-FLASH_SIMULATOR_BASE_OFFSET)
 
 /* maximum number of pages that can be tracked by the stats module */
 #define STATS_PAGE_COUNT_THRESHOLD 256
@@ -64,33 +64,33 @@
 #define STATS_NAME_DIRTYR(N, _) STATS_NAME(flash_sim_stats, dirty_read_unit##N)
 
 /* increment a unit erase cycles counter */
-#define ERASE_CYCLES_INC(U)						     \
-	do {								     \
-		if (U < STATS_PAGE_COUNT_THRESHOLD) {			     \
+#define ERASE_CYCLES_INC(U)                                                  \
+	do {                                                                 \
+		if (U < STATS_PAGE_COUNT_THRESHOLD) {                        \
 			(*(&flash_sim_stats.erase_cycles_unit0 + (U)) += 1); \
-		}							     \
+		}                                                            \
 	} while (0)
 
 #if (defined(CONFIG_STATS) && \
      (CONFIG_FLASH_SIMULATOR_STAT_PAGE_COUNT > STATS_PAGE_COUNT_THRESHOLD))
-       /* Limitation above is caused by used UTIL_REPEAT                    */
-       /* Using FLASH_SIMULATOR_FLASH_PAGE_COUNT allows to avoid terrible   */
-       /* error logg at the output and work with the stats module partially */
-       #define FLASH_SIMULATOR_FLASH_PAGE_COUNT STATS_PAGE_COUNT_THRESHOLD
+/* Limitation above is caused by used UTIL_REPEAT                    */
+/* Using FLASH_SIMULATOR_FLASH_PAGE_COUNT allows to avoid terrible   */
+/* error logg at the output and work with the stats module partially */
+#define FLASH_SIMULATOR_FLASH_PAGE_COUNT STATS_PAGE_COUNT_THRESHOLD
 #else
 #define FLASH_SIMULATOR_FLASH_PAGE_COUNT CONFIG_FLASH_SIMULATOR_STAT_PAGE_COUNT
 #endif
 
 /* simulator statistics */
 STATS_SECT_START(flash_sim_stats)
-STATS_SECT_ENTRY32(bytes_read)		/* total bytes read */
-STATS_SECT_ENTRY32(bytes_written)       /* total bytes written */
-STATS_SECT_ENTRY32(double_writes)       /* num. of writes to non-erased units */
-STATS_SECT_ENTRY32(flash_read_calls)    /* calls to flash_read() */
-STATS_SECT_ENTRY32(flash_read_time_us)  /* time spent in flash_read() */
-STATS_SECT_ENTRY32(flash_write_calls)   /* calls to flash_write() */
+STATS_SECT_ENTRY32(bytes_read) /* total bytes read */
+STATS_SECT_ENTRY32(bytes_written) /* total bytes written */
+STATS_SECT_ENTRY32(double_writes) /* num. of writes to non-erased units */
+STATS_SECT_ENTRY32(flash_read_calls) /* calls to flash_read() */
+STATS_SECT_ENTRY32(flash_read_time_us) /* time spent in flash_read() */
+STATS_SECT_ENTRY32(flash_write_calls) /* calls to flash_write() */
 STATS_SECT_ENTRY32(flash_write_time_us) /* time spent in flash_write() */
-STATS_SECT_ENTRY32(flash_erase_calls)   /* calls to flash_erase() */
+STATS_SECT_ENTRY32(flash_erase_calls) /* calls to flash_erase() */
 STATS_SECT_ENTRY32(flash_erase_time_us) /* time spent in flash_erase() */
 /* -- per-unit statistics -- */
 /* erase cycle count for unit */
@@ -150,8 +150,8 @@ static int flash_range_is_valid(const struct device *dev, off_t offset,
 				size_t len)
 {
 	ARG_UNUSED(dev);
-	if ((offset + len > FLASH_SIMULATOR_FLASH_SIZE +
-			    FLASH_SIMULATOR_BASE_OFFSET) ||
+	if ((offset + len >
+	     FLASH_SIMULATOR_FLASH_SIZE + FLASH_SIMULATOR_BASE_OFFSET) ||
 	    (offset < FLASH_SIMULATOR_BASE_OFFSET)) {
 		return 0;
 	}
@@ -173,8 +173,7 @@ static bool flash_wp_is_set(void)
 }
 
 static int flash_sim_read(const struct device *dev, const off_t offset,
-			  void *data,
-			  const size_t len)
+			  void *data, const size_t len)
 {
 	ARG_UNUSED(dev);
 
@@ -239,10 +238,10 @@ static int flash_sim_write(const struct device *dev, const off_t offset,
 
 	if (flash_sim_thresholds.max_write_calls != 0) {
 		if (flash_sim_stats.flash_write_calls >
-			flash_sim_thresholds.max_write_calls) {
+		    flash_sim_thresholds.max_write_calls) {
 			return 0;
 		} else if (flash_sim_stats.flash_write_calls ==
-				flash_sim_thresholds.max_write_calls) {
+			   flash_sim_thresholds.max_write_calls) {
 			if (flash_sim_thresholds.max_len == 0) {
 				return 0;
 			}
@@ -312,13 +311,13 @@ static int flash_sim_erase(const struct device *dev, const off_t offset,
 
 	if ((flash_sim_thresholds.max_erase_calls != 0) &&
 	    (flash_sim_stats.flash_erase_calls >=
-		flash_sim_thresholds.max_erase_calls)){
+	     flash_sim_thresholds.max_erase_calls)) {
 		return 0;
 	}
 
 	/* the first unit to be erased */
 	uint32_t unit_start = (offset - FLASH_SIMULATOR_BASE_OFFSET) /
-			   FLASH_SIMULATOR_ERASE_UNIT;
+			      FLASH_SIMULATOR_ERASE_UNIT;
 
 	/* erase as many units as necessary and increase their erase counter */
 	for (uint32_t i = 0; i < len / FLASH_SIMULATOR_ERASE_UNIT; i++) {
@@ -440,8 +439,8 @@ static int flash_init(const struct device *dev)
 	return flash_mock_init(dev);
 }
 
-DEVICE_AND_API_INIT(flash_simulator, FLASH_SIMULATOR_DEV_NAME, flash_init,
-		    NULL, NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(flash_simulator, FLASH_SIMULATOR_DEV_NAME, flash_init, NULL,
+		    NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &flash_sim_api);
 
 #ifdef CONFIG_ARCH_POSIX
@@ -474,7 +473,6 @@ static void flash_native_posix_options(void)
 
 	native_add_command_line_opts(flash_options);
 }
-
 
 NATIVE_TASK(flash_native_posix_options, PRE_BOOT_1, 1);
 NATIVE_TASK(flash_native_posix_cleanup, ON_EXIT, 1);

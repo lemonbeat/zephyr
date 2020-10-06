@@ -317,8 +317,7 @@ static int element_token(enum json_tokens token)
 	}
 }
 
-static int obj_next(struct json_obj *json,
-		    struct json_obj_key_value *kv)
+static int obj_next(struct json_obj *json, struct json_obj_key_value *kv)
 {
 	struct token token;
 
@@ -424,18 +423,16 @@ static bool equivalent_types(enum json_tokens type1, enum json_tokens type2)
 	return type1 == type2;
 }
 
-static int obj_parse(struct json_obj *obj,
-		     const struct json_obj_descr *descr, size_t descr_len,
-		     void *val);
+static int obj_parse(struct json_obj *obj, const struct json_obj_descr *descr,
+		     size_t descr_len, void *val);
 static int arr_parse(struct json_obj *obj,
 		     const struct json_obj_descr *elem_descr,
 		     size_t max_elements, void *field, void *val);
 
 static int decode_value(struct json_obj *obj,
-			const struct json_obj_descr *descr,
-			struct token *value, void *field, void *val)
+			const struct json_obj_descr *descr, struct token *value,
+			void *field, void *val)
 {
-
 	if (!equivalent_types(value->type, descr->type)) {
 		return -EINVAL;
 	}
@@ -443,8 +440,7 @@ static int decode_value(struct json_obj *obj,
 	switch (descr->type) {
 	case JSON_TOK_OBJECT_START:
 		return obj_parse(obj, descr->object.sub_descr,
-				 descr->object.sub_descr_len,
-				 field);
+				 descr->object.sub_descr_len, field);
 	case JSON_TOK_LIST_START:
 		return arr_parse(obj, descr->array.element_descr,
 				 descr->array.n_elements, field, val);
@@ -485,13 +481,15 @@ static ptrdiff_t get_elem_size(const struct json_obj_descr *descr)
 	case JSON_TOK_FALSE:
 		return sizeof(bool);
 	case JSON_TOK_LIST_START:
-		return descr->array.n_elements * get_elem_size(descr->array.element_descr);
+		return descr->array.n_elements *
+		       get_elem_size(descr->array.element_descr);
 	case JSON_TOK_OBJECT_START: {
 		ptrdiff_t total = 0;
 		size_t i;
 
 		for (i = 0; i < descr->object.sub_descr_len; i++) {
-			ptrdiff_t s = get_elem_size(&descr->object.sub_descr[i]);
+			ptrdiff_t s =
+				get_elem_size(&descr->object.sub_descr[i]);
 
 			total += ROUND_UP(s, 1 << descr->align_shift);
 		}
@@ -574,7 +572,7 @@ static int obj_parse(struct json_obj *obj, const struct json_obj_descr *descr,
 				return ret;
 			}
 
-			decoded_fields |= 1<<i;
+			decoded_fields |= 1 << i;
 			break;
 		}
 	}
@@ -622,8 +620,7 @@ static char escape_as(char chr)
 }
 
 static int json_escape_internal(const char *str,
-				json_append_bytes_t append_bytes,
-				void *data)
+				json_append_bytes_t append_bytes, void *data)
 {
 	const char *cur;
 	int ret = 0;
@@ -812,12 +809,12 @@ static int encode(const struct json_obj_descr *descr, const void *val,
 	case JSON_TOK_STRING:
 		return str_encode(ptr, append_bytes, data);
 	case JSON_TOK_LIST_START:
-		return arr_encode(descr->array.element_descr, ptr,
-				  val, append_bytes, data);
+		return arr_encode(descr->array.element_descr, ptr, val,
+				  append_bytes, data);
 	case JSON_TOK_OBJECT_START:
 		return json_obj_encode(descr->object.sub_descr,
-				       descr->object.sub_descr_len,
-				       ptr, append_bytes, data);
+				       descr->object.sub_descr_len, ptr,
+				       append_bytes, data);
 	case JSON_TOK_NUMBER:
 		return num_encode(ptr, append_bytes, data);
 	default:

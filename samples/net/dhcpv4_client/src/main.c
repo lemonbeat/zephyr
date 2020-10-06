@@ -22,8 +22,7 @@ LOG_MODULE_REGISTER(net_dhcpv4_client_sample, LOG_LEVEL_DBG);
 
 static struct net_mgmt_event_callback mgmt_cb;
 
-static void handler(struct net_mgmt_event_callback *cb,
-		    uint32_t mgmt_event,
+static void handler(struct net_mgmt_event_callback *cb, uint32_t mgmt_event,
 		    struct net_if *iface)
 {
 	int i = 0;
@@ -36,20 +35,22 @@ static void handler(struct net_mgmt_event_callback *cb,
 		char buf[NET_IPV4_ADDR_LEN];
 
 		if (iface->config.ip.ipv4->unicast[i].addr_type !=
-							NET_ADDR_DHCP) {
+		    NET_ADDR_DHCP) {
 			continue;
 		}
 
 		LOG_INF("Your address: %s",
-			log_strdup(net_addr_ntop(AF_INET,
-			    &iface->config.ip.ipv4->unicast[i].address.in_addr,
-						  buf, sizeof(buf))));
+			log_strdup(
+				net_addr_ntop(AF_INET,
+					      &iface->config.ip.ipv4->unicast[i]
+						       .address.in_addr,
+					      buf, sizeof(buf))));
 		LOG_INF("Lease time: %u seconds",
-			 iface->config.dhcpv4.lease_time);
+			iface->config.dhcpv4.lease_time);
 		LOG_INF("Subnet: %s",
-			log_strdup(net_addr_ntop(AF_INET,
-				       &iface->config.ip.ipv4->netmask,
-				       buf, sizeof(buf))));
+			log_strdup(net_addr_ntop(
+				AF_INET, &iface->config.ip.ipv4->netmask, buf,
+				sizeof(buf))));
 		LOG_INF("Router: %s",
 			log_strdup(net_addr_ntop(AF_INET,
 						 &iface->config.ip.ipv4->gw,

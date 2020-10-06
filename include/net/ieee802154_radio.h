@@ -27,16 +27,17 @@ extern "C" {
  */
 
 enum ieee802154_hw_caps {
-	IEEE802154_HW_FCS	  = BIT(0), /* Frame Check-Sum supported */
-	IEEE802154_HW_PROMISC	  = BIT(1), /* Promiscuous mode supported */
-	IEEE802154_HW_FILTER	  = BIT(2), /* Filter PAN ID, long/short addr */
-	IEEE802154_HW_CSMA	  = BIT(3), /* CSMA-CA supported */
-	IEEE802154_HW_2_4_GHZ	  = BIT(4), /* 2.4Ghz radio supported */
-	IEEE802154_HW_TX_RX_ACK	  = BIT(5), /* Handles ACK request on TX */
-	IEEE802154_HW_SUB_GHZ	  = BIT(6), /* Sub-GHz radio supported */
+	IEEE802154_HW_FCS = BIT(0), /* Frame Check-Sum supported */
+	IEEE802154_HW_PROMISC = BIT(1), /* Promiscuous mode supported */
+	IEEE802154_HW_FILTER = BIT(2), /* Filter PAN ID, long/short addr */
+	IEEE802154_HW_CSMA = BIT(3), /* CSMA-CA supported */
+	IEEE802154_HW_2_4_GHZ = BIT(4), /* 2.4Ghz radio supported */
+	IEEE802154_HW_TX_RX_ACK = BIT(5), /* Handles ACK request on TX */
+	IEEE802154_HW_SUB_GHZ = BIT(6), /* Sub-GHz radio supported */
 	IEEE802154_HW_ENERGY_SCAN = BIT(7), /* Energy scan supported */
-	IEEE802154_HW_TXTIME	  = BIT(8), /* TX at specified time supported */
-	IEEE802154_HW_SLEEP_TO_TX = BIT(9), /* TX directly from sleep supported */
+	IEEE802154_HW_TXTIME = BIT(8), /* TX at specified time supported */
+	IEEE802154_HW_SLEEP_TO_TX =
+		BIT(9), /* TX directly from sleep supported */
 };
 
 enum ieee802154_filter_type {
@@ -51,21 +52,20 @@ enum ieee802154_event {
 	IEEE802154_EVENT_TX_STARTED /* Data transmission started */
 };
 
-typedef void (*energy_scan_done_cb_t)(const struct device *dev,
-				      int16_t max_ed);
+typedef void (*energy_scan_done_cb_t)(const struct device *dev, int16_t max_ed);
 
 typedef void (*ieee802154_event_cb_t)(const struct device *dev,
 				      enum ieee802154_event evt,
 				      void *event_params);
 
 struct ieee802154_filter {
-/** @cond ignore */
+	/** @cond ignore */
 	union {
 		uint8_t *ieee_addr;
 		uint16_t short_addr;
 		uint16_t pan_id;
 	};
-/* @endcond */
+	/* @endcond */
 };
 
 /** IEEE802.15.4 Transmission mode. */
@@ -178,8 +178,7 @@ struct ieee802154_radio_api {
 	int (*set_channel)(const struct device *dev, uint16_t channel);
 
 	/** Set/Unset filters (for IEEE802154_HW_FILTER ) */
-	int (*filter)(const struct device *dev,
-		      bool set,
+	int (*filter)(const struct device *dev, bool set,
 		      enum ieee802154_filter_type type,
 		      const struct ieee802154_filter *filter);
 
@@ -210,8 +209,7 @@ struct ieee802154_radio_api {
 	 *  Note: channel must be set prior to request this function.
 	 *  duration parameter is in ms.
 	 */
-	int (*ed_scan)(const struct device *dev,
-		       uint16_t duration,
+	int (*ed_scan)(const struct device *dev, uint16_t duration,
 		       energy_scan_done_cb_t done_cb);
 };
 

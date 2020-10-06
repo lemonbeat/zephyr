@@ -34,8 +34,8 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include <drivers/console/uart_pipe.h>
 #include <random/rand32.h>
 
-#define SLIP_END     0300
-#define SLIP_ESC     0333
+#define SLIP_END 0300
+#define SLIP_ESC 0333
 #define SLIP_ESC_END 0334
 #define SLIP_ESC_ESC 0335
 
@@ -47,13 +47,13 @@ enum slip_state {
 
 struct slip_context {
 	bool init_done;
-	bool first;		/* SLIP received it's byte or not after
+	bool first; /* SLIP received it's byte or not after
 				 * driver initialization or SLIP_END byte.
 				 */
-	uint8_t buf[1];		/* SLIP data is read into this buf */
-	struct net_pkt *rx;	/* and then placed into this net_pkt */
-	struct net_buf *last;	/* Pointer to last buffer in the list */
-	uint8_t *ptr;		/* Where in net_pkt to add data */
+	uint8_t buf[1]; /* SLIP data is read into this buf */
+	struct net_pkt *rx; /* and then placed into this net_pkt */
+	struct net_buf *last; /* Pointer to last buffer in the list */
+	uint8_t *ptr; /* Where in net_pkt to add data */
 	struct net_if *iface;
 	uint8_t state;
 
@@ -133,8 +133,7 @@ static int slip_send(const struct device *dev, struct net_pkt *pkt)
 			LOG_DBG("sent data %d bytes", buf->len);
 
 			if (buf->len) {
-				LOG_HEXDUMP_DBG(buf->data,
-						buf->len, "<slip ");
+				LOG_HEXDUMP_DBG(buf->data, buf->len, "<slip ");
 			}
 		}
 	}
@@ -204,8 +203,7 @@ static void process_msg(struct slip_context *slip)
 	slip->last = NULL;
 }
 
-static inline int slip_input_byte(struct slip_context *slip,
-				  unsigned char c)
+static inline int slip_input_byte(struct slip_context *slip, unsigned char c)
 {
 	switch (slip->state) {
 	case STATE_GARBAGE:
@@ -319,8 +317,7 @@ static inline int slip_input_byte(struct slip_context *slip,
 
 static uint8_t *recv_cb(uint8_t *buf, size_t *off)
 {
-	struct slip_context *slip =
-		CONTAINER_OF(buf, struct slip_context, buf);
+	struct slip_context *slip = CONTAINER_OF(buf, struct slip_context, buf);
 	size_t i;
 
 	if (!slip->init_done) {
@@ -330,7 +327,6 @@ static uint8_t *recv_cb(uint8_t *buf, size_t *off)
 
 	for (i = 0; i < *off; i++) {
 		if (slip_input_byte(slip, buf[i])) {
-
 			if (LOG_LEVEL >= LOG_LEVEL_DBG) {
 				struct net_buf *buf = slip->rx->buffer;
 				int bytes = net_buf_frags_len(buf);
@@ -339,8 +335,8 @@ static uint8_t *recv_cb(uint8_t *buf, size_t *off)
 				while (bytes && buf) {
 					char msg[8 + 1];
 
-					snprintk(msg, sizeof(msg),
-						 ">slip %2d", count);
+					snprintk(msg, sizeof(msg), ">slip %2d",
+						 count);
 
 					LOG_HEXDUMP_DBG(buf->data, buf->len,
 							msg);
@@ -418,7 +414,7 @@ static void slip_iface_init(struct net_if *iface)
 			goto use_random_mac;
 		}
 	} else {
-use_random_mac:
+	use_random_mac:
 		/* 00-00-5E-00-53-xx Documentation RFC 7042 */
 		slip->mac_addr[0] = 0x00;
 		slip->mac_addr[1] = 0x00;
@@ -440,7 +436,7 @@ static enum ethernet_hw_caps eth_capabilities(const struct device *dev)
 
 	return ETHERNET_HW_VLAN
 #if defined(CONFIG_NET_LLDP)
-		| ETHERNET_LLDP
+	       | ETHERNET_LLDP
 #endif
 		;
 }
@@ -456,11 +452,10 @@ static const struct ethernet_api slip_if_api = {
 #define _SLIP_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(ETHERNET_L2)
 #define _SLIP_MTU 1500
 
-ETH_NET_DEVICE_INIT(slip, CONFIG_SLIP_DRV_NAME,
-		    slip_init, device_pm_control_nop,
-		    &slip_context_data, NULL,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &slip_if_api, _SLIP_MTU);
+ETH_NET_DEVICE_INIT(slip, CONFIG_SLIP_DRV_NAME, slip_init,
+		    device_pm_control_nop, &slip_context_data, NULL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &slip_if_api,
+		    _SLIP_MTU);
 #else
 
 static const struct dummy_api slip_if_api = {

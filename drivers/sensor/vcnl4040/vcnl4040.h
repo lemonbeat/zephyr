@@ -12,32 +12,32 @@
 #include <drivers/gpio.h>
 
 /* Registers all 16 bits */
-#define VCNL4040_REG_ALS_CONF	0x00
-#define VCNL4040_REG_ALS_THDH	0x01
-#define VCNL4040_REG_ALS_THDL	0x02
-#define VCNL4040_REG_PS_CONF	0x03
-#define VCNL4040_REG_PS_MS	0x04
-#define VCNL4040_REG_PS_CANC	0x05
-#define VCNL4040_REG_PS_THDL	0x06
-#define VCNL4040_REG_PS_THDH	0x07
-#define VCNL4040_REG_PS_DATA	0x08
-#define VCNL4040_REG_ALS_DATA	0x09
-#define VCNL4040_REG_WHITE_DATA	0x0A
-#define VCNL4040_REG_INT_FLAG	0x0B
-#define VCNL4040_REG_DEVICE_ID	0x0C
+#define VCNL4040_REG_ALS_CONF 0x00
+#define VCNL4040_REG_ALS_THDH 0x01
+#define VCNL4040_REG_ALS_THDL 0x02
+#define VCNL4040_REG_PS_CONF 0x03
+#define VCNL4040_REG_PS_MS 0x04
+#define VCNL4040_REG_PS_CANC 0x05
+#define VCNL4040_REG_PS_THDL 0x06
+#define VCNL4040_REG_PS_THDH 0x07
+#define VCNL4040_REG_PS_DATA 0x08
+#define VCNL4040_REG_ALS_DATA 0x09
+#define VCNL4040_REG_WHITE_DATA 0x0A
+#define VCNL4040_REG_INT_FLAG 0x0B
+#define VCNL4040_REG_DEVICE_ID 0x0C
 
-#define VCNL4040_DEFAULT_ID	0x0186
+#define VCNL4040_DEFAULT_ID 0x0186
 
-#define VCNL4040_LED_I_POS	8
-#define VCNL4040_PS_HD_POS	11
-#define VCNL4040_PS_HD_MASK	(0x01 << VCNL4040_PS_HD_POS)
-#define VCNL4040_PS_DUTY_POS	6
-#define VCNL4040_PS_IT_POS	1
-#define VCNL4040_PS_SD_POS	0
-#define VCNL4040_PS_SD_MASK	(0x01 << VCNL4040_PS_SD_POS)
-#define VCNL4040_ALS_IT_POS	6
-#define VCNL4040_ALS_SD_POS	0
-#define VCNL4040_ALS_SD_MASK	(0x01 << VCNL4040_ALS_SD_POS)
+#define VCNL4040_LED_I_POS 8
+#define VCNL4040_PS_HD_POS 11
+#define VCNL4040_PS_HD_MASK (0x01 << VCNL4040_PS_HD_POS)
+#define VCNL4040_PS_DUTY_POS 6
+#define VCNL4040_PS_IT_POS 1
+#define VCNL4040_PS_SD_POS 0
+#define VCNL4040_PS_SD_MASK (0x01 << VCNL4040_PS_SD_POS)
+#define VCNL4040_ALS_IT_POS 6
+#define VCNL4040_ALS_SD_POS 0
+#define VCNL4040_ALS_SD_MASK (0x01 << VCNL4040_ALS_SD_POS)
 
 enum led_current {
 	VCNL4040_LED_CURRENT_50MA,
@@ -135,8 +135,7 @@ int vcnl4040_write(const struct device *dev, uint8_t reg, uint16_t value);
 #ifdef CONFIG_VCNL4040_TRIGGER
 int vcnl4040_trigger_init(const struct device *dev);
 
-int vcnl4040_attr_set(const struct device *dev,
-		      enum sensor_channel chan,
+int vcnl4040_attr_set(const struct device *dev, enum sensor_channel chan,
 		      enum sensor_attribute attr,
 		      const struct sensor_value *val);
 

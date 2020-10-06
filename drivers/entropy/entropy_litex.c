@@ -14,12 +14,12 @@
 #include <string.h>
 #include <zephyr.h>
 
-#define PRBS_STATUS     ((volatile uint32_t *)DT_INST_REG_ADDR(0))
-#define PRBS_WIDTH      DT_INST_REG_SIZE(0)
+#define PRBS_STATUS ((volatile uint32_t *)DT_INST_REG_ADDR(0))
+#define PRBS_WIDTH DT_INST_REG_SIZE(0)
 #define SUBREG_SIZE_BIT 8
 
 static inline unsigned int prbs_read(volatile uint32_t *reg_status,
-					 volatile uint32_t reg_width)
+				     volatile uint32_t reg_width)
 {
 	uint32_t shifted_data, shift, i;
 	uint32_t result = 0;
@@ -34,7 +34,7 @@ static inline unsigned int prbs_read(volatile uint32_t *reg_status,
 }
 
 static int entropy_prbs_get_entropy(const struct device *dev, uint8_t *buffer,
-					 uint16_t length)
+				    uint16_t length)
 {
 	while (length > 0) {
 		size_t to_copy;
@@ -59,7 +59,6 @@ static const struct entropy_driver_api entropy_prbs_api = {
 	.get_entropy = entropy_prbs_get_entropy
 };
 
-DEVICE_AND_API_INIT(entropy_prbs, DT_INST_LABEL(0),
-		    entropy_prbs_init, NULL, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(entropy_prbs, DT_INST_LABEL(0), entropy_prbs_init, NULL,
+		    NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_prbs_api);

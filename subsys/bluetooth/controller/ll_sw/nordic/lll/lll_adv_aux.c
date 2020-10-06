@@ -44,10 +44,9 @@ static int prepare_cb(struct lll_prepare_param *prepare_param);
 static void abort_cb(struct lll_prepare_param *prepare_param, void *param);
 static void isr_tx(void *param);
 static void isr_rx(void *param);
-static inline int isr_rx_pdu(struct lll_adv_aux *lll_aux,
-			     uint8_t devmatch_ok, uint8_t devmatch_id,
-			     uint8_t irkmatch_ok, uint8_t irkmatch_id,
-			     uint8_t rssi_ready);
+static inline int isr_rx_pdu(struct lll_adv_aux *lll_aux, uint8_t devmatch_ok,
+			     uint8_t devmatch_id, uint8_t irkmatch_ok,
+			     uint8_t irkmatch_id, uint8_t rssi_ready);
 
 int lll_adv_aux_init(void)
 {
@@ -147,7 +146,7 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 #if !defined(BT_CTLR_ADV_EXT_PBACK)
 	/* Set up Radio H/W */
 	radio_reset();
-#endif  /* !BT_CTLR_ADV_EXT_PBACK */
+#endif /* !BT_CTLR_ADV_EXT_PBACK */
 
 #if defined(CONFIG_BT_CTLR_TX_PWR_DYNAMIC_CONTROL)
 	radio_tx_power_set(lll->tx_pwr_lvl);
@@ -166,7 +165,7 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 	radio_aa_set((uint8_t *)&aa);
 	radio_crc_configure(((0x5bUL) | ((0x06UL) << 8) | ((0x00UL) << 16)),
 			    0x555555);
-#endif  /* !BT_CTLR_ADV_EXT_PBACK */
+#endif /* !BT_CTLR_ADV_EXT_PBACK */
 
 	/* Use channel idx in aux_ptr */
 	lll_chan_set(aux_ptr->chan_idx);
@@ -175,9 +174,8 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 	radio_pkt_tx_set(sec_pdu);
 
 	/* Switch to Rx if connectable or scannable */
-	if (pri_com_hdr->adv_mode & (BT_HCI_LE_ADV_PROP_CONN |
-				     BT_HCI_LE_ADV_PROP_SCAN)) {
-
+	if (pri_com_hdr->adv_mode &
+	    (BT_HCI_LE_ADV_PROP_CONN | BT_HCI_LE_ADV_PROP_SCAN)) {
 		struct pdu_adv *scan_pdu;
 
 		scan_pdu = lll_adv_scan_rsp_latest_get(lll_adv, &upd);
@@ -234,9 +232,10 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 #if defined(CONFIG_BT_CTLR_XTAL_ADVANCED) && \
 	(EVENT_OVERHEAD_PREEMPT_US <= EVENT_OVERHEAD_PREEMPT_MIN_US)
 	/* check if preempt to start has changed */
-	if (lll_preempt_calc(evt, (TICKER_ID_ADV_AUX_BASE +
-				   ull_adv_aux_lll_handle_get(lll)),
-			     ticks_at_event)) {
+	if (lll_preempt_calc(
+		    evt,
+		    (TICKER_ID_ADV_AUX_BASE + ull_adv_aux_lll_handle_get(lll)),
+		    ticks_at_event)) {
 		radio_isr_set(lll_isr_abort, lll);
 		radio_disable();
 	} else
@@ -390,8 +389,8 @@ static void isr_rx(void *param)
 	if (crc_ok) {
 		int err;
 
-		err = isr_rx_pdu(param, devmatch_ok, devmatch_id,
-				 irkmatch_ok, irkmatch_id, rssi_ready);
+		err = isr_rx_pdu(param, devmatch_ok, devmatch_id, irkmatch_ok,
+				 irkmatch_id, rssi_ready);
 		if (!err) {
 			if (IS_ENABLED(CONFIG_BT_CTLR_PROFILE_ISR)) {
 				lll_prof_send();
@@ -406,10 +405,9 @@ isr_rx_do_close:
 	radio_disable();
 }
 
-static inline int isr_rx_pdu(struct lll_adv_aux *lll_aux,
-			     uint8_t devmatch_ok, uint8_t devmatch_id,
-			     uint8_t irkmatch_ok, uint8_t irkmatch_id,
-			     uint8_t rssi_ready)
+static inline int isr_rx_pdu(struct lll_adv_aux *lll_aux, uint8_t devmatch_ok,
+			     uint8_t devmatch_id, uint8_t irkmatch_ok,
+			     uint8_t irkmatch_id, uint8_t rssi_ready)
 {
 	struct pdu_adv *pdu_rx, *pdu_adv, *pdu_aux;
 	struct lll_adv *lll = lll_aux->adv;
@@ -420,7 +418,7 @@ static inline int isr_rx_pdu(struct lll_adv_aux *lll_aux,
 #if defined(CONFIG_BT_CTLR_PRIVACY)
 	/* An IRK match implies address resolution enabled */
 	uint8_t rl_idx = irkmatch_ok ? ull_filter_lll_rl_irk_idx(irkmatch_id) :
-				    FILTER_IDX_NONE;
+					     FILTER_IDX_NONE;
 #else
 	uint8_t rl_idx = FILTER_IDX_NONE;
 #endif /* CONFIG_BT_CTLR_PRIVACY */

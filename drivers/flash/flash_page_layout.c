@@ -7,7 +7,7 @@
 #include <drivers/flash.h>
 
 static int flash_get_page_info(const struct device *dev, off_t offs,
-				   bool use_addr, struct flash_pages_info *info)
+			       bool use_addr, struct flash_pages_info *info)
 {
 	const struct flash_driver_api *api = dev->api;
 	const struct flash_pages_layout *layout;
@@ -36,8 +36,8 @@ static int flash_get_page_info(const struct device *dev, off_t offs,
 				num_in_group = offs - page_count;
 			}
 
-			info->start_offset = group_offs +
-					     num_in_group * layout->pages_size;
+			info->start_offset =
+				group_offs + num_in_group * layout->pages_size;
 			info->index = page_count + num_in_group;
 
 			return 0;
@@ -82,8 +82,7 @@ size_t z_impl_flash_get_page_count(const struct device *dev)
 	return count;
 }
 
-void flash_page_foreach(const struct device *dev, flash_page_cb cb,
-			void *data)
+void flash_page_foreach(const struct device *dev, flash_page_cb cb, void *data)
 {
 	const struct flash_driver_api *api = dev->api;
 	const struct flash_pages_layout *layout;

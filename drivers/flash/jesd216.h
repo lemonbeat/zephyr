@@ -18,17 +18,17 @@
  * https://www.jedec.org/standards-documents/docs/jesd216b
  */
 
-#define JESD216_CMD_READ_SFDP   0x5A
-#define JESD216_CMD_BURST_SFDP  0x5B
+#define JESD216_CMD_READ_SFDP 0x5A
+#define JESD216_CMD_BURST_SFDP 0x5B
 
 /* Layout of a JESD216 parameter header. */
 struct jesd216_param_header {
-	uint8_t id_lsb;		/* ID LSB */
-	uint8_t rev_minor;	/* Minor revision number */
-	uint8_t rev_major;	/* Major revision number */
-	uint8_t len_dw;		/* Length of table in 32-bit DWORDs */
-	uint8_t ptp[3];		/* Address of table in SFDP space (LSB@0) */
-	uint8_t id_msb;		/* ID MSB */
+	uint8_t id_lsb; /* ID LSB */
+	uint8_t rev_minor; /* Minor revision number */
+	uint8_t rev_major; /* Major revision number */
+	uint8_t len_dw; /* Length of table in 32-bit DWORDs */
+	uint8_t ptp[3]; /* Address of table in SFDP space (LSB@0) */
+	uint8_t id_msb; /* ID MSB */
 } __packed;
 
 /* Get the number of bytes required for the parameter table. */
@@ -48,18 +48,16 @@ static inline uint16_t jesd216_param_id(const struct jesd216_param_header *hp)
  */
 static inline uint32_t jesd216_param_addr(const struct jesd216_param_header *hp)
 {
-	return ((hp->ptp[2] << 16)
-		| (hp->ptp[1] << 8)
-		| (hp->ptp[0] << 0));
+	return ((hp->ptp[2] << 16) | (hp->ptp[1] << 8) | (hp->ptp[0] << 0));
 }
 
 /* Layout of the Serial Flash Discoverable Parameters header. */
 struct jesd216_sfdp_header {
-	uint32_t magic;		/* "SFDP" in little endian */
-	uint8_t rev_minor;	/* Minor revision number */
-	uint8_t rev_major;	/* Major revision number */
-	uint8_t nph;		/* Number of parameter headers */
-	uint8_t access;		/* Access protocol */
+	uint32_t magic; /* "SFDP" in little endian */
+	uint8_t rev_minor; /* Minor revision number */
+	uint8_t rev_major; /* Major revision number */
+	uint8_t nph; /* Number of parameter headers */
+	uint8_t access; /* Access protocol */
 	struct jesd216_param_header phdr[]; /* Headers */
 } __packed;
 
@@ -100,8 +98,9 @@ struct jesd216_sfdp_header {
  *
  * @return required buffer size in bytes.
  */
-#define JESD216_SFDP_SIZE(nph) (sizeof(struct jesd216_sfdp_header)	\
-				+ ((nph) * sizeof(struct jesd216_param_header)))
+#define JESD216_SFDP_SIZE(nph)                \
+	(sizeof(struct jesd216_sfdp_header) + \
+	 ((nph) * sizeof(struct jesd216_param_header)))
 
 /** Extract the magic number from the SFDP structure in host byte order.
  *
@@ -150,12 +149,14 @@ struct jesd216_bfp {
 #define JESD216_SFDP_BFP_DW1_ADDRBYTES_VAL_3B4B 1
 #define JESD216_SFDP_BFP_DW1_ADDRBYTES_VAL_4B 2
 #define JESD216_SFDP_BFP_DW1_4KERASEINSTR_SHFT 8
-#define JESD216_SFDP_BFP_DW1_4KERASEINSTR_MASK (0xFF << JESD216_SFDP_BFP_DW1_4KERASEINSTR_SHFT)
+#define JESD216_SFDP_BFP_DW1_4KERASEINSTR_MASK \
+	(0xFF << JESD216_SFDP_BFP_DW1_4KERASEINSTR_SHFT)
 #define JESD216_SFDP_BFP_DW1_WEISWVSR_FLG BIT(4)
 #define JESD216_SFDP_BFP_DW1_VSRBP_FLG BIT(3)
 #define JESD216_SFDP_BFP_DW1_WRTGRAN_FLG BIT(2)
 #define JESD216_SFDP_BFP_DW1_BSERSZ_SHFT 0
-#define JESD216_SFDP_BFP_DW1_BSERSZ_MASK (0x03 << JESD216_SFDP_BFP_DW1_BSERSZ_SHFT)
+#define JESD216_SFDP_BFP_DW1_BSERSZ_MASK \
+	(0x03 << JESD216_SFDP_BFP_DW1_BSERSZ_SHFT)
 #define JESD216_SFDP_BFP_DW1_BSERSZ_VAL_4KSUP 0x01
 #define JESD216_SFDP_BFP_DW1_BSERSZ_VAL_4KNOTSUP 0x03
 
@@ -211,7 +212,7 @@ static inline uint64_t jesd216_bfp_density(const struct jesd216_bfp *hp)
  * about instruction support.
  */
 enum jesd216_mode_type {
-	JESD216_MODE_044,	/* implied instruction, execute in place */
+	JESD216_MODE_044, /* implied instruction, execute in place */
 	JESD216_MODE_088,
 	JESD216_MODE_111,
 	JESD216_MODE_112,
@@ -296,8 +297,7 @@ struct jesd216_erase_type {
  * @retval 0 if the erase type index provided usable information.
  * @retval -EINVAL if the erase type index is undefined.
  */
-int jesd216_bfp_erase(const struct jesd216_bfp *bfp,
-		      uint8_t idx,
+int jesd216_bfp_erase(const struct jesd216_bfp *bfp, uint8_t idx,
 		      struct jesd216_erase_type *etp);
 
 /* Extract typical and maximum erase times from DW10.
@@ -318,8 +318,7 @@ int jesd216_bfp_erase(const struct jesd216_bfp *bfp,
  * to maximum erase times.
  */
 int jesd216_bfp_erase_type_times(const struct jesd216_param_header *php,
-				 const struct jesd216_bfp *bfp,
-				 uint8_t idx,
+				 const struct jesd216_bfp *bfp, uint8_t idx,
 				 uint32_t *typ_ms);
 
 /* Get the page size from the Basic Flash Parameters.
@@ -331,8 +330,9 @@ int jesd216_bfp_erase_type_times(const struct jesd216_param_header *php,
  * @return the page size in bytes from the parameters if supported,
  * otherwise 256.
  */
-static inline uint32_t jesd216_bfp_page_size(const struct jesd216_param_header *php,
-					     const struct jesd216_bfp *bfp)
+static inline uint32_t
+jesd216_bfp_page_size(const struct jesd216_param_header *php,
+		      const struct jesd216_bfp *bfp)
 {
 	/* Page size introduced in JESD216A */
 	if (php->len_dw < 11) {

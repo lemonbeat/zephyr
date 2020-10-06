@@ -18,7 +18,7 @@
 #include <drivers/interrupt_controller/sysapic.h>
 #include <irq.h>
 
-#define IS_IOAPIC_IRQ(irq)  (irq < LOAPIC_IRQ_BASE)
+#define IS_IOAPIC_IRQ(irq) (irq < LOAPIC_IRQ_BASE)
 #define HARDWARE_IRQ_LIMIT ((LOAPIC_IRQ_BASE + LOAPIC_IRQ_COUNT) - 1)
 
 /**

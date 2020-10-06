@@ -74,8 +74,8 @@ int get_apds9960_val(struct sensor_value *val)
 		return -1;
 	}
 
-	if (sensor_channel_get(dev_info[DEV_IDX_APDS9960].dev,
-			       SENSOR_CHAN_PROX, &val[1])) {
+	if (sensor_channel_get(dev_info[DEV_IDX_APDS9960].dev, SENSOR_CHAN_PROX,
+			       &val[1])) {
 		return -1;
 	}
 
@@ -136,7 +136,6 @@ static void configure_accel(void)
 		printk("setting motion trigger failed, err %d\n", err);
 		return;
 	}
-
 
 	k_delayed_work_init(&motion_work, motion_timeout);
 	k_delayed_work_submit(&motion_work, MOTION_TIMEOUT);

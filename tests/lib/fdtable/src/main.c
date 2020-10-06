@@ -17,8 +17,8 @@ static int shared_fd;
 
 #define VTABLE_INIT ((const struct fd_op_vtable *)1)
 
-K_THREAD_STACK_DEFINE(fd_thread_stack, CONFIG_ZTEST_STACKSIZE +
-		      CONFIG_TEST_EXTRA_STACKSIZE);
+K_THREAD_STACK_DEFINE(fd_thread_stack,
+		      CONFIG_ZTEST_STACKSIZE + CONFIG_TEST_EXTRA_STACKSIZE);
 
 void test_z_reserve_fd(void)
 {
@@ -51,7 +51,7 @@ void test_z_get_fd_obj(void)
 
 	int err = -1;
 	const struct fd_op_vtable *vtable = 0;
-	const struct fd_op_vtable *vtable2 = vtable+1;
+	const struct fd_op_vtable *vtable2 = vtable + 1;
 
 	int *obj = z_get_fd_obj(fd, vtable, err); /* function being tested */
 
@@ -94,8 +94,10 @@ void test_z_finalize_fd(void)
 
 	obj = z_get_fd_obj_and_vtable(fd, &vtable);
 
-	zassert_equal_ptr(obj, original_obj, "obj is different after finalizing");
-	zassert_equal_ptr(vtable, original_vtable, "vtable is different after finalizing");
+	zassert_equal_ptr(obj, original_obj,
+			  "obj is different after finalizing");
+	zassert_equal_ptr(vtable, original_vtable,
+			  "vtable is different after finalizing");
 
 	z_free_fd(fd);
 }
@@ -160,9 +162,8 @@ void test_z_fd_multiple_access(void)
 
 	k_thread_create(&fd_thread, fd_thread_stack,
 			K_THREAD_STACK_SIZEOF(fd_thread_stack),
-			(k_thread_entry_t)test_cb,
-			INT_TO_POINTER(shared_fd), NULL, NULL,
-			CONFIG_ZTEST_THREAD_PRIORITY, 0, K_NO_WAIT);
+			(k_thread_entry_t)test_cb, INT_TO_POINTER(shared_fd),
+			NULL, NULL, CONFIG_ZTEST_THREAD_PRIORITY, 0, K_NO_WAIT);
 
 	k_thread_join(&fd_thread, K_FOREVER);
 
@@ -174,14 +175,12 @@ void test_z_fd_multiple_access(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_fdtable,
-			 ztest_unit_test(test_z_reserve_fd),
+	ztest_test_suite(test_fdtable, ztest_unit_test(test_z_reserve_fd),
 			 ztest_unit_test(test_z_get_fd_obj_and_vtable),
 			 ztest_unit_test(test_z_get_fd_obj),
 			 ztest_unit_test(test_z_finalize_fd),
 			 ztest_unit_test(test_z_alloc_fd),
 			 ztest_unit_test(test_z_free_fd),
-			 ztest_unit_test(test_z_fd_multiple_access)
-		);
+			 ztest_unit_test(test_z_fd_multiple_access));
 	ztest_run_test_suite(test_fdtable);
 }

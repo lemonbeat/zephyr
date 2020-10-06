@@ -18,23 +18,18 @@ extern struct bmg160_device_data bmg160_data;
 #include <logging/log.h>
 LOG_MODULE_DECLARE(BMG160, CONFIG_SENSOR_LOG_LEVEL);
 
-static inline void setup_int(const struct device *dev,
-			      bool enable)
+static inline void setup_int(const struct device *dev, bool enable)
 {
 	struct bmg160_device_data *data = dev->data;
-	const struct bmg160_device_config *const cfg =
-		dev->config;
+	const struct bmg160_device_config *const cfg = dev->config;
 
-	gpio_pin_interrupt_configure(data->gpio,
-				     cfg->int_pin,
-				     enable
-				     ? GPIO_INT_EDGE_TO_ACTIVE
-				     : GPIO_INT_DISABLE);
+	gpio_pin_interrupt_configure(data->gpio, cfg->int_pin,
+				     enable ? GPIO_INT_EDGE_TO_ACTIVE :
+						    GPIO_INT_DISABLE);
 }
 
 static void bmg160_gpio_callback(const struct device *port,
-				 struct gpio_callback *cb,
-				 uint32_t pin)
+				 struct gpio_callback *cb, uint32_t pin)
 {
 	struct bmg160_device_data *bmg160 =
 		CONTAINER_OF(cb, struct bmg160_device_data, gpio_cb);
@@ -56,13 +51,12 @@ static int bmg160_anymotion_set(const struct device *dev,
 	uint8_t anymotion_en = 0U;
 
 	if (handler) {
-		anymotion_en = BMG160_ANY_EN_X |
-			       BMG160_ANY_EN_Y |
+		anymotion_en = BMG160_ANY_EN_X | BMG160_ANY_EN_Y |
 			       BMG160_ANY_EN_Z;
 	}
 
-	if (bmg160_update_byte(dev, BMG160_REG_ANY_EN,
-			       BMG160_ANY_EN_MASK, anymotion_en) < 0) {
+	if (bmg160_update_byte(dev, BMG160_REG_ANY_EN, BMG160_ANY_EN_MASK,
+			       anymotion_en) < 0) {
 		return -EIO;
 	}
 
@@ -76,8 +70,7 @@ static int bmg160_drdy_set(const struct device *dev,
 {
 	struct bmg160_device_data *bmg160 = dev->data;
 
-	if (bmg160_update_byte(dev, BMG160_REG_INT_EN0,
-			       BMG160_DATA_EN,
+	if (bmg160_update_byte(dev, BMG160_REG_INT_EN0, BMG160_DATA_EN,
 			       handler ? BMG160_DATA_EN : 0) < 0) {
 		return -EIO;
 	}
@@ -109,14 +102,15 @@ int bmg160_slope_config(const struct device *dev, enum sensor_attribute attr,
 					 any_th_dps & BMG160_THRES_MASK);
 	} else if (attr == SENSOR_ATTR_SLOPE_DUR) {
 		/* slope duration can be 4, 8, 12 or 16 samples */
-		if (val->val1 != 4 && val->val1 != 8 &&
-		    val->val1 != 12 && val->val1 != 16) {
+		if (val->val1 != 4 && val->val1 != 8 && val->val1 != 12 &&
+		    val->val1 != 16) {
 			return -ENOTSUP;
 		}
 
 		return bmg160_write_byte(dev, BMG160_REG_ANY_EN,
-			   (val->val1 << BMG160_ANY_DURSAMPLE_POS) &
-			    BMG160_ANY_DURSAMPLE_MASK);
+					 (val->val1
+					  << BMG160_ANY_DURSAMPLE_POS) &
+						 BMG160_ANY_DURSAMPLE_MASK);
 	}
 
 	return -ENOTSUP;
@@ -181,7 +175,8 @@ static void bmg160_handle_int(const struct device *dev)
 }
 
 #ifdef CONFIG_BMG160_TRIGGER_OWN_THREAD
-static K_KERNEL_STACK_DEFINE(bmg160_thread_stack, CONFIG_BMG160_THREAD_STACK_SIZE);
+static K_KERNEL_STACK_DEFINE(bmg160_thread_stack,
+			     CONFIG_BMG160_THREAD_STACK_SIZE);
 static struct k_thread bmg160_thread;
 
 static void bmg160_thread_main(struct bmg160_device_data *bmg160)
@@ -231,7 +226,7 @@ int bmg160_trigger_init(const struct device *dev)
 	/* map data ready, FIFO and FastOffset interrupts to INT1 pin */
 	if (bmg160_write_byte(dev, BMG160_REG_INT_MAP1,
 			      BMG160_INT1_DATA | BMG160_INT1_FIFO |
-			      BMG160_INT1_FAST_OFFSET) < 0) {
+				      BMG160_INT1_FAST_OFFSET) < 0) {
 		LOG_DBG("Unable to map interrupts.");
 		return -EIO;
 	}
@@ -248,9 +243,8 @@ int bmg160_trigger_init(const struct device *dev)
 	k_sem_init(&bmg160->trig_sem, 0, UINT_MAX);
 	k_thread_create(&bmg160_thread, bmg160_thread_stack,
 			CONFIG_BMG160_THREAD_STACK_SIZE,
-			(k_thread_entry_t)bmg160_thread_main,
-			bmg160, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BMG160_THREAD_PRIORITY), 0,
+			(k_thread_entry_t)bmg160_thread_main, bmg160, NULL,
+			NULL, K_PRIO_COOP(CONFIG_BMG160_THREAD_PRIORITY), 0,
 			K_NO_WAIT);
 
 #elif defined(CONFIG_BMG160_TRIGGER_GLOBAL_THREAD)

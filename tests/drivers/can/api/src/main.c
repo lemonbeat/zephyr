@@ -28,18 +28,17 @@
  * @}
  */
 
-#define TEST_SEND_TIMEOUT    K_MSEC(100)
+#define TEST_SEND_TIMEOUT K_MSEC(100)
 #define TEST_RECEIVE_TIMEOUT K_MSEC(100)
 
-#define TEST_CAN_STD_ID      0x555
+#define TEST_CAN_STD_ID 0x555
 #define TEST_CAN_STD_MASK_ID 0x55A
-#define TEST_CAN_STD_MASK    0x7F0
+#define TEST_CAN_STD_MASK 0x7F0
 #define TEST_CAN_SOME_STD_ID 0x123
 
-#define TEST_CAN_EXT_ID      0x15555555
+#define TEST_CAN_EXT_ID 0x15555555
 #define TEST_CAN_EXT_MASK_ID 0x1555555A
-#define TEST_CAN_EXT_MASK    0x1FFFFFF0
-
+#define TEST_CAN_EXT_MASK 0x1FFFFFF0
 
 #if defined(CONFIG_CAN_LOOPBACK_DEV_NAME)
 #define CAN_DEVICE_NAME CONFIG_CAN_LOOPBACK_DEV_NAME
@@ -53,45 +52,35 @@ struct k_sem rx_cb_sem;
 struct k_sem tx_cb_sem;
 const struct device *can_dev;
 
-struct zcan_frame test_std_msg = {
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.rtr     = CAN_DATAFRAME,
-	.std_id  = TEST_CAN_STD_ID,
-	.dlc     = 8,
-	.data    = {1, 2, 3, 4, 5, 6, 7, 8}
-};
+struct zcan_frame test_std_msg = { .id_type = CAN_STANDARD_IDENTIFIER,
+				   .rtr = CAN_DATAFRAME,
+				   .std_id = TEST_CAN_STD_ID,
+				   .dlc = 8,
+				   .data = { 1, 2, 3, 4, 5, 6, 7, 8 } };
 
-struct zcan_frame test_std_mask_msg = {
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.rtr     = CAN_DATAFRAME,
-	.std_id  = TEST_CAN_STD_MASK_ID,
-	.dlc     = 8,
-	.data    = {1, 2, 3, 4, 5, 6, 7, 8}
-};
+struct zcan_frame test_std_mask_msg = { .id_type = CAN_STANDARD_IDENTIFIER,
+					.rtr = CAN_DATAFRAME,
+					.std_id = TEST_CAN_STD_MASK_ID,
+					.dlc = 8,
+					.data = { 1, 2, 3, 4, 5, 6, 7, 8 } };
 
-struct zcan_frame test_ext_msg = {
-	.id_type = CAN_EXTENDED_IDENTIFIER,
-	.rtr     = CAN_DATAFRAME,
-	.ext_id  = TEST_CAN_EXT_ID,
-	.dlc     = 8,
-	.data    = {1, 2, 3, 4, 5, 6, 7, 8}
-};
+struct zcan_frame test_ext_msg = { .id_type = CAN_EXTENDED_IDENTIFIER,
+				   .rtr = CAN_DATAFRAME,
+				   .ext_id = TEST_CAN_EXT_ID,
+				   .dlc = 8,
+				   .data = { 1, 2, 3, 4, 5, 6, 7, 8 } };
 
-struct zcan_frame test_ext_mask_msg = {
-	.id_type = CAN_EXTENDED_IDENTIFIER,
-	.rtr     = CAN_DATAFRAME,
-	.ext_id  = TEST_CAN_EXT_MASK_ID,
-	.dlc     = 8,
-	.data    = {1, 2, 3, 4, 5, 6, 7, 8}
-};
+struct zcan_frame test_ext_mask_msg = { .id_type = CAN_EXTENDED_IDENTIFIER,
+					.rtr = CAN_DATAFRAME,
+					.ext_id = TEST_CAN_EXT_MASK_ID,
+					.dlc = 8,
+					.data = { 1, 2, 3, 4, 5, 6, 7, 8 } };
 
-const struct zcan_filter test_std_filter = {
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.rtr = CAN_DATAFRAME,
-	.std_id = TEST_CAN_STD_ID,
-	.rtr_mask = 1,
-	.std_id_mask = CAN_STD_ID_MASK
-};
+const struct zcan_filter test_std_filter = { .id_type = CAN_STANDARD_IDENTIFIER,
+					     .rtr = CAN_DATAFRAME,
+					     .std_id = TEST_CAN_STD_ID,
+					     .rtr_mask = 1,
+					     .std_id_mask = CAN_STD_ID_MASK };
 
 const struct zcan_filter test_std_masked_filter = {
 	.id_type = CAN_STANDARD_IDENTIFIER,
@@ -101,13 +90,11 @@ const struct zcan_filter test_std_masked_filter = {
 	.std_id_mask = TEST_CAN_STD_MASK
 };
 
-const struct zcan_filter test_ext_filter = {
-	.id_type = CAN_EXTENDED_IDENTIFIER,
-	.rtr = CAN_DATAFRAME,
-	.ext_id = TEST_CAN_EXT_ID,
-	.rtr_mask = 1,
-	.ext_id_mask = CAN_EXT_ID_MASK
-};
+const struct zcan_filter test_ext_filter = { .id_type = CAN_EXTENDED_IDENTIFIER,
+					     .rtr = CAN_DATAFRAME,
+					     .ext_id = TEST_CAN_EXT_ID,
+					     .rtr_mask = 1,
+					     .ext_id_mask = CAN_EXT_ID_MASK };
 
 const struct zcan_filter test_ext_masked_filter = {
 	.id_type = CAN_EXTENDED_IDENTIFIER,
@@ -132,11 +119,9 @@ static inline void check_msg(struct zcan_frame *msg1, struct zcan_frame *msg2,
 {
 	int cmp_res;
 
-	zassert_equal(msg1->id_type, msg2->id_type,
-		      "ID type does not match");
+	zassert_equal(msg1->id_type, msg2->id_type, "ID type does not match");
 
-	zassert_equal(msg1->rtr, msg2->rtr,
-		      "RTR bit does not match");
+	zassert_equal(msg1->rtr, msg2->rtr, "RTR bit does not match");
 
 	if (msg2->id_type == CAN_STANDARD_IDENTIFIER) {
 		zassert_equal(msg1->std_id | mask, msg2->std_id | mask,
@@ -146,8 +131,7 @@ static inline void check_msg(struct zcan_frame *msg1, struct zcan_frame *msg2,
 			      "ID does not match");
 	}
 
-	zassert_equal(msg1->dlc, msg2->dlc,
-		      "DLC does not match");
+	zassert_equal(msg1->dlc, msg2->dlc, "DLC does not match");
 
 	cmp_res = memcmp(msg1->data, msg2->data, msg1->dlc);
 	zassert_equal(cmp_res, 0, "Received data differ");
@@ -245,8 +229,7 @@ static void rx_ext_mask_cb(struct zcan_frame *msg, void *arg)
 	k_sem_give(&rx_cb_sem);
 }
 
-static void send_test_msg(const struct device *can_dev,
-			  struct zcan_frame *msg)
+static void send_test_msg(const struct device *can_dev, struct zcan_frame *msg)
 {
 	int ret;
 
@@ -363,7 +346,8 @@ static inline int attach_isr(const struct device *can_dev,
 	return filter_id;
 }
 
-static void send_receive(const struct zcan_filter *filter, struct zcan_frame *msg)
+static void send_receive(const struct zcan_filter *filter,
+			 struct zcan_frame *msg)
 {
 	int ret, filter_id;
 	struct zcan_frame msg_buffer;
@@ -602,8 +586,8 @@ static void test_send_invalid_dlc(void)
 	frame.dlc = CAN_MAX_DLC + 1;
 
 	ret = can_send(can_dev, &frame, TEST_SEND_TIMEOUT, tx_std_isr, NULL);
-	zassert_equal(ret, CAN_TX_EINVAL,
-		      "ret [%d] not equal to %d", ret, CAN_TX_EINVAL);
+	zassert_equal(ret, CAN_TX_EINVAL, "ret [%d] not equal to %d", ret,
+		      CAN_TX_EINVAL);
 }
 
 void test_main(void)
@@ -614,8 +598,7 @@ void test_main(void)
 	can_dev = device_get_binding(CAN_DEVICE_NAME);
 	zassert_not_null(can_dev, "Device not found");
 
-	ztest_test_suite(can_driver,
-			 ztest_unit_test(test_set_loopback),
+	ztest_test_suite(can_driver, ztest_unit_test(test_set_loopback),
 			 ztest_unit_test(test_send_and_forget),
 			 ztest_unit_test(test_filter_attach),
 			 ztest_unit_test(test_receive_timeout),

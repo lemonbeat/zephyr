@@ -36,7 +36,7 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 #include "eth_smsc911x_priv.h"
 
-#define RESET_TIMEOUT     10
+#define RESET_TIMEOUT 10
 #define PHY_RESET_TIMEOUT K_MSEC(100)
 #define REG_WRITE_TIMEOUT 50
 
@@ -266,7 +266,7 @@ static int smsc_check_phy(void)
 	}
 
 	return ((phyid1 == 0xFFFF && phyid2 == 0xFFFF) ||
-	    (phyid1 == 0x0 && phyid2 == 0x0));
+		(phyid1 == 0x0 && phyid2 == 0x0));
 }
 
 int smsc_reset_phy(void)
@@ -327,8 +327,8 @@ void smsc_enable_mac_xmit(void)
 
 	smsc_mac_regread(SMSC9220_MAC_CR, &mac_cr);
 
-	mac_cr |= (1 << 3);     /* xmit enable */
-	mac_cr |= (1 << 28);    /* Heartbeat disable */
+	mac_cr |= (1 << 3); /* xmit enable */
+	mac_cr |= (1 << 28); /* Heartbeat disable */
 
 	smsc_mac_regwrite(SMSC9220_MAC_CR, mac_cr);
 }
@@ -338,7 +338,7 @@ void smsc_enable_mac_recv(void)
 	uint32_t mac_cr = 0U;
 
 	smsc_mac_regread(SMSC9220_MAC_CR, &mac_cr);
-	mac_cr |= (1 << 2);     /* Recv enable */
+	mac_cr |= (1 << 2); /* Recv enable */
 	smsc_mac_regwrite(SMSC9220_MAC_CR, mac_cr);
 }
 
@@ -401,7 +401,7 @@ int smsc_init(void)
 	smsc_enable_mac_recv();
 
 	/* Rx status FIFO level irq threshold */
-	SMSC9220->FIFO_INT &= ~(0xFF);  /* Clear 2 bottom nibbles */
+	SMSC9220->FIFO_INT &= ~(0xFF); /* Clear 2 bottom nibbles */
 
 	/* This sleep is compulsory otherwise txmit/receive will fail. */
 	k_sleep(K_MSEC(2000));
@@ -411,7 +411,8 @@ int smsc_init(void)
 
 /* Driver functions */
 
-static enum ethernet_hw_caps eth_smsc911x_get_capabilities(const struct device *dev)
+static enum ethernet_hw_caps
+eth_smsc911x_get_capabilities(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
@@ -479,8 +480,8 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 	uint32_t tx_stat;
 	int res;
 
-	txcmd_a = (1/*is_first_segment*/ << 13) | (1/*is_last_segment*/ << 12)
-		  | total_len;
+	txcmd_a = (1 /*is_first_segment*/ << 13) |
+		  (1 /*is_last_segment*/ << 12) | total_len;
 	/* Use len as a tag */
 	txcmd_b = total_len << 16 | total_len;
 	SMSC9220->TX_DATA_PORT = txcmd_a;
@@ -565,8 +566,8 @@ static struct net_pkt *smsc_recv_pkt(const struct device *dev,
 	/* Don't account for FCS when filling net pkt */
 	rem_size -= 4U;
 
-	pkt = net_pkt_rx_alloc_with_buffer(context->iface, rem_size,
-					   AF_UNSPEC, 0, K_NO_WAIT);
+	pkt = net_pkt_rx_alloc_with_buffer(context->iface, rem_size, AF_UNSPEC,
+					   0, K_NO_WAIT);
 	if (!pkt) {
 		LOG_ERR("Failed to obtain RX buffer");
 		smsc_discard_pkt();
@@ -587,7 +588,7 @@ static struct net_pkt *smsc_recv_pkt(const struct device *dev,
 	/* Adjust len of the last buf down for DWORD alignment */
 	if (pkt_size & 3) {
 		net_pkt_update_length(pkt, net_pkt_get_len(pkt) -
-				      (4 - (pkt_size & 3)));
+						   (4 - (pkt_size & 3)));
 	}
 
 	return pkt;
@@ -598,8 +599,8 @@ static void eth_smsc911x_isr(const struct device *dev)
 	uint32_t int_status = SMSC9220->INT_STS;
 	struct eth_context *context = dev->data;
 
-	LOG_DBG("%s: INT_STS=%x INT_EN=%x", __func__,
-		int_status, SMSC9220->INT_EN);
+	LOG_DBG("%s: INT_STS=%x INT_EN=%x", __func__, int_status,
+		SMSC9220->INT_EN);
 
 	if (int_status & BIT(SMSC9220_INTERRUPT_RXSTATUS_FIFO_LEVEL)) {
 		struct net_pkt *pkt;
@@ -609,8 +610,7 @@ static void eth_smsc911x_isr(const struct device *dev)
 		val = SMSC9220->RX_FIFO_INF;
 		uint32_t pkt_pending = BFIELD(val, RX_FIFO_INF_RXSUSED);
 
-		LOG_DBG("in RX FIFO: pkts: %u, bytes: %u",
-			pkt_pending,
+		LOG_DBG("in RX FIFO: pkts: %u, bytes: %u", pkt_pending,
 			BFIELD(val, RX_FIFO_INF_RXDUSED));
 
 		/* Ack rxstatus_fifo_level only when no packets pending. The
@@ -653,7 +653,6 @@ static void eth_smsc911x_isr(const struct device *dev)
 done:
 	/* Ack pending interrupts */
 	SMSC9220->INT_STS = int_status;
-
 }
 
 /* Bindings to the platform */
@@ -662,9 +661,8 @@ DEVICE_DECLARE(eth_smsc911x_0);
 
 int eth_init(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    eth_smsc911x_isr, DEVICE_GET(eth_smsc911x_0), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), eth_smsc911x_isr,
+		    DEVICE_GET(eth_smsc911x_0), 0);
 
 	int ret = smsc_init();
 
@@ -680,7 +678,7 @@ int eth_init(const struct device *dev)
 
 static struct eth_context eth_0_context;
 
-ETH_NET_DEVICE_INIT(eth_smsc911x_0, "smsc911x_0",
-		eth_init, device_pm_control_nop, &eth_0_context,
-		NULL /*&eth_config_0*/, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
-		NET_ETH_MTU /*MTU*/);
+ETH_NET_DEVICE_INIT(eth_smsc911x_0, "smsc911x_0", eth_init,
+		    device_pm_control_nop, &eth_0_context,
+		    NULL /*&eth_config_0*/, CONFIG_ETH_INIT_PRIORITY,
+		    &api_funcs, NET_ETH_MTU /*MTU*/);

@@ -13,18 +13,18 @@
 
 #include "binary_q31.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)100)
-#define ABS_ERROR_THRESH_Q31	((q31_t)5)
-#define ABS_ERROR_THRESH_Q63	((q63_t)(1 << 16))
+#define SNR_ERROR_THRESH ((float32_t)100)
+#define ABS_ERROR_THRESH_Q31 ((q31_t)5)
+#define ABS_ERROR_THRESH_Q63 ((q63_t)(1 << 16))
 
-#define NUM_MATRICES		(ARRAY_SIZE(in_dims) / 3)
-#define MAX_MATRIX_DIM		(40)
+#define NUM_MATRICES (ARRAY_SIZE(in_dims) / 3)
+#define MAX_MATRIX_DIM (40)
 
-#define OP2_MULT		(0)
-#define OP2C_CMPLX_MULT		(0)
+#define OP2_MULT (0)
+#define OP2C_CMPLX_MULT (0)
 
 static void test_op2(int op, const q31_t *input1, const q31_t *input2,
-	const q31_t *ref, size_t length)
+		     const q31_t *ref, size_t length)
 {
 	size_t index;
 	uint16_t *dims = (uint16_t *)in_dims;
@@ -67,8 +67,7 @@ static void test_op2(int op, const q31_t *input1, const q31_t *input2,
 		mat_out.numCols = columns;
 
 		/* Load matrix data */
-		memcpy(mat_in1.pData, input1,
-		       rows * internal * sizeof(q31_t));
+		memcpy(mat_in1.pData, input1, rows * internal * sizeof(q31_t));
 
 		memcpy(mat_in2.pData, input2,
 		       internal * columns * sizeof(q31_t));
@@ -87,13 +86,12 @@ static void test_op2(int op, const q31_t *input1, const q31_t *input2,
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output, ref, ABS_ERROR_THRESH_Q31),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output, ref,
+					 ABS_ERROR_THRESH_Q31),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -101,13 +99,11 @@ static void test_op2(int op, const q31_t *input1, const q31_t *input2,
 	free(output);
 }
 
-DEFINE_TEST_VARIANT5(
-	op2, arm_mat_mult_q31, OP2_MULT,
-	in_mult1, in_mult2, ref_mult,
-	ARRAY_SIZE(ref_mult));
+DEFINE_TEST_VARIANT5(op2, arm_mat_mult_q31, OP2_MULT, in_mult1, in_mult2,
+		     ref_mult, ARRAY_SIZE(ref_mult));
 
 static void test_op2c(int op, const q31_t *input1, const q31_t *input2,
-	const q31_t *ref, size_t length)
+		      const q31_t *ref, size_t length)
 {
 	size_t index;
 	uint16_t *dims = (uint16_t *)in_dims;
@@ -170,14 +166,13 @@ static void test_op2c(int op, const q31_t *input1, const q31_t *input2,
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(2 * length, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(2 * length, output, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(2 * length, output, ref,
-			ABS_ERROR_THRESH_Q31),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(2 * length, output, ref,
+					 ABS_ERROR_THRESH_Q31),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -185,17 +180,15 @@ static void test_op2c(int op, const q31_t *input1, const q31_t *input2,
 	free(output);
 }
 
-DEFINE_TEST_VARIANT5(
-	op2c, arm_mat_cmplx_mult_q31, OP2C_CMPLX_MULT,
-	in_cmplx_mult1, in_cmplx_mult2, ref_cmplx_mult,
-	ARRAY_SIZE(ref_cmplx_mult) / 2);
+DEFINE_TEST_VARIANT5(op2c, arm_mat_cmplx_mult_q31, OP2C_CMPLX_MULT,
+		     in_cmplx_mult1, in_cmplx_mult2, ref_cmplx_mult,
+		     ARRAY_SIZE(ref_cmplx_mult) / 2);
 
 void test_matrix_binary_q31(void)
 {
 	ztest_test_suite(matrix_binary_q31,
-		ztest_unit_test(test_op2_arm_mat_mult_q31),
-		ztest_unit_test(test_op2c_arm_mat_cmplx_mult_q31)
-		);
+			 ztest_unit_test(test_op2_arm_mat_mult_q31),
+			 ztest_unit_test(test_op2c_arm_mat_cmplx_mult_q31));
 
 	ztest_run_test_suite(matrix_binary_q31);
 }

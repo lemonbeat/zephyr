@@ -407,4 +407,4 @@ _after_imms\LVL:
 .popsection
 .endm
 
-#endif	/* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_ASM2_S_H */
+#endif /* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_ASM2_S_H */

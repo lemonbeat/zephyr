@@ -18,9 +18,9 @@ extern "C" {
  * pin-muxing and its polarity to enable alternative functionality.
  */
 struct npcx_alt {
-	uint8_t group:4;
-	uint8_t bit:3;
-	uint8_t inverted:1;
+	uint8_t group : 4;
+	uint8_t bit : 3;
+	uint8_t inverted : 1;
 };
 
 /**
@@ -57,7 +57,7 @@ struct npcx_alt {
  * @param altfunc 0: set pin-mux to GPIO, otherwise specific functionality
  */
 void soc_pinctrl_mux_configure(const struct npcx_alt *alts_list,
-			uint8_t alts_size, int altfunc);
+			       uint8_t alts_size, int altfunc);
 
 #ifdef __cplusplus
 }

@@ -25,7 +25,7 @@ void test_log_std_msg(void)
 		      "test assumes following setting");
 
 	uint32_t used_slabs = k_mem_slab_num_used_get(&log_msg_pool);
-	log_arg_t args[] = {1, 2, 3, 4, 5, 6};
+	log_arg_t args[] = { 1, 2, 3, 4, 5, 6 };
 	struct log_msg *msg;
 
 	/* Test for expected buffer usage based on number of arguments */
@@ -64,7 +64,6 @@ void test_log_std_msg(void)
 
 void test_log_hexdump_msg(void)
 {
-
 	uint32_t used_slabs = k_mem_slab_num_used_get(&log_msg_pool);
 	struct log_msg *msg;
 	uint8_t data[128];
@@ -77,15 +76,13 @@ void test_log_hexdump_msg(void)
 	msg = log_msg_hexdump_create("test", data,
 				     LOG_MSG_HEXDUMP_BYTES_SINGLE_CHUNK - 4);
 
-	zassert_equal((used_slabs + 1),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs + 1), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs++;
 
 	log_msg_put(msg);
 
-	zassert_equal((used_slabs - 1),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs - 1), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs--;
 
@@ -93,15 +90,13 @@ void test_log_hexdump_msg(void)
 	msg = log_msg_hexdump_create("test", data,
 				     LOG_MSG_HEXDUMP_BYTES_SINGLE_CHUNK);
 
-	zassert_equal((used_slabs + 1),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs + 1), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs++;
 
 	log_msg_put(msg);
 
-	zassert_equal((used_slabs - 1),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs - 1), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs--;
 
@@ -109,32 +104,28 @@ void test_log_hexdump_msg(void)
 	msg = log_msg_hexdump_create("test", data,
 				     LOG_MSG_HEXDUMP_BYTES_SINGLE_CHUNK + 1);
 
-	zassert_equal((used_slabs + 2U),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs + 2U), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs += 2U;
 
 	log_msg_put(msg);
 
-	zassert_equal((used_slabs - 2U),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs - 2U), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs -= 2U;
 
 	/* allocation of buffer that fits in 3 buffers */
 	msg = log_msg_hexdump_create("test", data,
 				     LOG_MSG_HEXDUMP_BYTES_SINGLE_CHUNK +
-				     HEXDUMP_BYTES_CONT_MSG + 1);
+					     HEXDUMP_BYTES_CONT_MSG + 1);
 
-	zassert_equal((used_slabs + 3U),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs + 3U), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs += 3U;
 
 	log_msg_put(msg);
 
-	zassert_equal((used_slabs - 3U),
-		      k_mem_slab_num_used_get(&log_msg_pool),
+	zassert_equal((used_slabs - 3U), k_mem_slab_num_used_get(&log_msg_pool),
 		      "Expected mem slab allocation.");
 	used_slabs -= 3U;
 }
@@ -161,36 +152,24 @@ void test_log_hexdump_data_get_single_chunk(void)
 	rd_length = wr_length - 1;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      rd_req_length,
+	zassert_equal(rd_length, rd_req_length,
 		      "Expected to read requested amount of data\n");
 
-	zassert_true(memcmp(&data[offset],
-		     read_data,
-		     rd_length) == 0,
-			"Expected data.\n");
+	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
+		     "Expected data.\n");
 
 	/* Attempt to read more data than present in the message */
 	offset = 0;
 	rd_length = wr_length + 1; /* requesting read more data */
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
-	zassert_equal(rd_length,
-		      wr_length,
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
+	zassert_equal(rd_length, wr_length,
 		      "Expected to read requested amount of data\n");
 
-	zassert_true(memcmp(&data[offset],
-		     read_data,
-		     rd_length) == 0,
+	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
 		     "Expected data.\n");
 
 	/* Attempt to read with non zero offset, requested length fits in the
@@ -200,18 +179,12 @@ void test_log_hexdump_data_get_single_chunk(void)
 	rd_length = 1; /* requesting read more data */
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      rd_req_length,
+	zassert_equal(rd_length, rd_req_length,
 		      "Expected to read requested amount of data\n");
 
-	zassert_true(memcmp(&data[offset],
-		     read_data,
-		     rd_length) == 0,
+	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
 		     "Expected data.\n");
 
 	/* Attempt to read with non zero offset, requested length DOES NOT fit
@@ -221,18 +194,12 @@ void test_log_hexdump_data_get_single_chunk(void)
 	rd_length = LOG_MSG_HEXDUMP_BYTES_SINGLE_CHUNK;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      wr_length - offset,
+	zassert_equal(rd_length, wr_length - offset,
 		      "Expected to read requested amount of data\n");
 
-	zassert_true(memcmp(&data[offset],
-		     read_data,
-		     rd_length) == 0,
+	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
 		     "Expected data.\n");
 
 	log_msg_put(msg);
@@ -261,18 +228,12 @@ void test_log_hexdump_data_get_two_chunks(void)
 	rd_length = wr_length;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      rd_req_length,
+	zassert_equal(rd_length, rd_req_length,
 		      "Expected to read requested amount of data\n");
 
-	zassert_true(memcmp(&data[offset],
-		     read_data,
-		     rd_length) == 0,
+	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
 		     "Expected data.\n");
 
 	/* Read data from first and second chunk. */
@@ -280,18 +241,12 @@ void test_log_hexdump_data_get_two_chunks(void)
 	rd_length = wr_length - 2;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      rd_req_length,
+	zassert_equal(rd_length, rd_req_length,
 		      "Expected to read requested amount of data\n");
 
-	zassert_true(memcmp(&data[offset],
-		     read_data,
-		     rd_length) == 0,
+	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
 		     "Expected data.\n");
 
 	/* Read data from second chunk. */
@@ -299,13 +254,9 @@ void test_log_hexdump_data_get_two_chunks(void)
 	rd_length = 1;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      rd_req_length,
+	zassert_equal(rd_length, rd_req_length,
 		      "Expected to read requested amount of data\n");
 
 	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
@@ -316,13 +267,9 @@ void test_log_hexdump_data_get_two_chunks(void)
 	rd_length = wr_length;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      wr_length - offset,
+	zassert_equal(rd_length, wr_length - offset,
 		      "Expected to read requested amount of data\n");
 
 	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
@@ -354,14 +301,9 @@ void test_log_hexdump_data_get_multiple_chunks(void)
 	rd_length = wr_length;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-
-	zassert_equal(rd_length,
-		      rd_req_length,
+	zassert_equal(rd_length, rd_req_length,
 		      "Expected to read requested amount of data\n");
 
 	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
@@ -372,13 +314,9 @@ void test_log_hexdump_data_get_multiple_chunks(void)
 	rd_length = wr_length - offset - 2;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      rd_req_length,
+	zassert_equal(rd_length, rd_req_length,
 		      "Expected to read requested amount of data\n");
 
 	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
@@ -389,42 +327,32 @@ void test_log_hexdump_data_get_multiple_chunks(void)
 	rd_length = wr_length - offset + 1;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      wr_length - offset,
+	zassert_equal(rd_length, wr_length - offset,
 		      "Expected to read requested amount of data\n");
 
 	zassert_true(memcmp(&data[offset], read_data, rd_length) == 0,
 		     "Expected data.\n");
-
 
 	/* Read beyond message */
 	offset = wr_length + 1;
 	rd_length = 1;
 	rd_req_length = rd_length;
 
-	log_msg_hexdump_data_get(msg,
-				 read_data,
-				 &rd_length,
-				 offset);
+	log_msg_hexdump_data_get(msg, read_data, &rd_length, offset);
 
-	zassert_equal(rd_length,
-		      0,
+	zassert_equal(rd_length, 0,
 		      "Expected to read requested amount of data\n");
 
 	log_msg_put(msg);
 }
 
-
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_log_message,
-		ztest_unit_test(test_log_std_msg),
+	ztest_test_suite(
+		test_log_message, ztest_unit_test(test_log_std_msg),
 		ztest_unit_test(test_log_hexdump_msg),
 		ztest_unit_test(test_log_hexdump_data_get_single_chunk),
 		ztest_unit_test(test_log_hexdump_data_get_two_chunks),

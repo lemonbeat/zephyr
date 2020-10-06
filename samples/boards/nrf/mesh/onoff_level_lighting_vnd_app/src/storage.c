@@ -59,8 +59,8 @@ static void save_last_target_states(void)
 
 static void save_lightness_range(void)
 {
-	ctl->light->range = (uint32_t) ((ctl->light->range_max << 16) |
-				     ctl->light->range_min);
+	ctl->light->range = (uint32_t)((ctl->light->range_max << 16) |
+				       ctl->light->range_min);
 
 	settings_save_one("ps/lr", &ctl->light->range,
 			  sizeof(ctl->light->range));
@@ -68,8 +68,8 @@ static void save_lightness_range(void)
 
 static void save_temperature_range(void)
 {
-	ctl->temp->range = (uint32_t) ((ctl->temp->range_max << 16) |
-				    ctl->temp->range_min);
+	ctl->temp->range =
+		(uint32_t)((ctl->temp->range_max << 16) | ctl->temp->range_min);
 
 	settings_save_one("ps/tr", &ctl->temp->range, sizeof(ctl->temp->range));
 }
@@ -112,8 +112,8 @@ void save_on_flash(uint8_t id)
 	k_work_submit(&storage_work);
 }
 
-static int ps_set(const char *key, size_t len_rd,
-		  settings_read_cb read_cb, void *cb_arg)
+static int ps_set(const char *key, size_t len_rd, settings_read_cb read_cb,
+		  void *cb_arg)
 {
 	ssize_t len = 0;
 	int key_len;

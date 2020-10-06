@@ -23,22 +23,15 @@
 static uint8_t data[MAX_USER_DATA_LENGTH], cmp_data[MAX_USER_DATA_LENGTH];
 
 static int mb85rs64v_access(const struct device *spi,
-			    struct spi_config *spi_cfg,
-			    uint8_t cmd, uint16_t addr, void *data, size_t len)
+			    struct spi_config *spi_cfg, uint8_t cmd,
+			    uint16_t addr, void *data, size_t len)
 {
 	uint8_t access[3];
-	struct spi_buf bufs[] = {
-		{
-			.buf = access,
-		},
-		{
-			.buf = data,
-			.len = len
-		}
-	};
-	struct spi_buf_set tx = {
-		.buffers = bufs
-	};
+	struct spi_buf bufs[] = { {
+					  .buf = access,
+				  },
+				  { .buf = data, .len = len } };
+	struct spi_buf_set tx = { .buffers = bufs };
 
 	access[0] = cmd;
 
@@ -50,10 +43,7 @@ static int mb85rs64v_access(const struct device *spi,
 		tx.count = 2;
 
 		if (cmd == MB85RS64V_READ_CMD) {
-			struct spi_buf_set rx = {
-				.buffers = bufs,
-				.count = 2
-			};
+			struct spi_buf_set rx = { .buffers = bufs, .count = 2 };
 
 			return spi_transceive(spi, spi_cfg, &tx, &rx);
 		}
@@ -64,15 +54,14 @@ static int mb85rs64v_access(const struct device *spi,
 	return spi_write(spi, spi_cfg, &tx);
 }
 
-
 static int mb85rs64v_read_id(const struct device *spi,
 			     struct spi_config *spi_cfg)
 {
 	uint8_t id[4];
 	int err;
 
-	err = mb85rs64v_access(spi, spi_cfg,
-			       MB85RS64V_MANUFACTURER_ID_CMD, 0, &id, 4);
+	err = mb85rs64v_access(spi, spi_cfg, MB85RS64V_MANUFACTURER_ID_CMD, 0,
+			       &id, 4);
 	if (err) {
 		printk("Error during ID read\n");
 		return -EIO;
@@ -103,16 +92,16 @@ static int write_bytes(const struct device *spi, struct spi_config *spi_cfg,
 	int err;
 
 	/* disable write protect */
-	err = mb85rs64v_access(spi, spi_cfg,
-			       MB85RS64V_WRITE_ENABLE_CMD, 0, NULL, 0);
+	err = mb85rs64v_access(spi, spi_cfg, MB85RS64V_WRITE_ENABLE_CMD, 0,
+			       NULL, 0);
 	if (err) {
 		printk("unable to disable write protect\n");
 		return -EIO;
 	}
 
 	/* write cmd */
-	err = mb85rs64v_access(spi, spi_cfg,
-			       MB85RS64V_WRITE_CMD, addr, data, num_bytes);
+	err = mb85rs64v_access(spi, spi_cfg, MB85RS64V_WRITE_CMD, addr, data,
+			       num_bytes);
 	if (err) {
 		printk("Error during SPI write\n");
 		return -EIO;
@@ -127,8 +116,8 @@ static int read_bytes(const struct device *spi, struct spi_config *spi_cfg,
 	int err;
 
 	/* read cmd */
-	err = mb85rs64v_access(spi, spi_cfg,
-			       MB85RS64V_READ_CMD, addr, data, num_bytes);
+	err = mb85rs64v_access(spi, spi_cfg, MB85RS64V_READ_CMD, addr, data,
+			       num_bytes);
 	if (err) {
 		printk("Error during SPI read\n");
 		return -EIO;
@@ -140,7 +129,7 @@ static int read_bytes(const struct device *spi, struct spi_config *spi_cfg,
 void main(void)
 {
 	const struct device *spi;
-	struct spi_config spi_cfg = {0};
+	struct spi_config spi_cfg = { 0 };
 	int err;
 
 	printk("fujitsu FRAM example application\n");
@@ -153,7 +142,6 @@ void main(void)
 
 	spi_cfg.operation = SPI_WORD_SET(8);
 	spi_cfg.frequency = 256000U;
-
 
 	err = mb85rs64v_read_id(spi, &spi_cfg);
 	if (err) {
@@ -212,7 +200,7 @@ void main(void)
 		return;
 	} else {
 		printk("Wrote %d bytes to address 0x00.\n",
-		       (uint32_t) sizeof(cmp_data));
+		       (uint32_t)sizeof(cmp_data));
 	}
 
 	err = read_bytes(spi, &spi_cfg, 0x00, data, sizeof(data));
@@ -221,7 +209,7 @@ void main(void)
 		return;
 	} else {
 		printk("Read %d bytes from address 0x00.\n",
-		       (uint32_t) sizeof(data));
+		       (uint32_t)sizeof(data));
 	}
 
 	err = 0;

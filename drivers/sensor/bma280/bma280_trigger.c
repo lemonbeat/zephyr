@@ -17,22 +17,17 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(BMA280, CONFIG_SENSOR_LOG_LEVEL);
 
-static inline void setup_int1(const struct device *dev,
-			      bool enable)
+static inline void setup_int1(const struct device *dev, bool enable)
 {
 	struct bma280_data *data = dev->data;
 
-	gpio_pin_interrupt_configure(data->gpio,
-				     DT_INST_GPIO_PIN(0, int1_gpios),
-				     (enable
-				      ? GPIO_INT_EDGE_TO_ACTIVE
-				      : GPIO_INT_DISABLE));
+	gpio_pin_interrupt_configure(
+		data->gpio, DT_INST_GPIO_PIN(0, int1_gpios),
+		(enable ? GPIO_INT_EDGE_TO_ACTIVE : GPIO_INT_DISABLE));
 }
 
-int bma280_attr_set(const struct device *dev,
-		    enum sensor_channel chan,
-		    enum sensor_attribute attr,
-		    const struct sensor_value *val)
+int bma280_attr_set(const struct device *dev, enum sensor_channel chan,
+		    enum sensor_attribute attr, const struct sensor_value *val)
 {
 	struct bma280_data *drv_data = dev->data;
 	uint64_t slope_th;
@@ -46,17 +41,16 @@ int bma280_attr_set(const struct device *dev,
 		slope_th = (uint64_t)val->val1 * 1000000U + (uint64_t)val->val2;
 		slope_th = (slope_th * (1 << 10)) / BMA280_PMU_FULL_RANGE;
 		if (i2c_reg_write_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-				       BMA280_REG_SLOPE_TH, (uint8_t)slope_th)
-				       < 0) {
+				       BMA280_REG_SLOPE_TH,
+				       (uint8_t)slope_th) < 0) {
 			LOG_DBG("Could not set slope threshold");
 			return -EIO;
 		}
 	} else if (attr == SENSOR_ATTR_SLOPE_DUR) {
 		if (i2c_reg_update_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-					BMA280_REG_INT_5,
-					BMA280_SLOPE_DUR_MASK,
-					val->val1 << BMA280_SLOPE_DUR_SHIFT)
-					< 0) {
+					BMA280_REG_INT_5, BMA280_SLOPE_DUR_MASK,
+					val->val1 << BMA280_SLOPE_DUR_SHIFT) <
+		    0) {
 			LOG_DBG("Could not set slope duration");
 			return -EIO;
 		}
@@ -94,8 +88,7 @@ static void bma280_thread_cb(const struct device *dev)
 	err = i2c_reg_read_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
 				BMA280_REG_INT_STATUS_1, &status);
 	if (status & BMA280_BIT_DATA_INT_STATUS &&
-	    drv_data->data_ready_handler != NULL &&
-	    err == 0) {
+	    drv_data->data_ready_handler != NULL && err == 0) {
 		drv_data->data_ready_handler(dev,
 					     &drv_data->data_ready_trigger);
 	}
@@ -104,8 +97,7 @@ static void bma280_thread_cb(const struct device *dev)
 	err = i2c_reg_read_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
 				BMA280_REG_INT_STATUS_0, &status);
 	if (status & BMA280_BIT_SLOPE_INT_STATUS &&
-	    drv_data->any_motion_handler != NULL &&
-	    err == 0) {
+	    drv_data->any_motion_handler != NULL && err == 0) {
 		drv_data->any_motion_handler(dev,
 					     &drv_data->data_ready_trigger);
 
@@ -153,8 +145,8 @@ int bma280_trigger_set(const struct device *dev,
 	if (trig->type == SENSOR_TRIG_DATA_READY) {
 		/* disable data ready interrupt while changing trigger params */
 		if (i2c_reg_update_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-					BMA280_REG_INT_EN_1,
-					BMA280_BIT_DATA_EN, 0) < 0) {
+					BMA280_REG_INT_EN_1, BMA280_BIT_DATA_EN,
+					0) < 0) {
 			LOG_DBG("Could not disable data ready interrupt");
 			return -EIO;
 		}
@@ -167,8 +159,7 @@ int bma280_trigger_set(const struct device *dev,
 
 		/* enable data ready interrupt */
 		if (i2c_reg_update_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-					BMA280_REG_INT_EN_1,
-					BMA280_BIT_DATA_EN,
+					BMA280_REG_INT_EN_1, BMA280_BIT_DATA_EN,
 					BMA280_BIT_DATA_EN) < 0) {
 			LOG_DBG("Could not enable data ready interrupt");
 			return -EIO;
@@ -208,30 +199,25 @@ int bma280_init_interrupt(const struct device *dev)
 	struct bma280_data *drv_data = dev->data;
 
 	/* set latched interrupts */
-	if (i2c_reg_write_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-			       BMA280_REG_INT_RST_LATCH,
-			       BMA280_BIT_INT_LATCH_RESET |
-			       BMA280_INT_MODE_LATCH) < 0) {
+	if (i2c_reg_write_byte(
+		    drv_data->i2c, BMA280_I2C_ADDRESS, BMA280_REG_INT_RST_LATCH,
+		    BMA280_BIT_INT_LATCH_RESET | BMA280_INT_MODE_LATCH) < 0) {
 		LOG_DBG("Could not set latched interrupts");
 		return -EIO;
 	}
 
 	/* setup data ready gpio interrupt */
-	drv_data->gpio =
-		device_get_binding(DT_INST_GPIO_LABEL(0, int1_gpios));
+	drv_data->gpio = device_get_binding(DT_INST_GPIO_LABEL(0, int1_gpios));
 	if (drv_data->gpio == NULL) {
 		LOG_DBG("Cannot get pointer to %s device",
-		    DT_INST_GPIO_LABEL(0, int1_gpios));
+			DT_INST_GPIO_LABEL(0, int1_gpios));
 		return -EINVAL;
 	}
 
-	gpio_pin_configure(drv_data->gpio,
-			   DT_INST_GPIO_PIN(0, int1_gpios),
-			   DT_INST_GPIO_FLAGS(0, int1_gpios)
-			   | GPIO_INPUT);
+	gpio_pin_configure(drv_data->gpio, DT_INST_GPIO_PIN(0, int1_gpios),
+			   DT_INST_GPIO_FLAGS(0, int1_gpios) | GPIO_INPUT);
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   bma280_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, bma280_gpio_callback,
 			   BIT(DT_INST_GPIO_PIN(0, int1_gpios)));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -241,8 +227,7 @@ int bma280_init_interrupt(const struct device *dev)
 
 	/* map data ready interrupt to INT1 */
 	if (i2c_reg_update_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-				BMA280_REG_INT_MAP_1,
-				BMA280_INT_MAP_1_BIT_DATA,
+				BMA280_REG_INT_MAP_1, BMA280_INT_MAP_1_BIT_DATA,
 				BMA280_INT_MAP_1_BIT_DATA) < 0) {
 		LOG_DBG("Could not map data ready interrupt pin");
 		return -EIO;
@@ -258,16 +243,16 @@ int bma280_init_interrupt(const struct device *dev)
 	}
 
 	if (i2c_reg_update_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-				BMA280_REG_INT_EN_1,
-				BMA280_BIT_DATA_EN, 0) < 0) {
+				BMA280_REG_INT_EN_1, BMA280_BIT_DATA_EN,
+				0) < 0) {
 		LOG_DBG("Could not disable data ready interrupt");
 		return -EIO;
 	}
 
 	/* disable any-motion interrupt */
 	if (i2c_reg_update_byte(drv_data->i2c, BMA280_I2C_ADDRESS,
-				BMA280_REG_INT_EN_0,
-				BMA280_SLOPE_EN_XYZ, 0) < 0) {
+				BMA280_REG_INT_EN_0, BMA280_SLOPE_EN_XYZ,
+				0) < 0) {
 		LOG_DBG("Could not disable data ready interrupt");
 		return -EIO;
 	}
@@ -279,9 +264,9 @@ int bma280_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_BMA280_THREAD_STACK_SIZE,
-			(k_thread_entry_t)bma280_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_BMA280_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)bma280_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_BMA280_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_BMA280_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = bma280_work_cb;
 #endif

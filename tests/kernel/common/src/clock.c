@@ -7,18 +7,18 @@
 #include <ztest.h>
 
 #if defined(CONFIG_ARCH_POSIX)
-#define ALIGN_MS_BOUNDARY		       \
-	do {				       \
-		uint32_t t = k_uptime_get_32();   \
-		while (t == k_uptime_get_32()) \
-			k_busy_wait(50);       \
+#define ALIGN_MS_BOUNDARY                       \
+	do {                                    \
+		uint32_t t = k_uptime_get_32(); \
+		while (t == k_uptime_get_32())  \
+			k_busy_wait(50);        \
 	} while (0)
 #else
-#define ALIGN_MS_BOUNDARY		       \
-	do {				       \
-		uint32_t t = k_uptime_get_32();   \
-		while (t == k_uptime_get_32()) \
-			;		       \
+#define ALIGN_MS_BOUNDARY                       \
+	do {                                    \
+		uint32_t t = k_uptime_get_32(); \
+		while (t == k_uptime_get_32())  \
+			;                       \
 	} while (0)
 #endif
 
@@ -116,15 +116,15 @@ void test_clock_cycle(void)
 	/*avoid cycle counter wrap around*/
 	if (c1 > c0) {
 		/* delta cycle should be greater than 1 milli-second*/
-		zassert_true((c1 - c0) >
-			     (sys_clock_hw_cycles_per_sec() / MSEC_PER_SEC),
+		zassert_true((c1 - c0) > (sys_clock_hw_cycles_per_sec() /
+					  MSEC_PER_SEC),
 			     NULL);
 		/* delta NS should be greater than 1 milli-second */
 		zassert_true((uint32_t)k_cyc_to_ns_floor64(c1 - c0) >
-			     (NSEC_PER_SEC / MSEC_PER_SEC), NULL);
+				     (NSEC_PER_SEC / MSEC_PER_SEC),
+			     NULL);
 	}
 }
-
 
 /*
  *help function
@@ -172,12 +172,11 @@ void test_ms_time_duration(void)
 	k_timer_start(&ktimer, K_MSEC(100), K_MSEC(50));
 
 	/** TESTPOINT: waiting time more than duration and check the count */
-	k_usleep(1);		/* align to tick */
+	k_usleep(1); /* align to tick */
 	k_busy_wait((DURATION + 1) * 1000);
 	zassert_true(tdata.duration_count == 1, "duration %u not 1",
 		     tdata.duration_count);
-	zassert_true(tdata.stop_count == 0,
-		     "stop %u not 0", tdata.stop_count);
+	zassert_true(tdata.stop_count == 0, "stop %u not 0", tdata.stop_count);
 
 	/** cleanup environemtn */
 	k_timer_stop(&ktimer);

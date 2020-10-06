@@ -10,11 +10,11 @@
 #include <drivers/pwm.h>
 #include <zephyr/types.h>
 
-#define REG_EN_ENABLE             0x1
-#define REG_EN_DISABLE            0x0
+#define REG_EN_ENABLE 0x1
+#define REG_EN_DISABLE 0x0
 
 /* PWM device in LiteX has only one channel */
-#define NUMBER_OF_CHANNELS        1
+#define NUMBER_OF_CHANNELS 1
 
 struct pwm_litex_cfg {
 	uint32_t reg_en_size;
@@ -25,17 +25,17 @@ struct pwm_litex_cfg {
 	volatile uint32_t *reg_period;
 };
 
-#define GET_PWM_CFG(dev)				       \
-	((const struct pwm_litex_cfg *) dev->config)
+#define GET_PWM_CFG(dev) ((const struct pwm_litex_cfg *)dev->config)
 
-static void litex_set_reg(volatile uint32_t *reg, uint32_t reg_size, uint32_t val)
+static void litex_set_reg(volatile uint32_t *reg, uint32_t reg_size,
+			  uint32_t val)
 {
 	uint32_t shifted_data;
 	volatile uint32_t *reg_addr;
 
 	for (int i = 0; i < reg_size; ++i) {
 		shifted_data = val >> ((reg_size - i - 1) * 8);
-		reg_addr = ((volatile uint32_t *) reg) + i;
+		reg_addr = ((volatile uint32_t *)reg) + i;
 		*(reg_addr) = shifted_data;
 	}
 }
@@ -49,8 +49,8 @@ int pwm_litex_init(const struct device *dev)
 }
 
 int pwm_litex_pin_set(const struct device *dev, uint32_t pwm,
-		      uint32_t period_cycles,
-		      uint32_t pulse_cycles, pwm_flags_t flags)
+		      uint32_t period_cycles, uint32_t pulse_cycles,
+		      pwm_flags_t flags)
 {
 	const struct pwm_litex_cfg *cfg = GET_PWM_CFG(dev);
 
@@ -78,8 +78,8 @@ int pwm_litex_get_cycles_per_sec(const struct device *dev, uint32_t pwm,
 }
 
 static const struct pwm_driver_api pwm_litex_driver_api = {
-	.pin_set             = pwm_litex_pin_set,
-	.get_cycles_per_sec  = pwm_litex_get_cycles_per_sec,
+	.pin_set = pwm_litex_pin_set,
+	.get_cycles_per_sec = pwm_litex_get_cycles_per_sec,
 };
 
 /* Device Instantiation */
@@ -89,30 +89,22 @@ static const struct pwm_driver_api pwm_litex_driver_api = {
  * actually used, that is why the register size from dts is divided by 4.
  */
 
-#define PWM_LITEX_INIT(n)						       \
-	static const struct pwm_litex_cfg pwm_litex_cfg_##n = {		       \
-		.reg_en =						       \
-		  (volatile uint32_t *)                                           \
-			DT_INST_REG_ADDR_BY_NAME(n, enable),           \
-		.reg_en_size = DT_INST_REG_SIZE_BY_NAME(n, enable) / 4,        \
-		.reg_width =						       \
-		  (volatile uint32_t *)                                           \
-			DT_INST_REG_ADDR_BY_NAME(n, width),            \
-		.reg_width_size = DT_INST_REG_SIZE_BY_NAME(n, width) / 4,      \
-		.reg_period  =						       \
-		  (volatile uint32_t *)                                           \
-			DT_INST_REG_ADDR_BY_NAME(n, period),           \
-		.reg_period_size = DT_INST_REG_SIZE_BY_NAME(n, period) / 4,    \
-	};								       \
-									       \
-	DEVICE_AND_API_INIT(pwm_##n,					       \
-			    DT_INST_LABEL(n),		       \
-			    pwm_litex_init,				       \
-			    NULL,					       \
-			    &pwm_litex_cfg_##n,				       \
-			    POST_KERNEL,				       \
-			    CONFIG_PWM_LITEX_INIT_PRIORITY,		       \
-			    &pwm_litex_driver_api			       \
-			   );
+#define PWM_LITEX_INIT(n)                                                    \
+	static const struct pwm_litex_cfg pwm_litex_cfg_##n = {              \
+		.reg_en = (volatile uint32_t *)DT_INST_REG_ADDR_BY_NAME(     \
+			n, enable),                                          \
+		.reg_en_size = DT_INST_REG_SIZE_BY_NAME(n, enable) / 4,      \
+		.reg_width = (volatile uint32_t *)DT_INST_REG_ADDR_BY_NAME(  \
+			n, width),                                           \
+		.reg_width_size = DT_INST_REG_SIZE_BY_NAME(n, width) / 4,    \
+		.reg_period = (volatile uint32_t *)DT_INST_REG_ADDR_BY_NAME( \
+			n, period),                                          \
+		.reg_period_size = DT_INST_REG_SIZE_BY_NAME(n, period) / 4,  \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(pwm_##n, DT_INST_LABEL(n), pwm_litex_init, NULL, \
+			    &pwm_litex_cfg_##n, POST_KERNEL,                 \
+			    CONFIG_PWM_LITEX_INIT_PRIORITY,                  \
+			    &pwm_litex_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(PWM_LITEX_INIT)

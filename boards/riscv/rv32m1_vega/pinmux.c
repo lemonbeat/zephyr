@@ -71,10 +71,10 @@ static int rv32m1_vega_pinmux_init(const struct device *dev)
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpspi0), okay) && CONFIG_SPI
 	/* LPSPI0 SCK, SOUT, PCS2, SIN */
-	pinmux_pin_set(portb,  4, PORT_PCR_MUX(kPORT_MuxAlt2));
-	pinmux_pin_set(portb,  5, PORT_PCR_MUX(kPORT_MuxAlt2));
-	pinmux_pin_set(portb,  6, PORT_PCR_MUX(kPORT_MuxAlt2));
-	pinmux_pin_set(portb,  7, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portb, 4, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portb, 5, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portb, 6, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portb, 7, PORT_PCR_MUX(kPORT_MuxAlt2));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpspi1), okay) && CONFIG_SPI

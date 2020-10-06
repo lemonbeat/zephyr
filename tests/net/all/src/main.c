@@ -21,20 +21,17 @@ LOG_MODULE_REGISTER(net_test, LOG_LEVEL_DBG);
 
 static struct offload_context {
 	void *none;
-} offload_context_data = {
-	.none = NULL
-};
+} offload_context_data = { .none = NULL };
 
 static struct dummy_api offload_if_api = {
 	.iface_api.init = NULL,
 	.send = NULL,
 };
 
-NET_DEVICE_OFFLOAD_INIT(net_offload, "net_offload",
-			NULL, device_pm_control_nop,
+NET_DEVICE_OFFLOAD_INIT(net_offload, "net_offload", NULL, device_pm_control_nop,
 			&offload_context_data, NULL,
-			CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			&offload_if_api, 0);
+			CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &offload_if_api,
+			0);
 
 static void test_ok(void)
 {
@@ -43,9 +40,7 @@ static void test_ok(void)
 
 void test_main(void)
 {
-	ztest_test_suite(net_compile_all_test,
-			 ztest_unit_test(test_ok)
-			 );
+	ztest_test_suite(net_compile_all_test, ztest_unit_test(test_ok));
 
 	ztest_run_test_suite(net_compile_all_test);
 }

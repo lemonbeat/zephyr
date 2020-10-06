@@ -44,50 +44,126 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_L2_IEEE802154_LOG_LEVEL);
   * is Multicast address.
   */
 
-#define src_sac1_sam00 \
-		{ { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define src_sac1_sam00                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define src_sam00 \
-		{ { { 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define src_sam00                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define src_sam01 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa } } }
+#define src_sam01                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define src_sam10 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0xbb } } }
+#define src_sam10                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0xff, 0xfe, \
+					0x00, 0x00, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam00 \
-		{ { { 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66 } } }
+#define dst_m1_dam00                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x11, 0x22, 0x33, \
+					0x44, 0x55, 0x66                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam01 \
-		{ { { 0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 } } }
+#define dst_m1_dam01                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x11, 0x22, \
+					0x33, 0x44, 0x55                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam10 \
-		{ { { 0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x22, 0x33 } } }
+#define dst_m1_dam10                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x11, 0x22, 0x33                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam11 \
-		{ { { 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11 } } }
+#define dst_m1_dam11                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x11                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_dam00 \
-		{ { { 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define dst_dam00                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_dam01 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa } } }
+#define dst_dam01                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_dam10 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0xbb } } }
-
+#define dst_dam10                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0xff, 0xfe, \
+					0x00, 0x00, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
 
 /* UDP Ports */
 /* 4 bit compressible udp ports */
@@ -95,61 +171,60 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_L2_IEEE802154_LOG_LEVEL);
 #define udp_dst_port_4bit 0xf0b2
 
 /* 8 bit compressible udp ports */
-#define udp_src_port_8bit   0xf111
+#define udp_src_port_8bit 0xf111
 #define udp_dst_port_8bit_y 0xf022 /* compressible */
 
 #define udp_src_port_8bit_y 0xf011 /* compressible */
-#define udp_dst_port_8bit   0xf122
+#define udp_dst_port_8bit 0xf122
 
 /* uncompressible ports */
 #define udp_src_port_16bit 0xff11
 #define udp_dst_port_16bit 0xff22
 
-static const char user_data[] =
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789";
+static const char user_data[] = "0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789";
 
 struct net_fragment_data {
 	struct net_ipv6_hdr ipv6;
@@ -158,7 +233,6 @@ struct net_fragment_data {
 	bool iphc;
 } __packed;
 
-
 int net_fragment_dev_init(const struct device *dev)
 {
 	return 0;
@@ -166,7 +240,9 @@ int net_fragment_dev_init(const struct device *dev)
 
 static void net_fragment_iface_init(struct net_if *iface)
 {
-	static uint8_t mac[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa, 0xbb};
+	static uint8_t mac[8] = {
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa, 0xbb
+	};
 
 	net_if_set_link_addr(iface, mac, 8, NET_LINK_IEEE802154);
 }
@@ -181,11 +257,10 @@ static struct dummy_api net_fragment_if_api = {
 	.send = tester_send,
 };
 
-NET_DEVICE_INIT(net_fragment_test, "net_fragment_test",
-		net_fragment_dev_init, device_pm_control_nop, NULL, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&net_fragment_if_api, DUMMY_L2,
-		NET_L2_GET_CTX_TYPE(DUMMY_L2), 127);
+NET_DEVICE_INIT(net_fragment_test, "net_fragment_test", net_fragment_dev_init,
+		device_pm_control_nop, NULL, NULL,
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_fragment_if_api,
+		DUMMY_L2, NET_L2_GET_CTX_TYPE(DUMMY_L2), 127);
 
 static bool compare_data(struct net_pkt *pkt, struct net_fragment_data *data)
 {
@@ -195,8 +270,7 @@ static bool compare_data(struct net_pkt *pkt, struct net_fragment_data *data)
 
 	if (net_pkt_get_len(pkt) != (NET_IPV6UDPH_LEN + remaining)) {
 		printk("mismatch lengths, expected %d received %zd\n",
-			NET_IPV6UDPH_LEN + remaining,
-			net_pkt_get_len(pkt));
+		       NET_IPV6UDPH_LEN + remaining, net_pkt_get_len(pkt));
 		return false;
 	}
 
@@ -250,7 +324,7 @@ static struct net_pkt *create_pkt(struct net_fragment_data *data)
 		return NULL;
 	}
 
-	memcpy(buf->data, (uint8_t *) data, NET_IPV6UDPH_LEN);
+	memcpy(buf->data, (uint8_t *)data, NET_IPV6UDPH_LEN);
 	net_buf_add(buf, NET_IPV6UDPH_LEN);
 
 	pos = 0U;
@@ -260,9 +334,9 @@ static struct net_pkt *create_pkt(struct net_fragment_data *data)
 	/* length is not set in net_fragment_data data pointer, calculate and set
 	 * in ipv6, udp and in data pointer too (it's required in comparison) */
 	buf->data[4] = len >> 8;
-	buf->data[5] = (uint8_t) len;
+	buf->data[5] = (uint8_t)len;
 	buf->data[44] = len >> 8;
-	buf->data[45] = (uint8_t) len;
+	buf->data[45] = (uint8_t)len;
 
 	data->ipv6.len = htons(len);
 	data->udp.len = htons(len);
@@ -630,7 +704,6 @@ static void test_fragment_ipv6_dispatch_big(void)
 	zassert_true(ret, NULL);
 }
 
-
 void test_main(void)
 {
 	ztest_test_suite(ieee802154_fragment,
@@ -641,8 +714,7 @@ void test_main(void)
 			 ztest_unit_test(test_fragment_sam01_m1_dam01),
 			 ztest_unit_test(test_fragment_sam10_m1_dam10),
 			 ztest_unit_test(test_fragment_ipv6_dispatch_small),
-			 ztest_unit_test(test_fragment_ipv6_dispatch_big)
-		);
+			 ztest_unit_test(test_fragment_ipv6_dispatch_big));
 
 	ztest_run_test_suite(ieee802154_fragment);
 }

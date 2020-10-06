@@ -22,21 +22,21 @@ typedef enum __packed {
 /* bt_conn flags: the flags defined here represent connection parameters */
 enum {
 	BT_CONN_AUTO_CONNECT,
-	BT_CONN_BR_LEGACY_SECURE,	/* 16 digits legacy PIN tracker */
-	BT_CONN_USER,			/* user I/O when pairing */
-	BT_CONN_BR_PAIRING,		/* BR connection in pairing context */
-	BT_CONN_BR_NOBOND,		/* SSP no bond pairing tracker */
-	BT_CONN_BR_PAIRING_INITIATOR,	/* local host starts authentication */
-	BT_CONN_CLEANUP,                /* Disconnected, pending cleanup */
-	BT_CONN_AUTO_PHY_UPDATE,        /* Auto-update PHY */
-	BT_CONN_SLAVE_PARAM_UPDATE,	/* If slave param update timer fired */
-	BT_CONN_SLAVE_PARAM_SET,	/* If slave param were set from app */
-	BT_CONN_SLAVE_PARAM_L2CAP,	/* If should force L2CAP for CPUP */
-	BT_CONN_FORCE_PAIR,             /* Pairing even with existing keys. */
+	BT_CONN_BR_LEGACY_SECURE, /* 16 digits legacy PIN tracker */
+	BT_CONN_USER, /* user I/O when pairing */
+	BT_CONN_BR_PAIRING, /* BR connection in pairing context */
+	BT_CONN_BR_NOBOND, /* SSP no bond pairing tracker */
+	BT_CONN_BR_PAIRING_INITIATOR, /* local host starts authentication */
+	BT_CONN_CLEANUP, /* Disconnected, pending cleanup */
+	BT_CONN_AUTO_PHY_UPDATE, /* Auto-update PHY */
+	BT_CONN_SLAVE_PARAM_UPDATE, /* If slave param update timer fired */
+	BT_CONN_SLAVE_PARAM_SET, /* If slave param were set from app */
+	BT_CONN_SLAVE_PARAM_L2CAP, /* If should force L2CAP for CPUP */
+	BT_CONN_FORCE_PAIR, /* Pairing even with existing keys. */
 
-	BT_CONN_AUTO_PHY_COMPLETE,      /* Auto-initiated PHY procedure done */
-	BT_CONN_AUTO_FEATURE_EXCH,	/* Auto-initiated LE Feat done */
-	BT_CONN_AUTO_VERSION_INFO,      /* Auto-initiated LE version done */
+	BT_CONN_AUTO_PHY_COMPLETE, /* Auto-initiated PHY procedure done */
+	BT_CONN_AUTO_FEATURE_EXCH, /* Auto-initiated LE Feat done */
+	BT_CONN_AUTO_VERSION_INFO, /* Auto-initiated LE version done */
 
 	/* Auto-initiated Data Length done. Auto-initiated Data Length Update
 	 * is only needed for controllers with BT_QUIRK_NO_AUTO_DLE. */
@@ -47,26 +47,26 @@ enum {
 };
 
 struct bt_conn_le {
-	bt_addr_le_t		dst;
+	bt_addr_le_t dst;
 
-	bt_addr_le_t		init_addr;
-	bt_addr_le_t		resp_addr;
+	bt_addr_le_t init_addr;
+	bt_addr_le_t resp_addr;
 
-	uint16_t			interval;
-	uint16_t			interval_min;
-	uint16_t			interval_max;
+	uint16_t interval;
+	uint16_t interval_min;
+	uint16_t interval_max;
 
-	uint16_t			latency;
-	uint16_t			timeout;
-	uint16_t			pending_latency;
-	uint16_t			pending_timeout;
+	uint16_t latency;
+	uint16_t timeout;
+	uint16_t pending_latency;
+	uint16_t pending_timeout;
 
-	uint8_t			features[8];
+	uint8_t features[8];
 
-	struct bt_keys		*keys;
+	struct bt_keys *keys;
 
 #if defined(CONFIG_BT_USER_PHY_UPDATE)
-	struct bt_conn_le_phy_info      phy;
+	struct bt_conn_le_phy_info phy;
 #endif
 
 #if defined(CONFIG_BT_USER_DATA_LEN_UPDATE)
@@ -79,30 +79,30 @@ struct bt_conn_le {
 #define LMP_MAX_PAGES 2
 
 struct bt_conn_br {
-	bt_addr_t		dst;
-	uint8_t			remote_io_capa;
-	uint8_t			remote_auth;
-	uint8_t			pairing_method;
+	bt_addr_t dst;
+	uint8_t remote_io_capa;
+	uint8_t remote_auth;
+	uint8_t pairing_method;
 	/* remote LMP features pages per 8 bytes each */
-	uint8_t			features[LMP_MAX_PAGES][8];
+	uint8_t features[LMP_MAX_PAGES][8];
 
-	struct bt_keys_link_key	*link_key;
+	struct bt_keys_link_key *link_key;
 };
 
 struct bt_conn_sco {
 	/* Reference to ACL Connection */
-	struct bt_conn          *acl;
-	uint16_t                pkt_type;
+	struct bt_conn *acl;
+	uint16_t pkt_type;
 };
 #endif
 
 struct bt_conn_iso {
 	/* Reference to ACL Connection */
-	struct bt_conn          *acl;
+	struct bt_conn *acl;
 	/* CIG ID */
-	uint8_t			cig_id;
+	uint8_t cig_id;
 	/* CIS ID */
-	uint8_t			cis_id;
+	uint8_t cis_id;
 };
 
 typedef void (*bt_conn_tx_cb_t)(struct bt_conn *conn, void *user_data);
@@ -118,65 +118,64 @@ struct bt_conn_tx {
 };
 
 struct bt_conn {
-	uint16_t			handle;
-	uint8_t			type;
-	uint8_t			role;
+	uint16_t handle;
+	uint8_t type;
+	uint8_t role;
 
 	ATOMIC_DEFINE(flags, BT_CONN_NUM_FLAGS);
 
 	/* Which local identity address this connection uses */
-	uint8_t                    id;
+	uint8_t id;
 
 #if defined(CONFIG_BT_SMP) || defined(CONFIG_BT_BREDR)
-	bt_security_t		sec_level;
-	bt_security_t		required_sec_level;
-	uint8_t			encrypt;
+	bt_security_t sec_level;
+	bt_security_t required_sec_level;
+	uint8_t encrypt;
 #endif /* CONFIG_BT_SMP || CONFIG_BT_BREDR */
 
 	/* Connection error or reason for disconnect */
-	uint8_t			err;
+	uint8_t err;
 
-	bt_conn_state_t		state;
+	bt_conn_state_t state;
 	uint16_t rx_len;
-	struct net_buf		*rx;
+	struct net_buf *rx;
 
 	/* Sent but not acknowledged TX packets with a callback */
-	sys_slist_t		tx_pending;
+	sys_slist_t tx_pending;
 	/* Sent but not acknowledged TX packets without a callback before
 	 * the next packet (if any) in tx_pending.
 	 */
-	uint32_t                   pending_no_cb;
+	uint32_t pending_no_cb;
 
 	/* Completed TX for which we need to call the callback */
-	sys_slist_t		tx_complete;
-	struct k_work           tx_complete_work;
-
+	sys_slist_t tx_complete;
+	struct k_work tx_complete_work;
 
 	/* Queue for outgoing ACL data */
-	struct k_fifo		tx_queue;
+	struct k_fifo tx_queue;
 
 	/* Active L2CAP/ISO channels */
-	sys_slist_t		channels;
+	sys_slist_t channels;
 
-	atomic_t		ref;
+	atomic_t ref;
 
 	/* Delayed work for connection update and other deferred tasks */
-	struct k_delayed_work	update_work;
+	struct k_delayed_work update_work;
 
 	union {
-		struct bt_conn_le	le;
+		struct bt_conn_le le;
 #if defined(CONFIG_BT_BREDR)
-		struct bt_conn_br	br;
-		struct bt_conn_sco	sco;
+		struct bt_conn_br br;
+		struct bt_conn_sco sco;
 #endif
 #if defined(CONFIG_BT_AUDIO)
-		struct bt_conn_iso	iso;
+		struct bt_conn_iso iso;
 #endif
 	};
 
 #if defined(CONFIG_BT_REMOTE_VERSION)
 	struct bt_conn_rv {
-		uint8_t  version;
+		uint8_t version;
 		uint16_t manufacturer;
 		uint16_t subversion;
 	} rv;
@@ -205,10 +204,10 @@ struct bt_conn *bt_conn_add_le(uint8_t id, const bt_addr_le_t *peer);
 
 /** Connection parameters for ISO connections */
 struct bt_iso_create_param {
-	uint8_t			id;
-	uint8_t			num_conns;
-	struct bt_conn		**conns;
-	struct bt_iso_chan	**chans;
+	uint8_t id;
+	uint8_t num_conns;
+	struct bt_conn **conns;
+	struct bt_iso_chan **chans;
 };
 
 /* Bind ISO connections parameters */
@@ -259,7 +258,7 @@ static inline bool bt_conn_is_handle_valid(struct bt_conn *conn)
 		    conn->type == BT_CONN_TYPE_ISO) {
 			return true;
 		}
-	__fallthrough;
+		__fallthrough;
 	default:
 		return false;
 	}
@@ -301,7 +300,8 @@ bool le_param_req(struct bt_conn *conn, struct bt_le_conn_param *param);
 #if defined(CONFIG_BT_SMP)
 /* rand and ediv should be in BT order */
 int bt_conn_le_start_encryption(struct bt_conn *conn, uint8_t rand[8],
-				uint8_t ediv[2], const uint8_t *ltk, size_t len);
+				uint8_t ediv[2], const uint8_t *ltk,
+				size_t len);
 
 /* Notify higher layers that RPA was resolved */
 void bt_conn_identity_resolved(struct bt_conn *conn);
@@ -319,13 +319,13 @@ struct net_buf *bt_conn_create_pdu_timeout_debug(struct net_buf_pool *pool,
 						 size_t reserve,
 						 k_timeout_t timeout,
 						 const char *func, int line);
-#define bt_conn_create_pdu_timeout(_pool, _reserve, _timeout) \
-	bt_conn_create_pdu_timeout_debug(_pool, _reserve, _timeout, \
-					 __func__, __LINE__)
+#define bt_conn_create_pdu_timeout(_pool, _reserve, _timeout)                 \
+	bt_conn_create_pdu_timeout_debug(_pool, _reserve, _timeout, __func__, \
+					 __LINE__)
 
-#define bt_conn_create_pdu(_pool, _reserve) \
-	bt_conn_create_pdu_timeout_debug(_pool, _reserve, K_FOREVER, \
-					 __func__, __line__)
+#define bt_conn_create_pdu(_pool, _reserve)                                    \
+	bt_conn_create_pdu_timeout_debug(_pool, _reserve, K_FOREVER, __func__, \
+					 __line__)
 #else
 struct net_buf *bt_conn_create_pdu_timeout(struct net_buf_pool *pool,
 					   size_t reserve, k_timeout_t timeout);
@@ -340,13 +340,13 @@ struct net_buf *bt_conn_create_frag_timeout_debug(size_t reserve,
 						  k_timeout_t timeout,
 						  const char *func, int line);
 
-#define bt_conn_create_frag_timeout(_reserve, _timeout) \
-	bt_conn_create_frag_timeout_debug(_reserve, _timeout, \
-					  __func__, __LINE__)
+#define bt_conn_create_frag_timeout(_reserve, _timeout)                 \
+	bt_conn_create_frag_timeout_debug(_reserve, _timeout, __func__, \
+					  __LINE__)
 
-#define bt_conn_create_frag(_reserve) \
-	bt_conn_create_frag_timeout_debug(_reserve, K_FOREVER, \
-					  __func__, __LINE__)
+#define bt_conn_create_frag(_reserve)                                    \
+	bt_conn_create_frag_timeout_debug(_reserve, K_FOREVER, __func__, \
+					  __LINE__)
 #else
 struct net_buf *bt_conn_create_frag_timeout(size_t reserve,
 					    k_timeout_t timeout);

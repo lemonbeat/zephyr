@@ -14,7 +14,6 @@
  * Chapter 3.3: Memory Map
  */
 
-
 #ifndef _STM32F1_SOC_H_
 #define _STM32F1_SOC_H_
 

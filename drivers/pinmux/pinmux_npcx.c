@@ -26,11 +26,9 @@ static const struct npcx_pinctrl_config npcx_pinctrl_cfg = {
 };
 
 /* Driver convenience defines */
-#define DRV_CONFIG(dev) \
-	((const struct npcx_pinctrl_config *)(dev)->config)
+#define DRV_CONFIG(dev) ((const struct npcx_pinctrl_config *)(dev)->config)
 
-#define HAL_INSTANCE(dev) \
-	(struct scfg_reg *)(DRV_CONFIG(dev)->base)
+#define HAL_INSTANCE(dev) (struct scfg_reg *)(DRV_CONFIG(dev)->base)
 
 /* Pin-control local functions */
 static void npcx_pinctrl_alt_sel(const struct npcx_alt *alt, int alt_func)
@@ -46,14 +44,14 @@ static void npcx_pinctrl_alt_sel(const struct npcx_alt *alt, int alt_func)
 	 *    Clear devalt bit to select Alternate Func.
 	 */
 	if (!!alt_func != !!alt->inverted)
-		NPCX_DEVALT(scfg_base, alt->group) |=  alt_mask;
+		NPCX_DEVALT(scfg_base, alt->group) |= alt_mask;
 	else
 		NPCX_DEVALT(scfg_base, alt->group) &= ~alt_mask;
 }
 
 /* Soc specific pin-control functions */
 void soc_pinctrl_mux_configure(const struct npcx_alt *alts_list,
-		      uint8_t alts_size, int altfunc)
+			       uint8_t alts_size, int altfunc)
 {
 	int i;
 
@@ -81,9 +79,6 @@ static int npcx_pinctrl_init(const struct device *dev)
 	return 0;
 }
 
-DEVICE_AND_API_INIT(npcx_pinctrl,
-		    DT_LABEL(DT_NODELABEL(scfg)),
-		    &npcx_pinctrl_init,
-		    NULL, &npcx_pinctrl_cfg,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    NULL);
+DEVICE_AND_API_INIT(npcx_pinctrl, DT_LABEL(DT_NODELABEL(scfg)),
+		    &npcx_pinctrl_init, NULL, &npcx_pinctrl_cfg, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, NULL);

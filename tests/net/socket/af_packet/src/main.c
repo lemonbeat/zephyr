@@ -29,12 +29,8 @@ struct eth_fake_context {
 	uint8_t *mac_address;
 };
 
-static struct eth_fake_context eth_fake_data1 = {
-	.mac_address = lladdr1
-};
-static struct eth_fake_context eth_fake_data2 = {
-	.mac_address = lladdr2
-};
+static struct eth_fake_context eth_fake_data1 = { .mac_address = lladdr1 };
+static struct eth_fake_context eth_fake_data2 = { .mac_address = lladdr2 };
 
 static int eth_fake_send(const struct device *dev, struct net_pkt *pkt)
 {
@@ -44,8 +40,8 @@ static int eth_fake_send(const struct device *dev, struct net_pkt *pkt)
 	ARG_UNUSED(dev);
 	ARG_UNUSED(pkt);
 
-	DBG("Sending data (%d bytes) to iface %d\n",
-	    net_pkt_get_len(pkt), net_if_get_by_iface(net_pkt_iface(pkt)));
+	DBG("Sending data (%d bytes) to iface %d\n", net_pkt_get_len(pkt),
+	    net_if_get_by_iface(net_pkt_iface(pkt)));
 
 	recv_pkt = net_pkt_clone(pkt, K_NO_WAIT);
 
@@ -83,13 +79,11 @@ static int eth_fake_init(const struct device *dev)
 
 ETH_NET_DEVICE_INIT(eth_fake1, "eth_fake1", eth_fake_init,
 		    device_pm_control_nop, &eth_fake_data1, NULL,
-		    CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs,
-		    NET_ETH_MTU);
+		    CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs, NET_ETH_MTU);
 
 ETH_NET_DEVICE_INIT(eth_fake2, "eth_fake2", eth_fake_init,
 		    device_pm_control_nop, &eth_fake_data2, NULL,
-		    CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs,
-		    NET_ETH_MTU);
+		    CONFIG_ETH_INIT_PRIORITY, &eth_fake_api_funcs, NET_ETH_MTU);
 
 static int setup_socket(struct net_if *iface, int type, int proto)
 {
@@ -229,8 +223,8 @@ static void test_packet_sockets_dgram(void)
 	} while (ret < 0 && errno == EAGAIN);
 
 	zassert_equal(ret, sizeof(data_to_send),
-		      "Cannot receive all data (%d vs %zd) (%d)",
-		      ret, sizeof(data_to_send), -errno);
+		      "Cannot receive all data (%d vs %zd) (%d)", ret,
+		      sizeof(data_to_send), -errno);
 
 	/* Send to socket 2 but read from socket 1. There should not be any
 	 * data in socket 1
@@ -265,8 +259,7 @@ static void test_packet_sockets_dgram(void)
 
 void test_main(void)
 {
-	ztest_test_suite(socket_packet,
-			 ztest_unit_test(test_packet_sockets),
+	ztest_test_suite(socket_packet, ztest_unit_test(test_packet_sockets),
 			 ztest_unit_test(test_packet_sockets_dgram));
 	ztest_run_test_suite(socket_packet);
 }

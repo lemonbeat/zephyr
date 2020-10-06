@@ -33,8 +33,7 @@ void *normal_mutex_entry(void *p1)
 
 	zassert_false(rc, "try lock failed");
 	TC_PRINT("mutex lock is taken\n");
-	zassert_false(pthread_mutex_unlock(&mutex1),
-		      "mutex unlock is falied");
+	zassert_false(pthread_mutex_unlock(&mutex1), "mutex unlock is falied");
 	return NULL;
 }
 
@@ -44,10 +43,8 @@ void *recursive_mutex_entry(void *p1)
 	zassert_false(pthread_mutex_lock(&mutex2),
 		      "mutex is not taken 2nd time");
 	TC_PRINT("recrusive mutex lock is taken\n");
-	zassert_false(pthread_mutex_unlock(&mutex2),
-		      "mutex is not unlocked");
-	zassert_false(pthread_mutex_unlock(&mutex2),
-		      "mutex is not unlocked");
+	zassert_false(pthread_mutex_unlock(&mutex2), "mutex is not unlocked");
+	zassert_false(pthread_mutex_unlock(&mutex2), "mutex is not unlocked");
 	return NULL;
 }
 
@@ -92,8 +89,7 @@ void test_posix_normal_mutex(void)
 
 	pthread_mutex_lock(&mutex1);
 
-	zassert_equal(type, PTHREAD_MUTEX_NORMAL,
-		      "mutex type is not normal");
+	zassert_equal(type, PTHREAD_MUTEX_NORMAL, "mutex type is not normal");
 
 	zassert_equal(protocol, PTHREAD_PRIO_NONE,
 		      "mutex protocol is not prio_none");

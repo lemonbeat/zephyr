@@ -45,21 +45,20 @@ LOG_MODULE_REGISTER(net_test, NET_LOG_LEVEL);
 static char *test_data = "Test data to be sent";
 
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 2 addresses */
-static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Destination address for test packets */
-static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 /* Keep track of all ethernet interfaces */
 static struct net_if *eth_interfaces[2];
@@ -92,8 +91,7 @@ static void eth_iface_init(struct net_if *iface)
 	struct eth_context *context = dev->data;
 
 	net_if_set_link_addr(iface, context->mac_addr,
-			     sizeof(context->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(context->mac_addr), NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 }
@@ -356,32 +354,29 @@ static void test_address_setup(void)
 	zassert_not_null(iface1, "Interface 1\n");
 	zassert_not_null(iface2, "Interface 2\n");
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1\n");
 	}
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr\n");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr2));
+		    net_sprint_ipv6_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2\n");
 	}
 
@@ -438,8 +433,7 @@ static void send_some_data(struct net_if *iface)
 	bool timestamp = true;
 	int ret;
 
-	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v6_ctx);
+	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &udp_v6_ctx);
 	zassert_equal(ret, 0, "Create IPv6 UDP context failed\n");
 
 	memcpy(&src_addr6.sin6_addr, &my_addr1, sizeof(struct in6_addr));
@@ -452,13 +446,13 @@ static void send_some_data(struct net_if *iface)
 	ret = add_neighbor(iface, &dst_addr);
 	zassert_true(ret, "Cannot add neighbor\n");
 
-	net_context_set_option(udp_v6_ctx, NET_OPT_TIMESTAMP,
-			       &timestamp, sizeof(timestamp));
+	net_context_set_option(udp_v6_ctx, NET_OPT_TIMESTAMP, &timestamp,
+			       sizeof(timestamp));
 
 	ret = net_context_sendto(udp_v6_ctx, test_data, strlen(test_data),
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_NO_WAIT, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_NO_WAIT,
+				 NULL);
 	zassert_true(ret > 0, "Send UDP pkt failed\n");
 
 	net_context_unref(udp_v6_ctx);
@@ -499,8 +493,7 @@ void test_main(void)
 			 ztest_unit_test(test_timestamp_setup_2nd_iface),
 			 ztest_unit_test(test_timestamp_setup_all),
 			 ztest_unit_test(test_check_timestamp_after_enabling),
-			 ztest_unit_test(test_timestamp_cleanup)
-			 );
+			 ztest_unit_test(test_timestamp_cleanup));
 
 	ztest_run_test_suite(net_tx_timestamp_test);
 }

@@ -11,37 +11,37 @@
 #include <kernel.h>
 #include <drivers/gpio.h>
 
-#define SHT3XD_CMD_FETCH                0xE000
-#define SHT3XD_CMD_ART                  0x2B32
-#define SHT3XD_CMD_READ_STATUS          0xF32D
-#define SHT3XD_CMD_CLEAR_STATUS         0x3041
+#define SHT3XD_CMD_FETCH 0xE000
+#define SHT3XD_CMD_ART 0x2B32
+#define SHT3XD_CMD_READ_STATUS 0xF32D
+#define SHT3XD_CMD_CLEAR_STATUS 0x3041
 
-#define SHT3XD_CMD_WRITE_TH_HIGH_SET    0x611D
-#define SHT3XD_CMD_WRITE_TH_HIGH_CLEAR  0x6116
-#define SHT3XD_CMD_WRITE_TH_LOW_SET     0x610B
-#define SHT3XD_CMD_WRITE_TH_LOW_CLEAR   0x6100
+#define SHT3XD_CMD_WRITE_TH_HIGH_SET 0x611D
+#define SHT3XD_CMD_WRITE_TH_HIGH_CLEAR 0x6116
+#define SHT3XD_CMD_WRITE_TH_LOW_SET 0x610B
+#define SHT3XD_CMD_WRITE_TH_LOW_CLEAR 0x6100
 
 #if CONFIG_SHT3XD_REPEATABILITY_LOW
-	#define SHT3XD_REPEATABILITY_IDX        0
+#define SHT3XD_REPEATABILITY_IDX 0
 #elif CONFIG_SHT3XD_REPEATABILITY_MEDIUM
-	#define SHT3XD_REPEATABILITY_IDX        1
+#define SHT3XD_REPEATABILITY_IDX 1
 #elif CONFIG_SHT3XD_REPEATABILITY_HIGH
-	#define SHT3XD_REPEATABILITY_IDX        2
+#define SHT3XD_REPEATABILITY_IDX 2
 #endif
 
 #if CONFIG_SHT3XD_MPS_05
-	#define SHT3XD_MPS_IDX          0
+#define SHT3XD_MPS_IDX 0
 #elif CONFIG_SHT3XD_MPS_1
-	#define SHT3XD_MPS_IDX          1
+#define SHT3XD_MPS_IDX 1
 #elif CONFIG_SHT3XD_MPS_2
-	#define SHT3XD_MPS_IDX          2
+#define SHT3XD_MPS_IDX 2
 #elif CONFIG_SHT3XD_MPS_4
-	#define SHT3XD_MPS_IDX          3
+#define SHT3XD_MPS_IDX 3
 #elif CONFIG_SHT3XD_MPS_10
-	#define SHT3XD_MPS_IDX          4
+#define SHT3XD_MPS_IDX 4
 #endif
 
-#define SHT3XD_CLEAR_STATUS_WAIT_USEC   1000
+#define SHT3XD_CLEAR_STATUS_WAIT_USEC 1000
 
 struct sht3xd_config {
 	char *bus_name;
@@ -105,10 +105,8 @@ int sht3xd_write_command(const struct device *dev, uint16_t cmd);
 
 int sht3xd_write_reg(const struct device *dev, uint16_t cmd, uint16_t val);
 
-int sht3xd_attr_set(const struct device *dev,
-		    enum sensor_channel chan,
-		    enum sensor_attribute attr,
-		    const struct sensor_value *val);
+int sht3xd_attr_set(const struct device *dev, enum sensor_channel chan,
+		    enum sensor_attribute attr, const struct sensor_value *val);
 
 int sht3xd_trigger_set(const struct device *dev,
 		       const struct sensor_trigger *trig,

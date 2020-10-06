@@ -29,7 +29,7 @@ struct usart_sam_dev_cfg {
 	struct soc_gpio_pin pin_tx;
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	uart_irq_config_func_t	irq_config_func;
+	uart_irq_config_func_t irq_config_func;
 #endif
 };
 
@@ -38,20 +38,16 @@ struct usart_sam_dev_data {
 	uint32_t baud_rate;
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	uart_irq_callback_user_data_t irq_cb;	/* Interrupt Callback */
-	void *cb_data;	/* Interrupt Callback Arg */
+	uart_irq_callback_user_data_t irq_cb; /* Interrupt Callback */
+	void *cb_data; /* Interrupt Callback Arg */
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-#define DEV_CFG(dev) \
-	((const struct usart_sam_dev_cfg *const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct usart_sam_dev_data *const)(dev)->data)
-
+#define DEV_CFG(dev) ((const struct usart_sam_dev_cfg *const)(dev)->config)
+#define DEV_DATA(dev) ((struct usart_sam_dev_data *const)(dev)->data)
 
 static int baudrate_set(Usart *const usart, uint32_t baudrate,
 			uint32_t mck_freq_hz);
-
 
 static int usart_sam_init(const struct device *dev)
 {
@@ -68,18 +64,15 @@ static int usart_sam_init(const struct device *dev)
 	soc_gpio_configure(&cfg->pin_tx);
 
 	/* Reset and disable USART */
-	usart->US_CR =   US_CR_RSTRX | US_CR_RSTTX
-		       | US_CR_RXDIS | US_CR_TXDIS | US_CR_RSTSTA;
+	usart->US_CR = US_CR_RSTRX | US_CR_RSTTX | US_CR_RXDIS | US_CR_TXDIS |
+		       US_CR_RSTSTA;
 
 	/* Disable Interrupts */
 	usart->US_IDR = 0xFFFFFFFF;
 
 	/* 8 bits of data, no parity, 1 stop bit in normal mode */
-	usart->US_MR =   US_MR_NBSTOP_1_BIT
-		       | US_MR_PAR_NO
-		       | US_MR_CHRL_8_BIT
-		       | US_MR_USCLKS_MCK
-		       | US_MR_CHMODE_NORMAL;
+	usart->US_MR = US_MR_NBSTOP_1_BIT | US_MR_PAR_NO | US_MR_CHRL_8_BIT |
+		       US_MR_USCLKS_MCK | US_MR_CHMODE_NORMAL;
 
 	/* Set baud rate */
 	retval = baudrate_set(usart, dev_data->baud_rate,
@@ -126,7 +119,7 @@ static void usart_sam_poll_out(const struct device *dev, unsigned char c)
 
 static int usart_sam_err_check(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 	int errors = 0;
 
 	if (usart->US_CSR & US_CSR_OVRE) {
@@ -149,9 +142,8 @@ static int baudrate_set(Usart *const usart, uint32_t baudrate,
 {
 	uint32_t divisor;
 
-	__ASSERT(baudrate,
-		 "baud rate has to be bigger than 0");
-	__ASSERT(mck_freq_hz/16U >= baudrate,
+	__ASSERT(baudrate, "baud rate has to be bigger than 0");
+	__ASSERT(mck_freq_hz / 16U >= baudrate,
 		 "MCK frequency is too small to set required baud rate");
 
 	divisor = mck_freq_hz / 16U / baudrate;
@@ -167,11 +159,10 @@ static int baudrate_set(Usart *const usart, uint32_t baudrate,
 
 #if CONFIG_UART_INTERRUPT_DRIVEN
 
-static int usart_sam_fifo_fill(const struct device *dev,
-			       const uint8_t *tx_data,
+static int usart_sam_fifo_fill(const struct device *dev, const uint8_t *tx_data,
 			       int size)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	/* Wait for transmitter to be ready. */
 	while ((usart->US_CSR & US_CSR_TXRDY) == 0) {
@@ -185,7 +176,7 @@ static int usart_sam_fifo_fill(const struct device *dev,
 static int usart_sam_fifo_read(const struct device *dev, uint8_t *rx_data,
 			       const int size)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 	int bytes_read;
 
 	bytes_read = 0;
@@ -204,73 +195,73 @@ static int usart_sam_fifo_read(const struct device *dev, uint8_t *rx_data,
 
 static void usart_sam_irq_tx_enable(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	usart->US_IER = US_IER_TXRDY;
 }
 
 static void usart_sam_irq_tx_disable(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	usart->US_IDR = US_IDR_TXRDY;
 }
 
 static int usart_sam_irq_tx_ready(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	return (usart->US_CSR & US_CSR_TXRDY);
 }
 
 static void usart_sam_irq_rx_enable(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	usart->US_IER = US_IER_RXRDY;
 }
 
 static void usart_sam_irq_rx_disable(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	usart->US_IDR = US_IDR_RXRDY;
 }
 
 static int usart_sam_irq_tx_complete(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	return !(usart->US_CSR & US_CSR_TXRDY);
 }
 
 static int usart_sam_irq_rx_ready(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	return (usart->US_CSR & US_CSR_RXRDY);
 }
 
 static void usart_sam_irq_err_enable(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	usart->US_IER = US_IER_OVRE | US_IER_FRAME | US_IER_PARE;
 }
 
 static void usart_sam_irq_err_disable(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	usart->US_IDR = US_IDR_OVRE | US_IDR_FRAME | US_IDR_PARE;
 }
 
 static int usart_sam_irq_is_pending(const struct device *dev)
 {
-	volatile Usart * const usart = DEV_CFG(dev)->regs;
+	volatile Usart *const usart = DEV_CFG(dev)->regs;
 
 	return (usart->US_IMR & (US_IMR_TXRDY | US_IMR_RXRDY)) &
-		(usart->US_CSR & (US_CSR_TXRDY | US_CSR_RXRDY));
+	       (usart->US_CSR & (US_CSR_TXRDY | US_CSR_RXRDY));
 }
 
 static int usart_sam_irq_update(const struct device *dev)
@@ -320,56 +311,53 @@ static const struct uart_driver_api usart_sam_driver_api = {
 	.irq_is_pending = usart_sam_irq_is_pending,
 	.irq_update = usart_sam_irq_update,
 	.irq_callback_set = usart_sam_irq_callback_set,
-#endif	/* CONFIG_UART_INTERRUPT_DRIVEN */
+#endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-#define USART_SAM_DECLARE_CFG(n, IRQ_FUNC_INIT)				\
-	static const struct usart_sam_dev_cfg usart##n##_sam_config = {	\
-		.regs = (Usart *)DT_INST_REG_ADDR(n),			\
-		.periph_id = DT_INST_PROP(n, peripheral_id),		\
-									\
-		.pin_rx = ATMEL_SAM_DT_PIN(n, 0),			\
-		.pin_tx = ATMEL_SAM_DT_PIN(n, 1),			\
-									\
-		IRQ_FUNC_INIT						\
+#define USART_SAM_DECLARE_CFG(n, IRQ_FUNC_INIT)                         \
+	static const struct usart_sam_dev_cfg usart##n##_sam_config = { \
+		.regs = (Usart *)DT_INST_REG_ADDR(n),                   \
+		.periph_id = DT_INST_PROP(n, peripheral_id),            \
+                                                                        \
+		.pin_rx = ATMEL_SAM_DT_PIN(n, 0),                       \
+		.pin_tx = ATMEL_SAM_DT_PIN(n, 1),                       \
+                                                                        \
+		IRQ_FUNC_INIT                                           \
 	}
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-#define USART_SAM_CONFIG_FUNC(n)					\
-	static void usart##n##_sam_irq_config_func(const struct device *port)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n),				\
-			    DT_INST_IRQ(n, priority),			\
-			    usart_sam_isr,				\
-			    DEVICE_GET(usart##n##_sam), 0);		\
-		irq_enable(DT_INST_IRQN(n));				\
+#define USART_SAM_CONFIG_FUNC(n)                                              \
+	static void usart##n##_sam_irq_config_func(const struct device *port) \
+	{                                                                     \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),        \
+			    usart_sam_isr, DEVICE_GET(usart##n##_sam), 0);    \
+		irq_enable(DT_INST_IRQN(n));                                  \
 	}
-#define USART_SAM_IRQ_CFG_FUNC_INIT(n)					\
+#define USART_SAM_IRQ_CFG_FUNC_INIT(n) \
 	.irq_config_func = usart##n##_sam_irq_config_func
-#define USART_SAM_INIT_CFG(n)						\
+#define USART_SAM_INIT_CFG(n) \
 	USART_SAM_DECLARE_CFG(n, USART_SAM_IRQ_CFG_FUNC_INIT(n))
 #else
 #define USART_SAM_CONFIG_FUNC(n)
 #define USART_SAM_IRQ_CFG_FUNC_INIT
-#define USART_SAM_INIT_CFG(n)						\
+#define USART_SAM_INIT_CFG(n) \
 	USART_SAM_DECLARE_CFG(n, USART_SAM_IRQ_CFG_FUNC_INIT)
 #endif
 
-#define USART_SAM_INIT(n)						\
-	static struct usart_sam_dev_data usart##n##_sam_data = {	\
-		.baud_rate = DT_INST_PROP(n, current_speed),		\
-	};								\
-									\
-	static const struct usart_sam_dev_cfg usart##n##_sam_config;	\
-									\
-	DEVICE_AND_API_INIT(usart##n##_sam, DT_INST_LABEL(n),		\
-			    &usart_sam_init, &usart##n##_sam_data,	\
-			    &usart##n##_sam_config, PRE_KERNEL_1,	\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &usart_sam_driver_api);			\
-									\
-	USART_SAM_CONFIG_FUNC(n)					\
-									\
+#define USART_SAM_INIT(n)                                                      \
+	static struct usart_sam_dev_data usart##n##_sam_data = {               \
+		.baud_rate = DT_INST_PROP(n, current_speed),                   \
+	};                                                                     \
+                                                                               \
+	static const struct usart_sam_dev_cfg usart##n##_sam_config;           \
+                                                                               \
+	DEVICE_AND_API_INIT(usart##n##_sam, DT_INST_LABEL(n), &usart_sam_init, \
+			    &usart##n##_sam_data, &usart##n##_sam_config,      \
+			    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,  \
+			    &usart_sam_driver_api);                            \
+                                                                               \
+	USART_SAM_CONFIG_FUNC(n)                                               \
+                                                                               \
 	USART_SAM_INIT_CFG(n);
 
 DT_INST_FOREACH_STATUS_OKAY(USART_SAM_INIT)

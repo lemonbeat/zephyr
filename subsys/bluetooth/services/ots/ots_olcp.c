@@ -21,8 +21,8 @@
 
 LOG_MODULE_DECLARE(bt_ots, CONFIG_BT_OTS_LOG_LEVEL);
 
-#define OLCP_PROC_TYPE_SIZE	1
-#define OLCP_RES_MAX_SIZE	7
+#define OLCP_PROC_TYPE_SIZE 1
+#define OLCP_RES_MAX_SIZE 7
 
 static enum bt_gatt_ots_olcp_res_code obj_manager_to_olcp_err_map(int err)
 {
@@ -37,8 +37,8 @@ static enum bt_gatt_ots_olcp_res_code obj_manager_to_olcp_err_map(int err)
 	}
 }
 
-static enum bt_gatt_ots_olcp_res_code olcp_first_proc_execute(
-	struct bt_ots *ots)
+static enum bt_gatt_ots_olcp_res_code
+olcp_first_proc_execute(struct bt_ots *ots)
 {
 	int err;
 	struct bt_gatt_ots_object *first_obj;
@@ -54,14 +54,12 @@ static enum bt_gatt_ots_olcp_res_code olcp_first_proc_execute(
 	return BT_GATT_OTS_OLCP_RES_SUCCESS;
 }
 
-static enum bt_gatt_ots_olcp_res_code olcp_last_proc_execute(
-	struct bt_ots *ots)
+static enum bt_gatt_ots_olcp_res_code olcp_last_proc_execute(struct bt_ots *ots)
 {
 	int err;
 	struct bt_gatt_ots_object *last_obj;
 
-	err = bt_gatt_ots_obj_manager_last_obj_get(ots->obj_manager,
-						   &last_obj);
+	err = bt_gatt_ots_obj_manager_last_obj_get(ots->obj_manager, &last_obj);
 	if (err) {
 		return obj_manager_to_olcp_err_map(err);
 	}
@@ -71,8 +69,7 @@ static enum bt_gatt_ots_olcp_res_code olcp_last_proc_execute(
 	return BT_GATT_OTS_OLCP_RES_SUCCESS;
 }
 
-static enum bt_gatt_ots_olcp_res_code olcp_prev_proc_execute(
-	struct bt_ots *ots)
+static enum bt_gatt_ots_olcp_res_code olcp_prev_proc_execute(struct bt_ots *ots)
 {
 	int err;
 	struct bt_gatt_ots_object *prev_obj;
@@ -81,8 +78,7 @@ static enum bt_gatt_ots_olcp_res_code olcp_prev_proc_execute(
 		return BT_GATT_OTS_OLCP_RES_OPERATION_FAILED;
 	}
 	err = bt_gatt_ots_obj_manager_prev_obj_get(ots->obj_manager,
-						   ots->cur_obj,
-						   &prev_obj);
+						   ots->cur_obj, &prev_obj);
 	if (err) {
 		return obj_manager_to_olcp_err_map(err);
 	}
@@ -92,8 +88,7 @@ static enum bt_gatt_ots_olcp_res_code olcp_prev_proc_execute(
 	return BT_GATT_OTS_OLCP_RES_SUCCESS;
 }
 
-static enum bt_gatt_ots_olcp_res_code olcp_next_proc_execute(
-	struct bt_ots *ots)
+static enum bt_gatt_ots_olcp_res_code olcp_next_proc_execute(struct bt_ots *ots)
 {
 	int err;
 	struct bt_gatt_ots_object *next_obj;
@@ -102,8 +97,7 @@ static enum bt_gatt_ots_olcp_res_code olcp_next_proc_execute(
 		return BT_GATT_OTS_OLCP_RES_OPERATION_FAILED;
 	}
 	err = bt_gatt_ots_obj_manager_next_obj_get(ots->obj_manager,
-						   ots->cur_obj,
-						   &next_obj);
+						   ots->cur_obj, &next_obj);
 	if (err) {
 		return obj_manager_to_olcp_err_map(err);
 	}
@@ -113,15 +107,13 @@ static enum bt_gatt_ots_olcp_res_code olcp_next_proc_execute(
 	return BT_GATT_OTS_OLCP_RES_SUCCESS;
 }
 
-static enum bt_gatt_ots_olcp_res_code olcp_goto_proc_execute(
-	struct bt_ots *ots, uint64_t id)
+static enum bt_gatt_ots_olcp_res_code olcp_goto_proc_execute(struct bt_ots *ots,
+							     uint64_t id)
 {
 	int err;
 	struct bt_gatt_ots_object *id_obj;
 
-	err = bt_gatt_ots_obj_manager_obj_get(ots->obj_manager,
-					      id,
-					      &id_obj);
+	err = bt_gatt_ots_obj_manager_obj_get(ots->obj_manager, id, &id_obj);
 	if (err) {
 		return obj_manager_to_olcp_err_map(err);
 	}
@@ -131,8 +123,8 @@ static enum bt_gatt_ots_olcp_res_code olcp_goto_proc_execute(
 	return BT_GATT_OTS_OLCP_RES_SUCCESS;
 }
 
-static enum bt_gatt_ots_olcp_res_code olcp_proc_execute(
-	struct bt_ots *ots, struct bt_gatt_ots_olcp_proc *proc)
+static enum bt_gatt_ots_olcp_res_code
+olcp_proc_execute(struct bt_ots *ots, struct bt_gatt_ots_olcp_proc *proc)
 {
 	LOG_DBG("Executing OLCP procedure with 0x%02X Op Code", proc->type);
 
@@ -155,8 +147,8 @@ static enum bt_gatt_ots_olcp_res_code olcp_proc_execute(
 	}
 };
 
-static enum bt_gatt_ots_olcp_res_code olcp_command_decode(
-	const uint8_t *buf, struct bt_gatt_ots_olcp_proc *proc)
+static enum bt_gatt_ots_olcp_res_code
+olcp_command_decode(const uint8_t *buf, struct bt_gatt_ots_olcp_proc *proc)
 {
 	memset(proc, 0, sizeof(*proc));
 
@@ -205,9 +197,8 @@ static bool olcp_command_len_verify(enum bt_gatt_ots_olcp_proc_type type,
 	return (len == ref_len);
 }
 
-static void olcp_ind_cb(struct bt_conn *conn,
-		const struct bt_gatt_attr *attr,
-		uint8_t err)
+static void olcp_ind_cb(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+			uint8_t err)
 {
 	LOG_DBG("Received OLCP Indication ACK with status: 0x%04X", err);
 }
@@ -218,7 +209,7 @@ static int olcp_ind_send(const struct bt_gatt_attr *olcp_attr,
 {
 	uint8_t olcp_res[OLCP_RES_MAX_SIZE];
 	uint16_t olcp_res_len = 0;
-	struct bt_ots *ots = (struct bt_ots *) olcp_attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)olcp_attr->user_data;
 
 	/* Encode OLCP Response */
 	olcp_res[olcp_res_len++] = BT_GATT_OTS_OLCP_PROC_RESP;
@@ -231,7 +222,7 @@ static int olcp_ind_send(const struct bt_gatt_attr *olcp_attr,
 	ots->olcp_ind.params.attr = olcp_attr;
 	ots->olcp_ind.params.func = olcp_ind_cb;
 	ots->olcp_ind.params.data = olcp_res;
-	ots->olcp_ind.params.len  = olcp_res_len;
+	ots->olcp_ind.params.len = olcp_res_len;
 
 	LOG_DBG("Sending OLCP indication");
 
@@ -239,14 +230,13 @@ static int olcp_ind_send(const struct bt_gatt_attr *olcp_attr,
 }
 
 ssize_t bt_gatt_ots_olcp_write(struct bt_conn *conn,
-				   const struct bt_gatt_attr *attr,
-				   const void *buf, uint16_t len,
-				   uint16_t offset, uint8_t flags)
+			       const struct bt_gatt_attr *attr, const void *buf,
+			       uint16_t len, uint16_t offset, uint8_t flags)
 {
 	struct bt_gatt_ots_object *old_obj;
 	enum bt_gatt_ots_olcp_res_code olcp_status;
 	struct bt_gatt_ots_olcp_proc olcp_proc;
-	struct bt_ots *ots = (struct bt_ots *) attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)attr->user_data;
 
 	LOG_DBG("Object List Control Point GATT Write Operation");
 
@@ -264,7 +254,8 @@ ssize_t bt_gatt_ots_olcp_write(struct bt_conn *conn,
 
 	if (!olcp_command_len_verify(olcp_proc.type, len)) {
 		LOG_ERR("Invalid length of OLCP Write Request for 0x%02X "
-			"Op Code", olcp_proc.type);
+			"Op Code",
+			olcp_proc.type);
 		return BT_GATT_ERR(BT_ATT_ERR_INVALID_ATTRIBUTE_LEN);
 	}
 
@@ -278,8 +269,7 @@ ssize_t bt_gatt_ots_olcp_write(struct bt_conn *conn,
 	} else if (old_obj != ots->cur_obj) {
 		char id[BT_OTS_OBJ_ID_STR_LEN];
 
-		bt_ots_obj_id_to_str(ots->cur_obj->id, id,
-					      sizeof(id));
+		bt_ots_obj_id_to_str(ots->cur_obj->id, id, sizeof(id));
 		LOG_DBG("Selecting a new Current Object with id: %s",
 			log_strdup(id));
 
@@ -293,11 +283,11 @@ ssize_t bt_gatt_ots_olcp_write(struct bt_conn *conn,
 }
 
 void bt_gatt_ots_olcp_cfg_changed(const struct bt_gatt_attr *attr,
-				      uint16_t value)
+				  uint16_t value)
 {
 	struct bt_gatt_ots_indicate *olcp_ind =
-	    CONTAINER_OF((struct _bt_gatt_ccc *) attr->user_data,
-			 struct bt_gatt_ots_indicate, ccc);
+		CONTAINER_OF((struct _bt_gatt_ccc *)attr->user_data,
+			     struct bt_gatt_ots_indicate, ccc);
 
 	LOG_DBG("Object List Control Point CCCD value: 0x%04X", value);
 

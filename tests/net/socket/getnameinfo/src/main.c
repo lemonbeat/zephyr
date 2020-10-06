@@ -22,8 +22,8 @@ void test_getnameinfo_ipv4(void)
 	memset(&saddr, 0, sizeof(saddr));
 	saddr.sin_family = AF_INET;
 
-	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr),
-			  host, sizeof(host), serv, sizeof(serv), 0);
+	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr), host,
+			  sizeof(host), serv, sizeof(serv), 0);
 	zassert_equal(ret, 0, "");
 
 	printk("%s %s\n", host, serv);
@@ -33,8 +33,8 @@ void test_getnameinfo_ipv4(void)
 	saddr.sin_port = htons(1234);
 	saddr.sin_addr.s_addr = htonl(0x7f000001);
 
-	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr),
-			  host, sizeof(host), serv, sizeof(serv), 0);
+	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr), host,
+			  sizeof(host), serv, sizeof(serv), 0);
 	zassert_equal(ret, 0, "");
 
 	printk("%s %s\n", host, serv);
@@ -52,8 +52,8 @@ void test_getnameinfo_ipv6(void)
 	memset(&saddr, 0, sizeof(saddr));
 	saddr.sin6_family = AF_INET6;
 
-	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr),
-			  host, sizeof(host), serv, sizeof(serv), 0);
+	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr), host,
+			  sizeof(host), serv, sizeof(serv), 0);
 	zassert_equal(ret, 0, "");
 
 	printk("%s %s\n", host, serv);
@@ -65,8 +65,8 @@ void test_getnameinfo_ipv6(void)
 	saddr.sin6_addr.s6_addr[1] = 0x55;
 	saddr.sin6_addr.s6_addr[15] = 0x11;
 
-	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr),
-			  host, sizeof(host), serv, sizeof(serv), 0);
+	ret = getnameinfo((struct sockaddr *)&saddr, sizeof(saddr), host,
+			  sizeof(host), serv, sizeof(serv), 0);
 	zassert_equal(ret, 0, "");
 
 	printk("%s %s\n", host, serv);

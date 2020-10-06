@@ -29,7 +29,7 @@ static inline uintptr_t sock_get_flag(struct net_context *ctx, uintptr_t mask)
 void net_socket_update_tc_rx_time(struct net_pkt *pkt, uint32_t end_tick);
 
 #if defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS) && \
-    !defined(CONFIG_NET_SOCKETS_OFFLOAD_TLS)
+	!defined(CONFIG_NET_SOCKETS_OFFLOAD_TLS)
 bool net_socket_is_tls(void *obj);
 #else
 static inline bool net_socket_is_tls(void *obj)
@@ -55,10 +55,10 @@ struct socket_op_vtable {
 			  const struct sockaddr *dest_addr, socklen_t addrlen);
 	ssize_t (*recvfrom)(void *obj, void *buf, size_t max_len, int flags,
 			    struct sockaddr *src_addr, socklen_t *addrlen);
-	int (*getsockopt)(void *obj, int level, int optname,
-			  void *optval, socklen_t *optlen);
-	int (*setsockopt)(void *obj, int level, int optname,
-			  const void *optval, socklen_t optlen);
+	int (*getsockopt)(void *obj, int level, int optname, void *optval,
+			  socklen_t *optlen);
+	int (*setsockopt)(void *obj, int level, int optname, const void *optval,
+			  socklen_t optlen);
 	ssize_t (*sendmsg)(void *obj, const struct msghdr *msg, int flags);
 	int (*getsockname)(void *obj, struct sockaddr *addr,
 			   socklen_t *addrlen);

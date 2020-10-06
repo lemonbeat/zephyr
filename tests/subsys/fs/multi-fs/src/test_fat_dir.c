@@ -10,7 +10,6 @@
 #include "test_fat.h"
 #include "test_fat_priv.h"
 
-
 void test_fat_mkdir(void)
 {
 	zassert_true(test_mkdir(TEST_DIR_PATH, TEST_FILE) == TC_PASS, NULL);

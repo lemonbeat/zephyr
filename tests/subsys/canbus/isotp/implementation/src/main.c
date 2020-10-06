@@ -10,7 +10,7 @@
 #include <net/buf.h>
 
 #define NUMBER_OF_REPETITIONS 5
-#define DATA_SIZE_SF          7
+#define DATA_SIZE_SF 7
 
 #if defined(CONFIG_CAN_LOOPBACK_DEV_NAME)
 #define CAN_DEVICE_NAME CONFIG_CAN_LOOPBACK_DEV_NAME
@@ -33,24 +33,14 @@
 
 const struct device *can_dev;
 
-const struct isotp_fc_opts fc_opts = {
-	.bs = 8,
-	.stmin = 0
-};
-const struct isotp_fc_opts fc_opts_single = {
-	.bs = 0,
-	.stmin = 1
-};
-const struct isotp_msg_id rx_addr = {
-	.std_id = 0x10,
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.use_ext_addr = 0
-};
-const struct isotp_msg_id tx_addr = {
-	.std_id = 0x11,
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.use_ext_addr = 0
-};
+const struct isotp_fc_opts fc_opts = { .bs = 8, .stmin = 0 };
+const struct isotp_fc_opts fc_opts_single = { .bs = 0, .stmin = 1 };
+const struct isotp_msg_id rx_addr = { .std_id = 0x10,
+				      .id_type = CAN_STANDARD_IDENTIFIER,
+				      .use_ext_addr = 0 };
+const struct isotp_msg_id tx_addr = { .std_id = 0x11,
+				      .id_type = CAN_STANDARD_IDENTIFIER,
+				      .use_ext_addr = 0 };
 
 struct isotp_recv_ctx recv_ctx;
 struct isotp_send_ctx send_ctx;
@@ -96,7 +86,7 @@ static void get_sf(struct isotp_recv_ctx *recv_ctx)
 	ret = isotp_recv(recv_ctx, data_buf_ptr++, 1, K_MSEC(1000));
 	zassert_equal(ret, 1, "recv returned %d", ret);
 	ret = isotp_recv(recv_ctx, data_buf_ptr++, sizeof(data_buf) - 1,
-			  K_MSEC(1000));
+			 K_MSEC(1000));
 	zassert_equal(ret, DATA_SIZE_SF - 1, "recv returned %d", ret);
 
 	ret = memcmp(random_data, data_buf, DATA_SIZE_SF);
@@ -116,7 +106,7 @@ static void send_test_data(const struct device *can_dev, const uint8_t *data,
 	int ret;
 
 	ret = isotp_send(&send_ctx, can_dev, data, len, &rx_addr, &tx_addr,
-			  send_complette_cb, NULL);
+			 send_complette_cb, NULL);
 	zassert_equal(ret, 0, "Send returned %d", ret);
 }
 
@@ -137,7 +127,8 @@ static const uint8_t *check_frag(struct net_buf *frag, const uint8_t *data)
 }
 
 static void receive_test_data_net(struct isotp_recv_ctx *recv_ctx,
-				 const uint8_t *data, size_t len, int32_t delay)
+				  const uint8_t *data, size_t len,
+				  int32_t delay)
 {
 	int remaining_len;
 	size_t received_len = 0;
@@ -166,7 +157,8 @@ static void receive_test_data_net(struct isotp_recv_ctx *recv_ctx,
 		      "Expected timeout but got %d", remaining_len);
 }
 
-static void check_data(const uint8_t *recv_data, const uint8_t *send_data, size_t len)
+static void check_data(const uint8_t *recv_data, const uint8_t *send_data,
+		       size_t len)
 {
 	int ret;
 
@@ -205,8 +197,8 @@ static void receive_test_data(struct isotp_recv_ctx *recv_ctx,
 	} while (remaining_len);
 
 	ret = isotp_recv(recv_ctx, data_buf, sizeof(data_buf), K_MSEC(50));
-	zassert_equal(ret, ISOTP_RECV_TIMEOUT,
-		      "Expected timeout but got %d", ret);
+	zassert_equal(ret, ISOTP_RECV_TIMEOUT, "Expected timeout but got %d",
+		      ret);
 }
 
 static void test_send_receive_net_sf(void)
@@ -251,8 +243,8 @@ static void test_send_receive_net_blocks(void)
 
 	for (i = 0; i < NUMBER_OF_REPETITIONS; i++) {
 		send_test_data(can_dev, random_data, random_data_len);
-		receive_test_data_net(&recv_ctx, random_data,
-				      random_data_len, 0);
+		receive_test_data_net(&recv_ctx, random_data, random_data_len,
+				      0);
 	}
 
 	isotp_unbind(&recv_ctx);
@@ -277,8 +269,8 @@ static void test_send_receive_blocks(void)
 
 static void test_send_receive_net_single_blocks(void)
 {
-	const size_t send_len = CONFIG_ISOTP_RX_BUF_COUNT *
-				CONFIG_ISOTP_RX_BUF_SIZE + 6;
+	const size_t send_len =
+		CONFIG_ISOTP_RX_BUF_COUNT * CONFIG_ISOTP_RX_BUF_SIZE + 6;
 	int ret, i;
 	size_t buf_len;
 	struct net_buf *buf, *frag;
@@ -311,8 +303,8 @@ static void test_send_receive_net_single_blocks(void)
 
 static void test_send_receive_single_block(void)
 {
-	const size_t send_len = CONFIG_ISOTP_RX_BUF_COUNT *
-				CONFIG_ISOTP_RX_BUF_SIZE + 6;
+	const size_t send_len =
+		CONFIG_ISOTP_RX_BUF_COUNT * CONFIG_ISOTP_RX_BUF_SIZE + 6;
 	int ret, i;
 
 	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr,
@@ -385,8 +377,8 @@ static void test_bind_unbind(void)
 static void test_buffer_allocation(void)
 {
 	int ret;
-	size_t send_data_length = CONFIG_ISOTP_RX_BUF_COUNT *
-				  CONFIG_ISOTP_RX_BUF_SIZE * 3 + 6;
+	size_t send_data_length =
+		CONFIG_ISOTP_RX_BUF_COUNT * CONFIG_ISOTP_RX_BUF_SIZE * 3 + 6;
 
 	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr, &fc_opts,
 			 K_NO_WAIT);
@@ -401,8 +393,8 @@ static void test_buffer_allocation(void)
 static void test_buffer_allocation_wait(void)
 {
 	int ret;
-	size_t send_data_length = CONFIG_ISOTP_RX_BUF_COUNT *
-				  CONFIG_ISOTP_RX_BUF_SIZE * 2 + 6;
+	size_t send_data_length =
+		CONFIG_ISOTP_RX_BUF_COUNT * CONFIG_ISOTP_RX_BUF_SIZE * 2 + 6;
 
 	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr, &fc_opts,
 			 K_NO_WAIT);
@@ -426,8 +418,7 @@ void test_main(void)
 	ret = can_configure(can_dev, CAN_LOOPBACK_MODE, 0);
 	zassert_equal(ret, 0, "Configuring loopback mode failed (%d)", ret);
 
-	ztest_test_suite(isotp,
-			 ztest_unit_test(test_bind_unbind),
+	ztest_test_suite(isotp, ztest_unit_test(test_bind_unbind),
 			 ztest_unit_test(test_send_receive_net_sf),
 			 ztest_unit_test(test_send_receive_net_blocks),
 			 ztest_unit_test(test_send_receive_net_single_blocks),
@@ -435,7 +426,6 @@ void test_main(void)
 			 ztest_unit_test(test_send_receive_blocks),
 			 ztest_unit_test(test_send_receive_single_block),
 			 ztest_unit_test(test_buffer_allocation),
-			 ztest_unit_test(test_buffer_allocation_wait)
-			 );
+			 ztest_unit_test(test_buffer_allocation_wait));
 	ztest_run_test_suite(isotp);
 }

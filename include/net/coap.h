@@ -135,22 +135,22 @@ enum coap_response_code {
 	COAP_RESPONSE_CODE_PRECONDITION_FAILED = coap_make_response_code(4, 12),
 	COAP_RESPONSE_CODE_REQUEST_TOO_LARGE = coap_make_response_code(4, 13),
 	COAP_RESPONSE_CODE_UNSUPPORTED_CONTENT_FORMAT =
-						coap_make_response_code(4, 15),
+		coap_make_response_code(4, 15),
 	COAP_RESPONSE_CODE_INTERNAL_ERROR = coap_make_response_code(5, 0),
 	COAP_RESPONSE_CODE_NOT_IMPLEMENTED = coap_make_response_code(5, 1),
 	COAP_RESPONSE_CODE_BAD_GATEWAY = coap_make_response_code(5, 2),
 	COAP_RESPONSE_CODE_SERVICE_UNAVAILABLE = coap_make_response_code(5, 3),
 	COAP_RESPONSE_CODE_GATEWAY_TIMEOUT = coap_make_response_code(5, 4),
 	COAP_RESPONSE_CODE_PROXYING_NOT_SUPPORTED =
-						coap_make_response_code(5, 5)
+		coap_make_response_code(5, 5)
 };
 
 #define COAP_CODE_EMPTY (0)
 
 /* block option helper */
-#define GET_BLOCK_NUM(v)        ((v) >> 4)
-#define GET_BLOCK_SIZE(v)       (((v) & 0x7))
-#define GET_MORE(v)             (!!((v) & 0x08))
+#define GET_BLOCK_NUM(v) ((v) >> 4)
+#define GET_BLOCK_SIZE(v) (((v)&0x7))
+#define GET_MORE(v) (!!((v)&0x08))
 
 struct coap_observer;
 struct coap_packet;
@@ -164,8 +164,8 @@ struct coap_resource;
  * invoked by the remote entity.
  */
 typedef int (*coap_method_t)(struct coap_resource *resource,
-			     struct coap_packet *request,
-			     struct sockaddr *addr, socklen_t addr_len);
+			     struct coap_packet *request, struct sockaddr *addr,
+			     socklen_t addr_len);
 
 /**
  * @typedef coap_notify_t
@@ -185,7 +185,7 @@ struct coap_resource {
 	/** Which function to be called for each CoAP method */
 	coap_method_t get, post, put, del;
 	coap_notify_t notify;
-	const char * const *path;
+	const char *const *path;
 	void *user_data;
 	sys_slist_t observers;
 	int age;
@@ -464,8 +464,7 @@ int coap_packet_append_payload(struct coap_packet *cpkt, uint8_t *payload,
  */
 int coap_handle_request(struct coap_packet *cpkt,
 			struct coap_resource *resources,
-			struct coap_option *options,
-			uint8_t opt_num,
+			struct coap_option *options, uint8_t opt_num,
 			struct sockaddr *addr, socklen_t addr_len);
 
 /**
@@ -494,8 +493,7 @@ enum coap_block_size {
  *
  * @return The size in bytes that the block_size represents
  */
-static inline uint16_t coap_block_size_to_bytes(
-	enum coap_block_size block_size)
+static inline uint16_t coap_block_size_to_bytes(enum coap_block_size block_size)
 {
 	return (1 << (block_size + 4));
 }
@@ -651,9 +649,9 @@ void coap_remove_observer(struct coap_resource *resource,
  * @return A pointer to a observer if a match is found, NULL
  * otherwise.
  */
-struct coap_observer *coap_find_observer_by_addr(
-	struct coap_observer *observers, size_t len,
-	const struct sockaddr *addr);
+struct coap_observer *
+coap_find_observer_by_addr(struct coap_observer *observers, size_t len,
+			   const struct sockaddr *addr);
 
 /**
  * @brief Returns the next available observer representation.
@@ -664,8 +662,8 @@ struct coap_observer *coap_find_observer_by_addr(
  * @return A pointer to a observer if there's an available observer,
  * NULL otherwise.
  */
-struct coap_observer *coap_observer_next_unused(
-	struct coap_observer *observers, size_t len);
+struct coap_observer *coap_observer_next_unused(struct coap_observer *observers,
+						size_t len);
 
 /**
  * @brief Indicates that a reply is expected for @a request.
@@ -704,8 +702,8 @@ int coap_pending_init(struct coap_pending *pending,
  * @return pointer to a free #coap_pending structure, NULL in case
  * none could be found.
  */
-struct coap_pending *coap_pending_next_unused(
-	struct coap_pending *pendings, size_t len);
+struct coap_pending *coap_pending_next_unused(struct coap_pending *pendings,
+					      size_t len);
 
 /**
  * @brief Returns the next available reply struct, so it can be used
@@ -717,8 +715,8 @@ struct coap_pending *coap_pending_next_unused(
  * @return pointer to a free #coap_reply structure, NULL in case
  * none could be found.
  */
-struct coap_reply *coap_reply_next_unused(
-	struct coap_reply *replies, size_t len);
+struct coap_reply *coap_reply_next_unused(struct coap_reply *replies,
+					  size_t len);
 
 /**
  * @brief After a response is received, returns if there is any
@@ -733,9 +731,9 @@ struct coap_reply *coap_reply_next_unused(
  * @return pointer to the associated #coap_pending structure, NULL in
  * case none could be found.
  */
-struct coap_pending *coap_pending_received(
-	const struct coap_packet *response,
-	struct coap_pending *pendings, size_t len);
+struct coap_pending *coap_pending_received(const struct coap_packet *response,
+					   struct coap_pending *pendings,
+					   size_t len);
 
 /**
  * @brief After a response is received, call coap_reply_t handler
@@ -749,10 +747,10 @@ struct coap_pending *coap_pending_received(
  * @return Pointer to the reply matching the packet received, NULL if
  * none could be found.
  */
-struct coap_reply *coap_response_received(
-	const struct coap_packet *response,
-	const struct sockaddr *from,
-	struct coap_reply *replies, size_t len);
+struct coap_reply *coap_response_received(const struct coap_packet *response,
+					  const struct sockaddr *from,
+					  struct coap_reply *replies,
+					  size_t len);
 
 /**
  * @brief Returns the next pending about to expire, pending->timeout
@@ -764,8 +762,8 @@ struct coap_reply *coap_response_received(
  * @return The next #coap_pending to expire, NULL if none is about to
  * expire.
  */
-struct coap_pending *coap_pending_next_to_expire(
-	struct coap_pending *pendings, size_t len);
+struct coap_pending *coap_pending_next_to_expire(struct coap_pending *pendings,
+						 size_t len);
 
 /**
  * @brief After a request is sent, user may want to cycle the pending

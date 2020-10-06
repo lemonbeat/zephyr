@@ -34,14 +34,14 @@ enum adc_gain {
 	ADC_GAIN_1_3, /**< x 1/3. */
 	ADC_GAIN_1_2, /**< x 1/2. */
 	ADC_GAIN_2_3, /**< x 2/3. */
-	ADC_GAIN_1,   /**< x 1. */
-	ADC_GAIN_2,   /**< x 2. */
-	ADC_GAIN_3,   /**< x 3. */
-	ADC_GAIN_4,   /**< x 4. */
-	ADC_GAIN_8,   /**< x 8. */
-	ADC_GAIN_16,  /**< x 16. */
-	ADC_GAIN_32,  /**< x 32. */
-	ADC_GAIN_64,  /**< x 64. */
+	ADC_GAIN_1, /**< x 1. */
+	ADC_GAIN_2, /**< x 2. */
+	ADC_GAIN_3, /**< x 3. */
+	ADC_GAIN_4, /**< x 4. */
+	ADC_GAIN_8, /**< x 8. */
+	ADC_GAIN_16, /**< x 16. */
+	ADC_GAIN_32, /**< x 32. */
+	ADC_GAIN_64, /**< x 64. */
 	ADC_GAIN_128, /**< x 128. */
 };
 
@@ -61,33 +61,32 @@ enum adc_gain {
  * @retval 0 if the gain was successfully reversed
  * @retval -EINVAL if the gain could not be interpreted
  */
-int adc_gain_invert(enum adc_gain gain,
-		    int32_t *value);
+int adc_gain_invert(enum adc_gain gain, int32_t *value);
 
 /** @brief ADC references. */
 enum adc_reference {
-	ADC_REF_VDD_1,     /**< VDD. */
-	ADC_REF_VDD_1_2,   /**< VDD/2. */
-	ADC_REF_VDD_1_3,   /**< VDD/3. */
-	ADC_REF_VDD_1_4,   /**< VDD/4. */
-	ADC_REF_INTERNAL,  /**< Internal. */
+	ADC_REF_VDD_1, /**< VDD. */
+	ADC_REF_VDD_1_2, /**< VDD/2. */
+	ADC_REF_VDD_1_3, /**< VDD/3. */
+	ADC_REF_VDD_1_4, /**< VDD/4. */
+	ADC_REF_INTERNAL, /**< Internal. */
 	ADC_REF_EXTERNAL0, /**< External, input 0. */
 	ADC_REF_EXTERNAL1, /**< External, input 1. */
 };
 
 /** Acquisition time is expressed in microseconds. */
-#define ADC_ACQ_TIME_MICROSECONDS  (1u)
+#define ADC_ACQ_TIME_MICROSECONDS (1u)
 /** Acquisition time is expressed in nanoseconds. */
-#define ADC_ACQ_TIME_NANOSECONDS   (2u)
+#define ADC_ACQ_TIME_NANOSECONDS (2u)
 /** Acquisition time is expressed in ADC ticks. */
-#define ADC_ACQ_TIME_TICKS         (3u)
+#define ADC_ACQ_TIME_TICKS (3u)
 /** Macro for composing the acquisition time value in given units. */
-#define ADC_ACQ_TIME(unit, value)  (((unit) << 14) | ((value) & BIT_MASK(14)))
+#define ADC_ACQ_TIME(unit, value) (((unit) << 14) | ((value)&BIT_MASK(14)))
 /** Value indicating that the default acquisition time should be used. */
-#define ADC_ACQ_TIME_DEFAULT       0
+#define ADC_ACQ_TIME_DEFAULT 0
 
-#define ADC_ACQ_TIME_UNIT(time)    (((time) >> 14) & BIT_MASK(2))
-#define ADC_ACQ_TIME_VALUE(time)   ((time) & BIT_MASK(14))
+#define ADC_ACQ_TIME_UNIT(time) (((time) >> 14) & BIT_MASK(2))
+#define ADC_ACQ_TIME_VALUE(time) ((time)&BIT_MASK(14))
 
 /**
  * @brief Structure for specifying the configuration of an ADC channel.
@@ -132,7 +131,7 @@ struct adc_channel_cfg {
 	 * on the underlying hardware capabilities or configured via a dedicated
 	 * Kconfig option).
 	 */
-	uint8_t channel_id   : 5;
+	uint8_t channel_id : 5;
 
 	/** Channel type: single-ended or differential. */
 	uint8_t differential : 1;
@@ -177,10 +176,8 @@ struct adc_channel_cfg {
  * @retval 0 on successful conversion
  * @retval -EINVAL if the gain is not reversible
  */
-static inline int adc_raw_to_millivolts(int32_t ref_mv,
-					enum adc_gain gain,
-					uint8_t resolution,
-					int32_t *valp)
+static inline int adc_raw_to_millivolts(int32_t ref_mv, enum adc_gain gain,
+					uint8_t resolution, int32_t *valp)
 {
 	int32_t adc_mv = *valp * ref_mv;
 	int ret = adc_gain_invert(gain, &adc_mv);
@@ -224,9 +221,9 @@ enum adc_action {
  *
  * @returns Action to be performed by the driver. See @ref adc_action.
  */
-typedef enum adc_action (*adc_sequence_callback)(const struct device *dev,
-						 const struct adc_sequence *sequence,
-						 uint16_t sampling_index);
+typedef enum adc_action (*adc_sequence_callback)(
+	const struct device *dev, const struct adc_sequence *sequence,
+	uint16_t sampling_index);
 
 /**
  * @brief Structure defining additional options for an ADC sampling sequence.
@@ -321,7 +318,6 @@ struct adc_sequence {
 	bool calibrate;
 };
 
-
 /**
  * @brief Type definition of ADC API function for configuring a channel.
  * See adc_channel_setup() for argument descriptions.
@@ -354,11 +350,11 @@ typedef int (*adc_api_read_async)(const struct device *dev,
  */
 __subsystem struct adc_driver_api {
 	adc_api_channel_setup channel_setup;
-	adc_api_read          read;
+	adc_api_read read;
 #ifdef CONFIG_ADC_ASYNC
-	adc_api_read_async    read_async;
+	adc_api_read_async read_async;
 #endif
-	uint16_t ref_internal;	/* mV */
+	uint16_t ref_internal; /* mV */
 };
 
 /**
@@ -376,11 +372,12 @@ __subsystem struct adc_driver_api {
 __syscall int adc_channel_setup(const struct device *dev,
 				const struct adc_channel_cfg *channel_cfg);
 
-static inline int z_impl_adc_channel_setup(const struct device *dev,
-					   const struct adc_channel_cfg *channel_cfg)
+static inline int
+z_impl_adc_channel_setup(const struct device *dev,
+			 const struct adc_channel_cfg *channel_cfg)
 {
 	const struct adc_driver_api *api =
-				(const struct adc_driver_api *)dev->api;
+		(const struct adc_driver_api *)dev->api;
 
 	return api->channel_setup(dev, channel_cfg);
 }
@@ -413,7 +410,7 @@ static inline int z_impl_adc_read(const struct device *dev,
 				  const struct adc_sequence *sequence)
 {
 	const struct adc_driver_api *api =
-				(const struct adc_driver_api *)dev->api;
+		(const struct adc_driver_api *)dev->api;
 
 	return api->read(dev, sequence);
 }
@@ -439,13 +436,12 @@ __syscall int adc_read_async(const struct device *dev,
 			     const struct adc_sequence *sequence,
 			     struct k_poll_signal *async);
 
-
 static inline int z_impl_adc_read_async(const struct device *dev,
 					const struct adc_sequence *sequence,
 					struct k_poll_signal *async)
 {
 	const struct adc_driver_api *api =
-				(const struct adc_driver_api *)dev->api;
+		(const struct adc_driver_api *)dev->api;
 
 	return api->read_async(dev, sequence, async);
 }
@@ -463,7 +459,7 @@ static inline int z_impl_adc_read_async(const struct device *dev,
 static inline uint16_t adc_ref_internal(const struct device *dev)
 {
 	const struct adc_driver_api *api =
-				(const struct adc_driver_api *)dev->api;
+		(const struct adc_driver_api *)dev->api;
 
 	return api->ref_internal;
 }
@@ -478,4 +474,4 @@ static inline uint16_t adc_ref_internal(const struct device *dev)
 
 #include <syscalls/adc.h>
 
-#endif  /* ZEPHYR_INCLUDE_DRIVERS_ADC_H_ */
+#endif /* ZEPHYR_INCLUDE_DRIVERS_ADC_H_ */

@@ -39,30 +39,30 @@
  * This information is stored in bitfield variable.
  * The order of the bitmap is the order recommended in RFC 2460.
  */
-#define NET_IPV6_EXT_HDR_BITMAP_HBHO   0x01
+#define NET_IPV6_EXT_HDR_BITMAP_HBHO 0x01
 #define NET_IPV6_EXT_HDR_BITMAP_DESTO1 0x02
-#define NET_IPV6_EXT_HDR_BITMAP_ROUTING        0x04
-#define NET_IPV6_EXT_HDR_BITMAP_FRAG   0x08
-#define NET_IPV6_EXT_HDR_BITMAP_AH     0x10
-#define NET_IPV6_EXT_HDR_BITMAP_ESP    0x20
+#define NET_IPV6_EXT_HDR_BITMAP_ROUTING 0x04
+#define NET_IPV6_EXT_HDR_BITMAP_FRAG 0x08
+#define NET_IPV6_EXT_HDR_BITMAP_AH 0x10
+#define NET_IPV6_EXT_HDR_BITMAP_ESP 0x20
 #define NET_IPV6_EXT_HDR_BITMAP_DESTO2 0x40
 
 /**
  * @brief Destination and Hop By Hop extension headers option types
  */
-#define NET_IPV6_EXT_HDR_OPT_PAD1  0
-#define NET_IPV6_EXT_HDR_OPT_PADN  1
-#define NET_IPV6_EXT_HDR_OPT_RPL   0x63
+#define NET_IPV6_EXT_HDR_OPT_PAD1 0
+#define NET_IPV6_EXT_HDR_OPT_PADN 1
+#define NET_IPV6_EXT_HDR_OPT_RPL 0x63
 
 /**
  * @brief Multicast Listener Record v2 record types.
  */
-#define NET_IPV6_MLDv2_MODE_IS_INCLUDE        1
-#define NET_IPV6_MLDv2_MODE_IS_EXCLUDE        2
+#define NET_IPV6_MLDv2_MODE_IS_INCLUDE 1
+#define NET_IPV6_MLDv2_MODE_IS_EXCLUDE 2
 #define NET_IPV6_MLDv2_CHANGE_TO_INCLUDE_MODE 3
 #define NET_IPV6_MLDv2_CHANGE_TO_EXCLUDE_MODE 4
-#define NET_IPV6_MLDv2_ALLOW_NEW_SOURCES      5
-#define NET_IPV6_MLDv2_BLOCK_OLD_SOURCES      6
+#define NET_IPV6_MLDv2_ALLOW_NEW_SOURCES 5
+#define NET_IPV6_MLDv2_BLOCK_OLD_SOURCES 6
 
 /* State of the neighbor */
 enum net_ipv6_nbr_state {
@@ -135,7 +135,6 @@ int net_ipv6_send_na(struct net_if *iface, const struct in6_addr *src,
 		     const struct in6_addr *dst, const struct in6_addr *tgt,
 		     uint8_t flags);
 
-
 static inline bool net_ipv6_is_nexthdr_upper_layer(uint8_t nexthdr)
 {
 	return (nexthdr == IPPROTO_ICMPV6 || nexthdr == IPPROTO_UDP ||
@@ -152,8 +151,7 @@ static inline bool net_ipv6_is_nexthdr_upper_layer(uint8_t nexthdr)
  * @return 0 on success, negative errno otherwise.
  */
 #if defined(CONFIG_NET_NATIVE_IPV6)
-int net_ipv6_create(struct net_pkt *pkt,
-		    const struct in6_addr *src,
+int net_ipv6_create(struct net_pkt *pkt, const struct in6_addr *src,
 		    const struct in6_addr *dst);
 #else
 static inline int net_ipv6_create(struct net_pkt *pkt,
@@ -293,9 +291,8 @@ struct net_nbr *net_ipv6_get_nbr(struct net_if *iface, uint8_t idx);
 struct in6_addr *net_ipv6_nbr_lookup_by_index(struct net_if *iface,
 					      uint8_t idx);
 #else
-static inline
-struct in6_addr *net_ipv6_nbr_lookup_by_index(struct net_if *iface,
-					      uint8_t idx)
+static inline struct in6_addr *
+net_ipv6_nbr_lookup_by_index(struct net_if *iface, uint8_t idx)
 {
 	return NULL;
 }
@@ -320,14 +317,12 @@ struct in6_addr *net_ipv6_nbr_lookup_by_index(struct net_if *iface,
 struct net_nbr *net_ipv6_nbr_add(struct net_if *iface,
 				 const struct in6_addr *addr,
 				 const struct net_linkaddr *lladdr,
-				 bool is_router,
-				 enum net_ipv6_nbr_state state);
+				 bool is_router, enum net_ipv6_nbr_state state);
 #else
-static inline struct net_nbr *net_ipv6_nbr_add(struct net_if *iface,
-					       const struct in6_addr *addr,
-					       const struct net_linkaddr *lladdr,
-					       bool is_router,
-					       enum net_ipv6_nbr_state state)
+static inline struct net_nbr *
+net_ipv6_nbr_add(struct net_if *iface, const struct in6_addr *addr,
+		 const struct net_linkaddr *lladdr, bool is_router,
+		 enum net_ipv6_nbr_state state)
 {
 	return NULL;
 }
@@ -457,10 +452,9 @@ enum net_verdict net_ipv6_handle_fragment_hdr(struct net_pkt *pkt,
 					      struct net_ipv6_hdr *hdr,
 					      uint8_t nexthdr);
 #else
-static inline
-enum net_verdict net_ipv6_handle_fragment_hdr(struct net_pkt *pkt,
-					      struct net_ipv6_hdr *hdr,
-					      uint8_t nexthdr)
+static inline enum net_verdict
+net_ipv6_handle_fragment_hdr(struct net_pkt *pkt, struct net_ipv6_hdr *hdr,
+			     uint8_t nexthdr)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(hdr);

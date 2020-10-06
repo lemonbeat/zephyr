@@ -8,11 +8,11 @@
 #include <spinlock.h>
 #include <arch/xtensa/xtensa_rtos.h>
 
-#define TIMER_IRQ UTIL_CAT(XCHAL_TIMER,		\
-			   UTIL_CAT(CONFIG_XTENSA_TIMER_ID, _INTERRUPT))
+#define TIMER_IRQ \
+	UTIL_CAT(XCHAL_TIMER, UTIL_CAT(CONFIG_XTENSA_TIMER_ID, _INTERRUPT))
 
-#define CYC_PER_TICK (sys_clock_hw_cycles_per_sec()	\
-		      / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define CYC_PER_TICK \
+	(sys_clock_hw_cycles_per_sec() / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 #define MAX_CYC 0xffffffffu
 #define MAX_TICKS ((MAX_CYC - CYC_PER_TICK) / CYC_PER_TICK)
 #define MIN_DELAY 1000
@@ -22,15 +22,15 @@ static unsigned int last_count;
 
 static void set_ccompare(uint32_t val)
 {
-	__asm__ volatile ("wsr.CCOMPARE" STRINGIFY(CONFIG_XTENSA_TIMER_ID) " %0"
-			  :: "r"(val));
+	__asm__ volatile("wsr.CCOMPARE" STRINGIFY(
+		CONFIG_XTENSA_TIMER_ID) " %0" ::"r"(val));
 }
 
 static uint32_t ccount(void)
 {
 	uint32_t val;
 
-	__asm__ volatile ("rsr.CCOUNT %0" : "=r"(val));
+	__asm__ volatile("rsr.CCOUNT %0" : "=r"(val));
 	return val;
 }
 

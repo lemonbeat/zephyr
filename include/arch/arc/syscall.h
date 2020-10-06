@@ -16,9 +16,9 @@
 #ifndef ZEPHYR_INCLUDE_ARCH_ARC_SYSCALL_H_
 #define ZEPHYR_INCLUDE_ARCH_ARC_SYSCALL_H_
 
-#define _TRAP_S_SCALL_IRQ_OFFLOAD		1
-#define _TRAP_S_CALL_RUNTIME_EXCEPT		2
-#define _TRAP_S_CALL_SYSTEM_CALL		3
+#define _TRAP_S_SCALL_IRQ_OFFLOAD 1
+#define _TRAP_S_CALL_RUNTIME_EXCEPT 2
+#define _TRAP_S_CALL_SYSTEM_CALL 3
 
 #ifdef CONFIG_USERSPACE
 #ifndef _ASMLANGUAGE
@@ -53,20 +53,18 @@ static inline uintptr_t arch_syscall_invoke6(uintptr_t arg1, uintptr_t arg2,
 
 	compiler_barrier();
 
-	__asm__ volatile(
-			 "trap_s %[trap_s_id]\n"
+	__asm__ volatile("trap_s %[trap_s_id]\n"
 			 : "=r"(ret)
-			 : [trap_s_id] "i" (_TRAP_S_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r3),
-			   "r" (r4), "r" (r5), "r" (r6));
+			 : [trap_s_id] "i"(_TRAP_S_CALL_SYSTEM_CALL), "r"(ret),
+			   "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r5),
+			   "r"(r6));
 
 	return ret;
 }
 
 static inline uintptr_t arch_syscall_invoke5(uintptr_t arg1, uintptr_t arg2,
 					     uintptr_t arg3, uintptr_t arg4,
-					     uintptr_t arg5,
-					     uintptr_t call_id)
+					     uintptr_t arg5, uintptr_t call_id)
 {
 	register uint32_t ret __asm__("r0") = arg1;
 	register uint32_t r1 __asm__("r1") = arg2;
@@ -77,12 +75,10 @@ static inline uintptr_t arch_syscall_invoke5(uintptr_t arg1, uintptr_t arg2,
 
 	compiler_barrier();
 
-	__asm__ volatile(
-			 "trap_s %[trap_s_id]\n"
+	__asm__ volatile("trap_s %[trap_s_id]\n"
 			 : "=r"(ret)
-			 : [trap_s_id] "i" (_TRAP_S_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r3),
-			   "r" (r4), "r" (r6));
+			 : [trap_s_id] "i"(_TRAP_S_CALL_SYSTEM_CALL), "r"(ret),
+			   "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r6));
 
 	return ret;
 }
@@ -99,19 +95,16 @@ static inline uintptr_t arch_syscall_invoke4(uintptr_t arg1, uintptr_t arg2,
 
 	compiler_barrier();
 
-	__asm__ volatile(
-			 "trap_s %[trap_s_id]\n"
+	__asm__ volatile("trap_s %[trap_s_id]\n"
 			 : "=r"(ret)
-			 : [trap_s_id] "i" (_TRAP_S_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r3),
-			   "r" (r6));
+			 : [trap_s_id] "i"(_TRAP_S_CALL_SYSTEM_CALL), "r"(ret),
+			   "r"(r1), "r"(r2), "r"(r3), "r"(r6));
 
 	return ret;
 }
 
 static inline uintptr_t arch_syscall_invoke3(uintptr_t arg1, uintptr_t arg2,
-					     uintptr_t arg3,
-					     uintptr_t call_id)
+					     uintptr_t arg3, uintptr_t call_id)
 {
 	register uint32_t ret __asm__("r0") = arg1;
 	register uint32_t r1 __asm__("r1") = arg2;
@@ -120,11 +113,10 @@ static inline uintptr_t arch_syscall_invoke3(uintptr_t arg1, uintptr_t arg2,
 
 	compiler_barrier();
 
-	__asm__ volatile(
-			 "trap_s %[trap_s_id]\n"
+	__asm__ volatile("trap_s %[trap_s_id]\n"
 			 : "=r"(ret)
-			 : [trap_s_id] "i" (_TRAP_S_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r6));
+			 : [trap_s_id] "i"(_TRAP_S_CALL_SYSTEM_CALL), "r"(ret),
+			   "r"(r1), "r"(r2), "r"(r6));
 
 	return ret;
 }
@@ -138,11 +130,10 @@ static inline uintptr_t arch_syscall_invoke2(uintptr_t arg1, uintptr_t arg2,
 
 	compiler_barrier();
 
-	__asm__ volatile(
-			 "trap_s %[trap_s_id]\n"
+	__asm__ volatile("trap_s %[trap_s_id]\n"
 			 : "=r"(ret)
-			 : [trap_s_id] "i" (_TRAP_S_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r6));
+			 : [trap_s_id] "i"(_TRAP_S_CALL_SYSTEM_CALL), "r"(ret),
+			   "r"(r1), "r"(r6));
 
 	return ret;
 }
@@ -154,11 +145,10 @@ static inline uintptr_t arch_syscall_invoke1(uintptr_t arg1, uintptr_t call_id)
 
 	compiler_barrier();
 
-	__asm__ volatile(
-			 "trap_s %[trap_s_id]\n"
+	__asm__ volatile("trap_s %[trap_s_id]\n"
 			 : "=r"(ret)
-			 : [trap_s_id] "i" (_TRAP_S_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r6));
+			 : [trap_s_id] "i"(_TRAP_S_CALL_SYSTEM_CALL), "r"(ret),
+			   "r"(r6));
 
 	return ret;
 }
@@ -170,11 +160,10 @@ static inline uintptr_t arch_syscall_invoke0(uintptr_t call_id)
 
 	compiler_barrier();
 
-	__asm__ volatile(
-			 "trap_s %[trap_s_id]\n"
+	__asm__ volatile("trap_s %[trap_s_id]\n"
 			 : "=r"(ret)
-			 : [trap_s_id] "i" (_TRAP_S_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r6));
+			 : [trap_s_id] "i"(_TRAP_S_CALL_SYSTEM_CALL), "r"(ret),
+			   "r"(r6));
 
 	return ret;
 }
@@ -187,7 +176,7 @@ static inline bool arch_is_user_context(void)
 
 	__asm__ volatile("lr %0, [%[status32]]\n"
 			 : "=r"(status)
-			 : [status32] "i" (_ARC_V2_STATUS32));
+			 : [status32] "i"(_ARC_V2_STATUS32));
 
 	return !(status & _ARC_V2_STATUS32_US) ? true : false;
 }

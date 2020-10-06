@@ -26,7 +26,7 @@ static struct sx12xx_data {
 	int16_t rssi;
 } dev_data;
 
-int __sx12xx_configure_pin(const struct device * *dev, const char *controller,
+int __sx12xx_configure_pin(const struct device **dev, const char *controller,
 			   gpio_pin_t pin, gpio_flags_t flags)
 {
 	int err;
@@ -65,8 +65,7 @@ static void sx12xx_ev_tx_done(void)
 	Radio.Sleep();
 }
 
-int sx12xx_lora_send(const struct device *dev, uint8_t *data,
-		     uint32_t data_len)
+int sx12xx_lora_send(const struct device *dev, uint8_t *data, uint32_t data_len)
 {
 	Radio.SetMaxPayloadLength(MODEM_LORA, data_len);
 
@@ -124,17 +123,16 @@ int sx12xx_lora_config(const struct device *dev,
 	} else {
 		/* TODO: Get symbol timeout value from config parameters */
 		Radio.SetRxConfig(MODEM_LORA, config->bandwidth,
-				  config->datarate, config->coding_rate,
-				  0, config->preamble_len, 10, false, 0,
-				  false, 0, 0, false, true);
+				  config->datarate, config->coding_rate, 0,
+				  config->preamble_len, 10, false, 0, false, 0,
+				  0, false, true);
 	}
 
 	return 0;
 }
 
 int sx12xx_lora_test_cw(const struct device *dev, uint32_t frequency,
-			int8_t tx_power,
-			uint16_t duration)
+			int8_t tx_power, uint16_t duration)
 {
 	Radio.SetTxContinuousWave(frequency, tx_power, duration);
 	return 0;

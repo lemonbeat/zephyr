@@ -17,22 +17,22 @@ LOG_MODULE_REGISTER(spi_oc_simple);
 #include "spi_oc_simple.h"
 
 /* Bit 5:4 == ESPR, Bit 1:0 == SPR */
-uint8_t DIVIDERS[] = { 0x00,       /*   2  */
-		    0x01,       /*   4  */
-		    0x10,       /*   8  */
-		    0x02,       /*  16  */
-		    0x03,       /*  32  */
-		    0x11,       /*  64  */
-		    0x12,       /* 128  */
-		    0x13,       /* 256  */
-		    0x20,       /* 512  */
-		    0x21,       /* 1024 */
-		    0x22,       /* 2048 */
-		    0x23 };     /* 4096 */
+uint8_t DIVIDERS[] = { 0x00, /*   2  */
+		       0x01, /*   4  */
+		       0x10, /*   8  */
+		       0x02, /*  16  */
+		       0x03, /*  32  */
+		       0x11, /*  64  */
+		       0x12, /* 128  */
+		       0x13, /* 256  */
+		       0x20, /* 512  */
+		       0x21, /* 1024 */
+		       0x22, /* 2048 */
+		       0x23 }; /* 4096 */
 
 static int spi_oc_simple_configure(const struct spi_oc_simple_cfg *info,
-				struct spi_oc_simple_data *spi,
-				const struct spi_config *config)
+				   struct spi_oc_simple_data *spi,
+				   const struct spi_config *config)
 {
 	uint8_t spcr = 0U;
 	int i;
@@ -117,7 +117,6 @@ int spi_oc_simple_transceive(const struct device *dev,
 		cur_xfer_len = spi_context_longest_current_buf(ctx);
 
 		for (i = 0; i < cur_xfer_len; i++) {
-
 			/* Write byte */
 			if (spi_context_tx_buf_on(ctx)) {
 				sys_write8(*ctx->tx_buf,
@@ -204,23 +203,19 @@ int spi_oc_simple_init(const struct device *dev)
 	return 0;
 }
 
-#define SPI_OC_INIT(inst)						\
-	static struct spi_oc_simple_cfg spi_oc_simple_cfg_##inst = {	\
-		.base = DT_INST_REG_ADDR_BY_NAME(inst, control),	\
-	};								\
-									\
-	static struct spi_oc_simple_data spi_oc_simple_data_##inst = {	\
-		SPI_CONTEXT_INIT_LOCK(spi_oc_simple_data_##inst, ctx),	\
-		SPI_CONTEXT_INIT_SYNC(spi_oc_simple_data_##inst, ctx),	\
-	};								\
-									\
-	DEVICE_AND_API_INIT(spi_oc_simple_##inst,			\
-			    DT_INST_LABEL(inst),			\
-			    spi_oc_simple_init,				\
-			    &spi_oc_simple_data_##inst,			\
-			    &spi_oc_simple_cfg_##inst,			\
-			    POST_KERNEL,				\
-			    CONFIG_SPI_INIT_PRIORITY,			\
-			    &spi_oc_simple_api);
+#define SPI_OC_INIT(inst)                                                   \
+	static struct spi_oc_simple_cfg spi_oc_simple_cfg_##inst = {        \
+		.base = DT_INST_REG_ADDR_BY_NAME(inst, control),            \
+	};                                                                  \
+                                                                            \
+	static struct spi_oc_simple_data spi_oc_simple_data_##inst = {      \
+		SPI_CONTEXT_INIT_LOCK(spi_oc_simple_data_##inst, ctx),      \
+		SPI_CONTEXT_INIT_SYNC(spi_oc_simple_data_##inst, ctx),      \
+	};                                                                  \
+                                                                            \
+	DEVICE_AND_API_INIT(spi_oc_simple_##inst, DT_INST_LABEL(inst),      \
+			    spi_oc_simple_init, &spi_oc_simple_data_##inst, \
+			    &spi_oc_simple_cfg_##inst, POST_KERNEL,         \
+			    CONFIG_SPI_INIT_PRIORITY, &spi_oc_simple_api);
 
 DT_INST_FOREACH_STATUS_OKAY(SPI_OC_INIT)

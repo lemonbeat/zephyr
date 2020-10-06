@@ -95,8 +95,7 @@ static int fxos8700_set_mt_ths(const struct device *dev,
 #endif
 }
 
-static int fxos8700_attr_set(const struct device *dev,
-			     enum sensor_channel chan,
+static int fxos8700_attr_set(const struct device *dev, enum sensor_channel chan,
 			     enum sensor_attribute attr,
 			     const struct sensor_value *val)
 {
@@ -152,14 +151,14 @@ static int fxos8700_sample_fetch(const struct device *dev,
 	 * RAM, store the data in raw format and wait to convert to the
 	 * normalized sensor_value type until later.
 	 */
-	__ASSERT(config->start_channel + config->num_channels
-			<= ARRAY_SIZE(data->raw),
-			"Too many channels");
+	__ASSERT(config->start_channel + config->num_channels <=
+			 ARRAY_SIZE(data->raw),
+		 "Too many channels");
 
 	raw = &data->raw[config->start_channel];
 
 	for (i = 0; i < num_bytes; i += 2) {
-		*raw++ = (buffer[i] << 8) | (buffer[i+1]);
+		*raw++ = (buffer[i] << 8) | (buffer[i + 1]);
 	}
 
 #ifdef CONFIG_FXOS8700_TEMP
@@ -200,8 +199,8 @@ static void fxos8700_accel_convert(struct sensor_value *val, int16_t raw,
 	 * always fits into 32-bits. Cast down to int32_t so we can use a
 	 * faster divide.
 	 */
-	val->val1 = (int32_t) micro_ms2 / 1000000;
-	val->val2 = (int32_t) micro_ms2 % 1000000;
+	val->val1 = (int32_t)micro_ms2 / 1000000;
+	val->val2 = (int32_t)micro_ms2 % 1000000;
 }
 
 static void fxos8700_magn_convert(struct sensor_value *val, int16_t raw)
@@ -348,8 +347,7 @@ int fxos8700_get_power(const struct device *dev, enum fxos8700_power *power)
 	uint8_t val = *power;
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      FXOS8700_REG_CTRLREG1,
-			      &val)) {
+			      FXOS8700_REG_CTRLREG1, &val)) {
 		LOG_ERR("Could not get power setting");
 		return -EIO;
 	}
@@ -366,15 +364,14 @@ int fxos8700_set_power(const struct device *dev, enum fxos8700_power power)
 
 	return i2c_reg_update_byte(data->i2c, config->i2c_address,
 				   FXOS8700_REG_CTRLREG1,
-				   FXOS8700_CTRLREG1_ACTIVE_MASK,
-				   power);
+				   FXOS8700_CTRLREG1_ACTIVE_MASK, power);
 }
 
 static int fxos8700_init(const struct device *dev)
 {
 	const struct fxos8700_config *config = dev->config;
 	struct fxos8700_data *data = dev->data;
-	struct sensor_value odr = {.val1 = 6, .val2 = 250000};
+	struct sensor_value odr = { .val1 = 6, .val2 = 250000 };
 	const struct device *rst;
 
 	/* Get the I2C device */
@@ -439,8 +436,8 @@ static int fxos8700_init(const struct device *dev)
 	case WHOAMI_ID_MMA8653:
 		if (config->mode != FXOS8700_MODE_ACCEL) {
 			LOG_ERR("Device 0x%x supports only "
-				    "accelerometer mode",
-				    data->whoami);
+				"accelerometer mode",
+				data->whoami);
 			return -EIO;
 		}
 		break;
@@ -457,10 +454,9 @@ static int fxos8700_init(const struct device *dev)
 		return -EIO;
 	}
 
-	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-				FXOS8700_REG_CTRLREG2,
-				FXOS8700_CTRLREG2_MODS_MASK,
-				config->power_mode)) {
+	if (i2c_reg_update_byte(
+		    data->i2c, config->i2c_address, FXOS8700_REG_CTRLREG2,
+		    FXOS8700_CTRLREG2_MODS_MASK, config->power_mode)) {
 		LOG_ERR("Could not set power scheme");
 		return -EIO;
 	}
@@ -468,8 +464,7 @@ static int fxos8700_init(const struct device *dev)
 	/* Set the mode (accel-only, mag-only, or hybrid) */
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
 				FXOS8700_REG_M_CTRLREG1,
-				FXOS8700_M_CTRLREG1_MODE_MASK,
-				config->mode)) {
+				FXOS8700_M_CTRLREG1_MODE_MASK, config->mode)) {
 		LOG_ERR("Could not set mode");
 		return -EIO;
 	}
@@ -488,8 +483,7 @@ static int fxos8700_init(const struct device *dev)
 	/* Set the full-scale range */
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
 				FXOS8700_REG_XYZ_DATA_CFG,
-				FXOS8700_XYZ_DATA_CFG_FS_MASK,
-				config->range)) {
+				FXOS8700_XYZ_DATA_CFG_FS_MASK, config->range)) {
 		LOG_ERR("Could not set range");
 		return -EIO;
 	}
@@ -597,7 +591,6 @@ static const struct fxos8700_config fxos8700_config = {
 
 static struct fxos8700_data fxos8700_data;
 
-DEVICE_AND_API_INIT(fxos8700, DT_INST_LABEL(0), fxos8700_init,
-		    &fxos8700_data, &fxos8700_config,
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(fxos8700, DT_INST_LABEL(0), fxos8700_init, &fxos8700_data,
+		    &fxos8700_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &fxos8700_driver_api);

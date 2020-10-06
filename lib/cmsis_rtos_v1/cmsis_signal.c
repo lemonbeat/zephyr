@@ -7,8 +7,8 @@
 #include <kernel.h>
 #include <cmsis_os.h>
 
-#define NSEC_PER_MSEC		(NSEC_PER_USEC * USEC_PER_MSEC)
-#define MAX_VALID_SIGNAL_VAL	((1 << osFeature_Signals) - 1)
+#define NSEC_PER_MSEC (NSEC_PER_USEC * USEC_PER_MSEC)
+#define MAX_VALID_SIGNAL_VAL ((1 << osFeature_Signals) - 1)
 
 void *k_thread_other_custom_data_get(struct k_thread *thread_id)
 {
@@ -22,14 +22,14 @@ int32_t osSignalSet(osThreadId thread_id, int32_t signals)
 {
 	int sig, key;
 
-	if ((thread_id == NULL) || (!signals) ||
-		(signals & 0x80000000) || (signals > MAX_VALID_SIGNAL_VAL)) {
+	if ((thread_id == NULL) || (!signals) || (signals & 0x80000000) ||
+	    (signals > MAX_VALID_SIGNAL_VAL)) {
 		return 0x80000000;
 	}
 
 	osThreadDef_t *thread_def =
 		(osThreadDef_t *)k_thread_other_custom_data_get(
-						(struct k_thread *)thread_id);
+			(struct k_thread *)thread_id);
 
 	key = irq_lock();
 	sig = thread_def->signal_results;
@@ -49,13 +49,13 @@ int32_t osSignalClear(osThreadId thread_id, int32_t signals)
 	int sig, key;
 
 	if (k_is_in_isr() || (thread_id == NULL) || (!signals) ||
-		(signals & 0x80000000) || (signals > MAX_VALID_SIGNAL_VAL)) {
+	    (signals & 0x80000000) || (signals > MAX_VALID_SIGNAL_VAL)) {
 		return 0x80000000;
 	}
 
 	osThreadDef_t *thread_def =
 		(osThreadDef_t *)k_thread_other_custom_data_get(
-						(struct k_thread *)thread_id);
+			(struct k_thread *)thread_id);
 
 	key = irq_lock();
 	sig = thread_def->signal_results;
@@ -90,7 +90,6 @@ osEvent osSignalWait(int32_t signals, uint32_t millisec)
 	osThreadDef_t *thread_def = k_thread_custom_data_get();
 
 	for (;;) {
-
 		time_stamp_start = (uint64_t)k_cycle_get_32();
 
 		switch (millisec) {
@@ -122,11 +121,10 @@ osEvent osSignalWait(int32_t signals, uint32_t millisec)
 			return evt;
 		}
 
-		__ASSERT(thread_def->poll_event->state
-				== K_POLL_STATE_SIGNALED,
-			"event state not signalled!");
+		__ASSERT(thread_def->poll_event->state == K_POLL_STATE_SIGNALED,
+			 "event state not signalled!");
 		__ASSERT(thread_def->poll_event->signal->signaled == 1,
-			"event signaled is not 1");
+			 "event signaled is not 1");
 
 		/* Reset the states to facilitate the next trigger */
 		thread_def->poll_event->signal->signaled = 0;
@@ -141,10 +139,11 @@ osEvent osSignalWait(int32_t signals, uint32_t millisec)
 		 * timeout value accordingly based on the time that has
 		 * already elapsed.
 		 */
-		hwclk_cycles_delta = (uint64_t)k_cycle_get_32() - time_stamp_start;
+		hwclk_cycles_delta =
+			(uint64_t)k_cycle_get_32() - time_stamp_start;
 		time_delta_ns =
 			(uint32_t)k_cyc_to_ns_floor64(hwclk_cycles_delta);
-		time_delta_ms =	(uint32_t)time_delta_ns/NSEC_PER_MSEC;
+		time_delta_ms = (uint32_t)time_delta_ns / NSEC_PER_MSEC;
 
 		if (timeout > time_delta_ms) {
 			timeout -= time_delta_ms;

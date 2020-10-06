@@ -76,8 +76,7 @@ extern "C" {
  *         have a cs-gpios property
  */
 #define DT_SPI_NUM_CS_GPIOS(spi) \
-	COND_CODE_1(DT_SPI_HAS_CS_GPIOS(spi), \
-		    (DT_PROP_LEN(spi, cs_gpios)), (0))
+	COND_CODE_1(DT_SPI_HAS_CS_GPIOS(spi), (DT_PROP_LEN(spi, cs_gpios)), (0))
 
 /**
  * @brief Does a SPI device have a chip select line configured?
@@ -262,4 +261,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* ZEPHYR_INCLUDE_DEVICETREE_SPI_H_ */
+#endif /* ZEPHYR_INCLUDE_DEVICETREE_SPI_H_ */

@@ -21,7 +21,6 @@
  * @}
  */
 
-
 /**
  * @brief Crypto Cipher APIs
  * @defgroup crypto_cipher Cipher
@@ -78,20 +77,20 @@ static inline int cipher_query_hwcaps(const struct device *dev)
 	struct crypto_driver_api *api;
 	int tmp;
 
-	api = (struct crypto_driver_api *) dev->api;
+	api = (struct crypto_driver_api *)dev->api;
 
 	tmp = api->query_hw_caps(dev);
 
 	__ASSERT((tmp & (CAP_OPAQUE_KEY_HNDL | CAP_RAW_KEY)) != 0,
 		 "Driver should support at least one key type: RAW/Opaque");
 
-	__ASSERT((tmp & (CAP_INPLACE_OPS | CAP_SEPARATE_IO_BUFS)) != 0,
-	     "Driver should support at least one IO buf type: Inplace/separate");
+	__ASSERT(
+		(tmp & (CAP_INPLACE_OPS | CAP_SEPARATE_IO_BUFS)) != 0,
+		"Driver should support at least one IO buf type: Inplace/separate");
 
 	__ASSERT((tmp & (CAP_SYNC_OPS | CAP_ASYNC_OPS)) != 0,
-		"Driver should support at least one op-type: sync/async");
+		 "Driver should support at least one op-type: sync/async");
 	return tmp;
-
 }
 
 /**
@@ -116,30 +115,30 @@ static inline int cipher_query_hwcaps(const struct device *dev)
 static inline int cipher_begin_session(const struct device *dev,
 				       struct cipher_ctx *ctx,
 				       enum cipher_algo algo,
-				       enum cipher_mode  mode,
+				       enum cipher_mode mode,
 				       enum cipher_op optype)
 {
 	struct crypto_driver_api *api;
 	uint32_t flags;
 
-	api = (struct crypto_driver_api *) dev->api;
+	api = (struct crypto_driver_api *)dev->api;
 	ctx->device = dev;
 	ctx->ops.cipher_mode = mode;
 
 	flags = (ctx->flags & (CAP_OPAQUE_KEY_HNDL | CAP_RAW_KEY));
 	__ASSERT(flags != 0U, "Keytype missing: RAW Key or OPAQUE handle");
 	__ASSERT(flags != (CAP_OPAQUE_KEY_HNDL | CAP_RAW_KEY),
-			 "conflicting options for keytype");
+		 "conflicting options for keytype");
 
 	flags = (ctx->flags & (CAP_INPLACE_OPS | CAP_SEPARATE_IO_BUFS));
 	__ASSERT(flags != 0U, "IO buffer type missing");
 	__ASSERT(flags != (CAP_INPLACE_OPS | CAP_SEPARATE_IO_BUFS),
-			"conflicting options for IO buffer type");
+		 "conflicting options for IO buffer type");
 
 	flags = (ctx->flags & (CAP_SYNC_OPS | CAP_ASYNC_OPS));
 	__ASSERT(flags != 0U, "sync/async type missing");
-	__ASSERT(flags != (CAP_SYNC_OPS |  CAP_ASYNC_OPS),
-			"conflicting options for sync/async");
+	__ASSERT(flags != (CAP_SYNC_OPS | CAP_ASYNC_OPS),
+		 "conflicting options for sync/async");
 
 	return api->begin_session(dev, ctx, algo, mode, optype);
 }
@@ -160,7 +159,7 @@ static inline int cipher_free_session(const struct device *dev,
 {
 	struct crypto_driver_api *api;
 
-	api = (struct crypto_driver_api *) dev->api;
+	api = (struct crypto_driver_api *)dev->api;
 
 	return api->free_session(dev, ctx);
 }
@@ -184,14 +183,13 @@ static inline int cipher_callback_set(const struct device *dev,
 {
 	struct crypto_driver_api *api;
 
-	api = (struct crypto_driver_api *) dev->api;
+	api = (struct crypto_driver_api *)dev->api;
 
 	if (api->crypto_async_callback_set) {
 		return api->crypto_async_callback_set(dev, cb);
 	}
 
 	return -ENOTSUP;
-
 }
 
 /**
@@ -204,9 +202,10 @@ static inline int cipher_callback_set(const struct device *dev,
  * @return 0 on success, negative errno code on fail.
  */
 static inline int cipher_block_op(struct cipher_ctx *ctx,
-				     struct cipher_pkt *pkt)
+				  struct cipher_pkt *pkt)
 {
-	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_ECB, "ECB mode "
+	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_ECB,
+		 "ECB mode "
 		 "session invoking a different mode handler");
 
 	pkt->ctx = ctx;
@@ -224,10 +223,11 @@ static inline int cipher_block_op(struct cipher_ctx *ctx,
  *
  * @return 0 on success, negative errno code on fail.
  */
-static inline int cipher_cbc_op(struct cipher_ctx *ctx,
-				struct cipher_pkt *pkt, uint8_t *iv)
+static inline int cipher_cbc_op(struct cipher_ctx *ctx, struct cipher_pkt *pkt,
+				uint8_t *iv)
 {
-	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_CBC, "CBC mode "
+	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_CBC,
+		 "CBC mode "
 		 "session invoking a different mode handler");
 
 	pkt->ctx = ctx;
@@ -251,10 +251,11 @@ static inline int cipher_cbc_op(struct cipher_ctx *ctx,
  *
  * @return 0 on success, negative errno code on fail.
  */
-static inline int cipher_ctr_op(struct cipher_ctx *ctx,
-				struct cipher_pkt *pkt, uint8_t *iv)
+static inline int cipher_ctr_op(struct cipher_ctx *ctx, struct cipher_pkt *pkt,
+				uint8_t *iv)
 {
-	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_CTR, "CTR mode "
+	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_CTR,
+		 "CTR mode "
 		 "session invoking a different mode handler");
 
 	pkt->ctx = ctx;
@@ -276,7 +277,8 @@ static inline int cipher_ctr_op(struct cipher_ctx *ctx,
 static inline int cipher_ccm_op(struct cipher_ctx *ctx,
 				struct cipher_aead_pkt *pkt, uint8_t *nonce)
 {
-	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_CCM, "CCM mode "
+	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_CCM,
+		 "CCM mode "
 		 "session invoking a different mode handler");
 
 	pkt->pkt->ctx = ctx;
@@ -298,7 +300,8 @@ static inline int cipher_ccm_op(struct cipher_ctx *ctx,
 static inline int cipher_gcm_op(struct cipher_ctx *ctx,
 				struct cipher_aead_pkt *pkt, uint8_t *nonce)
 {
-	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_GCM, "GCM mode "
+	__ASSERT(ctx->ops.cipher_mode == CRYPTO_CIPHER_MODE_GCM,
+		 "GCM mode "
 		 "session invoking a different mode handler");
 
 	pkt->pkt->ctx = ctx;

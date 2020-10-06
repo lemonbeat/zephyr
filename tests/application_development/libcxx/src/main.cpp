@@ -12,7 +12,7 @@
 
 BUILD_ASSERT(__cplusplus == 201703);
 
-std::array<int, 4> array = {1, 2, 3, 4};
+std::array<int, 4> array = { 1, 2, 3, 4 };
 std::vector<int> vector;
 
 static void test_array(void)
@@ -21,7 +21,7 @@ static void test_array(void)
 	zassert_equal(array[0], 1, "array[0] wrong");
 	zassert_equal(array[3], 4, "array[3] wrong");
 
-	std::array<uint8_t, 2> local = {1, 2};
+	std::array<uint8_t, 2> local = { 1, 2 };
 	zassert_equal(local.size(), 2, "unexpected size");
 	zassert_equal(local[0], 1, "local[0] wrong");
 	zassert_equal(local[1], 2, "local[1] wrong");
@@ -41,11 +41,12 @@ struct make_unique_data {
 	static int dtors;
 	int inst;
 
-	make_unique_data () :
-	inst{++ctors}
-	{ }
+	make_unique_data()
+		: inst{ ++ctors }
+	{
+	}
 
-	~make_unique_data ()
+	~make_unique_data()
 	{
 		++dtors;
 	}
@@ -70,11 +71,9 @@ static void test_make_unique(void)
 void test_main(void)
 {
 	TC_PRINT("version %u\n", (uint32_t)__cplusplus);
-	ztest_test_suite(libcxx_tests,
-			 ztest_unit_test(test_array),
+	ztest_test_suite(libcxx_tests, ztest_unit_test(test_array),
 			 ztest_unit_test(test_vector),
-			 ztest_unit_test(test_make_unique)
-		);
+			 ztest_unit_test(test_make_unique));
 
 	ztest_run_test_suite(libcxx_tests);
 }

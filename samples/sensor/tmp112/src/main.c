@@ -41,7 +41,8 @@ static void do_main(const struct device *dev)
 			return;
 		}
 
-		ret = sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP, &temp_value);
+		ret = sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP,
+					 &temp_value);
 		if (ret) {
 			printk("sensor_channel_get failed ret %d\n", ret);
 			return;

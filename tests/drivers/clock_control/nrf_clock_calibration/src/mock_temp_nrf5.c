@@ -24,7 +24,7 @@ static int mock_temp_nrf5_init(const struct device *dev)
 }
 
 static int mock_temp_nrf5_sample_fetch(const struct device *dev,
-					enum sensor_channel chan)
+				       enum sensor_channel chan)
 {
 	k_sleep(K_MSEC(1));
 	return 0;
@@ -43,11 +43,6 @@ static const struct sensor_driver_api mock_temp_nrf5_driver_api = {
 	.channel_get = mock_temp_nrf5_channel_get,
 };
 
-DEVICE_AND_API_INIT(mock_temp_nrf5,
-		    DT_LABEL(DT_INST(0, nordic_nrf_temp)),
-		    mock_temp_nrf5_init,
-		    NULL,
-		    NULL,
-		    POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY,
-		    &mock_temp_nrf5_driver_api);
+DEVICE_AND_API_INIT(mock_temp_nrf5, DT_LABEL(DT_INST(0, nordic_nrf_temp)),
+		    mock_temp_nrf5_init, NULL, NULL, POST_KERNEL,
+		    CONFIG_SENSOR_INIT_PRIORITY, &mock_temp_nrf5_driver_api);

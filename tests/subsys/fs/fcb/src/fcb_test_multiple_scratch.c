@@ -12,13 +12,11 @@ void test_fcb_multi_scratch(void)
 	struct fcb *fcb;
 	int rc;
 	struct fcb_entry loc;
-	uint8_t test_data[128] = {0};
+	uint8_t test_data[128] = { 0 };
 	int elem_cnts[4];
 	int idx;
 	int cnts[4];
-	struct append_arg aa_arg = {
-		.elem_cnts = cnts
-	};
+	struct append_arg aa_arg = { .elem_cnts = cnts };
 
 	fcb = &test_fcb;
 	fcb->f_scratch_cnt = 1U;
@@ -46,7 +44,7 @@ void test_fcb_multi_scratch(void)
 
 	zassert_true(elem_cnts[0] > 0, "unexpected entry number was appended");
 	zassert_true(elem_cnts[0] == elem_cnts[1] &&
-		     elem_cnts[0] == elem_cnts[2],
+			     elem_cnts[0] == elem_cnts[2],
 		     "unexpected entry number was appended");
 	zassert_true(elem_cnts[3] == 0, "unexpected entry number was appended");
 

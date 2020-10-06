@@ -37,14 +37,13 @@ LOG_MODULE_REGISTER(net_test, NET_LOG_LEVEL);
 #endif
 
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 static struct in_addr my_ipv4_addr1 = { { { 192, 0, 2, 1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 static struct in6_addr in6addr_mcast = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
 					     0, 0, 0, 0, 0, 0, 0, 0x1 } } };
@@ -117,18 +116,10 @@ static struct ethernet_api net_iface_api = {
 #define _ETH_L2_LAYER ETHERNET_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(ETHERNET_L2)
 
-NET_DEVICE_INIT_INSTANCE(net_iface1_test,
-			 "iface1",
-			 iface1,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface1_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 _ETH_L2_LAYER,
-			 _ETH_L2_CTX_TYPE,
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface1_test, "iface1", iface1, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface1_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 struct eth_fake_context {
 	struct net_if *iface;
@@ -153,15 +144,13 @@ static void eth_fake_iface_init(struct net_if *iface)
 	ctx->mac_address[4] = 0x53;
 	ctx->mac_address[5] = sys_rand32_get();
 
-	net_if_set_link_addr(iface, ctx->mac_address,
-			     sizeof(ctx->mac_address),
+	net_if_set_link_addr(iface, ctx->mac_address, sizeof(ctx->mac_address),
 			     NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 }
 
-static int eth_fake_send(const struct device *dev,
-			 struct net_pkt *pkt)
+static int eth_fake_send(const struct device *dev, struct net_pkt *pkt)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(pkt);
@@ -228,38 +217,35 @@ static void test_iface_setup(void)
 	net_if_foreach(iface_cb, NULL);
 
 	idx = net_if_get_by_iface(iface1);
-	((struct net_if_test *)
-	 net_if_get_device(iface1)->data)->idx = idx;
+	((struct net_if_test *)net_if_get_device(iface1)->data)->idx = idx;
 
-	DBG("Interfaces: [%d] iface1 %p\n",
-	    net_if_get_by_iface(iface1), iface1);
+	DBG("Interfaces: [%d] iface1 %p\n", net_if_get_by_iface(iface1),
+	    iface1);
 
 	zassert_not_null(iface1, "Interface 1");
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1");
 	}
 
-	ifaddr = net_if_ipv4_addr_add(iface1, &my_ipv4_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv4_addr_add(iface1, &my_ipv4_addr1, NET_ADDR_MANUAL,
+				      0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv4 address %s\n",
-		       net_sprint_ipv4_addr(&my_ipv4_addr1));
+		    net_sprint_ipv4_addr(&my_ipv4_addr1));
 		zassert_not_null(ifaddr, "ipv4 addr1");
 	}
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr");
 	}
 
@@ -270,7 +256,7 @@ static void test_iface_setup(void)
 	maddr = net_if_ipv6_maddr_add(iface1, &in6addr_mcast);
 	if (!maddr) {
 		DBG("Cannot add multicast IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&in6addr_mcast));
+		    net_sprint_ipv6_addr(&in6addr_mcast));
 		zassert_not_null(maddr, "mcast");
 	}
 
@@ -279,7 +265,8 @@ static void test_iface_setup(void)
 	test_started = true;
 }
 
-static int bytes_from_hostname_unique(uint8_t *buf, int buf_len, const char *src)
+static int bytes_from_hostname_unique(uint8_t *buf, int buf_len,
+				      const char *src)
 {
 	unsigned int i;
 
@@ -290,20 +277,20 @@ static int bytes_from_hostname_unique(uint8_t *buf, int buf_len, const char *src
 	}
 
 	for (i = 0U; i < strlen(src); i++) {
-		buf[i/2] <<= 4;
+		buf[i / 2] <<= 4;
 
 		if (src[i] >= '0' && src[i] <= '9') {
-			buf[i/2] += (src[i] - '0');
+			buf[i / 2] += (src[i] - '0');
 			continue;
 		}
 
 		if (src[i] >= 'A' && src[i] <= 'F') {
-			buf[i/2] += (10 + (src[i] - 'A'));
+			buf[i / 2] += (10 + (src[i] - 'A'));
 			continue;
 		}
 
 		if (src[i] >= 'a' && src[i] <= 'f') {
-			buf[i/2] += (10 + (src[i] - 'a'));
+			buf[i / 2] += (10 + (src[i] - 'a'));
 			continue;
 		}
 
@@ -327,8 +314,9 @@ static void test_hostname_get(void)
 		char mac[6];
 		int ret;
 
-		ret = bytes_from_hostname_unique(mac, sizeof(mac),
-				 hostname + sizeof(CONFIG_NET_HOSTNAME) - 1);
+		ret = bytes_from_hostname_unique(
+			mac, sizeof(mac),
+			hostname + sizeof(CONFIG_NET_HOSTNAME) - 1);
 		zassert_equal(ret, 0, "");
 
 		zassert_mem_equal(mac, net_if_get_link_addr(iface1)->addr,
@@ -342,18 +330,16 @@ static void test_hostname_set(void)
 		int ret;
 
 		ret = net_hostname_set_postfix("foobar", sizeof("foobar") - 1);
-		zassert_equal(ret, -EALREADY,
-			      "Could set hostname postfix (%d)", ret);
+		zassert_equal(ret, -EALREADY, "Could set hostname postfix (%d)",
+			      ret);
 	}
 }
 
 void test_main(void)
 {
-	ztest_test_suite(net_hostname_test,
-			 ztest_unit_test(test_iface_setup),
+	ztest_test_suite(net_hostname_test, ztest_unit_test(test_iface_setup),
 			 ztest_unit_test(test_hostname_get),
-			 ztest_unit_test(test_hostname_set)
-		);
+			 ztest_unit_test(test_hostname_set));
 
 	ztest_run_test_suite(net_hostname_test);
 }

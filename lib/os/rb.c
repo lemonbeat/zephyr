@@ -25,10 +25,10 @@ static struct rbnode *get_child(struct rbnode *n, int side)
 		return n->children[1];
 	}
 
-	uintptr_t l = (uintptr_t) n->children[0];
+	uintptr_t l = (uintptr_t)n->children[0];
 
 	l &= ~1UL;
-	return (struct rbnode *) l;
+	return (struct rbnode *)l;
 }
 
 static void set_child(struct rbnode *n, int side, void *val)
@@ -37,10 +37,10 @@ static void set_child(struct rbnode *n, int side, void *val)
 	if (side != 0) {
 		n->children[1] = val;
 	} else {
-		uintptr_t old = (uintptr_t) n->children[0];
-		uintptr_t new = (uintptr_t) val;
+		uintptr_t old = (uintptr_t)n->children[0];
+		uintptr_t new = (uintptr_t)val;
 
-		n->children[0] = (void *) (new | (old & 1UL));
+		n->children[0] = (void *)(new | (old & 1UL));
 	}
 }
 
@@ -64,7 +64,7 @@ static void set_color(struct rbnode *n, enum rb_color color)
 {
 	CHECK(n);
 
-	uintptr_t *p = (void *) &n->children[0];
+	uintptr_t *p = (void *)&n->children[0];
 
 	*p = (*p & ~1UL) | (uint8_t)color;
 }
@@ -102,7 +102,7 @@ struct rbnode *z_rb_get_minmax(struct rbtree *tree, int side)
 	struct rbnode *n;
 
 	for (n = tree->root; n != NULL && get_child(n, side) != NULL;
-			n = get_child(n, side)) {
+	     n = get_child(n, side)) {
 		;
 	}
 	return n;
@@ -173,8 +173,7 @@ static void fix_extra_red(struct rbnode **stack, int stacksz)
 
 		struct rbnode *grandparent = stack[stacksz - 3];
 		int side = get_side(grandparent, parent);
-		struct rbnode *aunt = get_child(grandparent,
-				side == 0 ? 1 : 0);
+		struct rbnode *aunt = get_child(grandparent, side == 0 ? 1 : 0);
 
 		if ((aunt != NULL) && is_red(aunt)) {
 			set_color(grandparent, RED);
@@ -298,8 +297,8 @@ static void fix_missing_black(struct rbnode **stack, int stacksz,
 		 */
 		c0 = get_child(sib, 0);
 		c1 = get_child(sib, 1);
-		if ((c0 == NULL || is_black(c0)) && (c1 == NULL ||
-					is_black(c1))) {
+		if ((c0 == NULL || is_black(c0)) &&
+		    (c1 == NULL || is_black(c1))) {
 			if (n == null_node) {
 				set_child(parent, n_side, NULL);
 			}

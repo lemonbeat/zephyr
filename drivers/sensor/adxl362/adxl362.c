@@ -28,25 +28,14 @@ static int adxl362_reg_access(struct adxl362_data *ctx, uint8_t cmd,
 			      uint8_t reg_addr, void *data, size_t length)
 {
 	uint8_t access[2] = { cmd, reg_addr };
-	const struct spi_buf buf[2] = {
-		{
-			.buf = access,
-			.len = 2
-		},
-		{
-			.buf = data,
-			.len = length
-		}
-	};
+	const struct spi_buf buf[2] = { { .buf = access, .len = 2 },
+					{ .buf = data, .len = length } };
 	struct spi_buf_set tx = {
 		.buffers = buf,
 	};
 
 	if (cmd == ADXL362_READ_REG) {
-		const struct spi_buf_set rx = {
-			.buffers = buf,
-			.count = 2
-		};
+		const struct spi_buf_set rx = { .buffers = buf, .count = 2 };
 
 		tx.count = 1;
 
@@ -64,11 +53,8 @@ static inline int adxl362_set_reg(const struct device *dev,
 {
 	struct adxl362_data *adxl362_data = dev->data;
 
-	return adxl362_reg_access(adxl362_data,
-				  ADXL362_WRITE_REG,
-				  register_address,
-				  &register_value,
-				  count);
+	return adxl362_reg_access(adxl362_data, ADXL362_WRITE_REG,
+				  register_address, &register_value, count);
 }
 
 int adxl362_reg_write_mask(const struct device *dev, uint8_t register_address,
@@ -78,11 +64,8 @@ int adxl362_reg_write_mask(const struct device *dev, uint8_t register_address,
 	uint8_t tmp;
 	struct adxl362_data *adxl362_data = dev->data;
 
-	ret = adxl362_reg_access(adxl362_data,
-				 ADXL362_READ_REG,
-				 register_address,
-				 &tmp,
-				 1);
+	ret = adxl362_reg_access(adxl362_data, ADXL362_READ_REG,
+				 register_address, &tmp, 1);
 
 	if (ret) {
 		return ret;
@@ -91,11 +74,8 @@ int adxl362_reg_write_mask(const struct device *dev, uint8_t register_address,
 	tmp &= ~mask;
 	tmp |= data;
 
-	return adxl362_reg_access(adxl362_data,
-				  ADXL362_WRITE_REG,
-				  register_address,
-				  &tmp,
-				  1);
+	return adxl362_reg_access(adxl362_data, ADXL362_WRITE_REG,
+				  register_address, &tmp, 1);
 }
 
 static inline int adxl362_get_reg(const struct device *dev, uint8_t *read_buf,
@@ -103,35 +83,26 @@ static inline int adxl362_get_reg(const struct device *dev, uint8_t *read_buf,
 {
 	struct adxl362_data *adxl362_data = dev->data;
 
-	return adxl362_reg_access(adxl362_data,
-				  ADXL362_READ_REG,
-				  register_address,
-				  read_buf, count);
+	return adxl362_reg_access(adxl362_data, ADXL362_READ_REG,
+				  register_address, read_buf, count);
 }
 
 #if defined(CONFIG_ADXL362_TRIGGER)
-static int adxl362_interrupt_config(const struct device *dev,
-				    uint8_t int1,
+static int adxl362_interrupt_config(const struct device *dev, uint8_t int1,
 				    uint8_t int2)
 {
 	int ret;
 	struct adxl362_data *adxl362_data = dev->data;
 
-	ret = adxl362_reg_access(adxl362_data,
-				  ADXL362_WRITE_REG,
-				  ADXL362_REG_INTMAP1,
-				  &int1,
-				  1);
+	ret = adxl362_reg_access(adxl362_data, ADXL362_WRITE_REG,
+				 ADXL362_REG_INTMAP1, &int1, 1);
 
 	if (ret) {
 		return ret;
 	}
 
-	return ret = adxl362_reg_access(adxl362_data,
-					ADXL362_WRITE_REG,
-					ADXL362_REG_INTMAP2,
-					&int2,
-					1);
+	return ret = adxl362_reg_access(adxl362_data, ADXL362_WRITE_REG,
+					ADXL362_REG_INTMAP2, &int2, 1);
 }
 
 int adxl362_get_status(const struct device *dev, uint8_t *status)
@@ -149,8 +120,8 @@ int adxl362_clear_data_ready(const struct device *dev)
 
 static int adxl362_software_reset(const struct device *dev)
 {
-	return adxl362_set_reg(dev, ADXL362_RESET_KEY,
-			       ADXL362_REG_SOFT_RESET, 1);
+	return adxl362_set_reg(dev, ADXL362_RESET_KEY, ADXL362_REG_SOFT_RESET,
+			       1);
 }
 
 static int adxl362_set_power_mode(const struct device *dev, uint8_t mode)
@@ -166,8 +137,7 @@ static int adxl362_set_power_mode(const struct device *dev, uint8_t mode)
 
 	new_power_ctl = old_power_ctl & ~ADXL362_POWER_CTL_MEASURE(0x3);
 	new_power_ctl = new_power_ctl |
-		      (mode *
-		       ADXL362_POWER_CTL_MEASURE(ADXL362_MEASURE_ON));
+			(mode * ADXL362_POWER_CTL_MEASURE(ADXL362_MEASURE_ON));
 	return adxl362_set_reg(dev, new_power_ctl, ADXL362_REG_POWER_CTL, 1);
 }
 
@@ -184,12 +154,7 @@ static const struct {
 			      * SENSOR_ATTR_SAMPLING_FREQUENCY attribute.
 			      */
 } adxl362_odr_map[] = {
-	{ 12, 500 },
-	{ 25, 0 },
-	{ 50, 0 },
-	{ 100, 0 },
-	{ 200, 0 },
-	{ 400, 0 },
+	{ 12, 500 }, { 25, 0 }, { 50, 0 }, { 100, 0 }, { 200, 0 }, { 400, 0 },
 };
 
 static int adxl362_freq_to_odr_val(uint16_t freq_int, uint16_t freq_milli)
@@ -216,9 +181,9 @@ static const struct adxl362_range {
 	uint16_t range;
 	uint8_t reg_val;
 } adxl362_acc_range_map[] = {
-	{2,	ADXL362_RANGE_2G},
-	{4,	ADXL362_RANGE_4G},
-	{8,	ADXL362_RANGE_8G},
+	{ 2, ADXL362_RANGE_2G },
+	{ 4, ADXL362_RANGE_4G },
+	{ 8, ADXL362_RANGE_8G },
 };
 
 static int32_t adxl362_range_to_reg_val(uint16_t range)
@@ -270,16 +235,13 @@ static int adxl362_set_output_rate(const struct device *dev, uint8_t out_rate)
 	return 0;
 }
 
-
-static int axl362_acc_config(const struct device *dev,
-			     enum sensor_channel chan,
+static int axl362_acc_config(const struct device *dev, enum sensor_channel chan,
 			     enum sensor_attribute attr,
 			     const struct sensor_value *val)
 {
 	switch (attr) {
 #if defined(CONFIG_ADXL362_ACCEL_RANGE_RUNTIME)
-	case SENSOR_ATTR_FULL_SCALE:
-	{
+	case SENSOR_ATTR_FULL_SCALE: {
 		int range_reg;
 
 		range_reg = adxl362_range_to_reg_val(sensor_ms2_to_g(val));
@@ -289,24 +251,20 @@ static int axl362_acc_config(const struct device *dev,
 		}
 
 		return adxl362_set_range(dev, range_reg);
-	}
-	break;
+	} break;
 #endif
 #if defined(CONFIG_ADXL362_ACCEL_ODR_RUNTIME)
-	case SENSOR_ATTR_SAMPLING_FREQUENCY:
-	{
+	case SENSOR_ATTR_SAMPLING_FREQUENCY: {
 		int out_rate;
 
-		out_rate = adxl362_freq_to_odr_val(val->val1,
-						   val->val2 / 1000);
+		out_rate = adxl362_freq_to_odr_val(val->val1, val->val2 / 1000);
 		if (out_rate < 0) {
 			LOG_DBG("invalid output rate.");
 			return -ENOTSUP;
 		}
 
 		return adxl362_set_output_rate(dev, out_rate);
-	}
-	break;
+	} break;
 #endif
 	default:
 		LOG_DBG("Accel attribute not supported.");
@@ -325,8 +283,7 @@ static int adxl362_attr_set_thresh(const struct device *dev,
 	uint16_t threshold = val->val1;
 	size_t ret;
 
-	if (chan != SENSOR_CHAN_ACCEL_X &&
-	    chan != SENSOR_CHAN_ACCEL_Y &&
+	if (chan != SENSOR_CHAN_ACCEL_X && chan != SENSOR_CHAN_ACCEL_Y &&
 	    chan != SENSOR_CHAN_ACCEL_Z) {
 		return -EINVAL;
 	}
@@ -347,8 +304,7 @@ static int adxl362_attr_set_thresh(const struct device *dev,
 	return ret;
 }
 
-static int adxl362_attr_set(const struct device *dev,
-			    enum sensor_channel chan,
+static int adxl362_attr_set(const struct device *dev, enum sensor_channel chan,
 			    enum sensor_attribute attr,
 			    const struct sensor_value *val)
 {
@@ -382,8 +338,8 @@ static int adxl362_fifo_setup(const struct device *dev, uint8_t mode,
 	int ret;
 
 	write_val = ADXL362_FIFO_CTL_FIFO_MODE(mode) |
-		   (en_temp_read * ADXL362_FIFO_CTL_FIFO_TEMP) |
-		   ADXL362_FIFO_CTL_AH;
+		    (en_temp_read * ADXL362_FIFO_CTL_FIFO_TEMP) |
+		    ADXL362_FIFO_CTL_AH;
 	ret = adxl362_set_reg(dev, write_val, ADXL362_REG_FIFO_CTL, 1);
 	if (ret) {
 		return ret;
@@ -399,8 +355,7 @@ static int adxl362_fifo_setup(const struct device *dev, uint8_t mode,
 
 static int adxl362_setup_activity_detection(const struct device *dev,
 					    uint8_t ref_or_abs,
-					    uint16_t threshold,
-					    uint8_t time)
+					    uint16_t threshold, uint8_t time)
 {
 	uint8_t old_act_inact_reg;
 	uint8_t new_act_inact_reg;
@@ -445,9 +400,9 @@ static int adxl362_setup_activity_detection(const struct device *dev,
 
 	new_act_inact_reg = old_act_inact_reg & ~ADXL362_ACT_INACT_CTL_ACT_REF;
 	new_act_inact_reg |= ADXL362_ACT_INACT_CTL_ACT_EN |
-			  (ref_or_abs * ADXL362_ACT_INACT_CTL_ACT_REF);
-	ret = adxl362_set_reg(dev, new_act_inact_reg,
-			      ADXL362_REG_ACT_INACT_CTL, 1);
+			     (ref_or_abs * ADXL362_ACT_INACT_CTL_ACT_REF);
+	ret = adxl362_set_reg(dev, new_act_inact_reg, ADXL362_REG_ACT_INACT_CTL,
+			      1);
 	if (ret) {
 		return ret;
 	}
@@ -457,8 +412,7 @@ static int adxl362_setup_activity_detection(const struct device *dev,
 
 static int adxl362_setup_inactivity_detection(const struct device *dev,
 					      uint8_t ref_or_abs,
-					      uint16_t threshold,
-					      uint16_t time)
+					      uint16_t threshold, uint16_t time)
 {
 	uint8_t old_act_inact_reg;
 	uint8_t new_act_inact_reg;
@@ -489,8 +443,8 @@ static int adxl362_setup_inactivity_detection(const struct device *dev,
 			    ~ADXL362_ACT_INACT_CTL_INACT_REF;
 	new_act_inact_reg |= ADXL362_ACT_INACT_CTL_INACT_EN |
 			     (ref_or_abs * ADXL362_ACT_INACT_CTL_INACT_REF);
-	ret = adxl362_set_reg(dev, new_act_inact_reg,
-			      ADXL362_REG_ACT_INACT_CTL, 1);
+	ret = adxl362_set_reg(dev, new_act_inact_reg, ADXL362_REG_ACT_INACT_CTL,
+			      1);
 	if (ret) {
 		return ret;
 	}
@@ -506,11 +460,10 @@ int adxl362_set_interrupt_mode(const struct device *dev, uint8_t mode)
 
 	LOG_DBG("Mode: %d", mode);
 
-	if (mode != ADXL362_MODE_DEFAULT &&
-	    mode != ADXL362_MODE_LINK &&
+	if (mode != ADXL362_MODE_DEFAULT && mode != ADXL362_MODE_LINK &&
 	    mode != ADXL362_MODE_LOOP) {
-		    LOG_ERR("Wrong mode");
-		    return -EINVAL;
+		LOG_ERR("Wrong mode");
+		return -EINVAL;
 	}
 
 	/* Select desired interrupt mode. */
@@ -523,10 +476,10 @@ int adxl362_set_interrupt_mode(const struct device *dev, uint8_t mode)
 	new_act_inact_reg = old_act_inact_reg &
 			    ~ADXL362_ACT_INACT_CTL_LINKLOOP(3);
 	new_act_inact_reg |= old_act_inact_reg |
-			    ADXL362_ACT_INACT_CTL_LINKLOOP(mode);
+			     ADXL362_ACT_INACT_CTL_LINKLOOP(mode);
 
-	ret = adxl362_set_reg(dev, new_act_inact_reg,
-			      ADXL362_REG_ACT_INACT_CTL, 1);
+	ret = adxl362_set_reg(dev, new_act_inact_reg, ADXL362_REG_ACT_INACT_CTL,
+			      1);
 
 	if (ret) {
 		return ret;
@@ -608,7 +561,7 @@ static int adxl362_channel_get(const struct device *dev,
 		adxl362_accel_convert(val, data->acc_y, data->selected_range);
 		break;
 	case SENSOR_CHAN_ACCEL_Z: /* Acceleration on the Z axis, in m/s^2. */
-		adxl362_accel_convert(val, data->acc_z,  data->selected_range);
+		adxl362_accel_convert(val, data->acc_z, data->selected_range);
 		break;
 	case SENSOR_CHAN_DIE_TEMP: /* Temperature in degrees Celsius. */
 		adxl362_temp_convert(val, data->temp);
@@ -621,9 +574,9 @@ static int adxl362_channel_get(const struct device *dev,
 }
 
 static const struct sensor_driver_api adxl362_api_funcs = {
-	.attr_set     = adxl362_attr_set,
+	.attr_set = adxl362_attr_set,
 	.sample_fetch = adxl362_sample_fetch,
-	.channel_get  = adxl362_channel_get,
+	.channel_get = adxl362_channel_get,
 #ifdef CONFIG_ADXL362_TRIGGER
 	.trigger_set = adxl362_trigger_set,
 #endif
@@ -646,11 +599,9 @@ static int adxl362_chip_init(const struct device *dev)
 	 *			time / ODR,
 	 *		where ODR - is the output data rate.
 	 */
-	ret =
-	adxl362_setup_activity_detection(dev,
-					 CONFIG_ADXL362_ABS_REF_MODE,
-					 CONFIG_ADXL362_ACTIVITY_THRESHOLD,
-					 1);
+	ret = adxl362_setup_activity_detection(
+		dev, CONFIG_ADXL362_ABS_REF_MODE,
+		CONFIG_ADXL362_ACTIVITY_THRESHOLD, 1);
 	if (ret) {
 		return ret;
 	}
@@ -668,11 +619,9 @@ static int adxl362_chip_init(const struct device *dev)
 	 *			time / ODR,
 	 *		where ODR - is the output data rate.
 	 */
-	ret =
-	adxl362_setup_inactivity_detection(dev,
-					   CONFIG_ADXL362_ABS_REF_MODE,
-					   CONFIG_ADXL362_INACTIVITY_THRESHOLD,
-					   1);
+	ret = adxl362_setup_inactivity_detection(
+		dev, CONFIG_ADXL362_ABS_REF_MODE,
+		CONFIG_ADXL362_INACTIVITY_THRESHOLD, 1);
 	if (ret) {
 		return ret;
 	}
@@ -744,7 +693,7 @@ static int adxl362_init(const struct device *dev)
 
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
 	data->adxl362_cs_ctrl.gpio_dev =
-				device_get_binding(config->gpio_cs_port);
+		device_get_binding(config->gpio_cs_port);
 	if (!data->adxl362_cs_ctrl.gpio_dev) {
 		LOG_ERR("Unable to get GPIO SPI CS device");
 		return -ENODEV;
@@ -782,8 +731,7 @@ static int adxl362_init(const struct device *dev)
 		return -EIO;
 	}
 
-	if (adxl362_interrupt_config(dev,
-				     config->int1_config,
+	if (adxl362_interrupt_config(dev, config->int1_config,
 				     config->int2_config) < 0) {
 		LOG_ERR("Failed to configure interrupt");
 		return -EIO;
@@ -809,6 +757,6 @@ static const struct adxl362_config adxl362_config = {
 #endif
 };
 
-DEVICE_AND_API_INIT(adxl362, DT_INST_LABEL(0), adxl362_init,
-		    &adxl362_data, &adxl362_config, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &adxl362_api_funcs);
+DEVICE_AND_API_INIT(adxl362, DT_INST_LABEL(0), adxl362_init, &adxl362_data,
+		    &adxl362_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &adxl362_api_funcs);

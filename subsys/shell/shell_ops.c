@@ -30,15 +30,17 @@ void shell_op_cursor_horiz_move(const struct shell *shell, int32_t delta)
  */
 static inline bool full_line_cmd(const struct shell *shell)
 {
-	return ((shell->ctx->cmd_buff_len + shell_strlen(shell->ctx->prompt))
-			% shell->ctx->vt100_ctx.cons.terminal_wid == 0U);
+	return ((shell->ctx->cmd_buff_len + shell_strlen(shell->ctx->prompt)) %
+			shell->ctx->vt100_ctx.cons.terminal_wid ==
+		0U);
 }
 
 /* Function returns true if cursor is at beginning of an empty line. */
 bool shell_cursor_in_empty_line(const struct shell *shell)
 {
-	return ((shell->ctx->cmd_buff_pos + shell_strlen(shell->ctx->prompt))
-			% shell->ctx->vt100_ctx.cons.terminal_wid == 0U);
+	return ((shell->ctx->cmd_buff_pos + shell_strlen(shell->ctx->prompt)) %
+			shell->ctx->vt100_ctx.cons.terminal_wid ==
+		0U);
 }
 
 void shell_op_cond_next_line(const struct shell *shell)
@@ -65,12 +67,12 @@ void shell_op_cursor_position_synchronize(const struct shell *shell)
 	}
 
 	if (last_line) {
-		shell_op_cursor_horiz_move(shell, cons->cur_x -
-							       cons->cur_x_end);
+		shell_op_cursor_horiz_move(shell,
+					   cons->cur_x - cons->cur_x_end);
 	} else {
 		shell_op_cursor_vert_move(shell, cons->cur_y_end - cons->cur_y);
-		shell_op_cursor_horiz_move(shell, cons->cur_x -
-							       cons->cur_x_end);
+		shell_op_cursor_horiz_move(shell,
+					   cons->cur_x - cons->cur_x_end);
 	}
 }
 
@@ -85,20 +87,18 @@ void shell_op_cursor_move(const struct shell *shell, int16_t val)
 				  shell->ctx->cmd_buff_len);
 
 	/* Calculate the new cursor. */
-	row_span = row_span_with_buffer_offsets_get(&shell->ctx->vt100_ctx.cons,
-						    shell->ctx->cmd_buff_pos,
-						    new_pos);
+	row_span = row_span_with_buffer_offsets_get(
+		&shell->ctx->vt100_ctx.cons, shell->ctx->cmd_buff_pos, new_pos);
 	col_span = column_span_with_buffer_offsets_get(
-						    &shell->ctx->vt100_ctx.cons,
-						    shell->ctx->cmd_buff_pos,
-						    new_pos);
+		&shell->ctx->vt100_ctx.cons, shell->ctx->cmd_buff_pos, new_pos);
 
 	shell_op_cursor_vert_move(shell, -row_span);
 	shell_op_cursor_horiz_move(shell, col_span);
 	shell->ctx->cmd_buff_pos = new_pos;
 }
 
-static uint16_t shift_calc(const char *str, uint16_t pos, uint16_t len, int16_t sign)
+static uint16_t shift_calc(const char *str, uint16_t pos, uint16_t len,
+			   int16_t sign)
 {
 	bool found = false;
 	uint16_t ret = 0U;
@@ -191,9 +191,8 @@ void shell_op_cursor_home_move(const struct shell *shell)
 void shell_op_cursor_end_move(const struct shell *shell)
 {
 	shell_op_cursor_move(shell, shell->ctx->cmd_buff_len -
-						shell->ctx->cmd_buff_pos);
+					    shell->ctx->cmd_buff_pos);
 }
-
 
 void shell_op_left_arrow(const struct shell *shell)
 {
@@ -224,7 +223,7 @@ static void reprint_from_cursor(const struct shell *shell, uint16_t diff,
 	}
 
 	shell_internal_fprintf(shell, SHELL_NORMAL, "%s",
-		      &shell->ctx->cmd_buff[shell->ctx->cmd_buff_pos]);
+			       &shell->ctx->cmd_buff[shell->ctx->cmd_buff_pos]);
 	shell->ctx->cmd_buff_pos = shell->ctx->cmd_buff_len;
 
 	if (full_line_cmd(shell)) {
@@ -236,7 +235,8 @@ static void reprint_from_cursor(const struct shell *shell, uint16_t diff,
 	shell_op_cursor_move(shell, -diff);
 }
 
-static void data_insert(const struct shell *shell, const char *data, uint16_t len)
+static void data_insert(const struct shell *shell, const char *data,
+			uint16_t len)
 {
 	uint16_t after = shell->ctx->cmd_buff_len - shell->ctx->cmd_buff_pos;
 	char *curr_pos = &shell->ctx->cmd_buff[shell->ctx->cmd_buff_pos];
@@ -275,7 +275,7 @@ static void char_replace(const struct shell *shell, char data)
 void shell_op_char_insert(const struct shell *shell, char data)
 {
 	if (shell->ctx->internal.flags.insert_mode &&
-		(shell->ctx->cmd_buff_len != shell->ctx->cmd_buff_pos)) {
+	    (shell->ctx->cmd_buff_len != shell->ctx->cmd_buff_pos)) {
 		char_replace(shell, data);
 	} else {
 		data_insert(shell, &data, 1);
@@ -315,8 +315,7 @@ void shell_op_delete_from_cursor(const struct shell *shell)
 	clear_eos(shell);
 }
 
-void shell_op_completion_insert(const struct shell *shell,
-				const char *compl,
+void shell_op_completion_insert(const struct shell *shell, const char * compl,
 				uint16_t compl_len)
 {
 	data_insert(shell, compl, compl_len);
@@ -368,8 +367,7 @@ static void shell_pend_on_txdone(const struct shell *shell)
 	}
 }
 
-void shell_write(const struct shell *shell, const void *data,
-		 size_t length)
+void shell_write(const struct shell *shell, const void *data, size_t length)
 {
 	__ASSERT_NO_MSG(shell && data);
 
@@ -377,9 +375,9 @@ void shell_write(const struct shell *shell, const void *data,
 	size_t tmp_cnt;
 
 	while (length) {
-		int err = shell->iface->api->write(shell->iface,
-				&((const uint8_t *) data)[offset], length,
-				&tmp_cnt);
+		int err = shell->iface->api->write(
+			shell->iface, &((const uint8_t *)data)[offset], length,
+			&tmp_cnt);
 		(void)err;
 		__ASSERT_NO_MSG(err == 0);
 		__ASSERT_NO_MSG(length >= tmp_cnt);
@@ -393,10 +391,9 @@ void shell_write(const struct shell *shell, const void *data,
 }
 
 /* Function shall be only used by the fprintf module. */
-void shell_print_stream(const void *user_ctx, const char *data,
-			size_t data_len)
+void shell_print_stream(const void *user_ctx, const char *data, size_t data_len)
 {
-	shell_write((const struct shell *) user_ctx, data, data_len);
+	shell_write((const struct shell *)user_ctx, data, data_len);
 }
 
 static void vt100_bgcolor_set(const struct shell *shell,
@@ -412,13 +409,11 @@ static void vt100_bgcolor_set(const struct shell *shell,
 
 	shell->ctx->vt100_ctx.col.bgcol = bgcolor;
 	shell_raw_fprintf(shell->fprintf_ctx, "%s", cmd);
-
 }
 
 void shell_vt100_color_set(const struct shell *shell,
 			   enum shell_vt100_color color)
 {
-
 	if (shell->ctx->vt100_ctx.col.col == color) {
 		return;
 	}
@@ -426,7 +421,6 @@ void shell_vt100_color_set(const struct shell *shell,
 	shell->ctx->vt100_ctx.col.col = color;
 
 	if (color != SHELL_NORMAL) {
-
 		uint8_t cmd[] = SHELL_VT100_COLOR(color - 1);
 
 		shell_raw_fprintf(shell->fprintf_ctx, "%s", cmd);
@@ -438,7 +432,7 @@ void shell_vt100_color_set(const struct shell *shell,
 }
 
 void shell_vt100_colors_restore(const struct shell *shell,
-				       const struct shell_vt100_colors *color)
+				const struct shell_vt100_colors *color)
 {
 	shell_vt100_color_set(shell, color->col);
 	vt100_bgcolor_set(shell, color->bgcol);
@@ -465,8 +459,7 @@ void shell_internal_vfprintf(const struct shell *shell,
 }
 
 void shell_internal_fprintf(const struct shell *shell,
-			    enum shell_vt100_color color,
-			    const char *fmt, ...)
+			    enum shell_vt100_color color, const char *fmt, ...)
 {
 	__ASSERT_NO_MSG(shell);
 	__ASSERT(!k_is_in_isr(), "Thread context required.");

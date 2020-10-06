@@ -14,11 +14,11 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME, LOG_LEVEL_DBG);
 
 struct test_frame {
 	uint32_t id_type : 1;
-	uint32_t rtr     : 1;
+	uint32_t rtr : 1;
 	/* Message identifier */
 	union {
-		uint32_t std_id  : 11;
-		uint32_t ext_id  : 29;
+		uint32_t std_id : 11;
+		uint32_t ext_id : 29;
 	};
 	/* The length of the message (max. 8) in byte */
 	uint8_t dlc;
@@ -33,13 +33,12 @@ void main(void)
 {
 	struct test_frame frame = { 0 };
 	const uint8_t data[DATA_MAX_DLEN] = { 0x01, 0x02, 0x03, 0x04,
-					0x05, 0x06, 0x07, 0x08 };
+					      0x05, 0x06, 0x07, 0x08 };
 	struct log_msg_ids src_level = {
 		.level = LOG_LEVEL_INTERNAL_RAW_STRING,
 		.source_id = 0, /* not used as level indicates raw string. */
 		.domain_id = 0, /* not used as level indicates raw string. */
 	};
-
 
 	/* standard print */
 	LOG_ERR("Error message example.");

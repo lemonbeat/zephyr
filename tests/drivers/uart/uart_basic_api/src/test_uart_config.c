@@ -26,13 +26,11 @@
 
 #include "test_uart.h"
 struct uart_config uart_cfg_check;
-const struct uart_config uart_cfg = {
-		.baudrate = 115200,
-		.parity = UART_CFG_PARITY_NONE,
-		.stop_bits = UART_CFG_STOP_BITS_1,
-		.data_bits = UART_CFG_DATA_BITS_8,
-		.flow_ctrl = UART_CFG_FLOW_CTRL_NONE
-	};
+const struct uart_config uart_cfg = { .baudrate = 115200,
+				      .parity = UART_CFG_PARITY_NONE,
+				      .stop_bits = UART_CFG_STOP_BITS_1,
+				      .data_bits = UART_CFG_DATA_BITS_8,
+				      .flow_ctrl = UART_CFG_FLOW_CTRL_NONE };
 
 static int test_configure(void)
 {
@@ -52,7 +50,6 @@ static int test_configure(void)
 
 	/* 0 if successful, - error code otherwise */
 	return (ret == 0) ? TC_PASS : TC_FAIL;
-
 }
 
 /* test UART configure get (retrieve configuration) */

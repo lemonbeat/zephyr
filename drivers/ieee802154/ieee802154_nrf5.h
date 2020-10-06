@@ -10,9 +10,9 @@
 
 #include "nrf_802154_config.h"
 
-#define NRF5_FCS_LENGTH   (2)
-#define NRF5_PSDU_LENGTH  (125)
-#define NRF5_PHR_LENGTH   (1)
+#define NRF5_FCS_LENGTH (2)
+#define NRF5_PSDU_LENGTH (125)
+#define NRF5_PHR_LENGTH (1)
 
 struct nrf5_802154_rx_frame {
 	void *fifo_reserved; /* 1st word reserved for use by fifo. */

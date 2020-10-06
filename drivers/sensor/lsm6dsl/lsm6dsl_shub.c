@@ -16,21 +16,21 @@
 
 LOG_MODULE_DECLARE(LSM6DSL, CONFIG_SENSOR_LOG_LEVEL);
 
-#define LSM6DSL_EMBEDDED_SLV0_ADDR       0x02
-#define LSM6DSL_EMBEDDED_SLV0_SUBADDR    0x03
-#define LSM6DSL_EMBEDDED_SLV0_CONFIG     0x04
-#define LSM6DSL_EMBEDDED_SLV1_ADDR       0x05
-#define LSM6DSL_EMBEDDED_SLV1_SUBADDR    0x06
-#define LSM6DSL_EMBEDDED_SLV1_CONFIG     0x07
-#define LSM6DSL_EMBEDDED_SLV2_ADDR       0x08
-#define LSM6DSL_EMBEDDED_SLV2_SUBADDR    0x09
-#define LSM6DSL_EMBEDDED_SLV2_CONFIG     0x0A
-#define LSM6DSL_EMBEDDED_SLV3_ADDR       0x0B
-#define LSM6DSL_EMBEDDED_SLV3_SUBADDR    0x0C
-#define LSM6DSL_EMBEDDED_SLV3_CONFIG     0x0D
-#define LSM6DSL_EMBEDDED_SLV0_DATAWRITE  0x0E
+#define LSM6DSL_EMBEDDED_SLV0_ADDR 0x02
+#define LSM6DSL_EMBEDDED_SLV0_SUBADDR 0x03
+#define LSM6DSL_EMBEDDED_SLV0_CONFIG 0x04
+#define LSM6DSL_EMBEDDED_SLV1_ADDR 0x05
+#define LSM6DSL_EMBEDDED_SLV1_SUBADDR 0x06
+#define LSM6DSL_EMBEDDED_SLV1_CONFIG 0x07
+#define LSM6DSL_EMBEDDED_SLV2_ADDR 0x08
+#define LSM6DSL_EMBEDDED_SLV2_SUBADDR 0x09
+#define LSM6DSL_EMBEDDED_SLV2_CONFIG 0x0A
+#define LSM6DSL_EMBEDDED_SLV3_ADDR 0x0B
+#define LSM6DSL_EMBEDDED_SLV3_SUBADDR 0x0C
+#define LSM6DSL_EMBEDDED_SLV3_CONFIG 0x0D
+#define LSM6DSL_EMBEDDED_SLV0_DATAWRITE 0x0E
 
-#define LSM6DSL_EMBEDDED_SLVX_READ       0x1
+#define LSM6DSL_EMBEDDED_SLVX_READ 0x1
 #define LSM6DSL_EMBEDDED_SLVX_THREE_SENS 0x20
 #define LSM6DSL_EMBEDDED_SLV0_WRITE_IDLE 0x07
 
@@ -43,15 +43,15 @@ static int lsm6dsl_shub_write_slave_reg(const struct device *dev,
  */
 #ifdef CONFIG_LSM6DSL_EXT0_LIS2MDL
 
-#define LIS2MDL_CFG_REG_A         0x60
-#define LIS2MDL_CFG_REG_B         0x61
-#define LIS2MDL_CFG_REG_C         0x62
-#define LIS2MDL_STATUS_REG        0x67
+#define LIS2MDL_CFG_REG_A 0x60
+#define LIS2MDL_CFG_REG_B 0x61
+#define LIS2MDL_CFG_REG_C 0x62
+#define LIS2MDL_STATUS_REG 0x67
 
-#define LIS2MDL_SW_RESET          0x20
-#define LIS2MDL_ODR_10HZ          0x00
-#define LIS2MDL_OFF_CANC          0x02
-#define LIS2MDL_SENSITIVITY       1500
+#define LIS2MDL_SW_RESET 0x20
+#define LIS2MDL_ODR_10HZ 0x00
+#define LIS2MDL_OFF_CANC 0x02
+#define LIS2MDL_SENSITIVITY 1500
 
 static int lsm6dsl_lis2mdl_init(const struct device *dev, uint8_t i2c_addr)
 {
@@ -62,16 +62,16 @@ static int lsm6dsl_lis2mdl_init(const struct device *dev, uint8_t i2c_addr)
 
 	/* sw reset device */
 	mag_cfg[0] = LIS2MDL_SW_RESET;
-	lsm6dsl_shub_write_slave_reg(dev, i2c_addr,
-				     LIS2MDL_CFG_REG_A, mag_cfg, 1);
+	lsm6dsl_shub_write_slave_reg(dev, i2c_addr, LIS2MDL_CFG_REG_A, mag_cfg,
+				     1);
 
 	k_sleep(K_MSEC(10)); /* turn-on time in ms */
 
 	/* configure mag */
 	mag_cfg[0] = LIS2MDL_ODR_10HZ;
 	mag_cfg[1] = LIS2MDL_OFF_CANC;
-	lsm6dsl_shub_write_slave_reg(dev, i2c_addr,
-				     LIS2MDL_CFG_REG_A, mag_cfg, 2);
+	lsm6dsl_shub_write_slave_reg(dev, i2c_addr, LIS2MDL_CFG_REG_A, mag_cfg,
+				     2);
 
 	return 0;
 }
@@ -82,13 +82,13 @@ static int lsm6dsl_lis2mdl_init(const struct device *dev, uint8_t i2c_addr)
  */
 #ifdef CONFIG_LSM6DSL_EXT0_LPS22HB
 
-#define LPS22HB_CTRL_REG1         0x10
-#define LPS22HB_CTRL_REG2         0x11
+#define LPS22HB_CTRL_REG1 0x10
+#define LPS22HB_CTRL_REG2 0x11
 
-#define LPS22HB_SW_RESET          0x04
-#define LPS22HB_ODR_10HZ          0x20
-#define LPS22HB_LPF_EN            0x08
-#define LPS22HB_BDU_EN            0x02
+#define LPS22HB_SW_RESET 0x04
+#define LPS22HB_ODR_10HZ 0x20
+#define LPS22HB_LPF_EN 0x08
+#define LPS22HB_BDU_EN 0x02
 
 static int lsm6dsl_lps22hb_init(const struct device *dev, uint8_t i2c_addr)
 {
@@ -96,15 +96,15 @@ static int lsm6dsl_lps22hb_init(const struct device *dev, uint8_t i2c_addr)
 
 	/* sw reset device */
 	baro_cfg[0] = LPS22HB_SW_RESET;
-	lsm6dsl_shub_write_slave_reg(dev, i2c_addr,
-				     LPS22HB_CTRL_REG2, baro_cfg, 1);
+	lsm6dsl_shub_write_slave_reg(dev, i2c_addr, LPS22HB_CTRL_REG2, baro_cfg,
+				     1);
 
 	k_sleep(K_MSEC(1)); /* turn-on time in ms */
 
 	/* configure device */
 	baro_cfg[0] = LPS22HB_ODR_10HZ | LPS22HB_LPF_EN | LPS22HB_BDU_EN;
-	lsm6dsl_shub_write_slave_reg(dev, i2c_addr,
-				     LPS22HB_CTRL_REG1, baro_cfg, 1);
+	lsm6dsl_shub_write_slave_reg(dev, i2c_addr, LPS22HB_CTRL_REG1, baro_cfg,
+				     1);
 
 	return 0;
 }
@@ -122,26 +122,26 @@ static struct lsm6dsl_shub_sens_list {
 #ifdef CONFIG_LSM6DSL_EXT0_LIS2MDL
 	{
 		/* LIS2MDL */
-		.i2c_addr       = { 0x1E },
-		.wai_addr       = 0x4F,
-		.wai_val        = 0x40,
-		.out_data_addr  = 0x68,
-		.out_data_len   = 0x06,
-		.dev_init       = (lsm6dsl_lis2mdl_init),
+		.i2c_addr = { 0x1E },
+		.wai_addr = 0x4F,
+		.wai_val = 0x40,
+		.out_data_addr = 0x68,
+		.out_data_len = 0x06,
+		.dev_init = (lsm6dsl_lis2mdl_init),
 	},
-#endif  /* CONFIG_LSM6DSL_EXT0_LIS2MDL */
+#endif /* CONFIG_LSM6DSL_EXT0_LIS2MDL */
 
 #ifdef CONFIG_LSM6DSL_EXT0_LPS22HB
 	{
 		/* LPS22HB */
-		.i2c_addr       = { 0x5C, 0x5D },
-		.wai_addr       = 0x0F,
-		.wai_val        = 0xB1,
-		.out_data_addr  = 0x28,
-		.out_data_len   = 0x05,
-		.dev_init       = (lsm6dsl_lps22hb_init),
+		.i2c_addr = { 0x5C, 0x5D },
+		.wai_addr = 0x0F,
+		.wai_val = 0xB1,
+		.out_data_addr = 0x28,
+		.out_data_len = 0x05,
+		.dev_init = (lsm6dsl_lps22hb_init),
 	},
-#endif  /* CONFIG_LSM6DSL_EXT0_LPS22HB */
+#endif /* CONFIG_LSM6DSL_EXT0_LPS22HB */
 };
 
 static uint8_t ext_i2c_addr;
@@ -168,8 +168,8 @@ static inline void lsm6dsl_shub_embedded_en(const struct device *dev, bool on)
 }
 
 #ifdef LSM6DSL_DEBUG
-static int lsm6dsl_read_embedded_reg(const struct device *dev,
-				     uint8_t reg_addr, uint8_t *value, int len)
+static int lsm6dsl_read_embedded_reg(const struct device *dev, uint8_t reg_addr,
+				     uint8_t *value, int len)
 {
 	struct lsm6dsl_data *data = dev->data;
 	lsm6dsl_shub_embedded_en(dev, true);
@@ -187,8 +187,8 @@ static int lsm6dsl_read_embedded_reg(const struct device *dev,
 #endif
 
 static int lsm6dsl_shub_write_embedded_regs(const struct device *dev,
-					    uint8_t reg_addr,
-					    uint8_t *value, uint8_t len)
+					    uint8_t reg_addr, uint8_t *value,
+					    uint8_t len)
 {
 	struct lsm6dsl_data *data = dev->data;
 	lsm6dsl_shub_embedded_en(dev, true);
@@ -215,10 +215,9 @@ static void lsm6dsl_shub_enable(const struct device *dev)
 
 	/* Enable Accel @26hz */
 	if (!data->accel_freq) {
-		data->hw_tf->update_reg(dev,
-				    LSM6DSL_REG_CTRL1_XL,
-				    LSM6DSL_MASK_CTRL1_XL_ODR_XL,
-				    2 << LSM6DSL_SHIFT_CTRL1_XL_ODR_XL);
+		data->hw_tf->update_reg(dev, LSM6DSL_REG_CTRL1_XL,
+					LSM6DSL_MASK_CTRL1_XL_ODR_XL,
+					2 << LSM6DSL_SHIFT_CTRL1_XL_ODR_XL);
 	}
 
 	/* Enable Sensor Hub */
@@ -238,10 +237,9 @@ static void lsm6dsl_shub_disable(const struct device *dev)
 
 	/* Disable Accel */
 	if (!data->accel_freq) {
-		data->hw_tf->update_reg(dev,
-				    LSM6DSL_REG_CTRL1_XL,
-				    LSM6DSL_MASK_CTRL1_XL_ODR_XL,
-				    0 << LSM6DSL_SHIFT_CTRL1_XL_ODR_XL);
+		data->hw_tf->update_reg(dev, LSM6DSL_REG_CTRL1_XL,
+					LSM6DSL_MASK_CTRL1_XL_ODR_XL,
+					0 << LSM6DSL_SHIFT_CTRL1_XL_ODR_XL);
 	}
 
 	/* Disable Digital Func */
@@ -293,17 +291,16 @@ static int lsm6dsl_shub_write_slave_reg(const struct device *dev,
 		slv_cfg[0] = (slv_addr << 1) & ~LSM6DSL_EMBEDDED_SLVX_READ;
 		slv_cfg[1] = slv_reg + cnt;
 
-		if (lsm6dsl_shub_write_embedded_regs(dev,
-						     LSM6DSL_EMBEDDED_SLV0_ADDR,
-						     slv_cfg, 2) < 0) {
+		if (lsm6dsl_shub_write_embedded_regs(
+			    dev, LSM6DSL_EMBEDDED_SLV0_ADDR, slv_cfg, 2) < 0) {
 			LOG_DBG("error writing embedded reg");
 			return -EIO;
 		}
 
 		slv_cfg[0] = value[cnt];
-		if (lsm6dsl_shub_write_embedded_regs(dev,
-					LSM6DSL_EMBEDDED_SLV0_DATAWRITE,
-					slv_cfg, 1) < 0) {
+		if (lsm6dsl_shub_write_embedded_regs(
+			    dev, LSM6DSL_EMBEDDED_SLV0_DATAWRITE, slv_cfg, 1) <
+		    0) {
 			LOG_DBG("error writing embedded reg");
 			return -EIO;
 		}
@@ -320,8 +317,7 @@ static int lsm6dsl_shub_write_slave_reg(const struct device *dev,
 	slv_cfg[0] = LSM6DSL_EMBEDDED_SLV0_WRITE_IDLE;
 	slv_cfg[1] = lsm6dsl_shub_sens_list[0].wai_addr;
 	slv_cfg[2] = LSM6DSL_EMBEDDED_SLVX_THREE_SENS;
-	if (lsm6dsl_shub_write_embedded_regs(dev,
-					     LSM6DSL_EMBEDDED_SLV0_ADDR,
+	if (lsm6dsl_shub_write_embedded_regs(dev, LSM6DSL_EMBEDDED_SLV0_ADDR,
 					     slv_cfg, 3) < 0) {
 		LOG_DBG("error writing embedded reg");
 		return -EIO;
@@ -346,8 +342,7 @@ static int lsm6dsl_shub_set_data_channel(const struct device *dev)
 	slv_cfg[0] = LSM6DSL_EMBEDDED_SLV0_WRITE_IDLE;
 	slv_cfg[1] = lsm6dsl_shub_sens_list[0].wai_addr;
 	slv_cfg[2] = LSM6DSL_EMBEDDED_SLVX_THREE_SENS;
-	if (lsm6dsl_shub_write_embedded_regs(dev,
-					     LSM6DSL_EMBEDDED_SLV0_ADDR,
+	if (lsm6dsl_shub_write_embedded_regs(dev, LSM6DSL_EMBEDDED_SLV0_ADDR,
 					     slv_cfg, 3) < 0) {
 		LOG_DBG("error writing embedded reg");
 		return -EIO;
@@ -357,8 +352,7 @@ static int lsm6dsl_shub_set_data_channel(const struct device *dev)
 	slv_cfg[0] = (slv_i2c_addr << 1) | LSM6DSL_EMBEDDED_SLVX_READ;
 	slv_cfg[1] = lsm6dsl_shub_sens_list[0].out_data_addr;
 	slv_cfg[2] = lsm6dsl_shub_sens_list[0].out_data_len;
-	if (lsm6dsl_shub_write_embedded_regs(dev,
-					     LSM6DSL_EMBEDDED_SLV1_ADDR,
+	if (lsm6dsl_shub_write_embedded_regs(dev, LSM6DSL_EMBEDDED_SLV1_ADDR,
 					     slv_cfg, 3) < 0) {
 		LOG_DBG("error writing embedded reg");
 		return -EIO;
@@ -400,8 +394,7 @@ int lsm6dsl_shub_init_external_chip(const struct device *dev)
 			continue;
 		}
 
-		if (lsm6dsl_shub_read_slave_reg(dev, slv_i2c_addr,
-						slv_wai_addr,
+		if (lsm6dsl_shub_read_slave_reg(dev, slv_i2c_addr, slv_wai_addr,
 						&chip_id, 1) < 0) {
 			LOG_DBG("failed reading external chip id");
 			return -EIO;

@@ -28,8 +28,8 @@ struct beetle_clock_control_cfg_t {
 	uint32_t freq;
 };
 
-static inline void beetle_set_clock(volatile uint32_t *base,
-				    uint8_t bit, enum arm_soc_state_t state)
+static inline void beetle_set_clock(volatile uint32_t *base, uint8_t bit,
+				    enum arm_soc_state_t state)
 {
 	uint32_t key;
 
@@ -84,7 +84,7 @@ static inline int beetle_clock_control_on(const struct device *dev,
 					  clock_control_subsys_t sub_system)
 {
 	struct arm_clock_control_t *beetle_cc =
-				(struct arm_clock_control_t *)(sub_system);
+		(struct arm_clock_control_t *)(sub_system);
 
 	uint8_t bit = 0U;
 
@@ -108,7 +108,7 @@ static inline int beetle_clock_control_off(const struct device *dev,
 					   clock_control_subsys_t sub_system)
 {
 	struct arm_clock_control_t *beetle_cc =
-				(struct arm_clock_control_t *)(sub_system);
+		(struct arm_clock_control_t *)(sub_system);
 
 	uint8_t bit = 0U;
 
@@ -127,13 +127,13 @@ static inline int beetle_clock_control_off(const struct device *dev,
 	return 0;
 }
 
-static int beetle_clock_control_get_subsys_rate(const struct device *clock,
-						clock_control_subsys_t sub_system,
-						uint32_t *rate)
+static int
+beetle_clock_control_get_subsys_rate(const struct device *clock,
+				     clock_control_subsys_t sub_system,
+				     uint32_t *rate)
 {
 #ifdef CONFIG_CLOCK_CONTROL_BEETLE_ENABLE_PLL
-	const struct beetle_clock_control_cfg_t * const cfg =
-						clock->config;
+	const struct beetle_clock_control_cfg_t *const cfg = clock->config;
 	uint32_t nc_mainclk = beetle_round_freq(cfg->freq);
 
 	*rate = nc_mainclk;
@@ -198,7 +198,6 @@ static uint32_t beetle_get_prescaler(uint32_t mainclk)
 
 static int beetle_pll_enable(uint32_t mainclk)
 {
-
 	uint32_t pre_mainclk = beetle_get_prescaler(mainclk);
 
 	/* Set PLLCTRL Register */
@@ -218,8 +217,7 @@ static int beetle_pll_enable(uint32_t mainclk)
 static int beetle_clock_control_init(const struct device *dev)
 {
 #ifdef CONFIG_CLOCK_CONTROL_BEETLE_ENABLE_PLL
-	const struct beetle_clock_control_cfg_t * const cfg =
-						dev->config;
+	const struct beetle_clock_control_cfg_t *const cfg = dev->config;
 
 	/*
 	 * Enable PLL if Beetle is configured to run at a different
@@ -243,8 +241,7 @@ static const struct beetle_clock_control_cfg_t beetle_cc_cfg = {
  *
  */
 DEVICE_AND_API_INIT(clock_control_beetle, CONFIG_ARM_CLOCK_CONTROL_DEV_NAME,
-		    &beetle_clock_control_init,
-		    NULL, &beetle_cc_cfg,
+		    &beetle_clock_control_init, NULL, &beetle_cc_cfg,
 		    PRE_KERNEL_1,
 		    CONFIG_CLOCK_CONTROL_BEETLE_DEVICE_INIT_PRIORITY,
 		    &beetle_clock_control_api);

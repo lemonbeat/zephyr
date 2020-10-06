@@ -46,8 +46,8 @@ void shell_history_mode_exit(struct shell_history *history)
 	history->current = NULL;
 }
 
-bool shell_history_get(struct shell_history *history, bool up,
-		       uint8_t *dst, uint16_t *len)
+bool shell_history_get(struct shell_history *history, bool up, uint8_t *dst,
+		       uint16_t *len)
 {
 	struct shell_history_item *h_item; /* history item */
 	sys_dnode_t *l_item; /* list item */
@@ -69,9 +69,9 @@ bool shell_history_get(struct shell_history *history, bool up,
 						      history->current);
 	} else { /* button up */
 		l_item = (history->current == NULL) ?
-		sys_dlist_peek_head_not_empty(&history->list) :
-		sys_dlist_peek_next_no_check(&history->list, history->current);
-
+				       sys_dlist_peek_head_not_empty(&history->list) :
+				       sys_dlist_peek_next_no_check(&history->list,
+							      history->current);
 	}
 
 	history->current = l_item;
@@ -89,8 +89,8 @@ bool shell_history_get(struct shell_history *history, bool up,
 }
 
 static void add_to_head(struct shell_history *history,
-			struct shell_history_item *item,
-			uint8_t *src, size_t len, uint16_t padding)
+			struct shell_history_item *item, uint8_t *src,
+			size_t len, uint16_t padding)
 {
 	item->len = len;
 	item->padding = padding;
@@ -114,8 +114,8 @@ static bool remove_from_tail(struct shell_history *history)
 
 	h_item = CONTAINER_OF(l_item, struct shell_history_item, dnode);
 
-	total_len = offsetof(struct shell_history_item, data) +
-			h_item->len + h_item->padding;
+	total_len = offsetof(struct shell_history_item, data) + h_item->len +
+		    h_item->padding;
 	ring_buf_get_finish(history->ring_buf, total_len);
 
 	return true;
@@ -152,23 +152,22 @@ void shell_history_put(struct shell_history *history, uint8_t *line, size_t len)
 	l_item = sys_dlist_peek_head(&history->list);
 	h_item = CONTAINER_OF(l_item, struct shell_history_item, dnode);
 
-	if (l_item &&
-	   (h_item->len == len) &&
-	   (memcmp(h_item->data, line, len) == 0)) {
+	if (l_item && (h_item->len == len) &&
+	    (memcmp(h_item->data, line, len) == 0)) {
 		/* Same command as before, do not store */
 		return;
 	}
 
 	do {
 		claim_len = ring_buf_put_claim(history->ring_buf,
-						(uint8_t **)&h_item, total_len);
+					       (uint8_t **)&h_item, total_len);
 		/* second allocation may succeed if we were at the end of the
 		 * buffer.
 		 */
 		if (claim_len < total_len) {
-			claim2_len =
-				ring_buf_put_claim(history->ring_buf,
-						   (uint8_t **)&h_item, total_len);
+			claim2_len = ring_buf_put_claim(history->ring_buf,
+							(uint8_t **)&h_item,
+							total_len);
 			if (claim2_len == total_len) {
 				ring_buf_put_finish(history->ring_buf,
 						    claim_len);

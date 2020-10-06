@@ -21,7 +21,7 @@ static void _default_sjli_entry(void);
  */
 const static uint32_t _sjli_vector_table[CONFIG_SJLI_TABLE_SIZE] = {
 	[0] = (uint32_t)_arc_do_secure_call,
-	[1 ... (CONFIG_SJLI_TABLE_SIZE - 1)] = (uint32_t)_default_sjli_entry,
+	[1 ...(CONFIG_SJLI_TABLE_SIZE - 1)] = (uint32_t)_default_sjli_entry,
 };
 
 /*
@@ -42,7 +42,7 @@ static void sjli_table_init(void)
 	/* install SJLI table */
 	z_arc_v2_aux_reg_write(_ARC_V2_NSC_TABLE_BASE, _sjli_vector_table);
 	z_arc_v2_aux_reg_write(_ARC_V2_NSC_TABLE_TOP,
-		(_sjli_vector_table + CONFIG_SJLI_TABLE_SIZE));
+			       (_sjli_vector_table + CONFIG_SJLI_TABLE_SIZE));
 }
 
 /*
@@ -65,4 +65,4 @@ static int arc_secureshield_init(const struct device *arg)
 }
 
 SYS_INIT(arc_secureshield_init, PRE_KERNEL_1,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+	 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

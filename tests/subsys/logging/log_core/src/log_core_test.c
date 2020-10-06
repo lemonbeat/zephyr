@@ -10,7 +10,6 @@
  *
  */
 
-
 #include <tc_util.h>
 #include <stdbool.h>
 #include <zephyr.h>
@@ -44,8 +43,7 @@ struct backend_cb {
 	uint32_t total_drops;
 };
 
-static void put(struct log_backend const *const backend,
-		struct log_msg *msg)
+static void put(struct log_backend const *const backend, struct log_msg *msg)
 {
 	log_msg_get(msg);
 	uint32_t nargs = log_msg_nargs_get(msg);
@@ -54,16 +52,14 @@ static void put(struct log_backend const *const backend,
 	if (cb->check_id) {
 		uint32_t exp_id = cb->exp_id[cb->counter];
 
-		zassert_equal(log_msg_source_id_get(msg),
-			      exp_id,
+		zassert_equal(log_msg_source_id_get(msg), exp_id,
 			      "Unexpected source_id");
 	}
 
 	if (cb->check_timestamp) {
 		uint32_t exp_timestamp = cb->exp_timestamps[cb->counter];
 
-		zassert_equal(log_msg_timestamp_get(msg),
-			      exp_timestamp,
+		zassert_equal(log_msg_timestamp_get(msg), exp_timestamp,
 			      "Unexpected message index");
 	}
 
@@ -72,15 +68,16 @@ static void put(struct log_backend const *const backend,
 		for (int i = 0; i < nargs; i++) {
 			uint32_t arg = log_msg_arg_get(msg, i);
 
-			zassert_equal(i+1, arg,
+			zassert_equal(i + 1, arg,
 				      "Unexpected argument in the message");
 		}
 	}
 
 	if (cb->check_strdup) {
-		zassert_false(cb->exp_strdup[cb->counter]
-			      ^ log_is_strdup((void *)log_msg_arg_get(msg, 0)),
-			      NULL);
+		zassert_false(
+			cb->exp_strdup[cb->counter] ^
+				log_is_strdup((void *)log_msg_arg_get(msg, 0)),
+			NULL);
 	}
 
 	if (cb->callback) {
@@ -138,10 +135,9 @@ static uint32_t timestamp_get(void)
  */
 static int log_source_id_get(const char *name)
 {
-
 	for (int i = 0; i < log_src_cnt_get(CONFIG_LOG_DOMAIN_ID); i++) {
-		if (strcmp(log_source_name_get(CONFIG_LOG_DOMAIN_ID, i), name)
-		    == 0) {
+		if (strcmp(log_source_name_get(CONFIG_LOG_DOMAIN_ID, i),
+			   name) == 0) {
 			return i;
 		}
 	}
@@ -197,10 +193,8 @@ static void test_log_backend_runtime_filtering(void)
 	while (log_process(false)) {
 	}
 
-	log_filter_set(&backend2,
-			CONFIG_LOG_DOMAIN_ID,
-			test_source_id,
-			LOG_LEVEL_WRN);
+	log_filter_set(&backend2, CONFIG_LOG_DOMAIN_ID, test_source_id,
+		       LOG_LEVEL_WRN);
 
 	LOG_INF("test");
 	LOG_WRN("test");
@@ -208,12 +202,10 @@ static void test_log_backend_runtime_filtering(void)
 	while (log_process(false)) {
 	}
 
-	zassert_equal(3,
-		      backend1_cb.counter,
+	zassert_equal(3, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
 
-	zassert_equal(2,
-		      backend2_cb.counter,
+	zassert_equal(2, backend2_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
 }
 
@@ -225,11 +217,11 @@ static void test_log_backend_runtime_filtering(void)
 uint8_t data[CONFIG_LOG_BUFFER_SIZE];
 static void test_log_overflow(void)
 {
-	uint32_t msgs_in_buf = CONFIG_LOG_BUFFER_SIZE/sizeof(union log_msg_chunk);
+	uint32_t msgs_in_buf =
+		CONFIG_LOG_BUFFER_SIZE / sizeof(union log_msg_chunk);
 	uint32_t max_hexdump_len = LOG_MSG_HEXDUMP_BYTES_HEAD_CHUNK +
-			    HEXDUMP_BYTES_CONT_MSG * (msgs_in_buf - 1);
+				   HEXDUMP_BYTES_CONT_MSG * (msgs_in_buf - 1);
 	uint32_t hexdump_len = max_hexdump_len - HEXDUMP_BYTES_CONT_MSG;
-
 
 	zassert_true(IS_ENABLED(CONFIG_LOG_MODE_OVERFLOW),
 		     "Test requires that overflow mode is enabled");
@@ -255,13 +247,12 @@ static void test_log_overflow(void)
 	backend1_cb.exp_timestamps[2] = 3U;
 
 	LOG_INF("test");
-	LOG_HEXDUMP_INF(data, max_hexdump_len+1, "test");
+	LOG_HEXDUMP_INF(data, max_hexdump_len + 1, "test");
 
 	while (log_process(false)) {
 	}
 
-	zassert_equal(2,
-		      backend1_cb.counter,
+	zassert_equal(2, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
 }
 
@@ -292,14 +283,13 @@ static void test_log_arguments(void)
 	LOG_INF("test %d %d %d %d", 1, 2, 3, 4);
 	LOG_INF("test %d %d %d %d %d", 1, 2, 3, 4, 5);
 	LOG_INF("test %d %d %d %d %d %d", 1, 2, 3, 4, 5, 6);
-	LOG_INF("test %d %d %d %d %d %d %d %d %d %d",
-			1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+	LOG_INF("test %d %d %d %d %d %d %d %d %d %d", 1, 2, 3, 4, 5, 6, 7, 8, 9,
+		10);
 
 	while (log_process(false)) {
 	}
 
-	zassert_equal(8,
-		      backend1_cb.counter,
+	zassert_equal(8, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
 }
 
@@ -361,21 +351,23 @@ static void test_log_strdup_gc(void)
 
 	zassert_equal(3, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
-
 }
 
-#define DETECT_STRDUP_MISSED(str, do_strdup, ...) \
-	{\
-		char tmp[] = "tmp";\
-		uint32_t exp_cnt = backend1_cb.counter + 1 + (do_strdup ? 0 : 1); \
-		LOG_ERR(str, ##__VA_ARGS__, do_strdup ? log_strdup(tmp) : tmp); \
-		\
-		while (log_process(false)) { \
-		} \
-		\
-		zassert_equal(exp_cnt, backend1_cb.counter,\
-		"Unexpected amount of messages received by the backend (%d).", \
-			backend1_cb.counter); \
+#define DETECT_STRDUP_MISSED(str, do_strdup, ...)                                      \
+	{                                                                              \
+		char tmp[] = "tmp";                                                    \
+		uint32_t exp_cnt =                                                     \
+			backend1_cb.counter + 1 + (do_strdup ? 0 : 1);                 \
+		LOG_ERR(str, ##__VA_ARGS__,                                            \
+			do_strdup ? log_strdup(tmp) : tmp);                            \
+                                                                                       \
+		while (log_process(false)) {                                           \
+		}                                                                      \
+                                                                                       \
+		zassert_equal(                                                         \
+			exp_cnt, backend1_cb.counter,                                  \
+			"Unexpected amount of messages received by the backend (%d).", \
+			backend1_cb.counter);                                          \
 	}
 
 static void test_log_strdup_detect_miss(void)
@@ -406,13 +398,13 @@ static void test_log_strdup_detect_miss(void)
 }
 
 static void strdup_trim_callback(struct log_backend const *const backend,
-			  struct log_msg *msg, size_t counter)
+				 struct log_msg *msg, size_t counter)
 {
 	char *str = (char *)log_msg_arg_get(msg, 0);
 	size_t len = strlen(str);
 
 	zassert_equal(len, CONFIG_LOG_STRDUP_MAX_STRING,
-			"Expected trimmed string");
+		      "Expected trimmed string");
 }
 
 static void test_strdup_trimming(void)
@@ -447,9 +439,8 @@ static void log_n_messages(uint32_t n_msg, uint32_t exp_dropped)
 	}
 
 	zassert_equal(backend1_cb.total_drops, exp_dropped,
-			"Unexpected log msg dropped %d (expected %d)",
-			backend1_cb.total_drops, exp_dropped);
-
+		      "Unexpected log msg dropped %d (expected %d)",
+		      backend1_cb.total_drops, exp_dropped);
 }
 
 /*
@@ -461,7 +452,7 @@ static void test_log_msg_dropped_notification(void)
 {
 	__ASSERT_NO_MSG(CONFIG_LOG_MODE_OVERFLOW);
 
-	uint32_t capacity = CONFIG_LOG_BUFFER_SIZE/sizeof(struct log_msg);
+	uint32_t capacity = CONFIG_LOG_BUFFER_SIZE / sizeof(struct log_msg);
 
 	log_setup(false);
 
@@ -482,8 +473,8 @@ static void test_single_z_log_get_s_mask(const char *str, uint32_t nargs,
 {
 	uint32_t mask = z_log_get_s_mask(str, nargs);
 
-	zassert_equal(mask, exp_mask, "Unexpected mask %x (expected %x)",
-								mask, exp_mask);
+	zassert_equal(mask, exp_mask, "Unexpected mask %x (expected %x)", mask,
+		      exp_mask);
 }
 
 static void test_z_log_get_s_mask(void)
@@ -514,15 +505,13 @@ static void test_log_panic(void)
 	zassert_true(backend1_cb.panic,
 		     "Expecting backend to receive panic notification.");
 
-	zassert_equal(2,
-		      backend1_cb.counter,
+	zassert_equal(2, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
 
 	/* messages processed where called */
 	LOG_INF("test");
 
-	zassert_equal(3,
-		      backend1_cb.counter,
+	zassert_equal(3, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
 }
 

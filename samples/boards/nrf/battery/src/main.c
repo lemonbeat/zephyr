@@ -53,8 +53,7 @@ static const char *now_str(void)
 	now /= 60U;
 	h = now;
 
-	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u",
-		 h, min, s, ms);
+	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u", h, min, s, ms);
 	return buf;
 }
 
@@ -71,15 +70,13 @@ void main(void)
 		int batt_mV = battery_sample();
 
 		if (batt_mV < 0) {
-			printk("Failed to read battery voltage: %d\n",
-			       batt_mV);
+			printk("Failed to read battery voltage: %d\n", batt_mV);
 			break;
 		}
 
 		unsigned int batt_pptt = battery_level_pptt(batt_mV, levels);
 
-		printk("[%s]: %d mV; %u pptt\n", now_str(),
-		       batt_mV, batt_pptt);
+		printk("[%s]: %d mV; %u pptt\n", now_str(), batt_mV, batt_pptt);
 
 		/* Burn battery so you can see that this works over time */
 		k_busy_wait(5 * USEC_PER_SEC);

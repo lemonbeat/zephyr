@@ -116,7 +116,9 @@ int coop_ctx_switch(void)
 		uint32_t diff;
 
 		diff = timing_cycles_get(&timestamp_start, &timestamp_end);
-		PRINT_STATS_AVG("Average context switch time between threads (coop)", diff, ctx_switch_counter);
+		PRINT_STATS_AVG(
+			"Average context switch time between threads (coop)",
+			diff, ctx_switch_counter);
 	}
 
 	timing_stop();

@@ -89,9 +89,9 @@ enum dns_query_type {
  */
 struct dns_addrinfo {
 	struct sockaddr ai_addr;
-	socklen_t       ai_addrlen;
-	uint8_t            ai_family;
-	char            ai_canonname[DNS_MAX_NAME_SIZE + 1];
+	socklen_t ai_addrlen;
+	uint8_t ai_family;
+	char ai_canonname[DNS_MAX_NAME_SIZE + 1];
 };
 
 /**
@@ -99,39 +99,39 @@ struct dns_addrinfo {
  */
 enum dns_resolve_status {
 	/** Invalid value for `ai_flags' field */
-	DNS_EAI_BADFLAGS    = -1,
+	DNS_EAI_BADFLAGS = -1,
 	/** NAME or SERVICE is unknown */
-	DNS_EAI_NONAME      = -2,
+	DNS_EAI_NONAME = -2,
 	/** Temporary failure in name resolution */
-	DNS_EAI_AGAIN       = -3,
+	DNS_EAI_AGAIN = -3,
 	/** Non-recoverable failure in name res */
-	DNS_EAI_FAIL        = -4,
+	DNS_EAI_FAIL = -4,
 	/** No address associated with NAME */
-	DNS_EAI_NODATA      = -5,
+	DNS_EAI_NODATA = -5,
 	/** `ai_family' not supported */
-	DNS_EAI_FAMILY      = -6,
+	DNS_EAI_FAMILY = -6,
 	/** `ai_socktype' not supported */
-	DNS_EAI_SOCKTYPE    = -7,
+	DNS_EAI_SOCKTYPE = -7,
 	/** SRV not supported for `ai_socktype' */
-	DNS_EAI_SERVICE     = -8,
+	DNS_EAI_SERVICE = -8,
 	/** Address family for NAME not supported */
-	DNS_EAI_ADDRFAMILY  = -9,
+	DNS_EAI_ADDRFAMILY = -9,
 	/** Memory allocation failure */
-	DNS_EAI_MEMORY      = -10,
+	DNS_EAI_MEMORY = -10,
 	/** System error returned in `errno' */
-	DNS_EAI_SYSTEM      = -11,
+	DNS_EAI_SYSTEM = -11,
 	/** Argument buffer overflow */
-	DNS_EAI_OVERFLOW    = -12,
+	DNS_EAI_OVERFLOW = -12,
 	/** Processing request in progress */
-	DNS_EAI_INPROGRESS  = -100,
+	DNS_EAI_INPROGRESS = -100,
 	/** Request canceled */
-	DNS_EAI_CANCELED    = -101,
+	DNS_EAI_CANCELED = -101,
 	/** Request not canceled */
 	DNS_EAI_NOTCANCELED = -102,
 	/** All requests done */
-	DNS_EAI_ALLDONE     = -103,
+	DNS_EAI_ALLDONE = -103,
 	/** IDN encoding failed */
-	DNS_EAI_IDN_ENCODE  = -105,
+	DNS_EAI_IDN_ENCODE = -105,
 };
 
 /**
@@ -154,8 +154,7 @@ enum dns_resolve_status {
  * @param user_data The user data given in dns_resolve_name() call.
  */
 typedef void (*dns_resolve_cb_t)(enum dns_resolve_status status,
-				 struct dns_addrinfo *info,
-				 void *user_data);
+				 struct dns_addrinfo *info, void *user_data);
 
 /**
  * DNS resolve context structure.
@@ -275,8 +274,7 @@ int dns_resolve_close(struct dns_resolve_context *ctx);
  *
  * @return 0 if ok, <0 if error.
  */
-int dns_resolve_cancel(struct dns_resolve_context *ctx,
-		       uint16_t dns_id);
+int dns_resolve_cancel(struct dns_resolve_context *ctx, uint16_t dns_id);
 
 /**
  * @brief Cancel a pending DNS query using id, name and type.
@@ -291,8 +289,7 @@ int dns_resolve_cancel(struct dns_resolve_context *ctx,
  * @return 0 if ok, <0 if error.
  */
 int dns_resolve_cancel_with_name(struct dns_resolve_context *ctx,
-				 uint16_t dns_id,
-				 const char *query_name,
+				 uint16_t dns_id, const char *query_name,
 				 enum dns_query_type query_type);
 
 /**
@@ -322,13 +319,9 @@ int dns_resolve_cancel_with_name(struct dns_resolve_context *ctx,
  *
  * @return 0 if resolving was started ok, < 0 otherwise
  */
-int dns_resolve_name(struct dns_resolve_context *ctx,
-		     const char *query,
-		     enum dns_query_type type,
-		     uint16_t *dns_id,
-		     dns_resolve_cb_t cb,
-		     void *user_data,
-		     int32_t timeout);
+int dns_resolve_name(struct dns_resolve_context *ctx, const char *query,
+		     enum dns_query_type type, uint16_t *dns_id,
+		     dns_resolve_cb_t cb, void *user_data, int32_t timeout);
 
 /**
  * @brief Get default DNS context.
@@ -369,20 +362,12 @@ struct dns_resolve_context *dns_resolve_get_default(void);
  *
  * @return 0 if resolving was started ok, < 0 otherwise
  */
-static inline int dns_get_addr_info(const char *query,
-				    enum dns_query_type type,
-				    uint16_t *dns_id,
-				    dns_resolve_cb_t cb,
-				    void *user_data,
-				    int32_t timeout)
+static inline int dns_get_addr_info(const char *query, enum dns_query_type type,
+				    uint16_t *dns_id, dns_resolve_cb_t cb,
+				    void *user_data, int32_t timeout)
 {
-	return dns_resolve_name(dns_resolve_get_default(),
-				query,
-				type,
-				dns_id,
-				cb,
-				user_data,
-				timeout);
+	return dns_resolve_name(dns_resolve_get_default(), query, type, dns_id,
+				cb, user_data, timeout);
 }
 
 /**

@@ -45,7 +45,8 @@ void uart_console_in_debug_hook_install(uart_console_in_debug_hook_t hook)
 	debug_hook_in = hook;
 }
 
-static UART_CONSOLE_OUT_DEBUG_HOOK_SIG(debug_hook_out_nop) {
+static UART_CONSOLE_OUT_DEBUG_HOOK_SIG(debug_hook_out_nop)
+{
 	ARG_UNUSED(c);
 	return !UART_CONSOLE_DEBUG_HOOK_HANDLED;
 }
@@ -59,7 +60,6 @@ void uart_console_out_debug_hook_install(uart_console_out_debug_hook_t *hook)
 	(debug_hook_out(c) == UART_CONSOLE_DEBUG_HOOK_HANDLED)
 
 #endif /* CONFIG_UART_CONSOLE_DEBUG_SERVER_HOOKS */
-
 
 #if defined(CONFIG_PRINTK) || defined(CONFIG_STDOUT_CONSOLE)
 /**
@@ -83,7 +83,7 @@ static int console_out(int c)
 		return c;
 	}
 
-#endif  /* CONFIG_UART_CONSOLE_DEBUG_SERVER_HOOKS */
+#endif /* CONFIG_UART_CONSOLE_DEBUG_SERVER_HOOKS */
 
 	if ('\n' == c) {
 		uart_poll_out(uart_console_dev, '\r');
@@ -99,7 +99,7 @@ static int console_out(int c)
 extern void __stdout_hook_install(int (*hook)(int));
 #else
 #define __stdout_hook_install(x) \
-	do {    /* nothing */	 \
+	do { /* nothing */       \
 	} while ((0))
 #endif
 
@@ -107,7 +107,7 @@ extern void __stdout_hook_install(int (*hook)(int));
 extern void __printk_hook_install(int (*fn)(int));
 #else
 #define __printk_hook_install(x) \
-	do {    /* nothing */	 \
+	do { /* nothing */       \
 	} while ((0))
 #endif
 
@@ -117,22 +117,21 @@ static struct k_fifo *lines_queue;
 static uint8_t (*completion_cb)(char *line, uint8_t len);
 
 /* Control characters */
-#define BS                 0x08
-#define ESC                0x1b
-#define DEL                0x7f
+#define BS 0x08
+#define ESC 0x1b
+#define DEL 0x7f
 
 /* ANSI escape sequences */
-#define ANSI_ESC           '['
-#define ANSI_UP            'A'
-#define ANSI_DOWN          'B'
-#define ANSI_FORWARD       'C'
-#define ANSI_BACKWARD      'D'
-#define ANSI_END           'F'
-#define ANSI_HOME          'H'
-#define ANSI_DEL           '~'
+#define ANSI_ESC '['
+#define ANSI_UP 'A'
+#define ANSI_DOWN 'B'
+#define ANSI_FORWARD 'C'
+#define ANSI_BACKWARD 'D'
+#define ANSI_END 'F'
+#define ANSI_HOME 'H'
+#define ANSI_DEL '~'
 
-static int read_uart(const struct device *uart, uint8_t *buf,
-		     unsigned int size)
+static int read_uart(const struct device *uart, uint8_t *buf, unsigned int size)
 {
 	int rx;
 
@@ -338,9 +337,9 @@ static void clear_mcumgr(void)
 /**
  * These states indicate whether an mcumgr frame is being received.
  */
-#define CONSOLE_MCUMGR_STATE_NONE       1
-#define CONSOLE_MCUMGR_STATE_HEADER     2
-#define CONSOLE_MCUMGR_STATE_PAYLOAD    3
+#define CONSOLE_MCUMGR_STATE_NONE 1
+#define CONSOLE_MCUMGR_STATE_HEADER 2
+#define CONSOLE_MCUMGR_STATE_PAYLOAD 3
 
 static int read_mcumgr_byte(uint8_t byte)
 {
@@ -478,7 +477,7 @@ static void uart_console_isr(const struct device *unused, void *user_data)
 		if (handle_mcumgr(cmd, byte)) {
 			continue;
 		}
-#endif          /* CONFIG_UART_CONSOLE_MCUMGR */
+#endif /* CONFIG_UART_CONSOLE_MCUMGR */
 
 		/* Handle ANSI escape mode */
 		if (atomic_test_bit(&esc_state, ESC_ANSI)) {
@@ -565,10 +564,10 @@ void uart_register_input(struct k_fifo *avail, struct k_fifo *lines,
 
 #else
 #define console_input_init(x) \
-	do {    /* nothing */ \
+	do { /* nothing */    \
 	} while ((0))
 #define uart_register_input(x) \
-	do {    /* nothing */  \
+	do { /* nothing */     \
 	} while ((0))
 #endif
 
@@ -593,7 +592,6 @@ static void uart_console_hook_install(void)
  */
 static int uart_console_init(const struct device *arg)
 {
-
 	ARG_UNUSED(arg);
 
 	/* Claim console device */

@@ -36,7 +36,6 @@ void z_nrf_clock_calibration_lfclk_started(void);
  */
 void z_nrf_clock_calibration_lfclk_stopped(void);
 
-
 #ifdef __cplusplus
 }
 #endif

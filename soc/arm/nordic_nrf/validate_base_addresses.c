@@ -41,10 +41,10 @@
  * @param lbl lowercase-and-underscores devicetree node label to check
  * @param mdk_addr expected address from the Nordic MDK.
  */
-#define CHECK_DT_REG(lbl, mdk_addr)					\
-	BUILD_ASSERT(							\
-		UTIL_OR(UTIL_NOT(DT_NODE_EXISTS(DT_NODELABEL(lbl))),	\
-			(DT_REG_ADDR(DT_NODELABEL(lbl)) == (uint32_t)(mdk_addr))))
+#define CHECK_DT_REG(lbl, mdk_addr)                                       \
+	BUILD_ASSERT(UTIL_OR(UTIL_NOT(DT_NODE_EXISTS(DT_NODELABEL(lbl))), \
+			     (DT_REG_ADDR(DT_NODELABEL(lbl)) ==           \
+			      (uint32_t)(mdk_addr))))
 
 /**
  * If a node label "lbl" might have different addresses depending on
@@ -56,26 +56,25 @@
  * @param addr_if_match MDK address to return if "lbl" has compatible "compat"
  * @param addr_if_no_match MDK address to return otherwise
  */
-#define NODE_ADDRESS(lbl, compat, addr_if_match, addr_if_no_match)	\
-	COND_CODE_1(DT_NODE_HAS_COMPAT(DT_NODELABEL(lbl), compat),	\
+#define NODE_ADDRESS(lbl, compat, addr_if_match, addr_if_no_match) \
+	COND_CODE_1(DT_NODE_HAS_COMPAT(DT_NODELABEL(lbl), compat), \
 		    (addr_if_match), (addr_if_no_match))
 
-#define CHECK_SPI_REG(lbl, num)						\
-	CHECK_DT_REG(lbl,						\
-		NODE_ADDRESS(lbl, nordic_nrf_spi, NRF_SPI##num,	\
-		NODE_ADDRESS(lbl, nordic_nrf_spim, NRF_SPIM##num,	\
-			     NRF_SPIS##num)))
+#define CHECK_SPI_REG(lbl, num)                                      \
+	CHECK_DT_REG(lbl,                                            \
+		     NODE_ADDRESS(lbl, nordic_nrf_spi, NRF_SPI##num, \
+				  NODE_ADDRESS(lbl, nordic_nrf_spim, \
+					       NRF_SPIM##num, NRF_SPIS##num)))
 
-#define CHECK_I2C_REG(lbl, num)						\
-	CHECK_DT_REG(lbl,						\
-		NODE_ADDRESS(lbl, nordic_nrf_twi, NRF_TWI##num,		\
-		NODE_ADDRESS(lbl, nordic_nrf_twim, NRF_TWIM##num,	\
-			     NRF_TWIS##num)))
+#define CHECK_I2C_REG(lbl, num)                                      \
+	CHECK_DT_REG(lbl,                                            \
+		     NODE_ADDRESS(lbl, nordic_nrf_twi, NRF_TWI##num, \
+				  NODE_ADDRESS(lbl, nordic_nrf_twim, \
+					       NRF_TWIM##num, NRF_TWIS##num)))
 
-#define CHECK_UART_REG(lbl, num)					\
-	CHECK_DT_REG(lbl,						\
-		NODE_ADDRESS(lbl, nordic_nrf_uart, NRF_UART##num,	\
-			     NRF_UARTE##num))
+#define CHECK_UART_REG(lbl, num)                                            \
+	CHECK_DT_REG(lbl, NODE_ADDRESS(lbl, nordic_nrf_uart, NRF_UART##num, \
+				       NRF_UARTE##num))
 
 CHECK_DT_REG(adc, NODE_ADDRESS(adc, nordic_nrf_adc, NRF_ADC, NRF_SAADC));
 CHECK_DT_REG(clock, NRF_CLOCK);
@@ -130,6 +129,6 @@ CHECK_DT_REG(uart3, NRF_UARTE3);
 CHECK_DT_REG(uicr, NRF_UICR);
 CHECK_DT_REG(usbd, NRF_USBD);
 CHECK_DT_REG(vmc, NRF_VMC);
-CHECK_DT_REG(wdt, NRF_WDT0);	/* this should be the same node as wdt0 */
+CHECK_DT_REG(wdt, NRF_WDT0); /* this should be the same node as wdt0 */
 CHECK_DT_REG(wdt0, NRF_WDT0);
 CHECK_DT_REG(wdt1, NRF_WDT1);

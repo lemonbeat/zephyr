@@ -61,7 +61,8 @@ struct ili9340_data {
 static int ili9340_transmit(const struct device *dev, uint8_t cmd,
 			    const void *tx_data, size_t tx_len)
 {
-	const struct ili9340_config *config = (struct ili9340_config *)dev->config;
+	const struct ili9340_config *config =
+		(struct ili9340_config *)dev->config;
 	struct ili9340_data *data = (struct ili9340_data *)dev->data;
 
 	int r;
@@ -72,7 +73,8 @@ static int ili9340_transmit(const struct device *dev, uint8_t cmd,
 	tx_buf.buf = &cmd;
 	tx_buf.len = 1U;
 
-	gpio_pin_set(data->command_data_gpio, config->cmd_data_pin, ILI9340_CMD);
+	gpio_pin_set(data->command_data_gpio, config->cmd_data_pin,
+		     ILI9340_CMD);
 	r = spi_write(data->spi_dev, &data->spi_config, &tx_bufs);
 	if (r < 0) {
 		return r;
@@ -83,7 +85,8 @@ static int ili9340_transmit(const struct device *dev, uint8_t cmd,
 		tx_buf.buf = (void *)tx_data;
 		tx_buf.len = tx_len;
 
-		gpio_pin_set(data->command_data_gpio, config->cmd_data_pin, ILI9340_DATA);
+		gpio_pin_set(data->command_data_gpio, config->cmd_data_pin,
+			     ILI9340_DATA);
 		r = spi_write(data->spi_dev, &data->spi_config, &tx_bufs);
 		if (r < 0) {
 			return r;
@@ -109,7 +112,8 @@ static int ili9340_exit_sleep(const struct device *dev)
 
 static void ili9340_hw_reset(const struct device *dev)
 {
-	const struct ili9340_config *config = (struct ili9340_config *)dev->config;
+	const struct ili9340_config *config =
+		(struct ili9340_config *)dev->config;
 	struct ili9340_data *data = (struct ili9340_data *)dev->data;
 
 	if (data->reset_gpio == NULL) {
@@ -124,7 +128,8 @@ static void ili9340_hw_reset(const struct device *dev)
 }
 
 static int ili9340_set_mem_area(const struct device *dev, const uint16_t x,
-				const uint16_t y, const uint16_t w, const uint16_t h)
+				const uint16_t y, const uint16_t w,
+				const uint16_t h)
 {
 	int r;
 	uint16_t spi_data[2];
@@ -162,11 +167,12 @@ static int ili9340_write(const struct device *dev, const uint16_t x,
 	uint16_t write_h;
 
 	__ASSERT(desc->width <= desc->pitch, "Pitch is smaller than width");
-	__ASSERT((desc->pitch * data->bytes_per_pixel * desc->height) <= desc->buf_size,
+	__ASSERT((desc->pitch * data->bytes_per_pixel * desc->height) <=
+			 desc->buf_size,
 		 "Input buffer to small");
 
 	LOG_DBG("Writing %dx%d (w,h) @ %dx%d (x,y)", desc->width, desc->height,
-			x, y);
+		x, y);
 	r = ili9340_set_mem_area(dev, x, y, desc->width, desc->height);
 	if (r < 0) {
 		return r;
@@ -180,8 +186,7 @@ static int ili9340_write(const struct device *dev, const uint16_t x,
 		nbr_of_writes = 1U;
 	}
 
-	r = ili9340_transmit(dev, ILI9340_CMD_MEM_WRITE,
-			     write_data_start,
+	r = ili9340_transmit(dev, ILI9340_CMD_MEM_WRITE, write_data_start,
 			     desc->width * data->bytes_per_pixel * write_h);
 	if (r < 0) {
 		return r;
@@ -208,8 +213,7 @@ static int ili9340_write(const struct device *dev, const uint16_t x,
 
 static int ili9340_read(const struct device *dev, const uint16_t x,
 			const uint16_t y,
-			const struct display_buffer_descriptor *desc,
-			void *buf)
+			const struct display_buffer_descriptor *desc, void *buf)
 {
 	LOG_ERR("Reading not supported");
 	return -ENOTSUP;
@@ -240,15 +244,16 @@ static int ili9340_set_brightness(const struct device *dev,
 	return -ENOTSUP;
 }
 
-static int ili9340_set_contrast(const struct device *dev, const uint8_t contrast)
+static int ili9340_set_contrast(const struct device *dev,
+				const uint8_t contrast)
 {
 	LOG_ERR("Set contrast not supported");
 	return -ENOTSUP;
 }
 
-static int ili9340_set_pixel_format(const struct device *dev,
-				    const enum display_pixel_format
-				    pixel_format)
+static int
+ili9340_set_pixel_format(const struct device *dev,
+			 const enum display_pixel_format pixel_format)
 {
 	struct ili9340_data *data = (struct ili9340_data *)dev->data;
 
@@ -335,7 +340,8 @@ static void ili9340_get_capabilities(const struct device *dev,
 
 static int ili9340_configure(const struct device *dev)
 {
-	const struct ili9340_config *config = (struct ili9340_config *)dev->config;
+	const struct ili9340_config *config =
+		(struct ili9340_config *)dev->config;
 
 	int r;
 	enum display_pixel_format pixel_format;
@@ -447,7 +453,8 @@ static int ili9340_configure(const struct device *dev)
 
 static int ili9340_init(const struct device *dev)
 {
-	const struct ili9340_config *config = (struct ili9340_config *)dev->config;
+	const struct ili9340_config *config =
+		(struct ili9340_config *)dev->config;
 	struct ili9340_data *data = (struct ili9340_data *)dev->data;
 
 	int r;
@@ -472,7 +479,8 @@ static int ili9340_init(const struct device *dev)
 
 	data->command_data_gpio = device_get_binding(config->cmd_data_label);
 	if (data->command_data_gpio == NULL) {
-		LOG_ERR("Could not get command/data GPIO port %s", config->cmd_data_label);
+		LOG_ERR("Could not get command/data GPIO port %s",
+			config->cmd_data_label);
 		return -ENODEV;
 	}
 
@@ -486,7 +494,8 @@ static int ili9340_init(const struct device *dev)
 	data->reset_gpio = device_get_binding(config->reset_label);
 	if (data->reset_gpio != NULL) {
 		r = gpio_pin_configure(data->reset_gpio, config->reset_pin,
-				       GPIO_OUTPUT_INACTIVE | config->reset_flags);
+				       GPIO_OUTPUT_INACTIVE |
+					       config->reset_flags);
 		if (r < 0) {
 			LOG_ERR("Could not configure reset GPIO (%d)", r);
 			return r;
@@ -523,53 +532,51 @@ static const struct display_driver_api ili9340_api = {
 	.set_orientation = ili9340_set_orientation,
 };
 
-#define ILI9340_INIT(index)                                                    \
-	static const struct ili9340_config ili9340_config_##index = {          \
-		.spi_name = DT_INST_BUS_LABEL(index),                          \
-		.spi_addr = DT_INST_REG_ADDR(index),                           \
-		.spi_max_freq = UTIL_AND(                                      \
-			DT_INST_HAS_PROP(index, spi_max_frequency),            \
-			DT_INST_PROP(index, spi_max_frequency)                 \
-		),                                                             \
-		.spi_cs_label = UTIL_AND(                                      \
-			DT_INST_SPI_DEV_HAS_CS_GPIOS(index),                   \
-			DT_INST_SPI_DEV_CS_GPIOS_LABEL(index)),                \
-		.spi_cs_pin = UTIL_AND(                                        \
-			DT_INST_SPI_DEV_HAS_CS_GPIOS(index),                   \
-			DT_INST_SPI_DEV_CS_GPIOS_PIN(index)),                  \
-		.spi_cs_flags = UTIL_AND(                                      \
-			DT_INST_SPI_DEV_HAS_CS_GPIOS(index),                   \
-			DT_INST_SPI_DEV_CS_GPIOS_FLAGS(index)),                \
-		.cmd_data_label = DT_INST_GPIO_LABEL(index, cmd_data_gpios),   \
-		.cmd_data_pin = DT_INST_GPIO_PIN(index, cmd_data_gpios),       \
-		.cmd_data_flags = DT_INST_GPIO_FLAGS(index, cmd_data_gpios),   \
-		.reset_label = UTIL_AND(                                       \
-			DT_INST_NODE_HAS_PROP(index, reset_gpios),             \
-			DT_INST_GPIO_LABEL(index, reset_gpios)),               \
-		.reset_pin = UTIL_AND(                                         \
-			DT_INST_NODE_HAS_PROP(index, reset_gpios),             \
-			DT_INST_GPIO_PIN(index, reset_gpios)),                 \
-		.reset_flags = UTIL_AND(                                       \
-			DT_INST_NODE_HAS_PROP(index, reset_gpios),             \
-			DT_INST_GPIO_FLAGS(index, reset_gpios)),               \
-		.pixel_format = DT_INST_PROP(index, pixel_format),             \
-		.rotation = DT_INST_PROP(index, rotation),                     \
-		.gamset = DT_INST_PROP(index, gamset),                         \
-		.frmctr1 = DT_INST_PROP(index, frmctr1),                       \
-		.disctrl = DT_INST_PROP(index, disctrl),                       \
-		.pwctrl1 = DT_INST_PROP(index, pwctrl1),                       \
-		.pwctrl2 = DT_INST_PROP(index, pwctrl2),                       \
-		.vmctrl1 = DT_INST_PROP(index, vmctrl1),                       \
-		.vmctrl2 = DT_INST_PROP(index, vmctrl2),                       \
-		.pgamctrl = DT_INST_PROP(index, pgamctrl),                     \
-		.ngamctrl = DT_INST_PROP(index, ngamctrl),                     \
-	};                                                                     \
-									       \
-	static struct ili9340_data ili9340_data_##index;                       \
-									       \
-	DEVICE_AND_API_INIT(ili9340_##index, DT_INST_LABEL(index),             \
-			    ili9340_init, &ili9340_data_##index,               \
-			    &ili9340_config_##index, POST_KERNEL,              \
+#define ILI9340_INIT(index)                                                  \
+	static const struct ili9340_config ili9340_config_##index = {        \
+		.spi_name = DT_INST_BUS_LABEL(index),                        \
+		.spi_addr = DT_INST_REG_ADDR(index),                         \
+		.spi_max_freq =                                              \
+			UTIL_AND(DT_INST_HAS_PROP(index, spi_max_frequency), \
+				 DT_INST_PROP(index, spi_max_frequency)),    \
+		.spi_cs_label =                                              \
+			UTIL_AND(DT_INST_SPI_DEV_HAS_CS_GPIOS(index),        \
+				 DT_INST_SPI_DEV_CS_GPIOS_LABEL(index)),     \
+		.spi_cs_pin = UTIL_AND(DT_INST_SPI_DEV_HAS_CS_GPIOS(index),  \
+				       DT_INST_SPI_DEV_CS_GPIOS_PIN(index)), \
+		.spi_cs_flags =                                              \
+			UTIL_AND(DT_INST_SPI_DEV_HAS_CS_GPIOS(index),        \
+				 DT_INST_SPI_DEV_CS_GPIOS_FLAGS(index)),     \
+		.cmd_data_label = DT_INST_GPIO_LABEL(index, cmd_data_gpios), \
+		.cmd_data_pin = DT_INST_GPIO_PIN(index, cmd_data_gpios),     \
+		.cmd_data_flags = DT_INST_GPIO_FLAGS(index, cmd_data_gpios), \
+		.reset_label =                                               \
+			UTIL_AND(DT_INST_NODE_HAS_PROP(index, reset_gpios),  \
+				 DT_INST_GPIO_LABEL(index, reset_gpios)),    \
+		.reset_pin =                                                 \
+			UTIL_AND(DT_INST_NODE_HAS_PROP(index, reset_gpios),  \
+				 DT_INST_GPIO_PIN(index, reset_gpios)),      \
+		.reset_flags =                                               \
+			UTIL_AND(DT_INST_NODE_HAS_PROP(index, reset_gpios),  \
+				 DT_INST_GPIO_FLAGS(index, reset_gpios)),    \
+		.pixel_format = DT_INST_PROP(index, pixel_format),           \
+		.rotation = DT_INST_PROP(index, rotation),                   \
+		.gamset = DT_INST_PROP(index, gamset),                       \
+		.frmctr1 = DT_INST_PROP(index, frmctr1),                     \
+		.disctrl = DT_INST_PROP(index, disctrl),                     \
+		.pwctrl1 = DT_INST_PROP(index, pwctrl1),                     \
+		.pwctrl2 = DT_INST_PROP(index, pwctrl2),                     \
+		.vmctrl1 = DT_INST_PROP(index, vmctrl1),                     \
+		.vmctrl2 = DT_INST_PROP(index, vmctrl2),                     \
+		.pgamctrl = DT_INST_PROP(index, pgamctrl),                   \
+		.ngamctrl = DT_INST_PROP(index, ngamctrl),                   \
+	};                                                                   \
+                                                                             \
+	static struct ili9340_data ili9340_data_##index;                     \
+                                                                             \
+	DEVICE_AND_API_INIT(ili9340_##index, DT_INST_LABEL(index),           \
+			    ili9340_init, &ili9340_data_##index,             \
+			    &ili9340_config_##index, POST_KERNEL,            \
 			    CONFIG_APPLICATION_INIT_PRIORITY, &ili9340_api);
 
 DT_INST_FOREACH_STATUS_OKAY(ILI9340_INIT)

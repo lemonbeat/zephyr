@@ -3,9 +3,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#if defined(__ZEPHYR__) && !(defined(CONFIG_BOARD_NATIVE_POSIX_32BIT) \
-	|| defined(CONFIG_BOARD_NATIVE_POSIX_64BIT) \
-	|| defined(CONFIG_SOC_SERIES_BSIM_NRFXX))
+#if defined(__ZEPHYR__) && !(defined(CONFIG_BOARD_NATIVE_POSIX_32BIT) || \
+			     defined(CONFIG_BOARD_NATIVE_POSIX_64BIT) || \
+			     defined(CONFIG_SOC_SERIES_BSIM_NRFXX))
 
 #include <net/socket.h>
 #include <posix/pthread.h>
@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define ARRAY_SIZE(x) (sizeof(x)/sizeof((x)[0]))
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 #endif
 
@@ -44,9 +44,9 @@ static const char *const names[] = {
 	"Charlie",
 };
 
-#if defined(__ZEPHYR__) && !(defined(CONFIG_BOARD_NATIVE_POSIX_32BIT) \
-	|| defined(CONFIG_BOARD_NATIVE_POSIX_64BIT) \
-	|| defined(CONFIG_SOC_SERIES_BSIM_NRFXX))
+#if defined(__ZEPHYR__) && !(defined(CONFIG_BOARD_NATIVE_POSIX_32BIT) || \
+			     defined(CONFIG_BOARD_NATIVE_POSIX_64BIT) || \
+			     defined(CONFIG_SOC_SERIES_BSIM_NRFXX))
 
 #define STACK_SIZE (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
 static pthread_attr_t attr[NUM_SOCKETPAIRS];
@@ -61,7 +61,7 @@ static void hello(int fd, const char *name)
 
 	if (res != strlen(name)) {
 		printf("%s(): send: expected: %d actual: %d errno: %d\n",
-			__func__, (int)strlen(name), res, errno);
+		       __func__, (int)strlen(name), res, errno);
 	}
 }
 
@@ -103,8 +103,8 @@ void zephyr_app_main(void)
 #else
 int main(int argc, char *argv[])
 {
-	(void) argc;
-	(void) argv;
+	(void)argc;
+	(void)argv;
 #endif
 
 	int r;
@@ -127,9 +127,9 @@ int main(int argc, char *argv[])
 			goto out;
 		}
 
-#if defined(__ZEPHYR__) && !(defined(CONFIG_BOARD_NATIVE_POSIX_32BIT) \
-	|| defined(CONFIG_BOARD_NATIVE_POSIX_64BIT) \
-	|| defined(CONFIG_SOC_SERIES_BSIM_NRFXX))
+#if defined(__ZEPHYR__) && !(defined(CONFIG_BOARD_NATIVE_POSIX_32BIT) || \
+			     defined(CONFIG_BOARD_NATIVE_POSIX_64BIT) || \
+			     defined(CONFIG_SOC_SERIES_BSIM_NRFXX))
 		/* Zephyr requires a non-NULL attribute for pthread_create */
 		attrp = &attr[i];
 		r = pthread_attr_init(attrp);
@@ -151,13 +151,12 @@ int main(int argc, char *argv[])
 			goto out;
 		}
 
-		printf("%s: socketpair: %d <=> %d\n",
-			ctx[i].name, ctx[i].spair[0], ctx[i].spair[1]);
+		printf("%s: socketpair: %d <=> %d\n", ctx[i].name,
+		       ctx[i].spair[0], ctx[i].spair[1]);
 	}
 
 	/* loop until all threads are done */
 	for (;;) {
-
 		/* count threads that are still running and fill in pollfds */
 		for (i = 0, num_active = 0; i < ARRAY_SIZE(ctx); ++i) {
 			if (ctx[i].spair[0] == -1) {
@@ -177,7 +176,6 @@ int main(int argc, char *argv[])
 		poll_r = poll(fds, num_active, -1);
 
 		for (size_t i = 0; i < num_active; ++i) {
-
 			fd = fds[i].fd;
 			idx = fd_to_idx(fd, ctx, ARRAY_SIZE(ctx));
 			if (idx < 0) {
@@ -186,7 +184,6 @@ int main(int argc, char *argv[])
 			}
 
 			if ((fds[i].revents & POLLIN) != 0) {
-
 				memset(buf, '\0', sizeof(buf));
 
 				/* read(2) should be used after #25443 */
@@ -202,7 +199,7 @@ int main(int argc, char *argv[])
 				printf("fd: %d: hung up\n", fd);
 				close(ctx[idx].spair[0]);
 				printf("%s: closed fd %d\n", __func__,
-					ctx[idx].spair[0]);
+				       ctx[idx].spair[0]);
 				pthread_join(ctx[idx].thread, &unused);
 				printf("joined %s\n", ctx[idx].name);
 				ctx[idx].spair[0] = -1;

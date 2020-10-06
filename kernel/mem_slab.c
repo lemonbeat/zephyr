@@ -19,7 +19,7 @@ static struct k_spinlock lock;
 
 #ifdef CONFIG_OBJECT_TRACING
 struct k_mem_slab *_trace_list_k_mem_slab;
-#endif	/* CONFIG_OBJECT_TRACING */
+#endif /* CONFIG_OBJECT_TRACING */
 
 /**
  * @brief Initialize kernel memory slab subsystem.
@@ -36,7 +36,8 @@ static int create_free_list(struct k_mem_slab *slab)
 
 	/* blocks must be word aligned */
 	CHECKIF(((slab->block_size | (uintptr_t)slab->buffer) &
-				(sizeof(void *) - 1)) != 0) {
+		 (sizeof(void *) - 1)) != 0)
+	{
 		return -EINVAL;
 	}
 
@@ -63,7 +64,8 @@ static int init_mem_slab_module(const struct device *dev)
 	int rc = 0;
 	ARG_UNUSED(dev);
 
-	Z_STRUCT_SECTION_FOREACH(k_mem_slab, slab) {
+	Z_STRUCT_SECTION_FOREACH(k_mem_slab, slab)
+	{
 		rc = create_free_list(slab);
 		if (rc < 0) {
 			goto out;
@@ -79,8 +81,8 @@ out:
 SYS_INIT(init_mem_slab_module, PRE_KERNEL_1,
 	 CONFIG_KERNEL_INIT_PRIORITY_OBJECTS);
 
-int k_mem_slab_init(struct k_mem_slab *slab, void *buffer,
-		    size_t block_size, uint32_t num_blocks)
+int k_mem_slab_init(struct k_mem_slab *slab, void *buffer, size_t block_size,
+		    uint32_t num_blocks)
 {
 	int rc = 0;
 

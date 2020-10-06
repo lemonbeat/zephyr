@@ -12,7 +12,7 @@
 #include <drivers/clock_control/stm32_clock_control.h>
 
 /* Maximum data sent in single transfer (Bytes) */
-#define DMA_STM32_MAX_DATA_ITEMS	0xffff
+#define DMA_STM32_MAX_DATA_ITEMS 0xffff
 
 struct dma_stm32_stream {
 	uint32_t direction;
@@ -83,7 +83,8 @@ bool stm32_dma_is_irq_happened(DMA_TypeDef *dma, uint32_t id);
 bool stm32_dma_is_unexpected_irq_happened(DMA_TypeDef *dma, uint32_t id);
 void stm32_dma_enable_stream(DMA_TypeDef *dma, uint32_t id);
 int stm32_dma_disable_stream(DMA_TypeDef *dma, uint32_t id);
-void stm32_dma_config_channel_function(DMA_TypeDef *dma, uint32_t id, uint32_t slot);
+void stm32_dma_config_channel_function(DMA_TypeDef *dma, uint32_t id,
+				       uint32_t slot);
 
 #ifdef CONFIG_DMA_STM32_V1
 void stm32_dma_disable_fifo_irq(DMA_TypeDef *dma, uint32_t id);
@@ -97,9 +98,9 @@ uint32_t stm32_dma_get_pburst(struct dma_config *config, bool source_periph);
 /* dma_stm32_ api functions are exported to the dmamux_stm32 */
 #define DMA_STM32_EXPORT_API
 int dma_stm32_configure(const struct device *dev, uint32_t id,
-				struct dma_config *config);
-int dma_stm32_reload(const struct device *dev, uint32_t id,
-			uint32_t src, uint32_t dst, size_t size);
+			struct dma_config *config);
+int dma_stm32_reload(const struct device *dev, uint32_t id, uint32_t src,
+		     uint32_t dst, size_t size);
 int dma_stm32_start(const struct device *dev, uint32_t id);
 int dma_stm32_stop(const struct device *dev, uint32_t id);
 #else

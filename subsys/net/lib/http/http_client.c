@@ -45,9 +45,8 @@ static ssize_t sendall(int sock, const void *buf, size_t len)
 	return 0;
 }
 
-static int http_send_data(int sock, char *send_buf,
-			  size_t send_buf_max_len, size_t *send_buf_pos,
-			  ...)
+static int http_send_data(int sock, char *send_buf, size_t send_buf_max_len,
+			  size_t *send_buf_pos, ...)
 {
 	const char *data;
 	va_list va;
@@ -69,8 +68,7 @@ static int http_send_data(int sock, char *send_buf,
 
 			if (remaining_len > to_be_copied) {
 				strncpy(send_buf + end_of_send,
-					data + end_of_data,
-					to_be_copied);
+					data + end_of_data, to_be_copied);
 
 				end_of_send += to_be_copied;
 				end_of_data += to_be_copied;
@@ -90,8 +88,7 @@ static int http_send_data(int sock, char *send_buf,
 				continue;
 			} else {
 				strncpy(send_buf + end_of_send,
-					data + end_of_data,
-					remaining_len);
+					data + end_of_data, remaining_len);
 				end_of_send += remaining_len;
 				remaining_len = 0;
 			}
@@ -146,9 +143,8 @@ static void print_header_field(size_t len, const char *str)
 
 static int on_url(struct http_parser *parser, const char *at, size_t length)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 	print_header_field(length, at);
 
 	if (req->internal.response.http_cb &&
@@ -161,9 +157,8 @@ static int on_url(struct http_parser *parser, const char *at, size_t length)
 
 static int on_status(struct http_parser *parser, const char *at, size_t length)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 	uint16_t len;
 
 	len = MIN(length, sizeof(req->internal.response.http_status) - 1);
@@ -184,9 +179,8 @@ static int on_status(struct http_parser *parser, const char *at, size_t length)
 static int on_header_field(struct http_parser *parser, const char *at,
 			   size_t length)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 	const char *content_len = "Content-Length";
 	uint16_t len;
 
@@ -206,14 +200,13 @@ static int on_header_field(struct http_parser *parser, const char *at,
 	return 0;
 }
 
-#define MAX_NUM_DIGITS	16
+#define MAX_NUM_DIGITS 16
 
 static int on_header_value(struct http_parser *parser, const char *at,
 			   size_t length)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 	char str[MAX_NUM_DIGITS];
 
 	if (req->internal.response.cl_present) {
@@ -247,9 +240,8 @@ static int on_header_value(struct http_parser *parser, const char *at,
 
 static int on_body(struct http_parser *parser, const char *at, size_t length)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 
 	req->internal.response.body_found = 1;
 	req->internal.response.processed += length;
@@ -294,9 +286,8 @@ static int on_body(struct http_parser *parser, const char *at, size_t length)
 
 static int on_headers_complete(struct http_parser *parser)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 
 	if (req->internal.response.http_cb &&
 	    req->internal.response.http_cb->on_headers_complete) {
@@ -327,9 +318,8 @@ static int on_headers_complete(struct http_parser *parser)
 
 static int on_message_begin(struct http_parser *parser)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 
 	if (req->internal.response.http_cb &&
 	    req->internal.response.http_cb->on_message_begin) {
@@ -344,9 +334,8 @@ static int on_message_begin(struct http_parser *parser)
 
 static int on_message_complete(struct http_parser *parser)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 
 	if (req->internal.response.http_cb &&
 	    req->internal.response.http_cb->on_message_complete) {
@@ -369,9 +358,8 @@ static int on_message_complete(struct http_parser *parser)
 
 static int on_chunk_header(struct http_parser *parser)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 
 	if (req->internal.response.http_cb &&
 	    req->internal.response.http_cb->on_chunk_header) {
@@ -383,9 +371,8 @@ static int on_chunk_header(struct http_parser *parser)
 
 static int on_chunk_complete(struct http_parser *parser)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 
 	if (req->internal.response.http_cb &&
 	    req->internal.response.http_cb->on_chunk_complete) {
@@ -467,8 +454,8 @@ static void http_timeout(struct k_work *work)
 	(void)close(data->sock);
 }
 
-int http_client_req(int sock, struct http_request *req,
-		    int32_t timeout, void *user_data)
+int http_client_req(int sock, struct http_request *req, int32_t timeout,
+		    void *user_data)
 {
 	/* Utilize the network usage by sending data in bigger blocks */
 	char send_buf[MAX_SEND_BUF_LEN];
@@ -589,12 +576,12 @@ int http_client_req(int sock, struct http_request *req,
 			}
 
 			ret = http_send_data(sock, send_buf, send_buf_max_len,
-					     &send_buf_pos, "Content-Length", ": ",
-					     content_len_str, HTTP_CRLF,
+					     &send_buf_pos, "Content-Length",
+					     ": ", content_len_str, HTTP_CRLF,
 					     HTTP_CRLF, NULL);
 		} else {
 			ret = http_send_data(sock, send_buf, send_buf_max_len,
-				     &send_buf_pos, HTTP_CRLF, NULL);
+					     &send_buf_pos, HTTP_CRLF, NULL);
 		}
 
 		if (ret < 0) {

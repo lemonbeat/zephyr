@@ -47,14 +47,13 @@ static inline void tx_irq_callback(uint32_t error_flags, void *arg)
 {
 	char *caller_str = (char *)arg;
 	if (error_flags) {
-		LOG_DBG("TX error from %s! error-code: %d",
-			caller_str, error_flags);
+		LOG_DBG("TX error from %s! error-code: %d", caller_str,
+			error_flags);
 	}
 }
 
 /* This is called by net_if.c when packet is about to be sent */
-static inline int socket_can_send(const struct device *dev,
-				  struct net_pkt *pkt)
+static inline int socket_can_send(const struct device *dev, struct net_pkt *pkt)
 {
 	struct socket_can_context *socket_context = dev->data;
 	int ret;
@@ -64,8 +63,8 @@ static inline int socket_can_send(const struct device *dev,
 	}
 
 	ret = can_send(socket_context->can_dev,
-		       (struct zcan_frame *)pkt->frags->data,
-		       SEND_TIMEOUT, tx_irq_callback, "socket_can_send");
+		       (struct zcan_frame *)pkt->frags->data, SEND_TIMEOUT,
+		       tx_irq_callback, "socket_can_send");
 	if (ret) {
 		LOG_DBG("Cannot send socket CAN msg (%d)", ret);
 	}
@@ -134,8 +133,7 @@ static inline void rx_thread(void *ctx, void *unused1, void *unused2)
 			   K_FOREVER);
 
 		pkt = net_pkt_rx_alloc_with_buffer(socket_context->iface,
-						   sizeof(msg),
-						   AF_CAN, 0,
+						   sizeof(msg), AF_CAN, 0,
 						   BUF_ALLOC_TIMEOUT);
 		if (!pkt) {
 			LOG_ERR("Failed to obtain RX buffer");

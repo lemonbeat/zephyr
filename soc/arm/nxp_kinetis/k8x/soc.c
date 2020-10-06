@@ -14,13 +14,13 @@
 #include <fsl_common.h>
 #include <fsl_clock.h>
 
-#define PERIPH_CLK_PLLFLLSEL	(1)
-#define PERIPH_CLK_OSCERCLK	(2)
-#define PERIPH_CLK_MCGIRCLK	(3)
+#define PERIPH_CLK_PLLFLLSEL (1)
+#define PERIPH_CLK_OSCERCLK (2)
+#define PERIPH_CLK_MCGIRCLK (3)
 
-#define RUNM_RUN		(0)
-#define RUNM_VLPR		(2)
-#define RUNM_HSRUN		(3)
+#define RUNM_RUN (0)
+#define RUNM_VLPR (2)
+#define RUNM_HSRUN (3)
 
 static const osc_config_t osc_config = {
 	.freq = CONFIG_OSC_XTAL0_FREQ,
@@ -39,7 +39,7 @@ static const osc_config_t osc_config = {
 	.oscerConfig = {
 		.enableMode = kOSC_ErClkEnable,
 #if (defined(FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER) && \
-	FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
+     FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
 		.erclkDiv = 0U,
 #endif
 	},

@@ -27,7 +27,10 @@ LOG_MODULE_DECLARE(os);
 unsigned int z_x86_exception_vector;
 #endif
 
-__weak void z_debug_fatal_hook(const z_arch_esf_t *esf) { ARG_UNUSED(esf); }
+__weak void z_debug_fatal_hook(const z_arch_esf_t *esf)
+{
+	ARG_UNUSED(esf);
+}
 
 void z_x86_spurious_irq(const z_arch_esf_t *esf)
 {
@@ -44,11 +47,9 @@ void arch_syscall_oops(void *ssf_ptr)
 {
 	struct _x86_syscall_stack_frame *ssf =
 		(struct _x86_syscall_stack_frame *)ssf_ptr;
-	z_arch_esf_t oops = {
-		.eip = ssf->eip,
-		.cs = ssf->cs,
-		.eflags = ssf->eflags
-	};
+	z_arch_esf_t oops = { .eip = ssf->eip,
+			      .cs = ssf->cs,
+			      .eflags = ssf->eflags };
 
 	if (oops.cs == USER_CODE_SEG) {
 		oops.esp = ssf->esp;
@@ -72,28 +73,27 @@ FUNC_NORETURN static void generic_exc_handle(unsigned int vector,
 	z_x86_unhandled_cpu_exception(vector, pEsf);
 }
 
-#define _EXC_FUNC(vector) \
-FUNC_NORETURN __used static void handle_exc_##vector(const z_arch_esf_t *pEsf) \
-{ \
-	generic_exc_handle(vector, pEsf); \
-}
+#define _EXC_FUNC(vector)                                     \
+	FUNC_NORETURN __used static void handle_exc_##vector( \
+		const z_arch_esf_t *pEsf)                     \
+	{                                                     \
+		generic_exc_handle(vector, pEsf);             \
+	}
 
 #define Z_EXC_FUNC_CODE(vector, dpl) \
-	_EXC_FUNC(vector) \
+	_EXC_FUNC(vector)            \
 	_EXCEPTION_CONNECT_CODE(handle_exc_##vector, vector, dpl)
 
-#define Z_EXC_FUNC_NOCODE(vector, dpl)	\
-	_EXC_FUNC(vector) \
+#define Z_EXC_FUNC_NOCODE(vector, dpl) \
+	_EXC_FUNC(vector)              \
 	_EXCEPTION_CONNECT_NOCODE(handle_exc_##vector, vector, dpl)
 
 /* Necessary indirection to ensure 'vector' is expanded before we expand
  * the handle_exc_##vector
  */
-#define EXC_FUNC_NOCODE(vector, dpl)		\
-	Z_EXC_FUNC_NOCODE(vector, dpl)
+#define EXC_FUNC_NOCODE(vector, dpl) Z_EXC_FUNC_NOCODE(vector, dpl)
 
-#define EXC_FUNC_CODE(vector, dpl)		\
-	Z_EXC_FUNC_CODE(vector, dpl)
+#define EXC_FUNC_CODE(vector, dpl) Z_EXC_FUNC_CODE(vector, dpl)
 
 EXC_FUNC_NOCODE(IV_DIVIDE_ERROR, 0);
 EXC_FUNC_NOCODE(IV_NON_MASKABLE_INTERRUPT, 0);
@@ -144,15 +144,14 @@ struct task_state_segment _main_tss = {
 
 /* Special TSS for handling double-faults with a known good stack */
 Z_GENERIC_SECTION(.tss)
-struct task_state_segment _df_tss = {
-	.esp = (uint32_t)(_df_stack + sizeof(_df_stack)),
-	.cs = CODE_SEG,
-	.ds = DATA_SEG,
-	.es = DATA_SEG,
-	.ss = DATA_SEG,
-	.eip = (uint32_t)df_handler_top,
-	.cr3 = (uint32_t)&z_x86_kernel_ptables
-};
+struct task_state_segment _df_tss = { .esp = (uint32_t)(_df_stack +
+							sizeof(_df_stack)),
+				      .cs = CODE_SEG,
+				      .ds = DATA_SEG,
+				      .es = DATA_SEG,
+				      .ss = DATA_SEG,
+				      .eip = (uint32_t)df_handler_top,
+				      .cr3 = (uint32_t)&z_x86_kernel_ptables };
 
 static __used void df_handler_bottom(void)
 {
@@ -192,8 +191,9 @@ static FUNC_NORETURN __used void df_handler_top(void)
 	_df_esf.eflags = _main_tss.eflags;
 
 	/* Restore the main IA task to a runnable state */
-	_main_tss.esp = (uint32_t)(Z_KERNEL_STACK_BUFFER(
-		z_interrupt_stacks[0]) + CONFIG_ISR_STACK_SIZE);
+	_main_tss.esp =
+		(uint32_t)(Z_KERNEL_STACK_BUFFER(z_interrupt_stacks[0]) +
+			   CONFIG_ISR_STACK_SIZE);
 	_main_tss.cs = CODE_SEG;
 	_main_tss.ds = DATA_SEG;
 	_main_tss.es = DATA_SEG;
@@ -205,7 +205,7 @@ static FUNC_NORETURN __used void df_handler_top(void)
 	/* NT bit is set in EFLAGS so we will task switch back to _main_tss
 	 * and run df_handler_bottom
 	 */
-	__asm__ volatile ("iret");
+	__asm__ volatile("iret");
 	CODE_UNREACHABLE;
 }
 

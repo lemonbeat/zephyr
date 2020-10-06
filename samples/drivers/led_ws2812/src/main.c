@@ -18,12 +18,15 @@ LOG_MODULE_REGISTER(main);
 #include <drivers/spi.h>
 #include <sys/util.h>
 
-#define STRIP_LABEL		DT_LABEL(DT_ALIAS(led_strip))
-#define STRIP_NUM_PIXELS	DT_PROP(DT_ALIAS(led_strip), chain_length)
+#define STRIP_LABEL DT_LABEL(DT_ALIAS(led_strip))
+#define STRIP_NUM_PIXELS DT_PROP(DT_ALIAS(led_strip), chain_length)
 
 #define DELAY_TIME K_MSEC(50)
 
-#define RGB(_r, _g, _b) { .r = (_r), .g = (_g), .b = (_b) }
+#define RGB(_r, _g, _b)                         \
+	{                                       \
+		.r = (_r), .g = (_g), .b = (_b) \
+	}
 
 static const struct led_rgb colors[] = {
 	RGB(0x0f, 0x00, 0x00), /* red */

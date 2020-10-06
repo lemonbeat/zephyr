@@ -22,8 +22,7 @@ void main(void)
 	uint32_t baudrate = 0U;
 	int ret;
 
-	dev = device_get_binding(
-		CONFIG_OPENTHREAD_NCP_SPINEL_ON_UART_DEV_NAME);
+	dev = device_get_binding(CONFIG_OPENTHREAD_NCP_SPINEL_ON_UART_DEV_NAME);
 	if (!dev) {
 		LOG_ERR("UART device not found");
 		return;

@@ -24,10 +24,8 @@ struct uart_cc32xx_dev_data_t {
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-#define DEV_CFG(dev) \
-	((const struct uart_device_config * const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct uart_cc32xx_dev_data_t * const)(dev)->data)
+#define DEV_CFG(dev) ((const struct uart_device_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct uart_cc32xx_dev_data_t *const)(dev)->data)
 
 #define PRIME_CHAR '\r'
 
@@ -66,8 +64,8 @@ static int uart_cc32xx_init(const struct device *dev)
 	MAP_UARTConfigSetExpClk((unsigned long)config->base,
 				MAP_PRCMPeripheralClockGet(PRCM_UARTA0),
 				DT_INST_PROP(0, current_speed),
-				(UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE
-				 | UART_CONFIG_PAR_NONE));
+				(UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+				 UART_CONFIG_PAR_NONE));
 	MAP_UARTFlowControlSet((unsigned long)config->base,
 			       UART_FLOWCONTROL_NONE);
 	/* Re-disable the FIFOs: */
@@ -77,10 +75,8 @@ static int uart_cc32xx_init(const struct device *dev)
 	/* Clear any pending UART RX interrupts: */
 	MAP_UARTIntClear((unsigned long)config->base, UART_INT_RX);
 
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    uart_cc32xx_isr, DEVICE_GET(uart_cc32xx_0),
-		    0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), uart_cc32xx_isr,
+		    DEVICE_GET(uart_cc32xx_0), 0);
 	irq_enable(DT_INST_IRQN(0));
 
 	/* Fill the tx fifo, so Zephyr console & shell subsystems get "primed"
@@ -120,8 +116,8 @@ static int uart_cc32xx_err_check(const struct device *dev)
 	cc32xx_errs = MAP_UARTRxErrorGet((unsigned long)config->base);
 
 	/* Map cc32xx SDK uart.h defines to zephyr uart.h defines */
-	z_err = ((cc32xx_errs & UART_RXERROR_OVERRUN) ?
-		  UART_ERROR_OVERRUN : 0) |
+	z_err = ((cc32xx_errs & UART_RXERROR_OVERRUN) ? UART_ERROR_OVERRUN :
+							      0) |
 		((cc32xx_errs & UART_RXERROR_BREAK) ? UART_BREAK : 0) |
 		((cc32xx_errs & UART_RXERROR_PARITY) ? UART_ERROR_PARITY : 0) |
 		((cc32xx_errs & UART_RXERROR_FRAMING) ? UART_ERROR_FRAMING : 0);
@@ -134,8 +130,7 @@ static int uart_cc32xx_err_check(const struct device *dev)
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 
 static int uart_cc32xx_fifo_fill(const struct device *dev,
-				 const uint8_t *tx_data,
-				 int size)
+				 const uint8_t *tx_data, int size)
 {
 	const struct uart_device_config *config = DEV_CFG(dev);
 	unsigned int num_tx = 0U;
@@ -160,8 +155,7 @@ static int uart_cc32xx_fifo_read(const struct device *dev, uint8_t *rx_data,
 	unsigned int num_rx = 0U;
 
 	while (((size - num_rx) > 0) &&
-		MAP_UARTCharsAvail((unsigned long)config->base)) {
-
+	       MAP_UARTCharsAvail((unsigned long)config->base)) {
 		/* Receive a character */
 		rx_data[num_rx++] =
 			MAP_UARTCharGetNonBlocking((unsigned long)config->base);
@@ -255,7 +249,7 @@ static void uart_cc32xx_irq_callback_set(const struct device *dev,
 					 uart_irq_callback_user_data_t cb,
 					 void *cb_data)
 {
-	struct uart_cc32xx_dev_data_t * const dev_data = DEV_DATA(dev);
+	struct uart_cc32xx_dev_data_t *const dev_data = DEV_DATA(dev);
 
 	dev_data->cb = cb;
 	dev_data->cb_data = cb_data;
@@ -276,10 +270,10 @@ static void uart_cc32xx_irq_callback_set(const struct device *dev,
 static void uart_cc32xx_isr(const struct device *dev)
 {
 	const struct uart_device_config *config = DEV_CFG(dev);
-	struct uart_cc32xx_dev_data_t * const dev_data = DEV_DATA(dev);
+	struct uart_cc32xx_dev_data_t *const dev_data = DEV_DATA(dev);
 
-	unsigned long intStatus = MAP_UARTIntStatus((unsigned long)config->base,
-						    1);
+	unsigned long intStatus =
+		MAP_UARTIntStatus((unsigned long)config->base, 1);
 
 	if (dev_data->cb) {
 		dev_data->cb(dev, dev_data->cb_data);
@@ -299,25 +293,24 @@ static const struct uart_driver_api uart_cc32xx_driver_api = {
 	.poll_out = uart_cc32xx_poll_out,
 	.err_check = uart_cc32xx_err_check,
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.fifo_fill	  = uart_cc32xx_fifo_fill,
-	.fifo_read	  = uart_cc32xx_fifo_read,
-	.irq_tx_enable	  = uart_cc32xx_irq_tx_enable,
-	.irq_tx_disable	  = uart_cc32xx_irq_tx_disable,
-	.irq_tx_ready	  = uart_cc32xx_irq_tx_ready,
-	.irq_rx_enable	  = uart_cc32xx_irq_rx_enable,
-	.irq_rx_disable	  = uart_cc32xx_irq_rx_disable,
-	.irq_tx_complete  = uart_cc32xx_irq_tx_complete,
-	.irq_rx_ready	  = uart_cc32xx_irq_rx_ready,
-	.irq_err_enable	  = uart_cc32xx_irq_err_enable,
-	.irq_err_disable  = uart_cc32xx_irq_err_disable,
-	.irq_is_pending	  = uart_cc32xx_irq_is_pending,
-	.irq_update	  = uart_cc32xx_irq_update,
+	.fifo_fill = uart_cc32xx_fifo_fill,
+	.fifo_read = uart_cc32xx_fifo_read,
+	.irq_tx_enable = uart_cc32xx_irq_tx_enable,
+	.irq_tx_disable = uart_cc32xx_irq_tx_disable,
+	.irq_tx_ready = uart_cc32xx_irq_tx_ready,
+	.irq_rx_enable = uart_cc32xx_irq_rx_enable,
+	.irq_rx_disable = uart_cc32xx_irq_rx_disable,
+	.irq_tx_complete = uart_cc32xx_irq_tx_complete,
+	.irq_rx_ready = uart_cc32xx_irq_rx_ready,
+	.irq_err_enable = uart_cc32xx_irq_err_enable,
+	.irq_err_disable = uart_cc32xx_irq_err_disable,
+	.irq_is_pending = uart_cc32xx_irq_is_pending,
+	.irq_update = uart_cc32xx_irq_update,
 	.irq_callback_set = uart_cc32xx_irq_callback_set,
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-DEVICE_AND_API_INIT(uart_cc32xx_0, DT_INST_LABEL(0),
-		    uart_cc32xx_init, &uart_cc32xx_dev_data_0,
-		    &uart_cc32xx_dev_cfg_0,
+DEVICE_AND_API_INIT(uart_cc32xx_0, DT_INST_LABEL(0), uart_cc32xx_init,
+		    &uart_cc32xx_dev_data_0, &uart_cc32xx_dev_cfg_0,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    (void *)&uart_cc32xx_driver_api);

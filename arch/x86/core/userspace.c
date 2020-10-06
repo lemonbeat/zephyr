@@ -20,9 +20,9 @@
 static inline void cr3_set(uintptr_t phys)
 {
 #ifdef CONFIG_X86_64
-	__asm__ volatile("movq %0, %%cr3\n\t" : : "r" (phys) : "memory");
+	__asm__ volatile("movq %0, %%cr3\n\t" : : "r"(phys) : "memory");
 #else
-	__asm__ volatile("movl %0, %%cr3\n\t" : : "r" (phys) : "memory");
+	__asm__ volatile("movl %0, %%cr3\n\t" : : "r"(phys) : "memory");
 #endif
 }
 
@@ -66,8 +66,8 @@ void z_x86_swap_update_page_tables(struct k_thread *incoming)
 }
 #endif /* CONFIG_X86_KPTI */
 
-FUNC_NORETURN static void drop_to_user(k_thread_entry_t user_entry,
-				       void *p1, void *p2, void *p3)
+FUNC_NORETURN static void drop_to_user(k_thread_entry_t user_entry, void *p1,
+				       void *p2, void *p3)
 {
 	uint32_t stack_end;
 
@@ -107,8 +107,8 @@ void *z_x86_userspace_prepare_thread(struct k_thread *thread)
 	return initial_entry;
 }
 
-FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry,
-					void *p1, void *p2, void *p3)
+FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry, void *p1,
+					void *p2, void *p3)
 {
 	z_x86_thread_pt_init(_current);
 

@@ -83,7 +83,8 @@ void app_b_entry(void *p1, void *p2, void *p3)
 #if Z_LIBC_PARTITION_EXISTS
 		&z_libc_partition,
 #endif
-		&app_b_partition, &shared_partition
+		&app_b_partition,
+		&shared_partition
 	};
 
 	/* Initialize a memory domain with the specified partitions

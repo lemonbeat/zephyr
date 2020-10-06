@@ -136,10 +136,8 @@ static inline bool verify_content_amount(sys_dlist_t *list, int amount)
 	return true;
 }
 
-static inline bool verify_tail_head(sys_dlist_t *list,
-				    sys_dnode_t *head,
-				    sys_dnode_t *tail,
-				    bool same)
+static inline bool verify_tail_head(sys_dlist_t *list, sys_dnode_t *head,
+				    sys_dnode_t *tail, bool same)
 {
 	if (sys_dlist_peek_head(list) != head) {
 		return false;
@@ -178,7 +176,7 @@ void test_dlist(void)
 	sys_dlist_init(&test_list);
 
 	zassert_true((verify_emptyness(&test_list)),
-			"test_list should be empty");
+		     "test_list should be empty");
 
 	/* Appending node 1 */
 	sys_dlist_append(&test_list, &test_node_1.node);
@@ -286,12 +284,8 @@ void test_dlist(void)
 		sys_dnode_t node;
 		int data;
 	} data_node[6] = {
-		{ .data = 0 },
-		{ .data = 1 },
-		{ .data = 2 },
-		{ .data = 3 },
-		{ .data = 4 },
-		{ .data = 5 },
+		{ .data = 0 }, { .data = 1 }, { .data = 2 },
+		{ .data = 3 }, { .data = 4 }, { .data = 5 },
 	};
 	sys_dnode_t *node = NULL;
 	int ii;
@@ -303,7 +297,8 @@ void test_dlist(void)
 	}
 
 	ii = 0;
-	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		ii++;
 		if (((struct data_node *)node)->data == 2) {
 			break;
@@ -312,7 +307,8 @@ void test_dlist(void)
 	zassert_equal(ii, 3, "");
 
 	ii = 0;
-	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		ii++;
 		if (((struct data_node *)node)->data == 3) {
 			break;
@@ -321,7 +317,8 @@ void test_dlist(void)
 	zassert_equal(ii, 1, "");
 
 	ii = 0;
-	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		ii++;
 	}
 	zassert_equal(ii, 2, "");

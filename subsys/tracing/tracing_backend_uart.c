@@ -59,9 +59,8 @@ static void uart_isr(const struct device *dev, void *user_data)
 }
 #endif
 
-static void tracing_backend_uart_output(
-		const struct tracing_backend *backend,
-		uint8_t *data, uint32_t length)
+static void tracing_backend_uart_output(const struct tracing_backend *backend,
+					uint8_t *data, uint32_t length)
 {
 	for (uint32_t i = 0; i < length; i++) {
 		uart_poll_out(tracing_uart_dev, data[i]);
@@ -70,8 +69,7 @@ static void tracing_backend_uart_output(
 
 static void tracing_backend_uart_init(void)
 {
-	tracing_uart_dev =
-		device_get_binding(CONFIG_TRACING_BACKEND_UART_NAME);
+	tracing_uart_dev = device_get_binding(CONFIG_TRACING_BACKEND_UART_NAME);
 	__ASSERT(tracing_uart_dev, "uart backend binding failed");
 
 #ifdef CONFIG_TRACING_HANDLE_HOST_CMD
@@ -92,7 +90,7 @@ static void tracing_backend_uart_init(void)
 
 const struct tracing_backend_api tracing_backend_uart_api = {
 	.init = tracing_backend_uart_init,
-	.output  = tracing_backend_uart_output
+	.output = tracing_backend_uart_output
 };
 
 TRACING_BACKEND_DEFINE(tracing_backend_uart, tracing_backend_uart_api);

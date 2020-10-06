@@ -13,23 +13,23 @@
 #define LOG_LEVEL LOG_LEVEL_DBG
 LOG_MODULE_REGISTER(pwrmgmt_test);
 
-#define SLP_STATES_SUPPORTED      2ul
+#define SLP_STATES_SUPPORTED 2ul
 
 /* Thread properties */
-#define TASK_STACK_SIZE           1024ul
-#define PRIORITY                  K_PRIO_COOP(5)
+#define TASK_STACK_SIZE 1024ul
+#define PRIORITY K_PRIO_COOP(5)
 /* Sleep time should be lower than CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_1 */
-#define THREAD_A_SLEEP_TIME       100ul
-#define THREAD_B_SLEEP_TIME       1000ul
+#define THREAD_A_SLEEP_TIME 100ul
+#define THREAD_B_SLEEP_TIME 1000ul
 
 /* Maximum latency should be less than 300 ms */
-#define MAX_EXPECTED_MS_LATENCY   500ul
+#define MAX_EXPECTED_MS_LATENCY 500ul
 
 /* Sleep some extra time than minimum residency */
-#define DP_EXTRA_SLP_TIME         1100ul
-#define LT_EXTRA_SLP_TIME         500ul
+#define DP_EXTRA_SLP_TIME 1100ul
+#define LT_EXTRA_SLP_TIME 500ul
 
-#define SEC_TO_MSEC               1000ul
+#define SEC_TO_MSEC 1000ul
 
 K_THREAD_STACK_DEFINE(stack_a, TASK_STACK_SIZE);
 K_THREAD_STACK_DEFINE(stack_b, TASK_STACK_SIZE);
@@ -221,13 +221,12 @@ static void create_tasks(void)
 	task_b_init();
 
 	k_thread_create(&thread_a_id, stack_a, TASK_STACK_SIZE, task_a_thread,
-		NULL, NULL, NULL, PRIORITY,  K_INHERIT_PERMS, K_FOREVER);
+			NULL, NULL, NULL, PRIORITY, K_INHERIT_PERMS, K_FOREVER);
 	k_thread_create(&thread_b_id, stack_b, TASK_STACK_SIZE, task_b_thread,
-		NULL, NULL, NULL, PRIORITY,  K_INHERIT_PERMS, K_FOREVER);
+			NULL, NULL, NULL, PRIORITY, K_INHERIT_PERMS, K_FOREVER);
 
 	k_thread_start(&thread_a_id);
 	k_thread_start(&thread_b_id);
-
 }
 
 static void destroy_tasks(void)
@@ -267,7 +266,6 @@ int test_pwr_mgmt_multithread(bool use_logging, uint8_t cycles)
 
 	checks_enabled = true;
 	while (iterations-- > 0) {
-
 		/* Light sleep cycle */
 		LOG_INF("Suspend...");
 		suspend_all_tasks();
@@ -325,7 +323,6 @@ int test_pwr_mgmt_singlethread(bool use_logging, uint8_t cycles)
 
 	checks_enabled = true;
 	while (iterations-- > 0) {
-
 		/* Trigger Light Sleep 1 state. 48MHz PLL stays on */
 		LOG_INF("About to enter light sleep");
 		k_msleep(CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_1 +

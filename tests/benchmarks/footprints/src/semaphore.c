@@ -10,7 +10,7 @@
 
 #include "footprint.h"
 
-#define STACK_SIZE	512
+#define STACK_SIZE 512
 
 K_SEM_DEFINE(semaphore0, 0, 1);
 
@@ -32,18 +32,16 @@ void run_semaphore(void)
 
 	k_sem_take(&sem0, K_FOREVER);
 
-	sem0_tid = k_thread_create(&my_thread, my_stack_area,
-				   STACK_SIZE, thread_fn,
-				   NULL, NULL, NULL,
-				   0, 0, K_NO_WAIT);
+	sem0_tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
+				   thread_fn, NULL, NULL, NULL, 0, 0,
+				   K_NO_WAIT);
 
 	k_thread_join(sem0_tid, K_FOREVER);
 
 #ifdef CONFIG_USERSPACE
-	sem0_tid = k_thread_create(&my_thread, my_stack_area,
-				   STACK_SIZE, thread_fn,
-				   NULL, NULL, NULL,
-				   0, K_USER, K_FOREVER);
+	sem0_tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
+				   thread_fn, NULL, NULL, NULL, 0, K_USER,
+				   K_FOREVER);
 
 	k_object_access_grant(&semaphore0, sem0_tid);
 

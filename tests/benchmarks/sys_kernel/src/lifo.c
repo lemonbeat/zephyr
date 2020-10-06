@@ -25,7 +25,6 @@ void lifo_test_init(void)
 	k_lifo_init(&lifo2);
 }
 
-
 /**
  *
  * @brief Lifo test thread
@@ -63,7 +62,6 @@ void lifo_thread1(void *par1, void *par2, void *par3)
 	/* wait till it is safe to end: */
 	k_fifo_get(&sync_fifo, K_FOREVER);
 }
-
 
 /**
  *
@@ -146,12 +144,11 @@ int lifo_test(void)
 	k_fifo_init(&sync_fifo);
 
 	/* test get/wait & put thread functions between co-op threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"LIFO #1");
+	fprintf(output_file, sz_test_case_fmt, "LIFO #1");
 	fprintf(output_file, sz_description,
-			"\n\tk_lifo_init"
-			"\n\tk_lifo_get(K_FOREVER)"
-			"\n\tk_lifo_put");
+		"\n\tk_lifo_init"
+		"\n\tk_lifo_get(K_FOREVER)"
+		"\n\tk_lifo_put");
 	printf(sz_test_start_fmt);
 
 	lifo_test_init();
@@ -159,12 +156,12 @@ int lifo_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, lifo_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, lifo_thread2,
-			 &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
@@ -176,14 +173,13 @@ int lifo_test(void)
 	}
 
 	/* test get/yield & put thread functions between co-op threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"LIFO #2");
+	fprintf(output_file, sz_test_case_fmt, "LIFO #2");
 	fprintf(output_file, sz_description,
-			"\n\tk_lifo_init"
-			"\n\tk_lifo_get(K_FOREVER)"
-			"\n\tk_lifo_get(TICKS_NONE)"
-			"\n\tk_lifo_put"
-			"\n\tk_yield");
+		"\n\tk_lifo_init"
+		"\n\tk_lifo_get(K_FOREVER)"
+		"\n\tk_lifo_get(TICKS_NONE)"
+		"\n\tk_lifo_put"
+		"\n\tk_yield");
 	printf(sz_test_start_fmt);
 
 	lifo_test_init();
@@ -193,12 +189,12 @@ int lifo_test(void)
 	i = 0;
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, lifo_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, lifo_thread3,
-			 &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
@@ -210,14 +206,13 @@ int lifo_test(void)
 	}
 
 	/* test get wait & put functions between co-op and premptive threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"LIFO #3");
+	fprintf(output_file, sz_test_case_fmt, "LIFO #3");
 	fprintf(output_file, sz_description,
-			"\n\tk_lifo_init"
-			"\n\tk_lifo_get(K_FOREVER)"
-			"\n\tk_lifo_put"
-			"\n\tk_lifo_get(K_FOREVER)"
-			"\n\tk_lifo_put");
+		"\n\tk_lifo_init"
+		"\n\tk_lifo_get(K_FOREVER)"
+		"\n\tk_lifo_put"
+		"\n\tk_lifo_get(K_FOREVER)"
+		"\n\tk_lifo_put");
 	printf(sz_test_start_fmt);
 
 	lifo_test_init();
@@ -225,8 +220,8 @@ int lifo_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, lifo_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	for (i = 0; i < number_of_loops / 2U; i++) {
 		intptr_t element[2];
 		intptr_t *pelement;

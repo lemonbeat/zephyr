@@ -72,14 +72,12 @@ __subsystem struct ps2_driver_api {
  * @retval 0 If successful.
  * @retval Negative errno code if failure.
  */
-__syscall int ps2_config(const struct device *dev,
-			 ps2_callback_t callback_isr);
+__syscall int ps2_config(const struct device *dev, ps2_callback_t callback_isr);
 
 static inline int z_impl_ps2_config(const struct device *dev,
 				    ps2_callback_t callback_isr)
 {
-	const struct ps2_driver_api *api =
-				(struct ps2_driver_api *)dev->api;
+	const struct ps2_driver_api *api = (struct ps2_driver_api *)dev->api;
 
 	return api->config(dev, callback_isr);
 }
@@ -98,7 +96,7 @@ __syscall int ps2_write(const struct device *dev, uint8_t value);
 static inline int z_impl_ps2_write(const struct device *dev, uint8_t value)
 {
 	const struct ps2_driver_api *api =
-			(const struct ps2_driver_api *)dev->api;
+		(const struct ps2_driver_api *)dev->api;
 
 	return api->write(dev, value);
 }
@@ -111,12 +109,12 @@ static inline int z_impl_ps2_write(const struct device *dev, uint8_t value)
  * @retval 0 If successful.
  * @retval Negative errno code if failure.
  */
-__syscall int ps2_read(const struct device *dev,  uint8_t *value);
+__syscall int ps2_read(const struct device *dev, uint8_t *value);
 
 static inline int z_impl_ps2_read(const struct device *dev, uint8_t *value)
 {
 	const struct ps2_driver_api *api =
-			(const struct ps2_driver_api *)dev->api;
+		(const struct ps2_driver_api *)dev->api;
 
 	return api->read(dev, value);
 }
@@ -133,7 +131,7 @@ __syscall int ps2_enable_callback(const struct device *dev);
 static inline int z_impl_ps2_enable_callback(const struct device *dev)
 {
 	const struct ps2_driver_api *api =
-			(const struct ps2_driver_api *)dev->api;
+		(const struct ps2_driver_api *)dev->api;
 
 	if (api->enable_callback == NULL) {
 		return -ENOTSUP;
@@ -154,7 +152,7 @@ __syscall int ps2_disable_callback(const struct device *dev);
 static inline int z_impl_ps2_disable_callback(const struct device *dev)
 {
 	const struct ps2_driver_api *api =
-			(const struct ps2_driver_api *)dev->api;
+		(const struct ps2_driver_api *)dev->api;
 
 	if (api->disable_callback == NULL) {
 		return -ENOTSUP;

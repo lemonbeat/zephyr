@@ -47,16 +47,14 @@ static struct adc_sequence adc_table = {
 	.options = &options,
 };
 
-static int gts_sample_fetch(const struct device *dev,
-			    enum sensor_channel chan)
+static int gts_sample_fetch(const struct device *dev, enum sensor_channel chan)
 {
 	struct gts_data *drv_data = dev->data;
 
 	return adc_read(drv_data->adc, &adc_table);
 }
 
-static int gts_channel_get(const struct device *dev,
-			   enum sensor_channel chan,
+static int gts_channel_get(const struct device *dev, enum sensor_channel chan,
 			   struct sensor_value *val)
 {
 	struct gts_data *drv_data = dev->data;
@@ -68,12 +66,10 @@ static int gts_channel_get(const struct device *dev,
 	 * is taken from the sensor reference page:
 	 *     http://www.seeedstudio.com/wiki/Grove_-_Temperature_Sensor
 	 */
-	dval = (1 / (log((BIT(GROVE_RESOLUTION) - 1.0)
-			/ drv_data->raw
-			- 1.0)
-		     / cfg->b_const
-		     + (1 / 298.15)))
-		- 273.15;
+	dval = (1 / (log((BIT(GROVE_RESOLUTION) - 1.0) / drv_data->raw - 1.0) /
+			     cfg->b_const +
+		     (1 / 298.15))) -
+	       273.15;
 	val->val1 = (int32_t)dval;
 	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
 
@@ -103,7 +99,8 @@ static int gts_init(const struct device *dev)
 		.acquisition_time = ADC_ACQ_TIME_DEFAULT,
 		.channel_id = cfg->adc_channel,
 #ifdef CONFIG_ADC_NRFX_SAADC
-		.input_positive = SAADC_CH_PSELP_PSELP_AnalogInput0 + cfg->adc_channel,
+		.input_positive =
+			SAADC_CH_PSELP_PSELP_AnalogInput0 + cfg->adc_channel,
 #endif
 	};
 	adc_table.buffer = &drv_data->raw;
@@ -119,12 +116,9 @@ static int gts_init(const struct device *dev)
 static struct gts_data gts_data;
 static const struct gts_config gts_cfg = {
 	.adc_label = DT_INST_IO_CHANNELS_LABEL(0),
-	.b_const = (IS_ENABLED(DT_INST_PROP(0, v1p0))
-		    ? 3975
-		    : 4250),
+	.b_const = (IS_ENABLED(DT_INST_PROP(0, v1p0)) ? 3975 : 4250),
 	.adc_channel = DT_INST_IO_CHANNELS_INPUT(0),
 };
 
-DEVICE_AND_API_INIT(gts_dev, DT_INST_LABEL(0), &gts_init,
-		&gts_data, &gts_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
-		&gts_api);
+DEVICE_AND_API_INIT(gts_dev, DT_INST_LABEL(0), &gts_init, &gts_data, &gts_cfg,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &gts_api);

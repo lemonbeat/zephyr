@@ -12,8 +12,11 @@
 #define BOOT_MAGIC_VAL_W1 0x7fefd260
 #define BOOT_MAGIC_VAL_W2 0x0f505235
 #define BOOT_MAGIC_VAL_W3 0x8079b62c
-#define BOOT_MAGIC_VALUES {BOOT_MAGIC_VAL_W0, BOOT_MAGIC_VAL_W1,\
-			   BOOT_MAGIC_VAL_W2, BOOT_MAGIC_VAL_W3 }
+#define BOOT_MAGIC_VALUES                                                \
+	{                                                                \
+		BOOT_MAGIC_VAL_W0, BOOT_MAGIC_VAL_W1, BOOT_MAGIC_VAL_W2, \
+			BOOT_MAGIC_VAL_W3                                \
+	}
 
 void test_bank_erase(void)
 {
@@ -38,8 +41,8 @@ void test_bank_erase(void)
 		}
 	}
 
-	zassert(boot_erase_img_bank(FLASH_AREA_ID(image_1)) == 0,
-		"pass", "fail");
+	zassert(boot_erase_img_bank(FLASH_AREA_ID(image_1)) == 0, "pass",
+		"fail");
 
 	for (offs = 0; offs < fa->fa_size; offs += sizeof(temp)) {
 		ret = flash_area_read(fa, offs, &temp, sizeof(temp));
@@ -52,12 +55,8 @@ void test_request_upgrade(void)
 {
 	const struct flash_area *fa;
 	const uint32_t expectation[6] = {
-		0xffffffff,
-		0xffffffff,
-		BOOT_MAGIC_VAL_W0,
-		BOOT_MAGIC_VAL_W1,
-		BOOT_MAGIC_VAL_W2,
-		BOOT_MAGIC_VAL_W3
+		0xffffffff,	   0xffffffff,	      BOOT_MAGIC_VAL_W0,
+		BOOT_MAGIC_VAL_W1, BOOT_MAGIC_VAL_W2, BOOT_MAGIC_VAL_W3
 	};
 	uint32_t readout[ARRAY_SIZE(expectation)];
 	int ret;
@@ -70,23 +69,24 @@ void test_request_upgrade(void)
 
 	zassert(boot_request_upgrade(false) == 0, "pass", "fail");
 
-	ret = flash_area_read(fa, fa->fa_size - sizeof(expectation),
-			      &readout, sizeof(readout));
+	ret = flash_area_read(fa, fa->fa_size - sizeof(expectation), &readout,
+			      sizeof(readout));
 	zassert_true(ret == 0, "Read from flash");
 
-	zassert(memcmp(expectation, readout, sizeof(expectation)) == 0,
-		"pass", "fail");
+	zassert(memcmp(expectation, readout, sizeof(expectation)) == 0, "pass",
+		"fail");
 
 	boot_erase_img_bank(FLASH_AREA_ID(image_1));
 
 	zassert(boot_request_upgrade(true) == 0, "pass", "fail");
 
-	ret = flash_area_read(fa, fa->fa_size - sizeof(expectation),
-			      &readout, sizeof(readout));
+	ret = flash_area_read(fa, fa->fa_size - sizeof(expectation), &readout,
+			      sizeof(readout));
 	zassert_true(ret == 0, "Read from flash");
 
-	zassert(memcmp(&expectation[2], &readout[2], sizeof(expectation) -
-		       2 * sizeof(expectation[0])) == 0, "pass", "fail");
+	zassert(memcmp(&expectation[2], &readout[2],
+		       sizeof(expectation) - 2 * sizeof(expectation[0])) == 0,
+		"pass", "fail");
 
 	zassert_equal(1, readout[0] & 0xff, "confirmation error");
 }
@@ -104,16 +104,15 @@ void test_write_confirm(void)
 		return;
 	}
 
-	zassert(boot_erase_img_bank(FLASH_AREA_ID(image_0)) == 0,
-		"pass", "fail");
+	zassert(boot_erase_img_bank(FLASH_AREA_ID(image_0)) == 0, "pass",
+		"fail");
 
-	ret = flash_area_read(fa, fa->fa_size - sizeof(img_magic),
-			      &readout, sizeof(img_magic));
+	ret = flash_area_read(fa, fa->fa_size - sizeof(img_magic), &readout,
+			      sizeof(img_magic));
 	zassert_true(ret == 0, "Read from flash");
 
 	if (memcmp(img_magic, readout, sizeof(img_magic)) != 0) {
-		ret = flash_area_write(fa, fa->fa_size - 16,
-				       img_magic, 16);
+		ret = flash_area_write(fa, fa->fa_size - 16, img_magic, 16);
 		zassert_true(ret == 0, "Write to flash");
 	}
 

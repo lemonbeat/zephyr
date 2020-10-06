@@ -35,9 +35,9 @@
 
 static struct {
 	struct {
-		void              *param;
+		void *param;
 		lll_is_abort_cb_t is_abort_cb;
-		lll_abort_cb_t    abort_cb;
+		lll_abort_cb_t abort_cb;
 	} curr;
 } event;
 
@@ -137,8 +137,8 @@ int lll_init(void)
 
 	/* Connect ISRs */
 	IRQ_CONNECT(LL_RADIO_IRQn, CONFIG_BT_CTLR_LLL_PRIO, isr_radio, NULL, 0);
-	IRQ_CONNECT(LL_RTC0_IRQn, CONFIG_BT_CTLR_ULL_HIGH_PRIO,
-		    rtc0_rv32m1_isr, NULL, 0);
+	IRQ_CONNECT(LL_RTC0_IRQn, CONFIG_BT_CTLR_ULL_HIGH_PRIO, rtc0_rv32m1_isr,
+		    NULL, 0);
 	IRQ_CONNECT(HAL_SWI_RADIO_IRQ, CONFIG_BT_CTLR_LLL_PRIO,
 		    swi_lll_rv32m1_isr, NULL, 0);
 #if defined(CONFIG_BT_CTLR_LOW_LAT) || \
@@ -242,16 +242,16 @@ void lll_disable(void *param)
 int lll_prepare_done(void *param)
 {
 #if defined(CONFIG_BT_CTLR_LOW_LAT) && \
-	    (CONFIG_BT_CTLR_LLL_PRIO == CONFIG_BT_CTLR_ULL_LOW_PRIO)
+	(CONFIG_BT_CTLR_LLL_PRIO == CONFIG_BT_CTLR_ULL_LOW_PRIO)
 	uint32_t ret;
 
 	/* Ticker Job Silence */
-	ret = ticker_job_idle_get(TICKER_INSTANCE_ID_CTLR,
-				  TICKER_USER_ID_LLL,
+	ret = ticker_job_idle_get(TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_LLL,
 				  ticker_op_job_disable, NULL);
 
-	return ((ret == TICKER_STATUS_SUCCESS) ||
-		(ret == TICKER_STATUS_BUSY)) ? 0 : -EFAULT;
+	return ((ret == TICKER_STATUS_SUCCESS) || (ret == TICKER_STATUS_BUSY)) ?
+			     0 :
+			     -EFAULT;
 #else
 	return 0;
 #endif /* CONFIG_BT_CTLR_LOW_LAT */
@@ -283,8 +283,7 @@ int lll_done(void *param)
 		if (IS_ENABLED(CONFIG_BT_CTLR_LOW_LAT) &&
 		    (CONFIG_BT_CTLR_LLL_PRIO == CONFIG_BT_CTLR_ULL_LOW_PRIO)) {
 			mayfly_enable(TICKER_USER_ID_LLL,
-				      TICKER_USER_ID_ULL_LOW,
-				      1);
+				      TICKER_USER_ID_ULL_LOW, 1);
 		}
 
 		DEBUG_RADIO_CLOSE(0);
@@ -306,7 +305,7 @@ bool lll_is_done(void *param)
 }
 
 int lll_is_abort_cb(void *next, int prio, void *curr,
-			 lll_prepare_cb_t *resume_cb, int *resume_prio)
+		    lll_prepare_cb_t *resume_cb, int *resume_prio)
 {
 	return -ECANCELED;
 }
@@ -368,7 +367,7 @@ uint32_t lll_evt_offset_get(struct evt_hdr *evt)
 }
 
 uint32_t lll_preempt_calc(struct evt_hdr *evt, uint8_t ticker_id,
-		       uint32_t ticks_at_event)
+			  uint32_t ticks_at_event)
 {
 	uint32_t ticks_now = ticker_ticks_now_get();
 	uint32_t diff;
@@ -418,7 +417,6 @@ void lll_chan_set(uint32_t chan)
 	radio_whiten_iv_set(chan);
 }
 
-
 uint32_t lll_radio_is_idle(void)
 {
 	return radio_is_idle();
@@ -433,7 +431,6 @@ uint32_t lll_radio_rx_ready_delay_get(uint8_t phy, uint8_t flags)
 {
 	return radio_rx_ready_delay_get(phy, flags);
 }
-
 
 static int init_reset(void)
 {
@@ -560,36 +557,29 @@ static void preempt_ticker_start(struct lll_prepare_param *prepare_param)
 	/* Calc the preempt timeout */
 	evt = HDR_LLL2EVT(prepare_param->param);
 	preempt_anchor = prepare_param->ticks_at_expire;
-	preempt_to = MAX(evt->ticks_active_to_start,
-			 evt->ticks_xtal_to_start) -
-			 evt->ticks_preempt_to_start;
+	preempt_to = MAX(evt->ticks_active_to_start, evt->ticks_xtal_to_start) -
+		     evt->ticks_preempt_to_start;
 
 	/* Setup pre empt timeout */
-	ret = ticker_start(TICKER_INSTANCE_ID_CTLR,
-			   TICKER_USER_ID_LLL,
-			   TICKER_ID_LLL_PREEMPT,
-			   preempt_anchor,
-			   preempt_to,
-			   TICKER_NULL_PERIOD,
-			   TICKER_NULL_REMAINDER,
-			   TICKER_NULL_LAZY,
-			   TICKER_NULL_SLOT,
-			   preempt_ticker_cb, NULL,
-			   ticker_start_op_cb, NULL);
+	ret = ticker_start(TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_LLL,
+			   TICKER_ID_LLL_PREEMPT, preempt_anchor, preempt_to,
+			   TICKER_NULL_PERIOD, TICKER_NULL_REMAINDER,
+			   TICKER_NULL_LAZY, TICKER_NULL_SLOT,
+			   preempt_ticker_cb, NULL, ticker_start_op_cb, NULL);
 	LL_ASSERT((ret == TICKER_STATUS_SUCCESS) ||
 		  (ret == TICKER_STATUS_FAILURE) ||
 		  (ret == TICKER_STATUS_BUSY));
 }
 
 static void preempt_ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
-			       uint16_t lazy, void *param)
+			      uint16_t lazy, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, preempt};
+	static struct mayfly mfy = { 0, 0, &link, NULL, preempt };
 	uint32_t ret;
 
-	ret = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL,
-			     0, &mfy);
+	ret = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL, 0,
+			     &mfy);
 	LL_ASSERT(!ret);
 }
 
@@ -619,8 +609,8 @@ static void preempt(void *param)
 	}
 
 	ret = event.curr.is_abort_cb(next->prepare_param.param, next->prio,
-				     event.curr.param,
-				     &resume_cb, &resume_prio);
+				     event.curr.param, &resume_cb,
+				     &resume_prio);
 	if (!ret) {
 		/* Let LLL know about the cancelled prepare */
 		next->is_aborted = 1;
@@ -673,8 +663,8 @@ static void ticker_op_job_disable(uint32_t status, void *op_context)
 
 	/* FIXME: */
 	if (1 /* _radio.state != STATE_NONE */) {
-		mayfly_enable(TICKER_USER_ID_ULL_LOW,
-			      TICKER_USER_ID_ULL_LOW, 0);
+		mayfly_enable(TICKER_USER_ID_ULL_LOW, TICKER_USER_ID_ULL_LOW,
+			      0);
 	}
 }
 #endif

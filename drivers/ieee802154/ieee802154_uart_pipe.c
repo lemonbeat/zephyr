@@ -26,24 +26,24 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 #include "ieee802154_uart_pipe.h"
 
-#define PAN_ID_OFFSET           3 /* Pan Id offset */
-#define DEST_ADDR_OFFSET        5 /* Destination offset address*/
-#define DEST_ADDR_TYPE_OFFSET   1 /* Destination address type */
+#define PAN_ID_OFFSET 3 /* Pan Id offset */
+#define DEST_ADDR_OFFSET 5 /* Destination offset address*/
+#define DEST_ADDR_TYPE_OFFSET 1 /* Destination address type */
 
-#define DEST_ADDR_TYPE_MASK     0x0c /* Mask for destination address type */
+#define DEST_ADDR_TYPE_MASK 0x0c /* Mask for destination address type */
 
-#define DEST_ADDR_TYPE_SHORT    0x08 /* Short destination address type */
+#define DEST_ADDR_TYPE_SHORT 0x08 /* Short destination address type */
 #define DEST_ADDR_TYPE_EXTENDED 0x0c /* Extended destination address type */
 
-#define PAN_ID_SIZE           2    /* Size of Pan Id */
-#define SHORT_ADDRESS_SIZE    2    /* Size of Short Mac Address */
-#define EXTENDED_ADDRESS_SIZE 8    /* Size of Extended Mac Address */
+#define PAN_ID_SIZE 2 /* Size of Pan Id */
+#define SHORT_ADDRESS_SIZE 2 /* Size of Short Mac Address */
+#define EXTENDED_ADDRESS_SIZE 8 /* Size of Extended Mac Address */
 
 /* Broadcast Short Address */
-#define BROADCAST_ADDRESS    ((uint8_t [SHORT_ADDRESS_SIZE]) {0xff, 0xff})
+#define BROADCAST_ADDRESS ((uint8_t[SHORT_ADDRESS_SIZE]){ 0xff, 0xff })
 
-static uint8_t dev_pan_id[PAN_ID_SIZE];             /* Device Pan Id */
-static uint8_t dev_short_addr[SHORT_ADDRESS_SIZE];  /* Device Short Address */
+static uint8_t dev_pan_id[PAN_ID_SIZE]; /* Device Pan Id */
+static uint8_t dev_short_addr[SHORT_ADDRESS_SIZE]; /* Device Short Address */
 static uint8_t dev_ext_addr[EXTENDED_ADDRESS_SIZE]; /* Device Extended Address */
 
 /** Singleton device used in uart pipe callback */
@@ -56,10 +56,9 @@ static bool received_dest_addr_matched(uint8_t *rx_buffer)
 	struct upipe_context *upipe = upipe_dev->data;
 
 	/* Check destination PAN Id */
-	if (memcmp(&rx_buffer[PAN_ID_OFFSET],
-		   dev_pan_id, PAN_ID_SIZE) != 0 &&
-	    memcmp(&rx_buffer[PAN_ID_OFFSET],
-		   BROADCAST_ADDRESS, PAN_ID_SIZE) != 0) {
+	if (memcmp(&rx_buffer[PAN_ID_OFFSET], dev_pan_id, PAN_ID_SIZE) != 0 &&
+	    memcmp(&rx_buffer[PAN_ID_OFFSET], BROADCAST_ADDRESS, PAN_ID_SIZE) !=
+		    0) {
 		return false;
 	}
 
@@ -68,24 +67,22 @@ static bool received_dest_addr_matched(uint8_t *rx_buffer)
 	case DEST_ADDR_TYPE_SHORT:
 		/* First check if the destination is broadcast */
 		/* If not broadcast, check if length and address matches */
-		if (memcmp(&rx_buffer[DEST_ADDR_OFFSET],
-			   BROADCAST_ADDRESS,
+		if (memcmp(&rx_buffer[DEST_ADDR_OFFSET], BROADCAST_ADDRESS,
 			   SHORT_ADDRESS_SIZE) != 0 &&
 		    (net_if_get_link_addr(upipe->iface)->len !=
-		     SHORT_ADDRESS_SIZE ||
-		     memcmp(&rx_buffer[DEST_ADDR_OFFSET],
-			    dev_short_addr,
+			     SHORT_ADDRESS_SIZE ||
+		     memcmp(&rx_buffer[DEST_ADDR_OFFSET], dev_short_addr,
 			    SHORT_ADDRESS_SIZE) != 0)) {
 			return false;
 		}
-	break;
+		break;
 
 	case DEST_ADDR_TYPE_EXTENDED:
 		/* If not broadcast, check if length and address matches */
 		if (net_if_get_link_addr(upipe->iface)->len !=
-		    EXTENDED_ADDRESS_SIZE ||
-		    memcmp(&rx_buffer[DEST_ADDR_OFFSET],
-			   dev_ext_addr, EXTENDED_ADDRESS_SIZE) != 0) {
+			    EXTENDED_ADDRESS_SIZE ||
+		    memcmp(&rx_buffer[DEST_ADDR_OFFSET], dev_ext_addr,
+			   EXTENDED_ADDRESS_SIZE) != 0) {
 			return false;
 		}
 		break;
@@ -164,9 +161,9 @@ static uint8_t *upipe_rx(uint8_t *buf, size_t *off)
 		}
 
 		goto flush;
-out:
+	out:
 		net_pkt_unref(pkt);
-flush:
+	flush:
 		upipe->rx = false;
 		upipe->rx_len = 0U;
 		upipe->rx_off = 0U;
@@ -179,9 +176,7 @@ done:
 
 static enum ieee802154_hw_caps upipe_get_capabilities(const struct device *dev)
 {
-	return IEEE802154_HW_FCS |
-		IEEE802154_HW_2_4_GHZ |
-		IEEE802154_HW_FILTER;
+	return IEEE802154_HW_FCS | IEEE802154_HW_2_4_GHZ | IEEE802154_HW_FILTER;
 }
 
 static int upipe_cca(const struct device *dev)
@@ -237,8 +232,7 @@ static int upipe_set_ieee_addr(const struct device *dev,
 	return 0;
 }
 
-static int upipe_filter(const struct device *dev,
-			bool set,
+static int upipe_filter(const struct device *dev, bool set,
 			enum ieee802154_filter_type type,
 			const struct ieee802154_filter *filter)
 {
@@ -267,10 +261,8 @@ static int upipe_set_txpower(const struct device *dev, int16_t dbm)
 	return 0;
 }
 
-static int upipe_tx(const struct device *dev,
-		    enum ieee802154_tx_mode mode,
-		    struct net_pkt *pkt,
-		    struct net_buf *frag)
+static int upipe_tx(const struct device *dev, enum ieee802154_tx_mode mode,
+		    struct net_pkt *pkt, struct net_buf *frag)
 {
 	struct upipe_context *upipe = dev->data;
 	uint8_t *pkt_buf = frag->data;
@@ -295,7 +287,7 @@ static int upipe_tx(const struct device *dev,
 	uart_pipe_send(&data, 1);
 
 	for (i = 0U; i < len; i++) {
-		uart_pipe_send(pkt_buf+i, 1);
+		uart_pipe_send(pkt_buf + i, 1);
 	}
 
 	return 0;
@@ -351,7 +343,7 @@ static inline uint8_t *get_mac(const struct device *dev)
 
 #if defined(CONFIG_IEEE802154_UPIPE_RANDOM_MAC)
 	UNALIGNED_PUT(sys_cpu_to_be32(sys_rand32_get()),
-		      (uint32_t *) ((uint8_t *)upipe->mac_addr+4));
+		      (uint32_t *)((uint8_t *)upipe->mac_addr + 4));
 #else
 	upipe->mac_addr[4] = CONFIG_IEEE802154_UPIPE_MAC4;
 	upipe->mac_addr[5] = CONFIG_IEEE802154_UPIPE_MAC5;
@@ -379,21 +371,19 @@ static void upipe_iface_init(struct net_if *iface)
 static struct upipe_context upipe_context_data;
 
 static struct ieee802154_radio_api upipe_radio_api = {
-	.iface_api.init		= upipe_iface_init,
+	.iface_api.init = upipe_iface_init,
 
-	.get_capabilities	= upipe_get_capabilities,
-	.cca			= upipe_cca,
-	.set_channel		= upipe_set_channel,
-	.filter			= upipe_filter,
-	.set_txpower		= upipe_set_txpower,
-	.tx			= upipe_tx,
-	.start			= upipe_start,
-	.stop			= upipe_stop,
+	.get_capabilities = upipe_get_capabilities,
+	.cca = upipe_cca,
+	.set_channel = upipe_set_channel,
+	.filter = upipe_filter,
+	.set_txpower = upipe_set_txpower,
+	.tx = upipe_tx,
+	.start = upipe_start,
+	.stop = upipe_stop,
 };
 
-NET_DEVICE_INIT(upipe_15_4, CONFIG_IEEE802154_UPIPE_DRV_NAME,
-		upipe_init, device_pm_control_nop,
-		&upipe_context_data, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&upipe_radio_api, IEEE802154_L2,
-		NET_L2_GET_CTX_TYPE(IEEE802154_L2), 125);
+NET_DEVICE_INIT(upipe_15_4, CONFIG_IEEE802154_UPIPE_DRV_NAME, upipe_init,
+		device_pm_control_nop, &upipe_context_data, NULL,
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &upipe_radio_api,
+		IEEE802154_L2, NET_L2_GET_CTX_TYPE(IEEE802154_L2), 125);

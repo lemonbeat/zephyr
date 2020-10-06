@@ -16,8 +16,8 @@ LOG_MODULE_REGISTER(usb_os_desc);
 
 static struct usb_os_descriptor *os_desc;
 
-int usb_handle_os_desc(struct usb_setup_packet *setup,
-		       int32_t *len, uint8_t **data)
+int usb_handle_os_desc(struct usb_setup_packet *setup, int32_t *len,
+		       uint8_t **data)
 {
 	if (!os_desc) {
 		return -ENOTSUP;
@@ -35,8 +35,8 @@ int usb_handle_os_desc(struct usb_setup_packet *setup,
 	return -ENOTSUP;
 }
 
-int usb_handle_os_desc_feature(struct usb_setup_packet *setup,
-			       int32_t *len, uint8_t **data)
+int usb_handle_os_desc_feature(struct usb_setup_packet *setup, int32_t *len,
+			       uint8_t **data)
 {
 	LOG_DBG("bRequest 0x%x", setup->bRequest);
 

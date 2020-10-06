@@ -18,23 +18,23 @@ extern "C" {
 /* The types of OLCP procedures. */
 enum bt_gatt_ots_olcp_proc_type {
 	/* Select the first object.*/
-	BT_GATT_OTS_OLCP_PROC_FIRST         = 0x01,
+	BT_GATT_OTS_OLCP_PROC_FIRST = 0x01,
 	/* Select the last object.*/
-	BT_GATT_OTS_OLCP_PROC_LAST          = 0x02,
+	BT_GATT_OTS_OLCP_PROC_LAST = 0x02,
 	/* Select the previous object.*/
-	BT_GATT_OTS_OLCP_PROC_PREV          = 0x03,
+	BT_GATT_OTS_OLCP_PROC_PREV = 0x03,
 	/* Select the next object.*/
-	BT_GATT_OTS_OLCP_PROC_NEXT          = 0x04,
+	BT_GATT_OTS_OLCP_PROC_NEXT = 0x04,
 	/* Select the object with the given object ID.*/
-	BT_GATT_OTS_OLCP_PROC_GOTO          = 0x05,
+	BT_GATT_OTS_OLCP_PROC_GOTO = 0x05,
 	/* Order the objects.*/
-	BT_GATT_OTS_OLCP_PROC_ORDER         = 0x06,
+	BT_GATT_OTS_OLCP_PROC_ORDER = 0x06,
 	/* Request the number of objects.*/
-	BT_GATT_OTS_OLCP_PROC_REQ_NUM_OBJS  = 0x07,
+	BT_GATT_OTS_OLCP_PROC_REQ_NUM_OBJS = 0x07,
 	/* Clear Marking.*/
 	BT_GATT_OTS_OLCP_PROC_CLEAR_MARKING = 0x08,
 	/* Response.*/
-	BT_GATT_OTS_OLCP_PROC_RESP          = 0x70,
+	BT_GATT_OTS_OLCP_PROC_RESP = 0x70,
 };
 
 /* Definition of a OLCP procedure. */
@@ -81,12 +81,11 @@ enum bt_gatt_ots_olcp_res_code {
 };
 
 ssize_t bt_gatt_ots_olcp_write(struct bt_conn *conn,
-				   const struct bt_gatt_attr *attr,
-				   const void *buf, uint16_t len,
-				   uint16_t offset, uint8_t flags);
+			       const struct bt_gatt_attr *attr, const void *buf,
+			       uint16_t len, uint16_t offset, uint8_t flags);
 
 void bt_gatt_ots_olcp_cfg_changed(const struct bt_gatt_attr *attr,
-				      uint16_t value);
+				  uint16_t value);
 
 #ifdef __cplusplus
 }

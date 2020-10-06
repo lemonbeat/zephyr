@@ -7,7 +7,6 @@
 #include <sys/__assert.h>
 #include <zephyr.h>
 
-
 /**
  *
  * @brief Assert Action Handler

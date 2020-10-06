@@ -42,8 +42,8 @@ void main(void)
 		.val2 = 0,
 	};
 
-	if (sensor_attr_set(dev, SENSOR_CHAN_PROX,
-			    SENSOR_ATTR_UPPER_THRESH, &attr)) {
+	if (sensor_attr_set(dev, SENSOR_CHAN_PROX, SENSOR_ATTR_UPPER_THRESH,
+			    &attr)) {
 		printk("Could not set threshold\n");
 		return;
 	}

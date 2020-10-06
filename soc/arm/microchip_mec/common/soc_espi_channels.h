@@ -13,8 +13,8 @@ extern "C" {
 /* Channel 0 - Peripheral Channel */
 
 /* 8042 event data */
-#define E8042_ISR_DATA_POS	8U
-#define E8042_ISR_CMD_DATA_POS	0U
+#define E8042_ISR_DATA_POS 8U
+#define E8042_ISR_CMD_DATA_POS 0U
 
 #ifdef __cplusplus
 }

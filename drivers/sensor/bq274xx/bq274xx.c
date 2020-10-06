@@ -17,8 +17,8 @@
 
 #define BQ274XX_SUBCLASS_DELAY 5 /* subclass 64 & 82 needs 5ms delay */
 
-static int bq274xx_command_reg_read(struct bq274xx_data *bq274xx, uint8_t reg_addr,
-				    int16_t *val)
+static int bq274xx_command_reg_read(struct bq274xx_data *bq274xx,
+				    uint8_t reg_addr, int16_t *val)
 {
 	uint8_t i2c_data[2];
 	int status;
@@ -66,8 +66,8 @@ static int bq274xx_control_reg_write(struct bq274xx_data *bq274xx,
 	return 0;
 }
 
-static int bq274xx_command_reg_write(struct bq274xx_data *bq274xx, uint8_t command,
-				     uint8_t data)
+static int bq274xx_command_reg_write(struct bq274xx_data *bq274xx,
+				     uint8_t command, uint8_t data)
 {
 	uint8_t i2c_data, reg_addr;
 	int status = 0;
@@ -306,10 +306,9 @@ static int bq274xx_sample_fetch(const struct device *dev,
 		break;
 
 	case SENSOR_CHAN_GAUGE_FULL_AVAIL_CAPACITY:
-		status =
-			bq274xx_command_reg_read(bq274xx,
-						 BQ274XX_COMMAND_AVAIL_CAPACITY,
-						 &bq274xx->full_avail_capacity);
+		status = bq274xx_command_reg_read(
+			bq274xx, BQ274XX_COMMAND_AVAIL_CAPACITY,
+			&bq274xx->full_avail_capacity);
 		if (status < 0) {
 			LOG_ERR("Failed to read full available capacity");
 			return -EIO;
@@ -357,14 +356,14 @@ static int bq274xx_gauge_init(const struct device *dev)
 	int status = 0;
 	uint8_t tmp_checksum = 0, checksum_old = 0, checksum_new = 0;
 	uint16_t flags = 0, designenergy_mwh = 0, taperrate = 0, id;
-	uint8_t designcap_msb, designcap_lsb, designenergy_msb, designenergy_lsb,
-		terminatevolt_msb, terminatevolt_lsb, taperrate_msb,
-		taperrate_lsb;
+	uint8_t designcap_msb, designcap_lsb, designenergy_msb,
+		designenergy_lsb, terminatevolt_msb, terminatevolt_lsb,
+		taperrate_msb, taperrate_lsb;
 	uint8_t block[32];
 
 	designenergy_mwh = (uint16_t)3.7 * config->design_capacity;
-	taperrate =
-		(uint16_t)config->design_capacity / (0.1 * config->taper_current);
+	taperrate = (uint16_t)config->design_capacity /
+		    (0.1 * config->taper_current);
 
 	bq274xx->i2c = device_get_binding(config->bus_name);
 	if (bq274xx->i2c == NULL) {
@@ -615,21 +614,21 @@ static const struct sensor_driver_api bq274xx_battery_driver_api = {
 	.channel_get = bq274xx_channel_get,
 };
 
-#define BQ274XX_INIT(index)                                                    \
-	static struct bq274xx_data bq274xx_driver_##index;                     \
-									       \
-	static const struct bq274xx_config bq274xx_config_##index = {          \
-		.bus_name = DT_INST_BUS_LABEL(index),                          \
-		.design_voltage = DT_INST_PROP(index, design_voltage),         \
-		.design_capacity = DT_INST_PROP(index, design_capacity),       \
-		.taper_current = DT_INST_PROP(index, taper_current),           \
-		.terminate_voltage = DT_INST_PROP(index, terminate_voltage),   \
-	};                                                                     \
-									       \
-	DEVICE_AND_API_INIT(bq274xx_##index, DT_INST_LABEL(index),             \
-			    &bq274xx_gauge_init, &bq274xx_driver_##index,      \
-			    &bq274xx_config_##index, POST_KERNEL,              \
-			    CONFIG_SENSOR_INIT_PRIORITY,                       \
+#define BQ274XX_INIT(index)                                                  \
+	static struct bq274xx_data bq274xx_driver_##index;                   \
+                                                                             \
+	static const struct bq274xx_config bq274xx_config_##index = {        \
+		.bus_name = DT_INST_BUS_LABEL(index),                        \
+		.design_voltage = DT_INST_PROP(index, design_voltage),       \
+		.design_capacity = DT_INST_PROP(index, design_capacity),     \
+		.taper_current = DT_INST_PROP(index, taper_current),         \
+		.terminate_voltage = DT_INST_PROP(index, terminate_voltage), \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(bq274xx_##index, DT_INST_LABEL(index),           \
+			    &bq274xx_gauge_init, &bq274xx_driver_##index,    \
+			    &bq274xx_config_##index, POST_KERNEL,            \
+			    CONFIG_SENSOR_INIT_PRIORITY,                     \
 			    &bq274xx_battery_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(BQ274XX_INIT)

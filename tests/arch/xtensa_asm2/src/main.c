@@ -17,16 +17,8 @@
  * the spill test and make every bit of every register in every call
  * significant in an attempt to catch any mistakes/swaps/etc...
  */
-int white[] = {
-	       0x5fad484a,
-	       0xc23e88f7,
-	       0xfff301fb,
-	       0xf1189ba7,
-	       0x88bffad6,
-	       0xaabb96fa,
-	       0x629619d5,
-	       0x246bee82
-};
+int white[] = { 0x5fad484a, 0xc23e88f7, 0xfff301fb, 0xf1189ba7,
+		0x88bffad6, 0xaabb96fa, 0x629619d5, 0x246bee82 };
 
 static inline unsigned int ccount(void)
 {
@@ -51,9 +43,7 @@ unsigned int spill_start, spill_end;
 /* Validated result for spill_fn() */
 int spill_expect;
 
-enum {
-	NO_SPILL, HAL_SPILL, ZEPHYR_SPILL, NUM_MODES
-} spill_mode;
+enum { NO_SPILL, HAL_SPILL, ZEPHYR_SPILL, NUM_MODES } spill_mode;
 
 static int spill_fn(int level, int a, int b, int c)
 {
@@ -62,8 +52,8 @@ static int spill_fn(int level, int a, int b, int c)
 	 * own, leaving no frames for us to test against!
 	 */
 	if (level >= ARRAY_SIZE(white)) {
-		__asm__ volatile ("rsr.WINDOWBASE %0" : "=r"(spill_wb0));
-		__asm__ volatile ("rsr.WINDOWSTART %0" : "=r"(spill_ws0));
+		__asm__ volatile("rsr.WINDOWBASE %0" : "=r"(spill_wb0));
+		__asm__ volatile("rsr.WINDOWSTART %0" : "=r"(spill_ws0));
 
 		spill_start = ccount();
 
@@ -80,11 +70,13 @@ static int spill_fn(int level, int a, int b, int c)
 			 */
 			int a0_save;
 
-			__asm__ volatile
-				("mov %0, a0"			"\n\t"
-				 "call0 spill_reg_windows"	"\n\t"
-				 "mov a0, %0"			"\n\t"
-				 : "=r"(a0_save));
+			__asm__ volatile("mov %0, a0"
+					 "\n\t"
+					 "call0 spill_reg_windows"
+					 "\n\t"
+					 "mov a0, %0"
+					 "\n\t"
+					 : "=r"(a0_save));
 		} else if (spill_mode == HAL_SPILL) {
 			/* Strictly there is a xthal_window_spill_nw
 			 * routine that is called with special setup
@@ -97,8 +89,8 @@ static int spill_fn(int level, int a, int b, int c)
 		}
 
 		spill_end = ccount();
-		__asm__ volatile ("rsr.WINDOWBASE %0" : "=r" (spill_wb1));
-		__asm__ volatile ("rsr.WINDOWSTART %0" : "=r" (spill_ws1));
+		__asm__ volatile("rsr.WINDOWBASE %0" : "=r"(spill_wb1));
+		__asm__ volatile("rsr.WINDOWSTART %0" : "=r"(spill_ws1));
 
 		return ((a + b) | c);
 	}
@@ -107,7 +99,7 @@ static int spill_fn(int level, int a, int b, int c)
 	int val2 = ((a | b) + c) ^ white[(level + 1) % ARRAY_SIZE(white)];
 	int val3 = (a - (b - c)) ^ white[(level + 2) % ARRAY_SIZE(white)];
 
-	int x = spill_fnp(level+1, val1, val2, val3);
+	int x = spill_fnp(level + 1, val1, val2, val3);
 
 	/* FIXME: as it happens, the compiler seems not to be
 	 * optimizing components of this addition before the function
@@ -134,9 +126,10 @@ int test_reg_spill(void)
 
 	for (spill_mode = 0; spill_mode < NUM_MODES; spill_mode++) {
 		printk("Testing %s\n",
-		       spill_mode == NO_SPILL ? "NO_SPILL"
-		       : (spill_mode == HAL_SPILL ? "HAL_SPILL"
-			  : "ZEPHYR_SPILL"));
+		       spill_mode == NO_SPILL ?
+				     "NO_SPILL" :
+				     (spill_mode == HAL_SPILL ? "HAL_SPILL" :
+								"ZEPHYR_SPILL"));
 
 		int result = spill_fnp(0, 1, 2, 3);
 
@@ -215,15 +208,16 @@ int test_highreg_save(void)
 
 		int spilled_words = test_highreg_sp_top - test_highreg_handle;
 
-		for (int quad = 0; ok && quad < (spilled_words - 1)/4; quad++) {
+		for (int quad = 0; ok && quad < (spilled_words - 1) / 4;
+		     quad++) {
 			int *qbase = test_highreg_sp_top - (quad + 1) * 4;
 
 			for (int ri = 0; ri < 4; ri++) {
 				int reg = 4 + quad * 4 + ri;
 
 				ok = ok && (qbase[ri] == reg);
-				printk("  q %d reg %d qb[%d] %d\n",
-				       quad, reg, ri, qbase[ri]);
+				printk("  q %d reg %d qb[%d] %d\n", quad, reg,
+				       ri, qbase[ri]);
 			}
 		}
 	}
@@ -236,8 +230,10 @@ void *switch_handle0, *switch_handle1;
 void xtensa_switch(void *handle, void **old_handle);
 
 void test_switch_bounce(void);
-__asm__("test_switch_bounce:"	"\n\t"
-	"call4 test_switch_top"	"\n\t");
+__asm__("test_switch_bounce:"
+	"\n\t"
+	"call4 test_switch_top"
+	"\n\t");
 
 volatile int switch_count;
 
@@ -261,8 +257,7 @@ int test_switch(void)
 	(void)memset(stack2, 0, sizeof(stack2));
 
 	int *sp = xtensa_init_stack(&stack2[ARRAY_SIZE(stack2)],
-				    (void *)test_switch_bounce,
-				    0, 0, 0);
+				    (void *)test_switch_bounce, 0, 0, 0);
 
 #if 0
 	/* DEBUG: dump the stack contents for manual inspection */
@@ -296,7 +291,7 @@ void rfi_jump_c(void)
 {
 	int ps;
 
-	__asm__ volatile ("rsr.PS %0" : "=r"(ps));
+	__asm__ volatile("rsr.PS %0" : "=r"(ps));
 	printk("%s, PS = %xh\n", __func__, ps);
 }
 
@@ -339,8 +334,8 @@ int test_xstack(void)
 
 	do_xstack_call(new_stack);
 
-	printk("xstack_ok %d stack2[%d] 0x%x\n",
-	       xstack_ok, XSTACK_SIZE, xstack_stack2[XSTACK_SIZE]);
+	printk("xstack_ok %d stack2[%d] 0x%x\n", xstack_ok, XSTACK_SIZE,
+	       xstack_stack2[XSTACK_SIZE]);
 
 	return xstack_ok && xstack_stack2[XSTACK_SIZE] == XSTACK_CANARY;
 }
@@ -356,7 +351,10 @@ volatile int timer2_fired;
 int excint_stack[8192];
 void *excint_stack_top = &excint_stack[ARRAY_SIZE(excint_stack)];
 
-static struct { int nest; void *stack_top; } excint_cpu;
+static struct {
+	int nest;
+	void *stack_top;
+} excint_cpu;
 
 volatile int int5_result;
 
@@ -365,7 +363,7 @@ void disable_timer(void)
 	int ie;
 
 	__asm__ volatile("rsr.intenable %0" : "=r"(ie));
-	ie &= ~(1<<TIMER_INT);
+	ie &= ~(1 << TIMER_INT);
 	__asm__ volatile("wsr.intenable %0; rsync" : : "r"(ie));
 }
 
@@ -374,7 +372,7 @@ void enable_timer(void)
 	int ie;
 
 	__asm__ volatile("rsr.intenable %0" : "=r"(ie));
-	ie |= (1<<TIMER_INT);
+	ie |= (1 << TIMER_INT);
 	__asm__ volatile("wsr.intenable %0; rsync" : : "r"(ie));
 }
 
@@ -426,8 +424,8 @@ int interrupt_test(void)
 		 */
 		const int max_reps = 8;
 		int wh = white[i % ARRAY_SIZE(white)];
-		int delay = spill_time * 2U
-			+ ((wh * (i+1)) % (spill_time * (max_reps - 2)));
+		int delay = spill_time * 2U +
+			    ((wh * (i + 1)) % (spill_time * (max_reps - 2)));
 
 		int alarm = ccount() + delay;
 

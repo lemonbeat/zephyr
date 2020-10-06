@@ -15,9 +15,9 @@ extern void test_poll_threadstate(void);
 extern void test_poll_grant_access(void);
 
 #ifdef CONFIG_64BIT
-#define MAX_SZ	256
+#define MAX_SZ 256
 #else
-#define MAX_SZ	128
+#define MAX_SZ 128
 #endif
 
 K_MEM_POOL_DEFINE(test_pool, 128, MAX_SZ, 4, 4);
@@ -29,8 +29,7 @@ void test_main(void)
 
 	k_thread_resource_pool_assign(k_current_get(), &test_pool);
 
-	ztest_test_suite(poll_api,
-			 ztest_1cpu_user_unit_test(test_poll_no_wait),
+	ztest_test_suite(poll_api, ztest_1cpu_user_unit_test(test_poll_no_wait),
 			 ztest_1cpu_unit_test(test_poll_wait),
 			 ztest_1cpu_unit_test(test_poll_zero_events),
 			 ztest_1cpu_unit_test(test_poll_cancel_main_low_prio),

@@ -393,8 +393,7 @@ extern "C" {
  * @param cell lowercase-and-underscores cell name
  * @return the cell value at index 0
  */
-#define DT_INST_PWMS_CELL(inst, cell) \
-	DT_INST_PWMS_CELL_BY_IDX(inst, 0, cell)
+#define DT_INST_PWMS_CELL(inst, cell) DT_INST_PWMS_CELL_BY_IDX(inst, 0, cell)
 
 /**
  * @brief Equivalent to DT_INST_PWMS_CELL_BY_IDX(inst, idx, channel)
@@ -492,4 +491,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* ZEPHYR_INCLUDE_DEVICETREE_PWMS_H_ */
+#endif /* ZEPHYR_INCLUDE_DEVICETREE_PWMS_H_ */

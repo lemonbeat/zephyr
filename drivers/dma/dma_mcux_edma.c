@@ -48,17 +48,16 @@ struct dma_mcux_edma_data {
 	struct call_back data_cb[DT_INST_PROP(0, dma_channels)];
 };
 
-#define DEV_CFG(dev)                                                           \
-	((const struct dma_mcux_edma_config *const)dev->config)
+#define DEV_CFG(dev) ((const struct dma_mcux_edma_config *const)dev->config)
 #define DEV_DATA(dev) ((struct dma_mcux_edma_data *)dev->data)
 #define DEV_BASE(dev) ((DMA_Type *)DEV_CFG(dev)->base)
 
 #define DEV_DMAMUX_BASE(dev) ((DMAMUX_Type *)DEV_CFG(dev)->dmamux_base)
 
-#define DEV_CHANNEL_DATA(dev, ch)                                              \
+#define DEV_CHANNEL_DATA(dev, ch) \
 	((struct call_back *)(&(DEV_DATA(dev)->data_cb[ch])))
 
-#define DEV_EDMA_HANDLE(dev, ch)                                               \
+#define DEV_EDMA_HANDLE(dev, ch) \
 	((edma_handle_t *)(&(DEV_CHANNEL_DATA(dev, ch)->edma_handle)))
 
 static void nxp_edma_callback(edma_handle_t *handle, void *param,
@@ -101,8 +100,8 @@ static void channel_irq(edma_handle_t *handle)
 			new_header = (uint8_t)sga_index;
 		} else {
 			new_header = sga_index != 0U ?
-					     (uint8_t)sga_index - 1U :
-					     (uint8_t)handle->tcdSize - 1U;
+						   (uint8_t)sga_index - 1U :
+						   (uint8_t)handle->tcdSize - 1U;
 		}
 		/* Calculate the number of finished TCDs */
 		if (new_header == (uint8_t)handle->header) {
@@ -115,7 +114,8 @@ static void channel_irq(edma_handle_t *handle)
 				tcds_done = 0;
 			}
 		} else {
-			tcds_done = (uint32_t)new_header - (uint32_t)handle->header;
+			tcds_done =
+				(uint32_t)new_header - (uint32_t)handle->header;
 			if (tcds_done < 0) {
 				tcds_done += handle->tcdSize;
 			}
@@ -375,8 +375,7 @@ static int dma_mcux_edma_reload(const struct device *dev, uint32_t channel,
 	return 0;
 }
 
-static int dma_mcux_edma_get_status(const struct device *dev,
-				    uint32_t channel,
+static int dma_mcux_edma_get_status(const struct device *dev, uint32_t channel,
 				    struct dma_status *status)
 {
 	edma_tcd_t *tcdRegs;

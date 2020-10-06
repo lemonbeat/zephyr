@@ -59,23 +59,21 @@ struct sys_sem {
  * @param _count_limit Maximum permitted semaphore count.
  */
 #ifdef CONFIG_USERSPACE
-#define SYS_SEM_DEFINE(_name, _initial_count, _count_limit) \
-	struct sys_sem _name = { \
-		.futex = { _initial_count }, \
-		.limit = _count_limit \
-	}; \
-	BUILD_ASSERT(((_count_limit) != 0) && \
+#define SYS_SEM_DEFINE(_name, _initial_count, _count_limit)   \
+	struct sys_sem _name = { .futex = { _initial_count }, \
+				 .limit = _count_limit };     \
+	BUILD_ASSERT(((_count_limit) != 0) &&                 \
 		     ((_initial_count) <= (_count_limit)))
 #else
 /* Stuff this in the section with the rest of the k_sem objects, since they
  * are identical and can be treated as a k_sem in the boot initialization code
  */
-#define SYS_SEM_DEFINE(_name, _initial_count, _count_limit) \
-	Z_STRUCT_SECTION_ITERABLE_ALTERNATE(k_sem, sys_sem, _name) = { \
-		.kernel_sem = Z_SEM_INITIALIZER(_name.kernel_sem, \
+#define SYS_SEM_DEFINE(_name, _initial_count, _count_limit)                   \
+	Z_STRUCT_SECTION_ITERABLE_ALTERNATE(k_sem, sys_sem, _name) = {        \
+		.kernel_sem = Z_SEM_INITIALIZER(_name.kernel_sem,             \
 						_initial_count, _count_limit) \
-	}; \
-	BUILD_ASSERT(((_count_limit) != 0) && \
+	};                                                                    \
+	BUILD_ASSERT(((_count_limit) != 0) &&                                 \
 		     ((_initial_count) <= (_count_limit)))
 #endif
 
@@ -93,7 +91,7 @@ struct sys_sem {
  *         (0, INT_MAX] and initial_count shouldn't be greater than limit.
  */
 int sys_sem_init(struct sys_sem *sem, unsigned int initial_count,
-		unsigned int limit);
+		 unsigned int limit);
 
 /**
  * @brief Give a semaphore.

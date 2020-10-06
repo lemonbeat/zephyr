@@ -60,10 +60,10 @@ static uint8_t tx_buffer[1024];
 
 static sec_tag_t m_sec_tags[] = {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
-		1,
+	1,
 #endif
 #if defined(MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED)
-		APP_PSK_TAG,
+	APP_PSK_TAG,
 #endif
 };
 
@@ -95,17 +95,13 @@ void mqtt_subscribe_config(struct mqtt_client *const client)
 #ifdef CONFIG_CLOUD_SUBSCRIBE_CONFIG
 	/* subscribe to config information */
 	struct mqtt_topic subs_topic = {
-		.topic = {
-			.utf8 = CONFIG_CLOUD_SUBSCRIBE_CONFIG,
-			.size = strlen(CONFIG_CLOUD_SUBSCRIBE_CONFIG)
-		},
+		.topic = { .utf8 = CONFIG_CLOUD_SUBSCRIBE_CONFIG,
+			   .size = strlen(CONFIG_CLOUD_SUBSCRIBE_CONFIG) },
 		.qos = MQTT_QOS_1_AT_LEAST_ONCE
 	};
-	const struct mqtt_subscription_list subs_list = {
-		.list = &subs_topic,
-		.list_count = 1U,
-		.message_id = 1U
-	};
+	const struct mqtt_subscription_list subs_list = { .list = &subs_topic,
+							  .list_count = 1U,
+							  .message_id = 1U };
 	int err;
 
 	err = mqtt_subscribe(client, &subs_list);
@@ -125,8 +121,7 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 		break;
 
 	case MQTT_EVT_UNSUBACK:
-		LOG_INF("UNSUBACK packet id: %u",
-				evt->param.suback.message_id);
+		LOG_INF("UNSUBACK packet id: %u", evt->param.suback.message_id);
 		break;
 
 	case MQTT_EVT_CONNACK:
@@ -156,10 +151,8 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 		int len = pub->message.payload.len;
 		int bytes_read;
 
-		LOG_INF("MQTT publish received %d, %d bytes",
-			evt->result, len);
-		LOG_INF("   id: %d, qos: %d",
-			pub->message_id,
+		LOG_INF("MQTT publish received %d, %d bytes", evt->result, len);
+		LOG_INF("   id: %d, qos: %d", pub->message_id,
 			pub->message.topic.qos);
 		LOG_INF("   item: %s",
 			log_strdup(pub->message.topic.topic.utf8));
@@ -167,8 +160,7 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 		/* assuming the config message is textual */
 		while (len) {
 			bytes_read = mqtt_read_publish_payload(
-				client, d,
-				len >= 32 ? 32 : len);
+				client, d, len >= 32 ? 32 : len);
 			if (bytes_read < 0 && bytes_read != -EAGAIN) {
 				LOG_ERR("failure to read payload");
 				break;
@@ -199,8 +191,7 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 
 		/* increment message id for when we send next message */
 		pub_data.message_id += 1U;
-		LOG_INF("PUBACK packet id: %u",
-				evt->param.puback.message_id);
+		LOG_INF("PUBACK packet id: %u", evt->param.puback.message_id);
 		break;
 
 	default:
@@ -213,9 +204,9 @@ static int wait_for_input(int timeout)
 {
 	int res;
 	struct zsock_pollfd fds[1] = {
-		[0] = {.fd = client_ctx.transport.tls.sock,
-		      .events = ZSOCK_POLLIN,
-		      .revents = 0},
+		[0] = { .fd = client_ctx.transport.tls.sock,
+			.events = ZSOCK_POLLIN,
+			.revents = 0 },
 	};
 
 	res = zsock_poll(fds, 1, timeout);
@@ -227,16 +218,12 @@ static int wait_for_input(int timeout)
 	return res;
 }
 
-#define ALIVE_TIME	(60 * MSEC_PER_SEC)
+#define ALIVE_TIME (60 * MSEC_PER_SEC)
 
-static struct mqtt_utf8 password = {
-	.utf8 = token
-};
+static struct mqtt_utf8 password = { .utf8 = token };
 
-static struct mqtt_utf8 username = {
-	.utf8 = client_username,
-	.size = sizeof(client_username)
-};
+static struct mqtt_utf8 username = { .utf8 = client_username,
+				     .size = sizeof(client_username) };
 
 void mqtt_startup(char *hostname, int port)
 {
@@ -265,7 +252,8 @@ void mqtt_startup(char *hostname, int port)
 		hints.ai_protocol = 0;
 		cnt = 0;
 		while ((err = getaddrinfo("mqtt.googleapis.com", "8883", &hints,
-					  &haddr)) && cnt < 3) {
+					  &haddr)) &&
+		       cnt < 3) {
 			LOG_ERR("Unable to get address for broker, retrying");
 			cnt++;
 		}
@@ -302,7 +290,6 @@ void mqtt_startup(char *hostname, int port)
 			return;
 		}
 
-
 		broker4->sin_family = AF_INET;
 		broker4->sin_port = htons(port);
 		net_ipaddr_copy(&broker4->sin_addr,
@@ -328,7 +315,7 @@ void mqtt_startup(char *hostname, int port)
 		client->transport.type = MQTT_TRANSPORT_SECURE;
 
 		struct mqtt_sec_config *tls_config =
-				&client->transport.tls.config;
+			&client->transport.tls.config;
 
 		tls_config->peer_verify = TLS_PEER_VERIFY_REQUIRED;
 		tls_config->cipher_list = NULL;

@@ -46,9 +46,9 @@ static struct spi_cs_control cs_ctrl;
  *
  * Note: GPIO3 is unused.
  */
-#define CC1200_IOCFG3	CC1200_GPIO_SIG_MARC_2PIN_STATUS_0
-#define CC1200_IOCFG2	CC1200_GPIO_SIG_MARC_2PIN_STATUS_1
-#define CC1200_IOCFG0	CC1200_GPIO_SIG_PKT_SYNC_RXTX
+#define CC1200_IOCFG3 CC1200_GPIO_SIG_MARC_2PIN_STATUS_0
+#define CC1200_IOCFG2 CC1200_GPIO_SIG_MARC_2PIN_STATUS_1
+#define CC1200_IOCFG0 CC1200_GPIO_SIG_PKT_SYNC_RXTX
 
 /***********************
  * Debugging functions *
@@ -79,20 +79,18 @@ static void cc1200_print_status(uint8_t status)
  ********************/
 
 bool z_cc1200_access_reg(struct cc1200_context *ctx, bool read, uint8_t addr,
-			void *data, size_t length, bool extended, bool burst)
+			 void *data, size_t length, bool extended, bool burst)
 {
 	uint8_t cmd_buf[2];
-	const struct spi_buf buf[2] = {
-		{
-			.buf = cmd_buf,
-			.len = extended ? 2 : 1,
-		},
-		{
-			.buf = data,
-			.len = length,
+	const struct spi_buf buf[2] = { {
+						.buf = cmd_buf,
+						.len = extended ? 2 : 1,
+					},
+					{
+						.buf = data,
+						.len = length,
 
-		}
-	};
+					} };
 	struct spi_buf_set tx = { .buffers = buf };
 
 	/*
@@ -116,10 +114,7 @@ bool z_cc1200_access_reg(struct cc1200_context *ctx, bool read, uint8_t addr,
 	}
 
 	if (read) {
-		const struct spi_buf_set rx = {
-			.buffers = buf,
-			.count = 2
-		};
+		const struct spi_buf_set rx = { .buffers = buf, .count = 2 };
 
 		cmd_buf[0] |= CC1200_ACCESS_RD;
 
@@ -129,7 +124,7 @@ bool z_cc1200_access_reg(struct cc1200_context *ctx, bool read, uint8_t addr,
 	}
 
 	/* CC1200_ACCESS_WR is 0 so no need to play with it */
-	tx.count =  data ? 2 : 1;
+	tx.count = data ? 2 : 1;
 
 	return (spi_write(ctx->spi, &ctx->spi_cfg, &tx) == 0);
 }
@@ -163,8 +158,8 @@ static uint8_t get_status(struct cc1200_context *ctx)
 {
 	uint8_t val;
 
-	if (z_cc1200_access_reg(ctx, true, CC1200_INS_SNOP,
-				&val, 1, false, false)) {
+	if (z_cc1200_access_reg(ctx, true, CC1200_INS_SNOP, &val, 1, false,
+				false)) {
 		/* See Section 3.1.2 */
 		return val & CC1200_STATUS_MASK;
 	}
@@ -203,10 +198,10 @@ static inline void gpio0_int_handler(const struct device *port,
 
 static void enable_gpio0_interrupt(struct cc1200_context *cc1200, bool enable)
 {
-	gpio_pin_interrupt_configure(
-		cc1200->gpios[CC1200_GPIO_IDX_GPIO0].dev,
-		cc1200->gpios[CC1200_GPIO_IDX_GPIO0].pin,
-		enable ? GPIO_INT_EDGE_TO_ACTIVE : GPIO_INT_DISABLE);
+	gpio_pin_interrupt_configure(cc1200->gpios[CC1200_GPIO_IDX_GPIO0].dev,
+				     cc1200->gpios[CC1200_GPIO_IDX_GPIO0].pin,
+				     enable ? GPIO_INT_EDGE_TO_ACTIVE :
+						    GPIO_INT_DISABLE);
 }
 
 static void setup_gpio_callback(const struct device *dev)
@@ -237,10 +232,9 @@ static bool write_reg_freq(struct cc1200_context *ctx, uint32_t freq)
 	freq_data[1] = (uint8_t)((freq & 0x0000FF00) >> 8);
 	freq_data[2] = (uint8_t)(freq & 0x000000FF);
 
-	return z_cc1200_access_reg(ctx, false, CC1200_REG_FREQ2,
-				  freq_data, 3, true, true);
+	return z_cc1200_access_reg(ctx, false, CC1200_REG_FREQ2, freq_data, 3,
+				   true, true);
 }
-
 
 /* See Section 9.12 - RF programming
  *
@@ -271,7 +265,8 @@ static bool write_reg_freq(struct cc1200_context *ctx, uint32_t freq)
  * User does not need to pass anything extra besides the nominal settings: no
  * pre-computed part or else.
  */
-static uint32_t rf_evaluate_freq_setting(struct cc1200_context *ctx, uint32_t chan)
+static uint32_t rf_evaluate_freq_setting(struct cc1200_context *ctx,
+					 uint32_t chan)
 {
 	uint32_t xtal = CONFIG_IEEE802154_CC1200_XOSC;
 	uint32_t mult_10 = 100000U;
@@ -280,7 +275,7 @@ static uint32_t rf_evaluate_freq_setting(struct cc1200_context *ctx, uint32_t ch
 	uint32_t rf, lo_div;
 
 	rf = ctx->rf_settings->chan_center_freq0 +
-		((chan * (uint32_t)ctx->rf_settings->channel_spacing) / 10U);
+	     ((chan * (uint32_t)ctx->rf_settings->channel_spacing) / 10U);
 	lo_div = get_lo_divider(ctx);
 
 	LOG_DBG("Calculating freq for %u KHz RF (%u)", rf, lo_div);
@@ -304,7 +299,7 @@ static uint32_t rf_evaluate_freq_setting(struct cc1200_context *ctx, uint32_t ch
 		rst = freq_tmp % factor;
 		freq_tmp /= factor;
 
-		if (factor > 1 && (rst/(factor/10U)) > 5) {
+		if (factor > 1 && (rst / (factor / 10U)) > 5) {
 			freq_tmp++;
 		}
 
@@ -331,8 +326,8 @@ rf_install_settings(const struct device *dev,
 				 (void *)rf_settings->registers,
 				 CC1200_RF_NON_EXT_SPACE_REGS, false, true) ||
 	    !z_cc1200_access_reg(cc1200, false, CC1200_REG_IF_MIX_CFG,
-				 (uint8_t *)rf_settings->registers
-				 + CC1200_RF_NON_EXT_SPACE_REGS,
+				 (uint8_t *)rf_settings->registers +
+					 CC1200_RF_NON_EXT_SPACE_REGS,
 				 CC1200_RF_EXT_SPACE_REGS, true, true) ||
 	    !write_reg_pkt_len(cc1200, 0xFF)) {
 		LOG_ERR("Could not install RF settings");
@@ -354,9 +349,7 @@ static int rf_calibrate(struct cc1200_context *ctx)
 	k_busy_wait(USEC_PER_MSEC * 5U);
 
 	/* We need to re-enable RX as SCAL shuts off the freq synth */
-	if (!instruct_sidle(ctx) ||
-	    !instruct_sfrx(ctx) ||
-	    !instruct_srx(ctx)) {
+	if (!instruct_sidle(ctx) || !instruct_sfrx(ctx) || !instruct_srx(ctx)) {
 		LOG_ERR("Could not switch to RX");
 		return -EIO;
 	}
@@ -372,32 +365,30 @@ static int rf_calibrate(struct cc1200_context *ctx)
  * TX functions *
  ***************/
 
-static inline bool write_txfifo(struct cc1200_context *ctx,
-				void *data, size_t length)
+static inline bool write_txfifo(struct cc1200_context *ctx, void *data,
+				size_t length)
 {
-	return z_cc1200_access_reg(ctx, false,
-				  CC1200_REG_TXFIFO,
-				  data, length, false, true);
+	return z_cc1200_access_reg(ctx, false, CC1200_REG_TXFIFO, data, length,
+				   false, true);
 }
 
 /****************
  * RX functions *
  ***************/
 
-static inline bool read_rxfifo(struct cc1200_context *ctx,
-			       void *data, size_t length)
+static inline bool read_rxfifo(struct cc1200_context *ctx, void *data,
+			       size_t length)
 {
-	return z_cc1200_access_reg(ctx, true,
-				  CC1200_REG_RXFIFO,
-				  data, length, false, true);
+	return z_cc1200_access_reg(ctx, true, CC1200_REG_RXFIFO, data, length,
+				   false, true);
 }
 
 static inline uint8_t get_packet_length(struct cc1200_context *ctx)
 {
 	uint8_t len;
 
-	if (z_cc1200_access_reg(ctx, true, CC1200_REG_RXFIFO,
-				&len, 1, false, true)) {
+	if (z_cc1200_access_reg(ctx, true, CC1200_REG_RXFIFO, &len, 1, false,
+				true)) {
 		return len;
 	}
 
@@ -419,7 +410,6 @@ static inline bool verify_rxfifo_validity(struct cc1200_context *ctx,
 static inline bool read_rxfifo_content(struct cc1200_context *ctx,
 				       struct net_buf *buf, uint8_t len)
 {
-
 	if (!read_rxfifo(ctx, buf->data, len) ||
 	    (get_status(ctx) == CC1200_STATUS_RX_FIFO_ERROR)) {
 		return false;
@@ -501,19 +491,17 @@ static void cc1200_rx(void *arg)
 
 		log_stack_usage(&cc1200->rx_thread);
 		continue;
-flush:
+	flush:
 		LOG_DBG("Flushing RX");
 		instruct_sidle(cc1200);
 		instruct_sfrx(cc1200);
 		instruct_srx(cc1200);
-out:
+	out:
 		if (pkt) {
 			net_pkt_unref(pkt);
 		}
-
 	}
 }
-
 
 /********************
  * Radio device API *
@@ -556,8 +544,7 @@ static int cc1200_set_channel(const struct device *dev, uint16_t channel)
 	if (atomic_get(&cc1200->rx) == 0) {
 		uint32_t freq = rf_evaluate_freq_setting(cc1200, channel);
 
-		if (!write_reg_freq(cc1200, freq) ||
-		    rf_calibrate(cc1200)) {
+		if (!write_reg_freq(cc1200, freq) || rf_calibrate(cc1200)) {
 			LOG_ERR("Could not set channel %u", channel);
 			return -EIO;
 		}
@@ -581,7 +568,7 @@ static int cc1200_set_txpower(const struct device *dev, int16_t dbm)
 	}
 
 	pa_power_ramp = read_reg_pa_cfg1(cc1200) & ~PA_POWER_RAMP_MASK;
-	pa_power_ramp |= ((uint8_t) dbm) & PA_POWER_RAMP_MASK;
+	pa_power_ramp |= ((uint8_t)dbm) & PA_POWER_RAMP_MASK;
 
 	if (!write_reg_pa_cfg1(cc1200, pa_power_ramp)) {
 		LOG_ERR("Could not proceed");
@@ -591,10 +578,8 @@ static int cc1200_set_txpower(const struct device *dev, int16_t dbm)
 	return 0;
 }
 
-static int cc1200_tx(const struct device *dev,
-		     enum ieee802154_tx_mode mode,
-		     struct net_pkt *pkt,
-		     struct net_buf *frag)
+static int cc1200_tx(const struct device *dev, enum ieee802154_tx_mode mode,
+		     struct net_pkt *pkt, struct net_buf *frag)
 {
 	struct cc1200_context *cc1200 = dev->data;
 	uint8_t *frame = frag->data;
@@ -613,10 +598,8 @@ static int cc1200_tx(const struct device *dev,
 	 * depending on len value, this will also take more time.
 	 */
 
-	if (!instruct_sidle(cc1200) ||
-	    !instruct_sfrx(cc1200) ||
-	    !instruct_sftx(cc1200) ||
-	    !instruct_sfstxon(cc1200)) {
+	if (!instruct_sidle(cc1200) || !instruct_sfrx(cc1200) ||
+	    !instruct_sftx(cc1200) || !instruct_sfstxon(cc1200)) {
 		LOG_ERR("Cannot switch to TX mode");
 		goto out;
 	}
@@ -646,8 +629,7 @@ static int cc1200_tx(const struct device *dev,
 out:
 	cc1200_print_status(get_status(cc1200));
 
-	if (atomic_get(&cc1200->tx) == 1 &&
-	    read_reg_num_txbytes(cc1200) != 0) {
+	if (atomic_get(&cc1200->tx) == 1 && read_reg_num_txbytes(cc1200) != 0) {
 		LOG_ERR("TX Failed");
 
 		atomic_set(&cc1200->tx_start, 0);
@@ -669,10 +651,8 @@ static int cc1200_start(const struct device *dev)
 {
 	struct cc1200_context *cc1200 = dev->data;
 
-	if (!instruct_sidle(cc1200) ||
-	    !instruct_sftx(cc1200) ||
-	    !instruct_sfrx(cc1200) ||
-	    rf_calibrate(cc1200)) {
+	if (!instruct_sidle(cc1200) || !instruct_sftx(cc1200) ||
+	    !instruct_sfrx(cc1200) || rf_calibrate(cc1200)) {
 		LOG_ERR("Could not proceed");
 		return -EIO;
 	}
@@ -734,16 +714,19 @@ static int power_on_and_setup(const struct device *dev)
 	return rf_calibrate(cc1200);
 }
 
-static struct cc1200_gpio_configuration *configure_gpios(const struct device *dev)
+static struct cc1200_gpio_configuration *
+configure_gpios(const struct device *dev)
 {
 	struct cc1200_context *cc1200 = dev->data;
-	const struct device *gpio = device_get_binding(DT_INST_GPIO_LABEL(0, int_gpios));
+	const struct device *gpio =
+		device_get_binding(DT_INST_GPIO_LABEL(0, int_gpios));
 
 	if (!gpio) {
 		return NULL;
 	}
 
-	cc1200->gpios[CC1200_GPIO_IDX_GPIO0].pin = DT_INST_GPIO_PIN(0, int_gpios);
+	cc1200->gpios[CC1200_GPIO_IDX_GPIO0].pin =
+		DT_INST_GPIO_PIN(0, int_gpios);
 	gpio_pin_configure(gpio, cc1200->gpios[CC1200_GPIO_IDX_GPIO0].pin,
 			   GPIO_INPUT | DT_INST_GPIO_FLAGS(0, int_gpios));
 	cc1200->gpios[CC1200_GPIO_IDX_GPIO0].dev = gpio;
@@ -762,8 +745,8 @@ static int configure_spi(const struct device *dev)
 	}
 
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	cs_ctrl.gpio_dev = device_get_binding(
-		DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
+	cs_ctrl.gpio_dev =
+		device_get_binding(DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
 	if (!cs_ctrl.gpio_dev) {
 		LOG_ERR("Unable to get GPIO SPI CS device");
 		return -ENODEV;
@@ -816,8 +799,8 @@ static int cc1200_init(const struct device *dev)
 
 	k_thread_create(&cc1200->rx_thread, cc1200->rx_stack,
 			CONFIG_IEEE802154_CC1200_RX_STACK_SIZE,
-			(k_thread_entry_t)cc1200_rx,
-			cc1200, NULL, NULL, K_PRIO_COOP(2), 0, K_NO_WAIT);
+			(k_thread_entry_t)cc1200_rx, cc1200, NULL, NULL,
+			K_PRIO_COOP(2), 0, K_NO_WAIT);
 	k_thread_name_set(&cc1200->rx_thread, "cc1200_rx");
 
 	LOG_INF("CC1200 initialized");
@@ -843,21 +826,19 @@ static void cc1200_iface_init(struct net_if *iface)
 static struct cc1200_context cc1200_context_data;
 
 static struct ieee802154_radio_api cc1200_radio_api = {
-	.iface_api.init	= cc1200_iface_init,
+	.iface_api.init = cc1200_iface_init,
 
-	.get_capabilities	= cc1200_get_capabilities,
-	.cca			= cc1200_cca,
-	.set_channel		= cc1200_set_channel,
-	.set_txpower		= cc1200_set_txpower,
-	.tx			= cc1200_tx,
-	.start			= cc1200_start,
-	.stop			= cc1200_stop,
+	.get_capabilities = cc1200_get_capabilities,
+	.cca = cc1200_cca,
+	.set_channel = cc1200_set_channel,
+	.set_txpower = cc1200_set_txpower,
+	.tx = cc1200_tx,
+	.start = cc1200_start,
+	.stop = cc1200_stop,
 	.get_subg_channel_count = cc1200_get_channel_count,
 };
 
-NET_DEVICE_INIT(cc1200, CONFIG_IEEE802154_CC1200_DRV_NAME,
-		cc1200_init, device_pm_control_nop,
-		&cc1200_context_data, NULL,
-		CONFIG_IEEE802154_CC1200_INIT_PRIO,
-		&cc1200_radio_api, IEEE802154_L2,
-		NET_L2_GET_CTX_TYPE(IEEE802154_L2), 125);
+NET_DEVICE_INIT(cc1200, CONFIG_IEEE802154_CC1200_DRV_NAME, cc1200_init,
+		device_pm_control_nop, &cc1200_context_data, NULL,
+		CONFIG_IEEE802154_CC1200_INIT_PRIO, &cc1200_radio_api,
+		IEEE802154_L2, NET_L2_GET_CTX_TYPE(IEEE802154_L2), 125);

@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #ifndef ZEPHYR_INCLUDE_SYSCALL_HANDLER_H_
 #define ZEPHYR_INCLUDE_SYSCALL_HANDLER_H_
 
@@ -121,7 +120,7 @@ extern void z_object_wordlist_foreach(_wordlist_cb_func_t func, void *context);
  * @param child Child thread, to copy permissions to
  */
 extern void z_thread_perms_inherit(struct k_thread *parent,
-				  struct k_thread *child);
+				   struct k_thread *child);
 
 /**
  * Grant a thread permission to a kernel object
@@ -288,11 +287,11 @@ extern char *z_user_string_alloc_copy(const char *src, size_t maxlen);
  */
 extern int z_user_string_copy(char *dst, const char *src, size_t maxlen);
 
-#define Z_OOPS(expr) \
-	do { \
-		if (expr) { \
+#define Z_OOPS(expr)                                                \
+	do {                                                        \
+		if (expr) {                                         \
 			arch_syscall_oops(_current->syscall_frame); \
-		} \
+		}                                                   \
 	} while (false)
 
 /**
@@ -308,14 +307,16 @@ extern int z_user_string_copy(char *dst, const char *src, size_t maxlen);
  *            arguments) to print on verification failure
  * @return False on success, True on failure
  */
-#define Z_SYSCALL_VERIFY_MSG(expr, fmt, ...) ({ \
-	bool expr_copy = !(expr); \
-	if (expr_copy) { \
-		LOG_MODULE_DECLARE(os); \
-		LOG_ERR("syscall %s failed check: " fmt, \
-			__func__, ##__VA_ARGS__); \
-	} \
-	expr_copy; })
+#define Z_SYSCALL_VERIFY_MSG(expr, fmt, ...)                               \
+	({                                                                 \
+		bool expr_copy = !(expr);                                  \
+		if (expr_copy) {                                           \
+			LOG_MODULE_DECLARE(os);                            \
+			LOG_ERR("syscall %s failed check: " fmt, __func__, \
+				##__VA_ARGS__);                            \
+		}                                                          \
+		expr_copy;                                                 \
+	})
 
 /**
  * @brief Runtime expression check for system call arguments
@@ -345,12 +346,11 @@ extern int z_user_string_copy(char *dst, const char *src, size_t maxlen);
  *		read it
  * @return 0 on success, nonzero on failure
  */
-#define Z_SYSCALL_MEMORY(ptr, size, write) \
-	Z_SYSCALL_VERIFY_MSG(arch_buffer_validate((void *)ptr, size, write) \
-			     == 0, \
-			     "Memory region %p (size %zu) %s access denied", \
-			     (void *)(ptr), (size_t)(size), \
-			     write ? "write" : "read")
+#define Z_SYSCALL_MEMORY(ptr, size, write)                                     \
+	Z_SYSCALL_VERIFY_MSG(                                                  \
+		arch_buffer_validate((void *)ptr, size, write) == 0,           \
+		"Memory region %p (size %zu) %s access denied", (void *)(ptr), \
+		(size_t)(size), write ? "write" : "read")
 
 /**
  * @brief Runtime check that a user thread has read permission to a memory area
@@ -365,8 +365,7 @@ extern int z_user_string_copy(char *dst, const char *src, size_t maxlen);
  * @param size Size of the memory area
  * @return 0 on success, nonzero on failure
  */
-#define Z_SYSCALL_MEMORY_READ(ptr, size) \
-	Z_SYSCALL_MEMORY(ptr, size, 0)
+#define Z_SYSCALL_MEMORY_READ(ptr, size) Z_SYSCALL_MEMORY(ptr, size, 0)
 
 /**
  * @brief Runtime check that a user thread has write permission to a memory area
@@ -381,18 +380,17 @@ extern int z_user_string_copy(char *dst, const char *src, size_t maxlen);
  * @param size Size of the memory area
  * @param 0 on success, nonzero on failure
  */
-#define Z_SYSCALL_MEMORY_WRITE(ptr, size) \
-	Z_SYSCALL_MEMORY(ptr, size, 1)
+#define Z_SYSCALL_MEMORY_WRITE(ptr, size) Z_SYSCALL_MEMORY(ptr, size, 1)
 
-#define Z_SYSCALL_MEMORY_ARRAY(ptr, nmemb, size, write) \
-	({ \
-		size_t product; \
+#define Z_SYSCALL_MEMORY_ARRAY(ptr, nmemb, size, write)                  \
+	({                                                               \
+		size_t product;                                          \
 		Z_SYSCALL_VERIFY_MSG(!size_mul_overflow((size_t)(nmemb), \
-							(size_t)(size), \
-							&product), \
-				     "%zux%zu array is too large", \
-				     (size_t)(nmemb), (size_t)(size)) ||  \
-			Z_SYSCALL_MEMORY(ptr, product, write); \
+							(size_t)(size),  \
+							&product),       \
+				     "%zux%zu array is too large",       \
+				     (size_t)(nmemb), (size_t)(size)) || \
+			Z_SYSCALL_MEMORY(ptr, product, write);           \
 	})
 
 /**
@@ -425,8 +423,7 @@ extern int z_user_string_copy(char *dst, const char *src, size_t maxlen);
 #define Z_SYSCALL_MEMORY_ARRAY_WRITE(ptr, nmemb, size) \
 	Z_SYSCALL_MEMORY_ARRAY(ptr, nmemb, size, 1)
 
-static inline int z_obj_validation_check(struct z_object *ko,
-					 const void *obj,
+static inline int z_obj_validation_check(struct z_object *ko, const void *obj,
 					 enum k_objects otype,
 					 enum _obj_init_check init)
 {
@@ -445,11 +442,11 @@ static inline int z_obj_validation_check(struct z_object *ko,
 	return ret;
 }
 
-#define Z_SYSCALL_IS_OBJ(ptr, type, init) \
-	Z_SYSCALL_VERIFY_MSG(z_obj_validation_check(			\
-				     z_object_find((const void *)ptr),	\
-				     (const void *)ptr,			\
-				     type, init) == 0, "access denied")
+#define Z_SYSCALL_IS_OBJ(ptr, type, init)                                   \
+	Z_SYSCALL_VERIFY_MSG(                                               \
+		z_obj_validation_check(z_object_find((const void *)ptr),    \
+				       (const void *)ptr, type, init) == 0, \
+		"access denied")
 
 /**
  * @brief Runtime check driver object pointer for presence of operation
@@ -461,14 +458,14 @@ static inline int z_obj_validation_check(struct z_object *ko,
  * @param op Driver operation (e.g. manage_callback)
  * @return 0 on success, nonzero on failure
  */
-#define Z_SYSCALL_DRIVER_OP(ptr, api_name, op) \
-	({ \
-		struct api_name *__device__ = (struct api_name *) \
-			((const struct device *)ptr)->api; \
-		Z_SYSCALL_VERIFY_MSG(__device__->op != NULL, \
-				    "Operation %s not defined for driver " \
-				    "instance %p", \
-				    # op, __device__); \
+#define Z_SYSCALL_DRIVER_OP(ptr, api_name, op)                                \
+	({                                                                    \
+		struct api_name *__device__ =                                 \
+			(struct api_name *)((const struct device *)ptr)->api; \
+		Z_SYSCALL_VERIFY_MSG(__device__->op != NULL,                  \
+				     "Operation %s not defined for driver "   \
+				     "instance %p",                           \
+				     #op, __device__);                        \
 	})
 
 /**
@@ -489,12 +486,12 @@ static inline int z_obj_validation_check(struct z_object *ko,
  * @param _api Expected driver API structure memory address
  * @return 0 on success, nonzero on failure
  */
-#define Z_SYSCALL_SPECIFIC_DRIVER(_device, _dtype, _api) \
-	({ \
+#define Z_SYSCALL_SPECIFIC_DRIVER(_device, _dtype, _api)                    \
+	({                                                                  \
 		const struct device *_dev = (const struct device *)_device; \
-		Z_SYSCALL_OBJ(_dev, _dtype) || \
-			Z_SYSCALL_VERIFY_MSG(_dev->api == _api, \
-					     "API structure mismatch"); \
+		Z_SYSCALL_OBJ(_dev, _dtype) ||                              \
+			Z_SYSCALL_VERIFY_MSG(_dev->api == _api,             \
+					     "API structure mismatch");     \
 	})
 
 /**
@@ -508,8 +505,7 @@ static inline int z_obj_validation_check(struct z_object *ko,
  * @param type Expected kernel object type
  * @return 0 on success, nonzero on failure
  */
-#define Z_SYSCALL_OBJ(ptr, type) \
-	Z_SYSCALL_IS_OBJ(ptr, type, _OBJ_INIT_TRUE)
+#define Z_SYSCALL_OBJ(ptr, type) Z_SYSCALL_IS_OBJ(ptr, type, _OBJ_INIT_TRUE)
 
 /**
  * @brief Runtime check kernel object pointer for non-init functions
@@ -522,8 +518,7 @@ static inline int z_obj_validation_check(struct z_object *ko,
  * @return 0 on success, nonzero on failure
  */
 
-#define Z_SYSCALL_OBJ_INIT(ptr, type) \
-	Z_SYSCALL_IS_OBJ(ptr, type, _OBJ_INIT_ANY)
+#define Z_SYSCALL_OBJ_INIT(ptr, type) Z_SYSCALL_IS_OBJ(ptr, type, _OBJ_INIT_ANY)
 
 /**
  * @brief Runtime check kernel object pointer for non-init functions

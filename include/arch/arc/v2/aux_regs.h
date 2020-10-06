@@ -21,7 +21,7 @@
 #define _ARC_V2_SEC_STAT 0x09
 #define _ARC_V2_STATUS32 0x00a
 #define _ARC_V2_STATUS32_P0 0x00b
-#define _ARC_V2_USER_SP	0x00d
+#define _ARC_V2_USER_SP 0x00d
 #define _ARC_V2_AUX_IRQ_CTRL 0x00e
 #define _ARC_V2_IC_IVIC 0x010
 #define _ARC_V2_IC_CTRL 0x011
@@ -31,7 +31,7 @@
 #define _ARC_V2_TMR0_COUNT 0x021
 #define _ARC_V2_TMR0_CONTROL 0x022
 #define _ARC_V2_TMR0_LIMIT 0x023
-#define _ARC_V2_IRQ_VECT_BASE    0x025
+#define _ARC_V2_IRQ_VECT_BASE 0x025
 #define _ARC_V2_IRQ_VECT_BASE_S 0x26
 #define _ARC_V2_KERNEL_SP 0x38
 #define _ARC_V2_SEC_U_SP 0x39
@@ -185,14 +185,14 @@
 #endif /* __CCAC__ */
 #endif /* _ASMLANGUAGE */
 
-#define z_arc_v2_core_id() \
-	({                                               \
-		unsigned int __ret;                      \
-		__asm__ __volatile__("lr %0, [%1]\n" \
-				     "xbfu %0, %0, 0xe8\n" \
-				     : "=r"(__ret)       \
-				     : "i"(_ARC_V2_IDENTITY));        \
-		__ret;                                   \
+#define z_arc_v2_core_id()                                     \
+	({                                                     \
+		unsigned int __ret;                            \
+		__asm__ __volatile__("lr %0, [%1]\n"           \
+				     "xbfu %0, %0, 0xe8\n"     \
+				     : "=r"(__ret)             \
+				     : "i"(_ARC_V2_IDENTITY)); \
+		__ret;                                         \
 	})
 
 #endif /* ZEPHYR_INCLUDE_ARCH_ARC_V2_AUX_REGS_H_ */

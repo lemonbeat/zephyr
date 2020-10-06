@@ -26,25 +26,21 @@ void z_impl_test_cpu_write_reg(void)
 	 */
 #if CONFIG_X86
 #ifndef CONFIG_X86_64
-	__asm__ volatile (
-		"movl $0xDEADBEEF, %eax;\n\t"
-		"movl $0xDEADBEEF, %ebx;\n\t"
-		"movl $0xDEADBEEF, %ecx;\n\t"
-		"movl $0xDEADBEEF, %edx;\n\t"
-		"movl $0xDEADBEEF, %edi;\n\t"
-		);
+	__asm__ volatile("movl $0xDEADBEEF, %eax;\n\t"
+			 "movl $0xDEADBEEF, %ebx;\n\t"
+			 "movl $0xDEADBEEF, %ecx;\n\t"
+			 "movl $0xDEADBEEF, %edx;\n\t"
+			 "movl $0xDEADBEEF, %edi;\n\t");
 #else
-	__asm__ volatile (
-		"movq $0xDEADBEEF, %rax;\n\t"
-		"movq $0xDEADBEEF, %rcx;\n\t"
-		"movq $0xDEADBEEF, %rdx;\n\t"
-		"movq $0xDEADBEEF, %rsi;\n\t"
-		"movq $0xDEADBEEF, %rdi;\n\t"
-		"movq $0xDEADBEEF, %r8;\n\t"
-		"movq $0xDEADBEEF, %r9;\n\t"
-		"movq $0xDEADBEEF, %r10;\n\t"
-		"movq $0xDEADBEEF, %r11;\n\t"
-		);
+	__asm__ volatile("movq $0xDEADBEEF, %rax;\n\t"
+			 "movq $0xDEADBEEF, %rcx;\n\t"
+			 "movq $0xDEADBEEF, %rdx;\n\t"
+			 "movq $0xDEADBEEF, %rsi;\n\t"
+			 "movq $0xDEADBEEF, %rdi;\n\t"
+			 "movq $0xDEADBEEF, %r8;\n\t"
+			 "movq $0xDEADBEEF, %r9;\n\t"
+			 "movq $0xDEADBEEF, %r10;\n\t"
+			 "movq $0xDEADBEEF, %r11;\n\t");
 #endif
 #endif
 }
@@ -73,50 +69,36 @@ void test_syscall_cpu_scrubs_regs(void)
 	int x86_reg_val[5];
 
 	test_cpu_write_reg();
-	__asm__ volatile (
-		"\t movl %%eax,%0" : "=r"(x86_reg_val[0]));
-	__asm__ volatile (
-		"\t movl %%ebx,%0" : "=r"(x86_reg_val[1]));
-	__asm__ volatile (
-		"\t movl %%ecx,%0" : "=r"(x86_reg_val[2]));
-	__asm__ volatile (
-		"\t movl %%edx,%0" : "=r"(x86_reg_val[3]));
-	__asm__ volatile (
-		"\t movl %%edi,%0" : "=r"(x86_reg_val[4]));
+	__asm__ volatile("\t movl %%eax,%0" : "=r"(x86_reg_val[0]));
+	__asm__ volatile("\t movl %%ebx,%0" : "=r"(x86_reg_val[1]));
+	__asm__ volatile("\t movl %%ecx,%0" : "=r"(x86_reg_val[2]));
+	__asm__ volatile("\t movl %%edx,%0" : "=r"(x86_reg_val[3]));
+	__asm__ volatile("\t movl %%edi,%0" : "=r"(x86_reg_val[4]));
 
 	for (int i = 0; i < 5; i++) {
 		zassert_not_equal(x86_reg_val[i], DB_VAL,
-				"reg val is 0xDEADBEEF, "
-				"not scrubbed after system call.");
+				  "reg val is 0xDEADBEEF, "
+				  "not scrubbed after system call.");
 	}
 #else
 	long x86_64_reg_val[9];
 
 	test_cpu_write_reg();
 
-	__asm__ volatile(
-		"\t movq %%rax,%0" : "=r"(x86_64_reg_val[0]));
-	__asm__ volatile(
-		"\t movq %%rcx,%0" : "=r"(x86_64_reg_val[1]));
-	__asm__ volatile(
-		"\t movq %%rdx,%0" : "=r"(x86_64_reg_val[2]));
-	__asm__ volatile(
-		"\t movq %%rsi,%0" : "=r"(x86_64_reg_val[3]));
-	__asm__ volatile(
-		"\t movq %%rdi,%0" : "=r"(x86_64_reg_val[4]));
-	__asm__ volatile(
-		"\t movq %%r8,%0" : "=r"(x86_64_reg_val[5]));
-	__asm__ volatile(
-		"\t movq %%r9,%0" : "=r"(x86_64_reg_val[6]));
-	__asm__ volatile(
-		"\t movq %%r10,%0" : "=r"(x86_64_reg_val[7]));
-	__asm__ volatile(
-		"\t movq %%r11,%0" : "=r"(x86_64_reg_val[8]));
+	__asm__ volatile("\t movq %%rax,%0" : "=r"(x86_64_reg_val[0]));
+	__asm__ volatile("\t movq %%rcx,%0" : "=r"(x86_64_reg_val[1]));
+	__asm__ volatile("\t movq %%rdx,%0" : "=r"(x86_64_reg_val[2]));
+	__asm__ volatile("\t movq %%rsi,%0" : "=r"(x86_64_reg_val[3]));
+	__asm__ volatile("\t movq %%rdi,%0" : "=r"(x86_64_reg_val[4]));
+	__asm__ volatile("\t movq %%r8,%0" : "=r"(x86_64_reg_val[5]));
+	__asm__ volatile("\t movq %%r9,%0" : "=r"(x86_64_reg_val[6]));
+	__asm__ volatile("\t movq %%r10,%0" : "=r"(x86_64_reg_val[7]));
+	__asm__ volatile("\t movq %%r11,%0" : "=r"(x86_64_reg_val[8]));
 
 	for (int i = 0; i < 9; i++) {
 		zassert_not_equal(x86_64_reg_val[i], DB_VAL,
-				"register value is 0xDEADBEEF, "
-				"not scrubbed after system call.");
+				  "register value is 0xDEADBEEF, "
+				  "not scrubbed after system call.");
 	}
 #endif
 #endif
@@ -125,6 +107,6 @@ void test_syscall_cpu_scrubs_regs(void)
 void test_main(void)
 {
 	ztest_test_suite(test_x86_cpu_scrubs_regs,
-		ztest_user_unit_test(test_syscall_cpu_scrubs_regs));
+			 ztest_user_unit_test(test_syscall_cpu_scrubs_regs));
 	ztest_run_test_suite(test_x86_cpu_scrubs_regs);
 }

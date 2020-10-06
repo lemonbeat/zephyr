@@ -52,10 +52,9 @@
 
 #define STACKSIZE (512 + CONFIG_TEST_EXTRA_STACKSIZE)
 
-static ZTEST_DMEM int tc_rc = TC_PASS;         /* test case return code */
+static ZTEST_DMEM int tc_rc = TC_PASS; /* test case return code */
 
 ZTEST_BMEM SYS_MUTEX_DEFINE(private_mutex);
-
 
 ZTEST_BMEM SYS_MUTEX_DEFINE(mutex_1);
 ZTEST_BMEM SYS_MUTEX_DEFINE(mutex_2);
@@ -89,7 +88,6 @@ void thread_05(void)
 		return;
 	}
 }
-
 
 /**
  *
@@ -150,7 +148,6 @@ void thread_07(void)
 		TC_ERROR("Failed to timeout on mutex %p\n", &mutex_3);
 		return;
 	}
-
 }
 
 /**
@@ -188,11 +185,11 @@ void thread_09(void)
 {
 	int rv;
 
-	k_sleep(K_MSEC(500));	/* Allow lower priority thread to run */
+	k_sleep(K_MSEC(500)); /* Allow lower priority thread to run */
 
 	/*<mutex_1> is already locked. */
 	rv = sys_mutex_lock(&mutex_1, K_NO_WAIT);
-	if (rv != -EBUSY) {	/* This attempt to lock the mutex */
+	if (rv != -EBUSY) { /* This attempt to lock the mutex */
 		/* should not succeed. */
 		tc_rc = TC_FAIL;
 		TC_ERROR("Failed to NOT take locked mutex %p\n", &mutex_1);
@@ -267,7 +264,6 @@ void test_mutex(void)
 	int thread_flags = 0;
 #endif
 
-
 	TC_START("Test kernel Mutex API");
 
 	PRINT_LINE;
@@ -297,7 +293,7 @@ void test_mutex(void)
 	TC_PRINT("Done LOCKING!  Current priority = %d\n",
 		 k_thread_priority_get(k_current_get()));
 
-	k_sleep(K_SECONDS(1));       /* thread_05 should time out */
+	k_sleep(K_SECONDS(1)); /* thread_05 should time out */
 
 	/* ~ 5 seconds have passed */
 
@@ -311,7 +307,7 @@ void test_mutex(void)
 	zassert_equal(rv, 7, "Gave %s and priority should drop.\n", "mutex_4");
 	zassert_equal(rv, 7, "Expected priority %d, not %d\n", 7, rv);
 
-	k_sleep(K_SECONDS(1));       /* thread_07 should time out */
+	k_sleep(K_SECONDS(1)); /* thread_07 should time out */
 
 	/* ~ 6 seconds have passed */
 
@@ -327,7 +323,7 @@ void test_mutex(void)
 	rv = k_thread_priority_get(k_current_get());
 	zassert_equal(rv, 10, "Expected priority %d, not %d\n", 10, rv);
 
-	k_sleep(K_SECONDS(1));     /* Give thread_11 time to run */
+	k_sleep(K_SECONDS(1)); /* Give thread_11 time to run */
 
 	zassert_equal(tc_rc, TC_PASS, NULL);
 
@@ -345,7 +341,7 @@ void test_mutex(void)
 	k_thread_create(&thread_12_thread_data, thread_12_stack_area, STACKSIZE,
 			(k_thread_entry_t)thread_12, NULL, NULL, NULL,
 			K_PRIO_PREEMPT(12), thread_flags, K_NO_WAIT);
-	k_sleep(K_MSEC(1));     /* Give thread_12 a chance to block on the mutex */
+	k_sleep(K_MSEC(1)); /* Give thread_12 a chance to block on the mutex */
 
 	sys_mutex_unlock(&private_mutex);
 	sys_mutex_unlock(&private_mutex); /* thread_12 should now have lock */
@@ -397,23 +393,23 @@ void test_user_access(void)
 #endif /* CONFIG_USERSPACE */
 }
 
-K_THREAD_DEFINE(THREAD_05, STACKSIZE, thread_05, NULL, NULL, NULL,
-		5, K_USER, 0);
+K_THREAD_DEFINE(THREAD_05, STACKSIZE, thread_05, NULL, NULL, NULL, 5, K_USER,
+		0);
 
-K_THREAD_DEFINE(THREAD_06, STACKSIZE, thread_06, NULL, NULL, NULL,
-		6, K_USER, 0);
+K_THREAD_DEFINE(THREAD_06, STACKSIZE, thread_06, NULL, NULL, NULL, 6, K_USER,
+		0);
 
-K_THREAD_DEFINE(THREAD_07, STACKSIZE, thread_07, NULL, NULL, NULL,
-		7, K_USER, 0);
+K_THREAD_DEFINE(THREAD_07, STACKSIZE, thread_07, NULL, NULL, NULL, 7, K_USER,
+		0);
 
-K_THREAD_DEFINE(THREAD_08, STACKSIZE, thread_08, NULL, NULL, NULL,
-		8, K_USER, 0);
+K_THREAD_DEFINE(THREAD_08, STACKSIZE, thread_08, NULL, NULL, NULL, 8, K_USER,
+		0);
 
-K_THREAD_DEFINE(THREAD_09, STACKSIZE, thread_09, NULL, NULL, NULL,
-		9, K_USER, 0);
+K_THREAD_DEFINE(THREAD_09, STACKSIZE, thread_09, NULL, NULL, NULL, 9, K_USER,
+		0);
 
-K_THREAD_DEFINE(THREAD_11, STACKSIZE, thread_11, NULL, NULL, NULL,
-		11, K_USER, 0);
+K_THREAD_DEFINE(THREAD_11, STACKSIZE, thread_11, NULL, NULL, NULL, 11, K_USER,
+		0);
 
 /*test case main entry*/
 void test_main(void)
@@ -421,8 +417,8 @@ void test_main(void)
 	int rv;
 
 #ifdef CONFIG_USERSPACE
-	k_thread_access_grant(k_current_get(),
-			      &thread_12_thread_data, &thread_12_stack_area);
+	k_thread_access_grant(k_current_get(), &thread_12_thread_data,
+			      &thread_12_stack_area);
 
 	k_mem_domain_add_thread(&k_mem_domain_default, THREAD_05);
 	k_mem_domain_add_thread(&k_mem_domain_default, THREAD_06);
@@ -443,20 +439,16 @@ void test_main(void)
 	 * mode, as this will otherwise fail an assertion in the thread code.
 	 */
 #ifdef CONFIG_USERSPACE
-	ztest_test_suite(mutex_complex,
-			 ztest_1cpu_user_unit_test(test_mutex),
+	ztest_test_suite(mutex_complex, ztest_1cpu_user_unit_test(test_mutex),
 			 ztest_user_unit_test(test_user_access),
 			 ztest_unit_test(test_supervisor_access));
 
 	ztest_run_test_suite(mutex_complex);
 #else
-	ztest_test_suite(mutex_complex,
-			 ztest_1cpu_unit_test(test_mutex),
+	ztest_test_suite(mutex_complex, ztest_1cpu_unit_test(test_mutex),
 			 ztest_unit_test(test_user_access),
 			 ztest_unit_test(test_supervisor_access));
 
 	ztest_run_test_suite(mutex_complex);
 #endif
-
-
 }

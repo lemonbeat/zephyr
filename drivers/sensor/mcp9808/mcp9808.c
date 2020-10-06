@@ -24,9 +24,8 @@ int mcp9808_reg_read(const struct device *dev, uint8_t reg, uint16_t *val)
 {
 	const struct mcp9808_data *data = dev->data;
 	const struct mcp9808_config *cfg = dev->config;
-	int rc = i2c_write_read(data->i2c_master, cfg->i2c_addr,
-				&reg, sizeof(reg),
-				val, sizeof(*val));
+	int rc = i2c_write_read(data->i2c_master, cfg->i2c_addr, &reg,
+				sizeof(reg), val, sizeof(*val));
 
 	if (rc == 0) {
 		*val = sys_be16_to_cpu(*val);
@@ -40,7 +39,8 @@ static int mcp9808_sample_fetch(const struct device *dev,
 {
 	struct mcp9808_data *data = dev->data;
 
-	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_AMBIENT_TEMP);
+	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL ||
+			chan == SENSOR_CHAN_AMBIENT_TEMP);
 
 	return mcp9808_reg_read(dev, MCP9808_REG_TEMP_AMB, &data->reg_val);
 }
@@ -100,6 +100,6 @@ static const struct mcp9808_config mcp9808_cfg = {
 #endif /* CONFIG_MCP9808_TRIGGER */
 };
 
-DEVICE_AND_API_INIT(mcp9808, DT_INST_LABEL(0), mcp9808_init,
-		    &mcp9808_data, &mcp9808_cfg, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &mcp9808_api_funcs);
+DEVICE_AND_API_INIT(mcp9808, DT_INST_LABEL(0), mcp9808_init, &mcp9808_data,
+		    &mcp9808_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &mcp9808_api_funcs);

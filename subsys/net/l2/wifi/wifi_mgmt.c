@@ -13,14 +13,14 @@ LOG_MODULE_REGISTER(net_wifi_mgmt, CONFIG_NET_L2_WIFI_MGMT_LOG_LEVEL);
 #include <net/net_if.h>
 #include <net/wifi_mgmt.h>
 
-static int wifi_connect(uint32_t mgmt_request, struct net_if *iface,
-			void *data, size_t len)
+static int wifi_connect(uint32_t mgmt_request, struct net_if *iface, void *data,
+			size_t len)
 {
 	struct wifi_connect_req_params *params =
 		(struct wifi_connect_req_params *)data;
 	const struct device *dev = net_if_get_device(iface);
 	struct net_wifi_mgmt_offload *off_api =
-		(struct net_wifi_mgmt_offload *) dev->api;
+		(struct net_wifi_mgmt_offload *)dev->api;
 
 	if (off_api == NULL || off_api->connect == NULL) {
 		return -ENOTSUP;
@@ -48,7 +48,7 @@ static int wifi_connect(uint32_t mgmt_request, struct net_if *iface,
 NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_WIFI_CONNECT, wifi_connect);
 
 static void scan_result_cb(struct net_if *iface, int status,
-			    struct wifi_scan_result *entry)
+			   struct wifi_scan_result *entry)
 {
 	if (!iface) {
 		return;
@@ -59,8 +59,8 @@ static void scan_result_cb(struct net_if *iface, int status,
 			.status = status,
 		};
 
-		net_mgmt_event_notify_with_info(NET_EVENT_WIFI_SCAN_DONE,
-						iface, &scan_status,
+		net_mgmt_event_notify_with_info(NET_EVENT_WIFI_SCAN_DONE, iface,
+						&scan_status,
 						sizeof(struct wifi_status));
 		return;
 	}
@@ -69,12 +69,12 @@ static void scan_result_cb(struct net_if *iface, int status,
 					entry, sizeof(struct wifi_scan_result));
 }
 
-static int wifi_scan(uint32_t mgmt_request, struct net_if *iface,
-		     void *data, size_t len)
+static int wifi_scan(uint32_t mgmt_request, struct net_if *iface, void *data,
+		     size_t len)
 {
 	const struct device *dev = net_if_get_device(iface);
 	struct net_wifi_mgmt_offload *off_api =
-		(struct net_wifi_mgmt_offload *) dev->api;
+		(struct net_wifi_mgmt_offload *)dev->api;
 
 	if (off_api == NULL || off_api->scan == NULL) {
 		return -ENOTSUP;
@@ -85,13 +85,12 @@ static int wifi_scan(uint32_t mgmt_request, struct net_if *iface,
 
 NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_WIFI_SCAN, wifi_scan);
 
-
 static int wifi_disconnect(uint32_t mgmt_request, struct net_if *iface,
 			   void *data, size_t len)
 {
 	const struct device *dev = net_if_get_device(iface);
 	struct net_wifi_mgmt_offload *off_api =
-		(struct net_wifi_mgmt_offload *) dev->api;
+		(struct net_wifi_mgmt_offload *)dev->api;
 
 	if (off_api == NULL || off_api->disconnect == NULL) {
 		return -ENOTSUP;
@@ -108,8 +107,8 @@ void wifi_mgmt_raise_connect_result_event(struct net_if *iface, int status)
 		.status = status,
 	};
 
-	net_mgmt_event_notify_with_info(NET_EVENT_WIFI_CONNECT_RESULT,
-					iface, &cnx_status,
+	net_mgmt_event_notify_with_info(NET_EVENT_WIFI_CONNECT_RESULT, iface,
+					&cnx_status,
 					sizeof(struct wifi_status));
 }
 
@@ -119,8 +118,8 @@ void wifi_mgmt_raise_disconnect_result_event(struct net_if *iface, int status)
 		.status = status,
 	};
 
-	net_mgmt_event_notify_with_info(NET_EVENT_WIFI_DISCONNECT_RESULT,
-					iface, &cnx_status,
+	net_mgmt_event_notify_with_info(NET_EVENT_WIFI_DISCONNECT_RESULT, iface,
+					&cnx_status,
 					sizeof(struct wifi_status));
 }
 
@@ -131,7 +130,7 @@ static int wifi_ap_enable(uint32_t mgmt_request, struct net_if *iface,
 		(struct wifi_connect_req_params *)data;
 	const struct device *dev = net_if_get_device(iface);
 	struct net_wifi_mgmt_offload *off_api =
-		(struct net_wifi_mgmt_offload *) dev->api;
+		(struct net_wifi_mgmt_offload *)dev->api;
 
 	if (off_api == NULL || off_api->ap_enable == NULL) {
 		return -ENOTSUP;
@@ -143,11 +142,11 @@ static int wifi_ap_enable(uint32_t mgmt_request, struct net_if *iface,
 NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_WIFI_AP_ENABLE, wifi_ap_enable);
 
 static int wifi_ap_disable(uint32_t mgmt_request, struct net_if *iface,
-			  void *data, size_t len)
+			   void *data, size_t len)
 {
 	const struct device *dev = net_if_get_device(iface);
 	struct net_wifi_mgmt_offload *off_api =
-		(struct net_wifi_mgmt_offload *) dev->api;
+		(struct net_wifi_mgmt_offload *)dev->api;
 
 	if (off_api == NULL || off_api->ap_enable == NULL) {
 		return -ENOTSUP;

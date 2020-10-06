@@ -39,7 +39,7 @@ static volatile bool data_received;
 static int char_sent;
 static const char fifo_data[] = "This is a FIFO test.\r\n";
 
-#define DATA_SIZE	(sizeof(fifo_data) - 1)
+#define DATA_SIZE (sizeof(fifo_data) - 1)
 
 static void uart_fifo_callback(const struct device *dev, void *user_data)
 {
@@ -64,8 +64,8 @@ static void uart_fifo_callback(const struct device *dev, void *user_data)
 		 * be able to put at least one byte into a FIFO. If not,
 		 * well, we'll fail test.
 		 */
-		if (uart_fifo_fill(dev,
-				   (uint8_t *)&fifo_data[tx_data_idx++], 1) > 0) {
+		if (uart_fifo_fill(dev, (uint8_t *)&fifo_data[tx_data_idx++],
+				   1) > 0) {
 			data_transmitted = true;
 			char_sent++;
 		}
@@ -140,7 +140,6 @@ static int test_fifo_fill(void)
 	} else {
 		return TC_FAIL;
 	}
-
 }
 
 void test_uart_fifo_fill(void)

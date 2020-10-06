@@ -34,14 +34,14 @@
  * OMA-TS-LightweightM2M-V1_0_2-20180209-A
  */
 
-#define LWM2M_OBJECT_SECURITY_ID			0
-#define LWM2M_OBJECT_SERVER_ID				1
-#define LWM2M_OBJECT_ACCESS_CONTROL_ID			2
-#define LWM2M_OBJECT_DEVICE_ID				3
-#define LWM2M_OBJECT_CONNECTIVITY_MONITORING_ID		4
-#define LWM2M_OBJECT_FIRMWARE_ID			5
-#define LWM2M_OBJECT_LOCATION_ID			6
-#define LWM2M_OBJECT_CONNECTIVITY_STATISTICS_ID		7
+#define LWM2M_OBJECT_SECURITY_ID 0
+#define LWM2M_OBJECT_SERVER_ID 1
+#define LWM2M_OBJECT_ACCESS_CONTROL_ID 2
+#define LWM2M_OBJECT_DEVICE_ID 3
+#define LWM2M_OBJECT_CONNECTIVITY_MONITORING_ID 4
+#define LWM2M_OBJECT_FIRMWARE_ID 5
+#define LWM2M_OBJECT_LOCATION_ID 6
+#define LWM2M_OBJECT_CONNECTIVITY_STATISTICS_ID 7
 
 /**
  * @brief LwM2M Objects produced by 3rd party Standards Development
@@ -118,7 +118,6 @@ struct lwm2m_ctx {
 	int sock_fd;
 };
 
-
 /**
  * @brief Asynchronous callback to get a resource buffer and length.
  *
@@ -168,10 +167,10 @@ typedef void *(*lwm2m_engine_get_data_cb_t)(uint16_t obj_inst_id,
  * @return Callback returns a negative error code (errno.h) indicating
  *         reason of failure or 0 for success.
  */
-typedef int (*lwm2m_engine_set_data_cb_t)(uint16_t obj_inst_id,
-					  uint16_t res_id, uint16_t res_inst_id,
-					  uint8_t *data, uint16_t data_len,
-					  bool last_block, size_t total_size);
+typedef int (*lwm2m_engine_set_data_cb_t)(uint16_t obj_inst_id, uint16_t res_id,
+					  uint16_t res_inst_id, uint8_t *data,
+					  uint16_t data_len, bool last_block,
+					  size_t total_size);
 
 /**
  * @brief Asynchronous event notification callback.
@@ -196,30 +195,30 @@ typedef int (*lwm2m_engine_user_cb_t)(uint16_t obj_inst_id);
  * @brief Power source types used for the "Available Power Sources" resource of
  * the LwM2M Device object.
  */
-#define LWM2M_DEVICE_PWR_SRC_TYPE_DC_POWER	0
-#define LWM2M_DEVICE_PWR_SRC_TYPE_BAT_INT	1
-#define LWM2M_DEVICE_PWR_SRC_TYPE_BAT_EXT	2
-#define LWM2M_DEVICE_PWR_SRC_TYPE_UNUSED	3
-#define LWM2M_DEVICE_PWR_SRC_TYPE_PWR_OVER_ETH	4
-#define LWM2M_DEVICE_PWR_SRC_TYPE_USB		5
-#define LWM2M_DEVICE_PWR_SRC_TYPE_AC_POWER	6
-#define LWM2M_DEVICE_PWR_SRC_TYPE_SOLAR		7
-#define LWM2M_DEVICE_PWR_SRC_TYPE_MAX		8
+#define LWM2M_DEVICE_PWR_SRC_TYPE_DC_POWER 0
+#define LWM2M_DEVICE_PWR_SRC_TYPE_BAT_INT 1
+#define LWM2M_DEVICE_PWR_SRC_TYPE_BAT_EXT 2
+#define LWM2M_DEVICE_PWR_SRC_TYPE_UNUSED 3
+#define LWM2M_DEVICE_PWR_SRC_TYPE_PWR_OVER_ETH 4
+#define LWM2M_DEVICE_PWR_SRC_TYPE_USB 5
+#define LWM2M_DEVICE_PWR_SRC_TYPE_AC_POWER 6
+#define LWM2M_DEVICE_PWR_SRC_TYPE_SOLAR 7
+#define LWM2M_DEVICE_PWR_SRC_TYPE_MAX 8
 
 /**
  * @brief Error codes used for the "Error Code" resource of the LwM2M Device
  * object.  An LwM2M client can register one of the following error codes via
  * the lwm2m_device_add_err() function.
  */
-#define LWM2M_DEVICE_ERROR_NONE			0
-#define LWM2M_DEVICE_ERROR_LOW_POWER		1
-#define LWM2M_DEVICE_ERROR_EXT_POWER_SUPPLY_OFF	2
-#define LWM2M_DEVICE_ERROR_GPS_FAILURE		3
-#define LWM2M_DEVICE_ERROR_LOW_SIGNAL_STRENGTH	4
-#define LWM2M_DEVICE_ERROR_OUT_OF_MEMORY	5
-#define LWM2M_DEVICE_ERROR_SMS_FAILURE		6
-#define LWM2M_DEVICE_ERROR_NETWORK_FAILURE	7
-#define LWM2M_DEVICE_ERROR_PERIPHERAL_FAILURE	8
+#define LWM2M_DEVICE_ERROR_NONE 0
+#define LWM2M_DEVICE_ERROR_LOW_POWER 1
+#define LWM2M_DEVICE_ERROR_EXT_POWER_SUPPLY_OFF 2
+#define LWM2M_DEVICE_ERROR_GPS_FAILURE 3
+#define LWM2M_DEVICE_ERROR_LOW_SIGNAL_STRENGTH 4
+#define LWM2M_DEVICE_ERROR_OUT_OF_MEMORY 5
+#define LWM2M_DEVICE_ERROR_SMS_FAILURE 6
+#define LWM2M_DEVICE_ERROR_NETWORK_FAILURE 7
+#define LWM2M_DEVICE_ERROR_PERIPHERAL_FAILURE 8
 
 /**
  * @brief Battery status codes used for the "Battery Status" resource (3/0/20)
@@ -227,13 +226,13 @@ typedef int (*lwm2m_engine_user_cb_t)(uint16_t obj_inst_id);
  *        client can set one of the following codes via:
  *        lwm2m_engine_set_u8("3/0/20", [battery status])
  */
-#define LWM2M_DEVICE_BATTERY_STATUS_NORMAL	0
-#define LWM2M_DEVICE_BATTERY_STATUS_CHARGING	1
-#define LWM2M_DEVICE_BATTERY_STATUS_CHARGE_COMP	2
-#define LWM2M_DEVICE_BATTERY_STATUS_DAMAGED	3
-#define LWM2M_DEVICE_BATTERY_STATUS_LOW		4
-#define LWM2M_DEVICE_BATTERY_STATUS_NOT_INST	5
-#define LWM2M_DEVICE_BATTERY_STATUS_UNKNOWN	6
+#define LWM2M_DEVICE_BATTERY_STATUS_NORMAL 0
+#define LWM2M_DEVICE_BATTERY_STATUS_CHARGING 1
+#define LWM2M_DEVICE_BATTERY_STATUS_CHARGE_COMP 2
+#define LWM2M_DEVICE_BATTERY_STATUS_DAMAGED 3
+#define LWM2M_DEVICE_BATTERY_STATUS_LOW 4
+#define LWM2M_DEVICE_BATTERY_STATUS_NOT_INST 5
+#define LWM2M_DEVICE_BATTERY_STATUS_UNKNOWN 6
 
 /**
  * @brief Register a new error code with LwM2M Device object.
@@ -244,17 +243,16 @@ typedef int (*lwm2m_engine_user_cb_t)(uint16_t obj_inst_id);
  */
 int lwm2m_device_add_err(uint8_t error_code);
 
-
 /**
  * @brief LWM2M Firmware Update object states
  *
  * An LwM2M client or the LwM2M Firmware Update object use the following codes
  * to represent the LwM2M Firmware Update state (5/0/3).
  */
-#define STATE_IDLE		0
-#define STATE_DOWNLOADING	1
-#define STATE_DOWNLOADED	2
-#define STATE_UPDATING		3
+#define STATE_IDLE 0
+#define STATE_DOWNLOADING 1
+#define STATE_DOWNLOADED 2
+#define STATE_UPDATING 3
 
 /**
  * @brief LWM2M Firmware Update object result codes
@@ -262,16 +260,16 @@ int lwm2m_device_add_err(uint8_t error_code);
  * After processing a firmware update, the client sets the result via one of
  * the following codes via lwm2m_engine_set_u8("5/0/5", [result code])
  */
-#define RESULT_DEFAULT		0
-#define RESULT_SUCCESS		1
-#define RESULT_NO_STORAGE	2
-#define RESULT_OUT_OF_MEM	3
-#define RESULT_CONNECTION_LOST	4
-#define RESULT_INTEGRITY_FAILED	5
-#define RESULT_UNSUP_FW		6
-#define RESULT_INVALID_URI	7
-#define RESULT_UPDATE_FAILED	8
-#define RESULT_UNSUP_PROTO	9
+#define RESULT_DEFAULT 0
+#define RESULT_SUCCESS 1
+#define RESULT_NO_STORAGE 2
+#define RESULT_OUT_OF_MEM 3
+#define RESULT_CONNECTION_LOST 4
+#define RESULT_INTEGRITY_FAILED 5
+#define RESULT_UNSUP_FW 6
+#define RESULT_INVALID_URI 7
+#define RESULT_UPDATE_FAILED 8
+#define RESULT_UNSUP_PROTO 9
 
 #if defined(CONFIG_LWM2M_FIRMWARE_UPDATE_OBJ_SUPPORT)
 /**
@@ -661,7 +659,6 @@ int lwm2m_engine_get_float64(char *pathstr, float64_value_t *buf);
  */
 int lwm2m_engine_get_objlnk(char *pathstr, struct lwm2m_objlnk *buf);
 
-
 /**
  * @brief Set resource (instance) read callback
  *
@@ -749,17 +746,17 @@ int lwm2m_engine_register_delete_callback(uint16_t obj_id,
 /**
  * @brief Resource read-only value bit
  */
-#define LWM2M_RES_DATA_READ_ONLY	0
+#define LWM2M_RES_DATA_READ_ONLY 0
 
 /**
  * @brief Resource read-only flag
  */
-#define LWM2M_RES_DATA_FLAG_RO		BIT(LWM2M_RES_DATA_READ_ONLY)
+#define LWM2M_RES_DATA_FLAG_RO BIT(LWM2M_RES_DATA_READ_ONLY)
 
 /**
  * @brief Read resource flags helper macro
  */
-#define LWM2M_HAS_RES_FLAG(res, f)	((res->data_flags & f) == f)
+#define LWM2M_HAS_RES_FLAG(res, f) ((res->data_flags & f) == f)
 
 /**
  * @brief Set data buffer for a resource
@@ -894,5 +891,5 @@ void lwm2m_rd_client_start(struct lwm2m_ctx *client_ctx, const char *ep_name,
 void lwm2m_rd_client_stop(struct lwm2m_ctx *client_ctx,
 			  lwm2m_ctx_event_cb_t event_cb);
 
-#endif	/* ZEPHYR_INCLUDE_NET_LWM2M_H_ */
+#endif /* ZEPHYR_INCLUDE_NET_LWM2M_H_ */
 /**@}  */

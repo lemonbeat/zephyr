@@ -26,10 +26,8 @@ static void return_value_tests(void)
 
 void test_main(void)
 {
-	ztest_test_suite(mock_framework_tests,
-		ztest_unit_test(parameter_test),
-		ztest_unit_test(return_value_test)
-	);
+	ztest_test_suite(mock_framework_tests, ztest_unit_test(parameter_test),
+			 ztest_unit_test(return_value_test));
 
 	ztest_run_test_suite(mock_framework_tests);
 }

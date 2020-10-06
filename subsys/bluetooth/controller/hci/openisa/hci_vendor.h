@@ -5,7 +5,7 @@
  */
 
 #define BT_HCI_VS_HW_PLAT 0
-#define BT_HCI_VS_HW_VAR  0
+#define BT_HCI_VS_HW_VAR 0
 
 /* Map vendor command handler directly to common implementation */
 inline int hci_vendor_cmd_handle(uint16_t ocf, struct net_buf *cmd,

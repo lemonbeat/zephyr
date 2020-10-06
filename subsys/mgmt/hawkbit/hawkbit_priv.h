@@ -156,12 +156,9 @@ struct entry {
 };
 
 struct entry http_request[] = {
-	{"HAWKBIT_PROBE", 0},
-	{"HAWKBIT_CONFIG_DEVICE", 1},
-	{"HAWKBIT_CLOSE", 2},
-	{"HAWKBIT_PROBE_DEPLOYMENT_BASE", 3},
-	{"HAWKBIT_REPORT", 4},
-	{"HAWKBIT_DOWNLOAD", 5},
+	{ "HAWKBIT_PROBE", 0 },	 { "HAWKBIT_CONFIG_DEVICE", 1 },
+	{ "HAWKBIT_CLOSE", 2 },	 { "HAWKBIT_PROBE_DEPLOYMENT_BASE", 3 },
+	{ "HAWKBIT_REPORT", 4 }, { "HAWKBIT_DOWNLOAD", 5 },
 };
 
 #endif /* __HAWKBIT_PRIV_H__ */

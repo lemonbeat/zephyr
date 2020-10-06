@@ -47,7 +47,7 @@ static void turn_off_clock(const struct device *dev,
 	} while (err >= 0);
 
 	while (clock_control_get_status(dev, subsys) !=
-		CLOCK_CONTROL_STATUS_OFF) {
+	       CLOCK_CONTROL_STATUS_OFF) {
 	}
 }
 
@@ -58,7 +58,7 @@ static void turn_off_clock(const struct device *dev,
  * skips occurs.
  */
 static void test_calibration(uint32_t exp_cal, uint32_t exp_skip,
-				uint32_t sleep_ms, uint32_t line)
+			     uint32_t sleep_ms, uint32_t line)
 {
 	int cal_cnt;
 	int skip_cnt;
@@ -72,11 +72,11 @@ static void test_calibration(uint32_t exp_cal, uint32_t exp_skip,
 	skip_cnt = z_nrf_clock_calibration_skips_count() - skip_cnt;
 
 	zassert_equal(cal_cnt, exp_cal,
-			"%d: Unexpected number of calibrations (%d, exp:%d)",
-			line, cal_cnt, exp_cal);
+		      "%d: Unexpected number of calibrations (%d, exp:%d)",
+		      line, cal_cnt, exp_cal);
 	zassert_equal(skip_cnt, exp_skip,
-			"%d: Unexpected number of skips (%d, exp:%d)",
-			line, skip_cnt, exp_skip);
+		      "%d: Unexpected number of skips (%d, exp:%d)", line,
+		      skip_cnt, exp_skip);
 }
 
 /* Function pends until calibration counter is performed. When function leaves,
@@ -97,8 +97,9 @@ static void sync_just_after_calibration(void)
  */
 static void test_basic_clock_calibration(void)
 {
-	int wait_ms = CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_PERIOD *
-		(CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP + 1) +
+	int wait_ms =
+		CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_PERIOD *
+			(CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP + 1) +
 		CALIBRATION_PROCESS_TIME_MS;
 	struct sensor_value value = { .val1 = 0, .val2 = 0 };
 
@@ -124,8 +125,7 @@ static void test_calibration_after_enabling_lfclk(void)
 
 	turn_on_clock(clk_dev, CLOCK_CONTROL_NRF_SUBSYS_LF);
 
-	TEST_CALIBRATION(1, 0,
-			 CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_PERIOD);
+	TEST_CALIBRATION(1, 0, CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_PERIOD);
 }
 
 /* Test checks if temperature change triggers calibration. */
@@ -137,15 +137,16 @@ static void test_temp_change_triggers_calibration(void)
 	sync_just_after_calibration();
 
 	/* change temperature by 0.25'C which should not trigger calibration */
-	value.val2 += ((CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_TEMP_DIFF - 1) *
-			250000);
+	value.val2 +=
+		((CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_TEMP_DIFF - 1) * 250000);
 	mock_temp_nrf5_value_set(&value);
 
 	/* expected one skip */
-	TEST_CALIBRATION(0, CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP,
-				CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP *
+	TEST_CALIBRATION(
+		0, CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP,
+		CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP *
 				CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_PERIOD +
-				CALIBRATION_PROCESS_TIME_MS);
+			CALIBRATION_PROCESS_TIME_MS);
 
 	TEST_CALIBRATION(1, 0,
 			 CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_PERIOD + 40);
@@ -168,24 +169,23 @@ static void test_force_calibration(void)
 	z_nrf_clock_calibration_force_start();
 
 	/*expect immediate calibration */
-	TEST_CALIBRATION(1, 0,
-		CALIBRATION_PROCESS_TIME_MS + 5);
+	TEST_CALIBRATION(1, 0, CALIBRATION_PROCESS_TIME_MS + 5);
 
 	/* and back to scheduled operation. */
-	TEST_CALIBRATION(1, CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP,
+	TEST_CALIBRATION(
+		1, CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP,
 		CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_PERIOD *
-		(CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP + 1) +
-		CALIBRATION_PROCESS_TIME_MS);
-
+				(CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_MAX_SKIP +
+				 1) +
+			CALIBRATION_PROCESS_TIME_MS);
 }
 
 void test_main(void)
 {
 	ztest_test_suite(test_nrf_clock_calibration,
-		ztest_unit_test(test_basic_clock_calibration),
-		ztest_unit_test(test_calibration_after_enabling_lfclk),
-		ztest_unit_test(test_temp_change_triggers_calibration),
-		ztest_unit_test(test_force_calibration)
-			 );
+			 ztest_unit_test(test_basic_clock_calibration),
+			 ztest_unit_test(test_calibration_after_enabling_lfclk),
+			 ztest_unit_test(test_temp_change_triggers_calibration),
+			 ztest_unit_test(test_force_calibration));
 	ztest_run_test_suite(test_nrf_clock_calibration);
 }

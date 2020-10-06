@@ -22,7 +22,7 @@
 #include <sys_clock.h>
 
 /* RTC registers. */
-#define RTC0 ((RtcMode0 *) DT_INST_REG_ADDR(0))
+#define RTC0 ((RtcMode0 *)DT_INST_REG_ADDR(0))
 
 #ifdef MCLK
 #define RTC_CLOCK_HW_CYCLES_PER_SEC SOC_ATMEL_SAM0_OSC32K_FREQ_HZ
@@ -31,8 +31,8 @@
 #endif
 
 /* Number of sys timer cycles per on tick. */
-#define CYCLES_PER_TICK (RTC_CLOCK_HW_CYCLES_PER_SEC \
-			 / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define CYCLES_PER_TICK \
+	(RTC_CLOCK_HW_CYCLES_PER_SEC / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 
 /* Maximum number of ticks. */
 #define MAX_TICKS (UINT32_MAX / CYCLES_PER_TICK - 2)
@@ -185,8 +185,8 @@ int z_clock_driver_init(const struct device *device)
 #else
 	/* Set up bus clock and GCLK generator. */
 	PM->APBAMASK.reg |= PM_APBAMASK_RTC;
-	GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID(RTC_GCLK_ID) | GCLK_CLKCTRL_CLKEN
-			    | GCLK_GEN(DT_INST_PROP(0, clock_generator));
+	GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID(RTC_GCLK_ID) | GCLK_CLKCTRL_CLKEN |
+			    GCLK_GEN(DT_INST_PROP(0, clock_generator));
 
 	/* Synchronize GCLK. */
 	while (GCLK->STATUS.bit.SYNCBUSY) {
@@ -245,8 +245,7 @@ int z_clock_driver_init(const struct device *device)
 
 	/* Enable RTC interrupt. */
 	NVIC_ClearPendingIRQ(DT_INST_IRQN(0));
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority), rtc_isr, 0, 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), rtc_isr, 0, 0);
 	irq_enable(DT_INST_IRQN(0));
 
 	return 0;
@@ -259,15 +258,15 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 #ifdef CONFIG_TICKLESS_KERNEL
 
 	ticks = (ticks == K_TICKS_FOREVER) ? MAX_TICKS : ticks;
-	ticks = MAX(MIN(ticks - 1, (int32_t) MAX_TICKS), 0);
+	ticks = MAX(MIN(ticks - 1, (int32_t)MAX_TICKS), 0);
 
 	/* Compute number of RTC cycles until the next timeout. */
 	uint32_t count = rtc_count();
 	uint32_t timeout = ticks * CYCLES_PER_TICK + count % CYCLES_PER_TICK;
 
 	/* Round to the nearest tick boundary. */
-	timeout = (timeout + CYCLES_PER_TICK - 1) / CYCLES_PER_TICK
-		  * CYCLES_PER_TICK;
+	timeout = (timeout + CYCLES_PER_TICK - 1) / CYCLES_PER_TICK *
+		  CYCLES_PER_TICK;
 
 	if (timeout < TICK_THRESHOLD) {
 		timeout += CYCLES_PER_TICK;

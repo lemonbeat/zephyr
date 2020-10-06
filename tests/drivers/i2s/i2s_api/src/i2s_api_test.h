@@ -33,9 +33,9 @@ extern struct k_mem_slab tx_0_mem_slab;
 extern struct k_mem_slab rx_1_mem_slab;
 extern struct k_mem_slab tx_1_mem_slab;
 
-#define SAMPLE_NO	32
-#define TIMEOUT		2000
-#define FRAME_CLK_FREQ	8000
+#define SAMPLE_NO 32
+#define TIMEOUT 2000
+#define FRAME_CLK_FREQ 8000
 
 extern int16_t data_l[SAMPLE_NO];
 extern int16_t data_r[SAMPLE_NO];

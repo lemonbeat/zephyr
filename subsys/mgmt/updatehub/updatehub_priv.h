@@ -135,84 +135,68 @@ struct probe {
 };
 
 static const struct json_obj_descr recv_probe_objects_descr[] = {
-	JSON_OBJ_DESCR_PRIM(struct resp_probe_objects,
-			    mode, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct resp_probe_objects,
-			    sha256sum, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct resp_probe_objects,
-			    size, JSON_TOK_NUMBER),
+	JSON_OBJ_DESCR_PRIM(struct resp_probe_objects, mode, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct resp_probe_objects, sha256sum,
+			    JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct resp_probe_objects, size, JSON_TOK_NUMBER),
 };
 
 static const struct json_obj_descr recv_probe_objects_descr_array[] = {
-	JSON_OBJ_DESCR_OBJECT(struct resp_probe_objects_array,
-			      objects, recv_probe_objects_descr),
+	JSON_OBJ_DESCR_OBJECT(struct resp_probe_objects_array, objects,
+			      recv_probe_objects_descr),
 };
 
 static const struct json_obj_descr recv_probe_sh_string_descr[] = {
-	JSON_OBJ_DESCR_PRIM(struct resp_probe_any_boards,
-			    product, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct resp_probe_any_boards, product,
+			    JSON_TOK_STRING),
 	JSON_OBJ_DESCR_PRIM_NAMED(struct resp_probe_any_boards,
 				  "supported-hardware", supported_hardware,
 				  JSON_TOK_STRING),
-	JSON_OBJ_DESCR_ARRAY_ARRAY(struct resp_probe_any_boards,
-				   objects, 2, objects_len,
-				   recv_probe_objects_descr_array,
+	JSON_OBJ_DESCR_ARRAY_ARRAY(struct resp_probe_any_boards, objects, 2,
+				   objects_len, recv_probe_objects_descr_array,
 				   ARRAY_SIZE(recv_probe_objects_descr_array)),
 };
 
 static const struct json_obj_descr recv_probe_sh_array_descr[] = {
-	JSON_OBJ_DESCR_PRIM(struct resp_probe_some_boards,
-			    product, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct resp_probe_some_boards, product,
+			    JSON_TOK_STRING),
 	JSON_OBJ_DESCR_ARRAY_NAMED(struct resp_probe_some_boards,
 				   "supported-hardware", supported_hardware,
 				   CONFIG_UPDATEHUB_SUPPORTED_HARDWARE_MAX,
 				   supported_hardware_len, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_ARRAY_ARRAY(struct resp_probe_some_boards,
-				   objects, 2, objects_len,
-				   recv_probe_objects_descr_array,
+	JSON_OBJ_DESCR_ARRAY_ARRAY(struct resp_probe_some_boards, objects, 2,
+				   objects_len, recv_probe_objects_descr_array,
 				   ARRAY_SIZE(recv_probe_objects_descr_array)),
 };
 
 static const struct json_obj_descr device_identity_descr[] = {
-	JSON_OBJ_DESCR_PRIM(struct updatehub_config_device_identity,
-			    id, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct updatehub_config_device_identity, id,
+			    JSON_TOK_STRING),
 };
 
 static const struct json_obj_descr send_report_descr[] = {
-	JSON_OBJ_DESCR_PRIM_NAMED(struct report,
-				  "product-uid", product_uid,
+	JSON_OBJ_DESCR_PRIM_NAMED(struct report, "product-uid", product_uid,
 				  JSON_TOK_STRING),
-	JSON_OBJ_DESCR_OBJECT_NAMED(struct report,
-				    "device-identity", device_identity,
-				    device_identity_descr),
-	JSON_OBJ_DESCR_PRIM_NAMED(struct report,
-				  "error-message", error_message,
+	JSON_OBJ_DESCR_OBJECT_NAMED(struct report, "device-identity",
+				    device_identity, device_identity_descr),
+	JSON_OBJ_DESCR_PRIM_NAMED(struct report, "error-message", error_message,
 				  JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM_NAMED(struct report,
-				  "previous-state", previous_state,
+	JSON_OBJ_DESCR_PRIM_NAMED(struct report, "previous-state",
+				  previous_state, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct report, version, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct report, hardware, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM_NAMED(struct report, "package-uid", package_uid,
 				  JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct report,
-			    version, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct report,
-			    hardware, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM_NAMED(struct report,
-				  "package-uid", package_uid,
-				  JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct report,
-			    status, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct report, status, JSON_TOK_STRING),
 };
 
 static const struct json_obj_descr send_probe_descr[] = {
-	JSON_OBJ_DESCR_PRIM_NAMED(struct probe,
-				  "product-uid", product_uid,
+	JSON_OBJ_DESCR_PRIM_NAMED(struct probe, "product-uid", product_uid,
 				  JSON_TOK_STRING),
-	JSON_OBJ_DESCR_OBJECT_NAMED(struct probe,
-				    "device-identity", device_identity,
-				    device_identity_descr),
-	JSON_OBJ_DESCR_PRIM(struct probe,
-			    version, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct probe,
-			    hardware, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_OBJECT_NAMED(struct probe, "device-identity",
+				    device_identity, device_identity_descr),
+	JSON_OBJ_DESCR_PRIM(struct probe, version, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct probe, hardware, JSON_TOK_STRING),
 };
 
 /**

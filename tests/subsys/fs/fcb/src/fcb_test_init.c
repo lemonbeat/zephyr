@@ -30,5 +30,5 @@ void test_fcb_init(void)
 
 	fcb->f_magic = 0U;
 	rc = fcb_init(TEST_FCB_FLASH_AREA_ID, fcb);
-	zassert_true(rc == 0,  "fcb_init call failure");
+	zassert_true(rc == 0, "fcb_init call failure");
 }

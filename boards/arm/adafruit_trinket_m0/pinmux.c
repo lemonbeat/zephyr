@@ -10,7 +10,8 @@
 
 static int board_pinmux_init(const struct device *dev)
 {
-	const struct device *muxa = device_get_binding(DT_LABEL(DT_NODELABEL(pinmux_a)));
+	const struct device *muxa =
+		device_get_binding(DT_LABEL(DT_NODELABEL(pinmux_a)));
 
 	ARG_UNUSED(dev);
 

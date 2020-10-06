@@ -30,8 +30,7 @@ static ZTEST_DMEM struct in_addr addr_v4 = { { { 192, 0, 2, 3 } } };
 #define DBG(fmt, ...)
 #endif
 
-static const uint8_t mac_addr_init[6] = { 0x01, 0x02, 0x03,
-				       0x04,  0x05,  0x06 };
+static const uint8_t mac_addr_init[6] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 
 struct eth_fake_context {
 	struct net_if *iface;
@@ -58,15 +57,13 @@ static void eth_fake_iface_init(struct net_if *iface)
 
 	ctx->iface = iface;
 
-	net_if_set_link_addr(iface, ctx->mac_address,
-			     sizeof(ctx->mac_address),
+	net_if_set_link_addr(iface, ctx->mac_address, sizeof(ctx->mac_address),
 			     NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 }
 
-static int eth_fake_send(const struct device *dev,
-			 struct net_pkt *pkt)
+static int eth_fake_send(const struct device *dev, struct net_pkt *pkt)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(pkt);
@@ -220,8 +217,8 @@ static int eth_fake_get_config(const struct device *dev,
 static enum ethernet_hw_caps eth_fake_get_capabilities(const struct device *dev)
 {
 	return ETHERNET_AUTO_NEGOTIATION_SET | ETHERNET_LINK_10BASE_T |
-		ETHERNET_LINK_100BASE_T | ETHERNET_DUPLEX_SET | ETHERNET_QAV |
-		ETHERNET_PROMISC_MODE | ETHERNET_PRIORITY_QUEUES;
+	       ETHERNET_LINK_100BASE_T | ETHERNET_DUPLEX_SET | ETHERNET_QAV |
+	       ETHERNET_PROMISC_MODE | ETHERNET_PRIORITY_QUEUES;
 }
 
 static struct ethernet_api eth_fake_api_funcs = {
@@ -325,9 +322,8 @@ static void trigger_events(void)
 	}
 }
 
-K_THREAD_DEFINE(trigger_events_thread_id, STACK_SIZE,
-		trigger_events, NULL, NULL, NULL,
-		THREAD_PRIORITY, 0, -1);
+K_THREAD_DEFINE(trigger_events_thread_id, STACK_SIZE, trigger_events, NULL,
+		NULL, NULL, THREAD_PRIORITY, 0, -1);
 
 static char *get_ip_addr(char *ipaddr, size_t len, sa_family_t family,
 			 struct net_mgmt_msghdr *hdr)
@@ -366,8 +362,7 @@ static void test_net_mgmt_setup(void)
 	sockaddr.nm_ifindex = net_if_get_by_iface(net_if_get_default());
 	sockaddr.nm_pid = (uintptr_t)k_current_get();
 	sockaddr.nm_mask = NET_EVENT_IPV6_DAD_SUCCEED |
-			   NET_EVENT_IPV6_ADDR_ADD |
-			   NET_EVENT_IPV6_ADDR_DEL;
+			   NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
 
 	ret = bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 	zassert_false(ret < 0, "Cannot bind net_mgmt socket (%d)", errno);
@@ -391,8 +386,7 @@ static void test_net_mgmt_catch_events(void)
 		event_addr_len = sizeof(event_addr);
 
 		ret = recvfrom(fd, buf, sizeof(buf), 0,
-			       (struct sockaddr *)&event_addr,
-			       &event_addr_len);
+			       (struct sockaddr *)&event_addr, &event_addr_len);
 		if (ret < 0) {
 			continue;
 		}
@@ -408,22 +402,20 @@ static void test_net_mgmt_catch_events(void)
 		case NET_EVENT_IPV6_ADDR_ADD:
 			DBG("IPv6 address added to interface %d (%s)\n",
 			    event_addr.nm_ifindex,
-			    get_ip_addr(ipaddr, sizeof(ipaddr),
-					AF_INET6, hdr));
+			    get_ip_addr(ipaddr, sizeof(ipaddr), AF_INET6, hdr));
 			zassert_equal(strncmp(ipaddr, "2001:db8::3",
-					      sizeof(ipaddr) - 1), 0,
-				      "Invalid IPv6 address %s added",
+					      sizeof(ipaddr) - 1),
+				      0, "Invalid IPv6 address %s added",
 				      ipaddr);
 			event_count--;
 			break;
 		case NET_EVENT_IPV6_ADDR_DEL:
 			DBG("IPv6 address removed from interface %d (%s)\n",
 			    event_addr.nm_ifindex,
-			    get_ip_addr(ipaddr, sizeof(ipaddr),
-					AF_INET6, hdr));
+			    get_ip_addr(ipaddr, sizeof(ipaddr), AF_INET6, hdr));
 			zassert_equal(strncmp(ipaddr, "2001:db8::3",
-					      sizeof(ipaddr) - 1), 0,
-				      "Invalid IPv6 address %s removed",
+					      sizeof(ipaddr) - 1),
+				      0, "Invalid IPv6 address %s removed",
 				      ipaddr);
 			event_count--;
 			break;
@@ -458,8 +450,8 @@ static void test_ethernet_set_qav(void)
 	params.qav_param.enabled = true;
 
 	ret = setsockopt(fd, SOL_NET_MGMT_RAW,
-			 NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-			 &params, sizeof(params));
+			 NET_REQUEST_ETHERNET_SET_QAV_PARAM, &params,
+			 sizeof(params));
 	zassert_equal(ret, 0, "Cannot set Qav parameters");
 }
 
@@ -485,8 +477,7 @@ static void test_ethernet_get_qav(void)
 	params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_STATUS;
 
 	ret = getsockopt(fd, SOL_NET_MGMT_RAW,
-			 NET_REQUEST_ETHERNET_GET_QAV_PARAM,
-			 &params, &optlen);
+			 NET_REQUEST_ETHERNET_GET_QAV_PARAM, &params, &optlen);
 	zassert_equal(ret, 0, "Cannot get Qav parameters (%d)", ret);
 	zassert_equal(optlen, sizeof(params), "Invalid optlen (%d)", optlen);
 
@@ -512,8 +503,8 @@ static void test_ethernet_get_unknown_option(void)
 	memset(&params, 0, sizeof(params));
 
 	ret = getsockopt(fd, SOL_NET_MGMT_RAW,
-			 NET_REQUEST_ETHERNET_GET_PRIORITY_QUEUES_NUM,
-			 &params, &optlen);
+			 NET_REQUEST_ETHERNET_GET_PRIORITY_QUEUES_NUM, &params,
+			 &optlen);
 	zassert_equal(ret, -1, "Could get prio queue parameters (%d)", errno);
 	zassert_equal(errno, EINVAL, "prio queue get parameters");
 }
@@ -537,8 +528,7 @@ static void test_ethernet_set_unknown_option(void)
 	memset(&params, 0, sizeof(params));
 
 	ret = setsockopt(fd, SOL_NET_MGMT_RAW,
-			 NET_REQUEST_ETHERNET_SET_MAC_ADDRESS,
-			 &params, optlen);
+			 NET_REQUEST_ETHERNET_SET_MAC_ADDRESS, &params, optlen);
 	zassert_equal(ret, -1, "Could set promisc_mode parameters (%d)", errno);
 	zassert_equal(errno, EINVAL, "promisc_mode set parameters");
 }
@@ -557,21 +547,19 @@ void test_main(void)
 {
 	k_thread_system_pool_assign(k_current_get());
 
-	ztest_test_suite(socket_net_mgmt,
-			 ztest_unit_test(test_net_mgmt_setup),
-			 ztest_unit_test(test_net_mgmt_catch_kernel),
-			 ztest_user_unit_test(test_net_mgmt_catch_user),
-			 ztest_unit_test(test_net_mgmt_cleanup),
-			 ztest_unit_test(test_ethernet_set_qav_kernel),
-			 ztest_user_unit_test(test_ethernet_set_qav_user),
-			 ztest_unit_test(test_ethernet_get_qav_kernel),
-			 ztest_user_unit_test(test_ethernet_get_qav_user),
-			 ztest_unit_test(test_ethernet_get_unknown_opt_kernel),
-			 ztest_user_unit_test(
-				 test_ethernet_get_unknown_opt_user),
-			 ztest_unit_test(test_ethernet_set_unknown_opt_kernel),
-			 ztest_user_unit_test(
-				 test_ethernet_set_unknown_opt_user));
+	ztest_test_suite(
+		socket_net_mgmt, ztest_unit_test(test_net_mgmt_setup),
+		ztest_unit_test(test_net_mgmt_catch_kernel),
+		ztest_user_unit_test(test_net_mgmt_catch_user),
+		ztest_unit_test(test_net_mgmt_cleanup),
+		ztest_unit_test(test_ethernet_set_qav_kernel),
+		ztest_user_unit_test(test_ethernet_set_qav_user),
+		ztest_unit_test(test_ethernet_get_qav_kernel),
+		ztest_user_unit_test(test_ethernet_get_qav_user),
+		ztest_unit_test(test_ethernet_get_unknown_opt_kernel),
+		ztest_user_unit_test(test_ethernet_get_unknown_opt_user),
+		ztest_unit_test(test_ethernet_set_unknown_opt_kernel),
+		ztest_user_unit_test(test_ethernet_set_unknown_opt_user));
 
 	ztest_run_test_suite(socket_net_mgmt);
 }

@@ -45,13 +45,14 @@ static void indicate_cb(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 }
 
 /* Heart Rate Service Declaration */
-BT_GATT_SERVICE_DEFINE(hts_svc,
-	BT_GATT_PRIMARY_SERVICE(BT_UUID_HTS),
-	BT_GATT_CHARACTERISTIC(BT_UUID_HTS_MEASUREMENT, BT_GATT_CHRC_INDICATE,
-			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
-	BT_GATT_CCC(htmc_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-	/* more optional Characteristics */
+BT_GATT_SERVICE_DEFINE(hts_svc, BT_GATT_PRIMARY_SERVICE(BT_UUID_HTS),
+		       BT_GATT_CHARACTERISTIC(BT_UUID_HTS_MEASUREMENT,
+					      BT_GATT_CHRC_INDICATE,
+					      BT_GATT_PERM_NONE, NULL, NULL,
+					      NULL),
+		       BT_GATT_CCC(htmc_ccc_cfg_changed,
+				   BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+		       /* more optional Characteristics */
 );
 
 void hts_init(void)
@@ -63,8 +64,7 @@ void hts_init(void)
 		return;
 	}
 
-	printk("temp device is %p, name is %s\n", temp_dev,
-	       temp_dev->name);
+	printk("temp device is %p, name is %s\n", temp_dev, temp_dev->name);
 }
 
 void hts_indicate(void)
@@ -105,7 +105,7 @@ void hts_indicate(void)
 
 		temperature = sensor_value_to_double(&temp_value);
 
-gatt_indicate:
+	gatt_indicate:
 		printf("temperature is %gC\n", temperature);
 
 		mantissa = (uint32_t)(temperature * 100);

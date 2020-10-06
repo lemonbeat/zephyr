@@ -125,8 +125,7 @@ static void broker_init(void)
 	broker4->sin_port = htons(SERVER_PORT);
 
 #if defined(CONFIG_DNS_RESOLVER)
-	net_ipaddr_copy(&broker4->sin_addr,
-			&net_sin(haddr->ai_addr)->sin_addr);
+	net_ipaddr_copy(&broker4->sin_addr, &net_sin(haddr->ai_addr)->sin_addr);
 #else
 	zsock_inet_pton(AF_INET, SERVER_ADDR, &broker4->sin_addr);
 #endif
@@ -189,8 +188,8 @@ static void client_init(struct mqtt_client *client)
 #if defined(CONFIG_SOCKS)
 	mqtt_client_set_proxy(client, &socks5_proxy,
 			      socks5_proxy.sa_family == AF_INET ?
-			      sizeof(struct sockaddr_in) :
-			      sizeof(struct sockaddr_in6));
+					    sizeof(struct sockaddr_in) :
+					    sizeof(struct sockaddr_in6));
 #endif
 }
 
@@ -245,10 +244,10 @@ static void mqtt_event_handler(struct mqtt_client *const client,
 			evt->param.publish.message.topic.qos);
 
 		while (len) {
-			bytes_read = mqtt_read_publish_payload(&client_ctx,
-					data,
-					len >= sizeof(data) - 1 ?
-					sizeof(data) - 1 : len);
+			bytes_read = mqtt_read_publish_payload(
+				&client_ctx, data,
+				len >= sizeof(data) - 1 ? sizeof(data) - 1 :
+								len);
 			if (bytes_read < 0 && bytes_read != -EAGAIN) {
 				LOG_ERR("failure to read payload");
 				break;
@@ -398,12 +397,12 @@ static int get_mqtt_broker_addrinfo(void)
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = 0;
 
-		rc = zsock_getaddrinfo(CONFIG_SAMPLE_CLOUD_AZURE_HOSTNAME, "8883",
-				       &hints, &haddr);
+		rc = zsock_getaddrinfo(CONFIG_SAMPLE_CLOUD_AZURE_HOSTNAME,
+				       "8883", &hints, &haddr);
 		if (rc == 0) {
 			LOG_INF("DNS resolved for %s:%d",
-			CONFIG_SAMPLE_CLOUD_AZURE_HOSTNAME,
-			CONFIG_SAMPLE_CLOUD_AZURE_SERVER_PORT);
+				CONFIG_SAMPLE_CLOUD_AZURE_HOSTNAME,
+				CONFIG_SAMPLE_CLOUD_AZURE_SERVER_PORT);
 
 			return 0;
 		}

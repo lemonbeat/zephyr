@@ -26,8 +26,7 @@ static inline void sys_set_mask(mem_addr_t addr, uint32_t mask, uint32_t value)
 	sys_write32(temp, addr);
 }
 
-int spi_config(const struct device *dev, uint32_t frequency,
-	       uint16_t operation)
+int spi_config(const struct device *dev, uint32_t frequency, uint16_t operation)
 {
 	uint32_t div;
 	uint32_t fmt_len;
@@ -80,9 +79,8 @@ int spi_config(const struct device *dev, uint32_t frequency,
 		return -ENOTSUP;
 	}
 	/* Set single line operation */
-	sys_set_mask(SPI_REG(dev, REG_FMT),
-		SF_FMT_PROTO_MASK,
-		SF_FMT_PROTO_SINGLE);
+	sys_set_mask(SPI_REG(dev, REG_FMT), SF_FMT_PROTO_MASK,
+		     SF_FMT_PROTO_SINGLE);
 
 	/* Set the endianness */
 	if (operation & SPI_TRANSFER_LSB) {
@@ -99,7 +97,7 @@ void spi_sifive_send(const struct device *dev, uint16_t frame)
 	while (sys_read32(SPI_REG(dev, REG_TXDATA)) & SF_TXDATA_FULL) {
 	}
 
-	sys_write32((uint32_t) frame, SPI_REG(dev, REG_TXDATA));
+	sys_write32((uint32_t)frame, SPI_REG(dev, REG_TXDATA));
 }
 
 uint16_t spi_sifive_recv(const struct device *dev)
@@ -109,7 +107,7 @@ uint16_t spi_sifive_recv(const struct device *dev)
 	while ((val = sys_read32(SPI_REG(dev, REG_RXDATA))) & SF_RXDATA_EMPTY) {
 	}
 
-	return (uint16_t) val;
+	return (uint16_t)val;
 }
 
 void spi_sifive_xfer(const struct device *dev, const bool hw_cs_control)
@@ -119,10 +117,9 @@ void spi_sifive_xfer(const struct device *dev, const bool hw_cs_control)
 	uint32_t send_len = spi_context_longest_current_buf(ctx);
 
 	for (uint32_t i = 0; i < send_len; i++) {
-
 		/* Send a frame */
 		if (i < ctx->tx_len) {
-			spi_sifive_send(dev, (uint16_t) (ctx->tx_buf)[i]);
+			spi_sifive_send(dev, (uint16_t)(ctx->tx_buf)[i]);
 		} else {
 			/* Send dummy bytes */
 			spi_sifive_send(dev, 0);
@@ -130,7 +127,7 @@ void spi_sifive_xfer(const struct device *dev, const bool hw_cs_control)
 
 		/* Receive a frame */
 		if (i < ctx->rx_len) {
-			ctx->rx_buf[i] = (uint8_t) spi_sifive_recv(dev);
+			ctx->rx_buf[i] = (uint8_t)spi_sifive_recv(dev);
 		} else {
 			/* Discard returned value */
 			spi_sifive_recv(dev);
@@ -239,23 +236,19 @@ static struct spi_driver_api spi_sifive_api = {
 	.release = spi_sifive_release,
 };
 
-#define SPI_INIT(n)	\
-	static struct spi_sifive_data spi_sifive_data_##n = { \
-		SPI_CONTEXT_INIT_LOCK(spi_sifive_data_##n, ctx), \
-		SPI_CONTEXT_INIT_SYNC(spi_sifive_data_##n, ctx), \
-	}; \
-	static struct spi_sifive_cfg spi_sifive_cfg_##n = { \
-		.base = DT_INST_REG_ADDR_BY_NAME(n, control), \
-		.f_sys = DT_INST_PROP(n, clock_frequency), \
-	}; \
-	DEVICE_AND_API_INIT(spi_##n, \
-			DT_INST_LABEL(n), \
-			spi_sifive_init, \
-			&spi_sifive_data_##n, \
-			&spi_sifive_cfg_##n, \
-			POST_KERNEL, \
-			CONFIG_SPI_INIT_PRIORITY, \
-			&spi_sifive_api)
+#define SPI_INIT(n)                                                     \
+	static struct spi_sifive_data spi_sifive_data_##n = {           \
+		SPI_CONTEXT_INIT_LOCK(spi_sifive_data_##n, ctx),        \
+		SPI_CONTEXT_INIT_SYNC(spi_sifive_data_##n, ctx),        \
+	};                                                              \
+	static struct spi_sifive_cfg spi_sifive_cfg_##n = {             \
+		.base = DT_INST_REG_ADDR_BY_NAME(n, control),           \
+		.f_sys = DT_INST_PROP(n, clock_frequency),              \
+	};                                                              \
+	DEVICE_AND_API_INIT(spi_##n, DT_INST_LABEL(n), spi_sifive_init, \
+			    &spi_sifive_data_##n, &spi_sifive_cfg_##n,  \
+			    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,      \
+			    &spi_sifive_api)
 
 #ifndef CONFIG_SIFIVE_SPI_0_ROM
 #if DT_INST_NODE_HAS_PROP(0, label)

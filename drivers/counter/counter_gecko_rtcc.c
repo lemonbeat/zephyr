@@ -19,8 +19,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(counter_gecko, CONFIG_COUNTER_LOG_LEVEL);
 
-#define RTCC_MAX_VALUE       (_RTCC_CNT_MASK)
-#define RTCC_ALARM_NUM        2
+#define RTCC_MAX_VALUE (_RTCC_CNT_MASK)
+#define RTCC_ALARM_NUM 2
 
 struct counter_gecko_config {
 	struct counter_config_info info;
@@ -40,13 +40,11 @@ struct counter_gecko_data {
 };
 
 #define DEV_NAME(dev) ((dev)->name)
-#define DEV_CFG(dev) \
-	((const struct counter_gecko_config * const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct counter_gecko_data *const)(dev)->data)
+#define DEV_CFG(dev) ((const struct counter_gecko_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct counter_gecko_data *const)(dev)->data)
 
 #ifdef CONFIG_SOC_GECKO_HAS_ERRATA_RTCC_E201
-#define ERRATA_RTCC_E201_MESSAGE \
+#define ERRATA_RTCC_E201_MESSAGE                                             \
 	"Errata RTCC_E201: In case RTCC prescaler != 1 the module does not " \
 	"reset the counter value on CCV1 compare."
 #endif
@@ -132,8 +130,7 @@ static int counter_gecko_set_top_value(const struct device *dev,
 
 	LOG_DBG("set top value: %u", ticks);
 
-	if ((flags & COUNTER_TOP_CFG_DONT_RESET) &&
-		RTCC_CounterGet() > ticks) {
+	if ((flags & COUNTER_TOP_CFG_DONT_RESET) && RTCC_CounterGet() > ticks) {
 		err = -ETIME;
 		if (flags & COUNTER_TOP_CFG_RESET_WHEN_LATE) {
 			RTCC_CounterSet(0);
@@ -204,8 +201,7 @@ static int counter_gecko_set_alarm(const struct device *dev, uint8_t chan_id,
 	return 0;
 }
 
-static int counter_gecko_cancel_alarm(const struct device *dev,
-				      uint8_t chan_id)
+static int counter_gecko_cancel_alarm(const struct device *dev, uint8_t chan_id)
 {
 	struct counter_gecko_data *const dev_data = DEV_DATA(dev);
 
@@ -237,43 +233,43 @@ static int counter_gecko_init(const struct device *dev)
 	const struct counter_gecko_config *const dev_cfg = DEV_CFG(dev);
 
 	RTCC_Init_TypeDef rtcc_config = {
-		false,                /* Don't start counting */
-		false,                /* Disable RTC during debug halt. */
-		false,                /* Don't wrap prescaler on CCV0 */
-		true,                 /* Counter wrap on CCV1 */
+		false, /* Don't start counting */
+		false, /* Disable RTC during debug halt. */
+		false, /* Don't wrap prescaler on CCV0 */
+		true, /* Counter wrap on CCV1 */
 #if defined(_SILICON_LABS_32B_SERIES_2)
 		(RTCC_CntPresc_TypeDef)(31UL - __CLZ(dev_cfg->prescaler)),
 #else
 		(RTCC_CntPresc_TypeDef)CMU_DivToLog2(dev_cfg->prescaler),
 #endif
-		rtccCntTickPresc,     /* Count according to prescaler value */
+		rtccCntTickPresc, /* Count according to prescaler value */
 #if defined(_RTCC_CTRL_BUMODETSEN_MASK)
-		false,                /* Don't store RTCC counter value in
+		false, /* Don't store RTCC counter value in
 				       * RTCC_CCV2 upon backup mode entry.
 				       */
 #endif
 #if defined(_RTCC_CTRL_OSCFDETEN_MASK)
-		false,                /* Don't enable LFXO fail detection */
+		false, /* Don't enable LFXO fail detection */
 #endif
-#if defined (_RTCC_CTRL_CNTMODE_MASK)
-		rtccCntModeNormal,    /* Use RTCC in normal mode */
+#if defined(_RTCC_CTRL_CNTMODE_MASK)
+		rtccCntModeNormal, /* Use RTCC in normal mode */
 #endif
-#if defined (_RTCC_CTRL_LYEARCORRDIS_MASK)
-		false                 /* No leap year correction. */
+#if defined(_RTCC_CTRL_LYEARCORRDIS_MASK)
+		false /* No leap year correction. */
 #endif
 	};
 
 	RTCC_CCChConf_TypeDef rtcc_channel_config = {
-		rtccCapComChModeCompare,    /* Use compare mode */
-		rtccCompMatchOutActionPulse,/* Don't care */
-		rtccPRSCh0,                 /* PRS is not used */
-		rtccInEdgeNone,             /* Capture input is not used */
-		rtccCompBaseCnt,            /* Compare with base CNT register */
-#if defined (_RTCC_CC_CTRL_COMPMASK_MASK)
-		0,                          /* Compare mask */
+		rtccCapComChModeCompare, /* Use compare mode */
+		rtccCompMatchOutActionPulse, /* Don't care */
+		rtccPRSCh0, /* PRS is not used */
+		rtccInEdgeNone, /* Capture input is not used */
+		rtccCompBaseCnt, /* Compare with base CNT register */
+#if defined(_RTCC_CC_CTRL_COMPMASK_MASK)
+		0, /* Compare mask */
 #endif
-#if defined (_RTCC_CC_CTRL_DAYCC_MASK)
-		rtccDayCompareModeMonth,    /* Don't care */
+#if defined(_RTCC_CC_CTRL_DAYCC_MASK)
+		rtccDayCompareModeMonth, /* Don't care */
 #endif
 	};
 
@@ -372,8 +368,7 @@ BUILD_ASSERT((DT_INST_PROP(0, prescaler) > 0U) &&
 
 static void counter_gecko_0_irq_config(void)
 {
-	IRQ_DIRECT_CONNECT(DT_INST_IRQN(0),
-			   DT_INST_IRQ(0, priority),
+	IRQ_DIRECT_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
 			   counter_gecko_isr_0, 0);
 	irq_enable(DT_INST_IRQN(0));
 }
@@ -392,7 +387,7 @@ static const struct counter_gecko_config counter_gecko_0_config = {
 
 static struct counter_gecko_data counter_gecko_0_data;
 
-DEVICE_AND_API_INIT(counter_gecko_0, DT_INST_LABEL(0),
-	counter_gecko_init, &counter_gecko_0_data, &counter_gecko_0_config,
-	PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-	&counter_gecko_driver_api);
+DEVICE_AND_API_INIT(counter_gecko_0, DT_INST_LABEL(0), counter_gecko_init,
+		    &counter_gecko_0_data, &counter_gecko_0_config,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &counter_gecko_driver_api);

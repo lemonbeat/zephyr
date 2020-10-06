@@ -53,8 +53,7 @@ void test_main(void)
 {
 	k_thread_system_pool_assign(k_current_get());
 
-	ztest_test_suite(socket_misc,
-			 ztest_user_unit_test(test_gethostname),
+	ztest_test_suite(socket_misc, ztest_user_unit_test(test_gethostname),
 			 ztest_user_unit_test(test_inet_pton));
 
 	ztest_run_test_suite(socket_misc);

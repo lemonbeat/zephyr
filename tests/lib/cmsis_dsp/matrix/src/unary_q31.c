@@ -13,17 +13,17 @@
 
 #include "unary_q31.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)100)
-#define ABS_ERROR_THRESH_Q31	((q31_t)2)
-#define ABS_ERROR_THRESH_Q63	((q63_t)(1 << 16))
+#define SNR_ERROR_THRESH ((float32_t)100)
+#define ABS_ERROR_THRESH_Q31 ((q31_t)2)
+#define ABS_ERROR_THRESH_Q63 ((q63_t)(1 << 16))
 
-#define NUM_MATRICES		(ARRAY_SIZE(in_dims) / 2)
-#define MAX_MATRIX_DIM		(40)
+#define NUM_MATRICES (ARRAY_SIZE(in_dims) / 2)
+#define MAX_MATRIX_DIM (40)
 
-#define OP2_ADD			(0)
-#define OP2_SUB			(1)
-#define OP1_SCALE		(0)
-#define OP1_TRANS		(1)
+#define OP2_ADD (0)
+#define OP2_SUB (1)
+#define OP1_SCALE (0)
+#define OP1_TRANS (1)
 
 static void test_op2(int op, const q31_t *ref, size_t length)
 {
@@ -81,13 +81,12 @@ static void test_op2(int op, const q31_t *ref, size_t length)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output, ref, ABS_ERROR_THRESH_Q31),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output, ref,
+					 ABS_ERROR_THRESH_Q31),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -95,10 +94,10 @@ static void test_op2(int op, const q31_t *ref, size_t length)
 	free(output);
 }
 
-DEFINE_TEST_VARIANT3(op2, arm_mat_add_q31, OP2_ADD,
-	ref_add, ARRAY_SIZE(ref_add));
-DEFINE_TEST_VARIANT3(op2, arm_mat_sub_q31, OP2_SUB,
-	ref_sub, ARRAY_SIZE(ref_sub));
+DEFINE_TEST_VARIANT3(op2, arm_mat_add_q31, OP2_ADD, ref_add,
+		     ARRAY_SIZE(ref_add));
+DEFINE_TEST_VARIANT3(op2, arm_mat_sub_q31, OP2_SUB, ref_sub,
+		     ARRAY_SIZE(ref_sub));
 
 static void test_op1(int op, const q31_t *ref, size_t length, bool transpose)
 {
@@ -152,32 +151,30 @@ static void test_op1(int op, const q31_t *ref, size_t length, bool transpose)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output, ref, ABS_ERROR_THRESH_Q31),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output, ref,
+					 ABS_ERROR_THRESH_Q31),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
 	free(output);
 }
 
-DEFINE_TEST_VARIANT4(op1, arm_mat_scale_q31, OP1_SCALE,
-	ref_scale, ARRAY_SIZE(ref_scale), false);
-DEFINE_TEST_VARIANT4(op1, arm_mat_trans_q31, OP1_TRANS,
-	ref_trans, ARRAY_SIZE(ref_trans), true);
+DEFINE_TEST_VARIANT4(op1, arm_mat_scale_q31, OP1_SCALE, ref_scale,
+		     ARRAY_SIZE(ref_scale), false);
+DEFINE_TEST_VARIANT4(op1, arm_mat_trans_q31, OP1_TRANS, ref_trans,
+		     ARRAY_SIZE(ref_trans), true);
 
 void test_matrix_unary_q31(void)
 {
 	ztest_test_suite(matrix_unary_q31,
-		ztest_unit_test(test_op2_arm_mat_add_q31),
-		ztest_unit_test(test_op2_arm_mat_sub_q31),
-		ztest_unit_test(test_op1_arm_mat_scale_q31),
-		ztest_unit_test(test_op1_arm_mat_trans_q31)
-		);
+			 ztest_unit_test(test_op2_arm_mat_add_q31),
+			 ztest_unit_test(test_op2_arm_mat_sub_q31),
+			 ztest_unit_test(test_op1_arm_mat_scale_q31),
+			 ztest_unit_test(test_op1_arm_mat_trans_q31));
 
 	ztest_run_test_suite(matrix_unary_q31);
 }

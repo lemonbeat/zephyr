@@ -31,8 +31,7 @@ static inline int lsm9ds0_mfd_reboot_memory(const struct device *dev)
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				LSM9DS0_MFD_REG_CTRL_REG0_XM,
 				LSM9DS0_MFD_MASK_CTRL_REG0_XM_BOOT,
-				1 << LSM9DS0_MFD_SHIFT_CTRL_REG0_XM_BOOT)
-				< 0) {
+				1 << LSM9DS0_MFD_SHIFT_CTRL_REG0_XM_BOOT) < 0) {
 		return -EIO;
 	}
 
@@ -58,17 +57,10 @@ static inline int lsm9ds0_mfd_accel_set_odr_raw(const struct device *dev,
 static const struct {
 	int freq_int;
 	int freq_micro;
-} lsm9ds0_mfd_accel_odr_map[] = { {0, 0},
-				  {3, 125000},
-				  {6, 250000},
-				  {12, 500000},
-				  {25, 0},
-				  {50, 0},
-				  {100, 0},
-				  {200, 0},
-				  {400, 0},
-				  {800, 0},
-				  {1600, 0} };
+} lsm9ds0_mfd_accel_odr_map[] = { { 0, 0 },	  { 3, 125000 }, { 6, 250000 },
+				  { 12, 500000 }, { 25, 0 },	 { 50, 0 },
+				  { 100, 0 },	  { 200, 0 },	 { 400, 0 },
+				  { 800, 0 },	  { 1600, 0 } };
 
 static int lsm9ds0_mfd_accel_set_odr(const struct device *dev,
 				     const struct sensor_value *val)
@@ -96,8 +88,7 @@ static inline int lsm9ds0_mfd_accel_set_fs_raw(const struct device *dev,
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				LSM9DS0_MFD_REG_CTRL_REG2_XM,
 				LSM9DS0_MFD_MASK_CTRL_REG2_XM_AFS,
-				fs << LSM9DS0_MFD_SHIFT_CTRL_REG2_XM_AFS)
-				< 0) {
+				fs << LSM9DS0_MFD_SHIFT_CTRL_REG2_XM_AFS) < 0) {
 		return -EIO;
 	}
 
@@ -111,11 +102,7 @@ static inline int lsm9ds0_mfd_accel_set_fs_raw(const struct device *dev,
 #if defined(CONFIG_LSM9DS0_MFD_ACCEL_FULL_SCALE_RUNTIME)
 static const struct {
 	int fs;
-} lsm9ds0_mfd_accel_fs_map[] = { {2},
-				 {4},
-				 {6},
-				 {8},
-				 {16} };
+} lsm9ds0_mfd_accel_fs_map[] = { { 2 }, { 4 }, { 6 }, { 8 }, { 16 } };
 
 static int lsm9ds0_mfd_accel_set_fs(const struct device *dev, int val)
 {
@@ -149,13 +136,9 @@ static inline int lsm9ds0_mfd_magn_set_odr_raw(const struct device *dev,
 static const struct {
 	int freq_int;
 	int freq_micro;
-} lsm9ds0_mfd_magn_odr_map[] = { {0, 0},
-				 {3, 125000},
-				 {6, 250000},
-				 {12, 500000},
-				 {25, 0},
-				 {50, 0},
-				 {100, 0} };
+} lsm9ds0_mfd_magn_odr_map[] = { { 0, 0 },	 { 3, 125000 }, { 6, 250000 },
+				 { 12, 500000 }, { 25, 0 },	{ 50, 0 },
+				 { 100, 0 } };
 
 static int lsm9ds0_mfd_magn_set_odr(const struct device *dev,
 				    const struct sensor_value *val)
@@ -183,8 +166,7 @@ static inline int lsm9ds0_mfd_magn_set_fs_raw(const struct device *dev,
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				LSM9DS0_MFD_REG_CTRL_REG6_XM,
 				LSM9DS0_MFD_MASK_CTRL_REG6_XM_MFS,
-				fs << LSM9DS0_MFD_SHIFT_CTRL_REG6_XM_MFS)
-				< 0) {
+				fs << LSM9DS0_MFD_SHIFT_CTRL_REG6_XM_MFS) < 0) {
 		return -EIO;
 	}
 
@@ -198,10 +180,7 @@ static inline int lsm9ds0_mfd_magn_set_fs_raw(const struct device *dev,
 #if defined(CONFIG_LSM9DS0_MFD_MAGN_FULL_SCALE_RUNTIME)
 static const struct {
 	int fs;
-} lsm9ds0_mfd_magn_fs_map[] = { {2},
-				{4},
-				{8},
-				{12} };
+} lsm9ds0_mfd_magn_fs_map[] = { { 2 }, { 4 }, { 8 }, { 12 } };
 
 static int lsm9ds0_mfd_magn_set_fs(const struct device *dev,
 				   const struct sensor_value *val)
@@ -235,8 +214,8 @@ static inline int lsm9ds0_mfd_sample_fetch_accel(const struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_accel_x = (int16_t)((uint16_t)(out_l) |
-			       ((uint16_t)(out_h) << 8));
+	data->sample_accel_x =
+		(int16_t)((uint16_t)(out_l) | ((uint16_t)(out_h) << 8));
 #endif
 
 #if defined(CONFIG_LSM9DS0_MFD_ACCEL_ENABLE_Y)
@@ -248,8 +227,8 @@ static inline int lsm9ds0_mfd_sample_fetch_accel(const struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_accel_y = (int16_t)((uint16_t)(out_l) |
-			       ((uint16_t)(out_h) << 8));
+	data->sample_accel_y =
+		(int16_t)((uint16_t)(out_l) | ((uint16_t)(out_h) << 8));
 #endif
 
 #if defined(CONFIG_LSM9DS0_MFD_ACCEL_ENABLE_Z)
@@ -261,8 +240,8 @@ static inline int lsm9ds0_mfd_sample_fetch_accel(const struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_accel_z = (int16_t)((uint16_t)(out_l) |
-			       ((uint16_t)(out_h) << 8));
+	data->sample_accel_z =
+		(int16_t)((uint16_t)(out_l) | ((uint16_t)(out_h) << 8));
 #endif
 
 #if defined(CONFIG_LSM9DS0_MFD_ACCEL_FULL_SCALE_RUNTIME)
@@ -288,8 +267,8 @@ static inline int lsm9ds0_mfd_sample_fetch_magn(const struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_magn_x = (int16_t)((uint16_t)(out_l) |
-			      ((uint16_t)(out_h) << 8));
+	data->sample_magn_x =
+		(int16_t)((uint16_t)(out_l) | ((uint16_t)(out_h) << 8));
 
 	if (i2c_reg_read_byte(data->i2c_master, config->i2c_slave_addr,
 			      LSM9DS0_MFD_REG_OUT_Y_L_M, &out_l) < 0 ||
@@ -299,8 +278,8 @@ static inline int lsm9ds0_mfd_sample_fetch_magn(const struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_magn_y = (int16_t)((uint16_t)(out_l) |
-			      ((uint16_t)(out_h) << 8));
+	data->sample_magn_y =
+		(int16_t)((uint16_t)(out_l) | ((uint16_t)(out_h) << 8));
 
 	if (i2c_reg_read_byte(data->i2c_master, config->i2c_slave_addr,
 			      LSM9DS0_MFD_REG_OUT_Z_L_M, &out_l) < 0 ||
@@ -310,8 +289,8 @@ static inline int lsm9ds0_mfd_sample_fetch_magn(const struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_magn_z = (int16_t)((uint16_t)(out_l) |
-			      ((uint16_t)(out_h) << 8));
+	data->sample_magn_z =
+		(int16_t)((uint16_t)(out_l) | ((uint16_t)(out_h) << 8));
 
 #if defined(CONFIG_LSM9DS0_MFD_MAGN_FULL_SCALE_RUNTIME)
 	data->sample_magn_fs = data->magn_fs;
@@ -336,8 +315,8 @@ static inline int lsm9ds0_mfd_sample_fetch_temp(const struct device *dev)
 		return -EIO;
 	}
 
-	data->sample_temp = (int16_t)((uint16_t)(out_l) |
-			    ((uint16_t)(out_h) << 8));
+	data->sample_temp =
+		(int16_t)((uint16_t)(out_l) | ((uint16_t)(out_h) << 8));
 
 	return 0;
 }
@@ -393,12 +372,11 @@ static int lsm9ds0_mfd_sample_fetch(const struct device *dev,
 
 #if !defined(LSM9DS0_MFD_ACCEL_DISABLED)
 static inline void lsm9ds0_mfd_convert_accel(struct sensor_value *val,
-					     int raw_val,
-					     float scale)
+					     int raw_val, float scale)
 {
 	double dval;
 
-	dval = (double)(raw_val) * scale;
+	dval = (double)(raw_val)*scale;
 	val->val1 = (int32_t)dval;
 	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
 }
@@ -479,12 +457,11 @@ static inline int lsm9ds0_mfd_get_accel(const struct device *dev,
 
 #if !defined(LSM9DS0_MFD_MAGN_DISABLED)
 static inline void lsm9ds0_mfd_convert_magn(struct sensor_value *val,
-					    int raw_val,
-					    float scale)
+					    int raw_val, float scale)
 {
 	double dval;
 
-	dval = (double)(raw_val) * scale;
+	dval = (double)(raw_val)*scale;
 	val->val1 = (int32_t)dval;
 	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
 }
@@ -611,8 +588,8 @@ static inline int lsm9ds0_mfd_attr_set_accel(const struct device *dev,
 
 #if defined(LSM9DS0_MFD_ATTR_SET_MAGN)
 static inline int lsm9ds0_mfd_attr_set_magn(const struct device *dev,
-					     enum sensor_attribute attr,
-					     const struct sensor_value *val)
+					    enum sensor_attribute attr,
+					    const struct sensor_value *val)
 {
 	switch (attr) {
 #if defined(CONFIG_LSM9DS0_MFD_MAGN_SAMPLING_RATE_RUNTIME)
@@ -637,7 +614,6 @@ static int lsm9ds0_mfd_attr_set(const struct device *dev,
 				enum sensor_attribute attr,
 				const struct sensor_value *val)
 {
-
 	switch (chan) {
 #if defined(LSM9DS0_MFD_ATTR_SET_ACCEL)
 	case SENSOR_CHAN_ACCEL_X:
@@ -694,13 +670,14 @@ static int lsm9ds0_mfd_init_chip(const struct device *dev)
 	LOG_DBG("chip id 0x%x", chip_id);
 
 #if !defined(LSM9DS0_MFD_ACCEL_DISABLED)
-	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
-				LSM9DS0_MFD_REG_CTRL_REG1_XM,
-				LSM9DS0_MFD_MASK_CTRL_REG1_XM_BDU |
-				LSM9DS0_MFD_MASK_CTRL_REG1_XM_AODR,
-				(1 << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_BDU) |
-				(LSM9DS0_MFD_ACCEL_DEFAULT_AODR <<
-				LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AODR))) {
+	if (i2c_reg_update_byte(
+		    data->i2c_master, config->i2c_slave_addr,
+		    LSM9DS0_MFD_REG_CTRL_REG1_XM,
+		    LSM9DS0_MFD_MASK_CTRL_REG1_XM_BDU |
+			    LSM9DS0_MFD_MASK_CTRL_REG1_XM_AODR,
+		    (1 << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_BDU) |
+			    (LSM9DS0_MFD_ACCEL_DEFAULT_AODR
+			     << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AODR))) {
 		LOG_DBG("failed to set AODR and BDU");
 		return -EIO;
 	}
@@ -710,17 +687,18 @@ static int lsm9ds0_mfd_init_chip(const struct device *dev)
 		return -EIO;
 	}
 
-	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
-				LSM9DS0_MFD_REG_CTRL_REG1_XM,
-				LSM9DS0_MFD_MASK_CTRL_REG1_XM_AXEN |
-				LSM9DS0_MFD_MASK_CTRL_REG1_XM_AYEN |
-				LSM9DS0_MFD_MASK_CTRL_REG1_XM_AZEN,
-				(LSM9DS0_MFD_ACCEL_ENABLE_X <<
-				LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AXEN) |
-				(LSM9DS0_MFD_ACCEL_ENABLE_Y <<
-				LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AYEN) |
-				(LSM9DS0_MFD_ACCEL_ENABLE_Z <<
-				LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AZEN)) < 0) {
+	if (i2c_reg_update_byte(
+		    data->i2c_master, config->i2c_slave_addr,
+		    LSM9DS0_MFD_REG_CTRL_REG1_XM,
+		    LSM9DS0_MFD_MASK_CTRL_REG1_XM_AXEN |
+			    LSM9DS0_MFD_MASK_CTRL_REG1_XM_AYEN |
+			    LSM9DS0_MFD_MASK_CTRL_REG1_XM_AZEN,
+		    (LSM9DS0_MFD_ACCEL_ENABLE_X
+		     << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AXEN) |
+			    (LSM9DS0_MFD_ACCEL_ENABLE_Y
+			     << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AYEN) |
+			    (LSM9DS0_MFD_ACCEL_ENABLE_Z
+			     << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_AZEN)) < 0) {
 		LOG_DBG("failed to set accelerometer axis enable bits\n");
 		return -EIO;
 	}
@@ -729,8 +707,7 @@ static int lsm9ds0_mfd_init_chip(const struct device *dev)
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				LSM9DS0_MFD_REG_CTRL_REG1_XM,
 				LSM9DS0_MFD_MASK_CTRL_REG1_XM_BDU,
-				1 << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_BDU)
-				< 0) {
+				1 << LSM9DS0_MFD_SHIFT_CTRL_REG1_XM_BDU) < 0) {
 		LOG_DBG("failed to set BDU\n");
 		return -EIO;
 	}
@@ -740,8 +717,7 @@ static int lsm9ds0_mfd_init_chip(const struct device *dev)
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				LSM9DS0_MFD_REG_CTRL_REG7_XM,
 				LSM9DS0_MFD_MASK_CTRL_REG7_XM_MD,
-				(0 << LSM9DS0_MFD_SHIFT_CTRL_REG7_XM_MD))
-				< 0) {
+				(0 << LSM9DS0_MFD_SHIFT_CTRL_REG7_XM_MD)) < 0) {
 		LOG_DBG("failed to power on magnetometer");
 		return -EIO;
 	}
@@ -761,8 +737,8 @@ static int lsm9ds0_mfd_init_chip(const struct device *dev)
 	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				LSM9DS0_MFD_REG_CTRL_REG5_XM,
 				LSM9DS0_MFD_MASK_CTRL_REG5_XM_TEMP_EN,
-				1 << LSM9DS0_MFD_SHIFT_CTRL_REG5_XM_TEMP_EN)
-				< 0) {
+				1 << LSM9DS0_MFD_SHIFT_CTRL_REG5_XM_TEMP_EN) <
+	    0) {
 		LOG_DBG("failed to power on temperature sensor");
 		return -EIO;
 	}
@@ -773,13 +749,13 @@ static int lsm9ds0_mfd_init_chip(const struct device *dev)
 
 int lsm9ds0_mfd_init(const struct device *dev)
 {
-	const struct lsm9ds0_mfd_config * const config = dev->config;
+	const struct lsm9ds0_mfd_config *const config = dev->config;
 	struct lsm9ds0_mfd_data *data = dev->data;
 
 	data->i2c_master = device_get_binding(config->i2c_master_dev_name);
 	if (!data->i2c_master) {
 		LOG_DBG("i2c master not found: %s",
-			   config->i2c_master_dev_name);
+			config->i2c_master_dev_name);
 		return -EINVAL;
 	}
 

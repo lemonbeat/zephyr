@@ -30,29 +30,30 @@
 #define LOG_MODULE_NAME hci_spi
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
-#define HCI_CMD                0x01
-#define HCI_ACL                0x02
-#define HCI_SCO                0x03
-#define HCI_EVT                0x04
+#define HCI_CMD 0x01
+#define HCI_ACL 0x02
+#define HCI_SCO 0x03
+#define HCI_EVT 0x04
 
 /* Special Values */
-#define SPI_WRITE              0x0A
-#define SPI_READ               0x0B
-#define READY_NOW              0x02
-#define SANITY_CHECK           0x02
+#define SPI_WRITE 0x0A
+#define SPI_READ 0x0B
+#define READY_NOW 0x02
+#define SANITY_CHECK 0x02
 
 /* Offsets */
-#define STATUS_HEADER_READY    0
-#define STATUS_HEADER_TOREAD   3
+#define STATUS_HEADER_READY 0
+#define STATUS_HEADER_TOREAD 3
 
-#define PACKET_TYPE            0
-#define EVT_BLUE_INITIALIZED   0x01
+#define PACKET_TYPE 0
+#define EVT_BLUE_INITIALIZED 0x01
 
-#define GPIO_IRQ_PIN           DT_GPIO_PIN(DT_INST(0, zephyr_bt_hci_spi_slave), irq_gpios)
-#define GPIO_IRQ_FLAGS         DT_GPIO_FLAGS(DT_INST(0, zephyr_bt_hci_spi_slave), irq_gpios)
+#define GPIO_IRQ_PIN DT_GPIO_PIN(DT_INST(0, zephyr_bt_hci_spi_slave), irq_gpios)
+#define GPIO_IRQ_FLAGS \
+	DT_GPIO_FLAGS(DT_INST(0, zephyr_bt_hci_spi_slave), irq_gpios)
 
 /* Needs to be aligned with the SPI master buffer size */
-#define SPI_MAX_MSG_LEN        255
+#define SPI_MAX_MSG_LEN 255
 
 static uint8_t rxmsg[SPI_MAX_MSG_LEN];
 static struct spi_buf rx;
@@ -85,8 +86,7 @@ static K_SEM_DEFINE(sem_spi_tx, 0, 1);
 static inline int spi_send(struct net_buf *buf)
 {
 	uint8_t header_master[5] = { 0 };
-	uint8_t header_slave[5] = { READY_NOW, SANITY_CHECK,
-				    0x00, 0x00, 0x00 };
+	uint8_t header_slave[5] = { READY_NOW, SANITY_CHECK, 0x00, 0x00, 0x00 };
 	int ret;
 
 	LOG_DBG("buf %p type %u len %u", buf, bt_buf_get_type(buf), buf->len);
@@ -145,8 +145,7 @@ static inline int spi_send(struct net_buf *buf)
 static void bt_tx_thread(void *p1, void *p2, void *p3)
 {
 	uint8_t header_master[5];
-	uint8_t header_slave[5] = { READY_NOW, SANITY_CHECK,
-				    0x00, 0x00, 0x00 };
+	uint8_t header_slave[5] = { READY_NOW, SANITY_CHECK, 0x00, 0x00, 0x00 };
 	struct net_buf *buf = NULL;
 
 	union {
@@ -169,8 +168,8 @@ static void bt_tx_thread(void *p1, void *p2, void *p3)
 		rx.len = 5;
 
 		do {
-			ret = spi_transceive(spi_hci_dev, &spi_cfg,
-					     &tx_bufs, &rx_bufs);
+			ret = spi_transceive(spi_hci_dev, &spi_cfg, &tx_bufs,
+					     &rx_bufs);
 			if (ret < 0) {
 				LOG_ERR("SPI transceive error: %d", ret);
 			}
@@ -190,8 +189,7 @@ static void bt_tx_thread(void *p1, void *p2, void *p3)
 		rx.len = SPI_MAX_MSG_LEN;
 
 		/* Receiving data from the SPI Host */
-		ret = spi_transceive(spi_hci_dev, &spi_cfg,
-				     &tx_bufs, &rx_bufs);
+		ret = spi_transceive(spi_hci_dev, &spi_cfg, &tx_bufs, &rx_bufs);
 		if (ret < 0) {
 			LOG_ERR("SPI transceive error: %d", ret);
 			continue;
@@ -215,8 +213,9 @@ static void bt_tx_thread(void *p1, void *p2, void *p3)
 					    hci_hdr.acl_hdr,
 					    sizeof(*hci_hdr.acl_hdr));
 			if (buf) {
-				net_buf_add_mem(buf, &rxmsg[5],
-						sys_le16_to_cpu(hci_hdr.acl_hdr->len));
+				net_buf_add_mem(
+					buf, &rxmsg[5],
+					sys_le16_to_cpu(hci_hdr.acl_hdr->len));
 			} else {
 				LOG_ERR("No available ACL buffers!");
 				continue;
@@ -227,8 +226,8 @@ static void bt_tx_thread(void *p1, void *p2, void *p3)
 			continue;
 		}
 
-		LOG_DBG("buf %p type %u len %u",
-			buf, bt_buf_get_type(buf), buf->len);
+		LOG_DBG("buf %p type %u len %u", buf, bt_buf_get_type(buf),
+			buf->len);
 
 		ret = bt_send(buf);
 		if (ret) {
@@ -247,7 +246,8 @@ static int hci_spi_init(const struct device *unused)
 
 	LOG_DBG("");
 
-	spi_hci_dev = device_get_binding(DT_BUS_LABEL(DT_INST(0, zephyr_bt_hci_spi_slave)));
+	spi_hci_dev = device_get_binding(
+		DT_BUS_LABEL(DT_INST(0, zephyr_bt_hci_spi_slave)));
 	if (!spi_hci_dev) {
 		return -EINVAL;
 	}
@@ -263,8 +263,8 @@ static int hci_spi_init(const struct device *unused)
 	return 0;
 }
 
-DEVICE_INIT(hci_spi, "hci_spi", &hci_spi_init, NULL, NULL,
-	    APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
+DEVICE_INIT(hci_spi, "hci_spi", &hci_spi_init, NULL, NULL, APPLICATION,
+	    CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
 
 void main(void)
 {

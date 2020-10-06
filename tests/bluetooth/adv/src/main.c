@@ -37,15 +37,15 @@ void test_adv_fast_ad_data_update(void)
 	printk("Bluetooth initialized\n");
 
 	/* Start advertising */
-	err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad),
-			      sd, ARRAY_SIZE(sd));
+	err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad), sd,
+			      ARRAY_SIZE(sd));
 	zassert_equal(err, 0, "Advertising failed to start (err %d)\n", err);
 
 	printk("Advertising started\n");
 
 	while (k_uptime_get() < TIMEOUT_MS) {
-		err = bt_le_adv_update_data(ad, ARRAY_SIZE(ad),
-					    sd, ARRAY_SIZE(sd));
+		err = bt_le_adv_update_data(ad, ARRAY_SIZE(ad), sd,
+					    ARRAY_SIZE(sd));
 		zassert_equal(err, 0, "Update adv data failed (err %d)\n", err);
 	}
 }

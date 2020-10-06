@@ -37,17 +37,22 @@ LOG_MODULE_REGISTER(LOG_DOMAIN);
 #if __DCACHE_PRESENT == 1
 #define DCACHE_INVALIDATE(addr, size) \
 	SCB_InvalidateDCache_by_Addr((uint32_t *)addr, size)
-#define DCACHE_CLEAN(addr, size) \
-	SCB_CleanDCache_by_Addr((uint32_t *)addr, size)
+#define DCACHE_CLEAN(addr, size) SCB_CleanDCache_by_Addr((uint32_t *)addr, size)
 #else
-#define DCACHE_INVALIDATE(addr, size) {; }
-#define DCACHE_CLEAN(addr, size) {; }
+#define DCACHE_INVALIDATE(addr, size) \
+	{                             \
+		;                     \
+	}
+#define DCACHE_CLEAN(addr, size) \
+	{                        \
+		;                \
+	}
 #endif
 
-#define SAM_SSC_WORD_SIZE_BITS_MIN    2
-#define SAM_SSC_WORD_SIZE_BITS_MAX   32
-#define SAM_SSC_WORD_PER_FRAME_MIN    1
-#define SAM_SSC_WORD_PER_FRAME_MAX   16
+#define SAM_SSC_WORD_SIZE_BITS_MIN 2
+#define SAM_SSC_WORD_SIZE_BITS_MAX 32
+#define SAM_SSC_WORD_PER_FRAME_MIN 1
+#define SAM_SSC_WORD_PER_FRAME_MAX 16
 
 struct queue_item {
 	void *mem_block;
@@ -81,8 +86,7 @@ struct stream {
 	struct ring_buf mem_block_queue;
 	void *mem_block;
 	bool last_block;
-	int (*stream_start)(struct stream *, Ssc *const,
-			    const struct device *);
+	int (*stream_start)(struct stream *, Ssc *const, const struct device *);
 	void (*stream_disable)(struct stream *, Ssc *const,
 			       const struct device *);
 	void (*queue_drop)(struct stream *);
@@ -98,12 +102,13 @@ struct i2s_sam_dev_data {
 };
 
 #define DEV_NAME(dev) ((dev)->name)
-#define DEV_CFG(dev) \
-	((const struct i2s_sam_dev_cfg *const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct i2s_sam_dev_data *const)(dev)->data)
+#define DEV_CFG(dev) ((const struct i2s_sam_dev_cfg *const)(dev)->config)
+#define DEV_DATA(dev) ((struct i2s_sam_dev_data *const)(dev)->data)
 
-#define MODULO_INC(val, max) { val = (++val < max) ? val : 0; }
+#define MODULO_INC(val, max)                   \
+	{                                      \
+		val = (++val < max) ? val : 0; \
+	}
 
 static const struct device *get_dev_from_dma_channel(uint32_t dma_channel);
 static void dma_rx_callback(const struct device *, void *, uint32_t, int);
@@ -235,9 +240,9 @@ static void dma_rx_callback(const struct device *dma_dev, void *user_data,
 		goto rx_disable;
 	}
 
-	ret = start_dma(dev_data->dev_dma, stream->dma_channel, &stream->dma_cfg,
-			(void *)&(ssc->SSC_RHR), stream->mem_block,
-			stream->cfg.block_size);
+	ret = start_dma(dev_data->dev_dma, stream->dma_channel,
+			&stream->dma_cfg, (void *)&(ssc->SSC_RHR),
+			stream->mem_block, stream->cfg.block_size);
 	if (ret < 0) {
 		LOG_DBG("Failed to start RX DMA transfer: %d", ret);
 		goto rx_disable;
@@ -296,9 +301,9 @@ static void dma_tx_callback(const struct device *dma_dev, void *user_data,
 	/* Assure cache coherency before DMA read operation */
 	DCACHE_CLEAN(stream->mem_block, mem_block_size);
 
-	ret = start_dma(dev_data->dev_dma, stream->dma_channel, &stream->dma_cfg,
-			stream->mem_block, (void *)&(ssc->SSC_THR),
-			mem_block_size);
+	ret = start_dma(dev_data->dev_dma, stream->dma_channel,
+			&stream->dma_cfg, stream->mem_block,
+			(void *)&(ssc->SSC_THR), mem_block_size);
 	if (ret < 0) {
 		LOG_DBG("Failed to start TX DMA transfer: %d", ret);
 		goto tx_disable;
@@ -324,46 +329,49 @@ static int set_rx_data_format(const struct i2s_sam_dev_cfg *const dev_cfg,
 	bool frame_clk_master = !(i2s_cfg->options & I2S_OPT_FRAME_CLK_SLAVE);
 
 	switch (i2s_cfg->format & I2S_FMT_DATA_FORMAT_MASK) {
-
 	case I2S_FMT_DATA_FORMAT_I2S:
 		num_words = 2U;
 		fslen = word_size_bits - 1;
 
-		ssc_rcmr = SSC_RCMR_CKI
-			   | (pin_rf_en ? SSC_RCMR_START_RF_FALLING : 0)
-			   | SSC_RCMR_STTDLY(1);
+		ssc_rcmr = SSC_RCMR_CKI |
+			   (pin_rf_en ? SSC_RCMR_START_RF_FALLING : 0) |
+			   SSC_RCMR_STTDLY(1);
 
-		ssc_rfmr = (pin_rf_en && frame_clk_master
-			    ? SSC_RFMR_FSOS_NEGATIVE : SSC_RFMR_FSOS_NONE);
+		ssc_rfmr = (pin_rf_en && frame_clk_master ?
+					  SSC_RFMR_FSOS_NEGATIVE :
+					  SSC_RFMR_FSOS_NONE);
 		break;
 
 	case I2S_FMT_DATA_FORMAT_PCM_SHORT:
-		ssc_rcmr = (pin_rf_en ? SSC_RCMR_START_RF_FALLING : 0)
-			   | SSC_RCMR_STTDLY(0);
+		ssc_rcmr = (pin_rf_en ? SSC_RCMR_START_RF_FALLING : 0) |
+			   SSC_RCMR_STTDLY(0);
 
-		ssc_rfmr = (pin_rf_en && frame_clk_master
-			    ? SSC_RFMR_FSOS_POSITIVE : SSC_RFMR_FSOS_NONE);
+		ssc_rfmr = (pin_rf_en && frame_clk_master ?
+					  SSC_RFMR_FSOS_POSITIVE :
+					  SSC_RFMR_FSOS_NONE);
 		break;
 
 	case I2S_FMT_DATA_FORMAT_PCM_LONG:
 		fslen = num_words * word_size_bits / 2U - 1;
 
-		ssc_rcmr = (pin_rf_en ? SSC_RCMR_START_RF_RISING : 0)
-			   | SSC_RCMR_STTDLY(0);
+		ssc_rcmr = (pin_rf_en ? SSC_RCMR_START_RF_RISING : 0) |
+			   SSC_RCMR_STTDLY(0);
 
-		ssc_rfmr = (pin_rf_en && frame_clk_master
-			    ? SSC_RFMR_FSOS_POSITIVE : SSC_RFMR_FSOS_NONE);
+		ssc_rfmr = (pin_rf_en && frame_clk_master ?
+					  SSC_RFMR_FSOS_POSITIVE :
+					  SSC_RFMR_FSOS_NONE);
 		break;
 
 	case I2S_FMT_DATA_FORMAT_LEFT_JUSTIFIED:
 		fslen = num_words * word_size_bits / 2U - 1;
 
-		ssc_rcmr = SSC_RCMR_CKI
-			   | (pin_rf_en ? SSC_RCMR_START_RF_RISING : 0)
-			   | SSC_RCMR_STTDLY(0);
+		ssc_rcmr = SSC_RCMR_CKI |
+			   (pin_rf_en ? SSC_RCMR_START_RF_RISING : 0) |
+			   SSC_RCMR_STTDLY(0);
 
-		ssc_rfmr = (pin_rf_en && frame_clk_master
-			    ? SSC_RFMR_FSOS_POSITIVE : SSC_RFMR_FSOS_NONE);
+		ssc_rfmr = (pin_rf_en && frame_clk_master ?
+					  SSC_RFMR_FSOS_POSITIVE :
+					  SSC_RFMR_FSOS_NONE);
 		break;
 
 	default:
@@ -372,30 +380,31 @@ static int set_rx_data_format(const struct i2s_sam_dev_cfg *const dev_cfg,
 	}
 
 	if (pin_rk_en) {
-		ssc_rcmr |= ((i2s_cfg->options & I2S_OPT_BIT_CLK_SLAVE)
-			     ? SSC_RCMR_CKS_RK : SSC_RCMR_CKS_MCK)
-			    | ((i2s_cfg->options & I2S_OPT_BIT_CLK_GATED)
-			       ? SSC_RCMR_CKO_TRANSFER : SSC_RCMR_CKO_CONTINUOUS);
+		ssc_rcmr |= ((i2s_cfg->options & I2S_OPT_BIT_CLK_SLAVE) ?
+					   SSC_RCMR_CKS_RK :
+					   SSC_RCMR_CKS_MCK) |
+			    ((i2s_cfg->options & I2S_OPT_BIT_CLK_GATED) ?
+					   SSC_RCMR_CKO_TRANSFER :
+					   SSC_RCMR_CKO_CONTINUOUS);
 	} else {
-		ssc_rcmr |= SSC_RCMR_CKS_TK
-			    | SSC_RCMR_CKO_NONE;
+		ssc_rcmr |= SSC_RCMR_CKS_TK | SSC_RCMR_CKO_NONE;
 	}
 	/* SSC_RCMR.PERIOD bit filed does not support setting the
 	 * frame period with one bit resolution. In case the required
 	 * frame period is an odd number set it to be one bit longer.
 	 */
-	ssc_rcmr |= (pin_rf_en ? 0 : SSC_RCMR_START_TRANSMIT)
-		    | SSC_RCMR_PERIOD((num_words * word_size_bits + 1) / 2U - 1);
+	ssc_rcmr |= (pin_rf_en ? 0 : SSC_RCMR_START_TRANSMIT) |
+		    SSC_RCMR_PERIOD((num_words * word_size_bits + 1) / 2U - 1);
 
 	/* Receive Clock Mode Register */
 	ssc->SSC_RCMR = ssc_rcmr;
 
-	ssc_rfmr |= SSC_RFMR_DATLEN(word_size_bits - 1)
-		    | ((i2s_cfg->format & I2S_FMT_DATA_ORDER_LSB)
-		       ? 0 : SSC_RFMR_MSBF)
-		    | SSC_RFMR_DATNB(num_words - 1)
-		    | SSC_RFMR_FSLEN(fslen)
-		    | SSC_RFMR_FSLEN_EXT(fslen >> 4);
+	ssc_rfmr |= SSC_RFMR_DATLEN(word_size_bits - 1) |
+		    ((i2s_cfg->format & I2S_FMT_DATA_ORDER_LSB) ?
+				   0 :
+				   SSC_RFMR_MSBF) |
+		    SSC_RFMR_DATNB(num_words - 1) | SSC_RFMR_FSLEN(fslen) |
+		    SSC_RFMR_FSLEN_EXT(fslen >> 4);
 
 	/* Receive Frame Mode Register */
 	ssc->SSC_RFMR = ssc_rfmr;
@@ -414,21 +423,18 @@ static int set_tx_data_format(const struct i2s_sam_dev_cfg *const dev_cfg,
 	uint32_t ssc_tfmr = 0U;
 
 	switch (i2s_cfg->format & I2S_FMT_DATA_FORMAT_MASK) {
-
 	case I2S_FMT_DATA_FORMAT_I2S:
 		num_words = 2U;
 		fslen = word_size_bits - 1;
 
-		ssc_tcmr = SSC_TCMR_START_TF_FALLING
-			   | SSC_TCMR_STTDLY(1);
+		ssc_tcmr = SSC_TCMR_START_TF_FALLING | SSC_TCMR_STTDLY(1);
 
 		ssc_tfmr = SSC_TFMR_FSOS_NEGATIVE;
 		break;
 
 	case I2S_FMT_DATA_FORMAT_PCM_SHORT:
-		ssc_tcmr = SSC_TCMR_CKI
-			   | SSC_TCMR_START_TF_FALLING
-			   | SSC_TCMR_STTDLY(0);
+		ssc_tcmr = SSC_TCMR_CKI | SSC_TCMR_START_TF_FALLING |
+			   SSC_TCMR_STTDLY(0);
 
 		ssc_tfmr = SSC_TFMR_FSOS_POSITIVE;
 		break;
@@ -436,9 +442,8 @@ static int set_tx_data_format(const struct i2s_sam_dev_cfg *const dev_cfg,
 	case I2S_FMT_DATA_FORMAT_PCM_LONG:
 		fslen = num_words * word_size_bits / 2U - 1;
 
-		ssc_tcmr = SSC_TCMR_CKI
-			   | SSC_TCMR_START_TF_RISING
-			   | SSC_TCMR_STTDLY(0);
+		ssc_tcmr = SSC_TCMR_CKI | SSC_TCMR_START_TF_RISING |
+			   SSC_TCMR_STTDLY(0);
 
 		ssc_tfmr = SSC_TFMR_FSOS_POSITIVE;
 		break;
@@ -446,8 +451,7 @@ static int set_tx_data_format(const struct i2s_sam_dev_cfg *const dev_cfg,
 	case I2S_FMT_DATA_FORMAT_LEFT_JUSTIFIED:
 		fslen = num_words * word_size_bits / 2U - 1;
 
-		ssc_tcmr = SSC_TCMR_START_TF_RISING
-			   | SSC_TCMR_STTDLY(0);
+		ssc_tcmr = SSC_TCMR_START_TF_RISING | SSC_TCMR_STTDLY(0);
 
 		ssc_tfmr = SSC_TFMR_FSOS_POSITIVE;
 		break;
@@ -461,11 +465,13 @@ static int set_tx_data_format(const struct i2s_sam_dev_cfg *const dev_cfg,
 	 * frame period with one bit resolution. In case the required
 	 * frame period is an odd number set it to be one bit longer.
 	 */
-	ssc_tcmr |= ((i2s_cfg->options & I2S_OPT_BIT_CLK_SLAVE)
-		     ? SSC_TCMR_CKS_TK : SSC_TCMR_CKS_MCK)
-		    | ((i2s_cfg->options & I2S_OPT_BIT_CLK_GATED)
-		       ? SSC_TCMR_CKO_TRANSFER : SSC_TCMR_CKO_CONTINUOUS)
-		    | SSC_TCMR_PERIOD((num_words * word_size_bits + 1) / 2U - 1);
+	ssc_tcmr |= ((i2s_cfg->options & I2S_OPT_BIT_CLK_SLAVE) ?
+				   SSC_TCMR_CKS_TK :
+				   SSC_TCMR_CKS_MCK) |
+		    ((i2s_cfg->options & I2S_OPT_BIT_CLK_GATED) ?
+				   SSC_TCMR_CKO_TRANSFER :
+				   SSC_TCMR_CKO_CONTINUOUS) |
+		    SSC_TCMR_PERIOD((num_words * word_size_bits + 1) / 2U - 1);
 
 	/* Transmit Clock Mode Register */
 	ssc->SSC_TCMR = ssc_tcmr;
@@ -475,12 +481,12 @@ static int set_tx_data_format(const struct i2s_sam_dev_cfg *const dev_cfg,
 		ssc_tfmr |= SSC_TFMR_FSOS_NONE;
 	}
 
-	ssc_tfmr |= SSC_TFMR_DATLEN(word_size_bits - 1)
-		    | ((i2s_cfg->format & I2S_FMT_DATA_ORDER_LSB)
-		       ? 0 : SSC_TFMR_MSBF)
-		    | SSC_TFMR_DATNB(num_words - 1)
-		    | SSC_TFMR_FSLEN(fslen)
-		    | SSC_TFMR_FSLEN_EXT(fslen >> 4);
+	ssc_tfmr |= SSC_TFMR_DATLEN(word_size_bits - 1) |
+		    ((i2s_cfg->format & I2S_FMT_DATA_ORDER_LSB) ?
+				   0 :
+				   SSC_TFMR_MSBF) |
+		    SSC_TFMR_DATNB(num_words - 1) | SSC_TFMR_FSLEN(fslen) |
+		    SSC_TFMR_FSLEN_EXT(fslen >> 4);
 
 	/* Transmit Frame Mode Register */
 	ssc->SSC_TFMR = ssc_tfmr;
@@ -865,8 +871,7 @@ static int i2s_sam_read(const struct device *dev, void **mem_block,
 	return 0;
 }
 
-static int i2s_sam_write(const struct device *dev, void *mem_block,
-			 size_t size)
+static int i2s_sam_write(const struct device *dev, void *mem_block, size_t size)
 {
 	struct i2s_sam_dev_data *const dev_data = DEV_DATA(dev);
 	int ret;
@@ -929,9 +934,11 @@ static int i2s_sam_initialize(const struct device *dev)
 	k_sem_init(&dev_data->tx.sem, CONFIG_I2S_SAM_SSC_TX_BLOCK_COUNT,
 		   CONFIG_I2S_SAM_SSC_TX_BLOCK_COUNT);
 
-	dev_data->dev_dma = device_get_binding(DT_INST_DMAS_LABEL_BY_NAME(0, tx));
+	dev_data->dev_dma =
+		device_get_binding(DT_INST_DMAS_LABEL_BY_NAME(0, tx));
 	if (!dev_data->dev_dma) {
-		LOG_ERR("%s device not found", DT_INST_DMAS_LABEL_BY_NAME(0, tx));
+		LOG_ERR("%s device not found",
+			DT_INST_DMAS_LABEL_BY_NAME(0, tx));
 		return -ENODEV;
 	}
 

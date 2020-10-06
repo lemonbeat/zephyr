@@ -29,8 +29,7 @@ LOG_MODULE_DECLARE(net_zperf_sample, LOG_LEVEL_DBG);
 static struct sockaddr_in6 *in6_addr_my;
 static struct sockaddr_in *in4_addr_my;
 
-static inline void set_dst_addr(const struct shell *shell,
-				sa_family_t family,
+static inline void set_dst_addr(const struct shell *shell, sa_family_t family,
 				struct net_pkt *pkt,
 				union net_ip_header *ip_hdr,
 				struct net_udp_hdr *udp_hdr,
@@ -52,8 +51,7 @@ static inline void set_dst_addr(const struct shell *shell,
 }
 
 static inline void build_reply(struct zperf_udp_datagram *hdr,
-			       struct zperf_server_hdr *stat,
-			       uint8_t *buf)
+			       struct zperf_server_hdr *stat, uint8_t *buf)
 {
 	int pos = 0;
 	struct zperf_server_hdr *stat_hdr;
@@ -76,8 +74,8 @@ static inline void build_reply(struct zperf_udp_datagram *hdr,
 }
 
 /* Send statistics to the remote client */
-#define BUF_SIZE sizeof(struct zperf_udp_datagram) +	\
-	sizeof(struct zperf_server_hdr)
+#define BUF_SIZE \
+	sizeof(struct zperf_udp_datagram) + sizeof(struct zperf_server_hdr)
 
 static int zperf_receiver_send_stat(const struct shell *shell,
 				    struct net_context *context,
@@ -91,18 +89,18 @@ static int zperf_receiver_send_stat(const struct shell *shell,
 	struct sockaddr dst_addr;
 	int ret;
 
-	shell_fprintf(shell, SHELL_NORMAL,
-		      "Received %d bytes\n", net_pkt_remaining_data(pkt));
+	shell_fprintf(shell, SHELL_NORMAL, "Received %d bytes\n",
+		      net_pkt_remaining_data(pkt));
 
-	set_dst_addr(shell, net_pkt_family(pkt),
-		     pkt, ip_hdr, udp_hdr, &dst_addr);
+	set_dst_addr(shell, net_pkt_family(pkt), pkt, ip_hdr, udp_hdr,
+		     &dst_addr);
 
 	build_reply(hdr, stat, reply);
 
 	ret = net_context_sendto(context, reply, BUF_SIZE, &dst_addr,
 				 net_pkt_family(pkt) == AF_INET6 ?
-				 sizeof(struct sockaddr_in6) :
-				 sizeof(struct sockaddr_in),
+					       sizeof(struct sockaddr_in6) :
+					       sizeof(struct sockaddr_in),
 				 NULL, K_NO_WAIT, NULL);
 	if (ret < 0) {
 		shell_fprintf(shell, SHELL_WARNING,
@@ -112,11 +110,9 @@ static int zperf_receiver_send_stat(const struct shell *shell,
 	return ret;
 }
 
-static void udp_received(struct net_context *context,
-			 struct net_pkt *pkt,
+static void udp_received(struct net_context *context, struct net_pkt *pkt,
 			 union net_ip_header *ip_hdr,
-			 union net_proto_header *proto_hdr,
-			 int status,
+			 union net_proto_header *proto_hdr, int status,
 			 void *user_data)
 {
 	NET_PKT_DATA_ACCESS_DEFINE(zperf, struct zperf_udp_datagram);
@@ -134,8 +130,7 @@ static void udp_received(struct net_context *context,
 
 	hdr = (struct zperf_udp_datagram *)net_pkt_get_data(pkt, &zperf);
 	if (!hdr) {
-		shell_fprintf(shell, SHELL_WARNING,
-			      "Short iperf packet!\n");
+		shell_fprintf(shell, SHELL_WARNING, "Short iperf packet!\n");
 		goto out;
 	}
 
@@ -143,8 +138,7 @@ static void udp_received(struct net_context *context,
 
 	session = get_session(pkt, ip_hdr, proto_hdr, SESSION_UDP);
 	if (!session) {
-		shell_fprintf(shell, SHELL_WARNING,
-			      "Cannot get a session!\n");
+		shell_fprintf(shell, SHELL_WARNING, "Cannot get a session!\n");
 		goto out;
 	}
 
@@ -187,10 +181,10 @@ static void udp_received(struct net_context *context,
 
 			/* Compute baud rate */
 			if (duration != 0U) {
-				rate_in_kbps = (uint32_t)
-					(((uint64_t)session->length * (uint64_t)8 *
-					  (uint64_t)USEC_PER_SEC) /
-					 ((uint64_t)duration * 1024U));
+				rate_in_kbps = (uint32_t)(
+					((uint64_t)session->length *
+					 (uint64_t)8 * (uint64_t)USEC_PER_SEC) /
+					((uint64_t)duration * 1024U));
 			} else {
 				rate_in_kbps = 0U;
 			}
@@ -198,8 +192,7 @@ static void udp_received(struct net_context *context,
 			/* Fill statistics */
 			session->stat.flags = 0x80000000;
 			session->stat.total_len1 = session->length >> 32;
-			session->stat.total_len2 =
-				session->length % 0xFFFFFFFF;
+			session->stat.total_len2 = session->length % 0xFFFFFFFF;
 			session->stat.stop_sec = duration / USEC_PER_SEC;
 			session->stat.stop_usec = duration % USEC_PER_SEC;
 			session->stat.error_cnt = session->error;
@@ -212,11 +205,10 @@ static void udp_received(struct net_context *context,
 						     ip_hdr, udp_hdr, hdr,
 						     &session->stat) < 0) {
 				shell_fprintf(shell, SHELL_WARNING,
-					    "Failed to send the packet\n");
+					      "Failed to send the packet\n");
 			}
 
-			shell_fprintf(shell, SHELL_NORMAL,
-				      " duration:\t\t");
+			shell_fprintf(shell, SHELL_NORMAL, " duration:\t\t");
 			print_number(shell, duration, TIME_US, TIME_US_UNIT);
 			shell_fprintf(shell, SHELL_NORMAL, "\n");
 
@@ -230,14 +222,12 @@ static void udp_received(struct net_context *context,
 				      " nb packets outorder:\t%u\n",
 				      session->error);
 
-			shell_fprintf(shell, SHELL_NORMAL,
-				      " jitter:\t\t\t");
+			shell_fprintf(shell, SHELL_NORMAL, " jitter:\t\t\t");
 			print_number(shell, session->jitter, TIME_US,
 				     TIME_US_UNIT);
 			shell_fprintf(shell, SHELL_NORMAL, "\n");
 
-			shell_fprintf(shell, SHELL_NORMAL,
-				      " rate:\t\t\t");
+			shell_fprintf(shell, SHELL_NORMAL, " rate:\t\t\t");
 			print_number(shell, rate_in_kbps, KBPS, KBPS_UNIT);
 			shell_fprintf(shell, SHELL_NORMAL, "\n");
 		} else {
@@ -246,17 +236,18 @@ static void udp_received(struct net_context *context,
 			session->length += net_pkt_remaining_data(pkt);
 
 			/* Compute jitter */
-			transit_time = time_delta(HW_CYCLES_TO_USEC(time),
-						  ntohl(hdr->tv_sec) *
-						  USEC_PER_SEC +
-						  ntohl(hdr->tv_usec));
+			transit_time =
+				time_delta(HW_CYCLES_TO_USEC(time),
+					   ntohl(hdr->tv_sec) * USEC_PER_SEC +
+						   ntohl(hdr->tv_usec));
 			if (session->last_transit_time != 0) {
-				int32_t delta_transit = transit_time -
+				int32_t delta_transit =
+					transit_time -
 					session->last_transit_time;
 
-				delta_transit =
-					(delta_transit < 0) ?
-					-delta_transit : delta_transit;
+				delta_transit = (delta_transit < 0) ?
+							      -delta_transit :
+							      delta_transit;
 
 				session->jitter +=
 					(delta_transit - session->jitter) / 16;
@@ -301,7 +292,6 @@ void zperf_udp_receiver_init(const struct shell *shell, int port)
 		in4_addr_my = zperf_get_sin();
 	}
 
-
 	if (IS_ENABLED(CONFIG_NET_IPV4)) {
 		ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
 				      &context4);
@@ -324,12 +314,13 @@ void zperf_udp_receiver_init(const struct shell *shell, int port)
 			/* Use existing IP */
 			in4_addr = zperf_get_default_if_in4_addr();
 			if (!in4_addr) {
-				shell_fprintf(shell, SHELL_WARNING,
-					      "Unable to get IPv4 by default\n");
+				shell_fprintf(
+					shell, SHELL_WARNING,
+					"Unable to get IPv4 by default\n");
 				return;
 			}
 			memcpy(&in4_addr_my->sin_addr, in4_addr,
-				sizeof(struct in_addr));
+			       sizeof(struct in_addr));
 		}
 
 		shell_fprintf(shell, SHELL_NORMAL, "Binding to %s\n",
@@ -342,10 +333,10 @@ void zperf_udp_receiver_init(const struct shell *shell, int port)
 					       (struct sockaddr *)in4_addr_my,
 					       sizeof(struct sockaddr_in));
 			if (ret < 0) {
-				shell_fprintf(shell, SHELL_WARNING,
-					 "Cannot bind IPv4 UDP port %d (%d)\n",
-					      ntohs(in4_addr_my->sin_port),
-					      ret);
+				shell_fprintf(
+					shell, SHELL_WARNING,
+					"Cannot bind IPv4 UDP port %d (%d)\n",
+					ntohs(in4_addr_my->sin_port), ret);
 				return;
 			}
 		}
@@ -374,12 +365,13 @@ void zperf_udp_receiver_init(const struct shell *shell, int port)
 			/* Use existing IP */
 			in6_addr = zperf_get_default_if_in6_addr();
 			if (!in6_addr) {
-				shell_fprintf(shell, SHELL_WARNING,
-					      "Unable to get IPv4 by default\n");
+				shell_fprintf(
+					shell, SHELL_WARNING,
+					"Unable to get IPv4 by default\n");
 				return;
 			}
 			memcpy(&in6_addr_my->sin6_addr, in6_addr,
-				sizeof(struct in6_addr));
+			       sizeof(struct in6_addr));
 		}
 
 		shell_fprintf(shell, SHELL_NORMAL, "Binding to %s\n",
@@ -392,10 +384,10 @@ void zperf_udp_receiver_init(const struct shell *shell, int port)
 					       (struct sockaddr *)in6_addr_my,
 					       sizeof(struct sockaddr_in6));
 			if (ret < 0) {
-				shell_fprintf(shell, SHELL_WARNING,
-					 "Cannot bind IPv6 UDP port %d (%d)\n",
-					      ntohs(in6_addr_my->sin6_port),
-					      ret);
+				shell_fprintf(
+					shell, SHELL_WARNING,
+					"Cannot bind IPv6 UDP port %d (%d)\n",
+					ntohs(in6_addr_my->sin6_port), ret);
 				return;
 			}
 		}
@@ -421,6 +413,5 @@ void zperf_udp_receiver_init(const struct shell *shell, int port)
 		}
 	}
 
-	shell_fprintf(shell, SHELL_NORMAL,
-		      "Listening on port %d\n", port);
+	shell_fprintf(shell, SHELL_NORMAL, "Listening on port %d\n", port);
 }

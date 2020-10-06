@@ -19,9 +19,8 @@
 extern "C" {
 #endif
 
-#define SETTINGS_TEST_FCB_VAL_STR_CNT   64
-#define SETTINGS_TEST_FCB_FLASH_CNT   4
-
+#define SETTINGS_TEST_FCB_VAL_STR_CNT 64
+#define SETTINGS_TEST_FCB_FLASH_CNT 4
 
 extern uint8_t val8;
 extern uint8_t val8_un;
@@ -50,7 +49,7 @@ void config_wipe_fcb(struct flash_sector *fs, int cnt);
 
 void test_config_fill_area(
 	char test_value[SETTINGS_TEST_FCB_VAL_STR_CNT][SETTINGS_MAX_VAL_LEN],
-		int iteration);
+	int iteration);
 
 #ifdef __cplusplus
 }

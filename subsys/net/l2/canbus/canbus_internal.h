@@ -7,12 +7,11 @@
 #ifndef ZEPHYR_SUBSYS_NET_L2_CANBUS_INTERNAL_H_
 #define ZEPHYR_SUBSYS_NET_L2_CANBUS_INTERNAL_H_
 
-
 #ifdef NET_CAN_USE_CAN_FD
 #define NET_CAN_DL 64
 #else
 #define NET_CAN_DL 8
-#endif/*NET_CAN_USE_CAN_FD*/
+#endif /*NET_CAN_USE_CAN_FD*/
 
 /* Protocol control information*/
 #define NET_CAN_PCI_SF 0x00 /* Single frame*/
@@ -20,44 +19,44 @@
 #define NET_CAN_PCI_CF 0x02 /* Consecutive frame */
 #define NET_CAN_PCI_FC 0x03 /* Flow control frame */
 
-#define NET_CAN_PCI_TYPE_BYTE        0
-#define NET_CAN_PCI_TYPE_POS         4
-#define NET_CAN_PCI_TYPE_MASK        0xF0
-#define NET_CAN_PCI_TYPE_SF   (NET_CAN_PCI_SF << NET_CAN_PCI_TYPE_POS)
-#define NET_CAN_PCI_TYPE_FF   (NET_CAN_PCI_FF << NET_CAN_PCI_TYPE_POS)
-#define NET_CAN_PCI_TYPE_CF   (NET_CAN_PCI_CF << NET_CAN_PCI_TYPE_POS)
-#define NET_CAN_PCI_TYPE_FC   (NET_CAN_PCI_FC << NET_CAN_PCI_TYPE_POS)
+#define NET_CAN_PCI_TYPE_BYTE 0
+#define NET_CAN_PCI_TYPE_POS 4
+#define NET_CAN_PCI_TYPE_MASK 0xF0
+#define NET_CAN_PCI_TYPE_SF (NET_CAN_PCI_SF << NET_CAN_PCI_TYPE_POS)
+#define NET_CAN_PCI_TYPE_FF (NET_CAN_PCI_FF << NET_CAN_PCI_TYPE_POS)
+#define NET_CAN_PCI_TYPE_CF (NET_CAN_PCI_CF << NET_CAN_PCI_TYPE_POS)
+#define NET_CAN_PCI_TYPE_FC (NET_CAN_PCI_FC << NET_CAN_PCI_TYPE_POS)
 
-#define NET_CAN_PCI_SF_DL_MASK       0x0F
+#define NET_CAN_PCI_SF_DL_MASK 0x0F
 
 #define NET_CAN_PCI_FF_DL_UPPER_BYTE 0
 #define NET_CAN_PCI_FF_DL_UPPER_MASK 0x0F
 #define NET_CAN_PCI_FF_DL_LOWER_BYTE 1
 
-#define NET_CAN_PCI_FS_BYTE          0
-#define NET_CAN_PCI_FS_MASK          0x0F
-#define NET_CAN_PCI_BS_BYTE          1
-#define NET_CAN_PCI_ST_MIN_BYTE      2
+#define NET_CAN_PCI_FS_BYTE 0
+#define NET_CAN_PCI_FS_MASK 0x0F
+#define NET_CAN_PCI_BS_BYTE 1
+#define NET_CAN_PCI_ST_MIN_BYTE 2
 
-#define NET_CAN_PCI_FS_CTS           0x0
-#define NET_CAN_PCI_FS_WAIT          0x1
-#define NET_CAN_PCI_FS_OVFLW         0x2
+#define NET_CAN_PCI_FS_CTS 0x0
+#define NET_CAN_PCI_FS_WAIT 0x1
+#define NET_CAN_PCI_FS_OVFLW 0x2
 
-#define NET_CAN_PCI_SN_MASK          0x0F
+#define NET_CAN_PCI_SN_MASK 0x0F
 
-#define NET_CAN_FF_DL_MIN            (NET_CAN_CAN_DL)
+#define NET_CAN_FF_DL_MIN (NET_CAN_CAN_DL)
 
-#define NET_CAN_WFT_FIRST            0xFF
+#define NET_CAN_WFT_FIRST 0xFF
 
 #define NET_CAN_BS_TIME K_MSEC(1000)
-#define NET_CAN_A_TIME  K_MSEC(1000)
+#define NET_CAN_A_TIME K_MSEC(1000)
 
 #define NET_CAN_FF_CF_TIME K_MSEC(1)
 
-#define NET_CAN_STMIN_MAX            0xFA
-#define NET_CAN_STMIN_MS_MAX         0x7F
-#define NET_CAN_STMIN_US_BEGIN       0xF1
-#define NET_CAN_STMIN_US_END         0xF9
+#define NET_CAN_STMIN_MAX 0xFA
+#define NET_CAN_STMIN_MS_MAX 0x7F
+#define NET_CAN_STMIN_US_BEGIN 0xF1
+#define NET_CAN_STMIN_US_END 0xF9
 
 #ifdef __cplusplus
 extern "C" {

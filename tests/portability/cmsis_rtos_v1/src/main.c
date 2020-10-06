@@ -27,22 +27,19 @@ extern void test_signal_events_isr(void);
 
 void test_main(void)
 {
-	ztest_test_suite(test_cmsis_apis,
-			ztest_unit_test(test_kernel_start),
-			ztest_unit_test(test_kernel_systick),
-			ztest_unit_test(test_thread_apis),
-			ztest_unit_test(test_thread_prio),
-			ztest_unit_test(test_thread_instances),
-			ztest_unit_test(test_timer),
-			ztest_unit_test(test_mutex),
-			ztest_unit_test(test_mutex_lock_timeout),
-			ztest_unit_test(test_semaphore),
-			ztest_unit_test(test_mempool),
-			ztest_unit_test(test_mailq),
-			ztest_unit_test(test_messageq),
-			ztest_unit_test(test_signal_events_no_wait),
-			ztest_unit_test(test_signal_events_timeout),
-			ztest_unit_test(test_signal_events_signalled),
-			ztest_unit_test(test_signal_events_isr));
+	ztest_test_suite(
+		test_cmsis_apis, ztest_unit_test(test_kernel_start),
+		ztest_unit_test(test_kernel_systick),
+		ztest_unit_test(test_thread_apis),
+		ztest_unit_test(test_thread_prio),
+		ztest_unit_test(test_thread_instances),
+		ztest_unit_test(test_timer), ztest_unit_test(test_mutex),
+		ztest_unit_test(test_mutex_lock_timeout),
+		ztest_unit_test(test_semaphore), ztest_unit_test(test_mempool),
+		ztest_unit_test(test_mailq), ztest_unit_test(test_messageq),
+		ztest_unit_test(test_signal_events_no_wait),
+		ztest_unit_test(test_signal_events_timeout),
+		ztest_unit_test(test_signal_events_signalled),
+		ztest_unit_test(test_signal_events_isr));
 	ztest_run_test_suite(test_cmsis_apis);
 }

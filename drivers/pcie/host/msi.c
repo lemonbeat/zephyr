@@ -58,7 +58,7 @@ bool pcie_set_msi(pcie_bdf_t bdf, unsigned int irq)
 		}
 
 		mcr |= PCIE_MSI_MCR_EN;
-		mcr &= ~PCIE_MSI_MCR_MME;  /* only 1 IRQ please */
+		mcr &= ~PCIE_MSI_MCR_MME; /* only 1 IRQ please */
 		pcie_conf_write(bdf, base + PCIE_MSI_MCR, mcr);
 		pcie_set_cmd(bdf, PCIE_CONF_CMDSTAT_MASTER, true);
 		success = true;

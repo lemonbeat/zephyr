@@ -48,7 +48,6 @@ out:
 	return ret;
 }
 
-
 static int fake_dev_send(const struct device *dev, struct net_pkt *pkt)
 {
 	ARG_UNUSED(dev);
@@ -97,14 +96,13 @@ static struct dummy_api fake_dev_if_api = {
 	.send = fake_dev_send,
 };
 
-#define _ETH_L2_LAYER    DUMMY_L2
+#define _ETH_L2_LAYER DUMMY_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
-NET_DEVICE_INIT(fake_dev, "fake_dev",
-		fake_dev_init, fake_dev_pm_control,
+NET_DEVICE_INIT(fake_dev, "fake_dev", fake_dev_init, fake_dev_pm_control,
 		&fake_dev_context_data, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&fake_dev_if_api, _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &fake_dev_if_api,
+		_ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 void test_setup(void)
 {
@@ -137,8 +135,8 @@ void test_pm(void)
 	zassert_false(net_if_is_suspended(iface), "net iface is not suspended");
 
 	/* Let's send some data, it should go through */
-	ret = sendto(sock, data, ARRAY_SIZE(data), 0,
-		     (struct sockaddr *)&addr4, sizeof(struct sockaddr_in));
+	ret = sendto(sock, data, ARRAY_SIZE(data), 0, (struct sockaddr *)&addr4,
+		     sizeof(struct sockaddr_in));
 	zassert_true(ret > 0, "Could not send data");
 
 	/* Let's make sure net stack's thread gets ran, or setting PM state
@@ -146,37 +144,33 @@ void test_pm(void)
 	 */
 	k_yield();
 
-	ret = device_set_power_state(dev, DEVICE_PM_SUSPEND_STATE,
-				     NULL, NULL);
+	ret = device_set_power_state(dev, DEVICE_PM_SUSPEND_STATE, NULL, NULL);
 	zassert_true(ret == 0, "Could not set state");
 
 	zassert_true(net_if_is_suspended(iface), "net iface is not suspended");
 
 	/* Let's try to suspend it again, it should fail relevantly */
-	ret = device_set_power_state(dev, DEVICE_PM_SUSPEND_STATE,
-				     NULL, NULL);
+	ret = device_set_power_state(dev, DEVICE_PM_SUSPEND_STATE, NULL, NULL);
 	zassert_true(ret == -EALREADY, "Could change state");
 
 	zassert_true(net_if_is_suspended(iface), "net iface is not suspended");
 
 	/* Let's send some data, it should fail relevantly */
-	ret = sendto(sock, data, ARRAY_SIZE(data), 0,
-		     (struct sockaddr *)&addr4, sizeof(struct sockaddr_in));
+	ret = sendto(sock, data, ARRAY_SIZE(data), 0, (struct sockaddr *)&addr4,
+		     sizeof(struct sockaddr_in));
 	zassert_true(ret < 0, "Could send data");
 
-	ret = device_set_power_state(dev, DEVICE_PM_ACTIVE_STATE,
-				     NULL, NULL);
+	ret = device_set_power_state(dev, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
 	zassert_true(ret == 0, "Could not set state");
 
 	zassert_false(net_if_is_suspended(iface), "net iface is suspended");
 
-	ret = device_set_power_state(dev, DEVICE_PM_ACTIVE_STATE,
-				     NULL, NULL);
+	ret = device_set_power_state(dev, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
 	zassert_true(ret == -EALREADY, "Could change state");
 
 	/* Let's send some data, it should go through */
-	ret = sendto(sock, data, ARRAY_SIZE(data), 0,
-		     (struct sockaddr *)&addr4, sizeof(struct sockaddr_in));
+	ret = sendto(sock, data, ARRAY_SIZE(data), 0, (struct sockaddr *)&addr4,
+		     sizeof(struct sockaddr_in));
 	zassert_true(ret > 0, "Could not send data");
 
 	close(sock);
@@ -184,8 +178,7 @@ void test_pm(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_net_pm,
-			 ztest_unit_test(test_setup),
+	ztest_test_suite(test_net_pm, ztest_unit_test(test_setup),
 			 ztest_unit_test(test_pm));
 	ztest_run_test_suite(test_net_pm);
 }

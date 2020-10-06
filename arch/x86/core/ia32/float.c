@@ -62,15 +62,13 @@ static inline void z_FpAccessDisable(void)
 {
 	void *tempReg;
 
-	__asm__ volatile(
-		"movl %%cr0, %0;\n\t"
-		"orl $0x8, %0;\n\t"
-		"movl %0, %%cr0;\n\t"
-		: "=r"(tempReg)
-		:
-		: "memory");
+	__asm__ volatile("movl %%cr0, %0;\n\t"
+			 "orl $0x8, %0;\n\t"
+			 "movl %0, %%cr0;\n\t"
+			 : "=r"(tempReg)
+			 :
+			 : "memory");
 }
-
 
 /**
  *
@@ -328,5 +326,5 @@ void _FpNotAvailableExcHandler(z_arch_esf_t *pEsf)
 
 	k_float_enable(_current, _FP_USER_MASK);
 }
-_EXCEPTION_CONNECT_NOCODE(_FpNotAvailableExcHandler,
-		IV_DEVICE_NOT_AVAILABLE, 0);
+_EXCEPTION_CONNECT_NOCODE(_FpNotAvailableExcHandler, IV_DEVICE_NOT_AVAILABLE,
+			  0);

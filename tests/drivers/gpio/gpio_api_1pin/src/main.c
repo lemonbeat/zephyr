@@ -8,7 +8,8 @@
 
 void test_main(void)
 {
-	ztest_test_suite(gpio_api_1pin_test,
+	ztest_test_suite(
+		gpio_api_1pin_test,
 		ztest_unit_test(test_gpio_pin_configure_push_pull),
 		ztest_unit_test(test_gpio_pin_configure_single_ended),
 		ztest_unit_test(test_gpio_pin_set_get_raw),

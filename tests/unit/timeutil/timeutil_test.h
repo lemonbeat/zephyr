@@ -16,8 +16,7 @@ struct timeutil_test_data {
 	struct tm tm;
 };
 
-void timeutil_check(const struct timeutil_test_data *tp,
-		    size_t count);
+void timeutil_check(const struct timeutil_test_data *tp, size_t count);
 
 void test_gmtime(void);
 void test_s32(void);

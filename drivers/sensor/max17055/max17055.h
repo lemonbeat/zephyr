@@ -9,16 +9,16 @@
 
 /* Register addresses */
 enum {
-	REP_CAP		= 0x5,
-	REP_SOC		= 0x6,
-	INT_TEMP	= 0x8,
-	VCELL		= 0x9,
-	AVG_CURRENT	= 0xb,
-	FULL_CAP_REP	= 0x10,
-	TTE		= 0x11,
-	CYCLES		= 0x17,
-	DESIGN_CAP	= 0x18,
-	TTF		= 0x20,
+	REP_CAP = 0x5,
+	REP_SOC = 0x6,
+	INT_TEMP = 0x8,
+	VCELL = 0x9,
+	AVG_CURRENT = 0xb,
+	FULL_CAP_REP = 0x10,
+	TTE = 0x11,
+	CYCLES = 0x17,
+	DESIGN_CAP = 0x18,
+	TTF = 0x20,
 };
 
 struct max17055_data {

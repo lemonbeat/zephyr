@@ -17,9 +17,9 @@
 #include <arch/cpu.h>
 
 /** Watchdog control register first write keys */
-#define WDT_FIRST_KEY     0x55ul
+#define WDT_FIRST_KEY 0x55ul
 /** Watchdog control register second write keys */
-#define WDT_SECOND_KEY    0xAAul
+#define WDT_SECOND_KEY 0xAAul
 
 /**
  * @brief Calculate \f$ \left\lceil \frac{a}{b} \right\rceil \f$ using
@@ -30,7 +30,7 @@
  *
  * @return (\a a / \a b) rounded up to the nearest integer.
  */
-#define div_ceil(a, b)	(((a) + (b) - 1) / (b))
+#define div_ceil(a, b) (((a) + (b)-1) / (b))
 
 /**
  * @brief Sets the WatchDog Timer Control register to the \a ctrl value thanks
@@ -62,8 +62,8 @@ static ALWAYS_INLINE void wdt_set_ctrl(uint32_t ctrl)
  * Fcpu = 48MHz
  * Fpll = (Fclk * PLL_mul) / PLL_div
  */
-#define PLL0_MUL        (192000000 / XTAL_FREQ)
-#define PLL0_DIV         4
+#define PLL0_MUL (192000000 / XTAL_FREQ)
+#define PLL0_DIV 4
 
 static inline bool pll_is_locked(uint32_t pll_id)
 {
@@ -100,23 +100,23 @@ static inline bool osc_is_ready(uint8_t id)
  */
 static inline uint32_t pll_config_init(uint32_t divide, uint32_t mul)
 {
-#define SCIF0_PLL_VCO_RANGE1_MAX_FREQ   240000000
-#define SCIF_PLL0_VCO_RANGE1_MIN_FREQ   160000000
-#define SCIF_PLL0_VCO_RANGE0_MAX_FREQ   180000000
-#define SCIF_PLL0_VCO_RANGE0_MIN_FREQ    80000000
+#define SCIF0_PLL_VCO_RANGE1_MAX_FREQ 240000000
+#define SCIF_PLL0_VCO_RANGE1_MIN_FREQ 160000000
+#define SCIF_PLL0_VCO_RANGE0_MAX_FREQ 180000000
+#define SCIF_PLL0_VCO_RANGE0_MIN_FREQ 80000000
 /* VCO frequency range is 160-240 MHz (80-180 MHz if unset) */
-#define PLL_OPT_VCO_RANGE_HIGH    0
+#define PLL_OPT_VCO_RANGE_HIGH 0
 /* Divide output frequency by two */
-#define PLL_OPT_OUTPUT_DIV        1
+#define PLL_OPT_OUTPUT_DIV 1
 /* The threshold above which to set the #PLL_OPT_VCO_RANGE_HIGH option */
-#define PLL_VCO_LOW_THRESHOLD     ((SCIF_PLL0_VCO_RANGE1_MIN_FREQ \
-	+ SCIF_PLL0_VCO_RANGE0_MAX_FREQ) / 2)
+#define PLL_VCO_LOW_THRESHOLD \
+	((SCIF_PLL0_VCO_RANGE1_MIN_FREQ + SCIF_PLL0_VCO_RANGE0_MAX_FREQ) / 2)
 #define PLL_MIN_HZ 40000000
 #define PLL_MAX_HZ 240000000
-#define MUL_MIN    2
-#define MUL_MAX    16
-#define DIV_MIN    0
-#define DIV_MAX    15
+#define MUL_MIN 2
+#define MUL_MAX 16
+#define DIV_MIN 0
+#define DIV_MAX 15
 
 	uint32_t pll_value;
 	uint32_t vco_hz;
@@ -131,19 +131,18 @@ static inline uint32_t pll_config_init(uint32_t divide, uint32_t mul)
 	if ((vco_hz < PLL_MIN_HZ * 2) && (mul <= 8)) {
 		mul *= 2;
 		vco_hz *= 2;
-		pll_value |= (1U << (SCIF_PLL_PLLOPT_Pos +
-				     PLL_OPT_OUTPUT_DIV));
+		pll_value |= (1U << (SCIF_PLL_PLLOPT_Pos + PLL_OPT_OUTPUT_DIV));
 	}
 
 	/* Set VCO frequency range according to calculated value */
 	if (vco_hz >= PLL_VCO_LOW_THRESHOLD) {
-		pll_value |= 1U << (SCIF_PLL_PLLOPT_Pos +
-				    PLL_OPT_VCO_RANGE_HIGH);
+		pll_value |= 1U
+			     << (SCIF_PLL_PLLOPT_Pos + PLL_OPT_VCO_RANGE_HIGH);
 	}
 
 	pll_value |= ((mul - 1) << SCIF_PLL_PLLMUL_Pos) |
-		      (divide << SCIF_PLL_PLLDIV_Pos) |
-		      (PLL_MAX_STARTUP_CYCLES << SCIF_PLL_PLLCOUNT_Pos);
+		     (divide << SCIF_PLL_PLLDIV_Pos) |
+		     (PLL_MAX_STARTUP_CYCLES << SCIF_PLL_PLLCOUNT_Pos);
 
 	return pll_value;
 }
@@ -151,9 +150,7 @@ static inline uint32_t pll_config_init(uint32_t divide, uint32_t mul)
 static inline void flashcalw_set_wait_state(uint32_t wait_state)
 {
 	HFLASHC->FCR = (HFLASHC->FCR & ~FLASHCALW_FCR_FWS) |
-			(wait_state ?
-			 FLASHCALW_FCR_FWS_1 :
-			 FLASHCALW_FCR_FWS_0);
+		       (wait_state ? FLASHCALW_FCR_FWS_1 : FLASHCALW_FCR_FWS_0);
 }
 
 static inline bool flashcalw_is_ready(void)
@@ -207,18 +204,16 @@ static ALWAYS_INLINE void clock_init(void)
 	if (!pll_is_locked(0)) {
 		/* This assumes external 12MHz Crystal */
 		SCIF->UNLOCK = SCIF_UNLOCK_KEY(0xAAu) |
-				SCIF_UNLOCK_ADDR((uint32_t)&SCIF->OSCCTRL0 -
-						 (uint32_t)SCIF);
+			       SCIF_UNLOCK_ADDR((uint32_t)&SCIF->OSCCTRL0 -
+						(uint32_t)SCIF);
 		SCIF->OSCCTRL0 = SCIF_OSCCTRL0_STARTUP(2) |
-					SCIF_OSCCTRL0_GAIN(3) |
-					SCIF_OSCCTRL0_MODE |
-					SCIF_OSCCTRL0_OSCEN;
+				 SCIF_OSCCTRL0_GAIN(3) | SCIF_OSCCTRL0_MODE |
+				 SCIF_OSCCTRL0_OSCEN;
 
 		while (!osc_is_ready(OSC_ID_OSC0)) {
 			;
 		};
-		uint32_t pll_config = pll_config_init(PLL0_DIV,
-						      PLL0_MUL);
+		uint32_t pll_config = pll_config_init(PLL0_DIV, PLL0_MUL);
 
 		SCIF->UNLOCK = SCIF_UNLOCK_KEY(0xAAu) |
 			       SCIF_UNLOCK_ADDR((uint32_t)&SCIF->PLL[0] -

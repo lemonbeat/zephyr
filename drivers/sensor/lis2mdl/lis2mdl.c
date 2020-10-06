@@ -55,8 +55,8 @@ static int lis2mdl_set_odr(const struct device *dev,
 #endif /* CONFIG_LIS2MDL_MAG_ODR_RUNTIME */
 
 static int lis2mdl_set_hard_iron(const struct device *dev,
-				   enum sensor_channel chan,
-				   const struct sensor_value *val)
+				 enum sensor_channel chan,
+				 const struct sensor_value *val)
 {
 	struct lis2mdl_data *lis2mdl = dev->data;
 	uint8_t i;
@@ -71,8 +71,8 @@ static int lis2mdl_set_hard_iron(const struct device *dev,
 }
 
 static void lis2mdl_channel_get_mag(const struct device *dev,
-				      enum sensor_channel chan,
-				      struct sensor_value *val)
+				    enum sensor_channel chan,
+				    struct sensor_value *val)
 {
 	int32_t cval;
 	int i;
@@ -91,7 +91,8 @@ static void lis2mdl_channel_get_mag(const struct device *dev,
 		ofs_start = ofs_stop = 2U;
 		break;
 	default:
-		ofs_start = 0U; ofs_stop = 2U;
+		ofs_start = 0U;
+		ofs_stop = 2U;
 		break;
 	}
 
@@ -105,7 +106,7 @@ static void lis2mdl_channel_get_mag(const struct device *dev,
 
 /* read internal temperature */
 static void lis2mdl_channel_get_temp(const struct device *dev,
-				       struct sensor_value *val)
+				     struct sensor_value *val)
 {
 	struct lis2mdl_data *drv_data = dev->data;
 
@@ -114,8 +115,8 @@ static void lis2mdl_channel_get_temp(const struct device *dev,
 }
 
 static int lis2mdl_channel_get(const struct device *dev,
-				 enum sensor_channel chan,
-				 struct sensor_value *val)
+			       enum sensor_channel chan,
+			       struct sensor_value *val)
 {
 	switch (chan) {
 	case SENSOR_CHAN_MAGN_X:
@@ -136,8 +137,8 @@ static int lis2mdl_channel_get(const struct device *dev,
 }
 
 static int lis2mdl_config(const struct device *dev, enum sensor_channel chan,
-			    enum sensor_attribute attr,
-			    const struct sensor_value *val)
+			  enum sensor_attribute attr,
+			  const struct sensor_value *val)
 {
 	switch (attr) {
 #ifdef CONFIG_LIS2MDL_MAG_ODR_RUNTIME
@@ -154,10 +155,9 @@ static int lis2mdl_config(const struct device *dev, enum sensor_channel chan,
 	return 0;
 }
 
-static int lis2mdl_attr_set(const struct device *dev,
-			      enum sensor_channel chan,
-			      enum sensor_attribute attr,
-			      const struct sensor_value *val)
+static int lis2mdl_attr_set(const struct device *dev, enum sensor_channel chan,
+			    enum sensor_attribute attr,
+			    const struct sensor_value *val)
 {
 	switch (chan) {
 	case SENSOR_CHAN_ALL:
@@ -252,7 +252,7 @@ static int lis2mdl_init_interface(const struct device *dev)
 	lis2mdl->bus = device_get_binding(config->master_dev_name);
 	if (!lis2mdl->bus) {
 		LOG_DBG("Could not get pointer to %s device",
-			    config->master_dev_name);
+			config->master_dev_name);
 		return -EINVAL;
 	}
 
@@ -265,22 +265,22 @@ static const struct lis2mdl_config lis2mdl_dev_config = {
 	.gpio_name = DT_INST_GPIO_LABEL(0, irq_gpios),
 	.gpio_pin = DT_INST_GPIO_PIN(0, irq_gpios),
 	.gpio_flags = DT_INST_GPIO_FLAGS(0, irq_gpios),
-#endif  /* CONFIG_LIS2MDL_TRIGGER */
+#endif /* CONFIG_LIS2MDL_TRIGGER */
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
 	.bus_init = lis2mdl_spi_init,
 	.spi_conf.frequency = DT_INST_PROP(0, spi_max_frequency),
-	.spi_conf.operation = (SPI_OP_MODE_MASTER | SPI_MODE_CPOL |
-			       SPI_MODE_CPHA | SPI_WORD_SET(8) |
-			       SPI_LINES_SINGLE),
-	.spi_conf.slave     = DT_INST_REG_ADDR(0),
+	.spi_conf.operation =
+		(SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_MODE_CPHA |
+		 SPI_WORD_SET(8) | SPI_LINES_SINGLE),
+	.spi_conf.slave = DT_INST_REG_ADDR(0),
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	.gpio_cs_port	    = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
-	.cs_gpio	    = DT_INST_SPI_DEV_CS_GPIOS_PIN(0),
-	.cs_gpio_flags	    = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0),
+	.gpio_cs_port = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
+	.cs_gpio = DT_INST_SPI_DEV_CS_GPIOS_PIN(0),
+	.cs_gpio_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0),
 
-	.spi_conf.cs        =  &lis2mdl_data.cs_ctrl,
+	.spi_conf.cs = &lis2mdl_data.cs_ctrl,
 #else
-	.spi_conf.cs        = NULL,
+	.spi_conf.cs = NULL,
 #endif
 #elif DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	.bus_init = lis2mdl_i2c_init,
@@ -373,13 +373,13 @@ static int lis2mdl_init(const struct device *dev)
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
 static int lis2mdl_set_power_state(struct lis2mdl_data *lis2mdl,
-		uint32_t new_state)
+				   uint32_t new_state)
 {
 	int status = 0;
 
 	if (new_state == DEVICE_PM_ACTIVE_STATE) {
 		status = lis2mdl_operating_mode_set(lis2mdl->ctx,
-				LIS2MDL_CONTINUOUS_MODE);
+						    LIS2MDL_CONTINUOUS_MODE);
 		if (status) {
 			LOG_ERR("Power up failed");
 		}
@@ -390,7 +390,7 @@ static int lis2mdl_set_power_state(struct lis2mdl_data *lis2mdl,
 				new_state == DEVICE_PM_SUSPEND_STATE ||
 				new_state == DEVICE_PM_OFF_STATE);
 		status = lis2mdl_operating_mode_set(lis2mdl->ctx,
-				LIS2MDL_POWER_DOWN);
+						    LIS2MDL_POWER_DOWN);
 		if (status) {
 			LOG_ERR("Power down failed");
 		}
@@ -402,7 +402,7 @@ static int lis2mdl_set_power_state(struct lis2mdl_data *lis2mdl,
 }
 
 static int lis2mdl_pm_control(struct device *dev, uint32_t ctrl_command,
-				void *context, device_pm_cb cb, void *arg)
+			      void *context, device_pm_cb cb, void *arg)
 {
 	struct lis2mdl_data *lis2mdl = dev->driver_data;
 	uint32_t current_state = lis2mdl->power_state;
@@ -432,6 +432,6 @@ static int lis2mdl_pm_control(struct device *dev, uint32_t ctrl_command,
 }
 #endif /* CONFIG_DEVICE_POWER_MANAGEMENT */
 
-DEVICE_DEFINE(lis2mdl, DT_INST_LABEL(0), lis2mdl_init,
-		lis2mdl_pm_control, &lis2mdl_data, &lis2mdl_dev_config,
-		POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &lis2mdl_driver_api);
+DEVICE_DEFINE(lis2mdl, DT_INST_LABEL(0), lis2mdl_init, lis2mdl_pm_control,
+	      &lis2mdl_data, &lis2mdl_dev_config, POST_KERNEL,
+	      CONFIG_SENSOR_INIT_PRIORITY, &lis2mdl_driver_api);

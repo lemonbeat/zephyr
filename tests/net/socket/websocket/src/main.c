@@ -59,9 +59,9 @@ struct test_data {
 };
 
 static int test_recv_buf(uint8_t *feed_buf, size_t feed_len,
-			 struct websocket_context *ctx,
-			 uint32_t *msg_type, uint64_t *remaining,
-			 uint8_t *recv_buf, size_t recv_len)
+			 struct websocket_context *ctx, uint32_t *msg_type,
+			 uint64_t *remaining, uint8_t *recv_buf,
+			 size_t recv_len)
 {
 	static struct test_data test_data;
 	int ctx_ptr;
@@ -72,19 +72,17 @@ static int test_recv_buf(uint8_t *feed_buf, size_t feed_len,
 
 	ctx_ptr = POINTER_TO_INT(&test_data);
 
-	return websocket_recv_msg(ctx_ptr, recv_buf, recv_len,
-				  msg_type, remaining, 0);
+	return websocket_recv_msg(ctx_ptr, recv_buf, recv_len, msg_type,
+				  remaining, 0);
 }
 
 /* Websocket frame, header is 6 bytes, FIN bit is set, opcode is text (1),
  * payload length is 12, masking key is e17e8eb9,
  * unmasked data is "test message"
  */
-static const unsigned char frame1[] = {
-	0x81, 0x8c, 0xe1, 0x7e, 0x8e, 0xb9, 0x95, 0x1b,
-	0xfd, 0xcd, 0xc1, 0x13, 0xeb, 0xca, 0x92, 0x1f,
-	0xe9, 0xdc
-};
+static const unsigned char frame1[] = { 0x81, 0x8c, 0xe1, 0x7e, 0x8e, 0xb9,
+					0x95, 0x1b, 0xfd, 0xcd, 0xc1, 0x13,
+					0xeb, 0xca, 0x92, 0x1f, 0xe9, 0xdc };
 
 static const unsigned char frame1_msg[] = {
 	/* Null added for printing purposes */
@@ -95,12 +93,9 @@ static const unsigned char frame1_msg[] = {
  * read full frame1 and then part of second frame
  */
 static const unsigned char frame2[] = {
-	0x81, 0x8c, 0xe1, 0x7e, 0x8e, 0xb9, 0x95, 0x1b,
-	0xfd, 0xcd, 0xc1, 0x13, 0xeb, 0xca, 0x92, 0x1f,
-	0xe9, 0xdc,
-	0x81, 0x8c, 0xe1, 0x7e, 0x8e, 0xb9, 0x95, 0x1b,
-	0xfd, 0xcd, 0xc1, 0x13, 0xeb, 0xca, 0x92, 0x1f,
-	0xe9, 0xdc
+	0x81, 0x8c, 0xe1, 0x7e, 0x8e, 0xb9, 0x95, 0x1b, 0xfd, 0xcd, 0xc1, 0x13,
+	0xeb, 0xca, 0x92, 0x1f, 0xe9, 0xdc, 0x81, 0x8c, 0xe1, 0x7e, 0x8e, 0xb9,
+	0x95, 0x1b, 0xfd, 0xcd, 0xc1, 0x13, 0xeb, 0xca, 0x92, 0x1f, 0xe9, 0xdc
 };
 
 #define FRAME1_HDR_SIZE (sizeof(frame1) - (sizeof(frame1_msg) - 1))
@@ -126,8 +121,8 @@ static void test_recv(int count)
 
 	/* We feed the frame N byte(s) at a time */
 	for (i = 0; i < sizeof(frame1) / count; i++) {
-		ret = test_recv_buf(&feed_buf[i * count], count,
-				    &ctx, &msg_type, &remaining,
+		ret = test_recv_buf(&feed_buf[i * count], count, &ctx,
+				    &msg_type, &remaining,
 				    recv_buf + total_read,
 				    sizeof(recv_buf) - total_read);
 		if (count < 7 && (i * count) < FRAME1_HDR_SIZE) {
@@ -158,11 +153,11 @@ static void test_recv(int count)
 		 * only part of the message. Parse the reset of the message
 		 * here.
 		 */
-		ret = test_recv_buf(&feed_buf[FRAME1_HDR_SIZE + total_read],
-			    sizeof(frame1) - FRAME1_HDR_SIZE - total_read,
-				    &ctx, &msg_type, &remaining,
-				    recv_buf + total_read,
-				    sizeof(recv_buf) - total_read);
+		ret = test_recv_buf(
+			&feed_buf[FRAME1_HDR_SIZE + total_read],
+			sizeof(frame1) - FRAME1_HDR_SIZE - total_read, &ctx,
+			&msg_type, &remaining, recv_buf + total_read,
+			sizeof(recv_buf) - total_read);
 		total_read += ret;
 		zassert_equal(total_read, sizeof(frame1) - FRAME1_HDR_SIZE,
 			      "Invalid amount of data read (%d)", ret);
@@ -283,20 +278,18 @@ int verify_sent_and_received_msg(struct msghdr *msg, bool split_msg)
 	ctx.tmp_buf_len = sizeof(temp_recv_buf);
 
 	/* Read first the header */
-	ret = test_recv_buf(msg->msg_iov[0].iov_base,
-			    msg->msg_iov[0].iov_len,
-			    &ctx, &msg_type, &remaining,
-			    recv_buf, sizeof(recv_buf));
+	ret = test_recv_buf(msg->msg_iov[0].iov_base, msg->msg_iov[0].iov_len,
+			    &ctx, &msg_type, &remaining, recv_buf,
+			    sizeof(recv_buf));
 	zassert_equal(ret, -EAGAIN, "Msg header not found");
 
 	/* Then the first split if it is enabled */
 	if (split_msg) {
 		split_len = msg->msg_iov[1].iov_len / 2;
 
-		ret = test_recv_buf(msg->msg_iov[1].iov_base,
-				    split_len,
-				    &ctx, &msg_type, &remaining,
-				    recv_buf, sizeof(recv_buf));
+		ret = test_recv_buf(msg->msg_iov[1].iov_base, split_len, &ctx,
+				    &msg_type, &remaining, recv_buf,
+				    sizeof(recv_buf));
 		zassert_true(ret > 0, "Cannot read data (%d)", ret);
 
 		total_read = ret;
@@ -304,19 +297,20 @@ int verify_sent_and_received_msg(struct msghdr *msg, bool split_msg)
 
 	/* Then the data */
 	while (remaining > 0) {
-		ret = test_recv_buf((uint8_t *)msg->msg_iov[1].iov_base +
-								total_read,
-				    msg->msg_iov[1].iov_len - total_read,
-				    &ctx, &msg_type, &remaining,
-				    recv_buf, sizeof(recv_buf));
+		ret = test_recv_buf(
+			(uint8_t *)msg->msg_iov[1].iov_base + total_read,
+			msg->msg_iov[1].iov_len - total_read, &ctx, &msg_type,
+			&remaining, recv_buf, sizeof(recv_buf));
 		zassert_true(ret > 0, "Cannot read data (%d)", ret);
 
 		if (memcmp(recv_buf, lorem_ipsum + total_read, ret) != 0) {
 			LOG_HEXDUMP_ERR(lorem_ipsum + total_read, ret,
 					"Received message should be");
 			LOG_HEXDUMP_ERR(recv_buf, ret, "but it was instead");
-			zassert_true(false, "Invalid received message "
-				     "after %d bytes", total_read);
+			zassert_true(false,
+				     "Invalid received message "
+				     "after %d bytes",
+				     total_read);
 		}
 
 		total_read += ret;
@@ -326,8 +320,8 @@ int verify_sent_and_received_msg(struct msghdr *msg, bool split_msg)
 		      "Msg body not valid, received %d instead of %zd",
 		      total_read, test_msg_len);
 
-	NET_DBG("Received %zd header and %zd body",
-		msg->msg_iov[0].iov_len, total_read);
+	NET_DBG("Received %zd header and %zd body", msg->msg_iov[0].iov_len,
+		total_read);
 
 	return msg->msg_iov[0].iov_len + total_read;
 }
@@ -344,10 +338,9 @@ static void test_send_and_recv_lorem_ipsum(void)
 
 	test_msg_len = sizeof(lorem_ipsum) - 1;
 
-	ret = websocket_send_msg(POINTER_TO_INT(&ctx),
-				 lorem_ipsum, test_msg_len,
-				 WEBSOCKET_OPCODE_DATA_TEXT, true, true,
-				 SYS_FOREVER_MS);
+	ret = websocket_send_msg(POINTER_TO_INT(&ctx), lorem_ipsum,
+				 test_msg_len, WEBSOCKET_OPCODE_DATA_TEXT, true,
+				 true, SYS_FOREVER_MS);
 	zassert_equal(ret, test_msg_len,
 		      "Should have sent %zd bytes but sent %d instead",
 		      test_msg_len, ret);
@@ -377,8 +370,7 @@ void test_main(void)
 {
 	k_thread_system_pool_assign(k_current_get());
 
-	ztest_test_suite(websocket,
-			 ztest_unit_test(test_recv_1_byte),
+	ztest_test_suite(websocket, ztest_unit_test(test_recv_1_byte),
 			 ztest_unit_test(test_recv_2_byte),
 			 ztest_unit_test(test_recv_3_byte),
 			 ztest_unit_test(test_recv_6_byte),
@@ -390,8 +382,7 @@ void test_main(void)
 			 ztest_unit_test(test_recv_whole_msg),
 			 ztest_unit_test(test_recv_two_msg),
 			 ztest_unit_test(test_send_and_recv_lorem_ipsum),
-			 ztest_unit_test(test_recv_two_large_split_msg)
-		);
+			 ztest_unit_test(test_recv_two_large_split_msg));
 
 	ztest_run_test_suite(websocket);
 }

@@ -23,50 +23,50 @@
 #define LOG_MODULE_NAME bt_mesh_pb_adv
 #include "common/log.h"
 
-#define GPCF(gpc)           (gpc & 0x03)
+#define GPCF(gpc) (gpc & 0x03)
 #define GPC_START(last_seg) (((last_seg) << 2) | 0x00)
-#define GPC_ACK             0x01
-#define GPC_CONT(seg_id)    (((seg_id) << 2) | 0x02)
-#define GPC_CTL(op)         (((op) << 2) | 0x03)
+#define GPC_ACK 0x01
+#define GPC_CONT(seg_id) (((seg_id) << 2) | 0x02)
+#define GPC_CTL(op) (((op) << 2) | 0x03)
 
 #define START_PAYLOAD_MAX 20
-#define CONT_PAYLOAD_MAX  23
+#define CONT_PAYLOAD_MAX 23
 
 #define START_LAST_SEG(gpc) (gpc >> 2)
 #define CONT_SEG_INDEX(gpc) (gpc >> 2)
 
 #define BEARER_CTL(gpc) (gpc >> 2)
-#define LINK_OPEN       0x00
-#define LINK_ACK        0x01
-#define LINK_CLOSE      0x02
+#define LINK_OPEN 0x00
+#define LINK_ACK 0x01
+#define LINK_CLOSE 0x02
 
 #define XACT_SEG_DATA(_seg) (&link.rx.buf->data[20 + ((_seg - 1) * 23)])
 #define XACT_SEG_RECV(_seg) (link.rx.seg &= ~(1 << (_seg)))
 
-#define XACT_ID_MAX  0x7f
+#define XACT_ID_MAX 0x7f
 #define XACT_ID_NVAL 0xff
-#define SEG_NVAL     0xff
+#define SEG_NVAL 0xff
 
-#define RETRANSMIT_TIMEOUT  K_MSEC(500)
-#define BUF_TIMEOUT         K_MSEC(400)
-#define CLOSING_TIMEOUT     (3 * MSEC_PER_SEC)
+#define RETRANSMIT_TIMEOUT K_MSEC(500)
+#define BUF_TIMEOUT K_MSEC(400)
+#define CLOSING_TIMEOUT (3 * MSEC_PER_SEC)
 #define TRANSACTION_TIMEOUT (30 * MSEC_PER_SEC)
 
 /* Acked messages, will do retransmissions manually, taking acks into account:
  */
-#define RETRANSMITS_RELIABLE   0
+#define RETRANSMITS_RELIABLE 0
 /* Unacked messages: */
 #define RETRANSMITS_UNRELIABLE 2
 /* PDU acks: */
-#define RETRANSMITS_ACK        2
+#define RETRANSMITS_ACK 2
 
 enum {
-	LINK_ACTIVE,    /* Link has been opened */
+	LINK_ACTIVE, /* Link has been opened */
 	LINK_ACK_RECVD, /* Ack for link has been received */
-	LINK_CLOSING,   /* Link is closing down */
-	LINK_INVALID,   /* Error occurred during provisioning */
-	ACK_PENDING,    /* An acknowledgment is being sent */
-	PROVISIONER,    /* The link was opened as provisioner */
+	LINK_CLOSING, /* Link is closing down */
+	LINK_INVALID, /* Error occurred during provisioning */
+	ACK_PENDING, /* An acknowledgment is being sent */
+	PROVISIONER, /* The link was opened as provisioner */
 
 	NUM_FLAGS,
 };
@@ -80,10 +80,10 @@ struct pb_adv {
 	void *cb_data;
 
 	struct {
-		uint8_t id;       /* Most recent transaction ID */
-		uint8_t seg;      /* Bit-field of unreceived segments */
+		uint8_t id; /* Most recent transaction ID */
+		uint8_t seg; /* Bit-field of unreceived segments */
 		uint8_t last_seg; /* Last segment (to check length) */
-		uint8_t fcs;      /* Expected FCS value */
+		uint8_t fcs; /* Expected FCS value */
 		struct net_buf_simple *buf;
 	} rx;
 
@@ -171,7 +171,7 @@ static void free_segments(void)
 
 static uint8_t next_transaction_id(uint8_t id)
 {
-	return (((id + 1) & XACT_ID_MAX) | (id & (XACT_ID_MAX+1)));
+	return (((id + 1) & XACT_ID_MAX) | (id & (XACT_ID_MAX + 1)));
 }
 
 static void prov_clear_tx(void)
@@ -335,8 +335,7 @@ static void gen_prov_cont(struct prov_rx *rx, struct net_buf_simple *buf)
 		return;
 	}
 
-	if (!link.rx.seg &&
-	    next_transaction_id(link.rx.id) == rx->xact_id) {
+	if (!link.rx.seg && next_transaction_id(link.rx.id) == rx->xact_id) {
 		BT_DBG("Start segment lost");
 
 		link.rx.id = rx->xact_id;
@@ -349,7 +348,7 @@ static void gen_prov_cont(struct prov_rx *rx, struct net_buf_simple *buf)
 		prov_clear_tx();
 	} else if (rx->xact_id != link.rx.id) {
 		BT_WARN("Data for unknown transaction (0x%x != 0x%x)",
-				rx->xact_id, link.rx.id);
+			rx->xact_id, link.rx.id);
 		return;
 	}
 
@@ -371,10 +370,10 @@ static void gen_prov_cont(struct prov_rx *rx, struct net_buf_simple *buf)
 		uint8_t expect_len;
 
 		expect_len = (link.rx.buf->len - 20U -
-				((link.rx.last_seg - 1) * 23U));
+			      ((link.rx.last_seg - 1) * 23U));
 		if (expect_len != buf->len) {
 			BT_ERR("Incorrect last seg len: %u != %u", expect_len,
-					buf->len);
+			       buf->len);
 			prov_failed(PROV_ERR_NVAL_FMT);
 			return;
 		}
@@ -631,7 +630,7 @@ static int bearer_ctl_send(uint8_t op, const void *data, uint8_t data_len,
 	k_delayed_work_submit(&link.prot_timer, PROTOCOL_TIMEOUT);
 
 	buf = adv_buf_create(reliable ? RETRANSMITS_RELIABLE :
-					RETRANSMITS_UNRELIABLE);
+					      RETRANSMITS_UNRELIABLE);
 	if (!buf) {
 		return -ENOBUFS;
 	}

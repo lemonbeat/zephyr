@@ -26,27 +26,23 @@ void multiboot(void)
 
 	if (multiboot_info.flags & MULTIBOOT_INFO_FLAGS_MEM) {
 		printk("\tBasic memory map: lower = %dK, upper = %dK.\n",
-			multiboot_info.mem_lower,
-			multiboot_info.mem_upper);
+		       multiboot_info.mem_lower, multiboot_info.mem_upper);
 	} else {
 		printk("\tNo basic memory map available.\n");
 	}
 
 	if (multiboot_info.flags & MULTIBOOT_INFO_FLAGS_MMAP) {
 		printk("\tExtended memory map was at 0x%08x (%d bytes).\n",
-			multiboot_info.mmap_addr,
-			multiboot_info.mmap_length);
+		       multiboot_info.mmap_addr, multiboot_info.mmap_length);
 	} else {
 		printk("\tNo extended memory map available.\n");
 	}
 
 	if (multiboot_info.flags & MULTIBOOT_INFO_FLAGS_FB) {
 		printk("\tFramebuffer %dbpp %dX%d (pitch %d) @ %08x.\n",
-			multiboot_info.fb_bpp,
-			multiboot_info.fb_width,
-			multiboot_info.fb_height,
-			multiboot_info.fb_pitch,
-			multiboot_info.fb_addr_lo);
+		       multiboot_info.fb_bpp, multiboot_info.fb_width,
+		       multiboot_info.fb_height, multiboot_info.fb_pitch,
+		       multiboot_info.fb_addr_lo);
 	} else {
 		printk("\tFramebuffer data not present.\n");
 	}

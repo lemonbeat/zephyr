@@ -201,7 +201,7 @@ void test_i2s_state_ready_neg(void)
 	zassert_equal(ret, -EIO, NULL);
 }
 
-#define TEST_I2S_STATE_RUNNING_NEG_REPEAT_COUNT  5
+#define TEST_I2S_STATE_RUNNING_NEG_REPEAT_COUNT 5
 
 /** @brief Verify all failure cases in RUNNING state.
  *

@@ -45,8 +45,8 @@ static void work_handler(struct k_work *work)
 	while (true) {
 		if (ctx.write) {
 			LOG_DBG("ctx.m: %u", ctx.m);
-			if (atomic_get(&ctx.m)
-				< CONFIG_NET_SOCKETPAIR_BUFFER_SIZE) {
+			if (atomic_get(&ctx.m) <
+			    CONFIG_NET_SOCKETPAIR_BUFFER_SIZE) {
 				continue;
 			}
 			LOG_DBG("ready to read!");
@@ -76,14 +76,13 @@ static void work_handler(struct k_work *work)
 void test_socketpair_write_block(void)
 {
 	int res;
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 
 	LOG_DBG("creating socketpair..");
 	res = socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
 	zassert_equal(res, 0, "socketpair(2) failed: %d", errno);
 
 	for (size_t i = 0; i < 2; ++i) {
-
 		LOG_DBG("data direction %d -> %d", sv[i], sv[(!i) & 1]);
 
 		LOG_DBG("setting up context");
@@ -94,19 +93,18 @@ void test_socketpair_write_block(void)
 		LOG_DBG("queueing work");
 		k_work_init(&work, work_handler);
 		res = k_work_submit_to_user_queue(&test_socketpair_work_q,
-			&work);
+						  &work);
 		zassert_equal(res, 0,
-			"k_work_submit_to_user_queue() failed: %d", res);
+			      "k_work_submit_to_user_queue() failed: %d", res);
 
 		/* fill up the buffer */
-		for (ctx.m = 0; atomic_get(&ctx.m)
-			< CONFIG_NET_SOCKETPAIR_BUFFER_SIZE;) {
-
+		for (ctx.m = 0;
+		     atomic_get(&ctx.m) < CONFIG_NET_SOCKETPAIR_BUFFER_SIZE;) {
 			res = write(sv[i], "x", 1);
 			zassert_not_equal(res, -1, "write(2) failed: %d",
-				errno);
+					  errno);
 			zassert_equal(res, 1, "wrote %d bytes instead of 1",
-				res);
+				      res);
 
 			atomic_inc(&ctx.m);
 			LOG_DBG("have written %u bytes", ctx.m);
@@ -129,14 +127,13 @@ void test_socketpair_read_block(void)
 {
 	int res;
 	char x;
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 
 	LOG_DBG("creating socketpair..");
 	res = socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
 	zassert_equal(res, 0, "socketpair(2) failed: %d", errno);
 
 	for (size_t i = 0; i < 2; ++i) {
-
 		LOG_DBG("data direction %d <- %d", sv[i], sv[(!i) & 1]);
 
 		LOG_DBG("setting up context");
@@ -147,9 +144,9 @@ void test_socketpair_read_block(void)
 		LOG_DBG("queueing work");
 		k_work_init(&work, work_handler);
 		res = k_work_submit_to_user_queue(&test_socketpair_work_q,
-			&work);
+						  &work);
 		zassert_equal(res, 0,
-			"k_work_submit_to_user_queue() failed: %d", res);
+			      "k_work_submit_to_user_queue() failed: %d", res);
 
 		/* try to read one byte */
 		LOG_DBG("reading from fd %d", sv[i]);

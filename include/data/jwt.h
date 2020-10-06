@@ -68,25 +68,20 @@ struct jwt_builder {
  * @retval 0 Success
  * @retval -ENOSPC Buffer is insufficient to initialize
  */
-int jwt_init_builder(struct jwt_builder *builder,
-		     char *buffer,
+int jwt_init_builder(struct jwt_builder *builder, char *buffer,
 		     size_t buffer_size);
 
 /**
  * @brief add JWT primary payload.
  */
-int jwt_add_payload(struct jwt_builder *builder,
-		    int32_t exp,
-		    int32_t iat,
+int jwt_add_payload(struct jwt_builder *builder, int32_t exp, int32_t iat,
 		    const char *aud);
 
 /**
  * @brief Sign the JWT token.
  */
-int jwt_sign(struct jwt_builder *builder,
-	     const char *der_key,
+int jwt_sign(struct jwt_builder *builder, const char *der_key,
 	     size_t der_key_len);
-
 
 static inline size_t jwt_payload_len(struct jwt_builder *builder)
 {

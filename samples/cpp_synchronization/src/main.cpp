@@ -27,14 +27,14 @@
  * @class semaphore the basic pure virtual semaphore class
  */
 class semaphore {
-public:
+    public:
 	virtual int wait(void) = 0;
 	virtual int wait(int timeout) = 0;
 	virtual void give(void) = 0;
 };
 
 /* specify delay between greetings (in ms); compute equivalent in ticks */
-#define SLEEPTIME  500
+#define SLEEPTIME 500
 #define STACKSIZE 2000
 
 struct k_thread coop_thread;
@@ -47,12 +47,15 @@ K_THREAD_STACK_DEFINE(coop_stack, STACKSIZE);
  * Class derives from the pure virtual semaphore class and
  * implements it's methods for the semaphore
  */
-class cpp_semaphore: public semaphore {
-protected:
+class cpp_semaphore : public semaphore {
+    protected:
 	struct k_sem _sema_internal;
-public:
+
+    public:
 	cpp_semaphore();
-	virtual ~cpp_semaphore() {}
+	virtual ~cpp_semaphore()
+	{
+	}
 	virtual int wait(void);
 	virtual int wait(int timeout);
 	virtual void give(void);
@@ -138,8 +141,8 @@ void main(void)
 	struct k_timer timer;
 
 	k_thread_create(&coop_thread, coop_stack, STACKSIZE,
-			(k_thread_entry_t) coop_thread_entry,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+			(k_thread_entry_t)coop_thread_entry, NULL, NULL, NULL,
+			K_PRIO_COOP(7), 0, K_NO_WAIT);
 	k_timer_init(&timer, NULL, NULL);
 
 	while (1) {

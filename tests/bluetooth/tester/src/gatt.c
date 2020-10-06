@@ -31,31 +31,29 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define MAX_UUID_LEN 16
 
 /* This masks Permission bits from GATT API */
-#define GATT_PERM_MASK			(BT_GATT_PERM_READ | \
-					 BT_GATT_PERM_READ_AUTHEN | \
-					 BT_GATT_PERM_READ_ENCRYPT | \
-					 BT_GATT_PERM_WRITE | \
-					 BT_GATT_PERM_WRITE_AUTHEN | \
-					 BT_GATT_PERM_WRITE_ENCRYPT | \
-					 BT_GATT_PERM_PREPARE_WRITE)
-#define GATT_PERM_ENC_READ_MASK		(BT_GATT_PERM_READ_ENCRYPT | \
-					 BT_GATT_PERM_READ_AUTHEN)
-#define GATT_PERM_ENC_WRITE_MASK	(BT_GATT_PERM_WRITE_ENCRYPT | \
-					 BT_GATT_PERM_WRITE_AUTHEN)
-#define GATT_PERM_READ_AUTHORIZATION	0x40
-#define GATT_PERM_WRITE_AUTHORIZATION	0x80
+#define GATT_PERM_MASK                                            \
+	(BT_GATT_PERM_READ | BT_GATT_PERM_READ_AUTHEN |           \
+	 BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE |         \
+	 BT_GATT_PERM_WRITE_AUTHEN | BT_GATT_PERM_WRITE_ENCRYPT | \
+	 BT_GATT_PERM_PREPARE_WRITE)
+#define GATT_PERM_ENC_READ_MASK \
+	(BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_READ_AUTHEN)
+#define GATT_PERM_ENC_WRITE_MASK \
+	(BT_GATT_PERM_WRITE_ENCRYPT | BT_GATT_PERM_WRITE_AUTHEN)
+#define GATT_PERM_READ_AUTHORIZATION 0x40
+#define GATT_PERM_WRITE_AUTHORIZATION 0x80
 
 /* GATT server context */
-#define SERVER_MAX_SERVICES		10
-#define SERVER_MAX_ATTRIBUTES		50
-#define SERVER_BUF_SIZE			2048
+#define SERVER_MAX_SERVICES 10
+#define SERVER_MAX_ATTRIBUTES 50
+#define SERVER_BUF_SIZE 2048
 
 /* bt_gatt_attr_next cannot be used on non-registered services */
 #define NEXT_DB_ATTR(attr) (attr + 1)
 #define LAST_DB_ATTR (server_db + (attr_count - 1))
 
-#define server_buf_push(_len)	net_buf_push(server_buf, ROUND_UP(_len, 4))
-#define server_buf_pull(_len)	net_buf_pull(server_buf, ROUND_UP(_len, 4))
+#define server_buf_push(_len) net_buf_push(server_buf, ROUND_UP(_len, 4))
+#define server_buf_pull(_len) net_buf_pull(server_buf, ROUND_UP(_len, 4))
 
 static struct bt_gatt_service server_svcs[SERVER_MAX_SERVICES];
 static struct bt_gatt_attr server_db[SERVER_MAX_ATTRIBUTES];
@@ -119,7 +117,7 @@ static struct bt_gatt_attr *gatt_db_add(const struct bt_gatt_attr *pattern,
 	static struct bt_gatt_attr *attr = server_db;
 	const union uuid *u = CONTAINER_OF(pattern->uuid, union uuid, uuid);
 	size_t uuid_size = u->uuid.type == BT_UUID_TYPE_16 ? sizeof(u->u16) :
-							     sizeof(u->u128);
+								   sizeof(u->u128);
 
 	/* Return NULL if database is full */
 	if (attr == &server_db[SERVER_MAX_ATTRIBUTES - 1]) {
@@ -135,7 +133,7 @@ static struct bt_gatt_attr *gatt_db_add(const struct bt_gatt_attr *pattern,
 
 	/* Store the UUID. */
 	attr->uuid = server_buf_push(uuid_size);
-	memcpy((void *) attr->uuid, &u->uuid, uuid_size);
+	memcpy((void *)attr->uuid, &u->uuid, uuid_size);
 
 	/* Copy user_data to the buffer. */
 	if (user_data_len) {
@@ -177,7 +175,7 @@ static uint8_t btp2bt_uuid(const uint8_t *uuid, uint8_t len,
 static void supported_commands(uint8_t *data, uint16_t len)
 {
 	uint8_t cmds[4];
-	struct gatt_read_supported_commands_rp *rp = (void *) cmds;
+	struct gatt_read_supported_commands_rp *rp = (void *)cmds;
 
 	(void)memset(cmds, 0, sizeof(cmds));
 
@@ -209,15 +207,15 @@ static void supported_commands(uint8_t *data, uint16_t len)
 	tester_set_bit(cmds, GATT_DISC_ALL_PRIM);
 
 	tester_send(BTP_SERVICE_ID_GATT, GATT_READ_SUPPORTED_COMMANDS,
-		    CONTROLLER_INDEX, (uint8_t *) rp, sizeof(cmds));
+		    CONTROLLER_INDEX, (uint8_t *)rp, sizeof(cmds));
 }
 
 static int register_service(void)
 {
 	int err;
 
-	server_svcs[svc_count].attrs = server_db +
-				       (attr_count - svc_attr_count);
+	server_svcs[svc_count].attrs =
+		server_db + (attr_count - svc_attr_count);
 	server_svcs[svc_count].attr_count = svc_attr_count;
 
 	err = bt_gatt_service_register(&server_svcs[svc_count]);
@@ -231,7 +229,7 @@ static int register_service(void)
 
 static void add_service(uint8_t *data, uint16_t len)
 {
-	const struct gatt_add_service_cmd *cmd = (void *) data;
+	const struct gatt_add_service_cmd *cmd = (void *)data;
 	struct gatt_add_service_rp rp;
 	struct bt_gatt_attr *attr_svc = NULL;
 	union uuid uuid;
@@ -242,7 +240,7 @@ static void add_service(uint8_t *data, uint16_t len)
 	}
 
 	uuid_size = uuid.uuid.type == BT_UUID_TYPE_16 ? sizeof(uuid.u16) :
-							sizeof(uuid.u128);
+							      sizeof(uuid.u128);
 
 	/* Register last defined service */
 	if (svc_attr_count) {
@@ -255,14 +253,16 @@ static void add_service(uint8_t *data, uint16_t len)
 
 	switch (cmd->type) {
 	case GATT_SERVICE_PRIMARY:
-		attr_svc = gatt_db_add(&(struct bt_gatt_attr)
-				       BT_GATT_PRIMARY_SERVICE(&uuid.uuid),
-				       uuid_size);
+		attr_svc = gatt_db_add(
+			&(struct bt_gatt_attr)BT_GATT_PRIMARY_SERVICE(
+				&uuid.uuid),
+			uuid_size);
 		break;
 	case GATT_SERVICE_SECONDARY:
-		attr_svc = gatt_db_add(&(struct bt_gatt_attr)
-				       BT_GATT_SECONDARY_SERVICE(&uuid.uuid),
-				       uuid_size);
+		attr_svc = gatt_db_add(
+			&(struct bt_gatt_attr)BT_GATT_SECONDARY_SERVICE(
+				&uuid.uuid),
+			uuid_size);
 		break;
 	}
 
@@ -274,7 +274,7 @@ static void add_service(uint8_t *data, uint16_t len)
 	rp.svc_id = sys_cpu_to_le16(attr_svc->handle);
 
 	tester_send(BTP_SERVICE_ID_GATT, GATT_ADD_SERVICE, CONTROLLER_INDEX,
-		    (uint8_t *) &rp, sizeof(rp));
+		    (uint8_t *)&rp, sizeof(rp));
 
 	return;
 fail:
@@ -313,10 +313,11 @@ static ssize_t read_value(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 				 value->len);
 }
 
-static void attr_value_changed_ev(uint16_t handle, const uint8_t *value, uint16_t len)
+static void attr_value_changed_ev(uint16_t handle, const uint8_t *value,
+				  uint16_t len)
 {
 	uint8_t buf[len + sizeof(struct gatt_attr_value_changed_ev)];
-	struct gatt_attr_value_changed_ev *ev = (void *) buf;
+	struct gatt_attr_value_changed_ev *ev = (void *)buf;
 
 	ev->handle = sys_cpu_to_le16(handle);
 	ev->data_length = sys_cpu_to_le16(len);
@@ -378,11 +379,10 @@ static int alloc_characteristic(struct add_characteristic *ch)
 	struct gatt_value value;
 
 	/* Add Characteristic Declaration */
-	attr_chrc = gatt_db_add(&(struct bt_gatt_attr)
-				BT_GATT_ATTRIBUTE(BT_UUID_GATT_CHRC,
-						  BT_GATT_PERM_READ,
-						  bt_gatt_attr_read_chrc, NULL,
-						  (&(struct bt_gatt_chrc){})),
+	attr_chrc = gatt_db_add(&(struct bt_gatt_attr)BT_GATT_ATTRIBUTE(
+					BT_UUID_GATT_CHRC, BT_GATT_PERM_READ,
+					bt_gatt_attr_read_chrc, NULL,
+					(&(struct bt_gatt_chrc){})),
 				sizeof(*chrc_data));
 	if (!attr_chrc) {
 		return -EINVAL;
@@ -412,11 +412,11 @@ static int alloc_characteristic(struct add_characteristic *ch)
 	ch->permissions |= BT_GATT_PERM_PREPARE_WRITE;
 
 	/* Add Characteristic Value */
-	attr_value = gatt_db_add(&(struct bt_gatt_attr)
-				 BT_GATT_ATTRIBUTE(ch->uuid,
-					ch->permissions & GATT_PERM_MASK,
-					read_value, write_value, &value),
-					sizeof(value));
+	attr_value =
+		gatt_db_add(&(struct bt_gatt_attr)BT_GATT_ATTRIBUTE(
+				    ch->uuid, ch->permissions & GATT_PERM_MASK,
+				    read_value, write_value, &value),
+			    sizeof(value));
 	if (!attr_value) {
 		server_buf_pull(sizeof(*chrc_data));
 		/* Characteristic attribute uuid has constant length */
@@ -434,7 +434,7 @@ static int alloc_characteristic(struct add_characteristic *ch)
 
 static void add_characteristic(uint8_t *data, uint16_t len)
 {
-	const struct gatt_add_characteristic_cmd *cmd = (void *) data;
+	const struct gatt_add_characteristic_cmd *cmd = (void *)data;
 	struct gatt_add_characteristic_rp rp;
 	struct add_characteristic cmd_data;
 	union uuid uuid;
@@ -460,7 +460,7 @@ static void add_characteristic(uint8_t *data, uint16_t len)
 
 	rp.char_id = sys_cpu_to_le16(cmd_data.char_id);
 	tester_send(BTP_SERVICE_ID_GATT, GATT_ADD_CHARACTERISTIC,
-		    CONTROLLER_INDEX, (uint8_t *) &rp, sizeof(rp));
+		    CONTROLLER_INDEX, (uint8_t *)&rp, sizeof(rp));
 	return;
 
 fail:
@@ -477,9 +477,8 @@ static void ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
 	ccc_value = value;
 }
 
-static struct bt_gatt_attr ccc = BT_GATT_CCC(ccc_cfg_changed,
-					     BT_GATT_PERM_READ |
-					     BT_GATT_PERM_WRITE);
+static struct bt_gatt_attr ccc =
+	BT_GATT_CCC(ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE);
 
 static struct bt_gatt_attr *add_ccc(const struct bt_gatt_attr *attr)
 {
@@ -494,7 +493,7 @@ static struct bt_gatt_attr *add_ccc(const struct bt_gatt_attr *attr)
 
 	/* Check characteristic properties */
 	if (!(chrc->properties &
-	    (BT_GATT_CHRC_NOTIFY | BT_GATT_CHRC_INDICATE))) {
+	      (BT_GATT_CHRC_NOTIFY | BT_GATT_CHRC_INDICATE))) {
 		return NULL;
 	}
 
@@ -523,7 +522,7 @@ static struct bt_gatt_attr *add_cep(const struct bt_gatt_attr *attr_chrc)
 	cep_value.properties = 0x0000;
 
 	/* Add CEP descriptor to GATT database */
-	return gatt_db_add(&(struct bt_gatt_attr) BT_GATT_CEP(&cep_value),
+	return gatt_db_add(&(struct bt_gatt_attr)BT_GATT_CEP(&cep_value),
 			   sizeof(cep_value));
 }
 
@@ -575,11 +574,11 @@ static int alloc_descriptor(const struct bt_gatt_attr *attr,
 		/* Allow prepare writes */
 		d->permissions |= BT_GATT_PERM_PREPARE_WRITE;
 
-		attr_desc = gatt_db_add(&(struct bt_gatt_attr)
-					BT_GATT_DESCRIPTOR(d->uuid,
-						d->permissions & GATT_PERM_MASK,
-						read_value, write_value,
-						&value), sizeof(value));
+		attr_desc = gatt_db_add(
+			&(struct bt_gatt_attr)BT_GATT_DESCRIPTOR(
+				d->uuid, d->permissions & GATT_PERM_MASK,
+				read_value, write_value, &value),
+			sizeof(value));
 	}
 
 	if (!attr_desc) {
@@ -611,7 +610,7 @@ static struct bt_gatt_attr *get_base_chrc(struct bt_gatt_attr *attr)
 
 static void add_descriptor(uint8_t *data, uint16_t len)
 {
-	const struct gatt_add_descriptor_cmd *cmd = (void *) data;
+	const struct gatt_add_descriptor_cmd *cmd = (void *)data;
 	struct gatt_add_descriptor_rp rp;
 	struct add_descriptor cmd_data;
 	struct bt_gatt_attr *chrc;
@@ -648,12 +647,12 @@ static void add_descriptor(uint8_t *data, uint16_t len)
 
 	rp.desc_id = sys_cpu_to_le16(cmd_data.desc_id);
 	tester_send(BTP_SERVICE_ID_GATT, GATT_ADD_DESCRIPTOR, CONTROLLER_INDEX,
-		    (uint8_t *) &rp, sizeof(rp));
+		    (uint8_t *)&rp, sizeof(rp));
 	return;
 
 fail:
-	tester_rsp(BTP_SERVICE_ID_GATT, GATT_ADD_DESCRIPTOR,
-		   CONTROLLER_INDEX, BTP_STATUS_FAILED);
+	tester_rsp(BTP_SERVICE_ID_GATT, GATT_ADD_DESCRIPTOR, CONTROLLER_INDEX,
+		   BTP_STATUS_FAILED);
 }
 
 static int alloc_included(struct bt_gatt_attr *attr,
@@ -665,8 +664,8 @@ static int alloc_included(struct bt_gatt_attr *attr,
 	 * user_data_len is set to 0 to NOT allocate memory in server_buf for
 	 * user_data, just to assign to it attr pointer.
 	 */
-	attr_incl = gatt_db_add(&(struct bt_gatt_attr)
-				BT_GATT_INCLUDE_SERVICE(attr), 0);
+	attr_incl = gatt_db_add(
+		&(struct bt_gatt_attr)BT_GATT_INCLUDE_SERVICE(attr), 0);
 
 	if (!attr_incl) {
 		return -EINVAL;
@@ -680,7 +679,7 @@ static int alloc_included(struct bt_gatt_attr *attr,
 
 static void add_included(uint8_t *data, uint16_t len)
 {
-	const struct gatt_add_included_service_cmd *cmd = (void *) data;
+	const struct gatt_add_included_service_cmd *cmd = (void *)data;
 	struct gatt_add_included_service_rp rp;
 	struct bt_gatt_attr *svc;
 	uint16_t included_service_id = 0U;
@@ -703,7 +702,7 @@ static void add_included(uint8_t *data, uint16_t len)
 
 	rp.included_service_id = sys_cpu_to_le16(included_service_id);
 	tester_send(BTP_SERVICE_ID_GATT, GATT_ADD_INCLUDED_SERVICE,
-		    CONTROLLER_INDEX, (uint8_t *) &rp, sizeof(rp));
+		    CONTROLLER_INDEX, (uint8_t *)&rp, sizeof(rp));
 	return;
 
 fail:
@@ -791,7 +790,7 @@ static uint8_t alloc_value(struct bt_gatt_attr *attr, struct set_value *data)
 
 static void set_value(uint8_t *data, uint16_t len)
 {
-	const struct gatt_set_value_cmd *cmd = (void *) data;
+	const struct gatt_set_value_cmd *cmd = (void *)data;
 	struct set_value cmd_data;
 	uint8_t status;
 
@@ -803,8 +802,9 @@ static void set_value(uint8_t *data, uint16_t len)
 		status = alloc_value(LAST_DB_ATTR, &cmd_data);
 	} else {
 		/* set value of local attr, corrected by pre set attr handles */
-		status = alloc_value(&server_db[cmd->attr_id -
-				     server_db[0].handle], &cmd_data);
+		status = alloc_value(
+			&server_db[cmd->attr_id - server_db[0].handle],
+			&cmd_data);
 	}
 
 	tester_rsp(BTP_SERVICE_ID_GATT, GATT_SET_VALUE, CONTROLLER_INDEX,
@@ -825,7 +825,7 @@ static void start_server(uint8_t *data, uint16_t len)
 	}
 
 	tester_send(BTP_SERVICE_ID_GATT, GATT_START_SERVER, CONTROLLER_INDEX,
-		    (uint8_t *) &rp, sizeof(rp));
+		    (uint8_t *)&rp, sizeof(rp));
 }
 
 static int set_attr_enc_key_size(const struct bt_gatt_attr *attr,
@@ -841,8 +841,8 @@ static int set_attr_enc_key_size(const struct bt_gatt_attr *attr,
 	}
 
 	/* Fail if permissions are not set */
-	if (!(attr->perm & (GATT_PERM_ENC_READ_MASK |
-			    GATT_PERM_ENC_WRITE_MASK))) {
+	if (!(attr->perm &
+	      (GATT_PERM_ENC_READ_MASK | GATT_PERM_ENC_WRITE_MASK))) {
 		return -EINVAL;
 	}
 
@@ -854,7 +854,7 @@ static int set_attr_enc_key_size(const struct bt_gatt_attr *attr,
 
 static void set_enc_key_size(uint8_t *data, uint16_t len)
 {
-	const struct gatt_set_enc_key_size_cmd *cmd = (void *) data;
+	const struct gatt_set_enc_key_size_cmd *cmd = (void *)data;
 	uint8_t status;
 
 	/* Fail if requested key size is invalid */
@@ -867,9 +867,9 @@ static void set_enc_key_size(uint8_t *data, uint16_t len)
 		status = set_attr_enc_key_size(LAST_DB_ATTR, cmd->key_size);
 	} else {
 		/* set value of local attr, corrected by pre set attr handles */
-		status = set_attr_enc_key_size(&server_db[cmd->attr_id -
-					       server_db[0].handle],
-					       cmd->key_size);
+		status = set_attr_enc_key_size(
+			&server_db[cmd->attr_id - server_db[0].handle],
+			cmd->key_size);
 	}
 
 fail:
@@ -914,8 +914,8 @@ static void exchange_mtu(uint8_t *data, uint16_t len)
 
 	return;
 fail:
-	tester_rsp(BTP_SERVICE_ID_GATT, GATT_EXCHANGE_MTU,
-		   CONTROLLER_INDEX, BTP_STATUS_FAILED);
+	tester_rsp(BTP_SERVICE_ID_GATT, GATT_EXCHANGE_MTU, CONTROLLER_INDEX,
+		   BTP_STATUS_FAILED);
 }
 
 static struct bt_gatt_discover_params discover_params;
@@ -929,17 +929,17 @@ static void discover_destroy(struct bt_gatt_discover_params *params)
 }
 
 static uint8_t disc_prim_cb(struct bt_conn *conn,
-			 const struct bt_gatt_attr *attr,
-			 struct bt_gatt_discover_params *params)
+			    const struct bt_gatt_attr *attr,
+			    struct bt_gatt_discover_params *params)
 {
 	struct bt_gatt_service_val *data;
-	struct gatt_disc_prim_rp *rp = (void *) gatt_buf.buf;
+	struct gatt_disc_prim_rp *rp = (void *)gatt_buf.buf;
 	struct gatt_service *service;
 	uint8_t uuid_length;
 
 	if (!attr) {
-		tester_send(BTP_SERVICE_ID_GATT, btp_opcode,
-			    CONTROLLER_INDEX, gatt_buf.buf, gatt_buf.len);
+		tester_send(BTP_SERVICE_ID_GATT, btp_opcode, CONTROLLER_INDEX,
+			    gatt_buf.buf, gatt_buf.len);
 		discover_destroy(params);
 		return BT_GATT_ITER_STOP;
 	}
@@ -950,8 +950,8 @@ static uint8_t disc_prim_cb(struct bt_conn *conn,
 
 	service = gatt_buf_reserve(sizeof(*service) + uuid_length);
 	if (!service) {
-		tester_rsp(BTP_SERVICE_ID_GATT, btp_opcode,
-			   CONTROLLER_INDEX, BTP_STATUS_FAILED);
+		tester_rsp(BTP_SERVICE_ID_GATT, btp_opcode, CONTROLLER_INDEX,
+			   BTP_STATUS_FAILED);
 		discover_destroy(params);
 		return BT_GATT_ITER_STOP;
 	}
@@ -1014,7 +1014,7 @@ fail_conn:
 
 static void disc_prim_uuid(uint8_t *data, uint16_t len)
 {
-	const struct gatt_disc_prim_uuid_cmd *cmd = (void *) data;
+	const struct gatt_disc_prim_uuid_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1060,7 +1060,7 @@ static uint8_t find_included_cb(struct bt_conn *conn,
 				struct bt_gatt_discover_params *params)
 {
 	struct bt_gatt_include *data;
-	struct gatt_find_included_rp *rp = (void *) gatt_buf.buf;
+	struct gatt_find_included_rp *rp = (void *)gatt_buf.buf;
 	struct gatt_included *included;
 	uint8_t uuid_length;
 
@@ -1104,7 +1104,7 @@ static uint8_t find_included_cb(struct bt_conn *conn,
 
 static void find_included(uint8_t *data, uint16_t len)
 {
-	const struct gatt_find_included_cmd *cmd = (void *) data;
+	const struct gatt_find_included_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1143,13 +1143,13 @@ static uint8_t disc_chrc_cb(struct bt_conn *conn,
 			    struct bt_gatt_discover_params *params)
 {
 	struct bt_gatt_chrc *data;
-	struct gatt_disc_chrc_rp *rp = (void *) gatt_buf.buf;
+	struct gatt_disc_chrc_rp *rp = (void *)gatt_buf.buf;
 	struct gatt_characteristic *chrc;
 	uint8_t uuid_length;
 
 	if (!attr) {
-		tester_send(BTP_SERVICE_ID_GATT, btp_opcode,
-			    CONTROLLER_INDEX, gatt_buf.buf, gatt_buf.len);
+		tester_send(BTP_SERVICE_ID_GATT, btp_opcode, CONTROLLER_INDEX,
+			    gatt_buf.buf, gatt_buf.len);
 		discover_destroy(params);
 		return BT_GATT_ITER_STOP;
 	}
@@ -1160,8 +1160,8 @@ static uint8_t disc_chrc_cb(struct bt_conn *conn,
 
 	chrc = gatt_buf_reserve(sizeof(*chrc) + uuid_length);
 	if (!chrc) {
-		tester_rsp(BTP_SERVICE_ID_GATT, btp_opcode,
-			   CONTROLLER_INDEX, BTP_STATUS_FAILED);
+		tester_rsp(BTP_SERVICE_ID_GATT, btp_opcode, CONTROLLER_INDEX,
+			   BTP_STATUS_FAILED);
 		discover_destroy(params);
 		return BT_GATT_ITER_STOP;
 	}
@@ -1186,7 +1186,7 @@ static uint8_t disc_chrc_cb(struct bt_conn *conn,
 
 static void disc_all_chrc(uint8_t *data, uint16_t len)
 {
-	const struct gatt_disc_all_chrc_cmd *cmd = (void *) data;
+	const struct gatt_disc_all_chrc_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1225,7 +1225,7 @@ fail_conn:
 
 static void disc_chrc_uuid(uint8_t *data, uint16_t len)
 {
-	const struct gatt_disc_chrc_uuid_cmd *cmd = (void *) data;
+	const struct gatt_disc_chrc_uuid_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1271,7 +1271,7 @@ static uint8_t disc_all_desc_cb(struct bt_conn *conn,
 				const struct bt_gatt_attr *attr,
 				struct bt_gatt_discover_params *params)
 {
-	struct gatt_disc_all_desc_rp *rp = (void *) gatt_buf.buf;
+	struct gatt_disc_all_desc_rp *rp = (void *)gatt_buf.buf;
 	struct gatt_descriptor *descriptor;
 	uint8_t uuid_length;
 
@@ -1311,7 +1311,7 @@ static uint8_t disc_all_desc_cb(struct bt_conn *conn,
 
 static void disc_all_desc(uint8_t *data, uint16_t len)
 {
-	const struct gatt_disc_all_desc_cmd *cmd = (void *) data;
+	const struct gatt_disc_all_desc_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1357,7 +1357,7 @@ static uint8_t read_cb(struct bt_conn *conn, uint8_t err,
 		       struct bt_gatt_read_params *params, const void *data,
 		       uint16_t length)
 {
-	struct gatt_read_rp *rp = (void *) gatt_buf.buf;
+	struct gatt_read_rp *rp = (void *)gatt_buf.buf;
 
 	/* Respond to the Lower Tester with ATT Error received */
 	if (err) {
@@ -1373,8 +1373,8 @@ static uint8_t read_cb(struct bt_conn *conn, uint8_t err,
 	}
 
 	if (!gatt_buf_add(data, length)) {
-		tester_rsp(BTP_SERVICE_ID_GATT, btp_opcode,
-			   CONTROLLER_INDEX, BTP_STATUS_FAILED);
+		tester_rsp(BTP_SERVICE_ID_GATT, btp_opcode, CONTROLLER_INDEX,
+			   BTP_STATUS_FAILED);
 		read_destroy(params);
 		return BT_GATT_ITER_STOP;
 	}
@@ -1386,7 +1386,7 @@ static uint8_t read_cb(struct bt_conn *conn, uint8_t err,
 
 static void read(uint8_t *data, uint16_t len)
 {
-	const struct gatt_read_cmd *cmd = (void *) data;
+	const struct gatt_read_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1425,7 +1425,7 @@ fail_conn:
 
 static void read_uuid(uint8_t *data, uint16_t len)
 {
-	const struct gatt_read_uuid_cmd *cmd = (void *) data;
+	const struct gatt_read_uuid_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1468,7 +1468,7 @@ fail_conn:
 
 static void read_long(uint8_t *data, uint16_t len)
 {
-	const struct gatt_read_long_cmd *cmd = (void *) data;
+	const struct gatt_read_long_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1507,7 +1507,7 @@ fail_conn:
 
 static void read_multiple(uint8_t *data, uint16_t len)
 {
-	const struct gatt_read_multiple_cmd *cmd = (void *) data;
+	const struct gatt_read_multiple_cmd *cmd = (void *)data;
 	uint16_t handles[cmd->handles_count];
 	struct bt_conn *conn;
 	int i;
@@ -1551,7 +1551,7 @@ fail_conn:
 static void write_without_rsp(uint8_t *data, uint16_t len, uint8_t op,
 			      bool sign)
 {
-	const struct gatt_write_without_rsp_cmd *cmd = (void *) data;
+	const struct gatt_write_without_rsp_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 	uint8_t status = BTP_STATUS_SUCCESS;
 
@@ -1561,10 +1561,9 @@ static void write_without_rsp(uint8_t *data, uint16_t len, uint8_t op,
 		goto rsp;
 	}
 
-	if (bt_gatt_write_without_response(conn, sys_le16_to_cpu(cmd->handle),
-					   cmd->data,
-					   sys_le16_to_cpu(cmd->data_length),
-					   sign) < 0) {
+	if (bt_gatt_write_without_response(
+		    conn, sys_le16_to_cpu(cmd->handle), cmd->data,
+		    sys_le16_to_cpu(cmd->data_length), sign) < 0) {
 		status = BTP_STATUS_FAILED;
 	}
 
@@ -1584,7 +1583,7 @@ static struct bt_gatt_write_params write_params;
 
 static void write(uint8_t *data, uint16_t len)
 {
-	const struct gatt_write_cmd *cmd = (void *) data;
+	const struct gatt_write_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1620,7 +1619,7 @@ static void write_long_rsp(struct bt_conn *conn, uint8_t err,
 
 static void write_long(uint8_t *data, uint16_t len)
 {
-	const struct gatt_write_long_cmd *cmd = (void *) data;
+	const struct gatt_write_long_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 
 	conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, (bt_addr_le_t *)data);
@@ -1656,7 +1655,7 @@ static uint8_t notify_func(struct bt_conn *conn,
 			   struct bt_gatt_subscribe_params *params,
 			   const void *data, uint16_t length)
 {
-	struct gatt_notification_ev *ev = (void *) ev_buf;
+	struct gatt_notification_ev *ev = (void *)ev_buf;
 	const bt_addr_le_t *addr;
 
 	if (!conn || !data) {
@@ -1665,15 +1664,15 @@ static uint8_t notify_func(struct bt_conn *conn,
 		return BT_GATT_ITER_STOP;
 	}
 	addr = bt_conn_get_dst(conn);
-	ev->type = (uint8_t) subscribe_params.value;
+	ev->type = (uint8_t)subscribe_params.value;
 	ev->handle = sys_cpu_to_le16(subscribe_params.value_handle);
 	ev->data_length = sys_cpu_to_le16(length);
 	memcpy(ev->data, data, length);
 	memcpy(ev->address, addr->a.val, sizeof(ev->address));
 	ev->address_type = addr->type;
 
-	tester_send(BTP_SERVICE_ID_GATT, GATT_EV_NOTIFICATION,
-		    CONTROLLER_INDEX, ev_buf, sizeof(*ev) + length);
+	tester_send(BTP_SERVICE_ID_GATT, GATT_EV_NOTIFICATION, CONTROLLER_INDEX,
+		    ev_buf, sizeof(*ev) + length);
 
 	return BT_GATT_ITER_CONTINUE;
 }
@@ -1697,7 +1696,7 @@ static void discover_complete(struct bt_conn *conn,
 	status = BTP_STATUS_SUCCESS;
 fail:
 	op = subscribe_params.value == BT_GATT_CCC_NOTIFY ? GATT_CFG_NOTIFY :
-							    GATT_CFG_INDICATE;
+								  GATT_CFG_INDICATE;
 
 	if (status == BTP_STATUS_FAILED) {
 		(void)memset(&subscribe_params, 0, sizeof(subscribe_params));
@@ -1766,7 +1765,7 @@ static int disable_subscription(struct bt_conn *conn, uint16_t ccc_handle)
 
 static void config_subscription(uint8_t *data, uint16_t len, uint16_t op)
 {
-	const struct gatt_cfg_notify_cmd *cmd = (void *) data;
+	const struct gatt_cfg_notify_cmd *cmd = (void *)data;
 	struct bt_conn *conn;
 	uint16_t ccc_handle = sys_le16_to_cpu(cmd->ccc_handle);
 	uint8_t status;
@@ -1821,7 +1820,6 @@ static uint8_t get_attrs_rp(const struct bt_gatt_attr *attr, uint16_t handle,
 	struct gatt_attr *gatt_attr;
 
 	if (foreach->uuid && bt_uuid_cmp(foreach->uuid, attr->uuid)) {
-
 		return BT_GATT_ITER_CONTINUE;
 	}
 
@@ -1847,7 +1845,7 @@ static uint8_t get_attrs_rp(const struct bt_gatt_attr *attr, uint16_t handle,
 
 static void get_attrs(uint8_t *data, uint16_t len)
 {
-	const struct gatt_get_attributes_cmd *cmd = (void *) data;
+	const struct gatt_get_attributes_cmd *cmd = (void *)data;
 	struct gatt_get_attributes_rp *rp;
 	struct net_buf_simple *buf = NET_BUF_SIMPLE(BTP_DATA_MAX_SIZE);
 	struct get_attrs_foreach_data foreach;
@@ -1939,7 +1937,7 @@ static uint8_t get_attr_val_rp(const struct bt_gatt_attr *attr, uint16_t handle,
 
 static void get_attr_val(uint8_t *data, uint16_t len)
 {
-	const struct gatt_get_attribute_value_cmd *cmd = (void *) data;
+	const struct gatt_get_attribute_value_cmd *cmd = (void *)data;
 	struct net_buf_simple *buf = NET_BUF_SIMPLE(BTP_DATA_MAX_SIZE);
 	uint16_t handle = sys_le16_to_cpu(cmd->handle);
 
@@ -1957,7 +1955,7 @@ static void get_attr_val(uint8_t *data, uint16_t len)
 }
 
 void tester_handle_gatt(uint8_t opcode, uint8_t index, uint8_t *data,
-			 uint16_t len)
+			uint16_t len)
 {
 	switch (opcode) {
 	case GATT_READ_SUPPORTED_COMMANDS:

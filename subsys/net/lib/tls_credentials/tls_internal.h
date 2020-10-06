@@ -42,7 +42,6 @@ void credentials_unlock(void);
 struct tls_credential *credential_get(sec_tag_t tag,
 				      enum tls_credential_type type);
 
-
 /* Function for iterating over credentials by tag.
  *
  * Note, that to assure thread safety, credential access should be locked with

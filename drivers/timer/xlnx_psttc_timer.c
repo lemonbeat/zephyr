@@ -11,26 +11,25 @@
 #include <drivers/timer/system_timer.h>
 #include "xlnx_psttc_timer_priv.h"
 
-#define TIMER_INDEX		CONFIG_XLNX_PSTTC_TIMER_INDEX
+#define TIMER_INDEX CONFIG_XLNX_PSTTC_TIMER_INDEX
 
-#define TIMER_IRQ		DT_INST_IRQN(0)
-#define TIMER_BASE_ADDR		DT_INST_REG_ADDR(0)
-#define TIMER_CLOCK_FREQUECY	DT_INST_PROP(0, clock_frequency)
+#define TIMER_IRQ DT_INST_IRQN(0)
+#define TIMER_BASE_ADDR DT_INST_REG_ADDR(0)
+#define TIMER_CLOCK_FREQUECY DT_INST_PROP(0, clock_frequency)
 
-#define TICKS_PER_SEC		CONFIG_SYS_CLOCK_TICKS_PER_SEC
-#define CYCLES_PER_SEC		TIMER_CLOCK_FREQUECY
-#define CYCLES_PER_TICK		(CYCLES_PER_SEC / TICKS_PER_SEC)
+#define TICKS_PER_SEC CONFIG_SYS_CLOCK_TICKS_PER_SEC
+#define CYCLES_PER_SEC TIMER_CLOCK_FREQUECY
+#define CYCLES_PER_TICK (CYCLES_PER_SEC / TICKS_PER_SEC)
 
 /*
  * CYCLES_NEXT_MIN must be large enough to ensure that the timer does not miss
  * interrupts.  This value was conservatively set using the trial and error
  * method, and there is room for improvement.
  */
-#define CYCLES_NEXT_MIN		(10000)
-#define CYCLES_NEXT_MAX		(XTTC_MAX_INTERVAL_COUNT)
+#define CYCLES_NEXT_MIN (10000)
+#define CYCLES_NEXT_MAX (XTTC_MAX_INTERVAL_COUNT)
 
-BUILD_ASSERT(TIMER_CLOCK_FREQUECY ==
-			CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC,
+BUILD_ASSERT(TIMER_CLOCK_FREQUECY == CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC,
 	     "Configured system timer frequency does not match the TTC "
 	     "clock frequency in the device tree");
 
@@ -131,8 +130,8 @@ int z_clock_driver_init(const struct device *device)
 	sys_write32(reg_val, TIMER_BASE_ADDR + XTTCPS_CNT_CNTRL_OFFSET);
 
 	/* Set initial timeout */
-	reg_val = IS_ENABLED(CONFIG_TICKLESS_KERNEL) ?
-			CYCLES_NEXT_MAX : CYCLES_PER_TICK;
+	reg_val = IS_ENABLED(CONFIG_TICKLESS_KERNEL) ? CYCLES_NEXT_MAX :
+							     CYCLES_PER_TICK;
 	sys_write32(reg_val, TIMER_BASE_ADDR + XTTCPS_MATCH_0_OFFSET);
 
 	/* Connect timer interrupt */

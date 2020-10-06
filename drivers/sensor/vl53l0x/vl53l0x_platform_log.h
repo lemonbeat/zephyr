@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #ifndef ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_PLATFORM_LOG_H_
 #define ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_PLATFORM_LOG_H_
 
@@ -32,15 +31,15 @@ enum {
 
 enum {
 	TRACE_FUNCTION_NONE = 0,
-	TRACE_FUNCTION_I2C  = 1,
-	TRACE_FUNCTION_ALL  = 0x7fffffff /* all bits except sign */
+	TRACE_FUNCTION_I2C = 1,
+	TRACE_FUNCTION_ALL = 0x7fffffff /* all bits except sign */
 };
 
 enum {
-	TRACE_MODULE_NONE              = 0x0,
-	TRACE_MODULE_API               = 0x1,
-	TRACE_MODULE_PLATFORM          = 0x2,
-	TRACE_MODULE_ALL               = 0x7fffffff /* all bits except sign */
+	TRACE_MODULE_NONE = 0x0,
+	TRACE_MODULE_API = 0x1,
+	TRACE_MODULE_PLATFORM = 0x2,
+	TRACE_MODULE_ALL = 0x7fffffff /* all bits except sign */
 };
 
 #define _LOG_FUNCTION_START(module, fmt, ...) (void)0
@@ -53,4 +52,4 @@ enum {
 }
 #endif
 
-#endif  /* ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_PLATFORM_LOG_H_ */
+#endif /* ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_PLATFORM_LOG_H_ */

@@ -27,19 +27,47 @@
  *       Don't replace it by device tree value, because PERIPHS_IO_MUX_
  *       is "internally" depends on it.
  */
-#define PIN(id)   ((PERIPHS_IO_MUX_ ## id ## _U) - (DR_REG_IO_MUX_BASE))
-static const uint8_t pin_mux_off[] = {
-	PIN(GPIO0),    PIN(U0TXD),    PIN(GPIO2),    PIN(U0RXD),
-	PIN(GPIO4),    PIN(GPIO5),    PIN(SD_CLK),   PIN(SD_DATA0),
-	PIN(SD_DATA1), PIN(SD_DATA2), PIN(SD_DATA3), PIN(SD_CMD),
-	PIN(MTDI),     PIN(MTCK),     PIN(MTMS),     PIN(MTDO),
-	PIN(GPIO16),   PIN(GPIO17),   PIN(GPIO18),   PIN(GPIO19),
-	0,             PIN(GPIO21),   PIN(GPIO22),   PIN(GPIO23),
-	0,             PIN(GPIO25),   PIN(GPIO26),   PIN(GPIO27),
-	0,             0,             0,             0,
-	PIN(GPIO32),   PIN(GPIO33),   PIN(GPIO34),   PIN(GPIO35),
-	PIN(GPIO36),   PIN(GPIO37),   PIN(GPIO38),   PIN(GPIO39)
-};
+#define PIN(id) ((PERIPHS_IO_MUX_##id##_U) - (DR_REG_IO_MUX_BASE))
+static const uint8_t pin_mux_off[] = { PIN(GPIO0),
+				       PIN(U0TXD),
+				       PIN(GPIO2),
+				       PIN(U0RXD),
+				       PIN(GPIO4),
+				       PIN(GPIO5),
+				       PIN(SD_CLK),
+				       PIN(SD_DATA0),
+				       PIN(SD_DATA1),
+				       PIN(SD_DATA2),
+				       PIN(SD_DATA3),
+				       PIN(SD_CMD),
+				       PIN(MTDI),
+				       PIN(MTCK),
+				       PIN(MTMS),
+				       PIN(MTDO),
+				       PIN(GPIO16),
+				       PIN(GPIO17),
+				       PIN(GPIO18),
+				       PIN(GPIO19),
+				       0,
+				       PIN(GPIO21),
+				       PIN(GPIO22),
+				       PIN(GPIO23),
+				       0,
+				       PIN(GPIO25),
+				       PIN(GPIO26),
+				       PIN(GPIO27),
+				       0,
+				       0,
+				       0,
+				       0,
+				       PIN(GPIO32),
+				       PIN(GPIO33),
+				       PIN(GPIO34),
+				       PIN(GPIO35),
+				       PIN(GPIO36),
+				       PIN(GPIO37),
+				       PIN(GPIO38),
+				       PIN(GPIO39) };
 #undef PIN
 
 static uint32_t *reg_for_pin(uint32_t pin)
@@ -88,7 +116,7 @@ static int pinmux_set(const struct device *dev, uint32_t pin, uint32_t func)
 		return -EINVAL;
 	}
 
-	return set_reg(pin, MCU_SEL_M, func<<MCU_SEL_S | 2<<FUN_DRV_S);
+	return set_reg(pin, MCU_SEL_M, func << MCU_SEL_S | 2 << FUN_DRV_S);
 }
 
 static int pinmux_get(const struct device *dev, uint32_t pin, uint32_t *func)
@@ -118,7 +146,7 @@ static int pinmux_pullup(const struct device *dev, uint32_t pin, uint8_t func)
 	return -EINVAL;
 }
 
-#define CFG(id)   ((GPIO_ ## id ## _REG) & 0xff)
+#define CFG(id) ((GPIO_##id##_REG) & 0xff)
 static int pinmux_input(const struct device *dev, uint32_t pin, uint8_t func)
 {
 	static const uint8_t offs[2][3] = {
@@ -158,12 +186,10 @@ static int pinmux_input(const struct device *dev, uint32_t pin, uint8_t func)
 }
 #undef CFG
 
-static struct pinmux_driver_api api_funcs = {
-	.set = pinmux_set,
-	.get = pinmux_get,
-	.pullup = pinmux_pullup,
-	.input = pinmux_input
-};
+static struct pinmux_driver_api api_funcs = { .set = pinmux_set,
+					      .get = pinmux_get,
+					      .pullup = pinmux_pullup,
+					      .input = pinmux_input };
 
 static int pinmux_initialize(const struct device *device)
 {
@@ -180,7 +206,6 @@ static int pinmux_initialize(const struct device *device)
 /* Initialize using PRE_KERNEL_1 priority so that GPIO can use the pin
  * mux driver.
  */
-DEVICE_AND_API_INIT(pmux_dev, CONFIG_PINMUX_NAME,
-		    &pinmux_initialize, NULL, NULL,
-		    PRE_KERNEL_2, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+DEVICE_AND_API_INIT(pmux_dev, CONFIG_PINMUX_NAME, &pinmux_initialize, NULL,
+		    NULL, PRE_KERNEL_2, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &api_funcs);

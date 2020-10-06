@@ -18,17 +18,18 @@
 #include <bluetooth/gatt.h>
 #include <bluetooth/hci.h>
 
-
 #include "pong.h"
 
-#define SCAN_TIMEOUT     K_SECONDS(2)
+#define SCAN_TIMEOUT K_SECONDS(2)
 
-#define APPEARANCE       0
+#define APPEARANCE 0
 
-#define PONG_SVC_UUID	0x90, 0x6c, 0x55, 0x0f, 0xee, 0x6f, 0x4d, 0x0d, \
-			0xa1, 0x7e, 0x24, 0x4e, 0x38, 0xea, 0x4f, 0xf9
-#define PONG_CHR_UUID	0xdd, 0x94, 0xaf, 0xd7, 0xcd, 0x2c, 0x40, 0xc6, \
-			0xb5, 0x82, 0x6a, 0xc5, 0x1c, 0x8f, 0xbf, 0xab
+#define PONG_SVC_UUID                                                     \
+	0x90, 0x6c, 0x55, 0x0f, 0xee, 0x6f, 0x4d, 0x0d, 0xa1, 0x7e, 0x24, \
+		0x4e, 0x38, 0xea, 0x4f, 0xf9
+#define PONG_CHR_UUID                                                     \
+	0xdd, 0x94, 0xaf, 0xd7, 0xcd, 0x2c, 0x40, 0xc6, 0xb5, 0x82, 0x6a, \
+		0xc5, 0x1c, 0x8f, 0xbf, 0xab
 
 static struct bt_uuid_128 pong_svc_uuid = BT_UUID_INIT_128(PONG_SVC_UUID);
 static struct bt_uuid_128 pong_chr_uuid = BT_UUID_INIT_128(PONG_CHR_UUID);
@@ -88,11 +89,11 @@ struct ble_data {
 void ble_send_ball(int8_t x_pos, int8_t y_pos, int8_t x_vel, int8_t y_vel)
 {
 	struct ble_data data = {
-		.op           = BLE_BALL_INFO,
-		.ball.x_pos   = x_pos,
-		.ball.y_pos   = y_pos,
-		.ball.x_vel   = x_vel,
-		.ball.y_vel   = y_vel,
+		.op = BLE_BALL_INFO,
+		.ball.x_pos = x_pos,
+		.ball.y_pos = y_pos,
+		.ball.x_vel = x_vel,
+		.ball.y_vel = y_vel,
 	};
 	int err;
 
@@ -126,8 +127,8 @@ void ble_send_lost(void)
 }
 
 static uint8_t notify_func(struct bt_conn *conn,
-			struct bt_gatt_subscribe_params *param,
-			const void *buf, uint16_t len)
+			   struct bt_gatt_subscribe_params *param,
+			   const void *buf, uint16_t len)
 {
 	const struct ble_data *data = buf;
 
@@ -164,8 +165,8 @@ static uint8_t notify_func(struct bt_conn *conn,
 }
 
 static uint8_t discover_func(struct bt_conn *conn,
-			  const struct bt_gatt_attr *attr,
-			  struct bt_gatt_discover_params *param)
+			     const struct bt_gatt_attr *attr,
+			     struct bt_gatt_discover_params *param)
 {
 	int err;
 
@@ -512,13 +513,14 @@ static void pong_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t val)
 }
 
 BT_GATT_SERVICE_DEFINE(pong_svc,
-	/* Vendor Primary Service Declaration */
-	BT_GATT_PRIMARY_SERVICE(&pong_svc_uuid.uuid),
-	BT_GATT_CHARACTERISTIC(&pong_chr_uuid.uuid, BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
-	BT_GATT_CCC(pong_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-);
+		       /* Vendor Primary Service Declaration */
+		       BT_GATT_PRIMARY_SERVICE(&pong_svc_uuid.uuid),
+		       BT_GATT_CHARACTERISTIC(&pong_chr_uuid.uuid,
+					      BT_GATT_CHRC_NOTIFY,
+					      BT_GATT_PERM_NONE, NULL, NULL,
+					      NULL),
+		       BT_GATT_CCC(pong_ccc_cfg_changed,
+				   BT_GATT_PERM_READ | BT_GATT_PERM_WRITE), );
 
 void ble_init(void)
 {

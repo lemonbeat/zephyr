@@ -69,7 +69,7 @@ void z_impl_sys_rand_get(void *dst, size_t outlen)
 
 	while (len < outlen) {
 		ret = sys_rand32_get();
-		if ((outlen-len) < sizeof(ret)) {
+		if ((outlen - len) < sizeof(ret)) {
 			blocksize = len;
 			(void)memcpy(udst, &ret, blocksize);
 		} else {

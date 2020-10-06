@@ -39,14 +39,14 @@ struct pwm_stm32_config {
 /** Series F3, F7, G0, G4, H7, L4, MP1 and WB have up to 6 channels, others up
  *  to 4.
  */
-#define TIMER_HAS_6CH                                                          \
-	(defined(CONFIG_SOC_SERIES_STM32F3X) ||                                \
-	 defined(CONFIG_SOC_SERIES_STM32F7X) ||                                \
-	 defined(CONFIG_SOC_SERIES_STM32G0X) ||                                \
-	 defined(CONFIG_SOC_SERIES_STM32G4X) ||                                \
-	 defined(CONFIG_SOC_SERIES_STM32H7X) ||                                \
-	 defined(CONFIG_SOC_SERIES_STM32L4X) ||                                \
-	 defined(CONFIG_SOC_SERIES_STM32MP1X) ||                               \
+#define TIMER_HAS_6CH                            \
+	(defined(CONFIG_SOC_SERIES_STM32F3X) ||  \
+	 defined(CONFIG_SOC_SERIES_STM32F7X) ||  \
+	 defined(CONFIG_SOC_SERIES_STM32G0X) ||  \
+	 defined(CONFIG_SOC_SERIES_STM32G4X) ||  \
+	 defined(CONFIG_SOC_SERIES_STM32H7X) ||  \
+	 defined(CONFIG_SOC_SERIES_STM32L4X) ||  \
+	 defined(CONFIG_SOC_SERIES_STM32MP1X) || \
 	 defined(CONFIG_SOC_SERIES_STM32WBX))
 
 /** Maximum number of timer channels. */
@@ -244,8 +244,7 @@ static int pwm_stm32_pin_set(const struct device *dev, uint32_t pwm,
 	return 0;
 }
 
-static int pwm_stm32_get_cycles_per_sec(const struct device *dev,
-					uint32_t pwm,
+static int pwm_stm32_get_cycles_per_sec(const struct device *dev, uint32_t pwm,
 					uint64_t *cycles)
 {
 	struct pwm_stm32_data *data = to_data(dev);
@@ -309,26 +308,26 @@ static int pwm_stm32_init(const struct device *dev)
 	return 0;
 }
 
-#define DT_INST_CLK(index, inst)                                               \
-	{                                                                      \
-		.bus = DT_CLOCKS_CELL(DT_INST(index, st_stm32_timers), bus),   \
-		.enr = DT_CLOCKS_CELL(DT_INST(index, st_stm32_timers), bits)   \
+#define DT_INST_CLK(index, inst)                                             \
+	{                                                                    \
+		.bus = DT_CLOCKS_CELL(DT_INST(index, st_stm32_timers), bus), \
+		.enr = DT_CLOCKS_CELL(DT_INST(index, st_stm32_timers), bits) \
 	}
 
-#define PWM_DEVICE_INIT(index)                                                 \
-	static struct pwm_stm32_data pwm_stm32_data_##index;                   \
-									       \
-	static const struct pwm_stm32_config pwm_stm32_config_##index = {      \
-		.timer = (TIM_TypeDef *)DT_REG_ADDR(                           \
-			DT_INST(index, st_stm32_timers)),                      \
-		.prescaler = DT_INST_PROP(index, st_prescaler),                \
-		.pclken = DT_INST_CLK(index, timer)                            \
-	};                                                                     \
-									       \
-	DEVICE_AND_API_INIT(pwm_stm32_##index, DT_INST_LABEL(index),           \
-			    &pwm_stm32_init, &pwm_stm32_data_##index,          \
-			    &pwm_stm32_config_##index, POST_KERNEL,            \
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,                \
+#define PWM_DEVICE_INIT(index)                                            \
+	static struct pwm_stm32_data pwm_stm32_data_##index;              \
+                                                                          \
+	static const struct pwm_stm32_config pwm_stm32_config_##index = { \
+		.timer = (TIM_TypeDef *)DT_REG_ADDR(                      \
+			DT_INST(index, st_stm32_timers)),                 \
+		.prescaler = DT_INST_PROP(index, st_prescaler),           \
+		.pclken = DT_INST_CLK(index, timer)                       \
+	};                                                                \
+                                                                          \
+	DEVICE_AND_API_INIT(pwm_stm32_##index, DT_INST_LABEL(index),      \
+			    &pwm_stm32_init, &pwm_stm32_data_##index,     \
+			    &pwm_stm32_config_##index, POST_KERNEL,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,           \
 			    &pwm_stm32_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(PWM_DEVICE_INIT)

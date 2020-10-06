@@ -9,12 +9,11 @@
 
 /* nrf 51 has lower ram, so creating less number of threads */
 #if CONFIG_SRAM_SIZE <= 24
-	#define NUM_THREAD 2
-#elif (CONFIG_SRAM_SIZE <= 32) \
-	|| defined(CONFIG_SOC_EMSK_EM7D)
-	#define NUM_THREAD 3
+#define NUM_THREAD 2
+#elif (CONFIG_SRAM_SIZE <= 32) || defined(CONFIG_SOC_EMSK_EM7D)
+#define NUM_THREAD 3
 #else
-	#define NUM_THREAD 10
+#define NUM_THREAD 10
 #endif
 #define ITRERATION_COUNT 5
 #define BASE_PRIORITY 1
@@ -36,8 +35,7 @@ static void thread_tslice(void *p1, void *p2, void *p3)
 	int idx = POINTER_TO_INT(p1);
 
 	/* Print New line for last thread */
-	int thread_parameter = (idx == (NUM_THREAD - 1)) ? '\n' :
-			       (idx + 'A');
+	int thread_parameter = (idx == (NUM_THREAD - 1)) ? '\n' : (idx + 'A');
 
 	while (1) {
 		/* Prining alphabet corresponding to thread*/
@@ -51,7 +49,6 @@ static void thread_tslice(void *p1, void *p2, void *p3)
 		/*Wait for relase of semaphore from Ztest thread*/
 		k_sem_take(&sema3, K_FOREVER);
 	}
-
 }
 
 /*test cases*/
@@ -79,13 +76,13 @@ void test_priority_scheduling(void)
 	/* Create Threads with different Priority*/
 	for (int i = 0; i < NUM_THREAD; i++) {
 		tid[i] = k_thread_create(&t[i], tstacks[i], STACK_SIZE,
-					 thread_tslice, INT_TO_POINTER(i), NULL, NULL,
+					 thread_tslice, INT_TO_POINTER(i), NULL,
+					 NULL,
 					 K_PRIO_PREEMPT(BASE_PRIORITY + i), 0,
 					 K_NO_WAIT);
 	}
 
 	while (count < ITRERATION_COUNT) {
-
 		/* Wait for each thread to complete */
 		for (int i = 0; i < NUM_THREAD; i++) {
 			k_sem_take(&sema2, K_FOREVER);
@@ -99,7 +96,6 @@ void test_priority_scheduling(void)
 		}
 		count++;
 	}
-
 
 	/* test case teardown*/
 	for (int i = 0; i < NUM_THREAD; i++) {

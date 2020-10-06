@@ -69,24 +69,23 @@
 
 /* Local APIC Timer Bits */
 
-#define LOAPIC_TIMER_DIVBY_2 0x0	 /* Divide by 2 */
-#define LOAPIC_TIMER_DIVBY_4 0x1	 /* Divide by 4 */
-#define LOAPIC_TIMER_DIVBY_8 0x2	 /* Divide by 8 */
-#define LOAPIC_TIMER_DIVBY_16 0x3	/* Divide by 16 */
-#define LOAPIC_TIMER_DIVBY_32 0x8	/* Divide by 32 */
-#define LOAPIC_TIMER_DIVBY_64 0x9	/* Divide by 64 */
-#define LOAPIC_TIMER_DIVBY_128 0xa       /* Divide by 128 */
-#define LOAPIC_TIMER_DIVBY_1 0xb	 /* Divide by 1 */
-#define LOAPIC_TIMER_DIVBY_MASK 0xf      /* mask bits */
+#define LOAPIC_TIMER_DIVBY_2 0x0 /* Divide by 2 */
+#define LOAPIC_TIMER_DIVBY_4 0x1 /* Divide by 4 */
+#define LOAPIC_TIMER_DIVBY_8 0x2 /* Divide by 8 */
+#define LOAPIC_TIMER_DIVBY_16 0x3 /* Divide by 16 */
+#define LOAPIC_TIMER_DIVBY_32 0x8 /* Divide by 32 */
+#define LOAPIC_TIMER_DIVBY_64 0x9 /* Divide by 64 */
+#define LOAPIC_TIMER_DIVBY_128 0xa /* Divide by 128 */
+#define LOAPIC_TIMER_DIVBY_1 0xb /* Divide by 1 */
+#define LOAPIC_TIMER_DIVBY_MASK 0xf /* mask bits */
 #define LOAPIC_TIMER_PERIODIC 0x00020000 /* Timer Mode: Periodic */
 
-
 #if defined(CONFIG_TICKLESS_IDLE)
-#define TIMER_MODE_ONE_SHOT     0
-#define TIMER_MODE_PERIODIC     1
+#define TIMER_MODE_ONE_SHOT 0
+#define TIMER_MODE_PERIODIC 1
 #else /* !CONFIG_TICKLESS_IDLE */
 #define tickless_idle_init() \
-	do {/* nothing */              \
+	do { /* nothing */   \
 	} while (0)
 #endif /* !CONFIG_TICKLESS_IDLE */
 
@@ -123,9 +122,8 @@ static uint32_t reg_timer_cfg_save;
 static inline void periodic_mode_set(void)
 {
 	x86_write_loapic(LOAPIC_TIMER,
-		x86_read_loapic(LOAPIC_TIMER) | LOAPIC_TIMER_PERIODIC);
+			 x86_read_loapic(LOAPIC_TIMER) | LOAPIC_TIMER_PERIODIC);
 }
-
 
 /**
  *
@@ -153,8 +151,8 @@ static inline void initial_count_register_set(uint32_t count)
  */
 static inline void one_shot_mode_set(void)
 {
-	x86_write_loapic(LOAPIC_TIMER,
-		x86_read_loapic(LOAPIC_TIMER) & ~LOAPIC_TIMER_PERIODIC);
+	x86_write_loapic(LOAPIC_TIMER, x86_read_loapic(LOAPIC_TIMER) &
+					       ~LOAPIC_TIMER_PERIODIC);
 }
 #endif /* CONFIG_TICKLESS_IDLE */
 
@@ -199,7 +197,7 @@ static inline void program_max_cycles(void)
 #endif
 
 void timer_int_handler(const void *unused /* parameter is not used */
-				 )
+)
 {
 	ARG_UNUSED(unused);
 
@@ -239,7 +237,7 @@ void timer_int_handler(const void *unused /* parameter is not used */
 #ifdef CONFIG_TICKLESS_IDLE
 	if (timer_mode == TIMER_MODE_ONE_SHOT) {
 		if (!timer_known_to_have_expired) {
-			uint32_t  cycles;
+			uint32_t cycles;
 
 			/*
 			 * The timer fired unexpectedly. This is due
@@ -302,7 +300,7 @@ uint32_t z_get_elapsed_program_time(void)
 	}
 
 	return programmed_full_ticks -
-	    (current_count_register_get() / cycles_per_tick);
+	       (current_count_register_get() / cycles_per_tick);
 }
 
 void z_set_time(uint32_t time)
@@ -312,8 +310,8 @@ void z_set_time(uint32_t time)
 		return;
 	}
 
-	programmed_full_ticks =
-	    time > max_system_ticks ? max_system_ticks : time;
+	programmed_full_ticks = time > max_system_ticks ? max_system_ticks :
+								time;
 
 	z_tick_set(z_clock_uptime());
 
@@ -334,9 +332,8 @@ uint64_t z_clock_uptime(void)
 
 	elapsed = z_tick_get();
 	if (programmed_cycles) {
-		elapsed +=
-		    (programmed_cycles -
-		     current_count_register_get()) / cycles_per_tick;
+		elapsed += (programmed_cycles - current_count_register_get()) /
+			   cycles_per_tick;
 	}
 
 	return elapsed;
@@ -381,7 +378,7 @@ static void tickless_idle_init(void)
  * @return N/A
  */
 void z_timer_idle_enter(int32_t ticks /* system ticks */
-				)
+)
 {
 #ifdef CONFIG_TICKLESS_KERNEL
 	if (ticks != K_TICKS_FOREVER) {
@@ -395,7 +392,7 @@ void z_timer_idle_enter(int32_t ticks /* system ticks */
 		initial_count_register_set(0); /* 0 disables timer */
 	}
 #else
-	uint32_t  cycles;
+	uint32_t cycles;
 
 	/*
 	 * Although interrupts are disabled, the LOAPIC timer is still counting
@@ -423,7 +420,8 @@ void z_timer_idle_enter(int32_t ticks /* system ticks */
 		programmed_cycles = cycles + cycles_per_max_ticks;
 	} else {
 		programmed_full_ticks = ticks - 1;
-		programmed_cycles = cycles + (programmed_full_ticks * cycles_per_tick);
+		programmed_cycles =
+			cycles + (programmed_full_ticks * cycles_per_tick);
 	}
 
 	/* Set timer to one-shot mode */
@@ -475,7 +473,7 @@ void z_clock_idle_exit(void)
 	remaining_cycles = current_count_register_get();
 
 	if ((remaining_cycles == 0U) ||
-		(remaining_cycles >= programmed_cycles)) {
+	    (remaining_cycles >= programmed_cycles)) {
 		/*
 		 * The timer has expired. The handler timer_int_handler() is
 		 * guaranteed to execute. Track the number of elapsed ticks. The
@@ -530,7 +528,8 @@ void z_clock_idle_exit(void)
 		 * the tick, being careful to not program zero thus stopping the timer.
 		 */
 
-		programmed_cycles = 1 + ((remaining_cycles - 1) % cycles_per_tick);
+		programmed_cycles =
+			1 + ((remaining_cycles - 1) % cycles_per_tick);
 
 		initial_count_register_set(programmed_cycles);
 	}
@@ -559,8 +558,8 @@ int z_clock_driver_init(const struct device *device)
 	tickless_idle_init();
 
 	x86_write_loapic(LOAPIC_TIMER_CONFIG,
-		     (x86_read_loapic(LOAPIC_TIMER_CONFIG) & ~0xf)
-		     | LOAPIC_TIMER_DIVBY_1);
+			 (x86_read_loapic(LOAPIC_TIMER_CONFIG) & ~0xf) |
+				 LOAPIC_TIMER_DIVBY_1);
 
 #ifdef CONFIG_TICKLESS_KERNEL
 	one_shot_mode_set();
@@ -632,7 +631,7 @@ static int sys_clock_resume(const struct device *dev)
 * the *context may include IN data or/and OUT data
 */
 int z_clock_device_ctrl(const struct device *port, uint32_t ctrl_command,
-			  void *context, device_pm_cb cb, void *arg)
+			void *context, device_pm_cb cb, void *arg)
 {
 	int ret = 0;
 
@@ -671,7 +670,7 @@ uint32_t z_timer_cycle_get_32(void)
 
 	/* 64-bit math to avoid overflows */
 	tsc = z_tsc_read() * (uint64_t)sys_clock_hw_cycles_per_sec() /
-		(uint64_t) CONFIG_TSC_CYCLES_PER_SEC;
+	      (uint64_t)CONFIG_TSC_CYCLES_PER_SEC;
 	return (uint32_t)tsc;
 #else
 	/* TSC runs same as the bus speed, nothing to do but return the TSC

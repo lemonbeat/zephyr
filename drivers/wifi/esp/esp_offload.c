@@ -58,29 +58,26 @@ static int _sock_connect(struct esp_data *dev, struct esp_socket *sock)
 
 	if (sock->ip_proto == IPPROTO_TCP) {
 		net_addr_ntop(sock->dst.sa_family,
-			      &net_sin(&sock->dst)->sin_addr,
-			      addr_str, sizeof(addr_str));
+			      &net_sin(&sock->dst)->sin_addr, addr_str,
+			      sizeof(addr_str));
 		snprintk(connect_msg, sizeof(connect_msg),
-			 "AT+CIPSTART=%d,\"TCP\",\"%s\",%d,7200",
-			 sock->link_id, addr_str,
-			 ntohs(net_sin(&sock->dst)->sin_port));
+			 "AT+CIPSTART=%d,\"TCP\",\"%s\",%d,7200", sock->link_id,
+			 addr_str, ntohs(net_sin(&sock->dst)->sin_port));
 	} else {
 		net_addr_ntop(sock->dst.sa_family,
-			      &net_sin(&sock->dst)->sin_addr,
-			      addr_str, sizeof(addr_str));
+			      &net_sin(&sock->dst)->sin_addr, addr_str,
+			      sizeof(addr_str));
 		snprintk(connect_msg, sizeof(connect_msg),
-			 "AT+CIPSTART=%d,\"UDP\",\"%s\",%d",
-			 sock->link_id, addr_str,
-			 ntohs(net_sin(&sock->dst)->sin_port));
+			 "AT+CIPSTART=%d,\"UDP\",\"%s\",%d", sock->link_id,
+			 addr_str, ntohs(net_sin(&sock->dst)->sin_port));
 	}
 
 	LOG_DBG("link %d, ip_proto %s, addr %s", sock->link_id,
 		sock->ip_proto == IPPROTO_TCP ? "TCP" : "UDP",
 		log_strdup(addr_str));
 
-	ret = modem_cmd_send(&dev->mctx.iface, &dev->mctx.cmd_handler,
-			     NULL, 0, connect_msg, &dev->sem_response,
-			     ESP_CMD_TIMEOUT);
+	ret = modem_cmd_send(&dev->mctx.iface, &dev->mctx.cmd_handler, NULL, 0,
+			     connect_msg, &dev->sem_response, ESP_CMD_TIMEOUT);
 	if (ret == 0) {
 		sock->flags |= ESP_SOCK_CONNECTED;
 	} else if (ret == -ETIMEDOUT) {
@@ -114,15 +111,11 @@ static void esp_connect_work(struct k_work *work)
 	if (sock->connect_cb) {
 		sock->connect_cb(sock->context, ret, sock->conn_user_data);
 	}
-
 }
 
-static int esp_connect(struct net_context *context,
-		       const struct sockaddr *addr,
-		       socklen_t addrlen,
-		       net_context_connect_cb_t cb,
-		       int32_t timeout,
-		       void *user_data)
+static int esp_connect(struct net_context *context, const struct sockaddr *addr,
+		       socklen_t addrlen, net_context_connect_cb_t cb,
+		       int32_t timeout, void *user_data)
 {
 	struct esp_socket *sock;
 	struct esp_data *dev;
@@ -163,17 +156,16 @@ static int esp_connect(struct net_context *context,
 	return ret;
 }
 
-static int esp_accept(struct net_context *context,
-			     net_tcp_accept_cb_t cb, int32_t timeout,
-			     void *user_data)
+static int esp_accept(struct net_context *context, net_tcp_accept_cb_t cb,
+		      int32_t timeout, void *user_data)
 {
 	return -ENOTSUP;
 }
 
 MODEM_CMD_DIRECT_DEFINE(on_cmd_tx_ready)
 {
-	struct esp_data *dev = CONTAINER_OF(data, struct esp_data,
-					    cmd_handler_data);
+	struct esp_data *dev =
+		CONTAINER_OF(data, struct esp_data, cmd_handler_data);
 
 	k_sem_give(&dev->sem_tx_ready);
 	return len;
@@ -181,8 +173,8 @@ MODEM_CMD_DIRECT_DEFINE(on_cmd_tx_ready)
 
 MODEM_CMD_DEFINE(on_cmd_send_ok)
 {
-	struct esp_data *dev = CONTAINER_OF(data, struct esp_data,
-					    cmd_handler_data);
+	struct esp_data *dev =
+		CONTAINER_OF(data, struct esp_data, cmd_handler_data);
 
 	modem_cmd_handler_set_error(data, 0);
 	k_sem_give(&dev->sem_response);
@@ -192,8 +184,8 @@ MODEM_CMD_DEFINE(on_cmd_send_ok)
 
 MODEM_CMD_DEFINE(on_cmd_send_fail)
 {
-	struct esp_data *dev = CONTAINER_OF(data, struct esp_data,
-					    cmd_handler_data);
+	struct esp_data *dev =
+		CONTAINER_OF(data, struct esp_data, cmd_handler_data);
 
 	modem_cmd_handler_set_error(data, -EIO);
 	k_sem_give(&dev->sem_response);
@@ -221,14 +213,13 @@ static int _sock_send(struct esp_data *dev, struct esp_socket *sock)
 	LOG_DBG("link %d, len %d", sock->link_id, pkt_len);
 
 	if (sock->ip_proto == IPPROTO_TCP) {
-		snprintk(cmd_buf, sizeof(cmd_buf),
-			 "AT+CIPSEND=%d,%d", sock->link_id, pkt_len);
+		snprintk(cmd_buf, sizeof(cmd_buf), "AT+CIPSEND=%d,%d",
+			 sock->link_id, pkt_len);
 	} else {
 		net_addr_ntop(sock->dst.sa_family,
-			      &net_sin(&sock->dst)->sin_addr,
-			      addr_str, sizeof(addr_str));
-		snprintk(cmd_buf, sizeof(cmd_buf),
-			 "AT+CIPSEND=%d,%d,\"%s\",%d",
+			      &net_sin(&sock->dst)->sin_addr, addr_str,
+			      sizeof(addr_str));
+		snprintk(cmd_buf, sizeof(cmd_buf), "AT+CIPSEND=%d,%d,\"%s\",%d",
 			 sock->link_id, pkt_len, addr_str,
 			 ntohs(net_sin(&sock->dst)->sin_port));
 	}
@@ -244,9 +235,8 @@ static int _sock_send(struct esp_data *dev, struct esp_socket *sock)
 		goto out;
 	}
 
-	ret = modem_cmd_handler_update_cmds(&dev->cmd_handler_data,
-					    cmds, ARRAY_SIZE(cmds),
-					    true);
+	ret = modem_cmd_handler_update_cmds(&dev->cmd_handler_data, cmds,
+					    ARRAY_SIZE(cmds), true);
 	if (ret < 0) {
 		goto out;
 	}
@@ -286,8 +276,8 @@ static int _sock_send(struct esp_data *dev, struct esp_socket *sock)
 	}
 
 out:
-	(void)modem_cmd_handler_update_cmds(&dev->cmd_handler_data,
-					    NULL, 0U, false);
+	(void)modem_cmd_handler_update_cmds(&dev->cmd_handler_data, NULL, 0U,
+					    false);
 	k_sem_give(&dev->cmd_handler_data.sem_tx_lock);
 
 	return ret;
@@ -321,12 +311,9 @@ static void esp_send_work(struct k_work *work)
 	}
 }
 
-static int esp_sendto(struct net_pkt *pkt,
-		      const struct sockaddr *dst_addr,
-		      socklen_t addrlen,
-		      net_context_send_cb_t cb,
-		      int32_t timeout,
-		      void *user_data)
+static int esp_sendto(struct net_pkt *pkt, const struct sockaddr *dst_addr,
+		      socklen_t addrlen, net_context_send_cb_t cb,
+		      int32_t timeout, void *user_data)
 {
 	struct net_context *context;
 	struct esp_socket *sock;
@@ -412,10 +399,8 @@ static int esp_sendto(struct net_pkt *pkt,
 	return ret;
 }
 
-static int esp_send(struct net_pkt *pkt,
-		    net_context_send_cb_t cb,
-		    int32_t timeout,
-		    void *user_data)
+static int esp_send(struct net_pkt *pkt, net_context_send_cb_t cb,
+		    int32_t timeout, void *user_data)
 {
 	return esp_sendto(pkt, NULL, 0, cb, timeout, user_data);
 }
@@ -523,17 +508,15 @@ static void esp_recvdata_work(struct k_work *work)
 
 	snprintk(cmd, sizeof(cmd), "AT+CIPRECVDATA=%d,%d", sock->link_id, len);
 
-	ret = modem_cmd_send(&dev->mctx.iface, &dev->mctx.cmd_handler,
-			     cmds, ARRAY_SIZE(cmds), cmd, &dev->sem_response,
+	ret = modem_cmd_send(&dev->mctx.iface, &dev->mctx.cmd_handler, cmds,
+			     ARRAY_SIZE(cmds), cmd, &dev->sem_response,
 			     ESP_CMD_TIMEOUT);
 	if (ret < 0) {
-		LOG_ERR("Error during rx: link %d, ret %d", sock->link_id,
-			ret);
+		LOG_ERR("Error during rx: link %d, ret %d", sock->link_id, ret);
 	} else if (sock->bytes_avail > 0) {
 		k_work_submit_to_queue(&dev->workq, &sock->recvdata_work);
 	}
 }
-
 
 static void esp_recv_work(struct k_work *work)
 {
@@ -552,8 +535,8 @@ static void esp_recv_work(struct k_work *work)
 	pkt = k_fifo_get(&sock->fifo_rx_pkt, K_NO_WAIT);
 	while (pkt) {
 		if (sock->recv_cb) {
-			sock->recv_cb(sock->context, pkt, NULL, NULL,
-				      0, sock->recv_user_data);
+			sock->recv_cb(sock->context, pkt, NULL, NULL, 0,
+				      sock->recv_user_data);
 			k_sem_give(&sock->sem_data_ready);
 		} else {
 			/* Discard */
@@ -572,10 +555,8 @@ static void esp_recv_work(struct k_work *work)
 	}
 }
 
-static int esp_recv(struct net_context *context,
-		    net_context_recv_cb_t cb,
-		    int32_t timeout,
-		    void *user_data)
+static int esp_recv(struct net_context *context, net_context_recv_cb_t cb,
+		    int32_t timeout, void *user_data)
 {
 	struct esp_socket *sock;
 	struct esp_data *dev;
@@ -635,8 +616,7 @@ static int esp_put(struct net_context *context)
 	sock->tx_pkt = NULL;
 
 	/* Drain rxfifo */
-	for (pkt = k_fifo_get(&sock->fifo_rx_pkt, K_NO_WAIT);
-	     pkt != NULL;
+	for (pkt = k_fifo_get(&sock->fifo_rx_pkt, K_NO_WAIT); pkt != NULL;
 	     pkt = k_fifo_get(&sock->fifo_rx_pkt, K_NO_WAIT)) {
 		net_pkt_unref(pkt);
 	}
@@ -646,10 +626,8 @@ static int esp_put(struct net_context *context)
 	return 0;
 }
 
-static int esp_get(sa_family_t family,
-		   enum net_sock_type type,
-		   enum net_ip_protocol ip_proto,
-		   struct net_context **context)
+static int esp_get(sa_family_t family, enum net_sock_type type,
+		   enum net_ip_protocol ip_proto, struct net_context **context)
 {
 	struct esp_socket *sock;
 	struct esp_data *dev;
@@ -686,15 +664,15 @@ static int esp_get(sa_family_t family,
 }
 
 static struct net_offload esp_offload = {
-	.get	       = esp_get,
-	.bind	       = esp_bind,
-	.listen	       = esp_listen,
-	.connect       = esp_connect,
-	.accept	       = esp_accept,
-	.send	       = esp_send,
-	.sendto	       = esp_sendto,
-	.recv	       = esp_recv,
-	.put	       = esp_put,
+	.get = esp_get,
+	.bind = esp_bind,
+	.listen = esp_listen,
+	.connect = esp_connect,
+	.accept = esp_accept,
+	.send = esp_send,
+	.sendto = esp_sendto,
+	.recv = esp_recv,
+	.put = esp_put,
 };
 
 int esp_offload_init(struct net_if *iface)

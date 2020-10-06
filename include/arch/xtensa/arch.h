@@ -31,7 +31,10 @@
 #define ARCH_STACK_PTR_ALIGN 16
 
 /* Xtensa GPRs are often designated by two different names */
-#define sys_define_gpr_with_alias(name1, name2) union { uint32_t name1, name2; }
+#define sys_define_gpr_with_alias(name1, name2) \
+	union {                                 \
+		uint32_t name1, name2;          \
+	}
 
 #include <arch/xtensa/exc.h>
 
@@ -43,9 +46,9 @@ extern "C" {
 extern void z_irq_priority_set(uint32_t irq, uint32_t prio, uint32_t flags);
 
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-{ \
-	Z_ISR_DECLARE(irq_p, flags_p, isr_p, isr_param_p); \
-}
+	{                                                                \
+		Z_ISR_DECLARE(irq_p, flags_p, isr_p, isr_param_p);       \
+	}
 
 /* Spurious interrupt handler. Throws an error if called */
 extern void z_irq_spurious(const void *unused);

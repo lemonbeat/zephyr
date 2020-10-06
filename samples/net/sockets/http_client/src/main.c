@@ -18,13 +18,13 @@ LOG_MODULE_REGISTER(net_http_client_sample, LOG_LEVEL_DBG);
 #define HTTPS_PORT 4443
 
 #if defined(CONFIG_NET_CONFIG_PEER_IPV6_ADDR)
-#define SERVER_ADDR6  CONFIG_NET_CONFIG_PEER_IPV6_ADDR
+#define SERVER_ADDR6 CONFIG_NET_CONFIG_PEER_IPV6_ADDR
 #else
 #define SERVER_ADDR6 ""
 #endif
 
 #if defined(CONFIG_NET_CONFIG_PEER_IPV4_ADDR)
-#define SERVER_ADDR4  CONFIG_NET_CONFIG_PEER_IPV4_ADDR
+#define SERVER_ADDR4 CONFIG_NET_CONFIG_PEER_IPV4_ADDR
 #else
 #define SERVER_ADDR4 ""
 #endif
@@ -72,7 +72,8 @@ static int setup_socket(sa_family_t family, const char *server, int port,
 					 sizeof(TLS_PEER_HOSTNAME));
 			if (ret < 0) {
 				LOG_ERR("Failed to set %s TLS_HOSTNAME "
-					"option (%d)", family_str, -errno);
+					"option (%d)",
+					family_str, -errno);
 				ret = -errno;
 			}
 		}
@@ -90,19 +91,13 @@ static int setup_socket(sa_family_t family, const char *server, int port,
 
 static int payload_cb(int sock, struct http_request *req, void *user_data)
 {
-	const char *content[] = {
-		"foobar",
-		"chunked",
-		"last"
-	};
+	const char *content[] = { "foobar", "chunked", "last" };
 	char tmp[64];
 	int i, pos = 0;
 
 	for (i = 0; i < ARRAY_SIZE(content); i++) {
-		pos += snprintk(tmp + pos, sizeof(tmp) - pos,
-				"%x\r\n%s\r\n",
-				(unsigned int)strlen(content[i]),
-				content[i]);
+		pos += snprintk(tmp + pos, sizeof(tmp) - pos, "%x\r\n%s\r\n",
+				(unsigned int)strlen(content[i]), content[i]);
 	}
 
 	pos += snprintk(tmp + pos, sizeof(tmp) - pos, "0\r\n\r\n");
@@ -113,8 +108,7 @@ static int payload_cb(int sock, struct http_request *req, void *user_data)
 }
 
 static void response_cb(struct http_response *rsp,
-			enum http_final_call final_data,
-			void *user_data)
+			enum http_final_call final_data, void *user_data)
 {
 	if (final_data == HTTP_DATA_MORE) {
 		LOG_INF("Partial data received (%zd bytes)", rsp->data_len);
@@ -139,8 +133,7 @@ static int connect_socket(sa_family_t family, const char *server, int port,
 	ret = connect(*sock, addr, addr_len);
 	if (ret < 0) {
 		LOG_ERR("Cannot connect to %s remote (%d)",
-			family == AF_INET ? "IPv4" : "IPv6",
-			-errno);
+			family == AF_INET ? "IPv4" : "IPv6", -errno);
 		ret = -errno;
 	}
 
@@ -171,15 +164,13 @@ void main(void)
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV4)) {
-		(void)connect_socket(AF_INET, SERVER_ADDR4, port,
-				     &sock4, (struct sockaddr *)&addr4,
-				     sizeof(addr4));
+		(void)connect_socket(AF_INET, SERVER_ADDR4, port, &sock4,
+				     (struct sockaddr *)&addr4, sizeof(addr4));
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV6)) {
-		(void)connect_socket(AF_INET6, SERVER_ADDR6, port,
-				     &sock6, (struct sockaddr *)&addr6,
-				     sizeof(addr6));
+		(void)connect_socket(AF_INET6, SERVER_ADDR6, port, &sock6,
+				     (struct sockaddr *)&addr6, sizeof(addr6));
 	}
 
 	if (sock4 < 0 && sock6 < 0) {
@@ -227,15 +218,13 @@ void main(void)
 	sock6 = -1;
 
 	if (IS_ENABLED(CONFIG_NET_IPV4)) {
-		(void)connect_socket(AF_INET, SERVER_ADDR4, port,
-				     &sock4, (struct sockaddr *)&addr4,
-				     sizeof(addr4));
+		(void)connect_socket(AF_INET, SERVER_ADDR4, port, &sock4,
+				     (struct sockaddr *)&addr4, sizeof(addr4));
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV6)) {
-		(void)connect_socket(AF_INET6, SERVER_ADDR6, port,
-				     &sock6, (struct sockaddr *)&addr6,
-				     sizeof(addr6));
+		(void)connect_socket(AF_INET6, SERVER_ADDR6, port, &sock6,
+				     (struct sockaddr *)&addr6, sizeof(addr6));
 	}
 
 	if (sock4 < 0 && sock6 < 0) {
@@ -289,15 +278,13 @@ void main(void)
 	sock6 = -1;
 
 	if (IS_ENABLED(CONFIG_NET_IPV4)) {
-		(void)connect_socket(AF_INET, SERVER_ADDR4, port,
-				     &sock4, (struct sockaddr *)&addr4,
-				     sizeof(addr4));
+		(void)connect_socket(AF_INET, SERVER_ADDR4, port, &sock4,
+				     (struct sockaddr *)&addr4, sizeof(addr4));
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV6)) {
-		(void)connect_socket(AF_INET6, SERVER_ADDR6, port,
-				     &sock6, (struct sockaddr *)&addr6,
-				     sizeof(addr6));
+		(void)connect_socket(AF_INET6, SERVER_ADDR6, port, &sock6,
+				     (struct sockaddr *)&addr6, sizeof(addr6));
 	}
 
 	if (sock4 < 0 && sock6 < 0) {
@@ -307,10 +294,8 @@ void main(void)
 
 	if (sock4 >= 0 && IS_ENABLED(CONFIG_NET_IPV4)) {
 		struct http_request req;
-		const char *headers[] = {
-			"Transfer-Encoding: chunked\r\n",
-			NULL
-		};
+		const char *headers[] = { "Transfer-Encoding: chunked\r\n",
+					  NULL };
 
 		memset(&req, 0, sizeof(req));
 
@@ -331,10 +316,8 @@ void main(void)
 
 	if (sock6 >= 0 && IS_ENABLED(CONFIG_NET_IPV6)) {
 		struct http_request req;
-		const char *headers[] = {
-			"Transfer-Encoding: chunked\r\n",
-			NULL
-		};
+		const char *headers[] = { "Transfer-Encoding: chunked\r\n",
+					  NULL };
 
 		memset(&req, 0, sizeof(req));
 

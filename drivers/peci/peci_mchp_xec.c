@@ -16,17 +16,17 @@ LOG_MODULE_REGISTER(peci_mchp_xec, CONFIG_PECI_LOG_LEVEL);
 /* Maximum PECI core clock is the main clock 48Mhz */
 #define MAX_PECI_CORE_CLOCK 48000u
 /* 1 ms */
-#define PECI_RESET_DELAY    1000u
+#define PECI_RESET_DELAY 1000u
 /* 100 us */
-#define PECI_IDLE_DELAY     100u
+#define PECI_IDLE_DELAY 100u
 /* 5 ms */
-#define PECI_IDLE_TIMEOUT   50u
+#define PECI_IDLE_TIMEOUT 50u
 /* 10 us */
-#define PECI_IO_DELAY       10
+#define PECI_IO_DELAY 10
 
 #define OPT_BIT_TIME_MSB_OFS 8u
 
-#define PECI_FCS_LEN         2
+#define PECI_FCS_LEN 2
 
 struct peci_xec_config {
 	PECI_Type *base;
@@ -42,7 +42,7 @@ static struct peci_xec_data peci_data;
 #endif
 
 static const struct peci_xec_config peci_xec_config = {
-	.base = (PECI_Type *) DT_INST_REG_ADDR(0),
+	.base = (PECI_Type *)DT_INST_REG_ADDR(0),
 	.irq_num = DT_INST_IRQN(0),
 };
 
@@ -210,10 +210,10 @@ static int peci_xec_read(const struct device *dev, struct peci_msg *msg)
 				LOG_DBG("TX FCS %x", tx_fcs);
 			} else if (i == (rx_buf->len + 1)) {
 				/* Get read block FCS, but don't count it */
-				rx_buf->buf[i-1] = base->RD_DATA;
+				rx_buf->buf[i - 1] = base->RD_DATA;
 			} else {
 				/* Get response */
-				rx_buf->buf[i-1] = base->RD_DATA;
+				rx_buf->buf[i - 1] = base->RD_DATA;
 				bytes_rcvd++;
 			}
 		}
@@ -229,7 +229,6 @@ static int peci_xec_read(const struct device *dev, struct peci_msg *msg)
 	 */
 	ret = check_bus_idle(base);
 	if (ret) {
-
 		return ret;
 	}
 
@@ -349,15 +348,12 @@ static int peci_xec_init(const struct device *dev)
 	base->CONTROL |= MCHP_PECI_CTRL_MIEN;
 
 	/* Direct NVIC */
-	IRQ_CONNECT(peci_xec_config.irq_num,
-		    DT_INST_IRQ(0, priority),
+	IRQ_CONNECT(peci_xec_config.irq_num, DT_INST_IRQ(0, priority),
 		    peci_xec_isr, NULL, 0);
 #endif
 	return 0;
 }
 
-DEVICE_AND_API_INIT(peci_xec, DT_INST_LABEL(0),
-		    &peci_xec_init,
-		    NULL, NULL,
+DEVICE_AND_API_INIT(peci_xec, DT_INST_LABEL(0), &peci_xec_init, NULL, NULL,
 		    POST_KERNEL, CONFIG_PECI_INIT_PRIORITY,
 		    &peci_xec_driver_api);

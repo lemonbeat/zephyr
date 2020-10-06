@@ -50,4 +50,4 @@ int usleep(useconds_t useconds);
 }
 #endif
 
-#endif	/* ZEPHYR_INCLUDE_POSIX_UNISTD_H_ */
+#endif /* ZEPHYR_INCLUDE_POSIX_UNISTD_H_ */

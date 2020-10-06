@@ -10,7 +10,7 @@
 #include "clock_freq.h"
 #include "epit.h"
 
-#define COUNTER_MAX_RELOAD	0xFFFFFFFF
+#define COUNTER_MAX_RELOAD 0xFFFFFFFF
 
 struct imx_epit_config {
 	struct counter_config_info info;
@@ -23,10 +23,10 @@ struct imx_epit_data {
 	volatile void *user_data;
 };
 
-static inline const struct imx_epit_config *get_epit_config(const struct device *dev)
+static inline const struct imx_epit_config *
+get_epit_config(const struct device *dev)
 {
-	return CONTAINER_OF(dev->config, struct imx_epit_config,
-			    info);
+	return CONTAINER_OF(dev->config, struct imx_epit_config, info);
 }
 
 static void imx_epit_isr(const struct device *dev)
@@ -43,19 +43,18 @@ static void imx_epit_isr(const struct device *dev)
 
 static void imx_epit_init(const struct device *dev)
 {
-	struct imx_epit_config *config = (struct imx_epit_config *)
-							   get_epit_config(dev);
+	struct imx_epit_config *config =
+		(struct imx_epit_config *)get_epit_config(dev);
 	EPIT_Type *base = config->base;
-	epit_init_config_t epit_config = {
-		.freeRun     = true,
-		.waitEnable  = true,
-		.stopEnable  = true,
-		.dbgEnable   = true,
-		.enableMode  = true
-	};
+	epit_init_config_t epit_config = { .freeRun = true,
+					   .waitEnable = true,
+					   .stopEnable = true,
+					   .dbgEnable = true,
+					   .enableMode = true };
 
 	/* Adjust frequency in the counter configuration info */
-	config->info.freq = get_epit_clock_freq(base)/(config->prescaler + 1U);
+	config->info.freq =
+		get_epit_clock_freq(base) / (config->prescaler + 1U);
 
 	EPIT_Init(base, &epit_config);
 }
@@ -109,7 +108,7 @@ static int imx_epit_set_top_value(const struct device *dev,
 
 	/* Set reload value and optionally counter to "ticks" */
 	EPIT_SetOverwriteCounter(base,
-				!(cfg->flags & COUNTER_TOP_CFG_DONT_RESET));
+				 !(cfg->flags & COUNTER_TOP_CFG_DONT_RESET));
 	EPIT_SetCounterLoadValue(base, cfg->ticks);
 
 	if (cfg->callback != NULL) {
@@ -149,9 +148,9 @@ static const struct counter_driver_api imx_epit_driver_api = {
 	.get_max_relative_alarm = imx_epit_get_max_relative_alarm,
 };
 
-#define COUNTER_IMX_EPIT_DEVICE(idx)					       \
-static int imx_epit_config_func_##idx(const struct device *dev);	       \
-static const struct imx_epit_config imx_epit_##idx##z_config = {	       \
+#define COUNTER_IMX_EPIT_DEVICE(idx)                                              \
+	static int imx_epit_config_func_##idx(const struct device *dev);          \
+	static const struct imx_epit_config imx_epit_##idx##z_config = {	       \
 	.info = {							       \
 			.max_top_value = COUNTER_MAX_RELOAD,		       \
 			.freq = 1U,					       \
@@ -160,21 +159,21 @@ static const struct imx_epit_config imx_epit_##idx##z_config = {	       \
 		},							       \
 	.base = (EPIT_Type *)DT_INST_REG_ADDR(idx),			       \
 	.prescaler = DT_INST_PROP(idx, prescaler),			       \
-};									       \
-static struct imx_epit_data imx_epit_##idx##_data;			       \
-DEVICE_AND_API_INIT(epit_##idx, DT_INST_LABEL(idx),			       \
-		    &imx_epit_config_func_##idx,			       \
-		    &imx_epit_##idx##_data, &imx_epit_##idx##z_config.info,    \
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	       \
-		    &imx_epit_driver_api);				       \
-static int imx_epit_config_func_##idx(const struct device *dev)		       \
-{									       \
-	imx_epit_init(dev);						       \
-	IRQ_CONNECT(DT_INST_IRQN(idx),					       \
-		    DT_INST_IRQ(idx, priority),				       \
-		    imx_epit_isr, DEVICE_GET(epit_##idx), 0);		       \
-	irq_enable(DT_INST_IRQN(idx));					       \
-	return 0;							       \
-}
+}; \
+	static struct imx_epit_data imx_epit_##idx##_data;                        \
+	DEVICE_AND_API_INIT(epit_##idx, DT_INST_LABEL(idx),                       \
+			    &imx_epit_config_func_##idx,                          \
+			    &imx_epit_##idx##_data,                               \
+			    &imx_epit_##idx##z_config.info, PRE_KERNEL_1,         \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,                  \
+			    &imx_epit_driver_api);                                \
+	static int imx_epit_config_func_##idx(const struct device *dev)           \
+	{                                                                         \
+		imx_epit_init(dev);                                               \
+		IRQ_CONNECT(DT_INST_IRQN(idx), DT_INST_IRQ(idx, priority),        \
+			    imx_epit_isr, DEVICE_GET(epit_##idx), 0);             \
+		irq_enable(DT_INST_IRQN(idx));                                    \
+		return 0;                                                         \
+	}
 
 DT_INST_FOREACH_STATUS_OKAY(COUNTER_IMX_EPIT_DEVICE)

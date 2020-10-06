@@ -18,8 +18,7 @@ LOG_MODULE_DECLARE(net_l2_ppp, CONFIG_NET_L2_PPP_LOG_LEVEL);
 #include "ppp_internal.h"
 
 static enum net_verdict ipv6cp_handle(struct ppp_context *ctx,
-				    struct net_if *iface,
-				    struct net_pkt *pkt)
+				      struct net_if *iface, struct net_pkt *pkt)
 {
 	return ppp_fsm_input(&ctx->ipv6cp.fsm, PPP_IPV6CP, pkt);
 }
@@ -71,8 +70,8 @@ static int ipv6cp_ack_iid(struct ppp_context *ctx, struct net_pkt *pkt,
 }
 
 static const struct ppp_my_option_info ipv6cp_my_options[] = {
-	PPP_MY_OPTION(IPV6CP_OPTION_INTERFACE_IDENTIFIER,
-		      ipv6cp_add_iid, ipv6cp_ack_iid, NULL),
+	PPP_MY_OPTION(IPV6CP_OPTION_INTERFACE_IDENTIFIER, ipv6cp_add_iid,
+		      ipv6cp_ack_iid, NULL),
 };
 
 BUILD_ASSERT(ARRAY_SIZE(ipv6cp_my_options) == IPV6CP_NUM_MY_OPTIONS);
@@ -106,8 +105,8 @@ static int ipv6cp_interface_identifier_parse(struct ppp_fsm *fsm,
 		net_sprint_ll_addr_buf(data->iface_id, sizeof(data->iface_id),
 				       iid_str, sizeof(iid_str));
 
-		NET_DBG("[%s/%p] Received %siid %s",
-			fsm->name, fsm, "peer ", log_strdup(iid_str));
+		NET_DBG("[%s/%p] Received %siid %s", fsm->name, fsm, "peer ",
+			log_strdup(iid_str));
 	}
 
 	data->iface_id_present = true;
@@ -120,10 +119,8 @@ static const struct ppp_peer_option_info ipv6cp_peer_options[] = {
 			ipv6cp_interface_identifier_parse, NULL),
 };
 
-static int ipv6cp_config_info_req(struct ppp_fsm *fsm,
-				  struct net_pkt *pkt,
-				  uint16_t length,
-				  struct net_pkt *ret_pkt)
+static int ipv6cp_config_info_req(struct ppp_fsm *fsm, struct net_pkt *pkt,
+				  uint16_t length, struct net_pkt *ret_pkt)
 {
 	struct ppp_context *ctx =
 		CONTAINER_OF(fsm, struct ppp_context, ipv6cp.fsm);
@@ -134,8 +131,7 @@ static int ipv6cp_config_info_req(struct ppp_fsm *fsm,
 
 	ret = ppp_config_info_req(fsm, pkt, length, ret_pkt, PPP_IPV6CP,
 				  ipv6cp_peer_options,
-				  ARRAY_SIZE(ipv6cp_peer_options),
-				  &data);
+				  ARRAY_SIZE(ipv6cp_peer_options), &data);
 	if (ret != PPP_CONFIGURE_ACK) {
 		/* There are some issues with configuration still */
 		return ret;
@@ -152,12 +148,11 @@ static int ipv6cp_config_info_req(struct ppp_fsm *fsm,
 	return PPP_CONFIGURE_ACK;
 }
 
-static int ipv6cp_config_info_ack(struct ppp_fsm *fsm,
-				  struct net_pkt *pkt,
+static int ipv6cp_config_info_ack(struct ppp_fsm *fsm, struct net_pkt *pkt,
 				  uint16_t length)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipv6cp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipv6cp.fsm);
 	uint8_t *iid = ctx->ipv6cp.my_options.iid;
 	size_t iid_len = sizeof(ctx->ipv6cp.my_options.iid);
 	int ret;
@@ -175,11 +170,10 @@ static int ipv6cp_config_info_ack(struct ppp_fsm *fsm,
 	if (CONFIG_NET_L2_PPP_LOG_LEVEL >= LOG_LEVEL_DBG) {
 		uint8_t iid_str[sizeof("xx:xx:xx:xx:xx:xx:xx:xx")];
 
-		net_sprint_ll_addr_buf(iid, iid_len,
-				       iid_str, sizeof(iid_str));
+		net_sprint_ll_addr_buf(iid, iid_len, iid_str, sizeof(iid_str));
 
-		NET_DBG("[%s/%p] Received %siid %s",
-			fsm->name, fsm, "", log_strdup(iid_str));
+		NET_DBG("[%s/%p] Received %siid %s", fsm->name, fsm, "",
+			log_strdup(iid_str));
 	}
 
 	return 0;
@@ -238,8 +232,8 @@ static void add_iid_address(struct net_if *iface, uint8_t *iid)
 
 static void ipv6cp_up(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipv6cp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipv6cp.fsm);
 	struct net_nbr *nbr;
 	struct in6_addr peer_addr;
 	struct net_linkaddr peer_lladdr;
@@ -266,11 +260,11 @@ static void ipv6cp_up(struct ppp_fsm *fsm)
 	/* TODO: What should be the type? */
 	peer_lladdr.type = NET_LINK_DUMMY;
 
-	nbr = net_ipv6_nbr_add(ctx->iface, &peer_addr, &peer_lladdr,
-			       false, NET_IPV6_NBR_STATE_STATIC);
+	nbr = net_ipv6_nbr_add(ctx->iface, &peer_addr, &peer_lladdr, false,
+			       NET_IPV6_NBR_STATE_STATIC);
 	if (!nbr) {
-		NET_ERR("[%s/%p] Cannot add peer %s to nbr table",
-			fsm->name, fsm,
+		NET_ERR("[%s/%p] Cannot add peer %s to nbr table", fsm->name,
+			fsm,
 			log_strdup(net_sprint_addr(AF_INET6,
 						   (const void *)&peer_addr)));
 	} else {
@@ -280,23 +274,23 @@ static void ipv6cp_up(struct ppp_fsm *fsm)
 			char *addr_str;
 
 			net_sprint_ll_addr_buf(peer_lladdr.addr,
-					       peer_lladdr.len,
-					       iid_str, sizeof(iid_str));
+					       peer_lladdr.len, iid_str,
+					       sizeof(iid_str));
 
 			addr_str = net_addr_ntop(AF_INET6, &peer_addr, dst,
 						 sizeof(dst));
 
-			NET_DBG("[%s/%p] Peer %s [%s] %s nbr cache",
-				fsm->name, fsm, log_strdup(addr_str),
-				log_strdup(iid_str), "added to");
+			NET_DBG("[%s/%p] Peer %s [%s] %s nbr cache", fsm->name,
+				fsm, log_strdup(addr_str), log_strdup(iid_str),
+				"added to");
 		}
 	}
 }
 
 static void ipv6cp_down(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipv6cp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipv6cp.fsm);
 	struct net_linkaddr peer_lladdr;
 	struct in6_addr my_addr;
 	struct in6_addr peer_addr;
@@ -325,8 +319,8 @@ static void ipv6cp_down(struct ppp_fsm *fsm)
 
 	ret = net_ipv6_nbr_rm(ctx->iface, &peer_addr);
 	if (!ret) {
-		NET_ERR("[%s/%p] Cannot rm peer %s from nbr table",
-			fsm->name, fsm,
+		NET_ERR("[%s/%p] Cannot rm peer %s from nbr table", fsm->name,
+			fsm,
 			log_strdup(net_sprint_addr(AF_INET6,
 						   (const void *)&peer_addr)));
 	} else {
@@ -335,24 +329,25 @@ static void ipv6cp_down(struct ppp_fsm *fsm)
 			char dst[INET6_ADDRSTRLEN];
 			char *addr_str;
 
-			net_sprint_ll_addr_buf(ctx->ipv6cp.peer_options.iid,
-					sizeof(ctx->ipv6cp.peer_options.iid),
-					iid_str, sizeof(iid_str));
+			net_sprint_ll_addr_buf(
+				ctx->ipv6cp.peer_options.iid,
+				sizeof(ctx->ipv6cp.peer_options.iid), iid_str,
+				sizeof(iid_str));
 
 			addr_str = net_addr_ntop(AF_INET6, &peer_addr, dst,
 						 sizeof(dst));
 
-			NET_DBG("[%s/%p] Peer %s [%s] %s nbr cache",
-				fsm->name, fsm, log_strdup(addr_str),
-				log_strdup(iid_str), "removed from");
+			NET_DBG("[%s/%p] Peer %s [%s] %s nbr cache", fsm->name,
+				fsm, log_strdup(addr_str), log_strdup(iid_str),
+				"removed from");
 		}
 	}
 }
 
 static void ipv6cp_finished(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipv6cp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipv6cp.fsm);
 
 	if (!ctx->is_ipv6cp_open) {
 		return;
@@ -393,7 +388,6 @@ static void ipv6cp_init(struct ppp_context *ctx)
 	ctx->ipv6cp.fsm.cb.config_info_req = ipv6cp_config_info_req;
 }
 
-PPP_PROTOCOL_REGISTER(IPV6CP, PPP_IPV6CP,
-		      ipv6cp_init, ipv6cp_handle,
-		      ipv6cp_lower_up, ipv6cp_lower_down,
-		      ipv6cp_open, ipv6cp_close);
+PPP_PROTOCOL_REGISTER(IPV6CP, PPP_IPV6CP, ipv6cp_init, ipv6cp_handle,
+		      ipv6cp_lower_up, ipv6cp_lower_down, ipv6cp_open,
+		      ipv6cp_close);

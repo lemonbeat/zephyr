@@ -87,8 +87,7 @@ int adxl362_trigger_set(const struct device *dev,
 		drv_data->th_handler = handler;
 		drv_data->th_trigger = *trig;
 		k_mutex_unlock(&drv_data->trigger_mutex);
-		int_mask = ADXL362_INTMAP1_ACT |
-			   ADXL362_INTMAP1_INACT;
+		int_mask = ADXL362_INTMAP1_ACT | ADXL362_INTMAP1_INACT;
 		/* Clear activity and inactivity interrupts */
 		adxl362_get_status(dev, &status_buf);
 		break;
@@ -111,7 +110,8 @@ int adxl362_trigger_set(const struct device *dev,
 		int_en = 0U;
 	}
 
-	return adxl362_reg_write_mask(dev, ADXL362_REG_INTMAP1, int_mask, int_en);
+	return adxl362_reg_write_mask(dev, ADXL362_REG_INTMAP1, int_mask,
+				      int_en);
 }
 
 int adxl362_init_interrupt(const struct device *dev)
@@ -124,8 +124,7 @@ int adxl362_init_interrupt(const struct device *dev)
 
 	drv_data->gpio = device_get_binding(cfg->gpio_port);
 	if (drv_data->gpio == NULL) {
-		LOG_ERR("Failed to get pointer to %s device!",
-			cfg->gpio_port);
+		LOG_ERR("Failed to get pointer to %s device!", cfg->gpio_port);
 		return -EINVAL;
 	}
 
@@ -138,8 +137,7 @@ int adxl362_init_interrupt(const struct device *dev)
 	gpio_pin_configure(drv_data->gpio, cfg->int_gpio,
 			   GPIO_INPUT | cfg->int_flags);
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   adxl362_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, adxl362_gpio_callback,
 			   BIT(cfg->int_gpio));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -154,9 +152,9 @@ int adxl362_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_ADXL362_THREAD_STACK_SIZE,
-			(k_thread_entry_t)adxl362_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_ADXL362_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)adxl362_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_ADXL362_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_ADXL362_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = adxl362_work_cb;
 #endif

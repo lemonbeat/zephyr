@@ -10,10 +10,10 @@
 #include <soc.h>
 #include <hal/nrf_rng.h>
 
-#define DT_DRV_COMPAT	nordic_nrf_rng
+#define DT_DRV_COMPAT nordic_nrf_rng
 
-#define IRQN		DT_INST_IRQN(0)
-#define IRQ_PRIO	DT_INST_IRQ(0, priority)
+#define IRQN DT_INST_IRQN(0)
+#define IRQ_PRIO DT_INST_IRQ(0, priority)
 
 /*
  * The nRF5 RNG HW has several characteristics that need to be taken
@@ -97,8 +97,7 @@ struct entropy_nrf5_dev_data {
 
 static struct entropy_nrf5_dev_data entropy_nrf5_data;
 
-#define DEV_DATA(dev) \
-	((struct entropy_nrf5_dev_data *)(dev)->data)
+#define DEV_DATA(dev) ((struct entropy_nrf5_dev_data *)(dev)->data)
 
 static int random_byte_get(void)
 {
@@ -119,13 +118,13 @@ static int random_byte_get(void)
 
 #pragma GCC push_options
 #if defined(CONFIG_BT_CTLR_FAST_ENC)
-#pragma GCC optimize ("Ofast")
+#pragma GCC optimize("Ofast")
 #endif
 static uint16_t rng_pool_get(struct rng_pool *rngp, uint8_t *buf, uint16_t len)
 {
-	uint32_t last  = rngp->last;
-	uint32_t mask  = rngp->mask;
-	uint8_t *dst   = buf;
+	uint32_t last = rngp->last;
+	uint32_t mask = rngp->mask;
+	uint8_t *dst = buf;
 	uint32_t first, available;
 	uint32_t other_read_in_progress;
 	unsigned int key;
@@ -181,8 +180,8 @@ static uint16_t rng_pool_get(struct rng_pool *rngp, uint8_t *buf, uint16_t len)
 static int rng_pool_put(struct rng_pool *rngp, uint8_t byte)
 {
 	uint8_t first = rngp->first_read;
-	uint8_t last  = rngp->last;
-	uint8_t mask  = rngp->mask;
+	uint8_t last = rngp->last;
+	uint8_t mask = rngp->mask;
 
 	/* Signal error if the pool is full. */
 	if (((last - first) & mask) == mask) {
@@ -195,13 +194,14 @@ static int rng_pool_put(struct rng_pool *rngp, uint8_t byte)
 	return 0;
 }
 
-static void rng_pool_init(struct rng_pool *rngp, uint16_t size, uint8_t threshold)
+static void rng_pool_init(struct rng_pool *rngp, uint16_t size,
+			  uint8_t threshold)
 {
 	rngp->first_alloc = 0U;
-	rngp->first_read  = 0U;
-	rngp->last	  = 0U;
-	rngp->mask	  = size - 1;
-	rngp->threshold	  = threshold;
+	rngp->first_read = 0U;
+	rngp->last = 0U;
+	rngp->mask = size - 1;
+	rngp->threshold = threshold;
 }
 
 static void isr(const void *arg)
@@ -254,9 +254,8 @@ static int entropy_nrf5_get_entropy(const struct device *device, uint8_t *buf,
 	return 0;
 }
 
-static int entropy_nrf5_get_entropy_isr(const struct device *dev,
-					uint8_t *buf, uint16_t len,
-					uint32_t flags)
+static int entropy_nrf5_get_entropy_isr(const struct device *dev, uint8_t *buf,
+					uint16_t len, uint32_t flags)
 {
 	uint16_t cnt = len;
 
@@ -331,9 +330,9 @@ static const struct entropy_driver_api entropy_nrf5_api_funcs = {
 	.get_entropy_isr = entropy_nrf5_get_entropy_isr
 };
 
-DEVICE_AND_API_INIT(entropy_nrf5, DT_INST_LABEL(0),
-		    entropy_nrf5_init, &entropy_nrf5_data, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(entropy_nrf5, DT_INST_LABEL(0), entropy_nrf5_init,
+		    &entropy_nrf5_data, NULL, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_nrf5_api_funcs);
 
 static int entropy_nrf5_init(const struct device *device)

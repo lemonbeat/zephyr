@@ -27,11 +27,11 @@ struct shell_dummy {
 	char buf[300];
 };
 
-#define SHELL_DUMMY_DEFINE(_name)					\
-	static struct shell_dummy _name##_shell_dummy;			\
-	struct shell_transport _name = {				\
-		.api = &shell_dummy_transport_api,			\
-		.ctx = (struct shell_dummy *)&_name##_shell_dummy	\
+#define SHELL_DUMMY_DEFINE(_name)                                 \
+	static struct shell_dummy _name##_shell_dummy;            \
+	struct shell_transport _name = {                          \
+		.api = &shell_dummy_transport_api,                \
+		.ctx = (struct shell_dummy *)&_name##_shell_dummy \
 	}
 
 /**

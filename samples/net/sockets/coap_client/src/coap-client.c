@@ -30,11 +30,11 @@ struct pollfd fds[1];
 static int nfds;
 
 /* CoAP Options */
-static const char * const test_path[] = { "test", NULL };
+static const char *const test_path[] = { "test", NULL };
 
-static const char * const large_path[] = { "large", NULL };
+static const char *const large_path[] = { "large", NULL };
 
-static const char * const obs_path[] = { "obs", NULL };
+static const char *const obs_path[] = { "obs", NULL };
 
 #define BLOCK_WISE_TRANSFER_SIZE_GET 2048
 
@@ -63,8 +63,7 @@ static int start_coap_client(void)
 	addr6.sin6_port = htons(PEER_PORT);
 	addr6.sin6_scope_id = 0U;
 
-	inet_pton(AF_INET6, CONFIG_NET_CONFIG_PEER_IPV6_ADDR,
-		  &addr6.sin6_addr);
+	inet_pton(AF_INET6, CONFIG_NET_CONFIG_PEER_IPV6_ADDR, &addr6.sin6_addr);
 
 	sock = socket(addr6.sin6_family, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock < 0) {
@@ -130,7 +129,7 @@ static int send_simple_coap_request(uint8_t method)
 {
 	uint8_t payload[] = "payload";
 	struct coap_packet request;
-	const char * const *p;
+	const char *const *p;
 	uint8_t *data;
 	int r;
 
@@ -139,9 +138,8 @@ static int send_simple_coap_request(uint8_t method)
 		return -ENOMEM;
 	}
 
-	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN,
-			     1, COAP_TYPE_CON, 8, coap_next_token(),
-			     method, coap_next_id());
+	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN, 1, COAP_TYPE_CON,
+			     8, coap_next_token(), method, coap_next_id());
 	if (r < 0) {
 		LOG_ERR("Failed to init CoAP message");
 		goto end;
@@ -311,7 +309,7 @@ end:
 static int send_large_coap_request(void)
 {
 	struct coap_packet request;
-	const char * const *p;
+	const char *const *p;
 	uint8_t *data;
 	int r;
 
@@ -325,9 +323,9 @@ static int send_large_coap_request(void)
 		return -ENOMEM;
 	}
 
-	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN,
-			     1, COAP_TYPE_CON, 8, coap_next_token(),
-			     COAP_METHOD_GET, coap_next_id());
+	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN, 1, COAP_TYPE_CON,
+			     8, coap_next_token(), COAP_METHOD_GET,
+			     coap_next_id());
 	if (r < 0) {
 		LOG_ERR("Failed to init CoAP message");
 		goto end;
@@ -397,8 +395,8 @@ static int send_obs_reply_ack(uint16_t id, uint8_t *token, uint8_t tkl)
 		return -ENOMEM;
 	}
 
-	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN,
-			     1, COAP_TYPE_ACK, tkl, token, 0, id);
+	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN, 1, COAP_TYPE_ACK,
+			     tkl, token, 0, id);
 	if (r < 0) {
 		LOG_ERR("Failed to init CoAP message");
 		goto end;
@@ -473,7 +471,7 @@ end:
 static int send_obs_coap_request(void)
 {
 	struct coap_packet request;
-	const char * const *p;
+	const char *const *p;
 	uint8_t *data;
 	int r;
 
@@ -482,9 +480,9 @@ static int send_obs_coap_request(void)
 		return -ENOMEM;
 	}
 
-	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN,
-			     1, COAP_TYPE_CON, 8, coap_next_token(),
-			     COAP_METHOD_GET, coap_next_id());
+	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN, 1, COAP_TYPE_CON,
+			     8, coap_next_token(), COAP_METHOD_GET,
+			     coap_next_id());
 	if (r < 0) {
 		LOG_ERR("Failed to init CoAP message");
 		goto end;
@@ -518,7 +516,7 @@ end:
 static int send_obs_reset_coap_request(void)
 {
 	struct coap_packet request;
-	const char * const *p;
+	const char *const *p;
 	uint8_t *data;
 	int r;
 
@@ -527,9 +525,9 @@ static int send_obs_reset_coap_request(void)
 		return -ENOMEM;
 	}
 
-	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN,
-			     1, COAP_TYPE_RESET, 8, coap_next_token(),
-			     0, coap_next_id());
+	r = coap_packet_init(&request, data, MAX_COAP_MSG_LEN, 1,
+			     COAP_TYPE_RESET, 8, coap_next_token(), 0,
+			     coap_next_id());
 	if (r < 0) {
 		LOG_ERR("Failed to init CoAP message");
 		goto end;

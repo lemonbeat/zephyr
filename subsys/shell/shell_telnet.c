@@ -26,9 +26,9 @@ LOG_MODULE_REGISTER(shell_telnet, CONFIG_SHELL_TELNET_LOG_LEVEL);
 struct shell_telnet *sh_telnet;
 
 /* Various definitions mapping the TELNET service configuration options */
-#define TELNET_PORT      CONFIG_SHELL_TELNET_PORT
+#define TELNET_PORT CONFIG_SHELL_TELNET_PORT
 #define TELNET_LINE_SIZE CONFIG_SHELL_TELNET_LINE_BUF_SIZE
-#define TELNET_TIMEOUT   CONFIG_SHELL_TELNET_SEND_TIMEOUT
+#define TELNET_TIMEOUT CONFIG_SHELL_TELNET_SEND_TIMEOUT
 
 #define TELNET_MIN_MSG 2
 
@@ -51,8 +51,8 @@ static void telnet_end_client_connection(void)
 	}
 }
 
-static void telnet_sent_cb(struct net_context *client,
-			   int status, void *user_data)
+static void telnet_sent_cb(struct net_context *client, int status,
+			   void *user_data)
 {
 	if (status < 0) {
 		telnet_end_client_connection();
@@ -175,11 +175,9 @@ static inline bool telnet_handle_command(struct net_pkt *pkt)
 	return true;
 }
 
-static void telnet_recv(struct net_context *client,
-			struct net_pkt *pkt,
+static void telnet_recv(struct net_context *client, struct net_pkt *pkt,
 			union net_ip_header *ip_hdr,
-			union net_proto_header *proto_hdr,
-			int status,
+			union net_proto_header *proto_hdr, int status,
 			void *user_data)
 {
 	size_t len;
@@ -188,8 +186,8 @@ static void telnet_recv(struct net_context *client,
 		telnet_end_client_connection();
 
 		LOG_DBG("Telnet client dropped (AF_INET%s) status %d",
-			net_context_get_family(client) == AF_INET ?
-			"" : "6", status);
+			net_context_get_family(client) == AF_INET ? "" : "6",
+			status);
 		return;
 	}
 
@@ -216,11 +214,8 @@ unref:
 	net_pkt_unref(pkt);
 }
 
-static void telnet_accept(struct net_context *client,
-			  struct sockaddr *addr,
-			  socklen_t addrlen,
-			  int error,
-			  void *user_data)
+static void telnet_accept(struct net_context *client, struct sockaddr *addr,
+			  socklen_t addrlen, int error, void *user_data)
 {
 	if (error) {
 		LOG_ERR("Error %d", error);
@@ -291,11 +286,9 @@ error:
 static int telnet_init(void)
 {
 	if (IS_ENABLED(CONFIG_NET_IPV4)) {
-		struct sockaddr_in any_addr4 = {
-			.sin_family = AF_INET,
-			.sin_port = htons(TELNET_PORT),
-			.sin_addr = INADDR_ANY_INIT
-		};
+		struct sockaddr_in any_addr4 = { .sin_family = AF_INET,
+						 .sin_port = htons(TELNET_PORT),
+						 .sin_addr = INADDR_ANY_INIT };
 		static struct net_context *ctx4;
 
 		telnet_setup_server(&ctx4, AF_INET,
@@ -323,10 +316,8 @@ static int telnet_init(void)
 
 /* Shell API */
 
-static int init(const struct shell_transport *transport,
-		const void *config,
-		shell_transport_handler_t evt_handler,
-		void *context)
+static int init(const struct shell_transport *transport, const void *config,
+		shell_transport_handler_t evt_handler, void *context)
 {
 	int err;
 
@@ -366,8 +357,8 @@ static int enable(const struct shell_transport *transport, bool blocking)
 	return 0;
 }
 
-static int write(const struct shell_transport *transport,
-		 const void *data, size_t length, size_t *cnt)
+static int write(const struct shell_transport *transport, const void *data,
+		 size_t length, size_t *cnt)
 {
 	struct shell_telnet_line_buf *lb;
 	size_t copy_len;
@@ -431,8 +422,8 @@ static int write(const struct shell_transport *transport,
 	return 0;
 }
 
-static int read(const struct shell_transport *transport,
-		void *data, size_t length, size_t *cnt)
+static int read(const struct shell_transport *transport, void *data,
+		size_t length, size_t *cnt)
 {
 	struct net_pkt *pkt;
 	size_t read_len;
@@ -491,7 +482,8 @@ static int enable_shell_telnet(const struct device *arg)
 
 	bool log_backend = CONFIG_SHELL_TELNET_INIT_LOG_LEVEL > 0;
 	uint32_t level = (CONFIG_SHELL_TELNET_INIT_LOG_LEVEL > LOG_LEVEL_DBG) ?
-		      CONFIG_LOG_MAX_LEVEL : CONFIG_SHELL_TELNET_INIT_LOG_LEVEL;
+				       CONFIG_LOG_MAX_LEVEL :
+				       CONFIG_SHELL_TELNET_INIT_LOG_LEVEL;
 
 	return shell_init(&shell_telnet, NULL, true, log_backend, level);
 }

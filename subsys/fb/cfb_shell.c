@@ -19,12 +19,11 @@
 #define HELP_INIT "call \"cfb init\" first"
 #define HELP_PRINT "<col: pos> <row: pos> \"<text>\""
 
-#define DISPLAY_DRIVER	CONFIG_CHARACTER_FRAMEBUFFER_SHELL_DRIVER_NAME
-
+#define DISPLAY_DRIVER CONFIG_CHARACTER_FRAMEBUFFER_SHELL_DRIVER_NAME
 
 static const struct device *dev;
-static const char * const param_name[] = {
-	"height", "width", "ppt", "rows", "cols"};
+static const char *const param_name[] = { "height", "width", "ppt", "rows",
+					  "cols" };
 
 static int cmd_clear(const struct shell *shell, size_t argc, char *argv[])
 {
@@ -76,7 +75,7 @@ static int cmd_cfb_print(const struct shell *shell, int col, int row, char *str)
 	err = cfb_print(dev, str, col, row * ppt);
 	if (err) {
 		shell_error(shell, "Failed to print the string %s error=%d",
-		      str, err);
+			    str, err);
 		return err;
 	}
 
@@ -317,15 +316,14 @@ static int cmd_get_param_all(const struct shell *shell, size_t argc,
 
 	for (unsigned int i = 0; i <= CFB_DISPLAY_COLS; i++) {
 		shell_print(shell, "param: %s=%d", param_name[i],
-				cfb_get_display_parameter(dev, i));
-
+			    cfb_get_display_parameter(dev, i));
 	}
 
 	return 0;
 }
 
 static int cmd_get_param_height(const struct shell *shell, size_t argc,
-			     char *argv[])
+				char *argv[])
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -342,7 +340,7 @@ static int cmd_get_param_height(const struct shell *shell, size_t argc,
 }
 
 static int cmd_get_param_width(const struct shell *shell, size_t argc,
-			     char *argv[])
+			       char *argv[])
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -376,7 +374,7 @@ static int cmd_get_param_ppt(const struct shell *shell, size_t argc,
 }
 
 static int cmd_get_param_rows(const struct shell *shell, size_t argc,
-			     char *argv[])
+			      char *argv[])
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -393,7 +391,7 @@ static int cmd_get_param_rows(const struct shell *shell, size_t argc,
 }
 
 static int cmd_get_param_cols(const struct shell *shell, size_t argc,
-			     char *argv[])
+			      char *argv[])
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -433,7 +431,8 @@ static int cmd_init(const struct shell *shell, size_t argc, char *argv[])
 	return err;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_cmd_get_param,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_cmd_get_param,
 
 	SHELL_CMD_ARG(all, NULL, NULL, cmd_get_param_all, 1, 0),
 	SHELL_CMD_ARG(height, NULL, NULL, cmd_get_param_height, 1, 0),
@@ -441,18 +440,18 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_cmd_get_param,
 	SHELL_CMD_ARG(ppt, NULL, NULL, cmd_get_param_ppt, 1, 0),
 	SHELL_CMD_ARG(rows, NULL, NULL, cmd_get_param_rows, 1, 0),
 	SHELL_CMD_ARG(cols, NULL, NULL, cmd_get_param_cols, 1, 0),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_cmd_scroll,
 
-	SHELL_CMD_ARG(vertical, NULL, HELP_PRINT, cmd_scroll_vert, 4, 0),
-	SHELL_CMD_ARG(horizontal, NULL, HELP_PRINT, cmd_scroll_horz, 4, 0),
-	SHELL_SUBCMD_SET_END
-);
+			       SHELL_CMD_ARG(vertical, NULL, HELP_PRINT,
+					     cmd_scroll_vert, 4, 0),
+			       SHELL_CMD_ARG(horizontal, NULL, HELP_PRINT,
+					     cmd_scroll_horz, 4, 0),
+			       SHELL_SUBCMD_SET_END);
 
-SHELL_STATIC_SUBCMD_SET_CREATE(cfb_cmds,
-	SHELL_CMD_ARG(init, NULL, HELP_NONE, cmd_init, 1, 0),
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	cfb_cmds, SHELL_CMD_ARG(init, NULL, HELP_NONE, cmd_init, 1, 0),
 	SHELL_CMD_ARG(get_device, NULL, HELP_NONE, cmd_get_device, 1, 0),
 	SHELL_CMD(get_param, &sub_cmd_get_param,
 		  "<all, height, width, ppt, rows, cols>", NULL),
@@ -460,11 +459,12 @@ SHELL_STATIC_SUBCMD_SET_CREATE(cfb_cmds,
 	SHELL_CMD_ARG(set_font, NULL, "<idx>", cmd_set_font, 2, 0),
 	SHELL_CMD_ARG(invert, NULL, HELP_NONE, cmd_invert, 1, 0),
 	SHELL_CMD_ARG(print, NULL, HELP_PRINT, cmd_print, 4, 0),
-	SHELL_CMD(scroll, &sub_cmd_scroll, "scroll a text in vertical or "
-		  "horizontal direction", NULL),
+	SHELL_CMD(scroll, &sub_cmd_scroll,
+		  "scroll a text in vertical or "
+		  "horizontal direction",
+		  NULL),
 	SHELL_CMD_ARG(clear, NULL, HELP_NONE, cmd_clear, 1, 0),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(cfb, &cfb_cmds, "Character Framebuffer shell commands",
 		   NULL);

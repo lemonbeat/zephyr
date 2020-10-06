@@ -21,36 +21,36 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(dma_dw);
 
-#define BYTE				(1)
-#define WORD				(2)
-#define DWORD				(4)
+#define BYTE (1)
+#define WORD (2)
+#define DWORD (4)
 
 /* CFG_LO */
-#define DW_CFG_CLASS(x)			(x << 29)
+#define DW_CFG_CLASS(x) (x << 29)
 /* CFG_HI */
-#define DW_CFGH_SRC_PER(x)		((x & 0xf) | ((x & 0x30) << 24))
-#define DW_CFGH_DST_PER(x)		(((x & 0xf) << 4) | ((x & 0x30) << 26))
+#define DW_CFGH_SRC_PER(x) ((x & 0xf) | ((x & 0x30) << 24))
+#define DW_CFGH_DST_PER(x) (((x & 0xf) << 4) | ((x & 0x30) << 26))
 
 /* default initial setup register values */
-#define DW_CFG_LOW_DEF			0x0
+#define DW_CFG_LOW_DEF 0x0
 
 #define DEV_NAME(dev) ((dev)->name)
 #define DEV_DATA(dev) ((struct dw_dma_dev_data *const)(dev)->data)
-#define DEV_CFG(dev) \
-	((const struct dw_dma_dev_cfg *const)(dev)->config)
+#define DEV_CFG(dev) ((const struct dw_dma_dev_cfg *const)(dev)->config)
 
 /* number of tries to wait for reset */
-#define DW_DMA_CFG_TRIES	10000
-#define INT_MASK_ALL		0xFF00
+#define DW_DMA_CFG_TRIES 10000
+#define INT_MASK_ALL 0xFF00
 
-static ALWAYS_INLINE void dw_write(uint32_t dma_base, uint32_t reg, uint32_t value)
+static ALWAYS_INLINE void dw_write(uint32_t dma_base, uint32_t reg,
+				   uint32_t value)
 {
-	*((volatile uint32_t*)(dma_base + reg)) = value;
+	*((volatile uint32_t *)(dma_base + reg)) = value;
 }
 
 static ALWAYS_INLINE uint32_t dw_read(uint32_t dma_base, uint32_t reg)
 {
-	return *((volatile uint32_t*)(dma_base + reg));
+	return *((volatile uint32_t *)(dma_base + reg));
 }
 
 static void dw_dma_isr(const struct device *dev)
@@ -92,13 +92,11 @@ static void dw_dma_isr(const struct device *dev)
 		chan_data = &dev_data->chan[channel];
 
 		if (chan_data->dma_blkcallback) {
-
 			/* Ensure the linked list (chan_data->lli) is
 			 * freed in the user callback function once
 			 * all the blocks are transferred.
 			 */
-			chan_data->dma_blkcallback(dev,
-						   chan_data->blkuser_data,
+			chan_data->dma_blkcallback(dev, chan_data->blkuser_data,
 						   channel, 0);
 		}
 	}
@@ -108,8 +106,7 @@ static void dw_dma_isr(const struct device *dev)
 		status_tfr &= ~(1 << channel);
 		chan_data = &dev_data->chan[channel];
 		if (chan_data->dma_tfrcallback) {
-			chan_data->dma_tfrcallback(dev,
-						   chan_data->tfruser_data,
+			chan_data->dma_tfrcallback(dev, chan_data->tfruser_data,
 						   channel, 0);
 		}
 	}
@@ -171,38 +168,37 @@ static int dw_dma_config(const struct device *dev, uint32_t channel,
 	ctrl_lo |= DW_CTLL_INT_EN;
 
 	switch (cfg->channel_direction) {
+	case MEMORY_TO_MEMORY:
+		ctrl_lo |= DW_CTLL_FC_M2M;
+		ctrl_lo |= DW_CTLL_SRC_INC | DW_CTLL_DST_INC;
+		break;
 
-		case MEMORY_TO_MEMORY:
-			ctrl_lo |= DW_CTLL_FC_M2M;
-			ctrl_lo |= DW_CTLL_SRC_INC | DW_CTLL_DST_INC;
-			break;
+	case MEMORY_TO_PERIPHERAL:
+		ctrl_lo |= DW_CTLL_FC_M2P;
+		ctrl_lo |= DW_CTLL_SRC_INC | DW_CTLL_DST_FIX;
 
-		case MEMORY_TO_PERIPHERAL:
-			ctrl_lo |= DW_CTLL_FC_M2P;
-			ctrl_lo |= DW_CTLL_SRC_INC | DW_CTLL_DST_FIX;
-
-			/* Assign a hardware handshaking interface (0-15) to the
+		/* Assign a hardware handshaking interface (0-15) to the
 			 * destination of channel
 			 */
-			dw_write(dev_cfg->base, DW_CFG_HIGH(channel),
-					DW_CFGH_DST_PER(cfg->dma_slot));
-			break;
+		dw_write(dev_cfg->base, DW_CFG_HIGH(channel),
+			 DW_CFGH_DST_PER(cfg->dma_slot));
+		break;
 
-		case PERIPHERAL_TO_MEMORY:
-			ctrl_lo |= DW_CTLL_FC_P2M;
-			ctrl_lo |= DW_CTLL_SRC_FIX | DW_CTLL_DST_INC;
+	case PERIPHERAL_TO_MEMORY:
+		ctrl_lo |= DW_CTLL_FC_P2M;
+		ctrl_lo |= DW_CTLL_SRC_FIX | DW_CTLL_DST_INC;
 
-			/* Assign a hardware handshaking interface (0-15) to the
+		/* Assign a hardware handshaking interface (0-15) to the
 			 * source of channel
 			 */
-			dw_write(dev_cfg->base, DW_CFG_HIGH(channel),
-					DW_CFGH_SRC_PER(cfg->dma_slot));
-			break;
+		dw_write(dev_cfg->base, DW_CFG_HIGH(channel),
+			 DW_CFGH_SRC_PER(cfg->dma_slot));
+		break;
 
-		default:
-			LOG_ERR("channel_direction %d is not supported",
-				    cfg->channel_direction);
-			return -EINVAL;
+	default:
+		LOG_ERR("channel_direction %d is not supported",
+			cfg->channel_direction);
+		return -EINVAL;
 	}
 
 	/* channel needs started from scratch, so write SARn, DARn */
@@ -240,8 +236,8 @@ static int dw_dma_config(const struct device *dev, uint32_t channel,
 	/* program CTLn */
 	dw_write(dev_cfg->base, DW_CTRL_LOW(channel), ctrl_lo);
 	dw_write(dev_cfg->base, DW_CTRL_HIGH(channel),
-		DW_CFG_CLASS(dev_data->channel_data->chan[channel].class) |
-		cfg_blocks->block_size);
+		 DW_CFG_CLASS(dev_data->channel_data->chan[channel].class) |
+			 cfg_blocks->block_size);
 
 	/* write channel config */
 	dw_write(dev_cfg->base, DW_CFG_LOW(channel), DW_CFG_LOW_DEF);
@@ -262,8 +258,8 @@ static int dw_dma_reload(const struct device *dev, uint32_t channel,
 	dw_write(dev_cfg->base, DW_SAR(channel), src);
 	dw_write(dev_cfg->base, DW_DAR(channel), dst);
 	dw_write(dev_cfg->base, DW_CTRL_HIGH(channel),
-		DW_CFG_CLASS(dev_data->channel_data->chan[channel].class) |
-		size);
+		 DW_CFG_CLASS(dev_data->channel_data->chan[channel].class) |
+			 size);
 
 	return 0;
 }
@@ -317,7 +313,7 @@ static void dw_dma_setup(const struct device *dev)
 	return;
 
 found:
-	for (i = 0; i <  DW_MAX_CHAN; i++) {
+	for (i = 0; i < DW_MAX_CHAN; i++) {
 		dw_read(dev_cfg->base, DW_DMA_CHAN_EN);
 	}
 
@@ -332,9 +328,9 @@ found:
 	dw_write(dev_cfg->base, DW_MASK_ERR, INT_MASK_ALL);
 
 	/* set channel priorities */
-	for (i = 0; i <  DW_MAX_CHAN; i++) {
+	for (i = 0; i < DW_MAX_CHAN; i++) {
 		dw_write(dev_cfg->base, DW_CTRL_HIGH(i),
-		DW_CFG_CLASS(dp->chan[i].class));
+			 DW_CFG_CLASS(dp->chan[i].class));
 	}
 }
 
@@ -360,10 +356,10 @@ static const struct dma_driver_api dw_dma_driver_api = {
 	.stop = dw_dma_transfer_stop,
 };
 
-#define DW_DMAC_INIT(inst)						\
-									\
-	DEVICE_DECLARE(dw_dma##inst);		\
-									\
+#define DW_DMAC_INIT(inst)                                                   \
+                                                                             \
+	DEVICE_DECLARE(dw_dma##inst);                                        \
+                                                                             \
 	static struct dw_drv_plat_data dmac##inst = {			\
 		.chan[0] = {						\
 			.class  = 6,					\
@@ -397,33 +393,30 @@ static const struct dma_driver_api dw_dma_driver_api = {
 			.class  = 6,					\
 			.weight = 0,					\
 		},							\
-	};								\
-									\
-	static void dw_dma##inst##_irq_config(void);			\
-									\
-	static const struct dw_dma_dev_cfg dw_dma##inst##_config = {	\
-		.base = DT_INST_REG_ADDR(inst),				\
-		.irq_config = dw_dma##inst##_irq_config			\
-	};								\
-									\
-	static struct dw_dma_dev_data dw_dma##inst##_data = {		\
-		.channel_data = &dmac##inst,				\
-	};								\
-									\
-	DEVICE_AND_API_INIT(dw_dma##inst, DT_INST_LABEL(inst),		\
-			    &dw_dma_init,				\
-			    &dw_dma##inst##_data,			\
-			    &dw_dma##inst##_config, POST_KERNEL,	\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &dw_dma_driver_api);			\
-									\
-	static void dw_dma##inst##_irq_config(void)			\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(inst),				\
-			    DT_INST_IRQ(inst, priority), dw_dma_isr,	\
-			    DEVICE_GET(dw_dma##inst),			\
-			    DT_INST_IRQ(inst, sense));			\
-		irq_enable(DT_INST_IRQN(inst));				\
+	};                    \
+                                                                             \
+	static void dw_dma##inst##_irq_config(void);                         \
+                                                                             \
+	static const struct dw_dma_dev_cfg dw_dma##inst##_config = {         \
+		.base = DT_INST_REG_ADDR(inst),                              \
+		.irq_config = dw_dma##inst##_irq_config                      \
+	};                                                                   \
+                                                                             \
+	static struct dw_dma_dev_data dw_dma##inst##_data = {                \
+		.channel_data = &dmac##inst,                                 \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(dw_dma##inst, DT_INST_LABEL(inst), &dw_dma_init, \
+			    &dw_dma##inst##_data, &dw_dma##inst##_config,    \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
+			    &dw_dma_driver_api);                             \
+                                                                             \
+	static void dw_dma##inst##_irq_config(void)                          \
+	{                                                                    \
+		IRQ_CONNECT(DT_INST_IRQN(inst), DT_INST_IRQ(inst, priority), \
+			    dw_dma_isr, DEVICE_GET(dw_dma##inst),            \
+			    DT_INST_IRQ(inst, sense));                       \
+		irq_enable(DT_INST_IRQN(inst));                              \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(DW_DMAC_INIT)

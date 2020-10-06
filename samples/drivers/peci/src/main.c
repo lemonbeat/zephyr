@@ -9,19 +9,19 @@
 #include <drivers/peci.h>
 #include <soc.h>
 
-#define TASK_STACK_SIZE         1024
-#define PRIORITY                7
+#define TASK_STACK_SIZE 1024
+#define PRIORITY 7
 
 /* PECI Host address */
-#define PECI_HOST_ADDR          0x30u
+#define PECI_HOST_ADDR 0x30u
 /* PECI Host bitrate 1Mbps */
-#define PECI_HOST_BITRATE       1000u
+#define PECI_HOST_BITRATE 1000u
 
-#define PECI_CONFIGINDEX_TJMAX  16u
-#define PECI_CONFIGHOSTID       0u
-#define PECI_CONFIGPARAM        0u
+#define PECI_CONFIGINDEX_TJMAX 16u
+#define PECI_CONFIGHOSTID 0u
+#define PECI_CONFIGPARAM 0u
 
-#define PECI_SAFE_TEMP          72
+#define PECI_SAFE_TEMP 72
 
 static const struct device *peci_dev;
 static bool peci_initialized;
@@ -62,11 +62,12 @@ int peci_get_tjmax(uint8_t *tjmax)
 	uint8_t peci_resp;
 	struct peci_msg packet;
 
-	uint8_t peci_resp_buf[PECI_RD_PKG_LEN_DWORD+1];
-	uint8_t peci_req_buf[] = { PECI_CONFIGHOSTID,
-				PECI_CONFIGINDEX_TJMAX,
-				PECI_CONFIGPARAM & 0x00FF,
-				(PECI_CONFIGPARAM & 0xFF00) >> 8,
+	uint8_t peci_resp_buf[PECI_RD_PKG_LEN_DWORD + 1];
+	uint8_t peci_req_buf[] = {
+		PECI_CONFIGHOSTID,
+		PECI_CONFIGINDEX_TJMAX,
+		PECI_CONFIGPARAM & 0x00FF,
+		(PECI_CONFIGPARAM & 0xFF00) >> 8,
 	};
 
 	packet.tx_buffer.buf = peci_req_buf;
@@ -101,9 +102,9 @@ int peci_get_temp(int *temperature)
 {
 	int16_t raw_cpu_temp;
 	int ret;
-	struct peci_msg packet = {0};
+	struct peci_msg packet = { 0 };
 
-	uint8_t peci_resp_buf[PECI_GET_TEMP_RD_LEN+1];
+	uint8_t peci_resp_buf[PECI_GET_TEMP_RD_LEN + 1];
 
 	rx_fcs = 0;
 	packet.tx_buffer.buf = NULL;
@@ -125,8 +126,9 @@ int peci_get_temp(int *temperature)
 	printk("Temp bytes: %02x", packet.rx_buffer.buf[0]);
 	printk("%02x\n", packet.rx_buffer.buf[1]);
 
-	raw_cpu_temp = (int16_t)(packet.rx_buffer.buf[0] |
-			(int16_t)((packet.rx_buffer.buf[1] << 8) & 0xFF00));
+	raw_cpu_temp =
+		(int16_t)(packet.rx_buffer.buf[0] |
+			  (int16_t)((packet.rx_buffer.buf[1] << 8) & 0xFF00));
 
 	if (raw_cpu_temp == 0x8000) {
 		printk("Invalid temp %x\n", raw_cpu_temp);
@@ -183,8 +185,8 @@ void main(void)
 	printk("PECI sample test\n");
 
 	k_thread_create(&temp_id, temp_stack, TASK_STACK_SIZE,
-		monitor_temperature_func, NULL, NULL, NULL, PRIORITY,
-		K_INHERIT_PERMS, K_FOREVER);
+			monitor_temperature_func, NULL, NULL, NULL, PRIORITY,
+			K_INHERIT_PERMS, K_FOREVER);
 
 #if DT_NODE_HAS_STATUS(DT_ALIAS(peci_0), okay)
 	peci_dev = device_get_binding(DT_LABEL(DT_ALIAS(peci_0)));

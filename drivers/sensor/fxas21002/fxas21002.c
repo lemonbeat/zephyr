@@ -14,9 +14,8 @@
 LOG_MODULE_REGISTER(FXAS21002, CONFIG_SENSOR_LOG_LEVEL);
 
 /* Sample period in microseconds, indexed by output data rate encoding (DR) */
-static const uint32_t sample_period[] = {
-	1250, 2500, 5000, 10000, 20000, 40000, 80000, 80000
-};
+static const uint32_t sample_period[] = { 1250,	 2500,	5000,  10000,
+					  20000, 40000, 80000, 80000 };
 
 static int fxas21002_sample_fetch(const struct device *dev,
 				  enum sensor_channel chan)
@@ -50,7 +49,7 @@ static int fxas21002_sample_fetch(const struct device *dev,
 	raw = &data->raw[0];
 
 	for (i = 0; i < sizeof(buffer); i += 2) {
-		*raw++ = (buffer[i] << 8) | (buffer[i+1]);
+		*raw++ = (buffer[i] << 8) | (buffer[i + 1]);
 	}
 
 exit:
@@ -139,8 +138,7 @@ int fxas21002_get_power(const struct device *dev, enum fxas21002_power *power)
 	uint8_t val = *power;
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      FXAS21002_REG_CTRLREG1,
-			      &val)) {
+			      FXAS21002_REG_CTRLREG1, &val)) {
 		LOG_ERR("Could not get power setting");
 		return -EIO;
 	}
@@ -157,13 +155,11 @@ int fxas21002_set_power(const struct device *dev, enum fxas21002_power power)
 
 	return i2c_reg_update_byte(data->i2c, config->i2c_address,
 				   FXAS21002_REG_CTRLREG1,
-				   FXAS21002_CTRLREG1_POWER_MASK,
-				   power);
+				   FXAS21002_CTRLREG1_POWER_MASK, power);
 }
 
 uint32_t fxas21002_get_transition_time(enum fxas21002_power start,
-				       enum fxas21002_power end,
-				       uint8_t dr)
+				       enum fxas21002_power end, uint8_t dr)
 {
 	uint32_t transition_time;
 
@@ -212,8 +208,8 @@ static int fxas21002_init(const struct device *dev)
 	}
 
 	if (whoami != config->whoami) {
-		LOG_ERR("WHOAMI value received 0x%x, expected 0x%x",
-			    whoami, config->whoami);
+		LOG_ERR("WHOAMI value received 0x%x, expected 0x%x", whoami,
+			config->whoami);
 		return -EIO;
 	}
 
@@ -237,8 +233,7 @@ static int fxas21002_init(const struct device *dev)
 	/* Set the full-scale range */
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
 				FXAS21002_REG_CTRLREG0,
-				FXAS21002_CTRLREG0_FS_MASK,
-				config->range)) {
+				FXAS21002_CTRLREG0_FS_MASK, config->range)) {
 		LOG_ERR("Could not set range");
 		return -EIO;
 	}
@@ -268,9 +263,8 @@ static int fxas21002_init(const struct device *dev)
 	}
 
 	/* Wait the transition time from standby to active mode */
-	transition_time = fxas21002_get_transition_time(FXAS21002_POWER_STANDBY,
-							FXAS21002_POWER_ACTIVE,
-							config->dr);
+	transition_time = fxas21002_get_transition_time(
+		FXAS21002_POWER_STANDBY, FXAS21002_POWER_ACTIVE, config->dr);
 	k_busy_wait(transition_time);
 	k_sem_give(&data->sem);
 
@@ -309,6 +303,5 @@ static const struct fxas21002_config fxas21002_config = {
 static struct fxas21002_data fxas21002_data;
 
 DEVICE_AND_API_INIT(fxas21002, DT_INST_LABEL(0), fxas21002_init,
-		    &fxas21002_data, &fxas21002_config,
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
-		    &fxas21002_driver_api);
+		    &fxas21002_data, &fxas21002_config, POST_KERNEL,
+		    CONFIG_SENSOR_INIT_PRIORITY, &fxas21002_driver_api);

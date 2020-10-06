@@ -13,12 +13,11 @@
 
 #include "misc_q31.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)100)
-#define ABS_ERROR_THRESH_Q31	((q31_t)2)
+#define SNR_ERROR_THRESH ((float32_t)100)
+#define ABS_ERROR_THRESH_Q31 ((q31_t)2)
 
-static void test_arm_correlate_q31(
-	size_t in1_length, size_t in2_length, const q31_t *ref,
-	size_t ref_length)
+static void test_arm_correlate_q31(size_t in1_length, size_t in2_length,
+				   const q31_t *ref, size_t ref_length)
 {
 	q31_t *output;
 
@@ -29,23 +28,22 @@ static void test_arm_correlate_q31(
 	arm_correlate_q31(in_com1, in1_length, in_com2, in2_length, output);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(ref_length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(ref_length, ref, output,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(ref_length, ref, output,
-			ABS_ERROR_THRESH_Q31),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(ref_length, ref, output,
+					 ABS_ERROR_THRESH_Q31),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
 }
 
-#define DEFINE_CORRELATE_TEST(a, b) \
-	DEFINE_TEST_VARIANT4( \
-		arm_correlate_q31, a##_##b, a, b, \
-		ref_correlate_##a##_##b, ARRAY_SIZE(ref_correlate_##a##_##b))
+#define DEFINE_CORRELATE_TEST(a, b)                            \
+	DEFINE_TEST_VARIANT4(arm_correlate_q31, a##_##b, a, b, \
+			     ref_correlate_##a##_##b,          \
+			     ARRAY_SIZE(ref_correlate_##a##_##b))
 
 DEFINE_CORRELATE_TEST(4, 1);
 DEFINE_CORRELATE_TEST(4, 2);
@@ -88,9 +86,8 @@ DEFINE_CORRELATE_TEST(13, 3);
 DEFINE_CORRELATE_TEST(13, 8);
 DEFINE_CORRELATE_TEST(13, 11);
 
-static void test_arm_conv_q31(
-	size_t in1_length, size_t in2_length, const q31_t *ref,
-	size_t ref_length)
+static void test_arm_conv_q31(size_t in1_length, size_t in2_length,
+			      const q31_t *ref, size_t ref_length)
 {
 	q31_t *output;
 
@@ -101,23 +98,21 @@ static void test_arm_conv_q31(
 	arm_conv_q31(in_com1, in1_length, in_com2, in2_length, output);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(ref_length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(ref_length, ref, output,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(ref_length, ref, output,
-			ABS_ERROR_THRESH_Q31),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(ref_length, ref, output,
+					 ABS_ERROR_THRESH_Q31),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
 }
 
-#define DEFINE_CONV_TEST(a, b) \
-	DEFINE_TEST_VARIANT4( \
-		arm_conv_q31, a##_##b, a, b, \
-		ref_conv_##a##_##b, ARRAY_SIZE(ref_conv_##a##_##b))
+#define DEFINE_CONV_TEST(a, b)                                                \
+	DEFINE_TEST_VARIANT4(arm_conv_q31, a##_##b, a, b, ref_conv_##a##_##b, \
+			     ARRAY_SIZE(ref_conv_##a##_##b))
 
 DEFINE_CONV_TEST(4, 1);
 DEFINE_CONV_TEST(4, 2);
@@ -163,87 +158,86 @@ DEFINE_CONV_TEST(13, 11);
 void test_filtering_misc_q31(void)
 {
 	ztest_test_suite(filtering_misc_q31,
-		ztest_unit_test(test_arm_correlate_q31_4_1),
-		ztest_unit_test(test_arm_correlate_q31_4_2),
-		ztest_unit_test(test_arm_correlate_q31_4_3),
-		ztest_unit_test(test_arm_correlate_q31_4_8),
-		ztest_unit_test(test_arm_correlate_q31_4_11),
-		ztest_unit_test(test_arm_correlate_q31_5_1),
-		ztest_unit_test(test_arm_correlate_q31_5_2),
-		ztest_unit_test(test_arm_correlate_q31_5_3),
-		ztest_unit_test(test_arm_correlate_q31_5_8),
-		ztest_unit_test(test_arm_correlate_q31_5_11),
-		ztest_unit_test(test_arm_correlate_q31_6_1),
-		ztest_unit_test(test_arm_correlate_q31_6_2),
-		ztest_unit_test(test_arm_correlate_q31_6_3),
-		ztest_unit_test(test_arm_correlate_q31_6_8),
-		ztest_unit_test(test_arm_correlate_q31_6_11),
-		ztest_unit_test(test_arm_correlate_q31_9_1),
-		ztest_unit_test(test_arm_correlate_q31_9_2),
-		ztest_unit_test(test_arm_correlate_q31_9_3),
-		ztest_unit_test(test_arm_correlate_q31_9_8),
-		ztest_unit_test(test_arm_correlate_q31_9_11),
-		ztest_unit_test(test_arm_correlate_q31_10_1),
-		ztest_unit_test(test_arm_correlate_q31_10_2),
-		ztest_unit_test(test_arm_correlate_q31_10_3),
-		ztest_unit_test(test_arm_correlate_q31_10_8),
-		ztest_unit_test(test_arm_correlate_q31_10_11),
-		ztest_unit_test(test_arm_correlate_q31_11_1),
-		ztest_unit_test(test_arm_correlate_q31_11_2),
-		ztest_unit_test(test_arm_correlate_q31_11_3),
-		ztest_unit_test(test_arm_correlate_q31_11_8),
-		ztest_unit_test(test_arm_correlate_q31_11_11),
-		ztest_unit_test(test_arm_correlate_q31_12_1),
-		ztest_unit_test(test_arm_correlate_q31_12_2),
-		ztest_unit_test(test_arm_correlate_q31_12_3),
-		ztest_unit_test(test_arm_correlate_q31_12_8),
-		ztest_unit_test(test_arm_correlate_q31_12_11),
-		ztest_unit_test(test_arm_correlate_q31_13_1),
-		ztest_unit_test(test_arm_correlate_q31_13_2),
-		ztest_unit_test(test_arm_correlate_q31_13_3),
-		ztest_unit_test(test_arm_correlate_q31_13_8),
-		ztest_unit_test(test_arm_correlate_q31_13_11),
-		ztest_unit_test(test_arm_conv_q31_4_1),
-		ztest_unit_test(test_arm_conv_q31_4_2),
-		ztest_unit_test(test_arm_conv_q31_4_3),
-		ztest_unit_test(test_arm_conv_q31_4_8),
-		ztest_unit_test(test_arm_conv_q31_4_11),
-		ztest_unit_test(test_arm_conv_q31_5_1),
-		ztest_unit_test(test_arm_conv_q31_5_2),
-		ztest_unit_test(test_arm_conv_q31_5_3),
-		ztest_unit_test(test_arm_conv_q31_5_8),
-		ztest_unit_test(test_arm_conv_q31_5_11),
-		ztest_unit_test(test_arm_conv_q31_6_1),
-		ztest_unit_test(test_arm_conv_q31_6_2),
-		ztest_unit_test(test_arm_conv_q31_6_3),
-		ztest_unit_test(test_arm_conv_q31_6_8),
-		ztest_unit_test(test_arm_conv_q31_6_11),
-		ztest_unit_test(test_arm_conv_q31_9_1),
-		ztest_unit_test(test_arm_conv_q31_9_2),
-		ztest_unit_test(test_arm_conv_q31_9_3),
-		ztest_unit_test(test_arm_conv_q31_9_8),
-		ztest_unit_test(test_arm_conv_q31_9_11),
-		ztest_unit_test(test_arm_conv_q31_10_1),
-		ztest_unit_test(test_arm_conv_q31_10_2),
-		ztest_unit_test(test_arm_conv_q31_10_3),
-		ztest_unit_test(test_arm_conv_q31_10_8),
-		ztest_unit_test(test_arm_conv_q31_10_11),
-		ztest_unit_test(test_arm_conv_q31_11_1),
-		ztest_unit_test(test_arm_conv_q31_11_2),
-		ztest_unit_test(test_arm_conv_q31_11_3),
-		ztest_unit_test(test_arm_conv_q31_11_8),
-		ztest_unit_test(test_arm_conv_q31_11_11),
-		ztest_unit_test(test_arm_conv_q31_12_1),
-		ztest_unit_test(test_arm_conv_q31_12_2),
-		ztest_unit_test(test_arm_conv_q31_12_3),
-		ztest_unit_test(test_arm_conv_q31_12_8),
-		ztest_unit_test(test_arm_conv_q31_12_11),
-		ztest_unit_test(test_arm_conv_q31_13_1),
-		ztest_unit_test(test_arm_conv_q31_13_2),
-		ztest_unit_test(test_arm_conv_q31_13_3),
-		ztest_unit_test(test_arm_conv_q31_13_8),
-		ztest_unit_test(test_arm_conv_q31_13_11)
-		);
+			 ztest_unit_test(test_arm_correlate_q31_4_1),
+			 ztest_unit_test(test_arm_correlate_q31_4_2),
+			 ztest_unit_test(test_arm_correlate_q31_4_3),
+			 ztest_unit_test(test_arm_correlate_q31_4_8),
+			 ztest_unit_test(test_arm_correlate_q31_4_11),
+			 ztest_unit_test(test_arm_correlate_q31_5_1),
+			 ztest_unit_test(test_arm_correlate_q31_5_2),
+			 ztest_unit_test(test_arm_correlate_q31_5_3),
+			 ztest_unit_test(test_arm_correlate_q31_5_8),
+			 ztest_unit_test(test_arm_correlate_q31_5_11),
+			 ztest_unit_test(test_arm_correlate_q31_6_1),
+			 ztest_unit_test(test_arm_correlate_q31_6_2),
+			 ztest_unit_test(test_arm_correlate_q31_6_3),
+			 ztest_unit_test(test_arm_correlate_q31_6_8),
+			 ztest_unit_test(test_arm_correlate_q31_6_11),
+			 ztest_unit_test(test_arm_correlate_q31_9_1),
+			 ztest_unit_test(test_arm_correlate_q31_9_2),
+			 ztest_unit_test(test_arm_correlate_q31_9_3),
+			 ztest_unit_test(test_arm_correlate_q31_9_8),
+			 ztest_unit_test(test_arm_correlate_q31_9_11),
+			 ztest_unit_test(test_arm_correlate_q31_10_1),
+			 ztest_unit_test(test_arm_correlate_q31_10_2),
+			 ztest_unit_test(test_arm_correlate_q31_10_3),
+			 ztest_unit_test(test_arm_correlate_q31_10_8),
+			 ztest_unit_test(test_arm_correlate_q31_10_11),
+			 ztest_unit_test(test_arm_correlate_q31_11_1),
+			 ztest_unit_test(test_arm_correlate_q31_11_2),
+			 ztest_unit_test(test_arm_correlate_q31_11_3),
+			 ztest_unit_test(test_arm_correlate_q31_11_8),
+			 ztest_unit_test(test_arm_correlate_q31_11_11),
+			 ztest_unit_test(test_arm_correlate_q31_12_1),
+			 ztest_unit_test(test_arm_correlate_q31_12_2),
+			 ztest_unit_test(test_arm_correlate_q31_12_3),
+			 ztest_unit_test(test_arm_correlate_q31_12_8),
+			 ztest_unit_test(test_arm_correlate_q31_12_11),
+			 ztest_unit_test(test_arm_correlate_q31_13_1),
+			 ztest_unit_test(test_arm_correlate_q31_13_2),
+			 ztest_unit_test(test_arm_correlate_q31_13_3),
+			 ztest_unit_test(test_arm_correlate_q31_13_8),
+			 ztest_unit_test(test_arm_correlate_q31_13_11),
+			 ztest_unit_test(test_arm_conv_q31_4_1),
+			 ztest_unit_test(test_arm_conv_q31_4_2),
+			 ztest_unit_test(test_arm_conv_q31_4_3),
+			 ztest_unit_test(test_arm_conv_q31_4_8),
+			 ztest_unit_test(test_arm_conv_q31_4_11),
+			 ztest_unit_test(test_arm_conv_q31_5_1),
+			 ztest_unit_test(test_arm_conv_q31_5_2),
+			 ztest_unit_test(test_arm_conv_q31_5_3),
+			 ztest_unit_test(test_arm_conv_q31_5_8),
+			 ztest_unit_test(test_arm_conv_q31_5_11),
+			 ztest_unit_test(test_arm_conv_q31_6_1),
+			 ztest_unit_test(test_arm_conv_q31_6_2),
+			 ztest_unit_test(test_arm_conv_q31_6_3),
+			 ztest_unit_test(test_arm_conv_q31_6_8),
+			 ztest_unit_test(test_arm_conv_q31_6_11),
+			 ztest_unit_test(test_arm_conv_q31_9_1),
+			 ztest_unit_test(test_arm_conv_q31_9_2),
+			 ztest_unit_test(test_arm_conv_q31_9_3),
+			 ztest_unit_test(test_arm_conv_q31_9_8),
+			 ztest_unit_test(test_arm_conv_q31_9_11),
+			 ztest_unit_test(test_arm_conv_q31_10_1),
+			 ztest_unit_test(test_arm_conv_q31_10_2),
+			 ztest_unit_test(test_arm_conv_q31_10_3),
+			 ztest_unit_test(test_arm_conv_q31_10_8),
+			 ztest_unit_test(test_arm_conv_q31_10_11),
+			 ztest_unit_test(test_arm_conv_q31_11_1),
+			 ztest_unit_test(test_arm_conv_q31_11_2),
+			 ztest_unit_test(test_arm_conv_q31_11_3),
+			 ztest_unit_test(test_arm_conv_q31_11_8),
+			 ztest_unit_test(test_arm_conv_q31_11_11),
+			 ztest_unit_test(test_arm_conv_q31_12_1),
+			 ztest_unit_test(test_arm_conv_q31_12_2),
+			 ztest_unit_test(test_arm_conv_q31_12_3),
+			 ztest_unit_test(test_arm_conv_q31_12_8),
+			 ztest_unit_test(test_arm_conv_q31_12_11),
+			 ztest_unit_test(test_arm_conv_q31_13_1),
+			 ztest_unit_test(test_arm_conv_q31_13_2),
+			 ztest_unit_test(test_arm_conv_q31_13_3),
+			 ztest_unit_test(test_arm_conv_q31_13_8),
+			 ztest_unit_test(test_arm_conv_q31_13_11));
 
 	ztest_run_test_suite(filtering_misc_q31);
 }

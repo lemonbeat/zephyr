@@ -86,7 +86,7 @@ void k_thread_system_pool_assign(struct k_thread *thread)
 	thread->resource_pool = _HEAP_MEM_POOL;
 }
 #else
-#define _HEAP_MEM_POOL	NULL
+#define _HEAP_MEM_POOL NULL
 #endif
 
 void *z_thread_malloc(size_t size)

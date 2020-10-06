@@ -33,46 +33,42 @@ struct net_if;
 /**
  * @brief NET MGMT event mask basics, normalizing parts of bit fields
  */
-#define NET_MGMT_EVENT_MASK		0x80000000
-#define NET_MGMT_ON_IFACE_MASK		0x40000000
-#define NET_MGMT_LAYER_MASK		0x30000000
-#define NET_MGMT_SYNC_EVENT_MASK	0x08000000
-#define NET_MGMT_LAYER_CODE_MASK	0x07FF0000
-#define NET_MGMT_COMMAND_MASK		0x0000FFFF
+#define NET_MGMT_EVENT_MASK 0x80000000
+#define NET_MGMT_ON_IFACE_MASK 0x40000000
+#define NET_MGMT_LAYER_MASK 0x30000000
+#define NET_MGMT_SYNC_EVENT_MASK 0x08000000
+#define NET_MGMT_LAYER_CODE_MASK 0x07FF0000
+#define NET_MGMT_COMMAND_MASK 0x0000FFFF
 
-#define NET_MGMT_EVENT_BIT		BIT(31)
-#define NET_MGMT_IFACE_BIT		BIT(30)
-#define NET_MGMT_SYNC_EVENT_BIT		BIT(27)
+#define NET_MGMT_EVENT_BIT BIT(31)
+#define NET_MGMT_IFACE_BIT BIT(30)
+#define NET_MGMT_SYNC_EVENT_BIT BIT(27)
 
-#define NET_MGMT_LAYER(_layer)		(_layer << 28)
-#define NET_MGMT_LAYER_CODE(_code)	(_code << 16)
+#define NET_MGMT_LAYER(_layer) (_layer << 28)
+#define NET_MGMT_LAYER_CODE(_code) (_code << 16)
 
-#define NET_MGMT_EVENT(mgmt_request)		\
-	(mgmt_request & NET_MGMT_EVENT_MASK)
+#define NET_MGMT_EVENT(mgmt_request) (mgmt_request & NET_MGMT_EVENT_MASK)
 
-#define NET_MGMT_ON_IFACE(mgmt_request)		\
-	(mgmt_request & NET_MGMT_ON_IFACE_MASK)
+#define NET_MGMT_ON_IFACE(mgmt_request) (mgmt_request & NET_MGMT_ON_IFACE_MASK)
 
-#define NET_MGMT_EVENT_SYNCHRONOUS(mgmt_request)	\
+#define NET_MGMT_EVENT_SYNCHRONOUS(mgmt_request) \
 	(mgmt_request & NET_MGMT_SYNC_EVENT_MASK)
 
-#define NET_MGMT_GET_LAYER(mgmt_request)	\
+#define NET_MGMT_GET_LAYER(mgmt_request) \
 	((mgmt_request & NET_MGMT_LAYER_MASK) >> 28)
 
-#define NET_MGMT_GET_LAYER_CODE(mgmt_request)	\
+#define NET_MGMT_GET_LAYER_CODE(mgmt_request) \
 	((mgmt_request & NET_MGMT_LAYER_CODE_MASK) >> 16)
 
-#define NET_MGMT_GET_COMMAND(mgmt_request)	\
+#define NET_MGMT_GET_COMMAND(mgmt_request) \
 	(mgmt_request & NET_MGMT_COMMAND_MASK)
 
-
 /* Useful generic definitions */
-#define NET_MGMT_LAYER_L2		1
-#define NET_MGMT_LAYER_L3		2
-#define NET_MGMT_LAYER_L4		3
+#define NET_MGMT_LAYER_L2 1
+#define NET_MGMT_LAYER_L3 2
+#define NET_MGMT_LAYER_L4 3
 
 /** @endcond */
-
 
 /**
  * @typedef net_mgmt_request_handler_t
@@ -86,18 +82,18 @@ struct net_if;
  * @param len Length in byte of the memory pointed by data.
  */
 typedef int (*net_mgmt_request_handler_t)(uint32_t mgmt_request,
-					  struct net_if *iface,
-					  void *data, size_t len);
+					  struct net_if *iface, void *data,
+					  size_t len);
 
-#define net_mgmt(_mgmt_request, _iface, _data, _len)			\
+#define net_mgmt(_mgmt_request, _iface, _data, _len) \
 	net_mgmt_##_mgmt_request(_mgmt_request, _iface, _data, _len)
 
-#define NET_MGMT_DEFINE_REQUEST_HANDLER(_mgmt_request)			\
-	extern int net_mgmt_##_mgmt_request(uint32_t mgmt_request,	\
-					    struct net_if *iface,	\
-					    void *data, size_t len)
+#define NET_MGMT_DEFINE_REQUEST_HANDLER(_mgmt_request)                        \
+	extern int net_mgmt_##_mgmt_request(uint32_t mgmt_request,            \
+					    struct net_if *iface, void *data, \
+					    size_t len)
 
-#define NET_MGMT_REGISTER_REQUEST_HANDLER(_mgmt_request, _func)	\
+#define NET_MGMT_REGISTER_REQUEST_HANDLER(_mgmt_request, _func) \
 	FUNC_ALIAS(_func, net_mgmt_##_mgmt_request, int)
 
 struct net_mgmt_event_callback;
@@ -171,10 +167,10 @@ struct net_mgmt_event_callback {
  * @param mgmt_event_mask A mask of relevant events for the handler
  */
 #ifdef CONFIG_NET_MGMT_EVENT
-static inline
-void net_mgmt_init_event_callback(struct net_mgmt_event_callback *cb,
-				  net_mgmt_event_handler_t handler,
-				  uint32_t mgmt_event_mask)
+static inline void
+net_mgmt_init_event_callback(struct net_mgmt_event_callback *cb,
+			     net_mgmt_event_handler_t handler,
+			     uint32_t mgmt_event_mask)
 {
 	__ASSERT(cb, "Callback pointer should not be NULL");
 	__ASSERT(handler, "Handler pointer should not be NULL");
@@ -254,19 +250,14 @@ static inline void net_mgmt_event_notify(uint32_t mgmt_event,
  *         actual event.
  */
 #ifdef CONFIG_NET_MGMT_EVENT
-int net_mgmt_event_wait(uint32_t mgmt_event_mask,
-			uint32_t *raised_event,
-			struct net_if **iface,
-			const void **info,
-			size_t *info_length,
-			k_timeout_t timeout);
+int net_mgmt_event_wait(uint32_t mgmt_event_mask, uint32_t *raised_event,
+			struct net_if **iface, const void **info,
+			size_t *info_length, k_timeout_t timeout);
 #else
 static inline int net_mgmt_event_wait(uint32_t mgmt_event_mask,
 				      uint32_t *raised_event,
-				      struct net_if **iface,
-				      const void **info,
-				      size_t *info_length,
-				      k_timeout_t timeout)
+				      struct net_if **iface, const void **info,
+				      size_t *info_length, k_timeout_t timeout)
 {
 	return 0;
 }
@@ -292,19 +283,14 @@ static inline int net_mgmt_event_wait(uint32_t mgmt_event_mask,
  *         actual event.
  */
 #ifdef CONFIG_NET_MGMT_EVENT
-int net_mgmt_event_wait_on_iface(struct net_if *iface,
-				 uint32_t mgmt_event_mask,
-				 uint32_t *raised_event,
-				 const void **info,
-				 size_t *info_length,
-				 k_timeout_t timeout);
+int net_mgmt_event_wait_on_iface(struct net_if *iface, uint32_t mgmt_event_mask,
+				 uint32_t *raised_event, const void **info,
+				 size_t *info_length, k_timeout_t timeout);
 #else
-static inline int net_mgmt_event_wait_on_iface(struct net_if *iface,
-					       uint32_t mgmt_event_mask,
-					       uint32_t *raised_event,
-					       const void **info,
-					       size_t *info_length,
-					       k_timeout_t timeout)
+static inline int
+net_mgmt_event_wait_on_iface(struct net_if *iface, uint32_t mgmt_event_mask,
+			     uint32_t *raised_event, const void **info,
+			     size_t *info_length, k_timeout_t timeout)
 {
 	return 0;
 }

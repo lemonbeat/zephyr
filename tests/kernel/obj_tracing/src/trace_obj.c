@@ -8,17 +8,7 @@
 #include <ztest.h>
 #include <debug/object_tracing.h>
 
-enum obj_name {
-	TIMER,
-	MEM_SLAB,
-	SEM,
-	MUTEX,
-	STACK,
-	MSGQ,
-	MBOX,
-	PIPE,
-	QUEUE
-};
+enum obj_name { TIMER, MEM_SLAB, SEM, MUTEX, STACK, MSGQ, MBOX, PIPE, QUEUE };
 
 static inline void expiry_dummy_fn(struct k_timer *timer)
 {
@@ -77,7 +67,7 @@ static void get_obj_count(int obj_type)
 			obj_list = SYS_TRACING_NEXT(struct k_timer, k_timer,
 						    obj_list);
 		}
-		zassert_equal(obj_found, 2,  "Didn't find timer objects");
+		zassert_equal(obj_found, 2, "Didn't find timer objects");
 		break;
 	case MEM_SLAB:
 		k_mem_slab_init(&mslab, slab, BLOCK_SIZE, NUM_BLOCKS);
@@ -100,8 +90,8 @@ static void get_obj_count(int obj_type)
 			if (obj_list == &ksema || obj_list == &sema) {
 				obj_found++;
 			}
-			obj_list = SYS_TRACING_NEXT(struct k_sem, k_sem,
-						    obj_list);
+			obj_list =
+				SYS_TRACING_NEXT(struct k_sem, k_sem, obj_list);
 		}
 		zassert_equal(obj_found, 2, "Didn't find semaphore objects");
 		break;

@@ -27,16 +27,16 @@
 #include "beacon.h"
 #include "foundation.h"
 
-#define PROVISIONED_INTERVAL       K_SECONDS(10)
+#define PROVISIONED_INTERVAL K_SECONDS(10)
 
-#define BEACON_TYPE_UNPROVISIONED  0x00
-#define BEACON_TYPE_SECURE         0x01
+#define BEACON_TYPE_UNPROVISIONED 0x00
+#define BEACON_TYPE_SECURE 0x01
 
 /* 3 transmissions, 20ms interval */
-#define UNPROV_XMIT                BT_MESH_TRANSMIT(2, 20)
+#define UNPROV_XMIT BT_MESH_TRANSMIT(2, 20)
 
 /* 1 transmission, 20ms interval */
-#define PROV_XMIT                  BT_MESH_TRANSMIT(0, 20)
+#define PROV_XMIT BT_MESH_TRANSMIT(0, 20)
 
 static struct k_delayed_work beacon_timer;
 
@@ -97,8 +97,8 @@ void bt_mesh_beacon_create(struct bt_mesh_subnet *sub,
 
 	net_buf_simple_add_mem(buf, sub->auth, 8);
 
-	BT_DBG("net_idx 0x%04x flags 0x%02x NetID %s", sub->net_idx,
-	       flags, bt_hex(keys->net_id, 8));
+	BT_DBG("net_idx 0x%04x flags 0x%02x NetID %s", sub->net_idx, flags,
+	       bt_hex(keys->net_id, 8));
 	BT_DBG("IV Index 0x%08x Auth %s", bt_mesh.iv_index,
 	       bt_hex(sub->auth, 8));
 }
@@ -230,9 +230,8 @@ static void unprovisioned_beacon_recv(struct net_buf_simple *buf)
 	prov = bt_mesh_prov_get();
 
 	if (prov->unprovisioned_beacon) {
-		prov->unprovisioned_beacon(uuid,
-					   (bt_mesh_prov_oob_info_t)oob_info,
-					   uri_hash);
+		prov->unprovisioned_beacon(
+			uuid, (bt_mesh_prov_oob_info_t)oob_info, uri_hash);
 	}
 }
 
@@ -266,7 +265,9 @@ static void beacon_send(struct k_work *work)
 {
 	/* Don't send anything if we have an active provisioning link */
 	if (IS_ENABLED(CONFIG_BT_MESH_PB_ADV) && bt_prov_active()) {
-		k_delayed_work_submit(&beacon_timer, K_SECONDS(CONFIG_BT_MESH_UNPROV_BEACON_INT));
+		k_delayed_work_submit(
+			&beacon_timer,
+			K_SECONDS(CONFIG_BT_MESH_UNPROV_BEACON_INT));
 		return;
 	}
 
@@ -288,7 +289,9 @@ static void beacon_send(struct k_work *work)
 
 	if (IS_ENABLED(CONFIG_BT_MESH_PB_ADV)) {
 		unprovisioned_beacon_send();
-		k_delayed_work_submit(&beacon_timer, K_SECONDS(CONFIG_BT_MESH_UNPROV_BEACON_INT));
+		k_delayed_work_submit(
+			&beacon_timer,
+			K_SECONDS(CONFIG_BT_MESH_UNPROV_BEACON_INT));
 	}
 }
 
@@ -319,8 +322,8 @@ static void secure_beacon_recv(struct net_buf_simple *buf)
 	iv_index = net_buf_simple_pull_be32(buf);
 	auth = buf->data;
 
-	BT_DBG("flags 0x%02x id %s iv_index 0x%08x",
-	       flags, bt_hex(net_id, 8), iv_index);
+	BT_DBG("flags 0x%02x id %s iv_index 0x%08x", flags, bt_hex(net_id, 8),
+	       iv_index);
 
 	sub = bt_mesh_subnet_find(net_id, flags, iv_index, auth, &new_key);
 	if (!sub) {

@@ -102,6 +102,5 @@ void main(void)
 
 			k_sleep(DELAY_TIME);
 		}
-
 	}
 }

@@ -30,8 +30,7 @@ static void do_mdns_ipv6_lookup(struct k_work *work);
 
 #define DNS_TIMEOUT (2 * MSEC_PER_SEC)
 
-void dns_result_cb(enum dns_resolve_status status,
-		   struct dns_addrinfo *info,
+void dns_result_cb(enum dns_resolve_status status, struct dns_addrinfo *info,
 		   void *user_data)
 {
 	char hr_addr[NET_IPV6_ADDR_LEN];
@@ -75,12 +74,11 @@ void dns_result_cb(enum dns_resolve_status status,
 
 	LOG_INF("%s %s address: %s", user_data ? (char *)user_data : "<null>",
 		hr_family,
-		log_strdup(net_addr_ntop(info->ai_family, addr,
-					 hr_addr, sizeof(hr_addr))));
+		log_strdup(net_addr_ntop(info->ai_family, addr, hr_addr,
+					 sizeof(hr_addr))));
 }
 
-void mdns_result_cb(enum dns_resolve_status status,
-		    struct dns_addrinfo *info,
+void mdns_result_cb(enum dns_resolve_status status, struct dns_addrinfo *info,
 		    void *user_data)
 {
 	char hr_addr[NET_IPV6_ADDR_LEN];
@@ -124,8 +122,8 @@ void mdns_result_cb(enum dns_resolve_status status,
 
 	LOG_INF("%s %s address: %s", user_data ? (char *)user_data : "<null>",
 		hr_family,
-		log_strdup(net_addr_ntop(info->ai_family, addr,
-					 hr_addr, sizeof(hr_addr))));
+		log_strdup(net_addr_ntop(info->ai_family, addr, hr_addr,
+					 sizeof(hr_addr))));
 }
 
 #if defined(CONFIG_NET_DHCPV4)
@@ -138,12 +136,8 @@ static void do_ipv4_lookup(struct k_work *work)
 	static uint16_t dns_id;
 	int ret;
 
-	ret = dns_get_addr_info(query,
-				DNS_QUERY_TYPE_A,
-				&dns_id,
-				dns_result_cb,
-				(void *)query,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(query, DNS_QUERY_TYPE_A, &dns_id, dns_result_cb,
+				(void *)query, DNS_TIMEOUT);
 	if (ret < 0) {
 		LOG_ERR("Cannot resolve IPv4 address (%d)", ret);
 		return;
@@ -153,8 +147,7 @@ static void do_ipv4_lookup(struct k_work *work)
 }
 
 static void ipv4_addr_add_handler(struct net_mgmt_event_callback *cb,
-				  uint32_t mgmt_event,
-				  struct net_if *iface)
+				  uint32_t mgmt_event, struct net_if *iface)
 {
 	char hr_addr[NET_IPV4_ADDR_LEN];
 	int i;
@@ -176,15 +169,15 @@ static void ipv4_addr_add_handler(struct net_mgmt_event_callback *cb,
 						 &if_addr->address.in_addr,
 						 hr_addr, NET_IPV4_ADDR_LEN)));
 		LOG_INF("Lease time: %u seconds",
-			 iface->config.dhcpv4.lease_time);
+			iface->config.dhcpv4.lease_time);
 		LOG_INF("Subnet: %s",
-			log_strdup(net_addr_ntop(AF_INET,
-					       &iface->config.ip.ipv4->netmask,
-					       hr_addr, NET_IPV4_ADDR_LEN)));
+			log_strdup(net_addr_ntop(
+				AF_INET, &iface->config.ip.ipv4->netmask,
+				hr_addr, NET_IPV4_ADDR_LEN)));
 		LOG_INF("Router: %s",
 			log_strdup(net_addr_ntop(AF_INET,
-					       &iface->config.ip.ipv4->gw,
-					       hr_addr, NET_IPV4_ADDR_LEN)));
+						 &iface->config.ip.ipv4->gw,
+						 hr_addr, NET_IPV4_ADDR_LEN)));
 		break;
 	}
 
@@ -225,12 +218,8 @@ static void do_mdns_ipv4_lookup(struct k_work *work)
 
 	LOG_DBG("Doing mDNS IPv4 query");
 
-	ret = dns_get_addr_info(query,
-				DNS_QUERY_TYPE_A,
-				NULL,
-				mdns_result_cb,
-				(void *)query,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(query, DNS_QUERY_TYPE_A, NULL, mdns_result_cb,
+				(void *)query, DNS_TIMEOUT);
 	if (ret < 0) {
 		LOG_ERR("Cannot resolve mDNS IPv4 address (%d)", ret);
 		return;
@@ -253,12 +242,8 @@ static void do_ipv4_lookup(void)
 	static uint16_t dns_id;
 	int ret;
 
-	ret = dns_get_addr_info(query,
-				DNS_QUERY_TYPE_A,
-				&dns_id,
-				dns_result_cb,
-				(void *)query,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(query, DNS_QUERY_TYPE_A, &dns_id, dns_result_cb,
+				(void *)query, DNS_TIMEOUT);
 	if (ret < 0) {
 		LOG_ERR("Cannot resolve IPv4 address (%d)", ret);
 		return;
@@ -295,12 +280,8 @@ static void do_ipv6_lookup(void)
 	static uint16_t dns_id;
 	int ret;
 
-	ret = dns_get_addr_info(query,
-				DNS_QUERY_TYPE_AAAA,
-				&dns_id,
-				dns_result_cb,
-				(void *)query,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(query, DNS_QUERY_TYPE_AAAA, &dns_id,
+				dns_result_cb, (void *)query, DNS_TIMEOUT);
 	if (ret < 0) {
 		LOG_ERR("Cannot resolve IPv6 address (%d)", ret);
 		return;
@@ -329,12 +310,8 @@ static void do_mdns_ipv6_lookup(struct k_work *work)
 
 	LOG_DBG("Doing mDNS IPv6 query");
 
-	ret = dns_get_addr_info(query,
-				DNS_QUERY_TYPE_AAAA,
-				NULL,
-				mdns_result_cb,
-				(void *)query,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(query, DNS_QUERY_TYPE_AAAA, NULL,
+				mdns_result_cb, (void *)query, DNS_TIMEOUT);
 	if (ret < 0) {
 		LOG_ERR("Cannot resolve mDNS IPv6 address (%d)", ret);
 		return;

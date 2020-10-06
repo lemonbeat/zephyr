@@ -14,7 +14,6 @@ struct k_fifo fifo2;
 
 static struct k_fifo sync_fifo; /* for synchronization */
 
-
 /**
  *
  * @brief Initialize FIFOs for the test
@@ -26,7 +25,6 @@ void fifo_test_init(void)
 	k_fifo_init(&fifo1);
 	k_fifo_init(&fifo2);
 }
-
 
 /**
  *
@@ -58,7 +56,6 @@ void fifo_thread1(void *par1, void *par2, void *par3)
 	/* wait till it is safe to end: */
 	k_fifo_get(&sync_fifo, K_FOREVER);
 }
-
 
 /**
  *
@@ -92,7 +89,6 @@ void fifo_thread2(void *par1, void *par2, void *par3)
 	/* wait till it is safe to end: */
 	k_fifo_get(&sync_fifo, K_FOREVER);
 }
-
 
 /**
  *
@@ -129,7 +125,6 @@ void fifo_thread3(void *par1, void *par2, void *par3)
 	k_fifo_get(&sync_fifo, K_FOREVER);
 }
 
-
 /**
  *
  * @brief The main test entry
@@ -147,12 +142,11 @@ int fifo_test(void)
 	k_fifo_init(&sync_fifo);
 
 	/* test get wait & put thread functions between co-op threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"FIFO #1");
+	fprintf(output_file, sz_test_case_fmt, "FIFO #1");
 	fprintf(output_file, sz_description,
-			"\n\tk_fifo_init"
-			"\n\tk_fifo_get(K_FOREVER)"
-			"\n\tk_fifo_put");
+		"\n\tk_fifo_init"
+		"\n\tk_fifo_get(K_FOREVER)"
+		"\n\tk_fifo_put");
 	printf(sz_test_start_fmt);
 
 	fifo_test_init();
@@ -160,11 +154,11 @@ int fifo_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, fifo_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, fifo_thread2,
-			 &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
@@ -176,14 +170,13 @@ int fifo_test(void)
 	}
 
 	/* test get/yield & put thread functions between co-op threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"FIFO #2");
+	fprintf(output_file, sz_test_case_fmt, "FIFO #2");
 	fprintf(output_file, sz_description,
-			"\n\tk_fifo_init"
-			"\n\tk_fifo_get(K_FOREVER)"
-			"\n\tk_fifo_get(TICKS_NONE)"
-			"\n\tk_fifo_put"
-			"\n\tk_yield");
+		"\n\tk_fifo_init"
+		"\n\tk_fifo_get(K_FOREVER)"
+		"\n\tk_fifo_get(TICKS_NONE)"
+		"\n\tk_fifo_put"
+		"\n\tk_yield");
 	printf(sz_test_start_fmt);
 
 	fifo_test_init();
@@ -192,11 +185,11 @@ int fifo_test(void)
 
 	i = 0;
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, fifo_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, fifo_thread3,
-			 &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
@@ -208,14 +201,13 @@ int fifo_test(void)
 	}
 
 	/* test get wait & put functions between co-op and premptive threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"FIFO #3");
+	fprintf(output_file, sz_test_case_fmt, "FIFO #3");
 	fprintf(output_file, sz_description,
-			"\n\tk_fifo_init"
-			"\n\tk_fifo_get(K_FOREVER)"
-			"\n\tk_fifo_put"
-			"\n\tk_fifo_get(K_FOREVER)"
-			"\n\tk_fifo_put");
+		"\n\tk_fifo_init"
+		"\n\tk_fifo_get(K_FOREVER)"
+		"\n\tk_fifo_put"
+		"\n\tk_fifo_get(K_FOREVER)"
+		"\n\tk_fifo_put");
 	printf(sz_test_start_fmt);
 
 	fifo_test_init();
@@ -223,11 +215,11 @@ int fifo_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, fifo_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops / 2U), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops / 2U), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, fifo_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops / 2U), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops / 2U), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	for (i = 0; i < number_of_loops / 2U; i++) {
 		intptr_t element[2];
 		intptr_t *pelement;

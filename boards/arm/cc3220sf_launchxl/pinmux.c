@@ -82,14 +82,14 @@
  *  value for the pin to operate in the I2C mode.  For example, pin 1 is
  *  configured with mode 1 to operate as I2C_SCL.
  */
-#define I2C_CC32XX_PIN_01_I2C_SCL  0x100  /*!< PIN 1 is used for I2C_SCL */
-#define I2C_CC32XX_PIN_02_I2C_SDA  0x101  /*!< PIN 2 is used for I2C_SDA */
-#define I2C_CC32XX_PIN_03_I2C_SCL  0x502  /*!< PIN 3 is used for I2C_SCL */
-#define I2C_CC32XX_PIN_04_I2C_SDA  0x503  /*!< PIN 4 is used for I2C_SDA */
-#define I2C_CC32XX_PIN_05_I2C_SCL  0x504  /*!< PIN 5 is used for I2C_SCL */
-#define I2C_CC32XX_PIN_06_I2C_SDA  0x505  /*!< PIN 6 is used for I2C_SDA */
-#define I2C_CC32XX_PIN_16_I2C_SCL  0x90F  /*!< PIN 16 is used for I2C_SCL */
-#define I2C_CC32XX_PIN_17_I2C_SDA  0x910  /*!< PIN 17 is used for I2C_SDA */
+#define I2C_CC32XX_PIN_01_I2C_SCL 0x100 /*!< PIN 1 is used for I2C_SCL */
+#define I2C_CC32XX_PIN_02_I2C_SDA 0x101 /*!< PIN 2 is used for I2C_SDA */
+#define I2C_CC32XX_PIN_03_I2C_SCL 0x502 /*!< PIN 3 is used for I2C_SCL */
+#define I2C_CC32XX_PIN_04_I2C_SDA 0x503 /*!< PIN 4 is used for I2C_SDA */
+#define I2C_CC32XX_PIN_05_I2C_SCL 0x504 /*!< PIN 5 is used for I2C_SCL */
+#define I2C_CC32XX_PIN_06_I2C_SDA 0x505 /*!< PIN 6 is used for I2C_SDA */
+#define I2C_CC32XX_PIN_16_I2C_SCL 0x90F /*!< PIN 16 is used for I2C_SCL */
+#define I2C_CC32XX_PIN_17_I2C_SDA 0x910 /*!< PIN 17 is used for I2C_SDA */
 
 int pinmux_initialize(const struct device *port)
 {
@@ -138,9 +138,8 @@ int pinmux_initialize(const struct device *port)
 		unsigned long mode;
 
 		/* Enable the I2C module clocks and wait for completion:*/
-		MAP_PRCMPeripheralClkEnable(PRCM_I2CA0,
-					    PRCM_RUN_MODE_CLK |
-					    PRCM_SLP_MODE_CLK);
+		MAP_PRCMPeripheralClkEnable(
+			PRCM_I2CA0, PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK);
 		while (!MAP_PRCMPeripheralStatusGet(PRCM_I2CA0)) {
 		}
 

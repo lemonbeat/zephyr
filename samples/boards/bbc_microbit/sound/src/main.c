@@ -13,15 +13,15 @@
 
 #include <display/mb_display.h>
 
-#define BUZZER_PIN     EXT_P0_GPIO_PIN
+#define BUZZER_PIN EXT_P0_GPIO_PIN
 
-#define PERIOD_MIN     50
-#define PERIOD_MAX     3900
-#define PERIOD_INIT    1500
+#define PERIOD_MIN 50
+#define PERIOD_MAX 3900
+#define PERIOD_INIT 1500
 
-#define BEEP_DURATION  K_MSEC(60)
+#define BEEP_DURATION K_MSEC(60)
 
-#define US_TO_HZ(_us)  (USEC_PER_SEC / (_us))
+#define US_TO_HZ(_us) (USEC_PER_SEC / (_us))
 
 static const struct device *pwm;
 static const struct device *gpio;
@@ -97,7 +97,7 @@ void main(void)
 
 	gpio_init_callback(&button_cb_data, button_pressed,
 			   BIT(DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) |
-			   BIT(DT_GPIO_PIN(DT_ALIAS(sw1), gpios)));
+				   BIT(DT_GPIO_PIN(DT_ALIAS(sw1), gpios)));
 
 	pwm = device_get_binding(DT_LABEL(DT_INST(0, nordic_nrf_sw_pwm)));
 

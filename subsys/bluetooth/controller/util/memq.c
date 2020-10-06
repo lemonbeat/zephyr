@@ -45,7 +45,8 @@
  * @param tail[out] Tail of queue. Will be updated
  * @return          Initial link-element
  */
-memq_link_t *memq_init(memq_link_t *link, memq_link_t **head, memq_link_t **tail)
+memq_link_t *memq_init(memq_link_t *link, memq_link_t **head,
+		       memq_link_t **tail)
 {
 	/* Head and tail pointer to the initial link - forms an empty queue */
 	*head = *tail = link;

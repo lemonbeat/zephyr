@@ -33,13 +33,13 @@ static double sqrt(double value)
 
 static double rtd_temperature(int nom, double resistance)
 {
-	double a0 =  3.90802E-3;
+	double a0 = 3.90802E-3;
 	double b0 = -0.58020E-6;
 	double temp;
 
 	temp = -nom * a0;
-	temp += sqrt((nom * nom) * (a0 * a0) - 4.0 * nom * b0 *
-		     (nom - resistance));
+	temp += sqrt((nom * nom) * (a0 * a0) -
+		     4.0 * nom * b0 * (nom - resistance));
 	temp /= 2.0 * nom * b0;
 
 	return temp;
@@ -60,15 +60,13 @@ void main(void)
 		.gain = ADC_GAIN_1,
 		.acquisition_time = ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 0)
 	};
-	const struct adc_sequence seq = {
-		.options = NULL,
-		.channels = BIT(0),
-		.buffer = &buffer,
-		.buffer_size = sizeof(buffer),
-		.resolution = 24,
-		.oversampling = 0,
-		.calibrate = 0
-	};
+	const struct adc_sequence seq = { .options = NULL,
+					  .channels = BIT(0),
+					  .buffer = &buffer,
+					  .buffer_size = sizeof(buffer),
+					  .resolution = 24,
+					  .oversampling = 0,
+					  .calibrate = 0 };
 
 	lmp90100 = device_get_binding(DT_LABEL(DT_INST(0, ti_lmp90100)));
 	if (!lmp90100) {
@@ -90,8 +88,8 @@ void main(void)
 			resistance = (buffer / 8388608.0) * 2000;
 			printf("R: %.02f ohm\n", resistance);
 			printf("T: %.02f degC\n",
-				rtd_temperature(RTD_NOMINAL_RESISTANCE,
-						resistance));
+			       rtd_temperature(RTD_NOMINAL_RESISTANCE,
+					       resistance));
 		}
 
 		k_sleep(K_MSEC(1000));

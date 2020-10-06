@@ -34,17 +34,15 @@
 /* Number of memory blocks. The minimum number of blocks needed to run the
  * test is 2
  */
-#define NUMBLOCKS   4
+#define NUMBLOCKS 4
 
 void test_slab_get_all_blocks(void **p);
 void test_slab_free_all_blocks(void **p);
-
 
 K_SEM_DEFINE(SEM_HELPERDONE, 0, 1);
 K_SEM_DEFINE(SEM_REGRESSDONE, 0, 1);
 
 K_MEM_SLAB_DEFINE(map_lgblks, 1024, NUMBLOCKS, 4);
-
 
 /**
  *
@@ -59,9 +57,9 @@ K_MEM_SLAB_DEFINE(map_lgblks, 1024, NUMBLOCKS, 4);
 
 void helper_thread(void)
 {
-	void *ptr[NUMBLOCKS];           /* Pointer to memory block */
+	void *ptr[NUMBLOCKS]; /* Pointer to memory block */
 
-	(void)memset(ptr, 0, sizeof(ptr));    /* keep static checkers happy */
+	(void)memset(ptr, 0, sizeof(ptr)); /* keep static checkers happy */
 	/* Wait for part 1 to complete */
 	k_sem_take(&SEM_REGRESSDONE, K_FOREVER);
 
@@ -72,7 +70,7 @@ void helper_thread(void)
 	/* Test k_mem_slab_alloc */
 	test_slab_get_all_blocks(ptr);
 
-	k_sem_give(&SEM_HELPERDONE);  /* Indicate part 2 is complete */
+	k_sem_give(&SEM_HELPERDONE); /* Indicate part 2 is complete */
 	/* Wait for part 3 to complete */
 	k_sem_take(&SEM_REGRESSDONE, K_FOREVER);
 
@@ -83,7 +81,8 @@ void helper_thread(void)
 	 * block will unblock RegressionTask.
 	 */
 	TC_PRINT("(4) - Free a block in <%s> to unblock the other task "
-		 "from alloc timeout\n", __func__);
+		 "from alloc timeout\n",
+		 __func__);
 
 	TC_PRINT("%s: About to free a memory block\n", __func__);
 	k_mem_slab_free(&map_lgblks, &ptr[0]);
@@ -103,11 +102,9 @@ void helper_thread(void)
 	}
 	TC_PRINT("%s: freed all blocks allocated by this task\n", __func__);
 
-
 	k_sem_give(&SEM_HELPERDONE);
 
-}  /* helper thread */
-
+} /* helper thread */
 
 /**
  *
@@ -127,7 +124,7 @@ void helper_thread(void)
 
 void test_slab_get_all_blocks(void **p)
 {
-	void *errptr;   /* Pointer to block */
+	void *errptr; /* Pointer to block */
 
 	for (int i = 0; i < NUMBLOCKS; i++) {
 		/* Verify number of used blocks in the map */
@@ -135,8 +132,8 @@ void test_slab_get_all_blocks(void **p)
 			      "Failed k_mem_slab_num_used_get");
 
 		/* Get memory block */
-		zassert_equal(k_mem_slab_alloc(&map_lgblks, &p[i], K_NO_WAIT), 0,
-			      "Failed k_mem_slab_alloc");
+		zassert_equal(k_mem_slab_alloc(&map_lgblks, &p[i], K_NO_WAIT),
+			      0, "Failed k_mem_slab_alloc");
 	} /* for */
 
 	/*
@@ -147,10 +144,10 @@ void test_slab_get_all_blocks(void **p)
 		      "Failed k_mem_slab_num_used_get");
 
 	/* Try to get one more block and it should fail */
-	zassert_equal(k_mem_slab_alloc(&map_lgblks, &errptr, K_NO_WAIT), -ENOMEM,
-		      "Failed k_mem_slab_alloc");
+	zassert_equal(k_mem_slab_alloc(&map_lgblks, &errptr, K_NO_WAIT),
+		      -ENOMEM, "Failed k_mem_slab_alloc");
 
-}  /* test_slab_get_all_blocks */
+} /* test_slab_get_all_blocks */
 
 /**
  *
@@ -172,8 +169,8 @@ void test_slab_free_all_blocks(void **p)
 {
 	for (int i = 0; i < NUMBLOCKS; i++) {
 		/* Verify number of used blocks in the map */
-		zassert_equal(k_mem_slab_num_used_get(&map_lgblks), NUMBLOCKS - i,
-			      "Failed k_mem_slab_num_used_get");
+		zassert_equal(k_mem_slab_num_used_get(&map_lgblks),
+			      NUMBLOCKS - i, "Failed k_mem_slab_num_used_get");
 
 		TC_PRINT("  block ptr to free p[%d] = %p\n", i, p[i]);
 		/* Free memory block */
@@ -191,7 +188,7 @@ void test_slab_free_all_blocks(void **p)
 	zassert_equal(k_mem_slab_num_used_get(&map_lgblks), 0,
 		      "Failed k_mem_slab_num_used_get");
 
-}   /* test_slab_free_all_blocks */
+} /* test_slab_free_all_blocks */
 
 /**
  *
@@ -212,9 +209,9 @@ void test_slab_free_all_blocks(void **p)
 
 void test_mslab(void)
 {
-	int ret_value;                  /* task_mem_map_xxx interface return value */
-	void *b;                        /* Pointer to memory block */
-	void *ptr[NUMBLOCKS];           /* Pointer to memory block */
+	int ret_value; /* task_mem_map_xxx interface return value */
+	void *b; /* Pointer to memory block */
+	void *ptr[NUMBLOCKS]; /* Pointer to memory block */
 
 	/* not strictly necessary, but keeps coverity checks happy */
 	(void)memset(ptr, 0, sizeof(ptr));
@@ -222,7 +219,8 @@ void test_mslab(void)
 	/* Part 1 of test */
 
 	TC_PRINT("(1) - Allocate and free %d blocks "
-		 "in <%s>\n", NUMBLOCKS, __func__);
+		 "in <%s>\n",
+		 NUMBLOCKS, __func__);
 
 	/* Test k_mem_slab_alloc */
 	test_slab_get_all_blocks(ptr);
@@ -230,7 +228,7 @@ void test_mslab(void)
 	/* Test task_mem_map_free */
 	test_slab_free_all_blocks(ptr);
 
-	k_sem_give(&SEM_REGRESSDONE);   /* Allow helper thread to run */
+	k_sem_give(&SEM_REGRESSDONE); /* Allow helper thread to run */
 	/* Wait for helper thread to finish */
 	k_sem_take(&SEM_HELPERDONE, K_FOREVER);
 
@@ -243,46 +241,44 @@ void test_mslab(void)
 	 */
 
 	TC_PRINT("(3) - Further allocation results in  timeout "
-		 "in <%s>\n", __func__);
+		 "in <%s>\n",
+		 __func__);
 
 	ret_value = k_mem_slab_alloc(&map_lgblks, &b, K_MSEC(20));
 	zassert_equal(-EAGAIN, ret_value,
 		      "Failed k_mem_slab_alloc, retValue %d\n", ret_value);
 
 	TC_PRINT("%s: start to wait for block\n", __func__);
-	k_sem_give(&SEM_REGRESSDONE);    /* Allow helper thread to run part 4 */
+	k_sem_give(&SEM_REGRESSDONE); /* Allow helper thread to run part 4 */
 	ret_value = k_mem_slab_alloc(&map_lgblks, &b, K_MSEC(50));
-	zassert_equal(0, ret_value,
-		      "Failed k_mem_slab_alloc, ret_value %d\n", ret_value);
+	zassert_equal(0, ret_value, "Failed k_mem_slab_alloc, ret_value %d\n",
+		      ret_value);
 
 	/* Wait for helper thread to complete */
 	k_sem_take(&SEM_HELPERDONE, K_FOREVER);
 
 	TC_PRINT("%s: start to wait for block\n", __func__);
-	k_sem_give(&SEM_REGRESSDONE);    /* Allow helper thread to run part 5 */
+	k_sem_give(&SEM_REGRESSDONE); /* Allow helper thread to run part 5 */
 	ret_value = k_mem_slab_alloc(&map_lgblks, &b, K_FOREVER);
-	zassert_equal(0, ret_value,
-		      "Failed k_mem_slab_alloc, ret_value %d\n", ret_value);
+	zassert_equal(0, ret_value, "Failed k_mem_slab_alloc, ret_value %d\n",
+		      ret_value);
 
 	/* Wait for helper thread to complete */
 	k_sem_take(&SEM_HELPERDONE, K_FOREVER);
-
 
 	/* Free memory block */
 	TC_PRINT("%s: Used %d block\n", __func__,
 		 k_mem_slab_num_used_get(&map_lgblks));
 	k_mem_slab_free(&map_lgblks, &b);
-	TC_PRINT("%s: 1 block freed, used %d block\n",
-		 __func__,  k_mem_slab_num_used_get(&map_lgblks));
+	TC_PRINT("%s: 1 block freed, used %d block\n", __func__,
+		 k_mem_slab_num_used_get(&map_lgblks));
 }
 
-K_THREAD_DEFINE(HELPER, STACKSIZE, helper_thread, NULL, NULL, NULL,
-		7, 0, 0);
+K_THREAD_DEFINE(HELPER, STACKSIZE, helper_thread, NULL, NULL, NULL, 7, 0, 0);
 
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(memory_slab,
-			 ztest_1cpu_unit_test(test_mslab));
+	ztest_test_suite(memory_slab, ztest_1cpu_unit_test(test_mslab));
 	ztest_run_test_suite(memory_slab);
 }

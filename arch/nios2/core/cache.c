@@ -7,7 +7,6 @@
 #include <arch/cpu.h>
 #include <sys/__assert.h>
 
-
 /**
  * Flush the entire instruction cache and pipeline.
  *
@@ -73,10 +72,10 @@ void z_nios2_dcache_flush_all(void)
 void z_nios2_dcache_flush_no_writeback(void *start, uint32_t len)
 {
 	uint8_t *i;
-	uint8_t *end = ((char *) start) + len;
+	uint8_t *end = ((char *)start) + len;
 
 	for (i = start; i < end; i += ALT_CPU_DCACHE_LINE_SIZE) {
-		__asm__ volatile ("initda (%0)" :: "r" (i));
+		__asm__ volatile("initda (%0)" ::"r"(i));
 	}
 
 	/*
@@ -85,8 +84,8 @@ void z_nios2_dcache_flush_no_writeback(void *start, uint32_t len)
 	 * multiple of 2 (which it always is).
 	 */
 
-	if (((uint32_t) start) & (ALT_CPU_DCACHE_LINE_SIZE - 1)) {
-		__asm__ volatile ("initda (%0)" :: "r" (i));
+	if (((uint32_t)start) & (ALT_CPU_DCACHE_LINE_SIZE - 1)) {
+		__asm__ volatile("initda (%0)" ::"r"(i));
 	}
 }
 #endif

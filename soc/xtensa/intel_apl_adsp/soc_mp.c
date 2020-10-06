@@ -28,26 +28,25 @@ LOG_MODULE_REGISTER(soc_mp, CONFIG_SOC_LOG_LEVEL);
 #include <ipm/ipm_cavs_idc_priv.h>
 
 /* ROM wake version parsed by ROM during core wake up. */
-#define IDC_ROM_WAKE_VERSION	0x2
+#define IDC_ROM_WAKE_VERSION 0x2
 
 /* IDC message type. */
-#define IDC_TYPE_SHIFT		24
-#define IDC_TYPE_MASK		0x7f
-#define IDC_TYPE(x)		(((x) & IDC_TYPE_MASK) << IDC_TYPE_SHIFT)
+#define IDC_TYPE_SHIFT 24
+#define IDC_TYPE_MASK 0x7f
+#define IDC_TYPE(x) (((x)&IDC_TYPE_MASK) << IDC_TYPE_SHIFT)
 
 /* IDC message header. */
-#define IDC_HEADER_MASK		0xffffff
-#define IDC_HEADER(x)		((x) & IDC_HEADER_MASK)
+#define IDC_HEADER_MASK 0xffffff
+#define IDC_HEADER(x) ((x)&IDC_HEADER_MASK)
 
 /* IDC message extension. */
-#define IDC_EXTENSION_MASK	0x3fffffff
-#define IDC_EXTENSION(x)	((x) & IDC_EXTENSION_MASK)
+#define IDC_EXTENSION_MASK 0x3fffffff
+#define IDC_EXTENSION(x) ((x)&IDC_EXTENSION_MASK)
 
 /* IDC power up message. */
-#define IDC_MSG_POWER_UP	\
-	(IDC_TYPE(0x1) | IDC_HEADER(IDC_ROM_WAKE_VERSION))
+#define IDC_MSG_POWER_UP (IDC_TYPE(0x1) | IDC_HEADER(IDC_ROM_WAKE_VERSION))
 
-#define IDC_MSG_POWER_UP_EXT(x)	IDC_EXTENSION((x) >> 2)
+#define IDC_MSG_POWER_UP_EXT(x) IDC_EXTENSION((x) >> 2)
 
 static const struct device *idc;
 #endif
@@ -55,21 +54,20 @@ static const struct device *idc;
 extern void __start(void);
 
 struct cpustart_rec {
-	uint32_t		cpu;
+	uint32_t cpu;
 
-	arch_cpustart_t	fn;
-	char		*stack_top;
-	void		*arg;
-	uint32_t		vecbase;
+	arch_cpustart_t fn;
+	char *stack_top;
+	void *arg;
+	uint32_t vecbase;
 
-	uint32_t		alive;
+	uint32_t alive;
 
 	/* padding to cache line */
-	uint8_t		padding[XCHAL_DCACHE_LINESIZE - 6 * 4];
+	uint8_t padding[XCHAL_DCACHE_LINESIZE - 6 * 4];
 };
 
-static __aligned(XCHAL_DCACHE_LINESIZE)
-struct cpustart_rec start_rec;
+static __aligned(XCHAL_DCACHE_LINESIZE) struct cpustart_rec start_rec;
 
 static void *mp_top;
 
@@ -97,8 +95,9 @@ static void mp_entry2(void)
 	/* Set up the CPU pointer. */
 	_cpu_t *cpu = &_kernel.cpus[start_rec.cpu];
 
-	__asm__ volatile(
-		"wsr." CONFIG_XTENSA_KERNEL_CPU_PTR_SR " %0" : : "r"(cpu));
+	__asm__ volatile("wsr." CONFIG_XTENSA_KERNEL_CPU_PTR_SR " %0"
+			 :
+			 : "r"(cpu));
 
 	/* Clear busy bit set by power up message */
 	idc_reg = idc_read(REG_IDCTFC(0), start_rec.cpu) | REG_IDCTFC_BUSY;
@@ -186,7 +185,8 @@ void arch_start_cpu(int cpu_num, k_thread_stack_t *stack, int sz,
 	idc_reg |= REG_IDCCTL_IDCTBIE(0);
 	idc_write(REG_IDCCTL, cpu_num, idc_reg);
 	sys_set_bit(DT_REG_ADDR(DT_NODELABEL(cavs0)) + 0x04 +
-		    CAVS_ICTL_INT_CPU_OFFSET(cpu_num), 8);
+			    CAVS_ICTL_INT_CPU_OFFSET(cpu_num),
+		    8);
 
 	/* Send power up message to the other core */
 	idc_write(REG_IDCIETC(cpu_num), 0, IDC_MSG_POWER_UP_EXT(RAM_BASE));
@@ -199,7 +199,8 @@ void arch_start_cpu(int cpu_num, k_thread_stack_t *stack, int sz,
 	idc_reg &= ~REG_IDCCTL_IDCTBIE(0);
 	idc_write(REG_IDCCTL, cpu_num, idc_reg);
 	sys_clear_bit(DT_REG_ADDR(DT_NODELABEL(cavs0)) + 0x04 +
-		      CAVS_ICTL_INT_CPU_OFFSET(cpu_num), 8);
+			      CAVS_ICTL_INT_CPU_OFFSET(cpu_num),
+		      8);
 
 	do {
 		SOC_DCACHE_INVALIDATE(&start_rec, sizeof(start_rec));

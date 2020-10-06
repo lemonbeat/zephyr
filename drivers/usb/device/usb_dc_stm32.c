@@ -58,45 +58,49 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(usb_dc_stm32);
 
-#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otgfs) && DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
+#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otgfs) && \
+	DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
 #error "Only one interface should be enabled at a time, OTG FS or OTG HS"
 #endif
 
 #if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
-#define USB_BASE_ADDRESS	DT_REG_ADDR(DT_INST(0, st_stm32_otghs))
-#define USB_IRQ			DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otghs), otghs, irq)
-#define USB_IRQ_PRI		DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otghs), otghs, priority)
-#define USB_NUM_BIDIR_ENDPOINTS	DT_PROP(DT_INST(0, st_stm32_otghs), num_bidir_endpoints)
-#define USB_RAM_SIZE		DT_PROP(DT_INST(0, st_stm32_otghs), ram_size)
+#define USB_BASE_ADDRESS DT_REG_ADDR(DT_INST(0, st_stm32_otghs))
+#define USB_IRQ DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otghs), otghs, irq)
+#define USB_IRQ_PRI DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otghs), otghs, priority)
+#define USB_NUM_BIDIR_ENDPOINTS \
+	DT_PROP(DT_INST(0, st_stm32_otghs), num_bidir_endpoints)
+#define USB_RAM_SIZE DT_PROP(DT_INST(0, st_stm32_otghs), ram_size)
 #if DT_NODE_HAS_PROP(DT_INST(0, st_stm32_otghs), maximum_speed)
-#define USB_MAXIMUM_SPEED	DT_PROP(DT_INST(0, st_stm32_otghs), maximum_speed)
+#define USB_MAXIMUM_SPEED DT_PROP(DT_INST(0, st_stm32_otghs), maximum_speed)
 #endif
-#define USB_CLOCK_BITS		DT_CLOCKS_CELL(DT_INST(0, st_stm32_otghs), bits)
-#define USB_CLOCK_BUS		DT_CLOCKS_CELL(DT_INST(0, st_stm32_otghs), bus)
+#define USB_CLOCK_BITS DT_CLOCKS_CELL(DT_INST(0, st_stm32_otghs), bits)
+#define USB_CLOCK_BUS DT_CLOCKS_CELL(DT_INST(0, st_stm32_otghs), bus)
 #elif DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otgfs)
-#define USB_BASE_ADDRESS	DT_REG_ADDR(DT_INST(0, st_stm32_otgfs))
-#define USB_IRQ			DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otgfs), otgfs, irq)
-#define USB_IRQ_PRI		DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otgfs), otgfs, priority)
-#define USB_NUM_BIDIR_ENDPOINTS	DT_PROP(DT_INST(0, st_stm32_otgfs), num_bidir_endpoints)
-#define USB_RAM_SIZE		DT_PROP(DT_INST(0, st_stm32_otgfs), ram_size)
+#define USB_BASE_ADDRESS DT_REG_ADDR(DT_INST(0, st_stm32_otgfs))
+#define USB_IRQ DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otgfs), otgfs, irq)
+#define USB_IRQ_PRI DT_IRQ_BY_NAME(DT_INST(0, st_stm32_otgfs), otgfs, priority)
+#define USB_NUM_BIDIR_ENDPOINTS \
+	DT_PROP(DT_INST(0, st_stm32_otgfs), num_bidir_endpoints)
+#define USB_RAM_SIZE DT_PROP(DT_INST(0, st_stm32_otgfs), ram_size)
 #if DT_NODE_HAS_PROP(DT_INST(0, st_stm32_otgfs), maximum_speed)
-#define USB_MAXIMUM_SPEED	DT_PROP(DT_INST(0, st_stm32_otgfs), maximum_speed)
+#define USB_MAXIMUM_SPEED DT_PROP(DT_INST(0, st_stm32_otgfs), maximum_speed)
 #endif
-#define USB_CLOCK_BITS		DT_CLOCKS_CELL(DT_INST(0, st_stm32_otgfs), bits)
-#define USB_CLOCK_BUS		DT_CLOCKS_CELL(DT_INST(0, st_stm32_otgfs), bus)
+#define USB_CLOCK_BITS DT_CLOCKS_CELL(DT_INST(0, st_stm32_otgfs), bits)
+#define USB_CLOCK_BUS DT_CLOCKS_CELL(DT_INST(0, st_stm32_otgfs), bus)
 #elif DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usb)
-#define USB_BASE_ADDRESS	DT_REG_ADDR(DT_INST(0, st_stm32_usb))
-#define USB_IRQ			DT_IRQ_BY_NAME(DT_INST(0, st_stm32_usb), usb, irq)
-#define USB_IRQ_PRI		DT_IRQ_BY_NAME(DT_INST(0, st_stm32_usb), usb, priority)
-#define USB_NUM_BIDIR_ENDPOINTS	DT_PROP(DT_INST(0, st_stm32_usb), num_bidir_endpoints)
-#define USB_RAM_SIZE		DT_PROP(DT_INST(0, st_stm32_usb), ram_size)
+#define USB_BASE_ADDRESS DT_REG_ADDR(DT_INST(0, st_stm32_usb))
+#define USB_IRQ DT_IRQ_BY_NAME(DT_INST(0, st_stm32_usb), usb, irq)
+#define USB_IRQ_PRI DT_IRQ_BY_NAME(DT_INST(0, st_stm32_usb), usb, priority)
+#define USB_NUM_BIDIR_ENDPOINTS \
+	DT_PROP(DT_INST(0, st_stm32_usb), num_bidir_endpoints)
+#define USB_RAM_SIZE DT_PROP(DT_INST(0, st_stm32_usb), ram_size)
 #if DT_NODE_HAS_PROP(DT_INST(0, st_stm32_usb), maximum_speed)
-#define USB_MAXIMUM_SPEED	DT_PROP(DT_INST(0, st_stm32_usb), maximum_speed)
+#define USB_MAXIMUM_SPEED DT_PROP(DT_INST(0, st_stm32_usb), maximum_speed)
 #endif
-#define USB_CLOCK_BITS		DT_CLOCKS_CELL(DT_INST(0, st_stm32_usb), bits)
-#define USB_CLOCK_BUS		DT_CLOCKS_CELL(DT_INST(0, st_stm32_usb), bus)
+#define USB_CLOCK_BITS DT_CLOCKS_CELL(DT_INST(0, st_stm32_usb), bits)
+#define USB_CLOCK_BUS DT_CLOCKS_CELL(DT_INST(0, st_stm32_usb), bus)
 #if DT_NODE_HAS_PROP(DT_INST(0, st_stm32_usb), enable_pin_remap)
-#define USB_ENABLE_PIN_REMAP	DT_PROP(DT_INST(0, st_stm32_usb), enable_pin_remap)
+#define USB_ENABLE_PIN_REMAP DT_PROP(DT_INST(0, st_stm32_usb), enable_pin_remap)
 #endif
 #endif
 
@@ -119,7 +123,7 @@ LOG_MODULE_REGISTER(usb_dc_stm32);
  * per endpoint.
  *
  */
-#define USB_BTABLE_SIZE  (8 * USB_NUM_BIDIR_ENDPOINTS)
+#define USB_BTABLE_SIZE (8 * USB_NUM_BIDIR_ENDPOINTS)
 
 #else /* USB_OTG_FS */
 
@@ -128,15 +132,16 @@ LOG_MODULE_REGISTER(usb_dc_stm32);
  * defines.
  */
 #if defined(CONFIG_SOC_SERIES_STM32L4X)
-#define USB_OTG_SPEED_HIGH                     0U
-#define USB_OTG_SPEED_HIGH_IN_FULL             1U
+#define USB_OTG_SPEED_HIGH 0U
+#define USB_OTG_SPEED_HIGH_IN_FULL 1U
 #endif /* CONFIG_SOC_SERIES_STM32L4X */
 
 #define EP0_MPS USB_OTG_MAX_EP0_SIZE
 
 #if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
 #define EP_MPS USB_OTG_HS_MAX_PACKET_SIZE
-#elif DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otgfs) || DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usb)
+#elif DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otgfs) || \
+	DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usb)
 #define EP_MPS USB_OTG_FS_MAX_PACKET_SIZE
 #endif
 
@@ -161,19 +166,19 @@ LOG_MODULE_REGISTER(usb_dc_stm32);
 
 /* Endpoint state */
 struct usb_dc_stm32_ep_state {
-	uint16_t ep_mps;		/** Endpoint max packet size */
-	uint16_t ep_pma_buf_len;	/** Previously allocated buffer size */
-	uint8_t ep_type;		/** Endpoint type (STM32 HAL enum) */
-	uint8_t ep_stalled;	/** Endpoint stall flag */
-	usb_dc_ep_callback cb;	/** Endpoint callback function */
-	uint32_t read_count;	/** Number of bytes in read buffer  */
-	uint32_t read_offset;	/** Current offset in read buffer */
-	struct k_sem write_sem;	/** Write boolean semaphore */
+	uint16_t ep_mps; /** Endpoint max packet size */
+	uint16_t ep_pma_buf_len; /** Previously allocated buffer size */
+	uint8_t ep_type; /** Endpoint type (STM32 HAL enum) */
+	uint8_t ep_stalled; /** Endpoint stall flag */
+	usb_dc_ep_callback cb; /** Endpoint callback function */
+	uint32_t read_count; /** Number of bytes in read buffer  */
+	uint32_t read_offset; /** Current offset in read buffer */
+	struct k_sem write_sem; /** Write boolean semaphore */
 };
 
 /* Driver state */
 struct usb_dc_stm32_state {
-	PCD_HandleTypeDef pcd;	/* Storage for the HAL_PCD api */
+	PCD_HandleTypeDef pcd; /* Storage for the HAL_PCD api */
 	usb_dc_status_callback status_cb; /* Status callback */
 	struct usb_dc_stm32_ep_state out_ep_state[USB_NUM_BIDIR_ENDPOINTS];
 	struct usb_dc_stm32_ep_state in_ep_state[USB_NUM_BIDIR_ENDPOINTS];
@@ -273,7 +278,8 @@ static int usb_dc_stm32_clock_enable(void)
 	 * device. For now, we only use MSI for USB if not already used as
 	 * system clock source.
 	 */
-#if defined(CONFIG_CLOCK_STM32_MSI_PLL_MODE) && !defined(CONFIG_CLOCK_STM32_SYSCLK_SRC_MSI)
+#if defined(CONFIG_CLOCK_STM32_MSI_PLL_MODE) && \
+	!defined(CONFIG_CLOCK_STM32_SYSCLK_SRC_MSI)
 	LL_RCC_MSI_Enable();
 	while (!LL_RCC_MSI_IsReady()) {
 		/* Wait for MSI to become ready */
@@ -317,7 +323,8 @@ static uint32_t usb_dc_stm32_get_maximum_speed(void)
 	 * If max-speed is not passed via DT, set it to USB controller's
 	 * maximum hardware capability.
 	 */
-#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usbphyc) && DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
+#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usbphyc) && \
+	DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
 	uint32_t speed = USB_OTG_SPEED_HIGH;
 #else
 	uint32_t speed = USB_OTG_SPEED_FULL;
@@ -328,7 +335,8 @@ static uint32_t usb_dc_stm32_get_maximum_speed(void)
 	if (!strncmp(USB_MAXIMUM_SPEED, "high-speed", 10)) {
 		speed = USB_OTG_SPEED_HIGH;
 	} else if (!strncmp(USB_MAXIMUM_SPEED, "full-speed", 10)) {
-#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usbphyc) && DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
+#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usbphyc) && \
+	DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
 		speed = USB_OTG_SPEED_HIGH_IN_FULL;
 #else
 		speed = USB_OTG_SPEED_FULL;
@@ -364,7 +372,8 @@ static int usb_dc_stm32_init(void)
 #endif
 	usb_dc_stm32_state.pcd.Init.dev_endpoints = USB_NUM_BIDIR_ENDPOINTS;
 	usb_dc_stm32_state.pcd.Init.speed = usb_dc_stm32_get_maximum_speed();
-#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usbphyc) && DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
+#if DT_HAS_COMPAT_STATUS_OKAY(st_stm32_usbphyc) && \
+	DT_HAS_COMPAT_STATUS_OKAY(st_stm32_otghs)
 	usb_dc_stm32_state.pcd.Init.phy_itface = USB_OTG_HS_EMBEDDED_PHY;
 #else
 	usb_dc_stm32_state.pcd.Init.phy_itface = PCD_PHY_EMBEDDED;
@@ -412,14 +421,12 @@ static int usb_dc_stm32_init(void)
 	/* TODO: make this dynamic (depending usage) */
 	HAL_PCDEx_SetRxFiFo(&usb_dc_stm32_state.pcd, FIFO_EP_WORDS);
 	for (i = 0U; i < USB_NUM_BIDIR_ENDPOINTS; i++) {
-		HAL_PCDEx_SetTxFiFo(&usb_dc_stm32_state.pcd, i,
-				    FIFO_EP_WORDS);
+		HAL_PCDEx_SetTxFiFo(&usb_dc_stm32_state.pcd, i, FIFO_EP_WORDS);
 		k_sem_init(&usb_dc_stm32_state.in_ep_state[i].write_sem, 1, 1);
 	}
 #endif /* USB */
 
-	IRQ_CONNECT(USB_IRQ, USB_IRQ_PRI,
-		    usb_dc_stm32_isr, 0, 0);
+	IRQ_CONNECT(USB_IRQ, USB_IRQ_PRI, usb_dc_stm32_isr, 0, 0);
 	irq_enable(USB_IRQ);
 	return 0;
 }
@@ -546,9 +553,9 @@ int usb_dc_ep_start_read(uint8_t ep, uint8_t *data, uint32_t max_data_len)
 		max_data_len = EP_MPS;
 	}
 
-	status = HAL_PCD_EP_Receive(&usb_dc_stm32_state.pcd, ep,
-				    usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)],
-				    max_data_len);
+	status = HAL_PCD_EP_Receive(
+		&usb_dc_stm32_state.pcd, ep,
+		usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)], max_data_len);
 	if (status != HAL_OK) {
 		LOG_ERR("HAL_PCD_EP_Receive failed(0x%02x), %d", ep,
 			(int)status);
@@ -570,7 +577,7 @@ int usb_dc_ep_get_read_count(uint8_t ep, uint32_t *read_bytes)
 	return 0;
 }
 
-int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data * const cfg)
+int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data *const cfg)
 {
 	uint8_t ep_idx = USB_EP_GET_IDX(cfg->ep_addr);
 
@@ -590,7 +597,7 @@ int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data * const cfg)
 	return 0;
 }
 
-int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const ep_cfg)
+int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data *const ep_cfg)
 {
 	uint8_t ep = ep_cfg->ep_addr;
 	struct usb_dc_stm32_ep_state *ep_state = usb_dc_stm32_get_ep_state(ep);
@@ -713,18 +720,17 @@ int usb_dc_ep_enable(const uint8_t ep)
 	LOG_DBG("HAL_PCD_EP_Open(0x%02x, %u, %u)", ep, ep_state->ep_mps,
 		ep_state->ep_type);
 
-	status = HAL_PCD_EP_Open(&usb_dc_stm32_state.pcd, ep,
-				 ep_state->ep_mps, ep_state->ep_type);
+	status = HAL_PCD_EP_Open(&usb_dc_stm32_state.pcd, ep, ep_state->ep_mps,
+				 ep_state->ep_type);
 	if (status != HAL_OK) {
-		LOG_ERR("HAL_PCD_EP_Open failed(0x%02x), %d", ep,
-			(int)status);
+		LOG_ERR("HAL_PCD_EP_Open failed(0x%02x), %d", ep, (int)status);
 		return -EIO;
 	}
 
 	if (USB_EP_DIR_IS_OUT(ep) && ep != EP0_OUT) {
-		return usb_dc_ep_start_read(ep,
-					  usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)],
-					  EP_MPS);
+		return usb_dc_ep_start_read(
+			ep, usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)],
+			EP_MPS);
 	}
 
 	return 0;
@@ -743,8 +749,7 @@ int usb_dc_ep_disable(const uint8_t ep)
 
 	status = HAL_PCD_EP_Close(&usb_dc_stm32_state.pcd, ep);
 	if (status != HAL_OK) {
-		LOG_ERR("HAL_PCD_EP_Close failed(0x%02x), %d", ep,
-			(int)status);
+		LOG_ERR("HAL_PCD_EP_Close failed(0x%02x), %d", ep, (int)status);
 		return -EIO;
 	}
 
@@ -752,7 +757,7 @@ int usb_dc_ep_disable(const uint8_t ep)
 }
 
 int usb_dc_ep_write(const uint8_t ep, const uint8_t *const data,
-		    const uint32_t data_len, uint32_t * const ret_bytes)
+		    const uint32_t data_len, uint32_t *const ret_bytes)
 {
 	struct usb_dc_stm32_ep_state *ep_state = usb_dc_stm32_get_ep_state(ep);
 	HAL_StatusTypeDef status;
@@ -780,8 +785,8 @@ int usb_dc_ep_write(const uint8_t ep, const uint8_t *const data,
 		len = USB_MAX_CTRL_MPS;
 	}
 
-	status = HAL_PCD_EP_Transmit(&usb_dc_stm32_state.pcd, ep,
-				     (void *)data, len);
+	status = HAL_PCD_EP_Transmit(&usb_dc_stm32_state.pcd, ep, (void *)data,
+				     len);
 	if (status != HAL_OK) {
 		LOG_ERR("HAL_PCD_EP_Transmit failed(0x%02x), %d", ep,
 			(int)status);
@@ -834,8 +839,10 @@ int usb_dc_ep_read_wait(uint8_t ep, uint8_t *data, uint32_t max_data_len,
 	 */
 	if (data) {
 		read_count = MIN(read_count, max_data_len);
-		memcpy(data, usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)] +
-		       ep_state->read_offset, read_count);
+		memcpy(data,
+		       usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)] +
+			       ep_state->read_offset,
+		       read_count);
 		ep_state->read_count -= read_count;
 		ep_state->read_offset += read_count;
 	} else if (max_data_len) {
@@ -862,15 +869,16 @@ int usb_dc_ep_read_continue(uint8_t ep)
 	 * DataOutStageCallback will called on transaction complete.
 	 */
 	if (!ep_state->read_count) {
-		usb_dc_ep_start_read(ep, usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)],
-				     EP_MPS);
+		usb_dc_ep_start_read(
+			ep, usb_dc_stm32_state.ep_buf[USB_EP_GET_IDX(ep)],
+			EP_MPS);
 	}
 
 	return 0;
 }
 
-int usb_dc_ep_read(const uint8_t ep, uint8_t *const data, const uint32_t max_data_len,
-		   uint32_t * const read_bytes)
+int usb_dc_ep_read(const uint8_t ep, uint8_t *const data,
+		   const uint32_t max_data_len, uint32_t *const read_bytes)
 {
 	if (usb_dc_ep_read_wait(ep, data, max_data_len, read_bytes) != 0) {
 		return -EINVAL;
@@ -1018,7 +1026,7 @@ void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef *hpcd)
 
 		if (!(setup->wLength == 0U) &&
 		    !(REQTYPE_GET_DIR(setup->bmRequestType) ==
-		    REQTYPE_DIR_TO_HOST)) {
+		      REQTYPE_DIR_TO_HOST)) {
 			usb_dc_ep_start_read(EP0_OUT,
 					     usb_dc_stm32_state.ep_buf[EP0_IDX],
 					     setup->wLength);
@@ -1069,11 +1077,12 @@ void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state)
 	const struct device *usb_disconnect;
 
 	usb_disconnect = device_get_binding(
-				DT_GPIO_LABEL(DT_INST(0, st_stm32_usb), disconnect_gpios));
+		DT_GPIO_LABEL(DT_INST(0, st_stm32_usb), disconnect_gpios));
 
-	gpio_pin_configure(usb_disconnect,
-			   DT_GPIO_PIN(DT_INST(0, st_stm32_usb), disconnect_gpios),
-			   DT_GPIO_FLAGS(DT_INST(0, st_stm32_usb), disconnect_gpios) |
-			   (state ? GPIO_OUTPUT_ACTIVE : GPIO_OUTPUT_INACTIVE));
+	gpio_pin_configure(
+		usb_disconnect,
+		DT_GPIO_PIN(DT_INST(0, st_stm32_usb), disconnect_gpios),
+		DT_GPIO_FLAGS(DT_INST(0, st_stm32_usb), disconnect_gpios) |
+			(state ? GPIO_OUTPUT_ACTIVE : GPIO_OUTPUT_INACTIVE));
 }
 #endif /* USB && CONFIG_USB_DC_STM32_DISCONN_ENABLE */

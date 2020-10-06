@@ -9,15 +9,15 @@
 
 #include <kernel.h>
 
-#define FLASH_OP_DONE    (0) /* 0 for compliance with the driver API. */
+#define FLASH_OP_DONE (0) /* 0 for compliance with the driver API. */
 #define FLASH_OP_ONGOING (-1)
 
 struct flash_context {
-	uint32_t data_addr;  /* Address of data to write. */
+	uint32_t data_addr; /* Address of data to write. */
 	uint32_t flash_addr; /* Address of flash to write or erase. */
-	uint32_t len;        /* Size of data to write or erase [B]. */
+	uint32_t len; /* Size of data to write or erase [B]. */
 #ifndef CONFIG_SOC_FLASH_NRF_RADIO_SYNC_NONE
-	uint8_t  enable_time_limit; /* set execution limited to the execution
+	uint8_t enable_time_limit; /* set execution limited to the execution
 				     * window.
 				     */
 #endif /* !CONFIG_SOC_FLASH_NRF_RADIO_SYNC_NONE */
@@ -32,12 +32,12 @@ struct flash_context {
 /* The timeout is multiplied by 1.5 because switching tasks may take
  * significant portion of time.
  */
-#define FLASH_TIMEOUT_MS ((FLASH_PAGE_ERASE_MAX_TIME_US) * \
-			  (FLASH_PAGE_MAX_CNT) / 1000 * 15 / 10)
+#define FLASH_TIMEOUT_MS \
+	((FLASH_PAGE_ERASE_MAX_TIME_US) * (FLASH_PAGE_MAX_CNT) / 1000 * 15 / 10)
 #else
 
-#define FLASH_TIMEOUT_MS ((FLASH_PAGE_ERASE_MAX_TIME_US) * \
-			  (FLASH_PAGE_MAX_CNT) / 1000)
+#define FLASH_TIMEOUT_MS \
+	((FLASH_PAGE_ERASE_MAX_TIME_US) * (FLASH_PAGE_MAX_CNT) / 1000)
 #endif /* CONFIG_SOC_FLASH_NRF_PARTIAL_ERASE */
 
 /**
@@ -55,7 +55,7 @@ struct flash_context {
  * @retval @ref FLASH_OP_DONE once operation was done, @ref FLASH_OP_ONGOING if
  *         operation needs more time for execution.
  */
-typedef int (*flash_op_handler_t) (void *context);
+typedef int (*flash_op_handler_t)(void *context);
 
 struct flash_op_desc {
 	flash_op_handler_t handler;

@@ -18,7 +18,6 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 #include "platform-zephyr.h"
 
-
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion,
 	       const char *aFormat, ...)
 {
@@ -31,7 +30,6 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion,
 	 * TODO : add support for ll (problem for 32 bit processors)
 	 */
 
-
 #ifdef OPENTHREAD_CONFIG_PLAT_LOG_FUNCTION__COUNT_ARGS
 	/* The arguments number has been counted by macro at compile time,
 	 * and the value has been passed in unused (now) aLogRegion.
@@ -39,7 +37,7 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion,
 	 * OPENTHREAD_CONFIG_PLAT_LOG_FUNCTION__COUNT_ARGS and use higher bits.
 	 * to pass args_num.
 	 */
-	uint32_t args_num = (uint32_t) aLogRegion;
+	uint32_t args_num = (uint32_t)aLogRegion;
 #else
 	ARG_UNUSED(aLogRegion);
 
@@ -58,20 +56,20 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion,
 	switch (aLogLevel) {
 	case OT_LOG_LEVEL_CRIT:
 		Z_LOG_VA(LOG_LEVEL_ERR, aFormat, param_list, args_num,
-			LOG_STRDUP_EXEC);
+			 LOG_STRDUP_EXEC);
 		break;
 	case OT_LOG_LEVEL_WARN:
 		Z_LOG_VA(LOG_LEVEL_WRN, aFormat, param_list, args_num,
-			LOG_STRDUP_EXEC);
+			 LOG_STRDUP_EXEC);
 		break;
 	case OT_LOG_LEVEL_NOTE:
 	case OT_LOG_LEVEL_INFO:
 		Z_LOG_VA(LOG_LEVEL_INF, aFormat, param_list, args_num,
-			LOG_STRDUP_EXEC);
+			 LOG_STRDUP_EXEC);
 		break;
 	case OT_LOG_LEVEL_DEBG:
 		Z_LOG_VA(LOG_LEVEL_DBG, aFormat, param_list, args_num,
-			LOG_STRDUP_EXEC);
+			 LOG_STRDUP_EXEC);
 		break;
 	default:
 		break;

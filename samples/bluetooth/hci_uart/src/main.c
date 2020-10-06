@@ -44,10 +44,10 @@ static K_FIFO_DEFINE(uart_tx_queue);
 #define H4_EVT 0x04
 
 /* Receiver states. */
-#define ST_IDLE 0	/* Waiting for packet type. */
-#define ST_HDR 1	/* Receiving packet header. */
-#define ST_PAYLOAD 2	/* Receiving packet payload. */
-#define ST_DISCARD 3	/* Dropping packet. */
+#define ST_IDLE 0 /* Waiting for packet type. */
+#define ST_HDR 1 /* Receiving packet header. */
+#define ST_PAYLOAD 2 /* Receiving packet payload. */
+#define ST_DISCARD 3 /* Dropping packet. */
 
 /* Length of a discard/flush buffer.
  * This is sized to align with a BLE HCI packet:
@@ -76,15 +76,16 @@ static bool valid_type(uint8_t type)
 static uint32_t get_len(const uint8_t *hdr_buf, uint8_t type)
 {
 	return (type == BT_BUF_CMD) ?
-		((const struct bt_hci_cmd_hdr *)hdr_buf)->param_len :
-		sys_le16_to_cpu(((const struct bt_hci_acl_hdr *)hdr_buf)->len);
+			     ((const struct bt_hci_cmd_hdr *)hdr_buf)->param_len :
+			     sys_le16_to_cpu(
+			       ((const struct bt_hci_acl_hdr *)hdr_buf)->len);
 }
 
 /* Function assumes that type is validated and only CMD or ACL will be used. */
 static int hdr_len(uint8_t type)
 {
-	return (type == H4_CMD) ?
-		sizeof(struct bt_hci_cmd_hdr) : sizeof(struct bt_hci_acl_hdr);
+	return (type == H4_CMD) ? sizeof(struct bt_hci_cmd_hdr) :
+					sizeof(struct bt_hci_acl_hdr);
 }
 
 static void rx_isr(void)
@@ -94,7 +95,7 @@ static void rx_isr(void)
 	static uint8_t state;
 	static uint8_t type;
 	static uint8_t hdr_buf[MAX(sizeof(struct bt_hci_cmd_hdr),
-			sizeof(struct bt_hci_acl_hdr))];
+				   sizeof(struct bt_hci_acl_hdr))];
 	int read;
 
 	do {
@@ -128,8 +129,8 @@ static void rx_isr(void)
 				 * interrupt. On failed allocation state machine
 				 * is reset.
 				 */
-				buf = bt_buf_get_tx(BT_BUF_H4, K_NO_WAIT,
-						    &type, sizeof(type));
+				buf = bt_buf_get_tx(BT_BUF_H4, K_NO_WAIT, &type,
+						    sizeof(type));
 				if (!buf) {
 					state = ST_IDLE;
 					return;
@@ -145,7 +146,6 @@ static void rx_isr(void)
 				} else {
 					state = ST_PAYLOAD;
 				}
-
 			}
 			break;
 		case ST_PAYLOAD:
@@ -160,8 +160,7 @@ static void rx_isr(void)
 				state = ST_IDLE;
 			}
 			break;
-		case ST_DISCARD:
-		{
+		case ST_DISCARD: {
 			uint8_t discard[H4_DISCARD_LEN];
 			size_t to_read = MIN(remaining, sizeof(discard));
 
@@ -172,13 +171,11 @@ static void rx_isr(void)
 			}
 
 			break;
-
 		}
 		default:
 			read = 0;
 			__ASSERT_NO_MSG(0);
 			break;
-
 		}
 	} while (read);
 }
@@ -247,8 +244,7 @@ static void tx_thread(void *p1, void *p2, void *p3)
 
 static int h4_send(struct net_buf *buf)
 {
-	LOG_DBG("buf %p type %u len %u", buf, bt_buf_get_type(buf),
-		    buf->len);
+	LOG_DBG("buf %p type %u len %u", buf, bt_buf_get_type(buf), buf->len);
 
 	net_buf_put(&uart_tx_queue, buf);
 	uart_irq_tx_enable(hci_uart_dev);
@@ -323,8 +319,8 @@ static int hci_uart_init(const struct device *unused)
 	return 0;
 }
 
-DEVICE_INIT(hci_uart, "hci_uart", &hci_uart_init, NULL, NULL,
-	    APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
+DEVICE_INIT(hci_uart, "hci_uart", &hci_uart_init, NULL, NULL, APPLICATION,
+	    CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
 
 void main(void)
 {
@@ -360,7 +356,7 @@ void main(void)
 
 		for (i = 0; i < sizeof(cc_evt); i++) {
 			uart_poll_out(hci_uart_dev,
-				      *(((const uint8_t *)&cc_evt)+i));
+				      *(((const uint8_t *)&cc_evt) + i));
 		}
 	}
 
@@ -368,8 +364,8 @@ void main(void)
 	 * controller
 	 */
 	k_thread_create(&tx_thread_data, tx_thread_stack,
-			K_THREAD_STACK_SIZEOF(tx_thread_stack), tx_thread,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+			K_THREAD_STACK_SIZEOF(tx_thread_stack), tx_thread, NULL,
+			NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 	k_thread_name_set(&tx_thread_data, "HCI uart TX");
 
 	while (1) {

@@ -41,21 +41,21 @@
  * gets deleted its struct becomes invalid and may be reused for other keys.
  */
 struct key_update {
-	uint16_t key_idx:12,    /* AppKey or NetKey Index */
-	      valid:1,       /* 1 if this entry is valid, 0 if not */
-	      app_key:1,     /* 1 if this is an AppKey, 0 if a NetKey */
-	      clear:1;       /* 1 if key needs clearing, 0 if storing */
+	uint16_t key_idx : 12, /* AppKey or NetKey Index */
+		valid : 1, /* 1 if this entry is valid, 0 if not */
+		app_key : 1, /* 1 if this is an AppKey, 0 if a NetKey */
+		clear : 1; /* 1 if key needs clearing, 0 if storing */
 };
 
-static struct key_update key_updates[CONFIG_BT_MESH_APP_KEY_COUNT +
-				     CONFIG_BT_MESH_SUBNET_COUNT];
+static struct key_update
+	key_updates[CONFIG_BT_MESH_APP_KEY_COUNT + CONFIG_BT_MESH_SUBNET_COUNT];
 
 static struct k_delayed_work pending_store;
 
 /* Mesh network storage information */
 struct net_val {
 	uint16_t primary_addr;
-	uint8_t  dev_key[16];
+	uint8_t dev_key[16];
 } __packed;
 
 /* Sequence number storage */
@@ -66,11 +66,10 @@ struct seq_val {
 /* Heartbeat Publication storage */
 struct hb_pub_val {
 	uint16_t dst;
-	uint8_t  period;
-	uint8_t  ttl;
+	uint8_t period;
+	uint8_t ttl;
 	uint16_t feat;
-	uint16_t net_idx:12,
-	      indefinite:1;
+	uint16_t net_idx : 12, indefinite : 1;
 };
 
 /* Miscellaneous configuration server model states */
@@ -87,38 +86,34 @@ struct cfg_val {
 /* IV Index & IV Update storage */
 struct iv_val {
 	uint32_t iv_index;
-	uint8_t  iv_update:1,
-	      iv_duration:7;
+	uint8_t iv_update : 1, iv_duration : 7;
 } __packed;
 
 /* Replay Protection List storage */
 struct rpl_val {
-	uint32_t seq:24,
-	      old_iv:1;
+	uint32_t seq : 24, old_iv : 1;
 };
 
 /* NetKey storage information */
 struct net_key_val {
-	uint8_t kr_flag:1,
-	     kr_phase:7;
+	uint8_t kr_flag : 1, kr_phase : 7;
 	uint8_t val[2][16];
 } __packed;
 
 /* AppKey storage information */
 struct app_key_val {
 	uint16_t net_idx;
-	bool  updated;
-	uint8_t  val[2][16];
+	bool updated;
+	uint8_t val[2][16];
 } __packed;
 
 struct mod_pub_val {
 	uint16_t addr;
 	uint16_t key;
-	uint8_t  ttl;
-	uint8_t  retransmit;
-	uint8_t  period;
-	uint8_t  period_div:4,
-	      cred:1;
+	uint8_t ttl;
+	uint8_t retransmit;
+	uint8_t period;
+	uint8_t period_div : 4, cred : 1;
 };
 
 /* Virtual Address information */
@@ -130,17 +125,17 @@ struct va_val {
 
 struct cdb_net_val {
 	uint32_t iv_index;
-	bool  iv_update;
+	bool iv_update;
 } __packed;
 
 /* Node storage information */
 struct node_val {
 	uint16_t net_idx;
-	uint8_t  num_elem;
-	uint8_t  flags;
+	uint8_t num_elem;
+	uint8_t flags;
 #define F_NODE_CONFIGURED 0x01
-	uint8_t  uuid[16];
-	uint8_t  dev_key[16];
+	uint8_t uuid[16];
+	uint8_t dev_key[16];
 } __packed;
 
 struct node_update {
@@ -281,8 +276,8 @@ static int seq_set(const char *name, size_t len_rd, settings_read_cb read_cb,
 	return 0;
 }
 
-static int rpl_set(const char *name, size_t len_rd,
-		   settings_read_cb read_cb, void *cb_arg)
+static int rpl_set(const char *name, size_t len_rd, settings_read_cb read_cb,
+		   void *cb_arg)
 {
 	struct bt_mesh_rpl *entry;
 	struct rpl_val rpl;
@@ -456,8 +451,8 @@ static int app_key_set(const char *name, size_t len_rd,
 	return 0;
 }
 
-static int hb_pub_set(const char *name, size_t len_rd,
-		      settings_read_cb read_cb, void *cb_arg)
+static int hb_pub_set(const char *name, size_t len_rd, settings_read_cb read_cb,
+		      void *cb_arg)
 {
 	struct bt_mesh_hb_pub *pub = bt_mesh_hb_pub_get();
 	struct hb_pub_val hb_val;
@@ -501,8 +496,8 @@ static int hb_pub_set(const char *name, size_t len_rd,
 	return 0;
 }
 
-static int cfg_set(const char *name, size_t len_rd,
-		   settings_read_cb read_cb, void *cb_arg)
+static int cfg_set(const char *name, size_t len_rd, settings_read_cb read_cb,
+		   void *cb_arg)
 {
 	struct bt_mesh_cfg_srv *cfg = bt_mesh_cfg_get();
 	int err;
@@ -516,7 +511,6 @@ static int cfg_set(const char *name, size_t len_rd,
 		BT_DBG("Cleared configuration state");
 		return 0;
 	}
-
 
 	err = mesh_x_set(read_cb, cb_arg, &stored_cfg.cfg,
 			 sizeof(stored_cfg.cfg));
@@ -552,7 +546,6 @@ static int mod_set_bind(struct bt_mesh_model *mod, size_t len_rd,
 		BT_ERR("Failed to read value (err %zd)", len);
 		return len;
 	}
-
 
 	BT_DBG("Decoded %zu bound keys for model", len / sizeof(mod->keys[0]));
 	return 0;
@@ -626,17 +619,16 @@ static int mod_set_pub(struct bt_mesh_model *mod, size_t len_rd,
 	return 0;
 }
 
-static int mod_data_set(struct bt_mesh_model *mod,
-			const char *name, size_t len_rd,
-			settings_read_cb read_cb, void *cb_arg)
+static int mod_data_set(struct bt_mesh_model *mod, const char *name,
+			size_t len_rd, settings_read_cb read_cb, void *cb_arg)
 {
 	const char *next;
 
 	settings_name_next(name, &next);
 
 	if (mod->cb && mod->cb->settings_set) {
-		return mod->cb->settings_set(mod, next, len_rd,
-			read_cb, cb_arg);
+		return mod->cb->settings_set(mod, next, len_rd, read_cb,
+					     cb_arg);
 	}
 
 	return 0;
@@ -660,8 +652,8 @@ static int mod_set(bool vnd, const char *name, size_t len_rd,
 	elem_idx = mod_key >> 8;
 	mod_idx = mod_key;
 
-	BT_DBG("Decoded mod_key 0x%04x as elem_idx %u mod_idx %u",
-	       mod_key, elem_idx, mod_idx);
+	BT_DBG("Decoded mod_key 0x%04x as elem_idx %u mod_idx %u", mod_key,
+	       elem_idx, mod_idx);
 
 	mod = bt_mesh_model_get(vnd, elem_idx, mod_idx);
 	if (!mod) {
@@ -710,8 +702,8 @@ static int vnd_mod_set(const char *name, size_t len_rd,
 }
 
 #if CONFIG_BT_MESH_LABEL_COUNT > 0
-static int va_set(const char *name, size_t len_rd,
-		  settings_read_cb read_cb, void *cb_arg)
+static int va_set(const char *name, size_t len_rd, settings_read_cb read_cb,
+		  void *cb_arg)
 {
 	struct va_val va;
 	struct label *lab;
@@ -751,8 +743,8 @@ static int va_set(const char *name, size_t len_rd,
 	lab->addr = va.addr;
 	lab->ref = va.ref;
 
-	BT_DBG("Restored Virtual Address, addr 0x%04x ref 0x%04x",
-	       lab->addr, lab->ref);
+	BT_DBG("Restored Virtual Address, addr 0x%04x ref 0x%04x", lab->addr,
+	       lab->ref);
 
 	return 0;
 }
@@ -955,8 +947,8 @@ static int cdb_app_key_set(const char *name, size_t len_rd,
 	return 0;
 }
 
-static int cdb_set(const char *name, size_t len_rd,
-		   settings_read_cb read_cb, void *cb_arg)
+static int cdb_set(const char *name, size_t len_rd, settings_read_cb read_cb,
+		   void *cb_arg)
 {
 	int len;
 	const char *next;
@@ -969,7 +961,6 @@ static int cdb_set(const char *name, size_t len_rd,
 	if (!strcmp(name, "Net")) {
 		return cdb_net_set(name, len_rd, read_cb, cb_arg);
 	}
-
 
 	len = settings_name_next(name, &next);
 
@@ -997,19 +988,14 @@ static int cdb_set(const char *name, size_t len_rd,
 
 const struct mesh_setting {
 	const char *name;
-	int (*func)(const char *name, size_t len_rd,
-		    settings_read_cb read_cb, void *cb_arg);
+	int (*func)(const char *name, size_t len_rd, settings_read_cb read_cb,
+		    void *cb_arg);
 } settings[] = {
-	{ "Net", net_set },
-	{ "IV", iv_set },
-	{ "Seq", seq_set },
-	{ "RPL", rpl_set },
-	{ "NetKey", net_key_set },
-	{ "AppKey", app_key_set },
-	{ "HBPub", hb_pub_set },
-	{ "Cfg", cfg_set },
-	{ "s", sig_mod_set },
-	{ "v", vnd_mod_set },
+	{ "Net", net_set },	   { "IV", iv_set },
+	{ "Seq", seq_set },	   { "RPL", rpl_set },
+	{ "NetKey", net_key_set }, { "AppKey", app_key_set },
+	{ "HBPub", hb_pub_set },   { "Cfg", cfg_set },
+	{ "s", sig_mod_set },	   { "v", vnd_mod_set },
 #if CONFIG_BT_MESH_LABEL_COUNT > 0
 	{ "Va", va_set },
 #endif
@@ -1018,8 +1004,8 @@ const struct mesh_setting {
 #endif
 };
 
-static int mesh_set(const char *name, size_t len_rd,
-		    settings_read_cb read_cb, void *cb_arg)
+static int mesh_set(const char *name, size_t len_rd, settings_read_cb read_cb,
+		    void *cb_arg)
 {
 	int i, len;
 	const char *next;
@@ -1135,8 +1121,8 @@ static int mesh_commit(void)
 	bt_mesh_model_foreach(commit_mod, NULL);
 
 	hb_pub = bt_mesh_hb_pub_get();
-	if (hb_pub && hb_pub->dst != BT_MESH_ADDR_UNASSIGNED &&
-	    hb_pub->count && hb_pub->period) {
+	if (hb_pub && hb_pub->dst != BT_MESH_ADDR_UNASSIGNED && hb_pub->count &&
+	    hb_pub->period) {
 		BT_DBG("Starting heartbeat publication");
 		k_work_submit(&hb_pub->timer.work);
 	}
@@ -1163,15 +1149,14 @@ SETTINGS_STATIC_HANDLER_DEFINE(bt_mesh, "bt/mesh", NULL, mesh_set, mesh_commit,
 			       NULL);
 
 /* Pending flags that use K_NO_WAIT as the storage timeout */
-#define NO_WAIT_PENDING_BITS (BIT(BT_MESH_NET_PENDING) |           \
-			      BIT(BT_MESH_IV_PENDING) |            \
-			      BIT(BT_MESH_SEQ_PENDING))
+#define NO_WAIT_PENDING_BITS                                  \
+	(BIT(BT_MESH_NET_PENDING) | BIT(BT_MESH_IV_PENDING) | \
+	 BIT(BT_MESH_SEQ_PENDING))
 
 /* Pending flags that use CONFIG_BT_MESH_STORE_TIMEOUT */
-#define GENERIC_PENDING_BITS (BIT(BT_MESH_KEYS_PENDING) |          \
-			      BIT(BT_MESH_HB_PUB_PENDING) |        \
-			      BIT(BT_MESH_CFG_PENDING) |           \
-			      BIT(BT_MESH_MOD_PENDING))
+#define GENERIC_PENDING_BITS                                       \
+	(BIT(BT_MESH_KEYS_PENDING) | BIT(BT_MESH_HB_PUB_PENDING) | \
+	 BIT(BT_MESH_CFG_PENDING) | BIT(BT_MESH_MOD_PENDING))
 
 static void schedule_store(int flag)
 {
@@ -1523,7 +1508,7 @@ static void store_pending_keys(void)
 					store_app_key(key);
 				} else {
 					BT_WARN("AppKeyIndex 0x%03x not found",
-					       update->key_idx);
+						update->key_idx);
 				}
 
 			} else {
@@ -1534,7 +1519,7 @@ static void store_pending_keys(void)
 					store_net_key(sub);
 				} else {
 					BT_WARN("NetKeyIndex 0x%03x not found",
-					       update->key_idx);
+						update->key_idx);
 				}
 			}
 		}
@@ -1563,8 +1548,8 @@ static void store_pending_cdb(void)
 	BT_DBG("");
 
 	net.iv_index = bt_mesh_cdb.iv_index;
-	net.iv_update = atomic_test_bit(bt_mesh_cdb.flags,
-					BT_MESH_CDB_IVU_IN_PROGRESS);
+	net.iv_update =
+		atomic_test_bit(bt_mesh_cdb.flags, BT_MESH_CDB_IVU_IN_PROGRESS);
 
 	err = settings_save_one("bt/mesh/cdb/Net", &net, sizeof(net));
 	if (err) {
@@ -1768,7 +1753,7 @@ static void store_pending_cdb_keys(void)
 }
 
 static struct node_update *cdb_node_update_find(uint16_t addr,
-					       struct node_update **free_slot)
+						struct node_update **free_slot)
 {
 	struct node_update *match;
 	int i;
@@ -1890,8 +1875,8 @@ static void store_pending_mod_pub(struct bt_mesh_model *mod, bool vnd)
 }
 
 static void store_pending_mod(struct bt_mesh_model *mod,
-			      struct bt_mesh_elem *elem, bool vnd,
-			      bool primary, void *user_data)
+			      struct bt_mesh_elem *elem, bool vnd, bool primary,
+			      void *user_data)
 {
 	if (!mod->flags) {
 		return;
@@ -1913,7 +1898,7 @@ static void store_pending_mod(struct bt_mesh_model *mod,
 	}
 }
 
-#define IS_VA_DEL(_label)	((_label)->ref == 0)
+#define IS_VA_DEL(_label) ((_label)->ref == 0)
 static void store_pending_va(void)
 {
 	struct label *lab;
@@ -2210,7 +2195,6 @@ void bt_mesh_store_mod_pub(struct bt_mesh_model *mod)
 	schedule_store(BT_MESH_MOD_PENDING);
 }
 
-
 void bt_mesh_store_label(void)
 {
 	schedule_store(BT_MESH_VA_PENDING);
@@ -2277,7 +2261,7 @@ void bt_mesh_clear_cdb_node(struct bt_mesh_cdb_node *node)
 
 /* TODO: Could be shared with key_update_find? */
 static struct key_update *cdb_key_update_find(bool app_key, uint16_t key_idx,
-					     struct key_update **free_slot)
+					      struct key_update **free_slot)
 {
 	struct key_update *match;
 	int i;
@@ -2410,8 +2394,8 @@ void bt_mesh_clear_cdb_app_key(struct bt_mesh_cdb_app_key *key)
 }
 
 int bt_mesh_model_data_store(struct bt_mesh_model *mod, bool vnd,
-			const char *name, const void *data,
-			size_t data_len)
+			     const char *name, const void *data,
+			     size_t data_len)
 {
 	char path[30];
 	int err;

@@ -24,20 +24,18 @@ LOG_MODULE_REGISTER(net_wifi_shell, LOG_LEVEL_INF);
 
 #define WIFI_SHELL_MODULE "wifi"
 
-#define WIFI_SHELL_MGMT_EVENTS (NET_EVENT_WIFI_SCAN_RESULT |		\
-				NET_EVENT_WIFI_SCAN_DONE |		\
-				NET_EVENT_WIFI_CONNECT_RESULT |		\
-				NET_EVENT_WIFI_DISCONNECT_RESULT)
+#define WIFI_SHELL_MGMT_EVENTS                                   \
+	(NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE | \
+	 NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT)
 
 static struct {
 	const struct shell *shell;
 
 	union {
 		struct {
-
-			uint8_t connecting		: 1;
-			uint8_t disconnecting	: 1;
-			uint8_t _unused		: 6;
+			uint8_t connecting : 1;
+			uint8_t disconnecting : 1;
+			uint8_t _unused : 6;
 		};
 		uint8_t all;
 	};
@@ -47,13 +45,13 @@ static uint32_t scan_result;
 
 static struct net_mgmt_event_callback wifi_shell_mgmt_cb;
 
-#define print(shell, level, fmt, ...)					\
-	do {								\
-		if (shell) {						\
+#define print(shell, level, fmt, ...)                                    \
+	do {                                                             \
+		if (shell) {                                             \
 			shell_fprintf(shell, level, fmt, ##__VA_ARGS__); \
-		} else {						\
-			printk(fmt, ##__VA_ARGS__);			\
-		}							\
+		} else {                                                 \
+			printk(fmt, ##__VA_ARGS__);                      \
+		}                                                        \
 	} while (false)
 
 static void handle_wifi_scan_result(struct net_mgmt_event_callback *cb)
@@ -65,22 +63,20 @@ static void handle_wifi_scan_result(struct net_mgmt_event_callback *cb)
 
 	if (scan_result == 1U) {
 		print(context.shell, SHELL_NORMAL,
-		      "%-4s | %-32s %-5s | %-4s | %-4s | %-5s\n",
-		      "Num", "SSID", "(len)", "Chan", "RSSI", "Sec");
+		      "%-4s | %-32s %-5s | %-4s | %-4s | %-5s\n", "Num", "SSID",
+		      "(len)", "Chan", "RSSI", "Sec");
 	}
 
 	print(context.shell, SHELL_NORMAL,
-	      "%-4d | %-32s %-5u | %-4u | %-4d | %-5s\n",
-	      scan_result, entry->ssid, entry->ssid_length,
-	      entry->channel, entry->rssi,
-	      (entry->security == WIFI_SECURITY_TYPE_PSK ?
-	       "WPA/WPA2" : "Open"));
+	      "%-4d | %-32s %-5u | %-4u | %-4d | %-5s\n", scan_result,
+	      entry->ssid, entry->ssid_length, entry->channel, entry->rssi,
+	      (entry->security == WIFI_SECURITY_TYPE_PSK ? "WPA/WPA2" :
+								 "Open"));
 }
 
 static void handle_wifi_scan_done(struct net_mgmt_event_callback *cb)
 {
-	const struct wifi_status *status =
-		(const struct wifi_status *)cb->info;
+	const struct wifi_status *status = (const struct wifi_status *)cb->info;
 
 	if (status->status) {
 		print(context.shell, SHELL_WARNING,
@@ -94,8 +90,7 @@ static void handle_wifi_scan_done(struct net_mgmt_event_callback *cb)
 
 static void handle_wifi_connect_result(struct net_mgmt_event_callback *cb)
 {
-	const struct wifi_status *status =
-		(const struct wifi_status *) cb->info;
+	const struct wifi_status *status = (const struct wifi_status *)cb->info;
 
 	if (status->status) {
 		print(context.shell, SHELL_WARNING,
@@ -109,15 +104,13 @@ static void handle_wifi_connect_result(struct net_mgmt_event_callback *cb)
 
 static void handle_wifi_disconnect_result(struct net_mgmt_event_callback *cb)
 {
-	const struct wifi_status *status =
-		(const struct wifi_status *) cb->info;
+	const struct wifi_status *status = (const struct wifi_status *)cb->info;
 
 	if (context.disconnecting) {
 		print(context.shell,
 		      status->status ? SHELL_WARNING : SHELL_NORMAL,
 		      "Disconnection request %s (%d)\n",
-		      status->status ? "failed" : "done",
-		      status->status);
+		      status->status ? "failed" : "done", status->status);
 		context.disconnecting = false;
 	} else {
 		print(context.shell, SHELL_NORMAL, "Disconnected\n");
@@ -146,7 +139,7 @@ static void wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb,
 }
 
 static int __wifi_args_to_params(size_t argc, char *argv[],
-				struct wifi_connect_req_params *params)
+				 struct wifi_connect_req_params *params)
 {
 	char *endptr;
 	int idx = 1;
@@ -201,16 +194,15 @@ static int cmd_wifi_connect(const struct shell *shell, size_t argc,
 	context.connecting = true;
 	context.shell = shell;
 
-	if (net_mgmt(NET_REQUEST_WIFI_CONNECT, iface,
-		     &cnx_params, sizeof(struct wifi_connect_req_params))) {
+	if (net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &cnx_params,
+		     sizeof(struct wifi_connect_req_params))) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Connection request failed\n");
 		context.connecting = false;
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Connection requested\n");
+		shell_fprintf(shell, SHELL_NORMAL, "Connection requested\n");
 	}
 
 	return 0;
@@ -239,8 +231,7 @@ static int cmd_wifi_disconnect(const struct shell *shell, size_t argc,
 			return -ENOEXEC;
 		}
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Disconnect requested\n");
+		shell_fprintf(shell, SHELL_NORMAL, "Disconnect requested\n");
 	}
 
 	return 0;
@@ -276,8 +267,8 @@ static int cmd_wifi_ap_enable(const struct shell *shell, size_t argc,
 
 	context.shell = shell;
 
-	if (net_mgmt(NET_REQUEST_WIFI_AP_ENABLE, iface,
-		     &cnx_params, sizeof(struct wifi_connect_req_params))) {
+	if (net_mgmt(NET_REQUEST_WIFI_AP_ENABLE, iface, &cnx_params,
+		     sizeof(struct wifi_connect_req_params))) {
 		shell_fprintf(shell, SHELL_WARNING, "AP mode failed\n");
 		return -ENOEXEC;
 	} else {
@@ -304,15 +295,16 @@ static int cmd_wifi_ap_disable(const struct shell *shell, size_t argc,
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(wifi_cmd_ap,
-	SHELL_CMD(enable, NULL, "<SSID> <SSID length> [channel] [PSK]",
-		  cmd_wifi_ap_enable),
-	SHELL_CMD(disable, NULL,
-		  "Disable Access Point mode",
-		  cmd_wifi_ap_disable),
-	SHELL_SUBCMD_SET_END
-);
+			       SHELL_CMD(enable, NULL,
+					 "<SSID> <SSID length> [channel] [PSK]",
+					 cmd_wifi_ap_enable),
+			       SHELL_CMD(disable, NULL,
+					 "Disable Access Point mode",
+					 cmd_wifi_ap_disable),
+			       SHELL_SUBCMD_SET_END);
 
-SHELL_STATIC_SUBCMD_SET_CREATE(wifi_commands,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	wifi_commands,
 	SHELL_CMD(connect, NULL,
 		  "\"<SSID>\"\n<channel number (optional), "
 		  "0 means all>\n"
@@ -322,8 +314,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(wifi_commands,
 		  cmd_wifi_disconnect),
 	SHELL_CMD(scan, NULL, "Scan Wifi AP", cmd_wifi_scan),
 	SHELL_CMD(ap, &wifi_cmd_ap, "Access Point mode commands", NULL),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(wifi, &wifi_commands, "Wifi commands", NULL);
 

@@ -37,12 +37,9 @@ static uint8_t calib_skip_cnt; /* Counting down skipped calibrations. */
 static volatile int total_cnt; /* Total number of calibrations. */
 static volatile int total_skips_cnt; /* Total number of skipped calibrations. */
 
-
-static void cal_hf_callback(struct onoff_manager *mgr,
-			    struct onoff_client *cli,
+static void cal_hf_callback(struct onoff_manager *mgr, struct onoff_client *cli,
 			    uint32_t state, int res);
-static void cal_lf_callback(struct onoff_manager *mgr,
-			    struct onoff_client *cli,
+static void cal_lf_callback(struct onoff_manager *mgr, struct onoff_client *cli,
 			    uint32_t state, int res);
 
 static struct onoff_client cli;
@@ -94,8 +91,7 @@ static void lf_release(void)
 	clk_release(&mgrs[CLOCK_CONTROL_NRF_TYPE_LFCLK]);
 }
 
-static void cal_lf_callback(struct onoff_manager *mgr,
-			    struct onoff_client *cli,
+static void cal_lf_callback(struct onoff_manager *mgr, struct onoff_client *cli,
 			    uint32_t state, int res)
 {
 	hf_request();
@@ -155,8 +151,7 @@ static void timeout_handler(struct k_timer *timer)
 /* Called when HFCLK XTAL is on. Schedules temperature measurement or triggers
  * calibration.
  */
-static void cal_hf_callback(struct onoff_manager *mgr,
-			    struct onoff_client *cli,
+static void cal_hf_callback(struct onoff_manager *mgr, struct onoff_client *cli,
 			    uint32_t state, int res)
 {
 	if ((temp_sensor == NULL) || !IS_ENABLED(CONFIG_MULTITHREADING)) {
@@ -209,7 +204,7 @@ static void measure_temperature(struct k_work *work)
 	}
 
 	if ((calib_skip_cnt == 0) ||
-		(diff >= CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_TEMP_DIFF)) {
+	    (diff >= CONFIG_CLOCK_CONTROL_NRF_CALIBRATION_TEMP_DIFF)) {
 		prev_temperature = temperature;
 		started = true;
 		start_hw_cal();
@@ -220,7 +215,7 @@ static void measure_temperature(struct k_work *work)
 	}
 
 	LOG_DBG("Calibration %s. Temperature diff: %d (in 0.25'C units).",
-			started ? "started" : "skipped", diff);
+		started ? "started" : "skipped", diff);
 }
 
 #define TEMP_NODE DT_INST(0, nordic_nrf_temp)

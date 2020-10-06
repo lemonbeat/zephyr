@@ -71,16 +71,20 @@ static int ism330dhcx_enable_xl_int(const struct device *dev, int enable)
 				    (uint8_t *)&int1_route.int1_ctrl, 1);
 
 		int1_route.int1_ctrl.int1_drdy_xl = enable;
-		return ism330dhcx_write_reg(ism330dhcx->ctx, ISM330DHCX_INT1_CTRL,
-					    (uint8_t *)&int1_route.int1_ctrl, 1);
+		return ism330dhcx_write_reg(ism330dhcx->ctx,
+					    ISM330DHCX_INT1_CTRL,
+					    (uint8_t *)&int1_route.int1_ctrl,
+					    1);
 	} else {
 		ism330dhcx_pin_int2_route_t int2_route;
 
 		ism330dhcx_read_reg(ism330dhcx->ctx, ISM330DHCX_INT2_CTRL,
 				    (uint8_t *)&int2_route.int2_ctrl, 1);
 		int2_route.int2_ctrl.int2_drdy_xl = enable;
-		return ism330dhcx_write_reg(ism330dhcx->ctx, ISM330DHCX_INT2_CTRL,
-					    (uint8_t *)&int2_route.int2_ctrl, 1);
+		return ism330dhcx_write_reg(ism330dhcx->ctx,
+					    ISM330DHCX_INT2_CTRL,
+					    (uint8_t *)&int2_route.int2_ctrl,
+					    1);
 	}
 }
 
@@ -104,18 +108,22 @@ static int ism330dhcx_enable_g_int(const struct device *dev, int enable)
 		ism330dhcx_pin_int1_route_t int1_route;
 
 		ism330dhcx_read_reg(ism330dhcx->ctx, ISM330DHCX_INT1_CTRL,
-				 (uint8_t *)&int1_route.int1_ctrl, 1);
+				    (uint8_t *)&int1_route.int1_ctrl, 1);
 		int1_route.int1_ctrl.int1_drdy_g = enable;
-		return ism330dhcx_write_reg(ism330dhcx->ctx, ISM330DHCX_INT1_CTRL,
-					    (uint8_t *)&int1_route.int1_ctrl, 1);
+		return ism330dhcx_write_reg(ism330dhcx->ctx,
+					    ISM330DHCX_INT1_CTRL,
+					    (uint8_t *)&int1_route.int1_ctrl,
+					    1);
 	} else {
 		ism330dhcx_pin_int2_route_t int2_route;
 
 		ism330dhcx_read_reg(ism330dhcx->ctx, ISM330DHCX_INT2_CTRL,
-				 (uint8_t *)&int2_route.int2_ctrl, 1);
+				    (uint8_t *)&int2_route.int2_ctrl, 1);
 		int2_route.int2_ctrl.int2_drdy_g = enable;
-		return ism330dhcx_write_reg(ism330dhcx->ctx, ISM330DHCX_INT2_CTRL,
-					    (uint8_t *)&int2_route.int2_ctrl, 1);
+		return ism330dhcx_write_reg(ism330dhcx->ctx,
+					    ISM330DHCX_INT2_CTRL,
+					    (uint8_t *)&int2_route.int2_ctrl,
+					    1);
 	}
 }
 
@@ -133,7 +141,8 @@ int ism330dhcx_trigger_set(const struct device *dev,
 		if (handler) {
 			return ism330dhcx_enable_xl_int(dev, ISM330DHCX_EN_BIT);
 		} else {
-			return ism330dhcx_enable_xl_int(dev, ISM330DHCX_DIS_BIT);
+			return ism330dhcx_enable_xl_int(dev,
+							ISM330DHCX_DIS_BIT);
 		}
 	} else if (trig->chan == SENSOR_CHAN_GYRO_XYZ) {
 		ism330dhcx->handler_drdy_gyr = handler;
@@ -178,9 +187,9 @@ static void ism330dhcx_handle_interrupt(const struct device *dev)
 
 		if ((status.xlda == 0) && (status.gda == 0)
 #if defined(CONFIG_ISM330DHCX_ENABLE_TEMP)
-					&& (status.tda == 0)
+		    && (status.tda == 0)
 #endif
-					) {
+		) {
 			break;
 		}
 
@@ -260,10 +269,9 @@ int ism330dhcx_init_interrupt(const struct device *dev)
 
 	k_thread_create(&ism330dhcx->thread, ism330dhcx->thread_stack,
 			CONFIG_ISM330DHCX_THREAD_STACK_SIZE,
-			(k_thread_entry_t)ism330dhcx_thread,
-			ism330dhcx, NULL, NULL,
-			K_PRIO_COOP(CONFIG_ISM330DHCX_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)ism330dhcx_thread, ism330dhcx, NULL,
+			NULL, K_PRIO_COOP(CONFIG_ISM330DHCX_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_ISM330DHCX_TRIGGER_GLOBAL_THREAD)
 	ism330dhcx->work.handler = ism330dhcx_work_cb;
 #endif /* CONFIG_ISM330DHCX_TRIGGER_OWN_THREAD */
@@ -275,8 +283,7 @@ int ism330dhcx_init_interrupt(const struct device *dev)
 		return ret;
 	}
 
-	gpio_init_callback(&ism330dhcx->gpio_cb,
-			   ism330dhcx_gpio_callback,
+	gpio_init_callback(&ism330dhcx->gpio_cb, ism330dhcx_gpio_callback,
 			   BIT(cfg->int_gpio_pin));
 
 	if (gpio_add_callback(ism330dhcx->gpio, &ism330dhcx->gpio_cb) < 0) {

@@ -9,8 +9,8 @@
 #include <device.h>
 #include <drivers/ipm.h>
 
-static void ipm_callback(const struct device *dev, void *context,
-			 uint32_t id, volatile void *data)
+static void ipm_callback(const struct device *dev, void *context, uint32_t id,
+			 volatile void *data)
 {
 	int i;
 	int status;
@@ -41,7 +41,7 @@ void main(void)
 	ipm_register_callback(ipm, ipm_callback, NULL);
 	ipm_set_enabled(ipm, 1);
 	printk("IPM initialized, data size = %d\n",
-		CONFIG_IPM_IMX_MAX_DATA_SIZE);
+	       CONFIG_IPM_IMX_MAX_DATA_SIZE);
 
 	while (1) {
 	}

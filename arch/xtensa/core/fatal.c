@@ -18,15 +18,14 @@ LOG_MODULE_DECLARE(os);
 #endif
 
 /* Need to do this as a macro since regnum must be an immediate value */
-#define get_sreg(regnum_p) ({ \
-	unsigned int retval; \
-	__asm__ volatile( \
-	    "rsr %[retval], %[regnum]\n\t" \
-	    : [retval] "=r" (retval) \
-	    : [regnum] "i" (regnum_p)); \
-	retval; \
+#define get_sreg(regnum_p)                                      \
+	({                                                      \
+		unsigned int retval;                            \
+		__asm__ volatile("rsr %[retval], %[regnum]\n\t" \
+				 : [retval] "=r"(retval)        \
+				 : [regnum] "i"(regnum_p));     \
+		retval;                                         \
 	})
-
 
 char *z_xtensa_exccause(unsigned int cause_code)
 {
@@ -76,7 +75,14 @@ char *z_xtensa_exccause(unsigned int cause_code)
 		return "load prohibited";
 	case 29:
 		return "store prohibited";
-	case 32: case 33: case 34: case 35: case 36: case 37: case 38: case 39:
+	case 32:
+	case 33:
+	case 34:
+	case 35:
+	case 36:
+	case 37:
+	case 38:
+	case 39:
 		return "coprocessor disabled";
 	default:
 		return "unknown/reserved";
@@ -103,21 +109,20 @@ XTENSA_ERR_NORET void FatalErrorHandler(void)
 
 XTENSA_ERR_NORET void ReservedInterruptHandler(unsigned int intNo)
 {
-	LOG_ERR("INTENABLE = 0x%x INTERRUPT = 0x%x (%x)",
-		get_sreg(INTENABLE), (1 << intNo), intNo);
+	LOG_ERR("INTENABLE = 0x%x INTERRUPT = 0x%x (%x)", get_sreg(INTENABLE),
+		(1 << intNo), intNo);
 	z_xtensa_fatal_error(K_ERR_SPURIOUS_IRQ, NULL);
 }
 
 void exit(int return_code)
 {
 #ifdef XT_SIMULATOR
-	__asm__ (
-	    "mov a3, %[code]\n\t"
-	    "movi a2, %[call]\n\t"
-	    "simcall\n\t"
-	    :
-	    : [code] "r" (return_code), [call] "i" (SYS_exit)
-	    : "a3", "a2");
+	__asm__("mov a3, %[code]\n\t"
+		"movi a2, %[call]\n\t"
+		"simcall\n\t"
+		:
+		: [code] "r"(return_code), [call] "i"(SYS_exit)
+		: "a3", "a2");
 #else
 	LOG_ERR("exit(%d)", return_code);
 	k_panic();

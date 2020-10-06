@@ -90,7 +90,7 @@ static int framebuf_write(const struct device *dev, const uint16_t x,
 	dst += (y * data->pitch);
 
 	for (row = 0; row < desc->height; ++row) {
-		(void) memcpy(dst, src, desc->width * sizeof(uint32_t));
+		(void)memcpy(dst, src, desc->width * sizeof(uint32_t));
 		dst += data->pitch;
 		src += desc->pitch;
 	}
@@ -112,7 +112,7 @@ static int framebuf_read(const struct device *dev, const uint16_t x,
 	src += (y * data->pitch);
 
 	for (row = 0; row < desc->height; ++row) {
-		(void) memcpy(dst, src, desc->width * sizeof(uint32_t));
+		(void)memcpy(dst, src, desc->width * sizeof(uint32_t));
 		src += data->pitch;
 		dst += desc->pitch;
 	}

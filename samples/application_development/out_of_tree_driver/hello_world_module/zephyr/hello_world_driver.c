@@ -41,8 +41,6 @@ static inline void z_vrfy_hello_world_print(const struct device *dev)
 #include <syscalls/hello_world_print_mrsh.c>
 #endif /* CONFIG_USERSPACE */
 
-
-DEVICE_AND_API_INIT(hello_world, "CUSTOM_DRIVER",
-		    init, &data, NULL,
+DEVICE_AND_API_INIT(hello_world, "CUSTOM_DRIVER", init, &data, NULL,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &((struct hello_world_driver_api){ .print = print_impl }));

@@ -12,7 +12,7 @@
 
 struct iaq_registers {
 	uint16_t co2_pred;
-	uint8_t  status;
+	uint8_t status;
 	int32_t resistance;
 	uint16_t voc;
 } __packed;

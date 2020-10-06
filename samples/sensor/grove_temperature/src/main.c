@@ -15,11 +15,12 @@
 #include <string.h>
 #endif
 
-#define SLEEP_TIME	K_MSEC(1000)
+#define SLEEP_TIME K_MSEC(1000)
 
 void main(void)
 {
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, grove_temperature)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, grove_temperature)));
 	struct sensor_value temp;
 	int read;
 
@@ -38,12 +39,11 @@ void main(void)
 
 	/* configure LCD */
 	glcd_function_set(glcd, GLCD_FS_ROWS_2 | GLCD_FS_DOT_SIZE_LITTLE |
-			  GLCD_FS_8BIT_MODE);
+					GLCD_FS_8BIT_MODE);
 	glcd_display_state_set(glcd, GLCD_DS_DISPLAY_ON);
 #endif
 
 	while (1) {
-
 		read = sensor_sample_fetch(dev);
 		if (read) {
 			printk("sample fetch error\n");
@@ -63,12 +63,10 @@ void main(void)
 		/* display temperature on LCD */
 		glcd_cursor_pos_set(glcd, 0, 0);
 #ifdef CONFIG_NEWLIB_LIBC_FLOAT_PRINTF
-		sprintf(row, "T:%.2f%cC",
-			sensor_value_to_double(&temp),
+		sprintf(row, "T:%.2f%cC", sensor_value_to_double(&temp),
 			223 /* degree symbol */);
 #else
-		sprintf(row, "T:%d%cC", temp.val1,
-			223 /* degree symbol */);
+		sprintf(row, "T:%d%cC", temp.val1, 223 /* degree symbol */);
 #endif
 		glcd_print(glcd, row, strlen(row));
 

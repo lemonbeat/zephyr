@@ -71,9 +71,9 @@ int settings_file_dst(struct settings_file *cf)
  * @retval false No duplicates found
  * @retval true  Duplicate found
  */
-static bool settings_file_check_duplicate(
-				  const struct line_entry_ctx *entry_ctx,
-				  const char * const name)
+static bool
+settings_file_check_duplicate(const struct line_entry_ctx *entry_ctx,
+			      const char *const name)
 {
 	struct line_entry_ctx entry2_ctx = *entry_ctx;
 
@@ -147,7 +147,7 @@ static int settings_file_load_priv(struct settings_store *cs, line_load_cb cb,
 		name[name_len] = '\0';
 
 		if (filter_duplicates &&
-		    (!read_entry_len(&entry_ctx, name_len+1) ||
+		    (!read_entry_len(&entry_ctx, name_len + 1) ||
 		     settings_file_check_duplicate(&entry_ctx, name))) {
 			pass_entry = false;
 		}
@@ -171,9 +171,7 @@ static int settings_file_load_priv(struct settings_store *cs, line_load_cb cb,
 static int settings_file_load(struct settings_store *cs,
 			      const struct settings_load_arg *arg)
 {
-	return settings_file_load_priv(cs,
-				       settings_line_load_cb,
-				       (void *)arg,
+	return settings_file_load_priv(cs, settings_line_load_cb, (void *)arg,
 				       true);
 }
 
@@ -214,8 +212,8 @@ static int settings_file_create_or_replace(struct fs_file_t *zfp,
  * Try to compress configuration file by keeping unique names only.
  */
 static int settings_file_save_and_compress(struct settings_file *cf,
-			   const char *name, const char *value,
-			   size_t val_len)
+					   const char *name, const char *value,
+					   size_t val_len)
 {
 	int rc, rc2;
 	struct fs_file_t rf;
@@ -224,16 +222,12 @@ static int settings_file_save_and_compress(struct settings_file *cf,
 	char name1[SETTINGS_MAX_NAME_LEN + SETTINGS_EXTRA_LEN];
 	char name2[SETTINGS_MAX_NAME_LEN + SETTINGS_EXTRA_LEN];
 	struct line_entry_ctx loc1 = {
-		.stor_ctx = &rf,
-		.seek = 0,
-		.len = 0 /* unknown length */
+		.stor_ctx = &rf, .seek = 0, .len = 0 /* unknown length */
 	};
 
 	struct line_entry_ctx loc2;
 
-	struct line_entry_ctx loc3 = {
-		.stor_ctx = &wf
-	};
+	struct line_entry_ctx loc3 = { .stor_ctx = &wf };
 
 	int copy;
 	int lines;
@@ -352,7 +346,6 @@ end_rolback:
 		(void)fs_unlink(tmp_file);
 	}
 	return -EIO;
-
 }
 
 static int settings_file_save_priv(struct settings_store *cs, const char *name,
@@ -360,7 +353,7 @@ static int settings_file_save_priv(struct settings_store *cs, const char *name,
 {
 	struct settings_file *cf = (struct settings_file *)cs;
 	struct line_entry_ctx entry_ctx;
-	struct fs_file_t  file;
+	struct fs_file_t file;
 	int rc2;
 	int rc;
 
@@ -386,7 +379,7 @@ static int settings_file_save_priv(struct settings_store *cs, const char *name,
 		if (rc == 0) {
 			entry_ctx.stor_ctx = &file;
 			rc = settings_line_write(name, value, val_len, 0,
-						  (void *)&entry_ctx);
+						 (void *)&entry_ctx);
 			if (rc == 0) {
 				cf->cf_lines++;
 			}
@@ -400,7 +393,6 @@ static int settings_file_save_priv(struct settings_store *cs, const char *name,
 
 	return rc;
 }
-
 
 /*
  * Called to save configuration.
@@ -503,7 +495,6 @@ int settings_backend_init(void)
 		.cf_maxlines = CONFIG_SETTINGS_FS_MAX_LINES
 	};
 	int rc;
-
 
 	rc = settings_file_src(&config_init_settings_file);
 	if (rc) {

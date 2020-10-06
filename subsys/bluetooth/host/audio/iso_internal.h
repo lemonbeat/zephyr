@@ -10,14 +10,14 @@
 
 #include <bluetooth/iso.h>
 
-#define BT_ISO_DATA_PATH_DISABLED			0xFF
+#define BT_ISO_DATA_PATH_DISABLED 0xFF
 
 struct iso_data {
 	/** BT_BUF_ISO_IN */
-	uint8_t  type;
+	uint8_t type;
 
 	/* Index into the bt_conn storage array */
-	uint8_t  index;
+	uint8_t index;
 
 	/** ISO connection handle */
 	uint16_t handle;
@@ -62,13 +62,13 @@ struct net_buf *bt_iso_create_pdu_timeout_debug(struct net_buf_pool *pool,
 						size_t reserve,
 						k_timeout_t timeout,
 						const char *func, int line);
-#define bt_iso_create_pdu_timeout(_pool, _reserve, _timeout) \
-	bt_iso_create_pdu_timeout_debug(_pool, _reserve, _timeout, \
-					__func__, __LINE__)
+#define bt_iso_create_pdu_timeout(_pool, _reserve, _timeout)                 \
+	bt_iso_create_pdu_timeout_debug(_pool, _reserve, _timeout, __func__, \
+					__LINE__)
 
-#define bt_iso_create_pdu(_pool, _reserve) \
-	bt_iso_create_pdu_timeout_debug(_pool, _reserve, K_FOREVER, \
-					__func__, __line__)
+#define bt_iso_create_pdu(_pool, _reserve)                                    \
+	bt_iso_create_pdu_timeout_debug(_pool, _reserve, K_FOREVER, __func__, \
+					__line__)
 #else
 struct net_buf *bt_iso_create_pdu_timeout(struct net_buf_pool *pool,
 					  size_t reserve, k_timeout_t timeout);
@@ -84,12 +84,11 @@ struct net_buf *bt_iso_create_frag_timeout_debug(size_t reserve,
 						 const char *func, int line);
 
 #define bt_iso_create_frag_timeout(_reserve, _timeout) \
-	bt_iso_create_frag_timeout_debug(_reserve, _timeout, \
-					 __func__, __LINE__)
+	bt_iso_create_frag_timeout_debug(_reserve, _timeout, __func__, __LINE__)
 
-#define bt_iso_create_frag(_reserve) \
-	bt_iso_create_frag_timeout_debug(_reserve, K_FOREVER, \
-					 __func__, __LINE__)
+#define bt_iso_create_frag(_reserve)                                    \
+	bt_iso_create_frag_timeout_debug(_reserve, K_FOREVER, __func__, \
+					 __LINE__)
 #else
 struct net_buf *bt_iso_create_frag_timeout(size_t reserve, k_timeout_t timeout);
 

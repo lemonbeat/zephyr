@@ -24,7 +24,6 @@
 #include <nrfx_usbd.h>
 #include <nrfx_power.h>
 
-
 #define LOG_LEVEL CONFIG_USB_DRIVER_LOG_LEVEL
 #include <logging/log.h>
 LOG_MODULE_REGISTER(usb_nrfx);
@@ -82,7 +81,6 @@ struct nrf_usbd_ep_cfg {
 	bool en;
 	uint8_t addr;
 	enum usb_dc_ep_transfer_type type;
-
 };
 
 /**
@@ -169,9 +167,9 @@ struct usbd_event {
  * be derived from the theoretical number of backlog events possible depending
  * on the number of endpoints configured.
  */
-#define FIFO_ELEM_MIN_SZ        sizeof(struct usbd_event)
-#define FIFO_ELEM_MAX_SZ        sizeof(struct usbd_event)
-#define FIFO_ELEM_ALIGN         sizeof(unsigned int)
+#define FIFO_ELEM_MIN_SZ sizeof(struct usbd_event)
+#define FIFO_ELEM_MAX_SZ sizeof(struct usbd_event)
+#define FIFO_ELEM_ALIGN sizeof(unsigned int)
 
 #if CONFIG_USB_NRFX_EVT_QUEUE_SIZE < 4
 #error Invalid USBD event queue size (CONFIG_USB_NRFX_EVT_QUEUE_SIZE).
@@ -187,12 +185,14 @@ K_MEM_POOL_DEFINE(fifo_elem_pool, FIFO_ELEM_MIN_SZ, FIFO_ELEM_MAX_SZ,
  */
 
 /** Number of IN Endpoints configured (including control) */
-#define CFG_EPIN_CNT (DT_INST_PROP(0, num_in_endpoints) +	\
-		      DT_INST_PROP(0, num_bidir_endpoints))
+#define CFG_EPIN_CNT                         \
+	(DT_INST_PROP(0, num_in_endpoints) + \
+	 DT_INST_PROP(0, num_bidir_endpoints))
 
 /** Number of OUT Endpoints configured (including control) */
-#define CFG_EPOUT_CNT (DT_INST_PROP(0, num_out_endpoints) +	\
-		       DT_INST_PROP(0, num_bidir_endpoints))
+#define CFG_EPOUT_CNT                         \
+	(DT_INST_PROP(0, num_out_endpoints) + \
+	 DT_INST_PROP(0, num_bidir_endpoints))
 
 /** Number of ISO IN Endpoints */
 #define CFG_EP_ISOIN_CNT DT_INST_PROP(0, num_isoin_endpoints)
@@ -204,8 +204,8 @@ K_MEM_POOL_DEFINE(fifo_elem_pool, FIFO_ELEM_MIN_SZ, FIFO_ELEM_MAX_SZ,
 #define EP_ISOIN_INDEX CFG_EPIN_CNT
 #define EP_ISOOUT_INDEX (CFG_EPIN_CNT + CFG_EP_ISOIN_CNT + CFG_EPOUT_CNT)
 
-#define EP_BUF_MAX_SZ		64UL
-#define ISO_EP_BUF_MAX_SZ	1024UL
+#define EP_BUF_MAX_SZ 64UL
+#define ISO_EP_BUF_MAX_SZ 1024UL
 
 /** Minimum endpoint buffer size (minimum block size) */
 #define EP_BUF_POOL_BLOCK_MIN_SZ EP_BUF_MAX_SZ
@@ -218,18 +218,19 @@ K_MEM_POOL_DEFINE(fifo_elem_pool, FIFO_ELEM_MIN_SZ, FIFO_ELEM_MAX_SZ,
 #endif
 
 /** Total endpoints configured */
-#define CFG_EP_CNT (CFG_EPIN_CNT + CFG_EP_ISOIN_CNT + \
-		    CFG_EPOUT_CNT + CFG_EP_ISOOUT_CNT)
+#define CFG_EP_CNT \
+	(CFG_EPIN_CNT + CFG_EP_ISOIN_CNT + CFG_EPOUT_CNT + CFG_EP_ISOOUT_CNT)
 
 /** Total buffer size for all endpoints */
-#define EP_BUF_TOTAL ((CFG_EPIN_CNT * EP_BUF_MAX_SZ) +	       \
-		      (CFG_EPOUT_CNT * EP_BUF_MAX_SZ) +	       \
-		      (CFG_EP_ISOIN_CNT * ISO_EP_BUF_MAX_SZ) + \
-		      (CFG_EP_ISOOUT_CNT * ISO_EP_BUF_MAX_SZ))
+#define EP_BUF_TOTAL                                                        \
+	((CFG_EPIN_CNT * EP_BUF_MAX_SZ) + (CFG_EPOUT_CNT * EP_BUF_MAX_SZ) + \
+	 (CFG_EP_ISOIN_CNT * ISO_EP_BUF_MAX_SZ) +                           \
+	 (CFG_EP_ISOOUT_CNT * ISO_EP_BUF_MAX_SZ))
 
 /** Total number of maximum sized buffers needed */
-#define EP_BUF_POOL_BLOCK_COUNT ((EP_BUF_TOTAL / EP_BUF_POOL_BLOCK_MAX_SZ) + \
-		      ((EP_BUF_TOTAL % EP_BUF_POOL_BLOCK_MAX_SZ) ? 1 : 0))
+#define EP_BUF_POOL_BLOCK_COUNT                      \
+	((EP_BUF_TOTAL / EP_BUF_POOL_BLOCK_MAX_SZ) + \
+	 ((EP_BUF_TOTAL % EP_BUF_POOL_BLOCK_MAX_SZ) ? 1 : 0))
 
 /** 4 Byte Buffer alignment required by hardware */
 #define EP_BUF_POOL_ALIGNMENT sizeof(unsigned int)
@@ -261,14 +262,13 @@ struct nrf_usbd_ctx {
 	bool attached;
 	bool ready;
 
-	struct k_work  usb_work;
+	struct k_work usb_work;
 	struct k_mutex drv_lock;
 
 	struct nrf_usbd_ep_ctx ep_ctx[CFG_EP_CNT];
 
 	uint16_t ctrl_read_len;
 };
-
 
 /* FIFO used for queuing up events from ISR. */
 K_FIFO_DEFINE(usbd_evt_fifo);
@@ -284,7 +284,6 @@ K_FIFO_DEFINE(usbd_evt_fifo);
 static struct k_work_q usbd_work_queue;
 static K_KERNEL_STACK_DEFINE(usbd_work_queue_stack,
 			     CONFIG_USB_NRFX_WORK_QUEUE_STACK_SIZE);
-
 
 static struct nrf_usbd_ctx usbd_ctx = {
 	.attached = false,
@@ -367,8 +366,7 @@ static struct nrf_usbd_ep_ctx *endpoint_ctx(const uint8_t ep)
 		if (unlikely(NRF_USBD_EPISO_CHECK(ep))) {
 			return &ctx->ep_ctx[EP_ISOOUT_INDEX];
 		} else {
-			return &ctx->ep_ctx[CFG_EPIN_CNT +
-					    CFG_EP_ISOIN_CNT +
+			return &ctx->ep_ctx[CFG_EPIN_CNT + CFG_EP_ISOIN_CNT +
 					    ep_num];
 		}
 	}
@@ -455,8 +453,7 @@ static inline struct usbd_event *usbd_evt_alloc(void)
 	struct k_mem_block block;
 
 	ret = k_mem_pool_alloc(&fifo_elem_pool, &block,
-			       sizeof(struct usbd_event),
-			       K_NO_WAIT);
+			       sizeof(struct usbd_event), K_NO_WAIT);
 
 	if (ret < 0) {
 		LOG_ERR("USBD event allocation failed!");
@@ -470,8 +467,7 @@ static inline struct usbd_event *usbd_evt_alloc(void)
 		usbd_evt_flush();
 
 		ret = k_mem_pool_alloc(&fifo_elem_pool, &block,
-					       sizeof(struct usbd_event),
-					       K_NO_WAIT);
+				       sizeof(struct usbd_event), K_NO_WAIT);
 		if (ret < 0) {
 			LOG_ERR("USBD event memory corrupted");
 			__ASSERT_NO_MSG(0);
@@ -520,7 +516,6 @@ static void usb_dc_power_event_handler(nrfx_power_usb_evt_t event)
 
 	ev->evt_type = USBD_EVT_POWER;
 	ev->evt.pwr_evt.state = new_state;
-
 
 	usbd_evt_put(ev);
 
@@ -605,7 +600,7 @@ static void ep_ctx_reset(struct nrf_usbd_ep_ctx *ep_ctx)
 {
 	ep_ctx->buf.data = ep_ctx->buf.block.data;
 	ep_ctx->buf.curr = ep_ctx->buf.data;
-	ep_ctx->buf.len  = 0U;
+	ep_ctx->buf.len = 0U;
 
 	/* Abort ongoing write operation. */
 	if (ep_ctx->write_in_progress) {
@@ -668,8 +663,7 @@ static int eps_ctx_init(void)
 
 		if (!ep_ctx->buf.block.data) {
 			err = k_mem_pool_alloc(&ep_buf_pool, &ep_ctx->buf.block,
-					       ISO_EP_BUF_MAX_SZ,
-					       K_NO_WAIT);
+					       ISO_EP_BUF_MAX_SZ, K_NO_WAIT);
 			if (err < 0) {
 				LOG_ERR("EP buffer alloc failed for ISOIN");
 				return -ENOMEM;
@@ -685,8 +679,7 @@ static int eps_ctx_init(void)
 
 		if (!ep_ctx->buf.block.data) {
 			err = k_mem_pool_alloc(&ep_buf_pool, &ep_ctx->buf.block,
-					       ISO_EP_BUF_MAX_SZ,
-					       K_NO_WAIT);
+					       ISO_EP_BUF_MAX_SZ, K_NO_WAIT);
 			if (err < 0) {
 				LOG_ERR("EP buffer alloc failed for ISOOUT");
 				return -ENOMEM;
@@ -823,8 +816,7 @@ static inline void usbd_work_process_setup(struct nrf_usbd_ep_ctx *ep_ctx)
 	LOG_DBG("SETUP: bR:0x%02x bmRT:0x%02x wV:0x%04x wI:0x%04x wL:%d",
 		(uint32_t)usbd_setup->bRequest,
 		(uint32_t)usbd_setup->bmRequestType,
-		(uint32_t)usbd_setup->wValue,
-		(uint32_t)usbd_setup->wIndex,
+		(uint32_t)usbd_setup->wValue, (uint32_t)usbd_setup->wIndex,
 		(uint32_t)usbd_setup->wLength);
 
 	/* Inform the stack. */
@@ -832,9 +824,9 @@ static inline void usbd_work_process_setup(struct nrf_usbd_ep_ctx *ep_ctx)
 
 	struct nrf_usbd_ctx *ctx = get_usbd_ctx();
 
-	if ((REQTYPE_GET_DIR(usbd_setup->bmRequestType)
-	     == REQTYPE_DIR_TO_DEVICE)
-	    && (usbd_setup->wLength)) {
+	if ((REQTYPE_GET_DIR(usbd_setup->bmRequestType) ==
+	     REQTYPE_DIR_TO_DEVICE) &&
+	    (usbd_setup->wLength)) {
 		ctx->ctrl_read_len = usbd_setup->wLength;
 		/* Allow data chunk on EP0 OUT */
 		nrfx_usbd_setup_data_clear();
@@ -857,8 +849,7 @@ static inline void usbd_work_process_recvreq(struct nrf_usbd_ctx *ctx,
 	ep_ctx->read_complete = false;
 
 	k_mutex_lock(&ctx->drv_lock, K_FOREVER);
-	NRFX_USBD_TRANSFER_OUT(transfer, ep_ctx->buf.data,
-			       ep_ctx->cfg.max_sz);
+	NRFX_USBD_TRANSFER_OUT(transfer, ep_ctx->buf.data, ep_ctx->cfg.max_sz);
 	nrfx_err_t err = nrfx_usbd_ep_transfer(
 		ep_addr_to_nrfx(ep_ctx->cfg.addr), &transfer);
 	if (err != NRFX_SUCCESS) {
@@ -866,7 +857,6 @@ static inline void usbd_work_process_recvreq(struct nrf_usbd_ctx *ctx,
 	}
 	k_mutex_unlock(&ctx->drv_lock);
 }
-
 
 static inline void usbd_work_process_ep_events(struct usbd_ep_event *ep_evt)
 {
@@ -885,13 +875,12 @@ static inline void usbd_work_process_ep_events(struct usbd_ep_event *ep_evt)
 		break;
 
 	case EP_EVT_RECV_COMPLETE:
-		ep_ctx->cfg.cb(ep_ctx->cfg.addr,
-			       USB_DC_EP_DATA_OUT);
+		ep_ctx->cfg.cb(ep_ctx->cfg.addr, USB_DC_EP_DATA_OUT);
 		break;
 
 	case EP_EVT_WRITE_COMPLETE:
-		if ((ep_ctx->cfg.type == USB_DC_EP_CONTROL)
-		    && (!ep_ctx->write_fragmented)) {
+		if ((ep_ctx->cfg.type == USB_DC_EP_CONTROL) &&
+		    (!ep_ctx->write_fragmented)) {
 			/* Trigger the hardware to perform
 			 * status stage, but only if there is
 			 * no more data to send (IN transfer
@@ -901,8 +890,7 @@ static inline void usbd_work_process_ep_events(struct usbd_ep_event *ep_evt)
 			nrfx_usbd_setup_clear();
 			k_mutex_unlock(&ctx->drv_lock);
 		}
-		ep_ctx->cfg.cb(ep_ctx->cfg.addr,
-			       USB_DC_EP_DATA_IN);
+		ep_ctx->cfg.cb(ep_ctx->cfg.addr, USB_DC_EP_DATA_IN);
 		break;
 	default:
 		break;
@@ -931,15 +919,13 @@ static void usbd_event_transfer_ctrl(nrfx_usbd_evt_t const *const p_event)
 			LOG_DBG("ctrl write complete");
 			usbd_evt_put(ev);
 			usbd_work_schedule();
-		}
-		break;
+		} break;
 
 		default: {
 			LOG_ERR("Unexpected event (nrfx_usbd): %d, ep 0x%02x",
 				p_event->data.eptransfer.status,
 				p_event->data.eptransfer.ep);
-		}
-		break;
+		} break;
 		}
 	} else {
 		switch (p_event->data.eptransfer.status) {
@@ -959,8 +945,7 @@ static void usbd_event_transfer_ctrl(nrfx_usbd_evt_t const *const p_event)
 
 			usbd_evt_put(ev);
 			usbd_work_schedule();
-		}
-		break;
+		} break;
 
 		case NRFX_USBD_EP_OK: {
 			struct nrf_usbd_ctx *ctx = get_usbd_ctx();
@@ -995,15 +980,13 @@ static void usbd_event_transfer_ctrl(nrfx_usbd_evt_t const *const p_event)
 
 			usbd_evt_put(ev);
 			usbd_work_schedule();
-		}
-		break;
+		} break;
 
 		default: {
 			LOG_ERR("Unexpected event (nrfx_usbd): %d, ep 0x%02x",
 				p_event->data.eptransfer.status,
 				p_event->data.eptransfer.ep);
-		}
-		break;
+		} break;
 		}
 	}
 }
@@ -1031,21 +1014,18 @@ static void usbd_event_transfer_data(nrfx_usbd_evt_t const *const p_event)
 			ev->evt.ep_evt.ep = ep_ctx;
 			usbd_evt_put(ev);
 			usbd_work_schedule();
-		}
-		break;
+		} break;
 
 		case NRFX_USBD_EP_ABORTED: {
 			LOG_DBG("Endpoint 0x%02x write aborted",
 				p_event->data.eptransfer.ep);
-		}
-		break;
+		} break;
 
 		default: {
 			LOG_ERR("Unexpected event (nrfx_usbd): %d, ep 0x%02x",
 				p_event->data.eptransfer.status,
 				p_event->data.eptransfer.ep);
-		}
-		break;
+		} break;
 		}
 
 	} else {
@@ -1067,8 +1047,7 @@ static void usbd_event_transfer_data(nrfx_usbd_evt_t const *const p_event)
 
 			usbd_evt_put(ev);
 			usbd_work_schedule();
-		}
-		break;
+		} break;
 
 		case NRFX_USBD_EP_OK: {
 			struct usbd_event *ev = usbd_evt_alloc();
@@ -1077,8 +1056,8 @@ static void usbd_event_transfer_data(nrfx_usbd_evt_t const *const p_event)
 				return;
 			}
 
-			ep_ctx->buf.len = nrf_usbd_ep_amount_get(NRF_USBD,
-				p_event->data.eptransfer.ep);
+			ep_ctx->buf.len = nrf_usbd_ep_amount_get(
+				NRF_USBD, p_event->data.eptransfer.ep);
 
 			LOG_DBG("read complete, ep 0x%02x, len %d",
 				(uint32_t)p_event->data.eptransfer.ep,
@@ -1090,15 +1069,13 @@ static void usbd_event_transfer_data(nrfx_usbd_evt_t const *const p_event)
 
 			usbd_evt_put(ev);
 			usbd_work_schedule();
-		}
-		break;
+		} break;
 
 		default: {
 			LOG_ERR("Unexpected event (nrfx_usbd): %d, ep 0x%02x",
 				p_event->data.eptransfer.status,
 				p_event->data.eptransfer.ep);
-		}
-		break;
+		} break;
 		}
 	}
 }
@@ -1109,7 +1086,7 @@ static void usbd_event_transfer_data(nrfx_usbd_evt_t const *const p_event)
 static void usbd_event_handler(nrfx_usbd_evt_t const *const p_event)
 {
 	struct nrf_usbd_ep_ctx *ep_ctx;
-	struct usbd_event evt = {0};
+	struct usbd_event evt = { 0 };
 	bool put_evt = false;
 
 	switch (p_event->type) {
@@ -1164,9 +1141,9 @@ static void usbd_event_handler(nrfx_usbd_evt_t const *const p_event)
 		nrfx_usbd_setup_t drv_setup;
 
 		nrfx_usbd_setup_get(&drv_setup);
-		if ((drv_setup.bRequest != REQ_SET_ADDRESS)
-		    || (REQTYPE_GET_TYPE(drv_setup.bmRequestType)
-			!= REQTYPE_TYPE_STANDARD)) {
+		if ((drv_setup.bRequest != REQ_SET_ADDRESS) ||
+		    (REQTYPE_GET_TYPE(drv_setup.bmRequestType) !=
+		     REQTYPE_TYPE_STANDARD)) {
 			/* SetAddress is habdled by USBD hardware.
 			 * No software action required.
 			 */
@@ -1307,16 +1284,16 @@ static void usbd_work_handler(struct k_work *item)
 			}
 			break;
 		case USBD_EVT_REINIT: {
-				/*
+			/*
 				 * Reinitialize the peripheral after queue
 				 * overflow.
 				 */
-				LOG_ERR("USBD event queue full!");
-				usbd_reinit();
-				break;
-			}
+			LOG_ERR("USBD event queue full!");
+			usbd_reinit();
+			break;
+		}
 		default:
-			LOG_ERR("Unknown USBD event: %"PRId16, ev->evt_type);
+			LOG_ERR("Unknown USBD event: %" PRId16, ev->evt_type);
 			break;
 		}
 		usbd_evt_free(ev);
@@ -1333,21 +1310,18 @@ int usb_dc_attach(void)
 		return 0;
 	}
 
-	k_work_q_start(&usbd_work_queue,
-		       usbd_work_queue_stack,
+	k_work_q_start(&usbd_work_queue, usbd_work_queue_stack,
 		       K_KERNEL_STACK_SIZEOF(usbd_work_queue_stack),
 		       CONFIG_SYSTEM_WORKQUEUE_PRIORITY);
 
 	k_work_init(&ctx->usb_work, usbd_work_handler);
 	k_mutex_init(&ctx->drv_lock);
-	ctx->hfxo_mgr =
-		z_nrf_clock_control_get_onoff(
-			COND_CODE_1(NRF_CLOCK_HAS_HFCLK192M,
-				    (CLOCK_CONTROL_NRF_SUBSYS_HF192M),
-				    (CLOCK_CONTROL_NRF_SUBSYS_HF)));
+	ctx->hfxo_mgr = z_nrf_clock_control_get_onoff(COND_CODE_1(
+		NRF_CLOCK_HAS_HFCLK192M, (CLOCK_CONTROL_NRF_SUBSYS_HF192M),
+		(CLOCK_CONTROL_NRF_SUBSYS_HF)));
 
-	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
-		    nrfx_isr, nrfx_usbd_irq_handler, 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), nrfx_isr,
+		    nrfx_usbd_irq_handler, 0);
 
 	err = nrfx_usbd_init(usbd_event_handler);
 
@@ -1449,7 +1423,6 @@ int usb_dc_set_address(const uint8_t addr)
 
 	return 0;
 }
-
 
 int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data *const ep_cfg)
 {
@@ -1553,7 +1526,6 @@ int usb_dc_ep_set_stall(const uint8_t ep)
 
 int usb_dc_ep_clear_stall(const uint8_t ep)
 {
-
 	struct nrf_usbd_ep_ctx *ep_ctx;
 
 	if (!dev_attached() || !dev_ready()) {
@@ -1599,7 +1571,7 @@ int usb_dc_ep_is_stalled(const uint8_t ep, uint8_t *const stalled)
 		return -EINVAL;
 	}
 
-	*stalled = (uint8_t) nrfx_usbd_ep_stall_check(ep_addr_to_nrfx(ep));
+	*stalled = (uint8_t)nrfx_usbd_ep_stall_check(ep_addr_to_nrfx(ep));
 
 	return 0;
 }
@@ -1748,8 +1720,8 @@ int usb_dc_ep_write(const uint8_t ep, const uint8_t *const data,
 	 * Detect the setup stage initiated by the stack
 	 * and perform appropriate action.
 	 */
-	if ((ep_ctx->cfg.type == USB_DC_EP_CONTROL)
-	    && (nrfx_usbd_last_setup_dir_get() != ep)) {
+	if ((ep_ctx->cfg.type == USB_DC_EP_CONTROL) &&
+	    (nrfx_usbd_last_setup_dir_get() != ep)) {
 		nrfx_usbd_setup_clear();
 		k_mutex_unlock(&ctx->drv_lock);
 		return 0;
@@ -1945,8 +1917,8 @@ static int usb_init(const struct device *arg)
 	 * USB events are handled by CLOCK interrupt handler.
 	 */
 	IRQ_CONNECT(USBREGULATOR_IRQn,
-		    DT_IRQ(DT_INST(0, nordic_nrf_clock), priority),
-		    nrfx_isr, nrfx_usbreg_irq_handler, 0);
+		    DT_IRQ(DT_INST(0, nordic_nrf_clock), priority), nrfx_isr,
+		    nrfx_usbreg_irq_handler, 0);
 	irq_enable(USBREGULATOR_IRQn);
 #endif
 

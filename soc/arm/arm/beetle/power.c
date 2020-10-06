@@ -12,51 +12,52 @@
 #include <arch/cpu.h>
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(gpio0), okay)
-#define CLK_BIT_GPIO0	_BEETLE_GPIO0
+#define CLK_BIT_GPIO0 _BEETLE_GPIO0
 #else
-#define CLK_BIT_GPIO0	0
+#define CLK_BIT_GPIO0 0
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(gpio1), okay)
-#define CLK_BIT_GPIO1	_BEETLE_GPIO1
+#define CLK_BIT_GPIO1 _BEETLE_GPIO1
 #else
-#define CLK_BIT_GPIO1	0
+#define CLK_BIT_GPIO1 0
 #endif
 
 #define AHB_CLK_BITS (CLK_BIT_GPIO0 | CLK_BIT_GPIO1)
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(timer0), okay)
-#define CLK_BIT_TIMER0	_BEETLE_TIMER0
+#define CLK_BIT_TIMER0 _BEETLE_TIMER0
 #else
-#define CLK_BIT_TIMER0	0
+#define CLK_BIT_TIMER0 0
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(timer1), okay)
-#define CLK_BIT_TIMER1	_BEETLE_TIMER1
+#define CLK_BIT_TIMER1 _BEETLE_TIMER1
 #else
-#define CLK_BIT_TIMER1	0
+#define CLK_BIT_TIMER1 0
 #endif
 
 #ifdef CONFIG_RUNTIME_NMI
-#define CLK_BIT_WDOG	_BEETLE_WDOG
+#define CLK_BIT_WDOG _BEETLE_WDOG
 #else
-#define CLK_BIT_WDOG	0
+#define CLK_BIT_WDOG 0
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart0), okay)
-#define CLK_BIT_UART0	_BEETLE_UART0
+#define CLK_BIT_UART0 _BEETLE_UART0
 #else
-#define CLK_BIT_UART0	0
+#define CLK_BIT_UART0 0
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart1), okay)
-#define CLK_BIT_UART1	_BEETLE_UART1
+#define CLK_BIT_UART1 _BEETLE_UART1
 #else
-#define CLK_BIT_UART1	0
+#define CLK_BIT_UART1 0
 #endif
 
-#define APB_CLK_BITS (CLK_BIT_TIMER0 | CLK_BIT_TIMER1 \
-		| CLK_BIT_WDOG | CLK_BIT_UART0 | CLK_BIT_UART1)
+#define APB_CLK_BITS                                                      \
+	(CLK_BIT_TIMER0 | CLK_BIT_TIMER1 | CLK_BIT_WDOG | CLK_BIT_UART0 | \
+	 CLK_BIT_UART1)
 
 /**
  * @brief Setup various clock on SoC in active state.

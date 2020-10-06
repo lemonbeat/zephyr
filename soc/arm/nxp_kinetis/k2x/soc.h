@@ -26,8 +26,8 @@ extern "C" {
 /* default system clock */
 
 #define SYSCLK_DEFAULT_IOSC_HZ MHZ(120)
-#define BUSCLK_DEFAULT_IOSC_HZ (SYSCLK_DEFAULT_IOSC_HZ / \
-				CONFIG_K22_BUS_CLOCK_DIVIDER)
+#define BUSCLK_DEFAULT_IOSC_HZ \
+	(SYSCLK_DEFAULT_IOSC_HZ / CONFIG_K22_BUS_CLOCK_DIVIDER)
 
 /* address bases */
 

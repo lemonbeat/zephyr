@@ -54,9 +54,9 @@ void posix_flush_stdout(void)
 
 #if defined(CONFIG_NATIVE_POSIX_STDIN_CONSOLE)
 
-#define VALID_DIRECTIVES \
+#define VALID_DIRECTIVES                            \
 	"Valid native console driver directives:\n" \
-	"  !wait %%u\n" \
+	"  !wait %%u\n"                             \
 	"  !quit\n"
 
 static struct k_fifo *avail_queue;
@@ -93,7 +93,7 @@ static inline void found_eof(void)
  */
 static int catch_directive(char *s, int32_t *towait)
 {
-	while (*s != 0  && isspace(*s)) {
+	while (*s != 0 && isspace(*s)) {
 		s++;
 	}
 
@@ -131,12 +131,12 @@ static int stdin_not_ready(void)
 	struct timeval timeout;
 
 	timeout.tv_usec = 0;
-	timeout.tv_sec  = 0;
+	timeout.tv_sec = 0;
 
 	FD_ZERO(&readfds);
 	FD_SET(STDIN_FILENO, &readfds);
 
-	ready = select(STDIN_FILENO+1, &readfds, NULL, NULL, &timeout);
+	ready = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
 
 	if (ready == 0) {
 		return 1;
@@ -268,4 +268,4 @@ static int native_posix_console_init(const struct device *arg)
 }
 
 SYS_INIT(native_posix_console_init, PRE_KERNEL_1,
-	CONFIG_NATIVE_POSIX_CONSOLE_INIT_PRIORITY);
+	 CONFIG_NATIVE_POSIX_CONSOLE_INIT_PRIORITY);

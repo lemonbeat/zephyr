@@ -93,22 +93,22 @@ static const struct dac_driver_api api_sam0_driver_api = {
 	.write_value = dac_sam0_write_value
 };
 
-#define SAM0_DAC_REFSEL(n)						       \
-	COND_CODE_1(DT_INST_NODE_HAS_PROP(n, reference),		       \
+#define SAM0_DAC_REFSEL(n)                               \
+	COND_CODE_1(DT_INST_NODE_HAS_PROP(n, reference), \
 		    (DT_ENUM_IDX(DT_DRV_INST(n), reference)), (0))
 
-#define SAM0_DAC_INIT(n)						       \
-	static const struct dac_sam0_cfg dac_sam0_cfg_##n = {		       \
-		.regs = (Dac *)DT_INST_REG_ADDR(n),			       \
-		.pm_apbc_bit = DT_INST_CLOCKS_CELL_BY_NAME(n, pm, bit),	       \
-		.gclk_clkctrl_id =					       \
-			DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, clkctrl_id),      \
-		.refsel = UTIL_CAT(SAM0_DAC_REFSEL_, SAM0_DAC_REFSEL(n)),      \
-	};								       \
-									       \
-	DEVICE_AND_API_INIT(dac_##n, DT_INST_LABEL(n), &dac_sam0_init, NULL,   \
-			    &dac_sam0_cfg_##n, POST_KERNEL,		       \
-			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	       \
+#define SAM0_DAC_INIT(n)                                                     \
+	static const struct dac_sam0_cfg dac_sam0_cfg_##n = {                \
+		.regs = (Dac *)DT_INST_REG_ADDR(n),                          \
+		.pm_apbc_bit = DT_INST_CLOCKS_CELL_BY_NAME(n, pm, bit),      \
+		.gclk_clkctrl_id =                                           \
+			DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, clkctrl_id),    \
+		.refsel = UTIL_CAT(SAM0_DAC_REFSEL_, SAM0_DAC_REFSEL(n)),    \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(dac_##n, DT_INST_LABEL(n), &dac_sam0_init, NULL, \
+			    &dac_sam0_cfg_##n, POST_KERNEL,                  \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,             \
 			    &api_sam0_driver_api)
 
 DT_INST_FOREACH_STATUS_OKAY(SAM0_DAC_INIT);

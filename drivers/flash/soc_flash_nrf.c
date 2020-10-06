@@ -33,10 +33,10 @@
 #define SOC_NV_FLASH_NODE DT_INST(0, soc_nv_flash)
 
 #ifndef CONFIG_SOC_FLASH_NRF_RADIO_SYNC_NONE
-#define FLASH_SLOT_WRITE     7500
+#define FLASH_SLOT_WRITE 7500
 #if defined(CONFIG_SOC_FLASH_NRF_PARTIAL_ERASE)
-#define FLASH_SLOT_ERASE (MAX(CONFIG_SOC_FLASH_NRF_PARTIAL_ERASE_MS * 1000, \
-			      7500))
+#define FLASH_SLOT_ERASE \
+	(MAX(CONFIG_SOC_FLASH_NRF_PARTIAL_ERASE_MS * 1000, 7500))
 #else
 #define FLASH_SLOT_ERASE FLASH_PAGE_ERASE_MAX_TIME_US
 #endif /* CONFIG_SOC_FLASH_NRF_PARTIAL_ERASE */
@@ -69,7 +69,6 @@ static struct k_sem sem_lock;
 #define SYNC_UNLOCK()
 #endif
 
-
 static int write(off_t addr, const void *data, size_t len);
 static int erase(uint32_t addr, uint32_t size);
 
@@ -82,9 +81,7 @@ static inline bool is_regular_addr_valid(off_t addr, size_t len)
 {
 	size_t flash_size = nrfx_nvmc_flash_size_get();
 
-	if (addr >= flash_size ||
-	    addr < 0 ||
-	    len > flash_size ||
+	if (addr >= flash_size || addr < 0 || len > flash_size ||
 	    (addr) + len > flash_size) {
 		return false;
 	}
@@ -92,13 +89,11 @@ static inline bool is_regular_addr_valid(off_t addr, size_t len)
 	return true;
 }
 
-
 static inline bool is_uicr_addr_valid(off_t addr, size_t len)
 {
 #ifdef CONFIG_SOC_FLASH_NRF_UICR
 	if (addr >= (off_t)NRF_UICR + sizeof(*NRF_UICR) ||
-	    addr < (off_t)NRF_UICR ||
-	    len > sizeof(*NRF_UICR) ||
+	    addr < (off_t)NRF_UICR || len > sizeof(*NRF_UICR) ||
 	    addr + len > (off_t)NRF_UICR + sizeof(*NRF_UICR)) {
 		return false;
 	}
@@ -115,8 +110,8 @@ static void nvmc_wait_ready(void)
 	}
 }
 
-static int flash_nrf_read(const struct device *dev, off_t addr,
-			    void *data, size_t len)
+static int flash_nrf_read(const struct device *dev, off_t addr, void *data,
+			  size_t len)
 {
 	if (is_regular_addr_valid(addr, len)) {
 		addr += DT_REG_ADDR(SOC_NV_FLASH_NODE);
@@ -134,7 +129,7 @@ static int flash_nrf_read(const struct device *dev, off_t addr,
 }
 
 static int flash_nrf_write(const struct device *dev, off_t addr,
-			     const void *data, size_t len)
+			   const void *data, size_t len)
 {
 	int ret;
 
@@ -222,8 +217,8 @@ static int flash_nrf_write_protection(const struct device *dev, bool enable)
 static struct flash_pages_layout dev_layout;
 
 static void flash_nrf_pages_layout(const struct device *dev,
-				     const struct flash_pages_layout **layout,
-				     size_t *layout_size)
+				   const struct flash_pages_layout **layout,
+				   size_t *layout_size)
 {
 	*layout = &dev_layout;
 	*layout_size = 1;
@@ -265,9 +260,9 @@ static int nrf_flash_init(const struct device *dev)
 	return 0;
 }
 
-DEVICE_AND_API_INIT(nrf_flash, DT_INST_LABEL(0), nrf_flash_init,
-		NULL, NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		&flash_nrf_api);
+DEVICE_AND_API_INIT(nrf_flash, DT_INST_LABEL(0), nrf_flash_init, NULL, NULL,
+		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &flash_nrf_api);
 
 #ifndef CONFIG_SOC_FLASH_NRF_RADIO_SYNC_NONE
 
@@ -282,10 +277,8 @@ static int erase_synchronously(uint32_t addr, uint32_t size)
 #endif
 	};
 
-	struct flash_op_desc flash_op_desc = {
-		.handler = erase_op,
-		.context = &context
-	};
+	struct flash_op_desc flash_op_desc = { .handler = erase_op,
+					       .context = &context };
 
 	nrf_flash_sync_set_context(FLASH_SLOT_ERASE);
 	return nrf_flash_sync_exe(&flash_op_desc);
@@ -294,16 +287,14 @@ static int erase_synchronously(uint32_t addr, uint32_t size)
 static int write_synchronously(off_t addr, const void *data, size_t len)
 {
 	struct flash_context context = {
-		.data_addr = (uint32_t) data,
+		.data_addr = (uint32_t)data,
 		.flash_addr = addr,
 		.len = len,
 		.enable_time_limit = 1 /* enable time limit */
 	};
 
-	struct flash_op_desc flash_op_desc = {
-		.handler = write_op,
-		.context = &context
-	};
+	struct flash_op_desc flash_op_desc = { .handler = write_op,
+					       .context = &context };
 
 	nrf_flash_sync_set_context(FLASH_SLOT_WRITE);
 	return nrf_flash_sync_exe(&flash_op_desc);
@@ -332,10 +323,10 @@ static int erase_op(void *context)
 #endif
 
 	do {
-
 #if defined(CONFIG_SOC_FLASH_NRF_PARTIAL_ERASE)
 		if (e_ctx->flash_addr == e_ctx->flash_addr_next) {
-			nrfx_nvmc_page_partial_erase_init(e_ctx->flash_addr,
+			nrfx_nvmc_page_partial_erase_init(
+				e_ctx->flash_addr,
 				CONFIG_SOC_FLASH_NRF_PARTIAL_ERASE_MS);
 			e_ctx->flash_addr_next += pg_size;
 		}
@@ -357,7 +348,6 @@ static int erase_op(void *context)
 			if (nrf_flash_sync_check_time_limit(i)) {
 				break;
 			}
-
 		}
 #endif /* !CONFIG_SOC_FLASH_NRF_RADIO_SYNC_NONE */
 
@@ -394,8 +384,7 @@ static int write_op(void *context)
 		}
 
 		nrfx_nvmc_bytes_write(w_ctx->flash_addr,
-				      (const void *)w_ctx->data_addr,
-				      count);
+				      (const void *)w_ctx->data_addr, count);
 
 		shift_write_context(count, w_ctx);
 
@@ -411,8 +400,9 @@ static int write_op(void *context)
 #endif /* CONFIG_SOC_FLASH_NRF_EMULATE_ONE_BYTE_WRITE_ACCESS */
 	/* Write all the 4-byte aligned data */
 	while (w_ctx->len >= sizeof(uint32_t)) {
-		nrfx_nvmc_word_write(w_ctx->flash_addr,
-				     UNALIGNED_GET((uint32_t *)w_ctx->data_addr));
+		nrfx_nvmc_word_write(
+			w_ctx->flash_addr,
+			UNALIGNED_GET((uint32_t *)w_ctx->data_addr));
 
 		shift_write_context(sizeof(uint32_t), w_ctx);
 
@@ -455,13 +445,13 @@ static int erase(uint32_t addr, uint32_t size)
 #endif
 	};
 
-	return	erase_op(&context);
+	return erase_op(&context);
 }
 
 static int write(off_t addr, const void *data, size_t len)
 {
 	struct flash_context context = {
-		.data_addr = (uint32_t) data,
+		.data_addr = (uint32_t)data,
 		.flash_addr = addr,
 		.len = len,
 #ifndef CONFIG_SOC_FLASH_NRF_RADIO_SYNC_NONE

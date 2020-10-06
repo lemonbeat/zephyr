@@ -18,7 +18,7 @@
  */
 
 /* sleep time in msec */
-#define SLEEPTIME  100
+#define SLEEPTIME 100
 
 uint8_t clamp_rgb(int val)
 {
@@ -50,9 +50,8 @@ void main(void)
 
 	/* Now configure the LCD the way we want it */
 
-	set_config = GLCD_FS_ROWS_2
-		     | GLCD_FS_DOT_SIZE_LITTLE
-		     | GLCD_FS_8BIT_MODE;
+	set_config = GLCD_FS_ROWS_2 | GLCD_FS_DOT_SIZE_LITTLE |
+		     GLCD_FS_8BIT_MODE;
 
 	glcd_function_set(glcd, set_config);
 

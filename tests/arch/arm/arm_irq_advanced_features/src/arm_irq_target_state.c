@@ -12,7 +12,7 @@
 	defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
 
 extern irq_target_state_t irq_target_state_set(unsigned int irq,
-	irq_target_state_t target_state);
+					       irq_target_state_t target_state);
 extern int irq_target_state_is_secure(unsigned int irq);
 
 void test_arm_irq_target_state(void)
@@ -55,7 +55,7 @@ void test_arm_irq_target_state(void)
 	}
 
 	zassert_true(i >= 0,
-		"No available IRQ line to configure as zero-latency\n");
+		     "No available IRQ line to configure as zero-latency\n");
 
 	TC_PRINT("Available IRQ line: %u\n", i);
 
@@ -64,19 +64,18 @@ void test_arm_irq_target_state(void)
 		irq_target_state_set(i, IRQ_TARGET_STATE_SECURE);
 
 	zassert_equal(result_state, IRQ_TARGET_STATE_SECURE,
-		"Target state not set to Secure\n");
+		      "Target state not set to Secure\n");
 
 	zassert_equal(irq_target_state_is_secure(i), 1,
-		"Target state not set to Secure\n");
+		      "Target state not set to Secure\n");
 
 	/* Set the available IRQ line to Secure and check the result. */
-	result_state =
-		irq_target_state_set(i, IRQ_TARGET_STATE_NON_SECURE);
+	result_state = irq_target_state_set(i, IRQ_TARGET_STATE_NON_SECURE);
 
 	zassert_equal(result_state, IRQ_TARGET_STATE_NON_SECURE,
-		"Target state not set to Secure\n");
+		      "Target state not set to Secure\n");
 	zassert_equal(irq_target_state_is_secure(i), 0,
-		"Target state not set to Non-Secure\n");
+		      "Target state not set to Non-Secure\n");
 }
 #else
 void test_arm_irq_target_state(void)

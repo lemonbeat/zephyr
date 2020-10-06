@@ -48,7 +48,6 @@ typedef struct _callee_saved _callee_saved_t;
  * cooperative context switch occurs.
  */
 typedef struct s_coopCoprocReg {
-
 	/*
 	 * This structure intentionally left blank. Coprocessor's registers are
 	 * all 'volatile' and saved using the lazy context switch mechanism.
@@ -101,7 +100,7 @@ struct _thread_arch {
 	 * 'tPreempCoprocReg' structures without ill effect.
 	 */
 
-	 /* non-volatile coprocessor's register storage */
+	/* non-volatile coprocessor's register storage */
 	tCoopCoprocReg coopCoprocReg;
 
 	/* volatile coprocessor's register storage */

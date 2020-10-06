@@ -25,7 +25,6 @@
 extern "C" {
 #endif
 
-
 struct _snode {
 	struct _snode *next;
 };
@@ -54,7 +53,7 @@ typedef struct _slist sys_slist_t;
  * @param __sl A pointer on a sys_slist_t to iterate on
  * @param __sn A sys_snode_t pointer to peek each node of the list
  */
-#define SYS_SLIST_FOR_EACH_NODE(__sl, __sn)				\
+#define SYS_SLIST_FOR_EACH_NODE(__sl, __sn) \
 	Z_GENLIST_FOR_EACH_NODE(slist, __sl, __sn)
 
 /**
@@ -77,7 +76,7 @@ typedef struct _slist sys_slist_t;
  * @param __sn A sys_snode_t pointer to peek each node of the list
  *             it contains the starting node, or NULL to start from the head
  */
-#define SYS_SLIST_ITERATE_FROM_NODE(__sl, __sn)				\
+#define SYS_SLIST_ITERATE_FROM_NODE(__sl, __sn) \
 	Z_GENLIST_ITERATE_FROM_NODE(slist, __sl, __sn)
 
 /**
@@ -96,7 +95,7 @@ typedef struct _slist sys_slist_t;
  * @param __sn A sys_snode_t pointer to peek each node of the list
  * @param __sns A sys_snode_t pointer for the loop to run safely
  */
-#define SYS_SLIST_FOR_EACH_NODE_SAFE(__sl, __sn, __sns)			\
+#define SYS_SLIST_FOR_EACH_NODE_SAFE(__sl, __sn, __sns) \
 	Z_GENLIST_FOR_EACH_NODE_SAFE(slist, __sl, __sn, __sns)
 
 /*
@@ -153,7 +152,7 @@ typedef struct _slist sys_slist_t;
  * @param __cn A pointer to peek each entry of the list
  * @param __n The field name of sys_node_t within the container struct
  */
-#define SYS_SLIST_FOR_EACH_CONTAINER(__sl, __cn, __n)			\
+#define SYS_SLIST_FOR_EACH_CONTAINER(__sl, __cn, __n) \
 	Z_GENLIST_FOR_EACH_CONTAINER(slist, __sl, __cn, __n)
 
 /**
@@ -171,9 +170,8 @@ typedef struct _slist sys_slist_t;
  * @param __cns A pointer for the loop to run safely
  * @param __n The field name of sys_node_t within the container struct
  */
-#define SYS_SLIST_FOR_EACH_CONTAINER_SAFE(__sl, __cn, __cns, __n)	\
+#define SYS_SLIST_FOR_EACH_CONTAINER_SAFE(__sl, __cn, __cns, __n) \
 	Z_GENLIST_FOR_EACH_CONTAINER_SAFE(slist, __sl, __cn, __cns, __n)
-
 
 /*
  * Required function definitions for the list_gen.h interface
@@ -193,7 +191,10 @@ static inline void sys_slist_init(sys_slist_t *list)
 	list->tail = NULL;
 }
 
-#define SYS_SLIST_STATIC_INIT(ptr_to_list) {NULL, NULL}
+#define SYS_SLIST_STATIC_INIT(ptr_to_list) \
+	{                                  \
+		NULL, NULL                 \
+	}
 
 static inline sys_snode_t *z_snode_next_peek(sys_snode_t *node)
 {
@@ -286,8 +287,7 @@ Z_GENLIST_PEEK_NEXT(slist, snode)
  * @param list A pointer on the list to affect
  * @param node A pointer on the node to prepend
  */
-static inline void sys_slist_prepend(sys_slist_t *list,
-				     sys_snode_t *node);
+static inline void sys_slist_prepend(sys_slist_t *list, sys_snode_t *node);
 
 Z_GENLIST_PREPEND(slist, snode)
 
@@ -299,8 +299,7 @@ Z_GENLIST_PREPEND(slist, snode)
  * @param list A pointer on the list to affect
  * @param node A pointer on the node to append
  */
-static inline void sys_slist_append(sys_slist_t *list,
-				    sys_snode_t *node);
+static inline void sys_slist_append(sys_slist_t *list, sys_snode_t *node);
 
 Z_GENLIST_APPEND(slist, snode)
 
@@ -317,8 +316,8 @@ Z_GENLIST_APPEND(slist, snode)
  * @param head A pointer to the first element of the list to append
  * @param tail A pointer to the last element of the list to append
  */
-static inline void sys_slist_append_list(sys_slist_t *list,
-					 void *head, void *tail);
+static inline void sys_slist_append_list(sys_slist_t *list, void *head,
+					 void *tail);
 
 Z_GENLIST_APPEND_LIST(slist, snode)
 
@@ -345,8 +344,7 @@ Z_GENLIST_MERGE_LIST(slist, snode)
  * @param prev A pointer on the previous node
  * @param node A pointer on the node to insert
  */
-static inline void sys_slist_insert(sys_slist_t *list,
-				    sys_snode_t *prev,
+static inline void sys_slist_insert(sys_slist_t *list, sys_snode_t *prev,
 				    sys_snode_t *node);
 
 Z_GENLIST_INSERT(slist, snode)
@@ -388,8 +386,7 @@ Z_GENLIST_GET(slist, snode)
  *        (can be NULL, which means the node is the list's head)
  * @param node A pointer on the node to remove
  */
-static inline void sys_slist_remove(sys_slist_t *list,
-				    sys_snode_t *prev_node,
+static inline void sys_slist_remove(sys_slist_t *list, sys_snode_t *prev_node,
 				    sys_snode_t *node);
 
 Z_GENLIST_REMOVE(slist, snode)

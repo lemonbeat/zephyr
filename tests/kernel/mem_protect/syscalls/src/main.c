@@ -9,11 +9,12 @@
 #include <ztest.h>
 #include "test_syscalls.h"
 
-#define BUF_SIZE	32
-#define SLEEP_MS_LONG	15000
+#define BUF_SIZE 32
+#define SLEEP_MS_LONG 15000
 
-#if defined(CONFIG_BOARD_NUCLEO_F429ZI) || defined(CONFIG_BOARD_NUCLEO_F207ZG) \
-	|| defined(CONFIG_BOARD_NUCLEO_L073RZ)
+#if defined(CONFIG_BOARD_NUCLEO_F429ZI) ||     \
+	defined(CONFIG_BOARD_NUCLEO_F207ZG) || \
+	defined(CONFIG_BOARD_NUCLEO_L073RZ)
 #define FAULTY_ADDRESS 0x0FFFFFFF
 #elif CONFIG_MMU
 /* Just past the permanent RAM mapping should be a non-present page */
@@ -127,9 +128,8 @@ static inline int z_vrfy_syscall_arg64(uint64_t arg)
  * arguments (this one happens to need 9), and to test generation of
  * 64 bit return values.
  */
-uint64_t z_impl_syscall_arg64_big(uint32_t arg1, uint32_t arg2,
-			       uint64_t arg3, uint32_t arg4,
-			       uint32_t arg5, uint64_t arg6)
+uint64_t z_impl_syscall_arg64_big(uint32_t arg1, uint32_t arg2, uint64_t arg3,
+				  uint32_t arg4, uint32_t arg5, uint64_t arg6)
 {
 	uint64_t args[] = { arg1, arg2, arg3, arg4, arg5, arg6 };
 	uint64_t ret = 0xae751a24ef464cc0ULL;
@@ -143,8 +143,8 @@ uint64_t z_impl_syscall_arg64_big(uint32_t arg1, uint32_t arg2,
 }
 
 static inline uint64_t z_vrfy_syscall_arg64_big(uint32_t arg1, uint32_t arg2,
-					     uint64_t arg3, uint32_t arg4,
-					     uint32_t arg5, uint64_t arg6)
+						uint64_t arg3, uint32_t arg4,
+						uint32_t arg5, uint64_t arg6)
 {
 	return z_impl_syscall_arg64_big(arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -186,7 +186,8 @@ void test_string_nlen(void)
 	 * Also skip this scenario for em_starterkit_7d, which won't generate
 	 * exceptions when unmapped address is accessed.
 	 */
-#if !((defined(CONFIG_BOARD_NSIM) && defined(CONFIG_SOC_NSIM_SEM)) || defined(CONFIG_SOC_EMSK_EM7D))
+#if !((defined(CONFIG_BOARD_NSIM) && defined(CONFIG_SOC_NSIM_SEM)) || \
+      defined(CONFIG_SOC_EMSK_EM7D))
 	/* Try to blow up the kernel */
 	ret = string_nlen((char *)FAULTY_ADDRESS, BUF_SIZE, &err);
 	zassert_equal(err, -1, "nonsense string address did not fault");
@@ -208,7 +209,7 @@ void test_user_string_alloc_copy(void)
 	zassert_equal(ret, -2, "got %d", ret);
 
 	ret = string_alloc_copy(
-	    "asdkajshdazskjdhikfsdjhfskdjfhsdkfjhskdfjhdskfjhs");
+		"asdkajshdazskjdhikfsdjhfskdjfhsdkfjhskdfjhdskfjhs");
 	zassert_equal(ret, -1, "got %d", ret);
 
 	ret = string_alloc_copy(kernel_string);
@@ -265,8 +266,7 @@ void test_to_copy(void)
 
 void test_arg64(void)
 {
-	zassert_equal(syscall_arg64(54321),
-		      z_impl_syscall_arg64(54321),
+	zassert_equal(syscall_arg64(54321), z_impl_syscall_arg64(54321),
 		      "syscall didn't match impl");
 
 	zassert_equal(syscall_arg64_big(1, 2, 3, 4, 5, 6),
@@ -274,8 +274,8 @@ void test_arg64(void)
 		      "syscall didn't match impl");
 }
 
-#define NR_THREADS	(CONFIG_MP_NUM_CPUS * 4)
-#define STACK_SZ	(1024 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define NR_THREADS (CONFIG_MP_NUM_CPUS * 4)
+#define STACK_SZ (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
 
 struct k_thread torture_threads[NR_THREADS];
 K_THREAD_STACK_ARRAY_DEFINE(torture_stacks, NR_THREADS, STACK_SZ);
@@ -287,7 +287,7 @@ void syscall_torture(void *arg1, void *arg2, void *arg3)
 	int ret, err;
 	char buf[BUF_SIZE];
 
-	for (;; ) {
+	for (;;) {
 		/* Run a bunch of our test syscalls in scenarios that are
 		 * expected to succeed in a tight loop to look
 		 * for concurrency problems.
@@ -326,9 +326,8 @@ void test_syscall_torture(void)
 
 	for (i = 0; i < NR_THREADS; i++) {
 		k_thread_create(&torture_threads[i], torture_stacks[i],
-				STACK_SZ, syscall_torture,
-				(void *)i, NULL, NULL,
-				2, K_INHERIT_PERMS | K_USER, K_NO_WAIT);
+				STACK_SZ, syscall_torture, (void *)i, NULL,
+				NULL, 2, K_INHERIT_PERMS | K_USER, K_NO_WAIT);
 	}
 
 	/* Let the torture threads hog the system for 15 seconds before we
@@ -362,8 +361,7 @@ void test_syscall_context_user(void *p1, void *p2, void *p3)
 	ARG_UNUSED(p2);
 	ARG_UNUSED(p3);
 
-	zassert_true(syscall_context(),
-		     "not reported in user syscall");
+	zassert_true(syscall_context(), "not reported in user syscall");
 }
 
 /* Show that z_is_in_syscall() works properly */
@@ -391,15 +389,13 @@ void test_main(void)
 	sprintf(user_string, "this is a user string");
 	k_thread_resource_pool_assign(k_current_get(), &test_pool);
 
-	ztest_test_suite(syscalls,
-			 ztest_unit_test(test_string_nlen),
+	ztest_test_suite(syscalls, ztest_unit_test(test_string_nlen),
 			 ztest_user_unit_test(test_string_nlen),
 			 ztest_user_unit_test(test_to_copy),
 			 ztest_user_unit_test(test_user_string_copy),
 			 ztest_user_unit_test(test_user_string_alloc_copy),
 			 ztest_user_unit_test(test_arg64),
 			 ztest_unit_test(test_syscall_torture),
-			 ztest_unit_test(test_syscall_context)
-			 );
+			 ztest_unit_test(test_syscall_context));
 	ztest_run_test_suite(syscalls);
 }

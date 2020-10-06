@@ -50,9 +50,8 @@ int remove(const char *filename);
 int getsockname(int sock, struct sockaddr *addr, socklen_t *addrlen);
 int poll(struct zsock_pollfd *fds, int nfds, int timeout);
 
-int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
-		char *host, socklen_t hostlen,
-		char *serv, socklen_t servlen, int flags);
+int getnameinfo(const struct sockaddr *addr, socklen_t addrlen, char *host,
+		socklen_t hostlen, char *serv, socklen_t servlen, int flags);
 
 ssize_t send(int sock, const void *buf, size_t len, int flags);
 ssize_t recv(int sock, void *buf, size_t max_len, int flags);
@@ -63,10 +62,10 @@ int getaddrinfo(const char *host, const char *service,
 
 void freeaddrinfo(struct zsock_addrinfo *ai);
 int connect(int sock, const struct sockaddr *addr, socklen_t addrlen);
-int getsockopt(int sock, int level, int optname,
-	       void *optval, socklen_t *optlen);
-int setsockopt(int sock, int level, int optname,
-	       const void *optval, socklen_t optlen);
+int getsockopt(int sock, int level, int optname, void *optval,
+	       socklen_t *optlen);
+int setsockopt(int sock, int level, int optname, const void *optval,
+	       socklen_t optlen);
 int listen(int sock, int backlog);
 int accept(int sock, struct sockaddr *addr, socklen_t *addrlen);
 int bind(int sock, const struct sockaddr *addr, socklen_t addrlen);

@@ -33,24 +33,24 @@
 #include <device.h>
 #include <drivers/gpio.h>
 
-#define GPIO_OUT_PIN            23
-#define GPIO_INT_PIN            24
-#define GPIO_NAME               "GPIO_"
-#define GPIO_DRV_NAME           DT_LABEL(DT_INST(0, snps_designware_gpio))
+#define GPIO_OUT_PIN 23
+#define GPIO_INT_PIN 24
+#define GPIO_NAME "GPIO_"
+#define GPIO_DRV_NAME DT_LABEL(DT_INST(0, snps_designware_gpio))
 
 /* size of stack area used by each thread */
-#define STACKSIZE               1024
+#define STACKSIZE 1024
 
 /* scheduling priority used by each thread */
-#define PRIORITY                7
+#define PRIORITY 7
 
 /* delay between greetings (in ms) */
-#define SLEEPTIME               500
+#define SLEEPTIME 500
 
 extern struct k_sem thread_sem;
 
-void gpio_test_callback(const struct device *port,
-			struct gpio_callback *cb, uint32_t pins)
+void gpio_test_callback(const struct device *port, struct gpio_callback *cb,
+			uint32_t pins)
 {
 	printk(GPIO_NAME "%d triggered\n", GPIO_INT_PIN);
 }
@@ -124,7 +124,7 @@ void gpio_thread(void *dummy1, void *dummy2, void *dummy3)
 			printk("Error getting " GPIO_NAME "%d!\n",
 			       GPIO_OUT_PIN);
 		} else {
-			printk("Reading "GPIO_NAME"%d = %d\n", GPIO_INT_PIN,
+			printk("Reading " GPIO_NAME "%d = %d\n", GPIO_INT_PIN,
 			       ret);
 		}
 

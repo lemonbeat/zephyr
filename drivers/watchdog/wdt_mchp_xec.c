@@ -16,14 +16,12 @@ LOG_MODULE_REGISTER(wdt_mchp_xec);
 #include <soc.h>
 #include <errno.h>
 
-#define WDT_XEC_REG_BASE						\
-	((WDT_Type *)(DT_INST_REG_ADDR(0)))
+#define WDT_XEC_REG_BASE ((WDT_Type *)(DT_INST_REG_ADDR(0)))
 
 struct wdt_xec_data {
 	wdt_callback_t cb;
 	bool timeout_installed;
 };
-
 
 DEVICE_DECLARE(wdt_xec);
 
@@ -168,9 +166,8 @@ static int wdt_xec_init(const struct device *dev)
 
 	MCHP_GIRQ_ENSET(MCHP_WDT_GIRQ) = MCHP_WDT_GIRQ_VAL;
 
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    wdt_xec_isr, DEVICE_GET(wdt_xec), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), wdt_xec_isr,
+		    DEVICE_GET(wdt_xec), 0);
 	irq_enable(DT_INST_IRQN(0));
 
 	return 0;
@@ -178,7 +175,6 @@ static int wdt_xec_init(const struct device *dev)
 
 static struct wdt_xec_data wdt_xec_dev_data;
 
-DEVICE_AND_API_INIT(wdt_xec, DT_INST_LABEL(0),
-		    wdt_xec_init, &wdt_xec_dev_data, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(wdt_xec, DT_INST_LABEL(0), wdt_xec_init, &wdt_xec_dev_data,
+		    NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &wdt_xec_api);

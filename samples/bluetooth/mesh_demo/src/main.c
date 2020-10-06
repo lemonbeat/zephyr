@@ -18,7 +18,7 @@
 #define MOD_LF 0x0000
 
 #define GROUP_ADDR 0xc000
-#define PUBLISHER_ADDR  0x000f
+#define PUBLISHER_ADDR 0x000f
 
 #define OP_VENDOR_BUTTON BT_MESH_MODEL_OP_3(0x00, BT_COMP_ID_LF)
 
@@ -64,8 +64,7 @@ static struct bt_mesh_cfg_srv cfg_srv = {
 	.hb_sub.func = heartbeat,
 };
 
-static struct bt_mesh_cfg_cli cfg_cli = {
-};
+static struct bt_mesh_cfg_cli cfg_cli = {};
 
 static void attention_on(struct bt_mesh_model *model)
 {
@@ -138,16 +137,16 @@ static void configure(void)
 	bt_mesh_cfg_app_key_add(net_idx, addr, net_idx, app_idx, app_key, NULL);
 
 	/* Bind to vendor model */
-	bt_mesh_cfg_mod_app_bind_vnd(net_idx, addr, addr, app_idx,
-				     MOD_LF, BT_COMP_ID_LF, NULL);
+	bt_mesh_cfg_mod_app_bind_vnd(net_idx, addr, addr, app_idx, MOD_LF,
+				     BT_COMP_ID_LF, NULL);
 
 	/* Bind to Health model */
 	bt_mesh_cfg_mod_app_bind(net_idx, addr, addr, app_idx,
 				 BT_MESH_MODEL_ID_HEALTH_SRV, NULL);
 
 	/* Add model subscription */
-	bt_mesh_cfg_mod_sub_add_vnd(net_idx, addr, addr, GROUP_ADDR,
-				    MOD_LF, BT_COMP_ID_LF, NULL);
+	bt_mesh_cfg_mod_sub_add_vnd(net_idx, addr, addr, GROUP_ADDR, MOD_LF,
+				    BT_COMP_ID_LF, NULL);
 
 #if NODE_ADDR == PUBLISHER_ADDR
 	{
@@ -295,5 +294,4 @@ void main(void)
 		k_sem_take(&tune_sem, K_FOREVER);
 		board_play_tune(tune_str);
 	}
-
 }

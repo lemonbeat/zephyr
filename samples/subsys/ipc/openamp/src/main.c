@@ -33,13 +33,13 @@ static struct metal_device shm_device = {
 	.num_regions = 1,
 	{
 		{
-			.virt       = (void *) SHM_START_ADDR,
-			.physmap    = shm_physmap,
-			.size       = SHM_SIZE,
+			.virt = (void *)SHM_START_ADDR,
+			.physmap = shm_physmap,
+			.size = SHM_SIZE,
 			.page_shift = 0xffffffff,
-			.page_mask  = 0xffffffff,
-			.mem_flags  = 0,
-			.ops        = { NULL },
+			.page_mask = 0xffffffff,
+			.mem_flags = 0,
+			.ops = { NULL },
 		},
 	},
 	.node = { NULL },
@@ -77,15 +77,13 @@ static uint32_t virtio_get_features(struct virtio_device *vdev)
 	return 1 << VIRTIO_RPMSG_F_NS;
 }
 
-static void virtio_set_features(struct virtio_device *vdev,
-				uint32_t features)
+static void virtio_set_features(struct virtio_device *vdev, uint32_t features)
 {
 }
 
 static void virtio_notify(struct virtqueue *vq)
 {
-#if defined(CONFIG_SOC_MPS2_AN521) || \
-	defined(CONFIG_SOC_V2M_MUSCA_A) || \
+#if defined(CONFIG_SOC_MPS2_AN521) || defined(CONFIG_SOC_V2M_MUSCA_A) || \
 	defined(CONFIG_SOC_V2M_MUSCA_B1)
 	uint32_t current_core = sse_200_platform_get_cpu_id();
 
@@ -114,10 +112,10 @@ static void platform_ipm_callback(const struct device *dev, void *context,
 	k_sem_give(&data_sem);
 }
 
-int endpoint_cb(struct rpmsg_endpoint *ept, void *data,
-		size_t len, uint32_t src, void *priv)
+int endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
+		uint32_t src, void *priv)
 {
-	received_data = *((unsigned int *) data);
+	received_data = *((unsigned int *)data);
 
 	k_sem_give(&data_rx_sem);
 
@@ -137,10 +135,8 @@ static void rpmsg_service_unbind(struct rpmsg_endpoint *ept)
 
 void ns_bind_cb(struct rpmsg_device *rdev, const char *name, uint32_t dest)
 {
-	(void)rpmsg_create_ept(ep, rdev, name,
-			RPMSG_ADDR_ANY, dest,
-			endpoint_cb,
-			rpmsg_service_unbind);
+	(void)rpmsg_create_ept(ep, rdev, name, RPMSG_ADDR_ANY, dest,
+			       endpoint_cb, rpmsg_service_unbind);
 
 	k_sem_give(&ept_sem);
 }
@@ -286,11 +282,10 @@ void main(void)
 {
 	printk("Starting application thread!\n");
 	k_thread_create(&thread_data, thread_stack, APP_TASK_STACK_SIZE,
-			(k_thread_entry_t)app_task,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+			(k_thread_entry_t)app_task, NULL, NULL, NULL,
+			K_PRIO_COOP(7), 0, K_NO_WAIT);
 
-#if defined(CONFIG_SOC_MPS2_AN521) || \
-	defined(CONFIG_SOC_V2M_MUSCA_A) || \
+#if defined(CONFIG_SOC_MPS2_AN521) || defined(CONFIG_SOC_V2M_MUSCA_A) || \
 	defined(CONFIG_SOC_V2M_MUSCA_B1)
 	wakeup_cpu1();
 	k_msleep(500);

@@ -20,9 +20,7 @@ LOG_MODULE_REGISTER(test_main, LOG_LEVEL_DBG);
  * Compare old style USB BOS definition with section aligned
  */
 
-static const uint8_t dummy_descriptor[] = {
-	0x00, 0x01, 0x02
-};
+static const uint8_t dummy_descriptor[] = { 0x00, 0x01, 0x02 };
 
 static struct webusb_bos_desc {
 	struct usb_bos_descriptor bos;
@@ -184,13 +182,11 @@ static void test_usb_bos_macros(void)
 	LOG_HEXDUMP_DBG((void *)&webusb_bos_descriptor_2, sizeof(cap_msosv2),
 			"webusb cap msos v2");
 
-	zassert_true(len ==
-		     sizeof(struct usb_bos_descriptor) +
-		     sizeof(cap_webusb) +
-		     sizeof(cap_msosv2),
+	zassert_true(len == sizeof(struct usb_bos_descriptor) +
+				     sizeof(cap_webusb) + sizeof(cap_msosv2),
 		     "Incorrect calculated length");
 	zassert_true(!memcmp(hdr, &webusb_bos_descriptor, len) ||
-		     !memcmp(hdr, &webusb_bos_descriptor_2, len),
+			     !memcmp(hdr, &webusb_bos_descriptor_2, len),
 		     "Wrong data");
 }
 
@@ -212,7 +208,7 @@ static void test_usb_bos(void)
 	zassert_true(!ret, "Return code failed");
 	zassert_equal(len, sizeof(webusb_bos_descriptor), "Wrong length");
 	zassert_true(!memcmp(data, &webusb_bos_descriptor, len) ||
-		     !memcmp(data, &webusb_bos_descriptor_2, len),
+			     !memcmp(data, &webusb_bos_descriptor_2, len),
 		     "Wrong data");
 }
 
@@ -220,8 +216,7 @@ static void test_usb_bos(void)
 void test_main(void)
 {
 	/* Prepare webusb_bos_descriptor_2 */
-	memcpy(&webusb_bos_descriptor_2.bos,
-	       &webusb_bos_descriptor.bos,
+	memcpy(&webusb_bos_descriptor_2.bos, &webusb_bos_descriptor.bos,
 	       sizeof(struct usb_bos_descriptor));
 
 	memcpy(&webusb_bos_descriptor_2.platform_msos,
@@ -238,8 +233,7 @@ void test_main(void)
 	       &webusb_bos_descriptor.capability_data_webusb,
 	       sizeof(struct usb_bos_capability_webusb));
 
-	ztest_test_suite(test_osdesc,
-			 ztest_unit_test(test_usb_bos_macros),
+	ztest_test_suite(test_osdesc, ztest_unit_test(test_usb_bos_macros),
 			 ztest_unit_test(test_usb_bos));
 	ztest_run_test_suite(test_osdesc);
 }

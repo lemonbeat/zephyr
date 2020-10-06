@@ -37,7 +37,7 @@ void arch_irq_offload(irq_offload_routine_t routine, const void *parameter)
 	_offload_routine = routine;
 	offload_param = parameter;
 
-	__asm__ volatile ("trap");
+	__asm__ volatile("trap");
 
 	irq_unlock(key);
 }

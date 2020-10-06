@@ -31,10 +31,10 @@ static int driver_send(struct net_buf *buf)
 }
 
 static const struct bt_hci_driver drv = {
-	.name         = "test",
-	.bus          = BT_HCI_DRIVER_BUS_VIRTUAL,
-	.open         = driver_open,
-	.send         = driver_send,
+	.name = "test",
+	.bus = BT_HCI_DRIVER_BUS_VIRTUAL,
+	.open = driver_open,
+	.send = driver_send,
 };
 
 static void driver_init(void)
@@ -46,14 +46,12 @@ void test_bluetooth_entry(void)
 {
 	driver_init();
 
-	zassert_true((bt_enable(NULL) == EXPECTED_ERROR),
-			"bt_enable failed");
+	zassert_true((bt_enable(NULL) == EXPECTED_ERROR), "bt_enable failed");
 }
 
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_bluetooth,
-			ztest_unit_test(test_bluetooth_entry));
+	ztest_test_suite(test_bluetooth, ztest_unit_test(test_bluetooth_entry));
 	ztest_run_test_suite(test_bluetooth);
 }

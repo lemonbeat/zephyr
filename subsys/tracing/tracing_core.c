@@ -13,7 +13,7 @@
 #include <tracing_buffer.h>
 #include <tracing_backend.h>
 
-#define TRACING_CMD_ENABLE  "enable"
+#define TRACING_CMD_ENABLE "enable"
 #define TRACING_CMD_DISABLE "disable"
 
 #ifdef CONFIG_TRACING_BACKEND_UART
@@ -26,10 +26,7 @@
 #define TRACING_BACKEND_NAME ""
 #endif
 
-enum tracing_state {
-	TRACING_DISABLE = 0,
-	TRACING_ENABLE
-};
+enum tracing_state { TRACING_DISABLE = 0, TRACING_ENABLE };
 
 static atomic_t tracing_state;
 static atomic_t tracing_packet_drop_num;
@@ -43,7 +40,7 @@ static struct k_thread tracing_thread;
 static struct k_timer tracing_thread_timer;
 static K_SEM_DEFINE(tracing_thread_sem, 0, 1);
 static K_THREAD_STACK_DEFINE(tracing_thread_stack,
-			CONFIG_TRACING_THREAD_STACK_SIZE);
+			     CONFIG_TRACING_THREAD_STACK_SIZE);
 
 static void tracing_thread_func(void *dummy1, void *dummy2, void *dummy3)
 {
@@ -58,10 +55,8 @@ static void tracing_thread_func(void *dummy1, void *dummy2, void *dummy3)
 		if (tracing_buffer_is_empty()) {
 			k_sem_take(&tracing_thread_sem, K_FOREVER);
 		} else {
-			transferring_length =
-				tracing_buffer_get_claim(
-						&transferring_buf,
-						tracing_buffer_max_length);
+			transferring_length = tracing_buffer_get_claim(
+				&transferring_buf, tracing_buffer_max_length);
 			tracing_buffer_handle(transferring_buf,
 					      transferring_length);
 			tracing_buffer_get_finish(transferring_length);
@@ -98,8 +93,8 @@ static int tracing_init(const struct device *arg)
 	}
 
 #ifdef CONFIG_TRACING_ASYNC
-	k_timer_init(&tracing_thread_timer,
-		     tracing_thread_timer_expiry_fn, NULL);
+	k_timer_init(&tracing_thread_timer, tracing_thread_timer_expiry_fn,
+		     NULL);
 
 	k_thread_create(&tracing_thread, tracing_thread_stack,
 			K_THREAD_STACK_SIZEOF(tracing_thread_stack),

@@ -8,8 +8,8 @@
 
 #include "syskernel.h"
 
-struct k_stack  stack_1;
-struct k_stack  stack_2;
+struct k_stack stack_1;
+struct k_stack stack_2;
 
 stack_data_t stack1[2];
 stack_data_t stack2[2];
@@ -26,7 +26,6 @@ void stack_test_init(void)
 	k_stack_init(&stack_1, stack1, 2);
 	k_stack_init(&stack_2, stack2, 2);
 }
-
 
 /**
  *
@@ -64,7 +63,6 @@ void stack_thread1(void *par1, void *par2, void *par3)
 	}
 }
 
-
 /**
  *
  * @brief Stack test thread
@@ -96,7 +94,6 @@ void stack_thread2(void *par1, void *par2, void *par3)
 	}
 }
 
-
 /**
  *
  * @brief Stack test thread
@@ -122,8 +119,7 @@ void stack_thread3(void *par1, void *par2, void *par3)
 		k_stack_push(&stack_1, data);
 		data = 0xffffffff;
 
-		while (k_stack_pop(&stack_2, &data,
-					     K_NO_WAIT) != 0) {
+		while (k_stack_pop(&stack_2, &data, K_NO_WAIT) != 0) {
 			k_yield();
 		}
 		if (data != i) {
@@ -132,7 +128,6 @@ void stack_thread3(void *par1, void *par2, void *par3)
 		(*pcounter)++;
 	}
 }
-
 
 /**
  *
@@ -148,12 +143,11 @@ int stack_test(void)
 	int return_value = 0;
 
 	/* test get wait & put stack functions between co-op threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"Stack #1");
+	fprintf(output_file, sz_test_case_fmt, "Stack #1");
 	fprintf(output_file, sz_description,
-			"\n\tk_stack_init"
-			"\n\tk_stack_pop(K_FOREVER)"
-			"\n\tk_stack_push");
+		"\n\tk_stack_init"
+		"\n\tk_stack_pop(K_FOREVER)"
+		"\n\tk_stack_push");
 	printf(sz_test_start_fmt);
 
 	stack_test_init();
@@ -161,25 +155,24 @@ int stack_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, stack_thread1,
-			 0, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			0, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, stack_thread2,
-			 (void *) &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			(void *)&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
 	return_value += check_result(i, t);
 
 	/* test get/yield & put stack functions between co-op threads */
-	fprintf(output_file, sz_test_case_fmt,
-			"Stack #2");
+	fprintf(output_file, sz_test_case_fmt, "Stack #2");
 	fprintf(output_file, sz_description,
-			"\n\tk_stack_init"
-			"\n\tk_stack_pop(K_FOREVER)"
-			"\n\tk_stack_pop"
-			"\n\tk_stack_push"
-			"\n\tk_yield");
+		"\n\tk_stack_init"
+		"\n\tk_stack_pop(K_FOREVER)"
+		"\n\tk_stack_pop"
+		"\n\tk_stack_push"
+		"\n\tk_yield");
 	printf(sz_test_start_fmt);
 
 	stack_test_init();
@@ -188,11 +181,11 @@ int stack_test(void)
 
 	i = 0;
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, stack_thread1,
-			 0, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			0, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, stack_thread3,
-			 (void *) &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			(void *)&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
@@ -201,14 +194,13 @@ int stack_test(void)
 	/* test get wait & put stack functions across co-op and premptive
 	 * threads
 	 */
-	fprintf(output_file, sz_test_case_fmt,
-			"Stack #3");
+	fprintf(output_file, sz_test_case_fmt, "Stack #3");
 	fprintf(output_file, sz_description,
-			"\n\tk_stack_init"
-			"\n\tk_stack_pop(K_FOREVER)"
-			"\n\tk_stack_push"
-			"\n\tk_stack_pop(K_FOREVER)"
-			"\n\tk_stack_push");
+		"\n\tk_stack_init"
+		"\n\tk_stack_pop(K_FOREVER)"
+		"\n\tk_stack_push"
+		"\n\tk_stack_pop(K_FOREVER)"
+		"\n\tk_stack_push");
 	printf(sz_test_start_fmt);
 
 	stack_test_init();
@@ -216,8 +208,8 @@ int stack_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, stack_thread1,
-			 0, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			0, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	for (i = 0; i < number_of_loops / 2U; i++) {
 		stack_data_t data;

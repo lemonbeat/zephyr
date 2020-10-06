@@ -33,8 +33,8 @@ static struct coap_observer observers[NUM_OBSERVERS];
 static struct coap_reply replies[NUM_REPLIES];
 
 /* This is exposed for this test in subsys/net/lib/coap/coap_link_format.c */
-bool _coap_match_path_uri(const char * const *path,
-			  const char *uri, uint16_t len);
+bool _coap_match_path_uri(const char *const *path, const char *uri,
+			  uint16_t len);
 
 /* Some forward declarations */
 static void server_notify_callback(struct coap_resource *resource,
@@ -44,20 +44,26 @@ static int server_resource_1_get(struct coap_resource *resource,
 				 struct coap_packet *request,
 				 struct sockaddr *addr, socklen_t addr_len);
 
-static const char * const server_resource_1_path[] = { "s", "1", NULL };
-static struct coap_resource server_resources[] =  {
+static const char *const server_resource_1_path[] = { "s", "1", NULL };
+static struct coap_resource server_resources[] = {
 	{ .path = server_resource_1_path,
 	  .get = server_resource_1_get,
 	  .notify = server_notify_callback },
-	{ },
+	{},
 };
 
 #define MY_PORT 12345
-#define peer_addr { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, \
-			0, 0, 0, 0, 0, 0, 0, 0x2 } } }
-static struct sockaddr_in6 dummy_addr = {
-	.sin6_family = AF_INET6,
-	.sin6_addr = peer_addr };
+#define peer_addr                                                            \
+	{                                                                    \
+		{                                                            \
+			{                                                    \
+				0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, \
+					0, 0, 0, 0, 0x2                      \
+			}                                                    \
+		}                                                            \
+	}
+static struct sockaddr_in6 dummy_addr = { .sin6_family = AF_INET6,
+					  .sin6_addr = peer_addr };
 
 static int test_build_empty_pdu(void)
 {
@@ -72,9 +78,8 @@ static int test_build_empty_pdu(void)
 		goto done;
 	}
 
-	r = coap_packet_init(&cpkt, data, COAP_BUF_SIZE,
-			     1, COAP_TYPE_CON, 0, NULL,
-			     COAP_METHOD_GET, 0);
+	r = coap_packet_init(&cpkt, data, COAP_BUF_SIZE, 1, COAP_TYPE_CON, 0,
+			     NULL, COAP_METHOD_GET, 0);
 	if (r < 0) {
 		TC_PRINT("Could not initialize packet\n");
 		goto done;
@@ -102,9 +107,9 @@ done:
 
 static int test_build_simple_pdu(void)
 {
-	uint8_t result_pdu[] = { 0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e',
-				 'n', 0xC1, 0x00, 0xFF, 'p', 'a', 'y', 'l',
-				 'o', 'a', 'd', 0x00 };
+	uint8_t result_pdu[] = { 0x55, 0xA5, 0x12, 0x34, 't',  'o', 'k',
+				 'e',  'n',  0xC1, 0x00, 0xFF, 'p', 'a',
+				 'y',  'l',  'o',  'a',	 'd',  0x00 };
 	struct coap_packet cpkt;
 	const char token[] = "token";
 	uint8_t *data;
@@ -117,11 +122,9 @@ static int test_build_simple_pdu(void)
 		goto done;
 	}
 
-	r = coap_packet_init(&cpkt, data, COAP_BUF_SIZE,
-			     1, COAP_TYPE_NON_CON,
+	r = coap_packet_init(&cpkt, data, COAP_BUF_SIZE, 1, COAP_TYPE_NON_CON,
 			     strlen(token), (uint8_t *)token,
-			     COAP_RESPONSE_CODE_PROXYING_NOT_SUPPORTED,
-			     0x1234);
+			     COAP_RESPONSE_CODE_PROXYING_NOT_SUPPORTED, 0x1234);
 	if (r < 0) {
 		TC_PRINT("Could not initialize packet\n");
 		goto done;
@@ -219,7 +222,7 @@ done:
 /* 1 option, No payload (No payload marker) */
 static int test_parse_empty_pdu_1(void)
 {
-	uint8_t pdu[] = { 0x40, 0x01, 0, 0, 0x40};
+	uint8_t pdu[] = { 0x40, 0x01, 0, 0, 0x40 };
 	struct coap_packet cpkt;
 	uint8_t *data;
 	uint8_t ver;
@@ -279,9 +282,9 @@ done:
 
 static int test_parse_simple_pdu(void)
 {
-	uint8_t pdu[] = { 0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e', 'n',
-		       0x00, 0xc1, 0x00, 0xff, 'p', 'a', 'y', 'l', 'o',
-		       'a', 'd', 0x00 };
+	uint8_t pdu[] = { 0x55, 0xA5, 0x12, 0x34, 't',	'o',  'k',
+			  'e',	'n',  0x00, 0xc1, 0x00, 0xff, 'p',
+			  'a',	'y',  'l',  'o',  'a',	'd',  0x00 };
 	struct coap_packet cpkt;
 	struct coap_option options[16] = {};
 	const uint8_t token[8];
@@ -344,8 +347,8 @@ static int test_parse_simple_pdu(void)
 		goto done;
 	}
 
-	count = coap_find_options(&cpkt, COAP_OPTION_CONTENT_FORMAT,
-				   options, count);
+	count = coap_find_options(&cpkt, COAP_OPTION_CONTENT_FORMAT, options,
+				  count);
 	if (count != 1) {
 		TC_PRINT("Unexpected number of options in the packet\n");
 		goto done;
@@ -380,8 +383,9 @@ done:
 
 static int test_parse_malformed_opt(void)
 {
-	uint8_t opt[] = { 0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e', 'n',
-		       0xD0 };
+	uint8_t opt[] = {
+		0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e', 'n', 0xD0
+	};
 	struct coap_packet cpkt;
 	uint8_t *data;
 	int result = TC_FAIL;
@@ -409,8 +413,9 @@ done:
 
 static int test_parse_malformed_opt_len(void)
 {
-	uint8_t opt[] = { 0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e', 'n',
-		       0xC1 };
+	uint8_t opt[] = {
+		0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e', 'n', 0xC1
+	};
 	struct coap_packet cpkt;
 	uint8_t *data;
 	int result = TC_FAIL;
@@ -438,8 +443,8 @@ done:
 
 static int test_parse_malformed_opt_ext(void)
 {
-	uint8_t opt[] = { 0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e', 'n',
-		       0xE0, 0x01 };
+	uint8_t opt[] = { 0x55, 0xA5, 0x12, 0x34, 't', 'o',
+			  'k',	'e',  'n',  0xE0, 0x01 };
 	struct coap_packet cpkt;
 	uint8_t *data;
 	int result = TC_FAIL;
@@ -467,8 +472,8 @@ done:
 
 static int test_parse_malformed_opt_len_ext(void)
 {
-	uint8_t opt[] = { 0x55, 0xA5, 0x12, 0x34, 't', 'o', 'k', 'e', 'n',
-		       0xEE, 0x01, 0x02, 0x01};
+	uint8_t opt[] = { 0x55, 0xA5, 0x12, 0x34, 't',	'o', 'k',
+			  'e',	'n',  0xEE, 0x01, 0x02, 0x01 };
 	struct coap_packet cpkt;
 	uint8_t *data;
 	int result = TC_FAIL;
@@ -497,7 +502,7 @@ done:
 /* 1 option, No payload (with payload marker) */
 static int test_parse_malformed_marker(void)
 {
-	uint8_t pdu[] = { 0x40, 0x01, 0, 0, 0x40, 0xFF};
+	uint8_t pdu[] = { 0x40, 0x01, 0, 0, 0x40, 0xFF };
 	struct coap_packet cpkt;
 	uint8_t *data;
 	int result = TC_FAIL;
@@ -526,15 +531,9 @@ done:
 static int test_match_path_uri(void)
 {
 	int result = TC_FAIL;
-	const char * const resource_path[] = {
-		"s",
-		"1",
-		"foobar",
-		"foobar3a",
-		"foobar3",
-		"devnull",
-		NULL
-	};
+	const char *const resource_path[] = { "s",	  "1",	     "foobar",
+					      "foobar3a", "foobar3", "devnull",
+					      NULL };
 	const char *uri;
 
 	uri = "/k";
@@ -585,14 +584,12 @@ out:
 	TC_END_RESULT(result);
 
 	return result;
-
 }
 
 #define BLOCK_WISE_TRANSFER_SIZE_GET 128
 
 static int prepare_block1_request(struct coap_packet *req,
-				  struct coap_block_context *req_ctx,
-				  int *more)
+				  struct coap_block_context *req_ctx, int *more)
 {
 	const char token[] = "token";
 	uint8_t payload[32] = { 0 };
@@ -615,9 +612,8 @@ static int prepare_block1_request(struct coap_packet *req,
 		goto done;
 	}
 
-	r = coap_packet_init(req, data, COAP_BUF_SIZE, 1,
-			     COAP_TYPE_CON, strlen(token),
-			     (uint8_t *) token, COAP_METHOD_POST,
+	r = coap_packet_init(req, data, COAP_BUF_SIZE, 1, COAP_TYPE_CON,
+			     strlen(token), (uint8_t *)token, COAP_METHOD_POST,
 			     coap_next_id());
 	if (r < 0) {
 		TC_PRINT("Unable to initialize request\n");
@@ -687,9 +683,8 @@ static int prepare_block1_response(struct coap_packet *rsp,
 	id = coap_header_get_id(req);
 	tkl = coap_header_get_token(req, token);
 
-	r = coap_packet_init(rsp, data, COAP_BUF_SIZE, 1,
-			     COAP_TYPE_ACK, tkl, token,
-			     COAP_RESPONSE_CODE_CREATED, id);
+	r = coap_packet_init(rsp, data, COAP_BUF_SIZE, 1, COAP_TYPE_ACK, tkl,
+			     token, COAP_RESPONSE_CODE_CREATED, id);
 	if (r < 0) {
 		TC_PRINT("Unable to initialize request\n");
 		goto done;
@@ -721,14 +716,16 @@ static int test_block1_request(struct coap_block_context *req_ctx, uint8_t iter)
 		if (req_ctx->current !=
 		    coap_block_size_to_bytes(COAP_BLOCK_32) * iter) {
 			TC_PRINT("req:%d,Couldn't get the current block "
-				 "position\n", iter);
+				 "position\n",
+				 iter);
 			goto done;
 		}
 	} else {
 		if (req_ctx->current !=
 		    coap_block_size_to_bytes(COAP_BLOCK_32) * (iter - 1U)) {
 			TC_PRINT("req:%d,Couldn't get the current block "
-				 "position\n", iter);
+				 "position\n",
+				 iter);
 			goto done;
 		}
 	}
@@ -744,7 +741,8 @@ done:
 	return result;
 }
 
-static int test_block1_response(struct coap_block_context *rsp_ctx, uint8_t iter)
+static int test_block1_response(struct coap_block_context *rsp_ctx,
+				uint8_t iter)
 {
 	int result = TC_FAIL;
 
@@ -815,7 +813,6 @@ static int test_block1_size(void)
 		if (result == TC_FAIL) {
 			goto done;
 		}
-
 	}
 
 	result = TC_PASS;
@@ -850,9 +847,8 @@ static int prepare_block2_request(struct coap_packet *req,
 		goto done;
 	}
 
-	r = coap_packet_init(req, data, COAP_BUF_SIZE, 1,
-			     COAP_TYPE_CON, strlen(token),
-			     (uint8_t *) token, COAP_METHOD_GET,
+	r = coap_packet_init(req, data, COAP_BUF_SIZE, 1, COAP_TYPE_CON,
+			     strlen(token), (uint8_t *)token, COAP_METHOD_GET,
 			     coap_next_id());
 	if (r < 0) {
 		TC_PRINT("Unable to initialize request\n");
@@ -872,8 +868,7 @@ done:
 
 static int prepare_block2_response(struct coap_packet *rsp,
 				   struct coap_block_context *rsp_ctx,
-				   struct coap_packet *req,
-				   int *more)
+				   struct coap_packet *req, int *more)
 {
 	uint8_t payload[64];
 	uint8_t token[8];
@@ -900,9 +895,8 @@ static int prepare_block2_response(struct coap_packet *rsp,
 	id = coap_header_get_id(req);
 	tkl = coap_header_get_token(req, token);
 
-	r = coap_packet_init(rsp, data, COAP_BUF_SIZE, 1,
-			     COAP_TYPE_ACK, tkl, token,
-			     COAP_RESPONSE_CODE_CONTENT, id);
+	r = coap_packet_init(rsp, data, COAP_BUF_SIZE, 1, COAP_TYPE_ACK, tkl,
+			     token, COAP_RESPONSE_CODE_CONTENT, id);
 	if (r < 0) {
 		TC_PRINT("Unable to initialize request\n");
 		goto done;
@@ -970,7 +964,8 @@ done:
 	return result;
 }
 
-static int test_block2_response(struct coap_block_context *rsp_ctx, uint8_t iter)
+static int test_block2_response(struct coap_block_context *rsp_ctx,
+				uint8_t iter)
 {
 	int result = TC_FAIL;
 
@@ -984,14 +979,16 @@ static int test_block2_response(struct coap_block_context *rsp_ctx, uint8_t iter
 		if (rsp_ctx->current !=
 		    coap_block_size_to_bytes(COAP_BLOCK_64) * iter) {
 			TC_PRINT("req:%d,Couldn't get the current block "
-				 "position\n", iter);
+				 "position\n",
+				 iter);
 			goto done;
 		}
 	} else {
 		if (rsp_ctx->current !=
 		    coap_block_size_to_bytes(COAP_BLOCK_64) * (iter - 1U)) {
 			TC_PRINT("req:%d,Couldn't get the current block "
-				 "position\n", iter);
+				 "position\n",
+				 iter);
 			goto done;
 		}
 	}
@@ -1054,7 +1051,6 @@ static int test_block2_size(void)
 		if (result == TC_FAIL) {
 			goto done;
 		}
-
 	}
 
 	result = TC_PASS;
@@ -1085,9 +1081,8 @@ static int test_retransmit_second_round(void)
 
 	id = coap_next_id();
 
-	r = coap_packet_init(&cpkt, data, COAP_BUF_SIZE,
-			     1, COAP_TYPE_CON, 0, coap_next_token(),
-			     COAP_METHOD_GET, id);
+	r = coap_packet_init(&cpkt, data, COAP_BUF_SIZE, 1, COAP_TYPE_CON, 0,
+			     coap_next_token(), COAP_METHOD_GET, id);
 	if (r < 0) {
 		TC_PRINT("Could not initialize packet\n");
 		goto done;
@@ -1099,7 +1094,7 @@ static int test_retransmit_second_round(void)
 		goto done;
 	}
 
-	r = coap_pending_init(pending, &cpkt, (struct sockaddr *) &dummy_addr);
+	r = coap_pending_init(pending, &cpkt, (struct sockaddr *)&dummy_addr);
 	if (r < 0) {
 		TC_PRINT("Could not initialize packet\n");
 		goto done;
@@ -1123,9 +1118,8 @@ static int test_retransmit_second_round(void)
 		goto done;
 	}
 
-	r = coap_packet_init(&rsp, rsp_data, COAP_BUF_SIZE,
-			     1, COAP_TYPE_ACK, 0, NULL,
-			     COAP_METHOD_GET, id);
+	r = coap_packet_init(&rsp, rsp_data, COAP_BUF_SIZE, 1, COAP_TYPE_ACK, 0,
+			     NULL, COAP_METHOD_GET, id);
 	if (r < 0) {
 		TC_PRINT("Could not initialize packet\n");
 		goto done;
@@ -1134,8 +1128,8 @@ static int test_retransmit_second_round(void)
 	/* Now we get the ack from the remote side */
 	rsp_pending = coap_pending_received(&rsp, pendings, NUM_PENDINGS);
 	if (pending != rsp_pending) {
-		TC_PRINT("Invalid pending %p should be %p\n",
-			 rsp_pending, pending);
+		TC_PRINT("Invalid pending %p should be %p\n", rsp_pending,
+			 pending);
 		goto done;
 	}
 
@@ -1179,7 +1173,7 @@ static void server_notify_callback(struct coap_resource *resource,
 				   struct coap_observer *observer)
 {
 	if (!ipaddr_cmp(&observer->addr,
-			(const struct sockaddr *) &dummy_addr)) {
+			(const struct sockaddr *)&dummy_addr)) {
 		TC_ERROR("The address of the observer doesn't match.\n");
 		return;
 	}
@@ -1213,7 +1207,7 @@ static int server_resource_1_get(struct coap_resource *resource,
 		return -EINVAL;
 	}
 
-	tkl = coap_header_get_token(request, (uint8_t *) token);
+	tkl = coap_header_get_token(request, (uint8_t *)token);
 	id = coap_header_get_id(request);
 
 	coap_observer_init(observer, request, addr);
@@ -1226,9 +1220,8 @@ static int server_resource_1_get(struct coap_resource *resource,
 		return -EINVAL;
 	}
 
-	r = coap_packet_init(&response, data, COAP_BUF_SIZE,
-			     1, COAP_TYPE_ACK, tkl, token,
-			     COAP_RESPONSE_CODE_OK, id);
+	r = coap_packet_init(&response, data, COAP_BUF_SIZE, 1, COAP_TYPE_ACK,
+			     tkl, token, COAP_RESPONSE_CODE_OK, id);
 	if (r < 0) {
 		TC_PRINT("Unable to initialize packet.\n");
 		goto done;
@@ -1262,16 +1255,14 @@ done:
 static int test_observer_server(void)
 {
 	uint8_t valid_request_pdu[] = {
-		0x45, 0x01, 0x12, 0x34,
-		't', 'o', 'k', 'e', 'n',
-		0x60, /* enable observe option */
-		0x51, 's', 0x01, '1', /* path */
+		0x45, 0x01, 0x12, 0x34, 't',
+		'o',  'k',  'e',  'n',	0x60, /* enable observe option */
+		0x51, 's',  0x01, '1', /* path */
 	};
 	uint8_t not_found_request_pdu[] = {
-		0x45, 0x01, 0x12, 0x34,
-		't', 'o', 'k', 'e', 'n',
-		0x60, /* enable observe option */
-		0x51, 's', 0x01, '2', /* path */
+		0x45, 0x01, 0x12, 0x34, 't',
+		'o',  'k',  'e',  'n',	0x60, /* enable observe option */
+		0x51, 's',  0x01, '2', /* path */
 	};
 	struct coap_packet req;
 	struct coap_option options[4] = {};
@@ -1288,15 +1279,15 @@ static int test_observer_server(void)
 
 	memcpy(data, valid_request_pdu, sizeof(valid_request_pdu));
 
-	r = coap_packet_parse(&req, data, sizeof(valid_request_pdu),
-			      options, opt_num);
+	r = coap_packet_parse(&req, data, sizeof(valid_request_pdu), options,
+			      opt_num);
 	if (r < 0) {
 		TC_PRINT("Could not initialize packet\n");
 		goto done;
 	}
 
 	r = coap_handle_request(&req, server_resources, options, opt_num,
-				(struct sockaddr *) &dummy_addr,
+				(struct sockaddr *)&dummy_addr,
 				sizeof(dummy_addr));
 	if (r < 0) {
 		TC_PRINT("Could not handle packet\n");
@@ -1328,7 +1319,7 @@ static int test_observer_server(void)
 	}
 
 	r = coap_handle_request(&req, server_resources, options, opt_num,
-				(struct sockaddr *) &dummy_addr,
+				(struct sockaddr *)&dummy_addr,
 				sizeof(dummy_addr));
 	if (r != -ENOENT) {
 		TC_PRINT("There should be no handler for this resource\n");
@@ -1361,7 +1352,7 @@ static int test_observer_client(void)
 	struct coap_reply *reply;
 	struct coap_option options[4] = {};
 	const char token[] = "token";
-	const char * const *p;
+	const char *const *p;
 	uint8_t *data = NULL;
 	uint8_t *rsp_data = NULL;
 	uint8_t opt_num = ARRAY_SIZE(options) - 1;
@@ -1375,10 +1366,9 @@ static int test_observer_client(void)
 		goto done;
 	}
 
-	r = coap_packet_init(&req, data, COAP_BUF_SIZE,
-			     1, COAP_TYPE_CON,
-			     strlen(token), (uint8_t *)token,
-			     COAP_METHOD_GET, coap_next_id());
+	r = coap_packet_init(&req, data, COAP_BUF_SIZE, 1, COAP_TYPE_CON,
+			     strlen(token), (uint8_t *)token, COAP_METHOD_GET,
+			     coap_next_id());
 	if (r < 0) {
 		TC_PRINT("Unable to initialize request\n");
 		goto done;
@@ -1392,8 +1382,8 @@ static int test_observer_client(void)
 	}
 
 	for (p = server_resource_1_path; p && *p; p++) {
-		r = coap_packet_append_option(&req, COAP_OPTION_URI_PATH,
-					      *p, strlen(*p));
+		r = coap_packet_append_option(&req, COAP_OPTION_URI_PATH, *p,
+					      strlen(*p));
 		if (r < 0) {
 			TC_PRINT("Unable to add option to request.\n");
 			goto done;
@@ -1417,7 +1407,7 @@ static int test_observer_client(void)
 	}
 
 	r = coap_handle_request(&req, server_resources, options, opt_num,
-				(struct sockaddr *) &dummy_addr,
+				(struct sockaddr *)&dummy_addr,
 				sizeof(dummy_addr));
 	if (r < 0) {
 		TC_PRINT("Could not handle packet\n");
@@ -1436,7 +1426,7 @@ static int test_observer_client(void)
 	}
 
 	reply = coap_response_received(&rsp,
-				       (const struct sockaddr *) &dummy_addr,
+				       (const struct sockaddr *)&dummy_addr,
 				       replies, NUM_REPLIES);
 	if (!reply) {
 		TC_PRINT("Couldn't find a matching waiting reply\n");
@@ -1458,24 +1448,59 @@ static const struct {
 	const char *name;
 	int (*func)(void);
 } tests[] = {
-	{ "Build empty PDU test", test_build_empty_pdu, },
-	{ "Build simple PDU test", test_build_simple_pdu, },
-	{ "Parse empty PDU test", test_parse_empty_pdu, },
-	{ "Parse empty PDU test no marker", test_parse_empty_pdu_1, },
-	{ "Parse simple PDU test", test_parse_simple_pdu, },
+	{
+		"Build empty PDU test",
+		test_build_empty_pdu,
+	},
+	{
+		"Build simple PDU test",
+		test_build_simple_pdu,
+	},
+	{
+		"Parse empty PDU test",
+		test_parse_empty_pdu,
+	},
+	{
+		"Parse empty PDU test no marker",
+		test_parse_empty_pdu_1,
+	},
+	{
+		"Parse simple PDU test",
+		test_parse_simple_pdu,
+	},
 	{ "Parse malformed option", test_parse_malformed_opt },
 	{ "Parse malformed option length", test_parse_malformed_opt_len },
 	{ "Parse malformed option ext", test_parse_malformed_opt_ext },
 	{ "Parse malformed option length ext",
-		test_parse_malformed_opt_len_ext },
-	{ "Parse malformed empty payload with marker",
-		test_parse_malformed_marker, },
-	{ "Test match path uri", test_match_path_uri, },
-	{ "Test block sized 1 transfer", test_block1_size, },
-	{ "Test block sized 2 transfer", test_block2_size, },
-	{ "Test retransmission", test_retransmit_second_round, },
-	{ "Test observer server", test_observer_server, },
-	{ "Test observer client", test_observer_client, },
+	  test_parse_malformed_opt_len_ext },
+	{
+		"Parse malformed empty payload with marker",
+		test_parse_malformed_marker,
+	},
+	{
+		"Test match path uri",
+		test_match_path_uri,
+	},
+	{
+		"Test block sized 1 transfer",
+		test_block1_size,
+	},
+	{
+		"Test block sized 2 transfer",
+		test_block2_size,
+	},
+	{
+		"Test retransmission",
+		test_retransmit_second_round,
+	},
+	{
+		"Test observer server",
+		test_observer_server,
+	},
+	{
+		"Test observer client",
+		test_observer_client,
+	},
 };
 
 void main(void)

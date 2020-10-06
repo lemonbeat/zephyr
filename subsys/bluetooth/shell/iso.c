@@ -40,9 +40,9 @@ static void iso_disconnected(struct bt_iso_chan *chan)
 }
 
 static struct bt_iso_chan_ops iso_ops = {
-	.recv		= iso_recv,
-	.connected	= iso_connected,
-	.disconnected	= iso_disconnected,
+	.recv = iso_recv,
+	.connected = iso_connected,
+	.disconnected = iso_disconnected,
 };
 
 static struct bt_iso_chan_qos iso_qos = {
@@ -83,8 +83,7 @@ static int cmd_listen(const struct shell *shell, size_t argc, char *argv[])
 
 	err = bt_iso_server_register(&iso_server);
 	if (err) {
-		shell_error(shell, "Unable to register ISO cap (err %d)",
-			    err);
+		shell_error(shell, "Unable to register ISO cap (err %d)", err);
 	}
 
 	return err;
@@ -180,7 +179,7 @@ NET_BUF_POOL_FIXED_DEFINE(tx_pool, 1, DATA_MTU, NULL);
 
 static int cmd_send(const struct shell *shell, size_t argc, char *argv[])
 {
-	static uint8_t buf_data[DATA_MTU] = { [0 ... (DATA_MTU - 1)] = 0xff };
+	static uint8_t buf_data[DATA_MTU] = { [0 ...(DATA_MTU - 1)] = 0xff };
 	int ret, len, count = 1;
 	struct net_buf *buf;
 
@@ -213,8 +212,7 @@ static int cmd_send(const struct shell *shell, size_t argc, char *argv[])
 	return 0;
 }
 
-static int cmd_disconnect(const struct shell *shell, size_t argc,
-			      char *argv[])
+static int cmd_disconnect(const struct shell *shell, size_t argc, char *argv[])
 {
 	int err;
 
@@ -229,22 +227,24 @@ static int cmd_disconnect(const struct shell *shell, size_t argc,
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(iso_cmds,
-	SHELL_CMD_ARG(bind, NULL, "[dir] [interval] [packing] [framing] "
-		      "[latency] [sdu] [phy] [rtn]", cmd_bind, 1, 8),
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	iso_cmds,
+	SHELL_CMD_ARG(bind, NULL,
+		      "[dir] [interval] [packing] [framing] "
+		      "[latency] [sdu] [phy] [rtn]",
+		      cmd_bind, 1, 8),
 	SHELL_CMD_ARG(connect, NULL, "Connect ISO Channel", cmd_connect, 1, 0),
 	SHELL_CMD_ARG(listen, NULL, "[security level]", cmd_listen, 1, 1),
 	SHELL_CMD_ARG(send, NULL, "Send to ISO Channel", cmd_send, 1, 0),
 	SHELL_CMD_ARG(disconnect, NULL, "Disconnect ISO Channel",
 		      cmd_disconnect, 1, 0),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 static int cmd_iso(const struct shell *shell, size_t argc, char **argv)
 {
 	if (argc > 1) {
-		shell_error(shell, "%s unknown parameter: %s",
-			    argv[0], argv[1]);
+		shell_error(shell, "%s unknown parameter: %s", argv[0],
+			    argv[1]);
 	} else {
 		shell_error(shell, "%s Missing subcommand", argv[0]);
 	}
@@ -252,5 +252,5 @@ static int cmd_iso(const struct shell *shell, size_t argc, char **argv)
 	return -ENOEXEC;
 }
 
-SHELL_CMD_ARG_REGISTER(iso, &iso_cmds, "Bluetooth ISO shell commands",
-		       cmd_iso, 1, 1);
+SHELL_CMD_ARG_REGISTER(iso, &iso_cmds, "Bluetooth ISO shell commands", cmd_iso,
+		       1, 1);

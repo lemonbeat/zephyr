@@ -31,18 +31,16 @@ struct gpio_sam_runtime {
 	sys_slist_t cb;
 };
 
-#define DEV_CFG(dev) \
-	((const struct gpio_sam_config * const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct gpio_sam_runtime * const)(dev)->data)
+#define DEV_CFG(dev) ((const struct gpio_sam_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct gpio_sam_runtime *const)(dev)->data)
 
-#define GPIO_SAM_ALL_PINS    0xFFFFFFFF
+#define GPIO_SAM_ALL_PINS 0xFFFFFFFF
 
 static int gpio_sam_port_configure(const struct device *dev, uint32_t mask,
 				   gpio_flags_t flags)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 
 	if (flags & GPIO_SINGLE_ENDED) {
 		/* TODO: Add support for Open Source, Open Drain mode */
@@ -56,10 +54,8 @@ static int gpio_sam_port_configure(const struct device *dev, uint32_t mask,
 		pio->PIO_IDR = mask;
 		/* Disable pull-up. */
 		pio->PIO_PUDR = mask;
-#if defined(CONFIG_SOC_SERIES_SAM4S) || \
-	defined(CONFIG_SOC_SERIES_SAM4E) || \
-	defined(CONFIG_SOC_SERIES_SAME70) || \
-	defined(CONFIG_SOC_SERIES_SAMV71)
+#if defined(CONFIG_SOC_SERIES_SAM4S) || defined(CONFIG_SOC_SERIES_SAM4E) || \
+	defined(CONFIG_SOC_SERIES_SAME70) || defined(CONFIG_SOC_SERIES_SAMV71)
 		/* Disable pull-down. */
 		pio->PIO_PPDDR = mask;
 #endif
@@ -98,21 +94,17 @@ static int gpio_sam_port_configure(const struct device *dev, uint32_t mask,
 	 * Clear both pulls, then enable the one we need.
 	 */
 	pio->PIO_PUDR = mask;
-#if defined(CONFIG_SOC_SERIES_SAM4S) || \
-	defined(CONFIG_SOC_SERIES_SAM4E) || \
-	defined(CONFIG_SOC_SERIES_SAME70) || \
-	defined(CONFIG_SOC_SERIES_SAMV71)
+#if defined(CONFIG_SOC_SERIES_SAM4S) || defined(CONFIG_SOC_SERIES_SAM4E) || \
+	defined(CONFIG_SOC_SERIES_SAME70) || defined(CONFIG_SOC_SERIES_SAMV71)
 	pio->PIO_PPDDR = mask;
 #endif
 	if (flags & GPIO_PULL_UP) {
 		/* Enable pull-up. */
 		pio->PIO_PUER = mask;
-#if defined(CONFIG_SOC_SERIES_SAM4S) || \
-	defined(CONFIG_SOC_SERIES_SAM4E) || \
-	defined(CONFIG_SOC_SERIES_SAME70) || \
-	defined(CONFIG_SOC_SERIES_SAMV71)
+#if defined(CONFIG_SOC_SERIES_SAM4S) || defined(CONFIG_SOC_SERIES_SAM4E) || \
+	defined(CONFIG_SOC_SERIES_SAME70) || defined(CONFIG_SOC_SERIES_SAMV71)
 
-	/* Setup Pull-down resistor. */
+		/* Setup Pull-down resistor. */
 	} else if (flags & GPIO_PULL_DOWN) {
 		/* Enable pull-down. */
 		pio->PIO_PPDER = mask;
@@ -126,10 +118,8 @@ static int gpio_sam_port_configure(const struct device *dev, uint32_t mask,
 	} else {
 		pio->PIO_SCIFSR = mask;
 	}
-#elif defined(CONFIG_SOC_SERIES_SAM4S) || \
-	defined(CONFIG_SOC_SERIES_SAM4E) || \
-	defined(CONFIG_SOC_SERIES_SAME70) || \
-	defined(CONFIG_SOC_SERIES_SAMV71)
+#elif defined(CONFIG_SOC_SERIES_SAM4S) || defined(CONFIG_SOC_SERIES_SAM4E) || \
+	defined(CONFIG_SOC_SERIES_SAME70) || defined(CONFIG_SOC_SERIES_SAMV71)
 
 	/* Setup debounce. */
 	if (flags & GPIO_INT_DEBOUNCE) {
@@ -153,20 +143,19 @@ static int gpio_sam_config(const struct device *dev, gpio_pin_t pin,
 
 static int gpio_sam_port_get_raw(const struct device *dev, uint32_t *value)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 
 	*value = pio->PIO_PDSR;
 
 	return 0;
 }
 
-static int gpio_sam_port_set_masked_raw(const struct device *dev,
-					uint32_t mask,
+static int gpio_sam_port_set_masked_raw(const struct device *dev, uint32_t mask,
 					uint32_t value)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 
 	pio->PIO_ODSR = (pio->PIO_ODSR & ~mask) | (mask & value);
 
@@ -175,8 +164,8 @@ static int gpio_sam_port_set_masked_raw(const struct device *dev,
 
 static int gpio_sam_port_set_bits_raw(const struct device *dev, uint32_t mask)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 
 	/* Set pins. */
 	pio->PIO_SODR = mask;
@@ -184,11 +173,10 @@ static int gpio_sam_port_set_bits_raw(const struct device *dev, uint32_t mask)
 	return 0;
 }
 
-static int gpio_sam_port_clear_bits_raw(const struct device *dev,
-					uint32_t mask)
+static int gpio_sam_port_clear_bits_raw(const struct device *dev, uint32_t mask)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 
 	/* Clear pins. */
 	pio->PIO_CODR = mask;
@@ -198,8 +186,8 @@ static int gpio_sam_port_clear_bits_raw(const struct device *dev,
 
 static int gpio_sam_port_toggle_bits(const struct device *dev, uint32_t mask)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 
 	/* Toggle pins. */
 	pio->PIO_ODSR ^= mask;
@@ -212,8 +200,8 @@ static int gpio_sam_port_interrupt_configure(const struct device *dev,
 					     enum gpio_int_mode mode,
 					     enum gpio_int_trig trig)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 
 	/* Disable the interrupt. */
 	pio->PIO_IDR = mask;
@@ -266,8 +254,8 @@ static int gpio_sam_pin_interrupt_configure(const struct device *dev,
 
 static void gpio_sam_isr(const struct device *dev)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
-	Pio * const pio = cfg->regs;
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
+	Pio *const pio = cfg->regs;
 	struct gpio_sam_runtime *context = dev->data;
 	uint32_t int_stat;
 
@@ -277,8 +265,7 @@ static void gpio_sam_isr(const struct device *dev)
 }
 
 static int gpio_sam_manage_callback(const struct device *port,
-				    struct gpio_callback *callback,
-				    bool set)
+				    struct gpio_callback *callback, bool set)
 {
 	struct gpio_sam_runtime *context = port->data;
 
@@ -298,7 +285,7 @@ static const struct gpio_driver_api gpio_sam_api = {
 
 int gpio_sam_init(const struct device *dev)
 {
-	const struct gpio_sam_config * const cfg = DEV_CFG(dev);
+	const struct gpio_sam_config *const cfg = DEV_CFG(dev);
 
 	/* The peripheral clock must be enabled for the interrupts to work. */
 	soc_pmc_peripheral_enable(cfg->periph_id);
@@ -308,9 +295,9 @@ int gpio_sam_init(const struct device *dev)
 	return 0;
 }
 
-#define GPIO_SAM_INIT(n)						\
-	static void port_##n##_sam_config_func(const struct device *dev);	\
-									\
+#define GPIO_SAM_INIT(n)                                                     \
+	static void port_##n##_sam_config_func(const struct device *dev);    \
+                                                                             \
 	static const struct gpio_sam_config port_##n##_sam_config = {	\
 		.common = {						\
 			.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_DT_INST(n),\
@@ -318,22 +305,20 @@ int gpio_sam_init(const struct device *dev)
 		.regs = (Pio *)DT_INST_REG_ADDR(n),			\
 		.periph_id = DT_INST_PROP(n, peripheral_id),		\
 		.config_func = port_##n##_sam_config_func,		\
-	};								\
-									\
-	static struct gpio_sam_runtime port_##n##_sam_runtime;		\
-									\
-	DEVICE_AND_API_INIT(port_##n##_sam, DT_INST_LABEL(n),		\
-			    gpio_sam_init, &port_##n##_sam_runtime,	\
-			    &port_##n##_sam_config, POST_KERNEL,	\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &gpio_sam_api);				\
-									\
-	static void port_##n##_sam_config_func(const struct device *dev)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),	\
-			    gpio_sam_isr,				\
-			    DEVICE_GET(port_##n##_sam), 0);		\
-		irq_enable(DT_INST_IRQN(n));				\
+	};      \
+                                                                             \
+	static struct gpio_sam_runtime port_##n##_sam_runtime;               \
+                                                                             \
+	DEVICE_AND_API_INIT(port_##n##_sam, DT_INST_LABEL(n), gpio_sam_init, \
+			    &port_##n##_sam_runtime, &port_##n##_sam_config, \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
+			    &gpio_sam_api);                                  \
+                                                                             \
+	static void port_##n##_sam_config_func(const struct device *dev)     \
+	{                                                                    \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),       \
+			    gpio_sam_isr, DEVICE_GET(port_##n##_sam), 0);    \
+		irq_enable(DT_INST_IRQN(n));                                 \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_SAM_INIT)

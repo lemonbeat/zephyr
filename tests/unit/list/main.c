@@ -12,11 +12,9 @@ extern void test_dlist(void);
 
 void test_main(void)
 {
-	ztest_test_suite(dlist,
-			 ztest_unit_test(test_dlist),
+	ztest_test_suite(dlist, ztest_unit_test(test_dlist),
 			 ztest_unit_test(test_slist),
-			 ztest_unit_test(test_sflist)
-			 );
+			 ztest_unit_test(test_sflist));
 
 	ztest_run_test_suite(dlist);
 }

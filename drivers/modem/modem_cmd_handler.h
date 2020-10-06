@@ -21,34 +21,29 @@
 extern "C" {
 #endif
 
-#define MODEM_CMD_DEFINE(name_) \
-static int name_(struct modem_cmd_handler_data *data, uint16_t len, \
-		 uint8_t **argv, uint16_t argc)
+#define MODEM_CMD_DEFINE(name_)                                             \
+	static int name_(struct modem_cmd_handler_data *data, uint16_t len, \
+			 uint8_t **argv, uint16_t argc)
 
-#define MODEM_CMD(cmd_, func_cb_, acount_, adelim_) { \
-	.cmd = cmd_, \
-	.cmd_len = (uint16_t)sizeof(cmd_)-1, \
-	.func = func_cb_, \
-	.arg_count = acount_, \
-	.delim = adelim_, \
-	.direct = false, \
-}
+#define MODEM_CMD(cmd_, func_cb_, acount_, adelim_)                       \
+	{                                                                 \
+		.cmd = cmd_, .cmd_len = (uint16_t)sizeof(cmd_) - 1,       \
+		.func = func_cb_, .arg_count = acount_, .delim = adelim_, \
+		.direct = false,                                          \
+	}
 
 #define MODEM_CMD_DIRECT_DEFINE(name_) MODEM_CMD_DEFINE(name_)
 
-#define MODEM_CMD_DIRECT(cmd_, func_cb_) { \
-	.cmd = cmd_, \
-	.cmd_len = (uint16_t)sizeof(cmd_)-1, \
-	.func = func_cb_, \
-	.arg_count = 0, \
-	.delim = "", \
-	.direct = true, \
-}
+#define MODEM_CMD_DIRECT(cmd_, func_cb_)                                       \
+	{                                                                      \
+		.cmd = cmd_, .cmd_len = (uint16_t)sizeof(cmd_) - 1,            \
+		.func = func_cb_, .arg_count = 0, .delim = "", .direct = true, \
+	}
 
-#define CMD_RESP	0
-#define CMD_UNSOL	1
-#define CMD_HANDLER	2
-#define CMD_MAX		3
+#define CMD_RESP 0
+#define CMD_UNSOL 1
+#define CMD_HANDLER 2
+#define CMD_MAX 3
 
 struct modem_cmd_handler_data;
 
@@ -62,13 +57,13 @@ struct modem_cmd {
 	bool direct;
 };
 
-#define SETUP_CMD(cmd_send_, match_cmd_, func_cb_, num_param_, delim_) { \
-	.send_cmd = cmd_send_, \
-	MODEM_CMD(match_cmd_, func_cb_, num_param_, delim_) \
-}
+#define SETUP_CMD(cmd_send_, match_cmd_, func_cb_, num_param_, delim_) \
+	{                                                              \
+		.send_cmd = cmd_send_,                                 \
+		MODEM_CMD(match_cmd_, func_cb_, num_param_, delim_)    \
+	}
 
-#define SETUP_CMD_NOHANDLE(send_cmd_) \
-		SETUP_CMD(send_cmd_, NULL, NULL, 0U, NULL)
+#define SETUP_CMD_NOHANDLE(send_cmd_) SETUP_CMD(send_cmd_, NULL, NULL, 0U, NULL)
 
 /* series of modem setup commands to run */
 struct setup_cmd {
@@ -152,9 +147,8 @@ int modem_cmd_handler_update_cmds(struct modem_cmd_handler_data *data,
 int modem_cmd_send_nolock(struct modem_iface *iface,
 			  struct modem_cmd_handler *handler,
 			  struct modem_cmd *handler_cmds,
-			  size_t handler_cmds_len,
-			  const uint8_t *buf, struct k_sem *sem,
-			  k_timeout_t timeout);
+			  size_t handler_cmds_len, const uint8_t *buf,
+			  struct k_sem *sem, k_timeout_t timeout);
 
 /**
  * @brief  send AT command to interface w/ a TX lock
@@ -167,8 +161,7 @@ int modem_cmd_send_nolock(struct modem_iface *iface,
  *
  * @retval 0 if ok, < 0 if error.
  */
-int modem_cmd_send(struct modem_iface *iface,
-		   struct modem_cmd_handler *handler,
+int modem_cmd_send(struct modem_iface *iface, struct modem_cmd_handler *handler,
 		   struct modem_cmd *handler_cmds, size_t handler_cmds_len,
 		   const uint8_t *buf, struct k_sem *sem, k_timeout_t timeout);
 

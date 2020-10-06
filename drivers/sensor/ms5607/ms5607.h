@@ -34,31 +34,31 @@
 #define MS5607_CMD_CONV_READ_CRC 0xAE
 
 #if defined(CONFIG_MS5607_PRES_OVER_256X)
-	#define MS5607_PRES_OVER_DEFAULT 256
+#define MS5607_PRES_OVER_DEFAULT 256
 #elif defined(CONFIG_MS5607_PRES_OVER_512X)
-	#define MS5607_PRES_OVER_DEFAULT 512
+#define MS5607_PRES_OVER_DEFAULT 512
 #elif defined(CONFIG_MS5607_PRES_OVER_1024X)
-	#define MS5607_PRES_OVER_DEFAULT 1024
+#define MS5607_PRES_OVER_DEFAULT 1024
 #elif defined(CONFIG_MS5607_PRES_OVER_2048X)
-	#define MS5607_PRES_OVER_DEFAULT 2048
+#define MS5607_PRES_OVER_DEFAULT 2048
 #elif defined(CONFIG_MS5607_PRES_OVER_4096X)
-	#define MS5607_PRES_OVER_DEFAULT 4096
+#define MS5607_PRES_OVER_DEFAULT 4096
 #else
-	#define MS5607_PRES_OVER_DEFAULT 2048
+#define MS5607_PRES_OVER_DEFAULT 2048
 #endif
 
 #if defined(CONFIG_MS5607_TEMP_OVER_256X)
-	#define MS5607_TEMP_OVER_DEFAULT 256
+#define MS5607_TEMP_OVER_DEFAULT 256
 #elif defined(CONFIG_MS5607_TEMP_OVER_512X)
-	#define MS5607_TEMP_OVER_DEFAULT 512
+#define MS5607_TEMP_OVER_DEFAULT 512
 #elif defined(CONFIG_MS5607_TEMP_OVER_1024X)
-	#define MS5607_TEMP_OVER_DEFAULT 1024
+#define MS5607_TEMP_OVER_DEFAULT 1024
 #elif defined(CONFIG_MS5607_TEMP_OVER_2048X)
-	#define MS5607_TEMP_OVER_DEFAULT 2048
+#define MS5607_TEMP_OVER_DEFAULT 2048
 #elif defined(CONFIG_MS5607_TEMP_OVER_4096X)
-	#define MS5607_TEMP_OVER_DEFAULT 4096
+#define MS5607_TEMP_OVER_DEFAULT 4096
 #else
-	#define MS5607_TEMP_OVER_DEFAULT 2048
+#define MS5607_TEMP_OVER_DEFAULT 2048
 #endif
 
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
@@ -97,7 +97,8 @@ struct ms5607_data {
 
 struct ms5607_transfer_function {
 	int (*reset)(const struct ms5607_data *data);
-	int (*read_prom)(const struct ms5607_data *data, uint8_t cmd, uint16_t *val);
+	int (*read_prom)(const struct ms5607_data *data, uint8_t cmd,
+			 uint16_t *val);
 	int (*start_conversion)(const struct ms5607_data *data, uint8_t cmd);
 	int (*read_adc)(const struct ms5607_data *data, uint32_t *val);
 };

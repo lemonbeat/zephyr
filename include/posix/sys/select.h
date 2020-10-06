@@ -18,9 +18,8 @@
 
 struct timeval;
 
-static inline int select(int nfds, fd_set *readfds,
-			 fd_set *writefds, fd_set *exceptfds,
-			 struct timeval *timeout)
+static inline int select(int nfds, fd_set *readfds, fd_set *writefds,
+			 fd_set *exceptfds, struct timeval *timeout)
 {
 	return zsock_select(nfds, readfds, writefds, exceptfds,
 			    (struct zsock_timeval *)timeout);

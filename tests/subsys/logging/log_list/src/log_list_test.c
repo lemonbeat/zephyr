@@ -17,7 +17,6 @@
 #include <zephyr.h>
 #include <ztest.h>
 
-
 void test_log_list(void)
 {
 	struct log_list_t my_list;
@@ -86,8 +85,7 @@ void test_log_list_multiple_items(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_log_list,
-			 ztest_unit_test(test_log_list),
+	ztest_test_suite(test_log_list, ztest_unit_test(test_log_list),
 			 ztest_unit_test(test_log_list_multiple_items));
 	ztest_run_test_suite(test_log_list);
 }

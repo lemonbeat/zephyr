@@ -43,8 +43,7 @@ LOG_MODULE_DECLARE(net_ipv6, CONFIG_NET_IPV6_LOG_LEVEL);
 static void reassembly_timeout(struct k_work *work);
 static bool reassembly_init_done;
 
-static struct net_ipv6_reassembly
-reassembly[CONFIG_NET_IPV6_FRAGMENT_MAX_COUNT];
+static struct net_ipv6_reassembly reassembly[CONFIG_NET_IPV6_FRAGMENT_MAX_COUNT];
 
 int net_ipv6_find_last_ext_hdr(struct net_pkt *pkt, uint16_t *next_hdr_off,
 			       uint16_t *last_hdr_off)
@@ -120,14 +119,12 @@ fail:
 	return -EINVAL;
 }
 
-static struct net_ipv6_reassembly *reassembly_get(uint32_t id,
-						  struct in6_addr *src,
-						  struct in6_addr *dst)
+static struct net_ipv6_reassembly *
+reassembly_get(uint32_t id, struct in6_addr *src, struct in6_addr *dst)
 {
 	int i, avail = -1;
 
 	for (i = 0; i < CONFIG_NET_IPV6_FRAGMENT_MAX_COUNT; i++) {
-
 		if (k_delayed_work_remaining_get(&reassembly[i].timer) &&
 		    reassembly[i].id == id &&
 		    net_ipv6_addr_cmp(src, &reassembly[i].src) &&
@@ -159,8 +156,7 @@ static struct net_ipv6_reassembly *reassembly_get(uint32_t id,
 	return &reassembly[avail];
 }
 
-static bool reassembly_cancel(uint32_t id,
-			      struct in6_addr *src,
+static bool reassembly_cancel(uint32_t id, struct in6_addr *src,
 			      struct in6_addr *dst)
 {
 	int i, j;
@@ -191,8 +187,8 @@ static bool reassembly_cancel(uint32_t id,
 				continue;
 			}
 
-			NET_DBG("[%d] IPv6 reassembly pkt %p %zd bytes data",
-				j, reassembly[i].pkt[j],
+			NET_DBG("[%d] IPv6 reassembly pkt %p %zd bytes data", j,
+				reassembly[i].pkt[j],
 				net_pkt_get_len(reassembly[i].pkt[j]));
 
 			net_pkt_unref(reassembly[i].pkt[j]);
@@ -259,8 +255,8 @@ static void reassemble_packet(struct net_ipv6_reassembly *reass)
 		removed_len = net_pkt_ipv6_fragment_start(pkt) +
 			      sizeof(struct net_ipv6_frag_hdr);
 
-		NET_DBG("Removing %d bytes from start of pkt %p",
-			removed_len, pkt->buffer);
+		NET_DBG("Removing %d bytes from start of pkt %p", removed_len,
+			pkt->buffer);
 
 		if (net_pkt_pull(pkt, removed_len)) {
 			NET_ERR("Failed to pull headers");
@@ -291,8 +287,8 @@ static void reassemble_packet(struct net_ipv6_reassembly *reass)
 		goto error;
 	}
 
-	ipv6.frag_hdr = (struct net_ipv6_frag_hdr *)net_pkt_get_data(
-							pkt, &frag_access);
+	ipv6.frag_hdr =
+		(struct net_ipv6_frag_hdr *)net_pkt_get_data(pkt, &frag_access);
 	if (!ipv6.frag_hdr) {
 		NET_ERR("Failed to get fragment header");
 		goto error;
@@ -322,8 +318,8 @@ static void reassemble_packet(struct net_ipv6_reassembly *reass)
 	len = net_pkt_ipv6_ext_len(pkt);
 	if (len > 0) {
 		NET_DBG("Old pkt %p IPv6 ext len is %d bytes", pkt, len);
-		net_pkt_set_ipv6_ext_len(pkt,
-				len - sizeof(struct net_ipv6_frag_hdr));
+		net_pkt_set_ipv6_ext_len(
+			pkt, len - sizeof(struct net_ipv6_frag_hdr));
 	}
 
 	len = net_pkt_get_len(pkt) - sizeof(struct net_ipv6_hdr);
@@ -332,8 +328,7 @@ static void reassemble_packet(struct net_ipv6_reassembly *reass)
 
 	net_pkt_set_data(pkt, &ipv6_access);
 
-	NET_DBG("New pkt %p IPv6 len is %d bytes", pkt,
-		len + NET_IPV6H_LEN);
+	NET_DBG("New pkt %p IPv6 len is %d bytes", pkt, len + NET_IPV6H_LEN);
 
 	/* We need to use the queue when feeding the packet back into the
 	 * IP stack as we might run out of stack if we call processing_data()
@@ -352,8 +347,9 @@ void net_ipv6_frag_foreach(net_ipv6_frag_cb_t cb, void *user_data)
 {
 	int i;
 
-	for (i = 0; reassembly_init_done &&
-		     i < CONFIG_NET_IPV6_FRAGMENT_MAX_COUNT; i++) {
+	for (i = 0;
+	     reassembly_init_done && i < CONFIG_NET_IPV6_FRAGMENT_MAX_COUNT;
+	     i++) {
 		if (!k_delayed_work_remaining_get(&reassembly[i].timer)) {
 			continue;
 		}
@@ -381,8 +377,8 @@ static bool fragment_verify(struct net_ipv6_reassembly *reass)
 	for (i = 1; i < NET_IPV6_FRAGMENTS_MAX_PKT; i++) {
 		offset = net_pkt_ipv6_fragment_offset(reass->pkt[i]);
 
-		NET_DBG("pkt %p offset %u prev_len %d", reass->pkt[i],
-			offset, prev_len);
+		NET_DBG("pkt %p offset %u prev_len %d", reass->pkt[i], offset,
+			prev_len);
 
 		if (prev_len < offset) {
 			/* Something wrong with the offset value */
@@ -401,8 +397,8 @@ static int shift_packets(struct net_ipv6_reassembly *reass, int pos)
 
 	for (i = pos + 1; i < NET_IPV6_FRAGMENTS_MAX_PKT; i++) {
 		if (!reass->pkt[i]) {
-			NET_DBG("Moving [%d] %p (offset 0x%x) to [%d]",
-				pos, reass->pkt[pos],
+			NET_DBG("Moving [%d] %p (offset 0x%x) to [%d]", pos,
+				reass->pkt[pos],
 				net_pkt_ipv6_fragment_offset(reass->pkt[pos]),
 				i);
 
@@ -453,8 +449,7 @@ enum net_verdict net_ipv6_handle_fragment_hdr(struct net_pkt *pkt,
 	 * being 1 byte too far, let's just read the next relevant pieces.
 	 */
 	if (net_pkt_skip(pkt, 1) || /* reserved */
-	    net_pkt_read_be16(pkt, &flag) ||
-	    net_pkt_read_be32(pkt, &id)) {
+	    net_pkt_read_be16(pkt, &flag) || net_pkt_read_be32(pkt, &id)) {
 		goto drop;
 	}
 
@@ -468,8 +463,8 @@ enum net_verdict net_ipv6_handle_fragment_hdr(struct net_pkt *pkt,
 	net_pkt_set_ipv6_fragment_offset(pkt, flag & 0xfff8);
 
 	if (!reass->pkt[0]) {
-		NET_DBG("Storing pkt %p to slot %d offset %d",
-			pkt, 0, net_pkt_ipv6_fragment_offset(pkt));
+		NET_DBG("Storing pkt %p to slot %d offset %d", pkt, 0,
+			net_pkt_ipv6_fragment_offset(pkt));
 		reass->pkt[0] = pkt;
 
 		reassembly_info("Reassembly 1st pkt", reass);
@@ -496,8 +491,8 @@ enum net_verdict net_ipv6_handle_fragment_hdr(struct net_pkt *pkt,
 			}
 		}
 
-		NET_DBG("Storing pkt %p to slot %d offset %d",
-			pkt, i, net_pkt_ipv6_fragment_offset(pkt));
+		NET_DBG("Storing pkt %p to slot %d offset %d", pkt, i,
+			net_pkt_ipv6_fragment_offset(pkt));
 		reass->pkt[i] = pkt;
 		found = true;
 
@@ -562,12 +557,9 @@ drop:
 
 #define BUF_ALLOC_TIMEOUT K_MSEC(100)
 
-static int send_ipv6_fragment(struct net_pkt *pkt,
-			      uint16_t fit_len,
-			      uint16_t frag_offset,
-			      uint16_t next_hdr_off,
-			      uint8_t next_hdr,
-			      bool final)
+static int send_ipv6_fragment(struct net_pkt *pkt, uint16_t fit_len,
+			      uint16_t frag_offset, uint16_t next_hdr_off,
+			      uint8_t next_hdr, bool final)
 {
 	NET_PKT_DATA_ACCESS_DEFINE(frag_access, struct net_ipv6_frag_hdr);
 	uint8_t frag_pkt_next_hdr = NET_IPV6_NEXTHDR_HBHO;
@@ -575,10 +567,10 @@ static int send_ipv6_fragment(struct net_pkt *pkt,
 	struct net_ipv6_frag_hdr *frag_hdr;
 	struct net_pkt *frag_pkt;
 
-	frag_pkt = net_pkt_alloc_with_buffer(net_pkt_iface(pkt), fit_len +
-					     net_pkt_ipv6_ext_len(pkt) +
-					     NET_IPV6_FRAGH_LEN,
-					     AF_INET6, 0, BUF_ALLOC_TIMEOUT);
+	frag_pkt = net_pkt_alloc_with_buffer(
+		net_pkt_iface(pkt),
+		fit_len + net_pkt_ipv6_ext_len(pkt) + NET_IPV6_FRAGH_LEN,
+		AF_INET6, 0, BUF_ALLOC_TIMEOUT);
 	if (!frag_pkt) {
 		return -ENOMEM;
 	}
@@ -591,8 +583,9 @@ static int send_ipv6_fragment(struct net_pkt *pkt,
 	if (net_pkt_copy(frag_pkt, pkt, next_hdr_off) ||
 	    net_pkt_write_u8(frag_pkt, NET_IPV6_NEXTHDR_FRAG) ||
 	    net_pkt_skip(pkt, 1) ||
-	    net_pkt_copy(frag_pkt, pkt, net_pkt_ip_hdr_len(pkt) +
-			 net_pkt_ipv6_ext_len(pkt) - next_hdr_off - 1)) {
+	    net_pkt_copy(frag_pkt, pkt,
+			 net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt) -
+				 next_hdr_off - 1)) {
 		goto fail;
 	}
 
@@ -618,7 +611,7 @@ static int send_ipv6_fragment(struct net_pkt *pkt,
 
 	net_pkt_set_ipv6_ext_len(frag_pkt,
 				 net_pkt_ipv6_ext_len(pkt) +
-				 sizeof(struct net_ipv6_frag_hdr));
+					 sizeof(struct net_ipv6_frag_hdr));
 
 	/* Finally we copy the payload part of this fragment from
 	 * the original packet
@@ -686,19 +679,20 @@ int net_ipv6_send_fragmented_pkt(struct net_if *iface, struct net_pkt *pkt,
 	 * Extenstion headers and Fragmentation header.
 	 */
 	fit_len = NET_IPV6_MTU - NET_IPV6_FRAGH_LEN -
-		(net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt));
+		  (net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt));
 	if (fit_len <= 0) {
 		/* Must be invalid extension headers length */
 		NET_DBG("No room for IPv6 payload MTU %d hdrs_len %d",
-			NET_IPV6_MTU, NET_IPV6_FRAGH_LEN +
-			net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt));
+			NET_IPV6_MTU,
+			NET_IPV6_FRAGH_LEN + net_pkt_ip_hdr_len(pkt) +
+				net_pkt_ipv6_ext_len(pkt));
 		return -EINVAL;
 	}
 
 	frag_offset = 0U;
 
 	length = net_pkt_get_len(pkt) -
-		(net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt));
+		 (net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt));
 	while (length) {
 		bool final = false;
 

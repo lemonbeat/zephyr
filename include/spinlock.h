@@ -159,5 +159,4 @@ static ALWAYS_INLINE void k_spin_release(struct k_spinlock *l)
 #endif
 }
 
-
 #endif /* ZEPHYR_INCLUDE_SPINLOCK_H_ */

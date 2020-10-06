@@ -23,46 +23,46 @@
 /* UART registers struct */
 struct uart_cmsdk_apb {
 	/* offset: 0x000 (r/w) data register    */
-	volatile uint32_t  data;
+	volatile uint32_t data;
 	/* offset: 0x004 (r/w) status register  */
-	volatile uint32_t  state;
+	volatile uint32_t state;
 	/* offset: 0x008 (r/w) control register */
-	volatile uint32_t  ctrl;
+	volatile uint32_t ctrl;
 	union {
 		/* offset: 0x00c (r/ ) interrupt status register */
-		volatile uint32_t  intstatus;
+		volatile uint32_t intstatus;
 		/* offset: 0x00c ( /w) interrupt clear register  */
-		volatile uint32_t  intclear;
+		volatile uint32_t intclear;
 	};
 	/* offset: 0x010 (r/w) baudrate divider register */
-	volatile uint32_t  bauddiv;
+	volatile uint32_t bauddiv;
 };
 
 /* UART Bits */
 /* CTRL Register */
-#define UART_TX_EN	(1 << 0)
-#define UART_RX_EN	(1 << 1)
-#define UART_TX_IN_EN	(1 << 2)
-#define UART_RX_IN_EN	(1 << 3)
-#define UART_TX_OV_EN	(1 << 4)
-#define UART_RX_OV_EN	(1 << 5)
-#define UART_HS_TM_TX	(1 << 6)
+#define UART_TX_EN (1 << 0)
+#define UART_RX_EN (1 << 1)
+#define UART_TX_IN_EN (1 << 2)
+#define UART_RX_IN_EN (1 << 3)
+#define UART_TX_OV_EN (1 << 4)
+#define UART_RX_OV_EN (1 << 5)
+#define UART_HS_TM_TX (1 << 6)
 
 /* STATE Register */
-#define UART_TX_BF	(1 << 0)
-#define UART_RX_BF	(1 << 1)
-#define UART_TX_B_OV	(1 << 2)
-#define UART_RX_B_OV	(1 << 3)
+#define UART_TX_BF (1 << 0)
+#define UART_RX_BF (1 << 1)
+#define UART_TX_B_OV (1 << 2)
+#define UART_RX_B_OV (1 << 3)
 
 /* INTSTATUS Register */
-#define UART_TX_IN	(1 << 0)
-#define UART_RX_IN	(1 << 1)
-#define UART_TX_OV_IN	(1 << 2)
-#define UART_RX_OV_IN	(1 << 3)
+#define UART_TX_IN (1 << 0)
+#define UART_RX_IN (1 << 1)
+#define UART_TX_OV_IN (1 << 2)
+#define UART_RX_OV_IN (1 << 3)
 
 /* Device data structure */
 struct uart_cmsdk_apb_dev_data {
-	uint32_t baud_rate;	/* Baud rate */
+	uint32_t baud_rate; /* Baud rate */
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	uart_irq_callback_user_data_t irq_cb;
 	void *irq_cb_data;
@@ -76,10 +76,8 @@ struct uart_cmsdk_apb_dev_data {
 };
 
 /* convenience defines */
-#define DEV_CFG(dev) \
-	((const struct uart_device_config * const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct uart_cmsdk_apb_dev_data * const)(dev)->data)
+#define DEV_CFG(dev) ((const struct uart_device_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct uart_cmsdk_apb_dev_data *const)(dev)->data)
 #define UART_STRUCT(dev) \
 	((volatile struct uart_cmsdk_apb *)(DEV_CFG(dev))->base)
 
@@ -98,7 +96,7 @@ static void uart_cmsdk_apb_isr(const struct device *dev);
 static void baudrate_set(const struct device *dev)
 {
 	volatile struct uart_cmsdk_apb *uart = UART_STRUCT(dev);
-	const struct uart_device_config * const dev_cfg = DEV_CFG(dev);
+	const struct uart_device_config *const dev_cfg = DEV_CFG(dev);
 	struct uart_cmsdk_apb_dev_data *const dev_data = DEV_DATA(dev);
 	/*
 	 * If baudrate and/or sys_clk_freq are 0 the configuration remains
@@ -125,7 +123,7 @@ static int uart_cmsdk_apb_init(const struct device *dev)
 {
 	volatile struct uart_cmsdk_apb *uart = UART_STRUCT(dev);
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	const struct uart_device_config * const dev_cfg = DEV_CFG(dev);
+	const struct uart_device_config *const dev_cfg = DEV_CFG(dev);
 #endif
 
 #ifdef CONFIG_CLOCK_CONTROL
@@ -133,12 +131,12 @@ static int uart_cmsdk_apb_init(const struct device *dev)
 	const struct device *clk =
 		device_get_binding(CONFIG_ARM_CLOCK_CONTROL_DEV_NAME);
 
-	struct uart_cmsdk_apb_dev_data * const data = DEV_DATA(dev);
+	struct uart_cmsdk_apb_dev_data *const data = DEV_DATA(dev);
 
 #ifdef CONFIG_SOC_SERIES_BEETLE
-	clock_control_on(clk, (clock_control_subsys_t *) &data->uart_cc_as);
-	clock_control_on(clk, (clock_control_subsys_t *) &data->uart_cc_ss);
-	clock_control_on(clk, (clock_control_subsys_t *) &data->uart_cc_dss);
+	clock_control_on(clk, (clock_control_subsys_t *)&data->uart_cc_as);
+	clock_control_on(clk, (clock_control_subsys_t *)&data->uart_cc_ss);
+	clock_control_on(clk, (clock_control_subsys_t *)&data->uart_cc_dss);
 #endif /* CONFIG_SOC_SERIES_BEETLE */
 #endif /* CONFIG_CLOCK_CONTROL */
 
@@ -188,8 +186,7 @@ static int uart_cmsdk_apb_poll_in(const struct device *dev, unsigned char *c)
  * @param dev UART device struct
  * @param c Character to send
  */
-static void uart_cmsdk_apb_poll_out(const struct device *dev,
-					     unsigned char c)
+static void uart_cmsdk_apb_poll_out(const struct device *dev, unsigned char c)
 {
 	volatile struct uart_cmsdk_apb *uart = UART_STRUCT(dev);
 
@@ -235,8 +232,8 @@ static int uart_cmsdk_apb_fifo_fill(const struct device *dev,
  *
  * @return the number of characters that have been read
  */
-static int uart_cmsdk_apb_fifo_read(const struct device *dev,
-				    uint8_t *rx_data, const int size)
+static int uart_cmsdk_apb_fifo_read(const struct device *dev, uint8_t *rx_data,
+				    const int size)
 {
 	volatile struct uart_cmsdk_apb *uart = UART_STRUCT(dev);
 
@@ -378,8 +375,8 @@ static void uart_cmsdk_apb_irq_err_disable(const struct device *dev)
 static int uart_cmsdk_apb_irq_is_pending(const struct device *dev)
 {
 	/* Return true if rx buffer full or tx buffer empty */
-	return (UART_STRUCT(dev)->state & (UART_RX_BF | UART_TX_BF))
-					!= UART_TX_BF;
+	return (UART_STRUCT(dev)->state & (UART_RX_BF | UART_TX_BF)) !=
+	       UART_TX_BF;
 }
 
 /**
@@ -435,7 +432,6 @@ void uart_cmsdk_apb_isr(const struct device *dev)
 
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 
-
 static const struct uart_driver_api uart_cmsdk_apb_driver_api = {
 	.poll_in = uart_cmsdk_apb_poll_in,
 	.poll_out = uart_cmsdk_apb_poll_out,
@@ -481,40 +477,30 @@ static struct uart_cmsdk_apb_dev_data uart_cmsdk_apb_dev_data_0 = {
 			.device = DT_INST_REG_ADDR(0),},
 };
 
-DEVICE_AND_API_INIT(uart_cmsdk_apb_0,
-		    DT_INST_LABEL(0),
-		    &uart_cmsdk_apb_init,
-		    &uart_cmsdk_apb_dev_data_0,
-		    &uart_cmsdk_apb_dev_cfg_0, PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(uart_cmsdk_apb_0, DT_INST_LABEL(0), &uart_cmsdk_apb_init,
+		    &uart_cmsdk_apb_dev_data_0, &uart_cmsdk_apb_dev_cfg_0,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &uart_cmsdk_apb_driver_api);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 #if DT_INST_IRQ_HAS_CELL(0, irq)
 static void uart_cmsdk_apb_irq_config_func_0(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_0),
-		    0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
+		    uart_cmsdk_apb_isr, DEVICE_GET(uart_cmsdk_apb_0), 0);
 	irq_enable(DT_INST_IRQN(0));
 }
 #else
 static void uart_cmsdk_apb_irq_config_func_0(const struct device *dev)
 {
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, tx, irq),
-		    DT_INST_IRQ_BY_NAME(0, tx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_0),
-		    0);
+		    DT_INST_IRQ_BY_NAME(0, tx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_0), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, tx, irq));
 
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, rx, irq),
-		    DT_INST_IRQ_BY_NAME(0, rx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_0),
-		    0);
+		    DT_INST_IRQ_BY_NAME(0, rx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_0), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, rx, irq));
 }
 #endif
@@ -546,40 +532,30 @@ static struct uart_cmsdk_apb_dev_data uart_cmsdk_apb_dev_data_1 = {
 			.device = DT_INST_REG_ADDR(1),},
 };
 
-DEVICE_AND_API_INIT(uart_cmsdk_apb_1,
-		    DT_INST_LABEL(1),
-		    &uart_cmsdk_apb_init,
-		    &uart_cmsdk_apb_dev_data_1,
-		    &uart_cmsdk_apb_dev_cfg_1, PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(uart_cmsdk_apb_1, DT_INST_LABEL(1), &uart_cmsdk_apb_init,
+		    &uart_cmsdk_apb_dev_data_1, &uart_cmsdk_apb_dev_cfg_1,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &uart_cmsdk_apb_driver_api);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 #if DT_INST_IRQ_HAS_CELL(1, irq)
 static void uart_cmsdk_apb_irq_config_func_1(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(1),
-		    DT_INST_IRQ(1, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_1),
-		    0);
+	IRQ_CONNECT(DT_INST_IRQN(1), DT_INST_IRQ(1, priority),
+		    uart_cmsdk_apb_isr, DEVICE_GET(uart_cmsdk_apb_1), 0);
 	irq_enable(DT_INST_IRQN(1));
 }
 #else
 static void uart_cmsdk_apb_irq_config_func_1(const struct device *dev)
 {
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(1, tx, irq),
-		    DT_INST_IRQ_BY_NAME(1, tx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_1),
-		    0);
+		    DT_INST_IRQ_BY_NAME(1, tx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_1), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(1, tx, irq));
 
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(1, rx, irq),
-		    DT_INST_IRQ_BY_NAME(1, rx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_1),
-		    0);
+		    DT_INST_IRQ_BY_NAME(1, rx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_1), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(1, rx, irq));
 }
 #endif
@@ -611,40 +587,30 @@ static struct uart_cmsdk_apb_dev_data uart_cmsdk_apb_dev_data_2 = {
 			.device = DT_INST_REG_ADDR(2),},
 };
 
-DEVICE_AND_API_INIT(uart_cmsdk_apb_2,
-		    DT_INST_LABEL(2),
-		    &uart_cmsdk_apb_init,
-		    &uart_cmsdk_apb_dev_data_2,
-		    &uart_cmsdk_apb_dev_cfg_2, PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(uart_cmsdk_apb_2, DT_INST_LABEL(2), &uart_cmsdk_apb_init,
+		    &uart_cmsdk_apb_dev_data_2, &uart_cmsdk_apb_dev_cfg_2,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &uart_cmsdk_apb_driver_api);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 #ifdef CMSDK_APB_UART_2_IRQ
 static void uart_cmsdk_apb_irq_config_func_2(const struct device *dev)
 {
-	IRQ_CONNECT(CMSDK_APB_UART_2_IRQ,
-		    DT_INST_IRQ_BY_NAME(2, priority, irq),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_2),
-		    0);
+	IRQ_CONNECT(CMSDK_APB_UART_2_IRQ, DT_INST_IRQ_BY_NAME(2, priority, irq),
+		    uart_cmsdk_apb_isr, DEVICE_GET(uart_cmsdk_apb_2), 0);
 	irq_enable(CMSDK_APB_UART_2_IRQ);
 }
 #else
 static void uart_cmsdk_apb_irq_config_func_2(const struct device *dev)
 {
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(2, tx, irq),
-		    DT_INST_IRQ_BY_NAME(2, tx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_2),
-		    0);
+		    DT_INST_IRQ_BY_NAME(2, tx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_2), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(2, tx, irq));
 
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(2, rx, irq),
-		    DT_INST_IRQ_BY_NAME(2, rx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_2),
-		    0);
+		    DT_INST_IRQ_BY_NAME(2, rx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_2), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(2, rx, irq));
 }
 #endif
@@ -676,40 +642,30 @@ static struct uart_cmsdk_apb_dev_data uart_cmsdk_apb_dev_data_3 = {
 			.device = DT_INST_REG_ADDR(3),},
 };
 
-DEVICE_AND_API_INIT(uart_cmsdk_apb_3,
-		    DT_INST_LABEL(3),
-		    &uart_cmsdk_apb_init,
-		    &uart_cmsdk_apb_dev_data_3,
-		    &uart_cmsdk_apb_dev_cfg_3, PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(uart_cmsdk_apb_3, DT_INST_LABEL(3), &uart_cmsdk_apb_init,
+		    &uart_cmsdk_apb_dev_data_3, &uart_cmsdk_apb_dev_cfg_3,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &uart_cmsdk_apb_driver_api);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 #ifdef CMSDK_APB_UART_3_IRQ
 static void uart_cmsdk_apb_irq_config_func_3(const struct device *dev)
 {
-	IRQ_CONNECT(CMSDK_APB_UART_3_IRQ,
-		    DT_INST_IRQ_BY_NAME(3, priority, irq),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_3),
-		    0);
+	IRQ_CONNECT(CMSDK_APB_UART_3_IRQ, DT_INST_IRQ_BY_NAME(3, priority, irq),
+		    uart_cmsdk_apb_isr, DEVICE_GET(uart_cmsdk_apb_3), 0);
 	irq_enable(CMSDK_APB_UART_3_IRQ);
 }
 #else
 static void uart_cmsdk_apb_irq_config_func_3(const struct device *dev)
 {
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(3, tx, irq),
-		    DT_INST_IRQ_BY_NAME(3, tx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_3),
-		    0);
+		    DT_INST_IRQ_BY_NAME(3, tx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_3), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(3, tx, irq));
 
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(3, rx, irq),
-		    DT_INST_IRQ_BY_NAME(3, rx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_3),
-		    0);
+		    DT_INST_IRQ_BY_NAME(3, rx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_3), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(3, rx, irq));
 }
 #endif
@@ -741,40 +697,30 @@ static struct uart_cmsdk_apb_dev_data uart_cmsdk_apb_dev_data_4 = {
 			.device = DT_INST_REG_ADDR(4),},
 };
 
-DEVICE_AND_API_INIT(uart_cmsdk_apb_4,
-		    DT_INST_LABEL(4),
-		    &uart_cmsdk_apb_init,
-		    &uart_cmsdk_apb_dev_data_4,
-		    &uart_cmsdk_apb_dev_cfg_4, PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(uart_cmsdk_apb_4, DT_INST_LABEL(4), &uart_cmsdk_apb_init,
+		    &uart_cmsdk_apb_dev_data_4, &uart_cmsdk_apb_dev_cfg_4,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &uart_cmsdk_apb_driver_api);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 #ifdef CMSDK_APB_UART_4_IRQ
 static void uart_cmsdk_apb_irq_config_func_4(const struct device *dev)
 {
-	IRQ_CONNECT(CMSDK_APB_UART_4_IRQ,
-		    DT_INST_IRQ_BY_NAME(4, priority, irq),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_4),
-		    0);
+	IRQ_CONNECT(CMSDK_APB_UART_4_IRQ, DT_INST_IRQ_BY_NAME(4, priority, irq),
+		    uart_cmsdk_apb_isr, DEVICE_GET(uart_cmsdk_apb_4), 0);
 	irq_enable(CMSDK_APB_UART_4_IRQ);
 }
 #else
 static void uart_cmsdk_apb_irq_config_func_4(const struct device *dev)
 {
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(4, tx, irq),
-		    DT_INST_IRQ_BY_NAME(4, tx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_4),
-		    0);
+		    DT_INST_IRQ_BY_NAME(4, tx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_4), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(4, tx, irq));
 
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(4, rx, irq),
-		    DT_INST_IRQ_BY_NAME(4, rx, priority),
-		    uart_cmsdk_apb_isr,
-		    DEVICE_GET(uart_cmsdk_apb_4),
-		    0);
+		    DT_INST_IRQ_BY_NAME(4, rx, priority), uart_cmsdk_apb_isr,
+		    DEVICE_GET(uart_cmsdk_apb_4), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(4, rx, irq));
 }
 #endif

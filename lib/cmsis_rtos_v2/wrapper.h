@@ -10,8 +10,8 @@
 #include <kernel.h>
 #include <cmsis_os2.h>
 
-#define TRUE    1
-#define FALSE   0
+#define TRUE 1
+#define FALSE 0
 
 struct cv2_thread {
 	sys_dnode_t node;

@@ -32,7 +32,7 @@ void shell_log_backend_enable(const struct shell_log_backend *backend,
 	if (err == 0) {
 		log_backend_enable(backend->backend, ctx, init_log_level);
 		log_output_ctx_set(backend->log_output, ctx);
-	backend->control_block->dropped_cnt = 0;
+		backend->control_block->dropped_cnt = 0;
 		backend->control_block->state = SHELL_LOG_BACKEND_ENABLED;
 	}
 }
@@ -81,14 +81,11 @@ static void flush_expired_messages(const struct shell *shell)
 	}
 }
 
-static void msg_to_fifo(const struct shell *shell,
-			struct log_msg *msg)
+static void msg_to_fifo(const struct shell *shell, struct log_msg *msg)
 {
 	int err;
-	struct shell_log_backend_msg t_msg = {
-		.msg = msg,
-		.timestamp = k_uptime_get_32()
-	};
+	struct shell_log_backend_msg t_msg = { .msg = msg,
+					       .timestamp = k_uptime_get_32() };
 
 	err = k_msgq_put(shell->log_backend->msgq, &t_msg,
 			 K_MSEC(shell->log_backend->timeout));
@@ -97,8 +94,7 @@ static void msg_to_fifo(const struct shell *shell,
 	case 0:
 		break;
 	case -EAGAIN:
-	case -ENOMSG:
-	{
+	case -ENOMSG: {
 		flush_expired_messages(shell);
 
 		err = k_msgq_put(shell->log_backend->msgq, &msg, K_NO_WAIT);
@@ -127,9 +123,8 @@ void shell_log_backend_disable(const struct shell_log_backend *backend)
 static void msg_process(const struct log_output *log_output,
 			struct log_msg *msg, bool colors)
 {
-	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL |
-		      LOG_OUTPUT_FLAG_TIMESTAMP |
-		      LOG_OUTPUT_FLAG_FORMAT_TIMESTAMP;
+	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL | LOG_OUTPUT_FLAG_TIMESTAMP |
+			 LOG_OUTPUT_FLAG_FORMAT_TIMESTAMP;
 
 	if (colors) {
 		flags |= LOG_OUTPUT_FLAG_COLORS;
@@ -143,9 +138,9 @@ bool shell_log_backend_process(const struct shell_log_backend *backend)
 {
 	uint32_t dropped;
 	const struct shell *shell =
-			(const struct shell *)backend->backend->cb->ctx;
+		(const struct shell *)backend->backend->cb->ctx;
 	bool colors = IS_ENABLED(CONFIG_SHELL_VT100_COLORS) &&
-			shell->ctx->internal.flags.use_colors;
+		      shell->ctx->internal.flags.use_colors;
 	struct log_msg *msg = msg_from_fifo(backend);
 
 	if (!msg) {
@@ -177,7 +172,7 @@ static void put(const struct log_backend *const backend, struct log_msg *msg)
 {
 	const struct shell *shell = (const struct shell *)backend->cb->ctx;
 	bool colors = IS_ENABLED(CONFIG_SHELL_VT100_COLORS) &&
-			shell->ctx->internal.flags.use_colors;
+		      shell->ctx->internal.flags.use_colors;
 	struct k_poll_signal *signal;
 
 	log_msg_get(msg);
@@ -212,9 +207,8 @@ static void put_sync_string(const struct log_backend *const backend,
 {
 	const struct shell *shell = (const struct shell *)backend->cb->ctx;
 	uint32_t key;
-	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL |
-		      LOG_OUTPUT_FLAG_TIMESTAMP |
-		      LOG_OUTPUT_FLAG_FORMAT_TIMESTAMP;
+	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL | LOG_OUTPUT_FLAG_TIMESTAMP |
+			 LOG_OUTPUT_FLAG_FORMAT_TIMESTAMP;
 
 	if (IS_ENABLED(CONFIG_SHELL_VT100_COLORS)) {
 		flags |= LOG_OUTPUT_FLAG_COLORS;
@@ -233,14 +227,14 @@ static void put_sync_string(const struct log_backend *const backend,
 }
 
 static void put_sync_hexdump(const struct log_backend *const backend,
-			 struct log_msg_ids src_level, uint32_t timestamp,
-			 const char *metadata, const uint8_t *data, uint32_t length)
+			     struct log_msg_ids src_level, uint32_t timestamp,
+			     const char *metadata, const uint8_t *data,
+			     uint32_t length)
 {
 	const struct shell *shell = (const struct shell *)backend->cb->ctx;
 	uint32_t key;
-	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL |
-		      LOG_OUTPUT_FLAG_TIMESTAMP |
-		      LOG_OUTPUT_FLAG_FORMAT_TIMESTAMP;
+	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL | LOG_OUTPUT_FLAG_TIMESTAMP |
+			 LOG_OUTPUT_FLAG_FORMAT_TIMESTAMP;
 
 	if (IS_ENABLED(CONFIG_SHELL_VT100_COLORS)) {
 		flags |= LOG_OUTPUT_FLAG_COLORS;
@@ -271,12 +265,12 @@ static void panic(const struct log_backend *const backend)
 
 	if (err == 0) {
 		shell->log_backend->control_block->state =
-							SHELL_LOG_BACKEND_PANIC;
+			SHELL_LOG_BACKEND_PANIC;
 
 		/* Move to the start of next line. */
 		shell_multiline_data_calc(&shell->ctx->vt100_ctx.cons,
-						  shell->ctx->cmd_buff_pos,
-						  shell->ctx->cmd_buff_len);
+					  shell->ctx->cmd_buff_pos,
+					  shell->ctx->cmd_buff_len);
 		shell_op_cursor_vert_move(shell, -1);
 		shell_op_cursor_horiz_move(shell,
 					   -shell->ctx->vt100_ctx.cons.cur_x);
@@ -300,10 +294,10 @@ static void dropped(const struct log_backend *const backend, uint32_t cnt)
 
 const struct log_backend_api log_backend_shell_api = {
 	.put = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : put,
-	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			put_sync_string : NULL,
-	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			put_sync_hexdump : NULL,
+	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? put_sync_string :
+								    NULL,
+	.put_sync_hexdump =
+		IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? put_sync_hexdump : NULL,
 	.dropped = dropped,
 	.panic = panic,
 };

@@ -14,7 +14,6 @@
 
 K_MUTEX_DEFINE(test_mutex);
 
-
 /**
  *
  * @brief Test for the multiple mutex lock/unlock time

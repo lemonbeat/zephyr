@@ -32,8 +32,7 @@
 
 static struct bt_mesh_rpl replay_list[CONFIG_BT_MESH_CRPL];
 
-void bt_mesh_rpl_update(struct bt_mesh_rpl *rpl,
-		struct bt_mesh_net_rx *rx)
+void bt_mesh_rpl_update(struct bt_mesh_rpl *rpl, struct bt_mesh_net_rx *rx)
 {
 	rpl->src = rx->ctx.addr;
 	rpl->seq = rx->seq;
@@ -49,8 +48,7 @@ void bt_mesh_rpl_update(struct bt_mesh_rpl *rpl,
  * updated (needed for segmented messages), whereas if a NULL match is given
  * the RPL is immediately updated (used for unsegmented messages).
  */
-bool bt_mesh_rpl_check(struct bt_mesh_net_rx *rx,
-		struct bt_mesh_rpl **match)
+bool bt_mesh_rpl_check(struct bt_mesh_net_rx *rx, struct bt_mesh_rpl **match)
 {
 	int i;
 

@@ -9,13 +9,11 @@
 
 #include <kernel.h>
 
-
 /**
  * @brief Timing Measurement APIs
  * @defgroup timing_api Timing APIs
  * @{
  */
-
 
 typedef uint64_t timing_t;
 
@@ -60,7 +58,7 @@ timing_t timing_counter_get(void);
  * @return Number of cycles between start and end.
  */
 uint64_t timing_cycles_get(volatile timing_t *const start,
-					 volatile timing_t *const end);
+			   volatile timing_t *const end);
 
 /**
  * @brief Get frequency of counter used (in Hz).

@@ -21,7 +21,7 @@ LOG_MODULE_REGISTER(TI_HDC, CONFIG_SENSOR_LOG_LEVEL);
 
 #if DT_INST_NODE_HAS_PROP(0, drdy_gpios)
 static void ti_hdc_gpio_callback(const struct device *dev,
-				  struct gpio_callback *cb, uint32_t pins)
+				 struct gpio_callback *cb, uint32_t pins)
 {
 	struct ti_hdc_data *drv_data =
 		CONTAINER_OF(cb, struct ti_hdc_data, gpio_cb);
@@ -50,8 +50,7 @@ static int ti_hdc_sample_fetch(const struct device *dev,
 #endif
 
 	buf[0] = TI_HDC_REG_TEMP;
-	if (i2c_write(drv_data->i2c, buf, 1,
-		      DT_INST_REG_ADDR(0)) < 0) {
+	if (i2c_write(drv_data->i2c, buf, 1, DT_INST_REG_ADDR(0)) < 0) {
 		LOG_DBG("Failed to write address pointer");
 		return -EIO;
 	}
@@ -73,7 +72,6 @@ static int ti_hdc_sample_fetch(const struct device *dev,
 
 	return 0;
 }
-
 
 static int ti_hdc_channel_get(const struct device *dev,
 			      enum sensor_channel chan,
@@ -132,13 +130,12 @@ static int ti_hdc_init(const struct device *dev)
 		return -EINVAL;
 	}
 
-	if (read16(drv_data->i2c, DT_INST_REG_ADDR(0),
-		   TI_HDC_REG_MANUFID) != TI_HDC_MANUFID) {
+	if (read16(drv_data->i2c, DT_INST_REG_ADDR(0), TI_HDC_REG_MANUFID) !=
+	    TI_HDC_MANUFID) {
 		LOG_ERR("Failed to get correct manufacturer ID");
 		return -EINVAL;
 	}
-	tmp = read16(drv_data->i2c, DT_INST_REG_ADDR(0),
-		     TI_HDC_REG_DEVICEID);
+	tmp = read16(drv_data->i2c, DT_INST_REG_ADDR(0), TI_HDC_REG_DEVICEID);
 	if (tmp != TI_HDC1000_DEVID && tmp != TI_HDC1050_DEVID) {
 		LOG_ERR("Unsupported device ID");
 		return -EINVAL;
@@ -148,19 +145,17 @@ static int ti_hdc_init(const struct device *dev)
 	k_sem_init(&drv_data->data_sem, 0, UINT_MAX);
 
 	/* setup data ready gpio interrupt */
-	drv_data->gpio = device_get_binding(
-				DT_INST_GPIO_LABEL(0, drdy_gpios));
+	drv_data->gpio = device_get_binding(DT_INST_GPIO_LABEL(0, drdy_gpios));
 	if (drv_data->gpio == NULL) {
 		LOG_DBG("Failed to get pointer to %s device",
-			 DT_INST_GPIO_LABEL(0, drdy_gpios));
+			DT_INST_GPIO_LABEL(0, drdy_gpios));
 		return -EINVAL;
 	}
 
 	gpio_pin_configure(drv_data->gpio, DT_INST_GPIO_PIN(0, drdy_gpios),
 			   GPIO_INPUT | DT_INST_GPIO_FLAGS(0, drdy_gpios));
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   ti_hdc_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, ti_hdc_gpio_callback,
 			   BIT(DT_INST_GPIO_PIN(0, drdy_gpios)));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -180,6 +175,6 @@ static int ti_hdc_init(const struct device *dev)
 
 static struct ti_hdc_data ti_hdc_data;
 
-DEVICE_AND_API_INIT(ti_hdc, DT_INST_LABEL(0), ti_hdc_init, &ti_hdc_data,
-		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(ti_hdc, DT_INST_LABEL(0), ti_hdc_init, &ti_hdc_data, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &ti_hdc_driver_api);

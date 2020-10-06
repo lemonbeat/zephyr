@@ -8,8 +8,8 @@
 #include <kernel.h>
 #include <cmsis_os.h>
 
-#define MESSAGE1	512
-#define MESSAGE2	123456
+#define MESSAGE1 512
+#define MESSAGE2 123456
 
 #define TIMEOUT 500
 #define Q_LEN 5
@@ -35,7 +35,7 @@ void send_msg_thread(void const *argument)
 		data = i;
 		status = osMessagePut(message_id, data, osWaitForever);
 		zassert_true(status == osOK,
-				"osMessagePut failure for message!");
+			     "osMessagePut failure for message!");
 	}
 
 	/* Try putting message to a full queue immediately
@@ -44,38 +44,37 @@ void send_msg_thread(void const *argument)
 	data = MESSAGE2;
 	status = osMessagePut(message_id, data, 0);
 	zassert_true(status == osErrorResource,
-			"Something's wrong with osMessagePut!");
+		     "Something's wrong with osMessagePut!");
 
 	/* Try putting message to a full queue within a duration
 	 * less than TIMEOUT, before the queue is emptied out
 	 */
 	data = MESSAGE2;
-	status = osMessagePut(message_id, data, TIMEOUT/2);
+	status = osMessagePut(message_id, data, TIMEOUT / 2);
 	zassert_true(status == osErrorTimeoutResource,
-			"Something's wrong with osMessagePut!");
+		     "Something's wrong with osMessagePut!");
 
 	/* Send another message after the queue is emptied */
 	data = MESSAGE2;
-	status = osMessagePut(message_id, data, TIMEOUT*2);
-	zassert_true(status == osOK,
-			"osMessagePut failure for message!");
+	status = osMessagePut(message_id, data, TIMEOUT * 2);
+	zassert_true(status == osOK, "osMessagePut failure for message!");
 }
 
 void message_recv(void)
 {
 	int i;
-	osEvent  evt;
+	osEvent evt;
 	uint32_t data;
 
 	/* Try getting message immediately before the queue is populated */
 	evt = osMessageGet(message_id, 0);
 	zassert_true(evt.status == osOK,
-			"Something's wrong with osMessageGet!");
+		     "Something's wrong with osMessageGet!");
 
 	/* Try receiving message within a duration of TIMEOUT */
 	evt = osMessageGet(message_id, TIMEOUT);
 	zassert_true(evt.status == osEventTimeout,
-			"Something's wrong with osMessageGet!");
+		     "Something's wrong with osMessageGet!");
 
 	/* Receive 1st message */
 	evt = osMessageGet(message_id, osWaitForever);
@@ -91,7 +90,7 @@ void message_recv(void)
 	for (i = 0; i < Q_LEN; i++) {
 		evt = osMessageGet(message_id, osWaitForever);
 		zassert_true(evt.status == osEventMessage,
-				"osMessageGet failure");
+			     "osMessageGet failure");
 
 		data = evt.value.v;
 		zassert_equal(data, i, NULL);

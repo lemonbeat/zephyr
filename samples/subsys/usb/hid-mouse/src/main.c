@@ -17,70 +17,68 @@ LOG_MODULE_REGISTER(main);
 #define SW0_NODE DT_ALIAS(sw0)
 
 #if DT_NODE_HAS_STATUS(SW0_NODE, okay)
-#define PORT0		DT_GPIO_LABEL(SW0_NODE, gpios)
-#define PIN0		DT_GPIO_PIN(SW0_NODE, gpios)
-#define PIN0_FLAGS	DT_GPIO_FLAGS(SW0_NODE, gpios)
+#define PORT0 DT_GPIO_LABEL(SW0_NODE, gpios)
+#define PIN0 DT_GPIO_PIN(SW0_NODE, gpios)
+#define PIN0_FLAGS DT_GPIO_FLAGS(SW0_NODE, gpios)
 #else
 #error "Unsupported board: sw0 devicetree alias is not defined"
-#define PORT0		""
-#define PIN0		0
-#define PIN0_FLAGS	0
+#define PORT0 ""
+#define PIN0 0
+#define PIN0_FLAGS 0
 #endif
 
 #define SW1_NODE DT_ALIAS(sw1)
 
 #if DT_NODE_HAS_STATUS(SW1_NODE, okay)
-#define PORT1		DT_GPIO_LABEL(SW1_NODE, gpios)
-#define PIN1		DT_GPIO_PIN(SW1_NODE, gpios)
-#define PIN1_FLAGS	DT_GPIO_FLAGS(SW1_NODE, gpios)
+#define PORT1 DT_GPIO_LABEL(SW1_NODE, gpios)
+#define PIN1 DT_GPIO_PIN(SW1_NODE, gpios)
+#define PIN1_FLAGS DT_GPIO_FLAGS(SW1_NODE, gpios)
 #endif
 
 #define SW2_NODE DT_ALIAS(sw2)
 
 #if DT_NODE_HAS_STATUS(SW2_NODE, okay)
-#define PORT2		DT_GPIO_LABEL(SW2_NODE, gpios)
-#define PIN2		DT_GPIO_PIN(SW2_NODE, gpios)
-#define PIN2_FLAGS	DT_GPIO_FLAGS(SW2_NODE, gpios)
+#define PORT2 DT_GPIO_LABEL(SW2_NODE, gpios)
+#define PIN2 DT_GPIO_PIN(SW2_NODE, gpios)
+#define PIN2_FLAGS DT_GPIO_FLAGS(SW2_NODE, gpios)
 #endif
 
 #define SW3_NODE DT_ALIAS(sw3)
 
 #if DT_NODE_HAS_STATUS(SW3_NODE, okay)
-#define PORT3		DT_GPIO_LABEL(SW3_NODE, gpios)
-#define PIN3		DT_GPIO_PIN(SW3_NODE, gpios)
-#define PIN3_FLAGS	DT_GPIO_FLAGS(SW3_NODE, gpios)
+#define PORT3 DT_GPIO_LABEL(SW3_NODE, gpios)
+#define PIN3 DT_GPIO_PIN(SW3_NODE, gpios)
+#define PIN3_FLAGS DT_GPIO_FLAGS(SW3_NODE, gpios)
 #endif
 
 #define LED0_NODE DT_ALIAS(led0)
 
 #if DT_NODE_HAS_STATUS(LED0_NODE, okay)
-#define LED_PORT	DT_GPIO_LABEL(LED0_NODE, gpios)
-#define LED		DT_GPIO_PIN(LED0_NODE, gpios)
-#define LED_FLAGS	DT_GPIO_FLAGS(LED0_NODE, gpios)
+#define LED_PORT DT_GPIO_LABEL(LED0_NODE, gpios)
+#define LED DT_GPIO_PIN(LED0_NODE, gpios)
+#define LED_FLAGS DT_GPIO_FLAGS(LED0_NODE, gpios)
 #else
 #error "Unsupported board: led0 devicetree alias is not defined"
-#define LED_PORT	""
-#define LED		0
-#define LED_FLAGS	0
+#define LED_PORT ""
+#define LED 0
+#define LED_FLAGS 0
 #endif
 
 static const uint8_t hid_report_desc[] = HID_MOUSE_REPORT_DESC(2);
 
 static uint8_t def_val[4];
 static volatile uint8_t status[4];
-static K_SEM_DEFINE(sem, 0, 1);	/* starts off "not available" */
+static K_SEM_DEFINE(sem, 0, 1); /* starts off "not available" */
 static struct gpio_callback callback[4];
 static enum usb_dc_status_code usb_status;
 
-#define MOUSE_BTN_REPORT_POS	0
-#define MOUSE_X_REPORT_POS	1
-#define MOUSE_Y_REPORT_POS	2
+#define MOUSE_BTN_REPORT_POS 0
+#define MOUSE_X_REPORT_POS 1
+#define MOUSE_Y_REPORT_POS 2
 
-#define MOUSE_BTN_LEFT		BIT(0)
-#define MOUSE_BTN_RIGHT		BIT(1)
-#define MOUSE_BTN_MIDDLE	BIT(2)
-
-
+#define MOUSE_BTN_LEFT BIT(0)
+#define MOUSE_BTN_RIGHT BIT(1)
+#define MOUSE_BTN_MIDDLE BIT(2)
 
 static void status_cb(enum usb_dc_status_code status, const uint8_t *param)
 {
@@ -102,8 +100,8 @@ static void left_button(const struct device *gpio, struct gpio_callback *cb,
 
 	ret = gpio_pin_get(gpio, PIN0);
 	if (ret < 0) {
-		LOG_ERR("Failed to get the state of pin %u, error: %d",
-			PIN0, ret);
+		LOG_ERR("Failed to get the state of pin %u, error: %d", PIN0,
+			ret);
 		return;
 	}
 
@@ -135,8 +133,8 @@ static void right_button(const struct device *gpio, struct gpio_callback *cb,
 
 	ret = gpio_pin_get(gpio, PIN1);
 	if (ret < 0) {
-		LOG_ERR("Failed to get the state of pin %u, error: %d",
-			PIN1, ret);
+		LOG_ERR("Failed to get the state of pin %u, error: %d", PIN1,
+			ret);
 		return;
 	}
 
@@ -162,8 +160,8 @@ static void x_move(const struct device *gpio, struct gpio_callback *cb,
 
 	ret = gpio_pin_get(gpio, PIN2);
 	if (ret < 0) {
-		LOG_ERR("Failed to get the state of pin %u, error: %d",
-			PIN2, ret);
+		LOG_ERR("Failed to get the state of pin %u, error: %d", PIN2,
+			ret);
 		return;
 	}
 
@@ -187,8 +185,8 @@ static void y_move(const struct device *gpio, struct gpio_callback *cb,
 
 	ret = gpio_pin_get(gpio, PIN3);
 	if (ret < 0) {
-		LOG_ERR("Failed to get the state of pin %u, error: %d",
-			PIN3, ret);
+		LOG_ERR("Failed to get the state of pin %u, error: %d", PIN3,
+			ret);
 		return;
 	}
 
@@ -216,15 +214,14 @@ int callbacks_configure(const struct device *gpio, uint32_t pin, int flags,
 
 	ret = gpio_pin_configure(gpio, pin, GPIO_INPUT | flags);
 	if (ret < 0) {
-		LOG_ERR("Failed to configure pin %u, error: %d",
-			pin, ret);
+		LOG_ERR("Failed to configure pin %u, error: %d", pin, ret);
 		return ret;
 	}
 
 	ret = gpio_pin_get(gpio, pin);
 	if (ret < 0) {
-		LOG_ERR("Failed to get the state of pin %u, error: %d",
-			pin, ret);
+		LOG_ERR("Failed to get the state of pin %u, error: %d", pin,
+			ret);
 		return ret;
 	}
 
@@ -233,8 +230,8 @@ int callbacks_configure(const struct device *gpio, uint32_t pin, int flags,
 	gpio_init_callback(callback, handler, BIT(pin));
 	ret = gpio_add_callback(gpio, callback);
 	if (ret < 0) {
-		LOG_ERR("Failed to add the callback for pin %u, error: %d",
-			pin, ret);
+		LOG_ERR("Failed to add the callback for pin %u, error: %d", pin,
+			ret);
 		return ret;
 	}
 
@@ -302,9 +299,8 @@ void main(void)
 	}
 #endif
 
-	usb_hid_register_device(hid_dev,
-				hid_report_desc, sizeof(hid_report_desc),
-				NULL);
+	usb_hid_register_device(hid_dev, hid_report_desc,
+				sizeof(hid_report_desc), NULL);
 
 	usb_hid_init(hid_dev);
 

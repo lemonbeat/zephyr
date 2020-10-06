@@ -51,16 +51,10 @@ LOG_MODULE_REGISTER(sample, LOG_LEVEL_INF);
 #define RETURN_FROM_MAIN(exit_code) return
 #endif
 
-enum corner {
-	TOP_LEFT,
-	TOP_RIGHT,
-	BOTTOM_RIGHT,
-	BOTTOM_LEFT
-};
+enum corner { TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT };
 
 typedef void (*fill_buffer)(enum corner corner, uint8_t grey, uint8_t *buf,
 			    size_t buf_size);
-
 
 #ifdef CONFIG_ARCH_POSIX
 static void posix_exit_main(int exit_code)
@@ -77,7 +71,7 @@ static void posix_exit_main(int exit_code)
 #endif
 
 static void fill_buffer_argb8888(enum corner corner, uint8_t grey, uint8_t *buf,
-			       size_t buf_size)
+				 size_t buf_size)
 {
 	uint32_t color = 0;
 
@@ -219,7 +213,7 @@ void main(void)
 
 	display_get_capabilities(display_dev, &capabilities);
 
-	if (capabilities.screen_info & SCREEN_INFO_MONO_VTILED)  {
+	if (capabilities.screen_info & SCREEN_INFO_MONO_VTILED) {
 		rect_w = 16;
 		rect_h = 8;
 	} else {

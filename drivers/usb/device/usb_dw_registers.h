@@ -118,7 +118,7 @@ struct usb_dw_reg {
 #define USB_DW_HWCFG4_DEDFIFOMODE BIT(25)
 #define USB_DW_GUSBCFG_PHY_IF_MASK BIT(3)
 #define USB_DW_GUSBCFG_PHY_IF_8_BIT (0)
-#define USB_DW_GUSBCFG_PHY_IF_16_BIT (1<<3)
+#define USB_DW_GUSBCFG_PHY_IF_16_BIT (1 << 3)
 #define USB_DW_GRSTCTL_AHB_IDLE BIT(31)
 #define USB_DW_GRSTCTL_TX_FNUM_OFFSET (6)
 #define USB_DW_GRSTCTL_TX_FFLSH BIT(5)
@@ -197,14 +197,14 @@ struct usb_dw_reg {
 #define USB_DW_CORE_RST_TIMEOUT_US 10000
 #define USB_DW_PLL_TIMEOUT_US 100
 
-#define USB_DW_EP_FIFO(ep)						\
+#define USB_DW_EP_FIFO(ep) \
 	(*(uint32_t *)(DT_INST_REG_ADDR(0) + 0x1000 * (ep + 1)))
 /* USB register block base address */
 #define USB_DW ((struct usb_dw_reg *)DT_INST_REG_ADDR(0))
 
-#define DW_USB_IN_EP_NUM		(6)
-#define DW_USB_OUT_EP_NUM		(4)
-#define DW_USB_MAX_PACKET_SIZE		(64)
+#define DW_USB_IN_EP_NUM (6)
+#define DW_USB_OUT_EP_NUM (4)
+#define DW_USB_MAX_PACKET_SIZE (64)
 
 #ifdef __cplusplus
 }

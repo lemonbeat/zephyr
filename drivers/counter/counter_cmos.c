@@ -32,14 +32,7 @@
  */
 
 struct state {
-	uint8_t second,
-	     minute,
-	     hour,
-	     day,
-	     month,
-	     year,
-	     status_a,
-	     status_b;
+	uint8_t second, minute, hour, day, month, year, status_a, status_b;
 };
 
 /*
@@ -60,9 +53,9 @@ const uint8_t addrs[] = { 0, 2, 4, 7, 8, 9, 10, 11 };
  * Interesting bits in 'struct state'.
  */
 
-#define STATUS_B_24HR	0x02	/* 24-hour (vs 12-hour) mode */
-#define STATUS_B_BIN	0x01	/* binary (vs BCD) mode */
-#define HOUR_PM		0x80	/* high bit of hour set = PM */
+#define STATUS_B_24HR 0x02 /* 24-hour (vs 12-hour) mode */
+#define STATUS_B_BIN 0x01 /* binary (vs BCD) mode */
+#define HOUR_PM 0x80 /* high bit of hour set = PM */
 
 /*
  * Read a value from the CMOS. Because of the address latch,
@@ -90,7 +83,7 @@ void read_state(struct state *state)
 	int i;
 	uint8_t *p;
 
-	p = (uint8_t *) state;
+	p = (uint8_t *)state;
 	for (i = 0; i < sizeof(*state); ++i) {
 		*p++ = read_register(addrs[i]);
 	}
@@ -117,10 +110,10 @@ static uint32_t hinnant(int y, int m, int d)
 	y -= (m <= 2);
 	era = ((y >= 0) ? y : (y - 399)) / 400;
 	yoe = y - era * 400;
-	doy = (153 * (m + ((m > 2) ? -3 : 9)) + 2)/5 + d - 1;
+	doy = (153 * (m + ((m > 2) ? -3 : 9)) + 2) / 5 + d - 1;
 	doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
 
-	return era * 146097 + ((int) doe) - 719468;
+	return era * 146097 + ((int)doe) - 719468;
 }
 
 /*
@@ -131,8 +124,8 @@ static uint32_t hinnant(int y, int m, int d)
 int get_value(const struct device *dev, uint32_t *ticks)
 {
 	struct state state, state2;
-	uint64_t *pun = (uint64_t *) &state;
-	uint64_t *pun2 = (uint64_t *) &state2;
+	uint64_t *pun = (uint64_t *)&state;
+	uint64_t *pun2 = (uint64_t *)&state2;
 	bool pm;
 	uint32_t epoch;
 
@@ -162,7 +155,7 @@ int get_value(const struct device *dev, uint32_t *ticks)
 	}
 
 	if (!(state.status_b & STATUS_B_BIN)) {
-		uint8_t *cp = (uint8_t *) &state;
+		uint8_t *cp = (uint8_t *)&state;
 		int i;
 
 		for (i = 0; i < NR_BCD_VALS; ++i) {
@@ -199,14 +192,10 @@ static int init(const struct device *dev)
 	return 0;
 }
 
-static const struct counter_config_info info = {
-	.max_top_value = UINT_MAX,
-	.freq = 1
-};
+static const struct counter_config_info info = { .max_top_value = UINT_MAX,
+						 .freq = 1 };
 
-static const struct counter_driver_api api = {
-	.get_value = get_value
-};
+static const struct counter_driver_api api = { .get_value = get_value };
 
-DEVICE_AND_API_INIT(counter_cmos, "CMOS", init, NULL, &info,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &api);
+DEVICE_AND_API_INIT(counter_cmos, "CMOS", init, NULL, &info, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &api);

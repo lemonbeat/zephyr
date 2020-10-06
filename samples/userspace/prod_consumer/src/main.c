@@ -17,7 +17,7 @@
 #include "app_a.h"
 #include "app_b.h"
 
-#define APP_A_STACKSIZE	2048
+#define APP_A_STACKSIZE 2048
 
 LOG_MODULE_REGISTER(app_main);
 
@@ -31,8 +31,8 @@ K_APPMEM_PARTITION_DEFINE(shared_partition);
  * SYS_MEM_POOL_DEFINE() is special in that we don't use K_APP_DMEM()
  * to route it to the shared partition, instead it takes a section parameter.
  */
-#define BLK_SIZE (SAMPLE_DRIVER_MSG_SIZE + \
-		  WB_UP(sizeof(struct sys_mem_pool_block)))
+#define BLK_SIZE \
+	(SAMPLE_DRIVER_MSG_SIZE + WB_UP(sizeof(struct sys_mem_pool_block)))
 SYS_MEM_POOL_DEFINE(shared_pool, NULL, BLK_SIZE, BLK_SIZE, 8, 8,
 		    K_APP_DMEM_SECTION(shared_partition));
 
@@ -61,8 +61,8 @@ void main(void)
 
 	/* Spawn supervisor entry for application A */
 	k_thread_create(&app_a_thread, app_a_stack, APP_A_STACKSIZE,
-			app_a_entry, NULL, NULL, NULL,
-			-1, K_INHERIT_PERMS, K_NO_WAIT);
+			app_a_entry, NULL, NULL, NULL, -1, K_INHERIT_PERMS,
+			K_NO_WAIT);
 
 	/* Re-use main for app B supervisor mode setup */
 	app_b_entry(NULL, NULL, NULL);

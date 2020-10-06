@@ -43,18 +43,16 @@ LOG_MODULE_REGISTER(gd7965, CONFIG_DISPLAY_LOG_LEVEL);
 #define GD7965_RESET_CNTRL DT_INST_GPIO_LABEL(0, reset_gpios)
 #define GD7965_RESET_FLAGS DT_INST_GPIO_FLAGS(0, reset_gpios)
 
-#define EPD_PANEL_WIDTH			DT_INST_PROP(0, width)
-#define EPD_PANEL_HEIGHT		DT_INST_PROP(0, height)
-#define GD7965_PIXELS_PER_BYTE		8U
+#define EPD_PANEL_WIDTH DT_INST_PROP(0, width)
+#define EPD_PANEL_HEIGHT DT_INST_PROP(0, height)
+#define GD7965_PIXELS_PER_BYTE 8U
 
 /* Horizontally aligned page! */
-#define GD7965_NUMOF_PAGES		(EPD_PANEL_WIDTH / \
-					 GD7965_PIXELS_PER_BYTE)
-#define GD7965_PANEL_FIRST_GATE		0U
-#define GD7965_PANEL_LAST_GATE		(EPD_PANEL_HEIGHT - 1)
-#define GD7965_PANEL_FIRST_PAGE		0U
-#define GD7965_PANEL_LAST_PAGE		(GD7965_NUMOF_PAGES - 1)
-
+#define GD7965_NUMOF_PAGES (EPD_PANEL_WIDTH / GD7965_PIXELS_PER_BYTE)
+#define GD7965_PANEL_FIRST_GATE 0U
+#define GD7965_PANEL_LAST_GATE (EPD_PANEL_HEIGHT - 1)
+#define GD7965_PANEL_FIRST_PAGE 0U
+#define GD7965_PANEL_LAST_PAGE (GD7965_NUMOF_PAGES - 1)
 
 struct gd7965_data {
 	const struct device *reset;
@@ -75,11 +73,11 @@ static uint8_t bdd_polarity;
 
 static bool blanking_on = true;
 
-static inline int gd7965_write_cmd(struct gd7965_data *driver,
-				   uint8_t cmd, uint8_t *data, size_t len)
+static inline int gd7965_write_cmd(struct gd7965_data *driver, uint8_t cmd,
+				   uint8_t *data, size_t len)
 {
-	struct spi_buf buf = {.buf = &cmd, .len = sizeof(cmd)};
-	struct spi_buf_set buf_set = {.buffers = &buf, .count = 1};
+	struct spi_buf buf = { .buf = &cmd, .len = sizeof(cmd) };
+	struct spi_buf_set buf_set = { .buffers = &buf, .count = 1 };
 
 	gpio_pin_set(driver->dc, GD7965_DC_PIN, 1);
 	if (spi_write(driver->spi_dev, &driver->spi_config, &buf_set)) {
@@ -148,18 +146,19 @@ static int gd7965_blanking_on(const struct device *dev)
 	return 0;
 }
 
-static int gd7965_write(const struct device *dev, const uint16_t x, const uint16_t y,
+static int gd7965_write(const struct device *dev, const uint16_t x,
+			const uint16_t y,
 			const struct display_buffer_descriptor *desc,
 			const void *buf)
 {
 	struct gd7965_data *driver = dev->data;
 	uint16_t x_end_idx = x + desc->width - 1;
 	uint16_t y_end_idx = y + desc->height - 1;
-	uint8_t ptl[GD7965_PTL_REG_LENGTH] = {0};
+	uint8_t ptl[GD7965_PTL_REG_LENGTH] = { 0 };
 	size_t buf_len;
 
-	LOG_DBG("x %u, y %u, height %u, width %u, pitch %u",
-		x, y, desc->height, desc->width, desc->pitch);
+	LOG_DBG("x %u, y %u, height %u, width %u, pitch %u", x, y, desc->height,
+		desc->width, desc->pitch);
 
 	buf_len = MIN(desc->buf_size,
 		      desc->height * desc->width / GD7965_PIXELS_PER_BYTE);
@@ -194,12 +193,13 @@ static int gd7965_write(const struct device *dev, const uint16_t x, const uint16
 
 	/* Disable boarder output */
 	bdd_polarity |= GD7965_CDI_BDZ;
-	if (gd7965_write_cmd(driver, GD7965_CMD_CDI,
-			     &bdd_polarity, sizeof(bdd_polarity))) {
+	if (gd7965_write_cmd(driver, GD7965_CMD_CDI, &bdd_polarity,
+			     sizeof(bdd_polarity))) {
 		return -EIO;
 	}
 
-	if (gd7965_write_cmd(driver, GD7965_CMD_DTM2, (uint8_t *)buf, buf_len)) {
+	if (gd7965_write_cmd(driver, GD7965_CMD_DTM2, (uint8_t *)buf,
+			     buf_len)) {
 		return -EIO;
 	}
 
@@ -212,8 +212,8 @@ static int gd7965_write(const struct device *dev, const uint16_t x, const uint16
 
 	/* Enable boarder output */
 	bdd_polarity &= ~GD7965_CDI_BDZ;
-	if (gd7965_write_cmd(driver, GD7965_CMD_CDI,
-			     &bdd_polarity, sizeof(bdd_polarity))) {
+	if (gd7965_write_cmd(driver, GD7965_CMD_CDI, &bdd_polarity,
+			     sizeof(bdd_polarity))) {
 		return -EIO;
 	}
 
@@ -224,7 +224,8 @@ static int gd7965_write(const struct device *dev, const uint16_t x, const uint16
 	return 0;
 }
 
-static int gd7965_read(const struct device *dev, const uint16_t x, const uint16_t y,
+static int gd7965_read(const struct device *dev, const uint16_t x,
+		       const uint16_t y,
 		       const struct display_buffer_descriptor *desc, void *buf)
 {
 	LOG_ERR("not supported");
@@ -262,8 +263,7 @@ static void gd7965_get_capabilities(const struct device *dev,
 }
 
 static int gd7965_set_orientation(const struct device *dev,
-				  const enum display_orientation
-				  orientation)
+				  const enum display_orientation orientation)
 {
 	LOG_ERR("Unsupported");
 	return -ENOTSUP;
@@ -330,8 +330,8 @@ static int gd7965_controller_init(const struct device *dev)
 		return -EIO;
 	}
 
-	if (gd7965_write_cmd(driver, GD7965_CMD_BTST,
-			     gd7965_softstart, sizeof(gd7965_softstart))) {
+	if (gd7965_write_cmd(driver, GD7965_CMD_BTST, gd7965_softstart,
+			     sizeof(gd7965_softstart))) {
 		return -EIO;
 	}
 
@@ -344,11 +344,8 @@ static int gd7965_controller_init(const struct device *dev)
 	gd7965_busy_wait(driver);
 
 	/* Pannel settings, KW mode */
-	tmp[0] = GD7965_PSR_KW_R |
-		 GD7965_PSR_UD |
-		 GD7965_PSR_SHL |
-		 GD7965_PSR_SHD |
-		 GD7965_PSR_RST;
+	tmp[0] = GD7965_PSR_KW_R | GD7965_PSR_UD | GD7965_PSR_SHL |
+		 GD7965_PSR_SHD | GD7965_PSR_RST;
 	if (gd7965_write_cmd(driver, GD7965_CMD_PSR, tmp, 1)) {
 		return -EIO;
 	}
@@ -357,13 +354,12 @@ static int gd7965_controller_init(const struct device *dev)
 	sys_put_be16(EPD_PANEL_WIDTH, &tmp[GD7965_TRES_HRES_IDX]);
 	sys_put_be16(EPD_PANEL_HEIGHT, &tmp[GD7965_TRES_VRES_IDX]);
 	LOG_HEXDUMP_DBG(tmp, sizeof(tmp), "TRES");
-	if (gd7965_write_cmd(driver, GD7965_CMD_TRES,
-			     tmp, GD7965_TRES_REG_LENGTH)) {
+	if (gd7965_write_cmd(driver, GD7965_CMD_TRES, tmp,
+			     GD7965_TRES_REG_LENGTH)) {
 		return -EIO;
 	}
 
-	bdd_polarity = GD7965_CDI_BDV1 |
-		       GD7965_CDI_N2OCP | GD7965_CDI_DDX0;
+	bdd_polarity = GD7965_CDI_BDV1 | GD7965_CDI_N2OCP | GD7965_CDI_DDX0;
 	tmp[GD7965_CDI_BDZ_DDX_IDX] = bdd_polarity;
 	tmp[GD7965_CDI_CDI_IDX] = DT_INST_PROP(0, cdi);
 	LOG_HEXDUMP_DBG(tmp, GD7965_CDI_REG_LENGTH, "CDI");
@@ -465,8 +461,6 @@ static struct display_driver_api gd7965_driver_api = {
 	.set_orientation = gd7965_set_orientation,
 };
 
-
-DEVICE_AND_API_INIT(gd7965, DT_INST_LABEL(0), gd7965_init,
-		    &gd7965_driver, NULL,
+DEVICE_AND_API_INIT(gd7965, DT_INST_LABEL(0), gd7965_init, &gd7965_driver, NULL,
 		    POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
 		    &gd7965_driver_api);

@@ -36,8 +36,8 @@ static void tmpool_api(void *p1, void *p2, void *p3)
 
 	for (int loops = 0; loops < LOOPS; loops++) {
 		for (int i = 0; i < 4; i++) {
-			ret[i] = k_mem_pool_alloc(pool, &block[i],
-						  BLK_SIZE_MIN, TIMEOUT);
+			ret[i] = k_mem_pool_alloc(pool, &block[i], BLK_SIZE_MIN,
+						  TIMEOUT);
 		}
 		ret[4] = k_mem_pool_alloc(pool, &block[4], BLK_SIZE_MAX,
 					  TIMEOUT);

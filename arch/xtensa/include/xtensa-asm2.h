@@ -16,8 +16,7 @@
  * INTLEVEL set to zero (i.e. it's a user thread, we don't start with
  * anything masked, so don't assume that!).
  */
-void *xtensa_init_stack(int *stack_top,
-			void (*entry)(void *, void *, void *),
+void *xtensa_init_stack(int *stack_top, void (*entry)(void *, void *, void *),
 			void *arg1, void *arg2, void *arg3);
 
 #endif /* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_ASM2_H_ */

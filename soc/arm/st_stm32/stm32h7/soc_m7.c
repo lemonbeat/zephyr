@@ -20,7 +20,6 @@
 #if defined(CONFIG_STM32H7_DUAL_CORE)
 static int stm32h7_m4_wakeup(const struct device *arg)
 {
-
 	/* HW semaphore and SysCfg Clock enable */
 	LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_HSEM);
 	LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_SYSCFG);
@@ -105,7 +104,6 @@ static int stm32h7_init(const struct device *arg)
 }
 
 SYS_INIT(stm32h7_init, PRE_KERNEL_1, 0);
-
 
 #if defined(CONFIG_STM32H7_DUAL_CORE)
 /* Unlock M4 once system configuration has been done */

@@ -26,10 +26,9 @@ extern struct k_thread get_single_tid;
 /*test case main entry*/
 void test_main(void)
 {
-	k_thread_access_grant(k_current_get(),
-			      &test_pipe, &put_sem, &get_sem,
-			      &sync_sem, &multiple_send_sem,
-			      &get_single_tid, &stack_1);
+	k_thread_access_grant(k_current_get(), &test_pipe, &put_sem, &get_sem,
+			      &sync_sem, &multiple_send_sem, &get_single_tid,
+			      &stack_1);
 
 	ztest_test_suite(test_pipe,
 			 ztest_user_unit_test(test_pipe_on_single_elements),
@@ -42,8 +41,7 @@ void test_main(void)
 			 ztest_user_unit_test(test_pipe_get_invalid_size),
 			 ztest_user_unit_test(test_pipe_get_min_xfer),
 			 ztest_user_unit_test(test_pipe_put_min_xfer),
-			 ztest_unit_test(test_pipe_define_at_runtime)
-			 );
+			 ztest_unit_test(test_pipe_define_at_runtime));
 
 	ztest_run_test_suite(test_pipe);
 }

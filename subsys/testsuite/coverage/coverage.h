@@ -26,7 +26,6 @@
  * Which is governed by section 7 of additional permissions.
  */
 
-
 #ifndef _COVERAGE_H_
 #define _COVERAGE_H_
 
@@ -38,15 +37,15 @@
 
 typedef uint64_t gcov_type;
 
-#define GCOV_TAG_FUNCTION_LENGTH  3
-#define GCOV_DATA_MAGIC   (0x67636461)
+#define GCOV_TAG_FUNCTION_LENGTH 3
+#define GCOV_DATA_MAGIC (0x67636461)
 #define GCOV_TAG_FUNCTION (0x01000000)
 #define GCOV_TAG_COUNTER_BASE (0x01a10000)
-#define GCOV_TAG_FOR_COUNTER(count)         \
-(GCOV_TAG_COUNTER_BASE + ((uint32_t) (count) << 17))
+#define GCOV_TAG_FOR_COUNTER(count) \
+	(GCOV_TAG_COUNTER_BASE + ((uint32_t)(count) << 17))
 
-#define FILE_START_INDICATOR	'*'
-#define GCOV_DUMP_SEPARATOR	'<'
+#define FILE_START_INDICATOR '*'
+#define GCOV_DUMP_SEPARATOR '<'
 
 /**Information about counters for a single function
  *
@@ -54,8 +53,8 @@ typedef uint64_t gcov_type;
  *  at run-time with the exception of the values array.
  */
 struct gcov_ctr_info {
-	unsigned int num;    /* number of counter values for this type */
-	gcov_type *values;   /* array of counter values for this type */
+	unsigned int num; /* number of counter values for this type */
+	gcov_type *values; /* array of counter values for this type */
 };
 
 /**
@@ -71,11 +70,11 @@ struct gcov_ctr_info {
  * of the object file containing the selected comdat function.
  */
 struct gcov_fn_info {
-	const struct gcov_info *key;     /* comdat key */
-	unsigned int ident;              /* unique ident of function */
-	unsigned int lineno_checksum;    /* function lineo_checksum */
-	unsigned int cfg_checksum;       /* function cfg checksum */
-	struct gcov_ctr_info ctrs[0];    /* instrumented counters */
+	const struct gcov_info *key; /* comdat key */
+	unsigned int ident; /* unique ident of function */
+	unsigned int lineno_checksum; /* function lineo_checksum */
+	unsigned int cfg_checksum; /* function cfg checksum */
+	struct gcov_ctr_info ctrs[0]; /* instrumented counters */
 };
 
 /** Profiling data per object file
@@ -84,15 +83,14 @@ struct gcov_fn_info {
  * at run-time with the exception of the next pointer.
  */
 struct gcov_info {
-	unsigned int version;        /* Gcov version (same as GCC version) */
-	struct gcov_info *next;      /* List head for a singly-linked list */
-	unsigned int stamp;          /* Uniquifying time stamp */
-	const char *filename;        /* Name of the associated gcda data file */
+	unsigned int version; /* Gcov version (same as GCC version) */
+	struct gcov_info *next; /* List head for a singly-linked list */
+	unsigned int stamp; /* Uniquifying time stamp */
+	const char *filename; /* Name of the associated gcda data file */
 	/* merge functions, null for unused*/
 	void (*merge[GCOV_COUNTERS])(gcov_type *, unsigned int);
-	unsigned int n_functions;         /* number of instrumented functions */
-	struct gcov_fn_info **functions;  /* function information */
-
+	unsigned int n_functions; /* number of instrumented functions */
+	struct gcov_fn_info **functions; /* function information */
 };
 
 #endif /* _COVERAGE_H_ */

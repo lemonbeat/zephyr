@@ -11,13 +11,13 @@
  */
 struct _memq_link {
 	struct _memq_link *next; /* permit chaining */
-	void              *mem;  /* payload */
+	void *mem; /* payload */
 };
 
 typedef struct _memq_link memq_link_t;
 
-#define MEMQ_DECLARE(name) \
-	struct { \
+#define MEMQ_DECLARE(name)         \
+	struct {                   \
 		memq_link_t *head; \
 		memq_link_t *tail; \
 	} memq_##name

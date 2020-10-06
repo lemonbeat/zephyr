@@ -13,12 +13,13 @@
 
 #if !defined(_ASMLANGUAGE)
 
-#define __noinit		__in_section_unique(_NOINIT_SECTION_NAME)
-#define __irq_vector_table	Z_GENERIC_SECTION(_IRQ_VECTOR_TABLE_SECTION_NAME)
-#define __sw_isr_table		Z_GENERIC_SECTION(_SW_ISR_TABLE_SECTION_NAME)
+#define __noinit __in_section_unique(_NOINIT_SECTION_NAME)
+#define __irq_vector_table Z_GENERIC_SECTION(_IRQ_VECTOR_TABLE_SECTION_NAME)
+#define __sw_isr_table Z_GENERIC_SECTION(_SW_ISR_TABLE_SECTION_NAME)
 
 #if defined(CONFIG_ARM)
-#define __kinetis_flash_config_section __in_section_unique(_KINETIS_FLASH_CONFIG_SECTION_NAME)
+#define __kinetis_flash_config_section \
+	__in_section_unique(_KINETIS_FLASH_CONFIG_SECTION_NAME)
 #define __ti_ccfg_section Z_GENERIC_SECTION(_TI_CCFG_SECTION_NAME)
 #define __ccm_data_section Z_GENERIC_SECTION(_CCM_DATA_SECTION_NAME)
 #define __ccm_bss_section Z_GENERIC_SECTION(_CCM_BSS_SECTION_NAME)

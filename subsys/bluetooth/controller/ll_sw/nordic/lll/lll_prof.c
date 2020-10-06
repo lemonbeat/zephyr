@@ -16,10 +16,10 @@
 
 #include "lll.h"
 
-static uint8_t latency_min = (uint8_t) -1;
+static uint8_t latency_min = (uint8_t)-1;
 static uint8_t latency_max;
 static uint8_t latency_prev;
-static uint8_t cputime_min = (uint8_t) -1;
+static uint8_t cputime_min = (uint8_t)-1;
 static uint8_t cputime_max;
 static uint8_t cputime_prev;
 static uint32_t timestamp_latency;

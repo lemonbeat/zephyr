@@ -34,7 +34,7 @@ int uart_mux_send(const struct device *uart, const uint8_t *buf, size_t size);
  * @retval <0 Error
  */
 int uart_mux_recv(const struct device *mux, struct gsm_dlci *dlci,
-			    uint8_t *data, size_t len);
+		  uint8_t *data, size_t len);
 
 #ifdef __cplusplus
 }

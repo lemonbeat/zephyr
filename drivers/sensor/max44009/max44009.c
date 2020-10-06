@@ -47,7 +47,7 @@ static int max44009_reg_read(struct max44009_data *drv_data, uint8_t reg,
 static int max44009_reg_write(struct max44009_data *drv_data, uint8_t reg,
 			      uint8_t val)
 {
-	uint8_t tx_buf[2] = {reg, val};
+	uint8_t tx_buf[2] = { reg, val };
 
 	return i2c_write(drv_data->i2c, tx_buf, sizeof(tx_buf),
 			 MAX44009_I2C_ADDRESS);
@@ -69,8 +69,7 @@ static int max44009_reg_update(struct max44009_data *drv_data, uint8_t reg,
 	return max44009_reg_write(drv_data, reg, new_val);
 }
 
-static int max44009_attr_set(const struct device *dev,
-			     enum sensor_channel chan,
+static int max44009_attr_set(const struct device *dev, enum sensor_channel chan,
 			     enum sensor_attribute attr,
 			     const struct sensor_value *val)
 {
@@ -179,7 +178,7 @@ int max44009_init(const struct device *dev)
 	drv_data->i2c = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (drv_data->i2c == NULL) {
 		LOG_DBG("Failed to get pointer to %s device!",
-			    DT_INST_BUS_LABEL(0));
+			DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -189,5 +188,5 @@ int max44009_init(const struct device *dev)
 static struct max44009_data max44009_drv_data;
 
 DEVICE_AND_API_INIT(max44009, DT_INST_LABEL(0), max44009_init,
-	    &max44009_drv_data, NULL, POST_KERNEL,
-	    CONFIG_SENSOR_INIT_PRIORITY, &max44009_driver_api);
+		    &max44009_drv_data, NULL, POST_KERNEL,
+		    CONFIG_SENSOR_INIT_PRIORITY, &max44009_driver_api);

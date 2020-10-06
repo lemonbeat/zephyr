@@ -46,7 +46,7 @@ int sys_notify_validate(struct sys_notify *notify)
 }
 
 sys_notify_generic_callback sys_notify_finalize(struct sys_notify *notify,
-						    int res)
+						int res)
 {
 	struct k_poll_signal *sig = NULL;
 	sys_notify_generic_callback rv = 0;

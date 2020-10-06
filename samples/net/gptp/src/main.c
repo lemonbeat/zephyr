@@ -103,16 +103,14 @@ static int init_vlan(void)
 	 * create IP address for this test. But first the VLAN needs to be
 	 * added to the interface so that IPv6 DAD can work properly.
 	 */
-	ret = setup_iface(ud.second,
-			  CONFIG_NET_SAMPLE_IFACE2_MY_IPV6_ADDR,
+	ret = setup_iface(ud.second, CONFIG_NET_SAMPLE_IFACE2_MY_IPV6_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE2_MY_IPV4_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE2_VLAN_TAG);
 	if (ret < 0) {
 		return ret;
 	}
 
-	ret = setup_iface(ud.third,
-			  CONFIG_NET_SAMPLE_IFACE3_MY_IPV6_ADDR,
+	ret = setup_iface(ud.third, CONFIG_NET_SAMPLE_IFACE3_MY_IPV6_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE3_MY_IPV4_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE3_VLAN_TAG);
 	if (ret < 0) {
@@ -123,8 +121,7 @@ static int init_vlan(void)
 }
 #endif /* CONFIG_NET_GPTP_VLAN */
 
-static void gptp_phase_dis_cb(uint8_t *gm_identity,
-			      uint16_t *time_base,
+static void gptp_phase_dis_cb(uint8_t *gm_identity, uint16_t *time_base,
 			      struct gptp_scaled_ns *last_gm_ph_change,
 			      double *last_gm_freq_change)
 {
@@ -137,8 +134,7 @@ static void gptp_phase_dis_cb(uint8_t *gm_identity,
 		LOG_DBG("GM %s last phase %d.%" PRId64 "",
 			log_strdup(gptp_sprint_clock_id(gm_identity, output,
 							sizeof(output))),
-			last_gm_ph_change->high,
-			last_gm_ph_change->low);
+			last_gm_ph_change->high, last_gm_ph_change->low);
 	}
 }
 

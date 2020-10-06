@@ -96,8 +96,9 @@ void *__printk_get_hook(void)
 }
 #endif /* CONFIG_PRINTK */
 
-static void print_digits(out_func_t out, void *ctx, printk_val_t num, unsigned int base,
-			 bool pad_before, char pad_char, int min_width)
+static void print_digits(out_func_t out, void *ctx, printk_val_t num,
+			 unsigned int base, bool pad_before, char pad_char,
+			 int min_width)
 {
 	char buf[DIGITS_BUFLEN];
 	unsigned int i;
@@ -143,7 +144,7 @@ static void print_dec(out_func_t out, void *ctx, printk_val_t num,
 
 static bool ok64(out_func_t out, void *ctx, long long val)
 {
-	if (sizeof(printk_val_t) < 8U && val != (long) val) {
+	if (sizeof(printk_val_t) < 8U && val != (long)val) {
 		out('E', ctx);
 		out('R', ctx);
 		out('R', ctx);
@@ -154,7 +155,7 @@ static bool ok64(out_func_t out, void *ctx, long long val)
 
 static bool negative(printk_val_t val)
 {
-	const printk_val_t hibit = ~(((printk_val_t) ~1) >> 1U);
+	const printk_val_t hibit = ~(((printk_val_t)~1) >> 1U);
 
 	return (val & hibit) != 0U;
 }
@@ -246,7 +247,7 @@ void z_vprintk(out_func_t out, void *ctx, const char *fmt, va_list ap)
 					if (!ok64(out, ctx, lld)) {
 						break;
 					}
-					d = (printk_val_t) lld;
+					d = (printk_val_t)lld;
 				} else if (*fmt == 'u') {
 					d = va_arg(ap, unsigned int);
 				} else {
@@ -318,7 +319,7 @@ void z_vprintk(out_func_t out, void *ctx, const char *fmt, va_list ap)
 			}
 			might_format = 0;
 		}
-still_might_format:
+	still_might_format:
 		++fmt;
 	}
 }

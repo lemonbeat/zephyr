@@ -23,7 +23,8 @@
  * The number of message buffers in the buffer pool.
  *
  */
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS                   CONFIG_OPENTHREAD_NUM_MESSAGE_BUFFERS
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS \
+	CONFIG_OPENTHREAD_NUM_MESSAGE_BUFFERS
 
 /**
  * @def OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS
@@ -32,7 +33,8 @@
  * (set using `otSetStateChangedCallback()`).
  *
  */
-#define OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS              CONFIG_OPENTHREAD_MAX_STATECHANGE_HANDLERS
+#define OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS \
+	CONFIG_OPENTHREAD_MAX_STATECHANGE_HANDLERS
 
 /**
  * @def OPENTHREAD_CONFIG_TMF_ADDRESS_CACHE_ENTRIES
@@ -40,7 +42,8 @@
  * The number of EID-to-RLOC cache entries.
  *
  */
-#define OPENTHREAD_CONFIG_TMF_ADDRESS_CACHE_ENTRIES             CONFIG_OPENTHREAD_TMF_ADDRESS_CACHE_ENTRIES
+#define OPENTHREAD_CONFIG_TMF_ADDRESS_CACHE_ENTRIES \
+	CONFIG_OPENTHREAD_TMF_ADDRESS_CACHE_ENTRIES
 
 /**
  * @def OPENTHREAD_CONFIG_LOG_PREPEND_LEVEL
@@ -48,7 +51,7 @@
  * Define to prepend the log level to all log messages.
  *
  */
-#define OPENTHREAD_CONFIG_LOG_PREPEND_LEVEL                     0
+#define OPENTHREAD_CONFIG_LOG_PREPEND_LEVEL 0
 
 /**
  * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_ACK_TIMEOUT_ENABLE
@@ -56,7 +59,7 @@
  * Define to 1 to enable software ACK timeout logic.
  *
  */
-#define OPENTHREAD_CONFIG_MAC_SOFTWARE_ACK_TIMEOUT_ENABLE       1
+#define OPENTHREAD_CONFIG_MAC_SOFTWARE_ACK_TIMEOUT_ENABLE 1
 
 /**
  * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE
@@ -64,7 +67,7 @@
  * Define to 1 to enable software retransmission logic.
  *
  */
-#define OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE        1
+#define OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE 1
 
 /**
  * @def SETTINGS_CONFIG_BASE_ADDRESS
@@ -72,7 +75,7 @@
  * The base address of settings.
  *
  */
-#define SETTINGS_CONFIG_BASE_ADDRESS                            0
+#define SETTINGS_CONFIG_BASE_ADDRESS 0
 
 /**
  * @def SETTINGS_CONFIG_PAGE_SIZE
@@ -90,7 +93,7 @@
  * The page number of settings.
  *
  */
-#define SETTINGS_CONFIG_PAGE_NUM                                4
+#define SETTINGS_CONFIG_PAGE_NUM 4
 
 /**
  * @def OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
@@ -99,7 +102,7 @@
  * in platform.
  *
  */
-#define OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE            0
+#define OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE 0
 
 /* Zephyr does not use OpenThreads heap. mbedTLS will use heap memory allocated
  * by Zephyr. Here, we use some dummy values to prevent OpenThread warnings.
@@ -153,22 +156,22 @@
  * The platform logging function for openthread.
  *
  */
-#define _OT_CONF_PLAT_LOG_FUN_NARGS__IMPL(		\
-		_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10,\
-		_11, _12, _13, _14, N, ...) N
+#define _OT_CONF_PLAT_LOG_FUN_NARGS__IMPL(_0, _1, _2, _3, _4, _5, _6, _7, _8,  \
+					  _9, _10, _11, _12, _13, _14, N, ...) \
+	N
 
-#define _OT_CONF_PLAT_LOG_FUN_NARGS__GET(...) \
-		_OT_CONF_PLAT_LOG_FUN_NARGS__IMPL(__VA_ARGS__,\
-		15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, ~)
+#define _OT_CONF_PLAT_LOG_FUN_NARGS__GET(...)                                  \
+	_OT_CONF_PLAT_LOG_FUN_NARGS__IMPL(__VA_ARGS__, 15, 14, 13, 12, 11, 10, \
+					  9, 8, 7, 6, 5, 4, 3, 2, 1, 0, ~)
 
 #define OPENTHREAD_CONFIG_PLAT_LOG_FUNCTION__COUNT_ARGS(aLogLevel, unused, \
-							aFormat, ...) \
-	do { \
-		ARG_UNUSED(unused); \
-		otPlatLog( \
-		  aLogLevel, \
-		  (otLogRegion)_OT_CONF_PLAT_LOG_FUN_NARGS__GET(__VA_ARGS__),\
-		  aFormat, ##__VA_ARGS__); \
+							aFormat, ...)      \
+	do {                                                               \
+		ARG_UNUSED(unused);                                        \
+		otPlatLog(aLogLevel,                                       \
+			  (otLogRegion)_OT_CONF_PLAT_LOG_FUN_NARGS__GET(   \
+				  __VA_ARGS__),                            \
+			  aFormat, ##__VA_ARGS__);                         \
 	} while (false)
 
 #ifdef OPENTHREAD_CONFIG_PLAT_LOG_FUNCTION
@@ -179,4 +182,4 @@
 #define OPENTHREAD_CONFIG_PLAT_LOG_FUNCTION \
 	OPENTHREAD_CONFIG_PLAT_LOG_FUNCTION__COUNT_ARGS
 
-#endif  /* OPENTHREAD_CORE_NRF52840_CONFIG_H_ */
+#endif /* OPENTHREAD_CORE_NRF52840_CONFIG_H_ */

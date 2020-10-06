@@ -14,7 +14,6 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(dma_stm32_v2);
 
-
 uint32_t dma_stm32_id_to_stream(uint32_t id)
 {
 	static const uint32_t stream_nr[] = {
@@ -134,7 +133,6 @@ bool dma_stm32_is_tc_active(DMA_TypeDef *DMAx, uint32_t id)
 
 	return func[id](DMAx);
 }
-
 
 void dma_stm32_clear_te(DMA_TypeDef *DMAx, uint32_t id)
 {

@@ -26,8 +26,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(wdt_sam);
 
-#define SAM_PRESCALAR   128
-#define WDT_MAX_VALUE   4095
+#define SAM_PRESCALAR 128
+#define WDT_MAX_VALUE 4095
 
 /* Device constant configuration parameters */
 struct wdt_sam_dev_cfg {
@@ -45,8 +45,7 @@ struct wdt_sam_dev_data {
 
 static struct wdt_sam_dev_data wdt_sam_data = { 0 };
 
-#define DEV_CFG(dev) \
-	((const struct wdt_sam_dev_cfg *const)(dev)->config)
+#define DEV_CFG(dev) ((const struct wdt_sam_dev_cfg *const)(dev)->config)
 
 static void wdt_sam_isr(const struct device *dev)
 {
@@ -72,11 +71,12 @@ int wdt_sam_convert_timeout(uint32_t timeout, uint32_t sclk)
 	uint32_t max, min;
 
 	timeout = timeout * 1000U;
-	min =  (SAM_PRESCALAR * 1000000) / sclk;
+	min = (SAM_PRESCALAR * 1000000) / sclk;
 	max = min * WDT_MAX_VALUE;
 	if ((timeout < min) || (timeout > max)) {
 		LOG_ERR("Invalid timeout value allowed range:"
-			"%d ms to %d ms", min / 1000U, max / 1000U);
+			"%d ms to %d ms",
+			min / 1000U, max / 1000U);
 		return -EINVAL;
 	}
 
@@ -108,7 +108,6 @@ static int wdt_sam_disable(const struct device *dev)
 
 static int wdt_sam_setup(const struct device *dev, uint8_t options)
 {
-
 	Wdt *const wdt = DEV_CFG(dev)->regs;
 	struct wdt_sam_dev_data *data = dev->data;
 
@@ -162,7 +161,7 @@ static int wdt_sam_install_timeout(const struct device *dev,
 	 * in the max field of the timeout config.
 	 */
 	timeout_value = wdt_sam_convert_timeout(cfg->window.max,
-						(uint32_t) CHIP_FREQ_XTAL_32K);
+						(uint32_t)CHIP_FREQ_XTAL_32K);
 
 	if (timeout_value < 0) {
 		return -EINVAL;
@@ -171,13 +170,13 @@ static int wdt_sam_install_timeout(const struct device *dev,
 	switch (cfg->flags) {
 	case WDT_FLAG_RESET_SOC:
 		/*A Watchdog fault (underflow or error) activates all resets */
-		wdt_mode = WDT_MR_WDRSTEN;  /* WDT reset enable */
+		wdt_mode = WDT_MR_WDRSTEN; /* WDT reset enable */
 		break;
 
 	case WDT_FLAG_RESET_NONE:
 		/* A Watchdog fault (underflow or error) asserts interrupt. */
 		if (cfg->callback) {
-			wdt_mode = WDT_MR_WDFIEN;   /* WDT fault interrupt. */
+			wdt_mode = WDT_MR_WDFIEN; /* WDT fault interrupt. */
 			data->cb = cfg->callback;
 		} else {
 			LOG_ERR("Invalid(NULL) ISR callback passed\n");
@@ -190,8 +189,8 @@ static int wdt_sam_install_timeout(const struct device *dev,
 	case WDT_FLAG_RESET_CPU_CORE:
 		/*A Watchdog fault activates the processor reset*/
 		LOG_DBG("Configuring reset CPU only mode\n");
-		wdt_mode = WDT_MR_WDRSTEN   |   /* WDT reset enable */
-			   WDT_MR_WDRPROC;      /* WDT reset processor only*/
+		wdt_mode = WDT_MR_WDRSTEN | /* WDT reset enable */
+			   WDT_MR_WDRPROC; /* WDT reset processor only*/
 		break;
 #endif
 	default:
@@ -199,8 +198,7 @@ static int wdt_sam_install_timeout(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	data->mode = wdt_mode |
-		     WDT_MR_WDV(timeout_value) |
+	data->mode = wdt_mode | WDT_MR_WDV(timeout_value) |
 		     WDT_MR_WDD(timeout_value);
 
 	data->timeout_valid = true;
@@ -235,8 +233,7 @@ static const struct wdt_sam_dev_cfg wdt_sam_cfg = {
 
 static void wdt_sam_irq_config(void)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority), wdt_sam_isr,
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), wdt_sam_isr,
 		    DEVICE_GET(wdt_sam), 0);
 	irq_enable(DT_INST_IRQN(0));
 }
@@ -251,6 +248,6 @@ static int wdt_sam_init(const struct device *dev)
 	return 0;
 }
 
-DEVICE_AND_API_INIT(wdt_sam, DT_INST_LABEL(0), wdt_sam_init,
-		    &wdt_sam_data, &wdt_sam_cfg, PRE_KERNEL_1,
+DEVICE_AND_API_INIT(wdt_sam, DT_INST_LABEL(0), wdt_sam_init, &wdt_sam_data,
+		    &wdt_sam_cfg, PRE_KERNEL_1,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &wdt_sam_api);

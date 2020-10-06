@@ -67,8 +67,8 @@ int mqtt_transport_write_msg(struct mqtt_client *client,
 	return transport_fn[client->transport.type].write_msg(client, message);
 }
 
-int mqtt_transport_read(struct mqtt_client *client, uint8_t *data, uint32_t buflen,
-			bool shall_block)
+int mqtt_transport_read(struct mqtt_client *client, uint8_t *data,
+			uint32_t buflen, bool shall_block)
 {
 	return transport_fn[client->transport.type].read(client, data, buflen,
 							 shall_block);

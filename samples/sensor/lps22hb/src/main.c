@@ -38,12 +38,12 @@ static void process_sample(const struct device *dev)
 
 	/* display temperature */
 	printf("Temperature:%.1f C\n", sensor_value_to_double(&temp));
-
 }
 
 void main(void)
 {
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, st_lps22hb_press)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lps22hb_press)));
 
 	if (dev == NULL) {
 		printf("Could not get LPS22HB device\n");

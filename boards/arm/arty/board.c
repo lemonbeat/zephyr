@@ -35,8 +35,8 @@ int board_daplink_qspi_mux_select(enum board_daplink_qspi_mux_mode mode)
 		return -EINVAL;
 	};
 
-	gpio = device_get_binding(DT_GPIO_LABEL(DAPLINK_QSPI_MUX_NODE,
-						mux_gpios));
+	gpio = device_get_binding(
+		DT_GPIO_LABEL(DAPLINK_QSPI_MUX_NODE, mux_gpios));
 	if (!gpio) {
 		LOG_ERR("DAPLink QSPI MUX GPIO device '%s' not found",
 			DT_GPIO_LABEL(DAPLINK_QSPI_MUX_NODE, mux_gpios));
@@ -45,7 +45,7 @@ int board_daplink_qspi_mux_select(enum board_daplink_qspi_mux_mode mode)
 
 	err = gpio_config(gpio, DT_GPIO_PIN(DAPLINK_QSPI_MUX_NODE, mux_gpios),
 			  DT_GPIO_FLAGS(DAPLINK_QSPI_MUX_NODE, mux_gpios) |
-			  flags);
+				  flags);
 	if (err) {
 		LOG_ERR("failed to configure DAPLink QSPI MUX GPIO (err %d)",
 			err);

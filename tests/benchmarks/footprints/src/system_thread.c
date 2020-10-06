@@ -16,7 +16,7 @@
 
 #include "footprint.h"
 
-#define STACK_SIZE	512
+#define STACK_SIZE 512
 
 K_SEM_DEFINE(yield_sem, 0, 1);
 
@@ -63,10 +63,8 @@ void run_thread_system(void)
 	k_tid_t yield0_tid;
 	k_tid_t yield1_tid;
 
-	k_tid_t my_tid = k_thread_create(&my_thread, my_stack_area,
-					 STACK_SIZE,
-					 thread_swap,
-					 NULL, NULL, NULL,
+	k_tid_t my_tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
+					 thread_swap, NULL, NULL, NULL,
 					 5 /*priority*/, 0, K_FOREVER);
 
 	k_thread_priority_set(my_tid, 5);
@@ -80,10 +78,9 @@ void run_thread_system(void)
 	k_thread_abort(my_tid);
 
 	k_tid_t sus_res_tid = k_thread_create(&my_thread, my_stack_area,
-					      STACK_SIZE,
-					      thread_suspend,
-					      NULL, NULL, NULL,
-					      -1 /*priority*/, 0, K_NO_WAIT);
+					      STACK_SIZE, thread_suspend, NULL,
+					      NULL, NULL, -1 /*priority*/, 0,
+					      K_NO_WAIT);
 
 	k_thread_resume(sus_res_tid);
 
@@ -91,16 +88,12 @@ void run_thread_system(void)
 
 	k_sleep(K_MSEC(10));
 
-	yield0_tid = k_thread_create(&my_thread, my_stack_area,
-				     STACK_SIZE,
-				     thread_yield0,
-				     NULL, NULL, NULL,
+	yield0_tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
+				     thread_yield0, NULL, NULL, NULL,
 				     0 /*priority*/, 0, K_NO_WAIT);
 
-	yield1_tid = k_thread_create(&my_thread_0, my_stack_area_0,
-				     STACK_SIZE,
-				     thread_yield1,
-				     NULL, NULL, NULL,
+	yield1_tid = k_thread_create(&my_thread_0, my_stack_area_0, STACK_SIZE,
+				     thread_yield1, NULL, NULL, NULL,
 				     0 /*priority*/, 0, K_NO_WAIT);
 
 	k_sleep(K_MSEC(1000));

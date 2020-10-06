@@ -51,8 +51,7 @@ struct irq_next_level_api {
  *
  * @return N/A
  */
-static inline void irq_enable_next_level(const struct device *dev,
-					 uint32_t irq)
+static inline void irq_enable_next_level(const struct device *dev, uint32_t irq)
 {
 	const struct irq_next_level_api *api =
 		(const struct irq_next_level_api *)dev->api;
@@ -111,8 +110,8 @@ static inline unsigned int irq_is_enabled_next_level(const struct device *dev)
  * @return N/A
  */
 static inline void irq_set_priority_next_level(const struct device *dev,
-				               uint32_t irq,
-				               uint32_t prio, uint32_t flags)
+					       uint32_t irq, uint32_t prio,
+					       uint32_t flags)
 {
 	const struct irq_next_level_api *api =
 		(const struct irq_next_level_api *)dev->api;
@@ -131,8 +130,8 @@ static inline void irq_set_priority_next_level(const struct device *dev,
  *
  * @return interrupt enable state, true or false
  */
-static inline unsigned int irq_line_is_enabled_next_level(const struct device *dev,
-							  unsigned int irq)
+static inline unsigned int
+irq_line_is_enabled_next_level(const struct device *dev, unsigned int irq)
 {
 	const struct irq_next_level_api *api =
 		(const struct irq_next_level_api *)dev->api;

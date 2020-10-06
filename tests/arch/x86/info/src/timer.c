@@ -7,7 +7,7 @@
 #include <device.h>
 #include <drivers/counter.h>
 
-#define NR_SAMPLES 10	/* sample timer 10 times */
+#define NR_SAMPLES 10 /* sample timer 10 times */
 
 static uint32_t sync(const struct device *cmos)
 {
@@ -47,7 +47,7 @@ void timer(void)
 #endif
 
 	printk(", configured frequency = %dHz\n",
-		sys_clock_hw_cycles_per_sec());
+	       sys_clock_hw_cycles_per_sec());
 
 	cmos = device_get_binding("CMOS");
 	if (cmos == NULL) {
@@ -64,11 +64,11 @@ void timer(void)
 			end = sync(cmos);
 			sum += end - start;
 
-			printk("\tstart = %u, end = %u, %u cycles\n",
-				start, end, end - start);
+			printk("\tstart = %u, end = %u, %u cycles\n", start,
+			       end, end - start);
 		}
 
-		printk("\taverage = %uHz\n", (unsigned) (sum / NR_SAMPLES));
+		printk("\taverage = %uHz\n", (unsigned)(sum / NR_SAMPLES));
 	}
 
 	printk("\n");

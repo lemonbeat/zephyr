@@ -17,11 +17,11 @@
 
 #if defined(CONFIG_X86_64) || defined(CONFIG_X86_PAE)
 #define XD_SUPPORTED
-#define BITL		BIT64
-#define PRI_ENTRY	"0x%016llx"
+#define BITL BIT64
+#define PRI_ENTRY "0x%016llx"
 #else
-#define BITL		BIT
-#define PRI_ENTRY	"0x%08x"
+#define BITL BIT
+#define PRI_ENTRY "0x%08x"
 #endif
 
 /*
@@ -33,19 +33,19 @@
  * masks as needed.
  */
 
-#define MMU_P		BITL(0)		/** Present */
-#define MMU_RW		BITL(1)		/** Read-Write */
-#define MMU_US		BITL(2)		/** User-Supervisor */
-#define MMU_PWT		BITL(3)		/** Page Write Through */
-#define MMU_PCD		BITL(4)		/** Page Cache Disable */
-#define MMU_A		BITL(5)		/** Accessed */
-#define MMU_D		BITL(6)		/** Dirty */
-#define MMU_PS		BITL(7)		/** Page Size */
-#define MMU_G		BITL(8)		/** Global */
+#define MMU_P BITL(0) /** Present */
+#define MMU_RW BITL(1) /** Read-Write */
+#define MMU_US BITL(2) /** User-Supervisor */
+#define MMU_PWT BITL(3) /** Page Write Through */
+#define MMU_PCD BITL(4) /** Page Cache Disable */
+#define MMU_A BITL(5) /** Accessed */
+#define MMU_D BITL(6) /** Dirty */
+#define MMU_PS BITL(7) /** Page Size */
+#define MMU_G BITL(8) /** Global */
 #ifdef XD_SUPPORTED
-#define MMU_XD		BITL(63)	/** Execute Disable */
+#define MMU_XD BITL(63) /** Execute Disable */
 #else
-#define MMU_XD		0
+#define MMU_XD 0
 #endif
 
 #ifdef CONFIG_EXCEPTION_DEBUG
@@ -131,9 +131,9 @@ static inline uintptr_t z_x86_cr3_get(void)
 {
 	uintptr_t cr3;
 #ifdef CONFIG_X86_64
-	__asm__ volatile("movq %%cr3, %0\n\t" : "=r" (cr3));
+	__asm__ volatile("movq %%cr3, %0\n\t" : "=r"(cr3));
 #else
-	__asm__ volatile("movl %%cr3, %0\n\t" : "=r" (cr3));
+	__asm__ volatile("movl %%cr3, %0\n\t" : "=r"(cr3));
 #endif
 	return cr3;
 }

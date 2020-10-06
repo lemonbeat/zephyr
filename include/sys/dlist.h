@@ -57,8 +57,8 @@ typedef struct _dnode sys_dnode_t;
  * @param __dl A pointer on a sys_dlist_t to iterate on
  * @param __dn A sys_dnode_t pointer to peek each node of the list
  */
-#define SYS_DLIST_FOR_EACH_NODE(__dl, __dn)				\
-	for (__dn = sys_dlist_peek_head(__dl); __dn != NULL;		\
+#define SYS_DLIST_FOR_EACH_NODE(__dl, __dn)                  \
+	for (__dn = sys_dlist_peek_head(__dl); __dn != NULL; \
 	     __dn = sys_dlist_peek_next(__dl, __dn))
 
 /**
@@ -81,11 +81,10 @@ typedef struct _dnode sys_dnode_t;
  * @param __dn A sys_dnode_t pointer to peek each node of the list;
  *             it contains the starting node, or NULL to start from the head
  */
-#define SYS_DLIST_ITERATE_FROM_NODE(__dl, __dn) \
-	for (__dn = __dn ? sys_dlist_peek_next_no_check(__dl, __dn) \
-			 : sys_dlist_peek_head(__dl); \
-	     __dn != NULL; \
-	     __dn = sys_dlist_peek_next(__dl, __dn))
+#define SYS_DLIST_ITERATE_FROM_NODE(__dl, __dn)                       \
+	for (__dn = __dn ? sys_dlist_peek_next_no_check(__dl, __dn) : \
+				 sys_dlist_peek_head(__dl);                 \
+	     __dn != NULL; __dn = sys_dlist_peek_next(__dl, __dn))
 
 /**
  * @brief Provide the primitive to safely iterate on a list
@@ -103,11 +102,11 @@ typedef struct _dnode sys_dnode_t;
  * @param __dn A sys_dnode_t pointer to peek each node of the list
  * @param __dns A sys_dnode_t pointer for the loop to run safely
  */
-#define SYS_DLIST_FOR_EACH_NODE_SAFE(__dl, __dn, __dns)			\
-	for (__dn = sys_dlist_peek_head(__dl),				\
-		     __dns = sys_dlist_peek_next(__dl, __dn);		\
-	     __dn != NULL; __dn = __dns,				\
-		     __dns = sys_dlist_peek_next(__dl, __dn))
+#define SYS_DLIST_FOR_EACH_NODE_SAFE(__dl, __dn, __dns) \
+	for (__dn = sys_dlist_peek_head(__dl),          \
+	    __dns = sys_dlist_peek_next(__dl, __dn);    \
+	     __dn != NULL;                              \
+	     __dn = __dns, __dns = sys_dlist_peek_next(__dl, __dn))
 
 /*
  * @brief Provide the primitive to resolve the container of a list node
@@ -136,10 +135,11 @@ typedef struct _dnode sys_dnode_t;
  * @param __cn Container struct type pointer
  * @param __n The field name of sys_dnode_t within the container struct
  */
-#define SYS_DLIST_PEEK_NEXT_CONTAINER(__dl, __cn, __n) \
-	((__cn != NULL) ? \
-	 SYS_DLIST_CONTAINER(sys_dlist_peek_next(__dl, &(__cn->__n)),	\
-				      __cn, __n) : NULL)
+#define SYS_DLIST_PEEK_NEXT_CONTAINER(__dl, __cn, __n)                        \
+	((__cn != NULL) ?                                                     \
+		       SYS_DLIST_CONTAINER(sys_dlist_peek_next(__dl, &(__cn->__n)), \
+				     __cn, __n) :                             \
+		       NULL)
 
 /**
  * @brief Provide the primitive to iterate on a list under a container
@@ -155,9 +155,9 @@ typedef struct _dnode sys_dnode_t;
  * @param __cn A pointer to peek each entry of the list
  * @param __n The field name of sys_dnode_t within the container struct
  */
-#define SYS_DLIST_FOR_EACH_CONTAINER(__dl, __cn, __n)			\
-	for (__cn = SYS_DLIST_PEEK_HEAD_CONTAINER(__dl, __cn, __n);     \
-	     __cn != NULL;                                              \
+#define SYS_DLIST_FOR_EACH_CONTAINER(__dl, __cn, __n)               \
+	for (__cn = SYS_DLIST_PEEK_HEAD_CONTAINER(__dl, __cn, __n); \
+	     __cn != NULL;                                          \
 	     __cn = SYS_DLIST_PEEK_NEXT_CONTAINER(__dl, __cn, __n))
 
 /**
@@ -175,11 +175,11 @@ typedef struct _dnode sys_dnode_t;
  * @param __cns A pointer for the loop to run safely
  * @param __n The field name of sys_dnode_t within the container struct
  */
-#define SYS_DLIST_FOR_EACH_CONTAINER_SAFE(__dl, __cn, __cns, __n)	\
-	for (__cn = SYS_DLIST_PEEK_HEAD_CONTAINER(__dl, __cn, __n),	\
-	     __cns = SYS_DLIST_PEEK_NEXT_CONTAINER(__dl, __cn, __n);    \
-	     __cn != NULL; __cn = __cns,				\
-	     __cns = SYS_DLIST_PEEK_NEXT_CONTAINER(__dl, __cn, __n))
+#define SYS_DLIST_FOR_EACH_CONTAINER_SAFE(__dl, __cn, __cns, __n)   \
+	for (__cn = SYS_DLIST_PEEK_HEAD_CONTAINER(__dl, __cn, __n), \
+	    __cns = SYS_DLIST_PEEK_NEXT_CONTAINER(__dl, __cn, __n); \
+	     __cn != NULL; __cn = __cns,                            \
+	    __cns = SYS_DLIST_PEEK_NEXT_CONTAINER(__dl, __cn, __n))
 
 /**
  * @brief initialize list to its empty state
@@ -195,7 +195,13 @@ static inline void sys_dlist_init(sys_dlist_t *list)
 	list->tail = (sys_dnode_t *)list;
 }
 
-#define SYS_DLIST_STATIC_INIT(ptr_to_list) { {(ptr_to_list)}, {(ptr_to_list)} }
+#define SYS_DLIST_STATIC_INIT(ptr_to_list) \
+	{                                  \
+		{ (ptr_to_list) },         \
+		{                          \
+			(ptr_to_list)      \
+		}                          \
+	}
 
 /**
  * @brief initialize node to its state when not in a list
@@ -462,8 +468,9 @@ static inline void sys_dlist_insert(sys_dnode_t *successor, sys_dnode_t *node)
  * @return N/A
  */
 
-static inline void sys_dlist_insert_at(sys_dlist_t *list, sys_dnode_t *node,
-	int (*cond)(sys_dnode_t *node, void *data), void *data)
+static inline void
+sys_dlist_insert_at(sys_dlist_t *list, sys_dnode_t *node,
+		    int (*cond)(sys_dnode_t *node, void *data), void *data)
 {
 	if (sys_dlist_is_empty(list)) {
 		sys_dlist_append(list, node);

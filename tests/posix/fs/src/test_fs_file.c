@@ -18,7 +18,8 @@ static int test_file_open(void)
 
 	res = open(TEST_FILE, O_CREAT | O_RDWR);
 
-	zassert_true(res >= 0, "Failed opening file: %d, errno=%d\n", res, errno);
+	zassert_true(res >= 0, "Failed opening file: %d, errno=%d\n", res,
+		     errno);
 
 	file = res;
 
@@ -118,7 +119,8 @@ static int test_file_close(void)
 	int res;
 
 	res = close(file);
-	zassert_true(res == 0, "Failed closing file: %d, errno=%d\n", res, errno);
+	zassert_true(res == 0, "Failed closing file: %d, errno=%d\n", res,
+		     errno);
 
 	return res;
 }
@@ -189,7 +191,7 @@ void test_fs_unlink(void)
 void test_fs_fd_leak(void)
 {
 	const int reps =
-	    MAX(CONFIG_POSIX_MAX_OPEN_FILES, CONFIG_POSIX_MAX_FDS) + 5;
+		MAX(CONFIG_POSIX_MAX_OPEN_FILES, CONFIG_POSIX_MAX_FDS) + 5;
 
 	for (int i = 0; i < reps; i++) {
 		test_fs_open();

@@ -81,8 +81,8 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 		}
 
 		connected = true;
-		TC_PRINT("[%s:%d] MQTT_EVT_CONNACK: Connected!\n",
-			 __func__, __LINE__);
+		TC_PRINT("[%s:%d] MQTT_EVT_CONNACK: Connected!\n", __func__,
+			 __LINE__);
 
 		break;
 
@@ -101,8 +101,8 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 			break;
 		}
 
-		TC_PRINT("[%s:%d] MQTT_EVT_PUBACK packet id: %u\n",
-			 __func__, __LINE__, evt->param.puback.message_id);
+		TC_PRINT("[%s:%d] MQTT_EVT_PUBACK packet id: %u\n", __func__,
+			 __LINE__, evt->param.puback.message_id);
 
 		break;
 
@@ -112,8 +112,8 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 			break;
 		}
 
-		TC_PRINT("[%s:%d] MQTT_EVT_PUBREC packet id: %u\n",
-			 __func__, __LINE__, evt->param.pubrec.message_id);
+		TC_PRINT("[%s:%d] MQTT_EVT_PUBREC packet id: %u\n", __func__,
+			 __LINE__, evt->param.pubrec.message_id);
 
 		const struct mqtt_pubrel_param rel_param = {
 			.message_id = evt->param.pubrec.message_id
@@ -121,8 +121,7 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 
 		err = mqtt_publish_qos2_release(client, &rel_param);
 		if (err != 0) {
-			TC_PRINT("Failed to send MQTT PUBREL: %d\n",
-				 err);
+			TC_PRINT("Failed to send MQTT PUBREL: %d\n", err);
 		}
 
 		break;
@@ -133,8 +132,8 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 			break;
 		}
 
-		TC_PRINT("[%s:%d] MQTT_EVT_PUBCOMP packet id: %u\n",
-			 __func__, __LINE__, evt->param.pubcomp.message_id);
+		TC_PRINT("[%s:%d] MQTT_EVT_PUBCOMP packet id: %u\n", __func__,
+			 __LINE__, evt->param.pubcomp.message_id);
 
 		break;
 
@@ -144,11 +143,9 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 			break;
 		}
 
-
 		TC_PRINT("[%s:%d] items: %d packet id: %u\n", __func__,
 			 __LINE__, evt->param.suback.return_codes.len,
 			 evt->param.suback.message_id);
-
 
 		break;
 
@@ -202,7 +199,6 @@ static int try_to_connect(struct mqtt_client *client)
 	int rc, i = 0;
 
 	while (i++ < APP_CONNECT_TRIES && !connected) {
-
 		client_init(&client_ctx);
 
 		rc = mqtt_connect(client);

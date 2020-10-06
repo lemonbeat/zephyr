@@ -35,8 +35,7 @@ struct rv32m1_lpi2c_data {
 	status_t completion_status;
 };
 
-static int rv32m1_lpi2c_configure(const struct device *dev,
-				  uint32_t dev_config)
+static int rv32m1_lpi2c_configure(const struct device *dev, uint32_t dev_config)
 {
 	const struct rv32m1_lpi2c_config *config = dev->config;
 	const struct device *clk;
@@ -126,8 +125,7 @@ static uint32_t rv32m1_lpi2c_convert_flags(int msg_flags)
 	return flags;
 }
 
-static int rv32m1_lpi2c_transfer(const struct device *dev,
-				 struct i2c_msg *msgs,
+static int rv32m1_lpi2c_transfer(const struct device *dev, struct i2c_msg *msgs,
 				 uint8_t num_msgs, uint16_t addr)
 {
 	const struct rv32m1_lpi2c_config *config = dev->config;
@@ -156,17 +154,17 @@ static int rv32m1_lpi2c_transfer(const struct device *dev,
 		}
 
 		transfer.slaveAddress = addr;
-		transfer.direction = (msgs->flags & I2C_MSG_READ)
-			? kLPI2C_Read : kLPI2C_Write;
+		transfer.direction = (msgs->flags & I2C_MSG_READ) ?
+						   kLPI2C_Read :
+						   kLPI2C_Write;
 		transfer.subaddress = 0;
 		transfer.subaddressSize = 0;
 		transfer.data = msgs->buf;
 		transfer.dataSize = msgs->len;
 
 		/* Start the transfer */
-		status = LPI2C_MasterTransferNonBlocking(config->base,
-							 &data->handle,
-							 &transfer);
+		status = LPI2C_MasterTransferNonBlocking(
+			config->base, &data->handle, &transfer);
 
 		/* Return an error if the transfer didn't start successfully
 		 * e.g., if the bus was busy
@@ -258,19 +256,19 @@ static int rv32m1_lpi2c_init(const struct device *dev)
 
 static const struct i2c_driver_api rv32m1_lpi2c_driver_api = {
 	.configure = rv32m1_lpi2c_configure,
-	.transfer  = rv32m1_lpi2c_transfer,
+	.transfer = rv32m1_lpi2c_transfer,
 };
 
 #define RV32M1_LPI2C_DEVICE(id)                                                \
-	static void rv32m1_lpi2c_irq_config_func_##id(const struct device *dev);     \
+	static void rv32m1_lpi2c_irq_config_func_##id(                         \
+		const struct device *dev);                                     \
 	static const struct rv32m1_lpi2c_config rv32m1_lpi2c_##id##_config = { \
-		.base =                                                        \
-		(LPI2C_Type *)DT_INST_REG_ADDR(id),                            \
+		.base = (LPI2C_Type *)DT_INST_REG_ADDR(id),                    \
 		.clock_controller = DT_INST_CLOCKS_LABEL(id),                  \
 		.clock_subsys =                                                \
-			(clock_control_subsys_t) DT_INST_CLOCKS_CELL(id, name),\
+			(clock_control_subsys_t)DT_INST_CLOCKS_CELL(id, name), \
 		.clock_ip_name = INST_DT_CLOCK_IP_NAME(id),                    \
-		.clock_ip_src  = kCLOCK_IpSrcFircAsync,                        \
+		.clock_ip_src = kCLOCK_IpSrcFircAsync,                         \
 		.bitrate = DT_INST_PROP(id, clock_frequency),                  \
 		.irq_config_func = rv32m1_lpi2c_irq_config_func_##id,          \
 	};                                                                     \
@@ -280,20 +278,17 @@ static const struct i2c_driver_api rv32m1_lpi2c_driver_api = {
 		.completion_sync = Z_SEM_INITIALIZER(                          \
 			rv32m1_lpi2c_##id##_data.completion_sync, 0, 1),       \
 	};                                                                     \
-	DEVICE_AND_API_INIT(rv32m1_lpi2c_##id,                                 \
-			    DT_INST_LABEL(id),                                 \
-			    &rv32m1_lpi2c_init,                                \
-			    &rv32m1_lpi2c_##id##_data,                         \
-			    &rv32m1_lpi2c_##id##_config,                       \
-			    POST_KERNEL, CONFIG_I2C_INIT_PRIORITY,             \
-			    &rv32m1_lpi2c_driver_api);	                       \
-	static void rv32m1_lpi2c_irq_config_func_##id(const struct device *dev)      \
+	DEVICE_AND_API_INIT(rv32m1_lpi2c_##id, DT_INST_LABEL(id),              \
+			    &rv32m1_lpi2c_init, &rv32m1_lpi2c_##id##_data,     \
+			    &rv32m1_lpi2c_##id##_config, POST_KERNEL,          \
+			    CONFIG_I2C_INIT_PRIORITY,                          \
+			    &rv32m1_lpi2c_driver_api);                         \
+	static void rv32m1_lpi2c_irq_config_func_##id(                         \
+		const struct device *dev)                                      \
 	{                                                                      \
-		IRQ_CONNECT(DT_INST_IRQN(id),                                  \
-			    0,						       \
-			    rv32m1_lpi2c_isr, DEVICE_GET(rv32m1_lpi2c_##id),   \
-			    0);                                                \
+		IRQ_CONNECT(DT_INST_IRQN(id), 0, rv32m1_lpi2c_isr,             \
+			    DEVICE_GET(rv32m1_lpi2c_##id), 0);                 \
 		irq_enable(DT_INST_IRQN(id));                                  \
-	}                                                                      \
+	}
 
 DT_INST_FOREACH_STATUS_OKAY(RV32M1_LPI2C_DEVICE)

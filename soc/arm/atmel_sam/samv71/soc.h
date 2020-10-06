@@ -62,7 +62,7 @@
 #elif defined CONFIG_SOC_PART_NUMBER_SAMV71Q21B
 #include <samv71q21b.h>
 #else
-  #error Library does not support the specified device.
+#error Library does not support the specified device.
 #endif
 
 #include "../common/soc_pmc.h"

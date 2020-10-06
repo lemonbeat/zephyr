@@ -32,16 +32,16 @@ extern uint32_t pcie_get_cap(pcie_bdf_t bdf, uint32_t cap_id);
  * Configuration word 13 contains the head of the capabilities list.
  */
 
-#define PCIE_CONF_CAPPTR	13U	/* capabilities pointer */
-#define PCIE_CONF_CAPPTR_FIRST(w)	(((w) >> 2) & 0x3FU)
+#define PCIE_CONF_CAPPTR 13U /* capabilities pointer */
+#define PCIE_CONF_CAPPTR_FIRST(w) (((w) >> 2) & 0x3FU)
 
 /*
  * The first word of every capability contains a capability identifier,
  * and a link to the next capability (or 0) in configuration space.
  */
 
-#define PCIE_CONF_CAP_ID(w)		((w) & 0xFFU)
-#define PCIE_CONF_CAP_NEXT(w)		(((w) >> 10) & 0x3FU)
+#define PCIE_CONF_CAP_ID(w) ((w)&0xFFU)
+#define PCIE_CONF_CAP_NEXT(w) (((w) >> 10) & 0x3FU)
 
 /**
  * @brief Compute the target address for an MSI posted write.
@@ -76,29 +76,29 @@ extern bool pcie_set_msi(pcie_bdf_t bdf, unsigned int irq);
  * MSI capability IDs in the PCI configuration capability list.
  */
 
-#define PCIE_MSI_CAP_ID		0x05U
-#define PCIE_MSIX_CAP_ID	0x11U
+#define PCIE_MSI_CAP_ID 0x05U
+#define PCIE_MSIX_CAP_ID 0x11U
 
 /*
  * The first word of the MSI capability is shared with the
  * capability ID and list link.  The high 16 bits are the MCR.
  */
 
-#define PCIE_MSI_MCR		0U
+#define PCIE_MSI_MCR 0U
 
-#define PCIE_MSI_MCR_EN		0x00010000U  /* enable MSI */
-#define PCIE_MSI_MCR_MME	0x00700000U  /* mask of # of enabled IRQs */
-#define PCIE_MSI_MCR_64		0x00800000U  /* 64-bit MSI */
+#define PCIE_MSI_MCR_EN 0x00010000U /* enable MSI */
+#define PCIE_MSI_MCR_MME 0x00700000U /* mask of # of enabled IRQs */
+#define PCIE_MSI_MCR_64 0x00800000U /* 64-bit MSI */
 
 /*
  * The MAP follows the MCR. If PCIE_MSI_MCR_64, then the MAP
  * is two words long. The MDR follows immediately after the MAP.
  */
 
-#define PCIE_MSI_MAP0		1U
-#define PCIE_MSI_MAP1_64	2U
-#define PCIE_MSI_MDR_32		2U
-#define PCIE_MSI_MDR_64		3U
+#define PCIE_MSI_MAP0 1U
+#define PCIE_MSI_MAP1_64 2U
+#define PCIE_MSI_MDR_32 2U
+#define PCIE_MSI_MDR_64 3U
 
 #ifdef __cplusplus
 }

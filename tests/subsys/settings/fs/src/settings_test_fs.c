@@ -9,7 +9,6 @@
 #include "settings_test.h"
 #include "settings_priv.h"
 
-
 uint8_t val8;
 uint16_t val16;
 uint64_t val64;
@@ -25,20 +24,16 @@ int c1_handle_get(const char *name, char *val, int val_len_max);
 int c1_handle_set(const char *name, size_t len, settings_read_cb read_cb,
 		  void *cb_arg);
 int c1_handle_commit(void);
-int c1_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len));
+int c1_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len));
 
 struct settings_handler c_test_handlers[] = {
-	{
-		.name = "myfoo",
-		.h_get = c1_handle_get,
-		.h_set = c1_handle_set,
-		.h_commit = c1_handle_commit,
-		.h_export = c1_handle_export
-	},
+	{ .name = "myfoo",
+	  .h_get = c1_handle_get,
+	  .h_set = c1_handle_set,
+	  .h_commit = c1_handle_commit,
+	  .h_export = c1_handle_export },
 };
-
-
 
 int c1_handle_get(const char *name, char *val, int val_len_max)
 {
@@ -110,8 +105,8 @@ int c1_handle_commit(void)
 	return 0;
 }
 
-int c1_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len))
+int c1_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len))
 {
 	if (test_export_block) {
 		return 0;

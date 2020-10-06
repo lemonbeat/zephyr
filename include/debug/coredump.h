@@ -13,12 +13,12 @@
 #include <arch/cpu.h>
 #include <sys/byteorder.h>
 
-#define Z_COREDUMP_HDR_VER		1
+#define Z_COREDUMP_HDR_VER 1
 
-#define	Z_COREDUMP_ARCH_HDR_ID		'A'
+#define Z_COREDUMP_ARCH_HDR_ID 'A'
 
-#define	Z_COREDUMP_MEM_HDR_ID		'M'
-#define Z_COREDUMP_MEM_HDR_VER		1
+#define Z_COREDUMP_MEM_HDR_ID 'M'
+#define Z_COREDUMP_MEM_HDR_VER 1
 
 /* Target code */
 enum z_coredump_tgt_code {
@@ -31,48 +31,48 @@ enum z_coredump_tgt_code {
 /* Coredump header */
 struct z_coredump_hdr_t {
 	/* 'Z', 'E' */
-	char		id[2];
+	char id[2];
 
 	/* Header version */
-	uint16_t	hdr_version;
+	uint16_t hdr_version;
 
 	/* Target code */
-	uint16_t	tgt_code;
+	uint16_t tgt_code;
 
 	/* Pointer size in Log2 */
-	uint8_t		ptr_size_bits;
+	uint8_t ptr_size_bits;
 
-	uint8_t		flag;
+	uint8_t flag;
 
 	/* Coredump Reason given */
-	unsigned int	reason;
+	unsigned int reason;
 } __packed;
 
 /* Architecture-specific block header */
 struct z_coredump_arch_hdr_t {
 	/* Z_COREDUMP_ARCH_HDR_ID */
-	char		id;
+	char id;
 
 	/* Header version */
-	uint16_t	hdr_version;
+	uint16_t hdr_version;
 
 	/* Number of bytes in this block (excluding header) */
-	uint16_t	num_bytes;
+	uint16_t num_bytes;
 } __packed;
 
 /* Memory block header */
 struct z_coredump_mem_hdr_t {
 	/* Z_COREDUMP_MEM_HDR_ID */
-	char		id;
+	char id;
 
 	/* Header version */
-	uint16_t	hdr_version;
+	uint16_t hdr_version;
 
 	/* Address of start of memory region */
-	uintptr_t	start;
+	uintptr_t start;
 
 	/* Address of end of memory region */
-	uintptr_t	end;
+	uintptr_t end;
 } __packed;
 
 void z_coredump(unsigned int reason, const z_arch_esf_t *esf,

@@ -5,12 +5,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <zephyr.h>
 #include <ztest.h>
 
-
-#define STACKSIZE       (2048 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define STACKSIZE (2048 + CONFIG_TEST_EXTRA_STACKSIZE)
 
 ZTEST_BMEM static int count;
 ZTEST_BMEM static int ret = TC_PASS;
@@ -94,8 +92,6 @@ void alternate_thread(void)
 	ret = TC_FAIL;
 }
 
-
-
 K_THREAD_STACK_DEFINE(alt_thread_stack_area, STACKSIZE);
 static struct k_thread alt_thread_data;
 
@@ -143,8 +139,7 @@ void test_create_alt_thread(void)
 
 void test_main(void)
 {
-	ztest_test_suite(stackprot,
-			 ztest_unit_test(test_create_alt_thread),
+	ztest_test_suite(stackprot, ztest_unit_test(test_create_alt_thread),
 			 ztest_user_unit_test(test_stackprot));
 	ztest_run_test_suite(stackprot);
 }

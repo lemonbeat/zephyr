@@ -15,7 +15,6 @@
  * Chapter 3.3: Memory organization
  */
 
-
 #ifndef _STM32F3_SOC_H_
 #define _STM32F3_SOC_H_
 

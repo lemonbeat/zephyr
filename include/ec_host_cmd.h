@@ -77,14 +77,14 @@ struct ec_host_cmd_handler {
  * @param _response_type The datatype of the response parameters for
  *        @a _function.
  */
-#define EC_HOST_CMD_HANDLER(_function, _id, _version_mask, _request_type,      \
-			    _response_type)                                    \
-	const Z_STRUCT_SECTION_ITERABLE(ec_host_cmd_handler, __cmd##_id) = {   \
-		.id = _id,                                                     \
-		.handler = _function,                                          \
-		.version_mask = _version_mask,                                 \
-		.min_rqt_size = sizeof(_request_type),                         \
-		.min_rsp_size = sizeof(_response_type),                        \
+#define EC_HOST_CMD_HANDLER(_function, _id, _version_mask, _request_type,    \
+			    _response_type)                                  \
+	const Z_STRUCT_SECTION_ITERABLE(ec_host_cmd_handler, __cmd##_id) = { \
+		.id = _id,                                                   \
+		.handler = _function,                                        \
+		.version_mask = _version_mask,                               \
+		.min_rqt_size = sizeof(_request_type),                       \
+		.min_rsp_size = sizeof(_response_type),                      \
 	}
 
 /**
@@ -99,13 +99,13 @@ struct ec_host_cmd_handler {
  * @param _version_mask The bitfield of all versions that the @a _function
  *        supports. E.g. BIT(0) corresponse to version 0.
  */
-#define EC_HOST_CMD_HANDLER_UNBOUND(_function, _id, _version_mask)             \
-	const Z_STRUCT_SECTION_ITERABLE(ec_host_cmd_handler, __cmd##_id) = {   \
-		.id = _id,                                                     \
-		.handler = _function,                                          \
-		.version_mask = _version_mask,                                 \
-		.min_rqt_size = 0,                                             \
-		.min_rsp_size = 0,                                             \
+#define EC_HOST_CMD_HANDLER_UNBOUND(_function, _id, _version_mask)           \
+	const Z_STRUCT_SECTION_ITERABLE(ec_host_cmd_handler, __cmd##_id) = { \
+		.id = _id,                                                   \
+		.handler = _function,                                        \
+		.version_mask = _version_mask,                               \
+		.min_rqt_size = 0,                                           \
+		.min_rsp_size = 0,                                           \
 	}
 
 /**

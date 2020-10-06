@@ -41,21 +41,20 @@ LOG_MODULE_REGISTER(net_test, NET_LOG_LEVEL);
 #endif
 
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 2 addresses */
-static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 3 addresses */
-static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 #define MAX_NUM_INTERFACES 3
 
@@ -90,8 +89,7 @@ static void eth_iface_init(struct net_if *iface)
 	struct eth_context *context = dev->data;
 
 	net_if_set_link_addr(iface, context->mac_addr,
-			     sizeof(context->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(context->mac_addr), NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 }
@@ -112,7 +110,6 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 	if (test_started) {
 		k_sem_give(&wait_data);
 	}
-
 
 	return 0;
 }
@@ -348,42 +345,38 @@ static void test_address_setup(void)
 	zassert_not_null(iface2, "Interface 2\n");
 	zassert_not_null(iface3, "Interface 3\n");
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1\n");
 	}
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr\n");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr2));
+		    net_sprint_ipv6_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2\n");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface3, &my_addr3,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface3, &my_addr3, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr3));
+		    net_sprint_ipv6_addr(&my_addr3));
 		zassert_not_null(ifaddr, "addr3\n");
 	}
 
@@ -452,8 +445,8 @@ static void test_ptp_clock_iface(int idx)
 
 	/* The clock value must be the same after incrementing it */
 	zassert_equal(orig + rnd_value, new_value,
-		      "Time adjust failure (%llu vs %llu)\n",
-		      orig + rnd_value, new_value);
+		      "Time adjust failure (%llu vs %llu)\n", orig + rnd_value,
+		      new_value);
 }
 
 static void test_ptp_clock_iface_1(void)
@@ -557,8 +550,7 @@ void test_main(void)
 		k_object_access_grant(clk, k_current_get());
 	}
 
-	ztest_test_suite(ptp_clock_test,
-			 ztest_unit_test(test_check_interfaces),
+	ztest_test_suite(ptp_clock_test, ztest_unit_test(test_check_interfaces),
 			 ztest_unit_test(test_address_setup),
 			 ztest_unit_test(test_ptp_clock_interfaces),
 			 ztest_unit_test(test_ptp_clock_iface_1),
@@ -566,8 +558,7 @@ void test_main(void)
 			 ztest_unit_test(test_ptp_clock_get_by_index),
 			 ztest_user_unit_test(test_ptp_clock_get_by_index_user),
 			 ztest_unit_test(test_ptp_clock_get_kernel),
-			 ztest_user_unit_test(test_ptp_clock_get_user)
-			 );
+			 ztest_user_unit_test(test_ptp_clock_get_user));
 
 	ztest_run_test_suite(ptp_clock_test);
 }

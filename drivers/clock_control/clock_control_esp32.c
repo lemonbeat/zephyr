@@ -48,32 +48,29 @@ struct pll_cfg {
 	struct bbpll_cfg bbpll[2];
 };
 
+#define PLL_APB_CLK_FREQ 80
 
-#define PLL_APB_CLK_FREQ            80
+#define RTC_PLL_FREQ_320M 0
+#define RTC_PLL_FREQ_480M 1
 
-#define RTC_PLL_FREQ_320M           0
-#define RTC_PLL_FREQ_480M           1
+#define DPORT_CPUPERIOD_SEL_80 0
+#define DPORT_CPUPERIOD_SEL_160 1
+#define DPORT_CPUPERIOD_SEL_240 2
 
-#define DPORT_CPUPERIOD_SEL_80      0
-#define DPORT_CPUPERIOD_SEL_160     1
-#define DPORT_CPUPERIOD_SEL_240     2
+#define DEV_CFG(dev) ((struct esp32_clock_config *)(dev->config))
+#define GET_REG_BANK(module_id) ((uint32_t)module_id / 32U)
+#define GET_REG_OFFSET(module_id) ((uint32_t)module_id % 32U)
 
-#define DEV_CFG(dev)                ((struct esp32_clock_config *)(dev->config))
-#define GET_REG_BANK(module_id)     ((uint32_t)module_id / 32U)
-#define GET_REG_OFFSET(module_id)   ((uint32_t)module_id % 32U)
-
-#define CLOCK_REGS_BANK_COUNT 	    3
+#define CLOCK_REGS_BANK_COUNT 3
 
 const struct control_regs clock_control_regs[CLOCK_REGS_BANK_COUNT] = {
 	[0] = { .clk = DPORT_PERIP_CLK_EN_REG, .rst = DPORT_PERIP_RST_EN_REG },
-	[1] = { .clk = DPORT_PERI_CLK_EN_REG,  .rst = DPORT_PERI_RST_EN_REG },
-	[2] = { .clk = DPORT_WIFI_CLK_EN_REG,  .rst = DPORT_CORE_RST_EN_REG }
+	[1] = { .clk = DPORT_PERI_CLK_EN_REG, .rst = DPORT_PERI_RST_EN_REG },
+	[2] = { .clk = DPORT_WIFI_CLK_EN_REG, .rst = DPORT_CORE_RST_EN_REG }
 };
 
-static uint32_t const xtal_freq[] = {
-	[ESP32_CLK_XTAL_40M] = 40,
-	[ESP32_CLK_XTAL_26M] = 26
-};
+static uint32_t const
+	xtal_freq[] = { [ESP32_CLK_XTAL_40M] = 40, [ESP32_CLK_XTAL_26M] = 26 };
 
 const struct pll_cfg pll_config[] = {
 	[RTC_PLL_FREQ_320M] = {
@@ -132,18 +129,22 @@ static void bbpll_configure(rtc_xtal_freq_t xtal_freq, uint32_t pll_freq)
 	const struct bbpll_cfg *bb_cfg = &pll_config[pll_freq].bbpll[xtal_freq];
 
 	/* Enable PLL, Clear PowerDown (_PD) flags */
-	CLEAR_PERI_REG_MASK(RTC_CNTL_OPTIONS0_REG,
-			    RTC_CNTL_BIAS_I2C_FORCE_PD |
-			    RTC_CNTL_BB_I2C_FORCE_PD |
-			    RTC_CNTL_BBPLL_FORCE_PD |
-			    RTC_CNTL_BBPLL_I2C_FORCE_PD);
+	CLEAR_PERI_REG_MASK(
+		RTC_CNTL_OPTIONS0_REG,
+		RTC_CNTL_BIAS_I2C_FORCE_PD | RTC_CNTL_BB_I2C_FORCE_PD |
+			RTC_CNTL_BBPLL_FORCE_PD | RTC_CNTL_BBPLL_I2C_FORCE_PD);
 
 	/* reset BBPLL configuration */
-	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_IR_CAL_DELAY, BBPLL_IR_CAL_DELAY_VAL);
-	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_IR_CAL_EXT_CAP, BBPLL_IR_CAL_EXT_CAP_VAL);
-	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_ENB_FCAL, BBPLL_OC_ENB_FCAL_VAL);
-	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_ENB_VCON, BBPLL_OC_ENB_VCON_VAL);
-	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_BBADC_CAL_7_0, BBPLL_BBADC_CAL_7_0_VAL);
+	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_IR_CAL_DELAY,
+			 BBPLL_IR_CAL_DELAY_VAL);
+	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_IR_CAL_EXT_CAP,
+			 BBPLL_IR_CAL_EXT_CAP_VAL);
+	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_ENB_FCAL,
+			 BBPLL_OC_ENB_FCAL_VAL);
+	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_ENB_VCON,
+			 BBPLL_OC_ENB_VCON_VAL);
+	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_BBADC_CAL_7_0,
+			 BBPLL_BBADC_CAL_7_0_VAL);
 
 	/* voltage needs to be changed for CPU@240MHz or
 	 * 80MHz Flash (because of internal flash regulator)
@@ -160,11 +161,13 @@ static void bbpll_configure(rtc_xtal_freq_t xtal_freq, uint32_t pll_freq)
 	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_ENDIV5, cfg->endiv5);
 	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_BBADC_DSMP, cfg->bbadc_dsmp);
 
-	uint8_t i2c_bbpll_lref = (bb_cfg->lref << 7) | (bb_cfg->div10_8 << 4) | (bb_cfg->div_ref);
+	uint8_t i2c_bbpll_lref = (bb_cfg->lref << 7) | (bb_cfg->div10_8 << 4) |
+				 (bb_cfg->div_ref);
 
 	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_LREF, i2c_bbpll_lref);
 	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_DIV_7_0, bb_cfg->div7_0);
-	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_DCUR, ((bb_cfg->bw << 6) | bb_cfg->dcur));
+	I2C_WRITEREG_RTC(I2C_BBPLL, I2C_BBPLL_OC_DCUR,
+			 ((bb_cfg->bw << 6) | bb_cfg->dcur));
 }
 
 static void cpuclk_pll_configure(uint32_t xtal_freq, uint32_t cpu_freq)
@@ -192,7 +195,8 @@ static void cpuclk_pll_configure(uint32_t xtal_freq, uint32_t cpu_freq)
 	/* Set CPU Speed (80,160,240) */
 	DPORT_REG_WRITE(DPORT_CPU_PER_CONF_REG, cpu_period_sel);
 	/* Set PLL as CPU Clock Source */
-	REG_SET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL, RTC_CNTL_SOC_CLK_SEL_PLL);
+	REG_SET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL,
+		      RTC_CNTL_SOC_CLK_SEL_PLL);
 
 	/*
 	 * Update REF_Tick,
@@ -206,7 +210,7 @@ static int clock_control_esp32_on(const struct device *dev,
 {
 	ARG_UNUSED(dev);
 	uint32_t bank = GET_REG_BANK(sys);
-	uint32_t offset =  GET_REG_OFFSET(sys);
+	uint32_t offset = GET_REG_OFFSET(sys);
 
 	__ASSERT_NO_MSG(bank >= CLOCK_REGS_BANK_COUNT);
 
@@ -220,7 +224,7 @@ static int clock_control_esp32_off(const struct device *dev,
 {
 	ARG_UNUSED(dev);
 	uint32_t bank = GET_REG_BANK(sys);
-	uint32_t offset =  GET_REG_OFFSET(sys);
+	uint32_t offset = GET_REG_OFFSET(sys);
 
 	__ASSERT_NO_MSG(bank >= CLOCK_REGS_BANK_COUNT);
 
@@ -229,14 +233,16 @@ static int clock_control_esp32_off(const struct device *dev,
 	return 0;
 }
 
-static enum clock_control_status clock_control_esp32_get_status(const struct device *dev,
-								clock_control_subsys_t sys)
+static enum clock_control_status
+clock_control_esp32_get_status(const struct device *dev,
+			       clock_control_subsys_t sys)
 {
 	ARG_UNUSED(dev);
 	uint32_t bank = GET_REG_BANK(sys);
-	uint32_t offset =  GET_REG_OFFSET(sys);
+	uint32_t offset = GET_REG_OFFSET(sys);
 
-	if (DPORT_GET_PERI_REG_MASK(clock_control_regs[bank].clk, BIT(offset))) {
+	if (DPORT_GET_PERI_REG_MASK(clock_control_regs[bank].clk,
+				    BIT(offset))) {
 		return CLOCK_CONTROL_STATUS_ON;
 	}
 	return CLOCK_CONTROL_STATUS_OFF;
@@ -249,7 +255,8 @@ static int clock_control_esp32_get_rate(const struct device *dev,
 	ARG_UNUSED(sub_system);
 
 	uint32_t xtal_freq_sel = DEV_CFG(dev)->xtal_freq_sel;
-	uint32_t soc_clk_sel = REG_GET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL);
+	uint32_t soc_clk_sel =
+		REG_GET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL);
 
 	switch (soc_clk_sel) {
 	case RTC_CNTL_SOC_CLK_SEL_XTL:
@@ -273,11 +280,14 @@ static int clock_control_esp32_init(const struct device *dev)
 
 	switch (cfg->clk_src_sel) {
 	case ESP32_CLK_SRC_XTAL:
-		REG_SET_FIELD(APB_CTRL_SYSCLK_CONF_REG, APB_CTRL_PRE_DIV_CNT, cfg->xtal_div);
+		REG_SET_FIELD(APB_CTRL_SYSCLK_CONF_REG, APB_CTRL_PRE_DIV_CNT,
+			      cfg->xtal_div);
 		/* adjust ref_tick */
-		REG_WRITE(APB_CTRL_XTAL_TICK_CONF_REG, xtal_freq[cfg->xtal_freq_sel] - 1);
+		REG_WRITE(APB_CTRL_XTAL_TICK_CONF_REG,
+			  xtal_freq[cfg->xtal_freq_sel] - 1);
 		/* switch clock source */
-		REG_SET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL, RTC_CNTL_SOC_CLK_SEL_XTL);
+		REG_SET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL,
+			      RTC_CNTL_SOC_CLK_SEL_XTL);
 		break;
 	case ESP32_CLK_SRC_PLL:
 		cpuclk_pll_configure(cfg->xtal_freq_sel, cfg->cpu_freq);
@@ -290,7 +300,8 @@ static int clock_control_esp32_init(const struct device *dev)
 	 * This should be updated on each frequency change
 	 * New CCOUNT = Current CCOUNT * (new freq / old freq)
 	 */
-	XTHAL_SET_CCOUNT((uint64_t)XTHAL_GET_CCOUNT() * cfg->cpu_freq / xtal_freq[cfg->xtal_freq_sel]);
+	XTHAL_SET_CCOUNT((uint64_t)XTHAL_GET_CCOUNT() * cfg->cpu_freq /
+			 xtal_freq[cfg->xtal_freq_sel]);
 	return 0;
 }
 
@@ -302,20 +313,25 @@ static const struct clock_control_driver_api clock_control_esp32_api = {
 };
 
 static const struct esp32_clock_config esp32_clock_config0 = {
-	.clk_src_sel = DT_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6), clock_source),
-	.cpu_freq = DT_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6), clock_frequency),
+	.clk_src_sel =
+		DT_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6), clock_source),
+	.cpu_freq = DT_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6),
+			    clock_frequency),
 	.xtal_freq_sel = DT_INST_PROP(0, xtal_freq),
-	.xtal_div =  DT_INST_PROP(0, xtal_div),
+	.xtal_div = DT_INST_PROP(0, xtal_div),
 };
 
-DEVICE_AND_API_INIT(clk_esp32, DT_INST_LABEL(0),
-		    &clock_control_esp32_init,
-		    NULL, &esp32_clock_config0,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_OBJECTS,
+DEVICE_AND_API_INIT(clk_esp32, DT_INST_LABEL(0), &clock_control_esp32_init,
+		    NULL, &esp32_clock_config0, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_OBJECTS,
 		    &clock_control_esp32_api);
 
-BUILD_ASSERT((CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC) == MHZ(DT_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6), clock_frequency)),
-		"SYS_CLOCK_HW_CYCLES_PER_SEC Value must be equal to CPU_Freq");
+BUILD_ASSERT((CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC) ==
+		     MHZ(DT_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6),
+				 clock_frequency)),
+	     "SYS_CLOCK_HW_CYCLES_PER_SEC Value must be equal to CPU_Freq");
 
-BUILD_ASSERT(DT_NODE_HAS_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6), clock_source),
-		"CPU clock-source property must be set to ESP32_CLK_SRC_XTAL or ESP32_CLK_SRC_PLL");
+BUILD_ASSERT(
+	DT_NODE_HAS_PROP(DT_INST(0, cadence_tensilica_xtensa_lx6),
+			 clock_source),
+	"CPU clock-source property must be set to ESP32_CLK_SRC_XTAL or ESP32_CLK_SRC_PLL");

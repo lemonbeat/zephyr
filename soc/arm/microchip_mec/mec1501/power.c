@@ -56,7 +56,7 @@ static void z_power_soc_deep_sleep(void)
 	 */
 	__set_BASEPRI(0);
 	__DSB();
-	__WFI();	/* triggers sleep hardware */
+	__WFI(); /* triggers sleep hardware */
 	__NOP();
 	__NOP();
 
@@ -96,7 +96,7 @@ static void z_power_soc_sleep(void)
 
 	__set_BASEPRI(0); /* Make sure wake interrupts are not masked! */
 	__DSB();
-	__WFI();	/* triggers sleep hardware */
+	__WFI(); /* triggers sleep hardware */
 	__NOP();
 	__NOP();
 }

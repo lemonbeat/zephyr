@@ -152,18 +152,19 @@ struct _rb_foreach {
 };
 
 #ifdef CONFIG_MISRA_SANE
-#define _RB_FOREACH_INIT(tree, node) {					\
-	.stack   = &(tree)->iter_stack[0],				\
-	.is_left = &(tree)->iter_left[0],				\
-	.top     = -1							\
-}
+#define _RB_FOREACH_INIT(tree, node)                        \
+	{                                                   \
+		.stack = &(tree)->iter_stack[0],            \
+		.is_left = &(tree)->iter_left[0], .top = -1 \
+	}
 #else
-#define _RB_FOREACH_INIT(tree, node) {					\
-	.stack   = (struct rbnode **)					\
-			alloca((tree)->max_depth * sizeof(struct rbnode *)), \
-	.is_left = (char *)alloca((tree)->max_depth * sizeof(char)),		\
-	.top     = -1							\
-}
+#define _RB_FOREACH_INIT(tree, node)                                         \
+	{                                                                    \
+		.stack = (struct rbnode **)alloca((tree)->max_depth *        \
+						  sizeof(struct rbnode *)),  \
+		.is_left = (char *)alloca((tree)->max_depth * sizeof(char)), \
+		.top = -1                                                    \
+	}
 #endif
 
 struct rbnode *z_rb_foreach_next(struct rbtree *tree, struct _rb_foreach *f);
@@ -189,9 +190,9 @@ struct rbnode *z_rb_foreach_next(struct rbtree *tree, struct _rb_foreach *f);
  * @param node The symbol name of a local struct rbnode* variable to
  *             use as the iterator
  */
-#define RB_FOR_EACH(tree, node) \
-	for (struct _rb_foreach __f = _RB_FOREACH_INIT(tree, node);	\
-	     (node = z_rb_foreach_next(tree, &__f));			\
+#define RB_FOR_EACH(tree, node)                                     \
+	for (struct _rb_foreach __f = _RB_FOREACH_INIT(tree, node); \
+	     (node = z_rb_foreach_next(tree, &__f));                \
 	     /**/)
 
 /**
@@ -204,11 +205,13 @@ struct rbnode *z_rb_foreach_next(struct rbtree *tree, struct _rb_foreach *f);
  * @param node The symbol name of a local iterator
  * @param field The field name of a struct rbnode inside node
  */
-#define RB_FOR_EACH_CONTAINER(tree, node, field)		           \
-	for (struct _rb_foreach __f = _RB_FOREACH_INIT(tree, node);	   \
-			({struct rbnode *n = z_rb_foreach_next(tree, &__f); \
-			 node = n ? CONTAINER_OF(n, __typeof__(*(node)),   \
-					 field) : NULL; }) != NULL;        \
-			 /**/)
+#define RB_FOR_EACH_CONTAINER(tree, node, field)                              \
+	for (struct _rb_foreach __f = _RB_FOREACH_INIT(tree, node);           \
+	     ({                                                               \
+		     struct rbnode *n = z_rb_foreach_next(tree, &__f);        \
+		     node = n ? CONTAINER_OF(n, __typeof__(*(node)), field) : \
+				      NULL;                                         \
+	     }) != NULL;                                                      \
+	     /**/)
 
 #endif /* ZEPHYR_INCLUDE_SYS_RB_H_ */

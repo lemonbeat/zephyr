@@ -22,8 +22,8 @@ void publish(struct k_work *work)
 	int err = 0;
 
 #ifndef ONE_LED_ONE_BUTTON_BOARD
-	if (gpio_pin_get(button_device[0],
-			 DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) == 1) {
+	if (gpio_pin_get(button_device[0], DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) ==
+	    1) {
 #if defined(ONOFF)
 		bt_mesh_model_msg_init(root_models[3].pub->msg,
 				       BT_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK);
@@ -208,8 +208,8 @@ void publish(struct k_work *work)
 #endif
 	}
 #else
-	if (gpio_pin_get(button_device[0],
-			 DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) == 1) {
+	if (gpio_pin_get(button_device[0], DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) ==
+	    1) {
 #if defined(ONOFF)
 		static uint8_t state = STATE_ON;
 

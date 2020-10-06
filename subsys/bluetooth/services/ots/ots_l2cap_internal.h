@@ -31,16 +31,14 @@ struct bt_gatt_ots_l2cap {
 };
 
 bool bt_gatt_ots_l2cap_is_open(struct bt_gatt_ots_l2cap *l2cap_ctx,
-				   struct bt_conn *conn);
+			       struct bt_conn *conn);
 
-int bt_gatt_ots_l2cap_send(struct bt_gatt_ots_l2cap *l2cap_ctx,
-			       uint8_t *data,
-			       uint32_t len);
+int bt_gatt_ots_l2cap_send(struct bt_gatt_ots_l2cap *l2cap_ctx, uint8_t *data,
+			   uint32_t len);
 
 int bt_gatt_ots_l2cap_register(struct bt_gatt_ots_l2cap *l2cap_ctx);
 
 int bt_gatt_ots_l2cap_unregister(struct bt_gatt_ots_l2cap *l2cap_ctx);
-
 
 #ifdef __cplusplus
 }

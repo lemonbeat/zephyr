@@ -24,8 +24,7 @@ void *calloc(size_t nmemb, size_t size);
 void *realloc(void *ptr, size_t size);
 void *reallocarray(void *ptr, size_t nmemb, size_t size);
 
-void *bsearch(const void *key, const void *array,
-	      size_t count, size_t size,
+void *bsearch(const void *key, const void *array, size_t count, size_t size,
 	      int (*cmp)(const void *key, const void *element));
 
 #define EXIT_SUCCESS 0
@@ -44,4 +43,4 @@ int rand(void);
 }
 #endif
 
-#endif  /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_STDLIB_H_ */
+#endif /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_STDLIB_H_ */

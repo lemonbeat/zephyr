@@ -9,9 +9,9 @@
 #include <cmsis_os.h>
 
 #ifdef CONFIG_COVERAGE
-#define STACKSZ		(512 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define STACKSZ (512 + CONFIG_TEST_EXTRA_STACKSIZE)
 #else
-#define STACKSZ		(512U)
+#define STACKSZ (512U)
 #endif
 
 void thread_inst_check(void const *argument)

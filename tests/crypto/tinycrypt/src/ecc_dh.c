@@ -71,7 +71,6 @@
 int ecdh_vectors(char **qx_vec, char **qy_vec, char **d_vec, char **z_vec,
 		 int tests, int verbose)
 {
-
 	unsigned int pub[2 * NUM_ECC_WORDS];
 	unsigned int prv[NUM_ECC_WORDS];
 	unsigned int z[NUM_ECC_WORDS];
@@ -83,7 +82,6 @@ int ecdh_vectors(char **qx_vec, char **qy_vec, char **d_vec, char **z_vec,
 	const struct uECC_Curve_t *curve = uECC_secp256r1();
 
 	for (int i = 0; i < tests; i++) {
-
 		string2scalar(pub + NUM_ECC_WORDS, NUM_ECC_WORDS, qx_vec[i]);
 		string2scalar(pub, NUM_ECC_WORDS, qy_vec[i]);
 		string2scalar(exp_z, NUM_ECC_WORDS, z_vec[i]);
@@ -96,14 +94,16 @@ int ecdh_vectors(char **qx_vec, char **qy_vec, char **d_vec, char **z_vec,
 		uint8_t z_bytes[NUM_ECC_BYTES];
 		uECC_vli_nativeToBytes(z_bytes, NUM_ECC_BYTES, exp_z);
 
-		rc = uECC_shared_secret(pub_bytes, private_bytes, z_bytes, curve);
+		rc = uECC_shared_secret(pub_bytes, private_bytes, z_bytes,
+					curve);
 
 		/**TESTPOINT: Check for ECDH failure*/
 		zassert_equal(rc, TC_CRYPTO_SUCCESS, "ECDH failure, exit");
 
 		uECC_vli_bytesToNative(z, z_bytes, NUM_ECC_BYTES);
 
-		result = check_ecc_result(i, "Z", exp_z, z, NUM_ECC_WORDS, verbose);
+		result = check_ecc_result(i, "Z", exp_z, z, NUM_ECC_WORDS,
+					  verbose);
 
 		/**TESTPOINT: Check result*/
 		zassert_false(result, "ECDH test failed");
@@ -298,7 +298,6 @@ int cavp_keygen(bool verbose)
 int pkv_vectors(char **qx_vec, char **qy_vec, int res_vec[], int tests,
 		bool verbose)
 {
-
 	unsigned int pub[2 * NUM_ECC_WORDS];
 	uint8_t _public[2 * NUM_ECC_BYTES];
 	int rc;
@@ -315,11 +314,13 @@ int pkv_vectors(char **qx_vec, char **qy_vec, int res_vec[], int tests,
 			rc = -2;
 		} else {
 			string2scalar(pub, NUM_ECC_WORDS, qx_vec[i]);
-			string2scalar(pub + NUM_ECC_WORDS, NUM_ECC_WORDS, qy_vec[i]);
+			string2scalar(pub + NUM_ECC_WORDS, NUM_ECC_WORDS,
+				      qy_vec[i]);
 
 			uECC_vli_nativeToBytes(_public, NUM_ECC_BYTES, pub);
 			uECC_vli_nativeToBytes(_public + NUM_ECC_BYTES,
-					       NUM_ECC_BYTES, pub + NUM_ECC_WORDS);
+					       NUM_ECC_BYTES,
+					       pub + NUM_ECC_WORDS);
 
 			rc = uECC_valid_public_key(_public, curve);
 		}
@@ -345,7 +346,7 @@ int pkv_vectors(char **qx_vec, char **qy_vec, int res_vec[], int tests,
 		/**TESTPOINT: Check result*/
 		zassert_false(result, "PubKey verification failed");
 	}
-		return result;
+	return result;
 }
 
 int cavp_pkv(bool verbose)
@@ -403,7 +404,8 @@ int montecarlo_ecdh(int num_tests, bool verbose)
 
 	const struct uECC_Curve_t *curve = uECC_secp256r1();
 
-	TC_PRINT("Test #4: Monte Carlo (%d Randomized EC-DH key-exchange) ", num_tests);
+	TC_PRINT("Test #4: Monte Carlo (%d Randomized EC-DH key-exchange) ",
+		 num_tests);
 	TC_PRINT("NIST-p256\n  ");
 
 	for (i = 0; i < num_tests; ++i) {

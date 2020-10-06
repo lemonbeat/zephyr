@@ -82,7 +82,6 @@
 #define ALT_CPU_RESET_ADDR 0x00000000
 #define ALT_CPU_HAS_EXTRA_EXCEPTION_INFO 1
 
-
 #define ALT_DEVICE_FAMILY "MAX 10"
 #define ALT_ENHANCED_INTERRUPT_API_PRESENT
 #define ALT_IRQ_BASE NULL
@@ -113,7 +112,6 @@
 #define ALT_STDOUT_TYPE "altera_avalon_jtag_uart"
 #define ALT_SYSTEM_NAME "ghrd_10m50da"
 
-
 /*
  * a_16550_uart_0 configuration
  *
@@ -132,7 +130,6 @@
 #define A_16550_UART_0_SPAN 512
 #define A_16550_UART_0_TYPE "altera_16550_uart"
 
-
 /*
  * hal configuration
  *
@@ -142,7 +139,6 @@
 #define ALT_MAX_FD 32
 #define ALT_SYS_CLK none
 #define ALT_TIMESTAMP_CLK none
-
 
 /*
  * jtag_uart_0 configuration
@@ -160,7 +156,6 @@
 #define JTAG_UART_0_TYPE "altera_avalon_jtag_uart"
 #define JTAG_UART_0_WRITE_DEPTH 64
 #define JTAG_UART_0_WRITE_THRESHOLD 8
-
 
 /*
  * onchip_flash_0_csr configuration
@@ -192,7 +187,6 @@
 #define ONCHIP_FLASH_0_CSR_SPAN 8
 #define ONCHIP_FLASH_0_CSR_TYPE "altera_onchip_flash"
 
-
 /*
  * onchip_flash_0_data configuration
  *
@@ -223,7 +217,6 @@
 #define ONCHIP_FLASH_0_DATA_SPAN 753664
 #define ONCHIP_FLASH_0_DATA_TYPE "altera_onchip_flash"
 
-
 /*
  * onchip_memory2_0 configuration
  *
@@ -251,7 +244,6 @@
 #define ONCHIP_MEMORY2_0_SPAN 262144
 #define ONCHIP_MEMORY2_0_TYPE "altera_avalon_onchip_memory2"
 #define ONCHIP_MEMORY2_0_WRITABLE 1
-
 
 /*
  * timer_0 configuration

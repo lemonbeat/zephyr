@@ -18,19 +18,16 @@ LOG_MODULE_REGISTER(net_mqtt_enc, CONFIG_MQTT_LOG_LEVEL);
 static const struct mqtt_utf8 mqtt_3_1_0_proto_desc =
 	MQTT_UTF8_LITERAL("MQIsdp");
 
-static const struct mqtt_utf8 mqtt_3_1_1_proto_desc =
-	MQTT_UTF8_LITERAL("MQTT");
+static const struct mqtt_utf8 mqtt_3_1_1_proto_desc = MQTT_UTF8_LITERAL("MQTT");
 
 /** Never changing ping request, needed for Keep Alive. */
 static const uint8_t ping_packet[MQTT_FIXED_HEADER_MIN_SIZE] = {
-	MQTT_PKT_TYPE_PINGREQ,
-	0x00
+	MQTT_PKT_TYPE_PINGREQ, 0x00
 };
 
 /** Never changing disconnect request. */
 static const uint8_t disc_packet[MQTT_FIXED_HEADER_MIN_SIZE] = {
-	MQTT_PKT_TYPE_DISCONNECT,
-	0x00
+	MQTT_PKT_TYPE_DISCONNECT, 0x00
 };
 
 /**
@@ -184,7 +181,7 @@ static uint8_t packet_length_encode(uint32_t length, struct buf_ctx *buf)
  * @retval -EMSGSIZE if the message is too big for MQTT.
  */
 static uint32_t mqtt_encode_fixed_header(uint8_t message_type, uint8_t *start,
-				      struct buf_ctx *buf)
+					 struct buf_ctx *buf)
 {
 	uint32_t length = buf->cur - start;
 	uint8_t fixed_header_length;
@@ -271,7 +268,7 @@ int connect_request_encode(const struct mqtt_client *client,
 {
 	uint8_t connect_flags = client->clean_session << 1;
 	const uint8_t message_type =
-			MQTT_MESSAGES_OPTIONS(MQTT_PKT_TYPE_CONNECT, 0, 0, 0);
+		MQTT_MESSAGES_OPTIONS(MQTT_PKT_TYPE_CONNECT, 0, 0, 0);
 	const struct mqtt_utf8 *mqtt_proto_desc;
 	uint8_t *connect_flags_pos;
 	int err_code;
@@ -389,8 +386,8 @@ int connect_request_encode(const struct mqtt_client *client,
 int publish_encode(const struct mqtt_publish_param *param, struct buf_ctx *buf)
 {
 	const uint8_t message_type = MQTT_MESSAGES_OPTIONS(
-			MQTT_PKT_TYPE_PUBLISH, param->dup_flag,
-			param->message.topic.qos, param->retain_flag);
+		MQTT_PKT_TYPE_PUBLISH, param->dup_flag,
+		param->message.topic.qos, param->retain_flag);
 	int err_code;
 	uint8_t *start;
 
@@ -481,8 +478,8 @@ int disconnect_encode(struct buf_ctx *buf)
 int subscribe_encode(const struct mqtt_subscription_list *param,
 		     struct buf_ctx *buf)
 {
-	const uint8_t message_type = MQTT_MESSAGES_OPTIONS(
-			MQTT_PKT_TYPE_SUBSCRIBE, 0, 1, 0);
+	const uint8_t message_type =
+		MQTT_MESSAGES_OPTIONS(MQTT_PKT_TYPE_SUBSCRIBE, 0, 1, 0);
 	int err_code, i;
 	uint8_t *start;
 

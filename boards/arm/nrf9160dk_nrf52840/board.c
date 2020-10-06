@@ -33,7 +33,7 @@ LOG_MODULE_REGISTER(board_control, CONFIG_BOARD_NRF9160DK_LOG_LEVEL);
 
 #define INTERFACE2_U21 10 /* COEX interface pins 6 - 8 */
 #define UART0_VCOM_U14 14 /* Route nRF9160 UART0 to VCOM0 */
-#define UART1_VCOM_U7 12  /* Route nRF9160 UART1 to VCOM2 */
+#define UART1_VCOM_U7 12 /* Route nRF9160 UART1 to VCOM2 */
 #define LED1_U8 5
 #define LED2_U8 7
 #define LED3_U11 1
@@ -67,23 +67,24 @@ __packed struct pin_config {
  */
 
 static const struct pin_config pins_on_p0[] = {
-	{ INTERFACE0_U5, IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE0_ARDUINO) },
+	{ INTERFACE0_U5,
+	  IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE0_ARDUINO) },
 	{ INTERFACE1_U6, IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE1_TRACE) },
 	{ UART1_VCOM_U7, IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART1_ARDUINO) },
-	{ BUTTON1_U12,   IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON0_PHY) },
-	{ BUTTON2_U12,   IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON1_PHY) },
-	{ SWITCH2_U9,    IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH1_PHY) },
+	{ BUTTON1_U12, IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON0_PHY) },
+	{ BUTTON2_U12, IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON1_PHY) },
+	{ SWITCH2_U9, IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH1_PHY) },
 };
 
 static const struct pin_config pins_on_p1[] = {
 	{ INTERFACE2_U21, IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE2_COEX) },
 	{ UART0_VCOM_U14, IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART0_VCOM) },
-	{ UART1_VCOM_U7,  IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART1_ARDUINO) },
-	{ LED1_U8,        IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED0_PHY) },
-	{ LED2_U8,        IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED1_PHY) },
-	{ LED3_U11,       IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED2_PHY) },
-	{ LED4_U11,       IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED3_PHY) },
-	{ SWITCH1_U9,     IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH0_PHY) },
+	{ UART1_VCOM_U7, IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART1_ARDUINO) },
+	{ LED1_U8, IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED0_PHY) },
+	{ LED2_U8, IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED1_PHY) },
+	{ LED3_U11, IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED2_PHY) },
+	{ LED4_U11, IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED3_PHY) },
+	{ SWITCH1_U9, IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH0_PHY) },
 };
 
 static void config_print(void)
@@ -91,89 +92,88 @@ static void config_print(void)
 	/* Interface pins 0-2 */
 	LOG_INF("Routing interface pins 0-2 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE0_MCU) ?
-			"nRF52840" :
-			"Arduino headers",
+			      "nRF52840" :
+			      "Arduino headers",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE0_MCU));
 
 	/* Interface pins 3-5 */
 	LOG_INF("Routing interface pins 3-5 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE1_MCU) ?
-			"nRF52840" :
-			"TRACE header",
+			      "nRF52840" :
+			      "TRACE header",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE1_MCU));
 
 	/* Interface pins 6-8 */
 	LOG_INF("Routing interface pins 6-8 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE2_MCU) ?
-			"nRF52840" :
-			"COEX header",
+			      "nRF52840" :
+			      "COEX header",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_INTERFACE2_MCU));
 
 	LOG_INF("Routing nRF9160 UART0 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART0_ARDUINO) ?
-			"Arduino pin headers" :
-			"VCOM0",
+			      "Arduino pin headers" :
+			      "VCOM0",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART0_ARDUINO));
 
 	LOG_INF("Routing nRF9160 UART1 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART1_ARDUINO) ?
-			"Arduino pin headers" :
-			"VCOM2",
+			      "Arduino pin headers" :
+			      "VCOM2",
 		/* defaults to arduino pins */
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_UART1_VCOM));
 
 	LOG_INF("Routing nRF9160 LED 1 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED0_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical LED",
+			      "Arduino pin headers" :
+			      "physical LED",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED0_ARDUINO));
 
 	LOG_INF("Routing nRF9160 LED 2 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED1_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical LED",
+			      "Arduino pin headers" :
+			      "physical LED",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED1_ARDUINO));
 
 	LOG_INF("Routing nRF9160 LED 3 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED2_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical LED",
+			      "Arduino pin headers" :
+			      "physical LED",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED2_ARDUINO));
 
 	LOG_INF("Routing nRF9160 LED 4 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED3_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical LED",
+			      "Arduino pin headers" :
+			      "physical LED",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_LED3_ARDUINO));
 
 	LOG_INF("Routing nRF9160 button 1 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON0_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical button",
+			      "Arduino pin headers" :
+			      "physical button",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON0_ARDUINO));
 
 	LOG_INF("Routing nRF9160 button 2 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON1_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical button",
+			      "Arduino pin headers" :
+			      "physical button",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_BUTTON1_ARDUINO));
 
 	LOG_INF("Routing nRF9160 switch 1 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH0_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical switch",
+			      "Arduino pin headers" :
+			      "physical switch",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH0_ARDUINO));
 
 	LOG_INF("Routing nRF9160 switch 2 to %s (pin -> %d)",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH1_ARDUINO) ?
-			"Arduino pin headers" :
-			"physical switch",
+			      "Arduino pin headers" :
+			      "physical switch",
 		IS_ENABLED(CONFIG_BOARD_NRF9160DK_SWITCH1_ARDUINO));
 }
 
 static int pins_configure(const struct device *port,
-			  const struct pin_config cfg[],
-			  size_t pins)
+			  const struct pin_config cfg[], size_t pins)
 {
 	int err;
 
@@ -184,22 +184,21 @@ static int pins_configure(const struct device *port,
 		 * so configure the pin as output with the proper initial
 		 * state.
 		 */
-		uint32_t flag = (cfg[i].val ? GPIO_OUTPUT_LOW
-					 : GPIO_OUTPUT_HIGH);
+		uint32_t flag =
+			(cfg[i].val ? GPIO_OUTPUT_LOW : GPIO_OUTPUT_HIGH);
 		err = gpio_pin_configure(port, cfg[i].pin, flag);
 		if (err) {
 			return cfg[i].pin;
 		}
 
-		LOG_DBG("port %p, pin %u -> %u",
-			port, cfg[i].pin, !cfg[i].val);
+		LOG_DBG("port %p, pin %u -> %u", port, cfg[i].pin, !cfg[i].val);
 	}
 
 	return 0;
 }
 
-static void chip_reset(const struct device *gpio,
-		       struct gpio_callback *cb, uint32_t pins)
+static void chip_reset(const struct device *gpio, struct gpio_callback *cb,
+		       uint32_t pins)
 {
 	const uint32_t stamp = k_cycle_get_32();
 
@@ -219,8 +218,7 @@ static void reset_pin_wait_low(const struct device *port, uint32_t pin)
 	} while (val > 0);
 }
 
-static int reset_pin_configure(const struct device *p0,
-			       const struct device *p1)
+static int reset_pin_configure(const struct device *p0, const struct device *p1)
 {
 	int err;
 	uint32_t pin = 0;
@@ -293,15 +291,15 @@ static int init(const struct device *dev)
 
 	p0 = device_get_binding(DT_LABEL(DT_NODELABEL(gpio0)));
 	if (!p0) {
-		LOG_ERR("GPIO device " DT_LABEL(DT_NODELABEL(gpio0))
-			" not found!");
+		LOG_ERR("GPIO device " DT_LABEL(
+			DT_NODELABEL(gpio0)) " not found!");
 		return -EIO;
 	}
 
 	p1 = device_get_binding(DT_LABEL(DT_NODELABEL(gpio1)));
 	if (!p1) {
-		LOG_ERR("GPIO device " DT_LABEL(DT_NODELABEL(gpio1))
-			" not found!");
+		LOG_ERR("GPIO device " DT_LABEL(
+			DT_NODELABEL(gpio1)) " not found!");
 		return -EIO;
 	}
 

@@ -12,7 +12,7 @@
 #include <sys/printk.h>
 #include <inttypes.h>
 
-#define SLEEP_TIME_MS	1
+#define SLEEP_TIME_MS 1
 
 /*
  * Get button configuration from the devicetree sw0 alias.
@@ -21,17 +21,17 @@
  * cell is optional.
  */
 
-#define SW0_NODE	DT_ALIAS(sw0)
+#define SW0_NODE DT_ALIAS(sw0)
 
 #if DT_NODE_HAS_STATUS(SW0_NODE, okay)
-#define SW0_GPIO_LABEL	DT_GPIO_LABEL(SW0_NODE, gpios)
-#define SW0_GPIO_PIN	DT_GPIO_PIN(SW0_NODE, gpios)
-#define SW0_GPIO_FLAGS	(GPIO_INPUT | DT_GPIO_FLAGS(SW0_NODE, gpios))
+#define SW0_GPIO_LABEL DT_GPIO_LABEL(SW0_NODE, gpios)
+#define SW0_GPIO_PIN DT_GPIO_PIN(SW0_NODE, gpios)
+#define SW0_GPIO_FLAGS (GPIO_INPUT | DT_GPIO_FLAGS(SW0_NODE, gpios))
 #else
 #error "Unsupported board: sw0 devicetree alias is not defined"
-#define SW0_GPIO_LABEL	""
-#define SW0_GPIO_PIN	0
-#define SW0_GPIO_FLAGS	0
+#define SW0_GPIO_LABEL ""
+#define SW0_GPIO_PIN 0
+#define SW0_GPIO_FLAGS 0
 #endif
 
 /* LED helpers, which use the led0 devicetree alias if it's available. */
@@ -61,17 +61,16 @@ void main(void)
 
 	ret = gpio_pin_configure(button, SW0_GPIO_PIN, SW0_GPIO_FLAGS);
 	if (ret != 0) {
-		printk("Error %d: failed to configure %s pin %d\n",
-		       ret, SW0_GPIO_LABEL, SW0_GPIO_PIN);
+		printk("Error %d: failed to configure %s pin %d\n", ret,
+		       SW0_GPIO_LABEL, SW0_GPIO_PIN);
 		return;
 	}
 
-	ret = gpio_pin_interrupt_configure(button,
-					   SW0_GPIO_PIN,
+	ret = gpio_pin_interrupt_configure(button, SW0_GPIO_PIN,
 					   GPIO_INT_EDGE_TO_ACTIVE);
 	if (ret != 0) {
 		printk("Error %d: failed to configure interrupt on %s pin %d\n",
-			ret, SW0_GPIO_LABEL, SW0_GPIO_PIN);
+		       ret, SW0_GPIO_LABEL, SW0_GPIO_PIN);
 		return;
 	}
 
@@ -93,12 +92,12 @@ void main(void)
  * to turn on the LED whenever the button is pressed.
  */
 
-#define LED0_NODE	DT_ALIAS(led0)
+#define LED0_NODE DT_ALIAS(led0)
 
 #if DT_NODE_HAS_STATUS(LED0_NODE, okay) && DT_NODE_HAS_PROP(LED0_NODE, gpios)
-#define LED0_GPIO_LABEL	DT_GPIO_LABEL(LED0_NODE, gpios)
-#define LED0_GPIO_PIN	DT_GPIO_PIN(LED0_NODE, gpios)
-#define LED0_GPIO_FLAGS	(GPIO_OUTPUT | DT_GPIO_FLAGS(LED0_NODE, gpios))
+#define LED0_GPIO_LABEL DT_GPIO_LABEL(LED0_NODE, gpios)
+#define LED0_GPIO_PIN DT_GPIO_PIN(LED0_NODE, gpios)
+#define LED0_GPIO_FLAGS (GPIO_OUTPUT | DT_GPIO_FLAGS(LED0_NODE, gpios))
 #endif
 
 #ifdef LED0_GPIO_LABEL
@@ -134,7 +133,7 @@ static void match_led_to_button(const struct device *button,
 	gpio_pin_set(led, LED0_GPIO_PIN, val);
 }
 
-#else  /* !defined(LED0_GPIO_LABEL) */
+#else /* !defined(LED0_GPIO_LABEL) */
 static const struct device *initialize_led(void)
 {
 	printk("No LED device was defined\n");
@@ -146,4 +145,4 @@ static void match_led_to_button(const struct device *button,
 {
 	return;
 }
-#endif	/* LED0_GPIO_LABEL */
+#endif /* LED0_GPIO_LABEL */

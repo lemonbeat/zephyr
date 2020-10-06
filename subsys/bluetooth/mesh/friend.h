@@ -17,8 +17,9 @@ bool bt_mesh_friend_match(uint16_t net_idx, uint16_t addr);
 struct bt_mesh_friend *bt_mesh_friend_find(uint16_t net_idx, uint16_t lpn_addr,
 					   bool valid, bool established);
 
-bool bt_mesh_friend_queue_has_space(uint16_t net_idx, uint16_t src, uint16_t dst,
-				    uint64_t *seq_auth, uint8_t seg_count);
+bool bt_mesh_friend_queue_has_space(uint16_t net_idx, uint16_t src,
+				    uint16_t dst, uint64_t *seq_auth,
+				    uint8_t seg_count);
 
 void bt_mesh_friend_enqueue_rx(struct bt_mesh_net_rx *rx,
 			       enum bt_mesh_friend_pdu_type type,

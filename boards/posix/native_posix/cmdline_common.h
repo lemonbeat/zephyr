@@ -17,14 +17,13 @@ extern "C" {
 /* Horizontal alignment of the 2nd column of the help message */
 #define _LONG_HELP_ALIGN 30
 
-#define _MAXOPT_SWITCH_LEN  32 /* Maximum allowed length for a switch name */
-#define _MAXOPT_NAME_LEN    32 /* Maximum allowed length for a variable name */
+#define _MAXOPT_SWITCH_LEN 32 /* Maximum allowed length for a switch name */
+#define _MAXOPT_NAME_LEN 32 /* Maximum allowed length for a variable name */
 
-#define _HELP_SWITCH  "[-h] [--h] [--help] [-?]"
-#define _HELP_DESCR   "Display this help"
+#define _HELP_SWITCH "[-h] [--h] [--help] [-?]"
+#define _HELP_DESCR "Display this help"
 
 #define _MAX_STRINGY_LEN (_MAXOPT_SWITCH_LEN + _MAXOPT_NAME_LEN + 2 + 1 + 2 + 1)
-
 
 /**
  * Prototype for a callback function when an option is found:
@@ -67,8 +66,10 @@ struct args_struct_t {
 	char *descript;
 };
 
-#define ARG_TABLE_ENDMARKER \
-	{false, false, false, NULL, NULL, 0, NULL, NULL, NULL}
+#define ARG_TABLE_ENDMARKER                                          \
+	{                                                            \
+		false, false, false, NULL, NULL, 0, NULL, NULL, NULL \
+	}
 
 int cmd_is_option(const char *arg, const char *option, int with_value);
 int cmd_is_help_option(const char *arg);

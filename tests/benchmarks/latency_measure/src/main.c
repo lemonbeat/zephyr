@@ -60,7 +60,8 @@ void test_thread(void *arg1, void *arg2, void *arg3)
 	TC_END_REPORT(error_count);
 }
 
-K_THREAD_DEFINE(test_thread_id, STACK_SIZE, test_thread, NULL, NULL, NULL, K_PRIO_PREEMPT(10), 0, 0);
+K_THREAD_DEFINE(test_thread_id, STACK_SIZE, test_thread, NULL, NULL, NULL,
+		K_PRIO_PREEMPT(10), 0, 0);
 
 void main(void)
 {

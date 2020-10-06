@@ -53,7 +53,7 @@ extern "C" {
  * @return The computed CRC16 value
  */
 uint16_t crc16(const uint8_t *src, size_t len, uint16_t polynomial,
-	    uint16_t initial_value, bool pad);
+	       uint16_t initial_value, bool pad);
 
 /**
  * @brief Generic function for computing CRC 8
@@ -70,8 +70,8 @@ uint16_t crc16(const uint8_t *src, size_t len, uint16_t polynomial,
  *
  * @return The computed CRC8 value
  */
-uint8_t crc8(const uint8_t *src, size_t len, uint8_t polynomial, uint8_t initial_value,
-	  bool reversed);
+uint8_t crc8(const uint8_t *src, size_t len, uint8_t polynomial,
+	     uint8_t initial_value, bool reversed);
 
 /**
  * @brief Compute the CRC-16/CCITT checksum of a buffer.

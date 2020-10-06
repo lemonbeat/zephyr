@@ -100,8 +100,7 @@ static void iis2dh_gpio_callback(const struct device *dev,
 		return;
 	}
 
-	gpio_pin_interrupt_configure(dev, iis2dh->gpio_pin,
-				     GPIO_INT_DISABLE);
+	gpio_pin_interrupt_configure(dev, iis2dh->gpio_pin, GPIO_INT_DISABLE);
 
 #if defined(CONFIG_IIS2DH_TRIGGER_OWN_THREAD)
 	k_sem_give(&iis2dh->gpio_sem);
@@ -139,8 +138,7 @@ int iis2dh_init_interrupt(const struct device *dev)
 	/* setup data ready gpio interrupt */
 	iis2dh->gpio = device_get_binding(cfg->int_gpio_port);
 	if (iis2dh->gpio == NULL) {
-		LOG_DBG("Cannot get pointer to %s device",
-			    cfg->int_gpio_port);
+		LOG_DBG("Cannot get pointer to %s device", cfg->int_gpio_port);
 		return -EINVAL;
 	}
 
@@ -150,10 +148,10 @@ int iis2dh_init_interrupt(const struct device *dev)
 	k_sem_init(&iis2dh->gpio_sem, 0, UINT_MAX);
 
 	k_thread_create(&iis2dh->thread, iis2dh->thread_stack,
-		       CONFIG_IIS2DH_THREAD_STACK_SIZE,
-		       (k_thread_entry_t)iis2dh_thread, iis2dh,
-		       0, NULL, K_PRIO_COOP(CONFIG_IIS2DH_THREAD_PRIORITY),
-		       0, K_NO_WAIT);
+			CONFIG_IIS2DH_THREAD_STACK_SIZE,
+			(k_thread_entry_t)iis2dh_thread, iis2dh, 0, NULL,
+			K_PRIO_COOP(CONFIG_IIS2DH_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_IIS2DH_TRIGGER_GLOBAL_THREAD)
 	iis2dh->work.handler = iis2dh_work_cb;
 #endif /* CONFIG_IIS2DH_TRIGGER_OWN_THREAD */
@@ -167,8 +165,7 @@ int iis2dh_init_interrupt(const struct device *dev)
 		return ret;
 	}
 
-	gpio_init_callback(&iis2dh->gpio_cb,
-			   iis2dh_gpio_callback,
+	gpio_init_callback(&iis2dh->gpio_cb, iis2dh_gpio_callback,
 			   BIT(cfg->int_gpio_pin));
 
 	if (gpio_add_callback(iis2dh->gpio, &iis2dh->gpio_cb) < 0) {
@@ -177,7 +174,8 @@ int iis2dh_init_interrupt(const struct device *dev)
 	}
 
 	/* enable drdy on int1 in pulse mode */
-	if (iis2dh_int1_pin_notification_mode_set(iis2dh->ctx, IIS2DH_INT1_PULSED)) {
+	if (iis2dh_int1_pin_notification_mode_set(iis2dh->ctx,
+						  IIS2DH_INT1_PULSED)) {
 		return -EIO;
 	}
 

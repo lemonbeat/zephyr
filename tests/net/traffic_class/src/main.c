@@ -58,25 +58,24 @@ static enum net_priority rx_tc2prio[NET_TC_RX_COUNT];
 static const char *test_data = "Test data to be sent";
 
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 2 addresses */
-static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 3 addresses */
-static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Destination address for test packets */
-static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 static struct sockaddr_in6 dst_addr6 = {
 	.sin6_family = AF_INET6,
@@ -110,8 +109,7 @@ static void eth_iface_init(struct net_if *iface)
 	struct eth_context *context = dev->data;
 
 	net_if_set_link_addr(iface, context->mac_addr,
-			     sizeof(context->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(context->mac_addr), NET_LINK_ETHERNET);
 }
 
 static bool check_higher_priority_pkt_sent(int tc, struct net_pkt *pkt)
@@ -207,17 +205,18 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 			if (ret) {
 				DBG("Current thread priority %d "
 				    "pkt %p prio %d tc %d\n",
-				    k_thread_priority_get(thread),
-				    pkt, prio, net_tx_priority2tc(prio));
+				    k_thread_priority_get(thread), pkt, prio,
+				    net_tx_priority2tc(prio));
 
 				test_failed = true;
-				zassert_false(test_failed,
-					      "Invalid priority sent %d TC %d,"
-					      " expecting %d (pkt %p)\n",
-					      prio,
-					      net_tx_priority2tc(prio),
-				  send_priorities[net_tx_priority2tc(prio)][i],
-					      pkt);
+				zassert_false(
+					test_failed,
+					"Invalid priority sent %d TC %d,"
+					" expecting %d (pkt %p)\n",
+					prio, net_tx_priority2tc(prio),
+					send_priorities[net_tx_priority2tc(
+						prio)][i],
+					pkt);
 				goto fail;
 			}
 
@@ -225,8 +224,7 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 		}
 
 		DBG("Received pkt %p from TC %c (thread prio %d)\n", pkt,
-		    *(pkt->frags->data +
-		      sizeof(struct net_ipv6_hdr) +
+		    *(pkt->frags->data + sizeof(struct net_ipv6_hdr) +
 		      sizeof(struct net_udp_hdr)),
 		    k_thread_priority_get(thread));
 
@@ -238,8 +236,8 @@ fail:
 }
 
 static struct dummy_api api_funcs = {
-	.iface_api.init	= eth_iface_init,
-	.send	= eth_tx,
+	.iface_api.init = eth_iface_init,
+	.send = eth_tx,
 };
 
 static void generate_mac(uint8_t *mac_addr)
@@ -268,8 +266,7 @@ static int eth_init(const struct device *dev)
  */
 NET_DEVICE_INIT(eth_test, "eth_test", eth_init, device_pm_control_nop,
 		&eth_context, NULL, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
-		DUMMY_L2, NET_L2_GET_CTX_TYPE(DUMMY_L2),
-		NET_ETH_MTU);
+		DUMMY_L2, NET_L2_GET_CTX_TYPE(DUMMY_L2), NET_ETH_MTU);
 
 static void address_setup(void)
 {
@@ -280,42 +277,38 @@ static void address_setup(void)
 
 	zassert_not_null(iface1, "Interface 1");
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1");
 	}
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr2));
+		    net_sprint_ipv6_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr3,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr3, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr3));
+		    net_sprint_ipv6_addr(&my_addr3));
 		zassert_not_null(ifaddr, "addr3");
 	}
 
@@ -382,8 +375,8 @@ static void setup_net_context(struct net_context **ctx)
 	iface1 = net_if_get_default();
 
 	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, ctx);
-	zassert_equal(ret, 0, "Create IPv6 UDP context %p failed (%d)\n",
-		      *ctx, ret);
+	zassert_equal(ret, 0, "Create IPv6 UDP context %p failed (%d)\n", *ctx,
+		      ret);
 
 	memcpy(&src_addr6.sin6_addr, &my_addr1, sizeof(struct in6_addr));
 	memcpy(&dst_addr6.sin6_addr, &dst_addr, sizeof(struct in6_addr));
@@ -393,8 +386,7 @@ static void setup_net_context(struct net_context **ctx)
 
 	ret = net_context_bind(*ctx, (struct sockaddr *)&src_addr6,
 			       sizeof(struct sockaddr_in6));
-	zassert_equal(ret, 0,
-		      "Context bind failure test failed (%d)\n", ret);
+	zassert_equal(ret, 0, "Context bind failure test failed (%d)\n", ret);
 }
 
 static void test_traffic_class_general_setup(void)
@@ -413,11 +405,9 @@ static void traffic_class_setup(enum net_priority *tc2prio, int count)
 
 		priority = tc2prio[i];
 
-		ret = net_context_set_option(net_ctxs[i].ctx,
-					     NET_OPT_PRIORITY,
+		ret = net_context_set_option(net_ctxs[i].ctx, NET_OPT_PRIORITY,
 					     &priority, sizeof(priority));
-		zassert_equal(ret, 0,
-			      "Cannot set priority %d to ctx %p (%d)\n",
+		zassert_equal(ret, 0, "Cannot set priority %d to ctx %p (%d)\n",
 			      priority, net_ctxs[i].ctx, ret);
 	}
 }
@@ -467,7 +457,7 @@ static void traffic_class_send_packets_with_prio(enum net_priority prio,
 	/* Convert num to ascii */
 	data[0] = tc + 0x30;
 	len = strlen(test_data);
-	memcpy(data+1, test_data, strlen(test_data));
+	memcpy(data + 1, test_data, strlen(test_data));
 
 	len += 1;
 
@@ -479,13 +469,12 @@ static void traffic_class_send_packets_with_prio(enum net_priority prio,
 
 	ret = net_context_sendto(net_ctxs[tc].ctx, data, len,
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_NO_WAIT, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_NO_WAIT,
+				 NULL);
 	zassert_true(ret > 0, "Send UDP pkt failed");
 }
 
-static void traffic_class_send_priority(enum net_priority prio,
-					int num_packets,
+static void traffic_class_send_priority(enum net_priority prio, int num_packets,
 					bool wait_for_packets)
 {
 	int i;
@@ -671,11 +660,9 @@ static void test_traffic_class_send_data_mix_all_2(void)
 	zassert_false(test_failed, "Traffic class verification failed.");
 }
 
-static void recv_cb(struct net_context *context,
-		    struct net_pkt *pkt,
+static void recv_cb(struct net_context *context, struct net_pkt *pkt,
 		    union net_ip_header *ip_hdr,
-		    union net_proto_header *proto_hdr,
-		    int status,
+		    union net_proto_header *proto_hdr, int status,
 		    void *user_data)
 {
 #if NET_LOG_LEVEL >= LOG_LEVEL_DBG
@@ -693,17 +680,17 @@ static void recv_cb(struct net_context *context,
 		if (ret) {
 			DBG("Current thread priority %d "
 			    "pkt %p prio %d tc %d\n",
-			    k_thread_priority_get(thread),
-			    pkt, prio, net_rx_priority2tc(prio));
+			    k_thread_priority_get(thread), pkt, prio,
+			    net_rx_priority2tc(prio));
 
 			test_failed = true;
-			zassert_false(test_failed,
-				      "Invalid priority received %d TC %d,"
-				      " expecting %d (pkt %p)\n",
-				      prio,
-				      net_rx_priority2tc(prio),
-				  recv_priorities[net_rx_priority2tc(prio)][i],
-				      pkt);
+			zassert_false(
+				test_failed,
+				"Invalid priority received %d TC %d,"
+				" expecting %d (pkt %p)\n",
+				prio, net_rx_priority2tc(prio),
+				recv_priorities[net_rx_priority2tc(prio)][i],
+				pkt);
 			goto fail;
 		}
 
@@ -724,11 +711,11 @@ static void test_traffic_class_setup_recv(void)
 	recv_cb_called = false;
 
 	for (i = 0; i < NET_TC_RX_COUNT; i++) {
-		ret = net_context_recv(net_ctxs[i].ctx, recv_cb,
-				       K_NO_WAIT, NULL);
+		ret = net_context_recv(net_ctxs[i].ctx, recv_cb, K_NO_WAIT,
+				       NULL);
 		zassert_equal(ret, 0,
-			      "[%d] Context recv UDP setup failed (%d)\n",
-			      i, ret);
+			      "[%d] Context recv UDP setup failed (%d)\n", i,
+			      ret);
 	}
 }
 
@@ -748,7 +735,7 @@ static void traffic_class_recv_packets_with_prio(enum net_priority prio,
 	/* Convert num to ascii */
 	data[0] = tc + 0x30;
 	len = strlen(test_data);
-	memcpy(data+1, test_data, strlen(test_data));
+	memcpy(data + 1, test_data, strlen(test_data));
 
 	len += 1;
 
@@ -771,16 +758,15 @@ static void traffic_class_recv_packets_with_prio(enum net_priority prio,
 	 */
 	ret = net_context_sendto(net_ctxs[tc].ctx, data, len,
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_NO_WAIT, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_NO_WAIT,
+				 NULL);
 	zassert_true(ret > 0, "Send UDP pkt failed");
 
 	/* Let the receiver to receive the packets */
 	k_sleep(K_MSEC(1));
 }
 
-static void traffic_class_recv_priority(enum net_priority prio,
-					int num_packets,
+static void traffic_class_recv_priority(enum net_priority prio, int num_packets,
 					bool wait_for_packets)
 {
 	int i;
@@ -970,44 +956,44 @@ static void test_traffic_class_recv_data_mix_all_2(void)
 
 void test_main(void)
 {
-	ztest_test_suite(net_traffic_class_test,
-			 ztest_unit_test(test_traffic_class_general_setup),
-			 ztest_unit_test(test_traffic_class_setup_tx),
-			 /* Send only same priority packets and verify that
+	ztest_test_suite(
+		net_traffic_class_test,
+		ztest_unit_test(test_traffic_class_general_setup),
+		ztest_unit_test(test_traffic_class_setup_tx),
+		/* Send only same priority packets and verify that
 			  * all are sent with proper traffic class.
 			  */
-			 ztest_unit_test(test_traffic_class_send_data_prio_bk),
-			 ztest_unit_test(test_traffic_class_send_data_prio_be),
-			 ztest_unit_test(test_traffic_class_send_data_prio_ee),
-			 ztest_unit_test(test_traffic_class_send_data_prio_ca),
-			 ztest_unit_test(test_traffic_class_send_data_prio_vi),
-			 ztest_unit_test(test_traffic_class_send_data_prio_vo),
-			 ztest_unit_test(test_traffic_class_send_data_prio_ic),
-			 ztest_unit_test(test_traffic_class_send_data_prio_nc),
-			 /* Then mix traffic classes and verify that higher
+		ztest_unit_test(test_traffic_class_send_data_prio_bk),
+		ztest_unit_test(test_traffic_class_send_data_prio_be),
+		ztest_unit_test(test_traffic_class_send_data_prio_ee),
+		ztest_unit_test(test_traffic_class_send_data_prio_ca),
+		ztest_unit_test(test_traffic_class_send_data_prio_vi),
+		ztest_unit_test(test_traffic_class_send_data_prio_vo),
+		ztest_unit_test(test_traffic_class_send_data_prio_ic),
+		ztest_unit_test(test_traffic_class_send_data_prio_nc),
+		/* Then mix traffic classes and verify that higher
 			  * class packets are sent first.
 			  */
-			 ztest_unit_test(test_traffic_class_send_data_mix),
-			 ztest_unit_test(test_traffic_class_send_data_mix_all_1),
-			 ztest_unit_test(test_traffic_class_send_data_mix_all_2),
-			 ztest_unit_test(test_traffic_class_cleanup_tx),
+		ztest_unit_test(test_traffic_class_send_data_mix),
+		ztest_unit_test(test_traffic_class_send_data_mix_all_1),
+		ztest_unit_test(test_traffic_class_send_data_mix_all_2),
+		ztest_unit_test(test_traffic_class_cleanup_tx),
 
-			 /* Same tests for received packets */
-			 ztest_unit_test(test_traffic_class_setup_rx),
-			 ztest_unit_test(test_traffic_class_setup_recv),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_bk),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_be),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_ee),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_ca),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_vi),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_vo),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_ic),
-			 ztest_unit_test(test_traffic_class_recv_data_prio_nc),
-			 ztest_unit_test(test_traffic_class_recv_data_mix),
-			 ztest_unit_test(test_traffic_class_recv_data_mix_all_1),
-			 ztest_unit_test(test_traffic_class_recv_data_mix_all_2),
-			 ztest_unit_test(test_traffic_class_cleanup_rx)
-			 );
+		/* Same tests for received packets */
+		ztest_unit_test(test_traffic_class_setup_rx),
+		ztest_unit_test(test_traffic_class_setup_recv),
+		ztest_unit_test(test_traffic_class_recv_data_prio_bk),
+		ztest_unit_test(test_traffic_class_recv_data_prio_be),
+		ztest_unit_test(test_traffic_class_recv_data_prio_ee),
+		ztest_unit_test(test_traffic_class_recv_data_prio_ca),
+		ztest_unit_test(test_traffic_class_recv_data_prio_vi),
+		ztest_unit_test(test_traffic_class_recv_data_prio_vo),
+		ztest_unit_test(test_traffic_class_recv_data_prio_ic),
+		ztest_unit_test(test_traffic_class_recv_data_prio_nc),
+		ztest_unit_test(test_traffic_class_recv_data_mix),
+		ztest_unit_test(test_traffic_class_recv_data_mix_all_1),
+		ztest_unit_test(test_traffic_class_recv_data_mix_all_2),
+		ztest_unit_test(test_traffic_class_cleanup_rx));
 
 	ztest_run_test_suite(net_traffic_class_test);
 }

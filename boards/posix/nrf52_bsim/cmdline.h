@@ -28,7 +28,7 @@ extern "C" {
 
 static inline void native_add_command_line_opts(struct args_struct_t *args)
 {
-	void bs_add_extra_dynargs(struct args_struct_t *args);
+	void bs_add_extra_dynargs(struct args_struct_t * args);
 	bs_add_extra_dynargs(args);
 }
 

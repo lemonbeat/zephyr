@@ -17,10 +17,10 @@
 extern "C" {
 #endif
 
-#define PHY_DUPLEX_FULL  GMAC_NCFGR_FD
-#define PHY_DUPLEX_HALF  0
-#define PHY_SPEED_100M   GMAC_NCFGR_SPD
-#define PHY_SPEED_10M    0
+#define PHY_DUPLEX_FULL GMAC_NCFGR_FD
+#define PHY_DUPLEX_HALF 0
+#define PHY_SPEED_100M GMAC_NCFGR_SPD
+#define PHY_SPEED_10M 0
 
 struct phy_sam_gmac_dev {
 	Gmac *regs;

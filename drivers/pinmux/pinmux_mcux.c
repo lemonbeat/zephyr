@@ -72,8 +72,7 @@ static const struct pinmux_mcux_config pinmux_mcux_porta_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_porta, CONFIG_PINMUX_MCUX_PORTA_NAME,
-		    &pinmux_mcux_init,
-		    NULL, &pinmux_mcux_porta_config,
+		    &pinmux_mcux_init, NULL, &pinmux_mcux_porta_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_mcux_driver_api);
 #endif
@@ -85,8 +84,7 @@ static const struct pinmux_mcux_config pinmux_mcux_portb_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_portb, CONFIG_PINMUX_MCUX_PORTB_NAME,
-		    &pinmux_mcux_init,
-		    NULL, &pinmux_mcux_portb_config,
+		    &pinmux_mcux_init, NULL, &pinmux_mcux_portb_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_mcux_driver_api);
 #endif
@@ -98,8 +96,7 @@ static const struct pinmux_mcux_config pinmux_mcux_portc_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_portc, CONFIG_PINMUX_MCUX_PORTC_NAME,
-		    &pinmux_mcux_init,
-		    NULL, &pinmux_mcux_portc_config,
+		    &pinmux_mcux_init, NULL, &pinmux_mcux_portc_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_mcux_driver_api);
 #endif
@@ -111,8 +108,7 @@ static const struct pinmux_mcux_config pinmux_mcux_portd_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_portd, CONFIG_PINMUX_MCUX_PORTD_NAME,
-		    &pinmux_mcux_init,
-		    NULL, &pinmux_mcux_portd_config,
+		    &pinmux_mcux_init, NULL, &pinmux_mcux_portd_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_mcux_driver_api);
 #endif
@@ -124,8 +120,7 @@ static const struct pinmux_mcux_config pinmux_mcux_porte_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_porte, CONFIG_PINMUX_MCUX_PORTE_NAME,
-		    &pinmux_mcux_init,
-		    NULL, &pinmux_mcux_porte_config,
+		    &pinmux_mcux_init, NULL, &pinmux_mcux_porte_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_mcux_driver_api);
 #endif

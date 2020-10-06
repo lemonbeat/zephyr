@@ -13,7 +13,7 @@
 #include <drivers/ipm.h>
 
 /* Arbitrary */
-#define DUMMY_IPM_DATA_WORDS    4
+#define DUMMY_IPM_DATA_WORDS 4
 
 struct ipm_dummy_regs {
 	uint32_t id;

@@ -38,9 +38,9 @@ FUNC_NORETURN void z_nios2_fatal_error(unsigned int reason,
 	CODE_UNREACHABLE;
 }
 
-#if defined(CONFIG_EXTRA_EXCEPTION_INFO) && \
-	(defined(CONFIG_PRINTK) || defined(CONFIG_LOG)) \
-	&& defined(ALT_CPU_HAS_EXTRA_EXCEPTION_INFO)
+#if defined(CONFIG_EXTRA_EXCEPTION_INFO) &&                \
+	(defined(CONFIG_PRINTK) || defined(CONFIG_LOG)) && \
+	defined(ALT_CPU_HAS_EXTRA_EXCEPTION_INFO)
 static char *cause_str(uint32_t cause_code)
 {
 	switch (cause_code) {
@@ -114,8 +114,8 @@ FUNC_NORETURN void _Fault(const z_arch_esf_t *esf)
 	eccftl = (exc_reg & NIOS2_EXCEPTION_REG_ECCFTL_MASK) != 0U;
 
 	/* Bits 2-6 contain the cause code */
-	cause = (exc_reg & NIOS2_EXCEPTION_REG_CAUSE_MASK)
-		 >> NIOS2_EXCEPTION_REG_CAUSE_OFST;
+	cause = (exc_reg & NIOS2_EXCEPTION_REG_CAUSE_MASK) >>
+		NIOS2_EXCEPTION_REG_CAUSE_OFST;
 
 	LOG_ERR("Exception cause: %d ECCFTL: 0x%x", cause, eccftl);
 #if CONFIG_EXTRA_EXCEPTION_INFO

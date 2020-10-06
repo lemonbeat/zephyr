@@ -28,8 +28,8 @@ struct ieee802154_req_params params;
 static struct net_mgmt_event_callback scan_cb;
 static const struct shell *cb_shell;
 
-static int cmd_ieee802154_ack(const struct shell *shell,
-			      size_t argc, char *argv[])
+static int cmd_ieee802154_ack(const struct shell *shell, size_t argc,
+			      char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 
@@ -65,8 +65,8 @@ static inline void parse_extended_address(char *addr, uint8_t *ext_addr)
 	net_bytes_from_str(ext_addr, IEEE802154_EXT_ADDR_LENGTH, addr);
 }
 
-static int cmd_ieee802154_associate(const struct shell *shell,
-				    size_t argc, char *argv[])
+static int cmd_ieee802154_associate(const struct shell *shell, size_t argc,
+				    char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	char ext_addr[MAX_EXT_ADDR_STR_LEN];
@@ -89,27 +89,27 @@ static int cmd_ieee802154_associate(const struct shell *shell,
 		parse_extended_address(ext_addr, params.addr);
 		params.len = IEEE802154_EXT_ADDR_LENGTH;
 	} else {
-		params.short_addr = (uint16_t) atoi(ext_addr);
+		params.short_addr = (uint16_t)atoi(ext_addr);
 		params.len = IEEE802154_SHORT_ADDR_LENGTH;
 	}
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_ASSOCIATE, iface,
-		     &params, sizeof(struct ieee802154_req_params))) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_ASSOCIATE, iface, &params,
+		     sizeof(struct ieee802154_req_params))) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Could not associate to %s on PAN ID %u\n",
 			      argv[2], params.pan_id);
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Associated to PAN ID %u\n", params.pan_id);
+		shell_fprintf(shell, SHELL_NORMAL, "Associated to PAN ID %u\n",
+			      params.pan_id);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_disassociate(const struct shell *shell,
-				       size_t argc, char *argv[])
+static int cmd_ieee802154_disassociate(const struct shell *shell, size_t argc,
+				       char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	int ret;
@@ -195,12 +195,13 @@ static void scan_result_cb(struct net_mgmt_event_callback *cb,
 
 	shell_fprintf(cb_shell, SHELL_NORMAL,
 		      "\nChannel: %u\tPAN ID: %u\tCoordinator Address: %s\t "
-		      "LQI: %u\n", params.channel, params.pan_id,
+		      "LQI: %u\n",
+		      params.channel, params.pan_id,
 		      print_coordinator_address(buf, sizeof(buf)), params.lqi);
 }
 
-static int cmd_ieee802154_scan(const struct shell *shell,
-			       size_t argc, char *argv[])
+static int cmd_ieee802154_scan(const struct shell *shell, size_t argc,
+			       char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint32_t scan_type;
@@ -245,8 +246,9 @@ static int cmd_ieee802154_scan(const struct shell *shell,
 	shell_fprintf(shell, SHELL_NORMAL,
 		      "%s Scanning (channel set: 0x%08x, duration %u ms)...\n",
 		      scan_type == NET_REQUEST_IEEE802154_ACTIVE_SCAN ?
-		      "Active" : "Passive", params.channel_set,
-		      params.duration);
+				    "Active" :
+				    "Passive",
+		      params.channel_set, params.duration);
 
 	cb_shell = shell;
 
@@ -264,15 +266,14 @@ static int cmd_ieee802154_scan(const struct shell *shell,
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Done\n");
+		shell_fprintf(shell, SHELL_NORMAL, "Done\n");
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_set_chan(const struct shell *shell,
-				   size_t argc, char *argv[])
+static int cmd_ieee802154_set_chan(const struct shell *shell, size_t argc,
+				   char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint16_t channel;
@@ -290,22 +291,21 @@ static int cmd_ieee802154_set_chan(const struct shell *shell,
 
 	channel = (uint16_t)atoi(argv[1]);
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_SET_CHANNEL, iface,
-		     &channel, sizeof(uint16_t))) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_SET_CHANNEL, iface, &channel,
+		     sizeof(uint16_t))) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Could not set channel %u\n", channel);
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Channel %u set\n", channel);
+		shell_fprintf(shell, SHELL_NORMAL, "Channel %u set\n", channel);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_get_chan(const struct shell *shell,
-				   size_t argc, char *argv[])
+static int cmd_ieee802154_get_chan(const struct shell *shell, size_t argc,
+				   char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint16_t channel;
@@ -319,22 +319,20 @@ static int cmd_ieee802154_get_chan(const struct shell *shell,
 		return -ENOEXEC;
 	}
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_GET_CHANNEL, iface,
-		     &channel, sizeof(uint16_t))) {
-		shell_fprintf(shell, SHELL_WARNING,
-			      "Could not get channel\n");
+	if (net_mgmt(NET_REQUEST_IEEE802154_GET_CHANNEL, iface, &channel,
+		     sizeof(uint16_t))) {
+		shell_fprintf(shell, SHELL_WARNING, "Could not get channel\n");
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Channel %u\n", channel);
+		shell_fprintf(shell, SHELL_NORMAL, "Channel %u\n", channel);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_set_pan_id(const struct shell *shell,
-				     size_t argc, char *argv[])
+static int cmd_ieee802154_set_pan_id(const struct shell *shell, size_t argc,
+				     char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint16_t pan_id;
@@ -354,22 +352,21 @@ static int cmd_ieee802154_set_pan_id(const struct shell *shell,
 
 	pan_id = (uint16_t)atoi(argv[1]);
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_SET_PAN_ID, iface,
-		     &pan_id, sizeof(uint16_t))) {
-		shell_fprintf(shell, SHELL_WARNING,
-			      "Could not set PAN ID %u\n", pan_id);
+	if (net_mgmt(NET_REQUEST_IEEE802154_SET_PAN_ID, iface, &pan_id,
+		     sizeof(uint16_t))) {
+		shell_fprintf(shell, SHELL_WARNING, "Could not set PAN ID %u\n",
+			      pan_id);
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "PAN ID %u set\n", pan_id);
+		shell_fprintf(shell, SHELL_NORMAL, "PAN ID %u set\n", pan_id);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_get_pan_id(const struct shell *shell,
-				     size_t argc, char *argv[])
+static int cmd_ieee802154_get_pan_id(const struct shell *shell, size_t argc,
+				     char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint16_t pan_id;
@@ -383,22 +380,21 @@ static int cmd_ieee802154_get_pan_id(const struct shell *shell,
 		return -ENOEXEC;
 	}
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_GET_PAN_ID, iface,
-		     &pan_id, sizeof(uint16_t))) {
-		shell_fprintf(shell, SHELL_WARNING,
-			      "Could not get PAN ID\n");
+	if (net_mgmt(NET_REQUEST_IEEE802154_GET_PAN_ID, iface, &pan_id,
+		     sizeof(uint16_t))) {
+		shell_fprintf(shell, SHELL_WARNING, "Could not get PAN ID\n");
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "PAN ID %u (0x%x)\n", pan_id, pan_id);
+		shell_fprintf(shell, SHELL_NORMAL, "PAN ID %u (0x%x)\n", pan_id,
+			      pan_id);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_set_ext_addr(const struct shell *shell,
-				       size_t argc, char *argv[])
+static int cmd_ieee802154_set_ext_addr(const struct shell *shell, size_t argc,
+				       char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint8_t addr[IEEE802154_EXT_ADDR_LENGTH];
@@ -415,29 +411,28 @@ static int cmd_ieee802154_set_ext_addr(const struct shell *shell,
 	}
 
 	if (strlen(argv[1]) != MAX_EXT_ADDR_STR_LEN) {
-		shell_fprintf(shell, SHELL_INFO,
-			      "%zd characters needed\n", MAX_EXT_ADDR_STR_LEN);
+		shell_fprintf(shell, SHELL_INFO, "%zd characters needed\n",
+			      MAX_EXT_ADDR_STR_LEN);
 		return -ENOEXEC;
 	}
 
 	parse_extended_address(argv[1], addr);
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_SET_EXT_ADDR, iface,
-		     addr, IEEE802154_EXT_ADDR_LENGTH)) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_SET_EXT_ADDR, iface, addr,
+		     IEEE802154_EXT_ADDR_LENGTH)) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Could not set extended address\n");
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Extended address set\n");
+		shell_fprintf(shell, SHELL_NORMAL, "Extended address set\n");
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_get_ext_addr(const struct shell *shell,
-				       size_t argc, char *argv[])
+static int cmd_ieee802154_get_ext_addr(const struct shell *shell, size_t argc,
+				       char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint8_t addr[IEEE802154_EXT_ADDR_LENGTH];
@@ -448,8 +443,8 @@ static int cmd_ieee802154_get_ext_addr(const struct shell *shell,
 		return -ENOEXEC;
 	}
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_GET_EXT_ADDR, iface,
-		     addr, IEEE802154_EXT_ADDR_LENGTH)) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_GET_EXT_ADDR, iface, addr,
+		     IEEE802154_EXT_ADDR_LENGTH)) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Could not get extended address\n");
 		return -ENOEXEC;
@@ -465,15 +460,15 @@ static int cmd_ieee802154_get_ext_addr(const struct shell *shell,
 
 		ext_addr[MAX_EXT_ADDR_STR_LEN - 1] = '\0';
 
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Extended address: %s\n", ext_addr);
+		shell_fprintf(shell, SHELL_NORMAL, "Extended address: %s\n",
+			      ext_addr);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_set_short_addr(const struct shell *shell,
-					 size_t argc, char *argv[])
+static int cmd_ieee802154_set_short_addr(const struct shell *shell, size_t argc,
+					 char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint16_t short_addr;
@@ -491,22 +486,22 @@ static int cmd_ieee802154_set_short_addr(const struct shell *shell,
 
 	short_addr = (uint16_t)atoi(argv[1]);
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_SET_SHORT_ADDR, iface,
-		     &short_addr, sizeof(uint16_t))) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_SET_SHORT_ADDR, iface, &short_addr,
+		     sizeof(uint16_t))) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Could not set short address %u\n", short_addr);
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Short address %u set\n", short_addr);
+		shell_fprintf(shell, SHELL_NORMAL, "Short address %u set\n",
+			      short_addr);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_get_short_addr(const struct shell *shell,
-					 size_t argc, char *argv[])
+static int cmd_ieee802154_get_short_addr(const struct shell *shell, size_t argc,
+					 char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	uint16_t short_addr;
@@ -517,22 +512,22 @@ static int cmd_ieee802154_get_short_addr(const struct shell *shell,
 		return -ENOEXEC;
 	}
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_GET_SHORT_ADDR, iface,
-		     &short_addr, sizeof(uint16_t))) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_GET_SHORT_ADDR, iface, &short_addr,
+		     sizeof(uint16_t))) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Could not get short address\n");
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "Short address %u\n", short_addr);
+		shell_fprintf(shell, SHELL_NORMAL, "Short address %u\n",
+			      short_addr);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_set_tx_power(const struct shell *shell,
-				       size_t argc, char *argv[])
+static int cmd_ieee802154_set_tx_power(const struct shell *shell, size_t argc,
+				       char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	int16_t tx_power;
@@ -550,22 +545,22 @@ static int cmd_ieee802154_set_tx_power(const struct shell *shell,
 
 	tx_power = (int16_t)atoi(argv[1]);
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_SET_TX_POWER, iface,
-		     &tx_power, sizeof(int16_t))) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_SET_TX_POWER, iface, &tx_power,
+		     sizeof(int16_t))) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Could not set TX power %d\n", tx_power);
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "TX power %d set\n", tx_power);
+		shell_fprintf(shell, SHELL_NORMAL, "TX power %d set\n",
+			      tx_power);
 	}
 
 	return 0;
 }
 
-static int cmd_ieee802154_get_tx_power(const struct shell *shell,
-				       size_t argc, char *argv[])
+static int cmd_ieee802154_get_tx_power(const struct shell *shell, size_t argc,
+				       char *argv[])
 {
 	struct net_if *iface = net_if_get_ieee802154();
 	int16_t tx_power;
@@ -576,66 +571,54 @@ static int cmd_ieee802154_get_tx_power(const struct shell *shell,
 		return -ENOEXEC;
 	}
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_GET_TX_POWER, iface,
-		     &tx_power, sizeof(int16_t))) {
-		shell_fprintf(shell, SHELL_WARNING,
-			      "Could not get TX power\n");
+	if (net_mgmt(NET_REQUEST_IEEE802154_GET_TX_POWER, iface, &tx_power,
+		     sizeof(int16_t))) {
+		shell_fprintf(shell, SHELL_WARNING, "Could not get TX power\n");
 
 		return -ENOEXEC;
 	} else {
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "TX power (in dbm) %d\n", tx_power);
+		shell_fprintf(shell, SHELL_NORMAL, "TX power (in dbm) %d\n",
+			      tx_power);
 	}
 
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(ieee802154_commands,
-	SHELL_CMD(ack, NULL,
-		  "<set/1 | unset/0> Set auto-ack flag",
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	ieee802154_commands,
+	SHELL_CMD(ack, NULL, "<set/1 | unset/0> Set auto-ack flag",
 		  cmd_ieee802154_ack),
 	SHELL_CMD(associate, NULL,
 		  "<pan_id> <PAN coordinator short or long address (EUI-64)>",
 		  cmd_ieee802154_associate),
-	SHELL_CMD(disassociate,	NULL,
-		  "Disassociate from network",
+	SHELL_CMD(disassociate, NULL, "Disassociate from network",
 		  cmd_ieee802154_disassociate),
-	SHELL_CMD(get_chan, NULL,
-		  "Get currently used channel",
+	SHELL_CMD(get_chan, NULL, "Get currently used channel",
 		  cmd_ieee802154_get_chan),
-	SHELL_CMD(get_ext_addr,	NULL,
-		  "Get currently used extended address",
+	SHELL_CMD(get_ext_addr, NULL, "Get currently used extended address",
 		  cmd_ieee802154_get_ext_addr),
-	SHELL_CMD(get_pan_id, NULL,
-		  "Get currently used PAN id",
+	SHELL_CMD(get_pan_id, NULL, "Get currently used PAN id",
 		  cmd_ieee802154_get_pan_id),
-	SHELL_CMD(get_short_addr, NULL,
-		  "Get currently used short address",
+	SHELL_CMD(get_short_addr, NULL, "Get currently used short address",
 		  cmd_ieee802154_get_short_addr),
-	SHELL_CMD(get_tx_power,	NULL,
-		  "Get currently used TX power",
+	SHELL_CMD(get_tx_power, NULL, "Get currently used TX power",
 		  cmd_ieee802154_get_tx_power),
-	SHELL_CMD(scan,	NULL,
+	SHELL_CMD(scan, NULL,
 		  "<passive|active> <channels set n[:m:...]:x|all>"
 		  " <per-channel duration in ms>",
 		  cmd_ieee802154_scan),
-	SHELL_CMD(set_chan, NULL,
-		  "<channel> Set used channel",
+	SHELL_CMD(set_chan, NULL, "<channel> Set used channel",
 		  cmd_ieee802154_set_chan),
-	SHELL_CMD(set_ext_addr,	NULL,
+	SHELL_CMD(set_ext_addr, NULL,
 		  "<long/extended address (EUI-64)> Set extended address",
 		  cmd_ieee802154_set_ext_addr),
-	SHELL_CMD(set_pan_id, NULL,
-		  "<pan_id> Set used PAN id",
+	SHELL_CMD(set_pan_id, NULL, "<pan_id> Set used PAN id",
 		  cmd_ieee802154_set_pan_id),
-	SHELL_CMD(set_short_addr, NULL,
-		  "<short address> Set short address",
+	SHELL_CMD(set_short_addr, NULL, "<short address> Set short address",
 		  cmd_ieee802154_set_short_addr),
-	SHELL_CMD(set_tx_power,	NULL,
-		  "<-18/-7/-4/-2/0/1/2/3/5> Set TX power",
+	SHELL_CMD(set_tx_power, NULL, "<-18/-7/-4/-2/0/1/2/3/5> Set TX power",
 		  cmd_ieee802154_set_tx_power),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(ieee802154, &ieee802154_commands, "IEEE 802.15.4 commands",
 		   NULL);

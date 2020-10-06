@@ -43,24 +43,22 @@ int gpio_mmio32_init(const struct device *dev);
  *
  * @see DEVICE_INIT
  */
-#define GPIO_MMIO32_INIT(_dev_name, _drv_name, _address, _mask)		\
-									\
-static struct gpio_mmio32_context _dev_name##_dev_data;			\
-									\
-static const struct gpio_mmio32_config _dev_name##_dev_cfg = {		\
+#define GPIO_MMIO32_INIT(_dev_name, _drv_name, _address, _mask)               \
+                                                                              \
+	static struct gpio_mmio32_context _dev_name##_dev_data;               \
+                                                                              \
+	static const struct gpio_mmio32_config _dev_name##_dev_cfg = {		\
 	.common = {							\
 		 .port_pin_mask = _mask,				\
 	},								\
 	.reg	= (volatile uint32_t *)_address,				\
 	.mask	= _mask,						\
-};									\
-									\
-DEVICE_AND_API_INIT(_dev_name, _drv_name,				\
-		    &gpio_mmio32_init,					\
-		    &_dev_name##_dev_data,				\
-		    &_dev_name##_dev_cfg,				\
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,	\
-		    &gpio_mmio32_api)
+};     \
+                                                                              \
+	DEVICE_AND_API_INIT(_dev_name, _drv_name, &gpio_mmio32_init,          \
+			    &_dev_name##_dev_data, &_dev_name##_dev_cfg,      \
+			    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
+			    &gpio_mmio32_api)
 
 #else /* CONFIG_GPIO_MMIO32 */
 
@@ -68,6 +66,5 @@ DEVICE_AND_API_INIT(_dev_name, _drv_name,				\
 #define GPIO_MMIO32_INIT(_dev_name, _drv_name, _address, _mask)
 
 #endif
-
 
 #endif /* ZEPHYR_INCLUDE_DRIVERS_GPIO_GPIO_MMIO32_H_ */

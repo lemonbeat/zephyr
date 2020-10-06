@@ -51,7 +51,6 @@ void z_smp_reacquire_global_lock(struct k_thread *thread)
 	}
 }
 
-
 /* Called from within z_swap(), so assumes lock already held */
 void z_smp_release_global_lock(struct k_thread *thread)
 {

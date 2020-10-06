@@ -115,7 +115,6 @@ void test_select(void)
 	zassert_true(tstamp >= 30U && tstamp <= 30 + FUZZ, "");
 	zassert_equal(res, 0, "");
 
-
 	/* Send pkt for s_sock and poll with timeout of 10ms */
 	len = send(c_sock, BUF_AND_SIZE(TEST_STR_SMALL), 0);
 	zassert_equal(len, STRLEN(TEST_STR_SMALL), "invalid send len");
@@ -133,7 +132,6 @@ void test_select(void)
 	zassert_false(FD_ISSET(c_sock, &readfds), "");
 	zassert_true(FD_ISSET(s_sock, &readfds), "");
 
-
 	/* Recv pkt from s_sock and ensure no poll events happen */
 	len = recv(s_sock, BUF_AND_SIZE(buf), 0);
 	zassert_equal(len, STRLEN(TEST_STR_SMALL), "invalid recv len");
@@ -146,7 +144,6 @@ void test_select(void)
 	zassert_true(k_uptime_get_32() - tstamp <= FUZZ, "");
 	zassert_equal(res, 0, "");
 	zassert_false(FD_ISSET(s_sock, &readfds), "");
-
 
 	/* Close one socket and ensure POLLNVAL happens */
 	res = close(c_sock);
@@ -169,8 +166,7 @@ void test_main(void)
 {
 	k_thread_system_pool_assign(k_current_get());
 
-	ztest_test_suite(socket_select,
-			 ztest_user_unit_test(test_fd_set),
+	ztest_test_suite(socket_select, ztest_user_unit_test(test_fd_set),
 			 ztest_user_unit_test(test_select));
 
 	ztest_run_test_suite(socket_select);

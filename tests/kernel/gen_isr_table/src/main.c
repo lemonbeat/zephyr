@@ -15,63 +15,62 @@ extern uint32_t _irq_vector_table[];
 #define HAS_DIRECT_IRQS
 #endif
 
-#define ISR1_OFFSET	0
-#define ISR2_OFFSET	1
+#define ISR1_OFFSET 0
+#define ISR2_OFFSET 1
 
 #if defined(CONFIG_RISCV)
 /* RISC-V has very few IRQ lines which can be triggered from software */
-#define ISR3_OFFSET	1
-#define ISR5_OFFSET	5
+#define ISR3_OFFSET 1
+#define ISR5_OFFSET 5
 
-#define IRQ_LINE(offset)        offset
-#define TABLE_INDEX(offset)     offset
-#define TRIG_CHECK_SIZE		6
+#define IRQ_LINE(offset) offset
+#define TABLE_INDEX(offset) offset
+#define TRIG_CHECK_SIZE 6
 #else
-#define ISR3_OFFSET	2
-#define ISR4_OFFSET	3
-#define ISR5_OFFSET	4
-#define ISR6_OFFSET	5
+#define ISR3_OFFSET 2
+#define ISR4_OFFSET 3
+#define ISR5_OFFSET 4
+#define ISR6_OFFSET 5
 
 #if defined(CONFIG_SOC_ARC_EMSDP)
 /* ARC EMSDP' console will use irq 108 / irq 107, will conflict
  * with isr used here, so add a workaround
  */
-#define TEST_NUM_IRQS	105
+#define TEST_NUM_IRQS 105
 #elif defined(CONFIG_SOC_NRF5340_CPUAPP) || defined(CONFIG_SOC_NRF9160)
 /* In nRF9160 and application core in nRF5340, not all interrupts with highest
  * numbers are implemented. Thus, limit the number of interrupts reported to
  * the test, so that it does not try to use some unavailable ones.
  */
-#define TEST_NUM_IRQS	33
+#define TEST_NUM_IRQS 33
 #elif defined(CONFIG_SOC_STM32G071XX)
 /* In STM32G071XX limit the number of interrupts reported to
  * the test, so that it does not try to use some of the IRQs
  * at the end of the vector table that are already used by
  * the board.
  */
-#define TEST_NUM_IRQS	30
+#define TEST_NUM_IRQS 30
 #elif defined(CONFIG_SOC_NPCX7M6FB)
 /* In NPCX7M6FB, it uses some the IRQs at the end of the vector table, for
  * example, the irq 60 and 61 used for Multi-Input Wake-Up Unit (MIWU) device
  * by default, and conflicts with isr used for testing. Move IRQs for this
  * test suite to solve the issue.
  */
-#define TEST_NUM_IRQS	42
+#define TEST_NUM_IRQS 42
 #else
-#define TEST_NUM_IRQS	CONFIG_NUM_IRQS
+#define TEST_NUM_IRQS CONFIG_NUM_IRQS
 #endif
 
-#define TEST_IRQ_TABLE_SIZE 	(IRQ_TABLE_SIZE - \
-				 (CONFIG_NUM_IRQS - TEST_NUM_IRQS))
-#define IRQ_LINE(offset)	(TEST_NUM_IRQS - ((offset) + 1))
-#define TABLE_INDEX(offset)	(TEST_IRQ_TABLE_SIZE - ((offset) + 1))
-#define TRIG_CHECK_SIZE		6
+#define TEST_IRQ_TABLE_SIZE (IRQ_TABLE_SIZE - (CONFIG_NUM_IRQS - TEST_NUM_IRQS))
+#define IRQ_LINE(offset) (TEST_NUM_IRQS - ((offset) + 1))
+#define TABLE_INDEX(offset) (TEST_IRQ_TABLE_SIZE - ((offset) + 1))
+#define TRIG_CHECK_SIZE 6
 #endif
 
-#define ISR3_ARG	0xb01dface
-#define ISR4_ARG	0xca55e77e
-#define ISR5_ARG	0xf0ccac1a
-#define ISR6_ARG	0xba5eba11
+#define ISR3_ARG 0xb01dface
+#define ISR4_ARG 0xca55e77e
+#define ISR5_ARG 0xf0ccac1a
+#define ISR6_ARG 0xba5eba11
 
 static volatile int trigger_check[TRIG_CHECK_SIZE];
 
@@ -93,9 +92,7 @@ void trigger_irq(int irq)
 {
 	uint32_t mip;
 
-	__asm__ volatile ("csrrs %0, mip, %1\n"
-			  : "=r" (mip)
-			  : "r" (1 << irq));
+	__asm__ volatile("csrrs %0, mip, %1\n" : "=r"(mip) : "r"(1 << irq));
 }
 #elif defined(CONFIG_CPU_ARCV2)
 void trigger_irq(int irq)
@@ -173,8 +170,7 @@ int test_irq(int offset)
 #endif
 	if (trigger_check[offset] != 1) {
 		TC_PRINT("interrupt %d didn't run once, ran %d times\n",
-			 IRQ_LINE(offset),
-			 trigger_check[offset]);
+			 IRQ_LINE(offset), trigger_check[offset]);
 		return -1;
 	}
 #else
@@ -183,8 +179,6 @@ int test_irq(int offset)
 #endif
 	return 0;
 }
-
-
 
 #ifdef HAS_DIRECT_IRQS
 static int check_vector(void *isr, int offset)

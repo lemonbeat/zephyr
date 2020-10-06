@@ -25,9 +25,8 @@ static void sleepy_thread(void *p1, void *p2, void *p3)
 
 void test_user_k_wakeup(void)
 {
-	k_thread_create(&user_thread, ustack, STACK_SIZE, sleepy_thread,
-			NULL, NULL, NULL,
-			k_thread_priority_get(k_current_get()),
+	k_thread_create(&user_thread, ustack, STACK_SIZE, sleepy_thread, NULL,
+			NULL, NULL, k_thread_priority_get(k_current_get()),
 			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_yield(); /* Let thread run and start sleeping forever */
@@ -70,8 +69,7 @@ void test_user_k_is_preempt(void)
 	zassert_false(twp, "unexpected return value");
 
 	k_thread_create(&user_thread, ustack, STACK_SIZE, preempt_test_thread,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(1),
+			NULL, NULL, NULL, K_PRIO_PREEMPT(1),
 			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_sem_take(&user_sem, K_FOREVER);

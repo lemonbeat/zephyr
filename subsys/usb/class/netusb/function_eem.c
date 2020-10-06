@@ -20,8 +20,9 @@ LOG_MODULE_REGISTER(usb_eem);
 
 static uint8_t sentinel[] = { 0xde, 0xad, 0xbe, 0xef };
 
-#define EEM_FRAME_SIZE (NET_ETH_MAX_FRAME_SIZE + sizeof(sentinel) + \
-			sizeof(uint16_t)) /* EEM header */
+#define EEM_FRAME_SIZE                               \
+	(NET_ETH_MAX_FRAME_SIZE + sizeof(sentinel) + \
+	 sizeof(uint16_t)) /* EEM header */
 
 static uint8_t tx_buf[EEM_FRAME_SIZE], rx_buf[EEM_FRAME_SIZE];
 
@@ -74,20 +75,16 @@ static uint8_t eem_get_first_iface_number(void)
 	return cdc_eem_cfg.if0.bInterfaceNumber;
 }
 
-#define EEM_OUT_EP_IDX		0
-#define EEM_IN_EP_IDX		1
+#define EEM_OUT_EP_IDX 0
+#define EEM_IN_EP_IDX 1
 
 static struct usb_ep_cfg_data eem_ep_data[] = {
-	{
-		/* Use transfer API */
-		.ep_cb = usb_transfer_ep_callback,
-		.ep_addr = CDC_EEM_OUT_EP_ADDR
-	},
-	{
-		/* Use transfer API */
-		.ep_cb = usb_transfer_ep_callback,
-		.ep_addr = CDC_EEM_IN_EP_ADDR
-	},
+	{ /* Use transfer API */
+	  .ep_cb = usb_transfer_ep_callback,
+	  .ep_addr = CDC_EEM_OUT_EP_ADDR },
+	{ /* Use transfer API */
+	  .ep_cb = usb_transfer_ep_callback,
+	  .ep_addr = CDC_EEM_IN_EP_ADDR },
 };
 
 static inline uint16_t eem_pkt_size(uint16_t hdr)
@@ -129,9 +126,8 @@ static int eem_send(struct net_pkt *pkt)
 	b_idx += sizeof(sentinel);
 
 	/* transfer data to host */
-	ret = usb_transfer_sync(eem_ep_data[EEM_IN_EP_IDX].ep_addr,
-				tx_buf, b_idx,
-				USB_TRANS_WRITE);
+	ret = usb_transfer_sync(eem_ep_data[EEM_IN_EP_IDX].ep_addr, tx_buf,
+				b_idx, USB_TRANS_WRITE);
 	if (ret != b_idx) {
 		LOG_ERR("Transfer failure");
 		return -EIO;
@@ -169,8 +165,8 @@ static void eem_read_cb(uint8_t ep, int size, void *priv)
 			goto done;
 		}
 
-		LOG_DBG("hdr 0x%x, eem_size %d, size %d",
-			eem_hdr, eem_size, size);
+		LOG_DBG("hdr 0x%x, eem_size %d, size %d", eem_hdr, eem_size,
+			size);
 
 		if (!size || !eem_size) {
 			LOG_DBG("no payload");
@@ -194,7 +190,7 @@ static void eem_read_cb(uint8_t ep, int size, void *priv)
 
 		netusb_recv(pkt);
 
-done:
+	done:
 		size -= eem_size;
 		ptr += eem_size;
 	} while (size);
@@ -236,8 +232,7 @@ static inline void eem_status_interface(const uint8_t *desc)
 }
 
 static void eem_status_cb(struct usb_cfg_data *cfg,
-			  enum usb_dc_status_code status,
-			  const uint8_t *param)
+			  enum usb_dc_status_code status, const uint8_t *param)
 {
 	ARG_UNUSED(cfg);
 

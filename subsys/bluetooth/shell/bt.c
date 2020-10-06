@@ -36,8 +36,8 @@
 #include "ll.h"
 #include "hci.h"
 
-#define DEVICE_NAME		CONFIG_BT_DEVICE_NAME
-#define DEVICE_NAME_LEN		(sizeof(DEVICE_NAME) - 1)
+#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 
 uint8_t selected_id = BT_ID_DEFAULT;
 const struct shell *ctx_shell;
@@ -89,11 +89,16 @@ static bool data_cb(struct bt_data *data, void *user_data)
 static const char *phy2str(uint8_t phy)
 {
 	switch (phy) {
-	case 0: return "No packets";
-	case BT_GAP_LE_PHY_1M: return "LE 1M";
-	case BT_GAP_LE_PHY_2M: return "LE 2M";
-	case BT_GAP_LE_PHY_CODED: return "LE Coded";
-	default: return "Unknown";
+	case 0:
+		return "No packets";
+	case BT_GAP_LE_PHY_1M:
+		return "LE 1M";
+	case BT_GAP_LE_PHY_2M:
+		return "LE 2M";
+	case BT_GAP_LE_PHY_CODED:
+		return "LE Coded";
+	default:
+		return "Unknown";
 	}
 }
 
@@ -108,7 +113,8 @@ static void scan_recv(const struct bt_le_scan_recv_info *info,
 	bt_data_parse(buf, data_cb, name);
 
 	bt_addr_le_to_str(info->addr, le_addr, sizeof(le_addr));
-	shell_print(ctx_shell, "[DEVICE]: %s, AD evt type %u, RSSI %i %s "
+	shell_print(ctx_shell,
+		    "[DEVICE]: %s, AD evt type %u, RSSI %i %s "
 		    "C:%u S:%u D:%d SR:%u E:%u Prim: %s, Secn: %s, "
 		    "Interval: %u",
 		    le_addr, info->adv_type, info->rssi, name,
@@ -241,7 +247,7 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	if (err) {
 		shell_error(ctx_shell, "Failed to connect to %s (0x%02x)", addr,
-			     err);
+			    err);
 		goto done;
 	}
 
@@ -264,7 +270,8 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	conn_addr_str(conn, addr, sizeof(addr));
-	shell_print(ctx_shell, "Disconnected: %s (reason 0x%02x)", addr, reason);
+	shell_print(ctx_shell, "Disconnected: %s (reason 0x%02x)", addr,
+		    reason);
 
 	if (default_conn == conn) {
 		bt_conn_unref(default_conn);
@@ -274,9 +281,11 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 
 static bool le_param_req(struct bt_conn *conn, struct bt_le_conn_param *param)
 {
-	shell_print(ctx_shell, "LE conn  param req: int (0x%04x, 0x%04x) lat %d"
-		    " to %d", param->interval_min, param->interval_max,
-		    param->latency, param->timeout);
+	shell_print(ctx_shell,
+		    "LE conn  param req: int (0x%04x, 0x%04x) lat %d"
+		    " to %d",
+		    param->interval_min, param->interval_max, param->latency,
+		    param->timeout);
 
 	return true;
 }
@@ -284,8 +293,10 @@ static bool le_param_req(struct bt_conn *conn, struct bt_le_conn_param *param)
 static void le_param_updated(struct bt_conn *conn, uint16_t interval,
 			     uint16_t latency, uint16_t timeout)
 {
-	shell_print(ctx_shell, "LE conn param updated: int 0x%04x lat %d "
-		     "to %d", interval, latency, timeout);
+	shell_print(ctx_shell,
+		    "LE conn param updated: int 0x%04x lat %d "
+		    "to %d",
+		    interval, latency, timeout);
 }
 
 #if defined(CONFIG_BT_SMP)
@@ -299,7 +310,7 @@ static void identity_resolved(struct bt_conn *conn, const bt_addr_le_t *rpa,
 	bt_addr_le_to_str(rpa, addr_rpa, sizeof(addr_rpa));
 
 	shell_print(ctx_shell, "Identity resolved %s -> %s", addr_rpa,
-	      addr_identity);
+		    addr_identity);
 }
 #endif
 
@@ -324,9 +335,9 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
 #if defined(CONFIG_BT_REMOTE_INFO)
 static const char *ver_str(uint8_t ver)
 {
-	const char * const str[] = {
-		"1.0b", "1.1", "1.2", "2.0", "2.1", "3.0", "4.0", "4.1", "4.2",
-		"5.0", "5.1",
+	const char *const str[] = {
+		"1.0b", "1.1", "1.2", "2.0", "2.1", "3.0",
+		"4.0",	"4.1", "4.2", "5.0", "5.1",
 	};
 
 	if (ver < ARRAY_SIZE(str)) {
@@ -346,19 +357,19 @@ static void remote_info_available(struct bt_conn *conn,
 	if (IS_ENABLED(CONFIG_BT_REMOTE_VERSION)) {
 		shell_print(ctx_shell,
 			    "Remote LMP version %s (0x%02x) subversion 0x%04x "
-			    "manufacturer 0x%04x", ver_str(remote_info->version),
-			    remote_info->version, remote_info->subversion,
-			    remote_info->manufacturer);
+			    "manufacturer 0x%04x",
+			    ver_str(remote_info->version), remote_info->version,
+			    remote_info->subversion, remote_info->manufacturer);
 	}
 
 	if (info.type == BT_CONN_TYPE_LE) {
 		uint8_t features[8];
-		char features_str[2 * sizeof(features) +  1];
+		char features_str[2 * sizeof(features) + 1];
 
 		sys_memcpy_swap(features, remote_info->le.features,
 				sizeof(features));
-		bin2hex(features, sizeof(features),
-			features_str, sizeof(features_str));
+		bin2hex(features, sizeof(features), features_str,
+			sizeof(features_str));
 		shell_print(ctx_shell, "LE Features: 0x%s ", features_str);
 	}
 }
@@ -370,14 +381,14 @@ void le_data_len_updated(struct bt_conn *conn,
 {
 	shell_print(ctx_shell,
 		    "LE data len updated: TX (len: %d time: %d)"
-		    " RX (len: %d time: %d)", info->tx_max_len,
-		    info->tx_max_time, info->rx_max_len, info->rx_max_time);
+		    " RX (len: %d time: %d)",
+		    info->tx_max_len, info->tx_max_time, info->rx_max_len,
+		    info->rx_max_time);
 }
 #endif
 
 #if defined(CONFIG_BT_USER_PHY_UPDATE)
-void le_phy_updated(struct bt_conn *conn,
-		    struct bt_conn_le_phy_info *info)
+void le_phy_updated(struct bt_conn *conn, struct bt_conn_le_phy_info *info)
 {
 	shell_print(ctx_shell, "LE PHY updated: TX PHY %s, RX PHY %s",
 		    phy2str(info->tx_phy), phy2str(info->rx_phy));
@@ -630,7 +641,7 @@ static int cmd_id_show(const struct shell *shell, size_t argc, char *argv[])
 
 		bt_addr_le_to_str(&addrs[i], addr_str, sizeof(addr_str));
 		shell_print(shell, "%s%zu: %s", i == selected_id ? "*" : " ", i,
-		      addr_str);
+			    addr_str);
 	}
 
 	return 0;
@@ -664,18 +675,21 @@ static int cmd_active_scan_on(const struct shell *shell, uint32_t options,
 {
 	int err;
 	struct bt_le_scan_param param = {
-			.type       = BT_LE_SCAN_TYPE_ACTIVE,
-			.options    = BT_LE_SCAN_OPT_FILTER_DUPLICATE,
-			.interval   = BT_GAP_SCAN_FAST_INTERVAL,
-			.window     = BT_GAP_SCAN_FAST_WINDOW,
-			.timeout    = timeout, };
+		.type = BT_LE_SCAN_TYPE_ACTIVE,
+		.options = BT_LE_SCAN_OPT_FILTER_DUPLICATE,
+		.interval = BT_GAP_SCAN_FAST_INTERVAL,
+		.window = BT_GAP_SCAN_FAST_WINDOW,
+		.timeout = timeout,
+	};
 
 	param.options |= options;
 
 	err = bt_le_scan_start(&param, NULL);
 	if (err) {
-		shell_error(shell, "Bluetooth set active scan failed "
-		      "(err %d)", err);
+		shell_error(shell,
+			    "Bluetooth set active scan failed "
+			    "(err %d)",
+			    err);
 		return err;
 	} else {
 		shell_print(shell, "Bluetooth active scan enabled");
@@ -688,19 +702,22 @@ static int cmd_passive_scan_on(const struct shell *shell, uint32_t options,
 			       uint16_t timeout)
 {
 	struct bt_le_scan_param param = {
-			.type       = BT_LE_SCAN_TYPE_PASSIVE,
-			.options    = BT_LE_SCAN_OPT_NONE,
-			.interval   = 0x10,
-			.window     = 0x10,
-			.timeout    = timeout, };
+		.type = BT_LE_SCAN_TYPE_PASSIVE,
+		.options = BT_LE_SCAN_OPT_NONE,
+		.interval = 0x10,
+		.window = 0x10,
+		.timeout = timeout,
+	};
 	int err;
 
 	param.options |= options;
 
 	err = bt_le_scan_start(&param, NULL);
 	if (err) {
-		shell_error(shell, "Bluetooth set passive scan failed "
-			    "(err %d)", err);
+		shell_error(shell,
+			    "Bluetooth set passive scan failed "
+			    "(err %d)",
+			    err);
 		return err;
 	} else {
 		shell_print(shell, "Bluetooth passive scan enabled");
@@ -801,8 +818,8 @@ static int cmd_advertise(const struct shell *shell, size_t argc, char *argv[])
 	param.interval_max = BT_GAP_ADV_FAST_INT_MAX_2;
 
 	if (!strcmp(argv[1], "on")) {
-		param.options = (BT_LE_ADV_OPT_CONNECTABLE |
-				 BT_LE_ADV_OPT_USE_NAME);
+		param.options =
+			(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_USE_NAME);
 	} else if (!strcmp(argv[1], "scan")) {
 		param.options = BT_LE_ADV_OPT_USE_NAME;
 	} else if (!strcmp(argv[1], "nconn")) {
@@ -842,8 +859,7 @@ static int cmd_advertise(const struct shell *shell, size_t argc, char *argv[])
 
 	err = bt_le_adv_start(&param, ad, ad_len, NULL, 0);
 	if (err < 0) {
-		shell_error(shell, "Failed to start advertising (err %d)",
-			    err);
+		shell_error(shell, "Failed to start advertising (err %d)", err);
 		return err;
 	} else {
 		shell_print(shell, "Advertising started");
@@ -857,8 +873,8 @@ fail:
 }
 
 #if defined(CONFIG_BT_PERIPHERAL)
-static int cmd_directed_adv(const struct shell *shell,
-			     size_t argc, char *argv[])
+static int cmd_directed_adv(const struct shell *shell, size_t argc,
+			    char *argv[])
 {
 	int err;
 	bt_addr_le_t addr;
@@ -903,7 +919,7 @@ static int cmd_directed_adv(const struct shell *shell,
 
 #if defined(CONFIG_BT_EXT_ADV)
 static bool adv_param_parse(size_t argc, char *argv[],
-			   struct bt_le_adv_param *param)
+			    struct bt_le_adv_param *param)
 {
 	memset(param, 0, sizeof(struct bt_le_adv_param));
 
@@ -1096,7 +1112,7 @@ static int cmd_adv_data(const struct shell *shell, size_t argc, char *argv[])
 	}
 
 	err = bt_le_ext_adv_set_data(adv, ad_len > 0 ? ad : NULL, ad_len,
-					  sd_len > 0 ? sd : NULL, sd_len);
+				     sd_len > 0 ? sd : NULL, sd_len);
 	if (err) {
 		shell_print(shell, "Failed to set advertising set data (%d)",
 			    err);
@@ -1316,7 +1332,6 @@ static int cmd_per_adv_param(const struct shell *shell, size_t argc,
 		param.interval_max = strtol(argv[2], NULL, 16);
 	} else {
 		param.interval_max = param.interval_min * 1.2;
-
 	}
 
 	if (param.interval_min > param.interval_max) {
@@ -1333,8 +1348,10 @@ static int cmd_per_adv_param(const struct shell *shell, size_t argc,
 
 	err = bt_le_per_adv_set_param(adv, &param);
 	if (err) {
-		shell_error(shell, "Failed to set periodic advertising "
-			    "parameters (%d)", err);
+		shell_error(shell,
+			    "Failed to set periodic advertising "
+			    "parameters (%d)",
+			    err);
 		return -ENOEXEC;
 	}
 
@@ -1389,15 +1406,16 @@ static void per_adv_sync_sync_cb(struct bt_le_per_adv_sync *sync,
 	char le_addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(info->addr, le_addr, sizeof(le_addr));
-	shell_print(ctx_shell, "PER_ADV_SYNC[%u]: [DEVICE]: %s synced, "
+	shell_print(ctx_shell,
+		    "PER_ADV_SYNC[%u]: [DEVICE]: %s synced, "
 		    "Interval 0x%04x (%u ms), PHY %s",
-		    bt_le_per_adv_sync_get_index(sync), le_addr,
-		    info->interval, info->interval * 5 / 4, phy2str(info->phy));
+		    bt_le_per_adv_sync_get_index(sync), le_addr, info->interval,
+		    info->interval * 5 / 4, phy2str(info->phy));
 }
 
-static void per_adv_sync_terminated_cb(
-	struct bt_le_per_adv_sync *sync,
-	const struct bt_le_per_adv_sync_term_info *info)
+static void
+per_adv_sync_terminated_cb(struct bt_le_per_adv_sync *sync,
+			   const struct bt_le_per_adv_sync_term_info *info)
 {
 	char le_addr[BT_ADDR_LE_STR_LEN];
 
@@ -1413,15 +1431,16 @@ static void per_adv_sync_terminated_cb(
 		    bt_le_per_adv_sync_get_index(sync), le_addr);
 }
 
-static void per_adv_sync_recv_cb(
-	struct bt_le_per_adv_sync *sync,
-	const struct bt_le_per_adv_sync_recv_info *info,
-	struct net_buf_simple *buf)
+static void
+per_adv_sync_recv_cb(struct bt_le_per_adv_sync *sync,
+		     const struct bt_le_per_adv_sync_recv_info *info,
+		     struct net_buf_simple *buf)
 {
 	char le_addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(info->addr, le_addr, sizeof(le_addr));
-	shell_print(ctx_shell, "PER_ADV_SYNC[%u]: [DEVICE]: %s, tx_power %i, "
+	shell_print(ctx_shell,
+		    "PER_ADV_SYNC[%u]: [DEVICE]: %s, tx_power %i, "
 		    "RSSI %i, CTE %u, data length %u",
 		    bt_le_per_adv_sync_get_index(sync), le_addr, info->tx_power,
 		    info->rssi, info->cte_type, buf->len);
@@ -1572,10 +1591,8 @@ static int cmd_connect_le(const struct shell *shell, size_t argc, char *argv[])
 	}
 #endif /* defined(CONFIG_BT_EXT_ADV) */
 
-	struct bt_conn_le_create_param *create_params =
-		BT_CONN_LE_CREATE_PARAM(options,
-					BT_GAP_SCAN_FAST_INTERVAL,
-					BT_GAP_SCAN_FAST_INTERVAL);
+	struct bt_conn_le_create_param *create_params = BT_CONN_LE_CREATE_PARAM(
+		options, BT_GAP_SCAN_FAST_INTERVAL, BT_GAP_SCAN_FAST_INTERVAL);
 
 	err = bt_conn_le_create(&addr, create_params, BT_LE_CONN_PARAM_DEFAULT,
 				&conn);
@@ -1583,7 +1600,6 @@ static int cmd_connect_le(const struct shell *shell, size_t argc, char *argv[])
 		shell_error(shell, "Connection failed (%d)", err);
 		return -ENOEXEC;
 	} else {
-
 		shell_print(shell, "Connection pending");
 
 		/* unref connection obj in advance as app user */
@@ -1692,19 +1708,26 @@ static int cmd_select(const struct shell *shell, size_t argc, char *argv[])
 static const char *get_conn_type_str(uint8_t type)
 {
 	switch (type) {
-	case BT_CONN_TYPE_LE: return "LE";
-	case BT_CONN_TYPE_BR: return "BR/EDR";
-	case BT_CONN_TYPE_SCO: return "SCO";
-	default: return "Invalid";
+	case BT_CONN_TYPE_LE:
+		return "LE";
+	case BT_CONN_TYPE_BR:
+		return "BR/EDR";
+	case BT_CONN_TYPE_SCO:
+		return "SCO";
+	default:
+		return "Invalid";
 	}
 }
 
 static const char *get_conn_role_str(uint8_t role)
 {
 	switch (role) {
-	case BT_CONN_ROLE_MASTER: return "master";
-	case BT_CONN_ROLE_SLAVE: return "slave";
-	default: return "Invalid";
+	case BT_CONN_ROLE_MASTER:
+		return "master";
+	case BT_CONN_ROLE_SLAVE:
+		return "slave";
+	default:
+		return "Invalid";
 	}
 }
 
@@ -1713,8 +1736,8 @@ static void print_le_addr(const char *desc, const bt_addr_le_t *addr)
 	char addr_str[BT_ADDR_LE_STR_LEN];
 
 	const char *addr_desc = bt_addr_le_is_identity(addr) ? "identity" :
-				bt_addr_le_is_rpa(addr) ? "resolvable" :
-				"non-resolvable";
+				bt_addr_le_is_rpa(addr)	     ? "resolvable" :
+								     "non-resolvable";
 
 	bt_addr_le_to_str(addr, addr_str, sizeof(addr_str));
 
@@ -1769,8 +1792,7 @@ static int cmd_info(const struct shell *shell, size_t argc, char *argv[])
 	}
 
 	shell_print(ctx_shell, "Type: %s, Role: %s, Id: %u",
-		    get_conn_type_str(info.type),
-		    get_conn_role_str(info.role),
+		    get_conn_type_str(info.type), get_conn_role_str(info.role),
 		    info.id);
 
 	if (info.type == BT_CONN_TYPE_LE) {
@@ -1791,7 +1813,8 @@ static int cmd_info(const struct shell *shell, size_t argc, char *argv[])
 			    phy2str(info.le.phy->rx_phy));
 #endif
 #if defined(CONFIG_BT_USER_DATA_LEN_UPDATE)
-		shell_print(ctx_shell, "LE data len: TX (len: %d time: %d)"
+		shell_print(ctx_shell,
+			    "LE data len: TX (len: %d time: %d)"
 			    " RX (len: %d time: %d)",
 			    info.le.data_len->tx_max_len,
 			    info.le.data_len->tx_max_time,
@@ -1882,8 +1905,6 @@ static int cmd_conn_data_len_update(const struct shell *shell, size_t argc,
 		shell_print(shell, "Calculated tx time: %d", param.tx_max_time);
 	}
 
-
-
 	err = bt_conn_le_data_len_update(default_conn, &param);
 	if (err) {
 		shell_error(shell, "data len update failed (err %d).", err);
@@ -1968,8 +1989,7 @@ static int cmd_oob(const struct shell *shell, size_t argc, char *argv[])
 }
 
 #if defined(CONFIG_BT_SMP) || defined(CONFIG_BT_BREDR)
-static int cmd_oob_remote(const struct shell *shell, size_t argc,
-			     char *argv[])
+static int cmd_oob_remote(const struct shell *shell, size_t argc, char *argv[])
 {
 	int err;
 	bt_addr_le_t addr;
@@ -2014,7 +2034,7 @@ static int cmd_clear(const struct shell *shell, size_t argc, char *argv[])
 		err = bt_unpair(selected_id, NULL);
 		if (err) {
 			shell_error(shell, "Failed to clear pairings (err %d)",
-			      err);
+				    err);
 			return err;
 		} else {
 			shell_print(shell, "Pairings successfully cleared");
@@ -2065,13 +2085,13 @@ static int cmd_security(const struct shell *shell, size_t argc, char *argv[])
 	sec = *argv[1] - '0';
 
 	if ((info.type == BT_CONN_TYPE_BR &&
-	    (sec < BT_SECURITY_L0 || sec > BT_SECURITY_L3))) {
+	     (sec < BT_SECURITY_L0 || sec > BT_SECURITY_L3))) {
 		shell_error(shell, "Invalid BR/EDR security level (%d)", sec);
 		return -ENOEXEC;
 	}
 
 	if ((info.type == BT_CONN_TYPE_LE &&
-	    (sec < BT_SECURITY_L1 || sec > BT_SECURITY_L4))) {
+	     (sec < BT_SECURITY_L1 || sec > BT_SECURITY_L4))) {
 		shell_error(shell, "Invalid LE security level (%d)", sec);
 		return -ENOEXEC;
 	}
@@ -2241,13 +2261,13 @@ static void auth_pairing_oob_data_request(struct bt_conn *conn,
 #if !defined(CONFIG_BT_SMP_OOB_LEGACY_PAIR_ONLY)
 	if (oob_info->type == BT_CONN_OOB_LE_SC) {
 		struct bt_le_oob_sc_data *oobd_local =
-			oob_info->lesc.oob_config != BT_CONN_OOB_REMOTE_ONLY
-						  ? &oob_local.le_sc_data
-						  : NULL;
+			oob_info->lesc.oob_config != BT_CONN_OOB_REMOTE_ONLY ?
+				      &oob_local.le_sc_data :
+				      NULL;
 		struct bt_le_oob_sc_data *oobd_remote =
-			oob_info->lesc.oob_config != BT_CONN_OOB_LOCAL_ONLY
-						  ? &oob_remote.le_sc_data
-						  : NULL;
+			oob_info->lesc.oob_config != BT_CONN_OOB_LOCAL_ONLY ?
+				      &oob_remote.le_sc_data :
+				      NULL;
 
 		if (oobd_remote &&
 		    bt_addr_le_cmp(info.le.remote, &oob_remote.addr)) {
@@ -2263,8 +2283,7 @@ static void auth_pairing_oob_data_request(struct bt_conn *conn,
 		    bt_addr_le_cmp(info.le.local, &oob_local.addr)) {
 			bt_addr_le_to_str(info.le.local, addr, sizeof(addr));
 			shell_print(ctx_shell,
-				    "No OOB data available for local %s",
-				    addr);
+				    "No OOB data available for local %s", addr);
 			bt_conn_auth_cancel(conn);
 			return;
 		}
@@ -2337,15 +2356,17 @@ static void auth_pincode_entry(struct bt_conn *conn, bool highsec)
 #endif
 
 #if defined(CONFIG_BT_SMP_APP_PAIRING_ACCEPT)
-enum bt_security_err pairing_accept(
-	struct bt_conn *conn, const struct bt_conn_pairing_feat *const feat)
+enum bt_security_err
+pairing_accept(struct bt_conn *conn,
+	       const struct bt_conn_pairing_feat *const feat)
 {
-	shell_print(ctx_shell, "Remote pairing features: "
-			       "IO: 0x%02x, OOB: %d, AUTH: 0x%02x, Key: %d, "
-			       "Init Kdist: 0x%02x, Resp Kdist: 0x%02x",
-			       feat->io_capability, feat->oob_data_flag,
-			       feat->auth_req, feat->max_enc_key_size,
-			       feat->init_key_dist, feat->resp_key_dist);
+	shell_print(ctx_shell,
+		    "Remote pairing features: "
+		    "IO: 0x%02x, OOB: %d, AUTH: 0x%02x, Key: %d, "
+		    "Init Kdist: 0x%02x, Resp Kdist: 0x%02x",
+		    feat->io_capability, feat->oob_data_flag, feat->auth_req,
+		    feat->max_enc_key_size, feat->init_key_dist,
+		    feat->resp_key_dist);
 
 	return BT_SECURITY_ERR_SUCCESS;
 }
@@ -2464,7 +2485,6 @@ static struct bt_conn_auth_cb auth_cb_oob = {
 	.bond_deleted = bond_deleted,
 };
 
-
 static int cmd_auth(const struct shell *shell, size_t argc, char *argv[])
 {
 	int err;
@@ -2491,8 +2511,7 @@ static int cmd_auth(const struct shell *shell, size_t argc, char *argv[])
 	return err;
 }
 
-static int cmd_auth_cancel(const struct shell *shell,
-			   size_t argc, char *argv[])
+static int cmd_auth_cancel(const struct shell *shell, size_t argc, char *argv[])
 {
 	struct bt_conn *conn;
 
@@ -2514,8 +2533,8 @@ static int cmd_auth_cancel(const struct shell *shell,
 	return 0;
 }
 
-static int cmd_auth_passkey_confirm(const struct shell *shell,
-				    size_t argc, char *argv[])
+static int cmd_auth_passkey_confirm(const struct shell *shell, size_t argc,
+				    char *argv[])
 {
 	if (!default_conn) {
 		shell_print(shell, "Not connected");
@@ -2526,8 +2545,8 @@ static int cmd_auth_passkey_confirm(const struct shell *shell,
 	return 0;
 }
 
-static int cmd_auth_pairing_confirm(const struct shell *shell,
-				    size_t argc, char *argv[])
+static int cmd_auth_pairing_confirm(const struct shell *shell, size_t argc,
+				    char *argv[])
 {
 	if (!default_conn) {
 		shell_print(shell, "Not connected");
@@ -2613,10 +2632,8 @@ static int cmd_wl_connect(const struct shell *shell, size_t argc, char *argv[])
 		}
 	}
 #endif /* defined(CONFIG_BT_EXT_ADV) */
-	struct bt_conn_le_create_param *create_params =
-		BT_CONN_LE_CREATE_PARAM(options,
-					BT_GAP_SCAN_FAST_INTERVAL,
-					BT_GAP_SCAN_FAST_WINDOW);
+	struct bt_conn_le_create_param *create_params = BT_CONN_LE_CREATE_PARAM(
+		options, BT_GAP_SCAN_FAST_INTERVAL, BT_GAP_SCAN_FAST_WINDOW);
 
 	if (!strcmp(action, "on")) {
 		err = bt_conn_le_create_auto(create_params,
@@ -2640,8 +2657,8 @@ static int cmd_wl_connect(const struct shell *shell, size_t argc, char *argv[])
 #endif /* defined(CONFIG_BT_WHITELIST) */
 
 #if defined(CONFIG_BT_FIXED_PASSKEY)
-static int cmd_fixed_passkey(const struct shell *shell,
-			     size_t argc, char *argv[])
+static int cmd_fixed_passkey(const struct shell *shell, size_t argc,
+			     char *argv[])
 {
 	unsigned int passkey;
 	int err;
@@ -2668,8 +2685,8 @@ static int cmd_fixed_passkey(const struct shell *shell,
 }
 #endif
 
-static int cmd_auth_passkey(const struct shell *shell,
-			    size_t argc, char *argv[])
+static int cmd_auth_passkey(const struct shell *shell, size_t argc,
+			    char *argv[])
 {
 	unsigned int passkey;
 	int err;
@@ -2718,36 +2735,36 @@ static int cmd_auth_oob_tk(const struct shell *shell, size_t argc, char *argv[])
 #endif /* !defined(CONFIG_BT_SMP_SC_PAIR_ONLY) */
 #endif /* CONFIG_BT_SMP) || CONFIG_BT_BREDR */
 
-
 #define HELP_NONE "[none]"
 #define HELP_ADDR_LE "<address: XX:XX:XX:XX:XX:XX> <type: (public|random)>"
 
 #if defined(CONFIG_BT_EXT_ADV)
 #define EXT_ADV_SCAN_OPT " [coded] [no-1m]"
-#define EXT_ADV_PARAM "<type: conn-scan conn-nscan, nconn-scan nconn-nscan> " \
-		      "[ext-adv] [no-2m] [coded] "                            \
-		      "[whitelist: wl, wl-scan, wl-conn] [identity] [name] "  \
-		      "[directed "HELP_ADDR_LE"] [mode: low]"
+#define EXT_ADV_PARAM                                           \
+	"<type: conn-scan conn-nscan, nconn-scan nconn-nscan> " \
+	"[ext-adv] [no-2m] [coded] "                            \
+	"[whitelist: wl, wl-scan, wl-conn] [identity] [name] "  \
+	"[directed " HELP_ADDR_LE "] [mode: low]"
 #else
 #define EXT_ADV_SCAN_OPT ""
 #endif /* defined(CONFIG_BT_EXT_ADV) */
 
-SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
-	SHELL_CMD_ARG(init, NULL, HELP_NONE, cmd_init, 1, 0),
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	bt_cmds, SHELL_CMD_ARG(init, NULL, HELP_NONE, cmd_init, 1, 0),
 #if defined(CONFIG_BT_HCI)
-	SHELL_CMD_ARG(hci-cmd, NULL, "<ogf> <ocf> [data]", cmd_hci_cmd, 3, 1),
+	SHELL_CMD_ARG(hci - cmd, NULL, "<ogf> <ocf> [data]", cmd_hci_cmd, 3, 1),
 #endif
-	SHELL_CMD_ARG(id-create, NULL, "[addr]", cmd_id_create, 1, 1),
-	SHELL_CMD_ARG(id-reset, NULL, "<id> [addr]", cmd_id_reset, 2, 1),
-	SHELL_CMD_ARG(id-delete, NULL, "<id>", cmd_id_delete, 2, 0),
-	SHELL_CMD_ARG(id-show, NULL, HELP_NONE, cmd_id_show, 1, 0),
-	SHELL_CMD_ARG(id-select, NULL, "<id>", cmd_id_select, 2, 0),
+	SHELL_CMD_ARG(id - create, NULL, "[addr]", cmd_id_create, 1, 1),
+	SHELL_CMD_ARG(id - reset, NULL, "<id> [addr]", cmd_id_reset, 2, 1),
+	SHELL_CMD_ARG(id - delete, NULL, "<id>", cmd_id_delete, 2, 0),
+	SHELL_CMD_ARG(id - show, NULL, HELP_NONE, cmd_id_show, 1, 0),
+	SHELL_CMD_ARG(id - select, NULL, "<id>", cmd_id_select, 2, 0),
 	SHELL_CMD_ARG(name, NULL, "[name]", cmd_name, 1, 1),
 #if defined(CONFIG_BT_OBSERVER)
-	SHELL_CMD_ARG(scan, NULL,
-		      "<value: on, passive, off> [filter: dups, nodups] [wl]"
-		      EXT_ADV_SCAN_OPT,
-		      cmd_scan, 2, 4),
+	SHELL_CMD_ARG(
+		scan, NULL,
+		"<value: on, passive, off> [filter: dups, nodups] [wl]" EXT_ADV_SCAN_OPT,
+		cmd_scan, 2, 4),
 #endif /* CONFIG_BT_OBSERVER */
 #if defined(CONFIG_BT_BROADCASTER)
 	SHELL_CMD_ARG(advertise, NULL,
@@ -2756,41 +2773,43 @@ SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
 		      "[one-time]",
 		      cmd_advertise, 2, 5),
 #if defined(CONFIG_BT_PERIPHERAL)
-	SHELL_CMD_ARG(directed-adv, NULL, HELP_ADDR_LE " [mode: low] "
-		      "[identity] [dir-rpa]",
+	SHELL_CMD_ARG(directed - adv, NULL,
+		      HELP_ADDR_LE " [mode: low] "
+				   "[identity] [dir-rpa]",
 		      cmd_directed_adv, 3, 3),
 #endif /* CONFIG_BT_PERIPHERAL */
 #if defined(CONFIG_BT_EXT_ADV)
-	SHELL_CMD_ARG(adv-create, NULL, EXT_ADV_PARAM, cmd_adv_create, 2, 8),
-	SHELL_CMD_ARG(adv-param, NULL, EXT_ADV_PARAM, cmd_adv_param, 2, 8),
-	SHELL_CMD_ARG(adv-data, NULL, "<data> [scan-response <data>] "
-				      "<type: discov, name, hex>", cmd_adv_data,
-		      1, 16),
-	SHELL_CMD_ARG(adv-start, NULL,
-		"[timeout <timeout>] [num-events <num events>]",
-		cmd_adv_start, 1, 4),
-	SHELL_CMD_ARG(adv-stop, NULL, "", cmd_adv_stop, 1, 0),
-	SHELL_CMD_ARG(adv-delete, NULL, "", cmd_adv_delete, 1, 0),
-	SHELL_CMD_ARG(adv-select, NULL, "[adv]", cmd_adv_select, 1, 1),
-	SHELL_CMD_ARG(adv-info, NULL, HELP_NONE, cmd_adv_info, 1, 0),
+	SHELL_CMD_ARG(adv - create, NULL, EXT_ADV_PARAM, cmd_adv_create, 2, 8),
+	SHELL_CMD_ARG(adv - param, NULL, EXT_ADV_PARAM, cmd_adv_param, 2, 8),
+	SHELL_CMD_ARG(adv - data, NULL,
+		      "<data> [scan-response <data>] "
+		      "<type: discov, name, hex>",
+		      cmd_adv_data, 1, 16),
+	SHELL_CMD_ARG(adv - start, NULL,
+		      "[timeout <timeout>] [num-events <num events>]",
+		      cmd_adv_start, 1, 4),
+	SHELL_CMD_ARG(adv - stop, NULL, "", cmd_adv_stop, 1, 0),
+	SHELL_CMD_ARG(adv - delete, NULL, "", cmd_adv_delete, 1, 0),
+	SHELL_CMD_ARG(adv - select, NULL, "[adv]", cmd_adv_select, 1, 1),
+	SHELL_CMD_ARG(adv - info, NULL, HELP_NONE, cmd_adv_info, 1, 0),
 #if defined(CONFIG_BT_PERIPHERAL)
-	SHELL_CMD_ARG(adv-oob, NULL, HELP_NONE, cmd_adv_oob, 1, 0),
+	SHELL_CMD_ARG(adv - oob, NULL, HELP_NONE, cmd_adv_oob, 1, 0),
 #endif /* CONFIG_BT_PERIPHERAL */
 #if defined(CONFIG_BT_PER_ADV)
-	SHELL_CMD_ARG(per-adv, NULL, "<type: off, on>", cmd_per_adv, 2, 0),
-	SHELL_CMD_ARG(per-adv-param, NULL,
+	SHELL_CMD_ARG(per - adv, NULL, "<type: off, on>", cmd_per_adv, 2, 0),
+	SHELL_CMD_ARG(per - adv - param, NULL,
 		      "[<interval-min> [<interval-max> [tx_power]]]",
 		      cmd_per_adv_param, 1, 3),
-	SHELL_CMD_ARG(per-adv-data, NULL, "<data>", cmd_per_adv_data, 2, 0),
+	SHELL_CMD_ARG(per - adv - data, NULL, "<data>", cmd_per_adv_data, 2, 0),
 #endif /* CONFIG_BT_PER_ADV */
 #endif /* CONFIG_BT_EXT_ADV */
 #endif /* CONFIG_BT_BROADCASTER */
 #if defined(CONFIG_BT_PER_ADV_SYNC)
-	SHELL_CMD_ARG(per-adv-sync-create, NULL,
+	SHELL_CMD_ARG(per - adv - sync - create, NULL,
 		      HELP_ADDR_LE " <sid> [skip <count>] [timeout <ms>] [aoa] "
-		      "[aod_1us] [aod_2us] [cte_only]",
+				   "[aod_1us] [aod_2us] [cte_only]",
 		      cmd_per_adv_sync_create, 4, 6),
-	SHELL_CMD_ARG(per-adv-sync-delete, NULL, "[<index>]",
+	SHELL_CMD_ARG(per - adv - sync - delete, NULL, "[<index>]",
 		      cmd_per_adv_sync_delete, 1, 1),
 #endif /* defined(CONFIG_BT_PER_ADV_SYNC) */
 #if defined(CONFIG_BT_CONN)
@@ -2798,66 +2817,68 @@ SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
 	SHELL_CMD_ARG(connect, NULL, HELP_ADDR_LE EXT_ADV_SCAN_OPT,
 		      cmd_connect_le, 3, 3),
 #if !defined(CONFIG_BT_WHITELIST)
-	SHELL_CMD_ARG(auto-conn, NULL, HELP_ADDR_LE, cmd_auto_conn, 3, 0),
+	SHELL_CMD_ARG(auto - conn, NULL, HELP_ADDR_LE, cmd_auto_conn, 3, 0),
 #endif /* !defined(CONFIG_BT_WHITELIST) */
 #endif /* CONFIG_BT_CENTRAL */
 	SHELL_CMD_ARG(disconnect, NULL, HELP_NONE, cmd_disconnect, 1, 2),
 	SHELL_CMD_ARG(select, NULL, HELP_ADDR_LE, cmd_select, 3, 0),
 	SHELL_CMD_ARG(info, NULL, HELP_ADDR_LE, cmd_info, 1, 2),
-	SHELL_CMD_ARG(conn-update, NULL, "<min> <max> <latency> <timeout>",
+	SHELL_CMD_ARG(conn - update, NULL, "<min> <max> <latency> <timeout>",
 		      cmd_conn_update, 5, 0),
 #if defined(CONFIG_BT_USER_DATA_LEN_UPDATE)
-	SHELL_CMD_ARG(data-len-update, NULL, "<tx_max_len> [tx_max_time]",
+	SHELL_CMD_ARG(data - len - update, NULL, "<tx_max_len> [tx_max_time]",
 		      cmd_conn_data_len_update, 2, 1),
 #endif
 #if defined(CONFIG_BT_USER_PHY_UPDATE)
-	SHELL_CMD_ARG(phy-update, NULL, "<tx_phy> [rx_phy] [s2] [s8]",
+	SHELL_CMD_ARG(phy - update, NULL, "<tx_phy> [rx_phy] [s2] [s8]",
 		      cmd_conn_phy_update, 2, 3),
 #endif
 #if defined(CONFIG_BT_CENTRAL)
-	SHELL_CMD_ARG(channel-map, NULL, "<channel-map: XXXXXXXXXX> (36-0)",
+	SHELL_CMD_ARG(channel - map, NULL, "<channel-map: XXXXXXXXXX> (36-0)",
 		      cmd_chan_map, 2, 1),
 #endif /* CONFIG_BT_CENTRAL */
 	SHELL_CMD_ARG(oob, NULL, NULL, cmd_oob, 1, 0),
 	SHELL_CMD_ARG(clear, NULL, "<remote: addr, all>", cmd_clear, 2, 1),
 #if defined(CONFIG_BT_SMP) || defined(CONFIG_BT_BREDR)
-	SHELL_CMD_ARG(security, NULL, "<security level BR/EDR: 0 - 3, "
-				      "LE: 1 - 4> [force-pair]",
+	SHELL_CMD_ARG(security, NULL,
+		      "<security level BR/EDR: 0 - 3, "
+		      "LE: 1 - 4> [force-pair]",
 		      cmd_security, 2, 1),
-	SHELL_CMD_ARG(bondable, NULL, "<bondable: on, off>", cmd_bondable,
-		      2, 0),
+	SHELL_CMD_ARG(bondable, NULL, "<bondable: on, off>", cmd_bondable, 2,
+		      0),
 	SHELL_CMD_ARG(bonds, NULL, HELP_NONE, cmd_bonds, 1, 0),
 	SHELL_CMD_ARG(connections, NULL, HELP_NONE, cmd_connections, 1, 0),
 	SHELL_CMD_ARG(auth, NULL,
 		      "<method: all, input, display, yesno, confirm, "
 		      "oob, none>",
 		      cmd_auth, 2, 0),
-	SHELL_CMD_ARG(auth-cancel, NULL, HELP_NONE, cmd_auth_cancel, 1, 0),
-	SHELL_CMD_ARG(auth-passkey, NULL, "<passkey>", cmd_auth_passkey, 2, 0),
-	SHELL_CMD_ARG(auth-passkey-confirm, NULL, HELP_NONE,
+	SHELL_CMD_ARG(auth - cancel, NULL, HELP_NONE, cmd_auth_cancel, 1, 0),
+	SHELL_CMD_ARG(auth - passkey, NULL, "<passkey>", cmd_auth_passkey, 2,
+		      0),
+	SHELL_CMD_ARG(auth - passkey - confirm, NULL, HELP_NONE,
 		      cmd_auth_passkey_confirm, 1, 0),
-	SHELL_CMD_ARG(auth-pairing-confirm, NULL, HELP_NONE,
+	SHELL_CMD_ARG(auth - pairing - confirm, NULL, HELP_NONE,
 		      cmd_auth_pairing_confirm, 1, 0),
 #if !defined(CONFIG_BT_SMP_SC_PAIR_ONLY)
-	SHELL_CMD_ARG(auth-oob-tk, NULL, "<tk>", cmd_auth_oob_tk, 2, 0),
+	SHELL_CMD_ARG(auth - oob - tk, NULL, "<tk>", cmd_auth_oob_tk, 2, 0),
 #endif /* !defined(CONFIG_BT_SMP_SC_PAIR_ONLY) */
-	SHELL_CMD_ARG(oob-remote, NULL,
-		      HELP_ADDR_LE" <oob rand> <oob confirm>",
-		      cmd_oob_remote, 3, 2),
-	SHELL_CMD_ARG(oob-clear, NULL, HELP_NONE, cmd_oob_clear, 1, 0),
+	SHELL_CMD_ARG(oob - remote, NULL,
+		      HELP_ADDR_LE " <oob rand> <oob confirm>", cmd_oob_remote,
+		      3, 2),
+	SHELL_CMD_ARG(oob - clear, NULL, HELP_NONE, cmd_oob_clear, 1, 0),
 #if defined(CONFIG_BT_WHITELIST)
-	SHELL_CMD_ARG(wl-add, NULL, HELP_ADDR_LE, cmd_wl_add, 3, 0),
-	SHELL_CMD_ARG(wl-rem, NULL, HELP_ADDR_LE, cmd_wl_rem, 3, 0),
-	SHELL_CMD_ARG(wl-clear, NULL, HELP_NONE, cmd_wl_clear, 1, 0),
+	SHELL_CMD_ARG(wl - add, NULL, HELP_ADDR_LE, cmd_wl_add, 3, 0),
+	SHELL_CMD_ARG(wl - rem, NULL, HELP_ADDR_LE, cmd_wl_rem, 3, 0),
+	SHELL_CMD_ARG(wl - clear, NULL, HELP_NONE, cmd_wl_clear, 1, 0),
 
 #if defined(CONFIG_BT_CENTRAL)
-	SHELL_CMD_ARG(wl-connect, NULL, "<on, off>" EXT_ADV_SCAN_OPT,
+	SHELL_CMD_ARG(wl - connect, NULL, "<on, off>" EXT_ADV_SCAN_OPT,
 		      cmd_wl_connect, 2, 3),
 #endif /* CONFIG_BT_CENTRAL */
 #endif /* defined(CONFIG_BT_WHITELIST) */
 #if defined(CONFIG_BT_FIXED_PASSKEY)
-	SHELL_CMD_ARG(fixed-passkey, NULL, "[passkey]", cmd_fixed_passkey,
-		      1, 1),
+	SHELL_CMD_ARG(fixed - passkey, NULL, "[passkey]", cmd_fixed_passkey, 1,
+		      1),
 #endif
 #endif /* CONFIG_BT_SMP || CONFIG_BT_BREDR) */
 #endif /* CONFIG_BT_CONN */
@@ -2867,23 +2888,21 @@ SHELL_STATIC_SUBCMD_SET_CREATE(bt_cmds,
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 #if defined(CONFIG_BT_BROADCASTER)
 	SHELL_CMD_ARG(advx, NULL,
-		      "<on hdcd ldcd off> [coded] [anon] [txp] [ad]",
-		      cmd_advx, 2, 4),
+		      "<on hdcd ldcd off> [coded] [anon] [txp] [ad]", cmd_advx,
+		      2, 4),
 #endif /* CONFIG_BT_BROADCASTER */
 #if defined(CONFIG_BT_OBSERVER)
-	SHELL_CMD_ARG(scanx, NULL, "<on passive off> [coded]", cmd_scanx,
-		      2, 1),
+	SHELL_CMD_ARG(scanx, NULL, "<on passive off> [coded]", cmd_scanx, 2, 1),
 #endif /* CONFIG_BT_OBSERVER */
 #endif /* CONFIG_BT_CTLR_ADV_EXT */
 #if defined(CONFIG_BT_CTLR_DTM)
 	SHELL_CMD_ARG(test_tx, NULL, "<chan> <len> <type> <phy>", cmd_test_tx,
 		      5, 0),
-	SHELL_CMD_ARG(test_rx, NULL, "<chan> <phy> <mod_idx>", cmd_test_rx,
-		      4, 0),
+	SHELL_CMD_ARG(test_rx, NULL, "<chan> <phy> <mod_idx>", cmd_test_rx, 4,
+		      0),
 	SHELL_CMD_ARG(test_end, NULL, HELP_NONE, cmd_test_end, 1, 0),
 #endif /* CONFIG_BT_CTLR_DTM */
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 static int cmd_bt(const struct shell *shell, size_t argc, char **argv)
 {

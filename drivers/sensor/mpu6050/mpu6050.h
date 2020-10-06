@@ -12,27 +12,25 @@
 #include <sys/util.h>
 #include <zephyr/types.h>
 
-#define MPU6050_REG_CHIP_ID		0x75
-#define MPU6050_CHIP_ID			0x68
+#define MPU6050_REG_CHIP_ID 0x75
+#define MPU6050_CHIP_ID 0x68
 
-#define MPU6050_REG_GYRO_CFG		0x1B
-#define MPU6050_GYRO_FS_SHIFT		3
+#define MPU6050_REG_GYRO_CFG 0x1B
+#define MPU6050_GYRO_FS_SHIFT 3
 
-#define MPU6050_REG_ACCEL_CFG		0x1C
-#define MPU6050_ACCEL_FS_SHIFT		3
+#define MPU6050_REG_ACCEL_CFG 0x1C
+#define MPU6050_ACCEL_FS_SHIFT 3
 
-#define MPU6050_REG_INT_EN		0x38
-#define MPU6050_DRDY_EN			BIT(0)
+#define MPU6050_REG_INT_EN 0x38
+#define MPU6050_DRDY_EN BIT(0)
 
-#define MPU6050_REG_DATA_START		0x3B
+#define MPU6050_REG_DATA_START 0x3B
 
-#define MPU6050_REG_PWR_MGMT1		0x6B
-#define MPU6050_SLEEP_EN		BIT(6)
+#define MPU6050_REG_PWR_MGMT1 0x6B
+#define MPU6050_SLEEP_EN BIT(6)
 
 /* measured in degrees/sec x10 to avoid floating point */
-static const uint16_t mpu6050_gyro_sensitivity_x10[] = {
-	1310, 655, 328, 164
-};
+static const uint16_t mpu6050_gyro_sensitivity_x10[] = { 1310, 655, 328, 164 };
 
 struct mpu6050_data {
 	const struct device *i2c;

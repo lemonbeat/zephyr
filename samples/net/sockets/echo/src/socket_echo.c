@@ -52,7 +52,8 @@ void main(void)
 	}
 
 	printf("Single-threaded TCP echo server waits for a connection on "
-	       "port %d...\n", BIND_PORT);
+	       "port %d...\n",
+	       BIND_PORT);
 
 	while (1) {
 		struct sockaddr_in client_addr;
@@ -94,7 +95,7 @@ void main(void)
 			} while (len);
 		}
 
-error:
+	error:
 		close(client);
 		printf("Connection from %s closed\n", addr_str);
 	}

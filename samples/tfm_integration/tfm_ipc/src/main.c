@@ -15,8 +15,7 @@
 
 K_MUTEX_DEFINE(tfm_mutex);
 
-int32_t tfm_ns_interface_dispatch(veneer_fn fn,
-				  uint32_t arg0, uint32_t arg1,
+int32_t tfm_ns_interface_dispatch(veneer_fn fn, uint32_t arg0, uint32_t arg1,
 				  uint32_t arg2, uint32_t arg3)
 {
 	int32_t result;
@@ -111,14 +110,11 @@ static void tfm_ipc_test_1004(void)
 	char str1[] = "str1";
 	char str2[] = "str2";
 	char str3[128], str4[128];
-	struct psa_invec invecs[2] = { { str1, sizeof(str1) /
-					 sizeof(char) },
-				       { str2, sizeof(str2) /
-					 sizeof(char) } };
-	struct psa_outvec outvecs[2] = { { str3, sizeof(str3) /
-					   sizeof(char) },
-					 { str4, sizeof(str4) /
-					   sizeof(char) } };
+	struct psa_invec invecs[2] = { { str1, sizeof(str1) / sizeof(char) },
+				       { str2, sizeof(str2) / sizeof(char) } };
+	struct psa_outvec outvecs[2] = { { str3, sizeof(str3) / sizeof(char) },
+					 { str4,
+					   sizeof(str4) / sizeof(char) } };
 	psa_handle_t handle;
 	psa_status_t status;
 	uint32_t version;
@@ -182,9 +178,8 @@ static void tfm_ipc_test_1006(void)
 	struct psa_outvec outvecs[1] = { { &test_result,
 					   sizeof(test_result) } };
 
-	handle = psa_connect(
-		IPC_CLIENT_TEST_PSA_ACCESS_APP_MEM_SID,
-		IPC_CLIENT_TEST_PSA_ACCESS_APP_MEM_VERSION);
+	handle = psa_connect(IPC_CLIENT_TEST_PSA_ACCESS_APP_MEM_SID,
+			     IPC_CLIENT_TEST_PSA_ACCESS_APP_MEM_VERSION);
 	if (handle > 0) {
 		printk("Connect success!\n");
 	} else {

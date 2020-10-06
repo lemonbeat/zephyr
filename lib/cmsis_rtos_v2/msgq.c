@@ -28,9 +28,10 @@ osMessageQueueId_t osMessageQueueNew(uint32_t msg_count, uint32_t msg_size,
 {
 	struct cv2_msgq *msgq;
 
-	BUILD_ASSERT(CONFIG_HEAP_MEM_POOL_SIZE >=
-		     CONFIG_CMSIS_V2_MSGQ_MAX_DYNAMIC_SIZE,
-		     "heap must be configured to be at least the max dynamic size");
+	BUILD_ASSERT(
+		CONFIG_HEAP_MEM_POOL_SIZE >=
+			CONFIG_CMSIS_V2_MSGQ_MAX_DYNAMIC_SIZE,
+		"heap must be configured to be at least the max dynamic size");
 
 	if (k_is_in_isr()) {
 		return NULL;
@@ -44,7 +45,8 @@ osMessageQueueId_t osMessageQueueNew(uint32_t msg_count, uint32_t msg_size,
 		attr = &init_msgq_attrs;
 	}
 
-	if (k_mem_slab_alloc(&cv2_msgq_slab, (void **)&msgq, K_MSEC(100)) == 0) {
+	if (k_mem_slab_alloc(&cv2_msgq_slab, (void **)&msgq, K_MSEC(100)) ==
+	    0) {
 		(void)memset(msgq, 0, sizeof(struct cv2_msgq));
 	} else {
 		return NULL;
@@ -52,12 +54,12 @@ osMessageQueueId_t osMessageQueueNew(uint32_t msg_count, uint32_t msg_size,
 
 	if (attr->mq_mem == NULL) {
 		__ASSERT((msg_count * msg_size) <=
-			 CONFIG_CMSIS_V2_MSGQ_MAX_DYNAMIC_SIZE,
+				 CONFIG_CMSIS_V2_MSGQ_MAX_DYNAMIC_SIZE,
 			 "message queue size exceeds dynamic maximum");
 
 		msgq->pool = k_calloc(msg_count, msg_size);
 		if (msgq->pool == NULL) {
-			k_mem_slab_free(&cv2_msgq_slab, (void *) &msgq);
+			k_mem_slab_free(&cv2_msgq_slab, (void *)&msgq);
 			return NULL;
 		}
 		msgq->is_dynamic_allocation = TRUE;
@@ -141,8 +143,7 @@ osStatus_t osMessageQueueGet(osMessageQueueId_t msgq_id, void *msg_ptr,
 	} else if (timeout == osWaitForever) {
 		retval = k_msgq_get(&msgq->z_msgq, msg_ptr, K_FOREVER);
 	} else {
-		retval = k_msgq_get(&msgq->z_msgq, msg_ptr,
-				    K_TICKS(timeout));
+		retval = k_msgq_get(&msgq->z_msgq, msg_ptr, K_TICKS(timeout));
 	}
 
 	if (retval == 0) {

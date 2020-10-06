@@ -26,7 +26,7 @@ LOG_MODULE_DECLARE(net_test, CONFIG_NET_SOCKETS_LOG_LEVEL);
 void test_socketpair_expected_failures(void)
 {
 	int res;
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 
 	/* Use invalid values in fields starting from left to right */
 
@@ -37,7 +37,7 @@ void test_socketpair_expected_failures(void)
 	}
 	zassert_equal(res, -1, "socketpair with fail with bad address family");
 	zassert_equal(errno, EAFNOSUPPORT,
-				  "errno should be EAFNOSUPPORT with bad adddress family");
+		      "errno should be EAFNOSUPPORT with bad adddress family");
 
 	res = socketpair(AF_UNIX, 42, 0, sv);
 	if (res != -1) {
@@ -45,9 +45,9 @@ void test_socketpair_expected_failures(void)
 		close(sv[1]);
 	}
 	zassert_equal(res, -1,
-				  "socketpair should fail with unsupported socket type");
+		      "socketpair should fail with unsupported socket type");
 	zassert_equal(errno, EPROTOTYPE,
-				  "errno should be EPROTOTYPE with bad socket type");
+		      "errno should be EPROTOTYPE with bad socket type");
 
 	res = socketpair(AF_UNIX, SOCK_STREAM, IPPROTO_TLS_1_0, sv);
 	if (res != -1) {
@@ -55,9 +55,9 @@ void test_socketpair_expected_failures(void)
 		close(sv[1]);
 	}
 	zassert_equal(res, -1,
-				  "socketpair should fail with unsupported protocol");
+		      "socketpair should fail with unsupported protocol");
 	zassert_equal(errno, EPROTONOSUPPORT,
-				  "errno should be EPROTONOSUPPORT with bad protocol");
+		      "errno should be EPROTONOSUPPORT with bad protocol");
 
 	/* This is not a POSIX requirement, but should be safe */
 	res = socketpair(AF_UNIX, SOCK_STREAM, 0, NULL);
@@ -66,7 +66,7 @@ void test_socketpair_expected_failures(void)
 		close(sv[1]);
 	}
 	zassert_equal(res, -1,
-				  "socketpair should fail with invalid socket vector");
+		      "socketpair should fail with invalid socket vector");
 	zassert_equal(errno, EFAULT,
-				  "errno should be EFAULT with bad socket vector");
+		      "errno should be EFAULT with bad socket vector");
 }

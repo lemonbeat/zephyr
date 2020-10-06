@@ -29,7 +29,6 @@ static struct driver_data m_data = {
 
 static nrfx_adc_channel_t m_channels[CONFIG_ADC_NRFX_ADC_CHANNEL_COUNT];
 
-
 /* Implementation of the ADC driver API function: adc_channel_setup. */
 static int adc_nrfx_channel_setup(const struct device *dev,
 				  const struct adc_channel_cfg *channel_cfg)
@@ -69,23 +68,23 @@ static int adc_nrfx_channel_setup(const struct device *dev,
 	switch (channel_cfg->reference) {
 	case ADC_REF_INTERNAL:
 		config->reference = NRF_ADC_CONFIG_REF_VBG;
-		config->extref    = NRF_ADC_CONFIG_EXTREFSEL_NONE;
+		config->extref = NRF_ADC_CONFIG_EXTREFSEL_NONE;
 		break;
 	case ADC_REF_VDD_1_2:
 		config->reference = NRF_ADC_CONFIG_REF_SUPPLY_ONE_HALF;
-		config->extref    = NRF_ADC_CONFIG_EXTREFSEL_NONE;
+		config->extref = NRF_ADC_CONFIG_EXTREFSEL_NONE;
 		break;
 	case ADC_REF_VDD_1_3:
 		config->reference = NRF_ADC_CONFIG_REF_SUPPLY_ONE_THIRD;
-		config->extref    = NRF_ADC_CONFIG_EXTREFSEL_NONE;
+		config->extref = NRF_ADC_CONFIG_EXTREFSEL_NONE;
 		break;
 	case ADC_REF_EXTERNAL0:
 		config->reference = NRF_ADC_CONFIG_REF_EXT;
-		config->extref    = NRF_ADC_CONFIG_EXTREFSEL_AREF0;
+		config->extref = NRF_ADC_CONFIG_EXTREFSEL_AREF0;
 		break;
 	case ADC_REF_EXTERNAL1:
 		config->reference = NRF_ADC_CONFIG_REF_EXT;
-		config->extref    = NRF_ADC_CONFIG_EXTREFSEL_AREF1;
+		config->extref = NRF_ADC_CONFIG_EXTREFSEL_AREF1;
 		break;
 	default:
 		LOG_ERR("Selected ADC reference is not valid");
@@ -129,7 +128,7 @@ static int check_buffer_size(const struct adc_sequence *sequence,
 
 	if (sequence->buffer_size < needed_buffer_size) {
 		LOG_ERR("Provided buffer is too small (%u/%u)",
-				sequence->buffer_size, needed_buffer_size);
+			sequence->buffer_size, needed_buffer_size);
 		return -ENOMEM;
 	}
 
@@ -150,7 +149,7 @@ static int start_read(const struct device *dev,
 	 */
 	if (!selected_channels ||
 	    (selected_channels &
-			~BIT_MASK(CONFIG_ADC_NRFX_ADC_CHANNEL_COUNT))) {
+	     ~BIT_MASK(CONFIG_ADC_NRFX_ADC_CHANNEL_COUNT))) {
 		LOG_ERR("Invalid selection of channels");
 		return -EINVAL;
 	}
@@ -161,10 +160,10 @@ static int start_read(const struct device *dev,
 	}
 
 	switch (sequence->resolution) {
-	case  8:
+	case 8:
 		nrf_resolution = NRF_ADC_CONFIG_RES_8BIT;
 		break;
-	case  9:
+	case 9:
 		nrf_resolution = NRF_ADC_CONFIG_RES_9BIT;
 		break;
 	case 10:
@@ -172,7 +171,7 @@ static int start_read(const struct device *dev,
 		break;
 	default:
 		LOG_ERR("ADC resolution value %d is not valid",
-			    sequence->resolution);
+			sequence->resolution);
 		return -EINVAL;
 	}
 
@@ -257,13 +256,12 @@ static int init_adc(const struct device *dev)
 	nrfx_err_t result = nrfx_adc_init(&config, event_handler);
 
 	if (result != NRFX_SUCCESS) {
-		LOG_ERR("Failed to initialize device: %s",
-			    dev->name);
+		LOG_ERR("Failed to initialize device: %s", dev->name);
 		return -EBUSY;
 	}
 
-	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
-		    nrfx_isr, nrfx_adc_irq_handler, 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), nrfx_isr,
+		    nrfx_adc_irq_handler, 0);
 
 	adc_context_unlock_unconditionally(&m_data.ctx);
 
@@ -272,11 +270,11 @@ static int init_adc(const struct device *dev)
 
 static const struct adc_driver_api adc_nrfx_driver_api = {
 	.channel_setup = adc_nrfx_channel_setup,
-	.read          = adc_nrfx_read,
+	.read = adc_nrfx_read,
 #ifdef CONFIG_ADC_ASYNC
-	.read_async    = adc_nrfx_read_async,
+	.read_async = adc_nrfx_read_async,
 #endif
-	.ref_internal  = 1200,
+	.ref_internal = 1200,
 };
 
 /*
@@ -288,13 +286,10 @@ static const struct adc_driver_api adc_nrfx_driver_api = {
  * Just in case that assumption becomes invalid in the future, we use
  * a BUILD_ASSERT().
  */
-#define ADC_INIT(inst)							\
-	BUILD_ASSERT((inst) == 0,					\
-		     "multiple instances not supported");		\
-	DEVICE_AND_API_INIT(adc_0, DT_INST_LABEL(0),			\
-			    init_adc, NULL, NULL,			\
-			    POST_KERNEL,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
+#define ADC_INIT(inst)                                                       \
+	BUILD_ASSERT((inst) == 0, "multiple instances not supported");       \
+	DEVICE_AND_API_INIT(adc_0, DT_INST_LABEL(0), init_adc, NULL, NULL,   \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
 			    &adc_nrfx_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(ADC_INIT)

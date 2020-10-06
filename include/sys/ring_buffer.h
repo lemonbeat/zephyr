@@ -19,14 +19,14 @@
 extern "C" {
 #endif
 
-#define SIZE32_OF(x) (sizeof((x))/sizeof(uint32_t))
+#define SIZE32_OF(x) (sizeof((x)) / sizeof(uint32_t))
 
 /**
  * @brief A structure to represent a ring buffer
  */
 struct ring_buf {
-	uint32_t head;	 /**< Index in buf for the head element */
-	uint32_t tail;	 /**< Index in buf for the tail element */
+	uint32_t head; /**< Index in buf for the head element */
+	uint32_t tail; /**< Index in buf for the tail element */
 	union ring_buf_misc {
 		struct ring_buf_misc_item_mode {
 			uint32_t dropped_put_count; /**< Running tally of the
@@ -39,13 +39,13 @@ struct ring_buf {
 			uint32_t tmp_head;
 		} byte_mode;
 	} misc;
-	uint32_t size;   /**< Size of buf in 32-bit chunks */
+	uint32_t size; /**< Size of buf in 32-bit chunks */
 
 	union ring_buf_buffer {
-		uint32_t *buf32;	 /**< Memory region for stored entries */
+		uint32_t *buf32; /**< Memory region for stored entries */
 		uint8_t *buf8;
 	} buf;
-	uint32_t mask;   /**< Modulo mask if size is a power of 2 */
+	uint32_t mask; /**< Modulo mask if size is a power of 2 */
 };
 
 /**
@@ -70,13 +70,12 @@ struct ring_buf {
  * @param name Name of the ring buffer.
  * @param pow Ring buffer size exponent.
  */
-#define RING_BUF_ITEM_DECLARE_POW2(name, pow) \
+#define RING_BUF_ITEM_DECLARE_POW2(name, pow)               \
 	static uint32_t _ring_buffer_data_##name[BIT(pow)]; \
-	struct ring_buf name = { \
-		.size = (BIT(pow)),	  \
-		.mask = (BIT(pow)) - 1, \
-		.buf = { .buf32 = _ring_buffer_data_##name } \
-	}
+	struct ring_buf name = { .size = (BIT(pow)),        \
+				 .mask = (BIT(pow)) - 1,    \
+				 .buf = { .buf32 =          \
+						  _ring_buffer_data_##name } }
 
 /** @deprecated Renamed to RING_BUF_ITEM_DECLARE_POW2. */
 #define SYS_RING_BUF_DECLARE_POW2(name, pow) \
@@ -96,11 +95,10 @@ struct ring_buf {
  * @param name Name of the ring buffer.
  * @param size32 Size of ring buffer (in 32-bit words).
  */
-#define RING_BUF_ITEM_DECLARE_SIZE(name, size32) \
-	static uint32_t _ring_buffer_data_##name[size32]; \
-	struct ring_buf name = { \
-		.size = size32, \
-		.buf = { .buf32 = _ring_buffer_data_##name} \
+#define RING_BUF_ITEM_DECLARE_SIZE(name, size32)                             \
+	static uint32_t _ring_buffer_data_##name[size32];                    \
+	struct ring_buf name = {                                             \
+		.size = size32, .buf = { .buf32 = _ring_buffer_data_##name } \
 	}
 
 /** @deprecated Renamed to RING_BUF_ITEM_DECLARE_SIZE. */
@@ -120,13 +118,10 @@ struct ring_buf {
  * @param name  Name of the ring buffer.
  * @param size8 Size of ring buffer (in bytes).
  */
-#define RING_BUF_DECLARE(name, size8) \
+#define RING_BUF_DECLARE(name, size8)                   \
 	static uint8_t _ring_buffer_data_##name[size8]; \
-	struct ring_buf name = { \
-		.size = size8, \
-		.buf = { .buf8 = _ring_buffer_data_##name} \
-	}
-
+	struct ring_buf name = { .size = size8,         \
+				 .buf = { .buf8 = _ring_buffer_data_##name } }
 
 /**
  * @brief Initialize a ring buffer.
@@ -144,7 +139,8 @@ struct ring_buf {
  * @param data Ring buffer data area (uint32_t data[size] or uint8_t data[size] for
  *	       bytes mode).
  */
-static inline void ring_buf_init(struct ring_buf *buf, uint32_t size, void *data)
+static inline void ring_buf_init(struct ring_buf *buf, uint32_t size,
+				 void *data)
 {
 	memset(buf, 0, sizeof(struct ring_buf));
 	buf->size = size;
@@ -167,7 +163,7 @@ static inline void ring_buf_init(struct ring_buf *buf, uint32_t size, void *data
  *  @return Ring buffer free space (in 32-bit words or bytes).
  */
 static inline uint32_t z_ring_buf_custom_space_get(uint32_t size, uint32_t head,
-					      uint32_t tail)
+						   uint32_t tail)
 {
 	if (tail < head) {
 		return head - tail - 1U;
@@ -301,7 +297,8 @@ int ring_buf_item_get(struct ring_buf *buf, uint16_t *type, uint8_t *value,
  * @return Size of allocated buffer which can be smaller than requested if
  *	   there is not enough free space or buffer wraps.
  */
-uint32_t ring_buf_put_claim(struct ring_buf *buf, uint8_t **data, uint32_t size);
+uint32_t ring_buf_put_claim(struct ring_buf *buf, uint8_t **data,
+			    uint32_t size);
 
 /**
  * @brief Indicate number of bytes written to allocated buffers.
@@ -369,7 +366,8 @@ uint32_t ring_buf_put(struct ring_buf *buf, const uint8_t *data, uint32_t size);
  * @return Number of valid bytes in the provided buffer which can be smaller
  *	   than requested if there is not enough free space or buffer wraps.
  */
-uint32_t ring_buf_get_claim(struct ring_buf *buf, uint8_t **data, uint32_t size);
+uint32_t ring_buf_get_claim(struct ring_buf *buf, uint8_t **data,
+			    uint32_t size);
 
 /**
  * @brief Indicate number of bytes read from claimed buffer.

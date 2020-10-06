@@ -20,38 +20,38 @@ LOG_MODULE_REGISTER(main);
 #define SW0_NODE DT_ALIAS(sw0)
 
 #if DT_NODE_HAS_STATUS(SW0_NODE, okay)
-#define PORT0		DT_GPIO_LABEL(SW0_NODE, gpios)
-#define PIN0		DT_GPIO_PIN(SW0_NODE, gpios)
-#define PIN0_FLAGS	DT_GPIO_FLAGS(SW0_NODE, gpios)
+#define PORT0 DT_GPIO_LABEL(SW0_NODE, gpios)
+#define PIN0 DT_GPIO_PIN(SW0_NODE, gpios)
+#define PIN0_FLAGS DT_GPIO_FLAGS(SW0_NODE, gpios)
 #else
 #error "Unsupported board: sw0 devicetree alias is not defined"
-#define PORT0		""
-#define PIN0		0
-#define PIN0_FLAGS	0
+#define PORT0 ""
+#define PIN0 0
+#define PIN0_FLAGS 0
 #endif
 
 #define SW1_NODE DT_ALIAS(sw1)
 
 #if DT_NODE_HAS_STATUS(SW1_NODE, okay)
-#define PORT1		DT_GPIO_LABEL(SW1_NODE, gpios)
-#define PIN1		DT_GPIO_PIN(SW1_NODE, gpios)
-#define PIN1_FLAGS	DT_GPIO_FLAGS(SW1_NODE, gpios)
+#define PORT1 DT_GPIO_LABEL(SW1_NODE, gpios)
+#define PIN1 DT_GPIO_PIN(SW1_NODE, gpios)
+#define PIN1_FLAGS DT_GPIO_FLAGS(SW1_NODE, gpios)
 #endif
 
 #define SW2_NODE DT_ALIAS(sw2)
 
 #if DT_NODE_HAS_STATUS(SW2_NODE, okay)
-#define PORT2		DT_GPIO_LABEL(SW2_NODE, gpios)
-#define PIN2		DT_GPIO_PIN(SW2_NODE, gpios)
-#define PIN2_FLAGS	DT_GPIO_FLAGS(SW2_NODE, gpios)
+#define PORT2 DT_GPIO_LABEL(SW2_NODE, gpios)
+#define PIN2 DT_GPIO_PIN(SW2_NODE, gpios)
+#define PIN2_FLAGS DT_GPIO_FLAGS(SW2_NODE, gpios)
 #endif
 
 #define SW3_NODE DT_ALIAS(sw3)
 
 #if DT_NODE_HAS_STATUS(SW3_NODE, okay)
-#define PORT3		DT_GPIO_LABEL(SW3_NODE, gpios)
-#define PIN3		DT_GPIO_PIN(SW3_NODE, gpios)
-#define PIN3_FLAGS	DT_GPIO_FLAGS(SW3_NODE, gpios)
+#define PORT3 DT_GPIO_LABEL(SW3_NODE, gpios)
+#define PIN3 DT_GPIO_PIN(SW3_NODE, gpios)
+#define PIN3_FLAGS DT_GPIO_FLAGS(SW3_NODE, gpios)
 #endif
 
 /* Event FIFO */
@@ -59,19 +59,19 @@ LOG_MODULE_REGISTER(main);
 K_FIFO_DEFINE(evt_fifo);
 
 enum evt_t {
-	GPIO_BUTTON_0	= 0x00,
-	GPIO_BUTTON_1	= 0x01,
-	GPIO_BUTTON_2	= 0x02,
-	GPIO_BUTTON_3	= 0x03,
-	CDC_UP		= 0x04,
-	CDC_DOWN	= 0x05,
-	CDC_LEFT	= 0x06,
-	CDC_RIGHT	= 0x07,
-	CDC_UNKNOWN	= 0x08,
-	CDC_STRING	= 0x09,
-	HID_MOUSE_CLEAR	= 0x0A,
-	HID_KBD_CLEAR	= 0x0B,
-	HID_KBD_STRING	= 0x0C,
+	GPIO_BUTTON_0 = 0x00,
+	GPIO_BUTTON_1 = 0x01,
+	GPIO_BUTTON_2 = 0x02,
+	GPIO_BUTTON_3 = 0x03,
+	CDC_UP = 0x04,
+	CDC_DOWN = 0x05,
+	CDC_LEFT = 0x06,
+	CDC_RIGHT = 0x07,
+	CDC_UNKNOWN = 0x08,
+	CDC_STRING = 0x09,
+	HID_MOUSE_CLEAR = 0x0A,
+	HID_KBD_CLEAR = 0x0B,
+	HID_KBD_STRING = 0x0C,
 };
 
 struct app_evt_t {
@@ -80,10 +80,10 @@ struct app_evt_t {
 	enum evt_t event_type;
 };
 
-#define FIFO_ELEM_MIN_SZ        sizeof(struct app_evt_t)
-#define FIFO_ELEM_MAX_SZ        sizeof(struct app_evt_t)
-#define FIFO_ELEM_COUNT         255
-#define FIFO_ELEM_ALIGN         sizeof(unsigned int)
+#define FIFO_ELEM_MIN_SZ sizeof(struct app_evt_t)
+#define FIFO_ELEM_MAX_SZ sizeof(struct app_evt_t)
+#define FIFO_ELEM_COUNT 255
+#define FIFO_ELEM_ALIGN sizeof(unsigned int)
 
 K_MEM_POOL_DEFINE(event_elem_pool, FIFO_ELEM_MIN_SZ, FIFO_ELEM_MAX_SZ,
 		  FIFO_ELEM_COUNT, FIFO_ELEM_ALIGN);
@@ -122,15 +122,13 @@ static inline struct app_evt_t *app_evt_alloc(void)
 	struct k_mem_block block;
 
 	ret = k_mem_pool_alloc(&event_elem_pool, &block,
-			       sizeof(struct app_evt_t),
-			       K_NO_WAIT);
+			       sizeof(struct app_evt_t), K_NO_WAIT);
 	if (ret < 0) {
 		LOG_ERR("APP event allocation failed!");
 		app_evt_flush();
 
 		ret = k_mem_pool_alloc(&event_elem_pool, &block,
-				       sizeof(struct app_evt_t),
-				       K_NO_WAIT);
+				       sizeof(struct app_evt_t), K_NO_WAIT);
 		if (ret < 0) {
 			LOG_ERR("APP event memory corrupted.");
 			__ASSERT_NO_MSG(0);
@@ -150,47 +148,47 @@ static inline struct app_evt_t *app_evt_alloc(void)
 static const uint8_t hid_mouse_report_desc[] = HID_MOUSE_REPORT_DESC(2);
 static const uint8_t hid_kbd_report_desc[] = HID_KEYBOARD_REPORT_DESC();
 
-static K_SEM_DEFINE(evt_sem, 0, 1);	/* starts off "not available" */
-static K_SEM_DEFINE(usb_sem, 1, 1);	/* starts off "available" */
+static K_SEM_DEFINE(evt_sem, 0, 1); /* starts off "not available" */
+static K_SEM_DEFINE(usb_sem, 1, 1); /* starts off "available" */
 static struct gpio_callback callback[4];
 
 static char data_buf_mouse[64], data_buf_kbd[64];
 static char string[64];
 static uint8_t chr_ptr_mouse, chr_ptr_kbd, str_pointer;
 
-#define MOUSE_BTN_REPORT_POS	0
-#define MOUSE_X_REPORT_POS	1
-#define MOUSE_Y_REPORT_POS	2
+#define MOUSE_BTN_REPORT_POS 0
+#define MOUSE_X_REPORT_POS 1
+#define MOUSE_Y_REPORT_POS 2
 
-#define MOUSE_BTN_LEFT		BIT(0)
-#define MOUSE_BTN_RIGHT		BIT(1)
-#define MOUSE_BTN_MIDDLE	BIT(2)
+#define MOUSE_BTN_LEFT BIT(0)
+#define MOUSE_BTN_RIGHT BIT(1)
+#define MOUSE_BTN_MIDDLE BIT(2)
 
-static const char *banner0	=	"Welcome to CDC ACM 0!\r\n"
-					"Supported commands:\r\n"
-					"up    - moves the mouse up\r\n"
-					"down  - moves the mouse down\r\n"
-					"right - moves the mouse to right\r\n"
-					"left  - moves the mouse to left\r\n";
-static const char *banner1	=	"Welcome to CDC ACM 1!\r\n"
-					"Enter a string and terminate "
-					"it with ENTER.\r\n"
-					"It will be sent via HID "
-					"when BUTTON 2 is pressed.\r\n"
-					"You can modify it by sending "
-					"a new one here.\r\n";
-static const char *gpio0	=	"Button 0 pressed\r\n";
-static const char *gpio1	=	"Button 1 pressed\r\n";
-static const char *gpio2	=	"Button 2 pressed\r\n";
-static const char *gpio3	=	"Button 3 pressed\r\n";
-static const char *unknown	=	"Command not recognized.\r\n";
-static const char *up		=	"Mouse up\r\n";
-static const char *down		=	"Mouse down\r\n";
-static const char *left		=	"Mouse left\r\n";
-static const char *right	=	"Mouse right\r\n";
-static const char *evt_fail	=	"Unknown event detected!\r\n";
-static const char *set_str	=	"String set to: ";
-static const char *endl		=	"\r\n";
+static const char *banner0 = "Welcome to CDC ACM 0!\r\n"
+			     "Supported commands:\r\n"
+			     "up    - moves the mouse up\r\n"
+			     "down  - moves the mouse down\r\n"
+			     "right - moves the mouse to right\r\n"
+			     "left  - moves the mouse to left\r\n";
+static const char *banner1 = "Welcome to CDC ACM 1!\r\n"
+			     "Enter a string and terminate "
+			     "it with ENTER.\r\n"
+			     "It will be sent via HID "
+			     "when BUTTON 2 is pressed.\r\n"
+			     "You can modify it by sending "
+			     "a new one here.\r\n";
+static const char *gpio0 = "Button 0 pressed\r\n";
+static const char *gpio1 = "Button 1 pressed\r\n";
+static const char *gpio2 = "Button 2 pressed\r\n";
+static const char *gpio3 = "Button 3 pressed\r\n";
+static const char *unknown = "Command not recognized.\r\n";
+static const char *up = "Mouse up\r\n";
+static const char *down = "Mouse down\r\n";
+static const char *left = "Mouse left\r\n";
+static const char *right = "Mouse right\r\n";
+static const char *evt_fail = "Unknown event detected!\r\n";
+static const char *set_str = "String set to: ";
+static const char *endl = "\r\n";
 
 static void in_ready_cb(const struct device *dev)
 {
@@ -413,9 +411,9 @@ static void cdc_mouse_int_handler(const struct device *dev, void *user_data)
 	}
 	uint32_t bytes_read;
 
-	while ((bytes_read = uart_fifo_read(dev,
-		(uint8_t *)data_buf_mouse+chr_ptr_mouse,
-		sizeof(data_buf_mouse)-chr_ptr_mouse))) {
+	while ((bytes_read = uart_fifo_read(
+			dev, (uint8_t *)data_buf_mouse + chr_ptr_mouse,
+			sizeof(data_buf_mouse) - chr_ptr_mouse))) {
 		chr_ptr_mouse += bytes_read;
 		if (data_buf_mouse[chr_ptr_mouse - 1] == '\r') {
 			/* ENTER */
@@ -461,9 +459,9 @@ static void cdc_kbd_int_handler(const struct device *dev, void *user_data)
 	}
 	uint32_t bytes_read;
 
-	while ((bytes_read = uart_fifo_read(dev,
-		(uint8_t *)data_buf_kbd+chr_ptr_kbd,
-		sizeof(data_buf_kbd)-chr_ptr_kbd))) {
+	while ((bytes_read = uart_fifo_read(
+			dev, (uint8_t *)data_buf_kbd + chr_ptr_kbd,
+			sizeof(data_buf_kbd) - chr_ptr_kbd))) {
 		chr_ptr_kbd += bytes_read;
 		if (data_buf_kbd[chr_ptr_kbd - 1] == '\r') {
 			/* ENTER */
@@ -486,8 +484,7 @@ static void btn0(const struct device *gpio, struct gpio_callback *cb,
 {
 	struct app_evt_t *ev = app_evt_alloc();
 
-	ev->event_type = GPIO_BUTTON_0,
-	app_evt_put(ev);
+	ev->event_type = GPIO_BUTTON_0, app_evt_put(ev);
 	k_sem_give(&evt_sem);
 }
 
@@ -497,8 +494,7 @@ static void btn1(const struct device *gpio, struct gpio_callback *cb,
 {
 	struct app_evt_t *ev = app_evt_alloc();
 
-	ev->event_type = GPIO_BUTTON_1,
-	app_evt_put(ev);
+	ev->event_type = GPIO_BUTTON_1, app_evt_put(ev);
 	k_sem_give(&evt_sem);
 }
 #endif
@@ -509,8 +505,7 @@ static void btn2(const struct device *gpio, struct gpio_callback *cb,
 {
 	struct app_evt_t *ev = app_evt_alloc();
 
-	ev->event_type = GPIO_BUTTON_2,
-	app_evt_put(ev);
+	ev->event_type = GPIO_BUTTON_2, app_evt_put(ev);
 	k_sem_give(&evt_sem);
 }
 #endif
@@ -521,15 +516,14 @@ static void btn3(const struct device *gpio, struct gpio_callback *cb,
 {
 	struct app_evt_t *ev = app_evt_alloc();
 
-	ev->event_type = GPIO_BUTTON_3,
-	app_evt_put(ev);
+	ev->event_type = GPIO_BUTTON_3, app_evt_put(ev);
 	k_sem_give(&evt_sem);
 }
 #endif
 
 int callbacks_configure(const struct device *gpio, uint32_t pin, int flags,
-			void (*handler)(const struct device *, struct gpio_callback*,
-					uint32_t),
+			void (*handler)(const struct device *,
+					struct gpio_callback *, uint32_t),
 			struct gpio_callback *callback)
 {
 	if (!gpio) {
@@ -537,8 +531,7 @@ int callbacks_configure(const struct device *gpio, uint32_t pin, int flags,
 		return -ENXIO;
 	}
 
-	gpio_pin_configure(gpio, pin,
-			   GPIO_INPUT | GPIO_INT_DEBOUNCE | flags);
+	gpio_pin_configure(gpio, pin, GPIO_INPUT | GPIO_INT_DEBOUNCE | flags);
 
 	gpio_init_callback(callback, handler, BIT(pin));
 	gpio_add_callback(gpio, callback);
@@ -670,34 +663,31 @@ void main(void)
 
 		while ((ev = app_evt_get()) != NULL) {
 			switch (ev->event_type) {
-			case GPIO_BUTTON_0:
-			{
+			case GPIO_BUTTON_0: {
 				/* Move the mouse in random direction */
-				uint8_t rep[] = {0x00, sys_rand32_get(),
-					      sys_rand32_get(), 0x00};
+				uint8_t rep[] = { 0x00, sys_rand32_get(),
+						  sys_rand32_get(), 0x00 };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid0_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid0_dev, rep, sizeof(rep),
+						 NULL);
 				write_data(cdc0_dev, gpio0, strlen(gpio0));
 				clear_mouse_report();
 				break;
 			}
-			case GPIO_BUTTON_1:
-			{
+			case GPIO_BUTTON_1: {
 				/* Press left mouse button */
-				uint8_t rep[] = {0x00, 0x00, 0x00, 0x00};
+				uint8_t rep[] = { 0x00, 0x00, 0x00, 0x00 };
 
 				rep[MOUSE_BTN_REPORT_POS] |= MOUSE_BTN_LEFT;
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid0_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid0_dev, rep, sizeof(rep),
+						 NULL);
 				write_data(cdc0_dev, gpio1, strlen(gpio1));
 				clear_mouse_report();
 				break;
 			}
-			case GPIO_BUTTON_2:
-			{
+			case GPIO_BUTTON_2: {
 				/* Send string on HID keyboard */
 				write_data(cdc1_dev, gpio2, strlen(gpio2));
 				if (strlen(string) > 0) {
@@ -710,76 +700,70 @@ void main(void)
 				}
 				break;
 			}
-			case GPIO_BUTTON_3:
-			{
+			case GPIO_BUTTON_3: {
 				/* Toggle CAPS LOCK */
-				uint8_t rep[] = {0x00, 0x00, 0x00, 0x00,
-					      0x00, 0x00, 0x00,
-					      HID_KEY_CAPSLOCK};
+				uint8_t rep[] = { 0x00, 0x00,
+						  0x00, 0x00,
+						  0x00, 0x00,
+						  0x00, HID_KEY_CAPSLOCK };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid1_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid1_dev, rep, sizeof(rep),
+						 NULL);
 				write_data(cdc1_dev, gpio3, strlen(gpio3));
 				clear_kbd_report();
 				break;
 			}
-			case CDC_UP:
-			{
+			case CDC_UP: {
 				/* Mouse up */
-				uint8_t rep[] = {0x00, 0x00, 0xE0, 0x00};
+				uint8_t rep[] = { 0x00, 0x00, 0xE0, 0x00 };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid0_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid0_dev, rep, sizeof(rep),
+						 NULL);
 				write_data(cdc0_dev, up, strlen(up));
 				clear_mouse_report();
 				break;
 			}
-			case CDC_DOWN:
-			{
+			case CDC_DOWN: {
 				/* Mouse down */
-				uint8_t rep[] = {0x00, 0x00, 0x20, 0x00};
+				uint8_t rep[] = { 0x00, 0x00, 0x20, 0x00 };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid0_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid0_dev, rep, sizeof(rep),
+						 NULL);
 				write_data(cdc0_dev, down, strlen(down));
 				clear_mouse_report();
 				break;
 			}
-			case CDC_RIGHT:
-			{
+			case CDC_RIGHT: {
 				/* Mouse right */
-				uint8_t rep[] = {0x00, 0x20, 0x00, 0x00};
+				uint8_t rep[] = { 0x00, 0x20, 0x00, 0x00 };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid0_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid0_dev, rep, sizeof(rep),
+						 NULL);
 				write_data(cdc0_dev, right, strlen(right));
 				clear_mouse_report();
 				break;
 			}
-			case CDC_LEFT:
-			{
+			case CDC_LEFT: {
 				/* Mouse left */
-				uint8_t rep[] = {0x00, 0xE0, 0x00, 0x00};
+				uint8_t rep[] = { 0x00, 0xE0, 0x00, 0x00 };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid0_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid0_dev, rep, sizeof(rep),
+						 NULL);
 				write_data(cdc0_dev, left, strlen(left));
 				clear_mouse_report();
 				break;
 			}
-			case CDC_UNKNOWN:
-			{
+			case CDC_UNKNOWN: {
 				write_data(cdc0_dev, unknown, strlen(unknown));
 				write_data(cdc1_dev, unknown, strlen(unknown));
 				break;
 			}
-			case CDC_STRING:
-			{
+			case CDC_STRING: {
 				write_data(cdc0_dev, set_str, strlen(set_str));
 				write_data(cdc0_dev, string, strlen(string));
 				write_data(cdc0_dev, endl, strlen(endl));
@@ -789,46 +773,44 @@ void main(void)
 				write_data(cdc1_dev, endl, strlen(endl));
 				break;
 			}
-			case HID_MOUSE_CLEAR:
-			{
+			case HID_MOUSE_CLEAR: {
 				/* Clear mouse report */
-				uint8_t rep[] = {0x00, 0x00, 0x00, 0x00};
+				uint8_t rep[] = { 0x00, 0x00, 0x00, 0x00 };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid0_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid0_dev, rep, sizeof(rep),
+						 NULL);
 				break;
 			}
-			case HID_KBD_CLEAR:
-			{
+			case HID_KBD_CLEAR: {
 				/* Clear kbd report */
-				uint8_t rep[] = {0x00, 0x00, 0x00, 0x00,
-					      0x00, 0x00, 0x00, 0x00};
+				uint8_t rep[] = { 0x00, 0x00, 0x00, 0x00,
+						  0x00, 0x00, 0x00, 0x00 };
 
 				k_sem_take(&usb_sem, K_FOREVER);
-				hid_int_ep_write(hid1_dev, rep,
-						 sizeof(rep), NULL);
+				hid_int_ep_write(hid1_dev, rep, sizeof(rep),
+						 NULL);
 				break;
 			}
-			case HID_KBD_STRING:
-			{
+			case HID_KBD_STRING: {
 				int ch = ascii_to_hid(string[str_pointer]);
 
 				if (ch == -1) {
 					LOG_WRN("Unsupported character: %d",
 						string[str_pointer]);
 				} else {
-					uint8_t rep[] = {0x00, 0x00, 0x00, 0x00,
-						      0x00, 0x00, 0x00, 0x00};
+					uint8_t rep[] = { 0x00, 0x00, 0x00,
+							  0x00, 0x00, 0x00,
+							  0x00, 0x00 };
 					if (needs_shift(string[str_pointer])) {
 						rep[0] |=
-						HID_KBD_MODIFIER_RIGHT_SHIFT;
+							HID_KBD_MODIFIER_RIGHT_SHIFT;
 					}
 					rep[7] = ch;
 
 					k_sem_take(&usb_sem, K_FOREVER);
 					hid_int_ep_write(hid1_dev, rep,
-							sizeof(rep), NULL);
+							 sizeof(rep), NULL);
 				}
 
 				str_pointer++;
@@ -845,16 +827,14 @@ void main(void)
 
 				break;
 			}
-			default:
-			{
+			default: {
 				LOG_ERR("Unknown event to execute");
 				write_data(cdc0_dev, evt_fail,
 					   strlen(evt_fail));
 				write_data(cdc1_dev, evt_fail,
 					   strlen(evt_fail));
 				break;
-			}
-			break;
+			} break;
 			}
 			app_evt_free(ev);
 		}

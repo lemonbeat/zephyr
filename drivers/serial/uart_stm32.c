@@ -31,16 +31,14 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(uart_stm32);
 
-#define HAS_LPUART_1 (DT_NODE_HAS_COMPAT_STATUS(DT_NODELABEL(lpuart1), \
-					 st_stm32_lpuart, okay))
+#define HAS_LPUART_1                                                       \
+	(DT_NODE_HAS_COMPAT_STATUS(DT_NODELABEL(lpuart1), st_stm32_lpuart, \
+				   okay))
 
 /* convenience defines */
-#define DEV_CFG(dev)							\
-	((const struct uart_stm32_config * const)(dev)->config)
-#define DEV_DATA(dev)							\
-	((struct uart_stm32_data * const)(dev)->data)
-#define UART_STRUCT(dev)					\
-	((USART_TypeDef *)(DEV_CFG(dev))->uconf.base)
+#define DEV_CFG(dev) ((const struct uart_stm32_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct uart_stm32_data *const)(dev)->data)
+#define UART_STRUCT(dev) ((USART_TypeDef *)(DEV_CFG(dev))->uconf.base)
 
 #define TIMEOUT 1000
 
@@ -55,17 +53,15 @@ static inline void uart_stm32_set_baudrate(const struct device *dev,
 
 	/* Get clock rate */
 	if (clock_control_get_rate(data->clock,
-			       (clock_control_subsys_t *)&config->pclken,
-			       &clock_rate) < 0) {
+				   (clock_control_subsys_t *)&config->pclken,
+				   &clock_rate) < 0) {
 		LOG_ERR("Failed call clock_control_get_rate");
 		return;
 	}
 
-
 #if HAS_LPUART_1
 	if (IS_LPUART_INSTANCE(UartInstance)) {
-		LL_LPUART_SetBaudRate(UartInstance,
-				      clock_rate,
+		LL_LPUART_SetBaudRate(UartInstance, clock_rate,
 #ifdef USART_PRESC_PRESCALER
 				      LL_USART_PRESCALER_DIV1,
 #endif
@@ -73,8 +69,7 @@ static inline void uart_stm32_set_baudrate(const struct device *dev,
 	} else {
 #endif /* HAS_LPUART_1 */
 
-		LL_USART_SetBaudRate(UartInstance,
-				     clock_rate,
+		LL_USART_SetBaudRate(UartInstance, clock_rate,
 #ifdef USART_PRESC_PRESCALER
 				     LL_USART_PRESCALER_DIV1,
 #endif
@@ -181,14 +176,14 @@ static inline uint32_t uart_stm32_cfg2ll_stopbits(enum uart_config_stop_bits sb)
 #ifdef LL_USART_STOPBITS_0_5
 	case UART_CFG_STOP_BITS_0_5:
 		return LL_USART_STOPBITS_0_5;
-#endif	/* LL_USART_STOPBITS_0_5 */
+#endif /* LL_USART_STOPBITS_0_5 */
 	case UART_CFG_STOP_BITS_1:
 		return LL_USART_STOPBITS_1;
 /* Some MCU's don't support 1.5 stop bits */
 #ifdef LL_USART_STOPBITS_1_5
 	case UART_CFG_STOP_BITS_1_5:
 		return LL_USART_STOPBITS_1_5;
-#endif	/* LL_USART_STOPBITS_1_5 */
+#endif /* LL_USART_STOPBITS_1_5 */
 	case UART_CFG_STOP_BITS_2:
 	default:
 		return LL_USART_STOPBITS_2;
@@ -202,14 +197,14 @@ static inline enum uart_config_stop_bits uart_stm32_ll2cfg_stopbits(uint32_t sb)
 #ifdef LL_USART_STOPBITS_0_5
 	case LL_USART_STOPBITS_0_5:
 		return UART_CFG_STOP_BITS_0_5;
-#endif	/* LL_USART_STOPBITS_0_5 */
+#endif /* LL_USART_STOPBITS_0_5 */
 	case LL_USART_STOPBITS_1:
 		return UART_CFG_STOP_BITS_1;
 /* Some MCU's don't support 1.5 stop bits */
 #ifdef LL_USART_STOPBITS_1_5
 	case LL_USART_STOPBITS_1_5:
 		return UART_CFG_STOP_BITS_1_5;
-#endif	/* LL_USART_STOPBITS_1_5 */
+#endif /* LL_USART_STOPBITS_1_5 */
 	case LL_USART_STOPBITS_2:
 	default:
 		return UART_CFG_STOP_BITS_2;
@@ -223,11 +218,11 @@ static inline uint32_t uart_stm32_cfg2ll_databits(enum uart_config_data_bits db)
 #ifdef LL_USART_DATAWIDTH_7B
 	case UART_CFG_DATA_BITS_7:
 		return LL_USART_DATAWIDTH_7B;
-#endif	/* LL_USART_DATAWIDTH_7B */
+#endif /* LL_USART_DATAWIDTH_7B */
 #ifdef LL_USART_DATAWIDTH_9B
 	case UART_CFG_DATA_BITS_9:
 		return LL_USART_DATAWIDTH_9B;
-#endif	/* LL_USART_DATAWIDTH_9B */
+#endif /* LL_USART_DATAWIDTH_9B */
 	case UART_CFG_DATA_BITS_8:
 	default:
 		return LL_USART_DATAWIDTH_8B;
@@ -241,11 +236,11 @@ static inline enum uart_config_data_bits uart_stm32_ll2cfg_databits(uint32_t db)
 #ifdef LL_USART_DATAWIDTH_7B
 	case LL_USART_DATAWIDTH_7B:
 		return UART_CFG_DATA_BITS_7;
-#endif	/* LL_USART_DATAWIDTH_7B */
+#endif /* LL_USART_DATAWIDTH_7B */
 #ifdef LL_USART_DATAWIDTH_9B
 	case LL_USART_DATAWIDTH_9B:
 		return UART_CFG_DATA_BITS_9;
-#endif	/* LL_USART_DATAWIDTH_9B */
+#endif /* LL_USART_DATAWIDTH_9B */
 	case LL_USART_DATAWIDTH_8B:
 	default:
 		return UART_CFG_DATA_BITS_8;
@@ -259,7 +254,8 @@ static inline enum uart_config_data_bits uart_stm32_ll2cfg_databits(uint32_t db)
  * @param  fc: Zephyr hardware flow control option.
  * @retval LL_USART_HWCONTROL_RTS_CTS, or LL_USART_HWCONTROL_NONE.
  */
-static inline uint32_t uart_stm32_cfg2ll_hwctrl(enum uart_config_flow_control fc)
+static inline uint32_t
+uart_stm32_cfg2ll_hwctrl(enum uart_config_flow_control fc)
 {
 	if (fc == UART_CFG_FLOW_CTRL_RTS_CTS) {
 		return LL_USART_HWCONTROL_RTS_CTS;
@@ -275,7 +271,8 @@ static inline uint32_t uart_stm32_cfg2ll_hwctrl(enum uart_config_flow_control fc
  * @param  fc: LL hardware flow control definition.
  * @retval UART_CFG_FLOW_CTRL_RTS_CTS, or UART_CFG_FLOW_CTRL_NONE.
  */
-static inline enum uart_config_flow_control uart_stm32_ll2cfg_hwctrl(uint32_t fc)
+static inline enum uart_config_flow_control
+uart_stm32_ll2cfg_hwctrl(uint32_t fc)
 {
 	if (fc == LL_USART_HWCONTROL_RTS_CTS) {
 		return UART_CFG_FLOW_CTRL_RTS_CTS;
@@ -331,7 +328,7 @@ static int uart_stm32_configure(const struct device *dev,
 #ifndef LL_USART_DATAWIDTH_9B
 	    || (UART_CFG_DATA_BITS_9 == cfg->data_bits)
 #endif /* LL_USART_DATAWIDTH_9B */
-		) {
+	) {
 		return -ENOTSUP;
 	}
 
@@ -377,12 +374,11 @@ static int uart_stm32_config_get(const struct device *dev,
 
 	cfg->baudrate = data->baud_rate;
 	cfg->parity = uart_stm32_ll2cfg_parity(uart_stm32_get_parity(dev));
-	cfg->stop_bits = uart_stm32_ll2cfg_stopbits(
-		uart_stm32_get_stopbits(dev));
-	cfg->data_bits = uart_stm32_ll2cfg_databits(
-		uart_stm32_get_databits(dev));
-	cfg->flow_ctrl = uart_stm32_ll2cfg_hwctrl(
-		uart_stm32_get_hwctrl(dev));
+	cfg->stop_bits =
+		uart_stm32_ll2cfg_stopbits(uart_stm32_get_stopbits(dev));
+	cfg->data_bits =
+		uart_stm32_ll2cfg_databits(uart_stm32_get_databits(dev));
+	cfg->flow_ctrl = uart_stm32_ll2cfg_hwctrl(uart_stm32_get_hwctrl(dev));
 	return 0;
 }
 
@@ -404,8 +400,7 @@ static int uart_stm32_poll_in(const struct device *dev, unsigned char *c)
 	return 0;
 }
 
-static void uart_stm32_poll_out(const struct device *dev,
-					unsigned char c)
+static void uart_stm32_poll_out(const struct device *dev, unsigned char c)
 {
 	USART_TypeDef *UartInstance = UART_STRUCT(dev);
 
@@ -462,8 +457,7 @@ static int uart_stm32_err_check(const struct device *dev)
 static inline void __uart_stm32_get_clock(const struct device *dev)
 {
 	struct uart_stm32_data *data = DEV_DATA(dev);
-	const struct device *clk =
-		device_get_binding(STM32_CLOCK_CONTROL_NAME);
+	const struct device *clk = device_get_binding(STM32_CLOCK_CONTROL_NAME);
 
 	__ASSERT_NO_MSG(clk);
 
@@ -473,14 +467,12 @@ static inline void __uart_stm32_get_clock(const struct device *dev)
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 
 static int uart_stm32_fifo_fill(const struct device *dev,
-				  const uint8_t *tx_data,
-				  int size)
+				const uint8_t *tx_data, int size)
 {
 	USART_TypeDef *UartInstance = UART_STRUCT(dev);
 	uint8_t num_tx = 0U;
 
-	while ((size - num_tx > 0) &&
-	       LL_USART_IsActiveFlag_TXE(UartInstance)) {
+	while ((size - num_tx > 0) && LL_USART_IsActiveFlag_TXE(UartInstance)) {
 		/* TXE flag will be cleared with byte write to DR|RDR register */
 
 		/* Send a character (8bit , parity none) */
@@ -491,7 +483,7 @@ static int uart_stm32_fifo_fill(const struct device *dev,
 }
 
 static int uart_stm32_fifo_read(const struct device *dev, uint8_t *rx_data,
-				  const int size)
+				const int size)
 {
 	USART_TypeDef *UartInstance = UART_STRUCT(dev);
 	uint8_t num_rx = 0U;
@@ -650,7 +642,7 @@ static const struct uart_driver_api uart_stm32_driver_api = {
 	.irq_is_pending = uart_stm32_irq_is_pending,
 	.irq_update = uart_stm32_irq_update,
 	.irq_callback_set = uart_stm32_irq_callback_set,
-#endif	/* CONFIG_UART_INTERRUPT_DRIVEN */
+#endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
 /**
@@ -674,7 +666,7 @@ static int uart_stm32_init(const struct device *dev)
 	__uart_stm32_get_clock(dev);
 	/* enable clock */
 	if (clock_control_on(data->clock,
-			(clock_control_subsys_t *)&config->pclken) != 0) {
+			     (clock_control_subsys_t *)&config->pclken) != 0) {
 		return -EIO;
 	}
 
@@ -727,8 +719,7 @@ static int uart_stm32_init(const struct device *dev)
 	LL_USART_Disable(UartInstance);
 
 	/* TX/RX direction */
-	LL_USART_SetTransferDirection(UartInstance,
-				      LL_USART_DIRECTION_TX_RX);
+	LL_USART_SetTransferDirection(UartInstance, LL_USART_DIRECTION_TX_RX);
 
 	/* Determine the datawidth and parity. If we use other parity than
 	 * 'none' we must use datawidth = 9 (to get 8 databit + 1 parity bit).
@@ -741,10 +732,11 @@ static int uart_stm32_init(const struct device *dev)
 		/* 8 databit, 1 parity bit, parity odd */
 		ll_parity = LL_USART_PARITY_ODD;
 		ll_datawidth = LL_USART_DATAWIDTH_9B;
-	} else {  /* Default to 8N0, but show warning if invalid value */
+	} else { /* Default to 8N0, but show warning if invalid value */
 		if (config->parity != 0) {
 			LOG_WRN("Invalid parity setting '%d'."
-				"Defaulting to 'none'.", config->parity);
+				"Defaulting to 'none'.",
+				config->parity);
 		}
 		/* 8 databit, parity none */
 		ll_parity = LL_USART_PARITY_NONE;
@@ -752,9 +744,7 @@ static int uart_stm32_init(const struct device *dev)
 	}
 
 	/* Set datawidth and parity, 1 start bit, 1 stop bit  */
-	LL_USART_ConfigCharacter(UartInstance,
-				 ll_datawidth,
-				 ll_parity,
+	LL_USART_ConfigCharacter(UartInstance, ll_datawidth, ll_parity,
 				 LL_USART_STOPBITS_1);
 
 	if (config->hw_flow_control) {
@@ -784,57 +774,53 @@ static int uart_stm32_init(const struct device *dev)
 	return 0;
 }
 
-
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-#define STM32_UART_IRQ_HANDLER_DECL(index)				\
+#define STM32_UART_IRQ_HANDLER_DECL(index) \
 	static void uart_stm32_irq_config_func_##index(const struct device *dev)
-#define STM32_UART_IRQ_HANDLER_FUNC(index)				\
+#define STM32_UART_IRQ_HANDLER_FUNC(index) \
 	.irq_config_func = uart_stm32_irq_config_func_##index,
-#define STM32_UART_IRQ_HANDLER(index)					\
-static void uart_stm32_irq_config_func_##index(const struct device *dev)	\
-{									\
-	IRQ_CONNECT(DT_INST_IRQN(index),				\
-		DT_INST_IRQ(index, priority),				\
-		uart_stm32_isr, DEVICE_GET(uart_stm32_##index),		\
-		0);							\
-	irq_enable(DT_INST_IRQN(index));				\
-}
+#define STM32_UART_IRQ_HANDLER(index)                                          \
+	static void uart_stm32_irq_config_func_##index(                        \
+		const struct device *dev)                                      \
+	{                                                                      \
+		IRQ_CONNECT(DT_INST_IRQN(index), DT_INST_IRQ(index, priority), \
+			    uart_stm32_isr, DEVICE_GET(uart_stm32_##index),    \
+			    0);                                                \
+		irq_enable(DT_INST_IRQN(index));                               \
+	}
 #else
 #define STM32_UART_IRQ_HANDLER_DECL(index)
 #define STM32_UART_IRQ_HANDLER_FUNC(index)
 #define STM32_UART_IRQ_HANDLER(index)
 #endif
 
-#define STM32_UART_INIT(index)						\
-STM32_UART_IRQ_HANDLER_DECL(index);					\
-									\
-static const struct soc_gpio_pinctrl uart_pins_##index[] =		\
-					ST_STM32_DT_PINCTRL(0, index);	\
-									\
-static const struct uart_stm32_config uart_stm32_cfg_##index = {	\
-	.uconf = {							\
-		.base = (uint8_t *)DT_INST_REG_ADDR(index),		\
-		STM32_UART_IRQ_HANDLER_FUNC(index)			\
-	},								\
-	.pclken = { .bus = DT_INST_CLOCKS_CELL(index, bus),		\
-		    .enr = DT_INST_CLOCKS_CELL(index, bits)		\
-	},								\
-	.hw_flow_control = DT_INST_PROP(index, hw_flow_control),	\
-	.parity = DT_INST_PROP(index, parity),				\
-	.pinctrl_list = uart_pins_##index,				\
-	.pinctrl_list_size = ARRAY_SIZE(uart_pins_##index),		\
-};									\
-									\
-static struct uart_stm32_data uart_stm32_data_##index = {		\
-	.baud_rate = DT_INST_PROP(index, current_speed),		\
-};									\
-									\
-DEVICE_AND_API_INIT(uart_stm32_##index, DT_INST_LABEL(index),		\
-		    &uart_stm32_init,					\
-		    &uart_stm32_data_##index, &uart_stm32_cfg_##index,	\
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,	\
-		    &uart_stm32_driver_api);				\
-									\
-STM32_UART_IRQ_HANDLER(index)
+#define STM32_UART_INIT(index)                                           \
+	STM32_UART_IRQ_HANDLER_DECL(index);                              \
+                                                                         \
+	static const struct soc_gpio_pinctrl uart_pins_##index[] =       \
+		ST_STM32_DT_PINCTRL(0, index);                           \
+                                                                         \
+	static const struct uart_stm32_config uart_stm32_cfg_##index = { \
+		.uconf = { .base = (uint8_t *)DT_INST_REG_ADDR(index),   \
+			   STM32_UART_IRQ_HANDLER_FUNC(index) },         \
+		.pclken = { .bus = DT_INST_CLOCKS_CELL(index, bus),      \
+			    .enr = DT_INST_CLOCKS_CELL(index, bits) },   \
+		.hw_flow_control = DT_INST_PROP(index, hw_flow_control), \
+		.parity = DT_INST_PROP(index, parity),                   \
+		.pinctrl_list = uart_pins_##index,                       \
+		.pinctrl_list_size = ARRAY_SIZE(uart_pins_##index),      \
+	};                                                               \
+                                                                         \
+	static struct uart_stm32_data uart_stm32_data_##index = {        \
+		.baud_rate = DT_INST_PROP(index, current_speed),         \
+	};                                                               \
+                                                                         \
+	DEVICE_AND_API_INIT(uart_stm32_##index, DT_INST_LABEL(index),    \
+			    &uart_stm32_init, &uart_stm32_data_##index,  \
+			    &uart_stm32_cfg_##index, PRE_KERNEL_1,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,          \
+			    &uart_stm32_driver_api);                     \
+                                                                         \
+	STM32_UART_IRQ_HANDLER(index)
 
 DT_INST_FOREACH_STATUS_OKAY(STM32_UART_INIT)

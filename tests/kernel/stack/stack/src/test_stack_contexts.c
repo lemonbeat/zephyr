@@ -63,8 +63,8 @@ static void tstack_thread_thread(struct k_stack *pstack)
 	/**TESTPOINT: thread-thread data passing via stack*/
 	k_tid_t tid = k_thread_create(&thread_data1, threadstack1, STACK_SIZE,
 				      tThread_entry, pstack, NULL, NULL,
-				      K_PRIO_PREEMPT(0), K_USER |
-				      K_INHERIT_PERMS, K_NO_WAIT);
+				      K_PRIO_PREEMPT(0),
+				      K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 	tstack_push(pstack);
 	k_sem_take(&end_sema1, K_FOREVER);
 
@@ -160,9 +160,8 @@ void test_stack_alloc_thread2thread(void)
 	k_sem_init(&end_sema1, 0, 1);
 	/**TESTPOINT: thread-thread data passing via stack*/
 	k_tid_t tid = k_thread_create(&thread_data1, threadstack1, STACK_SIZE,
-					tThread_entry, &kstack_test_alloc,
-					NULL, NULL, K_PRIO_PREEMPT(0), 0,
-					K_NO_WAIT);
+				      tThread_entry, &kstack_test_alloc, NULL,
+				      NULL, K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
 	tstack_push(&kstack_test_alloc);
 	k_sem_take(&end_sema1, K_FOREVER);
 
@@ -174,9 +173,9 @@ void test_stack_alloc_thread2thread(void)
 	k_stack_cleanup(&kstack_test_alloc);
 
 	/** Requested buffer allocation from the test pool.*/
-	ret = k_stack_alloc_init(&kstack_test_alloc, (STACK_SIZE/2)+1);
+	ret = k_stack_alloc_init(&kstack_test_alloc, (STACK_SIZE / 2) + 1);
 	zassert_true(ret == -ENOMEM,
-			"resource pool is smaller then requested buffer");
+		     "resource pool is smaller then requested buffer");
 }
 
 /**

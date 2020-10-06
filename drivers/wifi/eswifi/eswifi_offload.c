@@ -20,10 +20,8 @@ LOG_MODULE_DECLARE(LOG_MODULE_NAME);
 
 #include "eswifi.h"
 
-
 static int eswifi_off_bind(struct net_context *context,
-			   const struct sockaddr *addr,
-			   socklen_t addrlen)
+			   const struct sockaddr *addr, socklen_t addrlen)
 {
 	struct eswifi_off_socket *socket = context->offload_context;
 	struct eswifi_dev *eswifi = eswifi_by_iface_idx(context->iface);
@@ -97,10 +95,8 @@ static void eswifi_off_connect_work(struct k_work *work)
 }
 
 static int eswifi_off_connect(struct net_context *context,
-			      const struct sockaddr *addr,
-			      socklen_t addrlen,
-			      net_context_connect_cb_t cb,
-			      int32_t timeout,
+			      const struct sockaddr *addr, socklen_t addrlen,
+			      net_context_connect_cb_t cb, int32_t timeout,
 			      void *user_data)
 {
 	struct eswifi_off_socket *socket = context->offload_context;
@@ -206,8 +202,8 @@ static int __eswifi_off_send_pkt(struct eswifi_dev *eswifi,
 
 	offset += bytes;
 
-	err = eswifi_request(eswifi, eswifi->buf, offset + 1,
-			     eswifi->buf, sizeof(eswifi->buf));
+	err = eswifi_request(eswifi, eswifi->buf, offset + 1, eswifi->buf,
+			     sizeof(eswifi->buf));
 	if (err < 0) {
 		LOG_ERR("Unable to send data");
 		return -EIO;
@@ -246,10 +242,8 @@ static void eswifi_off_send_work(struct k_work *work)
 	}
 }
 
-static int eswifi_off_send(struct net_pkt *pkt,
-			   net_context_send_cb_t cb,
-			   int32_t timeout,
-			   void *user_data)
+static int eswifi_off_send(struct net_pkt *pkt, net_context_send_cb_t cb,
+			   int32_t timeout, void *user_data)
 {
 	struct eswifi_off_socket *socket = pkt->context->offload_context;
 	struct eswifi_dev *eswifi = eswifi_by_iface_idx(socket->context->iface);
@@ -294,10 +288,8 @@ static int eswifi_off_send(struct net_pkt *pkt,
 }
 
 static int eswifi_off_sendto(struct net_pkt *pkt,
-			     const struct sockaddr *dst_addr,
-			     socklen_t addrlen,
-			     net_context_send_cb_t cb,
-			     int32_t timeout,
+			     const struct sockaddr *dst_addr, socklen_t addrlen,
+			     net_context_send_cb_t cb, int32_t timeout,
 			     void *user_data)
 {
 	struct eswifi_off_socket *socket = pkt->context->offload_context;
@@ -350,14 +342,12 @@ static int eswifi_off_sendto(struct net_pkt *pkt,
 }
 
 static int eswifi_off_recv(struct net_context *context,
-			   net_context_recv_cb_t cb,
-			   int32_t timeout,
+			   net_context_recv_cb_t cb, int32_t timeout,
 			   void *user_data)
 {
 	struct eswifi_off_socket *socket = context->offload_context;
 	struct eswifi_dev *eswifi = eswifi_by_iface_idx(context->iface);
 	int err;
-
 
 	LOG_DBG("");
 
@@ -404,8 +394,7 @@ done:
 	return ret;
 }
 
-static int eswifi_off_get(sa_family_t family,
-			  enum net_sock_type type,
+static int eswifi_off_get(sa_family_t family, enum net_sock_type type,
 			  enum net_ip_protocol ip_proto,
 			  struct net_context **context)
 {
@@ -497,12 +486,11 @@ void eswifi_offload_async_msg(struct eswifi_dev *eswifi, char *msg, size_t len)
 		memcpy(&socket->context->remote, &socket->peer_addr,
 		       sizeof(struct sockaddr));
 
-		LOG_DBG("%u.%u.%u.%u connected to port %u",
-			ip[0], ip[1], ip[2], ip[3], port);
+		LOG_DBG("%u.%u.%u.%u connected to port %u", ip[0], ip[1], ip[2],
+			ip[3], port);
 
 		if (socket->accept_cb) {
-			socket->accept_cb(socket->context,
-					  &socket->peer_addr,
+			socket->accept_cb(socket->context, &socket->peer_addr,
 					  sizeof(struct sockaddr_in), 0,
 					  socket->accept_data);
 		}
@@ -513,15 +501,15 @@ void eswifi_offload_async_msg(struct eswifi_dev *eswifi, char *msg, size_t len)
 }
 
 static struct net_offload eswifi_offload = {
-	.get	       = eswifi_off_get,
-	.bind	       = eswifi_off_bind,
-	.listen	       = eswifi_off_listen,
-	.connect       = eswifi_off_connect,
-	.accept	       = eswifi_off_accept,
-	.send	       = eswifi_off_send,
-	.sendto	       = eswifi_off_sendto,
-	.recv	       = eswifi_off_recv,
-	.put	       = eswifi_off_put,
+	.get = eswifi_off_get,
+	.bind = eswifi_off_bind,
+	.listen = eswifi_off_listen,
+	.connect = eswifi_off_connect,
+	.accept = eswifi_off_accept,
+	.send = eswifi_off_send,
+	.sendto = eswifi_off_sendto,
+	.recv = eswifi_off_recv,
+	.put = eswifi_off_put,
 };
 
 static int eswifi_off_enable_dhcp(struct eswifi_dev *eswifi)

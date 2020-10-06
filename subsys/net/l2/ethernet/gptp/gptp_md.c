@@ -62,10 +62,8 @@ static void gptp_md_follow_up_prepare(struct net_pkt *pkt,
 
 	fup->prec_orig_ts_secs_high =
 		htons(sync_send->precise_orig_ts._sec.high);
-	fup->prec_orig_ts_secs_low =
-		htonl(sync_send->precise_orig_ts._sec.low);
-	fup->prec_orig_ts_nsecs =
-		htonl(sync_send->precise_orig_ts.nanosecond);
+	fup->prec_orig_ts_secs_low = htonl(sync_send->precise_orig_ts._sec.low);
+	fup->prec_orig_ts_nsecs = htonl(sync_send->precise_orig_ts.nanosecond);
 
 	fup->tlv_hdr.type = htons(GPTP_TLV_ORGANIZATION_EXT);
 	fup->tlv_hdr.len = htons(sizeof(struct gptp_follow_up_tlv));
@@ -184,11 +182,10 @@ static void gptp_md_pdelay_check_multiple_resp(int port)
 	port_ds = GPTP_PORT_DS(port);
 
 	if ((state->rcvd_pdelay_resp > 1) ||
-			(state->rcvd_pdelay_follow_up > 1)) {
+	    (state->rcvd_pdelay_follow_up > 1)) {
 		port_ds->as_capable = false;
 		NET_WARN("Too many responses (%d / %d)",
-			 state->rcvd_pdelay_resp,
-			 state->rcvd_pdelay_follow_up);
+			 state->rcvd_pdelay_resp, state->rcvd_pdelay_follow_up);
 		state->multiple_resp_count++;
 	} else {
 		state->multiple_resp_count = 0U;
@@ -200,7 +197,8 @@ static void gptp_md_pdelay_check_multiple_resp(int port)
 		state->pdelay_timer_expired = false;
 
 		/* Subtract time spent since last pDelay request. */
-		duration = GPTP_MULTIPLE_PDELAY_RESP_WAIT -
+		duration =
+			GPTP_MULTIPLE_PDELAY_RESP_WAIT -
 			gptp_uscaled_ns_to_timer_ms(&port_ds->pdelay_req_itv);
 
 		k_timer_start(&state->pdelay_timer, K_MSEC(duration),
@@ -227,8 +225,7 @@ static void gptp_md_compute_pdelay_rate_ratio(int port)
 	/* Get ingress timestamp. */
 	pkt = state->rcvd_pdelay_resp_ptr;
 	if (pkt) {
-		ingress_tstamp =
-			gptp_timestamp_to_nsec(net_pkt_timestamp(pkt));
+		ingress_tstamp = gptp_timestamp_to_nsec(net_pkt_timestamp(pkt));
 	}
 
 	/* Get peer corrected timestamp. */
@@ -261,9 +258,8 @@ static void gptp_md_compute_pdelay_rate_ratio(int port)
 		} else {
 			neighbor_rate_ratio =
 				(resp_evt_tstamp - state->ini_resp_evt_tstamp);
-			neighbor_rate_ratio /=
-				(ingress_tstamp -
-				 state->ini_resp_ingress_tstamp);
+			neighbor_rate_ratio /= (ingress_tstamp -
+						state->ini_resp_ingress_tstamp);
 
 			/* Measure the ratio with the previously sent response.
 			 */
@@ -385,8 +381,7 @@ static void gptp_md_pdelay_compute(int port)
 	hdr = GPTP_HDR(pkt);
 
 	local_clock = !memcmp(gptp_domain.default_ds.clk_id,
-			      hdr->port_id.clk_id,
-			      GPTP_CLOCK_ID_LEN);
+			      hdr->port_id.clk_id, GPTP_CLOCK_ID_LEN);
 	if (local_clock) {
 		NET_WARN("Discard path delay response from local clock.");
 		goto out;
@@ -442,7 +437,8 @@ static void gptp_md_pdelay_req_timeout(struct k_timer *timer)
 			state->pdelay_timer_expired = true;
 
 			if (state->rcvd_pdelay_resp == 0U) {
-				GPTP_STATS_INC(port,
+				GPTP_STATS_INC(
+					port,
 					pdelay_allowed_lost_resp_exceed_count);
 			}
 		}
@@ -474,8 +470,8 @@ static void gptp_md_follow_up_receipt_timeout(struct k_timer *timer)
 	for (port = GPTP_PORT_START; port < GPTP_PORT_END; port++) {
 		state = &GPTP_PORT_STATE(port)->sync_rcv;
 		if (timer == &state->follow_up_discard_timer) {
-			NET_WARN("No %s received after %s message",
-				 "FOLLOWUP", "SYNC");
+			NET_WARN("No %s received after %s message", "FOLLOWUP",
+				 "SYNC");
 			state->follow_up_timeout_expired = true;
 		}
 	}
@@ -636,7 +632,7 @@ static void gptp_md_pdelay_req_state_machine(int port)
 		state->pdelay_timer_expired = false;
 		k_timer_start(&state->pdelay_timer,
 			      K_MSEC(gptp_uscaled_ns_to_timer_ms(
-					     &port_ds->pdelay_req_itv)),
+				      &port_ds->pdelay_req_itv)),
 			      K_NO_WAIT);
 		/*
 		 * Transition directly to GPTP_PDELAY_REQ_WAIT_RESP.
@@ -716,7 +712,6 @@ static void gptp_md_pdelay_resp_state_machine(int port)
 		/* Handled in gptp_follow_up_callback. */
 		break;
 	}
-
 }
 
 static void gptp_md_sync_receive_state_machine(int port)
@@ -786,9 +781,8 @@ static void gptp_md_sync_receive_state_machine(int port)
 			gptp_handle_sync(port, state->rcvd_sync_ptr);
 			state->rcvd_sync = false;
 		} else if (state->rcvd_follow_up) {
-			if (!gptp_handle_follow_up(
-				    port, state->rcvd_follow_up_ptr)) {
-
+			if (!gptp_handle_follow_up(port,
+						   state->rcvd_follow_up_ptr)) {
 				/*
 				 * Fill the structure to be sent to
 				 * PortSyncSyncReceive.
@@ -850,8 +844,7 @@ static void gptp_md_sync_send_state_machine(int port)
 			if (pkt) {
 				/* Reference message to track timestamp info */
 				state->sync_ptr = net_pkt_ref(pkt);
-				gptp_md_sync_prepare(pkt,
-						     state->sync_send_ptr,
+				gptp_md_sync_prepare(pkt, state->sync_send_ptr,
 						     port);
 				gptp_send_sync(port, pkt);
 			}
@@ -873,9 +866,8 @@ static void gptp_md_sync_send_state_machine(int port)
 
 			pkt = gptp_prepare_follow_up(port, state->sync_ptr);
 			if (pkt) {
-				gptp_md_follow_up_prepare(pkt,
-							 state->sync_send_ptr,
-							 port);
+				gptp_md_follow_up_prepare(
+					pkt, state->sync_send_ptr, port);
 				gptp_send_follow_up(port, pkt);
 			}
 

@@ -32,11 +32,9 @@ static struct sockaddr_in *in4_addr_my;
 
 const struct shell *tcp_shell;
 
-static void tcp_received(struct net_context *context,
-			 struct net_pkt *pkt,
+static void tcp_received(struct net_context *context, struct net_pkt *pkt,
 			 union net_ip_header *ip_hdr,
-			 union net_proto_header *proto_hdr,
-			 int status,
+			 union net_proto_header *proto_hdr, int status,
 			 void *user_data)
 {
 	const struct shell *shell = tcp_shell;
@@ -60,8 +58,7 @@ static void tcp_received(struct net_context *context,
 	case STATE_COMPLETED:
 		break;
 	case STATE_NULL:
-		shell_fprintf(shell, SHELL_NORMAL,
-			      "New TCP session started\n");
+		shell_fprintf(shell, SHELL_NORMAL, "New TCP session started\n");
 		zperf_reset_session_stats(session);
 		session->start_time = k_cycle_get_32();
 		session->state = STATE_ONGOING;
@@ -82,11 +79,10 @@ static void tcp_received(struct net_context *context,
 
 			/* Compute baud rate */
 			if (duration != 0U) {
-				rate_in_kbps = (uint32_t)
-					(((uint64_t)session->length *
-					  (uint64_t)8 *
-					  (uint64_t)USEC_PER_SEC) /
-					 ((uint64_t)duration * 1024U));
+				rate_in_kbps = (uint32_t)(
+					((uint64_t)session->length *
+					 (uint64_t)8 * (uint64_t)USEC_PER_SEC) /
+					((uint64_t)duration * 1024U));
 			} else {
 				rate_in_kbps = 0U;
 			}
@@ -94,8 +90,7 @@ static void tcp_received(struct net_context *context,
 			shell_fprintf(shell, SHELL_NORMAL,
 				      "TCP session ended\n");
 
-			shell_fprintf(shell, SHELL_NORMAL,
-				      " Duration:\t\t");
+			shell_fprintf(shell, SHELL_NORMAL, " Duration:\t\t");
 			print_number(shell, duration, TIME_US, TIME_US_UNIT);
 			shell_fprintf(shell, SHELL_NORMAL, "\n");
 
@@ -120,11 +115,8 @@ static void tcp_received(struct net_context *context,
 	}
 }
 
-static void tcp_accepted(struct net_context *context,
-			 struct sockaddr *addr,
-			 socklen_t addrlen,
-			 int error,
-			 void *user_data)
+static void tcp_accepted(struct net_context *context, struct sockaddr *addr,
+			 socklen_t addrlen, int error, void *user_data)
 {
 	const struct shell *shell = user_data;
 	int ret;
@@ -166,7 +158,7 @@ void zperf_tcp_receiver_init(const struct shell *shell, int port)
 				      &context4);
 		if (ret < 0) {
 			shell_fprintf(shell, SHELL_WARNING,
-				     "Cannot get IPv4 TCP network context.\n");
+				      "Cannot get IPv4 TCP network context.\n");
 			return;
 		}
 
@@ -183,12 +175,13 @@ void zperf_tcp_receiver_init(const struct shell *shell, int port)
 			/* Use existing IP */
 			in4_addr = zperf_get_default_if_in4_addr();
 			if (!in4_addr) {
-				shell_fprintf(shell, SHELL_WARNING,
-					      "Unable to get IPv4 by default\n");
+				shell_fprintf(
+					shell, SHELL_WARNING,
+					"Unable to get IPv4 by default\n");
 				return;
 			}
 			memcpy(&in4_addr_my->sin_addr, in4_addr,
-				sizeof(struct in_addr));
+			       sizeof(struct in_addr));
 		}
 
 		shell_fprintf(shell, SHELL_NORMAL, "Binding to %s\n",
@@ -202,7 +195,7 @@ void zperf_tcp_receiver_init(const struct shell *shell, int port)
 				      &context6);
 		if (ret < 0) {
 			shell_fprintf(shell, SHELL_WARNING,
-				     "Cannot get IPv6 TCP network context.\n");
+				      "Cannot get IPv6 TCP network context.\n");
 			return;
 		}
 
@@ -220,12 +213,13 @@ void zperf_tcp_receiver_init(const struct shell *shell, int port)
 			/* Use existing IP */
 			in6_addr = zperf_get_default_if_in6_addr();
 			if (!in6_addr) {
-				shell_fprintf(shell, SHELL_WARNING,
-					      "Unable to get IPv4 by default\n");
+				shell_fprintf(
+					shell, SHELL_WARNING,
+					"Unable to get IPv4 by default\n");
 				return;
 			}
 			memcpy(&in6_addr_my->sin6_addr, in6_addr,
-				sizeof(struct in6_addr));
+			       sizeof(struct in6_addr));
 		}
 
 		shell_fprintf(shell, SHELL_NORMAL, "Binding to %s\n",
@@ -235,8 +229,7 @@ void zperf_tcp_receiver_init(const struct shell *shell, int port)
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV6) && context6) {
-		ret = net_context_bind(context6,
-				       (struct sockaddr *)in6_addr_my,
+		ret = net_context_bind(context6, (struct sockaddr *)in6_addr_my,
 				       sizeof(struct sockaddr_in6));
 		if (ret < 0) {
 			shell_fprintf(shell, SHELL_WARNING,
@@ -263,8 +256,7 @@ void zperf_tcp_receiver_init(const struct shell *shell, int port)
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV4) && context4) {
-		ret = net_context_bind(context4,
-				       (struct sockaddr *)in4_addr_my,
+		ret = net_context_bind(context4, (struct sockaddr *)in4_addr_my,
 				       sizeof(struct sockaddr_in));
 		if (ret < 0) {
 			shell_fprintf(shell, SHELL_WARNING,
@@ -290,8 +282,7 @@ void zperf_tcp_receiver_init(const struct shell *shell, int port)
 		}
 	}
 
-	shell_fprintf(shell, SHELL_NORMAL,
-		      "Listening on port %d\n", port);
+	shell_fprintf(shell, SHELL_NORMAL, "Listening on port %d\n", port);
 
 	zperf_tcp_started();
 	init_done = true;

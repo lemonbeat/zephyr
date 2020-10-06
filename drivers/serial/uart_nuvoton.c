@@ -12,14 +12,11 @@
 #define DT_DRV_COMPAT nuvoton_numicro_uart
 
 /* Device data structure */
-#define DEV_CFG(dev)						\
-	((const struct uart_numicro_config * const)(dev)->config)
+#define DEV_CFG(dev) ((const struct uart_numicro_config *const)(dev)->config)
 
-#define DRV_DATA(dev)						\
-	((struct uart_numicro_data * const)(dev)->data)
+#define DRV_DATA(dev) ((struct uart_numicro_data *const)(dev)->data)
 
-#define UART_STRUCT(dev)					\
-	((UART_T *)(DEV_CFG(dev))->devcfg.base)
+#define UART_STRUCT(dev) ((UART_T *)(DEV_CFG(dev))->devcfg.base)
 
 struct uart_numicro_config {
 	struct uart_device_config devcfg;
@@ -54,7 +51,8 @@ static int uart_numicro_err_check(const struct device *dev)
 	return 0;
 }
 
-static inline int32_t uart_numicro_convert_stopbit(enum uart_config_stop_bits sb)
+static inline int32_t
+uart_numicro_convert_stopbit(enum uart_config_stop_bits sb)
 {
 	switch (sb) {
 	case UART_CFG_STOP_BITS_1:
@@ -68,7 +66,8 @@ static inline int32_t uart_numicro_convert_stopbit(enum uart_config_stop_bits sb
 	}
 };
 
-static inline int32_t uart_numicro_convert_datalen(enum uart_config_data_bits db)
+static inline int32_t
+uart_numicro_convert_datalen(enum uart_config_data_bits db)
 {
 	switch (db) {
 	case UART_CFG_DATA_BITS_5:
@@ -84,7 +83,8 @@ static inline int32_t uart_numicro_convert_datalen(enum uart_config_data_bits db
 	}
 }
 
-static inline uint32_t uart_numicro_convert_parity(enum uart_config_parity parity)
+static inline uint32_t
+uart_numicro_convert_parity(enum uart_config_parity parity)
 {
 	switch (parity) {
 	case UART_CFG_PARITY_ODD:
@@ -128,8 +128,8 @@ static int uart_numicro_configure(const struct device *dev,
 
 	parity = uart_numicro_convert_parity(cfg->parity);
 
-	UART_SetLineConfig(UART_STRUCT(dev), cfg->baudrate, databits,
-			   parity, stopbits);
+	UART_SetLineConfig(UART_STRUCT(dev), cfg->baudrate, databits, parity,
+			   stopbits);
 
 	memcpy(&ddata->ucfg, cfg, sizeof(*cfg));
 
@@ -175,34 +175,33 @@ static int uart_numicro_init(const struct device *dev)
 }
 
 static const struct uart_driver_api uart_numicro_driver_api = {
-	.poll_in          = uart_numicro_poll_in,
-	.poll_out         = uart_numicro_poll_out,
-	.err_check        = uart_numicro_err_check,
-	.configure        = uart_numicro_configure,
-	.config_get       = uart_numicro_config_get,
+	.poll_in = uart_numicro_poll_in,
+	.poll_out = uart_numicro_poll_out,
+	.err_check = uart_numicro_err_check,
+	.configure = uart_numicro_configure,
+	.config_get = uart_numicro_config_get,
 };
 
-#define NUMICRO_INIT(index)						\
-									\
-static const struct uart_numicro_config uart_numicro_cfg_##index = {	\
+#define NUMICRO_INIT(index)                                                    \
+                                                                               \
+	static const struct uart_numicro_config uart_numicro_cfg_##index = {	\
 	.devcfg = {							\
 		.base = (uint8_t *)DT_INST_REG_ADDR(index),		\
 	},								\
 	.id_rst = UART##index##_RST,					\
 	.id_clk = UART##index##_MODULE,					\
-};									\
-									\
-static struct uart_numicro_data uart_numicro_data_##index = {		\
+}; \
+                                                                               \
+	static struct uart_numicro_data uart_numicro_data_##index = {		\
 	.ucfg = {							\
 		.baudrate = DT_INST_PROP(index, current_speed),		\
 	},								\
-};									\
-									\
-DEVICE_AND_API_INIT(uart_numicro_##index, DT_INST_LABEL(index),		\
-		    &uart_numicro_init,					\
-		    &uart_numicro_data_##index,				\
-		    &uart_numicro_cfg_##index,				\
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,	\
-		    &uart_numicro_driver_api);
+};       \
+                                                                               \
+	DEVICE_AND_API_INIT(uart_numicro_##index, DT_INST_LABEL(index),        \
+			    &uart_numicro_init, &uart_numicro_data_##index,    \
+			    &uart_numicro_cfg_##index, PRE_KERNEL_1,           \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,                \
+			    &uart_numicro_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(NUMICRO_INIT)

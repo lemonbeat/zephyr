@@ -22,18 +22,15 @@ struct npcx_pcc_config {
 };
 
 /* Driver convenience defines */
-#define DRV_CONFIG(dev) \
-	((const struct npcx_pcc_config *)(dev)->config)
+#define DRV_CONFIG(dev) ((const struct npcx_pcc_config *)(dev)->config)
 
-#define HAL_CDCG_INST(dev) \
-	(struct cdcg_reg *)(DRV_CONFIG(dev)->base_cdcg)
+#define HAL_CDCG_INST(dev) (struct cdcg_reg *)(DRV_CONFIG(dev)->base_cdcg)
 
-#define HAL_PMC_INST(dev) \
-	(struct pmc_reg *)(DRV_CONFIG(dev)->base_pmc)
+#define HAL_PMC_INST(dev) (struct pmc_reg *)(DRV_CONFIG(dev)->base_pmc)
 
 /* Clock controller local functions */
 static inline int npcx_clock_control_on(const struct device *dev,
-					 clock_control_subsys_t sub_system)
+					clock_control_subsys_t sub_system)
 {
 	ARG_UNUSED(dev);
 	struct npcx_clk_cfg *clk_cfg = (struct npcx_clk_cfg *)(sub_system);
@@ -45,7 +42,7 @@ static inline int npcx_clock_control_on(const struct device *dev,
 }
 
 static inline int npcx_clock_control_off(const struct device *dev,
-					  clock_control_subsys_t sub_system)
+					 clock_control_subsys_t sub_system)
 {
 	ARG_UNUSED(dev);
 	struct npcx_clk_cfg *clk_cfg = (struct npcx_clk_cfg *)(sub_system);
@@ -74,10 +71,10 @@ static int npcx_clock_control_get_subsys_rate(const struct device *dev,
 		*rate = NPCX_APB_CLOCK(3);
 		break;
 	case NPCX_CLOCK_BUS_AHB6:
-		*rate = CORE_CLK/(AHB6DIV_VAL + 1);
+		*rate = CORE_CLK / (AHB6DIV_VAL + 1);
 		break;
 	case NPCX_CLOCK_BUS_FIU:
-		*rate = CORE_CLK/(FIUDIV_VAL + 1);
+		*rate = CORE_CLK / (FIUDIV_VAL + 1);
 		break;
 	case NPCX_CLOCK_BUS_CORE:
 		*rate = CORE_CLK;
@@ -111,13 +108,13 @@ static int npcx_clock_control_init(const struct device *dev)
 	 * unstable for a little which can affect peripheral communication like
 	 * eSPI. Skip this if not needed.
 	 */
-	if (inst_cdcg->HFCGN != HFCGN_VAL || inst_cdcg->HFCGML != HFCGML_VAL
-			|| inst_cdcg->HFCGMH != HFCGMH_VAL) {
+	if (inst_cdcg->HFCGN != HFCGN_VAL || inst_cdcg->HFCGML != HFCGML_VAL ||
+	    inst_cdcg->HFCGMH != HFCGMH_VAL) {
 		/*
 		 * Configure frequency multiplier M/N values according to
 		 * the requested OSC_CLK (Unit:Hz).
 		 */
-		inst_cdcg->HFCGN  = HFCGN_VAL;
+		inst_cdcg->HFCGN = HFCGN_VAL;
 		inst_cdcg->HFCGML = HFCGML_VAL;
 		inst_cdcg->HFCGMH = HFCGMH_VAL;
 
@@ -129,8 +126,8 @@ static int npcx_clock_control_init(const struct device *dev)
 	}
 
 	/* Set all clock prescalers of core and peripherals. */
-	inst_cdcg->HFCGP   = ((FPRED_VAL << 4) | AHB6DIV_VAL);
-	inst_cdcg->HFCBCD  = (FIUDIV_VAL << 4);
+	inst_cdcg->HFCGP = ((FPRED_VAL << 4) | AHB6DIV_VAL);
+	inst_cdcg->HFCBCD = (FIUDIV_VAL << 4);
 	inst_cdcg->HFCBCD1 = (APB1DIV_VAL | (APB2DIV_VAL << 4));
 	inst_cdcg->HFCBCD2 = APB3DIV_VAL;
 
@@ -151,12 +148,10 @@ static int npcx_clock_control_init(const struct device *dev)
 
 const struct npcx_pcc_config pcc_config = {
 	.base_cdcg = DT_INST_REG_ADDR_BY_NAME(0, cdcg),
-	.base_pmc  = DT_INST_REG_ADDR_BY_NAME(0, pmc),
+	.base_pmc = DT_INST_REG_ADDR_BY_NAME(0, pmc),
 };
 
-DEVICE_AND_API_INIT(npcx_cdcg, NPCX_CLK_CTRL_NAME,
-		    &npcx_clock_control_init,
-		    NULL, &pcc_config,
-		    PRE_KERNEL_1,
+DEVICE_AND_API_INIT(npcx_cdcg, NPCX_CLK_CTRL_NAME, &npcx_clock_control_init,
+		    NULL, &pcc_config, PRE_KERNEL_1,
 		    CONFIG_KERNEL_INIT_PRIORITY_OBJECTS,
 		    &npcx_clock_control_api);

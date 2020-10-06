@@ -17,8 +17,7 @@ LOG_MODULE_REGISTER(net_mqtt_rx, CONFIG_MQTT_LOG_LEVEL);
  */
 
 static int mqtt_handle_packet(struct mqtt_client *client,
-			      uint8_t type_and_flags,
-			      uint32_t var_length,
+			      uint8_t type_and_flags, uint32_t var_length,
 			      struct buf_ctx *buf)
 {
 	int err_code = 0;
@@ -39,7 +38,7 @@ static int mqtt_handle_packet(struct mqtt_client *client,
 				 evt.param.connack.return_code);
 
 			if (evt.param.connack.return_code ==
-						MQTT_CONNECTION_ACCEPTED) {
+			    MQTT_CONNECTION_ACCEPTED) {
 				/* Set state. */
 				MQTT_SET_STATE(client, MQTT_STATE_CONNECTED);
 			} else {
@@ -62,7 +61,7 @@ static int mqtt_handle_packet(struct mqtt_client *client,
 		evt.result = err_code;
 
 		client->internal.remaining_payload =
-					evt.param.publish.message.payload.len;
+			evt.param.publish.message.payload.len;
 
 		MQTT_TRC("PUB QoS:%02x, message len %08x, topic len %08x",
 			 evt.param.publish.message.topic.qos,
@@ -217,8 +216,7 @@ static int mqtt_read_publish_var_header(struct mqtt_client *client,
 	}
 
 	/* Now we can read the whole header. */
-	err_code = mqtt_read_message_chunk(client, buf,
-					   variable_header_length);
+	err_code = mqtt_read_message_chunk(client, buf, variable_header_length);
 	if (err_code < 0) {
 		return err_code;
 	}

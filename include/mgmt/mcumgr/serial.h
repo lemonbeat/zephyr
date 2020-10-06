@@ -65,14 +65,14 @@
 extern "C" {
 #endif
 
-#define MCUMGR_SERIAL_HDR_PKT       0x0609
-#define MCUMGR_SERIAL_HDR_FRAG      0x0414
-#define MCUMGR_SERIAL_MAX_FRAME     128
+#define MCUMGR_SERIAL_HDR_PKT 0x0609
+#define MCUMGR_SERIAL_HDR_FRAG 0x0414
+#define MCUMGR_SERIAL_MAX_FRAME 128
 
-#define MCUMGR_SERIAL_HDR_PKT_1     (MCUMGR_SERIAL_HDR_PKT >> 8)
-#define MCUMGR_SERIAL_HDR_PKT_2     (MCUMGR_SERIAL_HDR_PKT & 0xff)
-#define MCUMGR_SERIAL_HDR_FRAG_1    (MCUMGR_SERIAL_HDR_FRAG >> 8)
-#define MCUMGR_SERIAL_HDR_FRAG_2    (MCUMGR_SERIAL_HDR_FRAG & 0xff)
+#define MCUMGR_SERIAL_HDR_PKT_1 (MCUMGR_SERIAL_HDR_PKT >> 8)
+#define MCUMGR_SERIAL_HDR_PKT_2 (MCUMGR_SERIAL_HDR_PKT & 0xff)
+#define MCUMGR_SERIAL_HDR_FRAG_1 (MCUMGR_SERIAL_HDR_FRAG >> 8)
+#define MCUMGR_SERIAL_HDR_FRAG_2 (MCUMGR_SERIAL_HDR_FRAG & 0xff)
 
 /**
  * @brief Maintains state for an incoming mcumgr request packet.
@@ -117,9 +117,9 @@ typedef int (*mcumgr_serial_tx_cb)(const void *data, int len, void *arg);
  *                                  received.
  *                              NULL if the packet is incomplete or invalid.
  */
-struct net_buf *mcumgr_serial_process_frag(
-	struct mcumgr_serial_rx_ctxt *rx_ctxt,
-	const uint8_t *frag, int frag_len);
+struct net_buf *
+mcumgr_serial_process_frag(struct mcumgr_serial_rx_ctxt *rx_ctxt,
+			   const uint8_t *frag, int frag_len);
 
 /**
  * @brief Encodes and transmits an mcumgr packet over serial.

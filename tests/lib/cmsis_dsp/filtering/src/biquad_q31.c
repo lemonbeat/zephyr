@@ -13,11 +13,11 @@
 
 #include "biquad_q31.pat"
 
-#define SNR_ERROR_THRESH		((float32_t)115)
-#define ABS_ERROR_THRESH_Q31		((q31_t)1000)
+#define SNR_ERROR_THRESH ((float32_t)115)
+#define ABS_ERROR_THRESH_Q31 ((q31_t)1000)
 
-#define SNR_ERROR_THRESH_32x64		((float32_t)140)
-#define ABS_ERROR_THRESH_Q31_32x64	((q31_t)25)
+#define SNR_ERROR_THRESH_32x64 ((float32_t)140)
+#define ABS_ERROR_THRESH_Q31_32x64 ((q31_t)25)
 
 static void test_arm_biquad_cascade_df1_q31(void)
 {
@@ -53,14 +53,13 @@ static void test_arm_biquad_cascade_df1_q31(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output_buf, ref,
-			ABS_ERROR_THRESH_Q31),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output_buf, ref,
+					 ABS_ERROR_THRESH_Q31),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -102,15 +101,13 @@ static void test_arm_biquad_cascade_df1_32x64_q31(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output_buf, ref,
-			SNR_ERROR_THRESH_32x64),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output_buf, ref,
+					SNR_ERROR_THRESH_32x64),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output_buf, ref,
-			ABS_ERROR_THRESH_Q31_32x64),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output_buf, ref,
+					 ABS_ERROR_THRESH_Q31_32x64),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -119,10 +116,10 @@ static void test_arm_biquad_cascade_df1_32x64_q31(void)
 
 void test_filtering_biquad_q31(void)
 {
-	ztest_test_suite(filtering_biquad_q31,
+	ztest_test_suite(
+		filtering_biquad_q31,
 		ztest_unit_test(test_arm_biquad_cascade_df1_q31),
-		ztest_unit_test(test_arm_biquad_cascade_df1_32x64_q31)
-		);
+		ztest_unit_test(test_arm_biquad_cascade_df1_32x64_q31));
 
 	ztest_run_test_suite(filtering_biquad_q31);
 }

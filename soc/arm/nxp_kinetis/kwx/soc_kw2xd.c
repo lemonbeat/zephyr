@@ -16,15 +16,15 @@
 #include <arch/cpu.h>
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
 
-#define PLLFLLSEL_MCGFLLCLK	(0)
-#define PLLFLLSEL_MCGPLLCLK	(1)
-#define PLLFLLSEL_IRC48MHZ	(3)
+#define PLLFLLSEL_MCGFLLCLK (0)
+#define PLLFLLSEL_MCGPLLCLK (1)
+#define PLLFLLSEL_IRC48MHZ (3)
 
-#define ER32KSEL_OSC32KCLK	(0)
-#define ER32KSEL_RTC		(2)
-#define ER32KSEL_LPO1KHZ	(3)
+#define ER32KSEL_OSC32KCLK (0)
+#define ER32KSEL_RTC (2)
+#define ER32KSEL_LPO1KHZ (3)
 
-#define TIMESRC_OSCERCLK        (2)
+#define TIMESRC_OSCERCLK (2)
 
 static const osc_config_t oscConfig = {
 	.freq = CONFIG_OSC_XTAL0_FREQ,
@@ -43,7 +43,7 @@ static const osc_config_t oscConfig = {
 	.oscerConfig = {
 		.enableMode = kOSC_ErClkEnable | kOSC_ErClkEnableInStop,
 #if (defined(FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER) && \
-	FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
+     FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
 		.erclkDiv = 0U,
 #endif
 	},
@@ -57,7 +57,7 @@ static const mcg_pll_config_t pll0Config = {
 
 static const sim_clock_config_t simConfig = {
 	.pllFllSel = PLLFLLSEL_MCGPLLCLK, /* PLLFLLSEL select PLL. */
-	.er32kSrc = ER32KSEL_RTC,         /* ERCLK32K selection, use RTC. */
+	.er32kSrc = ER32KSEL_RTC, /* ERCLK32K selection, use RTC. */
 	.clkdiv1 = SIM_CLKDIV1_OUTDIV1(CONFIG_KW2XD_CORE_CLOCK_DIVIDER - 1) |
 		   SIM_CLKDIV1_OUTDIV2(CONFIG_KW2XD_BUS_CLOCK_DIVIDER - 1) |
 		   SIM_CLKDIV1_OUTDIV4(CONFIG_KW2XD_FLASH_CLOCK_DIVIDER - 1),

@@ -37,15 +37,15 @@
 #endif
 
 #ifdef _LINKER
-#define Z_LINK_ITERABLE(struct_type) \
-	_CONCAT(_##struct_type, _list_start) = .; \
+#define Z_LINK_ITERABLE(struct_type)                     \
+	_CONCAT(_##struct_type, _list_start) =.;         \
 	KEEP(*(SORT_BY_NAME(._##struct_type.static.*))); \
-	_CONCAT(_##struct_type, _list_end) = .
+	_CONCAT(_##struct_type, _list_end) =.
 
-#define Z_LINK_ITERABLE_GC_ALLOWED(struct_type) \
-	_CONCAT(_##struct_type, _list_start) = .; \
+#define Z_LINK_ITERABLE_GC_ALLOWED(struct_type)    \
+	_CONCAT(_##struct_type, _list_start) =.;   \
 	*(SORT_BY_NAME(._##struct_type.static.*)); \
-	_CONCAT(_##struct_type, _list_end) = .
+	_CONCAT(_##struct_type, _list_end) =.
 
 /* Define an output section which will set up an iterable area
  * of equally-sized data structures. For use with Z_STRUCT_SECTION_ITERABLE.
@@ -57,11 +57,12 @@
  * they are not being directly referenced. Use this when symbols
  * are indirectly referenced by iterating through the section.
  */
-#define Z_ITERABLE_SECTION_ROM(struct_type, subalign) \
-	SECTION_PROLOGUE(struct_type##_area,,SUBALIGN(subalign)) \
-	{ \
-		Z_LINK_ITERABLE(struct_type); \
-	} GROUP_LINK_IN(ROMABLE_REGION)
+#define Z_ITERABLE_SECTION_ROM(struct_type, subalign)              \
+	SECTION_PROLOGUE(struct_type##_area, , SUBALIGN(subalign)) \
+	{                                                          \
+		Z_LINK_ITERABLE(struct_type);                      \
+	}                                                          \
+	GROUP_LINK_IN(ROMABLE_REGION)
 
 /* Define an output section which will set up an iterable area
  * of equally-sized data structures. For use with Z_STRUCT_SECTION_ITERABLE.
@@ -71,11 +72,12 @@
  *
  * Note that the symbols within the section can be garbage collected.
  */
-#define Z_ITERABLE_SECTION_ROM_GC_ALLOWED(struct_type, subalign) \
-	SECTION_PROLOGUE(struct_type##_area,,SUBALIGN(subalign)) \
-	{ \
-		Z_LINK_ITERABLE_GC_ALLOWED(struct_type); \
-	} GROUP_LINK_IN(ROMABLE_REGION)
+#define Z_ITERABLE_SECTION_ROM_GC_ALLOWED(struct_type, subalign)   \
+	SECTION_PROLOGUE(struct_type##_area, , SUBALIGN(subalign)) \
+	{                                                          \
+		Z_LINK_ITERABLE_GC_ALLOWED(struct_type);           \
+	}                                                          \
+	GROUP_LINK_IN(ROMABLE_REGION)
 
 /* Define an output section which will set up an iterable area
  * of equally-sized data structures. For use with Z_STRUCT_SECTION_ITERABLE.
@@ -87,12 +89,12 @@
  * they are not being directly referenced. Use this when symbols
  * are indirectly referenced by iterating through the section.
  */
-#define Z_ITERABLE_SECTION_RAM(struct_type, subalign) \
-	SECTION_DATA_PROLOGUE(struct_type##_area,,SUBALIGN(subalign)) \
-	{ \
-		Z_LINK_ITERABLE(struct_type); \
-	} GROUP_DATA_LINK_IN(RAMABLE_REGION, ROMABLE_REGION)
-
+#define Z_ITERABLE_SECTION_RAM(struct_type, subalign)                   \
+	SECTION_DATA_PROLOGUE(struct_type##_area, , SUBALIGN(subalign)) \
+	{                                                               \
+		Z_LINK_ITERABLE(struct_type);                           \
+	}                                                               \
+	GROUP_DATA_LINK_IN(RAMABLE_REGION, ROMABLE_REGION)
 
 /* Define an output section which will set up an iterable area
  * of equally-sized data structures. For use with Z_STRUCT_SECTION_ITERABLE.
@@ -102,11 +104,12 @@
  *
  * Note that the symbols within the section can be garbage collected.
  */
-#define Z_ITERABLE_SECTION_RAM_GC_ALLOWED(struct_type, subalign) \
-	SECTION_DATA_PROLOGUE(struct_type##_area,,SUBALIGN(subalign)) \
-	{ \
-		Z_LINK_ITERABLE_GC_ALLOWED(struct_type); \
-	} GROUP_DATA_LINK_IN(RAMABLE_REGION, ROMABLE_REGION)
+#define Z_ITERABLE_SECTION_RAM_GC_ALLOWED(struct_type, subalign)        \
+	SECTION_DATA_PROLOGUE(struct_type##_area, , SUBALIGN(subalign)) \
+	{                                                               \
+		Z_LINK_ITERABLE_GC_ALLOWED(struct_type);                \
+	}                                                               \
+	GROUP_DATA_LINK_IN(RAMABLE_REGION, ROMABLE_REGION)
 
 /*
  * generate a symbol to mark the start of the objects array for
@@ -114,10 +117,10 @@
  * (sorted by priority). Ensure the objects aren't discarded if there is
  * no direct reference to them
  */
-#define CREATE_OBJ_LEVEL(object, level)				\
-		__##object##_##level##_start = .;		\
-		KEEP(*(SORT(.object##_##level[0-9]*)));		\
-		KEEP(*(SORT(.object##_##level[1-9][0-9]*)));
+#define CREATE_OBJ_LEVEL(object, level)            \
+	__##object##_##level##_start =.;           \
+	KEEP(*(SORT(.object##_##level[0 - 9] *))); \
+	KEEP(*(SORT(.object##_##level[1 - 9][0 - 9] *)));
 
 /*
  * link in shell initialization objects for all modules that use shell and
@@ -213,7 +216,7 @@ extern char __vector_relay_table[];
 extern char __gcov_bss_start[];
 extern char __gcov_bss_end[];
 extern char __gcov_bss_size[];
-#endif	/* CONFIG_COVERAGE_GCOV */
+#endif /* CONFIG_COVERAGE_GCOV */
 
 /* end address of image, used by newlib for the heap */
 extern char _end[];

@@ -35,8 +35,9 @@ static off_t lba_to_address(uint32_t sector_num)
 
 	flash_addr = CONFIG_DISK_FLASH_START + sector_num * SECTOR_SIZE;
 
-	__ASSERT(flash_addr < (CONFIG_DISK_FLASH_START +
-		CONFIG_DISK_VOLUME_SIZE), "FS bound error");
+	__ASSERT(flash_addr <
+			 (CONFIG_DISK_FLASH_START + CONFIG_DISK_VOLUME_SIZE),
+		 "FS bound error");
 
 	return flash_addr;
 }
@@ -65,7 +66,7 @@ static int disk_flash_access_init(struct disk_info *disk)
 }
 
 static int disk_flash_access_read(struct disk_info *disk, uint8_t *buff,
-				uint32_t start_sector, uint32_t sector_count)
+				  uint32_t start_sector, uint32_t sector_count)
 {
 	off_t fl_addr;
 	uint32_t remaining;
@@ -97,8 +98,7 @@ static int disk_flash_access_read(struct disk_info *disk, uint8_t *buff,
 
 /* This performs read-copy into an output buffer */
 static int read_copy_flash_block(off_t start_addr, uint32_t size,
-				 const void *src_buff,
-				 uint8_t *dest_buff)
+				 const void *src_buff, uint8_t *dest_buff)
 {
 	off_t fl_addr;
 	uint32_t num_read;
@@ -161,8 +161,8 @@ static int update_flash_block(off_t start_addr, uint32_t size, const void *buff)
 
 	/* disable write-protection first before erase */
 	flash_write_protection_set(flash_dev, false);
-	if (flash_erase(flash_dev, fl_addr, CONFIG_DISK_ERASE_BLOCK_SIZE)
-			!= 0) {
+	if (flash_erase(flash_dev, fl_addr, CONFIG_DISK_ERASE_BLOCK_SIZE) !=
+	    0) {
 		return -EIO;
 	}
 
@@ -187,7 +187,7 @@ static int update_flash_block(off_t start_addr, uint32_t size, const void *buff)
 }
 
 static int disk_flash_access_write(struct disk_info *disk, const uint8_t *buff,
-				 uint32_t start_sector, uint32_t sector_count)
+				   uint32_t start_sector, uint32_t sector_count)
 {
 	off_t fl_addr;
 	uint32_t remaining;
@@ -214,7 +214,7 @@ static int disk_flash_access_write(struct disk_info *disk, const uint8_t *buff,
 
 		/* write goes over block boundary */
 		size = GET_SIZE_TO_BOUNDARY(fl_addr,
-						CONFIG_DISK_ERASE_BLOCK_SIZE);
+					    CONFIG_DISK_ERASE_BLOCK_SIZE);
 
 		/* write first partial block */
 		if (update_flash_block(fl_addr, size, buff) != 0) {
@@ -235,7 +235,7 @@ static int disk_flash_access_write(struct disk_info *disk, const uint8_t *buff,
 		}
 
 		rc = update_flash_block(fl_addr, CONFIG_DISK_ERASE_BLOCK_SIZE,
-					 buff);
+					buff);
 		if (rc != 0) {
 			return -EIO;
 		}
@@ -255,7 +255,8 @@ static int disk_flash_access_write(struct disk_info *disk, const uint8_t *buff,
 	return 0;
 }
 
-static int disk_flash_access_ioctl(struct disk_info *disk, uint8_t cmd, void *buff)
+static int disk_flash_access_ioctl(struct disk_info *disk, uint8_t cmd,
+				   void *buff)
 {
 	switch (cmd) {
 	case DISK_IOCTL_CTRL_SYNC:
@@ -264,7 +265,7 @@ static int disk_flash_access_ioctl(struct disk_info *disk, uint8_t cmd, void *bu
 		*(uint32_t *)buff = CONFIG_DISK_VOLUME_SIZE / SECTOR_SIZE;
 		return 0;
 	case DISK_IOCTL_GET_SECTOR_SIZE:
-		*(uint32_t *) buff = SECTOR_SIZE;
+		*(uint32_t *)buff = SECTOR_SIZE;
 		return 0;
 	case DISK_IOCTL_GET_ERASE_BLOCK_SZ: /* in sectors */
 		*(uint32_t *)buff = CONFIG_DISK_ERASE_BLOCK_SIZE / SECTOR_SIZE;

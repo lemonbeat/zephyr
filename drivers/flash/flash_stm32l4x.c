@@ -20,20 +20,21 @@ LOG_MODULE_REGISTER(LOG_DOMAIN);
 
 #include "flash_stm32.h"
 
-#if !defined (STM32L4R5xx) && !defined (STM32L4R7xx) && !defined (STM32L4R9xx) && !defined (STM32L4S5xx) && !defined (STM32L4S7xx) && !defined (STM32L4S9xx)
-#define STM32L4X_PAGE_SHIFT	11
+#if !defined(STM32L4R5xx) && !defined(STM32L4R7xx) && !defined(STM32L4R9xx) && \
+	!defined(STM32L4S5xx) && !defined(STM32L4S7xx) &&                      \
+	!defined(STM32L4S9xx)
+#define STM32L4X_PAGE_SHIFT 11
 #else
-#define STM32L4X_PAGE_SHIFT	12
+#define STM32L4X_PAGE_SHIFT 12
 #endif
 
 /* offset and len must be aligned on 8 for write
  * , positive and not beyond end of flash */
 bool flash_stm32_valid_range(const struct device *dev, off_t offset,
-			     uint32_t len,
-			     bool write)
+			     uint32_t len, bool write)
 {
 	return (!write || (offset % 8 == 0 && len % 8 == 0U)) &&
-		flash_stm32_range_exists(dev, offset, len);
+	       flash_stm32_range_exists(dev, offset, len);
 }
 
 /*
@@ -48,7 +49,8 @@ static unsigned int get_page(off_t offset)
 
 static int write_dword(const struct device *dev, off_t offset, uint64_t val)
 {
-	volatile uint32_t *flash = (uint32_t *)(offset + CONFIG_FLASH_BASE_ADDRESS);
+	volatile uint32_t *flash =
+		(uint32_t *)(offset + CONFIG_FLASH_BASE_ADDRESS);
 	FLASH_TypeDef *regs = FLASH_STM32_REGS(dev);
 #if defined(FLASH_OPTR_DUALBANK) || defined(FLASH_OPTR_DBANK)
 	bool dcache_enabled = false;
@@ -68,8 +70,7 @@ static int write_dword(const struct device *dev, off_t offset, uint64_t val)
 	}
 
 	/* Check if this double word is erased */
-	if (flash[0] != 0xFFFFFFFFUL ||
-	    flash[1] != 0xFFFFFFFFUL) {
+	if (flash[0] != 0xFFFFFFFFUL || flash[1] != 0xFFFFFFFFUL) {
 		return -EIO;
 	}
 
@@ -128,7 +129,7 @@ static int erase_page(const struct device *dev, unsigned int page)
 	/* L4 series (2K page size) with configurable Dual Bank (default y) */
 	/* Dual Bank is only option for 1M devices */
 	if ((regs->OPTR & FLASH_OPTR_DUALBANK) ||
-	    (SOC_NV_FLASH_SIZE == (1024*1024))) {
+	    (SOC_NV_FLASH_SIZE == (1024 * 1024))) {
 		/* Dual Bank configuration (nbr pages = flash size / 2 / 2K) */
 		pages_per_bank = SOC_NV_FLASH_SIZE >> 12;
 	} else {
@@ -184,14 +185,13 @@ static int erase_page(const struct device *dev, unsigned int page)
 	return rc;
 }
 
-int flash_stm32_block_erase_loop(const struct device *dev,
-				 unsigned int offset,
+int flash_stm32_block_erase_loop(const struct device *dev, unsigned int offset,
 				 unsigned int len)
 {
 	int i, rc = 0;
 
 	i = get_page(offset);
-	for (; i <= get_page(offset + len - 1) ; ++i) {
+	for (; i <= get_page(offset + len - 1); ++i) {
 		rc = erase_page(dev, i);
 		if (rc < 0) {
 			break;
@@ -207,8 +207,9 @@ int flash_stm32_write_range(const struct device *dev, unsigned int offset,
 	int i, rc = 0;
 
 	for (i = 0; i < len; i += 8, offset += 8U) {
-		rc = write_dword(dev, offset,
-				UNALIGNED_GET((const uint64_t *) data + (i >> 3)));
+		rc = write_dword(
+			dev, offset,
+			UNALIGNED_GET((const uint64_t *)data + (i >> 3)));
 		if (rc < 0) {
 			return rc;
 		}

@@ -26,7 +26,6 @@ struct k_mem_domain k_mem_domain_default;
 static bool check_add_partition(struct k_mem_domain *domain,
 				struct k_mem_partition *part)
 {
-
 	int i;
 	uintptr_t pstart, pend, dstart, dend;
 
@@ -48,8 +47,8 @@ static bool check_add_partition(struct k_mem_domain *domain,
 #endif
 
 	if (part->size == 0) {
-		LOG_ERR("zero sized partition at %p with base 0x%lx",
-			part, part->start);
+		LOG_ERR("zero sized partition at %p with base 0x%lx", part,
+			part->start);
 		return false;
 	}
 
@@ -78,8 +77,8 @@ static bool check_add_partition(struct k_mem_domain *domain,
 
 		if (pend > dstart && dend > pstart) {
 			LOG_ERR("partition %p base %lx (size %zu) overlaps existing base %lx (size %zu)",
-				part, part->start, part->size,
-				dpart->start, dpart->size);
+				part, part->start, part->size, dpart->start,
+				dpart->size);
 			return false;
 		}
 	}
@@ -110,8 +109,8 @@ void k_mem_domain_init(struct k_mem_domain *domain, uint8_t num_parts,
 
 		for (i = 0U; i < num_parts; i++) {
 			__ASSERT(check_add_partition(domain, parts[i]),
-				 "invalid partition index %d (%p)",
-				 i, parts[i]);
+				 "invalid partition index %d (%p)", i,
+				 parts[i]);
 
 			domain->partitions[i] = *parts[i];
 			domain->num_partitions++;
@@ -168,8 +167,8 @@ void k_mem_domain_add_partition(struct k_mem_domain *domain,
 	k_spinlock_key_t key;
 
 	__ASSERT_NO_MSG(domain != NULL);
-	__ASSERT(check_add_partition(domain, part),
-		 "invalid partition %p", part);
+	__ASSERT(check_add_partition(domain, part), "invalid partition %p",
+		 part);
 
 	key = k_spin_lock(&lock);
 
@@ -180,11 +179,10 @@ void k_mem_domain_add_partition(struct k_mem_domain *domain,
 		}
 	}
 
-	__ASSERT(p_idx < max_partitions,
-		 "no free partition slots available");
+	__ASSERT(p_idx < max_partitions, "no free partition slots available");
 
-	LOG_DBG("add partition base %lx size %zu to domain %p\n",
-		part->start, part->size, domain);
+	LOG_DBG("add partition base %lx size %zu to domain %p\n", part->start,
+		part->size, domain);
 
 	domain->partitions[p_idx].start = part->start;
 	domain->partitions[p_idx].size = part->size;
@@ -199,7 +197,7 @@ void k_mem_domain_add_partition(struct k_mem_domain *domain,
 }
 
 void k_mem_domain_remove_partition(struct k_mem_domain *domain,
-				  struct k_mem_partition *part)
+				   struct k_mem_partition *part)
 {
 	int p_idx;
 	k_spinlock_key_t key;
@@ -243,8 +241,8 @@ void k_mem_domain_add_thread(struct k_mem_domain *domain, k_tid_t thread)
 
 	key = k_spin_lock(&lock);
 	if (thread->mem_domain_info.mem_domain != NULL) {
-		LOG_DBG("remove thread %p from memory domain %p\n",
-			thread, thread->mem_domain_info.mem_domain);
+		LOG_DBG("remove thread %p from memory domain %p\n", thread,
+			thread->mem_domain_info.mem_domain);
 		sys_dlist_remove(&thread->mem_domain_info.mem_domain_q_node);
 #ifdef CONFIG_ARCH_MEM_DOMAIN_SYNCHRONOUS_API
 		arch_mem_domain_thread_remove(thread);

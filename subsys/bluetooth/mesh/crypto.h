@@ -32,11 +32,11 @@ static inline bool bt_mesh_s1(const char *m, uint8_t salt[16])
 int bt_mesh_k1(const uint8_t *ikm, size_t ikm_len, const uint8_t salt[16],
 	       const char *info, uint8_t okm[16]);
 
-#define bt_mesh_k1_str(ikm, ikm_len, salt_str, info, okm) \
-({ \
-	const uint8_t salt[16] = salt_str; \
-	bt_mesh_k1(ikm, ikm_len, salt, info, okm); \
-})
+#define bt_mesh_k1_str(ikm, ikm_len, salt_str, info, okm)  \
+	({                                                 \
+		const uint8_t salt[16] = salt_str;         \
+		bt_mesh_k1(ikm, ikm_len, salt, info, okm); \
+	})
 
 int bt_mesh_k2(const uint8_t n[16], const uint8_t *p, size_t p_len,
 	       uint8_t net_id[1], uint8_t enc_key[16], uint8_t priv_key[16]);
@@ -82,8 +82,8 @@ static inline int bt_mesh_session_key(const uint8_t dhkey[32],
 }
 
 static inline int bt_mesh_prov_nonce(const uint8_t dhkey[32],
-				      const uint8_t prov_salt[16],
-				      uint8_t nonce[13])
+				     const uint8_t prov_salt[16],
+				     uint8_t nonce[13])
 {
 	uint8_t tmp[16];
 	int err;
@@ -129,12 +129,13 @@ int bt_mesh_net_decrypt(const uint8_t key[16], struct net_buf_simple *buf,
 
 int bt_mesh_app_encrypt(const uint8_t key[16], bool dev_key, uint8_t aszmic,
 			struct net_buf_simple *buf, const uint8_t *ad,
-			uint16_t src, uint16_t dst, uint32_t seq_num, uint32_t iv_index);
+			uint16_t src, uint16_t dst, uint32_t seq_num,
+			uint32_t iv_index);
 
 int bt_mesh_app_decrypt(const uint8_t key[16], bool dev_key, uint8_t aszmic,
 			struct net_buf_simple *buf, struct net_buf_simple *out,
-			const uint8_t *ad, uint16_t src, uint16_t dst, uint32_t seq_num,
-			uint32_t iv_index);
+			const uint8_t *ad, uint16_t src, uint16_t dst,
+			uint32_t seq_num, uint32_t iv_index);
 
 uint8_t bt_mesh_fcs_calc(const uint8_t *data, uint8_t data_len);
 

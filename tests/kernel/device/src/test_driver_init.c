@@ -9,35 +9,33 @@
 #include <init.h>
 #include <ztest.h>
 
-
 /**
  * @brief Test cases to device driver initialization
  *
  */
 
-#define MY_DRIVER_LV_1    "my_driver_level_1"
-#define MY_DRIVER_LV_2    "my_driver_level_2"
-#define MY_DRIVER_LV_3    "my_driver_level_3"
-#define MY_DRIVER_LV_4    "my_driver_level_4"
-#define MY_DRIVER_PRI_1    "my_driver_priority_1"
-#define MY_DRIVER_PRI_2    "my_driver_priority_2"
-#define MY_DRIVER_PRI_3    "my_driver_priority_3"
-#define MY_DRIVER_PRI_4    "my_driver_priority_4"
+#define MY_DRIVER_LV_1 "my_driver_level_1"
+#define MY_DRIVER_LV_2 "my_driver_level_2"
+#define MY_DRIVER_LV_3 "my_driver_level_3"
+#define MY_DRIVER_LV_4 "my_driver_level_4"
+#define MY_DRIVER_PRI_1 "my_driver_priority_1"
+#define MY_DRIVER_PRI_2 "my_driver_priority_2"
+#define MY_DRIVER_PRI_3 "my_driver_priority_3"
+#define MY_DRIVER_PRI_4 "my_driver_priority_4"
 
-#define LEVEL_PRE_KERNEL_1	1
-#define LEVEL_PRE_KERNEL_2	2
-#define LEVEL_POST_KERNEL	3
-#define LEVEL_APPLICATION	4
+#define LEVEL_PRE_KERNEL_1 1
+#define LEVEL_PRE_KERNEL_2 2
+#define LEVEL_POST_KERNEL 3
+#define LEVEL_APPLICATION 4
 
-#define PRIORITY_1	1
-#define PRIORITY_2	2
-#define PRIORITY_3	3
-#define PRIORITY_4	4
-
+#define PRIORITY_1 1
+#define PRIORITY_2 2
+#define PRIORITY_3 3
+#define PRIORITY_4 4
 
 /* this is for storing sequence during initializtion */
-int init_level_sequence[4] = {0};
-int init_priority_sequence[4] = {0};
+int init_level_sequence[4] = { 0 };
+int init_priority_sequence[4] = { 0 };
 unsigned int seq_level_cnt;
 unsigned int seq_priority_cnt;
 
@@ -135,33 +133,33 @@ static int my_driver_pri_4_init(const struct device *dev)
  * @ingroup kernel_device_tests
  */
 DEVICE_AND_API_INIT(my_driver_level_1, MY_DRIVER_LV_1, &my_driver_lv_1_init,
-		NULL, NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&funcs_my_drivers);
+		    NULL, NULL, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs_my_drivers);
 
 DEVICE_AND_API_INIT(my_driver_level_2, MY_DRIVER_LV_2, &my_driver_lv_2_init,
-		NULL, NULL, PRE_KERNEL_2, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&funcs_my_drivers);
+		    NULL, NULL, PRE_KERNEL_2,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs_my_drivers);
 
 DEVICE_AND_API_INIT(my_driver_level_3, MY_DRIVER_LV_3, &my_driver_lv_3_init,
-		NULL, NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&funcs_my_drivers);
+		    NULL, NULL, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs_my_drivers);
 
 DEVICE_AND_API_INIT(my_driver_level_4, MY_DRIVER_LV_4, &my_driver_lv_4_init,
-		NULL, NULL, APPLICATION, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&funcs_my_drivers);
+		    NULL, NULL, APPLICATION,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs_my_drivers);
 
 DEVICE_AND_API_INIT(my_driver_priority_1, MY_DRIVER_PRI_1,
-		&my_driver_pri_1_init, NULL, NULL, POST_KERNEL, 1,
-		&funcs_my_drivers);
+		    &my_driver_pri_1_init, NULL, NULL, POST_KERNEL, 1,
+		    &funcs_my_drivers);
 
 DEVICE_AND_API_INIT(my_driver_priority_2, MY_DRIVER_PRI_2,
-		&my_driver_pri_2_init, NULL, NULL, POST_KERNEL, 2,
-		&funcs_my_drivers);
+		    &my_driver_pri_2_init, NULL, NULL, POST_KERNEL, 2,
+		    &funcs_my_drivers);
 
 DEVICE_AND_API_INIT(my_driver_priority_3, MY_DRIVER_PRI_3,
-		&my_driver_pri_3_init, NULL, NULL, POST_KERNEL, 3,
-		&funcs_my_drivers);
+		    &my_driver_pri_3_init, NULL, NULL, POST_KERNEL, 3,
+		    &funcs_my_drivers);
 
 DEVICE_AND_API_INIT(my_driver_priority_4, MY_DRIVER_PRI_4,
-		&my_driver_pri_4_init, NULL, NULL, POST_KERNEL, 4,
-		&funcs_my_drivers);
+		    &my_driver_pri_4_init, NULL, NULL, POST_KERNEL, 4,
+		    &funcs_my_drivers);

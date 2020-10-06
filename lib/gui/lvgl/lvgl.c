@@ -24,8 +24,12 @@ LOG_MODULE_REGISTER(lvgl);
 
 static lv_disp_buf_t disp_buf;
 
-#define BUFFER_SIZE (CONFIG_LVGL_BITS_PER_PIXEL * ((CONFIG_LVGL_VDB_SIZE * \
-			CONFIG_LVGL_HOR_RES_MAX * CONFIG_LVGL_VER_RES_MAX) / 100) / 8)
+#define BUFFER_SIZE                                         \
+	(CONFIG_LVGL_BITS_PER_PIXEL *                       \
+	 ((CONFIG_LVGL_VDB_SIZE * CONFIG_LVGL_HOR_RES_MAX * \
+	   CONFIG_LVGL_VER_RES_MAX) /                       \
+	  100) /                                            \
+	 8)
 
 #define NBR_PIXELS_IN_BUFFER (BUFFER_SIZE * 8 / CONFIG_LVGL_BITS_PER_PIXEL)
 
@@ -42,7 +46,7 @@ static uint8_t buf1[BUFFER_SIZE] __aligned(4);
 
 #if CONFIG_LVGL_LOG_LEVEL != 0
 static void lvgl_log(lv_log_level_t level, const char *file, uint32_t line,
-		const char *func, const char *dsc)
+		     const char *func, const char *dsc)
 {
 	/* Convert LVGL log level to Zephyr log level
 	 *
@@ -75,7 +79,8 @@ static void lvgl_log(lv_log_level_t level, const char *file, uint32_t line,
 static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 {
 	struct display_capabilities cap;
-	const struct device *display_dev = (const struct device *)disp_drv->user_data;
+	const struct device *display_dev =
+		(const struct device *)disp_drv->user_data;
 	int err = 0;
 
 	display_get_capabilities(display_dev, &cap);
@@ -113,15 +118,17 @@ static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 	uint16_t buf_nbr_pixels;
 	uint32_t buf_size;
 	struct display_capabilities cap;
-	const struct device *display_dev = (const struct device *)disp_drv->user_data;
+	const struct device *display_dev =
+		(const struct device *)disp_drv->user_data;
 
 	display_get_capabilities(display_dev, &cap);
 
 	disp_drv->hor_res = cap.x_resolution;
 	disp_drv->ver_res = cap.y_resolution;
 
-	buf_nbr_pixels = (CONFIG_LVGL_VDB_SIZE * disp_drv->hor_res *
-			disp_drv->ver_res) / 100;
+	buf_nbr_pixels =
+		(CONFIG_LVGL_VDB_SIZE * disp_drv->hor_res * disp_drv->ver_res) /
+		100;
 	/* one horizontal line is the minimum buffer requirement for lvgl */
 	if (buf_nbr_pixels < disp_drv->hor_res) {
 		buf_nbr_pixels = disp_drv->hor_res;
@@ -178,8 +185,7 @@ static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 K_MSGQ_DEFINE(kscan_msgq, sizeof(lv_indev_data_t),
 	      CONFIG_LVGL_POINTER_KSCAN_MSGQ_COUNT, 4);
 
-static void lvgl_pointer_kscan_callback(const struct device *dev,
-					uint32_t row,
+static void lvgl_pointer_kscan_callback(const struct device *dev, uint32_t row,
 					uint32_t col, bool pressed)
 {
 	lv_indev_data_t data = {
@@ -226,7 +232,8 @@ static bool lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 
 	if (IS_ENABLED(CONFIG_LVGL_POINTER_KSCAN_INVERT_X)) {
 		if (cap.current_orientation == DISPLAY_ORIENTATION_NORMAL ||
-		    cap.current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
+		    cap.current_orientation ==
+			    DISPLAY_ORIENTATION_ROTATED_180) {
 			prev.point.x = cap.x_resolution - prev.point.x;
 		} else {
 			prev.point.x = cap.y_resolution - prev.point.x;
@@ -235,7 +242,8 @@ static bool lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 
 	if (IS_ENABLED(CONFIG_LVGL_POINTER_KSCAN_INVERT_Y)) {
 		if (cap.current_orientation == DISPLAY_ORIENTATION_NORMAL ||
-		    cap.current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
+		    cap.current_orientation ==
+			    DISPLAY_ORIENTATION_ROTATED_180) {
 			prev.point.y = cap.y_resolution - prev.point.y;
 		} else {
 			prev.point.y = cap.x_resolution - prev.point.y;
@@ -322,7 +330,7 @@ static int lvgl_init(const struct device *dev)
 #endif
 
 	lv_disp_drv_init(&disp_drv);
-	disp_drv.user_data = (void *) display_dev;
+	disp_drv.user_data = (void *)display_dev;
 
 	err = lvgl_allocate_rendering_buffers(&disp_drv);
 	if (err != 0) {

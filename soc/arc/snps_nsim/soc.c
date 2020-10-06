@@ -31,7 +31,7 @@ static int arc_nsim_init(const struct device *dev)
 
 	for (i = 0; i < (CONFIG_NUM_IRQS - ARC_CONNECT_IDU_IRQ_START); i++) {
 		z_arc_connect_idu_set_mode(i, ARC_CONNECT_INTRPT_TRIGGER_LEVEL,
-			ARC_CONNECT_DISTRI_MODE_ROUND_ROBIN);
+					   ARC_CONNECT_DISTRI_MODE_ROUND_ROBIN);
 		z_arc_connect_idu_set_dest(i, 1 << core);
 		z_arc_connect_idu_set_mask(i, 0x0);
 	}

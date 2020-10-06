@@ -27,8 +27,8 @@
 
 LOG_MODULE_REGISTER(button_svc);
 
-#define BUT_PORT    DT_GPIO_LABEL(DT_ALIAS(sw0), gpios)
-#define BUT_PIN     DT_GPIO_PIN(DT_ALIAS(sw0), gpios)
+#define BUT_PORT DT_GPIO_LABEL(DT_ALIAS(sw0), gpios)
+#define BUT_PIN DT_GPIO_PIN(DT_ALIAS(sw0), gpios)
 
 extern struct bt_conn *conn;
 extern struct bt_gatt_service_static stsensor_svc[];
@@ -73,22 +73,21 @@ int button_init(void)
 
 	ret = gpio_pin_configure(button_dev, BUT_PIN,
 				 DT_GPIO_FLAGS(DT_ALIAS(sw0), gpios) |
-				 GPIO_INPUT);
+					 GPIO_INPUT);
 	if (ret != 0) {
-		LOG_ERR("Error %d: failed to configure pin %d '%s'\n",
-			ret, BUT_PIN, DT_LABEL(DT_ALIAS(sw0)));
+		LOG_ERR("Error %d: failed to configure pin %d '%s'\n", ret,
+			BUT_PIN, DT_LABEL(DT_ALIAS(sw0)));
 		return ret;
-
 	}
 
-	gpio_init_callback(&gpio_cb, button_pressed,
-			   BIT(BUT_PIN));
+	gpio_init_callback(&gpio_cb, button_pressed, BIT(BUT_PIN));
 	gpio_add_callback(button_dev, &gpio_cb);
 	ret = gpio_pin_interrupt_configure(button_dev, BUT_PIN,
 					   GPIO_INT_EDGE_TO_ACTIVE);
 	if (ret != 0) {
 		LOG_ERR("Error %d: failed to configure interrupt on pin "
-			"%d '%s'\n", ret, BUT_PIN, DT_LABEL(DT_ALIAS(sw0)));
+			"%d '%s'\n",
+			ret, BUT_PIN, DT_LABEL(DT_ALIAS(sw0)));
 		return ret;
 	}
 	but_val = 0;

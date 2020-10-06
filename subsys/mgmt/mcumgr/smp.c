@@ -30,8 +30,7 @@ static const struct mgmt_streamer_cfg zephyr_smp_cbor_cfg = {
 	.free_buf = zephyr_smp_free_buf,
 };
 
-void *
-zephyr_smp_alloc_rsp(const void *req, void *arg)
+void *zephyr_smp_alloc_rsp(const void *req, void *arg)
 {
 	const struct net_buf_pool *pool;
 	const struct net_buf *req_nb;
@@ -57,8 +56,7 @@ zephyr_smp_alloc_rsp(const void *req, void *arg)
 	return rsp_nb;
 }
 
-static void
-zephyr_smp_trim_front(void *buf, size_t len, void *arg)
+static void zephyr_smp_trim_front(void *buf, size_t len, void *arg)
 {
 	struct net_buf *nb;
 
@@ -104,8 +102,8 @@ zephyr_smp_trim_front(void *buf, size_t len, void *arg)
  * @return                      The next fragment to send on success;
  *                              NULL on failure.
  */
-static struct net_buf *
-zephyr_smp_split_frag(struct net_buf **nb, void *arg, uint16_t mtu)
+static struct net_buf *zephyr_smp_split_frag(struct net_buf **nb, void *arg,
+					     uint16_t mtu)
 {
 	struct net_buf *frag;
 	struct net_buf *src;
@@ -128,15 +126,14 @@ zephyr_smp_split_frag(struct net_buf **nb, void *arg, uint16_t mtu)
 	return frag;
 }
 
-static void
-zephyr_smp_reset_buf(void *buf, void *arg)
+static void zephyr_smp_reset_buf(void *buf, void *arg)
 {
 	net_buf_reset(buf);
 }
 
-static int
-zephyr_smp_write_at(struct cbor_encoder_writer *writer, size_t offset,
-		    const void *data, size_t len, void *arg)
+static int zephyr_smp_write_at(struct cbor_encoder_writer *writer,
+			       size_t offset, const void *data, size_t len,
+			       void *arg)
 {
 	struct cbor_nb_writer *czw;
 	struct net_buf *nb;
@@ -161,8 +158,7 @@ zephyr_smp_write_at(struct cbor_encoder_writer *writer, size_t offset,
 	return 0;
 }
 
-static int
-zephyr_smp_tx_rsp(struct smp_streamer *ns, void *rsp, void *arg)
+static int zephyr_smp_tx_rsp(struct smp_streamer *ns, void *rsp, void *arg)
 {
 	struct zephyr_smp_transport *zst;
 	struct net_buf *frag;
@@ -196,8 +192,7 @@ zephyr_smp_tx_rsp(struct smp_streamer *ns, void *rsp, void *arg)
 	return 0;
 }
 
-static void
-zephyr_smp_free_buf(void *buf, void *arg)
+static void zephyr_smp_free_buf(void *buf, void *arg)
 {
 	struct zephyr_smp_transport *zst = arg;
 
@@ -212,9 +207,8 @@ zephyr_smp_free_buf(void *buf, void *arg)
 	mcumgr_buf_free(buf);
 }
 
-static int
-zephyr_smp_init_reader(struct cbor_decoder_reader *reader, void *buf,
-		       void *arg)
+static int zephyr_smp_init_reader(struct cbor_decoder_reader *reader, void *buf,
+				  void *arg)
 {
 	struct cbor_nb_reader *czr;
 
@@ -224,9 +218,8 @@ zephyr_smp_init_reader(struct cbor_decoder_reader *reader, void *buf,
 	return 0;
 }
 
-static int
-zephyr_smp_init_writer(struct cbor_encoder_writer *writer, void *buf,
-		       void *arg)
+static int zephyr_smp_init_writer(struct cbor_encoder_writer *writer, void *buf,
+				  void *arg)
 {
 	struct cbor_nb_writer *czw;
 
@@ -239,9 +232,8 @@ zephyr_smp_init_writer(struct cbor_encoder_writer *writer, void *buf,
 /**
  * Processes a single SMP packet and sends the corresponding response(s).
  */
-static int
-zephyr_smp_process_packet(struct zephyr_smp_transport *zst,
-			  struct net_buf *nb)
+static int zephyr_smp_process_packet(struct zephyr_smp_transport *zst,
+				     struct net_buf *nb)
 {
 	struct cbor_nb_reader reader;
 	struct cbor_nb_writer writer;
@@ -265,8 +257,7 @@ zephyr_smp_process_packet(struct zephyr_smp_transport *zst,
 /**
  * Processes all received SNP request packets.
  */
-static void
-zephyr_smp_handle_reqs(struct k_work *work)
+static void zephyr_smp_handle_reqs(struct k_work *work)
 {
 	struct zephyr_smp_transport *zst;
 	struct net_buf *nb;
@@ -278,14 +269,13 @@ zephyr_smp_handle_reqs(struct k_work *work)
 	}
 }
 
-void
-zephyr_smp_transport_init(struct zephyr_smp_transport *zst,
-			  zephyr_smp_transport_out_fn *output_func,
-			  zephyr_smp_transport_get_mtu_fn *get_mtu_func,
-			  zephyr_smp_transport_ud_copy_fn *ud_copy_func,
-			  zephyr_smp_transport_ud_free_fn *ud_free_func)
+void zephyr_smp_transport_init(struct zephyr_smp_transport *zst,
+			       zephyr_smp_transport_out_fn *output_func,
+			       zephyr_smp_transport_get_mtu_fn *get_mtu_func,
+			       zephyr_smp_transport_ud_copy_fn *ud_copy_func,
+			       zephyr_smp_transport_ud_free_fn *ud_free_func)
 {
-	*zst = (struct zephyr_smp_transport) {
+	*zst = (struct zephyr_smp_transport){
 		.zst_output = output_func,
 		.zst_get_mtu = get_mtu_func,
 		.zst_ud_copy = ud_copy_func,
@@ -296,8 +286,7 @@ zephyr_smp_transport_init(struct zephyr_smp_transport *zst,
 	k_fifo_init(&zst->zst_fifo);
 }
 
-void
-zephyr_smp_rx_req(struct zephyr_smp_transport *zst, struct net_buf *nb)
+void zephyr_smp_rx_req(struct zephyr_smp_transport *zst, struct net_buf *nb)
 {
 	k_fifo_put(&zst->zst_fifo, nb);
 	k_work_submit(&zst->zst_work);

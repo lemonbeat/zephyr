@@ -20,12 +20,9 @@ LOG_MODULE_REGISTER(i2c_gecko);
 
 #include "i2c-priv.h"
 
-#define DEV_CFG(dev) \
-	((const struct i2c_gecko_config * const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct i2c_gecko_data * const)(dev)->data)
-#define DEV_BASE(dev) \
-	((I2C_TypeDef *)(DEV_CFG(dev))->base)
+#define DEV_CFG(dev) ((const struct i2c_gecko_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct i2c_gecko_data *const)(dev)->data)
+#define DEV_BASE(dev) ((I2C_TypeDef *)(DEV_CFG(dev))->base)
 
 struct i2c_gecko_config {
 	I2C_TypeDef *base;
@@ -62,7 +59,7 @@ void i2c_gecko_config_pins(const struct device *dev,
 			  (config->loc_scl << _I2C_ROUTELOC0_SCLLOC_SHIFT);
 #elif defined(GPIO_I2C_ROUTEEN_SCLPEN) && defined(GPIO_I2C_ROUTEEN_SDAPEN)
 	GPIO->I2CROUTE[I2C_NUM(base)].ROUTEEN = GPIO_I2C_ROUTEEN_SCLPEN |
-		GPIO_I2C_ROUTEEN_SDAPEN;
+						GPIO_I2C_ROUTEEN_SDAPEN;
 	GPIO->I2CROUTE[I2C_NUM(base)].SCLROUTE =
 		(config->pin_scl.pin << _GPIO_I2C_SCLROUTE_PIN_SHIFT) |
 		(config->pin_scl.port << _GPIO_I2C_SCLROUTE_PORT_SHIFT);
@@ -125,7 +122,7 @@ static int i2c_gecko_transfer(const struct device *dev, struct i2c_msg *msgs,
 
 	do {
 		seq.buf[0].data = msgs->buf;
-		seq.buf[0].len	= msgs->len;
+		seq.buf[0].len = msgs->len;
 
 		if ((msgs->flags & I2C_MSG_RW_MASK) == I2C_MSG_READ) {
 			seq.flags = I2C_FLAG_READ;
@@ -135,14 +132,14 @@ static int i2c_gecko_transfer(const struct device *dev, struct i2c_msg *msgs,
 				/* Next message */
 				msgs++;
 				num_msgs--;
-				if ((msgs->flags & I2C_MSG_RW_MASK)
-				    == I2C_MSG_READ) {
+				if ((msgs->flags & I2C_MSG_RW_MASK) ==
+				    I2C_MSG_READ) {
 					seq.flags = I2C_FLAG_WRITE_READ;
 				} else {
 					seq.flags = I2C_FLAG_WRITE_WRITE;
 				}
 				seq.buf[1].data = msgs->buf;
-				seq.buf[1].len	= msgs->len;
+				seq.buf[1].len = msgs->len;
 			}
 		}
 
@@ -199,10 +196,18 @@ static const struct i2c_driver_api i2c_gecko_driver_api = {
 
 #if DT_NODE_HAS_STATUS(DT_DRV_INST(0), okay)
 
-#define PIN_I2C_0_SDA {DT_INST_PROP_BY_IDX(0, location_sda, 1), \
-		DT_INST_PROP_BY_IDX(0, location_sda, 2), gpioModeWiredAnd, 1}
-#define PIN_I2C_0_SCL {DT_INST_PROP_BY_IDX(0, location_scl, 1), \
-		DT_INST_PROP_BY_IDX(0, location_scl, 2), gpioModeWiredAnd, 1}
+#define PIN_I2C_0_SDA                                            \
+	{                                                        \
+		DT_INST_PROP_BY_IDX(0, location_sda, 1),         \
+			DT_INST_PROP_BY_IDX(0, location_sda, 2), \
+			gpioModeWiredAnd, 1                      \
+	}
+#define PIN_I2C_0_SCL                                            \
+	{                                                        \
+		DT_INST_PROP_BY_IDX(0, location_scl, 1),         \
+			DT_INST_PROP_BY_IDX(0, location_scl, 2), \
+			gpioModeWiredAnd, 1                      \
+	}
 
 static const struct i2c_gecko_config i2c_gecko_config_0 = {
 	.base = (I2C_TypeDef *)DT_INST_REG_ADDR(0),
@@ -213,8 +218,8 @@ static const struct i2c_gecko_config i2c_gecko_config_0 = {
 	.loc_sda = DT_INST_PROP_BY_IDX(0, location_sda, 0),
 	.loc_scl = DT_INST_PROP_BY_IDX(0, location_scl, 0),
 #else
-#if DT_INST_PROP_BY_IDX(0, location_sda, 0) \
-	!= DT_INST_PROP_BY_IDX(0, location_scl, 0)
+#if DT_INST_PROP_BY_IDX(0, location_sda, 0) != \
+	DT_INST_PROP_BY_IDX(0, location_scl, 0)
 #error I2C_0 DTS location-* properties must have identical value
 #endif
 	.loc = DT_INST_PROP_BY_IDX(0, location_scl, 0),
@@ -224,18 +229,25 @@ static const struct i2c_gecko_config i2c_gecko_config_0 = {
 
 static struct i2c_gecko_data i2c_gecko_data_0;
 
-DEVICE_AND_API_INIT(i2c_gecko_0, DT_INST_LABEL(0),
-		    &i2c_gecko_init, &i2c_gecko_data_0, &i2c_gecko_config_0,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &i2c_gecko_driver_api);
+DEVICE_AND_API_INIT(i2c_gecko_0, DT_INST_LABEL(0), &i2c_gecko_init,
+		    &i2c_gecko_data_0, &i2c_gecko_config_0, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &i2c_gecko_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_DRV_INST(0), okay) */
 
 #if DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay)
 
-#define PIN_I2C_1_SDA {DT_INST_PROP_BY_IDX(1, location_sda, 1), \
-		DT_INST_PROP_BY_IDX(1, location_sda, 2), gpioModeWiredAnd, 1}
-#define PIN_I2C_1_SCL {DT_INST_PROP_BY_IDX(1, location_scl, 1), \
-		DT_INST_PROP_BY_IDX(1, location_scl, 2), gpioModeWiredAnd, 1}
+#define PIN_I2C_1_SDA                                            \
+	{                                                        \
+		DT_INST_PROP_BY_IDX(1, location_sda, 1),         \
+			DT_INST_PROP_BY_IDX(1, location_sda, 2), \
+			gpioModeWiredAnd, 1                      \
+	}
+#define PIN_I2C_1_SCL                                            \
+	{                                                        \
+		DT_INST_PROP_BY_IDX(1, location_scl, 1),         \
+			DT_INST_PROP_BY_IDX(1, location_scl, 2), \
+			gpioModeWiredAnd, 1                      \
+	}
 
 static const struct i2c_gecko_config i2c_gecko_config_1 = {
 	.base = (I2C_TypeDef *)DT_INST_REG_ADDR(1),
@@ -246,8 +258,8 @@ static const struct i2c_gecko_config i2c_gecko_config_1 = {
 	.loc_sda = DT_INST_PROP_BY_IDX(1, location_sda, 0),
 	.loc_scl = DT_INST_PROP_BY_IDX(1, location_scl, 0),
 #else
-#if DT_INST_PROP_BY_IDX(1, location_sda, 0) \
-	!= DT_INST_PROP_BY_IDX(1, location_scl, 0)
+#if DT_INST_PROP_BY_IDX(1, location_sda, 0) != \
+	DT_INST_PROP_BY_IDX(1, location_scl, 0)
 #error I2C_1 DTS location-* properties must have identical value
 #endif
 	.loc = DT_INST_PROP_BY_IDX(1, location_scl, 0),
@@ -257,8 +269,7 @@ static const struct i2c_gecko_config i2c_gecko_config_1 = {
 
 static struct i2c_gecko_data i2c_gecko_data_1;
 
-DEVICE_AND_API_INIT(i2c_gecko_1, DT_INST_LABEL(1),
-		    &i2c_gecko_init, &i2c_gecko_data_1, &i2c_gecko_config_1,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &i2c_gecko_driver_api);
+DEVICE_AND_API_INIT(i2c_gecko_1, DT_INST_LABEL(1), &i2c_gecko_init,
+		    &i2c_gecko_data_1, &i2c_gecko_config_1, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &i2c_gecko_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay) */

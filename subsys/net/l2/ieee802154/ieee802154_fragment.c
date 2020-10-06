@@ -25,9 +25,9 @@ LOG_MODULE_REGISTER(net_ieee802154_fragment,
 #include "6lo.h"
 #include "6lo_private.h"
 
-#define NET_FRAG_DISPATCH_MASK	0xF8
-#define NET_FRAG_OFFSET_POS	(NET_6LO_FRAG_DATAGRAM_SIZE_LEN +	\
-				 NET_6LO_FRAG_DATAGRAM_OFFSET_LEN)
+#define NET_FRAG_DISPATCH_MASK 0xF8
+#define NET_FRAG_OFFSET_POS \
+	(NET_6LO_FRAG_DATAGRAM_SIZE_LEN + NET_6LO_FRAG_DATAGRAM_OFFSET_LEN)
 
 #define BUF_TIMEOUT K_MSEC(50)
 
@@ -42,10 +42,10 @@ static uint16_t datagram_tag;
  *  IPv6 packets simultaneously.
  */
 struct frag_cache {
-	struct k_delayed_work timer;	/* Reassemble timer */
-	struct net_pkt *pkt;		/* Reassemble packet */
-	uint16_t size;			/* Datagram size */
-	uint16_t tag;			/* Datagram tag */
+	struct k_delayed_work timer; /* Reassemble timer */
+	struct net_pkt *pkt; /* Reassemble packet */
+	uint16_t size; /* Datagram size */
+	uint16_t tag; /* Datagram tag */
 	bool used;
 };
 
@@ -87,13 +87,13 @@ static struct frag_cache cache[REASS_CACHE_SIZE];
 static inline void set_datagram_size(uint8_t *ptr, uint16_t size)
 {
 	ptr[0] |= ((size & 0x7FF) >> 8);
-	ptr[1] = (uint8_t) size;
+	ptr[1] = (uint8_t)size;
 }
 
 static inline void set_datagram_tag(uint8_t *ptr, uint16_t tag)
 {
 	ptr[0] = tag >> 8;
-	ptr[1] = (uint8_t) tag;
+	ptr[1] = (uint8_t)tag;
 }
 
 static inline void set_up_frag_hdr(struct net_buf *frag, uint16_t size,
@@ -128,7 +128,7 @@ static inline uint8_t calc_max_payload(struct net_buf *frag, uint8_t offset)
 }
 
 static inline uint8_t copy_data(struct ieee802154_fragment_ctx *ctx,
-			     struct net_buf *frame_buf, uint8_t max)
+				struct net_buf *frame_buf, uint8_t max)
 {
 	uint8_t move = ctx->buf->len - (ctx->pos - ctx->buf->data);
 
@@ -332,8 +332,7 @@ static inline struct frag_cache *get_reass_cache(uint16_t size, uint16_t tag)
 
 	for (i = 0U; i < REASS_CACHE_SIZE; i++) {
 		if (cache[i].used) {
-			if (cache[i].size == size &&
-			    cache[i].tag == tag) {
+			if (cache[i].size == size && cache[i].tag == tag) {
 				return &cache[i];
 			}
 		}
@@ -397,15 +396,15 @@ static inline size_t fragment_cached_pkt_len(struct net_pkt *pkt)
 static inline uint16_t fragment_offset(struct net_buf *frag)
 {
 	if ((frag->data[0] & NET_FRAG_DISPATCH_MASK) ==
-		    NET_6LO_DISPATCH_FRAG1) {
+	    NET_6LO_DISPATCH_FRAG1) {
 		return 0;
 	}
 
 	return ((uint16_t)frag->data[NET_FRAG_OFFSET_POS] << 3);
 }
 
-static void fragment_move_back(struct net_pkt *pkt,
-			       struct net_buf *frag, struct net_buf *stop)
+static void fragment_move_back(struct net_pkt *pkt, struct net_buf *frag,
+			       struct net_buf *stop)
 {
 	struct net_buf *prev, *current;
 
@@ -457,8 +456,8 @@ static inline void fragment_reconstruct_packet(struct net_pkt *pkt)
 	while (current) {
 		next = current->frags;
 
-		if (!prev || (fragment_offset(prev) >
-			      fragment_offset(current))) {
+		if (!prev ||
+		    (fragment_offset(prev) > fragment_offset(current))) {
 			prev = current;
 		} else {
 			fragment_move_back(pkt, current, prev);
@@ -547,7 +546,6 @@ static inline enum net_verdict fragment_add_to_cache(struct net_pkt *pkt)
 
 	return NET_OK;
 }
-
 
 enum net_verdict ieee802154_reassemble(struct net_pkt *pkt)
 {

@@ -35,8 +35,7 @@
 #define _thread_offset_to_cpStack \
 	(_thread_offset_to_preempCoprocReg + __tPreempCoprocReg_cpStack_OFFSET)
 
-#define _thread_offset_to_cpEnable \
-	(_thread_offset_to_cpStack + XT_CPENABLE)
+#define _thread_offset_to_cpEnable (_thread_offset_to_cpStack + XT_CPENABLE)
 
 /* end - threads */
 

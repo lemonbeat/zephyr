@@ -44,11 +44,11 @@ static void test_clear_settings(void)
 
 	/* mounting info */
 	static struct fs_mount_t littlefs_mnt = {
-	.type = FS_LITTLEFS,
-	.fs_data = &cstorage,
-	.storage_dev = (void *)FLASH_AREA_ID(storage),
-	.mnt_point = "/ff"
-};
+		.type = FS_LITTLEFS,
+		.fs_data = &cstorage,
+		.storage_dev = (void *)FLASH_AREA_ID(storage),
+		.mnt_point = "/ff"
+	};
 
 	int rc;
 
@@ -56,8 +56,8 @@ static void test_clear_settings(void)
 	zassert_true(rc == 0, "mounting littlefs [%d]\n", rc);
 
 	rc = fs_unlink(CONFIG_SETTINGS_FS_FILE);
-	zassert_true(rc == 0 || rc == -ENOENT,
-		     "can't delete config file%d\n", rc);
+	zassert_true(rc == 0 || rc == -ENOENT, "can't delete config file%d\n",
+		     rc);
 #endif
 }
 
@@ -88,11 +88,11 @@ static void test_support_rtn(void)
 	rc = settings_name_steq(test1, "bt/a/b/c", &next1);
 	zassert_true(rc == 1, "_steq comparison failure");
 	zassert_not_null(next1, "_steq comparison next error");
-	zassert_equal_ptr(next1, test1+9, "next points to wrong location");
+	zassert_equal_ptr(next1, test1 + 9, "next points to wrong location");
 	rc = settings_name_steq(test2, "bt/a/b/c", &next2);
 	zassert_true(rc == 1, "_steq comparison failure");
 	zassert_not_null(next2, "_steq comparison next error");
-	zassert_equal_ptr(next2, test2+9, "next points to wrong location");
+	zassert_equal_ptr(next2, test2 + 9, "next points to wrong location");
 
 	/* no match: return 0, next = NULL */
 	rc = settings_name_steq(test1, "bta", &next1);
@@ -114,21 +114,21 @@ static void test_support_rtn(void)
 	rc = settings_name_next(test1, &next1);
 	zassert_true(rc == 2, "_next wrong return value");
 	zassert_not_null(next1, "_next wrong next");
-	zassert_equal_ptr(next1, test1+3, "next points to wrong location");
+	zassert_equal_ptr(next1, test1 + 3, "next points to wrong location");
 	rc = settings_name_next(test2, &next2);
 	zassert_true(rc == 2, "_next wrong return value");
 	zassert_not_null(next2, "_next wrong next");
-	zassert_equal_ptr(next2, test2+3, "next points to wrong location");
+	zassert_equal_ptr(next2, test2 + 3, "next points to wrong location");
 
 	/* second separator: return 1, next <> NULL */
 	rc = settings_name_next(next1, &next1);
 	zassert_true(rc == 1, "_next wrong return value");
 	zassert_not_null(next1, "_next wrong next");
-	zassert_equal_ptr(next1, test1+5, "next points to wrong location");
+	zassert_equal_ptr(next1, test1 + 5, "next points to wrong location");
 	rc = settings_name_next(next2, &next2);
 	zassert_true(rc == 1, "_next wrong return value");
 	zassert_not_null(next2, "_next wrong next");
-	zassert_equal_ptr(next2, test2+5, "next points to wrong location");
+	zassert_equal_ptr(next2, test2 + 5, "next points to wrong location");
 
 	/* third separator: return 1, next <> NULL */
 	rc = settings_name_next(next1, &next1);
@@ -153,7 +153,6 @@ static void test_support_rtn(void)
 	rc = settings_name_next(next2, &next2);
 	zassert_true(rc == 1, "_next wrong return value");
 	zassert_is_null(next2, "_next wrong next");
-
 }
 
 struct stored_data {
@@ -233,7 +232,6 @@ static void test_register_and_loading(void)
 
 	rc = settings_subsys_init();
 	zassert_true(rc == 0, "subsys init failed");
-
 
 	settings_save_one("ps/ss/ss/val2", &val, sizeof(uint8_t));
 
@@ -346,8 +344,8 @@ static void test_register_and_loading(void)
 	zassert_true(rc, "deregistering val1_settings failed");
 }
 
-int val123_set(const char *key, size_t len,
-	       settings_read_cb read_cb, void *cb_arg)
+int val123_set(const char *key, size_t len, settings_read_cb read_cb,
+	       void *cb_arg)
 {
 	int rc;
 	uint8_t val;
@@ -386,12 +384,8 @@ static struct settings_handler val123_settings = {
 unsigned int direct_load_cnt;
 uint8_t val_directly_loaded;
 
-int direct_loader(
-	const char *key,
-	size_t len,
-	settings_read_cb read_cb,
-	void *cb_arg,
-	void *param)
+int direct_loader(const char *key, size_t len, settings_read_cb read_cb,
+		  void *cb_arg, void *param)
 {
 	int rc;
 	uint8_t val;
@@ -401,7 +395,6 @@ int direct_loader(
 	zassert_equal(1, len, NULL);
 	zassert_is_null(key, "Unexpected key: %s", key);
 
-
 	zassert_not_null(cb_arg, NULL);
 	rc = read_cb(cb_arg, &val, sizeof(val));
 	zassert_equal(sizeof(val), rc, NULL);
@@ -410,7 +403,6 @@ int direct_loader(
 	direct_load_cnt += 1;
 	return 0;
 }
-
 
 static void test_direct_loading(void)
 {
@@ -441,18 +433,16 @@ static void test_direct_loading(void)
 	rc = settings_load_subtree("val/2");
 	zassert_true(rc == 0, NULL);
 
-	zassert_equal(0,  data.val1, NULL);
+	zassert_equal(0, data.val1, NULL);
 	zassert_equal(23, data.val2, NULL);
-	zassert_equal(0,  data.val3, NULL);
+	zassert_equal(0, data.val3, NULL);
 
 	/* Direct loading now */
 	memset(&data, 0, sizeof(data));
 	val_directly_loaded = 0;
 	direct_load_cnt = 0;
-	rc = settings_load_subtree_direct(
-		"val/2",
-		direct_loader,
-		(void *)0x1234);
+	rc = settings_load_subtree_direct("val/2", direct_loader,
+					  (void *)0x1234);
 	zassert_true(rc == 0, NULL);
 	zassert_equal(0, data.val1, NULL);
 	zassert_equal(0, data.val2, NULL);
@@ -479,12 +469,8 @@ static const struct test_loading_data data_final[] = {
 /* The counter of the callback called */
 static unsigned int data_final_called[ARRAY_SIZE(data_final)];
 
-
-static int filtered_loader(
-	const char *key,
-	size_t len,
-	settings_read_cb read_cb,
-	void *cb_arg)
+static int filtered_loader(const char *key, size_t len,
+			   settings_read_cb read_cb, void *cb_arg)
 {
 	int rc;
 	const char *next;
@@ -501,13 +487,15 @@ static int filtered_loader(
 	}
 	zassert_not_null(ldata->n, "Unexpected data name: %s", key);
 	zassert_is_null(next, NULL);
-	zassert_equal(strlen(ldata->v) + 1, len, "e: \"%s\", a:\"%s\"", ldata->v, buf);
+	zassert_equal(strlen(ldata->v) + 1, len, "e: \"%s\", a:\"%s\"",
+		      ldata->v, buf);
 	zassert_true(len <= sizeof(buf), NULL);
 
 	rc = read_cb(cb_arg, buf, len);
 	zassert_equal(len, rc, NULL);
 
-	zassert_false(strcmp(ldata->v, buf), "e: \"%s\", a:\"%s\"", ldata->v, buf);
+	zassert_false(strcmp(ldata->v, buf), "e: \"%s\", a:\"%s\"", ldata->v,
+		      buf);
 
 	/* Count an element that was properly loaded */
 	data_final_called[ldata - data_final] += 1;
@@ -520,18 +508,13 @@ static struct settings_handler filtered_loader_settings = {
 	.h_set = filtered_loader,
 };
 
-
-static int direct_filtered_loader(
-	const char *key,
-	size_t len,
-	settings_read_cb read_cb,
-	void *cb_arg,
-	void *param)
+static int direct_filtered_loader(const char *key, size_t len,
+				  settings_read_cb read_cb, void *cb_arg,
+				  void *param)
 {
 	zassert_equal(0x3456, (size_t)param, NULL);
 	return filtered_loader(key, len, read_cb, cb_arg);
 }
-
 
 static void test_direct_loading_filter(void)
 {
@@ -576,20 +559,17 @@ static void test_direct_loading_filter(void)
 		settings_save_one(buffer, ldata->v, strlen(ldata->v) + 1);
 	}
 
-
 	memset(data_final_called, 0, sizeof(data_final_called));
 
-	rc = settings_load_subtree_direct(
-		prefix,
-		direct_filtered_loader,
-		(void *)0x3456);
+	rc = settings_load_subtree_direct(prefix, direct_filtered_loader,
+					  (void *)0x3456);
 	zassert_equal(0, rc, NULL);
 
 	/* Check if all the data was called */
 	for (n = 0; data_final[n].n; ++n) {
 		zassert_equal(1, data_final_called[n],
-			"Unexpected number of calls (%u) of (%s) element",
-			n, data_final[n].n);
+			      "Unexpected number of calls (%u) of (%s) element",
+			      n, data_final[n].n);
 	}
 
 	rc = settings_register(&filtered_loader_settings);
@@ -601,11 +581,10 @@ static void test_direct_loading_filter(void)
 	/* Check if all the data was called */
 	for (n = 0; data_final[n].n; ++n) {
 		zassert_equal(2, data_final_called[n],
-			"Unexpected number of calls (%u) of (%s) element",
-			n, data_final[n].n);
+			      "Unexpected number of calls (%u) of (%s) element",
+			      n, data_final[n].n);
 	}
 }
-
 
 void test_main(void)
 {
@@ -614,8 +593,7 @@ void test_main(void)
 			 ztest_unit_test(test_support_rtn),
 			 ztest_unit_test(test_register_and_loading),
 			 ztest_unit_test(test_direct_loading),
-			 ztest_unit_test(test_direct_loading_filter)
-			);
+			 ztest_unit_test(test_direct_loading_filter));
 
 	ztest_run_test_suite(settings_test_suite);
 }

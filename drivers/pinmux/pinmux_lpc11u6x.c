@@ -22,9 +22,7 @@
 
 #include <drivers/pinmux.h>
 
-
-#define DEV_CFG(dev)  ((const struct pinmux_lpc11u6x_config *) \
-		      ((dev)->config))
+#define DEV_CFG(dev) ((const struct pinmux_lpc11u6x_config *)((dev)->config))
 
 struct pinmux_lpc11u6x_config {
 	uint8_t port;
@@ -54,8 +52,8 @@ static int pinmux_lpc11u6x_set(const struct device *dev, uint32_t pin,
 	return 0;
 }
 
-static int
-pinmux_lpc11u6x_get(const struct device *dev, uint32_t pin, uint32_t *func)
+static int pinmux_lpc11u6x_get(const struct device *dev, uint32_t pin,
+			       uint32_t *func)
 {
 	const struct pinmux_lpc11u6x_config *config = DEV_CFG(dev);
 	volatile uint32_t *base;
@@ -76,14 +74,14 @@ pinmux_lpc11u6x_get(const struct device *dev, uint32_t pin, uint32_t *func)
 	return 0;
 }
 
-static int
-pinmux_lpc11u6x_pullup(const struct device *dev, uint32_t pin, uint8_t func)
+static int pinmux_lpc11u6x_pullup(const struct device *dev, uint32_t pin,
+				  uint8_t func)
 {
 	return -ENOTSUP;
 }
 
-static int
-pinmux_lpc11u6x_input(const struct device *dev, uint32_t pin, uint8_t func)
+static int pinmux_lpc11u6x_input(const struct device *dev, uint32_t pin,
+				 uint8_t func)
 {
 	return -ENOTSUP;
 }
@@ -100,18 +98,18 @@ static const struct pinmux_driver_api pinmux_lpc11u6x_driver_api = {
 	.input = pinmux_lpc11u6x_input,
 };
 
-#define PINMUX_LPC11U6X_INIT(id)				\
-static const struct pinmux_lpc11u6x_config			\
-			pinmux_lpc11u6x_config_##id = {		\
-	.port = id,						\
-	.base = (volatile uint32_t *) DT_INST_REG_ADDR(id),	\
-	.npins = DT_INST_REG_SIZE(id) / 4,			\
-};								\
-								\
-DEVICE_AND_API_INIT(pinmux_lpc11u6x_##id, DT_INST_LABEL(id),	\
-		    &pinmux_lpc11u6x_init, NULL,		\
-		    &pinmux_lpc11u6x_config_##id, PRE_KERNEL_1,	\
-		    CONFIG_PINMUX_INIT_PRIORITY,		\
-		    &pinmux_lpc11u6x_driver_api);
+#define PINMUX_LPC11U6X_INIT(id)                                           \
+	static const struct pinmux_lpc11u6x_config                         \
+		pinmux_lpc11u6x_config_##id = {                            \
+			.port = id,                                        \
+			.base = (volatile uint32_t *)DT_INST_REG_ADDR(id), \
+			.npins = DT_INST_REG_SIZE(id) / 4,                 \
+		};                                                         \
+                                                                           \
+	DEVICE_AND_API_INIT(pinmux_lpc11u6x_##id, DT_INST_LABEL(id),       \
+			    &pinmux_lpc11u6x_init, NULL,                   \
+			    &pinmux_lpc11u6x_config_##id, PRE_KERNEL_1,    \
+			    CONFIG_PINMUX_INIT_PRIORITY,                   \
+			    &pinmux_lpc11u6x_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(PINMUX_LPC11U6X_INIT)

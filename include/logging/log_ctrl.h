@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief Logger
  * @defgroup logger Logger system
@@ -102,7 +101,6 @@ __syscall uint32_t log_buffered_cnt(void);
  */
 uint32_t log_src_cnt_get(uint32_t domain_id);
 
-
 /** @brief Get name of the source (module or instance).
  *
  * @param domain_id Domain ID.
@@ -131,7 +129,7 @@ const char *log_domain_name_get(uint32_t domain_id);
  * @return		Severity level.
  */
 uint32_t log_filter_get(struct log_backend const *const backend,
-		     uint32_t domain_id, uint32_t src_id, bool runtime);
+			uint32_t domain_id, uint32_t src_id, bool runtime);
 
 /**
  * @brief Set filter on given source for the provided backend.
@@ -145,9 +143,8 @@ uint32_t log_filter_get(struct log_backend const *const backend,
  *	   was set for all backends then maximal level that was set is returned.
  */
 __syscall uint32_t log_filter_set(struct log_backend const *const backend,
-			       uint32_t domain_id,
-			       uint32_t src_id,
-			       uint32_t level);
+				  uint32_t domain_id, uint32_t src_id,
+				  uint32_t level);
 
 /**
  *
@@ -157,8 +154,7 @@ __syscall uint32_t log_filter_set(struct log_backend const *const backend,
  * @param ctx		User context.
  * @param level		Severity level.
  */
-void log_backend_enable(struct log_backend const *const backend,
-			void *ctx,
+void log_backend_enable(struct log_backend const *const backend, void *ctx,
 			uint32_t level);
 
 /**
@@ -175,7 +171,9 @@ void log_backend_disable(struct log_backend const *const backend);
 #define LOG_PANIC() log_panic()
 #define LOG_PROCESS() log_process(false)
 #else
-#define LOG_CORE_INIT() do { } while (false)
+#define LOG_CORE_INIT() \
+	do {            \
+	} while (false)
 #define LOG_INIT() 0
 #define LOG_PANIC() /* Empty */
 #define LOG_PROCESS() false

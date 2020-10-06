@@ -8,7 +8,6 @@
 #include <kernel.h>
 #include <sys/printk.h>
 
-
 /* This function will allow execute from sram region.
  * This is needed only for this sample because by default all soc will
  * disable the execute from SRAM.
@@ -30,10 +29,8 @@ void disable_mpu_rasr_xn(void)
 			MPU->RASR ^= MPU_RASR_XN_Msk;
 		}
 	}
-
 }
-#endif	/* CONFIG_ARM_MPU */
-
+#endif /* CONFIG_ARM_MPU */
 
 extern void function_in_sram2(void);
 extern void function_in_split_multiple(void);
@@ -42,7 +39,7 @@ void main(void)
 {
 #ifdef CONFIG_ARM_MPU
 	disable_mpu_rasr_xn();
-#endif	/* CONFIG_ARM_MPU */
+#endif /* CONFIG_ARM_MPU */
 
 	printk("Address of main function %p\n\n", &main);
 	function_in_sram2();

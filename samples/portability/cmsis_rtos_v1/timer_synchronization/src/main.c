@@ -12,8 +12,8 @@
 #include <cmsis_os.h>
 
 /* specify delay between greetings (in ms); compute equivalent in ticks */
-#define TIMER_TICKS  50
-#define STACKSIZE  512
+#define TIMER_TICKS 50
+#define STACKSIZE 512
 #define MSGLEN 12
 #define Q_LEN 1
 #define INITIAL_DATA_VALUE 5

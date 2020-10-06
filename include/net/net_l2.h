@@ -30,18 +30,18 @@ struct net_if;
 /** L2 flags */
 enum net_l2_flags {
 	/** IP multicast supported */
-	NET_L2_MULTICAST			= BIT(0),
+	NET_L2_MULTICAST = BIT(0),
 
 	/** Do not joint solicited node multicast group */
-	NET_L2_MULTICAST_SKIP_JOIN_SOLICIT_NODE	= BIT(1),
+	NET_L2_MULTICAST_SKIP_JOIN_SOLICIT_NODE = BIT(1),
 
 	/** Is promiscuous mode supported */
-	NET_L2_PROMISC_MODE			= BIT(2),
+	NET_L2_PROMISC_MODE = BIT(2),
 
 	/** Is this L2 point-to-point with tunneling so no need to have
 	 * IP address etc to network interface.
 	 */
-	NET_L2_POINT_TO_POINT			= BIT(3),
+	NET_L2_POINT_TO_POINT = BIT(3),
 } __packed;
 
 /**
@@ -78,65 +78,64 @@ struct net_l2 {
 
 /** @cond INTERNAL_HIDDEN */
 #define NET_L2_GET_NAME(_name) _net_l2_##_name
-#define NET_L2_DECLARE_PUBLIC(_name)					\
+#define NET_L2_DECLARE_PUBLIC(_name) \
 	extern const struct net_l2 NET_L2_GET_NAME(_name)
 #define NET_L2_GET_CTX_TYPE(_name) _name##_CTX_TYPE
 
 #ifdef CONFIG_NET_L2_DUMMY
-#define DUMMY_L2		DUMMY
-#define DUMMY_L2_CTX_TYPE	void*
+#define DUMMY_L2 DUMMY
+#define DUMMY_L2_CTX_TYPE void *
 NET_L2_DECLARE_PUBLIC(DUMMY_L2);
 #endif /* CONFIG_NET_L2_DUMMY */
 
 #ifdef CONFIG_NET_L2_ETHERNET
-#define ETHERNET_L2		ETHERNET
+#define ETHERNET_L2 ETHERNET
 NET_L2_DECLARE_PUBLIC(ETHERNET_L2);
 #endif /* CONFIG_NET_L2_ETHERNET */
 
 #ifdef CONFIG_NET_L2_PPP
-#define PPP_L2			PPP
+#define PPP_L2 PPP
 NET_L2_DECLARE_PUBLIC(PPP_L2);
 #endif /* CONFIG_NET_L2_PPP */
 
 #ifdef CONFIG_NET_L2_IEEE802154
-#define IEEE802154_L2		IEEE802154
+#define IEEE802154_L2 IEEE802154
 NET_L2_DECLARE_PUBLIC(IEEE802154_L2);
 #endif /* CONFIG_NET_L2_IEEE802154 */
 
 #ifdef CONFIG_NET_L2_BT
-#define BLUETOOTH_L2		BLUETOOTH
-#define BLUETOOTH_L2_CTX_TYPE	void*
+#define BLUETOOTH_L2 BLUETOOTH
+#define BLUETOOTH_L2_CTX_TYPE void *
 NET_L2_DECLARE_PUBLIC(BLUETOOTH_L2);
 #endif /* CONFIG_NET_L2_BT */
 
 #ifdef CONFIG_NET_L2_OPENTHREAD
-#define OPENTHREAD_L2		OPENTHREAD
+#define OPENTHREAD_L2 OPENTHREAD
 NET_L2_DECLARE_PUBLIC(OPENTHREAD_L2);
 #endif /* CONFIG_NET_L2_OPENTHREAD */
 
 #ifdef CONFIG_NET_L2_CANBUS_RAW
-#define CANBUS_RAW_L2		CANBUS_RAW
-#define CANBUS_RAW_L2_CTX_TYPE	void*
+#define CANBUS_RAW_L2 CANBUS_RAW
+#define CANBUS_RAW_L2_CTX_TYPE void *
 NET_L2_DECLARE_PUBLIC(CANBUS_RAW_L2);
 #endif /* CONFIG_NET_L2_CANBUS_RAW */
 
 #ifdef CONFIG_NET_L2_CANBUS
-#define CANBUS_L2		CANBUS
+#define CANBUS_L2 CANBUS
 NET_L2_DECLARE_PUBLIC(CANBUS_L2);
 #endif /* CONFIG_NET_L2_CANBUS */
 
-#define NET_L2_INIT(_name, _recv_fn, _send_fn, _enable_fn, _get_flags_fn) \
-	const Z_STRUCT_SECTION_ITERABLE(net_l2,				\
-					NET_L2_GET_NAME(_name)) = {	\
-		.recv = (_recv_fn),					\
-		.send = (_send_fn),					\
-		.enable = (_enable_fn),					\
-		.get_flags = (_get_flags_fn),				\
+#define NET_L2_INIT(_name, _recv_fn, _send_fn, _enable_fn, _get_flags_fn)   \
+	const Z_STRUCT_SECTION_ITERABLE(net_l2, NET_L2_GET_NAME(_name)) = { \
+		.recv = (_recv_fn),                                         \
+		.send = (_send_fn),                                         \
+		.enable = (_enable_fn),                                     \
+		.get_flags = (_get_flags_fn),                               \
 	}
 
 #define NET_L2_GET_DATA(name, sfx) _net_l2_data_##name##sfx
 
-#define NET_L2_DATA_INIT(name, sfx, ctx_type)				\
+#define NET_L2_DATA_INIT(name, sfx, ctx_type) \
 	static ctx_type NET_L2_GET_DATA(name, sfx) __used;
 
 /** @endcond */

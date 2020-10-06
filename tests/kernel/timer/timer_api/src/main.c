@@ -17,8 +17,8 @@ struct timer_data {
 #define DURATION 100
 #define PERIOD 50
 #define EXPIRE_TIMES 4
-#define WITHIN_ERROR(var, target, epsilon)       \
-		(((var) >= (target)) && ((var) <= (target) + (epsilon)))
+#define WITHIN_ERROR(var, target, epsilon) \
+	(((var) >= (target)) && ((var) <= (target) + (epsilon)))
 /* ms can be converted precisely to ticks only when a ms is exactly
  * represented by an integral number of ticks.  If the conversion is
  * not precise, then the reverse conversion of a difference in ms can
@@ -26,7 +26,8 @@ struct timer_data {
  * the first and second ms conversion, and we need to adjust the
  * tolerance interval.
  */
-#define INEXACT_MS_CONVERT ((CONFIG_SYS_CLOCK_TICKS_PER_SEC % MSEC_PER_SEC) != 0)
+#define INEXACT_MS_CONVERT \
+	((CONFIG_SYS_CLOCK_TICKS_PER_SEC % MSEC_PER_SEC) != 0)
 
 #if CONFIG_NRF_RTC_TIMER
 /* On Nordic SOCs one or both of the tick and busy-wait clocks may
@@ -45,9 +46,8 @@ struct timer_data {
  * between the two clocks.  Produce a maximum error for a given
  * duration in microseconds.
  */
-#define BUSY_SLEW_THRESHOLD_TICKS(_us)				\
-	k_us_to_ticks_ceil32((_us) * BUSY_TICK_SLEW_PPM		\
-			     / PPM_DIVISOR)
+#define BUSY_SLEW_THRESHOLD_TICKS(_us) \
+	k_us_to_ticks_ceil32((_us)*BUSY_TICK_SLEW_PPM / PPM_DIVISOR)
 
 static void duration_expire(struct k_timer *timer);
 static void duration_stop(struct k_timer *timer);
@@ -69,12 +69,12 @@ static ZTEST_BMEM struct timer_data tdata;
 
 extern void test_time_conversions(void);
 
-#define TIMER_ASSERT(exp, tmr)			 \
-	do {					 \
-		if (!(exp)) {			 \
-			k_timer_stop(tmr);	 \
+#define TIMER_ASSERT(exp, tmr)                   \
+	do {                                     \
+		if (!(exp)) {                    \
+			k_timer_stop(tmr);       \
 			zassert_true(exp, NULL); \
-		}				 \
+		}                                \
 	} while (0)
 
 static void init_timer_data(void)
@@ -91,13 +91,14 @@ static void duration_expire(struct k_timer *timer)
 
 	tdata.expire_cnt++;
 	if (tdata.expire_cnt == 1) {
-		TIMER_ASSERT((interval >= DURATION)
-			     || (INEXACT_MS_CONVERT
-				 && (interval == DURATION - 1)), timer);
+		TIMER_ASSERT((interval >= DURATION) ||
+				     (INEXACT_MS_CONVERT &&
+				      (interval == DURATION - 1)),
+			     timer);
 	} else {
-		TIMER_ASSERT((interval >= PERIOD)
-			     || (INEXACT_MS_CONVERT
-				 && (interval == PERIOD - 1)), timer);
+		TIMER_ASSERT((interval >= PERIOD) || (INEXACT_MS_CONVERT &&
+						      (interval == PERIOD - 1)),
+			     timer);
 	}
 
 	if (tdata.expire_cnt >= EXPIRE_TIMES) {
@@ -129,7 +130,7 @@ static void status_expire(struct k_timer *timer)
 
 static void busy_wait_ms(int32_t ms)
 {
-	k_busy_wait(ms*1000);
+	k_busy_wait(ms * 1000);
 }
 
 static void status_stop(struct k_timer *timer)
@@ -193,13 +194,11 @@ void test_timer_duration_period(void)
 void test_timer_restart(void)
 {
 	init_timer_data();
-	k_timer_start(&status_anytime_timer, K_MSEC(DURATION),
-		      K_MSEC(PERIOD));
+	k_timer_start(&status_anytime_timer, K_MSEC(DURATION), K_MSEC(PERIOD));
 	busy_wait_ms(DURATION + PERIOD * (EXPIRE_TIMES - 1) + PERIOD / 2);
 
 	/** TESTPOINT: restart the timer */
-	k_timer_start(&status_anytime_timer, K_MSEC(DURATION),
-		      K_MSEC(PERIOD));
+	k_timer_start(&status_anytime_timer, K_MSEC(DURATION), K_MSEC(PERIOD));
 	/* Restart timer, timer's status is reset to zero */
 	TIMER_ASSERT(k_timer_status_get(&status_anytime_timer) == 0,
 		     &status_anytime_timer);
@@ -207,7 +206,6 @@ void test_timer_restart(void)
 	/* cleanup environment */
 	k_timer_stop(&status_anytime_timer);
 }
-
 
 /**
  * @brief Test Timer with zero period value
@@ -228,18 +226,18 @@ void test_timer_period_0(void)
 {
 	init_timer_data();
 	/** TESTPOINT: set period 0 */
-	k_timer_start(&period0_timer,
-		      K_TICKS(k_ms_to_ticks_floor32(DURATION)
-			      - BUSY_SLEW_THRESHOLD_TICKS(DURATION
-							  * USEC_PER_MSEC)),
-		      K_NO_WAIT);
+	k_timer_start(
+		&period0_timer,
+		K_TICKS(k_ms_to_ticks_floor32(DURATION) -
+			BUSY_SLEW_THRESHOLD_TICKS(DURATION * USEC_PER_MSEC)),
+		K_NO_WAIT);
 	tdata.timestamp = k_uptime_get();
 	busy_wait_ms(DURATION + 1);
 
 	/** TESTPOINT: ensure it is one-short timer */
-	TIMER_ASSERT((tdata.expire_cnt == 1)
-		     || (INEXACT_MS_CONVERT
-			 && (tdata.expire_cnt == 0)), &period0_timer);
+	TIMER_ASSERT((tdata.expire_cnt == 1) ||
+			     (INEXACT_MS_CONVERT && (tdata.expire_cnt == 0)),
+		     &period0_timer);
 	TIMER_ASSERT(tdata.stop_cnt == 0, &period0_timer);
 
 	/* cleanup environemtn */
@@ -307,7 +305,8 @@ static void tick_sync(void)
  */
 void test_timer_periodicity(void)
 {
-	uint64_t period_ms = k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(PERIOD));
+	uint64_t period_ms =
+		k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(PERIOD));
 	int64_t delta;
 
 	/* Start at a tick boundary, otherwise a tick expiring between
@@ -348,9 +347,9 @@ void test_timer_periodicity(void)
 		 * In the case of inexact conversion the delta will
 		 * occasionally be one less than the expected number.
 		 */
-		TIMER_ASSERT(WITHIN_ERROR(delta, period_ms, 1)
-			     || (INEXACT_MS_CONVERT
-				 && (delta == period_ms - 1)),
+		TIMER_ASSERT(WITHIN_ERROR(delta, period_ms, 1) ||
+				     (INEXACT_MS_CONVERT &&
+				      (delta == period_ms - 1)),
 			     &periodicity_timer);
 	}
 
@@ -405,8 +404,7 @@ void test_timer_status_get(void)
 void test_timer_status_get_anytime(void)
 {
 	init_timer_data();
-	k_timer_start(&status_anytime_timer, K_MSEC(DURATION),
-		      K_MSEC(PERIOD));
+	k_timer_start(&status_anytime_timer, K_MSEC(DURATION), K_MSEC(PERIOD));
 	busy_wait_ms(DURATION + PERIOD * (EXPIRE_TIMES - 1) + PERIOD / 2);
 
 	/** TESTPOINT: status get at any time */
@@ -515,9 +513,9 @@ K_TIMER_DEFINE(timer2, user_data_timer_handler, NULL);
 K_TIMER_DEFINE(timer3, user_data_timer_handler, NULL);
 K_TIMER_DEFINE(timer4, user_data_timer_handler, NULL);
 
-static ZTEST_DMEM struct k_timer *user_data_timer[5] = {
-	&timer0, &timer1, &timer2, &timer3, &timer4
-};
+static ZTEST_DMEM struct k_timer *user_data_timer[5] = { &timer0, &timer1,
+							 &timer2, &timer3,
+							 &timer4 };
 
 static const intptr_t user_data[5] = { 0x1337, 0xbabe, 0xd00d, 0xdeaf, 0xfade };
 
@@ -529,7 +527,8 @@ static void user_data_timer_handler(struct k_timer *timer)
 			timer == user_data_timer[1] ? 1 :
 			timer == user_data_timer[2] ? 2 :
 			timer == user_data_timer[3] ? 3 :
-			timer == user_data_timer[4] ? 4 : -1;
+			timer == user_data_timer[4] ? 4 :
+							    -1;
 
 	if (timer_num == -1) {
 		return;
@@ -610,7 +609,6 @@ void test_timer_remaining(void)
 	uint32_t slew_ticks;
 	uint64_t now;
 
-
 	init_timer_data();
 	k_usleep(1); /* align to tick */
 	k_timer_start(&remain_timer, K_MSEC(DURATION), K_NO_WAIT);
@@ -629,8 +627,7 @@ void test_timer_remaining(void)
 	 * the value obtained through k_timer_remaining_get() could be larger
 	 * than actual remaining time with maximum error equal to one tick.
 	 */
-	zassert_true(rem_ms <= (DURATION / 2) + k_ticks_to_ms_floor64(1),
-		     NULL);
+	zassert_true(rem_ms <= (DURATION / 2) + k_ticks_to_ms_floor64(1), NULL);
 
 	/* Half the value of DURATION in ticks may not be the value of
 	 * half DURATION in ticks, when DURATION/2 is not an integer
@@ -698,12 +695,12 @@ void test_timeout_abs(void)
 	rem_ticks = k_timer_remaining_ticks(&remain_timer);
 	cap2_ticks = k_uptime_ticks();
 	k_timer_stop(&remain_timer);
-	zassert_true((cap_ticks + rem_ticks + 1 == exp_ticks)
-		     || (rem_ticks + cap2_ticks + 1 == exp_ticks)
-		     || (INEXACT_MS_CONVERT
-			 && (cap_ticks + rem_ticks == exp_ticks))
-		     || (INEXACT_MS_CONVERT
-			 && (rem_ticks + cap2_ticks == exp_ticks)),
+	zassert_true((cap_ticks + rem_ticks + 1 == exp_ticks) ||
+			     (rem_ticks + cap2_ticks + 1 == exp_ticks) ||
+			     (INEXACT_MS_CONVERT &&
+			      (cap_ticks + rem_ticks == exp_ticks)) ||
+			     (INEXACT_MS_CONVERT &&
+			      (rem_ticks + cap2_ticks == exp_ticks)),
 		     NULL);
 #endif
 }
@@ -730,8 +727,7 @@ void test_main(void)
 	k_thread_access_grant(k_current_get(), &ktimer, &timer0, &timer1,
 			      &timer2, &timer3, &timer4);
 
-	ztest_test_suite(timer_api,
-			 ztest_unit_test(test_time_conversions),
+	ztest_test_suite(timer_api, ztest_unit_test(test_time_conversions),
 			 ztest_user_unit_test(test_timer_duration_period),
 			 ztest_user_unit_test(test_timer_restart),
 			 ztest_user_unit_test(test_timer_period_0),

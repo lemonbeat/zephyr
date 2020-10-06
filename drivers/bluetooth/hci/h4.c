@@ -29,28 +29,28 @@
 #include "../util.h"
 
 #define H4_NONE 0x00
-#define H4_CMD  0x01
-#define H4_ACL  0x02
-#define H4_SCO  0x03
-#define H4_EVT  0x04
-#define H4_ISO  0x05
+#define H4_CMD 0x01
+#define H4_ACL 0x02
+#define H4_SCO 0x03
+#define H4_EVT 0x04
+#define H4_ISO 0x05
 
 static K_KERNEL_STACK_DEFINE(rx_thread_stack, CONFIG_BT_RX_STACK_SIZE);
 static struct k_thread rx_thread_data;
 
 static struct {
 	struct net_buf *buf;
-	struct k_fifo   fifo;
+	struct k_fifo fifo;
 
-	uint16_t    remaining;
-	uint16_t    discard;
+	uint16_t remaining;
+	uint16_t discard;
 
-	bool     have_hdr;
-	bool     discardable;
+	bool have_hdr;
+	bool discardable;
 
-	uint8_t     hdr_len;
+	uint8_t hdr_len;
 
-	uint8_t     type;
+	uint8_t type;
 	union {
 		struct bt_hci_evt_hdr evt;
 		struct bt_hci_acl_hdr acl;
@@ -64,7 +64,7 @@ static struct {
 static struct {
 	uint8_t type;
 	struct net_buf *buf;
-	struct k_fifo   fifo;
+	struct k_fifo fifo;
 } tx = {
 	.fifo = Z_FIFO_INITIALIZER(tx.fifo),
 };
@@ -107,8 +107,8 @@ static inline void get_acl_hdr(void)
 	struct bt_hci_acl_hdr *hdr = &rx.acl;
 	int to_read = sizeof(*hdr) - rx.remaining;
 
-	rx.remaining -= uart_fifo_read(h4_dev, (uint8_t *)hdr + to_read,
-				       rx.remaining);
+	rx.remaining -=
+		uart_fifo_read(h4_dev, (uint8_t *)hdr + to_read, rx.remaining);
 	if (!rx.remaining) {
 		rx.remaining = sys_le16_to_cpu(hdr->len);
 		BT_DBG("Got ACL header. Payload %u bytes", rx.remaining);
@@ -121,8 +121,8 @@ static inline void get_iso_hdr(void)
 	struct bt_hci_iso_hdr *hdr = &rx.iso;
 	unsigned int to_read = sizeof(*hdr) - rx.remaining;
 
-	rx.remaining -= uart_fifo_read(h4_dev, (uint8_t *)hdr + to_read,
-				       rx.remaining);
+	rx.remaining -=
+		uart_fifo_read(h4_dev, (uint8_t *)hdr + to_read, rx.remaining);
 	if (!rx.remaining) {
 		rx.remaining = sys_le16_to_cpu(hdr->len);
 		BT_DBG("Got ISO header. Payload %u bytes", rx.remaining);
@@ -135,8 +135,8 @@ static inline void get_evt_hdr(void)
 	struct bt_hci_evt_hdr *hdr = &rx.evt;
 	int to_read = rx.hdr_len - rx.remaining;
 
-	rx.remaining -= uart_fifo_read(h4_dev, (uint8_t *)hdr + to_read,
-				       rx.remaining);
+	rx.remaining -=
+		uart_fifo_read(h4_dev, (uint8_t *)hdr + to_read, rx.remaining);
 	if (rx.hdr_len == sizeof(*hdr) && rx.remaining < sizeof(*hdr)) {
 		switch (rx.evt.evt) {
 		case BT_HCI_EVT_LE_META_EVENT:
@@ -164,7 +164,6 @@ static inline void get_evt_hdr(void)
 		rx.have_hdr = true;
 	}
 }
-
 
 static inline void copy_hdr(struct net_buf *buf)
 {
@@ -488,19 +487,18 @@ static int h4_open(void)
 	uart_irq_callback_set(h4_dev, bt_uart_isr);
 
 	k_thread_create(&rx_thread_data, rx_thread_stack,
-			K_KERNEL_STACK_SIZEOF(rx_thread_stack),
-			rx_thread, NULL, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BT_RX_PRIO),
-			0, K_NO_WAIT);
+			K_KERNEL_STACK_SIZEOF(rx_thread_stack), rx_thread, NULL,
+			NULL, NULL, K_PRIO_COOP(CONFIG_BT_RX_PRIO), 0,
+			K_NO_WAIT);
 
 	return 0;
 }
 
 static const struct bt_hci_driver drv = {
-	.name		= "H:4",
-	.bus		= BT_HCI_DRIVER_BUS_UART,
-	.open		= h4_open,
-	.send		= h4_send,
+	.name = "H:4",
+	.bus = BT_HCI_DRIVER_BUS_UART,
+	.open = h4_open,
+	.send = h4_send,
 };
 
 static int bt_uart_init(const struct device *unused)

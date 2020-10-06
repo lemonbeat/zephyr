@@ -33,40 +33,34 @@
  * @}
  */
 
-#define TEST_SEND_TIMEOUT    K_MSEC(100)
+#define TEST_SEND_TIMEOUT K_MSEC(100)
 #define TEST_RECEIVE_TIMEOUT K_MSEC(100)
 
-#define TEST_CAN_STD_ID      0x555
+#define TEST_CAN_STD_ID 0x555
 #define TEST_CAN_SOME_STD_ID 0x123
 
-#define TEST_CAN_EXT_ID      0x15555555
-#define TEST_CAN_EXT_MASK    0x1FFFFFF0
+#define TEST_CAN_EXT_ID 0x15555555
+#define TEST_CAN_EXT_MASK 0x1FFFFFF0
 
 CAN_DEFINE_MSGQ(can_msgq, 5);
 
-struct zcan_frame test_std_msg = {
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.rtr     = CAN_DATAFRAME,
-	.std_id  = TEST_CAN_STD_ID,
-	.dlc     = 8,
-	.data    = {1, 2, 3, 4, 5, 6, 7, 8}
-};
+struct zcan_frame test_std_msg = { .id_type = CAN_STANDARD_IDENTIFIER,
+				   .rtr = CAN_DATAFRAME,
+				   .std_id = TEST_CAN_STD_ID,
+				   .dlc = 8,
+				   .data = { 1, 2, 3, 4, 5, 6, 7, 8 } };
 
-const struct zcan_filter test_std_filter = {
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.rtr = CAN_DATAFRAME,
-	.std_id = TEST_CAN_STD_ID,
-	.rtr_mask = 1,
-	.std_id_mask = CAN_STD_ID_MASK
-};
+const struct zcan_filter test_std_filter = { .id_type = CAN_STANDARD_IDENTIFIER,
+					     .rtr = CAN_DATAFRAME,
+					     .std_id = TEST_CAN_STD_ID,
+					     .rtr_mask = 1,
+					     .std_id_mask = CAN_STD_ID_MASK };
 
-const struct zcan_filter test_ext_filter = {
-	.id_type = CAN_EXTENDED_IDENTIFIER,
-	.rtr = CAN_DATAFRAME,
-	.ext_id = TEST_CAN_EXT_ID,
-	.rtr_mask = 1,
-	.ext_id_mask = CAN_EXT_ID_MASK
-};
+const struct zcan_filter test_ext_filter = { .id_type = CAN_EXTENDED_IDENTIFIER,
+					     .rtr = CAN_DATAFRAME,
+					     .ext_id = TEST_CAN_EXT_ID,
+					     .rtr_mask = 1,
+					     .ext_id_mask = CAN_EXT_ID_MASK };
 
 const struct zcan_filter test_ext_masked_filter = {
 	.id_type = CAN_EXTENDED_IDENTIFIER,
@@ -88,29 +82,23 @@ static inline void check_msg(struct zcan_frame *msg1, struct zcan_frame *msg2)
 {
 	int cmp_res;
 
-	zassert_equal(msg1->id_type, msg2->id_type,
-		      "ID type does not match");
+	zassert_equal(msg1->id_type, msg2->id_type, "ID type does not match");
 
-	zassert_equal(msg1->rtr, msg2->rtr,
-		      "RTR bit does not match");
+	zassert_equal(msg1->rtr, msg2->rtr, "RTR bit does not match");
 
 	if (msg2->id_type == CAN_STANDARD_IDENTIFIER) {
-		zassert_equal(msg1->std_id, msg2->std_id,
-			      "ID does not match");
+		zassert_equal(msg1->std_id, msg2->std_id, "ID does not match");
 	} else {
-		zassert_equal(msg1->ext_id, msg2->ext_id,
-			      "ID does not match");
+		zassert_equal(msg1->ext_id, msg2->ext_id, "ID does not match");
 	}
 
-	zassert_equal(msg1->dlc, msg2->dlc,
-		      "DLC does not match");
+	zassert_equal(msg1->dlc, msg2->dlc, "DLC does not match");
 
 	cmp_res = memcmp(msg1->data, msg2->data, msg1->dlc);
 	zassert_equal(cmp_res, 0, "Received data differ");
 }
 
-static void send_test_msg(const struct device *can_dev,
-			  struct zcan_frame *msg)
+static void send_test_msg(const struct device *can_dev, struct zcan_frame *msg)
 {
 	int ret;
 
@@ -135,7 +123,8 @@ static void test_filter_handling(void)
 
 	ret = can_configure(can_dev, CAN_LOOPBACK_MODE, 0);
 
-	filter_id_1 = can_attach_msgq(can_dev, &can_msgq, &test_ext_masked_filter);
+	filter_id_1 =
+		can_attach_msgq(can_dev, &can_msgq, &test_ext_masked_filter);
 	zassert_not_equal(filter_id_1, CAN_NO_FREE_FILTER,
 			  "Filter full even for a single one");
 	zassert_true((filter_id_1 >= 0), "Negative filter number");
@@ -146,7 +135,8 @@ static void test_filter_handling(void)
 	zassert_true((filter_id_2 >= 0), "Negative filter number");
 
 	can_detach(can_dev, filter_id_1);
-	filter_id_1 = can_attach_msgq(can_dev, &can_msgq, &test_std_some_filter);
+	filter_id_1 =
+		can_attach_msgq(can_dev, &can_msgq, &test_std_some_filter);
 	zassert_not_equal(filter_id_1, CAN_NO_FREE_FILTER,
 			  "Filter full when overriding the first one");
 	zassert_true((filter_id_1 >= 0), "Negative filter number");
@@ -178,7 +168,6 @@ static void test_filter_handling(void)
 
 void test_main(void)
 {
-	ztest_test_suite(can_driver,
-			 ztest_unit_test(test_filter_handling));
+	ztest_test_suite(can_driver, ztest_unit_test(test_filter_handling));
 	ztest_run_test_suite(can_driver);
 }

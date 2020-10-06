@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #ifndef ZEPHYR_INCLUDE_NET_PPP_H_
 #define ZEPHYR_INCLUDE_NET_PPP_H_
 
@@ -73,16 +72,16 @@ BUILD_ASSERT(offsetof(struct ppp_api, iface_api) == 0);
  * for details.
  */
 enum ppp_protocol_type {
-	PPP_IP     = 0x0021, /**< RFC 1332 */
-	PPP_IPV6   = 0x0057, /**< RFC 5072 */
-	PPP_IPCP   = 0x8021, /**< RFC 1332 */
-	PPP_ECP    = 0x8053, /**< RFC 1968 */
+	PPP_IP = 0x0021, /**< RFC 1332 */
+	PPP_IPV6 = 0x0057, /**< RFC 5072 */
+	PPP_IPCP = 0x8021, /**< RFC 1332 */
+	PPP_ECP = 0x8053, /**< RFC 1968 */
 	PPP_IPV6CP = 0x8057, /**< RFC 5072 */
-	PPP_CCP    = 0x80FD, /**< RFC 1962 */
-	PPP_LCP    = 0xc021, /**< RFC 1661 */
-	PPP_PAP    = 0xc023, /**< RFC 1334 */
-	PPP_CHAP   = 0xc223, /**< RFC 1334 */
-	PPP_EAP    = 0xc227, /**< RFC 2284 */
+	PPP_CCP = 0x80FD, /**< RFC 1962 */
+	PPP_LCP = 0xc021, /**< RFC 1661 */
+	PPP_PAP = 0xc023, /**< RFC 1334 */
+	PPP_CHAP = 0xc223, /**< RFC 1334 */
+	PPP_EAP = 0xc227, /**< RFC 2284 */
 };
 
 /**
@@ -123,17 +122,17 @@ enum ppp_state {
  * PPP protocol operations from RFC 1661
  */
 enum ppp_packet_type {
-	PPP_CONFIGURE_REQ  = 1,
-	PPP_CONFIGURE_ACK  = 2,
+	PPP_CONFIGURE_REQ = 1,
+	PPP_CONFIGURE_ACK = 2,
 	PPP_CONFIGURE_NACK = 3,
-	PPP_CONFIGURE_REJ  = 4,
-	PPP_TERMINATE_REQ  = 5,
-	PPP_TERMINATE_ACK  = 6,
-	PPP_CODE_REJ       = 7,
-	PPP_PROTOCOL_REJ   = 8,
-	PPP_ECHO_REQ       = 9,
-	PPP_ECHO_REPLY     = 10,
-	PPP_DISCARD_REQ    = 11
+	PPP_CONFIGURE_REJ = 4,
+	PPP_TERMINATE_REQ = 5,
+	PPP_TERMINATE_ACK = 6,
+	PPP_CODE_REJ = 7,
+	PPP_PROTOCOL_REJ = 8,
+	PPP_ECHO_REQ = 9,
+	PPP_ECHO_REPLY = 10,
+	PPP_DISCARD_REQ = 11
 };
 
 /**
@@ -227,31 +226,27 @@ struct ppp_fsm {
 
 	struct {
 		/** Acknowledge Configuration Information */
-		int (*config_info_ack)(struct ppp_fsm *fsm,
-				       struct net_pkt *pkt,
+		int (*config_info_ack)(struct ppp_fsm *fsm, struct net_pkt *pkt,
 				       uint16_t length);
 
 		/** Add Configuration Information */
 		struct net_pkt *(*config_info_add)(struct ppp_fsm *fsm);
 
 		/** Length of Configuration Information */
-		int  (*config_info_len)(struct ppp_fsm *fsm);
+		int (*config_info_len)(struct ppp_fsm *fsm);
 
 		/** Negative Acknowledge Configuration Information */
 		int (*config_info_nack)(struct ppp_fsm *fsm,
-					struct net_pkt *pkt,
-					uint16_t length,
+					struct net_pkt *pkt, uint16_t length,
 					bool rejected);
 
 		/** Request peer's Configuration Information */
-		int (*config_info_req)(struct ppp_fsm *fsm,
-				       struct net_pkt *pkt,
+		int (*config_info_req)(struct ppp_fsm *fsm, struct net_pkt *pkt,
 				       uint16_t length,
 				       struct net_pkt *ret_pkt);
 
 		/** Reject Configuration Information */
-		int (*config_info_rej)(struct ppp_fsm *fsm,
-				       struct net_pkt *pkt,
+		int (*config_info_rej)(struct ppp_fsm *fsm, struct net_pkt *pkt,
 				       uint16_t length);
 
 		/** Reset Configuration Information */
@@ -329,8 +324,8 @@ struct ppp_fsm {
 	uint8_t ack_received : 1;
 };
 
-#define PPP_MY_OPTION_ACKED	BIT(0)
-#define PPP_MY_OPTION_REJECTED	BIT(1)
+#define PPP_MY_OPTION_ACKED BIT(0)
+#define PPP_MY_OPTION_REJECTED BIT(1)
 
 struct ppp_my_option_data {
 	uint32_t flags;
@@ -357,14 +352,14 @@ struct ipcp_options {
 	struct in_addr dns2_address;
 };
 
-#define IPCP_NUM_MY_OPTIONS	3
+#define IPCP_NUM_MY_OPTIONS 3
 
 struct ipv6cp_options {
 	/** Interface identifier */
 	uint8_t iid[PPP_INTERFACE_IDENTIFIER_LEN];
 };
 
-#define IPV6CP_NUM_MY_OPTIONS	1
+#define IPV6CP_NUM_MY_OPTIONS 1
 
 /** PPP L2 context specific to certain network interface */
 struct ppp_context {
@@ -535,24 +530,23 @@ void net_ppp_init(struct net_if *iface);
 
 /** @cond INTERNAL_HIDDEN */
 
-#define PPP_L2_CTX_TYPE	struct ppp_context
+#define PPP_L2_CTX_TYPE struct ppp_context
 
-#define _NET_PPP_LAYER	NET_MGMT_LAYER_L2
-#define _NET_PPP_CODE	0x209
-#define _NET_PPP_BASE	(NET_MGMT_IFACE_BIT |				\
-			 NET_MGMT_LAYER(_NET_PPP_LAYER) |		\
-			 NET_MGMT_LAYER_CODE(_NET_PPP_CODE))
-#define _NET_PPP_EVENT	(_NET_PPP_BASE | NET_MGMT_EVENT_BIT)
+#define _NET_PPP_LAYER NET_MGMT_LAYER_L2
+#define _NET_PPP_CODE 0x209
+#define _NET_PPP_BASE                                          \
+	(NET_MGMT_IFACE_BIT | NET_MGMT_LAYER(_NET_PPP_LAYER) | \
+	 NET_MGMT_LAYER_CODE(_NET_PPP_CODE))
+#define _NET_PPP_EVENT (_NET_PPP_BASE | NET_MGMT_EVENT_BIT)
 
 enum net_event_ppp_cmd {
 	NET_EVENT_PPP_CMD_CARRIER_ON = 1,
 	NET_EVENT_PPP_CMD_CARRIER_OFF,
 };
 
-#define NET_EVENT_PPP_CARRIER_ON					\
-	(_NET_PPP_EVENT | NET_EVENT_PPP_CMD_CARRIER_ON)
+#define NET_EVENT_PPP_CARRIER_ON (_NET_PPP_EVENT | NET_EVENT_PPP_CMD_CARRIER_ON)
 
-#define NET_EVENT_PPP_CARRIER_OFF					\
+#define NET_EVENT_PPP_CARRIER_OFF \
 	(_NET_PPP_EVENT | NET_EVENT_PPP_CMD_CARRIER_OFF)
 
 struct net_if;

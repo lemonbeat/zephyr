@@ -6,7 +6,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 /**
  * @file
  * @brief USB Communications Device Class (CDC) public header
@@ -22,84 +21,84 @@
 #define ZEPHYR_INCLUDE_USB_CLASS_USB_CDC_H_
 
 /** CDC Specification release number in BCD format */
-#define CDC_SRN_1_20			0x0120
+#define CDC_SRN_1_20 0x0120
 
 /** Communications Class Subclass Codes */
-#define ACM_SUBCLASS			0x02
-#define ECM_SUBCLASS			0x06
-#define EEM_SUBCLASS			0x0c
+#define ACM_SUBCLASS 0x02
+#define ECM_SUBCLASS 0x06
+#define EEM_SUBCLASS 0x0c
 
 /** Communications Class Protocol Codes */
-#define AT_CMD_V250_PROTOCOL		0x01
-#define EEM_PROTOCOL			0x07
+#define AT_CMD_V250_PROTOCOL 0x01
+#define EEM_PROTOCOL 0x07
 
 /**
  * @brief Data Class Interface Codes
  * @note CDC120-20101103-track.pdf, 4.5, Table 6
  */
-#define DATA_INTERFACE_CLASS		0x0A
+#define DATA_INTERFACE_CLASS 0x0A
 
 /**
  * @brief bDescriptor SubType for Communications
  * Class Functional Descriptors
  * @note CDC120-20101103-track.pdf, 5.2.3, Table 13
  */
-#define HEADER_FUNC_DESC		0x00
-#define CALL_MANAGEMENT_FUNC_DESC	0x01
-#define ACM_FUNC_DESC			0x02
-#define UNION_FUNC_DESC			0x06
-#define ETHERNET_FUNC_DESC		0x0F
+#define HEADER_FUNC_DESC 0x00
+#define CALL_MANAGEMENT_FUNC_DESC 0x01
+#define ACM_FUNC_DESC 0x02
+#define UNION_FUNC_DESC 0x06
+#define ETHERNET_FUNC_DESC 0x0F
 
 /**
  * @brief PSTN Subclass Specific Requests
  * for ACM devices
  * @note PSTN120.pdf, 6.3, Table 13
  */
-#define CDC_SEND_ENC_CMD		0x00
-#define CDC_GET_ENC_RSP			0x01
-#define SET_LINE_CODING			0x20
-#define GET_LINE_CODING			0x21
-#define SET_CONTROL_LINE_STATE		0x22
+#define CDC_SEND_ENC_CMD 0x00
+#define CDC_GET_ENC_RSP 0x01
+#define SET_LINE_CODING 0x20
+#define GET_LINE_CODING 0x21
+#define SET_CONTROL_LINE_STATE 0x22
 
 /** Control Signal Bitmap Values for SetControlLineState */
-#define SET_CONTROL_LINE_STATE_RTS	0x02
-#define SET_CONTROL_LINE_STATE_DTR	0x01
+#define SET_CONTROL_LINE_STATE_RTS 0x02
+#define SET_CONTROL_LINE_STATE_DTR 0x01
 
 /** Enhance enum uart_line_ctrl with CDC specific values */
-#define USB_CDC_LINE_CTRL_BAUD_RATE	UART_LINE_CTRL_BAUD_RATE
-#define USB_CDC_LINE_CTRL_DCD		UART_LINE_CTRL_DCD
-#define USB_CDC_LINE_CTRL_DSR		UART_LINE_CTRL_DSR
-#define USB_CDC_LINE_CTRL_BREAK		BIT(5)
-#define USB_CDC_LINE_CTRL_RING_SIGNAL	BIT(6)
-#define USB_CDC_LINE_CTRL_FRAMING	BIT(7)
-#define USB_CDC_LINE_CTRL_PARITY	BIT(8)
-#define USB_CDC_LINE_CTRL_OVER_RUN	BIT(9)
+#define USB_CDC_LINE_CTRL_BAUD_RATE UART_LINE_CTRL_BAUD_RATE
+#define USB_CDC_LINE_CTRL_DCD UART_LINE_CTRL_DCD
+#define USB_CDC_LINE_CTRL_DSR UART_LINE_CTRL_DSR
+#define USB_CDC_LINE_CTRL_BREAK BIT(5)
+#define USB_CDC_LINE_CTRL_RING_SIGNAL BIT(6)
+#define USB_CDC_LINE_CTRL_FRAMING BIT(7)
+#define USB_CDC_LINE_CTRL_PARITY BIT(8)
+#define USB_CDC_LINE_CTRL_OVER_RUN BIT(9)
 
 /** UART State Bitmap Values */
-#define SERIAL_STATE_OVER_RUN		0x40
-#define SERIAL_STATE_PARITY		0x20
-#define SERIAL_STATE_FRAMING		0x10
-#define SERIAL_STATE_RING_SIGNAL	0x08
-#define SERIAL_STATE_BREAK		0x04
-#define SERIAL_STATE_TX_CARRIER		0x02
-#define SERIAL_STATE_RX_CARRIER		0x01
+#define SERIAL_STATE_OVER_RUN 0x40
+#define SERIAL_STATE_PARITY 0x20
+#define SERIAL_STATE_FRAMING 0x10
+#define SERIAL_STATE_RING_SIGNAL 0x08
+#define SERIAL_STATE_BREAK 0x04
+#define SERIAL_STATE_TX_CARRIER 0x02
+#define SERIAL_STATE_RX_CARRIER 0x01
 
 /**
  * @brief Class-Specific Request Codes for Ethernet subclass
  * @note ECM120.pdf, 6.2, Table 6
  */
-#define SET_ETHERNET_MULTICAST_FILTERS	0x40
-#define SET_ETHERNET_PM_FILTER		0x41
-#define GET_ETHERNET_PM_FILTER		0x42
-#define SET_ETHERNET_PACKET_FILTER	0x43
-#define GET_ETHERNET_STATISTIC		0x44
+#define SET_ETHERNET_MULTICAST_FILTERS 0x40
+#define SET_ETHERNET_PM_FILTER 0x41
+#define GET_ETHERNET_PM_FILTER 0x42
+#define SET_ETHERNET_PACKET_FILTER 0x43
+#define GET_ETHERNET_STATISTIC 0x44
 
 /** Ethernet Packet Filter Bitmap */
-#define PACKET_TYPE_MULTICAST		0x10
-#define PACKET_TYPE_BROADCAST		0x08
-#define PACKET_TYPE_DIRECTED		0x04
-#define PACKET_TYPE_ALL_MULTICAST	0x02
-#define PACKET_TYPE_PROMISCUOUS		0x01
+#define PACKET_TYPE_MULTICAST 0x10
+#define PACKET_TYPE_BROADCAST 0x08
+#define PACKET_TYPE_DIRECTED 0x04
+#define PACKET_TYPE_ALL_MULTICAST 0x02
+#define PACKET_TYPE_PROMISCUOUS 0x01
 
 /** Header Functional Descriptor */
 struct cdc_header_descriptor {

@@ -10,15 +10,15 @@
 #include <stdio.h>
 
 #if defined(CONFIG_SSD16XX)
-#define DISPLAY_DRIVER		"SSD16XX"
+#define DISPLAY_DRIVER "SSD16XX"
 #endif
 
 #if defined(CONFIG_SSD1306)
-#define DISPLAY_DRIVER		"SSD1306"
+#define DISPLAY_DRIVER "SSD1306"
 #endif
 
 #ifndef DISPLAY_DRIVER
-#define DISPLAY_DRIVER		"DISPLAY"
+#define DISPLAY_DRIVER "DISPLAY"
 #endif
 
 void main(void)
@@ -60,23 +60,20 @@ void main(void)
 			break;
 		}
 		cfb_framebuffer_set_font(dev, idx);
-		printf("font width %d, font height %d\n",
-		       font_width, font_height);
+		printf("font width %d, font height %d\n", font_width,
+		       font_height);
 	}
 
 	printf("x_res %d, y_res %d, ppt %d, rows %d, cols %d\n",
 	       cfb_get_display_parameter(dev, CFB_DISPLAY_WIDTH),
-	       cfb_get_display_parameter(dev, CFB_DISPLAY_HEIGH),
-	       ppt,
-	       rows,
+	       cfb_get_display_parameter(dev, CFB_DISPLAY_HEIGH), ppt, rows,
 	       cfb_get_display_parameter(dev, CFB_DISPLAY_COLS));
 
 	while (1) {
 		for (int i = 0; i < rows; i++) {
 			cfb_framebuffer_clear(dev, false);
-			if (cfb_print(dev,
-				      "0123456789mMgj!\"§$%&/()=",
-				      0, i * ppt)) {
+			if (cfb_print(dev, "0123456789mMgj!\"§$%&/()=", 0,
+				      i * ppt)) {
 				printf("Failed to print a string\n");
 				continue;
 			}

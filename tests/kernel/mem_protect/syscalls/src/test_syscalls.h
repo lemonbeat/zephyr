@@ -18,8 +18,9 @@ __syscall size_t string_nlen(char *src, size_t maxlen, int *err);
 
 __syscall int syscall_arg64(uint64_t arg);
 
-__syscall uint64_t syscall_arg64_big(uint32_t arg1, uint32_t arg2, uint64_t arg3,
-				  uint32_t arg4, uint32_t arg5, uint64_t arg6);
+__syscall uint64_t syscall_arg64_big(uint32_t arg1, uint32_t arg2,
+				     uint64_t arg3, uint32_t arg4,
+				     uint32_t arg5, uint64_t arg6);
 
 __syscall bool syscall_context(void);
 

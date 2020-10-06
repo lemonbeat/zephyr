@@ -60,9 +60,9 @@ static void canopen_leds_update(struct k_timer *timer_id)
 
 K_TIMER_DEFINE(canopen_leds_timer, canopen_leds_update, NULL);
 
-void canopen_leds_init(CO_NMT_t *nmt,
-		       canopen_led_callback_t green_cb, void *green_arg,
-		       canopen_led_callback_t red_cb, void *red_arg)
+void canopen_leds_init(CO_NMT_t *nmt, canopen_led_callback_t green_cb,
+		       void *green_arg, canopen_led_callback_t red_cb,
+		       void *red_arg)
 {
 	k_timer_stop(&canopen_leds_timer);
 

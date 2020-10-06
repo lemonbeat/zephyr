@@ -24,44 +24,44 @@ LOG_MODULE_REGISTER(flash_stm32, CONFIG_FLASH_LOG_LEVEL);
 
 /* STM32F0: maximum erase time of 40ms for a 2K sector */
 #if defined(CONFIG_SOC_SERIES_STM32F0X)
-#define STM32_FLASH_MAX_ERASE_TIME	40
+#define STM32_FLASH_MAX_ERASE_TIME 40
 /* STM32F3: maximum erase time of 40ms for a 2K sector */
 #elif defined(CONFIG_SOC_SERIES_STM32F1X)
-#define STM32_FLASH_MAX_ERASE_TIME	40
+#define STM32_FLASH_MAX_ERASE_TIME 40
 /* STM32F3: maximum erase time of 40ms for a 2K sector */
 #elif defined(CONFIG_SOC_SERIES_STM32F3X)
-#define STM32_FLASH_MAX_ERASE_TIME	40
+#define STM32_FLASH_MAX_ERASE_TIME 40
 /* STM32F4: maximum erase time of 4s for a 128K sector */
 #elif defined(CONFIG_SOC_SERIES_STM32F4X)
-#define STM32_FLASH_MAX_ERASE_TIME	4000
+#define STM32_FLASH_MAX_ERASE_TIME 4000
 /* STM32F7: maximum erase time of 4s for a 256K sector */
 #elif defined(CONFIG_SOC_SERIES_STM32F7X)
-#define STM32_FLASH_MAX_ERASE_TIME	4000
+#define STM32_FLASH_MAX_ERASE_TIME 4000
 /* STM32L0: maximum erase time of 3.2ms for a 128B page */
 #elif defined(CONFIG_SOC_SERIES_STM32L0X)
-#define STM32_FLASH_MAX_ERASE_TIME	4
+#define STM32_FLASH_MAX_ERASE_TIME 4
 /* STM32L4: maximum erase time of 24.47ms for a 2K sector */
 #elif defined(CONFIG_SOC_SERIES_STM32L4X)
-#define STM32_FLASH_MAX_ERASE_TIME	25
+#define STM32_FLASH_MAX_ERASE_TIME 25
 /* STM32WB: maximum erase time of 24.5ms for a 4K sector */
 #elif defined(CONFIG_SOC_SERIES_STM32WBX)
-#define STM32_FLASH_MAX_ERASE_TIME	25
+#define STM32_FLASH_MAX_ERASE_TIME 25
 #elif defined(CONFIG_SOC_SERIES_STM32G0X)
 /* STM32G0: maximum erase time of 40ms for a 2K sector */
-#define STM32_FLASH_MAX_ERASE_TIME	40
+#define STM32_FLASH_MAX_ERASE_TIME 40
 /* STM32G4: maximum erase time of 24.47ms for a 2K sector */
 #elif defined(CONFIG_SOC_SERIES_STM32G4X)
-#define STM32_FLASH_MAX_ERASE_TIME	25
+#define STM32_FLASH_MAX_ERASE_TIME 25
 #endif
 
 /* Let's wait for double the max erase time to be sure that the operation is
  * completed.
  */
-#define STM32_FLASH_TIMEOUT	(2 * STM32_FLASH_MAX_ERASE_TIME)
+#define STM32_FLASH_TIMEOUT (2 * STM32_FLASH_MAX_ERASE_TIME)
 
 static const struct flash_parameters flash_stm32_parameters = {
 	.write_block_size = FLASH_STM32_WRITE_BLOCK_SIZE,
-	/* Some SoCs (L0/L1) use an EEPROM under the hood. Distinguish
+/* Some SoCs (L0/L1) use an EEPROM under the hood. Distinguish
 	 * between them based on the presence of the PECR register. */
 #if defined(FLASH_PECR_ERASE)
 	.erase_value = 0,
@@ -105,7 +105,7 @@ static int flash_stm32_check_status(const struct device *dev)
 		FLASH_FLAG_PGAERR |
 #endif
 #if defined(FLASH_FLAG_RDERR)
-		FLASH_FLAG_RDERR  |
+		FLASH_FLAG_RDERR |
 #endif
 #if defined(FLASH_FLAG_PGPERR)
 		FLASH_FLAG_PGPERR |
@@ -153,15 +153,16 @@ int flash_stm32_wait_flash_idle(const struct device *dev)
 	return 0;
 }
 
-static void flash_stm32_flush_caches(const struct device *dev,
-				     off_t offset, size_t len)
+static void flash_stm32_flush_caches(const struct device *dev, off_t offset,
+				     size_t len)
 {
-#if defined(CONFIG_SOC_SERIES_STM32F0X) || defined(CONFIG_SOC_SERIES_STM32F3X) || \
+#if defined(CONFIG_SOC_SERIES_STM32F0X) ||     \
+	defined(CONFIG_SOC_SERIES_STM32F3X) || \
 	defined(CONFIG_SOC_SERIES_STM32G0X)
 	ARG_UNUSED(dev);
 	ARG_UNUSED(offset);
 	ARG_UNUSED(len);
-#elif defined(CONFIG_SOC_SERIES_STM32F4X) || \
+#elif defined(CONFIG_SOC_SERIES_STM32F4X) ||   \
 	defined(CONFIG_SOC_SERIES_STM32L4X) || \
 	defined(CONFIG_SOC_SERIES_STM32WBX) || \
 	defined(CONFIG_SOC_SERIES_STM32G4X)
@@ -177,18 +178,17 @@ static void flash_stm32_flush_caches(const struct device *dev,
 		regs->ACR |= FLASH_ACR_DCEN;
 	}
 #elif defined(CONFIG_SOC_SERIES_STM32F7X)
-	SCB_InvalidateDCache_by_Addr((uint32_t *)(CONFIG_FLASH_BASE_ADDRESS
-						  + offset), len);
+	SCB_InvalidateDCache_by_Addr(
+		(uint32_t *)(CONFIG_FLASH_BASE_ADDRESS + offset), len);
 #endif
 }
 
-static int flash_stm32_read(const struct device *dev, off_t offset,
-			    void *data,
+static int flash_stm32_read(const struct device *dev, off_t offset, void *data,
 			    size_t len)
 {
 	if (!flash_stm32_valid_range(dev, offset, len, false)) {
 		LOG_ERR("Read range invalid. Offset: %ld, len: %zu",
-			(long int) offset, len);
+			(long int)offset, len);
 		return -EINVAL;
 	}
 
@@ -196,21 +196,20 @@ static int flash_stm32_read(const struct device *dev, off_t offset,
 		return 0;
 	}
 
-	LOG_DBG("Read offset: %ld, len: %zu", (long int) offset, len);
+	LOG_DBG("Read offset: %ld, len: %zu", (long int)offset, len);
 
-	memcpy(data, (uint8_t *) CONFIG_FLASH_BASE_ADDRESS + offset, len);
+	memcpy(data, (uint8_t *)CONFIG_FLASH_BASE_ADDRESS + offset, len);
 
 	return 0;
 }
 
-static int flash_stm32_erase(const struct device *dev, off_t offset,
-			     size_t len)
+static int flash_stm32_erase(const struct device *dev, off_t offset, size_t len)
 {
 	int rc;
 
 	if (!flash_stm32_valid_range(dev, offset, len, true)) {
 		LOG_ERR("Erase range invalid. Offset: %ld, len: %zu",
-			(long int) offset, len);
+			(long int)offset, len);
 		return -EINVAL;
 	}
 
@@ -220,7 +219,7 @@ static int flash_stm32_erase(const struct device *dev, off_t offset,
 
 	flash_stm32_sem_take(dev);
 
-	LOG_DBG("Erase offset: %ld, len: %zu", (long int) offset, len);
+	LOG_DBG("Erase offset: %ld, len: %zu", (long int)offset, len);
 
 	rc = flash_stm32_block_erase_loop(dev, offset, len);
 
@@ -238,7 +237,7 @@ static int flash_stm32_write(const struct device *dev, off_t offset,
 
 	if (!flash_stm32_valid_range(dev, offset, len, true)) {
 		LOG_ERR("Write range invalid. Offset: %ld, len: %zu",
-			(long int) offset, len);
+			(long int)offset, len);
 		return -EINVAL;
 	}
 
@@ -248,7 +247,7 @@ static int flash_stm32_write(const struct device *dev, off_t offset,
 
 	flash_stm32_sem_take(dev);
 
-	LOG_DBG("Write offset: %ld, len: %zu", (long int) offset, len);
+	LOG_DBG("Write offset: %ld, len: %zu", (long int)offset, len);
 
 	rc = flash_stm32_write_range(dev, offset, data, len);
 
@@ -321,8 +320,8 @@ flash_stm32_get_parameters(const struct device *dev)
 }
 
 static struct flash_stm32_priv flash_data = {
-	.regs = (FLASH_TypeDef *) DT_INST_REG_ADDR(0),
-#if defined(CONFIG_SOC_SERIES_STM32L4X) || \
+	.regs = (FLASH_TypeDef *)DT_INST_REG_ADDR(0),
+#if defined(CONFIG_SOC_SERIES_STM32L4X) ||     \
 	defined(CONFIG_SOC_SERIES_STM32F0X) || \
 	defined(CONFIG_SOC_SERIES_STM32F1X) || \
 	defined(CONFIG_SOC_SERIES_STM32F3X) || \
@@ -346,7 +345,7 @@ static const struct flash_driver_api flash_stm32_api = {
 
 static int stm32_flash_init(const struct device *dev)
 {
-#if defined(CONFIG_SOC_SERIES_STM32L4X) || \
+#if defined(CONFIG_SOC_SERIES_STM32L4X) ||     \
 	defined(CONFIG_SOC_SERIES_STM32F0X) || \
 	defined(CONFIG_SOC_SERIES_STM32F1X) || \
 	defined(CONFIG_SOC_SERIES_STM32F3X) || \
@@ -358,7 +357,7 @@ static int stm32_flash_init(const struct device *dev)
 	 * On STM32F0, Flash interface clock source is always HSI,
 	 * so statically enable HSI here.
 	 */
-#if defined(CONFIG_SOC_SERIES_STM32F0X) || \
+#if defined(CONFIG_SOC_SERIES_STM32F0X) ||     \
 	defined(CONFIG_SOC_SERIES_STM32F1X) || \
 	defined(CONFIG_SOC_SERIES_STM32F3X)
 	LL_RCC_HSI_Enable();
@@ -397,6 +396,6 @@ static int stm32_flash_init(const struct device *dev)
 	return flash_stm32_write_protection(dev, false);
 }
 
-DEVICE_AND_API_INIT(stm32_flash, DT_INST_LABEL(0),
-		    stm32_flash_init, &flash_data, NULL, POST_KERNEL,
+DEVICE_AND_API_INIT(stm32_flash, DT_INST_LABEL(0), stm32_flash_init,
+		    &flash_data, NULL, POST_KERNEL,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &flash_stm32_api);

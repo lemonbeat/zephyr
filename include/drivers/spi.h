@@ -31,10 +31,10 @@ extern "C" {
 /**
  * @brief SPI operational mode
  */
-#define SPI_OP_MODE_MASTER	0
-#define SPI_OP_MODE_SLAVE	BIT(0)
-#define SPI_OP_MODE_MASK	0x1
-#define SPI_OP_MODE_GET(_operation_) ((_operation_) & SPI_OP_MODE_MASK)
+#define SPI_OP_MODE_MASTER 0
+#define SPI_OP_MODE_SLAVE BIT(0)
+#define SPI_OP_MODE_MASK 0x1
+#define SPI_OP_MODE_GET(_operation_) ((_operation_)&SPI_OP_MODE_MASK)
 
 /**
  * @brief SPI Polarity & Phase Modes
@@ -45,7 +45,7 @@ extern "C" {
  * and active state will be 0. If untouched, the inverse will be true
  * which is the default.
  */
-#define SPI_MODE_CPOL		BIT(1)
+#define SPI_MODE_CPOL BIT(1)
 
 /**
  * Clock Phase: this dictates when is the data captured, and depends
@@ -54,35 +54,33 @@ extern "C" {
  * this bit is not set (default). This is fully reversed if CPOL is
  * not set.
  */
-#define SPI_MODE_CPHA		BIT(2)
+#define SPI_MODE_CPHA BIT(2)
 
 /**
  * Whatever data is transmitted is looped-back to the receiving buffer of
  * the controller. This is fully controller dependent as some may not
  * support this, and can be used for testing purposes only.
  */
-#define SPI_MODE_LOOP		BIT(3)
+#define SPI_MODE_LOOP BIT(3)
 
-#define SPI_MODE_MASK		(0xE)
-#define SPI_MODE_GET(_mode_)			\
-	((_mode_) & SPI_MODE_MASK)
+#define SPI_MODE_MASK (0xE)
+#define SPI_MODE_GET(_mode_) ((_mode_)&SPI_MODE_MASK)
 
 /**
  * @brief SPI Transfer modes (host controller dependent)
  */
-#define SPI_TRANSFER_MSB	(0)
-#define SPI_TRANSFER_LSB	BIT(4)
+#define SPI_TRANSFER_MSB (0)
+#define SPI_TRANSFER_LSB BIT(4)
 
 /**
  * @brief SPI word size
  */
-#define SPI_WORD_SIZE_SHIFT	(5)
-#define SPI_WORD_SIZE_MASK	(0x3F << SPI_WORD_SIZE_SHIFT)
-#define SPI_WORD_SIZE_GET(_operation_)					\
-	(((_operation_) & SPI_WORD_SIZE_MASK) >> SPI_WORD_SIZE_SHIFT)
+#define SPI_WORD_SIZE_SHIFT (5)
+#define SPI_WORD_SIZE_MASK (0x3F << SPI_WORD_SIZE_SHIFT)
+#define SPI_WORD_SIZE_GET(_operation_) \
+	(((_operation_)&SPI_WORD_SIZE_MASK) >> SPI_WORD_SIZE_SHIFT)
 
-#define SPI_WORD_SET(_word_size_)		\
-	((_word_size_) << SPI_WORD_SIZE_SHIFT)
+#define SPI_WORD_SET(_word_size_) ((_word_size_) << SPI_WORD_SIZE_SHIFT)
 
 /**
  * @brief SPI MISO lines
@@ -90,24 +88,24 @@ extern "C" {
  * Some controllers support dual, quad or octal MISO lines connected to slaves.
  * Default is single, which is the case most of the time.
  */
-#define SPI_LINES_SINGLE	(0 << 11)
-#define SPI_LINES_DUAL		(1 << 11)
-#define SPI_LINES_QUAD		(2 << 11)
-#define SPI_LINES_OCTAL		(3 << 11)
+#define SPI_LINES_SINGLE (0 << 11)
+#define SPI_LINES_DUAL (1 << 11)
+#define SPI_LINES_QUAD (2 << 11)
+#define SPI_LINES_OCTAL (3 << 11)
 
-#define SPI_LINES_MASK		(0x3 << 11)
+#define SPI_LINES_MASK (0x3 << 11)
 
 /**
  * @brief Specific SPI devices control bits
  */
 /* Requests - if possible - to keep CS asserted after the transaction */
-#define SPI_HOLD_ON_CS		BIT(13)
+#define SPI_HOLD_ON_CS BIT(13)
 /* Keep the device locked after the transaction for the current config.
  * Use this with extreme caution (see spi_release() below) as it will
  * prevent other callers to access the SPI device until spi_release() is
  * properly called.
  */
-#define SPI_LOCK_ON		BIT(14)
+#define SPI_LOCK_ON BIT(14)
 
 /* Active high logic on CS - Usually, and by default, CS logic is active
  * low. However, some devices may require the reverse logic: active high.
@@ -116,7 +114,7 @@ extern "C" {
  * the CS control to a gpio line through struct spi_cs_control would be
  * the solution.
  */
-#define SPI_CS_ACTIVE_HIGH	BIT(15)
+#define SPI_CS_ACTIVE_HIGH BIT(15)
 
 /**
  * @brief SPI Chip Select control structure
@@ -136,10 +134,10 @@ extern "C" {
  *    spi_config.
  */
 struct spi_cs_control {
-	const struct device	*gpio_dev;
-	uint32_t		delay;
-	gpio_pin_t		gpio_pin;
-	gpio_dt_flags_t		gpio_dt_flags;
+	const struct device *gpio_dev;
+	uint32_t delay;
+	gpio_pin_t gpio_pin;
+	gpio_dt_flags_t gpio_dt_flags;
 };
 
 /**
@@ -169,9 +167,9 @@ struct spi_cs_control {
  * detected.
  */
 struct spi_config {
-	uint32_t		frequency;
-	uint16_t		operation;
-	uint16_t		slave;
+	uint32_t frequency;
+	uint16_t operation;
+	uint16_t slave;
 
 	const struct spi_cs_control *cs;
 };
@@ -228,7 +226,6 @@ typedef int (*spi_api_io_async)(const struct device *dev,
  */
 typedef int (*spi_api_release)(const struct device *dev,
 			       const struct spi_config *config);
-
 
 /**
  * @brief SPI driver API

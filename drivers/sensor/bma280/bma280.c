@@ -55,7 +55,7 @@ static int bma280_sample_fetch(const struct device *dev,
 }
 
 static void bma280_channel_accel_convert(struct sensor_value *val,
-					int64_t raw_val)
+					 int64_t raw_val)
 {
 	/*
 	 * accel_val = (sample * BMA280_PMU_FULL_RAGE) /
@@ -122,7 +122,7 @@ int bma280_init(const struct device *dev)
 	drv_data->i2c = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (drv_data->i2c == NULL) {
 		LOG_DBG("Could not get pointer to %s device",
-			    DT_INST_BUS_LABEL(0));
+			DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -163,7 +163,6 @@ int bma280_init(const struct device *dev)
 
 struct bma280_data bma280_driver;
 
-DEVICE_AND_API_INIT(bma280, DT_INST_LABEL(0),
-		    bma280_init, &bma280_driver,
-		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(bma280, DT_INST_LABEL(0), bma280_init, &bma280_driver, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &bma280_driver_api);

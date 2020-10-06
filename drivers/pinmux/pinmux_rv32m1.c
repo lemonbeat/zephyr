@@ -69,17 +69,16 @@ static const struct pinmux_driver_api pinmux_rv32m1_driver_api = {
 	.input = pinmux_rv32m1_input,
 };
 
-#define PINMUX_RV32M1_INIT(n)						\
-	static const struct pinmux_rv32m1_config pinmux_rv32m1_##n##_config = {\
-		.base = (PORT_Type *)DT_INST_REG_ADDR(n),		\
-		.clock_ip_name = INST_DT_CLOCK_IP_NAME(n),		\
-	};								\
-									\
-	DEVICE_AND_API_INIT(pinmux_rv32m1_##n, DT_INST_LABEL(n),	\
-			    &pinmux_rv32m1_init,			\
-			    NULL, &pinmux_rv32m1_##n##_config,		\
-			    PRE_KERNEL_1,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	\
+#define PINMUX_RV32M1_INIT(n)                                                   \
+	static const struct pinmux_rv32m1_config pinmux_rv32m1_##n##_config = { \
+		.base = (PORT_Type *)DT_INST_REG_ADDR(n),                       \
+		.clock_ip_name = INST_DT_CLOCK_IP_NAME(n),                      \
+	};                                                                      \
+                                                                                \
+	DEVICE_AND_API_INIT(pinmux_rv32m1_##n, DT_INST_LABEL(n),                \
+			    &pinmux_rv32m1_init, NULL,                          \
+			    &pinmux_rv32m1_##n##_config, PRE_KERNEL_1,          \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,                \
 			    &pinmux_rv32m1_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(PINMUX_RV32M1_INIT)

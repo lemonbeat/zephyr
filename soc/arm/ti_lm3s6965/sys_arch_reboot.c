@@ -22,7 +22,7 @@ void sys_arch_reboot(int type)
 {
 	ARG_UNUSED(type);
 
-    /*
+	/*
      * QEMU is missing the support for rebooting through the SYSRESETREQ
      * mechanism.  Just jump back to __reset() of the image in flash,
      * which address can _always_ be found in the vector table reset slot
@@ -39,9 +39,8 @@ void sys_arch_reboot(int type)
 	if ((SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) == 0) {
 		z_do_software_reboot();
 	} else {
-		__asm__ volatile(
-			"ldr r0,  =z_force_exit_one_nested_irq\n\t"
-			"bx r0\n\t"
-			:::);
+		__asm__ volatile("ldr r0,  =z_force_exit_one_nested_irq\n\t"
+				 "bx r0\n\t" ::
+					 :);
 	}
 }

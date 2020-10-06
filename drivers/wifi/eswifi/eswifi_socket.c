@@ -60,7 +60,7 @@ static int __read_data(struct eswifi_dev *eswifi, size_t len, char **data)
 }
 
 int __eswifi_bind(struct eswifi_dev *eswifi, struct eswifi_off_socket *socket,
-		      const struct sockaddr *addr, socklen_t addrlen)
+		  const struct sockaddr *addr, socklen_t addrlen)
 {
 	int err;
 
@@ -101,7 +101,7 @@ static void eswifi_off_read_work(struct k_work *work)
 
 	if ((socket->type == ESWIFI_TRANSPORT_TCP ||
 	     socket->type == ESWIFI_TRANSPORT_TCP_SSL) &&
-	     socket->state != ESWIFI_SOCKET_STATE_CONNECTED) {
+	    socket->state != ESWIFI_SOCKET_STATE_CONNECTED) {
 		goto done;
 	}
 
@@ -123,8 +123,8 @@ static void eswifi_off_read_work(struct k_work *work)
 
 	LOG_DBG("payload sz = %d", len);
 
-	pkt = net_pkt_rx_alloc_with_buffer(eswifi->iface, len,
-					   AF_UNSPEC, 0, K_NO_WAIT);
+	pkt = net_pkt_rx_alloc_with_buffer(eswifi->iface, len, AF_UNSPEC, 0,
+					   K_NO_WAIT);
 	if (!pkt) {
 		LOG_ERR("Cannot allocate rx packet");
 		goto done;
@@ -137,8 +137,7 @@ static void eswifi_off_read_work(struct k_work *work)
 	net_pkt_cursor_init(pkt);
 
 do_recv_cb:
-	socket->recv_cb(socket->context, pkt,
-			NULL, NULL, 0, socket->recv_data);
+	socket->recv_cb(socket->context, pkt, NULL, NULL, 0, socket->recv_data);
 
 	if (!socket->context) {
 		/* something destroyed the socket in the recv path */
@@ -150,9 +149,8 @@ do_recv_cb:
 	next_timeout_ms = 0;
 
 done:
-	err = k_delayed_work_submit_to_queue(&eswifi->work_q,
-					     &socket->read_work,
-					     K_MSEC(next_timeout_ms));
+	err = k_delayed_work_submit_to_queue(
+		&eswifi->work_q, &socket->read_work, K_MSEC(next_timeout_ms));
 	if (err) {
 		LOG_ERR("Rescheduling socket read error");
 	}
@@ -192,7 +190,7 @@ int __eswifi_off_start_client(struct eswifi_dev *eswifi,
 
 	/* Set Remote Port */
 	snprintk(eswifi->buf, sizeof(eswifi->buf), "P4=%d\r",
-		(uint16_t)sys_be16_to_cpu(net_sin(addr)->sin_port));
+		 (uint16_t)sys_be16_to_cpu(net_sin(addr)->sin_port));
 	err = eswifi_at_cmd(eswifi, eswifi->buf);
 	if (err < 0) {
 		LOG_ERR("Unable to set remote port");

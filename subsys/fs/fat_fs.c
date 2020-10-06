@@ -17,12 +17,10 @@
 #define FATFS_MAX_FILE_NAME 12 /* Uses 8.3 SFN */
 
 /* Memory pool for FatFs directory objects */
-K_MEM_SLAB_DEFINE(fatfs_dirp_pool, sizeof(DIR),
-			CONFIG_FS_FATFS_NUM_DIRS, 4);
+K_MEM_SLAB_DEFINE(fatfs_dirp_pool, sizeof(DIR), CONFIG_FS_FATFS_NUM_DIRS, 4);
 
 /* Memory pool for FatFs file objects */
-K_MEM_SLAB_DEFINE(fatfs_filep_pool, sizeof(FIL),
-			CONFIG_FS_FATFS_NUM_FILES, 4);
+K_MEM_SLAB_DEFINE(fatfs_filep_pool, sizeof(FIL), CONFIG_FS_FATFS_NUM_FILES, 4);
 
 static int translate_error(int error)
 {
@@ -314,7 +312,8 @@ static int fatfs_readdir(struct fs_dir_t *zdp, struct fs_dirent *entry)
 		strcpy(entry->name, fno.fname);
 		if (entry->name[0] != 0) {
 			entry->type = ((fno.fattrib & AM_DIR) ?
-			       FS_DIR_ENTRY_DIR : FS_DIR_ENTRY_FILE);
+						     FS_DIR_ENTRY_DIR :
+						     FS_DIR_ENTRY_FILE);
 			entry->size = fno.fsize;
 		}
 	}
@@ -334,16 +333,16 @@ static int fatfs_closedir(struct fs_dir_t *zdp)
 	return translate_error(res);
 }
 
-static int fatfs_stat(struct fs_mount_t *mountp,
-		      const char *path, struct fs_dirent *entry)
+static int fatfs_stat(struct fs_mount_t *mountp, const char *path,
+		      struct fs_dirent *entry)
 {
 	FRESULT res;
 	FILINFO fno;
 
 	res = f_stat(&path[1], &fno);
 	if (res == FR_OK) {
-		entry->type = ((fno.fattrib & AM_DIR) ?
-			       FS_DIR_ENTRY_DIR : FS_DIR_ENTRY_FILE);
+		entry->type = ((fno.fattrib & AM_DIR) ? FS_DIR_ENTRY_DIR :
+							      FS_DIR_ENTRY_FILE);
 		strcpy(entry->name, fno.fname);
 		entry->size = fno.fsize;
 	}
@@ -351,8 +350,8 @@ static int fatfs_stat(struct fs_mount_t *mountp,
 	return translate_error(res);
 }
 
-static int fatfs_statvfs(struct fs_mount_t *mountp,
-			 const char *path, struct fs_statvfs *stat)
+static int fatfs_statvfs(struct fs_mount_t *mountp, const char *path,
+			 struct fs_statvfs *stat)
 {
 	FATFS *fs;
 	FRESULT res;
@@ -383,18 +382,17 @@ static int fatfs_mount(struct fs_mount_t *mountp)
 	if (res == FR_NO_FILESYSTEM) {
 		uint8_t work[_MAX_SS];
 
-		res = f_mkfs(&mountp->mnt_point[1],
-				(FM_FAT | FM_SFD), 0, work, sizeof(work));
+		res = f_mkfs(&mountp->mnt_point[1], (FM_FAT | FM_SFD), 0, work,
+			     sizeof(work));
 		if (res == FR_OK) {
 			res = f_mount((FATFS *)mountp->fs_data,
-					&mountp->mnt_point[1], 1);
+				      &mountp->mnt_point[1], 1);
 		}
 	}
 
 	__ASSERT((res == FR_OK), "FS init failed (%d)", translate_error(res));
 
 	return translate_error(res);
-
 }
 
 static int fatfs_unmount(struct fs_mount_t *mountp)

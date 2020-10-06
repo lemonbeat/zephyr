@@ -79,13 +79,13 @@ extern const struct emul __emul_list_end[];
  * @param node_id Node ID of the driver to emulate (e.g. DT_DRV_INST(n))
  * @param cfg_ptr emulator-specific configuration data
  */
-#define EMUL_DEFINE(init_ptr, node_id, cfg_ptr)			\
-	static struct emul EMUL_REG_NAME(node_id)		\
-	__attribute__((__section__(".emulators"))) __used = {	\
-		.init = (init_ptr),				\
-		.dev_label = DT_LABEL(node_id),			\
-		.cfg = (cfg_ptr),				\
-	};
+#define EMUL_DEFINE(init_ptr, node_id, cfg_ptr)                       \
+	static struct emul EMUL_REG_NAME(node_id)                     \
+		__attribute__((__section__(".emulators"))) __used = { \
+			.init = (init_ptr),                           \
+			.dev_label = DT_LABEL(node_id),               \
+			.cfg = (cfg_ptr),                             \
+		};
 
 /**
  * Set up a list of emulators

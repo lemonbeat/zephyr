@@ -130,26 +130,23 @@ static struct i2c_driver_api i2c_emul_api = {
 	.transfer = i2c_emul_transfer,
 };
 
-#define EMUL_LINK_AND_COMMA(node_id) {		\
-	.label = DT_LABEL(node_id),		\
-},
+#define EMUL_LINK_AND_COMMA(node_id)        \
+	{                                   \
+		.label = DT_LABEL(node_id), \
+	},
 
-#define I2C_EMUL_INIT(n) \
-	static const struct emul_link_for_bus emuls_##n[] = { \
+#define I2C_EMUL_INIT(n)                                              \
+	static const struct emul_link_for_bus emuls_##n[] = {         \
 		DT_FOREACH_CHILD(DT_DRV_INST(0), EMUL_LINK_AND_COMMA) \
-	}; \
-	static struct emul_list_for_bus i2c_emul_cfg_##n = { \
-		.children = emuls_##n, \
-		.num_children = ARRAY_SIZE(emuls_##n), \
-	}; \
-	static struct i2c_emul_data i2c_emul_data_##n; \
-	DEVICE_AND_API_INIT(i2c_##n, \
-			    DT_INST_LABEL(n), \
-			    i2c_emul_init, \
-			    &i2c_emul_data_##n, \
-			    &i2c_emul_cfg_##n, \
-			    POST_KERNEL, \
-			    CONFIG_I2C_INIT_PRIORITY, \
+	};                                                            \
+	static struct emul_list_for_bus i2c_emul_cfg_##n = {          \
+		.children = emuls_##n,                                \
+		.num_children = ARRAY_SIZE(emuls_##n),                \
+	};                                                            \
+	static struct i2c_emul_data i2c_emul_data_##n;                \
+	DEVICE_AND_API_INIT(i2c_##n, DT_INST_LABEL(n), i2c_emul_init, \
+			    &i2c_emul_data_##n, &i2c_emul_cfg_##n,    \
+			    POST_KERNEL, CONFIG_I2C_INIT_PRIORITY,    \
 			    &i2c_emul_api);
 
 DT_INST_FOREACH_STATUS_OKAY(I2C_EMUL_INIT)

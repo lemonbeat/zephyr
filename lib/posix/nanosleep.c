@@ -29,8 +29,8 @@ int nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
 		return -1;
 	}
 
-	if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0
-		|| rqtp->tv_nsec >= NSEC_PER_SEC) {
+	if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 ||
+	    rqtp->tv_nsec >= NSEC_PER_SEC) {
 		errno = EINVAL;
 		return -1;
 	}
@@ -43,8 +43,8 @@ int nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
 		/* If a user passes this in, we could be here a while, but
 		 * at least it's technically correct-ish
 		 */
-		ns = rqtp->tv_nsec + NSEC_PER_SEC
-			+ k_sleep(K_SECONDS(rqtp->tv_sec - 1)) * NSEC_PER_MSEC;
+		ns = rqtp->tv_nsec + NSEC_PER_SEC +
+		     k_sleep(K_SECONDS(rqtp->tv_sec - 1)) * NSEC_PER_MSEC;
 	} else {
 		ns = rqtp->tv_sec * NSEC_PER_SEC + rqtp->tv_nsec;
 	}

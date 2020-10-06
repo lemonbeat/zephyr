@@ -8,7 +8,7 @@
 #include <kernel.h>
 #include <cmsis_os2.h>
 
-#define STACKSZ         CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
+#define STACKSZ CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
 
 /* This is used to check the thread yield functionality between 2 threads */
 static int thread_yield_check;
@@ -109,18 +109,15 @@ static void thread2(void *argument)
 	osThreadYield();
 }
 
-static void thread_apis_common(int *yield_check,
-			       const char *thread1_name,
+static void thread_apis_common(int *yield_check, const char *thread1_name,
 			       osThreadAttr_t *thread1_attr,
 			       osThreadAttr_t *thread2_attr)
 {
 	osThreadId_t id1;
 	osThreadId_t id2;
 
-	struct thread1_args args = {
-		.yield_check = yield_check,
-		.name = thread1_name
-	};
+	struct thread1_args args = { .yield_check = yield_check,
+				     .name = thread1_name };
 
 	id1 = osThreadNew(thread1, &args, thread1_attr);
 	zassert_true(id1 != NULL, "Failed creating thread1");
@@ -138,8 +135,8 @@ static void thread_apis_common(int *yield_check,
 
 void test_thread_apis_dynamic(void)
 {
-	thread_apis_common(&thread_yield_check_dynamic, "ZephyrThread",
-			   NULL, NULL);
+	thread_apis_common(&thread_yield_check_dynamic, "ZephyrThread", NULL,
+			   NULL);
 }
 
 void test_thread_apis(void)
@@ -187,8 +184,7 @@ static void thread3(void *argument)
 	/* Restore the priority of the current thread */
 	osThreadSetPriority(id, prio);
 	rv = osThreadGetPriority(id);
-	zassert_equal(rv, prio,
-		      "Expected priority to be changed to %d, not %d",
+	zassert_equal(rv, prio, "Expected priority to be changed to %d, not %d",
 		      (int)prio, (int)rv);
 
 	/* Try to set unsupported priority and assert failure */
@@ -297,7 +293,7 @@ void test_thread_join(void)
 
 	milliseconds_spent = k_uptime_delta(&time_stamp);
 	zassert_true((milliseconds_spent >= DELAY_MS - DELTA_MS) &&
-		     (milliseconds_spent <= DELAY_MS + DELTA_MS),
+			     (milliseconds_spent <= DELAY_MS + DELTA_MS),
 		     "Join completed but was too fast or too slow.");
 
 	printk(" - Waiting for thread A to join...\n");

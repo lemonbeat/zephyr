@@ -13,34 +13,31 @@
 
 #include "f32.pat"
 
-#define DECLARE_COMMON_VARS(in_dims, in_param) \
-	const int16_t *dims = in_dims; \
+#define DECLARE_COMMON_VARS(in_dims, in_param)                 \
+	const int16_t *dims = in_dims;                         \
 	const float32_t *params = (const float32_t *)in_param; \
-	const int32_t classes[2] = { dims[1], dims[2] }; \
-	const uint16_t sample_count = dims[3]; \
-	const uint16_t vec_dims = dims[4]; \
-	const uint16_t svec_count = dims[5]; \
-	const float32_t intercept = \
-		params[svec_count + (vec_dims * svec_count)]; \
-	const float32_t *svec = params; \
+	const int32_t classes[2] = { dims[1], dims[2] };       \
+	const uint16_t sample_count = dims[3];                 \
+	const uint16_t vec_dims = dims[4];                     \
+	const uint16_t svec_count = dims[5];                   \
+	const float32_t intercept =                            \
+		params[svec_count + (vec_dims * svec_count)];  \
+	const float32_t *svec = params;                        \
 	const float32_t *dual_coeff = params + (vec_dims * svec_count)
 
-#define DECLARE_POLY_VARS() \
-	const uint16_t degree = dims[6]; \
-	const float32_t coeff0 = \
+#define DECLARE_POLY_VARS()                                       \
+	const uint16_t degree = dims[6];                          \
+	const float32_t coeff0 =                                  \
 		params[svec_count + (vec_dims * svec_count) + 1]; \
-	const float32_t gamma = \
-		params[svec_count + (vec_dims * svec_count) + 2]
+	const float32_t gamma = params[svec_count + (vec_dims * svec_count) + 2]
 
 #define DECLARE_RBF_VARS() \
-	const float32_t gamma = \
-		params[svec_count + (vec_dims * svec_count) + 1]
+	const float32_t gamma = params[svec_count + (vec_dims * svec_count) + 1]
 
-#define DECLARE_SIGMOID_VARS() \
-	const float32_t coeff0 = \
+#define DECLARE_SIGMOID_VARS()                                    \
+	const float32_t coeff0 =                                  \
 		params[svec_count + (vec_dims * svec_count) + 1]; \
-	const float32_t gamma = \
-		params[svec_count + (vec_dims * svec_count) + 2]
+	const float32_t gamma = params[svec_count + (vec_dims * svec_count) + 2]
 
 static void test_arm_svm_linear_predict_f32(void)
 {
@@ -53,8 +50,8 @@ static void test_arm_svm_linear_predict_f32(void)
 	int32_t *output, *output_buf;
 
 	/* Initialise instance */
-	arm_svm_linear_init_f32(&inst, svec_count, vec_dims,
-		intercept, dual_coeff, svec, classes);
+	arm_svm_linear_init_f32(&inst, svec_count, vec_dims, intercept,
+				dual_coeff, svec, classes);
 
 	/* Allocate output buffer */
 	output_buf = malloc(length * sizeof(int32_t));
@@ -73,9 +70,8 @@ static void test_arm_svm_linear_predict_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_equal_q31(length, output_buf, ref_linear),
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+	zassert_true(test_equal_q31(length, output_buf, ref_linear),
+		     ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	/* Free output buffer */
 	free(output_buf);
@@ -93,10 +89,9 @@ static void test_arm_svm_polynomial_predict_f32(void)
 	int32_t *output, *output_buf;
 
 	/* Initialise instance */
-	arm_svm_polynomial_init_f32(
-		&inst, svec_count, vec_dims,
-		intercept, dual_coeff, svec, classes,
-		degree, coeff0, gamma);
+	arm_svm_polynomial_init_f32(&inst, svec_count, vec_dims, intercept,
+				    dual_coeff, svec, classes, degree, coeff0,
+				    gamma);
 
 	/* Allocate output buffer */
 	output_buf = malloc(length * sizeof(int32_t));
@@ -115,9 +110,8 @@ static void test_arm_svm_polynomial_predict_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_equal_q31(length, output_buf, ref_polynomial),
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+	zassert_true(test_equal_q31(length, output_buf, ref_polynomial),
+		     ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	/* Free output buffer */
 	free(output_buf);
@@ -135,9 +129,8 @@ static void test_arm_svm_rbf_predict_f32(void)
 	int32_t *output, *output_buf;
 
 	/* Initialise instance */
-	arm_svm_rbf_init_f32(
-		&inst, svec_count, vec_dims,
-		intercept, dual_coeff, svec, classes, gamma);
+	arm_svm_rbf_init_f32(&inst, svec_count, vec_dims, intercept, dual_coeff,
+			     svec, classes, gamma);
 
 	/* Allocate output buffer */
 	output_buf = malloc(length * sizeof(int32_t));
@@ -156,9 +149,8 @@ static void test_arm_svm_rbf_predict_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_equal_q31(length, output_buf, ref_rbf),
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+	zassert_true(test_equal_q31(length, output_buf, ref_rbf),
+		     ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	/* Free output buffer */
 	free(output_buf);
@@ -176,9 +168,8 @@ static void test_arm_svm_sigmoid_predict_f32(void)
 	int32_t *output, *output_buf;
 
 	/* Initialise instance */
-	arm_svm_sigmoid_init_f32(
-		&inst, svec_count, vec_dims,
-		intercept, dual_coeff, svec, classes, coeff0, gamma);
+	arm_svm_sigmoid_init_f32(&inst, svec_count, vec_dims, intercept,
+				 dual_coeff, svec, classes, coeff0, gamma);
 
 	/* Allocate output buffer */
 	output_buf = malloc(length * sizeof(int32_t));
@@ -197,9 +188,8 @@ static void test_arm_svm_sigmoid_predict_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_equal_q31(length, output_buf, ref_sigmoid),
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+	zassert_true(test_equal_q31(length, output_buf, ref_sigmoid),
+		     ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	/* Free output buffer */
 	free(output_buf);
@@ -217,9 +207,8 @@ static void test_arm_svm_oneclass_predict_f32(void)
 	int32_t *output, *output_buf;
 
 	/* Initialise instance */
-	arm_svm_rbf_init_f32(
-		&inst, svec_count, vec_dims,
-		intercept, dual_coeff, svec, classes, gamma);
+	arm_svm_rbf_init_f32(&inst, svec_count, vec_dims, intercept, dual_coeff,
+			     svec, classes, gamma);
 
 	/* Allocate output buffer */
 	output_buf = malloc(length * sizeof(int32_t));
@@ -238,9 +227,8 @@ static void test_arm_svm_oneclass_predict_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_equal_q31(length, output_buf, ref_oneclass),
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+	zassert_true(test_equal_q31(length, output_buf, ref_oneclass),
+		     ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	/* Free output buffer */
 	free(output_buf);
@@ -249,12 +237,11 @@ static void test_arm_svm_oneclass_predict_f32(void)
 void test_svm_f32(void)
 {
 	ztest_test_suite(svm_f32,
-		ztest_unit_test(test_arm_svm_linear_predict_f32),
-		ztest_unit_test(test_arm_svm_polynomial_predict_f32),
-		ztest_unit_test(test_arm_svm_rbf_predict_f32),
-		ztest_unit_test(test_arm_svm_sigmoid_predict_f32),
-		ztest_unit_test(test_arm_svm_oneclass_predict_f32)
-		);
+			 ztest_unit_test(test_arm_svm_linear_predict_f32),
+			 ztest_unit_test(test_arm_svm_polynomial_predict_f32),
+			 ztest_unit_test(test_arm_svm_rbf_predict_f32),
+			 ztest_unit_test(test_arm_svm_sigmoid_predict_f32),
+			 ztest_unit_test(test_arm_svm_oneclass_predict_f32));
 
 	ztest_run_test_suite(svm_f32);
 }

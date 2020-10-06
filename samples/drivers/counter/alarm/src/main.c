@@ -51,8 +51,8 @@ static void test_counter_interrupt_fn(const struct device *counter_dev,
 	config->ticks = config->ticks * 2U;
 
 	printk("Set alarm in %u sec (%u ticks)\n",
-	       (uint32_t)(counter_ticks_to_us(counter_dev,
-					   config->ticks) / USEC_PER_SEC),
+	       (uint32_t)(counter_ticks_to_us(counter_dev, config->ticks) /
+			  USEC_PER_SEC),
 	       config->ticks);
 
 	err = counter_set_channel_alarm(counter_dev, ALARM_CHANNEL_ID,
@@ -84,8 +84,8 @@ void main(void)
 	err = counter_set_channel_alarm(counter_dev, ALARM_CHANNEL_ID,
 					&alarm_cfg);
 	printk("Set alarm in %u sec (%u ticks)\n",
-	       (uint32_t)(counter_ticks_to_us(counter_dev,
-					   alarm_cfg.ticks) / USEC_PER_SEC),
+	       (uint32_t)(counter_ticks_to_us(counter_dev, alarm_cfg.ticks) /
+			  USEC_PER_SEC),
 	       alarm_cfg.ticks);
 
 	if (-EINVAL == err) {

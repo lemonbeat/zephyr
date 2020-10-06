@@ -58,7 +58,8 @@ static int init_mutex_module(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	Z_STRUCT_SECTION_FOREACH(k_mutex, mutex) {
+	Z_STRUCT_SECTION_FOREACH(k_mutex, mutex)
+	{
 		SYS_TRACING_OBJ_INIT(k_mutex, mutex);
 	}
 	return 0;
@@ -105,11 +106,10 @@ static int32_t new_prio_for_inheritance(int32_t target, int32_t limit)
 static bool adjust_owner_prio(struct k_mutex *mutex, int32_t new_prio)
 {
 	if (mutex->owner->base.prio != new_prio) {
-
 		LOG_DBG("%p (ready (y/n): %c) prio changed to %d (was %d)",
-			mutex->owner, z_is_thread_ready(mutex->owner) ?
-			'y' : 'n',
-			new_prio, mutex->owner->base.prio);
+			mutex->owner,
+			z_is_thread_ready(mutex->owner) ? 'y' : 'n', new_prio,
+			mutex->owner->base.prio);
 
 		return z_set_prio(mutex->owner, new_prio);
 	}
@@ -128,17 +128,15 @@ int z_impl_k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	key = k_spin_lock(&lock);
 
 	if (likely((mutex->lock_count == 0U) || (mutex->owner == _current))) {
-
 		mutex->owner_orig_prio = (mutex->lock_count == 0U) ?
-					_current->base.prio :
-					mutex->owner_orig_prio;
+						       _current->base.prio :
+						       mutex->owner_orig_prio;
 
 		mutex->lock_count++;
 		mutex->owner = _current;
 
-		LOG_DBG("%p took mutex %p, count: %d, orig prio: %d",
-			_current, mutex, mutex->lock_count,
-			mutex->owner_orig_prio);
+		LOG_DBG("%p took mutex %p, count: %d, orig prio: %d", _current,
+			mutex, mutex->lock_count, mutex->owner_orig_prio);
 
 		k_spin_unlock(&lock, key);
 		sys_trace_end_call(SYS_TRACE_ID_MUTEX_LOCK);
@@ -182,8 +180,9 @@ int z_impl_k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 	struct k_thread *waiter = z_waitq_head(&mutex->wait_q);
 
 	new_prio = (waiter != NULL) ?
-		new_prio_for_inheritance(waiter->base.prio, mutex->owner_orig_prio) :
-		mutex->owner_orig_prio;
+				 new_prio_for_inheritance(waiter->base.prio,
+						    mutex->owner_orig_prio) :
+				 mutex->owner_orig_prio;
 
 	LOG_DBG("adjusting prio down on mutex %p", mutex);
 
@@ -215,13 +214,15 @@ int z_impl_k_mutex_unlock(struct k_mutex *mutex)
 
 	__ASSERT(!arch_is_in_isr(), "mutexes cannot be used inside ISRs");
 
-	CHECKIF(mutex->owner == NULL) {
+	CHECKIF(mutex->owner == NULL)
+	{
 		return -EINVAL;
 	}
 	/*
 	 * The current thread does not own the mutex.
 	 */
-	CHECKIF(mutex->owner != _current) {
+	CHECKIF(mutex->owner != _current)
+	{
 		return -EPERM;
 	}
 
@@ -256,8 +257,8 @@ int z_impl_k_mutex_unlock(struct k_mutex *mutex)
 
 	mutex->owner = new_owner;
 
-	LOG_DBG("new owner of mutex %p: %p (prio: %d)",
-		mutex, new_owner, new_owner ? new_owner->base.prio : -1000);
+	LOG_DBG("new owner of mutex %p: %p (prio: %d)", mutex, new_owner,
+		new_owner ? new_owner->base.prio : -1000);
 
 	if (new_owner != NULL) {
 		/*
@@ -273,7 +274,6 @@ int z_impl_k_mutex_unlock(struct k_mutex *mutex)
 		mutex->lock_count = 0U;
 		k_spin_unlock(&lock, key);
 	}
-
 
 k_mutex_unlock_return:
 	k_sched_unlock();

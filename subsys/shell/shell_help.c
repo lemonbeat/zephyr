@@ -8,7 +8,6 @@
 #include "shell_help.h"
 #include "shell_utils.h"
 
-
 /* Function prints a string on terminal screen with requested margin.
  * It takes care to not divide words.
  *   shell		Pointer to shell instance.
@@ -30,9 +29,8 @@ static void formatted_text_print(const struct shell *shell, const char *str,
 		shell_op_cursor_horiz_move(shell, terminal_offset);
 	}
 
-
 	/* Skipping whitespace. */
-	while (isspace((int) *(str + offset))) {
+	while (isspace((int)*(str + offset))) {
 		++offset;
 	}
 
@@ -49,8 +47,8 @@ static void formatted_text_print(const struct shell *shell, const char *str,
 					shell_write(shell, str + offset, idx);
 					offset += idx + 1;
 					cursor_next_line_move(shell);
-					shell_op_cursor_horiz_move(shell,
-							terminal_offset);
+					shell_op_cursor_horiz_move(
+						shell, terminal_offset);
 					break;
 				}
 			}
@@ -64,12 +62,12 @@ static void formatted_text_print(const struct shell *shell, const char *str,
 		/* String is longer than terminal line so text needs to
 		 * divide in the way to not divide words.
 		 */
-		length = shell->ctx->vt100_ctx.cons.terminal_wid
-				- terminal_offset;
+		length = shell->ctx->vt100_ctx.cons.terminal_wid -
+			 terminal_offset;
 
 		while (true) {
 			/* Determining line break. */
-			if (isspace((int) (*(str + offset + idx)))) {
+			if (isspace((int)(*(str + offset + idx)))) {
 				length = idx;
 				if (*(str + offset + idx) == '\n') {
 					break;
@@ -95,13 +93,12 @@ static void formatted_text_print(const struct shell *shell, const char *str,
 		/* Calculating text offset to ensure that next line will
 		 * not begin with a space.
 		 */
-		while (isspace((int) (*(str + offset)))) {
+		while (isspace((int)(*(str + offset)))) {
 			++offset;
 		}
 
 		cursor_next_line_move(shell);
 		shell_op_cursor_horiz_move(shell, terminal_offset);
-
 	}
 	cursor_next_line_move(shell);
 }
@@ -118,10 +115,9 @@ static void help_item_print(const struct shell *shell, const char *item_name,
 
 	if (!IS_ENABLED(CONFIG_NEWLIB_LIBC) && !IS_ENABLED(CONFIG_ARCH_POSIX)) {
 		/* print option name */
-		shell_internal_fprintf(shell, SHELL_NORMAL, "%s%-*s%s:",
-				       tabulator,
-				       item_name_width, item_name,
-				       tabulator);
+		shell_internal_fprintf(shell, SHELL_NORMAL,
+				       "%s%-*s%s:", tabulator, item_name_width,
+				       item_name, tabulator);
 	} else {
 		uint16_t tmp = item_name_width - strlen(item_name);
 		char space = ' ';
@@ -184,8 +180,8 @@ void shell_help_cmd_print(const struct shell *shell,
 
 	field_width = shell_strlen(cmd->syntax) + shell_strlen(cmd_sep);
 
-	shell_internal_fprintf(shell, SHELL_NORMAL, "%s%s",
-				cmd->syntax, cmd_sep);
+	shell_internal_fprintf(shell, SHELL_NORMAL, "%s%s", cmd->syntax,
+			       cmd_sep);
 
 	formatted_text_print(shell, cmd->help, field_width, false);
 }

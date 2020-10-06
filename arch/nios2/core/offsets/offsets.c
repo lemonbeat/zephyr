@@ -23,7 +23,6 @@
  * completeness.
  */
 
-
 #include <kernel.h>
 #include <kernel_arch_data.h>
 #include <gen_offset.h>

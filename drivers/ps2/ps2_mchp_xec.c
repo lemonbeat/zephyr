@@ -37,7 +37,7 @@ static int ps2_xec_configure(const struct device *dev,
 	struct ps2_xec_data *data = dev->data;
 	PS2_Type *base = config->base;
 
-	uint8_t  __attribute__((unused)) dummy;
+	uint8_t __attribute__((unused)) dummy;
 
 	if (!callback_isr) {
 		return -EINVAL;
@@ -67,7 +67,6 @@ static int ps2_xec_configure(const struct device *dev,
 	return 0;
 }
 
-
 static int ps2_xec_write(const struct device *dev, uint8_t value)
 {
 	const struct ps2_xec_config *config = dev->config;
@@ -75,7 +74,7 @@ static int ps2_xec_write(const struct device *dev, uint8_t value)
 	PS2_Type *base = config->base;
 	int i = 0;
 
-	uint8_t  __attribute__((unused)) dummy;
+	uint8_t __attribute__((unused)) dummy;
 
 	if (k_sem_take(&data->tx_lock, K_NO_WAIT)) {
 		return -EACCES;
@@ -87,8 +86,9 @@ static int ps2_xec_write(const struct device *dev, uint8_t value)
 	 * FSM.
 	 */
 	while (((base->STATUS &
-		(MCHP_PS2_STATUS_RX_BUSY | MCHP_PS2_STATUS_TX_IDLE))
-		!= MCHP_PS2_STATUS_TX_IDLE) && (i < PS2_TIMEOUT)) {
+		 (MCHP_PS2_STATUS_RX_BUSY | MCHP_PS2_STATUS_TX_IDLE)) !=
+		MCHP_PS2_STATUS_TX_IDLE) &&
+	       (i < PS2_TIMEOUT)) {
 		k_busy_wait(50);
 		i++;
 	}
@@ -167,7 +167,7 @@ static void ps2_xec_isr(const struct device *dev)
 			data->callback_isr(dev, base->TRX_BUFF);
 		}
 	} else if (status &
-		    (MCHP_PS2_STATUS_TX_TMOUT | MCHP_PS2_STATUS_TX_ST_TMOUT)) {
+		   (MCHP_PS2_STATUS_TX_TMOUT | MCHP_PS2_STATUS_TX_ST_TMOUT)) {
 		/* Clear sticky bits and go to read mode */
 		base->STATUS = MCHP_PS2_STATUS_RW1C_MASK;
 		LOG_ERR("TX time out: %0x", status);
@@ -191,7 +191,7 @@ static const struct ps2_driver_api ps2_xec_driver_api = {
 static int ps2_xec_init_0(const struct device *dev);
 
 static const struct ps2_xec_config ps2_xec_config_0 = {
-	.base = (PS2_Type *) DT_INST_REG_ADDR(0),
+	.base = (PS2_Type *)DT_INST_REG_ADDR(0),
 	.girq_id = DT_INST_PROP(0, girq),
 	.girq_bit = DT_INST_PROP(0, girq_bit),
 	.isr_nvic = DT_INST_IRQN(0),
@@ -199,12 +199,9 @@ static const struct ps2_xec_config ps2_xec_config_0 = {
 
 static struct ps2_xec_data ps2_xec_port_data_0;
 
-DEVICE_AND_API_INIT(ps2_xec_0, DT_INST_LABEL(0),
-		    &ps2_xec_init_0,
-		    &ps2_xec_port_data_0, &ps2_xec_config_0,
-		    POST_KERNEL, CONFIG_PS2_INIT_PRIORITY,
-		    &ps2_xec_driver_api);
-
+DEVICE_AND_API_INIT(ps2_xec_0, DT_INST_LABEL(0), &ps2_xec_init_0,
+		    &ps2_xec_port_data_0, &ps2_xec_config_0, POST_KERNEL,
+		    CONFIG_PS2_INIT_PRIORITY, &ps2_xec_driver_api);
 
 static int ps2_xec_init_0(const struct device *dev)
 {
@@ -214,9 +211,8 @@ static int ps2_xec_init_0(const struct device *dev)
 
 	k_sem_init(&data->tx_lock, 0, 1);
 
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    ps2_xec_isr, DEVICE_GET(ps2_xec_0), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), ps2_xec_isr,
+		    DEVICE_GET(ps2_xec_0), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 
@@ -228,7 +224,7 @@ static int ps2_xec_init_0(const struct device *dev)
 static int ps2_xec_init_1(const struct device *dev);
 
 static const struct ps2_xec_config ps2_xec_config_1 = {
-	.base = (PS2_Type *) DT_INST_REG_ADDR(1),
+	.base = (PS2_Type *)DT_INST_REG_ADDR(1),
 	.girq_id = DT_INST_PROP(1, girq),
 	.girq_bit = DT_INST_PROP(1, girq_bit),
 	.isr_nvic = DT_INST_IRQN(1),
@@ -237,11 +233,9 @@ static const struct ps2_xec_config ps2_xec_config_1 = {
 
 static struct ps2_xec_data ps2_xec_port_data_1;
 
-DEVICE_AND_API_INIT(ps2_xec_1, DT_INST_LABEL(1),
-		    &ps2_xec_init_1,
-		    &ps2_xec_port_data_1, &ps2_xec_config_1,
-		    POST_KERNEL, CONFIG_PS2_INIT_PRIORITY,
-		    &ps2_xec_driver_api);
+DEVICE_AND_API_INIT(ps2_xec_1, DT_INST_LABEL(1), &ps2_xec_init_1,
+		    &ps2_xec_port_data_1, &ps2_xec_config_1, POST_KERNEL,
+		    CONFIG_PS2_INIT_PRIORITY, &ps2_xec_driver_api);
 
 static int ps2_xec_init_1(const struct device *dev)
 {
@@ -251,9 +245,8 @@ static int ps2_xec_init_1(const struct device *dev)
 
 	k_sem_init(&data->tx_lock, 0, 1);
 
-	IRQ_CONNECT(DT_INST_IRQN(1),
-		    DT_INST_IRQ(1, priority),
-		    ps2_xec_isr, DEVICE_GET(ps2_xec_1), 0);
+	IRQ_CONNECT(DT_INST_IRQN(1), DT_INST_IRQ(1, priority), ps2_xec_isr,
+		    DEVICE_GET(ps2_xec_1), 0);
 
 	irq_enable(DT_INST_IRQN(1));
 

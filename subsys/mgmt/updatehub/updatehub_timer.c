@@ -42,8 +42,7 @@ void updatehub_tmr_start(void)
 {
 	LOG_DBG("tmr_start");
 	k_timer_start(&uhu_packet_down_tmr,
-		      K_SECONDS(CONFIG_UPDATEHUB_COAP_CONN_TIMEOUT),
-		      K_NO_WAIT);
+		      K_SECONDS(CONFIG_UPDATEHUB_COAP_CONN_TIMEOUT), K_NO_WAIT);
 }
 
 void updatehub_tmr_stop(void)

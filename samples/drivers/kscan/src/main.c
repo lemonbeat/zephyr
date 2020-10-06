@@ -82,22 +82,22 @@ static struct k_timer block_matrix_timer;
 /****************************************************************************/
 
 static const uint8_t keymap[MAX_MATRIX_KEY_COLS][MAX_MATRIX_KEY_ROWS] = {
-	{KEY_RSVD, 1, 112, 16, 2, KEY_RSVD, 30, KEY_RSVD},
-	{116, 117, 110, KEY_RSVD, 118, 17, 18, KEY_RSVD},
-	{113, KEY_RSVD, 114, 115, 3, KEY_RSVD, 119, KEY_RSVD},
-	{49, 34, 48, 5, 4, 19, 20, KEY_RSVD},
-	{35, 36, 21, 50, 6, 7, 22, 51},
-	{23, 32, 33, 37, 8, 31, 52, 61},
-	{38, 47, 46, KEY_RSVD, 9, 53, 24, 120},
-	{25, 79, KEY_RSVD, 39, 10, 28, 13, KEY_RSVD},
-	{41, KEY_RSVD, KEY_RSVD, 40, 27, 55, 11, 12},
-	{KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, 26, 90, 126, 121},
-	{84, 71, KEY_RSVD, KEY_RSVD, 54, 122, 29, 15},
-	{89, 83, KEY_RSVD, KEY_RSVD, 123, 75, 76, 43},
-	{255, 59, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, 87, KEY_RSVD},
-	{KEY_RSVD, KEY_RSVD, 44, 57, KEY_RSVD, KEY_RSVD, KEY_RSVD},
-	{62, 60, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD},
-	{KEY_RSVD, KEY_RSVD, 58, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, 64},
+	{ KEY_RSVD, 1, 112, 16, 2, KEY_RSVD, 30, KEY_RSVD },
+	{ 116, 117, 110, KEY_RSVD, 118, 17, 18, KEY_RSVD },
+	{ 113, KEY_RSVD, 114, 115, 3, KEY_RSVD, 119, KEY_RSVD },
+	{ 49, 34, 48, 5, 4, 19, 20, KEY_RSVD },
+	{ 35, 36, 21, 50, 6, 7, 22, 51 },
+	{ 23, 32, 33, 37, 8, 31, 52, 61 },
+	{ 38, 47, 46, KEY_RSVD, 9, 53, 24, 120 },
+	{ 25, 79, KEY_RSVD, 39, 10, 28, 13, KEY_RSVD },
+	{ 41, KEY_RSVD, KEY_RSVD, 40, 27, 55, 11, 12 },
+	{ KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, 26, 90, 126, 121 },
+	{ 84, 71, KEY_RSVD, KEY_RSVD, 54, 122, 29, 15 },
+	{ 89, 83, KEY_RSVD, KEY_RSVD, 123, 75, 76, 43 },
+	{ 255, 59, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, 87, KEY_RSVD },
+	{ KEY_RSVD, KEY_RSVD, 44, 57, KEY_RSVD, KEY_RSVD, KEY_RSVD },
+	{ 62, 60, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD },
+	{ KEY_RSVD, KEY_RSVD, 58, KEY_RSVD, KEY_RSVD, KEY_RSVD, KEY_RSVD, 64 },
 };
 
 /* Key used for typematic */
@@ -106,12 +106,11 @@ static uint8_t last_key;
 /* Typematic rate and delay values correspond to the data passed after
  * the F3 command (See the 8042 spec online)
  */
-static const uint16_t period[] = {
-	33U,  37U,  42U,  46U,  50U,  54U,  58U,  63U,
-	67U,  75U,  83U,  92U, 100U, 109U, 116U, 125U,
-	133U, 149U, 167U, 182U, 200U, 217U, 232U, 250U,
-	270U, 303U, 333U, 370U, 400U, 435U, 470U, 500U
-};
+static const uint16_t period[] = { 33U,	 37U,  42U,  46U,  50U,	 54U,  58U,
+				   63U,	 67U,  75U,  83U,  92U,	 100U, 109U,
+				   116U, 125U, 133U, 149U, 167U, 182U, 200U,
+				   217U, 232U, 250U, 270U, 303U, 333U, 370U,
+				   400U, 435U, 470U, 500U };
 
 static const uint16_t delay[] = { 250U, 500U, 750U, 1000U };
 
@@ -131,8 +130,8 @@ static void kb_callback(const struct device *dev, uint32_t row, uint32_t col,
 	LOG_INF("Key code = %u Pressed = %u\n", last_key, pressed);
 
 	if (pressed) {
-		k_timer_start(&typematic_timer,
-			      K_MSEC(delay[0]), K_MSEC(period[0]));
+		k_timer_start(&typematic_timer, K_MSEC(delay[0]),
+			      K_MSEC(period[0]));
 	} else {
 		k_timer_stop(&typematic_timer);
 	}
@@ -165,5 +164,4 @@ void main(void)
 	k_timer_init(&typematic_timer, typematic_callback, NULL);
 	k_timer_init(&block_matrix_timer, block_matrix_callback, NULL);
 	k_timer_start(&block_matrix_timer, K_SECONDS(1), K_SECONDS(3));
-
 }

@@ -13,12 +13,10 @@ void test_fcb_rotate(void)
 	int rc;
 	int old_id;
 	struct fcb_entry loc;
-	uint8_t test_data[128] = {0};
-	int elem_cnts[2] = {0, 0};
+	uint8_t test_data[128] = { 0 };
+	int elem_cnts[2] = { 0, 0 };
 	int cnts[2];
-	struct append_arg aa_arg = {
-		.elem_cnts = cnts
-	};
+	struct append_arg aa_arg = { .elem_cnts = cnts };
 
 	fcb = &test_fcb;
 
@@ -65,7 +63,7 @@ void test_fcb_rotate(void)
 	rc = fcb_walk(fcb, NULL, fcb_test_cnt_elems_cb, &aa_arg);
 	zassert_true(rc == 0, "fcb_walk call failure");
 	zassert_true(aa_arg.elem_cnts[0] == elem_cnts[0] ||
-		     aa_arg.elem_cnts[1] == elem_cnts[1],
+			     aa_arg.elem_cnts[1] == elem_cnts[1],
 		     "fcb_walk: entry count got different than expected");
 	zassert_true(aa_arg.elem_cnts[0] == 0 || aa_arg.elem_cnts[1] == 0,
 		     "fcb_walk: entry count got different than expected");

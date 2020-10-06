@@ -81,8 +81,7 @@ static inline void stats(struct net_if *iface)
 
 #if defined(CONFIG_NET_STATISTICS_IPV6)
 		NET_INFO("IPv6 recv      %d\tsent\t%d\tdrop\t%d\tforwarded\t%d",
-			 GET_STAT(iface, ipv6.recv),
-			 GET_STAT(iface, ipv6.sent),
+			 GET_STAT(iface, ipv6.recv), GET_STAT(iface, ipv6.sent),
 			 GET_STAT(iface, ipv6.drop),
 			 GET_STAT(iface, ipv6.forwarded));
 #if defined(CONFIG_NET_STATISTICS_IPV6_ND)
@@ -101,8 +100,7 @@ static inline void stats(struct net_if *iface)
 
 #if defined(CONFIG_NET_STATISTICS_IPV4)
 		NET_INFO("IPv4 recv      %d\tsent\t%d\tdrop\t%d\tforwarded\t%d",
-			 GET_STAT(iface, ipv4.recv),
-			 GET_STAT(iface, ipv4.sent),
+			 GET_STAT(iface, ipv4.recv), GET_STAT(iface, ipv4.sent),
 			 GET_STAT(iface, ipv4.drop),
 			 GET_STAT(iface, ipv4.forwarded));
 #endif /* CONFIG_NET_STATISTICS_IPV4 */
@@ -117,8 +115,7 @@ static inline void stats(struct net_if *iface)
 			 GET_STAT(iface, ip_errors.protoerr));
 
 		NET_INFO("ICMP recv      %d\tsent\t%d\tdrop\t%d",
-			 GET_STAT(iface, icmp.recv),
-			 GET_STAT(iface, icmp.sent),
+			 GET_STAT(iface, icmp.recv), GET_STAT(iface, icmp.sent),
 			 GET_STAT(iface, icmp.drop));
 		NET_INFO("ICMP typeer    %d\tchkerr\t%d",
 			 GET_STAT(iface, icmp.typeerr),
@@ -126,11 +123,9 @@ static inline void stats(struct net_if *iface)
 
 #if defined(CONFIG_NET_STATISTICS_UDP)
 		NET_INFO("UDP recv       %d\tsent\t%d\tdrop\t%d",
-			 GET_STAT(iface, udp.recv),
-			 GET_STAT(iface, udp.sent),
+			 GET_STAT(iface, udp.recv), GET_STAT(iface, udp.sent),
 			 GET_STAT(iface, udp.drop));
-		NET_INFO("UDP chkerr     %d",
-			 GET_STAT(iface, udp.chkerr));
+		NET_INFO("UDP chkerr     %d", GET_STAT(iface, udp.chkerr));
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_TCP)
@@ -138,16 +133,14 @@ static inline void stats(struct net_if *iface)
 			 GET_STAT(iface, tcp.bytes.received),
 			 GET_STAT(iface, tcp.bytes.sent));
 		NET_INFO("TCP seg recv   %d\tsent\t%d\tdrop\t%d",
-			 GET_STAT(iface, tcp.recv),
-			 GET_STAT(iface, tcp.sent),
+			 GET_STAT(iface, tcp.recv), GET_STAT(iface, tcp.sent),
 			 GET_STAT(iface, tcp.drop));
 		NET_INFO("TCP seg resent %d\tchkerr\t%d\tackerr\t%d",
 			 GET_STAT(iface, tcp.resent),
 			 GET_STAT(iface, tcp.chkerr),
 			 GET_STAT(iface, tcp.ackerr));
 		NET_INFO("TCP seg rsterr %d\trst\t%d\tre-xmit\t%d",
-			 GET_STAT(iface, tcp.rsterr),
-			 GET_STAT(iface, tcp.rst),
+			 GET_STAT(iface, tcp.rsterr), GET_STAT(iface, tcp.rst),
 			 GET_STAT(iface, tcp.rexmit));
 		NET_INFO("TCP conn drop  %d\tconnrst\t%d",
 			 GET_STAT(iface, tcp.conndrop),
@@ -166,8 +159,8 @@ static inline void stats(struct net_if *iface)
 
 		for (i = 0; i < NET_TC_TX_COUNT; i++) {
 			NET_INFO("[%d] %s (%d)\t%d\t\t%d", i,
-				 priority2str(GET_STAT(iface,
-						       tc.sent[i].priority)),
+				 priority2str(
+					 GET_STAT(iface, tc.sent[i].priority)),
 				 GET_STAT(iface, tc.sent[i].priority),
 				 GET_STAT(iface, tc.sent[i].pkts),
 				 GET_STAT(iface, tc.sent[i].bytes));
@@ -180,8 +173,8 @@ static inline void stats(struct net_if *iface)
 
 		for (i = 0; i < NET_TC_RX_COUNT; i++) {
 			NET_INFO("[%d] %s (%d)\t%d\t\t%d", i,
-				 priority2str(GET_STAT(iface,
-						       tc.recv[i].priority)),
+				 priority2str(
+					 GET_STAT(iface, tc.recv[i].priority)),
 				 GET_STAT(iface, tc.recv[i].priority),
 				 GET_STAT(iface, tc.recv[i].pkts),
 				 GET_STAT(iface, tc.recv[i].bytes));
@@ -199,7 +192,7 @@ static inline void stats(struct net_if *iface)
 			 GET_STAT(iface, pm.suspend_count));
 		NET_INFO("Average suspend time: %u ms",
 			 (uint32_t)(GET_STAT(iface, pm.overall_suspend_time) /
-				 GET_STAT(iface, pm.suspend_count)));
+				    GET_STAT(iface, pm.suspend_count)));
 		NET_INFO("Total suspended time: %llu ms",
 			 GET_STAT(iface, pm.overall_suspend_time));
 #endif
@@ -314,51 +307,42 @@ static int net_stats_get(uint32_t mgmt_request, struct net_if *iface,
 	return 0;
 }
 
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_ALL,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_ALL, net_stats_get);
 
 NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_PROCESSING_ERROR,
 				  net_stats_get);
 
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_BYTES,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_BYTES, net_stats_get);
 
 NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_IP_ERRORS,
 				  net_stats_get);
 
 #if defined(CONFIG_NET_STATISTICS_IPV4)
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_IPV4,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_IPV4, net_stats_get);
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_IPV6)
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_IPV6,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_IPV6, net_stats_get);
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_IPV6_ND)
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_IPV6_ND,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_IPV6_ND, net_stats_get);
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_ICMP)
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_ICMP,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_ICMP, net_stats_get);
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_UDP)
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_UDP,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_UDP, net_stats_get);
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_TCP)
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_TCP,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_TCP, net_stats_get);
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_POWER_MANAGEMENT)
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_PM,
-				  net_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_PM, net_stats_get);
 #endif
 
 #endif /* CONFIG_NET_STATISTICS_USER_API */

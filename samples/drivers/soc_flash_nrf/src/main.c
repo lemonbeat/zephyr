@@ -11,18 +11,17 @@
 #include <device.h>
 #include <stdio.h>
 
-
 #ifdef CONFIG_TRUSTED_EXECUTION_NONSECURE
 #define FLASH_TEST_OFFSET FLASH_AREA_OFFSET(image_1_nonsecure)
 #else
 #define FLASH_TEST_OFFSET FLASH_AREA_OFFSET(image_1)
 #endif
 
-#define FLASH_PAGE_SIZE   4096
-#define TEST_DATA_WORD_0  0x1122
-#define TEST_DATA_WORD_1  0xaabb
-#define TEST_DATA_WORD_2  0xabcd
-#define TEST_DATA_WORD_3  0x1234
+#define FLASH_PAGE_SIZE 4096
+#define TEST_DATA_WORD_0 0x1122
+#define TEST_DATA_WORD_1 0xaabb
+#define TEST_DATA_WORD_2 0xabcd
+#define TEST_DATA_WORD_3 0x1234
 
 #define FLASH_TEST_OFFSET2 0x41234
 #define FLASH_TEST_PAGE_IDX 37
@@ -44,8 +43,7 @@ void main(void)
 	printf("\nNordic nRF5 Flash Testing\n");
 	printf("=========================\n");
 
-	flash_dev =
-		device_get_binding(DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
+	flash_dev = device_get_binding(DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 
 	if (!flash_dev) {
 		printf("Nordic nRF5 flash driver was not found!\n");
@@ -65,15 +63,15 @@ void main(void)
 	for (i = 0U; i < ARRAY_SIZE(buf_array_1); i++) {
 		offset = FLASH_TEST_OFFSET + (i << 2);
 		printf("   Attempted to write %x at 0x%x\n", buf_array_1[i],
-				offset);
+		       offset);
 		if (flash_write(flash_dev, offset, &buf_array_1[i],
-					sizeof(uint32_t)) != 0) {
+				sizeof(uint32_t)) != 0) {
 			printf("   Flash write failed!\n");
 			return;
 		}
 		printf("   Attempted to read 0x%x\n", offset);
 		if (flash_read(flash_dev, offset, &buf_word,
-					sizeof(uint32_t)) != 0) {
+			       sizeof(uint32_t)) != 0) {
 			printf("   Flash read failed!\n");
 			return;
 		}
@@ -98,15 +96,15 @@ void main(void)
 	for (i = 0U; i < ARRAY_SIZE(buf_array_2); i++) {
 		offset = FLASH_TEST_OFFSET + (i << 2);
 		printf("   Attempted to write %x at 0x%x\n", buf_array_2[i],
-				offset);
+		       offset);
 		if (flash_write(flash_dev, offset, &buf_array_2[i],
-					sizeof(uint32_t)) != 0) {
+				sizeof(uint32_t)) != 0) {
 			printf("   Flash write failed!\n");
 			return;
 		}
 		printf("   Attempted to read 0x%x\n", offset);
 		if (flash_read(flash_dev, offset, &buf_word,
-					sizeof(uint32_t)) != 0) {
+			       sizeof(uint32_t)) != 0) {
 			printf("   Flash read failed!\n");
 			return;
 		}
@@ -130,15 +128,15 @@ void main(void)
 	for (i = 0U; i < ARRAY_SIZE(buf_array_3); i++) {
 		offset = FLASH_TEST_OFFSET + (i << 2) + 1;
 		printf("   Attempted to write %x at 0x%x\n", buf_array_3[i],
-				offset);
+		       offset);
 		if (flash_write(flash_dev, offset, &buf_array_3[i],
-					sizeof(uint32_t)) != 0) {
+				sizeof(uint32_t)) != 0) {
 			printf("   Flash write failed!\n");
 			return;
 		}
 		printf("   Attempted to read 0x%x\n", offset);
 		if (flash_read(flash_dev, offset, &buf_word,
-					sizeof(uint32_t)) != 0) {
+			       sizeof(uint32_t)) != 0) {
 			printf("   Flash read failed!\n");
 			return;
 		}
@@ -173,8 +171,7 @@ void main(void)
 
 	if (!rc) {
 		printf("   Page of number %u has start offset 0x%08x\n",
-		       FLASH_TEST_PAGE_IDX,
-		       info.start_offset);
+		       FLASH_TEST_PAGE_IDX, info.start_offset);
 		printf("     and size of 0x%08x B.\n", info.size);
 		if (info.index == FLASH_TEST_PAGE_IDX) {
 			printf("     Page index resolved properly\n");

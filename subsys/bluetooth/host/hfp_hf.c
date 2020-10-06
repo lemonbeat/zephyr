@@ -43,13 +43,13 @@ static const struct {
 	uint32_t min;
 	uint32_t max;
 } ag_ind[] = {
-	{"service", 0, 1}, /* HF_SERVICE_IND */
-	{"call", 0, 1}, /* HF_CALL_IND */
-	{"callsetup", 0, 3}, /* HF_CALL_SETUP_IND */
-	{"callheld", 0, 2}, /* HF_CALL_HELD_IND */
-	{"signal", 0, 5}, /* HF_SINGNAL_IND */
-	{"roam", 0, 1}, /* HF_ROAM_IND */
-	{"battchg", 0, 5} /* HF_BATTERY_IND */
+	{ "service", 0, 1 }, /* HF_SERVICE_IND */
+	{ "call", 0, 1 }, /* HF_CALL_IND */
+	{ "callsetup", 0, 3 }, /* HF_CALL_SETUP_IND */
+	{ "callheld", 0, 2 }, /* HF_CALL_HELD_IND */
+	{ "signal", 0, 5 }, /* HF_SINGNAL_IND */
+	{ "roam", 0, 1 }, /* HF_ROAM_IND */
+	{ "battchg", 0, 5 } /* HF_BATTERY_IND */
 };
 
 void hf_slc_error(struct at_client *hf_at)
@@ -362,10 +362,8 @@ static const struct unsolicited {
 	const char *cmd;
 	enum at_cmd_type type;
 	int (*func)(struct at_client *hf_at);
-} handlers[] = {
-	{ "CIEV", AT_CMD_TYPE_UNSOLICITED, ciev_handle },
-	{ "RING", AT_CMD_TYPE_OTHER, ring_handle }
-};
+} handlers[] = { { "CIEV", AT_CMD_TYPE_UNSOLICITED, ciev_handle },
+		 { "RING", AT_CMD_TYPE_OTHER, ring_handle } };
 
 static const struct unsolicited *hfp_hf_unsol_lookup(struct at_client *hf_at)
 {
@@ -400,7 +398,7 @@ int unsolicited_cb(struct at_client *hf_at, struct net_buf *buf)
 }
 
 int cmd_complete(struct at_client *hf_at, enum at_result result,
-	       enum at_cme cme_err)
+		 enum at_cme cme_err)
 {
 	struct bt_hfp_hf *hf = CONTAINER_OF(hf_at, struct bt_hfp_hf, at);
 	struct bt_conn *conn = hf->rfcomm_dlc.session->br_chan.chan.conn;

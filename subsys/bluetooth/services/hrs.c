@@ -27,7 +27,8 @@ LOG_MODULE_REGISTER(hrs);
 
 static uint8_t hrs_blsc;
 
-static void hrmc_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void hrmc_ccc_cfg_changed(const struct bt_gatt_attr *attr,
+				 uint16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -44,8 +45,8 @@ static ssize_t read_blsc(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 }
 
 /* Heart Rate Service Declaration */
-BT_GATT_SERVICE_DEFINE(hrs_svc,
-	BT_GATT_PRIMARY_SERVICE(BT_UUID_HRS),
+BT_GATT_SERVICE_DEFINE(
+	hrs_svc, BT_GATT_PRIMARY_SERVICE(BT_UUID_HRS),
 	BT_GATT_CHARACTERISTIC(BT_UUID_HRS_MEASUREMENT, BT_GATT_CHRC_NOTIFY,
 			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
 	BT_GATT_CCC(hrmc_ccc_cfg_changed,
@@ -53,8 +54,7 @@ BT_GATT_SERVICE_DEFINE(hrs_svc,
 	BT_GATT_CHARACTERISTIC(BT_UUID_HRS_BODY_SENSOR, BT_GATT_CHRC_READ,
 			       BT_GATT_PERM_READ, read_blsc, NULL, NULL),
 	BT_GATT_CHARACTERISTIC(BT_UUID_HRS_CONTROL_POINT, BT_GATT_CHRC_WRITE,
-			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
-);
+			       BT_GATT_PERM_NONE, NULL, NULL, NULL), );
 
 static int hrs_init(const struct device *dev)
 {

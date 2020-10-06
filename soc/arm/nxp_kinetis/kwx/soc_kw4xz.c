@@ -13,10 +13,10 @@
 #include <fsl_clock.h>
 #include <arch/cpu.h>
 
-#define LPUART0SRC_OSCERCLK	(1)
-#define TPMSRC_MCGPLLCLK	(1)
+#define LPUART0SRC_OSCERCLK (1)
+#define TPMSRC_MCGPLLCLK (1)
 
-#define CLKDIV1_DIVBY2		(1)
+#define CLKDIV1_DIVBY2 (1)
 
 static const osc_config_t oscConfig = {
 	.freq = CONFIG_OSC_XTAL0_FREQ,
@@ -67,10 +67,9 @@ static ALWAYS_INLINE void clock_init(void)
 	CLOCK_SetLpuartClock(LPUART0SRC_OSCERCLK);
 #endif
 
-#if defined(CONFIG_PWM) && \
-	(DT_NODE_HAS_STATUS(DT_NODELABEL(pwm0), okay) || \
-	 DT_NODE_HAS_STATUS(DT_NODELABEL(pwm1), okay) || \
-	 DT_NODE_HAS_STATUS(DT_NODELABEL(pwm2), okay))
+#if defined(CONFIG_PWM) && (DT_NODE_HAS_STATUS(DT_NODELABEL(pwm0), okay) || \
+			    DT_NODE_HAS_STATUS(DT_NODELABEL(pwm1), okay) || \
+			    DT_NODE_HAS_STATUS(DT_NODELABEL(pwm2), okay))
 	CLOCK_SetTpmClock(TPMSRC_MCGPLLCLK);
 #endif
 }

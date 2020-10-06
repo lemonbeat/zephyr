@@ -22,20 +22,20 @@
 const uint8_t hci_prop_evt_prefix[2] = { 0xAB, 0xBA };
 
 struct hci_evt_prop {
-	uint8_t  prefix[2];
+	uint8_t prefix[2];
 } __packed;
 
 struct hci_evt_prop_report {
-	uint8_t  data_len;
-	uint8_t  data[0];
+	uint8_t data_len;
+	uint8_t data[0];
 } __packed;
 
 /* Command handler structure for cmd_handle(). */
 struct cmd_handler {
 	uint16_t opcode; /* HCI command opcode */
-	uint8_t len;     /* HCI command response length */
-	void (*handler)(struct net_buf *buf, struct net_buf **evt,
-			uint8_t len, uint16_t opcode);
+	uint8_t len; /* HCI command response length */
+	void (*handler)(struct net_buf *buf, struct net_buf **evt, uint8_t len,
+			uint16_t opcode);
 };
 
 /* Add event to net_buf. */
@@ -84,8 +84,7 @@ static int cmd_handle_helper(uint16_t opcode, struct net_buf *cmd,
 }
 
 /* Lookup the command opcode and invoke handler. */
-static int cmd_handle(struct net_buf *cmd,
-		      const struct cmd_handler *handlers,
+static int cmd_handle(struct net_buf *cmd, const struct cmd_handler *handlers,
 		      size_t num_handlers)
 {
 	struct net_buf *evt = NULL;
@@ -172,35 +171,27 @@ static void le_read_supp_states(struct net_buf *buf, struct net_buf **evt,
 /* Setup handlers needed for bt_enable to function. */
 static const struct cmd_handler cmds[] = {
 	{ BT_HCI_OP_READ_LOCAL_VERSION_INFO,
-	  sizeof(struct bt_hci_rp_read_local_version_info),
-	  generic_success },
+	  sizeof(struct bt_hci_rp_read_local_version_info), generic_success },
 	{ BT_HCI_OP_READ_SUPPORTED_COMMANDS,
 	  sizeof(struct bt_hci_rp_read_supported_commands),
 	  read_supported_commands },
 	{ BT_HCI_OP_READ_LOCAL_FEATURES,
-	  sizeof(struct bt_hci_rp_read_local_features),
-	  read_local_features },
-	{ BT_HCI_OP_READ_BD_ADDR,
-	  sizeof(struct bt_hci_rp_read_bd_addr),
+	  sizeof(struct bt_hci_rp_read_local_features), read_local_features },
+	{ BT_HCI_OP_READ_BD_ADDR, sizeof(struct bt_hci_rp_read_bd_addr),
 	  generic_success },
-	{ BT_HCI_OP_SET_EVENT_MASK,
-	  sizeof(struct bt_hci_evt_cc_status),
+	{ BT_HCI_OP_SET_EVENT_MASK, sizeof(struct bt_hci_evt_cc_status),
 	  generic_success },
-	{ BT_HCI_OP_LE_SET_EVENT_MASK,
-	  sizeof(struct bt_hci_evt_cc_status),
+	{ BT_HCI_OP_LE_SET_EVENT_MASK, sizeof(struct bt_hci_evt_cc_status),
 	  generic_success },
 	{ BT_HCI_OP_LE_READ_LOCAL_FEATURES,
 	  sizeof(struct bt_hci_rp_le_read_local_features),
 	  le_read_local_features },
 	{ BT_HCI_OP_LE_READ_SUPP_STATES,
-	  sizeof(struct bt_hci_rp_le_read_supp_states),
-	  le_read_supp_states },
-	{ BT_HCI_OP_LE_RAND,
-	  sizeof(struct bt_hci_rp_le_rand),
+	  sizeof(struct bt_hci_rp_le_read_supp_states), le_read_supp_states },
+	{ BT_HCI_OP_LE_RAND, sizeof(struct bt_hci_rp_le_rand),
 	  generic_success },
 	{ BT_HCI_OP_LE_SET_RANDOM_ADDRESS,
-	  sizeof(struct bt_hci_cp_le_set_random_address),
-	  generic_success },
+	  sizeof(struct bt_hci_cp_le_set_random_address), generic_success },
 };
 
 /* HCI driver open. */
@@ -222,16 +213,16 @@ static int driver_send(struct net_buf *buf)
 
 /* HCI driver structure. */
 static const struct bt_hci_driver drv = {
-	.name         = "test",
-	.bus          = BT_HCI_DRIVER_BUS_VIRTUAL,
-	.open         = driver_open,
-	.send         = driver_send,
-	.quirks       = BT_QUIRK_NO_RESET,
+	.name = "test",
+	.bus = BT_HCI_DRIVER_BUS_VIRTUAL,
+	.open = driver_open,
+	.send = driver_send,
+	.quirks = BT_QUIRK_NO_RESET,
 };
 
 struct bt_recv_job_data {
-	struct k_work work;  /* Work item */
-	struct k_sem *sync;  /* Semaphore to synchronize with */
+	struct k_work work; /* Work item */
+	struct k_sem *sync; /* Semaphore to synchronize with */
 	struct net_buf *buf; /* Net buffer to be passed to bt_recv() */
 } job_data[CONFIG_BT_RX_BUF_COUNT];
 
@@ -350,15 +341,14 @@ static void test_hci_prop_evt_entry(void)
 	bt_hci_driver_register(&drv);
 
 	/* Go! Wait until Bluetooth initialization is done  */
-	zassert_true((bt_enable(NULL) == 0),
-		     "bt_enable failed");
+	zassert_true((bt_enable(NULL) == 0), "bt_enable failed");
 
 	/* Register the prop callback */
 	bt_hci_register_vnd_evt_cb(prop_cb);
 
 	/* Generate some data */
 	uint8_t data_len = 10;
-	uint8_t data[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	uint8_t data[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
 	/* Send the prop event report */
 	send_prop_report(&data[0], data_len);
@@ -368,8 +358,7 @@ static void test_hci_prop_evt_entry(void)
 		     "prop_cb was not called within timeout");
 
 	/* Verify the data length */
-	zassert_true(prop_cb_data_len == data_len,
-		     "prop_cb_data_len invalid");
+	zassert_true(prop_cb_data_len == data_len, "prop_cb_data_len invalid");
 
 	/* Verify the data itself */
 	zassert_true(memcmp(prop_cb_data, data, data_len) == 0,

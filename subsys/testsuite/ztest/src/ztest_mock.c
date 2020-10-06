@@ -63,7 +63,7 @@ void vprintk(const char *fmt, va_list ap)
  * been fixed to void* or similar GH-2825
  */
 #define BITS_PER_UL (8 * sizeof(unsigned long int))
-#define DEFINE_BITFIELD(name, bits)                                            \
+#define DEFINE_BITFIELD(name, bits) \
 	unsigned long int(name)[((bits) + BITS_PER_UL - 1) / BITS_PER_UL]
 
 static inline int sys_bitfield_find_first_clear(const unsigned long *bitmap,
@@ -289,8 +289,7 @@ int z_cleanup_mock(void)
 
 	if (parameter_list.next) {
 		PRINT("Parameter not used by mock: %s:%s\n",
-		      parameter_list.next->fn,
-		      parameter_list.next->name);
+		      parameter_list.next->fn, parameter_list.next->name);
 		fail = 1;
 	}
 	if (return_value_list.next) {

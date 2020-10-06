@@ -11,7 +11,7 @@ int lll_prepare_done(void *param);
 int lll_done(void *param);
 bool lll_is_done(void *param);
 int lll_is_abort_cb(void *next, int prio, void *curr,
-			 lll_prepare_cb_t *resume_cb, int *resume_prio);
+		    lll_prepare_cb_t *resume_cb, int *resume_prio);
 
 static inline int lll_is_stop(void *lll)
 {
@@ -21,7 +21,7 @@ static inline int lll_is_stop(void *lll)
 }
 uint32_t lll_evt_offset_get(struct evt_hdr *evt);
 uint32_t lll_preempt_calc(struct evt_hdr *evt, uint8_t ticker_id,
-		uint32_t ticks_at_event);
+			  uint32_t ticks_at_event);
 void lll_chan_set(uint32_t chan);
 void lll_isr_tx_status_reset(void);
 void lll_isr_rx_status_reset(void);

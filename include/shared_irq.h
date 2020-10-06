@@ -18,8 +18,7 @@ extern "C" {
 typedef int (*isr_t)(const struct device *dev);
 
 /* driver API definition */
-typedef int (*shared_irq_register_t)(const struct device *dev,
-				     isr_t isr_func,
+typedef int (*shared_irq_register_t)(const struct device *dev, isr_t isr_func,
 				     const struct device *isr_dev);
 typedef int (*shared_irq_enable_t)(const struct device *dev,
 				   const struct device *isr_dev);

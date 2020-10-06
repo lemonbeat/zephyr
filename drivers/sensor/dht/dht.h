@@ -9,9 +9,9 @@
 
 #include <device.h>
 
-#define DHT_START_SIGNAL_DURATION		18000
-#define DHT_SIGNAL_MAX_WAIT_DURATION		100
-#define DHT_DATA_BITS_NUM			40
+#define DHT_START_SIGNAL_DURATION 18000
+#define DHT_SIGNAL_MAX_WAIT_DURATION 100
+#define DHT_DATA_BITS_NUM 40
 
 struct dht_data {
 	const struct device *gpio;

@@ -11,8 +11,7 @@
 #include <fs/fcb.h>
 #include "fcb_priv.h"
 
-static struct flash_sector *
-fcb_new_sector(struct fcb *fcb, int cnt)
+static struct flash_sector *fcb_new_sector(struct fcb *fcb, int cnt)
 {
 	struct flash_sector *prev;
 	struct flash_sector *cur;
@@ -36,8 +35,7 @@ fcb_new_sector(struct fcb *fcb, int cnt)
 /*
  * Take one of the scratch blocks into use, if at all possible.
  */
-int
-fcb_append_to_scratch(struct fcb *fcb)
+int fcb_append_to_scratch(struct fcb *fcb)
 {
 	struct flash_sector *sector;
 	int rc;
@@ -56,8 +54,7 @@ fcb_append_to_scratch(struct fcb *fcb)
 	return 0;
 }
 
-int
-fcb_append(struct fcb *fcb, uint16_t len, struct fcb_entry *append_loc)
+int fcb_append(struct fcb *fcb, uint16_t len, struct fcb_entry *append_loc)
 {
 	struct flash_sector *sector;
 	struct fcb_entry *active;
@@ -82,7 +79,7 @@ fcb_append(struct fcb *fcb, uint16_t len, struct fcb_entry *append_loc)
 	if (active->fe_elem_off + len + cnt > active->fe_sector->fs_size) {
 		sector = fcb_new_sector(fcb, fcb->f_scratch_cnt);
 		if (!sector || (sector->fs_size <
-			sizeof(struct fcb_disk_area) + len + cnt)) {
+				sizeof(struct fcb_disk_area) + len + cnt)) {
 			rc = -ENOSPC;
 			goto err;
 		}
@@ -95,7 +92,8 @@ fcb_append(struct fcb *fcb, uint16_t len, struct fcb_entry *append_loc)
 		fcb->f_active_id++;
 	}
 
-	rc = fcb_flash_write(fcb, active->fe_sector, active->fe_elem_off, tmp_str, cnt);
+	rc = fcb_flash_write(fcb, active->fe_sector, active->fe_elem_off,
+			     tmp_str, cnt);
 	if (rc) {
 		rc = -EIO;
 		goto err;
@@ -114,8 +112,7 @@ err:
 	return rc;
 }
 
-int
-fcb_append_finish(struct fcb *fcb, struct fcb_entry *loc)
+int fcb_append_finish(struct fcb *fcb, struct fcb_entry *loc)
 {
 	int rc;
 	uint8_t crc8[fcb->f_align];

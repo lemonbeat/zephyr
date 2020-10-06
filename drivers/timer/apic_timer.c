@@ -42,10 +42,10 @@ BUILD_ASSERT(!IS_ENABLED(CONFIG_SMP), "APIC timer doesn't support SMP");
 
 /* These should be merged into include/drivers/interrupt_controller/loapic.h. */
 
-#define DCR_DIVIDER_MASK	0x0000000F	/* divider bits */
-#define DCR_DIVIDER		0x0000000B	/* divide by 1 */
-#define LVT_MODE_MASK		0x00060000	/* timer mode bits */
-#define LVT_MODE		0x00000000	/* one-shot */
+#define DCR_DIVIDER_MASK 0x0000000F /* divider bits */
+#define DCR_DIVIDER 0x0000000B /* divide by 1 */
+#define LVT_MODE_MASK 0x00060000 /* timer mode bits */
+#define LVT_MODE 0x00000000 /* one-shot */
 
 /*
  * CYCLES_PER_TICK must always be at least '2', otherwise MAX_TICKS
@@ -76,16 +76,16 @@ static uint32_t cached_icr = CYCLES_PER_TICK;
 
 #ifdef CONFIG_TICKLESS_KERNEL
 
-static uint64_t last_announcement;	/* last time we called z_clock_announce() */
+static uint64_t last_announcement; /* last time we called z_clock_announce() */
 
 void z_clock_set_timeout(int32_t n, bool idle)
 {
 	ARG_UNUSED(idle);
 
 	uint32_t ccr;
-	int   full_ticks;	/* number of complete ticks we'll wait */
-	uint32_t full_cycles;	/* full_ticks represented as cycles */
-	uint32_t partial_cycles;	/* number of cycles to first tick boundary */
+	int full_ticks; /* number of complete ticks we'll wait */
+	uint32_t full_cycles; /* full_ticks represented as cycles */
+	uint32_t partial_cycles; /* number of cycles to first tick boundary */
 
 	if (n < 1) {
 		full_ticks = 0;
@@ -219,21 +219,20 @@ int z_clock_driver_init(const struct device *device)
 
 	ARG_UNUSED(device);
 
-	val = x86_read_loapic(LOAPIC_TIMER_CONFIG);	/* set divider */
+	val = x86_read_loapic(LOAPIC_TIMER_CONFIG); /* set divider */
 	val &= ~DCR_DIVIDER_MASK;
 	val |= DCR_DIVIDER;
 	x86_write_loapic(LOAPIC_TIMER_CONFIG, val);
 
-	val = x86_read_loapic(LOAPIC_TIMER);		/* set timer mode */
+	val = x86_read_loapic(LOAPIC_TIMER); /* set timer mode */
 	val &= ~LVT_MODE_MASK;
 	val |= LVT_MODE;
 	x86_write_loapic(LOAPIC_TIMER, val);
 
 	/* remember, wiring up the interrupt will mess with the LVT, too */
 
-	IRQ_CONNECT(CONFIG_APIC_TIMER_IRQ,
-		CONFIG_APIC_TIMER_IRQ_PRIORITY,
-		isr, 0, 0);
+	IRQ_CONNECT(CONFIG_APIC_TIMER_IRQ, CONFIG_APIC_TIMER_IRQ_PRIORITY, isr,
+		    0, 0);
 
 	x86_write_loapic(LOAPIC_TIMER_ICR, cached_icr);
 	irq_enable(CONFIG_APIC_TIMER_IRQ);

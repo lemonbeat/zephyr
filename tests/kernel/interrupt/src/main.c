@@ -12,10 +12,8 @@ extern void test_prevent_interruption(void);
 
 void test_main(void)
 {
-	ztest_test_suite(interrupt_feature,
-			ztest_unit_test(test_isr_dynamic),
-			ztest_unit_test(test_nested_isr),
-			ztest_unit_test(test_prevent_interruption)
-			);
+	ztest_test_suite(interrupt_feature, ztest_unit_test(test_isr_dynamic),
+			 ztest_unit_test(test_nested_isr),
+			 ztest_unit_test(test_prevent_interruption));
 	ztest_run_test_suite(interrupt_feature);
 }

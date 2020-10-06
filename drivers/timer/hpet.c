@@ -14,30 +14,31 @@
 
 DEVICE_MMIO_TOPLEVEL_STATIC(hpet_regs, DT_DRV_INST(0));
 
-#define HPET_REG32(off) (*(volatile uint32_t *)(long)			\
-			 (DEVICE_MMIO_TOPLEVEL_GET(hpet_regs) + (off)))
+#define HPET_REG32(off)                                                     \
+	(*(volatile uint32_t *)(long)(DEVICE_MMIO_TOPLEVEL_GET(hpet_regs) + \
+				      (off)))
 
-#define CLK_PERIOD_REG        HPET_REG32(0x04) /* High dword of caps reg */
-#define GENERAL_CONF_REG      HPET_REG32(0x10)
-#define INTR_STATUS_REG       HPET_REG32(0x20)
-#define MAIN_COUNTER_REG      HPET_REG32(0xf0)
-#define TIMER0_CONF_REG       HPET_REG32(0x100)
+#define CLK_PERIOD_REG HPET_REG32(0x04) /* High dword of caps reg */
+#define GENERAL_CONF_REG HPET_REG32(0x10)
+#define INTR_STATUS_REG HPET_REG32(0x20)
+#define MAIN_COUNTER_REG HPET_REG32(0xf0)
+#define TIMER0_CONF_REG HPET_REG32(0x100)
 #define TIMER0_COMPARATOR_REG HPET_REG32(0x108)
 
 /* GENERAL_CONF_REG bits */
 #define GCONF_ENABLE BIT(0)
-#define GCONF_LR     BIT(1) /* legacy interrupt routing, disables PIT */
+#define GCONF_LR BIT(1) /* legacy interrupt routing, disables PIT */
 
 /* INTR_STATUS_REG bits */
-#define TIMER0_INT_STS   BIT(0)
+#define TIMER0_INT_STS BIT(0)
 
 /* TIMERn_CONF_REG bits */
-#define TCONF_INT_LEVEL  BIT(1)
+#define TCONF_INT_LEVEL BIT(1)
 #define TCONF_INT_ENABLE BIT(2)
-#define TCONF_PERIODIC   BIT(3)
-#define TCONF_VAL_SET    BIT(6)
-#define TCONF_MODE32     BIT(8)
-#define TCONF_FSB_EN     BIT(14) /* FSB interrupt delivery enable */
+#define TCONF_PERIODIC BIT(3)
+#define TCONF_VAL_SET BIT(6)
+#define TCONF_MODE32 BIT(8)
+#define TCONF_FSB_EN BIT(14) /* FSB interrupt delivery enable */
 
 #define MIN_DELAY 1000
 
@@ -63,8 +64,7 @@ static void hpet_isr(const void *arg)
 	INTR_STATUS_REG = TIMER0_INT_STS;
 #endif
 
-	if (IS_ENABLED(CONFIG_SMP) &&
-	    IS_ENABLED(CONFIG_QEMU_TARGET)) {
+	if (IS_ENABLED(CONFIG_SMP) && IS_ENABLED(CONFIG_QEMU_TARGET)) {
 		/* Qemu in SMP mode has observed the clock going
 		 * "backwards" relative to interrupts already received
 		 * on the other CPU, despite the HPET being
@@ -115,9 +115,8 @@ int z_clock_driver_init(const struct device *device)
 
 	DEVICE_MMIO_TOPLEVEL_MAP(hpet_regs, K_MEM_CACHE_NONE);
 
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    hpet_isr, 0, DT_INST_IRQ(0, sense));
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), hpet_isr, 0,
+		    DT_INST_IRQ(0, sense));
 	set_timer0_irq(DT_INST_IRQN(0));
 	irq_enable(DT_INST_IRQN(0));
 

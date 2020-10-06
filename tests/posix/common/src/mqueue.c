@@ -41,7 +41,6 @@ void *sender_thread(void *p1)
 	return NULL;
 }
 
-
 void *receiver_thread(void *p1)
 {
 	mqd_t mqd;
@@ -85,8 +84,7 @@ void test_posix_mqueue(void)
 
 		if (i % 2) {
 			ret = pthread_create(&newthread[i], &attr[i],
-					     sender_thread,
-					     INT_TO_POINTER(i));
+					     sender_thread, INT_TO_POINTER(i));
 		} else {
 			ret = pthread_create(&newthread[i], &attr[i],
 					     receiver_thread,

@@ -18,14 +18,12 @@
 #if HTS221_TRIGGER_ENABLED
 LOG_MODULE_DECLARE(HTS221, CONFIG_SENSOR_LOG_LEVEL);
 
-static inline void setup_drdy(const struct device *dev,
-			      bool enable)
+static inline void setup_drdy(const struct device *dev, bool enable)
 {
 	struct hts221_data *data = dev->data;
 	const struct hts221_config *cfg = dev->config;
-	unsigned int flags = enable
-		? GPIO_INT_EDGE_TO_ACTIVE
-		: GPIO_INT_DISABLE;
+	unsigned int flags = enable ? GPIO_INT_EDGE_TO_ACTIVE :
+					    GPIO_INT_DISABLE;
 
 	gpio_pin_interrupt_configure(data->drdy_dev, cfg->drdy_pin, flags);
 }
@@ -110,8 +108,7 @@ static void hts221_thread(struct hts221_data *data)
 #ifdef CONFIG_HTS221_TRIGGER_GLOBAL_THREAD
 static void hts221_work_cb(struct k_work *work)
 {
-	struct hts221_data *data =
-		CONTAINER_OF(work, struct hts221_data, work);
+	struct hts221_data *data = CONTAINER_OF(work, struct hts221_data, work);
 
 	process_drdy(data->dev);
 }
@@ -144,8 +141,8 @@ int hts221_init_interrupt(const struct device *dev)
 	}
 
 	/* enable data-ready interrupt */
-	if (i2c_reg_write_byte(data->i2c, cfg->i2c_addr,
-			       HTS221_REG_CTRL3, HTS221_DRDY_EN) < 0) {
+	if (i2c_reg_write_byte(data->i2c, cfg->i2c_addr, HTS221_REG_CTRL3,
+			       HTS221_DRDY_EN) < 0) {
 		LOG_ERR("Could not enable data-ready interrupt.");
 		return -EIO;
 	}
@@ -155,9 +152,9 @@ int hts221_init_interrupt(const struct device *dev)
 
 	k_thread_create(&data->thread, data->thread_stack,
 			CONFIG_HTS221_THREAD_STACK_SIZE,
-			(k_thread_entry_t)hts221_thread, data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_HTS221_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)hts221_thread, data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_HTS221_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_HTS221_TRIGGER_GLOBAL_THREAD)
 	data->work.handler = hts221_work_cb;
 #endif

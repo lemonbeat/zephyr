@@ -39,15 +39,11 @@ static APP_BMEM bool tcp6_handler_in_use[CONFIG_NET_SAMPLE_NUM_HANDLERS];
 static void process_tcp4(void);
 static void process_tcp6(void);
 
-K_THREAD_DEFINE(tcp4_thread_id, STACK_SIZE,
-		process_tcp4, NULL, NULL, NULL,
-		THREAD_PRIORITY,
-		IS_ENABLED(CONFIG_USERSPACE) ? K_USER : 0, -1);
+K_THREAD_DEFINE(tcp4_thread_id, STACK_SIZE, process_tcp4, NULL, NULL, NULL,
+		THREAD_PRIORITY, IS_ENABLED(CONFIG_USERSPACE) ? K_USER : 0, -1);
 
-K_THREAD_DEFINE(tcp6_thread_id, STACK_SIZE,
-		process_tcp6, NULL, NULL, NULL,
-		THREAD_PRIORITY,
-		IS_ENABLED(CONFIG_USERSPACE) ? K_USER : 0, -1);
+K_THREAD_DEFINE(tcp6_thread_id, STACK_SIZE, process_tcp6, NULL, NULL, NULL,
+		THREAD_PRIORITY, IS_ENABLED(CONFIG_USERSPACE) ? K_USER : 0, -1);
 
 static ssize_t sendall(int sock, const void *buf, size_t len)
 {
@@ -64,18 +60,16 @@ static ssize_t sendall(int sock, const void *buf, size_t len)
 	return 0;
 }
 
-static int start_tcp_proto(struct data *data,
-			   struct sockaddr *bind_addr,
+static int start_tcp_proto(struct data *data, struct sockaddr *bind_addr,
 			   socklen_t bind_addrlen)
 {
 	int ret;
 
 #if defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS)
-	data->tcp.sock = socket(bind_addr->sa_family, SOCK_STREAM,
-				IPPROTO_TLS_1_2);
+	data->tcp.sock =
+		socket(bind_addr->sa_family, SOCK_STREAM, IPPROTO_TLS_1_2);
 #else
-	data->tcp.sock = socket(bind_addr->sa_family, SOCK_STREAM,
-				IPPROTO_TCP);
+	data->tcp.sock = socket(bind_addr->sa_family, SOCK_STREAM, IPPROTO_TCP);
 #endif
 	if (data->tcp.sock < 0) {
 		LOG_ERR("Failed to create TCP socket (%s): %d", data->proto,
@@ -109,8 +103,8 @@ static int start_tcp_proto(struct data *data,
 
 	ret = listen(data->tcp.sock, MAX_CLIENT_QUEUE);
 	if (ret < 0) {
-		LOG_ERR("Failed to listen on TCP socket (%s): %d",
-			data->proto, errno);
+		LOG_ERR("Failed to listen on TCP socket (%s): %d", data->proto,
+			errno);
 		ret = -errno;
 	}
 
@@ -130,8 +124,8 @@ static void handle_data(void *ptr1, void *ptr2, void *ptr3)
 	client = data->tcp.accepted[slot].sock;
 
 	do {
-		received = recv(client,
-			data->tcp.accepted[slot].recv_buffer + offset,
+		received = recv(
+			client, data->tcp.accepted[slot].recv_buffer + offset,
 			sizeof(data->tcp.accepted[slot].recv_buffer) - offset,
 			0);
 
@@ -155,10 +149,8 @@ static void handle_data(void *ptr1, void *ptr2, void *ptr3)
 		 * buffer is full or there is no more data to read
 		 */
 		if (offset == sizeof(data->tcp.accepted[slot].recv_buffer) ||
-		    (recv(client,
-			  data->tcp.accepted[slot].recv_buffer + offset,
-			  sizeof(data->tcp.accepted[slot].recv_buffer) -
-								offset,
+		    (recv(client, data->tcp.accepted[slot].recv_buffer + offset,
+			  sizeof(data->tcp.accepted[slot].recv_buffer) - offset,
 			  MSG_PEEK | MSG_DONTWAIT) < 0 &&
 		     (errno == EAGAIN || errno == EWOULDBLOCK))) {
 #endif
@@ -167,7 +159,8 @@ static void handle_data(void *ptr1, void *ptr2, void *ptr3)
 				      offset);
 			if (ret < 0) {
 				LOG_ERR("TCP (%s): Failed to send, "
-					"closing socket", data->proto);
+					"closing socket",
+					data->proto);
 				ret = 0;
 				break;
 			}
@@ -213,8 +206,8 @@ static int process_tcp(struct data *data)
 	struct sockaddr_in client_addr;
 	socklen_t client_addr_len = sizeof(client_addr);
 
-	LOG_INF("Waiting for TCP connection on port %d (%s)...",
-		MY_PORT, data->proto);
+	LOG_INF("Waiting for TCP connection on port %d (%s)...", MY_PORT,
+		data->proto);
 
 	client = accept(data->tcp.sock, (struct sockaddr *)&client_addr,
 			&client_addr_len);
@@ -238,16 +231,16 @@ static int process_tcp(struct data *data)
 	if (client_addr.sin_family == AF_INET6) {
 		tcp6_handler_in_use[slot] = true;
 
-		k_thread_create(
-			&tcp6_handler_thread[slot],
-			tcp6_handler_stack[slot],
-			K_THREAD_STACK_SIZEOF(tcp6_handler_stack[slot]),
-			(k_thread_entry_t)handle_data,
-			INT_TO_POINTER(slot), data, &tcp6_handler_in_use[slot],
-			THREAD_PRIORITY,
-			IS_ENABLED(CONFIG_USERSPACE) ? K_USER |
-						       K_INHERIT_PERMS : 0,
-			K_NO_WAIT);
+		k_thread_create(&tcp6_handler_thread[slot],
+				tcp6_handler_stack[slot],
+				K_THREAD_STACK_SIZEOF(tcp6_handler_stack[slot]),
+				(k_thread_entry_t)handle_data,
+				INT_TO_POINTER(slot), data,
+				&tcp6_handler_in_use[slot], THREAD_PRIORITY,
+				IS_ENABLED(CONFIG_USERSPACE) ?
+					      K_USER | K_INHERIT_PERMS :
+					      0,
+				K_NO_WAIT);
 	}
 #endif
 
@@ -255,16 +248,16 @@ static int process_tcp(struct data *data)
 	if (client_addr.sin_family == AF_INET) {
 		tcp4_handler_in_use[slot] = true;
 
-		k_thread_create(
-			&tcp4_handler_thread[slot],
-			tcp4_handler_stack[slot],
-			K_THREAD_STACK_SIZEOF(tcp4_handler_stack[slot]),
-			(k_thread_entry_t)handle_data,
-			INT_TO_POINTER(slot), data, &tcp4_handler_in_use[slot],
-			THREAD_PRIORITY,
-			IS_ENABLED(CONFIG_USERSPACE) ? K_USER |
-						       K_INHERIT_PERMS : 0,
-			K_NO_WAIT);
+		k_thread_create(&tcp4_handler_thread[slot],
+				tcp4_handler_stack[slot],
+				K_THREAD_STACK_SIZEOF(tcp4_handler_stack[slot]),
+				(k_thread_entry_t)handle_data,
+				INT_TO_POINTER(slot), data,
+				&tcp4_handler_in_use[slot], THREAD_PRIORITY,
+				IS_ENABLED(CONFIG_USERSPACE) ?
+					      K_USER | K_INHERIT_PERMS :
+					      0,
+				K_NO_WAIT);
 	}
 #endif
 

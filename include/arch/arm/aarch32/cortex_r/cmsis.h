@@ -8,7 +8,8 @@
 #define ZEPHYR_INCLUDE_ARCH_ARM_AARCH32_CORTEX_R_CMSIS_H_
 
 #ifndef CONFIG_COMPAT_INCLUDES
-#warning "This header file has moved, include <arch/arm/aarch32/cortex_a_r/cpu.h> instead."
+#warning \
+	"This header file has moved, include <arch/arm/aarch32/cortex_a_r/cpu.h> instead."
 #endif
 
 #include <arch/arm/aarch32/cortex_a_r/cpu.h>

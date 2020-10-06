@@ -32,77 +32,77 @@
  * b110 = 64 bytes
  * b111 = 128 bytes.
  */
-#define MAX_BURST_LEN		0xf /* 16byte data */
-#define MAX_BURST_SIZE_LOG2	4
+#define MAX_BURST_LEN 0xf /* 16byte data */
+#define MAX_BURST_SIZE_LOG2 4
 
 /*
  * PL330 works only on 4GB boundary.
  * PL330 has 32bit registers for source and destination addresses
  */
-#define PL330_MAX_OFFSET	0x100000000
+#define PL330_MAX_OFFSET 0x100000000
 
 /* PL330 supports max 16MB dma based on AXI bus size */
-#define PL330_MAX_DMA_SIZE	0x1000000
+#define PL330_MAX_DMA_SIZE 0x1000000
 
 /* Maximum possible values for PL330 ucode loop counters */
-#define PL330_LOOP_COUNTER0_MAX	0x100
-#define PL330_LOOP_COUNTER1_MAX	0x100
+#define PL330_LOOP_COUNTER0_MAX 0x100
+#define PL330_LOOP_COUNTER1_MAX 0x100
 
-#define MAX_DMA_CHANNELS	DT_INST_PROP(0, dma_channels)
+#define MAX_DMA_CHANNELS DT_INST_PROP(0, dma_channels)
 
-#define DMAC_PL330_CS0		0x100
-#define DMAC_PL330_DBGSTATUS	0xd00
-#define DMAC_PL330_DBGCMD	0xd04
-#define DMAC_PL330_DBGINST0	0xd08
-#define DMAC_PL330_DBGINST1	0xd0c
+#define DMAC_PL330_CS0 0x100
+#define DMAC_PL330_DBGSTATUS 0xd00
+#define DMAC_PL330_DBGCMD 0xd04
+#define DMAC_PL330_DBGINST0 0xd08
+#define DMAC_PL330_DBGINST1 0xd0c
 
-#define DMA_TIMEOUT_US		10
-#define CH_STATUS_MASK		0xf
-#define DATA_MASK		0xf
+#define DMA_TIMEOUT_US 10
+#define CH_STATUS_MASK 0xf
+#define DATA_MASK 0xf
 
-#define DMA_INTSR1_SHIFT	24
-#define DMA_INTSR0_SHIFT	16
-#define DMA_INTSR0		0xa0
-#define DMA_SECURE_SHIFT	17
-#define DMA_CH_SHIFT		8
+#define DMA_INTSR1_SHIFT 24
+#define DMA_INTSR0_SHIFT 16
+#define DMA_INTSR0 0xa0
+#define DMA_SECURE_SHIFT 17
+#define DMA_CH_SHIFT 8
 
-#define CONTROL_OFFSET		0x4
-#define HIGHER_32_ADDR_MASK	0x0f
-#define DST_ADDR_SHIFT		0x4
+#define CONTROL_OFFSET 0x4
+#define HIGHER_32_ADDR_MASK 0x0f
+#define DST_ADDR_SHIFT 0x4
 
-#define MICROCODE_SIZE_MAX	0x400
-#define TOTAL_MICROCODE_SIZE	(MAX_DMA_CHANNELS * MICROCODE_SIZE_MAX)
-#define GET_MAX_DMA_SIZE(byte_width, burst_len) \
-		(PL330_LOOP_COUNTER0_MAX * PL330_LOOP_COUNTER1_MAX * \
-		(byte_width) * ((burst_len) + 1))
+#define MICROCODE_SIZE_MAX 0x400
+#define TOTAL_MICROCODE_SIZE (MAX_DMA_CHANNELS * MICROCODE_SIZE_MAX)
+#define GET_MAX_DMA_SIZE(byte_width, burst_len)                             \
+	(PL330_LOOP_COUNTER0_MAX * PL330_LOOP_COUNTER1_MAX * (byte_width) * \
+	 ((burst_len) + 1))
 
-#define CC_SRCINC_SHIFT		0
-#define CC_DSTINC_SHIFT		14
-#define CC_SRCPRI_SHIFT		8
-#define CC_DSTPRI_SHIFT		22
-#define CC_DSTNS_SHIFT		23
-#define CC_SRCBRSTLEN_SHIFT	4
-#define CC_DSTBRSTLEN_SHIFT	18
-#define CC_SRCBRSTSIZE_SHIFT	1
-#define CC_DSTBRSTSIZE_SHIFT	15
-#define CC_SRCCCTRL_SHIFT	11
-#define CC_SRCCCTRL_MASK	0x7
-#define CC_DSTCCTRL_SHIFT	25
-#define CC_DRCCCTRL_MASK	0x7
-#define CC_SWAP_SHIFT		28
-#define SRC_PRI_NONSEC_VALUE	0x2
-#define SRC_PRI_SEC_VALUE	0x0
+#define CC_SRCINC_SHIFT 0
+#define CC_DSTINC_SHIFT 14
+#define CC_SRCPRI_SHIFT 8
+#define CC_DSTPRI_SHIFT 22
+#define CC_DSTNS_SHIFT 23
+#define CC_SRCBRSTLEN_SHIFT 4
+#define CC_DSTBRSTLEN_SHIFT 18
+#define CC_SRCBRSTSIZE_SHIFT 1
+#define CC_DSTBRSTSIZE_SHIFT 15
+#define CC_SRCCCTRL_SHIFT 11
+#define CC_SRCCCTRL_MASK 0x7
+#define CC_DSTCCTRL_SHIFT 25
+#define CC_DRCCCTRL_MASK 0x7
+#define CC_SWAP_SHIFT 28
+#define SRC_PRI_NONSEC_VALUE 0x2
+#define SRC_PRI_SEC_VALUE 0x0
 
-#define OP_DMA_MOV		0xbc
-#define OP_DMA_LOOP_COUNT1	0x22
-#define OP_DMA_LOOP		0x20
-#define OP_DMA_LD		0x4
-#define OP_DMA_ST		0x8
-#define OP_DMA_SEV		0x34
-#define OP_DMA_END		0x00
-#define OP_DMA_LP_BK_JMP1	0x38
-#define OP_DMA_LP_BK_JMP2	0x3c
-#define SZ_CMD_DMAMOV		0x6
+#define OP_DMA_MOV 0xbc
+#define OP_DMA_LOOP_COUNT1 0x22
+#define OP_DMA_LOOP 0x20
+#define OP_DMA_LD 0x4
+#define OP_DMA_ST 0x8
+#define OP_DMA_SEV 0x34
+#define OP_DMA_END 0x00
+#define OP_DMA_LP_BK_JMP1 0x38
+#define OP_DMA_LP_BK_JMP2 0x3c
+#define SZ_CMD_DMAMOV 0x6
 
 enum dmamov_type {
 	/* Source Address Register */

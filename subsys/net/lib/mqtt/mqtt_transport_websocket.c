@@ -23,10 +23,8 @@ LOG_MODULE_REGISTER(net_mqtt_websocket, CONFIG_MQTT_LOG_LEVEL);
 
 int mqtt_client_websocket_connect(struct mqtt_client *client)
 {
-	const char *extra_headers[] = {
-		"Sec-WebSocket-Protocol: mqtt\r\n",
-		NULL
-	};
+	const char *extra_headers[] = { "Sec-WebSocket-Protocol: mqtt\r\n",
+					NULL };
 	int transport_sock;
 	int ret;
 
@@ -69,10 +67,8 @@ int mqtt_client_websocket_connect(struct mqtt_client *client)
 	client->transport.websocket.config.optional_headers = extra_headers;
 
 	client->transport.websocket.sock = websocket_connect(
-			transport_sock,
-			&client->transport.websocket.config,
-			client->transport.websocket.timeout,
-			NULL);
+		transport_sock, &client->transport.websocket.config,
+		client->transport.websocket.timeout, NULL);
 	if (client->transport.websocket.sock < 0) {
 		MQTT_TRC("Websocket connect failed (%d)",
 			 client->transport.websocket.sock);
@@ -95,8 +91,8 @@ int mqtt_client_websocket_write(struct mqtt_client *client, const uint8_t *data,
 	while (offset < datalen) {
 		ret = websocket_send_msg(client->transport.websocket.sock,
 					 data + offset, datalen - offset,
-					 WEBSOCKET_OPCODE_DATA_BINARY,
-					 true, true, SYS_FOREVER_MS);
+					 WEBSOCKET_OPCODE_DATA_BINARY, true,
+					 true, SYS_FOREVER_MS);
 		if (ret < 0) {
 			return -errno;
 		}
@@ -148,8 +144,8 @@ int mqtt_client_websocket_read(struct mqtt_client *client, uint8_t *data,
 		timeout = 0;
 	}
 
-	ret = websocket_recv_msg(client->transport.websocket.sock,
-				 data, buflen, &message_type, NULL, timeout);
+	ret = websocket_recv_msg(client->transport.websocket.sock, data, buflen,
+				 &message_type, NULL, timeout);
 	if (ret > 0 && message_type > 0) {
 		if (message_type & WEBSOCKET_FLAG_CLOSE) {
 			return 0;

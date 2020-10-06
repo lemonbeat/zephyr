@@ -36,7 +36,7 @@ static void do_main(const struct device *dev)
 
 const struct device *sensor_search_for_magnetometer()
 {
-	static char *magn_sensors[] = {"bmc150_magn", NULL};
+	static char *magn_sensors[] = { "bmc150_magn", NULL };
 	const struct device *dev;
 	int i;
 

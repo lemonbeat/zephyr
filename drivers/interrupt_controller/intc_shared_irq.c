@@ -25,7 +25,7 @@
  *  @param isr_dev Pointer to the device that will service the interrupt.
  */
 static int isr_register(const struct device *dev, isr_t isr_func,
-				 const struct device *isr_dev)
+			const struct device *isr_dev)
 {
 	struct shared_irq_runtime *clients = dev->data;
 	const struct shared_irq_config *config = dev->config;
@@ -46,8 +46,7 @@ static int isr_register(const struct device *dev, isr_t isr_func,
  *  @param dev Pointer to device structure for SHARED_IRQ driver instance.
  *  @param isr_dev Pointer to the device that will service the interrupt.
  */
-static inline int enable(const struct device *dev,
-			 const struct device *isr_dev)
+static inline int enable(const struct device *dev, const struct device *isr_dev)
 {
 	struct shared_irq_runtime *clients = dev->data;
 	const struct shared_irq_config *config = dev->config;
@@ -117,7 +116,6 @@ static const struct shared_irq_driver_api api_funcs = {
 	.disable = disable,
 };
 
-
 int shared_irq_initialize(const struct device *dev)
 {
 	const struct shared_irq_config *config = dev->config;
@@ -136,17 +134,14 @@ const struct shared_irq_config shared_irq_config_0 = {
 
 struct shared_irq_runtime shared_irq_0_runtime;
 
-DEVICE_AND_API_INIT(shared_irq_0, DT_INST_LABEL(0),
-		shared_irq_initialize, &shared_irq_0_runtime,
-		&shared_irq_config_0, POST_KERNEL,
-		CONFIG_SHARED_IRQ_INIT_PRIORITY, &api_funcs);
+DEVICE_AND_API_INIT(shared_irq_0, DT_INST_LABEL(0), shared_irq_initialize,
+		    &shared_irq_0_runtime, &shared_irq_config_0, POST_KERNEL,
+		    CONFIG_SHARED_IRQ_INIT_PRIORITY, &api_funcs);
 
 void shared_irq_config_0_irq(void)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    shared_irq_isr, DEVICE_GET(shared_irq_0),
-		    DT_INST_IRQ(0, sense));
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), shared_irq_isr,
+		    DEVICE_GET(shared_irq_0), DT_INST_IRQ(0, sense));
 }
 
 #endif /* CONFIG_SHARED_IRQ_0 */
@@ -162,17 +157,14 @@ const struct shared_irq_config shared_irq_config_1 = {
 
 struct shared_irq_runtime shared_irq_1_runtime;
 
-DEVICE_AND_API_INIT(shared_irq_1, DT_INST_LABEL(1),
-		shared_irq_initialize, &shared_irq_1_runtime,
-		&shared_irq_config_1, POST_KERNEL,
-		CONFIG_SHARED_IRQ_INIT_PRIORITY, &api_funcs);
+DEVICE_AND_API_INIT(shared_irq_1, DT_INST_LABEL(1), shared_irq_initialize,
+		    &shared_irq_1_runtime, &shared_irq_config_1, POST_KERNEL,
+		    CONFIG_SHARED_IRQ_INIT_PRIORITY, &api_funcs);
 
 void shared_irq_config_1_irq(void)
 {
-	IRQ_CONNECT(DT_INST_IRQN(1),
-		    DT_INST_IRQ(1, priority),
-		    shared_irq_isr, DEVICE_GET(shared_irq_1),
-		    DT_INST_IRQ(1, sense));
+	IRQ_CONNECT(DT_INST_IRQN(1), DT_INST_IRQ(1, priority), shared_irq_isr,
+		    DEVICE_GET(shared_irq_1), DT_INST_IRQ(1, sense));
 }
 
 #endif /* CONFIG_SHARED_IRQ_1 */

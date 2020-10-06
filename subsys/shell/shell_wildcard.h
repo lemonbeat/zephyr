@@ -44,15 +44,15 @@ bool shell_wildcard_character_exist(const char *str);
  * @param[in] cmd	Pointer to command which will be processed.
  * @param[in] pattern	Pointer to wildcard pattern.
  */
-enum shell_wildcard_status shell_wildcard_process(const struct shell *shell,
-					const struct shell_static_entry *cmd,
-					const char *pattern);
+enum shell_wildcard_status
+shell_wildcard_process(const struct shell *shell,
+		       const struct shell_static_entry *cmd,
+		       const char *pattern);
 
 /* Function finalizing wildcard expansion procedure.
  *
  * @param[in] shell	Pointer to the shell instance.
  */
 void shell_wildcard_finalize(const struct shell *shell);
-
 
 #endif /* SHELL_SHELL_WILDCARDS_H__ */

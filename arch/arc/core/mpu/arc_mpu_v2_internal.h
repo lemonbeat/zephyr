@@ -7,8 +7,8 @@
 #define ZEPHYR_ARCH_ARC_CORE_MPU_ARC_MPU_V2_INTERNAL_H_
 
 #define AUX_MPU_RDB_VALID_MASK (0x1)
-#define AUX_MPU_EN_ENABLE   (0x40000000)
-#define AUX_MPU_EN_DISABLE  (0xBFFFFFFF)
+#define AUX_MPU_EN_ENABLE (0x40000000)
+#define AUX_MPU_EN_DISABLE (0xBFFFFFFF)
 
 #define AUX_MPU_RDP_REGION_SIZE(bits) \
 	(((bits - 1) & 0x3) | (((bits - 1) & 0x1C) << 7))
@@ -22,8 +22,8 @@
 /**
  * This internal function initializes a MPU region
  */
-static inline void _region_init(uint32_t index, uint32_t region_addr, uint32_t size,
-				uint32_t region_attr)
+static inline void _region_init(uint32_t index, uint32_t region_addr,
+				uint32_t size, uint32_t region_attr)
 {
 	index = index * 2U;
 
@@ -67,8 +67,8 @@ static inline int get_region_index_by_type(uint32_t type)
 	 */
 	switch (type) {
 	case THREAD_STACK_USER_REGION:
-		return get_num_regions() - mpu_config.num_regions
-		       - THREAD_STACK_REGION;
+		return get_num_regions() - mpu_config.num_regions -
+		       THREAD_STACK_REGION;
 	case THREAD_STACK_REGION:
 	case THREAD_APP_DATA_REGION:
 	case THREAD_DOMAIN_PARTITION_REGION:
@@ -88,25 +88,26 @@ static inline int get_region_index_by_type(uint32_t type)
  */
 static inline bool _is_enabled_region(uint32_t r_index)
 {
-	return ((z_arc_v2_aux_reg_read(_ARC_V2_MPU_RDB0 + r_index * 2U)
-		 & AUX_MPU_RDB_VALID_MASK) == AUX_MPU_RDB_VALID_MASK);
+	return ((z_arc_v2_aux_reg_read(_ARC_V2_MPU_RDB0 + r_index * 2U) &
+		 AUX_MPU_RDB_VALID_MASK) == AUX_MPU_RDB_VALID_MASK);
 }
 
 /**
  * This internal function check if the given buffer in in the region
  */
-static inline bool _is_in_region(uint32_t r_index, uint32_t start, uint32_t size)
+static inline bool _is_in_region(uint32_t r_index, uint32_t start,
+				 uint32_t size)
 {
 	uint32_t r_addr_start;
 	uint32_t r_addr_end;
 	uint32_t r_size_lshift;
 
-	r_addr_start = z_arc_v2_aux_reg_read(_ARC_V2_MPU_RDB0 + r_index * 2U)
-		       & (~AUX_MPU_RDB_VALID_MASK);
-	r_size_lshift = z_arc_v2_aux_reg_read(_ARC_V2_MPU_RDP0 + r_index * 2U)
-			& AUX_MPU_RDP_SIZE_MASK;
+	r_addr_start = z_arc_v2_aux_reg_read(_ARC_V2_MPU_RDB0 + r_index * 2U) &
+		       (~AUX_MPU_RDB_VALID_MASK);
+	r_size_lshift = z_arc_v2_aux_reg_read(_ARC_V2_MPU_RDP0 + r_index * 2U) &
+			AUX_MPU_RDP_SIZE_MASK;
 	r_size_lshift = (r_size_lshift & 0x3) | ((r_size_lshift >> 7) & 0x1C);
-	r_addr_end = r_addr_start  + (1 << (r_size_lshift + 1));
+	r_addr_end = r_addr_start + (1 << (r_size_lshift + 1));
 
 	if (start >= r_addr_start && (start + size) <= r_addr_end) {
 		return 1;
@@ -144,7 +145,7 @@ static inline bool _is_user_accessible_region(uint32_t r_index, int write)
  */
 static inline int _mpu_configure(uint8_t type, uint32_t base, uint32_t size)
 {
-	int32_t region_index =  get_region_index_by_type(type);
+	int32_t region_index = get_region_index_by_type(type);
 	uint32_t region_attr = get_region_attr_by_type(type);
 
 	LOG_DBG("Region info: 0x%x 0x%x", base, size);
@@ -171,7 +172,8 @@ void arc_core_mpu_enable(void)
 {
 	/* Enable MPU */
 	z_arc_v2_aux_reg_write(_ARC_V2_MPU_EN,
-		z_arc_v2_aux_reg_read(_ARC_V2_MPU_EN) | AUX_MPU_EN_ENABLE);
+			       z_arc_v2_aux_reg_read(_ARC_V2_MPU_EN) |
+				       AUX_MPU_EN_ENABLE);
 }
 
 /**
@@ -181,7 +183,8 @@ void arc_core_mpu_disable(void)
 {
 	/* Disable MPU */
 	z_arc_v2_aux_reg_write(_ARC_V2_MPU_EN,
-		z_arc_v2_aux_reg_read(_ARC_V2_MPU_EN) & AUX_MPU_EN_DISABLE);
+			       z_arc_v2_aux_reg_read(_ARC_V2_MPU_EN) &
+				       AUX_MPU_EN_DISABLE);
 }
 
 /**
@@ -208,7 +211,6 @@ void arc_core_mpu_configure_thread(struct k_thread *thread)
 #endif
 }
 
-
 /**
  * @brief configure the default region
  *
@@ -216,8 +218,8 @@ void arc_core_mpu_configure_thread(struct k_thread *thread)
  */
 void arc_core_mpu_default(uint32_t region_attr)
 {
-	uint32_t val =  z_arc_v2_aux_reg_read(_ARC_V2_MPU_EN) &
-		    (~AUX_MPU_RDP_ATTR_MASK);
+	uint32_t val = z_arc_v2_aux_reg_read(_ARC_V2_MPU_EN) &
+		       (~AUX_MPU_RDP_ATTR_MASK);
 
 	region_attr &= AUX_MPU_RDP_ATTR_MASK;
 
@@ -232,7 +234,7 @@ void arc_core_mpu_default(uint32_t region_attr)
  * @param region_attr region attribute
  */
 int arc_core_mpu_region(uint32_t index, uint32_t base, uint32_t size,
-			 uint32_t region_attr)
+			uint32_t region_attr)
 {
 	if (index >= get_num_regions()) {
 		return -EINVAL;
@@ -276,10 +278,10 @@ void arc_core_mpu_configure_mem_domain(struct k_thread *thread)
 
 	for (; region_index >= 0; region_index--) {
 		if (num_partitions) {
-			LOG_DBG("set region 0x%x 0x%lx 0x%x",
-				region_index, pparts->start, pparts->size);
-			_region_init(region_index, pparts->start,
-			 pparts->size, pparts->attr);
+			LOG_DBG("set region 0x%x 0x%lx 0x%x", region_index,
+				pparts->start, pparts->size);
+			_region_init(region_index, pparts->start, pparts->size,
+				     pparts->attr);
 			num_partitions--;
 		} else {
 			/* clear the left mpu entries */
@@ -313,7 +315,7 @@ void arc_core_mpu_remove_mem_domain(struct k_mem_domain *mem_domain)
  * @param partition_id  memory partition id
  */
 void arc_core_mpu_remove_mem_partition(struct k_mem_domain *domain,
-			uint32_t part_id)
+				       uint32_t part_id)
 {
 	ARG_UNUSED(domain);
 
@@ -382,8 +384,8 @@ static int arc_mpu_init(const struct device *arg)
 	/* ARC MPU supports up to 16 Regions */
 	if (mpu_config.num_regions > num_regions) {
 		__ASSERT(0,
-		"Request to configure: %u regions (supported: %u)\n",
-		mpu_config.num_regions, num_regions);
+			 "Request to configure: %u regions (supported: %u)\n",
+			 mpu_config.num_regions, num_regions);
 		return -EINVAL;
 	}
 
@@ -408,8 +410,7 @@ static int arc_mpu_init(const struct device *arg)
 
 	/* configure the static regions */
 	for (i = 0U; i < mpu_config.num_regions; i++) {
-		_region_init(r_index,
-			     mpu_config.mpu_regions[i].base,
+		_region_init(r_index, mpu_config.mpu_regions[i].base,
 			     mpu_config.mpu_regions[i].size,
 			     mpu_config.mpu_regions[i].attr);
 		r_index++;
@@ -424,7 +425,6 @@ static int arc_mpu_init(const struct device *arg)
 	return 0;
 }
 
-SYS_INIT(arc_mpu_init, PRE_KERNEL_1,
-	 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+SYS_INIT(arc_mpu_init, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 
 #endif /* ZEPHYR_ARCH_ARC_CORE_MPU_ARC_MPU_V2_INTERNAL_H_ */

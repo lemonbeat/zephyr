@@ -12,12 +12,12 @@ LOG_MODULE_REGISTER(tftp_client, LOG_LEVEL_DBG);
 #include "tftp_client.h"
 
 /* TFTP Global Buffer. */
-static uint8_t   tftpc_buffer[TFTPC_MAX_BUF_SIZE];
-static uint32_t  tftpc_buffer_size;
+static uint8_t tftpc_buffer[TFTPC_MAX_BUF_SIZE];
+static uint32_t tftpc_buffer_size;
 
 /* TFTP Request block number property. */
-static uint32_t  tftpc_block_no;
-static uint32_t  tftpc_index;
+static uint32_t tftpc_block_no;
+static uint32_t tftpc_index;
 
 /* Global mutex to protect critical resources. */
 K_MUTEX_DEFINE(tftpc_lock);
@@ -28,9 +28,9 @@ K_MUTEX_DEFINE(tftpc_lock);
  * out directly to the TFTP server.
  */
 static uint32_t make_request(const char *remote_file, const char *mode,
-			  uint8_t request_type)
+			     uint8_t request_type)
 {
-	uint32_t      req_size;
+	uint32_t req_size;
 	const char def_mode[] = "octet";
 
 	/* Populate the read request with the provided params. Note that this
@@ -95,11 +95,11 @@ static inline int send_err(int sock, int err_code, char *err_string)
  */
 static int tftpc_recv_data(int sock)
 {
-	int           stat;
+	int stat;
 	struct pollfd fds;
 
 	/* Setup FDS. */
-	fds.fd     = sock;
+	fds.fd = sock;
 	fds.events = ZSOCK_POLLIN;
 
 	/* Enable poll on this socket. Wait for the specified number
@@ -128,7 +128,7 @@ static int tftpc_recv_data(int sock)
  */
 static int tftpc_process_resp(int sock, struct tftpc *client)
 {
-	uint16_t    block_no;
+	uint16_t block_no;
 
 	/* Get the block number as received in the packet. */
 	block_no = sys_get_be16(tftpc_buffer + 2);
@@ -152,8 +152,8 @@ static int tftpc_process_resp(int sock, struct tftpc *client)
 	}
 
 	/* Perform the actual copy and update the index. */
-	memcpy(client->user_buf + tftpc_index,
-	       tftpc_buffer + TFTP_HEADER_SIZE, RECV_DATA_SIZE());
+	memcpy(client->user_buf + tftpc_index, tftpc_buffer + TFTP_HEADER_SIZE,
+	       RECV_DATA_SIZE());
 	tftpc_index += RECV_DATA_SIZE();
 
 	/* "block" of data received. */
@@ -165,7 +165,7 @@ static int tftpc_process_resp(int sock, struct tftpc *client)
 	 * -> If block_size < 512, we will conclude the transfer.
 	 */
 	return (RECV_DATA_SIZE() == TFTP_BLOCK_SIZE) ? TFTP_BLOCK_SIZE :
-		TFTPC_SUCCESS;
+							     TFTPC_SUCCESS;
 }
 
 /* Name: tftp_send_request
@@ -181,11 +181,11 @@ static int tftpc_process_resp(int sock, struct tftpc *client)
  * -> DATA_OPCODE:  If the remote server responded with "Data".
  * -> ACK_OPCODE:   If the remote server responded with "Ack".
  */
-static int tftp_send_request(int sock, uint8_t request,
-			     const char *remote_file, const char *mode)
+static int tftp_send_request(int sock, uint8_t request, const char *remote_file,
+			     const char *mode)
 {
-	uint8_t    retx_cnt = 0;
-	uint32_t   req_size;
+	uint8_t retx_cnt = 0;
+	uint32_t req_size;
 
 	/* Create TFTP Request. */
 	req_size = make_request(remote_file, mode, request);
@@ -222,14 +222,13 @@ send_req:
 int tftp_get(struct sockaddr *server, struct tftpc *client,
 	     const char *remote_file, const char *mode)
 {
-
-	int32_t   stat     = TFTPC_UNKNOWN_FAILURE;
-	uint8_t    retx_cnt = 0;
-	int32_t   sock;
+	int32_t stat = TFTPC_UNKNOWN_FAILURE;
+	uint8_t retx_cnt = 0;
+	int32_t sock;
 
 	/* Re-init the global "block number" variable. */
 	tftpc_block_no = 1;
-	tftpc_index    = 0;
+	tftpc_index = 0;
 
 	/* Create Socket for TFTP (IPv4 / UDP) */
 	sock = socket(server->sa_family, SOCK_DGRAM, IPPROTO_UDP);
@@ -259,8 +258,7 @@ process_resp:
 
 	/* Process server response. */
 	stat = tftpc_process_resp(sock, client);
-	if (stat == TFTPC_BUFFER_OVERFLOW ||
-	    stat == TFTPC_SUCCESS) {
+	if (stat == TFTPC_BUFFER_OVERFLOW || stat == TFTPC_SUCCESS) {
 		goto req_done;
 	}
 

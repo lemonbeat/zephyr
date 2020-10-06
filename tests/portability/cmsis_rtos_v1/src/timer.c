@@ -7,9 +7,9 @@
 #include <ztest.h>
 #include <cmsis_os.h>
 
-#define ONESHOT_TIME	1000
-#define PERIOD		500
-#define NUM_PERIODS	5
+#define ONESHOT_TIME 1000
+#define PERIOD 500
+#define NUM_PERIODS 5
 
 void Timer1_Callback(void const *arg);
 void Timer2_Callback(void const *arg);
@@ -25,8 +25,8 @@ void Timer1_Callback(void const *arg)
 	uint32_t Tmr = *(uint32_t *)arg;
 
 	num_oneshots_executed++;
-	TC_PRINT("oneshot_callback (Timer %d) = %d\n",
-		 Tmr, num_oneshots_executed);
+	TC_PRINT("oneshot_callback (Timer %d) = %d\n", Tmr,
+		 num_oneshots_executed);
 }
 
 void Timer2_Callback(void const *arg)
@@ -34,16 +34,16 @@ void Timer2_Callback(void const *arg)
 	uint32_t Tmr = *(uint32_t *)arg;
 
 	num_periods_executed++;
-	TC_PRINT("periodic_callback (Timer %d) = %d\n",
-		 Tmr, num_periods_executed);
+	TC_PRINT("periodic_callback (Timer %d) = %d\n", Tmr,
+		 num_periods_executed);
 }
 
 void test_timer(void)
 {
 	osTimerId id1;
 	osTimerId id2;
-	uint32_t  exec1;
-	uint32_t  exec2;
+	uint32_t exec1;
+	uint32_t exec2;
 	osStatus status;
 	uint32_t timerDelay;
 
@@ -54,7 +54,8 @@ void test_timer(void)
 
 	/* Stop the timer before start */
 	status = osTimerStop(id1);
-	zassert_true(status == osErrorResource, "error while stopping non-active timer");
+	zassert_true(status == osErrorResource,
+		     "error while stopping non-active timer");
 
 	timerDelay = ONESHOT_TIME;
 	status = osTimerStart(id1, timerDelay);
@@ -64,9 +65,9 @@ void test_timer(void)
 	 * mode. Wait for 3 times the one-shot time to see
 	 * if it fires more than once.
 	 */
-	osDelay(timerDelay*3U + 100);
+	osDelay(timerDelay * 3U + 100);
 	zassert_true(num_oneshots_executed == 1U,
-			"error setting up one-shot timer");
+		     "error setting up one-shot timer");
 
 	status = osTimerStop(id1);
 	zassert_true(status == osOK, "error stopping one-shot timer");
@@ -87,10 +88,10 @@ void test_timer(void)
 	 * mode. Wait for NUM_PERIODS periods to see if it is
 	 * fired NUM_PERIODS times.
 	 */
-	osDelay(timerDelay*NUM_PERIODS + 100);
+	osDelay(timerDelay * NUM_PERIODS + 100);
 
 	zassert_true(num_periods_executed == NUM_PERIODS,
-			"error setting up periodic timer");
+		     "error setting up periodic timer");
 
 	/* Delete the timer before stop */
 	status = osTimerDelete(id2);

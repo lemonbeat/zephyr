@@ -19,33 +19,33 @@
 /** @def BT_UUID_SERVICE_B_5
  *  @brief UUID for the Service B.5
  */
-#define BT_UUID_SERVICE_B_5             BT_UUID_DECLARE_16(0xa00b)
+#define BT_UUID_SERVICE_B_5 BT_UUID_DECLARE_16(0xa00b)
 
 /** @def BT_UUID_VALUE_V8
  *  @brief UUID for the Value V8 Characteristic
  */
-#define BT_UUID_VALUE_V8                BT_UUID_DECLARE_16(0xb008)
+#define BT_UUID_VALUE_V8 BT_UUID_DECLARE_16(0xb008)
 
 /** @def BT_UUID_DES_V8D1
  *  @brief UUID for the Descriptor V8D1 Characteristic
  */
-#define BT_UUID_DES_V8D1                BT_UUID_DECLARE_16(0xb015)
+#define BT_UUID_DES_V8D1 BT_UUID_DECLARE_16(0xb015)
 
 /** @def BT_UUID_DES_V8D2
  *  @brief UUID for the Descriptor V8D2 Characteristic
  */
-#define BT_UUID_DES_V8D2                BT_UUID_DECLARE_16(0xb016)
+#define BT_UUID_DES_V8D2 BT_UUID_DECLARE_16(0xb016)
 
 /** @def BT_UUID_DES_V8D3
  *  @brief UUID for the Descriptor V8D3 Characteristic
  */
-#define BT_UUID_DES_V8D3                BT_UUID_DECLARE_16(0xb017)
+#define BT_UUID_DES_V8D3 BT_UUID_DECLARE_16(0xb017)
 
-static uint8_t   value_v8_value = 0x08;
-static uint8_t   des_v8d1_value = 0x01;
-static uint8_t   des_v8d2_value = 0x02;
-static uint8_t   des_v8d3_value = 0x03;
-static bool   bAuthorized;
+static uint8_t value_v8_value = 0x08;
+static uint8_t des_v8d1_value = 0x01;
+static uint8_t des_v8d2_value = 0x02;
+static uint8_t des_v8d3_value = 0x03;
+static bool bAuthorized;
 
 /**
  * @brief Attribute read call back for the Value V8 attribute
@@ -258,23 +258,25 @@ static ssize_t write_des_v8d3(struct bt_conn *conn,
 
 struct bt_gatt_attr service_b_5_1_attrs[] = {
 	BT_GATT_H_PRIMARY_SERVICE(BT_UUID_SERVICE_B_5, 0x80),
-	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V8,
-		BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
-		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE_ENCRYPT,
-		read_value_v8, write_value_v8, &value_v8_value, 0x81),
-	BT_GATT_H_DESCRIPTOR(BT_UUID_DES_V8D1,
+	BT_GATT_H_CHARACTERISTIC(
+		BT_UUID_VALUE_V8, BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE_ENCRYPT, read_value_v8,
+		write_value_v8, &value_v8_value, 0x81),
+	BT_GATT_H_DESCRIPTOR(
+		BT_UUID_DES_V8D1,
 		BT_GATT_PERM_READ_AUTHEN | BT_GATT_PERM_WRITE_AUTHEN,
 		read_des_v8d1, write_des_v8d1, &des_v8d1_value, 0x83),
-	BT_GATT_H_DESCRIPTOR(BT_UUID_DES_V8D2,
-		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+	BT_GATT_H_DESCRIPTOR(
+		BT_UUID_DES_V8D2, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
 		read_des_v8d2, write_des_v8d2, &des_v8d2_value, 0x84),
-	BT_GATT_H_DESCRIPTOR(BT_UUID_DES_V8D3,
+	BT_GATT_H_DESCRIPTOR(
+		BT_UUID_DES_V8D3,
 		BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT,
 		read_des_v8d3, write_des_v8d3, &des_v8d3_value, 0x85)
 };
 
 static struct bt_gatt_service service_b_5_1_svc =
-		    BT_GATT_SERVICE(service_b_5_1_attrs);
+	BT_GATT_SERVICE(service_b_5_1_attrs);
 
 /**
  * @brief Register the Service B.5 and all its Characteristics...

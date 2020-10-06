@@ -19,8 +19,7 @@ LOG_MODULE_DECLARE(net_l2_ppp, CONFIG_NET_L2_PPP_LOG_LEVEL);
 #include "ppp_internal.h"
 
 static enum net_verdict ipcp_handle(struct ppp_context *ctx,
-				    struct net_if *iface,
-				    struct net_pkt *pkt)
+				    struct net_if *iface, struct net_pkt *pkt)
 {
 	return ppp_fsm_input(&ctx->ipcp.fsm, PPP_IPCP, pkt);
 }
@@ -129,10 +128,10 @@ static int ipcp_nak_dns2(struct ppp_context *ctx, struct net_pkt *pkt,
 static const struct ppp_my_option_info ipcp_my_options[] = {
 	PPP_MY_OPTION(IPCP_OPTION_IP_ADDRESS, ipcp_add_ip_address,
 		      ipcp_ack_ip_address, ipcp_nak_ip_address),
-	PPP_MY_OPTION(IPCP_OPTION_DNS1, ipcp_add_dns1,
-		      ipcp_ack_dns1, ipcp_nak_dns1),
-	PPP_MY_OPTION(IPCP_OPTION_DNS2, ipcp_add_dns2,
-		      ipcp_ack_dns2, ipcp_nak_dns2),
+	PPP_MY_OPTION(IPCP_OPTION_DNS1, ipcp_add_dns1, ipcp_ack_dns1,
+		      ipcp_nak_dns1),
+	PPP_MY_OPTION(IPCP_OPTION_DNS2, ipcp_add_dns2, ipcp_ack_dns2,
+		      ipcp_nak_dns2),
 };
 
 BUILD_ASSERT(ARRAY_SIZE(ipcp_my_options) == IPCP_NUM_MY_OPTIONS);
@@ -163,8 +162,8 @@ static int ipcp_ip_address_parse(struct ppp_fsm *fsm, struct net_pkt *pkt,
 		char dst[INET_ADDRSTRLEN];
 		char *addr_str;
 
-		addr_str = net_addr_ntop(AF_INET, &data->addr, dst,
-					 sizeof(dst));
+		addr_str =
+			net_addr_ntop(AF_INET, &data->addr, dst, sizeof(dst));
 
 		NET_DBG("[IPCP] Received peer address %s",
 			log_strdup(addr_str));
@@ -179,10 +178,8 @@ static const struct ppp_peer_option_info ipcp_peer_options[] = {
 	PPP_PEER_OPTION(IPCP_OPTION_IP_ADDRESS, ipcp_ip_address_parse, NULL),
 };
 
-static int ipcp_config_info_req(struct ppp_fsm *fsm,
-				struct net_pkt *pkt,
-				uint16_t length,
-				struct net_pkt *ret_pkt)
+static int ipcp_config_info_req(struct ppp_fsm *fsm, struct net_pkt *pkt,
+				uint16_t length, struct net_pkt *ret_pkt)
 {
 	struct ppp_context *ctx =
 		CONTAINER_OF(fsm, struct ppp_context, ipcp.fsm);
@@ -193,16 +190,15 @@ static int ipcp_config_info_req(struct ppp_fsm *fsm,
 
 	ret = ppp_config_info_req(fsm, pkt, length, ret_pkt, PPP_IPCP,
 				  ipcp_peer_options,
-				  ARRAY_SIZE(ipcp_peer_options),
-				  &data);
+				  ARRAY_SIZE(ipcp_peer_options), &data);
 	if (ret != PPP_CONFIGURE_ACK) {
 		/* There are some issues with configuration still */
 		return ret;
 	}
 
 	if (!data.addr_present) {
-		NET_DBG("[%s/%p] No %saddress provided",
-			fsm->name, fsm, "peer ");
+		NET_DBG("[%s/%p] No %saddress provided", fsm->name, fsm,
+			"peer ");
 		return PPP_CONFIGURE_ACK;
 	}
 
@@ -221,25 +217,21 @@ static int ipcp_config_info_req(struct ppp_fsm *fsm,
 static void ipcp_set_dns_servers(struct ppp_fsm *fsm)
 {
 #if defined(CONFIG_NET_L2_PPP_OPTION_DNS_USE)
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipcp.fsm);
 
 	struct dns_resolve_context *dnsctx;
-	struct sockaddr_in dns1 = {
-		.sin_family = AF_INET,
-		.sin_port = htons(53),
-		.sin_addr = ctx->ipcp.my_options.dns1_address
-	};
-	struct sockaddr_in dns2 = {
-		.sin_family = AF_INET,
-		.sin_port = htons(53),
-		.sin_addr = ctx->ipcp.my_options.dns2_address
-	};
-	const struct sockaddr *dns_servers[] = {
-		(struct sockaddr *) &dns1,
-		(struct sockaddr *) &dns2,
-		NULL
-	};
+	struct sockaddr_in dns1 = { .sin_family = AF_INET,
+				    .sin_port = htons(53),
+				    .sin_addr =
+					    ctx->ipcp.my_options.dns1_address };
+	struct sockaddr_in dns2 = { .sin_family = AF_INET,
+				    .sin_port = htons(53),
+				    .sin_addr =
+					    ctx->ipcp.my_options.dns2_address };
+	const struct sockaddr *dns_servers[] = { (struct sockaddr *)&dns1,
+						 (struct sockaddr *)&dns2,
+						 NULL };
 	int i, ret;
 
 	if (!dns1.sin_addr.s_addr) {
@@ -268,13 +260,11 @@ static void ipcp_set_dns_servers(struct ppp_fsm *fsm)
 #endif
 }
 
-static int ipcp_config_info_nack(struct ppp_fsm *fsm,
-				 struct net_pkt *pkt,
-				 uint16_t length,
-				 bool rejected)
+static int ipcp_config_info_nack(struct ppp_fsm *fsm, struct net_pkt *pkt,
+				 uint16_t length, bool rejected)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipcp.fsm);
 	int ret;
 
 	ret = ppp_my_options_parse_conf_nak(fsm, pkt, length);
@@ -313,8 +303,8 @@ static void ipcp_close(struct ppp_context *ctx, const uint8_t *reason)
 
 static void ipcp_up(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipcp.fsm);
 	struct net_if_addr *addr;
 	char dst[INET_ADDRSTRLEN];
 	char *addr_str;
@@ -323,13 +313,11 @@ static void ipcp_up(struct ppp_fsm *fsm)
 		return;
 	}
 
-	addr_str = net_addr_ntop(AF_INET, &ctx->ipcp.my_options.address,
-				 dst, sizeof(dst));
+	addr_str = net_addr_ntop(AF_INET, &ctx->ipcp.my_options.address, dst,
+				 sizeof(dst));
 
-	addr = net_if_ipv4_addr_add(ctx->iface,
-				    &ctx->ipcp.my_options.address,
-				    NET_ADDR_MANUAL,
-				    0);
+	addr = net_if_ipv4_addr_add(ctx->iface, &ctx->ipcp.my_options.address,
+				    NET_ADDR_MANUAL, 0);
 	if (addr == NULL) {
 		NET_ERR("Could not set IP address %s", log_strdup(addr_str));
 		return;
@@ -346,8 +334,8 @@ static void ipcp_up(struct ppp_fsm *fsm)
 
 static void ipcp_down(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipcp.fsm);
 
 	if (ctx->is_ipcp_up) {
 		net_if_ipv4_addr_rm(ctx->iface, &ctx->ipcp.my_options.address);
@@ -371,8 +359,8 @@ static void ipcp_down(struct ppp_fsm *fsm)
 
 static void ipcp_finished(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       ipcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, ipcp.fsm);
 
 	if (!ctx->is_ipcp_open) {
 		return;
@@ -413,7 +401,5 @@ static void ipcp_init(struct ppp_context *ctx)
 	ctx->ipcp.fsm.cb.config_info_rej = ppp_my_options_parse_conf_rej;
 }
 
-PPP_PROTOCOL_REGISTER(IPCP, PPP_IPCP,
-		      ipcp_init, ipcp_handle,
-		      ipcp_lower_up, ipcp_lower_down,
-		      ipcp_open, ipcp_close);
+PPP_PROTOCOL_REGISTER(IPCP, PPP_IPCP, ipcp_init, ipcp_handle, ipcp_lower_up,
+		      ipcp_lower_down, ipcp_open, ipcp_close);

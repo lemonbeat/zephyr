@@ -36,15 +36,15 @@ static uint8_t raw_mode = BT_HCI_RAW_MODE_H4;
 static uint8_t raw_mode;
 #endif
 
-NET_BUF_POOL_FIXED_DEFINE(hci_rx_pool, CONFIG_BT_RX_BUF_COUNT,
-			  BT_BUF_RX_SIZE, NULL);
-NET_BUF_POOL_FIXED_DEFINE(hci_cmd_pool, CONFIG_BT_HCI_CMD_COUNT,
-			  BT_BUF_RX_SIZE, NULL);
-NET_BUF_POOL_FIXED_DEFINE(hci_acl_pool, BT_HCI_ACL_COUNT,
-			  BT_BUF_ACL_SIZE, NULL);
+NET_BUF_POOL_FIXED_DEFINE(hci_rx_pool, CONFIG_BT_RX_BUF_COUNT, BT_BUF_RX_SIZE,
+			  NULL);
+NET_BUF_POOL_FIXED_DEFINE(hci_cmd_pool, CONFIG_BT_HCI_CMD_COUNT, BT_BUF_RX_SIZE,
+			  NULL);
+NET_BUF_POOL_FIXED_DEFINE(hci_acl_pool, BT_HCI_ACL_COUNT, BT_BUF_ACL_SIZE,
+			  NULL);
 #if defined(CONFIG_BT_ISO)
-NET_BUF_POOL_FIXED_DEFINE(hci_iso_pool, BT_ISO_TX_BUF_COUNT,
-			  BT_ISO_TX_MTU, NULL);
+NET_BUF_POOL_FIXED_DEFINE(hci_iso_pool, BT_ISO_TX_BUF_COUNT, BT_ISO_TX_MTU,
+			  NULL);
 #endif
 
 struct bt_dev_raw bt_dev;
@@ -65,8 +65,8 @@ int bt_hci_driver_register(const struct bt_hci_driver *drv)
 
 	BT_DBG("Registered %s", drv->name ? drv->name : "");
 
-	bt_monitor_new_index(BT_MONITOR_TYPE_PRIMARY, drv->bus,
-			     BT_ADDR_ANY, drv->name ? drv->name : "bt0");
+	bt_monitor_new_index(BT_MONITOR_TYPE_PRIMARY, drv->bus, BT_ADDR_ANY,
+			     drv->name ? drv->name : "bt0");
 
 	return 0;
 }
@@ -166,7 +166,8 @@ struct net_buf *bt_buf_get_cmd_complete(k_timeout_t timeout)
 	return bt_buf_get_rx(BT_BUF_EVT, timeout);
 }
 
-struct net_buf *bt_buf_get_evt(uint8_t evt, bool discardable, k_timeout_t timeout)
+struct net_buf *bt_buf_get_evt(uint8_t evt, bool discardable,
+			       k_timeout_t timeout)
 {
 	return bt_buf_get_rx(BT_BUF_EVT, timeout);
 }

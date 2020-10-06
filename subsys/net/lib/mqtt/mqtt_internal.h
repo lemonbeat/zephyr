@@ -40,32 +40,32 @@ extern "C" {
 #define MQTT_FIXED_HEADER_MAX_SIZE 5
 
 /**@brief MQTT Control Packet Types. */
-#define MQTT_PKT_TYPE_CONNECT     0x10
-#define MQTT_PKT_TYPE_CONNACK     0x20
-#define MQTT_PKT_TYPE_PUBLISH     0x30
-#define MQTT_PKT_TYPE_PUBACK      0x40
-#define MQTT_PKT_TYPE_PUBREC      0x50
-#define MQTT_PKT_TYPE_PUBREL      0x60
-#define MQTT_PKT_TYPE_PUBCOMP     0x70
-#define MQTT_PKT_TYPE_SUBSCRIBE   0x80
-#define MQTT_PKT_TYPE_SUBACK      0x90
+#define MQTT_PKT_TYPE_CONNECT 0x10
+#define MQTT_PKT_TYPE_CONNACK 0x20
+#define MQTT_PKT_TYPE_PUBLISH 0x30
+#define MQTT_PKT_TYPE_PUBACK 0x40
+#define MQTT_PKT_TYPE_PUBREC 0x50
+#define MQTT_PKT_TYPE_PUBREL 0x60
+#define MQTT_PKT_TYPE_PUBCOMP 0x70
+#define MQTT_PKT_TYPE_SUBSCRIBE 0x80
+#define MQTT_PKT_TYPE_SUBACK 0x90
 #define MQTT_PKT_TYPE_UNSUBSCRIBE 0xA0
-#define MQTT_PKT_TYPE_UNSUBACK    0xB0
-#define MQTT_PKT_TYPE_PINGREQ     0xC0
-#define MQTT_PKT_TYPE_PINGRSP     0xD0
-#define MQTT_PKT_TYPE_DISCONNECT  0xE0
+#define MQTT_PKT_TYPE_UNSUBACK 0xB0
+#define MQTT_PKT_TYPE_PINGREQ 0xC0
+#define MQTT_PKT_TYPE_PINGRSP 0xD0
+#define MQTT_PKT_TYPE_DISCONNECT 0xE0
 
 /**@brief Masks for MQTT header flags. */
-#define MQTT_HEADER_DUP_MASK     0x08
-#define MQTT_HEADER_QOS_MASK     0x06
-#define MQTT_HEADER_RETAIN_MASK  0x01
+#define MQTT_HEADER_DUP_MASK 0x08
+#define MQTT_HEADER_QOS_MASK 0x06
+#define MQTT_HEADER_RETAIN_MASK 0x01
 
 /**@brief Masks for MQTT header flags. */
-#define MQTT_CONNECT_FLAG_CLEAN_SESSION   0x02
-#define MQTT_CONNECT_FLAG_WILL_TOPIC      0x04
-#define MQTT_CONNECT_FLAG_WILL_RETAIN     0x20
-#define MQTT_CONNECT_FLAG_PASSWORD        0x40
-#define MQTT_CONNECT_FLAG_USERNAME        0x80
+#define MQTT_CONNECT_FLAG_CLEAN_SESSION 0x02
+#define MQTT_CONNECT_FLAG_WILL_TOPIC 0x04
+#define MQTT_CONNECT_FLAG_WILL_RETAIN 0x20
+#define MQTT_CONNECT_FLAG_PASSWORD 0x40
+#define MQTT_CONNECT_FLAG_USERNAME 0x80
 
 #define MQTT_CONNACK_FLAG_SESSION_PRESENT 0x01
 
@@ -83,7 +83,7 @@ extern "C" {
 
 /**@brief Sets MQTT Client's state exclusive to 'STATE'. */
 #define MQTT_SET_STATE_EXCLUSIVE(CLIENT, STATE) \
-					((CLIENT)->internal.state = (STATE))
+	((CLIENT)->internal.state = (STATE))
 
 /**@brief Verifies if MQTT Client's state is set with one indicated in 'STATE'.
  */
@@ -98,11 +98,9 @@ extern "C" {
 /**@brief Computes the first byte of MQTT message header based on message type,
  *        duplication flag, QoS and  the retain flag.
  */
-#define MQTT_MESSAGES_OPTIONS(TYPE, DUP, QOS, RETAIN) \
-	(((TYPE)      & 0xF0)  | \
-	 (((DUP) << 3) & 0x08) | \
-	 (((QOS) << 1) & 0x06) | \
-	 ((RETAIN) & 0x01))
+#define MQTT_MESSAGES_OPTIONS(TYPE, DUP, QOS, RETAIN)                    \
+	(((TYPE)&0xF0) | (((DUP) << 3) & 0x08) | (((QOS) << 1) & 0x06) | \
+	 ((RETAIN)&0x01))
 
 #define MQTT_MAX_LENGTH_BYTES 4
 #define MQTT_LENGTH_VALUE_MASK 0x7F
@@ -110,18 +108,18 @@ extern "C" {
 #define MQTT_LENGTH_SHIFT 7
 
 /**@brief Check if the input pointer is NULL, if so it returns -EINVAL. */
-#define NULL_PARAM_CHECK(param) \
-	do { \
-		if ((param) == NULL) { \
+#define NULL_PARAM_CHECK(param)         \
+	do {                            \
+		if ((param) == NULL) {  \
 			return -EINVAL; \
-		} \
+		}                       \
 	} while (0)
 
-#define NULL_PARAM_CHECK_VOID(param) \
-	do { \
+#define NULL_PARAM_CHECK_VOID(param)   \
+	do {                           \
 		if ((param) == NULL) { \
-			return; \
-		} \
+			return;        \
+		}                      \
 	} while (0)
 
 /** Buffer context to iterate over buffer. */
@@ -134,17 +132,17 @@ struct buf_ctx {
 enum mqtt_state {
 	/** Idle state, implying the client entry in the table is unused/free.
 	 */
-	MQTT_STATE_IDLE                 = 0x00000000,
+	MQTT_STATE_IDLE = 0x00000000,
 
 	/** TCP Connection has been requested, awaiting result of the request.
 	 */
-	MQTT_STATE_TCP_CONNECTING       = 0x00000001,
+	MQTT_STATE_TCP_CONNECTING = 0x00000001,
 
 	/** TCP Connection successfully established. */
-	MQTT_STATE_TCP_CONNECTED        = 0x00000002,
+	MQTT_STATE_TCP_CONNECTED = 0x00000002,
 
 	/** MQTT Connection successful. */
-	MQTT_STATE_CONNECTED            = 0x00000004,
+	MQTT_STATE_CONNECTED = 0x00000004,
 };
 
 /**@brief Notify application about MQTT event.
@@ -379,8 +377,7 @@ int publish_complete_decode(struct buf_ctx *buf,
  *
  * @return 0 if the procedure is successful, an error code otherwise.
  */
-int subscribe_ack_decode(struct buf_ctx *buf,
-			 struct mqtt_suback_param *param);
+int subscribe_ack_decode(struct buf_ctx *buf, struct mqtt_suback_param *param);
 
 /**@brief Decode MQTT Unsubscribe packet.
  *

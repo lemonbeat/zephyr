@@ -16,14 +16,12 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(ADT7420, CONFIG_SENSOR_LOG_LEVEL);
 
-static void setup_int(const struct device *dev,
-		      bool enable)
+static void setup_int(const struct device *dev, bool enable)
 {
 	struct adt7420_data *drv_data = dev->data;
 	const struct adt7420_dev_config *cfg = dev->config;
-	gpio_flags_t flags = enable
-		? GPIO_INT_EDGE_TO_ACTIVE
-		: GPIO_INT_DISABLE;
+	gpio_flags_t flags = enable ? GPIO_INT_EDGE_TO_ACTIVE :
+					    GPIO_INT_DISABLE;
 
 	gpio_pin_interrupt_configure(drv_data->gpio, cfg->int_pin, flags);
 }
@@ -48,8 +46,8 @@ static void process_int(const struct device *dev)
 	uint8_t status;
 
 	/* Clear the status */
-	if (i2c_reg_read_byte(drv_data->i2c, cfg->i2c_addr,
-			      ADT7420_REG_STATUS, &status) < 0) {
+	if (i2c_reg_read_byte(drv_data->i2c, cfg->i2c_addr, ADT7420_REG_STATUS,
+			      &status) < 0) {
 		return;
 	}
 
@@ -133,13 +131,11 @@ int adt7420_init_interrupt(const struct device *dev)
 
 	drv_data->gpio = device_get_binding(cfg->int_name);
 	if (drv_data->gpio == NULL) {
-		LOG_DBG("Failed to get pointer to %s device!",
-			cfg->int_name);
+		LOG_DBG("Failed to get pointer to %s device!", cfg->int_name);
 		return -EINVAL;
 	}
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   adt7420_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, adt7420_gpio_callback,
 			   BIT(cfg->int_pin));
 
 	int rc = gpio_pin_configure(drv_data->gpio, cfg->int_pin,
@@ -160,9 +156,9 @@ int adt7420_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_ADT7420_THREAD_STACK_SIZE,
-			(k_thread_entry_t)adt7420_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_ADT7420_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)adt7420_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_ADT7420_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_ADT7420_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = adt7420_work_cb;
 #endif

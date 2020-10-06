@@ -37,7 +37,7 @@ extern "C" {
  * @param ... A string optionally containing printk valid conversion specifier,
  * followed by as many values as specifiers.
  */
-#define LOG_ERR(...)    Z_LOG(LOG_LEVEL_ERR, __VA_ARGS__)
+#define LOG_ERR(...) Z_LOG(LOG_LEVEL_ERR, __VA_ARGS__)
 
 /**
  * @brief Writes a WARNING level message to the log.
@@ -48,7 +48,7 @@ extern "C" {
  * @param ... A string optionally containing printk valid conversion specifier,
  * followed by as many values as specifiers.
  */
-#define LOG_WRN(...)   Z_LOG(LOG_LEVEL_WRN, __VA_ARGS__)
+#define LOG_WRN(...) Z_LOG(LOG_LEVEL_WRN, __VA_ARGS__)
 
 /**
  * @brief Writes an INFO level message to the log.
@@ -58,7 +58,7 @@ extern "C" {
  * @param ... A string optionally containing printk valid conversion specifier,
  * followed by as many values as specifiers.
  */
-#define LOG_INF(...)   Z_LOG(LOG_LEVEL_INF, __VA_ARGS__)
+#define LOG_INF(...) Z_LOG(LOG_LEVEL_INF, __VA_ARGS__)
 
 /**
  * @brief Writes a DEBUG level message to the log.
@@ -68,7 +68,7 @@ extern "C" {
  * @param ... A string optionally containing printk valid conversion specifier,
  * followed by as many values as specifiers.
  */
-#define LOG_DBG(...)    Z_LOG(LOG_LEVEL_DBG, __VA_ARGS__)
+#define LOG_DBG(...) Z_LOG(LOG_LEVEL_DBG, __VA_ARGS__)
 
 /**
  * @brief Writes an ERROR level message associated with the instance to the log.
@@ -238,7 +238,7 @@ extern "C" {
  * @param _length     Length of data (in bytes).
  * @param _str        Persistent, raw string.
  */
-#define LOG_INST_HEXDUMP_DBG(_log_inst, _data, _length, _str)	\
+#define LOG_INST_HEXDUMP_DBG(_log_inst, _data, _length, _str) \
 	Z_LOG_HEXDUMP_INSTANCE(LOG_LEVEL_DBG, _log_inst, _data, _length, _str)
 
 #ifndef CONFIG_LOG_MINIMAL
@@ -296,37 +296,34 @@ static inline char *log_strdup(const char *str)
 #if !defined(CONFIG_LOG)
 #define _LOG_LEVEL_RESOLVE(...) LOG_LEVEL_NONE
 #else
-#define _LOG_LEVEL_RESOLVE(...) \
-	Z_LOG_EVAL(LOG_LEVEL, \
-		  (GET_ARG_N(2, __VA_ARGS__, LOG_LEVEL)), \
-		  (GET_ARG_N(2, __VA_ARGS__, CONFIG_LOG_DEFAULT_LEVEL)))
+#define _LOG_LEVEL_RESOLVE(...)                                       \
+	Z_LOG_EVAL(LOG_LEVEL, (GET_ARG_N(2, __VA_ARGS__, LOG_LEVEL)), \
+		   (GET_ARG_N(2, __VA_ARGS__, CONFIG_LOG_DEFAULT_LEVEL)))
 #endif
 
 /* Return first argument */
 #define _LOG_ARG1(arg1, ...) arg1
 
-#define _LOG_MODULE_CONST_DATA_CREATE(_name, _level)			     \
-	IF_ENABLED(LOG_IN_CPLUSPLUS, (extern))				     \
-	const struct log_source_const_data LOG_ITEM_CONST_DATA(_name)	     \
-	__attribute__ ((section("." STRINGIFY(LOG_ITEM_CONST_DATA(_name))))) \
-	__attribute__((used)) = {					     \
-		.name = STRINGIFY(_name),				     \
-		.level = _level						     \
-	}
+#define _LOG_MODULE_CONST_DATA_CREATE(_name, _level)                          \
+	IF_ENABLED(LOG_IN_CPLUSPLUS, (extern))                                \
+	const struct log_source_const_data LOG_ITEM_CONST_DATA(_name)         \
+		__attribute__(                                                \
+			(section("." STRINGIFY(LOG_ITEM_CONST_DATA(_name))))) \
+			__attribute__((used)) = { .name = STRINGIFY(_name),   \
+						  .level = _level }
 
-#define _LOG_MODULE_DYNAMIC_DATA_CREATE(_name)				\
-	struct log_source_dynamic_data LOG_ITEM_DYNAMIC_DATA(_name)	\
-	__attribute__ ((section("." STRINGIFY(				\
-				     LOG_ITEM_DYNAMIC_DATA(_name))))	\
-				     )					\
-	__attribute__((used))
+#define _LOG_MODULE_DYNAMIC_DATA_CREATE(_name)                                 \
+	struct log_source_dynamic_data LOG_ITEM_DYNAMIC_DATA(_name)            \
+		__attribute__((                                                \
+			section("." STRINGIFY(LOG_ITEM_DYNAMIC_DATA(_name))))) \
+			__attribute__((used))
 
-#define _LOG_MODULE_DYNAMIC_DATA_COND_CREATE(_name)		\
-	IF_ENABLED(CONFIG_LOG_RUNTIME_FILTERING,		\
-		  (_LOG_MODULE_DYNAMIC_DATA_CREATE(_name);))
+#define _LOG_MODULE_DYNAMIC_DATA_COND_CREATE(_name) \
+	IF_ENABLED(CONFIG_LOG_RUNTIME_FILTERING,    \
+		   (_LOG_MODULE_DYNAMIC_DATA_CREATE(_name);))
 
-#define _LOG_MODULE_DATA_CREATE(_name, _level)			\
-	_LOG_MODULE_CONST_DATA_CREATE(_name, _level);		\
+#define _LOG_MODULE_DATA_CREATE(_name, _level)        \
+	_LOG_MODULE_CONST_DATA_CREATE(_name, _level); \
 	_LOG_MODULE_DYNAMIC_DATA_COND_CREATE(_name)
 
 /**
@@ -361,13 +358,12 @@ static inline char *log_strdup(const char *str)
  * @see LOG_MODULE_DECLARE
  */
 
-#define LOG_MODULE_REGISTER(...)					\
-	Z_LOG_EVAL(							\
-		_LOG_LEVEL_RESOLVE(__VA_ARGS__),			\
-		(_LOG_MODULE_DATA_CREATE(GET_ARG_N(1, __VA_ARGS__),	\
-				      _LOG_LEVEL_RESOLVE(__VA_ARGS__))),\
-		()/*Empty*/						\
-	)								\
+#define LOG_MODULE_REGISTER(...)                                               \
+	Z_LOG_EVAL(_LOG_LEVEL_RESOLVE(__VA_ARGS__),                            \
+		   (_LOG_MODULE_DATA_CREATE(GET_ARG_N(1, __VA_ARGS__),         \
+					    _LOG_LEVEL_RESOLVE(__VA_ARGS__))), \
+		   () /*Empty*/                                                \
+	)                                                                      \
 	LOG_MODULE_DECLARE(__VA_ARGS__)
 
 /**
@@ -396,27 +392,27 @@ static inline char *log_strdup(const char *str)
  *       this macro has no effect.
  * @see LOG_MODULE_REGISTER
  */
-#define LOG_MODULE_DECLARE(...)						      \
-	extern const struct log_source_const_data			      \
-			LOG_ITEM_CONST_DATA(GET_ARG_N(1, __VA_ARGS__));	      \
-	extern struct log_source_dynamic_data				      \
-			LOG_ITEM_DYNAMIC_DATA(GET_ARG_N(1, __VA_ARGS__));     \
-									      \
-	static const struct log_source_const_data *			      \
-		__log_current_const_data __unused =			      \
-			_LOG_LEVEL_RESOLVE(__VA_ARGS__) ?		      \
-			&LOG_ITEM_CONST_DATA(GET_ARG_N(1, __VA_ARGS__)) :     \
-			NULL;						      \
-									      \
-	static struct log_source_dynamic_data *				      \
-		__log_current_dynamic_data __unused =			      \
-			(_LOG_LEVEL_RESOLVE(__VA_ARGS__) &&		      \
-			IS_ENABLED(CONFIG_LOG_RUNTIME_FILTERING)) ?	      \
-			&LOG_ITEM_DYNAMIC_DATA(GET_ARG_N(1, __VA_ARGS__)) :   \
-			NULL;						      \
-									      \
-	static const uint32_t __log_level __unused =			      \
-					_LOG_LEVEL_RESOLVE(__VA_ARGS__)
+#define LOG_MODULE_DECLARE(...)                                             \
+	extern const struct log_source_const_data LOG_ITEM_CONST_DATA(      \
+		GET_ARG_N(1, __VA_ARGS__));                                 \
+	extern struct log_source_dynamic_data LOG_ITEM_DYNAMIC_DATA(        \
+		GET_ARG_N(1, __VA_ARGS__));                                 \
+                                                                            \
+	static const struct log_source_const_data *__log_current_const_data \
+		__unused = _LOG_LEVEL_RESOLVE(__VA_ARGS__) ?                \
+					 &LOG_ITEM_CONST_DATA(                    \
+					   GET_ARG_N(1, __VA_ARGS__)) :     \
+					 NULL;                                    \
+                                                                            \
+	static struct log_source_dynamic_data *__log_current_dynamic_data   \
+		__unused = (_LOG_LEVEL_RESOLVE(__VA_ARGS__) &&              \
+			    IS_ENABLED(CONFIG_LOG_RUNTIME_FILTERING)) ?     \
+					 &LOG_ITEM_DYNAMIC_DATA(                  \
+					   GET_ARG_N(1, __VA_ARGS__)) :     \
+					 NULL;                                    \
+                                                                            \
+	static const uint32_t __log_level __unused =                        \
+		_LOG_LEVEL_RESOLVE(__VA_ARGS__)
 
 /**
  * @brief Macro for setting log level in the file or function where instance
@@ -425,8 +421,9 @@ static inline char *log_strdup(const char *str)
  * @param level Level used in file or in function.
  *
  */
-#define LOG_LEVEL_SET(level) static const uint32_t __log_level __unused = \
-				Z_LOG_RESOLVED_LEVEL(level, 0)
+#define LOG_LEVEL_SET(level)                         \
+	static const uint32_t __log_level __unused = \
+		Z_LOG_RESOLVED_LEVEL(level, 0)
 
 /**
  * @}

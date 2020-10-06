@@ -142,8 +142,8 @@ static enum net_l2_flags net_bt_flags(struct net_if *iface)
 	return NET_L2_MULTICAST | NET_L2_MULTICAST_SKIP_JOIN_SOLICIT_NODE;
 }
 
-NET_L2_INIT(BLUETOOTH_L2, net_bt_recv, net_bt_send,
-	    net_bt_enable, net_bt_flags);
+NET_L2_INIT(BLUETOOTH_L2, net_bt_recv, net_bt_send, net_bt_enable,
+	    net_bt_flags);
 
 static void ipsp_connected(struct bt_l2cap_chan *chan)
 {
@@ -256,19 +256,18 @@ static struct net_buf *ipsp_alloc_buf(struct bt_l2cap_chan *chan)
 }
 
 static const struct bt_l2cap_chan_ops ipsp_ops = {
-	.alloc_buf	= ipsp_alloc_buf,
-	.recv		= ipsp_recv,
-	.connected	= ipsp_connected,
-	.disconnected	= ipsp_disconnected,
+	.alloc_buf = ipsp_alloc_buf,
+	.recv = ipsp_recv,
+	.connected = ipsp_connected,
+	.disconnected = ipsp_disconnected,
 };
 
-static struct bt_context bt_context_data = {
-	.conns[0 ... (CONFIG_BT_MAX_CONN - 1)] = {
-		.iface			= NULL,
-		.ipsp_chan.chan.ops	= &ipsp_ops,
-		.ipsp_chan.rx.mtu	= L2CAP_IPSP_MTU,
-	}
-};
+static struct bt_context
+	bt_context_data = { .conns[0 ...(CONFIG_BT_MAX_CONN - 1)] = {
+				    .iface = NULL,
+				    .ipsp_chan.chan.ops = &ipsp_ops,
+				    .ipsp_chan.rx.mtu = L2CAP_IPSP_MTU,
+			    } };
 
 static void bt_iface_init(struct net_if *iface)
 {
@@ -335,16 +334,16 @@ static int ipsp_accept(struct bt_conn *conn, struct bt_l2cap_chan **chan)
 }
 
 static struct bt_l2cap_server server = {
-	.psm		= L2CAP_IPSP_PSM,
-	.sec_level	= CONFIG_NET_L2_BT_SEC_LEVEL,
-	.accept		= ipsp_accept,
+	.psm = L2CAP_IPSP_PSM,
+	.sec_level = CONFIG_NET_L2_BT_SEC_LEVEL,
+	.accept = ipsp_accept,
 };
 
 #if defined(CONFIG_NET_L2_BT_MGMT)
 
-#define DEVICE_NAME		CONFIG_BT_DEVICE_NAME
-#define DEVICE_NAME_LEN		(sizeof(DEVICE_NAME) - 1)
-#define UNKNOWN_APPEARANCE	0x0000
+#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
+#define UNKNOWN_APPEARANCE 0x0000
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -356,11 +355,11 @@ static const struct bt_data sd[] = {
 };
 
 static int bt_advertise(uint32_t mgmt_request, struct net_if *iface, void *data,
-		      size_t len)
+			size_t len)
 {
 	if (!strcmp(data, "on")) {
-		return bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad),
-				       sd, ARRAY_SIZE(sd));
+		return bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
+				       ARRAY_SIZE(sd));
 	} else if (!strcmp(data, "off")) {
 		return bt_le_adv_stop();
 	} else {
@@ -387,9 +386,8 @@ static int bt_connect(uint32_t mgmt_request, struct net_if *iface, void *data,
 	}
 
 	if (default_conn) {
-		return bt_l2cap_chan_connect(default_conn,
-					     &conn->ipsp_chan.chan,
-					     L2CAP_IPSP_PSM);
+		return bt_l2cap_chan_connect(
+			default_conn, &conn->ipsp_chan.chan, L2CAP_IPSP_PSM);
 	}
 
 	return bt_conn_le_create(addr, BT_CONN_LE_CREATE_CONN,
@@ -588,8 +586,8 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 
 		bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-		NET_DBG("Disconnected: %s (reason 0x%02x)\n",
-			log_strdup(addr), reason);
+		NET_DBG("Disconnected: %s (reason 0x%02x)\n", log_strdup(addr),
+			reason);
 	}
 
 	bt_conn_unref(default_conn);

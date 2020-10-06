@@ -17,38 +17,38 @@
 /* See RFC 1035, 4.1.1 Header section format
  * DNS Message Header is always 12 bytes
  */
-#define DNS_MSG_HEADER_SIZE	12
+#define DNS_MSG_HEADER_SIZE 12
 
 /* This is the label's length octet, see 4.1.2. Question section format */
-#define DNS_LABEL_LEN_SIZE	1
-#define DNS_LABEL_MAX_SIZE	63
-#define DNS_ANSWER_MIN_SIZE	12
-#define DNS_COMMON_UINT_SIZE	2
+#define DNS_LABEL_LEN_SIZE 1
+#define DNS_LABEL_MAX_SIZE 63
+#define DNS_ANSWER_MIN_SIZE 12
+#define DNS_COMMON_UINT_SIZE 2
 
-#define DNS_HEADER_ID_LEN	2
-#define DNS_HEADER_FLAGS_LEN	2
-#define DNS_QTYPE_LEN		2
-#define DNS_QCLASS_LEN		2
-#define DNS_QDCOUNT_LEN		2
-#define DNS_ANCOUNT_LEN		2
-#define DNS_NSCOUNT_LEN		2
-#define DNS_ARCOUNT_LEN		2
-#define DNS_TTL_LEN		4
-#define DNS_RDLENGTH_LEN	2
+#define DNS_HEADER_ID_LEN 2
+#define DNS_HEADER_FLAGS_LEN 2
+#define DNS_QTYPE_LEN 2
+#define DNS_QCLASS_LEN 2
+#define DNS_QDCOUNT_LEN 2
+#define DNS_ANCOUNT_LEN 2
+#define DNS_NSCOUNT_LEN 2
+#define DNS_ARCOUNT_LEN 2
+#define DNS_TTL_LEN 4
+#define DNS_RDLENGTH_LEN 2
 
-#define NS_CMPRSFLGS    0xc0   /* DNS name compression */
+#define NS_CMPRSFLGS 0xc0 /* DNS name compression */
 
 /* RFC 1035 '4.1.1. Header section format' defines the following flags:
  * QR, Opcode, AA, TC, RD, RA, Z and RCODE.
  * This implementation only uses RD (Recursion Desired).
  */
-#define DNS_RECURSION		1
+#define DNS_RECURSION 1
 
 /* These two defines represent the 3rd and 4th bytes of the DNS msg header.
  * See RFC 1035, 4.1.1. Header section format.
  */
-#define DNS_FLAGS1		DNS_RECURSION	/* QR, Opcode, AA, and TC = 0 */
-#define DNS_FLAGS2		0		/* RA, Z and RCODE = 0 */
+#define DNS_FLAGS1 DNS_RECURSION /* QR, Opcode, AA, and TC = 0 */
+#define DNS_FLAGS2 0 /* RA, Z and RCODE = 0 */
 
 /**
  * DNS message structure for DNS responses
@@ -78,15 +78,16 @@ struct dns_msg_t {
 	uint16_t msg_size;
 };
 
-#define DNS_MSG_INIT(b, s)	{.msg = b, .msg_size = s,	\
-				 .response_type = -EINVAL}
-
+#define DNS_MSG_INIT(b, s)                                        \
+	{                                                         \
+		.msg = b, .msg_size = s, .response_type = -EINVAL \
+	}
 
 enum dns_rr_type {
 	DNS_RR_TYPE_INVALID = 0,
-	DNS_RR_TYPE_A	= 1,		/* IPv4  */
-	DNS_RR_TYPE_CNAME = 5,		/* CNAME */
-	DNS_RR_TYPE_AAAA = 28		/* IPv6  */
+	DNS_RR_TYPE_A = 1, /* IPv4  */
+	DNS_RR_TYPE_CNAME = 5, /* CNAME */
+	DNS_RR_TYPE_AAAA = 28 /* IPv6  */
 };
 
 enum dns_response_type {
@@ -101,10 +102,7 @@ enum dns_class {
 	DNS_CLASS_IN,
 };
 
-enum dns_msg_type {
-	DNS_QUERY = 0,
-	DNS_RESPONSE
-};
+enum dns_msg_type { DNS_QUERY = 0, DNS_RESPONSE };
 
 enum dns_header_rcode {
 	DNS_HEADER_NOERROR = 0,
@@ -249,8 +247,7 @@ static inline int dns_answer_ttl(uint16_t dname_size, uint8_t *answer)
 	return ntohl(UNALIGNED_GET((uint32_t *)(answer + dname_size + 4)));
 }
 
-static inline int dns_answer_rdlength(uint16_t dname_size,
-					     uint8_t *answer)
+static inline int dns_answer_rdlength(uint16_t dname_size, uint8_t *answer)
 {
 	return ntohs(UNALIGNED_GET((uint16_t *)(answer + dname_size + 8)));
 }
@@ -393,7 +390,6 @@ static inline int llmnr_unpack_query_header(struct dns_msg_t *msg,
  *         is not "IN".
  */
 int dns_unpack_query(struct dns_msg_t *dns_msg, struct net_buf *buf,
-		     enum dns_rr_type *qtype,
-		     enum dns_class *qclass);
+		     enum dns_rr_type *qtype, enum dns_class *qclass);
 
 #endif

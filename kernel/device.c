@@ -57,7 +57,7 @@ void z_sys_init_run_level(int32_t level)
 	};
 	const struct init_entry *entry;
 
-	for (entry = levels[level]; entry < levels[level+1]; entry++) {
+	for (entry = levels[level]; entry < levels[level + 1]; entry++) {
 		const struct device *dev = entry->dev;
 
 		if (dev != NULL) {
@@ -69,7 +69,7 @@ void z_sys_init_run_level(int32_t level)
 			 * Set the init status bit so device is not declared ready.
 			 */
 			sys_bitfield_set_bit(
-				(mem_addr_t) __device_init_status_start,
+				(mem_addr_t)__device_init_status_start,
 				(dev - __device_start));
 		}
 	}
@@ -104,8 +104,8 @@ static inline const struct device *z_vrfy_device_get_binding(const char *name)
 {
 	char name_copy[Z_DEVICE_MAX_NAME_LEN];
 
-	if (z_user_string_copy(name_copy, (char *)name, sizeof(name_copy))
-	    != 0) {
+	if (z_user_string_copy(name_copy, (char *)name, sizeof(name_copy)) !=
+	    0) {
 		return 0;
 	}
 
@@ -124,15 +124,13 @@ bool z_device_ready(const struct device *dev)
 {
 	/* Set bit indicates device failed initialization */
 	return !(sys_bitfield_test_bit((mem_addr_t)__device_init_status_start,
-					(dev - __device_start)));
+				       (dev - __device_start)));
 }
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
 int device_pm_control_nop(const struct device *unused_device,
-			  uint32_t unused_ctrl_command,
-			  void *unused_context,
-			  device_pm_cb cb,
-			  void *unused_arg)
+			  uint32_t unused_ctrl_command, void *unused_context,
+			  device_pm_cb cb, void *unused_arg)
 {
 	return -ENOTSUP;
 }
@@ -163,7 +161,7 @@ int device_busy_check(const struct device *chk_dev)
 void device_busy_set(const struct device *busy_dev)
 {
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-	atomic_set_bit((atomic_t *) __device_busy_start,
+	atomic_set_bit((atomic_t *)__device_busy_start,
 		       (busy_dev - __device_start));
 #else
 	ARG_UNUSED(busy_dev);
@@ -173,7 +171,7 @@ void device_busy_set(const struct device *busy_dev)
 void device_busy_clear(const struct device *busy_dev)
 {
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-	atomic_clear_bit((atomic_t *) __device_busy_start,
+	atomic_clear_bit((atomic_t *)__device_busy_start,
 			 (busy_dev - __device_start));
 #else
 	ARG_UNUSED(busy_dev);

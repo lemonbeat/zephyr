@@ -12,17 +12,17 @@
 
 #if (CONFIG_OPENAMP_RSC_TABLE_NUM_RPMSG_BUFF > 0)
 
-#define VDEV_ID                 0xFF
+#define VDEV_ID 0xFF
 #define VRING0_ID 0 /* (master to remote) fixed to 0 for Linux compatibility */
 #define VRING1_ID 1 /* (remote to master) fixed to 1 for Linux compatibility */
 
-#define VRING_COUNT             2
-#define RPMSG_IPU_C0_FEATURES   1
+#define VRING_COUNT 2
+#define RPMSG_IPU_C0_FEATURES 1
 
-#define VRING_RX_ADDRESS        -1  /* allocated by Master processor */
-#define VRING_TX_ADDRESS        -1  /* allocated by Master processor */
-#define VRING_BUFF_ADDRESS      -1  /* allocated by Master processor */
-#define VRING_ALIGNMENT         16  /* fixed to match with Linux constraint */
+#define VRING_RX_ADDRESS -1 /* allocated by Master processor */
+#define VRING_TX_ADDRESS -1 /* allocated by Master processor */
+#define VRING_BUFF_ADDRESS -1 /* allocated by Master processor */
+#define VRING_ALIGNMENT 16 /* fixed to match with Linux constraint */
 
 #endif
 

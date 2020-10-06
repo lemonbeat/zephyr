@@ -20,8 +20,7 @@
  * to the low power state.
  */
 /* #define DEEP_SLEEP_WAIT_ON_CLK_REQ_ENABLE */
-#define DEEP_SLEEP_WAIT_SPIN_CLK_REQ		1000
-
+#define DEEP_SLEEP_WAIT_SPIN_CLK_REQ 1000
 
 /*
  * Some peripherals if enabled always assert their CLK_REQ bits.
@@ -31,7 +30,6 @@
  * wake.
  */
 #define DEEP_SLEEP_PERIPH_SAVE_RESTORE
-
 
 /*
  * Light sleep: PLL remains on. Fastest wake latency.
@@ -61,7 +59,6 @@ void soc_deep_sleep_disable(void)
 	SCB->SCR &= ~(1ul << 2); /* disable Cortex-M4 SLEEPDEEP */
 }
 
-
 void soc_deep_sleep_wait_clk_idle(void)
 {
 #ifdef DEEP_SLEEP_WAIT_ON_CLK_REQ_ENABLE
@@ -69,13 +66,12 @@ void soc_deep_sleep_wait_clk_idle(void)
 
 	cnt = DEEP_SLEEP_WAIT_CLK_REQ;
 	do {
-		clkreq = PCR_REGS->CLK_REQ0 | PCR_REGS->CLK_REQ1
-			 | PCR_REGS->CLK_REQ2 | PCR_REGS->CLK_REQ3
-			 | PCR_REGS->CLK_REQ4;
+		clkreq = PCR_REGS->CLK_REQ0 | PCR_REGS->CLK_REQ1 |
+			 PCR_REGS->CLK_REQ2 | PCR_REGS->CLK_REQ3 |
+			 PCR_REGS->CLK_REQ4;
 	} while ((clkreq != (1ul << MCHP_PCR1_CPU_POS)) && (cnt-- != 0));
 #endif
 }
-
 
 /*
  * Allow peripherals connected to external masters to wake the PLL but not
@@ -119,18 +115,10 @@ struct ds_timer_info {
 };
 
 const struct ds_timer_info ds_timer_tbl[] = {
-	{
-		(uintptr_t)&B16TMR0_REGS->CTRL, 0
-	},
-	{
-		(uintptr_t)&B16TMR1_REGS->CTRL, 0
-	},
-	{
-		(uintptr_t)&B32TMR0_REGS->CTRL, 0
-	},
-	{
-		(uintptr_t)&B32TMR1_REGS->CTRL, 0
-	},
+	{ (uintptr_t)&B16TMR0_REGS->CTRL, 0 },
+	{ (uintptr_t)&B16TMR1_REGS->CTRL, 0 },
+	{ (uintptr_t)&B32TMR0_REGS->CTRL, 0 },
+	{ (uintptr_t)&B32TMR1_REGS->CTRL, 0 },
 	{
 		(uintptr_t)&CCT_REGS->CTRL,
 		(MCHP_CCT_CTRL_COMP1_SET | MCHP_CCT_CTRL_COMP0_SET),
@@ -138,7 +126,6 @@ const struct ds_timer_info ds_timer_tbl[] = {
 };
 #define NUM_DS_TIMER_ENTRIES \
 	(sizeof(ds_timer_tbl) / sizeof(struct ds_timer_info))
-
 
 static uint32_t timers[NUM_DS_TIMER_ENTRIES];
 static uint8_t uart_activate[3];

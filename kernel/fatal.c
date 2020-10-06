@@ -146,9 +146,10 @@ void z_fatal_error(unsigned int reason, const z_arch_esf_t *esf)
 		if ((esf != NULL) && arch_is_in_nested_exception(esf)) {
 #if defined(CONFIG_STACK_SENTINEL)
 			if (reason != K_ERR_STACK_CHK_FAIL) {
-				__ASSERT(0,
-				 "Attempted to recover from a fatal error in ISR");
-			 }
+				__ASSERT(
+					0,
+					"Attempted to recover from a fatal error in ISR");
+			}
 #endif /* CONFIG_STACK_SENTINEL */
 		}
 #endif /* CONFIG_ARCH_HAS_NESTED_EXCEPTION_DETECTION */

@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #ifndef EDTT_DRIVER_H
 #define EDTT_DRIVER_H
 

@@ -168,14 +168,12 @@ static int prepare_cb(struct lll_prepare_param *p)
 				 radio_rx_ready_delay_get(lll->phy, 1) -
 				 CONFIG_BT_CTLR_GPIO_LNA_OFFSET);
 #else /* !CONFIG_BT_CTLR_PHY */
-	radio_gpio_pa_lna_enable(remainder_us +
-				 radio_rx_ready_delay_get(0, 0) -
+	radio_gpio_pa_lna_enable(remainder_us + radio_rx_ready_delay_get(0, 0) -
 				 CONFIG_BT_CTLR_GPIO_LNA_OFFSET);
 #endif /* !CONFIG_BT_CTLR_PHY */
 #endif /* CONFIG_BT_CTLR_GPIO_LNA_PIN */
 
-#if defined(CONFIG_BT_CTLR_PROFILE_ISR) || \
-	defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
+#if defined(CONFIG_BT_CTLR_PROFILE_ISR) || defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
 	radio_tmr_end_capture();
 #endif /* CONFIG_BT_CTLR_PROFILE_ISR */
 
@@ -185,8 +183,9 @@ static int prepare_cb(struct lll_prepare_param *p)
 #if defined(CONFIG_BT_CTLR_XTAL_ADVANCED) && \
 	(EVENT_OVERHEAD_PREEMPT_US <= EVENT_OVERHEAD_PREEMPT_MIN_US)
 	/* check if preempt to start has changed */
-	if (lll_preempt_calc(evt, (TICKER_ID_SCAN_AUX_BASE +
-				   ull_scan_aux_lll_handle_get(lll)),
+	if (lll_preempt_calc(evt,
+			     (TICKER_ID_SCAN_AUX_BASE +
+			      ull_scan_aux_lll_handle_get(lll)),
 			     ticks_at_event)) {
 		radio_isr_set(isr_done, lll);
 		radio_disable();
@@ -317,8 +316,8 @@ static int isr_rx_pdu(struct lll_scan_aux *lll, uint8_t rssi_ready)
 	ftr = &(node_rx->hdr.rx_ftr);
 	ftr->param = lll;
 	ftr->ticks_anchor = radio_tmr_start_get();
-	ftr->radio_end_us = radio_tmr_end_get() -
-			    radio_rx_chain_delay_get(lll->phy, 1);
+	ftr->radio_end_us =
+		radio_tmr_end_get() - radio_rx_chain_delay_get(lll->phy, 1);
 
 	ftr->rssi = (rssi_ready) ? (radio_rssi_get() & 0x7f) : 0x7f;
 

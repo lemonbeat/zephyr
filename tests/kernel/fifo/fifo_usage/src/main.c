@@ -35,8 +35,8 @@
 #include <ztest.h>
 #include <irq_offload.h>
 
-#define STACK_SIZE	(1024 + CONFIG_TEST_EXTRA_STACKSIZE)
-#define LIST_LEN	4
+#define STACK_SIZE (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define LIST_LEN 4
 
 struct fdata_t {
 	sys_snode_t snode;
@@ -155,8 +155,9 @@ static void test_single_fifo_play(void)
 	}
 
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				thread_entry_fn_single, &fifo1, NULL, NULL,
-				K_PRIO_PREEMPT(0), K_INHERIT_PERMS, K_NO_WAIT);
+				      thread_entry_fn_single, &fifo1, NULL,
+				      NULL, K_PRIO_PREEMPT(0), K_INHERIT_PERMS,
+				      K_NO_WAIT);
 
 	/* Let the child thread run */
 	k_sem_take(&end_sema, K_FOREVER);
@@ -186,8 +187,9 @@ static void test_dual_fifo_play(void)
 	uint32_t i;
 
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				thread_entry_fn_dual, &fifo1, &fifo2, NULL,
-				K_PRIO_PREEMPT(0), K_INHERIT_PERMS, K_NO_WAIT);
+				      thread_entry_fn_dual, &fifo1, &fifo2,
+				      NULL, K_PRIO_PREEMPT(0), K_INHERIT_PERMS,
+				      K_NO_WAIT);
 
 	for (i = 0U; i < LIST_LEN; i++) {
 		/* Put item into fifo */
@@ -200,7 +202,6 @@ static void test_dual_fifo_play(void)
 
 	/* Clear the spawn thread to avoid side effect */
 	k_thread_abort(tid);
-
 }
 
 /**
@@ -218,9 +219,9 @@ static void test_isr_fifo_play(void)
 	k_sem_init(&end_sema, 0, 1);
 
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				thread_entry_fn_isr, &fifo1, &fifo2, NULL,
-				K_PRIO_PREEMPT(0), K_INHERIT_PERMS, K_NO_WAIT);
-
+				      thread_entry_fn_isr, &fifo1, &fifo2, NULL,
+				      K_PRIO_PREEMPT(0), K_INHERIT_PERMS,
+				      K_NO_WAIT);
 
 	/* Put item into fifo */
 	irq_offload(tIsr_entry_put, (const void *)&fifo2);

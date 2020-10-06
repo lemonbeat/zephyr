@@ -23,20 +23,20 @@
 
 #if defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
 #if ((CONFIG_BT_CTLR_GPIO_PA_PIN) > 31)
-#define NRF_GPIO_PA     NRF_P1
-#define NRF_GPIO_PA_PIN ((CONFIG_BT_CTLR_GPIO_PA_PIN) - 32)
+#define NRF_GPIO_PA NRF_P1
+#define NRF_GPIO_PA_PIN ((CONFIG_BT_CTLR_GPIO_PA_PIN)-32)
 #else
-#define NRF_GPIO_PA     NRF_GPIO
+#define NRF_GPIO_PA NRF_GPIO
 #define NRF_GPIO_PA_PIN CONFIG_BT_CTLR_GPIO_PA_PIN
 #endif
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN */
 
 #if defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 #if ((CONFIG_BT_CTLR_GPIO_LNA_PIN) > 31)
-#define NRF_GPIO_LNA     NRF_P1
-#define NRF_GPIO_LNA_PIN ((CONFIG_BT_CTLR_GPIO_LNA_PIN) - 32)
+#define NRF_GPIO_LNA NRF_P1
+#define NRF_GPIO_LNA_PIN ((CONFIG_BT_CTLR_GPIO_LNA_PIN)-32)
 #else
-#define NRF_GPIO_LNA     NRF_GPIO
+#define NRF_GPIO_LNA NRF_GPIO
 #define NRF_GPIO_LNA_PIN CONFIG_BT_CTLR_GPIO_LNA_PIN
 #endif
 #endif /* CONFIG_BT_CTLR_GPIO_LNA_PIN */
@@ -45,10 +45,10 @@
  * channels and groups as occupied and thus unavailable to other modules.
  */
 const uint32_t z_bt_ctlr_used_nrf_ppi_channels = HAL_USED_PPI_CHANNELS;
-const uint32_t z_bt_ctlr_used_nrf_ppi_groups   = HAL_USED_PPI_GROUPS;
+const uint32_t z_bt_ctlr_used_nrf_ppi_groups = HAL_USED_PPI_GROUPS;
 
 static radio_isr_cb_t isr_cb;
-static void           *isr_cb_param;
+static void *isr_cb_param;
 
 void isr_radio(void)
 {
@@ -64,17 +64,16 @@ void radio_isr_set(radio_isr_cb_t cb, void *param)
 	isr_cb_param = param;
 	isr_cb = cb;
 
-	nrf_radio_int_enable(NRF_RADIO,
-			     0 |
-				/* RADIO_INTENSET_READY_Msk |
+	nrf_radio_int_enable(NRF_RADIO, 0 |
+						/* RADIO_INTENSET_READY_Msk |
 				 * RADIO_INTENSET_ADDRESS_Msk |
 				 * RADIO_INTENSET_PAYLOAD_Msk |
 				 * RADIO_INTENSET_END_Msk |
 				 */
-				RADIO_INTENSET_DISABLED_Msk
-				/* | RADIO_INTENSET_RSSIEND_Msk |
+						RADIO_INTENSET_DISABLED_Msk
+			     /* | RADIO_INTENSET_RSSIEND_Msk |
 				 */
-	    );
+	);
 
 	NVIC_ClearPendingIRQ(RADIO_IRQn);
 	irq_enable(RADIO_IRQn);
@@ -104,14 +103,12 @@ void radio_reset(void)
 {
 	irq_disable(RADIO_IRQn);
 
-	nrf_radio_power_set(
-		NRF_RADIO,
-		(RADIO_POWER_POWER_Disabled << RADIO_POWER_POWER_Pos) &
-			RADIO_POWER_POWER_Msk);
-	nrf_radio_power_set(
-		NRF_RADIO,
-		(RADIO_POWER_POWER_Enabled << RADIO_POWER_POWER_Pos) &
-			RADIO_POWER_POWER_Msk);
+	nrf_radio_power_set(NRF_RADIO, (RADIO_POWER_POWER_Disabled
+					<< RADIO_POWER_POWER_Pos) &
+					       RADIO_POWER_POWER_Msk);
+	nrf_radio_power_set(NRF_RADIO, (RADIO_POWER_POWER_Enabled
+					<< RADIO_POWER_POWER_Pos) &
+					       RADIO_POWER_POWER_Msk);
 
 	hal_radio_reset();
 
@@ -129,9 +126,9 @@ void radio_phy_set(uint8_t phy, uint8_t flags)
 	NRF_RADIO->MODE = (mode << RADIO_MODE_MODE_Pos) & RADIO_MODE_MODE_Msk;
 
 #if defined(CONFIG_BT_CTLR_RADIO_ENABLE_FAST)
-	NRF_RADIO->MODECNF0 |= (RADIO_MODECNF0_RU_Fast <<
-				RADIO_MODECNF0_RU_Pos) &
-			       RADIO_MODECNF0_RU_Msk;
+	NRF_RADIO->MODECNF0 |=
+		(RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos) &
+		RADIO_MODECNF0_RU_Msk;
 #endif /* CONFIG_BT_CTLR_RADIO_ENABLE_FAST */
 }
 
@@ -177,11 +174,10 @@ void radio_whiten_iv_set(uint32_t iv)
 
 void radio_aa_set(uint8_t *aa)
 {
-	NRF_RADIO->TXADDRESS =
-	    (((0UL) << RADIO_TXADDRESS_TXADDRESS_Pos) &
-	     RADIO_TXADDRESS_TXADDRESS_Msk);
-	NRF_RADIO->RXADDRESSES =
-	    ((RADIO_RXADDRESSES_ADDR0_Enabled) << RADIO_RXADDRESSES_ADDR0_Pos);
+	NRF_RADIO->TXADDRESS = (((0UL) << RADIO_TXADDRESS_TXADDRESS_Pos) &
+				RADIO_TXADDRESS_TXADDRESS_Msk);
+	NRF_RADIO->RXADDRESSES = ((RADIO_RXADDRESSES_ADDR0_Enabled)
+				  << RADIO_RXADDRESSES_ADDR0_Pos);
 	NRF_RADIO->PREFIX0 = aa[3];
 	NRF_RADIO->BASE0 = (aa[2] << 24) | (aa[1] << 16) | (aa[0] << 8);
 }
@@ -201,8 +197,7 @@ void radio_pkt_configure(uint8_t bits_len, uint8_t max_len, uint8_t flags)
 	if (!IS_ENABLED(CONFIG_BT_CTLR_DATA_LENGTH_CLEAR) && dc) {
 		bits_len = 5U;
 	}
-#elif defined(CONFIG_SOC_COMPATIBLE_NRF52X) || \
-	defined(CONFIG_SOC_SERIES_NRF53X)
+#elif defined(CONFIG_SOC_COMPATIBLE_NRF52X) || defined(CONFIG_SOC_SERIES_NRF53X)
 	extra = 0U;
 
 	phy = (flags >> 1) & 0x07; /* phy */
@@ -235,30 +230,29 @@ void radio_pkt_configure(uint8_t bits_len, uint8_t max_len, uint8_t flags)
 	 * byte, include the S1 field in radio packet configuration.
 	 */
 	if (dc) {
-		extra |= (RADIO_PCNF0_S1INCL_Include <<
-			  RADIO_PCNF0_S1INCL_Pos) & RADIO_PCNF0_S1INCL_Msk;
+		extra |=
+			(RADIO_PCNF0_S1INCL_Include << RADIO_PCNF0_S1INCL_Pos) &
+			RADIO_PCNF0_S1INCL_Msk;
 	}
 #endif /* CONFIG_SOC_COMPATIBLE_NRF52X */
 
-	NRF_RADIO->PCNF0 = (((1UL) << RADIO_PCNF0_S0LEN_Pos) &
-			    RADIO_PCNF0_S0LEN_Msk) |
-			   ((((uint32_t)bits_len) << RADIO_PCNF0_LFLEN_Pos) &
-			    RADIO_PCNF0_LFLEN_Msk) |
-			   ((((uint32_t)8-bits_len) << RADIO_PCNF0_S1LEN_Pos) &
-			    RADIO_PCNF0_S1LEN_Msk) |
-			   extra;
+	NRF_RADIO->PCNF0 =
+		(((1UL) << RADIO_PCNF0_S0LEN_Pos) & RADIO_PCNF0_S0LEN_Msk) |
+		((((uint32_t)bits_len) << RADIO_PCNF0_LFLEN_Pos) &
+		 RADIO_PCNF0_LFLEN_Msk) |
+		((((uint32_t)8 - bits_len) << RADIO_PCNF0_S1LEN_Pos) &
+		 RADIO_PCNF0_S1LEN_Msk) |
+		extra;
 
 	NRF_RADIO->PCNF1 &= ~(RADIO_PCNF1_MAXLEN_Msk | RADIO_PCNF1_STATLEN_Msk |
 			      RADIO_PCNF1_BALEN_Msk | RADIO_PCNF1_ENDIAN_Msk);
-	NRF_RADIO->PCNF1 |= ((((uint32_t)max_len) << RADIO_PCNF1_MAXLEN_Pos) &
-			     RADIO_PCNF1_MAXLEN_Msk) |
-			    (((0UL) << RADIO_PCNF1_STATLEN_Pos) &
-			     RADIO_PCNF1_STATLEN_Msk) |
-			    (((3UL) << RADIO_PCNF1_BALEN_Pos) &
-			     RADIO_PCNF1_BALEN_Msk) |
-			    (((RADIO_PCNF1_ENDIAN_Little) <<
-			      RADIO_PCNF1_ENDIAN_Pos) &
-			     RADIO_PCNF1_ENDIAN_Msk);
+	NRF_RADIO->PCNF1 |=
+		((((uint32_t)max_len) << RADIO_PCNF1_MAXLEN_Pos) &
+		 RADIO_PCNF1_MAXLEN_Msk) |
+		(((0UL) << RADIO_PCNF1_STATLEN_Pos) & RADIO_PCNF1_STATLEN_Msk) |
+		(((3UL) << RADIO_PCNF1_BALEN_Pos) & RADIO_PCNF1_BALEN_Msk) |
+		(((RADIO_PCNF1_ENDIAN_Little) << RADIO_PCNF1_ENDIAN_Pos) &
+		 RADIO_PCNF1_ENDIAN_Msk);
 }
 
 void radio_pkt_rx_set(void *rx_packet)
@@ -399,10 +393,10 @@ uint32_t radio_is_idle(void)
 void radio_crc_configure(uint32_t polynomial, uint32_t iv)
 {
 	NRF_RADIO->CRCCNF =
-	    (((RADIO_CRCCNF_SKIPADDR_Skip) << RADIO_CRCCNF_SKIPADDR_Pos) &
-	     RADIO_CRCCNF_SKIPADDR_Msk) |
-	    (((RADIO_CRCCNF_LEN_Three) << RADIO_CRCCNF_LEN_Pos) &
-	       RADIO_CRCCNF_LEN_Msk);
+		(((RADIO_CRCCNF_SKIPADDR_Skip) << RADIO_CRCCNF_SKIPADDR_Pos) &
+		 RADIO_CRCCNF_SKIPADDR_Msk) |
+		(((RADIO_CRCCNF_LEN_Three) << RADIO_CRCCNF_LEN_Pos) &
+		 RADIO_CRCCNF_LEN_Msk);
 	NRF_RADIO->CRCPOLY = polynomial;
 	NRF_RADIO->CRCINIT = iv;
 }
@@ -413,8 +407,8 @@ uint32_t radio_crc_is_valid(void)
 }
 
 static uint8_t MALIGN(4) _pkt_empty[PDU_EM_LL_SIZE_MAX];
-static uint8_t MALIGN(4) _pkt_scratch[MAX((HAL_RADIO_PDU_LEN_MAX + 3),
-				       PDU_AC_LL_SIZE_MAX)];
+static uint8_t MALIGN(4)
+	_pkt_scratch[MAX((HAL_RADIO_PDU_LEN_MAX + 3), PDU_AC_LL_SIZE_MAX)];
 
 void *radio_pkt_empty_get(void)
 {
@@ -426,12 +420,12 @@ void *radio_pkt_scratch_get(void)
 	return _pkt_scratch;
 }
 
-#if defined(CONFIG_SOC_COMPATIBLE_NRF52832) && \
-	defined(CONFIG_BT_CTLR_LE_ENC) && \
+#if defined(CONFIG_SOC_COMPATIBLE_NRF52832) &&       \
+	defined(CONFIG_BT_CTLR_LE_ENC) &&            \
 	(!defined(CONFIG_BT_CTLR_DATA_LENGTH_MAX) || \
 	 (CONFIG_BT_CTLR_DATA_LENGTH_MAX < (HAL_RADIO_PDU_LEN_MAX - 4)))
-static uint8_t MALIGN(4) _pkt_decrypt[MAX((HAL_RADIO_PDU_LEN_MAX + 3),
-				       PDU_AC_LL_SIZE_MAX)];
+static uint8_t MALIGN(4)
+	_pkt_decrypt[MAX((HAL_RADIO_PDU_LEN_MAX + 3), PDU_AC_LL_SIZE_MAX)];
 
 void *radio_pkt_decrypt_get(void)
 {
@@ -442,8 +436,8 @@ void *radio_pkt_decrypt_get(void)
 #if !defined(CONFIG_BT_CTLR_TIFS_HW)
 static uint8_t sw_tifs_toggle;
 
-static void sw_switch(uint8_t dir, uint8_t phy_curr, uint8_t flags_curr, uint8_t phy_next,
-		      uint8_t flags_next)
+static void sw_switch(uint8_t dir, uint8_t phy_curr, uint8_t flags_curr,
+		      uint8_t phy_next, uint8_t flags_next)
 {
 	uint8_t ppi = HAL_SW_SWITCH_RADIO_ENABLE_PPI(sw_tifs_toggle);
 	uint8_t cc = SW_SWITCH_TIMER_EVTS_COMP(sw_tifs_toggle);
@@ -458,35 +452,33 @@ static void sw_switch(uint8_t dir, uint8_t phy_curr, uint8_t flags_curr, uint8_t
 		 * (TX) PHY. If RX PHY is LE Coded, assume S8 coding scheme.
 		 */
 		delay = HAL_RADIO_NS2US_ROUND(
-		    hal_radio_tx_ready_delay_ns_get(phy_next, flags_next) +
-		    hal_radio_rx_chain_delay_ns_get(phy_curr, 1));
+			hal_radio_tx_ready_delay_ns_get(phy_next, flags_next) +
+			hal_radio_rx_chain_delay_ns_get(phy_curr, 1));
 
 		hal_radio_txen_on_sw_switch(ppi);
 
 #if defined(CONFIG_BT_CTLR_PHY_CODED)
 #if defined(CONFIG_HAS_HW_NRF_RADIO_BLE_CODED)
 		uint8_t ppi_en =
-		    HAL_SW_SWITCH_RADIO_ENABLE_S2_PPI(sw_tifs_toggle);
+			HAL_SW_SWITCH_RADIO_ENABLE_S2_PPI(sw_tifs_toggle);
 		uint8_t ppi_dis =
-			HAL_SW_SWITCH_GROUP_TASK_DISABLE_PPI(
-			    sw_tifs_toggle);
+			HAL_SW_SWITCH_GROUP_TASK_DISABLE_PPI(sw_tifs_toggle);
 
 		if (phy_curr & BIT(2)) {
 			/* Switching to TX after RX on LE Coded PHY. */
 
 			uint8_t cc_s2 =
-			    SW_SWITCH_TIMER_S2_EVTS_COMP(sw_tifs_toggle);
+				SW_SWITCH_TIMER_S2_EVTS_COMP(sw_tifs_toggle);
 
 			uint32_t delay_s2;
 
 			/* Calculate assuming reception on S2 coding scheme. */
 			delay_s2 = HAL_RADIO_NS2US_ROUND(
-				hal_radio_tx_ready_delay_ns_get(
-					phy_next, flags_next) +
+				hal_radio_tx_ready_delay_ns_get(phy_next,
+								flags_next) +
 				hal_radio_rx_chain_delay_ns_get(phy_curr, 0));
 
-			SW_SWITCH_TIMER->CC[cc_s2] =
-				SW_SWITCH_TIMER->CC[cc];
+			SW_SWITCH_TIMER->CC[cc_s2] = SW_SWITCH_TIMER->CC[cc];
 
 			if (delay_s2 < SW_SWITCH_TIMER->CC[cc_s2]) {
 				SW_SWITCH_TIMER->CC[cc_s2] -= delay_s2;
@@ -494,13 +486,13 @@ static void sw_switch(uint8_t dir, uint8_t phy_curr, uint8_t flags_curr, uint8_t
 				SW_SWITCH_TIMER->CC[cc_s2] = 1;
 			}
 
-			hal_radio_sw_switch_coded_tx_config_set(ppi_en, ppi_dis,
-				cc_s2, sw_tifs_toggle);
+			hal_radio_sw_switch_coded_tx_config_set(
+				ppi_en, ppi_dis, cc_s2, sw_tifs_toggle);
 		} else {
 			/* Switching to TX after RX on LE 1M/2M PHY */
 
-			hal_radio_sw_switch_coded_config_clear(ppi_en,
-				ppi_dis, cc, sw_tifs_toggle);
+			hal_radio_sw_switch_coded_config_clear(
+				ppi_en, ppi_dis, cc, sw_tifs_toggle);
 		}
 #endif /* CONFIG_HAS_HW_NRF_RADIO_BLE_CODED */
 #endif /* CONFIG_BT_CTLR_PHY_CODED */
@@ -515,30 +507,28 @@ static void sw_switch(uint8_t dir, uint8_t phy_curr, uint8_t flags_curr, uint8_t
 #if defined(CONFIG_BT_CTLR_PHY_CODED)
 #if defined(CONFIG_HAS_HW_NRF_RADIO_BLE_CODED)
 		if (1) {
-			uint8_t ppi_en =
-				HAL_SW_SWITCH_RADIO_ENABLE_S2_PPI(
-					sw_tifs_toggle);
-			uint8_t ppi_dis =
-				HAL_SW_SWITCH_GROUP_TASK_DISABLE_PPI(
-					sw_tifs_toggle);
+			uint8_t ppi_en = HAL_SW_SWITCH_RADIO_ENABLE_S2_PPI(
+				sw_tifs_toggle);
+			uint8_t ppi_dis = HAL_SW_SWITCH_GROUP_TASK_DISABLE_PPI(
+				sw_tifs_toggle);
 
-			hal_radio_sw_switch_coded_config_clear(ppi_en,
-				ppi_dis, cc, sw_tifs_toggle);
+			hal_radio_sw_switch_coded_config_clear(
+				ppi_en, ppi_dis, cc, sw_tifs_toggle);
 		}
 #endif /* CONFIG_HAS_HW_NRF_RADIO_BLE_CODED */
 #endif /* CONFIG_BT_CTLR_PHY_CODED */
 	}
 
-	if (delay <
-		SW_SWITCH_TIMER->CC[cc]) {
+	if (delay < SW_SWITCH_TIMER->CC[cc]) {
 		nrf_timer_cc_set(SW_SWITCH_TIMER, cc,
 				 SW_SWITCH_TIMER->CC[cc] - delay);
 	} else {
 		nrf_timer_cc_set(SW_SWITCH_TIMER, cc, 1);
 	}
 
-	hal_radio_nrf_ppi_channels_enable(BIT(HAL_SW_SWITCH_TIMER_CLEAR_PPI) |
-				BIT(HAL_SW_SWITCH_GROUP_TASK_ENABLE_PPI));
+	hal_radio_nrf_ppi_channels_enable(
+		BIT(HAL_SW_SWITCH_TIMER_CLEAR_PPI) |
+		BIT(HAL_SW_SWITCH_GROUP_TASK_ENABLE_PPI));
 
 #if defined(CONFIG_BT_CTLR_SW_SWITCH_SINGLE_TIMER)
 	/* Since the event timer is cleared on END, we
@@ -565,8 +555,8 @@ void radio_switch_complete_and_rx(uint8_t phy_rx)
 #endif /* !CONFIG_BT_CTLR_TIFS_HW */
 }
 
-void radio_switch_complete_and_tx(uint8_t phy_rx, uint8_t flags_rx, uint8_t phy_tx,
-				  uint8_t flags_tx)
+void radio_switch_complete_and_tx(uint8_t phy_rx, uint8_t flags_rx,
+				  uint8_t phy_tx, uint8_t flags_tx)
 {
 #if defined(CONFIG_BT_CTLR_TIFS_HW)
 	NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk |
@@ -582,7 +572,7 @@ void radio_switch_complete_and_tx(uint8_t phy_rx, uint8_t flags_rx, uint8_t phy_
 void radio_switch_complete_and_disable(void)
 {
 	NRF_RADIO->SHORTS =
-	    (RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk);
+		(RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk);
 
 #if !defined(CONFIG_BT_CTLR_TIFS_HW)
 	hal_radio_sw_switch_disable();
@@ -591,9 +581,8 @@ void radio_switch_complete_and_disable(void)
 
 void radio_rssi_measure(void)
 {
-	NRF_RADIO->SHORTS |=
-	    (RADIO_SHORTS_ADDRESS_RSSISTART_Msk |
-	     RADIO_SHORTS_DISABLED_RSSISTOP_Msk);
+	NRF_RADIO->SHORTS |= (RADIO_SHORTS_ADDRESS_RSSISTART_Msk |
+			      RADIO_SHORTS_DISABLED_RSSISTOP_Msk);
 }
 
 uint32_t radio_rssi_get(void)
@@ -618,9 +607,8 @@ void radio_filter_configure(uint8_t bitmask_enable, uint8_t bitmask_addr_type,
 
 	for (index = 0U; index < 8; index++) {
 		NRF_RADIO->DAB[index] = ((uint32_t)bdaddr[3] << 24) |
-			((uint32_t)bdaddr[2] << 16) |
-			((uint32_t)bdaddr[1] << 8) |
-			bdaddr[0];
+					((uint32_t)bdaddr[2] << 16) |
+					((uint32_t)bdaddr[1] << 8) | bdaddr[0];
 		NRF_RADIO->DAP[index] = ((uint32_t)bdaddr[5] << 8) | bdaddr[4];
 		bdaddr += 6;
 	}
@@ -669,22 +657,22 @@ void radio_tmr_status_reset(void)
 	nrf_rtc_event_disable(NRF_RTC0, RTC_EVTENCLR_COMPARE2_Msk);
 
 	hal_radio_nrf_ppi_channels_disable(
-			BIT(HAL_RADIO_ENABLE_TX_ON_TICK_PPI) |
-			BIT(HAL_RADIO_ENABLE_RX_ON_TICK_PPI) |
-			BIT(HAL_EVENT_TIMER_START_PPI) |
-			BIT(HAL_RADIO_READY_TIME_CAPTURE_PPI) |
-			BIT(HAL_RADIO_RECV_TIMEOUT_CANCEL_PPI) |
-			BIT(HAL_RADIO_DISABLE_ON_HCTO_PPI) |
-			BIT(HAL_RADIO_END_TIME_CAPTURE_PPI) |
+		BIT(HAL_RADIO_ENABLE_TX_ON_TICK_PPI) |
+		BIT(HAL_RADIO_ENABLE_RX_ON_TICK_PPI) |
+		BIT(HAL_EVENT_TIMER_START_PPI) |
+		BIT(HAL_RADIO_READY_TIME_CAPTURE_PPI) |
+		BIT(HAL_RADIO_RECV_TIMEOUT_CANCEL_PPI) |
+		BIT(HAL_RADIO_DISABLE_ON_HCTO_PPI) |
+		BIT(HAL_RADIO_END_TIME_CAPTURE_PPI) |
 #if defined(CONFIG_BT_CTLR_PHY_CODED)
 #if defined(CONFIG_HAS_HW_NRF_RADIO_BLE_CODED)
-			BIT(HAL_TRIGGER_RATEOVERRIDE_PPI) |
+		BIT(HAL_TRIGGER_RATEOVERRIDE_PPI) |
 #if !defined(CONFIG_BT_CTLR_TIFS_HW)
-			BIT(HAL_SW_SWITCH_TIMER_S8_DISABLE_PPI) |
+		BIT(HAL_SW_SWITCH_TIMER_S8_DISABLE_PPI) |
 #endif /* !CONFIG_BT_CTLR_TIFS_HW */
 #endif /* CONFIG_HAS_HW_NRF_RADIO_BLE_CODED */
 #endif /* CONFIG_BT_CTLR_PHY_CODED */
-			BIT(HAL_TRIGGER_CRYPT_PPI));
+		BIT(HAL_TRIGGER_CRYPT_PPI));
 }
 
 void radio_tmr_tifs_set(uint32_t tifs)
@@ -708,7 +696,7 @@ uint32_t radio_tmr_start(uint8_t trx, uint32_t ticks_start, uint32_t remainder)
 	nrf_timer_task_trigger(EVENT_TIMER, NRF_TIMER_TASK_CLEAR);
 	EVENT_TIMER->MODE = 0;
 	EVENT_TIMER->PRESCALER = 4;
-	EVENT_TIMER->BITMODE = 2;	/* 24 - bit */
+	EVENT_TIMER->BITMODE = 2; /* 24 - bit */
 
 	nrf_timer_cc_set(EVENT_TIMER, 0, remainder);
 
@@ -952,8 +940,7 @@ uint32_t radio_tmr_sample_get(void)
 #endif /* !CONFIG_BT_CTLR_SW_SWITCH_SINGLE_TIMER */
 }
 
-#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || \
-    defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
+#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 #if defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
 void radio_gpio_pa_setup(void)
 {
@@ -962,18 +949,13 @@ void radio_gpio_pa_setup(void)
 	 *       set the NRF_GPIOTE->CONFIG[n].PORT to 1 (P1 port).
 	 */
 	NRF_GPIOTE->CONFIG[CONFIG_BT_CTLR_PA_LNA_GPIOTE_CHAN] =
-		(GPIOTE_CONFIG_MODE_Task <<
-		 GPIOTE_CONFIG_MODE_Pos) |
-		(CONFIG_BT_CTLR_GPIO_PA_PIN <<
-		 GPIOTE_CONFIG_PSEL_Pos) |
-		(GPIOTE_CONFIG_POLARITY_Toggle <<
-		 GPIOTE_CONFIG_POLARITY_Pos) |
+		(GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+		(CONFIG_BT_CTLR_GPIO_PA_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+		(GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
 #if defined(CONFIG_BT_CTLR_GPIO_PA_POL_INV)
-		(GPIOTE_CONFIG_OUTINIT_High <<
-		 GPIOTE_CONFIG_OUTINIT_Pos);
+		(GPIOTE_CONFIG_OUTINIT_High << GPIOTE_CONFIG_OUTINIT_Pos);
 #else
-		(GPIOTE_CONFIG_OUTINIT_Low <<
-		 GPIOTE_CONFIG_OUTINIT_Pos);
+		(GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
 #endif
 }
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN */
@@ -986,18 +968,13 @@ void radio_gpio_lna_setup(void)
 	 *       set the NRF_GPIOTE->CONFIG[n].PORT to 1 (P1 port).
 	 */
 	NRF_GPIOTE->CONFIG[CONFIG_BT_CTLR_PA_LNA_GPIOTE_CHAN] =
-		(GPIOTE_CONFIG_MODE_Task <<
-		 GPIOTE_CONFIG_MODE_Pos) |
-		(CONFIG_BT_CTLR_GPIO_LNA_PIN <<
-		 GPIOTE_CONFIG_PSEL_Pos) |
-		(GPIOTE_CONFIG_POLARITY_Toggle <<
-		 GPIOTE_CONFIG_POLARITY_Pos) |
+		(GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+		(CONFIG_BT_CTLR_GPIO_LNA_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+		(GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
 #if defined(CONFIG_BT_CTLR_GPIO_LNA_POL_INV)
-		(GPIOTE_CONFIG_OUTINIT_High <<
-		 GPIOTE_CONFIG_OUTINIT_Pos);
+		(GPIOTE_CONFIG_OUTINIT_High << GPIOTE_CONFIG_OUTINIT_Pos);
 #else
-		(GPIOTE_CONFIG_OUTINIT_Low <<
-		 GPIOTE_CONFIG_OUTINIT_Pos);
+		(GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
 #endif
 }
 
@@ -1027,13 +1004,13 @@ void radio_gpio_pa_lna_enable(uint32_t trx_us)
 	hal_enable_palna_ppi_config();
 	hal_disable_palna_ppi_config();
 	hal_radio_nrf_ppi_channels_enable(BIT(HAL_ENABLE_PALNA_PPI) |
-				BIT(HAL_DISABLE_PALNA_PPI));
+					  BIT(HAL_DISABLE_PALNA_PPI));
 }
 
 void radio_gpio_pa_lna_disable(void)
 {
 	hal_radio_nrf_ppi_channels_disable(BIT(HAL_ENABLE_PALNA_PPI) |
-				 BIT(HAL_DISABLE_PALNA_PPI));
+					   BIT(HAL_DISABLE_PALNA_PPI));
 }
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
 
@@ -1057,28 +1034,24 @@ void *radio_ccm_rx_pkt_set(struct ccm *ccm, uint8_t phy, void *pkt)
 	switch (phy) {
 	default:
 	case BIT(0):
-		mode |= (CCM_MODE_DATARATE_1Mbit <<
-			 CCM_MODE_DATARATE_Pos) &
+		mode |= (CCM_MODE_DATARATE_1Mbit << CCM_MODE_DATARATE_Pos) &
 			CCM_MODE_DATARATE_Msk;
 		break;
 
 	case BIT(1):
-		mode |= (CCM_MODE_DATARATE_2Mbit <<
-			 CCM_MODE_DATARATE_Pos) &
+		mode |= (CCM_MODE_DATARATE_2Mbit << CCM_MODE_DATARATE_Pos) &
 			CCM_MODE_DATARATE_Msk;
 		break;
 
 #if defined(CONFIG_BT_CTLR_PHY_CODED)
 #if defined(CONFIG_HAS_HW_NRF_RADIO_BLE_CODED)
 	case BIT(2):
-		mode |= (CCM_MODE_DATARATE_125Kbps <<
-			 CCM_MODE_DATARATE_Pos) &
+		mode |= (CCM_MODE_DATARATE_125Kbps << CCM_MODE_DATARATE_Pos) &
 			CCM_MODE_DATARATE_Msk;
 
-		NRF_CCM->RATEOVERRIDE =
-			(CCM_RATEOVERRIDE_RATEOVERRIDE_500Kbps <<
-			 CCM_RATEOVERRIDE_RATEOVERRIDE_Pos) &
-			CCM_RATEOVERRIDE_RATEOVERRIDE_Msk;
+		NRF_CCM->RATEOVERRIDE = (CCM_RATEOVERRIDE_RATEOVERRIDE_500Kbps
+					 << CCM_RATEOVERRIDE_RATEOVERRIDE_Pos) &
+					CCM_RATEOVERRIDE_RATEOVERRIDE_Msk;
 
 		hal_trigger_rateoverride_ppi_config();
 		hal_radio_nrf_ppi_channels_enable(
@@ -1088,11 +1061,11 @@ void *radio_ccm_rx_pkt_set(struct ccm *ccm, uint8_t phy, void *pkt)
 #endif /* CONFIG_BT_CTLR_PHY_CODED */
 	}
 
-#if !defined(CONFIG_SOC_COMPATIBLE_NRF52832) && \
+#if !defined(CONFIG_SOC_COMPATIBLE_NRF52832) &&      \
 	(!defined(CONFIG_BT_CTLR_DATA_LENGTH_MAX) || \
-	 (CONFIG_BT_CTLR_DATA_LENGTH_MAX < ((HAL_RADIO_PDU_LEN_MAX) - 4)))
+	 (CONFIG_BT_CTLR_DATA_LENGTH_MAX < ((HAL_RADIO_PDU_LEN_MAX)-4)))
 	uint8_t max_len = (NRF_RADIO->PCNF1 & RADIO_PCNF1_MAXLEN_Msk) >>
-			RADIO_PCNF1_MAXLEN_Pos;
+			  RADIO_PCNF1_MAXLEN_Pos;
 
 	NRF_CCM->MAXPACKETSIZE = max_len;
 #endif
@@ -1198,14 +1171,13 @@ void radio_ar_status_reset(void)
 {
 	radio_bc_status_reset();
 
-	NRF_AAR->ENABLE = (AAR_ENABLE_ENABLE_Disabled << AAR_ENABLE_ENABLE_Pos) &
-			  AAR_ENABLE_ENABLE_Msk;
+	NRF_AAR->ENABLE =
+		(AAR_ENABLE_ENABLE_Disabled << AAR_ENABLE_ENABLE_Pos) &
+		AAR_ENABLE_ENABLE_Msk;
 }
 
 uint32_t radio_ar_has_match(void)
 {
-	return (radio_bc_has_match() &&
-		NRF_AAR->EVENTS_END &&
-		NRF_AAR->EVENTS_RESOLVED &&
-		!NRF_AAR->EVENTS_NOTRESOLVED);
+	return (radio_bc_has_match() && NRF_AAR->EVENTS_END &&
+		NRF_AAR->EVENTS_RESOLVED && !NRF_AAR->EVENTS_NOTRESOLVED);
 }

@@ -12,9 +12,8 @@
  * Call 'cb' for every element in flash circular buffer. If sector is specified,
  * only elements with that flash_sector are reported.
  */
-int
-fcb_walk(struct fcb *fcb, struct flash_sector *sector, fcb_walk_cb cb,
-	 void *cb_arg)
+int fcb_walk(struct fcb *fcb, struct flash_sector *sector, fcb_walk_cb cb,
+	     void *cb_arg)
 {
 	struct fcb_entry_ctx entry_ctx;
 	int rc;
@@ -26,8 +25,7 @@ fcb_walk(struct fcb *fcb, struct flash_sector *sector, fcb_walk_cb cb,
 	if (rc < 0) {
 		return -EINVAL;
 	}
-	while ((rc = fcb_getnext_nolock(fcb, &entry_ctx.loc)) !=
-	       -ENOTSUP) {
+	while ((rc = fcb_getnext_nolock(fcb, &entry_ctx.loc)) != -ENOTSUP) {
 		k_mutex_unlock(&fcb->f_mtx);
 		if (sector && entry_ctx.loc.fe_sector != sector) {
 			return 0;

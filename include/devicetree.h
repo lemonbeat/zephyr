@@ -441,8 +441,7 @@
  * @return An expression which evaluates to 1 if "idx" is a valid index
  *         into the given property, and 0 otherwise.
  */
-#define DT_PROP_HAS_IDX(node_id, prop, idx) \
-	((idx) < DT_PROP_LEN(node_id, prop))
+#define DT_PROP_HAS_IDX(node_id, prop, idx) ((idx) < DT_PROP_LEN(node_id, prop))
 
 /**
  * @brief Get the value at index "idx" in an array type property
@@ -481,9 +480,9 @@
  * @param default_value a fallback value to expand to
  * @return the property's value or default_value
  */
-#define DT_PROP_OR(node_id, prop, default_value) \
-	COND_CODE_1(DT_NODE_HAS_PROP(node_id, prop), \
-		    (DT_PROP(node_id, prop)), (default_value))
+#define DT_PROP_OR(node_id, prop, default_value)                               \
+	COND_CODE_1(DT_NODE_HAS_PROP(node_id, prop), (DT_PROP(node_id, prop)), \
+		    (default_value))
 
 /**
  * @brief Equivalent to DT_PROP(node_id, label)
@@ -546,7 +545,7 @@
  *         default_idx_value ohterwise
  */
 #define DT_ENUM_IDX_OR(node_id, prop, default_idx_value) \
-	COND_CODE_1(DT_NODE_HAS_PROP(node_id, prop), \
+	COND_CODE_1(DT_NODE_HAS_PROP(node_id, prop),     \
 		    (DT_ENUM_IDX(node_id, prop)), (default_idx_value))
 
 /*
@@ -1066,7 +1065,7 @@
  * @param cell cell name specifier
  * @return the named value at the specifier given by the index
  */
-#define DT_IRQ_BY_IDX(node_id, idx, cell)   \
+#define DT_IRQ_BY_IDX(node_id, idx, cell) \
 	DT_CAT(node_id, _IRQ_IDX_##idx##_VAL_##cell)
 
 /**
@@ -1180,9 +1179,7 @@
  * @param node_id node identifier
  * @param fn macro to invoke
  */
-#define DT_FOREACH_CHILD(node_id, fn) \
-	DT_CAT(node_id, _FOREACH_CHILD)(fn)
-
+#define DT_FOREACH_CHILD(node_id, fn) DT_CAT(node_id, _FOREACH_CHILD)(fn)
 
 /**
  * @}
@@ -1258,8 +1255,8 @@
  * @param compat lowercase-and-underscores version of a compatible
  * @return Number of instances with status "okay"
  */
-#define DT_NUM_INST_STATUS_OKAY(compat)			\
-	UTIL_AND(DT_HAS_COMPAT_STATUS_OKAY(compat),		\
+#define DT_NUM_INST_STATUS_OKAY(compat)             \
+	UTIL_AND(DT_HAS_COMPAT_STATUS_OKAY(compat), \
 		 UTIL_CAT(DT_N_INST, DT_DASH(compat, NUM_OKAY)))
 
 /**
@@ -1301,7 +1298,8 @@
  * @param status okay or disabled as a token, not a string
  */
 #define DT_NODE_HAS_COMPAT_STATUS(node_id, compat, status) \
-	DT_NODE_HAS_COMPAT(node_id, compat) && DT_NODE_HAS_STATUS(node_id, status)
+	DT_NODE_HAS_COMPAT(node_id, compat) &&             \
+		DT_NODE_HAS_STATUS(node_id, status)
 
 /**
  * @brief Does a devicetree node have a property?
@@ -1319,7 +1317,6 @@
 #define DT_NODE_HAS_PROP(node_id, prop) \
 	IS_ENABLED(DT_CAT(node_id, _P_##prop##_EXISTS))
 
-
 /**
  * @brief Does a phandle array have a named cell specifier at an index?
  *
@@ -1336,9 +1333,8 @@
  * @return 1 if the named cell exists in the specifier at index idx,
  *         0 otherwise.
  */
-#define DT_PHA_HAS_CELL_AT_IDX(node_id, pha, idx, cell)             \
-	IS_ENABLED(DT_PROP(node_id,                                 \
-			   pha##_IDX_##idx##_VAL_##cell##_EXISTS))
+#define DT_PHA_HAS_CELL_AT_IDX(node_id, pha, idx, cell) \
+	IS_ENABLED(DT_PROP(node_id, pha##_IDX_##idx##_VAL_##cell##_EXISTS))
 
 /**
  * @brief Equivalent to DT_PHA_HAS_CELL_AT_IDX(node_id, pha, 0, cell)
@@ -1454,8 +1450,7 @@
  *
  * @see DT_FOREACH_CHILD
  */
-#define DT_INST_FOREACH_CHILD(inst, fn) \
-	DT_FOREACH_CHILD(DT_DRV_INST(inst), fn)
+#define DT_INST_FOREACH_CHILD(inst, fn) DT_FOREACH_CHILD(DT_DRV_INST(inst), fn)
 
 /**
  * @brief Get a DT_DRV_COMPAT instance property
@@ -1614,7 +1609,7 @@
  * @return node identifier for the phandle at the element named "name"
  */
 #define DT_INST_PHANDLE_BY_NAME(inst, pha, name) \
-	DT_PHANDLE_BY_NAME(DT_DRV_INST(inst), pha, name) \
+	DT_PHANDLE_BY_NAME(DT_DRV_INST(inst), pha, name)
 
 /**
  * @brief Get a DT_DRV_COMPAT instance's node identifier for a phandle in
@@ -1653,7 +1648,8 @@
  * @param idx index of the register whose address to return
  * @return address of the instance's idx-th register block
  */
-#define DT_INST_REG_ADDR_BY_IDX(inst, idx) DT_REG_ADDR_BY_IDX(DT_DRV_INST(inst), idx)
+#define DT_INST_REG_ADDR_BY_IDX(inst, idx) \
+	DT_REG_ADDR_BY_IDX(DT_DRV_INST(inst), idx)
 
 /**
  * @brief Get a DT_DRV_COMPAT instance's idx-th register block's size
@@ -1837,11 +1833,9 @@
  * @param fn Macro to call for each enabled node. Must accept an
  *           instance number as its only parameter.
  */
-#define DT_INST_FOREACH_STATUS_OKAY(fn) \
-	COND_CODE_1(DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT),	\
-		    (UTIL_CAT(DT_FOREACH_OKAY_INST_,		\
-			      DT_DRV_COMPAT)(fn)),		\
-		    ())
+#define DT_INST_FOREACH_STATUS_OKAY(fn)                       \
+	COND_CODE_1(DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT), \
+		    (UTIL_CAT(DT_FOREACH_OKAY_INST_, DT_DRV_COMPAT)(fn)), ())
 
 /**
  * @brief Does a DT_DRV_COMPAT instance have a property?
@@ -1933,7 +1927,7 @@
 #define DT_DASH_PREFIX(name) _##name
 /** @internal helper for DT_NODE_HAS_STATUS */
 #define DT_NODE_HAS_STATUS_INTERNAL(node_id, status) \
-	IS_ENABLED(DT_CAT(node_id, _STATUS_ ## status))
+	IS_ENABLED(DT_CAT(node_id, _STATUS_##status))
 /** @internal helper for test cases and DT_ANY_INST_ON_BUS_STATUS_OKAY() */
 #define DT_COMPAT_ON_BUS_INTERNAL(compat, bus) \
 	IS_ENABLED(UTIL_CAT(DT_CAT(DT_COMPAT_, compat), _BUS_##bus))

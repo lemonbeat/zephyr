@@ -54,13 +54,11 @@ static void isr_done(void *param);
 static void isr_abort(void *param);
 static struct pdu_adv *chan_prepare(struct lll_adv *lll);
 
-static inline int isr_rx_pdu(struct lll_adv *lll,
-			     uint8_t devmatch_ok, uint8_t devmatch_id,
-			     uint8_t irkmatch_ok, uint8_t irkmatch_id,
-			     uint8_t rssi_ready);
+static inline int isr_rx_pdu(struct lll_adv *lll, uint8_t devmatch_ok,
+			     uint8_t devmatch_id, uint8_t irkmatch_ok,
+			     uint8_t irkmatch_id, uint8_t rssi_ready);
 static bool isr_rx_sr_adva_check(uint8_t tx_addr, uint8_t *addr,
 				 struct pdu_adv *sr);
-
 
 static inline bool isr_rx_ci_check(struct lll_adv *lll, struct pdu_adv *adv,
 				   struct pdu_adv *ci, uint8_t devmatch_ok,
@@ -108,20 +106,19 @@ void lll_adv_prepare(void *param)
 }
 
 bool lll_adv_scan_req_check(struct lll_adv *lll, struct pdu_adv *sr,
-			    uint8_t tx_addr, uint8_t *addr,
-			    uint8_t devmatch_ok, uint8_t *rl_idx)
+			    uint8_t tx_addr, uint8_t *addr, uint8_t devmatch_ok,
+			    uint8_t *rl_idx)
 {
 #if defined(CONFIG_BT_CTLR_PRIVACY)
 	return ((((lll->filter_policy & 0x01) == 0) &&
-		 ull_filter_lll_rl_addr_allowed(sr->tx_addr,
-						sr->scan_req.scan_addr,
-						rl_idx)) ||
+		 ull_filter_lll_rl_addr_allowed(
+			 sr->tx_addr, sr->scan_req.scan_addr, rl_idx)) ||
 		(((lll->filter_policy & 0x01) != 0) &&
 		 (devmatch_ok || ull_filter_lll_irk_whitelisted(*rl_idx)))) &&
-		isr_rx_sr_adva_check(tx_addr, addr, sr);
+	       isr_rx_sr_adva_check(tx_addr, addr, sr);
 #else
 	return (((lll->filter_policy & 0x01) == 0U) || devmatch_ok) &&
-		isr_rx_sr_adva_check(tx_addr, addr, sr);
+	       isr_rx_sr_adva_check(tx_addr, addr, sr);
 #endif /* CONFIG_BT_CTLR_PRIVACY */
 }
 
@@ -151,7 +148,7 @@ int lll_adv_scan_req_report(struct lll_adv *lll, struct pdu_adv *pdu_adv_rx,
 	memcpy(pdu_adv, pdu_adv_rx, pdu_len);
 
 	node_rx->hdr.rx_ftr.rssi = (rssi_ready) ? (radio_rssi_get() & 0x7f) :
-						  0x7f;
+							0x7f;
 #if defined(CONFIG_BT_CTLR_PRIVACY)
 	node_rx->hdr.rx_ftr.rl_idx = rl_idx;
 #endif
@@ -223,7 +220,6 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 	_radio.mesh_adv_end_us = 0;
 #endif /* CONFIG_BT_HCI_MESH_EXT */
 
-
 #if defined(CONFIG_BT_CTLR_PRIVACY)
 	if (ull_filter_lll_rl_enabled()) {
 		struct lll_filter *filter =
@@ -235,10 +231,9 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 	} else
 #endif /* CONFIG_BT_CTLR_PRIVACY */
 
-	if (IS_ENABLED(CONFIG_BT_CTLR_FILTER) && lll->filter_policy) {
+		if (IS_ENABLED(CONFIG_BT_CTLR_FILTER) && lll->filter_policy) {
 		/* Setup Radio Filter */
 		struct lll_filter *wl = ull_filter_lll_get(true);
-
 
 		radio_filter_configure(wl->enable_bitmask,
 				       wl->addr_type_bitmask,
@@ -269,8 +264,8 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 #if defined(CONFIG_BT_CTLR_XTAL_ADVANCED) && \
 	(EVENT_OVERHEAD_PREEMPT_US <= EVENT_OVERHEAD_PREEMPT_MIN_US)
 	/* check if preempt to start has changed */
-	if (lll_preempt_calc(evt, (TICKER_ID_ADV_BASE +
-				   ull_adv_lll_handle_get(lll)),
+	if (lll_preempt_calc(evt,
+			     (TICKER_ID_ADV_BASE + ull_adv_lll_handle_get(lll)),
 			     ticks_at_event)) {
 		radio_isr_set(isr_abort, lll);
 		radio_disable();
@@ -501,8 +496,7 @@ static void isr_done(void *param)
 	lll_isr_status_reset();
 
 #if defined(CONFIG_BT_HCI_MESH_EXT)
-	if (_radio.advertiser.is_mesh &&
-	    !_radio.mesh_adv_end_us) {
+	if (_radio.advertiser.is_mesh && !_radio.mesh_adv_end_us) {
 		_radio.mesh_adv_end_us = radio_tmr_end_get();
 	}
 #endif /* CONFIG_BT_HCI_MESH_EXT */
@@ -609,7 +603,7 @@ static void isr_done(void *param)
 	LL_ASSERT(extra);
 
 	extra->type = EVENT_DONE_EXTRA_TYPE_ADV;
-#endif  /* CONFIG_BT_CTLR_ADV_EXT */
+#endif /* CONFIG_BT_CTLR_ADV_EXT */
 
 	lll_isr_cleanup(param);
 }
@@ -673,10 +667,9 @@ static struct pdu_adv *chan_prepare(struct lll_adv *lll)
 	return pdu;
 }
 
-static inline int isr_rx_pdu(struct lll_adv *lll,
-			     uint8_t devmatch_ok, uint8_t devmatch_id,
-			     uint8_t irkmatch_ok, uint8_t irkmatch_id,
-			     uint8_t rssi_ready)
+static inline int isr_rx_pdu(struct lll_adv *lll, uint8_t devmatch_ok,
+			     uint8_t devmatch_id, uint8_t irkmatch_ok,
+			     uint8_t irkmatch_id, uint8_t rssi_ready)
 {
 	struct pdu_adv *pdu_rx, *pdu_adv;
 	uint8_t tx_addr;
@@ -685,7 +678,7 @@ static inline int isr_rx_pdu(struct lll_adv *lll,
 #if defined(CONFIG_BT_CTLR_PRIVACY)
 	/* An IRK match implies address resolution enabled */
 	uint8_t rl_idx = irkmatch_ok ? ull_filter_lll_rl_irk_idx(irkmatch_id) :
-				    FILTER_IDX_NONE;
+					     FILTER_IDX_NONE;
 #else
 	uint8_t rl_idx = FILTER_IDX_NONE;
 #endif /* CONFIG_BT_CTLR_PRIVACY */
@@ -700,7 +693,7 @@ static inline int isr_rx_pdu(struct lll_adv *lll,
 	    (pdu_rx->len == sizeof(struct pdu_adv_scan_req)) &&
 	    (pdu_adv->type != PDU_ADV_TYPE_DIRECT_IND) &&
 	    lll_adv_scan_req_check(lll, pdu_rx, tx_addr, addr, devmatch_ok,
-				    &rl_idx)) {
+				   &rl_idx)) {
 		radio_isr_set(isr_done, lll);
 		radio_switch_complete_and_disable();
 		radio_pkt_tx_set(lll_adv_scan_rsp_curr_get(lll));
@@ -775,7 +768,7 @@ static inline int isr_rx_pdu(struct lll_adv *lll,
 
 #if defined(CONFIG_BT_CTLR_CONN_RSSI)
 		if (rssi_ready) {
-			lll->conn->rssi_latest =  radio_rssi_get();
+			lll->conn->rssi_latest = radio_rssi_get();
 		}
 #endif /* CONFIG_BT_CTLR_CONN_RSSI */
 
@@ -788,14 +781,15 @@ static inline int isr_rx_pdu(struct lll_adv *lll,
 		rx->hdr.type = NODE_RX_TYPE_CONNECTION;
 		rx->hdr.handle = 0xffff;
 
-		memcpy(rx->pdu, pdu_rx, (offsetof(struct pdu_adv, connect_ind) +
-					 sizeof(struct pdu_adv_connect_ind)));
+		memcpy(rx->pdu, pdu_rx,
+		       (offsetof(struct pdu_adv, connect_ind) +
+			sizeof(struct pdu_adv_connect_ind)));
 
 		ftr = &(rx->hdr.rx_ftr);
 		ftr->param = lll;
 		ftr->ticks_anchor = radio_tmr_start_get();
-		ftr->radio_end_us = radio_tmr_end_get() -
-				    radio_tx_chain_delay_get(0, 0);
+		ftr->radio_end_us =
+			radio_tmr_end_get() - radio_tx_chain_delay_get(0, 0);
 
 #if defined(CONFIG_BT_CTLR_PRIVACY)
 		ftr->rl_idx = irkmatch_ok ? rl_idx : FILTER_IDX_NONE;
@@ -819,7 +813,7 @@ static bool isr_rx_sr_adva_check(uint8_t tx_addr, uint8_t *addr,
 				 struct pdu_adv *sr)
 {
 	return (tx_addr == sr->rx_addr) &&
-		!memcmp(addr, sr->scan_req.adv_addr, BDADDR_SIZE);
+	       !memcmp(addr, sr->scan_req.adv_addr, BDADDR_SIZE);
 }
 
 static inline bool isr_rx_ci_check(struct lll_adv *lll, struct pdu_adv *adv,
@@ -841,15 +835,13 @@ static inline bool isr_rx_ci_check(struct lll_adv *lll, struct pdu_adv *adv,
 
 #if defined(CONFIG_BT_CTLR_PRIVACY)
 	return ((((lll->filter_policy & 0x02) == 0) &&
-		 ull_filter_lll_rl_addr_allowed(ci->tx_addr,
-						ci->connect_ind.init_addr,
-						rl_idx)) ||
+		 ull_filter_lll_rl_addr_allowed(
+			 ci->tx_addr, ci->connect_ind.init_addr, rl_idx)) ||
 		(((lll->filter_policy & 0x02) != 0) &&
 		 (devmatch_ok || ull_filter_lll_irk_whitelisted(*rl_idx)))) &&
 	       isr_rx_ci_adva_check(adv, ci);
 #else
-	return (((lll->filter_policy & 0x02) == 0) ||
-		(devmatch_ok)) &&
+	return (((lll->filter_policy & 0x02) == 0) || (devmatch_ok)) &&
 	       isr_rx_ci_adva_check(adv, ci);
 #endif /* CONFIG_BT_CTLR_PRIVACY */
 }
@@ -868,13 +860,12 @@ static inline bool isr_rx_ci_tgta_check(struct lll_adv *lll,
 		       BDADDR_SIZE);
 }
 
-static inline bool isr_rx_ci_adva_check(struct pdu_adv *adv,
-					struct pdu_adv *ci)
+static inline bool isr_rx_ci_adva_check(struct pdu_adv *adv, struct pdu_adv *ci)
 {
 	return (adv->tx_addr == ci->rx_addr) &&
-		(((adv->type == PDU_ADV_TYPE_DIRECT_IND) &&
+	       (((adv->type == PDU_ADV_TYPE_DIRECT_IND) &&
 		 !memcmp(adv->direct_ind.adv_addr, ci->connect_ind.adv_addr,
 			 BDADDR_SIZE)) ||
-		 (!memcmp(adv->adv_ind.addr, ci->connect_ind.adv_addr,
-			  BDADDR_SIZE)));
+		(!memcmp(adv->adv_ind.addr, ci->connect_ind.adv_addr,
+			 BDADDR_SIZE)));
 }

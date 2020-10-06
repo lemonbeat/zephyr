@@ -8,8 +8,7 @@
 #include <drivers/ipm.h>
 
 static inline int z_vrfy_ipm_send(const struct device *dev, int wait,
-				  uint32_t id,
-				  const void *data, int size)
+				  uint32_t id, const void *data, int size)
 {
 	Z_OOPS(Z_SYSCALL_DRIVER_IPM(dev, send));
 	Z_OOPS(Z_SYSCALL_MEMORY_READ(data, size));

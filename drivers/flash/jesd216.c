@@ -4,14 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <sys/types.h>
 #include <kernel.h>
 #include "jesd216.h"
 #include "spi_nor.h"
 
-static bool extract_instr(uint16_t packed,
-			  struct jesd216_instr *res)
+static bool extract_instr(uint16_t packed, struct jesd216_instr *res)
 {
 	bool rv = (res != NULL);
 
@@ -32,14 +30,14 @@ int jesd216_bfp_read_support(const struct jesd216_param_header *php,
 
 	switch (mode) {
 	case JESD216_MODE_044:
-		if ((php->len_dw >= 15)
-		    && (sys_le32_to_cpu(bfp->dw10[5]) & BIT(9))) {
+		if ((php->len_dw >= 15) &&
+		    (sys_le32_to_cpu(bfp->dw10[5]) & BIT(9))) {
 			rv = 0;
 		}
 		break;
 	case JESD216_MODE_088:
-		if ((php->len_dw >= 19)
-		    && (sys_le32_to_cpu(bfp->dw10[9]) & BIT(9))) {
+		if ((php->len_dw >= 19) &&
+		    (sys_le32_to_cpu(bfp->dw10[9]) & BIT(9))) {
 			rv = 0;
 		}
 		break;
@@ -120,9 +118,8 @@ int jesd216_bfp_read_support(const struct jesd216_param_header *php,
 	return rv;
 }
 
-int jesd216_bfp_erase(const struct jesd216_bfp *bfp,
-		       uint8_t idx,
-		       struct jesd216_erase_type *etp)
+int jesd216_bfp_erase(const struct jesd216_bfp *bfp, uint8_t idx,
+		      struct jesd216_erase_type *etp)
 {
 	__ASSERT_NO_MSG((idx > 0) && (idx <= JESD216_NUM_ERASE_TYPES));
 
@@ -148,8 +145,7 @@ int jesd216_bfp_erase(const struct jesd216_bfp *bfp,
 }
 
 int jesd216_bfp_erase_type_times(const struct jesd216_param_header *php,
-				 const struct jesd216_bfp *bfp,
-				 uint8_t idx,
+				 const struct jesd216_bfp *bfp, uint8_t idx,
 				 uint32_t *typ_ms)
 {
 	__ASSERT_NO_MSG((idx > 0) && (idx <= JESD216_NUM_ERASE_TYPES));
@@ -174,16 +170,16 @@ int jesd216_bfp_erase_type_times(const struct jesd216_param_header *php,
 	unsigned int max_factor = 2 * (1 + (dw10 & 0x0F));
 
 	switch (units) {
-	case 0x00:		/* 1 ms */
+	case 0x00: /* 1 ms */
 		*typ_ms = count;
 		break;
-	case 0x01:		/* 16 ms */
+	case 0x01: /* 16 ms */
 		*typ_ms = count * 16;
 		break;
-	case 0x02:		/* 128 ms */
+	case 0x02: /* 128 ms */
 		*typ_ms = count * 128;
 		break;
-	case 0x03:		/* 1 s */
+	case 0x03: /* 1 s */
 		*typ_ms = count * MSEC_PER_SEC;
 		break;
 	}

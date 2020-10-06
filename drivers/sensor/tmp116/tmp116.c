@@ -20,14 +20,13 @@
 #define LOG_LEVEL CONFIG_SENSOR_LOG_LEVEL
 LOG_MODULE_REGISTER(TMP116);
 
-static int tmp116_reg_read(const struct device *dev, uint8_t reg,
-			   uint16_t *val)
+static int tmp116_reg_read(const struct device *dev, uint8_t reg, uint16_t *val)
 {
 	struct tmp116_data *drv_data = dev->data;
 	const struct tmp116_dev_config *cfg = dev->config;
 
-	if (i2c_burst_read(drv_data->i2c, cfg->i2c_addr, reg, (uint8_t *)val, 2)
-	    < 0) {
+	if (i2c_burst_read(drv_data->i2c, cfg->i2c_addr, reg, (uint8_t *)val,
+			   2) < 0) {
 		return -EIO;
 	}
 
@@ -125,8 +124,7 @@ static int tmp116_init(const struct device *dev)
 	/* Bind to the I2C bus that the sensor is connected */
 	drv_data->i2c = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (!drv_data->i2c) {
-		LOG_ERR("Cannot bind to %s device!",
-			DT_INST_BUS_LABEL(0));
+		LOG_ERR("Cannot bind to %s device!", DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -145,6 +143,6 @@ static const struct tmp116_dev_config tmp116_config = {
 	.i2c_addr = DT_INST_REG_ADDR(0),
 };
 
-DEVICE_AND_API_INIT(hdc1080, DT_INST_LABEL(0), tmp116_init,
-		    &tmp116_data, &tmp116_config, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &tmp116_driver_api);
+DEVICE_AND_API_INIT(hdc1080, DT_INST_LABEL(0), tmp116_init, &tmp116_data,
+		    &tmp116_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &tmp116_driver_api);

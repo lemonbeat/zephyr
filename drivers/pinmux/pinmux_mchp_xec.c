@@ -10,12 +10,9 @@
 #include <soc.h>
 
 static const uint32_t valid_ctrl_masks[NUM_MCHP_GPIO_PORTS] = {
-	(MCHP_GPIO_PORT_A_BITMAP),
-	(MCHP_GPIO_PORT_B_BITMAP),
-	(MCHP_GPIO_PORT_C_BITMAP),
-	(MCHP_GPIO_PORT_D_BITMAP),
-	(MCHP_GPIO_PORT_E_BITMAP),
-	(MCHP_GPIO_PORT_F_BITMAP)
+	(MCHP_GPIO_PORT_A_BITMAP), (MCHP_GPIO_PORT_B_BITMAP),
+	(MCHP_GPIO_PORT_C_BITMAP), (MCHP_GPIO_PORT_D_BITMAP),
+	(MCHP_GPIO_PORT_E_BITMAP), (MCHP_GPIO_PORT_F_BITMAP)
 };
 
 struct pinmux_xec_config {
@@ -23,8 +20,7 @@ struct pinmux_xec_config {
 	uint32_t port_num;
 };
 
-static int pinmux_xec_set(const struct device *dev, uint32_t pin,
-			  uint32_t func)
+static int pinmux_xec_set(const struct device *dev, uint32_t pin, uint32_t func)
 {
 	const struct pinmux_xec_config *config = dev->config;
 	__IO uint32_t *current_pcr1;
@@ -89,9 +85,9 @@ static int pinmux_xec_get(const struct device *dev, uint32_t pin,
 	}
 
 	current_pcr1 = config->pcr1_base + pin;
-	*func = *current_pcr1 & (MCHP_GPIO_CTRL_BUFT_MASK
-					| MCHP_GPIO_CTRL_MUX_MASK
-					| MCHP_GPIO_CTRL_PUD_MASK);
+	*func = *current_pcr1 &
+		(MCHP_GPIO_CTRL_BUFT_MASK | MCHP_GPIO_CTRL_MUX_MASK |
+		 MCHP_GPIO_CTRL_PUD_MASK);
 
 	return 0;
 }
@@ -125,84 +121,78 @@ static const struct pinmux_driver_api pinmux_xec_driver_api = {
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_000_036), okay)
 static const struct pinmux_xec_config pinmux_xec_port000_036_config = {
-	.pcr1_base = (uint32_t *) PINMUX_ADDR(pinmux_000_036),
+	.pcr1_base = (uint32_t *)PINMUX_ADDR(pinmux_000_036),
 	.port_num = MCHP_GPIO_000_036,
 };
 
 DEVICE_AND_API_INIT(pinmux_xec_port000_036,
-		    DT_LABEL(DT_NODELABEL(pinmux_000_036)),
-		    &pinmux_xec_init,
-		    NULL, &pinmux_xec_port000_036_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    DT_LABEL(DT_NODELABEL(pinmux_000_036)), &pinmux_xec_init,
+		    NULL, &pinmux_xec_port000_036_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_xec_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_000_036), okay) */
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_040_076), okay)
 static const struct pinmux_xec_config pinmux_xec_port040_076_config = {
-	.pcr1_base = (uint32_t *) PINMUX_ADDR(pinmux_040_076),
+	.pcr1_base = (uint32_t *)PINMUX_ADDR(pinmux_040_076),
 	.port_num = MCHP_GPIO_040_076,
 };
 
 DEVICE_AND_API_INIT(pinmux_xec_port040_076,
-		    DT_LABEL(DT_NODELABEL(pinmux_040_076)),
-		    &pinmux_xec_init,
-		    NULL, &pinmux_xec_port040_076_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    DT_LABEL(DT_NODELABEL(pinmux_040_076)), &pinmux_xec_init,
+		    NULL, &pinmux_xec_port040_076_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_xec_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_040_076), okay) */
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_100_136), okay)
 static const struct pinmux_xec_config pinmux_xec_port100_136_config = {
-	.pcr1_base = (uint32_t *) PINMUX_ADDR(pinmux_100_136),
+	.pcr1_base = (uint32_t *)PINMUX_ADDR(pinmux_100_136),
 	.port_num = MCHP_GPIO_100_136,
 };
 
 DEVICE_AND_API_INIT(pinmux_xec_port100_136,
-		    DT_LABEL(DT_NODELABEL(pinmux_100_136)),
-		    &pinmux_xec_init,
-		    NULL, &pinmux_xec_port100_136_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    DT_LABEL(DT_NODELABEL(pinmux_100_136)), &pinmux_xec_init,
+		    NULL, &pinmux_xec_port100_136_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_xec_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_100_136), okay) */
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_140_176), okay)
 static const struct pinmux_xec_config pinmux_xec_port140_176_config = {
-	.pcr1_base = (uint32_t *) PINMUX_ADDR(pinmux_140_176),
+	.pcr1_base = (uint32_t *)PINMUX_ADDR(pinmux_140_176),
 	.port_num = MCHP_GPIO_140_176,
 };
 
 DEVICE_AND_API_INIT(pinmux_xec_port140_176,
-		    DT_LABEL(DT_NODELABEL(pinmux_140_176)),
-		    &pinmux_xec_init,
-		    NULL, &pinmux_xec_port140_176_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    DT_LABEL(DT_NODELABEL(pinmux_140_176)), &pinmux_xec_init,
+		    NULL, &pinmux_xec_port140_176_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_xec_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_140_176), okay) */
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_200_236), okay)
 static const struct pinmux_xec_config pinmux_xec_port200_236_config = {
-	.pcr1_base = (uint32_t *) PINMUX_ADDR(pinmux_200_236),
+	.pcr1_base = (uint32_t *)PINMUX_ADDR(pinmux_200_236),
 	.port_num = MCHP_GPIO_200_236,
 };
 
 DEVICE_AND_API_INIT(pinmux_xec_port200_236,
-		    DT_LABEL(DT_NODELABEL(pinmux_200_236)),
-		    &pinmux_xec_init,
-		    NULL, &pinmux_xec_port200_236_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    DT_LABEL(DT_NODELABEL(pinmux_200_236)), &pinmux_xec_init,
+		    NULL, &pinmux_xec_port200_236_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_xec_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_200_236), okay) */
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_240_276), okay)
 static const struct pinmux_xec_config pinmux_xec_port240_276_config = {
-	.pcr1_base = (uint32_t *) PINMUX_ADDR(pinmux_240_276),
+	.pcr1_base = (uint32_t *)PINMUX_ADDR(pinmux_240_276),
 	.port_num = MCHP_GPIO_240_276,
 };
 
 DEVICE_AND_API_INIT(pinmux_xec_port240_276,
-		    DT_LABEL(DT_NODELABEL(pinmux_240_276)),
-		    &pinmux_xec_init,
-		    NULL, &pinmux_xec_port240_276_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    DT_LABEL(DT_NODELABEL(pinmux_240_276)), &pinmux_xec_init,
+		    NULL, &pinmux_xec_port240_276_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_xec_driver_api);
 #endif /* DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_240_276), okay) */

@@ -35,7 +35,7 @@ static int ms5837_get_measurement(const struct device *i2c_master,
 	k_msleep(delay);
 
 	err = i2c_burst_read(i2c_master, i2c_address, adc_read_cmd,
-			((uint8_t *)val) + 1, 3);
+			     ((uint8_t *)val) + 1, 3);
 	if (err < 0) {
 		return err;
 	}
@@ -94,7 +94,7 @@ static void ms5837_compensate(struct ms5837_data *data,
 
 	data->temperature -= Ti;
 	data->pressure =
-	    (((SENS * adc_pressure) / (1ll << 21)) - OFF) / (1ll << 13);
+		(((SENS * adc_pressure) / (1ll << 21)) - OFF) / (1ll << 13);
 }
 
 static int ms5837_sample_fetch(const struct device *dev,
@@ -109,9 +109,8 @@ static int ms5837_sample_fetch(const struct device *dev,
 	__ASSERT_NO_MSG(channel == SENSOR_CHAN_ALL);
 
 	err = ms5837_get_measurement(data->i2c_master, cfg->i2c_address,
-				    &adc_pressure,
-				    data->presure_conv_cmd,
-				    data->presure_conv_delay);
+				     &adc_pressure, data->presure_conv_cmd,
+				     data->presure_conv_delay);
 	if (err < 0) {
 		return err;
 	}
@@ -161,7 +160,6 @@ static int ms5837_attr_set(const struct device *dev, enum sensor_channel chan,
 	uint8_t conv_delay;
 
 	if (attr == SENSOR_ATTR_OVERSAMPLING) {
-
 		switch (val->val1) {
 		case 8192:
 			p_conv_cmd = MS5837_CMD_CONV_P_8192;
@@ -231,8 +229,8 @@ static const struct sensor_driver_api ms5837_api_funcs = {
 };
 
 static int ms5837_read_prom(const struct device *i2c_master,
-			    const uint8_t i2c_address,
-			    const uint8_t cmd, uint16_t *val)
+			    const uint8_t i2c_address, const uint8_t cmd,
+			    uint16_t *val)
 {
 	int err;
 
@@ -263,8 +261,7 @@ static int ms5837_init(const struct device *dev)
 
 	data->i2c_master = device_get_binding(cfg->i2c_name);
 	if (data->i2c_master == NULL) {
-		LOG_ERR("i2c master %s not found",
-			    DT_INST_BUS_LABEL(0));
+		LOG_ERR("i2c master %s not found", DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -275,43 +272,37 @@ static int ms5837_init(const struct device *dev)
 	}
 
 	err = ms5837_read_prom(data->i2c_master, cfg->i2c_address,
-			       MS5837_CMD_CONV_READ_SENS_T1,
-			       &data->sens_t1);
+			       MS5837_CMD_CONV_READ_SENS_T1, &data->sens_t1);
 	if (err < 0) {
 		return err;
 	}
 
 	err = ms5837_read_prom(data->i2c_master, cfg->i2c_address,
-			       MS5837_CMD_CONV_READ_OFF_T1,
-			       &data->off_t1);
+			       MS5837_CMD_CONV_READ_OFF_T1, &data->off_t1);
 	if (err < 0) {
 		return err;
 	}
 
 	err = ms5837_read_prom(data->i2c_master, cfg->i2c_address,
-			       MS5837_CMD_CONV_READ_TCS,
-			       &data->tcs);
+			       MS5837_CMD_CONV_READ_TCS, &data->tcs);
 	if (err < 0) {
 		return err;
 	}
 
 	err = ms5837_read_prom(data->i2c_master, cfg->i2c_address,
-			       MS5837_CMD_CONV_READ_TCO,
-			       &data->tco);
+			       MS5837_CMD_CONV_READ_TCO, &data->tco);
 	if (err < 0) {
 		return err;
 	}
 
 	err = ms5837_read_prom(data->i2c_master, cfg->i2c_address,
-			       MS5837_CMD_CONV_READ_T_REF,
-			       &data->t_ref);
+			       MS5837_CMD_CONV_READ_T_REF, &data->t_ref);
 	if (err < 0) {
 		return err;
 	}
 
 	err = ms5837_read_prom(data->i2c_master, cfg->i2c_address,
-			       MS5837_CMD_CONV_READ_TEMPSENS,
-			       &data->tempsens);
+			       MS5837_CMD_CONV_READ_TEMPSENS, &data->tempsens);
 	if (err < 0) {
 		return err;
 	}

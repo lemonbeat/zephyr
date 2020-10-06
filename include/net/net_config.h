@@ -38,13 +38,13 @@ extern "C" {
  * @brief Application needs IPv6 subsystem configured and initialized.
  * Typically this means that the device has IPv6 address set.
  */
-#define NET_CONFIG_NEED_IPV6   0x00000002
+#define NET_CONFIG_NEED_IPV6 0x00000002
 
 /**
  * @brief Application needs IPv4 subsystem configured and initialized.
  * Typically this means that the device has IPv4 address set.
  */
-#define NET_CONFIG_NEED_IPV4   0x00000004
+#define NET_CONFIG_NEED_IPV4 0x00000004
 
 /**
  * @brief Initialize this network application.

@@ -26,7 +26,8 @@ static int write_handler(void *ctx, off_t off, char const *buf, size_t len)
 }
 
 static void test_encoding_iteration(char const *name, char const *value,
-				    char const *pattern, int exp_len, uint8_t wbs)
+				    char const *pattern, int exp_len,
+				    uint8_t wbs)
 {
 	int rc;
 
@@ -91,7 +92,7 @@ static int read_handle(void *ctx, off_t off, char *buf, size_t *len)
 	return 0;
 }
 
-char read_buf[128+10];
+char read_buf[128 + 10];
 
 static void test_raw_read_iteration(uint8_t rbs, size_t off, size_t len)
 {
@@ -113,7 +114,7 @@ static void test_raw_read_iteration(uint8_t rbs, size_t off, size_t len)
 	zassert_equal(expected, len_read, "Unexpected read size\n");
 
 	zassert_true(memcmp(&enc_buf[off], &read_buf[4], len_read) == 0,
-			    "read defect\n");
+		     "read defect\n");
 
 	for (rc = 0; rc < 4; rc++) {
 		zassert_equal(read_buf[rc], 0, "buffer lickage\n");
@@ -142,9 +143,6 @@ void test_setting_raw_read(void)
 	test_raw_read_iteration(8, 77, 3);
 }
 
-
-
-
 static void test_val_read_iteration(char const *src, size_t src_len,
 				    char const *pattern, size_t pattern_len,
 				    size_t len, uint8_t rbs, size_t off,
@@ -159,8 +157,8 @@ static void test_val_read_iteration(char const *src, size_t src_len,
 
 	settings_line_io_init(read_handle, write_handler, NULL, rbs);
 
-	rc =  settings_line_val_read(val_off, off, read_buf, len, &len_read,
-				     (void *)ENC_CTX_VAL);
+	rc = settings_line_val_read(val_off, off, read_buf, len, &len_read,
+				    (void *)ENC_CTX_VAL);
 
 	zassert_equal(rc, 0, "Can't read the value.\n");
 
@@ -231,6 +229,4 @@ void test_setting_val_read(void)
 						&val_pattern[i], j, j, 8, i, 0);
 		}
 	}
-
-
 }

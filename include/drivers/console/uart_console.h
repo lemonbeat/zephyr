@@ -41,10 +41,9 @@ void uart_register_input(struct k_fifo *avail, struct k_fifo *lines,
 #define UART_CONSOLE_OUT_DEBUG_HOOK_SIG(x) int(x)(char c)
 typedef UART_CONSOLE_OUT_DEBUG_HOOK_SIG(uart_console_out_debug_hook_t);
 
-void uart_console_out_debug_hook_install(
-				uart_console_out_debug_hook_t *hook);
+void uart_console_out_debug_hook_install(uart_console_out_debug_hook_t *hook);
 
-typedef int (*uart_console_in_debug_hook_t) (uint8_t);
+typedef int (*uart_console_in_debug_hook_t)(uint8_t);
 
 void uart_console_in_debug_hook_install(uart_console_in_debug_hook_t hook);
 

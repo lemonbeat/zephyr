@@ -18,7 +18,6 @@
 extern "C" {
 #endif
 
-
 /**
  *  @brief read timestamp register (CPU frequency)
  */

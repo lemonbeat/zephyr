@@ -41,10 +41,11 @@
 
 #define MESSAGE_SIZE CONFIG_LOG_BACKEND_RTT_MESSAGE_SIZE
 
-#define CHAR_BUF_SIZE \
-	((IS_ENABLED(CONFIG_LOG_BACKEND_RTT_MODE_BLOCK) && \
-	 !IS_ENABLED(CONFIG_LOG_IMMEDIATE)) ? \
-		CONFIG_LOG_BACKEND_RTT_OUTPUT_BUFFER_SIZE : 1)
+#define CHAR_BUF_SIZE                                        \
+	((IS_ENABLED(CONFIG_LOG_BACKEND_RTT_MODE_BLOCK) &&   \
+	  !IS_ENABLED(CONFIG_LOG_IMMEDIATE)) ?               \
+		       CONFIG_LOG_BACKEND_RTT_OUTPUT_BUFFER_SIZE : \
+		       1)
 
 #define RTT_LOCK() \
 	COND_CODE_0(CONFIG_LOG_BACKEND_RTT_BUFFER, (SEGGER_RTT_LOCK()), ())
@@ -52,10 +53,9 @@
 #define RTT_UNLOCK() \
 	COND_CODE_0(CONFIG_LOG_BACKEND_RTT_BUFFER, (SEGGER_RTT_UNLOCK()), ())
 
-#define RTT_BUFFER_SIZE \
-	COND_CODE_0(CONFIG_LOG_BACKEND_RTT_BUFFER, \
-		(0), (CONFIG_LOG_BACKEND_RTT_BUFFER_SIZE))
-
+#define RTT_BUFFER_SIZE                                 \
+	COND_CODE_0(CONFIG_LOG_BACKEND_RTT_BUFFER, (0), \
+		    (CONFIG_LOG_BACKEND_RTT_BUFFER_SIZE))
 
 static const char *drop_msg = DROP_MSG;
 static uint8_t rtt_buf[RTT_BUFFER_SIZE];
@@ -85,7 +85,7 @@ static inline bool is_panic_mode(void)
 
 static int data_out_drop_mode(uint8_t *data, size_t length, void *ctx)
 {
-	(void) ctx;
+	(void)ctx;
 	uint8_t *pos;
 
 	if (is_sync_mode()) {
@@ -98,7 +98,7 @@ static int data_out_drop_mode(uint8_t *data, size_t length, void *ctx)
 		}
 	}
 
-	return (int) (pos - data);
+	return (int)(pos - data);
 }
 
 static int char_out_drop_mode(uint8_t data)
@@ -142,14 +142,13 @@ static int line_out_drop_mode(void)
 		line_pos += DROP_MSG_LEN;
 		drop_warn = 1;
 
-
 		if (cnt < 10) {
 			line_buf[DROP_MSG_LEN - 2] = ' ';
-			line_buf[DROP_MSG_LEN - 3] = (uint8_t) ('0' + cnt);
+			line_buf[DROP_MSG_LEN - 3] = (uint8_t)('0' + cnt);
 			line_buf[DROP_MSG_LEN - 4] = ' ';
 		} else {
-			line_buf[DROP_MSG_LEN - 2] = (uint8_t) ('0' + cnt % 10);
-			line_buf[DROP_MSG_LEN - 3] = (uint8_t) ('0' + cnt / 10);
+			line_buf[DROP_MSG_LEN - 2] = (uint8_t)('0' + cnt % 10);
+			line_buf[DROP_MSG_LEN - 3] = (uint8_t)('0' + cnt / 10);
 			line_buf[DROP_MSG_LEN - 4] = '>';
 		}
 	}
@@ -175,7 +174,7 @@ static void on_failed_write(int retry_cnt)
 		host_present = false;
 	} else if (is_sync_mode()) {
 		k_busy_wait(USEC_PER_MSEC *
-				CONFIG_LOG_BACKEND_RTT_RETRY_DELAY_MS);
+			    CONFIG_LOG_BACKEND_RTT_RETRY_DELAY_MS);
 	} else {
 		k_msleep(CONFIG_LOG_BACKEND_RTT_RETRY_DELAY_MS);
 	}
@@ -191,11 +190,10 @@ static void on_write(int retry_cnt)
 		 * must also detect situation where host is disconnected.
 		 */
 		while (SEGGER_RTT_HasDataUp(CONFIG_LOG_BACKEND_RTT_BUFFER) &&
-			host_present) {
+		       host_present) {
 			on_failed_write(retry_cnt--);
 		}
 	}
-
 }
 
 static int data_out_block_mode(uint8_t *data, size_t length, void *ctx)
@@ -204,7 +202,8 @@ static int data_out_block_mode(uint8_t *data, size_t length, void *ctx)
 	/* This function is also called in drop mode for synchronous operation
 	 * in that case retry is undesired */
 	int retry_cnt = IS_ENABLED(CONFIG_LOG_BACKEND_RTT_MODE_BLOCK) ?
-			 CONFIG_LOG_BACKEND_RTT_RETRY_CNT : 1;
+				      CONFIG_LOG_BACKEND_RTT_RETRY_CNT :
+				      1;
 
 	do {
 		if (!is_sync_mode()) {
@@ -230,14 +229,15 @@ static int data_out_block_mode(uint8_t *data, size_t length, void *ctx)
 
 LOG_OUTPUT_DEFINE(log_output_rtt,
 		  IS_ENABLED(CONFIG_LOG_BACKEND_RTT_MODE_BLOCK) ?
-			  data_out_block_mode : data_out_drop_mode,
+				data_out_block_mode :
+				data_out_drop_mode,
 		  char_buf, sizeof(char_buf));
 
-static void put(const struct log_backend *const backend,
-		struct log_msg *msg)
+static void put(const struct log_backend *const backend, struct log_msg *msg)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_RTT_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
 	log_backend_std_put(&log_output_rtt, flag, msg);
 }
@@ -273,22 +273,25 @@ static void dropped(const struct log_backend *const backend, uint32_t cnt)
 }
 
 static void sync_string(const struct log_backend *const backend,
-		     struct log_msg_ids src_level, uint32_t timestamp,
-		     const char *fmt, va_list ap)
+			struct log_msg_ids src_level, uint32_t timestamp,
+			const char *fmt, va_list ap)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_RTT_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
-	log_backend_std_sync_string(&log_output_rtt, flag, src_level,
-				    timestamp, fmt, ap);
+	log_backend_std_sync_string(&log_output_rtt, flag, src_level, timestamp,
+				    fmt, ap);
 }
 
 static void sync_hexdump(const struct log_backend *const backend,
 			 struct log_msg_ids src_level, uint32_t timestamp,
-			 const char *metadata, const uint8_t *data, uint32_t length)
+			 const char *metadata, const uint8_t *data,
+			 uint32_t length)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_RTT_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
 	log_backend_std_sync_hexdump(&log_output_rtt, flag, src_level,
 				     timestamp, metadata, data, length);
@@ -296,10 +299,10 @@ static void sync_hexdump(const struct log_backend *const backend,
 
 const struct log_backend_api log_backend_rtt_api = {
 	.put = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : put,
-	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_string : NULL,
-	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_hexdump : NULL,
+	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_string :
+								    NULL,
+	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_hexdump :
+								     NULL,
 	.panic = panic,
 	.init = log_backend_rtt_init,
 	.dropped = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : dropped,

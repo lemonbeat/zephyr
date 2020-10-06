@@ -10,13 +10,13 @@
 #include <net/socket.h>
 
 /* Defines for creating static arrays for TFTP communication. */
-#define TFTP_HEADER_SIZE         4
-#define TFTP_BLOCK_SIZE          512
-#define TFTP_MAX_MODE_SIZE       8
-#define TFTP_REQ_RETX            CONFIG_TFTPC_REQUEST_RETRANSMITS
+#define TFTP_HEADER_SIZE 4
+#define TFTP_BLOCK_SIZE 512
+#define TFTP_MAX_MODE_SIZE 8
+#define TFTP_REQ_RETX CONFIG_TFTPC_REQUEST_RETRANSMITS
 
 /* Maximum amount of data that can be received in a single go ! */
-#define TFTPC_MAX_BUF_SIZE       (TFTP_BLOCK_SIZE + TFTP_HEADER_SIZE)
+#define TFTPC_MAX_BUF_SIZE (TFTP_BLOCK_SIZE + TFTP_HEADER_SIZE)
 
 /* Maximum filename size allowed by the TFTP Client. This is used as
  * an upper bound in the "make_request" function to ensure that there
@@ -26,16 +26,16 @@
  * "TFTP_MAX_MODE_SIZE" for mode info. Everything else can be used for
  * filename.
  */
-#define TFTP_MAX_FILENAME_SIZE   (TFTPC_MAX_BUF_SIZE - TFTP_MAX_MODE_SIZE - 4)
+#define TFTP_MAX_FILENAME_SIZE (TFTPC_MAX_BUF_SIZE - TFTP_MAX_MODE_SIZE - 4)
 
 /* TFTP Opcodes. */
-#define READ_REQUEST             0x1
-#define WRITE_REQUEST            0x2
-#define DATA_OPCODE              0x3
-#define ACK_OPCODE               0x4
-#define ERROR_OPCODE             0x5
+#define READ_REQUEST 0x1
+#define WRITE_REQUEST 0x2
+#define DATA_OPCODE 0x3
+#define ACK_OPCODE 0x4
+#define ERROR_OPCODE 0x5
 
-#define RECV_DATA_SIZE()         (tftpc_buffer_size - TFTP_HEADER_SIZE)
+#define RECV_DATA_SIZE() (tftpc_buffer_size - TFTP_HEADER_SIZE)
 
 /* Name: send_ack
  * Description: This function sends an Ack to the TFTP

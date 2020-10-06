@@ -10,8 +10,7 @@
 static uint32_t store_value;
 uint32_t parent_power_state;
 
-static int dummy_transfer(const struct device *dev, uint32_t cmd,
-			  uint32_t *val)
+static int dummy_transfer(const struct device *dev, uint32_t cmd, uint32_t *val)
 {
 	printk("transfer()\n");
 
@@ -45,8 +44,7 @@ static int dummy_resume_from_suspend(const struct device *dev)
 	return 0;
 }
 
-static int dummy_parent_pm_ctrl(const struct device *dev,
-				uint32_t ctrl_command,
+static int dummy_parent_pm_ctrl(const struct device *dev, uint32_t ctrl_command,
 				void *context, device_pm_cb cb, void *arg)
 {
 	int ret = 0;
@@ -64,7 +62,6 @@ static int dummy_parent_pm_ctrl(const struct device *dev,
 		break;
 	default:
 		ret = -EINVAL;
-
 	}
 
 	cb(dev, ret, context, arg);
@@ -83,5 +80,5 @@ int dummy_parent_init(const struct device *dev)
 }
 
 DEVICE_DEFINE(dummy_parent, DUMMY_PARENT_NAME, &dummy_parent_init,
-		    dummy_parent_pm_ctrl, NULL, NULL, POST_KERNEL,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs);
+	      dummy_parent_pm_ctrl, NULL, NULL, POST_KERNEL,
+	      CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs);

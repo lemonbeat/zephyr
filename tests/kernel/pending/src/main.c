@@ -11,24 +11,24 @@
 #include <kernel_structs.h>
 #include <stdbool.h>
 
-#define  NUM_SECONDS(x)      ((x) * 1000)
-#define  HALF_SECOND                (500)
-#define  THIRD_SECOND               (333)
-#define  FOURTH_SECOND              (250)
+#define NUM_SECONDS(x) ((x)*1000)
+#define HALF_SECOND (500)
+#define THIRD_SECOND (333)
+#define FOURTH_SECOND (250)
 
-#define COOP_STACKSIZE   (512 + CONFIG_TEST_EXTRA_STACKSIZE)
-#define PREEM_STACKSIZE  (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define COOP_STACKSIZE (512 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define PREEM_STACKSIZE (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
 
-#define FIFO_TEST_START       10
-#define FIFO_TEST_END         20
+#define FIFO_TEST_START 10
+#define FIFO_TEST_END 20
 
-#define SEM_TEST_START        30
-#define SEM_TEST_END          40
+#define SEM_TEST_START 30
+#define SEM_TEST_END 40
 
-#define LIFO_TEST_START       50
-#define LIFO_TEST_END         60
+#define LIFO_TEST_START 50
+#define LIFO_TEST_END 60
 
-#define NON_NULL_PTR          ((void *)0x12345678)
+#define NON_NULL_PTR ((void *)0x12345678)
 
 #ifdef CONFIG_COVERAGE
 #define OFFLOAD_WORKQUEUE_STACK_SIZE 4096
@@ -36,7 +36,7 @@
 #define OFFLOAD_WORKQUEUE_STACK_SIZE 1024
 #endif
 
-#define OFFLOAD_WORKQUEUE_PRIORITY	(-1)
+#define OFFLOAD_WORKQUEUE_PRIORITY (-1)
 static struct k_work_q offload_work_q;
 static K_THREAD_STACK_DEFINE(offload_work_q_stack,
 			     OFFLOAD_WORKQUEUE_STACK_SIZE);
@@ -67,15 +67,15 @@ static struct k_sem start_test_sem;
 static struct k_sem sync_test_sem;
 static struct k_sem end_test_sem;
 
-struct fifo_data fifo_test_data[4] = {
-	{ 0, FIFO_TEST_END + 1 }, { 0, FIFO_TEST_END + 2 },
-	{ 0, FIFO_TEST_END + 3 }, { 0, FIFO_TEST_END + 4 }
-};
+struct fifo_data fifo_test_data[4] = { { 0, FIFO_TEST_END + 1 },
+				       { 0, FIFO_TEST_END + 2 },
+				       { 0, FIFO_TEST_END + 3 },
+				       { 0, FIFO_TEST_END + 4 } };
 
-struct lifo_data lifo_test_data[4] = {
-	{ 0, LIFO_TEST_END + 1 }, { 0, LIFO_TEST_END + 2 },
-	{ 0, LIFO_TEST_END + 3 }, { 0, LIFO_TEST_END + 4 }
-};
+struct lifo_data lifo_test_data[4] = { { 0, LIFO_TEST_END + 1 },
+				       { 0, LIFO_TEST_END + 2 },
+				       { 0, LIFO_TEST_END + 3 },
+				       { 0, LIFO_TEST_END + 4 } };
 
 static uint32_t timer_start_tick;
 static uint32_t timer_end_tick;
@@ -118,7 +118,6 @@ static void sync_threads(struct k_work *work)
 	k_sem_give(offload->sem);
 	k_sem_give(offload->sem);
 	k_sem_give(offload->sem);
-
 }
 
 static void fifo_tests(int32_t timeout, volatile int *state,
@@ -151,8 +150,8 @@ static void fifo_tests(int32_t timeout, volatile int *state,
 	*state = increment_counter();
 
 	if (data->data != *state) {
-		TC_ERROR("**** Got FIFO data %d, not %d (%d)\n",
-			 data->data, *state, timeout);
+		TC_ERROR("**** Got FIFO data %d, not %d (%d)\n", data->data,
+			 *state, timeout);
 		return;
 	}
 
@@ -189,8 +188,8 @@ static void lifo_tests(int32_t timeout, volatile int *state,
 	*state = increment_counter();
 
 	if (data->data != *state) {
-		TC_ERROR("**** Got LIFO data %d, not %d (%d)\n",
-			 data->data, *state, timeout);
+		TC_ERROR("**** Got LIFO data %d, not %d (%d)\n", data->data,
+			 *state, timeout);
 		return;
 	}
 
@@ -248,8 +247,7 @@ void task_high(void)
 	k_sem_init(&sync_test_sem, 0, UINT_MAX);
 	k_sem_init(&end_test_sem, 0, UINT_MAX);
 
-	k_work_q_start(&offload_work_q,
-		       offload_work_q_stack,
+	k_work_q_start(&offload_work_q, offload_work_q_stack,
 		       K_THREAD_STACK_SIZEOF(offload_work_q_stack),
 		       OFFLOAD_WORKQUEUE_PRIORITY);
 
@@ -303,7 +301,7 @@ void test_pending_fifo(void)
 	 */
 	k_thread_priority_set(k_current_get(), 9);
 
-	struct offload_work offload1 = {0};
+	struct offload_work offload1 = { 0 };
 
 	k_work_init(&offload1.work_item, sync_threads);
 	offload1.sem = &start_test_sem;
@@ -316,9 +314,10 @@ void test_pending_fifo(void)
 
 	TC_PRINT("Testing preemptible threads block on fifos ...\n");
 	zassert_false((coop_high_state != FIFO_TEST_START) ||
-		      (coop_low_state != FIFO_TEST_START) ||
-		      (task_high_state != FIFO_TEST_START) ||
-		      (task_low_state != FIFO_TEST_START), NULL);
+			      (coop_low_state != FIFO_TEST_START) ||
+			      (task_high_state != FIFO_TEST_START) ||
+			      (task_low_state != FIFO_TEST_START),
+		      NULL);
 
 	/* Give waiting threads time to time-out */
 	k_sleep(K_SECONDS(2));
@@ -330,9 +329,9 @@ void test_pending_fifo(void)
 
 	TC_PRINT("Testing fifos time-out in correct order ...\n");
 	zassert_false((task_low_state != FIFO_TEST_START + 1) ||
-		      (task_high_state != FIFO_TEST_START + 2) ||
-		      (coop_low_state != FIFO_TEST_START + 3) ||
-		      (coop_high_state != FIFO_TEST_START + 4),
+			      (task_high_state != FIFO_TEST_START + 2) ||
+			      (coop_low_state != FIFO_TEST_START + 3) ||
+			      (coop_high_state != FIFO_TEST_START + 4),
 		      "**** Threads timed-out in unexpected order");
 
 	counter = FIFO_TEST_END;
@@ -354,12 +353,11 @@ void test_pending_fifo(void)
 	k_fifo_put(&fifo, &fifo_test_data[3]);
 
 	zassert_false((coop_high_state != FIFO_TEST_END + 1) ||
-		      (coop_low_state != FIFO_TEST_END + 2) ||
-		      (task_high_state != FIFO_TEST_END + 3) ||
-		      (task_low_state != FIFO_TEST_END + 4),
+			      (coop_low_state != FIFO_TEST_END + 2) ||
+			      (task_high_state != FIFO_TEST_END + 3) ||
+			      (task_low_state != FIFO_TEST_END + 4),
 		      "**** Unexpected delivery order");
 }
-
 
 void test_pending_lifo(void)
 {
@@ -370,8 +368,8 @@ void test_pending_lifo(void)
 	 */
 	k_thread_priority_set(k_current_get(), 9);
 
-	struct offload_work offload1 = {0};
-	struct offload_work offload2 = {0};
+	struct offload_work offload1 = { 0 };
+	struct offload_work offload2 = { 0 };
 
 	k_work_init(&offload1.work_item, sync_threads);
 	offload1.sem = &end_test_sem;
@@ -388,18 +386,19 @@ void test_pending_lifo(void)
 
 	TC_PRINT("Testing preemptible threads block on lifos ...\n");
 	zassert_false((coop_high_state != LIFO_TEST_START) ||
-		      (coop_low_state != LIFO_TEST_START) ||
-		      (task_high_state != LIFO_TEST_START) ||
-		      (task_low_state != LIFO_TEST_START), NULL);
+			      (coop_low_state != LIFO_TEST_START) ||
+			      (task_high_state != LIFO_TEST_START) ||
+			      (task_low_state != LIFO_TEST_START),
+		      NULL);
 
 	/* Give waiting threads time to time-out */
 	k_sleep(K_SECONDS(2));
 
 	TC_PRINT("Testing lifos time-out in correct order ...\n");
 	zassert_false((task_low_state != LIFO_TEST_START + 1) ||
-		      (task_high_state != LIFO_TEST_START + 2) ||
-		      (coop_low_state != LIFO_TEST_START + 3) ||
-		      (coop_high_state != LIFO_TEST_START + 4),
+			      (task_high_state != LIFO_TEST_START + 2) ||
+			      (coop_low_state != LIFO_TEST_START + 3) ||
+			      (coop_high_state != LIFO_TEST_START + 4),
 		      "**** Threads timed-out in unexpected order");
 
 	counter = LIFO_TEST_END;
@@ -421,11 +420,10 @@ void test_pending_lifo(void)
 
 	TC_PRINT("Testing lifos delivered data correctly ...\n");
 	zassert_false((coop_high_state != LIFO_TEST_END + 1) ||
-		      (coop_low_state != LIFO_TEST_END + 2) ||
-		      (task_high_state != LIFO_TEST_END + 3) ||
-		      (task_low_state != LIFO_TEST_END + 4),
+			      (coop_low_state != LIFO_TEST_END + 2) ||
+			      (task_high_state != LIFO_TEST_END + 3) ||
+			      (task_low_state != LIFO_TEST_END + 4),
 		      "**** Unexpected timeout order");
-
 }
 
 void test_pending_timer(void)
@@ -437,14 +435,14 @@ void test_pending_timer(void)
 	 */
 	k_thread_priority_set(k_current_get(), 9);
 
-	struct offload_work offload2 = {0};
+	struct offload_work offload2 = { 0 };
 
 	k_work_init(&offload2.work_item, sync_threads);
 	offload2.sem = &end_test_sem;
 	k_work_submit_to_queue(&offload_work_q, &offload2.work_item);
 
 	timer_end_tick = 0U;
-	k_sem_give(&start_test_sem);    /* start timer tests */
+	k_sem_give(&start_test_sem); /* start timer tests */
 
 	/*
 	 * NOTE: The timer test is running in the context of high_task().
@@ -459,10 +457,9 @@ void test_pending_timer(void)
 	k_sleep(K_SECONDS(2));
 
 	zassert_false((timer_end_tick < timer_start_tick + NUM_SECONDS(1)),
-			"Task waiting on timer error");
+		      "Task waiting on timer error");
 
-	zassert_equal(timer_data, NON_NULL_PTR,
-				"Incorrect data from timer");
+	zassert_equal(timer_data, NON_NULL_PTR, "Incorrect data from timer");
 
 	k_sem_give(&end_test_sem);
 }
@@ -472,16 +469,13 @@ void test_pending_timer(void)
  */
 void test_main(void)
 {
-	ztest_test_suite(pend,
-			ztest_1cpu_unit_test(test_pending_fifo),
-			ztest_1cpu_unit_test(test_pending_lifo),
-			ztest_1cpu_unit_test(test_pending_timer)
-			);
+	ztest_test_suite(pend, ztest_1cpu_unit_test(test_pending_fifo),
+			 ztest_1cpu_unit_test(test_pending_lifo),
+			 ztest_1cpu_unit_test(test_pending_timer));
 	ztest_run_test_suite(pend);
 }
 
-K_THREAD_DEFINE(TASK_LOW, PREEM_STACKSIZE, task_low, NULL, NULL, NULL,
-		7, 0, 0);
+K_THREAD_DEFINE(TASK_LOW, PREEM_STACKSIZE, task_low, NULL, NULL, NULL, 7, 0, 0);
 
-K_THREAD_DEFINE(TASK_HIGH, PREEM_STACKSIZE, task_high, NULL, NULL, NULL,
-		5, 0, 0);
+K_THREAD_DEFINE(TASK_HIGH, PREEM_STACKSIZE, task_high, NULL, NULL, NULL, 5, 0,
+		0);

@@ -24,27 +24,27 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "lwm2m_engine.h"
 
 /* Server resource IDs */
-#define LIGHT_ON_OFF_ID				5850
-#define LIGHT_DIMMER_ID				5851
-#define LIGHT_ON_TIME_ID			5852
-#define LIGHT_CUMULATIVE_ACTIVE_POWER_ID	5805
-#define LIGHT_POWER_FACTOR_ID			5820
-#define LIGHT_COLOUR_ID				5706
-#define LIGHT_SENSOR_UNITS_ID			5701
-#define LIGHT_APPLICATION_TYPE_ID		5750
+#define LIGHT_ON_OFF_ID 5850
+#define LIGHT_DIMMER_ID 5851
+#define LIGHT_ON_TIME_ID 5852
+#define LIGHT_CUMULATIVE_ACTIVE_POWER_ID 5805
+#define LIGHT_POWER_FACTOR_ID 5820
+#define LIGHT_COLOUR_ID 5706
+#define LIGHT_SENSOR_UNITS_ID 5701
+#define LIGHT_APPLICATION_TYPE_ID 5750
 
-#define LIGHT_MAX_ID		8
+#define LIGHT_MAX_ID 8
 
-#define MAX_INSTANCE_COUNT	CONFIG_LWM2M_IPSO_LIGHT_CONTROL_INSTANCE_COUNT
+#define MAX_INSTANCE_COUNT CONFIG_LWM2M_IPSO_LIGHT_CONTROL_INSTANCE_COUNT
 
-#define LIGHT_STRING_SHORT	8
-#define LIGHT_STRING_LONG       64
+#define LIGHT_STRING_SHORT 8
+#define LIGHT_STRING_LONG 64
 
 /*
  * Calculate resource instances as follows:
  * start with LIGHT_MAX_ID
  */
-#define RESOURCE_INSTANCE_COUNT	(LIGHT_MAX_ID)
+#define RESOURCE_INSTANCE_COUNT (LIGHT_MAX_ID)
 
 /* resource state variables */
 static bool on_off_value[MAX_INSTANCE_COUNT];
@@ -70,11 +70,11 @@ static struct lwm2m_engine_obj_field fields[] = {
 
 static struct lwm2m_engine_obj_inst inst[MAX_INSTANCE_COUNT];
 static struct lwm2m_engine_res res[MAX_INSTANCE_COUNT][LIGHT_MAX_ID];
-static struct lwm2m_engine_res_inst
-		res_inst[MAX_INSTANCE_COUNT][RESOURCE_INSTANCE_COUNT];
+static struct lwm2m_engine_res_inst res_inst[MAX_INSTANCE_COUNT]
+					    [RESOURCE_INSTANCE_COUNT];
 
-static void *on_time_read_cb(uint16_t obj_inst_id, uint16_t res_id, uint16_t res_inst_id,
-			     size_t *data_len)
+static void *on_time_read_cb(uint16_t obj_inst_id, uint16_t res_id,
+			     uint16_t res_inst_id, size_t *data_len)
 {
 	int i;
 
@@ -85,7 +85,7 @@ static void *on_time_read_cb(uint16_t obj_inst_id, uint16_t res_id, uint16_t res
 
 		if (on_off_value[i]) {
 			on_time_value[i] = (k_uptime_get() / MSEC_PER_SEC) -
-				on_time_offset[i];
+					   on_time_offset[i];
 		}
 
 		*data_len = sizeof(on_time_value[i]);
@@ -95,10 +95,10 @@ static void *on_time_read_cb(uint16_t obj_inst_id, uint16_t res_id, uint16_t res
 	return NULL;
 }
 
-static int on_time_post_write_cb(uint16_t obj_inst_id,
-				 uint16_t res_id, uint16_t res_inst_id,
-				 uint8_t *data, uint16_t data_len,
-				 bool last_block, size_t total_size)
+static int on_time_post_write_cb(uint16_t obj_inst_id, uint16_t res_id,
+				 uint16_t res_inst_id, uint8_t *data,
+				 uint16_t data_len, bool last_block,
+				 size_t total_size)
 {
 	int i;
 
@@ -107,7 +107,7 @@ static int on_time_post_write_cb(uint16_t obj_inst_id,
 		return -EINVAL;
 	}
 
-	int32_t counter = *(int32_t *) data;
+	int32_t counter = *(int32_t *)data;
 
 	for (i = 0; i < MAX_INSTANCE_COUNT; i++) {
 		if (!inst[i].obj || inst[i].obj_inst_id != obj_inst_id) {
@@ -133,7 +133,8 @@ static struct lwm2m_engine_obj_inst *light_control_create(uint16_t obj_inst_id)
 	for (index = 0; index < MAX_INSTANCE_COUNT; index++) {
 		if (inst[index].obj && inst[index].obj_inst_id == obj_inst_id) {
 			LOG_ERR("Can not create instance - "
-				"already existing: %u", obj_inst_id);
+				"already existing: %u",
+				obj_inst_id);
 			return NULL;
 		}
 
@@ -170,24 +171,19 @@ static struct lwm2m_engine_obj_inst *light_control_create(uint16_t obj_inst_id)
 			  &on_off_value[avail], sizeof(*on_off_value));
 	INIT_OBJ_RES_DATA(LIGHT_DIMMER_ID, res[avail], i, res_inst[avail], j,
 			  &dimmer_value[avail], sizeof(*dimmer_value));
-	INIT_OBJ_RES(LIGHT_ON_TIME_ID, res[avail], i,
-		     res_inst[avail], j, 1, true,
-		     &on_time_value[avail], sizeof(*on_time_value),
+	INIT_OBJ_RES(LIGHT_ON_TIME_ID, res[avail], i, res_inst[avail], j, 1,
+		     true, &on_time_value[avail], sizeof(*on_time_value),
 		     on_time_read_cb, NULL, on_time_post_write_cb, NULL);
 	INIT_OBJ_RES_DATA(LIGHT_CUMULATIVE_ACTIVE_POWER_ID, res[avail], i,
-			  res_inst[avail], j,
-			  &cumulative_active_value[avail],
+			  res_inst[avail], j, &cumulative_active_value[avail],
 			  sizeof(*cumulative_active_value));
-	INIT_OBJ_RES_DATA(LIGHT_POWER_FACTOR_ID, res[avail], i,
-			  res_inst[avail], j,
-			  &power_factor_value[avail],
+	INIT_OBJ_RES_DATA(LIGHT_POWER_FACTOR_ID, res[avail], i, res_inst[avail],
+			  j, &power_factor_value[avail],
 			  sizeof(*power_factor_value));
-	INIT_OBJ_RES_DATA(LIGHT_COLOUR_ID, res[avail], i,
-			  res_inst[avail], j,
+	INIT_OBJ_RES_DATA(LIGHT_COLOUR_ID, res[avail], i, res_inst[avail], j,
 			  colour[avail], LIGHT_STRING_LONG);
-	INIT_OBJ_RES_DATA(LIGHT_SENSOR_UNITS_ID, res[avail], i,
-			  res_inst[avail], j,
-			  units[avail], LIGHT_STRING_SHORT);
+	INIT_OBJ_RES_DATA(LIGHT_SENSOR_UNITS_ID, res[avail], i, res_inst[avail],
+			  j, units[avail], LIGHT_STRING_SHORT);
 	INIT_OBJ_RES_OPTDATA(LIGHT_APPLICATION_TYPE_ID, res[avail], i,
 			     res_inst[avail], j);
 

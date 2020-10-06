@@ -35,7 +35,7 @@ static const unsigned char private_key[] = {
 #define THREAD_PRIORITY K_PRIO_COOP(0)
 
 static const char content[] = {
-    #include "response_big.html.bin.inc"
+#include "response_big.html.bin.inc"
 };
 
 #define MAX_CLIENT_QUEUE CONFIG_NET_SAMPLE_NUM_HANDLERS
@@ -62,12 +62,10 @@ static int tcp6_accepted[CONFIG_NET_SAMPLE_NUM_HANDLERS];
 static void process_tcp4(void);
 static void process_tcp6(void);
 
-K_THREAD_DEFINE(tcp4_thread_id, STACK_SIZE,
-		process_tcp4, NULL, NULL, NULL,
+K_THREAD_DEFINE(tcp4_thread_id, STACK_SIZE, process_tcp4, NULL, NULL, NULL,
 		THREAD_PRIORITY, 0, -1);
 
-K_THREAD_DEFINE(tcp6_thread_id, STACK_SIZE,
-		process_tcp6, NULL, NULL, NULL,
+K_THREAD_DEFINE(tcp6_thread_id, STACK_SIZE, process_tcp6, NULL, NULL, NULL,
 		THREAD_PRIORITY, 0, -1);
 
 static ssize_t sendall(int sock, const void *buf, size_t len)
@@ -86,8 +84,7 @@ static ssize_t sendall(int sock, const void *buf, size_t len)
 	return 0;
 }
 
-static int setup(int *sock, struct sockaddr *bind_addr,
-		 socklen_t bind_addrlen)
+static int setup(int *sock, struct sockaddr *bind_addr, socklen_t bind_addrlen)
 {
 	int ret;
 
@@ -106,8 +103,8 @@ static int setup(int *sock, struct sockaddr *bind_addr,
 		SERVER_CERTIFICATE_TAG,
 	};
 
-	ret = setsockopt(*sock, SOL_TLS, TLS_SEC_TAG_LIST,
-			 sec_tag_list, sizeof(sec_tag_list));
+	ret = setsockopt(*sock, SOL_TLS, TLS_SEC_TAG_LIST, sec_tag_list,
+			 sizeof(sec_tag_list));
 	if (ret < 0) {
 		LOG_ERR("Failed to set TCP secure option %d", errno);
 		ret = -errno;
@@ -217,42 +214,32 @@ static int process_tcp(int *sock, int *accepted)
 #if defined(CONFIG_NET_IPV6)
 	if (client_addr.sin6_family == AF_INET6) {
 		tcp6_handler_tid[slot] = k_thread_create(
-			&tcp6_handler_thread[slot],
-			tcp6_handler_stack[slot],
+			&tcp6_handler_thread[slot], tcp6_handler_stack[slot],
 			K_THREAD_STACK_SIZEOF(tcp6_handler_stack[slot]),
 			(k_thread_entry_t)client_conn_handler,
-			INT_TO_POINTER(slot),
-			&accepted[slot],
-			&tcp6_handler_tid[slot],
-			THREAD_PRIORITY,
-			0, K_NO_WAIT);
+			INT_TO_POINTER(slot), &accepted[slot],
+			&tcp6_handler_tid[slot], THREAD_PRIORITY, 0, K_NO_WAIT);
 	}
 #endif
 
 #if defined(CONFIG_NET_IPV4)
 	if (client_addr.sin6_family == AF_INET) {
 		tcp4_handler_tid[slot] = k_thread_create(
-			&tcp4_handler_thread[slot],
-			tcp4_handler_stack[slot],
+			&tcp4_handler_thread[slot], tcp4_handler_stack[slot],
 			K_THREAD_STACK_SIZEOF(tcp4_handler_stack[slot]),
 			(k_thread_entry_t)client_conn_handler,
-			INT_TO_POINTER(slot),
-			&accepted[slot],
-			&tcp4_handler_tid[slot],
-			THREAD_PRIORITY,
-			0, K_NO_WAIT);
+			INT_TO_POINTER(slot), &accepted[slot],
+			&tcp4_handler_tid[slot], THREAD_PRIORITY, 0, K_NO_WAIT);
 	}
 #endif
 
 	if (LOG_LEVEL >= LOG_LEVEL_DBG) {
 		char addr_str[INET6_ADDRSTRLEN];
 
-		net_addr_ntop(client_addr.sin6_family,
-			      &client_addr.sin6_addr,
+		net_addr_ntop(client_addr.sin6_family, &client_addr.sin6_addr,
 			      addr_str, sizeof(addr_str));
 
-		LOG_DBG("[%d] Connection #%d from %s",
-			client, ++counter,
+		LOG_DBG("[%d] Connection #%d from %s", client, ++counter,
 			log_strdup(addr_str));
 	}
 
@@ -347,8 +334,8 @@ void main(void)
 	}
 
 	err = tls_credential_add(SERVER_CERTIFICATE_TAG,
-				 TLS_CREDENTIAL_PRIVATE_KEY,
-				 private_key, sizeof(private_key));
+				 TLS_CREDENTIAL_PRIVATE_KEY, private_key,
+				 sizeof(private_key));
 	if (err < 0) {
 		LOG_ERR("Failed to register private key: %d", err);
 	}

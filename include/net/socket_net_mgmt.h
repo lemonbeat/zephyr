@@ -70,7 +70,6 @@ struct sockaddr_nm {
 	uint32_t nm_mask;
 };
 
-
 /**
  * Each network management message is prefixed with this header.
  */

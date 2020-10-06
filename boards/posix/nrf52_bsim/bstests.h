@@ -23,7 +23,7 @@ extern "C" {
  * Will be called with the command line arguments for the testcase.
  * This is BEFORE any SW has run, and before the HW has been initialized
  */
-typedef void (*bst_test_args_t)(int, char**);
+typedef void (*bst_test_args_t)(int, char **);
 /* It will be called (in the HW models thread) before the CPU is booted */
 typedef void (*bst_test_pre_init_t)(void);
 /*
@@ -69,27 +69,30 @@ typedef void (*bst_test_main_t)(void);
 struct bst_test_instance {
 	char *test_id;
 	char *test_descr;
-	bst_test_args_t                    test_args_f;
-	bst_test_pre_init_t                test_pre_init_f;
-	bst_test_post_init_t               test_post_init_f;
-	bst_test_tick_t                    test_tick_f;
-	bst_test_delete_t                  test_delete_f;
-	bst_test_irq_sniffer_t             test_irq_sniffer_f;
-	bst_test_fake_ddriver_prekernel_t  test_fake_ddriver_prekernel_f;
+	bst_test_args_t test_args_f;
+	bst_test_pre_init_t test_pre_init_f;
+	bst_test_post_init_t test_post_init_f;
+	bst_test_tick_t test_tick_f;
+	bst_test_delete_t test_delete_f;
+	bst_test_irq_sniffer_t test_irq_sniffer_f;
+	bst_test_fake_ddriver_prekernel_t test_fake_ddriver_prekernel_f;
 	bst_test_fake_ddriver_postkernel_t test_fake_ddriver_postkernel_f;
-	bst_test_main_t                    test_main_f;
+	bst_test_main_t test_main_f;
 };
 
-#define BSTEST_END_MARKER \
-{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
+#define BSTEST_END_MARKER                                                   \
+	{                                                                   \
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, \
+			NULL                                                \
+	}
 
 struct bst_test_list {
-	struct bst_test_instance  *test_instance;
-	struct bst_test_list    *next;
+	struct bst_test_instance *test_instance;
+	struct bst_test_list *next;
 };
 
-typedef struct bst_test_list *(*bst_test_install_t)(struct bst_test_list
-							*test_tail);
+typedef struct bst_test_list *(*bst_test_install_t)(
+	struct bst_test_list *test_tail);
 
 struct bst_test_list *bst_add_tests(struct bst_test_list *tests,
 				    const struct bst_test_instance *test_def);
@@ -103,7 +106,7 @@ bool bst_irq_sniffer(int irq_number);
 uint8_t bst_delete(void);
 
 /* These return codes need to fit in a uint8_t (0..255), where 0 = successful */
-enum bst_result_t {Passed = 0, In_progress = 1, Failed = 2};
+enum bst_result_t { Passed = 0, In_progress = 1, Failed = 2 };
 
 void bst_print_testslist(void);
 

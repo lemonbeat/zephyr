@@ -6,7 +6,7 @@
 
 #include <zephyr.h>
 #include <device.h>
-#define DUMMY_DRIVER_NAME	"dummy_driver"
+#define DUMMY_DRIVER_NAME "dummy_driver"
 
 typedef int (*dummy_api_open_t)(const struct device *dev);
 

@@ -33,7 +33,7 @@ void test_config_compress_reset(void)
 	c2_var_count = 1;
 	(void)memset(elems, 0, sizeof(elems));
 
-	for (i = 0; ; i++) {
+	for (i = 0;; i++) {
 		test_config_fill_area(test_ref_value, i);
 		memcpy(val_string, test_ref_value, sizeof(val_string));
 
@@ -78,11 +78,11 @@ void test_config_compress_reset(void)
 	zassert_true(rc == 0,
 		     "can't register FCB as configuration destination");
 
-
 	zassert_true(fcb_free_sector_cnt(&cf.cf_fcb) == 1,
 		     "expected one free sector");
-	zassert_true(fa == cf.cf_fcb.f_active.fe_sector,
-		   "active sector should become free after garbage collection");
+	zassert_true(
+		fa == cf.cf_fcb.f_active.fe_sector,
+		"active sector should become free after garbage collection");
 
 	c2_var_count = 0;
 }

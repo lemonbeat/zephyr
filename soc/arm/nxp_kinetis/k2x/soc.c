@@ -25,7 +25,7 @@
 #include <arch/cpu.h>
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
 
-#define TIMESRC_OSCERCLK        (2)
+#define TIMESRC_OSCERCLK (2)
 
 static const osc_config_t oscConfig = {
 	.freq = CONFIG_OSC_XTAL0_FREQ,
@@ -84,7 +84,6 @@ static ALWAYS_INLINE void clock_init(void)
 
 	CLOCK_InitOsc0(&oscConfig);
 	CLOCK_SetXtal0Freq(CONFIG_OSC_XTAL0_FREQ);
-
 
 	CLOCK_SetInternalRefClkConfig(kMCG_IrclkEnable, kMCG_IrcSlow,
 				      CONFIG_MCG_FCRDIV);

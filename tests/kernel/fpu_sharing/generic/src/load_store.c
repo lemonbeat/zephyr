@@ -116,7 +116,6 @@ static void load_store_low(void)
 
 	/* Loop until the test finishes, or an error is detected. */
 	for (load_store_low_count = 0; !test_exited; load_store_low_count++) {
-
 		/*
 		 * Clear store buffer to erase all traces of any previous
 		 * floating point values that have been saved.
@@ -165,8 +164,7 @@ static void load_store_low(void)
 			if (store_ptr[i] != init_byte) {
 				TC_ERROR("Found 0x%x instead of 0x%x @ "
 					 "offset 0x%x\n",
-					 store_ptr[i],
-					 init_byte, i);
+					 store_ptr[i], init_byte, i);
 				TC_ERROR("Discrepancy found during "
 					 "iteration %d\n",
 					 load_store_low_count);
@@ -183,7 +181,7 @@ static void load_store_low(void)
 		 * disable floating point operations for the task.
 		 */
 #if (defined(CONFIG_X86) && defined(CONFIG_LAZY_FPU_SHARING)) || \
-		defined(CONFIG_ARMV7_M_ARMV8_M_FP)
+	defined(CONFIG_ARMV7_M_ARMV8_M_FP)
 		/*
 		 * In x86:
 		 * The subsequent execution of _load_all_float_registers() will
@@ -222,10 +220,8 @@ static void load_store_high(void)
 	unsigned char *reg_set_ptr = (unsigned char *)&float_reg_set;
 
 	/* Run the test until the specified maximum test count is reached */
-	for (load_store_high_count = 0;
-	     load_store_high_count <= MAX_TESTS;
+	for (load_store_high_count = 0; load_store_high_count <= MAX_TESTS;
 	     load_store_high_count++) {
-
 		/*
 		 * Initialize the float_reg_set structure by treating it as
 		 * a simple array of bytes (the arrangement and actual number
@@ -283,8 +279,7 @@ static void load_store_high(void)
 		if ((load_store_high_count % 100) == 0) {
 			PRINT_DATA("Load and store OK after %u (high) "
 				   "+ %u (low) tests\n",
-				   load_store_high_count,
-				   load_store_low_count);
+				   load_store_high_count, load_store_low_count);
 		}
 	}
 

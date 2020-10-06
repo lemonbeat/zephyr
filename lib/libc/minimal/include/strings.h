@@ -19,4 +19,4 @@ extern int strncasecmp(const char *s1, const char *s2, size_t n);
 }
 #endif
 
-#endif  /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_STRINGS_H_ */
+#endif /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_STRINGS_H_ */

@@ -26,10 +26,10 @@ static inline void shell_raw_fprintf(const struct shell_fprintf *const ctx,
 }
 
 /* Macro to send VT100 commands. */
-#define SHELL_VT100_CMD(_shell_, _cmd_) \
-	do {								\
-		static const char cmd[] = _cmd_;			\
-		shell_raw_fprintf(_shell_->fprintf_ctx, "%s", cmd);	\
+#define SHELL_VT100_CMD(_shell_, _cmd_)                             \
+	do {                                                        \
+		static const char cmd[] = _cmd_;                    \
+		shell_raw_fprintf(_shell_->fprintf_ctx, "%s", cmd); \
 	} while (0)
 
 /* Function sends VT100 command to clear the screen from cursor position to
@@ -206,8 +206,7 @@ void shell_op_char_delete(const struct shell *shell);
 
 void shell_op_delete_from_cursor(const struct shell *shell);
 
-void shell_op_completion_insert(const struct shell *shell,
-				const char *compl,
+void shell_op_completion_insert(const struct shell *shell, const char * compl,
 				uint16_t compl_len);
 
 bool shell_cursor_in_empty_line(const struct shell *shell);
@@ -236,8 +235,7 @@ void shell_print_prompt_and_cmd(const struct shell *shell);
  * This function can be only used by shell module, it shall not be called
  * directly.
  */
-void shell_write(const struct shell *shell, const void *data,
-		 size_t length);
+void shell_write(const struct shell *shell, const void *data, size_t length);
 
 /**
  * @internal @brief This function shall not be used directly, it is required by
@@ -267,8 +265,7 @@ void shell_vt100_colors_restore(const struct shell *shell,
  * handlers.
  */
 void shell_internal_fprintf(const struct shell *shell,
-			    enum shell_vt100_color color,
-			    const char *fmt, ...);
+			    enum shell_vt100_color color, const char *fmt, ...);
 
 void shell_internal_vfprintf(const struct shell *shell,
 			     enum shell_vt100_color color, const char *fmt,

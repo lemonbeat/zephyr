@@ -26,8 +26,7 @@
 static unsigned int seed = 0x5678;
 
 static int entropy_native_posix_get_entropy(const struct device *dev,
-					    uint8_t *buffer,
-					    uint16_t length)
+					    uint8_t *buffer, uint16_t length)
 {
 	ARG_UNUSED(dev);
 
@@ -49,8 +48,8 @@ static int entropy_native_posix_get_entropy(const struct device *dev,
 }
 
 static int entropy_native_posix_get_entropy_isr(const struct device *dev,
-						uint8_t *buf,
-						uint16_t len, uint32_t flags)
+						uint8_t *buf, uint16_t len,
+						uint32_t flags)
 {
 	ARG_UNUSED(flags);
 
@@ -71,13 +70,13 @@ static int entropy_native_posix_init(const struct device *dev)
 }
 
 static const struct entropy_driver_api entropy_native_posix_api_funcs = {
-	.get_entropy     = entropy_native_posix_get_entropy,
+	.get_entropy = entropy_native_posix_get_entropy,
 	.get_entropy_isr = entropy_native_posix_get_entropy_isr
 };
 
 DEVICE_AND_API_INIT(entropy_native_posix, DT_INST_LABEL(0),
-		    entropy_native_posix_init, NULL, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    entropy_native_posix_init, NULL, NULL, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_native_posix_api_funcs);
 
 static void add_fake_entropy_option(void)
@@ -90,11 +89,10 @@ static void add_fake_entropy_option(void)
 		 * destination, callback,
 		 * description
 		 */
-		{false, false, false,
-		"seed", "r_seed", 'u',
-		(void *)&seed, NULL,
-		"A 32-bit integer seed value for the entropy device, such as "
-		"97229 (decimal), 0x17BCD (hex), or 0275715 (octal)"},
+		{ false, false, false, "seed", "r_seed", 'u', (void *)&seed,
+		  NULL,
+		  "A 32-bit integer seed value for the entropy device, such as "
+		  "97229 (decimal), 0x17BCD (hex), or 0275715 (octal)" },
 		ARG_TABLE_ENDMARKER
 	};
 

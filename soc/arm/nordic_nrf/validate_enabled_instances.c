@@ -6,16 +6,19 @@
 
 #include <kernel.h>
 
-#define I2C_ENABLED(idx)  (IS_ENABLED(CONFIG_I2C) && \
-			   DT_NODE_HAS_STATUS(DT_NODELABEL(i2c##idx), okay))
+#define I2C_ENABLED(idx)           \
+	(IS_ENABLED(CONFIG_I2C) && \
+	 DT_NODE_HAS_STATUS(DT_NODELABEL(i2c##idx), okay))
 
-#define SPI_ENABLED(idx)  (IS_ENABLED(CONFIG_SPI) && \
-			   DT_NODE_HAS_STATUS(DT_NODELABEL(spi##idx), okay))
+#define SPI_ENABLED(idx)           \
+	(IS_ENABLED(CONFIG_SPI) && \
+	 DT_NODE_HAS_STATUS(DT_NODELABEL(spi##idx), okay))
 
-#define UART_ENABLED(idx) (IS_ENABLED(CONFIG_SERIAL) && \
-			   (IS_ENABLED(CONFIG_SOC_SERIES_NRF53X) || \
-			    IS_ENABLED(CONFIG_SOC_SERIES_NRF91X)) && \
-			   DT_NODE_HAS_STATUS(DT_NODELABEL(uart##idx), okay))
+#define UART_ENABLED(idx)                          \
+	(IS_ENABLED(CONFIG_SERIAL) &&              \
+	 (IS_ENABLED(CONFIG_SOC_SERIES_NRF53X) ||  \
+	  IS_ENABLED(CONFIG_SOC_SERIES_NRF91X)) && \
+	 DT_NODE_HAS_STATUS(DT_NODELABEL(uart##idx), okay))
 
 /*
  * In most Nordic SoCs, SPI and TWI peripherals with the same instance number
@@ -28,17 +31,18 @@
  * enabled simultaneously.
  */
 
-#define CHECK(idx) \
-	!(I2C_ENABLED(idx) && SPI_ENABLED(idx)) && \
-	!(I2C_ENABLED(idx) && UART_ENABLED(idx)) && \
-	!(SPI_ENABLED(idx) && UART_ENABLED(idx))
+#define CHECK(idx)                                          \
+	!(I2C_ENABLED(idx) && SPI_ENABLED(idx)) &&          \
+		!(I2C_ENABLED(idx) && UART_ENABLED(idx)) && \
+		!(SPI_ENABLED(idx) && UART_ENABLED(idx))
 
-#define MSG(idx) \
-	"Only one of the following peripherals can be enabled: " \
-	"SPI"#idx", SPIM"#idx", SPIS"#idx", TWI"#idx", TWIM"#idx", TWIS"#idx \
-	IF_ENABLED(CONFIG_SOC_SERIES_NRF53X, (", UARTE"#idx)) \
-	IF_ENABLED(CONFIG_SOC_SERIES_NRF91X, (", UARTE"#idx)) \
-	". Check nodes with status \"okay\" in zephyr.dts."
+#define MSG(idx)                                                             \
+	"Only one of the following peripherals can be enabled: "             \
+	"SPI" #idx ", SPIM" #idx ", SPIS" #idx ", TWI" #idx ", TWIM" #idx    \
+	", TWIS" #idx IF_ENABLED(CONFIG_SOC_SERIES_NRF53X, (", UARTE" #idx)) \
+		IF_ENABLED(                                                  \
+			CONFIG_SOC_SERIES_NRF91X,                            \
+			(", UARTE" #idx)) ". Check nodes with status \"okay\" in zephyr.dts."
 
 #if !IS_ENABLED(CONFIG_SOC_NRF52810)
 BUILD_ASSERT(CHECK(0), MSG(0));

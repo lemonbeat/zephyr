@@ -63,5 +63,4 @@ struct net_timeout {
  * @}
  */
 
-
 #endif /* ZEPHYR_INCLUDE_NET_NET_TIMEOUT_H_ */

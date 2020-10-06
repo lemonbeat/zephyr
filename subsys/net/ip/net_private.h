@@ -55,10 +55,18 @@ extern void net_pkt_init(void);
 extern void net_tc_tx_init(void);
 extern void net_tc_rx_init(void);
 #else
-static inline void net_context_init(void) { }
-static inline void net_pkt_init(void) { }
-static inline void net_tc_tx_init(void) { }
-static inline void net_tc_rx_init(void) { }
+static inline void net_context_init(void)
+{
+}
+static inline void net_pkt_init(void)
+{
+}
+static inline void net_tc_tx_init(void)
+{
+}
+static inline void net_tc_rx_init(void)
+{
+}
 static inline const char *net_context_state(struct net_context *context)
 {
 	ARG_UNUSED(context);
@@ -97,8 +105,7 @@ char *net_sprint_addr(sa_family_t af, const void *addr);
 #define net_sprint_ipv6_addr(_addr) net_sprint_addr(AF_INET6, _addr)
 
 #if defined(CONFIG_NET_CONTEXT_TIMESTAMP)
-int net_context_get_timestamp(struct net_context *context,
-			      struct net_pkt *pkt,
+int net_context_get_timestamp(struct net_context *context, struct net_pkt *pkt,
 			      struct net_ptp_time *timestamp);
 #else
 static inline int net_context_get_timestamp(struct net_context *context,
@@ -126,8 +133,6 @@ static inline void net_coap_init(void)
 	return;
 }
 #endif
-
-
 
 #if defined(CONFIG_NET_GPTP)
 /**
@@ -216,8 +221,8 @@ static inline char *net_sprint_ll_addr(const uint8_t *ll, uint8_t ll_len)
 	return net_sprint_ll_addr_buf(ll, ll_len, (char *)buf, sizeof(buf));
 }
 
-static inline void net_hexdump(const char *str,
-			       const uint8_t *packet, size_t length)
+static inline void net_hexdump(const char *str, const uint8_t *packet,
+			       size_t length)
 {
 	if (!length) {
 		LOG_DBG("%s zero-length packet", str);
@@ -226,7 +231,6 @@ static inline void net_hexdump(const char *str,
 
 	LOG_HEXDUMP_DBG(packet, length, str);
 }
-
 
 /* Hexdump from all fragments */
 static inline void net_pkt_hexdump(struct net_pkt *pkt, const char *str)
@@ -246,7 +250,8 @@ static inline void net_pkt_hexdump(struct net_pkt *pkt, const char *str)
 	}
 }
 
-static inline void net_pkt_print_buffer_info(struct net_pkt *pkt, const char *str)
+static inline void net_pkt_print_buffer_info(struct net_pkt *pkt,
+					     const char *str)
 {
 	struct net_buf *buf = pkt->buffer;
 
@@ -261,8 +266,8 @@ static inline void net_pkt_print_buffer_info(struct net_pkt *pkt, const char *st
 	}
 
 	while (buf) {
-		printk("%p[%d/%u (%u)]",
-		       buf, atomic_get(&pkt->atomic_ref), buf->len, buf->size);
+		printk("%p[%d/%u (%u)]", buf, atomic_get(&pkt->atomic_ref),
+		       buf->len, buf->size);
 
 		buf = buf->frags;
 		if (buf) {

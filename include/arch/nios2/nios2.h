@@ -37,8 +37,7 @@
  */
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif /* __cplusplus */
 
 /*
@@ -64,20 +63,20 @@ static inline uint32_t _nios2_read_et(void)
 {
 	uint32_t et;
 
-	__asm__("mov %0, et" : "=r" (et));
+	__asm__("mov %0, et" : "=r"(et));
 	return et;
 }
 
 static inline void _nios2_write_et(uint32_t et)
 {
-	__asm__ volatile("mov et, %z0" : : "rM" (et));
+	__asm__ volatile("mov et, %z0" : : "rM"(et));
 }
 
 static inline uint32_t _nios2_read_sp(void)
 {
 	uint32_t sp;
 
-	__asm__("mov %0, sp" : "=r" (sp));
+	__asm__("mov %0, sp" : "=r"(sp));
 	return sp;
 }
 
@@ -99,22 +98,22 @@ static inline void _nios2_report_stack_overflow(void)
  */
 static inline void _nios2_dcache_addr_flush(void *addr)
 {
-	__asm__ volatile ("flushda (%0)" :: "r" (addr));
+	__asm__ volatile("flushda (%0)" ::"r"(addr));
 }
 
 static inline void z_nios2_dcache_flush(uint32_t offset)
 {
-	__asm__ volatile ("flushd (%0)" :: "r" (offset));
+	__asm__ volatile("flushd (%0)" ::"r"(offset));
 }
 
 static inline void z_nios2_icache_flush(uint32_t offset)
 {
-	__asm__ volatile ("flushi %0" :: "r" (offset));
+	__asm__ volatile("flushi %0" ::"r"(offset));
 }
 
 static inline void z_nios2_pipeline_flush(void)
 {
-	__asm__ volatile ("flushp");
+	__asm__ volatile("flushp");
 }
 
 /*
@@ -160,8 +159,7 @@ enum nios2_creg {
 
 static inline void _nios2_reg_write(void *base, int regnum, uint32_t data)
 {
-	sys_write32(data,
-		    (mm_reg_t)z_nios2_get_register_address(base, regnum));
+	sys_write32(data, (mm_reg_t)z_nios2_get_register_address(base, regnum));
 }
 
 static inline uint32_t _nios2_reg_read(void *base, int regnum)
@@ -174,10 +172,10 @@ static inline uint32_t _nios2_reg_read(void *base, int regnum)
 /*
  * Nios II control registers that are always present
  */
-#define NIOS2_STATUS   status
-#define NIOS2_ESTATUS  estatus
-#define NIOS2_BSTATUS  bstatus
-#define NIOS2_IENABLE  ienable
+#define NIOS2_STATUS status
+#define NIOS2_ESTATUS estatus
+#define NIOS2_BSTATUS bstatus
+#define NIOS2_IENABLE ienable
 #define NIOS2_IPENDING ipending
 #define NIOS2_CPUID cpuid
 
@@ -196,26 +194,26 @@ static inline uint32_t _nios2_reg_read(void *base, int regnum)
  */
 
 /* STATUS, ESTATUS, BSTATUS, and SSTATUS registers */
-#define NIOS2_STATUS_PIE_MSK  (0x00000001)
+#define NIOS2_STATUS_PIE_MSK (0x00000001)
 #define NIOS2_STATUS_PIE_OFST (0)
-#define NIOS2_STATUS_U_MSK    (0x00000002)
-#define NIOS2_STATUS_U_OFST   (1)
-#define NIOS2_STATUS_EH_MSK   (0x00000004)
-#define NIOS2_STATUS_EH_OFST  (2)
-#define NIOS2_STATUS_IH_MSK     (0x00000008)
-#define NIOS2_STATUS_IH_OFST    (3)
-#define NIOS2_STATUS_IL_MSK     (0x000003f0)
-#define NIOS2_STATUS_IL_OFST    (4)
-#define NIOS2_STATUS_CRS_MSK    (0x0000fc00)
-#define NIOS2_STATUS_CRS_OFST   (10)
-#define NIOS2_STATUS_PRS_MSK    (0x003f0000)
-#define NIOS2_STATUS_PRS_OFST   (16)
-#define NIOS2_STATUS_NMI_MSK    (0x00400000)
-#define NIOS2_STATUS_NMI_OFST   (22)
-#define NIOS2_STATUS_RSIE_MSK   (0x00800000)
-#define NIOS2_STATUS_RSIE_OFST  (23)
-#define NIOS2_STATUS_SRS_MSK    (0x80000000)
-#define NIOS2_STATUS_SRS_OFST   (31)
+#define NIOS2_STATUS_U_MSK (0x00000002)
+#define NIOS2_STATUS_U_OFST (1)
+#define NIOS2_STATUS_EH_MSK (0x00000004)
+#define NIOS2_STATUS_EH_OFST (2)
+#define NIOS2_STATUS_IH_MSK (0x00000008)
+#define NIOS2_STATUS_IH_OFST (3)
+#define NIOS2_STATUS_IL_MSK (0x000003f0)
+#define NIOS2_STATUS_IL_OFST (4)
+#define NIOS2_STATUS_CRS_MSK (0x0000fc00)
+#define NIOS2_STATUS_CRS_OFST (10)
+#define NIOS2_STATUS_PRS_MSK (0x003f0000)
+#define NIOS2_STATUS_PRS_OFST (16)
+#define NIOS2_STATUS_NMI_MSK (0x00400000)
+#define NIOS2_STATUS_NMI_OFST (22)
+#define NIOS2_STATUS_RSIE_MSK (0x00800000)
+#define NIOS2_STATUS_RSIE_OFST (23)
+#define NIOS2_STATUS_SRS_MSK (0x80000000)
+#define NIOS2_STATUS_SRS_OFST (31)
 
 /* EXCEPTION register */
 #define NIOS2_EXCEPTION_REG_CAUSE_MASK (0x0000007c)
@@ -298,26 +296,26 @@ static inline uint32_t _nios2_reg_read(void *base, int regnum)
 #define NIOS2_CONFIG_REG_ECCEXC_OFST (3)
 
 /* MPUBASE (MPU Base Address) Register */
-#define NIOS2_MPUBASE_D_MASK         (0x00000001)
-#define NIOS2_MPUBASE_D_OFST         (0)
-#define NIOS2_MPUBASE_INDEX_MASK     (0x0000003e)
-#define NIOS2_MPUBASE_INDEX_OFST     (1)
+#define NIOS2_MPUBASE_D_MASK (0x00000001)
+#define NIOS2_MPUBASE_D_OFST (0)
+#define NIOS2_MPUBASE_INDEX_MASK (0x0000003e)
+#define NIOS2_MPUBASE_INDEX_OFST (1)
 #define NIOS2_MPUBASE_BASE_ADDR_MASK (0xffffffc0)
 #define NIOS2_MPUBASE_BASE_ADDR_OFST (6)
 
 /* MPUACC (MPU Access) Register */
 #define NIOS2_MPUACC_LIMIT_MASK (0xffffffc0)
 #define NIOS2_MPUACC_LIMIT_OFST (6)
-#define NIOS2_MPUACC_MASK_MASK  (0xffffffc0)
-#define NIOS2_MPUACC_MASK_OFST  (6)
-#define NIOS2_MPUACC_C_MASK     (0x00000020)
-#define NIOS2_MPUACC_C_OFST     (5)
-#define NIOS2_MPUACC_PERM_MASK  (0x0000001c)
-#define NIOS2_MPUACC_PERM_OFST  (2)
-#define NIOS2_MPUACC_RD_MASK    (0x00000002)
-#define NIOS2_MPUACC_RD_OFST    (1)
-#define NIOS2_MPUACC_WR_MASK    (0x00000001)
-#define NIOS2_MPUACC_WR_OFST    (0)
+#define NIOS2_MPUACC_MASK_MASK (0xffffffc0)
+#define NIOS2_MPUACC_MASK_OFST (6)
+#define NIOS2_MPUACC_C_MASK (0x00000020)
+#define NIOS2_MPUACC_C_OFST (5)
+#define NIOS2_MPUACC_PERM_MASK (0x0000001c)
+#define NIOS2_MPUACC_PERM_OFST (2)
+#define NIOS2_MPUACC_RD_MASK (0x00000002)
+#define NIOS2_MPUACC_RD_OFST (1)
+#define NIOS2_MPUACC_WR_MASK (0x00000001)
+#define NIOS2_MPUACC_WR_OFST (0)
 
 #ifdef __cplusplus
 }

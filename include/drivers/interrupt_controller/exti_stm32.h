@@ -45,9 +45,9 @@ void stm32_exti_disable(int line);
  */
 enum stm32_exti_trigger {
 	/* clear trigger */
-	STM32_EXTI_TRIG_NONE  = 0x0,
+	STM32_EXTI_TRIG_NONE = 0x0,
 	/* trigger on rising edge */
-	STM32_EXTI_TRIG_RISING  = 0x1,
+	STM32_EXTI_TRIG_RISING = 0x1,
 	/* trigger on falling endge */
 	STM32_EXTI_TRIG_FALLING = 0x2,
 	/* trigger on falling endge */
@@ -63,7 +63,7 @@ enum stm32_exti_trigger {
 void stm32_exti_trigger(int line, int trg);
 
 /* callback for exti interrupt */
-typedef void (*stm32_exti_callback_t) (int line, void *user);
+typedef void (*stm32_exti_callback_t)(int line, void *user);
 
 /**
  * @brief set EXTI interrupt callback

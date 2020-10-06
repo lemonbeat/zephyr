@@ -43,8 +43,8 @@ int bt_mesh_provision(const uint8_t net_key[16], uint16_t net_idx,
 	int err;
 
 	BT_INFO("Primary Element: 0x%04x", addr);
-	BT_DBG("net_idx 0x%04x flags 0x%02x iv_index 0x%04x",
-	       net_idx, flags, iv_index);
+	BT_DBG("net_idx 0x%04x flags 0x%02x iv_index 0x%04x", net_idx, flags,
+	       iv_index);
 
 	if (atomic_test_and_set_bit(bt_mesh.flags, BT_MESH_VALID)) {
 		return -EALREADY;
@@ -69,8 +69,7 @@ int bt_mesh_provision(const uint8_t net_key[16], uint16_t net_idx,
 		const struct bt_mesh_prov *prov;
 		struct bt_mesh_cdb_node *node;
 
-		if (!atomic_test_bit(bt_mesh_cdb.flags,
-				     BT_MESH_CDB_VALID)) {
+		if (!atomic_test_bit(bt_mesh_cdb.flags, BT_MESH_CDB_VALID)) {
 			BT_ERR("No valid network");
 			atomic_clear_bit(bt_mesh.flags, BT_MESH_VALID);
 			return -EINVAL;
@@ -141,8 +140,8 @@ int bt_mesh_provision(const uint8_t net_key[16], uint16_t net_idx,
 	return 0;
 }
 
-int bt_mesh_provision_adv(const uint8_t uuid[16], uint16_t net_idx, uint16_t addr,
-			  uint8_t attention_duration)
+int bt_mesh_provision_adv(const uint8_t uuid[16], uint16_t net_idx,
+			  uint16_t addr, uint8_t attention_duration)
 {
 	if (!atomic_test_bit(bt_mesh.flags, BT_MESH_VALID)) {
 		return -EINVAL;
@@ -260,7 +259,7 @@ int bt_mesh_suspend(void)
 }
 
 static void model_resume(struct bt_mesh_model *mod, struct bt_mesh_elem *elem,
-			  bool vnd, bool primary, void *user_data)
+			 bool vnd, bool primary, void *user_data)
 {
 	if (mod->pub && mod->pub->update) {
 		int32_t period_ms = bt_mesh_model_pub_period_get(mod);

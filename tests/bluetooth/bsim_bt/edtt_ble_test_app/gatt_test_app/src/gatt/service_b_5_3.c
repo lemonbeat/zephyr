@@ -19,14 +19,14 @@
 /** @def BT_UUID_SERVICE_B_5
  *  @brief UUID for the Service B.5
  */
-#define BT_UUID_SERVICE_B_5             BT_UUID_DECLARE_16(0xa00b)
+#define BT_UUID_SERVICE_B_5 BT_UUID_DECLARE_16(0xa00b)
 
 /** @def BT_UUID_VALUE_V8
  *  @brief UUID for the Value V8 Characteristic
  */
-#define BT_UUID_VALUE_V8                BT_UUID_DECLARE_16(0xb008)
+#define BT_UUID_VALUE_V8 BT_UUID_DECLARE_16(0xb008)
 
-static uint8_t   value_v8_value = 0x08;
+static uint8_t value_v8_value = 0x08;
 
 /**
  * @brief Attribute read call back for the Value V8 attribute
@@ -52,14 +52,13 @@ static ssize_t read_value_v8(struct bt_conn *conn,
 
 static struct bt_gatt_attr service_b_5_3_attrs[] = {
 	BT_GATT_H_PRIMARY_SERVICE(BT_UUID_SERVICE_B_5, 0x30),
-	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V8,
-		BT_GATT_CHRC_READ,
-		BT_GATT_PERM_READ,
-		read_value_v8, NULL, &value_v8_value, 0x31)
+	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V8, BT_GATT_CHRC_READ,
+				 BT_GATT_PERM_READ, read_value_v8, NULL,
+				 &value_v8_value, 0x31)
 };
 
 static struct bt_gatt_service service_b_5_3_svc =
-		    BT_GATT_SERVICE(service_b_5_3_attrs);
+	BT_GATT_SERVICE(service_b_5_3_attrs);
 
 /**
  * @brief Register the Service B.5 and all its Characteristics...

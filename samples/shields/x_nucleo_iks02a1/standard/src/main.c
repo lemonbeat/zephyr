@@ -167,9 +167,12 @@ void main(void)
 	struct sensor_value accel1[3], accel2[3];
 	struct sensor_value gyro[3];
 	struct sensor_value magn[3];
-	const struct device *iis2dlpc = device_get_binding(DT_LABEL(DT_INST(0, st_iis2dlpc)));
-	const struct device *iis2mdc = device_get_binding(DT_LABEL(DT_INST(0, st_iis2mdc)));
-	const struct device *ism330dhcx = device_get_binding(DT_LABEL(DT_INST(0, st_ism330dhcx)));
+	const struct device *iis2dlpc =
+		device_get_binding(DT_LABEL(DT_INST(0, st_iis2dlpc)));
+	const struct device *iis2mdc =
+		device_get_binding(DT_LABEL(DT_INST(0, st_iis2mdc)));
+	const struct device *ism330dhcx =
+		device_get_binding(DT_LABEL(DT_INST(0, st_ism330dhcx)));
 	int cnt = 1;
 
 	if (iis2dlpc == NULL) {
@@ -227,9 +230,9 @@ void main(void)
 		printf("X-NUCLEO-IKS02A1 sensor Mode 1 dashboard\n\n");
 
 		printf("IIS2DLPC: Accel (m.s-2): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&accel2[0]),
-			sensor_value_to_double(&accel2[1]),
-			sensor_value_to_double(&accel2[2]));
+		       sensor_value_to_double(&accel2[0]),
+		       sensor_value_to_double(&accel2[1]),
+		       sensor_value_to_double(&accel2[2]));
 
 		/* iis2mdc */
 		printf("IIS2MDC: Magn (gauss): x: %.3f, y: %.3f, z: %.3f\n",
@@ -241,14 +244,14 @@ void main(void)
 		       sensor_value_to_double(&die_temp2));
 
 		printf("ISM330DHCX: Accel (m.s-2): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&accel1[0]),
-			sensor_value_to_double(&accel1[1]),
-			sensor_value_to_double(&accel1[2]));
+		       sensor_value_to_double(&accel1[0]),
+		       sensor_value_to_double(&accel1[1]),
+		       sensor_value_to_double(&accel1[2]));
 
 		printf("ISM330DHCX: GYro (dps): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&gyro[0]),
-			sensor_value_to_double(&gyro[1]),
-			sensor_value_to_double(&gyro[2]));
+		       sensor_value_to_double(&gyro[0]),
+		       sensor_value_to_double(&gyro[1]),
+		       sensor_value_to_double(&gyro[2]));
 #ifdef CONFIG_IIS2DLPC_TRIGGER
 		printk("%d:: iis2dlpc trig %d\n", cnt, iis2dlpc_trig_cnt);
 #endif
@@ -258,10 +261,11 @@ void main(void)
 #endif
 
 #ifdef CONFIG_ISM330DHCX_TRIGGER
-		printk("%d:: ism330dhcx acc trig %d\n", cnt, ism330dhcx_acc_trig_cnt);
-		printk("%d:: ism330dhcx gyr trig %d\n", cnt, ism330dhcx_gyr_trig_cnt);
+		printk("%d:: ism330dhcx acc trig %d\n", cnt,
+		       ism330dhcx_acc_trig_cnt);
+		printk("%d:: ism330dhcx gyr trig %d\n", cnt,
+		       ism330dhcx_gyr_trig_cnt);
 #endif
-
 
 		cnt++;
 		k_sleep(K_MSEC(2000));

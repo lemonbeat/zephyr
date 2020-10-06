@@ -60,8 +60,7 @@ struct testfs_path {
  * @return a pointer to the start of the path.
  */
 const char *testfs_path_init(struct testfs_path *pp,
-			     const struct fs_mount_t *mp,
-			     ...);
+			     const struct fs_mount_t *mp, ...);
 
 /** Extend/modify an existing file system path.
  *
@@ -83,8 +82,7 @@ const char *testfs_path_init(struct testfs_path *pp,
  *
  * @return a pointer to the start of the path.
  */
-const char *testfs_path_extend(struct testfs_path *pp,
-			       ...);
+const char *testfs_path_extend(struct testfs_path *pp, ...);
 
 static inline struct testfs_path *testfs_path_copy(struct testfs_path *dp,
 						   const struct testfs_path *sp)
@@ -109,8 +107,7 @@ static inline struct testfs_path *testfs_path_copy(struct testfs_path *dp,
  *
  * @return number of octets written, or a negative error code.
  */
-int testfs_write_constant(struct fs_file_t *fp,
-			  uint8_t value,
+int testfs_write_constant(struct fs_file_t *fp, uint8_t value,
 			  unsigned int len);
 
 /** Verify that the file contains a sequence of constant data.
@@ -127,8 +124,7 @@ int testfs_write_constant(struct fs_file_t *fp,
  * len was reached or a mismatch occurred, or a negative error on file
  * read failure.
  */
-int testfs_verify_constant(struct fs_file_t *fp,
-			   uint8_t value,
+int testfs_verify_constant(struct fs_file_t *fp, uint8_t value,
 			   unsigned int len);
 
 /** Write an increasing sequence of bytes to the file.
@@ -143,8 +139,7 @@ int testfs_verify_constant(struct fs_file_t *fp,
  *
  * @return number of octets written, or a negative error code.
  */
-int testfs_write_incrementing(struct fs_file_t *fp,
-			      uint8_t value,
+int testfs_write_incrementing(struct fs_file_t *fp, uint8_t value,
 			      unsigned int len);
 
 /** Verify that the file contains a sequence of increasing data.
@@ -161,8 +156,7 @@ int testfs_write_incrementing(struct fs_file_t *fp,
  * len was reached or a mismatch occurred, or a negative error on file
  * read failure.
  */
-int testfs_verify_incrementing(struct fs_file_t *fp,
-			       uint8_t value,
+int testfs_verify_incrementing(struct fs_file_t *fp, uint8_t value,
 			       unsigned int len);
 
 /** Structure used to describe a filesystem layout. */
@@ -178,41 +172,42 @@ struct testfs_bcmd {
  * up to the next matching EXIT_DIR command are to be created within
  * that directory.
  */
-#define TESTFS_BCMD_ENTER_DIR(_n) {	  \
-		.type = FS_DIR_ENTRY_DIR, \
-		.name = _n,		  \
-}
+#define TESTFS_BCMD_ENTER_DIR(_n)                     \
+	{                                             \
+		.type = FS_DIR_ENTRY_DIR, .name = _n, \
+	}
 
 /* Specify that a file named _n is to be created, with _sz bytes of
  * content that starts with _val and increments with each byte.
  */
-#define TESTFS_BCMD_FILE(_n, _val, _sz) {  \
-		.type = FS_DIR_ENTRY_FILE, \
-		.name = _n,		   \
-		.size = _sz,		   \
-		.value = _val,		   \
-}
+#define TESTFS_BCMD_FILE(_n, _val, _sz)                             \
+	{                                                           \
+		.type = FS_DIR_ENTRY_FILE, .name = _n, .size = _sz, \
+		.value = _val,                                      \
+	}
 
 /* Specify that the content of the previous matching ENTER_DIR is
  * complete and subsequent entries should be created in the parent
  * directory.
  */
-#define TESTFS_BCMD_EXIT_DIR(_n) {	  \
+#define TESTFS_BCMD_EXIT_DIR(_n)          \
+	{                                 \
 		.type = FS_DIR_ENTRY_DIR, \
-}
+	}
 
 /* Specify that all build commands have been provided. */
-#define TESTFS_BCMD_END() { \
-}
+#define TESTFS_BCMD_END() \
+	{                 \
+	}
 
-#define TESTFS_BCMD_IS_ENTER_DIR(cp) (((cp)->type == FS_DIR_ENTRY_DIR) \
-				      && ((cp)->name != NULL))
-#define TESTFS_BCMD_IS_EXIT_DIR(cp) (((cp)->type == FS_DIR_ENTRY_DIR) \
-				     && ((cp)->name == NULL))
-#define TESTFS_BCMD_IS_FILE(cp) (((cp)->type == FS_DIR_ENTRY_FILE) \
-				 && ((cp)->name != NULL))
-#define TESTFS_BCMD_IS_END(cp) (((cp)->type == FS_DIR_ENTRY_FILE) \
-				&& ((cp)->name == NULL))
+#define TESTFS_BCMD_IS_ENTER_DIR(cp) \
+	(((cp)->type == FS_DIR_ENTRY_DIR) && ((cp)->name != NULL))
+#define TESTFS_BCMD_IS_EXIT_DIR(cp) \
+	(((cp)->type == FS_DIR_ENTRY_DIR) && ((cp)->name == NULL))
+#define TESTFS_BCMD_IS_FILE(cp) \
+	(((cp)->type == FS_DIR_ENTRY_FILE) && ((cp)->name != NULL))
+#define TESTFS_BCMD_IS_END(cp) \
+	(((cp)->type == FS_DIR_ENTRY_FILE) && ((cp)->name == NULL))
 
 /** Create a file system hierarchy.
  *
@@ -228,8 +223,7 @@ struct testfs_bcmd {
  * @return Zero after successfully building the hierarchy, or a
  * negative errno code.
  */
-int testfs_build(struct testfs_path *root,
-		 const struct testfs_bcmd *cp);
+int testfs_build(struct testfs_path *root, const struct testfs_bcmd *cp);
 
 /** Get the end range pointer for a sequence of build commands.
  *
@@ -264,8 +258,7 @@ static inline struct testfs_bcmd *testfs_bcmd_end(struct testfs_bcmd *cp)
  * build command content, or a negative error code on compare or file
  * system failures.
  */
-int testfs_bcmd_verify_layout(struct testfs_path *pp,
-			      struct testfs_bcmd *scp,
+int testfs_bcmd_verify_layout(struct testfs_path *pp, struct testfs_bcmd *scp,
 			      struct testfs_bcmd *ecp);
 
 /** Search a build command range for a match to an entry.

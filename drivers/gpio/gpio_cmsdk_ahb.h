@@ -43,7 +43,7 @@ struct gpio_cmsdk_ahb {
 		/* Offset: 0x038 (r/ ) interrupt status register */
 		volatile uint32_t intstatus;
 		/* Offset: 0x038 ( /w) interrupt clear register */
-		volatile uint32_t  intclear;
+		volatile uint32_t intclear;
 	};
 	volatile uint32_t reserved1[241];
 	/* Offset: 0x400 - 0x7fc lower byte masked access register (r/w) */

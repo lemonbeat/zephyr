@@ -10,17 +10,17 @@
 #endif /* CONFIG_BT_CTLR_RX_PDU_META */
 
 #define TICKER_INSTANCE_ID_CTLR 0
-#define TICKER_USER_ID_LLL      MAYFLY_CALL_ID_0
+#define TICKER_USER_ID_LLL MAYFLY_CALL_ID_0
 #define TICKER_USER_ID_ULL_HIGH MAYFLY_CALL_ID_1
-#define TICKER_USER_ID_ULL_LOW  MAYFLY_CALL_ID_2
-#define TICKER_USER_ID_THREAD   MAYFLY_CALL_ID_PROGRAM
+#define TICKER_USER_ID_ULL_LOW MAYFLY_CALL_ID_2
+#define TICKER_USER_ID_THREAD MAYFLY_CALL_ID_PROGRAM
 
 #define EVENT_PIPELINE_MAX 7
 #define EVENT_DONE_MAX 3
 
-#define HDR_ULL(p)     ((void *)((uint8_t *)(p) + sizeof(struct evt_hdr)))
-#define HDR_ULL2LLL(p) ((struct lll_hdr *)((uint8_t *)(p) + \
-					   sizeof(struct ull_hdr)))
+#define HDR_ULL(p) ((void *)((uint8_t *)(p) + sizeof(struct evt_hdr)))
+#define HDR_ULL2LLL(p) \
+	((struct lll_hdr *)((uint8_t *)(p) + sizeof(struct ull_hdr)))
 #define HDR_LLL2EVT(p) ((struct evt_hdr *)((struct lll_hdr *)(p))->parent)
 
 #if defined(CONFIG_BT_CTLR_XTAL_ADVANCED)
@@ -46,17 +46,17 @@ enum {
 	TICKER_ID_ADV_STOP,
 	TICKER_ID_ADV_BASE,
 #if defined(CONFIG_BT_CTLR_ADV_EXT) || defined(CONFIG_BT_HCI_MESH_EXT)
-	TICKER_ID_ADV_LAST = ((TICKER_ID_ADV_BASE) +
-			      (CONFIG_BT_CTLR_ADV_SET) - 1),
+	TICKER_ID_ADV_LAST =
+		((TICKER_ID_ADV_BASE) + (CONFIG_BT_CTLR_ADV_SET)-1),
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 #if (CONFIG_BT_CTLR_ADV_AUX_SET > 0)
 	TICKER_ID_ADV_AUX_BASE,
-	TICKER_ID_ADV_AUX_LAST = ((TICKER_ID_ADV_AUX_BASE) +
-				  (CONFIG_BT_CTLR_ADV_AUX_SET) - 1),
+	TICKER_ID_ADV_AUX_LAST =
+		((TICKER_ID_ADV_AUX_BASE) + (CONFIG_BT_CTLR_ADV_AUX_SET)-1),
 #if defined(CONFIG_BT_CTLR_ADV_PERIODIC)
 	TICKER_ID_ADV_SYNC_BASE,
-	TICKER_ID_ADV_SYNC_LAST = ((TICKER_ID_ADV_SYNC_BASE) +
-				   (CONFIG_BT_CTLR_ADV_SYNC_SET) - 1),
+	TICKER_ID_ADV_SYNC_LAST =
+		((TICKER_ID_ADV_SYNC_BASE) + (CONFIG_BT_CTLR_ADV_SYNC_SET)-1),
 #endif /* CONFIG_BT_CTLR_ADV_PERIODIC */
 #endif /* CONFIG_BT_CTLR_ADV_AUX_SET > 0 */
 #endif /* CONFIG_BT_CTLR_ADV_EXT */
@@ -66,25 +66,24 @@ enum {
 #if defined(CONFIG_BT_OBSERVER)
 	TICKER_ID_SCAN_STOP,
 	TICKER_ID_SCAN_BASE,
-	TICKER_ID_SCAN_LAST = ((TICKER_ID_SCAN_BASE) + (BT_CTLR_SCAN_SET) - 1),
+	TICKER_ID_SCAN_LAST = ((TICKER_ID_SCAN_BASE) + (BT_CTLR_SCAN_SET)-1),
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 	TICKER_ID_SCAN_AUX_BASE,
-	TICKER_ID_SCAN_AUX_LAST = ((TICKER_ID_SCAN_AUX_BASE) +
-				   (CONFIG_BT_CTLR_SCAN_AUX_SET) - 1),
+	TICKER_ID_SCAN_AUX_LAST =
+		((TICKER_ID_SCAN_AUX_BASE) + (CONFIG_BT_CTLR_SCAN_AUX_SET)-1),
 #endif /* CONFIG_BT_CTLR_ADV_EXT */
 #endif /* CONFIG_BT_OBSERVER */
 
 #if defined(CONFIG_BT_CONN)
 	TICKER_ID_CONN_BASE,
-	TICKER_ID_CONN_LAST = ((TICKER_ID_CONN_BASE) + (CONFIG_BT_MAX_CONN) -
-			       1),
+	TICKER_ID_CONN_LAST = ((TICKER_ID_CONN_BASE) + (CONFIG_BT_MAX_CONN)-1),
 #endif /* CONFIG_BT_CONN */
 
 #if defined(CONFIG_BT_CTLR_USER_EXT) && \
 	(CONFIG_BT_CTLR_USER_TICKER_ID_RANGE > 0)
 	TICKER_ID_USER_BASE,
-	TICKER_ID_USER_LAST = (TICKER_ID_USER_BASE +
-			       CONFIG_BT_CTLR_USER_TICKER_ID_RANGE - 1),
+	TICKER_ID_USER_LAST =
+		(TICKER_ID_USER_BASE + CONFIG_BT_CTLR_USER_TICKER_ID_RANGE - 1),
 #endif /* CONFIG_BT_CTLR_USER_EXT */
 
 	TICKER_ID_MAX,
@@ -111,7 +110,7 @@ struct evt_hdr {
 };
 
 struct ull_hdr {
-	uint8_t volatile ref;  /* Number of ongoing (between Prepare and Done)
+	uint8_t volatile ref; /* Number of ongoing (between Prepare and Done)
 				* events
 				*/
 	void (*disabled_cb)(void *param);
@@ -120,14 +119,14 @@ struct ull_hdr {
 
 struct lll_hdr {
 	void *parent;
-	uint8_t is_stop:1;
+	uint8_t is_stop : 1;
 };
 
 struct lll_prepare_param {
 	uint32_t ticks_at_expire;
 	uint32_t remainder;
 	uint16_t lazy;
-	void  *param;
+	void *param;
 };
 
 typedef int (*lll_prepare_cb_t)(struct lll_prepare_param *prepare_param);
@@ -138,12 +137,12 @@ typedef void (*lll_abort_cb_t)(struct lll_prepare_param *prepare_param,
 
 struct lll_event {
 	struct lll_prepare_param prepare_param;
-	lll_prepare_cb_t         prepare_cb;
-	lll_is_abort_cb_t        is_abort_cb;
-	lll_abort_cb_t           abort_cb;
-	int                      prio;
-	uint8_t                     is_resume:1;
-	uint8_t                     is_aborted:1;
+	lll_prepare_cb_t prepare_cb;
+	lll_is_abort_cb_t is_abort_cb;
+	lll_abort_cb_t abort_cb;
+	int prio;
+	uint8_t is_resume : 1;
+	uint8_t is_aborted : 1;
 };
 
 enum node_rx_type {
@@ -213,8 +212,8 @@ enum node_rx_type {
 /* Following proprietary defines must be at end of enum range */
 #if defined(CONFIG_BT_CTLR_USER_EXT)
 	NODE_RX_TYPE_USER_START = 0x17,
-	NODE_RX_TYPE_USER_END = NODE_RX_TYPE_USER_START +
-				CONFIG_BT_CTLR_USER_EVT_RANGE,
+	NODE_RX_TYPE_USER_END =
+		NODE_RX_TYPE_USER_START + CONFIG_BT_CTLR_USER_EVT_RANGE,
 #endif /* CONFIG_BT_CTLR_USER_EXT */
 
 };
@@ -224,43 +223,42 @@ struct node_rx_ftr {
 	union {
 		void *param;
 		struct {
-			uint8_t  status;
-			uint8_t  num_events;
+			uint8_t status;
+			uint8_t num_events;
 			uint16_t conn_handle;
 		} param_adv_term;
 	};
-	void     *extra;
+	void *extra;
 	uint32_t ticks_anchor;
 	uint32_t radio_end_us;
-	uint8_t  rssi;
+	uint8_t rssi;
 #if defined(CONFIG_BT_CTLR_PRIVACY)
-	uint8_t  lrpa_used:1;
-	uint8_t  rl_idx;
+	uint8_t lrpa_used : 1;
+	uint8_t rl_idx;
 #endif /* CONFIG_BT_CTLR_PRIVACY */
 #if defined(CONFIG_BT_CTLR_EXT_SCAN_FP)
-	uint8_t  direct;
+	uint8_t direct;
 #endif /* CONFIG_BT_CTLR_EXT_SCAN_FP */
 #if defined(CONFIG_BT_HCI_MESH_EXT)
-	uint8_t  chan_idx;
+	uint8_t chan_idx;
 #endif /* CONFIG_BT_HCI_MESH_EXT */
 };
-
 
 /* Header of node_rx_pdu */
 struct node_rx_hdr {
 	union {
-		void        *next;    /* For slist, by hci module */
-		memq_link_t *link;    /* Supply memq_link from ULL to LLL */
-		uint8_t     ack_last; /* Tx ack queue index at this node rx */
+		void *next; /* For slist, by hci module */
+		memq_link_t *link; /* Supply memq_link from ULL to LLL */
+		uint8_t ack_last; /* Tx ack queue index at this node rx */
 	};
 
 	enum node_rx_type type;
-	uint8_t           user_meta; /* User metadata */
-	uint16_t          handle;    /* State/Role instance handle */
+	uint8_t user_meta; /* User metadata */
+	uint16_t handle; /* State/Role instance handle */
 
 	union {
 #if defined(CONFIG_BT_CTLR_RX_PDU_META)
-		lll_rx_pdu_meta_t  rx_pdu_meta;
+		lll_rx_pdu_meta_t rx_pdu_meta;
 #endif /* CONFIG_BT_CTLR_RX_PDU_META */
 		struct node_rx_ftr rx_ftr;
 	};
@@ -268,7 +266,7 @@ struct node_rx_hdr {
 
 struct node_rx_pdu {
 	struct node_rx_hdr hdr;
-	uint8_t               pdu[0];
+	uint8_t pdu[0];
 };
 
 enum {
@@ -289,7 +287,7 @@ enum {
 #if defined(CONFIG_BT_CTLR_USER_EXT)
 	EVENT_DONE_EXTRA_TYPE_USER_START,
 	EVENT_DONE_EXTRA_TYPE_USER_END = EVENT_DONE_EXTRA_TYPE_USER_START +
-		CONFIG_BT_CTLR_USER_EVT_RANGE,
+					 CONFIG_BT_CTLR_USER_EVT_RANGE,
 #endif /* CONFIG_BT_CTLR_USER_EXT */
 
 };
@@ -305,9 +303,9 @@ struct event_done_extra {
 	union {
 		struct {
 			uint16_t trx_cnt;
-			uint8_t  crc_valid;
+			uint8_t crc_valid;
 #if defined(CONFIG_BT_CTLR_LE_ENC)
-			uint8_t  mic_state;
+			uint8_t mic_state;
 #endif /* CONFIG_BT_CTLR_LE_ENC */
 			union {
 				struct event_done_extra_slave slave;
@@ -317,8 +315,8 @@ struct event_done_extra {
 };
 
 struct node_rx_event_done {
-	struct node_rx_hdr      hdr;
-	void                    *param;
+	struct node_rx_hdr hdr;
+	void *param;
 	struct event_done_extra extra;
 };
 
@@ -356,11 +354,10 @@ int lll_csrand_isr_get(void *buf, size_t len);
 int lll_rand_get(void *buf, size_t len);
 int lll_rand_isr_get(void *buf, size_t len);
 
-int ull_prepare_enqueue(lll_is_abort_cb_t is_abort_cb,
-			       lll_abort_cb_t abort_cb,
-			       struct lll_prepare_param *prepare_param,
-			       lll_prepare_cb_t prepare_cb, int prio,
-			       uint8_t is_resume);
+int ull_prepare_enqueue(lll_is_abort_cb_t is_abort_cb, lll_abort_cb_t abort_cb,
+			struct lll_prepare_param *prepare_param,
+			lll_prepare_cb_t prepare_cb, int prio,
+			uint8_t is_resume);
 void *ull_prepare_dequeue_get(void);
 void *ull_prepare_dequeue_iter(uint8_t *idx);
 void *ull_pdu_rx_alloc_peek(uint8_t count);

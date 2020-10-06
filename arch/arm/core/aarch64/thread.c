@@ -16,7 +16,6 @@
 #include <wait_q.h>
 #include <arch/cpu.h>
 
-
 void z_thread_entry_wrapper(k_thread_entry_t k, void *p1, void *p2, void *p3);
 
 struct init_stack_frame {
@@ -44,8 +43,8 @@ struct init_stack_frame {
  * anymore.
  */
 void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
-		     char *stack_ptr, k_thread_entry_t entry,
-		     void *p1, void *p2, void *p3)
+		     char *stack_ptr, k_thread_entry_t entry, void *p1,
+		     void *p2, void *p3)
 {
 	struct init_stack_frame *pInitCtx;
 
@@ -83,7 +82,7 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
 
 void *z_arch_get_next_switch_handle(struct k_thread **old_thread)
 {
-	*old_thread =  _current;
+	*old_thread = _current;
 
 	return z_get_next_switch_handle(*old_thread);
 }

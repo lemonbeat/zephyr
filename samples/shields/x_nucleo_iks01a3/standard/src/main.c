@@ -36,7 +36,7 @@ static void lps22hh_trigger_handler(const struct device *dev,
 static int stts751_trig_cnt;
 
 static void stts751_trigger_handler(const struct device *dev,
-				       struct sensor_trigger *trig)
+				    struct sensor_trigger *trig)
 {
 	stts751_trig_cnt++;
 }
@@ -247,12 +247,18 @@ void main(void)
 	struct sensor_value accel1[3], accel2[3];
 	struct sensor_value gyro[3];
 	struct sensor_value magn[3];
-	const struct device *hts221 = device_get_binding(DT_LABEL(DT_INST(0, st_hts221)));
-	const struct device *lps22hh = device_get_binding(DT_LABEL(DT_INST(0, st_lps22hh)));
-	const struct device *stts751 = device_get_binding(DT_LABEL(DT_INST(0, st_stts751)));
-	const struct device *lis2mdl = device_get_binding(DT_LABEL(DT_INST(0, st_lis2mdl)));
-	const struct device *lis2dw12 = device_get_binding(DT_LABEL(DT_INST(0, st_lis2dw12)));
-	const struct device *lsm6dso = device_get_binding(DT_LABEL(DT_INST(0, st_lsm6dso)));
+	const struct device *hts221 =
+		device_get_binding(DT_LABEL(DT_INST(0, st_hts221)));
+	const struct device *lps22hh =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lps22hh)));
+	const struct device *stts751 =
+		device_get_binding(DT_LABEL(DT_INST(0, st_stts751)));
+	const struct device *lis2mdl =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lis2mdl)));
+	const struct device *lis2dw12 =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lis2dw12)));
+	const struct device *lsm6dso =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lsm6dso)));
 	int cnt = 1;
 
 	if (hts221 == NULL) {
@@ -377,19 +383,19 @@ void main(void)
 		       sensor_value_to_double(&die_temp2));
 
 		printf("LIS2DW12: Accel (m.s-2): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&accel2[0]),
-			sensor_value_to_double(&accel2[1]),
-			sensor_value_to_double(&accel2[2]));
+		       sensor_value_to_double(&accel2[0]),
+		       sensor_value_to_double(&accel2[1]),
+		       sensor_value_to_double(&accel2[2]));
 
 		printf("LSM6DSO: Accel (m.s-2): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&accel1[0]),
-			sensor_value_to_double(&accel1[1]),
-			sensor_value_to_double(&accel1[2]));
+		       sensor_value_to_double(&accel1[0]),
+		       sensor_value_to_double(&accel1[1]),
+		       sensor_value_to_double(&accel1[2]));
 
 		printf("LSM6DSO: GYro (dps): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&gyro[0]),
-			sensor_value_to_double(&gyro[1]),
-			sensor_value_to_double(&gyro[2]));
+		       sensor_value_to_double(&gyro[0]),
+		       sensor_value_to_double(&gyro[1]),
+		       sensor_value_to_double(&gyro[2]));
 
 #ifdef CONFIG_LSM6DSO_ENABLE_TEMP
 		/* temperature */
@@ -417,7 +423,7 @@ void main(void)
 		printk("%d:: lsm6dso acc trig %d\n", cnt, lsm6dso_acc_trig_cnt);
 		printk("%d:: lsm6dso gyr trig %d\n", cnt, lsm6dso_gyr_trig_cnt);
 		printk("%d:: lsm6dso temp trig %d\n", cnt,
-			lsm6dso_temp_trig_cnt);
+		       lsm6dso_temp_trig_cnt);
 #endif
 
 		cnt++;

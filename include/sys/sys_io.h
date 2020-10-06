@@ -331,7 +331,6 @@ typedef uintptr_t mem_addr_t;
  * @return 0 if it was clear, 1 otherwise
  */
 
-
 #ifdef __cplusplus
 }
 #endif

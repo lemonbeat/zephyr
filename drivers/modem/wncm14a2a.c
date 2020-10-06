@@ -49,11 +49,10 @@ struct mdm_control_pinconfig {
 	gpio_flags_t flags;
 };
 
-#define PINCONFIG(name_, pin_, flags_) { \
-	.dev_name = name_, \
-	.pin = pin_, \
-	.flags = flags_ \
-}
+#define PINCONFIG(name_, pin_, flags_)                          \
+	{                                                       \
+		.dev_name = name_, .pin = pin_, .flags = flags_ \
+	}
 
 /* pin settings */
 enum mdm_control_pins {
@@ -102,55 +101,54 @@ static const struct mdm_control_pinconfig pinconfig[] = {
 #endif
 };
 
-#define MDM_UART_DEV_NAME		DT_INST_BUS_LABEL(0)
+#define MDM_UART_DEV_NAME DT_INST_BUS_LABEL(0)
 
-#define MDM_BOOT_MODE_SPECIAL		0
-#define MDM_BOOT_MODE_NORMAL		1
-#define MDM_POWER_ENABLE		0
-#define MDM_POWER_DISABLE		1
-#define MDM_KEEP_AWAKE_DISABLED		0
-#define MDM_KEEP_AWAKE_ENABLED		1
-#define MDM_RESET_NOT_ASSERTED		0
-#define MDM_RESET_ASSERTED		1
-#define SHLD_3V3_1V8_SIG_TRANS_DISABLED	0
-#define SHLD_3V3_1V8_SIG_TRANS_ENABLED	1
-#define MDM_SEND_OK_ENABLED		0
-#define MDM_SEND_OK_DISABLED		1
+#define MDM_BOOT_MODE_SPECIAL 0
+#define MDM_BOOT_MODE_NORMAL 1
+#define MDM_POWER_ENABLE 0
+#define MDM_POWER_DISABLE 1
+#define MDM_KEEP_AWAKE_DISABLED 0
+#define MDM_KEEP_AWAKE_ENABLED 1
+#define MDM_RESET_NOT_ASSERTED 0
+#define MDM_RESET_ASSERTED 1
+#define SHLD_3V3_1V8_SIG_TRANS_DISABLED 0
+#define SHLD_3V3_1V8_SIG_TRANS_ENABLED 1
+#define MDM_SEND_OK_ENABLED 0
+#define MDM_SEND_OK_DISABLED 1
 
-#define MDM_CMD_TIMEOUT			(5 * MSEC_PER_SEC)
-#define MDM_CMD_SEND_TIMEOUT		(10 * MSEC_PER_SEC)
-#define MDM_CMD_CONN_TIMEOUT		(31 * MSEC_PER_SEC)
+#define MDM_CMD_TIMEOUT (5 * MSEC_PER_SEC)
+#define MDM_CMD_SEND_TIMEOUT (10 * MSEC_PER_SEC)
+#define MDM_CMD_CONN_TIMEOUT (31 * MSEC_PER_SEC)
 
-#define MDM_MAX_DATA_LENGTH		1500
+#define MDM_MAX_DATA_LENGTH 1500
 
-#define MDM_RECV_MAX_BUF		30
-#define MDM_RECV_BUF_SIZE		128
+#define MDM_RECV_MAX_BUF 30
+#define MDM_RECV_BUF_SIZE 128
 
-#define MDM_MAX_SOCKETS			6
+#define MDM_MAX_SOCKETS 6
 
 #define BUF_ALLOC_TIMEOUT K_SECONDS(1)
 
-#define CMD_HANDLER(cmd_, cb_) { \
-	.cmd = cmd_, \
-	.cmd_len = (uint16_t)sizeof(cmd_)-1, \
-	.func = on_cmd_ ## cb_ \
-}
+#define CMD_HANDLER(cmd_, cb_)                                      \
+	{                                                           \
+		.cmd = cmd_, .cmd_len = (uint16_t)sizeof(cmd_) - 1, \
+		.func = on_cmd_##cb_                                \
+	}
 
-#define MDM_MANUFACTURER_LENGTH		10
-#define MDM_MODEL_LENGTH		16
-#define MDM_REVISION_LENGTH		64
-#define MDM_IMEI_LENGTH			16
+#define MDM_MANUFACTURER_LENGTH 10
+#define MDM_MODEL_LENGTH 16
+#define MDM_REVISION_LENGTH 64
+#define MDM_IMEI_LENGTH 16
 
-#define RSSI_TIMEOUT_SECS		30
+#define RSSI_TIMEOUT_SECS 30
 
-NET_BUF_POOL_DEFINE(mdm_recv_pool, MDM_RECV_MAX_BUF, MDM_RECV_BUF_SIZE,
-		    0, NULL);
+NET_BUF_POOL_DEFINE(mdm_recv_pool, MDM_RECV_MAX_BUF, MDM_RECV_BUF_SIZE, 0,
+		    NULL);
 
 static uint8_t mdm_recv_buf[MDM_MAX_DATA_LENGTH];
 
 /* RX thread structures */
-K_KERNEL_STACK_DEFINE(wncm14a2a_rx_stack,
-		       CONFIG_MODEM_WNCM14A2A_RX_STACK_SIZE);
+K_KERNEL_STACK_DEFINE(wncm14a2a_rx_stack, CONFIG_MODEM_WNCM14A2A_RX_STACK_SIZE);
 struct k_thread wncm14a2a_rx_thread;
 
 /* RX thread work queue */
@@ -327,14 +325,14 @@ char *wncm14a2a_sprint_ip_addr(const struct sockaddr *addr)
 
 #if defined(CONFIG_NET_IPV6)
 	if (addr->sa_family == AF_INET6) {
-		return net_addr_ntop(AF_INET6, &net_sin6(addr)->sin6_addr,
-				     buf, sizeof(buf));
+		return net_addr_ntop(AF_INET6, &net_sin6(addr)->sin6_addr, buf,
+				     sizeof(buf));
 	} else
 #endif
 #if defined(CONFIG_NET_IPV4)
-	if (addr->sa_family == AF_INET) {
-		return net_addr_ntop(AF_INET, &net_sin(addr)->sin_addr,
-				     buf, sizeof(buf));
+		if (addr->sa_family == AF_INET) {
+		return net_addr_ntop(AF_INET, &net_sin(addr)->sin_addr, buf,
+				     sizeof(buf));
 	} else
 #endif
 	{
@@ -344,8 +342,8 @@ char *wncm14a2a_sprint_ip_addr(const struct sockaddr *addr)
 }
 
 /* Send an AT command with a series of response handlers */
-static int send_at_cmd(struct wncm14a2a_socket *sock,
-			const uint8_t *data, int timeout)
+static int send_at_cmd(struct wncm14a2a_socket *sock, const uint8_t *data,
+		       int timeout)
 {
 	int ret;
 
@@ -390,14 +388,13 @@ static int send_data(struct wncm14a2a_socket *sock, struct net_pkt *pkt)
 
 	frag = pkt->frags;
 	/* use SOCKWRITE with binary mode formatting */
-	snprintk(buf, sizeof(buf), "AT@SOCKWRITE=%d,%u,1\r",
-		 sock->socket_id, net_buf_frags_len(frag));
+	snprintk(buf, sizeof(buf), "AT@SOCKWRITE=%d,%u,1\r", sock->socket_id,
+		 net_buf_frags_len(frag));
 	mdm_receiver_send(&ictx.mdm_ctx, buf, strlen(buf));
 
 	/* Loop through packet data and send */
 	while (frag) {
-		mdm_receiver_send(&ictx.mdm_ctx,
-				  frag->data, frag->len);
+		mdm_receiver_send(&ictx.mdm_ctx, frag->data, frag->len);
 		frag = frag->frags;
 	}
 
@@ -436,7 +433,7 @@ static void net_buf_skipcrlf(struct net_buf **buf)
 }
 
 static uint16_t net_buf_findcrlf(struct net_buf *buf, struct net_buf **frag,
-			      uint16_t *offset)
+				 uint16_t *offset)
 {
 	uint16_t len = 0U, pos = 0U;
 
@@ -467,8 +464,7 @@ static uint16_t net_buf_findcrlf(struct net_buf *buf, struct net_buf **frag,
  * important.
  * Return the IP + protocol header length.
  */
-static int pkt_setup_ip_data(struct net_pkt *pkt,
-			     struct wncm14a2a_socket *sock)
+static int pkt_setup_ip_data(struct net_pkt *pkt, struct wncm14a2a_socket *sock)
 {
 	int hdr_len = 0;
 	uint16_t src_port = 0U, dst_port = 0U;
@@ -488,10 +484,9 @@ static int pkt_setup_ip_data(struct net_pkt *pkt,
 	} else
 #endif
 #if defined(CONFIG_NET_IPV4)
-	if (net_pkt_family(pkt) == AF_INET) {
+		if (net_pkt_family(pkt) == AF_INET) {
 		if (net_ipv4_create(
-			    pkt,
-			    &((struct sockaddr_in *)&sock->dst)->sin_addr,
+			    pkt, &((struct sockaddr_in *)&sock->dst)->sin_addr,
 			    &((struct sockaddr_in *)&sock->src)->sin_addr)) {
 			return -1;
 		}
@@ -515,7 +510,7 @@ static int pkt_setup_ip_data(struct net_pkt *pkt,
 	} else
 #endif
 #if defined(CONFIG_NET_TCP)
-	if (sock->ip_proto == IPPROTO_TCP) {
+		if (sock->ip_proto == IPPROTO_TCP) {
 		NET_PKT_DATA_ACCESS_DEFINE(tcp_access, struct net_tcp_hdr);
 		struct net_tcp_hdr *tcp;
 
@@ -567,8 +562,8 @@ static void on_cmd_atcmdinfo_manufacturer(struct net_buf **buf, uint16_t len)
 	size_t out_len;
 
 	out_len = net_buf_linearize(ictx.mdm_manufacturer,
-				    sizeof(ictx.mdm_manufacturer) - 1,
-				    *buf, 0, len);
+				    sizeof(ictx.mdm_manufacturer) - 1, *buf, 0,
+				    len);
 	ictx.mdm_manufacturer[out_len] = 0;
 	LOG_INF("Manufacturer: %s", ictx.mdm_manufacturer);
 }
@@ -577,8 +572,7 @@ static void on_cmd_atcmdinfo_model(struct net_buf **buf, uint16_t len)
 {
 	size_t out_len;
 
-	out_len = net_buf_linearize(ictx.mdm_model,
-				    sizeof(ictx.mdm_model) - 1,
+	out_len = net_buf_linearize(ictx.mdm_model, sizeof(ictx.mdm_model) - 1,
 				    *buf, 0, len);
 	ictx.mdm_model[out_len] = 0;
 	LOG_INF("Model: %s", ictx.mdm_model);
@@ -588,9 +582,8 @@ static void on_cmd_atcmdinfo_revision(struct net_buf **buf, uint16_t len)
 {
 	size_t out_len;
 
-	out_len = net_buf_linearize(ictx.mdm_revision,
-				    sizeof(ictx.mdm_revision) - 1,
-				    *buf, 0, len);
+	out_len = net_buf_linearize(
+		ictx.mdm_revision, sizeof(ictx.mdm_revision) - 1, *buf, 0, len);
 	ictx.mdm_revision[out_len] = 0;
 	LOG_INF("Revision: %s", ictx.mdm_revision);
 }
@@ -739,7 +732,7 @@ static void on_cmd_sockcreat(struct net_buf **buf, uint16_t len)
 	/* look up new socket by special id */
 	sock = socket_from_id(MDM_MAX_SOCKETS + 1);
 	if (sock) {
-	/* make sure only a single digit is picked up for socket_id */
+		/* make sure only a single digit is picked up for socket_id */
 		value[0] = net_buf_pull_u8(*buf);
 		sock->socket_id = atoi(value);
 	}
@@ -779,8 +772,8 @@ static void sockreadrecv_cb_work(struct k_work *work)
 	pkt = sock->recv_pkt;
 	sock->recv_pkt = NULL;
 	if (sock->recv_cb) {
-		sock->recv_cb(sock->context, pkt, NULL, NULL,
-			      0, sock->recv_user_data);
+		sock->recv_cb(sock->context, pkt, NULL, NULL, 0,
+			      sock->recv_user_data);
 	} else {
 		net_pkt_unref(pkt);
 	}
@@ -806,7 +799,7 @@ static void on_cmd_sockread(struct net_buf **buf, uint16_t len)
 			*buf = net_buf_frag_del(NULL, *buf);
 		}
 
-		if (value[i-1] == ',') {
+		if (value[i - 1] == ',') {
 			i--;
 			break;
 		}
@@ -845,9 +838,8 @@ static void on_cmd_sockread(struct net_buf **buf, uint16_t len)
 
 	/* allocate an RX pkt */
 	sock->recv_pkt = net_pkt_rx_alloc_with_buffer(
-			net_context_get_iface(sock->context),
-			actual_length, sock->family, sock->ip_proto,
-			BUF_ALLOC_TIMEOUT);
+		net_context_get_iface(sock->context), actual_length,
+		sock->family, sock->ip_proto, BUF_ALLOC_TIMEOUT);
 	if (!sock->recv_pkt) {
 		LOG_ERR("Failed net_pkt_get_reserve_rx!");
 		return;
@@ -1012,7 +1004,7 @@ static void on_cmd_socknotifyev(struct net_buf **buf, uint16_t len)
 		/* This also signifies that RRCSTATE = 1 */
 		ictx.ev_rrcstate = 1;
 		LOG_DBG("CSPS:%d", ictx.ev_csps);
-	/* RRCSTATE: 0: RRC Idle, 1: RRC Connected, 2: RRC Unknown */
+		/* RRCSTATE: 0: RRC Idle, 1: RRC Connected, 2: RRC Unknown */
 	} else if (!strncmp(&value[p1], "RRCSTATE", 8)) {
 		ictx.ev_rrcstate = atoi(&value[p2]);
 		LOG_DBG("RRCSTATE:%d", ictx.ev_rrcstate);
@@ -1065,10 +1057,8 @@ static void wncm14a2a_read_rx(struct net_buf **buf)
 
 	/* read all of the data from mdm_receiver */
 	while (true) {
-		ret = mdm_receiver_recv(&ictx.mdm_ctx,
-					uart_buffer,
-					sizeof(uart_buffer),
-					&bytes_read);
+		ret = mdm_receiver_recv(&ictx.mdm_ctx, uart_buffer,
+					sizeof(uart_buffer), &bytes_read);
 		if (ret < 0 || bytes_read == 0) {
 			/* mdm_receiver buffer is empty */
 			break;
@@ -1081,7 +1071,7 @@ static void wncm14a2a_read_rx(struct net_buf **buf)
 			*buf = net_buf_alloc(&mdm_recv_pool, BUF_ALLOC_TIMEOUT);
 			if (!*buf) {
 				LOG_ERR("Can't allocate RX data! "
-					    "Skipping data!");
+					"Skipping data!");
 				break;
 			}
 		}
@@ -1091,8 +1081,8 @@ static void wncm14a2a_read_rx(struct net_buf **buf)
 					      read_rx_allocator,
 					      &mdm_recv_pool);
 		if (rx_len < bytes_read) {
-			LOG_ERR("Data was lost! read %u of %u!",
-				    rx_len, bytes_read);
+			LOG_ERR("Data was lost! read %u of %u!", rx_len,
+				bytes_read);
 		}
 	}
 }
@@ -1168,16 +1158,16 @@ static void wncm14a2a_rx(void)
 						 handlers[i].cmd_len) == 0) {
 					/* found a matching handler */
 					LOG_DBG("MATCH %s (len:%u)",
-						    handlers[i].cmd, len);
+						handlers[i].cmd, len);
 
 					/* skip cmd_len */
-					rx_buf = net_buf_skip(rx_buf,
-							handlers[i].cmd_len);
+					rx_buf = net_buf_skip(
+						rx_buf, handlers[i].cmd_len);
 
 					/* locate next cr/lf */
 					frag = NULL;
-					len = net_buf_findcrlf(rx_buf,
-							       &frag, &offset);
+					len = net_buf_findcrlf(rx_buf, &frag,
+							       &offset);
 					if (!frag) {
 						break;
 					}
@@ -1202,8 +1192,8 @@ static void wncm14a2a_rx(void)
 					 * next handler search.  Ignore the
 					 * length returned.
 					 */
-					(void)net_buf_findcrlf(rx_buf,
-							       &frag, &offset);
+					(void)net_buf_findcrlf(rx_buf, &frag,
+							       &offset);
 					break;
 				}
 			}
@@ -1261,17 +1251,14 @@ static int modem_pin_init(void)
 			 MDM_BOOT_MODE_NORMAL);
 	LOG_DBG("MDM_POWER_PIN -> ENABLE");
 	gpio_pin_set_raw(ictx.gpio_port_dev[MDM_POWER],
-			 pinconfig[MDM_POWER].pin,
-			 MDM_POWER_ENABLE);
+			 pinconfig[MDM_POWER].pin, MDM_POWER_ENABLE);
 	LOG_DBG("MDM_KEEP_AWAKE_PIN -> ENABLED");
 	gpio_pin_set_raw(ictx.gpio_port_dev[MDM_KEEP_AWAKE],
-			 pinconfig[MDM_KEEP_AWAKE].pin,
-			 MDM_KEEP_AWAKE_ENABLED);
+			 pinconfig[MDM_KEEP_AWAKE].pin, MDM_KEEP_AWAKE_ENABLED);
 #if DT_INST_NODE_HAS_PROP(0, mdm_send_ok_gpios)
 	LOG_DBG("MDM_SEND_OK_PIN -> ENABLED");
 	gpio_pin_set_raw(ictx.gpio_port_dev[MDM_SEND_OK],
-			 pinconfig[MDM_SEND_OK].pin,
-			 MDM_SEND_OK_ENABLED);
+			 pinconfig[MDM_SEND_OK].pin, MDM_SEND_OK_ENABLED);
 #endif
 
 	/* wait for the WNC Module to perform its initial boot correctly */
@@ -1306,8 +1293,7 @@ static void modem_wakeup_pin_fix(void)
 	k_sleep(K_SECONDS(2));
 	LOG_DBG("MDM_KEEP_AWAKE_PIN -> ENABLED");
 	gpio_pin_set_raw(ictx.gpio_port_dev[MDM_KEEP_AWAKE],
-			 pinconfig[MDM_KEEP_AWAKE].pin,
-			 MDM_KEEP_AWAKE_ENABLED);
+			 pinconfig[MDM_KEEP_AWAKE].pin, MDM_KEEP_AWAKE_ENABLED);
 	k_sleep(K_MSEC(20));
 }
 
@@ -1322,8 +1308,7 @@ static void wncm14a2a_rssi_query_work(struct k_work *work)
 	}
 
 	/* re-start RSSI query work */
-	k_delayed_work_submit_to_queue(&wncm14a2a_workq,
-				       &ictx.rssi_query_work,
+	k_delayed_work_submit_to_queue(&wncm14a2a_workq, &ictx.rssi_query_work,
 				       K_SECONDS(RSSI_TIMEOUT_SECS));
 }
 
@@ -1368,8 +1353,10 @@ restart:
 		goto error;
 	}
 
-	ret = send_at_cmd(NULL, "AT%PDNSET=1,\"" CONFIG_MODEM_WNCM14A2A_APN_NAME
-			  "\",\"IPV4V6\"", MDM_CMD_TIMEOUT);
+	ret = send_at_cmd(NULL,
+			  "AT%PDNSET=1,\"" CONFIG_MODEM_WNCM14A2A_APN_NAME
+			  "\",\"IPV4V6\"",
+			  MDM_CMD_TIMEOUT);
 	if (ret < 0) {
 		LOG_ERR("AT%%PDNSET ret:%d", ret);
 		goto error;
@@ -1398,9 +1385,8 @@ restart:
 
 	counter = 0;
 	/* wait for RSSI > -1000 and != 0 */
-	while (counter++ < 15 &&
-	       (ictx.mdm_ctx.data_rssi <= -1000 ||
-		ictx.mdm_ctx.data_rssi == 0)) {
+	while (counter++ < 15 && (ictx.mdm_ctx.data_rssi <= -1000 ||
+				  ictx.mdm_ctx.data_rssi == 0)) {
 		/* stop RSSI delay work */
 		k_delayed_work_cancel(&ictx.rssi_query_work);
 		wncm14a2a_rssi_query_work(NULL);
@@ -1449,7 +1435,7 @@ static int wncm14a2a_init(const struct device *dev)
 
 	/* check for valid pinconfig */
 	__ASSERT(ARRAY_SIZE(pinconfig) == MAX_MDM_CONTROL_PINS,
-	       "Incorrect modem pinconfig!");
+		 "Incorrect modem pinconfig!");
 
 	(void)memset(&ictx, 0, sizeof(ictx));
 	for (i = 0; i < MDM_MAX_SOCKETS; i++) {
@@ -1460,8 +1446,7 @@ static int wncm14a2a_init(const struct device *dev)
 	k_sem_init(&ictx.response_sem, 0, 1);
 
 	/* initialize the work queue */
-	k_work_q_start(&wncm14a2a_workq,
-		       wncm14a2a_workq_stack,
+	k_work_q_start(&wncm14a2a_workq, wncm14a2a_workq_stack,
 		       K_KERNEL_STACK_SIZEOF(wncm14a2a_workq_stack),
 		       K_PRIO_COOP(7));
 
@@ -1470,10 +1455,10 @@ static int wncm14a2a_init(const struct device *dev)
 	/* setup port devices and pin directions */
 	for (i = 0; i < MAX_MDM_CONTROL_PINS; i++) {
 		ictx.gpio_port_dev[i] =
-				device_get_binding(pinconfig[i].dev_name);
+			device_get_binding(pinconfig[i].dev_name);
 		if (!ictx.gpio_port_dev[i]) {
 			LOG_ERR("gpio port (%s) not found!",
-				    pinconfig[i].dev_name);
+				pinconfig[i].dev_name);
 			return -ENODEV;
 		}
 
@@ -1497,8 +1482,8 @@ static int wncm14a2a_init(const struct device *dev)
 	/* start RX thread */
 	k_thread_create(&wncm14a2a_rx_thread, wncm14a2a_rx_stack,
 			K_KERNEL_STACK_SIZEOF(wncm14a2a_rx_stack),
-			(k_thread_entry_t) wncm14a2a_rx,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+			(k_thread_entry_t)wncm14a2a_rx, NULL, NULL, NULL,
+			K_PRIO_COOP(7), 0, K_NO_WAIT);
 
 	/* init RSSI query */
 	k_delayed_work_init(&ictx.rssi_query_work, wncm14a2a_rssi_query_work);
@@ -1511,8 +1496,7 @@ error:
 
 /*** OFFLOAD FUNCTIONS ***/
 
-static int offload_get(sa_family_t family,
-		       enum net_sock_type type,
+static int offload_get(sa_family_t family, enum net_sock_type type,
 		       enum net_ip_protocol ip_proto,
 		       struct net_context **context)
 {
@@ -1545,8 +1529,7 @@ static int offload_get(sa_family_t family,
 }
 
 static int offload_bind(struct net_context *context,
-			const struct sockaddr *addr,
-			socklen_t addrlen)
+			const struct sockaddr *addr, socklen_t addrlen)
 {
 	struct wncm14a2a_socket *sock = NULL;
 
@@ -1570,7 +1553,7 @@ static int offload_bind(struct net_context *context,
 	} else
 #endif
 #if defined(CONFIG_NET_IPV4)
-	if (addr->sa_family == AF_INET) {
+		if (addr->sa_family == AF_INET) {
 		net_ipaddr_copy(&net_sin(&sock->src)->sin_addr,
 				&net_sin(addr)->sin_addr);
 		net_sin(&sock->src)->sin_port = net_sin(addr)->sin_port;
@@ -1590,10 +1573,8 @@ static int offload_listen(struct net_context *context, int backlog)
 }
 
 static int offload_connect(struct net_context *context,
-			   const struct sockaddr *addr,
-			   socklen_t addrlen,
-			   net_context_connect_cb_t cb,
-			   int32_t timeout,
+			   const struct sockaddr *addr, socklen_t addrlen,
+			   net_context_connect_cb_t cb, int32_t timeout,
 			   void *user_data)
 {
 	int ret, dst_port = -1;
@@ -1617,7 +1598,7 @@ static int offload_connect(struct net_context *context,
 
 	if (sock->socket_id < 1) {
 		LOG_ERR("Invalid socket_id(%d) for net_ctx:%p!",
-			    sock->socket_id, context);
+			sock->socket_id, context);
 		return -EINVAL;
 	}
 
@@ -1632,7 +1613,7 @@ static int offload_connect(struct net_context *context,
 	} else
 #endif
 #if defined(CONFIG_NET_IPV4)
-	if (addr->sa_family == AF_INET) {
+		if (addr->sa_family == AF_INET) {
 		net_ipaddr_copy(&net_sin(&sock->dst)->sin_addr,
 				&net_sin(addr)->sin_addr);
 		dst_port = ntohs(net_sin(addr)->sin_port);
@@ -1655,8 +1636,8 @@ static int offload_connect(struct net_context *context,
 	timeout_sec = MIN(360, MAX(timeout_sec, 30));
 
 	snprintk(buf, sizeof(buf), "AT@SOCKCONN=%d,\"%s\",%d,%d",
-		 sock->socket_id, wncm14a2a_sprint_ip_addr(addr),
-		 dst_port, timeout_sec);
+		 sock->socket_id, wncm14a2a_sprint_ip_addr(addr), dst_port,
+		 timeout_sec);
 	ret = send_at_cmd(sock, buf, MDM_CMD_CONN_TIMEOUT);
 	if (ret < 0) {
 		LOG_ERR("AT@SOCKCONN ret:%d", ret);
@@ -1669,21 +1650,16 @@ static int offload_connect(struct net_context *context,
 	return ret;
 }
 
-static int offload_accept(struct net_context *context,
-			  net_tcp_accept_cb_t cb,
-			  int32_t timeout,
-			  void *user_data)
+static int offload_accept(struct net_context *context, net_tcp_accept_cb_t cb,
+			  int32_t timeout, void *user_data)
 {
 	/* NOT IMPLEMENTED */
 	return -ENOTSUP;
 }
 
-static int offload_sendto(struct net_pkt *pkt,
-			  const struct sockaddr *dst_addr,
-			  socklen_t addrlen,
-			  net_context_send_cb_t cb,
-			  int32_t timeout,
-			  void *user_data)
+static int offload_sendto(struct net_pkt *pkt, const struct sockaddr *dst_addr,
+			  socklen_t addrlen, net_context_send_cb_t cb,
+			  int32_t timeout, void *user_data)
 {
 	struct net_context *context = net_pkt_context(pkt);
 	struct wncm14a2a_socket *sock;
@@ -1713,10 +1689,8 @@ static int offload_sendto(struct net_pkt *pkt,
 	return ret;
 }
 
-static int offload_send(struct net_pkt *pkt,
-			net_context_send_cb_t cb,
-			int32_t timeout,
-			void *user_data)
+static int offload_send(struct net_pkt *pkt, net_context_send_cb_t cb,
+			int32_t timeout, void *user_data)
 {
 	struct net_context *context = net_pkt_context(pkt);
 	socklen_t addrlen;
@@ -1728,7 +1702,7 @@ static int offload_send(struct net_pkt *pkt,
 	} else
 #endif /* CONFIG_NET_IPV6 */
 #if defined(CONFIG_NET_IPV4)
-	if (net_pkt_family(pkt) == AF_INET) {
+		if (net_pkt_family(pkt) == AF_INET) {
 		addrlen = sizeof(struct sockaddr_in);
 	} else
 #endif /* CONFIG_NET_IPV4 */
@@ -1736,14 +1710,12 @@ static int offload_send(struct net_pkt *pkt,
 		return -EPFNOSUPPORT;
 	}
 
-	return offload_sendto(pkt, &context->remote, addrlen, cb,
-			      timeout, user_data);
+	return offload_sendto(pkt, &context->remote, addrlen, cb, timeout,
+			      user_data);
 }
 
-static int offload_recv(struct net_context *context,
-			net_context_recv_cb_t cb,
-			int32_t timeout,
-			void *user_data)
+static int offload_recv(struct net_context *context, net_context_recv_cb_t cb,
+			int32_t timeout, void *user_data)
 {
 	struct wncm14a2a_socket *sock;
 
@@ -1809,9 +1781,9 @@ static int offload_put(struct net_context *context)
 static struct net_offload offload_funcs = {
 	.get = offload_get,
 	.bind = offload_bind,
-	.listen = offload_listen,	/* TODO */
+	.listen = offload_listen, /* TODO */
 	.connect = offload_connect,
-	.accept = offload_accept,	/* TODO */
+	.accept = offload_accept, /* TODO */
 	.send = offload_send,
 	.sendto = offload_sendto,
 	.recv = offload_recv,
@@ -1838,16 +1810,15 @@ static void offload_iface_init(struct net_if *iface)
 
 	iface->if_dev->offload = &offload_funcs;
 	net_if_set_link_addr(iface, wncm14a2a_get_mac(dev),
-			     sizeof(ctx->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(ctx->mac_addr), NET_LINK_ETHERNET);
 	ctx->iface = iface;
 }
 
 static struct net_if_api api_funcs = {
-	.init	= offload_iface_init,
+	.init = offload_iface_init,
 };
 
-NET_DEVICE_OFFLOAD_INIT(modem_wncm14a2a, "MODEM_WNCM14A2A",
-			wncm14a2a_init, device_pm_control_nop, &ictx,
-			NULL, CONFIG_MODEM_WNCM14A2A_INIT_PRIORITY, &api_funcs,
+NET_DEVICE_OFFLOAD_INIT(modem_wncm14a2a, "MODEM_WNCM14A2A", wncm14a2a_init,
+			device_pm_control_nop, &ictx, NULL,
+			CONFIG_MODEM_WNCM14A2A_INIT_PRIORITY, &api_funcs,
 			MDM_MAX_DATA_LENGTH);

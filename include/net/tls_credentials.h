@@ -104,8 +104,8 @@ int tls_credential_add(sec_tag_t tag, enum tls_credential_type type,
  * @retval -ENOENT Requested TLS credential was not found.
  * @retval -EFBIG Requested TLS credential does not fit in the buffer provided.
  */
-int tls_credential_get(sec_tag_t tag, enum tls_credential_type type,
-		       void *cred, size_t *credlen);
+int tls_credential_get(sec_tag_t tag, enum tls_credential_type type, void *cred,
+		       size_t *credlen);
 
 /**
  * @brief Delete a TLS credential.

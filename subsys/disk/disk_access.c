@@ -59,7 +59,7 @@ int disk_access_init(const char *pdrv)
 	int rc = -EINVAL;
 
 	if ((disk != NULL) && (disk->ops != NULL) &&
-				(disk->ops->init != NULL)) {
+	    (disk->ops->init != NULL)) {
 		rc = disk->ops->init(disk);
 	}
 
@@ -72,21 +72,21 @@ int disk_access_status(const char *pdrv)
 	int rc = -EINVAL;
 
 	if ((disk != NULL) && (disk->ops != NULL) &&
-				(disk->ops->status != NULL)) {
+	    (disk->ops->status != NULL)) {
 		rc = disk->ops->status(disk);
 	}
 
 	return rc;
 }
 
-int disk_access_read(const char *pdrv, uint8_t *data_buf,
-		     uint32_t start_sector, uint32_t num_sector)
+int disk_access_read(const char *pdrv, uint8_t *data_buf, uint32_t start_sector,
+		     uint32_t num_sector)
 {
 	struct disk_info *disk = disk_access_get_di(pdrv);
 	int rc = -EINVAL;
 
 	if ((disk != NULL) && (disk->ops != NULL) &&
-				(disk->ops->read != NULL)) {
+	    (disk->ops->read != NULL)) {
 		rc = disk->ops->read(disk, data_buf, start_sector, num_sector);
 	}
 
@@ -100,7 +100,7 @@ int disk_access_write(const char *pdrv, const uint8_t *data_buf,
 	int rc = -EINVAL;
 
 	if ((disk != NULL) && (disk->ops != NULL) &&
-				(disk->ops->write != NULL)) {
+	    (disk->ops->write != NULL)) {
 		rc = disk->ops->write(disk, data_buf, start_sector, num_sector);
 	}
 
@@ -113,7 +113,7 @@ int disk_access_ioctl(const char *pdrv, uint8_t cmd, void *buf)
 	int rc = -EINVAL;
 
 	if ((disk != NULL) && (disk->ops != NULL) &&
-				(disk->ops->ioctl != NULL)) {
+	    (disk->ops->ioctl != NULL)) {
 		rc = disk->ops->ioctl(disk, cmd, buf);
 	}
 

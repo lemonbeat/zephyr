@@ -116,8 +116,8 @@ static int divider_setup(void)
 		rc = gpio_pin_configure(ddp->gpio, gcp->pin,
 					GPIO_OUTPUT_INACTIVE | gcp->flags);
 		if (rc != 0) {
-			LOG_ERR("Failed to control feed %s.%u: %d",
-				gcp->label, gcp->pin, rc);
+			LOG_ERR("Failed to control feed %s.%u: %d", gcp->label,
+				gcp->pin, rc);
 			return rc;
 		}
 	}
@@ -138,8 +138,8 @@ static int divider_setup(void)
 	};
 
 	if (cfg->output_ohm != 0) {
-		accp->input_positive = SAADC_CH_PSELP_PSELP_AnalogInput0
-			+ iocp->channel;
+		accp->input_positive =
+			SAADC_CH_PSELP_PSELP_AnalogInput0 + iocp->channel;
 	} else {
 		accp->input_positive = SAADC_CH_PSELP_PSELP_VDD;
 	}
@@ -174,7 +174,8 @@ int battery_measure_enable(bool enable)
 
 	if (battery_ok) {
 		const struct divider_data *ddp = &divider_data;
-		const struct gpio_channel_config *gcp = &divider_config.power_gpios;
+		const struct gpio_channel_config *gcp =
+			&divider_config.power_gpios;
 
 		rc = 0;
 		if (ddp->gpio) {
@@ -199,15 +200,14 @@ int battery_sample(void)
 			int32_t val = ddp->raw;
 
 			adc_raw_to_millivolts(adc_ref_internal(ddp->adc),
-					      ddp->adc_cfg.gain,
-					      sp->resolution,
+					      ddp->adc_cfg.gain, sp->resolution,
 					      &val);
 
 			if (dcp->output_ohm != 0) {
-				rc = val * (uint64_t)dcp->full_ohm
-					/ dcp->output_ohm;
-				LOG_INF("raw %u ~ %u mV => %d mV\n",
-					ddp->raw, val, rc);
+				rc = val * (uint64_t)dcp->full_ohm /
+				     dcp->output_ohm;
+				LOG_INF("raw %u ~ %u mV => %d mV\n", ddp->raw,
+					val, rc);
 			} else {
 				rc = val;
 				LOG_INF("raw %u ~ %u mV\n", ddp->raw, val);
@@ -228,8 +228,7 @@ unsigned int battery_level_pptt(unsigned int batt_mV,
 		return pb->lvl_pptt;
 	}
 	/* Go down to the last point at or below the measured voltage. */
-	while ((pb->lvl_pptt > 0)
-	       && (batt_mV < pb->lvl_mV)) {
+	while ((pb->lvl_pptt > 0) && (batt_mV < pb->lvl_mV)) {
 		++pb;
 	}
 	if (batt_mV < pb->lvl_mV) {
@@ -240,8 +239,7 @@ unsigned int battery_level_pptt(unsigned int batt_mV,
 	/* Linear interpolation between below and above points. */
 	const struct battery_level_point *pa = pb - 1;
 
-	return pb->lvl_pptt
-	       + ((pa->lvl_pptt - pb->lvl_pptt)
-		  * (batt_mV - pb->lvl_mV)
-		  / (pa->lvl_mV - pb->lvl_mV));
+	return pb->lvl_pptt +
+	       ((pa->lvl_pptt - pb->lvl_pptt) * (batt_mV - pb->lvl_mV) /
+		(pa->lvl_mV - pb->lvl_mV));
 }

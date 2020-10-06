@@ -12,17 +12,15 @@
 #include <driverlib/cpu.h>
 
 #define GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
-#define DIO8_PIN  8
-#define DIO9_PIN  9
+#define DIO8_PIN 8
+#define DIO9_PIN 9
 #define DIO10_PIN 10
 #define DIO20_PIN 20
-
 
 /*
  *  ======== CC1352R1_LAUNCHXL_sendExtFlashByte ========
  */
-void CC1352R1_LAUNCHXL_sendExtFlashByte(const struct device *dev,
-					uint8_t byte)
+void CC1352R1_LAUNCHXL_sendExtFlashByte(const struct device *dev, uint8_t byte)
 {
 	uint8_t i;
 
@@ -44,8 +42,8 @@ void CC1352R1_LAUNCHXL_sendExtFlashByte(const struct device *dev,
 		CPUdelay(8);
 	}
 
-	gpio_pin_set(dev, DIO10_PIN, 0);   /* CLK */
-	gpio_pin_set(dev, DIO20_PIN, 1);   /* CS */
+	gpio_pin_set(dev, DIO10_PIN, 0); /* CLK */
+	gpio_pin_set(dev, DIO20_PIN, 1); /* CS */
 
 	/*
 	 * Keep CS high at least 40 us

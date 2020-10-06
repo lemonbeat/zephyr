@@ -15,11 +15,9 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_L2_ETHERNET_LOG_LEVEL);
 
 #include <ztest.h>
 
-static const uint8_t mac_addr_init[6] = { 0x01, 0x02, 0x03,
-				       0x04,  0x05,  0x06 };
+static const uint8_t mac_addr_init[6] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 
-static const uint8_t mac_addr_change[6] = { 0x01, 0x02, 0x03,
-					 0x04,  0x05,  0x07 };
+static const uint8_t mac_addr_change[6] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x07 };
 
 struct eth_fake_context {
 	struct net_if *iface;
@@ -46,15 +44,13 @@ static void eth_fake_iface_init(struct net_if *iface)
 
 	ctx->iface = iface;
 
-	net_if_set_link_addr(iface, ctx->mac_address,
-			     sizeof(ctx->mac_address),
+	net_if_set_link_addr(iface, ctx->mac_address, sizeof(ctx->mac_address),
 			     NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 }
 
-static int eth_fake_send(const struct device *dev,
-			 struct net_pkt *pkt)
+static int eth_fake_send(const struct device *dev, struct net_pkt *pkt)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(pkt);
@@ -65,8 +61,8 @@ static int eth_fake_send(const struct device *dev,
 static enum ethernet_hw_caps eth_fake_get_capabilities(const struct device *dev)
 {
 	return ETHERNET_AUTO_NEGOTIATION_SET | ETHERNET_LINK_10BASE_T |
-		ETHERNET_LINK_100BASE_T | ETHERNET_DUPLEX_SET | ETHERNET_QAV |
-		ETHERNET_PROMISC_MODE | ETHERNET_PRIORITY_QUEUES;
+	       ETHERNET_LINK_100BASE_T | ETHERNET_DUPLEX_SET | ETHERNET_QAV |
+	       ETHERNET_PROMISC_MODE | ETHERNET_PRIORITY_QUEUES;
 }
 
 static int eth_fake_get_total_bandwidth(struct eth_fake_context *ctx)
@@ -313,11 +309,10 @@ static void test_change_mac_when_up(void)
 
 	memcpy(params.mac_address.addr, mac_addr_change, 6);
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_MAC_ADDRESS, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_MAC_ADDRESS, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
-	zassert_not_equal(ret, 0,
-			  "mac address change should not be possible");
+	zassert_not_equal(ret, 0, "mac address change should not be possible");
 }
 
 static void test_change_mac_when_down(void)
@@ -330,8 +325,8 @@ static void test_change_mac_when_down(void)
 
 	net_if_down(iface);
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_MAC_ADDRESS, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_MAC_ADDRESS, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_equal(ret, 0, "unable to change mac address");
 
@@ -368,8 +363,7 @@ static void test_change_to_same_auto_neg(void)
 	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_AUTO_NEGOTIATION, iface,
 		       &params, sizeof(struct ethernet_req_params));
 
-	zassert_not_equal(ret, 0,
-			  "invalid change to already auto negotiation");
+	zassert_not_equal(ret, 0, "invalid change to already auto negotiation");
 }
 
 static void test_change_link(void)
@@ -380,8 +374,8 @@ static void test_change_link(void)
 
 	params.l.link_100bt = true;
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_LINK, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_LINK, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_equal(ret, 0, "invalid link change");
 }
@@ -394,8 +388,8 @@ static void test_change_same_link(void)
 
 	params.l.link_100bt = true;
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_LINK, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_LINK, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_not_equal(ret, 0, "invalid same link change");
 }
@@ -408,8 +402,8 @@ static void test_change_unsupported_link(void)
 
 	params.l.link_1000bt = true;
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_LINK, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_LINK, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_not_equal(ret, 0, "invalid change to unsupported link");
 }
@@ -422,8 +416,8 @@ static void test_change_duplex(void)
 
 	params.full_duplex = false;
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_DUPLEX, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_DUPLEX, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_equal(ret, 0, "invalid duplex change");
 }
@@ -436,8 +430,8 @@ static void test_change_same_duplex(void)
 
 	params.full_duplex = false;
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_DUPLEX, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_DUPLEX, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_not_equal(ret, 0, "invalid change to already set duplex");
 }
@@ -453,8 +447,7 @@ static void test_change_qav_params(void)
 	int ret;
 
 	/* Try to get the number of the priority queues */
-	ret = net_mgmt(NET_REQUEST_ETHERNET_GET_PRIORITY_QUEUES_NUM,
-		       iface,
+	ret = net_mgmt(NET_REQUEST_ETHERNET_GET_PRIORITY_QUEUES_NUM, iface,
 		       &params, sizeof(struct ethernet_req_params));
 
 	zassert_equal(ret, 0, "could not get the number of priority queues");
@@ -474,8 +467,7 @@ static void test_change_qav_params(void)
 		/* Disable Qav for queue */
 		params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_STATUS;
 		params.qav_param.enabled = false;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not disable qav");
@@ -483,8 +475,7 @@ static void test_change_qav_params(void)
 		/* Invert it to make sure the read-back value is proper */
 		params.qav_param.enabled = true;
 
-		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not read qav status");
@@ -494,8 +485,7 @@ static void test_change_qav_params(void)
 
 		/* Re-enable Qav for queue */
 		params.qav_param.enabled = true;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not enable qav");
@@ -503,8 +493,7 @@ static void test_change_qav_params(void)
 		/* Invert it to make sure the read-back value is proper */
 		params.qav_param.enabled = false;
 
-		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not read qav status");
@@ -513,19 +502,16 @@ static void test_change_qav_params(void)
 			      "qav should be enabled");
 
 		/* Starting with delta bandwidth */
-		params.qav_param.type =
-			ETHERNET_QAV_PARAM_TYPE_DELTA_BANDWIDTH;
+		params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_DELTA_BANDWIDTH;
 		params.qav_param.delta_bandwidth = 10U;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not set delta bandwidth");
 
 		/* Reset local value - read-back and verify it */
 		params.qav_param.delta_bandwidth = 0U;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not read delta bandwidth");
@@ -535,16 +521,14 @@ static void test_change_qav_params(void)
 		/* And them the idle slope */
 		params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_IDLE_SLOPE;
 		params.qav_param.idle_slope = 10U;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not set idle slope");
 
 		/* Reset local value - read-back and verify it */
 		params.qav_param.idle_slope = 0U;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not read idle slope");
@@ -552,10 +536,8 @@ static void test_change_qav_params(void)
 			      "idle slope did not change");
 
 		/* Oper idle slope should also be the same */
-		params.qav_param.type =
-			ETHERNET_QAV_PARAM_TYPE_OPER_IDLE_SLOPE;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM,
-			       iface,
+		params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_OPER_IDLE_SLOPE;
+		ret = net_mgmt(NET_REQUEST_ETHERNET_GET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_equal(ret, 0, "could not read oper idle slope");
@@ -563,19 +545,16 @@ static void test_change_qav_params(void)
 			      "oper idle slope should equal admin idle slope");
 
 		/* Now try to set incorrect params to a correct queue */
-		params.qav_param.type =
-			ETHERNET_QAV_PARAM_TYPE_DELTA_BANDWIDTH;
+		params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_DELTA_BANDWIDTH;
 		params.qav_param.delta_bandwidth = -10;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_not_equal(ret, 0,
 				  "allowed to set invalid delta bandwidth");
 
 		params.qav_param.delta_bandwidth = 101U;
-		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-			       iface,
+		ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface,
 			       &params, sizeof(struct ethernet_req_params));
 
 		zassert_not_equal(ret, 0,
@@ -585,17 +564,15 @@ static void test_change_qav_params(void)
 	/* Try to set read-only parameters */
 	params.qav_param.queue_id = 0;
 	params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_OPER_IDLE_SLOPE;
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-		       iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_not_equal(ret, 0, "should not be able to set oper idle slope");
 
 	params.qav_param.queue_id = 0;
 	params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_TRAFFIC_CLASS;
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-		       iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_not_equal(ret, 0, "should not be able to set traffic class");
 
@@ -603,17 +580,15 @@ static void test_change_qav_params(void)
 	params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_DELTA_BANDWIDTH;
 	params.qav_param.queue_id = available_priority_queues;
 	params.qav_param.delta_bandwidth = 10U;
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-		       iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_not_equal(ret, 0, "should not be able to set delta bandwidth");
 
 	params.qav_param.type = ETHERNET_QAV_PARAM_TYPE_IDLE_SLOPE;
 	params.qav_param.idle_slope = 10U;
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
-		       iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_QAV_PARAM, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_not_equal(ret, 0, "should not be able to set idle slope");
 }
@@ -626,8 +601,8 @@ static void test_change_promisc_mode(bool mode)
 
 	params.promisc_mode = mode;
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_PROMISC_MODE, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_PROMISC_MODE, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_equal(ret, 0, "invalid promisc mode change");
 }
@@ -650,8 +625,8 @@ static void test_change_to_same_promisc_mode(void)
 
 	params.promisc_mode = true;
 
-	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_PROMISC_MODE, iface,
-		       &params, sizeof(struct ethernet_req_params));
+	ret = net_mgmt(NET_REQUEST_ETHERNET_SET_PROMISC_MODE, iface, &params,
+		       sizeof(struct ethernet_req_params));
 
 	zassert_equal(ret, -EALREADY,
 		      "invalid change to already set promisc mode");

@@ -49,7 +49,8 @@ static int init_sem_module(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	Z_STRUCT_SECTION_FOREACH(k_sem, sem) {
+	Z_STRUCT_SECTION_FOREACH(k_sem, sem)
+	{
 		SYS_TRACING_OBJ_INIT(k_sem, sem);
 	}
 	return 0;
@@ -65,7 +66,8 @@ int z_impl_k_sem_init(struct k_sem *sem, unsigned int initial_count,
 	/*
 	 * Limit cannot be zero and count cannot be greater than limit
 	 */
-	CHECKIF(limit == 0U || initial_count > limit) {
+	CHECKIF(limit == 0U || initial_count > limit)
+	{
 		return -EINVAL;
 	}
 
@@ -138,7 +140,8 @@ int z_impl_k_sem_take(struct k_sem *sem, k_timeout_t timeout)
 	int ret = 0;
 
 	__ASSERT(((arch_is_in_isr() == false) ||
-		  K_TIMEOUT_EQ(timeout, K_NO_WAIT)), "");
+		  K_TIMEOUT_EQ(timeout, K_NO_WAIT)),
+		 "");
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
 	sys_trace_semaphore_take(sem);

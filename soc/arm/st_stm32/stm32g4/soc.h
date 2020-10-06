@@ -13,7 +13,6 @@
  * Chapter 2.2: Memory organization
  */
 
-
 #ifndef _STM32G4_SOC_H_
 #define _STM32G4_SOC_H_
 

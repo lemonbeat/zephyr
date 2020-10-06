@@ -20,15 +20,15 @@
 
 static uint8_t __aligned(4) test_arr[TEST_ARR_SIZE];
 
-static int parse_helper(const struct shell *shell, size_t *argc,
-		char **argv[], const struct device * *flash_dev,
-		uint32_t *addr)
+static int parse_helper(const struct shell *shell, size_t *argc, char **argv[],
+			const struct device **flash_dev, uint32_t *addr)
 {
 	char *endptr;
 
 	*addr = strtoul((*argv)[1], &endptr, 16);
-	*flash_dev = device_get_binding((*endptr != '\0') ? (*argv)[1] :
-			DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
+	*flash_dev = device_get_binding(
+		(*endptr != '\0') ? (*argv)[1] :
+					  DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 	if (!*flash_dev) {
 		shell_error(shell, "Flash driver was not found!");
 		return -ENODEV;
@@ -66,8 +66,10 @@ static int cmd_erase(const struct shell *shell, size_t argc, char *argv[])
 						     &info);
 
 		if (result != 0) {
-			shell_error(shell, "Could not determine page size, "
-				    "code %d.", result);
+			shell_error(shell,
+				    "Could not determine page size, "
+				    "code %d.",
+				    result);
 			return -EINVAL;
 		}
 
@@ -244,25 +246,23 @@ static void device_name_get(size_t idx, struct shell_static_entry *entry)
 
 	entry->syntax = (dev != NULL) ? dev->name : NULL;
 	entry->handler = NULL;
-	entry->help  = NULL;
+	entry->help = NULL;
 	entry->subcmd = &dsub_device_name;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(flash_cmds,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	flash_cmds,
 	SHELL_CMD_ARG(erase, &dsub_device_name,
-		"[<device>] <page address> [<size>]",
-		cmd_erase, 2, 2),
+		      "[<device>] <page address> [<size>]", cmd_erase, 2, 2),
 	SHELL_CMD_ARG(read, &dsub_device_name,
-		"[<device>] <address> [<Dword count>]",
-		cmd_read, 2, 2),
+		      "[<device>] <address> [<Dword count>]", cmd_read, 2, 2),
 	SHELL_CMD_ARG(test, &dsub_device_name,
-		"[<device>] <address> <size> <repeat count>",
-		cmd_test, 4, 1),
+		      "[<device>] <address> <size> <repeat count>", cmd_test, 4,
+		      1),
 	SHELL_CMD_ARG(write, &dsub_device_name,
-		"[<device>] <address> <dword> [<dword>...]",
-		cmd_write, 3, BUF_ARRAY_CNT),
-	SHELL_SUBCMD_SET_END
-);
+		      "[<device>] <address> <dword> [<dword>...]", cmd_write, 3,
+		      BUF_ARRAY_CNT),
+	SHELL_SUBCMD_SET_END);
 
 static int cmd_flash(const struct shell *shell, size_t argc, char **argv)
 {
@@ -270,5 +270,5 @@ static int cmd_flash(const struct shell *shell, size_t argc, char **argv)
 	return -EINVAL;
 }
 
-SHELL_CMD_ARG_REGISTER(flash, &flash_cmds, "Flash shell commands",
-		       cmd_flash, 2, 0);
+SHELL_CMD_ARG_REGISTER(flash, &flash_cmds, "Flash shell commands", cmd_flash, 2,
+		       0);

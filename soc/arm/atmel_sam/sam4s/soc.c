@@ -59,8 +59,7 @@ static ALWAYS_INLINE void clock_init(void)
 			 */
 			| CKGR_MOR_MOSCXTST(0xFFu)
 			/* RC oscillator must stay on. */
-			| CKGR_MOR_MOSCRCEN
-			| CKGR_MOR_MOSCXTEN;
+			| CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
 
 	/* Wait for oscillator to be stabilized. */
 	while (!(PMC->PMC_SR & PMC_SR_MOSCXTS)) {
@@ -68,12 +67,9 @@ static ALWAYS_INLINE void clock_init(void)
 	}
 
 	/* Select the external crystal oscillator as the main clock source. */
-	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD
-			| CKGR_MOR_MOSCRCF_4_MHz
-			| CKGR_MOR_MOSCRCEN
-			| CKGR_MOR_MOSCXTEN
-			| CKGR_MOR_MOSCXTST(0xFFu)
-			| CKGR_MOR_MOSCSEL;
+	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCRCF_4_MHz |
+			CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN |
+			CKGR_MOR_MOSCXTST(0xFFu) | CKGR_MOR_MOSCSEL;
 
 	/* Wait for external oscillator to be selected. */
 	while (!(PMC->PMC_SR & PMC_SR_MOSCSELS)) {
@@ -81,10 +77,8 @@ static ALWAYS_INLINE void clock_init(void)
 	}
 
 	/* Turn off RC oscillator, not used any longer, to save power */
-	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD
-			| CKGR_MOR_MOSCSEL
-			| CKGR_MOR_MOSCXTST(0xFFu)
-			| CKGR_MOR_MOSCXTEN;
+	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCSEL |
+			CKGR_MOR_MOSCXTST(0xFFu) | CKGR_MOR_MOSCXTEN;
 
 	/* Wait for the RC oscillator to be turned off. */
 	while (PMC->PMC_SR & PMC_SR_MOSCRCS) {
@@ -111,9 +105,8 @@ static ALWAYS_INLINE void clock_init(void)
 	}
 
 	/* Set main fast RC oscillator to 12 MHz. */
-	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD
-			| CKGR_MOR_MOSCRCF_12_MHz
-			| CKGR_MOR_MOSCRCEN;
+	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCRCF_12_MHz |
+			CKGR_MOR_MOSCRCEN;
 
 	/* Wait for RC oscillator to stabilize. */
 	while (!(PMC->PMC_SR & PMC_SR_MOSCRCS)) {
@@ -135,10 +128,10 @@ static ALWAYS_INLINE void clock_init(void)
 	}
 
 	/* Setup PLLA. */
-	PMC->CKGR_PLLAR = CKGR_PLLAR_ONE
-			  | CKGR_PLLAR_MULA(CONFIG_SOC_ATMEL_SAM4S_PLLA_MULA)
-			  | CKGR_PLLAR_PLLACOUNT(0x3Fu)
-			  | CKGR_PLLAR_DIVA(CONFIG_SOC_ATMEL_SAM4S_PLLA_DIVA);
+	PMC->CKGR_PLLAR = CKGR_PLLAR_ONE |
+			  CKGR_PLLAR_MULA(CONFIG_SOC_ATMEL_SAM4S_PLLA_MULA) |
+			  CKGR_PLLAR_PLLACOUNT(0x3Fu) |
+			  CKGR_PLLAR_DIVA(CONFIG_SOC_ATMEL_SAM4S_PLLA_DIVA);
 
 	/*
 	 * NOTE: Both MULA and DIVA must be set to a value greater than 0 or

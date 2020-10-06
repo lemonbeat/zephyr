@@ -32,7 +32,6 @@ void thread_suspend_resume(void *p1, void *p2, void *p3)
 
 	/* comes to this line once its resumed*/
 	timestamp_start_resume_c = timing_counter_get();
-
 }
 
 int suspend_resume(void)
@@ -56,7 +55,6 @@ int suspend_resume(void)
 	timestamp_end_suspend_c = timing_counter_get();
 	k_thread_resume(t1_tid);
 	timestamp_end_resume_c = timing_counter_get();
-
 
 	diff = timing_cycles_get(&timestamp_start_create_c,
 				 &timestamp_end_create_c);

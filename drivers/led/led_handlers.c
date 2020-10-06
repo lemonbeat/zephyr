@@ -12,7 +12,7 @@ static inline int z_vrfy_led_blink(const struct device *dev, uint32_t led,
 {
 	Z_OOPS(Z_SYSCALL_DRIVER_LED(dev, blink));
 	return z_impl_led_blink((const struct device *)dev, led, delay_on,
-					delay_off);
+				delay_off);
 }
 #include <syscalls/led_blink_mrsh.c>
 
@@ -26,8 +26,7 @@ static inline int z_vrfy_led_get_info(const struct device *dev, uint32_t led,
 #include <syscalls/led_get_info_mrsh.c>
 
 static inline int z_vrfy_led_set_brightness(const struct device *dev,
-					    uint32_t led,
-					    uint8_t value)
+					    uint32_t led, uint8_t value)
 {
 	Z_OOPS(Z_SYSCALL_DRIVER_LED(dev, set_brightness));
 	return z_impl_led_set_brightness((const struct device *)dev, led,
@@ -35,9 +34,10 @@ static inline int z_vrfy_led_set_brightness(const struct device *dev,
 }
 #include <syscalls/led_set_brightness_mrsh.c>
 
-static inline int
-z_vrfy_led_write_channels(const struct device *dev, uint32_t start_channel,
-			  uint32_t num_channels, const uint8_t *buf)
+static inline int z_vrfy_led_write_channels(const struct device *dev,
+					    uint32_t start_channel,
+					    uint32_t num_channels,
+					    const uint8_t *buf)
 {
 	Z_OOPS(Z_SYSCALL_OBJ(dev, K_OBJ_DRIVER_LED));
 	Z_OOPS(Z_SYSCALL_MEMORY_READ(buf, num_channels));

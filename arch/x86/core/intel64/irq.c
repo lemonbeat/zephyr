@@ -22,7 +22,7 @@ unsigned char _irq_to_interrupt_vector[CONFIG_MAX_IRQ_LINES];
  * use (vector - IV_IRQS), since exception vectors do not appear here.
  */
 
-#define NR_IRQ_VECTORS (IV_NR_VECTORS - IV_IRQS)  /* # vectors free for IRQs */
+#define NR_IRQ_VECTORS (IV_NR_VECTORS - IV_IRQS) /* # vectors free for IRQs */
 
 void (*x86_irq_funcs[NR_IRQ_VECTORS])(const void *);
 const void *x86_irq_args[NR_IRQ_VECTORS];
@@ -83,8 +83,8 @@ static int allocate_vector(unsigned int priority)
  */
 
 int arch_irq_connect_dynamic(unsigned int irq, unsigned int priority,
-			     void (*func)(const void *arg),
-			     const void *arg, uint32_t flags)
+			     void (*func)(const void *arg), const void *arg,
+			     uint32_t flags)
 {
 	uint32_t key;
 	int vector;
@@ -112,8 +112,10 @@ void arch_irq_offload(irq_offload_routine_t routine, const void *parameter)
 {
 	x86_irq_funcs[CONFIG_IRQ_OFFLOAD_VECTOR - IV_IRQS] = routine;
 	x86_irq_args[CONFIG_IRQ_OFFLOAD_VECTOR - IV_IRQS] = parameter;
-	__asm__ volatile("int %0" : : "i" (CONFIG_IRQ_OFFLOAD_VECTOR)
-			  : "memory");
+	__asm__ volatile("int %0"
+			 :
+			 : "i"(CONFIG_IRQ_OFFLOAD_VECTOR)
+			 : "memory");
 	x86_irq_funcs[CONFIG_IRQ_OFFLOAD_VECTOR - IV_IRQS] = NULL;
 }
 
@@ -128,8 +130,7 @@ void z_x86_ipi_setup(void)
 	 * we fudge it with a cast. the argument is ignored, no harm done.
 	 */
 
-	x86_irq_funcs[CONFIG_SCHED_IPI_VECTOR - IV_IRQS] =
-		(void *) z_sched_ipi;
+	x86_irq_funcs[CONFIG_SCHED_IPI_VECTOR - IV_IRQS] = (void *)z_sched_ipi;
 }
 
 /*

@@ -26,7 +26,7 @@ void z_irq_do_offload(const void *unused)
 void arch_irq_offload(irq_offload_routine_t routine, const void *parameter)
 {
 	IRQ_CONNECT(CONFIG_IRQ_OFFLOAD_INTNUM, XCHAL_EXCM_LEVEL,
-		z_irq_do_offload, NULL, 0);
+		    z_irq_do_offload, NULL, 0);
 	arch_irq_disable(CONFIG_IRQ_OFFLOAD_INTNUM);
 	offload_routine = routine;
 	offload_param = parameter;

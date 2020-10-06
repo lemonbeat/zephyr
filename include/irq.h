@@ -61,10 +61,9 @@ extern "C" {
  *
  * @return The vector assigned to this interrupt
  */
-static inline int
-irq_connect_dynamic(unsigned int irq, unsigned int priority,
-		    void (*routine)(const void *parameter),
-		    const void *parameter, uint32_t flags)
+static inline int irq_connect_dynamic(unsigned int irq, unsigned int priority,
+				      void (*routine)(const void *parameter),
+				      const void *parameter, uint32_t flags)
 {
 	return arch_irq_connect_dynamic(irq, priority, routine, parameter,
 					flags);
@@ -262,7 +261,7 @@ static inline unsigned int irq_get_level(unsigned int irq)
 {
 #if defined(CONFIG_3RD_LEVEL_INTERRUPTS)
 	return ((irq >> 16) & 0xFF) != 0 ? 3 :
-		(((irq >> 8) & 0xFF) == 0 ? 1 : 2);
+						 (((irq >> 8) & 0xFF) == 0 ? 1 : 2);
 #elif defined(CONFIG_2ND_LEVEL_INTERRUPTS)
 	return ((irq >> 8) & 0xFF) == 0 ? 1 : 2;
 #else

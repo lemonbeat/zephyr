@@ -23,8 +23,8 @@
 
 /* asynchronous message descriptor type */
 struct k_mbox_async {
-	struct _thread_base thread;		/* dummy thread object */
-	struct k_mbox_msg tx_msg;	/* transmit message descriptor */
+	struct _thread_base thread; /* dummy thread object */
+	struct k_mbox_msg tx_msg; /* transmit message descriptor */
 };
 
 /* stack of unused asynchronous message descriptors */
@@ -46,10 +46,9 @@ static inline void mbox_async_free(struct k_mbox_async *async)
 
 #ifdef CONFIG_OBJECT_TRACING
 struct k_mbox *_trace_list_k_mbox;
-#endif	/* CONFIG_OBJECT_TRACING */
+#endif /* CONFIG_OBJECT_TRACING */
 
-#if (CONFIG_NUM_MBOX_ASYNC_MSGS > 0) || \
-	defined(CONFIG_OBJECT_TRACING)
+#if (CONFIG_NUM_MBOX_ASYNC_MSGS > 0) || defined(CONFIG_OBJECT_TRACING)
 
 /*
  * Do run-time initialization of mailbox object subsystem.
@@ -59,7 +58,8 @@ static int init_mbox_module(const struct device *dev)
 	ARG_UNUSED(dev);
 
 	/* array of asynchronous message descriptors */
-	static struct k_mbox_async __noinit async_msg[CONFIG_NUM_MBOX_ASYNC_MSGS];
+	static struct k_mbox_async __noinit
+		async_msg[CONFIG_NUM_MBOX_ASYNC_MSGS];
 
 #if (CONFIG_NUM_MBOX_ASYNC_MSGS > 0)
 	/*
@@ -85,7 +85,8 @@ static int init_mbox_module(const struct device *dev)
 	/* Complete initialization of statically defined mailboxes. */
 
 #ifdef CONFIG_OBJECT_TRACING
-	Z_STRUCT_SECTION_FOREACH(k_mbox, mbox) {
+	Z_STRUCT_SECTION_FOREACH(k_mbox, mbox)
+	{
 		SYS_TRACING_OBJ_INIT(k_mbox, mbox);
 	}
 #endif /* CONFIG_OBJECT_TRACING */
@@ -101,7 +102,7 @@ void k_mbox_init(struct k_mbox *mbox_ptr)
 {
 	z_waitq_init(&mbox_ptr->tx_msg_queue);
 	z_waitq_init(&mbox_ptr->rx_msg_queue);
-	mbox_ptr->lock = (struct k_spinlock) {};
+	mbox_ptr->lock = (struct k_spinlock){};
 	SYS_TRACING_OBJ_INIT(k_mbox, mbox_ptr);
 }
 
@@ -118,7 +119,7 @@ void k_mbox_init(struct k_mbox *mbox_ptr)
  * @return 0 if successfully matched, otherwise -1.
  */
 static int mbox_message_match(struct k_mbox_msg *tx_msg,
-			       struct k_mbox_msg *rx_msg)
+			      struct k_mbox_msg *rx_msg)
 {
 	uint32_t temp_info;
 
@@ -126,7 +127,6 @@ static int mbox_message_match(struct k_mbox_msg *tx_msg,
 	     (tx_msg->tx_target_thread == rx_msg->tx_target_thread)) &&
 	    ((rx_msg->rx_source_thread == (k_tid_t)K_ANY) ||
 	     (rx_msg->rx_source_thread == tx_msg->rx_source_thread))) {
-
 		/* update thread identifier fields for both descriptors */
 		rx_msg->rx_source_thread = tx_msg->rx_source_thread;
 		tx_msg->tx_target_thread = rx_msg->tx_target_thread;
@@ -233,7 +233,7 @@ static void mbox_message_dispose(struct k_mbox_msg *rx_msg)
  * @return 0 if successful, -ENOMSG if failed immediately, -EAGAIN if timed out
  */
 static int mbox_message_put(struct k_mbox *mbox, struct k_mbox_msg *tx_msg,
-			     k_timeout_t timeout)
+			    k_timeout_t timeout)
 {
 	struct k_thread *sending_thread;
 	struct k_thread *receiving_thread;
@@ -269,8 +269,8 @@ static int mbox_message_put(struct k_mbox *mbox, struct k_mbox_msg *tx_msg,
 			 * note: dummy sending thread sits (unqueued)
 			 * until the receiver consumes the message
 			 */
-			if ((sending_thread->base.thread_state & _THREAD_DUMMY)
-			    != 0U) {
+			if ((sending_thread->base.thread_state &
+			     _THREAD_DUMMY) != 0U) {
 				z_reschedule(&mbox->lock, key);
 				return 0;
 			}
@@ -281,7 +281,6 @@ static int mbox_message_put(struct k_mbox *mbox, struct k_mbox_msg *tx_msg,
 			 * until the receiver consumes the message
 			 */
 			return z_pend_curr(&mbox->lock, key, NULL, K_FOREVER);
-
 		}
 	}
 

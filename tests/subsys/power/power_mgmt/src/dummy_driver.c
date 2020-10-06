@@ -37,8 +37,7 @@ static int dummy_resume_from_suspend(const struct device *dev)
 	return 0;
 }
 
-static int dummy_device_pm_ctrl(const struct device *dev,
-				uint32_t ctrl_command,
+static int dummy_device_pm_ctrl(const struct device *dev, uint32_t ctrl_command,
 				void *context, device_pm_cb cb, void *arg)
 {
 	int ret = 0;
@@ -56,7 +55,6 @@ static int dummy_device_pm_ctrl(const struct device *dev,
 		break;
 	default:
 		ret = -EINVAL;
-
 	}
 
 	if (cb) {
@@ -78,5 +76,5 @@ int dummy_init(const struct device *dev)
 }
 
 DEVICE_DEFINE(dummy_driver, DUMMY_DRIVER_NAME, &dummy_init,
-		    dummy_device_pm_ctrl, NULL, NULL, APPLICATION,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs);
+	      dummy_device_pm_ctrl, NULL, NULL, APPLICATION,
+	      CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs);

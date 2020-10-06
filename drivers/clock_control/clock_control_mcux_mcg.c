@@ -31,12 +31,11 @@ static int mcux_mcg_off(const struct device *dev,
 }
 
 static int mcux_mcg_get_rate(const struct device *dev,
-			     clock_control_subsys_t sub_system,
-			     uint32_t *rate)
+			     clock_control_subsys_t sub_system, uint32_t *rate)
 {
 	clock_name_t clock_name;
 
-	switch ((uint32_t) sub_system) {
+	switch ((uint32_t)sub_system) {
 	case KINETIS_MCG_FIXED_FREQ_CLK:
 		clock_name = kCLOCK_McgFixedFreqClk;
 		break;
@@ -61,8 +60,6 @@ static const struct clock_control_driver_api mcux_mcg_driver_api = {
 	.get_rate = mcux_mcg_get_rate,
 };
 
-DEVICE_AND_API_INIT(mcux_mcg, DT_INST_LABEL(0),
-		    &mcux_mcg_init,
-		    NULL, NULL,
+DEVICE_AND_API_INIT(mcux_mcg, DT_INST_LABEL(0), &mcux_mcg_init, NULL, NULL,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &mcux_mcg_driver_api);

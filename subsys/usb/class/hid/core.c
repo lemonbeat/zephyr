@@ -20,8 +20,8 @@ LOG_MODULE_REGISTER(usb_hid);
 
 #include <stdlib.h>
 
-#define HID_INT_IN_EP_IDX		0
-#define HID_INT_OUT_EP_IDX		1
+#define HID_INT_IN_EP_IDX 0
+#define HID_INT_OUT_EP_IDX 1
 
 struct usb_hid_config {
 	struct usb_if_descriptor if0;
@@ -33,84 +33,72 @@ struct usb_hid_config {
 } __packed;
 
 #if defined(CONFIG_USB_HID_BOOT_PROTOCOL)
-#define INITIALIZER_IF							\
-	{								\
-		.bLength = sizeof(struct usb_if_descriptor),		\
-		.bDescriptorType = USB_INTERFACE_DESC,			\
-		.bInterfaceNumber = 0,					\
-		.bAlternateSetting = 0,					\
-		.bNumEndpoints = 1,					\
-		.bInterfaceClass = HID_CLASS,				\
-		.bInterfaceSubClass = 1,				\
-		.bInterfaceProtocol = CONFIG_USB_HID_PROTOCOL_CODE,	\
-		.iInterface = 0,					\
+#define INITIALIZER_IF                                                        \
+	{                                                                     \
+		.bLength = sizeof(struct usb_if_descriptor),                  \
+		.bDescriptorType = USB_INTERFACE_DESC, .bInterfaceNumber = 0, \
+		.bAlternateSetting = 0, .bNumEndpoints = 1,                   \
+		.bInterfaceClass = HID_CLASS, .bInterfaceSubClass = 1,        \
+		.bInterfaceProtocol = CONFIG_USB_HID_PROTOCOL_CODE,           \
+		.iInterface = 0,                                              \
 	}
 #else
-#define INITIALIZER_IF							\
-	{								\
-		.bLength = sizeof(struct usb_if_descriptor),		\
-		.bDescriptorType = USB_INTERFACE_DESC,			\
-		.bInterfaceNumber = 0,					\
-		.bAlternateSetting = 0,					\
-		.bNumEndpoints = 1,					\
-		.bInterfaceClass = HID_CLASS,				\
-		.bInterfaceSubClass = 0,				\
-		.bInterfaceProtocol = 0,				\
-		.iInterface = 0,					\
+#define INITIALIZER_IF                                                        \
+	{                                                                     \
+		.bLength = sizeof(struct usb_if_descriptor),                  \
+		.bDescriptorType = USB_INTERFACE_DESC, .bInterfaceNumber = 0, \
+		.bAlternateSetting = 0, .bNumEndpoints = 1,                   \
+		.bInterfaceClass = HID_CLASS, .bInterfaceSubClass = 0,        \
+		.bInterfaceProtocol = 0, .iInterface = 0,                     \
 	}
 #endif
 
 /* Descriptor length needs to be set after initialization */
-#define INITIALIZER_IF_HID						\
-	{								\
-		.bLength = sizeof(struct usb_hid_descriptor),		\
-		.bDescriptorType = USB_HID_DESC,			\
-		.bcdHID = sys_cpu_to_le16(USB_1_1),			\
-		.bCountryCode = 0,					\
-		.bNumDescriptors = 1,					\
-		.subdesc[0] = {						\
-			.bDescriptorType = USB_HID_REPORT_DESC,		\
-			.wDescriptorLength = 0,				\
-		},							\
+#define INITIALIZER_IF_HID                                             \
+	{                                                              \
+		.bLength = sizeof(struct usb_hid_descriptor),          \
+		.bDescriptorType = USB_HID_DESC,                       \
+		.bcdHID = sys_cpu_to_le16(USB_1_1), .bCountryCode = 0, \
+		.bNumDescriptors = 1,                                  \
+		.subdesc[0] = {                                        \
+			.bDescriptorType = USB_HID_REPORT_DESC,        \
+			.wDescriptorLength = 0,                        \
+		},                                                     \
 	}
 
-#define INITIALIZER_IF_EP(addr, attr, mps)				\
-	{								\
-		.bLength = sizeof(struct usb_ep_descriptor),		\
-		.bDescriptorType = USB_ENDPOINT_DESC,			\
-		.bEndpointAddress = addr,				\
-		.bmAttributes = attr,					\
-		.wMaxPacketSize = sys_cpu_to_le16(mps),			\
-		.bInterval = CONFIG_USB_HID_POLL_INTERVAL_MS,		\
+#define INITIALIZER_IF_EP(addr, attr, mps)                      \
+	{                                                       \
+		.bLength = sizeof(struct usb_ep_descriptor),    \
+		.bDescriptorType = USB_ENDPOINT_DESC,           \
+		.bEndpointAddress = addr, .bmAttributes = attr, \
+		.wMaxPacketSize = sys_cpu_to_le16(mps),         \
+		.bInterval = CONFIG_USB_HID_POLL_INTERVAL_MS,   \
 	}
 
 #ifdef CONFIG_ENABLE_HID_INT_OUT_EP
-#define DEFINE_HID_DESCR(x, _)						\
-	USBD_CLASS_DESCR_DEFINE(primary, x)				\
-	struct usb_hid_config hid_cfg_##x = {				\
-	/* Interface descriptor */					\
-	.if0 = INITIALIZER_IF,						\
-	.if0_hid = INITIALIZER_IF_HID,					\
-	.if0_int_in_ep =						\
-		INITIALIZER_IF_EP(AUTO_EP_IN,				\
-				  USB_DC_EP_INTERRUPT,			\
-				  CONFIG_HID_INTERRUPT_EP_MPS),		\
-	.if0_int_out_ep =						\
-		INITIALIZER_IF_EP(AUTO_EP_OUT,				\
-				  USB_DC_EP_INTERRUPT,			\
-				  CONFIG_HID_INTERRUPT_EP_MPS),		\
+#define DEFINE_HID_DESCR(x, _)                                              \
+	USBD_CLASS_DESCR_DEFINE(primary, x)                                 \
+	struct usb_hid_config hid_cfg_##x = {                               \
+		/* Interface descriptor */                                  \
+		.if0 = INITIALIZER_IF,                                      \
+		.if0_hid = INITIALIZER_IF_HID,                              \
+		.if0_int_in_ep =                                            \
+			INITIALIZER_IF_EP(AUTO_EP_IN, USB_DC_EP_INTERRUPT,  \
+					  CONFIG_HID_INTERRUPT_EP_MPS),     \
+		.if0_int_out_ep =                                           \
+			INITIALIZER_IF_EP(AUTO_EP_OUT, USB_DC_EP_INTERRUPT, \
+					  CONFIG_HID_INTERRUPT_EP_MPS),     \
 	};
 #else
-#define DEFINE_HID_DESCR(x, _)						\
-	USBD_CLASS_DESCR_DEFINE(primary, x)				\
-	struct usb_hid_config hid_cfg_##x = {				\
-	/* Interface descriptor */					\
-	.if0 = INITIALIZER_IF,						\
-	.if0_hid = INITIALIZER_IF_HID,					\
-	.if0_int_in_ep =						\
-		INITIALIZER_IF_EP(AUTO_EP_IN,				\
-				  USB_DC_EP_INTERRUPT,			\
-				  CONFIG_HID_INTERRUPT_EP_MPS),		\
+#define DEFINE_HID_DESCR(x, _)                                             \
+	USBD_CLASS_DESCR_DEFINE(primary, x)                                \
+	struct usb_hid_config hid_cfg_##x = {                              \
+		/* Interface descriptor */                                 \
+		.if0 = INITIALIZER_IF,                                     \
+		.if0_hid = INITIALIZER_IF_HID,                             \
+		.if0_int_in_ep =                                           \
+			INITIALIZER_IF_EP(AUTO_EP_IN, USB_DC_EP_INTERRUPT, \
+					  CONFIG_HID_INTERRUPT_EP_MPS),    \
 	};
 #endif
 
@@ -283,11 +271,12 @@ static int hid_on_set_protocol(const struct device *dev,
 #endif
 }
 
-static void usb_set_hid_report_size(const struct usb_cfg_data *cfg, uint16_t size)
+static void usb_set_hid_report_size(const struct usb_cfg_data *cfg,
+				    uint16_t size)
 {
 	struct usb_if_descriptor *if_desc = (void *)cfg->interface_descriptor;
 	struct usb_hid_config *desc =
-			CONTAINER_OF(if_desc, struct usb_hid_config, if0);
+		CONTAINER_OF(if_desc, struct usb_hid_config, if0);
 
 	LOG_DBG("if_desc %p desc %p size %u", if_desc, desc, size);
 
@@ -315,8 +304,8 @@ void hid_sof_handler(struct hid_device_info *dev_data)
 			dev_data->sof_cnt[i]++;
 		}
 
-		uint32_t diff = abs((dev_data->idle_rate[i] * 4U)
-				 - dev_data->sof_cnt[i]);
+		uint32_t diff = abs((dev_data->idle_rate[i] * 4U) -
+				    dev_data->sof_cnt[i]);
 
 		if (diff < (2 + (dev_data->idle_rate[i] / 10U))) {
 			dev_data->sof_cnt[i] = 0U;
@@ -391,12 +380,10 @@ static void hid_do_status_cb(struct hid_device_info *dev_data,
 		LOG_INF("Unknown event");
 		break;
 	}
-
 }
 
 static void hid_status_cb(struct usb_cfg_data *cfg,
-			  enum usb_dc_status_code status,
-			  const uint8_t *param)
+			  enum usb_dc_status_code status, const uint8_t *param)
 {
 	struct hid_device_info *dev_data;
 	struct usb_dev_data *common;
@@ -414,8 +401,8 @@ static void hid_status_cb(struct usb_cfg_data *cfg,
 	hid_do_status_cb(dev_data, status, param);
 }
 
-static int hid_class_handle_req(struct usb_setup_packet *setup,
-				int32_t *len, uint8_t **data)
+static int hid_class_handle_req(struct usb_setup_packet *setup, int32_t *len,
+				uint8_t **data)
 {
 	struct hid_device_info *dev_data;
 	struct usb_dev_data *common;
@@ -507,8 +494,8 @@ static int hid_class_handle_req(struct usb_setup_packet *setup,
 	return -ENOTSUP;
 }
 
-static int hid_custom_handle_req(struct usb_setup_packet *setup,
-				 int32_t *len, uint8_t **data)
+static int hid_custom_handle_req(struct usb_setup_packet *setup, int32_t *len,
+				 uint8_t **data)
 {
 	LOG_DBG("Standard request:"
 		"bRequest 0x%02x, bmRequestType 0x%02x, len %d",
@@ -516,8 +503,8 @@ static int hid_custom_handle_req(struct usb_setup_packet *setup,
 
 	if (REQTYPE_GET_DIR(setup->bmRequestType) == REQTYPE_DIR_TO_HOST &&
 	    REQTYPE_GET_RECIP(setup->bmRequestType) ==
-					REQTYPE_RECIP_INTERFACE &&
-					setup->bRequest == REQ_GET_DESCRIPTOR) {
+		    REQTYPE_RECIP_INTERFACE &&
+	    setup->bRequest == REQ_GET_DESCRIPTOR) {
 		uint8_t value = (uint8_t)(setup->wValue >> 8);
 		uint8_t iface_num = (uint8_t)setup->wIndex;
 		struct hid_device_info *dev_data;
@@ -553,7 +540,8 @@ static int hid_custom_handle_req(struct usb_setup_packet *setup,
 			 * So truncated wLength if it doesn't match. */
 			if (*len != dev_data->report_size) {
 				LOG_WRN("len %d doesn't match "
-					"Report Descriptor size", *len);
+					"Report Descriptor size",
+					*len);
 				*len = MIN(*len, dev_data->report_size);
 			}
 			*data = (uint8_t *)dev_data->report_desc;
@@ -612,23 +600,22 @@ static void hid_int_out(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 }
 #endif
 
-#define INITIALIZER_EP_DATA(cb, addr)			\
-	{						\
-		.ep_cb = cb,				\
-		.ep_addr = addr,			\
+#define INITIALIZER_EP_DATA(cb, addr)         \
+	{                                     \
+		.ep_cb = cb, .ep_addr = addr, \
 	}
 
 /* Describe Endpoints configuration */
 #ifdef CONFIG_ENABLE_HID_INT_OUT_EP
-#define DEFINE_HID_EP(x, _)						\
-	static struct usb_ep_cfg_data hid_ep_data_##x[] = {		\
-		INITIALIZER_EP_DATA(hid_int_in, AUTO_EP_IN),		\
-		INITIALIZER_EP_DATA(hid_int_out, AUTO_EP_OUT),		\
+#define DEFINE_HID_EP(x, _)                                    \
+	static struct usb_ep_cfg_data hid_ep_data_##x[] = {    \
+		INITIALIZER_EP_DATA(hid_int_in, AUTO_EP_IN),   \
+		INITIALIZER_EP_DATA(hid_int_out, AUTO_EP_OUT), \
 	};
 #else
-#define DEFINE_HID_EP(x, _)						\
-	static struct usb_ep_cfg_data hid_ep_data_##x[] = {		\
-		INITIALIZER_EP_DATA(hid_int_in, AUTO_EP_IN),		\
+#define DEFINE_HID_EP(x, _)                                  \
+	static struct usb_ep_cfg_data hid_ep_data_##x[] = {  \
+		INITIALIZER_EP_DATA(hid_int_in, AUTO_EP_IN), \
 	};
 #endif
 
@@ -647,8 +634,8 @@ static void hid_interface_config(struct usb_desc_header *head,
 #endif
 }
 
-#define DEFINE_HID_CFG_DATA(x, _)					\
-	USBD_CFG_DATA_DEFINE(primary, hid)				\
+#define DEFINE_HID_CFG_DATA(x, _)          \
+	USBD_CFG_DATA_DEFINE(primary, hid) \
 	struct usb_cfg_data hid_config_##x = {				\
 		.usb_device_description = NULL,				\
 		.interface_config = hid_interface_config,		\
@@ -694,30 +681,29 @@ void usb_hid_register_device(const struct device *dev, const uint8_t *desc,
 		&usb_hid_devlist);
 }
 
-int hid_int_ep_write(const struct device *dev, const uint8_t *data, uint32_t data_len,
-		     uint32_t *bytes_ret)
+int hid_int_ep_write(const struct device *dev, const uint8_t *data,
+		     uint32_t data_len, uint32_t *bytes_ret)
 {
 	const struct usb_cfg_data *cfg = dev->config;
 	struct hid_device_info *hid_dev_data = dev->data;
 
 	if (hid_dev_data->configured && !hid_dev_data->suspended) {
 		return usb_write(cfg->endpoint[HID_INT_IN_EP_IDX].ep_addr, data,
-			 data_len, bytes_ret);
+				 data_len, bytes_ret);
 	} else {
 		LOG_WRN("Device is not configured");
 		return -EAGAIN;
 	}
-
 }
 
-int hid_int_ep_read(const struct device *dev, uint8_t *data, uint32_t max_data_len,
-		    uint32_t *ret_bytes)
+int hid_int_ep_read(const struct device *dev, uint8_t *data,
+		    uint32_t max_data_len, uint32_t *ret_bytes)
 {
 #ifdef CONFIG_ENABLE_HID_INT_OUT_EP
 	const struct usb_cfg_data *cfg = dev->config;
 
-	return usb_read(cfg->endpoint[HID_INT_OUT_EP_IDX].ep_addr,
-			data, max_data_len, ret_bytes);
+	return usb_read(cfg->endpoint[HID_INT_OUT_EP_IDX].ep_addr, data,
+			max_data_len, ret_bytes);
 #else
 	return -ENOTSUP;
 #endif
@@ -734,17 +720,14 @@ static int usb_hid_device_init(const struct device *dev)
 	return 0;
 }
 
-#define DEFINE_HID_DEV_DATA(x, _)					\
-	struct hid_device_info usb_hid_dev_data_##x;
+#define DEFINE_HID_DEV_DATA(x, _) struct hid_device_info usb_hid_dev_data_##x;
 
-#define DEFINE_HID_DEVICE(x, _)						\
-	DEVICE_AND_API_INIT(usb_hid_device_##x,				\
-			    CONFIG_USB_HID_DEVICE_NAME "_" #x,		\
-			    &usb_hid_device_init,			\
-			    &usb_hid_dev_data_##x,			\
-			    &hid_config_##x, POST_KERNEL,		\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	\
-			    &hid_api);
+#define DEFINE_HID_DEVICE(x, _)                                          \
+	DEVICE_AND_API_INIT(usb_hid_device_##x,                          \
+			    CONFIG_USB_HID_DEVICE_NAME "_" #x,           \
+			    &usb_hid_device_init, &usb_hid_dev_data_##x, \
+			    &hid_config_##x, POST_KERNEL,                \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &hid_api);
 
 UTIL_LISTIFY(CONFIG_USB_HID_DEVICE_COUNT, DEFINE_HID_DESCR, _)
 UTIL_LISTIFY(CONFIG_USB_HID_DEVICE_COUNT, DEFINE_HID_EP, _)

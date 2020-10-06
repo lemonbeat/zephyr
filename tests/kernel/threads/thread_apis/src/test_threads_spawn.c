@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <ztest.h>
 
 #include "tests_thread_apis.h"
@@ -47,9 +46,8 @@ static void thread_entry_delay(void *p1, void *p2, void *p3)
  */
 void test_threads_spawn_params(void)
 {
-	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_params,
-			tp1, INT_TO_POINTER(tp2), tp3, 0,
-			K_USER, K_NO_WAIT);
+	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_params, tp1,
+			INT_TO_POINTER(tp2), tp3, 0, K_USER, K_NO_WAIT);
 	k_msleep(100);
 }
 
@@ -66,8 +64,8 @@ void test_threads_spawn_priority(void)
 {
 	/* spawn thread with higher priority */
 	spawn_prio = k_thread_priority_get(k_current_get()) - 1;
-	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_priority,
-			NULL, NULL, NULL, spawn_prio, K_USER, K_NO_WAIT);
+	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_priority, NULL,
+			NULL, NULL, spawn_prio, K_USER, K_NO_WAIT);
 	k_msleep(100);
 }
 
@@ -84,8 +82,8 @@ void test_threads_spawn_delay(void)
 {
 	/* spawn thread with higher priority */
 	tp2 = 10;
-	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_delay,
-			NULL, NULL, NULL, 0, K_USER, K_MSEC(120));
+	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_delay, NULL,
+			NULL, NULL, 0, K_USER, K_MSEC(120));
 	/* 100 < 120 ensure spawn thread not start */
 	k_msleep(100);
 	/* checkpoint: check spawn thread not execute */
@@ -115,8 +113,7 @@ void test_threads_spawn_forever(void)
 	tp2 = 10;
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
 				      thread_entry_delay, NULL, NULL, NULL,
-				      K_HIGHEST_THREAD_PRIO,
-				      K_USER, K_FOREVER);
+				      K_HIGHEST_THREAD_PRIO, K_USER, K_FOREVER);
 	k_yield();
 	/* checkpoint: check spawn thread not execute */
 	zassert_true(tp2 == 10, NULL);
@@ -141,8 +138,7 @@ void test_thread_start(void)
 
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
 				      thread_entry_delay, NULL, NULL, NULL,
-				      K_HIGHEST_THREAD_PRIO,
-				      K_USER, K_FOREVER);
+				      K_HIGHEST_THREAD_PRIO, K_USER, K_FOREVER);
 
 	k_thread_start(tid);
 	k_yield();

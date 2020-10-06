@@ -47,7 +47,7 @@ struct mcp320x_data {
 	struct k_sem sem;
 
 	K_KERNEL_STACK_MEMBER(stack,
-			CONFIG_ADC_MCP320X_ACQUISITION_THREAD_STACK_SIZE);
+			      CONFIG_ADC_MCP320X_ACQUISITION_THREAD_STACK_SIZE);
 };
 
 static int mcp320x_channel_setup(const struct device *dev,
@@ -188,34 +188,16 @@ static int mcp320x_read_channel(const struct device *dev, uint8_t channel,
 	uint8_t tx_bytes[2];
 	uint8_t rx_bytes[2];
 	int err;
-	const struct spi_buf tx_buf[2] = {
-		{
-			.buf = tx_bytes,
-			.len = sizeof(tx_bytes)
-		},
-		{
-			.buf = NULL,
-			.len = 1
-		}
-	};
-	const struct spi_buf rx_buf[2] = {
-		{
-			.buf = NULL,
-			.len = 1
-		},
-		{
-			.buf = rx_bytes,
-			.len = sizeof(rx_bytes)
-		}
-	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_buf,
-		.count = ARRAY_SIZE(tx_buf)
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_buf,
-		.count = ARRAY_SIZE(rx_buf)
-	};
+	const struct spi_buf tx_buf[2] = { { .buf = tx_bytes,
+					     .len = sizeof(tx_bytes) },
+					   { .buf = NULL, .len = 1 } };
+	const struct spi_buf rx_buf[2] = { { .buf = NULL, .len = 1 },
+					   { .buf = rx_bytes,
+					     .len = sizeof(rx_bytes) } };
+	const struct spi_buf_set tx = { .buffers = tx_buf,
+					.count = ARRAY_SIZE(tx_buf) };
+	const struct spi_buf_set rx = { .buffers = rx_buf,
+					.count = ARRAY_SIZE(rx_buf) };
 
 	/*
 	 * Configuration bits consists of: 5 dummy bits + start bit +
@@ -303,9 +285,8 @@ static int mcp320x_init(const struct device *dev)
 
 	k_thread_create(&data->thread, data->stack,
 			CONFIG_ADC_MCP320X_ACQUISITION_THREAD_STACK_SIZE,
-			(k_thread_entry_t)mcp320x_acquisition_thread,
-			data, NULL, NULL,
-			CONFIG_ADC_MCP320X_ACQUISITION_THREAD_PRIO,
+			(k_thread_entry_t)mcp320x_acquisition_thread, data,
+			NULL, NULL, CONFIG_ADC_MCP320X_ACQUISITION_THREAD_PRIO,
 			0, K_NO_WAIT);
 
 	adc_context_unlock_unconditionally(&data->ctx);
@@ -323,12 +304,12 @@ static const struct adc_driver_api mcp320x_adc_api = {
 
 #define INST_DT_MCP320X(inst, t) DT_INST(inst, microchip_mcp##t)
 
-#define MCP320X_DEVICE(t, n, ch) \
-	static struct mcp320x_data mcp##t##_data_##n = { \
-		ADC_CONTEXT_INIT_TIMER(mcp##t##_data_##n, ctx), \
-		ADC_CONTEXT_INIT_LOCK(mcp##t##_data_##n, ctx), \
-		ADC_CONTEXT_INIT_SYNC(mcp##t##_data_##n, ctx), \
-	}; \
+#define MCP320X_DEVICE(t, n, ch)                                           \
+	static struct mcp320x_data mcp##t##_data_##n = {                   \
+		ADC_CONTEXT_INIT_TIMER(mcp##t##_data_##n, ctx),            \
+		ADC_CONTEXT_INIT_LOCK(mcp##t##_data_##n, ctx),             \
+		ADC_CONTEXT_INIT_SYNC(mcp##t##_data_##n, ctx),             \
+	};                                                                 \
 	static const struct mcp320x_config mcp##t##_config_##n = { \
 		.spi_dev_name = DT_BUS_LABEL(INST_DT_MCP320X(n, t)), \
 		.spi_cs_dev_name = \
@@ -355,12 +336,11 @@ static const struct adc_driver_api mcp320x_adc_api = {
 			.cs = &mcp##t##_data_##n.spi_cs, \
 		}, \
 		.channels = ch, \
-	}; \
-	DEVICE_AND_API_INIT(mcp##t##_##n, \
-			    DT_LABEL(INST_DT_MCP320X(n, t)), \
-			    &mcp320x_init, &mcp##t##_data_##n, \
-			    &mcp##t##_config_##n, POST_KERNEL, \
-			    CONFIG_ADC_MCP320X_INIT_PRIORITY, \
+	};       \
+	DEVICE_AND_API_INIT(mcp##t##_##n, DT_LABEL(INST_DT_MCP320X(n, t)), \
+			    &mcp320x_init, &mcp##t##_data_##n,             \
+			    &mcp##t##_config_##n, POST_KERNEL,             \
+			    CONFIG_ADC_MCP320X_INIT_PRIORITY,              \
 			    &mcp320x_adc_api)
 
 /*
@@ -375,9 +355,9 @@ static const struct adc_driver_api mcp320x_adc_api = {
 
 #define CALL_WITH_ARG(arg, expr) expr(arg);
 
-#define INST_DT_MCP320X_FOREACH(t, inst_expr)				\
-	UTIL_LISTIFY(DT_NUM_INST_STATUS_OKAY(microchip_mcp##t),	\
-		     CALL_WITH_ARG, inst_expr)
+#define INST_DT_MCP320X_FOREACH(t, inst_expr)                                  \
+	UTIL_LISTIFY(DT_NUM_INST_STATUS_OKAY(microchip_mcp##t), CALL_WITH_ARG, \
+		     inst_expr)
 
 INST_DT_MCP320X_FOREACH(3204, MCP3204_DEVICE);
 INST_DT_MCP320X_FOREACH(3208, MCP3208_DEVICE);

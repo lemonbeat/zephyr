@@ -19,9 +19,8 @@ LOG_MODULE_DECLARE(APDS9960, CONFIG_SENSOR_LOG_LEVEL);
 
 void apds9960_work_cb(struct k_work *work)
 {
-	struct apds9960_data *data = CONTAINER_OF(work,
-						  struct apds9960_data,
-						  work);
+	struct apds9960_data *data =
+		CONTAINER_OF(work, struct apds9960_data, work);
 	const struct device *dev = data->dev;
 
 	if (data->p_th_handler != NULL) {
@@ -31,8 +30,7 @@ void apds9960_work_cb(struct k_work *work)
 	apds9960_setup_int(data, true);
 }
 
-int apds9960_attr_set(const struct device *dev,
-		      enum sensor_channel chan,
+int apds9960_attr_set(const struct device *dev, enum sensor_channel chan,
 		      enum sensor_attribute attr,
 		      const struct sensor_value *val)
 {
@@ -41,8 +39,7 @@ int apds9960_attr_set(const struct device *dev,
 
 	if (chan == SENSOR_CHAN_PROX) {
 		if (attr == SENSOR_ATTR_UPPER_THRESH) {
-			if (i2c_reg_write_byte(data->i2c,
-					       config->i2c_address,
+			if (i2c_reg_write_byte(data->i2c, config->i2c_address,
 					       APDS9960_PIHT_REG,
 					       (uint8_t)val->val1)) {
 				return -EIO;
@@ -51,8 +48,7 @@ int apds9960_attr_set(const struct device *dev,
 			return 0;
 		}
 		if (attr == SENSOR_ATTR_LOWER_THRESH) {
-			if (i2c_reg_write_byte(data->i2c,
-					       config->i2c_address,
+			if (i2c_reg_write_byte(data->i2c, config->i2c_address,
 					       APDS9960_PILT_REG,
 					       (uint8_t)val->val1)) {
 				return -EIO;
@@ -78,8 +74,7 @@ int apds9960_trigger_set(const struct device *dev,
 	case SENSOR_TRIG_THRESHOLD:
 		if (trig->chan == SENSOR_CHAN_PROX) {
 			data->p_th_handler = handler;
-			if (i2c_reg_update_byte(data->i2c,
-						config->i2c_address,
+			if (i2c_reg_update_byte(data->i2c, config->i2c_address,
 						APDS9960_ENABLE_REG,
 						APDS9960_ENABLE_PIEN,
 						APDS9960_ENABLE_PIEN)) {

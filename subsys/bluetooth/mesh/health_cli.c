@@ -30,10 +30,10 @@ static int32_t msg_timeout;
 static struct bt_mesh_health_cli *health_cli;
 
 struct health_fault_param {
-	uint16_t   cid;
-	uint8_t   *expect_test_id;
-	uint8_t   *test_id;
-	uint8_t   *faults;
+	uint16_t cid;
+	uint8_t *expect_test_id;
+	uint8_t *test_id;
+	uint8_t *faults;
 	size_t *fault_count;
 };
 
@@ -98,8 +98,8 @@ static void health_current_status(struct bt_mesh_model *model,
 	test_id = net_buf_simple_pull_u8(buf);
 	cid = net_buf_simple_pull_le16(buf);
 
-	BT_DBG("Test ID 0x%02x Company ID 0x%04x Fault Count %u",
-	       test_id, cid, buf->len);
+	BT_DBG("Test ID 0x%02x Company ID 0x%04x Fault Count %u", test_id, cid,
+	       buf->len);
 
 	if (!cli->current_status) {
 		BT_WARN("No Current Status callback available");
@@ -164,10 +164,10 @@ static void health_attention_status(struct bt_mesh_model *model,
 }
 
 const struct bt_mesh_model_op bt_mesh_health_cli_op[] = {
-	{ OP_HEALTH_FAULT_STATUS,    3,   health_fault_status },
-	{ OP_HEALTH_CURRENT_STATUS,  3,   health_current_status },
-	{ OP_HEALTH_PERIOD_STATUS,   1,   health_period_status },
-	{ OP_ATTENTION_STATUS,       1,   health_attention_status },
+	{ OP_HEALTH_FAULT_STATUS, 3, health_fault_status },
+	{ OP_HEALTH_CURRENT_STATUS, 3, health_current_status },
+	{ OP_HEALTH_PERIOD_STATUS, 1, health_period_status },
+	{ OP_ATTENTION_STATUS, 1, health_attention_status },
 	BT_MESH_MODEL_OP_END,
 };
 
@@ -206,7 +206,8 @@ static int cli_wait(void)
 	return err;
 }
 
-int bt_mesh_health_attention_get(uint16_t addr, uint16_t app_idx, uint8_t *attention)
+int bt_mesh_health_attention_get(uint16_t addr, uint16_t app_idx,
+				 uint8_t *attention)
 {
 	BT_MESH_MODEL_BUF_DEFINE(msg, OP_ATTENTION_GET, 0);
 	struct bt_mesh_msg_ctx ctx = {
@@ -236,8 +237,8 @@ int bt_mesh_health_attention_get(uint16_t addr, uint16_t app_idx, uint8_t *atten
 	return cli_wait();
 }
 
-int bt_mesh_health_attention_set(uint16_t addr, uint16_t app_idx, uint8_t attention,
-				 uint8_t *updated_attention)
+int bt_mesh_health_attention_set(uint16_t addr, uint16_t app_idx,
+				 uint8_t attention, uint8_t *updated_attention)
 {
 	BT_MESH_MODEL_BUF_DEFINE(msg, OP_ATTENTION_SET, 1);
 	struct bt_mesh_msg_ctx ctx = {
@@ -309,7 +310,7 @@ int bt_mesh_health_period_get(uint16_t addr, uint16_t app_idx, uint8_t *divisor)
 }
 
 int bt_mesh_health_period_set(uint16_t addr, uint16_t app_idx, uint8_t divisor,
-				 uint8_t *updated_divisor)
+			      uint8_t *updated_divisor)
 {
 	BT_MESH_MODEL_BUF_DEFINE(msg, OP_HEALTH_PERIOD_SET, 1);
 	struct bt_mesh_msg_ctx ctx = {
@@ -351,8 +352,8 @@ int bt_mesh_health_period_set(uint16_t addr, uint16_t app_idx, uint8_t divisor,
 }
 
 int bt_mesh_health_fault_test(uint16_t addr, uint16_t app_idx, uint16_t cid,
-				 uint8_t test_id, uint8_t *faults,
-				 size_t *fault_count)
+			      uint8_t test_id, uint8_t *faults,
+			      size_t *fault_count)
 {
 	BT_MESH_MODEL_BUF_DEFINE(msg, OP_HEALTH_FAULT_TEST, 3);
 	struct bt_mesh_msg_ctx ctx = {
@@ -398,8 +399,8 @@ int bt_mesh_health_fault_test(uint16_t addr, uint16_t app_idx, uint16_t cid,
 }
 
 int bt_mesh_health_fault_clear(uint16_t addr, uint16_t app_idx, uint16_t cid,
-				 uint8_t *test_id, uint8_t *faults,
-				 size_t *fault_count)
+			       uint8_t *test_id, uint8_t *faults,
+			       size_t *fault_count)
 {
 	BT_MESH_MODEL_BUF_DEFINE(msg, OP_HEALTH_FAULT_CLEAR, 2);
 	struct bt_mesh_msg_ctx ctx = {
@@ -444,8 +445,8 @@ int bt_mesh_health_fault_clear(uint16_t addr, uint16_t app_idx, uint16_t cid,
 }
 
 int bt_mesh_health_fault_get(uint16_t addr, uint16_t app_idx, uint16_t cid,
-				 uint8_t *test_id, uint8_t *faults,
-				 size_t *fault_count)
+			     uint8_t *test_id, uint8_t *faults,
+			     size_t *fault_count)
 {
 	BT_MESH_MODEL_BUF_DEFINE(msg, OP_HEALTH_FAULT_GET, 2);
 	struct bt_mesh_msg_ctx ctx = {

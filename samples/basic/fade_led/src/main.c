@@ -14,17 +14,17 @@
 #include <device.h>
 #include <drivers/pwm.h>
 
-#define PWM_LED0_NODE	DT_ALIAS(pwm_led0)
+#define PWM_LED0_NODE DT_ALIAS(pwm_led0)
 
 #if DT_NODE_HAS_STATUS(PWM_LED0_NODE, okay)
-#define PWM_LABEL	DT_PWMS_LABEL(PWM_LED0_NODE)
-#define PWM_CHANNEL	DT_PWMS_CHANNEL(PWM_LED0_NODE)
-#define PWM_FLAGS	DT_PWMS_FLAGS(PWM_LED0_NODE)
+#define PWM_LABEL DT_PWMS_LABEL(PWM_LED0_NODE)
+#define PWM_CHANNEL DT_PWMS_CHANNEL(PWM_LED0_NODE)
+#define PWM_FLAGS DT_PWMS_FLAGS(PWM_LED0_NODE)
 #else
 #error "Unsupported board: pwm-led0 devicetree alias is not defined"
-#define PWM_LABEL	""
-#define PWM_CHANNEL	0
-#define PWM_FLAGS	0
+#define PWM_LABEL ""
+#define PWM_CHANNEL 0
+#define PWM_FLAGS 0
 #endif
 
 /*
@@ -32,10 +32,10 @@
  * threshold. The steps should also be small enough, and happen
  * quickly enough, to make the output fade change appear continuous.
  */
-#define PERIOD_USEC	20000U
-#define NUM_STEPS	50U
-#define STEP_USEC	(PERIOD_USEC / NUM_STEPS)
-#define SLEEP_MSEC	25U
+#define PERIOD_USEC 20000U
+#define NUM_STEPS 50U
+#define STEP_USEC (PERIOD_USEC / NUM_STEPS)
+#define SLEEP_MSEC 25U
 
 void main(void)
 {

@@ -89,7 +89,7 @@ static int read_mcumgr_byte(struct smp_shell_data *data, uint8_t byte)
 size_t smp_shell_rx_bytes(struct smp_shell_data *data, const uint8_t *bytes,
 			  size_t size)
 {
-	size_t consumed = 0;		/* Number of bytes consumed by SMP */
+	size_t consumed = 0; /* Number of bytes consumed by SMP */
 
 	/* Process all bytes that are accepted as SMP commands. */
 	while (size != consumed) {
@@ -134,8 +134,7 @@ void smp_shell_process(struct smp_shell_data *data)
 		line_len = strlen(data->mcumgr_buff) - 1;
 
 		nb = mcumgr_serial_process_frag(&smp_shell_rx_ctxt,
-						data->mcumgr_buff,
-						line_len);
+						data->mcumgr_buff, line_len);
 		if (nb != NULL) {
 			zephyr_smp_rx_req(&smp_shell_transport, nb);
 		}

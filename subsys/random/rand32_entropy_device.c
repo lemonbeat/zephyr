@@ -23,7 +23,8 @@ uint32_t z_impl_sys_rand32_get(void)
 		 * if the whole operation isn't atomic.
 		 */
 		dev = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
-		__ASSERT((dev != NULL),
+		__ASSERT(
+			(dev != NULL),
 			"Device driver for %s (DT_CHOSEN_ZEPHYR_ENTROPY_LABEL) not found. "
 			"Check your build configuration!",
 			DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
@@ -57,7 +58,8 @@ static int rand_get(uint8_t *dst, size_t outlen, bool csrand)
 		 * if the whole operation isn't atomic.
 		 */
 		dev = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
-		__ASSERT((dev != NULL),
+		__ASSERT(
+			(dev != NULL),
 			"Device driver for %s (DT_CHOSEN_ZEPHYR_ENTROPY_LABEL) not found. "
 			"Check your build configuration!",
 			DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);

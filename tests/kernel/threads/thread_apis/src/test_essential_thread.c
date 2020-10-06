@@ -40,8 +40,8 @@ static void thread_entry(void *p1, void *p2, void *p3)
  */
 void test_essential_thread_operation(void)
 {
-	k_tid_t tid = k_thread_create(&kthread_thread, kthread_stack,
-				      STACKSIZE, (k_thread_entry_t)thread_entry, NULL,
+	k_tid_t tid = k_thread_create(&kthread_thread, kthread_stack, STACKSIZE,
+				      (k_thread_entry_t)thread_entry, NULL,
 				      NULL, NULL, K_PRIO_PREEMPT(0), 0,
 				      K_NO_WAIT);
 
@@ -49,8 +49,7 @@ void test_essential_thread_operation(void)
 	k_thread_abort(tid);
 }
 
-void k_sys_fatal_error_handler(unsigned int reason,
-				      const z_arch_esf_t *esf)
+void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *esf)
 {
 	ARG_UNUSED(esf);
 	ARG_UNUSED(reason);
@@ -92,5 +91,4 @@ void test_essential_thread_abort(void)
 
 	k_sem_take(&sync_sem, K_FOREVER);
 	k_thread_abort(tid);
-
 }

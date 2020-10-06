@@ -38,7 +38,6 @@ static ALWAYS_INLINE void arch_kernel_init(void)
 	z_irq_setup();
 }
 
-
 /**
  *
  * @brief Indicates the interrupt number of the highest priority
@@ -62,8 +61,8 @@ extern void z_thread_entry_wrapper(void);
 extern void z_user_thread_entry_wrapper(void);
 
 extern void z_arc_userspace_enter(k_thread_entry_t user_entry, void *p1,
-		 void *p2, void *p3, uint32_t stack, uint32_t size,
-		 struct k_thread *thread);
+				  void *p2, void *p3, uint32_t stack,
+				  uint32_t size, struct k_thread *thread);
 
 extern void z_arc_fatal_error(unsigned int reason, const z_arch_esf_t *esf);
 

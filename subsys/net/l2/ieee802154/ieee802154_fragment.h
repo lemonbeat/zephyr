@@ -33,13 +33,12 @@ static inline bool ieee802154_fragment_is_needed(struct net_pkt *pkt,
 						 uint8_t ll_hdr_size)
 {
 	return (net_pkt_get_len(pkt) + ll_hdr_size >
-			IEEE802154_MTU - IEEE802154_MFR_LENGTH);
+		IEEE802154_MTU - IEEE802154_MFR_LENGTH);
 }
 
-static inline
-void ieee802154_fragment_ctx_init(struct ieee802154_fragment_ctx *ctx,
-				  struct net_pkt *pkt, uint16_t hdr_diff,
-				  bool iphc)
+static inline void
+ieee802154_fragment_ctx_init(struct ieee802154_fragment_ctx *ctx,
+			     struct net_pkt *pkt, uint16_t hdr_diff, bool iphc)
 {
 	ctx->buf = pkt->buffer;
 	ctx->pos = ctx->buf->data;

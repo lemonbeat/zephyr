@@ -28,25 +28,18 @@ LOG_MODULE_REGISTER(BMC150_MAGN, CONFIG_SENSOR_LOG_LEVEL);
 static const struct {
 	int freq;
 	uint8_t reg_val;
-} bmc150_magn_samp_freq_table[] = { {2, 0x01},
-				    {6, 0x02},
-				    {8, 0x03},
-				    {10, 0x00},
-				    {15, 0x04},
-				    {20, 0x05},
-				    {25, 0x06},
-				    {30, 0x07} };
+} bmc150_magn_samp_freq_table[] = { { 2, 0x01 },  { 6, 0x02 },	{ 8, 0x03 },
+				    { 10, 0x00 }, { 15, 0x04 }, { 20, 0x05 },
+				    { 25, 0x06 }, { 30, 0x07 } };
 
 static const struct bmc150_magn_preset {
 	uint8_t rep_xy;
 	uint8_t rep_z;
 	uint8_t odr;
-} bmc150_magn_presets_table[] = {
-	[LOW_POWER_PRESET] = {3, 3, 10},
-	[REGULAR_PRESET] = {9, 15, 10},
-	[ENHANCED_REGULAR_PRESET] = {15, 27, 10},
-	[HIGH_ACCURACY_PRESET] = {47, 83, 20}
-};
+} bmc150_magn_presets_table[] = { [LOW_POWER_PRESET] = { 3, 3, 10 },
+				  [REGULAR_PRESET] = { 9, 15, 10 },
+				  [ENHANCED_REGULAR_PRESET] = { 15, 27, 10 },
+				  [HIGH_ACCURACY_PRESET] = { 47, 83, 20 } };
 
 static int bmc150_magn_set_power_mode(const struct device *dev,
 				      enum bmc150_magn_power_modes mode,
@@ -57,31 +50,26 @@ static int bmc150_magn_set_power_mode(const struct device *dev,
 
 	switch (mode) {
 	case BMC150_MAGN_POWER_MODE_SUSPEND:
-		if (i2c_reg_update_byte(data->i2c_master,
-					config->i2c_slave_addr,
-					BMC150_MAGN_REG_POWER,
-					BMC150_MAGN_MASK_POWER_CTL,
-					!state) < 0) {
+		if (i2c_reg_update_byte(
+			    data->i2c_master, config->i2c_slave_addr,
+			    BMC150_MAGN_REG_POWER, BMC150_MAGN_MASK_POWER_CTL,
+			    !state) < 0) {
 			return -EIO;
 		}
 		k_busy_wait(USEC_PER_MSEC * 5U);
 
 		return 0;
 	case BMC150_MAGN_POWER_MODE_SLEEP:
-		return i2c_reg_update_byte(data->i2c_master,
-					   config->i2c_slave_addr,
-					   BMC150_MAGN_REG_OPMODE_ODR,
-					   BMC150_MAGN_MASK_OPMODE,
-					   BMC150_MAGN_MODE_SLEEP <<
-					   BMC150_MAGN_SHIFT_OPMODE);
+		return i2c_reg_update_byte(
+			data->i2c_master, config->i2c_slave_addr,
+			BMC150_MAGN_REG_OPMODE_ODR, BMC150_MAGN_MASK_OPMODE,
+			BMC150_MAGN_MODE_SLEEP << BMC150_MAGN_SHIFT_OPMODE);
 		break;
 	case BMC150_MAGN_POWER_MODE_NORMAL:
-		return i2c_reg_update_byte(data->i2c_master,
-					   config->i2c_slave_addr,
-					   BMC150_MAGN_REG_OPMODE_ODR,
-					   BMC150_MAGN_MASK_OPMODE,
-					   BMC150_MAGN_MODE_NORMAL <<
-					   BMC150_MAGN_SHIFT_OPMODE);
+		return i2c_reg_update_byte(
+			data->i2c_master, config->i2c_slave_addr,
+			BMC150_MAGN_REG_OPMODE_ODR, BMC150_MAGN_MASK_OPMODE,
+			BMC150_MAGN_MODE_NORMAL << BMC150_MAGN_SHIFT_OPMODE);
 		break;
 	}
 
@@ -96,13 +84,12 @@ static int bmc150_magn_set_odr(const struct device *dev, uint8_t val)
 
 	for (i = 0U; i < ARRAY_SIZE(bmc150_magn_samp_freq_table); ++i) {
 		if (val <= bmc150_magn_samp_freq_table[i].freq) {
-			return i2c_reg_update_byte(data->i2c_master,
-						config->i2c_slave_addr,
-						BMC150_MAGN_REG_OPMODE_ODR,
-						BMC150_MAGN_MASK_ODR,
-						bmc150_magn_samp_freq_table[i].
-						reg_val <<
-						BMC150_MAGN_SHIFT_ODR);
+			return i2c_reg_update_byte(
+				data->i2c_master, config->i2c_slave_addr,
+				BMC150_MAGN_REG_OPMODE_ODR,
+				BMC150_MAGN_MASK_ODR,
+				bmc150_magn_samp_freq_table[i].reg_val
+					<< BMC150_MAGN_SHIFT_ODR);
 		}
 	}
 
@@ -239,7 +226,7 @@ static int bmc150_magn_write_rep_z(const struct device *dev, int val)
  * https://github.com/BoschSensortec/BMM050_driver
  */
 static int32_t bmc150_magn_compensate_xy(struct bmc150_magn_trim_regs *tregs,
-					int16_t xy, uint16_t rhall, bool is_x)
+					 int16_t xy, uint16_t rhall, bool is_x)
 {
 	int8_t txy1, txy2;
 	int16_t val;
@@ -261,12 +248,18 @@ static int32_t bmc150_magn_compensate_xy(struct bmc150_magn_trim_regs *tregs,
 	}
 
 	val = ((int16_t)(((uint16_t)((((int32_t)tregs->xyz1) << 14) / rhall)) -
-	      ((uint16_t)0x4000)));
-	val = ((int16_t)((((int32_t)xy) * ((((((((int32_t)tregs->xy2) *
-	      ((((int32_t)val) * ((int32_t)val)) >> 7)) + (((int32_t)val) *
-	      ((int32_t)(((int16_t)tregs->xy1) << 7)))) >> 9) +
-	      ((int32_t)0x100000)) * ((int32_t)(((int16_t)txy2) +
-	      ((int16_t)0xA0)))) >> 12)) >> 13)) + (((int16_t)txy1) << 3);
+			 ((uint16_t)0x4000)));
+	val = ((int16_t)((((int32_t)xy) *
+			  ((((((((int32_t)tregs->xy2) *
+				((((int32_t)val) * ((int32_t)val)) >> 7)) +
+			       (((int32_t)val) *
+				((int32_t)(((int16_t)tregs->xy1) << 7)))) >>
+			      9) +
+			     ((int32_t)0x100000)) *
+			    ((int32_t)(((int16_t)txy2) + ((int16_t)0xA0)))) >>
+			   12)) >>
+			 13)) +
+	      (((int16_t)txy1) << 3);
 
 	return (int32_t)val;
 }
@@ -280,10 +273,14 @@ static int32_t bmc150_magn_compensate_z(struct bmc150_magn_trim_regs *tregs,
 		return INT32_MIN;
 	}
 
-	val = (((((int32_t)(z - tregs->z4)) << 15) - ((((int32_t)tregs->z3) *
-	      ((int32_t)(((int16_t)rhall) - ((int16_t)tregs->xyz1)))) >> 2)) /
-	      (tregs->z2 + ((int16_t)(((((int32_t)tregs->z1) *
-	      ((((int16_t)rhall) << 1))) + (1 << 15)) >> 16))));
+	val = (((((int32_t)(z - tregs->z4)) << 15) -
+		((((int32_t)tregs->z3) *
+		  ((int32_t)(((int16_t)rhall) - ((int16_t)tregs->xyz1)))) >>
+		 2)) /
+	       (tregs->z2 +
+		((int16_t)(((((int32_t)tregs->z1) * ((((int16_t)rhall) << 1))) +
+			    (1 << 15)) >>
+			   16))));
 
 	return val;
 }
@@ -316,10 +313,10 @@ static int bmc150_magn_sample_fetch(const struct device *dev,
 	rhall = sys_le16_to_cpu(values[BMC150_MAGN_RHALL]) >>
 		BMC150_MAGN_SHIFT_RHALL_L;
 
-	data->sample_x = bmc150_magn_compensate_xy(&data->tregs, raw_x, rhall,
-						   true);
-	data->sample_y = bmc150_magn_compensate_xy(&data->tregs, raw_y, rhall,
-						   false);
+	data->sample_x =
+		bmc150_magn_compensate_xy(&data->tregs, raw_x, rhall, true);
+	data->sample_y =
+		bmc150_magn_compensate_xy(&data->tregs, raw_y, rhall, false);
 	data->sample_z = bmc150_magn_compensate_z(&data->tregs, raw_z, rhall);
 
 	return 0;
@@ -376,8 +373,8 @@ static inline int bmc150_magn_attr_set_rep(const struct device *dev,
 			return -EINVAL;
 		}
 
-		if (bmc150_magn_compute_max_odr(dev, val->val1, 0,
-						&max_odr) < 0) {
+		if (bmc150_magn_compute_max_odr(dev, val->val1, 0, &max_odr) <
+		    0) {
 			return -EIO;
 		}
 
@@ -402,8 +399,8 @@ static inline int bmc150_magn_attr_set_rep(const struct device *dev,
 			return -EINVAL;
 		}
 
-		if (bmc150_magn_compute_max_odr(dev, 0, val->val1,
-						&max_odr) < 0) {
+		if (bmc150_magn_compute_max_odr(dev, 0, val->val1, &max_odr) <
+		    0) {
 			return -EIO;
 		}
 
@@ -492,8 +489,8 @@ static int bmc150_magn_init_chip(const struct device *dev)
 	bmc150_magn_set_power_mode(dev, BMC150_MAGN_POWER_MODE_NORMAL, 0);
 	bmc150_magn_set_power_mode(dev, BMC150_MAGN_POWER_MODE_SUSPEND, 1);
 
-	if (bmc150_magn_set_power_mode(dev, BMC150_MAGN_POWER_MODE_SUSPEND, 0)
-				       < 0) {
+	if (bmc150_magn_set_power_mode(dev, BMC150_MAGN_POWER_MODE_SUSPEND, 0) <
+	    0) {
 		LOG_ERR("failed to bring up device from suspend mode");
 		return -EIO;
 	}
@@ -511,30 +508,27 @@ static int bmc150_magn_init_chip(const struct device *dev)
 
 	preset = bmc150_magn_presets_table[BMC150_MAGN_DEFAULT_PRESET];
 	if (bmc150_magn_set_odr(dev, preset.odr) < 0) {
-		LOG_ERR("failed to set ODR to %d",
-			    preset.odr);
+		LOG_ERR("failed to set ODR to %d", preset.odr);
 		goto err_poweroff;
 	}
 
 	if (i2c_reg_write_byte(data->i2c_master, config->i2c_slave_addr,
 			       BMC150_MAGN_REG_REP_XY,
-			       BMC150_MAGN_REPXY_TO_REGVAL(preset.rep_xy))
-			       < 0) {
-		LOG_ERR("failed to set REP XY to %d",
-			    preset.rep_xy);
+			       BMC150_MAGN_REPXY_TO_REGVAL(preset.rep_xy)) <
+	    0) {
+		LOG_ERR("failed to set REP XY to %d", preset.rep_xy);
 		goto err_poweroff;
 	}
 
 	if (i2c_reg_write_byte(data->i2c_master, config->i2c_slave_addr,
 			       BMC150_MAGN_REG_REP_Z,
 			       BMC150_MAGN_REPZ_TO_REGVAL(preset.rep_z)) < 0) {
-		LOG_ERR("failed to set REP Z to %d",
-			    preset.rep_z);
+		LOG_ERR("failed to set REP Z to %d", preset.rep_z);
 		goto err_poweroff;
 	}
 
-	if (bmc150_magn_set_power_mode(dev, BMC150_MAGN_POWER_MODE_NORMAL, 1)
-				       < 0) {
+	if (bmc150_magn_set_power_mode(dev, BMC150_MAGN_POWER_MODE_NORMAL, 1) <
+	    0) {
 		LOG_ERR("failed to power on device");
 		goto err_poweroff;
 	}
@@ -570,14 +564,13 @@ err_poweroff:
 
 static int bmc150_magn_init(const struct device *dev)
 {
-	const struct bmc150_magn_config * const config =
-					  dev->config;
+	const struct bmc150_magn_config *const config = dev->config;
 	struct bmc150_magn_data *data = dev->data;
 
 	data->i2c_master = device_get_binding(config->i2c_master_dev_name);
 	if (!data->i2c_master) {
 		LOG_ERR("i2c master not found: %s",
-			   config->i2c_master_dev_name);
+			config->i2c_master_dev_name);
 		return -EINVAL;
 	}
 
@@ -608,5 +601,5 @@ static const struct bmc150_magn_config bmc150_magn_config = {
 static struct bmc150_magn_data bmc150_magn_data;
 
 DEVICE_AND_API_INIT(bmc150_magn, DT_INST_LABEL(0), bmc150_magn_init,
-	    &bmc150_magn_data, &bmc150_magn_config, POST_KERNEL,
-	    CONFIG_SENSOR_INIT_PRIORITY, &bmc150_magn_api_funcs);
+		    &bmc150_magn_data, &bmc150_magn_config, POST_KERNEL,
+		    CONFIG_SENSOR_INIT_PRIORITY, &bmc150_magn_api_funcs);

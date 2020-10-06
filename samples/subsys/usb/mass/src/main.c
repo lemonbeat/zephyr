@@ -21,7 +21,7 @@ LOG_MODULE_REGISTER(main);
 #include <ff.h>
 
 static FATFS fat_fs;
-#define FATFS_MNTP      "/NAND:"
+#define FATFS_MNTP "/NAND:"
 
 static struct fs_mount_t fs_mnt = {
 	.type = FS_FATFS,
@@ -42,8 +42,8 @@ static struct fs_mount_t fs_mnt = {
 };
 #else
 #error No recognized file system
-#endif  /* file system */
-#endif  /* CONFIG_DISK_ACCESS_FLASH */
+#endif /* file system */
+#endif /* CONFIG_DISK_ACCESS_FLASH */
 
 static void setup_disk(void)
 {
@@ -54,8 +54,8 @@ static void setup_disk(void)
 	const struct flash_area *pfa;
 
 	rc = flash_area_open(id, &pfa);
-	printk("Area %u at 0x%x on %s for %u bytes\n",
-	       id, (unsigned int)pfa->fa_off, pfa->fa_dev_name,
+	printk("Area %u at 0x%x on %s for %u bytes\n", id,
+	       (unsigned int)pfa->fa_off, pfa->fa_dev_name,
 	       (unsigned int)pfa->fa_size);
 
 	if (IS_ENABLED(CONFIG_APP_WIPE_STORAGE)) {
@@ -82,8 +82,7 @@ static void setup_disk(void)
 
 		printk("%s: bsize = %lu ; frsize = %lu ;"
 		       " blocks = %lu ; bfree = %lu\n",
-		       mp->mnt_point,
-		       sbuf.f_bsize, sbuf.f_frsize,
+		       mp->mnt_point, sbuf.f_bsize, sbuf.f_frsize,
 		       sbuf.f_blocks, sbuf.f_bfree);
 
 		struct fs_dir_t dir = { 0 };
@@ -104,8 +103,7 @@ static void setup_disk(void)
 			}
 			printk("  %c %u %s\n",
 			       (ent.type == FS_DIR_ENTRY_FILE) ? 'F' : 'D',
-			       ent.size,
-			       ent.name);
+			       ent.size, ent.name);
 		}
 
 		(void)fs_closedir(&dir);

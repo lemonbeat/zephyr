@@ -22,7 +22,7 @@ struct uart_stm32_config {
 	/* initial hardware flow control, 1 for RTS/CTS */
 	bool hw_flow_control;
 	/* initial parity, 0 for none, 1 for odd, 2 for even */
-	int  parity;
+	int parity;
 	const struct soc_gpio_pinctrl *pinctrl_list;
 	size_t pinctrl_list_size;
 };
@@ -39,4 +39,4 @@ struct uart_stm32_data {
 #endif
 };
 
-#endif	/* ZEPHYR_DRIVERS_SERIAL_UART_STM32_H_ */
+#endif /* ZEPHYR_DRIVERS_SERIAL_UART_STM32_H_ */

@@ -25,15 +25,14 @@ static char *us_time_to_str(char *dest, uint64_t time)
 		unsigned int second;
 		unsigned int us;
 
-		hour   = (time / 3600U / 1000000U) % 24;
+		hour = (time / 3600U / 1000000U) % 24;
 		minute = (time / 60U / 1000000U) % 60;
 		second = (time / 1000000U) % 60;
-		us     = time % 1000000;
+		us = time % 1000000;
 
 		sprintf(dest, "%02u:%02u:%02u.%06u", hour, minute, second, us);
 	} else {
 		sprintf(dest, " NEVER/UNKNOWN ");
-
 	}
 	return dest;
 }
@@ -54,7 +53,7 @@ static void test_realtime(void)
 	int64_t diff, error;
 	uint64_t start_rtc_time[3];
 	double acc_ratio = 1;
-	double time_ratios[5] = {0.25, 2, 2, 2, 2};
+	double time_ratios[5] = { 0.25, 2, 2, 2, 2 };
 	/* This ratio adjustments lead to test speeds 0.25x, 0.5x, 1x, 2x & 4x*/
 
 	time = native_rtc_gettime_us(RTC_CLOCK_REALTIME);
@@ -92,12 +91,9 @@ static void test_realtime(void)
 		error = diff / 1000 - WAIT_TIME / acc_ratio;
 
 		posix_print_trace("%i/5: Speed ratio %.2f. Took %.3fms. "
-				"Should take %.3fms +- %ims\n",
-				i+1,
-				acc_ratio,
-				diff / 1000.0,
-				WAIT_TIME / acc_ratio,
-				TOLERANCE);
+				  "Should take %.3fms +- %ims\n",
+				  i + 1, acc_ratio, diff / 1000.0,
+				  WAIT_TIME / acc_ratio, TOLERANCE);
 
 		zassert_true(abs(error) < TOLERANCE,
 			     "Real time error over TOLERANCE");
@@ -107,37 +103,34 @@ static void test_realtime(void)
 		 * independently of the real timeness ratio
 		 */
 		diff = native_rtc_gettime_us(RTC_CLOCK_PSEUDOHOSTREALTIME) -
-			start_rtc_time[2];
+		       start_rtc_time[2];
 		error = diff - WAIT_TIME * 1000;
 
 		posix_print_trace("%i/5: PSEUDOHOSTREALTIME reports %.3fms "
-				"(error %.3fms)\n",
-				i+1,
-				diff / 1000.0,
-				error / 1000.0);
+				  "(error %.3fms)\n",
+				  i + 1, diff / 1000.0, error / 1000.0);
 
 		error /= 1000;
 		zassert_true(abs(error) < TOLERANCE,
 			     "PSEUDOHOSTREALTIME time error over TOLERANCE");
 
 		diff = native_rtc_gettime_us(RTC_CLOCK_BOOT) -
-			start_rtc_time[0];
+		       start_rtc_time[0];
 
 		zassert_true(diff == WAIT_TIME * 1000,
-				"Error in RTC_CLOCK_BOOT");
+			     "Error in RTC_CLOCK_BOOT");
 
 		diff = native_rtc_gettime_us(RTC_CLOCK_REALTIME) -
-			start_rtc_time[1];
+		       start_rtc_time[1];
 
 		zassert_true(diff == WAIT_TIME * 1000,
-				"Error in RTC_CLOCK_REALTIME");
+			     "Error in RTC_CLOCK_REALTIME");
 
 		start_time += WAIT_TIME * 1000 / acc_ratio;
 		start_rtc_time[0] += WAIT_TIME * 1000;
 		start_rtc_time[1] += WAIT_TIME * 1000;
 		start_rtc_time[2] += WAIT_TIME * 1000;
 	}
-
 }
 
 /**
@@ -152,8 +145,8 @@ static void test_rtc_offset(void)
 	start_rtc_time[0] = native_rtc_gettime_us(RTC_CLOCK_REALTIME);
 	start_rtc_time[1] = native_rtc_gettime_us(RTC_CLOCK_PSEUDOHOSTREALTIME);
 	native_rtc_offset(offset);
-	diff = native_rtc_gettime_us(RTC_CLOCK_PSEUDOHOSTREALTIME)
-		- start_rtc_time[1];
+	diff = native_rtc_gettime_us(RTC_CLOCK_PSEUDOHOSTREALTIME) -
+	       start_rtc_time[1];
 
 	error = diff - offset;
 	zassert_true(abs(error) < TOLERANCE,
@@ -166,10 +159,8 @@ static void test_rtc_offset(void)
 
 void test_main(void)
 {
-	ztest_test_suite(native_realtime_tests,
-		ztest_unit_test(test_realtime),
-		ztest_unit_test(test_rtc_offset)
-	);
+	ztest_test_suite(native_realtime_tests, ztest_unit_test(test_realtime),
+			 ztest_unit_test(test_rtc_offset));
 
 	ztest_run_test_suite(native_realtime_tests);
 }

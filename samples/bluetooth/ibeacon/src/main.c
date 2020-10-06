@@ -27,8 +27,7 @@
  */
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_NO_BREDR),
-	BT_DATA_BYTES(BT_DATA_MANUFACTURER_DATA,
-		      0x4c, 0x00, /* Apple */
+	BT_DATA_BYTES(BT_DATA_MANUFACTURER_DATA, 0x4c, 0x00, /* Apple */
 		      0x02, 0x15, /* iBeacon */
 		      0x18, 0xee, 0x15, 0x16, /* UUID[15..12] */
 		      0x01, 0x6b, /* UUID[11..10] */
@@ -50,8 +49,7 @@ static void bt_ready(int err)
 	printk("Bluetooth initialized\n");
 
 	/* Start advertising */
-	err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad),
-			      NULL, 0);
+	err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad), NULL, 0);
 	if (err) {
 		printk("Advertising failed to start (err %d)\n", err);
 		return;

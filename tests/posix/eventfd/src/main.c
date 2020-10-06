@@ -143,7 +143,7 @@ static void eventfd_poll_unset_common(int fd)
 
 	ret = eventfd_read(fd, &val);
 	zassert_equal(ret, 0, "read ret %d", ret);
-	zassert_equal(val, 2*TESTVAL, "val == %d, expected %d", val, TESTVAL);
+	zassert_equal(val, 2 * TESTVAL, "val == %d, expected %d", val, TESTVAL);
 
 	/* eventfd shall block on subsequent reads */
 
@@ -235,12 +235,13 @@ static void test_eventfd_overflow(void)
 	zassert_equal(ret, -1, "fd == %d", fd);
 	zassert_equal(errno, EINVAL, "did not get EINVAL");
 
-	ret = eventfd_write(fd, UINT64_MAX-1);
+	ret = eventfd_write(fd, UINT64_MAX - 1);
 	zassert_equal(ret, 0, "fd == %d", fd);
 
 	event = POLLOUT;
 	ret = is_blocked(fd, &event);
-	zassert_equal(ret, 1, "eventfd write not blocked with cnt == UINT64_MAX-1");
+	zassert_equal(ret, 1,
+		      "eventfd write not blocked with cnt == UINT64_MAX-1");
 
 	ret = eventfd_write(fd, 1);
 	zassert_equal(ret, -1, "fd == %d", fd);
@@ -269,17 +270,16 @@ static void test_eventfd_zero_shall_not_unblock(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_eventfd,
-				ztest_unit_test(test_eventfd),
-				ztest_unit_test(test_eventfd_read_nonblock),
-				ztest_unit_test(test_eventfd_write_then_read),
-				ztest_unit_test(test_eventfd_poll_timeout),
-				ztest_unit_test(test_eventfd_unset_poll_event_block),
-				ztest_unit_test(test_eventfd_unset_poll_event_nonblock),
-				ztest_unit_test(test_eventfd_set_poll_event_block),
-				ztest_unit_test(test_eventfd_set_poll_event_nonblock),
-				ztest_unit_test(test_eventfd_overflow),
-				ztest_unit_test(test_eventfd_zero_shall_not_unblock)
-				);
+	ztest_test_suite(
+		test_eventfd, ztest_unit_test(test_eventfd),
+		ztest_unit_test(test_eventfd_read_nonblock),
+		ztest_unit_test(test_eventfd_write_then_read),
+		ztest_unit_test(test_eventfd_poll_timeout),
+		ztest_unit_test(test_eventfd_unset_poll_event_block),
+		ztest_unit_test(test_eventfd_unset_poll_event_nonblock),
+		ztest_unit_test(test_eventfd_set_poll_event_block),
+		ztest_unit_test(test_eventfd_set_poll_event_nonblock),
+		ztest_unit_test(test_eventfd_overflow),
+		ztest_unit_test(test_eventfd_zero_shall_not_unblock));
 	ztest_run_test_suite(test_eventfd);
 }

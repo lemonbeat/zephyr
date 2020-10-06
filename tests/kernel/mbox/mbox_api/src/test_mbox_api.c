@@ -61,20 +61,19 @@ static char data[MAX_INFO_TYPE][MAIL_LEN] = {
 	"specify target/source thread, using a memory block"
 };
 
-static char big_msg_data[256]
-	= "Large message buffer, too big for mem_pool to receive";
+static char big_msg_data[256] =
+	"Large message buffer, too big for mem_pool to receive";
 
 static void async_put_sema_give(void *p1, void *p2, void *p3)
 {
 	k_sem_give(&sync_sema);
 }
 
-
 static void mbox_get_waiting_thread(void *p1, void *p2, void *p3)
 {
 	int thread_number = POINTER_TO_INT(p1);
 	struct k_mbox *pmbox = p2;
-	struct k_mbox_msg mmsg = {0};
+	struct k_mbox_msg mmsg = { 0 };
 
 	switch (thread_number) {
 	case 0:
@@ -104,12 +103,11 @@ static void mbox_get_waiting_thread(void *p1, void *p2, void *p3)
 	mmsg.size = 0;
 	zassert_true(k_mbox_get(pmbox, &mmsg, NULL, K_FOREVER) == 0,
 		     "Failure at thread number %d", thread_number);
-
 }
 
 static void tmbox_put(struct k_mbox *pmbox)
 {
-	struct k_mbox_msg mmsg = {0};
+	struct k_mbox_msg mmsg = { 0 };
 
 	switch (info_type) {
 	case PUT_GET_NULL:
@@ -152,7 +150,8 @@ static void tmbox_put(struct k_mbox *pmbox)
 		mmsg.size = MAIL_LEN;
 		mmsg.tx_data = NULL;
 		zassert_equal(k_mem_pool_alloc(&mpooltx, &mmsg.tx_block,
-					       MAIL_LEN, K_NO_WAIT), 0, NULL);
+					       MAIL_LEN, K_NO_WAIT),
+			      0, NULL);
 		memcpy(mmsg.tx_block.data, data[info_type], MAIL_LEN);
 		if (info_type == TARGET_SOURCE_THREAD_BLOCK) {
 			mmsg.tx_target_thread = receiver_tid;
@@ -165,9 +164,8 @@ static void tmbox_put(struct k_mbox *pmbox)
 		break;
 	case INCORRECT_TRANSMIT_TID:
 		mmsg.tx_target_thread = random_tid;
-		zassert_true(k_mbox_put(pmbox,
-					&mmsg,
-					K_NO_WAIT) == -ENOMSG, NULL);
+		zassert_true(k_mbox_put(pmbox, &mmsg, K_NO_WAIT) == -ENOMSG,
+			     NULL);
 		break;
 	case BLOCK_GET_INVALID_POOL:
 		/* To dispose of the rx msg using block get */
@@ -222,7 +220,8 @@ static void tmbox_put(struct k_mbox *pmbox)
 		mmsg.size = MAIL_LEN;
 		mmsg.tx_data = NULL;
 		zassert_equal(k_mem_pool_alloc(&mpooltx, &mmsg.tx_block,
-					       MAIL_LEN, K_NO_WAIT), 0, NULL);
+					       MAIL_LEN, K_NO_WAIT),
+			      0, NULL);
 		memcpy(mmsg.tx_block.data, data[0], MAIL_LEN);
 		mmsg.tx_target_thread = K_ANY;
 		zassert_true(k_mbox_put(pmbox, &mmsg, K_FOREVER) == 0, NULL);
@@ -298,7 +297,7 @@ static void tmbox_put(struct k_mbox *pmbox)
 
 static void tmbox_get(struct k_mbox *pmbox)
 {
-	struct k_mbox_msg mmsg = {0};
+	struct k_mbox_msg mmsg = { 0 };
 	char rxdata[MAIL_LEN];
 	struct k_mem_block rxblock;
 
@@ -357,20 +356,21 @@ static void tmbox_get(struct k_mbox *pmbox)
 		}
 		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, K_FOREVER) == 0,
 			     NULL);
-		zassert_true(k_mbox_data_block_get
-				     (&mmsg, &mpoolrx, &rxblock, K_FOREVER) == 0
-			     , NULL);
+		zassert_true(k_mbox_data_block_get(&mmsg, &mpoolrx, &rxblock,
+						   K_FOREVER) == 0,
+			     NULL);
 		zassert_equal(mmsg.info, ASYNC_PUT_GET_BLOCK, NULL);
 		zassert_equal(mmsg.size, MAIL_LEN, NULL);
 		/*verify rxblock*/
-		zassert_true(memcmp(rxblock.data, data[info_type], MAIL_LEN)
-			     == 0, NULL);
+		zassert_true(memcmp(rxblock.data, data[info_type], MAIL_LEN) ==
+				     0,
+			     NULL);
 		k_mem_pool_free(&rxblock);
 		break;
 	case INCORRECT_RECEIVER_TID:
 		mmsg.rx_source_thread = random_tid;
-		zassert_true(k_mbox_get
-			     (pmbox, &mmsg, NULL, K_NO_WAIT) == -ENOMSG,
+		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, K_NO_WAIT) ==
+				     -ENOMSG,
 			     NULL);
 		break;
 	case TIMED_OUT_MBOX_GET:
@@ -383,14 +383,15 @@ static void tmbox_get(struct k_mbox *pmbox)
 		mmsg.rx_source_thread = K_ANY;
 		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, K_FOREVER) == 0,
 			     NULL);
-		zassert_true(k_mbox_data_block_get
-			     (&mmsg, NULL, NULL, K_FOREVER) == 0,
+		zassert_true(k_mbox_data_block_get(&mmsg, NULL, NULL,
+						   K_FOREVER) == 0,
 			     NULL);
 		break;
 	case MSG_TID_MISMATCH:
 		mmsg.rx_source_thread = random_tid;
-		zassert_true(k_mbox_get
-			     (pmbox, &mmsg, NULL, K_NO_WAIT) == -ENOMSG, NULL);
+		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, K_NO_WAIT) ==
+				     -ENOMSG,
+			     NULL);
 		break;
 
 	case BLOCK_GET_BUFF_TO_POOL:
@@ -401,12 +402,13 @@ static void tmbox_get(struct k_mbox *pmbox)
 		mmsg.size = MAIL_LEN;
 		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, K_FOREVER) == 0,
 			     NULL);
-		zassert_true(k_mbox_data_block_get
-			     (&mmsg, &mpoolrx, &rxblock, K_FOREVER) == 0, NULL);
+		zassert_true(k_mbox_data_block_get(&mmsg, &mpoolrx, &rxblock,
+						   K_FOREVER) == 0,
+			     NULL);
 
 		/* verfiy */
-		zassert_true(memcmp(rxblock.data, data[1], MAIL_LEN)
-			     == 0, NULL);
+		zassert_true(memcmp(rxblock.data, data[1], MAIL_LEN) == 0,
+			     NULL);
 		/* free the block */
 		k_mem_pool_free(&rxblock);
 
@@ -420,8 +422,8 @@ static void tmbox_get(struct k_mbox *pmbox)
 		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, K_FOREVER) == 0,
 			     NULL);
 
-		zassert_true(k_mbox_data_block_get
-			     (&mmsg, &mpoolrx, &rxblock, K_MSEC(1)) == -EAGAIN,
+		zassert_true(k_mbox_data_block_get(&mmsg, &mpoolrx, &rxblock,
+						   K_MSEC(1)) == -EAGAIN,
 			     NULL);
 
 		/* Now dispose of the block since the test case finished */
@@ -448,8 +450,8 @@ static void tmbox_get(struct k_mbox *pmbox)
 		 * async put.
 		 */
 		k_thread_create(&async_tid, tstack_1, STACK_SIZE,
-				       async_put_sema_give, NULL, NULL, NULL,
-				       K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+				async_put_sema_give, NULL, NULL, NULL,
+				K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
 		mmsg.rx_source_thread = K_ANY;
 		mmsg.size = 0;
 		/* Here get is blocked until the thread we created releases
@@ -463,8 +465,8 @@ static void tmbox_get(struct k_mbox *pmbox)
 		 * async put.
 		 */
 		k_thread_create(&async_tid, tstack_1, STACK_SIZE,
-				       async_put_sema_give, NULL, NULL, NULL,
-				       K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+				async_put_sema_give, NULL, NULL, NULL,
+				K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
 		mmsg.rx_source_thread = &async_tid;
 		mmsg.size = 0;
 		/* Here the get is waiting for a async put to complete
@@ -490,20 +492,19 @@ static void tmbox_get(struct k_mbox *pmbox)
 			     NULL);
 		/* get the msg specific to receiver_tid */
 		mmsg.rx_source_thread = sender_tid;
-		zassert_true(k_mbox_get
-			     (pmbox, &mmsg, NULL, TIMEOUT) == 0, NULL);
+		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, TIMEOUT) == 0,
+			     NULL);
 
 		/* get msg from async or random tid */
 		mmsg.rx_source_thread = K_ANY;
-		zassert_true(k_mbox_get
-			     (pmbox, &mmsg, NULL, TIMEOUT) == 0, NULL);
+		zassert_true(k_mbox_get(pmbox, &mmsg, NULL, TIMEOUT) == 0,
+			     NULL);
 		break;
 	case MULTIPLE_WAITING_GET:
 		/* Create 5 threads who will wait on a mbox_get. */
 		for (uint32_t i = 0; i < 5; i++) {
 			k_thread_create(&waiting_get_tid[i],
-					waiting_get_stack[i],
-					STACK_SIZE,
+					waiting_get_stack[i], STACK_SIZE,
 					mbox_get_waiting_thread,
 					INT_TO_POINTER(i), pmbox, NULL,
 					K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
@@ -512,16 +513,14 @@ static void tmbox_get(struct k_mbox *pmbox)
 		 * async put. This will trigger the start of the msg transfer.
 		 */
 		k_thread_create(&async_tid, tstack_1, STACK_SIZE,
-				       async_put_sema_give, NULL, NULL, NULL,
-				       K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+				async_put_sema_give, NULL, NULL, NULL,
+				K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
 		break;
 
 	default:
 		break;
 	}
 }
-
-
 
 /*entry of contexts*/
 static void tmbox_entry(void *p1, void *p2, void *p3)
@@ -538,9 +537,9 @@ static void tmbox(struct k_mbox *pmbox)
 
 	/**TESTPOINT: thread-thread data passing via mbox*/
 	sender_tid = k_current_get();
-	receiver_tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				       tmbox_entry, pmbox, NULL, NULL,
-				       K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+	receiver_tid = k_thread_create(&tdata, tstack, STACK_SIZE, tmbox_entry,
+				       pmbox, NULL, NULL, K_PRIO_PREEMPT(0), 0,
+				       K_NO_WAIT);
 	tmbox_put(pmbox);
 	k_sem_take(&end_sema, K_FOREVER);
 

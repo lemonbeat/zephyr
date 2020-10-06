@@ -18,29 +18,28 @@ extern "C" {
 #endif
 
 /** Attempt to boot the contents of slot 0. */
-#define BOOT_SWAP_TYPE_NONE     1
+#define BOOT_SWAP_TYPE_NONE 1
 
 /** Swap to slot 1.  Absent a confirm command, revert back on next boot. */
-#define BOOT_SWAP_TYPE_TEST     2
+#define BOOT_SWAP_TYPE_TEST 2
 
 /** Swap to slot 1, and permanently switch to booting its contents. */
-#define BOOT_SWAP_TYPE_PERM     3
+#define BOOT_SWAP_TYPE_PERM 3
 
 /** Swap back to alternate slot.  A confirm changes this state to NONE. */
-#define BOOT_SWAP_TYPE_REVERT   4
+#define BOOT_SWAP_TYPE_REVERT 4
 
 /** Swap failed because image to be run is not valid */
-#define BOOT_SWAP_TYPE_FAIL     5
+#define BOOT_SWAP_TYPE_FAIL 5
 
-#define BOOT_IMG_VER_STRLEN_MAX 25  /* 255.255.65535.4294967295\0 */
+#define BOOT_IMG_VER_STRLEN_MAX 25 /* 255.255.65535.4294967295\0 */
 
 /* Trailer: */
-#define BOOT_MAX_ALIGN		8
-#define BOOT_MAGIC_SZ		16
+#define BOOT_MAX_ALIGN 8
+#define BOOT_MAGIC_SZ 16
 
-#define BOOT_TRAILER_IMG_STATUS_OFFS(bank_area) ((bank_area)->fa_size -\
-						  BOOT_MAGIC_SZ -\
-						  BOOT_MAX_ALIGN * 2)
+#define BOOT_TRAILER_IMG_STATUS_OFFS(bank_area) \
+	((bank_area)->fa_size - BOOT_MAGIC_SZ - BOOT_MAX_ALIGN * 2)
 /**
  * @brief MCUboot image header representation for image version
  *
@@ -114,8 +113,7 @@ struct mcuboot_img_header {
  *                    necessary information, an error is returned.
  * @return Zero on success, a negative value on error.
  */
-int boot_read_bank_header(uint8_t area_id,
-			  struct mcuboot_img_header *header,
+int boot_read_bank_header(uint8_t area_id, struct mcuboot_img_header *header,
 			  size_t header_size);
 
 /**
@@ -156,10 +154,9 @@ int boot_write_img_confirmed(void);
  */
 int mcuboot_swap_type(void);
 
-
 /** Boot upgrade request modes */
-#define BOOT_UPGRADE_TEST       0
-#define BOOT_UPGRADE_PERMANENT  1
+#define BOOT_UPGRADE_TEST 0
+#define BOOT_UPGRADE_PERMANENT 1
 
 /**
  * @brief Marks the image in slot 1 as pending. On the next reboot, the system
@@ -185,4 +182,4 @@ int boot_erase_img_bank(uint8_t area_id);
 }
 #endif
 
-#endif  /* ZEPHYR_INCLUDE_DFU_MCUBOOT_H_ */
+#endif /* ZEPHYR_INCLUDE_DFU_MCUBOOT_H_ */

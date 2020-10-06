@@ -14,24 +14,24 @@
  * generally also require CONFIG_DYNAMIC_INTERRUPTS.
  */
 
-#define PCIE_IRQ_DETECT		0xFFFFFFFU
+#define PCIE_IRQ_DETECT 0xFFFFFFFU
 
 /*
  * We represent a PCI device ID as [31:16] device ID, [15:0] vendor ID. Not
  * coincidentally, this is same representation used in PCI configuration space.
  */
 
-#define PCIE_ID_VEND_SHIFT	0U
-#define PCIE_ID_VEND_MASK	0xFFFFU
-#define PCIE_ID_DEV_SHIFT	16U
-#define PCIE_ID_DEV_MASK		0xFFFFU
+#define PCIE_ID_VEND_SHIFT 0U
+#define PCIE_ID_VEND_MASK 0xFFFFU
+#define PCIE_ID_DEV_SHIFT 16U
+#define PCIE_ID_DEV_MASK 0xFFFFU
 
-#define PCIE_ID(vend, dev) \
-	((((vend) & PCIE_ID_VEND_MASK) << PCIE_ID_VEND_SHIFT) | \
-	 (((dev) & PCIE_ID_DEV_MASK) << PCIE_ID_DEV_SHIFT))
+#define PCIE_ID(vend, dev)                                    \
+	((((vend)&PCIE_ID_VEND_MASK) << PCIE_ID_VEND_SHIFT) | \
+	 (((dev)&PCIE_ID_DEV_MASK) << PCIE_ID_DEV_SHIFT))
 
 #define PCIE_ID_TO_VEND(id) (((id) >> PCIE_ID_VEND_SHIFT) & PCIE_ID_VEND_MASK)
-#define PCIE_ID_TO_DEV(id)  (((id) >> PCIE_ID_DEV_SHIFT) & PCIE_ID_DEV_MASK)
+#define PCIE_ID_TO_DEV(id) (((id) >> PCIE_ID_DEV_SHIFT) & PCIE_ID_DEV_MASK)
 
 #define PCIE_ID_NONE PCIE_ID(0xFFFF, 0xFFFF)
 
@@ -47,17 +47,17 @@
  * of this shared format to avoid unnecessary layers of abstraction.
  */
 
-#define PCIE_BDF_BUS_SHIFT	16U
-#define PCIE_BDF_BUS_MASK	0xFFU
-#define PCIE_BDF_DEV_SHIFT	11U
-#define PCIE_BDF_DEV_MASK	0x1FU
-#define PCIE_BDF_FUNC_SHIFT	8U
-#define PCIE_BDF_FUNC_MASK	0x7U
+#define PCIE_BDF_BUS_SHIFT 16U
+#define PCIE_BDF_BUS_MASK 0xFFU
+#define PCIE_BDF_DEV_SHIFT 11U
+#define PCIE_BDF_DEV_MASK 0x1FU
+#define PCIE_BDF_FUNC_SHIFT 8U
+#define PCIE_BDF_FUNC_MASK 0x7U
 
-#define PCIE_BDF(bus, dev, func) \
-	((((bus) & PCIE_BDF_BUS_MASK) << PCIE_BDF_BUS_SHIFT) | \
-	 (((dev) & PCIE_BDF_DEV_MASK) << PCIE_BDF_DEV_SHIFT) | \
-	 (((func) & PCIE_BDF_FUNC_MASK) << PCIE_BDF_FUNC_SHIFT))
+#define PCIE_BDF(bus, dev, func)                             \
+	((((bus)&PCIE_BDF_BUS_MASK) << PCIE_BDF_BUS_SHIFT) | \
+	 (((dev)&PCIE_BDF_DEV_MASK) << PCIE_BDF_DEV_SHIFT) | \
+	 (((func)&PCIE_BDF_FUNC_MASK) << PCIE_BDF_FUNC_SHIFT))
 
 #define PCIE_BDF_TO_BUS(bdf) (((bdf) >> PCIE_BDF_BUS_SHIFT) & PCIE_BDF_BUS_MASK)
 #define PCIE_BDF_TO_DEV(bdf) (((bdf) >> PCIE_BDF_DEV_SHIFT) & PCIE_BDF_DEV_MASK)

@@ -39,8 +39,7 @@ static uint32_t overrides[] = {
 	/* DC/DC regulator: In Tx, use DCDCCTL5[3:0]=0x3 (DITHER_EN=0 and IPEAK=3). */
 	0x00F388D3,
 	/* Rx: Set LNA bias current offset to +15 to saturate trim to max (default: 0) */
-	0x000F8883,
-	0xFFFFFFFF
+	0x000F8883, 0xFFFFFFFF
 };
 
 static HwiP_Struct RF_hwiCpe0Obj;
@@ -214,8 +213,8 @@ static int ieee802154_cc13xx_cc26xx_tx(const struct device *dev,
 	drv_data->cmd_ieee_tx.status = IDLE;
 	drv_data->cmd_ieee_tx.payloadLen = frag->len;
 	drv_data->cmd_ieee_tx.pPayload = frag->data;
-	drv_data->cmd_ieee_tx.condition.rule =
-		ack ? COND_STOP_ON_FALSE : COND_NEVER;
+	drv_data->cmd_ieee_tx.condition.rule = ack ? COND_STOP_ON_FALSE :
+							   COND_NEVER;
 
 	if (ack) {
 		drv_data->cmd_ieee_rx_ack.status = IDLE;
@@ -273,8 +272,8 @@ static inline uint8_t ieee802154_cc13xx_cc26xx_convert_rssi(int8_t rssi)
 	       CC13XX_CC26XX_RSSI_DYNAMIC_RANGE;
 }
 
-static void ieee802154_cc13xx_cc26xx_rx_done(
-	struct ieee802154_cc13xx_cc26xx_data *drv_data)
+static void
+ieee802154_cc13xx_cc26xx_rx_done(struct ieee802154_cc13xx_cc26xx_data *drv_data)
 {
 	struct net_pkt *pkt;
 	uint8_t len, seq, corr;
@@ -528,7 +527,7 @@ static int ieee802154_cc13xx_cc26xx_init(const struct device *dev)
 	params.priority = INT_PRI_LEVEL1;
 	params.arg = (uintptr_t)DEVICE_GET(ieee802154_cc13xx_cc26xx);
 	HwiP_construct(&RF_hwiCpe0Obj, INT_RFC_CPE_0,
-		(HwiP_Fxn)ieee802154_cc13xx_cc26xx_cpe0_isr, &params);
+		       (HwiP_Fxn)ieee802154_cc13xx_cc26xx_cpe0_isr, &params);
 	RFCCpe0IntSelectClearEnable(IRQ_RX_ENTRY_DONE |
 				    IRQ_LAST_FG_COMMAND_DONE);
 

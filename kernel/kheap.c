@@ -18,7 +18,8 @@ void k_heap_init(struct k_heap *h, void *mem, size_t bytes)
 static int statics_init(const struct device *unused)
 {
 	ARG_UNUSED(unused);
-	Z_STRUCT_SECTION_FOREACH(k_heap, h) {
+	Z_STRUCT_SECTION_FOREACH(k_heap, h)
+	{
 		k_heap_init(h, h->heap.init_mem, h->heap.init_bytes);
 	}
 	return 0;
@@ -42,8 +43,8 @@ void *k_heap_alloc(struct k_heap *h, size_t bytes, k_timeout_t timeout)
 			break;
 		}
 
-		(void) z_pend_curr(&h->lock, key, &h->wait_q,
-				   K_TICKS(end - now));
+		(void)z_pend_curr(&h->lock, key, &h->wait_q,
+				  K_TICKS(end - now));
 		key = k_spin_lock(&h->lock);
 	}
 

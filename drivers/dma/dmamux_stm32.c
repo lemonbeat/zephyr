@@ -26,7 +26,7 @@ LOG_MODULE_REGISTER(dmamux_stm32, CONFIG_DMA_LOG_LEVEL);
 #define DT_DRV_COMPAT st_stm32_dmamux
 
 int dmamux_stm32_configure(const struct device *dev, uint32_t id,
-				struct dma_config *config)
+			   struct dma_config *config)
 {
 	/* device is the dmamux, id is the dmamux channel from 0 */
 	struct dmamux_stm32_data *data = dev->data;
@@ -61,14 +61,14 @@ int dmamux_stm32_configure(const struct device *dev, uint32_t id,
 	 * It gives this mux request ID to the dma through the config.dma_slot
 	 */
 	if (dma_stm32_configure(data->mux_channels[id].dev_dma,
-			data->mux_channels[id].dma_id, config) != 0) {
+				data->mux_channels[id].dma_id, config) != 0) {
 		LOG_ERR("cannot configure the dmamux.");
 		return -EINVAL;
 	}
 
 	/* set the Request Line ID to this dmamux channel i */
 	DMAMUX_Channel_TypeDef *dmamux =
-			(DMAMUX_Channel_TypeDef *)dev_config->base;
+		(DMAMUX_Channel_TypeDef *)dev_config->base;
 
 	LL_DMAMUX_SetRequestID(dmamux, id, request_id);
 
@@ -87,7 +87,7 @@ int dmamux_stm32_start(const struct device *dev, uint32_t id)
 	}
 
 	if (dma_stm32_start(data->mux_channels[id].dev_dma,
-		data->mux_channels[id].dma_id) != 0) {
+			    data->mux_channels[id].dma_id) != 0) {
 		LOG_ERR("cannot start the dmamux channel %d.", id);
 		return -EINVAL;
 	}
@@ -107,7 +107,7 @@ int dmamux_stm32_stop(const struct device *dev, uint32_t id)
 	}
 
 	if (dma_stm32_stop(data->mux_channels[id].dev_dma,
-		data->mux_channels[id].dma_id) != 0) {
+			   data->mux_channels[id].dma_id) != 0) {
 		LOG_ERR("cannot stop the dmamux channel %d.", id);
 		return -EINVAL;
 	}
@@ -115,8 +115,8 @@ int dmamux_stm32_stop(const struct device *dev, uint32_t id)
 	return 0;
 }
 
-int dmamux_stm32_reload(const struct device *dev, uint32_t id,
-			    uint32_t src, uint32_t dst, size_t size)
+int dmamux_stm32_reload(const struct device *dev, uint32_t id, uint32_t src,
+			uint32_t dst, size_t size)
 {
 	const struct dmamux_stm32_config *dev_config = dev->config;
 	struct dmamux_stm32_data *data = dev->data;
@@ -128,8 +128,8 @@ int dmamux_stm32_reload(const struct device *dev, uint32_t id,
 	}
 
 	if (dma_stm32_reload(data->mux_channels[id].dev_dma,
-		data->mux_channels[id].dma_id,
-		src, dst, size) != 0) {
+			     data->mux_channels[id].dma_id, src, dst,
+			     size) != 0) {
 		LOG_ERR("cannot reload the dmamux channel %d.", id);
 		return -EINVAL;
 	}
@@ -141,11 +141,10 @@ static int dmamux_stm32_init(const struct device *dev)
 {
 	struct dmamux_stm32_data *data = dev->data;
 	const struct dmamux_stm32_config *config = dev->config;
-	const struct device *clk =
-		device_get_binding(STM32_CLOCK_CONTROL_NAME);
+	const struct device *clk = device_get_binding(STM32_CLOCK_CONTROL_NAME);
 
-	if (clock_control_on(clk,
-		(clock_control_subsys_t *) &config->pclken) != 0) {
+	if (clock_control_on(clk, (clock_control_subsys_t *)&config->pclken) !=
+	    0) {
 		LOG_ERR("clock op failed\n");
 		return -EIO;
 	}
@@ -171,7 +170,7 @@ static int dmamux_stm32_init(const struct device *dev)
 			data->mux_channels[i].dev_dma =
 				device_get_binding((const char *)"DMA_2");
 			data->mux_channels[i].dma_id =
-			/* dma 2 channels from 1 to N */
+				/* dma 2 channels from 1 to N */
 				i - config->channel_nb / 2 + 1;
 		}
 	}
@@ -180,31 +179,30 @@ static int dmamux_stm32_init(const struct device *dev)
 }
 
 static const struct dma_driver_api dma_funcs = {
-	.reload		 = dmamux_stm32_reload,
-	.config		 = dmamux_stm32_configure,
-	.start		 = dmamux_stm32_start,
-	.stop		 = dmamux_stm32_stop,
+	.reload = dmamux_stm32_reload,
+	.config = dmamux_stm32_configure,
+	.start = dmamux_stm32_start,
+	.stop = dmamux_stm32_stop,
 };
 
-#define DMAMUX_INIT(index) \
-								\
-const struct dmamux_stm32_config dmamux_stm32_config_##index = {\
-	.pclken = { .bus = DT_INST_CLOCKS_CELL(index, bus),	\
-		    .enr = DT_INST_CLOCKS_CELL(index, bits) },	\
-	.base = DT_INST_REG_ADDR(index),			\
-	.channel_nb = DT_INST_PROP(index, dma_channels),	\
-	.gen_nb = DT_INST_PROP(index, dma_generators),		\
-	.req_nb = DT_INST_PROP(index, dma_requests),		\
-};								\
-								\
-static struct dmamux_stm32_data dmamux_stm32_data_##index = {	\
-	.mux_channels = NULL,					\
-};								\
-								\
-DEVICE_AND_API_INIT(dmamux_##index, DT_INST_LABEL(index),	\
-		    &dmamux_stm32_init,				\
-		    &dmamux_stm32_data_##index, &dmamux_stm32_config_##index,\
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,\
-		    &dma_funcs);
+#define DMAMUX_INIT(index)                                                  \
+                                                                            \
+	const struct dmamux_stm32_config dmamux_stm32_config_##index = {    \
+		.pclken = { .bus = DT_INST_CLOCKS_CELL(index, bus),         \
+			    .enr = DT_INST_CLOCKS_CELL(index, bits) },      \
+		.base = DT_INST_REG_ADDR(index),                            \
+		.channel_nb = DT_INST_PROP(index, dma_channels),            \
+		.gen_nb = DT_INST_PROP(index, dma_generators),              \
+		.req_nb = DT_INST_PROP(index, dma_requests),                \
+	};                                                                  \
+                                                                            \
+	static struct dmamux_stm32_data dmamux_stm32_data_##index = {       \
+		.mux_channels = NULL,                                       \
+	};                                                                  \
+                                                                            \
+	DEVICE_AND_API_INIT(dmamux_##index, DT_INST_LABEL(index),           \
+			    &dmamux_stm32_init, &dmamux_stm32_data_##index, \
+			    &dmamux_stm32_config_##index, POST_KERNEL,      \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &dma_funcs);
 
 DT_INST_FOREACH_STATUS_OKAY(DMAMUX_INIT)

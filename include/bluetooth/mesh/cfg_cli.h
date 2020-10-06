@@ -27,9 +27,9 @@ struct bt_mesh_cfg_cli {
 	struct bt_mesh_model *model;
 
 	/* Internal parameters for tracking message responses. */
-	struct k_sem          op_sync;
-	uint32_t                 op_pending;
-	void                 *op_param;
+	struct k_sem op_sync;
+	uint32_t op_pending;
+	void *op_param;
 };
 
 /** @def BT_MESH_MODEL_CFG_CLI
@@ -38,8 +38,8 @@ struct bt_mesh_cfg_cli {
  *
  *  @param cli_data Pointer to a @ref bt_mesh_cfg_cli instance.
  */
-#define BT_MESH_MODEL_CFG_CLI(cli_data)                                        \
-	BT_MESH_MODEL_CB(BT_MESH_MODEL_ID_CFG_CLI, bt_mesh_cfg_cli_op, NULL,   \
+#define BT_MESH_MODEL_CFG_CLI(cli_data)                                      \
+	BT_MESH_MODEL_CB(BT_MESH_MODEL_ID_CFG_CLI, bt_mesh_cfg_cli_op, NULL, \
 			 cli_data, &bt_mesh_cfg_cli_cb)
 
 /** @brief Get the target node's composition data.
@@ -80,7 +80,8 @@ int bt_mesh_cfg_beacon_get(uint16_t net_idx, uint16_t addr, uint8_t *status);
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_beacon_set(uint16_t net_idx, uint16_t addr, uint8_t val, uint8_t *status);
+int bt_mesh_cfg_beacon_set(uint16_t net_idx, uint16_t addr, uint8_t val,
+			   uint8_t *status);
 
 /** @brief Get the target node's Time To Live value.
  *
@@ -101,7 +102,8 @@ int bt_mesh_cfg_ttl_get(uint16_t net_idx, uint16_t addr, uint8_t *ttl);
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_ttl_set(uint16_t net_idx, uint16_t addr, uint8_t val, uint8_t *ttl);
+int bt_mesh_cfg_ttl_set(uint16_t net_idx, uint16_t addr, uint8_t val,
+			uint8_t *ttl);
 
 /** @brief Get the target node's Friend feature status.
  *
@@ -128,7 +130,8 @@ int bt_mesh_cfg_friend_get(uint16_t net_idx, uint16_t addr, uint8_t *status);
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_friend_set(uint16_t net_idx, uint16_t addr, uint8_t val, uint8_t *status);
+int bt_mesh_cfg_friend_set(uint16_t net_idx, uint16_t addr, uint8_t val,
+			   uint8_t *status);
 
 /** @brief Get the target node's Proxy feature state.
  *
@@ -141,7 +144,8 @@ int bt_mesh_cfg_friend_set(uint16_t net_idx, uint16_t addr, uint8_t val, uint8_t
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_gatt_proxy_get(uint16_t net_idx, uint16_t addr, uint8_t *status);
+int bt_mesh_cfg_gatt_proxy_get(uint16_t net_idx, uint16_t addr,
+			       uint8_t *status);
 
 /** @brief Set the target node's Proxy feature state.
  *
@@ -171,7 +175,7 @@ int bt_mesh_cfg_gatt_proxy_set(uint16_t net_idx, uint16_t addr, uint8_t val,
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_net_transmit_get(uint16_t net_idx, uint16_t addr,
-			  uint8_t *transmit);
+				 uint8_t *transmit);
 
 /** @brief Set the target node's network transmit parameters.
  *
@@ -184,8 +188,8 @@ int bt_mesh_cfg_net_transmit_get(uint16_t net_idx, uint16_t addr,
  *                    @ref BT_MESH_TRANSMIT_COUNT and @ref BT_MESH_TRANSMIT_INT.
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_net_transmit_set(uint16_t net_idx, uint16_t addr,
-		uint8_t val, uint8_t *transmit);
+int bt_mesh_cfg_net_transmit_set(uint16_t net_idx, uint16_t addr, uint8_t val,
+				 uint8_t *transmit);
 
 /** @brief Get the target node's Relay feature state.
  *
@@ -223,7 +227,8 @@ int bt_mesh_cfg_relay_get(uint16_t net_idx, uint16_t addr, uint8_t *status,
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_relay_set(uint16_t net_idx, uint16_t addr, uint8_t new_relay,
-			  uint8_t new_transmit, uint8_t *status, uint8_t *transmit);
+			  uint8_t new_transmit, uint8_t *status,
+			  uint8_t *transmit);
 
 /** @brief Add a network key to the target node.
  *
@@ -235,8 +240,9 @@ int bt_mesh_cfg_relay_set(uint16_t net_idx, uint16_t addr, uint8_t new_relay,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_net_key_add(uint16_t net_idx, uint16_t addr, uint16_t key_net_idx,
-			    const uint8_t net_key[16], uint8_t *status);
+int bt_mesh_cfg_net_key_add(uint16_t net_idx, uint16_t addr,
+			    uint16_t key_net_idx, const uint8_t net_key[16],
+			    uint8_t *status);
 
 /** @brief Get a list of the target node's network key indexes.
  *
@@ -276,9 +282,9 @@ int bt_mesh_cfg_net_key_del(uint16_t net_idx, uint16_t addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_app_key_add(uint16_t net_idx, uint16_t addr, uint16_t key_net_idx,
-			    uint16_t key_app_idx, const uint8_t app_key[16],
-			    uint8_t *status);
+int bt_mesh_cfg_app_key_add(uint16_t net_idx, uint16_t addr,
+			    uint16_t key_net_idx, uint16_t key_app_idx,
+			    const uint8_t app_key[16], uint8_t *status);
 
 /** @brief Get a list of the target node's application key indexes for a
  *         specific network key.
@@ -297,9 +303,9 @@ int bt_mesh_cfg_app_key_add(uint16_t net_idx, uint16_t addr, uint16_t key_net_id
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_app_key_get(uint16_t net_idx, uint16_t addr, uint16_t key_net_idx,
-			    uint8_t *status, uint16_t *keys, size_t *key_cnt);
-
+int bt_mesh_cfg_app_key_get(uint16_t net_idx, uint16_t addr,
+			    uint16_t key_net_idx, uint8_t *status,
+			    uint16_t *keys, size_t *key_cnt);
 
 /** @brief Delete an application key from the target node.
  *
@@ -312,7 +318,8 @@ int bt_mesh_cfg_app_key_get(uint16_t net_idx, uint16_t addr, uint16_t key_net_id
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_app_key_del(uint16_t net_idx, uint16_t addr,
-		uint16_t key_net_idx, uint16_t key_app_idx, uint8_t *status);
+			    uint16_t key_net_idx, uint16_t key_app_idx,
+			    uint8_t *status);
 
 /** @brief Bind an application to a SIG model on the target node.
  *
@@ -325,8 +332,9 @@ int bt_mesh_cfg_app_key_del(uint16_t net_idx, uint16_t addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_app_bind(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-			     uint16_t mod_app_idx, uint16_t mod_id, uint8_t *status);
+int bt_mesh_cfg_mod_app_bind(uint16_t net_idx, uint16_t addr,
+			     uint16_t elem_addr, uint16_t mod_app_idx,
+			     uint16_t mod_id, uint8_t *status);
 
 /** @brief Unbind an application from a SIG model on the target node.
  *
@@ -340,8 +348,8 @@ int bt_mesh_cfg_mod_app_bind(uint16_t net_idx, uint16_t addr, uint16_t elem_addr
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_mod_app_unbind(uint16_t net_idx, uint16_t addr,
-	uint16_t elem_addr, uint16_t mod_app_idx,
-	uint16_t mod_id, uint8_t *status);
+			       uint16_t elem_addr, uint16_t mod_app_idx,
+			       uint16_t mod_id, uint8_t *status);
 
 /** @brief Bind an application to a vendor model on the target node.
  *
@@ -355,8 +363,9 @@ int bt_mesh_cfg_mod_app_unbind(uint16_t net_idx, uint16_t addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_app_bind_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				 uint16_t mod_app_idx, uint16_t mod_id, uint16_t cid,
+int bt_mesh_cfg_mod_app_bind_vnd(uint16_t net_idx, uint16_t addr,
+				 uint16_t elem_addr, uint16_t mod_app_idx,
+				 uint16_t mod_id, uint16_t cid,
 				 uint8_t *status);
 
 /** @brief Unbind an application from a vendor model on the target node.
@@ -372,8 +381,9 @@ int bt_mesh_cfg_mod_app_bind_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_mod_app_unbind_vnd(uint16_t net_idx, uint16_t addr,
-	uint16_t elem_addr, uint16_t mod_app_idx, uint16_t mod_id,
-	uint16_t cid, uint8_t *status);
+				   uint16_t elem_addr, uint16_t mod_app_idx,
+				   uint16_t mod_id, uint16_t cid,
+				   uint8_t *status);
 
 /** @brief Get a list of all applications bound to a SIG model on the target
  *         node.
@@ -395,7 +405,6 @@ int bt_mesh_cfg_mod_app_get(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
 			    uint16_t mod_id, uint8_t *status, uint16_t *apps,
 			    size_t *app_cnt);
 
-
 /** @brief Get a list of all applications bound to a vendor model on the target
  *         node.
  *
@@ -413,9 +422,10 @@ int bt_mesh_cfg_mod_app_get(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_app_get_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				uint16_t mod_id, uint16_t cid, uint8_t *status,
-				uint16_t *apps, size_t *app_cnt);
+int bt_mesh_cfg_mod_app_get_vnd(uint16_t net_idx, uint16_t addr,
+				uint16_t elem_addr, uint16_t mod_id,
+				uint16_t cid, uint8_t *status, uint16_t *apps,
+				size_t *app_cnt);
 
 /** @def BT_MESH_PUB_PERIOD_100MS
  *
@@ -425,7 +435,7 @@ int bt_mesh_cfg_mod_app_get_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_a
  *
  *  @return Encoded value that can be assigned to bt_mesh_cfg_mod_pub.period
  */
-#define BT_MESH_PUB_PERIOD_100MS(steps)  ((steps) & BIT_MASK(6))
+#define BT_MESH_PUB_PERIOD_100MS(steps) ((steps)&BIT_MASK(6))
 
 /** @def BT_MESH_PUB_PERIOD_SEC
  *
@@ -435,7 +445,7 @@ int bt_mesh_cfg_mod_app_get_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_a
  *
  *  @return Encoded value that can be assigned to bt_mesh_cfg_mod_pub.period
  */
-#define BT_MESH_PUB_PERIOD_SEC(steps)   (((steps) & BIT_MASK(6)) | (1 << 6))
+#define BT_MESH_PUB_PERIOD_SEC(steps) (((steps)&BIT_MASK(6)) | (1 << 6))
 
 /** @def BT_MESH_PUB_PERIOD_10SEC
  *
@@ -446,7 +456,7 @@ int bt_mesh_cfg_mod_app_get_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_a
  *
  *  @return Encoded value that can be assigned to bt_mesh_cfg_mod_pub.period
  */
-#define BT_MESH_PUB_PERIOD_10SEC(steps) (((steps) & BIT_MASK(6)) | (2 << 6))
+#define BT_MESH_PUB_PERIOD_10SEC(steps) (((steps)&BIT_MASK(6)) | (2 << 6))
 
 /** @def BT_MESH_PUB_PERIOD_10MIN
  *
@@ -457,30 +467,30 @@ int bt_mesh_cfg_mod_app_get_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_a
  *
  *  @return Encoded value that can be assigned to bt_mesh_cfg_mod_pub.period
  */
-#define BT_MESH_PUB_PERIOD_10MIN(steps) (((steps) & BIT_MASK(6)) | (3 << 6))
+#define BT_MESH_PUB_PERIOD_10MIN(steps) (((steps)&BIT_MASK(6)) | (3 << 6))
 
 /** Model publication configuration parameters. */
 struct bt_mesh_cfg_mod_pub {
 	/** Publication destination address. */
-	uint16_t  addr;
+	uint16_t addr;
 	/** Application index to publish with. */
-	uint16_t  app_idx;
+	uint16_t app_idx;
 	/** Friendship credential flag. */
-	bool   cred_flag;
+	bool cred_flag;
 	/** Time To Live to publish with. */
-	uint8_t   ttl;
+	uint8_t ttl;
 	/**
 	 * Encoded publish period.
 	 * @see BT_MESH_PUB_PERIOD_100MS, BT_MESH_PUB_PERIOD_SEC,
 	 * BT_MESH_PUB_PERIOD_10SEC,
 	 * BT_MESH_PUB_PERIOD_10MIN
 	 */
-	uint8_t   period;
+	uint8_t period;
 	/**
 	 * Encoded transmit parameters.
 	 * @see BT_MESH_TRANSMIT
 	 */
-	uint8_t   transmit;
+	uint8_t transmit;
 };
 
 /** @brief Get publish parameters for a SIG model on the target node.
@@ -510,9 +520,10 @@ int bt_mesh_cfg_mod_pub_get(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_pub_get_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				uint16_t mod_id, uint16_t cid,
-				struct bt_mesh_cfg_mod_pub *pub, uint8_t *status);
+int bt_mesh_cfg_mod_pub_get_vnd(uint16_t net_idx, uint16_t addr,
+				uint16_t elem_addr, uint16_t mod_id,
+				uint16_t cid, struct bt_mesh_cfg_mod_pub *pub,
+				uint8_t *status);
 
 /** @brief Set publish parameters for a SIG model on the target node.
  *
@@ -541,9 +552,10 @@ int bt_mesh_cfg_mod_pub_set(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_pub_set_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				uint16_t mod_id, uint16_t cid,
-				struct bt_mesh_cfg_mod_pub *pub, uint8_t *status);
+int bt_mesh_cfg_mod_pub_set_vnd(uint16_t net_idx, uint16_t addr,
+				uint16_t elem_addr, uint16_t mod_id,
+				uint16_t cid, struct bt_mesh_cfg_mod_pub *pub,
+				uint8_t *status);
 
 /** @brief Add a group address to a SIG model's subscription list.
  *
@@ -557,7 +569,8 @@ int bt_mesh_cfg_mod_pub_set_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_a
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_mod_sub_add(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-			    uint16_t sub_addr, uint16_t mod_id, uint8_t *status);
+			    uint16_t sub_addr, uint16_t mod_id,
+			    uint8_t *status);
 
 /** @brief Add a group address to a vendor model's subscription list.
  *
@@ -571,9 +584,9 @@ int bt_mesh_cfg_mod_sub_add(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_add_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				 uint16_t sub_addr, uint16_t mod_id, uint16_t cid,
-				 uint8_t *status);
+int bt_mesh_cfg_mod_sub_add_vnd(uint16_t net_idx, uint16_t addr,
+				uint16_t elem_addr, uint16_t sub_addr,
+				uint16_t mod_id, uint16_t cid, uint8_t *status);
 
 /** @brief Delete a group address in a SIG model's subscription list.
  *
@@ -587,7 +600,8 @@ int bt_mesh_cfg_mod_sub_add_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_a
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_mod_sub_del(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-			    uint16_t sub_addr, uint16_t mod_id, uint8_t *status);
+			    uint16_t sub_addr, uint16_t mod_id,
+			    uint8_t *status);
 
 /** @brief Delete a group address in a vendor model's subscription list.
  *
@@ -601,9 +615,9 @@ int bt_mesh_cfg_mod_sub_del(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_del_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				 uint16_t sub_addr, uint16_t mod_id, uint16_t cid,
-				 uint8_t *status);
+int bt_mesh_cfg_mod_sub_del_vnd(uint16_t net_idx, uint16_t addr,
+				uint16_t elem_addr, uint16_t sub_addr,
+				uint16_t mod_id, uint16_t cid, uint8_t *status);
 
 /** @brief Overwrite all addresses in a SIG model's subscription list with a
  * group address.
@@ -620,8 +634,9 @@ int bt_mesh_cfg_mod_sub_del_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_a
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_overwrite(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				  uint16_t sub_addr, uint16_t mod_id, uint8_t *status);
+int bt_mesh_cfg_mod_sub_overwrite(uint16_t net_idx, uint16_t addr,
+				  uint16_t elem_addr, uint16_t sub_addr,
+				  uint16_t mod_id, uint8_t *status);
 
 /** @brief Overwrite all addresses in a vendor model's subscription list with a
  * group address.
@@ -641,7 +656,8 @@ int bt_mesh_cfg_mod_sub_overwrite(uint16_t net_idx, uint16_t addr, uint16_t elem
  */
 int bt_mesh_cfg_mod_sub_overwrite_vnd(uint16_t net_idx, uint16_t addr,
 				      uint16_t elem_addr, uint16_t sub_addr,
-				      uint16_t mod_id, uint16_t cid, uint8_t *status);
+				      uint16_t mod_id, uint16_t cid,
+				      uint8_t *status);
 
 /** @brief Add a virtual address to a SIG model's subscription list.
  *
@@ -655,9 +671,10 @@ int bt_mesh_cfg_mod_sub_overwrite_vnd(uint16_t net_idx, uint16_t addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_va_add(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-			       const uint8_t label[16], uint16_t mod_id,
-			       uint16_t *virt_addr, uint8_t *status);
+int bt_mesh_cfg_mod_sub_va_add(uint16_t net_idx, uint16_t addr,
+			       uint16_t elem_addr, const uint8_t label[16],
+			       uint16_t mod_id, uint16_t *virt_addr,
+			       uint8_t *status);
 
 /** @brief Add a virtual address to a vendor model's subscription list.
  *
@@ -672,9 +689,10 @@ int bt_mesh_cfg_mod_sub_va_add(uint16_t net_idx, uint16_t addr, uint16_t elem_ad
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_va_add_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				   const uint8_t label[16], uint16_t mod_id,
-				   uint16_t cid, uint16_t *virt_addr, uint8_t *status);
+int bt_mesh_cfg_mod_sub_va_add_vnd(uint16_t net_idx, uint16_t addr,
+				   uint16_t elem_addr, const uint8_t label[16],
+				   uint16_t mod_id, uint16_t cid,
+				   uint16_t *virt_addr, uint8_t *status);
 
 /** @brief Delete a virtual address in a SIG model's subscription list.
  *
@@ -688,9 +706,10 @@ int bt_mesh_cfg_mod_sub_va_add_vnd(uint16_t net_idx, uint16_t addr, uint16_t ele
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_va_del(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-			       const uint8_t label[16], uint16_t mod_id,
-			       uint16_t *virt_addr, uint8_t *status);
+int bt_mesh_cfg_mod_sub_va_del(uint16_t net_idx, uint16_t addr,
+			       uint16_t elem_addr, const uint8_t label[16],
+			       uint16_t mod_id, uint16_t *virt_addr,
+			       uint8_t *status);
 
 /** @brief Delete a virtual address in a vendor model's subscription list.
  *
@@ -705,9 +724,10 @@ int bt_mesh_cfg_mod_sub_va_del(uint16_t net_idx, uint16_t addr, uint16_t elem_ad
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_va_del_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				   const uint8_t label[16], uint16_t mod_id,
-				   uint16_t cid, uint16_t *virt_addr, uint8_t *status);
+int bt_mesh_cfg_mod_sub_va_del_vnd(uint16_t net_idx, uint16_t addr,
+				   uint16_t elem_addr, const uint8_t label[16],
+				   uint16_t mod_id, uint16_t cid,
+				   uint16_t *virt_addr, uint8_t *status);
 
 /** @brief Overwrite all addresses in a SIG model's subscription list with a
  * virtual address.
@@ -726,9 +746,9 @@ int bt_mesh_cfg_mod_sub_va_del_vnd(uint16_t net_idx, uint16_t addr, uint16_t ele
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_mod_sub_va_overwrite(uint16_t net_idx, uint16_t addr,
-				     uint16_t elem_addr, const uint8_t label[16],
-				     uint16_t mod_id, uint16_t *virt_addr,
-				     uint8_t *status);
+				     uint16_t elem_addr,
+				     const uint8_t label[16], uint16_t mod_id,
+				     uint16_t *virt_addr, uint8_t *status);
 
 /** @brief Overwrite all addresses in a vendor model's subscription list with a
  * virtual address.
@@ -748,7 +768,8 @@ int bt_mesh_cfg_mod_sub_va_overwrite(uint16_t net_idx, uint16_t addr,
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_mod_sub_va_overwrite_vnd(uint16_t net_idx, uint16_t addr,
-					 uint16_t elem_addr, const uint8_t label[16],
+					 uint16_t elem_addr,
+					 const uint8_t label[16],
 					 uint16_t mod_id, uint16_t cid,
 					 uint16_t *virt_addr, uint8_t *status);
 
@@ -787,9 +808,10 @@ int bt_mesh_cfg_mod_sub_get(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_cfg_mod_sub_get_vnd(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-				uint16_t mod_id, uint16_t cid, uint8_t *status,
-				uint16_t *subs, size_t *sub_cnt);
+int bt_mesh_cfg_mod_sub_get_vnd(uint16_t net_idx, uint16_t addr,
+				uint16_t elem_addr, uint16_t mod_id,
+				uint16_t cid, uint8_t *status, uint16_t *subs,
+				size_t *sub_cnt);
 
 /** Heartbeat subscription configuration parameters. */
 struct bt_mesh_cfg_hb_sub {
@@ -802,7 +824,7 @@ struct bt_mesh_cfg_hb_sub {
 	 * The decoded subscription period is (1 << (period - 1)) seconds, or 0
 	 * seconds if period is 0.
 	 */
-	uint8_t  period;
+	uint8_t period;
 	/**
 	 * Logarithmic Heartbeat subscription receive count.
 	 * The decoded Heartbeat count is (1 << (count - 1)) if count is
@@ -810,7 +832,7 @@ struct bt_mesh_cfg_hb_sub {
 	 *
 	 * Ignored in Heartbeat subscription set.
 	 */
-	uint8_t  count;
+	uint8_t count;
 	/**
 	 * Minimum hops in received messages, ie the shortest registered path
 	 * from the publishing node to the subscribing node. A Heartbeat
@@ -818,7 +840,7 @@ struct bt_mesh_cfg_hb_sub {
 	 *
 	 * Ignored in Heartbeat subscription set.
 	 */
-	uint8_t  min;
+	uint8_t min;
 	/**
 	 * Maximum hops in received messages, ie the longest registered path
 	 * from the publishing node to the subscribing node. A Heartbeat
@@ -826,7 +848,7 @@ struct bt_mesh_cfg_hb_sub {
 	 *
 	 * Ignored in Heartbeat subscription set.
 	 */
-	uint8_t  max;
+	uint8_t max;
 };
 
 /** @brief Set the target node's Heartbeat subscription parameters.
@@ -868,15 +890,15 @@ struct bt_mesh_cfg_hb_pub {
 	 * When returned from Heartbeat publication get, this parameter denotes
 	 * the number of Heartbeat messages remaining to be sent.
 	 */
-	uint8_t  count;
+	uint8_t count;
 	/**
 	 * Logarithmic Heartbeat publication transmit interval in seconds.
 	 * Decoded as (1 << (period - 1)) if period is between 1 and 0x11.
 	 * If period is 0, Heartbeat publication is disabled.
 	 */
-	uint8_t  period;
+	uint8_t period;
 	/** Publication message Time To Live value. */
-	uint8_t  ttl;
+	uint8_t ttl;
 	/**
 	 * Bitmap of features that trigger Heartbeat publications.
 	 * Legal values are @ref BT_MESH_FEAT_RELAY,
@@ -900,7 +922,8 @@ struct bt_mesh_cfg_hb_pub {
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_cfg_hb_pub_set(uint16_t net_idx, uint16_t addr,
-			   const struct bt_mesh_cfg_hb_pub *pub, uint8_t *status);
+			   const struct bt_mesh_cfg_hb_pub *pub,
+			   uint8_t *status);
 
 /** @brief Get the target node's Heartbeat publication parameters.
  *

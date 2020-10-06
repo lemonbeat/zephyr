@@ -27,14 +27,14 @@ extern "C" {
 #define S_IXOTH 00001
 
 /* File open modes */
-#define O_ACCMODE	   0003
-#define O_RDONLY	     00
-#define O_WRONLY	     01
-#define O_RDWR		     02
+#define O_ACCMODE 0003
+#define O_RDONLY 00
+#define O_WRONLY 01
+#define O_RDWR 02
 
-#define SEEK_SET	0	/* Seek from beginning of file.  */
-#define SEEK_CUR	1	/* Seek from current position.  */
-#define SEEK_END	2	/* Seek from end of file.  */
+#define SEEK_SET 0 /* Seek from beginning of file.  */
+#define SEEK_CUR 1 /* Seek from current position.  */
+#define SEEK_END 2 /* Seek from end of file.  */
 
 struct stat {
 	unsigned long st_size;
@@ -46,4 +46,4 @@ struct stat {
 }
 #endif
 
-#endif	/* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_SYS_STAT_H_ */
+#endif /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_SYS_STAT_H_ */

@@ -212,8 +212,8 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 	char dev[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(addr, dev, sizeof(dev));
-	printk("[DEVICE]: %s, AD evt type %u, AD data len %u, RSSI %i\n",
-	       dev, type, ad->len, rssi);
+	printk("[DEVICE]: %s, AD evt type %u, AD data len %u, RSSI %i\n", dev,
+	       type, ad->len, rssi);
 
 	/* We're only interested in connectable events */
 	if (type == BT_HCI_ADV_IND || type == BT_HCI_ADV_DIRECT_IND) {
@@ -227,10 +227,10 @@ static int scan_start(void)
 	 * devices that might update their advertising data at runtime.
 	 */
 	struct bt_le_scan_param scan_param = {
-		.type       = BT_LE_SCAN_TYPE_ACTIVE,
+		.type = BT_LE_SCAN_TYPE_ACTIVE,
 		.filter_dup = BT_LE_SCAN_OPT_FILTER_DUPLICATE,
-		.interval   = BT_GAP_SCAN_FAST_INTERVAL,
-		.window     = BT_GAP_SCAN_FAST_WINDOW,
+		.interval = BT_GAP_SCAN_FAST_INTERVAL,
+		.window = BT_GAP_SCAN_FAST_WINDOW,
 	};
 
 	return bt_le_scan_start(&scan_param, device_found);

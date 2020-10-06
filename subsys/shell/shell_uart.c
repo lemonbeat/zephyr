@@ -158,10 +158,8 @@ static void timer_handler(struct k_timer *timer)
 	}
 }
 
-static int init(const struct shell_transport *transport,
-		const void *config,
-		shell_transport_handler_t evt_handler,
-		void *context)
+static int init(const struct shell_transport *transport, const void *config,
+		shell_transport_handler_t evt_handler, void *context)
 {
 	const struct shell_uart *sh_uart = (struct shell_uart *)transport->ctx;
 
@@ -211,7 +209,7 @@ static int enable(const struct shell_transport *transport, bool blocking_tx)
 }
 
 static void irq_write(const struct shell_uart *sh_uart, const void *data,
-		     size_t length, size_t *cnt)
+		      size_t length, size_t *cnt)
 {
 	*cnt = ring_buf_put(sh_uart->tx_ringbuf, data, length);
 
@@ -222,14 +220,14 @@ static void irq_write(const struct shell_uart *sh_uart, const void *data,
 	}
 }
 
-static int write(const struct shell_transport *transport,
-		 const void *data, size_t length, size_t *cnt)
+static int write(const struct shell_transport *transport, const void *data,
+		 size_t length, size_t *cnt)
 {
 	const struct shell_uart *sh_uart = (struct shell_uart *)transport->ctx;
 	const uint8_t *data8 = (const uint8_t *)data;
 
 	if (IS_ENABLED(CONFIG_SHELL_BACKEND_SERIAL_INTERRUPT_DRIVEN) &&
-		!sh_uart->ctrl_blk->blocking_tx) {
+	    !sh_uart->ctrl_blk->blocking_tx) {
 		irq_write(sh_uart, data, length, cnt);
 	} else {
 		for (size_t i = 0; i < length; i++) {
@@ -245,8 +243,8 @@ static int write(const struct shell_transport *transport,
 	return 0;
 }
 
-static int read(const struct shell_transport *transport,
-		void *data, size_t length, size_t *cnt)
+static int read(const struct shell_transport *transport, void *data,
+		size_t length, size_t *cnt)
 {
 	struct shell_uart *sh_uart = (struct shell_uart *)transport->ctx;
 
@@ -279,11 +277,12 @@ static int enable_shell_uart(const struct device *arg)
 {
 	ARG_UNUSED(arg);
 	const struct device *dev =
-			device_get_binding(CONFIG_UART_SHELL_ON_DEV_NAME);
+		device_get_binding(CONFIG_UART_SHELL_ON_DEV_NAME);
 	bool log_backend = CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL > 0;
 	uint32_t level =
 		(CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL > LOG_LEVEL_DBG) ?
-		CONFIG_LOG_MAX_LEVEL : CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL;
+			      CONFIG_LOG_MAX_LEVEL :
+			      CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL;
 
 	if (dev == NULL) {
 		return -ENODEV;

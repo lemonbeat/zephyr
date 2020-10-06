@@ -34,63 +34,52 @@ struct usb_test_config {
 	struct usb_ep_descriptor if0_in2_ep;
 } __packed;
 
-#define TEST_BULK_EP_MPS		64
-#define TEST_DESCRIPTOR_TABLE_SPAN	157
+#define TEST_BULK_EP_MPS 64
+#define TEST_DESCRIPTOR_TABLE_SPAN 157
 
-#define INITIALIZER_IF							\
-	{								\
-		.bLength = sizeof(struct usb_if_descriptor),		\
-		.bDescriptorType = USB_INTERFACE_DESC,			\
-		.bInterfaceNumber = 0,					\
-		.bAlternateSetting = 0,					\
-		.bNumEndpoints = 3,					\
-		.bInterfaceClass = CUSTOM_CLASS,			\
-		.bInterfaceSubClass = 0,				\
-		.bInterfaceProtocol = 0,				\
-		.iInterface = 0,					\
+#define INITIALIZER_IF                                                        \
+	{                                                                     \
+		.bLength = sizeof(struct usb_if_descriptor),                  \
+		.bDescriptorType = USB_INTERFACE_DESC, .bInterfaceNumber = 0, \
+		.bAlternateSetting = 0, .bNumEndpoints = 3,                   \
+		.bInterfaceClass = CUSTOM_CLASS, .bInterfaceSubClass = 0,     \
+		.bInterfaceProtocol = 0, .iInterface = 0,                     \
 	}
 
-#define INITIALIZER_IF_EP(addr, attr, mps)				\
-	{								\
-		.bLength = sizeof(struct usb_ep_descriptor),		\
-		.bDescriptorType = USB_ENDPOINT_DESC,			\
-		.bEndpointAddress = addr,				\
-		.bmAttributes = attr,					\
-		.wMaxPacketSize = sys_cpu_to_le16(mps),			\
-		.bInterval = 0x00,					\
+#define INITIALIZER_IF_EP(addr, attr, mps)                                 \
+	{                                                                  \
+		.bLength = sizeof(struct usb_ep_descriptor),               \
+		.bDescriptorType = USB_ENDPOINT_DESC,                      \
+		.bEndpointAddress = addr, .bmAttributes = attr,            \
+		.wMaxPacketSize = sys_cpu_to_le16(mps), .bInterval = 0x00, \
 	}
 
-
-#define DEFINE_TEST_DESC(x, _)						\
-	USBD_CLASS_DESCR_DEFINE(primary, x)				\
-	struct usb_test_config test_cfg_##x = {				\
-	.if0 = INITIALIZER_IF,						\
-	.if0_out_ep = INITIALIZER_IF_EP(AUTO_EP_OUT,			\
-					USB_DC_EP_BULK,			\
-					TEST_BULK_EP_MPS),		\
-	.if0_in1_ep = INITIALIZER_IF_EP(AUTO_EP_IN,			\
-					USB_DC_EP_BULK,			\
-					TEST_BULK_EP_MPS),		\
-	.if0_in2_ep = INITIALIZER_IF_EP(AUTO_EP_IN,			\
-					USB_DC_EP_BULK,			\
-					TEST_BULK_EP_MPS),		\
+#define DEFINE_TEST_DESC(x, _)                                               \
+	USBD_CLASS_DESCR_DEFINE(primary, x)                                  \
+	struct usb_test_config test_cfg_##x = {                              \
+		.if0 = INITIALIZER_IF,                                       \
+		.if0_out_ep = INITIALIZER_IF_EP(AUTO_EP_OUT, USB_DC_EP_BULK, \
+						TEST_BULK_EP_MPS),           \
+		.if0_in1_ep = INITIALIZER_IF_EP(AUTO_EP_IN, USB_DC_EP_BULK,  \
+						TEST_BULK_EP_MPS),           \
+		.if0_in2_ep = INITIALIZER_IF_EP(AUTO_EP_IN, USB_DC_EP_BULK,  \
+						TEST_BULK_EP_MPS),           \
 	};
 
-#define INITIALIZER_EP_DATA(cb, addr)					\
-	{								\
-		.ep_cb = cb,						\
-		.ep_addr = addr,					\
+#define INITIALIZER_EP_DATA(cb, addr)         \
+	{                                     \
+		.ep_cb = cb, .ep_addr = addr, \
 	}
 
-#define DEFINE_TEST_EP_CFG(x, _)				\
-	static struct usb_ep_cfg_data ep_cfg_##x[] = {		\
-		INITIALIZER_EP_DATA(NULL, AUTO_EP_OUT),		\
-		INITIALIZER_EP_DATA(NULL, AUTO_EP_IN),		\
-		INITIALIZER_EP_DATA(NULL, AUTO_EP_IN),		\
+#define DEFINE_TEST_EP_CFG(x, _)                        \
+	static struct usb_ep_cfg_data ep_cfg_##x[] = {  \
+		INITIALIZER_EP_DATA(NULL, AUTO_EP_OUT), \
+		INITIALIZER_EP_DATA(NULL, AUTO_EP_IN),  \
+		INITIALIZER_EP_DATA(NULL, AUTO_EP_IN),  \
 	};
 
-#define DEFINE_TEST_CFG_DATA(x, _)				\
-	USBD_CFG_DATA_DEFINE(primary, test_##x)			\
+#define DEFINE_TEST_CFG_DATA(x, _)              \
+	USBD_CFG_DATA_DEFINE(primary, test_##x) \
 	struct usb_cfg_data test_config_##x = {			\
 	.usb_device_description = NULL,				\
 	.interface_config = interface_config,			\
@@ -107,8 +96,7 @@ struct usb_test_config {
 
 #define NUM_INSTANCES 2
 
-static void interface_config(struct usb_desc_header *head,
-			     uint8_t iface_num)
+static void interface_config(struct usb_desc_header *head, uint8_t iface_num)
 {
 	struct usb_if_descriptor *if_desc = (struct usb_if_descriptor *)head;
 
@@ -134,13 +122,13 @@ static struct usb_cfg_data *usb_get_cfg_data(struct usb_if_descriptor *iface)
 	return NULL;
 }
 
-static bool find_cfg_data_ep(const struct usb_ep_descriptor * const ep_descr,
-			     const struct usb_cfg_data * const cfg_data,
+static bool find_cfg_data_ep(const struct usb_ep_descriptor *const ep_descr,
+			     const struct usb_cfg_data *const cfg_data,
 			     uint8_t ep_count)
 {
 	for (int i = 0; i < cfg_data->num_endpoints; i++) {
 		if (cfg_data->endpoint[i].ep_addr ==
-				ep_descr->bEndpointAddress) {
+		    ep_descr->bEndpointAddress) {
 			LOG_DBG("found ep[%d] %x", i,
 				ep_descr->bEndpointAddress);
 
@@ -193,21 +181,23 @@ static void check_endpoint_allocation(struct usb_desc_header *head)
 			ep_count++;
 		}
 
-		head = (struct usb_desc_header *)((uint8_t *)head + head->bLength);
+		head = (struct usb_desc_header *)((uint8_t *)head +
+						  head->bLength);
 	}
 }
 
 /* Determine the number of bytes spanned between two linker-defined
  * symbols that are normally interpreted as pointers.
  */
-#define SYMBOL_SPAN(_ep, _sp) (int)(intptr_t)((uintptr_t)(_ep) - (uintptr_t)(_sp))
+#define SYMBOL_SPAN(_ep, _sp) \
+	(int)(intptr_t)((uintptr_t)(_ep) - (uintptr_t)(_sp))
 
 static void test_desc_sections(void)
 {
 	struct usb_desc_header *head;
 
 	TC_PRINT("__usb_descriptor_start %p\n", __usb_descriptor_start);
-	TC_PRINT("__usb_descriptor_end %p\n",  __usb_descriptor_end);
+	TC_PRINT("__usb_descriptor_end %p\n", __usb_descriptor_end);
 	TC_PRINT("USB Descriptor table span %d\n",
 		 SYMBOL_SPAN(__usb_descriptor_end, __usb_descriptor_start));
 
@@ -221,7 +211,8 @@ static void test_desc_sections(void)
 	LOG_DBG("Starting logs");
 
 	LOG_HEXDUMP_DBG((uint8_t *)__usb_descriptor_start,
-			SYMBOL_SPAN(__usb_descriptor_end, __usb_descriptor_start),
+			SYMBOL_SPAN(__usb_descriptor_end,
+				    __usb_descriptor_start),
 			"USB Descriptor table section");
 
 	LOG_HEXDUMP_DBG((uint8_t *)__usb_data_start,
@@ -245,7 +236,6 @@ static void test_desc_sections(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_desc,
-			 ztest_unit_test(test_desc_sections));
+	ztest_test_suite(test_desc, ztest_unit_test(test_desc_sections));
 	ztest_run_test_suite(test_desc);
 }

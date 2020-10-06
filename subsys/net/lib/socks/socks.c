@@ -16,15 +16,13 @@ LOG_MODULE_REGISTER(net_socks, CONFIG_SOCKS_LOG_LEVEL);
 #include "socks.h"
 #include "socks_internal.h"
 
-static void socks5_method_rsp_cb(struct net_context *ctx,
-				 struct net_pkt *pkt,
+static void socks5_method_rsp_cb(struct net_context *ctx, struct net_pkt *pkt,
 				 union net_ip_header *ip_hdr,
-				 union net_proto_header *proto_hdr,
-				 int status,
+				 union net_proto_header *proto_hdr, int status,
 				 void *user_data)
 {
 	struct socks5_method_response *method_rsp =
-			(struct socks5_method_response *)user_data;
+		(struct socks5_method_response *)user_data;
 
 	if (!pkt || status) {
 		memset(method_rsp, 0, sizeof(struct socks5_method_response));
@@ -40,15 +38,13 @@ end:
 	net_pkt_unref(pkt);
 }
 
-static void socks5_cmd_rsp_cb(struct net_context *ctx,
-			      struct net_pkt *pkt,
+static void socks5_cmd_rsp_cb(struct net_context *ctx, struct net_pkt *pkt,
 			      union net_ip_header *ip_hdr,
-			      union net_proto_header *proto_hdr,
-			      int status,
+			      union net_proto_header *proto_hdr, int status,
 			      void *user_data)
 {
 	struct socks5_command_response *cmd_rsp =
-			(struct socks5_command_response *)user_data;
+		(struct socks5_command_response *)user_data;
 	int size;
 
 	if (!pkt || status) {
@@ -69,10 +65,8 @@ end:
 }
 
 static int socks5_tcp_connect(struct net_context *ctx,
-			      const struct sockaddr *proxy,
-			      socklen_t proxy_len,
-			      const struct sockaddr *dest,
-			      socklen_t dest_len)
+			      const struct sockaddr *proxy, socklen_t proxy_len,
+			      const struct sockaddr *dest, socklen_t dest_len)
 {
 	struct socks5_method_request method_req;
 	struct socks5_method_response method_rsp;
@@ -91,9 +85,8 @@ static int socks5_tcp_connect(struct net_context *ctx,
 	/* size + 1 because just one method is supported */
 	size = sizeof(struct socks5_method_request_common) + 1;
 
-	ret = net_context_sendto(ctx, (uint8_t *)&method_req, size,
-				 proxy, proxy_len, NULL, K_NO_WAIT,
-				 ctx->user_data);
+	ret = net_context_sendto(ctx, (uint8_t *)&method_req, size, proxy,
+				 proxy_len, NULL, K_NO_WAIT, ctx->user_data);
 	if (ret < 0) {
 		LOG_ERR("Could not send negotiation packet");
 		return ret;
@@ -123,38 +116,33 @@ static int socks5_tcp_connect(struct net_context *ctx,
 	cmd_req.r.rsv = SOCKS5_PKT_RSV;
 
 	if (proxy->sa_family == AF_INET) {
-		const struct sockaddr_in *d4 =
-			(struct sockaddr_in *)dest;
+		const struct sockaddr_in *d4 = (struct sockaddr_in *)dest;
 
 		cmd_req.r.atyp = SOCKS5_ATYP_IPV4;
 
-		memcpy(&cmd_req.ipv4_addr.addr,
-		       (uint8_t *)&d4->sin_addr,
+		memcpy(&cmd_req.ipv4_addr.addr, (uint8_t *)&d4->sin_addr,
 		       sizeof(cmd_req.ipv4_addr.addr));
 
 		cmd_req.ipv4_addr.port = d4->sin_port;
 
-		size = sizeof(struct socks5_command_request_common)
-			+ sizeof(struct socks5_ipv4_addr);
+		size = sizeof(struct socks5_command_request_common) +
+		       sizeof(struct socks5_ipv4_addr);
 	} else if (proxy->sa_family == AF_INET6) {
-		const struct sockaddr_in6 *d6 =
-			(struct sockaddr_in6 *)dest;
+		const struct sockaddr_in6 *d6 = (struct sockaddr_in6 *)dest;
 
 		cmd_req.r.atyp = SOCKS5_ATYP_IPV6;
 
-		memcpy(&cmd_req.ipv6_addr.addr,
-		       (uint8_t *)&d6->sin6_addr,
+		memcpy(&cmd_req.ipv6_addr.addr, (uint8_t *)&d6->sin6_addr,
 		       sizeof(cmd_req.ipv6_addr.addr));
 
 		cmd_req.ipv6_addr.port = d6->sin6_port;
 
-		size = sizeof(struct socks5_command_request_common)
-			+ sizeof(struct socks5_ipv6_addr);
+		size = sizeof(struct socks5_command_request_common) +
+		       sizeof(struct socks5_ipv6_addr);
 	}
 
-	ret = net_context_sendto(ctx, (uint8_t *)&cmd_req, size,
-				 proxy, proxy_len, NULL, K_NO_WAIT,
-				 ctx->user_data);
+	ret = net_context_sendto(ctx, (uint8_t *)&cmd_req, size, proxy,
+				 proxy_len, NULL, K_NO_WAIT, ctx->user_data);
 	if (ret < 0) {
 		LOG_ERR("Could not send CONNECT command");
 		return ret;

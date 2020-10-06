@@ -46,8 +46,7 @@ BUILD_ASSERT(CONFIG_FS_LITTLEFS_CACHE_SIZE >= 4);
 #define CONFIG_FS_LITTLEFS_FC_MEM_POOL_NUM_BLOCKS CONFIG_FS_LITTLEFS_NUM_FILES
 #endif
 
-K_MEM_POOL_DEFINE(file_cache_pool,
-		  CONFIG_FS_LITTLEFS_FC_MEM_POOL_MIN_SIZE,
+K_MEM_POOL_DEFINE(file_cache_pool, CONFIG_FS_LITTLEFS_FC_MEM_POOL_MIN_SIZE,
 		  CONFIG_FS_LITTLEFS_FC_MEM_POOL_MAX_SIZE,
 		  CONFIG_FS_LITTLEFS_FC_MEM_POOL_NUM_BLOCKS, 4);
 
@@ -69,29 +68,29 @@ static int lfs_to_errno(int error)
 
 	switch (error) {
 	default:
-	case LFS_ERR_IO:        /* Error during device operation */
+	case LFS_ERR_IO: /* Error during device operation */
 		return -EIO;
-	case LFS_ERR_CORRUPT:   /* Corrupted */
+	case LFS_ERR_CORRUPT: /* Corrupted */
 		return -EFAULT;
-	case LFS_ERR_NOENT:     /* No directory entry */
+	case LFS_ERR_NOENT: /* No directory entry */
 		return -ENOENT;
-	case LFS_ERR_EXIST:     /* Entry already exists */
+	case LFS_ERR_EXIST: /* Entry already exists */
 		return -EEXIST;
-	case LFS_ERR_NOTDIR:    /* Entry is not a dir */
+	case LFS_ERR_NOTDIR: /* Entry is not a dir */
 		return -ENOTDIR;
-	case LFS_ERR_ISDIR:     /* Entry is a dir */
+	case LFS_ERR_ISDIR: /* Entry is a dir */
 		return -EISDIR;
-	case LFS_ERR_NOTEMPTY:  /* Dir is not empty */
+	case LFS_ERR_NOTEMPTY: /* Dir is not empty */
 		return -ENOTEMPTY;
-	case LFS_ERR_BADF:      /* Bad file number */
+	case LFS_ERR_BADF: /* Bad file number */
 		return -EBADF;
-	case LFS_ERR_FBIG:      /* File too large */
+	case LFS_ERR_FBIG: /* File too large */
 		return -EFBIG;
-	case LFS_ERR_INVAL:     /* Invalid parameter */
+	case LFS_ERR_INVAL: /* Invalid parameter */
 		return -EINVAL;
-	case LFS_ERR_NOSPC:     /* No space left on device */
+	case LFS_ERR_NOSPC: /* No space left on device */
 		return -ENOSPC;
-	case LFS_ERR_NOMEM:     /* No more memory available */
+	case LFS_ERR_NOMEM: /* No more memory available */
 		return -ENOMEM;
 	}
 }
@@ -104,33 +103,32 @@ static int errno_to_lfs(int error)
 
 	switch (error) {
 	default:
-	case -EIO:              /* Error during device operation */
+	case -EIO: /* Error during device operation */
 		return LFS_ERR_IO;
-	case -EFAULT:		/* Corrupted */
+	case -EFAULT: /* Corrupted */
 		return LFS_ERR_CORRUPT;
-	case -ENOENT:           /* No directory entry */
+	case -ENOENT: /* No directory entry */
 		return LFS_ERR_NOENT;
-	case -EEXIST:           /* Entry already exists */
+	case -EEXIST: /* Entry already exists */
 		return LFS_ERR_EXIST;
-	case -ENOTDIR:          /* Entry is not a dir */
+	case -ENOTDIR: /* Entry is not a dir */
 		return LFS_ERR_NOTDIR;
-	case -EISDIR:           /* Entry is a dir */
+	case -EISDIR: /* Entry is a dir */
 		return LFS_ERR_ISDIR;
-	case -ENOTEMPTY:        /* Dir is not empty */
+	case -ENOTEMPTY: /* Dir is not empty */
 		return LFS_ERR_NOTEMPTY;
-	case -EBADF:            /* Bad file number */
+	case -EBADF: /* Bad file number */
 		return LFS_ERR_BADF;
-	case -EFBIG:            /* File too large */
+	case -EFBIG: /* File too large */
 		return LFS_ERR_FBIG;
-	case -EINVAL:           /* Invalid parameter */
+	case -EINVAL: /* Invalid parameter */
 		return LFS_ERR_INVAL;
-	case -ENOSPC:           /* No space left on device */
+	case -ENOSPC: /* No space left on device */
 		return LFS_ERR_NOSPC;
-	case -ENOMEM:           /* No more memory available */
+	case -ENOMEM: /* No more memory available */
 		return LFS_ERR_NOMEM;
 	}
 }
-
 
 static int lfs_api_read(const struct lfs_config *c, lfs_block_t block,
 			lfs_off_t off, void *buffer, lfs_size_t size)
@@ -224,8 +222,7 @@ static int littlefs_open(struct fs_file_t *fp, const char *path,
 
 	fs_lock(fs);
 
-	ret = lfs_file_opencfg(&fs->lfs, &fdp->file,
-			       path, flags, &fdp->config);
+	ret = lfs_file_opencfg(&fs->lfs, &fdp->file, path, flags, &fdp->config);
 
 	fs_unlock(fs);
 out:
@@ -305,9 +302,8 @@ static ssize_t littlefs_write(struct fs_file_t *fp, const void *ptr, size_t len)
 	return lfs_to_errno(ret);
 }
 
-BUILD_ASSERT((FS_SEEK_SET == LFS_SEEK_SET)
-	     && (FS_SEEK_CUR == LFS_SEEK_CUR)
-	     && (FS_SEEK_END == LFS_SEEK_END));
+BUILD_ASSERT((FS_SEEK_SET == LFS_SEEK_SET) && (FS_SEEK_CUR == LFS_SEEK_CUR) &&
+	     (FS_SEEK_END == LFS_SEEK_END));
 
 static int littlefs_seek(struct fs_file_t *fp, off_t off, int whence)
 {
@@ -402,8 +398,8 @@ static int littlefs_opendir(struct fs_dir_t *dp, const char *path)
 
 static void info_to_dirent(const struct lfs_info *info, struct fs_dirent *entry)
 {
-	entry->type = ((info->type == LFS_TYPE_DIR) ?
-		       FS_DIR_ENTRY_DIR : FS_DIR_ENTRY_FILE);
+	entry->type = ((info->type == LFS_TYPE_DIR) ? FS_DIR_ENTRY_DIR :
+							    FS_DIR_ENTRY_FILE);
 	entry->size = info->size;
 	strncpy(entry->name, info->name, sizeof(entry->name));
 	entry->name[sizeof(entry->name) - 1] = '\0';
@@ -445,8 +441,8 @@ static int littlefs_closedir(struct fs_dir_t *dp)
 	return lfs_to_errno(ret);
 }
 
-static int littlefs_stat(struct fs_mount_t *mountp,
-			 const char *path, struct fs_dirent *entry)
+static int littlefs_stat(struct fs_mount_t *mountp, const char *path,
+			 struct fs_dirent *entry)
 {
 	struct fs_littlefs *fs = mountp->fs_data;
 
@@ -467,8 +463,8 @@ static int littlefs_stat(struct fs_mount_t *mountp,
 	return lfs_to_errno(ret);
 }
 
-static int littlefs_statvfs(struct fs_mount_t *mountp,
-			    const char *path, struct fs_statvfs *stat)
+static int littlefs_statvfs(struct fs_mount_t *mountp, const char *path,
+			    struct fs_statvfs *stat)
 {
 	struct fs_littlefs *fs = mountp->fs_data;
 	struct lfs *lfs = &fs->lfs;
@@ -550,9 +546,9 @@ static int littlefs_mount(struct fs_mount_t *mountp)
 	unsigned int area_id = (uintptr_t)mountp->storage_dev;
 	const struct device *dev;
 
-	LOG_INF("LittleFS version %u.%u, disk version %u.%u",
-		LFS_VERSION_MAJOR, LFS_VERSION_MINOR,
-		LFS_DISK_VERSION_MAJOR, LFS_DISK_VERSION_MINOR);
+	LOG_INF("LittleFS version %u.%u, disk version %u.%u", LFS_VERSION_MAJOR,
+		LFS_VERSION_MINOR, LFS_DISK_VERSION_MAJOR,
+		LFS_DISK_VERSION_MINOR);
 
 	if (fs->area) {
 		return -EBUSY;
@@ -569,9 +565,8 @@ static int littlefs_mount(struct fs_mount_t *mountp)
 		ret = -ENODEV;
 		goto out;
 	}
-	LOG_DBG("FS area %u at 0x%x for %u bytes",
-		area_id, (uint32_t)fs->area->fa_off,
-		(uint32_t)fs->area->fa_size);
+	LOG_DBG("FS area %u at 0x%x for %u bytes", area_id,
+		(uint32_t)fs->area->fa_off, (uint32_t)fs->area->fa_size);
 
 	dev = flash_area_get_device(fs->area);
 	if (dev == NULL) {
@@ -585,10 +580,10 @@ static int littlefs_mount(struct fs_mount_t *mountp)
 	BUILD_ASSERT(CONFIG_FS_LITTLEFS_CACHE_SIZE > 0);
 	BUILD_ASSERT(CONFIG_FS_LITTLEFS_LOOKAHEAD_SIZE > 0);
 	BUILD_ASSERT((CONFIG_FS_LITTLEFS_LOOKAHEAD_SIZE % 8) == 0);
-	BUILD_ASSERT((CONFIG_FS_LITTLEFS_CACHE_SIZE
-		      % CONFIG_FS_LITTLEFS_READ_SIZE) == 0);
-	BUILD_ASSERT((CONFIG_FS_LITTLEFS_CACHE_SIZE
-		      % CONFIG_FS_LITTLEFS_PROG_SIZE) == 0);
+	BUILD_ASSERT((CONFIG_FS_LITTLEFS_CACHE_SIZE %
+		      CONFIG_FS_LITTLEFS_READ_SIZE) == 0);
+	BUILD_ASSERT((CONFIG_FS_LITTLEFS_CACHE_SIZE %
+		      CONFIG_FS_LITTLEFS_PROG_SIZE) == 0);
 
 	struct lfs_config *lcp = &fs->cfg;
 
@@ -638,15 +633,14 @@ static int littlefs_mount(struct fs_mount_t *mountp)
 		lookahead_size = CONFIG_FS_LITTLEFS_LOOKAHEAD_SIZE;
 	}
 
-
 	/* No, you don't get to override this. */
 	lfs_size_t block_count = fs->area->fa_size / block_size;
 
-	LOG_INF("FS at %s:0x%x is %u 0x%x-byte blocks with %u cycle",
-		dev->name, (uint32_t)fs->area->fa_off,
-		block_count, block_size, block_cycles);
-	LOG_INF("sizes: rd %u ; pr %u ; ca %u ; la %u",
-		read_size, prog_size, cache_size, lookahead_size);
+	LOG_INF("FS at %s:0x%x is %u 0x%x-byte blocks with %u cycle", dev->name,
+		(uint32_t)fs->area->fa_off, block_count, block_size,
+		block_cycles);
+	LOG_INF("sizes: rd %u ; pr %u ; ca %u ; la %u", read_size, prog_size,
+		cache_size, lookahead_size);
 
 	__ASSERT_NO_MSG(prog_size != 0);
 	__ASSERT_NO_MSG(read_size != 0);

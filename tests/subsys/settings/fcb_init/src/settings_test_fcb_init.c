@@ -28,8 +28,8 @@ static uint32_t val32;
 #define FLASH_WRITE_BLOCK_SIZE \
 	DT_PROP(DT_CHOSEN(zephyr_flash), write_block_size)
 static const volatile __attribute__((section(".rodata")))
-__aligned(FLASH_WRITE_BLOCK_SIZE)
-uint8_t prepared_mark[FLASH_WRITE_BLOCK_SIZE] = {ERASED_VAL};
+__aligned(FLASH_WRITE_BLOCK_SIZE) uint8_t
+	prepared_mark[FLASH_WRITE_BLOCK_SIZE] = { ERASED_VAL };
 #endif
 
 static int c1_set(const char *name, size_t len, settings_read_cb read_cb,
@@ -47,8 +47,8 @@ static int c1_set(const char *name, size_t len, settings_read_cb read_cb,
 	return -ENOENT;
 }
 
-static int c1_export(int (*export_func)(const char *name,
-					const void *value, size_t val_len))
+static int c1_export(int (*export_func)(const char *name, const void *value,
+					size_t val_len))
 {
 	(void)export_func("hello/val32", &val32, sizeof(val32));
 
@@ -79,11 +79,10 @@ void test_init(void)
 		      "load value doesn't match to what was saved");
 }
 
-
 void test_prepare_storage(void)
 {
 #if FLASH_AREA_LABEL_EXISTS(image_0)
-/* This procedure uses mark which is stored inside SoC embedded program
+	/* This procedure uses mark which is stored inside SoC embedded program
  * flash. It will not work on devices on which read/write to them is not
  * possible.
  */
@@ -151,9 +150,7 @@ void test_main(void)
 	/* was flashed. */
 	test_init_setup();
 
-	ztest_test_suite(test_initialization,
-			 ztest_unit_test(test_init)
-			);
+	ztest_test_suite(test_initialization, ztest_unit_test(test_init));
 
 	ztest_run_test_suite(test_initialization);
 }

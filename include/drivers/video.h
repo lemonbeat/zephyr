@@ -31,7 +31,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief video format structure
  *
@@ -175,8 +174,7 @@ typedef int (*video_api_dequeue_t)(const struct device *dev,
  * See video_flush() for argument descriptions.
  */
 typedef int (*video_api_flush_t)(const struct device *dev,
-				 enum video_endpoint_id ep,
-				 bool cancel);
+				 enum video_endpoint_id ep, bool cancel);
 
 /**
  * @typedef video_api_stream_start_t
@@ -197,8 +195,7 @@ typedef int (*video_api_stream_stop_t)(const struct device *dev);
  * @brief set a video control value.
  * See video_set_ctrl() for argument descriptions.
  */
-typedef int (*video_api_set_ctrl_t)(const struct device *dev,
-				    unsigned int cid,
+typedef int (*video_api_set_ctrl_t)(const struct device *dev, unsigned int cid,
 				    void *value);
 
 /**
@@ -206,8 +203,7 @@ typedef int (*video_api_set_ctrl_t)(const struct device *dev,
  * @brief get a video control value.
  * See video_get_ctrl() for argument descriptions.
  */
-typedef int (*video_api_get_ctrl_t)(const struct device *dev,
-				    unsigned int cid,
+typedef int (*video_api_get_ctrl_t)(const struct device *dev, unsigned int cid,
 				    void *value);
 
 /**
@@ -338,8 +334,7 @@ static inline int video_enqueue(const struct device *dev,
  */
 static inline int video_dequeue(const struct device *dev,
 				enum video_endpoint_id ep,
-				struct video_buffer **buf,
-				k_timeout_t timeout)
+				struct video_buffer **buf, k_timeout_t timeout)
 {
 	const struct video_driver_api *api =
 		(const struct video_driver_api *)dev->api;
@@ -350,7 +345,6 @@ static inline int video_dequeue(const struct device *dev,
 
 	return api->dequeue(dev, ep, buf, timeout);
 }
-
 
 /**
  * @brief Flush endpoint buffers.
@@ -367,8 +361,7 @@ static inline int video_dequeue(const struct device *dev,
  * @retval 0 Is successful, -ERRNO code otherwise.
  */
 static inline int video_flush(const struct device *dev,
-			      enum video_endpoint_id ep,
-			      bool cancel)
+			      enum video_endpoint_id ep, bool cancel)
 {
 	const struct video_driver_api *api =
 		(const struct video_driver_api *)dev->api;
@@ -418,8 +411,7 @@ static inline int video_stream_stop(const struct device *dev)
 		(const struct video_driver_api *)dev->api;
 	int ret;
 
-	__ASSERT(api->stream_stop,
-		 "stream_stop must be implemented by driver");
+	__ASSERT(api->stream_stop, "stream_stop must be implemented by driver");
 
 	ret = api->stream_stop(dev);
 	video_flush(dev, VIDEO_EP_ANY, true);
@@ -547,19 +539,24 @@ struct video_buffer *video_buffer_alloc(size_t size);
  */
 void video_buffer_release(struct video_buffer *buf);
 
-
 /* fourcc - four-character-code */
-#define video_fourcc(a, b, c, d)\
-	((uint32_t)(a) | ((uint32_t)(b) << 8) | ((uint32_t)(c) << 16) | ((uint32_t)(d) << 24))
+#define video_fourcc(a, b, c, d)                                        \
+	((uint32_t)(a) | ((uint32_t)(b) << 8) | ((uint32_t)(c) << 16) | \
+	 ((uint32_t)(d) << 24))
 
 /* Raw bayer formats */
-#define VIDEO_PIX_FMT_BGGR8  video_fourcc('B', 'G', 'G', 'R') /*  8  BGBG.. GRGR.. */
-#define VIDEO_PIX_FMT_GBRG8  video_fourcc('G', 'B', 'R', 'G') /*  8  GBGB.. RGRG.. */
-#define VIDEO_PIX_FMT_GRBG8  video_fourcc('G', 'R', 'B', 'G') /*  8  GRGR.. BGBG.. */
-#define VIDEO_PIX_FMT_RGGB8  video_fourcc('R', 'G', 'G', 'B') /*  8  RGRG.. GBGB.. */
+#define VIDEO_PIX_FMT_BGGR8 \
+	video_fourcc('B', 'G', 'G', 'R') /*  8  BGBG.. GRGR.. */
+#define VIDEO_PIX_FMT_GBRG8 \
+	video_fourcc('G', 'B', 'R', 'G') /*  8  GBGB.. RGRG.. */
+#define VIDEO_PIX_FMT_GRBG8 \
+	video_fourcc('G', 'R', 'B', 'G') /*  8  GRGR.. BGBG.. */
+#define VIDEO_PIX_FMT_RGGB8 \
+	video_fourcc('R', 'G', 'G', 'B') /*  8  RGRG.. GBGB.. */
 
 /* RGB formats */
-#define VIDEO_PIX_FMT_RGB565 video_fourcc('R', 'G', 'B', 'P') /* 16  RGB-5-6-5 */
+#define VIDEO_PIX_FMT_RGB565 \
+	video_fourcc('R', 'G', 'B', 'P') /* 16  RGB-5-6-5 */
 
 #ifdef __cplusplus
 }

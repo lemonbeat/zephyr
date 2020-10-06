@@ -38,22 +38,21 @@ LOG_MODULE_REGISTER(net_test, NET_LOG_LEVEL);
 #endif
 
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 static struct in_addr my_ipv4_addr1 = { { { 192, 0, 2, 1 } } };
 
 /* Interface 2 addresses */
-static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 3 addresses */
-static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 3, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 3, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 static struct in6_addr in6addr_mcast = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
 					     0, 0, 0, 0, 0, 0, 0, 0x1 } } };
@@ -146,44 +145,20 @@ static struct dummy_api net_iface_api = {
 #define _ETH_L2_LAYER DUMMY_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
-NET_DEVICE_INIT_INSTANCE(net_iface1_test,
-			 "iface1",
-			 iface1,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface1_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 _ETH_L2_LAYER,
-			 _ETH_L2_CTX_TYPE,
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface1_test, "iface1", iface1, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface1_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
-NET_DEVICE_INIT_INSTANCE(net_iface2_test,
-			 "iface2",
-			 iface2,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface2_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 _ETH_L2_LAYER,
-			 _ETH_L2_CTX_TYPE,
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface2_test, "iface2", iface2, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface2_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
-NET_DEVICE_INIT_INSTANCE(net_iface3_test,
-			 "iface3",
-			 iface3,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface3_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 _ETH_L2_LAYER,
-			 _ETH_L2_CTX_TYPE,
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface3_test, "iface3", iface3, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface3_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 struct eth_fake_context {
 	struct net_if *iface;
@@ -200,15 +175,13 @@ static void eth_fake_iface_init(struct net_if *iface)
 
 	ctx->iface = iface;
 
-	net_if_set_link_addr(iface, ctx->mac_address,
-			     sizeof(ctx->mac_address),
+	net_if_set_link_addr(iface, ctx->mac_address, sizeof(ctx->mac_address),
 			     NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 }
 
-static int eth_fake_send(const struct device *dev,
-			 struct net_pkt *pkt)
+static int eth_fake_send(const struct device *dev, struct net_pkt *pkt)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(pkt);
@@ -288,8 +261,7 @@ static void iface_cb(struct net_if *iface, void *user_data)
 	    net_if_get_by_iface(iface));
 
 	if (net_if_l2(iface) == &NET_L2_GET_NAME(ETHERNET)) {
-		const struct ethernet_api *api =
-			net_if_get_device(iface)->api;
+		const struct ethernet_api *api = net_if_get_device(iface)->api;
 
 		/* As native_posix board will introduce another ethernet
 		 * interface, make sure that we only use our own in this test.
@@ -327,70 +299,62 @@ static void test_iface_setup(void)
 	net_if_foreach(iface_cb, NULL);
 
 	idx = net_if_get_by_iface(iface1);
-	((struct net_if_test *)
-	 net_if_get_device(iface1)->data)->idx = idx;
+	((struct net_if_test *)net_if_get_device(iface1)->data)->idx = idx;
 
 	idx = net_if_get_by_iface(iface2);
-	((struct net_if_test *)
-	 net_if_get_device(iface2)->data)->idx = idx;
+	((struct net_if_test *)net_if_get_device(iface2)->data)->idx = idx;
 
 	idx = net_if_get_by_iface(iface3);
-	((struct net_if_test *)
-	 net_if_get_device(iface3)->data)->idx = idx;
+	((struct net_if_test *)net_if_get_device(iface3)->data)->idx = idx;
 
 	DBG("Interfaces: [%d] iface1 %p, [%d] iface2 %p, [%d] iface3 %p\n",
-	    net_if_get_by_iface(iface1), iface1,
-	    net_if_get_by_iface(iface2), iface2,
-	    net_if_get_by_iface(iface3), iface3);
+	    net_if_get_by_iface(iface1), iface1, net_if_get_by_iface(iface2),
+	    iface2, net_if_get_by_iface(iface3), iface3);
 
 	zassert_not_null(iface1, "Interface 1");
 	zassert_not_null(iface2, "Interface 2");
 	zassert_not_null(iface3, "Interface 3");
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1");
 	}
 
-	ifaddr = net_if_ipv4_addr_add(iface1, &my_ipv4_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv4_addr_add(iface1, &my_ipv4_addr1, NET_ADDR_MANUAL,
+				      0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv4 address %s\n",
-		       net_sprint_ipv4_addr(&my_ipv4_addr1));
+		    net_sprint_ipv4_addr(&my_ipv4_addr1));
 		zassert_not_null(ifaddr, "ipv4 addr1");
 	}
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr2));
+		    net_sprint_ipv6_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr3,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr3, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr3));
+		    net_sprint_ipv6_addr(&my_addr3));
 		zassert_not_null(ifaddr, "addr3");
 	}
 
@@ -401,7 +365,7 @@ static void test_iface_setup(void)
 	maddr = net_if_ipv6_maddr_add(iface1, &in6addr_mcast);
 	if (!maddr) {
 		DBG("Cannot add multicast IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&in6addr_mcast));
+		    net_sprint_ipv6_addr(&in6addr_mcast));
 		zassert_not_null(maddr, "mcast");
 	}
 
@@ -425,8 +389,8 @@ static bool send_iface(struct net_if *iface, int val, bool expect_fail)
 	struct net_pkt *pkt;
 	int ret;
 
-	pkt = net_pkt_alloc_with_buffer(iface, sizeof(data),
-					AF_UNSPEC, 0, K_FOREVER);
+	pkt = net_pkt_alloc_with_buffer(iface, sizeof(data), AF_UNSPEC, 0,
+					K_FOREVER);
 	if (!pkt) {
 		DBG("Cannot allocate pkt\n");
 		return false;
@@ -510,13 +474,13 @@ static void test_send_iface1_up(void)
 
 static void test_select_src_iface(void)
 {
-	struct in6_addr dst_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					  0, 0, 0, 0, 0, 0, 0, 0x2 } } };
-	struct in6_addr ll_addr1 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-					 0, 0, 0x09, 0x12, 0xaa, 0x29, 0x02,
+	struct in6_addr dst_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					  0, 0, 0, 0, 0, 0, 0x2 } } };
+	struct in6_addr ll_addr1 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0,
+					 0, 0x09, 0x12, 0xaa, 0x29, 0x02,
 					 0x88 } } };
-	struct in6_addr dst_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 3, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x99 } } };
+	struct in6_addr dst_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 3, 0, 0, 0, 0,
+					  0, 0, 0, 0, 0, 0, 0x99 } } };
 	struct in6_addr in6addr_mcast1 = { { { 0x00 } } };
 	struct in_addr dst_addr_2 = { { { 192, 0, 2, 2 } } };
 
@@ -551,8 +515,8 @@ static void test_select_src_iface(void)
 	/* We should now get default interface */
 	iface = net_if_ipv6_select_src_iface(&ll_addr1);
 	zassert_equal_ptr(iface, net_if_get_default(),
-			  "Invalid interface %p vs %p selected",
-			  iface, net_if_get_default());
+			  "Invalid interface %p vs %p selected", iface,
+			  net_if_get_default());
 
 	net_ipaddr_copy(&ipv4.sin_addr, &dst_addr_2);
 	ipv4.sin_family = AF_INET;
@@ -653,8 +617,22 @@ static void test_v4_addr_rm(void)
 	zassert_true(ret, "Cannot remove IPv4 address");
 }
 
-#define MY_ADDR_V4_USER      { { { 10, 0, 0, 2 } } }
-#define UNKNOWN_ADDR_V4_USER { { { 5, 6, 7, 8 } } }
+#define MY_ADDR_V4_USER                     \
+	{                                   \
+		{                           \
+			{                   \
+				10, 0, 0, 2 \
+			}                   \
+		}                           \
+	}
+#define UNKNOWN_ADDR_V4_USER               \
+	{                                  \
+		{                          \
+			{                  \
+				5, 6, 7, 8 \
+			}                  \
+		}                          \
+	}
 
 static void test_v4_addr_add_user(void)
 {
@@ -701,13 +679,13 @@ static void test_v4_addr_rm_user_from_userspace(void)
 				 NULL, NULL);
 }
 
-static
-struct in6_addr my_ipv6_addr_test = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_ipv6_addr_test = {
+	{ { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1 } }
+};
 
-static
-struct in6_addr my_ipv6_addr_not_found = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0,
-					    0, 0, 0, 0, 0, 0, 0, 0, 0x64 } } };
+static struct in6_addr my_ipv6_addr_not_found = {
+	{ { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x64 } }
+};
 
 static void test_v6_addr_add(void)
 {
@@ -737,11 +715,25 @@ static void test_v6_addr_rm(void)
 	zassert_true(ret, "Cannot remove IPv6 address");
 }
 
-#define MY_ADDR_V6_USER { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, \
-			      0, 0, 0, 0, 0, 0, 0, 0x65 } } }
+#define MY_ADDR_V6_USER                                                      \
+	{                                                                    \
+		{                                                            \
+			{                                                    \
+				0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, \
+					0, 0, 0, 0, 0x65                     \
+			}                                                    \
+		}                                                            \
+	}
 
-#define UNKNOWN_ADDR_V6_USER { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, \
-			      0, 0, 0, 0, 0, 0, 0, 0x66 } } }
+#define UNKNOWN_ADDR_V6_USER                                                 \
+	{                                                                    \
+		{                                                            \
+			{                                                    \
+				0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, \
+					0, 0, 0, 0, 0x66                     \
+			}                                                    \
+		}                                                            \
+	}
 
 static void test_v6_addr_add_user(void)
 {
@@ -819,8 +811,8 @@ static void test_gw_addr_add(void)
 static void test_gw_addr_add_from_userspace(void)
 {
 	k_thread_access_grant(k_current_get(), net_if_get_by_index(1));
-	k_thread_user_mode_enter((k_thread_entry_t)test_gw_addr_add, NULL,
-				 NULL, NULL);
+	k_thread_user_mode_enter((k_thread_entry_t)test_gw_addr_add, NULL, NULL,
+				 NULL);
 }
 
 static void test_get_by_index(void)
@@ -838,8 +830,7 @@ static void test_get_by_index_from_userspace(void)
 
 void test_main(void)
 {
-	ztest_test_suite(net_iface_test,
-			 ztest_unit_test(test_iface_setup),
+	ztest_test_suite(net_iface_test, ztest_unit_test(test_iface_setup),
 			 ztest_unit_test(test_send_iface1),
 			 ztest_unit_test(test_send_iface2),
 			 ztest_unit_test(test_send_iface3),
@@ -869,8 +860,7 @@ void test_main(void)
 			 ztest_unit_test(test_gw_addr_add),
 			 ztest_unit_test(test_gw_addr_add_from_userspace),
 			 ztest_unit_test(test_get_by_index),
-			 ztest_unit_test(test_get_by_index_from_userspace)
-		);
+			 ztest_unit_test(test_get_by_index_from_userspace));
 
 	ztest_run_test_suite(net_iface_test);
 }

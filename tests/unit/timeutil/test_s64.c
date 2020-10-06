@@ -232,10 +232,8 @@ static void test_time32_errno_clear(void)
 
 	time_t ux = timeutil_timegm(&tp->tm);
 
-	zassert_equal(ux, tp->ux,
-		      "conversion incorrect");
-	zassert_equal(errno, 0,
-		      "errno was not cleared");
+	zassert_equal(ux, tp->ux, "conversion incorrect");
+	zassert_equal(errno, 0, "errno was not cleared");
 }
 
 static void test_time32_epochm1(void)
@@ -259,10 +257,8 @@ static void test_time32_epochm1(void)
 
 	time_t ux = timeutil_timegm(&tp->tm);
 
-	zassert_equal(ux, tp->ux,
-		      "conversion incorrect");
-	zassert_equal(errno, 0,
-		      "final errno state bad");
+	zassert_equal(ux, tp->ux, "conversion incorrect");
+	zassert_equal(errno, 0, "final errno state bad");
 }
 
 static void test_time32_underflow(void)
@@ -282,16 +278,13 @@ static void test_time32_underflow(void)
 		},
 	};
 
-	zassert_equal(timeutil_timegm64(&tp->tm), unix64,
-		      "fullscale failed");
+	zassert_equal(timeutil_timegm64(&tp->tm), unix64, "fullscale failed");
 	errno = 0;
 
 	time_t ux = timeutil_timegm(&tp->tm);
 
-	zassert_equal(ux, -1,
-		      "underflow undetected");
-	zassert_equal(errno, ERANGE,
-		      "final errno state bad");
+	zassert_equal(ux, -1, "underflow undetected");
+	zassert_equal(errno, ERANGE, "final errno state bad");
 }
 
 static void test_time32_overflow(void)
@@ -311,16 +304,13 @@ static void test_time32_overflow(void)
 		},
 	};
 
-	zassert_equal(timeutil_timegm64(&tp->tm), unix64,
-		      "fullscale failed");
+	zassert_equal(timeutil_timegm64(&tp->tm), unix64, "fullscale failed");
 	errno = 0;
 
 	time_t ux = timeutil_timegm(&tp->tm);
 
-	zassert_equal(ux, -1,
-		      "overflow undetected");
-	zassert_equal(errno, ERANGE,
-		      "final errno state bad");
+	zassert_equal(ux, -1, "overflow undetected");
+	zassert_equal(errno, ERANGE, "final errno state bad");
 }
 
 void test_s64(void)

@@ -68,7 +68,7 @@ static void test_socketpair_poll_timeout_common(int sv[2])
 
 void test_socketpair_poll_timeout(void)
 {
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 	int res = socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
 
 	zassert_not_equal(res, -1, "socketpair failed: %d", errno);
@@ -79,7 +79,7 @@ void test_socketpair_poll_timeout(void)
 /* O_NONBLOCK should have no affect on poll(2) */
 void test_socketpair_poll_timeout_nonblocking(void)
 {
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 	int res = socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
 
 	zassert_not_equal(res, -1, "socketpair failed: %d", errno);
@@ -102,8 +102,8 @@ static void close_fun(struct k_work *work)
 {
 	(void)work;
 
-	if (!(K_TIMEOUT_EQ(ctx.delay, K_NO_WAIT)
-		|| K_TIMEOUT_EQ(ctx.delay, K_FOREVER))) {
+	if (!(K_TIMEOUT_EQ(ctx.delay, K_NO_WAIT) ||
+	      K_TIMEOUT_EQ(ctx.delay, K_FOREVER))) {
 		k_sleep(ctx.delay);
 	}
 
@@ -124,7 +124,7 @@ void test_socketpair_poll_close_remote_end_POLLIN(void)
 	char c;
 	struct pollfd fds[1];
 
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 
 	res = socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
 	zassert_not_equal(res, -1, "socketpair(2) failed: %d", errno);
@@ -162,7 +162,7 @@ void test_socketpair_poll_close_remote_end_POLLOUT(void)
 	int res;
 	struct pollfd fds[1];
 
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 
 	/*
 	 * Fill up the remote q and then poll until write space is available.
@@ -210,7 +210,7 @@ void test_socketpair_poll_close_remote_end_POLLOUT(void)
  */
 void test_socketpair_poll_immediate_data(void)
 {
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 	int res;
 
 	struct pollfd fds[2];
@@ -260,8 +260,8 @@ static void rw_fun(struct k_work *work)
 	int res;
 	char c;
 
-	if (!(K_TIMEOUT_EQ(ctx.delay, K_NO_WAIT)
-		|| K_TIMEOUT_EQ(ctx.delay, K_FOREVER))) {
+	if (!(K_TIMEOUT_EQ(ctx.delay, K_NO_WAIT) ||
+	      K_TIMEOUT_EQ(ctx.delay, K_FOREVER))) {
 		k_sleep(ctx.delay);
 	}
 
@@ -291,7 +291,7 @@ static void rw_fun(struct k_work *work)
  */
 void test_socketpair_poll_delayed_data(void)
 {
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 	int res;
 
 	struct pollfd fds[1];

@@ -36,7 +36,6 @@ LOG_MODULE_DECLARE(os);
  */
 unsigned char sys_pm_idle_exit_notify;
 
-
 /* LCOV_EXCL_START
  * These are almost certainly overidden and in any event do nothing
  */
@@ -90,7 +89,7 @@ static void sys_power_save_idle(void)
 
 	set_kernel_idle_time_in_ticks(ticks);
 #if (defined(CONFIG_SYS_POWER_SLEEP_STATES) || \
-	defined(CONFIG_SYS_POWER_DEEP_SLEEP_STATES))
+     defined(CONFIG_SYS_POWER_DEEP_SLEEP_STATES))
 
 	sys_pm_idle_exit_notify = 1U;
 
@@ -134,11 +133,12 @@ void z_sys_power_save_idle_exit(int32_t ticks)
 	z_clock_idle_exit();
 }
 
-
 #if K_IDLE_PRIO < 0
 #define IDLE_YIELD_IF_COOP() k_yield()
 #else
-#define IDLE_YIELD_IF_COOP() do { } while (false)
+#define IDLE_YIELD_IF_COOP() \
+	do {                 \
+	} while (false)
 #endif
 
 void idle(void *p1, void *unused2, void *unused3)
@@ -174,8 +174,8 @@ void idle(void *p1, void *unused2, void *unused3)
 			 * again and we'll handle it when the loop iteration
 			 * is continued below.
 			 */
-			LOG_DBG("idle %p aborting thread %p",
-				_current, to_abort);
+			LOG_DBG("idle %p aborting thread %p", _current,
+				to_abort);
 
 			z_thread_single_abort(to_abort);
 

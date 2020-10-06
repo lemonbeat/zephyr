@@ -42,22 +42,21 @@ void z_impl_test_arm_user_syscall(void)
 	 * - MSPLIM register still guards the interrupt stack
 	 */
 	zassert_true((_current->arch.mode & CONTROL_nPRIV_Msk) == 0,
-	"mode variable not set to PRIV mode in system call\n");
+		     "mode variable not set to PRIV mode in system call\n");
 
 	zassert_false(arch_is_user_context(),
-	"arch_is_user_context() indicates nPRIV\n");
+		      "arch_is_user_context() indicates nPRIV\n");
 
-	zassert_true(
-		((__get_PSP() >= _current->arch.priv_stack_start) &&
-		(__get_PSP() < (_current->arch.priv_stack_start +
-			CONFIG_PRIVILEGED_STACK_SIZE))),
-	"Process SP outside thread privileged stack limits\n");
+	zassert_true(((__get_PSP() >= _current->arch.priv_stack_start) &&
+		      (__get_PSP() < (_current->arch.priv_stack_start +
+				      CONFIG_PRIVILEGED_STACK_SIZE))),
+		     "Process SP outside thread privileged stack limits\n");
 
 #if defined(CONFIG_BUILTIN_STACK_GUARD)
 	zassert_true(__get_PSPLIM() == _current->arch.priv_stack_start,
-	"PSPLIM not guarding the thread's privileged stack\n");
+		     "PSPLIM not guarding the thread's privileged stack\n");
 	zassert_true(__get_MSPLIM() == (uint32_t)z_interrupt_stacks,
-	"MSPLIM not guarding the interrupt stack\n");
+		     "MSPLIM not guarding the interrupt stack\n");
 #endif
 }
 
@@ -66,7 +65,6 @@ static inline void z_vrfy_test_arm_user_syscall(void)
 	z_impl_test_arm_user_syscall();
 }
 #include <syscalls/test_arm_user_syscall_mrsh.c>
-
 
 void arm_isr_handler(const void *args)
 {
@@ -82,16 +80,15 @@ void arm_isr_handler(const void *args)
 	 */
 
 	zassert_true((_current->arch.mode & CONTROL_nPRIV_Msk) != 0,
-	"mode variable not set to nPRIV mode for user thread\n");
+		     "mode variable not set to nPRIV mode for user thread\n");
 
 	zassert_false(arch_is_user_context(),
-	"arch_is_user_context() indicates nPRIV in ISR\n");
+		      "arch_is_user_context() indicates nPRIV in ISR\n");
 
-	zassert_true(
-		((__get_PSP() >= _current->stack_info.start) &&
-		(__get_PSP() < (_current->stack_info.start +
-			_current->stack_info.size))),
-	"Process SP outside thread stack limits\n");
+	zassert_true(((__get_PSP() >= _current->stack_info.start) &&
+		      (__get_PSP() < (_current->stack_info.start +
+				      _current->stack_info.size))),
+		     "Process SP outside thread stack limits\n");
 
 	static int first_call = 1;
 
@@ -109,10 +106,9 @@ void arm_isr_handler(const void *args)
 		/* Second ISR run occurs after thread context-switch.
 		 * We expect PSPLIM to be clear at this point.
 		 */
-		zassert_true(__get_PSPLIM() == 0,
-		"PSPLIM not clear\n");
+		zassert_true(__get_PSPLIM() == 0, "PSPLIM not clear\n");
 		zassert_true(__get_MSPLIM() == (uint32_t)z_interrupt_stacks,
-		"MSPLIM not guarding the interrupt stack\n");
+			     "MSPLIM not guarding the interrupt stack\n");
 #endif
 	}
 }
@@ -164,23 +160,23 @@ void test_arm_syscalls(void)
 	 * - MSPLIM register guards the interrupt stack
 	 */
 
-	zassert_true((_current->arch.mode & CONTROL_nPRIV_Msk) == 0,
-	"mode variable not set to PRIV mode for supervisor thread\n");
+	zassert_true(
+		(_current->arch.mode & CONTROL_nPRIV_Msk) == 0,
+		"mode variable not set to PRIV mode for supervisor thread\n");
 
 	zassert_false(arch_is_user_context(),
-	"arch_is_user_context() indicates nPRIV\n");
+		      "arch_is_user_context() indicates nPRIV\n");
 
-	zassert_true(
-		((__get_PSP() >= _current->stack_info.start) &&
-		(__get_PSP() < (_current->stack_info.start +
-			_current->stack_info.size))),
-	"Process SP outside thread stack limits\n");
+	zassert_true(((__get_PSP() >= _current->stack_info.start) &&
+		      (__get_PSP() < (_current->stack_info.start +
+				      _current->stack_info.size))),
+		     "Process SP outside thread stack limits\n");
 
 #if defined(CONFIG_BUILTIN_STACK_GUARD)
 	zassert_true(__get_PSPLIM() == _current->stack_info.start,
-	"PSPLIM not guarding the default stack\n");
+		     "PSPLIM not guarding the default stack\n");
 	zassert_true(__get_MSPLIM() == (uint32_t)z_interrupt_stacks,
-	"MSPLIM not guarding the interrupt stack\n");
+		     "MSPLIM not guarding the interrupt stack\n");
 #endif
 
 #if defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
@@ -206,15 +202,12 @@ void test_arm_syscalls(void)
 		}
 	}
 
-	zassert_true(i >= 0,
-		 "No available IRQ line to use in the test\n");
+	zassert_true(i >= 0, "No available IRQ line to use in the test\n");
 
 	TC_PRINT("Available IRQ line: %u\n", i);
 
-	arch_irq_connect_dynamic(i, 0 /* highest priority */,
-		arm_isr_handler,
-		NULL,
-		0);
+	arch_irq_connect_dynamic(i, 0 /* highest priority */, arm_isr_handler,
+				 NULL, 0);
 
 	NVIC_ClearPendingIRQ(i);
 	NVIC_EnableIRQ(i);
@@ -224,19 +217,16 @@ void test_arm_syscalls(void)
 	 * i.e. to allow the inspection of the thread state
 	 * while running in user mode.
 	 */
-	 SCB->CCR |= SCB_CCR_USERSETMPEND_Msk;
+	SCB->CCR |= SCB_CCR_USERSETMPEND_Msk;
 #endif /* CONFIG_ARMV7_M_ARMV8_M_MAINLINE*/
 
 	/* Create and switch to a user thread, passing
 	 * as argument the IRQ line to used in the test.
 	 */
-	k_thread_create(&user_thread,
-		user_thread_stack,
-		K_THREAD_STACK_SIZEOF(user_thread_stack),
-		(k_thread_entry_t)user_thread_entry,
-		(uint32_t *)i, NULL, NULL,
-		K_PRIO_COOP(PRIORITY), K_USER,
-		K_NO_WAIT);
+	k_thread_create(&user_thread, user_thread_stack,
+			K_THREAD_STACK_SIZEOF(user_thread_stack),
+			(k_thread_entry_t)user_thread_entry, (uint32_t *)i,
+			NULL, NULL, K_PRIO_COOP(PRIORITY), K_USER, K_NO_WAIT);
 }
 
 void z_impl_test_arm_cpu_write_reg(void)
@@ -253,12 +243,10 @@ void z_impl_test_arm_cpu_write_reg(void)
 	 * after returning from the system call
 	 */
 	TC_PRINT("Writing 0xDEADBEEF values into registers\n");
-	__asm__ volatile (
-		"ldr r0, =0xDEADBEEF;\n\t"
-		"ldr r1, =0xDEADBEEF;\n\t"
-		"ldr r2, =0xDEADBEEF;\n\t"
-		"ldr r3, =0xDEADBEEF;\n\t"
-		);
+	__asm__ volatile("ldr r0, =0xDEADBEEF;\n\t"
+			 "ldr r1, =0xDEADBEEF;\n\t"
+			 "ldr r2, =0xDEADBEEF;\n\t"
+			 "ldr r3, =0xDEADBEEF;\n\t");
 	TC_PRINT("Exit from system call\n");
 }
 
@@ -285,15 +273,15 @@ void test_syscall_cpu_scrubs_regs(void)
 
 	test_arm_cpu_write_reg();
 
-	__asm__ volatile ("mov %0, r0" : "=r"(arm_reg_val[0]));
-	__asm__ volatile ("mov %0, r1" : "=r"(arm_reg_val[1]));
-	__asm__ volatile ("mov %0, r2" : "=r"(arm_reg_val[2]));
-	__asm__ volatile ("mov %0, r3" : "=r"(arm_reg_val[3]));
+	__asm__ volatile("mov %0, r0" : "=r"(arm_reg_val[0]));
+	__asm__ volatile("mov %0, r1" : "=r"(arm_reg_val[1]));
+	__asm__ volatile("mov %0, r2" : "=r"(arm_reg_val[2]));
+	__asm__ volatile("mov %0, r3" : "=r"(arm_reg_val[3]));
 
 	for (int i = 0; i < 4; i++) {
 		zassert_not_equal(arm_reg_val[i], DB_VAL,
-				"register value is 0xDEADBEEF, "
-				"not scrubbed after system call.");
+				  "register value is 0xDEADBEEF, "
+				  "not scrubbed after system call.");
 	}
 }
 #endif /* CONFIG_USERSPACE */

@@ -42,7 +42,7 @@ int net_getaddrinfo_addr_str(const char *addr_str, const char *def_port,
 		return -1;
 	}
 
-	port  = net_addr_str_find_port(addr_str);
+	port = net_addr_str_find_port(addr_str);
 
 	if (port == NULL) {
 		port = def_port;

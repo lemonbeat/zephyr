@@ -59,13 +59,10 @@ static inline void insert_frag(struct net_pkt *pkt, struct net_buf *frag)
 	net_pkt_frag_add(current_pkt, new_frag);
 }
 
-static int fake_tx(const struct device *dev,
-		   enum ieee802154_tx_mode mode,
-		   struct net_pkt *pkt,
-		   struct net_buf *frag)
+static int fake_tx(const struct device *dev, enum ieee802154_tx_mode mode,
+		   struct net_pkt *pkt, struct net_buf *frag)
 {
-	NET_INFO("Sending packet %p - length %zu\n",
-		 pkt, net_pkt_get_len(pkt));
+	NET_INFO("Sending packet %p - length %zu\n", pkt, net_pkt_get_len(pkt));
 
 	if (!current_pkt) {
 		return 0;
@@ -95,8 +92,9 @@ static int fake_stop(const struct device *dev)
 static void fake_iface_init(struct net_if *iface)
 {
 	struct ieee802154_context *ctx = net_if_l2_data(iface);
-	static uint8_t mac[8] = { 0x00, 0x12, 0x4b, 0x00,
-				  0x00, 0x9e, 0xa3, 0xc2 };
+	static uint8_t mac[8] = {
+		0x00, 0x12, 0x4b, 0x00, 0x00, 0x9e, 0xa3, 0xc2
+	};
 
 	net_if_set_link_addr(iface, mac, 8, NET_LINK_IEEE802154);
 
@@ -115,19 +113,17 @@ static int fake_init(const struct device *dev)
 }
 
 static struct ieee802154_radio_api fake_radio_api = {
-	.iface_api.init	= fake_iface_init,
+	.iface_api.init = fake_iface_init,
 
-	.get_capabilities	= fake_get_capabilities,
-	.cca			= fake_cca,
-	.set_channel		= fake_set_channel,
-	.set_txpower		= fake_set_txpower,
-	.start			= fake_start,
-	.stop			= fake_stop,
-	.tx			= fake_tx,
+	.get_capabilities = fake_get_capabilities,
+	.cca = fake_cca,
+	.set_channel = fake_set_channel,
+	.set_txpower = fake_set_txpower,
+	.start = fake_start,
+	.stop = fake_stop,
+	.tx = fake_tx,
 };
 
-NET_DEVICE_INIT(fake, "fake_ieee802154",
-		fake_init, device_pm_control_nop, NULL, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&fake_radio_api, IEEE802154_L2,
-		NET_L2_GET_CTX_TYPE(IEEE802154_L2), 125);
+NET_DEVICE_INIT(fake, "fake_ieee802154", fake_init, device_pm_control_nop, NULL,
+		NULL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &fake_radio_api,
+		IEEE802154_L2, NET_L2_GET_CTX_TYPE(IEEE802154_L2), 125);

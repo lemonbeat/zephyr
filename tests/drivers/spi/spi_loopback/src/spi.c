@@ -16,10 +16,10 @@ LOG_MODULE_REGISTER(main);
 
 #include <drivers/spi.h>
 
-#define SPI_DRV_NAME	CONFIG_SPI_LOOPBACK_DRV_NAME
-#define SPI_SLAVE	CONFIG_SPI_LOOPBACK_SLAVE_NUMBER
-#define SLOW_FREQ	CONFIG_SPI_LOOPBACK_SLOW_FREQ
-#define FAST_FREQ	CONFIG_SPI_LOOPBACK_FAST_FREQ
+#define SPI_DRV_NAME CONFIG_SPI_LOOPBACK_DRV_NAME
+#define SPI_SLAVE CONFIG_SPI_LOOPBACK_SLAVE_NUMBER
+#define SLOW_FREQ CONFIG_SPI_LOOPBACK_SLOW_FREQ
+#define FAST_FREQ CONFIG_SPI_LOOPBACK_FAST_FREQ
 
 #if defined(CONFIG_SPI_LOOPBACK_CS_GPIO)
 #define CS_CTRL_GPIO_DRV_NAME CONFIG_SPI_LOOPBACK_CS_CTRL_GPIO_DRV_NAME
@@ -71,7 +71,7 @@ struct spi_config spi_cfg_slow = {
 #else
 	.operation = SPI_OP_MODE_MASTER | SPI_MODE_CPOL |
 #endif
-	SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
+		     SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
 	.slave = SPI_SLAVE,
 	.cs = SPI_CS,
 };
@@ -83,7 +83,7 @@ struct spi_config spi_cfg_fast = {
 #else
 	.operation = SPI_OP_MODE_MASTER | SPI_MODE_CPOL |
 #endif
-	SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
+		     SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
 	.slave = SPI_SLAVE,
 	.cs = SPI_CS,
 };
@@ -107,22 +107,17 @@ static int spi_complete_multiple(const struct device *dev,
 				 struct spi_config *spi_conf)
 {
 	struct spi_buf tx_bufs[2];
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
 	tx_bufs[0].buf = buffer_tx;
 	tx_bufs[0].len = BUF_SIZE;
 
 	tx_bufs[1].buf = buffer2_tx;
 	tx_bufs[1].len = BUF2_SIZE;
 
-
 	struct spi_buf rx_bufs[2];
-	const struct spi_buf_set rx = {
-		.buffers = rx_bufs,
-		.count = ARRAY_SIZE(rx_bufs)
-	};
+	const struct spi_buf_set rx = { .buffers = rx_bufs,
+					.count = ARRAY_SIZE(rx_bufs) };
 
 	rx_bufs[0].buf = buffer_rx;
 	rx_bufs[0].len = BUF_SIZE;
@@ -144,10 +139,8 @@ static int spi_complete_multiple(const struct device *dev,
 	if (memcmp(buffer_tx, buffer_rx, BUF_SIZE)) {
 		to_display_format(buffer_tx, BUF_SIZE, buffer_print_tx);
 		to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
-		LOG_ERR("Buffer contents are different: %s",
-			    buffer_print_tx);
-		LOG_ERR("                           vs: %s",
-			    buffer_print_rx);
+		LOG_ERR("Buffer contents are different: %s", buffer_print_tx);
+		LOG_ERR("                           vs: %s", buffer_print_rx);
 		zassert_false(1, "Buffer contents are different");
 		return -1;
 	}
@@ -156,9 +149,8 @@ static int spi_complete_multiple(const struct device *dev,
 		to_display_format(buffer2_tx, BUF2_SIZE, buffer_print_tx2);
 		to_display_format(buffer2_rx, BUF2_SIZE, buffer_print_rx2);
 		LOG_ERR("Buffer 2 contents are different: %s",
-			    buffer_print_tx2);
-		LOG_ERR("                           vs: %s",
-			    buffer_print_rx2);
+			buffer_print_tx2);
+		LOG_ERR("                           vs: %s", buffer_print_rx2);
 		zassert_false(1, "Buffer contents are different");
 		return -1;
 	}
@@ -183,14 +175,10 @@ static int spi_complete_loop(const struct device *dev,
 			.len = BUF_SIZE,
 		},
 	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_bufs,
-		.count = ARRAY_SIZE(rx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
+	const struct spi_buf_set rx = { .buffers = rx_bufs,
+					.count = ARRAY_SIZE(rx_bufs) };
 
 	int ret;
 
@@ -206,10 +194,8 @@ static int spi_complete_loop(const struct device *dev,
 	if (memcmp(buffer_tx, buffer_rx, BUF_SIZE)) {
 		to_display_format(buffer_tx, BUF_SIZE, buffer_print_tx);
 		to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
-		LOG_ERR("Buffer contents are different: %s",
-			    buffer_print_tx);
-		LOG_ERR("                           vs: %s",
-			    buffer_print_rx);
+		LOG_ERR("Buffer contents are different: %s", buffer_print_tx);
+		LOG_ERR("                           vs: %s", buffer_print_rx);
 		zassert_false(1, "Buffer contents are different");
 		return -1;
 	}
@@ -227,7 +213,7 @@ static int spi_null_tx_buf(const struct device *dev,
 
 	const struct spi_buf tx_bufs[] = {
 		{
-	       /*
+			/*
 		* According to documentation, when sending NULL tx buf -
 		*  NOP frames should be sent on MOSI line
 		*/
@@ -241,14 +227,10 @@ static int spi_null_tx_buf(const struct device *dev,
 			.len = BUF_SIZE,
 		},
 	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_bufs,
-		.count = ARRAY_SIZE(rx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
+	const struct spi_buf_set rx = { .buffers = rx_bufs,
+					.count = ARRAY_SIZE(rx_bufs) };
 
 	int ret;
 
@@ -260,7 +242,6 @@ static int spi_null_tx_buf(const struct device *dev,
 		zassert_false(ret, "SPI transceive failed");
 		return ret;
 	}
-
 
 	if (memcmp(buffer_rx, EXPECTED_NOP_RETURN_BUF, BUF_SIZE)) {
 		to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
@@ -290,14 +271,10 @@ static int spi_rx_half_start(const struct device *dev,
 			.len = 8,
 		},
 	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_bufs,
-		.count = ARRAY_SIZE(rx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
+	const struct spi_buf_set rx = { .buffers = rx_bufs,
+					.count = ARRAY_SIZE(rx_bufs) };
 	int ret;
 
 	LOG_INF("Start half start");
@@ -314,10 +291,8 @@ static int spi_rx_half_start(const struct device *dev,
 	if (memcmp(buffer_tx, buffer_rx, 8)) {
 		to_display_format(buffer_tx, 8, buffer_print_tx);
 		to_display_format(buffer_rx, 8, buffer_print_rx);
-		LOG_ERR("Buffer contents are different: %s",
-			    buffer_print_tx);
-		LOG_ERR("                           vs: %s",
-			    buffer_print_rx);
+		LOG_ERR("Buffer contents are different: %s", buffer_print_tx);
+		LOG_ERR("                           vs: %s", buffer_print_rx);
 		zassert_false(1, "Buffer contents are different");
 		return -1;
 	}
@@ -346,14 +321,10 @@ static int spi_rx_half_end(const struct device *dev,
 			.len = 8,
 		},
 	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_bufs,
-		.count = ARRAY_SIZE(rx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
+	const struct spi_buf_set rx = { .buffers = rx_bufs,
+					.count = ARRAY_SIZE(rx_bufs) };
 	int ret;
 
 	if (IS_ENABLED(CONFIG_SPI_STM32_DMA)) {
@@ -372,13 +343,11 @@ static int spi_rx_half_end(const struct device *dev,
 		return -1;
 	}
 
-	if (memcmp(buffer_tx+8, buffer_rx, 8)) {
+	if (memcmp(buffer_tx + 8, buffer_rx, 8)) {
 		to_display_format(buffer_tx + 8, 8, buffer_print_tx);
 		to_display_format(buffer_rx, 8, buffer_print_rx);
-		LOG_ERR("Buffer contents are different: %s",
-			    buffer_print_tx);
-		LOG_ERR("                           vs: %s",
-			    buffer_print_rx);
+		LOG_ERR("Buffer contents are different: %s", buffer_print_tx);
+		LOG_ERR("                           vs: %s", buffer_print_rx);
 		zassert_false(1, "Buffer contents are different");
 		return -1;
 	}
@@ -388,8 +357,7 @@ static int spi_rx_half_end(const struct device *dev,
 	return 0;
 }
 
-static int spi_rx_every_4(const struct device *dev,
-			  struct spi_config *spi_conf)
+static int spi_rx_every_4(const struct device *dev, struct spi_config *spi_conf)
 {
 	const struct spi_buf tx_bufs[] = {
 		{
@@ -415,14 +383,10 @@ static int spi_rx_every_4(const struct device *dev,
 			.len = 4,
 		},
 	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_bufs,
-		.count = ARRAY_SIZE(rx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
+	const struct spi_buf_set rx = { .buffers = rx_bufs,
+					.count = ARRAY_SIZE(rx_bufs) };
 	int ret;
 
 	if (IS_ENABLED(CONFIG_SPI_STM32_DMA)) {
@@ -444,19 +408,15 @@ static int spi_rx_every_4(const struct device *dev,
 	if (memcmp(buffer_tx + 4, buffer_rx, 4)) {
 		to_display_format(buffer_tx + 4, 4, buffer_print_tx);
 		to_display_format(buffer_rx, 4, buffer_print_rx);
-		LOG_ERR("Buffer contents are different: %s",
-			    buffer_print_tx);
-		LOG_ERR("                           vs: %s",
-			    buffer_print_rx);
+		LOG_ERR("Buffer contents are different: %s", buffer_print_tx);
+		LOG_ERR("                           vs: %s", buffer_print_rx);
 		zassert_false(1, "Buffer contents are different");
 		return -1;
 	} else if (memcmp(buffer_tx + 12, buffer_rx + 4, 4)) {
 		to_display_format(buffer_tx + 12, 4, buffer_print_tx);
 		to_display_format(buffer_rx + 4, 4, buffer_print_rx);
-		LOG_ERR("Buffer contents are different: %s",
-			    buffer_print_tx);
-		LOG_ERR("                           vs: %s",
-			    buffer_print_rx);
+		LOG_ERR("Buffer contents are different: %s", buffer_print_tx);
+		LOG_ERR("                           vs: %s", buffer_print_rx);
 		zassert_false(1, "Buffer contents are different");
 		return -1;
 	}
@@ -468,17 +428,14 @@ static int spi_rx_every_4(const struct device *dev,
 
 #if (CONFIG_SPI_ASYNC)
 static struct k_poll_signal async_sig = K_POLL_SIGNAL_INITIALIZER(async_sig);
-static struct k_poll_event async_evt =
-	K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
-				 K_POLL_MODE_NOTIFY_ONLY,
-				 &async_sig);
+static struct k_poll_event async_evt = K_POLL_EVENT_INITIALIZER(
+	K_POLL_TYPE_SIGNAL, K_POLL_MODE_NOTIFY_ONLY, &async_sig);
 static K_SEM_DEFINE(caller, 0, 1);
 K_THREAD_STACK_DEFINE(spi_async_stack, STACK_SIZE);
 static int result = 1;
 
 static void spi_async_call_cb(struct k_poll_event *async_evt,
-			      struct k_sem *caller_sem,
-			      void *unused)
+			      struct k_sem *caller_sem, void *unused)
 {
 	int ret;
 
@@ -497,8 +454,7 @@ static void spi_async_call_cb(struct k_poll_event *async_evt,
 	}
 }
 
-static int spi_async_call(const struct device *dev,
-			  struct spi_config *spi_conf)
+static int spi_async_call(const struct device *dev, struct spi_config *spi_conf)
 {
 	const struct spi_buf tx_bufs[] = {
 		{
@@ -512,14 +468,10 @@ static int spi_async_call(const struct device *dev,
 			.len = BUF_SIZE,
 		},
 	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_bufs,
-		.count = ARRAY_SIZE(rx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
+	const struct spi_buf_set rx = { .buffers = rx_bufs,
+					.count = ARRAY_SIZE(rx_bufs) };
 	int ret;
 
 	LOG_INF("Start async call");
@@ -538,7 +490,7 @@ static int spi_async_call(const struct device *dev,
 
 	k_sem_take(&caller, K_FOREVER);
 
-	if (result)  {
+	if (result) {
 		LOG_ERR("Call code %d", ret);
 		zassert_false(result, "SPI transceive failed");
 		return -1;
@@ -601,11 +553,10 @@ void test_spi_loopback(void)
 	spi_fast = spi_slow;
 
 #if (CONFIG_SPI_ASYNC)
-	async_thread_id = k_thread_create(&async_thread,
-					  spi_async_stack, STACK_SIZE,
-					  (k_thread_entry_t)spi_async_call_cb,
-					  &async_evt, &caller, NULL,
-					  K_PRIO_COOP(7), 0, K_NO_WAIT);
+	async_thread_id =
+		k_thread_create(&async_thread, spi_async_stack, STACK_SIZE,
+				(k_thread_entry_t)spi_async_call_cb, &async_evt,
+				&caller, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 #endif
 
 	LOG_INF("SPI test slow config");
@@ -619,7 +570,7 @@ void test_spi_loopback(void)
 #if (CONFIG_SPI_ASYNC)
 	    || spi_async_call(spi_slow, &spi_cfg_slow)
 #endif
-	    ) {
+	) {
 		goto end;
 	}
 
@@ -634,12 +585,12 @@ void test_spi_loopback(void)
 #if (CONFIG_SPI_ASYNC)
 	    || spi_async_call(spi_fast, &spi_cfg_fast)
 #endif
-	    ) {
+	) {
 		goto end;
 	}
 
-	if (spi_resource_lock_test(spi_slow, &spi_cfg_slow,
-				   spi_fast, &spi_cfg_fast)) {
+	if (spi_resource_lock_test(spi_slow, &spi_cfg_slow, spi_fast,
+				   &spi_cfg_fast)) {
 		goto end;
 	}
 

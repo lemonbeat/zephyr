@@ -13,7 +13,7 @@
 
 #include "barycenter_f32.pat"
 
-#define ABS_ERROR_THRESH	(1e-3)
+#define ABS_ERROR_THRESH (1e-3)
 
 void test_arm_barycenter_f32(void)
 {
@@ -37,8 +37,8 @@ void test_arm_barycenter_f32(void)
 		const uint16_t vec_length = dims[1];
 
 		/* Run test function */
-		arm_barycenter_f32(
-			input_val, input_coeff, output, vec_count, vec_length);
+		arm_barycenter_f32(input_val, input_coeff, output, vec_count,
+				   vec_length);
 
 		/* Increment pointers */
 		input_val += vec_count * vec_length;
@@ -48,11 +48,10 @@ void test_arm_barycenter_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_near_equal_f32(
-			length, output_buf, (float32_t *)ref_barycenter,
-			ABS_ERROR_THRESH),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_f32(length, output_buf,
+					 (float32_t *)ref_barycenter,
+					 ABS_ERROR_THRESH),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output_buf);
@@ -61,8 +60,7 @@ void test_arm_barycenter_f32(void)
 void test_support_barycenter_f32(void)
 {
 	ztest_test_suite(support_barycenter_f32,
-		ztest_unit_test(test_arm_barycenter_f32)
-		);
+			 ztest_unit_test(test_arm_barycenter_f32));
 
 	ztest_run_test_suite(support_barycenter_f32);
 }

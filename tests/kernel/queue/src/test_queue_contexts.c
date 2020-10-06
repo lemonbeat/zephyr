@@ -31,8 +31,7 @@ static struct k_sem end_sema;
 
 static void tqueue_append(struct k_queue *pqueue)
 {
-	k_queue_insert(pqueue, k_queue_peek_tail(pqueue),
-		       (void *)&data[0]);
+	k_queue_insert(pqueue, k_queue_peek_tail(pqueue), (void *)&data[0]);
 
 	for (int i = 1; i < LIST_LEN; i++) {
 		/**TESTPOINT: queue append */
@@ -109,9 +108,9 @@ static void tqueue_thread_thread(struct k_queue *pqueue)
 {
 	k_sem_init(&end_sema, 0, 1);
 	/**TESTPOINT: thread-thread data passing via queue*/
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      tThread_entry, pqueue, NULL, NULL,
-				      K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, tThread_entry,
+				      pqueue, NULL, NULL, K_PRIO_PREEMPT(0), 0,
+				      K_NO_WAIT);
 	tqueue_append(pqueue);
 	k_sem_take(&end_sema, K_FOREVER);
 	k_thread_abort(tid);
@@ -215,9 +214,9 @@ static void tThread_get(void *p1, void *p2, void *p3)
 static void tqueue_get_2threads(struct k_queue *pqueue)
 {
 	k_sem_init(&end_sema, 0, 1);
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      tThread_get, pqueue, NULL, NULL,
-				      K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, tThread_get,
+				      pqueue, NULL, NULL, K_PRIO_PREEMPT(0), 0,
+				      K_NO_WAIT);
 
 	k_tid_t tid1 = k_thread_create(&tdata1, tstack1, STACK_SIZE,
 				       tThread_get, pqueue, NULL, NULL,
@@ -276,8 +275,7 @@ static void tqueue_alloc(struct k_queue *pqueue)
 	zassert_true(k_queue_is_empty(pqueue), NULL);
 
 	/* Assign resource pool of sufficient size */
-	k_thread_resource_pool_assign(k_current_get(),
-				      &mem_pool_pass);
+	k_thread_resource_pool_assign(k_current_get(), &mem_pool_pass);
 
 	zassert_false(k_queue_alloc_prepend(pqueue, (void *)&data_prepend),
 		      NULL);
@@ -285,8 +283,7 @@ static void tqueue_alloc(struct k_queue *pqueue)
 	/* Now queue shouldn't be empty */
 	zassert_false(k_queue_is_empty(pqueue), NULL);
 
-	zassert_true(k_queue_get(pqueue, K_FOREVER) != NULL,
-		     NULL);
+	zassert_true(k_queue_get(pqueue, K_FOREVER) != NULL, NULL);
 }
 
 /**
@@ -312,7 +309,6 @@ void test_queue_alloc(void)
 
 	tqueue_alloc(&queue);
 }
-
 
 /* Does nothing but read items out of the queue and verify that they
  * are non-null.  Two such threads will be created.
@@ -341,15 +337,11 @@ void test_queue_poll_race(void)
 
 	k_queue_init(&queue);
 
-	k_thread_create(&tdata, tstack, STACK_SIZE,
-			queue_poll_race_consume,
-			&queue, &mid_count, NULL,
-			prio + 1, 0, K_NO_WAIT);
+	k_thread_create(&tdata, tstack, STACK_SIZE, queue_poll_race_consume,
+			&queue, &mid_count, NULL, prio + 1, 0, K_NO_WAIT);
 
-	k_thread_create(&tdata1, tstack1, STACK_SIZE,
-			queue_poll_race_consume,
-			&queue, &low_count, NULL,
-			prio + 2, 0, K_NO_WAIT);
+	k_thread_create(&tdata1, tstack1, STACK_SIZE, queue_poll_race_consume,
+			&queue, &low_count, NULL, prio + 2, 0, K_NO_WAIT);
 
 	/* Let them initialize and block */
 	k_sleep(K_TICKS(2));

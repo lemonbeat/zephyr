@@ -46,8 +46,8 @@
 extern "C" {
 #endif
 
-#define SOC_FLASH_0_ID 0	/** device_id for SoC flash memory driver   */
-#define SPI_FLASH_0_ID 1	/** device_id for external SPI flash driver */
+#define SOC_FLASH_0_ID 0 /** device_id for SoC flash memory driver   */
+#define SPI_FLASH_0_ID 1 /** device_id for external SPI flash driver */
 
 /**
  * @brief Structure for store flash partition data
@@ -83,11 +83,11 @@ struct flash_sector {
  * algorithm.
  */
 struct flash_area_check {
-	const uint8_t *match;		/** 256 bits match vector */
-	size_t clen;			/** Content len to be compared */
-	size_t off;			/** Start Offset */
-	uint8_t *rbuf;			/** Temporary read buffer  */
-	size_t rblen;			/** Size of read buffer */
+	const uint8_t *match; /** 256 bits match vector */
+	size_t clen; /** Content len to be compared */
+	size_t off; /** Start Offset */
+	uint8_t *rbuf; /** Temporary read buffer  */
+	size_t rblen; /** Size of read buffer */
 };
 
 /**
@@ -210,8 +210,7 @@ int flash_area_get_sectors(int fa_id, uint32_t *count,
  * @param user_data User supplied data
  *
  */
-typedef void (*flash_area_cb_t)(const struct flash_area *fa,
-				void *user_data);
+typedef void (*flash_area_cb_t)(const struct flash_area *fa, void *user_data);
 
 /**
  * Iterate over flash map
@@ -240,8 +239,7 @@ int flash_area_has_driver(const struct flash_area *fa);
  */
 const struct device *flash_area_get_device(const struct flash_area *fa);
 
-#define FLASH_AREA_LABEL_EXISTS(label) \
-	DT_HAS_FIXED_PARTITION_LABEL(label)
+#define FLASH_AREA_LABEL_EXISTS(label) DT_HAS_FIXED_PARTITION_LABEL(label)
 
 #define FLASH_AREA_ID(label) \
 	DT_FIXED_PARTITION_ID(DT_NODE_BY_FIXED_PARTITION_LABEL(label))

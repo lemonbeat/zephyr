@@ -117,26 +117,23 @@ static struct spi_driver_api spi_emul_api = {
 	.transceive = spi_emul_io,
 };
 
-#define EMUL_LINK_AND_COMMA(node_id) {		\
-	.label = DT_LABEL(node_id),		\
-},
+#define EMUL_LINK_AND_COMMA(node_id)        \
+	{                                   \
+		.label = DT_LABEL(node_id), \
+	},
 
-#define SPI_EMUL_INIT(n) \
-	static const struct emul_link_for_bus emuls_##n[] = { \
+#define SPI_EMUL_INIT(n)                                              \
+	static const struct emul_link_for_bus emuls_##n[] = {         \
 		DT_FOREACH_CHILD(DT_DRV_INST(0), EMUL_LINK_AND_COMMA) \
-	}; \
-	static struct emul_list_for_bus spi_emul_cfg_##n = { \
-		.children = emuls_##n, \
-		.num_children = ARRAY_SIZE(emuls_##n), \
-	}; \
-	static struct spi_emul_data spi_emul_data_##n; \
-	DEVICE_AND_API_INIT(spi_##n, \
-			    DT_INST_LABEL(n), \
-			    spi_emul_init, \
-			    &spi_emul_data_##n, \
-			    &spi_emul_cfg_##n, \
-			    POST_KERNEL, \
-			    CONFIG_SPI_INIT_PRIORITY, \
+	};                                                            \
+	static struct emul_list_for_bus spi_emul_cfg_##n = {          \
+		.children = emuls_##n,                                \
+		.num_children = ARRAY_SIZE(emuls_##n),                \
+	};                                                            \
+	static struct spi_emul_data spi_emul_data_##n;                \
+	DEVICE_AND_API_INIT(spi_##n, DT_INST_LABEL(n), spi_emul_init, \
+			    &spi_emul_data_##n, &spi_emul_cfg_##n,    \
+			    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,    \
 			    &spi_emul_api);
 
 DT_INST_FOREACH_STATUS_OKAY(SPI_EMUL_INIT)

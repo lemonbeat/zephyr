@@ -13,20 +13,20 @@
 
 #include "binary_q15.pat"
 
-#define SNR_ERROR_THRESH		((float32_t)70)
-#define SNR_LOW_ERROR_THRESH		((float32_t)30)
-#define ABS_ERROR_THRESH_Q15		((q15_t)1000)
-#define ABS_HIGH_ERROR_THRESH_Q15	((q15_t)2000)
-#define ABS_ERROR_THRESH_Q63		((q63_t)(1 << 16))
+#define SNR_ERROR_THRESH ((float32_t)70)
+#define SNR_LOW_ERROR_THRESH ((float32_t)30)
+#define ABS_ERROR_THRESH_Q15 ((q15_t)1000)
+#define ABS_HIGH_ERROR_THRESH_Q15 ((q15_t)2000)
+#define ABS_ERROR_THRESH_Q63 ((q63_t)(1 << 16))
 
-#define NUM_MATRICES			(ARRAY_SIZE(in_dims) / 3)
-#define MAX_MATRIX_DIM			(40)
+#define NUM_MATRICES (ARRAY_SIZE(in_dims) / 3)
+#define MAX_MATRIX_DIM (40)
 
-#define OP2_MULT			(0)
-#define OP2C_CMPLX_MULT			(0)
+#define OP2_MULT (0)
+#define OP2C_CMPLX_MULT (0)
 
 static void test_op2(int op, const q15_t *input1, const q15_t *input2,
-	const q15_t *ref, size_t length)
+		     const q15_t *ref, size_t length)
 {
 	size_t index;
 	uint16_t *dims = (uint16_t *)in_dims;
@@ -72,8 +72,7 @@ static void test_op2(int op, const q15_t *input1, const q15_t *input2,
 		mat_out.numCols = columns;
 
 		/* Load matrix data */
-		memcpy(mat_in1.pData, input1,
-		       rows * internal * sizeof(q15_t));
+		memcpy(mat_in1.pData, input1, rows * internal * sizeof(q15_t));
 
 		memcpy(mat_in2.pData, input2,
 		       internal * columns * sizeof(q15_t));
@@ -81,8 +80,7 @@ static void test_op2(int op, const q15_t *input1, const q15_t *input2,
 		/* Run test function */
 		switch (op) {
 		case OP2_MULT:
-			arm_mat_mult_q15(
-				&mat_in1, &mat_in2, &mat_out, scratch);
+			arm_mat_mult_q15(&mat_in1, &mat_in2, &mat_out, scratch);
 			break;
 		default:
 			zassert_unreachable("invalid operation");
@@ -93,14 +91,13 @@ static void test_op2(int op, const q15_t *input1, const q15_t *input2,
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q15(length, output, ref, SNR_LOW_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q15(length, output, ref,
+					SNR_LOW_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q15(length, output, ref,
-			ABS_HIGH_ERROR_THRESH_Q15),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q15(length, output, ref,
+					 ABS_HIGH_ERROR_THRESH_Q15),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -109,13 +106,11 @@ static void test_op2(int op, const q15_t *input1, const q15_t *input2,
 	free(output);
 }
 
-DEFINE_TEST_VARIANT5(
-	op2, arm_mat_mult_q15, OP2_MULT,
-	in_mult1, in_mult2, ref_mult,
-	ARRAY_SIZE(ref_mult));
+DEFINE_TEST_VARIANT5(op2, arm_mat_mult_q15, OP2_MULT, in_mult1, in_mult2,
+		     ref_mult, ARRAY_SIZE(ref_mult));
 
 static void test_op2c(int op, const q15_t *input1, const q15_t *input2,
-	const q15_t *ref, size_t length)
+		      const q15_t *ref, size_t length)
 {
 	size_t index;
 	uint16_t *dims = (uint16_t *)in_dims;
@@ -170,8 +165,8 @@ static void test_op2c(int op, const q15_t *input1, const q15_t *input2,
 		/* Run test function */
 		switch (op) {
 		case OP2C_CMPLX_MULT:
-			arm_mat_cmplx_mult_q15(
-				&mat_in1, &mat_in2, &mat_out, scratch);
+			arm_mat_cmplx_mult_q15(&mat_in1, &mat_in2, &mat_out,
+					       scratch);
 			break;
 		default:
 			zassert_unreachable("invalid operation");
@@ -182,14 +177,13 @@ static void test_op2c(int op, const q15_t *input1, const q15_t *input2,
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q15(2 * length, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q15(2 * length, output, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q15(2 * length, output, ref,
-			ABS_ERROR_THRESH_Q15),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q15(2 * length, output, ref,
+					 ABS_ERROR_THRESH_Q15),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -198,17 +192,15 @@ static void test_op2c(int op, const q15_t *input1, const q15_t *input2,
 	free(output);
 }
 
-DEFINE_TEST_VARIANT5(
-	op2c, arm_mat_cmplx_mult_q15, OP2C_CMPLX_MULT,
-	in_cmplx_mult1, in_cmplx_mult2, ref_cmplx_mult,
-	ARRAY_SIZE(ref_cmplx_mult) / 2);
+DEFINE_TEST_VARIANT5(op2c, arm_mat_cmplx_mult_q15, OP2C_CMPLX_MULT,
+		     in_cmplx_mult1, in_cmplx_mult2, ref_cmplx_mult,
+		     ARRAY_SIZE(ref_cmplx_mult) / 2);
 
 void test_matrix_binary_q15(void)
 {
 	ztest_test_suite(matrix_binary_q15,
-		ztest_unit_test(test_op2c_arm_mat_cmplx_mult_q15),
-		ztest_unit_test(test_op2_arm_mat_mult_q15)
-		);
+			 ztest_unit_test(test_op2c_arm_mat_cmplx_mult_q15),
+			 ztest_unit_test(test_op2_arm_mat_mult_q15));
 
 	ztest_run_test_suite(matrix_binary_q15);
 }

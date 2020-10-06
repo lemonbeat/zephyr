@@ -35,19 +35,20 @@ static inline void vector_to_irq(int irq_nbr, int *may_swap)
 	if (irq_vector_table[irq_nbr].func == NULL) { /* LCOV_EXCL_BR_LINE */
 		/* LCOV_EXCL_START */
 		posix_print_error_and_exit("Received irq %i without a "
-					"registered handler\n",
-					irq_nbr);
+					   "registered handler\n",
+					   irq_nbr);
 		/* LCOV_EXCL_STOP */
 	} else {
 		if (irq_vector_table[irq_nbr].flags & ISR_FLAG_DIRECT) {
-			*may_swap |= ((direct_irq_f_ptr)
-					irq_vector_table[irq_nbr].func)();
+			*may_swap |=
+				((direct_irq_f_ptr)irq_vector_table[irq_nbr]
+					 .func)();
 		} else {
 #ifdef CONFIG_SYS_POWER_MANAGEMENT
 			posix_irq_check_idle_exit();
 #endif
-			((normal_irq_f_ptr)irq_vector_table[irq_nbr].func)
-					(irq_vector_table[irq_nbr].param);
+			((normal_irq_f_ptr)irq_vector_table[irq_nbr].func)(
+				irq_vector_table[irq_nbr].param);
 			*may_swap = 1;
 		}
 	}
@@ -103,10 +104,8 @@ void posix_irq_handler(void)
 	 * 2) We are not nesting irq_handler calls (interrupts)
 	 * 3) Next thread to run in the ready queue is not this thread
 	 */
-	if (may_swap
-		&& (hw_irq_ctrl_get_cur_prio() == 256)
-		&& (_kernel.ready_q.cache != _current)) {
-
+	if (may_swap && (hw_irq_ctrl_get_cur_prio() == 256) &&
+	    (_kernel.ready_q.cache != _current)) {
 		(void)z_swap_irqlock(irq_lock);
 	}
 }
@@ -126,9 +125,10 @@ void posix_irq_handler_im_from_sw(void)
 	if (hw_irq_ctrl_get_highest_prio_irq() != -1) {
 		if (!posix_is_cpu_running()) { /* LCOV_EXCL_BR_LINE */
 			/* LCOV_EXCL_START */
-			posix_print_error_and_exit("programming error: %s "
-					"called from a HW model thread\n",
-					__func__);
+			posix_print_error_and_exit(
+				"programming error: %s "
+				"called from a HW model thread\n",
+				__func__);
 			/* LCOV_EXCL_STOP */
 		}
 		posix_irq_handler();
@@ -232,8 +232,8 @@ int posix_get_current_irq(void)
 void posix_isr_declare(unsigned int irq_p, int flags, void isr_p(const void *),
 		       const void *isr_param_p)
 {
-	irq_vector_table[irq_p].irq   = irq_p;
-	irq_vector_table[irq_p].func  = isr_p;
+	irq_vector_table[irq_p].irq = irq_p;
+	irq_vector_table[irq_p].func = isr_p;
 	irq_vector_table[irq_p].param = isr_param_p;
 	irq_vector_table[irq_p].flags = flags;
 }

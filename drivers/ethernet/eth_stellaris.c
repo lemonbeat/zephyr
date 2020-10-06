@@ -144,8 +144,8 @@ static struct net_pkt *eth_stellaris_rx_pkt(const struct device *dev,
 	reg_val = sys_read32(REG_MACDATA);
 	frame_len = reg_val & 0x0000ffff;
 
-	pkt = net_pkt_rx_alloc_with_buffer(iface, frame_len,
-					   AF_UNSPEC, 0, K_NO_WAIT);
+	pkt = net_pkt_rx_alloc_with_buffer(iface, frame_len, AF_UNSPEC, 0,
+					   K_NO_WAIT);
 	if (!pkt) {
 		return NULL;
 	}
@@ -276,8 +276,7 @@ static void eth_stellaris_init(struct net_if *iface)
 	dev_data->iface = iface;
 
 	/* Assign link local address. */
-	net_if_set_link_addr(iface,
-			     dev_data->mac_addr, 6, NET_LINK_ETHERNET);
+	net_if_set_link_addr(iface, dev_data->mac_addr, 6, NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 
@@ -307,8 +306,8 @@ static int eth_stellaris_dev_init(const struct device *dev)
 	sys_write32(value, REG_MACRCTL);
 
 	/* Enable transmitter */
-	value = BIT_MACTCTL_DUPLEX | BIT_MACTCTL_CRC |
-		BIT_MACTCTL_PADEN | BIT_MACTCTL_TXEN;
+	value = BIT_MACTCTL_DUPLEX | BIT_MACTCTL_CRC | BIT_MACTCTL_PADEN |
+		BIT_MACTCTL_TXEN;
 	sys_write32(value, REG_MACTCTL);
 
 	/* Enable Receiver */
@@ -323,8 +322,7 @@ DEVICE_DECLARE(eth_stellaris);
 static void eth_stellaris_irq_config(const struct device *dev)
 {
 	/* Enable Interrupt. */
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
 		    eth_stellaris_isr, DEVICE_GET(eth_stellaris), 0);
 	irq_enable(DT_INST_IRQN(0));
 }
@@ -342,15 +340,14 @@ struct eth_stellaris_runtime eth_data = {
 };
 
 static const struct ethernet_api eth_stellaris_apis = {
-	.iface_api.init	= eth_stellaris_init,
-	.send =  eth_stellaris_send,
+	.iface_api.init = eth_stellaris_init,
+	.send = eth_stellaris_send,
 #if defined(CONFIG_NET_STATISTICS_ETHERNET)
 	.get_stats = eth_stellaris_stats,
 #endif
 };
 
-NET_DEVICE_INIT(eth_stellaris, DT_INST_LABEL(0),
-		eth_stellaris_dev_init, device_pm_control_nop,
-		&eth_data, &eth_cfg, CONFIG_ETH_INIT_PRIORITY,
-		&eth_stellaris_apis, ETHERNET_L2,
+NET_DEVICE_INIT(eth_stellaris, DT_INST_LABEL(0), eth_stellaris_dev_init,
+		device_pm_control_nop, &eth_data, &eth_cfg,
+		CONFIG_ETH_INIT_PRIORITY, &eth_stellaris_apis, ETHERNET_L2,
 		NET_L2_GET_CTX_TYPE(ETHERNET_L2), NET_ETH_MTU);

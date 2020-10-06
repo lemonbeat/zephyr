@@ -60,13 +60,13 @@ static inline __printf_like(1, 0) void vprintk(const char *fmt, va_list ap)
 }
 #endif
 
-extern __printf_like(3, 4) int snprintk(char *str, size_t size,
-					const char *fmt, ...);
+extern __printf_like(3, 4) int snprintk(char *str, size_t size, const char *fmt,
+					...);
 extern __printf_like(3, 0) int vsnprintk(char *str, size_t size,
-					  const char *fmt, va_list ap);
+					 const char *fmt, va_list ap);
 
 extern __printf_like(3, 0) void z_vprintk(int (*out)(int f, void *c), void *ctx,
-					 const char *fmt, va_list ap);
+					  const char *fmt, va_list ap);
 
 #ifdef __cplusplus
 }

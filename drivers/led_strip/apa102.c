@@ -23,8 +23,8 @@ struct apa102_data {
 static int apa102_update(const struct device *dev, void *buf, size_t size)
 {
 	struct apa102_data *data = dev->data;
-	static const uint8_t zeros[] = {0, 0, 0, 0};
-	static const uint8_t ones[] = {0xFF, 0xFF, 0xFF, 0xFF};
+	static const uint8_t zeros[] = { 0, 0, 0, 0 };
+	static const uint8_t ones[] = { 0xFF, 0xFF, 0xFF, 0xFF };
 	const struct spi_buf tx_bufs[] = {
 		{
 			/* Start frame: at least 32 zeros */
@@ -45,10 +45,8 @@ static int apa102_update(const struct device *dev, void *buf, size_t size)
 			.len = sizeof(ones),
 		},
 	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_bufs,
-		.count = ARRAY_SIZE(tx_bufs)
-	};
+	const struct spi_buf_set tx = { .buffers = tx_bufs,
+					.count = ARRAY_SIZE(tx_bufs) };
 
 	return spi_write(data->spi, &data->cfg, &tx);
 }
@@ -95,8 +93,8 @@ static int apa102_init(const struct device *dev)
 
 	data->cfg.slave = DT_INST_REG_ADDR(0);
 	data->cfg.frequency = DT_INST_PROP(0, spi_max_frequency);
-	data->cfg.operation =
-		SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB | SPI_WORD_SET(8);
+	data->cfg.operation = SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB |
+			      SPI_WORD_SET(8);
 
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
 	data->cs_ctl.gpio_dev =
@@ -121,6 +119,6 @@ static const struct led_strip_driver_api apa102_api = {
 	.update_channels = apa102_update_channels,
 };
 
-DEVICE_AND_API_INIT(apa102_0, DT_INST_LABEL(0), apa102_init,
-		    &apa102_data_0, NULL, POST_KERNEL,
-		    CONFIG_LED_STRIP_INIT_PRIORITY, &apa102_api);
+DEVICE_AND_API_INIT(apa102_0, DT_INST_LABEL(0), apa102_init, &apa102_data_0,
+		    NULL, POST_KERNEL, CONFIG_LED_STRIP_INIT_PRIORITY,
+		    &apa102_api);

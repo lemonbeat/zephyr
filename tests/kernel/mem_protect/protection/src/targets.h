@@ -7,7 +7,7 @@
 #ifndef _PROT_TEST_TARGETS_H_
 #define _PROT_TEST_TARGETS_H_
 
-#define RODATA_VALUE  0xF00FF00F
+#define RODATA_VALUE 0xF00FF00F
 extern const uint32_t rodata_var;
 
 #define BUF_SIZE 16

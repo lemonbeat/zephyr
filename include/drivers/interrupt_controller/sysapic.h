@@ -9,17 +9,17 @@
 
 #include <drivers/interrupt_controller/loapic.h>
 
-#define IRQ_TRIGGER_EDGE	IOAPIC_EDGE
-#define IRQ_TRIGGER_LEVEL	IOAPIC_LEVEL
+#define IRQ_TRIGGER_EDGE IOAPIC_EDGE
+#define IRQ_TRIGGER_LEVEL IOAPIC_LEVEL
 
-#define IRQ_POLARITY_HIGH	IOAPIC_HIGH
-#define IRQ_POLARITY_LOW	IOAPIC_LOW
+#define IRQ_POLARITY_HIGH IOAPIC_HIGH
+#define IRQ_POLARITY_LOW IOAPIC_LOW
 
 #ifndef _ASMLANGUAGE
 #include <zephyr/types.h>
 
-#define LOAPIC_IRQ_BASE  CONFIG_IOAPIC_NUM_RTES
-#define LOAPIC_IRQ_COUNT 6  /* Default to LOAPIC_TIMER to LOAPIC_ERROR */
+#define LOAPIC_IRQ_BASE CONFIG_IOAPIC_NUM_RTES
+#define LOAPIC_IRQ_COUNT 6 /* Default to LOAPIC_TIMER to LOAPIC_ERROR */
 
 void z_irq_controller_irq_config(unsigned int vector, unsigned int irq,
 				 uint32_t flags);

@@ -23,10 +23,7 @@ static struct k_sem sync_sema;
 
 static k_tid_t tid1, receiver_tid;
 
-static enum mmsg_type {
-	PUT_GET_NULL = 0,
-	TARGET_SOURCE
-} info_type;
+static enum mmsg_type { PUT_GET_NULL = 0, TARGET_SOURCE } info_type;
 
 static void msg_sender(struct k_mbox *pmbox, k_timeout_t timeout)
 {
@@ -64,14 +61,17 @@ static void msg_receiver(struct k_mbox *pmbox, k_tid_t thd_id,
 		mmsg.size = sizeof(rxdata);
 		mmsg.rx_source_thread = thd_id;
 		if (K_TIMEOUT_EQ(timeout, K_FOREVER)) {
-			zassert_true(k_mbox_get(pmbox, &mmsg,
-				     rxdata, K_FOREVER) == 0, NULL);
+			zassert_true(k_mbox_get(pmbox, &mmsg, rxdata,
+						K_FOREVER) == 0,
+				     NULL);
 		} else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
-			zassert_false(k_mbox_get(pmbox, &mmsg,
-				      rxdata, K_NO_WAIT) == 0, NULL);
+			zassert_false(k_mbox_get(pmbox, &mmsg, rxdata,
+						 K_NO_WAIT) == 0,
+				      NULL);
 		} else {
-			zassert_true(k_mbox_get(pmbox, &mmsg,
-				     rxdata, timeout) == 0, NULL);
+			zassert_true(k_mbox_get(pmbox, &mmsg, rxdata,
+						timeout) == 0,
+				     NULL);
 		}
 		break;
 	default:
@@ -99,9 +99,8 @@ void test_msg_receiver(void)
 	info_type = PUT_GET_NULL;
 	msg_receiver(&mbox, K_ANY, K_NO_WAIT);
 
-	tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-			      test_send, &mbox, NULL, NULL,
-			      K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+	tid = k_thread_create(&tdata, tstack, STACK_SIZE, test_send, &mbox,
+			      NULL, NULL, K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
 
 	msg_receiver(&mbox, K_ANY, K_MSEC(2));
 	k_thread_abort(tid);
@@ -119,9 +118,8 @@ void test_msg_receiver_unlimited(void)
 	info_type = PUT_GET_NULL;
 
 	receiver_tid = k_current_get();
-	tid1 = k_thread_create(&tdata, tstack, STACK_SIZE,
-			      test_send_un, &mbox, NULL, NULL,
-			      K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+	tid1 = k_thread_create(&tdata, tstack, STACK_SIZE, test_send_un, &mbox,
+			       NULL, NULL, K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
 
 	msg_receiver(&mbox, tid1, K_FOREVER);
 	k_thread_abort(tid1);
@@ -131,8 +129,7 @@ void test_msg_receiver_unlimited(void)
 void test_main(void)
 {
 	test_mbox_init();
-	ztest_test_suite(test_mbox,
-			 ztest_unit_test(test_msg_receiver),
+	ztest_test_suite(test_mbox, ztest_unit_test(test_msg_receiver),
 			 ztest_unit_test(test_msg_receiver_unlimited));
 	ztest_run_test_suite(test_mbox);
 }

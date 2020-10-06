@@ -32,10 +32,8 @@ static int sht3xd_rh_processed_to_raw(const struct sensor_value *val)
 	return ((uval * 0xFFFF) / 100) / 1000000;
 }
 
-int sht3xd_attr_set(const struct device *dev,
-		    enum sensor_channel chan,
-		    enum sensor_attribute attr,
-		    const struct sensor_value *val)
+int sht3xd_attr_set(const struct device *dev, enum sensor_channel chan,
+		    enum sensor_attribute attr, const struct sensor_value *val)
 {
 	struct sht3xd_data *data = dev->data;
 	uint16_t set_cmd, clear_cmd, reg_val, temp, rh;
@@ -81,15 +79,13 @@ int sht3xd_attr_set(const struct device *dev,
 	return 0;
 }
 
-static inline void setup_alert(const struct device *dev,
-			       bool enable)
+static inline void setup_alert(const struct device *dev, bool enable)
 {
 	struct sht3xd_data *data = (struct sht3xd_data *)dev->data;
 	const struct sht3xd_config *cfg =
 		(const struct sht3xd_config *)dev->config;
-	unsigned int flags = enable
-		? GPIO_INT_EDGE_TO_ACTIVE
-		: GPIO_INT_DISABLE;
+	unsigned int flags = enable ? GPIO_INT_EDGE_TO_ACTIVE :
+					    GPIO_INT_DISABLE;
 
 	gpio_pin_interrupt_configure(data->alert_gpio, cfg->alert_pin, flags);
 }
@@ -175,8 +171,7 @@ static void sht3xd_thread(struct sht3xd_data *data)
 #ifdef CONFIG_SHT3XD_TRIGGER_GLOBAL_THREAD
 static void sht3xd_work_cb(struct k_work *work)
 {
-	struct sht3xd_data *data =
-		CONTAINER_OF(work, struct sht3xd_data, work);
+	struct sht3xd_data *data = CONTAINER_OF(work, struct sht3xd_data, work);
 
 	sht3xd_thread_cb(data->dev);
 }
@@ -217,14 +212,12 @@ int sht3xd_init_interrupt(const struct device *dev)
 	data->rh_low = 0U;
 	data->t_high = 0xFFFF;
 	data->rh_high = 0xFFFF;
-	if (sht3xd_write_reg(dev, SHT3XD_CMD_WRITE_TH_HIGH_SET, 0xFFFF)
-	    < 0) {
+	if (sht3xd_write_reg(dev, SHT3XD_CMD_WRITE_TH_HIGH_SET, 0xFFFF) < 0) {
 		LOG_DBG("Failed to write threshold high set value!");
 		return -EIO;
 	}
 
-	if (sht3xd_write_reg(dev, SHT3XD_CMD_WRITE_TH_HIGH_CLEAR,
-			     0xFFFF) < 0) {
+	if (sht3xd_write_reg(dev, SHT3XD_CMD_WRITE_TH_HIGH_CLEAR, 0xFFFF) < 0) {
 		LOG_DBG("Failed to write threshold high clear value!");
 		return -EIO;
 	}
@@ -244,9 +237,9 @@ int sht3xd_init_interrupt(const struct device *dev)
 
 	k_thread_create(&data->thread, data->thread_stack,
 			CONFIG_SHT3XD_THREAD_STACK_SIZE,
-			(k_thread_entry_t)sht3xd_thread, data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_SHT3XD_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)sht3xd_thread, data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_SHT3XD_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_SHT3XD_TRIGGER_GLOBAL_THREAD)
 	data->work.handler = sht3xd_work_cb;
 #endif

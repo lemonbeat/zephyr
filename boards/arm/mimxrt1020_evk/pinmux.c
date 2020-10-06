@@ -9,11 +9,10 @@
 #include <fsl_gpio.h>
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(enet), okay) && CONFIG_NET_L2_ETHERNET
-static gpio_pin_config_t enet_gpio_config = {
-	.direction = kGPIO_DigitalOutput,
-	.outputLogic = 0,
-	.interruptMode = kGPIO_NoIntmode
-};
+static gpio_pin_config_t enet_gpio_config = { .direction = kGPIO_DigitalOutput,
+					      .outputLogic = 0,
+					      .interruptMode =
+						      kGPIO_NoIntmode };
 #endif
 
 static int mimxrt1020_evk_init(const struct device *dev)
@@ -28,8 +27,8 @@ static int mimxrt1020_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_05_GPIO1_IO05,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	/* SW0 */
 	IOMUXC_SetPinMux(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 0);
@@ -41,13 +40,13 @@ static int mimxrt1020_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_06_LPUART1_TX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_07_LPUART1_RX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpuart2), okay) && CONFIG_SERIAL
@@ -57,13 +56,13 @@ static int mimxrt1020_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_08_LPUART2_TX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_09_LPUART2_RX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpi2c1), okay) && CONFIG_I2C
@@ -73,17 +72,17 @@ static int mimxrt1020_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_14_LPI2C1_SCL,
 			    IOMUXC_SW_PAD_CTL_PAD_PUS(3) |
-			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_15_LPI2C1_SDA,
 			    IOMUXC_SW_PAD_CTL_PAD_PUS(3) |
-			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpi2c4), okay) && CONFIG_I2C
@@ -93,17 +92,17 @@ static int mimxrt1020_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_02_LPI2C4_SCL,
 			    IOMUXC_SW_PAD_CTL_PAD_PUS(3) |
-			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_03_LPI2C4_SDA,
 			    IOMUXC_SW_PAD_CTL_PAD_PUS(3) |
-			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(enet), okay) && CONFIG_NET_L2_ETHERNET

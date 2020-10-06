@@ -96,10 +96,9 @@ static void conn_mgr_ipv6_events_handler(struct net_mgmt_event_callback *cb,
 	k_sem_give(&conn_mgr_lock);
 }
 #else
-static inline
-void conn_mgr_ipv6_events_handler(struct net_mgmt_event_callback *cb,
-				  uint32_t mgmt_event,
-				  struct net_if *iface)
+static inline void
+conn_mgr_ipv6_events_handler(struct net_mgmt_event_callback *cb,
+			     uint32_t mgmt_event, struct net_if *iface)
 {
 	ARG_UNUSED(cb);
 	ARG_UNUSED(mgmt_event);
@@ -143,10 +142,9 @@ static void conn_mgr_ipv4_events_handler(struct net_mgmt_event_callback *cb,
 	k_sem_give(&conn_mgr_lock);
 }
 #else
-static inline
-void conn_mgr_ipv4_events_handler(struct net_mgmt_event_callback *cb,
-				  uint32_t mgmt_event,
-				  struct net_if *iface)
+static inline void
+conn_mgr_ipv4_events_handler(struct net_mgmt_event_callback *cb,
+			     uint32_t mgmt_event, struct net_if *iface)
 {
 	ARG_UNUSED(cb);
 	ARG_UNUSED(mgmt_event);

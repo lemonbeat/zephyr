@@ -40,5 +40,4 @@ void function_in_sram2(void)
 __in_section(custom_section, static, fun) void function_in_custom_section(void)
 {
 	return;
-
 }

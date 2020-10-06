@@ -73,17 +73,9 @@ static const struct {
 	int32_t rate;
 	int32_t rate_dec;
 } stts751_map[] = {
-			{0, 62500},
-			{0, 125000},
-			{0, 250000},
-			{0, 500000},
-			{1, 0},
-			{2, 0},
-			{4, 0},
-			{8, 0},
-			{16, 0},
-			{32, 0},
-		};
+	{ 0, 62500 }, { 0, 125000 }, { 0, 250000 }, { 0, 500000 }, { 1, 0 },
+	{ 2, 0 },     { 4, 0 },	     { 8, 0 },	    { 16, 0 },	   { 32, 0 },
+};
 
 static int stts751_odr_set(const struct device *dev,
 			   const struct sensor_value *val)
@@ -110,8 +102,7 @@ static int stts751_odr_set(const struct device *dev,
 	return 0;
 }
 
-static int stts751_attr_set(const struct device *dev,
-			    enum sensor_channel chan,
+static int stts751_attr_set(const struct device *dev, enum sensor_channel chan,
 			    enum sensor_attribute attr,
 			    const struct sensor_value *val)
 {
@@ -170,7 +161,7 @@ static int stts751_init_chip(const struct device *dev)
 
 static int stts751_init(const struct device *dev)
 {
-	const struct stts751_config * const config = dev->config;
+	const struct stts751_config *const config = dev->config;
 	struct stts751_data *data = dev->data;
 
 	data->dev = dev;
@@ -203,9 +194,9 @@ static struct stts751_data stts751_data;
 static const struct stts751_config stts751_config = {
 	.master_dev_name = DT_INST_BUS_LABEL(0),
 #ifdef CONFIG_STTS751_TRIGGER
-	.event_port	= DT_INST_GPIO_LABEL(0, drdy_gpios),
-	.event_pin	= DT_INST_GPIO_PIN(0, drdy_gpios),
-	.int_flags	= DT_INST_GPIO_FLAGS(0, drdy_gpios),
+	.event_port = DT_INST_GPIO_LABEL(0, drdy_gpios),
+	.event_pin = DT_INST_GPIO_PIN(0, drdy_gpios),
+	.int_flags = DT_INST_GPIO_FLAGS(0, drdy_gpios),
 #endif
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	.bus_init = stts751_i2c_init,
@@ -215,6 +206,6 @@ static const struct stts751_config stts751_config = {
 #endif
 };
 
-DEVICE_AND_API_INIT(stts751, DT_INST_LABEL(0), stts751_init,
-		    &stts751_data, &stts751_config, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &stts751_api_funcs);
+DEVICE_AND_API_INIT(stts751, DT_INST_LABEL(0), stts751_init, &stts751_data,
+		    &stts751_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &stts751_api_funcs);

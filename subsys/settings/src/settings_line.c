@@ -30,7 +30,7 @@ int settings_line_write(const char *name, const char *value, size_t val_len,
 
 	bool done;
 	char w_buf[16]; /* write buff, must be aligned either to minimal */
-			/* base64 encoding size and write-block-size */
+	/* base64 encoding size and write-block-size */
 	int rc;
 	uint8_t wbs = settings_io_cb.rwbs;
 #ifdef CONFIG_SETTINGS_ENCODE_LEN
@@ -43,7 +43,6 @@ int settings_line_write(const char *name, const char *value, size_t val_len,
 	len_field = settings_line_len_calc(name, val_len);
 	memcpy(w_buf, &len_field, sizeof(len_field));
 	w_size = 0;
-
 
 	add = sizeof(len_field) % wbs;
 	if (add) {
@@ -97,8 +96,7 @@ int settings_line_write(const char *name, const char *value, size_t val_len,
 				add = (w_size) % wbs;
 				if (add) {
 					add = wbs - add;
-					memset(&w_buf[w_size], '\0',
-					       add);
+					memset(&w_buf[w_size], '\0', add);
 					w_size += add;
 				}
 				done = true;
@@ -133,7 +131,7 @@ int settings_next_line_ctx(struct line_entry_ctx *entry_ctx)
 	entry_ctx->len = 0; /* ask read handler to ignore len */
 
 	rc = settings_line_raw_read(0, (char *)&readout, sizeof(readout),
-			   &len_read, entry_ctx);
+				    &len_read, entry_ctx);
 	if (rc == 0) {
 		if (len_read != sizeof(readout)) {
 			if (len_read != 0) {
@@ -161,7 +159,6 @@ int settings_line_len_calc(const char *name, size_t val_len)
 	return len;
 }
 
-
 /**
  * Read RAW settings line entry data until a char from the storage.
  *
@@ -178,8 +175,8 @@ int settings_line_len_calc(const char *name, size_t val_len)
  * -ERCODE on storage errors
  */
 static int settings_line_raw_read_until(off_t seek, char *out, size_t len_req,
-				 size_t *len_read, char const *until_char,
-				 void *cb_arg)
+					size_t *len_read,
+					char const *until_char, void *cb_arg)
 {
 	size_t rem_size, len;
 	char temp_buf[16]; /* buffer for fit read-block-size requirements */
@@ -242,8 +239,8 @@ static int settings_line_raw_read_until(off_t seek, char *out, size_t len_req,
 int settings_line_raw_read(off_t seek, char *out, size_t len_req,
 			   size_t *len_read, void *cb_arg)
 {
-	return settings_line_raw_read_until(seek, out, len_req, len_read,
-					    NULL, cb_arg);
+	return settings_line_raw_read_until(seek, out, len_req, len_read, NULL,
+					    cb_arg);
 }
 
 /* off from value begin */
@@ -279,7 +276,6 @@ int settings_line_name_read(char *out, size_t len_req, size_t *len_read,
 					    &until_char, cb_arg);
 }
 
-
 int settings_line_entry_copy(void *dst_ctx, off_t dst_off, void *src_ctx,
 			     off_t src_off, size_t len)
 {
@@ -310,17 +306,15 @@ int settings_line_entry_copy(void *dst_ctx, off_t dst_off, void *src_ctx,
 
 void settings_line_io_init(int (*read_cb)(void *ctx, off_t off, char *buf,
 					  size_t *len),
-			  int (*write_cb)(void *ctx, off_t off, char const *buf,
-					  size_t len),
-			  size_t (*get_len_cb)(void *ctx),
-			  uint8_t io_rwbs)
+			   int (*write_cb)(void *ctx, off_t off,
+					   char const *buf, size_t len),
+			   size_t (*get_len_cb)(void *ctx), uint8_t io_rwbs)
 {
 	settings_io_cb.read_cb = read_cb;
 	settings_io_cb.write_cb = write_cb;
 	settings_io_cb.get_len_cb = get_len_cb;
 	settings_io_cb.rwbs = io_rwbs;
 }
-
 
 /* val_off - offset of value-string within line entries */
 static int settings_line_cmp(char const *val, size_t val_len,
@@ -361,7 +355,7 @@ static int settings_line_cmp(char const *val, size_t val_len,
 }
 
 int settings_line_dup_check_cb(const char *name, void *val_read_cb_ctx,
-				off_t off, void *cb_arg)
+			       off_t off, void *cb_arg)
 {
 	struct settings_line_dup_check_arg *cdca;
 	size_t len_read;
@@ -393,8 +387,7 @@ static ssize_t settings_line_read_cb(void *cb_arg, void *data, size_t len)
 	size_t len_read;
 	int rc;
 
-	rc = settings_line_val_read(value_context->off, 0, data, len,
-				    &len_read,
+	rc = settings_line_val_read(value_context->off, 0, data, len, &len_read,
 				    value_context->read_cb_ctx);
 
 	if (rc == 0) {

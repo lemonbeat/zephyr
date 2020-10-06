@@ -71,8 +71,7 @@ static bool check_dns_query(uint8_t *buf, int buf_len)
 	queries = ret;
 	queries_received++;
 
-	NET_DBG("Received %d %s", queries,
-		queries > 1 ? "queries" : "query");
+	NET_DBG("Received %d %s", queries, queries > 1 ? "queries" : "query");
 
 	(void)memset(result->data, 0, net_buf_tailroom(result));
 	result->len = 0U;
@@ -90,8 +89,7 @@ static bool check_dns_query(uint8_t *buf, int buf_len)
 	/* In this test we are just checking if the query came to us in correct
 	 * form, we are not creating a DNS server implementation here.
 	 */
-	if (strncmp(result->data + 1, QUERY_HOST,
-		    sizeof(QUERY_HOST) - 1)) {
+	if (strncmp(result->data + 1, QUERY_HOST, sizeof(QUERY_HOST) - 1)) {
 		net_buf_unref(result);
 		return false;
 	}
@@ -139,9 +137,9 @@ static int process_dns(void)
 					addr = (struct sockaddr *)&addr_v6;
 				}
 
-				ret = recvfrom(pollfds[idx].fd,
-					       recv_buf, sizeof(recv_buf), 0,
-					       addr, &addr_len);
+				ret = recvfrom(pollfds[idx].fd, recv_buf,
+					       sizeof(recv_buf), 0, addr,
+					       &addr_len);
 				if (ret < 0) {
 					/* Socket error */
 					NET_ERR("DNS: Connection error (%d)",
@@ -163,8 +161,7 @@ static int process_dns(void)
 	return -errno;
 }
 
-K_THREAD_DEFINE(dns_server_thread_id, STACK_SIZE,
-		process_dns, NULL, NULL, NULL,
+K_THREAD_DEFINE(dns_server_thread_id, STACK_SIZE, process_dns, NULL, NULL, NULL,
 		THREAD_PRIORITY, 0, -1);
 
 void test_getaddrinfo_setup(void)
@@ -174,8 +171,7 @@ void test_getaddrinfo_setup(void)
 	int ret;
 
 	ret = net_ipaddr_parse(CONFIG_DNS_SERVER1,
-			       sizeof(CONFIG_DNS_SERVER1) - 1,
-			       &addr);
+			       sizeof(CONFIG_DNS_SERVER1) - 1, &addr);
 	zassert_true(ret, "Cannot parse IP address %s", CONFIG_DNS_SERVER1);
 
 	if (addr.sa_family == AF_INET) {
@@ -185,8 +181,7 @@ void test_getaddrinfo_setup(void)
 	}
 
 	ret = net_ipaddr_parse(CONFIG_DNS_SERVER2,
-			       sizeof(CONFIG_DNS_SERVER2) - 1,
-			       &addr);
+			       sizeof(CONFIG_DNS_SERVER2) - 1, &addr);
 	zassert_true(ret, "Cannot parse IP address %s", CONFIG_DNS_SERVER2);
 
 	if (addr.sa_family == AF_INET) {

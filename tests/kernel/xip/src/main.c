@@ -23,10 +23,10 @@
 #include <ztest.h>
 
 /* This test relies on these values being one larger than the one before */
-#define TEST_VAL_1  0x1
-#define TEST_VAL_2  0x2
-#define TEST_VAL_3  0x3
-#define TEST_VAL_4  0x4
+#define TEST_VAL_1 0x1
+#define TEST_VAL_2 0x2
+#define TEST_VAL_3 0x3
+#define TEST_VAL_4 0x4
 
 #define XIP_TEST_ARRAY_SZ 4
 
@@ -36,8 +36,8 @@ extern uint32_t xip_array[XIP_TEST_ARRAY_SZ];
  * This array is deliberately defined outside of the scope of the main test
  * module to avoid optimization issues.
  */
-uint32_t xip_array[XIP_TEST_ARRAY_SZ] = {
-	TEST_VAL_1, TEST_VAL_2, TEST_VAL_3, TEST_VAL_4};
+uint32_t xip_array[XIP_TEST_ARRAY_SZ] = { TEST_VAL_1, TEST_VAL_2, TEST_VAL_3,
+					  TEST_VAL_4 };
 
 /**
  * @brief Test XIP
@@ -46,20 +46,19 @@ uint32_t xip_array[XIP_TEST_ARRAY_SZ] = {
  */
 void test_globals(void)
 {
-	int  i;
+	int i;
 
 	/* Array should be filled with monotomically incrementing values */
 	for (i = 0; i < XIP_TEST_ARRAY_SZ; i++) {
-
 		/**TESTPOINT: Check if the array value is correct*/
-		zassert_equal(xip_array[i], (i+1), "Array value is incorrect");
+		zassert_equal(xip_array[i], (i + 1),
+			      "Array value is incorrect");
 	}
 }
 
 /**test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(xip,
-		ztest_unit_test(test_globals));
+	ztest_test_suite(xip, ztest_unit_test(test_globals));
 	ztest_run_test_suite(xip);
 }

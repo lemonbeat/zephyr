@@ -14,10 +14,10 @@
 static struct {
 	memq_link_t *head;
 	memq_link_t *tail;
-	uint8_t        enable_req;
-	uint8_t        enable_ack;
-	uint8_t        disable_req;
-	uint8_t        disable_ack;
+	uint8_t enable_req;
+	uint8_t enable_ack;
+	uint8_t disable_req;
+	uint8_t disable_ack;
 } mft[MAYFLY_CALLEE_COUNT][MAYFLY_CALLER_COUNT];
 
 static memq_link_t mfl[MAYFLY_CALLEE_COUNT][MAYFLY_CALLER_COUNT];
@@ -147,8 +147,7 @@ static void dequeue(uint8_t callee_id, uint8_t caller_id, memq_link_t *link,
 
 		/* dequeue mayfly struct */
 		memq_dequeue(mft[callee_id][caller_id].tail,
-			     &mft[callee_id][caller_id].head,
-			     0);
+			     &mft[callee_id][caller_id].head, 0);
 
 		/* release link into dequeued mayfly struct */
 		m->_link = link;
@@ -188,8 +187,7 @@ void mayfly_run(uint8_t callee_id)
 
 		/* fetch mayfly in callee queue, if any */
 		link = memq_peek(mft[callee_id][caller_id].head,
-				 mft[callee_id][caller_id].tail,
-				 (void **)&m);
+				 mft[callee_id][caller_id].tail, (void **)&m);
 		while (link) {
 			uint8_t state;
 
@@ -288,7 +286,7 @@ void mayfly_ut_test(void *param)
 {
 	static uint32_t *count;
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, mayfly_ut_mfy};
+	static struct mayfly mfy = { 0, 0, &link, NULL, mayfly_ut_mfy };
 	uint32_t err;
 
 	printk("%s: req= %u, ack= %u\n", __func__, mfy._req, mfy._ack);
@@ -311,7 +309,7 @@ void mayfly_ut_test(void *param)
 uint32_t mayfly_ut_run_test(void)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, mayfly_ut_test};
+	static struct mayfly mfy = { 0, 0, &link, NULL, mayfly_ut_test };
 	uint32_t err;
 
 	printk("%s: req= %u, ack= %u\n", __func__, mfy._req, mfy._ack);
@@ -333,7 +331,7 @@ uint32_t mayfly_ut(void)
 {
 	static uint32_t count;
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, &count, mayfly_ut_test};
+	static struct mayfly mfy = { 0, 0, &link, &count, mayfly_ut_test };
 	uint32_t err;
 
 	printk("%s: req= %u, ack= %u\n", __func__, mfy._req, mfy._ack);

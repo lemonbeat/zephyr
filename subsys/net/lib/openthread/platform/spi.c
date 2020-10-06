@@ -31,13 +31,11 @@ void otPlatSpiSlaveDisable(void)
 	/* Intentionally empty */
 }
 
-otError otPlatSpiSlavePrepareTransaction(
-	uint8_t *anOutputBuf,
-	uint16_t anOutputBufLen,
-	uint8_t *anInputBuf,
-	uint16_t anInputBufLen,
-	bool aRequestTransactionFlag
-)
+otError otPlatSpiSlavePrepareTransaction(uint8_t *anOutputBuf,
+					 uint16_t anOutputBufLen,
+					 uint8_t *anInputBuf,
+					 uint16_t anInputBufLen,
+					 bool aRequestTransactionFlag)
 {
 	ARG_UNUSED(anOutputBuf);
 	ARG_UNUSED(anOutputBufLen);

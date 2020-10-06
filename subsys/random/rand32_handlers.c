@@ -7,7 +7,6 @@
 #include <random/rand32.h>
 #include <syscall_handler.h>
 
-
 static inline uint32_t z_vrfy_sys_rand32_get(void)
 {
 	return z_impl_sys_rand32_get();

@@ -200,7 +200,8 @@ static int cmd_fill(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(eeprom_cmds,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	eeprom_cmds,
 	SHELL_CMD_ARG(read, NULL, "<device> <offset> <length>", cmd_read, 4, 0),
 	SHELL_CMD_ARG(write, NULL,
 		      "<device> <offset> [byte0] <byte1> .. <byteN>", cmd_write,
@@ -208,7 +209,6 @@ SHELL_STATIC_SUBCMD_SET_CREATE(eeprom_cmds,
 	SHELL_CMD_ARG(size, NULL, "<device>", cmd_size, 2, 0),
 	SHELL_CMD_ARG(fill, NULL, "<device> <offset> <length> <pattern>",
 		      cmd_fill, 5, 0),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(eeprom, &eeprom_cmds, "EEPROM shell commands", NULL);

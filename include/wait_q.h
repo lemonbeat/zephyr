@@ -26,11 +26,8 @@ extern "C" {
 
 static inline void z_waitq_init(_wait_q_t *w)
 {
-	w->waitq = (struct _priq_rb) {
-		.tree = {
-			.lessthan_fn = z_priq_rb_lessthan
-		}
-	};
+	w->waitq = (struct _priq_rb){ .tree = { .lessthan_fn =
+							z_priq_rb_lessthan } };
 }
 
 static inline struct k_thread *z_waitq_head(_wait_q_t *w)
@@ -40,7 +37,7 @@ static inline struct k_thread *z_waitq_head(_wait_q_t *w)
 
 #else /* !CONFIG_WAITQ_SCALABLE: */
 
-#define _WAIT_Q_FOR_EACH(wq, thread_ptr) \
+#define _WAIT_Q_FOR_EACH(wq, thread_ptr)                         \
 	SYS_DLIST_FOR_EACH_CONTAINER(&((wq)->waitq), thread_ptr, \
 				     base.qnode_dlist)
 

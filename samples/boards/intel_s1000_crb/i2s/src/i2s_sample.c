@@ -15,57 +15,58 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(i2s_sample);
 
-#define AUDIO_SAMPLE_FREQ		(48000)
-#define AUDIO_SAMPLES_PER_CH_PER_FRAME	(64)
-#define AUDIO_NUM_CHANNELS		(2)
-#define AUDIO_SAMPLES_PER_FRAME		\
+#define AUDIO_SAMPLE_FREQ (48000)
+#define AUDIO_SAMPLES_PER_CH_PER_FRAME (64)
+#define AUDIO_NUM_CHANNELS (2)
+#define AUDIO_SAMPLES_PER_FRAME \
 	(AUDIO_SAMPLES_PER_CH_PER_FRAME * AUDIO_NUM_CHANNELS)
-#define AUDIO_SAMPLE_BYTES		(4)
-#define AUDIO_SAMPLE_BIT_WIDTH		(32)
+#define AUDIO_SAMPLE_BYTES (4)
+#define AUDIO_SAMPLE_BIT_WIDTH (32)
 
-#define AUDIO_FRAME_BUF_BYTES		\
-	(AUDIO_SAMPLES_PER_FRAME * AUDIO_SAMPLE_BYTES)
+#define AUDIO_FRAME_BUF_BYTES (AUDIO_SAMPLES_PER_FRAME * AUDIO_SAMPLE_BYTES)
 
-#define I2S_PLAYBACK_DEV		"I2S_1"
-#define I2S_HOST_DEV			"I2S_2"
+#define I2S_PLAYBACK_DEV "I2S_1"
+#define I2S_HOST_DEV "I2S_2"
 
-#define I2S_PLAY_BUF_COUNT		(6)
-#define I2S_TX_PRELOAD_BUF_COUNT	(2)
+#define I2S_PLAY_BUF_COUNT (6)
+#define I2S_TX_PRELOAD_BUF_COUNT (2)
 
-#define BASE_TONE_FREQ_HZ		1046.502 /* Hz */
-#define FLOAT_VALUE_OF_2PI		(2 * 3.1415926535897932384626433832795)
-#define BASE_TONE_FREQ_RAD		(BASE_TONE_FREQ_HZ * FLOAT_VALUE_OF_2PI)
-#define BASE_TONE_PHASE_DELTA		(BASE_TONE_FREQ_RAD / AUDIO_SAMPLE_FREQ)
+#define BASE_TONE_FREQ_HZ 1046.502 /* Hz */
+#define FLOAT_VALUE_OF_2PI (2 * 3.1415926535897932384626433832795)
+#define BASE_TONE_FREQ_RAD (BASE_TONE_FREQ_HZ * FLOAT_VALUE_OF_2PI)
+#define BASE_TONE_PHASE_DELTA (BASE_TONE_FREQ_RAD / AUDIO_SAMPLE_FREQ)
 
-#define SECONDS_PER_TONE		(1) /* second(s) */
-#define TONES_TO_PLAY			\
-	{0, 2, 4, 5, 7, 9, 10, 12, 12, 10, 9, 7, 5, 4, 2, 0}
+#define SECONDS_PER_TONE (1) /* second(s) */
+#define TONES_TO_PLAY                                              \
+	{                                                          \
+		0, 2, 4, 5, 7, 9, 10, 12, 12, 10, 9, 7, 5, 4, 2, 0 \
+	}
 
-#define AUDIO_FRAMES_PER_SECOND		\
+#define AUDIO_FRAMES_PER_SECOND \
 	(AUDIO_SAMPLE_FREQ / AUDIO_SAMPLES_PER_CH_PER_FRAME)
-#define AUDIO_FRAMES_PER_TONE_DURATION	\
+#define AUDIO_FRAMES_PER_TONE_DURATION \
 	(SECONDS_PER_TONE * AUDIO_FRAMES_PER_SECOND)
 
-#define SIGNAL_AMPLITUDE_DBFS		(-36)
-#define SIGNAL_AMPLITUDE_BITS		(31 + (SIGNAL_AMPLITUDE_DBFS / 6))
-#define SIGNAL_AMPLITUDE_SCALE		(1 << SIGNAL_AMPLITUDE_BITS)
+#define SIGNAL_AMPLITUDE_DBFS (-36)
+#define SIGNAL_AMPLITUDE_BITS (31 + (SIGNAL_AMPLITUDE_DBFS / 6))
+#define SIGNAL_AMPLITUDE_SCALE (1 << SIGNAL_AMPLITUDE_BITS)
 
 #ifdef AUDIO_PLAY_FROM_HOST
-#define APP_MODE_STRING			"host playback"
+#define APP_MODE_STRING "host playback"
 #else
-#define APP_MODE_STRING			"tone playback"
+#define APP_MODE_STRING "tone playback"
 #endif
 
 static struct k_mem_slab i2s_mem_slab;
-__attribute__((section(".dma_buffers")))
-static char audio_buffers[AUDIO_FRAME_BUF_BYTES][I2S_PLAY_BUF_COUNT];
+__attribute__((section(".dma_buffers"))) static char
+	audio_buffers[AUDIO_FRAME_BUF_BYTES][I2S_PLAY_BUF_COUNT];
 static const struct device *spk_i2s_dev;
 static const struct device *host_i2s_dev;
 static const struct device *codec_device;
 
 #ifndef AUDIO_PLAY_FROM_HOST
 static inline int audio_playback_buffer_fill(float phase_delta, int32_t *buffer,
-		int channels, int samples)
+					     int channels, int samples)
 {
 	int channel;
 	int32_t sample;
@@ -97,8 +98,9 @@ static float audio_playback_tone_get_next(void)
 	char tones[] = TONES_TO_PLAY;
 
 	if (frame == 0) {
-		LOG_INF("Tone %u Hz", (unsigned int)(BASE_TONE_FREQ_HZ *
-					powf(2.0, (float)tones[index]/12.0)));
+		LOG_INF("Tone %u Hz",
+			(unsigned int)(BASE_TONE_FREQ_HZ *
+				       powf(2.0, (float)tones[index] / 12.0)));
 	}
 
 	if (++frame == AUDIO_FRAMES_PER_TONE_DURATION) {
@@ -113,7 +115,7 @@ static float audio_playback_tone_get_next(void)
 		return 0.0f;
 	}
 
-	return (BASE_TONE_PHASE_DELTA * powf(2.0, (float)tones[index]/12.0));
+	return (BASE_TONE_PHASE_DELTA * powf(2.0, (float)tones[index] / 12.0));
 }
 #endif
 
@@ -142,7 +144,8 @@ static void i2s_audio_init(void)
 
 	codec_device = device_get_binding(DT_LABEL(DT_INST(0, ti_tlv320dac)));
 	if (!codec_device) {
-		LOG_ERR("unable to find " DT_LABEL(DT_INST(0, ti_tlv320dac)) " device");
+		LOG_ERR("unable to find " DT_LABEL(
+			DT_INST(0, ti_tlv320dac)) " device");
 		return;
 	}
 
@@ -150,8 +153,7 @@ static void i2s_audio_init(void)
 	i2s_cfg.word_size = AUDIO_SAMPLE_BIT_WIDTH;
 	i2s_cfg.channels = AUDIO_NUM_CHANNELS;
 	i2s_cfg.format = I2S_FMT_DATA_FORMAT_I2S | I2S_FMT_CLK_NF_NB;
-	i2s_cfg.options = I2S_OPT_FRAME_CLK_MASTER |
-		I2S_OPT_BIT_CLK_MASTER;
+	i2s_cfg.options = I2S_OPT_FRAME_CLK_MASTER | I2S_OPT_BIT_CLK_MASTER;
 	i2s_cfg.frame_clk_freq = AUDIO_SAMPLE_FREQ;
 	i2s_cfg.block_size = AUDIO_FRAME_BUF_BYTES;
 	i2s_cfg.mem_slab = &i2s_mem_slab;
@@ -176,7 +178,7 @@ static void i2s_audio_init(void)
 	codec_cfg.dai_type = AUDIO_DAI_TYPE_I2S,
 	codec_cfg.dai_cfg.i2s = i2s_cfg;
 	codec_cfg.dai_cfg.i2s.options = I2S_OPT_FRAME_CLK_SLAVE |
-				I2S_OPT_BIT_CLK_SLAVE;
+					I2S_OPT_BIT_CLK_SLAVE;
 	codec_cfg.dai_cfg.i2s.mem_slab = NULL;
 	codec_cfg.mclk_freq = soc_get_ref_clk_freq();
 
@@ -222,8 +224,7 @@ static void i2s_prepare_audio(const struct device *dev)
 			return;
 		}
 
-		LOG_DBG("allocated buffer %p frame %d",
-				buffer, frame_counter);
+		LOG_DBG("allocated buffer %p frame %d", buffer, frame_counter);
 
 		/* fill the buffer with zeros (silence) */
 		memset(buffer, 0, AUDIO_FRAME_BUF_BYTES);
@@ -271,9 +272,9 @@ static void i2s_play_audio(void)
 
 #ifndef AUDIO_PLAY_FROM_HOST
 		/* fill buffer with audio samples */
-		if (audio_playback_buffer_fill(audio_playback_tone_get_next(),
-					(int32_t *)in_buf, AUDIO_NUM_CHANNELS,
-					size) < size) {
+		if (audio_playback_buffer_fill(
+			    audio_playback_tone_get_next(), (int32_t *)in_buf,
+			    AUDIO_NUM_CHANNELS, size) < size) {
 			/* break if all tones are exhausted */
 			k_mem_slab_free(&i2s_mem_slab, &in_buf);
 			break;
@@ -326,5 +327,5 @@ static void i2s_audio_sample_app(void *p1, void *p2, void *p3)
 #endif
 }
 
-K_THREAD_DEFINE(i2s_sample, 1024, i2s_audio_sample_app, NULL, NULL, NULL,
-		10, 0, 0);
+K_THREAD_DEFINE(i2s_sample, 1024, i2s_audio_sample_app, NULL, NULL, NULL, 10, 0,
+		0);

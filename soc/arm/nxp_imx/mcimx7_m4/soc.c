@@ -24,8 +24,8 @@ void SOC_ClockInit(void)
 	CCM_ControlGate(CCM, ccmCcgrGateWdog3, ccmClockNeededRun);
 
 	RDC_SetPdapAccess(RDC, rdcPdapWdog3,
-			RDC_DOMAIN_PERM(M4_DOMAIN_ID, RDC_DOMAIN_PERM_RW),
-			false, false);
+			  RDC_DOMAIN_PERM(M4_DOMAIN_ID, RDC_DOMAIN_PERM_RW),
+			  false, false);
 
 	WDOG_DisablePowerdown(WDOG3);
 
@@ -55,13 +55,11 @@ void SOC_RdcInit(void)
 #ifdef CONFIG_GPIO_IMX
 static void nxp_mcimx7_gpio_config(void)
 {
-
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(gpio1), okay)
 	RDC_SetPdapAccess(RDC, rdcPdapGpio1, RDC_DT_VAL(gpio1), false, false);
 	/* Enable gpio clock gate */
 	CCM_ControlGate(CCM, ccmCcgrGateGpio1, ccmClockNeededRunWait);
 #endif
-
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(gpio2), okay)
 	RDC_SetPdapAccess(RDC, rdcPdapGpio2, RDC_DT_VAL(gpio2), false, false);
@@ -69,20 +67,17 @@ static void nxp_mcimx7_gpio_config(void)
 	CCM_ControlGate(CCM, ccmCcgrGateGpio2, ccmClockNeededRunWait);
 #endif
 
-
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(gpio7), okay)
 	RDC_SetPdapAccess(RDC, rdcPdapGpio7, RDC_DT_VAL(gpio7), false, false);
 	/* Enable gpio clock gate */
 	CCM_ControlGate(CCM, ccmCcgrGateGpio7, ccmClockNeededRunWait);
 #endif
-
 }
 #endif /* CONFIG_GPIO_IMX */
 
 #ifdef CONFIG_UART_IMX
 static void nxp_mcimx7_uart_config(void)
 {
-
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart2), okay)
 	/* We need to grasp board uart exclusively */
 	RDC_SetPdapAccess(RDC, rdcPdapUart2, RDC_DT_VAL(uart2), false, false);
@@ -115,11 +110,9 @@ static void nxp_mcimx7_uart_config(void)
 }
 #endif /* CONFIG_UART_IMX */
 
-
 #ifdef CONFIG_I2C_IMX
 static void nxp_mcimx7_i2c_config(void)
 {
-
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(i2c1), okay)
 	/* In this example, we need to grasp board I2C exclusively */
 	RDC_SetPdapAccess(RDC, rdcPdapI2c1, RDC_DT_VAL(i2c1), false, false);
@@ -159,14 +152,12 @@ static void nxp_mcimx7_i2c_config(void)
 	CCM_EnableRoot(CCM, ccmRootI2c4);
 	CCM_ControlGate(CCM, ccmCcgrGateI2c4, ccmClockNeededRunWait);
 #endif
-
 }
 #endif /* CONFIG_I2C_IMX */
 
 #ifdef CONFIG_PWM_IMX
 static void nxp_mcimx7_pwm_config(void)
 {
-
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pwm1), okay)
 	/* We need to grasp board pwm exclusively */
 	RDC_SetPdapAccess(RDC, rdcPdapPwm1, RDC_DT_VAL(pwm1), false, false);
@@ -206,7 +197,6 @@ static void nxp_mcimx7_pwm_config(void)
 	CCM_EnableRoot(CCM, ccmRootPwm4);
 	CCM_ControlGate(CCM, ccmCcgrGatePwm4, ccmClockNeededAll);
 #endif
-
 }
 #endif /* CONFIG_PWM_IMX */
 

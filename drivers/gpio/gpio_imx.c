@@ -38,9 +38,8 @@ static int imx_gpio_configure(const struct device *port, gpio_pin_t pin,
 		return -ENOTSUP;
 	}
 
-	if ((flags & (GPIO_SINGLE_ENDED
-		      | GPIO_PULL_UP
-		      | GPIO_PULL_DOWN)) != 0U) {
+	if ((flags & (GPIO_SINGLE_ENDED | GPIO_PULL_UP | GPIO_PULL_DOWN)) !=
+	    0U) {
 		return -ENOTSUP;
 	}
 
@@ -83,8 +82,8 @@ static int imx_gpio_port_set_masked_raw(const struct device *port,
 	const struct imx_gpio_config *config = port->config;
 	GPIO_Type *base = config->base;
 
-	GPIO_WritePortOutput(base,
-			(GPIO_ReadPortInput(base) & ~mask) | (value & mask));
+	GPIO_WritePortOutput(base, (GPIO_ReadPortInput(base) & ~mask) |
+					   (value & mask));
 
 	return 0;
 }
@@ -134,8 +133,8 @@ static int imx_gpio_pin_interrupt_configure(const struct device *port,
 	uint32_t icr_val;
 	uint8_t shift;
 
-	if (((base->GDIR & BIT(pin)) != 0U)
-	    && (mode != GPIO_INT_MODE_DISABLED)) {
+	if (((base->GDIR & BIT(pin)) != 0U) &&
+	    (mode != GPIO_INT_MODE_DISABLED)) {
 		/* Interrupt on output pin not supported */
 		return -ENOTSUP;
 	}
@@ -207,44 +206,40 @@ static const struct gpio_driver_api imx_gpio_driver_api = {
 	.manage_callback = imx_gpio_manage_callback,
 };
 
-#define GPIO_IMX_INIT(n)						\
-	static int imx_gpio_##n##_init(const struct device *port);	\
-									\
+#define GPIO_IMX_INIT(n)                                                     \
+	static int imx_gpio_##n##_init(const struct device *port);           \
+                                                                             \
 	static const struct imx_gpio_config imx_gpio_##n##_config = {	\
 		.common = {						\
 			.port_pin_mask =				\
 				GPIO_PORT_PIN_MASK_FROM_DT_INST(n),	\
 		},							\
 		.base = (GPIO_Type *)DT_INST_REG_ADDR(n),		\
-	};								\
-									\
-	static struct imx_gpio_data imx_gpio_##n##_data;		\
-									\
-	DEVICE_AND_API_INIT(imx_gpio_##n, DT_INST_LABEL(n),		\
-			    imx_gpio_##n##_init,			\
-			    &imx_gpio_##n##_data,			\
-			    &imx_gpio_##n##_config,			\
-			    POST_KERNEL,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	\
-			    &imx_gpio_driver_api);			\
-									\
-	static int imx_gpio_##n##_init(const struct device *port)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, 0, irq),		\
-			    DT_INST_IRQ_BY_IDX(n, 0, priority),		\
-			    imx_gpio_port_isr,				\
-			    DEVICE_GET(imx_gpio_##n), 0);		\
-									\
-		irq_enable(DT_INST_IRQ_BY_IDX(n, 0, irq));		\
-									\
-		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, 1, irq),		\
-			    DT_INST_IRQ_BY_IDX(n, 1, priority),		\
-			    imx_gpio_port_isr,				\
-			    DEVICE_GET(imx_gpio_##n), 0);		\
-									\
-		irq_enable(DT_INST_IRQ_BY_IDX(n, 1, irq));		\
-									\
-		return 0;						\
+	};      \
+                                                                             \
+	static struct imx_gpio_data imx_gpio_##n##_data;                     \
+                                                                             \
+	DEVICE_AND_API_INIT(imx_gpio_##n, DT_INST_LABEL(n),                  \
+			    imx_gpio_##n##_init, &imx_gpio_##n##_data,       \
+			    &imx_gpio_##n##_config, POST_KERNEL,             \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,             \
+			    &imx_gpio_driver_api);                           \
+                                                                             \
+	static int imx_gpio_##n##_init(const struct device *port)            \
+	{                                                                    \
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, 0, irq),                   \
+			    DT_INST_IRQ_BY_IDX(n, 0, priority),              \
+			    imx_gpio_port_isr, DEVICE_GET(imx_gpio_##n), 0); \
+                                                                             \
+		irq_enable(DT_INST_IRQ_BY_IDX(n, 0, irq));                   \
+                                                                             \
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, 1, irq),                   \
+			    DT_INST_IRQ_BY_IDX(n, 1, priority),              \
+			    imx_gpio_port_isr, DEVICE_GET(imx_gpio_##n), 0); \
+                                                                             \
+		irq_enable(DT_INST_IRQ_BY_IDX(n, 1, irq));                   \
+                                                                             \
+		return 0;                                                    \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_IMX_INIT)

@@ -38,7 +38,7 @@ static void test_flash_read(void)
 	static const struct device *flash_dev;
 	const char *buf;
 	const int test_base = FLASH_SIMULATOR_BASE_OFFSET;
-	const int test_size = 0x24;  /* 32-alignment required */
+	const int test_size = 0x24; /* 32-alignment required */
 	uint8_t data[test_size];
 	size_t size;
 	int ret;
@@ -78,8 +78,7 @@ void test_main(void)
 	k_usleep(10);
 
 	ztest_test_suite(shell_flash_test_suite,
-			 ztest_unit_test(test_flash_read)
-			);
+			 ztest_unit_test(test_flash_read));
 
 	ztest_run_test_suite(shell_flash_test_suite);
 }

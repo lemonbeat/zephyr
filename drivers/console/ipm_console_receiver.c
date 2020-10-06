@@ -83,8 +83,8 @@ static void ipm_console_thread(void *arg1, void *arg2, void *arg3)
 }
 
 static void ipm_console_receive_callback(const struct device *ipm_dev,
-					 void *user_data,
-					 uint32_t id, volatile void *data)
+					 void *user_data, uint32_t id,
+					 volatile void *data)
 {
 	struct ipm_console_receiver_runtime_data *driver_data = user_data;
 	int ret;
@@ -110,11 +110,9 @@ static void ipm_console_receive_callback(const struct device *ipm_dev,
 	}
 }
 
-
 int ipm_console_receiver_init(const struct device *d)
 {
-	const struct ipm_console_receiver_config_info *config_info =
-		d->config;
+	const struct ipm_console_receiver_config_info *config_info = d->config;
 	struct ipm_console_receiver_runtime_data *driver_data = d->data;
 	const struct device *ipm;
 

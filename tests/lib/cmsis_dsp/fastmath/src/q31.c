@@ -13,8 +13,8 @@
 
 #include "q31.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)100)
-#define ABS_ERROR_THRESH	((q31_t)2200)
+#define SNR_ERROR_THRESH ((float32_t)100)
+#define ABS_ERROR_THRESH ((q31_t)2200)
 
 static void test_arm_cos_q31(void)
 {
@@ -32,13 +32,13 @@ static void test_arm_cos_q31(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output, ref_cos, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output, ref_cos,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output, ref_cos, ABS_ERROR_THRESH),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output, ref_cos,
+					 ABS_ERROR_THRESH),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -60,13 +60,13 @@ static void test_arm_sin_q31(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output, ref_sin, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output, ref_sin,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output, ref_sin, ABS_ERROR_THRESH),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output, ref_sin,
+					 ABS_ERROR_THRESH),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -89,24 +89,24 @@ static void test_arm_sqrt_q31(void)
 
 		/* Validate operation status */
 		if (in_sqrt[index] <= 0) {
-			zassert_equal(status, ARM_MATH_ARGUMENT_ERROR,
+			zassert_equal(
+				status, ARM_MATH_ARGUMENT_ERROR,
 				"square root did fail with an input value "
 				"of '0'");
 		} else {
 			zassert_equal(status, ARM_MATH_SUCCESS,
-				"square root operation did not succeed");
+				      "square root operation did not succeed");
 		}
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q31(length, output, ref_sqrt, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q31(length, output, ref_sqrt,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q31(length, output, ref_sqrt,
-			ABS_ERROR_THRESH),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q31(length, output, ref_sqrt,
+					 ABS_ERROR_THRESH),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -114,11 +114,9 @@ static void test_arm_sqrt_q31(void)
 
 void test_fastmath_q31(void)
 {
-	ztest_test_suite(fastmath_q31,
-		ztest_unit_test(test_arm_cos_q31),
-		ztest_unit_test(test_arm_sin_q31),
-		ztest_unit_test(test_arm_sqrt_q31)
-		);
+	ztest_test_suite(fastmath_q31, ztest_unit_test(test_arm_cos_q31),
+			 ztest_unit_test(test_arm_sin_q31),
+			 ztest_unit_test(test_arm_sqrt_q31));
 
 	ztest_run_test_suite(fastmath_q31);
 }

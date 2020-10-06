@@ -18,8 +18,8 @@ static void SOC_RdcInit(void)
 
 	/* Set access to WDOG3 for M4 core */
 	RDC_SetPdapAccess(RDC, rdcPdapWdog3,
-			RDC_DOMAIN_PERM(M4_DOMAIN_ID, RDC_DOMAIN_PERM_RW),
-			false, false);
+			  RDC_DOMAIN_PERM(M4_DOMAIN_ID, RDC_DOMAIN_PERM_RW),
+			  false, false);
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart1), okay)
 	/* Set access to UART_1 for M4 core */

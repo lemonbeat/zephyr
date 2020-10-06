@@ -21,7 +21,6 @@ static int board_pinmux_init(const struct device *dev)
 	pinmux_pin_set(muxa, 16, PINMUX_FUNC_D);
 	pinmux_pin_set(muxa, 17, PINMUX_FUNC_D);
 
-
 #if ATMEL_SAM0_DT_SERCOM_CHECK(0, atmel_sam0_spi) && defined(CONFIG_SPI_SAM0)
 	/* SPI SERCOM0 on MISO=PA6, MOSI=PA4, SCK=PA5 */
 	pinmux_pin_set(muxa, 6, PINMUX_FUNC_D);

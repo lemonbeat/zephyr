@@ -45,14 +45,14 @@ extern "C" {
  * @param flash_device Flash Device
  */
 struct nvs_fs {
-	off_t offset;		/* filesystem offset in flash */
-	uint32_t ate_wra;		/* next alloc table entry write address */
-	uint32_t data_wra;		/* next data write address */
-	uint16_t sector_size;	/* filesystem is divided into sectors,
+	off_t offset; /* filesystem offset in flash */
+	uint32_t ate_wra; /* next alloc table entry write address */
+	uint32_t data_wra; /* next data write address */
+	uint16_t sector_size; /* filesystem is divided into sectors,
 				 * sector size should be multiple of pagesize
 				 */
-	uint16_t sector_count;	/* amount of sectors in the filesystem */
-	bool ready;		/* is the filesystem initialized ? */
+	uint16_t sector_count; /* amount of sectors in the filesystem */
+	bool ready; /* is the filesystem initialized ? */
 
 	struct k_mutex nvs_lock;
 	const struct device *flash_device;
@@ -154,7 +154,7 @@ ssize_t nvs_read(struct nvs_fs *fs, uint16_t id, void *data, size_t len);
  * and more data is available. On error returns -ERRNO code.
  */
 ssize_t nvs_read_hist(struct nvs_fs *fs, uint16_t id, void *data, size_t len,
-		  uint16_t cnt);
+		      uint16_t cnt);
 
 /**
  * @brief nvs_calc_free_space

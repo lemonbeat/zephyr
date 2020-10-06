@@ -39,16 +39,15 @@ struct gpio_ht16k33_data {
 	sys_slist_t callbacks;
 };
 
-static int gpio_ht16k33_cfg(const struct device *dev,
-			    gpio_pin_t pin,
+static int gpio_ht16k33_cfg(const struct device *dev, gpio_pin_t pin,
 			    gpio_flags_t flags)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(pin);
 
 	/* Keyscan is input-only */
-	if (((flags & (GPIO_INPUT | GPIO_OUTPUT)) == GPIO_DISCONNECTED)
-	    || ((flags & GPIO_OUTPUT) != 0)) {
+	if (((flags & (GPIO_INPUT | GPIO_OUTPUT)) == GPIO_DISCONNECTED) ||
+	    ((flags & GPIO_OUTPUT) != 0)) {
 		return -ENOTSUP;
 	}
 
@@ -121,8 +120,7 @@ static int gpio_ht16k33_pin_interrupt_configure(const struct device *port,
 	return 0;
 }
 
-void ht16k33_process_keyscan_row_data(const struct device *dev,
-				      uint32_t keys)
+void ht16k33_process_keyscan_row_data(const struct device *dev, uint32_t keys)
 {
 	struct gpio_ht16k33_data *data = dev->data;
 
@@ -180,7 +178,7 @@ static const struct gpio_driver_api gpio_ht16k33_api = {
 	.get_pending_int = gpio_ht16k33_get_pending_int,
 };
 
-#define GPIO_HT16K33_DEVICE(id)						\
+#define GPIO_HT16K33_DEVICE(id)                                            \
 	static const struct gpio_ht16k33_cfg gpio_ht16k33_##id##_cfg = {\
 		.common = {						\
 			.port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(13),		\
@@ -189,16 +187,14 @@ static const struct gpio_driver_api gpio_ht16k33_api = {
 			DT_INST_BUS_LABEL(id),	\
 		.keyscan_idx     =					\
 			DT_INST_REG_ADDR(id),	\
-	};								\
-									\
-	static struct gpio_ht16k33_data gpio_ht16k33_##id##_data;	\
-									\
-	DEVICE_AND_API_INIT(gpio_ht16k33_##id,				\
-			    DT_INST_LABEL(id),	\
-			    &gpio_ht16k33_init,				\
-			    &gpio_ht16k33_##id##_data,			\
-			    &gpio_ht16k33_##id##_cfg, POST_KERNEL,	\
-			    CONFIG_GPIO_HT16K33_INIT_PRIORITY,		\
+	};  \
+                                                                           \
+	static struct gpio_ht16k33_data gpio_ht16k33_##id##_data;          \
+                                                                           \
+	DEVICE_AND_API_INIT(gpio_ht16k33_##id, DT_INST_LABEL(id),          \
+			    &gpio_ht16k33_init, &gpio_ht16k33_##id##_data, \
+			    &gpio_ht16k33_##id##_cfg, POST_KERNEL,         \
+			    CONFIG_GPIO_HT16K33_INIT_PRIORITY,             \
 			    &gpio_ht16k33_api);
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_HT16K33_DEVICE)

@@ -60,7 +60,6 @@ static inline uint32_t arch_k_cycle_get_32(void);
 
 /** @} */
 
-
 /**
  * @addtogroup arch-threads
  * @{
@@ -181,7 +180,6 @@ void arch_cpu_atomic_idle(unsigned int key);
 
 /** @} */
 
-
 /**
  * @addtogroup arch-smp
  * @{
@@ -217,7 +215,6 @@ typedef FUNC_NORETURN void (*arch_cpustart_t)(void *data);
 void arch_start_cpu(int cpu_num, k_thread_stack_t *stack, int sz,
 		    arch_cpustart_t fn, void *arg);
 /** @} */
-
 
 /**
  * @addtogroup arch-irq
@@ -356,7 +353,6 @@ void arch_irq_offload(irq_offload_routine_t routine, const void *parameter);
 
 /** @} */
 
-
 /**
  * @defgroup arch-smp Architecture-specific SMP APIs
  * @ingroup arch-interface
@@ -375,7 +371,6 @@ void arch_sched_ipi(void);
 #endif /* CONFIG_SMP */
 
 /** @} */
-
 
 /**
  * @defgroup arch-userspace Architecture-specific userspace APIs
@@ -417,8 +412,7 @@ static inline uintptr_t arch_syscall_invoke0(uintptr_t call_id);
  *	          kernel-side dispatch table
  * @return Return value of the system call. Void system calls return 0 here.
  */
-static inline uintptr_t arch_syscall_invoke1(uintptr_t arg1,
-					     uintptr_t call_id);
+static inline uintptr_t arch_syscall_invoke1(uintptr_t arg1, uintptr_t call_id);
 
 /**
  * Invoke a system call with 2 arguments.
@@ -447,8 +441,7 @@ static inline uintptr_t arch_syscall_invoke2(uintptr_t arg1, uintptr_t arg2,
  * @return Return value of the system call. Void system calls return 0 here.
  */
 static inline uintptr_t arch_syscall_invoke3(uintptr_t arg1, uintptr_t arg2,
-					     uintptr_t arg3,
-					     uintptr_t call_id);
+					     uintptr_t arg3, uintptr_t call_id);
 
 /**
  * Invoke a system call with 4 arguments.
@@ -483,8 +476,7 @@ static inline uintptr_t arch_syscall_invoke4(uintptr_t arg1, uintptr_t arg2,
  */
 static inline uintptr_t arch_syscall_invoke5(uintptr_t arg1, uintptr_t arg2,
 					     uintptr_t arg3, uintptr_t arg4,
-					     uintptr_t arg5,
-					     uintptr_t call_id);
+					     uintptr_t arg5, uintptr_t call_id);
 
 /**
  * Invoke a system call with 6 arguments.
@@ -657,8 +649,8 @@ int arch_buffer_validate(void *addr, size_t size, int write);
  * @param p2 2nd parameter to user thread
  * @param p3 3rd parameter to user thread
  */
-FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry,
-					void *p1, void *p2, void *p3);
+FUNC_NORETURN void arch_user_mode_enter(k_thread_entry_t user_entry, void *p1,
+					void *p2, void *p3);
 
 /**
  * @brief Induce a kernel oops that appears to come from a specific location

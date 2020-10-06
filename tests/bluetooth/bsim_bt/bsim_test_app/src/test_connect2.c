@@ -39,21 +39,21 @@ static struct bt_conn *default_conn;
 #define WAIT_TIME 5 /*seconds*/
 extern enum bst_result_t bst_result;
 
-#define FAIL(...)					\
-	do {						\
-		bst_result = Failed;			\
-		bs_trace_error_time_line(__VA_ARGS__);	\
+#define FAIL(...)                                      \
+	do {                                           \
+		bst_result = Failed;                   \
+		bs_trace_error_time_line(__VA_ARGS__); \
 	} while (0)
 
-#define PASS(...)					\
-	do {						\
-		bst_result = Passed;			\
-		bs_trace_info_time(1, __VA_ARGS__);	\
+#define PASS(...)                                   \
+	do {                                        \
+		bst_result = Passed;                \
+		bs_trace_info_time(1, __VA_ARGS__); \
 	} while (0)
 
 static void test_con2_init(void)
 {
-	bst_ticker_set_next_tick_absolute(WAIT_TIME*1e6);
+	bst_ticker_set_next_tick_absolute(WAIT_TIME * 1e6);
 	bst_result = In_progress;
 }
 
@@ -71,8 +71,7 @@ static void test_con2_tick(bs_time_t HW_device_time)
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
+	BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_CTS_VAL)),
 };
@@ -177,16 +176,14 @@ static void test_con2_main(void)
 }
 
 static const struct bst_test_instance test_connect[] = {
-	{
-		.test_id = "peripheral",
-		.test_descr = "Basic connection test. It expects that a "
-			      "central device can be found. The test will "
-			      "pass if notifications can be sent without "
-			      "crash.",
-		.test_post_init_f = test_con2_init,
-		.test_tick_f = test_con2_tick,
-		.test_main_f = test_con2_main
-	},
+	{ .test_id = "peripheral",
+	  .test_descr = "Basic connection test. It expects that a "
+			"central device can be found. The test will "
+			"pass if notifications can be sent without "
+			"crash.",
+	  .test_post_init_f = test_con2_init,
+	  .test_tick_f = test_con2_tick,
+	  .test_main_f = test_con2_main },
 	BSTEST_END_MARKER
 };
 

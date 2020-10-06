@@ -22,17 +22,12 @@
 typedef void (*dw_extractor)(const struct jesd216_param_header *php,
 			     const struct jesd216_bfp *bfp);
 
-static const char * const mode_tags[] = {
-	[JESD216_MODE_044] = "QSPI XIP",
-	[JESD216_MODE_088] = "OSPI XIP",
-	[JESD216_MODE_111] = "1-1-1",
-	[JESD216_MODE_112] = "1-1-2",
-	[JESD216_MODE_114] = "1-1-4",
-	[JESD216_MODE_118] = "1-1-8",
-	[JESD216_MODE_122] = "1-2-2",
-	[JESD216_MODE_144] = "1-4-4",
-	[JESD216_MODE_188] = "1-8-8",
-	[JESD216_MODE_222] = "2-2-2",
+static const char *const mode_tags[] = {
+	[JESD216_MODE_044] = "QSPI XIP", [JESD216_MODE_088] = "OSPI XIP",
+	[JESD216_MODE_111] = "1-1-1",	 [JESD216_MODE_112] = "1-1-2",
+	[JESD216_MODE_114] = "1-1-4",	 [JESD216_MODE_118] = "1-1-8",
+	[JESD216_MODE_122] = "1-2-2",	 [JESD216_MODE_144] = "1-4-4",
+	[JESD216_MODE_188] = "1-8-8",	 [JESD216_MODE_222] = "2-2-2",
 	[JESD216_MODE_444] = "4-4-4",
 };
 
@@ -51,8 +46,9 @@ static void summarize_dw1(const struct jesd216_param_header *php,
 		[3] = "Reserved",
 	};
 
-	printf("Addressing: %s\n", addr_bytes[(dw1 & JESD216_SFDP_BFP_DW1_ADDRBYTES_MASK)
-					      >> JESD216_SFDP_BFP_DW1_ADDRBYTES_SHFT]);
+	printf("Addressing: %s\n",
+	       addr_bytes[(dw1 & JESD216_SFDP_BFP_DW1_ADDRBYTES_MASK) >>
+			  JESD216_SFDP_BFP_DW1_ADDRBYTES_SHFT]);
 
 	static const char *const bsersz[] = {
 		[0] = "Reserved 00b",
@@ -61,23 +57,24 @@ static void summarize_dw1(const struct jesd216_param_header *php,
 		[JESD216_SFDP_BFP_DW1_BSERSZ_VAL_4KNOTSUP] = "not uniform",
 	};
 
-	printf("4-KiBy erase: %s\n", bsersz[(dw1 & JESD216_SFDP_BFP_DW1_BSERSZ_MASK)
-					    >> JESD216_SFDP_BFP_DW1_BSERSZ_SHFT]);
+	printf("4-KiBy erase: %s\n",
+	       bsersz[(dw1 & JESD216_SFDP_BFP_DW1_BSERSZ_MASK) >>
+		      JESD216_SFDP_BFP_DW1_BSERSZ_SHFT]);
 
 	for (size_t mode = 0; mode < ARRAY_SIZE(mode_tags); ++mode) {
 		const char *tag = mode_tags[mode];
 
 		if (tag) {
 			struct jesd216_instr cmd;
-			int rc = jesd216_bfp_read_support(php, bfp,
-							  (enum jesd216_mode_type)mode,
-							  &cmd);
+			int rc = jesd216_bfp_read_support(
+				php, bfp, (enum jesd216_mode_type)mode, &cmd);
 
 			if (rc == 0) {
 				printf("Support %s\n", tag);
 			} else if (rc > 0) {
 				printf("Support %s: instr %02Xh, %u mode clocks, %u waits\n",
-				       tag, cmd.instr, cmd.mode_clocks, cmd.wait_states);
+				       tag, cmd.instr, cmd.mode_clocks,
+				       cmd.wait_states);
 			}
 		}
 	}
@@ -86,7 +83,8 @@ static void summarize_dw1(const struct jesd216_param_header *php,
 static void summarize_dw2(const struct jesd216_param_header *php,
 			  const struct jesd216_bfp *bfp)
 {
-	printf("Flash density: %u bytes\n", (uint32_t)(jesd216_bfp_density(bfp) / 8));
+	printf("Flash density: %u bytes\n",
+	       (uint32_t)(jesd216_bfp_density(bfp) / 8));
 }
 
 static void summarize_dw89(const struct jesd216_param_header *php,
@@ -98,14 +96,14 @@ static void summarize_dw89(const struct jesd216_param_header *php,
 
 	for (uint8_t idx = 1; idx < JESD216_NUM_ERASE_TYPES; ++idx) {
 		if (jesd216_bfp_erase(bfp, idx, &etype) == 0) {
-			typ_max_mul = jesd216_bfp_erase_type_times(php, bfp,
-								   idx, &typ_ms);
+			typ_max_mul = jesd216_bfp_erase_type_times(
+				php, bfp, idx, &typ_ms);
 
 			printf("ET%u: instr %02Xh for %u By", idx, etype.cmd,
 			       (uint32_t)BIT(etype.exp));
 			if (typ_max_mul > 0) {
-				printf("; typ %u ms, max %u ms",
-				       typ_ms, typ_max_mul * typ_ms);
+				printf("; typ %u ms, max %u ms", typ_ms,
+				       typ_max_mul * typ_ms);
 			}
 			printf("\n");
 		}
@@ -121,16 +119,15 @@ static void summarize_dw11(const struct jesd216_param_header *php,
 		return;
 	}
 
-	printf("Chip erase: typ %u ms, max %u ms\n",
-	       dw11.chip_erase_ms, dw11.typ_max_factor * dw11.chip_erase_ms);
+	printf("Chip erase: typ %u ms, max %u ms\n", dw11.chip_erase_ms,
+	       dw11.typ_max_factor * dw11.chip_erase_ms);
 
 	printf("Byte program: type %u + %u * B us, max %u + %u * B us\n",
 	       dw11.byte_prog_first_us, dw11.byte_prog_addl_us,
 	       dw11.typ_max_factor * dw11.byte_prog_first_us,
 	       dw11.typ_max_factor * dw11.byte_prog_addl_us);
 
-	printf("Page program: typ %u us, max %u us\n",
-	       dw11.page_prog_us,
+	printf("Page program: typ %u us, max %u us\n", dw11.page_prog_us,
 	       dw11.typ_max_factor * dw11.page_prog_us);
 
 	printf("Page size: %u By\n", dw11.page_size);
@@ -152,12 +149,10 @@ static void summarize_dw12(const struct jesd216_param_header *php,
 	uint8_t psusp_instr = dw13 >> 8;
 	uint8_t presm_instr = dw13 >> 0;
 
-	printf("Suspend: %02Xh ; Resume: %02Xh\n",
-	       susp_instr, resm_instr);
-	if ((susp_instr != psusp_instr)
-	    || (resm_instr != presm_instr)) {
-		printf("Program suspend: %02Xh ; Resume: %02Xh\n",
-		       psusp_instr, presm_instr);
+	printf("Suspend: %02Xh ; Resume: %02Xh\n", susp_instr, resm_instr);
+	if ((susp_instr != psusp_instr) || (resm_instr != presm_instr)) {
+		printf("Program suspend: %02Xh ; Resume: %02Xh\n", psusp_instr,
+		       presm_instr);
 	}
 }
 
@@ -170,18 +165,14 @@ static void summarize_dw14(const struct jesd216_param_header *php,
 		return;
 	}
 	printf("DPD: Enter %02Xh, exit %02Xh ; delay %u ns ; poll 0x%02x\n",
-	       dw14.enter_dpd_instr, dw14.exit_dpd_instr,
-	       dw14.exit_delay_ns, dw14.poll_options);
+	       dw14.enter_dpd_instr, dw14.exit_dpd_instr, dw14.exit_delay_ns,
+	       dw14.poll_options);
 }
 
 /* Indexed from 1 to match JESD216 data word numbering */
 static const dw_extractor extractor[] = {
-	[1] = summarize_dw1,
-	[2] = summarize_dw2,
-	[8] = summarize_dw89,
-	[11] = summarize_dw11,
-	[12] = summarize_dw12,
-	[14] = summarize_dw14,
+	[1] = summarize_dw1,   [2] = summarize_dw2,   [8] = summarize_dw89,
+	[11] = summarize_dw11, [12] = summarize_dw12, [14] = summarize_dw14,
 };
 
 static void dump_bfp(const struct jesd216_param_header *php,
@@ -214,8 +205,8 @@ static void dump_bytes(const struct jesd216_param_header *php,
 
 		bool emit_nl = (nw == php->len_dw) || ((nw % 4) == 0);
 
-		sprintf(buffer, "%02x %02x %02x %02x",
-			u8p[0], u8p[1], u8p[2], u8p[3]);
+		sprintf(buffer, "%02x %02x %02x %02x", u8p[0], u8p[1], u8p[2],
+			u8p[3]);
 		if (emit_nl) {
 			printf("%s\n\t", buffer);
 		} else {
@@ -244,7 +235,8 @@ void main(void)
 
 	if (rc != 0) {
 		printf("Read SFDP not supported: device not JESD216-compliant "
-		       "(err %d)\n", rc);
+		       "(err %d)\n",
+		       rc);
 		return;
 	}
 
@@ -255,19 +247,20 @@ void main(void)
 		return;
 	}
 
-	printf("%s: SFDP v %u.%u AP %x with %u PH\n", dev->name,
-		hp->rev_major, hp->rev_minor, hp->access, 1 + hp->nph);
+	printf("%s: SFDP v %u.%u AP %x with %u PH\n", dev->name, hp->rev_major,
+	       hp->rev_minor, hp->access, 1 + hp->nph);
 
 	const struct jesd216_param_header *php = hp->phdr;
-	const struct jesd216_param_header *phpe = php + MIN(decl_nph, 1 + hp->nph);
+	const struct jesd216_param_header *phpe =
+		php + MIN(decl_nph, 1 + hp->nph);
 
 	while (php != phpe) {
 		uint16_t id = jesd216_param_id(php);
 		uint32_t addr = jesd216_param_addr(php);
 
 		printf("PH%u: %04x rev %u.%u: %u DW @ %x\n",
-		       (uint32_t)(php - hp->phdr), id, php->rev_major, php->rev_minor,
-		       php->len_dw, addr);
+		       (uint32_t)(php - hp->phdr), id, php->rev_major,
+		       php->rev_minor, php->len_dw, addr);
 
 		uint32_t dw[php->len_dw];
 
@@ -278,10 +271,12 @@ void main(void)
 		}
 
 		if (id == JESD216_SFDP_PARAM_ID_BFP) {
-			const struct jesd216_bfp *bfp = (struct jesd216_bfp *)dw;
+			const struct jesd216_bfp *bfp =
+				(struct jesd216_bfp *)dw;
 
 			dump_bfp(php, bfp);
-			printf("size = <%u>;\n", (uint32_t)jesd216_bfp_density(bfp));
+			printf("size = <%u>;\n",
+			       (uint32_t)jesd216_bfp_density(bfp));
 			printf("sfdp-bfp =");
 		} else {
 			printf("sfdp-%04x =", id);
@@ -296,8 +291,7 @@ void main(void)
 
 	rc = flash_read_jedec_id(dev, id);
 	if (rc == 0) {
-		printf("jedec-id = [%02x %02x %02x];\n",
-		       id[0], id[1], id[2]);
+		printf("jedec-id = [%02x %02x %02x];\n", id[0], id[1], id[2]);
 	} else {
 		printf("JEDEC ID read failed: %d\n", rc);
 	}

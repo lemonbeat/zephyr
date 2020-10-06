@@ -24,7 +24,6 @@ sys_slist_t settings_handlers;
 
 K_MUTEX_DEFINE(settings_lock);
 
-
 void settings_store_init(void);
 
 void settings_init(void)
@@ -40,7 +39,8 @@ int settings_register(struct settings_handler *handler)
 {
 	int rc = 0;
 
-	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch) {
+	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch)
+	{
 		if (strcmp(handler->name, ch->name) == 0) {
 			return -EEXIST;
 		}
@@ -78,8 +78,8 @@ int settings_name_steq(const char *name, const char *key, const char **next)
 	 * limited to what can be read
 	 */
 
-	while ((*key != '\0') && (*key == *name) &&
-	       (*name != '\0') && (*name != SETTINGS_NAME_END)) {
+	while ((*key != '\0') && (*key == *name) && (*name != '\0') &&
+	       (*name != SETTINGS_NAME_END)) {
 		key++;
 		name++;
 	}
@@ -135,7 +135,7 @@ int settings_name_next(const char *name, const char **next)
 }
 
 struct settings_handler_static *settings_parse_and_lookup(const char *name,
-							const char **next)
+							  const char **next)
 {
 	struct settings_handler_static *bestmatch;
 	const char *tmpnext;
@@ -145,7 +145,8 @@ struct settings_handler_static *settings_parse_and_lookup(const char *name,
 		*next = NULL;
 	}
 
-	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch) {
+	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch)
+	{
 		if (!settings_name_steq(name, ch->name, &tmpnext)) {
 			continue;
 		}
@@ -189,10 +190,8 @@ struct settings_handler_static *settings_parse_and_lookup(const char *name,
 	return bestmatch;
 }
 
-int settings_call_set_handler(const char *name,
-			      size_t len,
-			      settings_read_cb read_cb,
-			      void *read_cb_arg,
+int settings_call_set_handler(const char *name, size_t len,
+			      settings_read_cb read_cb, void *read_cb_arg,
 			      const struct settings_load_arg *load_arg)
 {
 	int rc;
@@ -222,8 +221,7 @@ int settings_call_set_handler(const char *name,
 			/* Ignoring the error */
 			rc = 0;
 		} else {
-			LOG_DBG("set-value OK. key: %s",
-				log_strdup(name));
+			LOG_DBG("set-value OK. key: %s", log_strdup(name));
 		}
 	}
 	return rc;
@@ -241,7 +239,8 @@ int settings_commit_subtree(const char *subtree)
 
 	rc = 0;
 
-	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch) {
+	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch)
+	{
 		if (subtree && !settings_name_steq(ch->name, subtree, NULL)) {
 			continue;
 		}

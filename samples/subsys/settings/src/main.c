@@ -32,26 +32,24 @@ int32_t voltage_val = -3000;
 char source_name_val[6] = "";
 
 int alpha_handle_set(const char *name, size_t len, settings_read_cb read_cb,
-		  void *cb_arg);
+		     void *cb_arg);
 int alpha_handle_commit(void);
-int alpha_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len));
+int alpha_handle_export(int (*cb)(const char *name, const void *value,
+				  size_t val_len));
 
 int beta_handle_set(const char *name, size_t len, settings_read_cb read_cb,
-		  void *cb_arg);
+		    void *cb_arg);
 int beta_handle_commit(void);
-int beta_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len));
+int beta_handle_export(int (*cb)(const char *name, const void *value,
+				 size_t val_len));
 int beta_handle_get(const char *name, char *val, int val_len_max);
 
 /* dynamic main tree handler */
-struct settings_handler alph_handler = {
-		.name = "alpha",
-		.h_get = NULL,
-		.h_set = alpha_handle_set,
-		.h_commit = alpha_handle_commit,
-		.h_export = alpha_handle_export
-};
+struct settings_handler alph_handler = { .name = "alpha",
+					 .h_get = NULL,
+					 .h_set = alpha_handle_set,
+					 .h_commit = alpha_handle_commit,
+					 .h_export = alpha_handle_export };
 
 /* static subtree handler */
 SETTINGS_STATIC_HANDLER_DEFINE(beta, "alpha/beta", beta_handle_get,
@@ -59,7 +57,7 @@ SETTINGS_STATIC_HANDLER_DEFINE(beta, "alpha/beta", beta_handle_get,
 			       beta_handle_export);
 
 int alpha_handle_set(const char *name, size_t len, settings_read_cb read_cb,
-		  void *cb_arg)
+		     void *cb_arg)
 {
 	const char *next;
 	size_t next_len;
@@ -110,7 +108,7 @@ int alpha_handle_set(const char *name, size_t len, settings_read_cb read_cb,
 }
 
 int beta_handle_set(const char *name, size_t len, settings_read_cb read_cb,
-		  void *cb_arg)
+		    void *cb_arg)
 {
 	const char *next;
 	size_t name_len;
@@ -152,8 +150,8 @@ int alpha_handle_commit(void)
 	return 0;
 }
 
-int alpha_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len))
+int alpha_handle_export(int (*cb)(const char *name, const void *value,
+				  size_t val_len))
 {
 	printk("export keys under <alpha> handler\n");
 	(void)cb("alpha/angle/1", &angle_val, sizeof(angle_val));
@@ -164,13 +162,13 @@ int alpha_handle_export(int (*cb)(const char *name,
 	return 0;
 }
 
-int beta_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len))
+int beta_handle_export(int (*cb)(const char *name, const void *value,
+				 size_t val_len))
 {
 	printk("export keys under <beta> handler\n");
 	(void)cb("alpha/beta/voltage", &voltage_val, sizeof(voltage_val));
-	(void)cb("alpha/beta/source", source_name_val, strlen(source_name_val) +
-						       1);
+	(void)cb("alpha/beta/source", source_name_val,
+		 strlen(source_name_val) + 1);
 
 	return 0;
 }
@@ -265,7 +263,7 @@ struct direct_length_data {
 };
 
 static int direct_loader(const char *name, size_t len, settings_read_cb read_cb,
-			  void *cb_arg, void *param)
+			 void *cb_arg, void *param)
 {
 	const char *next;
 	size_t name_len;
@@ -340,7 +338,7 @@ static int direct_loader_immediate_value(const char *name, size_t len,
 	size_t name_len;
 	int rc;
 	struct direct_immediate_value *one_value =
-					(struct direct_immediate_value *)param;
+		(struct direct_immediate_value *)param;
 
 	name_len = settings_name_next(name, &next);
 
@@ -400,14 +398,13 @@ static void example_without_handler(void)
 	} else if (rc == 0) {
 		printk("<gamma> = %d\n", val_u8);
 	} else {
-		printk("unexpected"FAIL_MSG, rc);
+		printk("unexpected" FAIL_MSG, rc);
 	}
 
 	val_u8++;
 
 	printk("save <gamma> key directly: ");
-	rc = settings_save_one("gamma", (const void *)&val_u8,
-			       sizeof(val_u8));
+	rc = settings_save_one("gamma", (const void *)&val_u8, sizeof(val_u8));
 	if (rc) {
 		printk(FAIL_MSG, rc);
 	} else {
@@ -424,17 +421,16 @@ static void example_initialization(void)
 
 	/* mounting info */
 	static struct fs_mount_t littlefs_mnt = {
-	.type = FS_LITTLEFS,
-	.fs_data = &cstorage,
-	.storage_dev = (void *)FLASH_AREA_ID(storage),
-	.mnt_point = "/ff"
+		.type = FS_LITTLEFS,
+		.fs_data = &cstorage,
+		.storage_dev = (void *)FLASH_AREA_ID(storage),
+		.mnt_point = "/ff"
 	};
 
 	rc = fs_mount(&littlefs_mnt);
 	if (rc != 0) {
 		printk("mounting littlefs error: [%d]\n", rc);
 	} else {
-
 		rc = fs_unlink(CONFIG_SETTINGS_FS_FILE);
 		if ((rc != 0) && (rc != -ENOENT)) {
 			printk("can't delete config file%d\n", rc);
@@ -498,7 +494,7 @@ void example_runtime_usage(void)
 	printk(SECTION_BEGIN_LINE);
 	printk("Inject the value to the setting destination in runtime\n\n");
 
-	rc = settings_runtime_set("alpha/beta/source", (void *) injected_str,
+	rc = settings_runtime_set("alpha/beta/source", (void *)injected_str,
 				  strlen(injected_str) + 1);
 
 	printk("injected <alpha/beta/source>: ");
@@ -509,15 +505,16 @@ void example_runtime_usage(void)
 	}
 
 	printk("  The settings destination off the key <alpha/beta/source> has "
-	       "got value: \"%s\"\n\n", source_name_val);
+	       "got value: \"%s\"\n\n",
+	       source_name_val);
 
 	/* set settins destination value "by hand" for next example */
-	(void) strcpy(source_name_val, "rtos");
+	(void)strcpy(source_name_val, "rtos");
 
 	printk(SECTION_BEGIN_LINE);
 	printk("Read a value from the setting destination in runtime\n\n");
 
-	rc = settings_runtime_get("alpha/beta/source", (void *) injected_str,
+	rc = settings_runtime_get("alpha/beta/source", (void *)injected_str,
 				  strlen(injected_str) + 1);
 	printk("fetched <alpha/beta/source>: ");
 	if (rc < 0) {
@@ -533,7 +530,6 @@ void example_runtime_usage(void)
 
 void main(void)
 {
-
 	int i;
 
 	printk("\n*** Settings usage example ***\n\n");

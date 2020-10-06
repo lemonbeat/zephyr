@@ -60,7 +60,7 @@ static K_KERNEL_STACK_DEFINE(recv_thread_stack, CONFIG_BT_RX_STACK_SIZE);
 
 #if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)
 static struct k_poll_signal hbuf_signal =
-		K_POLL_SIGNAL_INITIALIZER(hbuf_signal);
+	K_POLL_SIGNAL_INITIALIZER(hbuf_signal);
 static sys_slist_t hbuf_pend;
 static int32_t hbuf_count;
 #endif
@@ -81,7 +81,8 @@ static struct net_buf *process_prio_evt(struct node_rx_pdu *node_rx,
 					     K_FOREVER);
 			hci_disconn_complete_encode(pdu_data, handle, buf);
 			hci_disconn_complete_process(handle);
-			*evt_flags = BT_HCI_EVT_FLAG_RECV_PRIO | BT_HCI_EVT_FLAG_RECV;
+			*evt_flags = BT_HCI_EVT_FLAG_RECV_PRIO |
+				     BT_HCI_EVT_FLAG_RECV;
 			return buf;
 		}
 	}
@@ -161,7 +162,6 @@ static void prio_recv_thread(void *p1, void *p2, void *p3)
 			 * for ULL mayfly
 			 */
 			continue;
-
 		}
 
 		BT_DBG("sem take...");
@@ -300,12 +300,12 @@ static inline struct net_buf *process_hbuf(struct node_rx_pdu *n)
 	case HCI_CLASS_EVT_CONNECTION:
 	case HCI_CLASS_EVT_LLCP:
 		BT_DBG("FC: dequeueing event");
-		(void) sys_slist_get(&hbuf_pend);
+		(void)sys_slist_get(&hbuf_pend);
 		break;
 	case HCI_CLASS_ACL_DATA:
 		if (hbuf_count) {
 			BT_DBG("FC: dequeueing ACL data");
-			(void) sys_slist_get(&hbuf_pend);
+			(void)sys_slist_get(&hbuf_pend);
 		} else {
 			/* no buffers, HCI will signal */
 			node_rx = NULL;
@@ -397,7 +397,7 @@ static void recv_thread(void *p1, void *p2, void *p3)
 		if (buf) {
 			if (buf->len) {
 				BT_DBG("Packet in: type:%u len:%u",
-					bt_buf_get_type(buf), buf->len);
+				       bt_buf_get_type(buf), buf->len);
 				bt_recv(buf);
 			} else {
 				net_buf_unref(buf);
@@ -413,7 +413,7 @@ static int cmd_handle(struct net_buf *buf)
 	struct node_rx_pdu *node_rx = NULL;
 	struct net_buf *evt;
 
-	evt = hci_cmd_handle(buf, (void **) &node_rx);
+	evt = hci_cmd_handle(buf, (void **)&node_rx);
 	if (evt) {
 		BT_DBG("Replying with event of %u bytes", evt->len);
 		bt_recv_prio(evt);
@@ -501,13 +501,14 @@ static int hci_driver_open(void)
 	k_thread_create(&prio_recv_thread_data, prio_recv_thread_stack,
 			K_KERNEL_STACK_SIZEOF(prio_recv_thread_stack),
 			prio_recv_thread, NULL, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BT_DRIVER_RX_HIGH_PRIO), 0, K_NO_WAIT);
+			K_PRIO_COOP(CONFIG_BT_DRIVER_RX_HIGH_PRIO), 0,
+			K_NO_WAIT);
 	k_thread_name_set(&prio_recv_thread_data, "BT RX pri");
 
 	k_thread_create(&recv_thread_data, recv_thread_stack,
-			K_KERNEL_STACK_SIZEOF(recv_thread_stack),
-			recv_thread, NULL, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BT_RX_PRIO), 0, K_NO_WAIT);
+			K_KERNEL_STACK_SIZEOF(recv_thread_stack), recv_thread,
+			NULL, NULL, NULL, K_PRIO_COOP(CONFIG_BT_RX_PRIO), 0,
+			K_NO_WAIT);
 	k_thread_name_set(&recv_thread_data, "BT RX");
 
 	BT_DBG("Success.");
@@ -516,11 +517,11 @@ static int hci_driver_open(void)
 }
 
 static const struct bt_hci_driver drv = {
-	.name	= "Controller",
-	.bus	= BT_HCI_DRIVER_BUS_VIRTUAL,
+	.name = "Controller",
+	.bus = BT_HCI_DRIVER_BUS_VIRTUAL,
 	.quirks = BT_QUIRK_NO_AUTO_DLE,
-	.open	= hci_driver_open,
-	.send	= hci_driver_send,
+	.open = hci_driver_open,
+	.send = hci_driver_send,
 };
 
 static int hci_driver_init(const struct device *unused)

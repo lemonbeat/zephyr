@@ -121,14 +121,12 @@ int test_file_close(struct fs_file_t *filep)
 		return res;
 	}
 
-
 	return res;
 }
 
 int test_file_delete(const char *file_path)
 {
 	int res;
-
 
 	TC_PRINT("\nDelete tests:\n");
 

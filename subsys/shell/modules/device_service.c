@@ -38,7 +38,7 @@ static bool device_get_config_level(const struct shell *shell, int level)
 	const struct device *dev;
 	bool devices = false;
 
-	for (dev = levels[level]; dev < levels[level+1]; dev++) {
+	for (dev = levels[level]; dev < levels[level + 1]; dev++) {
 		if (z_device_ready(dev)) {
 			devices = true;
 
@@ -48,8 +48,8 @@ static bool device_get_config_level(const struct shell *shell, int level)
 	return devices;
 }
 
-static int cmd_device_levels(const struct shell *shell,
-			      size_t argc, char **argv)
+static int cmd_device_levels(const struct shell *shell, size_t argc,
+			     char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -82,8 +82,7 @@ static int cmd_device_levels(const struct shell *shell,
 	return 0;
 }
 
-static int cmd_device_list(const struct shell *shell,
-			      size_t argc, char **argv)
+static int cmd_device_list(const struct shell *shell, size_t argc, char **argv)
 {
 	const struct device *dev;
 	ARG_UNUSED(argc);
@@ -114,11 +113,13 @@ static int cmd_device_list(const struct shell *shell,
 	return 0;
 }
 
-
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_device,
-	SHELL_CMD(levels, NULL, "List configured devices by levels", cmd_device_levels),
-	SHELL_CMD(list, NULL, "List configured devices", cmd_device_list),
-	SHELL_SUBCMD_SET_END /* Array terminated. */
+			       SHELL_CMD(levels, NULL,
+					 "List configured devices by levels",
+					 cmd_device_levels),
+			       SHELL_CMD(list, NULL, "List configured devices",
+					 cmd_device_list),
+			       SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 
 SHELL_CMD_REGISTER(device, &sub_device, "Device commands", NULL);

@@ -38,13 +38,12 @@ void main(void)
 
 	rc = flash_area_open(id, &pfa);
 	if (rc < 0) {
-		printk("FAIL: unable to find flash area %u: %d\n",
-		       id, rc);
+		printk("FAIL: unable to find flash area %u: %d\n", id, rc);
 		return;
 	}
 
-	printk("Area %u at 0x%x on %s for %u bytes\n",
-	       id, (unsigned int)pfa->fa_off, pfa->fa_dev_name,
+	printk("Area %u at 0x%x on %s for %u bytes\n", id,
+	       (unsigned int)pfa->fa_off, pfa->fa_dev_name,
 	       (unsigned int)pfa->fa_size);
 
 	/* Optional wipe flash contents */
@@ -59,8 +58,7 @@ void main(void)
 	rc = fs_mount(mp);
 	if (rc < 0) {
 		printk("FAIL: mount id %u at %s: %d\n",
-		       (unsigned int)mp->storage_dev, mp->mnt_point,
-		       rc);
+		       (unsigned int)mp->storage_dev, mp->mnt_point, rc);
 		return;
 	}
 	printk("%s mount: %d\n", mp->mnt_point, rc);
@@ -73,9 +71,8 @@ void main(void)
 
 	printk("%s: bsize = %lu ; frsize = %lu ;"
 	       " blocks = %lu ; bfree = %lu\n",
-	       mp->mnt_point,
-	       sbuf.f_bsize, sbuf.f_frsize,
-	       sbuf.f_blocks, sbuf.f_bfree);
+	       mp->mnt_point, sbuf.f_bsize, sbuf.f_frsize, sbuf.f_blocks,
+	       sbuf.f_bfree);
 
 	struct fs_dirent dirent;
 
@@ -100,13 +97,11 @@ void main(void)
 		printk("%s read count %u: %d\n", fname, boot_count, rc);
 		rc = fs_seek(&file, 0, FS_SEEK_SET);
 		printk("%s seek start: %d\n", fname, rc);
-
 	}
 
 	boot_count += 1;
 	rc = fs_write(&file, &boot_count, sizeof(boot_count));
-	printk("%s write new boot count %u: %d\n", fname,
-	       boot_count, rc);
+	printk("%s write new boot count %u: %d\n", fname, boot_count, rc);
 
 	rc = fs_close(&file);
 	printk("%s close: %d\n", fname, rc);
@@ -128,8 +123,7 @@ void main(void)
 			break;
 		}
 		printk("  %c %u %s\n",
-		       (ent.type == FS_DIR_ENTRY_FILE) ? 'F' : 'D',
-		       ent.size,
+		       (ent.type == FS_DIR_ENTRY_FILE) ? 'F' : 'D', ent.size,
 		       ent.name);
 	}
 

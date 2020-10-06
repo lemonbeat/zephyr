@@ -148,8 +148,7 @@ static struct websocket_context *websocket_find(int real_sock)
 }
 
 static void response_cb(struct http_response *rsp,
-			enum http_final_call final_data,
-			void *user_data)
+			enum http_final_call final_data, void *user_data)
 {
 	struct websocket_context *ctx = user_data;
 
@@ -167,9 +166,8 @@ static void response_cb(struct http_response *rsp,
 static int on_header_field(struct http_parser *parser, const char *at,
 			   size_t length)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 	struct websocket_context *ctx = req->internal.user_data;
 	const char *ws_accept_str = "Sec-WebSocket-Accept";
 	uint16_t len;
@@ -191,9 +189,8 @@ static int on_header_field(struct http_parser *parser, const char *at,
 static int on_header_value(struct http_parser *parser, const char *at,
 			   size_t length)
 {
-	struct http_request *req = CONTAINER_OF(parser,
-						struct http_request,
-						internal.parser);
+	struct http_request *req =
+		CONTAINER_OF(parser, struct http_request, internal.parser);
 	struct websocket_context *ctx = req->internal.user_data;
 	char str[MAX_SEC_ACCEPT_LEN];
 
@@ -205,12 +202,12 @@ static int on_header_value(struct http_parser *parser, const char *at,
 		ctx->sec_accept_present = false;
 
 		ret = base64_encode(str, sizeof(str) - 1, &olen,
-				    ctx->sec_accept_key,
-				    WS_SHA1_OUTPUT_LEN);
+				    ctx->sec_accept_key, WS_SHA1_OUTPUT_LEN);
 		if (ret == 0) {
 			if (strncmp(at, str, length)) {
 				NET_DBG("[%p] Security keys do not match "
-					"%s vs %s", ctx, str, at);
+					"%s vs %s",
+					ctx, str, at);
 			} else {
 				ctx->sec_accept_ok = true;
 			}
@@ -224,8 +221,8 @@ static int on_header_value(struct http_parser *parser, const char *at,
 	return 0;
 }
 
-int websocket_connect(int sock, struct websocket_request *wreq,
-		      int32_t timeout, void *user_data)
+int websocket_connect(int sock, struct websocket_request *wreq, int32_t timeout,
+		      void *user_data)
 {
 	/* This is the expected Sec-WebSocket-Accept key. We are storing a
 	 * pointer to this in ctx but the value is only used for the duration
@@ -240,15 +237,10 @@ int websocket_connect(int sock, struct websocket_request *wreq,
 	size_t olen;
 	char key_accept[MAX_SEC_ACCEPT_LEN + sizeof(WS_MAGIC)];
 	uint32_t rnd_value = sys_rand32_get();
-	char sec_ws_key[] =
-		"Sec-WebSocket-Key: 0123456789012345678901==\r\n";
-	char *headers[] = {
-		sec_ws_key,
-		"Upgrade: websocket\r\n",
-		"Connection: Upgrade\r\n",
-		"Sec-WebSocket-Version: 13\r\n",
-		NULL
-	};
+	char sec_ws_key[] = "Sec-WebSocket-Key: 0123456789012345678901==\r\n";
+	char *headers[] = { sec_ws_key, "Upgrade: websocket\r\n",
+			    "Connection: Upgrade\r\n",
+			    "Sec-WebSocket-Version: 13\r\n", NULL };
 
 	fd = -1;
 
@@ -279,8 +271,7 @@ int websocket_connect(int sock, struct websocket_request *wreq,
 			 sec_accept_key);
 
 	ret = base64_encode(sec_ws_key + sizeof("Sec-Websocket-Key: ") - 1,
-			    sizeof(sec_ws_key) -
-					sizeof("Sec-Websocket-Key: "),
+			    sizeof(sec_ws_key) - sizeof("Sec-Websocket-Key: "),
 			    &olen, sec_accept_key,
 			    /* We are only interested in 16 first bytes so
 			     * substract 4 from the SHA-1 length
@@ -299,8 +290,8 @@ int websocket_connect(int sock, struct websocket_request *wreq,
 		goto out;
 	}
 
-	memcpy(sec_ws_key + sizeof("Sec-Websocket-Key: ") - 1 + olen,
-	       HTTP_CRLF, sizeof(HTTP_CRLF));
+	memcpy(sec_ws_key + sizeof("Sec-Websocket-Key: ") - 1 + olen, HTTP_CRLF,
+	       sizeof(HTTP_CRLF));
 
 	memset(&req, 0, sizeof(req));
 
@@ -566,13 +557,13 @@ int websocket_send_msg(int ws_sock, const uint8_t *payload, size_t payload_len,
 		memcpy(data_to_send, payload, payload_len);
 
 		for (i = 0; i < payload_len; i++) {
-			data_to_send[i] ^=
-				ctx->masking_value >> (8 * (3 - i % 4));
+			data_to_send[i] ^= ctx->masking_value >>
+					   (8 * (3 - i % 4));
 		}
 	}
 
-	ret = websocket_prepare_and_send(ctx, header, hdr_len,
-					 data_to_send, payload_len, timeout);
+	ret = websocket_prepare_and_send(ctx, header, hdr_len, data_to_send,
+					 payload_len, timeout);
 	if (ret < 0) {
 		NET_DBG("Cannot send ws msg (%d)", -errno);
 		goto quit;
@@ -587,12 +578,13 @@ quit:
 }
 
 static bool websocket_parse_header(uint8_t *buf, size_t buf_len, bool *masked,
-				   uint32_t *mask_value, uint64_t *message_length,
+				   uint32_t *mask_value,
+				   uint64_t *message_length,
 				   uint32_t *message_type_flag,
 				   size_t *header_len)
 {
 	uint8_t len_len; /* length of the length field in header */
-	uint8_t len;     /* message length byte */
+	uint8_t len; /* message length byte */
 	uint16_t value;
 
 	value = sys_get_be16(&buf[0]);
@@ -651,7 +643,8 @@ static bool websocket_parse_header(uint8_t *buf, size_t buf_len, bool *masked,
 }
 
 int websocket_recv_msg(int ws_sock, uint8_t *buf, size_t buf_len,
-		       uint32_t *message_type, uint64_t *remaining, int32_t timeout)
+		       uint32_t *message_type, uint64_t *remaining,
+		       int32_t timeout)
 {
 	struct websocket_context *ctx;
 	size_t header_len = 0;
@@ -721,13 +714,10 @@ int websocket_recv_msg(int ws_sock, uint8_t *buf, size_t buf_len,
 			/* Now we will be able to figure out what is the
 			 * actual size of the header.
 			 */
-			if (websocket_parse_header(&ctx->tmp_buf[0],
-						   ctx->tmp_buf_pos,
-						   &masked,
-						   &ctx->masking_value,
-						   &ctx->message_len,
-						   &ctx->message_type,
-						   &header_len)) {
+			if (websocket_parse_header(
+				    &ctx->tmp_buf[0], ctx->tmp_buf_pos, &masked,
+				    &ctx->masking_value, &ctx->message_len,
+				    &ctx->message_type, &header_len)) {
 				ctx->masked = masked;
 
 				if (message_type) {
@@ -750,8 +740,7 @@ int websocket_recv_msg(int ws_sock, uint8_t *buf, size_t buf_len,
 		ctx->header_received = true;
 
 		if (HEXDUMP_RECV_PACKETS) {
-			LOG_HEXDUMP_DBG(&ctx->tmp_buf[0], header_len,
-					"Header");
+			LOG_HEXDUMP_DBG(&ctx->tmp_buf[0], header_len, "Header");
 			NET_DBG("[%p] masked %d mask 0x%04x hdr %zd msg %zd",
 				ctx, ctx->masked,
 				ctx->masked ? ctx->masking_value : 0,
@@ -834,12 +823,13 @@ int websocket_recv_msg(int ws_sock, uint8_t *buf, size_t buf_len,
 		 * which byte from masking value to take. The mask_shift will
 		 * tell that.
 		 */
-		int mask_shift = (ctx->total_read - recv_len) % sizeof(uint32_t);
+		int mask_shift =
+			(ctx->total_read - recv_len) % sizeof(uint32_t);
 		int i;
 
 		for (i = 0; i < recv_len; i++) {
 			buf[i] ^= ctx->masking_value >>
-				(8 * (3 - (i + mask_shift) % 4));
+				  (8 * (3 - (i + mask_shift) % 4));
 		}
 	}
 
@@ -869,8 +859,8 @@ static int websocket_send(struct websocket_context *ctx, const uint8_t *buf,
 	NET_DBG("[%p] Sending %zd bytes", ctx, buf_len);
 
 	ret = websocket_send_msg(ctx->sock, buf, buf_len,
-				 WEBSOCKET_OPCODE_DATA_TEXT,
-				 true, true, timeout);
+				 WEBSOCKET_OPCODE_DATA_TEXT, true, true,
+				 timeout);
 	if (ret < 0) {
 		errno = -ret;
 		return -1;
@@ -917,8 +907,7 @@ static ssize_t websocket_write_vmeth(void *obj, const void *buffer,
 }
 
 static ssize_t websocket_sendto_ctx(void *obj, const void *buf, size_t len,
-				    int flags,
-				    const struct sockaddr *dest_addr,
+				    int flags, const struct sockaddr *dest_addr,
 				    socklen_t addrlen)
 {
 	struct websocket_context *ctx = obj;

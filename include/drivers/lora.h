@@ -63,8 +63,8 @@ typedef int (*lora_api_config)(const struct device *dev,
  *
  * @see lora_send() for argument descriptions.
  */
-typedef int (*lora_api_send)(const struct device *dev,
-			     uint8_t *data, uint32_t data_len);
+typedef int (*lora_api_send)(const struct device *dev, uint8_t *data,
+			     uint32_t data_len);
 
 /**
  * @typedef lora_api_recv()
@@ -73,8 +73,8 @@ typedef int (*lora_api_send)(const struct device *dev,
  * @see lora_recv() for argument descriptions.
  */
 typedef int (*lora_api_recv)(const struct device *dev, uint8_t *data,
-			     uint8_t size,
-			     k_timeout_t timeout, int16_t *rssi, int8_t *snr);
+			     uint8_t size, k_timeout_t timeout, int16_t *rssi,
+			     int8_t *snr);
 
 /**
  * @typedef lora_api_test_cw()
@@ -87,8 +87,8 @@ typedef int (*lora_api_test_cw)(const struct device *dev, uint32_t frequency,
 
 struct lora_driver_api {
 	lora_api_config config;
-	lora_api_send	send;
-	lora_api_recv	recv;
+	lora_api_send send;
+	lora_api_recv recv;
 	lora_api_test_cw test_cw;
 };
 
@@ -118,8 +118,8 @@ static inline int lora_config(const struct device *dev,
  * @param data_len  Length of the data to be sent
  * @return 0 on success, negative on error
  */
-static inline int lora_send(const struct device *dev,
-			    uint8_t *data, uint32_t data_len)
+static inline int lora_send(const struct device *dev, uint8_t *data,
+			    uint32_t data_len)
 {
 	const struct lora_driver_api *api = dev->api;
 
@@ -143,8 +143,8 @@ static inline int lora_send(const struct device *dev,
  * @return Length of the data received on success, negative on error
  */
 static inline int lora_recv(const struct device *dev, uint8_t *data,
-			    uint8_t size,
-			    k_timeout_t timeout, int16_t *rssi, int8_t *snr)
+			    uint8_t size, k_timeout_t timeout, int16_t *rssi,
+			    int8_t *snr)
 {
 	const struct lora_driver_api *api = dev->api;
 
@@ -175,4 +175,4 @@ static inline int lora_test_cw(const struct device *dev, uint32_t frequency,
 	return api->test_cw(dev, frequency, tx_power, duration);
 }
 
-#endif	/* ZEPHYR_INCLUDE_DRIVERS_LORA_H_ */
+#endif /* ZEPHYR_INCLUDE_DRIVERS_LORA_H_ */

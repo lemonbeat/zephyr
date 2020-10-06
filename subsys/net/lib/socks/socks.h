@@ -20,13 +20,11 @@
  * @retval 0 or an error code if it was unsuccessful.
  */
 #if defined(CONFIG_SOCKS)
-int net_socks5_connect(struct net_context *ctx,
-		       const struct sockaddr *dest,
+int net_socks5_connect(struct net_context *ctx, const struct sockaddr *dest,
 		       socklen_t dest_len);
 #else
 inline int net_socks5_connect(struct net_context *ctx,
-			      const struct sockaddr *dest,
-			      socklen_t dest_len)
+			      const struct sockaddr *dest, socklen_t dest_len)
 {
 	ARG_UNUSED(ctx);
 	ARG_UNUSED(dest);

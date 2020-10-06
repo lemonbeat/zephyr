@@ -15,7 +15,6 @@ void test_main(void)
 #ifdef CONFIG_USERSPACE
 	k_mem_domain_add_partition(&k_mem_domain_default, &k_mbedtls_partition);
 #endif
-	ztest_test_suite(test_mbedtls_fn,
-		ztest_user_unit_test(test_mbedtls));
+	ztest_test_suite(test_mbedtls_fn, ztest_user_unit_test(test_mbedtls));
 	ztest_run_test_suite(test_mbedtls_fn);
 }

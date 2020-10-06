@@ -13,7 +13,6 @@ static int test_config_save_one_byte_value(const char *name, uint8_t val)
 	return settings_save_one(name, &val, 1);
 }
 
-
 void test_config_save_one_file(void)
 {
 	int rc;
@@ -30,8 +29,7 @@ void test_config_save_one_file(void)
 	zassert_true(rc == 0, "can't register FS as configuration source");
 
 	rc = settings_file_dst(&cf);
-	zassert_true(rc == 0,
-		     "can't register FS as configuration destination");
+	zassert_true(rc == 0, "can't register FS as configuration destination");
 
 	val8 = 33U;
 	rc = settings_save();

@@ -51,7 +51,8 @@ static int mcux_pwm_pin_set(const struct device *dev, uint32_t pwm,
 
 	if ((period_cycles == 0) || (pulse_cycles > period_cycles)) {
 		LOG_ERR("Invalid combination: period_cycles=%u, "
-			"pulse_cycles=%u", period_cycles, pulse_cycles);
+			"pulse_cycles=%u",
+			period_cycles, pulse_cycles);
 		return -EINVAL;
 	}
 
@@ -152,23 +153,20 @@ static const struct pwm_driver_api pwm_mcux_driver_api = {
 	.get_cycles_per_sec = mcux_pwm_get_cycles_per_sec,
 };
 
-#define PWM_DEVICE_INIT_MCUX(n)			  \
-	static struct pwm_mcux_data pwm_mcux_data_ ## n;		  \
-									  \
-	static const struct pwm_mcux_config pwm_mcux_config_ ## n = {     \
-		.base = (void *)DT_REG_ADDR(DT_PARENT(DT_DRV_INST(n))),   \
-		.index = DT_INST_PROP(n, index),			  \
-		.mode = kPWM_EdgeAligned,				  \
-		.prescale = kPWM_Prescale_Divide_128,			  \
-		.clock_source = kCLOCK_IpgClk,				  \
-	};								  \
-									  \
-	DEVICE_AND_API_INIT(pwm_mcux_ ## n,				  \
-			    DT_INST_LABEL(n),				  \
-			    pwm_mcux_init,				  \
-			    &pwm_mcux_data_ ## n,			  \
-			    &pwm_mcux_config_ ## n,			  \
-			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,\
+#define PWM_DEVICE_INIT_MCUX(n)                                              \
+	static struct pwm_mcux_data pwm_mcux_data_##n;                       \
+                                                                             \
+	static const struct pwm_mcux_config pwm_mcux_config_##n = {          \
+		.base = (void *)DT_REG_ADDR(DT_PARENT(DT_DRV_INST(n))),      \
+		.index = DT_INST_PROP(n, index),                             \
+		.mode = kPWM_EdgeAligned,                                    \
+		.prescale = kPWM_Prescale_Divide_128,                        \
+		.clock_source = kCLOCK_IpgClk,                               \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(pwm_mcux_##n, DT_INST_LABEL(n), pwm_mcux_init,   \
+			    &pwm_mcux_data_##n, &pwm_mcux_config_##n,        \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
 			    &pwm_mcux_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(PWM_DEVICE_INIT_MCUX)

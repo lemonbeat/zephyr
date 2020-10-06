@@ -21,18 +21,18 @@ LOG_MODULE_REGISTER(ipm_adsp, CONFIG_IPM_LOG_LEVEL);
  * messages or via shared memory. Following parameters specify maximum
  * values for ID and DATA.
  */
-#define IPM_INTEL_ADSP_MAX_DATA_SIZE		256
-#define IPM_INTEL_ADSP_MAX_ID_VAL		IPC_DIPCI_MSG_MASK
+#define IPM_INTEL_ADSP_MAX_DATA_SIZE 256
+#define IPM_INTEL_ADSP_MAX_ID_VAL IPC_DIPCI_MSG_MASK
 
 /* Mailbox ADSP -> Host */
-#define IPM_INTEL_ADSP_MAILBOX_OUT		MAILBOX_DSPBOX_BASE
-#define IPM_INTEL_ADSP_MAILBOX_OUT_SIZE	MAILBOX_DSPBOX_SIZE
+#define IPM_INTEL_ADSP_MAILBOX_OUT MAILBOX_DSPBOX_BASE
+#define IPM_INTEL_ADSP_MAILBOX_OUT_SIZE MAILBOX_DSPBOX_SIZE
 
 BUILD_ASSERT(IPM_INTEL_ADSP_MAILBOX_OUT_SIZE >= IPM_INTEL_ADSP_MAX_DATA_SIZE);
 
 /* Mailbox Host -> ADSP */
-#define IPM_INTEL_ADSP_MAILBOX_IN		MAILBOX_HOSTBOX_BASE
-#define IPM_INTEL_ADSP_MAILBOX_IN_SIZE	MAILBOX_HOSTBOX_SIZE
+#define IPM_INTEL_ADSP_MAILBOX_IN MAILBOX_HOSTBOX_BASE
+#define IPM_INTEL_ADSP_MAILBOX_IN_SIZE MAILBOX_HOSTBOX_SIZE
 
 BUILD_ASSERT(IPM_INTEL_ADSP_MAILBOX_IN_SIZE >= IPM_INTEL_ADSP_MAX_DATA_SIZE);
 
@@ -94,8 +94,7 @@ static void ipm_adsp_isr(const struct device *dev)
 			  ipc_read(IPC_DIPCCTL) & ~IPC_DIPCCTL_IPCIDIE);
 
 		/* Clear DONE bit, Notify HOST that operation is completed */
-		ipc_write(IPC_DIPCIE,
-			  ipc_read(IPC_DIPCIE) | IPC_DIPCIE_DONE);
+		ipc_write(IPC_DIPCIE, ipc_read(IPC_DIPCIE) | IPC_DIPCIE_DONE);
 
 		/* Unmask DONE interrupt */
 		ipc_write(IPC_DIPCCTL,
@@ -141,8 +140,7 @@ static int ipm_adsp_send(const struct device *dev, int wait, uint32_t id,
 }
 
 static void ipm_adsp_register_callback(const struct device *dev,
-				       ipm_callback_t cb,
-				       void *user_data)
+				       ipm_callback_t cb, void *user_data)
 {
 	struct ipm_adsp_data *data = dev->data;
 
@@ -205,17 +203,14 @@ static const struct ipm_adsp_config ipm_adsp_config = {
 
 static struct ipm_adsp_data ipm_adsp_data;
 
-DEVICE_AND_API_INIT(ipm_adsp, DT_INST_LABEL(0),
-		    &ipm_adsp_init,
-		    &ipm_adsp_data, &ipm_adsp_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &ipm_adsp_driver_api);
+DEVICE_AND_API_INIT(ipm_adsp, DT_INST_LABEL(0), &ipm_adsp_init, &ipm_adsp_data,
+		    &ipm_adsp_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &ipm_adsp_driver_api);
 
 static void ipm_adsp_config_func(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    ipm_adsp_isr, DEVICE_GET(ipm_adsp), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), ipm_adsp_isr,
+		    DEVICE_GET(ipm_adsp), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 }

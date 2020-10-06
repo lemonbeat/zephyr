@@ -36,16 +36,14 @@ static inline void z_zassert_(bool cond, const char *file, int line)
 	}
 }
 
-#define z_zassert(cond, default_msg, file, line, func, msg, ...)	\
+#define z_zassert(cond, default_msg, file, line, func, msg, ...) \
 	z_zassert_(cond, file, line)
 
 #else /* CONFIG_ZTEST_ASSERT_VERBOSE != 0 */
 
-static inline void z_zassert(bool cond,
-			    const char *default_msg,
-			    const char *file,
-			    int line, const char *func,
-			    const char *msg, ...)
+static inline void z_zassert(bool cond, const char *default_msg,
+			     const char *file, int line, const char *func,
+			     const char *msg, ...)
 {
 	if (cond == false) {
 		va_list vargs;
@@ -68,7 +66,6 @@ static inline void z_zassert(bool cond,
 
 #endif /* CONFIG_ZTEST_ASSERT_VERBOSE */
 
-
 /**
  * @defgroup ztest_assert Ztest assertion macros
  * @ingroup ztest
@@ -89,58 +86,56 @@ static inline void z_zassert(bool cond,
  * @param default_msg Message to print if @a cond is false
  */
 
-#define zassert(cond, default_msg, msg, ...)			    \
-	z_zassert(cond, msg ? ("(" default_msg ")") : (default_msg), \
-		 __FILE__, __LINE__, __func__, msg ? msg : "", ##__VA_ARGS__)
+#define zassert(cond, default_msg, msg, ...)                                   \
+	z_zassert(cond, msg ? ("(" default_msg ")") : (default_msg), __FILE__, \
+		  __LINE__, __func__, msg ? msg : "", ##__VA_ARGS__)
 
 /**
  * @brief Assert that this function call won't be reached
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_unreachable(msg, ...) zassert(0, "Reached unreachable code", \
-					      msg, ##__VA_ARGS__)
+#define zassert_unreachable(msg, ...) \
+	zassert(0, "Reached unreachable code", msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a cond is true
  * @param cond Condition to check
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_true(cond, msg, ...) zassert(cond, #cond " is false", \
-					     msg, ##__VA_ARGS__)
+#define zassert_true(cond, msg, ...) \
+	zassert(cond, #cond " is false", msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a cond is false
  * @param cond Condition to check
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_false(cond, msg, ...) zassert(!(cond), #cond " is true", \
-					      msg, ##__VA_ARGS__)
+#define zassert_false(cond, msg, ...) \
+	zassert(!(cond), #cond " is true", msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a cond is 0 (success)
  * @param cond Condition to check
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_ok(cond, msg, ...) zassert(!(cond), #cond " is non-zero", \
-					      msg, ##__VA_ARGS__)
+#define zassert_ok(cond, msg, ...) \
+	zassert(!(cond), #cond " is non-zero", msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a ptr is NULL
  * @param ptr Pointer to compare
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_is_null(ptr, msg, ...) zassert((ptr) == NULL,	    \
-					       #ptr " is not NULL", \
-					       msg, ##__VA_ARGS__)
+#define zassert_is_null(ptr, msg, ...) \
+	zassert((ptr) == NULL, #ptr " is not NULL", msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a ptr is not NULL
  * @param ptr Pointer to compare
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_not_null(ptr, msg, ...) zassert((ptr) != NULL,	      \
-						#ptr " is NULL", msg, \
-						##__VA_ARGS__)
+#define zassert_not_null(ptr, msg, ...) \
+	zassert((ptr) != NULL, #ptr " is NULL", msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a a equals @a b
@@ -151,9 +146,8 @@ static inline void z_zassert(bool cond,
  * @param b Value to compare
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_equal(a, b, msg, ...) zassert((a) == (b),	      \
-					      #a " not equal to " #b, \
-					      msg, ##__VA_ARGS__)
+#define zassert_equal(a, b, msg, ...) \
+	zassert((a) == (b), #a " not equal to " #b, msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a a does not equal @a b
@@ -164,9 +158,8 @@ static inline void z_zassert(bool cond,
  * @param b Value to compare
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_not_equal(a, b, msg, ...) zassert((a) != (b),	      \
-						  #a " equal to " #b, \
-						  msg, ##__VA_ARGS__)
+#define zassert_not_equal(a, b, msg, ...) \
+	zassert((a) != (b), #a " equal to " #b, msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that @a a equals @a b
@@ -177,9 +170,9 @@ static inline void z_zassert(bool cond,
  * @param b Value to compare
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_equal_ptr(a, b, msg, ...)			    \
-	zassert((void *)(a) == (void *)(b), #a " not equal to " #b, \
-		msg, ##__VA_ARGS__)
+#define zassert_equal_ptr(a, b, msg, ...)                                \
+	zassert((void *)(a) == (void *)(b), #a " not equal to " #b, msg, \
+		##__VA_ARGS__)
 
 /**
  * @brief Assert that @a a is within @a b with delta @a d
@@ -189,10 +182,9 @@ static inline void z_zassert(bool cond,
  * @param d Delta
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_within(a, b, d, msg, ...)			     \
-	zassert(((a) > ((b) - (d))) && ((a) < ((b) + (d))),	     \
-		#a " not within " #b " +/- " #d,		     \
-		msg, ##__VA_ARGS__)
+#define zassert_within(a, b, d, msg, ...)                   \
+	zassert(((a) > ((b) - (d))) && ((a) < ((b) + (d))), \
+		#a " not within " #b " +/- " #d, msg, ##__VA_ARGS__)
 
 /**
  * @brief Assert that 2 memory buffers have the same contents
@@ -205,8 +197,7 @@ static inline void z_zassert(bool cond,
  * @param ... Arguments, see @ref zassert_mem_equal__
  *            for real arguments accepted.
  */
-#define zassert_mem_equal(...) \
-	zassert_mem_equal__(__VA_ARGS__)
+#define zassert_mem_equal(...) zassert_mem_equal__(__VA_ARGS__)
 
 /**
  * @brief Internal assert that 2 memory buffers have the same contents
@@ -219,9 +210,9 @@ static inline void z_zassert(bool cond,
  * @param size Size of buffers
  * @param msg Optional message to print if the assertion fails
  */
-#define zassert_mem_equal__(buf, exp, size, msg, ...)                    \
-	zassert(memcmp(buf, exp, size) == 0, #buf " not equal to " #exp, \
-	msg, ##__VA_ARGS__)
+#define zassert_mem_equal__(buf, exp, size, msg, ...)                         \
+	zassert(memcmp(buf, exp, size) == 0, #buf " not equal to " #exp, msg, \
+		##__VA_ARGS__)
 
 /**
  * @}

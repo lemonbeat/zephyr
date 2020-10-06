@@ -237,8 +237,7 @@ extern "C" {
  * @param idx logical index into dmas property
  * @return 1 if the "dmas" property has a specifier at index "idx", 0 otherwise
  */
-#define DT_INST_DMAS_HAS_IDX(inst, idx) \
-	DT_DMAS_HAS_IDX(DT_DRV_INST(inst), idx)
+#define DT_INST_DMAS_HAS_IDX(inst, idx) DT_DMAS_HAS_IDX(DT_DRV_INST(inst), idx)
 
 /**
  * @brief Does a dmas property have a named element?
@@ -268,4 +267,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* ZEPHYR_INCLUDE_DEVICETREE_DMAS_H_ */
+#endif /* ZEPHYR_INCLUDE_DEVICETREE_DMAS_H_ */

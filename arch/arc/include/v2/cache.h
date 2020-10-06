@@ -24,9 +24,9 @@ extern "C" {
 #endif
 
 /* i-cache defines for IC_CTRL register */
-#define IC_CACHE_ENABLE   0x00
-#define IC_CACHE_DISABLE  0x01
-#define IC_CACHE_DIRECT   0x00
+#define IC_CACHE_ENABLE 0x00
+#define IC_CACHE_DISABLE 0x01
+#define IC_CACHE_DIRECT 0x00
 #define IC_CACHE_INDIRECT 0x20
 
 /*
@@ -36,10 +36,10 @@ extern "C" {
  */
 static ALWAYS_INLINE void z_icache_setup(void)
 {
-	uint32_t icache_config = (
-		IC_CACHE_DIRECT | /* direct mapping (one-way assoc.) */
-		IC_CACHE_ENABLE   /* i-cache enabled */
-	);
+	uint32_t icache_config =
+		(IC_CACHE_DIRECT | /* direct mapping (one-way assoc.) */
+		 IC_CACHE_ENABLE /* i-cache enabled */
+		);
 	uint32_t val;
 
 	val = z_arc_v2_aux_reg_read(_ARC_V2_I_CACHE_BUILD);

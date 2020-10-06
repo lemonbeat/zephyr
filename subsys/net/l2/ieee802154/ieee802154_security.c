@@ -83,10 +83,8 @@ int ieee802154_security_setup_session(struct ieee802154_security_ctx *sec_ctx,
 }
 
 bool ieee802154_decrypt_auth(struct ieee802154_security_ctx *sec_ctx,
-			     uint8_t *frame,
-			     uint8_t auth_payload_len,
-			     uint8_t decrypt_payload_len,
-			     uint8_t *src_ext_addr,
+			     uint8_t *frame, uint8_t auth_payload_len,
+			     uint8_t decrypt_payload_len, uint8_t *src_ext_addr,
 			     uint32_t frame_counter)
 {
 	struct cipher_aead_pkt apkt;
@@ -114,13 +112,14 @@ bool ieee802154_decrypt_auth(struct ieee802154_security_ctx *sec_ctx,
 	apkt.ad = frame;
 	apkt.ad_len = auth_payload_len;
 	apkt.tag = sec_ctx->dec.mode_params.ccm_info.tag_len ?
-		frame + auth_payload_len + decrypt_payload_len : NULL;
+				 frame + auth_payload_len + decrypt_payload_len :
+				 NULL;
 	apkt.pkt = &pkt;
 
 	ret = cipher_ccm_op(&sec_ctx->dec, &apkt, nonce);
 	if (ret) {
-		NET_ERR("Cannot decrypt/auth (%i): %p %u/%u - fc %u",
-			ret, frame, auth_payload_len, decrypt_payload_len,
+		NET_ERR("Cannot decrypt/auth (%i): %p %u/%u - fc %u", ret,
+			frame, auth_payload_len, decrypt_payload_len,
 			frame_counter);
 		return false;
 	}
@@ -129,10 +128,8 @@ bool ieee802154_decrypt_auth(struct ieee802154_security_ctx *sec_ctx,
 }
 
 bool ieee802154_encrypt_auth(struct ieee802154_security_ctx *sec_ctx,
-			     uint8_t *frame,
-			     uint8_t auth_payload_len,
-			     uint8_t encrypt_payload_len,
-			     uint8_t *src_ext_addr)
+			     uint8_t *frame, uint8_t auth_payload_len,
+			     uint8_t encrypt_payload_len, uint8_t *src_ext_addr)
 {
 	struct cipher_aead_pkt apkt;
 	struct cipher_pkt pkt;
@@ -160,8 +157,8 @@ bool ieee802154_encrypt_auth(struct ieee802154_security_ctx *sec_ctx,
 
 	ret = cipher_ccm_op(&sec_ctx->enc, &apkt, nonce);
 	if (ret) {
-		NET_ERR("Cannot encrypt/auth (%i): %p %u/%u - fc %u",
-			ret, frame, auth_payload_len, encrypt_payload_len,
+		NET_ERR("Cannot encrypt/auth (%i): %p %u/%u - fc %u", ret,
+			frame, auth_payload_len, encrypt_payload_len,
 			sec_ctx->frame_counter);
 		return false;
 	}

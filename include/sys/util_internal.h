@@ -76,8 +76,7 @@
  */
 #define Z_LIST_ADD_ELEM(e) EMPTY, e
 #define Z_LIST_DROP_FIRST(...) GET_ARGS_LESS_N(1, __VA_ARGS__)
-#define Z_LIST_NO_EMPTIES(e) \
-	COND_CODE_1(IS_EMPTY(e), (), (Z_LIST_ADD_ELEM(e)))
+#define Z_LIST_NO_EMPTIES(e) COND_CODE_1(IS_EMPTY(e), (), (Z_LIST_ADD_ELEM(e)))
 
 /*
  * Macros for doing code-generation with the preprocessor as if we
@@ -95,7 +94,7 @@
 #define UTIL_OBSTRUCT(...) __VA_ARGS__ UTIL_DEFER(UTIL_EMPTY)()
 #define UTIL_EXPAND(...) __VA_ARGS__
 
-#define UTIL_EVAL(...)  UTIL_EVAL1(UTIL_EVAL1(UTIL_EVAL1(__VA_ARGS__)))
+#define UTIL_EVAL(...) UTIL_EVAL1(UTIL_EVAL1(UTIL_EVAL1(__VA_ARGS__)))
 #define UTIL_EVAL1(...) UTIL_EVAL2(UTIL_EVAL2(UTIL_EVAL2(__VA_ARGS__)))
 #define UTIL_EVAL2(...) UTIL_EVAL3(UTIL_EVAL3(UTIL_EVAL3(__VA_ARGS__)))
 #define UTIL_EVAL3(...) UTIL_EVAL4(UTIL_EVAL4(UTIL_EVAL4(__VA_ARGS__)))
@@ -641,7 +640,7 @@
 #define UTIL_DEC_256 255
 
 #define UTIL_CHECK_N(x, n, ...) n
-#define UTIL_CHECK(...) UTIL_CHECK_N(__VA_ARGS__, 0,)
+#define UTIL_CHECK(...) UTIL_CHECK_N(__VA_ARGS__, 0, )
 #define UTIL_NOT(x) UTIL_CHECK(UTIL_PRIMITIVE_CAT(UTIL_NOT_, x))
 #define UTIL_NOT_0 ~, 1,
 #define UTIL_COMPL(b) UTIL_PRIMITIVE_CAT(UTIL_COMPL_, b)
@@ -656,36 +655,23 @@
 #define UTIL_EAT(...)
 #define UTIL_WHEN(c) UTIL_IF(c)(UTIL_EXPAND, UTIL_EAT)
 
-#define UTIL_REPEAT(count, macro, ...)			    \
-	UTIL_WHEN(count)				    \
-	(						    \
-		UTIL_OBSTRUCT(UTIL_REPEAT_INDIRECT) ()	    \
-		(					    \
-			UTIL_DEC(count), macro, __VA_ARGS__ \
-		)					    \
-		UTIL_OBSTRUCT(macro)			    \
-		(					    \
-			UTIL_DEC(count), __VA_ARGS__	    \
-		)					    \
-	)
+#define UTIL_REPEAT(count, macro, ...)                                 \
+	UTIL_WHEN(count)                                               \
+	(UTIL_OBSTRUCT(UTIL_REPEAT_INDIRECT)()(UTIL_DEC(count), macro, \
+					       __VA_ARGS__)            \
+		 UTIL_OBSTRUCT(macro)(UTIL_DEC(count), __VA_ARGS__))
 #define UTIL_REPEAT_INDIRECT() UTIL_REPEAT
 
 /* Internal macros used by FOR_EACH, FOR_EACH_IDX, etc. */
 
-#define Z_FOR_EACH_IDX(count, n, macro, sep, fixed_arg0, fixed_arg1, ...)\
-	UTIL_WHEN(count)						\
-	(								\
-		UTIL_OBSTRUCT(macro)					\
-		(							\
-			fixed_arg0, fixed_arg1, n, Z_GET_ARG1(__VA_ARGS__)\
-		) COND_CODE_1(count, (), (__DEBRACKET sep))		\
-		UTIL_OBSTRUCT(Z_FOR_EACH_IDX_INDIRECT) ()		\
-		(							\
-			UTIL_DEC(count), UTIL_INC(n), macro, sep,	\
-			fixed_arg0, fixed_arg1,				\
-			Z_GET_ARGS_LESS_1(__VA_ARGS__)			\
-		)							\
-	)
+#define Z_FOR_EACH_IDX(count, n, macro, sep, fixed_arg0, fixed_arg1, ...)      \
+	UTIL_WHEN(count)                                                       \
+	(UTIL_OBSTRUCT(macro)(fixed_arg0, fixed_arg1, n,                       \
+			      Z_GET_ARG1(__VA_ARGS__))                         \
+		 COND_CODE_1(count, (), (__DEBRACKET sep)) UTIL_OBSTRUCT(      \
+			 Z_FOR_EACH_IDX_INDIRECT)()(                           \
+			 UTIL_DEC(count), UTIL_INC(n), macro, sep, fixed_arg0, \
+			 fixed_arg1, Z_GET_ARGS_LESS_1(__VA_ARGS__)))
 
 #define Z_GET_ARG1(arg1, ...) arg1
 #define Z_GET_ARGS_LESS_1(arg1, ...) __VA_ARGS__
@@ -693,8 +679,8 @@
 #define Z_FOR_EACH_IDX_INDIRECT() Z_FOR_EACH_IDX
 
 #define Z_FOR_EACH_IDX2(count, iter, macro, sc, fixed_arg0, fixed_arg1, ...) \
-	UTIL_EVAL(Z_FOR_EACH_IDX(count, iter, macro, sc,\
-				 fixed_arg0, fixed_arg1, __VA_ARGS__))
+	UTIL_EVAL(Z_FOR_EACH_IDX(count, iter, macro, sc, fixed_arg0,         \
+				 fixed_arg1, __VA_ARGS__))
 
 #define Z_FOR_EACH_SWALLOW_NOTHING(F, fixed_arg, index, arg) \
 	F(index, arg, fixed_arg)
@@ -720,20 +706,14 @@
 #define Z_GET_ARG_N_EVAL5(...) __VA_ARGS__
 
 /* Set of internal macros used for GET_ARG_N of macros. */
-#define Z_GET_ARG_N(count, single_arg, ...)				\
-	UTIL_WHEN(count)						\
-	(								\
-		IF_ENABLED(count, (UTIL_OBSTRUCT(__DEBRACKET)		\
-		(							\
-			COND_CODE_1(single_arg,				\
-				(Z_GET_ARG1(__VA_ARGS__)), (__VA_ARGS__))\
-		)))							\
-		UTIL_OBSTRUCT(Z_GET_ARG_N_INDIRECT) ()			\
-		(							\
-			UTIL_DEC(count), single_arg,			\
-			Z_GET_ARGS_LESS_1(__VA_ARGS__)			\
-		)							\
-	)
+#define Z_GET_ARG_N(count, single_arg, ...)                               \
+	UTIL_WHEN(count)                                                  \
+	(IF_ENABLED(count, (UTIL_OBSTRUCT(__DEBRACKET)(COND_CODE_1(       \
+				   single_arg, (Z_GET_ARG1(__VA_ARGS__)), \
+				   (__VA_ARGS__)))))                      \
+		 UTIL_OBSTRUCT(Z_GET_ARG_N_INDIRECT)()(                   \
+			 UTIL_DEC(count), single_arg,                     \
+			 Z_GET_ARGS_LESS_1(__VA_ARGS__)))
 
 #define Z_GET_ARG_N_INDIRECT() Z_GET_ARG_N
 
@@ -741,36 +721,34 @@
 	Z_GET_ARG_N_EVAL(Z_GET_ARG_N(N, single_arg, __VA_ARGS__))
 
 /* Implementation details for NUM_VA_ARGS_LESS_1 */
-#define NUM_VA_ARGS_LESS_1_IMPL(				\
-	_ignored,						\
-	_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10,		\
-	_11, _12, _13, _14, _15, _16, _17, _18, _19, _20,	\
-	_21, _22, _23, _24, _25, _26, _27, _28, _29, _30,	\
-	_31, _32, _33, _34, _35, _36, _37, _38, _39, _40,	\
-	_41, _42, _43, _44, _45, _46, _47, _48, _49, _50,	\
-	_51, _52, _53, _54, _55, _56, _57, _58, _59, _60,	\
-	_61, _62, N, ...) N
+#define NUM_VA_ARGS_LESS_1_IMPL(                                              \
+	_ignored, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
+	_14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, \
+	_28, _29, _30, _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, _41, \
+	_42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, \
+	_56, _57, _58, _59, _60, _61, _62, N, ...)                            \
+	N
 
 /* Used by MACRO_MAP_CAT */
-#define MACRO_MAP_CAT_(...)						\
-	/* To make sure it works also for 2 arguments in total */	\
+#define MACRO_MAP_CAT_(...)                                       \
+	/* To make sure it works also for 2 arguments in total */ \
 	MACRO_MAP_CAT_N(NUM_VA_ARGS_LESS_1(__VA_ARGS__), __VA_ARGS__)
-#define MACRO_MAP_CAT_N_(N, ...) UTIL_CAT(MACRO_MC_, N)(__VA_ARGS__,)
+#define MACRO_MAP_CAT_N_(N, ...) UTIL_CAT(MACRO_MC_, N)(__VA_ARGS__, )
 #define MACRO_MC_0(...)
-#define MACRO_MC_1(m, a, ...)  m(a)
-#define MACRO_MC_2(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_1(m, __VA_ARGS__,))
-#define MACRO_MC_3(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_2(m, __VA_ARGS__,))
-#define MACRO_MC_4(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_3(m, __VA_ARGS__,))
-#define MACRO_MC_5(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_4(m, __VA_ARGS__,))
-#define MACRO_MC_6(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_5(m, __VA_ARGS__,))
-#define MACRO_MC_7(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_6(m, __VA_ARGS__,))
-#define MACRO_MC_8(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_7(m, __VA_ARGS__,))
-#define MACRO_MC_9(m, a, ...)  UTIL_CAT(m(a), MACRO_MC_8(m, __VA_ARGS__,))
-#define MACRO_MC_10(m, a, ...) UTIL_CAT(m(a), MACRO_MC_9(m, __VA_ARGS__,))
-#define MACRO_MC_11(m, a, ...) UTIL_CAT(m(a), MACRO_MC_10(m, __VA_ARGS__,))
-#define MACRO_MC_12(m, a, ...) UTIL_CAT(m(a), MACRO_MC_11(m, __VA_ARGS__,))
-#define MACRO_MC_13(m, a, ...) UTIL_CAT(m(a), MACRO_MC_12(m, __VA_ARGS__,))
-#define MACRO_MC_14(m, a, ...) UTIL_CAT(m(a), MACRO_MC_13(m, __VA_ARGS__,))
-#define MACRO_MC_15(m, a, ...) UTIL_CAT(m(a), MACRO_MC_14(m, __VA_ARGS__,))
+#define MACRO_MC_1(m, a, ...) m(a)
+#define MACRO_MC_2(m, a, ...) UTIL_CAT(m(a), MACRO_MC_1(m, __VA_ARGS__, ))
+#define MACRO_MC_3(m, a, ...) UTIL_CAT(m(a), MACRO_MC_2(m, __VA_ARGS__, ))
+#define MACRO_MC_4(m, a, ...) UTIL_CAT(m(a), MACRO_MC_3(m, __VA_ARGS__, ))
+#define MACRO_MC_5(m, a, ...) UTIL_CAT(m(a), MACRO_MC_4(m, __VA_ARGS__, ))
+#define MACRO_MC_6(m, a, ...) UTIL_CAT(m(a), MACRO_MC_5(m, __VA_ARGS__, ))
+#define MACRO_MC_7(m, a, ...) UTIL_CAT(m(a), MACRO_MC_6(m, __VA_ARGS__, ))
+#define MACRO_MC_8(m, a, ...) UTIL_CAT(m(a), MACRO_MC_7(m, __VA_ARGS__, ))
+#define MACRO_MC_9(m, a, ...) UTIL_CAT(m(a), MACRO_MC_8(m, __VA_ARGS__, ))
+#define MACRO_MC_10(m, a, ...) UTIL_CAT(m(a), MACRO_MC_9(m, __VA_ARGS__, ))
+#define MACRO_MC_11(m, a, ...) UTIL_CAT(m(a), MACRO_MC_10(m, __VA_ARGS__, ))
+#define MACRO_MC_12(m, a, ...) UTIL_CAT(m(a), MACRO_MC_11(m, __VA_ARGS__, ))
+#define MACRO_MC_13(m, a, ...) UTIL_CAT(m(a), MACRO_MC_12(m, __VA_ARGS__, ))
+#define MACRO_MC_14(m, a, ...) UTIL_CAT(m(a), MACRO_MC_13(m, __VA_ARGS__, ))
+#define MACRO_MC_15(m, a, ...) UTIL_CAT(m(a), MACRO_MC_14(m, __VA_ARGS__, ))
 
 #endif /* ZEPHYR_INCLUDE_SYS_UTIL_INTERNAL_H_ */

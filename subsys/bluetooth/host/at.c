@@ -49,8 +49,7 @@ int at_get_number(struct at_client *at, uint32_t *val)
 
 	skip_space(at);
 
-	for (i = 0U, *val = 0U;
-	     isdigit((unsigned char)at->buf[at->pos]);
+	for (i = 0U, *val = 0U; isdigit((unsigned char)at->buf[at->pos]);
 	     at->pos++, i++) {
 		*val = *val * 10U + at->buf[at->pos] - '0';
 	}

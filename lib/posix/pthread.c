@@ -12,8 +12,8 @@
 #include <posix/pthread.h>
 #include <sys/slist.h>
 
-#define PTHREAD_INIT_FLAGS	PTHREAD_CANCEL_ENABLE
-#define PTHREAD_CANCELED	((void *) -1)
+#define PTHREAD_INIT_FLAGS PTHREAD_CANCEL_ENABLE
+#define PTHREAD_CANCELED ((void *)-1)
 
 #define LOWEST_POSIX_THREAD_PRIORITY 1
 
@@ -68,7 +68,7 @@ static int32_t posix_to_zephyr_priority(uint32_t priority, int policy)
 
 	if (policy == SCHED_FIFO) {
 		/* Zephyr COOP priority starts from -1 */
-		prio =  -1 * (priority + 1);
+		prio = -1 * (priority + 1);
 	} else {
 		prio = (CONFIG_NUM_PREEMPT_PRIORITIES - priority);
 	}
@@ -114,7 +114,7 @@ int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr,
 
 static void zephyr_thread_wrapper(void *arg1, void *arg2, void *arg3)
 {
-	void * (*fun_ptr)(void *) = arg3;
+	void *(*fun_ptr)(void *) = arg3;
 
 	fun_ptr(arg1);
 	pthread_exit(NULL);
@@ -141,14 +141,14 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr,
 	 * pointer and stack size. So even though POSIX 1003.1 spec accepts
 	 * attrib as NULL but zephyr needs it initialized with valid stack.
 	 */
-	if ((attr == NULL) || (attr->initialized == 0U)
-	    || (attr->stack == NULL) || (attr->stacksize == 0)) {
+	if ((attr == NULL) || (attr->initialized == 0U) ||
+	    (attr->stack == NULL) || (attr->stacksize == 0)) {
 		return EINVAL;
 	}
 
 	pthread_mutex_lock(&pthread_pool_lock);
-	for (pthread_num = 0;
-	    pthread_num < CONFIG_MAX_PTHREAD_COUNT; pthread_num++) {
+	for (pthread_num = 0; pthread_num < CONFIG_MAX_PTHREAD_COUNT;
+	     pthread_num++) {
 		thread = &posix_thread_pool[pthread_num];
 		if (thread->state == PTHREAD_TERMINATED) {
 			thread->state = PTHREAD_JOINABLE;
@@ -183,17 +183,13 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr,
 	pthread_cond_init(&thread->state_cond, &cond_attr);
 	sys_slist_init(&thread->key_list);
 
-	*newthread = (pthread_t) k_thread_create(&thread->thread, attr->stack,
-						 attr->stacksize,
-						 (k_thread_entry_t)
-						 zephyr_thread_wrapper,
-						 (void *)arg, NULL,
-						 threadroutine, prio,
-						 (~K_ESSENTIAL & attr->flags),
-						 K_MSEC(attr->delayedstart));
+	*newthread = (pthread_t)k_thread_create(
+		&thread->thread, attr->stack, attr->stacksize,
+		(k_thread_entry_t)zephyr_thread_wrapper, (void *)arg, NULL,
+		threadroutine, prio, (~K_ESSENTIAL & attr->flags),
+		K_MSEC(attr->delayedstart));
 	return 0;
 }
-
 
 /**
  * @brief Set cancelability State.
@@ -202,10 +198,9 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr,
  */
 int pthread_setcancelstate(int state, int *oldstate)
 {
-	struct posix_thread *pthread = (struct posix_thread *) pthread_self();
+	struct posix_thread *pthread = (struct posix_thread *)pthread_self();
 
-	if (state != PTHREAD_CANCEL_ENABLE &&
-	    state != PTHREAD_CANCEL_DISABLE) {
+	if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE) {
 		return EINVAL;
 	}
 
@@ -229,7 +224,7 @@ int pthread_setcancelstate(int state, int *oldstate)
  */
 int pthread_cancel(pthread_t pthread)
 {
-	struct posix_thread *thread = (struct posix_thread *) pthread;
+	struct posix_thread *thread = (struct posix_thread *)pthread;
 	int cancel_state;
 
 	if ((thread == NULL) || (thread->state == PTHREAD_TERMINATED)) {
@@ -252,7 +247,7 @@ int pthread_cancel(pthread_t pthread)
 		}
 		pthread_mutex_unlock(&thread->state_lock);
 
-		k_thread_abort((k_tid_t) thread);
+		k_thread_abort((k_tid_t)thread);
 	}
 
 	return 0;
@@ -294,7 +289,6 @@ int pthread_setschedparam(pthread_t pthread, int policy,
  */
 int pthread_attr_init(pthread_attr_t *attr)
 {
-
 	if (attr == NULL) {
 		return ENOMEM;
 	}
@@ -312,14 +306,14 @@ int pthread_attr_init(pthread_attr_t *attr)
 int pthread_getschedparam(pthread_t pthread, int *policy,
 			  struct sched_param *param)
 {
-	struct posix_thread *thread = (struct posix_thread *) pthread;
+	struct posix_thread *thread = (struct posix_thread *)pthread;
 	uint32_t priority;
 
 	if ((thread == NULL) || (thread->state == PTHREAD_TERMINATED)) {
 		return ESRCH;
 	}
 
-	priority = k_thread_priority_get((k_tid_t) thread);
+	priority = k_thread_priority_get((k_tid_t)thread);
 
 	param->sched_priority = zephyr_to_posix_priority(priority, policy);
 	return 0;
@@ -380,7 +374,8 @@ void pthread_exit(void *retval)
 	SYS_SLIST_FOR_EACH_NODE(&self->key_list, node_l) {
 		thread_spec_data = (pthread_thread_data *)node_l;
 		key_obj = thread_spec_data->key;
-		if ((key_obj->destructor != NULL) && (thread_spec_data != NULL)) {
+		if ((key_obj->destructor != NULL) &&
+		    (thread_spec_data != NULL)) {
 			(key_obj->destructor)(thread_spec_data->spec_data);
 		}
 	}
@@ -396,7 +391,7 @@ void pthread_exit(void *retval)
  */
 int pthread_join(pthread_t thread, void **status)
 {
-	struct posix_thread *pthread = (struct posix_thread *) thread;
+	struct posix_thread *pthread = (struct posix_thread *)thread;
 	int ret = 0;
 
 	if (pthread == NULL) {
@@ -434,7 +429,7 @@ int pthread_join(pthread_t thread, void **status)
  */
 int pthread_detach(pthread_t thread)
 {
-	struct posix_thread *pthread = (struct posix_thread *) thread;
+	struct posix_thread *pthread = (struct posix_thread *)thread;
 	int ret = 0;
 
 	if (pthread == NULL) {
@@ -501,7 +496,6 @@ int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)
 	return 0;
 }
 
-
 /**
  * @brief Get scheduling policy attribute in Thread attributes.
  *
@@ -516,7 +510,6 @@ int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
 	*policy = attr->schedpolicy;
 	return 0;
 }
-
 
 /**
  * @brief Set scheduling policy attribute in Thread attributes object.
@@ -547,7 +540,6 @@ int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize)
 
 	*stacksize = attr->stacksize;
 	return 0;
-
 }
 
 /**
@@ -555,8 +547,8 @@ int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize)
  *
  * See IEEE 1003.1
  */
-int pthread_attr_getstack(const pthread_attr_t *attr,
-				 void **stackaddr, size_t *stacksize)
+int pthread_attr_getstack(const pthread_attr_t *attr, void **stackaddr,
+			  size_t *stacksize)
 {
 	if ((attr == NULL) || (attr->initialized == 0U)) {
 		return EINVAL;
@@ -633,7 +625,7 @@ int pthread_getname_np(pthread_t thread, char *name, size_t len)
 	}
 
 	memset(name, '\0', len);
-	return k_thread_name_copy(kthread, name, len-1);
+	return k_thread_name_copy(kthread, name, len - 1);
 #else
 	ARG_UNUSED(thread);
 	ARG_UNUSED(name);

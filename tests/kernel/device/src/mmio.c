@@ -7,7 +7,7 @@
 #include <ztest.h>
 #include <device.h>
 
-#define DT_DRV_COMPAT	fakedriver
+#define DT_DRV_COMPAT fakedriver
 
 /*
  * Driver with a single MMIO region to manage
@@ -118,8 +118,8 @@ const struct foo_mult_config_info foo12_config = {
 	DEVICE_MMIO_NAMED_ROM_INIT(grault, DT_DRV_INST(2))
 };
 
-#define DEV_DATA(dev)	((struct foo_mult_dev_data *)((dev)->data))
-#define DEV_CFG(dev)	((struct foo_mult_config_info *)((dev)->config))
+#define DEV_DATA(dev) ((struct foo_mult_dev_data *)((dev)->data))
+#define DEV_CFG(dev) ((struct foo_mult_config_info *)((dev)->config))
 
 int foo_mult_init(const struct device *device)
 {
@@ -235,18 +235,14 @@ void test_mmio_toplevel(void)
 #ifdef DEVICE_MMIO_IS_IN_RAM
 	zassert_equal(rom_foo3->phys_addr, DT_INST_REG_ADDR(3),
 		      "bad phys_addr (foo3)");
-	zassert_equal(rom_foo3->size, DT_INST_REG_SIZE(3),
-		      "bad size (foo3)");
+	zassert_equal(rom_foo3->size, DT_INST_REG_SIZE(3), "bad size (foo3)");
 	zassert_equal(rom_foo4->phys_addr, DT_INST_REG_ADDR(4),
 		      "bad phys_addr (foo4)");
-	zassert_equal(rom_foo4->size, DT_INST_REG_SIZE(4),
-		      "bad size (foo4)");
+	zassert_equal(rom_foo4->size, DT_INST_REG_SIZE(4), "bad size (foo4)");
 #else
-	zassert_equal(rom_foo3->addr, DT_INST_REG_ADDR(3),
-		      "bad addr (foo3)");
+	zassert_equal(rom_foo3->addr, DT_INST_REG_ADDR(3), "bad addr (foo3)");
 	zassert_equal(regs_foo3, rom_foo3->addr, "bad regs (foo3)");
-	zassert_equal(rom_foo4->addr, DT_INST_REG_ADDR(4),
-		      "bad addr (foo4)");
+	zassert_equal(rom_foo4->addr, DT_INST_REG_ADDR(4), "bad addr (foo4)");
 	zassert_equal(regs_foo4, rom_foo4->addr, "bad regs (foo4)");
 #endif
 }

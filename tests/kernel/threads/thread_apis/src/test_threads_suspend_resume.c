@@ -24,9 +24,9 @@ static void threads_suspend_resume(int prio)
 	/* create thread with lower priority */
 	int create_prio = last_prio + 1;
 
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      thread_entry, NULL, NULL, NULL,
-				      create_prio, K_USER, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry,
+				      NULL, NULL, NULL, create_prio, K_USER,
+				      K_NO_WAIT);
 	/* checkpoint: suspend current thread */
 	k_thread_suspend(tid);
 	k_msleep(100);
@@ -94,8 +94,8 @@ void test_threads_suspend(void)
 	after_suspend = false;
 
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      suspend_myself, NULL, NULL, NULL,
-				      0, K_USER, K_NO_WAIT);
+				      suspend_myself, NULL, NULL, NULL, 0,
+				      K_USER, K_NO_WAIT);
 
 	/* Give the thread a chance to start and verify that it
 	 * stopped executing after suspending itself.
@@ -131,8 +131,8 @@ void test_threads_suspend_timeout(void)
 	after_suspend = false;
 
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      sleep_suspended, NULL, NULL, NULL,
-				      0, K_USER, K_NO_WAIT);
+				      sleep_suspended, NULL, NULL, NULL, 0,
+				      K_USER, K_NO_WAIT);
 
 	k_msleep(50);
 	k_thread_suspend(tid);

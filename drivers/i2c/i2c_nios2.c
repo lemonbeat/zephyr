@@ -17,15 +17,14 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(i2c_nios2);
 
-#define NIOS2_I2C_TIMEOUT_USEC		1000
+#define NIOS2_I2C_TIMEOUT_USEC 1000
 
-#define DEV_CFG(dev) \
-	((struct i2c_nios2_config *)(dev)->config)
+#define DEV_CFG(dev) ((struct i2c_nios2_config *)(dev)->config)
 
 struct i2c_nios2_config {
-	ALT_AVALON_I2C_DEV_t	i2c_dev;
-	IRQ_DATA_t		irq_data;
-	struct k_sem		sem_lock;
+	ALT_AVALON_I2C_DEV_t i2c_dev;
+	IRQ_DATA_t irq_data;
+	struct k_sem sem_lock;
 };
 
 static int i2c_nios2_configure(const struct device *dev, uint32_t dev_config)
@@ -69,12 +68,11 @@ static int i2c_nios2_transfer(const struct device *dev, struct i2c_msg *msgs,
 
 	k_sem_take(&config->sem_lock, K_FOREVER);
 	/* register the optional interrupt callback */
-	alt_avalon_i2c_register_optional_irq_handler(
-			&config->i2c_dev, &config->irq_data);
+	alt_avalon_i2c_register_optional_irq_handler(&config->i2c_dev,
+						     &config->irq_data);
 
 	/* Iterate over all the messages */
 	for (i = 0; i < num_msgs; i++) {
-
 		/* convert restart flag */
 		if (msgs->flags & I2C_MSG_RESTART) {
 			restart = ALT_AVALON_I2C_RESTART;
@@ -95,14 +93,13 @@ static int i2c_nios2_transfer(const struct device *dev, struct i2c_msg *msgs,
 		/* Start the transfer */
 		if (msgs->flags & I2C_MSG_READ) {
 			status = alt_avalon_i2c_master_receive_using_interrupts(
-							&config->i2c_dev,
-							msgs->buf, msgs->len,
-							restart, stop);
+				&config->i2c_dev, msgs->buf, msgs->len, restart,
+				stop);
 		} else {
-			status = alt_avalon_i2c_master_transmit_using_interrupts
-							(&config->i2c_dev,
-							msgs->buf, msgs->len,
-							restart, stop);
+			status =
+				alt_avalon_i2c_master_transmit_using_interrupts(
+					&config->i2c_dev, msgs->buf, msgs->len,
+					restart, stop);
 		}
 
 		/* Return an error if the transfer didn't
@@ -118,7 +115,7 @@ static int i2c_nios2_transfer(const struct device *dev, struct i2c_msg *msgs,
 		while (timeout) {
 			k_busy_wait(1);
 			status = alt_avalon_i2c_interrupt_transaction_status(
-							&config->i2c_dev);
+				&config->i2c_dev);
 			if (status == ALT_AVALON_I2C_SUCCESS) {
 				break;
 			}
@@ -165,10 +162,9 @@ static struct i2c_nios2_config i2c_nios2_cfg = {
 	},
 };
 
-DEVICE_AND_API_INIT(i2c_nios2_0, DT_INST_LABEL(0), &i2c_nios2_init,
-		    NULL, &i2c_nios2_cfg,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &i2c_nios2_driver_api);
+DEVICE_AND_API_INIT(i2c_nios2_0, DT_INST_LABEL(0), &i2c_nios2_init, NULL,
+		    &i2c_nios2_cfg, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &i2c_nios2_driver_api);
 
 static int i2c_nios2_init(const struct device *dev)
 {
@@ -178,9 +174,8 @@ static int i2c_nios2_init(const struct device *dev)
 	/* initialize semaphore */
 	k_sem_init(&config->sem_lock, 1, 1);
 
-	rc = i2c_nios2_configure(dev,
-			I2C_MODE_MASTER |
-			I2C_SPEED_SET(I2C_SPEED_STANDARD));
+	rc = i2c_nios2_configure(
+		dev, I2C_MODE_MASTER | I2C_SPEED_SET(I2C_SPEED_STANDARD));
 	if (rc) {
 		LOG_ERR("i2c configure failed %d\n", rc);
 		return rc;
@@ -188,9 +183,9 @@ static int i2c_nios2_init(const struct device *dev)
 
 	/* clear ISR register content */
 	alt_avalon_i2c_int_clear(&config->i2c_dev,
-			ALT_AVALON_I2C_ISR_ALL_CLEARABLE_INTS_MSK);
-	IRQ_CONNECT(I2C_0_IRQ, CONFIG_I2C_0_IRQ_PRI,
-			i2c_nios2_isr, DEVICE_GET(i2c_nios2_0), 0);
+				 ALT_AVALON_I2C_ISR_ALL_CLEARABLE_INTS_MSK);
+	IRQ_CONNECT(I2C_0_IRQ, CONFIG_I2C_0_IRQ_PRI, i2c_nios2_isr,
+		    DEVICE_GET(i2c_nios2_0), 0);
 	irq_enable(I2C_0_IRQ);
 	return 0;
 }

@@ -22,11 +22,11 @@ void ext_log_system_foo(void)
 	ext_log(EXT_LOG_WARNING, "warning level log, 2 arguments: %d %d", 1, 2);
 
 	ext_log(EXT_LOG_NOTICE, "notice level log, 3 arguments: %d, %s, 0x%08x",
-							100, "string", 0x255);
+		100, "string", 0x255);
 
-	ext_log(EXT_LOG_INFO, "info level log, 4 arguments : %d %d %d %d",
-								1, 2, 3, 4);
+	ext_log(EXT_LOG_INFO, "info level log, 4 arguments : %d %d %d %d", 1, 2,
+		3, 4);
 
 	ext_log(EXT_LOG_DEBUG, "debug level log, 5 arguments: %d %d %d %d %d",
-								1, 2, 3, 4, 5);
+		1, 2, 3, 4, 5);
 }

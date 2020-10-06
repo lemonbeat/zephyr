@@ -37,7 +37,6 @@ static ALWAYS_INLINE unsigned int find_msb_set(uint32_t op)
 	return 32 - __builtin_clz(op);
 }
 
-
 /**
  *
  * @brief find least significant bit set in a 32-bit word

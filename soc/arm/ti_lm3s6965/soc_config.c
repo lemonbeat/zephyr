@@ -49,8 +49,8 @@ SYS_INIT(uart_stellaris_init, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
 
 #define RCGC2 (*((volatile uint32_t *)0x400FE108))
 
-#define RCGC2_PHY_EN   0x40000000
-#define RCGC2_EMAC_EN  0x10000000
+#define RCGC2_PHY_EN 0x40000000
+#define RCGC2_EMAC_EN 0x10000000
 
 static int eth_stellaris_init(const struct device *dev)
 {

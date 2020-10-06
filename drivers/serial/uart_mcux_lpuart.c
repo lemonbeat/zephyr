@@ -50,8 +50,8 @@ static void mcux_lpuart_poll_out(const struct device *dev, unsigned char c)
 {
 	const struct mcux_lpuart_config *config = dev->config;
 
-	while (!(LPUART_GetStatusFlags(config->base)
-		& kLPUART_TxDataRegEmptyFlag)) {
+	while (!(LPUART_GetStatusFlags(config->base) &
+		 kLPUART_TxDataRegEmptyFlag)) {
 	}
 
 	LPUART_WriteByte(config->base, c);
@@ -76,24 +76,21 @@ static int mcux_lpuart_err_check(const struct device *dev)
 	}
 
 	LPUART_ClearStatusFlags(config->base, kLPUART_RxOverrunFlag |
-					      kLPUART_ParityErrorFlag |
-					      kLPUART_FramingErrorFlag);
+						      kLPUART_ParityErrorFlag |
+						      kLPUART_FramingErrorFlag);
 
 	return err;
 }
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 static int mcux_lpuart_fifo_fill(const struct device *dev,
-				 const uint8_t *tx_data,
-				 int len)
+				 const uint8_t *tx_data, int len)
 {
 	const struct mcux_lpuart_config *config = dev->config;
 	uint8_t num_tx = 0U;
 
-	while ((len - num_tx > 0) &&
-	       (LPUART_GetStatusFlags(config->base)
-		& kLPUART_TxDataRegEmptyFlag)) {
-
+	while ((len - num_tx > 0) && (LPUART_GetStatusFlags(config->base) &
+				      kLPUART_TxDataRegEmptyFlag)) {
 		LPUART_WriteByte(config->base, tx_data[num_tx++]);
 	}
 
@@ -106,10 +103,8 @@ static int mcux_lpuart_fifo_read(const struct device *dev, uint8_t *rx_data,
 	const struct mcux_lpuart_config *config = dev->config;
 	uint8_t num_rx = 0U;
 
-	while ((len - num_rx > 0) &&
-	       (LPUART_GetStatusFlags(config->base)
-		& kLPUART_RxDataRegFullFlag)) {
-
+	while ((len - num_rx > 0) && (LPUART_GetStatusFlags(config->base) &
+				      kLPUART_RxDataRegFullFlag)) {
 		rx_data[num_rx++] = LPUART_ReadByte(config->base);
 	}
 
@@ -146,8 +141,8 @@ static int mcux_lpuart_irq_tx_ready(const struct device *dev)
 	uint32_t mask = kLPUART_TxDataRegEmptyInterruptEnable;
 	uint32_t flags = LPUART_GetStatusFlags(config->base);
 
-	return (LPUART_GetEnabledInterrupts(config->base) & mask)
-		&& (flags & kLPUART_TxDataRegEmptyFlag);
+	return (LPUART_GetEnabledInterrupts(config->base) & mask) &&
+	       (flags & kLPUART_TxDataRegEmptyFlag);
 }
 
 static void mcux_lpuart_irq_rx_enable(const struct device *dev)
@@ -179,8 +174,8 @@ static int mcux_lpuart_irq_rx_ready(const struct device *dev)
 	const struct mcux_lpuart_config *config = dev->config;
 	uint32_t mask = kLPUART_RxDataRegFullInterruptEnable;
 
-	return (LPUART_GetEnabledInterrupts(config->base) & mask)
-		&& mcux_lpuart_irq_rx_full(dev);
+	return (LPUART_GetEnabledInterrupts(config->base) & mask) &&
+	       mcux_lpuart_irq_rx_full(dev);
 }
 
 static void mcux_lpuart_irq_err_enable(const struct device *dev)
@@ -205,8 +200,7 @@ static void mcux_lpuart_irq_err_disable(const struct device *dev)
 
 static int mcux_lpuart_irq_is_pending(const struct device *dev)
 {
-	return (mcux_lpuart_irq_tx_ready(dev)
-		|| mcux_lpuart_irq_rx_ready(dev));
+	return (mcux_lpuart_irq_tx_ready(dev) || mcux_lpuart_irq_rx_ready(dev));
 }
 
 static int mcux_lpuart_irq_update(const struct device *dev)
@@ -274,11 +268,11 @@ static int mcux_lpuart_configure_init(const struct device *dev,
 #if defined(FSL_FEATURE_LPUART_HAS_7BIT_DATA_SUPPORT) && \
 	FSL_FEATURE_LPUART_HAS_7BIT_DATA_SUPPORT
 	case UART_CFG_DATA_BITS_7:
-		uart_config.dataBitsCount  = kLPUART_SevenDataBits;
+		uart_config.dataBitsCount = kLPUART_SevenDataBits;
 		break;
 #endif
 	case UART_CFG_DATA_BITS_8:
-		uart_config.dataBitsCount  = kLPUART_EightDataBits;
+		uart_config.dataBitsCount = kLPUART_EightDataBits;
 		break;
 	default:
 		return -ENOTSUP;
@@ -325,7 +319,8 @@ static int mcux_lpuart_configure_init(const struct device *dev,
 	return 0;
 }
 
-static int mcux_lpuart_config_get(const struct device *dev, struct uart_config *cfg)
+static int mcux_lpuart_config_get(const struct device *dev,
+				  struct uart_config *cfg)
 {
 	struct mcux_lpuart_data *data = dev->data;
 	*cfg = data->uart_config;
@@ -397,60 +392,58 @@ static const struct uart_driver_api mcux_lpuart_driver_api = {
 #endif
 };
 
-
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-#define MCUX_LPUART_IRQ_INIT(n, i)					\
-	do {								\
-		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, i, irq),		\
-			    DT_INST_IRQ_BY_IDX(n, i, priority),		\
-			    mcux_lpuart_isr, DEVICE_GET(uart_##n), 0);	\
-									\
-		irq_enable(DT_INST_IRQ_BY_IDX(n, i, irq));		\
+#define MCUX_LPUART_IRQ_INIT(n, i)                                     \
+	do {                                                           \
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, i, irq),             \
+			    DT_INST_IRQ_BY_IDX(n, i, priority),        \
+			    mcux_lpuart_isr, DEVICE_GET(uart_##n), 0); \
+                                                                       \
+		irq_enable(DT_INST_IRQ_BY_IDX(n, i, irq));             \
 	} while (0)
-#define LPUART_MCUX_CONFIG_FUNC(n)					\
+#define LPUART_MCUX_CONFIG_FUNC(n)                                        \
 	static void mcux_lpuart_config_func_##n(const struct device *dev) \
-	{								\
-		MCUX_LPUART_IRQ_INIT(n, 0);				\
-									\
-		IF_ENABLED(DT_INST_IRQ_HAS_IDX(n, 1),			\
-			   (MCUX_LPUART_IRQ_INIT(n, 1);))		\
+	{                                                                 \
+		MCUX_LPUART_IRQ_INIT(n, 0);                               \
+                                                                          \
+		IF_ENABLED(DT_INST_IRQ_HAS_IDX(n, 1),                     \
+			   (MCUX_LPUART_IRQ_INIT(n, 1);))                 \
 	}
-#define LPUART_MCUX_IRQ_CFG_FUNC_INIT(n)				\
+#define LPUART_MCUX_IRQ_CFG_FUNC_INIT(n) \
 	.irq_config_func = mcux_lpuart_config_func_##n
-#define LPUART_MCUX_INIT_CFG(n)						\
+#define LPUART_MCUX_INIT_CFG(n) \
 	LPUART_MCUX_DECLARE_CFG(n, LPUART_MCUX_IRQ_CFG_FUNC_INIT(n))
 #else
 #define LPUART_MCUX_CONFIG_FUNC(n)
 #define LPUART_MCUX_IRQ_CFG_FUNC_INIT
-#define LPUART_MCUX_INIT_CFG(n)						\
+#define LPUART_MCUX_INIT_CFG(n) \
 	LPUART_MCUX_DECLARE_CFG(n, LPUART_MCUX_IRQ_CFG_FUNC_INIT)
 #endif
 
-#define LPUART_MCUX_DECLARE_CFG(n, IRQ_FUNC_INIT)			\
-static const struct mcux_lpuart_config mcux_lpuart_##n##_config = {	\
-	.base = (LPUART_Type *) DT_INST_REG_ADDR(n),			\
-	.clock_name = DT_INST_CLOCKS_LABEL(n),				\
-	.clock_subsys = (clock_control_subsys_t)DT_INST_CLOCKS_CELL(n, name),\
-	.baud_rate = DT_INST_PROP(n, current_speed),			\
-	IRQ_FUNC_INIT							\
-}
+#define LPUART_MCUX_DECLARE_CFG(n, IRQ_FUNC_INIT)                             \
+	static const struct mcux_lpuart_config mcux_lpuart_##n##_config = {   \
+		.base = (LPUART_Type *)DT_INST_REG_ADDR(n),                   \
+		.clock_name = DT_INST_CLOCKS_LABEL(n),                        \
+		.clock_subsys =                                               \
+			(clock_control_subsys_t)DT_INST_CLOCKS_CELL(n, name), \
+		.baud_rate = DT_INST_PROP(n, current_speed),                  \
+		IRQ_FUNC_INIT                                                 \
+	}
 
-#define LPUART_MCUX_INIT(n)						\
-									\
-	static struct mcux_lpuart_data mcux_lpuart_##n##_data;		\
-									\
-	static const struct mcux_lpuart_config mcux_lpuart_##n##_config;\
-									\
-	DEVICE_AND_API_INIT(uart_##n, DT_INST_LABEL(n),			\
-			    &mcux_lpuart_init,				\
-			    &mcux_lpuart_##n##_data,			\
-			    &mcux_lpuart_##n##_config,			\
-			    PRE_KERNEL_1,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &mcux_lpuart_driver_api);			\
-									\
-	LPUART_MCUX_CONFIG_FUNC(n)					\
-									\
+#define LPUART_MCUX_INIT(n)                                                \
+                                                                           \
+	static struct mcux_lpuart_data mcux_lpuart_##n##_data;             \
+                                                                           \
+	static const struct mcux_lpuart_config mcux_lpuart_##n##_config;   \
+                                                                           \
+	DEVICE_AND_API_INIT(uart_##n, DT_INST_LABEL(n), &mcux_lpuart_init, \
+			    &mcux_lpuart_##n##_data,                       \
+			    &mcux_lpuart_##n##_config, PRE_KERNEL_1,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,            \
+			    &mcux_lpuart_driver_api);                      \
+                                                                           \
+	LPUART_MCUX_CONFIG_FUNC(n)                                         \
+                                                                           \
 	LPUART_MCUX_INIT_CFG(n);
 
 DT_INST_FOREACH_STATUS_OKAY(LPUART_MCUX_INIT)

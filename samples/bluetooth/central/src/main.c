@@ -117,8 +117,8 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 }
 
 static struct bt_conn_cb conn_callbacks = {
-		.connected = connected,
-		.disconnected = disconnected,
+	.connected = connected,
+	.disconnected = disconnected,
 };
 
 void main(void)

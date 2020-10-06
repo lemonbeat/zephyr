@@ -9,7 +9,7 @@
 #include <string.h>
 
 K_MEM_SLAB_DEFINE(cmsis_semaphore_slab, sizeof(struct k_sem),
-		CONFIG_CMSIS_SEMAPHORE_MAX_COUNT, 4);
+		  CONFIG_CMSIS_SEMAPHORE_MAX_COUNT, 4);
 
 /**
  * @brief Create and Initialize a semaphore object.
@@ -27,8 +27,8 @@ osSemaphoreId osSemaphoreCreate(const osSemaphoreDef_t *semaphore_def,
 		return NULL;
 	}
 
-	if (k_mem_slab_alloc(&cmsis_semaphore_slab,
-				(void **)&semaphore, K_MSEC(100)) == 0) {
+	if (k_mem_slab_alloc(&cmsis_semaphore_slab, (void **)&semaphore,
+			     K_MSEC(100)) == 0) {
 		(void)memset(semaphore, 0, sizeof(struct k_sem));
 	} else {
 		return NULL;
@@ -44,7 +44,7 @@ osSemaphoreId osSemaphoreCreate(const osSemaphoreDef_t *semaphore_def,
  */
 int32_t osSemaphoreWait(osSemaphoreId semaphore_id, uint32_t timeout)
 {
-	struct k_sem *semaphore = (struct k_sem *) semaphore_id;
+	struct k_sem *semaphore = (struct k_sem *)semaphore_id;
 	int status;
 
 	if (semaphore_id == NULL) {
@@ -79,7 +79,7 @@ int32_t osSemaphoreWait(osSemaphoreId semaphore_id, uint32_t timeout)
  */
 osStatus osSemaphoreRelease(osSemaphoreId semaphore_id)
 {
-	struct k_sem *semaphore = (struct k_sem *) semaphore_id;
+	struct k_sem *semaphore = (struct k_sem *)semaphore_id;
 
 	if (semaphore_id == NULL) {
 		return osErrorParameter;
@@ -100,7 +100,7 @@ osStatus osSemaphoreRelease(osSemaphoreId semaphore_id)
  */
 osStatus osSemaphoreDelete(osSemaphoreId semaphore_id)
 {
-	struct k_sem *semaphore = (struct k_sem *) semaphore_id;
+	struct k_sem *semaphore = (struct k_sem *)semaphore_id;
 
 	if (semaphore_id == NULL) {
 		return osErrorParameter;
@@ -114,7 +114,7 @@ osStatus osSemaphoreDelete(osSemaphoreId semaphore_id)
 	 * could not be deleted) is not supported in Zephyr.
 	 */
 
-	k_mem_slab_free(&cmsis_semaphore_slab, (void *) &semaphore);
+	k_mem_slab_free(&cmsis_semaphore_slab, (void *)&semaphore);
 
 	return osOK;
 }

@@ -19,8 +19,8 @@ LOG_MODULE_DECLARE(net_zperf_sample, LOG_LEVEL_DBG);
 #include "zperf_internal.h"
 
 static uint8_t sample_packet[sizeof(struct zperf_udp_datagram) +
-			  sizeof(struct zperf_client_hdr_v1) +
-			  PACKET_SIZE_MAX];
+			     sizeof(struct zperf_client_hdr_v1) +
+			     PACKET_SIZE_MAX];
 
 static inline void zperf_upload_decode_stat(const struct shell *shell,
 					    struct net_pkt *pkt,
@@ -31,8 +31,7 @@ static inline void zperf_upload_decode_stat(const struct shell *shell,
 	struct zperf_udp_datagram *hdr;
 	struct zperf_server_hdr *stat;
 
-	hdr = (struct zperf_udp_datagram *)
-		net_pkt_get_data(pkt, &zperf_udp);
+	hdr = (struct zperf_udp_datagram *)net_pkt_get_data(pkt, &zperf_udp);
 	if (!hdr) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Network packet too short\n");
@@ -41,8 +40,7 @@ static inline void zperf_upload_decode_stat(const struct shell *shell,
 
 	net_pkt_acknowledge_data(pkt, &zperf_udp);
 
-	stat = (struct zperf_server_hdr *)
-		net_pkt_get_data(pkt, &zperf_stat);
+	stat = (struct zperf_server_hdr *)net_pkt_get_data(pkt, &zperf_stat);
 	if (!stat) {
 		shell_fprintf(shell, SHELL_WARNING,
 			      "Network packet too short\n");
@@ -54,17 +52,17 @@ static inline void zperf_upload_decode_stat(const struct shell *shell,
 	results->nb_packets_outorder =
 		ntohl(UNALIGNED_GET(&stat->outorder_cnt));
 	results->nb_bytes_sent = ntohl(UNALIGNED_GET(&stat->total_len2));
-	results->time_in_us = ntohl(UNALIGNED_GET(&stat->stop_usec)) +
+	results->time_in_us =
+		ntohl(UNALIGNED_GET(&stat->stop_usec)) +
 		ntohl(UNALIGNED_GET(&stat->stop_sec)) * USEC_PER_SEC;
-	results->jitter_in_us = ntohl(UNALIGNED_GET(&stat->jitter2)) +
+	results->jitter_in_us =
+		ntohl(UNALIGNED_GET(&stat->jitter2)) +
 		ntohl(UNALIGNED_GET(&stat->jitter1)) * USEC_PER_SEC;
 }
 
-static void stat_received(struct net_context *context,
-			  struct net_pkt *pkt,
+static void stat_received(struct net_context *context, struct net_pkt *pkt,
 			  union net_ip_header *ip_hdr,
-			  union net_proto_header *proto_hdr,
-			  int status,
+			  union net_proto_header *proto_hdr, int status,
 			  void *user_data)
 {
 	struct net_pkt **stat = user_data;
@@ -74,8 +72,7 @@ static void stat_received(struct net_context *context,
 
 static inline void zperf_upload_fin(const struct shell *shell,
 				    struct net_context *context,
-				    uint32_t nb_packets,
-				    uint32_t end_time,
+				    uint32_t nb_packets, uint32_t end_time,
 				    uint32_t packet_size,
 				    struct zperf_results *results)
 {
@@ -91,8 +88,8 @@ static inline void zperf_upload_fin(const struct shell *shell,
 		/* Fill the packet header */
 		datagram->id = htonl(-nb_packets);
 		datagram->tv_sec = htonl(HW_CYCLES_TO_SEC(end_time));
-		datagram->tv_usec = htonl(HW_CYCLES_TO_USEC(end_time) %
-					  USEC_PER_SEC);
+		datagram->tv_usec =
+			htonl(HW_CYCLES_TO_USEC(end_time) % USEC_PER_SEC);
 
 		hdr = (struct zperf_client_hdr_v1 *)(sample_packet +
 						     sizeof(*datagram));
@@ -105,8 +102,8 @@ static inline void zperf_upload_fin(const struct shell *shell,
 		hdr->flags = 0;
 		hdr->num_of_threads = htonl(1);
 		hdr->port = 0;
-		hdr->buffer_len = sizeof(sample_packet) -
-			sizeof(*datagram) - sizeof(*hdr);
+		hdr->buffer_len = sizeof(sample_packet) - sizeof(*datagram) -
+				  sizeof(*hdr);
 		hdr->bandwidth = 0;
 		hdr->num_of_bytes = htonl(packet_size);
 
@@ -115,16 +112,15 @@ static inline void zperf_upload_fin(const struct shell *shell,
 				       NULL, K_NO_WAIT, NULL);
 		if (ret < 0) {
 			shell_fprintf(shell, SHELL_WARNING,
-				      "Failed to send the packet (%d)\n",
-				      ret);
+				      "Failed to send the packet (%d)\n", ret);
 			continue;
 		}
 
 		/* Receive statistics */
 		stat = NULL;
 
-		ret = net_context_recv(context, stat_received,
-				       K_SECONDS(2), &stat);
+		ret = net_context_recv(context, stat_received, K_SECONDS(2),
+				       &stat);
 		if (ret == -ETIMEDOUT) {
 			break;
 		}
@@ -141,8 +137,8 @@ static inline void zperf_upload_fin(const struct shell *shell,
 	while (stat) {
 		stat = NULL;
 
-		ret = net_context_recv(context, stat_received,
-				       K_NO_WAIT, &stat);
+		ret = net_context_recv(context, stat_received, K_NO_WAIT,
+				       &stat);
 		if (ret == -ETIMEDOUT) {
 			break;
 		}
@@ -156,17 +152,14 @@ static inline void zperf_upload_fin(const struct shell *shell,
 	}
 }
 
-void zperf_udp_upload(const struct shell *shell,
-		      struct net_context *context,
-		      int port,
-		      unsigned int duration_in_ms,
-		      unsigned int packet_size,
-		      unsigned int rate_in_kbps,
+void zperf_udp_upload(const struct shell *shell, struct net_context *context,
+		      int port, unsigned int duration_in_ms,
+		      unsigned int packet_size, unsigned int rate_in_kbps,
 		      struct zperf_results *results)
 {
-	uint32_t packet_duration = (uint32_t)(((uint64_t) packet_size *
-					       SEC_TO_HW_CYCLES(1) * 8U) /
-					      (uint64_t)(rate_in_kbps * 1024U));
+	uint32_t packet_duration =
+		(uint32_t)(((uint64_t)packet_size * SEC_TO_HW_CYCLES(1) * 8U) /
+			   (uint64_t)(rate_in_kbps * 1024U));
 	uint32_t duration = MSEC_TO_HW_CYCLES(duration_in_ms);
 	uint32_t print_interval = SEC_TO_HW_CYCLES(1);
 	uint32_t delay = packet_duration;
@@ -204,8 +197,8 @@ void zperf_udp_upload(const struct shell *shell,
 
 		/* Algorithm to maintain a given baud rate */
 		if (last_loop_time != loop_time) {
-			adjust = packet_duration - time_delta(last_loop_time,
-							      loop_time);
+			adjust = packet_duration -
+				 time_delta(last_loop_time, loop_time);
 		} else {
 			/* It's the first iteration so no need for adjustment
 			 */
@@ -233,8 +226,8 @@ void zperf_udp_upload(const struct shell *shell,
 		hdr->flags = 0;
 		hdr->num_of_threads = htonl(1);
 		hdr->port = htonl(port);
-		hdr->buffer_len = sizeof(sample_packet) -
-			sizeof(*datagram) - sizeof(*hdr);
+		hdr->buffer_len = sizeof(sample_packet) - sizeof(*datagram) -
+				  sizeof(*hdr);
 		hdr->bandwidth = htonl(rate_in_kbps);
 		hdr->num_of_bytes = htonl(packet_size);
 
@@ -243,8 +236,7 @@ void zperf_udp_upload(const struct shell *shell,
 				       NULL, K_NO_WAIT, NULL);
 		if (ret < 0) {
 			shell_fprintf(shell, SHELL_WARNING,
-				      "Failed to send the packet (%d)\n",
-				      ret);
+				      "Failed to send the packet (%d)\n", ret);
 			break;
 		} else {
 			nb_packets++;
@@ -253,8 +245,8 @@ void zperf_udp_upload(const struct shell *shell,
 		/* Print log every seconds */
 		if (time_delta(last_print_time, loop_time) > print_interval) {
 			shell_fprintf(shell, SHELL_WARNING,
-				    "nb_packets=%u\tdelay=%u\tadjust=%d\n",
-				    nb_packets, delay, adjust);
+				      "nb_packets=%u\tdelay=%u\tadjust=%d\n",
+				      nb_packets, delay, adjust);
 			last_print_time = loop_time;
 		}
 

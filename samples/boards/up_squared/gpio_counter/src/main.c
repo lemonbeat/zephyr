@@ -38,9 +38,9 @@
  */
 
 struct _pin {
-	uint32_t		hat_num;
-	uint32_t		pin;
-	const char	*gpio_dev_name;
+	uint32_t hat_num;
+	uint32_t pin;
+	const char *gpio_dev_name;
 	const struct device *gpio_dev;
 };
 
@@ -79,8 +79,8 @@ static volatile uint32_t counter;
 
 K_SEM_DEFINE(counter_sem, 0, 1);
 
-#define NUM_PINS	ARRAY_SIZE(counter_pins)
-#define MASK		(BIT(NUM_PINS) - 1)
+#define NUM_PINS ARRAY_SIZE(counter_pins)
+#define MASK (BIT(NUM_PINS) - 1)
 
 void button_cb(const struct device *gpiodev, struct gpio_callback *cb,
 	       uint32_t pin)
@@ -119,8 +119,7 @@ void main(void)
 	/* Set pins to output */
 	for (i = 0; i < NUM_PINS; i++) {
 		ret = gpio_pin_configure(counter_pins[i].gpio_dev,
-					 counter_pins[i].pin,
-					 GPIO_OUTPUT_LOW);
+					 counter_pins[i].pin, GPIO_OUTPUT_LOW);
 		if (ret) {
 			printk("ERROR: cannot set HAT pin %d to OUT (%d)\n",
 			       counter_pins[i].hat_num, ret);
@@ -129,14 +128,12 @@ void main(void)
 	}
 
 	/* Setup input pin */
-	ret = gpio_pin_configure(intr_pin.gpio_dev, intr_pin.pin,
-				 GPIO_INPUT);
+	ret = gpio_pin_configure(intr_pin.gpio_dev, intr_pin.pin, GPIO_INPUT);
 	if (ret) {
 		printk("ERROR: cannot set HAT pin %d to IN (%d)\n",
-			       intr_pin.hat_num, ret);
-			return;
+		       intr_pin.hat_num, ret);
+		return;
 	}
-
 
 	/* Callback uses pin_mask, so need bit shifting */
 	gpio_init_callback(&gpio_cb, button_cb, (1 << intr_pin.pin));
@@ -147,8 +144,8 @@ void main(void)
 					   GPIO_INT_EDGE_RISING);
 	if (ret) {
 		printk("ERROR: cannot config interrupt on HAT pin %d (%d)\n",
-			       intr_pin.hat_num, ret);
-			return;
+		       intr_pin.hat_num, ret);
+		return;
 	}
 
 	/* main loop */
@@ -158,8 +155,7 @@ void main(void)
 
 		for (i = 0; i < NUM_PINS; i++) {
 			ret = gpio_pin_set(counter_pins[i].gpio_dev,
-					   counter_pins[i].pin,
-					   (val & BIT(i)));
+					   counter_pins[i].pin, (val & BIT(i)));
 			if (ret) {
 				printk("ERROR: cannot set HAT pin %d value (%d)\n",
 				       counter_pins[i].hat_num, ret);

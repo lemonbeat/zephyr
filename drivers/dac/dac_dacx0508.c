@@ -12,23 +12,23 @@
 
 LOG_MODULE_REGISTER(dac_dacx0508, CONFIG_DAC_LOG_LEVEL);
 
-#define DACX0508_REG_DEVICE_ID   0x01U
-#define DACX0508_REG_CONFIG      0x03U
-#define DACX0508_REG_GAIN        0x04U
-#define DACX0508_REG_TRIGGER     0x05U
-#define DACX0508_REG_STATUS      0x07U
-#define DACX0508_REG_DAC0        0x08U
+#define DACX0508_REG_DEVICE_ID 0x01U
+#define DACX0508_REG_CONFIG 0x03U
+#define DACX0508_REG_GAIN 0x04U
+#define DACX0508_REG_TRIGGER 0x05U
+#define DACX0508_REG_STATUS 0x07U
+#define DACX0508_REG_DAC0 0x08U
 
-#define DACX0508_MASK_DEVICE_ID_8CH          BIT(11)
-#define DACX0508_MASK_CONFIG_REF_PWDWN       BIT(8)
-#define DACX0508_MASK_GAIN_BUFF_GAIN(x)      BIT(x)
-#define DACX0508_MASK_GAIN_REFDIV_EN         BIT(8)
-#define DACX0508_MASK_TRIGGER_SOFT_RESET     (BIT(1) | BIT(3))
-#define DACX0508_MASK_STATUS_REF_ALM         BIT(0)
+#define DACX0508_MASK_DEVICE_ID_8CH BIT(11)
+#define DACX0508_MASK_CONFIG_REF_PWDWN BIT(8)
+#define DACX0508_MASK_GAIN_BUFF_GAIN(x) BIT(x)
+#define DACX0508_MASK_GAIN_REFDIV_EN BIT(8)
+#define DACX0508_MASK_TRIGGER_SOFT_RESET (BIT(1) | BIT(3))
+#define DACX0508_MASK_STATUS_REF_ALM BIT(0)
 
-#define DACX0508_READ_CMD       0x80
-#define DACX0508_POR_DELAY      250
-#define DACX0508_MAX_CHANNEL    8
+#define DACX0508_READ_CMD 0x80
+#define DACX0508_POR_DELAY 250
+#define DACX0508_MAX_CHANNEL 8
 
 struct dacx0508_config {
 	const char *spi_dev_name;
@@ -52,24 +52,13 @@ static int dacx0508_reg_read(const struct device *dev, uint8_t addr,
 			     uint8_t *data)
 {
 	struct dacx0508_data *dev_data = dev->data;
-	const struct spi_buf buf[2] = {
-		{
-			.buf = &addr,
-			.len = sizeof(addr)
-		},
-		{
-			.buf = data,
-			.len = 2
-		}
-	};
+	const struct spi_buf buf[2] = { { .buf = &addr, .len = sizeof(addr) },
+					{ .buf = data, .len = 2 } };
 	struct spi_buf_set tx = {
 		.buffers = buf,
 		.count = ARRAY_SIZE(buf),
 	};
-	struct spi_buf_set rx = {
-		.buffers = buf,
-		.count = ARRAY_SIZE(buf)
-	};
+	struct spi_buf_set rx = { .buffers = buf, .count = ARRAY_SIZE(buf) };
 	uint8_t tmp;
 	int ret;
 
@@ -98,19 +87,11 @@ static int dacx0508_reg_read(const struct device *dev, uint8_t addr,
 }
 
 static int dacx0508_reg_write(const struct device *dev, uint8_t addr,
-			      	uint8_t *data)
+			      uint8_t *data)
 {
 	struct dacx0508_data *dev_data = dev->data;
-	const struct spi_buf buf[2] = {
-		{
-			.buf = &addr,
-			.len = sizeof(addr)
-		},
-		{
-			.buf = data,
-			.len = 2
-		}
-	};
+	const struct spi_buf buf[2] = { { .buf = &addr, .len = sizeof(addr) },
+					{ .buf = data, .len = 2 } };
 	struct spi_buf_set tx = {
 		.buffers = buf,
 		.count = ARRAY_SIZE(buf),
@@ -124,10 +105,12 @@ static int dacx0508_reg_write(const struct device *dev, uint8_t addr,
 	return spi_write(dev_data->spi_dev, &dev_data->spi_cfg, &tx);
 }
 
-int dacx0508_reg_update(const struct device *dev, uint8_t addr,
-			 uint16_t mask, bool setting)
+int dacx0508_reg_update(const struct device *dev, uint8_t addr, uint16_t mask,
+			bool setting)
 {
-	uint8_t regval[2] = {0, };
+	uint8_t regval[2] = {
+		0,
+	};
 	uint16_t tmp;
 	int ret;
 
@@ -155,7 +138,7 @@ int dacx0508_reg_update(const struct device *dev, uint8_t addr,
 }
 
 static int dacx0508_channel_setup(const struct device *dev,
-				   const struct dac_channel_cfg *channel_cfg)
+				  const struct dac_channel_cfg *channel_cfg)
 {
 	const struct dacx0508_config *config = dev->config;
 	struct dacx0508_data *data = dev->data;
@@ -212,7 +195,7 @@ static int dacx0508_write_value(const struct device *dev, uint8_t channel,
 
 static int dacx0508_soft_reset(const struct device *dev)
 {
-	uint8_t regval[2] = {0, DACX0508_MASK_TRIGGER_SOFT_RESET};
+	uint8_t regval[2] = { 0, DACX0508_MASK_TRIGGER_SOFT_RESET };
 	int ret;
 
 	ret = dacx0508_reg_write(dev, DACX0508_REG_TRIGGER, regval);
@@ -227,7 +210,9 @@ static int dacx0508_soft_reset(const struct device *dev)
 static int dacx0508_device_id_check(const struct device *dev)
 {
 	const struct dacx0508_config *config = dev->config;
-	uint8_t regval[2] = {0, };
+	uint8_t regval[2] = {
+		0,
+	};
 	uint8_t resolution;
 	uint16_t dev_id;
 	int ret;
@@ -246,7 +231,7 @@ static int dacx0508_device_id_check(const struct device *dev)
 	}
 
 	if ((dev_id & DACX0508_MASK_DEVICE_ID_8CH) !=
-				DACX0508_MASK_DEVICE_ID_8CH) {
+	    DACX0508_MASK_DEVICE_ID_8CH) {
 		LOG_ERR("Support channels mismatch");
 		return -EINVAL;
 	}
@@ -298,7 +283,6 @@ static int dacx0508_setup(const struct device *dev)
 		return -EIO;
 	}
 
-
 	for (int i = 0; i < 8; i++) {
 		tmp |= config->gain[i] << i;
 	}
@@ -322,7 +306,7 @@ static int dacx0508_setup(const struct device *dev)
 		return -EIO;
 	}
 	if ((regval[1] & DACX0508_MASK_STATUS_REF_ALM) ==
-				DACX0508_MASK_STATUS_REF_ALM) {
+	    DACX0508_MASK_STATUS_REF_ALM) {
 		LOG_ERR("Difference between VREF/DIV and VDD is "
 			"below the required minimum analog threshold");
 		return -EIO;
@@ -346,7 +330,7 @@ static int dacx0508_init(const struct device *dev)
 
 	if (config->spi_cs_dev_name) {
 		data->spi_cs.gpio_dev =
-				device_get_binding(config->spi_cs_dev_name);
+			device_get_binding(config->spi_cs_dev_name);
 		if (!data->spi_cs.gpio_dev) {
 			LOG_ERR("Cannot get pointer to %s device",
 				config->spi_cs_dev_name);
@@ -386,8 +370,8 @@ static const struct dac_driver_api dacx0508_driver_api = {
 
 #define INST_DT_DACX0508(inst, t) DT_INST(inst, ti_dac##t)
 
-#define DACX0508_DEVICE(t, n, res) \
-	static struct dacx0508_data dac##t##_data_##n; \
+#define DACX0508_DEVICE(t, n, res)                                          \
+	static struct dacx0508_data dac##t##_data_##n;                      \
 	static const struct dacx0508_config dac##t##_config_##n = { \
 		.spi_dev_name = DT_BUS_LABEL(INST_DT_DACX0508(n, t)), \
 		.spi_cs_dev_name = \
@@ -423,12 +407,11 @@ static const struct dac_driver_api dacx0508_driver_api = {
 		.gain[5] = DT_PROP(INST_DT_DACX0508(n, t), channel5_gain), \
 		.gain[6] = DT_PROP(INST_DT_DACX0508(n, t), channel6_gain), \
 		.gain[7] = DT_PROP(INST_DT_DACX0508(n, t), channel7_gain), \
-	}; \
-	DEVICE_AND_API_INIT(dac##t##_##n, \
-			    DT_LABEL(INST_DT_DACX0508(n, t)), \
-			    &dacx0508_init, &dac##t##_data_##n, \
-			    &dac##t##_config_##n, POST_KERNEL, \
-			    CONFIG_DAC_DACX0508_INIT_PRIORITY, \
+	};       \
+	DEVICE_AND_API_INIT(dac##t##_##n, DT_LABEL(INST_DT_DACX0508(n, t)), \
+			    &dacx0508_init, &dac##t##_data_##n,             \
+			    &dac##t##_config_##n, POST_KERNEL,              \
+			    CONFIG_DAC_DACX0508_INIT_PRIORITY,              \
 			    &dacx0508_driver_api)
 
 /*
@@ -448,9 +431,9 @@ static const struct dac_driver_api dacx0508_driver_api = {
 
 #define CALL_WITH_ARG(arg, expr) expr(arg)
 
-#define INST_DT_DACX0508_FOREACH(t, inst_expr) \
-	UTIL_LISTIFY(DT_NUM_INST_STATUS_OKAY(ti_dac##t), \
-		     CALL_WITH_ARG, inst_expr)
+#define INST_DT_DACX0508_FOREACH(t, inst_expr)                          \
+	UTIL_LISTIFY(DT_NUM_INST_STATUS_OKAY(ti_dac##t), CALL_WITH_ARG, \
+		     inst_expr)
 
 INST_DT_DACX0508_FOREACH(60508, DAC60508_DEVICE);
 INST_DT_DACX0508_FOREACH(70508, DAC70508_DEVICE);

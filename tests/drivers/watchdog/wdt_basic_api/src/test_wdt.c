@@ -92,23 +92,22 @@
 #error "Unsupported SoC and no watchdog0 alias in zephyr.dts"
 #endif
 
-#define WDT_TEST_STATE_IDLE        0
+#define WDT_TEST_STATE_IDLE 0
 #define WDT_TEST_STATE_CHECK_RESET 1
 
-#define WDT_TEST_CB0_TEST_VALUE    0x0CB0
-#define WDT_TEST_CB1_TEST_VALUE    0x0CB1
+#define WDT_TEST_CB0_TEST_VALUE 0x0CB0
+#define WDT_TEST_CB1_TEST_VALUE 0x0CB1
 
 #ifdef CONFIG_WDT_NRFX
-#define TIMEOUTS                   2
+#define TIMEOUTS 2
 #elif defined(CONFIG_IWDG_STM32)
-#define TIMEOUTS                   0
+#define TIMEOUTS 0
 #else
-#define TIMEOUTS                   1
+#define TIMEOUTS 1
 #endif
 
-#define TEST_WDT_CALLBACK_1        (TIMEOUTS > 0)
-#define TEST_WDT_CALLBACK_2        (TIMEOUTS > 1)
-
+#define TEST_WDT_CALLBACK_1 (TIMEOUTS > 0)
+#define TEST_WDT_CALLBACK_2 (TIMEOUTS > 1)
 
 static struct wdt_timeout_cfg m_cfg_wdt0;
 #if TEST_WDT_CALLBACK_2
@@ -232,7 +231,6 @@ static int test_wdt_callback_1(void)
 			TC_PRINT("CB1 not supported on platform\n");
 			m_testcase_index++;
 			return TC_PASS;
-
 		}
 		TC_PRINT("Watchdog install error\n");
 		return TC_FAIL;
@@ -276,7 +274,6 @@ static int test_wdt_callback_2(void)
 			return TC_FAIL;
 		}
 	}
-
 
 	m_testvalue = 0U;
 	m_cfg_wdt0.callback = wdt_int_cb0;

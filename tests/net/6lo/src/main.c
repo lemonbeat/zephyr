@@ -38,62 +38,153 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_6LO_LOG_LEVEL);
 #define SIZE_OF_SMALL_DATA 40
 #define SIZE_OF_LARGE_DATA 120
 
- /* IPv6 Source and Destination address
+/* IPv6 Source and Destination address
   * Example addresses are based on SAC (Source Address Compression),
   * SAM (Source Address Mode), DAC (Destination Address Compression),
   * DAM (Destination Address Mode) and also if the destination address
   * is Multicast address.
   */
 
-#define src_sac1_sam00 \
-		{ { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define src_sac1_sam00                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define src_sam00 \
-		{ { { 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define src_sam00                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define src_sam01 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa } } }
+#define src_sam01                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define src_sam10 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0xbb } } }
-#define src_sam11 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa, 0xbb } } }
+#define src_sam10                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0xff, 0xfe, \
+					0x00, 0x00, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
+#define src_sam11                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0xaa, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam00 \
-		{ { { 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66 } } }
+#define dst_m1_dam00                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x11, 0x22, 0x33, \
+					0x44, 0x55, 0x66                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam01 \
-		{ { { 0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 } } }
+#define dst_m1_dam01                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x11, 0x22, \
+					0x33, 0x44, 0x55                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam10 \
-		{ { { 0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x22, 0x33 } } }
+#define dst_m1_dam10                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x11, 0x22, 0x33                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_m1_dam11 \
-		{ { { 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11 } } }
+#define dst_m1_dam11                                                        \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x11                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_dam00 \
-		{ { { 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define dst_dam00                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_dam01 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa } } }
+#define dst_dam01                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
 
-#define dst_dam10 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0xbb } } }
-#define dst_dam11 \
-		{ { { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xbb, 0xaa } } }
+#define dst_dam10                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0xff, 0xfe, \
+					0x00, 0x00, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
+#define dst_dam11                                                           \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0xbb, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
 
 uint8_t src_mac[8] = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa, 0xbb };
 uint8_t dst_mac[8] = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xbb, 0xaa };
@@ -103,49 +194,101 @@ uint8_t dst_mac[8] = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xbb, 0xaa };
 /* CONFIG_NET_MAX_6LO_CONTEXTS=2, defined in prj.conf, If you want
  * to increase this value, then add extra contexts here.
  */
-#define ctx1_prefix \
-		{ { { 0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define ctx1_prefix                                                         \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
 /* 6CO contexts */
-static struct net_icmpv6_nd_opt_6co ctx1 = {
-	.context_len = 0x40,
-	.flag = 0x11,
-	.reserved = 0,
-	.lifetime = 0x1234,
-	.prefix = ctx1_prefix
-};
+static struct net_icmpv6_nd_opt_6co ctx1 = { .context_len = 0x40,
+					     .flag = 0x11,
+					     .reserved = 0,
+					     .lifetime = 0x1234,
+					     .prefix = ctx1_prefix };
 
-#define ctx2_prefix \
-		{ { { 0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } } }
+#define ctx2_prefix                                                         \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0x00                    \
+			}                                                   \
+		}                                                           \
+	}
 
-static struct net_icmpv6_nd_opt_6co ctx2 = {
-	.context_len = 0x80,
-	.flag = 0x12,
-	.reserved = 0,
-	.lifetime = 0x1234,
-	.prefix = ctx2_prefix
-};
+static struct net_icmpv6_nd_opt_6co ctx2 = { .context_len = 0x80,
+					     .flag = 0x12,
+					     .reserved = 0,
+					     .lifetime = 0x1234,
+					     .prefix = ctx2_prefix };
 
-#define src_sac1_sam01 \
-		{ { { 0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa } } }
-#define dst_dac1_dam01 \
-		{ { { 0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa } } }
-#define src_sac1_sam10 \
-		{ { { 0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0xbb } } }
-#define dst_dac1_dam10 \
-		{ { { 0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0xbb } } }
-#define src_sac1_sam11 \
-		{ { { 0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa, 0xbb } } }
-#define dst_dac1_dam11 \
-		{ { { 0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-		      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xbb, 0xaa } } }
+#define src_sac1_sam01                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
+#define dst_dac1_dam01                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0x00, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
+#define src_sac1_sam10                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0xff, 0xfe, \
+					0x00, 0x00, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
+#define dst_dac1_dam10                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0xff, 0xfe, \
+					0x00, 0x00, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
+#define src_sac1_sam11                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xaa, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0xaa, 0xbb                    \
+			}                                                   \
+		}                                                           \
+	}
+#define dst_dac1_dam11                                                      \
+	{                                                                   \
+		{                                                           \
+			{                                                   \
+				0xcc, 0xdd, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+					0x00, 0xbb, 0xaa                    \
+			}                                                   \
+		}                                                           \
+	}
 #endif
 
 /* UDP Ports */
@@ -154,11 +297,11 @@ static struct net_icmpv6_nd_opt_6co ctx2 = {
 #define udp_dst_port_4bit 0xf0b2
 
 /* 8 bit compressible udp ports */
-#define udp_src_port_8bit   0xf111
+#define udp_src_port_8bit 0xf111
 #define udp_dst_port_8bit_y 0xf022 /* compressible */
 
 #define udp_src_port_8bit_y 0xf011 /* compressible */
-#define udp_dst_port_8bit   0xf122
+#define udp_dst_port_8bit 0xf122
 
 /* uncompressible ports */
 #define udp_src_port_16bit 0xff11
@@ -178,46 +321,44 @@ static struct net_icmpv6_nd_opt_6co ctx2 = {
 #define HLIM_1 0
 #define HLOM_0 1
 
-#define SAC0_SAM00     16
-#define SAC0_SAM01     8
-#define SAC0_SAM10     2
-#define SAC0_SAM11     0
-#define SAC1_SAM00     0
-#define SAC1_SAM01     8
-#define SAC1_SAM10     2
-#define SAC1_SAM11     0
+#define SAC0_SAM00 16
+#define SAC0_SAM01 8
+#define SAC0_SAM10 2
+#define SAC0_SAM11 0
+#define SAC1_SAM00 0
+#define SAC1_SAM01 8
+#define SAC1_SAM10 2
+#define SAC1_SAM11 0
 
-#define M0_DAC0_DAM00  16
-#define M0_DAC0_DAM01  8
-#define M0_DAC0_DAM10  2
-#define M0_DAC0_DAM11  0
-#define M0_DAC1_DAM01  8
-#define M0_DAC1_DAM10  2
-#define M0_DAC1_DAM11  0
-#define M1_DAC0_DAM00  16
-#define M1_DAC0_DAM01  6
-#define M1_DAC0_DAM10  4
-#define M1_DAC0_DAM11  1
-#define M1_DAC1_DAM00  6
+#define M0_DAC0_DAM00 16
+#define M0_DAC0_DAM01 8
+#define M0_DAC0_DAM10 2
+#define M0_DAC0_DAM11 0
+#define M0_DAC1_DAM01 8
+#define M0_DAC1_DAM10 2
+#define M0_DAC1_DAM11 0
+#define M1_DAC0_DAM00 16
+#define M1_DAC0_DAM01 6
+#define M1_DAC0_DAM10 4
+#define M1_DAC0_DAM11 1
+#define M1_DAC1_DAM00 6
 
-#define UDP_CHKSUM_0   2
-#define UDP_CHKSUM_1   0
+#define UDP_CHKSUM_0 2
+#define UDP_CHKSUM_1 0
 
-#define UDP_P00        4
-#define UDP_P01        3
-#define UDP_P10        3
-#define UDP_P11        1
+#define UDP_P00 4
+#define UDP_P01 3
+#define UDP_P10 3
+#define UDP_P11 1
 
-
-#define IPHC_SIZE      2
-#define NHC_SIZE       1
+#define IPHC_SIZE 2
+#define NHC_SIZE 1
 
 #define IPV6_DISPATCH_DIFF -1
 
-static const char user_data[] =
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789"
-		"0123456789012345678901234567890123456789";
+static const char user_data[] = "0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789"
+				"0123456789012345678901234567890123456789";
 
 struct user_data_small {
 	char data[SIZE_OF_SMALL_DATA];
@@ -226,7 +367,6 @@ struct user_data_small {
 struct user_data_large {
 	char data[SIZE_OF_LARGE_DATA];
 };
-
 
 struct net_6lo_data {
 	struct net_ipv6_hdr ipv6;
@@ -243,7 +383,6 @@ struct net_6lo_data {
 	bool iphc;
 	bool small;
 } __packed;
-
 
 int net_6lo_dev_init(const struct device *dev)
 {
@@ -269,10 +408,10 @@ static struct dummy_api net_6lo_if_api = {
 	.send = tester_send,
 };
 
-NET_DEVICE_INIT(net_6lo_test, "net_6lo_test",
-		net_6lo_dev_init, device_pm_control_nop, NULL, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&net_6lo_if_api, DUMMY_L2, NET_L2_GET_CTX_TYPE(DUMMY_L2), 127);
+NET_DEVICE_INIT(net_6lo_test, "net_6lo_test", net_6lo_dev_init,
+		device_pm_control_nop, NULL, NULL,
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_6lo_if_api, DUMMY_L2,
+		NET_L2_GET_CTX_TYPE(DUMMY_L2), 127);
 
 static bool compare_ipv6_hdr(struct net_pkt *pkt, struct net_6lo_data *data)
 {
@@ -288,7 +427,7 @@ static bool compare_ipv6_hdr(struct net_pkt *pkt, struct net_6lo_data *data)
 	net_pkt_acknowledge_data(pkt, &ipv6_access);
 
 	res = memcmp((uint8_t *)ipv6_hdr, (uint8_t *)&data->ipv6,
-		      sizeof(struct net_ipv6_hdr));
+		     sizeof(struct net_ipv6_hdr));
 	if (res) {
 		TC_PRINT("Missmatch IPv6 HDR\n");
 		return false;
@@ -311,7 +450,7 @@ static bool compare_udp_hdr(struct net_pkt *pkt, struct net_6lo_data *data)
 	net_pkt_acknowledge_data(pkt, &udp_access);
 
 	res = memcmp((uint8_t *)udp_hdr, (uint8_t *)&data->nh.udp,
-		      sizeof(struct net_udp_hdr));
+		     sizeof(struct net_udp_hdr));
 	if (res) {
 		TC_PRINT("Missmatch UDP HDR\n");
 		return false;
@@ -334,7 +473,7 @@ static bool compare_icmp_hdr(struct net_pkt *pkt, struct net_6lo_data *data)
 	net_pkt_acknowledge_data(pkt, &icmp_access);
 
 	res = memcmp((uint8_t *)icmp_hdr, (uint8_t *)&data->nh.icmp,
-		      sizeof(struct net_icmp_hdr));
+		     sizeof(struct net_icmp_hdr));
 	if (res) {
 		TC_PRINT("Missmatch ICMP HDR\n");
 		return false;
@@ -392,9 +531,7 @@ static bool compare_pkt(struct net_pkt *pkt, struct net_6lo_data *data)
 	int remaining = data->small ? SIZE_OF_SMALL_DATA : SIZE_OF_LARGE_DATA;
 
 	if (data->nh_udp) {
-		if (net_pkt_get_len(pkt) !=
-		    (NET_IPV6UDPH_LEN + remaining)) {
-
+		if (net_pkt_get_len(pkt) != (NET_IPV6UDPH_LEN + remaining)) {
 			TC_PRINT("mismatch lengths, expected %d received %zu\n",
 				 NET_IPV6UDPH_LEN + remaining,
 				 net_pkt_get_len(pkt));
@@ -402,9 +539,7 @@ static bool compare_pkt(struct net_pkt *pkt, struct net_6lo_data *data)
 			return false;
 		}
 	} else if (data->nh_icmp) {
-		if (net_pkt_get_len(pkt) !=
-		    (NET_IPV6ICMPH_LEN + remaining)) {
-
+		if (net_pkt_get_len(pkt) != (NET_IPV6ICMPH_LEN + remaining)) {
 			TC_PRINT("mismatch lengths, expected %d received %zu\n",
 				 NET_IPV6ICMPH_LEN + remaining,
 				 net_pkt_get_len(pkt));
@@ -412,9 +547,7 @@ static bool compare_pkt(struct net_pkt *pkt, struct net_6lo_data *data)
 			return false;
 		}
 	} else {
-		if (net_pkt_get_len(pkt) !=
-		    (NET_IPV6H_LEN + remaining)) {
-
+		if (net_pkt_get_len(pkt) != (NET_IPV6H_LEN + remaining)) {
 			TC_PRINT("mismatch lengths, expected %d received %zu\n",
 				 NET_IPV6H_LEN + remaining,
 				 net_pkt_get_len(pkt));
@@ -433,7 +566,7 @@ static bool compare_pkt(struct net_pkt *pkt, struct net_6lo_data *data)
 		if (!compare_udp_hdr(pkt, data)) {
 			return false;
 		}
-	} else	if (data->nh_icmp) {
+	} else if (data->nh_icmp) {
 		if (!compare_icmp_hdr(pkt, data)) {
 			return false;
 		}
@@ -480,14 +613,14 @@ static struct net_pkt *create_pkt(struct net_6lo_data *data)
 	}
 
 	if (data->nh_udp) {
-		memcpy(frag->data, (uint8_t *) data, NET_IPV6UDPH_LEN);
+		memcpy(frag->data, (uint8_t *)data, NET_IPV6UDPH_LEN);
 		net_buf_add(frag, NET_IPV6UDPH_LEN);
 	} else if (data->nh_icmp) {
-		memcpy(frag->data, (uint8_t *) data, NET_IPV6ICMPH_LEN);
+		memcpy(frag->data, (uint8_t *)data, NET_IPV6ICMPH_LEN);
 		net_buf_add(frag, NET_IPV6ICMPH_LEN);
 
 	} else {
-		memcpy(frag->data, (uint8_t *) data, NET_IPV6H_LEN);
+		memcpy(frag->data, (uint8_t *)data, NET_IPV6H_LEN);
 		net_buf_add(frag, NET_IPV6H_LEN);
 	}
 
@@ -506,13 +639,13 @@ static struct net_pkt *create_pkt(struct net_6lo_data *data)
 	 * in ipv6, udp and in data pointer too (it's required in comparison)
 	 */
 	frag->data[4] = len >> 8;
-	frag->data[5] = (uint8_t) len;
+	frag->data[5] = (uint8_t)len;
 
 	data->ipv6.len = htons(len);
 
 	if (data->nh_udp) {
 		frag->data[44] = len >> 8;
-		frag->data[45] = (uint8_t) len;
+		frag->data[45] = (uint8_t)len;
 
 		data->nh.udp.len = htons(len);
 	}
@@ -751,40 +884,37 @@ static struct net_6lo_data test_data_10 = {
 	.iphc = false
 };
 
-static struct net_6lo_data test_data_11 = {
-	.ipv6.vtc = 0x61,
-	.ipv6.tcflow = 0x20,
-	.ipv6.flow = 0x00,
-	.ipv6.len = 0,
-	.ipv6.nexthdr = 0,
-	.ipv6.hop_limit = 0xff,
-	.ipv6.src = src_sac1_sam00,
-	.ipv6.dst = dst_m1_dam00,
-	.hdr_diff = IPV6_DISPATCH_DIFF,
-	.nh_udp = false,
-	.nh_icmp = false,
-	.small = false,
-	.iphc = false
-};
+static struct net_6lo_data test_data_11 = { .ipv6.vtc = 0x61,
+					    .ipv6.tcflow = 0x20,
+					    .ipv6.flow = 0x00,
+					    .ipv6.len = 0,
+					    .ipv6.nexthdr = 0,
+					    .ipv6.hop_limit = 0xff,
+					    .ipv6.src = src_sac1_sam00,
+					    .ipv6.dst = dst_m1_dam00,
+					    .hdr_diff = IPV6_DISPATCH_DIFF,
+					    .nh_udp = false,
+					    .nh_icmp = false,
+					    .small = false,
+					    .iphc = false };
 
-static struct net_6lo_data test_data_12 = {
-	.ipv6.vtc = 0x61,
-	.ipv6.tcflow = 0x20,
-	.ipv6.flow = 0x00,
-	.ipv6.len = 0,
-	.ipv6.nexthdr = IPPROTO_ICMPV6,
-	.ipv6.hop_limit = 0xff,
-	.ipv6.src = src_sac1_sam00,
-	.ipv6.dst = dst_m1_dam00,
-	.nh.icmp.type = NET_ICMPV6_ECHO_REQUEST,
-	.nh.icmp.code = 0,
-	.nh.icmp.chksum = 0,
-	.hdr_diff = IPV6_DISPATCH_DIFF,
-	.nh_udp = false,
-	.nh_icmp = true,
-	.small = false,
-	.iphc = false
-};
+static struct net_6lo_data test_data_12 = { .ipv6.vtc = 0x61,
+					    .ipv6.tcflow = 0x20,
+					    .ipv6.flow = 0x00,
+					    .ipv6.len = 0,
+					    .ipv6.nexthdr = IPPROTO_ICMPV6,
+					    .ipv6.hop_limit = 0xff,
+					    .ipv6.src = src_sac1_sam00,
+					    .ipv6.dst = dst_m1_dam00,
+					    .nh.icmp.type =
+						    NET_ICMPV6_ECHO_REQUEST,
+					    .nh.icmp.code = 0,
+					    .nh.icmp.chksum = 0,
+					    .hdr_diff = IPV6_DISPATCH_DIFF,
+					    .nh_udp = false,
+					    .nh_icmp = true,
+					    .small = false,
+					    .iphc = false };
 
 static struct net_6lo_data test_data_13 = {
 	.ipv6.vtc = 0x60,
@@ -817,7 +947,7 @@ static struct net_6lo_data test_data_14 = {
 	.ipv6.hop_limit = 0xff,
 	.ipv6.src = src_sac1_sam00,
 	.ipv6.dst = dst_m1_dam11,
-	.hdr_diff = NET_IPV6H_LEN - IPHC_SIZE  -
+	.hdr_diff = NET_IPV6H_LEN - IPHC_SIZE -
 		    (TF_11 + NHC_0 + CID_0 + SAC1_SAM00 + M1_DAC0_DAM11),
 	.nh_udp = false,
 	.nh_icmp = false,
@@ -1072,8 +1202,7 @@ static void test_6lo(struct net_6lo_data *data)
 	pkt = create_pkt(data);
 	zassert_not_null(pkt, "failed to create buffer");
 #if DEBUG > 0
-	TC_PRINT("length before compression %zu\n",
-		 net_pkt_get_len(pkt));
+	TC_PRINT("length before compression %zu\n", net_pkt_get_len(pkt));
 	net_pkt_hexdump(pkt, "before-compression");
 #endif
 
@@ -1083,19 +1212,16 @@ static void test_6lo(struct net_6lo_data *data)
 		     "compression failed");
 
 #if DEBUG > 0
-	TC_PRINT("length after compression %zu\n",
-		 net_pkt_get_len(pkt));
+	TC_PRINT("length after compression %zu\n", net_pkt_get_len(pkt));
 	net_pkt_hexdump(pkt, "after-compression");
 #endif
 
 	diff = net_6lo_uncompress_hdr_diff(pkt);
 	zassert_true(diff == data->hdr_diff, "unexpected HDR diff");
 
-	zassert_true(net_6lo_uncompress(pkt),
-		     "uncompression failed");
+	zassert_true(net_6lo_uncompress(pkt), "uncompression failed");
 #if DEBUG > 0
-	TC_PRINT("length after uncompression %zu\n",
-	       net_pkt_get_len(pkt));
+	TC_PRINT("length after uncompression %zu\n", net_pkt_get_len(pkt));
 	net_pkt_hexdump(pkt, "after-uncompression");
 #endif
 
@@ -1112,32 +1238,32 @@ static const struct {
 	const char *name;
 	struct net_6lo_data *data;
 } tests[] = {
-	{ "test_6lo_sam00_dam00", &test_data_1},
-	{ "test_6lo_sam01_dam01", &test_data_2},
-	{ "test_6lo_sam10_dam10", &test_data_3},
-	{ "test_6lo_sam00_m1_dam00", &test_data_4},
-	{ "test_6lo_sam01_m1_dam01", &test_data_5},
-	{ "test_6lo_sam10_m1_dam10", &test_data_6},
-	{ "test_6lo_sam10_m1_dam10_no_udp", &test_data_7},
-	{ "test_6lo_sam10_m1_dam10_iphc", &test_data_8},
-	{ "test_6lo_ipv6_dispatch_small", &test_data_9},
-	{ "test_6lo_ipv6_dispatch_big", &test_data_10},
-	{ "test_6lo_ipv6_dispatch_big_no_udp", &test_data_11},
-	{ "test_6lo_ipv6_dispatch_big_iphc", &test_data_12},
-	{ "test_6lo_sam11_dam11", &test_data_13},
-	{ "test_6lo_sac1_sam00_m1_dam11", &test_data_14},
+	{ "test_6lo_sam00_dam00", &test_data_1 },
+	{ "test_6lo_sam01_dam01", &test_data_2 },
+	{ "test_6lo_sam10_dam10", &test_data_3 },
+	{ "test_6lo_sam00_m1_dam00", &test_data_4 },
+	{ "test_6lo_sam01_m1_dam01", &test_data_5 },
+	{ "test_6lo_sam10_m1_dam10", &test_data_6 },
+	{ "test_6lo_sam10_m1_dam10_no_udp", &test_data_7 },
+	{ "test_6lo_sam10_m1_dam10_iphc", &test_data_8 },
+	{ "test_6lo_ipv6_dispatch_small", &test_data_9 },
+	{ "test_6lo_ipv6_dispatch_big", &test_data_10 },
+	{ "test_6lo_ipv6_dispatch_big_no_udp", &test_data_11 },
+	{ "test_6lo_ipv6_dispatch_big_iphc", &test_data_12 },
+	{ "test_6lo_sam11_dam11", &test_data_13 },
+	{ "test_6lo_sac1_sam00_m1_dam11", &test_data_14 },
 #if defined(CONFIG_NET_6LO_CONTEXT)
-	{ "test_6lo_sac1_sam01_dac1_dam01", &test_data_15},
-	{ "test_6lo_sac1_sam10_dac1_dam10", &test_data_16},
-	{ "test_6lo_sac1_sam11_dac1_dam11", &test_data_17},
-	{ "test_6lo_sac0_sam01_dac1_dam01", &test_data_18},
-	{ "test_6lo_sac1_sam01_dac0_dam01", &test_data_19},
-	{ "test_6lo_sac1_sam01_m1_dam00", &test_data_20},
-	{ "test_6lo_sac1_sam01_m1_dam01", &test_data_21},
-	{ "test_6lo_sac1_sam10_m1_dam10", &test_data_22},
-	{ "test_6lo_sac1_sam11_m1_dam10", &test_data_23},
-	{ "test_6lo_sac0_sam00_dac1_dam01", &test_data_24},
-	{ "test_6lo_sac1_sam00_m1_dam00", &test_data_25},
+	{ "test_6lo_sac1_sam01_dac1_dam01", &test_data_15 },
+	{ "test_6lo_sac1_sam10_dac1_dam10", &test_data_16 },
+	{ "test_6lo_sac1_sam11_dac1_dam11", &test_data_17 },
+	{ "test_6lo_sac0_sam01_dac1_dam01", &test_data_18 },
+	{ "test_6lo_sac1_sam01_dac0_dam01", &test_data_19 },
+	{ "test_6lo_sac1_sam01_m1_dam00", &test_data_20 },
+	{ "test_6lo_sac1_sam01_m1_dam01", &test_data_21 },
+	{ "test_6lo_sac1_sam10_m1_dam10", &test_data_22 },
+	{ "test_6lo_sac1_sam11_m1_dam10", &test_data_23 },
+	{ "test_6lo_sac0_sam00_dac1_dam01", &test_data_24 },
+	{ "test_6lo_sac1_sam00_m1_dam00", &test_data_25 },
 #endif
 };
 

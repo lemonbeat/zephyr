@@ -47,10 +47,10 @@ extern "C" {
 #error "Unsupported endianness"
 #endif
 
-typedef bool          bool_t;
-typedef float         float32_t;
-typedef long double   float64_t;
-typedef char          char_t;
+typedef bool bool_t;
+typedef float float32_t;
+typedef long double float64_t;
+typedef char char_t;
 typedef unsigned char oChar_t;
 typedef unsigned char domain_t;
 
@@ -94,17 +94,17 @@ typedef struct canopen_module {
 
 void canopen_send_lock(void);
 void canopen_send_unlock(void);
-#define CO_LOCK_CAN_SEND()   canopen_send_lock()
+#define CO_LOCK_CAN_SEND() canopen_send_lock()
 #define CO_UNLOCK_CAN_SEND() canopen_send_unlock()
 
 void canopen_emcy_lock(void);
 void canopen_emcy_unlock(void);
-#define CO_LOCK_EMCY()   canopen_emcy_lock()
+#define CO_LOCK_EMCY() canopen_emcy_lock()
 #define CO_UNLOCK_EMCY() canopen_emcy_unlock()
 
 void canopen_od_lock(void);
 void canopen_od_unlock(void);
-#define CO_LOCK_OD()   canopen_od_lock()
+#define CO_LOCK_OD() canopen_od_lock()
 #define CO_UNLOCK_OD() canopen_od_unlock()
 
 /*
@@ -113,8 +113,16 @@ void canopen_od_unlock(void);
  */
 #define CANrxMemoryBarrier()
 #define IS_CANrxNew(rxNew) ((uintptr_t)rxNew)
-#define SET_CANrxNew(rxNew) { CANrxMemoryBarrier(); rxNew = (void *)1L; }
-#define CLEAR_CANrxNew(rxNew) { CANrxMemoryBarrier(); rxNew = (void *)0L; }
+#define SET_CANrxNew(rxNew)           \
+	{                             \
+		CANrxMemoryBarrier(); \
+		rxNew = (void *)1L;   \
+	}
+#define CLEAR_CANrxNew(rxNew)         \
+	{                             \
+		CANrxMemoryBarrier(); \
+		rxNew = (void *)0L;   \
+	}
 
 #ifdef __cplusplus
 }

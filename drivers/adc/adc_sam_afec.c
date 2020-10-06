@@ -62,16 +62,14 @@ struct adc_sam_cfg {
 	struct soc_gpio_pin afec_trg_pin;
 };
 
-#define DEV_CFG(dev) \
-	((const struct adc_sam_cfg *const)(dev)->config)
+#define DEV_CFG(dev) ((const struct adc_sam_cfg *const)(dev)->config)
 
-#define DEV_DATA(dev) \
-	((struct adc_sam_data *)(dev)->data)
+#define DEV_DATA(dev) ((struct adc_sam_data *)(dev)->data)
 
 static int adc_sam_channel_setup(const struct device *dev,
 				 const struct adc_channel_cfg *channel_cfg)
 {
-	const struct adc_sam_cfg * const cfg = DEV_CFG(dev);
+	const struct adc_sam_cfg *const cfg = DEV_CFG(dev);
 	Afec *const afec = cfg->regs;
 
 	uint8_t channel_id = channel_cfg->channel_id;
@@ -112,8 +110,8 @@ static int adc_sam_channel_setup(const struct device *dev,
 	/* Set single ended channels to unsigned and differential channels
 	 * to signed conversions.
 	 */
-	afec->AFEC_EMR &= ~(AFEC_EMR_SIGNMODE(
-			  AFEC_EMR_SIGNMODE_SE_UNSG_DF_SIGN_Val));
+	afec->AFEC_EMR &=
+		~(AFEC_EMR_SIGNMODE(AFEC_EMR_SIGNMODE_SE_UNSG_DF_SIGN_Val));
 
 	return 0;
 }
@@ -177,7 +175,7 @@ static int check_buffer_size(const struct adc_sequence *sequence,
 	}
 	if (sequence->buffer_size < needed_buffer_size) {
 		LOG_ERR("Provided buffer is too small (%u/%u)",
-				sequence->buffer_size, needed_buffer_size);
+			sequence->buffer_size, needed_buffer_size);
 		return -ENOMEM;
 	}
 	return 0;
@@ -195,8 +193,7 @@ static int start_read(const struct device *dev,
 	/* Signal an error if the channel selection is invalid (no channels or
 	 * a non-existing one is selected).
 	 */
-	if (channels == 0U ||
-	    (channels & (~0UL << NUM_CHANNELS))) {
+	if (channels == 0U || (channels & (~0UL << NUM_CHANNELS))) {
 		LOG_ERR("Invalid selection of channels");
 		return -EINVAL;
 	}
@@ -211,7 +208,7 @@ static int start_read(const struct device *dev,
 		 * 1544.
 		 */
 		LOG_ERR("ADC resolution value %d is not valid",
-			    sequence->resolution);
+			sequence->resolution);
 		return -EINVAL;
 	}
 
@@ -270,14 +267,10 @@ static int adc_sam_init(const struct device *dev)
 	/* Reset the AFEC. */
 	afec->AFEC_CR = AFEC_CR_SWRST;
 
-	afec->AFEC_MR = AFEC_MR_TRGEN_DIS
-		      | AFEC_MR_SLEEP_NORMAL
-		      | AFEC_MR_FWUP_OFF
-		      | AFEC_MR_FREERUN_OFF
-		      | AFEC_MR_PRESCAL(CONF_ADC_PRESCALER)
-		      | AFEC_MR_STARTUP_SUT96
-		      | AFEC_MR_ONE
-		      | AFEC_MR_USEQ_NUM_ORDER;
+	afec->AFEC_MR =
+		AFEC_MR_TRGEN_DIS | AFEC_MR_SLEEP_NORMAL | AFEC_MR_FWUP_OFF |
+		AFEC_MR_FREERUN_OFF | AFEC_MR_PRESCAL(CONF_ADC_PRESCALER) |
+		AFEC_MR_STARTUP_SUT96 | AFEC_MR_ONE | AFEC_MR_USEQ_NUM_ORDER;
 
 	/* Set all channels CM voltage to Vrefp/2 (512). */
 	for (int i = 0; i < NUM_CHANNELS; i++) {
@@ -286,9 +279,7 @@ static int adc_sam_init(const struct device *dev)
 	}
 
 	/* Enable PGA and Current Bias. */
-	afec->AFEC_ACR = AFEC_ACR_PGA0EN
-		       | AFEC_ACR_PGA1EN
-		       | AFEC_ACR_IBCTL(1);
+	afec->AFEC_ACR = AFEC_ACR_PGA0EN | AFEC_ACR_PGA1EN | AFEC_ACR_IBCTL(1);
 
 	soc_pmc_peripheral_enable(cfg->periph_id);
 
@@ -349,34 +340,32 @@ static void adc_sam_isr(const struct device *dev)
 	}
 }
 
-#define ADC_SAM_INIT(n)							\
-	static void adc##n##_sam_cfg_func(const struct device *dev);	\
-									\
-	static const struct adc_sam_cfg adc##n##_sam_cfg = {		\
-		.regs = (Afec *)DT_INST_REG_ADDR(n),			\
-		.cfg_func = adc##n##_sam_cfg_func,			\
-		.periph_id = DT_INST_PROP(n, peripheral_id),		\
-		.afec_trg_pin = ATMEL_SAM_DT_PIN(n, 0),			\
-	};								\
-									\
-	static struct adc_sam_data adc##n##_sam_data = {		\
-		ADC_CONTEXT_INIT_TIMER(adc##n##_sam_data, ctx),		\
-		ADC_CONTEXT_INIT_LOCK(adc##n##_sam_data, ctx),		\
-		ADC_CONTEXT_INIT_SYNC(adc##n##_sam_data, ctx),		\
-	};								\
-									\
-	DEVICE_AND_API_INIT(adc##n##_sam, DT_INST_LABEL(n),		\
-			    adc_sam_init, &adc##n##_sam_data,		\
-			    &adc##n##_sam_cfg, POST_KERNEL,		\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &adc_sam_api);				\
-									\
-	static void adc##n##_sam_cfg_func(const struct device *dev)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),	\
-			    adc_sam_isr,				\
-			    DEVICE_GET(adc##n##_sam), 0);		\
-		irq_enable(DT_INST_IRQN(n));				\
+#define ADC_SAM_INIT(n)                                                      \
+	static void adc##n##_sam_cfg_func(const struct device *dev);         \
+                                                                             \
+	static const struct adc_sam_cfg adc##n##_sam_cfg = {                 \
+		.regs = (Afec *)DT_INST_REG_ADDR(n),                         \
+		.cfg_func = adc##n##_sam_cfg_func,                           \
+		.periph_id = DT_INST_PROP(n, peripheral_id),                 \
+		.afec_trg_pin = ATMEL_SAM_DT_PIN(n, 0),                      \
+	};                                                                   \
+                                                                             \
+	static struct adc_sam_data adc##n##_sam_data = {                     \
+		ADC_CONTEXT_INIT_TIMER(adc##n##_sam_data, ctx),              \
+		ADC_CONTEXT_INIT_LOCK(adc##n##_sam_data, ctx),               \
+		ADC_CONTEXT_INIT_SYNC(adc##n##_sam_data, ctx),               \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(adc##n##_sam, DT_INST_LABEL(n), adc_sam_init,    \
+			    &adc##n##_sam_data, &adc##n##_sam_cfg,           \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
+			    &adc_sam_api);                                   \
+                                                                             \
+	static void adc##n##_sam_cfg_func(const struct device *dev)          \
+	{                                                                    \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),       \
+			    adc_sam_isr, DEVICE_GET(adc##n##_sam), 0);       \
+		irq_enable(DT_INST_IRQN(n));                                 \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(ADC_SAM_INIT)

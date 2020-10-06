@@ -55,10 +55,10 @@ struct z_device_mmio_rom {
 	size_t size;
 };
 
-#define Z_DEVICE_MMIO_ROM_INITIALIZER(node_id) \
-	{ \
+#define Z_DEVICE_MMIO_ROM_INITIALIZER(node_id)     \
+	{                                          \
 		.phys_addr = DT_REG_ADDR(node_id), \
-		.size = DT_REG_SIZE(node_id) \
+		.size = DT_REG_SIZE(node_id)       \
 	}
 
 /**
@@ -107,8 +107,8 @@ struct z_device_mmio_rom {
 };
 
 #define Z_DEVICE_MMIO_ROM_INITIALIZER(node_id) \
-	{ \
-		.addr = DT_REG_ADDR(node_id) \
+	{                                      \
+		.addr = DT_REG_ADDR(node_id)   \
 	}
 #endif /* DEVICE_MMIO_IS_IN_RAM */
 #endif /* !_ASMLANGUAGE */
@@ -152,7 +152,7 @@ struct z_device_mmio_rom {
  * A pointer to this memory may be obtained with DEVICE_MMIO_RAM_PTR().
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_RAM			mm_reg_t _mmio
+#define DEVICE_MMIO_RAM mm_reg_t _mmio
 #else
 #define DEVICE_MMIO_RAM
 #endif
@@ -170,7 +170,7 @@ struct z_device_mmio_rom {
  * @param device device node_id object
  * @retval mm_reg_t  pointer to storage location
  */
-#define DEVICE_MMIO_RAM_PTR(device)	(mm_reg_t *)((device)->data)
+#define DEVICE_MMIO_RAM_PTR(device) (mm_reg_t *)((device)->data)
 #endif /* DEVICE_MMIO_IS_IN_RAM */
 
 /**
@@ -201,7 +201,7 @@ struct z_device_mmio_rom {
  *
  * @see DEVICE_MMIO_ROM_INIT()
  */
-#define DEVICE_MMIO_ROM		struct z_device_mmio_rom _mmio
+#define DEVICE_MMIO_ROM struct z_device_mmio_rom _mmio
 
 /**
  * @def DEVICE_MMIO_ROM_PTR(dev)
@@ -214,8 +214,7 @@ struct z_device_mmio_rom {
  * @param dev device instance object
  * @retval struct device_mmio_rom * pointer to storage location
  */
-#define DEVICE_MMIO_ROM_PTR(dev) \
-	((struct z_device_mmio_rom *)((dev)->config))
+#define DEVICE_MMIO_ROM_PTR(dev) ((struct z_device_mmio_rom *)((dev)->config))
 
 /**
  * @def DEVICE_MMIO_ROM_INIT(node_id)
@@ -257,13 +256,14 @@ struct z_device_mmio_rom {
  * @param flags cache mode flags
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_MAP(dev, flags) \
-	device_map(DEVICE_MMIO_RAM_PTR(dev), \
+#define DEVICE_MMIO_MAP(dev, flags)                     \
+	device_map(DEVICE_MMIO_RAM_PTR(dev),            \
 		   DEVICE_MMIO_ROM_PTR(dev)->phys_addr, \
-		   DEVICE_MMIO_ROM_PTR(dev)->size, \
-		   (flags))
+		   DEVICE_MMIO_ROM_PTR(dev)->size, (flags))
 #else
-#define DEVICE_MMIO_MAP(dev, flags) do { } while (0)
+#define DEVICE_MMIO_MAP(dev, flags) \
+	do {                        \
+	} while (0)
 #endif
 
 /**
@@ -286,9 +286,9 @@ struct z_device_mmio_rom {
  * @return mm_reg_t  linear address of the MMIO region
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_GET(dev)	(*DEVICE_MMIO_RAM_PTR(dev))
+#define DEVICE_MMIO_GET(dev) (*DEVICE_MMIO_RAM_PTR(dev))
 #else
-#define DEVICE_MMIO_GET(dev)	(DEVICE_MMIO_ROM_PTR(dev)->addr)
+#define DEVICE_MMIO_GET(dev) (DEVICE_MMIO_ROM_PTR(dev)->addr)
 #endif
 /** @} */
 
@@ -333,7 +333,7 @@ struct z_device_mmio_rom {
  * @param name Member name to use to store within dev_data.
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_NAMED_RAM(name)	mm_reg_t name
+#define DEVICE_MMIO_NAMED_RAM(name) mm_reg_t name
 #else
 #define DEVICE_MMIO_NAMED_RAM(name)
 #endif /* DEVICE_MMIO_IS_IN_RAM */
@@ -351,8 +351,7 @@ struct z_device_mmio_rom {
  * @param name Member name within dev_data
  * @retval mm_reg_t  pointer to storage location
  */
-#define DEVICE_MMIO_NAMED_RAM_PTR(dev, name) \
-		(&(DEV_DATA(dev)->name))
+#define DEVICE_MMIO_NAMED_RAM_PTR(dev, name) (&(DEV_DATA(dev)->name))
 #endif /* DEVICE_MMIO_IS_IN_RAM */
 
 /**
@@ -462,13 +461,14 @@ struct z_device_mmio_rom {
  * @param flags One of the DEVICE_CACHE_* caching modes
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_NAMED_MAP(dev, name, flags) \
-	device_map(DEVICE_MMIO_NAMED_RAM_PTR((dev), name), \
+#define DEVICE_MMIO_NAMED_MAP(dev, name, flags)                         \
+	device_map(DEVICE_MMIO_NAMED_RAM_PTR((dev), name),              \
 		   (DEVICE_MMIO_NAMED_ROM_PTR((dev), name)->phys_addr), \
-		   (DEVICE_MMIO_NAMED_ROM_PTR((dev), name)->size), \
-		   (flags))
+		   (DEVICE_MMIO_NAMED_ROM_PTR((dev), name)->size), (flags))
 #else
-#define DEVICE_MMIO_NAMED_MAP(dev, name, flags) do { } while (0)
+#define DEVICE_MMIO_NAMED_MAP(dev, name, flags) \
+	do {                                    \
+	} while (0)
 #endif
 
 /**
@@ -494,10 +494,10 @@ struct z_device_mmio_rom {
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
 #define DEVICE_MMIO_NAMED_GET(dev, name) \
-		(*DEVICE_MMIO_NAMED_RAM_PTR((dev), name))
+	(*DEVICE_MMIO_NAMED_RAM_PTR((dev), name))
 #else
 #define DEVICE_MMIO_NAMED_GET(dev, name) \
-		((DEVICE_MMIO_NAMED_ROM_PTR((dev), name))->addr)
+	((DEVICE_MMIO_NAMED_ROM_PTR((dev), name))->addr)
 #endif /* DEVICE_MMIO_IS_IN_RAM */
 
 /** @} */
@@ -519,8 +519,8 @@ struct z_device_mmio_rom {
  * @{
  */
 
- #define Z_TOPLEVEL_ROM_NAME(name) _CONCAT(z_mmio_rom__, name)
- #define Z_TOPLEVEL_RAM_NAME(name) _CONCAT(z_mmio_ram__, name)
+#define Z_TOPLEVEL_ROM_NAME(name) _CONCAT(z_mmio_rom__, name)
+#define Z_TOPLEVEL_RAM_NAME(name) _CONCAT(z_mmio_ram__, name)
 
 /**
  * @def DEVICE_MMIO_TOPLEVEL(name, node_id)
@@ -538,12 +538,12 @@ struct z_device_mmio_rom {
  * @param node_id Device-tree node identifier for this region
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_TOPLEVEL(name, node_id) \
-	mm_reg_t Z_TOPLEVEL_RAM_NAME(name); \
+#define DEVICE_MMIO_TOPLEVEL(name, node_id)                        \
+	mm_reg_t Z_TOPLEVEL_RAM_NAME(name);                        \
 	const struct z_device_mmio_rom Z_TOPLEVEL_ROM_NAME(name) = \
 		Z_DEVICE_MMIO_ROM_INITIALIZER(node_id)
 #else
-#define DEVICE_MMIO_TOPLEVEL(name, node_id) \
+#define DEVICE_MMIO_TOPLEVEL(name, node_id)                        \
 	const struct z_device_mmio_rom Z_TOPLEVEL_ROM_NAME(name) = \
 		Z_DEVICE_MMIO_ROM_INITIALIZER(node_id)
 #endif /* DEVICE_MMIO_IS_IN_RAM */
@@ -563,7 +563,7 @@ struct z_device_mmio_rom {
  */
 
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_TOPLEVEL_DECLARE(name) \
+#define DEVICE_MMIO_TOPLEVEL_DECLARE(name)         \
 	extern mm_reg_t Z_TOPLEVEL_RAM_NAME(name); \
 	extern const struct z_device_mmio_rom Z_TOPLEVEL_ROM_NAME(name)
 #else
@@ -586,12 +586,12 @@ struct z_device_mmio_rom {
  * @param node_id Device-tree node identifier for this region
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_TOPLEVEL_STATIC(name, node_id) \
-	static mm_reg_t Z_TOPLEVEL_RAM_NAME(name); \
+#define DEVICE_MMIO_TOPLEVEL_STATIC(name, node_id)                        \
+	static mm_reg_t Z_TOPLEVEL_RAM_NAME(name);                        \
 	static const struct z_device_mmio_rom Z_TOPLEVEL_ROM_NAME(name) = \
 		Z_DEVICE_MMIO_ROM_INITIALIZER(node_id)
 #else
-#define DEVICE_MMIO_TOPLEVEL_STATIC(name, node_id) \
+#define DEVICE_MMIO_TOPLEVEL_STATIC(name, node_id)                        \
 	static const struct z_device_mmio_rom Z_TOPLEVEL_ROM_NAME(name) = \
 		Z_DEVICE_MMIO_ROM_INITIALIZER(node_id)
 #endif /* DEVICE_MMIO_IS_IN_RAM */
@@ -641,12 +641,14 @@ struct z_device_mmio_rom {
  * @param flags One of the DEVICE_CACHE_* caching modes
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_TOPLEVEL_MAP(name, flags) \
-	device_map(&Z_TOPLEVEL_RAM_NAME(name), \
+#define DEVICE_MMIO_TOPLEVEL_MAP(name, flags)           \
+	device_map(&Z_TOPLEVEL_RAM_NAME(name),          \
 		   Z_TOPLEVEL_ROM_NAME(name).phys_addr, \
 		   Z_TOPLEVEL_ROM_NAME(name).size, flags)
 #else
-#define DEVICE_MMIO_TOPLEVEL_MAP(name, flags) do { } while (0)
+#define DEVICE_MMIO_TOPLEVEL_MAP(name, flags) \
+	do {                                  \
+	} while (0)
 #endif
 
 /**
@@ -660,11 +662,10 @@ struct z_device_mmio_rom {
  * @return mm_reg_t  linear address of the MMIO region
  */
 #ifdef DEVICE_MMIO_IS_IN_RAM
-#define DEVICE_MMIO_TOPLEVEL_GET(name)	\
-		((mm_reg_t)Z_TOPLEVEL_RAM_NAME(name))
+#define DEVICE_MMIO_TOPLEVEL_GET(name) ((mm_reg_t)Z_TOPLEVEL_RAM_NAME(name))
 #else
-#define DEVICE_MMIO_TOPLEVEL_GET(name)	\
-		((mm_reg_t)Z_TOPLEVEL_ROM_NAME(name).addr)
+#define DEVICE_MMIO_TOPLEVEL_GET(name) \
+	((mm_reg_t)Z_TOPLEVEL_ROM_NAME(name).addr)
 #endif
 /** @} */
 

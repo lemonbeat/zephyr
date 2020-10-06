@@ -18,8 +18,8 @@ static const osEventFlagsAttr_t init_event_flags_attrs = {
 	.cb_size = 0,
 };
 
-#define DONT_CARE               (0)
-#define NSEC_PER_MSEC           (NSEC_PER_USEC * USEC_PER_MSEC)
+#define DONT_CARE (0)
+#define NSEC_PER_MSEC (NSEC_PER_USEC * USEC_PER_MSEC)
 
 /**
  * @brief Create and Initialize an Event Flags object.
@@ -36,8 +36,8 @@ osEventFlagsId_t osEventFlagsNew(const osEventFlagsAttr_t *attr)
 		attr = &init_event_flags_attrs;
 	}
 
-	if (k_mem_slab_alloc(&cv2_event_flags_slab, (void **)&events, K_MSEC(100))
-	    == 0) {
+	if (k_mem_slab_alloc(&cv2_event_flags_slab, (void **)&events,
+			     K_MSEC(100)) == 0) {
 		memset(events, 0, sizeof(struct cv2_event_flags));
 	} else {
 		return NULL;
@@ -122,7 +122,6 @@ uint32_t osEventFlagsWait(osEventFlagsId_t ef_id, uint32_t flags,
 	}
 
 	for (;;) {
-
 		time_stamp_start = (uint64_t)k_cycle_get_32();
 
 		switch (timeout) {
@@ -157,7 +156,6 @@ uint32_t osEventFlagsWait(osEventFlagsId_t ef_id, uint32_t flags,
 		events->poll_event.state = K_POLL_STATE_NOT_READY;
 
 		if (options & osFlagsWaitAll) {
-
 			/* Check if all events we are waiting on have
 			 * been signalled
 			 */
@@ -172,8 +170,8 @@ uint32_t osEventFlagsWait(osEventFlagsId_t ef_id, uint32_t flags,
 			hwclk_cycles_delta =
 				(uint64_t)k_cycle_get_32() - time_stamp_start;
 
-			time_delta_ns =
-				(uint32_t)k_cyc_to_ns_floor64(hwclk_cycles_delta);
+			time_delta_ns = (uint32_t)k_cyc_to_ns_floor64(
+				hwclk_cycles_delta);
 
 			time_delta_ms = (uint32_t)time_delta_ns / NSEC_PER_MSEC;
 
@@ -189,7 +187,6 @@ uint32_t osEventFlagsWait(osEventFlagsId_t ef_id, uint32_t flags,
 
 	sig = events->signal_results;
 	if (!(options & osFlagsNoClear)) {
-
 		/* Clear signal flags as the thread is ready now */
 		key = irq_lock();
 		events->signal_results &= ~(flags);

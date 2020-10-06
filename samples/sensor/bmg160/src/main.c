@@ -14,8 +14,8 @@
 #include <drivers/sensor.h>
 #include <drivers/i2c.h>
 
-#define MAX_TEST_TIME	15000
-#define SLEEPTIME	300
+#define MAX_TEST_TIME 15000
+#define SLEEPTIME 300
 
 static void print_gyro_data(const struct device *bmg160)
 {
@@ -41,8 +41,7 @@ static void print_temp_data(const struct device *bmg160)
 		return;
 	}
 
-	printf("Temperature (Celsius): %f\n",
-	       val.val1 + val.val2 / 1000000.0);
+	printf("Temperature (Celsius): %f\n", val.val1 + val.val2 / 1000000.0);
 }
 
 static void test_polling_mode(const struct device *bmg160)
@@ -98,8 +97,8 @@ static void test_trigger_mode(const struct device *bmg160)
 
 	sensor_degrees_to_rad(10, &attr); /* convert to rad/s */
 
-	if (sensor_attr_set(bmg160, SENSOR_CHAN_GYRO_XYZ,
-			    SENSOR_ATTR_SLOPE_TH, &attr) < 0) {
+	if (sensor_attr_set(bmg160, SENSOR_CHAN_GYRO_XYZ, SENSOR_ATTR_SLOPE_TH,
+			    &attr) < 0) {
 		printf("Gyro: cannot set slope threshold.\n");
 		return;
 	}
@@ -108,8 +107,8 @@ static void test_trigger_mode(const struct device *bmg160)
 	attr.val1 = 4;
 	attr.val2 = 0;
 
-	if (sensor_attr_set(bmg160, SENSOR_CHAN_GYRO_XYZ,
-			    SENSOR_ATTR_SLOPE_DUR, &attr) < 0) {
+	if (sensor_attr_set(bmg160, SENSOR_CHAN_GYRO_XYZ, SENSOR_ATTR_SLOPE_DUR,
+			    &attr) < 0) {
 		printf("Gyro: cannot set slope duration.\n");
 		return;
 	}

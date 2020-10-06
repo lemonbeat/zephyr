@@ -11,8 +11,8 @@
 #include <sys/__assert.h>
 #include "soc_gpio.h"
 
-static void configure_common_attr(volatile Gpio *gpio,
-				  uint32_t mask, uint32_t flags)
+static void configure_common_attr(volatile Gpio *gpio, uint32_t mask,
+				  uint32_t flags)
 {
 	flags &= SOC_GPIO_FLAGS_MASK;
 
@@ -41,8 +41,8 @@ static void configure_common_attr(volatile Gpio *gpio,
 	}
 }
 
-static void configure_input_attr(volatile Gpio *gpio,
-				 uint32_t mask, uint32_t flags)
+static void configure_input_attr(volatile Gpio *gpio, uint32_t mask,
+				 uint32_t flags)
 {
 	/* Configure input filter */
 	if ((flags & SOC_GPIO_IN_FILTER_MASK) != 0U) {

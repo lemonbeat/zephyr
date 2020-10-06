@@ -37,12 +37,13 @@ enum {
 	BT_QUIRK_NO_AUTO_DLE = BIT(1),
 };
 
-#define IS_BT_QUIRK_NO_AUTO_DLE(bt_dev) ((bt_dev)->drv->quirks & BT_QUIRK_NO_AUTO_DLE)
+#define IS_BT_QUIRK_NO_AUTO_DLE(bt_dev) \
+	((bt_dev)->drv->quirks & BT_QUIRK_NO_AUTO_DLE)
 
 /* @brief The HCI event shall be given to bt_recv_prio */
 #define BT_HCI_EVT_FLAG_RECV_PRIO BIT(0)
 /* @brief  The HCI event shall be given to bt_recv. */
-#define BT_HCI_EVT_FLAG_RECV      BIT(1)
+#define BT_HCI_EVT_FLAG_RECV BIT(1)
 
 /** @brief Get HCI event flags.
  *
@@ -123,16 +124,16 @@ uint8_t bt_read_static_addr(struct bt_hci_vs_static_addr addrs[], uint8_t size);
 
 /** Possible values for the 'bus' member of the bt_hci_driver struct */
 enum bt_hci_driver_bus {
-	BT_HCI_DRIVER_BUS_VIRTUAL       = 0,
-	BT_HCI_DRIVER_BUS_USB           = 1,
-	BT_HCI_DRIVER_BUS_PCCARD        = 2,
-	BT_HCI_DRIVER_BUS_UART          = 3,
-	BT_HCI_DRIVER_BUS_RS232         = 4,
-	BT_HCI_DRIVER_BUS_PCI           = 5,
-	BT_HCI_DRIVER_BUS_SDIO          = 6,
-	BT_HCI_DRIVER_BUS_SPI           = 7,
-	BT_HCI_DRIVER_BUS_I2C           = 8,
-	BT_HCI_DRIVER_BUS_IPM           = 9,
+	BT_HCI_DRIVER_BUS_VIRTUAL = 0,
+	BT_HCI_DRIVER_BUS_USB = 1,
+	BT_HCI_DRIVER_BUS_PCCARD = 2,
+	BT_HCI_DRIVER_BUS_UART = 3,
+	BT_HCI_DRIVER_BUS_RS232 = 4,
+	BT_HCI_DRIVER_BUS_PCI = 5,
+	BT_HCI_DRIVER_BUS_SDIO = 6,
+	BT_HCI_DRIVER_BUS_SPI = 7,
+	BT_HCI_DRIVER_BUS_I2C = 8,
+	BT_HCI_DRIVER_BUS_IPM = 9,
 };
 
 /**

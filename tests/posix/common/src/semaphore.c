@@ -63,7 +63,8 @@ void test_posix_semaphore(void)
 	zassert_equal(sem_init(&sema, 0, 0), 0, "sem_init failed");
 
 	/* TESTPOINT: Call sem_post with invalid kobject */
-	zassert_equal(sem_post(dummy_sem), -1, "sem_post of"
+	zassert_equal(sem_post(dummy_sem), -1,
+		      "sem_post of"
 		      " invalid semaphore object didn't fail");
 	zassert_equal(errno, EINVAL, NULL);
 
@@ -97,7 +98,8 @@ void test_posix_semaphore(void)
 	zassert_equal(errno, ETIMEDOUT, NULL);
 
 	/* TESTPOINT: sem_destroy with invalid kobject */
-	zassert_equal(sem_destroy(dummy_sem), -1, "invalid"
+	zassert_equal(sem_destroy(dummy_sem), -1,
+		      "invalid"
 		      " semaphore is destroyed");
 	zassert_equal(errno, EINVAL, NULL);
 
@@ -111,7 +113,8 @@ void test_posix_semaphore(void)
 	zassert_equal(sem_getvalue(&sema, &val), 0, NULL);
 	zassert_equal(val, 1, NULL);
 
-	zassert_equal(sem_destroy(&sema), -1, "acquired semaphore"
+	zassert_equal(sem_destroy(&sema), -1,
+		      "acquired semaphore"
 		      " is destroyed");
 	zassert_equal(errno, EBUSY, NULL);
 

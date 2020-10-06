@@ -29,40 +29,40 @@ LOG_MODULE_REGISTER(ht16k33);
 /* HT16K33 commands and options */
 #define HT16K33_CMD_DISP_DATA_ADDR 0x00
 
-#define HT16K33_CMD_SYSTEM_SETUP   0x20
-#define HT16K33_OPT_S              BIT(0)
+#define HT16K33_CMD_SYSTEM_SETUP 0x20
+#define HT16K33_OPT_S BIT(0)
 
-#define HT16K33_CMD_KEY_DATA_ADDR  0x40
+#define HT16K33_CMD_KEY_DATA_ADDR 0x40
 
-#define HT16K33_CMD_INT_FLAG_ADDR  0x60
+#define HT16K33_CMD_INT_FLAG_ADDR 0x60
 
-#define HT16K33_CMD_DISP_SETUP     0x80
-#define HT16K33_OPT_D              BIT(0)
-#define HT16K33_OPT_B0             BIT(1)
-#define HT16K33_OPT_B1             BIT(2)
-#define HT16K33_OPT_BLINK_OFF      0
-#define HT16K33_OPT_BLINK_2HZ      HT16K33_OPT_B0
-#define HT16K33_OPT_BLINK_1HZ      HT16K33_OPT_B1
-#define HT16K33_OPT_BLINK_05HZ     (HT16K33_OPT_B1 | HT16K33_OPT_B0)
+#define HT16K33_CMD_DISP_SETUP 0x80
+#define HT16K33_OPT_D BIT(0)
+#define HT16K33_OPT_B0 BIT(1)
+#define HT16K33_OPT_B1 BIT(2)
+#define HT16K33_OPT_BLINK_OFF 0
+#define HT16K33_OPT_BLINK_2HZ HT16K33_OPT_B0
+#define HT16K33_OPT_BLINK_1HZ HT16K33_OPT_B1
+#define HT16K33_OPT_BLINK_05HZ (HT16K33_OPT_B1 | HT16K33_OPT_B0)
 
-#define HT16K33_CMD_ROW_INT_SET    0xa0
-#define HT16K33_OPT_ROW_INT        BIT(0)
-#define HT16K33_OPT_ACT            BIT(1)
-#define HT16K33_OPT_ROW            0
-#define HT16K33_OPT_INT_LOW        HT16K33_OPT_ROW_INT
-#define HT16K33_OPT_INT_HIGH       (HT16K33_OPT_ACT | HT16K33_OPT_ROW_INT)
+#define HT16K33_CMD_ROW_INT_SET 0xa0
+#define HT16K33_OPT_ROW_INT BIT(0)
+#define HT16K33_OPT_ACT BIT(1)
+#define HT16K33_OPT_ROW 0
+#define HT16K33_OPT_INT_LOW HT16K33_OPT_ROW_INT
+#define HT16K33_OPT_INT_HIGH (HT16K33_OPT_ACT | HT16K33_OPT_ROW_INT)
 
-#define HT16K33_CMD_DIMMING_SET    0xe0
+#define HT16K33_CMD_DIMMING_SET 0xe0
 
 /* HT16K33 size definitions */
-#define HT16K33_DISP_ROWS          16
-#define HT16K33_DISP_COLS          8
-#define HT16K33_DISP_DATA_SIZE     HT16K33_DISP_ROWS
-#define HT16K33_DISP_SEGMENTS      (HT16K33_DISP_ROWS * HT16K33_DISP_COLS)
-#define HT16K33_DIMMING_LEVELS     16
-#define HT16K33_KEYSCAN_ROWS       3
-#define HT16K33_KEYSCAN_COLS       13
-#define HT16K33_KEYSCAN_DATA_SIZE  6
+#define HT16K33_DISP_ROWS 16
+#define HT16K33_DISP_COLS 8
+#define HT16K33_DISP_DATA_SIZE HT16K33_DISP_ROWS
+#define HT16K33_DISP_SEGMENTS (HT16K33_DISP_ROWS * HT16K33_DISP_COLS)
+#define HT16K33_DIMMING_LEVELS 16
+#define HT16K33_KEYSCAN_ROWS 3
+#define HT16K33_KEYSCAN_COLS 13
+#define HT16K33_KEYSCAN_DATA_SIZE 6
 
 struct ht16k33_cfg {
 	char *i2c_dev_name;
@@ -79,7 +79,7 @@ struct ht16k33_data {
 	const struct device *i2c;
 	const struct device *dev;
 	struct led_data dev_data;
-	 /* Shadow buffer for the display data RAM */
+	/* Shadow buffer for the display data RAM */
 	uint8_t buffer[HT16K33_DISP_DATA_SIZE];
 #ifdef CONFIG_HT16K33_KEYSCAN
 	struct k_mutex lock;
@@ -115,9 +115,9 @@ static int ht16k33_led_blink(const struct device *dev, uint32_t led,
 	cmd = HT16K33_CMD_DISP_SETUP | HT16K33_OPT_D;
 	if (delay_off == 0) {
 		cmd |= HT16K33_OPT_BLINK_OFF;
-	} else if (period > 1500)  {
+	} else if (period > 1500) {
 		cmd |= HT16K33_OPT_BLINK_05HZ;
-	} else if (period > 750)  {
+	} else if (period > 750) {
 		cmd |= HT16K33_OPT_BLINK_1HZ;
 	} else {
 		cmd |= HT16K33_OPT_BLINK_2HZ;
@@ -237,8 +237,7 @@ static bool ht16k33_process_keyscan_data(const struct device *dev)
 	int i;
 
 	err = i2c_burst_read(data->i2c, config->i2c_addr,
-			     HT16K33_CMD_KEY_DATA_ADDR, keys,
-			     sizeof(keys));
+			     HT16K33_CMD_KEY_DATA_ADDR, keys, sizeof(keys));
 	if (err) {
 		LOG_ERR("Failed to to read HT16K33 key data (err %d)", err);
 		return false;
@@ -299,8 +298,8 @@ static void ht16k33_timer_callback(struct k_timer *timer)
 }
 
 int ht16k33_register_keyscan_device(const struct device *parent,
-					   const struct device *child,
-					   uint8_t keyscan_idx)
+				    const struct device *child,
+				    uint8_t keyscan_idx)
 {
 	struct ht16k33_data *data = parent->data;
 
@@ -420,7 +419,8 @@ static int ht16k33_init(const struct device *dev)
 
 		/* Flush key data before enabling interrupt */
 		err = i2c_burst_read(data->i2c, config->i2c_addr,
-				HT16K33_CMD_KEY_DATA_ADDR, keys, sizeof(keys));
+				     HT16K33_CMD_KEY_DATA_ADDR, keys,
+				     sizeof(keys));
 		if (err) {
 			LOG_ERR("Failed to to read HT16K33 key data");
 			return -EIO;
@@ -450,8 +450,8 @@ static int ht16k33_init(const struct device *dev)
 	k_thread_create(&data->irq_thread, data->irq_thread_stack,
 			CONFIG_HT16K33_KEYSCAN_IRQ_THREAD_STACK_SIZE,
 			(k_thread_entry_t)ht16k33_irq_thread, data, NULL, NULL,
-			K_PRIO_COOP(CONFIG_HT16K33_KEYSCAN_IRQ_THREAD_PRIO),
-			0, K_NO_WAIT);
+			K_PRIO_COOP(CONFIG_HT16K33_KEYSCAN_IRQ_THREAD_PRIO), 0,
+			K_NO_WAIT);
 #endif /* CONFIG_HT16K33_KEYSCAN */
 
 	return 0;
@@ -464,46 +464,43 @@ static const struct led_driver_api ht16k33_leds_api = {
 	.off = ht16k33_led_off,
 };
 
-#define HT16K33_DEVICE(id)						\
-	static const struct ht16k33_cfg ht16k33_##id##_cfg = {		\
-		.i2c_dev_name = DT_INST_BUS_LABEL(id),			\
-		.i2c_addr     = DT_INST_REG_ADDR(id),			\
-		.irq_enabled  = false,					\
-	};								\
-									\
-	static struct ht16k33_data ht16k33_##id##_data;			\
-									\
-	DEVICE_AND_API_INIT(ht16k33_##id, DT_INST_LABEL(id),		\
-			    &ht16k33_init, &ht16k33_##id##_data,	\
-			    &ht16k33_##id##_cfg, POST_KERNEL,		\
-			    CONFIG_LED_INIT_PRIORITY, &ht16k33_leds_api)
+#define HT16K33_DEVICE(id)                                                  \
+	static const struct ht16k33_cfg ht16k33_##id##_cfg = {              \
+		.i2c_dev_name = DT_INST_BUS_LABEL(id),                      \
+		.i2c_addr = DT_INST_REG_ADDR(id),                           \
+		.irq_enabled = false,                                       \
+	};                                                                  \
+                                                                            \
+	static struct ht16k33_data ht16k33_##id##_data;                     \
+                                                                            \
+	DEVICE_AND_API_INIT(ht16k33_##id, DT_INST_LABEL(id), &ht16k33_init, \
+			    &ht16k33_##id##_data, &ht16k33_##id##_cfg,      \
+			    POST_KERNEL, CONFIG_LED_INIT_PRIORITY,          \
+			    &ht16k33_leds_api)
 
 #ifdef CONFIG_HT16K33_KEYSCAN
-#define HT16K33_DEVICE_WITH_IRQ(id)					\
-	static const struct ht16k33_cfg ht16k33_##id##_cfg = {		\
-		.i2c_dev_name = DT_INST_BUS_LABEL(id),			\
-		.i2c_addr     = DT_INST_REG_ADDR(id),			\
-		.irq_enabled  = true,					\
-		.irq_dev_name =						\
-		DT_INST_GPIO_LABEL(id, irq_gpios),			\
-		.irq_pin      = DT_INST_GPIO_PIN(id, irq_gpios),	\
-		.irq_flags    =						\
-		DT_INST_GPIO_FLAGS(id, irq_gpios),			\
-	};								\
-									\
-	static struct ht16k33_data ht16k33_##id##_data;			\
-									\
-	DEVICE_AND_API_INIT(ht16k33_##id, DT_INST_LABEL(id),		\
-			    &ht16k33_init, &ht16k33_##id##_data,	\
-			    &ht16k33_##id##_cfg, POST_KERNEL,		\
-			    CONFIG_LED_INIT_PRIORITY, &ht16k33_leds_api)
+#define HT16K33_DEVICE_WITH_IRQ(id)                                         \
+	static const struct ht16k33_cfg ht16k33_##id##_cfg = {              \
+		.i2c_dev_name = DT_INST_BUS_LABEL(id),                      \
+		.i2c_addr = DT_INST_REG_ADDR(id),                           \
+		.irq_enabled = true,                                        \
+		.irq_dev_name = DT_INST_GPIO_LABEL(id, irq_gpios),          \
+		.irq_pin = DT_INST_GPIO_PIN(id, irq_gpios),                 \
+		.irq_flags = DT_INST_GPIO_FLAGS(id, irq_gpios),             \
+	};                                                                  \
+                                                                            \
+	static struct ht16k33_data ht16k33_##id##_data;                     \
+                                                                            \
+	DEVICE_AND_API_INIT(ht16k33_##id, DT_INST_LABEL(id), &ht16k33_init, \
+			    &ht16k33_##id##_data, &ht16k33_##id##_cfg,      \
+			    POST_KERNEL, CONFIG_LED_INIT_PRIORITY,          \
+			    &ht16k33_leds_api)
 #else /* ! CONFIG_HT16K33_KEYSCAN */
 #define HT16K33_DEVICE_WITH_IRQ(id) HT16K33_DEVICE(id)
 #endif /* ! CONFIG_HT16K33_KEYSCAN */
 
-#define HT16K33_INSTANTIATE(id)					\
-	COND_CODE_1(DT_INST_NODE_HAS_PROP(id, irq_gpios),	\
-		    (HT16K33_DEVICE_WITH_IRQ(id)),		\
-		    (HT16K33_DEVICE(id)));
+#define HT16K33_INSTANTIATE(id)                           \
+	COND_CODE_1(DT_INST_NODE_HAS_PROP(id, irq_gpios), \
+		    (HT16K33_DEVICE_WITH_IRQ(id)), (HT16K33_DEVICE(id)));
 
 DT_INST_FOREACH_STATUS_OKAY(HT16K33_INSTANTIATE)

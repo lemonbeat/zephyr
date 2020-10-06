@@ -22,19 +22,19 @@
 #include "conn_internal.h"
 
 enum pairing_method {
-	LEGACY,			/* Legacy (pre-SSP) pairing */
-	JUST_WORKS,		/* JustWorks pairing */
-	PASSKEY_INPUT,		/* Passkey Entry input */
-	PASSKEY_DISPLAY,	/* Passkey Entry display */
-	PASSKEY_CONFIRM,	/* Passkey confirm */
+	LEGACY, /* Legacy (pre-SSP) pairing */
+	JUST_WORKS, /* JustWorks pairing */
+	PASSKEY_INPUT, /* Passkey Entry input */
+	PASSKEY_DISPLAY, /* Passkey Entry display */
+	PASSKEY_CONFIRM, /* Passkey confirm */
 };
 
 /* based on table 5.7, Core Spec 4.2, Vol.3 Part C, 5.2.2.6 */
 static const uint8_t ssp_method[4 /* remote */][4 /* local */] = {
-	      { JUST_WORKS, JUST_WORKS, PASSKEY_INPUT, JUST_WORKS },
-	      { JUST_WORKS, PASSKEY_CONFIRM, PASSKEY_INPUT, JUST_WORKS },
-	      { PASSKEY_DISPLAY, PASSKEY_DISPLAY, PASSKEY_INPUT, JUST_WORKS },
-	      { JUST_WORKS, JUST_WORKS, JUST_WORKS, JUST_WORKS },
+	{ JUST_WORKS, JUST_WORKS, PASSKEY_INPUT, JUST_WORKS },
+	{ JUST_WORKS, PASSKEY_CONFIRM, PASSKEY_INPUT, JUST_WORKS },
+	{ PASSKEY_DISPLAY, PASSKEY_DISPLAY, PASSKEY_INPUT, JUST_WORKS },
+	{ JUST_WORKS, JUST_WORKS, JUST_WORKS, JUST_WORKS },
 };
 
 static int pin_code_neg_reply(const bt_addr_t *bdaddr)
@@ -391,8 +391,7 @@ int bt_ssp_auth_cancel(struct bt_conn *conn)
 	case PASSKEY_INPUT:
 		return ssp_passkey_neg_reply(conn);
 	case PASSKEY_DISPLAY:
-		return bt_conn_disconnect(conn,
-					  BT_HCI_ERR_AUTH_FAIL);
+		return bt_conn_disconnect(conn, BT_HCI_ERR_AUTH_FAIL);
 	case LEGACY:
 		return pin_code_neg_reply(&conn->br.dst);
 	default:
@@ -430,7 +429,8 @@ void hci_evt_link_key_notify(struct net_buf *buf)
 		return;
 	}
 
-	BT_DBG("%s, link type 0x%02x", bt_addr_str(&evt->bdaddr), evt->key_type);
+	BT_DBG("%s, link type 0x%02x", bt_addr_str(&evt->bdaddr),
+	       evt->key_type);
 
 	if (!conn->br.link_key) {
 		conn->br.link_key = bt_keys_get_link_key(&evt->bdaddr);
@@ -639,8 +639,8 @@ void hci_evt_io_capa_req(struct net_buf *buf)
 		return;
 	}
 
-	resp_buf = bt_hci_cmd_create(BT_HCI_OP_IO_CAPABILITY_REPLY,
-				     sizeof(*cp));
+	resp_buf =
+		bt_hci_cmd_create(BT_HCI_OP_IO_CAPABILITY_REPLY, sizeof(*cp));
 	if (!resp_buf) {
 		BT_ERR("Out of command buffers");
 		bt_conn_unref(conn);

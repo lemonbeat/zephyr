@@ -12,8 +12,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(nrfx_sample, LOG_LEVEL_INF);
 
-#define INPUT_PIN	DT_GPIO_PIN(DT_ALIAS(sw0), gpios)
-#define OUTPUT_PIN	DT_GPIO_PIN(DT_ALIAS(led0), gpios)
+#define INPUT_PIN DT_GPIO_PIN(DT_ALIAS(sw0), gpios)
+#define OUTPUT_PIN DT_GPIO_PIN(DT_ALIAS(led0), gpios)
 
 static void button_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
@@ -28,8 +28,8 @@ void main(void)
 
 	/* Connect GPIOTE_0 IRQ to nrfx_gpiote_irq_handler */
 	IRQ_CONNECT(DT_IRQN(DT_NODELABEL(gpiote)),
-		    DT_IRQ(DT_NODELABEL(gpiote), priority),
-		    nrfx_isr, nrfx_gpiote_irq_handler, 0);
+		    DT_IRQ(DT_NODELABEL(gpiote), priority), nrfx_isr,
+		    nrfx_gpiote_irq_handler, 0);
 
 	/* Initialize GPIOTE (the interrupt priority passed as the parameter
 	 * here is ignored, see nrfx_glue.h).
@@ -91,14 +91,10 @@ void main(void)
 	 * subscribed using the OUT task. This means that each time the button
 	 * is pressed, the LED pin will be toggled.
 	 */
-	nrf_gpiote_publish_set(
-		NRF_GPIOTE,
-		nrfx_gpiote_in_event_get(INPUT_PIN),
-		channel);
-	nrf_gpiote_subscribe_set(
-		NRF_GPIOTE,
-		nrfx_gpiote_out_task_get(OUTPUT_PIN),
-		channel);
+	nrf_gpiote_publish_set(NRF_GPIOTE, nrfx_gpiote_in_event_get(INPUT_PIN),
+			       channel);
+	nrf_gpiote_subscribe_set(NRF_GPIOTE,
+				 nrfx_gpiote_out_task_get(OUTPUT_PIN), channel);
 
 	/* Enable DPPI channel */
 	err = nrfx_dppi_channel_enable(channel);

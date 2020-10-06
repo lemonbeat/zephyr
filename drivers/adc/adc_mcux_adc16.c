@@ -88,7 +88,8 @@ static int start_read(const struct device *dev,
 	case 13:
 		resolution = kADC16_Resolution12or13Bit;
 		break;
-#if defined(FSL_FEATURE_ADC16_MAX_RESOLUTION) && (FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16U)
+#if defined(FSL_FEATURE_ADC16_MAX_RESOLUTION) && \
+	(FSL_FEATURE_ADC16_MAX_RESOLUTION >= 16U)
 	case 16:
 		resolution = kADC16_Resolution16Bit;
 		break;
@@ -212,8 +213,8 @@ static void mcux_adc16_isr(const struct device *dev)
 	uint16_t result;
 
 	result = ADC16_GetChannelConversionValue(base, channel_group);
-	LOG_DBG("Finished channel %d. Result is 0x%04x",
-		    data->channel_id, result);
+	LOG_DBG("Finished channel %d. Result is 0x%04x", data->channel_id,
+		result);
 
 	*data->buffer++ = result;
 	data->channels &= ~BIT(data->channel_id);
@@ -252,7 +253,7 @@ static int mcux_adc16_init(const struct device *dev)
 
 	ADC16_Init(base, &adc_config);
 #if defined(FSL_FEATURE_ADC16_HAS_CALIBRATION) && \
-	    FSL_FEATURE_ADC16_HAS_CALIBRATION
+	FSL_FEATURE_ADC16_HAS_CALIBRATION
 	ADC16_SetHardwareAverage(base, kADC16_HardwareAverageCount32);
 	ADC16_DoAutoCalibration(base);
 #endif
@@ -275,33 +276,32 @@ static const struct adc_driver_api mcux_adc16_driver_api = {
 #endif
 };
 
-#define ACD16_MCUX_INIT(n)						\
-	static void mcux_adc16_config_func_##n(const struct device *dev); \
-									\
-	static const struct mcux_adc16_config mcux_adc16_config_##n = {	\
-		.base = (ADC_Type *)DT_INST_REG_ADDR(n),		\
-		.irq_config_func = mcux_adc16_config_func_##n,		\
-	};								\
-									\
-	static struct mcux_adc16_data mcux_adc16_data_##n = {		\
-		ADC_CONTEXT_INIT_TIMER(mcux_adc16_data_##n, ctx),	\
-		ADC_CONTEXT_INIT_LOCK(mcux_adc16_data_##n, ctx),	\
-		ADC_CONTEXT_INIT_SYNC(mcux_adc16_data_##n, ctx),	\
-	};								\
-									\
-	DEVICE_AND_API_INIT(mcux_adc16_##n, DT_INST_LABEL(n),		\
-			    &mcux_adc16_init, &mcux_adc16_data_##n,	\
-			    &mcux_adc16_config_##n, POST_KERNEL,	\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &mcux_adc16_driver_api);			\
-									\
-	static void mcux_adc16_config_func_##n(const struct device *dev) \
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),	\
-			    mcux_adc16_isr,				\
-			    DEVICE_GET(mcux_adc16_##n), 0);		\
-									\
-		irq_enable(DT_INST_IRQN(n));				\
+#define ACD16_MCUX_INIT(n)                                                  \
+	static void mcux_adc16_config_func_##n(const struct device *dev);   \
+                                                                            \
+	static const struct mcux_adc16_config mcux_adc16_config_##n = {     \
+		.base = (ADC_Type *)DT_INST_REG_ADDR(n),                    \
+		.irq_config_func = mcux_adc16_config_func_##n,              \
+	};                                                                  \
+                                                                            \
+	static struct mcux_adc16_data mcux_adc16_data_##n = {               \
+		ADC_CONTEXT_INIT_TIMER(mcux_adc16_data_##n, ctx),           \
+		ADC_CONTEXT_INIT_LOCK(mcux_adc16_data_##n, ctx),            \
+		ADC_CONTEXT_INIT_SYNC(mcux_adc16_data_##n, ctx),            \
+	};                                                                  \
+                                                                            \
+	DEVICE_AND_API_INIT(mcux_adc16_##n, DT_INST_LABEL(n),               \
+			    &mcux_adc16_init, &mcux_adc16_data_##n,         \
+			    &mcux_adc16_config_##n, POST_KERNEL,            \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,             \
+			    &mcux_adc16_driver_api);                        \
+                                                                            \
+	static void mcux_adc16_config_func_##n(const struct device *dev)    \
+	{                                                                   \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),      \
+			    mcux_adc16_isr, DEVICE_GET(mcux_adc16_##n), 0); \
+                                                                            \
+		irq_enable(DT_INST_IRQN(n));                                \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(ACD16_MCUX_INIT)

@@ -90,7 +90,7 @@ static inline enum net_verdict process_data(struct net_pkt *pkt,
 			if (ret == NET_DROP) {
 				NET_DBG("Packet %p discarded by L2", pkt);
 				net_stats_update_processing_error(
-							net_pkt_iface(pkt));
+					net_pkt_iface(pkt));
 			}
 
 			return ret;
@@ -225,7 +225,7 @@ static inline int check_ip_addr(struct net_pkt *pkt)
 #endif /* CONFIG_NET_IPV6 */
 
 #if defined(CONFIG_NET_IPV4)
-	if (net_pkt_family(pkt) == AF_INET) {
+		if (net_pkt_family(pkt) == AF_INET) {
 		if (net_ipv4_addr_cmp(&NET_IPV4_HDR(pkt)->dst,
 				      net_ipv4_unspecified_address())) {
 			NET_DBG("IPv4 dst address missing");
@@ -237,7 +237,7 @@ static inline int check_ip_addr(struct net_pkt *pkt)
 		 */
 		if (net_ipv4_is_addr_loopback(&NET_IPV4_HDR(pkt)->dst) ||
 		    (net_ipv4_is_addr_bcast(net_pkt_iface(pkt),
-				     &NET_IPV4_HDR(pkt)->dst) == false &&
+					    &NET_IPV4_HDR(pkt)->dst) == false &&
 		     net_ipv4_is_my_addr(&NET_IPV4_HDR(pkt)->dst))) {
 			struct in_addr addr;
 
@@ -393,8 +393,8 @@ int net_recv_data(struct net_if *iface, struct net_pkt *pkt)
 	net_pkt_set_overwrite(pkt, true);
 	net_pkt_cursor_init(pkt);
 
-	NET_DBG("prio %d iface %p pkt %p len %zu", net_pkt_priority(pkt),
-		iface, pkt, net_pkt_get_len(pkt));
+	NET_DBG("prio %d iface %p pkt %p len %zu", net_pkt_priority(pkt), iface,
+		pkt, net_pkt_get_len(pkt));
 
 	if (IS_ENABLED(CONFIG_NET_ROUTING)) {
 		net_pkt_set_orig_iface(pkt, iface);
@@ -415,8 +415,7 @@ static inline void l3_init(void)
 
 	net_ipv4_autoconf_init();
 
-	if (IS_ENABLED(CONFIG_NET_UDP) ||
-	    IS_ENABLED(CONFIG_NET_TCP) ||
+	if (IS_ENABLED(CONFIG_NET_UDP) || IS_ENABLED(CONFIG_NET_TCP) ||
 	    IS_ENABLED(CONFIG_NET_SOCKETS_PACKET) ||
 	    IS_ENABLED(CONFIG_NET_SOCKETS_CAN)) {
 		net_conn_init();

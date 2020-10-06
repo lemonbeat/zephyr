@@ -55,7 +55,8 @@ static void imx_mu_isr(const struct device *dev)
 			all_registers_full = true;
 			for (i = 0; i < IMX_IPM_DATA_REGS; i++) {
 				if (!MU_IsRxFull(base,
-						(id * IMX_IPM_DATA_REGS) + i)) {
+						 (id * IMX_IPM_DATA_REGS) +
+							 i)) {
 					all_registers_full = false;
 					break;
 				}
@@ -63,8 +64,9 @@ static void imx_mu_isr(const struct device *dev)
 			if (all_registers_full) {
 				for (i = 0; i < IMX_IPM_DATA_REGS; i++) {
 					MU_ReceiveMsg(base,
-						(id * IMX_IPM_DATA_REGS) + i,
-						&data32[i]);
+						      (id * IMX_IPM_DATA_REGS) +
+							      i,
+						      &data32[i]);
 				}
 
 				if (data->callback) {
@@ -115,8 +117,8 @@ static int imx_mu_ipm_send(const struct device *dev, int wait, uint32_t id,
 	}
 
 	if (wait) {
-		while (!MU_IsTxEmpty(base,
-			(id * IMX_IPM_DATA_REGS) + IMX_IPM_DATA_REGS - 1)) {
+		while (!MU_IsTxEmpty(base, (id * IMX_IPM_DATA_REGS) +
+						   IMX_IPM_DATA_REGS - 1)) {
 		}
 	}
 
@@ -138,8 +140,7 @@ static uint32_t imx_mu_ipm_max_id_val_get(const struct device *dev)
 }
 
 static void imx_mu_ipm_register_callback(const struct device *dev,
-					 ipm_callback_t cb,
-					 void *user_data)
+					 ipm_callback_t cb, void *user_data)
 {
 	struct imx_mu_data *driver_data = dev->data;
 
@@ -214,17 +215,14 @@ static const struct imx_mu_config imx_mu_b_config = {
 
 static struct imx_mu_data imx_mu_b_data;
 
-DEVICE_AND_API_INIT(mu_b, DT_INST_LABEL(0),
-		    &imx_mu_init,
-		    &imx_mu_b_data, &imx_mu_b_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &imx_mu_driver_api);
+DEVICE_AND_API_INIT(mu_b, DT_INST_LABEL(0), &imx_mu_init, &imx_mu_b_data,
+		    &imx_mu_b_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &imx_mu_driver_api);
 
 static void imx_mu_config_func_b(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    imx_mu_isr, DEVICE_GET(mu_b), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), imx_mu_isr,
+		    DEVICE_GET(mu_b), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 }

@@ -25,8 +25,7 @@ static const char *now_str(void)
 	now /= 60U;
 	h = now;
 
-	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u",
-		 h, min, s, ms);
+	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u", h, min, s, ms);
 	return buf;
 }
 
@@ -38,12 +37,10 @@ static int process_mpu6050(const struct device *dev)
 	int rc = sensor_sample_fetch(dev);
 
 	if (rc == 0) {
-		rc = sensor_channel_get(dev, SENSOR_CHAN_ACCEL_XYZ,
-					accel);
+		rc = sensor_channel_get(dev, SENSOR_CHAN_ACCEL_XYZ, accel);
 	}
 	if (rc == 0) {
-		rc = sensor_channel_get(dev, SENSOR_CHAN_GYRO_XYZ,
-					gyro);
+		rc = sensor_channel_get(dev, SENSOR_CHAN_GYRO_XYZ, gyro);
 	}
 	if (rc == 0) {
 		rc = sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP,
@@ -53,8 +50,7 @@ static int process_mpu6050(const struct device *dev)
 		printf("[%s]:%g Cel\n"
 		       "  accel % f % f % f m/s/s\n"
 		       "  gyro  % f % f % f rad/s\n",
-		       now_str(),
-		       sensor_value_to_double(&temperature),
+		       now_str(), sensor_value_to_double(&temperature),
 		       sensor_value_to_double(&accel[0]),
 		       sensor_value_to_double(&accel[1]),
 		       sensor_value_to_double(&accel[2]),
@@ -95,12 +91,11 @@ void main(void)
 	}
 
 #ifdef CONFIG_MPU6050_TRIGGER
-	trigger = (struct sensor_trigger) {
+	trigger = (struct sensor_trigger){
 		.type = SENSOR_TRIG_DATA_READY,
 		.chan = SENSOR_CHAN_ALL,
 	};
-	if (sensor_trigger_set(mpu6050, &trigger,
-			       handle_mpu6050_drdy) < 0) {
+	if (sensor_trigger_set(mpu6050, &trigger, handle_mpu6050_drdy) < 0) {
 		printf("Cannot configure trigger\n");
 		return;
 	};

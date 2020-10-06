@@ -10,7 +10,6 @@
  * Interrupt Controller (IIC)
  */
 
-
 #include <kernel.h>
 #include <kernel_structs.h>
 #include <arch/cpu.h>
@@ -30,7 +29,6 @@ FUNC_NORETURN void z_irq_spurious(const void *unused)
 	z_nios2_fatal_error(K_ERR_SPURIOUS_IRQ, NULL);
 }
 
-
 void arch_irq_enable(unsigned int irq)
 {
 	uint32_t ienable;
@@ -44,8 +42,6 @@ void arch_irq_enable(unsigned int irq)
 
 	irq_unlock(key);
 };
-
-
 
 void arch_irq_disable(unsigned int irq)
 {

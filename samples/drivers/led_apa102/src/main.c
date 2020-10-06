@@ -26,9 +26,21 @@ LOG_MODULE_REGISTER(main);
 #define DELAY_TIME K_MSEC(40)
 
 static const struct led_rgb colors[] = {
-	{ .r = 0xff, .g = 0x00, .b = 0x00, }, /* red */
-	{ .r = 0x00, .g = 0xff, .b = 0x00, }, /* green */
-	{ .r = 0x00, .g = 0x00, .b = 0xff, }, /* blue */
+	{
+		.r = 0xff,
+		.g = 0x00,
+		.b = 0x00,
+	}, /* red */
+	{
+		.r = 0x00,
+		.g = 0xff,
+		.b = 0x00,
+	}, /* green */
+	{
+		.r = 0x00,
+		.g = 0x00,
+		.b = 0xff,
+	}, /* blue */
 };
 
 static const struct led_rgb black = {
@@ -58,9 +70,11 @@ void main(void)
 
 	strip = device_get_binding(DT_LABEL(DT_INST(0, apa_apa102)));
 	if (strip) {
-		LOG_INF("Found LED strip device %s", DT_LABEL(DT_INST(0, apa_apa102)));
+		LOG_INF("Found LED strip device %s",
+			DT_LABEL(DT_INST(0, apa_apa102)));
 	} else {
-		LOG_ERR("LED strip device %s not found", DT_LABEL(DT_INST(0, apa_apa102)));
+		LOG_ERR("LED strip device %s not found",
+			DT_LABEL(DT_INST(0, apa_apa102)));
 		return;
 	}
 

@@ -9,7 +9,7 @@
 
 #include "footprint.h"
 
-#define STACK_SIZE	512
+#define STACK_SIZE 512
 
 K_MUTEX_DEFINE(user_mutex);
 
@@ -31,8 +31,8 @@ static void run_user_mutex(void)
 
 	/* Exercise simple workqueue */
 	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
-			      user_thread_fn, NULL, NULL, NULL,
-			      0, K_USER, K_FOREVER);
+			      user_thread_fn, NULL, NULL, NULL, 0, K_USER,
+			      K_FOREVER);
 	k_object_access_grant(&user_mutex, tid);
 
 	k_thread_start(tid);

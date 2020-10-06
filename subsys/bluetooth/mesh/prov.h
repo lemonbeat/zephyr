@@ -6,15 +6,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define PROV_ERR_NONE          0x00
-#define PROV_ERR_NVAL_PDU      0x01
-#define PROV_ERR_NVAL_FMT      0x02
-#define PROV_ERR_UNEXP_PDU     0x03
-#define PROV_ERR_CFM_FAILED    0x04
-#define PROV_ERR_RESOURCES     0x05
-#define PROV_ERR_DECRYPT       0x06
-#define PROV_ERR_UNEXP_ERR     0x07
-#define PROV_ERR_ADDR          0x08
+#define PROV_ERR_NONE 0x00
+#define PROV_ERR_NVAL_PDU 0x01
+#define PROV_ERR_NVAL_FMT 0x02
+#define PROV_ERR_UNEXP_PDU 0x03
+#define PROV_ERR_CFM_FAILED 0x04
+#define PROV_ERR_RESOURCES 0x05
+#define PROV_ERR_DECRYPT 0x06
+#define PROV_ERR_UNEXP_ERR 0x07
+#define PROV_ERR_ADDR 0x08
 
 int bt_mesh_pb_adv_open(const uint8_t uuid[16], uint16_t net_idx, uint16_t addr,
 			uint8_t attention_duration);

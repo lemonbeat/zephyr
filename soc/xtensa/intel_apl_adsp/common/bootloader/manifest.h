@@ -12,43 +12,43 @@
 #include <stdint.h>
 
 /* start offset for base FW module */
-#define SOF_MAN_ELF_TEXT_OFFSET		0x2000
+#define SOF_MAN_ELF_TEXT_OFFSET 0x2000
 
 /* FW Extended Manifest Header id = $AE1 */
-#define SOF_MAN_EXT_HEADER_MAGIC	0x31454124
+#define SOF_MAN_EXT_HEADER_MAGIC 0x31454124
 
 /* module type load type */
-#define SOF_MAN_MOD_TYPE_BUILTIN	0
-#define SOF_MAN_MOD_TYPE_MODULE		1
+#define SOF_MAN_MOD_TYPE_BUILTIN 0
+#define SOF_MAN_MOD_TYPE_MODULE 1
 
 struct sof_man_module_type {
-	uint32_t load_type:4;	/* SOF_MAN_MOD_TYPE_ */
-	uint32_t auto_start:1;
-	uint32_t domain_ll:1;
-	uint32_t domain_dp:1;
-	uint32_t rsvd_:25;
+	uint32_t load_type : 4; /* SOF_MAN_MOD_TYPE_ */
+	uint32_t auto_start : 1;
+	uint32_t domain_ll : 1;
+	uint32_t domain_dp : 1;
+	uint32_t rsvd_ : 25;
 };
 
 /* segment flags.type */
-#define SOF_MAN_SEGMENT_TEXT		0
-#define SOF_MAN_SEGMENT_RODATA		1
-#define SOF_MAN_SEGMENT_DATA		1
-#define SOF_MAN_SEGMENT_BSS		2
-#define SOF_MAN_SEGMENT_EMPTY		15
+#define SOF_MAN_SEGMENT_TEXT 0
+#define SOF_MAN_SEGMENT_RODATA 1
+#define SOF_MAN_SEGMENT_DATA 1
+#define SOF_MAN_SEGMENT_BSS 2
+#define SOF_MAN_SEGMENT_EMPTY 15
 
 union sof_man_segment_flags {
 	uint32_t ul;
 	struct {
-		uint32_t contents:1;
-		uint32_t alloc:1;
-		uint32_t load:1;
-		uint32_t readonly:1;
-		uint32_t code:1;
-		uint32_t data:1;
-		uint32_t _rsvd0:2;
-		uint32_t type:4;	/* MAN_SEGMENT_ */
-		uint32_t _rsvd1:4;
-		uint32_t length:16;	/* of segment in pages */
+		uint32_t contents : 1;
+		uint32_t alloc : 1;
+		uint32_t load : 1;
+		uint32_t readonly : 1;
+		uint32_t code : 1;
+		uint32_t data : 1;
+		uint32_t _rsvd0 : 2;
+		uint32_t type : 4; /* MAN_SEGMENT_ */
+		uint32_t _rsvd1 : 4;
+		uint32_t length : 16; /* of segment in pages */
 	} r;
 } __attribute__((packed));
 
@@ -65,16 +65,19 @@ struct sof_man_segment_desc {
  * The firmware binary can be split into several modules.
  */
 
-#define SOF_MAN_MOD_ID_LEN		4
-#define SOF_MAN_MOD_NAME_LEN		8
-#define SOF_MAN_MOD_SHA256_LEN		32
-#define SOF_MAN_MOD_ID			{'$', 'A', 'M', 'E'}
+#define SOF_MAN_MOD_ID_LEN 4
+#define SOF_MAN_MOD_NAME_LEN 8
+#define SOF_MAN_MOD_SHA256_LEN 32
+#define SOF_MAN_MOD_ID             \
+	{                          \
+		'$', 'A', 'M', 'E' \
+	}
 
 /*
  * Each module has an entry in the FW header. Used by ROM - Immutable.
  */
 struct sof_man_module {
-	uint8_t struct_id[SOF_MAN_MOD_ID_LEN];	/* SOF_MAN_MOD_ID */
+	uint8_t struct_id[SOF_MAN_MOD_ID_LEN]; /* SOF_MAN_MOD_ID */
 	uint8_t name[SOF_MAN_MOD_NAME_LEN];
 	uint8_t uuid[16];
 	struct sof_man_module_type type;
@@ -83,8 +86,8 @@ struct sof_man_module {
 	uint16_t cfg_offset;
 	uint16_t cfg_count;
 	uint32_t affinity_mask;
-	uint16_t instance_max_count;	/* max number of instances */
-	uint16_t instance_bss_size;	/* instance (pages) */
+	uint16_t instance_max_count; /* max number of instances */
+	uint16_t instance_bss_size; /* instance (pages) */
 	struct sof_man_segment_desc segment[3];
 } __attribute__((packed));
 
@@ -92,25 +95,28 @@ struct sof_man_module {
  * Each module has a configuration in the FW header. Used by ROM - Immutable.
  */
 struct sof_man_mod_config {
-	uint32_t par[4];	/* module parameters */
-	uint32_t is_pages;	/* actual size of instance .bss (pages) */
-	uint32_t cps;		/* cycles per second */
-	uint32_t ibs;		/* input buffer size (bytes) */
-	uint32_t obs;		/* output buffer size (bytes) */
-	uint32_t module_flags;	/* flags, reserved for future use */
-	uint32_t cpc;		/* cycles per single run */
-	uint32_t obls;		/* output block size, reserved for future use */
+	uint32_t par[4]; /* module parameters */
+	uint32_t is_pages; /* actual size of instance .bss (pages) */
+	uint32_t cps; /* cycles per second */
+	uint32_t ibs; /* input buffer size (bytes) */
+	uint32_t obs; /* output buffer size (bytes) */
+	uint32_t module_flags; /* flags, reserved for future use */
+	uint32_t cpc; /* cycles per single run */
+	uint32_t obls; /* output block size, reserved for future use */
 } __attribute__((packed));
 
 /*
  * FW Manifest Header
  */
 
-#define SOF_MAN_FW_HDR_FW_NAME_LEN	8
-#define SOF_MAN_FW_HDR_ID		{'$', 'A', 'M', '1'}
-#define SOF_MAN_FW_HDR_NAME		"ADSPFW"
-#define SOF_MAN_FW_HDR_FLAGS		0x0
-#define SOF_MAN_FW_HDR_FEATURES		0x1ff
+#define SOF_MAN_FW_HDR_FW_NAME_LEN 8
+#define SOF_MAN_FW_HDR_ID          \
+	{                          \
+		'$', 'A', 'M', '1' \
+	}
+#define SOF_MAN_FW_HDR_NAME "ADSPFW"
+#define SOF_MAN_FW_HDR_FLAGS 0x0
+#define SOF_MAN_FW_HDR_FEATURES 0x1ff
 
 /*
  * The firmware has a standard header that is checked by the ROM on firmware
@@ -162,7 +168,7 @@ struct sof_man_fw_desc {
  * Component Descriptor. Used by ROM - Immutable.
  */
 struct sof_man_component_desc {
-	uint32_t reserved[2];	/* all 0 */
+	uint32_t reserved[2]; /* all 0 */
 	uint32_t version;
 	uint8_t hash[SOF_MAN_MOD_SHA256_LEN];
 	uint32_t base_offset;
@@ -174,10 +180,10 @@ struct sof_man_component_desc {
  * Audio DSP extended metadata. Used by ROM - Immutable.
  */
 struct sof_man_adsp_meta_file_ext {
-	uint32_t ext_type;	/* always 17 for ADSP extension */
+	uint32_t ext_type; /* always 17 for ADSP extension */
 	uint32_t ext_len;
 	uint32_t imr_type;
-	uint8_t reserved[16];	/* all 0 */
+	uint8_t reserved[16]; /* all 0 */
 	struct sof_man_component_desc comp_desc[1];
 } __attribute__((packed));
 
@@ -192,8 +198,8 @@ struct sof_man_module_manifest {
 /*
  * Module offset in manifest.
  */
-#define SOF_MAN_MODULE_OFFSET(index) \
+#define SOF_MAN_MODULE_OFFSET(index)        \
 	(sizeof(struct sof_man_fw_header) + \
-		(index) * sizeof(struct sof_man_module))
+	 (index) * sizeof(struct sof_man_module))
 
 #endif

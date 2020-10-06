@@ -27,8 +27,7 @@ static int ak8975_sample_fetch(const struct device *dev,
 
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);
 
-	if (i2c_reg_write_byte(drv_data->i2c,
-			       DT_INST_REG_ADDR(0),
+	if (i2c_reg_write_byte(drv_data->i2c, DT_INST_REG_ADDR(0),
 			       AK8975_REG_CNTL, AK8975_MODE_MEASURE) < 0) {
 		LOG_ERR("Failed to start measurement.");
 		return -EIO;
@@ -36,8 +35,7 @@ static int ak8975_sample_fetch(const struct device *dev,
 
 	k_busy_wait(AK8975_MEASURE_TIME_US);
 
-	if (i2c_burst_read(drv_data->i2c,
-			   DT_INST_REG_ADDR(0),
+	if (i2c_burst_read(drv_data->i2c, DT_INST_REG_ADDR(0),
 			   AK8975_REG_DATA_START, buf, 6) < 0) {
 		LOG_ERR("Failed to read sample data.");
 		return -EIO;
@@ -67,10 +65,9 @@ static int ak8975_channel_get(const struct device *dev,
 {
 	struct ak8975_data *drv_data = dev->data;
 
-	__ASSERT_NO_MSG(chan == SENSOR_CHAN_MAGN_XYZ ||
-			chan == SENSOR_CHAN_MAGN_X ||
-			chan == SENSOR_CHAN_MAGN_Y ||
-			chan == SENSOR_CHAN_MAGN_Z);
+	__ASSERT_NO_MSG(
+		chan == SENSOR_CHAN_MAGN_XYZ || chan == SENSOR_CHAN_MAGN_X ||
+		chan == SENSOR_CHAN_MAGN_Y || chan == SENSOR_CHAN_MAGN_Z);
 
 	if (chan == SENSOR_CHAN_MAGN_XYZ) {
 		ak8975_convert(val, drv_data->x_sample, drv_data->x_adj);
@@ -96,15 +93,13 @@ static int ak8975_read_adjustment_data(struct ak8975_data *drv_data)
 {
 	uint8_t buf[3];
 
-	if (i2c_reg_write_byte(drv_data->i2c,
-			       DT_INST_REG_ADDR(0),
+	if (i2c_reg_write_byte(drv_data->i2c, DT_INST_REG_ADDR(0),
 			       AK8975_REG_CNTL, AK8975_MODE_FUSE_ACCESS) < 0) {
 		LOG_ERR("Failed to set chip in fuse access mode.");
 		return -EIO;
 	}
 
-	if (i2c_burst_read(drv_data->i2c,
-			   DT_INST_REG_ADDR(0),
+	if (i2c_burst_read(drv_data->i2c, DT_INST_REG_ADDR(0),
 			   AK8975_REG_ADJ_DATA_START, buf, 3) < 0) {
 		LOG_ERR("Failed to read adjustment data.");
 		return -EIO;
@@ -122,11 +117,10 @@ int ak8975_init(const struct device *dev)
 	struct ak8975_data *drv_data = dev->data;
 	uint8_t id;
 
-	drv_data->i2c =
-		device_get_binding(DT_INST_BUS_LABEL(0));
+	drv_data->i2c = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (drv_data->i2c == NULL) {
 		LOG_ERR("Failed to get pointer to %s device!",
-			    DT_INST_BUS_LABEL(0));
+			DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -149,8 +143,7 @@ int ak8975_init(const struct device *dev)
 #endif
 
 	/* check chip ID */
-	if (i2c_reg_read_byte(drv_data->i2c,
-			      DT_INST_REG_ADDR(0),
+	if (i2c_reg_read_byte(drv_data->i2c, DT_INST_REG_ADDR(0),
 			      AK8975_REG_CHIP_ID, &id) < 0) {
 		LOG_ERR("Failed to read chip ID.");
 		return -EIO;
@@ -170,7 +163,6 @@ int ak8975_init(const struct device *dev)
 
 struct ak8975_data ak8975_data;
 
-DEVICE_AND_API_INIT(ak8975, DT_INST_LABEL(0), ak8975_init,
-		    &ak8975_data,
-		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(ak8975, DT_INST_LABEL(0), ak8975_init, &ak8975_data, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &ak8975_driver_api);

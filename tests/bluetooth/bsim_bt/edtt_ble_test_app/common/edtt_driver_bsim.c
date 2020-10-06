@@ -37,10 +37,10 @@ int edtt_mode_enabled;
  */
 static int edtt_autoshutdown;
 
-#define TO_DEVICE  0
+#define TO_DEVICE 0
 #define TO_BRIDGE 1
 static int fifo[2] = { -1, -1 };
-static char *fifo_path[2] = {NULL, NULL};
+static char *fifo_path[2] = { NULL, NULL };
 
 extern unsigned int global_device_nbr;
 
@@ -111,13 +111,14 @@ int edtt_read(uint8_t *ptr, size_t size, int flags)
 			read += received_bytes;
 		} else {
 			if (flags & EDTTT_BLOCK) {
-				bs_trace_raw_time(9, "EDTT: No enough data yet,"
-						"sleeping for %i ms\n",
-						EDTT_IF_RECHECK_DELTA);
+				bs_trace_raw_time(9,
+						  "EDTT: No enough data yet,"
+						  "sleeping for %i ms\n",
+						  EDTT_IF_RECHECK_DELTA);
 				k_sleep(K_MSEC(EDTT_IF_RECHECK_DELTA));
 			} else {
 				bs_trace_raw_time(9, "EDTT: No enough data yet,"
-						"returning\n");
+						     "returning\n");
 				break;
 			}
 		}
@@ -187,17 +188,17 @@ static void edptd_create_fifo_if(void)
 	 * also SIGPIPE is already ignored
 	 */
 
-	fifo_path[TO_DEVICE] = (char *)bs_calloc(pb_com_path_length + 30,
-						 sizeof(char));
-	fifo_path[TO_BRIDGE] = (char *)bs_calloc(pb_com_path_length + 30,
-						 sizeof(char));
-	sprintf(fifo_path[TO_DEVICE], "%s/Device%i.PTTin",
-		pb_com_path, global_device_nbr);
-	sprintf(fifo_path[TO_BRIDGE], "%s/Device%i.PTTout",
-		pb_com_path, global_device_nbr);
+	fifo_path[TO_DEVICE] =
+		(char *)bs_calloc(pb_com_path_length + 30, sizeof(char));
+	fifo_path[TO_BRIDGE] =
+		(char *)bs_calloc(pb_com_path_length + 30, sizeof(char));
+	sprintf(fifo_path[TO_DEVICE], "%s/Device%i.PTTin", pb_com_path,
+		global_device_nbr);
+	sprintf(fifo_path[TO_BRIDGE], "%s/Device%i.PTTout", pb_com_path,
+		global_device_nbr);
 
-	if ((pb_create_fifo_if_not_there(fifo_path[TO_DEVICE]) != 0)
-		|| (pb_create_fifo_if_not_there(fifo_path[TO_BRIDGE]) != 0)) {
+	if ((pb_create_fifo_if_not_there(fifo_path[TO_DEVICE]) != 0) ||
+	    (pb_create_fifo_if_not_there(fifo_path[TO_BRIDGE]) != 0)) {
 		bs_trace_error_line("Couldnt create FIFOs for EDTT IF\n");
 	}
 
@@ -224,7 +225,7 @@ static void edptd_create_fifo_if(void)
 
 static void edttd_clean_up(void)
 {
-	for (int dir = TO_DEVICE ; dir <= TO_BRIDGE ; dir++) {
+	for (int dir = TO_DEVICE; dir <= TO_BRIDGE; dir++) {
 		if (fifo_path[dir]) {
 			if (fifo[dir] != -1) {
 				close(fifo[dir]);
@@ -250,14 +251,15 @@ static int fifo_low_level_read(uint8_t *bufptr, int size)
 		/*The FIFO was closed by the bridge*/
 		if (edtt_autoshutdown) {
 			bs_trace_raw_time(3, "EDTT: FIFO closed "
-					"(ptt_autoshutdown==true) =>"
-					" Terminate\n");
+					     "(ptt_autoshutdown==true) =>"
+					     " Terminate\n");
 			edttd_clean_up();
 			bs_trace_exit_line("\n");
 		} else {
-			bs_trace_raw_time(3, "EDTT: FIFO closed "
-					"(ptt_autoshutdown==false) => We close "
-					"the FIFOs and move on\n");
+			bs_trace_raw_time(
+				3, "EDTT: FIFO closed "
+				   "(ptt_autoshutdown==false) => We close "
+				   "the FIFOs and move on\n");
 			edttd_clean_up();
 			edtt_mode_enabled = false;
 			return -1;

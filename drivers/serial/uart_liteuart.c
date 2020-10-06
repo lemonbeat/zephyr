@@ -14,16 +14,16 @@
 #include <drivers/uart.h>
 #include <zephyr/types.h>
 
-#define UART_EV_TX	(1 << 0)
-#define UART_EV_RX	(1 << 1)
-#define UART_BASE_ADDR	DT_INST_REG_ADDR(0)
-#define UART_RXTX	((UART_BASE_ADDR) + 0x00)
-#define UART_TXFULL	((UART_BASE_ADDR) + 0x04)
-#define UART_RXEMPTY	((UART_BASE_ADDR) + 0x08)
-#define UART_EV_STATUS	((UART_BASE_ADDR) + 0x0c)
-#define UART_EV_PENDING	((UART_BASE_ADDR) + 0x10)
-#define UART_EV_ENABLE	((UART_BASE_ADDR) + 0x14)
-#define UART_IRQ	DT_INST_IRQN(0)
+#define UART_EV_TX (1 << 0)
+#define UART_EV_RX (1 << 1)
+#define UART_BASE_ADDR DT_INST_REG_ADDR(0)
+#define UART_RXTX ((UART_BASE_ADDR) + 0x00)
+#define UART_TXFULL ((UART_BASE_ADDR) + 0x04)
+#define UART_RXEMPTY ((UART_BASE_ADDR) + 0x08)
+#define UART_EV_STATUS ((UART_BASE_ADDR) + 0x0c)
+#define UART_EV_PENDING ((UART_BASE_ADDR) + 0x10)
+#define UART_EV_ENABLE ((UART_BASE_ADDR) + 0x14)
+#define UART_IRQ DT_INST_IRQN(0)
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 typedef void (*irq_cfg_func_t)(void);
@@ -206,8 +206,8 @@ static int uart_liteuart_fifo_fill(const struct device *dev,
  *
  * @return Number of bytes read
  */
-static int uart_liteuart_fifo_read(const struct device *dev,
-				   uint8_t *rx_data, const int size)
+static int uart_liteuart_fifo_read(const struct device *dev, uint8_t *rx_data,
+				   const int size)
 {
 	int i;
 
@@ -286,26 +286,26 @@ static void liteuart_uart_irq_handler(const struct device *dev)
 
 	irq_unlock(key);
 }
-#endif	/* CONFIG_UART_INTERRUPT_DRIVEN */
+#endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 
 static const struct uart_driver_api uart_liteuart_driver_api = {
-	.poll_in		= uart_liteuart_poll_in,
-	.poll_out		= uart_liteuart_poll_out,
-	.err_check		= NULL,
+	.poll_in = uart_liteuart_poll_in,
+	.poll_out = uart_liteuart_poll_out,
+	.err_check = NULL,
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.fifo_fill		= uart_liteuart_fifo_fill,
-	.fifo_read		= uart_liteuart_fifo_read,
-	.irq_tx_enable		= uart_liteuart_irq_tx_enable,
-	.irq_tx_disable		= uart_liteuart_irq_tx_disable,
-	.irq_tx_ready		= uart_liteuart_irq_tx_ready,
-	.irq_rx_enable		= uart_liteuart_irq_rx_enable,
-	.irq_rx_disable		= uart_liteuart_irq_rx_disable,
-	.irq_rx_ready		= uart_liteuart_irq_rx_ready,
-	.irq_err_enable		= uart_liteuart_irq_err,
-	.irq_err_disable	= uart_liteuart_irq_err,
-	.irq_is_pending		= uart_liteuart_irq_is_pending,
-	.irq_update		= uart_liteuart_irq_update,
-	.irq_callback_set	= uart_liteuart_irq_callback_set
+	.fifo_fill = uart_liteuart_fifo_fill,
+	.fifo_read = uart_liteuart_fifo_read,
+	.irq_tx_enable = uart_liteuart_irq_tx_enable,
+	.irq_tx_disable = uart_liteuart_irq_tx_disable,
+	.irq_tx_ready = uart_liteuart_irq_tx_ready,
+	.irq_rx_enable = uart_liteuart_irq_rx_enable,
+	.irq_rx_disable = uart_liteuart_irq_rx_disable,
+	.irq_rx_ready = uart_liteuart_irq_rx_ready,
+	.irq_err_enable = uart_liteuart_irq_err,
+	.irq_err_disable = uart_liteuart_irq_err,
+	.irq_is_pending = uart_liteuart_irq_is_pending,
+	.irq_update = uart_liteuart_irq_update,
+	.irq_callback_set = uart_liteuart_irq_callback_set
 #endif
 };
 
@@ -313,15 +313,14 @@ static struct uart_liteuart_data uart_liteuart_data_0;
 static int uart_liteuart_init(const struct device *dev);
 
 static const struct uart_liteuart_device_config uart_liteuart_dev_cfg_0 = {
-	.port		= UART_BASE_ADDR,
-	.baud_rate	= DT_INST_PROP(0, current_speed)
+	.port = UART_BASE_ADDR,
+	.baud_rate = DT_INST_PROP(0, current_speed)
 };
 
-DEVICE_AND_API_INIT(uart_liteuart_0, DT_INST_LABEL(0),
-		uart_liteuart_init,
-		&uart_liteuart_data_0, &uart_liteuart_dev_cfg_0,
-		PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		(void *)&uart_liteuart_driver_api);
+DEVICE_AND_API_INIT(uart_liteuart_0, DT_INST_LABEL(0), uart_liteuart_init,
+		    &uart_liteuart_data_0, &uart_liteuart_dev_cfg_0,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    (void *)&uart_liteuart_driver_api);
 
 static int uart_liteuart_init(const struct device *dev)
 {
@@ -329,8 +328,7 @@ static int uart_liteuart_init(const struct device *dev)
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	IRQ_CONNECT(UART_IRQ, DT_INST_IRQ(0, priority),
-			liteuart_uart_irq_handler, DEVICE_GET(uart_liteuart_0),
-			0);
+		    liteuart_uart_irq_handler, DEVICE_GET(uart_liteuart_0), 0);
 	irq_enable(UART_IRQ);
 #endif
 

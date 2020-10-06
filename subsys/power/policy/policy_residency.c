@@ -12,7 +12,7 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(power);
 
-#define SECS_TO_TICKS		CONFIG_SYS_CLOCK_TICKS_PER_SEC
+#define SECS_TO_TICKS CONFIG_SYS_CLOCK_TICKS_PER_SEC
 
 /* PM Policy based on SoC/Platform residency requirements */
 static const unsigned int pm_min_residency[] = {
@@ -22,25 +22,25 @@ static const unsigned int pm_min_residency[] = {
 #endif
 
 #ifdef CONFIG_HAS_SYS_POWER_STATE_SLEEP_2
-	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 * SECS_TO_TICKS / MSEC_PER_SEC,
+	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 *SECS_TO_TICKS / MSEC_PER_SEC,
 #endif
 
 #ifdef CONFIG_HAS_SYS_POWER_STATE_SLEEP_3
-	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_3 * SECS_TO_TICKS / MSEC_PER_SEC,
+	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_3 *SECS_TO_TICKS / MSEC_PER_SEC,
 #endif
 #endif /* CONFIG_SYS_POWER_SLEEP_STATES */
 
 #ifdef CONFIG_SYS_POWER_DEEP_SLEEP_STATES
 #ifdef CONFIG_HAS_SYS_POWER_STATE_DEEP_SLEEP_1
-	CONFIG_SYS_PM_MIN_RESIDENCY_DEEP_SLEEP_1 * SECS_TO_TICKS / MSEC_PER_SEC,
+	CONFIG_SYS_PM_MIN_RESIDENCY_DEEP_SLEEP_1 *SECS_TO_TICKS / MSEC_PER_SEC,
 #endif
 
 #ifdef CONFIG_HAS_SYS_POWER_STATE_DEEP_SLEEP_2
-	CONFIG_SYS_PM_MIN_RESIDENCY_DEEP_SLEEP_2 * SECS_TO_TICKS / MSEC_PER_SEC,
+	CONFIG_SYS_PM_MIN_RESIDENCY_DEEP_SLEEP_2 *SECS_TO_TICKS / MSEC_PER_SEC,
 #endif
 
 #ifdef CONFIG_HAS_SYS_POWER_STATE_DEEP_SLEEP_3
-	CONFIG_SYS_PM_MIN_RESIDENCY_DEEP_SLEEP_3 * SECS_TO_TICKS / MSEC_PER_SEC,
+	CONFIG_SYS_PM_MIN_RESIDENCY_DEEP_SLEEP_3 *SECS_TO_TICKS / MSEC_PER_SEC,
 #endif
 #endif /* CONFIG_SYS_POWER_DEEP_SLEEP_STATES */
 };
@@ -63,8 +63,8 @@ enum power_states sys_pm_policy_next_state(int32_t ticks)
 		if ((ticks == K_TICKS_FOREVER) ||
 		    (ticks >= pm_min_residency[i])) {
 			LOG_DBG("Selected power state %d "
-					"(ticks: %d, min_residency: %u)",
-					i, ticks, pm_min_residency[i]);
+				"(ticks: %d, min_residency: %u)",
+				i, ticks, pm_min_residency[i]);
 			return (enum power_states)(i);
 		}
 	}

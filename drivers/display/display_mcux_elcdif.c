@@ -17,8 +17,7 @@
 
 LOG_MODULE_REGISTER(display_mcux_elcdif, CONFIG_DISPLAY_LOG_LEVEL);
 
-K_MEM_POOL_DEFINE(mcux_elcdif_pool,
-		  CONFIG_MCUX_ELCDIF_POOL_BLOCK_MIN,
+K_MEM_POOL_DEFINE(mcux_elcdif_pool, CONFIG_MCUX_ELCDIF_POOL_BLOCK_MIN,
 		  CONFIG_MCUX_ELCDIF_POOL_BLOCK_MAX,
 		  CONFIG_MCUX_ELCDIF_POOL_BLOCK_NUM,
 		  CONFIG_MCUX_ELCDIF_POOL_BLOCK_ALIGN);
@@ -55,7 +54,8 @@ static int mcux_elcdif_write(const struct device *dev, const uint16_t x,
 	uint8_t *dst;
 
 	__ASSERT((data->pixel_bytes * desc->pitch * desc->height) <=
-		 desc->buf_size, "Input buffer too small");
+			 desc->buf_size,
+		 "Input buffer too small");
 
 	LOG_DBG("W=%d, H=%d, @%d,%d", desc->width, desc->height, x, y);
 
@@ -75,12 +75,11 @@ static int mcux_elcdif_write(const struct device *dev, const uint16_t x,
 	}
 
 #ifdef CONFIG_HAS_MCUX_CACHE
-	DCACHE_CleanByRange((uint32_t) data->fb[write_idx].data,
-			    data->fb_bytes);
+	DCACHE_CleanByRange((uint32_t)data->fb[write_idx].data, data->fb_bytes);
 #endif
 
 	ELCDIF_SetNextBufferAddr(config->base,
-				 (uint32_t) data->fb[write_idx].data);
+				 (uint32_t)data->fb[write_idx].data);
 
 	data->write_idx = read_idx;
 
@@ -128,9 +127,9 @@ static int mcux_elcdif_set_contrast(const struct device *dev,
 	return -ENOTSUP;
 }
 
-static int mcux_elcdif_set_pixel_format(const struct device *dev,
-					const enum display_pixel_format
-					pixel_format)
+static int
+mcux_elcdif_set_pixel_format(const struct device *dev,
+			     const enum display_pixel_format pixel_format)
 {
 	const struct mcux_elcdif_config *config = dev->config;
 
@@ -141,8 +140,9 @@ static int mcux_elcdif_set_pixel_format(const struct device *dev,
 	return -ENOTSUP;
 }
 
-static int mcux_elcdif_set_orientation(const struct device *dev,
-		const enum display_orientation orientation)
+static int
+mcux_elcdif_set_orientation(const struct device *dev,
+			    const enum display_orientation orientation)
 {
 	if (orientation == DISPLAY_ORIENTATION_NORMAL) {
 		return 0;
@@ -151,8 +151,9 @@ static int mcux_elcdif_set_orientation(const struct device *dev,
 	return -ENOTSUP;
 }
 
-static void mcux_elcdif_get_capabilities(const struct device *dev,
-		struct display_capabilities *capabilities)
+static void
+mcux_elcdif_get_capabilities(const struct device *dev,
+			     struct display_capabilities *capabilities)
 {
 	const struct mcux_elcdif_config *config = dev->config;
 
@@ -185,8 +186,8 @@ static int mcux_elcdif_init(const struct device *dev)
 	elcdif_rgb_mode_config_t rgb_mode = config->rgb_mode;
 
 	data->pixel_bytes = config->bits_per_pixel / 8U;
-	data->fb_bytes = data->pixel_bytes *
-			 rgb_mode.panelWidth * rgb_mode.panelHeight;
+	data->fb_bytes =
+		data->pixel_bytes * rgb_mode.panelWidth * rgb_mode.panelHeight;
 	data->write_idx = 1U;
 
 	for (i = 0; i < ARRAY_SIZE(data->fb); i++) {
@@ -197,7 +198,7 @@ static int mcux_elcdif_init(const struct device *dev)
 		}
 		memset(data->fb[i].data, 0, data->fb_bytes);
 	}
-	rgb_mode.bufferAddr = (uint32_t) data->fb[0].data;
+	rgb_mode.bufferAddr = (uint32_t)data->fb[0].data;
 
 	k_sem_init(&data->sem, 1, 1);
 
@@ -253,17 +254,14 @@ static struct mcux_elcdif_config mcux_elcdif_config_1 = {
 
 static struct mcux_elcdif_data mcux_elcdif_data_1;
 
-DEVICE_AND_API_INIT(mcux_elcdif_1, DT_INST_LABEL(0),
-		    &mcux_elcdif_init,
-		    &mcux_elcdif_data_1, &mcux_elcdif_config_1,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &mcux_elcdif_api);
+DEVICE_AND_API_INIT(mcux_elcdif_1, DT_INST_LABEL(0), &mcux_elcdif_init,
+		    &mcux_elcdif_data_1, &mcux_elcdif_config_1, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &mcux_elcdif_api);
 
 static void mcux_elcdif_config_func_1(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    mcux_elcdif_isr, DEVICE_GET(mcux_elcdif_1), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), mcux_elcdif_isr,
+		    DEVICE_GET(mcux_elcdif_1), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 }

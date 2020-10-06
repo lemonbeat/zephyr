@@ -69,8 +69,8 @@ static int cmd_info(const struct shell *shell, size_t argc, char *argv)
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
 
-	char device_id[DEVICE_ID_HEX_MAX_SIZE] = {0},
-	     firmware_version[BOOT_IMG_VER_STRLEN_MAX] = {0};
+	char device_id[DEVICE_ID_HEX_MAX_SIZE] = { 0 },
+	     firmware_version[BOOT_IMG_VER_STRLEN_MAX] = { 0 };
 
 	hawkbit_get_firmware_version(firmware_version, BOOT_IMG_VER_STRLEN_MAX);
 	hawkbit_get_device_identity(device_id, DEVICE_ID_HEX_MAX_SIZE);

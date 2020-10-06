@@ -51,14 +51,12 @@
 #ifndef __LINKER_H_
 #define __LINKER_H_
 
-
 /*
  * BSP controls alt_load() behavior in crt0.
  *
  */
 
 #define ALT_LOAD_EXPLICITLY_CONTROLLED
-
 
 /*
  * Base address and span (size in bytes) of each linker region
@@ -74,7 +72,6 @@
 #define RESET_REGION_BASE 0x0
 #define RESET_REGION_SPAN 32
 
-
 /*
  * Devices associated with code sections
  *
@@ -86,14 +83,12 @@
 #define ALT_RWDATA_DEVICE ONCHIP_MEMORY2_0
 #define ALT_TEXT_DEVICE ONCHIP_FLASH_0_DATA
 
-
 /*
  * Initialization code at the reset address is allowed (e.g. no external bootloader).
  *
  */
 
 #define ALT_ALLOW_CODE_AT_RESET
-
 
 /*
  * The alt_load() facility is called from crt0 to copy sections into RAM.

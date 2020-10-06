@@ -126,7 +126,8 @@ extern "C" {
  * @param inst DT_DRV_COMPAT instance number
  * @return the label property of the node referenced at index 0
  */
-#define DT_INST_IO_CHANNELS_LABEL(inst) DT_INST_IO_CHANNELS_LABEL_BY_IDX(inst, 0)
+#define DT_INST_IO_CHANNELS_LABEL(inst) \
+	DT_INST_IO_CHANNELS_LABEL_BY_IDX(inst, 0)
 
 /**
  * @brief Get an io-channels specifier input cell at an index
@@ -245,7 +246,8 @@ extern "C" {
  * @param inst DT_DRV_COMPAT instance number
  * @return the input cell in the specifier at index 0
  */
-#define DT_INST_IO_CHANNELS_INPUT(inst) DT_INST_IO_CHANNELS_INPUT_BY_IDX(inst, 0)
+#define DT_INST_IO_CHANNELS_INPUT(inst) \
+	DT_INST_IO_CHANNELS_INPUT_BY_IDX(inst, 0)
 
 /**
  * @}
@@ -255,4 +257,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* ZEPHYR_INCLUDE_DEVICETREE_ADC_H_ */
+#endif /* ZEPHYR_INCLUDE_DEVICETREE_ADC_H_ */

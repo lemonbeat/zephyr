@@ -96,9 +96,8 @@ void test_smp_coop_threads(void)
 {
 	int i, ok = 1;
 
-	k_tid_t tid = k_thread_create(&t2, t2_stack, T2_STACK_SIZE, t2_fn,
-				      NULL, NULL, NULL,
-				      K_PRIO_COOP(2), 0, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&t2, t2_stack, T2_STACK_SIZE, t2_fn, NULL,
+				      NULL, NULL, K_PRIO_COOP(2), 0, K_NO_WAIT);
 
 	/* Wait for the other thread (on a separate CPU) to actually
 	 * start running.  We want synchrony to be as perfect as
@@ -130,8 +129,7 @@ static void child_fn(void *p1, void *p2, void *p3)
 	ARG_UNUSED(p3);
 	int parent_cpu_id = POINTER_TO_INT(p1);
 
-	zassert_true(parent_cpu_id != curr_cpu(),
-		     "Parent isn't on other core");
+	zassert_true(parent_cpu_id != curr_cpu(), "Parent isn't on other core");
 
 	sync_count++;
 	k_sem_give(&cpuid_sema);
@@ -153,8 +151,8 @@ void test_cpu_id_threads(void)
 	int parent_cpu_id = curr_cpu();
 
 	k_tid_t tid = k_thread_create(&t2, t2_stack, T2_STACK_SIZE, child_fn,
-				      INT_TO_POINTER(parent_cpu_id), NULL,
-				      NULL, K_PRIO_PREEMPT(2), 0, K_NO_WAIT);
+				      INT_TO_POINTER(parent_cpu_id), NULL, NULL,
+				      K_PRIO_PREEMPT(2), 0, K_NO_WAIT);
 
 	while (sync_count == -1) {
 	}
@@ -170,7 +168,7 @@ static void thread_entry(void *p1, void *p2, void *p3)
 	int thread_num = POINTER_TO_INT(p1);
 	int count = 0;
 
-	tinfo[thread_num].executed  = 1;
+	tinfo[thread_num].executed = 1;
 	tinfo[thread_num].cpu_id = curr_cpu();
 
 	while (count++ < 5) {
@@ -190,7 +188,7 @@ static void spin_for_threads_exit(void)
 }
 
 static void spawn_threads(int prio, int thread_num, int equal_prio,
-			k_thread_entry_t thread_entry, int delay)
+			  k_thread_entry_t thread_entry, int delay)
 {
 	int i;
 
@@ -254,7 +252,6 @@ void test_coop_resched_threads(void)
 
 	/* Wait for some time to let other core's thread run */
 	k_busy_wait(DELAY_US);
-
 
 	/* Reassure that cooperative thread's are not preempted
 	 * by checking last thread's execution
@@ -328,7 +325,6 @@ void test_yield_threads(void)
 	for (int i = 0; i < THREADS_NUM; i++) {
 		zassert_true(tinfo[i].executed == 1,
 			     "thread %d did not execute", i);
-
 	}
 
 	abort_threads(THREADS_NUM);
@@ -370,7 +366,7 @@ static void thread_wakeup_entry(void *p1, void *p2, void *p3)
 
 	k_msleep(DELAY_US * 1000);
 
-	tinfo[thread_num].executed  = 1;
+	tinfo[thread_num].executed = 1;
 }
 
 static void wakeup_on_start_thread(int tnum)
@@ -393,8 +389,7 @@ static void wakeup_on_start_thread(int tnum)
 			k_wakeup(tinfo[i].tid);
 		}
 	}
-	zassert_equal(threads_started, tnum,
-		      "All threads haven't started");
+	zassert_equal(threads_started, tnum, "All threads haven't started");
 }
 
 static void check_wokeup_threads(int tnum)
@@ -451,13 +446,11 @@ static void thread_get_cpu_entry(void *p1, void *p2, void *p3)
 	_cpu_t *curr_cpu = arch_curr_cpu();
 
 	/**TESTPOINT: call arch_curr_cpu() to get cpu struct */
-	zassert_true(curr_cpu != NULL,
-			"test failed to get current cpu.");
+	zassert_true(curr_cpu != NULL, "test failed to get current cpu.");
 
 	cpu_id = curr_cpu->id;
 
-	zassert_true(bsp_id != cpu_id,
-			"should not be the same with our BSP");
+	zassert_true(bsp_id != cpu_id, "should not be the same with our BSP");
 
 	/* loop forever to ensure running on this CPU */
 	while (1) {
@@ -520,10 +513,9 @@ void test_get_cpu(void)
 	int cpu_id = arch_curr_cpu()->id;
 
 	thread_id = k_thread_create(&t2, t2_stack, T2_STACK_SIZE,
-				      (k_thread_entry_t)thread_get_cpu_entry,
-				      &cpu_id, NULL, NULL,
-				      K_PRIO_COOP(2),
-				      K_INHERIT_PERMS, K_NO_WAIT);
+				    (k_thread_entry_t)thread_get_cpu_entry,
+				    &cpu_id, NULL, NULL, K_PRIO_COOP(2),
+				    K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_busy_wait(DELAY_US);
 
@@ -587,7 +579,7 @@ void test_smp_ipi(void)
 {
 	TC_PRINT("cpu num=%d", CONFIG_MP_NUM_CPUS);
 
-	for (int i = 0; i < 3 ; i++) {
+	for (int i = 0; i < 3; i++) {
 		/* issue a sched ipi to tell other CPU to run thread */
 		sched_ipi_has_called = 0;
 		arch_sched_ipi();
@@ -600,8 +592,7 @@ void test_smp_ipi(void)
 
 		/**TESTPOINT: check if enter our IPI interrupt handler */
 		zassert_true(sched_ipi_has_called != 0,
-				"did not receive IPI.(%d)",
-				sched_ipi_has_called);
+			     "did not receive IPI.(%d)", sched_ipi_has_called);
 	}
 }
 #else
@@ -619,8 +610,7 @@ void test_main(void)
 	 */
 	k_sleep(K_MSEC(10));
 
-	ztest_test_suite(smp,
-			 ztest_unit_test(test_smp_coop_threads),
+	ztest_test_suite(smp, ztest_unit_test(test_smp_coop_threads),
 			 ztest_unit_test(test_cpu_id_threads),
 			 ztest_unit_test(test_coop_resched_threads),
 			 ztest_unit_test(test_preempt_resched_threads),
@@ -628,7 +618,6 @@ void test_main(void)
 			 ztest_unit_test(test_sleep_threads),
 			 ztest_unit_test(test_wakeup_threads),
 			 ztest_unit_test(test_smp_ipi),
-			 ztest_unit_test(test_get_cpu)
-			 );
+			 ztest_unit_test(test_get_cpu));
 	ztest_run_test_suite(smp);
 }

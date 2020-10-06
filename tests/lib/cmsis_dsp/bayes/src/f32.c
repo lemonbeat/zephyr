@@ -13,7 +13,7 @@
 
 #include "f32.pat"
 
-#define REL_ERROR_THRESH	(5.0e-6)
+#define REL_ERROR_THRESH (5.0e-6)
 
 void test_gaussian_naive_bayes_predict_f32(void)
 {
@@ -42,8 +42,7 @@ void test_gaussian_naive_bayes_predict_f32(void)
 		malloc(pattern_count * class_count * sizeof(float32_t));
 	zassert_not_null(output_probs_buf, ASSERT_MSG_BUFFER_ALLOC_FAILED);
 
-	output_preds_buf =
-		malloc(pattern_count * sizeof(uint16_t));
+	output_preds_buf = malloc(pattern_count * sizeof(uint16_t));
 	zassert_not_null(output_preds_buf, ASSERT_MSG_BUFFER_ALLOC_FAILED);
 
 	output_probs = output_probs_buf;
@@ -52,9 +51,8 @@ void test_gaussian_naive_bayes_predict_f32(void)
 	/* Enumerate patterns */
 	for (index = 0; index < pattern_count; index++) {
 		/* Run test function */
-		*output_preds =
-			arm_gaussian_naive_bayes_predict_f32(
-				&inst, input, output_probs);
+		*output_preds = arm_gaussian_naive_bayes_predict_f32(
+			&inst, input, output_probs);
 
 		/* Increment pointers */
 		input += vec_dims;
@@ -63,14 +61,13 @@ void test_gaussian_naive_bayes_predict_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_rel_error_f32(pattern_count, output_probs_buf,
-			(float32_t *)ref_prob, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(pattern_count, output_probs_buf,
+					(float32_t *)ref_prob,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_equal_q15(pattern_count, output_preds_buf, ref_pred),
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+	zassert_true(test_equal_q15(pattern_count, output_preds_buf, ref_pred),
+		     ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	/* Free output buffers */
 	free(output_probs_buf);
@@ -79,9 +76,9 @@ void test_gaussian_naive_bayes_predict_f32(void)
 
 void test_bayes_f32(void)
 {
-	ztest_test_suite(bayes_f32,
-		ztest_unit_test(test_gaussian_naive_bayes_predict_f32)
-		);
+	ztest_test_suite(
+		bayes_f32,
+		ztest_unit_test(test_gaussian_naive_bayes_predict_f32));
 
 	ztest_run_test_suite(bayes_f32);
 }

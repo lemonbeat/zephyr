@@ -18,7 +18,7 @@
 #include <stdbool.h>
 #include <sys/check.h>
 
-#define WORKQUEUE_THREAD_NAME	"workqueue"
+#define WORKQUEUE_THREAD_NAME "workqueue"
 
 #ifdef CONFIG_SYS_CLOCK_EXISTS
 static struct k_spinlock lock;
@@ -31,7 +31,7 @@ void k_work_q_start(struct k_work_q *work_q, k_thread_stack_t *stack,
 {
 	k_queue_init(&work_q->queue);
 	(void)k_thread_create(&work_q->thread, stack, stack_size, z_work_q_main,
-			work_q, NULL, NULL, prio, 0, K_NO_WAIT);
+			      work_q, NULL, NULL, prio, 0, K_NO_WAIT);
 
 	k_thread_name_set(&work_q->thread, WORKQUEUE_THREAD_NAME);
 }
@@ -39,8 +39,8 @@ void k_work_q_start(struct k_work_q *work_q, k_thread_stack_t *stack,
 #ifdef CONFIG_SYS_CLOCK_EXISTS
 static void work_timeout(struct _timeout *t)
 {
-	struct k_delayed_work *w = CONTAINER_OF(t, struct k_delayed_work,
-						   timeout);
+	struct k_delayed_work *w =
+		CONTAINER_OF(t, struct k_delayed_work, timeout);
 
 	/* submit work to workqueue */
 	k_work_submit_to_queue(w->work_q, &w->work);
@@ -55,7 +55,8 @@ void k_delayed_work_init(struct k_delayed_work *work, k_work_handler_t handler)
 
 static int work_cancel(struct k_delayed_work *work)
 {
-	CHECKIF(work->work_q == NULL) {
+	CHECKIF(work->work_q == NULL)
+	{
 		return -EALREADY;
 	}
 

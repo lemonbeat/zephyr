@@ -29,7 +29,7 @@ struct uart_sam_dev_cfg {
 	struct soc_gpio_pin pin_tx;
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	uart_irq_config_func_t	irq_config_func;
+	uart_irq_config_func_t irq_config_func;
 #endif
 };
 
@@ -38,20 +38,16 @@ struct uart_sam_dev_data {
 	uint32_t baud_rate;
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	uart_irq_callback_user_data_t irq_cb;	/* Interrupt Callback */
-	void *irq_cb_data;	/* Interrupt Callback Arg */
+	uart_irq_callback_user_data_t irq_cb; /* Interrupt Callback */
+	void *irq_cb_data; /* Interrupt Callback Arg */
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-#define DEV_CFG(dev) \
-	((const struct uart_sam_dev_cfg *const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct uart_sam_dev_data *const)(dev)->data)
-
+#define DEV_CFG(dev) ((const struct uart_sam_dev_cfg *const)(dev)->config)
+#define DEV_DATA(dev) ((struct uart_sam_dev_data *const)(dev)->data)
 
 static int baudrate_set(Uart *const uart, uint32_t baudrate,
 			uint32_t mck_freq_hz);
-
 
 static int uart_sam_init(const struct device *dev)
 {
@@ -68,8 +64,8 @@ static int uart_sam_init(const struct device *dev)
 	soc_gpio_configure(&cfg->pin_tx);
 
 	/* Reset and disable UART */
-	uart->UART_CR =   UART_CR_RSTRX | UART_CR_RSTTX
-			| UART_CR_RXDIS | UART_CR_TXDIS | UART_CR_RSTSTA;
+	uart->UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS |
+			UART_CR_TXDIS | UART_CR_RSTSTA;
 
 	/* Disable Interrupts */
 	uart->UART_IDR = 0xFFFFFFFF;
@@ -77,8 +73,7 @@ static int uart_sam_init(const struct device *dev)
 	/* 8 bits of data, no parity, 1 stop bit in normal mode,  baud rate
 	 * driven by the peripheral clock, UART does not filter the receive line
 	 */
-	uart->UART_MR =   UART_MR_PAR_NO
-			| UART_MR_CHMODE_NORMAL;
+	uart->UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
 
 	/* Set baud rate */
 	retval = baudrate_set(uart, dev_data->baud_rate,
@@ -125,7 +120,7 @@ static void uart_sam_poll_out(const struct device *dev, unsigned char c)
 
 static int uart_sam_err_check(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 	int errors = 0;
 
 	if (uart->UART_SR & UART_SR_OVRE) {
@@ -148,9 +143,8 @@ static int baudrate_set(Uart *const uart, uint32_t baudrate,
 {
 	uint32_t divisor;
 
-	__ASSERT(baudrate,
-		 "baud rate has to be bigger than 0");
-	__ASSERT(mck_freq_hz/16U >= baudrate,
+	__ASSERT(baudrate, "baud rate has to be bigger than 0");
+	__ASSERT(mck_freq_hz / 16U >= baudrate,
 		 "MCK frequency is too small to set required baud rate");
 
 	divisor = mck_freq_hz / 16U / baudrate;
@@ -166,11 +160,10 @@ static int baudrate_set(Uart *const uart, uint32_t baudrate,
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 
-static int uart_sam_fifo_fill(const struct device *dev,
-			      const uint8_t *tx_data,
+static int uart_sam_fifo_fill(const struct device *dev, const uint8_t *tx_data,
 			      int size)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	/* Wait for transmitter to be ready. */
 	while ((uart->UART_SR & UART_SR_TXRDY) == 0) {
@@ -184,7 +177,7 @@ static int uart_sam_fifo_fill(const struct device *dev,
 static int uart_sam_fifo_read(const struct device *dev, uint8_t *rx_data,
 			      const int size)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 	int bytes_read;
 
 	bytes_read = 0;
@@ -203,73 +196,73 @@ static int uart_sam_fifo_read(const struct device *dev, uint8_t *rx_data,
 
 static void uart_sam_irq_tx_enable(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	uart->UART_IER = UART_IER_TXRDY;
 }
 
 static void uart_sam_irq_tx_disable(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	uart->UART_IDR = UART_IDR_TXRDY;
 }
 
 static int uart_sam_irq_tx_ready(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	return (uart->UART_SR & UART_SR_TXRDY);
 }
 
 static void uart_sam_irq_rx_enable(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	uart->UART_IER = UART_IER_RXRDY;
 }
 
 static void uart_sam_irq_rx_disable(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	uart->UART_IDR = UART_IDR_RXRDY;
 }
 
 static int uart_sam_irq_tx_complete(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	return !(uart->UART_SR & UART_SR_TXRDY);
 }
 
 static int uart_sam_irq_rx_ready(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	return (uart->UART_SR & UART_SR_RXRDY);
 }
 
 static void uart_sam_irq_err_enable(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	uart->UART_IER = UART_IER_OVRE | UART_IER_FRAME | UART_IER_PARE;
 }
 
 static void uart_sam_irq_err_disable(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	uart->UART_IDR = UART_IDR_OVRE | UART_IDR_FRAME | UART_IDR_PARE;
 }
 
 static int uart_sam_irq_is_pending(const struct device *dev)
 {
-	volatile Uart * const uart = DEV_CFG(dev)->regs;
+	volatile Uart *const uart = DEV_CFG(dev)->regs;
 
 	return (uart->UART_IMR & (UART_IMR_TXRDY | UART_IMR_RXRDY)) &
-		(uart->UART_SR & (UART_SR_TXRDY | UART_SR_RXRDY));
+	       (uart->UART_SR & (UART_SR_TXRDY | UART_SR_RXRDY));
 }
 
 static int uart_sam_irq_update(const struct device *dev)
@@ -319,56 +312,52 @@ static const struct uart_driver_api uart_sam_driver_api = {
 	.irq_is_pending = uart_sam_irq_is_pending,
 	.irq_update = uart_sam_irq_update,
 	.irq_callback_set = uart_sam_irq_callback_set,
-#endif	/* CONFIG_UART_INTERRUPT_DRIVEN */
+#endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-#define UART_SAM_DECLARE_CFG(n, IRQ_FUNC_INIT)				\
-	static const struct uart_sam_dev_cfg uart##n##_sam_config = {	\
-		.regs = (Uart *)DT_INST_REG_ADDR(n),			\
-		.periph_id = DT_INST_PROP(n, peripheral_id),		\
-									\
-		.pin_rx = ATMEL_SAM_DT_PIN(n, 0),			\
-		.pin_tx = ATMEL_SAM_DT_PIN(n, 1),			\
-									\
-		IRQ_FUNC_INIT						\
+#define UART_SAM_DECLARE_CFG(n, IRQ_FUNC_INIT)                        \
+	static const struct uart_sam_dev_cfg uart##n##_sam_config = { \
+		.regs = (Uart *)DT_INST_REG_ADDR(n),                  \
+		.periph_id = DT_INST_PROP(n, peripheral_id),          \
+                                                                      \
+		.pin_rx = ATMEL_SAM_DT_PIN(n, 0),                     \
+		.pin_tx = ATMEL_SAM_DT_PIN(n, 1),                     \
+                                                                      \
+		IRQ_FUNC_INIT                                         \
 	}
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-#define UART_SAM_CONFIG_FUNC(n)						\
-	static void uart##n##_sam_irq_config_func(const struct device *port)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n),				\
-			    DT_INST_IRQ(n, priority),			\
-			    uart_sam_isr,				\
-			    DEVICE_GET(uart##n##_sam), 0);		\
-		irq_enable(DT_INST_IRQN(n));				\
+#define UART_SAM_CONFIG_FUNC(n)                                              \
+	static void uart##n##_sam_irq_config_func(const struct device *port) \
+	{                                                                    \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),       \
+			    uart_sam_isr, DEVICE_GET(uart##n##_sam), 0);     \
+		irq_enable(DT_INST_IRQN(n));                                 \
 	}
-#define UART_SAM_IRQ_CFG_FUNC_INIT(n)					\
+#define UART_SAM_IRQ_CFG_FUNC_INIT(n) \
 	.irq_config_func = uart##n##_sam_irq_config_func
-#define UART_SAM_INIT_CFG(n)						\
+#define UART_SAM_INIT_CFG(n) \
 	UART_SAM_DECLARE_CFG(n, UART_SAM_IRQ_CFG_FUNC_INIT(n))
 #else
 #define UART_SAM_CONFIG_FUNC(n)
 #define UART_SAM_IRQ_CFG_FUNC_INIT
-#define UART_SAM_INIT_CFG(n)						\
-	UART_SAM_DECLARE_CFG(n, UART_SAM_IRQ_CFG_FUNC_INIT)
+#define UART_SAM_INIT_CFG(n) UART_SAM_DECLARE_CFG(n, UART_SAM_IRQ_CFG_FUNC_INIT)
 #endif
 
-#define UART_SAM_INIT(n)						\
-	static struct uart_sam_dev_data uart##n##_sam_data = {		\
-		.baud_rate = DT_INST_PROP(n, current_speed),		\
-	};								\
-									\
-	static const struct uart_sam_dev_cfg uart##n##_sam_config;	\
-									\
-	DEVICE_AND_API_INIT(uart##n##_sam, DT_INST_LABEL(n),		\
-			    &uart_sam_init, &uart##n##_sam_data,	\
-			    &uart##n##_sam_config, PRE_KERNEL_1,	\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &uart_sam_driver_api);			\
-									\
-	UART_SAM_CONFIG_FUNC(n)						\
-									\
+#define UART_SAM_INIT(n)                                                      \
+	static struct uart_sam_dev_data uart##n##_sam_data = {                \
+		.baud_rate = DT_INST_PROP(n, current_speed),                  \
+	};                                                                    \
+                                                                              \
+	static const struct uart_sam_dev_cfg uart##n##_sam_config;            \
+                                                                              \
+	DEVICE_AND_API_INIT(uart##n##_sam, DT_INST_LABEL(n), &uart_sam_init,  \
+			    &uart##n##_sam_data, &uart##n##_sam_config,       \
+			    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
+			    &uart_sam_driver_api);                            \
+                                                                              \
+	UART_SAM_CONFIG_FUNC(n)                                               \
+                                                                              \
 	UART_SAM_INIT_CFG(n);
 
 DT_INST_FOREACH_STATUS_OKAY(UART_SAM_INIT)

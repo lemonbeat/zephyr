@@ -35,8 +35,7 @@ int phy_gecko_init(const struct phy_gecko_dev *phy);
  * @param status link parameters common to remote and local PHY
  * @return 0 on success or a negative error value on failure
  */
-int phy_gecko_auto_negotiate(const struct phy_gecko_dev *phy,
-				uint32_t *status);
+int phy_gecko_auto_negotiate(const struct phy_gecko_dev *phy, uint32_t *status);
 /**
  * @brief Get PHY ID value.
  *

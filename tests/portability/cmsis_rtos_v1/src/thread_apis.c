@@ -62,27 +62,26 @@ void thread3(void const *argument)
 	osThreadSetPriority(id, osPriorityBelowNormal);
 	rv = osThreadGetPriority(id);
 	zassert_equal(rv, osPriorityBelowNormal,
-			"Expected priority to be changed to %d, not %d",
-			(int)osPriorityBelowNormal, (int)rv);
+		      "Expected priority to be changed to %d, not %d",
+		      (int)osPriorityBelowNormal, (int)rv);
 
 	/* Increase the priority of the current thread */
 	osThreadSetPriority(id, osPriorityAboveNormal);
 	rv = osThreadGetPriority(id);
 	zassert_equal(rv, osPriorityAboveNormal,
-			"Expected priority to be changed to %d, not %d",
-			(int)osPriorityAboveNormal, (int)rv);
+		      "Expected priority to be changed to %d, not %d",
+		      (int)osPriorityAboveNormal, (int)rv);
 
 	/* Restore the priority of the current thread */
 	osThreadSetPriority(id, prio);
 	rv = osThreadGetPriority(id);
-	zassert_equal(rv, prio,
-			"Expected priority to be changed to %d, not %d",
-			(int)prio, (int)rv);
+	zassert_equal(rv, prio, "Expected priority to be changed to %d, not %d",
+		      (int)prio, (int)rv);
 
 	/* Try to set unsupported priority and assert failure */
 	status = osThreadSetPriority(id, osPriorityDeadline);
 	zassert_true(status == osErrorValue,
-			"Something's wrong with osThreadSetPriority!");
+		     "Something's wrong with osThreadSetPriority!");
 
 	/* Indication that thread3 is done with its processing */
 	thread3_state = 1;
@@ -118,12 +117,12 @@ void test_thread_prio(void)
 	/* Try to set priority to inactive thread and assert failure */
 	status = osThreadSetPriority(id3, osPriorityNormal);
 	zassert_true(status == osErrorResource,
-			"Something's wrong with osThreadSetPriority!");
+		     "Something's wrong with osThreadSetPriority!");
 
 	/* Try to terminate inactive thread and assert failure */
 	status = osThreadTerminate(id3);
 	zassert_true(status == osErrorResource,
-			"Something's wrong with osThreadTerminate!");
+		     "Something's wrong with osThreadTerminate!");
 
 	thread3_state = 0;
 }

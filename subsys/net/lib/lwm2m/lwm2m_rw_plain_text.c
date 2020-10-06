@@ -139,11 +139,11 @@ size_t plain_text_put_float32fix(struct lwm2m_output_context *out,
 		}
 	}
 
-	return plain_text_put_format(out, "%s%d.%s",
-				     /* handle negative val2 when val1 is 0 */
-				     (value->val1 == 0 && value->val2 < 0) ?
-						"-" : "",
-				     value->val1, buf);
+	return plain_text_put_format(
+		out, "%s%d.%s",
+		/* handle negative val2 when val1 is 0 */
+		(value->val1 == 0 && value->val2 < 0) ? "-" : "", value->val1,
+		buf);
 }
 
 size_t plain_text_put_float64fix(struct lwm2m_output_context *out,
@@ -165,16 +165,15 @@ size_t plain_text_put_float64fix(struct lwm2m_output_context *out,
 		}
 	}
 
-	return plain_text_put_format(out, "%s%lld.%s",
-				     /* handle negative val2 when val1 is 0 */
-				     (value->val1 == 0 && value->val2 < 0) ?
-						"-" : "",
-				     value->val1, buf);
+	return plain_text_put_format(
+		out, "%s%lld.%s",
+		/* handle negative val2 when val1 is 0 */
+		(value->val1 == 0 && value->val2 < 0) ? "-" : "", value->val1,
+		buf);
 }
 
 static size_t put_string(struct lwm2m_output_context *out,
-			 struct lwm2m_obj_path *path,
-			 char *buf, size_t buflen)
+			 struct lwm2m_obj_path *path, char *buf, size_t buflen)
 {
 	if (buf_append(CPKT_BUF_WRITE(out->out_cpkt), buf, buflen) < 0) {
 		return 0;
@@ -184,8 +183,7 @@ static size_t put_string(struct lwm2m_output_context *out,
 }
 
 static size_t put_bool(struct lwm2m_output_context *out,
-		       struct lwm2m_obj_path *path,
-		       bool value)
+		       struct lwm2m_obj_path *path, bool value)
 {
 	if (value) {
 		return plain_text_put_format(out, "%u", 1);
@@ -203,8 +201,7 @@ static size_t put_objlnk(struct lwm2m_output_context *out,
 }
 
 static size_t plain_text_read_number(struct lwm2m_input_context *in,
-				     int64_t *value1,
-				     int64_t *value2,
+				     int64_t *value1, int64_t *value2,
 				     bool accept_sign, bool accept_dot)
 {
 	int64_t *counter = value1;
@@ -220,8 +217,8 @@ static size_t plain_text_read_number(struct lwm2m_input_context *in,
 	}
 
 	while (in->offset < in->in_cpkt->offset) {
-		if (buf_read_u8(&tmp, CPKT_BUF_READ(in->in_cpkt),
-				&in->offset) < 0) {
+		if (buf_read_u8(&tmp, CPKT_BUF_READ(in->in_cpkt), &in->offset) <
+		    0) {
 			break;
 		}
 
@@ -267,8 +264,8 @@ static size_t get_s64(struct lwm2m_input_context *in, int64_t *value)
 	return plain_text_read_number(in, value, NULL, true, false);
 }
 
-static size_t get_string(struct lwm2m_input_context *in,
-			 uint8_t *value, size_t buflen)
+static size_t get_string(struct lwm2m_input_context *in, uint8_t *value,
+			 size_t buflen)
 {
 	uint16_t in_len;
 
@@ -279,8 +276,8 @@ static size_t get_string(struct lwm2m_input_context *in,
 		in_len = buflen - 1;
 	}
 
-	if (buf_read(value, in_len, CPKT_BUF_READ(in->in_cpkt),
-		     &in->offset) < 0) {
+	if (buf_read(value, in_len, CPKT_BUF_READ(in->in_cpkt), &in->offset) <
+	    0) {
 		value[0] = '\0';
 		return 0;
 	}
@@ -307,12 +304,11 @@ static size_t get_float32fix(struct lwm2m_input_context *in,
 static size_t get_float64fix(struct lwm2m_input_context *in,
 			     float64_value_t *value)
 {
-	return plain_text_read_number(in, &value->val1, &value->val2,
-				      true, true);
+	return plain_text_read_number(in, &value->val1, &value->val2, true,
+				      true);
 }
 
-static size_t get_bool(struct lwm2m_input_context *in,
-		       bool *value)
+static size_t get_bool(struct lwm2m_input_context *in, bool *value)
 {
 	uint8_t tmp;
 
@@ -328,9 +324,8 @@ static size_t get_bool(struct lwm2m_input_context *in,
 	return 0;
 }
 
-static size_t get_opaque(struct lwm2m_input_context *in,
-			 uint8_t *value, size_t buflen,
-			 struct lwm2m_opaque_context *opaque,
+static size_t get_opaque(struct lwm2m_input_context *in, uint8_t *value,
+			 size_t buflen, struct lwm2m_opaque_context *opaque,
 			 bool *last_block)
 {
 	uint16_t in_len;
@@ -364,10 +359,9 @@ static size_t get_opaque(struct lwm2m_input_context *in,
 		}
 	}
 
-	return lwm2m_engine_get_opaque_more(in, value, buflen,
-					    opaque, last_block);
+	return lwm2m_engine_get_opaque_more(in, value, buflen, opaque,
+					    last_block);
 }
-
 
 static size_t get_objlnk(struct lwm2m_input_context *in,
 			 struct lwm2m_objlnk *value)

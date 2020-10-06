@@ -70,7 +70,6 @@
  */
 void string2scalar(unsigned int *scalar, unsigned int num_word32, char *str)
 {
-
 	unsigned int num_bytes = num_word32 * 4U;
 	uint8_t tmp[num_bytes];
 	size_t hexlen = strlen(str);
@@ -90,7 +89,6 @@ void string2scalar(unsigned int *scalar, unsigned int num_word32, char *str)
 		k_panic();
 	}
 	uECC_vli_bytesToNative(scalar, tmp, num_bytes);
-
 }
 
 void vli_print_bytes(uint8_t *vli, unsigned int size)
@@ -120,8 +118,7 @@ void print_ecc_scalar(const char *label, const unsigned int *p_vli,
 }
 
 int check_ecc_result(const int num, const char *name,
-		     const unsigned int *expected,
-		     const unsigned int *computed,
+		     const unsigned int *expected, const unsigned int *computed,
 		     const unsigned int num_word32, const bool verbose)
 {
 	uint32_t num_bytes = num_word32 * 4U;
@@ -139,13 +136,13 @@ int check_ecc_result(const int num, const char *name,
 	return TC_PASS;
 }
 
-int check_code(const int num, const int expected,
-	       const int computed, const int verbose)
+int check_code(const int num, const int expected, const int computed,
+	       const int verbose)
 {
-
 	if (expected != computed) {
 		TC_ERROR("\n  Vector #%02d check - FAILURE:\n", num);
-		TC_ERROR("\n  Expected: %d, computed: %d\n\n", expected, computed);
+		TC_ERROR("\n  Expected: %d, computed: %d\n\n", expected,
+			 computed);
 		return TC_FAIL;
 	}
 
@@ -161,7 +158,6 @@ int check_code(const int num, const int expected,
 int keygen_vectors(char **d_vec, char **qx_vec, char **qy_vec, int tests,
 		   bool verbose)
 {
-
 	unsigned int pub[2 * NUM_ECC_WORDS];
 	unsigned int d[NUM_ECC_WORDS];
 	unsigned int prv[NUM_ECC_WORDS];
@@ -174,7 +170,8 @@ int keygen_vectors(char **d_vec, char **qx_vec, char **qy_vec, int tests,
 	for (int i = 0; i < tests; i++) {
 		string2scalar(exp_prv, NUM_ECC_WORDS, d_vec[i]);
 		string2scalar(exp_pub, NUM_ECC_WORDS, qx_vec[i]);
-		string2scalar(exp_pub + NUM_ECC_WORDS, NUM_ECC_WORDS, qy_vec[i]);
+		string2scalar(exp_pub + NUM_ECC_WORDS, NUM_ECC_WORDS,
+			      qy_vec[i]);
 
 		/*
 		 * Feed prvkey vector as padded random seed into ecc_make_key.
@@ -190,18 +187,24 @@ int keygen_vectors(char **d_vec, char **qx_vec, char **qy_vec, int tests,
 
 		uECC_vli_bytesToNative(prv, prv_bytes, NUM_ECC_BYTES);
 		uECC_vli_bytesToNative(pub, pub_bytes, NUM_ECC_BYTES);
-		uECC_vli_bytesToNative(pub + NUM_ECC_WORDS, pub_bytes + NUM_ECC_BYTES, NUM_ECC_BYTES);
+		uECC_vli_bytesToNative(pub + NUM_ECC_WORDS,
+				       pub_bytes + NUM_ECC_BYTES,
+				       NUM_ECC_BYTES);
 
 		/* validate correctness of vector conversion and make_key() */
-		result = check_ecc_result(i, "prv  ", exp_prv, prv,  NUM_ECC_WORDS, verbose);
+		result = check_ecc_result(i, "prv  ", exp_prv, prv,
+					  NUM_ECC_WORDS, verbose);
 		if (result == TC_FAIL) {
 			return result;
 		}
-		result = check_ecc_result(i, "pub.x", exp_pub, pub,  NUM_ECC_WORDS, verbose);
+		result = check_ecc_result(i, "pub.x", exp_pub, pub,
+					  NUM_ECC_WORDS, verbose);
 		if (result == TC_FAIL) {
 			return result;
 		}
-		result = check_ecc_result(i, "pub.y", exp_pub + NUM_ECC_WORDS, pub + NUM_ECC_WORDS,  NUM_ECC_WORDS, verbose);
+		result = check_ecc_result(i, "pub.y", exp_pub + NUM_ECC_WORDS,
+					  pub + NUM_ECC_WORDS, NUM_ECC_WORDS,
+					  verbose);
 		if (result == TC_FAIL) {
 			return result;
 		}

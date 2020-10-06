@@ -115,8 +115,7 @@ int eth_setup_host(const char *if_name)
 	 * check that situation in the script itself so that the -i option
 	 * we add here is ignored in that case.
 	 */
-	return ssystem("%s -i %s", ETH_NATIVE_POSIX_SETUP_SCRIPT,
-		       if_name);
+	return ssystem("%s -i %s", ETH_NATIVE_POSIX_SETUP_SCRIPT, if_name);
 }
 
 int eth_start_script(const char *if_name)
@@ -135,8 +134,7 @@ int eth_start_script(const char *if_name)
 	} else {
 		return ssystem("sudo -u %s %s %s",
 			       ETH_NATIVE_POSIX_STARTUP_SCRIPT_USER,
-			       ETH_NATIVE_POSIX_STARTUP_SCRIPT,
-			       if_name);
+			       ETH_NATIVE_POSIX_STARTUP_SCRIPT, if_name);
 	}
 }
 
@@ -200,8 +198,8 @@ int eth_promisc_mode(const char *if_name, bool enable)
 		return 0;
 	}
 
-	return ssystem("ip link set dev %s promisc %s",
-		       if_name, enable ? "on" : "off");
+	return ssystem("ip link set dev %s promisc %s", if_name,
+		       enable ? "on" : "off");
 }
 #endif /* CONFIG_NET_PROMISCUOUS_MODE */
 

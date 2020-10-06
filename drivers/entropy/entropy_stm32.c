@@ -23,8 +23,8 @@
 #include <drivers/clock_control/stm32_clock_control.h>
 #include "stm32_hsem.h"
 
-#define IRQN		DT_INST_IRQN(0)
-#define IRQ_PRIO	DT_INST_IRQ(0, priority)
+#define IRQN DT_INST_IRQN(0)
+#define IRQ_PRIO DT_INST_IRQ(0, priority)
 
 /*
  * This driver need to take into account all STM32 family:
@@ -79,15 +79,12 @@ struct entropy_stm32_rng_dev_data {
 	RNG_POOL_DEFINE(thr, CONFIG_ENTROPY_STM32_THR_POOL_SIZE);
 };
 
-#define DEV_DATA(dev) \
-	((struct entropy_stm32_rng_dev_data *)(dev)->data)
+#define DEV_DATA(dev) ((struct entropy_stm32_rng_dev_data *)(dev)->data)
 
-#define DEV_CFG(dev) \
-	((const struct entropy_stm32_rng_dev_cfg *)(dev)->config)
-
+#define DEV_CFG(dev) ((const struct entropy_stm32_rng_dev_cfg *)(dev)->config)
 
 static const struct entropy_stm32_rng_dev_cfg entropy_stm32_rng_config = {
-	.pclken	= { .bus = DT_INST_CLOCKS_CELL(0, bus),
+	.pclken = { .bus = DT_INST_CLOCKS_CELL(0, bus),
 		    .enr = DT_INST_CLOCKS_CELL(0, bits) },
 };
 
@@ -122,7 +119,7 @@ static int random_byte_get(void)
 			retval = -EIO;
 		} else {
 			retval = LL_RNG_ReadRandData32(
-						    entropy_stm32_rng_data.rng);
+				entropy_stm32_rng_data.rng);
 		}
 	}
 
@@ -133,13 +130,13 @@ static int random_byte_get(void)
 
 #pragma GCC push_options
 #if defined(CONFIG_BT_CTLR_FAST_ENC)
-#pragma GCC optimize ("Ofast")
+#pragma GCC optimize("Ofast")
 #endif
 static uint16_t rng_pool_get(struct rng_pool *rngp, uint8_t *buf, uint16_t len)
 {
-	uint32_t last  = rngp->last;
-	uint32_t mask  = rngp->mask;
-	uint8_t *dst   = buf;
+	uint32_t last = rngp->last;
+	uint32_t mask = rngp->mask;
+	uint8_t *dst = buf;
 	uint32_t first, available;
 	uint32_t other_read_in_progress;
 	unsigned int key;
@@ -195,8 +192,8 @@ static uint16_t rng_pool_get(struct rng_pool *rngp, uint8_t *buf, uint16_t len)
 static int rng_pool_put(struct rng_pool *rngp, uint8_t byte)
 {
 	uint8_t first = rngp->first_read;
-	uint8_t last  = rngp->last;
-	uint8_t mask  = rngp->mask;
+	uint8_t last = rngp->last;
+	uint8_t mask = rngp->mask;
 
 	/* Signal error if the pool is full. */
 	if (((last - first) & mask) == mask) {
@@ -210,13 +207,13 @@ static int rng_pool_put(struct rng_pool *rngp, uint8_t byte)
 }
 
 static void rng_pool_init(struct rng_pool *rngp, uint16_t size,
-			uint8_t threshold)
+			  uint8_t threshold)
 {
 	rngp->first_alloc = 0U;
-	rngp->first_read  = 0U;
-	rngp->last	  = 0U;
-	rngp->mask	  = size - 1;
-	rngp->threshold	  = threshold;
+	rngp->first_read = 0U;
+	rngp->last = 0U;
+	rngp->mask = size - 1;
+	rngp->threshold = threshold;
 }
 
 static void stm32_rng_isr(const void *arg)
@@ -231,11 +228,10 @@ static void stm32_rng_isr(const void *arg)
 	}
 
 	ret = rng_pool_put((struct rng_pool *)(entropy_stm32_rng_data.isr),
-				byte);
+			   byte);
 	if (ret < 0) {
 		ret = rng_pool_put(
-				(struct rng_pool *)(entropy_stm32_rng_data.thr),
-				byte);
+			(struct rng_pool *)(entropy_stm32_rng_data.thr), byte);
 		if (ret < 0) {
 			LL_RNG_DisableIT(entropy_stm32_rng_data.rng);
 		}
@@ -245,8 +241,7 @@ static void stm32_rng_isr(const void *arg)
 }
 
 static int entropy_stm32_rng_get_entropy(const struct device *device,
-					 uint8_t *buf,
-					 uint16_t len)
+					 uint8_t *buf, uint16_t len)
 {
 	/* Check if this API is called on correct driver instance. */
 	__ASSERT_NO_MSG(&entropy_stm32_rng_data == DEV_DATA(device));
@@ -256,8 +251,8 @@ static int entropy_stm32_rng_get_entropy(const struct device *device,
 
 		k_sem_take(&entropy_stm32_rng_data.sem_lock, K_FOREVER);
 		bytes = rng_pool_get(
-				(struct rng_pool *)(entropy_stm32_rng_data.thr),
-				buf, len);
+			(struct rng_pool *)(entropy_stm32_rng_data.thr), buf,
+			len);
 		k_sem_give(&entropy_stm32_rng_data.sem_lock);
 
 		if (bytes == 0U) {
@@ -274,9 +269,8 @@ static int entropy_stm32_rng_get_entropy(const struct device *device,
 }
 
 static int entropy_stm32_rng_get_entropy_isr(const struct device *dev,
-						uint8_t *buf,
-						uint16_t len,
-					uint32_t flags)
+					     uint8_t *buf, uint16_t len,
+					     uint32_t flags)
 {
 	uint16_t cnt = len;
 
@@ -285,8 +279,8 @@ static int entropy_stm32_rng_get_entropy_isr(const struct device *dev,
 
 	if (likely((flags & ENTROPY_BUSYWAIT) == 0U)) {
 		return rng_pool_get(
-				(struct rng_pool *)(entropy_stm32_rng_data.isr),
-				buf, len);
+			(struct rng_pool *)(entropy_stm32_rng_data.isr), buf,
+			len);
 	}
 
 	if (len) {
@@ -309,7 +303,7 @@ static int entropy_stm32_rng_get_entropy_isr(const struct device *dev,
 			int byte;
 
 			while (LL_RNG_IsActiveFlag_DRDY(
-					entropy_stm32_rng_data.rng) != 1) {
+				       entropy_stm32_rng_data.rng) != 1) {
 				/*
 				 * To guarantee waking up from the event, the
 				 * SEV-On-Pend feature must be enabled (enabled
@@ -358,8 +352,7 @@ static int entropy_stm32_rng_init(const struct device *dev)
 
 #if CONFIG_SOC_SERIES_STM32L4X
 	/* Configure PLLSA11 to enable 48M domain */
-	LL_RCC_PLLSAI1_ConfigDomain_48M(LL_RCC_PLLSOURCE_MSI,
-					LL_RCC_PLLM_DIV_1,
+	LL_RCC_PLLSAI1_ConfigDomain_48M(LL_RCC_PLLSOURCE_MSI, LL_RCC_PLLM_DIV_1,
 					24, LL_RCC_PLLSAI1Q_DIV_2);
 
 	/* Enable PLLSA1 */
@@ -376,9 +369,9 @@ static int entropy_stm32_rng_init(const struct device *dev)
 	 *  choose PLLSAI1 source as the 48 MHz clock is needed for the RNG
 	 *  Linear Feedback Shift Register
 	 */
-	 LL_RCC_SetRNGClockSource(LL_RCC_RNG_CLKSOURCE_PLLSAI1);
-#elif defined(RCC_CR2_HSI48ON) || defined(RCC_CR_HSI48ON) \
-	|| defined(RCC_CRRCR_HSI48ON)
+	LL_RCC_SetRNGClockSource(LL_RCC_RNG_CLKSOURCE_PLLSAI1);
+#elif defined(RCC_CR2_HSI48ON) || defined(RCC_CR_HSI48ON) || \
+	defined(RCC_CRRCR_HSI48ON)
 
 #if CONFIG_SOC_SERIES_STM32L0X
 	/* We need SYSCFG to control VREFINT, so make sure it is clocked */
@@ -411,14 +404,12 @@ static int entropy_stm32_rng_init(const struct device *dev)
 	__ASSERT_NO_MSG(dev_data->clock != NULL);
 
 	res = clock_control_on(dev_data->clock,
-		(clock_control_subsys_t *)&dev_cfg->pclken);
+			       (clock_control_subsys_t *)&dev_cfg->pclken);
 	__ASSERT_NO_MSG(res == 0);
 
 	LL_RNG_EnableIT(dev_data->rng);
 
 	LL_RNG_Enable(dev_data->rng);
-
-
 
 	/* Locking semaphore initialized to 1 (unlocked) */
 	k_sem_init(&dev_data->sem_lock, 1, 1);
@@ -444,8 +435,7 @@ static const struct entropy_driver_api entropy_stm32_rng_api = {
 	.get_entropy_isr = entropy_stm32_rng_get_entropy_isr
 };
 
-DEVICE_AND_API_INIT(entropy_stm32_rng, DT_INST_LABEL(0),
-		    entropy_stm32_rng_init,
+DEVICE_AND_API_INIT(entropy_stm32_rng, DT_INST_LABEL(0), entropy_stm32_rng_init,
 		    &entropy_stm32_rng_data, &entropy_stm32_rng_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_stm32_rng_api);

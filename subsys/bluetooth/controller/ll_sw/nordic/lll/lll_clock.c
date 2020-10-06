@@ -38,7 +38,6 @@ static void clock_ready(struct onoff_manager *mgr, struct onoff_client *cli,
 
 static int blocking_on(struct onoff_manager *mgr, uint32_t timeout)
 {
-
 	struct lll_clock_state state;
 	int err;
 

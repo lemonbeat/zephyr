@@ -52,8 +52,7 @@ void usb_bos_register_cap(struct usb_bos_platform_descriptor *desc)
 	hdr->bNumDeviceCaps += 1U;
 }
 
-int usb_handle_bos(struct usb_setup_packet *setup,
-		   int32_t *len, uint8_t **data)
+int usb_handle_bos(struct usb_setup_packet *setup, int32_t *len, uint8_t **data)
 {
 	if (GET_DESC_TYPE(setup->wValue) == DESCRIPTOR_TYPE_BOS) {
 		LOG_DBG("Read BOS descriptor");

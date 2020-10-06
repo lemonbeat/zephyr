@@ -35,13 +35,13 @@ static inline void msg_init(const struct device *dev, struct i2c_msg *msg,
 		LL_I2C_SetTransferSize(i2c, msg->len);
 	} else {
 		if (I2C_ADDR_10_BITS & data->dev_config) {
-			LL_I2C_SetMasterAddressingMode(i2c,
-					LL_I2C_ADDRESSING_MODE_10BIT);
-			LL_I2C_SetSlaveAddr(i2c, (uint32_t) slave);
+			LL_I2C_SetMasterAddressingMode(
+				i2c, LL_I2C_ADDRESSING_MODE_10BIT);
+			LL_I2C_SetSlaveAddr(i2c, (uint32_t)slave);
 		} else {
-			LL_I2C_SetMasterAddressingMode(i2c,
-				LL_I2C_ADDRESSING_MODE_7BIT);
-			LL_I2C_SetSlaveAddr(i2c, (uint32_t) slave << 1);
+			LL_I2C_SetMasterAddressingMode(
+				i2c, LL_I2C_ADDRESSING_MODE_7BIT);
+			LL_I2C_SetSlaveAddr(i2c, (uint32_t)slave << 1);
 		}
 
 		if (!(msg->flags & I2C_MSG_STOP) && next_msg_flags &&
@@ -114,8 +114,7 @@ static void stm32_i2c_slave_event(const struct device *dev)
 	const struct i2c_stm32_config *cfg = DEV_CFG(dev);
 	struct i2c_stm32_data *data = DEV_DATA(dev);
 	I2C_TypeDef *i2c = cfg->i2c;
-	const struct i2c_slave_callbacks *slave_cb =
-		data->slave_cfg->callbacks;
+	const struct i2c_slave_callbacks *slave_cb = data->slave_cfg->callbacks;
 
 	if (LL_I2C_IsActiveFlag_TXIS(i2c)) {
 		uint8_t val;
@@ -302,8 +301,7 @@ static void stm32_i2c_event(const struct device *dev)
 	}
 
 	/* Transfer Complete or Transfer Complete Reload */
-	if (LL_I2C_IsActiveFlag_TC(i2c) ||
-	    LL_I2C_IsActiveFlag_TCR(i2c)) {
+	if (LL_I2C_IsActiveFlag_TC(i2c) || LL_I2C_IsActiveFlag_TCR(i2c)) {
 		/* Issue stop condition if necessary */
 		if (data->current.msg->flags & I2C_MSG_STOP) {
 			LL_I2C_GenerateStopCondition(i2c);
@@ -352,7 +350,7 @@ end:
 #ifdef CONFIG_I2C_STM32_COMBINED_INTERRUPT
 void stm32_i2c_combined_isr(void *arg)
 {
-	const struct device *dev = (const struct device *) arg;
+	const struct device *dev = (const struct device *)arg;
 
 	if (stm32_i2c_error(dev)) {
 		return;
@@ -363,14 +361,14 @@ void stm32_i2c_combined_isr(void *arg)
 
 void stm32_i2c_event_isr(void *arg)
 {
-	const struct device *dev = (const struct device *) arg;
+	const struct device *dev = (const struct device *)arg;
 
 	stm32_i2c_event(dev);
 }
 
 void stm32_i2c_error_isr(void *arg)
 {
-	const struct device *dev = (const struct device *) arg;
+	const struct device *dev = (const struct device *)arg;
 
 	stm32_i2c_error(dev);
 }
@@ -405,8 +403,7 @@ int stm32_i2c_msg_write(const struct device *dev, struct i2c_msg *msg,
 	return 0;
 error:
 	if (data->current.is_arlo) {
-		LOG_DBG("%s: ARLO %d", __func__,
-				    data->current.is_arlo);
+		LOG_DBG("%s: ARLO %d", __func__, data->current.is_arlo);
 		data->current.is_arlo = 0U;
 	}
 
@@ -416,8 +413,7 @@ error:
 	}
 
 	if (data->current.is_err) {
-		LOG_DBG("%s: ERR %d", __func__,
-				    data->current.is_err);
+		LOG_DBG("%s: ERR %d", __func__, data->current.is_err);
 		data->current.is_err = 0U;
 	}
 
@@ -454,8 +450,7 @@ int stm32_i2c_msg_read(const struct device *dev, struct i2c_msg *msg,
 	return 0;
 error:
 	if (data->current.is_arlo) {
-		LOG_DBG("%s: ARLO %d", __func__,
-				    data->current.is_arlo);
+		LOG_DBG("%s: ARLO %d", __func__, data->current.is_arlo);
 		data->current.is_arlo = 0U;
 	}
 
@@ -465,8 +460,7 @@ error:
 	}
 
 	if (data->current.is_err) {
-		LOG_DBG("%s: ERR %d", __func__,
-				    data->current.is_err);
+		LOG_DBG("%s: ERR %d", __func__, data->current.is_err);
 		data->current.is_err = 0U;
 	}
 
@@ -608,8 +602,8 @@ int stm32_i2c_configure_timing(const struct device *dev, uint32_t clock)
 		const struct i2c_config_timing *preset = &cfg->timings[i];
 		uint32_t speed = i2c_map_dt_bitrate(preset->i2c_speed);
 
-		if ((I2C_SPEED_GET(speed) == I2C_SPEED_GET(data->dev_config))
-		   && (preset->periph_clock == clock)) {
+		if ((I2C_SPEED_GET(speed) == I2C_SPEED_GET(data->dev_config)) &&
+		    (preset->periph_clock == clock)) {
 			/*  Found a matching periph clock and i2c speed */
 			LL_I2C_SetTiming(i2c, preset->timing_setting);
 			return 0;
@@ -643,7 +637,7 @@ int stm32_i2c_configure_timing(const struct device *dev, uint32_t clock)
 		uint32_t sdadel = i2c_hold_time_min / ns_presc;
 		uint32_t scldel = i2c_setup_time_min / ns_presc;
 
-		if ((sclh - 1) > 255 ||  (scll - 1) > 255) {
+		if ((sclh - 1) > 255 || (scll - 1) > 255) {
 			++presc;
 			continue;
 		}
@@ -653,8 +647,8 @@ int stm32_i2c_configure_timing(const struct device *dev, uint32_t clock)
 			continue;
 		}
 
-		timing = __LL_I2C_CONVERT_TIMINGS(presc - 1,
-					scldel - 1, sdadel, sclh - 1, scll - 1);
+		timing = __LL_I2C_CONVERT_TIMINGS(presc - 1, scldel - 1, sdadel,
+						  sclh - 1, scll - 1);
 		break;
 	} while (presc < 16);
 

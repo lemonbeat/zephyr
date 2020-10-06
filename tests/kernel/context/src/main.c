@@ -34,14 +34,14 @@
 #include <soc.h>
 #endif
 
-#define THREAD_STACKSIZE    (512 + CONFIG_TEST_EXTRA_STACKSIZE)
-#define THREAD_STACKSIZE2   (384 + CONFIG_TEST_EXTRA_STACKSIZE)
-#define THREAD_PRIORITY     4
+#define THREAD_STACKSIZE (512 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define THREAD_STACKSIZE2 (384 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define THREAD_PRIORITY 4
 
-#define THREAD_SELF_CMD    0
-#define EXEC_CTX_TYPE_CMD  1
+#define THREAD_SELF_CMD 0
+#define EXEC_CTX_TYPE_CMD 1
 
-#define UNKNOWN_COMMAND    -1
+#define UNKNOWN_COMMAND -1
 
 /*
  * Get the timer type dependent IRQ number. If timer type
@@ -56,8 +56,8 @@
 #elif defined(CONFIG_LOAPIC_TIMER)
 #define TICK_IRQ CONFIG_LOAPIC_TIMER_IRQ
 #elif defined(CONFIG_XTENSA)
-#define TICK_IRQ UTIL_CAT(XCHAL_TIMER,		\
-			  UTIL_CAT(CONFIG_XTENSA_TIMER_ID, _INTERRUPT))
+#define TICK_IRQ \
+	UTIL_CAT(XCHAL_TIMER, UTIL_CAT(CONFIG_XTENSA_TIMER_ID, _INTERRUPT))
 
 #elif defined(CONFIG_ALTERA_AVALON_TIMER)
 #define TICK_IRQ TIMER_0_IRQ
@@ -77,7 +77,7 @@
  * not considered an IRQ by the irq_enable/Disable APIs.
  */
 #elif defined(CONFIG_ARCH_POSIX)
-#if  defined(CONFIG_BOARD_NATIVE_POSIX)
+#if defined(CONFIG_BOARD_NATIVE_POSIX)
 #define TICK_IRQ TIMER_TICK_IRQ
 #else
 /*
@@ -97,25 +97,22 @@
  * https://github.com/zephyrproject-rtos/sdk-ng/issues/255
  */
 #if !defined(CONFIG_CPU_CORTEX_M1) && !defined(CONFIG_NIOS2) && \
-    !defined(CONFIG_SOC_QEMU_CORTEX_A53) && \
+	!defined(CONFIG_SOC_QEMU_CORTEX_A53) &&                 \
 	(!defined(CONFIG_RISCV) || defined(CONFIG_RISCV_HAS_CPU_IDLE))
 #define HAS_POWERSAVE_INSTRUCTION
 #endif
 
-
-
 typedef struct {
-	int command;            /* command to process   */
-	int error;              /* error value (if any) */
+	int command; /* command to process   */
+	int error; /* error value (if any) */
 	union {
-		void *data;     /* pointer to data to use or return */
-		int value;      /* value to be passed or returned   */
+		void *data; /* pointer to data to use or return */
+		int value; /* value to be passed or returned   */
 	};
 } ISR_INFO;
 
-
-typedef int (*disable_int_func) (int);
-typedef void (*enable_int_func) (int);
+typedef int (*disable_int_func)(int);
+typedef void (*enable_int_func)(int);
 
 static struct k_sem sem_thread;
 static struct k_timer timer;
@@ -251,7 +248,7 @@ static void _test_kernel_cpu_idle(int atomic)
 	 * (k_timer_start() rounds its duration argument down, not up,
 	 * to a tick boundary)
 	 */
-	 k_usleep(1);
+	k_usleep(1);
 
 	/* Set up a time to trigger events to exit idle mode */
 	k_timer_init(&idle_timer, idle_timer_expiry_function, NULL);
@@ -268,9 +265,10 @@ static void _test_kernel_cpu_idle(int atomic)
 		}
 		tms += 1;
 		tms2 = k_uptime_get_32();
-		zassert_false(tms2 < tms, "Bad ms value computed,"
-	      "got %d which is less than %d\n",
-	      tms2, tms);
+		zassert_false(tms2 < tms,
+			      "Bad ms value computed,"
+			      "got %d which is less than %d\n",
+			      tms2, tms);
 	}
 }
 
@@ -300,7 +298,8 @@ static void _test_kernel_cpu_idle(int atomic)
 		/* calculating milliseconds per tick*/
 		tms += k_ticks_to_ms_floor64(1);
 		tms2 = k_uptime_get_32();
-		zassert_false(tms2 < tms, "Bad ms per tick value computed,"
+		zassert_false(tms2 < tms,
+			      "Bad ms per tick value computed,"
 			      "got %d which is less than %d\n",
 			      tms2, tms);
 	}
@@ -423,8 +422,7 @@ static void _test_kernel_interrupts(disable_int_func disable_int,
 	}
 
 	tick2 = z_tick_get_32();
-	zassert_not_equal(tick, tick2,
-			  "tick didn't advance as expected");
+	zassert_not_equal(tick, tick2, "tick didn't advance as expected");
 }
 
 /**
@@ -463,7 +461,8 @@ static void test_kernel_timer_interrupts(void)
 {
 #ifdef TICK_IRQ
 	/* Disable interrupts coming from the timer. */
-	_test_kernel_interrupts(irq_disable_wrapper, irq_enable_wrapper, TICK_IRQ);
+	_test_kernel_interrupts(irq_disable_wrapper, irq_enable_wrapper,
+				TICK_IRQ);
 #else
 	ztest_test_skip();
 #endif
@@ -508,8 +507,7 @@ static void test_kernel_ctx_thread(void)
 
 	zassert_false(isr_info.error, "ISR detected an error");
 
-	zassert_equal(isr_info.value, K_ISR,
-		      "isr_info.value was not K_ISR");
+	zassert_equal(isr_info.value, K_ISR, "isr_info.value was not K_ISR");
 
 	TC_PRINT("Testing k_is_in_isr() from a preemptible thread\n");
 	zassert_false(k_is_in_isr(), "Should not be in ISR context");
@@ -517,7 +515,6 @@ static void test_kernel_ctx_thread(void)
 	zassert_false(_current->base.prio < 0,
 		      "Current thread should have preemptible priority: %d",
 		      _current->base.prio);
-
 }
 
 /**
@@ -534,7 +531,8 @@ static void _test_kernel_thread(k_tid_t _thread_id)
 	k_tid_t self_thread_id;
 
 	self_thread_id = k_current_get();
-	zassert_true((self_thread_id != _thread_id), "thread id matches parent thread");
+	zassert_true((self_thread_id != _thread_id),
+		     "thread id matches parent thread");
 
 	isr_info.command = THREAD_SELF_CMD;
 	isr_info.error = 0;
@@ -543,7 +541,8 @@ static void _test_kernel_thread(k_tid_t _thread_id)
 	 * Either the ISR detected an error, or the ISR context ID
 	 * does not match the interrupted thread's ID.
 	 */
-	zassert_false((isr_info.error || (isr_info.data != (void *)self_thread_id)),
+	zassert_false((isr_info.error ||
+		       (isr_info.data != (void *)self_thread_id)),
 		      "Thread ID taken during ISR != calling thread");
 
 	isr_info.command = EXEC_CTX_TYPE_CMD;
@@ -552,7 +551,8 @@ static void _test_kernel_thread(k_tid_t _thread_id)
 	zassert_false((isr_info.error || (isr_info.value != K_ISR)),
 		      "k_is_in_isr() when called from an ISR is false");
 
-	zassert_false(k_is_in_isr(), "k_is_in_isr() when called from a thread is true");
+	zassert_false(k_is_in_isr(),
+		      "k_is_in_isr() when called from a thread is true");
 
 	zassert_false((_current->base.prio >= 0),
 		      "thread is not a cooperative thread");
@@ -592,11 +592,10 @@ static void thread_helper(void *arg1, void *arg2, void *arg3)
 	/* Lower priority to that of thread_entry() */
 	k_thread_priority_set(self_thread_id, self_thread_id->base.prio + 1);
 
-	k_yield();      /* Yield to thread of equal priority */
+	k_yield(); /* Yield to thread of equal priority */
 
 	thread_evidence++;
 	/* thread_evidence should now be 2 */
-
 }
 
 /**
@@ -612,7 +611,7 @@ static void k_yield_entry(void *arg0, void *arg1, void *arg2)
 	ARG_UNUSED(arg1);
 	ARG_UNUSED(arg2);
 
-	thread_evidence++;      /* Prove that the thread has run */
+	thread_evidence++; /* Prove that the thread has run */
 	k_sem_take(&sem_thread, K_FOREVER);
 
 	/*
@@ -636,9 +635,10 @@ static void k_yield_entry(void *arg0, void *arg1, void *arg2)
 	 */
 	k_yield();
 
-	zassert_not_equal(thread_evidence, 0,
-			  "k_yield() did not yield to a higher priority thread: %d",
-			  thread_evidence);
+	zassert_not_equal(
+		thread_evidence, 0,
+		"k_yield() did not yield to a higher priority thread: %d",
+		thread_evidence);
 
 	zassert_false((thread_evidence > 1),
 		      "k_yield() did not yield to an equal priority thread: %d",
@@ -666,11 +666,10 @@ static void kernel_thread_entry(void *_thread_id, void *arg1, void *arg2)
 	ARG_UNUSED(arg1);
 	ARG_UNUSED(arg2);
 
-	thread_evidence++;      /* Prove that the thread has run */
+	thread_evidence++; /* Prove that the thread has run */
 	k_sem_take(&sem_thread, K_FOREVER);
 
-	_test_kernel_thread((k_tid_t) _thread_id);
-
+	_test_kernel_thread((k_tid_t)_thread_id);
 }
 
 /*
@@ -686,12 +685,8 @@ struct timeout_order {
 };
 
 struct timeout_order timeouts[] = {
-	{ 0, 1000, 2, 0 },
-	{ 0, 1500, 4, 1 },
-	{ 0, 500, 0, 2 },
-	{ 0, 750, 1, 3 },
-	{ 0, 1750, 5, 4 },
-	{ 0, 2000, 6, 5 },
+	{ 0, 1000, 2, 0 }, { 0, 1500, 4, 1 }, { 0, 500, 0, 2 },
+	{ 0, 750, 1, 3 },  { 0, 1750, 5, 4 }, { 0, 2000, 6, 5 },
 	{ 0, 1250, 3, 6 },
 };
 
@@ -791,16 +786,17 @@ static void test_busy_wait(void)
 	int32_t timeout;
 	int rv;
 
-	timeout = 20;           /* in ms */
+	timeout = 20; /* in ms */
 
 	k_thread_create(&timeout_threads[0], timeout_stacks[0],
 			THREAD_STACKSIZE2, busy_wait_thread,
-			INT_TO_POINTER(timeout), NULL,
-			NULL, K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
+			INT_TO_POINTER(timeout), NULL, NULL,
+			K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
 
 	rv = k_sem_take(&reply_timeout, K_MSEC(timeout * 2 * 2));
 
-	zassert_false(rv, " *** thread timed out waiting for " "k_busy_wait()");
+	zassert_false(rv, " *** thread timed out waiting for "
+			  "k_busy_wait()");
 }
 
 /**
@@ -817,16 +813,16 @@ static void test_k_sleep(void)
 	int rv;
 	int i;
 
-
 	timeout = 50;
 
 	k_thread_create(&timeout_threads[0], timeout_stacks[0],
 			THREAD_STACKSIZE2, thread_sleep,
-			INT_TO_POINTER(timeout), NULL,
-			NULL, K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
+			INT_TO_POINTER(timeout), NULL, NULL,
+			K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
 
 	rv = k_sem_take(&reply_timeout, K_MSEC(timeout * 2));
-	zassert_equal(rv, 0, " *** thread timed out waiting for thread on "
+	zassert_equal(rv, 0,
+		      " *** thread timed out waiting for thread on "
 		      "k_sleep().");
 
 	/* test k_thread_create() without cancellation */
@@ -834,20 +830,19 @@ static void test_k_sleep(void)
 
 	for (i = 0; i < NUM_TIMEOUT_THREADS; i++) {
 		k_thread_create(&timeout_threads[i], timeout_stacks[i],
-				THREAD_STACKSIZE2,
-				delayed_thread,
-				INT_TO_POINTER(i), NULL, NULL,
-				K_PRIO_COOP(5), 0,
-				K_MSEC(timeouts[i].timeout));
+				THREAD_STACKSIZE2, delayed_thread,
+				INT_TO_POINTER(i), NULL, NULL, K_PRIO_COOP(5),
+				0, K_MSEC(timeouts[i].timeout));
 	}
 	for (i = 0; i < NUM_TIMEOUT_THREADS; i++) {
 		data = k_fifo_get(&timeout_order_fifo, K_MSEC(750));
 		zassert_not_null(data, " *** timeout while waiting for"
-				 " delayed thread");
+				       " delayed thread");
 
 		zassert_equal(data->timeout_order, i,
 			      " *** wrong delayed thread ran (got %d, "
-			      "expected %d)\n", data->timeout_order, i);
+			      "expected %d)\n",
+			      data->timeout_order, i);
 
 		TC_PRINT(" got thread (q order: %d, t/o: %d) as expected\n",
 			 data->q_order, data->timeout);
@@ -903,25 +898,26 @@ static void test_k_sleep(void)
 		data = k_fifo_get(&timeout_order_fifo, K_MSEC(2750));
 
 		zassert_not_null(data, " *** timeout while waiting for"
-				 " delayed thread");
+				       " delayed thread");
 
 		zassert_equal(data->timeout_order, i,
 			      " *** wrong delayed thread ran (got %d, "
-			      "expected %d)\n", data->timeout_order, i);
+			      "expected %d)\n",
+			      data->timeout_order, i);
 
 		TC_PRINT(" got (q order: %d, t/o: %d, t/o order %d) "
-			 "as expected\n", data->q_order, data->timeout,
-			 data->timeout_order);
+			 "as expected\n",
+			 data->q_order, data->timeout, data->timeout_order);
 	}
 
 	zassert_equal(num_cancellations, next_cancellation,
 		      " *** wrong number of cancellations (expected %d, "
-		      "got %d\n", num_cancellations, next_cancellation);
+		      "got %d\n",
+		      num_cancellations, next_cancellation);
 
 	/* ensure no more thread fire */
 	data = k_fifo_get(&timeout_order_fifo, K_MSEC(750));
 	zassert_false(data, " *** got something unexpected in the fifo");
-
 }
 
 /**
@@ -945,11 +941,12 @@ void test_k_yield(void)
 	k_sem_init(&sem_thread, 0, UINT_MAX);
 
 	k_thread_create(&thread_data1, thread_stack1, THREAD_STACKSIZE,
-			k_yield_entry, NULL, NULL,
-			NULL, K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
+			k_yield_entry, NULL, NULL, NULL,
+			K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
 
 	zassert_equal(thread_evidence, 1,
-		      "Thread did not execute as expected!: %d", thread_evidence);
+		      "Thread did not execute as expected!: %d",
+		      thread_evidence);
 
 	k_sem_give(&sem_thread);
 	k_sem_give(&sem_thread);
@@ -965,11 +962,9 @@ void test_k_yield(void)
  */
 void test_kernel_thread(void)
 {
-
 	k_thread_create(&thread_data3, thread_stack3, THREAD_STACKSIZE,
-			kernel_thread_entry, NULL, NULL,
-			NULL, K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
-
+			kernel_thread_entry, NULL, NULL, NULL,
+			K_PRIO_COOP(THREAD_PRIORITY), 0, K_NO_WAIT);
 }
 
 /*test case main entry*/
@@ -979,8 +974,7 @@ void test_main(void)
 
 	kernel_init_objects();
 
-	ztest_test_suite(context,
-			 ztest_unit_test(test_kernel_interrupts),
+	ztest_test_suite(context, ztest_unit_test(test_kernel_interrupts),
 			 ztest_1cpu_unit_test(test_kernel_timer_interrupts),
 			 ztest_unit_test(test_kernel_ctx_thread),
 			 ztest_1cpu_unit_test(test_busy_wait),
@@ -988,7 +982,6 @@ void test_main(void)
 			 ztest_unit_test(test_kernel_cpu_idle_atomic),
 			 ztest_unit_test(test_kernel_cpu_idle),
 			 ztest_1cpu_unit_test(test_k_yield),
-			 ztest_1cpu_unit_test(test_kernel_thread)
-			 );
+			 ztest_1cpu_unit_test(test_kernel_thread));
 	ztest_run_test_suite(context);
 }

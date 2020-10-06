@@ -7,19 +7,17 @@
 #include <kernel.h>
 #include <ksched.h>
 
-void z_thread_entry_wrapper(k_thread_entry_t thread,
-			    void *arg1,
-			    void *arg2,
+void z_thread_entry_wrapper(k_thread_entry_t thread, void *arg1, void *arg2,
 			    void *arg3);
 
 void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
-		     char *stack_ptr, k_thread_entry_t entry,
-		     void *p1, void *p2, void *p3)
+		     char *stack_ptr, k_thread_entry_t entry, void *p1,
+		     void *p2, void *p3)
 {
 	struct __esf *stack_init;
 
 #ifdef CONFIG_RISCV_SOC_CONTEXT_SAVE
-	const struct soc_esf soc_esf_init = {SOC_ESF_INIT};
+	const struct soc_esf soc_esf_init = { SOC_ESF_INIT };
 #endif
 
 	/* Initial stack frame for thread */
@@ -89,18 +87,15 @@ int arch_float_disable(struct k_thread *thread)
 	thread->base.user_options &= ~K_FP_REGS;
 
 	/* Clear the FS bits to disable the FPU. */
-	__asm__ volatile (
-		"mv t0, %0\n"
-		"csrrc x0, mstatus, t0\n"
-		:
-		: "r" (MSTATUS_FS_MASK)
-		);
+	__asm__ volatile("mv t0, %0\n"
+			 "csrrc x0, mstatus, t0\n"
+			 :
+			 : "r"(MSTATUS_FS_MASK));
 
 	irq_unlock(key);
 
 	return 0;
 }
-
 
 int arch_float_enable(struct k_thread *thread)
 {
@@ -121,12 +116,10 @@ int arch_float_enable(struct k_thread *thread)
 	thread->base.user_options |= K_FP_REGS;
 
 	/* Set the FS bits to Initial to enable the FPU. */
-	__asm__ volatile (
-		"mv t0, %0\n"
-		"csrrs x0, mstatus, t0\n"
-		:
-		: "r" (MSTATUS_FS_INIT)
-		);
+	__asm__ volatile("mv t0, %0\n"
+			 "csrrs x0, mstatus, t0\n"
+			 :
+			 : "r"(MSTATUS_FS_INIT));
 
 	irq_unlock(key);
 

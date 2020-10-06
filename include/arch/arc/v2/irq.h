@@ -36,7 +36,7 @@ extern void sys_trace_isr_exit(void);
 #endif
 
 extern void z_irq_priority_set(unsigned int irq, unsigned int prio,
-			      uint32_t flags);
+			       uint32_t flags);
 extern void _isr_wrapper(void);
 extern void z_irq_spurious(const void *unused);
 
@@ -49,10 +49,10 @@ extern void z_irq_spurious(const void *unused);
  * runtime.
  */
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-{ \
-	Z_ISR_DECLARE(irq_p, 0, isr_p, isr_param_p); \
-	z_irq_priority_set(irq_p, priority_p, flags_p); \
-}
+	{                                                                \
+		Z_ISR_DECLARE(irq_p, 0, isr_p, isr_param_p);             \
+		z_irq_priority_set(irq_p, priority_p, flags_p);          \
+	}
 
 /**
  * Configure a 'direct' static interrupt.
@@ -75,18 +75,18 @@ extern void z_irq_spurious(const void *unused);
  * See include/irq.h for details.
  * All arguments must be computable at build time.
  */
-#define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p) \
-{ \
-	Z_ISR_DECLARE(irq_p, ISR_FLAG_DIRECT, isr_p, NULL); \
-	BUILD_ASSERT(priority_p || !IS_ENABLED(CONFIG_ARC_FIRQ) || \
-	(IS_ENABLED(CONFIG_ARC_FIRQ_STACK) && \
-	!IS_ENABLED(CONFIG_ARC_STACK_CHECKING)), \
-	"irq priority cannot be set to 0 when CONFIG_ARC_FIRQ_STACK" \
-	"is not configured or CONFIG_ARC_FIRQ_STACK " \
-	"and CONFIG_ARC_STACK_CHECKING are configured together"); \
-	z_irq_priority_set(irq_p, priority_p, flags_p); \
-}
-
+#define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p)                   \
+	{                                                                            \
+		Z_ISR_DECLARE(irq_p, ISR_FLAG_DIRECT, isr_p, NULL);                  \
+		BUILD_ASSERT(                                                        \
+			priority_p || !IS_ENABLED(CONFIG_ARC_FIRQ) ||                \
+				(IS_ENABLED(CONFIG_ARC_FIRQ_STACK) &&                \
+				 !IS_ENABLED(CONFIG_ARC_STACK_CHECKING)),            \
+			"irq priority cannot be set to 0 when CONFIG_ARC_FIRQ_STACK" \
+			"is not configured or CONFIG_ARC_FIRQ_STACK "                \
+			"and CONFIG_ARC_STACK_CHECKING are configured together");    \
+		z_irq_priority_set(irq_p, priority_p, flags_p);                      \
+	}
 
 static inline void arch_isr_direct_header(void)
 {
@@ -113,25 +113,24 @@ extern void arch_isr_direct_header(void);
 #define ARCH_ISR_DIRECT_FOOTER(swap) arch_isr_direct_footer(swap)
 
 #if defined(__CCAC__)
-#define _ARC_DIRECT_ISR_FUNC_ATTRIBUTE		__interrupt__
+#define _ARC_DIRECT_ISR_FUNC_ATTRIBUTE __interrupt__
 #else
-#define _ARC_DIRECT_ISR_FUNC_ATTRIBUTE		interrupt("ilink")
+#define _ARC_DIRECT_ISR_FUNC_ATTRIBUTE interrupt("ilink")
 #endif
 
 /*
  * Scheduling can not be done in direct isr. If required, please use kernel
  * aware interrupt handling
  */
-#define ARCH_ISR_DIRECT_DECLARE(name) \
-	static inline int name##_body(void); \
-	__attribute__ ((_ARC_DIRECT_ISR_FUNC_ATTRIBUTE))void name(void) \
-	{ \
-		ISR_DIRECT_HEADER(); \
-		name##_body(); \
-		ISR_DIRECT_FOOTER(0); \
-	} \
+#define ARCH_ISR_DIRECT_DECLARE(name)                                   \
+	static inline int name##_body(void);                            \
+	__attribute__((_ARC_DIRECT_ISR_FUNC_ATTRIBUTE)) void name(void) \
+	{                                                               \
+		ISR_DIRECT_HEADER();                                    \
+		name##_body();                                          \
+		ISR_DIRECT_FOOTER(0);                                   \
+	}                                                               \
 	static inline int name##_body(void)
-
 
 /**
  *
@@ -169,7 +168,7 @@ static ALWAYS_INLINE unsigned int arch_irq_lock(void)
 {
 	unsigned int key;
 
-	__asm__ volatile("clri %0" : "=r"(key):: "memory");
+	__asm__ volatile("clri %0" : "=r"(key)::"memory");
 	return key;
 }
 
@@ -184,7 +183,7 @@ static ALWAYS_INLINE bool arch_irq_unlocked(unsigned int key)
 	 * r0 ==  {26’d0, 1’b1, STATUS32.IE, STATUS32.E[3:0] }
 	 * bit4 is used to record IE (Interrupt Enable) bit
 	 */
-	return (key & 0x10)  ==  0x10;
+	return (key & 0x10) == 0x10;
 }
 
 #endif /* _ASMLANGUAGE */

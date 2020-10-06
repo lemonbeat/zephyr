@@ -25,20 +25,19 @@ extern "C" {
 /*
  * use trap_s to raise a SW exception
  */
-#define ARCH_EXCEPT(reason_p)	do { \
-		__asm__ volatile ( \
-		"mov %%r0, %[reason]\n\t" \
-		"trap_s %[id]\n\t" \
-		: \
-		: [reason] "i" (reason_p), \
-		[id] "i" (_TRAP_S_CALL_RUNTIME_EXCEPT) \
-		: "memory"); \
-		CODE_UNREACHABLE; \
+#define ARCH_EXCEPT(reason_p)                                            \
+	do {                                                             \
+		__asm__ volatile("mov %%r0, %[reason]\n\t"               \
+				 "trap_s %[id]\n\t"                      \
+				 :                                       \
+				 : [reason] "i"(reason_p),               \
+				   [id] "i"(_TRAP_S_CALL_RUNTIME_EXCEPT) \
+				 : "memory");                            \
+		CODE_UNREACHABLE;                                        \
 	} while (false)
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* ZEPHYR_INCLUDE_ARCH_ARC_V2_ERROR_H_ */

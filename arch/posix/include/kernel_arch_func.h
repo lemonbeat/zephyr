@@ -23,8 +23,8 @@ static inline void arch_kernel_init(void)
 	/* Nothing to be done */
 }
 
-static ALWAYS_INLINE void
-arch_thread_return_value_set(struct k_thread *thread, unsigned int value)
+static ALWAYS_INLINE void arch_thread_return_value_set(struct k_thread *thread,
+						       unsigned int value)
 {
 	thread->callee_saved.retval = value;
 }

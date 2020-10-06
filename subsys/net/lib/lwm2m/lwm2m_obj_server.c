@@ -21,42 +21,42 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #endif
 
 /* Server resource IDs */
-#define SERVER_SHORT_SERVER_ID		0
-#define SERVER_LIFETIME_ID		1
-#define SERVER_DEFAULT_MIN_PERIOD_ID	2
-#define SERVER_DEFAULT_MAX_PERIOD_ID	3
-#define SERVER_DISABLE_ID		4
-#define SERVER_DISABLE_TIMEOUT_ID	5
-#define SERVER_STORE_NOTIFY_ID		6
-#define SERVER_TRANSPORT_BINDING_ID	7
-#define SERVER_REG_UPDATE_TRIGGER_ID	8
+#define SERVER_SHORT_SERVER_ID 0
+#define SERVER_LIFETIME_ID 1
+#define SERVER_DEFAULT_MIN_PERIOD_ID 2
+#define SERVER_DEFAULT_MAX_PERIOD_ID 3
+#define SERVER_DISABLE_ID 4
+#define SERVER_DISABLE_TIMEOUT_ID 5
+#define SERVER_STORE_NOTIFY_ID 6
+#define SERVER_TRANSPORT_BINDING_ID 7
+#define SERVER_REG_UPDATE_TRIGGER_ID 8
 
-#define SERVER_MAX_ID			9
+#define SERVER_MAX_ID 9
 
 /* Server flags */
-#define SERVER_FLAG_DISABLED		1
-#define SERVER_FLAG_STORE_NOTIFY	2
+#define SERVER_FLAG_DISABLED 1
+#define SERVER_FLAG_STORE_NOTIFY 2
 
-#define MAX_INSTANCE_COUNT		CONFIG_LWM2M_SERVER_INSTANCE_COUNT
+#define MAX_INSTANCE_COUNT CONFIG_LWM2M_SERVER_INSTANCE_COUNT
 
-#define TRANSPORT_BINDING_LEN		4
+#define TRANSPORT_BINDING_LEN 4
 
 /*
  * Calculate resource instances as follows:
  * start with SERVER_MAX_ID
  * subtract EXEC resources (2)
  */
-#define RESOURCE_INSTANCE_COUNT	(SERVER_MAX_ID - 2)
+#define RESOURCE_INSTANCE_COUNT (SERVER_MAX_ID - 2)
 
 /* resource state variables */
 static uint16_t server_id[MAX_INSTANCE_COUNT];
 static uint32_t lifetime[MAX_INSTANCE_COUNT];
 static uint32_t default_min_period[MAX_INSTANCE_COUNT];
 static uint32_t default_max_period[MAX_INSTANCE_COUNT];
-static uint8_t  server_flag_disabled[MAX_INSTANCE_COUNT];
+static uint8_t server_flag_disabled[MAX_INSTANCE_COUNT];
 static uint32_t disabled_timeout[MAX_INSTANCE_COUNT];
-static uint8_t  server_flag_store_notify[MAX_INSTANCE_COUNT];
-static char  transport_binding[MAX_INSTANCE_COUNT][TRANSPORT_BINDING_LEN];
+static uint8_t server_flag_store_notify[MAX_INSTANCE_COUNT];
+static char transport_binding[MAX_INSTANCE_COUNT][TRANSPORT_BINDING_LEN];
 
 static struct lwm2m_engine_obj server;
 static struct lwm2m_engine_obj_field fields[] = {
@@ -79,8 +79,8 @@ static struct lwm2m_engine_obj_field fields[] = {
 
 static struct lwm2m_engine_obj_inst inst[MAX_INSTANCE_COUNT];
 static struct lwm2m_engine_res res[MAX_INSTANCE_COUNT][SERVER_MAX_ID];
-static struct lwm2m_engine_res_inst
-			res_inst[MAX_INSTANCE_COUNT][RESOURCE_INSTANCE_COUNT];
+static struct lwm2m_engine_res_inst res_inst[MAX_INSTANCE_COUNT]
+					    [RESOURCE_INSTANCE_COUNT];
 
 static int disable_cb(uint16_t obj_inst_id)
 {
@@ -108,7 +108,7 @@ static int update_trigger_cb(uint16_t obj_inst_id)
 }
 
 static int32_t server_get_instance_s32(uint16_t obj_inst_id, int32_t *data,
-				     int32_t default_value)
+				       int32_t default_value)
 {
 	int i;
 
@@ -154,7 +154,8 @@ static struct lwm2m_engine_obj_inst *server_create(uint16_t obj_inst_id)
 	for (index = 0; index < MAX_INSTANCE_COUNT; index++) {
 		if (inst[index].obj && inst[index].obj_inst_id == obj_inst_id) {
 			LOG_ERR("Can not create instance - "
-				"already existing: %u", obj_inst_id);
+				"already existing: %u",
+				obj_inst_id);
 			return NULL;
 		}
 	}
@@ -167,7 +168,8 @@ static struct lwm2m_engine_obj_inst *server_create(uint16_t obj_inst_id)
 
 	if (index >= MAX_INSTANCE_COUNT) {
 		LOG_ERR("Can not create instance - "
-			"no more room: %u", obj_inst_id);
+			"no more room: %u",
+			obj_inst_id);
 		return NULL;
 	}
 
@@ -187,32 +189,27 @@ static struct lwm2m_engine_obj_inst *server_create(uint16_t obj_inst_id)
 
 	/* initialize instance resource data */
 	INIT_OBJ_RES_DATA(SERVER_SHORT_SERVER_ID, res[index], i,
-			  res_inst[index], j,
-			  &server_id[index], sizeof(*server_id));
-	INIT_OBJ_RES_DATA(SERVER_LIFETIME_ID, res[index], i,
-			  res_inst[index], j,
+			  res_inst[index], j, &server_id[index],
+			  sizeof(*server_id));
+	INIT_OBJ_RES_DATA(SERVER_LIFETIME_ID, res[index], i, res_inst[index], j,
 			  &lifetime[index], sizeof(*lifetime));
 	INIT_OBJ_RES_DATA(SERVER_DEFAULT_MIN_PERIOD_ID, res[index], i,
-			  res_inst[index], j,
-			  &default_min_period[index],
+			  res_inst[index], j, &default_min_period[index],
 			  sizeof(*default_min_period));
 	INIT_OBJ_RES_DATA(SERVER_DEFAULT_MAX_PERIOD_ID, res[index], i,
-			  res_inst[index], j,
-			  &default_max_period[index],
+			  res_inst[index], j, &default_max_period[index],
 			  sizeof(*default_max_period));
 	INIT_OBJ_RES_EXECUTE(SERVER_DISABLE_ID, res[index], i, disable_cb);
 	INIT_OBJ_RES_DATA(SERVER_DISABLE_TIMEOUT_ID, res[index], i,
-			  res_inst[index], j,
-			  &disabled_timeout[index],
+			  res_inst[index], j, &disabled_timeout[index],
 			  sizeof(*disabled_timeout));
 	INIT_OBJ_RES_DATA(SERVER_STORE_NOTIFY_ID, res[index], i,
-			  res_inst[index], j,
-			  &server_flag_store_notify[index],
+			  res_inst[index], j, &server_flag_store_notify[index],
 			  sizeof(*server_flag_store_notify));
 	/* Mark Transport Binding RO as we only support UDP atm */
 	INIT_OBJ_RES_DATA(SERVER_TRANSPORT_BINDING_ID, res[index], i,
-			  res_inst[index], j,
-			  transport_binding[index], TRANSPORT_BINDING_LEN);
+			  res_inst[index], j, transport_binding[index],
+			  TRANSPORT_BINDING_LEN);
 	INIT_OBJ_RES_EXECUTE(SERVER_REG_UPDATE_TRIGGER_ID, res[index], i,
 			     update_trigger_cb);
 

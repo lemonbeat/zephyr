@@ -17,21 +17,21 @@
  * to right register index.
  */
 static const uint32_t bridge_peripheral_ids[] = {
-	2,	/* PBA GRP */
-	3,	/* PBB GRP */
-	4,	/* PBC GRP */
-	5,	/* PBD GRP */
-	1,	/* HSB GRP */
-	0,	/* CPU GRP */
+	2, /* PBA GRP */
+	3, /* PBB GRP */
+	4, /* PBC GRP */
+	5, /* PBD GRP */
+	1, /* HSB GRP */
+	0, /* CPU GRP */
 };
 
 static const uint32_t bridge_peripheral_instances[] = {
-	1,	/* CPU MASK Instances */
-	10,	/* HSB MASK Instances */
-	24,	/* PBA MASK Instances */
-	7,	/* PBB MASK Instances */
-	5,	/* PBC MASK Instances */
-	6,	/* PBD MASK Instances */
+	1, /* CPU MASK Instances */
+	10, /* HSB MASK Instances */
+	24, /* PBA MASK Instances */
+	7, /* PBB MASK Instances */
+	5, /* PBC MASK Instances */
+	6, /* PBD MASK Instances */
 };
 
 void soc_pmc_peripheral_enable(uint32_t id)
@@ -51,12 +51,11 @@ void soc_pmc_peripheral_enable(uint32_t id)
 		return;
 	}
 
-	mask		= *(&PM->CPUMASK + bus_id);
-	mask		|= (1U << per_idx);
-	PM->UNLOCK	= PM_UNLOCK_KEY(0xAAu) |
-			  PM_UNLOCK_ADDR(((uint32_t)&PM->CPUMASK -
-					  (uint32_t)PM) +
-					  (4 * bus_id));
+	mask = *(&PM->CPUMASK + bus_id);
+	mask |= (1U << per_idx);
+	PM->UNLOCK = PM_UNLOCK_KEY(0xAAu) |
+		     PM_UNLOCK_ADDR(((uint32_t)&PM->CPUMASK - (uint32_t)PM) +
+				    (4 * bus_id));
 	*(&PM->CPUMASK + bus_id) = mask;
 }
 
@@ -77,12 +76,11 @@ void soc_pmc_peripheral_disable(uint32_t id)
 		return;
 	}
 
-	mask		= *(&PM->CPUMASK + bus_id);
-	mask		&= ~(1U << per_idx);
-	PM->UNLOCK	= PM_UNLOCK_KEY(0xAAu) |
-			  PM_UNLOCK_ADDR(((uint32_t)&PM->CPUMASK -
-					  (uint32_t)PM) +
-					  (4 * bus_id));
+	mask = *(&PM->CPUMASK + bus_id);
+	mask &= ~(1U << per_idx);
+	PM->UNLOCK = PM_UNLOCK_KEY(0xAAu) |
+		     PM_UNLOCK_ADDR(((uint32_t)&PM->CPUMASK - (uint32_t)PM) +
+				    (4 * bus_id));
 	*(&PM->CPUMASK + bus_id) = mask;
 }
 
@@ -112,11 +110,10 @@ void soc_pm_enable_pba_divmask(uint32_t mask)
 {
 	uint32_t temp_mask;
 
-	temp_mask	= PM->PBADIVMASK;
-	temp_mask	|= mask;
+	temp_mask = PM->PBADIVMASK;
+	temp_mask |= mask;
 
-	PM->UNLOCK	= PM_UNLOCK_KEY(0xAAu) |
-			  PM_UNLOCK_ADDR((uint32_t)&PM->PBADIVMASK -
-					 (uint32_t)PM);
+	PM->UNLOCK = PM_UNLOCK_KEY(0xAAu) |
+		     PM_UNLOCK_ADDR((uint32_t)&PM->PBADIVMASK - (uint32_t)PM);
 	PM->PBADIVMASK = temp_mask;
 }

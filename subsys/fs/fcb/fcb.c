@@ -13,8 +13,7 @@
 #include "string.h"
 #include <errno.h>
 
-uint8_t
-fcb_get_align(const struct fcb *fcb)
+uint8_t fcb_get_align(const struct fcb *fcb)
 {
 	uint8_t align;
 
@@ -71,8 +70,7 @@ int fcb_flash_write(const struct fcb *fcb, const struct flash_sector *sector,
 	return 0;
 }
 
-int
-fcb_erase_sector(const struct fcb *fcb, const struct flash_sector *sector)
+int fcb_erase_sector(const struct fcb *fcb, const struct flash_sector *sector)
 {
 	int rc;
 
@@ -89,8 +87,7 @@ fcb_erase_sector(const struct fcb *fcb, const struct flash_sector *sector)
 	return 0;
 }
 
-int
-fcb_init(int f_area_id, struct fcb *fcb)
+int fcb_init(int f_area_id, struct fcb *fcb)
 {
 	struct flash_sector *sector;
 	int rc;
@@ -168,8 +165,7 @@ fcb_init(int f_area_id, struct fcb *fcb)
 	return rc;
 }
 
-int
-fcb_free_sector_cnt(struct fcb *fcb)
+int fcb_free_sector_cnt(struct fcb *fcb)
 {
 	int i;
 	struct flash_sector *fa;
@@ -184,19 +180,17 @@ fcb_free_sector_cnt(struct fcb *fcb)
 	return i;
 }
 
-int
-fcb_is_empty(struct fcb *fcb)
+int fcb_is_empty(struct fcb *fcb)
 {
 	return (fcb->f_active.fe_sector == fcb->f_oldest &&
-	  fcb->f_active.fe_elem_off == sizeof(struct fcb_disk_area));
+		fcb->f_active.fe_elem_off == sizeof(struct fcb_disk_area));
 }
 
 /**
  * Length of an element is encoded in 1 or 2 bytes.
  * 1 byte for lengths < 128 bytes, and 2 bytes for < 16384.
  */
-int
-fcb_put_len(uint8_t *buf, uint16_t len)
+int fcb_put_len(uint8_t *buf, uint16_t len)
 {
 	if (len < 0x80) {
 		buf[0] = len;
@@ -210,8 +204,7 @@ fcb_put_len(uint8_t *buf, uint16_t len)
 	}
 }
 
-int
-fcb_get_len(uint8_t *buf, uint16_t *len)
+int fcb_get_len(uint8_t *buf, uint16_t *len)
 {
 	int rc;
 
@@ -231,8 +224,8 @@ fcb_get_len(uint8_t *buf, uint16_t *len)
 /**
  * Initialize erased sector for use.
  */
-int
-fcb_sector_hdr_init(struct fcb *fcb, struct flash_sector *sector, uint16_t id)
+int fcb_sector_hdr_init(struct fcb *fcb, struct flash_sector *sector,
+			uint16_t id)
 {
 	struct fcb_disk_area fda;
 	int rc;
@@ -284,9 +277,8 @@ int fcb_sector_hdr_read(struct fcb *fcb, struct flash_sector *sector,
  * @param2 ptr to the fcb_entry to be returned
  * @return 0 on there are any fcbs aviable; -ENOENT otherwise
  */
-int
-fcb_offset_last_n(struct fcb *fcb, uint8_t entries,
-		struct fcb_entry *last_n_entry)
+int fcb_offset_last_n(struct fcb *fcb, uint8_t entries,
+		      struct fcb_entry *last_n_entry)
 {
 	struct fcb_entry loc;
 	int i;
@@ -326,8 +318,7 @@ fcb_offset_last_n(struct fcb *fcb, uint8_t entries,
  * @param fcb
  * @return 0 on success; non-zero on failure
  */
-int
-fcb_clear(struct fcb *fcb)
+int fcb_clear(struct fcb *fcb)
 {
 	int rc;
 

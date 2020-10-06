@@ -23,10 +23,10 @@ void test_bootdelay(void)
 
 	/* compare this with the boot delay specified */
 	zassert_true(k_cyc_to_ns_floor64(current_cycles) >=
-			(NSEC_PER_MSEC * CONFIG_BOOT_DELAY),
-			"boot delay not executed: %d < %d",
-			(uint32_t)k_cyc_to_ns_floor64(current_cycles),
-			(NSEC_PER_MSEC * CONFIG_BOOT_DELAY));
+			     (NSEC_PER_MSEC * CONFIG_BOOT_DELAY),
+		     "boot delay not executed: %d < %d",
+		     (uint32_t)k_cyc_to_ns_floor64(current_cycles),
+		     (NSEC_PER_MSEC * CONFIG_BOOT_DELAY));
 }
 
 /**

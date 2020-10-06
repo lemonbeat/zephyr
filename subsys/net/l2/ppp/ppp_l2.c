@@ -23,8 +23,8 @@ LOG_MODULE_REGISTER(net_l2_ppp, CONFIG_NET_L2_PPP_LOG_LEVEL);
 
 static const struct ppp_protocol_handler *ppp_lcp;
 
-static void ppp_update_rx_stats(struct net_if *iface,
-				struct net_pkt *pkt, size_t length)
+static void ppp_update_rx_stats(struct net_if *iface, struct net_pkt *pkt,
+				size_t length)
 {
 #if defined(CONFIG_NET_STATISTICS_PPP)
 	ppp_stats_update_bytes_rx(iface, length);
@@ -32,8 +32,8 @@ static void ppp_update_rx_stats(struct net_if *iface,
 #endif /* CONFIG_NET_STATISTICS_PPP */
 }
 
-static void ppp_update_tx_stats(struct net_if *iface,
-				struct net_pkt *pkt, size_t length)
+static void ppp_update_tx_stats(struct net_if *iface, struct net_pkt *pkt,
+				size_t length)
 {
 #if defined(CONFIG_NET_STATISTICS_PPP)
 	ppp_stats_update_bytes_tx(iface, length);
@@ -80,7 +80,8 @@ static enum net_verdict process_ppp_msg(struct net_if *iface,
 		return NET_CONTINUE;
 	}
 
-	Z_STRUCT_SECTION_FOREACH(ppp_protocol_handler, proto) {
+	Z_STRUCT_SECTION_FOREACH(ppp_protocol_handler, proto)
+	{
 		if (proto->protocol != protocol) {
 			continue;
 		}
@@ -104,16 +105,14 @@ static enum net_verdict process_ppp_msg(struct net_if *iface,
 
 	NET_DBG("%s protocol %s%s(0x%02x)",
 		ppp_proto2str(protocol) ? "Unhandled" : "Unknown",
-		ppp_proto2str(protocol),
-		ppp_proto2str(protocol) ? " " : "",
+		ppp_proto2str(protocol), ppp_proto2str(protocol) ? " " : "",
 		protocol);
 
 quit:
 	return verdict;
 }
 
-static enum net_verdict ppp_recv(struct net_if *iface,
-				 struct net_pkt *pkt)
+static enum net_verdict ppp_recv(struct net_if *iface, struct net_pkt *pkt)
 {
 	enum net_verdict verdict;
 
@@ -203,10 +202,8 @@ static void start_ppp(struct ppp_context *ctx)
 
 static int ppp_enable(struct net_if *iface, bool state)
 {
-	const struct ppp_api *ppp =
-		net_if_get_device(iface)->api;
+	const struct ppp_api *ppp = net_if_get_device(iface)->api;
 	struct ppp_context *ctx = net_if_l2_data(iface);
-
 
 	if (ctx->is_enabled == state) {
 		return 0;
@@ -246,8 +243,8 @@ NET_L2_INIT(PPP_L2, ppp_recv, ppp_send, ppp_enable, ppp_flags);
 
 static void carrier_on(struct k_work *work)
 {
-	struct ppp_context *ctx = CONTAINER_OF(work, struct ppp_context,
-					       carrier_mgmt.work);
+	struct ppp_context *ctx =
+		CONTAINER_OF(work, struct ppp_context, carrier_mgmt.work);
 
 	if (ctx->iface == NULL || ctx->carrier_mgmt.enabled) {
 		return;
@@ -264,8 +261,8 @@ static void carrier_on(struct k_work *work)
 
 static void carrier_off(struct k_work *work)
 {
-	struct ppp_context *ctx = CONTAINER_OF(work, struct ppp_context,
-					       carrier_mgmt.work);
+	struct ppp_context *ctx =
+		CONTAINER_OF(work, struct ppp_context, carrier_mgmt.work);
 
 	if (ctx->iface == NULL) {
 		return;
@@ -284,8 +281,7 @@ static void carrier_off(struct k_work *work)
 	ctx->carrier_mgmt.enabled = false;
 }
 
-static void handle_carrier(struct ppp_context *ctx,
-			   k_work_handler_t handler)
+static void handle_carrier(struct ppp_context *ctx, k_work_handler_t handler)
 {
 	k_work_init(&ctx->carrier_mgmt.work, handler);
 
@@ -332,8 +328,7 @@ static void echo_reply_handler(void *user_data, size_t user_data_len)
 	uint32_t time_diff;
 
 	time_diff = end_time - ctx->shell.echo_req_data;
-	ctx->shell.echo_req_data =
-		k_cyc_to_ns_floor64(time_diff) / 1000;
+	ctx->shell.echo_req_data = k_cyc_to_ns_floor64(time_diff) / 1000;
 
 	k_sem_give(&ctx->shell.wait_echo_reply);
 }
@@ -404,13 +399,14 @@ const struct ppp_protocol_handler *ppp_lcp_get(void)
 
 static void ppp_startup(struct k_work *work)
 {
-	struct ppp_context *ctx = CONTAINER_OF(work, struct ppp_context,
-					       startup);
+	struct ppp_context *ctx =
+		CONTAINER_OF(work, struct ppp_context, startup);
 	int count = 0;
 
 	NET_DBG("PPP %p startup for interface %p", ctx, ctx->iface);
 
-	Z_STRUCT_SECTION_FOREACH(ppp_protocol_handler, proto) {
+	Z_STRUCT_SECTION_FOREACH(ppp_protocol_handler, proto)
+	{
 		if (proto->protocol == PPP_LCP) {
 			ppp_lcp = proto;
 		}

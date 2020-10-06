@@ -12,11 +12,11 @@ LOG_MODULE_DECLARE(osdp, CONFIG_OSDP_LOG_LEVEL);
 
 #define TAG "PHY: "
 
-#define OSDP_PKT_MARK                  0xFF
-#define OSDP_PKT_SOM                   0x53
-#define PKT_CONTROL_SQN                0x03
-#define PKT_CONTROL_CRC                0x04
-#define PKT_CONTROL_SCB                0x08
+#define OSDP_PKT_MARK 0xFF
+#define OSDP_PKT_SOM 0x53
+#define PKT_CONTROL_SQN 0x03
+#define PKT_CONTROL_CRC 0x04
+#define PKT_CONTROL_SCB 0x08
 
 struct osdp_packet_header {
 	uint8_t mark;
@@ -103,7 +103,7 @@ int osdp_phy_packet_init(struct osdp_pd *pd, uint8_t *buf, int max_len)
 	pkt = (struct osdp_packet_header *)buf;
 	pkt->mark = OSDP_PKT_MARK;
 	pkt->som = OSDP_PKT_SOM;
-	pkt->pd_address = pd->address & 0x7F;	/* Use only the lower 7 bits */
+	pkt->pd_address = pd->address & 0x7F; /* Use only the lower 7 bits */
 	if (pd_mode) {
 		/* PD must reply with MSB of it's address set */
 		pkt->pd_address |= 0x80;
@@ -128,8 +128,8 @@ int osdp_phy_packet_init(struct osdp_pd *pd, uint8_t *buf, int max_len)
 	return sizeof(struct osdp_packet_header) + sb_len;
 }
 
-int osdp_phy_packet_finalize(struct osdp_pd *pd, uint8_t *buf,
-			     int len, int max_len)
+int osdp_phy_packet_finalize(struct osdp_pd *pd, uint8_t *buf, int len,
+			     int max_len)
 {
 	uint16_t crc16;
 	struct osdp_packet_header *pkt;
@@ -137,7 +137,8 @@ int osdp_phy_packet_finalize(struct osdp_pd *pd, uint8_t *buf,
 	/* Do a sanity check only as we expect expect header to be prefilled */
 	if (buf[0] != OSDP_PKT_MARK || buf[1] != OSDP_PKT_SOM) {
 		LOG_ERR(TAG "packet_finalize: header validation failed! "
-			"CMD: %02x", pd->cmd_id);
+			    "CMD: %02x",
+			pd->cmd_id);
 		return OSDP_ERR_PKT_FMT;
 	}
 	pkt = (struct osdp_packet_header *)buf;
@@ -150,7 +151,7 @@ int osdp_phy_packet_finalize(struct osdp_pd *pd, uint8_t *buf,
 	if (len + 2 > max_len) {
 		goto out_of_space_error;
 	}
-	crc16 = osdp_compute_crc16(buf + 1, len - 1);  /* excluding mark byte */
+	crc16 = osdp_compute_crc16(buf + 1, len - 1); /* excluding mark byte */
 	buf[len + 0] = BYTE_0(crc16);
 	buf[len + 1] = BYTE_1(crc16);
 	len += 2;
@@ -159,7 +160,8 @@ int osdp_phy_packet_finalize(struct osdp_pd *pd, uint8_t *buf,
 
 out_of_space_error:
 	LOG_ERR(TAG "packet_finalize: Out of buffer space! "
-		"CMD: %02x", pd->cmd_id);
+		    "CMD: %02x",
+		pd->cmd_id);
 	return OSDP_ERR_PKT_FMT;
 }
 

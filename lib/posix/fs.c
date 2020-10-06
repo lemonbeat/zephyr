@@ -20,7 +20,7 @@ BUILD_ASSERT(PATH_MAX >= MAX_FILE_NAME, "PATH_MAX is less than MAX_FILE_NAME");
 struct posix_fs_desc {
 	union {
 		struct fs_file_t file;
-		struct fs_dir_t	dir;
+		struct fs_dir_t dir;
 	};
 	bool is_dir;
 	bool used;

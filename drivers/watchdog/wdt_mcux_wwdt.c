@@ -165,25 +165,21 @@ static const struct wdt_driver_api mcux_wwdt_api = {
 static void mcux_wwdt_config_func_0(const struct device *dev);
 
 static const struct mcux_wwdt_config mcux_wwdt_config_0 = {
-	.base = (WWDT_Type *) DT_INST_REG_ADDR(0),
-	.clk_divider =
-		DT_INST_PROP(0, clk_divider),
+	.base = (WWDT_Type *)DT_INST_REG_ADDR(0),
+	.clk_divider = DT_INST_PROP(0, clk_divider),
 	.irq_config_func = mcux_wwdt_config_func_0,
 };
 
 static struct mcux_wwdt_data mcux_wwdt_data_0;
 
-DEVICE_AND_API_INIT(mcux_wwdt_0, DT_INST_LABEL(0),
-		    &mcux_wwdt_init, &mcux_wwdt_data_0,
-		    &mcux_wwdt_config_0, POST_KERNEL,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &mcux_wwdt_api);
+DEVICE_AND_API_INIT(mcux_wwdt_0, DT_INST_LABEL(0), &mcux_wwdt_init,
+		    &mcux_wwdt_data_0, &mcux_wwdt_config_0, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &mcux_wwdt_api);
 
 static void mcux_wwdt_config_func_0(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    mcux_wwdt_isr, DEVICE_GET(mcux_wwdt_0), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), mcux_wwdt_isr,
+		    DEVICE_GET(mcux_wwdt_0), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 }

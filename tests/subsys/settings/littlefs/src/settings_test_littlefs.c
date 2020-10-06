@@ -29,8 +29,7 @@ void test_main(void)
 			 ztest_unit_test(test_config_multiple_in_file),
 			 ztest_unit_test(test_config_save_in_file),
 			 ztest_unit_test(test_config_save_one_file),
-			 ztest_unit_test(test_config_compress_file)
-			);
+			 ztest_unit_test(test_config_compress_file));
 
 	ztest_run_test_suite(test_config);
 }

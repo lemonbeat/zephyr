@@ -42,9 +42,8 @@ extern "C" {
  * ONOFF_STATE_ON, ONOFF_STATE_OFF, ONOFF_STATE_TO_ON,
  * ONOFF_STATE_TO_OFF, or ONOFF_STATE_RESETTING.
  */
-#define ONOFF_STATE_MASK (ONOFF_FLAG_ERROR   \
-			  | ONOFF_FLAG_ONOFF \
-			  | ONOFF_FLAG_TRANSITION)
+#define ONOFF_STATE_MASK \
+	(ONOFF_FLAG_ERROR | ONOFF_FLAG_ONOFF | ONOFF_FLAG_TRANSITION)
 
 /**
  * @brief Value exposed by ONOFF_STATE_MASK when service is off.
@@ -98,8 +97,7 @@ struct onoff_monitor;
  * non-negative on success, or a negative error code.  If an error is
  * indicated the service shall enter an error state.
  */
-typedef void (*onoff_notify_fn)(struct onoff_manager *mgr,
-				int res);
+typedef void (*onoff_notify_fn)(struct onoff_manager *mgr, int res);
 
 /**
  * @brief Signature used by service implementations to effect a
@@ -187,16 +185,16 @@ struct onoff_manager {
  * @param _reset a function used to clear errors and force the service
  * to an off state. Can be null.
  */
-#define ONOFF_TRANSITIONS_INITIALIZER(_start, _stop, _reset) { \
-		.start = _start,			       \
-		.stop = _stop,				       \
-		.reset = _reset,			       \
-}
+#define ONOFF_TRANSITIONS_INITIALIZER(_start, _stop, _reset)     \
+	{                                                        \
+		.start = _start, .stop = _stop, .reset = _reset, \
+	}
 
 /** @internal */
-#define ONOFF_MANAGER_INITIALIZER(_transitions) { \
-		.transitions = _transitions,	  \
-}
+#define ONOFF_MANAGER_INITIALIZER(_transitions) \
+	{                                       \
+		.transitions = _transitions,    \
+	}
 
 /**
  * @brief Initialize an on-off service to off state.
@@ -249,8 +247,7 @@ struct onoff_client;
  * non-negative ONOFF_FLAG_ERROR may still be set in state.
  */
 typedef void (*onoff_client_callback)(struct onoff_manager *mgr,
-				      struct onoff_client *cli,
-				      uint32_t state,
+				      struct onoff_client *cli, uint32_t state,
 				      int res);
 
 /**
@@ -342,8 +339,7 @@ static inline bool onoff_has_error(const struct onoff_manager *mgr)
  * @retval -EINVAL if the parameters are invalid.
  * @retval -EAGAIN if the reference count would overflow.
  */
-int onoff_request(struct onoff_manager *mgr,
-		  struct onoff_client *cli);
+int onoff_request(struct onoff_manager *mgr, struct onoff_client *cli);
 
 /**
  * @brief Release a reserved use of an on-off service.
@@ -396,8 +392,7 @@ int onoff_release(struct onoff_manager *mgr);
  * likely indicates that the operation and client notification had
  * already completed.
  */
-int onoff_cancel(struct onoff_manager *mgr,
-		 struct onoff_client *cli);
+int onoff_cancel(struct onoff_manager *mgr, struct onoff_client *cli);
 
 /**
  * @brief Helper function to safely cancel a request.
@@ -476,8 +471,7 @@ static inline int onoff_cancel_or_release(struct onoff_manager *mgr,
  * @retval -EINVAL if the parameters are invalid.
  * @retval -EALREADY if the service does not have a recorded error.
  */
-int onoff_reset(struct onoff_manager *mgr,
-		struct onoff_client *cli);
+int onoff_reset(struct onoff_manager *mgr, struct onoff_client *cli);
 
 /**
  * @brief Signature used to notify a monitor of an onoff service of
@@ -509,8 +503,7 @@ int onoff_reset(struct onoff_manager *mgr,
  */
 typedef void (*onoff_monitor_callback)(struct onoff_manager *mgr,
 				       struct onoff_monitor *mon,
-				       uint32_t state,
-				       int res);
+				       uint32_t state, int res);
 
 /**
  * @brief Registration state for notifications of onoff service
@@ -595,8 +588,7 @@ struct onoff_sync_service {
  * is held on return regardless of whether a negative state is
  * returned.
  */
-int onoff_sync_lock(struct onoff_sync_service *srv,
-		    k_spinlock_key_t *keyp);
+int onoff_sync_lock(struct onoff_sync_service *srv, k_spinlock_key_t *keyp);
 
 /**
  * @brief Process the completion of a transition in a synchronous
@@ -630,11 +622,8 @@ int onoff_sync_lock(struct onoff_sync_service *srv,
  * @return negative if the service is left or put into an error state, otherwise
  * the number of active requests at the time the lock was released.
  */
-int onoff_sync_finalize(struct onoff_sync_service *srv,
-			 k_spinlock_key_t key,
-			 struct onoff_client *cli,
-			 int res,
-			 bool on);
+int onoff_sync_finalize(struct onoff_sync_service *srv, k_spinlock_key_t key,
+			struct onoff_client *cli, int res, bool on);
 
 /** @} */
 

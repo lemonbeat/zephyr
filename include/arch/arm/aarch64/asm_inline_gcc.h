@@ -25,17 +25,17 @@ extern "C" {
 
 static ALWAYS_INLINE void __DSB(void)
 {
-	__asm__ volatile ("dsb sy" : : : "memory");
+	__asm__ volatile("dsb sy" : : : "memory");
 }
 
 static ALWAYS_INLINE void __DMB(void)
 {
-	__asm__ volatile ("dmb sy" : : : "memory");
+	__asm__ volatile("dmb sy" : : : "memory");
 }
 
 static ALWAYS_INLINE void __ISB(void)
 {
-	__asm__ volatile ("isb" : : : "memory");
+	__asm__ volatile("isb" : : : "memory");
 }
 
 static ALWAYS_INLINE unsigned int arch_irq_lock(void)
@@ -49,8 +49,8 @@ static ALWAYS_INLINE unsigned int arch_irq_lock(void)
 	__asm__ volatile("mrs %0, daif;"
 			 "msr daifset, %1;"
 			 "isb"
-			 : "=r" (key)
-			 : "i" (DAIFSET_IRQ)
+			 : "=r"(key)
+			 : "i"(DAIFSET_IRQ)
 			 : "memory", "cc");
 
 	return key;
@@ -61,7 +61,7 @@ static ALWAYS_INLINE void arch_irq_unlock(unsigned int key)
 	__asm__ volatile("msr daif, %0;"
 			 "isb"
 			 :
-			 : "r" (key)
+			 : "r"(key)
 			 : "memory", "cc");
 }
 

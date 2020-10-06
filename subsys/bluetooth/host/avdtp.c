@@ -43,8 +43,8 @@ static struct bt_avdtp_seid_lsep *lseps;
 
 #define AVDTP_CHAN(_ch) CONTAINER_OF(_ch, struct bt_avdtp, br_chan.chan)
 
-#define AVDTP_KWORK(_work) CONTAINER_OF(_work, struct bt_avdtp_req,\
-					timeout_work)
+#define AVDTP_KWORK(_work) \
+	CONTAINER_OF(_work, struct bt_avdtp_req, timeout_work)
 
 #define AVDTP_TIMEOUT K_SECONDS(6)
 
@@ -52,11 +52,10 @@ static const struct {
 	uint8_t sig_id;
 	void (*func)(struct bt_avdtp *session, struct net_buf *buf,
 		     uint8_t msg_type);
-} handler[] = {
-};
+} handler[] = {};
 
-static int avdtp_send(struct bt_avdtp *session,
-		      struct net_buf *buf, struct bt_avdtp_req *req)
+static int avdtp_send(struct bt_avdtp *session, struct net_buf *buf,
+		      struct bt_avdtp_req *req)
 {
 	int result;
 	struct bt_avdtp_single_sig_hdr *hdr;
@@ -80,8 +79,7 @@ static int avdtp_send(struct bt_avdtp *session,
 	return result;
 }
 
-static struct net_buf *avdtp_create_pdu(uint8_t msg_type,
-					uint8_t pkt_type,
+static struct net_buf *avdtp_create_pdu(uint8_t msg_type, uint8_t pkt_type,
 					uint8_t sig_id)
 {
 	struct net_buf *buf;
@@ -109,7 +107,6 @@ static void avdtp_timeout(struct k_work *work)
 	BT_DBG("Failed Signal_id = %d", (AVDTP_KWORK(work))->sig);
 
 	/* Gracefully Disconnect the Signalling and streaming L2cap chann*/
-
 }
 
 /* L2CAP Interface callbacks */
@@ -126,7 +123,6 @@ void bt_avdtp_l2cap_connected(struct bt_l2cap_chan *chan)
 	BT_DBG("chan %p session %p", chan, session);
 	/* Init the timer */
 	k_delayed_work_init(&session->req->timeout_work, avdtp_timeout);
-
 }
 
 void bt_avdtp_l2cap_disconnected(struct bt_l2cap_chan *chan)
@@ -159,8 +155,8 @@ int bt_avdtp_l2cap_recv(struct bt_l2cap_chan *chan, struct net_buf *buf)
 	sigid = AVDTP_GET_SIG_ID(hdr->signal_id);
 	tid = AVDTP_GET_TR_ID(hdr->hdr);
 
-	BT_DBG("msg_type[0x%02x] sig_id[0x%02x] tid[0x%02x]",
-		msgtype, sigid, tid);
+	BT_DBG("msg_type[0x%02x] sig_id[0x%02x] tid[0x%02x]", msgtype, sigid,
+	       tid);
 
 	/* validate if there is an outstanding resp expected*/
 	if (msgtype != BT_AVDTP_CMD) {
@@ -169,11 +165,10 @@ int bt_avdtp_l2cap_recv(struct bt_l2cap_chan *chan, struct net_buf *buf)
 			return 0;
 		}
 
-		if (session->req->sig != sigid ||
-		    session->req->tid != tid) {
+		if (session->req->sig != sigid || session->req->tid != tid) {
 			BT_DBG("Peer mismatch resp, expected sig[0x%02x]"
-				"tid[0x%02x]", session->req->sig,
-				session->req->tid);
+			       "tid[0x%02x]",
+			       session->req->sig, session->req->tid);
 			return 0;
 		}
 	}
@@ -315,8 +310,7 @@ int bt_avdtp_discover(struct bt_avdtp *session,
 		return -EINVAL;
 	}
 
-	buf = avdtp_create_pdu(BT_AVDTP_CMD,
-			       BT_AVDTP_PACKET_TYPE_SINGLE,
+	buf = avdtp_create_pdu(BT_AVDTP_CMD, BT_AVDTP_PACKET_TYPE_SINGLE,
 			       BT_AVDTP_DISCOVER);
 	if (!buf) {
 		BT_ERR("Error: No Buff available");

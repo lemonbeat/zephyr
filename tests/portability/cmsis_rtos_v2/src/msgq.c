@@ -14,11 +14,11 @@ struct sample_data {
 	unsigned int data3;
 };
 
-#define MESSAGE1        512
-#define MESSAGE2        123456
-#define TIMEOUT_TICKS   50
-#define Q_LEN           5
-#define STACKSZ         CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
+#define MESSAGE1 512
+#define MESSAGE2 123456
+#define TIMEOUT_TICKS 50
+#define Q_LEN 5
+#define STACKSZ CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
 
 osMessageQueueId_t message_id;
 
@@ -48,8 +48,8 @@ void send_msg_thread(void *argument)
 		data[i].data1 = i * 3;
 		data[i].data2 = i * 3 + 1;
 		data[i].data3 = i * 3 + 2;
-		status = osMessageQueuePut(message_id, data + i,
-					   0, osWaitForever);
+		status = osMessageQueuePut(message_id, data + i, 0,
+					   osWaitForever);
 		zassert_true(status == osOK,
 			     "osMessageQueuePut failure for message!");
 	}
@@ -79,8 +79,7 @@ void send_msg_thread(void *argument)
 	/* Send another message after the queue is emptied */
 	sample.data1 = MESSAGE2;
 	status = osMessageQueuePut(message_id, &sample, 0, TIMEOUT_TICKS * 2);
-	zassert_true(status == osOK,
-		     "osMessageQueuePut failure for message!");
+	zassert_true(status == osOK, "osMessageQueuePut failure for message!");
 }
 
 void message_recv(void)
@@ -95,8 +94,8 @@ void message_recv(void)
 		     "Something's wrong with osMessageQueueGet!");
 
 	/* Try receiving message within a duration of TIMEOUT */
-	status = osMessageQueueGet(message_id, (void *)&recv_data,
-				   NULL, TIMEOUT_TICKS);
+	status = osMessageQueueGet(message_id, (void *)&recv_data, NULL,
+				   TIMEOUT_TICKS);
 	zassert_true(status == osErrorTimeout,
 		     "Something's wrong with osMessageQueueGet!");
 
@@ -108,8 +107,8 @@ void message_recv(void)
 		      "Something's wrong with osMessageQueueGetMsgSize!");
 
 	/* Receive 1st message */
-	status = osMessageQueueGet(message_id, (void *)&recv_data,
-				   NULL, osWaitForever);
+	status = osMessageQueueGet(message_id, (void *)&recv_data, NULL,
+				   osWaitForever);
 	zassert_true(status == osOK, "osMessageQueueGet failure");
 	zassert_equal(recv_data.data1, MESSAGE1, NULL);
 
@@ -128,8 +127,8 @@ void message_recv(void)
 	}
 
 	/* Receive the next message */
-	status = osMessageQueueGet(message_id, (void *)&recv_data,
-				   NULL, osWaitForever);
+	status = osMessageQueueGet(message_id, (void *)&recv_data, NULL,
+				   osWaitForever);
 	zassert_true(status == osOK, "osMessageQueueGet failure");
 	zassert_equal(recv_data.data1, MESSAGE2, NULL);
 }

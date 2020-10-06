@@ -30,7 +30,7 @@ __subsystem struct hello_world_driver_api {
 	void (*print)(const struct device *dev);
 };
 
-__syscall     void        hello_world_print(const struct device *dev);
+__syscall void hello_world_print(const struct device *dev);
 static inline void z_impl_hello_world_print(const struct device *dev)
 {
 	const struct hello_world_driver_api *api = dev->api;

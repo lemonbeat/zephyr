@@ -34,4 +34,4 @@ extern struct dirent *readdir(DIR *dirp);
 
 #endif /* CONFIG_POSIX_FS */
 
-#endif	/* ZEPHYR_INCLUDE_POSIX_DIRENT_H_ */
+#endif /* ZEPHYR_INCLUDE_POSIX_DIRENT_H_ */

@@ -9,7 +9,7 @@
 #include <posix/unistd.h>
 #include "test_fs.h"
 
-#define THE_FILE FATFS_MNTP"/the_file.txt"
+#define THE_FILE FATFS_MNTP "/the_file.txt"
 
 static int test_file_open_flags(void)
 {
@@ -77,7 +77,6 @@ static int test_file_open_flags(void)
 
 	close(fd);
 	/* end 2 */
-
 
 	/* 3 Attempt read/write operation on file opened with flags = 0 */
 	TC_PRINT("Attempt open existing with flags = 0\n");
@@ -200,7 +199,6 @@ static int test_file_open_flags(void)
 		TC_PRINT("Expected success, fd = %d, errno = %d\n", fd, errno);
 		return TC_FAIL;
 	}
-
 
 	TC_PRINT("Attempt read file opened with flags = O_APPEND | O_RDWR\n");
 	lseek(fd, 0, SEEK_SET);

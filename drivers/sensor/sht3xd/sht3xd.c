@@ -18,23 +18,17 @@
 LOG_MODULE_REGISTER(SHT3XD, CONFIG_SENSOR_LOG_LEVEL);
 
 #ifdef CONFIG_SHT3XD_SINGLE_SHOT_MODE
-static const uint16_t measure_cmd[3] = {
-	0x2400, 0x240B, 0x2416
-};
+static const uint16_t measure_cmd[3] = { 0x2400, 0x240B, 0x2416 };
 #endif
 #ifdef CONFIG_SHT3XD_PERIODIC_MODE
-static const uint16_t measure_cmd[5][3] = {
-	{ 0x202F, 0x2024, 0x2032 },
-	{ 0x212D, 0x2126, 0x2130 },
-	{ 0x222B, 0x2220, 0x2236 },
-	{ 0x2329, 0x2322, 0x2334 },
-	{ 0x272A, 0x2721, 0x2737 }
-};
+static const uint16_t measure_cmd[5][3] = { { 0x202F, 0x2024, 0x2032 },
+					    { 0x212D, 0x2126, 0x2130 },
+					    { 0x222B, 0x2220, 0x2236 },
+					    { 0x2329, 0x2322, 0x2334 },
+					    { 0x272A, 0x2721, 0x2737 } };
 #endif
 
-static const int measure_wait[3] = {
-	4000, 6000, 15000
-};
+static const int measure_wait[3] = { 4000, 6000, 15000 };
 
 /*
  * CRC algorithm parameters were taken from the
@@ -96,9 +90,8 @@ static int sht3xd_sample_fetch(const struct device *dev,
 
 #ifdef CONFIG_SHT3XD_SINGLE_SHOT_MODE
 	/* start single shot measurement */
-	if (sht3xd_write_command(dev,
-				 measure_cmd[SHT3XD_REPEATABILITY_IDX])
-	    < 0) {
+	if (sht3xd_write_command(dev, measure_cmd[SHT3XD_REPEATABILITY_IDX]) <
+	    0) {
 		LOG_DBG("Failed to set single shot measurement mode!");
 		return -EIO;
 	}
@@ -110,13 +103,10 @@ static int sht3xd_sample_fetch(const struct device *dev,
 	}
 #endif
 #ifdef CONFIG_SHT3XD_PERIODIC_MODE
-	uint8_t tx_buf[2] = {
-		SHT3XD_CMD_FETCH >> 8,
-		SHT3XD_CMD_FETCH & 0xFF
-	};
+	uint8_t tx_buf[2] = { SHT3XD_CMD_FETCH >> 8, SHT3XD_CMD_FETCH & 0xFF };
 
-	if (i2c_write_read(i2c, address, tx_buf, sizeof(tx_buf),
-			   rx_buf, sizeof(rx_buf)) < 0) {
+	if (i2c_write_read(i2c, address, tx_buf, sizeof(tx_buf), rx_buf,
+			   sizeof(rx_buf)) < 0) {
 		LOG_DBG("Failed to read data sample!");
 		return -EIO;
 	}
@@ -185,8 +175,7 @@ static int sht3xd_init(const struct device *dev)
 	const struct device *i2c = device_get_binding(cfg->bus_name);
 
 	if (i2c == NULL) {
-		LOG_DBG("Failed to get pointer to %s device!",
-			cfg->bus_name);
+		LOG_DBG("Failed to get pointer to %s device!", cfg->bus_name);
 		return -EINVAL;
 	}
 	data->bus = i2c;
@@ -207,9 +196,10 @@ static int sht3xd_init(const struct device *dev)
 
 #ifdef CONFIG_SHT3XD_PERIODIC_MODE
 	/* set periodic measurement mode */
-	if (sht3xd_write_command(dev,
-				 measure_cmd[SHT3XD_MPS_IDX][SHT3XD_REPEATABILITY_IDX])
-	    < 0) {
+	if (sht3xd_write_command(
+		    dev,
+		    measure_cmd[SHT3XD_MPS_IDX][SHT3XD_REPEATABILITY_IDX]) <
+	    0) {
 		LOG_DBG("Failed to set measurement mode!");
 		return -EIO;
 	}
@@ -239,7 +229,6 @@ static const struct sht3xd_config sht3xd0_cfg = {
 #endif
 };
 
-DEVICE_AND_API_INIT(sht3xd0, DT_INST_LABEL(0),
-		    sht3xd_init, &sht3xd0_driver, &sht3xd0_cfg,
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(sht3xd0, DT_INST_LABEL(0), sht3xd_init, &sht3xd0_driver,
+		    &sht3xd0_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &sht3xd_driver_api);

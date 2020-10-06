@@ -48,7 +48,6 @@ static int ppp_stats_get(uint32_t mgmt_request, struct net_if *iface,
 	return 0;
 }
 
-NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_PPP,
-				  ppp_stats_get);
+NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_STATS_GET_PPP, ppp_stats_get);
 
 #endif /* CONFIG_NET_STATISTICS_USER_API */

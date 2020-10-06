@@ -8,7 +8,7 @@
 #include <drivers/flash.h>
 #include <logging/log_ctrl.h>
 
-#define FLASH_DEVICE  "DATAFLASH_1"
+#define FLASH_DEVICE "DATAFLASH_1"
 
 /* Set to 1 to test the chip erase functionality. Please be aware that this
  * operation takes quite a while (it depends on the chip size, but can easily
@@ -16,10 +16,10 @@
  * Note - erasing of the test region or whole chip is performed only when
  *        CONFIG_SPI_FLASH_AT45_USE_READ_MODIFY_WRITE is not enabled.
  */
-#define ERASE_WHOLE_CHIP    0
+#define ERASE_WHOLE_CHIP 0
 
-#define TEST_REGION_OFFSET  0xFE00
-#define TEST_REGION_SIZE    0x400
+#define TEST_REGION_OFFSET 0xFE00
+#define TEST_REGION_SIZE 0x400
 
 static uint8_t write_buf[TEST_REGION_SIZE];
 static uint8_t read_buf[TEST_REGION_SIZE];
@@ -44,8 +44,8 @@ void main(void)
 	page_count = flash_get_page_count(flash_dev);
 	(void)flash_get_page_info_by_idx(flash_dev, 0, &pages_info);
 	chip_size = page_count * pages_info.size;
-	printk("Using %s, chip size: %u bytes (page: %u)\n",
-	       FLASH_DEVICE, chip_size, pages_info.size);
+	printk("Using %s, chip size: %u bytes (page: %u)\n", FLASH_DEVICE,
+	       chip_size, pages_info.size);
 
 	printk("Reading the first byte of the test region ... ");
 	err = flash_read(flash_dev, TEST_REGION_OFFSET, &data, 1);
@@ -68,8 +68,8 @@ void main(void)
 		err = flash_erase(flash_dev, 0, chip_size);
 	} else {
 		printk("Erasing the test region... ");
-		err = flash_erase(flash_dev,
-				  TEST_REGION_OFFSET, TEST_REGION_SIZE);
+		err = flash_erase(flash_dev, TEST_REGION_OFFSET,
+				  TEST_REGION_SIZE);
 	}
 
 	if (err != 0) {
@@ -80,8 +80,8 @@ void main(void)
 	printk("OK\n");
 
 	printk("Checking if the test region is erased... ");
-	err = flash_read(flash_dev, TEST_REGION_OFFSET,
-			 read_buf, TEST_REGION_SIZE);
+	err = flash_read(flash_dev, TEST_REGION_OFFSET, read_buf,
+			 TEST_REGION_SIZE);
 	if (err != 0) {
 		printk("FAILED\n");
 		return;
@@ -100,8 +100,8 @@ void main(void)
 #endif /* !IS_ENABLED(CONFIG_SPI_FLASH_AT45_USE_READ_MODIFY_WRITE) */
 
 	printk("Writing the first half of the test region... ");
-	err = flash_write(flash_dev, TEST_REGION_OFFSET,
-			  write_buf,  TEST_REGION_SIZE/2);
+	err = flash_write(flash_dev, TEST_REGION_OFFSET, write_buf,
+			  TEST_REGION_SIZE / 2);
 	if (err != 0) {
 		printk("FAILED\n");
 		return;
@@ -110,8 +110,9 @@ void main(void)
 	printk("OK\n");
 
 	printk("Writing the second half of the test region... ");
-	err = flash_write(flash_dev, TEST_REGION_OFFSET + TEST_REGION_SIZE/2,
-			  &write_buf[TEST_REGION_SIZE/2], TEST_REGION_SIZE/2);
+	err = flash_write(flash_dev, TEST_REGION_OFFSET + TEST_REGION_SIZE / 2,
+			  &write_buf[TEST_REGION_SIZE / 2],
+			  TEST_REGION_SIZE / 2);
 	if (err != 0) {
 		printk("FAILED\n");
 		return;
@@ -120,8 +121,8 @@ void main(void)
 	printk("OK\n");
 
 	printk("Reading the whole test region... ");
-	err = flash_read(flash_dev, TEST_REGION_OFFSET,
-			 read_buf, TEST_REGION_SIZE);
+	err = flash_read(flash_dev, TEST_REGION_OFFSET, read_buf,
+			 TEST_REGION_SIZE);
 	if (err != 0) {
 		printk("FAILED\n");
 		return;
@@ -143,8 +144,8 @@ void main(void)
 
 #if IS_ENABLED(CONFIG_DEVICE_POWER_MANAGEMENT)
 	printk("Putting the flash device into low power state... ");
-	err = device_set_power_state(flash_dev, DEVICE_PM_LOW_POWER_STATE,
-				     NULL, NULL);
+	err = device_set_power_state(flash_dev, DEVICE_PM_LOW_POWER_STATE, NULL,
+				     NULL);
 	if (err != 0) {
 		printk("FAILED\n");
 		return;

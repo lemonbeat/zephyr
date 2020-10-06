@@ -55,14 +55,14 @@ static int mpr_read_reg(const struct device *dev)
 		k_sleep(K_MSEC(MPR_REG_READ_DATA_CONV_DELAY_MS));
 
 		rc = i2c_read(data->i2c_master, read_buf, sizeof(read_buf),
-				  cfg->i2c_addr);
+			      cfg->i2c_addr);
 		if (rc < 0) {
 			return rc;
 		}
 
-		if (!(*read_buf & MPR_STATUS_MASK_POWER_ON)
-			|| (*read_buf & MPR_STATUS_MASK_INTEGRITY_TEST_FAILED)
-			|| (*read_buf & MPR_STATUS_MASK_MATH_SATURATION)) {
+		if (!(*read_buf & MPR_STATUS_MASK_POWER_ON) ||
+		    (*read_buf & MPR_STATUS_MASK_INTEGRITY_TEST_FAILED) ||
+		    (*read_buf & MPR_STATUS_MASK_MATH_SATURATION)) {
 			return -EIO;
 		}
 
@@ -75,9 +75,7 @@ static int mpr_read_reg(const struct device *dev)
 		return -EIO;
 	}
 
-	data->reg_val = (read_buf[1] << 16)
-			| (read_buf[2] << 8)
-			|  read_buf[3];
+	data->reg_val = (read_buf[1] << 16) | (read_buf[2] << 8) | read_buf[3];
 
 	return 0;
 }
@@ -91,7 +89,8 @@ static int mpr_read_reg(const struct device *dev)
 static inline void mpr_convert_reg(const uint32_t *reg, uint64_t *value)
 {
 	if (*reg > MPR_OUTPUT_MIN) {
-		*value = (uint64_t)(*reg - MPR_OUTPUT_MIN) * (MPR_P_MAX - MPR_P_MIN);
+		*value = (uint64_t)(*reg - MPR_OUTPUT_MIN) *
+			 (MPR_P_MAX - MPR_P_MIN);
 		*value *= MPR_CONVERSION_FACTOR;
 		*value /= MPR_OUTPUT_RANGE;
 		*value += MPR_P_MIN;
@@ -100,16 +99,14 @@ static inline void mpr_convert_reg(const uint32_t *reg, uint64_t *value)
 	}
 }
 
-static int mpr_sample_fetch(const struct device *dev,
-			    enum sensor_channel chan)
+static int mpr_sample_fetch(const struct device *dev, enum sensor_channel chan)
 {
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_PRESS);
 
 	return mpr_read_reg(dev);
 }
 
-static int mpr_channel_get(const struct device *dev,
-			   enum sensor_channel chan,
+static int mpr_channel_get(const struct device *dev, enum sensor_channel chan,
 			   struct sensor_value *val)
 {
 	const struct mpr_data *data = dev->data;
@@ -137,6 +134,5 @@ static const struct mpr_config mpr_cfg = {
 	.i2c_addr = DT_INST_REG_ADDR(0),
 };
 
-DEVICE_AND_API_INIT(mpr, DT_INST_LABEL(0), mpr_init, &mpr_data,
-			&mpr_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
-			&mpr_api_funcs);
+DEVICE_AND_API_INIT(mpr, DT_INST_LABEL(0), mpr_init, &mpr_data, &mpr_cfg,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &mpr_api_funcs);

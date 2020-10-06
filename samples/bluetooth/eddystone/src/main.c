@@ -33,76 +33,76 @@ struct k_delayed_work idle_work;
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	/* Eddystone Service UUID a3c87500-8ed3-4bdf-8a39-a01bebede295 */
-	BT_DATA_BYTES(BT_DATA_UUID128_ALL,
-		      0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-		      0xdf, 0x4b, 0xd3, 0x8e, 0x00, 0x75, 0xc8, 0xa3),
+	BT_DATA_BYTES(BT_DATA_UUID128_ALL, 0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0,
+		      0x39, 0x8a, 0xdf, 0x4b, 0xd3, 0x8e, 0x00, 0x75, 0xc8,
+		      0xa3),
 };
 
 /* Eddystone Service Variables */
 /* Service UUID a3c87500-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x00, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x00, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87501-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_caps_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x01, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_caps_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x01, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87502-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_slot_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x02, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_slot_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x02, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87503-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_intv_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x03, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_intv_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x03, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87504-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_tx_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x04, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_tx_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x04, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87505-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_adv_tx_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x05, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_adv_tx_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x05, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87506-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_lock_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x06, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_lock_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x06, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87507-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_unlock_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x07, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_unlock_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x07, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87508-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_ecdh_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x08, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_ecdh_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x08, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c87509-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_eid_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x09, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_eid_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x09, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c8750a-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_data_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x0a, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_data_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x0a, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c8750b-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_reset_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x0b, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_reset_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x0b, 0x75, 0xc8, 0xa3);
 
 /* Characteristic UUID a3c8750c-8ed3-4bdf-8a39-a01bebede295 */
-static struct bt_uuid_128 eds_connectable_uuid = BT_UUID_INIT_128(
-	0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a,
-	0xdf, 0x4b, 0xd3, 0x8e, 0x0c, 0x75, 0xc8, 0xa3);
+static struct bt_uuid_128 eds_connectable_uuid =
+	BT_UUID_INIT_128(0x95, 0xe2, 0xed, 0xeb, 0x1b, 0xa0, 0x39, 0x8a, 0xdf,
+			 0x4b, 0xd3, 0x8e, 0x0c, 0x75, 0xc8, 0xa3);
 
 enum {
 	EDS_TYPE_UID = 0x00,
@@ -189,13 +189,13 @@ static ssize_t read_caps(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 static ssize_t read_slot(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 			 void *buf, uint16_t len, uint16_t offset)
 {
-	return bt_gatt_attr_read(conn, attr, buf, len, offset,
-				 &eds_active_slot, sizeof(eds_active_slot));
+	return bt_gatt_attr_read(conn, attr, buf, len, offset, &eds_active_slot,
+				 sizeof(eds_active_slot));
 }
 
-static ssize_t write_slot(struct bt_conn *conn,
-			  const struct bt_gatt_attr *attr, const void *buf,
-			  uint16_t len, uint16_t offset, uint8_t flags)
+static ssize_t write_slot(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+			  const void *buf, uint16_t len, uint16_t offset,
+			  uint8_t flags)
 {
 	uint8_t value;
 
@@ -215,8 +215,8 @@ static ssize_t write_slot(struct bt_conn *conn,
 }
 
 static ssize_t read_tx_power(struct bt_conn *conn,
-			     const struct bt_gatt_attr *attr,
-			     void *buf, uint16_t len, uint16_t offset)
+			     const struct bt_gatt_attr *attr, void *buf,
+			     uint16_t len, uint16_t offset)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 
@@ -229,9 +229,8 @@ static ssize_t read_tx_power(struct bt_conn *conn,
 }
 
 static ssize_t write_tx_power(struct bt_conn *conn,
-			      const struct bt_gatt_attr *attr,
-			      const void *buf, uint16_t len, uint16_t offset,
-			      uint8_t flags)
+			      const struct bt_gatt_attr *attr, const void *buf,
+			      uint16_t len, uint16_t offset, uint8_t flags)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 
@@ -249,8 +248,8 @@ static ssize_t write_tx_power(struct bt_conn *conn,
 }
 
 static ssize_t read_adv_tx_power(struct bt_conn *conn,
-				 const struct bt_gatt_attr *attr,
-				 void *buf, uint16_t len, uint16_t offset)
+				 const struct bt_gatt_attr *attr, void *buf,
+				 uint16_t len, uint16_t offset)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 
@@ -265,8 +264,7 @@ static ssize_t read_adv_tx_power(struct bt_conn *conn,
 static ssize_t write_adv_tx_power(struct bt_conn *conn,
 				  const struct bt_gatt_attr *attr,
 				  const void *buf, uint16_t len,
-				  uint16_t offset,
-				  uint8_t flags)
+				  uint16_t offset, uint8_t flags)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 
@@ -284,8 +282,8 @@ static ssize_t write_adv_tx_power(struct bt_conn *conn,
 }
 
 static ssize_t read_interval(struct bt_conn *conn,
-			     const struct bt_gatt_attr *attr,
-			     void *buf, uint16_t len, uint16_t offset)
+			     const struct bt_gatt_attr *attr, void *buf,
+			     uint16_t len, uint16_t offset)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 
@@ -306,9 +304,9 @@ static ssize_t read_lock(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 				 sizeof(slot->state));
 }
 
-static ssize_t write_lock(struct bt_conn *conn,
-			  const struct bt_gatt_attr *attr, const void *buf,
-			  uint16_t len, uint16_t offset, uint8_t flags)
+static ssize_t write_lock(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+			  const void *buf, uint16_t len, uint16_t offset,
+			  uint8_t flags)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 	uint8_t value;
@@ -342,8 +340,8 @@ static ssize_t write_lock(struct bt_conn *conn,
 }
 
 static ssize_t read_unlock(struct bt_conn *conn,
-			   const struct bt_gatt_attr *attr,
-			   void *buf, uint16_t len, uint16_t offset)
+			   const struct bt_gatt_attr *attr, void *buf,
+			   uint16_t len, uint16_t offset)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 
@@ -450,9 +448,8 @@ static int eds_slot_restart(struct eds_slot *slot, uint8_t type)
 }
 
 static ssize_t write_adv_data(struct bt_conn *conn,
-			      const struct bt_gatt_attr *attr,
-			      const void *buf, uint16_t len, uint16_t offset,
-			      uint8_t flags)
+			      const struct bt_gatt_attr *attr, const void *buf,
+			      uint16_t len, uint16_t offset, uint8_t flags)
 {
 	struct eds_slot *slot = &eds_slots[eds_active_slot];
 	uint8_t type;
@@ -487,8 +484,8 @@ static ssize_t write_adv_data(struct bt_conn *conn,
 		 * controlled by characteristics 4 (Radio Tx Power) and
 		 * 5 (Advertised Tx Power).
 		 */
-		slot->ad[2].data_len = MIN(slot->ad[2].data_len,
-					   len + EDS_URL_WRITE_OFFSET);
+		slot->ad[2].data_len =
+			MIN(slot->ad[2].data_len, len + EDS_URL_WRITE_OFFSET);
 		memcpy(&slot->ad[2].data + EDS_URL_WRITE_OFFSET, buf,
 		       slot->ad[2].data_len - EDS_URL_WRITE_OFFSET);
 
@@ -508,25 +505,24 @@ static ssize_t write_adv_data(struct bt_conn *conn,
 }
 
 static ssize_t write_reset(struct bt_conn *conn,
-			   const struct bt_gatt_attr *attr,
-			   const void *buf, uint16_t len, uint16_t offset,
-			   uint8_t flags)
+			   const struct bt_gatt_attr *attr, const void *buf,
+			   uint16_t len, uint16_t offset, uint8_t flags)
 {
 	/* TODO: Power cycle or reload for storage the values */
 	return BT_GATT_ERR(BT_ATT_ERR_WRITE_NOT_PERMITTED);
 }
 
 static ssize_t read_connectable(struct bt_conn *conn,
-			     const struct bt_gatt_attr *attr, void *buf,
-			     uint16_t len, uint16_t offset)
+				const struct bt_gatt_attr *attr, void *buf,
+				uint16_t len, uint16_t offset)
 {
 	uint8_t connectable = 0x01;
 
 	/* Returning a non-zero value indicates that the beacon is capable
 	 * of becoming non-connectable
 	 */
-	return bt_gatt_attr_read(conn, attr, buf, len, offset,
-				 &connectable, sizeof(connectable));
+	return bt_gatt_attr_read(conn, attr, buf, len, offset, &connectable,
+				 sizeof(connectable));
 }
 
 static ssize_t write_connectable(struct bt_conn *conn,
@@ -557,8 +553,8 @@ static ssize_t write_connectable(struct bt_conn *conn,
 }
 
 /* Eddystone Configuration Service Declaration */
-BT_GATT_SERVICE_DEFINE(eds_svc,
-	BT_GATT_PRIMARY_SERVICE(&eds_uuid),
+BT_GATT_SERVICE_DEFINE(
+	eds_svc, BT_GATT_PRIMARY_SERVICE(&eds_uuid),
 	/* Capabilities: Readable only when unlocked. Never writable. */
 	BT_GATT_CHARACTERISTIC(&eds_caps_uuid.uuid, BT_GATT_CHRC_READ,
 			       BT_GATT_PERM_READ, read_caps, NULL, &eds_caps),
@@ -608,14 +604,13 @@ BT_GATT_SERVICE_DEFINE(eds_svc,
 			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
 			       read_adv_data, write_adv_data, NULL),
 	/* ADV Factory Reset: Must be unlocked for write. */
-	BT_GATT_CHARACTERISTIC(&eds_reset_uuid.uuid,  BT_GATT_CHRC_WRITE,
+	BT_GATT_CHARACTERISTIC(&eds_reset_uuid.uuid, BT_GATT_CHRC_WRITE,
 			       BT_GATT_PERM_WRITE, NULL, write_reset, NULL),
 	/* ADV Remain Connectable: Must be unlocked for write. */
 	BT_GATT_CHARACTERISTIC(&eds_connectable_uuid.uuid,
 			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
 			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-			       read_connectable, write_connectable, NULL),
-);
+			       read_connectable, write_connectable, NULL), );
 
 static void bt_ready(int err)
 {

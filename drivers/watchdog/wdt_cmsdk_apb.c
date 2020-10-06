@@ -18,38 +18,38 @@
 
 struct wdog_cmsdk_apb {
 	/* offset: 0x000 (r/w) watchdog load register */
-	volatile uint32_t  load;
+	volatile uint32_t load;
 	/* offset: 0x004 (r/ ) watchdog value register */
-	volatile uint32_t  value;
+	volatile uint32_t value;
 	/* offset: 0x008 (r/w) watchdog control register */
-	volatile uint32_t  ctrl;
+	volatile uint32_t ctrl;
 	/* offset: 0x00c ( /w) watchdog clear interrupt register */
-	volatile uint32_t  intclr;
+	volatile uint32_t intclr;
 	/* offset: 0x010 (r/ ) watchdog raw interrupt status register */
-	volatile uint32_t  rawintstat;
+	volatile uint32_t rawintstat;
 	/* offset: 0x014 (r/ ) watchdog interrupt status register */
-	volatile uint32_t  maskintstat;
-	volatile uint32_t  reserved0[762];
+	volatile uint32_t maskintstat;
+	volatile uint32_t reserved0[762];
 	/* offset: 0xc00 (r/w) watchdog lock register */
-	volatile uint32_t  lock;
-	volatile uint32_t  reserved1[191];
+	volatile uint32_t lock;
+	volatile uint32_t reserved1[191];
 	/* offset: 0xf00 (r/w) watchdog integration test control register */
-	volatile uint32_t  itcr;
+	volatile uint32_t itcr;
 	/* offset: 0xf04 ( /w) watchdog integration test output set register */
-	volatile uint32_t  itop;
+	volatile uint32_t itop;
 };
 
-#define CMSDK_APB_WDOG_LOAD		(0xFFFFFFFF << 0)
-#define CMSDK_APB_WDOG_RELOAD		(0xE4E1C00 << 0)
-#define CMSDK_APB_WDOG_VALUE		(0xFFFFFFFF << 0)
-#define CMSDK_APB_WDOG_CTRL_RESEN	(0x1 << 1)
-#define CMSDK_APB_WDOG_CTRL_INTEN	(0x1 << 0)
-#define CMSDK_APB_WDOG_INTCLR		(0x1 << 0)
-#define CMSDK_APB_WDOG_RAWINTSTAT	(0x1 << 0)
-#define CMSDK_APB_WDOG_MASKINTSTAT	(0x1 << 0)
-#define CMSDK_APB_WDOG_LOCK		(0x1 << 0)
-#define CMSDK_APB_WDOG_INTEGTESTEN	(0x1 << 0)
-#define CMSDK_APB_WDOG_INTEGTESTOUTSET	(0x1 << 1)
+#define CMSDK_APB_WDOG_LOAD (0xFFFFFFFF << 0)
+#define CMSDK_APB_WDOG_RELOAD (0xE4E1C00 << 0)
+#define CMSDK_APB_WDOG_VALUE (0xFFFFFFFF << 0)
+#define CMSDK_APB_WDOG_CTRL_RESEN (0x1 << 1)
+#define CMSDK_APB_WDOG_CTRL_INTEN (0x1 << 0)
+#define CMSDK_APB_WDOG_INTCLR (0x1 << 0)
+#define CMSDK_APB_WDOG_RAWINTSTAT (0x1 << 0)
+#define CMSDK_APB_WDOG_MASKINTSTAT (0x1 << 0)
+#define CMSDK_APB_WDOG_LOCK (0x1 << 0)
+#define CMSDK_APB_WDOG_INTEGTESTEN (0x1 << 0)
+#define CMSDK_APB_WDOG_INTEGTESTOUTSET (0x1 << 1)
 
 /*
  * Value written to the LOCK register to lock or unlock the write access
@@ -58,8 +58,7 @@ struct wdog_cmsdk_apb {
 #define CMSDK_APB_WDOG_UNLOCK_VALUE (0x1ACCE551)
 #define CMSDK_APB_WDOG_LOCK_VALUE (0x2BDDF662)
 
-#define WDOG_STRUCT \
-	((volatile struct wdog_cmsdk_apb *)(DT_INST_REG_ADDR(0)))
+#define WDOG_STRUCT ((volatile struct wdog_cmsdk_apb *)(DT_INST_REG_ADDR(0)))
 
 /* Keep reference of the device to pass it to the callback */
 const struct device *wdog_r;
@@ -113,7 +112,7 @@ static int wdog_cmsdk_apb_install_timeout(const struct device *dev,
 
 	/* Reload value */
 	reload_s = config->window.max *
-			   DT_INST_PROP_BY_PHANDLE(0, clocks, clock_frequency);
+		   DT_INST_PROP_BY_PHANDLE(0, clocks, clock_frequency);
 	flags = config->flags;
 
 	wdog->load = reload_s;
@@ -199,8 +198,6 @@ static int wdog_cmsdk_apb_init(const struct device *dev)
 	return 0;
 }
 
-DEVICE_AND_API_INIT(wdog_cmsdk_apb, DT_INST_LABEL(0),
-		    wdog_cmsdk_apb_init,
-		    NULL, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(wdog_cmsdk_apb, DT_INST_LABEL(0), wdog_cmsdk_apb_init, NULL,
+		    NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &wdog_cmsdk_apb_api);

@@ -31,17 +31,16 @@ LOG_MODULE_REGISTER(eth_gecko, CONFIG_ETHERNET_LOG_LEVEL);
 
 #include "eth.h"
 
-static uint8_t dma_tx_buffer[ETH_TX_BUF_COUNT][ETH_TX_BUF_SIZE]
-__aligned(ETH_BUF_ALIGNMENT);
-static uint8_t dma_rx_buffer[ETH_RX_BUF_COUNT][ETH_RX_BUF_SIZE]
-__aligned(ETH_BUF_ALIGNMENT);
-static struct eth_buf_desc dma_tx_desc_tab[ETH_TX_BUF_COUNT]
-__aligned(ETH_DESC_ALIGNMENT);
-static struct eth_buf_desc dma_rx_desc_tab[ETH_RX_BUF_COUNT]
-__aligned(ETH_DESC_ALIGNMENT);
+static uint8_t dma_tx_buffer[ETH_TX_BUF_COUNT][ETH_TX_BUF_SIZE] __aligned(
+	ETH_BUF_ALIGNMENT);
+static uint8_t dma_rx_buffer[ETH_RX_BUF_COUNT][ETH_RX_BUF_SIZE] __aligned(
+	ETH_BUF_ALIGNMENT);
+static struct eth_buf_desc
+	dma_tx_desc_tab[ETH_TX_BUF_COUNT] __aligned(ETH_DESC_ALIGNMENT);
+static struct eth_buf_desc
+	dma_rx_desc_tab[ETH_RX_BUF_COUNT] __aligned(ETH_DESC_ALIGNMENT);
 static uint32_t tx_buf_idx;
 static uint32_t rx_buf_idx;
-
 
 static void link_configure(ETH_TypeDef *eth, uint32_t flags)
 {
@@ -93,7 +92,7 @@ static void eth_init_tx_buf_desc(void)
 
 	/* Initialize TX buffer descriptors */
 	for (i = 0; i < ETH_TX_BUF_COUNT; i++) {
-		address = (uint32_t) dma_tx_buffer[i];
+		address = (uint32_t)dma_tx_buffer[i];
 		dma_tx_desc_tab[i].address = address;
 		dma_tx_desc_tab[i].status = ETH_TX_USED;
 	}
@@ -109,7 +108,7 @@ static void eth_init_rx_buf_desc(void)
 	int i;
 
 	for (i = 0; i < ETH_RX_BUF_COUNT; i++) {
-		address = (uint32_t) dma_rx_buffer[i];
+		address = (uint32_t)dma_rx_buffer[i];
 		dma_rx_desc_tab[i].address = address & ETH_RX_ADDRESS;
 		dma_rx_desc_tab[i].status = 0;
 	}
@@ -174,8 +173,8 @@ static struct net_pkt *frame_get(const struct device *dev)
 		}
 
 		if (sofIdx != UINT32_MAX) {
-			total_len += (dma_rx_desc_tab[j].status &
-				ETH_RX_LENGTH);
+			total_len +=
+				(dma_rx_desc_tab[j].status & ETH_RX_LENGTH);
 
 			/* Check for EOF */
 			if (dma_rx_desc_tab[j].status & ETH_RX_EOF) {
@@ -191,8 +190,8 @@ static struct net_pkt *frame_get(const struct device *dev)
 	/* Verify we found a full frame */
 	if (eofIdx != UINT32_MAX) {
 		/* Allocate room for full frame */
-		rx_frame = net_pkt_rx_alloc_with_buffer(dev_data->iface,
-					total_len, AF_UNSPEC, 0, K_NO_WAIT);
+		rx_frame = net_pkt_rx_alloc_with_buffer(
+			dev_data->iface, total_len, AF_UNSPEC, 0, K_NO_WAIT);
 		if (!rx_frame) {
 			LOG_ERR("Failed to obtain RX buffer");
 			ETH_RX_DISABLE(eth);
@@ -211,8 +210,7 @@ static struct net_pkt *frame_get(const struct device *dev)
 			if (net_pkt_write(rx_frame, &dma_rx_buffer[j],
 					  frag_len) < 0) {
 				LOG_ERR("Failed to append RX buffer");
-				dma_rx_desc_tab[j].address &=
-					~ETH_RX_OWNERSHIP;
+				dma_rx_desc_tab[j].address &= ~ETH_RX_OWNERSHIP;
 				net_pkt_unref(rx_frame);
 				rx_frame = NULL;
 				break;
@@ -310,8 +308,8 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 		tx_buf_idx++;
 	} else {
 		dma_tx_desc_tab[tx_buf_idx].status =
-			(total_len & ETH_TX_LENGTH) | (ETH_TX_LAST |
-				ETH_TX_WRAP);
+			(total_len & ETH_TX_LENGTH) |
+			(ETH_TX_LAST | ETH_TX_WRAP);
 		tx_buf_idx = 0;
 	}
 
@@ -336,8 +334,9 @@ static void rx_thread(void *arg1, void *unused1, void *unused2)
 	__ASSERT_NO_MSG(cfg != NULL);
 
 	while (1) {
-		res = k_sem_take(&dev_data->rx_sem, K_MSEC(
-			 CONFIG_ETH_GECKO_CARRIER_CHECK_RX_IDLE_TIMEOUT_MS));
+		res = k_sem_take(
+			&dev_data->rx_sem,
+			K_MSEC(CONFIG_ETH_GECKO_CARRIER_CHECK_RX_IDLE_TIMEOUT_MS));
 		if (res == 0) {
 			if (dev_data->link_up != true) {
 				dev_data->link_up = true;
@@ -356,7 +355,7 @@ static void rx_thread(void *arg1, void *unused1, void *unused2)
 					eth_gecko_setup_mac(dev);
 					net_eth_carrier_on(dev_data->iface);
 				}
-			} else   {
+			} else {
 				if (dev_data->link_up != false) {
 					dev_data->link_up = false;
 					LOG_INF("Link down");
@@ -376,8 +375,7 @@ static void eth_isr(const struct device *dev)
 	uint32_t int_stat = eth->IFCR;
 	uint32_t tx_irq_mask = (ETH_IENS_TXCMPLT | ETH_IENS_TXUNDERRUN |
 				ETH_IENS_RTRYLMTORLATECOL |
-				ETH_IENS_TXUSEDBITREAD |
-				ETH_IENS_AMBAERR);
+				ETH_IENS_TXUSEDBITREAD | ETH_IENS_AMBAERR);
 	uint32_t rx_irq_mask = (ETH_IENS_RXCMPLT | ETH_IENS_RXUSEDBITREAD);
 
 	__ASSERT_NO_MSG(dev_data != NULL);
@@ -388,7 +386,7 @@ static void eth_isr(const struct device *dev)
 		if (int_stat & ETH_IENS_RXCMPLT) {
 			/* Receive complete */
 			k_sem_give(&dev_data->rx_sem);
-		} else   {
+		} else {
 			/* Receive error */
 			LOG_DBG("RX Error");
 			rx_error_handler(eth);
@@ -401,7 +399,7 @@ static void eth_isr(const struct device *dev)
 	if (int_stat & tx_irq_mask) {
 		if (int_stat & ETH_IENS_TXCMPLT) {
 			/* Transmit complete */
-		} else   {
+		} else {
 			/* Transmit error: no actual handling, the current
 			 * buffer is no longer used and we release the
 			 * semaphore which signals the user thread to
@@ -443,8 +441,8 @@ static void eth_init_pins(const struct device *dev)
 	for (idx = 0; idx < ARRAY_SIZE(cfg->pin_list->rmii); idx++)
 		soc_gpio_configure(&cfg->pin_list->rmii[idx]);
 
-	eth->ROUTELOC1 |= (DT_INST_PROP(0, location_rmii) <<
-			   _ETH_ROUTELOC1_RMIILOC_SHIFT);
+	eth->ROUTELOC1 |= (DT_INST_PROP(0, location_rmii)
+			   << _ETH_ROUTELOC1_RMIILOC_SHIFT);
 	eth->ROUTEPEN |= ETH_ROUTEPEN_RMIIPEN;
 #endif
 
@@ -452,11 +450,10 @@ static void eth_init_pins(const struct device *dev)
 	for (idx = 0; idx < ARRAY_SIZE(cfg->pin_list->mdio); idx++)
 		soc_gpio_configure(&cfg->pin_list->mdio[idx]);
 
-	eth->ROUTELOC1 |= (DT_INST_PROP(0, location_mdio) <<
-			   _ETH_ROUTELOC1_MDIOLOC_SHIFT);
+	eth->ROUTELOC1 |= (DT_INST_PROP(0, location_mdio)
+			   << _ETH_ROUTELOC1_MDIOLOC_SHIFT);
 	eth->ROUTEPEN |= ETH_ROUTEPEN_MDIOPEN;
 #endif
-
 }
 
 static int eth_init(const struct device *dev)
@@ -518,10 +515,10 @@ static void eth_iface_init(struct net_if *iface)
 	generate_mac(dev_data->mac_addr);
 
 	/* Set link address */
-	LOG_DBG("MAC %02x:%02x:%02x:%02x:%02x:%02x",
-		dev_data->mac_addr[0], dev_data->mac_addr[1],
-		dev_data->mac_addr[2], dev_data->mac_addr[3],
-		dev_data->mac_addr[4], dev_data->mac_addr[5]);
+	LOG_DBG("MAC %02x:%02x:%02x:%02x:%02x:%02x", dev_data->mac_addr[0],
+		dev_data->mac_addr[1], dev_data->mac_addr[2],
+		dev_data->mac_addr[3], dev_data->mac_addr[4],
+		dev_data->mac_addr[5]);
 
 	net_if_set_link_addr(iface, dev_data->mac_addr,
 			     sizeof(dev_data->mac_addr), NET_LINK_ETHERNET);
@@ -532,13 +529,10 @@ static void eth_iface_init(struct net_if *iface)
 
 	/* Filtering MAC addresses */
 	eth->SPECADDR1BOTTOM =
-		(dev_data->mac_addr[0] << 0)  |
-		(dev_data->mac_addr[1] << 8)  |
-		(dev_data->mac_addr[2] << 16) |
-		(dev_data->mac_addr[3] << 24);
-	eth->SPECADDR1TOP =
-		(dev_data->mac_addr[4] << 0)  |
-		(dev_data->mac_addr[5] << 8);
+		(dev_data->mac_addr[0] << 0) | (dev_data->mac_addr[1] << 8) |
+		(dev_data->mac_addr[2] << 16) | (dev_data->mac_addr[3] << 24);
+	eth->SPECADDR1TOP = (dev_data->mac_addr[4] << 0) |
+			    (dev_data->mac_addr[5] << 8);
 
 	eth->SPECADDR2BOTTOM = 0;
 	eth->SPECADDR3BOTTOM = 0;
@@ -570,18 +564,14 @@ static void eth_iface_init(struct net_if *iface)
 			ETH_RXSTATUS_FRMRX | ETH_RXSTATUS_BUFFNOTAVAIL;
 
 	/* Enable interrupts */
-	eth->IENS = ETH_IENS_RXCMPLT |
-		    ETH_IENS_RXUSEDBITREAD |
-		    ETH_IENS_TXCMPLT |
-		    ETH_IENS_TXUNDERRUN |
-		    ETH_IENS_RTRYLMTORLATECOL |
-		    ETH_IENS_TXUSEDBITREAD |
+	eth->IENS = ETH_IENS_RXCMPLT | ETH_IENS_RXUSEDBITREAD |
+		    ETH_IENS_TXCMPLT | ETH_IENS_TXUNDERRUN |
+		    ETH_IENS_RTRYLMTORLATECOL | ETH_IENS_TXUSEDBITREAD |
 		    ETH_IENS_AMBAERR;
 
 	/* Additional DMA configuration */
 	eth->DMACFG |= _ETH_DMACFG_AMBABRSTLEN_MASK |
-		       ETH_DMACFG_FRCDISCARDONERR |
-		       ETH_DMACFG_TXPBUFTCPEN;
+		       ETH_DMACFG_FRCDISCARDONERR | ETH_DMACFG_TXPBUFTCPEN;
 	eth->DMACFG &= ~ETH_DMACFG_HDRDATASPLITEN;
 
 	/* Set network configuration */
@@ -610,17 +600,18 @@ static void eth_iface_init(struct net_if *iface)
 	/* Start interruption-poll thread */
 	k_thread_create(&dev_data->rx_thread, dev_data->rx_thread_stack,
 			K_KERNEL_STACK_SIZEOF(dev_data->rx_thread_stack),
-			rx_thread, (void *) dev, NULL, NULL,
-			K_PRIO_COOP(CONFIG_ETH_GECKO_RX_THREAD_PRIO),
-			0, K_NO_WAIT);
+			rx_thread, (void *)dev, NULL, NULL,
+			K_PRIO_COOP(CONFIG_ETH_GECKO_RX_THREAD_PRIO), 0,
+			K_NO_WAIT);
 }
 
-static enum ethernet_hw_caps eth_gecko_get_capabilities(const struct device *dev)
+static enum ethernet_hw_caps
+eth_gecko_get_capabilities(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
 	return (ETHERNET_AUTO_NEGOTIATION_SET | ETHERNET_LINK_10BASE_T |
-			ETHERNET_LINK_100BASE_T | ETHERNET_DUPLEX_SET);
+		ETHERNET_LINK_100BASE_T | ETHERNET_DUPLEX_SET);
 }
 
 static const struct ethernet_api eth_api = {
@@ -633,26 +624,21 @@ DEVICE_DECLARE(eth_gecko);
 
 static void eth0_irq_config(void)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority), eth_isr,
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), eth_isr,
 		    DEVICE_GET(eth_gecko), 0);
 	irq_enable(DT_INST_IRQN(0));
 }
 
-static const struct eth_gecko_pin_list pins_eth0 = {
-	.mdio = PIN_LIST_PHY,
-	.rmii = PIN_LIST_RMII
-};
+static const struct eth_gecko_pin_list pins_eth0 = { .mdio = PIN_LIST_PHY,
+						     .rmii = PIN_LIST_RMII };
 
 static const struct eth_gecko_dev_cfg eth0_config = {
-	.regs = (ETH_TypeDef *)
-		DT_INST_REG_ADDR(0),
+	.regs = (ETH_TypeDef *)DT_INST_REG_ADDR(0),
 	.pin_list = &pins_eth0,
-	.pin_list_size = ARRAY_SIZE(pins_eth0.mdio) +
-			 ARRAY_SIZE(pins_eth0.rmii),
+	.pin_list_size =
+		ARRAY_SIZE(pins_eth0.mdio) + ARRAY_SIZE(pins_eth0.rmii),
 	.config_func = eth0_irq_config,
-	.phy = { (ETH_TypeDef *)
-		 DT_INST_REG_ADDR(0),
+	.phy = { (ETH_TypeDef *)DT_INST_REG_ADDR(0),
 		 DT_INST_PROP(0, phy_address) },
 };
 

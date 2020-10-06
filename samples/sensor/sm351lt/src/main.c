@@ -19,15 +19,12 @@ static void fetch_and_display(const struct device *sensor)
 
 	++count;
 	if (rc == 0) {
-		rc = sensor_channel_get(sensor,
-					SENSOR_CHAN_PROX,
-					&mag);
+		rc = sensor_channel_get(sensor, SENSOR_CHAN_PROX, &mag);
 	}
 	if (rc < 0) {
 		printf("ERROR: Update failed: %d\n", rc);
 	} else {
-		printf("#%u @ %u ms: %d\n",
-		       count, k_uptime_get_32(), mag.val1);
+		printf("#%u @ %u ms: %d\n", count, k_uptime_get_32(), mag.val1);
 	}
 }
 
@@ -41,7 +38,8 @@ static void trigger_handler(const struct device *dev,
 
 void main(void)
 {
-	const struct device *sensor = device_get_binding(DT_LABEL(DT_INST(0, honeywell_sm351lt)));
+	const struct device *sensor =
+		device_get_binding(DT_LABEL(DT_INST(0, honeywell_sm351lt)));
 
 	if (sensor == NULL) {
 		printf("Could not get %s device\n",
@@ -61,8 +59,7 @@ void main(void)
 			.val1 = GPIO_INT_EDGE_BOTH,
 		};
 
-		rc = sensor_attr_set(sensor, trig.chan,
-				     SENSOR_ATTR_PRIV_START,
+		rc = sensor_attr_set(sensor, trig.chan, SENSOR_ATTR_PRIV_START,
 				     &trigger_type);
 		if (rc != 0) {
 			printf("Failed to set trigger type: %d\n", rc);

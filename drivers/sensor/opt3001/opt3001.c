@@ -21,8 +21,8 @@ static int opt3001_reg_read(struct opt3001_data *drv_data, uint8_t reg,
 {
 	uint8_t value[2];
 
-	if (i2c_burst_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-		reg, value, 2) != 0) {
+	if (i2c_burst_read(drv_data->i2c, DT_INST_REG_ADDR(0), reg, value, 2) !=
+	    0) {
 		return -EIO;
 	}
 
@@ -99,8 +99,8 @@ static int opt3001_channel_get(const struct device *dev,
 	 * lux is the integer obtained using the following formula:
 	 * (2^(exponent value)) * 0.01 * mantisa value
 	 */
-	uval = (1 << (drv_data->sample >> OPT3001_SAMPLE_EXPONENT_SHIFT))
-		* (drv_data->sample & OPT3001_MANTISSA_MASK);
+	uval = (1 << (drv_data->sample >> OPT3001_SAMPLE_EXPONENT_SHIFT)) *
+	       (drv_data->sample & OPT3001_MANTISSA_MASK);
 	val->val1 = uval / 100;
 	val->val2 = (uval % 100) * 10000;
 
@@ -124,8 +124,8 @@ static int opt3001_chip_init(const struct device *dev)
 		return -EINVAL;
 	}
 
-	if (opt3001_reg_read(drv_data, OPT3001_REG_MANUFACTURER_ID,
-		&value) != 0) {
+	if (opt3001_reg_read(drv_data, OPT3001_REG_MANUFACTURER_ID, &value) !=
+	    0) {
 		return -EIO;
 	}
 
@@ -134,8 +134,7 @@ static int opt3001_chip_init(const struct device *dev)
 		return -ENOTSUP;
 	}
 
-	if (opt3001_reg_read(drv_data, OPT3001_REG_DEVICE_ID,
-		&value) != 0) {
+	if (opt3001_reg_read(drv_data, OPT3001_REG_DEVICE_ID, &value) != 0) {
 		return -EIO;
 	}
 
@@ -165,6 +164,6 @@ int opt3001_init(const struct device *dev)
 
 static struct opt3001_data opt3001_drv_data;
 
-DEVICE_AND_API_INIT(opt3001, DT_INST_LABEL(0), opt3001_init,
-		    &opt3001_drv_data, NULL, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &opt3001_driver_api);
+DEVICE_AND_API_INIT(opt3001, DT_INST_LABEL(0), opt3001_init, &opt3001_drv_data,
+		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &opt3001_driver_api);

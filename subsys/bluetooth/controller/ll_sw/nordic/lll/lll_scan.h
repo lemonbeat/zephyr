@@ -15,26 +15,26 @@ struct lll_scan {
 	uint16_t conn_timeout;
 #endif /* CONFIG_BT_CENTRAL */
 
-	uint8_t  state:1;
-	uint8_t  chan:2;
-	uint8_t  filter_policy:2;
-	uint8_t  adv_addr_type:1;
-	uint8_t  init_addr_type:1;
-	uint8_t  type:1;
+	uint8_t state : 1;
+	uint8_t chan : 2;
+	uint8_t filter_policy : 2;
+	uint8_t adv_addr_type : 1;
+	uint8_t init_addr_type : 1;
+	uint8_t type : 1;
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
-	uint8_t  phy:3;
-	uint8_t  is_adv_ind:1;
+	uint8_t phy : 3;
+	uint8_t is_adv_ind : 1;
 #endif /* CONFIG_BT_CTLR_ADV_EXT */
 
 #if defined(CONFIG_BT_CTLR_PRIVACY)
-	uint8_t  rpa_gen:1;
+	uint8_t rpa_gen : 1;
 	/* initiator only */
 	uint8_t rl_idx;
 #endif /* CONFIG_BT_CTLR_PRIVACY */
 
-	uint8_t  init_addr[BDADDR_SIZE];
-	uint8_t  adv_addr[BDADDR_SIZE];
+	uint8_t init_addr[BDADDR_SIZE];
+	uint8_t adv_addr[BDADDR_SIZE];
 
 	uint16_t interval;
 	uint32_t ticks_window;
@@ -47,9 +47,9 @@ struct lll_scan {
 struct lll_scan_aux {
 	struct lll_hdr hdr;
 
-	uint8_t chan:6;
+	uint8_t chan : 6;
 
-	uint8_t phy:3;
+	uint8_t phy : 3;
 
 	uint32_t window_size_us;
 

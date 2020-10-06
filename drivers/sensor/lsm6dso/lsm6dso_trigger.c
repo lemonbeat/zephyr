@@ -123,8 +123,8 @@ static int lsm6dso_enable_g_int(const struct device *dev, int enable)
  * lsm6dso_trigger_set - link external trigger to event data ready
  */
 int lsm6dso_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler)
+			const struct sensor_trigger *trig,
+			sensor_trigger_handler_t handler)
 {
 	struct lsm6dso_data *lsm6dso = dev->data;
 
@@ -178,9 +178,9 @@ static void lsm6dso_handle_interrupt(const struct device *dev)
 
 		if ((status.xlda == 0) && (status.gda == 0)
 #if defined(CONFIG_LSM6DSO_ENABLE_TEMP)
-					&& (status.tda == 0)
+		    && (status.tda == 0)
 #endif
-					) {
+		) {
 			break;
 		}
 
@@ -204,7 +204,7 @@ static void lsm6dso_handle_interrupt(const struct device *dev)
 }
 
 static void lsm6dso_gpio_callback(const struct device *dev,
-				    struct gpio_callback *cb, uint32_t pins)
+				  struct gpio_callback *cb, uint32_t pins)
 {
 	struct lsm6dso_data *lsm6dso =
 		CONTAINER_OF(cb, struct lsm6dso_data, gpio_cb);
@@ -251,8 +251,7 @@ int lsm6dso_init_interrupt(const struct device *dev)
 	/* setup data ready gpio interrupt (INT1 or INT2) */
 	lsm6dso->gpio = device_get_binding(cfg->int_gpio_port);
 	if (lsm6dso->gpio == NULL) {
-		LOG_DBG("Cannot get pointer to %s device",
-			    cfg->int_gpio_port);
+		LOG_DBG("Cannot get pointer to %s device", cfg->int_gpio_port);
 		return -EINVAL;
 	}
 
@@ -261,9 +260,9 @@ int lsm6dso_init_interrupt(const struct device *dev)
 
 	k_thread_create(&lsm6dso->thread, lsm6dso->thread_stack,
 			CONFIG_LSM6DSO_THREAD_STACK_SIZE,
-			(k_thread_entry_t)lsm6dso_thread, lsm6dso,
-			NULL, NULL, K_PRIO_COOP(CONFIG_LSM6DSO_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)lsm6dso_thread, lsm6dso, NULL, NULL,
+			K_PRIO_COOP(CONFIG_LSM6DSO_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_LSM6DSO_TRIGGER_GLOBAL_THREAD)
 	lsm6dso->work.handler = lsm6dso_work_cb;
 #endif /* CONFIG_LSM6DSO_TRIGGER_OWN_THREAD */
@@ -275,8 +274,7 @@ int lsm6dso_init_interrupt(const struct device *dev)
 		return ret;
 	}
 
-	gpio_init_callback(&lsm6dso->gpio_cb,
-			   lsm6dso_gpio_callback,
+	gpio_init_callback(&lsm6dso->gpio_cb, lsm6dso_gpio_callback,
 			   BIT(cfg->int_gpio_pin));
 
 	if (gpio_add_callback(lsm6dso->gpio, &lsm6dso->gpio_cb) < 0) {
@@ -285,8 +283,8 @@ int lsm6dso_init_interrupt(const struct device *dev)
 	}
 
 	/* enable interrupt on int1/int2 in pulse mode */
-	if (lsm6dso_int_notification_set(lsm6dso->ctx,
-					 LSM6DSO_ALL_INT_PULSED) < 0) {
+	if (lsm6dso_int_notification_set(lsm6dso->ctx, LSM6DSO_ALL_INT_PULSED) <
+	    0) {
 		LOG_DBG("Could not set pulse mode");
 		return -EIO;
 	}

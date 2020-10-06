@@ -40,7 +40,6 @@ extern "C" {
  */
 #define PHONY_HARD_IRQ 0xFFFF
 
-
 #ifdef __cplusplus
 }
 #endif

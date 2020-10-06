@@ -36,18 +36,18 @@
 #include <xtensa/hal.h>
 
 /* size of stack area used by each thread */
-#define STACKSIZE               1024
+#define STACKSIZE 1024
 
 /* scheduling priority used by each thread */
-#define PRIORITY                7
+#define PRIORITY 7
 
 /* delay between greetings (in ms) */
-#define SLEEPTIME               K_MSEC(500)
+#define SLEEPTIME K_MSEC(500)
 
 /* max time to be waited for dma to complete (in ms) */
-#define WAITTIME                K_MSEC(1000)
+#define WAITTIME K_MSEC(1000)
 
-#define MAX_TRANSFERS		4
+#define MAX_TRANSFERS 4
 
 /* This semaphore is used as a signal from the dma isr to the app
  * to let it know the DMA is complete. The app should wait till
@@ -57,8 +57,8 @@ K_SEM_DEFINE(dma_sem, 0, 1);
 
 extern struct k_sem thread_sem;
 
-#define DMA_DEVICE_NAME		CONFIG_DMA_0_NAME
-#define RX_BUFF_SIZE		(48)
+#define DMA_DEVICE_NAME CONFIG_DMA_0_NAME
+#define RX_BUFF_SIZE (48)
 
 struct transfers {
 	const char *source;
@@ -100,8 +100,8 @@ static struct transfers transfer_blocks[MAX_TRANSFERS] = {
 static const struct device *dma_device;
 static uint32_t current_block_count, total_block_count;
 
-static void test_done(const struct device *dma_dev, void *arg,
-		      uint32_t channel, int error_code)
+static void test_done(const struct device *dma_dev, void *arg, uint32_t channel,
+		      int error_code)
 {
 	uint32_t src, dst;
 	size_t size;
@@ -125,7 +125,7 @@ static void test_done(const struct device *dma_dev, void *arg,
 
 static int test_task(uint32_t chan_id, uint32_t blen, uint32_t block_count)
 {
-	struct dma_config dma_cfg = {0};
+	struct dma_config dma_cfg = { 0 };
 
 	struct dma_block_config dma_block_cfg = {
 		.block_size = sizeof(tx_data),
@@ -135,7 +135,7 @@ static int test_task(uint32_t chan_id, uint32_t blen, uint32_t block_count)
 
 	if (block_count > ARRAY_SIZE(transfer_blocks)) {
 		printk("block_count %u is greater than %ld\n", block_count,
-			ARRAY_SIZE(transfer_blocks));
+		       ARRAY_SIZE(transfer_blocks));
 		return -1;
 	}
 
@@ -157,8 +157,8 @@ static int test_task(uint32_t chan_id, uint32_t blen, uint32_t block_count)
 	dma_cfg.block_count = 1U;
 	dma_cfg.head_block = &dma_block_cfg;
 
-	printk("Preparing DMA Controller: Chan_ID=%u, BURST_LEN=%u\n",
-			chan_id, blen);
+	printk("Preparing DMA Controller: Chan_ID=%u, BURST_LEN=%u\n", chan_id,
+	       blen);
 
 	(void)memset(rx_data, 0, sizeof(rx_data));
 	(void)memset(rx_data2, 0, sizeof(rx_data2));

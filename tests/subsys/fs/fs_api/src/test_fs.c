@@ -22,8 +22,8 @@ static int file_length;
 static struct fs_mount_t *mp[FS_TYPE_EXTERNAL_BASE];
 static bool nospace;
 
-static
-int temp_open(struct fs_file_t *zfp, const char *file_name, fs_mode_t flags)
+static int temp_open(struct fs_file_t *zfp, const char *file_name,
+		     fs_mode_t flags)
 {
 	if (zfp == NULL || file_name == NULL) {
 		return -EINVAL;
@@ -72,7 +72,7 @@ static int temp_unlink(struct fs_mount_t *mountp, const char *path)
 }
 
 static int temp_rename(struct fs_mount_t *mountp, const char *from,
-			const char *to)
+		       const char *to)
 {
 	if (mountp == NULL || from == NULL || to == NULL) {
 		return -EINVAL;
@@ -116,7 +116,7 @@ static ssize_t temp_write(struct fs_file_t *zfp, const void *ptr, size_t size)
 	}
 
 	bw = size;
-	if (file_length + bw >  BUF_LEN) {
+	if (file_length + bw > BUF_LEN) {
 		bw = BUF_LEN - file_length;
 		nospace = true;
 	}
@@ -130,7 +130,6 @@ static ssize_t temp_write(struct fs_file_t *zfp, const void *ptr, size_t size)
 
 static int temp_seek(struct fs_file_t *zfp, off_t offset, int whence)
 {
-
 	if (!zfp) {
 		return -EINVAL;
 	}
@@ -270,8 +269,8 @@ static int temp_closedir(struct fs_dir_t *zdp)
 	return 0;
 }
 
-static int temp_stat(struct fs_mount_t *mountp,
-		      const char *path, struct fs_dirent *entry)
+static int temp_stat(struct fs_mount_t *mountp, const char *path,
+		     struct fs_dirent *entry)
 {
 	if (mountp == NULL || path == NULL || entry == NULL) {
 		return -EINVAL;
@@ -280,8 +279,8 @@ static int temp_stat(struct fs_mount_t *mountp,
 	return 0;
 }
 
-static int temp_statvfs(struct fs_mount_t *mountp,
-			 const char *path, struct fs_statvfs *stat)
+static int temp_statvfs(struct fs_mount_t *mountp, const char *path,
+			struct fs_statvfs *stat)
 {
 	if (mountp == NULL || path == NULL || stat == NULL) {
 		return -EINVAL;

@@ -114,9 +114,10 @@ static inline int stm32_clock_control_off(const struct device *dev,
 	return 0;
 }
 
-static int stm32_clock_control_get_subsys_rate(const struct device *clock,
-					       clock_control_subsys_t sub_system,
-					       uint32_t *rate)
+static int
+stm32_clock_control_get_subsys_rate(const struct device *clock,
+				    clock_control_subsys_t sub_system,
+				    uint32_t *rate)
 {
 	struct stm32_pclken *pclken = (struct stm32_pclken *)(sub_system);
 
@@ -138,7 +139,7 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 			break;
 		case LL_APB1_GRP1_PERIPH_LPTIM1:
 			*rate = LL_RCC_GetLPTIMClockFreq(
-					LL_RCC_LPTIM1_CLKSOURCE);
+				LL_RCC_LPTIM1_CLKSOURCE);
 			break;
 		case LL_APB1_GRP1_PERIPH_SPI2:
 		case LL_APB1_GRP1_PERIPH_SPI3:
@@ -147,17 +148,17 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 		case LL_APB1_GRP1_PERIPH_USART2:
 		case LL_APB1_GRP1_PERIPH_UART4:
 			*rate = LL_RCC_GetUARTClockFreq(
-					LL_RCC_UART24_CLKSOURCE);
+				LL_RCC_UART24_CLKSOURCE);
 			break;
 		case LL_APB1_GRP1_PERIPH_USART3:
 		case LL_APB1_GRP1_PERIPH_UART5:
 			*rate = LL_RCC_GetUARTClockFreq(
-					LL_RCC_UART35_CLKSOURCE);
+				LL_RCC_UART35_CLKSOURCE);
 			break;
 		case LL_APB1_GRP1_PERIPH_UART7:
 		case LL_APB1_GRP1_PERIPH_UART8:
 			*rate = LL_RCC_GetUARTClockFreq(
-					LL_RCC_UART78_CLKSOURCE);
+				LL_RCC_UART78_CLKSOURCE);
 			break;
 		case LL_APB1_GRP1_PERIPH_I2C1:
 		case LL_APB1_GRP1_PERIPH_I2C2:
@@ -169,7 +170,7 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 			break;
 		case LL_APB1_GRP1_PERIPH_SPDIF:
 			*rate = LL_RCC_GetSPDIFRXClockFreq(
-					LL_RCC_SPDIFRX_CLKSOURCE);
+				LL_RCC_SPDIFRX_CLKSOURCE);
 			break;
 		case LL_APB1_GRP1_PERIPH_CEC:
 			*rate = LL_RCC_GetCECClockFreq(LL_RCC_CEC_CLKSOURCE);
@@ -199,7 +200,7 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 			break;
 		case LL_APB2_GRP1_PERIPH_USART6:
 			*rate = LL_RCC_GetUARTClockFreq(
-					LL_RCC_USART6_CLKSOURCE);
+				LL_RCC_USART6_CLKSOURCE);
 			break;
 		case LL_APB2_GRP1_PERIPH_SAI1:
 			*rate = LL_RCC_GetSAIClockFreq(LL_RCC_SAI1_CLKSOURCE);
@@ -212,11 +213,11 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 			break;
 		case LL_APB2_GRP1_PERIPH_DFSDM1:
 			*rate = LL_RCC_GetDFSDMClockFreq(
-					LL_RCC_DFSDM_CLKSOURCE);
+				LL_RCC_DFSDM_CLKSOURCE);
 			break;
 		case LL_APB2_GRP1_PERIPH_FDCAN:
 			*rate = LL_RCC_GetFDCANClockFreq(
-					LL_RCC_FDCAN_CLKSOURCE);
+				LL_RCC_FDCAN_CLKSOURCE);
 			break;
 		case LL_APB2_GRP1_PERIPH_ADFSDM1:
 		default:
@@ -228,12 +229,12 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 		case LL_APB3_GRP1_PERIPH_LPTIM2:
 		case LL_APB3_GRP1_PERIPH_LPTIM3:
 			*rate = LL_RCC_GetLPTIMClockFreq(
-					LL_RCC_LPTIM23_CLKSOURCE);
+				LL_RCC_LPTIM23_CLKSOURCE);
 			break;
 		case LL_APB3_GRP1_PERIPH_LPTIM4:
 		case LL_APB3_GRP1_PERIPH_LPTIM5:
 			*rate = LL_RCC_GetLPTIMClockFreq(
-					LL_RCC_LPTIM45_CLKSOURCE);
+				LL_RCC_LPTIM45_CLKSOURCE);
 			break;
 		case LL_APB3_GRP1_PERIPH_SAI4:
 			*rate = LL_RCC_GetSAIClockFreq(LL_RCC_SAI4_CLKSOURCE);
@@ -257,7 +258,7 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 			break;
 		case LL_APB4_GRP1_PERIPH_USBPHY:
 			*rate = LL_RCC_GetUSBPHYClockFreq(
-					LL_RCC_USBPHY_CLKSOURCE);
+				LL_RCC_USBPHY_CLKSOURCE);
 			break;
 		case LL_APB4_GRP1_PERIPH_DDRPERFM:
 		case LL_APB4_GRP1_PERIPH_STGENRO:
@@ -277,12 +278,12 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 			break;
 		case LL_APB5_GRP1_PERIPH_USART1:
 			*rate = LL_RCC_GetUARTClockFreq(
-					LL_RCC_USART1_CLKSOURCE);
+				LL_RCC_USART1_CLKSOURCE);
 			break;
 		case LL_APB5_GRP1_PERIPH_STGEN:
 		case LL_APB5_GRP1_PERIPH_STGENSTP:
 			*rate = LL_RCC_GetSTGENClockFreq(
-					LL_RCC_STGEN_CLKSOURCE);
+				LL_RCC_STGEN_CLKSOURCE);
 			break;
 		case LL_APB5_GRP1_PERIPH_RTCAPB:
 			*rate = LL_RCC_GetRTCClockFreq();
@@ -305,7 +306,7 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 			break;
 		case LL_AHB2_GRP1_PERIPH_SDMMC3:
 			*rate = LL_RCC_GetSDMMCClockFreq(
-					LL_RCC_SDMMC3_CLKSOURCE);
+				LL_RCC_SDMMC3_CLKSOURCE);
 			break;
 		case LL_AHB2_GRP1_PERIPH_DMA1:
 		case LL_AHB2_GRP1_PERIPH_DMA2:
@@ -363,7 +364,7 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 		case LL_AHB6_GRP1_PERIPH_SDMMC1:
 		case LL_AHB6_GRP1_PERIPH_SDMMC2:
 			*rate = LL_RCC_GetSDMMCClockFreq(
-					LL_RCC_SDMMC12_CLKSOURCE);
+				LL_RCC_SDMMC12_CLKSOURCE);
 			break;
 		case LL_AHB6_GRP1_PERIPH_MDMA:
 		case LL_AHB6_GRP1_PERIPH_GPU:
@@ -410,8 +411,6 @@ static int stm32_clock_control_init(const struct device *dev)
  * that the device init runs just after SOC init
  */
 DEVICE_AND_API_INIT(rcc_stm32, STM32_CLOCK_CONTROL_NAME,
-		    &stm32_clock_control_init,
-		    NULL, NULL,
-		    PRE_KERNEL_1,
+		    &stm32_clock_control_init, NULL, NULL, PRE_KERNEL_1,
 		    CONFIG_CLOCK_CONTROL_STM32_DEVICE_INIT_PRIORITY,
 		    &stm32_clock_control_api);

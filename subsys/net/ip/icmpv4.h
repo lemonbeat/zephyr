@@ -18,12 +18,12 @@
 #include <net/net_ip.h>
 #include <net/net_pkt.h>
 
-#define NET_ICMPV4_DST_UNREACH  3	/* Destination unreachable */
+#define NET_ICMPV4_DST_UNREACH 3 /* Destination unreachable */
 #define NET_ICMPV4_ECHO_REQUEST 8
-#define NET_ICMPV4_ECHO_REPLY   0
+#define NET_ICMPV4_ECHO_REPLY 0
 
-#define NET_ICMPV4_DST_UNREACH_NO_PROTO  2 /* Protocol not supported */
-#define NET_ICMPV4_DST_UNREACH_NO_PORT   3 /* Port unreachable */
+#define NET_ICMPV4_DST_UNREACH_NO_PROTO 2 /* Protocol not supported */
+#define NET_ICMPV4_DST_UNREACH_NO_PORT 3 /* Port unreachable */
 
 #define NET_ICMPV4_UNUSED_LEN 4
 
@@ -33,9 +33,8 @@ struct net_icmpv4_echo_req {
 } __packed;
 
 typedef enum net_verdict (*icmpv4_callback_handler_t)(
-					struct net_pkt *pkt,
-					struct net_ipv4_hdr *ip_hdr,
-					struct net_icmp_hdr *icmp_hdr);
+	struct net_pkt *pkt, struct net_ipv4_hdr *ip_hdr,
+	struct net_icmp_hdr *icmp_hdr);
 
 struct net_icmpv4_handler {
 	sys_snode_t node;
@@ -69,19 +68,14 @@ int net_icmpv4_send_error(struct net_pkt *pkt, uint8_t type, uint8_t code);
  * @return Return 0 if the sending succeed, <0 otherwise.
  */
 #if defined(CONFIG_NET_NATIVE_IPV4)
-int net_icmpv4_send_echo_request(struct net_if *iface,
-				 struct in_addr *dst,
-				 uint16_t identifier,
-				 uint16_t sequence,
-				 const void *data,
-				 size_t data_size);
+int net_icmpv4_send_echo_request(struct net_if *iface, struct in_addr *dst,
+				 uint16_t identifier, uint16_t sequence,
+				 const void *data, size_t data_size);
 #else
-static inline int net_icmpv4_send_echo_request(struct net_if *iface,
-					       struct in_addr *dst,
-					       uint16_t identifier,
-					       uint16_t sequence,
-					       const void *data,
-					       size_t data_size)
+static inline int
+net_icmpv4_send_echo_request(struct net_if *iface, struct in_addr *dst,
+			     uint16_t identifier, uint16_t sequence,
+			     const void *data, size_t data_size)
 {
 	ARG_UNUSED(iface);
 	ARG_UNUSED(dst);

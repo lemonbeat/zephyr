@@ -18,9 +18,9 @@ extern "C" {
 
 struct settings_file {
 	struct settings_store cf_store;
-	const char *cf_name;	/* filename */
-	int cf_maxlines;	/* max # of lines before compressing */
-	int cf_lines;		/* private */
+	const char *cf_name; /* filename */
+	int cf_maxlines; /* max # of lines before compressing */
+	int cf_lines; /* private */
 };
 
 /* register file to be source of settings */

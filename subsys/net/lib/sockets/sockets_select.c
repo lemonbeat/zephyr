@@ -10,10 +10,11 @@
 #define STRUCT_MEMBER_ARRAY_SIZE(type, field) ARRAY_SIZE(((type *)0)->field)
 
 /* Returns results in word_idx and bit_mask "output" params */
-#define FD_SET_CALC_OFFSETS(set, word_idx, bit_mask) { \
-	unsigned int b_idx = fd % (sizeof(set->bitset[0]) * 8); \
-	word_idx = fd / (sizeof(set->bitset[0]) * 8); \
-	bit_mask = 1 << b_idx; \
+#define FD_SET_CALC_OFFSETS(set, word_idx, bit_mask)                    \
+	{                                                               \
+		unsigned int b_idx = fd % (sizeof(set->bitset[0]) * 8); \
+		word_idx = fd / (sizeof(set->bitset[0]) * 8);           \
+		bit_mask = 1 << b_idx;                                  \
 	}
 
 void ZSOCK_FD_ZERO(zsock_fd_set *set)
@@ -127,8 +128,7 @@ int zsock_select(int nfds, zsock_fd_set *readfds, zsock_fd_set *writefds,
 
 	poll_timeout = -1;
 	if (timeout != NULL) {
-		poll_timeout = timeout->tv_sec * 1000
-			       + timeout->tv_usec / 1000;
+		poll_timeout = timeout->tv_sec * 1000 + timeout->tv_usec / 1000;
 	}
 
 	res = zsock_poll(pfds, num_pfds, poll_timeout);

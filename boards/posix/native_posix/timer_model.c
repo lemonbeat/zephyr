@@ -50,15 +50,14 @@ static char *us_time_to_str(char *dest, uint64_t time)
 		unsigned int second;
 		unsigned int us;
 
-		hour   = (time / 3600U / 1000000U) % 24;
+		hour = (time / 3600U / 1000000U) % 24;
 		minute = (time / 60U / 1000000U) % 60;
 		second = (time / 1000000U) % 60;
-		us     = time % 1000000;
+		us = time % 1000000;
 
 		sprintf(dest, "%02u:%02u:%02u.%06u", hour, minute, second, us);
 	} else {
 		sprintf(dest, " NEVER/UNKNOWN ");
-
 	}
 	return dest;
 }
@@ -170,7 +169,6 @@ void hwtimer_init(void)
 
 void hwtimer_cleanup(void)
 {
-
 }
 
 /**
@@ -187,9 +185,9 @@ void hwtimer_enable(uint64_t period)
 static void hwtimer_tick_timer_reached(void)
 {
 	if (real_time_mode) {
-		uint64_t expected_rt = (hw_timer_tick_timer - last_radj_stime)
-				    / clock_ratio
-				    + last_radj_rtime;
+		uint64_t expected_rt =
+			(hw_timer_tick_timer - last_radj_stime) / clock_ratio +
+			last_radj_rtime;
 		uint64_t real_time = get_host_us_time();
 
 		int64_t diff = expected_rt - real_time;
@@ -201,19 +199,19 @@ static void hwtimer_tick_timer_reached(void)
 		us_time_to_str(es, expected_rt - boot_time);
 		us_time_to_str(rs, real_time - boot_time);
 		printf("tick @%5llims: diff = expected_rt - real_time = "
-			"%5lli = %s - %s\n",
-			hw_timer_tick_timer/1000U, diff, es, rs);
+		       "%5lli = %s - %s\n",
+		       hw_timer_tick_timer / 1000U, diff, es, rs);
 #endif
 
 		if (diff > 0) { /* we need to slow down */
 			struct timespec requested_time;
 			struct timespec remaining;
 
-			requested_time.tv_sec  = diff / 1e6;
-			requested_time.tv_nsec = (diff -
-						 requested_time.tv_sec*1e6)*1e3;
+			requested_time.tv_sec = diff / 1e6;
+			requested_time.tv_nsec =
+				(diff - requested_time.tv_sec * 1e6) * 1e3;
 
-			(void) nanosleep(&requested_time, &remaining);
+			(void)nanosleep(&requested_time, &remaining);
 		}
 	}
 
@@ -277,7 +275,6 @@ int64_t hwtimer_get_pending_silent_ticks(void)
 	return silent_ticks;
 }
 
-
 /**
  * During boot set the real time clock simulated time not start
  * from the real host time
@@ -327,22 +324,20 @@ void hwtimer_adjust_rt_ratio(double ratio_correction)
 
 #if DEBUG_NP_TIMER
 	char ct[30];
-	int64_t r_drift = (long double)(clock_ratio-1.0)/(clock_ratio)*s_diff;
+	int64_t r_drift =
+		(long double)(clock_ratio - 1.0) / (clock_ratio)*s_diff;
 
 	last_drift_offset += r_drift;
 	us_time_to_str(ct, current_stime);
 
 	printf("%s(): @%s, s_diff= %llius after last adjust\n"
-		" during which we drifted %.3fms\n"
-		" total acc drift (last_drift_offset) = %.3fms\n"
-		" last_radj_rtime = %.3fms (+%.3fms )\n"
-		" Ratio adjusted to %f\n",
-		__func__, ct, s_diff,
-		r_drift/1000.0,
-		last_drift_offset/1000.0,
-		last_radj_rtime/1000.0,
-		s_diff/clock_ratio/1000.0,
-		clock_ratio*ratio_correction);
+	       " during which we drifted %.3fms\n"
+	       " total acc drift (last_drift_offset) = %.3fms\n"
+	       " last_radj_rtime = %.3fms (+%.3fms )\n"
+	       " Ratio adjusted to %f\n",
+	       __func__, ct, s_diff, r_drift / 1000.0,
+	       last_drift_offset / 1000.0, last_radj_rtime / 1000.0,
+	       s_diff / clock_ratio / 1000.0, clock_ratio * ratio_correction);
 #endif
 
 	clock_ratio *= ratio_correction;
@@ -355,7 +350,6 @@ int64_t hwtimer_get_simu_rtc_time(void)
 {
 	return hwm_get_time() + rtc_offset;
 }
-
 
 /**
  * Return a version of the host time which would have drifted as if the host
@@ -420,9 +414,10 @@ static void cmd_stop_at_found(char *argv, int offset)
 	ARG_UNUSED(offset);
 	if (args.stop_at < 0) {
 		posix_print_error_and_exit("Error: stop-at must be positive "
-					   "(%s)\n", argv);
+					   "(%s)\n",
+					   argv);
 	}
-	hwm_set_end_of_time(args.stop_at*1e6);
+	hwm_set_end_of_time(args.stop_at * 1e6);
 }
 
 static void cmd_realtime_found(char *argv, int offset)
@@ -443,7 +438,7 @@ static void cmd_rtcoffset_found(char *argv, int offset)
 {
 	ARG_UNUSED(argv);
 	ARG_UNUSED(offset);
-	hwtimer_set_rtc_offset(args.rtc_offset*1e6);
+	hwtimer_set_rtc_offset(args.rtc_offset * 1e6);
 }
 
 static void cmd_rt_drift_found(char *argv, int offset)
@@ -452,7 +447,7 @@ static void cmd_rt_drift_found(char *argv, int offset)
 	ARG_UNUSED(offset);
 	if (!(args.rt_drift > -1)) {
 		posix_print_error_and_exit("The drift needs to be > -1. "
-					  "Please use --help for more info\n");
+					   "Please use --help for more info\n");
 	}
 	args.rt_ratio = args.rt_drift + 1;
 	hwtimer_set_rt_ratio(args.rt_ratio);
@@ -464,7 +459,7 @@ static void cmd_rt_ratio_found(char *argv, int offset)
 	ARG_UNUSED(offset);
 	if ((args.rt_ratio <= 0)) {
 		posix_print_error_and_exit("The ratio needs to be > 0. "
-					  "Please use --help for more info\n");
+					   "Please use --help for more info\n");
 	}
 	hwtimer_set_rt_ratio(args.rt_ratio);
 }
@@ -486,58 +481,48 @@ static void native_add_time_options(void)
 		 * destination, callback,
 		 * description
 		 */
-		{false, false, true,
-		"rt", "", 'b',
-		NULL, cmd_realtime_found,
-		"Slow down the execution to the host real time, "
-		"or a ratio of it (see --rt-ratio below)"},
+		{ false, false, true, "rt", "", 'b', NULL, cmd_realtime_found,
+		  "Slow down the execution to the host real time, "
+		  "or a ratio of it (see --rt-ratio below)" },
 
-		{false, false, true,
-		"no-rt", "", 'b',
-		NULL, cmd_no_realtime_found,
-		"Do NOT slow down the execution to real time, but advance "
-		"Zephyr's time as fast as possible and decoupled from the host "
-		"time"},
+		{ false, false, true, "no-rt", "", 'b', NULL,
+		  cmd_no_realtime_found,
+		  "Do NOT slow down the execution to real time, but advance "
+		  "Zephyr's time as fast as possible and decoupled from the host "
+		  "time" },
 
-		{false, false, false,
-		"rt-drift", "dratio", 'd',
-		(void *)&args.rt_drift, cmd_rt_drift_found,
-		"Drift of the simulated clock relative to the host real time. "
-		"Normally this would be set to a value of a few ppm (e.g. 50e-6"
-		") "
-		"This option has no effect in non real time mode"
-		},
+		{ false, false, false, "rt-drift", "dratio", 'd',
+		  (void *)&args.rt_drift, cmd_rt_drift_found,
+		  "Drift of the simulated clock relative to the host real time. "
+		  "Normally this would be set to a value of a few ppm (e.g. 50e-6"
+		  ") "
+		  "This option has no effect in non real time mode" },
 
-		{false, false, false,
-		"rt-ratio", "ratio", 'd',
-		(void *)&args.rt_ratio, cmd_rt_ratio_found,
-		"Relative speed of the simulated time vs real time. "
-		"For ex. set to 2 to have simulated time pass at double the "
-		"speed of real time. "
-		"Note that both rt-drift & rt-ratio adjust the same clock "
-		"speed, and therefore it does not make sense to use them "
-		"simultaneously. "
-		"This option has no effect in non real time mode"
-		},
+		{ false, false, false, "rt-ratio", "ratio", 'd',
+		  (void *)&args.rt_ratio, cmd_rt_ratio_found,
+		  "Relative speed of the simulated time vs real time. "
+		  "For ex. set to 2 to have simulated time pass at double the "
+		  "speed of real time. "
+		  "Note that both rt-drift & rt-ratio adjust the same clock "
+		  "speed, and therefore it does not make sense to use them "
+		  "simultaneously. "
+		  "This option has no effect in non real time mode" },
 
-		{false, false, false,
-		"rtc-offset", "time_offset", 'd',
-		(void *)&args.rtc_offset, cmd_rtcoffset_found,
-		"At boot offset the RTC clock by this amount of seconds"
-		},
+		{ false, false, false, "rtc-offset", "time_offset", 'd',
+		  (void *)&args.rtc_offset, cmd_rtcoffset_found,
+		  "At boot offset the RTC clock by this amount of seconds" },
 
-		{false, false, true,
-		"rtc-reset", "", 'b',
-		NULL, cmd_rtcreset_found,
-		"Start the simulated real time clock at 0. Otherwise it starts "
-		"matching the value provided by the host real time clock"},
+		{ false, false, true, "rtc-reset", "", 'b', NULL,
+		  cmd_rtcreset_found,
+		  "Start the simulated real time clock at 0. Otherwise it starts "
+		  "matching the value provided by the host real time clock" },
 
-		{false, false, false,
-		 "stop_at", "time", 'd',
-		(void *)&args.stop_at, cmd_stop_at_found,
-		"In simulated seconds, when to stop automatically"},
+		{ false, false, false, "stop_at", "time", 'd',
+		  (void *)&args.stop_at, cmd_stop_at_found,
+		  "In simulated seconds, when to stop automatically" },
 
-		ARG_TABLE_ENDMARKER};
+		ARG_TABLE_ENDMARKER
+	};
 
 	native_add_command_line_opts(timer_options);
 }

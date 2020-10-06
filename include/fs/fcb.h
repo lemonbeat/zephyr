@@ -34,7 +34,7 @@ extern "C" {
  * @{
  */
 
-#define FCB_MAX_LEN	(CHAR_MAX | CHAR_MAX << 7) /**< Max length of element */
+#define FCB_MAX_LEN (CHAR_MAX | CHAR_MAX << 7) /**< Max length of element */
 
 /**
  * @brief FCB entry info structure. This data structure describes the element
@@ -64,8 +64,8 @@ struct fcb_entry {
  *
  * @param entry fcb entry structure
  */
-#define FCB_ENTRY_FA_DATA_OFF(entry) (entry.fe_sector->fs_off +\
-				      entry.fe_data_off)
+#define FCB_ENTRY_FA_DATA_OFF(entry) \
+	(entry.fe_sector->fs_off + entry.fe_data_off)
 /**
  * @brief Structure for transferring complete information about FCB entry
  * location within flash memory.

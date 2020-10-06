@@ -116,9 +116,8 @@ void test_spinlock_bounce(void)
 {
 	int i;
 
-	k_thread_create(&cpu1_thread, cpu1_stack, CPU1_STACK_SIZE,
-			cpu1_fn, NULL, NULL, NULL,
-			0, 0, K_NO_WAIT);
+	k_thread_create(&cpu1_thread, cpu1_stack, CPU1_STACK_SIZE, cpu1_fn,
+			NULL, NULL, NULL, 0, 0, K_NO_WAIT);
 
 	k_busy_wait(10);
 
@@ -154,8 +153,7 @@ void test_spinlock_mutual_exclusion(void)
 	zassert_true(lock_runtime.locked, "Spinlock failed to lock");
 
 	/* check irq has not locked */
-	zassert_true(arch_irq_unlocked(key.key),
-			"irq should be first locked!");
+	zassert_true(arch_irq_unlocked(key.key), "irq should be first locked!");
 
 	/*
 	 * We make irq locked nested to check if interrupt
@@ -165,7 +163,7 @@ void test_spinlock_mutual_exclusion(void)
 
 	/* check irq has already locked */
 	zassert_false(arch_irq_unlocked(irq_key),
-			"irq should be already locked!");
+		      "irq should be already locked!");
 
 	arch_irq_unlock(irq_key);
 
@@ -176,8 +174,7 @@ void test_spinlock_mutual_exclusion(void)
 
 void test_main(void)
 {
-	ztest_test_suite(spinlock,
-			 ztest_unit_test(test_spinlock_basic),
+	ztest_test_suite(spinlock, ztest_unit_test(test_spinlock_basic),
 			 ztest_unit_test(test_spinlock_bounce),
 			 ztest_unit_test(test_spinlock_mutual_exclusion));
 	ztest_run_test_suite(spinlock);

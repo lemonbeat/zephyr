@@ -25,14 +25,13 @@ extern "C" {
  *
  */
 typedef struct {
-	VL53L0X_DevData_t Data;    /* embed ST Ewok Dev  data as "Data"*/
+	VL53L0X_DevData_t Data; /* embed ST Ewok Dev  data as "Data"*/
 	/*!< user specific field */
-	uint8_t   I2cDevAddr;      /* i2c device address user specific field */
-	uint8_t   comms_type;      /* VL53L0X_COMMS_I2C or VL53L0X_COMMS_SPI */
-	uint16_t  comms_speed_khz; /* Comms speed [kHz] */
+	uint8_t I2cDevAddr; /* i2c device address user specific field */
+	uint8_t comms_type; /* VL53L0X_COMMS_I2C or VL53L0X_COMMS_SPI */
+	uint16_t comms_speed_khz; /* Comms speed [kHz] */
 	const struct device *i2c;
 } VL53L0X_Dev_t;
-
 
 /**
  * @brief Declare the device Handle as a pointer of the structure VL53L0X_Dev_t
@@ -60,7 +59,6 @@ typedef VL53L0X_Dev_t *VL53L0X_DEV;
  * @param data      Data to be set
  */
 #define PALDevDataSet(Dev, field, data) ((Dev->Data.field) = (data))
-
 
 /**
  * @defgroup VL53L0X_registerAccess_group PAL Register Access Functions
@@ -169,7 +167,6 @@ VL53L0X_Error VL53L0X_UpdateByte(VL53L0X_DEV Dev, uint8_t index,
 
 /** @} end of VL53L0X_registerAccess_group */
 
-
 /**
  * @brief execute delay in all polling API call
  *
@@ -192,4 +189,4 @@ VL53L0X_Error VL53L0X_PollingDelay(VL53L0X_DEV Dev);
 }
 #endif
 
-#endif  /* ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_PLATFORM_H_ */
+#endif /* ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_PLATFORM_H_ */

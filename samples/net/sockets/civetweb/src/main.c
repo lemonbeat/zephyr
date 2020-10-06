@@ -10,13 +10,13 @@
 
 #include "civetweb.h"
 
-#define HTTP_PORT	8080
-#define HTTPS_PORT	4443
+#define HTTP_PORT 8080
+#define HTTPS_PORT 4443
 
-#define CIVETWEB_MAIN_THREAD_STACK_SIZE		CONFIG_MAIN_STACK_SIZE
+#define CIVETWEB_MAIN_THREAD_STACK_SIZE CONFIG_MAIN_STACK_SIZE
 
 /* Use samllest possible value of 1024 (see the line 18619 of civetweb.c) */
-#define MAX_REQUEST_SIZE_BYTES			1024
+#define MAX_REQUEST_SIZE_BYTES 1024
 
 K_THREAD_STACK_DEFINE(civetweb_stack, CIVETWEB_MAIN_THREAD_STACK_SIZE);
 
@@ -30,19 +30,18 @@ struct civetweb_info {
 	const char *data_model;
 };
 
-#define FIELD(struct_, member_, type_) { \
-	.field_name = #member_, \
-	.field_name_len = sizeof(#member_) - 1, \
-	.offset = offsetof(struct_, member_), \
-	.type = type_ \
-}
+#define FIELD(struct_, member_, type_)                              \
+	{                                                           \
+		.field_name = #member_,                             \
+		.field_name_len = sizeof(#member_) - 1,             \
+		.offset = offsetof(struct_, member_), .type = type_ \
+	}
 
 void send_ok(struct mg_connection *conn)
 {
-	mg_printf(conn,
-		  "HTTP/1.1 200 OK\r\n"
-		  "Content-Type: text/html\r\n"
-		  "Connection: close\r\n\r\n");
+	mg_printf(conn, "HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/html\r\n"
+			"Connection: close\r\n\r\n");
 }
 
 int hello_world_handler(struct mg_connection *conn, void *cbdata)
@@ -86,7 +85,6 @@ int system_info_handler(struct mg_connection *conn, void *cbdata)
 		mg_printf(conn, "Could not retrieve: %d\n", ret);
 		return 500;
 	}
-
 
 	mg_printf(conn, "<html><body>");
 
@@ -143,15 +141,14 @@ int history_handler(struct mg_connection *conn, void *cbdata)
 
 void *main_pthread(void *arg)
 {
-	static const char * const options[] = {
-		"listening_ports",
-		STRINGIFY(HTTP_PORT),
-		"num_threads",
-		"1",
-		"max_request_size",
-		STRINGIFY(MAX_REQUEST_SIZE_BYTES),
-		NULL
-	};
+	static const char *const options[] = { "listening_ports",
+					       STRINGIFY(HTTP_PORT),
+					       "num_threads",
+					       "1",
+					       "max_request_size",
+					       STRINGIFY(
+						       MAX_REQUEST_SIZE_BYTES),
+					       NULL };
 
 	struct mg_callbacks callbacks;
 	struct mg_context *ctx;
@@ -182,6 +179,6 @@ void main(void)
 	(void)pthread_attr_setstack(&civetweb_attr, &civetweb_stack,
 				    CIVETWEB_MAIN_THREAD_STACK_SIZE);
 
-	(void)pthread_create(&civetweb_thread, &civetweb_attr,
-			     &main_pthread, 0);
+	(void)pthread_create(&civetweb_thread, &civetweb_attr, &main_pthread,
+			     0);
 }

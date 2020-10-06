@@ -4,38 +4,35 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <drivers/dac.h>
 #include <zephyr.h>
 #include <ztest.h>
 
-#if defined(CONFIG_BOARD_NUCLEO_L073RZ) || \
-	defined(CONFIG_BOARD_NUCLEO_L152RE)
+#if defined(CONFIG_BOARD_NUCLEO_L073RZ) || defined(CONFIG_BOARD_NUCLEO_L152RE)
 
-#define DAC_DEVICE_NAME		DT_LABEL(DT_NODELABEL(dac1))
-#define DAC_CHANNEL_ID		1
-#define DAC_RESOLUTION		12
+#define DAC_DEVICE_NAME DT_LABEL(DT_NODELABEL(dac1))
+#define DAC_CHANNEL_ID 1
+#define DAC_RESOLUTION 12
 
 #elif defined(CONFIG_BOARD_TWR_KE18F)
 
-#define DAC_DEVICE_NAME		DT_LABEL(DT_NODELABEL(dac0))
-#define DAC_RESOLUTION		12
-#define DAC_CHANNEL_ID		0
+#define DAC_DEVICE_NAME DT_LABEL(DT_NODELABEL(dac0))
+#define DAC_RESOLUTION 12
+#define DAC_CHANNEL_ID 0
 
 #elif defined(CONFIG_BOARD_FRDM_K64F)
 
-#define DAC_DEVICE_NAME		DT_LABEL(DT_NODELABEL(dac0))
-#define DAC_RESOLUTION		12
-#define DAC_CHANNEL_ID		0
+#define DAC_DEVICE_NAME DT_LABEL(DT_NODELABEL(dac0))
+#define DAC_RESOLUTION 12
+#define DAC_CHANNEL_ID 0
 
 #else
 #error "Unsupported board."
 #endif
 
-static const struct dac_channel_cfg dac_ch_cfg = {
-	.channel_id  = DAC_CHANNEL_ID,
-	.resolution  = DAC_RESOLUTION
-};
+static const struct dac_channel_cfg dac_ch_cfg = { .channel_id = DAC_CHANNEL_ID,
+						   .resolution =
+							   DAC_RESOLUTION };
 
 const struct device *get_dac_device(void)
 {
@@ -51,7 +48,8 @@ static const struct device *init_dac(void)
 
 	ret = dac_channel_setup(dac_dev, &dac_ch_cfg);
 	zassert_equal(ret, 0,
-		"Setting up of the first channel failed with code %d", ret);
+		      "Setting up of the first channel failed with code %d",
+		      ret);
 
 	return dac_dev;
 }
@@ -71,7 +69,7 @@ static int test_task_write_value(void)
 
 	/* write a value of half the full scale resolution */
 	ret = dac_write_value(dac_dev, DAC_CHANNEL_ID,
-						(1U << DAC_RESOLUTION) / 2);
+			      (1U << DAC_RESOLUTION) / 2);
 	zassert_equal(ret, 0, "dac_write_value() failed with code %d", ret);
 
 	return TC_PASS;

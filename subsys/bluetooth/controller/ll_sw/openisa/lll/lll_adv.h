@@ -5,8 +5,8 @@
  */
 
 struct lll_adv_pdu {
-	uint8_t           first;
-	uint8_t           last;
+	uint8_t first;
+	uint8_t last;
 	/* TODO: use,
 	 * struct pdu_adv *pdu[DOUBLE_BUFFER_SIZE];
 	 */
@@ -19,23 +19,23 @@ struct lll_adv {
 #if defined(CONFIG_BT_PERIPHERAL)
 	/* NOTE: conn context has to be after lll_hdr */
 	struct lll_conn *conn;
-	uint8_t is_hdcd:1;
+	uint8_t is_hdcd : 1;
 #endif /* CONFIG_BT_PERIPHERAL */
 
-	uint8_t chan_map:3;
-	uint8_t chan_map_curr:3;
-	uint8_t filter_policy:2;
+	uint8_t chan_map : 3;
+	uint8_t chan_map_curr : 3;
+	uint8_t filter_policy : 2;
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
-	uint8_t phy_p:3;
+	uint8_t phy_p : 3;
 #endif /* !CONFIG_BT_CTLR_ADV_EXT */
 
 #if defined(CONFIG_BT_HCI_MESH_EXT)
-	uint8_t is_mesh:1;
+	uint8_t is_mesh : 1;
 #endif /* CONFIG_BT_HCI_MESH_EXT */
 
 #if defined(CONFIG_BT_CTLR_PRIVACY)
-	uint8_t  rl_idx;
+	uint8_t rl_idx;
 #endif /* CONFIG_BT_CTLR_PRIVACY */
 
 	struct lll_adv_pdu adv_data;
@@ -71,7 +71,8 @@ static inline void lll_adv_pdu_enqueue(struct lll_adv_pdu *pdu, uint8_t idx)
 	pdu->last = idx;
 }
 
-static inline struct pdu_adv *lll_adv_data_alloc(struct lll_adv *lll, uint8_t *idx)
+static inline struct pdu_adv *lll_adv_data_alloc(struct lll_adv *lll,
+						 uint8_t *idx)
 {
 	return lll_adv_pdu_alloc(&lll->adv_data, idx);
 }

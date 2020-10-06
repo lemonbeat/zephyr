@@ -32,14 +32,11 @@ k_tid_t parent_tid;
 
 uint8_t MEM_DOMAIN_ALIGNMENT inherit_buf[MEM_REGION_ALLOC]; /* for mem domain */
 
-K_MEM_PARTITION_DEFINE(inherit_memory_partition,
-		       inherit_buf,
-		       sizeof(inherit_buf),
-		       K_MEM_PARTITION_P_RW_U_RW);
+K_MEM_PARTITION_DEFINE(inherit_memory_partition, inherit_buf,
+		       sizeof(inherit_buf), K_MEM_PARTITION_P_RW_U_RW);
 
 struct k_mem_partition *inherit_memory_partition_array[] = {
-	&inherit_memory_partition,
-	&ztest_mem_partition
+	&inherit_memory_partition, &ztest_mem_partition
 };
 
 struct k_mem_domain inherit_mem_domain;
@@ -52,7 +49,7 @@ static void access_test(void)
 	/* check for all accesses  */
 	k_sem_give(&inherit_sem);
 	k_mutex_lock(&inherit_mutex, K_FOREVER);
-	(void) k_timer_status_get(&inherit_timer);
+	(void)k_timer_status_get(&inherit_timer);
 	k_msgq_put(&inherit_msgq, (void *)&msg_q_data, K_NO_WAIT);
 	k_mutex_unlock(&inherit_mutex);
 	inherit_buf[10] = 0xA5;
@@ -107,18 +104,12 @@ void test_permission_inheritance(void)
 	parent_tid = k_current_get();
 	k_mem_domain_add_thread(&inherit_mem_domain, parent_tid);
 
-	k_thread_access_grant(parent_tid,
-			      &inherit_sem,
-			      &inherit_mutex,
-			      &inherit_timer,
-			      &inherit_msgq, &test_1_stack);
+	k_thread_access_grant(parent_tid, &inherit_sem, &inherit_mutex,
+			      &inherit_timer, &inherit_msgq, &test_1_stack);
 
-	k_thread_create(&test_1_tid,
-			test_1_stack,
-			INHERIT_STACK_SIZE,
-			test_thread_1_for_SU,
-			NULL, NULL, NULL,
-			0, K_INHERIT_PERMS, K_NO_WAIT);
+	k_thread_create(&test_1_tid, test_1_stack, INHERIT_STACK_SIZE,
+			test_thread_1_for_SU, NULL, NULL, NULL, 0,
+			K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_thread_join(&test_1_tid, K_FOREVER);
 }
@@ -146,10 +137,8 @@ void parent_handler(void *p1, void *p2, void *p3)
 {
 	parent_res_pool_ptr = ret_resource_pool_ptr();
 	k_thread_create(&child_thr, child_thr_stack,
-			K_THREAD_STACK_SIZEOF(child_thr_stack),
-			child_handler,
-			NULL, NULL, NULL,
-			PRIORITY, 0, K_NO_WAIT);
+			K_THREAD_STACK_SIZEOF(child_thr_stack), child_handler,
+			NULL, NULL, NULL, PRIORITY, 0, K_NO_WAIT);
 }
 
 /**
@@ -173,10 +162,8 @@ void test_inherit_resource_pool(void)
 {
 	k_sem_reset(&sync_sem);
 	k_thread_create(&parent_thr, parent_thr_stack,
-			K_THREAD_STACK_SIZEOF(parent_thr_stack),
-			parent_handler,
-			NULL, NULL, NULL,
-			PRIORITY, 0, K_NO_WAIT);
+			K_THREAD_STACK_SIZEOF(parent_thr_stack), parent_handler,
+			NULL, NULL, NULL, PRIORITY, 0, K_NO_WAIT);
 	k_thread_resource_pool_assign(&parent_thr, &res_pool);
 	k_sem_take(&sync_sem, K_FOREVER);
 	zassert_true(parent_res_pool_ptr == child_res_pool_ptr,

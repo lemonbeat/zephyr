@@ -25,8 +25,7 @@ void log_frontend_0(const char *str, struct log_msg_ids src_level);
  * @param arg0		First argument.
  * @param src_level	Log identification.
  */
-void log_frontend_1(const char *str,
-		    log_arg_t arg0,
+void log_frontend_1(const char *str, log_arg_t arg0,
 		    struct log_msg_ids src_level);
 
 /** @brief Standard log with two arguments.
@@ -36,9 +35,7 @@ void log_frontend_1(const char *str,
  * @param arg1		Second argument.
  * @param src_level	Log identification.
  */
-void log_frontend_2(const char *str,
-		    log_arg_t arg0,
-		    log_arg_t arg1,
+void log_frontend_2(const char *str, log_arg_t arg0, log_arg_t arg1,
 		    struct log_msg_ids src_level);
 
 /** @brief Standard log with three arguments.
@@ -49,11 +46,8 @@ void log_frontend_2(const char *str,
  * @param arg2		Third argument.
  * @param src_level	Log identification.
  */
-void log_frontend_3(const char *str,
-		    log_arg_t arg0,
-		    log_arg_t arg1,
-		    log_arg_t arg2,
-		    struct log_msg_ids src_level);
+void log_frontend_3(const char *str, log_arg_t arg0, log_arg_t arg1,
+		    log_arg_t arg2, struct log_msg_ids src_level);
 
 /** @brief Standard log with arguments list.
  *
@@ -62,9 +56,7 @@ void log_frontend_3(const char *str,
  * @param narg		Number of arguments in the array.
  * @param src_level	Log identification.
  */
-void log_frontend_n(const char *str,
-		    log_arg_t *args,
-		    uint32_t narg,
+void log_frontend_n(const char *str, log_arg_t *args, uint32_t narg,
 		    struct log_msg_ids src_level);
 
 /** @brief Hexdump log.
@@ -74,10 +66,7 @@ void log_frontend_n(const char *str,
  * @param length	Data length.
  * @param src_level	Log identification.
  */
-void log_frontend_hexdump(const char *str,
-			  const uint8_t *data,
-			  uint32_t length,
+void log_frontend_hexdump(const char *str, const uint8_t *data, uint32_t length,
 			  struct log_msg_ids src_level);
-
 
 #endif /* LOG_FRONTEND_H_ */

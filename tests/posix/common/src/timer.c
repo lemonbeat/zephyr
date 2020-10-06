@@ -52,11 +52,10 @@ void test_posix_timer(void)
 
 	if (ret == 0) {
 		printk("Timer fires every %d secs and  %d nsecs\n",
-		       (int) value.it_interval.tv_sec,
-		       (int) value.it_interval.tv_nsec);
+		       (int)value.it_interval.tv_sec,
+		       (int)value.it_interval.tv_nsec);
 		printk("Time remaining to fire %d secs and  %d nsecs\n",
-		       (int) value.it_value.tv_sec,
-		       (int) value.it_value.tv_nsec);
+		       (int)value.it_value.tv_sec, (int)value.it_value.tv_nsec);
 	}
 
 	clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -77,10 +76,12 @@ void test_posix_timer(void)
 		secs_elapsed = (te.tv_sec - ts.tv_sec - 1);
 	}
 
-	total_secs_timer = (value.it_value.tv_sec * NSEC_PER_SEC +
-			    value.it_value.tv_nsec + (uint64_t) exp_count *
-			    (value.it_interval.tv_sec * NSEC_PER_SEC +
-			     value.it_interval.tv_nsec)) / NSEC_PER_SEC;
+	total_secs_timer =
+		(value.it_value.tv_sec * NSEC_PER_SEC + value.it_value.tv_nsec +
+		 (uint64_t)exp_count *
+			 (value.it_interval.tv_sec * NSEC_PER_SEC +
+			  value.it_interval.tv_nsec)) /
+		NSEC_PER_SEC;
 
 	/*TESTPOINT: Check if POSIX timer test passed*/
 	zassert_equal(total_secs_timer, secs_elapsed,

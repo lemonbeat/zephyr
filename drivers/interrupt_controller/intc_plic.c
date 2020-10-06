@@ -19,13 +19,13 @@
 
 #include <sw_isr_table.h>
 
-#define PLIC_MAX_PRIO	DT_INST_PROP(0, riscv_max_priority)
-#define PLIC_PRIO	DT_INST_REG_ADDR_BY_NAME(0, prio)
-#define PLIC_IRQ_EN	DT_INST_REG_ADDR_BY_NAME(0, irq_en)
-#define PLIC_REG	DT_INST_REG_ADDR_BY_NAME(0, reg)
+#define PLIC_MAX_PRIO DT_INST_PROP(0, riscv_max_priority)
+#define PLIC_PRIO DT_INST_REG_ADDR_BY_NAME(0, prio)
+#define PLIC_IRQ_EN DT_INST_REG_ADDR_BY_NAME(0, irq_en)
+#define PLIC_REG DT_INST_REG_ADDR_BY_NAME(0, reg)
 
-#define PLIC_IRQS        (CONFIG_NUM_IRQS - CONFIG_2ND_LVL_ISR_TBL_OFFSET)
-#define PLIC_EN_SIZE     ((PLIC_IRQS >> 5) + 1)
+#define PLIC_IRQS (CONFIG_NUM_IRQS - CONFIG_2ND_LVL_ISR_TBL_OFFSET)
+#define PLIC_EN_SIZE ((PLIC_IRQS >> 5) + 1)
 
 struct plic_regs_t {
 	uint32_t threshold_prio;
@@ -137,7 +137,7 @@ int riscv_plic_get_irq(void)
 static void plic_irq_handler(const void *arg)
 {
 	volatile struct plic_regs_t *regs =
-	    (volatile struct plic_regs_t *) PLIC_REG;
+		(volatile struct plic_regs_t *)PLIC_REG;
 
 	uint32_t irq;
 	struct _isr_table_entry *ite;
@@ -185,7 +185,7 @@ static int plic_init(const struct device *dev)
 	volatile uint32_t *en = (volatile uint32_t *)PLIC_IRQ_EN;
 	volatile uint32_t *prio = (volatile uint32_t *)PLIC_PRIO;
 	volatile struct plic_regs_t *regs =
-	    (volatile struct plic_regs_t *)PLIC_REG;
+		(volatile struct plic_regs_t *)PLIC_REG;
 	int i;
 
 	/* Ensure that all interrupts are disabled initially */
@@ -204,11 +204,7 @@ static int plic_init(const struct device *dev)
 	regs->threshold_prio = 0U;
 
 	/* Setup IRQ handler for PLIC driver */
-	IRQ_CONNECT(RISCV_MACHINE_EXT_IRQ,
-		    0,
-		    plic_irq_handler,
-		    NULL,
-		    0);
+	IRQ_CONNECT(RISCV_MACHINE_EXT_IRQ, 0, plic_irq_handler, NULL, 0);
 
 	/* Enable IRQ for PLIC driver */
 	irq_enable(RISCV_MACHINE_EXT_IRQ);

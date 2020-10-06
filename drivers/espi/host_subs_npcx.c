@@ -148,7 +148,7 @@ struct host_sub_npcx_data {
 };
 
 static const struct npcx_clk_cfg host_dev_clk_cfg[] =
-					DT_NPCX_CLK_CFG_ITEMS_LIST(0);
+	DT_NPCX_CLK_CFG_ITEMS_LIST(0);
 
 struct host_sub_npcx_config host_sub_cfg = {
 	.inst_mswc = (struct mswc_reg *)DT_INST_REG_ADDR_BY_NAME(0, mswc),
@@ -165,8 +165,8 @@ struct host_sub_npcx_config host_sub_cfg = {
 struct host_sub_npcx_data host_sub_data;
 
 /* Application shouldn't touch these flags in KBC status register directly */
-#define NPCX_KBC_STS_MASK (BIT(NPCX_HIKMST_IBF) | BIT(NPCX_HIKMST_OBF) \
-						| BIT(NPCX_HIKMST_A2))
+#define NPCX_KBC_STS_MASK \
+	(BIT(NPCX_HIKMST_IBF) | BIT(NPCX_HIKMST_OBF) | BIT(NPCX_HIKMST_A2))
 
 /* IO base address of EC Logical Device Configuration */
 #define NPCX_EC_CFG_IO_ADDR 0x4E
@@ -180,21 +180,21 @@ struct host_sub_npcx_data host_sub_data;
 
 /* Logical Device Number Assignments */
 #define EC_CFG_LDN_MOUSE 0x05
-#define EC_CFG_LDN_KBC   0x06
-#define EC_CFG_LDN_SHM   0x0F
-#define EC_CFG_LDN_ACPI  0x11 /* PM Channel 1 */
-#define EC_CFG_LDN_HCMD  0x12 /* PM Channel 2 */
+#define EC_CFG_LDN_KBC 0x06
+#define EC_CFG_LDN_SHM 0x0F
+#define EC_CFG_LDN_ACPI 0x11 /* PM Channel 1 */
+#define EC_CFG_LDN_HCMD 0x12 /* PM Channel 2 */
 
 /* Index of EC (4E/4F) Configuration Register */
-#define EC_CFG_IDX_LDN             0x07
-#define EC_CFG_IDX_CTRL            0x30
-#define EC_CFG_IDX_CMD_IO_ADDR_H   0x60
-#define EC_CFG_IDX_CMD_IO_ADDR_L   0x61
-#define EC_CFG_IDX_DATA_IO_ADDR_H  0x62
-#define EC_CFG_IDX_DATA_IO_ADDR_L  0x63
+#define EC_CFG_IDX_LDN 0x07
+#define EC_CFG_IDX_CTRL 0x30
+#define EC_CFG_IDX_CMD_IO_ADDR_H 0x60
+#define EC_CFG_IDX_CMD_IO_ADDR_L 0x61
+#define EC_CFG_IDX_DATA_IO_ADDR_H 0x62
+#define EC_CFG_IDX_DATA_IO_ADDR_L 0x63
 
 /* Index of Special Logical Device Configuration (Shared Memory Module) */
-#define EC_CFG_IDX_SHM_CFG         0xF1
+#define EC_CFG_IDX_SHM_CFG 0xF1
 #define EC_CFG_IDX_SHM_WND1_ADDR_0 0xF4
 #define EC_CFG_IDX_SHM_WND1_ADDR_1 0xF5
 #define EC_CFG_IDX_SHM_WND1_ADDR_2 0xF6
@@ -211,20 +211,20 @@ static void host_kbc_ibf_isr(void *arg)
 	ARG_UNUSED(arg);
 	struct kbc_reg *const inst_kbc = host_sub_cfg.inst_kbc;
 	struct espi_event evt = { ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		ESPI_PERIPHERAL_8042_KBC, ESPI_PERIPHERAL_NODATA
-	};
+				  ESPI_PERIPHERAL_8042_KBC,
+				  ESPI_PERIPHERAL_NODATA };
 
 	/*
 	 * The high byte contains information from the host, and the lower byte
 	 * indicates if the host sent a command or data. 1 = Command.
 	 */
 	evt.evt_data = (inst_kbc->HIKMDI << NPCX_8042_DATA_POS) |
-		       (IS_BIT_SET(inst_kbc->HIKMST, NPCX_HIKMST_A2) <<
-				       NPCX_8042_TYPE_POS);
+		       (IS_BIT_SET(inst_kbc->HIKMST, NPCX_HIKMST_A2)
+			<< NPCX_8042_TYPE_POS);
 
 	LOG_DBG("%s: kbc data 0x%02x", __func__, evt.evt_data);
 	espi_send_callbacks(host_sub_data.callbacks, host_sub_data.host_bus_dev,
-							evt);
+			    evt);
 }
 
 static void host_kbc_obe_isr(void *arg)
@@ -257,8 +257,8 @@ static void host_kbc_init(void)
 	 * 2. Enable Output Buffer Full Mouse(OBFM) SIRQ 12.
 	 * 3. Enable Output Buffer Full Keyboard (OBFK) SIRQ 1.
 	 */
-	inst_kbc->HICTRL = BIT(NPCX_HICTRL_IBFCIE) | BIT(NPCX_HICTRL_OBFMIE)
-						| BIT(NPCX_HICTRL_OBFKIE);
+	inst_kbc->HICTRL = BIT(NPCX_HICTRL_IBFCIE) | BIT(NPCX_HICTRL_OBFMIE) |
+			   BIT(NPCX_HICTRL_OBFKIE);
 
 	/* Configure SIRQ 1/12 type (level + high) */
 	inst_kbc->HIIRQC = 0x00;
@@ -269,16 +269,14 @@ static void host_kbc_init(void)
 #if defined(CONFIG_ESPI_PERIPHERAL_HOST_IO)
 static void host_acpi_process_input_data(uint8_t data)
 {
-	struct espi_event evt = {
-		.evt_type = ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		.evt_details = ESPI_PERIPHERAL_HOST_IO,
-		.evt_data = ESPI_PERIPHERAL_NODATA
-	};
+	struct espi_event evt = { .evt_type = ESPI_BUS_PERIPHERAL_NOTIFICATION,
+				  .evt_details = ESPI_PERIPHERAL_HOST_IO,
+				  .evt_data = ESPI_PERIPHERAL_NODATA };
 
 	LOG_DBG("%s: acpi data 0x%02x", __func__, data);
 	evt.evt_data = data;
 	espi_send_callbacks(host_sub_data.callbacks, host_sub_data.host_bus_dev,
-							evt);
+			    evt);
 }
 
 static void host_acpi_init(void)
@@ -310,8 +308,8 @@ static void host_acpi_init(void)
 
 #if defined(CONFIG_ESPI_PERIPHERAL_EC_HOST_CMD)
 /* Host command argument and memory map buffers */
-static uint8_t	shm_mem_host_cmd[256] __aligned(8);
-static uint8_t	shm_memmap[256] __aligned(8);
+static uint8_t shm_mem_host_cmd[256] __aligned(8);
+static uint8_t shm_memmap[256] __aligned(8);
 
 /* Host command sub-device local functions */
 static void host_hcmd_process_input_data(uint8_t data)
@@ -352,12 +350,11 @@ static void host_hcmd_init(void)
 	 * 2. BIT 7 must be 1.
 	 */
 	inst_hcmd->HIPMCTL |= BIT(7) | BIT(NPCX_HIPMCTL_IBFIE);
-
 }
 #endif
 
 #if defined(CONFIG_ESPI_PERIPHERAL_HOST_IO) || \
-				defined(CONFIG_ESPI_PERIPHERAL_EC_HOST_CMD)
+	defined(CONFIG_ESPI_PERIPHERAL_EC_HOST_CMD)
 /* Host pm (host io) sub-module isr function for all channels such as ACPI. */
 static void host_pmch_ibf_isr(void *arg)
 {
@@ -397,9 +394,9 @@ static void host_port80_isr(void *arg)
 	ARG_UNUSED(arg);
 	struct shm_reg *const inst_shm = host_sub_cfg.inst_shm;
 	struct espi_event evt = { ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		(ESPI_PERIPHERAL_INDEX_0 << 16) | ESPI_PERIPHERAL_DEBUG_PORT80,
-		ESPI_PERIPHERAL_NODATA
-	};
+				  (ESPI_PERIPHERAL_INDEX_0 << 16) |
+					  ESPI_PERIPHERAL_DEBUG_PORT80,
+				  ESPI_PERIPHERAL_NODATA };
 	uint8_t status = inst_shm->DP80STS;
 
 	LOG_DBG("%s: p80 status 0x%02X", __func__, status);
@@ -409,7 +406,7 @@ static void host_port80_isr(void *arg)
 		LOG_DBG("p80: %04x", inst_shm->DP80BUF);
 		evt.evt_data = inst_shm->DP80BUF;
 		espi_send_callbacks(host_sub_data.callbacks,
-				host_sub_data.host_bus_dev, evt);
+				    host_sub_data.host_bus_dev, evt);
 	}
 
 	/* If FIFO is overflow, show error msg */
@@ -432,15 +429,14 @@ static void host_port80_init(void)
 	 * SYNC mode (It must be 1 in eSPI mode), Read Auto Advance mode, and
 	 * Port80 module itself.
 	 */
-	inst_shm->DP80CTL = BIT(NPCX_DP80CTL_CIEN) | BIT(NPCX_DP80CTL_RAA)
-			| BIT(NPCX_DP80CTL_DP80EN) | BIT(NPCX_DP80CTL_SYNCEN);
+	inst_shm->DP80CTL = BIT(NPCX_DP80CTL_CIEN) | BIT(NPCX_DP80CTL_RAA) |
+			    BIT(NPCX_DP80CTL_DP80EN) | BIT(NPCX_DP80CTL_SYNCEN);
 }
 #endif
 
 #if defined(CONFIG_ESPI_PERIPHERAL_UART)
 /* host uart pinmux configuration */
-static const struct npcx_alt host_uart_alts[] =
-					DT_NPCX_ALT_ITEMS_LIST(0);
+static const struct npcx_alt host_uart_alts[] = DT_NPCX_ALT_ITEMS_LIST(0);
 /* Host UART sub-device local functions */
 void host_uart_init(void)
 {
@@ -448,7 +444,7 @@ void host_uart_init(void)
 
 	/* Configure pin-mux for serial port device */
 	soc_pinctrl_mux_configure(host_uart_alts, ARRAY_SIZE(host_uart_alts),
-									1);
+				  1);
 	/* Make sure unlock host access of serial port */
 	inst_c2h->LKSIOHA &= ~BIT(NPCX_LKSIOHA_LKSPHA);
 	/* Clear 'Host lock violation occurred' bit of serial port initially */
@@ -463,7 +459,7 @@ static void host_c2h_wait_write_done(void)
 	uint32_t elapsed_cycles;
 	uint32_t start_cycles = k_cycle_get_32();
 	uint32_t max_wait_cycles =
-			k_us_to_cyc_ceil32(NPCX_C2H_TRANSACTION_TIMEOUT_US);
+		k_us_to_cyc_ceil32(NPCX_C2H_TRANSACTION_TIMEOUT_US);
 
 	while (IS_BIT_SET(inst_c2h->SIBCTRL, NPCX_SIBCTRL_CSWR)) {
 		elapsed_cycles = k_cycle_get_32() - start_cycles;
@@ -480,7 +476,7 @@ static void host_c2h_wait_read_done(void)
 	uint32_t elapsed_cycles;
 	uint32_t start_cycles = k_cycle_get_32();
 	uint32_t max_wait_cycles =
-			k_us_to_cyc_ceil32(NPCX_C2H_TRANSACTION_TIMEOUT_US);
+		k_us_to_cyc_ceil32(NPCX_C2H_TRANSACTION_TIMEOUT_US);
 
 	while (IS_BIT_SET(inst_c2h->SIBCTRL, NPCX_SIBCTRL_CSRD)) {
 		elapsed_cycles = k_cycle_get_32() - start_cycles;
@@ -583,15 +579,14 @@ uint8_t host_c2h_read_io_cfg_reg(uint8_t reg_index)
 }
 
 /* Soc specific host sub modules functions */
-int soc_host_periph_read_request(enum lpc_peripheral_opcode op,
-								uint32_t *data)
+int soc_host_periph_read_request(enum lpc_peripheral_opcode op, uint32_t *data)
 {
 	struct kbc_reg *const inst_kbc = host_sub_cfg.inst_kbc;
 
 	if (op >= E8042_START_OPCODE && op <= E8042_MAX_OPCODE) {
 		/* Make sure kbc 8042 is on */
 		if (!IS_BIT_SET(inst_kbc->HICTRL, NPCX_HICTRL_OBFKIE) ||
-			!IS_BIT_SET(inst_kbc->HICTRL, NPCX_HICTRL_OBFMIE)) {
+		    !IS_BIT_SET(inst_kbc->HICTRL, NPCX_HICTRL_OBFMIE)) {
 			return -ENOTSUP;
 		}
 
@@ -620,8 +615,7 @@ int soc_host_periph_read_request(enum lpc_peripheral_opcode op,
 	return 0;
 }
 
-int soc_host_periph_write_request(enum lpc_peripheral_opcode op,
-								uint32_t *data)
+int soc_host_periph_write_request(enum lpc_peripheral_opcode op, uint32_t *data)
 {
 	volatile uint32_t __attribute__((unused)) dummy;
 	struct kbc_reg *const inst_kbc = host_sub_cfg.inst_kbc;
@@ -629,7 +623,7 @@ int soc_host_periph_write_request(enum lpc_peripheral_opcode op,
 	if (op >= E8042_START_OPCODE && op <= E8042_MAX_OPCODE) {
 		/* Make sure kbc 8042 is on */
 		if (!IS_BIT_SET(inst_kbc->HICTRL, NPCX_HICTRL_OBFKIE) ||
-			!IS_BIT_SET(inst_kbc->HICTRL, NPCX_HICTRL_OBFMIE)) {
+		    !IS_BIT_SET(inst_kbc->HICTRL, NPCX_HICTRL_OBFMIE)) {
 			return -ENOTSUP;
 		}
 		if (data)
@@ -730,8 +724,7 @@ void soc_host_init_subs_host_domain(void)
 	/* Select 'Shared Memory' bank which LDN are 0x0F */
 	host_c2h_write_io_cfg_reg(EC_CFG_IDX_LDN, EC_CFG_LDN_SHM);
 	/* WIN 1 & 2 mapping to IO space */
-	host_c2h_write_io_cfg_reg(0xF1,
-			host_c2h_read_io_cfg_reg(0xF1) | 0x30);
+	host_c2h_write_io_cfg_reg(0xF1, host_c2h_read_io_cfg_reg(0xF1) | 0x30);
 	/* WIN1 as Host Command on the IO address 0x0800 */
 	host_c2h_write_io_cfg_reg(EC_CFG_IDX_SHM_WND1_ADDR_1, 0x08);
 	host_c2h_write_io_cfg_reg(EC_CFG_IDX_SHM_WND1_ADDR_0, 0x00);
@@ -745,12 +738,12 @@ void soc_host_init_subs_host_domain(void)
 }
 
 int soc_host_init_subs_core_domain(const struct device *host_bus_dev,
-							sys_slist_t *callbacks)
+				   sys_slist_t *callbacks)
 {
 	struct mswc_reg *const inst_mswc = host_sub_cfg.inst_mswc;
 	struct shm_reg *const inst_shm = host_sub_cfg.inst_shm;
 	const struct device *const clk_dev =
-					device_get_binding(NPCX_CLK_CTRL_NAME);
+		device_get_binding(NPCX_CLK_CTRL_NAME);
 	int i;
 
 	host_sub_data.callbacks = callbacks;
@@ -758,8 +751,9 @@ int soc_host_init_subs_core_domain(const struct device *host_bus_dev,
 
 	/* Turn on all host necessary sub-module clocks first */
 	for (i = 0; i < host_sub_cfg.clks_size; i++)
-		if (clock_control_on(clk_dev, (clock_control_subsys_t *)
-				&host_sub_cfg.clks_list[i]) != 0) {
+		if (clock_control_on(clk_dev,
+				     (clock_control_subsys_t *)&host_sub_cfg
+					     .clks_list[i]) != 0) {
 			return -EIO;
 		}
 
@@ -797,33 +791,29 @@ int soc_host_init_subs_core_domain(const struct device *host_bus_dev,
 	/* Host KBC sub-device interrupt installation */
 #if defined(CONFIG_ESPI_PERIPHERAL_8042_KBC)
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, kbc_ibf, irq),
-		    DT_INST_IRQ_BY_NAME(0, kbc_ibf, priority),
-		    host_kbc_ibf_isr,
+		    DT_INST_IRQ_BY_NAME(0, kbc_ibf, priority), host_kbc_ibf_isr,
 		    NULL, 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, kbc_ibf, irq));
 
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, kbc_obe, irq),
-		    DT_INST_IRQ_BY_NAME(0, kbc_obe, priority),
-		    host_kbc_obe_isr,
+		    DT_INST_IRQ_BY_NAME(0, kbc_obe, priority), host_kbc_obe_isr,
 		    NULL, 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, kbc_obe, irq));
 #endif
 
 	/* Host PM channel (Host IO) sub-device interrupt installation */
 #if defined(CONFIG_ESPI_PERIPHERAL_HOST_IO) || \
-				defined(CONFIG_ESPI_PERIPHERAL_EC_HOST_CMD)
+	defined(CONFIG_ESPI_PERIPHERAL_EC_HOST_CMD)
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, pmch_ibf, irq),
 		    DT_INST_IRQ_BY_NAME(0, pmch_ibf, priority),
-		    host_pmch_ibf_isr,
-		    NULL, 0);
+		    host_pmch_ibf_isr, NULL, 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, pmch_ibf, irq));
 #endif
 
 	/* Host Port80 sub-device interrupt installation */
 #if defined(CONFIG_ESPI_PERIPHERAL_DEBUG_PORT_80)
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, p80_fifo, irq),
-		    DT_INST_IRQ_BY_NAME(0, p80_fifo, priority),
-		    host_port80_isr,
+		    DT_INST_IRQ_BY_NAME(0, p80_fifo, priority), host_port80_isr,
 		    NULL, 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, p80_fifo, irq));
 #endif

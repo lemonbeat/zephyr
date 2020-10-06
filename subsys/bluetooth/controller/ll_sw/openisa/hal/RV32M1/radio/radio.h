@@ -7,8 +7,7 @@
 
 #define RADIO_TXP_DEFAULT 0
 
-
-typedef void (*radio_isr_cb_t) (void *param);
+typedef void (*radio_isr_cb_t)(void *param);
 
 void isr_radio(void *arg);
 void radio_isr_set(radio_isr_cb_t cb, void *param);
@@ -45,8 +44,8 @@ void *radio_pkt_empty_get(void);
 void *radio_pkt_scratch_get(void);
 
 void radio_switch_complete_and_rx(uint8_t phy_rx);
-void radio_switch_complete_and_tx(uint8_t phy_rx, uint8_t flags_rx, uint8_t phy_tx,
-				  uint8_t flags_tx);
+void radio_switch_complete_and_tx(uint8_t phy_rx, uint8_t flags_rx,
+				  uint8_t phy_tx, uint8_t flags_tx);
 void radio_switch_complete_and_disable(void);
 
 void radio_rssi_measure(void);

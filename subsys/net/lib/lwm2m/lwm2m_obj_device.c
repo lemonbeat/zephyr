@@ -24,51 +24,51 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "lwm2m_engine.h"
 
 /* Device resource IDs */
-#define DEVICE_MANUFACTURER_ID			0
-#define DEVICE_MODEL_NUMBER_ID			1
-#define DEVICE_SERIAL_NUMBER_ID			2
-#define DEVICE_FIRMWARE_VERSION_ID		3
-#define DEVICE_REBOOT_ID			4
-#define DEVICE_FACTORY_DEFAULT_ID		5
-#define DEVICE_AVAILABLE_POWER_SOURCES_ID	6
-#define DEVICE_POWER_SOURCE_VOLTAGE_ID		7
-#define DEVICE_POWER_SOURCE_CURRENT_ID		8
-#define DEVICE_BATTERY_LEVEL_ID			9
-#define DEVICE_MEMORY_FREE_ID			10
-#define DEVICE_ERROR_CODE_ID			11
-#define DEVICE_RESET_ERROR_CODE_ID		12
-#define DEVICE_CURRENT_TIME_ID			13
-#define DEVICE_UTC_OFFSET_ID			14
-#define DEVICE_TIMEZONE_ID			15
-#define DEVICE_SUPPORTED_BINDING_MODES_ID	16
-#define DEVICE_TYPE_ID				17
-#define DEVICE_HARDWARE_VERSION_ID		18
-#define DEVICE_SOFTWARE_VERSION_ID		19
-#define DEVICE_BATTERY_STATUS_ID		20
-#define DEVICE_MEMORY_TOTAL_ID			21
-#define DEVICE_EXT_DEV_INFO_ID			22
+#define DEVICE_MANUFACTURER_ID 0
+#define DEVICE_MODEL_NUMBER_ID 1
+#define DEVICE_SERIAL_NUMBER_ID 2
+#define DEVICE_FIRMWARE_VERSION_ID 3
+#define DEVICE_REBOOT_ID 4
+#define DEVICE_FACTORY_DEFAULT_ID 5
+#define DEVICE_AVAILABLE_POWER_SOURCES_ID 6
+#define DEVICE_POWER_SOURCE_VOLTAGE_ID 7
+#define DEVICE_POWER_SOURCE_CURRENT_ID 8
+#define DEVICE_BATTERY_LEVEL_ID 9
+#define DEVICE_MEMORY_FREE_ID 10
+#define DEVICE_ERROR_CODE_ID 11
+#define DEVICE_RESET_ERROR_CODE_ID 12
+#define DEVICE_CURRENT_TIME_ID 13
+#define DEVICE_UTC_OFFSET_ID 14
+#define DEVICE_TIMEZONE_ID 15
+#define DEVICE_SUPPORTED_BINDING_MODES_ID 16
+#define DEVICE_TYPE_ID 17
+#define DEVICE_HARDWARE_VERSION_ID 18
+#define DEVICE_SOFTWARE_VERSION_ID 19
+#define DEVICE_BATTERY_STATUS_ID 20
+#define DEVICE_MEMORY_TOTAL_ID 21
+#define DEVICE_EXT_DEV_INFO_ID 22
 
-#define DEVICE_MAX_ID				23
+#define DEVICE_MAX_ID 23
 
 #ifdef CONFIG_LWM2M_DEVICE_ERROR_CODE_MAX
-#define DEVICE_ERROR_CODE_MAX	CONFIG_LWM2M_DEVICE_ERROR_CODE_MAX
+#define DEVICE_ERROR_CODE_MAX CONFIG_LWM2M_DEVICE_ERROR_CODE_MAX
 #else
-#define DEVICE_ERROR_CODE_MAX	10
+#define DEVICE_ERROR_CODE_MAX 10
 #endif
 
 #ifdef CONFIG_LWM2M_DEVICE_PWRSRC_MAX
-#define DEVICE_PWRSRC_MAX	CONFIG_LWM2M_DEVICE_PWRSRC_MAX
+#define DEVICE_PWRSRC_MAX CONFIG_LWM2M_DEVICE_PWRSRC_MAX
 #else
-#define DEVICE_PWRSRC_MAX	5
+#define DEVICE_PWRSRC_MAX 5
 #endif
 
 #ifdef CONFIG_LWM2M_DEVICE_EXT_DEV_INFO_MAX
 #define DEVICE_EXT_DEV_INFO_MAX CONFIG_LWM2M_DEVICE_EXT_DEV_INFO_MAX
 #else
-#define DEVICE_EXT_DEV_INFO_MAX	1
+#define DEVICE_EXT_DEV_INFO_MAX 1
 #endif
 
-#define DEVICE_STRING_SHORT	8
+#define DEVICE_STRING_SHORT 8
 
 #define DEVICE_SERVICE_INTERVAL_MS (MSEC_PER_SEC * 10)
 
@@ -81,15 +81,15 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
  * add DEVICE_ERROR_CODE_MAX for ERROR CODE resource instances
  * add DEVICE_EXT_DEV_INFO_MAX for EXT DEV INFO  resource instances
  */
-#define RESOURCE_INSTANCE_COUNT	(DEVICE_MAX_ID - 3 - 5 + \
-				 DEVICE_PWRSRC_MAX*3 + DEVICE_ERROR_CODE_MAX + \
-				 DEVICE_EXT_DEV_INFO_MAX)
+#define RESOURCE_INSTANCE_COUNT                          \
+	(DEVICE_MAX_ID - 3 - 5 + DEVICE_PWRSRC_MAX * 3 + \
+	 DEVICE_ERROR_CODE_MAX + DEVICE_EXT_DEV_INFO_MAX)
 
 /* resource state variables */
-static uint8_t  error_code_list[DEVICE_ERROR_CODE_MAX];
+static uint8_t error_code_list[DEVICE_ERROR_CODE_MAX];
 static int32_t time_temp;
 static uint32_t time_offset;
-static uint8_t  binding_mode[DEVICE_STRING_SHORT];
+static uint8_t binding_mode[DEVICE_STRING_SHORT];
 
 /* only 1 instance of device object exists */
 static struct lwm2m_engine_obj device;
@@ -158,12 +158,13 @@ static void *current_time_pre_write_cb(uint16_t obj_inst_id, uint16_t res_id,
 }
 
 static int current_time_post_write_cb(uint16_t obj_inst_id, uint16_t res_id,
-				      uint16_t res_inst_id,
-				      uint8_t *data, uint16_t data_len,
-				      bool last_block, size_t total_size)
+				      uint16_t res_inst_id, uint8_t *data,
+				      uint16_t data_len, bool last_block,
+				      size_t total_size)
 {
 	if (data_len == 4U) {
-		time_offset = *(int32_t *)data - (int32_t)(k_uptime_get() / 1000);
+		time_offset =
+			*(int32_t *)data - (int32_t)(k_uptime_get() / 1000);
 		return 0;
 	}
 
@@ -221,19 +222,18 @@ static struct lwm2m_engine_obj_inst *device_create(uint16_t obj_inst_id)
 	INIT_OBJ_RES_OPTDATA(DEVICE_BATTERY_LEVEL_ID, res, i, res_inst, j);
 	INIT_OBJ_RES_OPTDATA(DEVICE_MEMORY_FREE_ID, res, i, res_inst, j);
 	error_code_ri = &res_inst[j];
-	INIT_OBJ_RES_MULTI_DATA(DEVICE_ERROR_CODE_ID, res, i,
-				res_inst, j, DEVICE_ERROR_CODE_MAX, false,
-				error_code_list, sizeof(*error_code_list));
+	INIT_OBJ_RES_MULTI_DATA(DEVICE_ERROR_CODE_ID, res, i, res_inst, j,
+				DEVICE_ERROR_CODE_MAX, false, error_code_list,
+				sizeof(*error_code_list));
 	INIT_OBJ_RES_EXECUTE(DEVICE_RESET_ERROR_CODE_ID, res, i,
 			     reset_error_list_cb);
 	INIT_OBJ_RES_OPT(DEVICE_CURRENT_TIME_ID, res, i, res_inst, j, 1, true,
-			 current_time_read_cb,
-			 current_time_pre_write_cb,
+			 current_time_read_cb, current_time_pre_write_cb,
 			 current_time_post_write_cb, NULL);
 	INIT_OBJ_RES_OPTDATA(DEVICE_UTC_OFFSET_ID, res, i, res_inst, j);
 	INIT_OBJ_RES_OPTDATA(DEVICE_TIMEZONE_ID, res, i, res_inst, j);
-	INIT_OBJ_RES_DATA(DEVICE_SUPPORTED_BINDING_MODES_ID, res, i,
-			  res_inst, j, binding_mode, DEVICE_STRING_SHORT);
+	INIT_OBJ_RES_DATA(DEVICE_SUPPORTED_BINDING_MODES_ID, res, i, res_inst,
+			  j, binding_mode, DEVICE_STRING_SHORT);
 	INIT_OBJ_RES_OPTDATA(DEVICE_TYPE_ID, res, i, res_inst, j);
 	INIT_OBJ_RES_OPTDATA(DEVICE_HARDWARE_VERSION_ID, res, i, res_inst, j);
 	INIT_OBJ_RES_OPTDATA(DEVICE_SOFTWARE_VERSION_ID, res, i, res_inst, j);

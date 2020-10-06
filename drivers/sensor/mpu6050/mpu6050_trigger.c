@@ -72,7 +72,6 @@ static void mpu6050_thread_cb(const struct device *dev)
 
 	gpio_pin_interrupt_configure(drv_data->gpio, cfg->int_pin,
 				     GPIO_INT_EDGE_TO_ACTIVE);
-
 }
 
 #ifdef CONFIG_MPU6050_TRIGGER_OWN_THREAD
@@ -103,8 +102,7 @@ int mpu6050_init_interrupt(const struct device *dev)
 	/* setup data ready gpio interrupt */
 	drv_data->gpio = device_get_binding(cfg->int_label);
 	if (drv_data->gpio == NULL) {
-		LOG_ERR("Failed to get pointer to %s device",
-			    cfg->int_label);
+		LOG_ERR("Failed to get pointer to %s device", cfg->int_label);
 		return -EINVAL;
 	}
 
@@ -113,8 +111,7 @@ int mpu6050_init_interrupt(const struct device *dev)
 	gpio_pin_configure(drv_data->gpio, cfg->int_pin,
 			   GPIO_INPUT | cfg->int_flags);
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   mpu6050_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, mpu6050_gpio_callback,
 			   BIT(cfg->int_pin));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -123,8 +120,8 @@ int mpu6050_init_interrupt(const struct device *dev)
 	}
 
 	/* enable data ready interrupt */
-	if (i2c_reg_write_byte(drv_data->i2c, cfg->i2c_addr,
-			       MPU6050_REG_INT_EN, MPU6050_DRDY_EN) < 0) {
+	if (i2c_reg_write_byte(drv_data->i2c, cfg->i2c_addr, MPU6050_REG_INT_EN,
+			       MPU6050_DRDY_EN) < 0) {
 		LOG_ERR("Failed to enable data ready interrupt.");
 		return -EIO;
 	}
@@ -134,9 +131,9 @@ int mpu6050_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_MPU6050_THREAD_STACK_SIZE,
-			(k_thread_entry_t)mpu6050_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_MPU6050_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)mpu6050_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_MPU6050_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_MPU6050_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = mpu6050_work_cb;
 #endif

@@ -17,7 +17,7 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(settings, CONFIG_SETTINGS_LOG_LEVEL);
 
-#define SETTINGS_FCB_VERS		1
+#define SETTINGS_FCB_VERS 1
 
 int settings_backend_init(void);
 void settings_mount_fcb_backend(struct settings_fcb *cf);
@@ -51,10 +51,10 @@ int settings_fcb_src(struct settings_fcb *cf)
 		 * is missing.
 		 */
 		if (fcb_free_sector_cnt(&cf->cf_fcb) < 1) {
-
-			rc = flash_area_erase(cf->cf_fcb.fap,
-					cf->cf_fcb.f_active.fe_sector->fs_off,
-					cf->cf_fcb.f_active.fe_sector->fs_size);
+			rc = flash_area_erase(
+				cf->cf_fcb.fap,
+				cf->cf_fcb.f_active.fe_sector->fs_off,
+				cf->cf_fcb.f_active.fe_sector->fs_size);
 
 			if (rc) {
 				return -EIO;
@@ -91,8 +91,8 @@ int settings_fcb_dst(struct settings_fcb *cf)
  * @retval true  Duplicate found
  */
 static bool settings_fcb_check_duplicate(struct settings_fcb *cf,
-					const struct fcb_entry_ctx *entry_ctx,
-					const char * const name)
+					 const struct fcb_entry_ctx *entry_ctx,
+					 const char *const name)
 {
 	struct fcb_entry_ctx entry2_ctx = *entry_ctx;
 
@@ -121,15 +121,12 @@ static int read_entry_len(const struct fcb_entry_ctx *entry_ctx, off_t off)
 	return entry_ctx->loc.fe_data_len - off;
 }
 
-static int settings_fcb_load_priv(struct settings_store *cs,
-				  line_load_cb cb,
-				  void *cb_arg,
-				  bool filter_duplicates)
+static int settings_fcb_load_priv(struct settings_store *cs, line_load_cb cb,
+				  void *cb_arg, bool filter_duplicates)
 {
 	struct settings_fcb *cf = (struct settings_fcb *)cs;
 	struct fcb_entry_ctx entry_ctx = {
-		{.fe_sector = NULL, .fe_elem_off = 0},
-		.fap = cf->cf_fcb.fap
+		{ .fe_sector = NULL, .fe_elem_off = 0 }, .fap = cf->cf_fcb.fap
 	};
 	int rc;
 
@@ -148,7 +145,7 @@ static int settings_fcb_load_priv(struct settings_store *cs,
 		name[name_len] = '\0';
 
 		if (filter_duplicates &&
-		    (!read_entry_len(&entry_ctx, name_len+1) ||
+		    (!read_entry_len(&entry_ctx, name_len + 1) ||
 		     settings_fcb_check_duplicate(cf, &entry_ctx, name))) {
 			pass_entry = false;
 		}
@@ -167,11 +164,8 @@ static int settings_fcb_load_priv(struct settings_store *cs,
 static int settings_fcb_load(struct settings_store *cs,
 			     const struct settings_load_arg *arg)
 {
-	return settings_fcb_load_priv(
-		cs,
-		settings_line_load_cb,
-		(void *)arg,
-		true);
+	return settings_fcb_load_priv(cs, settings_line_load_cb, (void *)arg,
+				      true);
 }
 
 static int read_handler(void *ctx, off_t off, char *buf, size_t *len)
@@ -384,8 +378,7 @@ int settings_backend_init(void)
 		.cf_fcb.f_magic = CONFIG_SETTINGS_FCB_MAGIC,
 		.cf_fcb.f_sectors = settings_fcb_area,
 	};
-	uint32_t cnt = sizeof(settings_fcb_area) /
-		    sizeof(settings_fcb_area[0]);
+	uint32_t cnt = sizeof(settings_fcb_area) / sizeof(settings_fcb_area[0]);
 	int rc;
 	const struct flash_area *fap;
 

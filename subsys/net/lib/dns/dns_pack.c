@@ -116,8 +116,8 @@ int dns_unpack_answer(struct dns_msg_t *dns_msg, int dname_ptr, uint32_t *ttl)
 
 	answer = dns_msg->msg + dns_msg->answer_offset;
 
-	dname_len = skip_fqdn(answer,
-			      dns_msg->msg_size - dns_msg->answer_offset);
+	dname_len =
+		skip_fqdn(answer, dns_msg->msg_size - dns_msg->answer_offset);
 	if (dname_len < 0) {
 		return dname_len;
 	}
@@ -142,8 +142,8 @@ int dns_unpack_answer(struct dns_msg_t *dns_msg, int dname_ptr, uint32_t *ttl)
 	 * Cache-Flush bit (highest one).
 	 */
 	if ((dns_answer_class(dname_len, answer) &
-	     (IS_ENABLED(CONFIG_MDNS_RESOLVER) ? 0x7fff : 0xffff))
-							!= DNS_CLASS_IN) {
+	     (IS_ENABLED(CONFIG_MDNS_RESOLVER) ? 0x7fff : 0xffff)) !=
+	    DNS_CLASS_IN) {
 		return -EINVAL;
 	}
 
@@ -151,10 +151,9 @@ int dns_unpack_answer(struct dns_msg_t *dns_msg, int dname_ptr, uint32_t *ttl)
 	*ttl = dns_answer_ttl(dname_len, answer);
 	len = dns_answer_rdlength(dname_len, answer);
 	pos = dns_msg->answer_offset + dname_len +
-		DNS_COMMON_UINT_SIZE + /* class length */
-		DNS_COMMON_UINT_SIZE + /* type length */
-		DNS_TTL_LEN +
-		DNS_RDLENGTH_LEN;
+	      DNS_COMMON_UINT_SIZE + /* class length */
+	      DNS_COMMON_UINT_SIZE + /* type length */
+	      DNS_TTL_LEN + DNS_RDLENGTH_LEN;
 
 	switch (dns_answer_type(dname_len, answer)) {
 	case DNS_RR_TYPE_A:
@@ -163,8 +162,8 @@ int dns_unpack_answer(struct dns_msg_t *dns_msg, int dname_ptr, uint32_t *ttl)
 		return 0;
 
 	case DNS_RR_TYPE_CNAME:
-		set_dns_msg_response(dns_msg, DNS_RESPONSE_CNAME_NO_IP,
-				     pos, len);
+		set_dns_msg_response(dns_msg, DNS_RESPONSE_CNAME_NO_IP, pos,
+				     len);
 		return 0;
 
 	default:
@@ -212,7 +211,6 @@ int dns_unpack_response_header(struct dns_msg_t *msg, int src_id)
 		break;
 	default:
 		return rc;
-
 	}
 
 	qdcount = dns_unpack_header_qdcount(dns_header);
@@ -248,8 +246,8 @@ static int dns_msg_pack_query_header(uint8_t *buf, uint16_t size, uint16_t id)
 	/* Split the following assignements just in case we need to alter
 	 * the flags in future releases
 	 */
-	*(buf + offset) = DNS_FLAGS1;		/* QR, Opcode, AA, TC and RD */
-	*(buf + offset + 1) = DNS_FLAGS2;	/* RA, Z and RCODE */
+	*(buf + offset) = DNS_FLAGS1; /* QR, Opcode, AA, TC and RD */
+	*(buf + offset + 1) = DNS_FLAGS2; /* RA, Z and RCODE */
 
 	offset += DNS_HEADER_FLAGS_LEN;
 	/* set question counter */
@@ -550,8 +548,8 @@ int dns_unpack_query(struct dns_msg_t *dns_msg, struct net_buf *buf,
 	dns_query = dns_msg->msg + dns_msg->query_offset;
 	remaining_size = dns_msg->msg_size - dns_msg->query_offset;
 
-	ret = dns_unpack_name(dns_msg->msg, dns_msg->msg_size, dns_query,
-			      buf, &end_of_label);
+	ret = dns_unpack_name(dns_msg->msg, dns_msg->msg_size, dns_query, buf,
+			      &end_of_label);
 	if (ret < 0) {
 		return ret;
 	}

@@ -32,17 +32,17 @@ static void adxl372_thread_cb(const struct device *dev)
 		 * threshold and then call the trigger handler.
 		 */
 		if (cfg->max_peak_detect_mode &&
-			ADXL372_STATUS_2_INACT(status2)) {
+		    ADXL372_STATUS_2_INACT(status2)) {
 			drv_data->th_handler(dev, &drv_data->th_trigger);
 		} else if (!cfg->max_peak_detect_mode &&
-			(ADXL372_STATUS_2_INACT(status2) ||
-			ADXL372_STATUS_2_ACTIVITY(status2))) {
+			   (ADXL372_STATUS_2_INACT(status2) ||
+			    ADXL372_STATUS_2_ACTIVITY(status2))) {
 			drv_data->th_handler(dev, &drv_data->th_trigger);
 		}
 	}
 
 	if ((drv_data->drdy_handler != NULL) &&
-		ADXL372_STATUS_1_DATA_RDY(status1)) {
+	    ADXL372_STATUS_1_DATA_RDY(status1)) {
 		drv_data->drdy_handler(dev, &drv_data->drdy_trigger);
 	}
 
@@ -139,16 +139,14 @@ int adxl372_init_interrupt(const struct device *dev)
 
 	drv_data->gpio = device_get_binding(cfg->gpio_port);
 	if (drv_data->gpio == NULL) {
-		LOG_ERR("Failed to get pointer to %s device!",
-		    cfg->gpio_port);
+		LOG_ERR("Failed to get pointer to %s device!", cfg->gpio_port);
 		return -EINVAL;
 	}
 
 	gpio_pin_configure(drv_data->gpio, cfg->int_gpio,
 			   GPIO_INPUT | cfg->int_flags);
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   adxl372_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, adxl372_gpio_callback,
 			   BIT(cfg->int_gpio));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -162,9 +160,9 @@ int adxl372_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_ADXL372_THREAD_STACK_SIZE,
-			(k_thread_entry_t)adxl372_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_ADXL372_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)adxl372_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_ADXL372_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_ADXL372_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = adxl372_work_cb;
 #endif

@@ -19,12 +19,12 @@ LOG_MODULE_REGISTER(tuning);
 static void tun_drv_process_command(uint8_t *data, uint32_t len);
 
 /* Buffer size in "words" for the tuning commands and replies */
-#define TUN_DRV_CMD_MAX_WORDS	(264)
-#define TUN_DRV_CMD_MAX_BYTES	(TUN_DRV_CMD_MAX_WORDS << 2)
+#define TUN_DRV_CMD_MAX_WORDS (264)
+#define TUN_DRV_CMD_MAX_BYTES (TUN_DRV_CMD_MAX_WORDS << 2)
 
-#define TUN_DRV_ALERT_Q_LEN	((TUN_DRV_CMD_MAX_BYTES +\
-			USB_TPORT_HID_REPORT_DATA_LEN - 1) /\
-		USB_TPORT_HID_REPORT_DATA_LEN)
+#define TUN_DRV_ALERT_Q_LEN                                            \
+	((TUN_DRV_CMD_MAX_BYTES + USB_TPORT_HID_REPORT_DATA_LEN - 1) / \
+	 USB_TPORT_HID_REPORT_DATA_LEN)
 
 static struct {
 	/* room for transport header */
@@ -55,7 +55,7 @@ static int tun_drv_io_thread(void)
 
 	/* initialize the audio core's tuning interface */
 	audio_core_tuning_interface_init((uint32_t *)command_buffer.buffer,
-			TUN_DRV_CMD_MAX_WORDS);
+					 TUN_DRV_CMD_MAX_WORDS);
 
 	/* initialize the tuning transport protocol driver */
 	usb_transport_init(tun_drv_process_command);

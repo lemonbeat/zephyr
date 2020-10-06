@@ -13,14 +13,14 @@
 
 #define Z_REG(base, off) (*(volatile uint32_t *)((base) + (off)))
 
-#define RTC_CNTL_BASE             0x3ff48000
-#define RTC_CNTL_OPTIONS0     Z_REG(RTC_CNTL_BASE, 0x0)
+#define RTC_CNTL_BASE 0x3ff48000
+#define RTC_CNTL_OPTIONS0 Z_REG(RTC_CNTL_BASE, 0x0)
 #define RTC_CNTL_SW_CPU_STALL Z_REG(RTC_CNTL_BASE, 0xac)
 
-#define DPORT_BASE                 0x3ff00000
-#define DPORT_APPCPU_CTRL_A    Z_REG(DPORT_BASE, 0x02C)
-#define DPORT_APPCPU_CTRL_B    Z_REG(DPORT_BASE, 0x030)
-#define DPORT_APPCPU_CTRL_C    Z_REG(DPORT_BASE, 0x034)
+#define DPORT_BASE 0x3ff00000
+#define DPORT_APPCPU_CTRL_A Z_REG(DPORT_BASE, 0x02C)
+#define DPORT_APPCPU_CTRL_B Z_REG(DPORT_BASE, 0x030)
+#define DPORT_APPCPU_CTRL_C Z_REG(DPORT_BASE, 0x034)
 
 struct cpustart_rec {
 	int cpu;
@@ -105,10 +105,13 @@ static void appcpu_entry2(void)
  */
 void z_appcpu_stack_switch(void *stack, void *entry);
 __asm__("\n"
-	".align 4"		"\n"
-	"z_appcpu_stack_switch:"	"\n\t"
+	".align 4"
+	"\n"
+	"z_appcpu_stack_switch:"
+	"\n\t"
 
-	"entry a1, 16"		"\n\t"
+	"entry a1, 16"
+	"\n\t"
 
 	/* Subtle: we want the stack to be 16 bytes higher than the
 	 * top on entry to the called function, because the ABI forces
@@ -120,7 +123,8 @@ __asm__("\n"
 	 * Those 16 bytes would otherwise be wasted on the stack, so
 	 * adjust
 	 */
-	"addi a1, a2, 16"	"\n\t"
+	"addi a1, a2, 16"
+	"\n\t"
 
 	/* Clear WINDOWSTART so called functions never try to spill
 	 * our callers' registers into the now-garbage stack pointers
@@ -128,22 +132,31 @@ __asm__("\n"
 	 * WINDOWBASE, our C callee will do that when it does an
 	 * ENTRY.
 	 */
-	"movi a0, 0"		"\n\t"
-	"wsr.WINDOWSTART a0"	"\n\t"
+	"movi a0, 0"
+	"\n\t"
+	"wsr.WINDOWSTART a0"
+	"\n\t"
 
 	/* Clear CALLINC field of PS (you would think it would, but
 	 * our ENTRY doesn't actually do that) so the callee's ENTRY
 	 * doesn't shift the registers
 	 */
-	"rsr.PS a0"		"\n\t"
-	"movi a2, 0xfffcffff"	"\n\t"
-	"and a0, a0, a2"	"\n\t"
-	"wsr.PS a0"		"\n\t"
+	"rsr.PS a0"
+	"\n\t"
+	"movi a2, 0xfffcffff"
+	"\n\t"
+	"and a0, a0, a2"
+	"\n\t"
+	"wsr.PS a0"
+	"\n\t"
 
-	"rsync"			"\n\t"
-	"movi a0, 0"		"\n\t"
+	"rsync"
+	"\n\t"
+	"movi a0, 0"
+	"\n\t"
 
-	"jx a3"			"\n\t");
+	"jx a3"
+	"\n\t");
 
 /* Carefully constructed to use no stack beyond compiler-generated ABI
  * instructions.  WE DO NOT KNOW WHERE THE STACK FOR THIS FUNCTION IS.
@@ -174,9 +187,9 @@ static void appcpu_start(void)
 	esp32_rom_Cache_Read_Enable(1);
 
 	RTC_CNTL_SW_CPU_STALL &= ~RTC_CNTL_SW_STALL_APPCPU_C1;
-	RTC_CNTL_OPTIONS0     &= ~RTC_CNTL_SW_STALL_APPCPU_C0;
-	DPORT_APPCPU_CTRL_B   |= DPORT_APPCPU_CLKGATE_EN;
-	DPORT_APPCPU_CTRL_C   &= ~DPORT_APPCPU_RUNSTALL;
+	RTC_CNTL_OPTIONS0 &= ~RTC_CNTL_SW_STALL_APPCPU_C0;
+	DPORT_APPCPU_CTRL_B |= DPORT_APPCPU_CLKGATE_EN;
+	DPORT_APPCPU_CTRL_C &= ~DPORT_APPCPU_RUNSTALL;
 
 	/* Pulse the RESETTING bit */
 	DPORT_APPCPU_CTRL_A |= DPORT_APPCPU_RESETTING;

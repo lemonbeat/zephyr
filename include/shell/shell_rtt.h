@@ -21,11 +21,11 @@ struct shell_rtt {
 	void *context;
 };
 
-#define SHELL_RTT_DEFINE(_name)					\
-	static struct shell_rtt _name##_shell_rtt;			\
-	struct shell_transport _name = {				\
-		.api = &shell_rtt_transport_api,			\
-		.ctx = (struct shell_rtt *)&_name##_shell_rtt		\
+#define SHELL_RTT_DEFINE(_name)                               \
+	static struct shell_rtt _name##_shell_rtt;            \
+	struct shell_transport _name = {                      \
+		.api = &shell_rtt_transport_api,              \
+		.ctx = (struct shell_rtt *)&_name##_shell_rtt \
 	}
 
 /**

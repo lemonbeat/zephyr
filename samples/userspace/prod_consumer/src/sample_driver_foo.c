@@ -20,8 +20,7 @@ LOG_MODULE_REGISTER(sample_driver);
  * The driver sets up a timer which is used to fake interrupts.
  */
 
-#define DEV_DATA(dev) \
-	((struct sample_driver_foo_dev_data *const)(dev)->data)
+#define DEV_DATA(dev) ((struct sample_driver_foo_dev_data *const)(dev)->data)
 
 struct sample_driver_foo_dev_data {
 	const struct device *dev;
@@ -80,8 +79,7 @@ static void sample_driver_foo_isr(void *param)
 
 	char data_payload[SAMPLE_DRIVER_MSG_SIZE];
 
-	LOG_INF("%s: param=%p count=%u", __func__, param,
-		data->count);
+	LOG_INF("%s: param=%p count=%u", __func__, param, data->count);
 
 	/* Just for demonstration purposes; the data payload is full of junk */
 	if (data->cb) {
@@ -112,7 +110,6 @@ static int sample_driver_foo_init(const struct device *dev)
 static struct sample_driver_foo_dev_data sample_driver_foo_dev_data_0;
 
 DEVICE_AND_API_INIT(sample_driver_foo_0, SAMPLE_DRIVER_NAME_0,
-		    &sample_driver_foo_init,
-		    &sample_driver_foo_dev_data_0, NULL,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &sample_driver_foo_init, &sample_driver_foo_dev_data_0,
+		    NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &sample_driver_foo_api);

@@ -20,56 +20,50 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(sx1276);
 
-#define GPIO_RESET_PIN		DT_INST_GPIO_PIN(0, reset_gpios)
-#define GPIO_CS_PIN		DT_INST_SPI_DEV_CS_GPIOS_PIN(0)
-#define GPIO_CS_FLAGS		DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0)
+#define GPIO_RESET_PIN DT_INST_GPIO_PIN(0, reset_gpios)
+#define GPIO_CS_PIN DT_INST_SPI_DEV_CS_GPIOS_PIN(0)
+#define GPIO_CS_FLAGS DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0)
 
-#define GPIO_ANTENNA_ENABLE_PIN				\
-	DT_INST_GPIO_PIN(0, antenna_enable_gpios)
-#define GPIO_RFI_ENABLE_PIN			\
-	DT_INST_GPIO_PIN(0, rfi_enable_gpios)
-#define GPIO_RFO_ENABLE_PIN			\
-	DT_INST_GPIO_PIN(0, rfo_enable_gpios)
-#define GPIO_PA_BOOST_ENABLE_PIN			\
-	DT_INST_GPIO_PIN(0, pa_boost_enable_gpios)
+#define GPIO_ANTENNA_ENABLE_PIN DT_INST_GPIO_PIN(0, antenna_enable_gpios)
+#define GPIO_RFI_ENABLE_PIN DT_INST_GPIO_PIN(0, rfi_enable_gpios)
+#define GPIO_RFO_ENABLE_PIN DT_INST_GPIO_PIN(0, rfo_enable_gpios)
+#define GPIO_PA_BOOST_ENABLE_PIN DT_INST_GPIO_PIN(0, pa_boost_enable_gpios)
 
-#define GPIO_TCXO_POWER_PIN	DT_INST_GPIO_PIN(0, tcxo_power_gpios)
+#define GPIO_TCXO_POWER_PIN DT_INST_GPIO_PIN(0, tcxo_power_gpios)
 
 #if DT_INST_NODE_HAS_PROP(0, tcxo_power_startup_delay_ms)
-#define TCXO_POWER_STARTUP_DELAY_MS			\
-	DT_INST_PROP(0, tcxo_power_startup_delay_ms)
+#define TCXO_POWER_STARTUP_DELAY_MS DT_INST_PROP(0, tcxo_power_startup_delay_ms)
 #else
-#define TCXO_POWER_STARTUP_DELAY_MS		0
+#define TCXO_POWER_STARTUP_DELAY_MS 0
 #endif
 
 /*
  * Those macros must be in sync with 'power-amplifier-output' dts property.
  */
-#define SX1276_PA_RFO				0
-#define SX1276_PA_BOOST				1
+#define SX1276_PA_RFO 0
+#define SX1276_PA_BOOST 1
 
-#if DT_INST_NODE_HAS_PROP(0, rfo_enable_gpios) &&	\
+#if DT_INST_NODE_HAS_PROP(0, rfo_enable_gpios) && \
 	DT_INST_NODE_HAS_PROP(0, pa_boost_enable_gpios)
-#define SX1276_PA_OUTPUT(power)				\
-	((power) > 14 ? SX1276_PA_BOOST : SX1276_PA_RFO)
+#define SX1276_PA_OUTPUT(power) ((power) > 14 ? SX1276_PA_BOOST : SX1276_PA_RFO)
 #elif DT_INST_NODE_HAS_PROP(0, rfo_enable_gpios)
-#define SX1276_PA_OUTPUT(power)		SX1276_PA_RFO
+#define SX1276_PA_OUTPUT(power) SX1276_PA_RFO
 #elif DT_INST_NODE_HAS_PROP(0, pa_boost_enable_gpios)
-#define SX1276_PA_OUTPUT(power)		SX1276_PA_BOOST
+#define SX1276_PA_OUTPUT(power) SX1276_PA_BOOST
 #elif DT_INST_NODE_HAS_PROP(0, power_amplifier_output)
-#define SX1276_PA_OUTPUT(power)				\
+#define SX1276_PA_OUTPUT(power) \
 	DT_ENUM_IDX(DT_DRV_INST(0), power_amplifier_output)
 #else
 BUILD_ASSERT(0, "None of rfo-enable-gpios, pa-boost-enable-gpios and "
-	     "power-amplifier-output has been specified. "
-	     "Look at semtech,sx1276.yaml to fix that.");
+		"power-amplifier-output has been specified. "
+		"Look at semtech,sx1276.yaml to fix that.");
 #endif
 
-#define SX1276_REG_PA_CONFIG			0x09
-#define SX1276_REG_PA_DAC			0x4d
-#define SX1276_REG_VERSION			0x42
+#define SX1276_REG_PA_CONFIG 0x09
+#define SX1276_REG_PA_DAC 0x4d
+#define SX1276_REG_VERSION 0x42
 
-#define SX1276_PA_CONFIG_MAX_POWER_SHIFT	4
+#define SX1276_PA_CONFIG_MAX_POWER_SHIFT 4
 
 extern DioIrqHandler *DioIrq[];
 
@@ -80,10 +74,10 @@ struct sx1276_dio {
 };
 
 /* Helper macro that UTIL_LISTIFY can use and produces an element with comma */
-#define SX1276_DIO_GPIO_ELEM(idx, inst) \
-	{ \
+#define SX1276_DIO_GPIO_ELEM(idx, inst)                          \
+	{                                                        \
 		DT_INST_GPIO_LABEL_BY_IDX(inst, dio_gpios, idx), \
-		DT_INST_GPIO_PIN_BY_IDX(inst, dio_gpios, idx), \
+		DT_INST_GPIO_PIN_BY_IDX(inst, dio_gpios, idx),   \
 		DT_INST_GPIO_FLAGS_BY_IDX(inst, dio_gpios, idx), \
 	},
 
@@ -108,7 +102,7 @@ static struct sx1276_data {
 #if DT_INST_NODE_HAS_PROP(0, pa_boost_enable_gpios)
 	const struct device *pa_boost_enable;
 #endif
-#if DT_INST_NODE_HAS_PROP(0, rfo_enable_gpios) &&	\
+#if DT_INST_NODE_HAS_PROP(0, rfo_enable_gpios) && \
 	DT_INST_NODE_HAS_PROP(0, pa_boost_enable_gpios)
 	uint8_t tx_power;
 #endif
@@ -163,8 +157,7 @@ static inline void sx1276_rfo_enable(int val)
 static inline void sx1276_pa_boost_enable(int val)
 {
 #if DT_INST_NODE_HAS_PROP(0, pa_boost_enable_gpios)
-	gpio_pin_set(dev_data.pa_boost_enable,
-		     GPIO_PA_BOOST_ENABLE_PIN, val);
+	gpio_pin_set(dev_data.pa_boost_enable, GPIO_PA_BOOST_ENABLE_PIN, val);
 #endif
 }
 
@@ -257,8 +250,7 @@ static void sx1276_irq_callback(const struct device *dev,
 	pin = find_lsb_set(pins) - 1;
 
 	for (i = 0; i < SX1276_MAX_DIO; i++) {
-		if (dev == dev_data.dio_dev[i] &&
-		    pin == sx1276_dios[i].pin) {
+		if (dev == dev_data.dio_dev[i] && pin == sx1276_dios[i].pin) {
 			k_work_submit(&dev_data.dio_work[i]);
 		}
 	}
@@ -285,11 +277,10 @@ void SX1276IoIrqInit(DioIrqHandler **irqHandlers)
 		k_work_init(&dev_data.dio_work[i], sx1276_dio_work_handle);
 
 		gpio_pin_configure(dev_data.dio_dev[i], sx1276_dios[i].pin,
-				   GPIO_INPUT | GPIO_INT_DEBOUNCE
-				   | sx1276_dios[i].flags);
+				   GPIO_INPUT | GPIO_INT_DEBOUNCE |
+					   sx1276_dios[i].flags);
 
-		gpio_init_callback(&callbacks[i],
-				   sx1276_irq_callback,
+		gpio_init_callback(&callbacks[i], sx1276_irq_callback,
 				   BIT(sx1276_dios[i].pin));
 
 		if (gpio_add_callback(dev_data.dio_dev[i], &callbacks[i]) < 0) {
@@ -300,34 +291,23 @@ void SX1276IoIrqInit(DioIrqHandler **irqHandlers)
 					     sx1276_dios[i].pin,
 					     GPIO_INT_EDGE_TO_ACTIVE);
 	}
-
 }
 
 static int sx1276_transceive(uint8_t reg, bool write, void *data, size_t length)
 {
-	const struct spi_buf buf[2] = {
-		{
-			.buf = &reg,
-			.len = sizeof(reg)
-		},
-		{
-			.buf = data,
-			.len = length
-		}
-	};
+	const struct spi_buf buf[2] = { { .buf = &reg, .len = sizeof(reg) },
+					{ .buf = data, .len = length } };
 	struct spi_buf_set tx = {
 		.buffers = buf,
 		.count = ARRAY_SIZE(buf),
 	};
 
 	if (!write) {
-		const struct spi_buf_set rx = {
-			.buffers = buf,
-			.count = ARRAY_SIZE(buf)
-		};
+		const struct spi_buf_set rx = { .buffers = buf,
+						.count = ARRAY_SIZE(buf) };
 
-		return spi_transceive(dev_data.spi, &dev_data.spi_cfg,
-				&tx, &rx);
+		return spi_transceive(dev_data.spi, &dev_data.spi_cfg, &tx,
+				      &rx);
 	}
 
 	return spi_write(dev_data.spi, &dev_data.spi_cfg, &tx);
@@ -402,7 +382,7 @@ void SX1276SetRfTxPower(int8_t power)
 		}
 	}
 
-#if DT_INST_NODE_HAS_PROP(0, rfo_enable_gpios) &&	\
+#if DT_INST_NODE_HAS_PROP(0, rfo_enable_gpios) && \
 	DT_INST_NODE_HAS_PROP(0, pa_boost_enable_gpios)
 	dev_data.tx_power = power;
 #endif
@@ -483,7 +463,7 @@ static int sx1276_lora_init(const struct device *dev)
 	dev_data.spi = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (!dev_data.spi) {
 		LOG_ERR("Cannot get pointer to %s device",
-			    DT_INST_BUS_LABEL(0));
+			DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -492,11 +472,10 @@ static int sx1276_lora_init(const struct device *dev)
 	dev_data.spi_cfg.slave = DT_INST_REG_ADDR(0);
 
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	spi_cs.gpio_dev = device_get_binding(
-			DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
+	spi_cs.gpio_dev = device_get_binding(DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
 	if (!spi_cs.gpio_dev) {
 		LOG_ERR("Cannot get pointer to %s device",
-		       DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
+			DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
 		return -EIO;
 	}
 
@@ -552,7 +531,6 @@ static const struct lora_driver_api sx1276_lora_api = {
 	.test_cw = sx12xx_lora_test_cw,
 };
 
-DEVICE_AND_API_INIT(sx1276_lora, DT_INST_LABEL(0),
-		    &sx1276_lora_init, NULL,
+DEVICE_AND_API_INIT(sx1276_lora, DT_INST_LABEL(0), &sx1276_lora_init, NULL,
 		    NULL, POST_KERNEL, CONFIG_LORA_INIT_PRIORITY,
 		    &sx1276_lora_api);

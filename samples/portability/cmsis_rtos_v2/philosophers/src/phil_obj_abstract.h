@@ -33,37 +33,34 @@
 #define phil_obj_abstract__h
 
 #if FORKS == SEMAPHORES
-	osSemaphoreAttr_t sema_attr[] = {
-		{"sema0", 0, NULL, 0U},
-		{"sema1", 0, NULL, 0U},
-		{"sema2", 0, NULL, 0U},
-		{"sema3", 0, NULL, 0U},
-		{"sema4", 0, NULL, 0U},
-		{"sema5", 0, NULL, 0U}
-	};
+osSemaphoreAttr_t sema_attr[] = {
+	{ "sema0", 0, NULL, 0U }, { "sema1", 0, NULL, 0U },
+	{ "sema2", 0, NULL, 0U }, { "sema3", 0, NULL, 0U },
+	{ "sema4", 0, NULL, 0U }, { "sema5", 0, NULL, 0U }
+};
 
-	#define fork_init(x) osSemaphoreNew(1, 1, &sema_attr[x])
-	#define take(x) osSemaphoreAcquire(x, osWaitForever)
-	#define drop(x) osSemaphoreRelease(x)
-	#define fork_type_str "semaphores"
-	#define fork_t osSemaphoreId_t
+#define fork_init(x) osSemaphoreNew(1, 1, &sema_attr[x])
+#define take(x) osSemaphoreAcquire(x, osWaitForever)
+#define drop(x) osSemaphoreRelease(x)
+#define fork_type_str "semaphores"
+#define fork_t osSemaphoreId_t
 
 #elif FORKS == MUTEXES
-	osMutexAttr_t mutex_attr[x] = {
-		{"Mutex0", osMutexRecursive | osMutexPrioInherit, NULL, 0U},
-		{"Mutex1", osMutexRecursive | osMutexPrioInherit, NULL, 0U},
-		{"Mutex2", osMutexRecursive | osMutexPrioInherit, NULL, 0U},
-		{"Mutex3", osMutexRecursive | osMutexPrioInherit, NULL, 0U},
-		{"Mutex4", osMutexRecursive | osMutexPrioInherit, NULL, 0U},
-		{"Mutex5", osMutexRecursive | osMutexPrioInherit, NULL, 0U}
-	};
+osMutexAttr_t mutex_attr[x] = {
+	{ "Mutex0", osMutexRecursive | osMutexPrioInherit, NULL, 0U },
+	{ "Mutex1", osMutexRecursive | osMutexPrioInherit, NULL, 0U },
+	{ "Mutex2", osMutexRecursive | osMutexPrioInherit, NULL, 0U },
+	{ "Mutex3", osMutexRecursive | osMutexPrioInherit, NULL, 0U },
+	{ "Mutex4", osMutexRecursive | osMutexPrioInherit, NULL, 0U },
+	{ "Mutex5", osMutexRecursive | osMutexPrioInherit, NULL, 0U }
+};
 
-	#define fork_init(x) osMutexNew(&mutex_attr[x])
-	#define take(x) osMutexAcquire(x, osWaitForever)
-	#define drop(x) osMutexRelease(x)
-	#define fork_type_str "mutexes"
-	#define fork_t osMutexAttr_t
+#define fork_init(x) osMutexNew(&mutex_attr[x])
+#define take(x) osMutexAcquire(x, osWaitForever)
+#define drop(x) osMutexRelease(x)
+#define fork_type_str "mutexes"
+#define fork_t osMutexAttr_t
 #else
-	#error unknown fork type
+#error unknown fork type
 #endif
 #endif /* phil_obj_abstract__h */

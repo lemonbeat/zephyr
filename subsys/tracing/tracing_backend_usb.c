@@ -14,11 +14,11 @@
 #include <tracing_buffer.h>
 #include <tracing_backend.h>
 
-#define USB_TRANSFER_ONGOING               1
-#define USB_TRANSFER_FREE                  0
+#define USB_TRANSFER_ONGOING 1
+#define USB_TRANSFER_FREE 0
 
-#define TRACING_IF_IN_EP_ADDR              0x81
-#define TRACING_IF_OUT_EP_ADDR             0x01
+#define TRACING_IF_IN_EP_ADDR 0x81
+#define TRACING_IF_OUT_EP_ADDR 0x01
 
 struct usb_device_desc {
 	struct usb_if_descriptor if0;
@@ -71,8 +71,7 @@ USBD_CLASS_DESCR_DEFINE(primary, 0) struct usb_device_desc dev_desc = {
 };
 
 static void dev_status_cb(struct usb_cfg_data *cfg,
-			  enum usb_dc_status_code status,
-			  const uint8_t *param)
+			  enum usb_dc_status_code status, const uint8_t *param)
 {
 	ARG_UNUSED(cfg);
 	ARG_UNUSED(param);
@@ -80,7 +79,8 @@ static void dev_status_cb(struct usb_cfg_data *cfg,
 	usb_device_status = status;
 }
 
-static void tracing_ep_out_cb(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status)
+static void tracing_ep_out_cb(uint8_t ep,
+			      enum usb_dc_ep_cb_status_code ep_status)
 {
 	uint8_t *cmd = NULL;
 	uint32_t bytes_to_read, length;
@@ -104,7 +104,8 @@ static void tracing_ep_out_cb(uint8_t ep, enum usb_dc_ep_cb_status_code ep_statu
 	usb_write(TRACING_IF_IN_EP_ADDR, NULL, 0, NULL);
 }
 
-static void tracing_ep_in_cb(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status)
+static void tracing_ep_in_cb(uint8_t ep,
+			     enum usb_dc_ep_cb_status_code ep_status)
 {
 	ARG_UNUSED(ep);
 	ARG_UNUSED(ep_status);
@@ -124,7 +125,7 @@ static struct usb_ep_cfg_data ep_cfg[] = {
 };
 
 USBD_CFG_DATA_DEFINE(primary, tracing_backend_usb)
-	struct usb_cfg_data tracing_backend_usb_config = {
+struct usb_cfg_data tracing_backend_usb_config = {
 	.usb_device_description = NULL,
 	.interface_descriptor = &dev_desc.if0,
 	.cb_usb_status = dev_status_cb,
@@ -154,7 +155,9 @@ static void tracing_backend_usb_output(const struct tracing_backend *backend,
 		 */
 		ret = usb_write(TRACING_IF_IN_EP_ADDR, data,
 				length >= CONFIG_TRACING_USB_MPS ?
-				CONFIG_TRACING_USB_MPS - 1 : length, &bytes);
+					      CONFIG_TRACING_USB_MPS - 1 :
+					      length,
+				&bytes);
 		if (ret) {
 			continue;
 		}

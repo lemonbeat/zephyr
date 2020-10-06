@@ -106,13 +106,13 @@ z_impl_ec_host_cmd_periph_init(const struct device *dev,
  *
  * @retval 0 if successful
  */
-__syscall int ec_host_cmd_periph_send(
-	const struct device *dev,
-	const struct ec_host_cmd_periph_tx_buf *tx_buf);
+__syscall int
+ec_host_cmd_periph_send(const struct device *dev,
+			const struct ec_host_cmd_periph_tx_buf *tx_buf);
 
-static inline int z_impl_ec_host_cmd_periph_send(
-	const struct device *dev,
-	const struct ec_host_cmd_periph_tx_buf *tx_buf)
+static inline int
+z_impl_ec_host_cmd_periph_send(const struct device *dev,
+			       const struct ec_host_cmd_periph_tx_buf *tx_buf)
 {
 	const struct ec_host_cmd_periph_api *api =
 		(const struct ec_host_cmd_periph_api *)dev->api;

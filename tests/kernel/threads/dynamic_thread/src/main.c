@@ -36,8 +36,8 @@ static void dyn_thread_entry(void *p1, void *p2, void *p3)
 
 static void prep(void)
 {
-	k_thread_access_grant(k_current_get(), dyn_thread_stack,
-			      &start_sem, &end_sem);
+	k_thread_access_grant(k_current_get(), dyn_thread_stack, &start_sem,
+			      &end_sem);
 }
 
 static void create_dynamic_thread(void)
@@ -202,7 +202,6 @@ void test_main(void)
 			 ztest_unit_test(test_kernel_create_dyn_user_thread),
 			 ztest_user_unit_test(test_user_create_dyn_user_thread),
 			 ztest_unit_test(test_dyn_thread_perms),
-			 ztest_unit_test(test_thread_index_management)
-			 );
+			 ztest_unit_test(test_thread_index_management));
 	ztest_run_test_suite(thread_dynamic);
 }

@@ -11,12 +11,11 @@
 
 /* nrf 51 has lower ram, so creating less number of threads */
 #if CONFIG_SRAM_SIZE <= 24
-	#define NUM_THREAD 2
-#elif (CONFIG_SRAM_SIZE <= 32) \
-	|| defined(CONFIG_SOC_EMSK_EM7D)
-	#define NUM_THREAD 3
+#define NUM_THREAD 2
+#elif (CONFIG_SRAM_SIZE <= 32) || defined(CONFIG_SOC_EMSK_EM7D)
+#define NUM_THREAD 3
 #else
-	#define NUM_THREAD 10
+#define NUM_THREAD 10
 #endif
 #define BASE_PRIORITY 0
 #define ITRERATION_COUNT 5
@@ -38,11 +37,12 @@ static void thread_tslice(void *p1, void *p2, void *p3)
 	int idx = POINTER_TO_INT(p1);
 
 	/*Print New line for last thread*/
-	int thread_parameter = (idx == (NUM_THREAD - 1)) ? '\n' :
-			       (idx + 'A');
+	int thread_parameter = (idx == (NUM_THREAD - 1)) ? '\n' : (idx + 'A');
 
-	int64_t expected_slice_min = k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(SLICE_SIZE));
-	int64_t expected_slice_max = k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(SLICE_SIZE) + 1);
+	int64_t expected_slice_min =
+		k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(SLICE_SIZE));
+	int64_t expected_slice_max =
+		k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(SLICE_SIZE) + 1);
 
 	/* Clumsy, but need to handle the precision loss with
 	 * submillisecond ticks.  It's always possible to alias and
@@ -60,7 +60,8 @@ static void thread_tslice(void *p1, void *p2, void *p3)
 		 */
 		zassert_true(((tdelta >= expected_slice_min) &&
 			      (tdelta <= expected_slice_max) &&
-			      (idx == thread_idx)), NULL);
+			      (idx == thread_idx)),
+			     NULL);
 		thread_idx = (thread_idx + 1) % (NUM_THREAD);
 
 		/* Keep the current thread busy for more than one slice,
@@ -99,9 +100,8 @@ void test_slice_scheduling(void)
 	/* create threads with equal preemptive priority*/
 	for (int i = 0; i < NUM_THREAD; i++) {
 		tid[i] = k_thread_create(&t[i], tstacks[i], STACK_SIZE,
-					 thread_tslice,
-					 INT_TO_POINTER(i), NULL, NULL,
-					 K_PRIO_PREEMPT(BASE_PRIORITY), 0,
+					 thread_tslice, INT_TO_POINTER(i), NULL,
+					 NULL, K_PRIO_PREEMPT(BASE_PRIORITY), 0,
 					 K_NO_WAIT);
 	}
 
@@ -123,7 +123,6 @@ void test_slice_scheduling(void)
 		}
 		count++;
 	}
-
 
 	/* test case teardown*/
 	for (int i = 0; i < NUM_THREAD; i++) {

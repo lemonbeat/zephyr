@@ -31,5 +31,4 @@ void dequtask(void)
 	}
 }
 
-
 #endif /* FIFO_BENCH */

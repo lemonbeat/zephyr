@@ -25,9 +25,8 @@ LOG_MODULE_DECLARE(os);
 #ifdef CONFIG_USERSPACE
 Z_EXC_DECLARE(z_arc_user_string_nlen);
 
-static const struct z_exc_handle exceptions[] = {
-	Z_EXC_HANDLE(z_arc_user_string_nlen)
-};
+static const struct z_exc_handle exceptions[] = { Z_EXC_HANDLE(
+	z_arc_user_string_nlen) };
 #endif
 
 #if defined(CONFIG_MPU_STACK_GUARD)
@@ -87,7 +86,7 @@ static bool z_check_thread_stack_fail(const uint32_t fault_addr, uint32_t sp)
 		guard_start = guard_end - Z_ARC_STACK_GUARD_SIZE;
 	}
 
-	 /* treat any MPU exceptions within the guard region as a stack
+	/* treat any MPU exceptions within the guard region as a stack
 	  * overflow if the stack pointer is at or below the end of the guard
 	  * region.
 	  */
@@ -267,7 +266,8 @@ static void dump_privilege_exception(uint32_t cause, uint32_t parameter)
 	}
 }
 
-static void dump_exception_info(uint32_t vector, uint32_t cause, uint32_t parameter)
+static void dump_exception_info(uint32_t vector, uint32_t cause,
+				uint32_t parameter)
 {
 	if (vector >= 0x10 && vector <= 0xFF) {
 		LOG_ERR("interrupt %u", vector);
@@ -360,7 +360,7 @@ void _Fault(z_arch_esf_t *esf, uint32_t old_sp)
 #endif
 
 	vector = Z_ARC_V2_ECR_VECTOR(ecr);
-	cause =  Z_ARC_V2_ECR_CODE(ecr);
+	cause = Z_ARC_V2_ECR_CODE(ecr);
 	parameter = Z_ARC_V2_ECR_PARAMETER(ecr);
 
 	/* exception raised by kernel */
@@ -371,7 +371,7 @@ void _Fault(z_arch_esf_t *esf, uint32_t old_sp)
 		 */
 #ifdef CONFIG_USERSPACE
 		if ((esf->status32 & _ARC_V2_STATUS32_U) &&
-			esf->r0 != K_ERR_STACK_CHK_FAIL) {
+		    esf->r0 != K_ERR_STACK_CHK_FAIL) {
 			esf->r0 = K_ERR_KERNEL_OOPS;
 		}
 #endif
@@ -400,8 +400,8 @@ void _Fault(z_arch_esf_t *esf, uint32_t old_sp)
 #endif
 
 #ifdef CONFIG_MPU_STACK_GUARD
-	if (vector == ARC_EV_PROT_V && ((parameter == 0x4) ||
-					(parameter == 0x24))) {
+	if (vector == ARC_EV_PROT_V &&
+	    ((parameter == 0x4) || (parameter == 0x24))) {
 		if (z_check_thread_stack_fail(exc_addr, old_sp)) {
 			z_arc_fatal_error(K_ERR_STACK_CHK_FAIL, esf);
 			return;

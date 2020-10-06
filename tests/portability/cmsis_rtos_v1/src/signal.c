@@ -11,16 +11,16 @@
 #include <irq_offload.h>
 #include <kernel_structs.h>
 
-#define TIMEOUT		(100)
-#define SIGNAL1		(0x00000020)
-#define SIGNAL2		(0x00000004)
-#define SIGNAL		(SIGNAL1 | SIGNAL2)
+#define TIMEOUT (100)
+#define SIGNAL1 (0x00000020)
+#define SIGNAL2 (0x00000004)
+#define SIGNAL (SIGNAL1 | SIGNAL2)
 
 #define SIGNAL_FLAG 0x00000001
 #define ISR_SIGNAL 0x50
 
 #define SIGNAL_ALL_FLAGS ((1 << osFeature_Signals) - 1)
-#define SIGNAL_OUTOFLIMIT_FLAG ((1 << (osFeature_Signals + 1))-1)
+#define SIGNAL_OUTOFLIMIT_FLAG ((1 << (osFeature_Signals + 1)) - 1)
 
 void Thread_1(void const *arg)
 {
@@ -56,7 +56,7 @@ void test_multiple_signal_flags(void const *thread_id)
 	/* signal all the available flags at one shot */
 	signals = osSignalSet((osThreadId)thread_id, SIGNAL_ALL_FLAGS);
 	zassert_not_equal(signals, 0x80000000,
-					  "Signal flags maximum limit failed");
+			  "Signal flags maximum limit failed");
 	/* clear all the bits to check next scenario */
 	signals = osSignalClear((osThreadId)thread_id, SIGNAL_ALL_FLAGS);
 	zassert_not_equal(signals, 0x80000000, "");
@@ -142,20 +142,20 @@ void test_signal_events_signalled(void)
 	evt = osSignalWait(0, TIMEOUT);
 	zassert_equal(evt.status, osEventSignal, "wait for single flag failed");
 	zassert_equal(evt.value.signals, SIGNAL1,
-				  "wait single flag returned invalid value");
+		      "wait single flag returned invalid value");
 
 	/* validate by passing invalid parameters */
 	zassert_equal(osSignalSet(NULL, 0), 0x80000000,
-				  "NULL signal set unexpectedly");
+		      "NULL signal set unexpectedly");
 	zassert_equal(osSignalClear(NULL, 0), 0x80000000,
-				  "NULL signal cleared unexpectedly");
+		      "NULL signal cleared unexpectedly");
 	/* cannot wait for Flag mask with MSB set */
 	zassert_equal(osSignalWait((int32_t)0x80010000, 0).status, osErrorValue,
-				  "signal wait passed unexpectedly");
+		      "signal wait passed unexpectedly");
 	zassert_equal(osSignalSet(osThreadGetId(), (int32_t)0x80010000),
-				  0x80000000, "signal set unexpectedly");
+		      0x80000000, "signal set unexpectedly");
 	zassert_equal(osSignalClear(osThreadGetId(), (int32_t)0x80010000),
-				    0x80000000, "signal cleared unexpectedly");
+		      0x80000000, "signal cleared unexpectedly");
 
 	test_multiple_signal_flags(osThreadGetId());
 }
@@ -191,6 +191,6 @@ void test_signal_events_isr(void)
 	evt = osSignalWait(ISR_SIGNAL, TIMEOUT);
 	zassert_equal(evt.status, osEventSignal,
 		      "signal wait failed unexpectedly");
-	zassert_equal((evt.value.signals & ISR_SIGNAL),
-		       ISR_SIGNAL, "unexpected signal wait value");
+	zassert_equal((evt.value.signals & ISR_SIGNAL), ISR_SIGNAL,
+		      "unexpected signal wait value");
 }

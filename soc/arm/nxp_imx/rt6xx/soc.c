@@ -25,26 +25,26 @@
 #include <fsl_common.h>
 #include <fsl_device_registers.h>
 
-#define SYSTEM_IS_XIP_FLEXSPI() \
-	((((uint32_t)nxp_rt600_init >= 0x08000000U) &&		\
-	  ((uint32_t)nxp_rt600_init < 0x10000000U)) ||		\
-	 (((uint32_t)nxp_rt600_init >= 0x18000000U) &&		\
+#define SYSTEM_IS_XIP_FLEXSPI()                        \
+	((((uint32_t)nxp_rt600_init >= 0x08000000U) && \
+	  ((uint32_t)nxp_rt600_init < 0x10000000U)) || \
+	 (((uint32_t)nxp_rt600_init >= 0x18000000U) && \
 	  ((uint32_t)nxp_rt600_init < 0x20000000U)))
 
 #ifdef CONFIG_INIT_SYS_PLL
 const clock_sys_pll_config_t g_sysPllConfig = {
-	.sys_pll_src  = kCLOCK_SysPllXtalIn,
-	.numerator	  = 0,
-	.denominator  = 1,
+	.sys_pll_src = kCLOCK_SysPllXtalIn,
+	.numerator = 0,
+	.denominator = 1,
 	.sys_pll_mult = kCLOCK_SysPllMult22
 };
 #endif
 
 #ifdef CONFIG_INIT_AUDIO_PLL
 const clock_audio_pll_config_t g_audioPllConfig = {
-	.audio_pll_src	= kCLOCK_AudioPllXtalIn,
-	.numerator		= 5040,
-	.denominator	= 27000,
+	.audio_pll_src = kCLOCK_AudioPllXtalIn,
+	.numerator = 5040,
+	.denominator = 27000,
 	.audio_pll_mult = kCLOCK_AudioPllMult22
 };
 #endif
@@ -66,28 +66,28 @@ extern void z_arm_pendsv(void);
 extern void z_clock_isr(void);
 extern void z_arm_exc_spurious(void);
 
-__imx_boot_ivt_section void (* const image_vector_table[])(void)  = {
-	(void (*)())(z_main_stack + CONFIG_MAIN_STACK_SIZE),  /* 0x00 */
-	z_arm_reset,				/* 0x04 */
-	z_arm_nmi,					/* 0x08 */
-	z_arm_hard_fault,			/* 0x0C */
-	z_arm_mpu_fault,			/* 0x10 */
-	z_arm_bus_fault,			/* 0x14 */
-	z_arm_usage_fault,			/* 0x18 */
+__imx_boot_ivt_section void (*const image_vector_table[])(void) = {
+	(void (*)())(z_main_stack + CONFIG_MAIN_STACK_SIZE), /* 0x00 */
+	z_arm_reset, /* 0x04 */
+	z_arm_nmi, /* 0x08 */
+	z_arm_hard_fault, /* 0x0C */
+	z_arm_mpu_fault, /* 0x10 */
+	z_arm_bus_fault, /* 0x14 */
+	z_arm_usage_fault, /* 0x18 */
 #if defined(CONFIG_ARM_SECURE_FIRMWARE)
-	z_arm_secure_fault,			/* 0x1C */
+	z_arm_secure_fault, /* 0x1C */
 #else
 	z_arm_exc_spurious,
 #endif /* CONFIG_ARM_SECURE_FIRMWARE */
-	(void (*)())_flash_used,	/* 0x20, imageLength. */
-	0,				/* 0x24, imageType (Plain Image) */
-	0,				/* 0x28, authBlockOffset/crcChecksum */
-	z_arm_svc,		/* 0x2C */
-	z_arm_debug_monitor,	/* 0x30 */
-	(void (*)())image_vector_table,		/* 0x34, imageLoadAddress. */
-	z_arm_pendsv,						/* 0x38 */
+	(void (*)())_flash_used, /* 0x20, imageLength. */
+	0, /* 0x24, imageType (Plain Image) */
+	0, /* 0x28, authBlockOffset/crcChecksum */
+	z_arm_svc, /* 0x2C */
+	z_arm_debug_monitor, /* 0x30 */
+	(void (*)())image_vector_table, /* 0x34, imageLoadAddress. */
+	z_arm_pendsv, /* 0x38 */
 #if defined(CONFIG_SYS_CLOCK_EXISTS)
-	z_clock_isr,						/* 0x3C */
+	z_clock_isr, /* 0x3C */
 #else
 	z_arm_exc_spurious,
 #endif
@@ -189,14 +189,14 @@ static int nxp_rt600_init(const struct device *arg)
 		 * to initiate command
 		 */
 		CACHE64->CCR = (CACHE64_CTRL_CCR_INVW1_MASK |
-					CACHE64_CTRL_CCR_INVW0_MASK);
+				CACHE64_CTRL_CCR_INVW0_MASK);
 		CACHE64->CCR |= CACHE64_CTRL_CCR_GO_MASK;
 		/* Wait until the command completes */
 		while (CACHE64->CCR & CACHE64_CTRL_CCR_GO_MASK) {
 		}
 		/* Enable cache, enable write buffer */
 		CACHE64->CCR = (CACHE64_CTRL_CCR_ENWRBUF_MASK |
-						CACHE64_CTRL_CCR_ENCACHE_MASK);
+				CACHE64_CTRL_CCR_ENCACHE_MASK);
 
 		/* Set whole FlexSPI0 space to write through. */
 		CACHE64_POLSEL->REG0_TOP = 0x07FFFC00U;

@@ -9,10 +9,9 @@
 #include <init.h>
 #include <sys/mempool.h>
 
-K_MEM_POOL_DEFINE(lvgl_mem_pool,
-		CONFIG_LVGL_MEM_POOL_MIN_SIZE,
-		CONFIG_LVGL_MEM_POOL_MAX_SIZE,
-		CONFIG_LVGL_MEM_POOL_NUMBER_BLOCKS, 4);
+K_MEM_POOL_DEFINE(lvgl_mem_pool, CONFIG_LVGL_MEM_POOL_MIN_SIZE,
+		  CONFIG_LVGL_MEM_POOL_MAX_SIZE,
+		  CONFIG_LVGL_MEM_POOL_NUMBER_BLOCKS, 4);
 
 void *lvgl_malloc(size_t size)
 {

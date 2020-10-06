@@ -20,7 +20,7 @@
  */
 
 uint16_t modem_socket_next_packet_size(struct modem_socket_config *cfg,
-				    struct modem_socket *sock)
+				       struct modem_socket *sock)
 {
 	uint16_t total = 0U;
 
@@ -63,8 +63,7 @@ static int modem_socket_packet_drop_first(struct modem_socket *sock)
 
 	sock->packet_count--;
 	for (i = 0; i < sock->packet_count; i++) {
-		sock->packet_sizes[i] =
-			sock->packet_sizes[i + 1];
+		sock->packet_sizes[i] = sock->packet_sizes[i + 1];
 	}
 
 	sock->packet_sizes[sock->packet_count] = 0U;
@@ -139,8 +138,8 @@ data_ready:
  * Socket Support Functions
  */
 
-int modem_socket_get(struct modem_socket_config *cfg,
-		     int family, int type, int proto)
+int modem_socket_get(struct modem_socket_config *cfg, int family, int type,
+		     int proto)
 {
 	int i;
 
@@ -256,8 +255,8 @@ void modem_socket_put(struct modem_socket_config *cfg, int sock_fd)
  * socket it polled. I think we could live with such limitation though in the
  * initial implementation, but this should be improved in the future.
  */
-int modem_socket_poll(struct modem_socket_config *cfg,
-		      struct zsock_pollfd *fds, int nfds, int msecs)
+int modem_socket_poll(struct modem_socket_config *cfg, struct zsock_pollfd *fds,
+		      int nfds, int msecs)
 {
 	struct modem_socket *sock;
 	int ret, i;

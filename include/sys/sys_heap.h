@@ -163,11 +163,9 @@ bool sys_heap_validate(struct sys_heap *h);
  * @param result Struct into which to store test results.
  */
 void sys_heap_stress(void *(*alloc)(void *arg, size_t bytes),
-		     void (*free)(void *arg, void *p),
-		     void *arg, size_t total_bytes,
-		     uint32_t op_count,
-		     void *scratch_mem, size_t scratch_bytes,
-		     int target_percent,
+		     void (*free)(void *arg, void *p), void *arg,
+		     size_t total_bytes, uint32_t op_count, void *scratch_mem,
+		     size_t scratch_bytes, int target_percent,
 		     struct z_heap_stress_result *result);
 
 /** @brief Dump heap structure content for debugging to the console

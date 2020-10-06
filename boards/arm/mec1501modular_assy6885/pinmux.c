@@ -109,15 +109,15 @@ static void configure_debug_interface(void)
 	 * controlled by their respective PCR register (UART2).
 	 * For more details see table 44-1
 	 */
-	ECS_REGS->DEBUG_CTRL = (MCHP_ECS_DCTRL_DBG_EN |
-				MCHP_ECS_DCTRL_MODE_SWD);
+	ECS_REGS->DEBUG_CTRL =
+		(MCHP_ECS_DCTRL_DBG_EN | MCHP_ECS_DCTRL_MODE_SWD);
 #elif defined(CONFIG_SOC_MEC1501_DEBUG_AND_TRACING)
-	#if defined(CONFIG_SOC_MEC1501_DEBUG_AND_ETM_TRACING)
-	#pragma error "TRACE DATA are not exposed in HW connector"
-	#elif defined(CONFIG_SOC_MEC1501_DEBUG_AND_SWV_TRACING)
-		ECS_REGS->DEBUG_CTRL = (MCHP_ECS_DCTRL_DBG_EN |
-				MCHP_ECS_DCTRL_MODE_SWD_SWV);
-	#endif /* CONFIG_SOC_MEC1501_DEBUG_AND_TRACING */
+#if defined(CONFIG_SOC_MEC1501_DEBUG_AND_ETM_TRACING)
+#pragma error "TRACE DATA are not exposed in HW connector"
+#elif defined(CONFIG_SOC_MEC1501_DEBUG_AND_SWV_TRACING)
+	ECS_REGS->DEBUG_CTRL =
+		(MCHP_ECS_DCTRL_DBG_EN | MCHP_ECS_DCTRL_MODE_SWD_SWV);
+#endif /* CONFIG_SOC_MEC1501_DEBUG_AND_TRACING */
 
 #endif /* CONFIG_SOC_MEC1501_DEBUG_WITHOUT_TRACING */
 }
@@ -184,8 +184,9 @@ static int board_pinmux_init(const struct device *dev)
 	/* Set muxing, for UART 0 TX/RX and power up */
 	mchp_pcr_periph_slp_ctrl(PCR_UART0, MCHP_PCR_SLEEP_DIS);
 
-	UART0_REGS->CFG_SEL = (MCHP_UART_LD_CFG_INTCLK +
-		MCHP_UART_LD_CFG_RESET_SYS + MCHP_UART_LD_CFG_NO_INVERT);
+	UART0_REGS->CFG_SEL =
+		(MCHP_UART_LD_CFG_INTCLK + MCHP_UART_LD_CFG_RESET_SYS +
+		 MCHP_UART_LD_CFG_NO_INVERT);
 	UART0_REGS->ACTV = MCHP_UART_LD_ACTIVATE;
 
 	pinmux_pin_set(portc, MCHP_GPIO_104, MCHP_GPIO_CTRL_MUX_F1);
@@ -196,8 +197,9 @@ static int board_pinmux_init(const struct device *dev)
 	/* Set muxing, for UART 1 TX/RX and power up */
 	mchp_pcr_periph_slp_ctrl(PCR_UART1, MCHP_PCR_SLEEP_DIS);
 
-	UART1_REGS->CFG_SEL = (MCHP_UART_LD_CFG_INTCLK +
-		MCHP_UART_LD_CFG_RESET_SYS + MCHP_UART_LD_CFG_NO_INVERT);
+	UART1_REGS->CFG_SEL =
+		(MCHP_UART_LD_CFG_INTCLK + MCHP_UART_LD_CFG_RESET_SYS +
+		 MCHP_UART_LD_CFG_NO_INVERT);
 	UART1_REGS->ACTV = MCHP_UART_LD_ACTIVATE;
 
 	pinmux_pin_set(portd, MCHP_GPIO_170, MCHP_GPIO_CTRL_MUX_F1);
@@ -228,23 +230,28 @@ static int board_pinmux_init(const struct device *dev)
 #ifdef CONFIG_I2C_XEC
 
 #if DT_NODE_HAS_STATUS(DT_INST(0, microchip_xec_i2c), okay)
-	i2c_pinmux(&pinmux_ports, DT_PROP(DT_INST(0, microchip_xec_i2c), port_sel));
+	i2c_pinmux(&pinmux_ports,
+		   DT_PROP(DT_INST(0, microchip_xec_i2c), port_sel));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_INST(1, microchip_xec_i2c), okay)
-	i2c_pinmux(&pinmux_ports, DT_PROP(DT_INST(1, microchip_xec_i2c), port_sel));
+	i2c_pinmux(&pinmux_ports,
+		   DT_PROP(DT_INST(1, microchip_xec_i2c), port_sel));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_INST(2, microchip_xec_i2c), okay)
-	i2c_pinmux(&pinmux_ports, DT_PROP(DT_INST(2, microchip_xec_i2c), port_sel));
+	i2c_pinmux(&pinmux_ports,
+		   DT_PROP(DT_INST(2, microchip_xec_i2c), port_sel));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_INST(3, microchip_xec_i2c), okay)
-	i2c_pinmux(&pinmux_ports, DT_PROP(DT_INST(3, microchip_xec_i2c), port_sel));
+	i2c_pinmux(&pinmux_ports,
+		   DT_PROP(DT_INST(3, microchip_xec_i2c), port_sel));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_INST(4, microchip_xec_i2c), okay)
-	i2c_pinmux(&pinmux_ports, DT_PROP(DT_INST(4, microchip_xec_i2c), port_sel));
+	i2c_pinmux(&pinmux_ports,
+		   DT_PROP(DT_INST(4, microchip_xec_i2c), port_sel));
 #endif
 
 #endif /* CONFIG_I2C_XEC */
@@ -269,19 +276,19 @@ static int board_pinmux_init(const struct device *dev)
 #ifdef CONFIG_PS2_XEC_0
 	/* Set muxing for PS20B*/
 	mchp_pcr_periph_slp_ctrl(PCR_PS2_0, MCHP_PCR_SLEEP_DIS);
-	pinmux_pin_set(porta, MCHP_GPIO_007, MCHP_GPIO_CTRL_MUX_F2 |
-		       MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
-	pinmux_pin_set(porta, MCHP_GPIO_010, MCHP_GPIO_CTRL_MUX_F2 |
-		       MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
+	pinmux_pin_set(porta, MCHP_GPIO_007,
+		       MCHP_GPIO_CTRL_MUX_F2 | MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
+	pinmux_pin_set(porta, MCHP_GPIO_010,
+		       MCHP_GPIO_CTRL_MUX_F2 | MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
 #endif
 
 #ifdef CONFIG_PS2_XEC_1
 	/* Set muxing for PS21B*/
 	mchp_pcr_periph_slp_ctrl(PCR_PS2_1, MCHP_PCR_SLEEP_DIS);
-	pinmux_pin_set(portd, MCHP_GPIO_154, MCHP_GPIO_CTRL_MUX_F2 |
-		       MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
-	pinmux_pin_set(portd, MCHP_GPIO_155, MCHP_GPIO_CTRL_MUX_F2 |
-		       MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
+	pinmux_pin_set(portd, MCHP_GPIO_154,
+		       MCHP_GPIO_CTRL_MUX_F2 | MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
+	pinmux_pin_set(portd, MCHP_GPIO_155,
+		       MCHP_GPIO_CTRL_MUX_F2 | MCHP_GPIO_CTRL_BUFT_OPENDRAIN);
 #endif
 
 #ifdef CONFIG_PWM_XEC
@@ -332,7 +339,7 @@ static int board_pinmux_init(const struct device *dev)
 #endif /* CONFIG_PWM_XEC  */
 
 #if defined CONFIG_KSCAN_XEC
-       /* KSCAN KSO00 */
+	/* KSCAN KSO00 */
 	pinmux_pin_set(portb, MCHP_GPIO_040,
 		       MCHP_GPIO_CTRL_MUX_F2 | MCHP_GPIO_CTRL_PUD_PU);
 	/* KSCAN KSO01 */
@@ -361,7 +368,7 @@ static int board_pinmux_init(const struct device *dev)
 		       MCHP_GPIO_CTRL_MUX_F1 | MCHP_GPIO_CTRL_PUD_PU);
 	/* KSCAN KSO14 */
 	pinmux_pin_set(portd, MCHP_GPIO_152,
-			MCHP_GPIO_CTRL_MUX_F1 | MCHP_GPIO_CTRL_PUD_PU);
+		       MCHP_GPIO_CTRL_MUX_F1 | MCHP_GPIO_CTRL_PUD_PU);
 	/* KSCAN KSO15 */
 	pinmux_pin_set(portd, MCHP_GPIO_151,
 		       MCHP_GPIO_CTRL_MUX_F2 | MCHP_GPIO_CTRL_PUD_PU);

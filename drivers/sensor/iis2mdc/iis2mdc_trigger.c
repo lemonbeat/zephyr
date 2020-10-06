@@ -28,8 +28,8 @@ static int iis2mdc_enable_int(const struct device *dev, int enable)
 
 /* link external trigger to event data ready */
 int iis2mdc_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler)
+			const struct sensor_trigger *trig,
+			sensor_trigger_handler_t handler)
 {
 	struct iis2mdc_data *iis2mdc = dev->data;
 	union axis3bit16_t raw;
@@ -67,7 +67,7 @@ static void iis2mdc_handle_interrupt(const struct device *dev)
 }
 
 static void iis2mdc_gpio_callback(const struct device *dev,
-				    struct gpio_callback *cb, uint32_t pins)
+				  struct gpio_callback *cb, uint32_t pins)
 {
 	struct iis2mdc_data *iis2mdc =
 		CONTAINER_OF(cb, struct iis2mdc_data, gpio_cb);
@@ -112,8 +112,7 @@ int iis2mdc_init_interrupt(const struct device *dev)
 	/* setup data ready gpio interrupt */
 	iis2mdc->gpio = device_get_binding(config->drdy_port);
 	if (iis2mdc->gpio == NULL) {
-		LOG_DBG("Cannot get pointer to %s device",
-			    config->drdy_port);
+		LOG_DBG("Cannot get pointer to %s device", config->drdy_port);
 		return -EINVAL;
 	}
 
@@ -121,9 +120,9 @@ int iis2mdc_init_interrupt(const struct device *dev)
 	k_sem_init(&iis2mdc->gpio_sem, 0, UINT_MAX);
 	k_thread_create(&iis2mdc->thread, iis2mdc->thread_stack,
 			CONFIG_IIS2MDC_THREAD_STACK_SIZE,
-			(k_thread_entry_t)iis2mdc_thread, iis2mdc,
-			NULL, NULL, K_PRIO_COOP(CONFIG_IIS2MDC_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)iis2mdc_thread, iis2mdc, NULL, NULL,
+			K_PRIO_COOP(CONFIG_IIS2MDC_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_IIS2MDC_TRIGGER_GLOBAL_THREAD)
 	iis2mdc->work.handler = iis2mdc_work_cb;
 #endif
@@ -131,8 +130,7 @@ int iis2mdc_init_interrupt(const struct device *dev)
 	gpio_pin_configure(iis2mdc->gpio, config->drdy_pin,
 			   GPIO_INPUT | config->drdy_flags);
 
-	gpio_init_callback(&iis2mdc->gpio_cb,
-			   iis2mdc_gpio_callback,
+	gpio_init_callback(&iis2mdc->gpio_cb, iis2mdc_gpio_callback,
 			   BIT(config->drdy_pin));
 
 	if (gpio_add_callback(iis2mdc->gpio, &iis2mdc->gpio_cb) < 0) {

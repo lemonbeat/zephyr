@@ -53,11 +53,10 @@ void test_deadline(void)
 	 * were executed in the right order.
 	 */
 	for (i = 0; i < NUM_THREADS; i++) {
-		k_thread_create(&worker_threads[i],
-				worker_stacks[i], STACK_SIZE,
-				worker, INT_TO_POINTER(i), NULL, NULL,
-				K_LOWEST_APPLICATION_THREAD_PRIO,
-				0, K_NO_WAIT);
+		k_thread_create(&worker_threads[i], worker_stacks[i],
+				STACK_SIZE, worker, INT_TO_POINTER(i), NULL,
+				NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0,
+				K_NO_WAIT);
 
 		/* Positive-definite number with the bottom 8 bits
 		 * masked off to prevent aliasing where "very close"
@@ -84,7 +83,7 @@ void test_deadline(void)
 	zassert_true(n_exec == NUM_THREADS, "not enough threads ran");
 
 	for (i = 1; i < NUM_THREADS; i++) {
-		int d0 = thread_deadlines[exec_order[i-1]];
+		int d0 = thread_deadlines[exec_order[i - 1]];
 		int d1 = thread_deadlines[exec_order[i]];
 
 		zassert_true(d0 <= d1, "threads ran in wrong order");
@@ -93,7 +92,6 @@ void test_deadline(void)
 
 void test_main(void)
 {
-	ztest_test_suite(suite_deadline,
-			 ztest_unit_test(test_deadline));
+	ztest_test_suite(suite_deadline, ztest_unit_test(test_deadline));
 	ztest_run_test_suite(suite_deadline);
 }

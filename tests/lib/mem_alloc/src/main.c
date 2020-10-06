@@ -47,7 +47,7 @@ void test_malloc(void)
  */
 void test_free(void)
 {
-/*
+	/*
  * In free, if ptr is passed as NULL, no operation is performed
  * Just make sure, no exception occurs and test pass
  */
@@ -66,10 +66,10 @@ void test_calloc(void)
 {
 	char *cptr = NULL;
 
-	cptr =  calloc(CALLOC_BUFLEN, sizeof(char));
+	cptr = calloc(CALLOC_BUFLEN, sizeof(char));
 	zassert_not_null((cptr), "calloc failed, errno: %d", errno);
 	zassert_true(((memcmp(cptr, zerobuf, CALLOC_BUFLEN)) == 0),
-			"calloc failed to set zero value, errno: %d", errno);
+		     "calloc failed to set zero value, errno: %d", errno);
 	memset(cptr, 'p', CALLOC_BUFLEN);
 	free(cptr);
 	cptr = NULL;
@@ -102,7 +102,7 @@ void test_realloc(void)
 
 	(void)memset(filled_buf, 'p', BUF_LEN);
 	zassert_true(((memcmp(ptr, filled_buf, BUF_LEN)) == 0),
-			"realloc failed to copy malloc data, errno: %d", errno);
+		     "realloc failed to copy malloc data, errno: %d", errno);
 
 	free(ptr);
 	ptr = NULL;
@@ -138,13 +138,12 @@ void test_reallocarray(void)
 
 	(void)memset(filled_buf, 'p', BUF_LEN);
 	zassert_true(((memcmp(ptr, filled_buf, BUF_LEN)) == 0),
-			"realloc failed to copy malloc data, errno: %d", errno);
+		     "realloc failed to copy malloc data, errno: %d", errno);
 
 	free(ptr);
 	ptr = NULL;
 }
 #endif
-
 
 #define MAX_LEN (10 * BUF_LEN)
 
@@ -205,7 +204,6 @@ void test_main(void)
 			 ztest_user_unit_test(test_realloc),
 			 ztest_user_unit_test(test_reallocarray),
 			 ztest_user_unit_test(test_memalloc_all),
-			 ztest_user_unit_test(test_memalloc_max)
-			 );
+			 ztest_user_unit_test(test_memalloc_max));
 	ztest_run_test_suite(test_c_lib_dynamic_memalloc);
 }

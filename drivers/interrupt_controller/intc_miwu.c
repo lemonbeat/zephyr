@@ -80,48 +80,48 @@ sys_slist_t cb_list_gpio;
 sys_slist_t cb_list_generic;
 
 /* Driver convenience defines */
-#define DRV_CONFIG(dev) \
-	((const struct intc_miwu_config *)(dev)->config)
+#define DRV_CONFIG(dev) ((const struct intc_miwu_config *)(dev)->config)
 
-BUILD_ASSERT(sizeof(struct miwu_io_callback) == sizeof(struct gpio_callback),
+BUILD_ASSERT(
+	sizeof(struct miwu_io_callback) == sizeof(struct gpio_callback),
 	"Size of struct miwu_io_callback must equal to struct gpio_callback");
 
-BUILD_ASSERT(sizeof(struct miwu_io_params) == sizeof(gpio_port_pins_t),
+BUILD_ASSERT(
+	sizeof(struct miwu_io_params) == sizeof(gpio_port_pins_t),
 	"Size of struct miwu_io_params must equal to struct gpio_port_pins_t");
 
 /* MIWU local functions */
-static void intc_miwu_dispatch_gpio_isr(uint8_t wui_table,
-					uint8_t wui_group, uint8_t wui_bit)
+static void intc_miwu_dispatch_gpio_isr(uint8_t wui_table, uint8_t wui_group,
+					uint8_t wui_bit)
 {
 	struct miwu_io_callback *cb, *tmp;
 
 	SYS_SLIST_FOR_EACH_CONTAINER_SAFE(&cb_list_gpio, cb, tmp, node) {
 		/* Pending bit, group and table match the wui item in list */
-		if (cb->params.wui.table == wui_table
-			&& cb->params.wui.group == wui_group
-			&& cb->params.wui.bit == wui_bit) {
+		if (cb->params.wui.table == wui_table &&
+		    cb->params.wui.group == wui_group &&
+		    cb->params.wui.bit == wui_bit) {
 			__ASSERT(cb->handler, "No GPIO callback handler!");
 			/*
 			 * Execute GPIO callback and the other callback might
 			 * match the same wui item.
 			 */
 			cb->handler(soc_get_gpio_dev(cb->params.gpio_port),
-					(struct gpio_callback *)cb,
-					cb->params.pin_mask);
+				    (struct gpio_callback *)cb,
+				    cb->params.pin_mask);
 		}
 	}
 }
 
-static void intc_miwu_dispatch_generic_isr(uint8_t wui_table,
-					uint8_t wui_group, uint8_t wui_bit)
+static void intc_miwu_dispatch_generic_isr(uint8_t wui_table, uint8_t wui_group,
+					   uint8_t wui_bit)
 {
 	struct miwu_dev_callback *cb, *tmp;
 
 	SYS_SLIST_FOR_EACH_CONTAINER_SAFE(&cb_list_generic, cb, tmp, node) {
 		/* Pending bit, group and table match the wui item in list */
-		if (cb->wui.table == wui_table
-				&& cb->wui.group == wui_group
-				&& cb->wui.bit == wui_bit) {
+		if (cb->wui.table == wui_table && cb->wui.group == wui_group &&
+		    cb->wui.bit == wui_bit) {
 			__ASSERT(cb->handler, "No Generic callback handler!");
 			/*
 			 * Execute generic callback and the other callback might
@@ -144,13 +144,13 @@ static void intc_miwu_isr_pri(int wui_table, int wui_group)
 
 	for (wui_bit = 0; wui_bit < 8; wui_bit++) {
 		if (mask & BIT(wui_bit)) {
-			LOG_DBG("miwu_isr %d %d %d!\n", wui_table,
-							wui_group, wui_bit);
+			LOG_DBG("miwu_isr %d %d %d!\n", wui_table, wui_group,
+				wui_bit);
 			/* Dispatch registed gpio and generic isrs */
-			intc_miwu_dispatch_gpio_isr(wui_table,
-							wui_group, wui_bit);
-			intc_miwu_dispatch_generic_isr(wui_table,
-							wui_group, wui_bit);
+			intc_miwu_dispatch_gpio_isr(wui_table, wui_group,
+						    wui_bit);
+			intc_miwu_dispatch_generic_isr(wui_table, wui_group,
+						       wui_bit);
 		}
 	}
 }
@@ -181,7 +181,8 @@ unsigned int soc_miwu_irq_get_state(const struct npcx_wui *wui)
 }
 
 int soc_miwu_interrupt_configure(const struct npcx_wui *wui,
-		enum miwu_int_mode mode, enum miwu_int_trig trig)
+				 enum miwu_int_mode mode,
+				 enum miwu_int_trig trig)
 {
 	uint32_t base = DRV_CONFIG(miwu_devs[wui->table])->base;
 	uint8_t pmask = BIT(wui->bit);
@@ -206,7 +207,7 @@ int soc_miwu_interrupt_configure(const struct npcx_wui *wui,
 			default:
 				return -EINVAL;
 			}
-		/* Handle interrupt for edge trigger */
+			/* Handle interrupt for edge trigger */
 		} else {
 			/* Set detection mode to edge */
 			NPCX_WKMOD(base, wui->group) &= ~pmask;
@@ -245,12 +246,12 @@ int soc_miwu_interrupt_configure(const struct npcx_wui *wui,
 }
 
 void soc_miwu_init_gpio_callback(struct miwu_io_callback *callback,
-				const struct npcx_wui *io_wui, int port)
+				 const struct npcx_wui *io_wui, int port)
 {
 	/* Initialize WUI and GPIO settings in unused bits field */
 	callback->params.wui.table = io_wui->table;
 	callback->params.wui.group = io_wui->group;
-	callback->params.wui.bit   = io_wui->bit;
+	callback->params.wui.bit = io_wui->bit;
 	callback->params.gpio_port = port;
 }
 
@@ -262,7 +263,7 @@ void soc_miwu_init_dev_callback(struct miwu_dev_callback *callback,
 	/* Initialize WUI and input device settings */
 	callback->wui.table = dev_wui->table;
 	callback->wui.group = dev_wui->group;
-	callback->wui.bit   = dev_wui->bit;
+	callback->wui.bit = dev_wui->bit;
 	callback->handler = handler;
 	callback->source = source;
 }
@@ -308,57 +309,56 @@ int soc_miwu_manage_dev_callback(struct miwu_dev_callback *cb, bool set)
 	static int intc_miwu_init##inst(const struct device *dev)
 
 /* MIWU ISR implementation */
-#define NPCX_MIWU_ISR_FUNC_IMPL(inst)                                          \
-	static void intc_miwu_isr##inst(void *arg)                             \
-	{                                                                      \
-		uint8_t grp_mask = (uint32_t)arg;                              \
-		int group = 0;                                                 \
-									       \
-		/* Check all MIWU groups belong to the same irq */             \
-		do {                                                           \
-			if (grp_mask & 0x01)                                   \
-				intc_miwu_isr_pri(inst, group);                \
-			group++;                                               \
-			grp_mask = grp_mask >> 1;                              \
-									       \
-		} while (grp_mask != 0);                                       \
+#define NPCX_MIWU_ISR_FUNC_IMPL(inst)                              \
+	static void intc_miwu_isr##inst(void *arg)                 \
+	{                                                          \
+		uint8_t grp_mask = (uint32_t)arg;                  \
+		int group = 0;                                     \
+                                                                   \
+		/* Check all MIWU groups belong to the same irq */ \
+		do {                                               \
+			if (grp_mask & 0x01)                       \
+				intc_miwu_isr_pri(inst, group);    \
+			group++;                                   \
+			grp_mask = grp_mask >> 1;                  \
+                                                                   \
+		} while (grp_mask != 0);                           \
 	}
 
 /* MIWU init function implementation */
-#define NPCX_MIWU_INIT_FUNC_IMPL(inst)                                         \
-	static int intc_miwu_init##inst(const struct device *dev)              \
-	{                                                                      \
-		int i;                                                         \
-		uint32_t base = DRV_CONFIG(dev)->base;                         \
-									       \
-		/* Clear all MIWUs' pending and enable bits of MIWU device */  \
-		for (i = 0; i < NPCX_MIWU_GROUP_COUNT; i++) {                  \
-			NPCX_WKPCL(base, i) = 0xFF;                            \
-			NPCX_WKEN(base, i) = 0;                                \
-		}                                                              \
-									       \
-		/* Config IRQ and MWIU group directly */                       \
-		DT_FOREACH_CHILD(DT_NODE_FROM_MIWU_MAP(inst),                  \
-			DT_MIWU_IRQ_CONNECT_IMPL_CHILD_FUNC)                   \
-		return 0;                                                      \
-	}                                                                      \
+#define NPCX_MIWU_INIT_FUNC_IMPL(inst)                                        \
+	static int intc_miwu_init##inst(const struct device *dev)             \
+	{                                                                     \
+		int i;                                                        \
+		uint32_t base = DRV_CONFIG(dev)->base;                        \
+                                                                              \
+		/* Clear all MIWUs' pending and enable bits of MIWU device */ \
+		for (i = 0; i < NPCX_MIWU_GROUP_COUNT; i++) {                 \
+			NPCX_WKPCL(base, i) = 0xFF;                           \
+			NPCX_WKEN(base, i) = 0;                               \
+		}                                                             \
+                                                                              \
+		/* Config IRQ and MWIU group directly */                      \
+		DT_FOREACH_CHILD(DT_NODE_FROM_MIWU_MAP(inst),                 \
+				 DT_MIWU_IRQ_CONNECT_IMPL_CHILD_FUNC)         \
+		return 0;                                                     \
+	}
 
-#define NPCX_MIWU_INIT(inst)                                                   \
-	NPCX_MIWU_INIT_FUNC_DECL(inst);                                        \
-									       \
-	static const struct intc_miwu_config miwu_config_##inst = {	       \
-		.base = DT_REG_ADDR(DT_NODELABEL(miwu##inst)),                 \
-		.index = DT_PROP(DT_NODELABEL(miwu##inst), index),             \
-	};                                                                     \
-									       \
-	DEVICE_AND_API_INIT(intc_miwu_##inst, DT_INST_LABEL(inst),             \
-			    NPCX_MIWU_INIT_FUNC(inst),                         \
-			    NULL, &miwu_config_##inst,                         \
-			    PRE_KERNEL_1,                                      \
-			    CONFIG_KERNEL_INIT_PRIORITY_OBJECTS, NULL);        \
-									       \
-	NPCX_MIWU_ISR_FUNC_IMPL(inst)                                          \
-									       \
+#define NPCX_MIWU_INIT(inst)                                            \
+	NPCX_MIWU_INIT_FUNC_DECL(inst);                                 \
+                                                                        \
+	static const struct intc_miwu_config miwu_config_##inst = {     \
+		.base = DT_REG_ADDR(DT_NODELABEL(miwu##inst)),          \
+		.index = DT_PROP(DT_NODELABEL(miwu##inst), index),      \
+	};                                                              \
+                                                                        \
+	DEVICE_AND_API_INIT(intc_miwu_##inst, DT_INST_LABEL(inst),      \
+			    NPCX_MIWU_INIT_FUNC(inst), NULL,            \
+			    &miwu_config_##inst, PRE_KERNEL_1,          \
+			    CONFIG_KERNEL_INIT_PRIORITY_OBJECTS, NULL); \
+                                                                        \
+	NPCX_MIWU_ISR_FUNC_IMPL(inst)                                   \
+                                                                        \
 	NPCX_MIWU_INIT_FUNC_IMPL(inst)
 
 DT_INST_FOREACH_STATUS_OKAY(NPCX_MIWU_INIT)
@@ -366,9 +366,8 @@ DT_INST_FOREACH_STATUS_OKAY(NPCX_MIWU_INIT)
 /* MIWU module instances */
 #define NPCX_MIWU_DEV(inst) DEVICE_GET(intc_miwu_##inst),
 
-static const struct device *miwu_devs[] = {
-	DT_INST_FOREACH_STATUS_OKAY(NPCX_MIWU_DEV)
-};
+static const struct device *miwu_devs[] = { DT_INST_FOREACH_STATUS_OKAY(
+	NPCX_MIWU_DEV) };
 
 BUILD_ASSERT(ARRAY_SIZE(miwu_devs) == NPCX_MIWU_TABLE_COUNT,
-		"Size of miwu_devs array must equal to NPCX_MIWU_TABLE_COUNT");
+	     "Size of miwu_devs array must equal to NPCX_MIWU_TABLE_COUNT");

@@ -45,7 +45,7 @@ LOG_MODULE_REGISTER(updatehub, CONFIG_UPDATEHUB_LOG_LEVEL);
 #define MAX_DOWNLOAD_DATA (MAX_PAYLOAD_SIZE + 32)
 #define MAX_IP_SIZE 30
 
-#define SHA256_HEX_DIGEST_SIZE	((TC_SHA256_DIGEST_SIZE * 2) + 1)
+#define SHA256_HEX_DIGEST_SIZE ((TC_SHA256_DIGEST_SIZE * 2) + 1)
 
 #if defined(CONFIG_UPDATEHUB_CE)
 #define UPDATEHUB_SERVER CONFIG_UPDATEHUB_SERVER
@@ -76,7 +76,8 @@ static struct update_info {
 
 static struct k_delayed_work updatehub_work_handle;
 
-static int bin2hex_str(uint8_t *bin, size_t bin_len, char *str, size_t str_buf_len)
+static int bin2hex_str(uint8_t *bin, size_t bin_len, char *str,
+		       size_t str_buf_len)
 {
 	if (bin == NULL || str == NULL) {
 		return -1;
@@ -125,7 +126,7 @@ static int metadata_hash_get(char *metadata)
 	}
 
 	if (bin2hex_str(ctx.hash, TC_SHA256_DIGEST_SIZE,
-		update_info.package_uid, SHA256_HEX_DIGEST_SIZE)) {
+			update_info.package_uid, SHA256_HEX_DIGEST_SIZE)) {
 		return -1;
 	}
 
@@ -212,13 +213,14 @@ static bool start_coap_client(void)
 	ret = -1;
 
 #if defined(CONFIG_UPDATEHUB_DTLS)
-	if (setsockopt(ctx.sock, SOL_TLS, TLS_SEC_TAG_LIST,
-		       sec_list, sizeof(sec_list)) < 0) {
+	if (setsockopt(ctx.sock, SOL_TLS, TLS_SEC_TAG_LIST, sec_list,
+		       sizeof(sec_list)) < 0) {
 		LOG_ERR("Failed to set TLS_TAG option");
 		goto error;
 	}
 
-	if (setsockopt(ctx.sock, SOL_TLS, TLS_PEER_VERIFY, &verify, sizeof(int)) < 0) {
+	if (setsockopt(ctx.sock, SOL_TLS, TLS_PEER_VERIFY, &verify,
+		       sizeof(int)) < 0) {
 		LOG_ERR("Failed to set TLS_PEER_VERIFY option");
 		goto error;
 	}
@@ -279,15 +281,15 @@ static int send_request(enum coap_msgtype msgtype, enum coap_method method,
 			goto error;
 		}
 
-		ret = coap_append_block2_option(&request_packet,
-						&ctx.block);
+		ret = coap_append_block2_option(&request_packet, &ctx.block);
 		if (ret < 0) {
 			LOG_ERR("Unable coap append block 2");
 			goto error;
 		}
 
 		ret = coap_packet_append_option(&request_packet, 2048,
-						UPDATEHUB_API_HEADER, strlen(UPDATEHUB_API_HEADER));
+						UPDATEHUB_API_HEADER,
+						strlen(UPDATEHUB_API_HEADER));
 		if (ret < 0) {
 			LOG_ERR("Unable add option to add updatehub header");
 			goto error;
@@ -305,17 +307,18 @@ static int send_request(enum coap_msgtype msgtype, enum coap_method method,
 			goto error;
 		}
 
-		ret = coap_packet_append_option(&request_packet,
-						COAP_OPTION_CONTENT_FORMAT,
-						&content_application_json,
-						sizeof(content_application_json));
+		ret = coap_packet_append_option(
+			&request_packet, COAP_OPTION_CONTENT_FORMAT,
+			&content_application_json,
+			sizeof(content_application_json));
 		if (ret < 0) {
 			LOG_ERR("Unable add option to request format");
 			goto error;
 		}
 
 		ret = coap_packet_append_option(&request_packet, 2048,
-						UPDATEHUB_API_HEADER, strlen(UPDATEHUB_API_HEADER));
+						UPDATEHUB_API_HEADER,
+						strlen(UPDATEHUB_API_HEADER));
 		if (ret < 0) {
 			LOG_ERR("Unable add option to add updatehub header");
 			goto error;
@@ -327,8 +330,7 @@ static int send_request(enum coap_msgtype msgtype, enum coap_method method,
 			goto error;
 		}
 
-		ret = coap_packet_append_payload(&request_packet,
-						 ctx.payload,
+		ret = coap_packet_append_payload(&request_packet, ctx.payload,
 						 strlen(ctx.payload));
 		if (ret < 0) {
 			LOG_ERR("Not able to append payload");
@@ -366,8 +368,8 @@ static bool install_update_cb_sha256(void)
 		return false;
 	}
 
-	if (bin2hex_str(ctx.hash, TC_SHA256_DIGEST_SIZE,
-		sha256, SHA256_HEX_DIGEST_SIZE)) {
+	if (bin2hex_str(ctx.hash, TC_SHA256_DIGEST_SIZE, sha256,
+			SHA256_HEX_DIGEST_SIZE)) {
 		LOG_ERR("Could not create sha256sum hex representation");
 		return false;
 	}
@@ -446,24 +448,26 @@ static void install_update_cb(void)
 	updatehub_blk_set(UPDATEHUB_BLK_ATTEMPT, 0);
 	updatehub_blk_set(UPDATEHUB_BLK_TX_AVAILABLE, 1);
 
-	ctx.downloaded_size = ctx.downloaded_size +
-			      (response_packet.max_len - response_packet.offset);
+	ctx.downloaded_size = ctx.downloaded_size + (response_packet.max_len -
+						     response_packet.offset);
 
 #if defined(CONFIG_UPDATEHUB_DOWNLOAD_SHA256_VERIFICATION) || \
 	defined(CONFIG_UPDATEHUB_DOWNLOAD_STORAGE_SHA256_VERIFICATION)
 	if (tc_sha256_update(&ctx.sha256sum,
 			     response_packet.data + response_packet.offset,
-			     response_packet.max_len - response_packet.offset) < 1) {
+			     response_packet.max_len - response_packet.offset) <
+	    1) {
 		LOG_ERR("Could not update sha256sum");
 		ctx.code_status = UPDATEHUB_DOWNLOAD_ERROR;
 		goto cleanup;
 	}
 #endif
 
-	if (flash_img_buffered_write(&ctx.flash_ctx,
-				     response_packet.data + response_packet.offset,
-				     response_packet.max_len - response_packet.offset,
-				     ctx.downloaded_size == ctx.block.total_size) < 0) {
+	if (flash_img_buffered_write(
+		    &ctx.flash_ctx,
+		    response_packet.data + response_packet.offset,
+		    response_packet.max_len - response_packet.offset,
+		    ctx.downloaded_size == ctx.block.total_size) < 0) {
 		LOG_ERR("Error to write on the flash");
 		ctx.code_status = UPDATEHUB_INSTALL_ERROR;
 		goto cleanup;
@@ -622,7 +626,8 @@ static int report(enum updatehub_state state)
 		goto error;
 	}
 
-	if (!updatehub_get_firmware_version(firmware_version, BOOT_IMG_VER_STRLEN_MAX)) {
+	if (!updatehub_get_firmware_version(firmware_version,
+					    BOOT_IMG_VER_STRLEN_MAX)) {
 		goto error;
 	}
 
@@ -636,16 +641,13 @@ static int report(enum updatehub_state state)
 
 	switch (ctx.code_status) {
 	case UPDATEHUB_INSTALL_ERROR:
-		report.previous_state =
-			state_name(UPDATEHUB_STATE_INSTALLING);
+		report.previous_state = state_name(UPDATEHUB_STATE_INSTALLING);
 		break;
 	case UPDATEHUB_DOWNLOAD_ERROR:
-		report.previous_state =
-			state_name(UPDATEHUB_STATE_DOWNLOADING);
+		report.previous_state = state_name(UPDATEHUB_STATE_DOWNLOADING);
 		break;
 	case UPDATEHUB_FLASH_INIT_ERROR:
-		report.previous_state =
-			state_name(UPDATEHUB_FLASH_INIT_ERROR);
+		report.previous_state = state_name(UPDATEHUB_FLASH_INIT_ERROR);
 		break;
 	default:
 		report.previous_state = "";
@@ -660,9 +662,8 @@ static int report(enum updatehub_state state)
 
 	memset(&ctx.payload, 0, MAX_PAYLOAD_SIZE);
 	ret = json_obj_encode_buf(send_report_descr,
-				  ARRAY_SIZE(send_report_descr),
-				  &report, ctx.payload,
-				  MAX_PAYLOAD_SIZE - 1);
+				  ARRAY_SIZE(send_report_descr), &report,
+				  ctx.payload, MAX_PAYLOAD_SIZE - 1);
 	if (ret < 0) {
 		LOG_ERR("Could not encode metadata");
 		goto error;
@@ -757,8 +758,8 @@ enum updatehub_response updatehub_probe(void)
 
 	size_t sha256size;
 
-	if (device_id == NULL || firmware_version == NULL ||
-	    metadata == NULL || metadata_copy == NULL) {
+	if (device_id == NULL || firmware_version == NULL || metadata == NULL ||
+	    metadata_copy == NULL) {
 		LOG_ERR("Could not alloc probe memory");
 		ctx.code_status = UPDATEHUB_METADATA_ERROR;
 		goto error;
@@ -770,7 +771,8 @@ enum updatehub_response updatehub_probe(void)
 		goto error;
 	}
 
-	if (!updatehub_get_firmware_version(firmware_version, BOOT_IMG_VER_STRLEN_MAX)) {
+	if (!updatehub_get_firmware_version(firmware_version,
+					    BOOT_IMG_VER_STRLEN_MAX)) {
 		ctx.code_status = UPDATEHUB_METADATA_ERROR;
 		goto error;
 	}
@@ -787,8 +789,7 @@ enum updatehub_response updatehub_probe(void)
 	request.hardware = CONFIG_BOARD;
 
 	memset(&ctx.payload, 0, MAX_PAYLOAD_SIZE);
-	if (json_obj_encode_buf(send_probe_descr,
-				ARRAY_SIZE(send_probe_descr),
+	if (json_obj_encode_buf(send_probe_descr, ARRAY_SIZE(send_probe_descr),
 				&request, ctx.payload,
 				MAX_PAYLOAD_SIZE - 1) < 0) {
 		LOG_ERR("Could not encode metadata");
@@ -803,7 +804,8 @@ enum updatehub_response updatehub_probe(void)
 		goto error;
 	}
 
-	if (send_request(COAP_TYPE_CON, COAP_METHOD_POST, UPDATEHUB_PROBE) < 0) {
+	if (send_request(COAP_TYPE_CON, COAP_METHOD_POST, UPDATEHUB_PROBE) <
+	    0) {
 		ctx.code_status = UPDATEHUB_NETWORKING_ERROR;
 		goto cleanup;
 	}
@@ -829,7 +831,6 @@ enum updatehub_response updatehub_probe(void)
 			   recv_probe_sh_array_descr,
 			   ARRAY_SIZE(recv_probe_sh_array_descr),
 			   &metadata_some_boards) < 0) {
-
 		if (json_obj_parse(metadata_copy, strlen(metadata_copy),
 				   recv_probe_sh_string_descr,
 				   ARRAY_SIZE(recv_probe_sh_string_descr),
@@ -845,8 +846,9 @@ enum updatehub_response updatehub_probe(void)
 			goto cleanup;
 		}
 
-		sha256size = strlen(
-			metadata_any_boards.objects[1].objects.sha256sum) + 1;
+		sha256size = strlen(metadata_any_boards.objects[1]
+					    .objects.sha256sum) +
+			     1;
 
 		if (sha256size != SHA256_HEX_DIGEST_SIZE) {
 			LOG_ERR("SHA256 size is invalid");
@@ -857,7 +859,8 @@ enum updatehub_response updatehub_probe(void)
 		memcpy(update_info.sha256sum_image,
 		       metadata_any_boards.objects[1].objects.sha256sum,
 		       SHA256_HEX_DIGEST_SIZE);
-		update_info.image_size = metadata_any_boards.objects[1].objects.size;
+		update_info.image_size =
+			metadata_any_boards.objects[1].objects.size;
 		LOG_DBG("metadata_any: %s", update_info.sha256sum_image);
 	} else {
 		if (metadata_some_boards.objects_len != 2) {
@@ -868,13 +871,13 @@ enum updatehub_response updatehub_probe(void)
 
 		if (!is_compatible_hardware(&metadata_some_boards)) {
 			LOG_ERR("Incompatible hardware");
-			ctx.code_status =
-				UPDATEHUB_INCOMPATIBLE_HARDWARE;
+			ctx.code_status = UPDATEHUB_INCOMPATIBLE_HARDWARE;
 			goto cleanup;
 		}
 
-		sha256size = strlen(
-			metadata_some_boards.objects[1].objects.sha256sum) + 1;
+		sha256size = strlen(metadata_some_boards.objects[1]
+					    .objects.sha256sum) +
+			     1;
 
 		if (sha256size != SHA256_HEX_DIGEST_SIZE) {
 			LOG_ERR("SHA256 size is invalid");

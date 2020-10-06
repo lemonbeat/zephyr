@@ -41,12 +41,12 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_IPV6_LOG_LEVEL);
 #define DBG(fmt, ...)
 #endif
 
-static struct in6_addr my_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0, 0, 0, 0, 0x1 } } };
-static struct in6_addr peer_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					 0, 0, 0, 0, 0, 0, 0, 0x2 } } };
-static struct in6_addr mcast_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					  0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr peer_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					 0, 0, 0, 0, 0, 0, 0x2 } } };
+static struct in6_addr mcast_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					  0, 0, 0, 0, 0, 0, 0x1 } } };
 
 static struct net_if *iface;
 static bool is_group_joined;
@@ -102,8 +102,7 @@ static struct net_icmp_hdr *get_icmp_hdr(struct net_pkt *pkt)
 {
 	net_pkt_cursor_init(pkt);
 
-	net_pkt_skip(pkt, net_pkt_ip_hdr_len(pkt) +
-		     net_pkt_ipv6_ext_len(pkt));
+	net_pkt_skip(pkt, net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt));
 
 	return (struct net_icmp_hdr *)net_pkt_cursor_get_pos(pkt);
 }
@@ -143,14 +142,13 @@ static struct dummy_api net_test_if_api = {
 #define _ETH_L2_LAYER DUMMY_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
-NET_DEVICE_INIT(net_test_mld, "net_test_mld",
-		net_test_dev_init, device_pm_control_nop, &net_test_data, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&net_test_if_api, _ETH_L2_LAYER, _ETH_L2_CTX_TYPE,
-		127);
+NET_DEVICE_INIT(net_test_mld, "net_test_mld", net_test_dev_init,
+		device_pm_control_nop, &net_test_data, NULL,
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_test_if_api,
+		_ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
-static void group_joined(struct net_mgmt_event_callback *cb,
-			 uint32_t nm_event, struct net_if *iface)
+static void group_joined(struct net_mgmt_event_callback *cb, uint32_t nm_event,
+			 struct net_if *iface)
 {
 	if (nm_event != NET_EVENT_IPV6_MCAST_JOIN) {
 		/* Spurious callback. */
@@ -162,8 +160,8 @@ static void group_joined(struct net_mgmt_event_callback *cb,
 	k_sem_give(&wait_data);
 }
 
-static void group_left(struct net_mgmt_event_callback *cb,
-			 uint32_t nm_event, struct net_if *iface)
+static void group_left(struct net_mgmt_event_callback *cb, uint32_t nm_event,
+		       struct net_if *iface)
 {
 	if (nm_event != NET_EVENT_IPV6_MCAST_LEAVE) {
 		/* Spurious callback. */
@@ -208,8 +206,7 @@ static void test_mld_setup(void)
 
 	zassert_not_null(iface, "Interface is NULL");
 
-	ifaddr = net_if_ipv6_addr_add(iface, &my_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface, &my_addr, NET_ADDR_MANUAL, 0);
 
 	zassert_not_null(ifaddr, "Cannot add IPv6 address");
 }
@@ -328,8 +325,8 @@ static void send_query(struct net_if *iface)
 	net_ipv6_addr_create(&dst, 0xff02, 0, 0, 0, 0, 0, 0, 0x0016);
 
 	/* router alert opt + icmpv6 reserved space + mldv2 mcast record */
-	pkt = net_pkt_alloc_with_buffer(iface, 144, AF_INET6,
-					IPPROTO_ICMPV6, K_FOREVER);
+	pkt = net_pkt_alloc_with_buffer(iface, 144, AF_INET6, IPPROTO_ICMPV6,
+					K_FOREVER);
 	zassert_not_null(pkt, "Cannot allocate pkt");
 
 	net_pkt_set_ipv6_hop_limit(pkt, 1); /* RFC 3810 ch 7.4 */
@@ -503,7 +500,7 @@ static void test_allnodes(void)
 	ifmaddr = net_if_ipv6_maddr_lookup(&addr, &iface);
 
 	zassert_not_null(ifmaddr, "Interface does not contain "
-			"allnodes multicast address");
+				  "allnodes multicast address");
 }
 
 static void test_solicit_node(void)
@@ -517,13 +514,12 @@ static void test_solicit_node(void)
 	ifmaddr = net_if_ipv6_maddr_lookup(&addr, &iface);
 
 	zassert_not_null(ifmaddr, "Interface does not contain "
-			"solicit node multicast address");
+				  "solicit node multicast address");
 }
 
 void test_main(void)
 {
-	ztest_test_suite(net_mld_test,
-			 ztest_unit_test(test_mld_setup),
+	ztest_test_suite(net_mld_test, ztest_unit_test(test_mld_setup),
 			 ztest_unit_test(test_join_group),
 			 ztest_unit_test(test_leave_group),
 			 ztest_unit_test(test_catch_join_group),
@@ -533,8 +529,7 @@ void test_main(void)
 			 ztest_unit_test(test_catch_query),
 			 ztest_unit_test(test_verify_send_report),
 			 ztest_unit_test(test_allnodes),
-			 ztest_unit_test(test_solicit_node)
-			 );
+			 ztest_unit_test(test_solicit_node));
 
 	ztest_run_test_suite(net_mld_test);
 }

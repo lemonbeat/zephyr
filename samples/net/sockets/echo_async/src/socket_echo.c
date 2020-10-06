@@ -45,11 +45,11 @@
 struct pollfd pollfds[NUM_FDS];
 int pollnum;
 
-#define fatal(msg, ...) { \
+#define fatal(msg, ...)                                    \
+	{                                                  \
 		printf("Error: " msg "\n", ##__VA_ARGS__); \
-		exit(1); \
+		exit(1);                                   \
 	}
-
 
 static void setblocking(int fd, bool val)
 {
@@ -152,7 +152,7 @@ void main(void)
 		printf("error: socket(AF_INET6): %d\n", errno);
 		exit(1);
 	}
-	#ifdef IPV6_V6ONLY
+#ifdef IPV6_V6ONLY
 	/* For Linux, we need to make socket IPv6-only to bind it to the
 	 * same port as IPv4 socket above.
 	 */
@@ -162,7 +162,7 @@ void main(void)
 		printf("error: setsockopt: %d\n", errno);
 		exit(1);
 	}
-	#endif
+#endif
 	res = bind(serv6, (struct sockaddr *)&bind_addr6, sizeof(bind_addr6));
 	if (res == -1) {
 		printf("Cannot bind IPv6, errno: %d\n", errno);
@@ -175,7 +175,8 @@ void main(void)
 #endif
 
 	printf("Asynchronous TCP echo server waits for connections on "
-	       "port %d...\n", BIND_PORT);
+	       "port %d...\n",
+	       BIND_PORT);
 
 	while (1) {
 		struct sockaddr_storage client_addr;
@@ -195,24 +196,30 @@ void main(void)
 			int fd = pollfds[i].fd;
 			if (i < num_servs) {
 				/* If server socket */
-				int client = accept(fd, (struct sockaddr *)&client_addr,
-						    &client_addr_len);
-				void *addr = &((struct sockaddr_in *)&client_addr)->sin_addr;
+				int client = accept(
+					fd, (struct sockaddr *)&client_addr,
+					&client_addr_len);
+				void *addr =
+					&((struct sockaddr_in *)&client_addr)
+						 ->sin_addr;
 
 				if (client < 0) {
 					printf("error: accept: %d\n", errno);
 					continue;
 				}
-				inet_ntop(client_addr.ss_family, addr,
-					  addr_str, sizeof(addr_str));
-				printf("Connection #%d from %s fd=%d\n", counter++,
-				       addr_str, client);
+				inet_ntop(client_addr.ss_family, addr, addr_str,
+					  sizeof(addr_str));
+				printf("Connection #%d from %s fd=%d\n",
+				       counter++, addr_str, client);
 				if (pollfds_add(client) < 0) {
-					static char msg[] = "Too many connections\n";
+					static char msg[] =
+						"Too many connections\n";
 
-					res = send(client, msg, sizeof(msg) - 1, 0);
+					res = send(client, msg, sizeof(msg) - 1,
+						   0);
 					if (res < 0) {
-						printf("error: send: %d\n", errno);
+						printf("error: send: %d\n",
+						       errno);
 					}
 					close(client);
 				} else {
@@ -223,9 +230,10 @@ void main(void)
 				int len = recv(fd, buf, sizeof(buf), 0);
 				if (len <= 0) {
 					if (len < 0) {
-						printf("error: recv: %d\n", errno);
+						printf("error: recv: %d\n",
+						       errno);
 					}
-error:
+				error:
 					pollfds_del(fd);
 					close(fd);
 					printf("Connection fd=%d closed\n", fd);

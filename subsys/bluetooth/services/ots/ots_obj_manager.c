@@ -19,10 +19,10 @@
 LOG_MODULE_DECLARE(bt_ots, CONFIG_BT_OTS_LOG_LEVEL);
 
 /**Start of the usable range of Object IDs (values 0 to 0x100 are reserved)*/
-#define OTS_OBJ_ID_START_RANGE  0x000000000100
+#define OTS_OBJ_ID_START_RANGE 0x000000000100
 
 #define OTS_OBJ_INDEX_TO_ID(_index) (OTS_OBJ_ID_START_RANGE + (_index))
-#define OTS_OBJ_ID_TO_INDEX(_id)    ((_id) - OTS_OBJ_ID_START_RANGE)
+#define OTS_OBJ_ID_TO_INDEX(_id) ((_id)-OTS_OBJ_ID_START_RANGE)
 
 struct bt_gatt_ots_pool_item {
 	sys_dnode_t dnode;
@@ -48,8 +48,8 @@ int bt_gatt_ots_obj_manager_first_obj_get(
 	}
 
 	obj_dnode = sys_dlist_peek_head_not_empty(&obj_manager->list);
-	first_item = CONTAINER_OF(obj_dnode, struct bt_gatt_ots_pool_item,
-				  dnode);
+	first_item =
+		CONTAINER_OF(obj_dnode, struct bt_gatt_ots_pool_item, dnode);
 	*obj = &first_item->val;
 
 	return 0;
@@ -67,8 +67,8 @@ int bt_gatt_ots_obj_manager_last_obj_get(
 	}
 
 	obj_dnode = sys_dlist_peek_tail(&obj_manager->list);
-	last_item = CONTAINER_OF(obj_dnode, struct bt_gatt_ots_pool_item,
-				 dnode);
+	last_item =
+		CONTAINER_OF(obj_dnode, struct bt_gatt_ots_pool_item, dnode);
 	*obj = &last_item->val;
 
 	return 0;
@@ -93,8 +93,7 @@ int bt_gatt_ots_obj_manager_prev_obj_get(
 		return -ENFILE;
 	}
 
-	prev_item = CONTAINER_OF(prev_obj_dnode,
-				 struct bt_gatt_ots_pool_item,
+	prev_item = CONTAINER_OF(prev_obj_dnode, struct bt_gatt_ots_pool_item,
 				 dnode);
 	*prev_obj = &prev_item->val;
 
@@ -120,17 +119,16 @@ int bt_gatt_ots_obj_manager_next_obj_get(
 		return -ENFILE;
 	}
 
-	next_item = CONTAINER_OF(next_obj_dnode,
-				 struct bt_gatt_ots_pool_item,
+	next_item = CONTAINER_OF(next_obj_dnode, struct bt_gatt_ots_pool_item,
 				 dnode);
 	*next_obj = &next_item->val;
 
 	return 0;
 }
 
-int bt_gatt_ots_obj_manager_obj_get(
-	struct bt_gatt_ots_obj_manager *obj_manager, uint64_t id,
-	struct bt_gatt_ots_object **object)
+int bt_gatt_ots_obj_manager_obj_get(struct bt_gatt_ots_obj_manager *obj_manager,
+				    uint64_t id,
+				    struct bt_gatt_ots_object **object)
 {
 	uint64_t i = OTS_OBJ_ID_TO_INDEX(id);
 
@@ -155,13 +153,11 @@ int bt_gatt_ots_obj_manager_obj_get(
 	return 0;
 }
 
-int bt_gatt_ots_obj_manager_obj_add(
-	struct bt_gatt_ots_obj_manager *obj_manager,
-	struct bt_gatt_ots_object **object)
+int bt_gatt_ots_obj_manager_obj_add(struct bt_gatt_ots_obj_manager *obj_manager,
+				    struct bt_gatt_ots_object **object)
 {
 	for (uint64_t i = 0; i < ARRAY_SIZE(obj_manager->pool); i++) {
-		struct bt_gatt_ots_pool_item *cur_obj =
-			&obj_manager->pool[i];
+		struct bt_gatt_ots_pool_item *cur_obj = &obj_manager->pool[i];
 
 		if (!cur_obj->is_allocated) {
 			cur_obj->is_allocated = true;
@@ -197,7 +193,6 @@ void *bt_gatt_ots_obj_manager_assign(void)
 	static struct bt_gatt_ots_obj_manager
 		obj_manager[CONFIG_BT_OTS_MAX_INST_CNT];
 	struct bt_gatt_ots_obj_manager *cur_manager;
-
 
 	for (cur_manager = obj_manager;
 	     cur_manager != obj_manager + CONFIG_BT_OTS_MAX_INST_CNT;

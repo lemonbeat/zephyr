@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define DT_DRV_COMPAT	infineon_xmc4xxx_uart
+#define DT_DRV_COMPAT infineon_xmc4xxx_uart
 
 #include <xmc_gpio.h>
 #include <xmc_uart.h>
@@ -15,10 +15,8 @@ struct uart_xmc4xxx_data {
 	XMC_UART_CH_CONFIG_t config;
 };
 
-#define DEV_CFG(dev) \
-	((const struct uart_device_config * const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct uart_xmc4xxx_data * const)(dev)->data)
+#define DEV_CFG(dev) ((const struct uart_device_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct uart_xmc4xxx_data *const)(dev)->data)
 
 static int uart_xmc4xxx_poll_in(const struct device *dev, unsigned char *c)
 {
@@ -64,19 +62,19 @@ static const struct uart_driver_api uart_xmc4xxx_driver_api = {
 	.poll_out = uart_xmc4xxx_poll_out,
 };
 
-#define XMC4XXX_INIT(index)						\
-static struct uart_xmc4xxx_data xmc4xxx_data_##index = {		\
-	.config.baudrate = DT_INST_PROP(index, current_speed)		\
-};									\
-									\
-static const struct uart_device_config xmc4xxx_config_##index = {	\
-	.base = (void *)DT_INST_REG_ADDR(index),			\
-};									\
-									\
-	DEVICE_AND_API_INIT(uart_xmc4xxx_##index, DT_INST_LABEL(index),	\
-			    &uart_xmc4xxx_init, &xmc4xxx_data_##index,	\
-			    &xmc4xxx_config_##index, PRE_KERNEL_1,	\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
+#define XMC4XXX_INIT(index)                                               \
+	static struct uart_xmc4xxx_data xmc4xxx_data_##index = {          \
+		.config.baudrate = DT_INST_PROP(index, current_speed)     \
+	};                                                                \
+                                                                          \
+	static const struct uart_device_config xmc4xxx_config_##index = { \
+		.base = (void *)DT_INST_REG_ADDR(index),                  \
+	};                                                                \
+                                                                          \
+	DEVICE_AND_API_INIT(uart_xmc4xxx_##index, DT_INST_LABEL(index),   \
+			    &uart_xmc4xxx_init, &xmc4xxx_data_##index,    \
+			    &xmc4xxx_config_##index, PRE_KERNEL_1,        \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,           \
 			    &uart_xmc4xxx_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(XMC4XXX_INIT)

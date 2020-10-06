@@ -30,8 +30,8 @@ static int max17055_reg_read(struct max17055_data *priv, int reg_addr,
 	uint8_t i2c_data[2];
 	int rc;
 
-	rc = i2c_burst_read(priv->i2c, DT_INST_REG_ADDR(0), reg_addr,
-			    i2c_data, 2);
+	rc = i2c_burst_read(priv->i2c, DT_INST_REG_ADDR(0), reg_addr, i2c_data,
+			    2);
 	if (rc < 0) {
 		LOG_ERR("Unable to read register");
 		return rc;
@@ -93,8 +93,8 @@ static int max17055_channel_get(const struct device *dev,
 	case SENSOR_CHAN_GAUGE_AVG_CURRENT: {
 		int cap_ma;
 
-		cap_ma = capacity_to_ma(config->rsense_mohms,
-					priv->avg_current);
+		cap_ma =
+			capacity_to_ma(config->rsense_mohms, priv->avg_current);
 		set_millis(valp, cap_ma);
 		break;
 	}
@@ -218,22 +218,22 @@ static const struct sensor_driver_api max17055_battery_driver_api = {
 	.channel_get = max17055_channel_get,
 };
 
-#define MAX17055_INIT(index)						\
-	static struct max17055_data max17055_driver_##index;		\
-									\
-	static const struct max17055_config max17055_config_##index = { \
-		.bus_name = DT_INST_BUS_LABEL(index),			\
-		.rsense_mohms = DT_INST_PROP(index, rsense_mohms),	\
-		.design_voltage = DT_INST_PROP(index, design_voltage),	\
-		.desired_voltage = DT_INST_PROP(index, desired_voltage), \
-		.desired_charging_current =				\
-			DT_INST_PROP(index, desired_charging_current),	\
-	};								\
-									\
-	DEVICE_AND_API_INIT(max17055_##index, DT_INST_LABEL(index),	\
+#define MAX17055_INIT(index)                                                \
+	static struct max17055_data max17055_driver_##index;                \
+                                                                            \
+	static const struct max17055_config max17055_config_##index = {     \
+		.bus_name = DT_INST_BUS_LABEL(index),                       \
+		.rsense_mohms = DT_INST_PROP(index, rsense_mohms),          \
+		.design_voltage = DT_INST_PROP(index, design_voltage),      \
+		.desired_voltage = DT_INST_PROP(index, desired_voltage),    \
+		.desired_charging_current =                                 \
+			DT_INST_PROP(index, desired_charging_current),      \
+	};                                                                  \
+                                                                            \
+	DEVICE_AND_API_INIT(max17055_##index, DT_INST_LABEL(index),         \
 			    &max17055_gauge_init, &max17055_driver_##index, \
-			    &max17055_config_##index, POST_KERNEL,	\
-			    CONFIG_SENSOR_INIT_PRIORITY,		\
+			    &max17055_config_##index, POST_KERNEL,          \
+			    CONFIG_SENSOR_INIT_PRIORITY,                    \
 			    &max17055_battery_driver_api)
 
 DT_INST_FOREACH_STATUS_OKAY(MAX17055_INIT);

@@ -22,10 +22,10 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(power);
 
-#define SECS_TO_TICKS		CONFIG_SYS_CLOCK_TICKS_PER_SEC
+#define SECS_TO_TICKS CONFIG_SYS_CLOCK_TICKS_PER_SEC
 
 /* Wakeup delay from standby in microseconds */
-#define WAKEDELAYSTANDBY    240
+#define WAKEDELAYSTANDBY 240
 
 extern PowerCC26X2_ModuleState PowerCC26X2_module;
 
@@ -33,7 +33,7 @@ extern PowerCC26X2_ModuleState PowerCC26X2_module;
 static const unsigned int pm_min_residency[] = {
 #ifdef CONFIG_SYS_POWER_SLEEP_STATES
 	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_1 * SECS_TO_TICKS / MSEC_PER_SEC,
-	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 * SECS_TO_TICKS / MSEC_PER_SEC,
+	CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 *SECS_TO_TICKS / MSEC_PER_SEC,
 #endif /* CONFIG_SYS_POWER_SLEEP_STATES */
 };
 
@@ -67,21 +67,22 @@ enum power_states sys_pm_policy_next_state(int32_t ticks)
 			 */
 			switch (i) {
 			case 0: /* Idle mode */
-				if ((constraints & (1 <<
-				    PowerCC26XX_DISALLOW_IDLE)) != 0) {
+				if ((constraints &
+				     (1 << PowerCC26XX_DISALLOW_IDLE)) != 0) {
 					disallowed = true;
 				}
 				break;
 			case 1: /* Standby mode */
-				if ((constraints & (1 <<
-				    PowerCC26XX_DISALLOW_STANDBY)) != 0) {
+				if ((constraints &
+				     (1 << PowerCC26XX_DISALLOW_STANDBY)) !=
+				    0) {
 					disallowed = true;
 				}
 				/* Set timeout for wakeup event */
 				__ASSERT(
-				    CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 > 1,
-				    "CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 must "
-				    "be greater than 1.");
+					CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 > 1,
+					"CONFIG_SYS_PM_MIN_RESIDENCY_SLEEP_2 must "
+					"be greater than 1.");
 				if (ticks != K_TICKS_FOREVER) {
 					/* NOTE: Ideally we'd like to set a
 					 * timer to wake up just a little
@@ -97,20 +98,26 @@ enum power_states sys_pm_policy_next_state(int32_t ticks)
 					 * SYS_PM_MIN_RESIDENCY_SLEEP_2
 					 * must be greater than 1.
 					 */
-					ticks -= (WAKEDELAYSTANDBY *
-						CONFIG_SYS_CLOCK_TICKS_PER_SEC
-						+ 1000000) / 1000000;
+					ticks -=
+						(WAKEDELAYSTANDBY *
+							 CONFIG_SYS_CLOCK_TICKS_PER_SEC +
+						 1000000) /
+						1000000;
 #if (CONFIG_SYS_CLOCK_TICKS_PER_SEC <= 1000)
 					/*
 					 * ClockP_setTimeout cannot handle any
 					 * more ticks
 					 */
-					ticks = MIN(ticks, UINT32_MAX / 1000 *
-						CONFIG_SYS_CLOCK_TICKS_PER_SEC);
+					ticks = MIN(
+						ticks,
+						UINT32_MAX / 1000 *
+							CONFIG_SYS_CLOCK_TICKS_PER_SEC);
 #endif
-					ClockP_setTimeout(ClockP_handle(
-						(ClockP_Struct *)
-						&PowerCC26X2_module.clockObj),
+					ClockP_setTimeout(
+						ClockP_handle(
+							(ClockP_Struct
+								 *)&PowerCC26X2_module
+								.clockObj),
 						ticks);
 				}
 				break;

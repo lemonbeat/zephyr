@@ -107,8 +107,8 @@ void mcux_gpt_isr(const struct device *dev)
 	uint32_t current = GPT_GetCurrentTimerCount(config->base);
 	uint32_t status;
 
-	status =  GPT_GetStatusFlags(config->base, kGPT_OutputCompare1Flag |
-				     kGPT_RollOverFlag);
+	status = GPT_GetStatusFlags(config->base, kGPT_OutputCompare1Flag |
+							  kGPT_RollOverFlag);
 	GPT_ClearStatusFlags(config->base, status);
 	__DSB();
 
@@ -200,9 +200,9 @@ static const struct counter_driver_api mcux_gpt_driver_api = {
 	.get_max_relative_alarm = mcux_gpt_get_max_relative_alarm,
 };
 
-#define GPT_DEVICE_INIT_MCUX(n)						\
-	static struct mcux_gpt_data mcux_gpt_data_ ## n;		\
-									\
+#define GPT_DEVICE_INIT_MCUX(n)                                         \
+	static struct mcux_gpt_data mcux_gpt_data_##n;                  \
+                                                                        \
 	static const struct mcux_gpt_config mcux_gpt_config_ ## n = {	\
 		.base = (void *)DT_INST_REG_ADDR(n),			\
 		.clock_source = kCLOCK_PerClk,				\
@@ -212,25 +212,21 @@ static const struct counter_driver_api mcux_gpt_driver_api = {
 			.channels = 1,					\
 			.flags = COUNTER_CONFIG_INFO_COUNT_UP,		\
 		},							\
-	};								\
-									\
-	static int mcux_gpt_## n ##_init(const struct device *dev);	\
-	DEVICE_AND_API_INIT(mcux_gpt ## n,				\
-			    DT_INST_LABEL(n),				\
-			    mcux_gpt_## n ##_init,			\
-			    &mcux_gpt_data_ ## n,			\
-			    &mcux_gpt_config_ ## n,			\
-			    POST_KERNEL,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &mcux_gpt_driver_api);			\
-									\
-	static int mcux_gpt_## n ##_init(const struct device *dev)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n),				\
-			    DT_INST_IRQ(n, priority),			\
-			    mcux_gpt_isr, DEVICE_GET(mcux_gpt ## n), 0);\
-		irq_enable(DT_INST_IRQN(n));				\
-		return mcux_gpt_init(dev);				\
-	}								\
+	}; \
+                                                                        \
+	static int mcux_gpt_##n##_init(const struct device *dev);       \
+	DEVICE_AND_API_INIT(mcux_gpt##n, DT_INST_LABEL(n),              \
+			    mcux_gpt_##n##_init, &mcux_gpt_data_##n,    \
+			    &mcux_gpt_config_##n, POST_KERNEL,          \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,         \
+			    &mcux_gpt_driver_api);                      \
+                                                                        \
+	static int mcux_gpt_##n##_init(const struct device *dev)        \
+	{                                                               \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),  \
+			    mcux_gpt_isr, DEVICE_GET(mcux_gpt##n), 0);  \
+		irq_enable(DT_INST_IRQN(n));                            \
+		return mcux_gpt_init(dev);                              \
+	}
 
 DT_INST_FOREACH_STATUS_OKAY(GPT_DEVICE_INIT_MCUX)

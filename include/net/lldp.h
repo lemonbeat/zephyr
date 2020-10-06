@@ -26,8 +26,8 @@ extern "C" {
 
 /** @cond INTERNAL_HIDDEN */
 
-#define LLDP_TLV_GET_LENGTH(type_length)	(type_length & BIT_MASK(9))
-#define LLDP_TLV_GET_TYPE(type_length)		((uint8_t)(type_length >> 9))
+#define LLDP_TLV_GET_LENGTH(type_length) (type_length & BIT_MASK(9))
+#define LLDP_TLV_GET_TYPE(type_length) ((uint8_t)(type_length >> 9))
 
 /* LLDP Definitions */
 
@@ -43,14 +43,14 @@ extern "C" {
  */
 #if defined(CONFIG_NET_LLDP_CHASSIS_ID_SUBTYPE)
 #if (CONFIG_NET_LLDP_CHASSIS_ID_SUBTYPE == 4)
-#define NET_LLDP_CHASSIS_ID_VALUE		\
-	{					\
-	  CONFIG_NET_LLDP_CHASSIS_ID_MAC0,	\
-	  CONFIG_NET_LLDP_CHASSIS_ID_MAC1,	\
-	  CONFIG_NET_LLDP_CHASSIS_ID_MAC2,	\
-	  CONFIG_NET_LLDP_CHASSIS_ID_MAC3,	\
-	  CONFIG_NET_LLDP_CHASSIS_ID_MAC4,	\
-	  CONFIG_NET_LLDP_CHASSIS_ID_MAC5 	\
+#define NET_LLDP_CHASSIS_ID_VALUE                        \
+	{                                                \
+		CONFIG_NET_LLDP_CHASSIS_ID_MAC0,         \
+			CONFIG_NET_LLDP_CHASSIS_ID_MAC1, \
+			CONFIG_NET_LLDP_CHASSIS_ID_MAC2, \
+			CONFIG_NET_LLDP_CHASSIS_ID_MAC3, \
+			CONFIG_NET_LLDP_CHASSIS_ID_MAC4, \
+			CONFIG_NET_LLDP_CHASSIS_ID_MAC5  \
 	}
 
 #define NET_LLDP_CHASSIS_ID_VALUE_LEN (6)
@@ -72,14 +72,13 @@ extern "C" {
  */
 #if defined(CONFIG_NET_LLDP_PORT_ID_SUBTYPE)
 #if (CONFIG_NET_LLDP_PORT_ID_SUBTYPE == 3)
-#define NET_LLDP_PORT_ID_VALUE		\
-	{				\
-	  CONFIG_NET_LLDP_PORT_ID_MAC0,	\
-	  CONFIG_NET_LLDP_PORT_ID_MAC1, \
-	  CONFIG_NET_LLDP_PORT_ID_MAC2, \
-	  CONFIG_NET_LLDP_PORT_ID_MAC3, \
-	  CONFIG_NET_LLDP_PORT_ID_MAC4, \
-	  CONFIG_NET_LLDP_PORT_ID_MAC5  \
+#define NET_LLDP_PORT_ID_VALUE                                              \
+	{                                                                   \
+		CONFIG_NET_LLDP_PORT_ID_MAC0, CONFIG_NET_LLDP_PORT_ID_MAC1, \
+			CONFIG_NET_LLDP_PORT_ID_MAC2,                       \
+			CONFIG_NET_LLDP_PORT_ID_MAC3,                       \
+			CONFIG_NET_LLDP_PORT_ID_MAC4,                       \
+			CONFIG_NET_LLDP_PORT_ID_MAC5                        \
 	}
 
 #define NET_LLDP_PORT_ID_VALUE_LEN (6)
@@ -112,24 +111,23 @@ extern "C" {
 	MIN((CONFIG_NET_LLDP_TX_INTERVAL * CONFIG_NET_LLDP_TX_HOLD) + 1, 65535)
 #endif
 
-
 struct net_if;
 
 /** @endcond */
 
 /** TLV Types. Please refer to table 8-1 from IEEE 802.1AB standard. */
 enum net_lldp_tlv_type {
-	LLDP_TLV_END_LLDPDU          = 0, /**< End Of LLDPDU (optional)      */
-	LLDP_TLV_CHASSIS_ID          = 1, /**< Chassis ID (mandatory)        */
-	LLDP_TLV_PORT_ID             = 2, /**< Port ID (mandatory)           */
-	LLDP_TLV_TTL                 = 3, /**< Time To Live (mandatory)      */
-	LLDP_TLV_PORT_DESC           = 4, /**< Port Description (optional)   */
-	LLDP_TLV_SYSTEM_NAME         = 5, /**< System Name (optional)        */
-	LLDP_TLV_SYSTEM_DESC         = 6, /**< System Description (optional) */
+	LLDP_TLV_END_LLDPDU = 0, /**< End Of LLDPDU (optional)      */
+	LLDP_TLV_CHASSIS_ID = 1, /**< Chassis ID (mandatory)        */
+	LLDP_TLV_PORT_ID = 2, /**< Port ID (mandatory)           */
+	LLDP_TLV_TTL = 3, /**< Time To Live (mandatory)      */
+	LLDP_TLV_PORT_DESC = 4, /**< Port Description (optional)   */
+	LLDP_TLV_SYSTEM_NAME = 5, /**< System Name (optional)        */
+	LLDP_TLV_SYSTEM_DESC = 6, /**< System Description (optional) */
 	LLDP_TLV_SYSTEM_CAPABILITIES = 7, /**< System Capability (optional)  */
-	LLDP_TLV_MANAGEMENT_ADDR     = 8, /**< Management Address (optional) */
+	LLDP_TLV_MANAGEMENT_ADDR = 8, /**< Management Address (optional) */
 	/* Types 9 - 126 are reserved. */
-	LLDP_TLV_ORG_SPECIFIC       = 127, /**< Org specific TLVs (optional) */
+	LLDP_TLV_ORG_SPECIFIC = 127, /**< Org specific TLVs (optional) */
 };
 
 /** Chassis ID TLV, see chapter 8.5.2 in IEEE 802.1AB */
@@ -165,9 +163,9 @@ struct net_lldp_time_to_live_tlv {
  * as stated in "8.2 LLDPDU format" from the IEEE 802.1AB
  */
 struct net_lldpdu {
-	struct net_lldp_chassis_tlv chassis_id;	/**< Mandatory Chassis TLV */
-	struct net_lldp_port_tlv port_id;	/**< Mandatory Port TLV */
-	struct net_lldp_time_to_live_tlv ttl;	/**< Mandatory TTL TLV */
+	struct net_lldp_chassis_tlv chassis_id; /**< Mandatory Chassis TLV */
+	struct net_lldp_port_tlv port_id; /**< Mandatory Port TLV */
+	struct net_lldp_time_to_live_tlv ttl; /**< Mandatory TTL TLV */
 } __packed;
 
 /**

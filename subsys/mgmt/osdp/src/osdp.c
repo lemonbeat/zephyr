@@ -43,7 +43,6 @@ static void osdp_uart_isr(const struct device *dev, void *user_data)
 	struct osdp_device *p = user_data;
 
 	while (uart_irq_update(dev) && uart_irq_is_pending(dev)) {
-
 		if (uart_irq_rx_ready(dev)) {
 			read = uart_fifo_read(dev, buf, sizeof(buf));
 			if (read) {
@@ -104,7 +103,7 @@ static struct osdp *osdp_build_ctx(struct osdp_channel *channel)
 	int i;
 	struct osdp *ctx;
 	struct osdp_pd *pd;
-	int pd_adddres[CONFIG_OSDP_NUM_CONNECTED_PD] = {0};
+	int pd_adddres[CONFIG_OSDP_NUM_CONNECTED_PD] = { 0 };
 
 #ifdef CONFIG_OSDP_MODE_PD
 	pd_adddres[0] = CONFIG_OSDP_PD_ADDRESS;
@@ -128,8 +127,8 @@ static struct osdp *osdp_build_ctx(struct osdp_channel *channel)
 		pd->address = pd_adddres[i];
 		pd->baud_rate = CONFIG_OSDP_UART_BAUD_RATE;
 		memcpy(&pd->channel, channel, sizeof(struct osdp_channel));
-		k_mem_slab_init(&pd->cmd.slab,
-				pd->cmd.slab_buf, sizeof(struct osdp_cmd),
+		k_mem_slab_init(&pd->cmd.slab, pd->cmd.slab_buf,
+				sizeof(struct osdp_cmd),
 				CONFIG_OSDP_PD_COMMAND_QUEUE_SIZE);
 	}
 	return ctx;
@@ -211,8 +210,8 @@ static int osdp_init(const struct device *arg)
 
 	/* kick off refresh thread */
 	k_thread_create(&osdp_refresh_thread, osdp_thread_stack,
-			CONFIG_OSDP_THREAD_STACK_SIZE, osdp_refresh,
-			NULL, NULL, NULL, K_PRIO_COOP(2), 0, K_NO_WAIT);
+			CONFIG_OSDP_THREAD_STACK_SIZE, osdp_refresh, NULL, NULL,
+			NULL, K_PRIO_COOP(2), 0, K_NO_WAIT);
 	return 0;
 }
 

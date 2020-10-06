@@ -50,11 +50,11 @@ struct i2c_gpio_config {
 
 /* Driver instance data */
 struct i2c_gpio_context {
-	struct i2c_bitbang bitbang;	/* Bit-bang library data */
-	const struct device *scl_gpio;	/* GPIO used for I2C SCL line */
-	const struct device *sda_gpio;	/* GPIO used for I2C SDA line */
-	gpio_pin_t scl_pin;		/* Pin on gpio used for SCL line */
-	gpio_pin_t sda_pin;		/* Pin on gpio used for SDA line */
+	struct i2c_bitbang bitbang; /* Bit-bang library data */
+	const struct device *scl_gpio; /* GPIO used for I2C SCL line */
+	const struct device *sda_gpio; /* GPIO used for I2C SDA line */
+	gpio_pin_t scl_pin; /* Pin on gpio used for SCL line */
+	gpio_pin_t sda_pin; /* Pin on gpio used for SDA line */
 };
 
 static void i2c_gpio_set_scl(void *io_context, int state)
@@ -94,7 +94,7 @@ static int i2c_gpio_configure(const struct device *dev, uint32_t dev_config)
 }
 
 static int i2c_gpio_transfer(const struct device *dev, struct i2c_msg *msgs,
-				uint8_t num_msgs, uint16_t slave_address)
+			     uint8_t num_msgs, uint16_t slave_address)
 {
 	struct i2c_gpio_context *context = dev->data;
 
@@ -168,24 +168,23 @@ static int i2c_gpio_init(const struct device *dev)
 	return 0;
 }
 
-#define	DEFINE_I2C_GPIO(_num)						\
-									\
-static struct i2c_gpio_context i2c_gpio_dev_data_##_num;		\
-									\
-static const struct i2c_gpio_config i2c_gpio_dev_cfg_##_num = {		\
-	.scl_gpio_name	= DT_INST_GPIO_LABEL(_num, scl_gpios),		\
-	.sda_gpio_name	= DT_INST_GPIO_LABEL(_num, sda_gpios),		\
-	.scl_pin	= DT_INST_GPIO_PIN(_num, scl_gpios),		\
-	.sda_pin	= DT_INST_GPIO_PIN(_num, sda_gpios),		\
-	.scl_flags	= DT_INST_GPIO_FLAGS(_num, scl_gpios),		\
-	.sda_flags	= DT_INST_GPIO_FLAGS(_num, sda_gpios),		\
-	.bitrate	= DT_INST_PROP(_num, clock_frequency),		\
-};									\
-									\
-DEVICE_AND_API_INIT(i2c_gpio_##_num, DT_INST_LABEL(_num),		\
-	    i2c_gpio_init,						\
-	    &i2c_gpio_dev_data_##_num,					\
-	    &i2c_gpio_dev_cfg_##_num,					\
-	    PRE_KERNEL_2, CONFIG_I2C_INIT_PRIORITY, &api);
+#define DEFINE_I2C_GPIO(_num)                                           \
+                                                                        \
+	static struct i2c_gpio_context i2c_gpio_dev_data_##_num;        \
+                                                                        \
+	static const struct i2c_gpio_config i2c_gpio_dev_cfg_##_num = { \
+		.scl_gpio_name = DT_INST_GPIO_LABEL(_num, scl_gpios),   \
+		.sda_gpio_name = DT_INST_GPIO_LABEL(_num, sda_gpios),   \
+		.scl_pin = DT_INST_GPIO_PIN(_num, scl_gpios),           \
+		.sda_pin = DT_INST_GPIO_PIN(_num, sda_gpios),           \
+		.scl_flags = DT_INST_GPIO_FLAGS(_num, scl_gpios),       \
+		.sda_flags = DT_INST_GPIO_FLAGS(_num, sda_gpios),       \
+		.bitrate = DT_INST_PROP(_num, clock_frequency),         \
+	};                                                              \
+                                                                        \
+	DEVICE_AND_API_INIT(i2c_gpio_##_num, DT_INST_LABEL(_num),       \
+			    i2c_gpio_init, &i2c_gpio_dev_data_##_num,   \
+			    &i2c_gpio_dev_cfg_##_num, PRE_KERNEL_2,     \
+			    CONFIG_I2C_INIT_PRIORITY, &api);
 
 DT_INST_FOREACH_STATUS_OKAY(DEFINE_I2C_GPIO)

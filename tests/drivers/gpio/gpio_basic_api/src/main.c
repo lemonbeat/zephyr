@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include "test_gpio.h"
 
 /* Grotesque hack for pinmux boards */
@@ -25,10 +24,13 @@ static void board_setup(void)
 #if DT_NODE_HAS_STATUS(DT_INST(0, test_gpio_basic_api), okay)
 	/* PIN_IN and PIN_OUT must be on same controller. */
 	if (strcmp(DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), out_gpios),
-		   DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), in_gpios)) != 0) {
+		   DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), in_gpios)) !=
+	    0) {
 		printk("FATAL: output controller %s != input controller %s\n",
-		       DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), out_gpios),
-		       DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api), in_gpios));
+		       DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api),
+				     out_gpios),
+		       DT_GPIO_LABEL(DT_INST(0, test_gpio_basic_api),
+				     in_gpios));
 		k_panic();
 	}
 #endif
@@ -65,49 +67,45 @@ static void board_setup(void)
 
 	/* Configure pin RGMII2_RD2 as GPIO5_IO14. */
 	IOMUXC_SW_MUX_CTL_PAD_RGMII2_RD2 =
-				IOMUXC_SW_MUX_CTL_PAD_RGMII2_RD2_MUX_MODE(5);
+		IOMUXC_SW_MUX_CTL_PAD_RGMII2_RD2_MUX_MODE(5);
 	/* Select pull enabled, speed 100 MHz, drive strength 43 ohm */
 	IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2 =
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_PUE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_PKE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_SPEED(2) |
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_DSE(6);
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_PUE_MASK |
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_PKE_MASK |
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_SPEED(2) |
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD2_DSE(6);
 
 	/* Configure pin RGMII2_RD3 as GPIO5_IO15. */
 	IOMUXC_SW_MUX_CTL_PAD_RGMII2_RD3 =
-				IOMUXC_SW_MUX_CTL_PAD_RGMII2_RD3_MUX_MODE(5);
+		IOMUXC_SW_MUX_CTL_PAD_RGMII2_RD3_MUX_MODE(5);
 	/* Select pull enabled, speed 100 MHz, drive strength 43 ohm */
 	IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3 =
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_PUE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_PKE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_SPEED(2) |
-				IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_DSE(6);
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_PUE_MASK |
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_PKE_MASK |
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_SPEED(2) |
+		IOMUXC_SW_PAD_CTL_PAD_RGMII2_RD3_DSE(6);
 #elif defined(CONFIG_BOARD_MIMXRT1050_EVK)
 	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_06_GPIO1_IO22, 0);
 	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_07_GPIO1_IO23, 0);
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_06_GPIO1_IO22,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_07_GPIO1_IO23,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #elif defined(CONFIG_SOC_FAMILY_LPC)
 	/* Assumes ARDUINO pins are mapped on PORT0 on all boards*/
 	const struct device *port0 =
 		device_get_binding(CONFIG_PINMUX_MCUX_LPC_PORT0_NAME);
-	const uint32_t pin_config = (
-			IOCON_PIO_FUNC0 |
-			IOCON_PIO_INV_DI |
-			IOCON_PIO_DIGITAL_EN |
-			IOCON_PIO_INPFILT_OFF |
-			IOCON_PIO_OPENDRAIN_DI
-			);
-	pinmux_pin_set(port0, PIN_IN,  pin_config);
+	const uint32_t pin_config =
+		(IOCON_PIO_FUNC0 | IOCON_PIO_INV_DI | IOCON_PIO_DIGITAL_EN |
+		 IOCON_PIO_INPFILT_OFF | IOCON_PIO_OPENDRAIN_DI);
+	pinmux_pin_set(port0, PIN_IN, pin_config);
 	pinmux_pin_set(port0, PIN_OUT, pin_config);
 #elif defined(CONFIG_BOARD_RV32M1_VEGA)
 	const char *pmx_name = DT_LABEL(DT_NODELABEL(porta));
@@ -121,8 +119,7 @@ static void board_setup(void)
 void test_main(void)
 {
 	board_setup();
-	ztest_test_suite(gpio_basic_test,
-			 ztest_unit_test(test_gpio_port),
+	ztest_test_suite(gpio_basic_test, ztest_unit_test(test_gpio_port),
 			 ztest_unit_test(test_gpio_callback_add_remove),
 			 ztest_unit_test(test_gpio_callback_self_remove),
 			 ztest_unit_test(test_gpio_callback_enable_disable),

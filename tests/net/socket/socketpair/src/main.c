@@ -52,12 +52,11 @@ void test_main(void)
 {
 	k_thread_system_pool_assign(k_current_get());
 
-	k_thread_access_grant(k_current_get(),
-		&test_socketpair_work_q.queue);
+	k_thread_access_grant(k_current_get(), &test_socketpair_work_q.queue);
 
 	k_work_q_start(&test_socketpair_work_q, test_socketpair_work_q_stack,
-		K_THREAD_STACK_SIZEOF(test_socketpair_work_q_stack),
-		CONFIG_MAIN_THREAD_PRIORITY);
+		       K_THREAD_STACK_SIZEOF(test_socketpair_work_q_stack),
+		       CONFIG_MAIN_THREAD_PRIORITY);
 
 	ztest_test_suite(
 		socketpair,
@@ -82,16 +81,14 @@ void test_main(void)
 			test_socketpair_close_one_end_and_write_to_the_other),
 
 		ztest_user_unit_test(test_socketpair_poll_timeout),
-		ztest_user_unit_test(
-			test_socketpair_poll_timeout_nonblocking),
+		ztest_user_unit_test(test_socketpair_poll_timeout_nonblocking),
 		ztest_user_unit_test(test_socketpair_poll_immediate_data),
 		ztest_user_unit_test(test_socketpair_poll_delayed_data),
 
 		ztest_user_unit_test(
 			test_socketpair_poll_close_remote_end_POLLIN),
 		ztest_user_unit_test(
-			test_socketpair_poll_close_remote_end_POLLOUT)
-	);
+			test_socketpair_poll_close_remote_end_POLLOUT));
 
 	ztest_run_test_suite(socketpair);
 }

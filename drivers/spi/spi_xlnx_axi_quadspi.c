@@ -15,70 +15,68 @@ LOG_MODULE_REGISTER(xlnx_quadspi, CONFIG_SPI_LOG_LEVEL);
 #include "spi_context.h"
 
 /* AXI Quad SPI v3.2 register offsets (See Xilinx PG153 for details) */
-#define SRR_OFFSET             0x40
-#define SPICR_OFFSET           0x60
-#define SPISR_OFFSET           0x64
-#define SPI_DTR_OFFSET         0x68
-#define SPI_DRR_OFFSET         0x6c
-#define SPISSR_OFFSET          0x70
+#define SRR_OFFSET 0x40
+#define SPICR_OFFSET 0x60
+#define SPISR_OFFSET 0x64
+#define SPI_DTR_OFFSET 0x68
+#define SPI_DRR_OFFSET 0x6c
+#define SPISSR_OFFSET 0x70
 #define SPI_TX_FIFO_OCR_OFFSET 0x74
 #define SPI_RX_FIFO_OCR_OFFSET 0x78
-#define DGIER_OFFSET           0x1c
-#define IPISR_OFFSET           0x20
-#define IPIER_OFFSET           0x28
+#define DGIER_OFFSET 0x1c
+#define IPISR_OFFSET 0x20
+#define IPIER_OFFSET 0x28
 
 /* SRR bit definitions */
 #define SRR_SOFTRESET_MAGIC 0xa
 
 /* SPICR bit definitions */
-#define SPICR_LOOP            BIT(0)
-#define SPICR_SPE             BIT(1)
-#define SPICR_MASTER          BIT(2)
-#define SPICR_CPOL            BIT(3)
-#define SPICR_CPHA            BIT(4)
-#define SPICR_TX_FIFO_RESET   BIT(5)
-#define SPICR_RX_FIFO_RESET   BIT(6)
-#define SPICR_MANUAL_SS       BIT(7)
+#define SPICR_LOOP BIT(0)
+#define SPICR_SPE BIT(1)
+#define SPICR_MASTER BIT(2)
+#define SPICR_CPOL BIT(3)
+#define SPICR_CPHA BIT(4)
+#define SPICR_TX_FIFO_RESET BIT(5)
+#define SPICR_RX_FIFO_RESET BIT(6)
+#define SPICR_MANUAL_SS BIT(7)
 #define SPICR_MASTER_XFER_INH BIT(8)
-#define SPICR_LSB_FIRST       BIT(9)
+#define SPICR_LSB_FIRST BIT(9)
 
 /* SPISR bit definitions */
-#define SPISR_RX_EMPTY          BIT(0)
-#define SPISR_RX_FULL           BIT(1)
-#define SPISR_TX_EMPTY          BIT(2)
-#define SPISR_TX_FULL           BIT(3)
-#define SPISR_MODF              BIT(4)
+#define SPISR_RX_EMPTY BIT(0)
+#define SPISR_RX_FULL BIT(1)
+#define SPISR_TX_EMPTY BIT(2)
+#define SPISR_TX_FULL BIT(3)
+#define SPISR_MODF BIT(4)
 #define SPISR_SLAVE_MODE_SELECT BIT(5)
-#define SPISR_CPOL_CPHA_ERROR   BIT(6)
-#define SPISR_SLAVE_MODE_ERROR  BIT(7)
-#define SPISR_MSB_ERROR         BIT(8)
-#define SPISR_LOOPBACK_ERROR    BIT(9)
-#define SPISR_COMMAND_ERROR     BIT(10)
+#define SPISR_CPOL_CPHA_ERROR BIT(6)
+#define SPISR_SLAVE_MODE_ERROR BIT(7)
+#define SPISR_MSB_ERROR BIT(8)
+#define SPISR_LOOPBACK_ERROR BIT(9)
+#define SPISR_COMMAND_ERROR BIT(10)
 
-#define SPISR_ERROR_MASK (SPISR_COMMAND_ERROR |		\
-			  SPISR_LOOPBACK_ERROR |	\
-			  SPISR_MSB_ERROR |		\
-			  SPISR_SLAVE_MODE_ERROR |	\
-			  SPISR_CPOL_CPHA_ERROR)
+#define SPISR_ERROR_MASK                                                \
+	(SPISR_COMMAND_ERROR | SPISR_LOOPBACK_ERROR | SPISR_MSB_ERROR | \
+	 SPISR_SLAVE_MODE_ERROR | SPISR_CPOL_CPHA_ERROR)
 
 /* DGIER bit definitions */
 #define DGIER_GIE BIT(31)
 
 /* IPISR and IPIER bit definitions */
-#define IPIXR_MODF               BIT(0)
-#define IPIXR_SLAVE_MODF         BIT(1)
-#define IPIXR_DTR_EMPTY          BIT(2)
-#define IPIXR_DTR_UNDERRUN       BIT(3)
-#define IPIXR_DRR_FULL           BIT(4)
-#define IPIXR_DRR_OVERRUN        BIT(5)
+#define IPIXR_MODF BIT(0)
+#define IPIXR_SLAVE_MODF BIT(1)
+#define IPIXR_DTR_EMPTY BIT(2)
+#define IPIXR_DTR_UNDERRUN BIT(3)
+#define IPIXR_DRR_FULL BIT(4)
+#define IPIXR_DRR_OVERRUN BIT(5)
 #define IPIXR_TX_FIFO_HALF_EMPTY BIT(6)
-#define IPIXR_SLAVE_MODE_SELECT  BIT(7)
-#define IPIXR_DDR_NOT_EMPTY      BIT(8)
-#define IPIXR_CPOL_CPHA_ERROR    BIT(9)
-#define IPIXR_SLAVE_MODE_ERROR   BIT(10)
-#define IPIXR_MSB_ERROR          BIT(11)
-#define IPIXR_LOOPBACK_ERROR     BIT(12)
-#define IPIXR_COMMAND_ERROR      BIT(13)
+#define IPIXR_SLAVE_MODE_SELECT BIT(7)
+#define IPIXR_DDR_NOT_EMPTY BIT(8)
+#define IPIXR_CPOL_CPHA_ERROR BIT(9)
+#define IPIXR_SLAVE_MODE_ERROR BIT(10)
+#define IPIXR_MSB_ERROR BIT(11)
+#define IPIXR_LOOPBACK_ERROR BIT(12)
+#define IPIXR_COMMAND_ERROR BIT(13)
 
 struct xlnx_quadspi_config {
 	mm_reg_t base;
@@ -100,8 +98,7 @@ static inline uint32_t xlnx_quadspi_read32(const struct device *dev,
 }
 
 static inline void xlnx_quadspi_write32(const struct device *dev,
-					uint32_t value,
-					mm_reg_t offset)
+					uint32_t value, mm_reg_t offset)
 {
 	const struct xlnx_quadspi_config *config = dev->config;
 
@@ -151,8 +148,8 @@ static int xlnx_quadspi_configure(const struct device *dev,
 	}
 
 	if (spi_cfg->slave >= config->num_ss_bits) {
-		LOG_ERR("unsupported slave %d, num_ss_bits %d",
-			spi_cfg->slave, config->num_ss_bits);
+		LOG_ERR("unsupported slave %d, num_ss_bits %d", spi_cfg->slave,
+			config->num_ss_bits);
 		return -ENOTSUP;
 	}
 
@@ -161,7 +158,7 @@ static int xlnx_quadspi_configure(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	if (!IS_ENABLED(CONFIG_SPI_SLAVE) && \
+	if (!IS_ENABLED(CONFIG_SPI_SLAVE) &&
 	    (spi_cfg->operation & SPI_OP_MODE_SLAVE)) {
 		LOG_ERR("slave mode support not enabled");
 		return -ENOTSUP;
@@ -461,34 +458,33 @@ static const struct spi_driver_api xlnx_quadspi_driver_api = {
 	.release = xlnx_quadspi_release,
 };
 
-#define XLNX_QUADSPI_INIT(n)						\
-	static void xlnx_quadspi_config_func_##n(const struct device *dev);	\
-									\
-	static const struct xlnx_quadspi_config xlnx_quadspi_config_##n = { \
-		.base = DT_INST_REG_ADDR(n),				\
-		.irq_config_func = xlnx_quadspi_config_func_##n,	\
-		.num_ss_bits = DT_INST_PROP(n, xlnx_num_ss_bits),	\
-		.num_xfer_bytes =					\
-			DT_INST_PROP(n, xlnx_num_transfer_bits) / 8,	\
-	};								\
-									\
-	static struct xlnx_quadspi_data xlnx_quadspi_data_##n = {	\
-		SPI_CONTEXT_INIT_LOCK(xlnx_quadspi_data_##n, ctx),	\
-		SPI_CONTEXT_INIT_SYNC(xlnx_quadspi_data_##n, ctx),	\
-	};								\
-									\
-	DEVICE_AND_API_INIT(xlnx_quadspi_##n, DT_INST_LABEL(n),		\
-			    &xlnx_quadspi_init, &xlnx_quadspi_data_##n,	\
-			    &xlnx_quadspi_config_##n, POST_KERNEL,	\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &xlnx_quadspi_driver_api);			\
-									\
-	static void xlnx_quadspi_config_func_##n(const struct device *dev)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),	\
-			    xlnx_quadspi_isr,				\
-			    DEVICE_GET(xlnx_quadspi_##n), 0);		\
-		irq_enable(DT_INST_IRQN(n));				\
+#define XLNX_QUADSPI_INIT(n)                                                   \
+	static void xlnx_quadspi_config_func_##n(const struct device *dev);    \
+                                                                               \
+	static const struct xlnx_quadspi_config xlnx_quadspi_config_##n = {    \
+		.base = DT_INST_REG_ADDR(n),                                   \
+		.irq_config_func = xlnx_quadspi_config_func_##n,               \
+		.num_ss_bits = DT_INST_PROP(n, xlnx_num_ss_bits),              \
+		.num_xfer_bytes = DT_INST_PROP(n, xlnx_num_transfer_bits) / 8, \
+	};                                                                     \
+                                                                               \
+	static struct xlnx_quadspi_data xlnx_quadspi_data_##n = {              \
+		SPI_CONTEXT_INIT_LOCK(xlnx_quadspi_data_##n, ctx),             \
+		SPI_CONTEXT_INIT_SYNC(xlnx_quadspi_data_##n, ctx),             \
+	};                                                                     \
+                                                                               \
+	DEVICE_AND_API_INIT(xlnx_quadspi_##n, DT_INST_LABEL(n),                \
+			    &xlnx_quadspi_init, &xlnx_quadspi_data_##n,        \
+			    &xlnx_quadspi_config_##n, POST_KERNEL,             \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,                \
+			    &xlnx_quadspi_driver_api);                         \
+                                                                               \
+	static void xlnx_quadspi_config_func_##n(const struct device *dev)     \
+	{                                                                      \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),         \
+			    xlnx_quadspi_isr, DEVICE_GET(xlnx_quadspi_##n),    \
+			    0);                                                \
+		irq_enable(DT_INST_IRQN(n));                                   \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(XLNX_QUADSPI_INIT)

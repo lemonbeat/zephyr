@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /** L2CAP header size, used for buffer size calculations */
-#define BT_L2CAP_HDR_SIZE               4
+#define BT_L2CAP_HDR_SIZE 4
 
 /** @def BT_L2CAP_BUF_SIZE
  *
@@ -38,9 +38,8 @@ extern "C" {
  *
  *  @return Needed buffer size to match the requested L2CAP MTU.
  */
-#define BT_L2CAP_BUF_SIZE(mtu) (BT_BUF_RESERVE + \
-				BT_HCI_ACL_HDR_SIZE + BT_L2CAP_HDR_SIZE + \
-				(mtu))
+#define BT_L2CAP_BUF_SIZE(mtu) \
+	(BT_BUF_RESERVE + BT_HCI_ACL_HDR_SIZE + BT_L2CAP_HDR_SIZE + (mtu))
 
 struct bt_l2cap_chan;
 
@@ -92,59 +91,59 @@ typedef enum bt_l2cap_chan_status {
 /** @brief L2CAP Channel structure. */
 struct bt_l2cap_chan {
 	/** Channel connection reference */
-	struct bt_conn			*conn;
+	struct bt_conn *conn;
 	/** Channel operations reference */
-	const struct bt_l2cap_chan_ops	*ops;
-	sys_snode_t			node;
-	bt_l2cap_chan_destroy_t		destroy;
+	const struct bt_l2cap_chan_ops *ops;
+	sys_snode_t node;
+	bt_l2cap_chan_destroy_t destroy;
 	/* Response Timeout eXpired (RTX) timer */
-	struct k_delayed_work		rtx_work;
+	struct k_delayed_work rtx_work;
 	ATOMIC_DEFINE(status, BT_L2CAP_NUM_STATUS);
 
 #if defined(CONFIG_BT_L2CAP_DYNAMIC_CHANNEL)
-	bt_l2cap_chan_state_t		state;
+	bt_l2cap_chan_state_t state;
 	/** Remote PSM to be connected */
-	uint16_t				psm;
+	uint16_t psm;
 	/** Helps match request context during CoC */
-	uint8_t				ident;
-	bt_security_t			required_sec_level;
+	uint8_t ident;
+	bt_security_t required_sec_level;
 #endif /* CONFIG_BT_L2CAP_DYNAMIC_CHANNEL */
 };
 
 /** @brief LE L2CAP Endpoint structure. */
 struct bt_l2cap_le_endpoint {
 	/** Endpoint CID */
-	uint16_t				cid;
+	uint16_t cid;
 	/** Endpoint Maximum Transmission Unit */
-	uint16_t				mtu;
+	uint16_t mtu;
 	/** Endpoint Maximum PDU payload Size */
-	uint16_t				mps;
+	uint16_t mps;
 	/** Endpoint initial credits */
-	uint16_t				init_credits;
+	uint16_t init_credits;
 	/** Endpoint credits */
-	atomic_t			credits;
+	atomic_t credits;
 };
 
 /** @brief LE L2CAP Channel structure. */
 struct bt_l2cap_le_chan {
 	/** Common L2CAP channel reference object */
-	struct bt_l2cap_chan		chan;
+	struct bt_l2cap_chan chan;
 	/** Channel Receiving Endpoint */
-	struct bt_l2cap_le_endpoint	rx;
+	struct bt_l2cap_le_endpoint rx;
 	/** Channel Transmission Endpoint */
-	struct bt_l2cap_le_endpoint	tx;
+	struct bt_l2cap_le_endpoint tx;
 	/** Channel Transmission queue */
-	struct k_fifo                   tx_queue;
+	struct k_fifo tx_queue;
 	/** Channel Pending Transmission buffer  */
-	struct net_buf                  *tx_buf;
+	struct net_buf *tx_buf;
 	/** Channel Transmission work  */
-	struct k_work			tx_work;
+	struct k_work tx_work;
 	/** Segment SDU packet from upper layer */
-	struct net_buf			*_sdu;
-	uint16_t				_sdu_len;
+	struct net_buf *_sdu;
+	uint16_t _sdu_len;
 
-	struct k_work			rx_work;
-	struct k_fifo			rx_queue;
+	struct k_work rx_work;
+	struct k_fifo rx_queue;
 };
 
 /** @def BT_L2CAP_LE_CHAN(_ch)
@@ -161,21 +160,21 @@ struct bt_l2cap_le_chan {
 /** @brief BREDR L2CAP Endpoint structure. */
 struct bt_l2cap_br_endpoint {
 	/** Endpoint CID */
-	uint16_t				cid;
+	uint16_t cid;
 	/** Endpoint Maximum Transmission Unit */
-	uint16_t				mtu;
+	uint16_t mtu;
 };
 
 /** @brief BREDR L2CAP Channel structure. */
 struct bt_l2cap_br_chan {
 	/** Common L2CAP channel reference object */
-	struct bt_l2cap_chan		chan;
+	struct bt_l2cap_chan chan;
 	/** Channel Receiving Endpoint */
-	struct bt_l2cap_br_endpoint	rx;
+	struct bt_l2cap_br_endpoint rx;
 	/** Channel Transmission Endpoint */
-	struct bt_l2cap_br_endpoint	tx;
+	struct bt_l2cap_br_endpoint tx;
 	/* For internal use only */
-	atomic_t			flags[1];
+	atomic_t flags[1];
 };
 
 /** @brief L2CAP Channel operations structure. */
@@ -290,10 +289,10 @@ struct bt_l2cap_server {
 	 *                  recommended however), or auto-allocated by the
 	 *                  stack if the app gave 0 as the value.
 	 */
-	uint16_t			psm;
+	uint16_t psm;
 
 	/** Required minimim security level */
-	bt_security_t		sec_level;
+	bt_security_t sec_level;
 
 	/** @brief Server accept callback
 	 *

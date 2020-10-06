@@ -101,9 +101,8 @@ static int ppp_save_byte(struct ppp_driver_context *ppp, uint8_t byte)
 
 	if (!ppp->pkt) {
 		ppp->pkt = net_pkt_rx_alloc_with_buffer(
-			ppp->iface,
-			CONFIG_NET_BUF_DATA_SIZE,
-			AF_UNSPEC, 0, K_NO_WAIT);
+			ppp->iface, CONFIG_NET_BUF_DATA_SIZE, AF_UNSPEC, 0,
+			K_NO_WAIT);
 		if (!ppp->pkt) {
 			LOG_ERR("[%p] cannot allocate pkt", ppp);
 			return -ENOMEM;
@@ -125,8 +124,7 @@ static int ppp_save_byte(struct ppp_driver_context *ppp, uint8_t byte)
 	 * before we write a byte to last available cursor position.
 	 */
 	if (ppp->available == 1) {
-		ret = net_pkt_alloc_buffer(ppp->pkt,
-					   CONFIG_NET_BUF_DATA_SIZE,
+		ret = net_pkt_alloc_buffer(ppp->pkt, CONFIG_NET_BUF_DATA_SIZE,
 					   AF_UNSPEC, K_NO_WAIT);
 		if (ret < 0) {
 			LOG_ERR("[%p] cannot allocate new data buffer", ppp);
@@ -139,8 +137,8 @@ static int ppp_save_byte(struct ppp_driver_context *ppp, uint8_t byte)
 	if (ppp->available) {
 		ret = net_pkt_write_u8(ppp->pkt, byte);
 		if (ret < 0) {
-			LOG_ERR("[%p] Cannot write to pkt %p (%d)",
-				ppp, ppp->pkt, ret);
+			LOG_ERR("[%p] Cannot write to pkt %p (%d)", ppp,
+				ppp->pkt, ret);
 			goto out_of_mem;
 		}
 
@@ -185,8 +183,8 @@ static void ppp_change_state(struct ppp_driver_context *ctx,
 	NET_ASSERT(new_state >= STATE_HDLC_FRAME_START &&
 		   new_state <= STATE_HDLC_FRAME_DATA);
 
-	NET_DBG("[%p] state %s (%d) => %s (%d)",
-		ctx, ppp_driver_state_str(ctx->state), ctx->state,
+	NET_DBG("[%p] state %s (%d) => %s (%d)", ctx,
+		ppp_driver_state_str(ctx->state), ctx->state,
 		ppp_driver_state_str(new_state), new_state);
 
 	ctx->state = new_state;
@@ -205,8 +203,8 @@ static int ppp_send_flush(struct ppp_driver_context *ppp, int off)
 	return 0;
 }
 
-static int ppp_send_bytes(struct ppp_driver_context *ppp,
-			  const uint8_t *data, int len, int off)
+static int ppp_send_bytes(struct ppp_driver_context *ppp, const uint8_t *data,
+			  int len, int off)
 {
 	int i;
 
@@ -251,7 +249,6 @@ static void ppp_handle_client(struct ppp_driver_context *ppp, uint8_t byte)
 		(void)ppp_send_flush(ppp, offset);
 		ppp->client_index = 0;
 	}
-
 }
 #endif
 
@@ -576,21 +573,19 @@ static int ppp_send(const struct device *dev, struct net_pkt *pkt)
 	}
 
 	/* Sync, Address & Control fields */
-	sync_addr_ctrl = sys_cpu_to_be32(0x7e << 24 | 0xff << 16 |
-					 0x7d << 8 | 0x23);
+	sync_addr_ctrl =
+		sys_cpu_to_be32(0x7e << 24 | 0xff << 16 | 0x7d << 8 | 0x23);
 	send_off = ppp_send_bytes(ppp, (const uint8_t *)&sync_addr_ctrl,
 				  sizeof(sync_addr_ctrl), send_off);
 
 	if (protocol > 0) {
 		escaped = htons(ppp_escape_byte(protocol, &offset));
 		send_off = ppp_send_bytes(ppp, (uint8_t *)&escaped + offset,
-					  offset ? 1 : 2,
-					  send_off);
+					  offset ? 1 : 2, send_off);
 
 		escaped = htons(ppp_escape_byte(protocol >> 8, &offset));
 		send_off = ppp_send_bytes(ppp, (uint8_t *)&escaped + offset,
-					  offset ? 1 : 2,
-					  send_off);
+					  offset ? 1 : 2, send_off);
 	}
 
 	/* Note that we do not print the first four bytes and FCS bytes at the
@@ -607,8 +602,7 @@ static int ppp_send(const struct device *dev, struct net_pkt *pkt)
 			escaped = htons(ppp_escape_byte(buf->data[i], &offset));
 			send_off = ppp_send_bytes(ppp,
 						  (uint8_t *)&escaped + offset,
-						  offset ? 1 : 2,
-						  send_off);
+						  offset ? 1 : 2, send_off);
 		}
 
 		buf = buf->frags;
@@ -616,13 +610,11 @@ static int ppp_send(const struct device *dev, struct net_pkt *pkt)
 
 	escaped = htons(ppp_escape_byte(fcs, &offset));
 	send_off = ppp_send_bytes(ppp, (uint8_t *)&escaped + offset,
-				  offset ? 1 : 2,
-				  send_off);
+				  offset ? 1 : 2, send_off);
 
 	escaped = htons(ppp_escape_byte(fcs >> 8, &offset));
 	send_off = ppp_send_bytes(ppp, (uint8_t *)&escaped + offset,
-				  offset ? 1 : 2,
-				  send_off);
+				  offset ? 1 : 2, send_off);
 
 	byte = 0x7e;
 	send_off = ppp_send_bytes(ppp, &byte, 1, send_off);
@@ -742,7 +734,7 @@ static void ppp_iface_init(struct net_if *iface)
 			goto use_random_mac;
 		}
 	} else {
-use_random_mac:
+	use_random_mac:
 		/* 00-00-5E-00-53-xx Documentation RFC 7042 */
 		ppp->mac_addr[0] = 0x00;
 		ppp->mac_addr[1] = 0x00;
@@ -891,5 +883,5 @@ static const struct ppp_api ppp_if_api = {
 
 NET_DEVICE_INIT(ppp, CONFIG_NET_PPP_DRV_NAME, ppp_driver_init,
 		device_pm_control_nop, &ppp_driver_context_data, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &ppp_if_api,
-		PPP_L2, NET_L2_GET_CTX_TYPE(PPP_L2), PPP_MTU);
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &ppp_if_api, PPP_L2,
+		NET_L2_GET_CTX_TYPE(PPP_L2), PPP_MTU);

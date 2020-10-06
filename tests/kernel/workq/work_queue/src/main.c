@@ -11,20 +11,21 @@
 #include <tc_util.h>
 #include <sys/util.h>
 
-#define NUM_TEST_ITEMS          6
+#define NUM_TEST_ITEMS 6
 /* Each work item takes 100ms */
-#define WORK_ITEM_WAIT          100
+#define WORK_ITEM_WAIT 100
 
 /* In fact, each work item could take up to this value */
-#define WORK_ITEM_WAIT_ALIGNED	\
-	k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(WORK_ITEM_WAIT) + _TICK_ALIGN)
+#define WORK_ITEM_WAIT_ALIGNED                                       \
+	k_ticks_to_ms_floor64(k_ms_to_ticks_ceil32(WORK_ITEM_WAIT) + \
+			      _TICK_ALIGN)
 
 /*
  * Wait 50ms between work submissions, to ensure co-op and prempt
  * preempt thread submit alternatively.
  */
-#define SUBMIT_WAIT	50
-#define STACK_SIZE      (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define SUBMIT_WAIT 50
+#define STACK_SIZE (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
 
 /* How long to wait for the full test suite to complete.  Allow for a
  * little slop
@@ -43,7 +44,6 @@ struct triggered_test_item {
 	struct k_poll_event event;
 };
 
-
 static K_THREAD_STACK_DEFINE(co_op_stack, STACK_SIZE);
 static struct k_thread co_op_data;
 
@@ -57,7 +57,7 @@ static int expected_poll_result;
 static void work_handler(struct k_work *work)
 {
 	struct delayed_test_item *ti =
-			CONTAINER_OF(work, struct delayed_test_item, work);
+		CONTAINER_OF(work, struct delayed_test_item, work);
 
 	TC_PRINT(" - Running test item %d\n", ti->key);
 	k_msleep(WORK_ITEM_WAIT);
@@ -116,8 +116,8 @@ static void delayed_test_items_submit(void)
 	int i;
 
 	k_thread_create(&co_op_data, co_op_stack, STACK_SIZE,
-			(k_thread_entry_t)coop_work_main,
-			NULL, NULL, NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
+			(k_thread_entry_t)coop_work_main, NULL, NULL, NULL,
+			K_PRIO_COOP(10), 0, K_NO_WAIT);
 
 	for (i = 0; i < NUM_TEST_ITEMS; i += 2) {
 		TC_PRINT(" - Submitting work %d from preempt thread\n", i + 1);
@@ -140,7 +140,6 @@ static void check_results(int num_tests)
 			      " (expected %d)\n",
 			      results[i], i, i + 1);
 	}
-
 }
 
 /**
@@ -165,12 +164,10 @@ static void test_sequence(void)
 	reset_results();
 }
 
-
-
 static void resubmit_work_handler(struct k_work *work)
 {
 	struct delayed_test_item *ti =
-			CONTAINER_OF(work, struct delayed_test_item, work);
+		CONTAINER_OF(work, struct delayed_test_item, work);
 
 	k_msleep(WORK_ITEM_WAIT);
 
@@ -210,7 +207,7 @@ static void test_resubmit(void)
 static void delayed_work_handler(struct k_work *work)
 {
 	struct delayed_test_item *ti =
-			CONTAINER_OF(work, struct delayed_test_item, work);
+		CONTAINER_OF(work, struct delayed_test_item, work);
 
 	TC_PRINT(" - Running delayed test item %d\n", ti->key);
 
@@ -247,7 +244,8 @@ static void coop_delayed_work_main(int arg1, int arg2)
 
 	for (i = 1; i < NUM_TEST_ITEMS; i += 2) {
 		TC_PRINT(" - Submitting delayed work %d from"
-			 " coop thread\n", i + 1);
+			 " coop thread\n",
+			 i + 1);
 		k_delayed_work_submit(&delayed_tests[i].work,
 				      K_MSEC((i + 1) * WORK_ITEM_WAIT));
 	}
@@ -265,16 +263,18 @@ static void test_delayed_submit(void)
 	int i;
 
 	k_thread_create(&co_op_data, co_op_stack, STACK_SIZE,
-			(k_thread_entry_t)coop_delayed_work_main,
-			NULL, NULL, NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
+			(k_thread_entry_t)coop_delayed_work_main, NULL, NULL,
+			NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
 
 	for (i = 0; i < NUM_TEST_ITEMS; i += 2) {
 		TC_PRINT(" - Submitting delayed work %d from"
-			 " preempt thread\n", i + 1);
-		zassert_true(k_delayed_work_submit(&delayed_tests[i].work,
-			   K_MSEC((i + 1) * WORK_ITEM_WAIT)) == 0, NULL);
+			 " preempt thread\n",
+			 i + 1);
+		zassert_true(k_delayed_work_submit(
+				     &delayed_tests[i].work,
+				     K_MSEC((i + 1) * WORK_ITEM_WAIT)) == 0,
+			     NULL);
 	}
-
 }
 
 static void coop_delayed_work_cancel_main(int arg1, int arg2)
@@ -306,8 +306,8 @@ static void test_delayed_cancel(void)
 	k_delayed_work_cancel(&delayed_tests[0].work);
 
 	k_thread_create(&co_op_data, co_op_stack, STACK_SIZE,
-			(k_thread_entry_t)coop_delayed_work_cancel_main,
-			NULL, NULL, NULL, K_HIGHEST_THREAD_PRIO, 0, K_NO_WAIT);
+			(k_thread_entry_t)coop_delayed_work_cancel_main, NULL,
+			NULL, NULL, K_HIGHEST_THREAD_PRIO, 0, K_NO_WAIT);
 
 	TC_PRINT(" - Waiting for work to finish\n");
 	k_msleep(WORK_ITEM_WAIT_ALIGNED);
@@ -350,7 +350,7 @@ static void test_delayed_pending(void)
 static void delayed_resubmit_work_handler(struct k_work *work)
 {
 	struct delayed_test_item *ti =
-			CONTAINER_OF(work, struct delayed_test_item, work);
+		CONTAINER_OF(work, struct delayed_test_item, work);
 
 	results[num_results++] = ti->key;
 
@@ -407,7 +407,6 @@ static void coop_delayed_work_resubmit(void)
 	}
 }
 
-
 /**
  * @brief Test delayed resubmission of work queue thread
  *
@@ -423,8 +422,8 @@ static void test_delayed_resubmit_thread(void)
 	k_delayed_work_init(&delayed_tests[0].work, delayed_work_handler);
 
 	k_thread_create(&co_op_data, co_op_stack, STACK_SIZE,
-			(k_thread_entry_t)coop_delayed_work_resubmit,
-			NULL, NULL, NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
+			(k_thread_entry_t)coop_delayed_work_resubmit, NULL,
+			NULL, NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
 
 	TC_PRINT(" - Waiting for work to finish\n");
 	k_msleep(WORK_ITEM_WAIT_ALIGNED);
@@ -462,12 +461,13 @@ static void test_delayed(void)
 static void triggered_work_handler(struct k_work *work)
 {
 	struct triggered_test_item *ti =
-			CONTAINER_OF(work, struct triggered_test_item, work);
+		CONTAINER_OF(work, struct triggered_test_item, work);
 
 	TC_PRINT(" - Running triggered test item %d\n", ti->key);
 
 	zassert_equal(ti->work.poll_result, expected_poll_result,
-		     "res %d expect %d", ti->work.poll_result, expected_poll_result);
+		      "res %d expect %d", ti->work.poll_result,
+		      expected_poll_result);
 
 	results[num_results++] = ti->key;
 }
@@ -489,8 +489,7 @@ static void test_triggered_init(void)
 				 triggered_work_handler);
 
 		k_poll_signal_init(&triggered_tests[i].signal);
-		k_poll_event_init(&triggered_tests[i].event,
-				  K_POLL_TYPE_SIGNAL,
+		k_poll_event_init(&triggered_tests[i].event, K_POLL_TYPE_SIGNAL,
 				  K_POLL_MODE_NOTIFY_ONLY,
 				  &triggered_tests[i].signal);
 	}
@@ -510,8 +509,9 @@ static void test_triggered_submit(k_timeout_t timeout)
 	for (i = 0; i < NUM_TEST_ITEMS; i++) {
 		TC_PRINT(" - Submitting triggered work %d\n", i + 1);
 		zassert_true(k_work_poll_submit(&triggered_tests[i].work,
-						&triggered_tests[i].event,
-						1, timeout) == 0, NULL);
+						&triggered_tests[i].event, 1,
+						timeout) == 0,
+			     NULL);
 	}
 }
 
@@ -527,7 +527,8 @@ static void test_triggered_trigger(void)
 	for (i = 0; i < NUM_TEST_ITEMS; i++) {
 		TC_PRINT(" - Triggering work %d\n", i + 1);
 		zassert_true(k_poll_signal_raise(&triggered_tests[i].signal,
-						 1) == 0, NULL);
+						 1) == 0,
+			     NULL);
 	}
 }
 
@@ -596,7 +597,7 @@ static void test_already_triggered(void)
 static void triggered_resubmit_work_handler(struct k_work *work)
 {
 	struct triggered_test_item *ti =
-			CONTAINER_OF(work, struct triggered_test_item, work);
+		CONTAINER_OF(work, struct triggered_test_item, work);
 
 	results[num_results++] = ti->key;
 
@@ -606,8 +607,9 @@ static void triggered_resubmit_work_handler(struct k_work *work)
 
 		k_poll_signal_reset(&triggered_tests[0].signal);
 		zassert_true(k_work_poll_submit(&triggered_tests[0].work,
-						&triggered_tests[0].event,
-						1, K_FOREVER) == 0, NULL);
+						&triggered_tests[0].event, 1,
+						K_FOREVER) == 0,
+			     NULL);
 	}
 }
 
@@ -632,21 +634,21 @@ static void test_triggered_resubmit(void)
 			 triggered_resubmit_work_handler);
 
 	k_poll_signal_init(&triggered_tests[0].signal);
-	k_poll_event_init(&triggered_tests[0].event,
-			  K_POLL_TYPE_SIGNAL,
-			  K_POLL_MODE_NOTIFY_ONLY,
-			  &triggered_tests[0].signal);
+	k_poll_event_init(&triggered_tests[0].event, K_POLL_TYPE_SIGNAL,
+			  K_POLL_MODE_NOTIFY_ONLY, &triggered_tests[0].signal);
 
 	TC_PRINT(" - Submitting triggered work\n");
 	zassert_true(k_work_poll_submit(&triggered_tests[0].work,
-					&triggered_tests[0].event,
-					1, K_FOREVER) == 0, NULL);
+					&triggered_tests[0].event, 1,
+					K_FOREVER) == 0,
+		     NULL);
 
 	for (i = 0; i < NUM_TEST_ITEMS; i++) {
 		TC_PRINT(" - Triggering test item execution (iteration: %d)\n",
-									i + 1);
+			 i + 1);
 		zassert_true(k_poll_signal_raise(&triggered_tests[0].signal,
-						 1) == 0, NULL);
+						 1) == 0,
+			     NULL);
 		k_msleep(WORK_ITEM_WAIT);
 	}
 
@@ -782,8 +784,7 @@ static void test_triggered_wait_expired(void)
 void test_main(void)
 {
 	k_thread_priority_set(k_current_get(), 0);
-	ztest_test_suite(workqueue,
-			 ztest_1cpu_unit_test(test_sequence),
+	ztest_test_suite(workqueue, ztest_1cpu_unit_test(test_sequence),
 			 ztest_1cpu_unit_test(test_resubmit),
 			 ztest_1cpu_unit_test(test_delayed),
 			 ztest_1cpu_unit_test(test_delayed_resubmit),
@@ -796,7 +797,6 @@ void test_main(void)
 			 ztest_1cpu_unit_test(test_triggered_no_wait),
 			 ztest_1cpu_unit_test(test_triggered_no_wait_expired),
 			 ztest_1cpu_unit_test(test_triggered_wait),
-			 ztest_1cpu_unit_test(test_triggered_wait_expired)
-			 );
+			 ztest_1cpu_unit_test(test_triggered_wait_expired));
 	ztest_run_test_suite(workqueue);
 }

@@ -6,6 +6,6 @@
 
 #define MB_FONT_COUNT 95
 #define MB_FONT_START ' '
-#define MB_FONT_END   '~'
+#define MB_FONT_END '~'
 
 extern const struct mb_image mb_font[MB_FONT_COUNT];

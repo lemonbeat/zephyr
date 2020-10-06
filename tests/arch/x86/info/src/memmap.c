@@ -52,19 +52,17 @@ void memmap(void)
 			label = "UNKNOWN";
 		}
 
-		printk("\t%016llx -> %016llx %s (%lldK)\n",
-			entry->base, entry->base + entry->length - 1,
-			label,
-			entry->length / 1024);
+		printk("\t%016llx -> %016llx %s (%lldK)\n", entry->base,
+		       entry->base + entry->length - 1, label,
+		       entry->length / 1024);
 	}
 
 	printk("\n\tKernel exclusions:\n");
 
 	for (int i = 0; i < x86_nr_memmap_exclusions; ++i) {
-		printk("\t%p -> %p (%s)\n",
-			x86_memmap_exclusions[i].start,
-			x86_memmap_exclusions[i].end,
-			x86_memmap_exclusions[i].name);
+		printk("\t%p -> %p (%s)\n", x86_memmap_exclusions[i].start,
+		       x86_memmap_exclusions[i].end,
+		       x86_memmap_exclusions[i].name);
 	}
 
 	printk("\n");

@@ -22,7 +22,7 @@ struct mcux_pcc_config {
 	uint32_t base_address;
 };
 
-#define DEV_CFG(dev)  ((struct mcux_pcc_config *)(dev->config))
+#define DEV_CFG(dev) ((struct mcux_pcc_config *)(dev->config))
 #define DEV_BASE(dev) (DEV_CFG(dev)->base_address)
 #ifndef MAKE_PCC_REGADDR
 #define MAKE_PCC_REGADDR(base, offset) ((base) + (offset))
@@ -51,8 +51,7 @@ static int mcux_pcc_off(const struct device *dev,
 }
 
 static int mcux_pcc_get_rate(const struct device *dev,
-			       clock_control_subsys_t sub_system,
-			       uint32_t *rate)
+			     clock_control_subsys_t sub_system, uint32_t *rate)
 {
 	*rate = CLOCK_GetIpFreq(clock_ip(dev, sub_system));
 	return 0;
@@ -69,16 +68,14 @@ static const struct clock_control_driver_api mcux_pcc_api = {
 	.get_rate = mcux_pcc_get_rate,
 };
 
-#define MCUX_PCC_INIT(inst)						\
-	static const struct mcux_pcc_config mcux_pcc##inst##_config = {	\
-		.base_address = DT_INST_REG_ADDR(inst)			\
-	};								\
-									\
-	DEVICE_AND_API_INIT(mcux_pcc##inst, DT_INST_LABEL(inst),	\
-			    &mcux_pcc_init,				\
-			    NULL, &mcux_pcc##inst##_config,		\
-			    PRE_KERNEL_1,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_OBJECTS,	\
+#define MCUX_PCC_INIT(inst)                                                    \
+	static const struct mcux_pcc_config mcux_pcc##inst##_config = {        \
+		.base_address = DT_INST_REG_ADDR(inst)                         \
+	};                                                                     \
+                                                                               \
+	DEVICE_AND_API_INIT(mcux_pcc##inst, DT_INST_LABEL(inst),               \
+			    &mcux_pcc_init, NULL, &mcux_pcc##inst##_config,    \
+			    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_OBJECTS, \
 			    &mcux_pcc_api);
 
 DT_INST_FOREACH_STATUS_OKAY(MCUX_PCC_INIT)

@@ -35,8 +35,8 @@
 #define LOG_LEVEL CONFIG_USB_DRIVER_LOG_LEVEL
 LOG_MODULE_REGISTER(native_posix_adapt);
 
-#define USBIP_PORT	3240
-#define USBIP_VERSION	273
+#define USBIP_PORT 3240
+#define USBIP_VERSION 273
 
 #define VERBOSE_DEBUG
 
@@ -90,7 +90,7 @@ static int send_interfaces(const uint8_t *descriptors, int connfd)
 		uint8_t bInterfaceClass;
 		uint8_t bInterfaceSubClass;
 		uint8_t bInterfaceProtocol;
-		uint8_t padding;	/* alignment */
+		uint8_t padding; /* alignment */
 	} __packed iface;
 
 	while (descriptors[0]) {
@@ -300,8 +300,8 @@ void usbip_start(void)
 		posix_exit(EXIT_FAILURE);
 	}
 
-	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR,
-		       (const char *)&reuse, sizeof(reuse)) < 0) {
+	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuse,
+		       sizeof(reuse)) < 0) {
 		LOG_WRN("setsockopt() failed: %s", strerror(errno));
 	}
 

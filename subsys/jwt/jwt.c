@@ -93,11 +93,11 @@ static void base64_flush(struct jwt_builder *st)
 
 	base64_outch(st, base64_char(st->wip[0] >> 2));
 	base64_outch(st, base64_char(((st->wip[0] & 0x03) << 4) |
-				(st->wip[1] >> 4)));
+				     (st->wip[1] >> 4)));
 
 	if (st->pending >= 2) {
 		base64_outch(st, base64_char(((st->wip[1] & 0x0f) << 2) |
-				(st->wip[2] >> 6)));
+					     (st->wip[2] >> 6)));
 	}
 	if (st->pending >= 3) {
 		base64_outch(st, base64_char(st->wip[2] & 0x3f));
@@ -115,8 +115,7 @@ static void base64_addbyte(struct jwt_builder *st, uint8_t byte)
 	}
 }
 
-static int base64_append_bytes(const char *bytes, size_t len,
-			 void *data)
+static int base64_append_bytes(const char *bytes, size_t len, void *data)
 {
 	struct jwt_builder *st = data;
 
@@ -173,10 +172,8 @@ static void jwt_add_header(struct jwt_builder *builder)
 	base64_flush(builder);
 }
 
-int jwt_add_payload(struct jwt_builder *builder,
-		     int32_t exp,
-		     int32_t iat,
-		     const char *aud)
+int jwt_add_payload(struct jwt_builder *builder, int32_t exp, int32_t iat,
+		    const char *aud)
 {
 	struct jwt_payload payload = {
 		.exp = exp,
@@ -186,16 +183,15 @@ int jwt_add_payload(struct jwt_builder *builder,
 
 	base64_outch(builder, '.');
 	int res = json_obj_encode(jwt_payload_desc,
-				  ARRAY_SIZE(jwt_payload_desc),
-				  &payload, base64_append_bytes, builder);
+				  ARRAY_SIZE(jwt_payload_desc), &payload,
+				  base64_append_bytes, builder);
 
 	base64_flush(builder);
 	return res;
 }
 
 #ifdef CONFIG_JWT_SIGN_RSA
-int jwt_sign(struct jwt_builder *builder,
-	     const char *der_key,
+int jwt_sign(struct jwt_builder *builder, const char *der_key,
 	     size_t der_key_len)
 {
 	int res;
@@ -203,8 +199,7 @@ int jwt_sign(struct jwt_builder *builder,
 
 	mbedtls_pk_init(&ctx);
 
-	res = mbedtls_pk_parse_key(&ctx, der_key, der_key_len,
-				       NULL, 0);
+	res = mbedtls_pk_parse_key(&ctx, der_key, der_key_len, NULL, 0);
 	if (res != 0) {
 		return res;
 	}
@@ -216,13 +211,10 @@ int jwt_sign(struct jwt_builder *builder,
 	 * The '0' indicates to mbedtls to do a SHA256, instead of
 	 * 224.
 	 */
-	mbedtls_sha256(builder->base, builder->buf - builder->base,
-		       hash, 0);
+	mbedtls_sha256(builder->base, builder->buf - builder->base, hash, 0);
 
-	res = mbedtls_pk_sign(&ctx, MBEDTLS_MD_SHA256,
-			      hash, sizeof(hash),
-			      sig, &sig_len,
-			      NULL, NULL);
+	res = mbedtls_pk_sign(&ctx, MBEDTLS_MD_SHA256, hash, sizeof(hash), sig,
+			      &sig_len, NULL, NULL);
 	if (res != 0) {
 		return res;
 	}
@@ -256,9 +248,8 @@ static int setup_prng(void)
 		memcpy(entropy + i, &rv, sizeof(uint32_t));
 	}
 
-	int res = tc_ctr_prng_init(&prng_state,
-				   (const uint8_t *) &entropy, sizeof(entropy),
-				   personalize,
+	int res = tc_ctr_prng_init(&prng_state, (const uint8_t *)&entropy,
+				   sizeof(entropy), personalize,
 				   sizeof(personalize));
 
 	return res == TC_CRYPTO_SUCCESS ? 0 : -EINVAL;
@@ -270,8 +261,7 @@ int default_CSPRNG(uint8_t *dest, unsigned int size)
 	return res;
 }
 
-int jwt_sign(struct jwt_builder *builder,
-	     const char *der_key,
+int jwt_sign(struct jwt_builder *builder, const char *der_key,
 	     size_t der_key_len)
 {
 	struct tc_sha256_state_struct ctx;
@@ -290,8 +280,7 @@ int jwt_sign(struct jwt_builder *builder,
 	uECC_set_rng(&default_CSPRNG);
 
 	/* Note that tinycrypt only supports P-256. */
-	res = uECC_sign(der_key, hash, sizeof(hash),
-			sig, &curve_secp256r1);
+	res = uECC_sign(der_key, hash, sizeof(hash), sig, &curve_secp256r1);
 	if (res != TC_CRYPTO_SUCCESS) {
 		return -EINVAL;
 	}
@@ -304,8 +293,7 @@ int jwt_sign(struct jwt_builder *builder,
 }
 #endif
 
-int jwt_init_builder(struct jwt_builder *builder,
-		     char *buffer,
+int jwt_init_builder(struct jwt_builder *builder, char *buffer,
 		     size_t buffer_size)
 {
 	builder->base = buffer;

@@ -16,10 +16,10 @@
 #define TEST_NESTED_ISR
 #endif
 
-#define DURATION	5
+#define DURATION 5
 
-#define ISR0_TOKEN	0xDEADBEEF
-#define ISR1_TOKEN	0xCAFEBABE
+#define ISR0_TOKEN 0xDEADBEEF
+#define ISR1_TOKEN 0xCAFEBABE
 
 /*
  * This test uses two IRQ lines selected within the range of available IRQs on
@@ -37,15 +37,15 @@
  * The IRQ priorities start at 1 because the priority 0 is reserved for the
  * SVCall exception and Zero-Latency IRQs (see `_EXCEPTION_RESERVED_PRIO`).
  */
-#define IRQ0_PRIO	2
-#define IRQ1_PRIO	1
+#define IRQ0_PRIO 2
+#define IRQ1_PRIO 1
 #elif defined(CONFIG_GIC)
 /*
  * For the platforms that use the ARM GIC, use the SGI (software generated
  * interrupt) lines 14 and 15 for testing.
  */
-#define IRQ0_LINE	14
-#define IRQ1_LINE	15
+#define IRQ0_LINE 14
+#define IRQ1_LINE 15
 
 /*
  * Choose lower prio for IRQ0 and higher priority for IRQ1
@@ -54,18 +54,18 @@
  * '0x0' as the priorities so that the preemption rule applies
  * generically to all GIC versions and security states.
  */
-#define IRQ0_PRIO	IRQ_DEFAULT_PRIORITY
-#define IRQ1_PRIO	0x0
+#define IRQ0_PRIO IRQ_DEFAULT_PRIORITY
+#define IRQ1_PRIO 0x0
 #else
 /*
  * For all the other platforms, use the last two available IRQ lines for
  * testing.
  */
-#define IRQ0_LINE	(CONFIG_NUM_IRQS - 1)
-#define IRQ1_LINE	(CONFIG_NUM_IRQS - 2)
+#define IRQ0_LINE (CONFIG_NUM_IRQS - 1)
+#define IRQ1_LINE (CONFIG_NUM_IRQS - 2)
 
-#define IRQ0_PRIO	1
-#define IRQ1_PRIO	0
+#define IRQ0_PRIO 1
+#define IRQ1_PRIO 0
 #endif
 
 #ifdef TEST_NESTED_ISR

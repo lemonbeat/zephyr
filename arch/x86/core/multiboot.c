@@ -133,7 +133,7 @@ static int multiboot_framebuf_init(const struct device *dev)
 		data->pitch = (info->fb_pitch / 4) + adj_x;
 		adj_x /= 2;
 		adj_y /= 2;
-		buffer = (uint32_t *) (uintptr_t) info->fb_addr_lo;
+		buffer = (uint32_t *)(uintptr_t)info->fb_addr_lo;
 		buffer += adj_x;
 		buffer += adj_y * data->pitch;
 		data->buffer = buffer;
@@ -143,14 +143,9 @@ static int multiboot_framebuf_init(const struct device *dev)
 	}
 }
 
-DEVICE_AND_API_INIT(multiboot_framebuf,
-		    "FRAMEBUF",
-		    multiboot_framebuf_init,
-		    &multiboot_framebuf_data,
-		    NULL,
-		    PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &framebuf_display_api);
+DEVICE_AND_API_INIT(multiboot_framebuf, "FRAMEBUF", multiboot_framebuf_init,
+		    &multiboot_framebuf_data, NULL, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &framebuf_display_api);
 
 #endif /* CONFIG_MULTIBOOT_FRAMEBUF */
 

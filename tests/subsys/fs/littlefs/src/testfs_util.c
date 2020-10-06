@@ -10,8 +10,7 @@
 #include <ztest.h>
 #include "testfs_util.h"
 
-static const char *path_vextend(struct testfs_path *pp,
-				va_list ap)
+static const char *path_vextend(struct testfs_path *pp, va_list ap)
 {
 	const char *ep = va_arg(ap, const char *);
 	const char *endp = pp->path + sizeof(pp->path);
@@ -46,8 +45,7 @@ static const char *path_vextend(struct testfs_path *pp,
 }
 
 const char *testfs_path_init(struct testfs_path *pp,
-			     const struct fs_mount_t *mp,
-			     ...)
+			     const struct fs_mount_t *mp, ...)
 {
 	va_list ap;
 
@@ -72,8 +70,7 @@ const char *testfs_path_init(struct testfs_path *pp,
 	return pp->path;
 }
 
-const char *testfs_path_extend(struct testfs_path *pp,
-			       ...)
+const char *testfs_path_extend(struct testfs_path *pp, ...)
 {
 	va_list ap;
 
@@ -84,9 +81,7 @@ const char *testfs_path_extend(struct testfs_path *pp,
 	return pp->path;
 }
 
-int testfs_write_constant(struct fs_file_t *fp,
-			  uint8_t value,
-			  unsigned int len)
+int testfs_write_constant(struct fs_file_t *fp, uint8_t value, unsigned int len)
 {
 	uint8_t buffer[TESTFS_BUFFER_SIZE];
 	unsigned int rem = len;
@@ -112,8 +107,7 @@ int testfs_write_constant(struct fs_file_t *fp,
 	return len;
 }
 
-int testfs_verify_constant(struct fs_file_t *fp,
-			   uint8_t value,
+int testfs_verify_constant(struct fs_file_t *fp, uint8_t value,
 			   unsigned int len)
 {
 	uint8_t buffer[TESTFS_BUFFER_SIZE];
@@ -152,8 +146,7 @@ int testfs_verify_constant(struct fs_file_t *fp,
 	return match;
 }
 
-int testfs_write_incrementing(struct fs_file_t *fp,
-			      uint8_t value,
+int testfs_write_incrementing(struct fs_file_t *fp, uint8_t value,
 			      unsigned int len)
 {
 	uint8_t buffer[TESTFS_BUFFER_SIZE];
@@ -182,8 +175,7 @@ int testfs_write_incrementing(struct fs_file_t *fp,
 	return len;
 }
 
-int testfs_verify_incrementing(struct fs_file_t *fp,
-			       uint8_t value,
+int testfs_verify_incrementing(struct fs_file_t *fp, uint8_t value,
 			       unsigned int len)
 {
 	uint8_t buffer[TESTFS_BUFFER_SIZE];
@@ -222,25 +214,23 @@ int testfs_verify_incrementing(struct fs_file_t *fp,
 	return match;
 }
 
-int testfs_build(struct testfs_path *root,
-		 const struct testfs_bcmd *cp)
+int testfs_build(struct testfs_path *root, const struct testfs_bcmd *cp)
 {
 	int rc;
 
 	while (!TESTFS_BCMD_IS_END(cp)) {
-
 		if (TESTFS_BCMD_IS_FILE(cp)) {
 			struct fs_file_t file;
 
 			rc = fs_open(&file,
-				     testfs_path_extend(root,
-							cp->name,
+				     testfs_path_extend(root, cp->name,
 							TESTFS_PATH_END),
 				     FS_O_CREATE | FS_O_RDWR);
 			TC_PRINT("create at %s with %u from 0x%02x: %d\n",
 				 root->path, cp->size, cp->value, rc);
 			if (rc == 0) {
-				rc = testfs_write_incrementing(&file, cp->value, cp->size);
+				rc = testfs_write_incrementing(&file, cp->value,
+							       cp->size);
 				(void)fs_close(&file);
 			}
 			testfs_path_extend(root, "..", TESTFS_PATH_END);
@@ -252,9 +242,7 @@ int testfs_build(struct testfs_path *root,
 			}
 
 		} else if (TESTFS_BCMD_IS_ENTER_DIR(cp)) {
-			testfs_path_extend(root,
-					   cp->name,
-					   TESTFS_PATH_END);
+			testfs_path_extend(root, cp->name, TESTFS_PATH_END);
 			rc = fs_mkdir(root->path);
 			TC_PRINT("mkdir %s: %d\n", root->path, rc);
 			if (rc < 0) {
@@ -282,15 +270,13 @@ int testfs_build(struct testfs_path *root,
  */
 static int check_layout_entry(struct testfs_path *pp,
 			      const struct fs_dirent *statp,
-			      struct testfs_bcmd *cp,
-			      struct testfs_bcmd *ecp)
+			      struct testfs_bcmd *cp, struct testfs_bcmd *ecp)
 {
 	int rc = 0;
 	unsigned int foreign = 0;
 
 	/* Create the full path */
-	testfs_path_extend(pp, statp->name,
-			   TESTFS_PATH_END);
+	testfs_path_extend(pp, statp->name, TESTFS_PATH_END);
 
 	/* Also check file content */
 	if (statp->type == FS_DIR_ENTRY_FILE) {
@@ -305,8 +291,8 @@ static int check_layout_entry(struct testfs_path *pp,
 		}
 		rc = testfs_verify_incrementing(&file, cp->value, cp->size);
 		if (rc != cp->size) {
-			TC_PRINT("%s: content check failed: %d\n",
-				 pp->path, rc);
+			TC_PRINT("%s: content check failed: %d\n", pp->path,
+				 rc);
 			if (rc >= 0) {
 				rc = -EIO;
 			}
@@ -318,8 +304,7 @@ static int check_layout_entry(struct testfs_path *pp,
 				 pp->path, rc);
 		}
 	} else if (statp->type == FS_DIR_ENTRY_DIR) {
-		rc = testfs_bcmd_verify_layout(pp,
-					       cp + 1,
+		rc = testfs_bcmd_verify_layout(pp, cp + 1,
 					       testfs_bcmd_exitdir(cp, ecp));
 		if (rc >= 0) {
 			foreign = rc;
@@ -327,8 +312,7 @@ static int check_layout_entry(struct testfs_path *pp,
 	}
 
 out:
-	testfs_path_extend(pp, "..",
-			   TESTFS_PATH_END);
+	testfs_path_extend(pp, "..", TESTFS_PATH_END);
 
 	if (rc >= 0) {
 		cp->matched = true;
@@ -338,8 +322,7 @@ out:
 	return rc;
 }
 
-int testfs_bcmd_verify_layout(struct testfs_path *pp,
-			      struct testfs_bcmd *scp,
+int testfs_bcmd_verify_layout(struct testfs_path *pp, struct testfs_bcmd *scp,
 			      struct testfs_bcmd *ecp)
 {
 	struct fs_dir_t dir;
@@ -381,21 +364,19 @@ int testfs_bcmd_verify_layout(struct testfs_path *pp,
 
 		cp = testfs_bcmd_find(&stat, scp, ecp);
 
-		bool dotdir = ((stat.type == FS_DIR_ENTRY_DIR)
-			       && ((strcmp(stat.name, ".") == 0)
-				   || (strcmp(stat.name, "..") == 0)));
+		bool dotdir = ((stat.type == FS_DIR_ENTRY_DIR) &&
+			       ((strcmp(stat.name, ".") == 0) ||
+				(strcmp(stat.name, "..") == 0)));
 
-		TC_PRINT("%s %s%s%s %zu\n", pp->path,
-			 stat.name,
+		TC_PRINT("%s %s%s%s %zu\n", pp->path, stat.name,
 			 (stat.type == FS_DIR_ENTRY_FILE) ? "" : "/",
-			 dotdir ? " SYNTHESIZED"
-			 : (cp == NULL) ? " FOREIGN"
-			 : "",
+			 dotdir	      ? " SYNTHESIZED" :
+			 (cp == NULL) ? " FOREIGN" :
+					      "",
 			 stat.size);
 
 		if (dotdir) {
-			zassert_true(false,
-				     "special directories observed");
+			zassert_true(false, "special directories observed");
 		} else if (cp != NULL) {
 			rc = check_layout_entry(pp, &stat, cp, ecp);
 			if (rc > 0) {
@@ -410,8 +391,7 @@ int testfs_bcmd_verify_layout(struct testfs_path *pp,
 	int rc2 = fs_closedir(&dir);
 
 	if (rc2 != 0) {
-		TC_PRINT("%s: closedir failed: %d\n",
-			 pp->path, rc2);
+		TC_PRINT("%s: closedir failed: %d\n", pp->path, rc2);
 		if (rc >= 0) {
 			rc = (rc2 >= 0) ? -EIO : rc2;
 		}
@@ -447,10 +427,9 @@ struct testfs_bcmd *testfs_bcmd_find(struct fs_dirent *statp,
 	struct testfs_bcmd *cp = scp;
 
 	while (cp < ecp) {
-		if ((cp->type == statp->type)
-		    && (cp->name != NULL)
-		    && (strcmp(cp->name, statp->name) == 0)
-		    && (cp->size == statp->size)) {
+		if ((cp->type == statp->type) && (cp->name != NULL) &&
+		    (strcmp(cp->name, statp->name) == 0) &&
+		    (cp->size == statp->size)) {
 			return cp;
 		}
 

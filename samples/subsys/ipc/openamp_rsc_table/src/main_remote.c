@@ -19,17 +19,17 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(openamp_rsc_table, LOG_LEVEL_DBG);
 
-#define RPMSG_CHAN_NAME	"rpmsg-client-sample"
-#define SHM_DEVICE_NAME	"shm"
+#define RPMSG_CHAN_NAME "rpmsg-client-sample"
+#define SHM_DEVICE_NAME "shm"
 
 #if !DT_HAS_CHOSEN(zephyr_ipc_shm)
 #error "Sample requires definition of shared memory for rpmsg"
 #endif
 
 /* Constants derived from device tree */
-#define SHM_NODE		DT_CHOSEN(zephyr_ipc_shm)
-#define SHM_START_ADDR	DT_REG_ADDR(SHM_NODE)
-#define SHM_SIZE		DT_REG_SIZE(SHM_NODE)
+#define SHM_NODE DT_CHOSEN(zephyr_ipc_shm)
+#define SHM_START_ADDR DT_REG_ADDR(SHM_NODE)
+#define SHM_SIZE DT_REG_SIZE(SHM_NODE)
 
 #define APP_TASK_STACK_SIZE (512)
 K_THREAD_STACK_DEFINE(thread_stack, APP_TASK_STACK_SIZE);
@@ -59,7 +59,7 @@ static struct rpmsg_virtio_device rvdev;
 
 static void *rsc_table;
 
-static char rcv_msg[20];  /* should receive "Hello world!" */
+static char rcv_msg[20]; /* should receive "Hello world!" */
 static unsigned int rcv_len;
 static struct rpmsg_endpoint rcv_ept;
 
@@ -99,8 +99,8 @@ static void receive_message(unsigned char **msg, unsigned int *len)
 static void new_service_cb(struct rpmsg_device *rdev, const char *name,
 			   uint32_t src)
 {
-	LOG_ERR("%s: unexpected ns service receive for name %s\n",
-		__func__, name);
+	LOG_ERR("%s: unexpected ns service receive for name %s\n", __func__,
+		name);
 }
 
 int mailbox_notify(void *priv, uint32_t id)
@@ -187,9 +187,8 @@ static void cleanup_system(void)
 	metal_finish();
 }
 
-struct  rpmsg_device *
-platform_create_rpmsg_vdev(unsigned int vdev_index,
-			   unsigned int role,
+struct rpmsg_device *
+platform_create_rpmsg_vdev(unsigned int vdev_index, unsigned int role,
 			   void (*rst_cb)(struct virtio_device *vdev),
 			   rpmsg_ns_bind_cb ns_cb)
 {
@@ -198,8 +197,8 @@ platform_create_rpmsg_vdev(unsigned int vdev_index,
 	int ret;
 
 	vdev = rproc_virtio_create_vdev(VIRTIO_DEV_SLAVE, VDEV_ID,
-					rsc_table_to_vdev(rsc_table),
-					rsc_io, NULL, mailbox_notify, NULL);
+					rsc_table_to_vdev(rsc_table), rsc_io,
+					NULL, mailbox_notify, NULL);
 
 	if (!vdev) {
 		LOG_DBG("failed to create vdev\r\n");
@@ -228,7 +227,7 @@ platform_create_rpmsg_vdev(unsigned int vdev_index,
 	}
 
 	rpmsg_virtio_init_shm_pool(&shpool, NULL, SHM_SIZE);
-	ret =  rpmsg_init_vdev(&rvdev, vdev, ns_cb, shm_io, &shpool);
+	ret = rpmsg_init_vdev(&rvdev, vdev, ns_cb, shm_io, &shpool);
 
 	if (ret) {
 		LOG_DBG("failed rpmsg_init_vdev\r\n");
@@ -271,9 +270,8 @@ void app_task(void *arg1, void *arg2, void *arg3)
 		goto task_end;
 	}
 
-	ret = rpmsg_create_ept(&rcv_ept, rpdev, RPMSG_CHAN_NAME,
-			       RPMSG_ADDR_ANY, RPMSG_ADDR_ANY,
-			       rpmsg_recv_callback, NULL);
+	ret = rpmsg_create_ept(&rcv_ept, rpdev, RPMSG_CHAN_NAME, RPMSG_ADDR_ANY,
+			       RPMSG_ADDR_ANY, rpmsg_recv_callback, NULL);
 	if (ret != 0)
 		LOG_ERR("error while creating endpoint(%d)\n", ret);
 
@@ -294,6 +292,6 @@ void main(void)
 {
 	printk("Starting application thread!\n");
 	k_thread_create(&thread_data, thread_stack, APP_TASK_STACK_SIZE,
-			(k_thread_entry_t)app_task,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+			(k_thread_entry_t)app_task, NULL, NULL, NULL,
+			K_PRIO_COOP(7), 0, K_NO_WAIT);
 }

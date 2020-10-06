@@ -40,10 +40,7 @@ extern "C" {
  */
 struct fs_file_system_t;
 
-enum fs_dir_entry_type {
-	FS_DIR_ENTRY_FILE = 0,
-	FS_DIR_ENTRY_DIR
-};
+enum fs_dir_entry_type { FS_DIR_ENTRY_FILE = 0, FS_DIR_ENTRY_DIR };
 
 /** @brief Enumeration to uniquely identify file system types.
  *
@@ -155,8 +152,8 @@ struct fs_file_system_t {
 	int (*open)(struct fs_file_t *filp, const char *fs_path,
 		    fs_mode_t flags);
 	ssize_t (*read)(struct fs_file_t *filp, void *dest, size_t nbytes);
-	ssize_t (*write)(struct fs_file_t *filp,
-					const void *src, size_t nbytes);
+	ssize_t (*write)(struct fs_file_t *filp, const void *src,
+			 size_t nbytes);
 	int (*lseek)(struct fs_file_t *filp, off_t off, int whence);
 	off_t (*tell)(struct fs_file_t *filp);
 	int (*truncate)(struct fs_file_t *filp, off_t length);
@@ -171,33 +168,33 @@ struct fs_file_system_t {
 	int (*unmount)(struct fs_mount_t *mountp);
 	int (*unlink)(struct fs_mount_t *mountp, const char *name);
 	int (*rename)(struct fs_mount_t *mountp, const char *from,
-					const char *to);
+		      const char *to);
 	int (*mkdir)(struct fs_mount_t *mountp, const char *name);
 	int (*stat)(struct fs_mount_t *mountp, const char *path,
-					struct fs_dirent *entry);
+		    struct fs_dirent *entry);
 	int (*statvfs)(struct fs_mount_t *mountp, const char *path,
-					struct fs_statvfs *stat);
+		       struct fs_statvfs *stat);
 };
 
-#define FS_O_READ       0x01
-#define FS_O_WRITE      0x02
-#define FS_O_RDWR       (FS_O_READ | FS_O_WRITE)
-#define FS_O_MODE_MASK  0x03
+#define FS_O_READ 0x01
+#define FS_O_WRITE 0x02
+#define FS_O_RDWR (FS_O_READ | FS_O_WRITE)
+#define FS_O_MODE_MASK 0x03
 
-#define FS_O_CREATE     0x10
-#define FS_O_APPEND     0x20
+#define FS_O_CREATE 0x10
+#define FS_O_APPEND 0x20
 #define FS_O_FLAGS_MASK 0x30
 
-#define FS_O_MASK       (FS_O_MODE_MASK | FS_O_FLAGS_MASK)
+#define FS_O_MASK (FS_O_MODE_MASK | FS_O_FLAGS_MASK)
 
 #ifndef FS_SEEK_SET
-#define FS_SEEK_SET	0	/* Seek from beginning of file. */
+#define FS_SEEK_SET 0 /* Seek from beginning of file. */
 #endif
 #ifndef FS_SEEK_CUR
-#define FS_SEEK_CUR	1	/* Seek from current position. */
+#define FS_SEEK_CUR 1 /* Seek from current position. */
 #endif
 #ifndef FS_SEEK_END
-#define FS_SEEK_END	2	/* Seek from end of file.  */
+#define FS_SEEK_END 2 /* Seek from end of file.  */
 #endif
 
 /**
@@ -530,7 +527,6 @@ int fs_unregister(int type, const struct fs_file_system_t *fs);
 /**
  * @}
  */
-
 
 #ifdef __cplusplus
 }

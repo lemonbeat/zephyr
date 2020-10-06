@@ -13,10 +13,8 @@ SHELL_DUMMY_DEFINE(shell_transport_dummy);
 SHELL_DEFINE(shell_dummy, CONFIG_SHELL_PROMPT_DUMMY, &shell_transport_dummy, 1,
 	     0, SHELL_FLAG_OLF_CRLF);
 
-static int init(const struct shell_transport *transport,
-		const void *config,
-		shell_transport_handler_t evt_handler,
-		void *context)
+static int init(const struct shell_transport *transport, const void *config,
+		shell_transport_handler_t evt_handler, void *context)
 {
 	struct shell_dummy *sh_dummy = (struct shell_dummy *)transport->ctx;
 
@@ -53,8 +51,8 @@ static int enable(const struct shell_transport *transport, bool blocking)
 	return 0;
 }
 
-static int write(const struct shell_transport *transport,
-		 const void *data, size_t length, size_t *cnt)
+static int write(const struct shell_transport *transport, const void *data,
+		 size_t length, size_t *cnt)
 {
 	struct shell_dummy *sh_dummy = (struct shell_dummy *)transport->ctx;
 	size_t store_cnt;
@@ -76,8 +74,8 @@ static int write(const struct shell_transport *transport,
 	return 0;
 }
 
-static int read(const struct shell_transport *transport,
-		void *data, size_t length, size_t *cnt)
+static int read(const struct shell_transport *transport, void *data,
+		size_t length, size_t *cnt)
 {
 	struct shell_dummy *sh_dummy = (struct shell_dummy *)transport->ctx;
 
@@ -90,13 +88,11 @@ static int read(const struct shell_transport *transport,
 	return 0;
 }
 
-const struct shell_transport_api shell_dummy_transport_api = {
-	.init = init,
-	.uninit = uninit,
-	.enable = enable,
-	.write = write,
-	.read = read
-};
+const struct shell_transport_api shell_dummy_transport_api = { .init = init,
+							       .uninit = uninit,
+							       .enable = enable,
+							       .write = write,
+							       .read = read };
 
 static int enable_shell_dummy(const struct device *arg)
 {

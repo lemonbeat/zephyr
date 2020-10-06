@@ -47,8 +47,7 @@ LOG_MODULE_REGISTER(net_ipv6, CONFIG_NET_IPV6_LOG_LEVEL);
  */
 #define MAX_REACHABLE_TIME 3600000
 
-int net_ipv6_create(struct net_pkt *pkt,
-		    const struct in6_addr *src,
+int net_ipv6_create(struct net_pkt *pkt, const struct in6_addr *src,
 		    const struct in6_addr *dst)
 {
 	NET_PKT_DATA_ACCESS_CONTIGUOUS_DEFINE(ipv6_access, struct net_ipv6_hdr);
@@ -59,10 +58,10 @@ int net_ipv6_create(struct net_pkt *pkt,
 		return -ENOBUFS;
 	}
 
-	ipv6_hdr->vtc     = 0x60;
-	ipv6_hdr->tcflow  = 0U;
-	ipv6_hdr->flow    = 0U;
-	ipv6_hdr->len     = 0U;
+	ipv6_hdr->vtc = 0x60;
+	ipv6_hdr->tcflow = 0U;
+	ipv6_hdr->flow = 0U;
+	ipv6_hdr->len = 0U;
 	ipv6_hdr->nexthdr = 0U;
 
 	/* User can tweak the default hop limit if needed */
@@ -93,8 +92,8 @@ int net_ipv6_finalize(struct net_pkt *pkt, uint8_t next_header_proto)
 		return -ENOBUFS;
 	}
 
-	ipv6_hdr->len = htons(net_pkt_get_len(pkt) -
-			      sizeof(struct net_ipv6_hdr));
+	ipv6_hdr->len =
+		htons(net_pkt_get_len(pkt) - sizeof(struct net_ipv6_hdr));
 
 	if (net_pkt_ipv6_next_hdr(pkt) != 255U) {
 		ipv6_hdr->nexthdr = net_pkt_ipv6_next_hdr(pkt);
@@ -109,8 +108,7 @@ int net_ipv6_finalize(struct net_pkt *pkt, uint8_t next_header_proto)
 		return -ENOBUFS;
 	}
 
-	if (IS_ENABLED(CONFIG_NET_UDP) &&
-	    next_header_proto == IPPROTO_UDP) {
+	if (IS_ENABLED(CONFIG_NET_UDP) && next_header_proto == IPPROTO_UDP) {
 		return net_udp_finalize(pkt);
 	} else if (IS_ENABLED(CONFIG_NET_TCP) &&
 		   next_header_proto == IPPROTO_TCP) {
@@ -141,8 +139,8 @@ static inline bool ipv6_drop_on_unknown_option(struct net_pkt *pkt,
 	 *     Problem, Code 2, message to the packet's Source Address,
 	 *     pointing to the unrecognized Option Type.
 	 */
-	NET_DBG("Unknown option %d (0x%02x) MSB %d - 0x%02x",
-		opt_type, opt_type, opt_type >> 6, opt_type & 0xc0);
+	NET_DBG("Unknown option %d (0x%02x) MSB %d - 0x%02x", opt_type,
+		opt_type, opt_type >> 6, opt_type & 0xc0);
 
 	switch (opt_type & 0xc0) {
 	case 0x00:
@@ -179,7 +177,8 @@ static inline int ipv6_handle_ext_hdr_options(struct net_pkt *pkt,
 	exthdr_len = exthdr_len * 8U + 8;
 	if (exthdr_len > pkt_len) {
 		NET_DBG("Corrupted packet, extension header %d too long "
-			"(max %d bytes)", exthdr_len, pkt_len);
+			"(max %d bytes)",
+			exthdr_len, pkt_len);
 		return -EINVAL;
 	}
 
@@ -219,8 +218,8 @@ static inline int ipv6_handle_ext_hdr_options(struct net_pkt *pkt,
 				return -EINVAL;
 			}
 
-			if (ipv6_drop_on_unknown_option(pkt, hdr,
-							opt_type, length)) {
+			if (ipv6_drop_on_unknown_option(pkt, hdr, opt_type,
+							length)) {
 				return -ENOTSUP;
 			}
 
@@ -238,9 +237,8 @@ static inline int ipv6_handle_ext_hdr_options(struct net_pkt *pkt,
 }
 
 #if defined(CONFIG_NET_ROUTE)
-static struct net_route_entry *add_route(struct net_if *iface,
-					 struct in6_addr *addr,
-					 uint8_t prefix_len)
+static struct net_route_entry *
+add_route(struct net_if *iface, struct in6_addr *addr, uint8_t prefix_len)
 {
 	struct net_route_entry *route;
 
@@ -258,8 +256,7 @@ static struct net_route_entry *add_route(struct net_if *iface,
 }
 #endif /* CONFIG_NET_ROUTE */
 
-static void ipv6_no_route_info(struct net_pkt *pkt,
-			       struct in6_addr *src,
+static void ipv6_no_route_info(struct net_pkt *pkt, struct in6_addr *src,
 			       struct in6_addr *dst)
 {
 	NET_DBG("Will not route pkt %p ll src %s to dst %s between interfaces",
@@ -277,11 +274,10 @@ static enum net_verdict ipv6_route_packet(struct net_pkt *pkt,
 
 	/* Check if the packet can be routed */
 	if (IS_ENABLED(CONFIG_NET_ROUTING)) {
-		found = net_route_get_info(NULL, &hdr->dst, &route,
-					   &nexthop);
+		found = net_route_get_info(NULL, &hdr->dst, &route, &nexthop);
 	} else {
-		found = net_route_get_info(net_pkt_iface(pkt),
-					   &hdr->dst, &route, &nexthop);
+		found = net_route_get_info(net_pkt_iface(pkt), &hdr->dst,
+					   &route, &nexthop);
 	}
 
 	if (found) {
@@ -310,9 +306,8 @@ static enum net_verdict ipv6_route_packet(struct net_pkt *pkt,
 			 * different than the original route, then add
 			 * route to original source.
 			 */
-			NET_DBG("Route pkt %p from %p to %p",
-				pkt, net_pkt_orig_iface(pkt),
-				net_pkt_iface(pkt));
+			NET_DBG("Route pkt %p from %p to %p", pkt,
+				net_pkt_orig_iface(pkt), net_pkt_iface(pkt));
 
 			add_route(net_pkt_orig_iface(pkt), &hdr->src, 128);
 		}
@@ -362,9 +357,8 @@ static inline enum net_verdict ipv6_route_packet(struct net_pkt *pkt,
 
 #endif /* CONFIG_NET_ROUTE */
 
-
 static enum net_verdict ipv6_forward_mcast_packet(struct net_pkt *pkt,
-						 struct net_ipv6_hdr *hdr)
+						  struct net_ipv6_hdr *hdr)
 {
 #if defined(CONFIG_NET_ROUTE_MCAST)
 	int routed;
@@ -372,9 +366,9 @@ static enum net_verdict ipv6_forward_mcast_packet(struct net_pkt *pkt,
 	/* check if routing loop could be created or if the destination is of
 	 * interface local scope or if from link local source
 	 */
-	if (net_ipv6_is_addr_mcast(&hdr->src)  ||
-	      net_ipv6_is_addr_mcast_iface(&hdr->dst) ||
-	       net_ipv6_is_ll_addr(&hdr->src)) {
+	if (net_ipv6_is_addr_mcast(&hdr->src) ||
+	    net_ipv6_is_addr_mcast_iface(&hdr->dst) ||
+	    net_ipv6_is_ll_addr(&hdr->src)) {
 		return NET_CONTINUE;
 	}
 
@@ -414,8 +408,8 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 
 	pkt_len = ntohs(hdr->len) + sizeof(struct net_ipv6_hdr);
 	if (real_len < pkt_len) {
-		NET_DBG("DROP: pkt len per hdr %d != pkt real len %d",
-			pkt_len, real_len);
+		NET_DBG("DROP: pkt len per hdr %d != pkt real len %d", pkt_len,
+			real_len);
 		goto drop;
 	} else if (real_len > pkt_len) {
 		net_pkt_update_length(pkt, pkt_len);
@@ -445,7 +439,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 
 		if (net_ipv6_is_addr_mcast_iface(&hdr->dst) ||
 		    (net_ipv6_is_addr_mcast_group(
-			    &hdr->dst, net_ipv6_unspecified_address()) &&
+			     &hdr->dst, net_ipv6_unspecified_address()) &&
 		     (net_ipv6_is_addr_mcast_site(&hdr->dst) ||
 		      net_ipv6_is_addr_mcast_org(&hdr->dst)))) {
 			NET_DBG("DROP: invalid scope multicast packet");
@@ -461,7 +455,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 	net_pkt_set_family(pkt, PF_INET6);
 
 	if (IS_ENABLED(CONFIG_NET_ROUTE_MCAST) &&
-		net_ipv6_is_addr_mcast(&hdr->dst)) {
+	    net_ipv6_is_addr_mcast(&hdr->dst)) {
 		/* If the packet is a multicast packet and multicast routing
 		 * is activated, we give the packet to the routing engine.
 		 *
@@ -564,8 +558,7 @@ enum net_verdict net_ipv6_input(struct net_pkt *pkt, bool is_loopback)
 
 		case NET_IPV6_NEXTHDR_FRAG:
 			if (IS_ENABLED(CONFIG_NET_IPV6_FRAGMENT)) {
-				net_pkt_set_ipv6_hdr_prev(pkt,
-							  prev_hdr_offset);
+				net_pkt_set_ipv6_hdr_prev(pkt, prev_hdr_offset);
 				net_pkt_set_ipv6_fragment_start(
 					pkt,
 					net_pkt_get_current_offset(pkt) - 1);

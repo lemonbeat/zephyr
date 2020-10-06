@@ -54,7 +54,6 @@
 /* Include definitions from linker script generator */
 #include "linker.h"
 
-
 /*
  * CPU configuration
  *
@@ -97,7 +96,6 @@
 #define ALT_CPU_OCI_VERSION 1
 #define ALT_CPU_RESET_ADDR 0x00000000
 
-
 /*
  * CPU configuration (with legacy prefix - don't use these anymore)
  *
@@ -137,7 +135,6 @@
 #define NIOS2_OCI_VERSION 1
 #define NIOS2_RESET_ADDR 0x00000000
 
-
 /*
  * Define for each module class mastered by the CPU
  *
@@ -155,7 +152,6 @@
 #define __ALTERA_MSGDMA
 #define __ALTERA_NIOS2_GEN2
 #define __ALTERA_ONCHIP_FLASH
-
 
 /*
  * System configuration
@@ -192,7 +188,6 @@
 #define ALT_STDOUT_TYPE "altera_avalon_jtag_uart"
 #define ALT_SYSTEM_NAME "ghrd_10m50da"
 
-
 /*
  * a_16550_uart_0 configuration
  *
@@ -210,7 +205,6 @@
 #define A_16550_UART_0_NAME "/dev/a_16550_uart_0"
 #define A_16550_UART_0_SPAN 512
 #define A_16550_UART_0_TYPE "altera_16550_uart"
-
 
 /*
  * ext_flash_avl_csr configuration
@@ -231,7 +225,6 @@
 #define EXT_FLASH_AVL_CSR_SUBSECTOR_SIZE 4096
 #define EXT_FLASH_AVL_CSR_TYPE "altera_generic_quad_spi_controller2"
 
-
 /*
  * ext_flash_avl_mem configuration
  *
@@ -251,7 +244,6 @@
 #define EXT_FLASH_AVL_MEM_SUBSECTOR_SIZE 4096
 #define EXT_FLASH_AVL_MEM_TYPE "altera_generic_quad_spi_controller2"
 
-
 /*
  * hal configuration
  *
@@ -261,7 +253,6 @@
 #define ALT_MAX_FD 32
 #define ALT_SYS_CLK TIMER_0
 #define ALT_TIMESTAMP_CLK none
-
 
 /*
  * i2c_0 configuration
@@ -279,7 +270,6 @@
 #define I2C_0_TYPE "altera_avalon_i2c"
 #define I2C_0_USE_AV_ST 0
 
-
 /*
  * jtag_uart_0 configuration
  *
@@ -296,7 +286,6 @@
 #define JTAG_UART_0_TYPE "altera_avalon_jtag_uart"
 #define JTAG_UART_0_WRITE_DEPTH 64
 #define JTAG_UART_0_WRITE_THRESHOLD 8
-
 
 /*
  * led configuration
@@ -323,7 +312,6 @@
 #define LED_RESET_VALUE 0
 #define LED_SPAN 16
 #define LED_TYPE "altera_avalon_pio"
-
 
 /*
  * msgdma_0_csr configuration
@@ -362,7 +350,6 @@
 #define MSGDMA_0_CSR_TRANSFER_TYPE "Aligned Accesses"
 #define MSGDMA_0_CSR_TYPE "altera_msgdma"
 
-
 /*
  * msgdma_0_descriptor_slave configuration
  *
@@ -400,7 +387,6 @@
 #define MSGDMA_0_DESCRIPTOR_SLAVE_TRANSFER_TYPE "Aligned Accesses"
 #define MSGDMA_0_DESCRIPTOR_SLAVE_TYPE "altera_msgdma"
 
-
 /*
  * onchip_flash_0_csr configuration
  *
@@ -430,7 +416,6 @@
 #define ONCHIP_FLASH_0_CSR_SECTOR5_START_ADDR 0xffffffff
 #define ONCHIP_FLASH_0_CSR_SPAN 8
 #define ONCHIP_FLASH_0_CSR_TYPE "altera_onchip_flash"
-
 
 /*
  * onchip_flash_0_data configuration
@@ -462,7 +447,6 @@
 #define ONCHIP_FLASH_0_DATA_SPAN 753664
 #define ONCHIP_FLASH_0_DATA_TYPE "altera_onchip_flash"
 
-
 /*
  * onchip_memory2_0 configuration
  *
@@ -490,7 +474,6 @@
 #define ONCHIP_MEMORY2_0_SPAN 131072
 #define ONCHIP_MEMORY2_0_TYPE "altera_avalon_onchip_memory2"
 #define ONCHIP_MEMORY2_0_WRITABLE 1
-
 
 /*
  * spi_0 configuration
@@ -522,7 +505,6 @@
 #define SPI_0_TARGETSSDELAY "0.0"
 #define SPI_0_TYPE "altera_avalon_spi"
 
-
 /*
  * sysid configuration
  *
@@ -537,7 +519,6 @@
 #define SYSID_SPAN 8
 #define SYSID_TIMESTAMP 1512455752
 #define SYSID_TYPE "altera_avalon_sysid_qsys"
-
 
 /*
  * timer_0 configuration

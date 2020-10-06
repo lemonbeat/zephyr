@@ -40,8 +40,8 @@ static void put_msgq(struct k_msgq *pmsgq)
 		zassert_equal(read_data, data[0], NULL);
 
 		/**TESTPOINT: msgq free get*/
-		zassert_equal(k_msgq_num_free_get(pmsgq),
-				MSGQ_LEN - 1 - i, NULL);
+		zassert_equal(k_msgq_num_free_get(pmsgq), MSGQ_LEN - 1 - i,
+			      NULL);
 		/**TESTPOINT: msgq used get*/
 		zassert_equal(k_msgq_num_used_get(pmsgq), i + 1, NULL);
 	}
@@ -64,8 +64,8 @@ static void get_msgq(struct k_msgq *pmsgq)
 		/**TESTPOINT: msgq free get*/
 		zassert_equal(k_msgq_num_free_get(pmsgq), i + 1, NULL);
 		/**TESTPOINT: msgq used get*/
-		zassert_equal(k_msgq_num_used_get(pmsgq),
-				MSGQ_LEN - 1 - i, NULL);
+		zassert_equal(k_msgq_num_used_get(pmsgq), MSGQ_LEN - 1 - i,
+			      NULL);
 	}
 }
 
@@ -94,9 +94,8 @@ static void msgq_thread(struct k_msgq *pmsgq)
 {
 	/**TESTPOINT: thread-thread data passing via message queue*/
 	put_msgq(pmsgq);
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      thread_entry, pmsgq, NULL, NULL,
-				      K_PRIO_PREEMPT(0),
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry,
+				      pmsgq, NULL, NULL, K_PRIO_PREEMPT(0),
 				      K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 	k_sem_take(&end_sema, K_FOREVER);
 	k_thread_abort(tid);
@@ -183,12 +182,12 @@ static void msgq_thread_data_passing(struct k_msgq *pmsgq)
 	}
 
 	k_tid_t tid = k_thread_create(&tdata2, tstack2, STACK_SIZE,
-					pend_thread_entry, pmsgq, NULL,
-					NULL, K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+				      pend_thread_entry, pmsgq, NULL, NULL,
+				      K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
 
 	k_tid_t tid1 = k_thread_create(&tdata1, tstack1, STACK_SIZE,
-					thread_entry_get_data, pmsgq, NULL,
-					NULL, K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+				       thread_entry_get_data, pmsgq, NULL, NULL,
+				       K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
 
 	k_sem_take(&end_sema, K_FOREVER);
 	k_thread_abort(tid);
@@ -365,7 +364,7 @@ void test_msgq_alloc(void)
 	/** Requesting buffer allocation from the test pool.*/
 	ret = k_msgq_alloc_init(&kmsgq_test_alloc, MSG_SIZE * 128, MSGQ_LEN);
 	zassert_true(ret == -ENOMEM,
-		"resource pool is smaller then requested buffer");
+		     "resource pool is smaller then requested buffer");
 
 	/* Requesting a huge size of MSG to validate overflow*/
 	ret = k_msgq_alloc_init(&kmsgq_test_alloc, OVERFLOW_SIZE_MSG, MSGQ_LEN);
@@ -393,8 +392,8 @@ void test_msgq_empty(void)
 	zassert_equal(ret, 0, NULL);
 
 	k_tid_t tid = k_thread_create(&tdata2, tstack2, STACK_SIZE,
-				      get_empty_entry, &msgq1, NULL,
-				      NULL, pri, 0, K_NO_WAIT);
+				      get_empty_entry, &msgq1, NULL, NULL, pri,
+				      0, K_NO_WAIT);
 
 	k_sem_take(&end_sema, K_FOREVER);
 	/* that getting thread is being blocked now */
@@ -422,11 +421,10 @@ void test_msgq_full(void)
 	ret = k_sem_init(&end_sema, 0, 1);
 	zassert_equal(ret, 0, NULL);
 
-
 	k_msgq_put(&msgq1, &data[0], K_NO_WAIT);
 	k_tid_t tid = k_thread_create(&tdata2, tstack2, STACK_SIZE,
-					put_full_entry, &msgq1, NULL,
-					NULL, pri, 0, K_NO_WAIT);
+				      put_full_entry, &msgq1, NULL, NULL, pri,
+				      0, K_NO_WAIT);
 	k_sem_take(&end_sema, K_FOREVER);
 	/* that putting thread is being blocked now */
 	zassert_equal(tid->base.thread_state, _THREAD_PENDING, NULL);

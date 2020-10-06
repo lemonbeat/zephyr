@@ -26,7 +26,6 @@
 #include <irq.h>
 #include <sys/printk.h>
 
-
 /*
  * storage space for the interrupt stack of fast_irq
  */
@@ -47,38 +46,36 @@ void z_arc_firq_stack_set(void)
 {
 #ifdef CONFIG_SMP
 	char *firq_sp = Z_KERNEL_STACK_BUFFER(
-		  _firq_interrupt_stack[z_arc_v2_core_id()]) +
-		  CONFIG_ARC_FIRQ_STACK_SIZE;
+				_firq_interrupt_stack[z_arc_v2_core_id()]) +
+			CONFIG_ARC_FIRQ_STACK_SIZE;
 #else
 	char *firq_sp = Z_KERNEL_STACK_BUFFER(_firq_interrupt_stack) +
-		  CONFIG_ARC_FIRQ_STACK_SIZE;
+			CONFIG_ARC_FIRQ_STACK_SIZE;
 #endif
 
-/* the z_arc_firq_stack_set must be called when irq diasbled, as
+	/* the z_arc_firq_stack_set must be called when irq diasbled, as
  * it can be called not only in the init phase but also other places
  */
 	unsigned int key = arch_irq_lock();
 
-	__asm__ volatile (
-/* only ilink will not be banked, so use ilink as channel
+	__asm__ volatile(
+		/* only ilink will not be banked, so use ilink as channel
  * between 2 banks
  */
-	"mov %%ilink, %0\n\t"
-	"lr %0, [%1]\n\t"
-	"or %0, %0, %2\n\t"
-	"kflag %0\n\t"
-	"mov %%sp, %%ilink\n\t"
-/* switch back to bank0, use ilink to avoid the pollution of
+		"mov %%ilink, %0\n\t"
+		"lr %0, [%1]\n\t"
+		"or %0, %0, %2\n\t"
+		"kflag %0\n\t"
+		"mov %%sp, %%ilink\n\t"
+		/* switch back to bank0, use ilink to avoid the pollution of
  * bank1's gp regs.
  */
-	"lr %%ilink, [%1]\n\t"
-	"and %%ilink, %%ilink, %3\n\t"
-	"kflag %%ilink\n\t"
-	:
-	: "r"(firq_sp), "i"(_ARC_V2_STATUS32),
-	  "i"(_ARC_V2_STATUS32_RB(1)),
-	  "i"(~_ARC_V2_STATUS32_RB(7))
-	);
+		"lr %%ilink, [%1]\n\t"
+		"and %%ilink, %%ilink, %3\n\t"
+		"kflag %%ilink\n\t"
+		:
+		: "r"(firq_sp), "i"(_ARC_V2_STATUS32),
+		  "i"(_ARC_V2_STATUS32_RB(1)), "i"(~_ARC_V2_STATUS32_RB(7)));
 	arch_irq_unlock(key);
 }
 #endif
@@ -147,11 +144,10 @@ void z_irq_priority_set(unsigned int irq, unsigned int prio, uint32_t flags)
  * left prio levels allocated to normal world
  */
 #if defined(CONFIG_ARC_SECURE_FIRMWARE)
-	prio = prio < ARC_N_IRQ_START_LEVEL ?
-		prio : (ARC_N_IRQ_START_LEVEL - 1);
+	prio = prio < ARC_N_IRQ_START_LEVEL ? prio :
+						    (ARC_N_IRQ_START_LEVEL - 1);
 #elif defined(CONFIG_ARC_NORMAL_FIRMWARE)
-	prio = prio < ARC_N_IRQ_START_LEVEL ?
-		 ARC_N_IRQ_START_LEVEL : prio;
+	prio = prio < ARC_N_IRQ_START_LEVEL ? ARC_N_IRQ_START_LEVEL : prio;
 #endif
 	z_arc_v2_irq_unit_prio_set(irq, prio);
 }

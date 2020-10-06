@@ -46,11 +46,10 @@ struct bt_mesh_health_cli {
 			       size_t fault_count);
 
 	/* Internal parameters for tracking message responses. */
-	struct k_sem          op_sync;
-	uint32_t                 op_pending;
-	void                 *op_param;
+	struct k_sem op_sync;
+	uint32_t op_pending;
+	void *op_param;
 };
-
 
 /** @def BT_MESH_MODEL_HEALTH_CLI
  *
@@ -58,8 +57,8 @@ struct bt_mesh_health_cli {
  *
  *  @param cli_data Pointer to a @ref bt_mesh_health_cli instance.
  */
-#define BT_MESH_MODEL_HEALTH_CLI(cli_data)                                     \
-	BT_MESH_MODEL_CB(BT_MESH_MODEL_ID_HEALTH_CLI, bt_mesh_health_cli_op,   \
+#define BT_MESH_MODEL_HEALTH_CLI(cli_data)                                   \
+	BT_MESH_MODEL_CB(BT_MESH_MODEL_ID_HEALTH_CLI, bt_mesh_health_cli_op, \
 			 NULL, cli_data, &bt_mesh_health_cli_cb)
 
 /** @brief Set Health client model instance to use for communication.
@@ -84,8 +83,8 @@ int bt_mesh_health_cli_set(struct bt_mesh_model *model);
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_health_fault_get(uint16_t addr, uint16_t app_idx, uint16_t cid,
-				 uint8_t *test_id, uint8_t *faults,
-				 size_t *fault_count);
+			     uint8_t *test_id, uint8_t *faults,
+			     size_t *fault_count);
 
 /** @brief Clear the registered faults for the given Company ID.
  *
@@ -101,8 +100,8 @@ int bt_mesh_health_fault_get(uint16_t addr, uint16_t app_idx, uint16_t cid,
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_health_fault_clear(uint16_t addr, uint16_t app_idx, uint16_t cid,
-				 uint8_t *test_id, uint8_t *faults,
-				 size_t *fault_count);
+			       uint8_t *test_id, uint8_t *faults,
+			       size_t *fault_count);
 
 /** @brief Invoke a self-test procedure for the given Company ID.
  *
@@ -116,8 +115,8 @@ int bt_mesh_health_fault_clear(uint16_t addr, uint16_t app_idx, uint16_t cid,
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_health_fault_test(uint16_t addr, uint16_t app_idx, uint16_t cid,
-				 uint8_t test_id, uint8_t *faults,
-				 size_t *fault_count);
+			      uint8_t test_id, uint8_t *faults,
+			      size_t *fault_count);
 
 /** @brief Get the target node's Health fast period divisor.
  *
@@ -135,7 +134,8 @@ int bt_mesh_health_fault_test(uint16_t addr, uint16_t app_idx, uint16_t cid,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_health_period_get(uint16_t addr, uint16_t app_idx, uint8_t *divisor);
+int bt_mesh_health_period_get(uint16_t addr, uint16_t app_idx,
+			      uint8_t *divisor);
 
 /** @brief Set the target node's Health fast period divisor.
  *
@@ -155,7 +155,7 @@ int bt_mesh_health_period_get(uint16_t addr, uint16_t app_idx, uint8_t *divisor)
  *  @return 0 on success, or (negative) error code on failure.
  */
 int bt_mesh_health_period_set(uint16_t addr, uint16_t app_idx, uint8_t divisor,
-				 uint8_t *updated_divisor);
+			      uint8_t *updated_divisor);
 
 /** @brief Get the current attention timer value.
  *
@@ -165,7 +165,8 @@ int bt_mesh_health_period_set(uint16_t addr, uint16_t app_idx, uint8_t divisor,
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_health_attention_get(uint16_t addr, uint16_t app_idx, uint8_t *attention);
+int bt_mesh_health_attention_get(uint16_t addr, uint16_t app_idx,
+				 uint8_t *attention);
 
 /** @brief Set the attention timer.
  *
@@ -177,8 +178,8 @@ int bt_mesh_health_attention_get(uint16_t addr, uint16_t app_idx, uint8_t *atten
  *
  *  @return 0 on success, or (negative) error code on failure.
  */
-int bt_mesh_health_attention_set(uint16_t addr, uint16_t app_idx, uint8_t attention,
-				 uint8_t *updated_attention);
+int bt_mesh_health_attention_set(uint16_t addr, uint16_t app_idx,
+				 uint8_t attention, uint8_t *updated_attention);
 
 /** @brief Get the current transmission timeout value.
  *

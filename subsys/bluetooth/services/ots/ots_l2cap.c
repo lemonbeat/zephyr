@@ -24,10 +24,10 @@ LOG_MODULE_DECLARE(bt_ots, CONFIG_BT_OTS_LOG_LEVEL);
 /* According to BLE specification Assigned Numbers that are used in the
  * Logical Link Control for protocol/service multiplexers.
  */
-#define BT_GATT_OTS_L2CAP_PSM	0x0025
+#define BT_GATT_OTS_L2CAP_PSM 0x0025
 
 /* Maximum size of TX buffer and its payload. */
-#define MAX_TX_BUF_SIZE		256
+#define MAX_TX_BUF_SIZE 256
 #define MAX_TX_BUF_PAYLOAD_SIZE (MAX_TX_BUF_SIZE - BT_L2CAP_CHAN_SEND_RESERVE)
 
 NET_BUF_POOL_FIXED_DEFINE(ot_chan_tx_pool, 1, MAX_TX_BUF_SIZE, NULL);
@@ -107,10 +107,10 @@ static void l2cap_disconnected(struct bt_l2cap_chan *chan)
 }
 
 static const struct bt_l2cap_chan_ops l2cap_ops = {
-	.sent		= l2cap_sent,
-	.status		= l2cap_status,
-	.connected	= l2cap_connected,
-	.disconnected	= l2cap_disconnected,
+	.sent = l2cap_sent,
+	.status = l2cap_status,
+	.connected = l2cap_connected,
+	.disconnected = l2cap_disconnected,
 };
 
 static inline void l2cap_chan_init(struct bt_l2cap_le_chan *chan)
@@ -145,7 +145,7 @@ static int l2cap_accept(struct bt_conn *conn, struct bt_l2cap_chan **chan)
 
 static struct bt_l2cap_server l2cap_server = {
 	.psm = BT_GATT_OTS_L2CAP_PSM,
-	.accept	= l2cap_accept,
+	.accept = l2cap_accept,
 };
 
 static int bt_gatt_ots_l2cap_init(const struct device *arg)
@@ -166,13 +166,13 @@ static int bt_gatt_ots_l2cap_init(const struct device *arg)
 }
 
 bool bt_gatt_ots_l2cap_is_open(struct bt_gatt_ots_l2cap *l2cap_ctx,
-				   struct bt_conn *conn)
+			       struct bt_conn *conn)
 {
 	return (l2cap_ctx->ot_chan.chan.conn == conn);
 }
 
-int bt_gatt_ots_l2cap_send(struct bt_gatt_ots_l2cap *l2cap_ctx,
-			       uint8_t *data, uint32_t len)
+int bt_gatt_ots_l2cap_send(struct bt_gatt_ots_l2cap *l2cap_ctx, uint8_t *data,
+			   uint32_t len)
 {
 	int err;
 
@@ -211,5 +211,4 @@ int bt_gatt_ots_l2cap_unregister(struct bt_gatt_ots_l2cap *l2cap_ctx)
 	return 0;
 }
 
-SYS_INIT(bt_gatt_ots_l2cap_init, APPLICATION,
-	 CONFIG_APPLICATION_INIT_PRIORITY);
+SYS_INIT(bt_gatt_ots_l2cap_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);

@@ -9,39 +9,39 @@
 #include <strings.h>
 #include "random_data.h"
 
-#define PCI_TYPE_POS      4
-#define DATA_SIZE_SF      7
-#define DATA_SIZE_CF      7
-#define DATA_SIZE_SF_EXT  6
-#define DATA_SIZE_FF      6
-#define CAN_DL            8
-#define DATA_SEND_LENGTH  272
-#define SF_PCI_TYPE       0
-#define SF_PCI_BYTE_1     ((SF_PCI_TYPE << PCI_TYPE_POS) | DATA_SIZE_SF)
+#define PCI_TYPE_POS 4
+#define DATA_SIZE_SF 7
+#define DATA_SIZE_CF 7
+#define DATA_SIZE_SF_EXT 6
+#define DATA_SIZE_FF 6
+#define CAN_DL 8
+#define DATA_SEND_LENGTH 272
+#define SF_PCI_TYPE 0
+#define SF_PCI_BYTE_1 ((SF_PCI_TYPE << PCI_TYPE_POS) | DATA_SIZE_SF)
 #define SF_PCI_BYTE_2_EXT ((SF_PCI_TYPE << PCI_TYPE_POS) | DATA_SIZE_SF_EXT)
 #define SF_PCI_BYTE_LEN_8 ((SF_PCI_TYPE << PCI_TYPE_POS) | (DATA_SIZE_SF + 1))
-#define EXT_ADDR           5
-#define FF_PCI_TYPE        1
-#define FF_PCI_BYTE_1(dl)      ((FF_PCI_TYPE << PCI_TYPE_POS) | ((dl) >> 8))
-#define FF_PCI_BYTE_2(dl)      ((dl) & 0xFF)
-#define FC_PCI_TYPE        3
-#define FC_PCI_CTS         0
-#define FC_PCI_WAIT        1
-#define FC_PCI_OVFLW       2
-#define FC_PCI_BYTE_1(FS)  ((FC_PCI_TYPE << PCI_TYPE_POS) | (FS))
-#define FC_PCI_BYTE_2(BS)  (BS)
+#define EXT_ADDR 5
+#define FF_PCI_TYPE 1
+#define FF_PCI_BYTE_1(dl) ((FF_PCI_TYPE << PCI_TYPE_POS) | ((dl) >> 8))
+#define FF_PCI_BYTE_2(dl) ((dl)&0xFF)
+#define FC_PCI_TYPE 3
+#define FC_PCI_CTS 0
+#define FC_PCI_WAIT 1
+#define FC_PCI_OVFLW 2
+#define FC_PCI_BYTE_1(FS) ((FC_PCI_TYPE << PCI_TYPE_POS) | (FS))
+#define FC_PCI_BYTE_2(BS) (BS)
 #define FC_PCI_BYTE_3(ST_MIN) (ST_MIN)
-#define DATA_SIZE_FC       3
-#define CF_PCI_TYPE        2
-#define CF_PCI_BYTE_1      (CF_PCI_TYPE << PCI_TYPE_POS)
-#define STMIN_VAL_1        5
-#define STMIN_VAL_2        50
+#define DATA_SIZE_FC 3
+#define CF_PCI_TYPE 2
+#define CF_PCI_BYTE_1 (CF_PCI_TYPE << PCI_TYPE_POS)
+#define STMIN_VAL_1 5
+#define STMIN_VAL_2 50
 #define STMIN_UPPER_TOLERANCE 5
 
-#define CEIL(A, B) (((A) + (B) - 1) / (B))
+#define CEIL(A, B) (((A) + (B)-1) / (B))
 
-#define BS_TIMEOUT_UPPER_MS   1100
-#define BS_TIMEOUT_LOWER_MS   1000
+#define BS_TIMEOUT_UPPER_MS 1100
+#define BS_TIMEOUT_LOWER_MS 1000
 
 #if defined(CONFIG_CAN_LOOPBACK_DEV_NAME)
 #define CAN_DEVICE_NAME CONFIG_CAN_LOOPBACK_DEV_NAME
@@ -67,42 +67,27 @@ struct frame_desired {
 	uint8_t length;
 };
 
-struct frame_desired des_frames[CEIL((DATA_SEND_LENGTH - DATA_SIZE_FF),
-				      DATA_SIZE_CF)];
+struct frame_desired
+	des_frames[CEIL((DATA_SEND_LENGTH - DATA_SIZE_FF), DATA_SIZE_CF)];
 
+const struct isotp_fc_opts fc_opts = { .bs = 8, .stmin = 0 };
+const struct isotp_fc_opts fc_opts_single = { .bs = 0, .stmin = 0 };
+const struct isotp_msg_id rx_addr = { .std_id = 0x10,
+				      .id_type = CAN_STANDARD_IDENTIFIER,
+				      .use_ext_addr = 0 };
+const struct isotp_msg_id tx_addr = { .std_id = 0x11,
+				      .id_type = CAN_STANDARD_IDENTIFIER,
+				      .use_ext_addr = 0 };
 
-const struct isotp_fc_opts fc_opts = {
-	.bs = 8,
-	.stmin = 0
-};
-const struct isotp_fc_opts fc_opts_single = {
-	.bs = 0,
-	.stmin = 0
-};
-const struct isotp_msg_id rx_addr = {
-	.std_id = 0x10,
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.use_ext_addr = 0
-};
-const struct isotp_msg_id tx_addr = {
-	.std_id = 0x11,
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.use_ext_addr = 0
-};
+const struct isotp_msg_id rx_addr_ext = { .std_id = 0x10,
+					  .id_type = CAN_STANDARD_IDENTIFIER,
+					  .use_ext_addr = 1,
+					  .ext_addr = EXT_ADDR };
 
-const struct isotp_msg_id rx_addr_ext = {
-	.std_id = 0x10,
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.use_ext_addr = 1,
-	.ext_addr = EXT_ADDR
-};
-
-const struct isotp_msg_id tx_addr_ext = {
-	.std_id = 0x11,
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.use_ext_addr = 1,
-	.ext_addr = EXT_ADDR
-};
+const struct isotp_msg_id tx_addr_ext = { .std_id = 0x11,
+					  .id_type = CAN_STANDARD_IDENTIFIER,
+					  .use_ext_addr = 1,
+					  .ext_addr = EXT_ADDR };
 
 const struct device *can_dev;
 struct isotp_recv_ctx recv_ctx;
@@ -113,7 +98,7 @@ struct k_sem send_compl_sem;
 
 void send_complette_cb(int error_nr, void *arg)
 {
-	int expected_err_nr = (int) arg;
+	int expected_err_nr = (int)arg;
 
 	zassert_equal(error_nr, expected_err_nr,
 		      "Unexpected error nr. expect: %d, got %d",
@@ -128,8 +113,8 @@ static void print_hex(const uint8_t *ptr, size_t len)
 	}
 }
 
-
-static int check_data(const uint8_t *frame, const uint8_t *desired, size_t length)
+static int check_data(const uint8_t *frame, const uint8_t *desired,
+		      size_t length)
 {
 	int ret;
 
@@ -153,7 +138,6 @@ static void send_sf(void)
 			 &rx_addr, &tx_addr, send_complette_cb, ISOTP_N_OK);
 	zassert_equal(ret, 0, "Send returned %d", ret);
 }
-
 
 static void get_sf(struct isotp_recv_ctx *recv_ctx, size_t data_size)
 {
@@ -210,19 +194,17 @@ static void receive_test_data(struct isotp_recv_ctx *recv_ctx,
 	} while (remaining_len);
 
 	ret = isotp_recv(recv_ctx, data_buf, sizeof(data_buf), K_MSEC(50));
-	zassert_equal(ret, ISOTP_RECV_TIMEOUT,
-		      "Expected timeout but got %d", ret);
+	zassert_equal(ret, ISOTP_RECV_TIMEOUT, "Expected timeout but got %d",
+		      ret);
 }
 
 static void send_frame_series(struct frame_desired *frames, size_t length,
 			      uint32_t id)
 {
 	int i, ret;
-	struct zcan_frame frame = {
-		.id_type = CAN_STANDARD_IDENTIFIER,
-		.rtr = CAN_DATAFRAME,
-		.std_id = id
-	};
+	struct zcan_frame frame = { .id_type = CAN_STANDARD_IDENTIFIER,
+				    .rtr = CAN_DATAFRAME,
+				    .std_id = id };
 	struct frame_desired *desired = frames;
 
 	for (i = 0; i < length; i++) {
@@ -260,13 +242,11 @@ static void check_frame_series(struct frame_desired *frames, size_t length,
 static int attach_msgq(uint32_t id)
 {
 	int filter_id;
-	struct zcan_filter filter = {
-		.id_type = CAN_STANDARD_IDENTIFIER,
-		.rtr = CAN_DATAFRAME,
-		.std_id = id,
-		.rtr_mask = 1,
-		.std_id_mask = CAN_STD_ID_MASK
-	};
+	struct zcan_filter filter = { .id_type = CAN_STANDARD_IDENTIFIER,
+				      .rtr = CAN_DATAFRAME,
+				      .std_id = id,
+				      .rtr_mask = 1,
+				      .std_id_mask = CAN_STD_ID_MASK };
 
 	filter_id = can_attach_msgq(can_dev, &frame_msgq, &filter);
 	zassert_not_equal(filter_id, CAN_NO_FREE_FILTER, "Filter full");
@@ -284,7 +264,7 @@ static void prepare_cf_frames(struct frame_desired *frames, size_t frames_cnt,
 	size_t remaining_length = data_len;
 
 	for (i = 0; i < frames_cnt && remaining_length; i++) {
-		frames[i].data[0] = CF_PCI_BYTE_1 | ((i+1) & 0x0F);
+		frames[i].data[0] = CF_PCI_BYTE_1 | ((i + 1) & 0x0F);
 		frames[i].length = CAN_DL;
 		memcpy(&des_frames[i].data[1], data_ptr, DATA_SIZE_CF);
 
@@ -325,7 +305,7 @@ static void test_receive_sf(void)
 
 	single_frame.data[0] = SF_PCI_BYTE_1;
 	memcpy(&single_frame.data[1], random_data, DATA_SIZE_SF);
-	single_frame.length  = DATA_SIZE_SF + 1;
+	single_frame.length = DATA_SIZE_SF + 1;
 
 	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr,
 			 &fc_opts_single, K_NO_WAIT);
@@ -363,7 +343,7 @@ static void test_send_sf_ext(void)
 
 	ret = isotp_send(&send_ctx, can_dev, random_data, DATA_SIZE_SF_EXT,
 			 &rx_addr_ext, &tx_addr_ext, send_complette_cb,
-			  ISOTP_N_OK);
+			 ISOTP_N_OK);
 	zassert_equal(ret, 0, "Send returned %d", ret);
 
 	check_frame_series(&des_frame, 1, &frame_msgq);
@@ -379,7 +359,7 @@ static void test_receive_sf_ext(void)
 	single_frame.data[0] = EXT_ADDR;
 	single_frame.data[1] = SF_PCI_BYTE_2_EXT;
 	memcpy(&single_frame.data[2], random_data, DATA_SIZE_SF_EXT);
-	single_frame.length  = DATA_SIZE_SF_EXT + 2;
+	single_frame.length = DATA_SIZE_SF_EXT + 2;
 
 	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr_ext, &tx_addr,
 			 &fc_opts_single, K_NO_WAIT);
@@ -487,7 +467,7 @@ static void test_send_data_blocks(void)
 	/* dynamic bs */
 	check_frame_series(data_frame_ptr, 2, &frame_msgq);
 	data_frame_ptr += 2;
-	remaining_length -= 2  * DATA_SIZE_CF;
+	remaining_length -= 2 * DATA_SIZE_CF;
 	ret = k_msgq_get(&frame_msgq, &dummy_frame, K_MSEC(50));
 	zassert_equal(ret, -EAGAIN, "Expected timeout but got %d", ret);
 
@@ -575,8 +555,8 @@ static void test_receive_data_blocks(void)
 	zassert_true((filter_id >= 0), "Negative filter number [%d]",
 		     filter_id);
 
-	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr,
-			 &fc_opts, K_NO_WAIT);
+	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr, &fc_opts,
+			 K_NO_WAIT);
 	zassert_equal(ret, ISOTP_N_OK, "Binding failed [%d]", ret);
 
 	send_frame_series(&ff_frame, 1, rx_addr.std_id);
@@ -625,7 +605,7 @@ static void test_send_timeouts(void)
 	zassert_equal(ret, ISOTP_N_TIMEOUT_BS, "Expected timeout but got %d",
 		      ret);
 	zassert_true(time_diff <= BS_TIMEOUT_UPPER_MS,
-		     "Timeout too late (%dms)",  time_diff);
+		     "Timeout too late (%dms)", time_diff);
 	zassert_true(time_diff >= BS_TIMEOUT_LOWER_MS,
 		     "Timeout too early (%dms)", time_diff);
 
@@ -676,19 +656,19 @@ static void test_receive_timeouts(void)
 	memcpy(&ff_frame.data[2], random_data, DATA_SIZE_FF);
 	ff_frame.length = DATA_SIZE_FF + 2;
 
-	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr,
-			 &fc_opts, K_NO_WAIT);
+	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr, &fc_opts,
+			 K_NO_WAIT);
 	zassert_equal(ret, ISOTP_N_OK, "Binding failed [%d]", ret);
 
 	send_frame_series(&ff_frame, 1, rx_addr.std_id);
 	start_time = k_uptime_get_32();
 
 	ret = isotp_recv(&recv_ctx, data_buf, sizeof(data_buf), K_FOREVER);
-	zassert_equal(ret, DATA_SIZE_FF,
-		      "Expected FF data length but got %d", ret);
+	zassert_equal(ret, DATA_SIZE_FF, "Expected FF data length but got %d",
+		      ret);
 	ret = isotp_recv(&recv_ctx, data_buf, sizeof(data_buf), K_FOREVER);
-	zassert_equal(ret, ISOTP_N_TIMEOUT_CR,
-		      "Expected timeout but got %d", ret);
+	zassert_equal(ret, ISOTP_N_TIMEOUT_CR, "Expected timeout but got %d",
+		      ret);
 
 	time_diff = k_uptime_get_32() - start_time;
 	zassert_true(time_diff >= BS_TIMEOUT_LOWER_MS,
@@ -775,8 +755,8 @@ void test_receiver_fc_errors(void)
 	zassert_true((filter_id >= 0), "Negative filter number [%d]",
 		     filter_id);
 
-	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr,
-			 &fc_opts, K_NO_WAIT);
+	ret = isotp_bind(&recv_ctx, can_dev, &rx_addr, &tx_addr, &fc_opts,
+			 K_NO_WAIT);
 	zassert_equal(ret, ISOTP_N_OK, "Binding failed [%d]", ret);
 
 	/* wrong sequence number */
@@ -790,11 +770,11 @@ void test_receiver_fc_errors(void)
 	send_frame_series(des_frames, fc_opts.bs, rx_addr.std_id);
 
 	ret = isotp_recv(&recv_ctx, data_buf, sizeof(data_buf), K_MSEC(200));
-	zassert_equal(ret, DATA_SIZE_FF,
-		      "Expected FF data length but got %d", ret);
+	zassert_equal(ret, DATA_SIZE_FF, "Expected FF data length but got %d",
+		      ret);
 	ret = isotp_recv(&recv_ctx, data_buf, sizeof(data_buf), K_MSEC(200));
-	zassert_equal(ret, ISOTP_N_WRONG_SN,
-		      "Expected wrong SN but got %d", ret);
+	zassert_equal(ret, ISOTP_N_WRONG_SN, "Expected wrong SN but got %d",
+		      ret);
 
 	can_detach(can_dev, filter_id);
 	k_msgq_cleanup(&frame_msgq);
@@ -835,8 +815,8 @@ void test_sender_fc_errors(void)
 			 &fc_opts_single, K_NO_WAIT);
 	zassert_equal(ret, ISOTP_N_OK, "Binding failed [%d]", ret);
 
-	ret = isotp_send(&send_ctx, can_dev, random_data, 5*1024,
-			 &tx_addr, &rx_addr, NULL, NULL);
+	ret = isotp_send(&send_ctx, can_dev, random_data, 5 * 1024, &tx_addr,
+			 &rx_addr, NULL, NULL);
 	zassert_equal(ret, ISOTP_N_BUFFER_OVERFLW,
 		      "Expected overflow bot got %d", ret);
 	isotp_unbind(&recv_ctx);
@@ -871,7 +851,6 @@ void test_sender_fc_errors(void)
 	can_detach(can_dev, filter_id);
 }
 
-
 void test_main(void)
 {
 	int ret;
@@ -887,8 +866,7 @@ void test_main(void)
 
 	k_sem_init(&send_compl_sem, 0, 1);
 
-	ztest_test_suite(isotp_conformance,
-			 ztest_unit_test(test_send_sf),
+	ztest_test_suite(isotp_conformance, ztest_unit_test(test_send_sf),
 			 ztest_unit_test(test_receive_sf),
 			 ztest_unit_test(test_send_sf_ext),
 			 ztest_unit_test(test_receive_sf_ext),
@@ -900,7 +878,6 @@ void test_main(void)
 			 ztest_unit_test(test_receive_timeouts),
 			 ztest_unit_test(test_stmin),
 			 ztest_unit_test(test_receiver_fc_errors),
-			 ztest_unit_test(test_sender_fc_errors)
-			 );
+			 ztest_unit_test(test_sender_fc_errors));
 	ztest_run_test_suite(isotp_conformance);
 }

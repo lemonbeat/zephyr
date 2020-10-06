@@ -26,7 +26,7 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
  * 10BASE-T, 100BASE-TX is 3.7s, to add an extra margin the timeout
  * is set at 4s.
  */
-#define PHY_AUTONEG_TIMEOUT_MS   4000
+#define PHY_AUTONEG_TIMEOUT_MS 4000
 
 /* Enable MDIO serial bus between MAC and PHY. */
 static void mdio_bus_enable(Gmac *gmac)
@@ -43,9 +43,9 @@ static void mdio_bus_disable(Gmac *gmac)
 /* Wait PHY operation complete. */
 static int mdio_bus_wait(Gmac *gmac)
 {
-	uint32_t retries = 100U;  /* will wait up to 1 s */
+	uint32_t retries = 100U; /* will wait up to 1 s */
 
-	while (!(gmac->GMAC_NSR & GMAC_NSR_IDLE))   {
+	while (!(gmac->GMAC_NSR & GMAC_NSR_IDLE)) {
 		if (retries-- == 0U) {
 			LOG_ERR("timeout");
 			return -ETIMEDOUT;
@@ -64,12 +64,9 @@ static int mdio_bus_send(Gmac *gmac, uint8_t phy_addr, uint8_t reg_addr,
 	int retval;
 
 	/* Write GMAC PHY maintenance register */
-	gmac->GMAC_MAN =   GMAC_MAN_CLTTO
-			 | (GMAC_MAN_OP(rw ? 0x2 : 0x1))
-			 | GMAC_MAN_WTN(0x02)
-			 | GMAC_MAN_PHYA(phy_addr)
-			 | GMAC_MAN_REGA(reg_addr)
-			 | GMAC_MAN_DATA(data);
+	gmac->GMAC_MAN = GMAC_MAN_CLTTO | (GMAC_MAN_OP(rw ? 0x2 : 0x1)) |
+			 GMAC_MAN_WTN(0x02) | GMAC_MAN_PHYA(phy_addr) |
+			 GMAC_MAN_REGA(reg_addr) | GMAC_MAN_DATA(data);
 
 	/* Wait until PHY is ready */
 	retval = mdio_bus_wait(gmac);
@@ -193,7 +190,7 @@ uint32_t phy_sam_gmac_id_get(const struct phy_sam_gmac_dev *phy)
 
 bool phy_sam_gmac_link_status_get(const struct phy_sam_gmac_dev *phy)
 {
-	Gmac * const gmac = phy->regs;
+	Gmac *const gmac = phy->regs;
 	uint32_t bmsr;
 
 	mdio_bus_enable(gmac);
@@ -234,7 +231,7 @@ int phy_sam_gmac_auto_negotiate(const struct phy_sam_gmac_dev *phy,
 	}
 
 	val |= MII_BMCR_AUTONEG_ENABLE | MII_BMCR_AUTONEG_RESTART;
-	val &= ~MII_BMCR_ISOLATE;  /* Don't isolate the PHY */
+	val &= ~MII_BMCR_ISOLATE; /* Don't isolate the PHY */
 
 	retval = phy_write(phy, MII_BMCR, val);
 	if (retval < 0) {

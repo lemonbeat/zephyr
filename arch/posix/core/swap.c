@@ -42,12 +42,10 @@ int arch_swap(unsigned int key)
 
 	posix_thread_status_t *ready_thread_ptr =
 		(posix_thread_status_t *)
-		_kernel.ready_q.cache->callee_saved.thread_status;
+			_kernel.ready_q.cache->callee_saved.thread_status;
 
-	posix_thread_status_t *this_thread_ptr  =
-		(posix_thread_status_t *)
-		_current->callee_saved.thread_status;
-
+	posix_thread_status_t *this_thread_ptr =
+		(posix_thread_status_t *)_current->callee_saved.thread_status;
 
 	_current = _kernel.ready_q.cache;
 #if CONFIG_TRACING
@@ -60,8 +58,7 @@ int arch_swap(unsigned int key)
 	 * to run later, and signal to whomever is allowed to run to
 	 * continue.
 	 */
-	posix_swap(ready_thread_ptr->thread_idx,
-		this_thread_ptr->thread_idx);
+	posix_swap(ready_thread_ptr->thread_idx, this_thread_ptr->thread_idx);
 
 	/* When we continue, _kernel->current points back to this thread */
 
@@ -69,8 +66,6 @@ int arch_swap(unsigned int key)
 
 	return _current->callee_saved.retval;
 }
-
-
 
 #ifdef CONFIG_ARCH_HAS_CUSTOM_SWAP_TO_MAIN
 /* This is just a version of arch_swap() in which we do not save anything
@@ -86,7 +81,7 @@ void arch_switch_to_main_thread(struct k_thread *main_thread, char *stack_ptr,
 	ARG_UNUSED(_main);
 
 	posix_thread_status_t *ready_thread_ptr =
-			(posix_thread_status_t *)
+		(posix_thread_status_t *)
 			_kernel.ready_q.cache->callee_saved.thread_status;
 
 	sys_trace_thread_switched_out();

@@ -25,9 +25,8 @@ static void tracing_backend_posix_init(void)
 	__ASSERT(out_stream != NULL, "posix backend init failed");
 }
 
-static void tracing_backend_posix_output(
-		const struct tracing_backend *backend,
-		uint8_t *data, uint32_t length)
+static void tracing_backend_posix_output(const struct tracing_backend *backend,
+					 uint8_t *data, uint32_t length)
 {
 	fwrite(data, length, 1, (FILE *)out_stream);
 
@@ -38,7 +37,7 @@ static void tracing_backend_posix_output(
 
 const struct tracing_backend_api tracing_backend_posix_api = {
 	.init = tracing_backend_posix_init,
-	.output  = tracing_backend_posix_output
+	.output = tracing_backend_posix_output
 };
 
 TRACING_BACKEND_DEFINE(tracing_backend_posix, tracing_backend_posix_api);

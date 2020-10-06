@@ -15,11 +15,8 @@
  */
 static bool sDiagMode;
 
-otError otPlatDiagProcess(otInstance *aInstance,
-			  uint8_t argc,
-			  char   *argv[],
-			  char   *aOutput,
-			  size_t  aOutputMaxLen)
+otError otPlatDiagProcess(otInstance *aInstance, uint8_t argc, char *argv[],
+			  char *aOutput, size_t aOutputMaxLen)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(aInstance);
@@ -51,8 +48,7 @@ void otPlatDiagTxPowerSet(int8_t aTxPower)
 	ARG_UNUSED(aTxPower);
 }
 
-void otPlatDiagRadioReceived(otInstance *aInstance,
-			     otRadioFrame *aFrame,
+void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame,
 			     otError aError)
 {
 	ARG_UNUSED(aInstance);

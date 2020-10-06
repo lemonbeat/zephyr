@@ -7,7 +7,7 @@
 #include <sys/crc.h>
 
 uint16_t crc16(const uint8_t *src, size_t len, uint16_t polynomial,
-	    uint16_t initial_value, bool pad)
+	       uint16_t initial_value, bool pad)
 {
 	uint16_t crc = initial_value;
 	size_t padding = pad ? sizeof(crc) : 0;
@@ -15,7 +15,6 @@ uint16_t crc16(const uint8_t *src, size_t len, uint16_t polynomial,
 
 	/* src length + padding (if required) */
 	for (i = 0; i < len + padding; i++) {
-
 		for (b = 0; b < 8; b++) {
 			uint16_t divide = crc & 0x8000UL;
 

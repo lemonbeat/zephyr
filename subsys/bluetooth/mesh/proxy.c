@@ -30,32 +30,33 @@
 #include "access.h"
 #include "proxy.h"
 
-#define PDU_TYPE(data)     (data[0] & BIT_MASK(6))
-#define PDU_SAR(data)      (data[0] >> 6)
+#define PDU_TYPE(data) (data[0] & BIT_MASK(6))
+#define PDU_SAR(data) (data[0] >> 6)
 
 /* Mesh Profile 1.0 Section 6.6:
  * "The timeout for the SAR transfer is 20 seconds. When the timeout
  *  expires, the Proxy Server shall disconnect."
  */
-#define PROXY_SAR_TIMEOUT  K_SECONDS(20)
+#define PROXY_SAR_TIMEOUT K_SECONDS(20)
 
-#define SAR_COMPLETE       0x00
-#define SAR_FIRST          0x01
-#define SAR_CONT           0x02
-#define SAR_LAST           0x03
+#define SAR_COMPLETE 0x00
+#define SAR_FIRST 0x01
+#define SAR_CONT 0x02
+#define SAR_LAST 0x03
 
-#define CFG_FILTER_SET     0x00
-#define CFG_FILTER_ADD     0x01
-#define CFG_FILTER_REMOVE  0x02
-#define CFG_FILTER_STATUS  0x03
+#define CFG_FILTER_SET 0x00
+#define CFG_FILTER_ADD 0x01
+#define CFG_FILTER_REMOVE 0x02
+#define CFG_FILTER_STATUS 0x03
 
 #define PDU_HDR(sar, type) (sar << 6 | (type & BIT_MASK(6)))
 
 #define CLIENT_BUF_SIZE 68
 
 #if defined(CONFIG_BT_MESH_DEBUG_USE_ID_ADDR)
-#define ADV_OPT (BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME | \
-		 BT_LE_ADV_OPT_USE_IDENTITY)
+#define ADV_OPT                                               \
+	(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME | \
+	 BT_LE_ADV_OPT_USE_IDENTITY)
 #else
 #define ADV_OPT (BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME)
 #endif
@@ -95,8 +96,8 @@ static struct bt_mesh_proxy_client {
 #if defined(CONFIG_BT_MESH_GATT_PROXY)
 	struct k_work send_beacons;
 #endif
-	struct k_delayed_work    sar_timer;
-	struct net_buf_simple    buf;
+	struct k_delayed_work sar_timer;
+	struct net_buf_simple buf;
 } clients[CONFIG_BT_MAX_CONN] = {
 	[0 ... (CONFIG_BT_MAX_CONN - 1)] = {
 #if defined(CONFIG_BT_MESH_GATT_PROXY)
@@ -276,8 +277,8 @@ static void proxy_cfg(struct bt_mesh_proxy_client *client)
 	uint8_t opcode;
 	int err;
 
-	err = bt_mesh_net_decode(&client->buf, BT_MESH_NET_IF_PROXY_CFG,
-				 &rx, &buf);
+	err = bt_mesh_net_decode(&client->buf, BT_MESH_NET_IF_PROXY_CFG, &rx,
+				 &buf);
 	if (err) {
 		BT_ERR("Failed to decode Proxy Configuration (err %d)", err);
 		return;
@@ -286,8 +287,8 @@ static void proxy_cfg(struct bt_mesh_proxy_client *client)
 	rx.local_match = 1U;
 
 	if (bt_mesh_rpl_check(&rx, NULL)) {
-		BT_WARN("Replay: src 0x%04x dst 0x%04x seq 0x%06x",
-			rx.ctx.addr, rx.ctx.recv_dst, rx.seq);
+		BT_WARN("Replay: src 0x%04x dst 0x%04x seq 0x%06x", rx.ctx.addr,
+			rx.ctx.recv_dst, rx.seq);
 		return;
 	}
 
@@ -461,9 +462,9 @@ static void proxy_complete_pdu(struct bt_mesh_proxy_client *client)
 
 #define ATTR_IS_PROV(attr) (attr->user_data != NULL)
 
-static ssize_t proxy_recv(struct bt_conn *conn,
-			  const struct bt_gatt_attr *attr, const void *buf,
-			  uint16_t len, uint16_t offset, uint8_t flags)
+static ssize_t proxy_recv(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+			  const void *buf, uint16_t len, uint16_t offset,
+			  uint8_t flags)
 {
 	struct bt_mesh_proxy_client *client = find_client(conn);
 	const uint8_t *data = buf;
@@ -625,7 +626,7 @@ static void prov_ccc_changed(const struct bt_gatt_attr *attr, uint16_t value)
 }
 
 static ssize_t prov_ccc_write(struct bt_conn *conn,
-			   const struct bt_gatt_attr *attr, uint16_t value)
+			      const struct bt_gatt_attr *attr, uint16_t value)
 {
 	struct bt_mesh_proxy_client *client;
 
@@ -657,14 +658,11 @@ static struct bt_gatt_attr prov_attrs[] = {
 
 	BT_GATT_CHARACTERISTIC(BT_UUID_MESH_PROV_DATA_IN,
 			       BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-			       BT_GATT_PERM_WRITE, NULL, proxy_recv,
-			       (void *)1),
+			       BT_GATT_PERM_WRITE, NULL, proxy_recv, (void *)1),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_MESH_PROV_DATA_OUT,
-			       BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_NONE,
-			       NULL, NULL, NULL),
-	BT_GATT_CCC_MANAGED(&prov_ccc,
-			    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+	BT_GATT_CHARACTERISTIC(BT_UUID_MESH_PROV_DATA_OUT, BT_GATT_CHRC_NOTIFY,
+			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
+	BT_GATT_CCC_MANAGED(&prov_ccc, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 };
 
 static struct bt_gatt_service prov_svc = BT_GATT_SERVICE(prov_attrs);
@@ -692,7 +690,6 @@ int bt_mesh_proxy_prov_enable(void)
 			clients[i].filter_type = PROV;
 		}
 	}
-
 
 	return 0;
 }
@@ -776,15 +773,11 @@ static struct bt_gatt_attr proxy_attrs[] = {
 
 	BT_GATT_CHARACTERISTIC(BT_UUID_MESH_PROXY_DATA_IN,
 			       BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-			       BT_GATT_PERM_WRITE,
-			       NULL, proxy_recv, NULL),
+			       BT_GATT_PERM_WRITE, NULL, proxy_recv, NULL),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_MESH_PROXY_DATA_OUT,
-			       BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_NONE,
-			       NULL, NULL, NULL),
-	BT_GATT_CCC_MANAGED(&proxy_ccc,
-			    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+	BT_GATT_CHARACTERISTIC(BT_UUID_MESH_PROXY_DATA_OUT, BT_GATT_CHRC_NOTIFY,
+			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
+	BT_GATT_CCC_MANAGED(&proxy_ccc, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 };
 
 static struct bt_gatt_service proxy_svc = BT_GATT_SERVICE(proxy_attrs);
@@ -948,8 +941,7 @@ static void notify_complete(struct bt_conn *conn, void *user_data)
 	}
 }
 
-static int proxy_send(struct bt_conn *conn, const void *data,
-		      uint16_t len)
+static int proxy_send(struct bt_conn *conn, const void *data, uint16_t len)
 {
 	struct bt_gatt_notify_params params = {
 		.data = data,
@@ -1050,11 +1042,11 @@ static const struct bt_data prov_ad[] = {
 
 #if defined(CONFIG_BT_MESH_GATT_PROXY)
 
-#define ID_TYPE_NET  0x00
+#define ID_TYPE_NET 0x00
 #define ID_TYPE_NODE 0x01
 
-#define NODE_ID_LEN  19
-#define NET_ID_LEN   11
+#define NODE_ID_LEN 19
+#define NET_ID_LEN 11
 
 #define NODE_ID_TIMEOUT (CONFIG_BT_MESH_NODE_ID_TIMEOUT * MSEC_PER_SEC)
 
@@ -1126,8 +1118,8 @@ static int net_id_adv(struct bt_mesh_subnet *sub)
 
 	memcpy(proxy_svc_data + 3, sub->keys[sub->kr_flag].net_id, 8);
 
-	err = bt_le_adv_start(&slow_adv_param, net_id_ad,
-			      ARRAY_SIZE(net_id_ad), NULL, 0);
+	err = bt_le_adv_start(&slow_adv_param, net_id_ad, ARRAY_SIZE(net_id_ad),
+			      NULL, 0);
 	if (err) {
 		BT_WARN("Failed to advertise using Network ID (err %d)", err);
 		return err;

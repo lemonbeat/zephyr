@@ -19,12 +19,12 @@ LOG_MODULE_REGISTER(thread_analyzer, CONFIG_THREAD_ANALYZER_LOG_LEVEL);
 
 #if IS_ENABLED(CONFIG_THREAD_ANALYZER_USE_PRINTK)
 #define THREAD_ANALYZER_PRINT(...) printk(__VA_ARGS__)
-#define THREAD_ANALYZER_FMT(str)   str "\n"
-#define THREAD_ANALYZER_VSTR(str)  (str)
+#define THREAD_ANALYZER_FMT(str) str "\n"
+#define THREAD_ANALYZER_VSTR(str) (str)
 #else
 #define THREAD_ANALYZER_PRINT(...) LOG_INF(__VA_ARGS__)
-#define THREAD_ANALYZER_FMT(str)   str
-#define THREAD_ANALYZER_VSTR(str)  log_strdup(str)
+#define THREAD_ANALYZER_FMT(str) str
+#define THREAD_ANALYZER_VSTR(str) log_strdup(str)
 #endif
 
 /* @brief Maximum length of the pointer when converted to string
@@ -105,11 +105,8 @@ void thread_analyzer_auto(void)
 	}
 }
 
-K_THREAD_DEFINE(thread_analyzer,
-		CONFIG_THREAD_ANALYZER_AUTO_STACK_SIZE,
-		thread_analyzer_auto,
-		NULL, NULL, NULL,
-		K_LOWEST_APPLICATION_THREAD_PRIO,
-		0, 0);
+K_THREAD_DEFINE(thread_analyzer, CONFIG_THREAD_ANALYZER_AUTO_STACK_SIZE,
+		thread_analyzer_auto, NULL, NULL, NULL,
+		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
 
 #endif

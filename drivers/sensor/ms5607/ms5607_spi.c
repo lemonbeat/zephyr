@@ -25,10 +25,8 @@ static struct spi_cs_control ms5607_cs_ctrl;
 
 static struct spi_config ms5607_spi_conf = {
 	.frequency = DT_INST_PROP(0, spi_max_frequency),
-	.operation = (SPI_OP_MODE_MASTER | SPI_WORD_SET(8) |
-		      SPI_MODE_CPOL | SPI_MODE_CPHA |
-		      SPI_TRANSFER_MSB |
-		      SPI_LINES_SINGLE),
+	.operation = (SPI_OP_MODE_MASTER | SPI_WORD_SET(8) | SPI_MODE_CPOL |
+		      SPI_MODE_CPHA | SPI_TRANSFER_MSB | SPI_LINES_SINGLE),
 	.slave = DT_INST_REG_ADDR(0),
 	.cs = SPI_CS,
 };
@@ -79,7 +77,6 @@ static int ms5607_spi_read_prom(const struct ms5607_data *data, uint8_t cmd,
 		uint8_t rx[3];
 	} rx;
 
-
 	const struct spi_buf rx_buf = {
 		.buf = &rx,
 		.len = 3,
@@ -95,9 +92,7 @@ static int ms5607_spi_read_prom(const struct ms5607_data *data, uint8_t cmd,
 		.count = 1,
 	};
 
-	err = spi_transceive(data->ms5607_device,
-			     &ms5607_spi_conf,
-			     &tx_buf_set,
+	err = spi_transceive(data->ms5607_device, &ms5607_spi_conf, &tx_buf_set,
 			     &rx_buf_set);
 	if (err < 0) {
 		return err;
@@ -108,8 +103,8 @@ static int ms5607_spi_read_prom(const struct ms5607_data *data, uint8_t cmd,
 	return 0;
 }
 
-
-static int ms5607_spi_start_conversion(const struct ms5607_data *data, uint8_t cmd)
+static int ms5607_spi_start_conversion(const struct ms5607_data *data,
+				       uint8_t cmd)
 {
 	return ms5607_spi_raw_cmd(data, cmd);
 }
@@ -146,9 +141,7 @@ static int ms5607_spi_read_adc(const struct ms5607_data *data, uint32_t *val)
 		.count = 1,
 	};
 
-	err = spi_transceive(data->ms5607_device,
-			     &ms5607_spi_conf,
-			     &tx_buf_set,
+	err = spi_transceive(data->ms5607_device, &ms5607_spi_conf, &tx_buf_set,
 			     &rx_buf_set);
 	if (err < 0) {
 		return err;
@@ -173,8 +166,8 @@ int ms5607_spi_init(const struct device *dev)
 	data->tf = &ms5607_spi_transfer_function;
 
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	ms5607_cs_ctrl.gpio_dev = device_get_binding(
-		DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
+	ms5607_cs_ctrl.gpio_dev =
+		device_get_binding(DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
 	if (!ms5607_cs_ctrl.gpio_dev) {
 		LOG_ERR("Unable to get GPIO SPI CS device");
 		return -ENODEV;

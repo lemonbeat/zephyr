@@ -43,7 +43,7 @@ static void put(struct log_backend const *const backend, struct log_msg *msg)
 
 	if (cb->check_domain_id) {
 		zassert_equal(log_msg_domain_id_get(msg), CONFIG_LOG_DOMAIN_ID,
-				"Unexpected domain id");
+			      "Unexpected domain id");
 	}
 
 	if (cb->check_timestamp) {
@@ -64,8 +64,8 @@ static void put(struct log_backend const *const backend, struct log_msg *msg)
 }
 
 static void sync_string(const struct log_backend *const backend,
-		     struct log_msg_ids src_level, uint32_t timestamp,
-		     const char *fmt, va_list ap)
+			struct log_msg_ids src_level, uint32_t timestamp,
+			const char *fmt, va_list ap)
 {
 	struct backend_cb *cb = (struct backend_cb *)backend->cb->ctx;
 
@@ -86,10 +86,10 @@ static void sync_hexdump(const struct log_backend *const backend,
 
 const struct log_backend_api log_backend_test_api = {
 	.put = put,
-	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_string : NULL,
-	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_hexdump : NULL,
+	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_string :
+								    NULL,
+	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_hexdump :
+								     NULL,
 };
 
 LOG_BACKEND_DEFINE(backend1, log_backend_test_api, false);
@@ -181,8 +181,9 @@ static void test_log_sync(void)
 		LOG_INF("Log immediately");
 
 		/* log immediately, no log_process needed */
-		zassert_equal(2, backend1_cb.sync,
-			      "Unexpected amount of messages received by the backend.");
+		zassert_equal(
+			2, backend1_cb.sync,
+			"Unexpected amount of messages received by the backend.");
 	} else {
 		ztest_test_skip();
 	}
@@ -302,8 +303,7 @@ static void test_log_timestamping(void)
 	while (log_test_process(false)) {
 	}
 
-	zassert_equal(3,
-		      backend1_cb.counter,
+	zassert_equal(3, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
 }
 
@@ -363,7 +363,6 @@ static void test_log_thread(void)
 	k_sleep(K_MSEC(2000));
 	zassert_equal(3, backend1_cb.counter,
 		      "Unexpected amount of messages received by the backend.");
-
 }
 #else
 static void test_log_thread(void)
@@ -389,8 +388,7 @@ void test_main(void)
 #ifdef CONFIG_LOG_PROCESS_THREAD
 	k_thread_foreach(promote_log_thread, NULL);
 #endif
-	ztest_test_suite(test_log_list,
-			 ztest_unit_test(test_multiple_backends),
+	ztest_test_suite(test_log_list, ztest_unit_test(test_multiple_backends),
 			 ztest_unit_test(test_log_domain_id),
 			 ztest_unit_test(test_log_severity),
 			 ztest_unit_test(test_log_timestamping),

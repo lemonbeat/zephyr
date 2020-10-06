@@ -15,7 +15,7 @@
  * specify a channel classification for the data, secondary advertising,
  * periodic, and isochronous physical channels based on its local information.
  */
-static uint8_t map[5] = {0xFF, 0xFF, 0xFF, 0xFF, 0x1F};
+static uint8_t map[5] = { 0xFF, 0xFF, 0xFF, 0xFF, 0x1F };
 static uint8_t count = 37U;
 
 int ull_chan_reset(void)

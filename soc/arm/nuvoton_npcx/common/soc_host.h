@@ -25,7 +25,7 @@ extern "C" {
  * @retval -EIO if cannot turn on host sub-module source clocks in core domain.
  */
 int soc_host_init_subs_core_domain(const struct device *host_bus_dev,
-							sys_slist_t *callbacks);
+				   sys_slist_t *callbacks);
 
 /**
  * @brief Initializes all host sub-modules in Host domain.
@@ -49,8 +49,7 @@ void soc_host_init_subs_host_domain(void);
  * @retval -ENOTSUP if eSPI peripheral is off or not supported.
  * @retval -EINVAL for unimplemented lpc opcode, but in range.
  */
-int soc_host_periph_read_request(enum lpc_peripheral_opcode op,
-								uint32_t *data);
+int soc_host_periph_read_request(enum lpc_peripheral_opcode op, uint32_t *data);
 
 /**
  * @brief Writes data to a host sub-module which generates an eSPI transaction.
@@ -66,7 +65,7 @@ int soc_host_periph_read_request(enum lpc_peripheral_opcode op,
  * @retval -EINVAL for unimplemented lpc opcode, but in range.
  */
 int soc_host_periph_write_request(enum lpc_peripheral_opcode op,
-								uint32_t *data);
+				  uint32_t *data);
 
 #ifdef __cplusplus
 }

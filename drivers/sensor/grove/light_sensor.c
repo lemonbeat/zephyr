@@ -26,7 +26,6 @@ LOG_MODULE_REGISTER(grove_light, CONFIG_SENSOR_LOG_LEVEL);
 #define GROVE_RESOLUTION 12
 #endif
 
-
 struct gls_data {
 	const struct device *adc;
 	struct adc_channel_cfg ch_cfg;
@@ -47,16 +46,14 @@ static struct adc_sequence adc_table = {
 	.options = &options,
 };
 
-static int gls_sample_fetch(const struct device *dev,
-			    enum sensor_channel chan)
+static int gls_sample_fetch(const struct device *dev, enum sensor_channel chan)
 {
 	struct gls_data *drv_data = dev->data;
 
 	return adc_read(drv_data->adc, &adc_table);
 }
 
-static int gls_channel_get(const struct device *dev,
-			   enum sensor_channel chan,
+static int gls_channel_get(const struct device *dev, enum sensor_channel chan,
 			   struct sensor_value *val)
 {
 	struct gls_data *drv_data = dev->data;
@@ -68,8 +65,9 @@ static int gls_channel_get(const struct device *dev,
 	 * the UPM project:
 	 * https://github.com/intel-iot-devkit/upm/blob/master/src/grove/grove.cxx#L161
 	 */
-	ldr_val = (BIT(GROVE_RESOLUTION) - 1.0 - analog_val) * 10.0 / analog_val;
-	dval = 10000.0 / pow(ldr_val * 15.0, 4.0/3.0);
+	ldr_val =
+		(BIT(GROVE_RESOLUTION) - 1.0 - analog_val) * 10.0 / analog_val;
+	dval = 10000.0 / pow(ldr_val * 15.0, 4.0 / 3.0);
 
 	val->val1 = (int32_t)dval;
 	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
@@ -101,7 +99,8 @@ static int gls_init(const struct device *dev)
 		.acquisition_time = ADC_ACQ_TIME_DEFAULT,
 		.channel_id = cfg->adc_channel,
 #ifdef CONFIG_ADC_NRFX_SAADC
-		.input_positive = SAADC_CH_PSELP_PSELP_AnalogInput0 + cfg->adc_channel,
+		.input_positive =
+			SAADC_CH_PSELP_PSELP_AnalogInput0 + cfg->adc_channel,
 #endif
 	};
 	adc_table.buffer = &drv_data->raw;
@@ -120,6 +119,5 @@ static const struct gls_config gls_cfg = {
 	.adc_channel = DT_INST_IO_CHANNELS_INPUT(0),
 };
 
-DEVICE_AND_API_INIT(gls_dev, DT_INST_LABEL(0), &gls_init,
-		&gls_data, &gls_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
-		&gls_api);
+DEVICE_AND_API_INIT(gls_dev, DT_INST_LABEL(0), &gls_init, &gls_data, &gls_cfg,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &gls_api);

@@ -45,8 +45,8 @@ int pcie_ep_xfer_data_memcpy(const struct device *dev, uint64_t pcie_addr,
 	int mapped_size, ret;
 	uint32_t xfer_size, unmapped_size;
 
-	mapped_size = pcie_ep_map_addr(dev, pcie_addr, &mapped_addr,
-				       size, ob_mem_type);
+	mapped_size = pcie_ep_map_addr(dev, pcie_addr, &mapped_addr, size,
+				       ob_mem_type);
 
 	/* Check if outbound memory mapping succeeded */
 	if (mapped_size < 0) {
@@ -81,9 +81,8 @@ int pcie_ep_xfer_data_memcpy(const struct device *dev, uint64_t pcie_addr,
 	xfer_size = mapped_size; /* save already tranferred data size */
 
 	unmapped_size = size - mapped_size;
-	mapped_size = pcie_ep_map_addr(dev, pcie_addr + xfer_size,
-				       &mapped_addr, unmapped_size,
-				       ob_mem_type);
+	mapped_size = pcie_ep_map_addr(dev, pcie_addr + xfer_size, &mapped_addr,
+				       unmapped_size, ob_mem_type);
 
 	/* Check if outbound memory mapping succeeded */
 	if (mapped_size < 0) {

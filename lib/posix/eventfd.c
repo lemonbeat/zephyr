@@ -22,8 +22,7 @@ struct eventfd {
 K_MUTEX_DEFINE(eventfd_mtx);
 static struct eventfd efds[CONFIG_EVENTFD_MAX];
 
-static int eventfd_poll_prepare(struct eventfd *efd,
-				struct zsock_pollfd *pfd,
+static int eventfd_poll_prepare(struct eventfd *efd, struct zsock_pollfd *pfd,
 				struct k_poll_event **pev,
 				struct k_poll_event *pev_end)
 {
@@ -56,8 +55,7 @@ static int eventfd_poll_prepare(struct eventfd *efd,
 	return 0;
 }
 
-static int eventfd_poll_update(struct eventfd *efd,
-			       struct zsock_pollfd *pfd,
+static int eventfd_poll_update(struct eventfd *efd, struct zsock_pollfd *pfd,
 			       struct k_poll_event **pev)
 {
 	ARG_UNUSED(efd);

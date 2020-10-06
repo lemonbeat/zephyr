@@ -8,7 +8,7 @@
  */
 
 #include <sys/printk.h>
-#define  MBEDTLS_PRINT (int(*)(const char *, ...)) printk
+#define MBEDTLS_PRINT (int (*)(const char *, ...)) printk
 
 #include <string.h>
 #include <stdio.h>
@@ -61,9 +61,9 @@
 #else
 #include <stdio.h>
 #include <stdlib.h>
-#define mbedtls_printf     printf
-#define mbedtls_snprintf   snprintf
-#define mbedtls_exit       exit
+#define mbedtls_printf printf
+#define mbedtls_snprintf snprintf
+#define mbedtls_exit exit
 #define MBEDTLS_EXIT_SUCCESS EXIT_SUCCESS
 #define MBEDTLS_EXIT_FAILURE EXIT_FAILURE
 #endif
@@ -93,12 +93,12 @@ static int test_snprintf(size_t n, const char ref_buf[10], int ref_ret)
 	const char ref[10] = "xxxxxxxxx";
 
 	ret = mbedtls_snprintf(buf, n, "%s", "123");
-	if (ret < 0 || (size_t) ret >= n) {
+	if (ret < 0 || (size_t)ret >= n) {
 		ret = -1;
 	}
 
-	if (strncmp(ref_buf, buf, sizeof(buf)) != 0 ||
-	    ref_ret != ret || memcmp(buf + n, ref + n, sizeof(buf) - n) != 0) {
+	if (strncmp(ref_buf, buf, sizeof(buf)) != 0 || ref_ret != ret ||
+	    memcmp(buf + n, ref + n, sizeof(buf) - n) != 0) {
 		return 1;
 	}
 
@@ -128,7 +128,7 @@ static void create_entropy_seed_file(void)
 	size_t output_len = 0;
 	unsigned char seed_value[MBEDTLS_ENTROPY_BLOCK_SIZE];
 
-/* Attempt to read the entropy seed file. If this fails - attempt to write
+	/* Attempt to read the entropy seed file. If this fails - attempt to write
  * to the file to ensure one is present.
  */
 	result = mbedtls_platform_std_nv_seed_read(seed_value,
@@ -137,10 +137,8 @@ static void create_entropy_seed_file(void)
 		return;
 	}
 
-	result = mbedtls_platform_entropy_poll(NULL,
-					       seed_value,
-					       MBEDTLS_ENTROPY_BLOCK_SIZE,
-					       &output_len);
+	result = mbedtls_platform_entropy_poll(
+		NULL, seed_value, MBEDTLS_ENTROPY_BLOCK_SIZE, &output_len);
 	if (result != 0) {
 		return;
 	}
@@ -170,7 +168,7 @@ void test_mbedtls(void)
 
 	TC_START("Performing mbedTLS crypto tests:");
 
-/*
+	/*
  * The C standard doesn't guarantee that all-bits-0 is the representation
  * of a NULL pointer. We do however use that in our code for initializing
  * structures, which should work on every modern platform. Let's be sure.
@@ -378,15 +376,15 @@ void test_mbedtls(void)
 	suites_tested++;
 #endif
 
-#if defined(MBEDTLS_CMAC_C) \
-	&& (defined(MBEDTLS_AES_C) || defined(MBEDTLS_DES_C))
+#if defined(MBEDTLS_CMAC_C) && \
+	(defined(MBEDTLS_AES_C) || defined(MBEDTLS_DES_C))
 	if (mbedtls_cmac_self_test(v) != 0) {
 		suites_failed++;
 	}
 	suites_tested++;
 #endif
 
-/* Slow tests last */
+	/* Slow tests last */
 
 #if defined(MBEDTLS_TIMING_C)
 	if (mbedtls_timing_self_test(v) != 0) {
@@ -422,10 +420,10 @@ void test_mbedtls(void)
 		} else {
 			mbedtls_printf("  [ All tests PASS ]\n\n");
 		}
-		zassert_not_equal(suites_tested, 0,
-			      "ran %d tests", suites_tested);
-		zassert_equal(suites_failed, 0,
-			      "%d tests failed", suites_failed);
+		zassert_not_equal(suites_tested, 0, "ran %d tests",
+				  suites_tested);
+		zassert_equal(suites_failed, 0, "%d tests failed",
+			      suites_failed);
 
 #if defined(_WIN32)
 		mbedtls_printf("  Press Enter to exit this program.\n");
@@ -433,5 +431,4 @@ void test_mbedtls(void)
 		getchar();
 #endif
 	}
-
 }

@@ -15,7 +15,8 @@
 
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
 
-static ALWAYS_INLINE void benchmark_begin(uint32_t *irq_key, uint32_t *timestamp)
+static ALWAYS_INLINE void benchmark_begin(uint32_t *irq_key,
+					  uint32_t *timestamp)
 {
 	ARG_UNUSED(timestamp);
 
@@ -27,7 +28,8 @@ static ALWAYS_INLINE void benchmark_begin(uint32_t *irq_key, uint32_t *timestamp
 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
-static ALWAYS_INLINE uint32_t benchmark_end(uint32_t irq_key, uint32_t timestamp)
+static ALWAYS_INLINE uint32_t benchmark_end(uint32_t irq_key,
+					    uint32_t timestamp)
 {
 	/* Stop DWT cycle counter */
 	DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;
@@ -39,12 +41,13 @@ static ALWAYS_INLINE uint32_t benchmark_end(uint32_t irq_key, uint32_t timestamp
 	return DWT->CYCCNT;
 }
 
-#define BENCHMARK_TYPE		"Processor Cycles"
+#define BENCHMARK_TYPE "Processor Cycles"
 
 #else
 /* Use system timer clock on other systems */
 
-static ALWAYS_INLINE void benchmark_begin(uint32_t *irq_key, uint32_t *timestamp)
+static ALWAYS_INLINE void benchmark_begin(uint32_t *irq_key,
+					  uint32_t *timestamp)
 {
 	volatile uint32_t now;
 
@@ -58,7 +61,8 @@ static ALWAYS_INLINE void benchmark_begin(uint32_t *irq_key, uint32_t *timestamp
 	*timestamp = now;
 }
 
-static ALWAYS_INLINE uint32_t benchmark_end(uint32_t irq_key, uint32_t timestamp)
+static ALWAYS_INLINE uint32_t benchmark_end(uint32_t irq_key,
+					    uint32_t timestamp)
 {
 	volatile uint32_t now;
 
@@ -72,7 +76,7 @@ static ALWAYS_INLINE uint32_t benchmark_end(uint32_t irq_key, uint32_t timestamp
 	return now - timestamp;
 }
 
-#define BENCHMARK_TYPE		"System Timer Cycles"
+#define BENCHMARK_TYPE "System Timer Cycles"
 
 #endif
 

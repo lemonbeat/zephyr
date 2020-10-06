@@ -58,21 +58,20 @@ static int configure_mock(const struct device *dev,
 			  const struct ieee802154_config *config);
 
 /* mocks */
-static struct ieee802154_radio_api rapi = {
-	.get_capabilities = get_capabilities,
-	.cca = cca_mock,
-	.set_channel = set_channel_mock,
-	.filter = filter_mock,
-	.set_txpower = set_txpower_mock,
-	.tx = tx_mock,
-	.start = start_mock,
-	.stop = stop_mock,
-	.configure = configure_mock,
+static struct ieee802154_radio_api rapi = { .get_capabilities =
+						    get_capabilities,
+					    .cca = cca_mock,
+					    .set_channel = set_channel_mock,
+					    .filter = filter_mock,
+					    .set_txpower = set_txpower_mock,
+					    .tx = tx_mock,
+					    .start = start_mock,
+					    .stop = stop_mock,
+					    .configure = configure_mock,
 #ifdef CONFIG_NET_L2_IEEE802154_SUB_GHZ
-	.get_subg_channel_count = NULL,
+					    .get_subg_channel_count = NULL,
 #endif /* CONFIG_NET_L2_IEEE802154_SUB_GHZ */
-	.ed_scan = scan_mock
-};
+					    .ed_scan = scan_mock };
 
 static struct device radio = { .api = &rapi };
 
@@ -153,7 +152,8 @@ static enum ieee802154_hw_caps get_capabilities(const struct device *dev)
 	       IEEE802154_HW_ENERGY_SCAN | IEEE802154_HW_SLEEP_TO_TX;
 }
 
-static enum ieee802154_hw_caps get_capabilities_caps_mock(const struct device *dev)
+static enum ieee802154_hw_caps
+get_capabilities_caps_mock(const struct device *dev)
 {
 	zassert_equal(dev, &radio, "Device handle incorrect.");
 
@@ -519,7 +519,8 @@ static void test_sensitivity_test(void)
 }
 
 static void set_expected_match_values(enum ieee802154_config_type type,
-				      uint8_t *addr, bool extended, bool enabled)
+				      uint8_t *addr, bool extended,
+				      bool enabled)
 {
 	ztest_expect_value(configure_match_mock, type, type);
 	switch (type) {
@@ -687,11 +688,11 @@ static void test_get_caps_test(void)
 			IEEE802154_HW_2_4_GHZ | IEEE802154_HW_TX_RX_ACK |
 			IEEE802154_HW_SUB_GHZ | IEEE802154_HW_ENERGY_SCAN |
 			IEEE802154_HW_TXTIME | IEEE802154_HW_SLEEP_TO_TX);
-	zassert_equal(
-		otPlatRadioGetCaps(ot),
-		OT_RADIO_CAPS_CSMA_BACKOFF | OT_RADIO_CAPS_ENERGY_SCAN |
-			OT_RADIO_CAPS_ACK_TIMEOUT | OT_RADIO_CAPS_SLEEP_TO_TX,
-		"Incorrect capabilities returned.");
+	zassert_equal(otPlatRadioGetCaps(ot),
+		      OT_RADIO_CAPS_CSMA_BACKOFF | OT_RADIO_CAPS_ENERGY_SCAN |
+			      OT_RADIO_CAPS_ACK_TIMEOUT |
+			      OT_RADIO_CAPS_SLEEP_TO_TX,
+		      "Incorrect capabilities returned.");
 
 	rapi.get_capabilities = get_capabilities;
 }
@@ -787,7 +788,6 @@ static void test_address_test(void)
 	ztest_expect_data(filter_mock, filter->ieee_addr, ieee_addr.m8);
 	otPlatRadioSetExtendedAddress(ot, &ieee_addr);
 }
-
 
 uint8_t alloc_pkt(struct net_pkt **out_packet, uint8_t buf_ct, uint8_t offset)
 {
@@ -940,7 +940,6 @@ static void test_net_pkt_transmit(void)
 	/* Do not expect free in case of failure in send */
 
 	platformRadioProcess(ot);
-
 }
 
 void test_main(void)
@@ -948,20 +947,19 @@ void test_main(void)
 	platformRadioInit();
 
 	ztest_test_suite(openthread_radio,
-		ztest_unit_test(test_energy_scan_immediate_test),
-		ztest_unit_test(test_energy_scan_delayed_test),
-		ztest_unit_test(test_tx_test),
-		ztest_unit_test(test_tx_power_test),
-		ztest_unit_test(test_sensitivity_test),
-		ztest_unit_test(test_source_match_test),
-		ztest_unit_test(test_promiscuous_mode_set_test),
-		ztest_unit_test(test_get_caps_test),
-		ztest_unit_test(test_get_rssi_test),
-		ztest_unit_test(test_radio_state_test),
-		ztest_unit_test(test_address_test),
-		ztest_unit_test(test_receive_test),
-		ztest_unit_test(test_net_pkt_transmit));
-
+			 ztest_unit_test(test_energy_scan_immediate_test),
+			 ztest_unit_test(test_energy_scan_delayed_test),
+			 ztest_unit_test(test_tx_test),
+			 ztest_unit_test(test_tx_power_test),
+			 ztest_unit_test(test_sensitivity_test),
+			 ztest_unit_test(test_source_match_test),
+			 ztest_unit_test(test_promiscuous_mode_set_test),
+			 ztest_unit_test(test_get_caps_test),
+			 ztest_unit_test(test_get_rssi_test),
+			 ztest_unit_test(test_radio_state_test),
+			 ztest_unit_test(test_address_test),
+			 ztest_unit_test(test_receive_test),
+			 ztest_unit_test(test_net_pkt_transmit));
 
 	ztest_run_test_suite(openthread_radio);
 }

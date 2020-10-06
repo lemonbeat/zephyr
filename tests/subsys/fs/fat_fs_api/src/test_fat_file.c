@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include "test_fat.h"
 #include <string.h>
 
@@ -178,7 +177,7 @@ static int test_file_truncate(void)
 
 	fs_seek(&filep, 0, FS_SEEK_END);
 	TC_PRINT("File size after shrinking by 5 bytes = %ld\n",
-						fs_tell(&filep));
+		 fs_tell(&filep));
 	if (fs_tell(&filep) != (orig_pos - 5)) {
 		TC_PRINT("File size after fs_truncate not as expected\n");
 		fs_close(&filep);
@@ -198,7 +197,7 @@ static int test_file_truncate(void)
 
 	fs_seek(&filep, 0, FS_SEEK_END);
 	TC_PRINT("File size after expanding by 10 bytes = %ld\n",
-						fs_tell(&filep));
+		 fs_tell(&filep));
 	if (fs_tell(&filep) != (orig_pos + 10)) {
 		TC_PRINT("File size after fs_truncate not as expected\n");
 		fs_close(&filep);

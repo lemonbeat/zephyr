@@ -38,10 +38,8 @@ struct gpio_sam0_data {
 #endif
 };
 
-#define DEV_CFG(dev) \
-	((const struct gpio_sam0_config *const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct gpio_sam0_data *const)(dev)->data)
+#define DEV_CFG(dev) ((const struct gpio_sam0_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct gpio_sam0_data *const)(dev)->data)
 
 #ifdef CONFIG_SAM0_EIC
 static void gpio_sam0_isr(uint32_t pins, void *arg)
@@ -98,8 +96,7 @@ static int gpio_sam0_config(const struct device *dev, gpio_pin_t pin,
 
 	/* Preserve debounce flag for interrupt configuration. */
 	WRITE_BIT(DEV_DATA(dev)->debounce, pin,
-		  ((flags & GPIO_INT_DEBOUNCE) != 0)
-		  && (pincfg.bit.INEN != 0));
+		  ((flags & GPIO_INT_DEBOUNCE) != 0) && (pincfg.bit.INEN != 0));
 
 	/* Write the now-built pin configuration */
 	regs->PINCFG[pin] = pincfg;
@@ -198,8 +195,8 @@ static int gpio_sam0_pin_interrupt_configure(const struct device *dev,
 		 * as an output, so interrupts are only supported if
 		 * the pin is configured as input-only.
 		 */
-		if ((pincfg.bit.INEN == 0)
-		    || ((regs->DIR.reg & BIT(pin)) != 0)) {
+		if ((pincfg.bit.INEN == 0) ||
+		    ((regs->DIR.reg & BIT(pin)) != 0)) {
 			rc = -ENOTSUP;
 			break;
 		}
@@ -214,14 +211,14 @@ static int gpio_sam0_pin_interrupt_configure(const struct device *dev,
 
 		switch (trig) {
 		case GPIO_INT_TRIG_LOW:
-			trigger = (mode == GPIO_INT_MODE_LEVEL)
-				? SAM0_EIC_LOW
-				: SAM0_EIC_FALLING;
+			trigger = (mode == GPIO_INT_MODE_LEVEL) ?
+						SAM0_EIC_LOW :
+						SAM0_EIC_FALLING;
 			break;
 		case GPIO_INT_TRIG_HIGH:
-			trigger = (mode == GPIO_INT_MODE_LEVEL)
-				? SAM0_EIC_HIGH
-				: SAM0_EIC_RISING;
+			trigger = (mode == GPIO_INT_MODE_LEVEL) ?
+						SAM0_EIC_HIGH :
+						SAM0_EIC_RISING;
 			break;
 		case GPIO_INT_TRIG_BOTH:
 			trigger = SAM0_EIC_BOTH;
@@ -233,7 +230,8 @@ static int gpio_sam0_pin_interrupt_configure(const struct device *dev,
 
 		if (rc == 0) {
 			rc = sam0_eic_acquire(config->id, pin, trigger,
-					      (DEV_DATA(dev)->debounce & BIT(pin)) != 0,
+					      (DEV_DATA(dev)->debounce &
+					       BIT(pin)) != 0,
 					      gpio_sam0_isr, data);
 		}
 		if (rc == 0) {
@@ -253,7 +251,6 @@ static int gpio_sam0_pin_interrupt_configure(const struct device *dev,
 
 	return rc;
 }
-
 
 static int gpio_sam0_manage_callback(const struct device *dev,
 				     struct gpio_callback *callback, bool set)
@@ -286,7 +283,10 @@ static const struct gpio_driver_api gpio_sam0_api = {
 #endif
 };
 
-static int gpio_sam0_init(const struct device *dev) { return 0; }
+static int gpio_sam0_init(const struct device *dev)
+{
+	return 0;
+}
 
 /* Port A */
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(porta), okay)
@@ -303,10 +303,9 @@ static const struct gpio_sam0_config gpio_sam0_config_0 = {
 
 static struct gpio_sam0_data gpio_sam0_data_0;
 
-DEVICE_AND_API_INIT(gpio_sam0_0, DT_LABEL(DT_NODELABEL(porta)),
-		    gpio_sam0_init, &gpio_sam0_data_0, &gpio_sam0_config_0,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &gpio_sam0_api);
+DEVICE_AND_API_INIT(gpio_sam0_0, DT_LABEL(DT_NODELABEL(porta)), gpio_sam0_init,
+		    &gpio_sam0_data_0, &gpio_sam0_config_0, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &gpio_sam0_api);
 #endif
 
 /* Port B */
@@ -324,10 +323,9 @@ static const struct gpio_sam0_config gpio_sam0_config_1 = {
 
 static struct gpio_sam0_data gpio_sam0_data_1;
 
-DEVICE_AND_API_INIT(gpio_sam0_1, DT_LABEL(DT_NODELABEL(portb)),
-		    gpio_sam0_init, &gpio_sam0_data_1, &gpio_sam0_config_1,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &gpio_sam0_api);
+DEVICE_AND_API_INIT(gpio_sam0_1, DT_LABEL(DT_NODELABEL(portb)), gpio_sam0_init,
+		    &gpio_sam0_data_1, &gpio_sam0_config_1, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &gpio_sam0_api);
 #endif
 
 /* Port C */
@@ -345,10 +343,9 @@ static const struct gpio_sam0_config gpio_sam0_config_2 = {
 
 static struct gpio_sam0_data gpio_sam0_data_2;
 
-DEVICE_AND_API_INIT(gpio_sam0_2, DT_LABEL(DT_NODELABEL(portc)),
-		    gpio_sam0_init, &gpio_sam0_data_2, &gpio_sam0_config_2,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &gpio_sam0_api);
+DEVICE_AND_API_INIT(gpio_sam0_2, DT_LABEL(DT_NODELABEL(portc)), gpio_sam0_init,
+		    &gpio_sam0_data_2, &gpio_sam0_config_2, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &gpio_sam0_api);
 #endif
 
 /* Port D */
@@ -366,8 +363,7 @@ static const struct gpio_sam0_config gpio_sam0_config_3 = {
 
 static struct gpio_sam0_data gpio_sam0_data_3;
 
-DEVICE_AND_API_INIT(gpio_sam0_3, DT_LABEL(DT_NODELABEL(portd)),
-		    gpio_sam0_init, &gpio_sam0_data_3, &gpio_sam0_config_3,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &gpio_sam0_api);
+DEVICE_AND_API_INIT(gpio_sam0_3, DT_LABEL(DT_NODELABEL(portd)), gpio_sam0_init,
+		    &gpio_sam0_data_3, &gpio_sam0_config_3, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &gpio_sam0_api);
 #endif

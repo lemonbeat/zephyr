@@ -38,13 +38,13 @@ static inline int z_impl_z_clock_hw_cycles_per_sec_runtime_get(void)
 #endif /* CONFIG_TIMER_READS_ITS_FREQUENCY_AT_RUNTIME */
 
 #if defined(__cplusplus) && __cplusplus >= 201402L
-  #if defined(CONFIG_TIMER_READS_ITS_FREQUENCY_AT_RUNTIME)
-    #define TIME_CONSTEXPR
-  #else
-    #define TIME_CONSTEXPR constexpr
-  #endif
+#if defined(CONFIG_TIMER_READS_ITS_FREQUENCY_AT_RUNTIME)
+#define TIME_CONSTEXPR
 #else
-  #define TIME_CONSTEXPR
+#define TIME_CONSTEXPR constexpr
+#endif
+#else
+#define TIME_CONSTEXPR
 #endif
 
 static TIME_CONSTEXPR inline int sys_clock_hw_cycles_per_sec(void)
@@ -75,15 +75,14 @@ static TIME_CONSTEXPR inline int sys_clock_hw_cycles_per_sec(void)
  *    round_off - Return the nearest value to the resulting fraction
  *                (pass both round_up/off as false to get "round_down")
  */
-static TIME_CONSTEXPR ALWAYS_INLINE uint64_t z_tmcvt(uint64_t t, uint32_t from_hz,
-						  uint32_t to_hz, bool const_hz,
-						  bool result32, bool round_up,
-						  bool round_off)
+static TIME_CONSTEXPR ALWAYS_INLINE uint64_t
+z_tmcvt(uint64_t t, uint32_t from_hz, uint32_t to_hz, bool const_hz,
+	bool result32, bool round_up, bool round_off)
 {
-	bool mul_ratio = const_hz &&
-		(to_hz > from_hz) && ((to_hz % from_hz) == 0U);
-	bool div_ratio = const_hz &&
-		(from_hz > to_hz) && ((from_hz % to_hz) == 0U);
+	bool mul_ratio = const_hz && (to_hz > from_hz) &&
+			 ((to_hz % from_hz) == 0U);
+	bool div_ratio = const_hz && (from_hz > to_hz) &&
+			 ((from_hz % to_hz) == 0U);
 
 	if (from_hz == to_hz) {
 		return result32 ? ((uint32_t)t) : t;

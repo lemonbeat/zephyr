@@ -29,7 +29,6 @@ extern "C" {
 #define _ARC_V2_AUX_IRQ_CTRL_16_REGS 8
 #define _ARC_V2_AUX_IRQ_CTRL_32_REGS 16
 
-
 #ifdef CONFIG_ARC_SECURE_FIRMWARE
 #define _ARC_V2_DEF_IRQ_LEVEL (ARC_N_IRQ_START_LEVEL - 1)
 #else
@@ -53,14 +52,14 @@ extern "C" {
  */
 static ALWAYS_INLINE void z_irq_setup(void)
 {
-	uint32_t aux_irq_ctrl_value = (
-		_ARC_V2_AUX_IRQ_CTRL_LOOP_REGS | /* save lp_xxx registers */
+	uint32_t aux_irq_ctrl_value =
+		(_ARC_V2_AUX_IRQ_CTRL_LOOP_REGS | /* save lp_xxx registers */
 #ifdef CONFIG_CODE_DENSITY
-		_ARC_V2_AUX_IRQ_CTRL_LP | /* save code density registers */
+		 _ARC_V2_AUX_IRQ_CTRL_LP | /* save code density registers */
 #endif
-		_ARC_V2_AUX_IRQ_CTRL_BLINK     | /* save blink */
-		_ARC_V2_AUX_IRQ_CTRL_14_REGS     /* save r0 -> r13 (caller-saved) */
-	);
+		 _ARC_V2_AUX_IRQ_CTRL_BLINK | /* save blink */
+		 _ARC_V2_AUX_IRQ_CTRL_14_REGS /* save r0 -> r13 (caller-saved) */
+		);
 
 	z_arc_cpu_sleep_mode = _ARC_V2_WAKE_IRQ_LEVEL;
 

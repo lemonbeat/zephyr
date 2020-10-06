@@ -30,8 +30,9 @@ typedef int (*transport_write_msg_handler_t)(struct mqtt_client *client,
 					     const struct msghdr *message);
 
 /**@brief Transport read handler. */
-typedef int (*transport_read_handler_t)(struct mqtt_client *client, uint8_t *data,
-					uint32_t buflen, bool shall_block);
+typedef int (*transport_read_handler_t)(struct mqtt_client *client,
+					uint8_t *data, uint32_t buflen,
+					bool shall_block);
 
 /**@brief Transport disconnect handler. */
 typedef int (*transport_disconnect_handler_t)(struct mqtt_client *client);
@@ -104,8 +105,8 @@ int mqtt_transport_write_msg(struct mqtt_client *client,
  * @retval Number of bytes read or an error code indicating reason for failure.
  *         0 if connection was closed.
  */
-int mqtt_transport_read(struct mqtt_client *client, uint8_t *data, uint32_t buflen,
-			bool shall_block);
+int mqtt_transport_read(struct mqtt_client *client, uint8_t *data,
+			uint32_t buflen, bool shall_block);
 
 /**@brief Handles transport disconnection requests on configured transport.
  *

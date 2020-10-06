@@ -64,7 +64,6 @@ static inline void Cy_SysClk_ClkHf0Init(void)
 	Cy_SysClk_ClkHfSetSource(0u, CY_SYSCLK_CLKHF_IN_CLKPATH0);
 	Cy_SysClk_ClkHfSetDivider(0u, CY_SYSCLK_CLKHF_NO_DIVIDE);
 	Cy_SysClk_ClkHfEnable(0u);
-
 }
 static inline void Cy_SysClk_IloInit(void)
 {
@@ -103,7 +102,6 @@ static inline void Cy_SysClk_ClkSlowInit(void)
 {
 	Cy_SysClk_ClkSlowSetDivider(0u);
 }
-
 
 static void init_cycfg_platform(void)
 {
@@ -347,7 +345,7 @@ static void init_cycfg_platform(void)
 	/* Set accurate flash wait states */
 #if (defined(CY_CFG_PWR_ENABLED) && defined(CY_CFG_SYSCLK_CLKHF0_ENABLED))
 	Cy_SysLib_SetWaitStates(CY_CFG_PWR_USING_ULP != 0,
-		CY_CFG_SYSCLK_CLKHF0_FREQ_MHZ);
+				CY_CFG_SYSCLK_CLKHF0_FREQ_MHZ);
 #endif
 }
 

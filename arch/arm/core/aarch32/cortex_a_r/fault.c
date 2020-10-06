@@ -10,7 +10,7 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(os);
 
-#define FAULT_DUMP_VERBOSE	(CONFIG_FAULT_DUMP == 2)
+#define FAULT_DUMP_VERBOSE (CONFIG_FAULT_DUMP == 2)
 
 #if FAULT_DUMP_VERBOSE
 static const char *get_dbgdscr_moe_string(uint32_t moe)

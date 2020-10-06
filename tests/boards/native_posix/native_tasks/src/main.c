@@ -20,7 +20,7 @@ static void test_check(int hook)
 {
 	static int call_nbr;
 	static int failed;
-	static int expected_order[8] = {1, 2, 3, 8, 6, 5, 4, 7};
+	static int expected_order[8] = { 1, 2, 3, 8, 6, 5, 4, 7 };
 
 	if (failed) {
 		return;
@@ -38,10 +38,10 @@ static void test_check(int hook)
 	}
 }
 
-#define TEST_HOOK(n)			\
-	static void test_hook##n(void)	\
-	{				\
-		test_check(n);	\
+#define TEST_HOOK(n)                   \
+	static void test_hook##n(void) \
+	{                              \
+		test_check(n);         \
 	}
 
 TEST_HOOK(1);

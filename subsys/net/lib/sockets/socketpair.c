@@ -20,7 +20,7 @@ LOG_MODULE_REGISTER(net_spair, CONFIG_NET_SOCKETS_LOG_LEVEL);
 
 enum {
 	SPAIR_SIG_CANCEL, /**< operation has been canceled */
-	SPAIR_SIG_DATA,   /**< @ref spair.recv_q has been updated */
+	SPAIR_SIG_DATA, /**< @ref spair.recv_q has been updated */
 };
 
 enum {
@@ -74,8 +74,9 @@ static inline bool sock_is_nonblock(const struct spair *spair)
 /** Determine if a @ref spair is connected */
 static inline bool sock_is_connected(const struct spair *spair)
 {
-	const struct spair *remote = z_get_fd_obj(spair->remote,
-		(const struct fd_op_vtable *)&spair_fd_op_vtable, 0);
+	const struct spair *remote = z_get_fd_obj(
+		spair->remote, (const struct fd_op_vtable *)&spair_fd_op_vtable,
+		0);
 
 	if (remote == NULL) {
 		return false;
@@ -99,8 +100,9 @@ static inline bool sock_is_eof(const struct spair *spair)
  */
 static inline size_t spair_write_avail(struct spair *spair)
 {
-	struct spair *const remote = z_get_fd_obj(spair->remote,
-		(const struct fd_op_vtable *)&spair_fd_op_vtable, 0);
+	struct spair *const remote = z_get_fd_obj(
+		spair->remote, (const struct fd_op_vtable *)&spair_fd_op_vtable,
+		0);
 
 	if (remote == NULL) {
 		return 0;
@@ -169,7 +171,8 @@ static void spair_delete(struct spair *spair)
 	}
 
 	if (spair->remote != -1) {
-		remote = z_get_fd_obj(spair->remote,
+		remote = z_get_fd_obj(
+			spair->remote,
 			(const struct fd_op_vtable *)&spair_fd_op_vtable, 0);
 
 		if (remote != NULL) {
@@ -178,10 +181,10 @@ static void spair_delete(struct spair *spair)
 				have_remote_sem = true;
 				remote->remote = -1;
 				res = k_poll_signal_raise(&remote->write_signal,
-					SPAIR_SIG_CANCEL);
+							  SPAIR_SIG_CANCEL);
 				__ASSERT(res == 0,
-					"k_poll_signal_raise() failed: %d",
-					res);
+					 "k_poll_signal_raise() failed: %d",
+					 res);
 			}
 		}
 	}
@@ -421,7 +424,8 @@ static ssize_t spair_write(void *obj, const void *buffer, size_t count)
 	have_local_sem = true;
 
 	remote = z_get_fd_obj(spair->remote,
-		(const struct fd_op_vtable *)&spair_fd_op_vtable, 0);
+			      (const struct fd_op_vtable *)&spair_fd_op_vtable,
+			      0);
 
 	if (remote == NULL) {
 		errno = EPIPE;
@@ -458,15 +462,12 @@ static ssize_t spair_write(void *obj, const void *buffer, size_t count)
 	}
 
 	if (will_block) {
-
 		for (int signaled = false, result = -1; !signaled;
-			result = -1) {
-
+		     result = -1) {
 			struct k_poll_event events[] = {
-				K_POLL_EVENT_INITIALIZER(
-					K_POLL_TYPE_SIGNAL,
-					K_POLL_MODE_NOTIFY_ONLY,
-					&remote->read_signal),
+				K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
+							 K_POLL_MODE_NOTIFY_ONLY,
+							 &remote->read_signal),
 			};
 
 			k_sem_give(&remote->sem);
@@ -479,9 +480,10 @@ static ssize_t spair_write(void *obj, const void *buffer, size_t count)
 				goto out;
 			}
 
-			remote = z_get_fd_obj(spair->remote,
-				(const struct fd_op_vtable *)
-				&spair_fd_op_vtable, 0);
+			remote = z_get_fd_obj(
+				spair->remote,
+				(const struct fd_op_vtable *)&spair_fd_op_vtable,
+				0);
 
 			if (remote == NULL) {
 				errno = EPIPE;
@@ -505,22 +507,21 @@ static ssize_t spair_write(void *obj, const void *buffer, size_t count)
 			}
 
 			switch (result) {
-				case SPAIR_SIG_DATA: {
-					break;
-				}
+			case SPAIR_SIG_DATA: {
+				break;
+			}
 
-				case SPAIR_SIG_CANCEL: {
-					errno = EPIPE;
-					res = -1;
-					goto out;
-				}
+			case SPAIR_SIG_CANCEL: {
+				errno = EPIPE;
+				res = -1;
+				goto out;
+			}
 
-				default: {
-					__ASSERT(false,
-						"unrecognized result: %d",
-						result);
-					continue;
-				}
+			default: {
+				__ASSERT(false, "unrecognized result: %d",
+					 result);
+				continue;
+			}
 			}
 
 			/* SPAIR_SIG_DATA was received */
@@ -528,8 +529,8 @@ static ssize_t spair_write(void *obj, const void *buffer, size_t count)
 		}
 	}
 
-	res = k_pipe_put(&remote->recv_q, (void *)buffer, count,
-			 &bytes_written, 1, K_NO_WAIT);
+	res = k_pipe_put(&remote->recv_q, (void *)buffer, count, &bytes_written,
+			 1, K_NO_WAIT);
 	__ASSERT(res == 0, "k_pipe_put() failed: %d", res);
 
 	res = k_poll_signal_raise(&remote->write_signal, SPAIR_SIG_DATA);
@@ -643,16 +644,12 @@ static ssize_t spair_read(void *obj, void *buffer, size_t count)
 	}
 
 	if (will_block) {
-
 		for (int signaled = false, result = -1; !signaled;
-			result = -1) {
-
+		     result = -1) {
 			struct k_poll_event events[] = {
-				K_POLL_EVENT_INITIALIZER(
-					K_POLL_TYPE_SIGNAL,
-					K_POLL_MODE_NOTIFY_ONLY,
-					&spair->write_signal
-				),
+				K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
+							 K_POLL_MODE_NOTIFY_ONLY,
+							 &spair->write_signal),
 			};
 
 			k_sem_give(&spair->sem);
@@ -673,22 +670,21 @@ static ssize_t spair_read(void *obj, void *buffer, size_t count)
 			}
 
 			switch (result) {
-				case SPAIR_SIG_DATA: {
-					break;
-				}
+			case SPAIR_SIG_DATA: {
+				break;
+			}
 
-				case SPAIR_SIG_CANCEL: {
-					errno = EPIPE;
-					res = -1;
-					goto out;
-				}
+			case SPAIR_SIG_CANCEL: {
+				errno = EPIPE;
+				res = -1;
+				goto out;
+			}
 
-				default: {
-					__ASSERT(false,
-						"unrecognized result: %d",
-						result);
-					continue;
-				}
+			default: {
+				__ASSERT(false, "unrecognized result: %d",
+					 result);
+				continue;
+			}
 			}
 
 			/* SPAIR_SIG_DATA was received */
@@ -696,8 +692,8 @@ static ssize_t spair_read(void *obj, void *buffer, size_t count)
 		}
 	}
 
-	res = k_pipe_get(&spair->recv_q, (void *)buffer, count, &bytes_read,
-			 1, K_NO_WAIT);
+	res = k_pipe_get(&spair->recv_q, (void *)buffer, count, &bytes_read, 1,
+			 K_NO_WAIT);
 	__ASSERT(res == 0, "k_pipe_get() failed: %d", res);
 
 	if (is_connected) {
@@ -727,7 +723,6 @@ static int zsock_poll_prepare_ctx(struct spair *const spair,
 	bool have_remote_sem = false;
 
 	if (pfd->events & ZSOCK_POLLIN) {
-
 		/* Tell poll() to short-circuit wait */
 		if (sock_is_eof(spair)) {
 			res = -EALREADY;
@@ -744,7 +739,6 @@ static int zsock_poll_prepare_ctx(struct spair *const spair,
 	}
 
 	if (pfd->events & ZSOCK_POLLOUT) {
-
 		/* Tell poll() to short-circuit wait */
 		if (!sock_is_connected(spair)) {
 			res = -EALREADY;
@@ -756,9 +750,9 @@ static int zsock_poll_prepare_ctx(struct spair *const spair,
 			goto out;
 		}
 
-		remote = z_get_fd_obj(spair->remote,
-			(const struct fd_op_vtable *)
-			&spair_fd_op_vtable, 0);
+		remote = z_get_fd_obj(
+			spair->remote,
+			(const struct fd_op_vtable *)&spair_fd_op_vtable, 0);
 
 		__ASSERT(remote != NULL, "remote is NULL");
 
@@ -807,8 +801,9 @@ static int zsock_poll_update_ctx(struct spair *const spair,
 			goto pollout_done;
 		}
 
-		remote = z_get_fd_obj(spair->remote,
-			(const struct fd_op_vtable *) &spair_fd_op_vtable, 0);
+		remote = z_get_fd_obj(
+			spair->remote,
+			(const struct fd_op_vtable *)&spair_fd_op_vtable, 0);
 
 		__ASSERT(remote != NULL, "remote is NULL");
 
@@ -834,7 +829,7 @@ static int zsock_poll_update_ctx(struct spair *const spair,
 			 * returned 0
 			 */
 			__ASSERT(result == SPAIR_SIG_CANCEL,
-				"invalid result %d", result);
+				 "invalid result %d", result);
 			pfd->revents |= ZSOCK_POLLHUP;
 		}
 	}
@@ -861,7 +856,7 @@ pollout_done:
 			 * returned 0
 			 */
 			__ASSERT(result == SPAIR_SIG_CANCEL,
-					 "invalid result %d", result);
+				 "invalid result %d", result);
 			pfd->revents |= ZSOCK_POLLIN;
 		}
 	}
@@ -904,50 +899,50 @@ static int spair_ioctl(void *obj, unsigned int request, va_list args)
 	have_local_sem = true;
 
 	switch (request) {
-		case F_GETFL: {
-			if (sock_is_nonblock(spair)) {
-				flags |= O_NONBLOCK;
-			}
-
-			res = flags;
-			goto out;
+	case F_GETFL: {
+		if (sock_is_nonblock(spair)) {
+			flags |= O_NONBLOCK;
 		}
 
-		case F_SETFL: {
-			flags = va_arg(args, int);
+		res = flags;
+		goto out;
+	}
 
-			if (flags & O_NONBLOCK) {
-				spair->flags |= SPAIR_FLAG_NONBLOCK;
-			} else {
-				spair->flags &= ~SPAIR_FLAG_NONBLOCK;
-			}
+	case F_SETFL: {
+		flags = va_arg(args, int);
 
-			res = 0;
-			goto out;
+		if (flags & O_NONBLOCK) {
+			spair->flags |= SPAIR_FLAG_NONBLOCK;
+		} else {
+			spair->flags &= ~SPAIR_FLAG_NONBLOCK;
 		}
 
-		case ZFD_IOCTL_POLL_PREPARE: {
-			pfd = va_arg(args, struct zsock_pollfd *);
-			pev = va_arg(args, struct k_poll_event **);
-			pev_end = va_arg(args, struct k_poll_event *);
+		res = 0;
+		goto out;
+	}
 
-			res = zsock_poll_prepare_ctx(obj, pfd, pev, pev_end);
-			goto out;
-		}
+	case ZFD_IOCTL_POLL_PREPARE: {
+		pfd = va_arg(args, struct zsock_pollfd *);
+		pev = va_arg(args, struct k_poll_event **);
+		pev_end = va_arg(args, struct k_poll_event *);
 
-		case ZFD_IOCTL_POLL_UPDATE: {
-			pfd = va_arg(args, struct zsock_pollfd *);
-			pev = va_arg(args, struct k_poll_event **);
+		res = zsock_poll_prepare_ctx(obj, pfd, pev, pev_end);
+		goto out;
+	}
 
-			res = zsock_poll_update_ctx(obj, pfd, pev);
-			goto out;
-		}
+	case ZFD_IOCTL_POLL_UPDATE: {
+		pfd = va_arg(args, struct zsock_pollfd *);
+		pev = va_arg(args, struct k_poll_event **);
 
-		default: {
-			errno = EOPNOTSUPP;
-			res = -1;
-			goto out;
-		}
+		res = zsock_poll_update_ctx(obj, pfd, pev);
+		goto out;
+	}
+
+	default: {
+		errno = EOPNOTSUPP;
+		res = -1;
+		goto out;
+	}
 	}
 
 out:
@@ -958,8 +953,7 @@ out:
 	return res;
 }
 
-static int spair_bind(void *obj, const struct sockaddr *addr,
-		      socklen_t addrlen)
+static int spair_bind(void *obj, const struct sockaddr *addr, socklen_t addrlen)
 {
 	ARG_UNUSED(obj);
 	ARG_UNUSED(addr);
@@ -989,8 +983,7 @@ static int spair_listen(void *obj, int backlog)
 	return -1;
 }
 
-static int spair_accept(void *obj, struct sockaddr *addr,
-			socklen_t *addrlen)
+static int spair_accept(void *obj, struct sockaddr *addr, socklen_t *addrlen)
 {
 	ARG_UNUSED(obj);
 	ARG_UNUSED(addr);
@@ -1000,9 +993,8 @@ static int spair_accept(void *obj, struct sockaddr *addr,
 	return -1;
 }
 
-static ssize_t spair_sendto(void *obj, const void *buf, size_t len,
-			    int flags, const struct sockaddr *dest_addr,
-				 socklen_t addrlen)
+static ssize_t spair_sendto(void *obj, const void *buf, size_t len, int flags,
+			    const struct sockaddr *dest_addr, socklen_t addrlen)
 {
 	ARG_UNUSED(flags);
 	ARG_UNUSED(dest_addr);
@@ -1011,8 +1003,7 @@ static ssize_t spair_sendto(void *obj, const void *buf, size_t len,
 	return spair_write(obj, buf, len);
 }
 
-static ssize_t spair_sendmsg(void *obj, const struct msghdr *msg,
-			     int flags)
+static ssize_t spair_sendmsg(void *obj, const struct msghdr *msg, int flags)
 {
 	ARG_UNUSED(flags);
 
@@ -1058,7 +1049,7 @@ static ssize_t spair_sendmsg(void *obj, const struct msghdr *msg,
 
 	for (size_t i = 0; i < msg->msg_iovlen; ++i) {
 		res = spair_write(spair, msg->msg_iov[i].iov_base,
-			msg->msg_iov[i].iov_len);
+				  msg->msg_iov[i].iov_len);
 		if (res == -1) {
 			goto out;
 		}
@@ -1070,9 +1061,8 @@ out:
 	return res;
 }
 
-static ssize_t spair_recvfrom(void *obj, void *buf, size_t max_len,
-			      int flags, struct sockaddr *src_addr,
-				   socklen_t *addrlen)
+static ssize_t spair_recvfrom(void *obj, void *buf, size_t max_len, int flags,
+			      struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	(void)flags;
 	(void)src_addr;
@@ -1094,8 +1084,8 @@ static ssize_t spair_recvfrom(void *obj, void *buf, size_t max_len,
 	return spair_read(obj, buf, max_len);
 }
 
-static int spair_getsockopt(void *obj, int level, int optname,
-			    void *optval, socklen_t *optlen)
+static int spair_getsockopt(void *obj, int level, int optname, void *optval,
+			    socklen_t *optlen)
 {
 	ARG_UNUSED(obj);
 	ARG_UNUSED(level);

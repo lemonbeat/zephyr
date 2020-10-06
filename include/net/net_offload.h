@@ -36,16 +36,13 @@ struct net_offload {
 	/**
 	 * This function is called when the socket is to be opened.
 	 */
-	int (*get)(sa_family_t family,
-		   enum net_sock_type type,
-		   enum net_ip_protocol ip_proto,
-		   struct net_context **context);
+	int (*get)(sa_family_t family, enum net_sock_type type,
+		   enum net_ip_protocol ip_proto, struct net_context **context);
 
 	/**
 	 * This function is called when user wants to bind to local IP address.
 	 */
-	int (*bind)(struct net_context *context,
-		    const struct sockaddr *addr,
+	int (*bind)(struct net_context *context, const struct sockaddr *addr,
 		    socklen_t addrlen);
 
 	/**
@@ -58,48 +55,36 @@ struct net_offload {
 	 * This function is called when user wants to create a connection
 	 * to a peer host.
 	 */
-	int (*connect)(struct net_context *context,
-		       const struct sockaddr *addr,
-		       socklen_t addrlen,
-		       net_context_connect_cb_t cb,
-		       int32_t timeout,
-		       void *user_data);
+	int (*connect)(struct net_context *context, const struct sockaddr *addr,
+		       socklen_t addrlen, net_context_connect_cb_t cb,
+		       int32_t timeout, void *user_data);
 
 	/**
 	 * This function is called when user wants to accept a connection
 	 * being established.
 	 */
-	int (*accept)(struct net_context *context,
-		      net_tcp_accept_cb_t cb,
-		      int32_t timeout,
-		      void *user_data);
+	int (*accept)(struct net_context *context, net_tcp_accept_cb_t cb,
+		      int32_t timeout, void *user_data);
 
 	/**
 	 * This function is called when user wants to send data to peer host.
 	 */
-	int (*send)(struct net_pkt *pkt,
-		    net_context_send_cb_t cb,
-		    int32_t timeout,
-		    void *user_data);
+	int (*send)(struct net_pkt *pkt, net_context_send_cb_t cb,
+		    int32_t timeout, void *user_data);
 
 	/**
 	 * This function is called when user wants to send data to peer host.
 	 */
-	int (*sendto)(struct net_pkt *pkt,
-		      const struct sockaddr *dst_addr,
-		      socklen_t addrlen,
-		      net_context_send_cb_t cb,
-		      int32_t timeout,
-		      void *user_data);
+	int (*sendto)(struct net_pkt *pkt, const struct sockaddr *dst_addr,
+		      socklen_t addrlen, net_context_send_cb_t cb,
+		      int32_t timeout, void *user_data);
 
 	/**
 	 * This function is called when user wants to receive data from peer
 	 * host.
 	 */
-	int (*recv)(struct net_context *context,
-		    net_context_recv_cb_t cb,
-		    int32_t timeout,
-		    void *user_data);
+	int (*recv)(struct net_context *context, net_context_recv_cb_t cb,
+		    int32_t timeout, void *user_data);
 
 	/**
 	 * This function is called when user wants to close the socket.
@@ -124,8 +109,7 @@ struct net_offload {
  *
  * @return 0 if ok, < 0 if error
  */
-static inline int net_offload_get(struct net_if *iface,
-				  sa_family_t family,
+static inline int net_offload_get(struct net_if *iface, sa_family_t family,
 				  enum net_sock_type type,
 				  enum net_ip_protocol ip_proto,
 				  struct net_context **context)
@@ -175,8 +159,7 @@ static inline int net_offload_bind(struct net_if *iface,
  * @return 0 if ok, < 0 if error
  */
 static inline int net_offload_listen(struct net_if *iface,
-				     struct net_context *context,
-				     int backlog)
+				     struct net_context *context, int backlog)
 {
 	NET_ASSERT(iface);
 	NET_ASSERT(net_if_offload(iface));
@@ -219,21 +202,20 @@ static inline int net_offload_connect(struct net_if *iface,
 				      const struct sockaddr *addr,
 				      socklen_t addrlen,
 				      net_context_connect_cb_t cb,
-				      k_timeout_t timeout,
-				      void *user_data)
+				      k_timeout_t timeout, void *user_data)
 {
 	NET_ASSERT(iface);
 	NET_ASSERT(net_if_offload(iface));
 	NET_ASSERT(net_if_offload(iface)->connect);
 
-	return net_if_offload(iface)->connect(
-		context, addr, addrlen, cb,
+	return net_if_offload(iface)->connect(context, addr, addrlen, cb,
 #ifdef CONFIG_LEGACY_TIMEOUT_API
-		Z_TIMEOUT_MS(timeout),
+					      Z_TIMEOUT_MS(timeout),
 #else
-		k_ticks_to_ms_floor64(timeout.ticks),
+					      k_ticks_to_ms_floor64(
+						      timeout.ticks),
 #endif
-		user_data);
+					      user_data);
 }
 
 /**
@@ -266,21 +248,20 @@ static inline int net_offload_connect(struct net_if *iface,
 static inline int net_offload_accept(struct net_if *iface,
 				     struct net_context *context,
 				     net_tcp_accept_cb_t cb,
-				     k_timeout_t timeout,
-				     void *user_data)
+				     k_timeout_t timeout, void *user_data)
 {
 	NET_ASSERT(iface);
 	NET_ASSERT(net_if_offload(iface));
 	NET_ASSERT(net_if_offload(iface)->accept);
 
-	return net_if_offload(iface)->accept(
-		context, cb,
+	return net_if_offload(iface)->accept(context, cb,
 #ifdef CONFIG_LEGACY_TIMEOUT_API
-		Z_TIMEOUT_MS(timeout),
+					     Z_TIMEOUT_MS(timeout),
 #else
-		k_ticks_to_ms_floor64(timeout.ticks),
+					     k_ticks_to_ms_floor64(
+						     timeout.ticks),
 #endif
-		user_data);
+					     user_data);
 }
 
 /**
@@ -309,24 +290,21 @@ static inline int net_offload_accept(struct net_if *iface,
  *
  * @return 0 if ok, < 0 if error
  */
-static inline int net_offload_send(struct net_if *iface,
-				   struct net_pkt *pkt,
+static inline int net_offload_send(struct net_if *iface, struct net_pkt *pkt,
 				   net_context_send_cb_t cb,
-				   k_timeout_t timeout,
-				   void *user_data)
+				   k_timeout_t timeout, void *user_data)
 {
 	NET_ASSERT(iface);
 	NET_ASSERT(net_if_offload(iface));
 	NET_ASSERT(net_if_offload(iface)->send);
 
-	return net_if_offload(iface)->send(
-		pkt, cb,
+	return net_if_offload(iface)->send(pkt, cb,
 #ifdef CONFIG_LEGACY_TIMEOUT_API
-		Z_TIMEOUT_MS(timeout),
+					   Z_TIMEOUT_MS(timeout),
 #else
-		k_ticks_to_ms_floor64(timeout.ticks),
+					   k_ticks_to_ms_floor64(timeout.ticks),
 #endif
-		user_data);
+					   user_data);
 }
 
 /**
@@ -357,26 +335,24 @@ static inline int net_offload_send(struct net_if *iface,
  *
  * @return 0 if ok, < 0 if error
  */
-static inline int net_offload_sendto(struct net_if *iface,
-				     struct net_pkt *pkt,
+static inline int net_offload_sendto(struct net_if *iface, struct net_pkt *pkt,
 				     const struct sockaddr *dst_addr,
 				     socklen_t addrlen,
 				     net_context_send_cb_t cb,
-				     k_timeout_t timeout,
-				     void *user_data)
+				     k_timeout_t timeout, void *user_data)
 {
 	NET_ASSERT(iface);
 	NET_ASSERT(net_if_offload(iface));
 	NET_ASSERT(net_if_offload(iface)->sendto);
 
-	return net_if_offload(iface)->sendto(
-		pkt, dst_addr, addrlen, cb,
+	return net_if_offload(iface)->sendto(pkt, dst_addr, addrlen, cb,
 #ifdef CONFIG_LEGACY_TIMEOUT_API
-		Z_TIMEOUT_MS(timeout),
+					     Z_TIMEOUT_MS(timeout),
 #else
-		k_ticks_to_ms_floor64(timeout.ticks),
+					     k_ticks_to_ms_floor64(
+						     timeout.ticks),
 #endif
-		user_data);
+					     user_data);
 }
 
 /**
@@ -415,21 +391,19 @@ static inline int net_offload_sendto(struct net_if *iface,
 static inline int net_offload_recv(struct net_if *iface,
 				   struct net_context *context,
 				   net_context_recv_cb_t cb,
-				   k_timeout_t timeout,
-				   void *user_data)
+				   k_timeout_t timeout, void *user_data)
 {
 	NET_ASSERT(iface);
 	NET_ASSERT(net_if_offload(iface));
 	NET_ASSERT(net_if_offload(iface)->recv);
 
-	return net_if_offload(iface)->recv(
-		context, cb,
+	return net_if_offload(iface)->recv(context, cb,
 #ifdef CONFIG_LEGACY_TIMEOUT_API
-		Z_TIMEOUT_MS(timeout),
+					   Z_TIMEOUT_MS(timeout),
 #else
-		k_ticks_to_ms_floor64(timeout.ticks),
+					   k_ticks_to_ms_floor64(timeout.ticks),
 #endif
-		user_data);
+					   user_data);
 }
 
 /**
@@ -459,8 +433,7 @@ static inline int net_offload_put(struct net_if *iface,
 
 /** @cond INTERNAL_HIDDEN */
 
-static inline int net_offload_get(struct net_if *iface,
-				  sa_family_t family,
+static inline int net_offload_get(struct net_if *iface, sa_family_t family,
 				  enum net_sock_type type,
 				  enum net_ip_protocol ip_proto,
 				  struct net_context **context)
@@ -477,8 +450,7 @@ static inline int net_offload_bind(struct net_if *iface,
 }
 
 static inline int net_offload_listen(struct net_if *iface,
-				     struct net_context *context,
-				     int backlog)
+				     struct net_context *context, int backlog)
 {
 	return 0;
 }
@@ -488,8 +460,7 @@ static inline int net_offload_connect(struct net_if *iface,
 				      const struct sockaddr *addr,
 				      socklen_t addrlen,
 				      net_context_connect_cb_t cb,
-				      k_timeout_t timeout,
-				      void *user_data)
+				      k_timeout_t timeout, void *user_data)
 {
 	return 0;
 }
@@ -497,28 +468,23 @@ static inline int net_offload_connect(struct net_if *iface,
 static inline int net_offload_accept(struct net_if *iface,
 				     struct net_context *context,
 				     net_tcp_accept_cb_t cb,
-				     k_timeout_t timeout,
-				     void *user_data)
+				     k_timeout_t timeout, void *user_data)
 {
 	return 0;
 }
 
-static inline int net_offload_send(struct net_if *iface,
-				   struct net_pkt *pkt,
+static inline int net_offload_send(struct net_if *iface, struct net_pkt *pkt,
 				   net_context_send_cb_t cb,
-				   k_timeout_t timeout,
-				   void *user_data)
+				   k_timeout_t timeout, void *user_data)
 {
 	return 0;
 }
 
-static inline int net_offload_sendto(struct net_if *iface,
-				     struct net_pkt *pkt,
+static inline int net_offload_sendto(struct net_if *iface, struct net_pkt *pkt,
 				     const struct sockaddr *dst_addr,
 				     socklen_t addrlen,
 				     net_context_send_cb_t cb,
-				     k_timeout_t timeout,
-				     void *user_data)
+				     k_timeout_t timeout, void *user_data)
 {
 	return 0;
 }
@@ -526,8 +492,7 @@ static inline int net_offload_sendto(struct net_if *iface,
 static inline int net_offload_recv(struct net_if *iface,
 				   struct net_context *context,
 				   net_context_recv_cb_t cb,
-				   k_timeout_t timeout,
-				   void *user_data)
+				   k_timeout_t timeout, void *user_data)
 {
 	return 0;
 }

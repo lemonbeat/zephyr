@@ -46,21 +46,21 @@ int sema_context_switch(void)
 	uint32_t diff;
 	timing_start();
 
-	k_thread_create(&thread_one_data, thread_one_stack,
-			STACK_SIZE, thread_sema_test1,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(3), 0, K_FOREVER);
+	k_thread_create(&thread_one_data, thread_one_stack, STACK_SIZE,
+			thread_sema_test1, NULL, NULL, NULL, K_PRIO_PREEMPT(3),
+			0, K_FOREVER);
 	k_thread_name_set(&thread_one_data, "sema_test1");
 	k_thread_start(&thread_one_data);
 
 	timestamp_end_sema_t_c = timing_counter_get();
-	diff = timing_cycles_get(&timestamp_start_sema_t_c, &timestamp_end_sema_t_c);
+	diff = timing_cycles_get(&timestamp_start_sema_t_c,
+				 &timestamp_end_sema_t_c);
 	PRINT_STATS("Semaphore take time (context switch)", diff);
-
 
 	timestamp_start_sema_g_c = timing_counter_get();
 	k_sem_give(&sem_bench);
-	diff = timing_cycles_get(&timestamp_start_sema_g_c, &timestamp_end_sema_g_c);
+	diff = timing_cycles_get(&timestamp_start_sema_g_c,
+				 &timestamp_end_sema_g_c);
 	PRINT_STATS("Semaphore give time (context switch)", diff);
 
 	return 0;
@@ -96,7 +96,8 @@ int sema_test_signal(void)
 
 	if (bench_test_end() == 0) {
 		diff = timing_cycles_get(&timestamp_start, &timestamp_end);
-		PRINT_STATS_AVG("Average semaphore signal time", diff, N_TEST_SEMA);
+		PRINT_STATS_AVG("Average semaphore signal time", diff,
+				N_TEST_SEMA);
 	} else {
 		error_count++;
 		PRINT_OVERFLOW_ERROR();
@@ -116,7 +117,8 @@ int sema_test_signal(void)
 
 	if (bench_test_end() == 0) {
 		diff = timing_cycles_get(&timestamp_start, &timestamp_end);
-		PRINT_STATS_AVG("Average semaphore test time", diff, N_TEST_SEMA);
+		PRINT_STATS_AVG("Average semaphore test time", diff,
+				N_TEST_SEMA);
 	} else {
 		error_count++;
 		PRINT_OVERFLOW_ERROR();

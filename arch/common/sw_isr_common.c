@@ -20,38 +20,41 @@ struct irq_parent_offset {
 	unsigned int offset;
 };
 
-#define INIT_IRQ_PARENT_OFFSET(i, o) { \
-	.irq = i, \
-	.offset = o, \
-},
+#define INIT_IRQ_PARENT_OFFSET(i, o) \
+	{                            \
+		.irq = i,            \
+		.offset = o,         \
+	},
 
 #define IRQ_INDEX_TO_OFFSET(i, base) (base + i * CONFIG_MAX_IRQ_PER_AGGREGATOR)
 
 #ifdef CONFIG_2ND_LEVEL_INTERRUPTS
 
-#define CAT_2ND_LVL_LIST(i, base) \
+#define CAT_2ND_LVL_LIST(i, base)                                 \
 	INIT_IRQ_PARENT_OFFSET(CONFIG_2ND_LVL_INTR_0##i##_OFFSET, \
-		IRQ_INDEX_TO_OFFSET(i, base))
-static struct irq_parent_offset lvl2_irq_list[CONFIG_NUM_2ND_LEVEL_AGGREGATORS]
-	= { UTIL_LISTIFY(CONFIG_NUM_2ND_LEVEL_AGGREGATORS, CAT_2ND_LVL_LIST,
+			       IRQ_INDEX_TO_OFFSET(i, base))
+static struct irq_parent_offset
+	lvl2_irq_list[CONFIG_NUM_2ND_LEVEL_AGGREGATORS] = { UTIL_LISTIFY(
+		CONFIG_NUM_2ND_LEVEL_AGGREGATORS, CAT_2ND_LVL_LIST,
 		CONFIG_2ND_LVL_ISR_TBL_OFFSET) };
 
-#endif/* CONFIG_2ND_LEVEL_INTERRUPTS */
+#endif /* CONFIG_2ND_LEVEL_INTERRUPTS */
 
 #ifdef CONFIG_3RD_LEVEL_INTERRUPTS
 
-#define CAT_3RD_LVL_LIST(i, base) \
+#define CAT_3RD_LVL_LIST(i, base)                                 \
 	INIT_IRQ_PARENT_OFFSET(CONFIG_3RD_LVL_INTR_0##i##_OFFSET, \
-		IRQ_INDEX_TO_OFFSET(i, base))
-static struct irq_parent_offset lvl3_irq_list[CONFIG_NUM_3RD_LEVEL_AGGREGATORS]
-	 = { UTIL_LISTIFY(CONFIG_NUM_3RD_LEVEL_AGGREGATORS, CAT_3RD_LVL_LIST,
+			       IRQ_INDEX_TO_OFFSET(i, base))
+static struct irq_parent_offset
+	lvl3_irq_list[CONFIG_NUM_3RD_LEVEL_AGGREGATORS] = { UTIL_LISTIFY(
+		CONFIG_NUM_3RD_LEVEL_AGGREGATORS, CAT_3RD_LVL_LIST,
 		CONFIG_3RD_LVL_ISR_TBL_OFFSET) };
 
 #endif /* CONFIG_3RD_LEVEL_INTERRUPTS */
 
 unsigned int get_parent_offset(unsigned int parent_irq,
-					struct irq_parent_offset list[],
-					unsigned int length)
+			       struct irq_parent_offset list[],
+			       unsigned int length)
 {
 	unsigned int i;
 	unsigned int offset = 0;
@@ -93,17 +96,17 @@ void z_isr_install(unsigned int irq, void (*routine)(const void *),
 
 	if (level == 2) {
 		parent_irq = irq_parent_level_2(irq);
-		parent_offset = get_parent_offset(parent_irq,
-			lvl2_irq_list,
-			CONFIG_NUM_2ND_LEVEL_AGGREGATORS);
+		parent_offset =
+			get_parent_offset(parent_irq, lvl2_irq_list,
+					  CONFIG_NUM_2ND_LEVEL_AGGREGATORS);
 		table_idx = parent_offset + irq_from_level_2(irq);
 	}
 #ifdef CONFIG_3RD_LEVEL_INTERRUPTS
 	else if (level == 3) {
 		parent_irq = irq_parent_level_3(irq);
-		parent_offset = get_parent_offset(parent_irq,
-			lvl3_irq_list,
-			CONFIG_NUM_3RD_LEVEL_AGGREGATORS);
+		parent_offset =
+			get_parent_offset(parent_irq, lvl3_irq_list,
+					  CONFIG_NUM_3RD_LEVEL_AGGREGATORS);
 		table_idx = parent_offset + irq_from_level_3(irq);
 	}
 #endif /* CONFIG_3RD_LEVEL_INTERRUPTS */
@@ -126,11 +129,9 @@ void z_isr_install(unsigned int irq, void (*routine)(const void *),
 /* Some architectures don't/can't interpret flags or priority and have
  * no more processing to do than this.  Provide a generic fallback.
  */
-int __weak arch_irq_connect_dynamic(unsigned int irq,
-				    unsigned int priority,
+int __weak arch_irq_connect_dynamic(unsigned int irq, unsigned int priority,
 				    void (*routine)(const void *),
-				    const void *parameter,
-				    uint32_t flags)
+				    const void *parameter, uint32_t flags)
 {
 	ARG_UNUSED(flags);
 	ARG_UNUSED(priority);

@@ -22,11 +22,11 @@ enum bt_gatt_ots_att_err_codes {
 	 *  not supported by this Server for a reason other than
 	 *  the attribute permissions.
 	 */
-	BT_GATT_OTS_WRITE_REQUEST_REJECTED     = 0x80,
+	BT_GATT_OTS_WRITE_REQUEST_REJECTED = 0x80,
 	/** An attempt was made to read or write to an Object Metadata
 	 *  characteristic while the Current Object was an Invalid Object.
 	 */
-	BT_GATT_OTS_OBJECT_NOT_SELECTED        = 0x81,
+	BT_GATT_OTS_OBJECT_NOT_SELECTED = 0x81,
 	/** The Server is unable to service the Read Request or Write Request
 	 *  because it exceeds the concurrency limit of the service.
 	 */

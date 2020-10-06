@@ -22,31 +22,31 @@ extern struct bt_gatt_attr service_c_1_2_attrs[];
 /** @def BT_UUID_SERVICE_A
  *  @brief UUID for the Service A
  */
-#define BT_UUID_SERVICE_A               BT_UUID_DECLARE_16(0xa00a)
+#define BT_UUID_SERVICE_A BT_UUID_DECLARE_16(0xa00a)
 
 /** @def BT_UUID_VALUE_V1
  *  @brief UUID for the Value V1 Characteristic
  */
-#define BT_UUID_VALUE_V1                BT_UUID_DECLARE_16(0xb001)
+#define BT_UUID_VALUE_V1 BT_UUID_DECLARE_16(0xb001)
 
 /** @def BT_UUID_VALUE_V2
  *  @brief UUID for the Value V2 Characteristic
  */
-#define BT_UUID_VALUE_V2                BT_UUID_DECLARE_16(0xb002)
+#define BT_UUID_VALUE_V2 BT_UUID_DECLARE_16(0xb002)
 
 /** @def BT_UUID_VALUE_V3
  *  @brief UUID for the Value V3 Characteristic
  */
-#define BT_UUID_VALUE_V3                BT_UUID_DECLARE_16(0xb003)
+#define BT_UUID_VALUE_V3 BT_UUID_DECLARE_16(0xb003)
 
-static uint8_t   value_v1_value = 0x01;
-static uint8_t   value_v2_value[] = {
-	      '1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '3', '3', '3',
-	      '3', '3', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5', '6',
-	      '6', '6', '6', '6', '7', '7', '7', '7', '7', '8', '8', '8', '8',
-	      '8', '9', '9', '9', '9', '9', '0', '0', '0', '0', '0', '\0'
-};
-static uint8_t   value_v3_value = 0x03;
+static uint8_t value_v1_value = 0x01;
+static uint8_t value_v2_value[] = { '1', '1', '1', '1', '1', '2', '2', '2', '2',
+				    '2', '3', '3', '3', '3', '3', '4', '4', '4',
+				    '4', '4', '5', '5', '5', '5', '5', '6', '6',
+				    '6', '6', '6', '7', '7', '7', '7', '7', '8',
+				    '8', '8', '8', '8', '9', '9', '9', '9', '9',
+				    '0', '0', '0', '0', '0', '\0' };
+static uint8_t value_v3_value = 0x03;
 
 /**
  * @brief Attribute read call back for the Value V1 attribute
@@ -154,22 +154,20 @@ static struct bt_gatt_attr service_a_2_attrs[] = {
 	BT_GATT_H_PRIMARY_SERVICE(BT_UUID_SERVICE_A, 0x60),
 	BT_GATT_H_INCLUDE_SERVICE(service_d_2_attrs, 0x61),
 	BT_GATT_H_INCLUDE_SERVICE(service_c_1_2_attrs, 0x62),
-	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V1,
-		BT_GATT_CHRC_READ,
-		BT_GATT_PERM_READ,
-		read_value_v1, NULL, &value_v1_value, 0x63),
-	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V2,
-		BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
-		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-		read_str_value, write_value_v2, &value_v2_value, 0x65),
-	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V3,
-		BT_GATT_CHRC_WRITE,
-		BT_GATT_PERM_WRITE,
-		NULL, write_value_v3, &value_v3_value, 0x67)
+	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V1, BT_GATT_CHRC_READ,
+				 BT_GATT_PERM_READ, read_value_v1, NULL,
+				 &value_v1_value, 0x63),
+	BT_GATT_H_CHARACTERISTIC(
+		BT_UUID_VALUE_V2, BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE, read_str_value,
+		write_value_v2, &value_v2_value, 0x65),
+	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V3, BT_GATT_CHRC_WRITE,
+				 BT_GATT_PERM_WRITE, NULL, write_value_v3,
+				 &value_v3_value, 0x67)
 };
 
 static struct bt_gatt_service service_a_2_svc =
-		    BT_GATT_SERVICE(service_a_2_attrs);
+	BT_GATT_SERVICE(service_a_2_attrs);
 
 /**
  * @brief Register the Service A and all its Characteristics...

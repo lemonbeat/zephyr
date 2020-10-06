@@ -110,11 +110,12 @@ static inline int read_id(const struct shell *shell, int pos, char **argv,
 	}
 
 	if (val < 0 || val > CAN_EXT_ID_MASK ||
-	   (!ext && val > CAN_MAX_STD_ID)) {
-		shell_error(shell, "Id invalid. %sid must not be negative or "
-				   "bigger than 0x%x",
-				   ext ? "ext " : "",
-				   ext ? CAN_EXT_ID_MASK : CAN_MAX_STD_ID);
+	    (!ext && val > CAN_MAX_STD_ID)) {
+		shell_error(shell,
+			    "Id invalid. %sid must not be negative or "
+			    "bigger than 0x%x",
+			    ext ? "ext " : "",
+			    ext ? CAN_EXT_ID_MASK : CAN_MAX_STD_ID);
 		return -EINVAL;
 	}
 
@@ -124,7 +125,7 @@ static inline int read_id(const struct shell *shell, int pos, char **argv,
 }
 
 static inline int read_mask(const struct shell *shell, int pos, char **argv,
-			  bool ext, uint32_t *mask)
+			    bool ext, uint32_t *mask)
 {
 	char *end_ptr;
 	long val;
@@ -136,11 +137,12 @@ static inline int read_mask(const struct shell *shell, int pos, char **argv,
 	}
 
 	if (val < 0 || val > CAN_EXT_ID_MASK ||
-	   (!ext && val > CAN_MAX_STD_ID)) {
-		shell_error(shell, "Mask invalid. %smask must not be negative "
-				   "or bigger than 0x%x",
-				   ext ? "ext " : "",
-				   ext ? CAN_EXT_ID_MASK : CAN_MAX_STD_ID);
+	    (!ext && val > CAN_MAX_STD_ID)) {
+		shell_error(shell,
+			    "Mask invalid. %smask must not be negative "
+			    "or bigger than 0x%x",
+			    ext ? "ext " : "",
+			    ext ? CAN_EXT_ID_MASK : CAN_MAX_STD_ID);
 		return -EINVAL;
 	}
 
@@ -191,7 +193,8 @@ static void print_frame(struct zcan_frame *frame, void *arg)
 
 	shell_fprintf(shell, SHELL_NORMAL, "|0x%-8x|%s|%s|%d|",
 		      frame->id_type == CAN_STANDARD_IDENTIFIER ?
-				frame->std_id : frame->ext_id,
+				    frame->std_id :
+				    frame->ext_id,
 		      frame->id_type == CAN_STANDARD_IDENTIFIER ? "std" : "ext",
 		      frame->rtr ? "RTR" : "   ", frame->dlc);
 
@@ -329,7 +332,8 @@ static int cmd_attach(const struct shell *shell, size_t argc, char **argv)
 		return -EINVAL;
 	}
 
-	filter.id_type = ext ? CAN_EXTENDED_IDENTIFIER : CAN_STANDARD_IDENTIFIER;
+	filter.id_type = ext ? CAN_EXTENDED_IDENTIFIER :
+				     CAN_STANDARD_IDENTIFIER;
 	filter.rtr = rtr ? CAN_REMOTEREQUEST : CAN_DATAFRAME;
 
 	pos = read_id(shell, pos, argv, ext, &id);
@@ -358,8 +362,9 @@ static int cmd_attach(const struct shell *shell, size_t argc, char **argv)
 
 	filter.rtr_mask = rtr_mask;
 
-	shell_print(shell, "Attach filter with ID 0x%x (%s id) and mask 0x%x "
-			   " RTR: %d",
+	shell_print(shell,
+		    "Attach filter with ID 0x%x (%s id) and mask 0x%x "
+		    " RTR: %d",
 		    ext ? filter.ext_id : filter.std_id,
 		    ext ? "extended" : "standard",
 		    ext ? filter.ext_id_mask : filter.std_id_mask,
@@ -395,8 +400,6 @@ static int cmd_detach(const struct shell *shell, size_t argc, char **argv)
 		return -EINVAL;
 	}
 
-
-
 	id = strtol(argv[2], &end_ptr, 0);
 	if (*end_ptr != '\0') {
 		shell_error(shell, "filter_id is not a number");
@@ -412,7 +415,8 @@ static int cmd_detach(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_can,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_can,
 	SHELL_CMD_ARG(config, NULL,
 		      "Configure CAN controller.\n"
 		      " Usage: config device_name [-sl] bitrate\n"

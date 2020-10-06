@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <ztest.h>
 
 #define TIMEOUT K_MSEC(100)
@@ -14,20 +13,19 @@ static ZTEST_DMEM unsigned char __aligned(4) data[] = "abcd1234";
 
 struct k_pipe put_get_pipe;
 
-
 static void put_fail(struct k_pipe *p)
 {
 	size_t wt_byte = 0;
 
-	zassert_false(k_pipe_put(p, data, PIPE_LEN, &wt_byte,
-				 1, K_FOREVER), NULL);
+	zassert_false(k_pipe_put(p, data, PIPE_LEN, &wt_byte, 1, K_FOREVER),
+		      NULL);
 	/**TESTPOINT: pipe put returns -EIO*/
-	zassert_equal(k_pipe_put(p, data, PIPE_LEN, &wt_byte,
-				 1, K_NO_WAIT), -EIO, NULL);
+	zassert_equal(k_pipe_put(p, data, PIPE_LEN, &wt_byte, 1, K_NO_WAIT),
+		      -EIO, NULL);
 	zassert_false(wt_byte, NULL);
 	/**TESTPOINT: pipe put returns -EAGAIN*/
-	zassert_equal(k_pipe_put(p, data, PIPE_LEN, &wt_byte,
-				 1, TIMEOUT), -EAGAIN, NULL);
+	zassert_equal(k_pipe_put(p, data, PIPE_LEN, &wt_byte, 1, TIMEOUT),
+		      -EAGAIN, NULL);
 	zassert_true(wt_byte < 1, NULL);
 }
 
@@ -65,12 +63,12 @@ static void get_fail(struct k_pipe *p)
 	size_t rd_byte = 0;
 
 	/**TESTPOINT: pipe put returns -EIO*/
-	zassert_equal(k_pipe_get(p, rx_data, PIPE_LEN, &rd_byte, 1,
-				 K_NO_WAIT), -EIO, NULL);
+	zassert_equal(k_pipe_get(p, rx_data, PIPE_LEN, &rd_byte, 1, K_NO_WAIT),
+		      -EIO, NULL);
 	zassert_false(rd_byte, NULL);
 	/**TESTPOINT: pipe put returns -EAGAIN*/
-	zassert_equal(k_pipe_get(p, rx_data, PIPE_LEN, &rd_byte, 1,
-				 TIMEOUT), -EAGAIN, NULL);
+	zassert_equal(k_pipe_get(p, rx_data, PIPE_LEN, &rd_byte, 1, TIMEOUT),
+		      -EAGAIN, NULL);
 	zassert_true(rd_byte < 1, NULL);
 }
 

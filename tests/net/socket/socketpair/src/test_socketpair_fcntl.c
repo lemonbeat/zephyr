@@ -26,23 +26,23 @@ LOG_MODULE_DECLARE(net_test, CONFIG_NET_SOCKETS_LOG_LEVEL);
 void test_socketpair_fcntl(void)
 {
 	int res;
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 	int flags;
 
 	res = socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
-	zassert_equal(res, 0,
-		"socketpair(AF_UNIX, SOCK_STREAM, 0, sv) failed");
+	zassert_equal(res, 0, "socketpair(AF_UNIX, SOCK_STREAM, 0, sv) failed");
 
 	res = fcntl(sv[0], F_GETFL, 0);
-	zassert_not_equal(res, -1,
-		"fcntl(sv[0], F_GETFL) failed. errno: %d", errno);
+	zassert_not_equal(res, -1, "fcntl(sv[0], F_GETFL) failed. errno: %d",
+			  errno);
 
 	flags = res;
 	zassert_equal(res & O_NONBLOCK, 0,
-		"socketpair should block by default");
+		      "socketpair should block by default");
 
 	res = fcntl(sv[0], F_SETFL, flags | O_NONBLOCK);
-	zassert_not_equal(res, -1,
+	zassert_not_equal(
+		res, -1,
 		"fcntl(sv[0], F_SETFL, flags | O_NONBLOCK) failed. errno: %d",
 		errno);
 

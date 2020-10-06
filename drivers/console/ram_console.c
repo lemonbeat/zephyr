@@ -6,7 +6,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <kernel.h>
 #include <sys/printk.h>
 #include <device.h>

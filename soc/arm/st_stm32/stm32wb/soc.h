@@ -13,7 +13,6 @@
  * Chapter 2.2.2: Memory map and register boundary addresses
  */
 
-
 #ifndef _STM32WBX_SOC_H_
 #define _STM32WBX_SOC_H_
 

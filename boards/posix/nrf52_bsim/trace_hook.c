@@ -32,7 +32,7 @@ int print_char(int c)
 
 	if (printnow) {
 		bs_trace_print(BS_TRACE_RAW, NULL, 0, 2, BS_TRACE_AUTOTIME, 0,
-				"%s\n", stdout_buff);
+			       "%s\n", stdout_buff);
 		n_pend = 0;
 		stdout_buff[0] = 0;
 	}
@@ -47,7 +47,7 @@ void posix_flush_stdout(void)
 	if (n_pend) {
 		stdout_buff[n_pend] = 0;
 		bs_trace_print(BS_TRACE_RAW, NULL, 0, 2, BS_TRACE_AUTOTIME, 0,
-				"%s", stdout_buff);
+			       "%s", stdout_buff);
 		n_pend = 0;
 		stdout_buff[0] = 0;
 		fflush(stdout);
@@ -97,11 +97,10 @@ void posix_print_trace(const char *format, ...)
 	va_list variable_argsp;
 
 	va_start(variable_argsp, format);
-	bs_trace_vprint(BS_TRACE_RAW, NULL, 0, 2, BS_TRACE_AUTOTIME, 0,
-			format, variable_argsp);
+	bs_trace_vprint(BS_TRACE_RAW, NULL, 0, 2, BS_TRACE_AUTOTIME, 0, format,
+			variable_argsp);
 	va_end(variable_argsp);
 }
-
 
 int posix_trace_over_tty(int file_number)
 {

@@ -41,8 +41,8 @@ struct test_state {
 static void ZEQ(int ret, int expected)
 {
 	zassert_equal(ret, expected,
-		      "FAILED: expected = %d, ret = %d, errno = %d\n",
-		      expected, ret, errno);
+		      "FAILED: expected = %d, ret = %d, errno = %d\n", expected,
+		      ret, errno);
 	TC_PRINT("SUCCESS\n");
 }
 
@@ -55,7 +55,7 @@ static void ZEQ(int ret, int expected)
 static void ZOPEN(struct test_state *ts, int flags, int expected, int line)
 {
 	TC_PRINT("# %d: OPEN %s with flags %x\n", line, ts->file_path, flags);
-	ZEQ(fs_open(&ts->file, ts->file_path,  flags), expected);
+	ZEQ(fs_open(&ts->file, ts->file_path, flags), expected);
 }
 
 /* Close file. Will automatically fail test case if unsuccessful. */
@@ -85,7 +85,7 @@ static void ZUNLINK(struct test_state *ts, int line)
 	int ret;
 
 	TC_PRINT("# %d: UNLINK %s\n", line, ts->file_path);
-	ret  = fs_unlink(ts->file_path);
+	ret = fs_unlink(ts->file_path);
 	zassert((ret == 0 || ret == -ENOENT), "Done", "Failed");
 	TC_PRINT("SUCCESS\n");
 }
@@ -122,12 +122,12 @@ static void ZREWIND(struct test_state *ts, int line)
 #define ZREWIND(ts) ZREWIND(ts, __LINE__)
 
 /* Create empty file */
-#define ZMKEMPTY(ts)			\
-do {					\
-	ZUNLINK(ts);			\
-	ZOPEN(ts, FS_O_CREATE, 0);	\
-	ZCLOSE(ts);			\
-} while (0)
+#define ZMKEMPTY(ts)                       \
+	do {                               \
+		ZUNLINK(ts);               \
+		ZOPEN(ts, FS_O_CREATE, 0); \
+		ZCLOSE(ts);                \
+	} while (0)
 
 void test_fs_open_flags(void)
 {
@@ -152,48 +152,44 @@ void test_fs_open_flags(void)
 	ZOPEN(&ts, FS_O_APPEND | FS_O_RDWR, -ENOENT);
 	ZEND();
 
-
 	/* Attempt create new file with no read/write access and check
 	 * operations on it.
 	 */
 	ZBEGIN("Attempt create new with no R/W access");
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
 	ZOPEN(&ts, FS_O_CREATE | 0, 0);
 	ZWRITE(&ts, -EACCES);
 	ZREAD(&ts, -EACCES);
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
-	#else
+#else
 	TC_PRINT("Bypassed test\n");
-	#endif
+#endif
 	ZEND();
-
 
 	ZBEGIN("Attempt create new with READ access");
 	ZOPEN(&ts, FS_O_CREATE | FS_O_READ, 0);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
 	ZWRITE(&ts, -EACCES);
-	#else
+#else
 	TC_PRINT("Write bypassed\n");
-	#endif
+#endif
 	ZREAD(&ts, 0);
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
 
-
 	ZBEGIN("Attempt create new with WRITE access");
 	ZOPEN(&ts, FS_O_CREATE | FS_O_WRITE, 0);
 	ZWRITE(&ts, ts.write_size);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
 	ZREAD(&ts, -EACCES);
-	#else
+#else
 	TC_PRINT("Read bypassed\n");
-	#endif
+#endif
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
-
 
 	ZBEGIN("Attempt create new with R/W access");
 	ZOPEN(&ts, FS_O_CREATE | FS_O_RDWR, 0);
@@ -204,54 +200,50 @@ void test_fs_open_flags(void)
 	ZUNLINK(&ts);
 	ZEND();
 
-
 	ZBEGIN("Attempt open existing with no R/W access");
 	ZMKEMPTY(&ts);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_RW_IS_DEFAULT
-	ZOPEN(&ts, 0,  0);
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_RW_IS_DEFAULT
+	ZOPEN(&ts, 0, 0);
 	ZWRITE(&ts, -EACCES);
 	ZREAD(&ts, -EACCES);
 	ZCLOSE(&ts);
-	#else
+#else
 	TC_PRINT("Bypassed test\n");
-	#endif
+#endif
 	ZUNLINK(&ts);
 	ZEND();
-
 
 	ZBEGIN("Attempt open existing with READ access");
 	ZMKEMPTY(&ts);
-	ZOPEN(&ts, FS_O_READ,  0);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
+	ZOPEN(&ts, FS_O_READ, 0);
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
 	ZWRITE(&ts, -EACCES);
-	#else
+#else
 	TC_PRINT("Write bypassed\n");
-	#endif
+#endif
 	/* File is empty */
 	ZREAD(&ts, 0);
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
-
 
 	ZBEGIN("Attempt open existing with WRITE access");
 	ZMKEMPTY(&ts);
-	ZOPEN(&ts, FS_O_WRITE,  0);
+	ZOPEN(&ts, FS_O_WRITE, 0);
 	ZCHKPOS(&ts, 0);
 	ZWRITE(&ts, ts.write_size);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
 	ZREAD(&ts, -EACCES);
-	#else
+#else
 	TC_PRINT("Read bypassed\n");
-	#endif
+#endif
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
 
-
 	ZBEGIN("Attempt open existing with R/W access");
 	ZMKEMPTY(&ts);
-	ZOPEN(&ts, FS_O_RDWR,  0);
+	ZOPEN(&ts, FS_O_RDWR, 0);
 	ZWRITE(&ts, ts.write_size);
 	/* Read is done at the end of file, so 0 bytes will be read */
 	ZREAD(&ts, 0);
@@ -259,56 +251,52 @@ void test_fs_open_flags(void)
 	ZUNLINK(&ts);
 	ZEND();
 
-
 	ZBEGIN("Attempt append existing with no R/W access");
 	ZMKEMPTY(&ts);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_RW_IS_DEFAULT
-	ZOPEN(&ts, FS_O_APPEND,  0);
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_RW_IS_DEFAULT
+	ZOPEN(&ts, FS_O_APPEND, 0);
 	ZCHKPOS(&ts, 0);
 	ZWRITE(&ts, -EACCES);
 	ZREAD(&ts, -EACCES);
 	ZCLOSE(&ts);
-	#else
+#else
 	TC_PRINT("Test bypassed\n");
-	#endif
+#endif
 	ZUNLINK(&ts);
 	ZEND();
 
-
 	ZBEGIN("Attempt append existing with READ access");
 	ZMKEMPTY(&ts);
-	ZOPEN(&ts, FS_O_APPEND | FS_O_READ,  0);
+	ZOPEN(&ts, FS_O_APPEND | FS_O_READ, 0);
 	ZCHKPOS(&ts, 0);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
 	ZWRITE(&ts, -EACCES);
-	#else
+#else
 	TC_PRINT("Write bypassed\n");
-	#endif
+#endif
 	/* File is empty */
 	ZREAD(&ts, 0);
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
 
-
 	ZBEGIN("Attempt append existing with WRITE access");
 	ZMKEMPTY(&ts);
-	ZOPEN(&ts, FS_O_APPEND | FS_O_WRITE,  0);
+	ZOPEN(&ts, FS_O_APPEND | FS_O_WRITE, 0);
 	ZCHKPOS(&ts, 0);
 	ZWRITE(&ts, ts.write_size);
-	#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
+#ifndef BYPASS_FS_OPEN_FLAGS_LFS_ASSERT_CRASH
 	ZREAD(&ts, -EACCES);
-	#else
+#else
 	TC_PRINT("Read bypassed\n");
-	#endif
+#endif
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
 
-
 	ZBEGIN("Attempt append existing with R/W access");
 	ZMKEMPTY(&ts);
-	ZOPEN(&ts, FS_O_APPEND | FS_O_RDWR,  0);
+	ZOPEN(&ts, FS_O_APPEND | FS_O_RDWR, 0);
 	ZCHKPOS(&ts, 0);
 	ZWRITE(&ts, ts.write_size);
 	/* Read is done at the end of file, so 0 bytes will be read */
@@ -316,7 +304,6 @@ void test_fs_open_flags(void)
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
-
 
 	/* This is simple check by file position, not contents. Since writing
 	 * same pattern twice, the position of file should be twice the
@@ -336,7 +323,6 @@ void test_fs_open_flags(void)
 	ZCLOSE(&ts);
 	ZUNLINK(&ts);
 	ZEND();
-
 
 	ZBEGIN("Check if appended forwards file before write");
 	/* Prepare file */

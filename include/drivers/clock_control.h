@@ -34,7 +34,7 @@ extern "C" {
 /* Clock control API */
 
 /* Used to select all subsystem of a clock controller */
-#define CLOCK_CONTROL_SUBSYS_ALL	NULL
+#define CLOCK_CONTROL_SUBSYS_ALL NULL
 
 /**
  * @brief Current clock status.
@@ -46,14 +46,12 @@ enum clock_control_status {
 	CLOCK_CONTROL_STATUS_UNKNOWN
 };
 
-
 /**
  * @cond INTERNAL_HIDDEN
  */
 #define Z_CLOCK_CONTROL_ASYNC_DATA_INITIALIZER(_cb, _user_data) \
-	{ \
-		.cb = cb, \
-		.user_data = _user_data \
+	{                                                       \
+		.cb = cb, .user_data = _user_data               \
 	}
 /**
  * INTERNAL_HIDDEN @endcond
@@ -84,7 +82,7 @@ typedef void (*clock_control_cb_t)(const struct device *dev,
  * @param user_data	User data
  */
 #define CLOCK_CONTROL_ASYNC_DATA_DEFINE(name, cb, user_data) \
-	struct clock_control_async_data name = \
+	struct clock_control_async_data name =               \
 		Z_CLOCK_CONTROL_ASYNC_DATA_INITIALIZER(cb, user_data)
 
 /**
@@ -104,22 +102,21 @@ typedef int (*clock_control)(const struct device *dev,
 			     clock_control_subsys_t sys);
 
 typedef int (*clock_control_get)(const struct device *dev,
-				 clock_control_subsys_t sys,
-				 uint32_t *rate);
+				 clock_control_subsys_t sys, uint32_t *rate);
 
 typedef int (*clock_control_async_on_fn)(const struct device *dev,
 					 clock_control_subsys_t sys,
 					 struct clock_control_async_data *data);
 
-typedef enum clock_control_status (*clock_control_get_status_fn)(const struct device *dev,
-								 clock_control_subsys_t sys);
+typedef enum clock_control_status (*clock_control_get_status_fn)(
+	const struct device *dev, clock_control_subsys_t sys);
 
 struct clock_control_driver_api {
-	clock_control			on;
-	clock_control			off;
-	clock_control_async_on_fn	async_on;
-	clock_control_get		get_rate;
-	clock_control_get_status_fn	get_status;
+	clock_control on;
+	clock_control off;
+	clock_control_async_on_fn async_on;
+	clock_control_get get_rate;
+	clock_control_get_status_fn get_status;
 };
 
 /**
@@ -203,8 +200,8 @@ static inline int clock_control_async_on(const struct device *dev,
  *
  * @return Status.
  */
-static inline enum clock_control_status clock_control_get_status(const struct device *dev,
-								 clock_control_subsys_t sys)
+static inline enum clock_control_status
+clock_control_get_status(const struct device *dev, clock_control_subsys_t sys)
 {
 	const struct clock_control_driver_api *api =
 		(const struct clock_control_driver_api *)dev->api;
@@ -231,7 +228,7 @@ static inline int clock_control_get_rate(const struct device *dev,
 		(const struct clock_control_driver_api *)dev->api;
 
 	__ASSERT(api->get_rate != NULL, "%s not implemented for device %s",
-		__func__, dev->name);
+		 __func__, dev->name);
 
 	return api->get_rate(dev, sys, rate);
 }

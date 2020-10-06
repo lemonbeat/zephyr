@@ -35,10 +35,7 @@ struct wdt_esp32_regs_t {
 	uint32_t wprotect;
 };
 
-enum wdt_mode {
-	WDT_MODE_RESET = 0,
-	WDT_MODE_INTERRUPT_RESET
-};
+enum wdt_mode { WDT_MODE_RESET = 0, WDT_MODE_INTERRUPT_RESET };
 
 struct wdt_esp32_data {
 	uint32_t timeout;
@@ -57,12 +54,9 @@ struct wdt_esp32_config {
 	} irq;
 };
 
-#define DEV_CFG(dev) \
-	((const struct wdt_esp32_config *const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct wdt_esp32_data *)(dev)->data)
-#define DEV_BASE(dev) \
-	((volatile struct wdt_esp32_regs_t  *)(DEV_CFG(dev))->base)
+#define DEV_CFG(dev) ((const struct wdt_esp32_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct wdt_esp32_data *)(dev)->data)
+#define DEV_BASE(dev) ((volatile struct wdt_esp32_regs_t *)(DEV_CFG(dev))->base)
 
 /* ESP32 ignores writes to any register if WDTWPROTECT doesn't contain the
  * magic value of TIMG_WDT_WKEY_VALUE.  The datasheet recommends unsealing,
@@ -71,7 +65,6 @@ struct wdt_esp32_config {
 static inline void wdt_esp32_seal(const struct device *dev)
 {
 	DEV_BASE(dev)->wprotect = 0U;
-
 }
 
 static inline void wdt_esp32_unseal(const struct device *dev)
@@ -84,7 +77,6 @@ static void wdt_esp32_enable(const struct device *dev)
 	wdt_esp32_unseal(dev);
 	DEV_BASE(dev)->config0 |= BIT(TIMG_WDT_EN_S);
 	wdt_esp32_seal(dev);
-
 }
 
 static int wdt_esp32_disable(const struct device *dev)
@@ -111,7 +103,8 @@ static void wdt_esp32_isr(const struct device *dev);
 static int wdt_esp32_feed(const struct device *dev, int channel_id)
 {
 	wdt_esp32_unseal(dev);
-	DEV_BASE(dev)->feed = 0xABAD1DEA; /* Writing any value to WDTFEED will reload it. */
+	DEV_BASE(dev)->feed =
+		0xABAD1DEA; /* Writing any value to WDTFEED will reload it. */
 	wdt_esp32_seal(dev);
 
 	return 0;
@@ -192,8 +185,8 @@ static int wdt_esp32_install_timeout(const struct device *dev,
 
 	data->timeout = cfg->window.max;
 
-	data->mode = (cfg->callback == NULL) ?
-		     WDT_MODE_RESET : WDT_MODE_INTERRUPT_RESET;
+	data->mode = (cfg->callback == NULL) ? WDT_MODE_RESET :
+						     WDT_MODE_INTERRUPT_RESET;
 
 	data->callback = cfg->callback;
 
@@ -224,20 +217,18 @@ static const struct wdt_driver_api wdt_api = {
 	.feed = wdt_esp32_feed
 };
 
-#define ESP32_WDT_INIT(idx)										   \
-	DEVICE_DECLARE(wdt_esp32_##idx);								   \
-	static void wdt_esp32_connect_irq_func##idx(void)						   \
-	{												   \
-		esp32_rom_intr_matrix_set(0, ETS_TG##idx##_WDT_LEVEL_INTR_SOURCE,			   \
-					  CONFIG_WDT##idx##_ESP32_IRQ);					   \
-		IRQ_CONNECT(CONFIG_WDT##idx##_ESP32_IRQ,						   \
-			    4,										   \
-			    wdt_esp32_isr,								   \
-			    DEVICE_GET(wdt_esp32_##idx),						   \
-			    0);										   \
-	}												   \
-													   \
-	static struct wdt_esp32_data wdt##idx##_data;							   \
+#define ESP32_WDT_INIT(idx)                                                    \
+	DEVICE_DECLARE(wdt_esp32_##idx);                                       \
+	static void wdt_esp32_connect_irq_func##idx(void)                      \
+	{                                                                      \
+		esp32_rom_intr_matrix_set(0,                                   \
+					  ETS_TG##idx##_WDT_LEVEL_INTR_SOURCE, \
+					  CONFIG_WDT##idx##_ESP32_IRQ);        \
+		IRQ_CONNECT(CONFIG_WDT##idx##_ESP32_IRQ, 4, wdt_esp32_isr,     \
+			    DEVICE_GET(wdt_esp32_##idx), 0);                   \
+	}                                                                      \
+                                                                               \
+	static struct wdt_esp32_data wdt##idx##_data;                          \
 	static struct wdt_esp32_config wdt_esp32_config##idx = {					   \
 		.base = (struct wdt_esp32_regs_t *) DT_INST_REG_ADDR(idx), \
 		.irq_regs = {										   \
@@ -249,14 +240,12 @@ static const struct wdt_driver_api wdt_api = {
 			.line =  CONFIG_WDT##idx##_ESP32_IRQ,						   \
 		},											   \
 		.connect_irq = wdt_esp32_connect_irq_func##idx						   \
-	};												   \
-													   \
-	DEVICE_AND_API_INIT(wdt_esp32_##idx, DT_INST_LABEL(idx),		   \
-			    wdt_esp32_init,								   \
-			    &wdt##idx##_data,								   \
-			    &wdt_esp32_config##idx,							   \
-			    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,				   \
-			    &wdt_api)
+	};      \
+                                                                               \
+	DEVICE_AND_API_INIT(wdt_esp32_##idx, DT_INST_LABEL(idx),               \
+			    wdt_esp32_init, &wdt##idx##_data,                  \
+			    &wdt_esp32_config##idx, PRE_KERNEL_1,              \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &wdt_api)
 
 static void wdt_esp32_isr(const struct device *dev)
 {
@@ -268,7 +257,6 @@ static void wdt_esp32_isr(const struct device *dev)
 
 	*DEV_CFG(dev)->irq_regs.timer_int_clr |= TIMG_WDT_INT_CLR;
 }
-
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(wdt0), okay)
 ESP32_WDT_INIT(0);

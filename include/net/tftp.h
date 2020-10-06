@@ -20,17 +20,17 @@ extern "C" {
 #endif
 
 struct tftpc {
-	uint8_t   *user_buf;
-	uint32_t  user_buf_size;
+	uint8_t *user_buf;
+	uint32_t user_buf_size;
 };
 
 /* TFTP Client Error codes. */
-#define TFTPC_SUCCESS             0
-#define TFTPC_DUPLICATE_DATA     -1
-#define TFTPC_BUFFER_OVERFLOW    -2
-#define TFTPC_UNKNOWN_FAILURE    -3
-#define TFTPC_REMOTE_ERROR       -4
-#define TFTPC_RETRIES_EXHAUSTED  -5
+#define TFTPC_SUCCESS 0
+#define TFTPC_DUPLICATE_DATA -1
+#define TFTPC_BUFFER_OVERFLOW -2
+#define TFTPC_UNKNOWN_FAILURE -3
+#define TFTPC_REMOTE_ERROR -4
+#define TFTPC_RETRIES_EXHAUSTED -5
 
 /* @brief This function gets "file" from the remote server.
  *

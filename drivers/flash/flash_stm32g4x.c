@@ -18,18 +18,17 @@ LOG_MODULE_REGISTER(LOG_DOMAIN);
 
 #include "flash_stm32.h"
 
-#define STM32G4X_PAGE_SHIFT	11
+#define STM32G4X_PAGE_SHIFT 11
 
 /*
  * offset and len must be aligned on 8 for write,
  * positive and not beyond end of flash
  */
 bool flash_stm32_valid_range(const struct device *dev, off_t offset,
-			     uint32_t len,
-			     bool write)
+			     uint32_t len, bool write)
 {
 	return (!write || (offset % 8 == 0 && len % 8 == 0U)) &&
-		flash_stm32_range_exists(dev, offset, len);
+	       flash_stm32_range_exists(dev, offset, len);
 }
 
 /*
@@ -42,7 +41,8 @@ static unsigned int get_page(off_t offset)
 
 static int write_dword(const struct device *dev, off_t offset, uint64_t val)
 {
-	volatile uint32_t *flash = (uint32_t *)(offset + CONFIG_FLASH_BASE_ADDRESS);
+	volatile uint32_t *flash =
+		(uint32_t *)(offset + CONFIG_FLASH_BASE_ADDRESS);
 	FLASH_TypeDef *regs = FLASH_STM32_REGS(dev);
 	uint32_t tmp;
 	int rc;
@@ -60,8 +60,7 @@ static int write_dword(const struct device *dev, off_t offset, uint64_t val)
 	}
 
 	/* Check if this double word is erased */
-	if (flash[0] != 0xFFFFFFFFUL ||
-	    flash[1] != 0xFFFFFFFFUL) {
+	if (flash[0] != 0xFFFFFFFFUL || flash[1] != 0xFFFFFFFFUL) {
 		LOG_ERR("Word at offs %d not erased", offset);
 		return -EIO;
 	}
@@ -118,7 +117,6 @@ static int erase_page(const struct device *dev, unsigned int page)
 		LOG_DBG("Erase page %d on bank 1", page);
 	}
 
-
 	__ASSERT(page <= 127, "There are only 127 pages, but page is %d", page);
 #endif
 
@@ -145,14 +143,13 @@ static int erase_page(const struct device *dev, unsigned int page)
 	return rc;
 }
 
-int flash_stm32_block_erase_loop(const struct device *dev,
-				 unsigned int offset,
+int flash_stm32_block_erase_loop(const struct device *dev, unsigned int offset,
 				 unsigned int len)
 {
 	int i, rc = 0;
 
 	i = get_page(offset);
-	for (; i <= get_page(offset + len - 1) ; ++i) {
+	for (; i <= get_page(offset + len - 1); ++i) {
 		rc = erase_page(dev, i);
 		if (rc < 0) {
 			break;
@@ -168,7 +165,7 @@ int flash_stm32_write_range(const struct device *dev, unsigned int offset,
 	int i, rc = 0;
 
 	for (i = 0; i < len; i += 8, offset += 8) {
-		rc = write_dword(dev, offset, ((const uint64_t *) data)[i>>3]);
+		rc = write_dword(dev, offset, ((const uint64_t *)data)[i >> 3]);
 		if (rc < 0) {
 			return rc;
 		}

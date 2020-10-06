@@ -20,13 +20,13 @@ LOG_MODULE_REGISTER(adc_mchp_xec);
 #define XEC_ADC_VREF_ANALOG 3300
 
 /* ADC Control Register */
-#define XEC_ADC_CTRL_SINGLE_DONE_STATUS		BIT(7)
-#define XEC_ADC_CTRL_REPEAT_DONE_STATUS		BIT(6)
-#define XER_ADC_CTRL_SOFT_RESET			BIT(4)
-#define XEC_ADC_CTRL_POWER_SAVER_DIS		BIT(3)
-#define XEC_ADC_CTRL_START_REPEAT		BIT(2)
-#define XEC_ADC_CTRL_START_SINGLE		BIT(1)
-#define XEC_ADC_CTRL_ACTIVATE			BIT(0)
+#define XEC_ADC_CTRL_SINGLE_DONE_STATUS BIT(7)
+#define XEC_ADC_CTRL_REPEAT_DONE_STATUS BIT(6)
+#define XER_ADC_CTRL_SOFT_RESET BIT(4)
+#define XEC_ADC_CTRL_POWER_SAVER_DIS BIT(3)
+#define XEC_ADC_CTRL_START_REPEAT BIT(2)
+#define XEC_ADC_CTRL_START_SINGLE BIT(1)
+#define XEC_ADC_CTRL_ACTIVATE BIT(0)
 
 struct adc_xec_data {
 	struct adc_context ctx;
@@ -48,9 +48,7 @@ struct adc_xec_regs {
 	uint32_t sar_control_reg;
 };
 
-#define ADC_XEC_REG_BASE						\
-	((struct adc_xec_regs *)(DT_INST_REG_ADDR(0)))
-
+#define ADC_XEC_REG_BASE ((struct adc_xec_regs *)(DT_INST_REG_ADDR(0)))
 
 DEVICE_DECLARE(adc_xec);
 
@@ -286,17 +284,16 @@ static int adc_xec_init(const struct device *dev)
 	struct adc_xec_regs *adc_regs = ADC_XEC_REG_BASE;
 	struct adc_xec_data *data = dev->data;
 
-	adc_regs->control_reg =  XEC_ADC_CTRL_ACTIVATE
-		| XEC_ADC_CTRL_POWER_SAVER_DIS
-		| XEC_ADC_CTRL_SINGLE_DONE_STATUS
-		| XEC_ADC_CTRL_REPEAT_DONE_STATUS;
+	adc_regs->control_reg = XEC_ADC_CTRL_ACTIVATE |
+				XEC_ADC_CTRL_POWER_SAVER_DIS |
+				XEC_ADC_CTRL_SINGLE_DONE_STATUS |
+				XEC_ADC_CTRL_REPEAT_DONE_STATUS;
 
 	MCHP_GIRQ_SRC(MCHP_ADC_GIRQ) = MCHP_ADC_SNG_DONE_GIRQ_VAL;
 	MCHP_GIRQ_ENSET(MCHP_ADC_GIRQ) = MCHP_ADC_SNG_DONE_GIRQ_VAL;
 
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    adc_xec_isr, DEVICE_GET(adc_xec), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), adc_xec_isr,
+		    DEVICE_GET(adc_xec), 0);
 	irq_enable(DT_INST_IRQN(0));
 
 	adc_context_unlock_unconditionally(&data->ctx);
@@ -310,7 +307,6 @@ static struct adc_xec_data adc_xec_dev_data_0 = {
 	ADC_CONTEXT_INIT_SYNC(adc_xec_dev_data_0, ctx),
 };
 
-DEVICE_AND_API_INIT(adc_xec, DT_INST_LABEL(0),
-		    adc_xec_init, &adc_xec_dev_data_0, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &adc_xec_api);
+DEVICE_AND_API_INIT(adc_xec, DT_INST_LABEL(0), adc_xec_init,
+		    &adc_xec_dev_data_0, NULL, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &adc_xec_api);

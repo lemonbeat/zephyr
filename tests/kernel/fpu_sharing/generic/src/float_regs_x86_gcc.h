@@ -39,29 +39,27 @@
 
 static inline void _load_all_float_registers(struct fp_register_set *regs)
 {
-	__asm__ volatile (
-		"movdqu  0(%0), %%xmm0\n\t;"
-		"movdqu 16(%0), %%xmm1\n\t;"
-		"movdqu 32(%0), %%xmm2\n\t;"
-		"movdqu 48(%0), %%xmm3\n\t;"
-		"movdqu 64(%0), %%xmm4\n\t;"
-		"movdqu 80(%0), %%xmm5\n\t;"
-		"movdqu 96(%0), %%xmm6\n\t;"
-		"movdqu 112(%0), %%xmm7\n\t;"
+	__asm__ volatile("movdqu  0(%0), %%xmm0\n\t;"
+			 "movdqu 16(%0), %%xmm1\n\t;"
+			 "movdqu 32(%0), %%xmm2\n\t;"
+			 "movdqu 48(%0), %%xmm3\n\t;"
+			 "movdqu 64(%0), %%xmm4\n\t;"
+			 "movdqu 80(%0), %%xmm5\n\t;"
+			 "movdqu 96(%0), %%xmm6\n\t;"
+			 "movdqu 112(%0), %%xmm7\n\t;"
 
-		"fldt   128(%0)\n\t;"
-		"fldt   138(%0)\n\t;"
-		"fldt   148(%0)\n\t;"
-		"fldt   158(%0)\n\t;"
-		"fldt   168(%0)\n\t;"
-		"fldt   178(%0)\n\t;"
-		"fldt   188(%0)\n\t;"
-		"fldt   198(%0)\n\t;"
+			 "fldt   128(%0)\n\t;"
+			 "fldt   138(%0)\n\t;"
+			 "fldt   148(%0)\n\t;"
+			 "fldt   158(%0)\n\t;"
+			 "fldt   168(%0)\n\t;"
+			 "fldt   178(%0)\n\t;"
+			 "fldt   188(%0)\n\t;"
+			 "fldt   198(%0)\n\t;"
 
-		: : "r" (regs)
-		);
+			 :
+			 : "r"(regs));
 }
-
 
 /**
  *
@@ -84,40 +82,38 @@ static inline void _load_all_float_registers(struct fp_register_set *regs)
 static inline void
 _load_then_store_all_float_registers(struct fp_register_set *regs)
 {
-	__asm__ volatile (
-		"movdqu  0(%0), %%xmm0\n\t;"
-		"movdqu 16(%0), %%xmm1\n\t;"
-		"movdqu 32(%0), %%xmm2\n\t;"
-		"movdqu 48(%0), %%xmm3\n\t;"
-		"movdqu 64(%0), %%xmm4\n\t;"
-		"movdqu 80(%0), %%xmm5\n\t;"
-		"movdqu 96(%0), %%xmm6\n\t;"
-		"movdqu 112(%0), %%xmm7\n\t;"
+	__asm__ volatile("movdqu  0(%0), %%xmm0\n\t;"
+			 "movdqu 16(%0), %%xmm1\n\t;"
+			 "movdqu 32(%0), %%xmm2\n\t;"
+			 "movdqu 48(%0), %%xmm3\n\t;"
+			 "movdqu 64(%0), %%xmm4\n\t;"
+			 "movdqu 80(%0), %%xmm5\n\t;"
+			 "movdqu 96(%0), %%xmm6\n\t;"
+			 "movdqu 112(%0), %%xmm7\n\t;"
 
-		"fldt   128(%0)\n\t;"
-		"fldt   138(%0)\n\t;"
-		"fldt   148(%0)\n\t;"
-		"fldt   158(%0)\n\t;"
-		"fldt   168(%0)\n\t;"
-		"fldt   178(%0)\n\t;"
-		"fldt   188(%0)\n\t;"
-		"fldt   198(%0)\n\t;"
+			 "fldt   128(%0)\n\t;"
+			 "fldt   138(%0)\n\t;"
+			 "fldt   148(%0)\n\t;"
+			 "fldt   158(%0)\n\t;"
+			 "fldt   168(%0)\n\t;"
+			 "fldt   178(%0)\n\t;"
+			 "fldt   188(%0)\n\t;"
+			 "fldt   198(%0)\n\t;"
 
-		/* pop the x87 FPU registers back to memory */
+			 /* pop the x87 FPU registers back to memory */
 
-		"fstpt  198(%0)\n\t;"
-		"fstpt  188(%0)\n\t;"
-		"fstpt  178(%0)\n\t;"
-		"fstpt  168(%0)\n\t;"
-		"fstpt  158(%0)\n\t;"
-		"fstpt  148(%0)\n\t;"
-		"fstpt  138(%0)\n\t;"
-		"fstpt  128(%0)\n\t;"
+			 "fstpt  198(%0)\n\t;"
+			 "fstpt  188(%0)\n\t;"
+			 "fstpt  178(%0)\n\t;"
+			 "fstpt  168(%0)\n\t;"
+			 "fstpt  158(%0)\n\t;"
+			 "fstpt  148(%0)\n\t;"
+			 "fstpt  138(%0)\n\t;"
+			 "fstpt  128(%0)\n\t;"
 
-		: : "r" (regs)
-		);
+			 :
+			 : "r"(regs));
 }
-
 
 /**
  *
@@ -133,26 +129,26 @@ _load_then_store_all_float_registers(struct fp_register_set *regs)
 
 static inline void _store_all_float_registers(struct fp_register_set *regs)
 {
-	__asm__ volatile (
-		"movdqu %%xmm0, 0(%0)\n\t;"
-		"movdqu %%xmm1, 16(%0)\n\t;"
-		"movdqu %%xmm2, 32(%0)\n\t;"
-		"movdqu %%xmm3, 48(%0)\n\t;"
-		"movdqu %%xmm4, 64(%0)\n\t;"
-		"movdqu %%xmm5, 80(%0)\n\t;"
-		"movdqu %%xmm6, 96(%0)\n\t;"
-		"movdqu %%xmm7, 112(%0)\n\t;"
+	__asm__ volatile("movdqu %%xmm0, 0(%0)\n\t;"
+			 "movdqu %%xmm1, 16(%0)\n\t;"
+			 "movdqu %%xmm2, 32(%0)\n\t;"
+			 "movdqu %%xmm3, 48(%0)\n\t;"
+			 "movdqu %%xmm4, 64(%0)\n\t;"
+			 "movdqu %%xmm5, 80(%0)\n\t;"
+			 "movdqu %%xmm6, 96(%0)\n\t;"
+			 "movdqu %%xmm7, 112(%0)\n\t;"
 
-		"fstpt  198(%0)\n\t;"
-		"fstpt  188(%0)\n\t;"
-		"fstpt  178(%0)\n\t;"
-		"fstpt  168(%0)\n\t;"
-		"fstpt  158(%0)\n\t;"
-		"fstpt  148(%0)\n\t;"
-		"fstpt  138(%0)\n\t;"
-		"fstpt  128(%0)\n\t;"
+			 "fstpt  198(%0)\n\t;"
+			 "fstpt  188(%0)\n\t;"
+			 "fstpt  178(%0)\n\t;"
+			 "fstpt  168(%0)\n\t;"
+			 "fstpt  158(%0)\n\t;"
+			 "fstpt  148(%0)\n\t;"
+			 "fstpt  138(%0)\n\t;"
+			 "fstpt  128(%0)\n\t;"
 
-		: : "r" (regs) : "memory"
-		);
+			 :
+			 : "r"(regs)
+			 : "memory");
 }
 #endif /* _FLOAT_REGS_X86_GCC_H */

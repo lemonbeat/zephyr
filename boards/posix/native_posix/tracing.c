@@ -9,7 +9,7 @@
  */
 
 #include <stdlib.h> /* for exit */
-#include <stdio.h>  /* for printfs */
+#include <stdio.h> /* for printfs */
 #include <stdarg.h> /* for va args */
 #include <unistd.h>
 #include "soc.h"
@@ -51,7 +51,7 @@ void posix_print_trace(const char *format, ...)
  * -1 = we do not know yet
  * Indexed 0:stdout, 1:stderr
  */
-static int is_a_tty[2] = {-1, -1};
+static int is_a_tty[2] = { -1, -1 };
 
 void trace_disable_color(char *argv, int offset)
 {
@@ -63,7 +63,6 @@ void trace_enable_color(char *argv, int offset)
 {
 	is_a_tty[0] = -1;
 	is_a_tty[1] = -1;
-
 }
 
 void trace_force_color(char *argv, int offset)
@@ -99,19 +98,17 @@ void native_add_tracing_options(void)
 		 * destination, callback,
 		 * description
 		 */
-		{ false, false, true,
-		"color", "color", 'b',
-		NULL, trace_enable_color,
-		"(default) Enable color in traces if printing to console"},
-		{ false, false, true,
-		"no-color", "no-color", 'b',
-		NULL, trace_disable_color,
-		"Disable color in traces even if printing to console"},
-		{ false, false, true,
-		"force-color", "force-color", 'b',
-		NULL, trace_force_color,
-		"Enable color in traces even if printing to files/pipes"},
-		ARG_TABLE_ENDMARKER};
+		{ false, false, true, "color", "color", 'b', NULL,
+		  trace_enable_color,
+		  "(default) Enable color in traces if printing to console" },
+		{ false, false, true, "no-color", "no-color", 'b', NULL,
+		  trace_disable_color,
+		  "Disable color in traces even if printing to console" },
+		{ false, false, true, "force-color", "force-color", 'b', NULL,
+		  trace_force_color,
+		  "Enable color in traces even if printing to files/pipes" },
+		ARG_TABLE_ENDMARKER
+	};
 
 	native_add_command_line_opts(trace_options);
 }

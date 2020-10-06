@@ -8,8 +8,8 @@
 #include <kernel.h>
 #include <cmsis_os2.h>
 
-#define TIMEOUT_TICKS   10
-#define STACKSZ         CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
+#define TIMEOUT_TICKS 10
+#define STACKSZ CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
 
 void thread_sema(void *arg)
 {
@@ -40,30 +40,23 @@ void thread_sema(void *arg)
 		     "Semaphore release failure");
 
 	/* Try releasing when no semaphore is obtained */
-	zassert_true(
-		osSemaphoreRelease((osSemaphoreId_t)arg) == osErrorResource,
-		"Semaphore released unexpectedly!");
+	zassert_true(osSemaphoreRelease((osSemaphoreId_t)arg) ==
+			     osErrorResource,
+		     "Semaphore released unexpectedly!");
 }
 
 static K_THREAD_STACK_DEFINE(test_stack, STACKSZ);
-static osThreadAttr_t thread_attr = {
-	.name = "Sema_check",
-	.attr_bits = osThreadDetached,
-	.cb_mem = NULL,
-	.cb_size = 0,
-	.stack_mem = &test_stack,
-	.stack_size = STACKSZ,
-	.priority = osPriorityNormal,
-	.tz_module = 0,
-	.reserved = 0
-};
+static osThreadAttr_t thread_attr = { .name = "Sema_check",
+				      .attr_bits = osThreadDetached,
+				      .cb_mem = NULL,
+				      .cb_size = 0,
+				      .stack_mem = &test_stack,
+				      .stack_size = STACKSZ,
+				      .priority = osPriorityNormal,
+				      .tz_module = 0,
+				      .reserved = 0 };
 
-const osSemaphoreAttr_t sema_attr = {
-	"mySemaphore",
-	0,
-	NULL,
-	0U
-};
+const osSemaphoreAttr_t sema_attr = { "mySemaphore", 0, NULL, 0U };
 
 void test_semaphore(void)
 {

@@ -54,7 +54,6 @@ static int flash_sync(struct stream_flash_ctx *ctx)
 	int rc = 0;
 	size_t write_addr = ctx->offset + ctx->bytes_written;
 
-
 	if (IS_ENABLED(CONFIG_STREAM_FLASH_ERASE)) {
 		if (ctx->buf_bytes == 0) {
 			return 0;
@@ -74,8 +73,7 @@ static int flash_sync(struct stream_flash_ctx *ctx)
 	flash_write_protection_set(ctx->fdev, true);
 
 	if (rc != 0) {
-		LOG_ERR("flash_write error %d offset=0x%08zx", rc,
-			write_addr);
+		LOG_ERR("flash_write error %d offset=0x%08zx", rc, write_addr);
 		return rc;
 	}
 
@@ -106,8 +104,8 @@ static int flash_sync(struct stream_flash_ctx *ctx)
 	return rc;
 }
 
-int stream_flash_buffered_write(struct stream_flash_ctx *ctx, const uint8_t *data,
-				size_t len, bool flush)
+int stream_flash_buffered_write(struct stream_flash_ctx *ctx,
+				const uint8_t *data, size_t len, bool flush)
 {
 	int processed = 0;
 	int rc = 0;
@@ -140,8 +138,8 @@ int stream_flash_buffered_write(struct stream_flash_ctx *ctx, const uint8_t *dat
 
 	/* place rest of the data into ctx->buf */
 	if (processed < len) {
-		memcpy(ctx->buf + ctx->buf_bytes,
-		       data + processed, len - processed);
+		memcpy(ctx->buf + ctx->buf_bytes, data + processed,
+		       len - processed);
 		ctx->buf_bytes += len - processed;
 	}
 
@@ -156,8 +154,7 @@ int stream_flash_buffered_write(struct stream_flash_ctx *ctx, const uint8_t *dat
 			 */
 			rc = flash_read(ctx->fdev,
 					ctx->offset + ctx->bytes_written,
-					(void *)&filler,
-					1);
+					(void *)&filler, 1);
 
 			if (rc != 0) {
 				return rc;
@@ -202,7 +199,6 @@ int stream_flash_init(struct stream_flash_ctx *ctx, const struct device *fdev,
 	/* Calculate the total size of the flash device */
 	api->page_layout(fdev, &layout, &layout_size);
 	for (int i = 0; i < layout_size; i++) {
-
 		total_size += layout->pages_count * layout->pages_size;
 
 		if (buf_len > layout->pages_size) {
@@ -211,7 +207,6 @@ int stream_flash_init(struct stream_flash_ctx *ctx, const struct device *fdev,
 		}
 
 		layout++;
-
 	}
 
 	if ((offset + size) > total_size ||

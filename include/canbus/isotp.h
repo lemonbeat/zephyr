@@ -44,51 +44,51 @@
  */
 
 /** Completed successfully */
-#define ISOTP_N_OK              0
+#define ISOTP_N_OK 0
 
 /** Ar/As has timed out */
-#define ISOTP_N_TIMEOUT_A      -1
+#define ISOTP_N_TIMEOUT_A -1
 
 /** Reception of next FC has timed out */
-#define ISOTP_N_TIMEOUT_BS     -2
+#define ISOTP_N_TIMEOUT_BS -2
 
 /** Cr has timed out */
-#define ISOTP_N_TIMEOUT_CR     -3
+#define ISOTP_N_TIMEOUT_CR -3
 
 /** Unexpected sequence number */
-#define ISOTP_N_WRONG_SN       -4
+#define ISOTP_N_WRONG_SN -4
 
 /** Invalid flow status received*/
-#define ISOTP_N_INVALID_FS     -5
+#define ISOTP_N_INVALID_FS -5
 
 /** Unexpected PDU received */
-#define ISOTP_N_UNEXP_PDU      -6
+#define ISOTP_N_UNEXP_PDU -6
 
 /** Maximum number of WAIT flowStatus PDUs exceeded */
-#define ISOTP_N_WFT_OVRN       -7
+#define ISOTP_N_WFT_OVRN -7
 
 /** FlowStatus OVFLW PDU was received */
 #define ISOTP_N_BUFFER_OVERFLW -8
 
 /** General error */
-#define ISOTP_N_ERROR          -9
+#define ISOTP_N_ERROR -9
 
 /** Implementation specific errors */
 
 /** Can't bind or send because the CAN device has no filter left*/
-#define ISOTP_NO_FREE_FILTER    -10
+#define ISOTP_NO_FREE_FILTER -10
 
 /** No net buffer left to allocate */
-#define ISOTP_NO_NET_BUF_LEFT   -11
+#define ISOTP_NO_NET_BUF_LEFT -11
 
 /** Not sufficient space in the buffer left for the data */
-#define ISOTP_NO_BUF_DATA_LEFT  -12
+#define ISOTP_NO_BUF_DATA_LEFT -12
 
 /** No context buffer left to allocate */
-#define ISOTP_NO_CTX_LEFT       -13
+#define ISOTP_NO_CTX_LEFT -13
 
 /** Timeout for recv */
-#define ISOTP_RECV_TIMEOUT      -14
+#define ISOTP_RECV_TIMEOUT -14
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,8 +102,8 @@ extern "C" {
 struct isotp_msg_id {
 	/** Message identifier*/
 	union {
-		uint32_t std_id  : 11;
-		uint32_t ext_id  : 29;
+		uint32_t std_id : 11;
+		uint32_t ext_id : 29;
 	};
 	/** extended address */
 	uint8_t ext_addr;
@@ -127,7 +127,7 @@ struct isotp_msg_id {
  * Used to pass the options to the bind and send functions.
  */
 struct isotp_fc_opts {
-	uint8_t bs;    /**< Block size. Number of CF PDUs before next CF is sent */
+	uint8_t bs; /**< Block size. Number of CF PDUs before next CF is sent */
 	uint8_t stmin; /**< Minimum separation time. Min time between frames */
 };
 
@@ -158,8 +158,7 @@ struct isotp_recv_ctx;
 int isotp_bind(struct isotp_recv_ctx *ctx, const struct device *can_dev,
 	       const struct isotp_msg_id *rx_addr,
 	       const struct isotp_msg_id *tx_addr,
-	       const struct isotp_fc_opts *opts,
-	       k_timeout_t timeout);
+	       const struct isotp_fc_opts *opts, k_timeout_t timeout);
 
 /**
  * @brief Unbind a context from the interface
@@ -260,9 +259,8 @@ int isotp_send(struct isotp_send_ctx *ctx, const struct device *can_dev,
  * @retval ISOTP_N_OK on success
  * @retval ISOTP_N_* on error
  */
-int isotp_send_ctx_buf(const struct device *can_dev,
-		       const uint8_t *data, size_t len,
-		       const struct isotp_msg_id *tx_addr,
+int isotp_send_ctx_buf(const struct device *can_dev, const uint8_t *data,
+		       size_t len, const struct isotp_msg_id *tx_addr,
 		       const struct isotp_msg_id *rx_addr,
 		       isotp_tx_callback_t complete_cb, void *cb_arg,
 		       k_timeout_t timeout);
@@ -285,8 +283,7 @@ int isotp_send_ctx_buf(const struct device *can_dev,
  * @retval ISOTP_N_OK on success
  * @retval ISOTP_* on error
  */
-int isotp_send_net_ctx_buf(const struct device *can_dev,
-			   struct net_buf *data,
+int isotp_send_net_ctx_buf(const struct device *can_dev, struct net_buf *data,
 			   const struct isotp_msg_id *tx_addr,
 			   const struct isotp_msg_id *rx_addr,
 			   isotp_tx_callback_t complete_cb, void *cb_arg,
@@ -315,9 +312,8 @@ int isotp_send_net_ctx_buf(const struct device *can_dev,
  * @retval ISOTP_N_OK on success
  * @retval ISOTP_* on error
  */
-int isotp_send_buf(const struct device *can_dev,
-		   const uint8_t *data, size_t len,
-		   const struct isotp_msg_id *tx_addr,
+int isotp_send_buf(const struct device *can_dev, const uint8_t *data,
+		   size_t len, const struct isotp_msg_id *tx_addr,
 		   const struct isotp_msg_id *rx_addr,
 		   isotp_tx_callback_t complete_cb, void *cb_arg,
 		   k_timeout_t timeout);
@@ -355,9 +351,9 @@ struct isotp_send_ctx {
 	uint8_t wft;
 	uint8_t bs;
 	uint8_t sn : 4;
-	uint8_t is_net_buf  : 1;
+	uint8_t is_net_buf : 1;
 	uint8_t is_ctx_slab : 1;
-	uint8_t has_callback: 1;
+	uint8_t has_callback : 1;
 };
 
 struct isotp_recv_ctx {

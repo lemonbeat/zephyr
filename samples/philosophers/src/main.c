@@ -103,10 +103,8 @@ static void print_phil_state(int id, const char *fmt, int32_t delay)
 
 	set_phil_state_pos(id);
 
-	printk("Philosopher %d [%s:%s%d] ",
-	       id, prio < 0 ? "C" : "P",
-	       prio < 0 ? "" : " ",
-	       prio);
+	printk("Philosopher %d [%s:%s%d] ", id, prio < 0 ? "C" : "P",
+	       prio < 0 ? "" : " ", prio);
 
 	if (delay) {
 		printk(fmt, delay < 1000 ? " " : "", delay);
@@ -124,7 +122,7 @@ static int32_t get_random_delay(int id, int period_in_ms)
 	 * and the current uptime to create some pseudo-randomness. It produces
 	 * a value between 0 and 31.
 	 */
-	int32_t delay = (k_uptime_get_32()/100 * (id + 1)) & 0x1f;
+	int32_t delay = (k_uptime_get_32() / 100 * (id + 1)) & 0x1f;
 
 	/* add 1 to not generate a delay of 0 */
 	int32_t ms = (delay + 1) * period_in_ms;
@@ -176,7 +174,6 @@ void philosopher(void *id, void *unused1, void *unused2)
 		print_phil_state(my_id, " THINKING [ %s%d ms ] ", delay);
 		k_msleep(delay);
 	}
-
 }
 
 static int new_prio(int phil)
@@ -185,7 +182,7 @@ static int new_prio(int phil)
 #if SAME_PRIO
 	return 0;
 #else
-	return -(phil - (NUM_PHIL/2));
+	return -(phil - (NUM_PHIL / 2));
 #endif
 #else
 #if defined(CONFIG_COOP_ENABLED)
@@ -193,7 +190,7 @@ static int new_prio(int phil)
 #elif defined(CONFIG_PREEMPT_ENABLED)
 	return phil;
 #else
-	#error unpossible
+#error unpossible
 #endif
 #endif
 }
@@ -227,15 +224,16 @@ static void start_threads(void)
 	}
 }
 
-#define DEMO_DESCRIPTION  \
-	"\x1b[2J\x1b[15;1H"   \
-	"Demo Description\n"  \
-	"----------------\n"  \
-	"An implementation of a solution to the Dining Philosophers\n" \
-	"problem (a classic multi-thread synchronization problem).\n" \
+#define DEMO_DESCRIPTION                                                      \
+	"\x1b[2J\x1b[15;1H"                                                   \
+	"Demo Description\n"                                                  \
+	"----------------\n"                                                  \
+	"An implementation of a solution to the Dining Philosophers\n"        \
+	"problem (a classic multi-thread synchronization problem).\n"         \
 	"This particular implementation demonstrates the usage of multiple\n" \
-	"preemptible and cooperative threads of differing priorities, as\n" \
-	"well as %s %s and thread sleeping.\n", obj_init_type, fork_type_str
+	"preemptible and cooperative threads of differing priorities, as\n"   \
+	"well as %s %s and thread sleeping.\n",                               \
+		obj_init_type, fork_type_str
 
 static void display_demo_description(void)
 {

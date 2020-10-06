@@ -22,112 +22,134 @@
 
 #include "mb_font.h"
 
-#define MODE_MASK    BIT_MASK(16)
+#define MODE_MASK BIT_MASK(16)
 
 /* Onboard LED Row 1 */
-#define LED_ROW1_GPIO_PIN   13
-#define LED_ROW1_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_ROW1_GPIO_PIN 13
+#define LED_ROW1_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Row 2 */
-#define LED_ROW2_GPIO_PIN   14
-#define LED_ROW2_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_ROW2_GPIO_PIN 14
+#define LED_ROW2_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Row 3 */
-#define LED_ROW3_GPIO_PIN   15
-#define LED_ROW3_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_ROW3_GPIO_PIN 15
+#define LED_ROW3_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 1 */
-#define LED_COL1_GPIO_PIN   4
-#define LED_COL1_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL1_GPIO_PIN 4
+#define LED_COL1_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 2 */
-#define LED_COL2_GPIO_PIN   5
-#define LED_COL2_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL2_GPIO_PIN 5
+#define LED_COL2_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 3 */
-#define LED_COL3_GPIO_PIN   6
-#define LED_COL3_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL3_GPIO_PIN 6
+#define LED_COL3_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 4 */
-#define LED_COL4_GPIO_PIN   7
-#define LED_COL4_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL4_GPIO_PIN 7
+#define LED_COL4_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 5 */
-#define LED_COL5_GPIO_PIN   8
-#define LED_COL5_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL5_GPIO_PIN 8
+#define LED_COL5_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 6 */
-#define LED_COL6_GPIO_PIN   9
-#define LED_COL6_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL6_GPIO_PIN 9
+#define LED_COL6_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 7 */
-#define LED_COL7_GPIO_PIN   10
-#define LED_COL7_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL7_GPIO_PIN 10
+#define LED_COL7_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 8 */
-#define LED_COL8_GPIO_PIN   11
-#define LED_COL8_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
+#define LED_COL8_GPIO_PIN 11
+#define LED_COL8_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 /* Onboard LED Column 9 */
-#define LED_COL9_GPIO_PIN   12
-#define LED_COL9_GPIO_PORT  DT_LABEL(DT_NODELABEL(gpio0))
-
+#define LED_COL9_GPIO_PIN 12
+#define LED_COL9_GPIO_PORT DT_LABEL(DT_NODELABEL(gpio0))
 
 #define DISPLAY_ROWS 3
 #define DISPLAY_COLS 9
 
-#define SCROLL_OFF   0
+#define SCROLL_OFF 0
 #define SCROLL_START 1
 
 #define SCROLL_DEFAULT_DURATION_MS 80
 
 struct mb_display {
-	const struct device *dev;         /* GPIO device */
+	const struct device *dev; /* GPIO device */
 
-	struct k_timer  timer;       /* Rendering timer */
+	struct k_timer timer; /* Rendering timer */
 
-	uint8_t            img_count;   /* Image count */
+	uint8_t img_count; /* Image count */
 
-	uint8_t            cur_img;     /* Current image or character to show */
+	uint8_t cur_img; /* Current image or character to show */
 
-	uint8_t            scroll:3,    /* Scroll shift */
-			first:1,     /* First frame of a scroll sequence */
-			loop:1,      /* Loop to beginning */
-			text:1,      /* We're showing a string (not image) */
-			img_sep:1;   /* One column image separation */
+	uint8_t scroll : 3, /* Scroll shift */
+		first : 1, /* First frame of a scroll sequence */
+		loop : 1, /* Loop to beginning */
+		text : 1, /* We're showing a string (not image) */
+		img_sep : 1; /* One column image separation */
 
 	/* The following variables track the currently shown image */
-	uint8_t            cur;         /* Currently rendered row */
-	uint32_t           row[3];      /* Content (columns) for each row */
-	int64_t           expiry;      /* When to stop showing current image */
-	int32_t           duration;    /* Duration for each shown image */
+	uint8_t cur; /* Currently rendered row */
+	uint32_t row[3]; /* Content (columns) for each row */
+	int64_t expiry; /* When to stop showing current image */
+	int32_t duration; /* Duration for each shown image */
 
 	union {
 		const struct mb_image *img; /* Array of images to show */
-		const char            *str; /* String to be shown */
+		const char *str; /* String to be shown */
 	};
 
 	/* Buffer for printed strings */
-	char            str_buf[CONFIG_MICROBIT_DISPLAY_STR_MAX];
+	char str_buf[CONFIG_MICROBIT_DISPLAY_STR_MAX];
 };
 
 struct x_y {
-	uint8_t x:4,
-	     y:4;
+	uint8_t x : 4, y : 4;
 };
 
 /* Where the X,Y coordinates of each row/col are found.
  * The top left corner has the coordinates 0,0.
  */
 static const struct x_y map[DISPLAY_ROWS][DISPLAY_COLS] = {
-	{{0, 0}, {2, 0}, {4, 0}, {4, 3}, {3, 3}, {2, 3}, {1, 3}, {0, 3}, {1, 2} },
-	{{4, 2}, {0, 2}, {2, 2}, {1, 0}, {3, 0}, {3, 4}, {1, 4}, {0, 0}, {0, 0} },
-	{{2, 4}, {4, 4}, {0, 4}, {0, 1}, {1, 1}, {2, 1}, {3, 1}, {4, 1}, {3, 2} },
+	{ { 0, 0 },
+	  { 2, 0 },
+	  { 4, 0 },
+	  { 4, 3 },
+	  { 3, 3 },
+	  { 2, 3 },
+	  { 1, 3 },
+	  { 0, 3 },
+	  { 1, 2 } },
+	{ { 4, 2 },
+	  { 0, 2 },
+	  { 2, 2 },
+	  { 1, 0 },
+	  { 3, 0 },
+	  { 3, 4 },
+	  { 1, 4 },
+	  { 0, 0 },
+	  { 0, 0 } },
+	{ { 2, 4 },
+	  { 4, 4 },
+	  { 0, 4 },
+	  { 0, 1 },
+	  { 1, 1 },
+	  { 2, 1 },
+	  { 3, 1 },
+	  { 4, 1 },
+	  { 3, 2 } },
 };
 
 /* Mask of all the column bits */
-static const uint32_t col_mask = (((~0UL) << LED_COL1_GPIO_PIN) &
-			       ((~0UL) >> (31 - LED_COL9_GPIO_PIN)));
+static const uint32_t col_mask =
+	(((~0UL) << LED_COL1_GPIO_PIN) & ((~0UL) >> (31 - LED_COL9_GPIO_PIN)));
 
 static inline const struct mb_image *get_font(char ch)
 {
@@ -257,8 +279,8 @@ static void update_scroll(struct mb_display *disp)
 			const struct mb_image *i2 = next_img(disp);
 
 			img.row[i] = ((i1->row[i] >> disp->scroll) |
-				      (i2->row[i] << (scroll_steps(disp) -
-						      disp->scroll)));
+				      (i2->row[i]
+				       << (scroll_steps(disp) - disp->scroll)));
 		}
 
 		disp->scroll++;
@@ -387,8 +409,8 @@ void mb_display_stop(struct mb_display *disp)
 	reset_display(disp);
 }
 
-void mb_display_print(struct mb_display *disp, uint32_t mode,
-		      int32_t duration, const char *fmt, ...)
+void mb_display_print(struct mb_display *disp, uint32_t mode, int32_t duration,
+		      const char *fmt, ...)
 {
 	va_list ap;
 

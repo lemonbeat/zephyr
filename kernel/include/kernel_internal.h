@@ -37,14 +37,14 @@ static inline void z_data_copy(void)
 #endif
 FUNC_NORETURN void z_cstart(void);
 
-extern FUNC_NORETURN void z_thread_entry(k_thread_entry_t entry,
-			  void *p1, void *p2, void *p3);
+extern FUNC_NORETURN void z_thread_entry(k_thread_entry_t entry, void *p1,
+					 void *p2, void *p3);
 
 extern char *z_setup_new_thread(struct k_thread *new_thread,
 				k_thread_stack_t *stack, size_t stack_size,
-				k_thread_entry_t entry,
-				void *p1, void *p2, void *p3,
-				int prio, uint32_t options, const char *name);
+				k_thread_entry_t entry, void *p1, void *p2,
+				void *p3, int prio, uint32_t options,
+				const char *name);
 
 /**
  * @brief Allocate some memory from the current thread's resource pool
@@ -72,7 +72,7 @@ extern void z_thread_essential_clear(void);
 extern void z_thread_monitor_exit(struct k_thread *thread);
 #else
 #define z_thread_monitor_exit(thread) \
-	do {/* nothing */    \
+	do { /* nothing */            \
 	} while (false)
 #endif /* CONFIG_THREAD_MONITOR */
 
@@ -80,17 +80,16 @@ extern void z_thread_monitor_exit(struct k_thread *thread);
 /* This is a arch function traditionally, but when the switch-based
  * z_swap() is in use it's a simple inline provided by the kernel.
  */
-static ALWAYS_INLINE void
-arch_thread_return_value_set(struct k_thread *thread, unsigned int value)
+static ALWAYS_INLINE void arch_thread_return_value_set(struct k_thread *thread,
+						       unsigned int value)
 {
 	thread->swap_retval = value;
 }
 #endif
 
 static ALWAYS_INLINE void
-z_thread_return_value_set_with_data(struct k_thread *thread,
-				   unsigned int value,
-				   void *data)
+z_thread_return_value_set_with_data(struct k_thread *thread, unsigned int value,
+				    void *data)
 {
 	arch_thread_return_value_set(thread, value);
 	thread->base.swap_data = data;
@@ -112,7 +111,6 @@ extern uint32_t z_timestamp_idle; /* timestamp when CPU goes idle */
 #endif
 
 extern struct k_thread z_main_thread;
-
 
 #ifdef CONFIG_MULTITHREADING
 extern struct k_thread z_idle_threads[CONFIG_MP_NUM_CPUS];
@@ -136,7 +134,6 @@ struct gdb_ctx;
  */
 extern int z_gdb_main_loop(struct gdb_ctx *ctx, bool start);
 #endif
-
 
 #ifdef __cplusplus
 }

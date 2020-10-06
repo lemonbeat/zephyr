@@ -54,8 +54,7 @@ void test_timer(void)
 
 	errors = 0U;
 
-	TC_PRINT("k_ticks_to_cyc_floor32(1) = %d\n",
-		 k_ticks_to_cyc_floor32(1));
+	TC_PRINT("k_ticks_to_cyc_floor32(1) = %d\n", k_ticks_to_cyc_floor32(1));
 	TC_PRINT("sys_clock_hw_cycles_per_sec() = %d\n",
 		 sys_clock_hw_cycles_per_sec());
 
@@ -69,7 +68,8 @@ void test_timer(void)
 		if (t_now < t_last) {
 			diff = t_now - t_last;
 			TC_PRINT("diff = %d (t_last = %u : t_now = %u);"
-				"i = %u\n", diff, t_last, t_now, i);
+				 "i = %u\n",
+				 diff, t_last, t_now, i);
 			errors++;
 		}
 		t_last = t_now;

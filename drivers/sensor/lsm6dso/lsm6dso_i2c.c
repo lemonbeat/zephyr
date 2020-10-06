@@ -25,8 +25,8 @@ static int lsm6dso_i2c_read(struct lsm6dso_data *data, uint8_t reg_addr,
 {
 	const struct lsm6dso_config *cfg = data->dev->config;
 
-	return i2c_burst_read(data->bus, cfg->i2c_slv_addr,
-			      reg_addr, value, len);
+	return i2c_burst_read(data->bus, cfg->i2c_slv_addr, reg_addr, value,
+			      len);
 }
 
 static int lsm6dso_i2c_write(struct lsm6dso_data *data, uint8_t reg_addr,
@@ -34,16 +34,16 @@ static int lsm6dso_i2c_write(struct lsm6dso_data *data, uint8_t reg_addr,
 {
 	const struct lsm6dso_config *cfg = data->dev->config;
 
-	return i2c_burst_write(data->bus, cfg->i2c_slv_addr,
-			       reg_addr, value, len);
+	return i2c_burst_write(data->bus, cfg->i2c_slv_addr, reg_addr, value,
+			       len);
 }
 
 int lsm6dso_i2c_init(const struct device *dev)
 {
 	struct lsm6dso_data *data = dev->data;
 
-	data->ctx_i2c.read_reg = (stmdev_read_ptr) lsm6dso_i2c_read,
-	data->ctx_i2c.write_reg = (stmdev_write_ptr) lsm6dso_i2c_write,
+	data->ctx_i2c.read_reg = (stmdev_read_ptr)lsm6dso_i2c_read,
+	data->ctx_i2c.write_reg = (stmdev_write_ptr)lsm6dso_i2c_write,
 
 	data->ctx = &data->ctx_i2c;
 	data->ctx->handle = data;

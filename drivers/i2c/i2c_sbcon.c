@@ -23,9 +23,9 @@
 struct sbcon {
 	union {
 		volatile uint32_t SB_CONTROLS; /* Write to set pins high */
-		volatile uint32_t SB_CONTROL;  /* Read for state of pins */
+		volatile uint32_t SB_CONTROL; /* Read for state of pins */
 	};
-	volatile uint32_t SB_CONTROLC;	/* Write to set pins low */
+	volatile uint32_t SB_CONTROLC; /* Write to set pins low */
 };
 
 /* Bits values for SCL and SDA lines in struct sbcon registers */
@@ -34,12 +34,12 @@ struct sbcon {
 
 /* Driver config */
 struct i2c_sbcon_config {
-	struct sbcon *sbcon;		/* Address of hardware registers */
+	struct sbcon *sbcon; /* Address of hardware registers */
 };
 
 /* Driver instance data */
 struct i2c_sbcon_context {
-	struct i2c_bitbang bitbang;	/* Bit-bang library data */
+	struct i2c_bitbang bitbang; /* Bit-bang library data */
 };
 
 static void i2c_sbcon_set_scl(void *io_context, int state)
@@ -85,12 +85,12 @@ static int i2c_sbcon_configure(const struct device *dev, uint32_t dev_config)
 }
 
 static int i2c_sbcon_transfer(const struct device *dev, struct i2c_msg *msgs,
-				uint8_t num_msgs, uint16_t slave_address)
+			      uint8_t num_msgs, uint16_t slave_address)
 {
 	struct i2c_sbcon_context *context = dev->data;
 
 	return i2c_bitbang_transfer(&context->bitbang, msgs, num_msgs,
-							slave_address);
+				    slave_address);
 }
 
 static struct i2c_driver_api api = {
@@ -108,18 +108,17 @@ static int i2c_sbcon_init(const struct device *dev)
 	return 0;
 }
 
-#define	DEFINE_I2C_SBCON(_num)						\
-									\
-static struct i2c_sbcon_context i2c_sbcon_dev_data_##_num;		\
-									\
-static const struct i2c_sbcon_config i2c_sbcon_dev_cfg_##_num = {	\
-	.sbcon		= (void *)DT_INST_REG_ADDR(_num), \
-};									\
-									\
-DEVICE_AND_API_INIT(i2c_sbcon_##_num, DT_INST_LABEL(_num), \
-	    i2c_sbcon_init,						\
-	    &i2c_sbcon_dev_data_##_num,					\
-	    &i2c_sbcon_dev_cfg_##_num,					\
-	    PRE_KERNEL_2, CONFIG_I2C_INIT_PRIORITY, &api);
+#define DEFINE_I2C_SBCON(_num)                                            \
+                                                                          \
+	static struct i2c_sbcon_context i2c_sbcon_dev_data_##_num;        \
+                                                                          \
+	static const struct i2c_sbcon_config i2c_sbcon_dev_cfg_##_num = { \
+		.sbcon = (void *)DT_INST_REG_ADDR(_num),                  \
+	};                                                                \
+                                                                          \
+	DEVICE_AND_API_INIT(i2c_sbcon_##_num, DT_INST_LABEL(_num),        \
+			    i2c_sbcon_init, &i2c_sbcon_dev_data_##_num,   \
+			    &i2c_sbcon_dev_cfg_##_num, PRE_KERNEL_2,      \
+			    CONFIG_I2C_INIT_PRIORITY, &api);
 
 DT_INST_FOREACH_STATUS_OKAY(DEFINE_I2C_SBCON)

@@ -23,8 +23,8 @@
 
 LOG_MODULE_REGISTER(LSM6DSO, CONFIG_SENSOR_LOG_LEVEL);
 
-static const uint16_t lsm6dso_odr_map[] = {0, 12, 26, 52, 104, 208, 416, 833,
-					1660, 3330, 6660};
+static const uint16_t lsm6dso_odr_map[] = { 0,	 12,  26,   52,	  104, 208,
+					    416, 833, 1660, 3330, 6660 };
 
 #if defined(LSM6DSO_ACCEL_ODR_RUNTIME) || defined(LSM6DSO_GYRO_ODR_RUNTIME)
 static int lsm6dso_freq_to_odr_val(uint16_t freq)
@@ -53,8 +53,8 @@ static int lsm6dso_odr_to_freq_val(uint16_t odr)
 }
 
 #ifdef LSM6DSO_ACCEL_FS_RUNTIME
-static const uint16_t lsm6dso_accel_fs_map[] = {2, 16, 4, 8};
-static const uint16_t lsm6dso_accel_fs_sens[] = {1, 8, 2, 4};
+static const uint16_t lsm6dso_accel_fs_map[] = { 2, 16, 4, 8 };
+static const uint16_t lsm6dso_accel_fs_sens[] = { 1, 8, 2, 4 };
 
 static int lsm6dso_accel_range_to_fs_val(int32_t range)
 {
@@ -71,8 +71,8 @@ static int lsm6dso_accel_range_to_fs_val(int32_t range)
 #endif
 
 #ifdef LSM6DSO_GYRO_FS_RUNTIME
-static const uint16_t lsm6dso_gyro_fs_map[] = {250, 500, 1000, 2000, 125};
-static const uint16_t lsm6dso_gyro_fs_sens[] = {2, 4, 8, 16, 1};
+static const uint16_t lsm6dso_gyro_fs_map[] = { 250, 500, 1000, 2000, 125 };
+static const uint16_t lsm6dso_gyro_fs_sens[] = { 2, 4, 8, 16, 1 };
 
 static int lsm6dso_gyro_range_to_fs_val(int32_t range)
 {
@@ -274,8 +274,7 @@ static int lsm6dso_gyro_config(const struct device *dev,
 	return 0;
 }
 
-static int lsm6dso_attr_set(const struct device *dev,
-			    enum sensor_channel chan,
+static int lsm6dso_attr_set(const struct device *dev, enum sensor_channel chan,
 			    enum sensor_attribute attr,
 			    const struct sensor_value *val)
 {
@@ -403,10 +402,9 @@ static inline void lsm6dso_accel_convert(struct sensor_value *val, int raw_val,
 
 	/* Sensitivity is exposed in ug/LSB */
 	/* Convert to m/s^2 */
-	dval = (int64_t)(raw_val) * sensitivity * SENSOR_G_DOUBLE;
+	dval = (int64_t)(raw_val)*sensitivity * SENSOR_G_DOUBLE;
 	val->val1 = (int32_t)(dval / 1000000);
 	val->val2 = (int32_t)(dval % 1000000);
-
 }
 
 static inline int lsm6dso_accel_get_channel(enum sensor_channel chan,
@@ -452,7 +450,7 @@ static inline void lsm6dso_gyro_convert(struct sensor_value *val, int raw_val,
 
 	/* Sensitivity is exposed in udps/LSB */
 	/* Convert to rad/s */
-	dval = (int64_t)(raw_val) * sensitivity * SENSOR_DEG2RAD_DOUBLE;
+	dval = (int64_t)(raw_val)*sensitivity * SENSOR_DEG2RAD_DOUBLE;
 	val->val1 = (int32_t)(dval / 1000000);
 	val->val2 = (int32_t)(dval % 1000000);
 }
@@ -529,13 +527,12 @@ static inline int lsm6dso_magn_get_channel(enum sensor_channel chan,
 		return -ENOTSUP;
 	}
 
-
 	sample[0] = sys_le16_to_cpu((int16_t)(data->ext_data[idx][0] |
-				    (data->ext_data[idx][1] << 8)));
+					      (data->ext_data[idx][1] << 8)));
 	sample[1] = sys_le16_to_cpu((int16_t)(data->ext_data[idx][2] |
-				    (data->ext_data[idx][3] << 8)));
+					      (data->ext_data[idx][3] << 8)));
 	sample[2] = sys_le16_to_cpu((int16_t)(data->ext_data[idx][4] |
-				    (data->ext_data[idx][5] << 8)));
+					      (data->ext_data[idx][5] << 8)));
 
 	switch (chan) {
 	case SENSOR_CHAN_MAGN_X:
@@ -574,7 +571,7 @@ static inline void lsm6dso_hum_convert(struct sensor_value *val,
 	}
 
 	raw_val = sys_le16_to_cpu((int16_t)(data->ext_data[idx][0] |
-					  (data->ext_data[idx][1] << 8)));
+					    (data->ext_data[idx][1] << 8)));
 
 	/* find relative humidty by linear interpolation */
 	rh = (ht->y1 - ht->y0) * raw_val + ht->x1 * ht->y0 - ht->x0 * ht->y1;
@@ -598,14 +595,14 @@ static inline void lsm6dso_press_convert(struct sensor_value *val,
 	}
 
 	raw_val = sys_le32_to_cpu((int32_t)(data->ext_data[idx][0] |
-					  (data->ext_data[idx][1] << 8) |
-					  (data->ext_data[idx][2] << 16)));
+					    (data->ext_data[idx][1] << 8) |
+					    (data->ext_data[idx][2] << 16)));
 
 	/* Pressure sensitivity is 4096 LSB/hPa */
 	/* Convert raw_val to val in kPa */
 	val->val1 = (raw_val >> 12) / 10;
 	val->val2 = (raw_val >> 12) % 10 * 100000 +
-		(((int32_t)((raw_val) & 0x0FFF) * 100000L) >> 12);
+		    (((int32_t)((raw_val)&0x0FFF) * 100000L) >> 12);
 }
 
 static inline void lsm6dso_temp_convert(struct sensor_value *val,
@@ -621,7 +618,7 @@ static inline void lsm6dso_temp_convert(struct sensor_value *val,
 	}
 
 	raw_val = sys_le16_to_cpu((int16_t)(data->ext_data[idx][3] |
-					  (data->ext_data[idx][4] << 8)));
+					    (data->ext_data[idx][4] << 8)));
 
 	/* Temperature sensitivity is 100 LSB/deg C */
 	val->val1 = raw_val / 100;
@@ -713,8 +710,8 @@ static int lsm6dso_init_chip(const struct device *dev)
 
 	k_busy_wait(100);
 
-	if (lsm6dso_accel_set_fs_raw(dev,
-				     LSM6DSO_DEFAULT_ACCEL_FULLSCALE) < 0) {
+	if (lsm6dso_accel_set_fs_raw(dev, LSM6DSO_DEFAULT_ACCEL_FULLSCALE) <
+	    0) {
 		LOG_DBG("failed to set accelerometer full-scale");
 		return -EIO;
 	}
@@ -759,18 +756,18 @@ static const struct lsm6dso_config lsm6dso_config = {
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
 	.bus_init = lsm6dso_spi_init,
 	.spi_conf.frequency = DT_INST_PROP(0, spi_max_frequency),
-	.spi_conf.operation = (SPI_OP_MODE_MASTER | SPI_MODE_CPOL |
-			       SPI_MODE_CPHA | SPI_WORD_SET(8) |
-			       SPI_LINES_SINGLE),
-	.spi_conf.slave     = DT_INST_REG_ADDR(0),
+	.spi_conf.operation =
+		(SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_MODE_CPHA |
+		 SPI_WORD_SET(8) | SPI_LINES_SINGLE),
+	.spi_conf.slave = DT_INST_REG_ADDR(0),
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	.gpio_cs_port	    = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
-	.cs_gpio	    = DT_INST_SPI_DEV_CS_GPIOS_PIN(0),
-	.cs_gpio_flags	    = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0),
+	.gpio_cs_port = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
+	.cs_gpio = DT_INST_SPI_DEV_CS_GPIOS_PIN(0),
+	.cs_gpio_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0),
 
-	.spi_conf.cs        =  &lsm6dso_data.cs_ctrl,
+	.spi_conf.cs = &lsm6dso_data.cs_ctrl,
 #else
-	.spi_conf.cs        = NULL,
+	.spi_conf.cs = NULL,
 #endif
 #elif DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	.bus_init = lsm6dso_i2c_init,
@@ -793,15 +790,14 @@ static const struct lsm6dso_config lsm6dso_config = {
 
 static int lsm6dso_init(const struct device *dev)
 {
-	const struct lsm6dso_config * const config = dev->config;
+	const struct lsm6dso_config *const config = dev->config;
 	struct lsm6dso_data *data = dev->data;
 
 	data->dev = dev;
 
 	data->bus = device_get_binding(config->bus_name);
 	if (!data->bus) {
-		LOG_DBG("master not found: %s",
-			    config->bus_name);
+		LOG_DBG("master not found: %s", config->bus_name);
 		return -EINVAL;
 	}
 
@@ -829,9 +825,8 @@ static int lsm6dso_init(const struct device *dev)
 	return 0;
 }
 
-
 static struct lsm6dso_data lsm6dso_data;
 
-DEVICE_AND_API_INIT(lsm6dso, DT_INST_LABEL(0), lsm6dso_init,
-		    &lsm6dso_data, &lsm6dso_config, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &lsm6dso_api_funcs);
+DEVICE_AND_API_INIT(lsm6dso, DT_INST_LABEL(0), lsm6dso_init, &lsm6dso_data,
+		    &lsm6dso_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &lsm6dso_api_funcs);

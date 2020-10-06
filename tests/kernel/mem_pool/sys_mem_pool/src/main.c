@@ -7,20 +7,19 @@
 #include <ztest.h>
 #include <sys/mempool.h>
 
-
-#define BLK_SIZE_MIN    256
-#define BLK_SIZE_MAX    1024
-#define BLK_NUM_MAX     8
+#define BLK_SIZE_MIN 256
+#define BLK_SIZE_MAX 1024
+#define BLK_NUM_MAX 8
 #define TOTAL_POOL_SIZE (BLK_SIZE_MAX * BLK_NUM_MAX)
-#define TOTAL_MIN_BLKS  (TOTAL_POOL_SIZE / BLK_SIZE_MIN)
+#define TOTAL_MIN_BLKS (TOTAL_POOL_SIZE / BLK_SIZE_MIN)
 
-#define DESC_SIZE       sizeof(struct sys_mem_pool_block)
+#define DESC_SIZE sizeof(struct sys_mem_pool_block)
 
 #define BLK_SIZE_EXCLUDE_DESC (BLK_SIZE_MIN - 16)
 #define BLK_ALIGN BLK_SIZE_MIN
 
-SYS_MEM_POOL_DEFINE(pool, NULL, BLK_SIZE_MIN, BLK_SIZE_MAX,
-		    BLK_NUM_MAX, BLK_ALIGN, ZTEST_SECTION);
+SYS_MEM_POOL_DEFINE(pool, NULL, BLK_SIZE_MIN, BLK_SIZE_MAX, BLK_NUM_MAX,
+		    BLK_ALIGN, ZTEST_SECTION);
 
 /**
  * @brief Verify sys_mem_pool allocation and free
@@ -126,10 +125,10 @@ void test_main(void)
 {
 	sys_mem_pool_init(&pool);
 
-	ztest_test_suite(test_sys_mem_pool_api,
-			 ztest_user_unit_test(test_sys_mem_pool_alloc_free),
-			 ztest_user_unit_test(test_sys_mem_pool_alloc_align4),
-			 ztest_user_unit_test(test_sys_mem_pool_min_block_size)
-			 );
+	ztest_test_suite(
+		test_sys_mem_pool_api,
+		ztest_user_unit_test(test_sys_mem_pool_alloc_free),
+		ztest_user_unit_test(test_sys_mem_pool_alloc_align4),
+		ztest_user_unit_test(test_sys_mem_pool_min_block_size));
 	ztest_run_test_suite(test_sys_mem_pool_api);
 }

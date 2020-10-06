@@ -10,19 +10,19 @@
 #include <zephyr/types.h>
 #include <device.h>
 
-#define SX9500_REG_IRQ_SRC		0x00
-#define SX9500_REG_STAT			0x01
-#define SX9500_REG_IRQ_MSK		0x03
+#define SX9500_REG_IRQ_SRC 0x00
+#define SX9500_REG_STAT 0x01
+#define SX9500_REG_IRQ_MSK 0x03
 
-#define SX9500_REG_PROX_CTRL0		0x06
-#define SX9500_REG_PROX_CTRL1		0x07
+#define SX9500_REG_PROX_CTRL0 0x06
+#define SX9500_REG_PROX_CTRL1 0x07
 
 /* These are used both in the IRQ_SRC register, to identify which
  * interrupt occur, and in the IRQ_MSK register, to enable specific
  * interrupts.
  */
-#define SX9500_CONV_DONE_IRQ		(1 << 3)
-#define SX9500_NEAR_FAR_IRQ		((1 << 5) | (1 << 6))
+#define SX9500_CONV_DONE_IRQ (1 << 3)
+#define SX9500_NEAR_FAR_IRQ ((1 << 5) | (1 << 6))
 
 struct sx9500_data {
 	const struct device *i2c_master;

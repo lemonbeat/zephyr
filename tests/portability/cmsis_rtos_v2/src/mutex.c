@@ -8,16 +8,13 @@
 #include <kernel.h>
 #include <cmsis_os2.h>
 
-#define TIMEOUT_TICKS   10
-#define STACKSZ         CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
+#define TIMEOUT_TICKS 10
+#define STACKSZ CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
 
 int max_mtx_cnt = CONFIG_CMSIS_V2_MUTEX_MAX_COUNT;
-const osMutexAttr_t mutex_attr = {
-	"myMutex",
-	osMutexRecursive | osMutexPrioInherit,
-	NULL,
-	0U
-};
+const osMutexAttr_t mutex_attr = { "myMutex",
+				   osMutexRecursive | osMutexPrioInherit, NULL,
+				   0U };
 
 void cleanup_max_mutex(osMutexId_t *mutex_ids)
 {
@@ -39,12 +36,14 @@ void test_max_mutex(void)
 	for (mtx_cnt = 0; mtx_cnt < max_mtx_cnt + 1; mtx_cnt++) {
 		mutex_ids[mtx_cnt] = osMutexNew(&mutex_attr);
 		if (mtx_cnt == max_mtx_cnt) {
-			zassert_true(mutex_ids[mtx_cnt] == NULL,
-				     "Mutex creation pass unexpectedly after max count");
+			zassert_true(
+				mutex_ids[mtx_cnt] == NULL,
+				"Mutex creation pass unexpectedly after max count");
 			cleanup_max_mutex(mutex_ids);
 		} else {
-			zassert_true(mutex_ids[mtx_cnt] != NULL,
-				     "Multiple mutex creation failed before max count");
+			zassert_true(
+				mutex_ids[mtx_cnt] != NULL,
+				"Multiple mutex creation failed before max count");
 		}
 	}
 }
@@ -141,17 +140,15 @@ void tThread_entry_lock_timeout(void *arg)
 }
 
 static K_THREAD_STACK_DEFINE(test_stack, STACKSZ);
-static osThreadAttr_t thread_attr = {
-	.name = "Mutex_check",
-	.attr_bits = osThreadDetached,
-	.cb_mem = NULL,
-	.cb_size = 0,
-	.stack_mem = &test_stack,
-	.stack_size = STACKSZ,
-	.priority = osPriorityNormal,
-	.tz_module = 0,
-	.reserved = 0
-};
+static osThreadAttr_t thread_attr = { .name = "Mutex_check",
+				      .attr_bits = osThreadDetached,
+				      .cb_mem = NULL,
+				      .cb_size = 0,
+				      .stack_mem = &test_stack,
+				      .stack_size = STACKSZ,
+				      .priority = osPriorityNormal,
+				      .tz_module = 0,
+				      .reserved = 0 };
 
 void test_mutex_lock_timeout(void)
 {

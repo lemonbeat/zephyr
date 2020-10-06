@@ -265,13 +265,11 @@ static int wdt_sam0_init(const struct device *dev)
 	PM->APBAMASK.bit.WDT_ = 1;
 
 	/* Connect to GCLK2 (~1.024 kHz) */
-	GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID_WDT
-		| GCLK_CLKCTRL_GEN_GCLK2
-		| GCLK_CLKCTRL_CLKEN;
+	GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID_WDT | GCLK_CLKCTRL_GEN_GCLK2 |
+			    GCLK_CLKCTRL_CLKEN;
 #endif
 
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority), wdt_sam0_isr,
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), wdt_sam0_isr,
 		    DEVICE_GET(wdt_sam0), 0);
 	irq_enable(DT_INST_IRQN(0));
 
@@ -280,6 +278,6 @@ static int wdt_sam0_init(const struct device *dev)
 
 static struct wdt_sam0_dev_data wdt_sam0_data;
 
-DEVICE_AND_API_INIT(wdt_sam0, DT_INST_LABEL(0), wdt_sam0_init,
-		    &wdt_sam0_data, NULL, PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &wdt_sam0_api);
+DEVICE_AND_API_INIT(wdt_sam0, DT_INST_LABEL(0), wdt_sam0_init, &wdt_sam0_data,
+		    NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &wdt_sam0_api);

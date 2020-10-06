@@ -18,8 +18,7 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 static const struct device *mic_dev;
 
-static void data_received(const struct device *dev,
-			  struct net_buf *buffer,
+static void data_received(const struct device *dev, struct net_buf *buffer,
 			  size_t size)
 {
 	int ret;
@@ -45,8 +44,8 @@ static void data_received(const struct device *dev,
 static void feature_update(const struct device *dev,
 			   const struct usb_audio_fu_evt *evt)
 {
-	LOG_DBG("Control selector %d for channel %d updated",
-		evt->cs, evt->channel);
+	LOG_DBG("Control selector %d for channel %d updated", evt->cs,
+		evt->channel);
 	switch (evt->cs) {
 	case USB_AUDIO_FU_MUTE_CONTROL:
 	default:

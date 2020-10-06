@@ -44,29 +44,31 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_ROUTE_LOG_LEVEL);
 #endif
 
 static struct in6_addr iface_1_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					  0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+					    0, 0, 0, 0, 0, 0, 0, 0x1 } } };
 
 static struct in6_addr iface_2_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-				    0, 0, 0, 0, 0x0b, 0x0e, 0x0e, 0x3 } } };
+					    0, 0, 0, 0, 0x0b, 0x0e, 0x0e,
+					    0x3 } } };
 
 static struct in6_addr iface_3_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-				    0, 0, 0, 0, 0x0e, 0x0e, 0x0e, 0x4 } } };
+					    0, 0, 0, 0, 0x0e, 0x0e, 0x0e,
+					    0x4 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr_1 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-					0, 0, 0, 0xf2,
-					0xaa, 0x29, 0x02, 0x04 } } };
+static struct in6_addr ll_addr_1 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0,
+					 0, 0, 0xf2, 0xaa, 0x29, 0x02,
+					 0x04 } } };
 
-static struct in6_addr ll_addr_2 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2,
-					   0xaa, 0x29, 0x05, 0x06 } } };
+static struct in6_addr ll_addr_2 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0,
+					 0, 0, 0xf2, 0xaa, 0x29, 0x05,
+					 0x06 } } };
 
-static struct in6_addr ll_addr_3 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2,
-					   0xaa, 0x29, 0x07, 0x08 } } };
+static struct in6_addr ll_addr_3 = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0,
+					 0, 0, 0xf2, 0xaa, 0x29, 0x07,
+					 0x08 } } };
 
-static struct in6_addr in6addr_mcast = { { { 0xff, 0x02, 0, 0, 0, 0, 0, 0,
-					     0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr in6addr_mcast = { { { 0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0,
+					     0, 0, 0, 0, 0, 0x1 } } };
 
 static struct net_if *iface_1;
 static struct net_if *iface_2;
@@ -83,47 +85,29 @@ struct net_route_mcast_iface_cfg {
 
 static struct net_route_entry_mcast *test_mcast_routes[MAX_MCAST_ROUTES];
 
-static struct in6_addr mcast_prefix_iflocal = { { {
-					0xFF, 0x01, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0 } } };
-static struct in6_addr mcast_prefix_llocal = { { {
-					0xFF, 0x02, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0 } } };
-static struct in6_addr mcast_prefix_admin = { { {
-					0xFF, 0x04, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0 } } };
-static struct in6_addr mcast_prefix_site_local = { { {
-					0xFF, 0x05, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0 } } };
-static struct in6_addr mcast_prefix_orga = { { {
-					0xFF, 0x08, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0 } } };
-static struct in6_addr mcast_prefix_global = { { {
-					0xFF, 0x0E, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0,
-					0, 0, 0, 0 } } };
+static struct in6_addr mcast_prefix_iflocal = {
+	{ { 0xFF, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+};
+static struct in6_addr mcast_prefix_llocal = { { { 0xFF, 0x02, 0, 0, 0, 0, 0, 0,
+						   0, 0, 0, 0, 0, 0, 0, 0 } } };
+static struct in6_addr mcast_prefix_admin = { { { 0xFF, 0x04, 0, 0, 0, 0, 0, 0,
+						  0, 0, 0, 0, 0, 0, 0, 0 } } };
+static struct in6_addr mcast_prefix_site_local = {
+	{ { 0xFF, 0x05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+};
+static struct in6_addr mcast_prefix_orga = { { { 0xFF, 0x08, 0, 0, 0, 0, 0, 0,
+						 0, 0, 0, 0, 0, 0, 0, 0 } } };
+static struct in6_addr mcast_prefix_global = { { { 0xFF, 0x0E, 0, 0, 0, 0, 0, 0,
+						   0, 0, 0, 0, 0, 0, 0, 0 } } };
 /*
  * full network prefix based address,
  * see RFC-3306 for details
  * FF3F:40:FD01:101:: \128
  * network prefix FD01:101::\64
  */
-static struct in6_addr mcast_prefix_nw_based = { { {
-		0xFF, 0x3F, 0, 0x40,
-		0xFD, 0x01, 0x01, 0x01,
-		0, 0, 0, 0,
-		0, 0, 0, 0 } } };
+static struct in6_addr mcast_prefix_nw_based = { { { 0xFF, 0x3F, 0, 0x40, 0xFD,
+						     0x01, 0x01, 0x01, 0, 0, 0,
+						     0, 0, 0, 0, 0 } } };
 
 static uint8_t forwarding_counter;
 static bool iface_1_forwarded;
@@ -164,7 +148,8 @@ static uint8_t *net_route_mcast_get_mac(const struct device *dev)
 }
 
 static void net_route_mcast_add_addresses(struct net_if *iface,
-		struct in6_addr *ipv6, struct in6_addr *ll_addr)
+					  struct in6_addr *ipv6,
+					  struct in6_addr *ll_addr)
 {
 	struct net_if_mcast_addr *maddr;
 	struct net_if_addr *ifaddr;
@@ -172,7 +157,7 @@ static void net_route_mcast_add_addresses(struct net_if *iface,
 	uint8_t *mac = net_route_mcast_get_mac(net_if_get_device(iface));
 
 	net_if_set_link_addr(iface, mac, sizeof(struct net_eth_addr),
-				     NET_LINK_ETHERNET);
+			     NET_LINK_ETHERNET);
 
 	ifaddr = net_if_ipv6_addr_add(iface, ipv6, NET_ADDR_MANUAL, 0);
 	zassert_not_null(ifaddr, "Cannot add global IPv6 address");
@@ -210,12 +195,10 @@ static bool check_packet_addresses(struct net_pkt *pkt)
 {
 	struct net_ipv6_hdr *ipv6_hdr = NET_IPV6_HDR(pkt);
 
-	if ((memcmp(&active_scenario.src,
-			&ipv6_hdr->src,
-			sizeof(struct in6_addr)) != 0) ||
-			(memcmp(&active_scenario.mcast,
-					&ipv6_hdr->dst,
-					sizeof(struct in6_addr)) != 0)) {
+	if ((memcmp(&active_scenario.src, &ipv6_hdr->src,
+		    sizeof(struct in6_addr)) != 0) ||
+	    (memcmp(&active_scenario.mcast, &ipv6_hdr->dst,
+		    sizeof(struct in6_addr)) != 0)) {
 		return false;
 	}
 
@@ -267,25 +250,25 @@ static struct dummy_api net_route_mcast_if_api_3 = {
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
 NET_DEVICE_INIT_INSTANCE(mcast_iface_1, "mcast_iface_1", iface_1,
-			net_route_mcast_dev_init, device_pm_control_nop,
-			&net_route_data_if1, NULL,
-			CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			&net_route_mcast_if_api_1, _ETH_L2_LAYER,
-			_ETH_L2_CTX_TYPE, 127);
+			 net_route_mcast_dev_init, device_pm_control_nop,
+			 &net_route_data_if1, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+			 &net_route_mcast_if_api_1, _ETH_L2_LAYER,
+			 _ETH_L2_CTX_TYPE, 127);
 
 NET_DEVICE_INIT_INSTANCE(mcast_iface_2, "mcast_iface_2", iface_2,
-			net_route_mcast_dev_init, device_pm_control_nop,
-			&net_route_data_if2, NULL,
-			CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			&net_route_mcast_if_api_2, _ETH_L2_LAYER,
-			_ETH_L2_CTX_TYPE, 127);
+			 net_route_mcast_dev_init, device_pm_control_nop,
+			 &net_route_data_if2, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+			 &net_route_mcast_if_api_2, _ETH_L2_LAYER,
+			 _ETH_L2_CTX_TYPE, 127);
 
 NET_DEVICE_INIT_INSTANCE(mcast_iface_3, "mcast_iface_3", iface_3,
-			net_route_mcast_dev_init, device_pm_control_nop,
-			&net_route_data_if3, NULL,
-			CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			&net_route_mcast_if_api_3, _ETH_L2_LAYER,
-			_ETH_L2_CTX_TYPE, 127);
+			 net_route_mcast_dev_init, device_pm_control_nop,
+			 &net_route_data_if3, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+			 &net_route_mcast_if_api_3, _ETH_L2_LAYER,
+			 _ETH_L2_CTX_TYPE, 127);
 
 static struct net_pkt *setup_ipv6_udp(struct net_if *iface,
 				      struct in6_addr *src_addr,
@@ -310,7 +293,7 @@ static struct net_pkt *setup_ipv6_udp(struct net_if *iface,
 	res = net_udp_create(pkt, htons(src_port), htons(remote_port));
 	zassert_equal(0, res, "udp create failed");
 
-	res = net_pkt_write(pkt, (uint8_t *) payload, strlen(payload));
+	res = net_pkt_write(pkt, (uint8_t *)payload, strlen(payload));
 	zassert_equal(0, res, "pkt write failed");
 
 	net_pkt_cursor_init(pkt);
@@ -342,80 +325,77 @@ static void test_route_mcast_route_add(void)
 	entry = net_route_mcast_add(iface_1, &mcast_prefix_llocal, 16);
 	zassert_is_null(entry, "add link local should fail");
 
-	test_mcast_routes[0] = net_route_mcast_add(iface_1,
-				    &mcast_prefix_admin, 16);
+	test_mcast_routes[0] =
+		net_route_mcast_add(iface_1, &mcast_prefix_admin, 16);
 	zassert_not_null(test_mcast_routes[0], "mcast route add failed");
 
-	test_mcast_routes[1] = net_route_mcast_add(iface_2,
-					      &mcast_prefix_site_local, 16);
+	test_mcast_routes[1] =
+		net_route_mcast_add(iface_2, &mcast_prefix_site_local, 16);
 	zassert_not_null(test_mcast_routes[1], "mcast route add failed");
 
-	test_mcast_routes[2] = net_route_mcast_add(iface_1,
-						      &mcast_prefix_orga, 16);
+	test_mcast_routes[2] =
+		net_route_mcast_add(iface_1, &mcast_prefix_orga, 16);
 	zassert_not_null(test_mcast_routes[2], "mcast route add failed");
 
-	test_mcast_routes[3] = net_route_mcast_add(iface_2,
-						      &mcast_prefix_global, 16);
+	test_mcast_routes[3] =
+		net_route_mcast_add(iface_2, &mcast_prefix_global, 16);
 	zassert_not_null(test_mcast_routes[3], "mcast route add failed");
 
 	/* check if route can be added
 	 * if forwarding flag not set on iface
 	 */
-	test_mcast_routes[4] = net_route_mcast_add(iface_3,
-			&mcast_prefix_global, 16);
+	test_mcast_routes[4] =
+		net_route_mcast_add(iface_3, &mcast_prefix_global, 16);
 	zassert_is_null(test_mcast_routes[4], "mcast route add should fail");
 
-	test_mcast_routes[4] = net_route_mcast_add(iface_1,
-				&mcast_prefix_nw_based, 96);
+	test_mcast_routes[4] =
+		net_route_mcast_add(iface_1, &mcast_prefix_nw_based, 96);
 	zassert_not_null(test_mcast_routes[4],
-			"add for nw prefix based failed");
+			 "add for nw prefix based failed");
 
 	memcpy(&nw_prefix_based_all_nodes, &mcast_prefix_nw_based,
-			sizeof(struct in6_addr));
+	       sizeof(struct in6_addr));
 	nw_prefix_based_all_nodes.s6_addr[15] = 0x01;
 
-	test_mcast_routes[5] = net_route_mcast_add(iface_2,
-				&nw_prefix_based_all_nodes, 128);
+	test_mcast_routes[5] =
+		net_route_mcast_add(iface_2, &nw_prefix_based_all_nodes, 128);
 	zassert_not_null(test_mcast_routes[5],
-			"add for nw prefix based failed");
+			 "add for nw prefix based failed");
 }
 
 static void mcast_foreach_cb(struct net_route_entry_mcast *entry,
-	     void *user_data)
+			     void *user_data)
 {
 	zassert_equal_ptr(user_data, &mcast_prefix_global,
-						  "foreach failed, wrong user_data");
+			  "foreach failed, wrong user_data");
 }
 
 static void test_route_mcast_foreach(void)
 {
-	int executed_first = net_route_mcast_foreach(mcast_foreach_cb,
-		NULL, &mcast_prefix_global);
+	int executed_first = net_route_mcast_foreach(mcast_foreach_cb, NULL,
+						     &mcast_prefix_global);
 
-	int executed_skip =  net_route_mcast_foreach(mcast_foreach_cb,
-			&mcast_prefix_admin, &mcast_prefix_global);
+	int executed_skip = net_route_mcast_foreach(
+		mcast_foreach_cb, &mcast_prefix_admin, &mcast_prefix_global);
 
 	zassert_true(executed_skip == (executed_first - 1),
-			"mcast foreach skip did not skip");
+		     "mcast foreach skip did not skip");
 }
 
 static void test_route_mcast_lookup(void)
 {
 	struct net_route_entry_mcast *route =
-			net_route_mcast_lookup(&mcast_prefix_admin);
+		net_route_mcast_lookup(&mcast_prefix_admin);
 
-	zassert_equal_ptr(test_mcast_routes[0], route,
-				  "mcast lookup failed");
+	zassert_equal_ptr(test_mcast_routes[0], route, "mcast lookup failed");
 
 	route = net_route_mcast_lookup(&mcast_prefix_site_local);
 
-	zassert_equal_ptr(test_mcast_routes[1], route,
-					  "mcast lookup failed");
+	zassert_equal_ptr(test_mcast_routes[1], route, "mcast lookup failed");
 
 	route = net_route_mcast_lookup(&mcast_prefix_global);
 
-	zassert_equal_ptr(test_mcast_routes[3], route,
-						  "mcast lookup failed");
+	zassert_equal_ptr(test_mcast_routes[3], route, "mcast lookup failed");
 }
 static void test_route_mcast_route_del(void)
 {
@@ -467,11 +447,12 @@ static void test_route_mcast_scenario1(void)
 	active_scenario.src.s6_addr[15] = 0x02;
 
 	memcpy(&active_scenario.mcast, &mcast_prefix_site_local,
-			sizeof(struct in6_addr));
+	       sizeof(struct in6_addr));
 	active_scenario.mcast.s6_addr[15] = 0x01;
 
 	struct net_pkt *pkt1 = setup_ipv6_udp(iface_1, &active_scenario.src,
-				&active_scenario.mcast, 20015, 20001);
+					      &active_scenario.mcast, 20015,
+					      20001);
 
 	active_scenario.is_active = true;
 	if (net_recv_data(iface_1, pkt1) < 0) {
@@ -481,12 +462,11 @@ static void test_route_mcast_scenario1(void)
 	k_sleep(WAIT_TIME);
 	net_pkt_unref(pkt1);
 
-
 	zassert_true(iface_2_forwarded, "iface_2 did not forward");
 	zassert_false(iface_1_forwarded, "iface_1 forwarded");
 	zassert_false(iface_3_forwarded, "iface_3 forwarded");
 	zassert_equal(forwarding_counter, 1,
-			"unexpected forwarded packet count");
+		      "unexpected forwarded packet count");
 
 	reset_counters();
 
@@ -494,7 +474,8 @@ static void test_route_mcast_scenario1(void)
 	active_scenario.src.s6_addr[15] = 0x09;
 
 	struct net_pkt *pkt2 = setup_ipv6_udp(iface_3, &active_scenario.src,
-			&active_scenario.mcast, 20015, 20001);
+					      &active_scenario.mcast, 20015,
+					      20001);
 	if (net_recv_data(iface_3, pkt2) < 0) {
 		net_pkt_unref(pkt2);
 		zassert_true(0, "failed to receive initial packet!");
@@ -506,7 +487,7 @@ static void test_route_mcast_scenario1(void)
 	zassert_false(iface_1_forwarded, "iface_1 forwarded");
 	zassert_false(iface_3_forwarded, "iface_3 forwarded");
 	zassert_equal(forwarding_counter, 1,
-			"unexpected forwarded packet count");
+		      "unexpected forwarded packet count");
 	reset_counters();
 }
 
@@ -529,11 +510,11 @@ static void test_route_mcast_scenario2(void)
 	active_scenario.src.s6_addr[15] = 0x08;
 
 	memcpy(&active_scenario.mcast, &mcast_prefix_admin,
-			sizeof(struct in6_addr));
+	       sizeof(struct in6_addr));
 	active_scenario.mcast.s6_addr[15] = 0x01;
 
 	struct net_pkt *pkt = setup_ipv6_udp(iface_1, &active_scenario.src,
-			&active_scenario.mcast, 215, 201);
+					     &active_scenario.mcast, 215, 201);
 
 	active_scenario.is_active = true;
 	if (net_recv_data(iface_1, pkt) < 0) {
@@ -553,7 +534,7 @@ static void test_route_mcast_scenario2(void)
 	active_scenario.src.s6_addr[15] = 0x08;
 
 	struct net_pkt *pkt2 = setup_ipv6_udp(iface_3, &active_scenario.src,
-			&active_scenario.mcast, 215, 201);
+					      &active_scenario.mcast, 215, 201);
 	if (net_recv_data(iface_3, pkt2) < 0) {
 		net_pkt_unref(pkt2);
 		zassert_true(0, "failed to receive initial packet!");
@@ -585,11 +566,11 @@ static void test_route_mcast_scenario3(void)
 	active_scenario.src.s6_addr[15] = 0x08;
 
 	memcpy(&active_scenario.mcast, &mcast_prefix_nw_based,
-				sizeof(struct in6_addr));
+	       sizeof(struct in6_addr));
 	active_scenario.mcast.s6_addr[15] = 0x01;
 
 	struct net_pkt *pkt = setup_ipv6_udp(iface_3, &active_scenario.src,
-				&active_scenario.mcast, 215, 201);
+					     &active_scenario.mcast, 215, 201);
 
 	active_scenario.is_active = true;
 	if (net_recv_data(iface_3, pkt) < 0) {
@@ -609,7 +590,7 @@ static void test_route_mcast_scenario3(void)
 	/* set to custom group id */
 	active_scenario.mcast.s6_addr[15] = 0x0F;
 	struct net_pkt *pkt2 = setup_ipv6_udp(iface_3, &active_scenario.src,
-					&active_scenario.mcast, 215, 201);
+					      &active_scenario.mcast, 215, 201);
 
 	active_scenario.is_active = true;
 	if (net_recv_data(iface_3, pkt2) < 0) {
@@ -631,7 +612,7 @@ static void test_route_mcast_scenario3(void)
 	active_scenario.mcast.s6_addr[11] = 0x0F;
 	active_scenario.mcast.s6_addr[15] = 0x01;
 	struct net_pkt *pkt3 = setup_ipv6_udp(iface_3, &active_scenario.src,
-			&active_scenario.mcast, 215, 201);
+					      &active_scenario.mcast, 215, 201);
 
 	active_scenario.is_active = true;
 	if (net_recv_data(iface_3, pkt3) < 0) {
@@ -652,14 +633,13 @@ static void test_route_mcast_scenario3(void)
 void test_main(void)
 {
 	ztest_test_suite(test_route_mcast,
-			ztest_unit_test(test_route_mcast_init),
-			ztest_unit_test(test_route_mcast_route_add),
-			ztest_unit_test(test_route_mcast_foreach),
-			ztest_unit_test(test_route_mcast_scenario1),
-			ztest_unit_test(test_route_mcast_scenario2),
-			ztest_unit_test(test_route_mcast_scenario3),
-			ztest_unit_test(test_route_mcast_lookup),
-			ztest_unit_test(test_route_mcast_route_del)
-			);
+			 ztest_unit_test(test_route_mcast_init),
+			 ztest_unit_test(test_route_mcast_route_add),
+			 ztest_unit_test(test_route_mcast_foreach),
+			 ztest_unit_test(test_route_mcast_scenario1),
+			 ztest_unit_test(test_route_mcast_scenario2),
+			 ztest_unit_test(test_route_mcast_scenario3),
+			 ztest_unit_test(test_route_mcast_lookup),
+			 ztest_unit_test(test_route_mcast_route_del));
 	ztest_run_test_suite(test_route_mcast);
 }

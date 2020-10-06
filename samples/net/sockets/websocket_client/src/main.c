@@ -19,13 +19,13 @@ LOG_MODULE_REGISTER(net_websocket_client_sample, LOG_LEVEL_DBG);
 #define SERVER_PORT 9001
 
 #if defined(CONFIG_NET_CONFIG_PEER_IPV6_ADDR)
-#define SERVER_ADDR6  CONFIG_NET_CONFIG_PEER_IPV6_ADDR
+#define SERVER_ADDR6 CONFIG_NET_CONFIG_PEER_IPV6_ADDR
 #else
 #define SERVER_ADDR6 ""
 #endif
 
 #if defined(CONFIG_NET_CONFIG_PEER_IPV4_ADDR)
-#define SERVER_ADDR4  CONFIG_NET_CONFIG_PEER_IPV4_ADDR
+#define SERVER_ADDR4 CONFIG_NET_CONFIG_PEER_IPV4_ADDR
 #else
 #define SERVER_ADDR4 ""
 #endif
@@ -109,7 +109,8 @@ static int setup_socket(sa_family_t family, const char *server, int port,
 					 sizeof(TLS_PEER_HOSTNAME));
 			if (ret < 0) {
 				LOG_ERR("Failed to set %s TLS_HOSTNAME "
-					"option (%d)", family_str, -errno);
+					"option (%d)",
+					family_str, -errno);
 				ret = -errno;
 				goto fail;
 			}
@@ -147,8 +148,7 @@ static int connect_socket(sa_family_t family, const char *server, int port,
 	ret = connect(*sock, addr, addr_len);
 	if (ret < 0) {
 		LOG_ERR("Cannot connect to %s remote (%d)",
-			family == AF_INET ? "IPv4" : "IPv6",
-			-errno);
+			family == AF_INET ? "IPv4" : "IPv6", -errno);
 		ret = -errno;
 	}
 
@@ -197,10 +197,8 @@ static void recv_data_wso_api(int sock, size_t amount, uint8_t *buf,
 
 	while (remaining > 0) {
 		ret = websocket_recv_msg(sock, buf + read_pos,
-					 buf_len - read_pos,
-					 &message_type,
-					 &remaining,
-					 0);
+					 buf_len - read_pos, &message_type,
+					 &remaining, 0);
 		if (ret <= 0) {
 			if (ret == -EAGAIN) {
 				k_sleep(K_MSEC(50));
@@ -208,7 +206,8 @@ static void recv_data_wso_api(int sock, size_t amount, uint8_t *buf,
 			}
 
 			LOG_DBG("%s connection closed while "
-				"waiting (%d/%d)", proto, ret, errno);
+				"waiting (%d/%d)",
+				proto, ret, errno);
 			break;
 		}
 
@@ -219,7 +218,8 @@ static void recv_data_wso_api(int sock, size_t amount, uint8_t *buf,
 	if (remaining != 0 || total_read != amount ||
 	    /* Do not check the final \n at the end of the msg */
 	    memcmp(lorem_ipsum, buf, amount - 1) != 0) {
-		LOG_ERR("%s data recv failure %zd/%d bytes (remaining %" PRId64 ")",
+		LOG_ERR("%s data recv failure %zd/%d bytes (remaining %" PRId64
+			")",
 			proto, amount, total_read, remaining);
 		LOG_HEXDUMP_DBG(buf, total_read, "received ws buf");
 		LOG_HEXDUMP_DBG(lorem_ipsum, total_read, "sent ws buf");
@@ -246,7 +246,8 @@ static void recv_data_bsd_api(int sock, size_t amount, uint8_t *buf,
 			}
 
 			LOG_DBG("%s connection closed while "
-				"waiting (%d/%d)", proto, ret, errno);
+				"waiting (%d/%d)",
+				proto, ret, errno);
 			break;
 		}
 
@@ -321,10 +322,7 @@ static bool send_and_wait_msg(int sock, size_t amount, const char *proto,
 void main(void)
 {
 	/* Just an example how to set extra headers */
-	const char *extra_headers[] = {
-		"Origin: http://foobar\r\n",
-		NULL
-	};
+	const char *extra_headers[] = { "Origin: http://foobar\r\n", NULL };
 	int sock4 = -1, sock6 = -1;
 	int websock4 = -1, websock6 = -1;
 	int32_t timeout = 3 * MSEC_PER_SEC;
@@ -346,9 +344,8 @@ void main(void)
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV4)) {
-		(void)connect_socket(AF_INET, SERVER_ADDR4, SERVER_PORT,
-				     &sock4, (struct sockaddr *)&addr4,
-				     sizeof(addr4));
+		(void)connect_socket(AF_INET, SERVER_ADDR4, SERVER_PORT, &sock4,
+				     (struct sockaddr *)&addr4, sizeof(addr4));
 	}
 
 	if (IS_ENABLED(CONFIG_NET_IPV6)) {
@@ -413,14 +410,14 @@ void main(void)
 		amount = how_much_to_send(ipsum_len);
 
 		if (websock4 >= 0 &&
-		    !send_and_wait_msg(websock4, amount, "IPv4",
-				       recv_buf_ipv4, sizeof(recv_buf_ipv4))) {
+		    !send_and_wait_msg(websock4, amount, "IPv4", recv_buf_ipv4,
+				       sizeof(recv_buf_ipv4))) {
 			break;
 		}
 
 		if (websock6 >= 0 &&
-		    !send_and_wait_msg(websock6, amount, "IPv6",
-				       recv_buf_ipv6, sizeof(recv_buf_ipv6))) {
+		    !send_and_wait_msg(websock6, amount, "IPv6", recv_buf_ipv6,
+				       sizeof(recv_buf_ipv6))) {
 			break;
 		}
 

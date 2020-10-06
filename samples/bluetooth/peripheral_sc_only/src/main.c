@@ -134,7 +134,6 @@ void main(void)
 
 	printk("Bluetooth initialized\n");
 
-
 	bt_conn_auth_cb_register(&auth_cb_display);
 	bt_conn_cb_register(&conn_callbacks);
 

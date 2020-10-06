@@ -42,8 +42,7 @@ static const struct flash_parameters flash_mcux_parameters = {
  *
  */
 
-static int flash_mcux_erase(const struct device *dev, off_t offset,
-			    size_t len)
+static int flash_mcux_erase(const struct device *dev, off_t offset, size_t len)
 {
 	struct flash_priv *priv = dev->data;
 	uint32_t addr;
@@ -65,8 +64,8 @@ static int flash_mcux_erase(const struct device *dev, off_t offset,
 	return (rc == kStatus_Success) ? 0 : -EINVAL;
 }
 
-static int flash_mcux_read(const struct device *dev, off_t offset,
-				void *data, size_t len)
+static int flash_mcux_read(const struct device *dev, off_t offset, void *data,
+			   size_t len)
 {
 	struct flash_priv *priv = dev->data;
 	uint32_t addr;
@@ -78,13 +77,13 @@ static int flash_mcux_read(const struct device *dev, off_t offset,
 	 */
 	addr = offset + priv->pflash_block_base;
 
-	memcpy(data, (void *) addr, len);
+	memcpy(data, (void *)addr, len);
 
 	return 0;
 }
 
 static int flash_mcux_write(const struct device *dev, off_t offset,
-				const void *data, size_t len)
+			    const void *data, size_t len)
 {
 	struct flash_priv *priv = dev->data;
 	uint32_t addr;
@@ -98,7 +97,7 @@ static int flash_mcux_write(const struct device *dev, off_t offset,
 	addr = offset + priv->pflash_block_base;
 
 	key = irq_lock();
-	rc = FLASH_Program(&priv->config, addr, (uint32_t *) data, len);
+	rc = FLASH_Program(&priv->config, addr, (uint32_t *)data, len);
 	irq_unlock(key);
 
 	k_sem_give(&priv->write_lock);
@@ -123,7 +122,7 @@ static int flash_mcux_write_protection(const struct device *dev, bool enable)
 #if defined(CONFIG_FLASH_PAGE_LAYOUT)
 static const struct flash_pages_layout dev_layout = {
 	.pages_count = DT_REG_SIZE(SOC_NV_FLASH_NODE) /
-				DT_PROP(SOC_NV_FLASH_NODE, erase_block_size),
+		       DT_PROP(SOC_NV_FLASH_NODE, erase_block_size),
 	.pages_size = DT_PROP(SOC_NV_FLASH_NODE, erase_block_size),
 };
 
@@ -170,12 +169,12 @@ static int flash_mcux_init(const struct device *dev)
 	rc = FLASH_Init(&priv->config);
 
 	FLASH_GetProperty(&priv->config, kFLASH_PropertyPflashBlockBaseAddr,
-			(uint32_t *)&pflash_block_base);
-	priv->pflash_block_base = (uint32_t) pflash_block_base;
+			  (uint32_t *)&pflash_block_base);
+	priv->pflash_block_base = (uint32_t)pflash_block_base;
 
 	return (rc == kStatus_Success) ? 0 : -EIO;
 }
 
-DEVICE_AND_API_INIT(flash_mcux, DT_INST_LABEL(0),
-			flash_mcux_init, &flash_data, NULL, POST_KERNEL,
-			CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &flash_mcux_api);
+DEVICE_AND_API_INIT(flash_mcux, DT_INST_LABEL(0), flash_mcux_init, &flash_data,
+		    NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &flash_mcux_api);

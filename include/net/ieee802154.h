@@ -27,8 +27,8 @@ extern "C" {
  * @{
  */
 
-#define IEEE802154_MAX_ADDR_LENGTH	8
-#define IEEE802154_NO_CHANNEL		USHRT_MAX
+#define IEEE802154_MAX_ADDR_LENGTH 8
+#define IEEE802154_NO_CHANNEL USHRT_MAX
 
 struct ieee802154_security_ctx {
 	uint32_t frame_counter;
@@ -36,9 +36,9 @@ struct ieee802154_security_ctx {
 	struct cipher_ctx dec;
 	uint8_t key[16];
 	uint8_t key_len;
-	uint8_t level	: 3;
-	uint8_t key_mode	: 2;
-	uint8_t _unused	: 3;
+	uint8_t level : 3;
+	uint8_t key_mode : 2;
+	uint8_t _unused : 3;
 };
 
 /* This not meant to be used by any code but 802.15.4 L2 stack */
@@ -67,13 +67,13 @@ struct ieee802154_context {
 	int16_t tx_power;
 	uint8_t sequence;
 	uint8_t ack_seq;
-	uint8_t ack_received	: 1;
-	uint8_t ack_requested	: 1;
-	uint8_t associated		: 1;
-	uint8_t _unused		: 5;
+	uint8_t ack_received : 1;
+	uint8_t ack_requested : 1;
+	uint8_t associated : 1;
+	uint8_t _unused : 5;
 };
 
-#define IEEE802154_L2_CTX_TYPE	struct ieee802154_context
+#define IEEE802154_L2_CTX_TYPE struct ieee802154_context
 
 #ifdef __cplusplus
 }

@@ -6,7 +6,7 @@
 
 /* NOTE: Definitions used internal to ULL implementations */
 
-#define SCAN_HANDLE_1M        0
+#define SCAN_HANDLE_1M 0
 #define SCAN_HANDLE_PHY_CODED 1
 
 int ull_scan_init(void);

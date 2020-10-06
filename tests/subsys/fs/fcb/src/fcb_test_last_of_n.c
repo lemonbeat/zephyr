@@ -14,7 +14,7 @@ void test_fcb_last_of_n(void)
 	int rc;
 	struct fcb_entry loc;
 	struct fcb_entry areas[ENTRIES];
-	uint8_t test_data[128] = {0};
+	uint8_t test_data[128] = { 0 };
 	uint8_t i;
 
 	fcb = &test_fcb;
@@ -47,31 +47,31 @@ void test_fcb_last_of_n(void)
 	rc = fcb_offset_last_n(fcb, 1, &loc);
 	zassert_true(rc == 0, "fcb_offset_last_n call failure");
 	zassert_true(areas[4].fe_sector == loc.fe_sector &&
-		     areas[4].fe_data_off == loc.fe_data_off &&
-		     areas[4].fe_data_len == loc.fe_data_len,
+			     areas[4].fe_data_off == loc.fe_data_off &&
+			     areas[4].fe_data_len == loc.fe_data_len,
 		     "fcb_offset_last_n: fetched wrong n-th location");
 
 	/* somewhere in the middle */
 	rc = fcb_offset_last_n(fcb, 3, &loc);
 	zassert_true(rc == 0, "fcb_offset_last_n call failure");
 	zassert_true(areas[2].fe_sector == loc.fe_sector &&
-		     areas[2].fe_data_off == loc.fe_data_off &&
-		     areas[2].fe_data_len == loc.fe_data_len,
+			     areas[2].fe_data_off == loc.fe_data_off &&
+			     areas[2].fe_data_len == loc.fe_data_len,
 		     "fcb_offset_last_n: fetched wrong n-th location");
 
 	/* first entry */
 	rc = fcb_offset_last_n(fcb, 5, &loc);
 	zassert_true(rc == 0, "fcb_offset_last_n call failure");
 	zassert_true(areas[0].fe_sector == loc.fe_sector &&
-		     areas[0].fe_data_off == loc.fe_data_off &&
-		     areas[0].fe_data_len == loc.fe_data_len,
+			     areas[0].fe_data_off == loc.fe_data_off &&
+			     areas[0].fe_data_len == loc.fe_data_len,
 		     "fcb_offset_last_n: fetched wrong n-th location");
 
 	/* after last valid entry, returns the first one like for 5 */
 	rc = fcb_offset_last_n(fcb, 6, &loc);
 	zassert_true(rc == 0, "fcb_offset_last_n call failure");
 	zassert_true(areas[0].fe_sector == loc.fe_sector &&
-		     areas[0].fe_data_off == loc.fe_data_off &&
-		     areas[0].fe_data_len == loc.fe_data_len,
+			     areas[0].fe_data_off == loc.fe_data_off &&
+			     areas[0].fe_data_len == loc.fe_data_len,
 		     "fcb_offset_last_n: fetched wrong n-th location");
 }

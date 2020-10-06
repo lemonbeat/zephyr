@@ -54,8 +54,8 @@ static inline int buf_insert(uint8_t *dst, uint16_t *dst_len, uint16_t dst_size,
 }
 
 /* read */
-static inline int buf_read(uint8_t *dst, uint16_t len, uint8_t *src, uint16_t src_len,
-			   uint16_t *offset)
+static inline int buf_read(uint8_t *dst, uint16_t len, uint8_t *src,
+			   uint16_t src_len, uint16_t *offset)
 {
 	if (!src) {
 		return -EINVAL;
@@ -74,7 +74,8 @@ static inline int buf_read(uint8_t *dst, uint16_t len, uint8_t *src, uint16_t sr
 	return 0;
 }
 
-static inline int buf_skip(uint16_t len, uint8_t *src, uint16_t src_len, uint16_t *offset)
+static inline int buf_skip(uint16_t len, uint8_t *src, uint16_t src_len,
+			   uint16_t *offset)
 {
 	return buf_read(NULL, len, src, src_len, offset);
 }
@@ -88,7 +89,8 @@ static inline int buf_read_u8(uint8_t *value, uint8_t *src, uint16_t src_len,
 static inline int buf_read_u16(uint16_t *value, uint8_t *src, uint16_t src_len,
 			       uint16_t *offset)
 {
-	return buf_read((uint8_t *)value, sizeof(uint16_t), src, src_len, offset);
+	return buf_read((uint8_t *)value, sizeof(uint16_t), src, src_len,
+			offset);
 }
 
 static inline int buf_read_be16(uint16_t *value, uint8_t *src, uint16_t src_len,
@@ -106,7 +108,8 @@ static inline int buf_read_be16(uint16_t *value, uint8_t *src, uint16_t src_len,
 static inline int buf_read_u32(uint32_t *value, uint8_t *src, uint16_t src_len,
 			       uint16_t *offset)
 {
-	return buf_read((uint8_t *)value, sizeof(uint32_t), src, src_len, offset);
+	return buf_read((uint8_t *)value, sizeof(uint32_t), src, src_len,
+			offset);
 }
 
 static inline int buf_read_be32(uint32_t *value, uint8_t *src, uint16_t src_len,

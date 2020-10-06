@@ -10,13 +10,15 @@
 #include "settings_test.h"
 #include "settings/settings_file.h"
 
-#define EXP_STR_CONTENT_1 "\x10\x00myfoo/mybar16=\x00\x01"\
-			  "\x0d\x00myfoo/mybar=\x14"\
-			  "\x16\x00myfoo/mybar64=\x25\x00\x00\x00\x00\x00\x00\x00"
+#define EXP_STR_CONTENT_1                \
+	"\x10\x00myfoo/mybar16=\x00\x01" \
+	"\x0d\x00myfoo/mybar=\x14"       \
+	"\x16\x00myfoo/mybar64=\x25\x00\x00\x00\x00\x00\x00\x00"
 
-#define EXP_STR_CONTENT_2 "\x0d\x00myfoo/mybar=\x14"\
-			  "\x10\x00myfoo/mybar16=\x01\x01"\
-			  "\x16\x00myfoo/mybar64=\x13\x00\x00\x00\x00\x00\x00\x00"
+#define EXP_STR_CONTENT_2                \
+	"\x0d\x00myfoo/mybar=\x14"       \
+	"\x10\x00myfoo/mybar16=\x01\x01" \
+	"\x16\x00myfoo/mybar64=\x13\x00\x00\x00\x00\x00\x00\x00"
 
 int file_str_cmp(const char *fname, char const *string, size_t pattern_len);
 
@@ -38,8 +40,7 @@ void test_config_compress_file(void)
 	zassert_true(rc == 0, "can't register FS as configuration source");
 
 	rc = settings_file_dst(&cf);
-	zassert_true(rc == 0,
-		     "can't register FS as configuration destination");
+	zassert_true(rc == 0, "can't register FS as configuration destination");
 
 	val64 = 1125U;
 	val16 = 256U;
@@ -61,7 +62,7 @@ void test_config_compress_file(void)
 	const char exp_content_1[] = EXP_STR_CONTENT_1;
 
 	/* check 1st compression */
-	rc = file_str_cmp(cf.cf_name, exp_content_1, sizeof(exp_content_1)-1);
+	rc = file_str_cmp(cf.cf_name, exp_content_1, sizeof(exp_content_1) - 1);
 	zassert_true(rc == 0, "bad value read");
 
 	val16 = 257U;
@@ -78,7 +79,7 @@ void test_config_compress_file(void)
 	const char exp_content_2[] = EXP_STR_CONTENT_2;
 
 	/* check subsequent compression */
-	rc = file_str_cmp(cf.cf_name, exp_content_2, sizeof(exp_content_2)-1);
+	rc = file_str_cmp(cf.cf_name, exp_content_2, sizeof(exp_content_2) - 1);
 	zassert_true(rc == 0, "bad value read");
 }
 

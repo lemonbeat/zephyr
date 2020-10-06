@@ -24,40 +24,34 @@ LOG_MODULE_REGISTER(webusb);
 #include "webusb.h"
 
 /* Max packet size for Bulk endpoints */
-#define WEBUSB_BULK_EP_MPS		64
+#define WEBUSB_BULK_EP_MPS 64
 /* Number of interfaces */
-#define WEBUSB_NUM_ITF			0x01
+#define WEBUSB_NUM_ITF 0x01
 /* Number of Endpoints in the custom interface */
-#define WEBUSB_NUM_EP			0x02
+#define WEBUSB_NUM_EP 0x02
 
-#define WEBUSB_IN_EP_IDX		0
-#define WEBUSB_OUT_EP_IDX		1
+#define WEBUSB_IN_EP_IDX 0
+#define WEBUSB_OUT_EP_IDX 1
 
 static struct webusb_req_handlers *req_handlers;
 
 uint8_t rx_buf[64];
 
-#define INITIALIZER_IF(num_ep, iface_class)				\
-	{								\
-		.bLength = sizeof(struct usb_if_descriptor),		\
-		.bDescriptorType = USB_INTERFACE_DESC,			\
-		.bInterfaceNumber = 0,					\
-		.bAlternateSetting = 0,					\
-		.bNumEndpoints = num_ep,				\
-		.bInterfaceClass = iface_class,				\
-		.bInterfaceSubClass = 0,				\
-		.bInterfaceProtocol = 0,				\
-		.iInterface = 0,					\
+#define INITIALIZER_IF(num_ep, iface_class)                                   \
+	{                                                                     \
+		.bLength = sizeof(struct usb_if_descriptor),                  \
+		.bDescriptorType = USB_INTERFACE_DESC, .bInterfaceNumber = 0, \
+		.bAlternateSetting = 0, .bNumEndpoints = num_ep,              \
+		.bInterfaceClass = iface_class, .bInterfaceSubClass = 0,      \
+		.bInterfaceProtocol = 0, .iInterface = 0,                     \
 	}
 
-#define INITIALIZER_IF_EP(addr, attr, mps, interval)			\
-	{								\
-		.bLength = sizeof(struct usb_ep_descriptor),		\
-		.bDescriptorType = USB_ENDPOINT_DESC,			\
-		.bEndpointAddress = addr,				\
-		.bmAttributes = attr,					\
-		.wMaxPacketSize = sys_cpu_to_le16(mps),			\
-		.bInterval = interval,					\
+#define INITIALIZER_IF_EP(addr, attr, mps, interval)                           \
+	{                                                                      \
+		.bLength = sizeof(struct usb_ep_descriptor),                   \
+		.bDescriptorType = USB_ENDPOINT_DESC,                          \
+		.bEndpointAddress = addr, .bmAttributes = attr,                \
+		.wMaxPacketSize = sys_cpu_to_le16(mps), .bInterval = interval, \
 	}
 
 USBD_CLASS_DESCR_DEFINE(primary, 0) struct {
@@ -83,8 +77,8 @@ USBD_CLASS_DESCR_DEFINE(primary, 0) struct {
  *
  * @return  0 on success, negative errno code on fail.
  */
-int webusb_custom_handle_req(struct usb_setup_packet *pSetup,
-			     int32_t *len, uint8_t **data)
+int webusb_custom_handle_req(struct usb_setup_packet *pSetup, int32_t *len,
+			     uint8_t **data)
 {
 	LOG_DBG("");
 
@@ -105,8 +99,8 @@ int webusb_custom_handle_req(struct usb_setup_packet *pSetup,
  *
  * @return  0 on success, negative errno code on fail.
  */
-int webusb_vendor_handle_req(struct usb_setup_packet *pSetup,
-			     int32_t *len, uint8_t **data)
+int webusb_vendor_handle_req(struct usb_setup_packet *pSetup, int32_t *len,
+			     uint8_t **data)
 {
 	/* Call the callback */
 	if (req_handlers && req_handlers->vendor_handler) {
@@ -149,8 +143,8 @@ static void webusb_read_cb(uint8_t ep, int size, void *priv)
 	usb_transfer(cfg->endpoint[WEBUSB_IN_EP_IDX].ep_addr, rx_buf, size,
 		     USB_TRANS_WRITE, webusb_write_cb, cfg);
 done:
-	usb_transfer(ep, rx_buf, sizeof(rx_buf), USB_TRANS_READ,
-		     webusb_read_cb, cfg);
+	usb_transfer(ep, rx_buf, sizeof(rx_buf), USB_TRANS_READ, webusb_read_cb,
+		     cfg);
 }
 
 /**
@@ -180,8 +174,8 @@ static void webusb_dev_status_cb(struct usb_cfg_data *cfg,
 		break;
 	case USB_DC_CONFIGURED:
 		LOG_DBG("USB device configured");
-		webusb_read_cb(cfg->endpoint[WEBUSB_OUT_EP_IDX].ep_addr,
-			       0, cfg);
+		webusb_read_cb(cfg->endpoint[WEBUSB_OUT_EP_IDX].ep_addr, 0,
+			       cfg);
 		break;
 	case USB_DC_DISCONNECTED:
 		LOG_DBG("USB device disconnected");
@@ -201,14 +195,8 @@ static void webusb_dev_status_cb(struct usb_cfg_data *cfg,
 
 /* Describe EndPoints configuration */
 static struct usb_ep_cfg_data webusb_ep_data[] = {
-	{
-		.ep_cb = usb_transfer_ep_callback,
-		.ep_addr = AUTO_EP_IN
-	},
-	{
-		.ep_cb	= usb_transfer_ep_callback,
-		.ep_addr = AUTO_EP_OUT
-	}
+	{ .ep_cb = usb_transfer_ep_callback, .ep_addr = AUTO_EP_IN },
+	{ .ep_cb = usb_transfer_ep_callback, .ep_addr = AUTO_EP_OUT }
 };
 
 USBD_CFG_DATA_DEFINE(primary, webusb) struct usb_cfg_data webusb_config = {

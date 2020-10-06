@@ -28,15 +28,14 @@
 #include <linker/sections.h>
 #include <ztest.h>
 
-#define NUM_MILLISECONDS        50
-#define TEST_TIMEOUT            200
+#define NUM_MILLISECONDS 50
+#define TEST_TIMEOUT 200
 
 #ifdef CONFIG_COVERAGE
 #define OFFLOAD_WORKQUEUE_STACK_SIZE 4096
 #else
 #define OFFLOAD_WORKQUEUE_STACK_SIZE 1024
 #endif
-
 
 static uint32_t critical_var;
 static uint32_t alt_thread_iterations;
@@ -125,13 +124,13 @@ void alternate_thread(void *arg1, void *arg2, void *arg3)
 	ARG_UNUSED(arg2);
 	ARG_UNUSED(arg3);
 
-	k_sem_take(&ALT_SEM, K_FOREVER);        /* Wait to be activated */
+	k_sem_take(&ALT_SEM, K_FOREVER); /* Wait to be activated */
 
 	alt_thread_iterations = critical_loop("alt1", alt_thread_iterations);
 
 	k_sem_give(&REGRESS_SEM);
 
-	k_sem_take(&ALT_SEM, K_FOREVER);        /* Wait to be re-activated */
+	k_sem_take(&ALT_SEM, K_FOREVER); /* Wait to be re-activated */
 
 	alt_thread_iterations = critical_loop("alt2", alt_thread_iterations);
 
@@ -154,7 +153,7 @@ void regression_thread(void *arg1, void *arg2, void *arg3)
 	ARG_UNUSED(arg2);
 	ARG_UNUSED(arg3);
 
-	k_sem_give(&ALT_SEM);   /* Activate alternate_thread() */
+	k_sem_give(&ALT_SEM); /* Activate alternate_thread() */
 
 	ncalls = critical_loop("reg1", ncalls);
 
@@ -168,7 +167,7 @@ void regression_thread(void *arg1, void *arg2, void *arg3)
 	TC_PRINT("Enable timeslicing at %u\n", k_uptime_get_32());
 	k_sched_time_slice_set(10, 10);
 
-	k_sem_give(&ALT_SEM);   /* Re-activate alternate_thread() */
+	k_sem_give(&ALT_SEM); /* Re-activate alternate_thread() */
 
 	ncalls = critical_loop("reg2", ncalls);
 
@@ -180,7 +179,6 @@ void regression_thread(void *arg1, void *arg2, void *arg3)
 		      "Unexpected value for <critical_var>");
 
 	k_sem_give(&TEST_SEM);
-
 }
 
 /**
@@ -196,18 +194,15 @@ void test_offload_workqueue(void)
 	critical_var = 0U;
 	alt_thread_iterations = 0U;
 
-	k_work_q_start(&offload_work_q,
-		       offload_work_q_stack,
+	k_work_q_start(&offload_work_q, offload_work_q_stack,
 		       K_THREAD_STACK_SIZEOF(offload_work_q_stack),
 		       CONFIG_MAIN_THREAD_PRIORITY);
 
-	k_thread_create(&thread1, stack1, STACK_SIZE,
-			alternate_thread, NULL, NULL, NULL,
-			K_PRIO_PREEMPT(12), 0, K_NO_WAIT);
+	k_thread_create(&thread1, stack1, STACK_SIZE, alternate_thread, NULL,
+			NULL, NULL, K_PRIO_PREEMPT(12), 0, K_NO_WAIT);
 
-	k_thread_create(&thread2, stack2, STACK_SIZE,
-			regression_thread, NULL, NULL, NULL,
-			K_PRIO_PREEMPT(12), 0, K_NO_WAIT);
+	k_thread_create(&thread2, stack2, STACK_SIZE, regression_thread, NULL,
+			NULL, NULL, K_PRIO_PREEMPT(12), 0, K_NO_WAIT);
 
 	zassert_true(k_sem_take(&TEST_SEM, K_MSEC(TEST_TIMEOUT * 2)) == 0,
 		     "Timed out waiting for TEST_SEM");
@@ -216,7 +211,6 @@ void test_offload_workqueue(void)
 void test_main(void)
 {
 	ztest_test_suite(kernel_offload_wq,
-			 ztest_1cpu_unit_test(test_offload_workqueue)
-			 );
+			 ztest_1cpu_unit_test(test_offload_workqueue));
 	ztest_run_test_suite(kernel_offload_wq);
 }

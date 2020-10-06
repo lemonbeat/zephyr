@@ -47,12 +47,13 @@ static inline bool append_be16(struct coap_packet *cpkt, uint16_t data)
 	}
 
 	cpkt->data[cpkt->offset++] = data >> 8;
-	cpkt->data[cpkt->offset++] = (uint8_t) data;
+	cpkt->data[cpkt->offset++] = (uint8_t)data;
 
 	return true;
 }
 
-static inline bool append(struct coap_packet *cpkt, const uint8_t *data, uint16_t len)
+static inline bool append(struct coap_packet *cpkt, const uint8_t *data,
+			  uint16_t len)
 {
 	if (!cpkt || !data) {
 		return false;
@@ -68,10 +69,10 @@ static inline bool append(struct coap_packet *cpkt, const uint8_t *data, uint16_
 	return true;
 }
 
-static bool match_path_uri(const char * const *path,
-			   const char *uri, uint16_t len)
+static bool match_path_uri(const char *const *path, const char *uri,
+			   uint16_t len)
 {
-	const char * const *p = NULL;
+	const char *const *p = NULL;
 	int i, j, k, plen;
 
 	if (!path) {
@@ -119,7 +120,7 @@ static bool match_path_uri(const char * const *path,
 				return true;
 			}
 
-next:
+		next:
 			p++;
 		}
 	}
@@ -132,10 +133,10 @@ next:
 	return true;
 }
 
-static bool match_attributes(const char * const *attributes,
+static bool match_attributes(const char *const *attributes,
 			     const struct coap_option *query)
 {
-	const char * const *attr;
+	const char *const *attr;
 
 	/* FIXME: deal with the case when there are multiple options in a
 	 * query, for example: 'rt=lux temperature', if I want to list
@@ -148,7 +149,7 @@ static bool match_attributes(const char * const *attributes,
 			continue;
 		}
 
-		if (!strncmp((char *) query->value, *attr, attr_len)) {
+		if (!strncmp((char *)query->value, *attr, attr_len)) {
 			return true;
 		}
 	}
@@ -161,7 +162,7 @@ static bool match_queries_resource(const struct coap_resource *resource,
 				   int num_queries)
 {
 	struct coap_core_metadata *meta = resource->user_data;
-	const char * const *attributes = NULL;
+	const char *const *attributes = NULL;
 	const int href_len = strlen("href");
 
 	if (num_queries == 0) {
@@ -177,10 +178,10 @@ static bool match_queries_resource(const struct coap_resource *resource,
 	}
 
 	if (query->len > href_len + 1 &&
-	    !strncmp((char *) query->value, "href", href_len)) {
+	    !strncmp((char *)query->value, "href", href_len)) {
 		/* The stuff after 'href=' */
-		const char *uri = (char *) query->value + href_len + 1;
-		uint16_t uri_len  = query->len - (href_len + 1);
+		const char *uri = (char *)query->value + href_len + 1;
+		uint16_t uri_len = query->len - (href_len + 1);
 
 		return match_path_uri(resource->path, uri, uri_len);
 	}
@@ -214,10 +215,9 @@ enum coap_block_size default_block_size(void)
 	return COAP_BLOCK_64;
 }
 
-static bool append_to_coap_pkt(struct coap_packet *response,
-			       const char *str, uint16_t len,
-			       uint16_t *remaining, size_t *offset,
-			       size_t current)
+static bool append_to_coap_pkt(struct coap_packet *response, const char *str,
+			       uint16_t len, uint16_t *remaining,
+			       size_t *offset, size_t current)
 {
 	uint16_t pos = 0U;
 	bool res;
@@ -250,13 +250,12 @@ static bool append_to_coap_pkt(struct coap_packet *response,
 	return res;
 }
 
-static int format_uri(const char * const *path,
-		      struct coap_packet *response,
-		      uint16_t *remaining, size_t *offset,
-		      size_t current, bool *more)
+static int format_uri(const char *const *path, struct coap_packet *response,
+		      uint16_t *remaining, size_t *offset, size_t current,
+		      bool *more)
 {
 	static const char prefix[] = "</";
-	const char * const *p;
+	const char *const *p;
 	bool res;
 
 	if (!path) {
@@ -274,7 +273,7 @@ static int format_uri(const char * const *path,
 		return 0;
 	}
 
-	for (p = path; *p; ) {
+	for (p = path; *p;) {
 		uint16_t path_len = strlen(*p);
 
 		res = append_to_coap_pkt(response, *p, path_len, remaining,
@@ -303,7 +302,6 @@ static int format_uri(const char * const *path,
 			*more = true;
 			return 0;
 		}
-
 	}
 
 	res = append_to_coap_pkt(response, ">", 1, remaining, offset, current);
@@ -321,23 +319,22 @@ static int format_uri(const char * const *path,
 	return 0;
 }
 
-static int format_attributes(const char * const *attributes,
-			     struct coap_packet *response,
-			     uint16_t *remaining, size_t *offset,
-			     size_t current, bool *more)
+static int format_attributes(const char *const *attributes,
+			     struct coap_packet *response, uint16_t *remaining,
+			     size_t *offset, size_t current, bool *more)
 {
-	const char * const *attr;
+	const char *const *attr;
 	bool res;
 
 	if (!attributes) {
 		goto terminator;
 	}
 
-	for (attr = attributes; *attr; ) {
+	for (attr = attributes; *attr;) {
 		int attr_len = strlen(*attr);
 
-		res = append_to_coap_pkt(response, *attr, attr_len,
-					 remaining, offset, current);
+		res = append_to_coap_pkt(response, *attr, attr_len, remaining,
+					 offset, current);
 		if (!res) {
 			return -ENOMEM;
 		}
@@ -352,8 +349,8 @@ static int format_attributes(const char * const *attributes,
 			continue;
 		}
 
-		res = append_to_coap_pkt(response, ";", 1,
-					 remaining, offset, current);
+		res = append_to_coap_pkt(response, ";", 1, remaining, offset,
+					 current);
 		if (!res) {
 			return -ENOMEM;
 		}
@@ -381,16 +378,15 @@ terminator:
 }
 
 static int format_resource(const struct coap_resource *resource,
-			   struct coap_packet *response,
-			   uint16_t *remaining, size_t *offset,
-			   size_t current, bool *more)
+			   struct coap_packet *response, uint16_t *remaining,
+			   size_t *offset, size_t current, bool *more)
 {
 	struct coap_core_metadata *meta = resource->user_data;
-	const char * const *attributes = NULL;
+	const char *const *attributes = NULL;
 	int r;
 
-	r = format_uri(resource->path, response, remaining,
-		       offset, current, more);
+	r = format_uri(resource->path, response, remaining, offset, current,
+		       more);
 	if (r < 0) {
 		return r;
 	}
@@ -448,9 +444,9 @@ int clear_more_flag(struct coap_packet *cpkt)
 }
 
 int coap_well_known_core_get(struct coap_resource *resource,
-			      struct coap_packet *request,
-			      struct coap_packet *response,
-			      uint8_t *data, uint16_t len)
+			     struct coap_packet *request,
+			     struct coap_packet *response, uint8_t *data,
+			     uint16_t len)
 {
 	static struct coap_block_context ctx;
 	struct coap_option query;
@@ -496,8 +492,8 @@ int coap_well_known_core_get(struct coap_resource *resource,
 
 	num_queries = r;
 
-	r = coap_packet_init(response, data, len, 1, COAP_TYPE_ACK,
-			     tkl, token, COAP_RESPONSE_CODE_CONTENT, id);
+	r = coap_packet_init(response, data, len, 1, COAP_TYPE_ACK, tkl, token,
+			     COAP_RESPONSE_CODE_CONTENT, id);
 	if (r < 0) {
 		goto end;
 	}
@@ -559,9 +555,9 @@ end:
 
 #else
 
-static int format_uri(const char * const *path, struct coap_packet *response)
+static int format_uri(const char *const *path, struct coap_packet *response)
 {
-	const char * const *p;
+	const char *const *p;
 	char *prefix = "</";
 	bool res;
 
@@ -569,27 +565,27 @@ static int format_uri(const char * const *path, struct coap_packet *response)
 		return -EINVAL;
 	}
 
-	res = append(response, (uint8_t *) prefix, strlen(prefix));
+	res = append(response, (uint8_t *)prefix, strlen(prefix));
 	if (!res) {
 		return -ENOMEM;
 	}
 
-	for (p = path; *p; ) {
-		res = append(response, (uint8_t *) *p, strlen(*p));
+	for (p = path; *p;) {
+		res = append(response, (uint8_t *)*p, strlen(*p));
 		if (!res) {
 			return -ENOMEM;
 		}
 
 		p++;
 		if (*p) {
-			res = append_u8(response, (uint8_t) '/');
+			res = append_u8(response, (uint8_t)'/');
 			if (!res) {
 				return -ENOMEM;
 			}
 		}
 	}
 
-	res = append_u8(response, (uint8_t) '>');
+	res = append_u8(response, (uint8_t)'>');
 	if (!res) {
 		return -ENOMEM;
 	}
@@ -597,25 +593,25 @@ static int format_uri(const char * const *path, struct coap_packet *response)
 	return 0;
 }
 
-static int format_attributes(const char * const *attributes,
+static int format_attributes(const char *const *attributes,
 			     struct coap_packet *response)
 {
-	const char * const *attr;
+	const char *const *attr;
 	bool res;
 
 	if (!attributes) {
 		goto terminator;
 	}
 
-	for (attr = attributes; *attr; ) {
-		res = append(response, (uint8_t *) *attr, strlen(*attr));
+	for (attr = attributes; *attr;) {
+		res = append(response, (uint8_t *)*attr, strlen(*attr));
 		if (!res) {
 			return -ENOMEM;
 		}
 
 		attr++;
 		if (*attr) {
-			res = append_u8(response, (uint8_t) ';');
+			res = append_u8(response, (uint8_t)';');
 			if (!res) {
 				return -ENOMEM;
 			}
@@ -623,7 +619,7 @@ static int format_attributes(const char * const *attributes,
 	}
 
 terminator:
-	res = append_u8(response, (uint8_t) ';');
+	res = append_u8(response, (uint8_t)';');
 	if (!res) {
 		return -ENOMEM;
 	}
@@ -635,7 +631,7 @@ static int format_resource(const struct coap_resource *resource,
 			   struct coap_packet *response)
 {
 	struct coap_core_metadata *meta = resource->user_data;
-	const char * const *attributes = NULL;
+	const char *const *attributes = NULL;
 	int r;
 
 	r = format_uri(resource->path, response);
@@ -652,8 +648,8 @@ static int format_resource(const struct coap_resource *resource,
 
 int coap_well_known_core_get(struct coap_resource *resource,
 			     struct coap_packet *request,
-			     struct coap_packet *response,
-			     uint8_t *data, uint16_t len)
+			     struct coap_packet *response, uint8_t *data,
+			     uint16_t len)
 {
 	struct coap_option query;
 	uint8_t token[8];
@@ -680,8 +676,8 @@ int coap_well_known_core_get(struct coap_resource *resource,
 
 	num_queries = r;
 
-	r = coap_packet_init(response, data, len, 1, COAP_TYPE_ACK,
-			     tkl, token, COAP_RESPONSE_CODE_CONTENT, id);
+	r = coap_packet_init(response, data, len, 1, COAP_TYPE_ACK, tkl, token,
+			     COAP_RESPONSE_CODE_CONTENT, id);
 	if (r < 0) {
 		return r;
 	}
@@ -715,8 +711,8 @@ int coap_well_known_core_get(struct coap_resource *resource,
 
 /* Exposing some of the APIs to CoAP unit tests in tests/net/lib/coap */
 #if defined(CONFIG_COAP_TEST_API_ENABLE)
-bool _coap_match_path_uri(const char * const *path,
-			  const char *uri, uint16_t len)
+bool _coap_match_path_uri(const char *const *path, const char *uri,
+			  uint16_t len)
 {
 	return match_path_uri(path, uri, len);
 }

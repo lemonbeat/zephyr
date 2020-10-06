@@ -141,7 +141,6 @@ static void canopen_tx_retry(struct k_work *item)
 				CO_errorReport(CANmodule->em,
 					       CO_EM_GENERIC_SOFTWARE_ERROR,
 					       CO_EMC_COMMUNICATION, 0);
-
 			}
 
 			buffer->bufferFull = false;
@@ -162,10 +161,9 @@ void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 }
 
 CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule,
-				   void *CANdriverState,
-				   CO_CANrx_t rxArray[], uint16_t rxSize,
-				   CO_CANtx_t txArray[], uint16_t txSize,
-				   uint16_t CANbitRate)
+				   void *CANdriverState, CO_CANrx_t rxArray[],
+				   uint16_t rxSize, CO_CANtx_t txArray[],
+				   uint16_t txSize, uint16_t CANbitRate)
 {
 	struct canopen_context *ctx = (struct canopen_context *)CANdriverState;
 	uint16_t i;
@@ -180,13 +178,13 @@ CO_ReturnError_t CO_CANmodule_init(CO_CANmodule_t *CANmodule,
 
 	if (rxSize > CONFIG_CAN_MAX_FILTER) {
 		LOG_ERR("insufficient number of concurrent CAN RX filters"
-			" (needs %d, %d available)", rxSize,
-			CONFIG_CAN_MAX_FILTER);
+			" (needs %d, %d available)",
+			rxSize, CONFIG_CAN_MAX_FILTER);
 		return CO_ERROR_OUT_OF_MEMORY;
 	} else if (rxSize < CONFIG_CAN_MAX_FILTER) {
 		LOG_DBG("excessive number of concurrent CAN RX filters enabled"
-			" (needs %d, %d available)", rxSize,
-			CONFIG_CAN_MAX_FILTER);
+			" (needs %d, %d available)",
+			rxSize, CONFIG_CAN_MAX_FILTER);
 	}
 
 	canopen_detach_all_rx_filters(CANmodule);
@@ -245,9 +243,9 @@ uint16_t CO_CANrxMsg_readIdent(const CO_CANrxMsg_t *rxMsg)
 }
 
 CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index,
-				uint16_t ident, uint16_t mask, bool_t rtr,
-				void *object,
-				CO_CANrxBufferCallback_t pFunct)
+				    uint16_t ident, uint16_t mask, bool_t rtr,
+				    void *object,
+				    CO_CANrxBufferCallback_t pFunct)
 {
 	struct zcan_filter filter;
 	CO_CANrx_t *buffer;
@@ -277,9 +275,8 @@ CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index,
 		can_detach(CANmodule->dev, buffer->filter_id);
 	}
 
-	buffer->filter_id = can_attach_isr(CANmodule->dev,
-					   canopen_rx_isr_callback,
-					   buffer, &filter);
+	buffer->filter_id = can_attach_isr(
+		CANmodule->dev, canopen_rx_isr_callback, buffer, &filter);
 	if (buffer->filter_id == CAN_NO_FREE_FILTER) {
 		LOG_ERR("failed to attach CAN rx isr, no free filter");
 		CO_errorReport(CANmodule->em, CO_EM_MEMORY_ALLOCATION_ERROR,
@@ -400,13 +397,12 @@ void CO_CANverifyErrors(CO_CANmodule_t *CANmodule)
 	 * TODO: Zephyr lacks an API for reading the rx mailbox
 	 * overflow counter.
 	 */
-	rx_overflows  = 0;
+	rx_overflows = 0;
 
 	state = can_get_state(CANmodule->dev, &err_cnt);
 
 	errors = ((uint32_t)err_cnt.tx_err_cnt << 16) |
-		 ((uint32_t)err_cnt.rx_err_cnt << 8) |
-		 rx_overflows;
+		 ((uint32_t)err_cnt.rx_err_cnt << 8) | rx_overflows;
 
 	if (errors != CANmodule->errors) {
 		CANmodule->errors = errors;

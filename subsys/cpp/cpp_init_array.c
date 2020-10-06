@@ -21,9 +21,8 @@ extern func_ptr __init_array_end[];
  */
 void __do_init_array_aux(void)
 {
-	for (func_ptr *func = __init_array_start;
-		func < __init_array_end;
-		func++) {
+	for (func_ptr *func = __init_array_start; func < __init_array_end;
+	     func++) {
 		(*func)();
 	}
 }

@@ -68,44 +68,41 @@ void sys_trace_idle(void)
 	SEGGER_SYSVIEW_OnIdle();
 }
 
-
 void sys_trace_semaphore_init(struct k_sem *sem)
 {
-	SEGGER_SYSVIEW_RecordU32(
-		SYS_TRACE_ID_SEMA_INIT, (uint32_t)(uintptr_t)sem);
+	SEGGER_SYSVIEW_RecordU32(SYS_TRACE_ID_SEMA_INIT,
+				 (uint32_t)(uintptr_t)sem);
 }
 
 void sys_trace_semaphore_take(struct k_sem *sem)
 {
-	SEGGER_SYSVIEW_RecordU32(
-		SYS_TRACE_ID_SEMA_TAKE, (uint32_t)(uintptr_t)sem);
+	SEGGER_SYSVIEW_RecordU32(SYS_TRACE_ID_SEMA_TAKE,
+				 (uint32_t)(uintptr_t)sem);
 }
 
 void sys_trace_semaphore_give(struct k_sem *sem)
 {
-	SEGGER_SYSVIEW_RecordU32(
-		SYS_TRACE_ID_SEMA_GIVE, (uint32_t)(uintptr_t)sem);
+	SEGGER_SYSVIEW_RecordU32(SYS_TRACE_ID_SEMA_GIVE,
+				 (uint32_t)(uintptr_t)sem);
 }
 
 void sys_trace_mutex_init(struct k_mutex *mutex)
 {
-	SEGGER_SYSVIEW_RecordU32(
-		SYS_TRACE_ID_MUTEX_INIT, (uint32_t)(uintptr_t)mutex);
+	SEGGER_SYSVIEW_RecordU32(SYS_TRACE_ID_MUTEX_INIT,
+				 (uint32_t)(uintptr_t)mutex);
 }
 
 void sys_trace_mutex_lock(struct k_mutex *mutex)
 {
-	SEGGER_SYSVIEW_RecordU32(
-		SYS_TRACE_ID_MUTEX_LOCK, (uint32_t)(uintptr_t)mutex);
+	SEGGER_SYSVIEW_RecordU32(SYS_TRACE_ID_MUTEX_LOCK,
+				 (uint32_t)(uintptr_t)mutex);
 }
 
 void sys_trace_mutex_unlock(struct k_mutex *mutex)
 {
-	SEGGER_SYSVIEW_RecordU32(
-		SYS_TRACE_ID_MUTEX_UNLOCK, (uint32_t)(uintptr_t)mutex);
+	SEGGER_SYSVIEW_RecordU32(SYS_TRACE_ID_MUTEX_UNLOCK,
+				 (uint32_t)(uintptr_t)mutex);
 }
-
-
 
 static void send_task_list_cb(void)
 {
@@ -123,10 +120,10 @@ static void send_task_list_cb(void)
 			memcpy(name, tname, THREAD_NAME_LEN);
 			name[THREAD_NAME_LEN - 1] = '\0';
 		} else {
-			snprintk(name, sizeof(name), "T%pE%p",
-				 thread, &thread->entry);
+			snprintk(name, sizeof(name), "T%pE%p", thread,
+				 &thread->entry);
 		}
-		SEGGER_SYSVIEW_SendTaskInfo(&(SEGGER_SYSVIEW_TASKINFO) {
+		SEGGER_SYSVIEW_SendTaskInfo(&(SEGGER_SYSVIEW_TASKINFO){
 			.TaskID = (uint32_t)(uintptr_t)thread,
 			.sName = name,
 			.StackSize = thread->stack_info.size,
@@ -136,18 +133,15 @@ static void send_task_list_cb(void)
 	}
 }
 
-
 static U64 get_time_cb(void)
 {
 	return (U64)k_cycle_get_32();
 }
 
-
 const SEGGER_SYSVIEW_OS_API SYSVIEW_X_OS_TraceAPI = {
 	get_time_cb,
 	send_task_list_cb,
 };
-
 
 static int sysview_init(const struct device *arg)
 {
@@ -159,6 +153,5 @@ static int sysview_init(const struct device *arg)
 	}
 	return 0;
 }
-
 
 SYS_INIT(sysview_init, POST_KERNEL, 0);

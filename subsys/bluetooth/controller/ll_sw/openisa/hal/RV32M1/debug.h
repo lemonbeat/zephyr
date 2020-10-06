@@ -35,37 +35,35 @@ extern const struct device *vega_debug_portb;
 extern const struct device *vega_debug_portc;
 extern const struct device *vega_debug_portd;
 
-#define DEBUG0_PIN       5
-#define DEBUG0_PORT		 vega_debug_portd
+#define DEBUG0_PIN 5
+#define DEBUG0_PORT vega_debug_portd
 
-#define DEBUG1_PIN       4
-#define DEBUG1_PORT		 vega_debug_portd
+#define DEBUG1_PIN 4
+#define DEBUG1_PORT vega_debug_portd
 
-#define DEBUG2_PIN       3
-#define DEBUG2_PORT		 vega_debug_portd
+#define DEBUG2_PIN 3
+#define DEBUG2_PORT vega_debug_portd
 
-#define DEBUG3_PIN       2
-#define DEBUG3_PORT		 vega_debug_portd
+#define DEBUG3_PIN 2
+#define DEBUG3_PORT vega_debug_portd
 
-#define DEBUG4_PIN       1
-#define DEBUG4_PORT		 vega_debug_portd
+#define DEBUG4_PIN 1
+#define DEBUG4_PORT vega_debug_portd
 
-#define DEBUG5_PIN       0
-#define DEBUG5_PORT		 vega_debug_portd
+#define DEBUG5_PIN 0
+#define DEBUG5_PORT vega_debug_portd
 
-#define DEBUG6_PIN       30
-#define DEBUG6_PORT		 vega_debug_portc
+#define DEBUG6_PIN 30
+#define DEBUG6_PORT vega_debug_portc
 
-#define DEBUG7_PIN       29
-#define DEBUG7_PORT		 vega_debug_portc
+#define DEBUG7_PIN 29
+#define DEBUG7_PORT vega_debug_portc
 
-#define DEBUG8_PIN       28
-#define DEBUG8_PORT		 vega_debug_portc
+#define DEBUG8_PIN 28
+#define DEBUG8_PORT vega_debug_portc
 
-#define DEBUG9_PIN       29
-#define DEBUG9_PORT		 vega_debug_portb
-
-
+#define DEBUG9_PIN 29
+#define DEBUG9_PORT vega_debug_portb
 
 /* below are some interesting macros referenced by controller
  * which can be defined to SoC's GPIO toggle to observe/debug the
@@ -79,14 +77,17 @@ extern const struct device *vega_debug_portd;
  * portd
  *
  */
-#define DEBUG_INIT() \
-	do { \
-		vega_debug_portb = device_get_binding(DT_LABEL(DT_NODELABEL(gpiob))); \
-		vega_debug_portc = device_get_binding(DT_LABEL(DT_NODELABEL(gpioc))); \
-		vega_debug_portd = device_get_binding(DT_LABEL(DT_NODELABEL(gpiod))); \
-		\
-		gpio_pin_set(DEBUG0_PORT, DEBUG0_PIN, 1); \
-		gpio_pin_set(DEBUG0_PORT, DEBUG0_PIN, 0); \
+#define DEBUG_INIT()                                                       \
+	do {                                                               \
+		vega_debug_portb =                                         \
+			device_get_binding(DT_LABEL(DT_NODELABEL(gpiob))); \
+		vega_debug_portc =                                         \
+			device_get_binding(DT_LABEL(DT_NODELABEL(gpioc))); \
+		vega_debug_portd =                                         \
+			device_get_binding(DT_LABEL(DT_NODELABEL(gpiod))); \
+                                                                           \
+		gpio_pin_set(DEBUG0_PORT, DEBUG0_PIN, 1);                  \
+		gpio_pin_set(DEBUG0_PORT, DEBUG0_PIN, 0);                  \
 	} while (0)
 
 #define DEBUG_CPU_SLEEP(flag) gpio_pin_set(DEBUG0_PORT, DEBUG0_PIN, flag)
@@ -103,51 +104,39 @@ extern const struct device *vega_debug_portd;
 
 #define DEBUG_RADIO_ACTIVE(flag) gpio_pin_set(DEBUG9_PORT, DEBUG9_PIN, flag)
 
-#define DEBUG_RADIO_CLOSE(flag) \
-	do { \
-		if (!flag) { \
+#define DEBUG_RADIO_CLOSE(flag)                                      \
+	do {                                                         \
+		if (!flag) {                                         \
 			gpio_pin_set(DEBUG3_PORT, DEBUG3_PIN, flag); \
 			gpio_pin_set(DEBUG4_PORT, DEBUG4_PIN, flag); \
 			gpio_pin_set(DEBUG5_PORT, DEBUG5_PIN, flag); \
 			gpio_pin_set(DEBUG6_PORT, DEBUG6_PIN, flag); \
-		} \
+		}                                                    \
 	} while (0)
 
-#define DEBUG_RADIO_PREPARE_A(flag) \
-		gpio_pin_set(DEBUG3_PORT, DEBUG3_PIN, flag)
+#define DEBUG_RADIO_PREPARE_A(flag) gpio_pin_set(DEBUG3_PORT, DEBUG3_PIN, flag)
 
-#define DEBUG_RADIO_START_A(flag) \
-		gpio_pin_set(DEBUG3_PORT, DEBUG3_PIN, flag)
+#define DEBUG_RADIO_START_A(flag) gpio_pin_set(DEBUG3_PORT, DEBUG3_PIN, flag)
 
-#define DEBUG_RADIO_CLOSE_A(flag) \
-		gpio_pin_set(DEBUG3_PORT, DEBUG3_PIN, flag)
+#define DEBUG_RADIO_CLOSE_A(flag) gpio_pin_set(DEBUG3_PORT, DEBUG3_PIN, flag)
 
-#define DEBUG_RADIO_PREPARE_S(flag) \
-		gpio_pin_set(DEBUG4_PORT, DEBUG4_PIN, flag)
+#define DEBUG_RADIO_PREPARE_S(flag) gpio_pin_set(DEBUG4_PORT, DEBUG4_PIN, flag)
 
-#define DEBUG_RADIO_START_S(flag) \
-		gpio_pin_set(DEBUG4_PORT, DEBUG4_PIN, flag)
+#define DEBUG_RADIO_START_S(flag) gpio_pin_set(DEBUG4_PORT, DEBUG4_PIN, flag)
 
-#define DEBUG_RADIO_CLOSE_S(flag) \
-		gpio_pin_set(DEBUG4_PORT, DEBUG4_PIN, flag)
+#define DEBUG_RADIO_CLOSE_S(flag) gpio_pin_set(DEBUG4_PORT, DEBUG4_PIN, flag)
 
-#define DEBUG_RADIO_PREPARE_O(flag) \
-		gpio_pin_set(DEBUG5_PORT, DEBUG5_PIN, flag)
+#define DEBUG_RADIO_PREPARE_O(flag) gpio_pin_set(DEBUG5_PORT, DEBUG5_PIN, flag)
 
-#define DEBUG_RADIO_START_O(flag) \
-		gpio_pin_set(DEBUG5_PORT, DEBUG5_PIN, flag)
+#define DEBUG_RADIO_START_O(flag) gpio_pin_set(DEBUG5_PORT, DEBUG5_PIN, flag)
 
-#define DEBUG_RADIO_CLOSE_O(flag) \
-		gpio_pin_set(DEBUG5_PORT, DEBUG5_PIN, flag)
+#define DEBUG_RADIO_CLOSE_O(flag) gpio_pin_set(DEBUG5_PORT, DEBUG5_PIN, flag)
 
-#define DEBUG_RADIO_PREPARE_M(flag) \
-		gpio_pin_set(DEBUG6_PORT, DEBUG6_PIN, flag)
+#define DEBUG_RADIO_PREPARE_M(flag) gpio_pin_set(DEBUG6_PORT, DEBUG6_PIN, flag)
 
-#define DEBUG_RADIO_START_M(flag) \
-		gpio_pin_set(DEBUG6_PORT, DEBUG6_PIN, flag)
+#define DEBUG_RADIO_START_M(flag) gpio_pin_set(DEBUG6_PORT, DEBUG6_PIN, flag)
 
-#define DEBUG_RADIO_CLOSE_M(flag) \
-		gpio_pin_set(DEBUG6_PORT, DEBUG6_PIN, flag)
+#define DEBUG_RADIO_CLOSE_M(flag) gpio_pin_set(DEBUG6_PORT, DEBUG6_PIN, flag)
 
 #else
 

@@ -20,8 +20,7 @@ LOG_MODULE_REGISTER(net_ieee802154_csma, CONFIG_NET_L2_IEEE802154_LOG_LEVEL);
 #include "ieee802154_utils.h"
 #include "ieee802154_radio_utils.h"
 
-static inline int csma_ca_radio_send(struct net_if *iface,
-				     struct net_pkt *pkt,
+static inline int csma_ca_radio_send(struct net_if *iface, struct net_pkt *pkt,
 				     struct net_buf *frag)
 {
 	const uint8_t max_bo = CONFIG_NET_L2_IEEE802154_RADIO_CSMA_CA_MAX_BO;
@@ -58,8 +57,8 @@ loop:
 			}
 		}
 
-		ret = ieee802154_tx(iface, IEEE802154_TX_MODE_DIRECT,
-				    pkt, frag);
+		ret = ieee802154_tx(iface, IEEE802154_TX_MODE_DIRECT, pkt,
+				    frag);
 		if (ret) {
 			continue;
 		}
@@ -87,8 +86,7 @@ static enum net_verdict csma_ca_radio_handle_ack(struct net_if *iface,
 }
 
 /* Declare the public Radio driver function used by the HW drivers */
-FUNC_ALIAS(csma_ca_radio_send,
-	   ieee802154_radio_send, int);
+FUNC_ALIAS(csma_ca_radio_send, ieee802154_radio_send, int);
 
-FUNC_ALIAS(csma_ca_radio_handle_ack,
-	   ieee802154_radio_handle_ack, enum net_verdict);
+FUNC_ALIAS(csma_ca_radio_handle_ack, ieee802154_radio_handle_ack,
+	   enum net_verdict);

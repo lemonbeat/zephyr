@@ -21,16 +21,16 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(crypto_stm32);
 
-#define CRYP_SUPPORT (CAP_RAW_KEY | CAP_SEPARATE_IO_BUFS | CAP_SYNC_OPS | \
-		      CAP_NO_IV_PREFIX)
+#define CRYP_SUPPORT \
+	(CAP_RAW_KEY | CAP_SEPARATE_IO_BUFS | CAP_SYNC_OPS | CAP_NO_IV_PREFIX)
 #define BLOCK_LEN_BYTES 16
 #define BLOCK_LEN_WORDS (BLOCK_LEN_BYTES / sizeof(uint32_t))
 #define CRYPTO_MAX_SESSION CONFIG_CRYPTO_STM32_MAX_SESSION
 
 struct crypto_stm32_session crypto_stm32_sessions[CRYPTO_MAX_SESSION];
 
-static void copy_reverse_words(uint8_t *dst_buf, int dst_len,
-			       uint8_t *src_buf, int src_len)
+static void copy_reverse_words(uint8_t *dst_buf, int dst_len, uint8_t *src_buf,
+			       int src_len)
 {
 	int i;
 
@@ -201,7 +201,7 @@ static int crypto_stm32_ctr_encrypt(struct cipher_ctx *ctx,
 				    struct cipher_pkt *pkt, uint8_t *iv)
 {
 	int ret;
-	uint32_t ctr[BLOCK_LEN_WORDS] = {0};
+	uint32_t ctr[BLOCK_LEN_WORDS] = { 0 };
 	int ivlen = ctx->keylen - (ctx->mode_params.ctr_info.ctr_len >> 3);
 
 	struct crypto_stm32_session *session = CRYPTO_STM32_SESSN(ctx);
@@ -221,7 +221,7 @@ static int crypto_stm32_ctr_decrypt(struct cipher_ctx *ctx,
 				    struct cipher_pkt *pkt, uint8_t *iv)
 {
 	int ret;
-	uint32_t ctr[BLOCK_LEN_WORDS] = {0};
+	uint32_t ctr[BLOCK_LEN_WORDS] = { 0 };
 	int ivlen = ctx->keylen - (ctx->mode_params.ctr_info.ctr_len >> 3);
 
 	struct crypto_stm32_session *session = CRYPTO_STM32_SESSN(ctx);
@@ -298,8 +298,7 @@ static int crypto_stm32_session_setup(const struct device *dev,
 	/* The STM32F4 CRYP peripheral supports key sizes of 128, 192 and 256
 	 * bits.
 	 */
-	if ((ctx->keylen != 16U) &&
-	    (ctx->keylen != 24U) &&
+	if ((ctx->keylen != 16U) && (ctx->keylen != 24U) &&
 	    (ctx->keylen != 32U)) {
 		LOG_ERR("%u key size is not supported", ctx->keylen);
 		return -EINVAL;
@@ -369,8 +368,9 @@ static int crypto_stm32_session_setup(const struct device *dev,
 		}
 	}
 
-	copy_reverse_words((uint8_t *)session->key, CRYPTO_STM32_AES_MAX_KEY_LEN,
-			   ctx->key.bit_stream, ctx->keylen);
+	copy_reverse_words((uint8_t *)session->key,
+			   CRYPTO_STM32_AES_MAX_KEY_LEN, ctx->key.bit_stream,
+			   ctx->keylen);
 
 	session->config.pKey = session->key;
 	session->config.DataType = CRYP_DATATYPE_8B;
@@ -450,19 +450,15 @@ static struct crypto_driver_api crypto_enc_funcs = {
 };
 
 static struct crypto_stm32_data crypto_stm32_dev_data = {
-	.hcryp = {
-		.Instance = CRYP
-	}
+	.hcryp = { .Instance = CRYP }
 };
 
 static struct crypto_stm32_config crypto_stm32_dev_config = {
-	.pclken = {
-		.enr = DT_INST_CLOCKS_CELL(0, bits),
-		.bus = DT_INST_CLOCKS_CELL(0, bus)
-	}
+	.pclken = { .enr = DT_INST_CLOCKS_CELL(0, bits),
+		    .bus = DT_INST_CLOCKS_CELL(0, bus) }
 };
 
-DEVICE_AND_API_INIT(crypto_stm32, DT_INST_LABEL(0),
-		    crypto_stm32_init, &crypto_stm32_dev_data,
-		    &crypto_stm32_dev_config, POST_KERNEL,
-		    CONFIG_CRYPTO_INIT_PRIORITY, (void *)&crypto_enc_funcs);
+DEVICE_AND_API_INIT(crypto_stm32, DT_INST_LABEL(0), crypto_stm32_init,
+		    &crypto_stm32_dev_data, &crypto_stm32_dev_config,
+		    POST_KERNEL, CONFIG_CRYPTO_INIT_PRIORITY,
+		    (void *)&crypto_enc_funcs);

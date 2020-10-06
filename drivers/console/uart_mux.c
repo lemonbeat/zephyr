@@ -63,13 +63,12 @@ struct uart_mux {
 	uint8_t rx_buf[CONFIG_UART_MUX_TEMP_BUF_SIZE];
 };
 
-#define DEFINE_UART_MUX(x, _)						\
-	RING_BUF_DECLARE(uart_rx_ringbuf_##x,				\
-			 CONFIG_UART_MUX_RINGBUF_SIZE);			\
-	static struct uart_mux uart_mux_##x __used			\
-		__attribute__((__section__(".uart_mux.data"))) = {	\
-			.rx_ringbuf = &uart_rx_ringbuf_##x,		\
-	};
+#define DEFINE_UART_MUX(x, _)                                                \
+	RING_BUF_DECLARE(uart_rx_ringbuf_##x, CONFIG_UART_MUX_RINGBUF_SIZE); \
+	static struct uart_mux uart_mux_##x __used                           \
+		__attribute__((__section__(".uart_mux.data"))) = {           \
+			.rx_ringbuf = &uart_rx_ringbuf_##x,                  \
+		};
 
 UTIL_LISTIFY(CONFIG_UART_MUX_REAL_DEVICE_COUNT, DEFINE_UART_MUX, _)
 
@@ -78,17 +77,16 @@ extern struct uart_mux __uart_mux_end[];
 
 /* UART Mux Driver Status Codes */
 enum uart_mux_status_code {
-	UART_MUX_UNKNOWN,      /* Initial connection status   */
-	UART_MUX_CONFIGURED,   /* UART mux configuration done */
-	UART_MUX_CONNECTED,    /* UART mux connected          */
+	UART_MUX_UNKNOWN, /* Initial connection status   */
+	UART_MUX_CONFIGURED, /* UART mux configuration done */
+	UART_MUX_CONNECTED, /* UART mux connected          */
 	UART_MUX_DISCONNECTED, /* UART mux connection lost    */
 };
 
 struct uart_mux_config {
 };
 
-#define DEV_DATA(dev) \
-	((struct uart_mux_dev_data *)(dev)->data)
+#define DEV_DATA(dev) ((struct uart_mux_dev_data *)(dev)->data)
 
 struct uart_mux_dev_data {
 	sys_snode_t node;
@@ -189,7 +187,8 @@ static int uart_mux_consume_ringbuf(struct uart_mux *uart_mux)
 static void uart_mux_rx_work(struct k_work *work)
 {
 	struct uart_mux *uart_mux =
-		CONTAINER_OF(work, struct uart_mux, rx_work);;
+		CONTAINER_OF(work, struct uart_mux, rx_work);
+	;
 	int ret;
 
 	do {
@@ -218,8 +217,7 @@ static void uart_mux_tx_work(struct k_work *work)
 		char tmp[sizeof("SEND _x") +
 			 sizeof(CONFIG_UART_MUX_DEVICE_NAME)];
 
-		snprintk(tmp, sizeof(tmp), "SEND %s",
-			 dev_data->dev->name);
+		snprintk(tmp, sizeof(tmp), "SEND %s", dev_data->dev->name);
 		LOG_HEXDUMP_DBG(data, len, log_strdup(tmp));
 	}
 
@@ -243,8 +241,8 @@ static int uart_mux_init(const struct device *dev)
 	k_work_init(&dev_data->tx_work, uart_mux_tx_work);
 	k_work_init(&dev_data->cb_work, uart_mux_cb_work);
 
-	LOG_DBG("Device %s dev %p dev_data %p cfg %p created",
-		dev->name, dev, dev_data, dev->config);
+	LOG_DBG("Device %s dev %p dev_data %p cfg %p created", dev->name, dev,
+		dev_data, dev->config);
 
 	return 0;
 }
@@ -260,19 +258,17 @@ static void uart_mux_isr(const struct device *uart, void *user_data)
 	size_t wrote = 0;
 
 	/* Read all data off UART, and send to RX worker for unmuxing */
-	while (uart_irq_update(uart) &&
-	       uart_irq_rx_ready(uart)) {
+	while (uart_irq_update(uart) && uart_irq_rx_ready(uart)) {
 		rx = uart_fifo_read(uart, real_uart->rx_buf,
 				    sizeof(real_uart->rx_buf));
 		if (rx <= 0) {
 			continue;
 		}
 
-		wrote = ring_buf_put(real_uart->rx_ringbuf,
-				     real_uart->rx_buf, rx);
+		wrote = ring_buf_put(real_uart->rx_ringbuf, real_uart->rx_buf,
+				     rx);
 		if (wrote < rx) {
-			LOG_ERR("Ring buffer full, drop %d bytes",
-				rx - wrote);
+			LOG_ERR("Ring buffer full, drop %d bytes", rx - wrote);
 		}
 
 		k_work_submit_to_queue(&uart_mux_workq, &real_uart->rx_work);
@@ -301,12 +297,11 @@ static void dlci_created_cb(struct gsm_dlci *dlci, bool connected,
 
 	LOG_DBG("%s %s", dev_data->dev->name,
 		dev_data->status == UART_MUX_CONNECTED ? "connected" :
-							 "disconnected");
+							       "disconnected");
 
 	if (dev_data->attach_cb) {
 		dev_data->attach_cb(dev_data->dev,
-				    dlci ? gsm_dlci_id(dlci) : -1,
-				    connected,
+				    dlci ? gsm_dlci_id(dlci) : -1, connected,
 				    dev_data->attach_user_data);
 	}
 }
@@ -359,9 +354,8 @@ static int init_real_uart(const struct device *mux, const struct device *uart,
 		uart_irq_rx_disable(real_uart->uart);
 		uart_irq_tx_disable(real_uart->uart);
 		uart_mux_flush_isr(real_uart->uart);
-		uart_irq_callback_user_data_set(
-			real_uart->uart, uart_mux_isr,
-			real_uart);
+		uart_irq_callback_user_data_set(real_uart->uart, uart_mux_isr,
+						real_uart);
 
 		uart_irq_rx_enable(real_uart->uart);
 	}
@@ -375,8 +369,7 @@ static int init_real_uart(const struct device *mux, const struct device *uart,
 
 /* This will bind the physical (real) UART to this muxed UART */
 static int attach(const struct device *mux_uart, const struct device *uart,
-		  int dlci_address, uart_mux_attach_cb_t cb,
-		  void *user_data)
+		  int dlci_address, uart_mux_attach_cb_t cb, void *user_data)
 {
 	sys_snode_t *sn, *sns;
 
@@ -384,8 +377,8 @@ static int attach(const struct device *mux_uart, const struct device *uart,
 		return -EINVAL;
 	}
 
-	LOG_DBG("Attach DLCI %d (%s) to %s", dlci_address,
-		mux_uart->name, uart->name);
+	LOG_DBG("Attach DLCI %d (%s) to %s", dlci_address, mux_uart->name,
+		uart->name);
 
 	SYS_SLIST_FOR_EACH_NODE_SAFE(&uart_mux_data_devlist, sn, sns) {
 		struct uart_mux_dev_data *dev_data =
@@ -408,12 +401,9 @@ static int attach(const struct device *mux_uart, const struct device *uart,
 			dev_data->attach_user_data = user_data;
 			dev_data->status = UART_MUX_CONFIGURED;
 
-			ret = gsm_dlci_create(real_uart->mux,
-					      mux_uart,
-					      dlci_address,
-					      dlci_created_cb,
-					      dev_data,
-					      &dev_data->dlci);
+			ret = gsm_dlci_create(real_uart->mux, mux_uart,
+					      dlci_address, dlci_created_cb,
+					      dev_data, &dev_data->dlci);
 			if (ret < 0) {
 				LOG_DBG("Cannot create DLCI %d (%d)",
 					dlci_address, ret);
@@ -435,8 +425,7 @@ static int uart_mux_poll_in(const struct device *dev, unsigned char *p_char)
 	return -ENOTSUP;
 }
 
-static void uart_mux_poll_out(const struct device *dev,
-			      unsigned char out_char)
+static void uart_mux_poll_out(const struct device *dev, unsigned char out_char)
 {
 	struct uart_mux_dev_data *dev_data = DEV_DATA(dev);
 
@@ -472,8 +461,8 @@ static int uart_mux_config_get(const struct device *dev,
 	return -ENOTSUP;
 }
 
-static int uart_mux_fifo_fill(const struct device *dev,
-			      const uint8_t *tx_data, int len)
+static int uart_mux_fifo_fill(const struct device *dev, const uint8_t *tx_data,
+			      int len)
 {
 	struct uart_mux_dev_data *dev_data;
 	size_t wrote;
@@ -487,8 +476,8 @@ static int uart_mux_fifo_fill(const struct device *dev,
 		return -ENOENT;
 	}
 
-	LOG_DBG("dev_data %p len %d tx_ringbuf space %u",
-		dev_data, len, ring_buf_space_get(dev_data->tx_ringbuf));
+	LOG_DBG("dev_data %p len %d tx_ringbuf space %u", dev_data, len,
+		ring_buf_space_get(dev_data->tx_ringbuf));
 
 	if (dev_data->status != UART_MUX_CONNECTED) {
 		LOG_WRN("UART mux not connected, drop %d bytes", len);
@@ -522,8 +511,7 @@ static int uart_mux_fifo_read(const struct device *dev, uint8_t *rx_data,
 		return -ENOENT;
 	}
 
-	LOG_DBG("%s size %d rx_ringbuf space %u",
-		dev->name, size,
+	LOG_DBG("%s size %d rx_ringbuf space %u", dev->name, size,
 		ring_buf_space_get(dev_data->rx_ringbuf));
 
 	len = ring_buf_get(dev_data->rx_ringbuf, rx_data, size);
@@ -782,21 +770,18 @@ int uart_mux_send(const struct device *uart, const uint8_t *buf, size_t size)
 }
 
 int uart_mux_recv(const struct device *mux, struct gsm_dlci *dlci,
-		  uint8_t *data,
-		  size_t len)
+		  uint8_t *data, size_t len)
 {
 	struct uart_mux_dev_data *dev_data = DEV_DATA(mux);
 	size_t wrote = 0;
 
-	LOG_DBG("%s: dlci %p data %p len %zd", mux->name, dlci,
-		data, len);
+	LOG_DBG("%s: dlci %p data %p len %zd", mux->name, dlci, data, len);
 
 	if (IS_ENABLED(CONFIG_UART_MUX_VERBOSE_DEBUG)) {
 		char tmp[sizeof("RECV _x") +
 			 sizeof(CONFIG_UART_MUX_DEVICE_NAME)];
 
-		snprintk(tmp, sizeof(tmp), "RECV %s",
-			 dev_data->dev->name);
+		snprintk(tmp, sizeof(tmp), "RECV %s", dev_data->dev->name);
 		LOG_HEXDUMP_DBG(data, len, log_strdup(tmp));
 	}
 
@@ -832,26 +817,22 @@ void uart_mux_foreach(uart_mux_cb_t cb, void *user_data)
 	}
 }
 
-#define DEFINE_UART_MUX_CFG_DATA(x, _)					  \
-	struct uart_mux_cfg_data uart_mux_config_##x = {		  \
+#define DEFINE_UART_MUX_CFG_DATA(x, _) \
+	struct uart_mux_cfg_data uart_mux_config_##x = {};
+
+#define DEFINE_UART_MUX_DEV_DATA(x, _)                                  \
+	RING_BUF_DECLARE(tx_ringbuf_##x, CONFIG_UART_MUX_RINGBUF_SIZE); \
+	RING_BUF_DECLARE(rx_ringbuf_##x, CONFIG_UART_MUX_RINGBUF_SIZE); \
+	static struct uart_mux_dev_data uart_mux_dev_data_##x = {       \
+		.tx_ringbuf = &tx_ringbuf_##x,                          \
+		.rx_ringbuf = &rx_ringbuf_##x,                          \
 	};
 
-#define DEFINE_UART_MUX_DEV_DATA(x, _)					  \
-	RING_BUF_DECLARE(tx_ringbuf_##x, CONFIG_UART_MUX_RINGBUF_SIZE);	  \
-	RING_BUF_DECLARE(rx_ringbuf_##x, CONFIG_UART_MUX_RINGBUF_SIZE);	  \
-	static struct uart_mux_dev_data uart_mux_dev_data_##x = {	  \
-		.tx_ringbuf = &tx_ringbuf_##x,				  \
-		.rx_ringbuf = &rx_ringbuf_##x,				  \
-	};
-
-#define DEFINE_UART_MUX_DEVICE(x, _)					  \
-	DEVICE_AND_API_INIT(uart_mux_##x,				  \
-			    CONFIG_UART_MUX_DEVICE_NAME "_" #x,		  \
-			    &uart_mux_init,				  \
-			    &uart_mux_dev_data_##x,			  \
-			    &uart_mux_config_##x,			  \
-			    POST_KERNEL,				  \
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		  \
+#define DEFINE_UART_MUX_DEVICE(x, _)                                          \
+	DEVICE_AND_API_INIT(uart_mux_##x, CONFIG_UART_MUX_DEVICE_NAME "_" #x, \
+			    &uart_mux_init, &uart_mux_dev_data_##x,           \
+			    &uart_mux_config_##x, POST_KERNEL,                \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,               \
 			    &uart_mux_driver_api);
 
 UTIL_LISTIFY(CONFIG_UART_MUX_DEVICE_COUNT, DEFINE_UART_MUX_CFG_DATA, _)

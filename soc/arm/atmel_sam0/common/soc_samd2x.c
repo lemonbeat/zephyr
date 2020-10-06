@@ -78,15 +78,14 @@ static void dfll_init(void)
 	GCLK->GENDIV.reg = GCLK_GENDIV_ID(1) | GCLK_GENDIV_DIV(0);
 	wait_gclk_synchronization();
 
-
 #if defined(CONFIG_SOC_ATMEL_SAMD_XOSC32K_AS_MAIN)
 	/* Route XOSC32K to GCLK1 */
-	GCLK->GENCTRL.reg =
-	    GCLK_GENCTRL_ID(1) | GCLK_GENCTRL_SRC_XOSC32K | GCLK_GENCTRL_GENEN;
+	GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(1) | GCLK_GENCTRL_SRC_XOSC32K |
+			    GCLK_GENCTRL_GENEN;
 #elif defined(CONFIG_SOC_ATMEL_SAMD_OSC8M_AS_MAIN)
 	/* Route OSC8M to GCLK1 */
-	GCLK->GENCTRL.reg =
-	    GCLK_GENCTRL_ID(1) | GCLK_GENCTRL_SRC_OSC8M | GCLK_GENCTRL_GENEN;
+	GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(1) | GCLK_GENCTRL_SRC_OSC8M |
+			    GCLK_GENCTRL_GENEN;
 #else
 #error Unsupported main clock source.
 #endif
@@ -94,8 +93,8 @@ static void dfll_init(void)
 	wait_gclk_synchronization();
 
 	/* Route GCLK1 to multiplexer 1 */
-	GCLK->CLKCTRL.reg =
-	    GCLK_CLKCTRL_ID(0) | GCLK_CLKCTRL_GEN_GCLK1 | GCLK_CLKCTRL_CLKEN;
+	GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID(0) | GCLK_CLKCTRL_GEN_GCLK1 |
+			    GCLK_CLKCTRL_CLKEN;
 	wait_gclk_synchronization();
 
 	SYSCTRL->DFLLCTRL.reg = SYSCTRL_DFLLCTRL_ENABLE;
@@ -103,8 +102,8 @@ static void dfll_init(void)
 	}
 
 	uint32_t mul = (SOC_ATMEL_SAM0_MCK_FREQ_HZ +
-		     SOC_ATMEL_SAM0_GCLK1_FREQ_HZ / 2) /
-		    SOC_ATMEL_SAM0_GCLK1_FREQ_HZ;
+			SOC_ATMEL_SAM0_GCLK1_FREQ_HZ / 2) /
+		       SOC_ATMEL_SAM0_GCLK1_FREQ_HZ;
 
 	SYSCTRL->DFLLMUL.reg = SYSCTRL_DFLLMUL_CSTEP(31) |
 			       SYSCTRL_DFLLMUL_FSTEP(511) |
@@ -148,16 +147,16 @@ static void gclks_init(void)
 	wait_gclk_synchronization();
 
 	/* OSC8M/1 -> GCLK3 */
-	GCLK->GENCTRL.reg =
-	    GCLK_GENCTRL_ID(3) | GCLK_GENCTRL_SRC_OSC8M | GCLK_GENCTRL_GENEN;
+	GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(3) | GCLK_GENCTRL_SRC_OSC8M |
+			    GCLK_GENCTRL_GENEN;
 	wait_gclk_synchronization();
 
 	/* OSCULP32K/32 -> GCLK2 */
 	GCLK->GENDIV.reg = GCLK_GENDIV_ID(2) | GCLK_GENDIV_DIV(32 - 1);
 	wait_gclk_synchronization();
 
-	GCLK->GENCTRL.reg =
-	    GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_SRC_OSC32K | GCLK_GENCTRL_GENEN;
+	GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_SRC_OSC32K |
+			    GCLK_GENCTRL_GENEN;
 	wait_gclk_synchronization();
 }
 

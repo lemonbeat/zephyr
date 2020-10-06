@@ -15,14 +15,14 @@
 #define th_seq(_x) ntohl(UNALIGNED_GET(&(_x)->th_seq))
 #define th_ack(_x) ntohl(UNALIGNED_GET(&(_x)->th_ack))
 
-#define tcp_slist(_slist, _op, _type, _link)				\
-({									\
-	sys_snode_t *_node = sys_slist_##_op(_slist);			\
-									\
-	_type * _x = _node ? CONTAINER_OF(_node, _type, _link) : NULL;	\
-									\
-	_x;								\
-})
+#define tcp_slist(_slist, _op, _type, _link)                                  \
+	({                                                                    \
+		sys_snode_t *_node = sys_slist_##_op(_slist);                 \
+                                                                              \
+		_type *_x = _node ? CONTAINER_OF(_node, _type, _link) : NULL; \
+                                                                              \
+		_x;                                                           \
+	})
 
 #if IS_ENABLED(CONFIG_NET_TEST_PROTOCOL)
 #define tcp_malloc(_size) \
@@ -48,73 +48,66 @@
 #endif
 
 #define tcp_pkt_ref(_pkt) net_pkt_ref(_pkt)
-#define tcp_pkt_alloc(_conn, _len)					\
-({									\
-	struct net_pkt *_pkt;						\
-									\
-	if ((_len) > 0) {						\
-		_pkt = net_pkt_alloc_with_buffer(			\
-			(_conn)->iface,					\
-			(_len),						\
-			net_context_get_family((_conn)->context),	\
-			IPPROTO_TCP,					\
-			TCP_PKT_ALLOC_TIMEOUT);				\
-	} else {							\
-		_pkt = net_pkt_alloc(TCP_PKT_ALLOC_TIMEOUT);		\
-	}								\
-									\
-	tp_pkt_alloc(_pkt, tp_basename(__FILE__), __LINE__);		\
-									\
-	_pkt;								\
-})
-
+#define tcp_pkt_alloc(_conn, _len)                                        \
+	({                                                                \
+		struct net_pkt *_pkt;                                     \
+                                                                          \
+		if ((_len) > 0) {                                         \
+			_pkt = net_pkt_alloc_with_buffer(                 \
+				(_conn)->iface, (_len),                   \
+				net_context_get_family((_conn)->context), \
+				IPPROTO_TCP, TCP_PKT_ALLOC_TIMEOUT);      \
+		} else {                                                  \
+			_pkt = net_pkt_alloc(TCP_PKT_ALLOC_TIMEOUT);      \
+		}                                                         \
+                                                                          \
+		tp_pkt_alloc(_pkt, tp_basename(__FILE__), __LINE__);      \
+                                                                          \
+		_pkt;                                                     \
+	})
 
 #if IS_ENABLED(CONFIG_NET_TEST_PROTOCOL)
-#define conn_seq(_conn, _req) \
+#define conn_seq(_conn, _req)                                              \
 	tp_seq_track(TP_SEQ, &(_conn)->seq, (_req), tp_basename(__FILE__), \
-			__LINE__, __func__)
-#define conn_ack(_conn, _req) \
+		     __LINE__, __func__)
+#define conn_ack(_conn, _req)                                              \
 	tp_seq_track(TP_ACK, &(_conn)->ack, (_req), tp_basename(__FILE__), \
-			__LINE__, __func__)
+		     __LINE__, __func__)
 #else
 #define conn_seq(_conn, _req) (_conn)->seq += (_req)
 #define conn_ack(_conn, _req) (_conn)->ack += (_req)
 #endif
 
-#define conn_mss(_conn)					\
-	((_conn)->recv_options.mss_found ?		\
-	 (_conn)->recv_options.mss : NET_IPV6_MTU)
+#define conn_mss(_conn)                                                \
+	((_conn)->recv_options.mss_found ? (_conn)->recv_options.mss : \
+						 NET_IPV6_MTU)
 
-#define conn_state(_conn, _s)						\
-({									\
-	NET_DBG("%s->%s",						\
-		tcp_state_to_str((_conn)->state, false),		\
-		tcp_state_to_str((_s), false));				\
-	(_conn)->state = _s;						\
-})
+#define conn_state(_conn, _s)                                              \
+	({                                                                 \
+		NET_DBG("%s->%s", tcp_state_to_str((_conn)->state, false), \
+			tcp_state_to_str((_s), false));                    \
+		(_conn)->state = _s;                                       \
+	})
 
-#define conn_send_data_dump(_conn)					\
-({									\
-	NET_DBG("conn: %p total=%zd, unacked_len=%d, "			\
-		"send_win=%hu, mss=%hu",				\
-		(_conn), net_pkt_get_len((_conn)->send_data),		\
-		conn->unacked_len, conn->send_win,			\
-		conn_mss((_conn)));					\
-	NET_DBG("conn: %p send_data_timer=%hu, send_data_retries=%hu",	\
-		(_conn),						\
-		(bool)k_delayed_work_remaining_get(&(_conn)->send_data_timer),\
-		(_conn)->send_data_retries);				\
-})
+#define conn_send_data_dump(_conn)                                             \
+	({                                                                     \
+		NET_DBG("conn: %p total=%zd, unacked_len=%d, "                 \
+			"send_win=%hu, mss=%hu",                               \
+			(_conn), net_pkt_get_len((_conn)->send_data),          \
+			conn->unacked_len, conn->send_win, conn_mss((_conn))); \
+		NET_DBG("conn: %p send_data_timer=%hu, send_data_retries=%hu", \
+			(_conn),                                               \
+			(bool)k_delayed_work_remaining_get(                    \
+				&(_conn)->send_data_timer),                    \
+			(_conn)->send_data_retries);                           \
+	})
 
-#define TCPOPT_END	0
-#define TCPOPT_NOP	1
-#define TCPOPT_MAXSEG	2
-#define TCPOPT_WINDOW	3
+#define TCPOPT_END 0
+#define TCPOPT_NOP 1
+#define TCPOPT_MAXSEG 2
+#define TCPOPT_WINDOW 3
 
-enum pkt_addr {
-	TCP_EP_SRC = 1,
-	TCP_EP_DST = 0
-};
+enum pkt_addr { TCP_EP_SRC = 1, TCP_EP_DST = 0 };
 
 struct tcphdr {
 	uint16_t th_sport;
@@ -122,12 +115,12 @@ struct tcphdr {
 	uint32_t th_seq;
 	uint32_t th_ack;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	uint8_t th_x2:4;	/* unused */
-	uint8_t th_off:4;	/* data offset */
+	uint8_t th_x2 : 4; /* unused */
+	uint8_t th_off : 4; /* data offset */
 #endif
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	uint8_t th_off:4;
-	uint8_t th_x2:4;
+	uint8_t th_off : 4;
+	uint8_t th_x2 : 4;
 #endif
 	uint8_t th_flags;
 	uint16_t th_win;
@@ -158,10 +151,7 @@ enum tcp_state {
 	TCP_CLOSED
 };
 
-enum tcp_data_mode {
-	TCP_DATA_MODE_SEND = 0,
-	TCP_DATA_MODE_RESEND = 1
-};
+enum tcp_data_mode { TCP_DATA_MODE_SEND = 0, TCP_DATA_MODE_RESEND = 1 };
 
 union tcp_endpoint {
 	struct sockaddr sa;
@@ -209,18 +199,18 @@ struct tcp { /* TCP connection */
 	bool in_close : 1;
 };
 
-#define _flags(_fl, _op, _mask, _cond)					\
-({									\
-	bool result = false;						\
-									\
-	if (UNALIGNED_GET(_fl) && (_cond) &&				\
-	    (UNALIGNED_GET(_fl) _op(_mask))) {				\
-		UNALIGNED_PUT(UNALIGNED_GET(_fl) & ~(_mask), _fl);	\
-		result = true;						\
-	}								\
-									\
-	result;								\
-})
+#define _flags(_fl, _op, _mask, _cond)                                     \
+	({                                                                 \
+		bool result = false;                                       \
+                                                                           \
+		if (UNALIGNED_GET(_fl) && (_cond) &&                       \
+		    (UNALIGNED_GET(_fl) _op(_mask))) {                     \
+			UNALIGNED_PUT(UNALIGNED_GET(_fl) & ~(_mask), _fl); \
+			result = true;                                     \
+		}                                                          \
+                                                                           \
+		result;                                                    \
+	})
 
-#define FL(_fl, _op, _mask, _args...)					\
+#define FL(_fl, _op, _mask, _args...) \
 	_flags(_fl, _op, _mask, strlen("" #_args) ? _args : true)

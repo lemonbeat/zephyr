@@ -28,15 +28,15 @@
  */
 #if defined(CONFIG_EAGER_FPU_SHARING) || defined(CONFIG_LAZY_FPU_SHARING)
 #ifdef CONFIG_SSE
-#define FP_REG_SET_ALIGN  16
+#define FP_REG_SET_ALIGN 16
 #else
-#define FP_REG_SET_ALIGN  4
+#define FP_REG_SET_ALIGN 4
 #endif
 #else
 /* Unused, no special alignment requirements, use default alignment for
  * char buffers on this arch
  */
-#define FP_REG_SET_ALIGN  1
+#define FP_REG_SET_ALIGN 1
 #endif /* CONFIG_*_FP_SHARING */
 
 /*
@@ -73,7 +73,6 @@ struct _callee_saved {
 	 *  unsigned long esi;
 	 *  unsigned long edi;
 	 */
-
 };
 
 typedef struct _callee_saved _callee_saved_t;
@@ -103,21 +102,21 @@ typedef struct s_FpReg {
  * Memory, 32-Bit Format.
  */
 
-typedef struct s_FpRegSet {  /* # of bytes: name of register */
-	unsigned short fcw;      /* 2  : x87 FPU control word */
-	unsigned short pad1;     /* 2  : N/A */
-	unsigned short fsw;      /* 2  : x87 FPU status word */
-	unsigned short pad2;     /* 2  : N/A */
-	unsigned short ftw;      /* 2  : x87 FPU tag word */
-	unsigned short pad3;     /* 2  : N/A */
-	unsigned int fpuip;      /* 4  : x87 FPU instruction pointer offset */
-	unsigned short cs;       /* 2  : x87 FPU instruction pointer selector */
+typedef struct s_FpRegSet { /* # of bytes: name of register */
+	unsigned short fcw; /* 2  : x87 FPU control word */
+	unsigned short pad1; /* 2  : N/A */
+	unsigned short fsw; /* 2  : x87 FPU status word */
+	unsigned short pad2; /* 2  : N/A */
+	unsigned short ftw; /* 2  : x87 FPU tag word */
+	unsigned short pad3; /* 2  : N/A */
+	unsigned int fpuip; /* 4  : x87 FPU instruction pointer offset */
+	unsigned short cs; /* 2  : x87 FPU instruction pointer selector */
 	unsigned short fop : 11; /* 2  : x87 FPU opcode */
 	unsigned short pad4 : 5; /*    : 5 bits = 00000 */
-	unsigned int fpudp;      /* 4  : x87 FPU instr operand ptr offset */
-	unsigned short ds;       /* 2  : x87 FPU instr operand ptr selector */
-	unsigned short pad5;     /* 2  : N/A */
-	tFpReg fpReg[8];	 /* 80 : ST0 -> ST7 */
+	unsigned int fpudp; /* 4  : x87 FPU instr operand ptr offset */
+	unsigned short ds; /* 2  : x87 FPU instr operand ptr selector */
+	unsigned short pad5; /* 2  : N/A */
+	tFpReg fpReg[8]; /* 80 : ST0 -> ST7 */
 } tFpRegSet __aligned(FP_REG_SET_ALIGN);
 
 #ifdef CONFIG_SSE
@@ -125,7 +124,7 @@ typedef struct s_FpRegSet {  /* # of bytes: name of register */
 /* definition of a single x87 (floating point / MMX) register */
 
 typedef struct s_FpRegEx {
-	unsigned char reg[10];  /* 80 bits: ST[0-7] or MM[0-7] */
+	unsigned char reg[10]; /* 80 bits: ST[0-7] or MM[0-7] */
 	unsigned char rsrvd[6]; /* 48 bits: reserved */
 } tFpRegEx;
 
@@ -150,21 +149,21 @@ typedef struct s_XmmReg {
 
 typedef struct s_FpRegSetEx /* # of bytes: name of register */
 {
-	unsigned short fcw;     /* 2  : x87 FPU control word */
-	unsigned short fsw;     /* 2  : x87 FPU status word */
-	unsigned char ftw;      /* 1  : x87 FPU abridged tag word */
-	unsigned char rsrvd0;   /* 1  : reserved */
-	unsigned short fop;     /* 2  : x87 FPU opcode */
-	unsigned int fpuip;     /* 4  : x87 FPU instruction pointer offset */
-	unsigned short cs;      /* 2  : x87 FPU instruction pointer selector */
-	unsigned short rsrvd1;  /* 2  : reserved */
-	unsigned int fpudp;     /* 4  : x87 FPU instr operand ptr offset */
-	unsigned short ds;      /* 2  : x87 FPU instr operand ptr selector */
-	unsigned short rsrvd2;  /* 2  : reserved */
-	unsigned int mxcsr;     /* 4  : MXCSR register state */
+	unsigned short fcw; /* 2  : x87 FPU control word */
+	unsigned short fsw; /* 2  : x87 FPU status word */
+	unsigned char ftw; /* 1  : x87 FPU abridged tag word */
+	unsigned char rsrvd0; /* 1  : reserved */
+	unsigned short fop; /* 2  : x87 FPU opcode */
+	unsigned int fpuip; /* 4  : x87 FPU instruction pointer offset */
+	unsigned short cs; /* 2  : x87 FPU instruction pointer selector */
+	unsigned short rsrvd1; /* 2  : reserved */
+	unsigned int fpudp; /* 4  : x87 FPU instr operand ptr offset */
+	unsigned short ds; /* 2  : x87 FPU instr operand ptr selector */
+	unsigned short rsrvd2; /* 2  : reserved */
+	unsigned int mxcsr; /* 4  : MXCSR register state */
 	unsigned int mxcsrMask; /* 4  : MXCSR register mask */
-	tFpRegEx fpReg[8];      /* 128 : x87 FPU/MMX registers */
-	tXmmReg xmmReg[8];      /* 128 : XMM registers */
+	tFpRegEx fpReg[8]; /* 128 : x87 FPU/MMX registers */
+	tXmmReg xmmReg[8]; /* 128 : XMM registers */
 	unsigned char rsrvd3[176]; /* 176 : reserved */
 } tFpRegSetEx __aligned(FP_REG_SET_ALIGN);
 

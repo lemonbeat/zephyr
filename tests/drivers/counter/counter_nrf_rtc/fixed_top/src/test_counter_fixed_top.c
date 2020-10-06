@@ -18,7 +18,7 @@ const char *devices[] = {
 	/* Nordic RTC0 may be reserved for Bluetooth */
 	DT_LABEL(DT_NODELABEL(rtc0)),
 #endif
-	/* Nordic RTC1 is used for the system clock */
+/* Nordic RTC1 is used for the system clock */
 #ifdef CONFIG_COUNTER_RTC2
 	DT_LABEL(DT_NODELABEL(rtc2)),
 #endif
@@ -41,7 +41,6 @@ static void counter_tear_down_instance(const char *dev_name)
 
 	err = counter_stop(dev);
 	zassert_equal(0, err, "%s: Counter failed to stop", dev_name);
-
 }
 
 static void test_all_instances(counter_test_func_t func)
@@ -59,10 +58,7 @@ void test_set_custom_top_value_fails_on_instance(const char *dev_name)
 {
 	const struct device *dev;
 	int err;
-	struct counter_top_cfg top_cfg = {
-		.callback = NULL,
-		.flags = 0
-	};
+	struct counter_top_cfg top_cfg = { .callback = NULL, .flags = 0 };
 
 	dev = device_get_binding(dev_name);
 	top_cfg.ticks = counter_get_max_top_value(dev) - 1;
@@ -86,10 +82,8 @@ void test_top_handler_on_instance(const char *dev_name)
 	const struct device *dev;
 	uint32_t tmp_top_cnt;
 	int err;
-	struct counter_top_cfg top_cfg = {
-		.callback = top_handler,
-		.flags = 0
-	};
+	struct counter_top_cfg top_cfg = { .callback = top_handler,
+					   .flags = 0 };
 
 	dev = device_get_binding(dev_name);
 	top_cfg.ticks = counter_get_max_top_value(dev);
@@ -119,8 +113,7 @@ void test_top_handler(void)
 void test_main(void)
 {
 	ztest_test_suite(test_counter,
-		ztest_unit_test(test_set_custom_top_value_fails),
-		ztest_unit_test(test_top_handler)
-			 );
+			 ztest_unit_test(test_set_custom_top_value_fails),
+			 ztest_unit_test(test_top_handler));
 	ztest_run_test_suite(test_counter);
 }

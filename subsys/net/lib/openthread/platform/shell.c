@@ -32,8 +32,9 @@ int otConsoleOutputCallback(const char *aBuf, uint16_t aBufLength,
 	return aBufLength;
 }
 
-#define SHELL_HELP_OT	"OpenThread subcommands\n" \
-			"Use \"ot help\" to get the list of subcommands"
+#define SHELL_HELP_OT              \
+	"OpenThread subcommands\n" \
+	"Use \"ot help\" to get the list of subcommands"
 
 static int ot_cmd(const struct shell *shell, size_t argc, char *argv[])
 {

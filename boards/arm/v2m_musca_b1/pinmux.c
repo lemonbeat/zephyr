@@ -14,18 +14,18 @@
 
 #include "pinmux/pinmux.h"
 
-#define IOMUX_MAIN_INSEL	(0x68 >> 2)
-#define IOMUX_MAIN_OUTSEL	(0x70 >> 2)
-#define IOMUX_MAIN_OENSEL	(0x78 >> 2)
-#define IOMUX_MAIN_DEFAULT_IN	(0x80 >> 2)
-#define IOMUX_ALTF1_INSEL	(0x88 >> 2)
-#define IOMUX_ALTF1_OUTSEL	(0x90 >> 2)
-#define IOMUX_ALTF1_OENSEL	(0x98 >> 2)
-#define IOMUX_ALTF1_DEFAULT_IN	(0xA0 >> 2)
-#define IOMUX_ALTF2_INSEL	(0xA8 >> 2)
-#define IOMUX_ALTF2_OUTSEL	(0xB0 >> 2)
-#define IOMUX_ALTF2_OENSEL	(0xB8 >> 2)
-#define IOMUX_ALTF2_DEFAULT_IN	(0xC0 >> 2)
+#define IOMUX_MAIN_INSEL (0x68 >> 2)
+#define IOMUX_MAIN_OUTSEL (0x70 >> 2)
+#define IOMUX_MAIN_OENSEL (0x78 >> 2)
+#define IOMUX_MAIN_DEFAULT_IN (0x80 >> 2)
+#define IOMUX_ALTF1_INSEL (0x88 >> 2)
+#define IOMUX_ALTF1_OUTSEL (0x90 >> 2)
+#define IOMUX_ALTF1_OENSEL (0x98 >> 2)
+#define IOMUX_ALTF1_DEFAULT_IN (0xA0 >> 2)
+#define IOMUX_ALTF2_INSEL (0xA8 >> 2)
+#define IOMUX_ALTF2_OUTSEL (0xB0 >> 2)
+#define IOMUX_ALTF2_OENSEL (0xB8 >> 2)
+#define IOMUX_ALTF2_DEFAULT_IN (0xC0 >> 2)
 
 #ifdef CONFIG_TRUSTED_EXECUTION_NONSECURE
 static void arm_musca_b1_pinmux_defaults(void)
@@ -55,7 +55,6 @@ static void arm_musca_b1_pinmux_defaults(void)
 	scc[IOMUX_ALTF1_OENSEL] &= ~(BIT(2) | BIT(3) | BIT(4));
 	scc[IOMUX_ALTF2_OUTSEL] &= ~(BIT(2) | BIT(3) | BIT(4));
 	scc[IOMUX_ALTF2_OENSEL] &= ~(BIT(2) | BIT(3) | BIT(4));
-
 }
 #endif
 

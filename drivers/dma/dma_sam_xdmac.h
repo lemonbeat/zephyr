@@ -19,20 +19,20 @@ extern "C" {
 
 /* XDMA_MBR_UBC */
 #define XDMA_UBC_NDE (0x1u << 24)
-#define   XDMA_UBC_NDE_FETCH_DIS (0x0u << 24)
-#define   XDMA_UBC_NDE_FETCH_EN  (0x1u << 24)
+#define XDMA_UBC_NDE_FETCH_DIS (0x0u << 24)
+#define XDMA_UBC_NDE_FETCH_EN (0x1u << 24)
 #define XDMA_UBC_NSEN (0x1u << 25)
-#define   XDMA_UBC_NSEN_UNCHANGED (0x0u << 25)
-#define   XDMA_UBC_NSEN_UPDATED (0x1u << 25)
+#define XDMA_UBC_NSEN_UNCHANGED (0x0u << 25)
+#define XDMA_UBC_NSEN_UPDATED (0x1u << 25)
 #define XDMA_UBC_NDEN (0x1u << 26)
-#define   XDMA_UBC_NDEN_UNCHANGED (0x0u << 26)
-#define   XDMA_UBC_NDEN_UPDATED (0x1u << 26)
+#define XDMA_UBC_NDEN_UNCHANGED (0x0u << 26)
+#define XDMA_UBC_NDEN_UPDATED (0x1u << 26)
 #define XDMA_UBC_NVIEW_SHIFT 27
-#define   XDMA_UBC_NVIEW_MASK (0x3u << XDMA_UBC_NVIEW_SHIFT)
-#define   XDMA_UBC_NVIEW_NDV0 (0x0u << XDMA_UBC_NVIEW_SHIFT)
-#define   XDMA_UBC_NVIEW_NDV1 (0x1u << XDMA_UBC_NVIEW_SHIFT)
-#define   XDMA_UBC_NVIEW_NDV2 (0x2u << XDMA_UBC_NVIEW_SHIFT)
-#define   XDMA_UBC_NVIEW_NDV3 (0x3u << XDMA_UBC_NVIEW_SHIFT)
+#define XDMA_UBC_NVIEW_MASK (0x3u << XDMA_UBC_NVIEW_SHIFT)
+#define XDMA_UBC_NVIEW_NDV0 (0x0u << XDMA_UBC_NVIEW_SHIFT)
+#define XDMA_UBC_NVIEW_NDV1 (0x1u << XDMA_UBC_NVIEW_SHIFT)
+#define XDMA_UBC_NVIEW_NDV2 (0x2u << XDMA_UBC_NVIEW_SHIFT)
+#define XDMA_UBC_NVIEW_NDV3 (0x3u << XDMA_UBC_NVIEW_SHIFT)
 
 /** DMA channel configuration parameters */
 struct sam_xdmac_channel_config {

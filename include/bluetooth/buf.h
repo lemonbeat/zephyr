@@ -105,7 +105,8 @@ struct net_buf *bt_buf_get_cmd_complete(k_timeout_t timeout);
  *                      the special values K_NO_WAIT and K_FOREVER.
  *  @return A new buffer.
  */
-struct net_buf *bt_buf_get_evt(uint8_t evt, bool discardable, k_timeout_t timeout);
+struct net_buf *bt_buf_get_evt(uint8_t evt, bool discardable,
+			       k_timeout_t timeout);
 
 /** Set the buffer type
  *

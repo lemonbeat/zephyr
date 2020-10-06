@@ -36,12 +36,14 @@ void test_max_mutex(void)
 	for (mtx_cnt = 0; mtx_cnt < max_mtx_cnt + 1; mtx_cnt++) {
 		mutex_ids[mtx_cnt] = osMutexCreate(osMutex(Mutex_multi));
 		if (mtx_cnt == max_mtx_cnt) {
-			zassert_true(mutex_ids[mtx_cnt] == NULL,
-			  "Mutex creation pass unexpectedly after max count");
+			zassert_true(
+				mutex_ids[mtx_cnt] == NULL,
+				"Mutex creation pass unexpectedly after max count");
 			cleanup_max_mutex(mutex_ids);
 		} else {
-			zassert_true(mutex_ids[mtx_cnt] != NULL,
-			  "Multiple mutex creation failed before max count");
+			zassert_true(
+				mutex_ids[mtx_cnt] != NULL,
+				"Multiple mutex creation failed before max count");
 		}
 	}
 }

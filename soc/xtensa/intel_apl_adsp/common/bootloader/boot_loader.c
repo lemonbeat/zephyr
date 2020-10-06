@@ -11,7 +11,7 @@
 #include <soc.h>
 #include "manifest.h"
 
-#define MANIFEST_BASE	IMR_BOOT_LDR_MANIFEST_BASE
+#define MANIFEST_BASE IMR_BOOT_LDR_MANIFEST_BASE
 
 extern void __start(void);
 
@@ -48,14 +48,13 @@ static inline void bbzero(void *dest, size_t bytes)
 }
 
 static void parse_module(struct sof_man_fw_header *hdr,
-	struct sof_man_module *mod)
+			 struct sof_man_module *mod)
 {
 	int i;
 	uint32_t bias;
 
 	/* each module has 3 segments */
 	for (i = 0; i < 3; i++) {
-
 		/* platform_trace_point(TRACE_BOOT_LDR_PARSE_SEGMENT + i); */
 		switch (mod->segment[i].flags.r.type) {
 		case SOF_MAN_SEGMENT_TEXT:
@@ -67,13 +66,12 @@ static void parse_module(struct sof_man_fw_header *hdr,
 			bmemcpy((void *)mod->segment[i].v_base_addr,
 				(void *)((int)hdr + bias),
 				mod->segment[i].flags.r.length *
-				HOST_PAGE_SIZE);
+					HOST_PAGE_SIZE);
 			break;
 		case SOF_MAN_SEGMENT_BSS:
 			/* copy from IMR to SRAM */
 			bbzero((void *)mod->segment[i].v_base_addr,
-			       mod->segment[i].flags.r.length *
-			       HOST_PAGE_SIZE);
+			       mod->segment[i].flags.r.length * HOST_PAGE_SIZE);
 			break;
 		default:
 			/* ignore */
@@ -87,15 +85,13 @@ static void parse_module(struct sof_man_fw_header *hdr,
 /* parse FW manifest and copy modules */
 static void parse_manifest(void)
 {
-	struct sof_man_fw_desc *desc =
-		(struct sof_man_fw_desc *)MANIFEST_BASE;
+	struct sof_man_fw_desc *desc = (struct sof_man_fw_desc *)MANIFEST_BASE;
 	struct sof_man_fw_header *hdr = &desc->header;
 	struct sof_man_module *mod;
 	int i;
 
 	/* copy module to SRAM  - skip bootloader module */
 	for (i = MAN_SKIP_ENTRIES; i < hdr->num_module_entries; i++) {
-
 		/* platform_trace_point(TRACE_BOOT_LDR_PARSE_MODULE + i); */
 		mod = (void *)((uintptr_t)desc + SOF_MAN_MODULE_OFFSET(i));
 		parse_module(hdr, mod);

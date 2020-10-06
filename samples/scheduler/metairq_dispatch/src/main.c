@@ -25,8 +25,8 @@ K_THREAD_STACK_ARRAY_DEFINE(thread_stacks, NUM_THREADS, STACK_SIZE);
 
 /* The static metairq thread we'll use for dispatch */
 static void metairq_fn(void *p1, void *p2, void *p3);
-K_THREAD_DEFINE(metairq_thread, STACK_SIZE, metairq_fn,
-		NULL, NULL, NULL, K_HIGHEST_THREAD_PRIO, 0, 0);
+K_THREAD_DEFINE(metairq_thread, STACK_SIZE, metairq_fn, NULL, NULL, NULL,
+		K_HIGHEST_THREAD_PRIO, 0, 0);
 
 /* Accumulated list of latencies, for a naive variance computation at
  * the end.
@@ -65,7 +65,7 @@ static void metairq_fn(void *p1, void *p2, void *p3)
 
 		if (ret) {
 			LOG_INF("Thread %d queue full, message %d dropped",
-			       m.target, m.seq);
+				m.target, m.seq);
 		}
 	}
 }
@@ -81,11 +81,11 @@ static uint32_t isqrt(uint64_t n)
 
 		return (uint32_t)(((hi * hi) > n) ? lo : hi);
 	}
-	return (uint32_t) n;
+	return (uint32_t)n;
 }
 
-static void calc_stats(const uint32_t *array, uint32_t n,
-		       uint32_t *lo, uint32_t *hi, uint32_t *mean, uint32_t *stdev)
+static void calc_stats(const uint32_t *array, uint32_t n, uint32_t *lo,
+		       uint32_t *hi, uint32_t *mean, uint32_t *stdev)
 {
 	uint64_t tot = 0, totsq = 0;
 
@@ -100,7 +100,7 @@ static void calc_stats(const uint32_t *array, uint32_t n,
 	*mean = (uint32_t)((tot + (n / 2)) / n);
 
 	for (int i = 0; i < n; i++) {
-		int64_t d = (int32_t) (array[i] - *mean);
+		int64_t d = (int32_t)(array[i] - *mean);
 
 		totsq += d * d;
 	}
@@ -140,13 +140,12 @@ static void record_latencies(struct msg *m, uint32_t latency)
 		__ASSERT_NO_MSG(ret == 0);
 		k_msleep(100);
 
-		calc_stats(stats.mirq_latencies, stats.num_mirq,
-			   &lo, &hi, &mean, &stdev);
+		calc_stats(stats.mirq_latencies, stats.num_mirq, &lo, &hi,
+			   &mean, &stdev);
 
 		LOG_INF("        ---------- Latency (cyc) ----------");
 		LOG_INF("            Best    Worst     Mean    Stdev");
 		LOG_INF("MetaIRQ %8d %8d %8d %8d", lo, hi, mean, stdev);
-
 
 		for (int i = 0; i < NUM_THREADS; i++) {
 			if (stats.threads[i].nevt == 0) {
@@ -155,11 +154,11 @@ static void record_latencies(struct msg *m, uint32_t latency)
 			}
 
 			calc_stats(stats.threads[i].latencies,
-				   stats.threads[i].nevt,
-				   &lo, &hi, &mean, &stdev);
+				   stats.threads[i].nevt, &lo, &hi, &mean,
+				   &stdev);
 
-			LOG_INF("Thread%d %8d %8d %8d %8d",
-				i, lo, hi, mean, stdev);
+			LOG_INF("Thread%d %8d %8d %8d %8d", i, lo, hi, mean,
+				stdev);
 		}
 
 		LOG_INF("MetaIRQ Test Complete");
@@ -205,9 +204,9 @@ static void thread_fn(void *p1, void *p2, void *p3)
 		 * 4. The actual time taken to process the message
 		 *    (may be higher if the thread was preempted)
 		 */
-		LOG_INF("M%d T%d mirq %d disp %d proc %d real %d",
-			m.seq, id, m.metairq_latency,
-			start - m.timestamp, m.proc_cyc, dur);
+		LOG_INF("M%d T%d mirq %d disp %d proc %d real %d", m.seq, id,
+			m.metairq_latency, start - m.timestamp, m.proc_cyc,
+			dur);
 #endif
 
 		/* Collect the latency values in a big statistics array */
@@ -224,14 +223,13 @@ void main(void)
 		 * e.g. thread 0 will be preempted only by the
 		 * metairq.
 		 */
-		int prio = (-NUM_THREADS/2) + i;
+		int prio = (-NUM_THREADS / 2) + i;
 
 		k_msgq_init(&threads[i].msgq, (char *)threads[i].msgq_buf,
 			    sizeof(struct msg), QUEUE_DEPTH);
 
-		k_thread_create(&threads[i].thread,
-				thread_stacks[i], STACK_SIZE,
-				thread_fn, (void *)i, NULL, NULL,
+		k_thread_create(&threads[i].thread, thread_stacks[i],
+				STACK_SIZE, thread_fn, (void *)i, NULL, NULL,
 				prio, 0, K_NO_WAIT);
 	}
 

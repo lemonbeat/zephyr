@@ -24,14 +24,12 @@ struct uart_msp432p4xx_dev_data_t {
 	eUSCI_UART_Config uartConfig;
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 	uart_irq_callback_user_data_t cb; /**< Callback function pointer */
-	void *cb_data;  /**< Callback function arg */
+	void *cb_data; /**< Callback function arg */
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-#define DEV_CFG(dev) \
-	((const struct uart_device_config * const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct uart_msp432p4xx_dev_data_t * const)(dev)->data)
+#define DEV_CFG(dev) ((const struct uart_device_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct uart_msp432p4xx_dev_data_t *const)(dev)->data)
 
 DEVICE_DECLARE(uart_msp432p4xx_0);
 
@@ -124,8 +122,9 @@ static int uart_msp432p4xx_init(const struct device *dev)
 	eUSCI_UART_Config UartConfig;
 
 	/* Select P1.2 and P1.3 in UART mode */
-	MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1,
-		(GPIO_PIN2 | GPIO_PIN3), GPIO_PRIMARY_MODULE_FUNCTION);
+	MAP_GPIO_setAsPeripheralModuleFunctionInputPin(
+		GPIO_PORT_P1, (GPIO_PIN2 | GPIO_PIN3),
+		GPIO_PRIMARY_MODULE_FUNCTION);
 
 	UartConfig.selectClockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK;
 	UartConfig.parity = EUSCI_A_UART_NO_PARITY;
@@ -146,10 +145,8 @@ static int uart_msp432p4xx_init(const struct device *dev)
 	MAP_UART_enableModule((unsigned long)config->base);
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	IRQ_CONNECT(DT_INST_IRQN(0),
-			DT_INST_IRQ(0, priority),
-			uart_msp432p4xx_isr, DEVICE_GET(uart_msp432p4xx_0),
-			0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
+		    uart_msp432p4xx_isr, DEVICE_GET(uart_msp432p4xx_0), 0);
 	irq_enable(DT_INST_IRQN(0));
 
 #endif
@@ -165,8 +162,7 @@ static int uart_msp432p4xx_poll_in(const struct device *dev, unsigned char *c)
 	return 0;
 }
 
-static void uart_msp432p4xx_poll_out(const struct device *dev,
-				     unsigned char c)
+static void uart_msp432p4xx_poll_out(const struct device *dev, unsigned char c)
 {
 	const struct uart_device_config *config = DEV_CFG(dev);
 
@@ -175,16 +171,17 @@ static void uart_msp432p4xx_poll_out(const struct device *dev,
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 static int uart_msp432p4xx_fifo_fill(const struct device *dev,
-						const uint8_t *tx_data, int size)
+				     const uint8_t *tx_data, int size)
 {
 	const struct uart_device_config *config = DEV_CFG(dev);
 	unsigned int num_tx = 0U;
 
 	while ((size - num_tx) > 0) {
 		MAP_UART_transmitData((unsigned long)config->base,
-							tx_data[num_tx]);
-		if (MAP_UART_getInterruptStatus((unsigned long)config->base,
-			EUSCI_A_UART_TRANSMIT_COMPLETE_INTERRUPT_FLAG)) {
+				      tx_data[num_tx]);
+		if (MAP_UART_getInterruptStatus(
+			    (unsigned long)config->base,
+			    EUSCI_A_UART_TRANSMIT_COMPLETE_INTERRUPT_FLAG)) {
 			num_tx++;
 		} else {
 			break;
@@ -194,17 +191,16 @@ static int uart_msp432p4xx_fifo_fill(const struct device *dev,
 	return (int)num_tx;
 }
 
-static int uart_msp432p4xx_fifo_read(const struct device *dev,
-							uint8_t *rx_data,
-							const int size)
+static int uart_msp432p4xx_fifo_read(const struct device *dev, uint8_t *rx_data,
+				     const int size)
 {
 	const struct uart_device_config *config = DEV_CFG(dev);
 	unsigned int num_rx = 0U;
 
 	while (((size - num_rx) > 0) &&
-		MAP_UART_getInterruptStatus((unsigned long)config->base,
-					EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG)) {
-
+	       MAP_UART_getInterruptStatus(
+		       (unsigned long)config->base,
+		       EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG)) {
 		rx_data[num_rx++] =
 			MAP_UART_receiveData((unsigned long)config->base);
 	}
@@ -217,7 +213,7 @@ static void uart_msp432p4xx_irq_tx_enable(const struct device *dev)
 	const struct uart_device_config *config = DEV_CFG(dev);
 
 	MAP_UART_enableInterrupt((unsigned long)config->base,
-					EUSCI_A_UART_TRANSMIT_INTERRUPT);
+				 EUSCI_A_UART_TRANSMIT_INTERRUPT);
 }
 
 static void uart_msp432p4xx_irq_tx_disable(const struct device *dev)
@@ -225,7 +221,7 @@ static void uart_msp432p4xx_irq_tx_disable(const struct device *dev)
 	const struct uart_device_config *config = DEV_CFG(dev);
 
 	MAP_UART_disableInterrupt((unsigned long)config->base,
-					EUSCI_A_UART_TRANSMIT_INTERRUPT);
+				  EUSCI_A_UART_TRANSMIT_INTERRUPT);
 }
 
 static int uart_msp432p4xx_irq_tx_ready(const struct device *dev)
@@ -233,8 +229,9 @@ static int uart_msp432p4xx_irq_tx_ready(const struct device *dev)
 	const struct uart_device_config *config = DEV_CFG(dev);
 	unsigned int int_status;
 
-	int_status =  MAP_UART_getInterruptStatus((unsigned long)config->base,
-					EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG);
+	int_status = MAP_UART_getInterruptStatus(
+		(unsigned long)config->base,
+		EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG);
 
 	return (int_status & EUSCI_A_IE_TXIE);
 }
@@ -244,7 +241,7 @@ static void uart_msp432p4xx_irq_rx_enable(const struct device *dev)
 	const struct uart_device_config *config = DEV_CFG(dev);
 
 	MAP_UART_enableInterrupt((unsigned long)config->base,
-				EUSCI_A_UART_RECEIVE_INTERRUPT);
+				 EUSCI_A_UART_RECEIVE_INTERRUPT);
 }
 
 static void uart_msp432p4xx_irq_rx_disable(const struct device *dev)
@@ -252,15 +249,16 @@ static void uart_msp432p4xx_irq_rx_disable(const struct device *dev)
 	const struct uart_device_config *config = DEV_CFG(dev);
 
 	MAP_UART_disableInterrupt((unsigned long)config->base,
-				EUSCI_A_UART_RECEIVE_INTERRUPT);
+				  EUSCI_A_UART_RECEIVE_INTERRUPT);
 }
 
 static int uart_msp432p4xx_irq_tx_complete(const struct device *dev)
 {
 	const struct uart_device_config *config = DEV_CFG(dev);
 
-	return MAP_UART_getInterruptStatus((unsigned long)config->base,
-				EUSCI_A_UART_TRANSMIT_COMPLETE_INTERRUPT_FLAG);
+	return MAP_UART_getInterruptStatus(
+		(unsigned long)config->base,
+		EUSCI_A_UART_TRANSMIT_COMPLETE_INTERRUPT_FLAG);
 }
 
 static int uart_msp432p4xx_irq_rx_ready(const struct device *dev)
@@ -268,8 +266,9 @@ static int uart_msp432p4xx_irq_rx_ready(const struct device *dev)
 	const struct uart_device_config *config = DEV_CFG(dev);
 	unsigned int int_status;
 
-	int_status = MAP_UART_getInterruptStatus((unsigned long)config->base,
-					EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG);
+	int_status = MAP_UART_getInterruptStatus(
+		(unsigned long)config->base,
+		EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG);
 
 	return (int_status & EUSCI_A_IE_RXIE);
 }
@@ -289,8 +288,8 @@ static int uart_msp432p4xx_irq_is_pending(const struct device *dev)
 	const struct uart_device_config *config = DEV_CFG(dev);
 	unsigned int int_status;
 
-	int_status = MAP_UART_getEnabledInterruptStatus(
-						(unsigned long)config->base);
+	int_status =
+		MAP_UART_getEnabledInterruptStatus((unsigned long)config->base);
 
 	return (int_status & (EUSCI_A_IE_TXIE | EUSCI_A_IE_RXIE));
 }
@@ -304,7 +303,7 @@ static void uart_msp432p4xx_irq_callback_set(const struct device *dev,
 					     uart_irq_callback_user_data_t cb,
 					     void *cb_data)
 {
-	struct uart_msp432p4xx_dev_data_t * const dev_data = DEV_DATA(dev);
+	struct uart_msp432p4xx_dev_data_t *const dev_data = DEV_DATA(dev);
 
 	dev_data->cb = cb;
 	dev_data->cb_data = cb_data;
@@ -322,11 +321,11 @@ static void uart_msp432p4xx_irq_callback_set(const struct device *dev,
 static void uart_msp432p4xx_isr(const struct device *dev)
 {
 	const struct uart_device_config *config = DEV_CFG(dev);
-	struct uart_msp432p4xx_dev_data_t * const dev_data = DEV_DATA(dev);
+	struct uart_msp432p4xx_dev_data_t *const dev_data = DEV_DATA(dev);
 	unsigned int int_status;
 
-	int_status = MAP_UART_getEnabledInterruptStatus(
-						(unsigned long)config->base);
+	int_status =
+		MAP_UART_getEnabledInterruptStatus((unsigned long)config->base);
 
 	if (dev_data->cb) {
 		dev_data->cb(dev, dev_data->cb_data);
@@ -343,25 +342,24 @@ static const struct uart_driver_api uart_msp432p4xx_driver_api = {
 	.poll_in = uart_msp432p4xx_poll_in,
 	.poll_out = uart_msp432p4xx_poll_out,
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-	.fifo_fill	  = uart_msp432p4xx_fifo_fill,
-	.fifo_read	  = uart_msp432p4xx_fifo_read,
-	.irq_tx_enable	  = uart_msp432p4xx_irq_tx_enable,
-	.irq_tx_disable	  = uart_msp432p4xx_irq_tx_disable,
-	.irq_tx_ready	  = uart_msp432p4xx_irq_tx_ready,
-	.irq_rx_enable	  = uart_msp432p4xx_irq_rx_enable,
-	.irq_rx_disable	  = uart_msp432p4xx_irq_rx_disable,
-	.irq_tx_complete  = uart_msp432p4xx_irq_tx_complete,
-	.irq_rx_ready	  = uart_msp432p4xx_irq_rx_ready,
-	.irq_err_enable	  = uart_msp432p4xx_irq_err_enable,
-	.irq_err_disable  = uart_msp432p4xx_irq_err_disable,
-	.irq_is_pending	  = uart_msp432p4xx_irq_is_pending,
-	.irq_update	  = uart_msp432p4xx_irq_update,
+	.fifo_fill = uart_msp432p4xx_fifo_fill,
+	.fifo_read = uart_msp432p4xx_fifo_read,
+	.irq_tx_enable = uart_msp432p4xx_irq_tx_enable,
+	.irq_tx_disable = uart_msp432p4xx_irq_tx_disable,
+	.irq_tx_ready = uart_msp432p4xx_irq_tx_ready,
+	.irq_rx_enable = uart_msp432p4xx_irq_rx_enable,
+	.irq_rx_disable = uart_msp432p4xx_irq_rx_disable,
+	.irq_tx_complete = uart_msp432p4xx_irq_tx_complete,
+	.irq_rx_ready = uart_msp432p4xx_irq_rx_ready,
+	.irq_err_enable = uart_msp432p4xx_irq_err_enable,
+	.irq_err_disable = uart_msp432p4xx_irq_err_disable,
+	.irq_is_pending = uart_msp432p4xx_irq_is_pending,
+	.irq_update = uart_msp432p4xx_irq_update,
 	.irq_callback_set = uart_msp432p4xx_irq_callback_set,
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 };
 
-DEVICE_AND_API_INIT(uart_msp432p4xx_0, DT_INST_LABEL(0),
-			uart_msp432p4xx_init, &uart_msp432p4xx_dev_data_0,
-			&uart_msp432p4xx_dev_cfg_0,
-			PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-			(void *)&uart_msp432p4xx_driver_api);
+DEVICE_AND_API_INIT(uart_msp432p4xx_0, DT_INST_LABEL(0), uart_msp432p4xx_init,
+		    &uart_msp432p4xx_dev_data_0, &uart_msp432p4xx_dev_cfg_0,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    (void *)&uart_msp432p4xx_driver_api);

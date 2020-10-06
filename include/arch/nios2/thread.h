@@ -33,7 +33,7 @@ struct _callee_saved {
 	uint32_t r22;
 	uint32_t r23;
 
-	 /* Normally used for the frame pointer but also a general purpose
+	/* Normally used for the frame pointer but also a general purpose
 	  * register if frame pointers omitted
 	  */
 	uint32_t r28;

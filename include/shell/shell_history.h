@@ -17,7 +17,6 @@
 extern "C" {
 #endif
 
-
 struct shell_history {
 	struct ring_buf *ring_buf;
 	sys_dlist_t list;
@@ -30,18 +29,13 @@ struct shell_history {
  * @param _name History instance name.
  * @param _size Memory dedicated for shell history.
  */
-#define SHELL_HISTORY_DEFINE(_name, _size) \
-	static uint8_t __noinit __aligned(sizeof(void *)) \
-			_name##_ring_buf_data[_size]; \
-	static struct ring_buf _name##_ring_buf = \
-		{ \
-			.size = _size, \
-			.buf =  { .buf8 = _name##_ring_buf_data } \
-		}; \
-	static struct shell_history _name = { \
-		.ring_buf = &_name##_ring_buf \
-	}
-
+#define SHELL_HISTORY_DEFINE(_name, _size)                              \
+	static uint8_t __noinit __aligned(sizeof(void *))               \
+		_name##_ring_buf_data[_size];                           \
+	static struct ring_buf _name##_ring_buf = {                     \
+		.size = _size, .buf = { .buf8 = _name##_ring_buf_data } \
+	};                                                              \
+	static struct shell_history _name = { .ring_buf = &_name##_ring_buf }
 
 /**
  * @brief Initialize shell history module.
@@ -79,8 +73,8 @@ void shell_history_mode_exit(struct shell_history *history);
  *				data (output).
  * @return True if remains in history mode.
  */
-bool shell_history_get(struct shell_history *history, bool up,
-		       uint8_t *dst, uint16_t *len);
+bool shell_history_get(struct shell_history *history, bool up, uint8_t *dst,
+		       uint16_t *len);
 
 /**
  * @brief Put line into shell command history.
@@ -92,7 +86,8 @@ bool shell_history_get(struct shell_history *history, bool up,
  * @param len		Data length.
  *
  */
-void shell_history_put(struct shell_history *history, uint8_t *line, size_t len);
+void shell_history_put(struct shell_history *history, uint8_t *line,
+		       size_t len);
 
 /**
  * @brief Get state of shell history.

@@ -30,31 +30,31 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #endif
 
 /* Server resource IDs */
-#define TEMP_SENSOR_VALUE_ID			5700
-#define TEMP_UNITS_ID				5701
-#define TEMP_MIN_MEASURED_VALUE_ID		5601
-#define TEMP_MAX_MEASURED_VALUE_ID		5602
-#define TEMP_MIN_RANGE_VALUE_ID			5603
-#define TEMP_MAX_RANGE_VALUE_ID			5604
-#define TEMP_RESET_MIN_MAX_MEASURED_VALUES_ID	5605
+#define TEMP_SENSOR_VALUE_ID 5700
+#define TEMP_UNITS_ID 5701
+#define TEMP_MIN_MEASURED_VALUE_ID 5601
+#define TEMP_MAX_MEASURED_VALUE_ID 5602
+#define TEMP_MIN_RANGE_VALUE_ID 5603
+#define TEMP_MAX_RANGE_VALUE_ID 5604
+#define TEMP_RESET_MIN_MAX_MEASURED_VALUES_ID 5605
 #if ADD_TIMESTAMPS
-#define TEMP_TIMESTAMP_ID			5518
+#define TEMP_TIMESTAMP_ID 5518
 
-#define TEMP_MAX_ID		8
-#else  /* !ADD_TIMESTAMPS */
-#define TEMP_MAX_ID		7
+#define TEMP_MAX_ID 8
+#else /* !ADD_TIMESTAMPS */
+#define TEMP_MAX_ID 7
 #endif
 
-#define MAX_INSTANCE_COUNT	CONFIG_LWM2M_IPSO_TEMP_SENSOR_INSTANCE_COUNT
+#define MAX_INSTANCE_COUNT CONFIG_LWM2M_IPSO_TEMP_SENSOR_INSTANCE_COUNT
 
-#define TEMP_STRING_SHORT	8
+#define TEMP_STRING_SHORT 8
 
 /*
  * Calculate resource instances as follows:
  * start with TEMP_MAX_ID
  * subtract EXEC resources (1)
  */
-#define RESOURCE_INSTANCE_COUNT	(TEMP_MAX_ID - 1)
+#define RESOURCE_INSTANCE_COUNT (TEMP_MAX_ID - 1)
 
 /* resource state variables */
 static float32_value_t sensor_value[MAX_INSTANCE_COUNT];
@@ -80,8 +80,8 @@ static struct lwm2m_engine_obj_field fields[] = {
 
 static struct lwm2m_engine_obj_inst inst[MAX_INSTANCE_COUNT];
 static struct lwm2m_engine_res res[MAX_INSTANCE_COUNT][TEMP_MAX_ID];
-static struct lwm2m_engine_res_inst
-		res_inst[MAX_INSTANCE_COUNT][RESOURCE_INSTANCE_COUNT];
+static struct lwm2m_engine_res_inst res_inst[MAX_INSTANCE_COUNT]
+					    [RESOURCE_INSTANCE_COUNT];
 
 static void update_min_measured(uint16_t obj_inst_id, int index)
 {
@@ -115,10 +115,10 @@ static int reset_min_max_measured_values_cb(uint16_t obj_inst_id)
 	return -ENOENT;
 }
 
-static int sensor_value_write_cb(uint16_t obj_inst_id,
-				 uint16_t res_id, uint16_t res_inst_id,
-				 uint8_t *data, uint16_t data_len,
-				 bool last_block, size_t total_size)
+static int sensor_value_write_cb(uint16_t obj_inst_id, uint16_t res_id,
+				 uint16_t res_inst_id, uint8_t *data,
+				 uint16_t data_len, bool last_block,
+				 size_t total_size)
 {
 	int i;
 	bool update_min = false;
@@ -130,18 +130,18 @@ static int sensor_value_write_cb(uint16_t obj_inst_id,
 			if (sensor_value[i].val1 < min_measured_value[i].val1) {
 				update_min = true;
 			} else if (sensor_value[i].val1 ==
-					min_measured_value[i].val1 &&
+					   min_measured_value[i].val1 &&
 				   sensor_value[i].val2 <
-					min_measured_value[i].val2) {
+					   min_measured_value[i].val2) {
 				update_min = true;
 			}
 
 			if (sensor_value[i].val1 > max_measured_value[i].val1) {
 				update_max = true;
 			} else if (sensor_value[i].val1 ==
-					max_measured_value[i].val1 &&
+					   max_measured_value[i].val1 &&
 				   sensor_value[i].val2 >
-					max_measured_value[i].val2) {
+					   max_measured_value[i].val2) {
 				update_max = true;
 			}
 
@@ -166,7 +166,8 @@ static struct lwm2m_engine_obj_inst *temp_sensor_create(uint16_t obj_inst_id)
 	for (index = 0; index < MAX_INSTANCE_COUNT; index++) {
 		if (inst[index].obj && inst[index].obj_inst_id == obj_inst_id) {
 			LOG_ERR("Can not create instance - "
-				"already existing: %u", obj_inst_id);
+				"already existing: %u",
+				obj_inst_id);
 			return NULL;
 		}
 	}
@@ -201,10 +202,9 @@ static struct lwm2m_engine_obj_inst *temp_sensor_create(uint16_t obj_inst_id)
 	init_res_instance(res_inst[index], ARRAY_SIZE(res_inst[index]));
 
 	/* initialize instance resource data */
-	INIT_OBJ_RES(TEMP_SENSOR_VALUE_ID, res[index], i,
-		     res_inst[index], j, 1, true,
-		     &sensor_value[index], sizeof(*sensor_value),
-		     NULL, NULL, sensor_value_write_cb, NULL);
+	INIT_OBJ_RES(TEMP_SENSOR_VALUE_ID, res[index], i, res_inst[index], j, 1,
+		     true, &sensor_value[index], sizeof(*sensor_value), NULL,
+		     NULL, sensor_value_write_cb, NULL);
 	INIT_OBJ_RES_DATA(TEMP_UNITS_ID, res[index], i, res_inst[index], j,
 			  units[index], TEMP_STRING_SHORT);
 	INIT_OBJ_RES_DATA(TEMP_MIN_MEASURED_VALUE_ID, res[index], i,
@@ -219,11 +219,11 @@ static struct lwm2m_engine_obj_inst *temp_sensor_create(uint16_t obj_inst_id)
 	INIT_OBJ_RES_DATA(TEMP_MAX_RANGE_VALUE_ID, res[index], i,
 			  res_inst[index], j, &max_range_value[index],
 			  sizeof(*max_range_value));
-	INIT_OBJ_RES_EXECUTE(TEMP_RESET_MIN_MAX_MEASURED_VALUES_ID,
-			     res[index], i, reset_min_max_measured_values_cb);
+	INIT_OBJ_RES_EXECUTE(TEMP_RESET_MIN_MAX_MEASURED_VALUES_ID, res[index],
+			     i, reset_min_max_measured_values_cb);
 #if ADD_TIMESTAMPS
-	INIT_OBJ_RES_OPTDATA(TEMP_TIMESTAMP_ID, res[index], i,
-			     res_inst[index], j);
+	INIT_OBJ_RES_OPTDATA(TEMP_TIMESTAMP_ID, res[index], i, res_inst[index],
+			     j);
 #endif
 
 	inst[index].resources = res[index];

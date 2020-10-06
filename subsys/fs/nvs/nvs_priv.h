@@ -30,16 +30,16 @@ extern "C" {
 
 /* Allocation Table Entry */
 struct nvs_ate {
-	uint16_t id;	/* data id */
-	uint16_t offset;	/* data offset within sector */
-	uint16_t len;	/* data len within sector */
-	uint8_t part;	/* part of a multipart data - future extension */
-	uint8_t crc8;	/* crc8 check of the entry */
+	uint16_t id; /* data id */
+	uint16_t offset; /* data offset within sector */
+	uint16_t len; /* data len within sector */
+	uint8_t part; /* part of a multipart data - future extension */
+	uint8_t crc8; /* crc8 check of the entry */
 } __packed;
 
 BUILD_ASSERT(offsetof(struct nvs_ate, crc8) ==
-		 sizeof(struct nvs_ate) - sizeof(uint8_t),
-		 "crc8 must be the last member");
+		     sizeof(struct nvs_ate) - sizeof(uint8_t),
+	     "crc8 must be the last member");
 
 #ifdef __cplusplus
 }

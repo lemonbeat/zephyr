@@ -36,15 +36,15 @@ int z_clock_driver_init(const struct device *device)
 	ARG_UNUSED(device);
 
 	IOWR_ALTERA_AVALON_TIMER_PERIODL(TIMER_0_BASE,
-			k_ticks_to_cyc_floor32(1) & 0xFFFF);
-	IOWR_ALTERA_AVALON_TIMER_PERIODH(TIMER_0_BASE,
-			(k_ticks_to_cyc_floor32(1) >> 16) & 0xFFFF);
+					 k_ticks_to_cyc_floor32(1) & 0xFFFF);
+	IOWR_ALTERA_AVALON_TIMER_PERIODH(
+		TIMER_0_BASE, (k_ticks_to_cyc_floor32(1) >> 16) & 0xFFFF);
 
 	IRQ_CONNECT(TIMER_0_IRQ, 0, timer_irq_handler, NULL, 0);
 	irq_enable(TIMER_0_IRQ);
 
-	alt_avalon_timer_sc_init((void *)TIMER_0_BASE, 0,
-			TIMER_0_IRQ, k_ticks_to_cyc_floor32(1));
+	alt_avalon_timer_sc_init((void *)TIMER_0_BASE, 0, TIMER_0_IRQ,
+				 k_ticks_to_cyc_floor32(1));
 
 	return 0;
 }

@@ -31,21 +31,21 @@ extern "C" {
 /**
  * @brief Pause watchdog timer when CPU is in sleep state.
  */
-#define WDT_OPT_PAUSE_IN_SLEEP		BIT(0)
+#define WDT_OPT_PAUSE_IN_SLEEP BIT(0)
 
 /**
  * @brief Pause watchdog timer when CPU is halted by the debugger.
  */
-#define WDT_OPT_PAUSE_HALTED_BY_DBG	BIT(1)
+#define WDT_OPT_PAUSE_HALTED_BY_DBG BIT(1)
 
 /**
  * @brief Watchdog reset flag bit field mask shift.
  */
-#define WDT_FLAG_RESET_SHIFT		(0)
+#define WDT_FLAG_RESET_SHIFT (0)
 /**
  * @brief Watchdog reset flag bit field mask.
  */
-#define WDT_FLAG_RESET_MASK		(0x3 << WDT_FLAG_RESET_SHIFT)
+#define WDT_FLAG_RESET_MASK (0x3 << WDT_FLAG_RESET_SHIFT)
 
 /**
  * @name Watchdog Reset Behavior.
@@ -53,11 +53,11 @@ extern "C" {
  * @{
  */
 /** No reset */
-#define WDT_FLAG_RESET_NONE		(0 << WDT_FLAG_RESET_SHIFT)
+#define WDT_FLAG_RESET_NONE (0 << WDT_FLAG_RESET_SHIFT)
 /** CPU core reset */
-#define WDT_FLAG_RESET_CPU_CORE		(1 << WDT_FLAG_RESET_SHIFT)
+#define WDT_FLAG_RESET_CPU_CORE (1 << WDT_FLAG_RESET_SHIFT)
 /** Global SoC reset */
-#define WDT_FLAG_RESET_SOC		(2 << WDT_FLAG_RESET_SHIFT)
+#define WDT_FLAG_RESET_SOC (2 << WDT_FLAG_RESET_SHIFT)
 /**
  * @}
  */
@@ -219,7 +219,7 @@ static inline int wdt_install_timeout(const struct device *dev,
 				      const struct wdt_timeout_cfg *cfg)
 {
 	const struct wdt_driver_api *api =
-		(const struct wdt_driver_api *) dev->api;
+		(const struct wdt_driver_api *)dev->api;
 
 	return api->install_timeout(dev, cfg);
 }

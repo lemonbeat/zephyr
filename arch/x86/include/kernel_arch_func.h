@@ -26,9 +26,9 @@ static inline bool arch_is_in_isr(void)
 	 */
 	bool ret;
 
-	__asm__ volatile ("pushf; cli");
+	__asm__ volatile("pushf; cli");
 	ret = arch_curr_cpu()->nested != 0;
-	__asm__ volatile ("popf");
+	__asm__ volatile("popf");
 	return ret;
 #else
 	return _kernel.cpus[0].nested != 0U;
@@ -43,7 +43,6 @@ extern FUNC_NORETURN void z_x86_prep_c(void *arg);
 /* Setup ultra-minimal serial driver for printk() */
 void z_x86_early_serial_init(void);
 #endif /* CONFIG_X86_VERY_EARLY_CONSOLE */
-
 
 /* Called upon CPU exception that is unhandled and hence fatal; dump
  * interesting info and call z_x86_fatal_error()
@@ -78,9 +77,9 @@ bool z_x86_check_stack_bounds(uintptr_t addr, size_t size, uint16_t cs);
 
 #ifdef CONFIG_USERSPACE
 extern FUNC_NORETURN void z_x86_userspace_enter(k_thread_entry_t user_entry,
-					       void *p1, void *p2, void *p3,
-					       uintptr_t stack_end,
-					       uintptr_t stack_start);
+						void *p1, void *p2, void *p3,
+						uintptr_t stack_end,
+						uintptr_t stack_start);
 
 /* Preparation steps needed for all threads if user mode is turned on.
  *

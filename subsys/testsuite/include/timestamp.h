@@ -22,8 +22,7 @@
 #include <test_asm_inline_other.h>
 #endif
 
-
-#define TICK_SYNCH()  k_sleep(K_TICKS(1))
+#define TICK_SYNCH() k_sleep(K_TICKS(1))
 
 #define OS_GET_TIME() k_cycle_get_32()
 
@@ -57,7 +56,6 @@ static inline void bench_test_init(void)
 	tm_off = OS_GET_TIME() - t;
 }
 
-
 /* timestamp for checks */
 static int64_t timestamp_check;
 
@@ -74,7 +72,6 @@ static inline void bench_test_start(void)
 	TICK_SYNCH();
 	timestamp_check = k_uptime_delta(&timestamp_check);
 }
-
 
 /* returns 0 if the completed within a second and -1 if not */
 static inline int bench_test_end(void)
@@ -104,8 +101,8 @@ static inline int high_timer_overflow(void)
 	/* Check if the time elapsed in msec is sufficient to trigger an
 	 *  overflow of the high precision timer
 	 */
-	if (timestamp_check >= (k_cyc_to_ns_floor64(UINT_MAX) /
-				(NSEC_PER_USEC * USEC_PER_MSEC))) {
+	if (timestamp_check >=
+	    (k_cyc_to_ns_floor64(UINT_MAX) / (NSEC_PER_USEC * USEC_PER_MSEC))) {
 		return -1;
 	}
 	return 0;

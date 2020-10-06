@@ -25,16 +25,16 @@ extern "C" {
 /* Define the commands that differ between the AT versions */
 #if defined(CONFIG_WIFI_ESP_AT_VERSION_1_7)
 #define _CWMODE "CWMODE_CUR"
-#define _CWSAP  "CWSAP_CUR"
-#define _CWJAP  "CWJAP_CUR"
+#define _CWSAP "CWSAP_CUR"
+#define _CWJAP "CWJAP_CUR"
 #define _CIPSTA "CIPSTA_CUR"
 #define _CIPSTAMAC "CIPSTAMAC_CUR"
 #define _CIPRECVDATA "+CIPRECVDATA,"
 #define _CIPRECVDATA_END ':'
 #else
 #define _CWMODE "CWMODE"
-#define _CWSAP  "CWSAP"
-#define _CWJAP  "CWJAP"
+#define _CWSAP "CWSAP"
+#define _CWJAP "CWJAP"
 #define _CIPSTA "CIPSTA"
 #define _CIPSTAMAC "CIPSTAMAC"
 #define _CIPRECVDATA "+CIPRECVDATA:"
@@ -51,8 +51,7 @@ extern "C" {
 #if defined(CONFIG_WIFI_ESP_AT_VERSION_1_7)
 #define ESP_PROTO_PASSIVE(proto) (proto == IPPROTO_TCP)
 #else
-#define ESP_PROTO_PASSIVE(proto) \
-	(proto == IPPROTO_TCP || proto == IPPROTO_UDP)
+#define ESP_PROTO_PASSIVE(proto) (proto == IPPROTO_TCP || proto == IPPROTO_UDP)
 #endif /* CONFIG_WIFI_ESP_AT_VERSION_1_7 */
 #else
 #define ESP_PROTO_PASSIVE(proto) 0
@@ -67,41 +66,41 @@ extern "C" {
 #endif
 
 #if DT_INST_NODE_HAS_PROP(0, target_speed)
-#define _UART_BAUD	DT_INST_PROP(0, target_speed)
+#define _UART_BAUD DT_INST_PROP(0, target_speed)
 #else
-#define _UART_BAUD	DT_PROP(ESP_BUS, current_speed)
+#define _UART_BAUD DT_PROP(ESP_BUS, current_speed)
 #endif
 
-#define _UART_CUR \
-	STRINGIFY(_UART_BAUD)",8,1,0,"_FLOW_CONTROL
+#define _UART_CUR STRINGIFY(_UART_BAUD) ",8,1,0," _FLOW_CONTROL
 
-#define CONN_CMD_MAX_LEN (sizeof("AT+"_CWJAP"=\"\",\"\"") + \
-			  WIFI_SSID_MAX_LEN + WIFI_PSK_MAX_LEN)
+#define CONN_CMD_MAX_LEN                                         \
+	(sizeof("AT+" _CWJAP "=\"\",\"\"") + WIFI_SSID_MAX_LEN + \
+	 WIFI_PSK_MAX_LEN)
 
 #define ESP_MAX_SOCKETS 5
 
 /* Maximum amount that can be sent with CIPSEND and read with CIPRECVDATA */
-#define ESP_MTU		2048
-#define CIPRECVDATA_MAX_LEN	ESP_MTU
+#define ESP_MTU 2048
+#define CIPRECVDATA_MAX_LEN ESP_MTU
 
-#define INVALID_LINK_ID		255
+#define INVALID_LINK_ID 255
 
-#define MDM_RING_BUF_SIZE	CONFIG_WIFI_ESP_MDM_RING_BUF_SIZE
-#define MDM_RECV_MAX_BUF	CONFIG_WIFI_ESP_MDM_RX_BUF_COUNT
-#define MDM_RECV_BUF_SIZE	CONFIG_WIFI_ESP_MDM_RX_BUF_SIZE
-#define CMD_BUF_ALLOC_TIMEOUT	K_SECONDS(1)
+#define MDM_RING_BUF_SIZE CONFIG_WIFI_ESP_MDM_RING_BUF_SIZE
+#define MDM_RECV_MAX_BUF CONFIG_WIFI_ESP_MDM_RX_BUF_COUNT
+#define MDM_RECV_BUF_SIZE CONFIG_WIFI_ESP_MDM_RX_BUF_SIZE
+#define CMD_BUF_ALLOC_TIMEOUT K_SECONDS(1)
 
-#define ESP_CMD_TIMEOUT		K_SECONDS(10)
-#define ESP_SCAN_TIMEOUT	K_SECONDS(10)
-#define ESP_CONNECT_TIMEOUT	K_SECONDS(20)
-#define ESP_INIT_TIMEOUT	K_SECONDS(10)
+#define ESP_CMD_TIMEOUT K_SECONDS(10)
+#define ESP_SCAN_TIMEOUT K_SECONDS(10)
+#define ESP_CONNECT_TIMEOUT K_SECONDS(20)
+#define ESP_INIT_TIMEOUT K_SECONDS(10)
 
 extern struct esp_data esp_driver_data;
 
 enum esp_socket_flags {
-	ESP_SOCK_IN_USE     = BIT(1),
+	ESP_SOCK_IN_USE = BIT(1),
 	ESP_SOCK_CONNECTING = BIT(2),
-	ESP_SOCK_CONNECTED  = BIT(3)
+	ESP_SOCK_CONNECTED = BIT(3)
 };
 
 struct esp_socket {
@@ -145,10 +144,7 @@ struct esp_socket {
 	void *recv_user_data;
 };
 
-enum esp_data_flag {
-	EDF_STA_CONNECTING = BIT(1),
-	EDF_STA_CONNECTED  = BIT(2)
-};
+enum esp_data_flag { EDF_STA_CONNECTING = BIT(1), EDF_STA_CONNECTED = BIT(2) };
 
 /* driver data */
 struct esp_data {
@@ -221,14 +217,12 @@ static inline bool esp_socket_connected(struct esp_socket *sock)
 	return (sock->flags & ESP_SOCK_CONNECTED) != 0;
 }
 
-static inline void esp_flag_set(struct esp_data *dev,
-				enum esp_data_flag flag)
+static inline void esp_flag_set(struct esp_data *dev, enum esp_data_flag flag)
 {
 	dev->flags |= flag;
 }
 
-static inline void esp_flag_clear(struct esp_data *dev,
-				  enum esp_data_flag flag)
+static inline void esp_flag_clear(struct esp_data *dev, enum esp_data_flag flag)
 {
 	dev->flags &= (~flag);
 }

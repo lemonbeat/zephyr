@@ -35,8 +35,8 @@ int lis3mdl_trigger_set(const struct device *dev,
 	}
 
 	gpio_pin_interrupt_configure(drv_data->gpio,
-			DT_INST_GPIO_PIN(0, irq_gpios),
-			GPIO_INT_DISABLE);
+				     DT_INST_GPIO_PIN(0, irq_gpios),
+				     GPIO_INT_DISABLE);
 
 	drv_data->data_ready_handler = handler;
 	if (handler == NULL) {
@@ -46,8 +46,8 @@ int lis3mdl_trigger_set(const struct device *dev,
 	drv_data->data_ready_trigger = *trig;
 
 	gpio_pin_interrupt_configure(drv_data->gpio,
-			DT_INST_GPIO_PIN(0, irq_gpios),
-			GPIO_INT_EDGE_TO_ACTIVE);
+				     DT_INST_GPIO_PIN(0, irq_gpios),
+				     GPIO_INT_EDGE_TO_ACTIVE);
 
 	return 0;
 }
@@ -60,8 +60,7 @@ static void lis3mdl_gpio_callback(const struct device *dev,
 
 	ARG_UNUSED(pins);
 
-	gpio_pin_interrupt_configure(dev,
-				     DT_INST_GPIO_PIN(0, irq_gpios),
+	gpio_pin_interrupt_configure(dev, DT_INST_GPIO_PIN(0, irq_gpios),
 				     GPIO_INT_DISABLE);
 
 #if defined(CONFIG_LIS3MDL_TRIGGER_OWN_THREAD)
@@ -81,8 +80,8 @@ static void lis3mdl_thread_cb(const struct device *dev)
 	}
 
 	gpio_pin_interrupt_configure(drv_data->gpio,
-			DT_INST_GPIO_PIN(0, irq_gpios),
-			GPIO_INT_EDGE_TO_ACTIVE);
+				     DT_INST_GPIO_PIN(0, irq_gpios),
+				     GPIO_INT_EDGE_TO_ACTIVE);
 }
 
 #ifdef CONFIG_LIS3MDL_TRIGGER_OWN_THREAD
@@ -110,21 +109,17 @@ int lis3mdl_init_interrupt(const struct device *dev)
 	struct lis3mdl_data *drv_data = dev->data;
 
 	/* setup data ready gpio interrupt */
-	drv_data->gpio =
-		device_get_binding(DT_INST_GPIO_LABEL(0, irq_gpios));
+	drv_data->gpio = device_get_binding(DT_INST_GPIO_LABEL(0, irq_gpios));
 	if (drv_data->gpio == NULL) {
 		LOG_DBG("Cannot get pointer to %s device.",
-			    DT_INST_GPIO_LABEL(0, irq_gpios));
+			DT_INST_GPIO_LABEL(0, irq_gpios));
 		return -EINVAL;
 	}
 
-	gpio_pin_configure(drv_data->gpio,
-			   DT_INST_GPIO_PIN(0, irq_gpios),
-			   GPIO_INPUT |
-			   DT_INST_GPIO_FLAGS(0, irq_gpios));
+	gpio_pin_configure(drv_data->gpio, DT_INST_GPIO_PIN(0, irq_gpios),
+			   GPIO_INPUT | DT_INST_GPIO_FLAGS(0, irq_gpios));
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   lis3mdl_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, lis3mdl_gpio_callback,
 			   BIT(DT_INST_GPIO_PIN(0, irq_gpios)));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -145,16 +140,16 @@ int lis3mdl_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_LIS3MDL_THREAD_STACK_SIZE,
-			(k_thread_entry_t)lis3mdl_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_LIS3MDL_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)lis3mdl_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_LIS3MDL_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_LIS3MDL_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = lis3mdl_work_cb;
 #endif
 
 	gpio_pin_interrupt_configure(drv_data->gpio,
-			DT_INST_GPIO_PIN(0, irq_gpios),
-			GPIO_INT_EDGE_TO_ACTIVE);
+				     DT_INST_GPIO_PIN(0, irq_gpios),
+				     GPIO_INT_EDGE_TO_ACTIVE);
 
 	return 0;
 }

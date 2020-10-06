@@ -46,22 +46,18 @@ static void validate_phase_transition(enum ppp_phase current,
 {
 	static const uint8_t valid_transitions[] = {
 		[PPP_DEAD] = 1 << PPP_ESTABLISH,
-		[PPP_ESTABLISH] = 1 << PPP_DEAD |
-				1 << PPP_AUTH |
-				1 << PPP_TERMINATE,
-		[PPP_AUTH] = 1 << PPP_TERMINATE |
-				1 << PPP_NETWORK,
-		[PPP_NETWORK] = 1 << PPP_TERMINATE |
-				1 << PPP_RUNNING,
-		[PPP_RUNNING] = 1 << PPP_TERMINATE |
-				1 << PPP_NETWORK,
+		[PPP_ESTABLISH] = 1 << PPP_DEAD | 1 << PPP_AUTH |
+				  1 << PPP_TERMINATE,
+		[PPP_AUTH] = 1 << PPP_TERMINATE | 1 << PPP_NETWORK,
+		[PPP_NETWORK] = 1 << PPP_TERMINATE | 1 << PPP_RUNNING,
+		[PPP_RUNNING] = 1 << PPP_TERMINATE | 1 << PPP_NETWORK,
 		[PPP_TERMINATE] = 1 << PPP_DEAD,
 	};
 
 	if (!(valid_transitions[current] & 1 << new)) {
 		NET_DBG("Invalid phase transition: %s (%d) => %s (%d)",
-			ppp_phase_str(current), current,
-			ppp_phase_str(new), new);
+			ppp_phase_str(current), current, ppp_phase_str(new),
+			new);
 	}
 }
 #else
@@ -86,13 +82,12 @@ void ppp_change_phase(struct ppp_context *ctx, enum ppp_phase new_phase)
 		return;
 	}
 
-	NET_ASSERT(new_phase >= PPP_DEAD &&
-		   new_phase <= PPP_TERMINATE);
+	NET_ASSERT(new_phase >= PPP_DEAD && new_phase <= PPP_TERMINATE);
 
 #if CONFIG_NET_L2_PPP_LOG_LEVEL >= LOG_LEVEL_DBG
-	NET_DBG("[%p] phase %s (%d) => %s (%d) (%s():%d)",
-		ctx, ppp_phase_str(ctx->phase), ctx->phase,
-		ppp_phase_str(new_phase), new_phase, caller, line);
+	NET_DBG("[%p] phase %s (%d) => %s (%d) (%s():%d)", ctx,
+		ppp_phase_str(ctx->phase), ctx->phase, ppp_phase_str(new_phase),
+		new_phase, caller, line);
 #endif
 
 	validate_phase_transition(ctx->phase, new_phase);
@@ -204,49 +199,33 @@ static void validate_state_transition(enum ppp_state current,
 {
 	/* See RFC 1661 ch. 4.1 */
 	static const uint16_t valid_transitions[] = {
-		[PPP_INITIAL] = 1 << PPP_CLOSED |
-				1 << PPP_STARTING,
-		[PPP_STARTING] = 1 << PPP_INITIAL |
-				1 << PPP_REQUEST_SENT,
-		[PPP_CLOSED] = 1 << PPP_INITIAL |
-				1 << PPP_REQUEST_SENT,
-		[PPP_STOPPED] = 1 << PPP_STARTING |
-				1 << PPP_CLOSED |
-				1 << PPP_ACK_RECEIVED |
-				1 << PPP_REQUEST_SENT,
-		[PPP_CLOSING] = 1 << PPP_INITIAL |
-				1 << PPP_STOPPING |
+		[PPP_INITIAL] = 1 << PPP_CLOSED | 1 << PPP_STARTING,
+		[PPP_STARTING] = 1 << PPP_INITIAL | 1 << PPP_REQUEST_SENT,
+		[PPP_CLOSED] = 1 << PPP_INITIAL | 1 << PPP_REQUEST_SENT,
+		[PPP_STOPPED] = 1 << PPP_STARTING | 1 << PPP_CLOSED |
+				1 << PPP_ACK_RECEIVED | 1 << PPP_REQUEST_SENT,
+		[PPP_CLOSING] = 1 << PPP_INITIAL | 1 << PPP_STOPPING |
 				1 << PPP_CLOSED,
-		[PPP_STOPPING] = 1 << PPP_STARTING |
-				1 << PPP_CLOSING |
-				1 << PPP_STOPPED,
-		[PPP_REQUEST_SENT] = 1 << PPP_STARTING |
-				1 << PPP_CLOSING |
-				1 << PPP_STOPPED |
-				1 << PPP_ACK_SENT |
-				1 << PPP_ACK_RECEIVED,
-		[PPP_ACK_RECEIVED] = 1 << PPP_STARTING |
-				1 << PPP_CLOSING |
-				1 << PPP_OPENED |
-				1 << PPP_REQUEST_SENT |
-				1 << PPP_STOPPED,
-		[PPP_ACK_SENT] = 1 << PPP_STARTING |
-				1 << PPP_CLOSING |
-				1 << PPP_STOPPED |
-				1 << PPP_REQUEST_SENT |
-				1 << PPP_OPENED,
-		[PPP_OPENED] = 1 << PPP_STARTING |
-				1 << PPP_CLOSING |
-				1 << PPP_ACK_SENT |
-				1 << PPP_REQUEST_SENT |
-				1 << PPP_CLOSING |
-				1 << PPP_STOPPING,
+		[PPP_STOPPING] = 1 << PPP_STARTING | 1 << PPP_CLOSING |
+				 1 << PPP_STOPPED,
+		[PPP_REQUEST_SENT] = 1 << PPP_STARTING | 1 << PPP_CLOSING |
+				     1 << PPP_STOPPED | 1 << PPP_ACK_SENT |
+				     1 << PPP_ACK_RECEIVED,
+		[PPP_ACK_RECEIVED] = 1 << PPP_STARTING | 1 << PPP_CLOSING |
+				     1 << PPP_OPENED | 1 << PPP_REQUEST_SENT |
+				     1 << PPP_STOPPED,
+		[PPP_ACK_SENT] = 1 << PPP_STARTING | 1 << PPP_CLOSING |
+				 1 << PPP_STOPPED | 1 << PPP_REQUEST_SENT |
+				 1 << PPP_OPENED,
+		[PPP_OPENED] = 1 << PPP_STARTING | 1 << PPP_CLOSING |
+			       1 << PPP_ACK_SENT | 1 << PPP_REQUEST_SENT |
+			       1 << PPP_CLOSING | 1 << PPP_STOPPING,
 	};
 
 	if (!(valid_transitions[current] & 1 << new)) {
 		NET_DBG("Invalid state transition: %s (%d) => %s (%d)",
-			ppp_state_str(current), current,
-			ppp_state_str(new), new);
+			ppp_state_str(current), current, ppp_state_str(new),
+			new);
 	}
 }
 #else
@@ -271,13 +250,12 @@ void ppp_change_state(struct ppp_fsm *fsm, enum ppp_state new_state)
 		return;
 	}
 
-	NET_ASSERT(new_state >= PPP_INITIAL &&
-		   new_state <= PPP_OPENED);
+	NET_ASSERT(new_state >= PPP_INITIAL && new_state <= PPP_OPENED);
 
 #if CONFIG_NET_L2_PPP_LOG_LEVEL >= LOG_LEVEL_DBG
-	NET_DBG("[%s/%p] state %s (%d) => %s (%d) (%s():%d)",
-		fsm->name, fsm, ppp_state_str(fsm->state), fsm->state,
-		ppp_state_str(new_state), new_state, caller, line);
+	NET_DBG("[%s/%p] state %s (%d) => %s (%d) (%s():%d)", fsm->name, fsm,
+		ppp_state_str(fsm->state), fsm->state, ppp_state_str(new_state),
+		new_state, caller, line);
 #endif
 
 	validate_state_transition(fsm->state, new_state);
@@ -285,8 +263,7 @@ void ppp_change_state(struct ppp_fsm *fsm, enum ppp_state new_state)
 	fsm->state = new_state;
 }
 
-const char *ppp_option2str(enum ppp_protocol_type protocol,
-			   int type)
+const char *ppp_option2str(enum ppp_protocol_type protocol, int type)
 {
 #if (CONFIG_NET_L2_PPP_LOG_LEVEL >= LOG_LEVEL_DBG) || defined(CONFIG_NET_SHELL)
 	switch (protocol) {

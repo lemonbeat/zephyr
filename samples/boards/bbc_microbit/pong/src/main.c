@@ -25,33 +25,38 @@
  * system where top-left is (0, 0) and bottom-right is (49, 49).
  */
 
-#define SCROLL_SPEED      400          /* Text scrolling speed */
+#define SCROLL_SPEED 400 /* Text scrolling speed */
 
-#define PIXEL_SIZE        10           /* Virtual coordinates per real pixel */
+#define PIXEL_SIZE 10 /* Virtual coordinates per real pixel */
 
-#define GAME_REFRESH      K_MSEC(100)  /* Animation refresh rate of the game */
+#define GAME_REFRESH K_MSEC(100) /* Animation refresh rate of the game */
 
-#define PADDLE_ROW        4            /* Real Y coordinate of the paddle */
-#define PADDLE_MIN        0            /* Minimum paddle real X coordinate */
-#define PADDLE_MAX        3            /* Maximum paddle real X coordinate */
+#define PADDLE_ROW 4 /* Real Y coordinate of the paddle */
+#define PADDLE_MIN 0 /* Minimum paddle real X coordinate */
+#define PADDLE_MAX 3 /* Maximum paddle real X coordinate */
 
-#define BALL_VEL_Y_START  -4           /* Default ball vertical speed */
+#define BALL_VEL_Y_START -4 /* Default ball vertical speed */
 
-#define BALL_POS_X_MIN    0            /* Maximum ball X coordinate */
-#define BALL_POS_X_MAX    49           /* Maximum ball X coordinate */
-#define BALL_POS_Y_MIN    0            /* Maximum ball Y coordinate */
-#define BALL_POS_Y_MAX    39           /* Maximum ball Y coordinate */
+#define BALL_POS_X_MIN 0 /* Maximum ball X coordinate */
+#define BALL_POS_X_MAX 49 /* Maximum ball X coordinate */
+#define BALL_POS_Y_MIN 0 /* Maximum ball Y coordinate */
+#define BALL_POS_Y_MAX 39 /* Maximum ball Y coordinate */
 
-#define START_THRESHOLD   100          /* Max time between A & B press */
-#define RESTART_THRESHOLD (2 * MSEC_PER_SEC) /* Time before restart is
+#define START_THRESHOLD 100 /* Max time between A & B press */
+#define RESTART_THRESHOLD \
+	(2 * MSEC_PER_SEC) /* Time before restart is
 					      *	allowed
 					      */
 
-#define REAL_TO_VIRT(r)  ((r) * 10)
-#define VIRT_TO_REAL(v)  ((v) / 10)
+#define REAL_TO_VIRT(r) ((r)*10)
+#define VIRT_TO_REAL(v) ((v) / 10)
 
 /* Ball starting position (just to the left of the paddle mid-point) */
-#define BALL_START       (struct x_y){ 4, BALL_POS_Y_MAX }
+#define BALL_START                \
+	(struct x_y)              \
+	{                         \
+		4, BALL_POS_Y_MAX \
+	}
 
 struct x_y {
 	int x;
@@ -82,8 +87,8 @@ static int select_idx;
 static const struct pong_selection *select;
 
 static const struct pong_choice mode_choice[] = {
-	{ SINGLE,   "Single" },
-	{ MULTI,    "Multi" },
+	{ SINGLE, "Single" },
+	{ MULTI, "Multi" },
 };
 
 static bool remote_lost;
@@ -107,16 +112,16 @@ static struct x_y ball_vel = { 0, 0 };
 static int64_t a_timestamp;
 static int64_t b_timestamp;
 
-#define SOUND_PIN            EXT_P0_GPIO_PIN
-#define SOUND_PERIOD_PADDLE  200
-#define SOUND_PERIOD_WALL    1000
+#define SOUND_PIN EXT_P0_GPIO_PIN
+#define SOUND_PERIOD_PADDLE 200
+#define SOUND_PERIOD_WALL 1000
 
 static const struct device *pwm;
 
 static enum sound_state {
-	SOUND_IDLE,    /* No sound */
-	SOUND_PADDLE,  /* Ball has hit the paddle */
-	SOUND_WALL,    /* Ball has hit a wall */
+	SOUND_IDLE, /* No sound */
+	SOUND_PADDLE, /* Ball has hit the paddle */
+	SOUND_WALL, /* Ball has hit a wall */
 } sound_state;
 
 static inline void beep(int period)
@@ -278,20 +283,16 @@ static void game_ended(bool won)
 	started = false;
 
 	if (won) {
-		struct mb_image img = MB_IMAGE({ 0, 1, 0, 1, 0 },
-					       { 0, 1, 0, 1, 0 },
-					       { 0, 0, 0, 0, 0 },
-					       { 1, 0, 0, 0, 1 },
-					       { 0, 1, 1, 1, 0 });
+		struct mb_image img = MB_IMAGE(
+			{ 0, 1, 0, 1, 0 }, { 0, 1, 0, 1, 0 }, { 0, 0, 0, 0, 0 },
+			{ 1, 0, 0, 0, 1 }, { 0, 1, 1, 1, 0 });
 		mb_display_image(disp, MB_DISPLAY_MODE_SINGLE,
 				 RESTART_THRESHOLD, &img, 1);
 		printk("You won!\n");
 	} else {
-		struct mb_image img = MB_IMAGE({ 0, 1, 0, 1, 0 },
-					       { 0, 1, 0, 1, 0 },
-					       { 0, 0, 0, 0, 0 },
-					       { 0, 1, 1, 1, 0 },
-					       { 1, 0, 0, 0, 1 });
+		struct mb_image img = MB_IMAGE(
+			{ 0, 1, 0, 1, 0 }, { 0, 1, 0, 1, 0 }, { 0, 0, 0, 0, 0 },
+			{ 0, 1, 1, 1, 0 }, { 1, 0, 0, 0, 1 });
 		mb_display_image(disp, MB_DISPLAY_MODE_SINGLE,
 				 RESTART_THRESHOLD, &img, 1);
 		printk("You lost!\n");
@@ -502,7 +503,7 @@ static void configure_buttons(void)
 
 	gpio_init_callback(&button_cb_data, button_pressed,
 			   BIT(DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) |
-			   BIT(DT_GPIO_PIN(DT_ALIAS(sw1), gpios)));
+				   BIT(DT_GPIO_PIN(DT_ALIAS(sw1), gpios)));
 
 	gpio_add_callback(gpio, &button_cb_data);
 }
@@ -524,7 +525,7 @@ void main(void)
 	printk("Started\n");
 
 	while (1) {
-		struct mb_image img = { };
+		struct mb_image img = {};
 
 		k_sem_take(&disp_update, K_FOREVER);
 
@@ -539,7 +540,7 @@ void main(void)
 				BIT(VIRT_TO_REAL(ball_pos.x));
 		}
 
-		mb_display_image(disp, MB_DISPLAY_MODE_SINGLE,
-				 SYS_FOREVER_MS, &img, 1);
+		mb_display_image(disp, MB_DISPLAY_MODE_SINGLE, SYS_FOREVER_MS,
+				 &img, 1);
 	}
 }

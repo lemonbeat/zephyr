@@ -16,11 +16,11 @@
 /* uncomment if you want PCM output in ascii */
 /*#define PCM_OUTPUT_IN_ASCII		1  */
 
-#define AUDIO_FREQ		16000
-#define CHAN_SIZE		16
-#define PCM_BLK_SIZE_MS		((AUDIO_FREQ/1000) * sizeof(int16_t))
+#define AUDIO_FREQ 16000
+#define CHAN_SIZE 16
+#define PCM_BLK_SIZE_MS ((AUDIO_FREQ / 1000) * sizeof(int16_t))
 
-#define NUM_MS		5000
+#define NUM_MS 5000
 
 K_MEM_SLAB_DEFINE(rx_mem_slab, PCM_BLK_SIZE_MS, NUM_MS, 1);
 
@@ -53,12 +53,12 @@ void signal_sampling_started(void)
 	led0 = device_get_binding(DT_GPIO_LABEL(DT_ALIAS(led0), gpios));
 	gpio_pin_configure(led0, DT_GPIO_PIN(DT_ALIAS(led0), gpios),
 			   GPIO_OUTPUT_ACTIVE |
-			   DT_GPIO_FLAGS(DT_ALIAS(led0), gpios));
+				   DT_GPIO_FLAGS(DT_ALIAS(led0), gpios));
 
 	led1 = device_get_binding(DT_GPIO_LABEL(DT_ALIAS(led1), gpios));
 	gpio_pin_configure(led1, DT_GPIO_PIN(DT_ALIAS(led1), gpios),
 			   GPIO_OUTPUT_INACTIVE |
-			   DT_GPIO_FLAGS(DT_ALIAS(led1), gpios));
+				   DT_GPIO_FLAGS(DT_ALIAS(led1), gpios));
 }
 
 void signal_sampling_stopped(void)
@@ -68,12 +68,12 @@ void signal_sampling_stopped(void)
 	led0 = device_get_binding(DT_GPIO_LABEL(DT_ALIAS(led0), gpios));
 	gpio_pin_configure(led0, DT_GPIO_PIN(DT_ALIAS(led0), gpios),
 			   GPIO_OUTPUT_ACTIVE |
-			   DT_GPIO_FLAGS(DT_ALIAS(led0), gpios));
+				   DT_GPIO_FLAGS(DT_ALIAS(led0), gpios));
 
 	led1 = device_get_binding(DT_GPIO_LABEL(DT_ALIAS(led1), gpios));
 	gpio_pin_configure(led1, DT_GPIO_PIN(DT_ALIAS(led1), gpios),
 			   GPIO_OUTPUT_ACTIVE |
-			   DT_GPIO_FLAGS(DT_ALIAS(led1), gpios));
+				   DT_GPIO_FLAGS(DT_ALIAS(led1), gpios));
 }
 
 void signal_print_stopped(void)
@@ -83,12 +83,12 @@ void signal_print_stopped(void)
 	led0 = device_get_binding(DT_GPIO_LABEL(DT_ALIAS(led0), gpios));
 	gpio_pin_configure(led0, DT_GPIO_PIN(DT_ALIAS(led0), gpios),
 			   GPIO_OUTPUT_INACTIVE |
-			   DT_GPIO_FLAGS(DT_ALIAS(led0), gpios));
+				   DT_GPIO_FLAGS(DT_ALIAS(led0), gpios));
 
 	led1 = device_get_binding(DT_GPIO_LABEL(DT_ALIAS(led1), gpios));
 	gpio_pin_configure(led1, DT_GPIO_PIN(DT_ALIAS(led1), gpios),
 			   GPIO_OUTPUT_ACTIVE |
-			   DT_GPIO_FLAGS(DT_ALIAS(led1), gpios));
+				   DT_GPIO_FLAGS(DT_ALIAS(led1), gpios));
 }
 
 void *rx_block[NUM_MS];
@@ -105,7 +105,7 @@ void main(void)
 	ledc = device_get_binding(DT_LABEL(DT_INST(0, ti_lp3943)));
 	if (!ledc) {
 		printk("Could not get pointer to %s sensor\n",
-			DT_LABEL(DT_INST(0, ti_lp3943)));
+		       DT_LABEL(DT_INST(0, ti_lp3943)));
 		return;
 	}
 
@@ -127,11 +127,12 @@ void main(void)
 
 	int ret;
 
-	const struct device *mic_dev = device_get_binding(DT_LABEL(DT_INST(0, st_mpxxdtyy)));
+	const struct device *mic_dev =
+		device_get_binding(DT_LABEL(DT_INST(0, st_mpxxdtyy)));
 
 	if (!mic_dev) {
 		printk("Could not get pointer to %s device\n",
-			DT_LABEL(DT_INST(0, st_mpxxdtyy)));
+		       DT_LABEL(DT_INST(0, st_mpxxdtyy)));
 		return;
 	}
 
@@ -174,7 +175,7 @@ void main(void)
 	for (i = 0; i < NUM_MS; i++) {
 		uint16_t *pcm_out = rx_block[i];
 
-		for (j = 0; j < rx_size/2; j++) {
+		for (j = 0; j < rx_size / 2; j++) {
 			printk("0x%04x,\n", pcm_out[j]);
 		}
 	}
@@ -186,7 +187,7 @@ void main(void)
 	for (i = 0; i < NUM_MS; i++) {
 		uint16_t *pcm_out = rx_block[i];
 
-		for (j = 0; j < rx_size/2; j++) {
+		for (j = 0; j < rx_size / 2; j++) {
 			pcm_l = (char)(pcm_out[j] & 0xFF);
 			pcm_h = (char)((pcm_out[j] >> 8) & 0xFF);
 

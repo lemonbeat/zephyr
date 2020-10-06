@@ -66,7 +66,7 @@ void tz_nonsecure_state_setup(const tz_nonsecure_setup_conf_t *p_ns_conf)
 	 * the privilege level for thread mode.
 	 */
 	configure_nonsecure_control(p_ns_conf->control_ns.spsel,
-		p_ns_conf->control_ns.npriv);
+				    p_ns_conf->control_ns.npriv);
 }
 
 void tz_nbanked_exception_target_state_set(int secure_state)
@@ -77,9 +77,9 @@ void tz_nbanked_exception_target_state_set(int secure_state)
 	} else {
 		aircr_payload |= SCB_AIRCR_BFHFNMINS_Msk;
 	}
-	SCB->AIRCR = ((AIRCR_VECT_KEY_PERMIT_WRITE << SCB_AIRCR_VECTKEY_Pos)
-			& SCB_AIRCR_VECTKEY_Msk)
-		| aircr_payload;
+	SCB->AIRCR = ((AIRCR_VECT_KEY_PERMIT_WRITE << SCB_AIRCR_VECTKEY_Pos) &
+		      SCB_AIRCR_VECTKEY_Msk) |
+		     aircr_payload;
 }
 
 void tz_nonsecure_exception_prio_config(int secure_boost)
@@ -90,9 +90,9 @@ void tz_nonsecure_exception_prio_config(int secure_boost)
 	} else {
 		aircr_payload &= ~(SCB_AIRCR_PRIS_Msk);
 	}
-	SCB->AIRCR = ((AIRCR_VECT_KEY_PERMIT_WRITE << SCB_AIRCR_VECTKEY_Pos)
-			& SCB_AIRCR_VECTKEY_Msk)
-		| aircr_payload;
+	SCB->AIRCR = ((AIRCR_VECT_KEY_PERMIT_WRITE << SCB_AIRCR_VECTKEY_Pos) &
+		      SCB_AIRCR_VECTKEY_Msk) |
+		     aircr_payload;
 }
 
 void tz_nonsecure_system_reset_req_block(int block)
@@ -103,16 +103,15 @@ void tz_nonsecure_system_reset_req_block(int block)
 	} else {
 		aircr_payload &= ~(SCB_AIRCR_SYSRESETREQS_Msk);
 	}
-	SCB->AIRCR = ((0x5FAUL << SCB_AIRCR_VECTKEY_Pos)
-			& SCB_AIRCR_VECTKEY_Msk)
-		| aircr_payload;
+	SCB->AIRCR =
+		((0x5FAUL << SCB_AIRCR_VECTKEY_Pos) & SCB_AIRCR_VECTKEY_Msk) |
+		aircr_payload;
 }
 
 #if defined(CONFIG_ARMV7_M_ARMV8_M_FP)
 void tz_nonsecure_fpu_access_enable(void)
 {
-	SCB->NSACR |=
-		(1UL << SCB_NSACR_CP10_Pos) | (1UL << SCB_NSACR_CP11_Pos);
+	SCB->NSACR |= (1UL << SCB_NSACR_CP10_Pos) | (1UL << SCB_NSACR_CP11_Pos);
 }
 #endif /* CONFIG_ARMV7_M_ARMV8_M_FP */
 
@@ -136,13 +135,13 @@ uint32_t tz_sau_number_of_regions_get(void)
 }
 
 #if defined(CONFIG_CPU_HAS_ARM_SAU)
-#if defined (__SAUREGION_PRESENT) && (__SAUREGION_PRESENT == 1U)
+#if defined(__SAUREGION_PRESENT) && (__SAUREGION_PRESENT == 1U)
 int tz_sau_region_configure_enable(tz_sau_conf_t *p_sau_conf)
 {
 	uint32_t regions = tz_sau_number_of_regions_get();
 
 	if ((p_sau_conf->region_num == 0) ||
-		(p_sau_conf->region_num > (regions - 1))) {
+	    (p_sau_conf->region_num > (regions - 1))) {
 		return 0;
 	}
 
@@ -150,9 +149,9 @@ int tz_sau_region_configure_enable(tz_sau_conf_t *p_sau_conf)
 	SAU->RNR = p_sau_conf->region_num & SAU_RNR_REGION_Msk;
 
 	if (p_sau_conf->enable) {
-		SAU->RLAR = SAU_RLAR_ENABLE_Msk
-			| (SAU_RLAR_LADDR_Msk & p_sau_conf->limit_addr)
-			| (p_sau_conf->nsc ? SAU_RLAR_NSC_Msk : 0);
+		SAU->RLAR = SAU_RLAR_ENABLE_Msk |
+			    (SAU_RLAR_LADDR_Msk & p_sau_conf->limit_addr) |
+			    (p_sau_conf->nsc ? SAU_RLAR_NSC_Msk : 0);
 		SAU->RBAR = p_sau_conf->base_addr & SAU_RBAR_BADDR_Msk;
 	} else {
 		SAU->RLAR &= ~(SAU_RLAR_ENABLE_Msk);

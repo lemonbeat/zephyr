@@ -14,12 +14,12 @@
 #include <string.h>
 #include <logging/log.h>
 
-#define SUPPORTED_FLAGS (GPIO_INPUT | GPIO_OUTPUT | \
-			GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH | \
-			GPIO_ACTIVE_LOW | GPIO_ACTIVE_HIGH)
+#define SUPPORTED_FLAGS                                    \
+	(GPIO_INPUT | GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW | \
+	 GPIO_OUTPUT_INIT_HIGH | GPIO_ACTIVE_LOW | GPIO_ACTIVE_HIGH)
 
-#define GPIO_LOW        0
-#define GPIO_HIGH       1
+#define GPIO_LOW 0
+#define GPIO_HIGH 1
 
 #define LOG_LEVEL CONFIG_GPIO_LOG_LEVEL
 LOG_MODULE_REGISTER(gpio_litex);
@@ -42,13 +42,12 @@ struct gpio_litex_data {
 
 /* Helper macros for GPIO */
 
-#define DEV_GPIO_CFG(dev)						\
-	((const struct gpio_litex_cfg *)(dev)->config)
+#define DEV_GPIO_CFG(dev) ((const struct gpio_litex_cfg *)(dev)->config)
 
 /* Helper functions for bit / port access */
 
-static inline void set_bit(const struct gpio_litex_cfg *config,
-			   uint32_t bit, bool val)
+static inline void set_bit(const struct gpio_litex_cfg *config, uint32_t bit,
+			   bool val)
 {
 	int regv, new_regv;
 
@@ -57,7 +56,8 @@ static inline void set_bit(const struct gpio_litex_cfg *config,
 	litex_write(config->reg_addr, config->reg_size, new_regv);
 }
 
-static inline uint32_t get_bit(const struct gpio_litex_cfg *config, uint32_t bit)
+static inline uint32_t get_bit(const struct gpio_litex_cfg *config,
+			       uint32_t bit)
 {
 	int regv = litex_read(config->reg_addr, config->reg_size);
 
@@ -91,8 +91,8 @@ static int gpio_litex_init(const struct device *dev)
 	return 0;
 }
 
-static int gpio_litex_configure(const struct device *dev,
-				gpio_pin_t pin, gpio_flags_t flags)
+static int gpio_litex_configure(const struct device *dev, gpio_pin_t pin,
+				gpio_flags_t flags)
 {
 	const struct gpio_litex_cfg *gpio_config = DEV_GPIO_CFG(dev);
 
@@ -216,28 +216,21 @@ static const struct gpio_driver_api gpio_litex_driver_api = {
 
 /* Device Instantiation */
 
-#define GPIO_LITEX_INIT(n) \
-	BUILD_ASSERT(DT_INST_REG_SIZE(n) != 0 \
-		     && DT_INST_REG_SIZE(n) % 4 == 0, \
-		     "Register size must be a multiple of 4"); \
-\
-	static const struct gpio_litex_cfg gpio_litex_cfg_##n = { \
-		.reg_addr = \
-		(volatile uint32_t *) DT_INST_REG_ADDR(n), \
-		.reg_size = DT_INST_REG_SIZE(n) / 4, \
-		.nr_gpios = DT_INST_PROP(n, ngpios), \
-		.port_is_output = DT_INST_PROP(n, port_is_output), \
-	}; \
-	static struct gpio_litex_data gpio_litex_data_##n; \
-\
-	DEVICE_AND_API_INIT(litex_gpio_##n, \
-			    DT_INST_LABEL(n), \
-			    gpio_litex_init, \
-			    &gpio_litex_data_##n, \
-			    &gpio_litex_cfg_##n, \
-			    POST_KERNEL, \
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
-			    &gpio_litex_driver_api \
-			   );
+#define GPIO_LITEX_INIT(n)                                                     \
+	BUILD_ASSERT(DT_INST_REG_SIZE(n) != 0 && DT_INST_REG_SIZE(n) % 4 == 0, \
+		     "Register size must be a multiple of 4");                 \
+                                                                               \
+	static const struct gpio_litex_cfg gpio_litex_cfg_##n = {              \
+		.reg_addr = (volatile uint32_t *)DT_INST_REG_ADDR(n),          \
+		.reg_size = DT_INST_REG_SIZE(n) / 4,                           \
+		.nr_gpios = DT_INST_PROP(n, ngpios),                           \
+		.port_is_output = DT_INST_PROP(n, port_is_output),             \
+	};                                                                     \
+	static struct gpio_litex_data gpio_litex_data_##n;                     \
+                                                                               \
+	DEVICE_AND_API_INIT(litex_gpio_##n, DT_INST_LABEL(n), gpio_litex_init, \
+			    &gpio_litex_data_##n, &gpio_litex_cfg_##n,         \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,   \
+			    &gpio_litex_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_LITEX_INIT)

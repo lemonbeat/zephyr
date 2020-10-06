@@ -11,7 +11,6 @@
 #include <arch/cpu.h>
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
 
-
 /*
  * Make sure PCR sleep enables are clear except for crypto
  * which do not have internal clock gating.
@@ -50,8 +49,8 @@ static void clk32_change(uint8_t new_clk32)
 {
 	new_clk32 &= MCHP_VBATR_CLKEN_MASK;
 
-	if ((VBATR_REGS->CLK32_EN & MCHP_VBATR_CLKEN_MASK)
-		== (uint32_t)new_clk32) {
+	if ((VBATR_REGS->CLK32_EN & MCHP_VBATR_CLKEN_MASK) ==
+	    (uint32_t)new_clk32) {
 		return;
 	}
 
@@ -73,16 +72,16 @@ static int soc_clk32_init(void)
 	uint8_t new_clk32;
 
 #ifdef CONFIG_SOC_MEC1501_EXT_32K
-  #ifdef CONFIG_SOC_MEC1501_EXT_32K_CRYSTAL
-    #ifdef CONFIG_SOC_MEC1501_EXT_32K_PARALLEL_CRYSTAL
+#ifdef CONFIG_SOC_MEC1501_EXT_32K_CRYSTAL
+#ifdef CONFIG_SOC_MEC1501_EXT_32K_PARALLEL_CRYSTAL
 	new_clk32 = MCHP_VBATR_USE_PAR_CRYSTAL;
-    #else
+#else
 	new_clk32 = MCHP_VBATR_USE_SE_CRYSTAL;
-    #endif
-  #else
+#endif
+#else
 	/* Use 32KHZ_PIN as 32KHz source */
 	new_clk32 = MCHP_VBATR_USE_32KIN_PIN;
-  #endif
+#endif
 #else
 	/* Use internal 32KHz +/-2% silicon oscillator
 	 * if required performed OTP value override

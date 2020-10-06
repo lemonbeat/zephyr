@@ -44,7 +44,7 @@ static void test_get(bool ok, bool up, uint8_t *exp_buf, uint16_t exp_len)
 		zassert_equal(out_len, exp_len, "Unexpected entry length.\n");
 		if (out_len) {
 			zassert_equal(memcmp(out_buf, exp_buf, out_len), 0,
-				"Expected equal buffers.\n");
+				      "Expected equal buffers.\n");
 		}
 	} else {
 		zassert_false(res, "History should return nothing.\n");
@@ -127,7 +127,7 @@ static void test_history_get_up_and_down(void)
 	test_get(true, true, exp2_buf, 15); /* up - 2*/
 	test_get(true, true, exp1_buf, 20); /* up - 1*/
 	test_get(true, false, exp2_buf, 15); /* down - 2 */
-	test_get(true, true, exp1_buf, 20);  /* up - 1*/
+	test_get(true, true, exp1_buf, 20); /* up - 1*/
 	test_get(true, false, exp2_buf, 15); /* down - 2 */
 	test_get(true, false, exp3_buf, 20); /* down - 3 */
 	test_get(false, false, NULL, 0); /* down - nothing */
@@ -256,13 +256,12 @@ static void test_storing_long_buffers(void)
 void test_main(void)
 {
 	ztest_test_suite(shell_test_suite,
-			ztest_unit_test(test_history_add_get),
-			ztest_unit_test(test_history_purge),
-			ztest_unit_test(test_history_get_up_and_down),
-			ztest_unit_test(test_too_long_line_not_stored),
-			ztest_unit_test(test_no_duplicates_in_a_row),
-			ztest_unit_test(test_storing_long_buffers)
-			);
+			 ztest_unit_test(test_history_add_get),
+			 ztest_unit_test(test_history_purge),
+			 ztest_unit_test(test_history_get_up_and_down),
+			 ztest_unit_test(test_too_long_line_not_stored),
+			 ztest_unit_test(test_no_duplicates_in_a_row),
+			 ztest_unit_test(test_storing_long_buffers));
 
 	ztest_run_test_suite(shell_test_suite);
 }

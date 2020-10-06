@@ -12,33 +12,31 @@
 #include <zephyr/types.h>
 #include <drivers/gpio.h>
 
-#define HMC5883L_REG_CONFIG_A           0x00
-#define HMC5883L_ODR_SHIFT              2
+#define HMC5883L_REG_CONFIG_A 0x00
+#define HMC5883L_ODR_SHIFT 2
 
-#define HMC5883L_REG_CONFIG_B           0x01
-#define HMC5883L_GAIN_SHIFT             5
+#define HMC5883L_REG_CONFIG_B 0x01
+#define HMC5883L_GAIN_SHIFT 5
 
-#define HMC5883L_REG_MODE               0x02
-#define HMC5883L_MODE_CONTINUOUS        0
+#define HMC5883L_REG_MODE 0x02
+#define HMC5883L_MODE_CONTINUOUS 0
 
-#define HMC5883L_REG_DATA_START         0x03
+#define HMC5883L_REG_DATA_START 0x03
 
-#define HMC5883L_REG_CHIP_ID            0x0A
-#define HMC5883L_CHIP_ID_A              'H'
-#define HMC5883L_CHIP_ID_B              '4'
-#define HMC5883L_CHIP_ID_C              '3'
+#define HMC5883L_REG_CHIP_ID 0x0A
+#define HMC5883L_CHIP_ID_A 'H'
+#define HMC5883L_CHIP_ID_B '4'
+#define HMC5883L_CHIP_ID_C '3'
 
-static const char *const hmc5883l_odr_strings[] = {
-	"0.75", "1.5", "3", "7.5", "15", "30", "75"
-};
+static const char *const hmc5883l_odr_strings[] = { "0.75", "1.5", "3", "7.5",
+						    "15",   "30",  "75" };
 
 static const char *const hmc5883l_fs_strings[] = {
 	"0.88", "1.3", "1.9", "2.5", "4", "4.7", "5.6", "8.1"
 };
 
-static const uint16_t hmc5883l_gain[] = {
-	1370, 1090, 820, 660, 440, 390, 330, 230
-};
+static const uint16_t hmc5883l_gain[] = { 1370, 1090, 820, 660,
+					  440,	390,  330, 230 };
 
 struct hmc5883l_data {
 	const struct device *i2c;

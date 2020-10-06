@@ -39,7 +39,6 @@ void lock_unlock_check(const void *arg)
 	int32_t state_before_lock, state_after_lock, current_state;
 	uint32_t tick_freq, sys_timer_freq;
 
-
 	state_before_lock = osKernelLock();
 	if (k_is_in_isr()) {
 		zassert_true(state_before_lock == osErrorISR, NULL);

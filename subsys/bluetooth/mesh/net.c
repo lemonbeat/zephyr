@@ -48,18 +48,19 @@
 
 #define LOOPBACK_MAX_PDU_LEN (BT_MESH_NET_HDR_LEN + 16)
 #define LOOPBACK_USER_DATA_SIZE sizeof(struct bt_mesh_subnet *)
-#define LOOPBACK_BUF_SUB(buf) (*(struct bt_mesh_subnet **)net_buf_user_data(buf))
+#define LOOPBACK_BUF_SUB(buf) \
+	(*(struct bt_mesh_subnet **)net_buf_user_data(buf))
 
 /* Seq limit after IV Update is triggered */
 #define IV_UPDATE_SEQ_LIMIT 8000000
 
-#define IVI(pdu)           ((pdu)[0] >> 7)
-#define NID(pdu)           ((pdu)[0] & 0x7f)
-#define CTL(pdu)           ((pdu)[1] >> 7)
-#define TTL(pdu)           ((pdu)[1] & 0x7f)
-#define SEQ(pdu)           (sys_get_be24(&pdu[2]))
-#define SRC(pdu)           (sys_get_be16(&(pdu)[5]))
-#define DST(pdu)           (sys_get_be16(&(pdu)[7]))
+#define IVI(pdu) ((pdu)[0] >> 7)
+#define NID(pdu) ((pdu)[0] & 0x7f)
+#define CTL(pdu) ((pdu)[1] >> 7)
+#define TTL(pdu) ((pdu)[1] & 0x7f)
+#define SEQ(pdu) (sys_get_be24(&pdu[2]))
+#define SRC(pdu) (sys_get_be16(&(pdu)[5]))
+#define DST(pdu) (sys_get_be16(&(pdu)[7]))
 
 /* Determine how many friendship credentials we need */
 #if defined(CONFIG_BT_MESH_FRIEND)
@@ -74,7 +75,7 @@ static struct friend_cred friend_cred[FRIEND_CRED_COUNT];
 
 static struct {
 	uint32_t src : 15, /* MSb of source is always 0 */
-	      seq : 17;
+		seq : 17;
 } msg_cache[CONFIG_BT_MESH_MSG_CACHE_SIZE];
 static uint16_t msg_cache_next;
 
@@ -97,7 +98,7 @@ NET_BUF_POOL_DEFINE(loopback_buf_pool, CONFIG_BT_MESH_LOOPBACK_BUFS,
 		    LOOPBACK_MAX_PDU_LEN, LOOPBACK_USER_DATA_SIZE, NULL);
 
 static uint32_t dup_cache[CONFIG_BT_MESH_MSG_CACHE_SIZE];
-static int   dup_cache_next;
+static int dup_cache_next;
 
 static bool check_dup(struct net_buf_simple *data)
 {
@@ -207,7 +208,8 @@ int bt_mesh_net_keys_create(struct bt_mesh_subnet_keys *keys,
 	return 0;
 }
 
-int friend_cred_set(struct friend_cred *cred, uint8_t idx, const uint8_t net_key[16])
+int friend_cred_set(struct friend_cred *cred, uint8_t idx,
+		    const uint8_t net_key[16])
 {
 	uint16_t lpn_addr, frnd_addr;
 	int err;
@@ -288,8 +290,9 @@ int friend_cred_update(struct bt_mesh_subnet *sub)
 	return 0;
 }
 
-struct friend_cred *friend_cred_create(struct bt_mesh_subnet *sub, uint16_t addr,
-				       uint16_t lpn_counter, uint16_t frnd_counter)
+struct friend_cred *friend_cred_create(struct bt_mesh_subnet *sub,
+				       uint16_t addr, uint16_t lpn_counter,
+				       uint16_t frnd_counter)
 {
 	struct friend_cred *cred;
 	int i, err;
@@ -536,7 +539,7 @@ bool bt_mesh_kr_update(struct bt_mesh_subnet *sub, uint8_t new_kr, bool new_key)
 				/* Ignore */
 				break;
 			}
-		/* Upon receiving a Secure Network beacon with the KR flag set
+			/* Upon receiving a Secure Network beacon with the KR flag set
 		 * to 0 using the new NetKey in Phase 1, the node shall
 		 * immediately transition to Phase 3, which effectively skips
 		 * Phase 2.
@@ -608,8 +611,8 @@ bool bt_mesh_net_iv_update(uint32_t iv_index, bool iv_update)
 		/* We're currently in IV Update mode */
 
 		if (iv_index != bt_mesh.iv_index) {
-			BT_WARN("IV Index mismatch: 0x%08x != 0x%08x",
-				iv_index, bt_mesh.iv_index);
+			BT_WARN("IV Index mismatch: 0x%08x != 0x%08x", iv_index,
+				bt_mesh.iv_index);
 			return false;
 		}
 
@@ -752,7 +755,7 @@ static void bt_mesh_net_local(struct k_work *work)
 		BT_DBG("src: 0x%04x dst: 0x%04x seq 0x%06x sub %p", rx.ctx.addr,
 		       rx.ctx.addr, rx.seq, sub);
 
-		(void) bt_mesh_trans_recv(&buf->b, &rx);
+		(void)bt_mesh_trans_recv(&buf->b, &rx);
 		net_buf_unref(buf);
 	}
 }
@@ -792,8 +795,8 @@ static int net_header_encode(struct bt_mesh_net_tx *tx, uint8_t nid,
 		return -EINVAL;
 	}
 
-	BT_DBG("src 0x%04x dst 0x%04x ctl %u seq 0x%06x",
-	       tx->src, tx->ctx->addr, ctl, bt_mesh.seq);
+	BT_DBG("src 0x%04x dst 0x%04x ctl %u seq 0x%06x", tx->src,
+	       tx->ctx->addr, ctl, bt_mesh.seq);
 
 	net_buf_simple_push_be16(buf, tx->ctx->addr);
 	net_buf_simple_push_be16(buf, tx->src);
@@ -978,9 +981,9 @@ static bool auth_match(struct bt_mesh_subnet_keys *keys,
 	return true;
 }
 
-struct bt_mesh_subnet *bt_mesh_subnet_find(const uint8_t net_id[8], uint8_t flags,
-					   uint32_t iv_index, const uint8_t auth[8],
-					   bool *new_key)
+struct bt_mesh_subnet *bt_mesh_subnet_find(const uint8_t net_id[8],
+					   uint8_t flags, uint32_t iv_index,
+					   const uint8_t auth[8], bool *new_key)
 {
 	int i;
 
@@ -1372,7 +1375,8 @@ static void ivu_refresh(struct k_work *work)
 
 	BT_DBG("%s for %u hour%s",
 	       atomic_test_bit(bt_mesh.flags, BT_MESH_IVU_IN_PROGRESS) ?
-	       "IVU in Progress" : "IVU Normal mode",
+			     "IVU in Progress" :
+			     "IVU Normal mode",
 	       bt_mesh.ivu_duration, bt_mesh.ivu_duration == 1U ? "" : "s");
 
 	if (bt_mesh.ivu_duration < BT_MESH_IVU_MIN_HOURS) {

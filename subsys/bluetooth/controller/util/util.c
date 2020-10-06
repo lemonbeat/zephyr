@@ -127,12 +127,10 @@ again:
 		 */
 		if ((consecutive_cnt > 6) ||
 #if defined(CONFIG_BT_CTLR_PHY_CODED)
-		    (!consecutive_bit && (((bit_idx < 6) &&
-					   (ones_count_lsb8 < 1)) ||
-					  ((bit_idx < 5) &&
-					   (ones_count_lsb8 < 2)) ||
-					  ((bit_idx < 4) &&
-					   (ones_count_lsb8 < 3)))) ||
+		    (!consecutive_bit &&
+		     (((bit_idx < 6) && (ones_count_lsb8 < 1)) ||
+		      ((bit_idx < 5) && (ones_count_lsb8 < 2)) ||
+		      ((bit_idx < 4) && (ones_count_lsb8 < 3)))) ||
 #endif /* CONFIG_BT_CTLR_PHY_CODED */
 		    ((consecutive_cnt < 6) &&
 		     (((bit_idx < 29) && (transitions < 1)) ||
@@ -206,8 +204,7 @@ again:
 	}
 
 	/* It shall not have all four octets equal. */
-	if (!((aa & 0xFFFF) ^ (aa >> 16)) &&
-	    !((aa & 0xFF) ^ (aa >> 24))) {
+	if (!((aa & 0xFFFF) ^ (aa >> 16)) && !((aa & 0xFF) ^ (aa >> 24))) {
 		goto again;
 	}
 

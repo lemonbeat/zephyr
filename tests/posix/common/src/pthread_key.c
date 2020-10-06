@@ -29,7 +29,7 @@ void *thread_top(void *p1)
 
 	value = k_malloc(sizeof(buffer));
 
-	zassert_true((int) POINTER_TO_INT(value),
+	zassert_true((int)POINTER_TO_INT(value),
 		     "thread could not allocate storage");
 
 	ret = pthread_setspecific(key, value);
@@ -44,11 +44,10 @@ void *thread_top(void *p1)
 	/* TESTPOINT: Check if pthread_getspecific returns the same value
 	 * set by pthread_setspecific
 	 */
-	zassert_equal(value, getval,
-			"set and retrieved values are different");
+	zassert_equal(value, getval, "set and retrieved values are different");
 
 	printk("set value = %d and retrieved value = %d\n",
-		(int) POINTER_TO_INT(value), (int) POINTER_TO_INT(getval));
+	       (int)POINTER_TO_INT(value), (int)POINTER_TO_INT(getval));
 
 	return NULL;
 }
@@ -63,7 +62,7 @@ void *thread_func(void *p1)
 
 	value = k_malloc(sizeof(buffer));
 
-	zassert_true((int) POINTER_TO_INT(value),
+	zassert_true((int)POINTER_TO_INT(value),
 		     "thread could not allocate storage");
 
 	for (i = 0; i < N_KEY; i++) {
@@ -81,11 +80,10 @@ void *thread_func(void *p1)
 		 * value set by pthread_setspecific for each of the keys
 		 */
 		zassert_equal(value, getval,
-				"set and retrieved values are different");
+			      "set and retrieved values are different");
 
-		printk("key %d: set value = %d and retrieved value = %d\n",
-				i, (int) POINTER_TO_INT(value),
-				(int) POINTER_TO_INT(getval));
+		printk("key %d: set value = %d and retrieved value = %d\n", i,
+		       (int)POINTER_TO_INT(value), (int)POINTER_TO_INT(getval));
 	}
 	return NULL;
 }
@@ -142,9 +140,9 @@ void test_posix_multiple_threads_single_key(void)
 		ret = pthread_attr_init(&attr[i]);
 		if (ret != 0) {
 			zassert_false(pthread_attr_destroy(&attr[i]),
-					"Unable to destroy pthread object attr");
+				      "Unable to destroy pthread object attr");
 			zassert_false(pthread_attr_init(&attr[i]),
-					"Unable to create pthread object attr");
+				      "Unable to create pthread object attr");
 		}
 
 		schedparam.sched_priority = 2;
@@ -152,7 +150,7 @@ void test_posix_multiple_threads_single_key(void)
 		pthread_attr_setstack(&attr[i], &stackp[i][0], STACKSZ);
 
 		ret = pthread_create(&newthread[i], &attr[i], thread_top,
-				INT_TO_POINTER(i));
+				     INT_TO_POINTER(i));
 
 		/* TESTPOINT: Check if threads are created successfully */
 		zassert_false(ret, "attempt to create threads failed");
@@ -187,17 +185,16 @@ void test_posix_single_thread_multiple_keys(void)
 	ret = pthread_attr_init(&attr);
 	if (ret != 0) {
 		zassert_false(pthread_attr_destroy(&attr),
-				"Unable to destroy pthread object attr");
+			      "Unable to destroy pthread object attr");
 		zassert_false(pthread_attr_init(&attr),
-				"Unable to create pthread object attr");
+			      "Unable to create pthread object attr");
 	}
 
 	schedparam.sched_priority = 2;
 	pthread_attr_setschedparam(&attr, &schedparam);
 	pthread_attr_setstack(&attr, &stackp[0][0], STACKSZ);
 
-	ret = pthread_create(&newthread, &attr, thread_func,
-			(void *)0);
+	ret = pthread_create(&newthread, &attr, thread_func, (void *)0);
 
 	/*TESTPOINT: Check if thread is created successfully */
 	zassert_false(ret, "attempt to create thread failed");

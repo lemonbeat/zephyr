@@ -22,8 +22,7 @@ static int k_sys_work_q_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	k_work_q_start(&k_sys_work_q,
-		       sys_work_q_stack,
+	k_work_q_start(&k_sys_work_q, sys_work_q_stack,
 		       K_KERNEL_STACK_SIZEOF(sys_work_q_stack),
 		       CONFIG_SYSTEM_WORKQUEUE_PRIORITY);
 	k_thread_name_set(&k_sys_work_q.thread, "sysworkq");

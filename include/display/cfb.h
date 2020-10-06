@@ -34,7 +34,7 @@ extern "C" {
  */
 
 enum cfb_display_param {
-	CFB_DISPLAY_HEIGH		= 0,
+	CFB_DISPLAY_HEIGH = 0,
 	CFB_DISPLAY_WIDTH,
 	CFB_DISPLAY_PPT,
 	CFB_DISPLAY_ROWS,
@@ -42,9 +42,9 @@ enum cfb_display_param {
 };
 
 enum cfb_font_caps {
-	CFB_FONT_MONO_VPACKED		= BIT(0),
-	CFB_FONT_MONO_HPACKED		= BIT(1),
-	CFB_FONT_MSB_FIRST		= BIT(2),
+	CFB_FONT_MONO_VPACKED = BIT(0),
+	CFB_FONT_MONO_HPACKED = BIT(1),
+	CFB_FONT_MSB_FIRST = BIT(2),
 };
 
 struct cfb_font {
@@ -67,15 +67,14 @@ struct cfb_font {
  * @param _fc     Character mapped to first font element.
  * @param _lc     Character mapped to last font element.
  */
-#define FONT_ENTRY_DEFINE(_name, _width, _height, _caps, _data, _fc, _lc)      \
-	static const Z_STRUCT_SECTION_ITERABLE(cfb_font, _name) =	       \
-	{								       \
-		.data = _data,						       \
-		.caps = _caps,						       \
-		.width = _width,					       \
-		.height = _height,					       \
-		.first_char = _fc,					       \
-		.last_char = _lc,					       \
+#define FONT_ENTRY_DEFINE(_name, _width, _height, _caps, _data, _fc, _lc) \
+	static const Z_STRUCT_SECTION_ITERABLE(cfb_font, _name) = {       \
+		.data = _data,                                            \
+		.caps = _caps,                                            \
+		.width = _width,                                          \
+		.height = _height,                                        \
+		.first_char = _fc,                                        \
+		.last_char = _lc,                                         \
 	}
 
 /**
@@ -127,8 +126,7 @@ int cfb_framebuffer_finalize(const struct device *dev);
  *
  * @return Display parameter value
  */
-int cfb_get_display_parameter(const struct device *dev,
-			      enum cfb_display_param);
+int cfb_get_display_parameter(const struct device *dev, enum cfb_display_param);
 
 /**
  * @brief Set font.

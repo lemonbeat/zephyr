@@ -14,7 +14,6 @@
 #include <timing/timing.h>
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
 
-
 /**
  * @brief Initialize and Enable the DWT cycle counter
  *
@@ -33,8 +32,8 @@ static inline int z_arm_dwt_init(const struct device *arg)
 
 	/* Assert that the cycle counter is indeed implemented. */
 	__ASSERT(DWT->CTRL & DWT_CTRL_NOCYCCNT_Msk != 0,
-		"DWT implements no cycle counter. "
-		"Cannot be used for cycle counting\n");
+		 "DWT implements no cycle counter. "
+		 "Cannot be used for cycle counting\n");
 
 	return 0;
 }
@@ -92,7 +91,6 @@ static inline uint64_t z_arm_dwt_freq_get(void)
 	static uint64_t dwt_frequency;
 
 	if (!dwt_frequency) {
-
 		z_arm_dwt_init(NULL);
 
 		uint32_t cyc_start = k_cycle_get_32();
@@ -115,7 +113,6 @@ static inline uint64_t z_arm_dwt_freq_get(void)
 		uint64_t dtsc = dwt_end - dwt_start;
 
 		dwt_frequency = (cyc_freq * dtsc) / dcyc;
-
 	}
 	return dwt_frequency;
 #endif /* CONFIG_SOC_FAMILY_NRF */
@@ -142,7 +139,7 @@ timing_t timing_counter_get(void)
 }
 
 uint64_t timing_cycles_get(volatile timing_t *const start,
-				  volatile timing_t *const end)
+			   volatile timing_t *const end)
 {
 	return (*end - *start);
 }

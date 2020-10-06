@@ -19,14 +19,13 @@
 /** @def BT_UUID_SERVICE_E
  *  @brief UUID for the Service E
  */
-#define BT_UUID_SERVICE_E               BT_UUID_DECLARE_16(0xa00e)
+#define BT_UUID_SERVICE_E BT_UUID_DECLARE_16(0xa00e)
 
-static struct bt_gatt_attr service_e_3_attrs[] = {
-	BT_GATT_H_PRIMARY_SERVICE(BT_UUID_SERVICE_E, 0xFFFF)
-};
+static struct bt_gatt_attr service_e_3_attrs[] = { BT_GATT_H_PRIMARY_SERVICE(
+	BT_UUID_SERVICE_E, 0xFFFF) };
 
 static struct bt_gatt_service service_e_3_svc =
-		    BT_GATT_SERVICE(service_e_3_attrs);
+	BT_GATT_SERVICE(service_e_3_attrs);
 
 /**
  * @brief Register the Service E and all its Characteristics...

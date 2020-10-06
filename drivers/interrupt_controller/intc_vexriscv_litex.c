@@ -14,26 +14,26 @@
 #include <zephyr.h>
 #include <zephyr/types.h>
 
-#define IRQ_MASK		DT_REG_ADDR_BY_NAME(DT_INST(0, vexriscv_intc0), irq_mask)
-#define IRQ_PENDING		DT_REG_ADDR_BY_NAME(DT_INST(0, vexriscv_intc0), irq_pending)
+#define IRQ_MASK DT_REG_ADDR_BY_NAME(DT_INST(0, vexriscv_intc0), irq_mask)
+#define IRQ_PENDING DT_REG_ADDR_BY_NAME(DT_INST(0, vexriscv_intc0), irq_pending)
 
-#define TIMER0_IRQ		DT_IRQN(DT_INST(0, litex_timer0))
-#define UART0_IRQ		DT_IRQN(DT_INST(0, litex_uart0))
+#define TIMER0_IRQ DT_IRQN(DT_INST(0, litex_timer0))
+#define UART0_IRQ DT_IRQN(DT_INST(0, litex_uart0))
 
-#define ETH0_IRQ		DT_IRQN(DT_INST(0, litex_eth0))
+#define ETH0_IRQ DT_IRQN(DT_INST(0, litex_eth0))
 
-#define I2S_RX_IRQ		DT_IRQN(DT_NODELABEL(i2s_rx))
-#define I2S_TX_IRQ		DT_IRQN(DT_NODELABEL(i2s_tx))
+#define I2S_RX_IRQ DT_IRQN(DT_NODELABEL(i2s_rx))
+#define I2S_TX_IRQ DT_IRQN(DT_NODELABEL(i2s_tx))
 static inline void vexriscv_litex_irq_setmask(uint32_t mask)
 {
-	__asm__ volatile ("csrw %0, %1" :: "i"(IRQ_MASK), "r"(mask));
+	__asm__ volatile("csrw %0, %1" ::"i"(IRQ_MASK), "r"(mask));
 }
 
 static inline uint32_t vexriscv_litex_irq_getmask(void)
 {
 	uint32_t mask;
 
-	__asm__ volatile ("csrr %0, %1" : "=r"(mask) : "i"(IRQ_MASK));
+	__asm__ volatile("csrr %0, %1" : "=r"(mask) : "i"(IRQ_MASK));
 	return mask;
 }
 
@@ -41,18 +41,16 @@ static inline uint32_t vexriscv_litex_irq_pending(void)
 {
 	uint32_t pending;
 
-	__asm__ volatile ("csrr %0, %1" : "=r"(pending) : "i"(IRQ_PENDING));
+	__asm__ volatile("csrr %0, %1" : "=r"(pending) : "i"(IRQ_PENDING));
 	return pending;
 }
 
 static inline void vexriscv_litex_irq_setie(uint32_t ie)
 {
 	if (ie) {
-		__asm__ volatile ("csrrs x0, mstatus, %0"
-				:: "r"(MSTATUS_IEN));
+		__asm__ volatile("csrrs x0, mstatus, %0" ::"r"(MSTATUS_IEN));
 	} else {
-		__asm__ volatile ("csrrc x0, mstatus, %0"
-				:: "r"(MSTATUS_IEN));
+		__asm__ volatile("csrrc x0, mstatus, %0" ::"r"(MSTATUS_IEN));
 	}
 }
 
@@ -116,15 +114,14 @@ int arch_irq_is_enabled(unsigned int irq)
 static int vexriscv_litex_irq_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
-	__asm__ volatile ("csrrs x0, mie, %0"
-			:: "r"((1 << RISCV_MACHINE_TIMER_IRQ)
-				| (1 << RISCV_MACHINE_EXT_IRQ)));
+	__asm__ volatile("csrrs x0, mie, %0" ::"r"(
+		(1 << RISCV_MACHINE_TIMER_IRQ) | (1 << RISCV_MACHINE_EXT_IRQ)));
 	vexriscv_litex_irq_setie(1);
-	IRQ_CONNECT(RISCV_MACHINE_EXT_IRQ, 0, vexriscv_litex_irq_handler,
-			NULL, 0);
+	IRQ_CONNECT(RISCV_MACHINE_EXT_IRQ, 0, vexriscv_litex_irq_handler, NULL,
+		    0);
 
 	return 0;
 }
 
 SYS_INIT(vexriscv_litex_irq_init, PRE_KERNEL_2,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+	 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

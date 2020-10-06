@@ -13,22 +13,22 @@
 
 #include "unary_f32.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)120)
-#define REL_ERROR_THRESH	(1.0e-6)
-#define ABS_ERROR_THRESH	(1.0e-5)
+#define SNR_ERROR_THRESH ((float32_t)120)
+#define REL_ERROR_THRESH (1.0e-6)
+#define ABS_ERROR_THRESH (1.0e-5)
 
-#define SNR_ERROR_THRESH_INV	((float32_t)70)
-#define REL_ERROR_THRESH_INV	(1.0e-3)
-#define ABS_ERROR_THRESH_INV	(1.0e-3)
+#define SNR_ERROR_THRESH_INV ((float32_t)70)
+#define REL_ERROR_THRESH_INV (1.0e-3)
+#define ABS_ERROR_THRESH_INV (1.0e-3)
 
-#define NUM_MATRICES		(ARRAY_SIZE(in_dims) / 2)
-#define NUM_MATRICES_INV	ARRAY_SIZE(in_inv_dims)
-#define MAX_MATRIX_DIM		(40)
+#define NUM_MATRICES (ARRAY_SIZE(in_dims) / 2)
+#define NUM_MATRICES_INV ARRAY_SIZE(in_inv_dims)
+#define MAX_MATRIX_DIM (40)
 
-#define OP2_ADD			(0)
-#define OP2_SUB			(1)
-#define OP1_SCALE		(0)
-#define OP1_TRANS		(1)
+#define OP2_ADD (0)
+#define OP2_SUB (1)
+#define OP1_SCALE (0)
+#define OP1_TRANS (1)
 
 static void test_op2(int op, const uint32_t *ref, size_t length)
 {
@@ -89,15 +89,13 @@ static void test_op2(int op, const uint32_t *ref, size_t length)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -105,13 +103,12 @@ static void test_op2(int op, const uint32_t *ref, size_t length)
 	free(output);
 }
 
-DEFINE_TEST_VARIANT3(op2, arm_mat_add_f32, OP2_ADD,
-	ref_add, ARRAY_SIZE(ref_add));
-DEFINE_TEST_VARIANT3(op2, arm_mat_sub_f32, OP2_SUB,
-	ref_sub, ARRAY_SIZE(ref_sub));
+DEFINE_TEST_VARIANT3(op2, arm_mat_add_f32, OP2_ADD, ref_add,
+		     ARRAY_SIZE(ref_add));
+DEFINE_TEST_VARIANT3(op2, arm_mat_sub_f32, OP2_SUB, ref_sub,
+		     ARRAY_SIZE(ref_sub));
 
-static void test_op1(int op, const uint32_t *ref, size_t length,
-	bool transpose)
+static void test_op1(int op, const uint32_t *ref, size_t length, bool transpose)
 {
 	size_t index;
 	uint16_t *dims = (uint16_t *)in_dims;
@@ -164,25 +161,23 @@ static void test_op1(int op, const uint32_t *ref, size_t length,
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
 	free(output);
 }
 
-DEFINE_TEST_VARIANT4(op1, arm_mat_scale_f32, OP1_SCALE,
-	ref_scale, ARRAY_SIZE(ref_scale), false);
-DEFINE_TEST_VARIANT4(op1, arm_mat_trans_f32, OP1_TRANS,
-	ref_trans, ARRAY_SIZE(ref_trans), true);
+DEFINE_TEST_VARIANT4(op1, arm_mat_scale_f32, OP1_SCALE, ref_scale,
+		     ARRAY_SIZE(ref_scale), false);
+DEFINE_TEST_VARIANT4(op1, arm_mat_trans_f32, OP1_TRANS, ref_trans,
+		     ARRAY_SIZE(ref_trans), true);
 
 static void test_arm_mat_inverse_f32(void)
 {
@@ -217,14 +212,14 @@ static void test_arm_mat_inverse_f32(void)
 		mat_in1.numCols = mat_out.numCols = columns;
 
 		/* Load matrix data */
-		memcpy(mat_in1.pData,
-		       input, rows * columns * sizeof(float32_t));
+		memcpy(mat_in1.pData, input,
+		       rows * columns * sizeof(float32_t));
 
 		/* Run test function */
 		status = arm_mat_inverse_f32(&mat_in1, &mat_out);
 
 		zassert_equal(status, ARM_MATH_SUCCESS,
-			ASSERT_MSG_INCORRECT_COMP_RESULT);
+			      ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 		/* Increment pointers */
 		input += (rows * columns);
@@ -232,15 +227,14 @@ static void test_arm_mat_inverse_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref_inv,
-			SNR_ERROR_THRESH_INV),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref_inv,
+					SNR_ERROR_THRESH_INV),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref_inv,
-			ABS_ERROR_THRESH_INV, REL_ERROR_THRESH_INV),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref_inv,
+					  ABS_ERROR_THRESH_INV,
+					  REL_ERROR_THRESH_INV),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -250,12 +244,11 @@ static void test_arm_mat_inverse_f32(void)
 void test_matrix_unary_f32(void)
 {
 	ztest_test_suite(matrix_unary_f32,
-		ztest_unit_test(test_op2_arm_mat_add_f32),
-		ztest_unit_test(test_op2_arm_mat_sub_f32),
-		ztest_unit_test(test_op1_arm_mat_scale_f32),
-		ztest_unit_test(test_op1_arm_mat_trans_f32),
-		ztest_unit_test(test_arm_mat_inverse_f32)
-		);
+			 ztest_unit_test(test_op2_arm_mat_add_f32),
+			 ztest_unit_test(test_op2_arm_mat_sub_f32),
+			 ztest_unit_test(test_op1_arm_mat_scale_f32),
+			 ztest_unit_test(test_op1_arm_mat_trans_f32),
+			 ztest_unit_test(test_arm_mat_inverse_f32));
 
 	ztest_run_test_suite(matrix_unary_f32);
 }

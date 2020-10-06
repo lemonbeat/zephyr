@@ -5,8 +5,8 @@
  */
 
 #include "test_sched.h"
-#define THREADS_NUM     3
-#define DURATION	K_MSEC(1)
+#define THREADS_NUM 3
+#define DURATION K_MSEC(1)
 
 BUILD_ASSERT(THREADS_NUM <= MAX_NUM_THREAD);
 
@@ -58,9 +58,8 @@ static void spawn_threads(int sleep_sec)
 		tdata[i].tid = k_thread_create(&tthread[i], tstacks[i],
 					       STACK_SIZE, thread_entry,
 					       INT_TO_POINTER(i),
-					       INT_TO_POINTER(sleep_sec),
-					       NULL, tdata[i].priority, 0,
-					       K_NO_WAIT);
+					       INT_TO_POINTER(sleep_sec), NULL,
+					       tdata[i].priority, 0, K_NO_WAIT);
 	}
 }
 
@@ -98,7 +97,6 @@ static void thread_handler(void *p1, void *p2, void *p3)
  */
 void test_yield_cooperative(void)
 {
-
 	/* set current thread to a cooperative priority */
 	init_prio = -1;
 	setup_threads();
@@ -211,12 +209,11 @@ void test_pending_thread_wakeup(void)
 
 	/* Create a thread which waits for semaphore */
 	k_tid_t tid = k_thread_create(&t, tstack, STACK_SIZE,
-				      (k_thread_entry_t)coop_thread,
-				      NULL, NULL, NULL,
-				      K_PRIO_COOP(1), 0, K_NO_WAIT);
+				      (k_thread_entry_t)coop_thread, NULL, NULL,
+				      NULL, K_PRIO_COOP(1), 0, K_NO_WAIT);
 
 	zassert_false(executed == 1, "The thread didn't wait"
-		      " for semaphore acquisition");
+				     " for semaphore acquisition");
 
 	/* Call wakeup on pending thread */
 	k_wakeup(tid);
@@ -225,7 +222,7 @@ void test_pending_thread_wakeup(void)
 	 * execution of pending thread
 	 */
 	zassert_true(executed != 1, "k_wakeup woke up a"
-		     " pending thread!");
+				    " pending thread!");
 
 	k_thread_abort(tid);
 }
@@ -434,8 +431,8 @@ void test_unlock_nested_sched_lock(void)
 void test_wakeup_expired_timer_thread(void)
 {
 	k_tid_t tid = k_thread_create(&tthread[0], tstack, STACK_SIZE,
-					thread_handler, NULL, NULL, NULL,
-					K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+				      thread_handler, NULL, NULL, NULL,
+				      K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
 	k_sem_take(&timer_sema, K_FOREVER);
 	/* wakeup a thread if the timer is expired */
 	k_wakeup(tid);

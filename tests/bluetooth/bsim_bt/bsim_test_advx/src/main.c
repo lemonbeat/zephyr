@@ -22,68 +22,81 @@
 #include "time_machine.h"
 #include "bstests.h"
 
-#define HANDLE          0x0000
-#define EVT_PROP_SCAN   BIT(1)
-#define EVT_PROP_ANON   BIT(5)
-#define EVT_PROP_TXP    BIT(6)
-#define ADV_INTERVAL    0x20
-#define OWN_ADDR_TYPE   1
-#define PEER_ADDR_TYPE  0
-#define PEER_ADDR       NULL
-#define ADV_CHAN_MAP    0x07
-#define FILTER_POLICY   0x00
-#define ADV_TX_PWR      NULL
-#define ADV_SEC_SKIP    0
-#define ADV_PHY_1M      BIT(0)
-#define ADV_PHY_2M      BIT(1)
-#define ADV_PHY_CODED   BIT(2)
-#define ADV_SID         0
-#define SCAN_REQ_NOT    0
+#define HANDLE 0x0000
+#define EVT_PROP_SCAN BIT(1)
+#define EVT_PROP_ANON BIT(5)
+#define EVT_PROP_TXP BIT(6)
+#define ADV_INTERVAL 0x20
+#define OWN_ADDR_TYPE 1
+#define PEER_ADDR_TYPE 0
+#define PEER_ADDR NULL
+#define ADV_CHAN_MAP 0x07
+#define FILTER_POLICY 0x00
+#define ADV_TX_PWR NULL
+#define ADV_SEC_SKIP 0
+#define ADV_PHY_1M BIT(0)
+#define ADV_PHY_2M BIT(1)
+#define ADV_PHY_CODED BIT(2)
+#define ADV_SID 0
+#define SCAN_REQ_NOT 0
 
-#define AD_OP           0x03
-#define AD_FRAG_PREF    0x00
+#define AD_OP 0x03
+#define AD_FRAG_PREF 0x00
 
 #define ADV_INTERVAL_PERIODIC 0x30
 
-#define SCAN_INTERVAL   0x04
-#define SCAN_WINDOW     0x04
+#define SCAN_INTERVAL 0x04
+#define SCAN_WINDOW 0x04
 
-#define FAIL(...)					\
-	do {						\
-		bst_result = Failed;			\
-		bs_trace_error_time_line(__VA_ARGS__);	\
+#define FAIL(...)                                      \
+	do {                                           \
+		bst_result = Failed;                   \
+		bs_trace_error_time_line(__VA_ARGS__); \
 	} while (0)
 
-#define PASS(...)					\
-	do {						\
-		bst_result = Passed;			\
-		bs_trace_info_time(1, __VA_ARGS__);	\
+#define PASS(...)                                   \
+	do {                                        \
+		bst_result = Passed;                \
+		bs_trace_info_time(1, __VA_ARGS__); \
 	} while (0)
 
 extern enum bst_result_t bst_result;
 
-static uint8_t const own_addr[] = {0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5};
+static uint8_t const own_addr[] = { 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5 };
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_NO_BREDR),
-	};
+};
 
 static uint8_t adv_data[] = {
-		2, BT_DATA_FLAGS, BT_LE_AD_NO_BREDR,
-	};
+	2,
+	BT_DATA_FLAGS,
+	BT_LE_AD_NO_BREDR,
+};
 
 static uint8_t adv_data1[] = {
-		2, BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
-		7, BT_DATA_NAME_COMPLETE, 'Z', 'e', 'p', 'h', 'y', 'r',
-	};
+	2,
+	BT_DATA_FLAGS,
+	(BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
+	7,
+	BT_DATA_NAME_COMPLETE,
+	'Z',
+	'e',
+	'p',
+	'h',
+	'y',
+	'r',
+};
 
 static uint8_t adv_data2[] = {
-		2, BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
-	};
+	2,
+	BT_DATA_FLAGS,
+	(BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
+};
 
 static uint8_t sr_data[] = {
-		7, BT_DATA_NAME_COMPLETE, 'Z', 'e', 'p', 'h', 'y', 'r',
-	};
+	7, BT_DATA_NAME_COMPLETE, 'Z', 'e', 'p', 'h', 'y', 'r',
+};
 
 static struct bt_conn *default_conn;
 static bool volatile is_connected, is_disconnected;
@@ -100,7 +113,8 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 
 	is_connected = true;
 
-	err = bt_conn_disconnect(default_conn, BT_HCI_ERR_REMOTE_USER_TERM_CONN);
+	err = bt_conn_disconnect(default_conn,
+				 BT_HCI_ERR_REMOTE_USER_TERM_CONN);
 	if (err) {
 		printk("Disconnection failed (err %d).\n", err);
 	}
@@ -310,9 +324,8 @@ static void test_advx_main(void)
 	phy_s = ADV_PHY_2M;
 	err = ll_adv_params_set(handle, evt_prop, ADV_INTERVAL, adv_type,
 				OWN_ADDR_TYPE, PEER_ADDR_TYPE, PEER_ADDR,
-				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR,
-				phy_p, ADV_SEC_SKIP, phy_s, ADV_SID,
-				SCAN_REQ_NOT);
+				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR, phy_p,
+				ADV_SEC_SKIP, phy_s, ADV_SID, SCAN_REQ_NOT);
 	if (err) {
 		goto exit;
 	}
@@ -498,9 +511,8 @@ static void test_advx_main(void)
 	printk("Creating new adv set (scannable)...");
 	err = ll_adv_params_set(handle, EVT_PROP_SCAN, ADV_INTERVAL, adv_type,
 				OWN_ADDR_TYPE, PEER_ADDR_TYPE, PEER_ADDR,
-				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR,
-				phy_p, ADV_SEC_SKIP, phy_s, ADV_SID,
-				SCAN_REQ_NOT);
+				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR, phy_p,
+				ADV_SEC_SKIP, phy_s, ADV_SID, SCAN_REQ_NOT);
 	if (err) {
 		goto exit;
 	}
@@ -549,9 +561,8 @@ static void test_advx_main(void)
 	printk("Creating new adv set...");
 	err = ll_adv_params_set(handle, evt_prop, ADV_INTERVAL, adv_type,
 				OWN_ADDR_TYPE, PEER_ADDR_TYPE, PEER_ADDR,
-				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR,
-				phy_p, ADV_SEC_SKIP, phy_s, ADV_SID,
-				SCAN_REQ_NOT);
+				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR, phy_p,
+				ADV_SEC_SKIP, phy_s, ADV_SID, SCAN_REQ_NOT);
 	if (err) {
 		goto exit;
 	}
@@ -598,9 +609,8 @@ static void test_advx_main(void)
 	printk("Creating new adv set...");
 	err = ll_adv_params_set(handle, evt_prop, ADV_INTERVAL, adv_type,
 				OWN_ADDR_TYPE, PEER_ADDR_TYPE, PEER_ADDR,
-				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR,
-				phy_p, ADV_SEC_SKIP, phy_s, ADV_SID,
-				SCAN_REQ_NOT);
+				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR, phy_p,
+				ADV_SEC_SKIP, phy_s, ADV_SID, SCAN_REQ_NOT);
 	if (err) {
 		goto exit;
 	}
@@ -646,11 +656,11 @@ static void test_advx_main(void)
 
 	printk("Creating every other adv set ...");
 	for (handle = 0; handle < num_adv_sets; handle += 2) {
-		err = ll_adv_params_set(handle, evt_prop, ADV_INTERVAL, adv_type,
-					OWN_ADDR_TYPE, PEER_ADDR_TYPE, PEER_ADDR,
-					ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR,
-					phy_p, ADV_SEC_SKIP, phy_s, ADV_SID,
-					SCAN_REQ_NOT);
+		err = ll_adv_params_set(handle, evt_prop, ADV_INTERVAL,
+					adv_type, OWN_ADDR_TYPE, PEER_ADDR_TYPE,
+					PEER_ADDR, ADV_CHAN_MAP, FILTER_POLICY,
+					ADV_TX_PWR, phy_p, ADV_SEC_SKIP, phy_s,
+					ADV_SID, SCAN_REQ_NOT);
 		if (err) {
 			goto exit;
 		}
@@ -677,9 +687,8 @@ static void test_advx_main(void)
 	handle = 0;
 	err = ll_adv_params_set(handle, evt_prop, ADV_INTERVAL, adv_type,
 				OWN_ADDR_TYPE, PEER_ADDR_TYPE, PEER_ADDR,
-				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR,
-				phy_p, ADV_SEC_SKIP, phy_s, ADV_SID,
-				SCAN_REQ_NOT);
+				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR, phy_p,
+				ADV_SEC_SKIP, phy_s, ADV_SID, SCAN_REQ_NOT);
 	if (err) {
 		goto exit;
 	}
@@ -741,11 +750,16 @@ static void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
 static const char *phy2str(uint8_t phy)
 {
 	switch (phy) {
-	case 0: return "No packets";
-	case BT_GAP_LE_PHY_1M: return "LE 1M";
-	case BT_GAP_LE_PHY_2M: return "LE 2M";
-	case BT_GAP_LE_PHY_CODED: return "LE Coded";
-	default: return "Unknown";
+	case 0:
+		return "No packets";
+	case BT_GAP_LE_PHY_1M:
+		return "LE 1M";
+	case BT_GAP_LE_PHY_2M:
+		return "LE 2M";
+	case BT_GAP_LE_PHY_CODED:
+		return "LE Coded";
+	default:
+		return "Unknown";
 	}
 }
 
@@ -798,10 +812,10 @@ static struct bt_le_scan_cb scan_callbacks = {
 static void test_scanx_main(void)
 {
 	struct bt_le_scan_param scan_param = {
-		.type       = BT_HCI_LE_SCAN_ACTIVE,
-		.options    = BT_LE_SCAN_OPT_NONE,
-		.interval   = 0x0004,
-		.window     = 0x0004,
+		.type = BT_HCI_LE_SCAN_ACTIVE,
+		.options = BT_LE_SCAN_OPT_NONE,
+		.interval = 0x0004,
+		.window = 0x0004,
 	};
 	int err;
 
@@ -903,20 +917,16 @@ static void test_advx_tick(bs_time_t HW_device_time)
 }
 
 static const struct bst_test_instance test_def[] = {
-	{
-		.test_id = "advx",
-		.test_descr = "Extended Advertising",
-		.test_post_init_f = test_advx_init,
-		.test_tick_f = test_advx_tick,
-		.test_main_f = test_advx_main
-	},
-	{
-		.test_id = "scanx",
-		.test_descr = "Extended scanning",
-		.test_post_init_f = test_advx_init,
-		.test_tick_f = test_advx_tick,
-		.test_main_f = test_scanx_main
-	},
+	{ .test_id = "advx",
+	  .test_descr = "Extended Advertising",
+	  .test_post_init_f = test_advx_init,
+	  .test_tick_f = test_advx_tick,
+	  .test_main_f = test_advx_main },
+	{ .test_id = "scanx",
+	  .test_descr = "Extended scanning",
+	  .test_post_init_f = test_advx_init,
+	  .test_tick_f = test_advx_tick,
+	  .test_main_f = test_scanx_main },
 	BSTEST_END_MARKER
 };
 
@@ -925,10 +935,7 @@ struct bst_test_list *test_advx_install(struct bst_test_list *tests)
 	return bst_add_tests(tests, test_def);
 }
 
-bst_test_install_t test_installers[] = {
-	test_advx_install,
-	NULL
-};
+bst_test_install_t test_installers[] = { test_advx_install, NULL };
 
 void main(void)
 {

@@ -9,7 +9,7 @@
 
 #include <ztest.h>
 
-#define MS_TO_US(ms)  (ms * USEC_PER_MSEC)
+#define MS_TO_US(ms) (ms * USEC_PER_MSEC)
 
 #if defined(CONFIG_CPU_CORTEX_M)
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
@@ -19,7 +19,6 @@ static inline uint32_t get_available_nvic_line(uint32_t initial_offset)
 	int i;
 
 	for (i = initial_offset - 1; i >= 0; i--) {
-
 		if (NVIC_GetEnableIRQ(i) == 0) {
 			/*
 			 * Interrupts configured statically with IRQ_CONNECT(.)
@@ -62,8 +61,8 @@ static inline uint32_t get_available_nvic_line(uint32_t initial_offset)
 static inline void trigger_irq(int irq)
 {
 	printk("Triggering irq : %d\n", irq);
-#if defined(CONFIG_SOC_TI_LM3S6965_QEMU) || defined(CONFIG_CPU_CORTEX_M0) \
-	|| defined(CONFIG_CPU_CORTEX_M0PLUS) || defined(CONFIG_CPU_CORTEX_M1)
+#if defined(CONFIG_SOC_TI_LM3S6965_QEMU) || defined(CONFIG_CPU_CORTEX_M0) || \
+	defined(CONFIG_CPU_CORTEX_M0PLUS) || defined(CONFIG_CPU_CORTEX_M1)
 	NVIC_SetPendingIRQ(irq);
 #else
 	NVIC->STIR = irq;

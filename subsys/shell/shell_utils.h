@@ -13,26 +13,24 @@
 extern "C" {
 #endif
 
-#define SHELL_MSG_SPECIFY_SUBCOMMAND	"Please specify a subcommand.\n"
+#define SHELL_MSG_SPECIFY_SUBCOMMAND "Please specify a subcommand.\n"
 
 int32_t row_span_with_buffer_offsets_get(struct shell_multiline_cons *cons,
-				       uint16_t offset1,
-				       uint16_t offset2);
+					 uint16_t offset1, uint16_t offset2);
 
 int32_t column_span_with_buffer_offsets_get(struct shell_multiline_cons *cons,
-					  uint16_t offset1,
-					  uint16_t offset2);
+					    uint16_t offset1, uint16_t offset2);
 
 void shell_multiline_data_calc(struct shell_multiline_cons *cons,
-				   uint16_t buff_pos, uint16_t buff_len);
+			       uint16_t buff_pos, uint16_t buff_len);
 
 static inline uint16_t shell_strlen(const char *str)
 {
 	return str == NULL ? 0U : (uint16_t)strlen(str);
 }
 
-char shell_make_argv(size_t *argc, const char **argv,
-		     char *cmd, uint8_t max_argc);
+char shell_make_argv(size_t *argc, const char **argv, char *cmd,
+		     uint8_t max_argc);
 
 /** @brief Removes pattern and following space
  *
@@ -47,15 +45,13 @@ void shell_pattern_remove(char *buff, uint16_t *buff_len, const char *pattern);
  *
  * @return Fetched command or null if command with that index does not exist.
  */
-const struct shell_static_entry *shell_cmd_get(
-					const struct shell_static_entry *parent,
-					size_t idx,
-					struct shell_static_entry *dloc);
+const struct shell_static_entry *
+shell_cmd_get(const struct shell_static_entry *parent, size_t idx,
+	      struct shell_static_entry *dloc);
 
-const struct shell_static_entry *shell_find_cmd(
-					const struct shell_static_entry *parent,
-					const char *cmd_str,
-					struct shell_static_entry *dloc);
+const struct shell_static_entry *
+shell_find_cmd(const struct shell_static_entry *parent, const char *cmd_str,
+	       struct shell_static_entry *dloc);
 
 /* @internal @brief Function returns pointer to a shell's subcommands array
  * for a level given by argc and matching command patter provided in argv.
@@ -69,16 +65,13 @@ const struct shell_static_entry *shell_find_cmd(
  *
  * @return		Pointer to found command.
  */
-const struct shell_static_entry *shell_get_last_command(
-					const struct shell_static_entry *entry,
-					size_t argc,
-					const char *argv[],
-					size_t *match_arg,
-					struct shell_static_entry *dloc,
-					bool only_static);
+const struct shell_static_entry *
+shell_get_last_command(const struct shell_static_entry *entry, size_t argc,
+		       const char *argv[], size_t *match_arg,
+		       struct shell_static_entry *dloc, bool only_static);
 
-int shell_command_add(char *buff, uint16_t *buff_len,
-		      const char *new_cmd, const char *pattern);
+int shell_command_add(char *buff, uint16_t *buff_len, const char *new_cmd,
+		      const char *pattern);
 
 const struct shell_static_entry *shell_root_cmd_find(const char *syntax);
 

@@ -14,12 +14,12 @@ extern "C" {
 #endif
 
 #if defined(CONFIG_BT_MESH_CDB)
-#define NODE_COUNT    CONFIG_BT_MESH_CDB_NODE_COUNT
-#define SUBNET_COUNT  CONFIG_BT_MESH_CDB_SUBNET_COUNT
+#define NODE_COUNT CONFIG_BT_MESH_CDB_NODE_COUNT
+#define SUBNET_COUNT CONFIG_BT_MESH_CDB_SUBNET_COUNT
 #define APP_KEY_COUNT CONFIG_BT_MESH_CDB_APP_KEY_COUNT
 #else
-#define NODE_COUNT    0
-#define SUBNET_COUNT  0
+#define NODE_COUNT 0
+#define SUBNET_COUNT 0
 #define APP_KEY_COUNT 0
 #endif
 
@@ -31,11 +31,11 @@ enum {
 };
 
 struct bt_mesh_cdb_node {
-	uint8_t  uuid[16];
+	uint8_t uuid[16];
 	uint16_t addr;
 	uint16_t net_idx;
-	uint8_t  num_elem;
-	uint8_t  dev_key[16];
+	uint8_t num_elem;
+	uint8_t dev_key[16];
 
 	ATOMIC_DEFINE(flags, BT_MESH_CDB_NODE_FLAG_COUNT);
 };
@@ -127,8 +127,9 @@ void bt_mesh_cdb_iv_update(uint32_t iv_index, bool iv_update);
  *
  *  @return The new node or NULL if it cannot be allocated.
  */
-struct bt_mesh_cdb_node *bt_mesh_cdb_node_alloc(const uint8_t uuid[16], uint16_t addr,
-						uint8_t num_elem, uint16_t net_idx);
+struct bt_mesh_cdb_node *bt_mesh_cdb_node_alloc(const uint8_t uuid[16],
+						uint16_t addr, uint8_t num_elem,
+						uint16_t net_idx);
 
 /** @brief Delete a node.
  *
@@ -172,7 +173,7 @@ enum {
  *          or BT_MESH_CDB_ITER_STOP to stop.
  */
 typedef uint8_t (*bt_mesh_cdb_node_func_t)(struct bt_mesh_cdb_node *node,
-					void *user_data);
+					   void *user_data);
 
 /** @brief Node iterator.
  *
@@ -227,7 +228,6 @@ void bt_mesh_cdb_subnet_store(const struct bt_mesh_cdb_subnet *sub);
  *  @return The flags for the subnet.
  */
 uint8_t bt_mesh_cdb_subnet_flags(const struct bt_mesh_cdb_subnet *sub);
-
 
 /** @brief Allocate an application key.
  *

@@ -51,15 +51,15 @@ struct dualtimer_cmsdk_apb {
 	volatile uint32_t itop;
 };
 
-#define DUALTIMER_CTRL_EN	(1 << 7)
-#define DUALTIMER_CTRL_MODE	(1 << 6)
-#define DUALTIMER_CTRL_INTEN	(1 << 5)
-#define DUALTIMER_CTRL_PRESCALE	(3 << 2)
-#define DUALTIMER_CTRL_SIZE_32	(1 << 1)
-#define DUALTIMER_CTRL_ONESHOOT	(1 << 0)
-#define DUALTIMER_INTCLR	(1 << 0)
-#define DUALTIMER_RAWINTSTAT	(1 << 0)
-#define DUALTIMER_MASKINTSTAT	(1 << 0)
+#define DUALTIMER_CTRL_EN (1 << 7)
+#define DUALTIMER_CTRL_MODE (1 << 6)
+#define DUALTIMER_CTRL_INTEN (1 << 5)
+#define DUALTIMER_CTRL_PRESCALE (3 << 2)
+#define DUALTIMER_CTRL_SIZE_32 (1 << 1)
+#define DUALTIMER_CTRL_ONESHOOT (1 << 0)
+#define DUALTIMER_INTCLR (1 << 0)
+#define DUALTIMER_RAWINTSTAT (1 << 0)
+#define DUALTIMER_MASKINTSTAT (1 << 0)
 
 #ifdef __cplusplus
 }

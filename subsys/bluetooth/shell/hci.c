@@ -32,7 +32,7 @@ int cmd_mesh_adv(const struct shell *shell, size_t argc, char *argv[])
 
 		buf = bt_hci_cmd_create(BT_HCI_OP_VS_MESH,
 					sizeof(struct bt_hci_cp_mesh) +
-					sizeof(*cp));
+						sizeof(*cp));
 		if (!buf) {
 			return -ENOBUFS;
 		}
@@ -60,7 +60,7 @@ int cmd_mesh_adv(const struct shell *shell, size_t argc, char *argv[])
 
 		buf = bt_hci_cmd_create(BT_HCI_OP_VS_MESH,
 					sizeof(struct bt_hci_cp_mesh) +
-					sizeof(*cp));
+						sizeof(*cp));
 		if (!buf) {
 			return -ENOBUFS;
 		}

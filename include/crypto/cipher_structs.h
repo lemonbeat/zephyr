@@ -24,7 +24,6 @@
  * @{
  */
 
-
 /** Cipher Algorithm */
 enum cipher_algo {
 	CRYPTO_CIPHER_ALGO_AES = 1,
@@ -66,21 +65,20 @@ typedef int (*ctr_op_t)(struct cipher_ctx *ctx, struct cipher_pkt *pkt,
 			uint8_t *ctr);
 
 typedef int (*ccm_op_t)(struct cipher_ctx *ctx, struct cipher_aead_pkt *pkt,
-			 uint8_t *nonce);
+			uint8_t *nonce);
 
 typedef int (*gcm_op_t)(struct cipher_ctx *ctx, struct cipher_aead_pkt *pkt,
-			 uint8_t *nonce);
+			uint8_t *nonce);
 
 struct cipher_ops {
-
 	enum cipher_mode cipher_mode;
 
 	union {
-		block_op_t	block_crypt_hndlr;
-		cbc_op_t	cbc_crypt_hndlr;
-		ctr_op_t	ctr_crypt_hndlr;
-		ccm_op_t	ccm_crypt_hndlr;
-		gcm_op_t	gcm_crypt_hndlr;
+		block_op_t block_crypt_hndlr;
+		cbc_op_t cbc_crypt_hndlr;
+		ctr_op_t ctr_crypt_hndlr;
+		ccm_op_t ccm_crypt_hndlr;
+		gcm_op_t gcm_crypt_hndlr;
 	};
 };
 
@@ -108,7 +106,6 @@ struct gcm_params {
  * in terms of who fills what and when w.r.t begin_session() call.
  */
 struct cipher_ctx {
-
 	/** Place for driver to return function pointers to be invoked per
 	 * cipher operation. To be populated by crypto driver on return from
 	 * begin_session() based on the algo/mode chosen by the app.
@@ -158,7 +155,7 @@ struct cipher_ctx {
 	/** Cryptographic keylength in bytes. To be populated by the app
 	 * before calling begin_session()
 	 */
-	uint16_t  keylen;
+	uint16_t keylen;
 
 	/** How certain fields are to be interpreted for this session.
 	 * (A bitmask of CAP_* below.)
@@ -174,31 +171,30 @@ struct cipher_ctx {
  * capabilities via provided API (cipher_query_hwcaps()), and choose a
  * supported config during the session setup.
  */
-#define CAP_OPAQUE_KEY_HNDL		BIT(0)
-#define CAP_RAW_KEY			BIT(1)
+#define CAP_OPAQUE_KEY_HNDL BIT(0)
+#define CAP_RAW_KEY BIT(1)
 
 /* TBD to define */
-#define CAP_KEY_LOADING_API		BIT(2)
+#define CAP_KEY_LOADING_API BIT(2)
 
 /** Whether the output is placed in separate buffer or not */
-#define CAP_INPLACE_OPS			BIT(3)
-#define CAP_SEPARATE_IO_BUFS		BIT(4)
+#define CAP_INPLACE_OPS BIT(3)
+#define CAP_SEPARATE_IO_BUFS BIT(4)
 
 /**
  * These denotes if the output (completion of a cipher_xxx_op) is conveyed
  * by the op function returning, or it is conveyed by an async notification
  */
-#define CAP_SYNC_OPS			BIT(5)
-#define CAP_ASYNC_OPS			BIT(6)
+#define CAP_SYNC_OPS BIT(5)
+#define CAP_ASYNC_OPS BIT(6)
 
 /** Whether the hardware/driver supports autononce feature */
-#define CAP_AUTONONCE			BIT(7)
+#define CAP_AUTONONCE BIT(7)
 
 /** Don't prefix IV to cipher blocks */
-#define CAP_NO_IV_PREFIX		BIT(8)
+#define CAP_NO_IV_PREFIX BIT(8)
 
 /* More flags to be added as necessary */
-
 
 /**
  * Structure encoding IO parameters of one cryptographic
@@ -209,12 +205,11 @@ struct cipher_ctx {
  * call.
  */
 struct cipher_pkt {
-
 	/** Start address of input buffer */
 	uint8_t *in_buf;
 
 	/** Bytes to be operated upon */
-	int  in_len;
+	int in_len;
 
 	/** Start of the output buffer, to be allocated by
 	 * the application. Can be NULL for in-place ops. To be populated

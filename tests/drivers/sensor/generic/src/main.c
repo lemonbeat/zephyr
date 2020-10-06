@@ -15,7 +15,7 @@
 #include "dummy_sensor.h"
 
 K_SEM_DEFINE(sem, 0, 1);
-#define RETURN_SUCCESS  (0)
+#define RETURN_SUCCESS (0)
 
 struct channel_sequence {
 	enum sensor_channel chan;
@@ -38,30 +38,35 @@ static struct channel_sequence chan_elements[] = {
 
 static struct trigger_sequence trigger_elements[] = {
 	/* trigger for SENSOR_TRIG_THRESHOLD */
-	{ {SENSOR_TRIG_THRESHOLD, SENSOR_CHAN_PROX},
-	{ 127, 0 }, SENSOR_ATTR_UPPER_THRESH },
+	{ { SENSOR_TRIG_THRESHOLD, SENSOR_CHAN_PROX },
+	  { 127, 0 },
+	  SENSOR_ATTR_UPPER_THRESH },
 
 	/* trigger for SENSOR_TRIG_TIMER */
-	{ {SENSOR_TRIG_TIMER, SENSOR_CHAN_PROX},
-	{ 130, 127 }, SENSOR_ATTR_UPPER_THRESH },
+	{ { SENSOR_TRIG_TIMER, SENSOR_CHAN_PROX },
+	  { 130, 127 },
+	  SENSOR_ATTR_UPPER_THRESH },
 
 	/* trigger for SENSOR_TRIG_DATA_READY */
-	{ {SENSOR_TRIG_DATA_READY, SENSOR_CHAN_PROX},
-	{ 150, 130 }, SENSOR_ATTR_UPPER_THRESH },
+	{ { SENSOR_TRIG_DATA_READY, SENSOR_CHAN_PROX },
+	  { 150, 130 },
+	  SENSOR_ATTR_UPPER_THRESH },
 
 	/* trigger for SENSOR_TRIG_DELTA */
-	{ {SENSOR_TRIG_DELTA, SENSOR_CHAN_PROX},
-	{ 180, 150 }, SENSOR_ATTR_UPPER_THRESH },
+	{ { SENSOR_TRIG_DELTA, SENSOR_CHAN_PROX },
+	  { 180, 150 },
+	  SENSOR_ATTR_UPPER_THRESH },
 
 	/* trigger for SENSOR_TRIG_NEAR_FAR */
-	{ {SENSOR_TRIG_NEAR_FAR, SENSOR_CHAN_PROX},
-	{ 155, 180 }, SENSOR_ATTR_UPPER_THRESH }
+	{ { SENSOR_TRIG_NEAR_FAR, SENSOR_CHAN_PROX },
+	  { 155, 180 },
+	  SENSOR_ATTR_UPPER_THRESH }
 };
 
-#define TOTAL_CHAN_ELEMENTS (sizeof(chan_elements) / \
-		sizeof(struct channel_sequence))
-#define TOTAL_TRIG_ELEMENTS (sizeof(trigger_elements) / \
-		sizeof(struct trigger_sequence))
+#define TOTAL_CHAN_ELEMENTS \
+	(sizeof(chan_elements) / sizeof(struct channel_sequence))
+#define TOTAL_TRIG_ELEMENTS \
+	(sizeof(trigger_elements) / sizeof(struct trigger_sequence))
 /**
  * @brief Test get multiple channels values.
  *
@@ -84,22 +89,23 @@ void test_sensor_get_channels(void)
 	zassert_not_null(dev, "failed: dev is null.");
 
 	zassert_equal(sensor_sample_fetch(dev), RETURN_SUCCESS,
-			"fail to fetch sample.");
+		      "fail to fetch sample.");
 
 	/* Get and check channels value. */
 	for (int i = 0; i < TOTAL_CHAN_ELEMENTS; i++) {
 		zassert_equal(sensor_channel_get(dev, chan_elements[i].chan,
-				&data), RETURN_SUCCESS, "fail to get channel.");
+						 &data),
+			      RETURN_SUCCESS, "fail to get channel.");
 
 		zassert_equal(data.val1, chan_elements[i].data.val1,
-				"the data is not match.");
+			      "the data is not match.");
 		zassert_equal(data.val2, chan_elements[i].data.val2,
-				"the data is not match.");
+			      "the data is not match.");
 	}
 }
 
 static void trigger_handler(const struct device *dev,
-				struct sensor_trigger *trigger)
+			    struct sensor_trigger *trigger)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(trigger);
@@ -130,45 +136,44 @@ void test_sensor_handle_triggers(void)
 	zassert_not_null(dev, "failed: dev is null.");
 
 	zassert_equal(sensor_sample_fetch(dev), RETURN_SUCCESS,
-			"fail to fetch sample.");
+		      "fail to fetch sample.");
 
 	/* setup multiple triggers */
 	for (int i = 0; i < TOTAL_TRIG_ELEMENTS; i++) {
 		/* set attributes for trigger */
 		zassert_equal(sensor_attr_set(dev,
-				trigger_elements[i].trig.chan,
-				trigger_elements[i].attr,
-				&trigger_elements[i].data),
-				RETURN_SUCCESS, "fail to set attributes");
+					      trigger_elements[i].trig.chan,
+					      trigger_elements[i].attr,
+					      &trigger_elements[i].data),
+			      RETURN_SUCCESS, "fail to set attributes");
 
 		/* read-back attributes for trigger */
 		zassert_equal(sensor_attr_get(dev,
-				trigger_elements[i].trig.chan,
-				trigger_elements[i].attr,
-				&data),
-				RETURN_SUCCESS, "fail to get attributes");
-		zassert_equal(trigger_elements[i].data.val1,
-			      data.val1, "read-back returned wrong val1");
-		zassert_equal(trigger_elements[i].data.val2,
-			      data.val2, "read-back returned wrong val2");
+					      trigger_elements[i].trig.chan,
+					      trigger_elements[i].attr, &data),
+			      RETURN_SUCCESS, "fail to get attributes");
+		zassert_equal(trigger_elements[i].data.val1, data.val1,
+			      "read-back returned wrong val1");
+		zassert_equal(trigger_elements[i].data.val2, data.val2,
+			      "read-back returned wrong val2");
 
 		/* setting a sensor’s trigger and handler */
-		zassert_equal(sensor_trigger_set(dev,
-				&trigger_elements[i].trig,
-				trigger_handler),
-				RETURN_SUCCESS, "fail to set trigger");
+		zassert_equal(sensor_trigger_set(dev, &trigger_elements[i].trig,
+						 trigger_handler),
+			      RETURN_SUCCESS, "fail to set trigger");
 
 		/* get channels value after trigger fired */
 		k_sem_take(&sem, K_FOREVER);
 		zassert_equal(sensor_channel_get(dev,
-				trigger_elements[i].trig.chan,
-				&data), RETURN_SUCCESS, "fail to get channel.");
+						 trigger_elements[i].trig.chan,
+						 &data),
+			      RETURN_SUCCESS, "fail to get channel.");
 
 		/* check the result of the trigger channel */
 		zassert_equal(data.val1, trigger_elements[i].data.val1,
-				"retrived data is not match.");
+			      "retrived data is not match.");
 		zassert_equal(data.val2, trigger_elements[i].data.val2,
-				"retrived data is not match.");
+			      "retrived data is not match.");
 	}
 }
 

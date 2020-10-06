@@ -16,10 +16,10 @@
 
 extern tstrNmBusCapabilities egstrNmBusCapabilities;
 
-#define NM_EDGE_INTERRUPT	(1)
+#define NM_EDGE_INTERRUPT (1)
 
-#define NM_DEBUG		CONF_WINC_DEBUG
-#define NM_BSP_PRINTF		CONF_WINC_PRINTF
+#define NM_DEBUG CONF_WINC_DEBUG
+#define NM_BSP_PRINTF CONF_WINC_PRINTF
 
 enum winc1500_gpio_index {
 	WINC1500_GPIO_IDX_CHIP_EN = 0,
@@ -35,10 +35,10 @@ struct winc1500_gpio_configuration {
 };
 
 struct winc1500_device {
-	struct winc1500_gpio_configuration	*gpios;
-	struct gpio_callback			gpio_cb;
+	struct winc1500_gpio_configuration *gpios;
+	struct gpio_callback gpio_cb;
 	const struct device *spi;
-	struct spi_config			spi_cfg;
+	struct spi_config spi_cfg;
 };
 
 extern struct winc1500_device winc1500;

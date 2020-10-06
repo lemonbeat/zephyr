@@ -38,7 +38,6 @@ struct _callee_saved {
 	void *thread_status;
 };
 
-
 struct _thread_arch {
 	/* nothing for now */
 	int dummy;

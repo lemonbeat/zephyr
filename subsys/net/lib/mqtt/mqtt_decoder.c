@@ -173,8 +173,8 @@ static int packet_length_decode(struct buf_ctx *buf, uint32_t *length)
 			return -EAGAIN;
 		}
 
-		*length += ((uint32_t)*(buf->cur) & MQTT_LENGTH_VALUE_MASK)
-								<< shift;
+		*length += ((uint32_t) * (buf->cur) & MQTT_LENGTH_VALUE_MASK)
+			   << shift;
 		shift += MQTT_LENGTH_SHIFT;
 		bytes++;
 	} while ((*(buf->cur++) & MQTT_LENGTH_CONTINUATION_BIT) != 0U);
@@ -218,8 +218,8 @@ int connect_ack_decode(const struct mqtt_client *client, struct buf_ctx *buf,
 	}
 
 	if (client->protocol_version == MQTT_VERSION_3_1_1) {
-		param->session_present_flag =
-			flags & MQTT_CONNACK_FLAG_SESSION_PRESENT;
+		param->session_present_flag = flags &
+					      MQTT_CONNACK_FLAG_SESSION_PRESENT;
 
 		MQTT_TRC("[CID %p]: session_present_flag: %d", client,
 			 param->session_present_flag);
@@ -258,8 +258,8 @@ int publish_decode(uint8_t flags, uint32_t var_length, struct buf_ctx *buf,
 
 	if (var_length < var_header_length) {
 		MQTT_ERR("Corrupted PUBLISH message, header length (%u) larger "
-			 "than total length (%u)", var_header_length,
-			 var_length);
+			 "than total length (%u)",
+			 var_header_length, var_length);
 		return -EINVAL;
 	}
 

@@ -18,7 +18,7 @@ LOG_MODULE_REGISTER(clock_control);
 static int mcux_sim_on(const struct device *dev,
 		       clock_control_subsys_t sub_system)
 {
-	clock_ip_name_t clock_ip_name = (clock_ip_name_t) sub_system;
+	clock_ip_name_t clock_ip_name = (clock_ip_name_t)sub_system;
 
 	CLOCK_EnableClock(clock_ip_name);
 
@@ -28,7 +28,7 @@ static int mcux_sim_on(const struct device *dev,
 static int mcux_sim_off(const struct device *dev,
 			clock_control_subsys_t sub_system)
 {
-	clock_ip_name_t clock_ip_name = (clock_ip_name_t) sub_system;
+	clock_ip_name_t clock_ip_name = (clock_ip_name_t)sub_system;
 
 	CLOCK_DisableClock(clock_ip_name);
 
@@ -41,12 +41,12 @@ static int mcux_sim_get_subsys_rate(const struct device *dev,
 {
 	clock_name_t clock_name;
 
-	switch ((uint32_t) sub_system) {
+	switch ((uint32_t)sub_system) {
 	case KINETIS_SIM_LPO_CLK:
 		clock_name = kCLOCK_LpoClk;
 		break;
 	default:
-		clock_name = (clock_name_t) sub_system;
+		clock_name = (clock_name_t)sub_system;
 		break;
 	}
 
@@ -58,34 +58,34 @@ static int mcux_sim_get_subsys_rate(const struct device *dev,
 #if DT_NODE_HAS_STATUS(DT_INST(0, nxp_kinetis_ke1xf_sim), okay)
 #define NXP_KINETIS_SIM_LABEL DT_LABEL(DT_INST(0, nxp_kinetis_ke1xf_sim))
 #if DT_NODE_HAS_PROP(DT_INST(0, nxp_kinetis_ke1xf_sim), clkout_source)
-	#define NXP_KINETIS_SIM_CLKOUT_SOURCE \
-			DT_PROP(DT_INST(0, nxp_kinetis_ke1xf_sim), clkout_source)
+#define NXP_KINETIS_SIM_CLKOUT_SOURCE \
+	DT_PROP(DT_INST(0, nxp_kinetis_ke1xf_sim), clkout_source)
 #endif
 #if DT_NODE_HAS_PROP(DT_INST(0, nxp_kinetis_ke1xf_sim), clkout_divider)
-	#define NXP_KINETIS_SIM_CLKOUT_DIVIDER \
-			DT_PROP(DT_INST(0, nxp_kinetis_ke1xf_sim), clkout_divider)
+#define NXP_KINETIS_SIM_CLKOUT_DIVIDER \
+	DT_PROP(DT_INST(0, nxp_kinetis_ke1xf_sim), clkout_divider)
 #endif
 #else
 #define NXP_KINETIS_SIM_LABEL DT_LABEL(DT_INST(0, nxp_kinetis_sim))
 #if DT_NODE_HAS_PROP(DT_INST(0, nxp_kinetis_sim), clkout_source)
-	#define NXP_KINETIS_SIM_CLKOUT_SOURCE \
-		DT_PROP(DT_INST(0, nxp_kinetis_sim), clkout_source)
+#define NXP_KINETIS_SIM_CLKOUT_SOURCE \
+	DT_PROP(DT_INST(0, nxp_kinetis_sim), clkout_source)
 #endif
 #if DT_NODE_HAS_PROP(DT_INST(0, nxp_kinetis_sim), clkout_divider)
-	#define NXP_KINETIS_SIM_CLKOUT_DIVIDER \
-		DT_PROP(DT_INST(0, nxp_kinetis_sim), clkout_divider)
+#define NXP_KINETIS_SIM_CLKOUT_DIVIDER \
+	DT_PROP(DT_INST(0, nxp_kinetis_sim), clkout_divider)
 #endif
 #endif
 
 static int mcux_sim_init(const struct device *dev)
 {
 #ifdef NXP_KINETIS_SIM_CLKOUT_DIVIDER
-	SIM->CHIPCTL = (SIM->CHIPCTL & ~SIM_CHIPCTL_CLKOUTDIV_MASK)
-		| SIM_CHIPCTL_CLKOUTDIV(NXP_KINETIS_SIM_CLKOUT_DIVIDER);
+	SIM->CHIPCTL = (SIM->CHIPCTL & ~SIM_CHIPCTL_CLKOUTDIV_MASK) |
+		       SIM_CHIPCTL_CLKOUTDIV(NXP_KINETIS_SIM_CLKOUT_DIVIDER);
 #endif
 #ifdef NXP_KINETIS_SIM_CLKOUT_SOURCE
-	SIM->CHIPCTL = (SIM->CHIPCTL & ~SIM_CHIPCTL_CLKOUTSEL_MASK)
-		| SIM_CHIPCTL_CLKOUTSEL(NXP_KINETIS_SIM_CLKOUT_SOURCE);
+	SIM->CHIPCTL = (SIM->CHIPCTL & ~SIM_CHIPCTL_CLKOUTSEL_MASK) |
+		       SIM_CHIPCTL_CLKOUTSEL(NXP_KINETIS_SIM_CLKOUT_SOURCE);
 #endif
 
 	return 0;
@@ -97,8 +97,6 @@ static const struct clock_control_driver_api mcux_sim_driver_api = {
 	.get_rate = mcux_sim_get_subsys_rate,
 };
 
-DEVICE_AND_API_INIT(mcux_sim, NXP_KINETIS_SIM_LABEL,
-		    &mcux_sim_init,
-		    NULL, NULL,
+DEVICE_AND_API_INIT(mcux_sim, NXP_KINETIS_SIM_LABEL, &mcux_sim_init, NULL, NULL,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &mcux_sim_driver_api);

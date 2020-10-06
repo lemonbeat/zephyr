@@ -87,7 +87,7 @@ static bool set_transition_counter(struct transition *transition)
 		break;
 	}
 
-	transition->counter = ((float) transition->total_duration / 100);
+	transition->counter = ((float)transition->total_duration / 100);
 
 	if (transition->counter > DEVICE_SPECIFIC_RESOLUTION) {
 		transition->counter = DEVICE_SPECIFIC_RESOLUTION;
@@ -107,8 +107,8 @@ void set_transition_values(uint8_t type)
 		return;
 	}
 
-	ctl->transition->quo_tt = ctl->transition->total_duration /
-				  ctl->transition->counter;
+	ctl->transition->quo_tt =
+		ctl->transition->total_duration / ctl->transition->counter;
 
 	switch (type) {
 	case ONOFF:
@@ -116,34 +116,34 @@ void set_transition_values(uint8_t type)
 	case ACTUAL:
 	case LINEAR:
 		ctl->light->delta =
-			((float) (ctl->light->current - ctl->light->target) /
+			((float)(ctl->light->current - ctl->light->target) /
 			 ctl->transition->counter);
 		break;
 	case CTL_LIGHT:
 		ctl->light->delta =
-			((float) (ctl->light->current - ctl->light->target) /
+			((float)(ctl->light->current - ctl->light->target) /
 			 ctl->transition->counter);
 
 		ctl->temp->delta =
-			((float) (ctl->temp->current - ctl->temp->target) /
+			((float)(ctl->temp->current - ctl->temp->target) /
 			 ctl->transition->counter);
 
 		ctl->duv->delta =
-			((float) (ctl->duv->current - ctl->duv->target) /
+			((float)(ctl->duv->current - ctl->duv->target) /
 			 ctl->transition->counter);
 		break;
 	case LEVEL_TEMP:
 		ctl->temp->delta =
-			((float) (ctl->temp->current - ctl->temp->target) /
+			((float)(ctl->temp->current - ctl->temp->target) /
 			 ctl->transition->counter);
 		break;
 	case CTL_TEMP:
 		ctl->temp->delta =
-			((float) (ctl->temp->current - ctl->temp->target) /
+			((float)(ctl->temp->current - ctl->temp->target) /
 			 ctl->transition->counter);
 
 		ctl->duv->delta =
-			((float) (ctl->duv->current - ctl->duv->target) /
+			((float)(ctl->duv->current - ctl->duv->target) /
 			 ctl->transition->counter);
 		break;
 	default:
@@ -417,7 +417,6 @@ static void light_ctl_temp_work_handler(struct k_work *work)
 	}
 }
 
-
 K_WORK_DEFINE(onoff_work, onoff_work_handler);
 K_WORK_DEFINE(level_lightness_work, level_lightness_work_handler);
 K_WORK_DEFINE(level_temp_work, level_temp_work_handler);
@@ -486,8 +485,7 @@ void level_lightness_handler(void)
 		return;
 	}
 
-	k_timer_init(&ctl->transition->timer,
-		     level_lightness_tt_handler, NULL);
+	k_timer_init(&ctl->transition->timer, level_lightness_tt_handler, NULL);
 
 	k_timer_start(&ctl->transition->timer,
 		      K_MSEC(ctl->transition->delay * 5U),
@@ -515,8 +513,8 @@ void light_lightness_actual_handler(void)
 		return;
 	}
 
-	k_timer_init(&ctl->transition->timer,
-		     light_lightness_actual_tt_handler, NULL);
+	k_timer_init(&ctl->transition->timer, light_lightness_actual_tt_handler,
+		     NULL);
 
 	k_timer_start(&ctl->transition->timer,
 		      K_MSEC(ctl->transition->delay * 5U),
@@ -530,8 +528,8 @@ void light_lightness_linear_handler(void)
 		return;
 	}
 
-	k_timer_init(&ctl->transition->timer,
-		     light_lightness_linear_tt_handler, NULL);
+	k_timer_init(&ctl->transition->timer, light_lightness_linear_tt_handler,
+		     NULL);
 
 	k_timer_start(&ctl->transition->timer,
 		      K_MSEC(ctl->transition->delay * 5U),
@@ -559,8 +557,7 @@ void light_ctl_temp_handler(void)
 		return;
 	}
 
-	k_timer_init(&ctl->transition->timer,
-		     light_ctl_temp_tt_handler, NULL);
+	k_timer_init(&ctl->transition->timer, light_ctl_temp_tt_handler, NULL);
 
 	k_timer_start(&ctl->transition->timer,
 		      K_MSEC(ctl->transition->delay * 5U),

@@ -36,24 +36,24 @@
 #include "settings.h"
 #include "transport.h"
 
-#define AID_MASK                    ((uint8_t)(BIT_MASK(6)))
+#define AID_MASK ((uint8_t)(BIT_MASK(6)))
 
-#define SEG(data)                   ((data)[0] >> 7)
-#define AKF(data)                   (((data)[0] >> 6) & 0x01)
-#define AID(data)                   ((data)[0] & AID_MASK)
-#define ASZMIC(data)                (((data)[1] >> 7) & 1)
+#define SEG(data) ((data)[0] >> 7)
+#define AKF(data) (((data)[0] >> 6) & 0x01)
+#define AID(data) ((data)[0] & AID_MASK)
+#define ASZMIC(data) (((data)[1] >> 7) & 1)
 
 #define APP_MIC_LEN(aszmic) ((aszmic) ? BT_MESH_MIC_LONG : BT_MESH_MIC_SHORT)
 
-#define UNSEG_HDR(akf, aid)         ((akf << 6) | (aid & AID_MASK))
-#define SEG_HDR(akf, aid)           (UNSEG_HDR(akf, aid) | 0x80)
+#define UNSEG_HDR(akf, aid) ((akf << 6) | (aid & AID_MASK))
+#define SEG_HDR(akf, aid) (UNSEG_HDR(akf, aid) | 0x80)
 
-#define BLOCK_COMPLETE(seg_n)       (uint32_t)(((uint64_t)1 << (seg_n + 1)) - 1)
+#define BLOCK_COMPLETE(seg_n) (uint32_t)(((uint64_t)1 << (seg_n + 1)) - 1)
 
-#define SEQ_AUTH(iv_index, seq)     (((uint64_t)iv_index) << 24 | (uint64_t)seq)
+#define SEQ_AUTH(iv_index, seq) (((uint64_t)iv_index) << 24 | (uint64_t)seq)
 
 /* Number of retransmit attempts (after the initial transmit) per segment */
-#define SEG_RETRANSMIT_ATTEMPTS     4
+#define SEG_RETRANSMIT_ATTEMPTS 4
 
 /* "This timer shall be set to a minimum of 200 + 50 * TTL milliseconds.".
  * We use 400 since 300 is a common send duration for standard HCI, and we
@@ -66,55 +66,52 @@
  */
 #define SEG_RETRANSMIT_TIMEOUT_GROUP 50
 
-#define SEG_RETRANSMIT_TIMEOUT(tx)                                             \
-	(BT_MESH_ADDR_IS_UNICAST(tx->dst) ?                                    \
-		 SEG_RETRANSMIT_TIMEOUT_UNICAST(tx) :                          \
-		 SEG_RETRANSMIT_TIMEOUT_GROUP)
+#define SEG_RETRANSMIT_TIMEOUT(tx)                    \
+	(BT_MESH_ADDR_IS_UNICAST(tx->dst) ?           \
+		       SEG_RETRANSMIT_TIMEOUT_UNICAST(tx) : \
+		       SEG_RETRANSMIT_TIMEOUT_GROUP)
 /* How long to wait for available buffers before giving up */
-#define BUF_TIMEOUT                 K_NO_WAIT
+#define BUF_TIMEOUT K_NO_WAIT
 
 static struct seg_tx {
 	struct bt_mesh_subnet *sub;
-	void                  *seg[CONFIG_BT_MESH_TX_SEG_MAX];
-	uint64_t              seq_auth;
-	uint16_t              src;
-	uint16_t              dst;
-	uint16_t              len;
-	uint8_t               hdr;
-	uint8_t               xmit;
-	uint8_t               seg_n;         /* Last segment index */
-	uint8_t               seg_o;         /* Segment being sent */
-	uint8_t               nack_count;    /* Number of unacked segs */
-	uint8_t               attempts;      /* Remaining tx attempts */
-	uint8_t               ttl;           /* Transmitted TTL value */
-	uint8_t               seg_pending;   /* Number of segments pending */
-	uint8_t               blocked:1,     /* Blocked by ongoing tx */
-			      ctl:1,         /* Control packet */
-			      aszmic:1,      /* MIC size */
-			      started:1,     /* Start cb called */
-			      sending:1,     /* Sending is in progress */
-			      friend_cred:1; /* Using Friend credentials */
+	void *seg[CONFIG_BT_MESH_TX_SEG_MAX];
+	uint64_t seq_auth;
+	uint16_t src;
+	uint16_t dst;
+	uint16_t len;
+	uint8_t hdr;
+	uint8_t xmit;
+	uint8_t seg_n; /* Last segment index */
+	uint8_t seg_o; /* Segment being sent */
+	uint8_t nack_count; /* Number of unacked segs */
+	uint8_t attempts; /* Remaining tx attempts */
+	uint8_t ttl; /* Transmitted TTL value */
+	uint8_t seg_pending; /* Number of segments pending */
+	uint8_t blocked : 1, /* Blocked by ongoing tx */
+		ctl : 1, /* Control packet */
+		aszmic : 1, /* MIC size */
+		started : 1, /* Start cb called */
+		sending : 1, /* Sending is in progress */
+		friend_cred : 1; /* Using Friend credentials */
 	const struct bt_mesh_send_cb *cb;
-	void                  *cb_data;
-	struct k_delayed_work retransmit;    /* Retransmit timer */
+	void *cb_data;
+	struct k_delayed_work retransmit; /* Retransmit timer */
 } seg_tx[CONFIG_BT_MESH_TX_SEG_MSG_COUNT];
 
 static struct seg_rx {
-	struct bt_mesh_subnet   *sub;
-	void                    *seg[CONFIG_BT_MESH_RX_SEG_MAX];
-	uint64_t                    seq_auth;
-	uint16_t                    src;
-	uint16_t                    dst;
-	uint16_t                    len;
-	uint8_t                     hdr;
-	uint8_t                     seg_n:5,
-				 ctl:1,
-				 in_use:1,
-				 obo:1;
-	uint8_t                     ttl;
-	uint32_t                    block;
-	uint32_t                    last;
-	struct k_delayed_work    ack;
+	struct bt_mesh_subnet *sub;
+	void *seg[CONFIG_BT_MESH_RX_SEG_MAX];
+	uint64_t seq_auth;
+	uint16_t src;
+	uint16_t dst;
+	uint16_t len;
+	uint8_t hdr;
+	uint8_t seg_n : 5, ctl : 1, in_use : 1, obo : 1;
+	uint8_t ttl;
+	uint32_t block;
+	uint32_t last;
+	struct k_delayed_work ack;
 } seg_rx[CONFIG_BT_MESH_RX_SEG_MSG_COUNT];
 
 K_MEM_SLAB_DEFINE(segs, BT_MESH_APP_SEG_SDU_MAX, CONFIG_BT_MESH_SEG_BUFS, 4);
@@ -151,9 +148,8 @@ static int send_unseg(struct bt_mesh_net_tx *tx, struct net_buf_simple *sdu,
 	net_buf_add_mem(buf, sdu->data, sdu->len);
 
 	if (IS_ENABLED(CONFIG_BT_MESH_FRIEND)) {
-		if (!bt_mesh_friend_queue_has_space(tx->sub->net_idx,
-						    tx->src, tx->ctx->addr,
-						    NULL, 1)) {
+		if (!bt_mesh_friend_queue_has_space(tx->sub->net_idx, tx->src,
+						    tx->ctx->addr, NULL, 1)) {
 			if (BT_MESH_ADDR_IS_UNICAST(tx->ctx->addr)) {
 				BT_ERR("Not enough space in Friend Queue");
 				net_buf_unref(buf);
@@ -221,8 +217,7 @@ static void seg_tx_unblock_check(struct seg_tx *tx)
 
 	/* Unblock the first blocked tx with the same params. */
 	for (i = 0; i < ARRAY_SIZE(seg_tx); ++i) {
-		if (&seg_tx[i] != tx &&
-		    seg_tx[i].blocked &&
+		if (&seg_tx[i] != tx && seg_tx[i].blocked &&
 		    seg_tx_blocks(tx, seg_tx[i].src, seg_tx[i].dst) &&
 		    (!blocked || seg_tx[i].seq_auth < blocked->seq_auth)) {
 			blocked = &seg_tx[i];
@@ -305,7 +300,7 @@ static void schedule_retransmit(struct seg_tx *tx)
 	 */
 	k_delayed_work_submit(&tx->retransmit,
 			      tx->seg_o ? K_NO_WAIT :
-					  K_MSEC(SEG_RETRANSMIT_TIMEOUT(tx)));
+						K_MSEC(SEG_RETRANSMIT_TIMEOUT(tx)));
 }
 
 static void seg_send_start(uint16_t duration, int err, void *user_data)
@@ -342,7 +337,8 @@ static void seg_tx_buf_build(struct seg_tx *tx, uint8_t seg_o,
 			     struct net_buf_simple *buf)
 {
 	uint16_t seq_zero = tx->seq_auth & TRANS_SEQ_ZERO_MASK;
-	uint8_t len = MIN(seg_len(tx->ctl), tx->len - (seg_len(tx->ctl) * seg_o));
+	uint8_t len =
+		MIN(seg_len(tx->ctl), tx->len - (seg_len(tx->ctl) * seg_o));
 
 	net_buf_simple_add_u8(buf, tx->hdr);
 	net_buf_simple_add_u8(buf, (tx->aszmic << 7) | seq_zero >> 6);
@@ -557,9 +553,7 @@ static int send_seg(struct bt_mesh_net_tx *net_tx, struct net_buf_simple *sdu,
 				k_mem_slab_free(&segs, &buf);
 				tx->seg[seg_o] = NULL;
 			}
-
 		}
-
 	}
 
 	/* This can happen if segments only went into the Friend Queue */
@@ -586,8 +580,7 @@ static int send_seg(struct bt_mesh_net_tx *net_tx, struct net_buf_simple *sdu,
 
 	seg_tx_send_unacked(tx);
 
-	if (IS_ENABLED(CONFIG_BT_MESH_LOW_POWER) &&
-	    bt_mesh_lpn_established()) {
+	if (IS_ENABLED(CONFIG_BT_MESH_LOW_POWER) && bt_mesh_lpn_established()) {
 		bt_mesh_lpn_poll();
 	}
 
@@ -641,8 +634,8 @@ int bt_mesh_trans_send(struct bt_mesh_net_tx *tx, struct net_buf_simple *msg,
 	       tx->ctx->app_idx, tx->ctx->addr);
 	BT_DBG("len %u: %s", msg->len, bt_hex(msg->data, msg->len));
 
-	err = bt_mesh_app_key_get(tx->sub, tx->ctx->app_idx,
-				  tx->ctx->addr, &key, &aid);
+	err = bt_mesh_app_key_get(tx->sub, tx->ctx->app_idx, tx->ctx->addr,
+				  &key, &aid);
 	if (err) {
 		return err;
 	}
@@ -696,8 +689,9 @@ static void seg_rx_assemble(struct seg_rx *rx, struct net_buf_simple *buf,
 	}
 }
 
-static int remote_devkey_decrypt(struct bt_mesh_net_rx *rx, uint32_t seq, uint8_t *ad,
-				 uint8_t aszmic, struct net_buf_simple *buf,
+static int remote_devkey_decrypt(struct bt_mesh_net_rx *rx, uint32_t seq,
+				 uint8_t *ad, uint8_t aszmic,
+				 struct net_buf_simple *buf,
 				 struct net_buf_simple *sdu)
 {
 	struct bt_mesh_cdb_node *node;
@@ -735,8 +729,9 @@ static int remote_devkey_decrypt(struct bt_mesh_net_rx *rx, uint32_t seq, uint8_
 }
 
 static int app_key_decrypt(struct bt_mesh_net_rx *rx,
-			   struct bt_mesh_app_key *key, uint32_t seq, uint8_t *ad,
-			   uint8_t hdr, uint8_t aszmic, struct net_buf_simple *buf,
+			   struct bt_mesh_app_key *key, uint32_t seq,
+			   uint8_t *ad, uint8_t hdr, uint8_t aszmic,
+			   struct net_buf_simple *buf,
 			   struct net_buf_simple *sdu)
 {
 	struct bt_mesh_app_keys *keys;
@@ -946,7 +941,8 @@ static int sdu_recv_seg(struct seg_rx *seg, uint8_t hdr, uint8_t aszmic,
 	return 0;
 }
 
-static struct seg_tx *seg_tx_lookup(uint16_t seq_zero, uint8_t obo, uint16_t addr)
+static struct seg_tx *seg_tx_lookup(uint16_t seq_zero, uint8_t obo,
+				    uint16_t addr)
 {
 	struct seg_tx *tx;
 	int i;
@@ -1203,8 +1199,8 @@ static inline int32_t ack_timeout(struct seg_rx *rx)
 }
 
 int bt_mesh_ctl_send(struct bt_mesh_net_tx *tx, uint8_t ctl_op, void *data,
-		     size_t data_len,
-		     const struct bt_mesh_send_cb *cb, void *cb_data)
+		     size_t data_len, const struct bt_mesh_send_cb *cb,
+		     void *cb_data)
 {
 	struct net_buf_simple buf;
 
@@ -1228,7 +1224,8 @@ int bt_mesh_ctl_send(struct bt_mesh_net_tx *tx, uint8_t ctl_op, void *data,
 }
 
 static int send_ack(struct bt_mesh_subnet *sub, uint16_t src, uint16_t dst,
-		    uint8_t ttl, uint64_t *seq_auth, uint32_t block, uint8_t obo)
+		    uint8_t ttl, uint64_t *seq_auth, uint32_t block,
+		    uint8_t obo)
 {
 	struct bt_mesh_msg_ctx ctx = {
 		.net_idx = sub->net_idx,
@@ -1263,8 +1260,8 @@ static int send_ack(struct bt_mesh_subnet *sub, uint16_t src, uint16_t dst,
 	sys_put_be16(((seq_zero << 2) & 0x7ffc) | (obo << 15), buf);
 	sys_put_be32(block, &buf[2]);
 
-	return bt_mesh_ctl_send(&tx, TRANS_CTL_OP_ACK, buf, sizeof(buf),
-				NULL, NULL);
+	return bt_mesh_ctl_send(&tx, TRANS_CTL_OP_ACK, buf, sizeof(buf), NULL,
+				NULL);
 }
 
 static void seg_rx_reset(struct seg_rx *rx, bool full_reset)
@@ -1322,8 +1319,8 @@ static void seg_ack(struct k_work *work)
 		return;
 	}
 
-	send_ack(rx->sub, rx->dst, rx->src, rx->ttl, &rx->seq_auth,
-		 rx->block, rx->obo);
+	send_ack(rx->sub, rx->dst, rx->src, rx->ttl, &rx->seq_auth, rx->block,
+		 rx->obo);
 
 	k_delayed_work_submit(&rx->ack, K_MSEC(ack_timeout(rx)));
 }
@@ -1486,10 +1483,10 @@ static int trans_seg(struct net_buf_simple *buf, struct bt_mesh_net_rx *net_rx,
 	 * Mentioned delta shall be >= 0, if it is not then seq_auth will
 	 * be broken and it will be verified by the code below.
 	 */
-	*seq_auth = SEQ_AUTH(BT_MESH_NET_IVI_RX(net_rx),
-			     (net_rx->seq -
-			      ((((net_rx->seq & BIT_MASK(14)) - seq_zero)) &
-			       BIT_MASK(13))));
+	*seq_auth = SEQ_AUTH(
+		BT_MESH_NET_IVI_RX(net_rx),
+		(net_rx->seq -
+		 ((((net_rx->seq & BIT_MASK(14)) - seq_zero)) & BIT_MASK(13))));
 
 	*seg_count = seg_n + 1;
 
@@ -1545,12 +1542,11 @@ static int trans_seg(struct net_buf_simple *buf, struct bt_mesh_net_rx *net_rx,
 	/* Verify early that there will be space in the Friend Queue(s) in
 	 * case this message is destined to an LPN of ours.
 	 */
-	if (IS_ENABLED(CONFIG_BT_MESH_FRIEND) &&
-	    net_rx->friend_match && !net_rx->local_match &&
-	    !bt_mesh_friend_queue_has_space(net_rx->sub->net_idx,
-					    net_rx->ctx.addr,
-					    net_rx->ctx.recv_dst, seq_auth,
-					    *seg_count)) {
+	if (IS_ENABLED(CONFIG_BT_MESH_FRIEND) && net_rx->friend_match &&
+	    !net_rx->local_match &&
+	    !bt_mesh_friend_queue_has_space(
+		    net_rx->sub->net_idx, net_rx->ctx.addr,
+		    net_rx->ctx.recv_dst, seq_auth, *seg_count)) {
 		BT_ERR("No space in Friend Queue for %u segments", *seg_count);
 		send_ack(net_rx->sub, net_rx->ctx.recv_dst, net_rx->ctx.addr,
 			 net_rx->ctx.send_ttl, seq_auth, 0,
@@ -1669,8 +1665,8 @@ int bt_mesh_trans_recv(struct net_buf_simple *buf, struct bt_mesh_net_rx *rx)
 		rx->friend_match = false;
 	}
 
-	BT_DBG("src 0x%04x dst 0x%04x seq 0x%08x friend_match %u",
-	       rx->ctx.addr, rx->ctx.recv_dst, rx->seq, rx->friend_match);
+	BT_DBG("src 0x%04x dst 0x%04x seq 0x%08x friend_match %u", rx->ctx.addr,
+	       rx->ctx.recv_dst, rx->seq, rx->friend_match);
 
 	/* Remove network headers */
 	net_buf_simple_pull(buf, BT_MESH_NET_HDR_LEN);
@@ -1686,8 +1682,8 @@ int bt_mesh_trans_recv(struct net_buf_simple *buf, struct bt_mesh_net_rx *rx)
 	 * requested the Friend to send them. The messages must also
 	 * be encrypted using the Friend Credentials.
 	 */
-	if (IS_ENABLED(CONFIG_BT_MESH_LOW_POWER) &&
-	    bt_mesh_lpn_established() && rx->net_if == BT_MESH_NET_IF_ADV &&
+	if (IS_ENABLED(CONFIG_BT_MESH_LOW_POWER) && bt_mesh_lpn_established() &&
+	    rx->net_if == BT_MESH_NET_IF_ADV &&
 	    (!bt_mesh_lpn_waiting_update() || !rx->friend_cred)) {
 		BT_WARN("Ignoring unexpected message in Low Power mode");
 		return -EAGAIN;
@@ -1733,8 +1729,8 @@ int bt_mesh_trans_recv(struct net_buf_simple *buf, struct bt_mesh_net_rx *rx)
 
 	if (IS_ENABLED(CONFIG_BT_MESH_FRIEND) && rx->friend_match && !err) {
 		if (seq_auth == TRANS_SEQ_AUTH_NVAL) {
-			bt_mesh_friend_enqueue_rx(rx, pdu_type, NULL,
-						  seg_count, buf);
+			bt_mesh_friend_enqueue_rx(rx, pdu_type, NULL, seg_count,
+						  buf);
 		} else {
 			bt_mesh_friend_enqueue_rx(rx, pdu_type, &seq_auth,
 						  seg_count, buf);
@@ -1786,7 +1782,7 @@ int bt_mesh_heartbeat_send(const struct bt_mesh_send_cb *cb, void *cb_data)
 	struct bt_mesh_cfg_srv *cfg = bt_mesh_cfg_get();
 	uint16_t feat = 0U;
 	struct __packed {
-		uint8_t  init_ttl;
+		uint8_t init_ttl;
 		uint16_t feat;
 	} hb;
 	struct bt_mesh_msg_ctx ctx = {

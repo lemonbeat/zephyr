@@ -157,21 +157,13 @@ enum sdhc_r1_error_flag {
 	SDHC_R1AUTH_SEQ_ERR = (1U << 3U),
 
 	SDHC_R1ERR_All_FLAG =
-		(SDHC_R1OUTOF_RANGE_ERR |
-		SDHC_R1ADDRESS_ERR |
-		SDHC_R1BLK_LEN_ERR |
-		SDHC_R1ERASE_SEQ_ERR |
-		SDHC_R1ERASE_PARAMETER_ERR |
-		SDHC_R1WRITE_PROTECTION_ERR |
-		SDHC_R1CARD_LOCKED_ERR |
-		SDHC_R1LOCK_UNLOCK_ERR |
-		SDHC_R1CMD_CRC_ERR |
-		SDHC_R1ILLEGAL_CMD_ERR |
-		SDHC_R1ECC_ERR |
-		SDHC_R1CARD_CONTROL_ERR |
-		SDHC_R1ERR |
-		SDHC_R1CID_CSD_OVERWRITE_ERR |
-		SDHC_R1AUTH_SEQ_ERR),
+		(SDHC_R1OUTOF_RANGE_ERR | SDHC_R1ADDRESS_ERR |
+		 SDHC_R1BLK_LEN_ERR | SDHC_R1ERASE_SEQ_ERR |
+		 SDHC_R1ERASE_PARAMETER_ERR | SDHC_R1WRITE_PROTECTION_ERR |
+		 SDHC_R1CARD_LOCKED_ERR | SDHC_R1LOCK_UNLOCK_ERR |
+		 SDHC_R1CMD_CRC_ERR | SDHC_R1ILLEGAL_CMD_ERR | SDHC_R1ECC_ERR |
+		 SDHC_R1CARD_CONTROL_ERR | SDHC_R1ERR |
+		 SDHC_R1CID_CSD_OVERWRITE_ERR | SDHC_R1AUTH_SEQ_ERR),
 
 	SDHC_R1ERR_NONE = 0,
 };
@@ -463,27 +455,27 @@ BUILD_ASSERT(SDMMC_DEFAULT_BLOCK_SIZE % sizeof(sdhc_ones) == 0);
 
 /* Maps R1 response flags to error codes */
 static const struct sdhc_flag_map sdhc_r1_flags[] = {
-	{SDHC_R1_PARAMETER, EFAULT},	   {SDHC_R1_ADDRESS, EFAULT},
-	{SDHC_R1_ILLEGAL_COMMAND, EINVAL}, {SDHC_R1_COM_CRC, EILSEQ},
-	{SDHC_R1_ERASE_SEQ, EIO},	  {SDHC_R1_ERASE_RESET, EIO},
-	{SDHC_R1_IDLE, ECONNRESET},	{0, 0},
+	{ SDHC_R1_PARAMETER, EFAULT },	     { SDHC_R1_ADDRESS, EFAULT },
+	{ SDHC_R1_ILLEGAL_COMMAND, EINVAL }, { SDHC_R1_COM_CRC, EILSEQ },
+	{ SDHC_R1_ERASE_SEQ, EIO },	     { SDHC_R1_ERASE_RESET, EIO },
+	{ SDHC_R1_IDLE, ECONNRESET },	     { 0, 0 },
 };
 
 /* Maps disk status flags to error codes */
 static const struct sdhc_flag_map sdhc_disk_status_flags[] = {
-	{DISK_STATUS_UNINIT, ENODEV},
-	{DISK_STATUS_NOMEDIA, ENOENT},
-	{DISK_STATUS_WR_PROTECT, EROFS},
-	{0, 0},
+	{ DISK_STATUS_UNINIT, ENODEV },
+	{ DISK_STATUS_NOMEDIA, ENOENT },
+	{ DISK_STATUS_WR_PROTECT, EROFS },
+	{ 0, 0 },
 };
 
 /* Maps data block flags to error codes */
 static const struct sdhc_flag_map sdhc_data_response_flags[] = {
-	{SDHC_RESPONSE_WRITE_ERR, EIO},
-	{SDHC_RESPONSE_CRC_ERR, EILSEQ},
-	{SDHC_RESPONSE_ACCEPTED, 0},
+	{ SDHC_RESPONSE_WRITE_ERR, EIO },
+	{ SDHC_RESPONSE_CRC_ERR, EILSEQ },
+	{ SDHC_RESPONSE_ACCEPTED, 0 },
 	/* Unrecognised value */
-	{0, EPROTO},
+	{ 0, EPROTO },
 };
 
 /* Returns true if an error code is retryable at the disk layer */
@@ -551,7 +543,7 @@ static inline int sdhc_map_data_status(int status)
 
 /* Initialises a retry helper */
 static inline void sdhc_retry_init(struct sdhc_retry *retry, uint32_t timeout,
-			    uint16_t sleep)
+				   uint16_t sleep)
 {
 	retry->end = k_uptime_get_32() + timeout;
 	retry->tries = 0;
@@ -587,23 +579,17 @@ static inline bool sdhc_retry_ok(struct sdhc_retry *retry)
 	return false;
 }
 
-static inline void sdhc_decode_csd(struct sd_csd *csd,
-	uint32_t *raw_csd, uint32_t *blk_cout, uint32_t *blk_size)
+static inline void sdhc_decode_csd(struct sd_csd *csd, uint32_t *raw_csd,
+				   uint32_t *blk_cout, uint32_t *blk_size)
 {
 	uint32_t tmp_blk_cout, tmp_blk_size;
 
-	csd->csd_structure = (uint8_t)((raw_csd[3U] &
-		0xC0000000U) >> 30U);
-	csd->read_time1 = (uint8_t)((raw_csd[3U] &
-		0xFF0000U) >> 16U);
-	csd->read_time2 = (uint8_t)((raw_csd[3U] &
-		0xFF00U) >> 8U);
-	csd->xfer_rate = (uint8_t)(raw_csd[3U] &
-		0xFFU);
-	csd->cmd_class = (uint16_t)((raw_csd[2U] &
-		0xFFF00000U) >> 20U);
-	csd->read_blk_len = (uint8_t)((raw_csd[2U] &
-		0xF0000U) >> 16U);
+	csd->csd_structure = (uint8_t)((raw_csd[3U] & 0xC0000000U) >> 30U);
+	csd->read_time1 = (uint8_t)((raw_csd[3U] & 0xFF0000U) >> 16U);
+	csd->read_time2 = (uint8_t)((raw_csd[3U] & 0xFF00U) >> 8U);
+	csd->xfer_rate = (uint8_t)(raw_csd[3U] & 0xFFU);
+	csd->cmd_class = (uint16_t)((raw_csd[2U] & 0xFFF00000U) >> 20U);
+	csd->read_blk_len = (uint8_t)((raw_csd[2U] & 0xF0000U) >> 16U);
 	if (raw_csd[2U] & 0x8000U)
 		csd->flags |= SD_CSD_READ_BLK_PARTIAL_FLAG;
 	if (raw_csd[2U] & 0x4000U)
@@ -615,24 +601,22 @@ static inline void sdhc_decode_csd(struct sd_csd *csd,
 
 	switch (csd->csd_structure) {
 	case 0:
-		csd->device_size = (uint32_t)((raw_csd[2U] &
-			0x3FFU) << 2U);
-		csd->device_size |= (uint32_t)((raw_csd[1U] &
-			0xC0000000U) >> 30U);
-		csd->read_current_min = (uint8_t)((raw_csd[1U] &
-			0x38000000U) >> 27U);
-		csd->read_current_max = (uint8_t)((raw_csd[1U] &
-			0x7000000U) >> 24U);
-		csd->write_current_min = (uint8_t)((raw_csd[1U] &
-			0xE00000U) >> 20U);
-		csd->write_current_max = (uint8_t)((raw_csd[1U] &
-			0x1C0000U) >> 18U);
-		csd->dev_size_mul = (uint8_t)((raw_csd[1U] &
-			0x38000U) >> 15U);
+		csd->device_size = (uint32_t)((raw_csd[2U] & 0x3FFU) << 2U);
+		csd->device_size |=
+			(uint32_t)((raw_csd[1U] & 0xC0000000U) >> 30U);
+		csd->read_current_min =
+			(uint8_t)((raw_csd[1U] & 0x38000000U) >> 27U);
+		csd->read_current_max =
+			(uint8_t)((raw_csd[1U] & 0x7000000U) >> 24U);
+		csd->write_current_min =
+			(uint8_t)((raw_csd[1U] & 0xE00000U) >> 20U);
+		csd->write_current_max =
+			(uint8_t)((raw_csd[1U] & 0x1C0000U) >> 18U);
+		csd->dev_size_mul = (uint8_t)((raw_csd[1U] & 0x38000U) >> 15U);
 
 		/* Get card total block count and block size. */
-		tmp_blk_cout = ((csd->device_size + 1U) <<
-			(csd->dev_size_mul + 2U));
+		tmp_blk_cout =
+			((csd->device_size + 1U) << (csd->dev_size_mul + 2U));
 		tmp_blk_size = (1U << (csd->read_blk_len));
 		if (tmp_blk_size != SDMMC_DEFAULT_BLOCK_SIZE) {
 			tmp_blk_cout = (tmp_blk_cout * tmp_blk_size);
@@ -647,10 +631,9 @@ static inline void sdhc_decode_csd(struct sd_csd *csd,
 	case 1:
 		tmp_blk_size = SDMMC_DEFAULT_BLOCK_SIZE;
 
-		csd->device_size = (uint32_t)((raw_csd[2U] &
-			0x3FU) << 16U);
-		csd->device_size |= (uint32_t)((raw_csd[1U] &
-			0xFFFF0000U) >> 16U);
+		csd->device_size = (uint32_t)((raw_csd[2U] & 0x3FU) << 16U);
+		csd->device_size |=
+			(uint32_t)((raw_csd[1U] & 0xFFFF0000U) >> 16U);
 
 		tmp_blk_cout = ((csd->device_size + 1U) * 1024U);
 		if (blk_cout)
@@ -664,14 +647,10 @@ static inline void sdhc_decode_csd(struct sd_csd *csd,
 
 	if ((uint8_t)((raw_csd[1U] & 0x4000U) >> 14U))
 		csd->flags |= SD_CSD_ERASE_BLK_EN_FLAG;
-	csd->erase_size = (uint8_t)((raw_csd[1U] &
-		0x3F80U) >> 7U);
-	csd->write_prtect_size = (uint8_t)(raw_csd[1U] &
-		0x7FU);
-	csd->write_speed_factor = (uint8_t)((raw_csd[0U] &
-		0x1C000000U) >> 26U);
-	csd->write_blk_len = (uint8_t)((raw_csd[0U] &
-		0x3C00000U) >> 22U);
+	csd->erase_size = (uint8_t)((raw_csd[1U] & 0x3F80U) >> 7U);
+	csd->write_prtect_size = (uint8_t)(raw_csd[1U] & 0x7FU);
+	csd->write_speed_factor = (uint8_t)((raw_csd[0U] & 0x1C000000U) >> 26U);
+	csd->write_blk_len = (uint8_t)((raw_csd[0U] & 0x3C00000U) >> 22U);
 	if ((uint8_t)((raw_csd[0U] & 0x200000U) >> 21U))
 		csd->flags |= SD_CSD_WRITE_BLK_PARTIAL_FLAG;
 	if ((uint8_t)((raw_csd[0U] & 0x8000U) >> 15U))
@@ -679,16 +658,14 @@ static inline void sdhc_decode_csd(struct sd_csd *csd,
 	if ((uint8_t)((raw_csd[0U] & 0x4000U) >> 14U))
 		csd->flags |= SD_CSD_COPY_FLAG;
 	if ((uint8_t)((raw_csd[0U] & 0x2000U) >> 13U))
-		csd->flags |=
-			SD_CSD_PERMANENT_WRITE_PROTECT_FLAG;
+		csd->flags |= SD_CSD_PERMANENT_WRITE_PROTECT_FLAG;
 	if ((uint8_t)((raw_csd[0U] & 0x1000U) >> 12U))
-		csd->flags |=
-			SD_CSD_TMP_WRITE_PROTECT_FLAG;
+		csd->flags |= SD_CSD_TMP_WRITE_PROTECT_FLAG;
 	csd->file_fmt = (uint8_t)((raw_csd[0U] & 0xC00U) >> 10U);
 }
 
-static inline void sdhc_decode_scr(struct sd_scr *scr,
-	uint32_t *raw_scr, uint32_t *version)
+static inline void sdhc_decode_scr(struct sd_scr *scr, uint32_t *raw_scr,
+				   uint32_t *version)
 {
 	uint32_t tmp_version = 0;
 
@@ -725,8 +702,7 @@ static inline void sdhc_decode_scr(struct sd_scr *scr,
 		*version = tmp_version;
 }
 
-static inline void sdhc_decode_cid(struct sd_cid *cid,
-	uint32_t *raw_cid)
+static inline void sdhc_decode_cid(struct sd_cid *cid, uint32_t *raw_cid)
 {
 	cid->manufacturer = (uint8_t)((raw_cid[3U] & 0xFF000000U) >> 24U);
 	cid->application = (uint16_t)((raw_cid[3U] & 0xFFFF00U) >> 8U);

@@ -16,8 +16,8 @@
 extern "C" {
 #endif
 
-#define OSDP_CMD_TEXT_MAX_LEN          32
-#define OSDP_CMD_KEYSET_KEY_MAX_LEN    32
+#define OSDP_CMD_TEXT_MAX_LEN 32
+#define OSDP_CMD_KEYSET_KEY_MAX_LEN 32
 
 /**
  * @brief Various card formats that a PD can support. This is sent to CP
@@ -202,9 +202,9 @@ struct osdp_cmd {
 	sys_snode_t node;
 	enum osdp_cmd_e id;
 	union {
-		struct osdp_cmd_led    led;
+		struct osdp_cmd_led led;
 		struct osdp_cmd_buzzer buzzer;
-		struct osdp_cmd_text   text;
+		struct osdp_cmd_text text;
 		struct osdp_cmd_output output;
 		struct osdp_cmd_comset comset;
 		struct osdp_cmd_keyset keyset;
@@ -223,10 +223,9 @@ int osdp_pd_get_cmd(struct osdp_cmd *cmd);
 
 #else /* CONFIG_OSDP_MODE_PD */
 
-int osdp_cp_set_callback_key_press(
-	int (*cb)(int address, uint8_t key));
-int osdp_cp_set_callback_card_read(
-	int (*cb)(int address, int format, uint8_t *data, int len));
+int osdp_cp_set_callback_key_press(int (*cb)(int address, uint8_t key));
+int osdp_cp_set_callback_card_read(int (*cb)(int address, int format,
+					     uint8_t *data, int len));
 int osdp_cp_send_cmd_output(int pd, struct osdp_cmd_output *p);
 int osdp_cp_send_cmd_led(int pd, struct osdp_cmd_led *p);
 int osdp_cp_send_cmd_buzzer(int pd, struct osdp_cmd_buzzer *p);
@@ -239,4 +238,4 @@ int osdp_cp_send_cmd_comset(int pd, struct osdp_cmd_comset *p);
 }
 #endif
 
-#endif	/* _OSDP_H_ */
+#endif /* _OSDP_H_ */

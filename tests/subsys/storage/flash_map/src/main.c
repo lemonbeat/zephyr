@@ -31,8 +31,7 @@ void test_flash_area_get_sectors(void)
 	zassert_true(rc == 0, "flash_area_open() fail");
 
 	/* First erase the area so it's ready for use. */
-	flash_dev =
-		device_get_binding(DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
+	flash_dev = device_get_binding(DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 
 	rc = flash_write_protection_set(flash_dev, false);
 	zassert_false(rc, "failed to disable flash write protection");
@@ -63,17 +62,18 @@ void test_flash_area_get_sectors(void)
 		rc = memcmp(wd, rd, sizeof(wd));
 		zassert_true(rc == 0, "read data != write data");
 
-		(void) flash_write_protection_set(flash_dev, false);
+		(void)flash_write_protection_set(flash_dev, false);
 		/* write stuff to end of area */
-		rc = flash_write(flash_dev, fa->fa_off + off +
-					    fs_sectors[i].fs_size - sizeof(wd),
+		rc = flash_write(flash_dev,
+				 fa->fa_off + off + fs_sectors[i].fs_size -
+					 sizeof(wd),
 				 wd, sizeof(wd));
 		zassert_true(rc == 0, "hal_flash_write() fail");
 
 		/* and read it back */
 		(void)memset(rd, 0, sizeof(rd));
-		rc = flash_area_read(fa, off + fs_sectors[i].fs_size -
-					 sizeof(rd),
+		rc = flash_area_read(fa,
+				     off + fs_sectors[i].fs_size - sizeof(rd),
 				     rd, sizeof(rd));
 		zassert_true(rc == 0, "hal_flash_read() fail");
 
@@ -96,7 +96,6 @@ void test_flash_area_get_sectors(void)
 		rc = memcmp(wd, rd, sizeof(rd));
 		zassert_true(rc == 0, "area not erased");
 	}
-
 }
 
 void test_flash_area_check_int_sha256(void)
@@ -162,7 +161,6 @@ void test_main(void)
 {
 	ztest_test_suite(test_flash_map,
 			 ztest_unit_test(test_flash_area_get_sectors),
-			 ztest_unit_test(test_flash_area_check_int_sha256)
-			);
+			 ztest_unit_test(test_flash_area_check_int_sha256));
 	ztest_run_test_suite(test_flash_map);
 }

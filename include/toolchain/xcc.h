@@ -27,7 +27,7 @@
 #include <stdbool.h>
 
 #ifndef UINT32_C
-#define UINT32_C(x)	x ## U
+#define UINT32_C(x) x##U
 #endif
 
 #ifndef __COUNTER__
@@ -50,16 +50,18 @@
  * ourselves.
  */
 #if XCHAL_MEMORY_ORDER == XTHAL_BIGENDIAN
-#define __BYTE_ORDER__		__ORDER_BIG_ENDIAN__
+#define __BYTE_ORDER__ __ORDER_BIG_ENDIAN__
 #elif XCHAL_MEMORY_ORDER == XTHAL_LITTLEENDIAN
-#define __BYTE_ORDER__		__ORDER_LITTLE_ENDIAN__
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #else
 #error "Cannot determine __BYTE_ORDER__"
 #endif
 
 #endif /* __GCC_LINKER_CMD__ */
 
-#define __builtin_unreachable() do { __ASSERT(false, "Unreachable code"); } \
-	while (true)
+#define __builtin_unreachable()                      \
+	do {                                         \
+		__ASSERT(false, "Unreachable code"); \
+	} while (true)
 
 #endif

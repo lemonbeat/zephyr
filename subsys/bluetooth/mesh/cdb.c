@@ -48,8 +48,7 @@ static int addr_is_free(uint16_t addr_start, uint8_t num_elem, uint16_t *next)
 	int i;
 
 	if (!BT_MESH_ADDR_IS_UNICAST(addr_start) ||
-	    !BT_MESH_ADDR_IS_UNICAST(addr_end) ||
-	    num_elem == 0) {
+	    !BT_MESH_ADDR_IS_UNICAST(addr_end) || num_elem == 0) {
 		return -EINVAL;
 	}
 
@@ -113,8 +112,7 @@ int bt_mesh_cdb_create(const uint8_t key[16])
 {
 	struct bt_mesh_cdb_subnet *sub;
 
-	if (atomic_test_and_set_bit(bt_mesh_cdb.flags,
-				    BT_MESH_CDB_VALID)) {
+	if (atomic_test_and_set_bit(bt_mesh_cdb.flags, BT_MESH_CDB_VALID)) {
 		return -EALREADY;
 	}
 
@@ -246,8 +244,9 @@ uint8_t bt_mesh_cdb_subnet_flags(const struct bt_mesh_cdb_subnet *sub)
 	return flags;
 }
 
-struct bt_mesh_cdb_node *bt_mesh_cdb_node_alloc(const uint8_t uuid[16], uint16_t addr,
-						uint8_t num_elem, uint16_t net_idx)
+struct bt_mesh_cdb_node *bt_mesh_cdb_node_alloc(const uint8_t uuid[16],
+						uint16_t addr, uint8_t num_elem,
+						uint16_t net_idx)
 {
 	int i;
 

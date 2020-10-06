@@ -6,10 +6,10 @@
 
 #include <ztest.h>
 
-#define FATFS_MNTP	"/RAM:"
-#define TEST_FILE	FATFS_MNTP"/testfile.txt"
-#define TEST_DIR	FATFS_MNTP"/testdir"
-#define TEST_DIR_FILE	FATFS_MNTP"/testdir/testfile.txt"
+#define FATFS_MNTP "/RAM:"
+#define TEST_FILE FATFS_MNTP "/testfile.txt"
+#define TEST_DIR FATFS_MNTP "/testdir"
+#define TEST_DIR_FILE FATFS_MNTP "/testdir/testfile.txt"
 
 extern const char test_str[];
 

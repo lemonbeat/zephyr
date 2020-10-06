@@ -11,27 +11,27 @@
 #include <drivers/gpio.h>
 #include <sys/util.h>
 
-#define TMP007_I2C_ADDRESS		DT_INST_REG_ADDR(0)
+#define TMP007_I2C_ADDRESS DT_INST_REG_ADDR(0)
 
-#define TMP007_REG_CONFIG		0x02
-#define TMP007_ALERT_EN_BIT		BIT(8)
+#define TMP007_REG_CONFIG 0x02
+#define TMP007_ALERT_EN_BIT BIT(8)
 
-#define TMP007_REG_TOBJ			0x03
-#define TMP007_DATA_INVALID_BIT		BIT(0)
+#define TMP007_REG_TOBJ 0x03
+#define TMP007_DATA_INVALID_BIT BIT(0)
 
-#define TMP007_REG_STATUS		0x04
-#define TMP007_DATA_READY_INT_BIT	BIT(14)
-#define TMP007_TOBJ_TH_HIGH_INT_BIT	BIT(13)
-#define TMP007_TOBJ_TH_LOW_INT_BIT	BIT(12)
-#define TMP007_TOBJ_TH_INT_BITS		\
+#define TMP007_REG_STATUS 0x04
+#define TMP007_DATA_READY_INT_BIT BIT(14)
+#define TMP007_TOBJ_TH_HIGH_INT_BIT BIT(13)
+#define TMP007_TOBJ_TH_LOW_INT_BIT BIT(12)
+#define TMP007_TOBJ_TH_INT_BITS \
 	(TMP007_TOBJ_TH_HIGH_INT_BIT | TMP007_TOBJ_TH_LOW_INT_BIT)
 
-#define TMP007_REG_TOBJ_TH_HIGH		0x06
-#define TMP007_REG_TOBJ_TH_LOW		0x07
+#define TMP007_REG_TOBJ_TH_HIGH 0x06
+#define TMP007_REG_TOBJ_TH_LOW 0x07
 
 /* scale in micro degrees Celsius */
-#define TMP007_TEMP_SCALE		31250
-#define TMP007_TEMP_TH_SCALE		500000
+#define TMP007_TEMP_SCALE 31250
+#define TMP007_TEMP_TH_SCALE 500000
 
 struct tmp007_data {
 	const struct device *i2c;
@@ -64,13 +64,11 @@ int tmp007_reg_read(struct tmp007_data *drv_data, uint8_t reg, uint16_t *val);
 
 int tmp007_reg_write(struct tmp007_data *drv_data, uint8_t reg, uint16_t val);
 
-int tmp007_reg_update(struct tmp007_data *drv_data, uint8_t reg,
-		      uint16_t mask, uint16_t val);
+int tmp007_reg_update(struct tmp007_data *drv_data, uint8_t reg, uint16_t mask,
+		      uint16_t val);
 
-int tmp007_attr_set(const struct device *dev,
-		    enum sensor_channel chan,
-		    enum sensor_attribute attr,
-		    const struct sensor_value *val);
+int tmp007_attr_set(const struct device *dev, enum sensor_channel chan,
+		    enum sensor_attribute attr, const struct sensor_value *val);
 
 int tmp007_trigger_set(const struct device *dev,
 		       const struct sensor_trigger *trig,

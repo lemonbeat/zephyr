@@ -42,8 +42,8 @@ static ALWAYS_INLINE int sys_test_bit(mem_addr_t addr, unsigned int bit)
 	return temp & (1 << bit);
 }
 
-static ALWAYS_INLINE
-	void sys_bitfield_set_bit(mem_addr_t addr, unsigned int bit)
+static ALWAYS_INLINE void sys_bitfield_set_bit(mem_addr_t addr,
+					       unsigned int bit)
 {
 	/* Doing memory offsets in terms of 32-bit values to prevent
 	 * alignment issues
@@ -51,20 +51,19 @@ static ALWAYS_INLINE
 	sys_set_bit(addr + ((bit >> 5) << 2), bit & 0x1F);
 }
 
-static ALWAYS_INLINE
-	void sys_bitfield_clear_bit(mem_addr_t addr, unsigned int bit)
+static ALWAYS_INLINE void sys_bitfield_clear_bit(mem_addr_t addr,
+						 unsigned int bit)
 {
 	sys_clear_bit(addr + ((bit >> 5) << 2), bit & 0x1F);
 }
 
-static ALWAYS_INLINE
-	int sys_bitfield_test_bit(mem_addr_t addr, unsigned int bit)
+static ALWAYS_INLINE int sys_bitfield_test_bit(mem_addr_t addr,
+					       unsigned int bit)
 {
 	return sys_test_bit(addr + ((bit >> 5) << 2), bit & 0x1F);
 }
 
-static ALWAYS_INLINE
-	int sys_test_and_set_bit(mem_addr_t addr, unsigned int bit)
+static ALWAYS_INLINE int sys_test_and_set_bit(mem_addr_t addr, unsigned int bit)
 {
 	int ret;
 
@@ -74,8 +73,8 @@ static ALWAYS_INLINE
 	return ret;
 }
 
-static ALWAYS_INLINE
-	int sys_test_and_clear_bit(mem_addr_t addr, unsigned int bit)
+static ALWAYS_INLINE int sys_test_and_clear_bit(mem_addr_t addr,
+						unsigned int bit)
 {
 	int ret;
 
@@ -85,8 +84,8 @@ static ALWAYS_INLINE
 	return ret;
 }
 
-static ALWAYS_INLINE
-	int sys_bitfield_test_and_set_bit(mem_addr_t addr, unsigned int bit)
+static ALWAYS_INLINE int sys_bitfield_test_and_set_bit(mem_addr_t addr,
+						       unsigned int bit)
 {
 	int ret;
 
@@ -96,8 +95,8 @@ static ALWAYS_INLINE
 	return ret;
 }
 
-static ALWAYS_INLINE
-	int sys_bitfield_test_and_clear_bit(mem_addr_t addr, unsigned int bit)
+static ALWAYS_INLINE int sys_bitfield_test_and_clear_bit(mem_addr_t addr,
+							 unsigned int bit)
 {
 	int ret;
 

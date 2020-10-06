@@ -41,20 +41,19 @@ static inline void _load_all_float_registers(struct fp_register_set *regs)
 #ifdef CONFIG_FP_FPU_DA
 	uint32_t temp = 0;
 
-	__asm__ volatile (
-		"ld.ab %1, [%0, 4];\n\t"
-		"sr %1, [%2];\n\t"
-		"ld.ab %1, [%0, 4];\n\t"
-		"sr %1, [%3];\n\t"
-		"ld.ab %1, [%0, 4];\n\t"
-		"sr %1, [%4];\n\t"
-		"ld.ab %1, [%0, 4];\n\t"
-		"sr %1, [%5];\n\t"
-		: : "r" (regs), "r" (temp),
-		"i"(_ARC_V2_FPU_DPFP1L), "i"(_ARC_V2_FPU_DPFP1H),
-		"i"(_ARC_V2_FPU_DPFP2L), "i"(_ARC_V2_FPU_DPFP2H)
-		: "memory"
-		);
+	__asm__ volatile("ld.ab %1, [%0, 4];\n\t"
+			 "sr %1, [%2];\n\t"
+			 "ld.ab %1, [%0, 4];\n\t"
+			 "sr %1, [%3];\n\t"
+			 "ld.ab %1, [%0, 4];\n\t"
+			 "sr %1, [%4];\n\t"
+			 "ld.ab %1, [%0, 4];\n\t"
+			 "sr %1, [%5];\n\t"
+			 :
+			 : "r"(regs), "r"(temp), "i"(_ARC_V2_FPU_DPFP1L),
+			   "i"(_ARC_V2_FPU_DPFP1H), "i"(_ARC_V2_FPU_DPFP2L),
+			   "i"(_ARC_V2_FPU_DPFP2H)
+			 : "memory");
 #endif
 }
 
@@ -75,19 +74,18 @@ static inline void _store_all_float_registers(struct fp_register_set *regs)
 #ifdef CONFIG_FP_FPU_DA
 	uint32_t temp = 0;
 
-	__asm__ volatile (
-		"lr %1, [%2];\n\t"
-		"st.ab %1, [%0, 4];\n\t"
-		"lr %1, [%3];\n\t"
-		"st.ab %1, [%0, 4];\n\t"
-		"lr %1, [%4];\n\t"
-		"st.ab %1, [%0, 4];\n\t"
-		"lr %1, [%5];\n\t"
-		"st.ab %1, [%0, 4];\n\t"
-		: : "r" (regs), "r" (temp),
-		"i"(_ARC_V2_FPU_DPFP1L), "i"(_ARC_V2_FPU_DPFP1H),
-		"i"(_ARC_V2_FPU_DPFP2L), "i"(_ARC_V2_FPU_DPFP2H)
-		);
+	__asm__ volatile("lr %1, [%2];\n\t"
+			 "st.ab %1, [%0, 4];\n\t"
+			 "lr %1, [%3];\n\t"
+			 "st.ab %1, [%0, 4];\n\t"
+			 "lr %1, [%4];\n\t"
+			 "st.ab %1, [%0, 4];\n\t"
+			 "lr %1, [%5];\n\t"
+			 "st.ab %1, [%0, 4];\n\t"
+			 :
+			 : "r"(regs), "r"(temp), "i"(_ARC_V2_FPU_DPFP1L),
+			   "i"(_ARC_V2_FPU_DPFP1H), "i"(_ARC_V2_FPU_DPFP2L),
+			   "i"(_ARC_V2_FPU_DPFP2H));
 #endif
 }
 
@@ -105,8 +103,8 @@ static inline void _store_all_float_registers(struct fp_register_set *regs)
  * @return N/A
  */
 
-static inline void _load_then_store_all_float_registers(struct fp_register_set
-							*regs)
+static inline void
+_load_then_store_all_float_registers(struct fp_register_set *regs)
 {
 	_load_all_float_registers(regs);
 	_store_all_float_registers(regs);

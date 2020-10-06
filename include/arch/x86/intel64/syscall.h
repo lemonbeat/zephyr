@@ -61,9 +61,9 @@ static inline uintptr_t arch_syscall_invoke6(uintptr_t arg1, uintptr_t arg2,
 	register uintptr_t r9 __asm__("%r9") = arg6;
 
 	__asm__ volatile("syscall\n\t"
-			 : "=r" (rax)
-			 : "r" (rax), "r" (rdi), "r" (rsi), "r" (rdx),
-			   "r" (r10), "r" (r8), "r" (r9)
+			 : "=r"(rax)
+			 : "r"(rax), "r"(rdi), "r"(rsi), "r"(rdx), "r"(r10),
+			   "r"(r8), "r"(r9)
 			 : "memory", "rcx", "r11");
 
 	return rax;
@@ -71,8 +71,7 @@ static inline uintptr_t arch_syscall_invoke6(uintptr_t arg1, uintptr_t arg2,
 
 static inline uintptr_t arch_syscall_invoke5(uintptr_t arg1, uintptr_t arg2,
 					     uintptr_t arg3, uintptr_t arg4,
-					     uintptr_t arg5,
-					     uintptr_t call_id)
+					     uintptr_t arg5, uintptr_t call_id)
 {
 	register uintptr_t rax __asm__("%rax") = call_id;
 	register uintptr_t rdi __asm__("%rdi") = arg1;
@@ -82,9 +81,9 @@ static inline uintptr_t arch_syscall_invoke5(uintptr_t arg1, uintptr_t arg2,
 	register uintptr_t r8 __asm__("%r8") = arg5;
 
 	__asm__ volatile("syscall\n\t"
-			 : "=r" (rax)
-			 : "r" (rax), "r" (rdi), "r" (rsi), "r" (rdx),
-			   "r" (r10), "r" (r8)
+			 : "=r"(rax)
+			 : "r"(rax), "r"(rdi), "r"(rsi), "r"(rdx), "r"(r10),
+			   "r"(r8)
 			 : "memory", "rcx", "r11");
 
 	return rax;
@@ -101,17 +100,15 @@ static inline uintptr_t arch_syscall_invoke4(uintptr_t arg1, uintptr_t arg2,
 	register uintptr_t r10 __asm__("%r10") = arg4; /* RCX unavailable */
 
 	__asm__ volatile("syscall\n\t"
-			 : "=r" (rax)
-			 : "r" (rax), "r" (rdi), "r" (rsi), "r" (rdx),
-			   "r" (r10)
+			 : "=r"(rax)
+			 : "r"(rax), "r"(rdi), "r"(rsi), "r"(rdx), "r"(r10)
 			 : "memory", "rcx", "r11");
 
 	return rax;
 }
 
 static inline uintptr_t arch_syscall_invoke3(uintptr_t arg1, uintptr_t arg2,
-					     uintptr_t arg3,
-					     uintptr_t call_id)
+					     uintptr_t arg3, uintptr_t call_id)
 {
 	register uintptr_t rax __asm__("%rax") = call_id;
 	register uintptr_t rdi __asm__("%rdi") = arg1;
@@ -119,8 +116,8 @@ static inline uintptr_t arch_syscall_invoke3(uintptr_t arg1, uintptr_t arg2,
 	register uintptr_t rdx __asm__("%rdx") = arg3;
 
 	__asm__ volatile("syscall\n\t"
-			 : "=r" (rax)
-			 : "r" (rax), "r" (rdi), "r" (rsi), "r" (rdx)
+			 : "=r"(rax)
+			 : "r"(rax), "r"(rdi), "r"(rsi), "r"(rdx)
 			 : "memory", "rcx", "r11");
 
 	return rax;
@@ -135,22 +132,21 @@ static inline uintptr_t arch_syscall_invoke2(uintptr_t arg1, uintptr_t arg2,
 	register uintptr_t rsi __asm__("%rsi") = arg2;
 
 	__asm__ volatile("syscall\n\t"
-			 : "=r" (rax)
-			 : "r" (rax), "r" (rdi), "r" (rsi)
+			 : "=r"(rax)
+			 : "r"(rax), "r"(rdi), "r"(rsi)
 			 : "memory", "rcx", "r11");
 
 	return rax;
 }
 
-static inline uintptr_t arch_syscall_invoke1(uintptr_t arg1,
-					     uintptr_t call_id)
+static inline uintptr_t arch_syscall_invoke1(uintptr_t arg1, uintptr_t call_id)
 {
 	register uintptr_t rax __asm__("%rax") = call_id;
 	register uintptr_t rdi __asm__("%rdi") = arg1;
 
 	__asm__ volatile("syscall\n\t"
-			 : "=r" (rax)
-			 : "r" (rax), "r" (rdi)
+			 : "=r"(rax)
+			 : "r"(rax), "r"(rdi)
 			 : "memory", "rcx", "r11");
 
 	return rax;
@@ -161,8 +157,8 @@ static inline uintptr_t arch_syscall_invoke0(uintptr_t call_id)
 	register uintptr_t rax __asm__("%rax") = call_id;
 
 	__asm__ volatile("syscall\n\t"
-			 : "=r" (rax)
-			 : "r" (rax)
+			 : "=r"(rax)
+			 : "r"(rax)
 			 : "memory", "rcx", "r11");
 
 	return rax;
@@ -172,7 +168,7 @@ static inline bool arch_is_user_context(void)
 {
 	int cs;
 
-	__asm__ volatile ("mov %%cs, %[cs_val]" : [cs_val] "=r" (cs));
+	__asm__ volatile("mov %%cs, %[cs_val]" : [cs_val] "=r"(cs));
 
 	return (cs & 0x3) != 0;
 }

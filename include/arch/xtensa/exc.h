@@ -47,5 +47,4 @@ char *z_xtensa_exccause(unsigned int cause_code);
 }
 #endif
 
-
 #endif /* ZEPHYR_INCLUDE_ARCH_XTENSA_EXC_H_ */

@@ -12,8 +12,8 @@
 #include <fsl_clock.h>
 #include <fsl_device_registers.h>
 
-#define PORT0_IDX	0u
-#define PORT1_IDX	1u
+#define PORT0_IDX 0u
+#define PORT1_IDX 1u
 
 struct pinmux_mcux_lpc_config {
 	clock_ip_name_t clock_ip_name;
@@ -99,8 +99,7 @@ static const struct pinmux_mcux_lpc_config pinmux_mcux_lpc_port0_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_port0, CONFIG_PINMUX_MCUX_LPC_PORT0_NAME,
-		    &pinmux_mcux_lpc_init,
-		    NULL, &pinmux_mcux_lpc_port0_config,
+		    &pinmux_mcux_lpc_init, NULL, &pinmux_mcux_lpc_port0_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_mcux_driver_api);
 #endif /* CONFIG_PINMUX_MCUX_LPC_PORT0 */
@@ -117,8 +116,7 @@ static const struct pinmux_mcux_lpc_config pinmux_mcux_lpc_port1_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_port1, CONFIG_PINMUX_MCUX_LPC_PORT1_NAME,
-		    &pinmux_mcux_lpc_init,
-		    NULL, &pinmux_mcux_lpc_port1_config,
+		    &pinmux_mcux_lpc_init, NULL, &pinmux_mcux_lpc_port1_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_mcux_driver_api);
 #endif /* CONFIG_PINMUX_MCUX_LPC_PORT1 */

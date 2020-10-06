@@ -9,7 +9,6 @@
 #include <soc.h>
 #include <kernel.h>
 
-
 static int soc_init(const struct device *dev)
 {
 	__IO uint32_t *girc_enable_set;
@@ -25,7 +24,7 @@ static int soc_init(const struct device *dev)
 	for (girc_enable_set = (uint32_t *)&INTS_INST->GIRQ08_EN_SET;
 	     girc_enable_set <= &INTS_INST->GIRQ15_EN_SET;
 	     girc_enable_set += 5) {
-	/* This probably will require tunning, but drawing 8.2 also
+		/* This probably will require tunning, but drawing 8.2 also
 	illustrates how to diasable spurious interrupts */
 		*girc_enable_set = 0xFFFFFFFF;
 	}

@@ -26,18 +26,17 @@ static const struct device *idc;
 extern void __start(void);
 
 struct cpustart_rec {
-	uint32_t		cpu;
-	arch_cpustart_t	fn;
-	char		*stack_top;
-	void		*arg;
-	uint32_t		vecbase;
-	uint32_t		alive;
+	uint32_t cpu;
+	arch_cpustart_t fn;
+	char *stack_top;
+	void *arg;
+	uint32_t vecbase;
+	uint32_t alive;
 	/* padding to cache line */
-	uint8_t		padding[XCHAL_DCACHE_LINESIZE - 6 * 4];
+	uint8_t padding[XCHAL_DCACHE_LINESIZE - 6 * 4];
 };
 
-static __aligned(XCHAL_DCACHE_LINESIZE)
-struct cpustart_rec start_rec;
+static __aligned(XCHAL_DCACHE_LINESIZE) struct cpustart_rec start_rec;
 
 static void *mp_top;
 
@@ -64,8 +63,9 @@ static void mp_entry2(void)
 	/* Set up the CPU pointer. */
 	_cpu_t *cpu = &_kernel.cpus[start_rec.cpu];
 
-	__asm__ volatile(
-		"wsr." CONFIG_XTENSA_KERNEL_CPU_PTR_SR " %0" : : "r"(cpu));
+	__asm__ volatile("wsr." CONFIG_XTENSA_KERNEL_CPU_PTR_SR " %0"
+			 :
+			 : "r"(cpu));
 
 #ifdef CONFIG_IPM_CAVS_IDC
 	/* Interrupt must be enabled while running on current core */

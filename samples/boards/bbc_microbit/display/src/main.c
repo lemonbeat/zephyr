@@ -11,51 +11,28 @@
 
 #include <display/mb_display.h>
 
-static struct mb_image smiley = MB_IMAGE({ 0, 1, 0, 1, 0 },
-					 { 0, 1, 0, 1, 0 },
-					 { 0, 0, 0, 0, 0 },
-					 { 1, 0, 0, 0, 1 },
+static struct mb_image smiley = MB_IMAGE({ 0, 1, 0, 1, 0 }, { 0, 1, 0, 1, 0 },
+					 { 0, 0, 0, 0, 0 }, { 1, 0, 0, 0, 1 },
 					 { 0, 1, 1, 1, 0 });
 
 static const struct mb_image scroll[] = {
-	MB_IMAGE({ 1, 0, 0, 0, 0 },
-		 { 1, 0, 0, 0, 1 },
-		 { 1, 0, 0, 1, 0 },
-		 { 1, 0, 1, 0, 0 },
-		 { 1, 1, 0, 0, 0 }),
-	MB_IMAGE({ 1, 0, 0, 0, 0 },
-		 { 0, 1, 0, 0, 0 },
-		 { 0, 0, 1, 0, 0 },
-		 { 0, 0, 0, 1, 0 },
-		 { 0, 0, 0, 0, 1 }),
-	MB_IMAGE({ 0, 0, 0, 0, 1 },
-		 { 0, 0, 1, 0, 1 },
-		 { 0, 1, 0, 1, 1 },
-		 { 1, 0, 0, 0, 1 },
-		 { 0, 0, 0, 0, 1 }),
+	MB_IMAGE({ 1, 0, 0, 0, 0 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 1, 0 },
+		 { 1, 0, 1, 0, 0 }, { 1, 1, 0, 0, 0 }),
+	MB_IMAGE({ 1, 0, 0, 0, 0 }, { 0, 1, 0, 0, 0 }, { 0, 0, 1, 0, 0 },
+		 { 0, 0, 0, 1, 0 }, { 0, 0, 0, 0, 1 }),
+	MB_IMAGE({ 0, 0, 0, 0, 1 }, { 0, 0, 1, 0, 1 }, { 0, 1, 0, 1, 1 },
+		 { 1, 0, 0, 0, 1 }, { 0, 0, 0, 0, 1 }),
 };
 
 static const struct mb_image animation[] = {
-	MB_IMAGE({ 0, 0, 0, 0, 0 },
-		 { 0, 0, 0, 0, 0 },
-		 { 0, 0, 1, 0, 0 },
-		 { 0, 0, 0, 0, 0 },
-		 { 0, 0, 0, 0, 0 }),
-	MB_IMAGE({ 0, 0, 0, 0, 0 },
-		 { 0, 1, 1, 1, 0 },
-		 { 0, 1, 1, 1, 0 },
-		 { 0, 1, 1, 1, 0 },
-		 { 0, 0, 0, 0, 0 }),
-	MB_IMAGE({ 1, 1, 1, 1, 1 },
-		 { 1, 1, 1, 1, 1 },
-		 { 1, 1, 0, 1, 1 },
-		 { 1, 1, 1, 1, 1 },
-		 { 1, 1, 1, 1, 1 }),
-	MB_IMAGE({ 1, 1, 1, 1, 1 },
-		 { 1, 0, 0, 0, 1 },
-		 { 1, 0, 0, 0, 1 },
-		 { 1, 0, 0, 0, 1 },
-		 { 1, 1, 1, 1, 1 }),
+	MB_IMAGE({ 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }, { 0, 0, 1, 0, 0 },
+		 { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 }),
+	MB_IMAGE({ 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 },
+		 { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 }),
+	MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 1, 1, 0, 1, 1 },
+		 { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }),
+	MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 },
+		 { 1, 0, 0, 0, 1 }, { 1, 1, 1, 1, 1 }),
 };
 
 void main(void)
@@ -71,8 +48,8 @@ void main(void)
 	 */
 
 	/* Display countdown from '9' to '0' */
-	mb_display_print(disp, MB_DISPLAY_MODE_SINGLE,
-			 1 * MSEC_PER_SEC, "9876543210");
+	mb_display_print(disp, MB_DISPLAY_MODE_SINGLE, 1 * MSEC_PER_SEC,
+			 "9876543210");
 	k_sleep(K_SECONDS(11));
 
 	/* Iterate through all pixels one-by-one */
@@ -92,8 +69,8 @@ void main(void)
 	k_sleep(K_SECONDS(2));
 
 	/* Show a short scrolling animation */
-	mb_display_image(disp, MB_DISPLAY_MODE_SCROLL, 1 * MSEC_PER_SEC,
-			 scroll, ARRAY_SIZE(scroll));
+	mb_display_image(disp, MB_DISPLAY_MODE_SCROLL, 1 * MSEC_PER_SEC, scroll,
+			 ARRAY_SIZE(scroll));
 	k_sleep(K_SECONDS((ARRAY_SIZE(scroll) + 2)));
 
 	/* Show a sequential animation */

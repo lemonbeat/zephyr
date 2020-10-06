@@ -16,9 +16,9 @@
  * ring buffer will be one of these headers plus any extra data supplied
  */
 struct ring_element {
-	uint32_t  type   :16; /**< Application-specific */
-	uint32_t  length :8;  /**< length in 32-bit chunks */
-	uint32_t  value  :8;  /**< Room for small integral values */
+	uint32_t type : 16; /**< Application-specific */
+	uint32_t length : 8; /**< length in 32-bit chunks */
+	uint32_t value : 8; /**< Room for small integral values */
 };
 
 int ring_buf_item_put(struct ring_buf *buf, uint16_t type, uint8_t value,
@@ -66,7 +66,7 @@ int ring_buf_item_get(struct ring_buf *buf, uint16_t *type, uint8_t *value,
 		return -EAGAIN;
 	}
 
-	header = (struct ring_element *) &buf->buf.buf32[buf->head];
+	header = (struct ring_element *)&buf->buf.buf32[buf->head];
 
 	if (header->length > *size32) {
 		*size32 = header->length;
@@ -165,9 +165,8 @@ uint32_t ring_buf_get_claim(struct ring_buf *buf, uint8_t **data, uint32_t size)
 	uint32_t space, granted_size, trail_size;
 
 	space = (buf->size - 1) -
-		z_ring_buf_custom_space_get(buf->size,
-					    buf->misc.byte_mode.tmp_head,
-					    buf->tail);
+		z_ring_buf_custom_space_get(
+			buf->size, buf->misc.byte_mode.tmp_head, buf->tail);
 	trail_size = buf->size - buf->misc.byte_mode.tmp_head;
 
 	/* Limit requested size to available size. */

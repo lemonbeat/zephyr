@@ -27,10 +27,8 @@ static int check_esf_matches_expectations(const z_arch_esf_t *pEsf)
 {
 	const uint16_t expected_fault_instruction = 0xde5a; /* udf #90 */
 	const bool caller_regs_match_expected =
-		(pEsf->basic.r0 == 0) &&
-		(pEsf->basic.r1 == 1) &&
-		(pEsf->basic.r2 == 2) &&
-		(pEsf->basic.r3 == 3) &&
+		(pEsf->basic.r0 == 0) && (pEsf->basic.r1 == 1) &&
+		(pEsf->basic.r2 == 2) && (pEsf->basic.r3 == 3) &&
 		(pEsf->basic.lr == 15) &&
 		(*(uint16_t *)pEsf->basic.pc == expected_fault_instruction);
 	if (!caller_regs_match_expected) {
@@ -62,9 +60,9 @@ static int check_esf_matches_expectations(const z_arch_esf_t *pEsf)
 	const uint32_t exc_bits_set_mask = 0xff00000C;
 
 	if ((pEsf->extra_info.exc_return & exc_bits_set_mask) !=
-		exc_bits_set_mask) {
+	    exc_bits_set_mask) {
 		printk("Incorrect EXC_RETURN of 0x%08x",
-			pEsf->extra_info.exc_return);
+		       pEsf->extra_info.exc_return);
 		return -1;
 	}
 
@@ -73,14 +71,14 @@ static int check_esf_matches_expectations(const z_arch_esf_t *pEsf)
 	 * is overwritten in fault.c)
 	 */
 	if (memcmp((void *)callee_regs->psp, pEsf,
-		offsetof(struct __esf, basic.xpsr)) != 0) {
+		   offsetof(struct __esf, basic.xpsr)) != 0) {
 		printk("psp does not match __basic_sf provided\n");
 		return -1;
 	}
 
 	if (pEsf->extra_info.msp != expected_msp) {
 		printk("MSP is 0x%08x but should be 0x%08x",
-			pEsf->extra_info.msp, expected_msp);
+		       pEsf->extra_info.msp, expected_msp);
 		return -1;
 	}
 #endif /* CONFIG_EXTRA_EXCEPTION_INFO */
@@ -98,7 +96,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *pEsf)
 
 	if (reason != expected_reason) {
 		printk("Wrong crash type got %d expected %d\n", reason,
-			expected_reason);
+		       expected_reason);
 		k_fatal_halt(reason);
 	}
 
@@ -126,29 +124,27 @@ void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *pEsf)
  */
 void set_regs_with_known_pattern(void)
 {
-	__asm__ volatile(
-		"mov r1, #1\n"
-		"mov r2, #2\n"
-		"mov r3, #3\n"
-		"mov r4, #4\n"
-		"mov r5, #5\n"
-		"mov r6, #6\n"
-		"mov r7, #7\n"
-		"mov r0, #8\n"
-		"mov r8, r0\n"
-		"add r0, r0, #1\n"
-		"mov r9, r0\n"
-		"add r0, r0, #1\n"
-		"mov r10, r0\n"
-		"add r0, r0, #1\n"
-		"mov r11, r0\n"
-		"add r0, r0, #1\n"
-		"mov r12, r0\n"
-		"add r0, r0, #3\n"
-		"mov lr, r0\n"
-		"mov r0, #0\n"
-		"udf #90\n"
-	);
+	__asm__ volatile("mov r1, #1\n"
+			 "mov r2, #2\n"
+			 "mov r3, #3\n"
+			 "mov r4, #4\n"
+			 "mov r5, #5\n"
+			 "mov r6, #6\n"
+			 "mov r7, #7\n"
+			 "mov r0, #8\n"
+			 "mov r8, r0\n"
+			 "add r0, r0, #1\n"
+			 "mov r9, r0\n"
+			 "add r0, r0, #1\n"
+			 "mov r10, r0\n"
+			 "add r0, r0, #1\n"
+			 "mov r11, r0\n"
+			 "add r0, r0, #1\n"
+			 "mov r12, r0\n"
+			 "add r0, r0, #3\n"
+			 "mov lr, r0\n"
+			 "mov r0, #0\n"
+			 "udf #90\n");
 }
 
 void test_arm_esf_collection(void)
@@ -177,14 +173,13 @@ void test_arm_esf_collection(void)
 	TC_PRINT("Testing ESF Reporting\n");
 	k_thread_create(&esf_collection_thread, esf_collection_stack,
 			K_THREAD_STACK_SIZEOF(esf_collection_stack),
-			(k_thread_entry_t)set_regs_with_known_pattern,
-			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0,
-			K_NO_WAIT);
+			(k_thread_entry_t)set_regs_with_known_pattern, NULL,
+			NULL, NULL, K_PRIO_COOP(PRIORITY), 0, K_NO_WAIT);
 
 	test_validation_rv = esf_validation_rv;
 
 	zassert_not_equal(test_validation_rv, TC_FAIL,
-		"ESF fault collection failed");
+			  "ESF fault collection failed");
 }
 
 void arm_isr_handler(const void *args)
@@ -223,7 +218,8 @@ void arm_isr_handler(const void *args)
 		int reason = expected_reason;
 
 		zassert_equal(reason, -1,
-			"expected_reason has not been reset (%d)\n", reason);
+			      "expected_reason has not been reset (%d)\n",
+			      reason);
 #endif
 	}
 }
@@ -271,8 +267,7 @@ void test_arm_interrupt(void)
 		}
 	}
 
-	zassert_true(i >= 0,
-		"No available IRQ line to use in the test\n");
+	zassert_true(i >= 0, "No available IRQ line to use in the test\n");
 
 	TC_PRINT("Available IRQ line: %u\n", i);
 
@@ -291,20 +286,17 @@ void test_arm_interrupt(void)
 	 * expected reason variable is reset.
 	 */
 	reason = expected_reason;
-	zassert_equal(reason, -1,
-		"expected_reason has not been reset (%d)\n", reason);
+	zassert_equal(reason, -1, "expected_reason has not been reset (%d)\n",
+		      reason);
 	NVIC_DisableIRQ(i);
 
-	arch_irq_connect_dynamic(i, 0 /* highest priority */,
-		arm_isr_handler,
-		NULL,
-		0);
+	arch_irq_connect_dynamic(i, 0 /* highest priority */, arm_isr_handler,
+				 NULL, 0);
 
 	NVIC_ClearPendingIRQ(i);
 	NVIC_EnableIRQ(i);
 
 	for (int j = 1; j <= 3; j++) {
-
 		/* Set the dynamic IRQ to pending state. */
 		NVIC_SetPendingIRQ(i);
 
@@ -340,8 +332,8 @@ void test_arm_interrupt(void)
 	 * expected reason variable is reset.
 	 */
 	reason = expected_reason;
-	zassert_equal(reason, -1,
-		"expected_reason has not been reset (%d)\n", reason);
+	zassert_equal(reason, -1, "expected_reason has not been reset (%d)\n",
+		      reason);
 #endif
 #endif
 
@@ -394,7 +386,6 @@ void z_impl_test_arm_user_interrupt_syscall(void)
 	static bool first_call = 1;
 
 	if (first_call == 1) {
-
 		/* First time the syscall is invoked */
 		first_call = 0;
 
@@ -420,7 +411,7 @@ void test_arm_user_interrupt(void)
 {
 	/* Test thread executing in user mode */
 	zassert_true(arch_is_user_context(),
-		"Test thread not running in user mode\n");
+		     "Test thread not running in user mode\n");
 
 	/* Attempt to lock IRQs in user mode */
 	irq_lock();
@@ -457,7 +448,6 @@ void test_arm_user_interrupt(void)
 	TC_PRINT("Skipped\n");
 }
 #endif /* CONFIG_USERSPACE */
-
 
 /**
  * @}

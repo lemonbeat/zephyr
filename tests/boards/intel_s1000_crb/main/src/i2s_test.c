@@ -30,23 +30,23 @@
 #define NUM_I2S_BUFFERS 4
 
 /* size of stack area used by each thread */
-#define STACKSIZE               2048
+#define STACKSIZE 2048
 
 /* scheduling priority used by each thread */
-#define PRIORITY                7
+#define PRIORITY 7
 
 /* delay between greetings (in ms) */
-#define SLEEPTIME               K_MSEC(500)
+#define SLEEPTIME K_MSEC(500)
 
 extern struct k_sem thread_sem;
 
-#define NUM_OF_CHANNELS		2
-#define FRAME_CLK_FREQ		48000
-#define I2S_WORDSIZE		32
-#define BLOCK_SIZE		192
-#define BLOCK_SIZE_BYTES	(BLOCK_SIZE * sizeof(int32_t))
-#define FRAMES_PER_ITERATION	50
-#define TIMEOUT			2000
+#define NUM_OF_CHANNELS 2
+#define FRAME_CLK_FREQ 48000
+#define I2S_WORDSIZE 32
+#define BLOCK_SIZE 192
+#define BLOCK_SIZE_BYTES (BLOCK_SIZE * sizeof(int32_t))
+#define FRAMES_PER_ITERATION 50
+#define TIMEOUT 2000
 
 static char __aligned(4) audio_buffers[BLOCK_SIZE_BYTES * NUM_I2S_BUFFERS];
 static struct k_mem_slab i2s_mem_slab;
@@ -134,7 +134,7 @@ void test_i2s_bidirectional_transfer(void)
 		/* Start transmission after 2 frames are queued */
 		if (frames == 2) {
 			ret = i2s_trigger(dev_i2s, I2S_DIR_TX,
-					I2S_TRIGGER_START);
+					  I2S_TRIGGER_START);
 			if (ret != 0) {
 				printk("TX Start failed with %d error\n", ret);
 				return;
@@ -156,7 +156,7 @@ void test_i2s_bidirectional_transfer(void)
 		return;
 	}
 	printk("Completed %d bidirectional frames on " I2S_DEV_NAME "\n",
-			FRAMES_PER_ITERATION);
+	       FRAMES_PER_ITERATION);
 }
 
 /* i2s_thread is a static thread that is spawned automatically */

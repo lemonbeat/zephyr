@@ -31,8 +31,7 @@ struct nios2_msgdma_dev_cfg {
 };
 
 #define DEV_NAME(dev) ((dev)->name)
-#define DEV_CFG(dev) \
-	((struct nios2_msgdma_dev_cfg *)(dev)->config)
+#define DEV_CFG(dev) ((struct nios2_msgdma_dev_cfg *)(dev)->config)
 
 static void nios2_msgdma_isr(void *arg)
 {
@@ -98,7 +97,7 @@ static int nios2_msgdma_config(const struct device *dev, uint32_t channel,
 
 	if (cfg->head_block->block_size > MSGDMA_0_DESCRIPTOR_SLAVE_MAX_BYTE) {
 		LOG_ERR("DMA error: Data size too big: %d",
-			    cfg->head_block->block_size);
+			cfg->head_block->block_size);
 		return -EINVAL;
 	}
 
@@ -107,7 +106,7 @@ static int nios2_msgdma_config(const struct device *dev, uint32_t channel,
 	dev_cfg->user_data = cfg->user_data;
 	dev_cfg->direction = cfg->channel_direction;
 	dma_block = cfg->head_block;
-	control =  ALTERA_MSGDMA_DESCRIPTOR_CONTROL_TRANSFER_COMPLETE_IRQ_MASK |
+	control = ALTERA_MSGDMA_DESCRIPTOR_CONTROL_TRANSFER_COMPLETE_IRQ_MASK |
 		  ALTERA_MSGDMA_DESCRIPTOR_CONTROL_EARLY_TERMINATION_IRQ_MASK;
 
 	if (dev_cfg->direction == MEMORY_TO_MEMORY) {
@@ -115,32 +114,29 @@ static int nios2_msgdma_config(const struct device *dev, uint32_t channel,
 			dev_cfg->msgdma_dev, &dev_cfg->desc,
 			(alt_u32 *)dma_block->source_address,
 			(alt_u32 *)dma_block->dest_address,
-			dma_block->block_size,
-			control);
+			dma_block->block_size, control);
 	} else if (dev_cfg->direction == MEMORY_TO_PERIPHERAL) {
 		status = alt_msgdma_construct_standard_mm_to_st_descriptor(
 			dev_cfg->msgdma_dev, &dev_cfg->desc,
 			(alt_u32 *)dma_block->source_address,
-			dma_block->block_size,
-			control);
+			dma_block->block_size, control);
 	} else if (dev_cfg->direction == PERIPHERAL_TO_MEMORY) {
 		status = alt_msgdma_construct_standard_st_to_mm_descriptor(
 			dev_cfg->msgdma_dev, &dev_cfg->desc,
 			(alt_u32 *)dma_block->dest_address,
-			dma_block->block_size,
-			control);
+			dma_block->block_size, control);
 	} else {
 		LOG_ERR("invalid channel direction");
 		status = -EINVAL;
 	}
 
 	/* Register msgdma callback */
-	alt_msgdma_register_callback(dev_cfg->msgdma_dev,
-			nios2_msgdma_callback,
-			ALTERA_MSGDMA_CSR_GLOBAL_INTERRUPT_MASK |
+	alt_msgdma_register_callback(
+		dev_cfg->msgdma_dev, nios2_msgdma_callback,
+		ALTERA_MSGDMA_CSR_GLOBAL_INTERRUPT_MASK |
 			ALTERA_MSGDMA_CSR_STOP_ON_ERROR_MASK |
 			ALTERA_MSGDMA_CSR_STOP_ON_EARLY_TERMINATION_MASK,
-			dev_cfg);
+		dev_cfg);
 
 	/* Clear the IRQ status */
 	IOWR_ALTERA_MSGDMA_CSR_STATUS(dev_cfg->msgdma_dev->csr_base,
@@ -164,7 +160,7 @@ static int nios2_msgdma_transfer_start(const struct device *dev,
 
 	k_sem_take(&cfg->sem_lock, K_FOREVER);
 	status = alt_msgdma_standard_descriptor_async_transfer(cfg->msgdma_dev,
-								&cfg->desc);
+							       &cfg->desc);
 	k_sem_give(&cfg->sem_lock);
 
 	if (status < 0) {
@@ -219,8 +215,8 @@ static int nios2_msgdma0_initialize(const struct device *dev)
 
 	alt_msgdma_init(dev_cfg->msgdma_dev, 0, MSGDMA_0_CSR_IRQ);
 
-	IRQ_CONNECT(MSGDMA_0_CSR_IRQ, CONFIG_DMA_0_IRQ_PRI,
-		    nios2_msgdma_isr, DEVICE_GET(dma0_nios2), 0);
+	IRQ_CONNECT(MSGDMA_0_CSR_IRQ, CONFIG_DMA_0_IRQ_PRI, nios2_msgdma_isr,
+		    DEVICE_GET(dma0_nios2), 0);
 
 	irq_enable(MSGDMA_0_CSR_IRQ);
 
@@ -228,7 +224,8 @@ static int nios2_msgdma0_initialize(const struct device *dev)
 }
 
 ALTERA_MSGDMA_CSR_DESCRIPTOR_SLAVE_INSTANCE(MSGDMA_0, MSGDMA_0_CSR,
-				MSGDMA_0_DESCRIPTOR_SLAVE, msgdma_dev0)
+					    MSGDMA_0_DESCRIPTOR_SLAVE,
+					    msgdma_dev0)
 
 static struct nios2_msgdma_dev_cfg dma0_nios2_config = {
 	.msgdma_dev = &msgdma_dev0,

@@ -126,16 +126,14 @@ static int init_vlan(void)
 	 * create IP address for this test. But first the VLAN needs to be
 	 * added to the interface so that IPv6 DAD can work properly.
 	 */
-	ret = setup_iface(ud.second,
-			  CONFIG_NET_SAMPLE_IFACE2_MY_IPV6_ADDR,
+	ret = setup_iface(ud.second, CONFIG_NET_SAMPLE_IFACE2_MY_IPV6_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE2_MY_IPV4_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE2_VLAN_TAG);
 	if (ret < 0) {
 		return ret;
 	}
 
-	ret = setup_iface(ud.third,
-			  CONFIG_NET_SAMPLE_IFACE3_MY_IPV6_ADDR,
+	ret = setup_iface(ud.third, CONFIG_NET_SAMPLE_IFACE3_MY_IPV6_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE3_MY_IPV4_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE3_VLAN_TAG);
 	if (ret < 0) {
@@ -185,8 +183,8 @@ static enum net_verdict parse_lldp(struct net_if *iface, struct net_pkt *pkt)
 			break;
 		}
 
-		LOG_DBG("type_length %u type %u length %u",
-			type_length, type, length);
+		LOG_DBG("type_length %u type %u length %u", type_length, type,
+			length);
 	}
 
 	/* Let stack to free the packet */

@@ -33,8 +33,7 @@ extern "C" {
  *
  * See entropy_get_entropy() for argument description
  */
-typedef int (*entropy_get_entropy_t)(const struct device *dev,
-				     uint8_t *buffer,
+typedef int (*entropy_get_entropy_t)(const struct device *dev, uint8_t *buffer,
 				     uint16_t length);
 /**
  * @typedef entropy_get_entropy_isr_t
@@ -43,11 +42,10 @@ typedef int (*entropy_get_entropy_t)(const struct device *dev,
  * See entropy_get_entropy_isr() for argument description
  */
 typedef int (*entropy_get_entropy_isr_t)(const struct device *dev,
-					 uint8_t *buffer,
-					 uint16_t length,
+					 uint8_t *buffer, uint16_t length,
 					 uint32_t flags);
 __subsystem struct entropy_driver_api {
-	entropy_get_entropy_t     get_entropy;
+	entropy_get_entropy_t get_entropy;
 	entropy_get_entropy_isr_t get_entropy_isr;
 };
 
@@ -61,24 +59,22 @@ __subsystem struct entropy_driver_api {
  * @retval 0 on success.
  * @retval -ERRNO errno code on error.
  */
-__syscall int entropy_get_entropy(const struct device *dev,
-				  uint8_t *buffer,
+__syscall int entropy_get_entropy(const struct device *dev, uint8_t *buffer,
 				  uint16_t length);
 
 static inline int z_impl_entropy_get_entropy(const struct device *dev,
-					     uint8_t *buffer,
-					     uint16_t length)
+					     uint8_t *buffer, uint16_t length)
 {
 	const struct entropy_driver_api *api =
 		(const struct entropy_driver_api *)dev->api;
 
 	__ASSERT(api->get_entropy != NULL,
-		"Callback pointer should not be NULL");
+		 "Callback pointer should not be NULL");
 	return api->get_entropy(dev, buffer, length);
 }
 
 /* Busy-wait for random data to be ready */
-#define ENTROPY_BUSYWAIT  BIT(0)
+#define ENTROPY_BUSYWAIT BIT(0)
 
 /**
  * @brief Fills a buffer with entropy in a non-blocking or busy-wait manner.
@@ -91,8 +87,7 @@ static inline int z_impl_entropy_get_entropy(const struct device *dev,
  * @retval number of bytes filled with entropy or -error.
  */
 static inline int entropy_get_entropy_isr(const struct device *dev,
-					  uint8_t *buffer,
-					  uint16_t length,
+					  uint8_t *buffer, uint16_t length,
 					  uint32_t flags)
 {
 	const struct entropy_driver_api *api =
@@ -104,7 +99,6 @@ static inline int entropy_get_entropy_isr(const struct device *dev,
 
 	return api->get_entropy_isr(dev, buffer, length, flags);
 }
-
 
 #ifdef __cplusplus
 }

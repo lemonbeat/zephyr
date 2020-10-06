@@ -25,29 +25,23 @@ struct device_data {
 
 static const struct device_data devices[] = {
 #if DT_HAS_COMPAT_STATUS_OKAY(nordic_nrf_clock)
-	{
-		.name = DT_LABEL(DT_INST(0, nordic_nrf_clock)),
-		.subsys_data =  (const struct device_subsys_data[]){
-			{
-				.subsys = CLOCK_CONTROL_NRF_SUBSYS_HF,
-				.startup_us =
-					IS_ENABLED(CONFIG_SOC_SERIES_NRF91X) ?
-						3000 : 400
-			},
-			{
-				.subsys = CLOCK_CONTROL_NRF_SUBSYS_LF,
-				.startup_us = (CLOCK_CONTROL_NRF_K32SRC ==
-					NRF_CLOCK_LFCLK_RC) ? 1000 : 500000
-			}
-		},
-		.subsys_cnt = CLOCK_CONTROL_NRF_TYPE_COUNT
-	}
+	{ .name = DT_LABEL(DT_INST(0, nordic_nrf_clock)),
+	  .subsys_data =
+		  (const struct device_subsys_data[]){
+			  { .subsys = CLOCK_CONTROL_NRF_SUBSYS_HF,
+			    .startup_us = IS_ENABLED(CONFIG_SOC_SERIES_NRF91X) ?
+							3000 :
+							400 },
+			  { .subsys = CLOCK_CONTROL_NRF_SUBSYS_LF,
+			    .startup_us = (CLOCK_CONTROL_NRF_K32SRC ==
+					   NRF_CLOCK_LFCLK_RC) ?
+							1000 :
+							500000 } },
+	  .subsys_cnt = CLOCK_CONTROL_NRF_TYPE_COUNT }
 #endif
 };
 
-
-typedef void (*test_func_t)(const char *dev_name,
-			    clock_control_subsys_t subsys,
+typedef void (*test_func_t)(const char *dev_name, clock_control_subsys_t subsys,
 			    uint32_t startup_us);
 
 typedef bool (*test_capability_check_t)(const char *dev_name,
@@ -72,13 +66,13 @@ static void setup_instance(const char *dev_name, clock_control_subsys_t subsys)
 		}
 #endif
 	} while (clock_control_get_status(dev, subsys) !=
-			CLOCK_CONTROL_STATUS_OFF);
+		 CLOCK_CONTROL_STATUS_OFF);
 
 	LOG_INF("setup done");
 }
 
 static void tear_down_instance(const char *dev_name,
-				clock_control_subsys_t subsys)
+			       clock_control_subsys_t subsys)
 {
 #if DT_HAS_COMPAT_STATUS_OKAY(nordic_nrf_clock)
 	/* Turn on LF clock using onoff service if it is disabled. */
@@ -90,7 +84,7 @@ static void tear_down_instance(const char *dev_name,
 	int err;
 
 	if (clock_control_get_status(clk, CLOCK_CONTROL_NRF_SUBSYS_LF) !=
-		CLOCK_CONTROL_STATUS_OFF) {
+	    CLOCK_CONTROL_STATUS_OFF) {
 		return;
 	}
 
@@ -107,8 +101,7 @@ static void tear_down_instance(const char *dev_name,
 
 static void test_with_single_instance(const char *dev_name,
 				      clock_control_subsys_t subsys,
-				      uint32_t startup_time,
-				      test_func_t func,
+				      uint32_t startup_time, test_func_t func,
 				      test_capability_check_t capability_check)
 {
 	setup_instance(dev_name, subsys);
@@ -124,14 +117,15 @@ static void test_with_single_instance(const char *dev_name,
 	k_sleep(K_MSEC(100));
 }
 static void test_all_instances(test_func_t func,
-				test_capability_check_t capability_check)
+			       test_capability_check_t capability_check)
 {
 	for (size_t i = 0; i < ARRAY_SIZE(devices); i++) {
 		for (size_t j = 0; j < devices[i].subsys_cnt; j++) {
-			test_with_single_instance(devices[i].name,
-					devices[i].subsys_data[j].subsys,
-					devices[i].subsys_data[j].startup_us,
-					func, capability_check);
+			test_with_single_instance(
+				devices[i].name,
+				devices[i].subsys_data[j].subsys,
+				devices[i].subsys_data[j].startup_us, func,
+				capability_check);
 		}
 	}
 }
@@ -151,21 +145,21 @@ static void test_on_off_status_instance(const char *dev_name,
 
 	status = clock_control_get_status(dev, subsys);
 	zassert_equal(CLOCK_CONTROL_STATUS_OFF, status,
-			"%s: Unexpected status (%d)", dev_name, status);
+		      "%s: Unexpected status (%d)", dev_name, status);
 
 	err = clock_control_on(dev, subsys);
 	zassert_equal(0, err, "%s: Unexpected err (%d)", dev_name, err);
 
 	status = clock_control_get_status(dev, subsys);
 	zassert_equal(status, CLOCK_CONTROL_STATUS_ON,
-			"%s: Unexpected status (%d)", dev_name, status);
+		      "%s: Unexpected status (%d)", dev_name, status);
 
 	err = clock_control_off(dev, subsys);
 	zassert_equal(0, err, "%s: Unexpected err (%d)", dev_name, err);
 
 	status = clock_control_get_status(dev, subsys);
 	zassert_equal(CLOCK_CONTROL_STATUS_OFF, status,
-			"%s: Unexpected status (%d)", dev_name, status);
+		      "%s: Unexpected status (%d)", dev_name, status);
 }
 
 static void test_on_off_status(void)
@@ -184,9 +178,7 @@ static void async_capable_callback(const struct device *dev,
 static bool async_capable(const char *dev_name, clock_control_subsys_t subsys)
 {
 	const struct device *dev = device_get_binding(dev_name);
-	struct clock_control_async_data data = {
-		.cb = async_capable_callback
-	};
+	struct clock_control_async_data data = { .cb = async_capable_callback };
 	int err;
 
 	err = clock_control_async_on(dev, subsys, &data);
@@ -196,7 +188,7 @@ static bool async_capable(const char *dev_name, clock_control_subsys_t subsys)
 	}
 
 	while (clock_control_get_status(dev, subsys) !=
-		CLOCK_CONTROL_STATUS_ON) {
+	       CLOCK_CONTROL_STATUS_ON) {
 		/* pend util clock is started */
 	}
 
@@ -213,8 +205,7 @@ static bool async_capable(const char *dev_name, clock_control_subsys_t subsys)
  * Test checks that callbacks are called after clock is started.
  */
 static void clock_on_callback(const struct device *dev,
-				clock_control_subsys_t subsys,
-				void *user_data)
+			      clock_control_subsys_t subsys, void *user_data)
 {
 	bool *executed = (bool *)user_data;
 
@@ -229,14 +220,12 @@ static void test_async_on_instance(const char *dev_name,
 	enum clock_control_status status;
 	int err;
 	bool executed = false;
-	struct clock_control_async_data data = {
-		.cb = clock_on_callback,
-		.user_data = &executed
-	};
+	struct clock_control_async_data data = { .cb = clock_on_callback,
+						 .user_data = &executed };
 
 	status = clock_control_get_status(dev, subsys);
 	zassert_equal(CLOCK_CONTROL_STATUS_OFF, status,
-			"%s: Unexpected status (%d)", dev_name, status);
+		      "%s: Unexpected status (%d)", dev_name, status);
 
 	err = clock_control_async_on(dev, subsys, &data);
 	zassert_equal(0, err, "%s: Unexpected err (%d)", dev_name, err);
@@ -246,8 +235,8 @@ static void test_async_on_instance(const char *dev_name,
 
 	zassert_true(executed, "%s: Expected flag to be true", dev_name);
 	zassert_equal(CLOCK_CONTROL_STATUS_ON,
-			clock_control_get_status(dev, subsys),
-			"Unexpected clock status");
+		      clock_control_get_status(dev, subsys),
+		      "Unexpected clock status");
 }
 
 static void test_async_on(void)
@@ -269,14 +258,12 @@ static void test_async_on_stopped_on_instance(const char *dev_name,
 	int err;
 	int key;
 	bool executed = false;
-	struct clock_control_async_data data = {
-		.cb = clock_on_callback,
-		.user_data = &executed
-	};
+	struct clock_control_async_data data = { .cb = clock_on_callback,
+						 .user_data = &executed };
 
 	status = clock_control_get_status(dev, subsys);
 	zassert_equal(CLOCK_CONTROL_STATUS_OFF, status,
-			"%s: Unexpected status (%d)", dev_name, status);
+		      "%s: Unexpected status (%d)", dev_name, status);
 
 	/* lock to prevent clock interrupt for fast starting clocks.*/
 	key = irq_lock();
@@ -303,8 +290,8 @@ static void test_async_on_stopped(void)
  * Test checks that that second start returns error.
  */
 static void test_double_start_on_instance(const char *dev_name,
-						clock_control_subsys_t subsys,
-						uint32_t startup_us)
+					  clock_control_subsys_t subsys,
+					  uint32_t startup_us)
 {
 	const struct device *dev = device_get_binding(dev_name);
 	enum clock_control_status status;
@@ -312,7 +299,7 @@ static void test_double_start_on_instance(const char *dev_name,
 
 	status = clock_control_get_status(dev, subsys);
 	zassert_equal(CLOCK_CONTROL_STATUS_OFF, status,
-			"%s: Unexpected status (%d)", dev_name, status);
+		      "%s: Unexpected status (%d)", dev_name, status);
 
 	err = clock_control_on(dev, subsys);
 	zassert_equal(0, err, "%s: Unexpected err (%d)", dev_name, err);
@@ -331,8 +318,8 @@ static void test_double_start(void)
  * Test precondition: clock is stopped.
  */
 static void test_double_stop_on_instance(const char *dev_name,
-						clock_control_subsys_t subsys,
-						uint32_t startup_us)
+					 clock_control_subsys_t subsys,
+					 uint32_t startup_us)
 {
 	const struct device *dev = device_get_binding(dev_name);
 	enum clock_control_status status;
@@ -340,7 +327,7 @@ static void test_double_stop_on_instance(const char *dev_name,
 
 	status = clock_control_get_status(dev, subsys);
 	zassert_equal(CLOCK_CONTROL_STATUS_OFF, status,
-			"%s: Unexpected status (%d)", dev_name, status);
+		      "%s: Unexpected status (%d)", dev_name, status);
 
 	err = clock_control_off(dev, subsys);
 	zassert_equal(0, err, "%s: Unexpected err (%d)", dev_name, err);
@@ -354,11 +341,10 @@ static void test_double_stop(void)
 void test_main(void)
 {
 	ztest_test_suite(test_clock_control,
-		ztest_unit_test(test_on_off_status),
-		ztest_unit_test(test_async_on),
-		ztest_unit_test(test_async_on_stopped),
-		ztest_unit_test(test_double_start),
-		ztest_unit_test(test_double_stop)
-			 );
+			 ztest_unit_test(test_on_off_status),
+			 ztest_unit_test(test_async_on),
+			 ztest_unit_test(test_async_on_stopped),
+			 ztest_unit_test(test_double_start),
+			 ztest_unit_test(test_double_stop));
 	ztest_run_test_suite(test_clock_control);
 }

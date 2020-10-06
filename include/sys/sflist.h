@@ -44,7 +44,6 @@ struct _sflist {
 
 typedef struct _sflist sys_sflist_t;
 
-
 /**
  * @brief Provide the primitive to iterate on a list
  * Note: the loop is unsafe and thus __sn should not be removed
@@ -60,7 +59,7 @@ typedef struct _sflist sys_sflist_t;
  * @param __sl A pointer on a sys_sflist_t to iterate on
  * @param __sn A sys_sfnode_t pointer to peek each node of the list
  */
-#define SYS_SFLIST_FOR_EACH_NODE(__sl, __sn)				\
+#define SYS_SFLIST_FOR_EACH_NODE(__sl, __sn) \
 	Z_GENLIST_FOR_EACH_NODE(sflist, __sl, __sn)
 
 /**
@@ -83,7 +82,7 @@ typedef struct _sflist sys_sflist_t;
  * @param __sn A sys_sfnode_t pointer to peek each node of the list
  *             it contains the starting node, or NULL to start from the head
  */
-#define SYS_SFLIST_ITERATE_FROM_NODE(__sl, __sn)				\
+#define SYS_SFLIST_ITERATE_FROM_NODE(__sl, __sn) \
 	Z_GENLIST_ITERATE_FROM_NODE(sflist, __sl, __sn)
 
 /**
@@ -102,7 +101,7 @@ typedef struct _sflist sys_sflist_t;
  * @param __sn A sys_sfnode_t pointer to peek each node of the list
  * @param __sns A sys_sfnode_t pointer for the loop to run safely
  */
-#define SYS_SFLIST_FOR_EACH_NODE_SAFE(__sl, __sn, __sns)			\
+#define SYS_SFLIST_FOR_EACH_NODE_SAFE(__sl, __sn, __sns) \
 	Z_GENLIST_FOR_EACH_NODE_SAFE(sflist, __sl, __sn, __sns)
 
 /*
@@ -159,7 +158,7 @@ typedef struct _sflist sys_sflist_t;
  * @param __cn A pointer to peek each entry of the list
  * @param __n The field name of sys_sfnode_t within the container struct
  */
-#define SYS_SFLIST_FOR_EACH_CONTAINER(__sl, __cn, __n)			\
+#define SYS_SFLIST_FOR_EACH_CONTAINER(__sl, __cn, __n) \
 	Z_GENLIST_FOR_EACH_CONTAINER(sflist, __sl, __cn, __n)
 
 /**
@@ -177,9 +176,8 @@ typedef struct _sflist sys_sflist_t;
  * @param __cns A pointer for the loop to run safely
  * @param __n The field name of sys_sfnode_t within the container struct
  */
-#define SYS_SFLIST_FOR_EACH_CONTAINER_SAFE(__sl, __cn, __cns, __n)	\
+#define SYS_SFLIST_FOR_EACH_CONTAINER_SAFE(__sl, __cn, __cns, __n) \
 	Z_GENLIST_FOR_EACH_CONTAINER_SAFE(sflist, __sl, __cn, __cns, __n)
-
 
 /*
  * Required function definitions for the list_gen.h interface
@@ -199,8 +197,11 @@ static inline void sys_sflist_init(sys_sflist_t *list)
 	list->tail = NULL;
 }
 
-#define SYS_SFLIST_STATIC_INIT(ptr_to_list) {NULL, NULL}
-#define SYS_SFLIST_FLAGS_MASK	0x3UL
+#define SYS_SFLIST_STATIC_INIT(ptr_to_list) \
+	{                                   \
+		NULL, NULL                  \
+	}
+#define SYS_SFLIST_FLAGS_MASK 0x3UL
 
 static inline sys_sfnode_t *z_sfnode_next_peek(sys_sfnode_t *node)
 {
@@ -209,8 +210,7 @@ static inline sys_sfnode_t *z_sfnode_next_peek(sys_sfnode_t *node)
 
 static inline uint8_t sys_sfnode_flags_get(sys_sfnode_t *node);
 
-static inline void z_sfnode_next_set(sys_sfnode_t *parent,
-				       sys_sfnode_t *child)
+static inline void z_sfnode_next_set(sys_sfnode_t *parent, sys_sfnode_t *child)
 {
 	uint8_t cur_flags = sys_sfnode_flags_get(parent);
 
@@ -348,8 +348,7 @@ Z_GENLIST_PEEK_NEXT(sflist, sfnode)
  * @param list A pointer on the list to affect
  * @param node A pointer on the node to prepend
  */
-static inline void sys_sflist_prepend(sys_sflist_t *list,
-				      sys_sfnode_t *node);
+static inline void sys_sflist_prepend(sys_sflist_t *list, sys_sfnode_t *node);
 
 Z_GENLIST_PREPEND(sflist, sfnode)
 
@@ -361,8 +360,7 @@ Z_GENLIST_PREPEND(sflist, sfnode)
  * @param list A pointer on the list to affect
  * @param node A pointer on the node to append
  */
-static inline void sys_sflist_append(sys_sflist_t *list,
-				     sys_sfnode_t *node);
+static inline void sys_sflist_append(sys_sflist_t *list, sys_sfnode_t *node);
 
 Z_GENLIST_APPEND(sflist, sfnode)
 
@@ -379,8 +377,8 @@ Z_GENLIST_APPEND(sflist, sfnode)
  * @param head A pointer to the first element of the list to append
  * @param tail A pointer to the last element of the list to append
  */
-static inline void sys_sflist_append_list(sys_sflist_t *list,
-					  void *head, void *tail);
+static inline void sys_sflist_append_list(sys_sflist_t *list, void *head,
+					  void *tail);
 
 Z_GENLIST_APPEND_LIST(sflist, sfnode)
 
@@ -407,8 +405,7 @@ Z_GENLIST_MERGE_LIST(sflist, sfnode)
  * @param prev A pointer on the previous node
  * @param node A pointer on the node to insert
  */
-static inline void sys_sflist_insert(sys_sflist_t *list,
-				     sys_sfnode_t *prev,
+static inline void sys_sflist_insert(sys_sflist_t *list, sys_sfnode_t *prev,
 				     sys_sfnode_t *node);
 
 Z_GENLIST_INSERT(sflist, sfnode)

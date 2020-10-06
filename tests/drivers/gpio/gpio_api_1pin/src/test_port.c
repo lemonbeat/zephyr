@@ -4,12 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <limits.h>
 #include <sys/util.h>
 #include "test_gpio_api.h"
 
-#define TEST_GPIO_PORT_VALUE_MAX         ((1LLU << GPIO_MAX_PINS_PER_PORT) - 1)
+#define TEST_GPIO_PORT_VALUE_MAX ((1LLU << GPIO_MAX_PINS_PER_PORT) - 1)
 
 static void port_get_raw_and_verify(const struct device *port,
 				    gpio_port_pins_t mask,
@@ -18,7 +17,7 @@ static void port_get_raw_and_verify(const struct device *port,
 	gpio_port_value_t val_actual;
 
 	zassert_equal(gpio_port_get_raw(port, &val_actual), 0,
-		     "Test point %d: failed to get physical port value", idx);
+		      "Test point %d: failed to get physical port value", idx);
 	zassert_equal(val_expected & mask, val_actual & mask,
 		      "Test point %d: invalid physical port get value", idx);
 }
@@ -30,7 +29,7 @@ static void port_get_and_verify(const struct device *port,
 	gpio_port_value_t val_actual;
 
 	zassert_equal(gpio_port_get(port, &val_actual), 0,
-		     "Test point %d: failed to get logical port value", idx);
+		      "Test point %d: failed to get logical port value", idx);
 	zassert_equal(val_expected & mask, val_actual & mask,
 		      "Test point %d: invalid logical port get value", idx);
 }
@@ -177,7 +176,8 @@ void test_gpio_port_set_masked_get_raw(void)
 	zassert_equal(ret, 0, "Failed to configure the pin");
 
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_masked_raw_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
+		port_set_masked_raw_and_verify(port, BIT(TEST_PIN),
+					       test_vector[i], i);
 		port_get_raw_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
 	}
 }
@@ -217,7 +217,8 @@ void test_gpio_port_set_masked_get(void)
 	zassert_equal(ret, 0, "Failed to configure the pin");
 
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_masked_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
+		port_set_masked_and_verify(port, BIT(TEST_PIN), test_vector[i],
+					   i);
 		port_get_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
 	}
 }
@@ -249,8 +250,8 @@ void test_gpio_port_set_masked_get_active_high(void)
 
 	TC_PRINT("Running test on port=%s, pin=%d\n", TEST_DEV, TEST_PIN);
 
-	ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT | GPIO_INPUT |
-				 GPIO_ACTIVE_HIGH);
+	ret = gpio_pin_configure(port, TEST_PIN,
+				 GPIO_OUTPUT | GPIO_INPUT | GPIO_ACTIVE_HIGH);
 	if (ret == -ENOTSUP) {
 		TC_PRINT("Simultaneous pin in/out mode is not supported.\n");
 		ztest_test_skip();
@@ -260,14 +261,16 @@ void test_gpio_port_set_masked_get_active_high(void)
 
 	TC_PRINT("Step 1: Set logical, get logical and physical port value\n");
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_masked_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
+		port_set_masked_and_verify(port, BIT(TEST_PIN), test_vector[i],
+					   i);
 		port_get_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
 		port_get_raw_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
 	}
 
 	TC_PRINT("Step 2: Set physical, get logical and physical port value\n");
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_masked_raw_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
+		port_set_masked_raw_and_verify(port, BIT(TEST_PIN),
+					       test_vector[i], i);
 		port_get_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
 		port_get_raw_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
 	}
@@ -300,8 +303,8 @@ void test_gpio_port_set_masked_get_active_low(void)
 
 	TC_PRINT("Running test on port=%s, pin=%d\n", TEST_DEV, TEST_PIN);
 
-	ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT | GPIO_INPUT |
-				 GPIO_ACTIVE_LOW);
+	ret = gpio_pin_configure(port, TEST_PIN,
+				 GPIO_OUTPUT | GPIO_INPUT | GPIO_ACTIVE_LOW);
 	if (ret == -ENOTSUP) {
 		TC_PRINT("Simultaneous pin in/out mode is not supported.\n");
 		ztest_test_skip();
@@ -311,14 +314,17 @@ void test_gpio_port_set_masked_get_active_low(void)
 
 	TC_PRINT("Step 1: Set logical, get logical and physical port value\n");
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_masked_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
+		port_set_masked_and_verify(port, BIT(TEST_PIN), test_vector[i],
+					   i);
 		port_get_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
-		port_get_raw_and_verify(port, BIT(TEST_PIN), ~test_vector[i], i);
+		port_get_raw_and_verify(port, BIT(TEST_PIN), ~test_vector[i],
+					i);
 	}
 
 	TC_PRINT("Step 2: Set physical, get logical and physical port value\n");
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_masked_raw_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
+		port_set_masked_raw_and_verify(port, BIT(TEST_PIN),
+					       test_vector[i], i);
 		port_get_and_verify(port, BIT(TEST_PIN), ~test_vector[i], i);
 		port_get_raw_and_verify(port, BIT(TEST_PIN), test_vector[i], i);
 	}
@@ -332,11 +338,11 @@ void test_gpio_port_set_bits_clear_bits_raw(void)
 
 	const gpio_port_value_t test_vector[][2] = {
 		/* set value, clear value */
-		{0xEE11EE11, 0xEE11EE11},
-		{0x11EE11EE, TEST_GPIO_PORT_VALUE_MAX},
-		{0x00000000, 0x55555555},
-		{TEST_GPIO_PORT_VALUE_MAX, 0xAAAAAAAA},
-		{TEST_GPIO_PORT_VALUE_MAX, TEST_GPIO_PORT_VALUE_MAX},
+		{ 0xEE11EE11, 0xEE11EE11 },
+		{ 0x11EE11EE, TEST_GPIO_PORT_VALUE_MAX },
+		{ 0x00000000, 0x55555555 },
+		{ TEST_GPIO_PORT_VALUE_MAX, 0xAAAAAAAA },
+		{ TEST_GPIO_PORT_VALUE_MAX, TEST_GPIO_PORT_VALUE_MAX },
 	};
 
 	port = device_get_binding(TEST_DEV);
@@ -371,11 +377,11 @@ void test_gpio_port_set_bits_clear_bits(void)
 
 	const gpio_port_value_t test_vector[][2] = {
 		/* set value, clear value */
-		{TEST_GPIO_PORT_VALUE_MAX, 0xAAAAAAAA},
-		{0x00000000, TEST_GPIO_PORT_VALUE_MAX},
-		{0xCC33CC33, 0x33CC33CC},
-		{0x33CC33CC, 0x33CC33CC},
-		{0x00000000, 0x55555555},
+		{ TEST_GPIO_PORT_VALUE_MAX, 0xAAAAAAAA },
+		{ 0x00000000, TEST_GPIO_PORT_VALUE_MAX },
+		{ 0xCC33CC33, 0x33CC33CC },
+		{ 0x33CC33CC, 0x33CC33CC },
+		{ 0x00000000, 0x55555555 },
 	};
 
 	port = device_get_binding(TEST_DEV);
@@ -410,13 +416,13 @@ void test_gpio_port_set_clr_bits_raw(void)
 
 	const gpio_port_value_t test_vector[][2] = {
 		/* set value, clear value */
-		{0xEE11EE11, 0x11EE11EE},
-		{0x00000000, TEST_GPIO_PORT_VALUE_MAX},
-		{0x55555555, 0x00000000},
-		{TEST_GPIO_PORT_VALUE_MAX, 0x00000000},
-		{0x00000000, 0x00000000},
-		{0xAAAAAAAA, 0x00000000},
-		{0x00000000, TEST_GPIO_PORT_VALUE_MAX},
+		{ 0xEE11EE11, 0x11EE11EE },
+		{ 0x00000000, TEST_GPIO_PORT_VALUE_MAX },
+		{ 0x55555555, 0x00000000 },
+		{ TEST_GPIO_PORT_VALUE_MAX, 0x00000000 },
+		{ 0x00000000, 0x00000000 },
+		{ 0xAAAAAAAA, 0x00000000 },
+		{ 0x00000000, TEST_GPIO_PORT_VALUE_MAX },
 	};
 
 	port = device_get_binding(TEST_DEV);
@@ -433,7 +439,8 @@ void test_gpio_port_set_clr_bits_raw(void)
 	zassert_equal(ret, 0, "Failed to configure the pin");
 
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_clr_bits_raw(port, test_vector[i][0], test_vector[i][1], i);
+		port_set_clr_bits_raw(port, test_vector[i][0],
+				      test_vector[i][1], i);
 		val_expected |= test_vector[i][0] & (BIT(TEST_PIN));
 		val_expected &= ~(test_vector[i][1] & (BIT(TEST_PIN)));
 		port_get_raw_and_verify(port, BIT(TEST_PIN), val_expected, i);
@@ -448,12 +455,12 @@ void test_gpio_port_set_clr_bits(void)
 
 	const gpio_port_value_t test_vector[][2] = {
 		/* set value, clear value */
-		{0xEE11EE11, 0x11EE11EE},
-		{0x00000000, TEST_GPIO_PORT_VALUE_MAX},
-		{0x55555555, 0x00000000},
-		{TEST_GPIO_PORT_VALUE_MAX, 0x00000000},
-		{0xAAAAAAAA, 0x00000000},
-		{0x00000000, TEST_GPIO_PORT_VALUE_MAX},
+		{ 0xEE11EE11, 0x11EE11EE },
+		{ 0x00000000, TEST_GPIO_PORT_VALUE_MAX },
+		{ 0x55555555, 0x00000000 },
+		{ TEST_GPIO_PORT_VALUE_MAX, 0x00000000 },
+		{ 0xAAAAAAAA, 0x00000000 },
+		{ 0x00000000, TEST_GPIO_PORT_VALUE_MAX },
 	};
 
 	port = device_get_binding(TEST_DEV);
@@ -470,7 +477,8 @@ void test_gpio_port_set_clr_bits(void)
 	zassert_equal(ret, 0, "Failed to configure the pin");
 
 	for (int i = 0; i < ARRAY_SIZE(test_vector); i++) {
-		port_set_clr_bits(port, test_vector[i][0], test_vector[i][1], i);
+		port_set_clr_bits(port, test_vector[i][0], test_vector[i][1],
+				  i);
 		val_expected |= test_vector[i][0] & (BIT(TEST_PIN));
 		val_expected &= ~(test_vector[i][1] & (BIT(TEST_PIN)));
 		port_get_and_verify(port, BIT(TEST_PIN), val_expected, i);

@@ -34,21 +34,21 @@ extern "C" {
 /* Possible Cmd Codes for disk_ioctl() */
 
 /* Get the number of sectors in the disk  */
-#define DISK_IOCTL_GET_SECTOR_COUNT		1
+#define DISK_IOCTL_GET_SECTOR_COUNT 1
 /* Get the size of a disk SECTOR in bytes */
-#define DISK_IOCTL_GET_SECTOR_SIZE		2
+#define DISK_IOCTL_GET_SECTOR_SIZE 2
 /* How many  sectors constitute a FLASH Erase block */
-#define DISK_IOCTL_GET_ERASE_BLOCK_SZ		4
+#define DISK_IOCTL_GET_ERASE_BLOCK_SZ 4
 /* Commit any cached read/writes to disk */
-#define DISK_IOCTL_CTRL_SYNC			5
+#define DISK_IOCTL_CTRL_SYNC 5
 
 /* 3 is reserved.  It used to be DISK_IOCTL_GET_DISK_SIZE */
 
 /* Possible return bitmasks for disk_status() */
-#define DISK_STATUS_OK			0x00
-#define DISK_STATUS_UNINIT		0x01
-#define DISK_STATUS_NOMEDIA		0x02
-#define DISK_STATUS_WR_PROTECT		0x04
+#define DISK_STATUS_OK 0x00
+#define DISK_STATUS_UNINIT 0x01
+#define DISK_STATUS_NOMEDIA 0x02
+#define DISK_STATUS_WR_PROTECT 0x04
 
 struct disk_operations;
 
@@ -101,8 +101,8 @@ int disk_access_status(const char *pdrv);
  *
  * @return 0 on success, negative errno code on fail
  */
-int disk_access_read(const char *pdrv, uint8_t *data_buf,
-		     uint32_t start_sector, uint32_t num_sector);
+int disk_access_read(const char *pdrv, uint8_t *data_buf, uint32_t start_sector,
+		     uint32_t num_sector);
 
 /*
  * @brief write data to disk

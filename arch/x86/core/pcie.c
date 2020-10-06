@@ -42,8 +42,8 @@ static void pcie_mm_init(void)
 			uintptr_t phys_addr;
 
 			bus_segs[i].start_bus = m->pci_segs[i].start_bus;
-			bus_segs[i].n_buses = 1 + m->pci_segs[i].end_bus
-				- m->pci_segs[i].start_bus;
+			bus_segs[i].n_buses = 1 + m->pci_segs[i].end_bus -
+					      m->pci_segs[i].start_bus;
 
 			phys_addr = m->pci_segs[i].base_addr;
 			/* 32 devices & 8 functions per bus, 4k per device */
@@ -58,19 +58,18 @@ static void pcie_mm_init(void)
 #endif
 }
 
-static inline void pcie_mm_conf(pcie_bdf_t bdf, unsigned int reg,
-				bool write, uint32_t *data)
+static inline void pcie_mm_conf(pcie_bdf_t bdf, unsigned int reg, bool write,
+				uint32_t *data)
 {
 	for (int i = 0; i < ARRAY_SIZE(bus_segs); i++) {
 		int off = PCIE_BDF_TO_BUS(bdf) - bus_segs[i].start_bus;
 
 		if (off >= 0 && off < bus_segs[i].n_buses) {
-			bdf = PCIE_BDF(off,
-				       PCIE_BDF_TO_DEV(bdf),
+			bdf = PCIE_BDF(off, PCIE_BDF_TO_DEV(bdf),
 				       PCIE_BDF_TO_FUNC(bdf));
 
-			volatile uint32_t *regs
-				= (void *)&bus_segs[0].mmio[bdf << 4];
+			volatile uint32_t *regs =
+				(void *)&bus_segs[0].mmio[bdf << 4];
 
 			if (write) {
 				regs[reg] = *data;
@@ -85,20 +84,20 @@ static inline void pcie_mm_conf(pcie_bdf_t bdf, unsigned int reg,
 
 /* Traditional Configuration Mechanism */
 
-#define PCIE_X86_CAP	0xCF8U	/* Configuration Address Port */
-#define PCIE_X86_CAP_BDF_MASK	0x00FFFF00U  /* b/d/f bits */
-#define PCIE_X86_CAP_EN		0x80000000U  /* enable bit */
-#define PCIE_X86_CAP_WORD_MASK	0x3FU  /*  6-bit word index .. */
-#define PCIE_X86_CAP_WORD_SHIFT	2U  /* .. is in CAP[7:2] */
+#define PCIE_X86_CAP 0xCF8U /* Configuration Address Port */
+#define PCIE_X86_CAP_BDF_MASK 0x00FFFF00U /* b/d/f bits */
+#define PCIE_X86_CAP_EN 0x80000000U /* enable bit */
+#define PCIE_X86_CAP_WORD_MASK 0x3FU /*  6-bit word index .. */
+#define PCIE_X86_CAP_WORD_SHIFT 2U /* .. is in CAP[7:2] */
 
-#define PCIE_X86_CDP	0xCFCU	/* Configuration Data Port */
+#define PCIE_X86_CDP 0xCFCU /* Configuration Data Port */
 
 /*
  * Helper function for exported configuration functions. Configuration access
  * ain't atomic, so spinlock to keep drivers from clobbering each other.
  */
-static inline void pcie_io_conf(pcie_bdf_t bdf, unsigned int reg,
-				bool write, uint32_t *data)
+static inline void pcie_io_conf(pcie_bdf_t bdf, unsigned int reg, bool write,
+				uint32_t *data)
 {
 	static struct k_spinlock lock;
 	k_spinlock_key_t k;
@@ -120,8 +119,8 @@ static inline void pcie_io_conf(pcie_bdf_t bdf, unsigned int reg,
 	k_spin_unlock(&lock, k);
 }
 
-static inline void pcie_conf(pcie_bdf_t bdf, unsigned int reg,
-			     bool write, uint32_t *data)
+static inline void pcie_conf(pcie_bdf_t bdf, unsigned int reg, bool write,
+			     uint32_t *data)
 
 {
 #ifdef CONFIG_PCIE_MMIO_CFG
@@ -160,14 +159,14 @@ void pcie_conf_write(pcie_bdf_t bdf, unsigned int reg, uint32_t data)
 uint32_t pcie_msi_map(unsigned int irq)
 {
 	ARG_UNUSED(irq);
-	return 0xFEE00000U;  /* standard delivery to BSP local APIC */
+	return 0xFEE00000U; /* standard delivery to BSP local APIC */
 }
 
 uint16_t pcie_msi_mdr(unsigned int irq)
 {
 	unsigned char vector = Z_IRQ_TO_INTERRUPT_VECTOR(irq);
 
-	return 0x4000U | vector;  /* edge triggered */
+	return 0x4000U | vector; /* edge triggered */
 }
 
 #endif

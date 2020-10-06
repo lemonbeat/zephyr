@@ -205,12 +205,11 @@ static uint32_t level_to_syst_severity(uint32_t level)
 	return ret;
 }
 
-static void std_print(struct log_msg *msg,
-		const struct log_output *log_output)
+static void std_print(struct log_msg *msg, const struct log_output *log_output)
 {
 	const char *str = log_msg_str_get(msg);
 	uint32_t nargs = log_msg_nargs_get(msg);
-	uint32_t *args = alloca(sizeof(uint32_t)*nargs);
+	uint32_t *args = alloca(sizeof(uint32_t) * nargs);
 	uint32_t severity = level_to_syst_severity(log_msg_level_get(msg));
 
 	for (int i = 0; i < nargs; i++) {
@@ -226,72 +225,72 @@ static void std_print(struct log_msg *msg,
 		break;
 	case 2:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1]);
+				 args[1]);
 		break;
 	case 3:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2]);
+				 args[1], args[2]);
 		break;
 	case 4:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3]);
+				 args[1], args[2], args[3]);
 		break;
 	case 5:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4]);
+				 args[1], args[2], args[3], args[4]);
 		break;
 	case 6:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5]);
+				 args[1], args[2], args[3], args[4], args[5]);
 		break;
 	case 7:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6]);
 		break;
 	case 8:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7]);
 		break;
 	case 9:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7], args[8]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7], args[8]);
 		break;
 	case 10:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7], args[8], args[9]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7], args[8], args[9]);
 		break;
 	case 11:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7], args[8], args[9], args[10]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7], args[8], args[9], args[10]);
 		break;
 	case 12:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7], args[8], args[9], args[10],
-				args[11]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7], args[8], args[9], args[10],
+				 args[11]);
 		break;
 	case 13:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7], args[8], args[9], args[10],
-				args[11], args[12]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7], args[8], args[9], args[10],
+				 args[11], args[12]);
 		break;
 	case 14:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7], args[8], args[9], args[10],
-				args[11], args[12], args[13]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7], args[8], args[9], args[10],
+				 args[11], args[12], args[13]);
 		break;
 	case 15:
 		MIPI_SYST_PRINTF(&log_syst_handle, severity, str, args[0],
-				args[1], args[2], args[3], args[4], args[5],
-				args[6], args[7], args[8], args[9], args[10],
-				args[11], args[12], args[13], args[14]);
+				 args[1], args[2], args[3], args[4], args[5],
+				 args[6], args[7], args[8], args[9], args[10],
+				 args[11], args[12], args[13], args[14]);
 		break;
 	default:
 		/* Unsupported number of arguments. */
@@ -301,7 +300,7 @@ static void std_print(struct log_msg *msg,
 }
 
 static void raw_string_print(struct log_msg *msg,
-			const struct log_output *log_output)
+			     const struct log_output *log_output)
 {
 	char buf[CONFIG_LOG_STRDUP_MAX_STRING + 1];
 	size_t length = CONFIG_LOG_STRDUP_MAX_STRING;
@@ -327,7 +326,7 @@ static void hexdump_print(struct log_msg *msg,
 }
 
 void log_output_msg_syst_process(const struct log_output *log_output,
-				struct log_msg *msg, uint32_t flag)
+				 struct log_msg *msg, uint32_t flag)
 {
 	uint8_t level = (uint8_t)log_msg_level_get(msg);
 	bool raw_string = (level == LOG_LEVEL_INTERNAL_RAW_STRING);
@@ -344,8 +343,8 @@ void log_output_msg_syst_process(const struct log_output *log_output,
 }
 
 void log_output_string_syst_process(const struct log_output *log_output,
-				struct log_msg_ids src_level,
-				const char *fmt, va_list ap, uint32_t flag)
+				    struct log_msg_ids src_level,
+				    const char *fmt, va_list ap, uint32_t flag)
 {
 	uint8_t str[CONFIG_LOG_STRDUP_MAX_STRING];
 	size_t length = CONFIG_LOG_STRDUP_MAX_STRING;
@@ -360,8 +359,9 @@ void log_output_string_syst_process(const struct log_output *log_output,
 }
 
 void log_output_hexdump_syst_process(const struct log_output *log_output,
-				struct log_msg_ids src_level,
-				const uint8_t *data, uint32_t length, uint32_t flag)
+				     struct log_msg_ids src_level,
+				     const uint8_t *data, uint32_t length,
+				     uint32_t flag)
 {
 	uint32_t severity = level_to_syst_severity((uint32_t)src_level.level);
 
@@ -374,11 +374,10 @@ static int syst_init(const struct device *arg)
 {
 	ARG_UNUSED(arg);
 
-	MIPI_SYST_INIT_STATE(&log_syst_header,
-			     mipi_syst_platform_init, (void *)0);
+	MIPI_SYST_INIT_STATE(&log_syst_header, mipi_syst_platform_init,
+			     (void *)0);
 
-	MIPI_SYST_INIT_HANDLE_STATE(&log_syst_header,
-				    &log_syst_handle, NULL);
+	MIPI_SYST_INIT_HANDLE_STATE(&log_syst_header, &log_syst_handle, NULL);
 
 	return 0;
 }

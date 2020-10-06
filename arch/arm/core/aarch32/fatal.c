@@ -18,19 +18,18 @@ LOG_MODULE_DECLARE(os);
 
 static void esf_dump(const z_arch_esf_t *esf)
 {
-	LOG_ERR("r0/a1:  0x%08x  r1/a2:  0x%08x  r2/a3:  0x%08x",
-		esf->basic.a1, esf->basic.a2, esf->basic.a3);
-	LOG_ERR("r3/a4:  0x%08x r12/ip:  0x%08x r14/lr:  0x%08x",
-		esf->basic.a4, esf->basic.ip, esf->basic.lr);
+	LOG_ERR("r0/a1:  0x%08x  r1/a2:  0x%08x  r2/a3:  0x%08x", esf->basic.a1,
+		esf->basic.a2, esf->basic.a3);
+	LOG_ERR("r3/a4:  0x%08x r12/ip:  0x%08x r14/lr:  0x%08x", esf->basic.a4,
+		esf->basic.ip, esf->basic.lr);
 	LOG_ERR(" xpsr:  0x%08x", esf->basic.xpsr);
 #if defined(CONFIG_FPU) && defined(CONFIG_FPU_SHARING)
 	for (int i = 0; i < 16; i += 4) {
 		LOG_ERR("s[%2d]:  0x%08x  s[%2d]:  0x%08x"
 			"  s[%2d]:  0x%08x  s[%2d]:  0x%08x",
-			i, (uint32_t)esf->s[i],
-			i + 1, (uint32_t)esf->s[i + 1],
-			i + 2, (uint32_t)esf->s[i + 2],
-			i + 3, (uint32_t)esf->s[i + 3]);
+			i, (uint32_t)esf->s[i], i + 1, (uint32_t)esf->s[i + 1],
+			i + 2, (uint32_t)esf->s[i + 2], i + 3,
+			(uint32_t)esf->s[i + 3]);
 	}
 	LOG_ERR("fpscr:  0x%08x", esf->fpscr);
 #endif
@@ -46,13 +45,11 @@ static void esf_dump(const z_arch_esf_t *esf)
 			callee->v7, callee->v8, callee->psp);
 	}
 #endif /* CONFIG_EXTRA_EXCEPTION_INFO */
-	LOG_ERR("Faulting instruction address (r15/pc): 0x%08x",
-		esf->basic.pc);
+	LOG_ERR("Faulting instruction address (r15/pc): 0x%08x", esf->basic.pc);
 }
 
 void z_arm_fatal_error(unsigned int reason, const z_arch_esf_t *esf)
 {
-
 	if (esf != NULL) {
 		esf_dump(esf);
 	}
@@ -88,8 +85,7 @@ void z_do_kernel_oops(const z_arch_esf_t *esf)
 		 * failures via software-triggered system fatal exceptions.
 		 */
 		if (!((esf->basic.r0 == K_ERR_KERNEL_OOPS) ||
-			(esf->basic.r0 == K_ERR_STACK_CHK_FAIL))) {
-
+		      (esf->basic.r0 == K_ERR_STACK_CHK_FAIL))) {
 			reason = K_ERR_KERNEL_OOPS;
 		}
 	}
@@ -106,7 +102,7 @@ void z_do_kernel_oops(const z_arch_esf_t *esf)
 	z_arch_esf_t esf_copy;
 
 	memcpy(&esf_copy, esf, offsetof(z_arch_esf_t, extra_info));
-	esf_copy.extra_info = (struct __extra_esf_info) { 0 };
+	esf_copy.extra_info = (struct __extra_esf_info){ 0 };
 	z_arm_fatal_error(reason, &esf_copy);
 #endif /* CONFIG_EXTRA_EXCEPTION_INFO */
 }

@@ -144,7 +144,6 @@ static inline bool size_mul_overflow(size_t a, size_t b, size_t *result)
 }
 #endif /* use_builtin(__builtin_mul_overflow) */
 
-
 /*
  * The GCC builtins __builtin_clz(), __builtin_ctz(), and 64-bit
  * variants are described by the GCC documentation as having undefined

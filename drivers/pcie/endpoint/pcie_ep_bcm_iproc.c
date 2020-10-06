@@ -18,8 +18,8 @@ LOG_MODULE_REGISTER(iproc_pcie);
 #define DT_DRV_COMPAT brcm_iproc_pcie_ep
 
 /* Helper macro to read 64-bit data using two 32-bit data read */
-#define sys_read64(addr)    (((uint64_t)(sys_read32(addr + 4)) << 32) | \
-			     sys_read32(addr))
+#define sys_read64(addr) \
+	(((uint64_t)(sys_read32(addr + 4)) << 32) | sys_read32(addr))
 
 static int iproc_pcie_conf_read(const struct device *dev, uint32_t offset,
 				uint32_t *data)
@@ -64,13 +64,14 @@ static int iproc_pcie_map_addr(const struct device *dev, uint64_t pcie_addr,
 	/* We support 2 outbound windows,
 	 * one in highmem region and another in lowmem region
 	 */
-	if ((ob_mem_type == PCIE_OB_HIGHMEM ||
-	     ob_mem_type == PCIE_OB_ANYMEM) && !ctx->highmem_in_use) {
+	if ((ob_mem_type == PCIE_OB_HIGHMEM || ob_mem_type == PCIE_OB_ANYMEM) &&
+	    !ctx->highmem_in_use) {
 		idx = PCIE_MAP_HIGHMEM_IDX;
 		pcie_ob_base = cfg->map_high_base;
 		pcie_ob_size = cfg->map_high_size;
 	} else if ((ob_mem_type == PCIE_OB_LOWMEM ||
-		    ob_mem_type == PCIE_OB_ANYMEM) && !ctx->lowmem_in_use) {
+		    ob_mem_type == PCIE_OB_ANYMEM) &&
+		   !ctx->lowmem_in_use) {
 		idx = PCIE_MAP_LOWMEM_IDX;
 		pcie_ob_base = cfg->map_low_base;
 		pcie_ob_size = cfg->map_low_size;
@@ -172,9 +173,9 @@ static int iproc_pcie_generate_msi(const struct device *dev,
 	iproc_pcie_conf_read(dev, MSI_DATA, &data);
 	data |= msi_num;
 
-	ret = pcie_ep_xfer_data_memcpy(dev, addr,
-				       (uintptr_t *)&data, sizeof(data),
-				       PCIE_OB_LOWMEM, DEVICE_TO_HOST);
+	ret = pcie_ep_xfer_data_memcpy(dev, addr, (uintptr_t *)&data,
+				       sizeof(data), PCIE_OB_LOWMEM,
+				       DEVICE_TO_HOST);
 
 #else
 	const struct iproc_pcie_ep_config *cfg = dev->config;
@@ -207,16 +208,15 @@ static int iproc_pcie_generate_msix(const struct device *dev,
 
 	data = sys_read32(msix_offset + MSIX_TBL_DATA_OFF);
 
-	ret = pcie_ep_xfer_data_memcpy(dev, addr,
-				       (uintptr_t *)&data, sizeof(data),
-				       PCIE_OB_LOWMEM, DEVICE_TO_HOST);
+	ret = pcie_ep_xfer_data_memcpy(dev, addr, (uintptr_t *)&data,
+				       sizeof(data), PCIE_OB_LOWMEM,
+				       DEVICE_TO_HOST);
 
 	return ret;
 }
 
 static int iproc_pcie_raise_irq(const struct device *dev,
-				enum pci_ep_irq_type irq_type,
-				uint32_t irq_num)
+				enum pci_ep_irq_type irq_type, uint32_t irq_num)
 {
 	struct iproc_pcie_ep_ctx *ctx = dev->data;
 	k_spinlock_key_t key;
@@ -369,8 +369,8 @@ static void iproc_pcie_reset_config(const struct device *dev)
 
 #if DT_INST_IRQ_HAS_NAME(0, perst)
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, perst, irq),
-		    DT_INST_IRQ_BY_NAME(0, perst, priority),
-		    iproc_pcie_perst, DEVICE_GET(iproc_pcie_ep_0), 0);
+		    DT_INST_IRQ_BY_NAME(0, perst, priority), iproc_pcie_perst,
+		    DEVICE_GET(iproc_pcie_ep_0), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, perst, irq));
 #endif
 
@@ -383,8 +383,8 @@ static void iproc_pcie_reset_config(const struct device *dev)
 
 #if DT_INST_IRQ_HAS_NAME(0, flr)
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, flr, irq),
-		    DT_INST_IRQ_BY_NAME(0, flr, priority),
-		    iproc_pcie_flr, DEVICE_GET(iproc_pcie_ep_0), 0);
+		    DT_INST_IRQ_BY_NAME(0, flr, priority), iproc_pcie_flr,
+		    DEVICE_GET(iproc_pcie_ep_0), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, flr, irq));
 #endif
 }
@@ -441,10 +441,10 @@ static int iproc_pcie_ep_init(const struct device *dev)
 	}
 
 	iproc_pcie_conf_read(dev, PCIE_LINK_STATUS_CONTROL, &data);
-	LOG_INF("PCIe linkup speed 0x%x\n", ((data >>
-				PCIE_LINKSPEED_SHIFT) & PCIE_LINKSPEED_MASK));
-	LOG_INF("PCIe linkup width 0x%x\n", ((data >>
-				PCIE_LINKWIDTH_SHIFT) & PCIE_LINKWIDTH_MASK));
+	LOG_INF("PCIe linkup speed 0x%x\n",
+		((data >> PCIE_LINKSPEED_SHIFT) & PCIE_LINKSPEED_MASK));
+	LOG_INF("PCIe linkup width 0x%x\n",
+		((data >> PCIE_LINKWIDTH_SHIFT) & PCIE_LINKWIDTH_MASK));
 
 #ifdef CONFIG_PCIE_EP_BCM_IPROC_INIT_CFG
 	iproc_pcie_msi_config(dev);
@@ -482,8 +482,6 @@ static struct pcie_ep_driver_api iproc_pcie_ep_api = {
 	.register_reset_cb = iproc_pcie_register_reset_cb,
 };
 
-DEVICE_AND_API_INIT(iproc_pcie_ep_0, DT_INST_LABEL(0),
-		    &iproc_pcie_ep_init, &iproc_pcie_ep_ctx_0,
-		    &iproc_pcie_ep_config_0,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &iproc_pcie_ep_api);
+DEVICE_AND_API_INIT(iproc_pcie_ep_0, DT_INST_LABEL(0), &iproc_pcie_ep_init,
+		    &iproc_pcie_ep_ctx_0, &iproc_pcie_ep_config_0, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &iproc_pcie_ep_api);

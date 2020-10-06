@@ -23,7 +23,6 @@ void sema_test_init(void)
 	k_sem_init(&sem2, 0, 1);
 }
 
-
 /**
  *
  * @brief Semaphore test thread
@@ -47,7 +46,6 @@ void sema_thread1(void *par1, void *par2, void *par3)
 		k_sem_give(&sem2);
 	}
 }
-
 
 /**
  *
@@ -101,7 +99,6 @@ void sema_thread3(void *par1, void *par2, void *par3)
 	}
 }
 
-
 /**
  *
  * @brief The main test entry
@@ -114,12 +111,11 @@ int sema_test(void)
 	int i = 0;
 	int return_value = 0;
 
-	fprintf(output_file, sz_test_case_fmt,
-			"Semaphore #1");
+	fprintf(output_file, sz_test_case_fmt, "Semaphore #1");
 	fprintf(output_file, sz_description,
-			"\n\tk_sem_init"
-			"\n\tk_sem_take(K_FOREVER)"
-			"\n\tk_sem_give");
+		"\n\tk_sem_init"
+		"\n\tk_sem_take(K_FOREVER)"
+		"\n\tk_sem_give");
 	printf(sz_test_start_fmt);
 
 	sema_test_init();
@@ -127,23 +123,22 @@ int sema_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, sema_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, sema_thread2,
-			 (void *) &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			(void *)&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
 	return_value += check_result(i, t);
 
-	fprintf(output_file, sz_test_case_fmt,
-			"Semaphore #2");
+	fprintf(output_file, sz_test_case_fmt, "Semaphore #2");
 	fprintf(output_file, sz_description,
-			"\n\tk_sem_init"
-			"\n\tk_sem_take(TICKS_NONE)"
-			"\n\tk_yield"
-			"\n\tk_sem_give");
+		"\n\tk_sem_init"
+		"\n\tk_sem_take(TICKS_NONE)"
+		"\n\tk_yield"
+		"\n\tk_sem_give");
 	printf(sz_test_start_fmt);
 
 	sema_test_init();
@@ -152,24 +147,23 @@ int sema_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, sema_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	k_thread_create(&thread_data2, thread_stack2, STACK_SIZE, sema_thread3,
-			 (void *) &i, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			(void *)&i, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 
 	t = TIME_STAMP_DELTA_GET(t);
 
 	return_value += check_result(i, t);
 
-	fprintf(output_file, sz_test_case_fmt,
-			"Semaphore #3");
+	fprintf(output_file, sz_test_case_fmt, "Semaphore #3");
 	fprintf(output_file, sz_description,
-			"\n\tk_sem_init"
-			"\n\tk_sem_take(K_FOREVER)"
-			"\n\tk_sem_give"
-			"\n\tk_sem_give"
-			"\n\tk_sem_take(K_FOREVER)");
+		"\n\tk_sem_init"
+		"\n\tk_sem_take(K_FOREVER)"
+		"\n\tk_sem_give"
+		"\n\tk_sem_give"
+		"\n\tk_sem_take(K_FOREVER)");
 	printf(sz_test_start_fmt);
 
 	sema_test_init();
@@ -177,8 +171,8 @@ int sema_test(void)
 	t = BENCH_START();
 
 	k_thread_create(&thread_data1, thread_stack1, STACK_SIZE, sema_thread1,
-			 NULL, INT_TO_POINTER(number_of_loops), NULL,
-			 K_PRIO_COOP(3), 0, K_NO_WAIT);
+			NULL, INT_TO_POINTER(number_of_loops), NULL,
+			K_PRIO_COOP(3), 0, K_NO_WAIT);
 	for (i = 0; i < number_of_loops; i++) {
 		k_sem_give(&sem1);
 		k_sem_take(&sem2, K_FOREVER);

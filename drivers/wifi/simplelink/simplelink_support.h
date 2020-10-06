@@ -14,14 +14,14 @@
 extern "C" {
 #endif
 
-#define SSID_LEN_MAX	 (32)
-#define BSSID_LEN_MAX	 (6)
+#define SSID_LEN_MAX (32)
+#define BSSID_LEN_MAX (6)
 
 /* Define ID for simplelink_wifi_cb to not conflict with WLAN event IDs: */
 #define SIMPLELINK_WIFI_CB_IPACQUIRED \
-		(SL_WLAN_EVENT_MAX + SL_NETAPP_EVENT_IPV4_ACQUIRED)
+	(SL_WLAN_EVENT_MAX + SL_NETAPP_EVENT_IPV4_ACQUIRED)
 #define SIMPLELINK_WIFI_CB_IPV6ACQUIRED \
-		(SL_WLAN_EVENT_MAX + SL_NETAPP_EVENT_IPV6_ACQUIRED)
+	(SL_WLAN_EVENT_MAX + SL_NETAPP_EVENT_IPV6_ACQUIRED)
 
 struct sl_connect_state {
 	uint32_t gateway_ip;
@@ -39,7 +39,7 @@ typedef void (*simplelink_wifi_cb_t)(uint32_t mgmt_event,
 
 extern int z_simplelink_start_scan(void);
 extern void z_simplelink_get_scan_result(int index,
-					struct wifi_scan_result *scan_result);
+					 struct wifi_scan_result *scan_result);
 extern void z_simplelink_get_mac(unsigned char *mac);
 extern int z_simplelink_init(simplelink_wifi_cb_t wifi_cb);
 extern int z_simplelink_connect(struct wifi_connect_req_params *params);

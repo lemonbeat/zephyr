@@ -22,8 +22,8 @@ static void button_pressed(const struct device *dev, struct gpio_callback *cb,
 {
 	struct mb_display *disp = mb_display_get();
 
-	mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, 500,
-			 "OOB Number: %u", oob_number);
+	mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, 500, "OOB Number: %u",
+			 oob_number);
 }
 
 static void configure_button(void)
@@ -47,10 +47,8 @@ static void configure_button(void)
 void board_output_number(bt_mesh_output_action_t action, uint32_t number)
 {
 	struct mb_display *disp = mb_display_get();
-	struct mb_image arrow = MB_IMAGE({ 0, 0, 1, 0, 0 },
-					 { 0, 1, 0, 0, 0 },
-					 { 1, 1, 1, 1, 1 },
-					 { 0, 1, 0, 0, 0 },
+	struct mb_image arrow = MB_IMAGE({ 0, 0, 1, 0, 0 }, { 0, 1, 0, 0, 0 },
+					 { 1, 1, 1, 1, 1 }, { 0, 1, 0, 0, 0 },
 					 { 0, 0, 1, 0, 0 });
 
 	oob_number = number;
@@ -65,12 +63,9 @@ void board_output_number(bt_mesh_output_action_t action, uint32_t number)
 void board_prov_complete(void)
 {
 	struct mb_display *disp = mb_display_get();
-	struct mb_image arrow = MB_IMAGE({ 0, 1, 0, 1, 0 },
-					 { 0, 1, 0, 1, 0 },
-					 { 0, 0, 0, 0, 0 },
-					 { 1, 0, 0, 0, 1 },
+	struct mb_image arrow = MB_IMAGE({ 0, 1, 0, 1, 0 }, { 0, 1, 0, 1, 0 },
+					 { 0, 0, 0, 0, 0 }, { 1, 0, 0, 0, 1 },
 					 { 0, 1, 1, 1, 0 });
-
 
 	gpio_pin_interrupt_configure(gpio, DT_GPIO_PIN(DT_ALIAS(sw0), gpios),
 				     GPIO_INT_DISABLE);
@@ -83,15 +78,11 @@ void board_init(void)
 {
 	struct mb_display *disp = mb_display_get();
 	static struct mb_image blink[] = {
-		MB_IMAGE({ 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
+		MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 },
+			 { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 },
 			 { 1, 1, 1, 1, 1 }),
-		MB_IMAGE({ 0, 0, 0, 0, 0 },
-			 { 0, 0, 0, 0, 0 },
-			 { 0, 0, 0, 0, 0 },
-			 { 0, 0, 0, 0, 0 },
+		MB_IMAGE({ 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 },
+			 { 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 },
 			 { 0, 0, 0, 0, 0 })
 	};
 

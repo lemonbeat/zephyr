@@ -34,8 +34,8 @@ static int stts751_enable_int(const struct device *dev, int enable)
  * stts751_trigger_set - link external trigger to event data ready
  */
 int stts751_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler)
+			const struct sensor_trigger *trig,
+			sensor_trigger_handler_t handler)
 {
 	struct stts751_data *stts751 = dev->data;
 
@@ -66,8 +66,7 @@ static void stts751_handle_interrupt(const struct device *dev)
 
 	stts751_status_reg_get(stts751->ctx, &status);
 
-	if (stts751->thsld_handler != NULL &&
-	    (status.t_high || status.t_low)) {
+	if (stts751->thsld_handler != NULL && (status.t_high || status.t_low)) {
 		stts751->thsld_handler(dev, &thsld_trigger);
 	}
 
@@ -131,9 +130,9 @@ int stts751_init_interrupt(const struct device *dev)
 
 	k_thread_create(&stts751->thread, stts751->thread_stack,
 			CONFIG_STTS751_THREAD_STACK_SIZE,
-			(k_thread_entry_t)stts751_thread, stts751,
-			NULL, NULL, K_PRIO_COOP(CONFIG_STTS751_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)stts751_thread, stts751, NULL, NULL,
+			K_PRIO_COOP(CONFIG_STTS751_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_STTS751_TRIGGER_GLOBAL_THREAD)
 	stts751->work.handler = stts751_work_cb;
 #endif /* CONFIG_STTS751_TRIGGER_OWN_THREAD */
@@ -154,14 +153,14 @@ int stts751_init_interrupt(const struct device *dev)
 	}
 
 	/* Enable interrupt on high temperature */
-	float temp_hi = (float) CONFIG_STTS751_TEMP_HI_THRESHOLD;
-	float temp_lo = (float) CONFIG_STTS751_TEMP_LO_THRESHOLD;
+	float temp_hi = (float)CONFIG_STTS751_TEMP_HI_THRESHOLD;
+	float temp_lo = (float)CONFIG_STTS751_TEMP_LO_THRESHOLD;
 
-	stts751_high_temperature_threshold_set(stts751->ctx,
-					stts751_from_celsius_to_lsb(temp_hi));
+	stts751_high_temperature_threshold_set(
+		stts751->ctx, stts751_from_celsius_to_lsb(temp_hi));
 
-	stts751_low_temperature_threshold_set(stts751->ctx,
-					stts751_from_celsius_to_lsb(temp_lo));
+	stts751_low_temperature_threshold_set(
+		stts751->ctx, stts751_from_celsius_to_lsb(temp_lo));
 
 	return gpio_pin_interrupt_configure(stts751->gpio, cfg->event_pin,
 					    GPIO_INT_EDGE_TO_ACTIVE);

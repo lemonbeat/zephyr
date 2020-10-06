@@ -22,8 +22,7 @@ static void vcnl4040_handle_cb(struct vcnl4040_data *data)
 }
 
 static void vcnl4040_gpio_callback(const struct device *dev,
-				   struct gpio_callback *cb,
-				   uint32_t pin_mask)
+				   struct gpio_callback *cb, uint32_t pin_mask)
 {
 	struct vcnl4040_data *data =
 		CONTAINER_OF(cb, struct vcnl4040_data, gpio_cb);
@@ -116,8 +115,7 @@ static void vcnl4040_work_handler(struct k_work *work)
 }
 #endif
 
-int vcnl4040_attr_set(const struct device *dev,
-		      enum sensor_channel chan,
+int vcnl4040_attr_set(const struct device *dev, enum sensor_channel chan,
 		      enum sensor_attribute attr,
 		      const struct sensor_value *val)
 {
@@ -254,10 +252,9 @@ int vcnl4040_trigger_init(const struct device *dev)
 	k_sem_init(&data->trig_sem, 0, UINT_MAX);
 	k_thread_create(&data->thread, data->thread_stack,
 			CONFIG_VCNL4040_THREAD_STACK_SIZE,
-			(k_thread_entry_t)vcnl4040_thread_main,
-			data, NULL, NULL,
-			K_PRIO_COOP(CONFIG_VCNL4040_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)vcnl4040_thread_main, data, NULL,
+			NULL, K_PRIO_COOP(CONFIG_VCNL4040_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 	k_thread_name_set(&data->thread, "VCNL4040 trigger");
 #elif defined(CONFIG_VCNL4040_TRIGGER_GLOBAL_THREAD)
 	data->work.handler = vcnl4040_work_handler;

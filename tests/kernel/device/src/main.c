@@ -11,13 +11,12 @@
 #include <sys/printk.h>
 #include "abstract_driver.h"
 
+#define DUMMY_PORT_1 "dummy"
+#define DUMMY_PORT_2 "dummy_driver"
+#define BAD_DRIVER "bad_driver"
 
-#define DUMMY_PORT_1    "dummy"
-#define DUMMY_PORT_2    "dummy_driver"
-#define BAD_DRIVER	"bad_driver"
-
-#define MY_DRIVER_A     "my_driver_A"
-#define MY_DRIVER_B     "my_driver_B"
+#define MY_DRIVER_A "my_driver_A"
+#define MY_DRIVER_B "my_driver_B"
 
 extern void test_mmio_multiple(void);
 extern void test_mmio_toplevel(void);
@@ -163,24 +162,22 @@ void test_pre_kernel_detection(void)
 {
 	struct init_record *rpe = rp;
 
-	zassert_equal(rp - init_records, 4U,
-		      "bad record count");
+	zassert_equal(rp - init_records, 4U, "bad record count");
 	rp = init_records;
 	while ((rp < rpe) && rp->pre_kernel) {
-		zassert_equal(rp->is_in_isr, false,
-			      "rec %zu isr", rp - init_records);
-		zassert_equal(rp->is_pre_kernel, true,
-			      "rec %zu pre-kernel", rp - init_records);
+		zassert_equal(rp->is_in_isr, false, "rec %zu isr",
+			      rp - init_records);
+		zassert_equal(rp->is_pre_kernel, true, "rec %zu pre-kernel",
+			      rp - init_records);
 		++rp;
 	}
-	zassert_equal(rp - init_records, 2U,
-		      "bad pre-kernel count");
+	zassert_equal(rp - init_records, 2U, "bad pre-kernel count");
 
 	while (rp < rpe) {
-		zassert_equal(rp->is_in_isr, false,
-			      "rec %zu isr", rp - init_records);
-		zassert_equal(rp->is_pre_kernel, false,
-			      "rec %zu post-kernel", rp - init_records);
+		zassert_equal(rp->is_in_isr, false, "rec %zu isr",
+			      rp - init_records);
+		zassert_equal(rp->is_pre_kernel, false, "rec %zu post-kernel",
+			      rp - init_records);
 		++rp;
 	}
 }
@@ -230,8 +227,7 @@ static void test_enable_and_disable_automatic_idle_pm(void)
 		return;
 	}
 
-	zassert_true((ret == 0),
-		"Unable to get active state to device");
+	zassert_true((ret == 0), "Unable to get active state to device");
 
 	/* enable automatic idle PM and check its status */
 	device_pm_enable(dev);
@@ -291,26 +287,23 @@ void test_dummy_device_pm(void)
 		return;
 	}
 
-	zassert_true((ret == 0),
-			"Unable to set active state to device");
+	zassert_true((ret == 0), "Unable to set active state to device");
 
 	ret = device_get_power_state(dev, &device_power_state);
-	zassert_true((ret == 0),
-			"Unable to get active state to device");
+	zassert_true((ret == 0), "Unable to get active state to device");
 	zassert_true((device_power_state == DEVICE_PM_ACTIVE_STATE),
-			"Error power status");
+		     "Error power status");
 
 	/* Set device state to DEVICE_PM_FORCE_SUSPEND_STATE */
-	ret = device_set_power_state(dev,
-		DEVICE_PM_FORCE_SUSPEND_STATE, NULL, NULL);
+	ret = device_set_power_state(dev, DEVICE_PM_FORCE_SUSPEND_STATE, NULL,
+				     NULL);
 
 	zassert_true((ret == 0), "Unable to force suspend device");
 
 	ret = device_get_power_state(dev, &device_power_state);
-	zassert_true((ret == 0),
-			"Unable to get suspend state to device");
+	zassert_true((ret == 0), "Unable to get suspend state to device");
 	zassert_true((device_power_state == DEVICE_PM_ACTIVE_STATE),
-			"Error power status");
+		     "Error power status");
 }
 #else
 static void test_enable_and_disable_automatic_idle_pm(void)
@@ -353,12 +346,11 @@ void test_device_init_level(void)
 	 * correct, and it should be 1, 2, 3, 4
 	 */
 	for (int i = 0; i < 4; i++) {
-		if (init_level_sequence[i] != (i+1))
+		if (init_level_sequence[i] != (i + 1))
 			seq_correct = false;
 	}
 
-	zassert_true((seq_correct == true),
-			"init sequence is not correct");
+	zassert_true((seq_correct == true), "init sequence is not correct");
 }
 
 /**
@@ -379,14 +371,13 @@ void test_device_init_priority(void)
 	 * and it should be 1, 2, 3, 4
 	 */
 	for (int i = 0; i < 4; i++) {
-		if (init_priority_sequence[i] != (i+1))
+		if (init_priority_sequence[i] != (i + 1))
 			sequence_correct = false;
 	}
 
 	zassert_true((sequence_correct == true),
-			"init sequence is not correct");
+		     "init sequence is not correct");
 }
-
 
 /**
  * @brief Test abstraction of device drivers with common functionalities
@@ -432,27 +423,26 @@ void test_abstraction_driver_common(void)
 	zassert_true(baz == 2, "common API do_that fail");
 }
 
-
 /**
  * @}
  */
 
 void test_main(void)
 {
-	ztest_test_suite(device,
-			 ztest_unit_test(test_dummy_device_pm),
-			 ztest_unit_test(test_build_suspend_device_list),
-			 ztest_unit_test(test_dummy_device),
-			 ztest_unit_test(test_enable_and_disable_automatic_idle_pm),
-			 ztest_unit_test(test_pre_kernel_detection),
-			 ztest_user_unit_test(test_bogus_dynamic_name),
-			 ztest_user_unit_test(test_dynamic_name),
-			 ztest_unit_test(test_device_init_level),
-			 ztest_unit_test(test_device_init_priority),
-			 ztest_unit_test(test_abstraction_driver_common),
-			 ztest_unit_test(test_mmio_single),
-			 ztest_unit_test(test_mmio_multiple),
-			 ztest_unit_test(test_mmio_toplevel),
-			 ztest_unit_test(test_mmio_device_map));
+	ztest_test_suite(
+		device, ztest_unit_test(test_dummy_device_pm),
+		ztest_unit_test(test_build_suspend_device_list),
+		ztest_unit_test(test_dummy_device),
+		ztest_unit_test(test_enable_and_disable_automatic_idle_pm),
+		ztest_unit_test(test_pre_kernel_detection),
+		ztest_user_unit_test(test_bogus_dynamic_name),
+		ztest_user_unit_test(test_dynamic_name),
+		ztest_unit_test(test_device_init_level),
+		ztest_unit_test(test_device_init_priority),
+		ztest_unit_test(test_abstraction_driver_common),
+		ztest_unit_test(test_mmio_single),
+		ztest_unit_test(test_mmio_multiple),
+		ztest_unit_test(test_mmio_toplevel),
+		ztest_unit_test(test_mmio_device_map));
 	ztest_run_test_suite(device);
 }

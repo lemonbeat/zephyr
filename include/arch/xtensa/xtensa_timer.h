@@ -23,13 +23,13 @@
 #define ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_TIMER_H_
 
 #ifdef __ASSEMBLER__
-#include    <xtensa/coreasm.h>
+#include <xtensa/coreasm.h>
 #endif
 
-#include    <xtensa/corebits.h>
-#include    <xtensa/config/system.h>
+#include <xtensa/corebits.h>
+#include <xtensa/config/system.h>
 
-#include    "xtensa_rtos.h"     /* in case this wasn't included directly */
+#include "xtensa_rtos.h" /* in case this wasn't included directly */
 
 #define USE_INTERNAL_TIMER 1
 #define EXTERNAL_TIMER_IRQ -1
@@ -47,55 +47,55 @@
 #endif /* XCHAL_NUM_TIMERS */
 
 #ifndef XT_TIMER_INDEX
-	#if XCHAL_TIMER3_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
-	  #if XCHAL_INT_LEVEL(XCHAL_TIMER3_INTERRUPT) <= XCHAL_EXCM_LEVEL
-	    #undef  XT_TIMER_INDEX
-	    #define XT_TIMER_INDEX    3
-	  #endif
-	#endif
-	#if XCHAL_TIMER2_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
-	  #if XCHAL_INT_LEVEL(XCHAL_TIMER2_INTERRUPT) <= XCHAL_EXCM_LEVEL
-	    #undef  XT_TIMER_INDEX
-	    #define XT_TIMER_INDEX    2
-	  #endif
-	#endif
-	#if XCHAL_TIMER1_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
-	  #if XCHAL_INT_LEVEL(XCHAL_TIMER1_INTERRUPT) <= XCHAL_EXCM_LEVEL
-	    #undef  XT_TIMER_INDEX
-	    #define XT_TIMER_INDEX    1
-	  #endif
-	#endif
-	#if XCHAL_TIMER0_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
-	  #if XCHAL_INT_LEVEL(XCHAL_TIMER0_INTERRUPT) <= XCHAL_EXCM_LEVEL
-	    #undef  XT_TIMER_INDEX
-	    #define XT_TIMER_INDEX    0
-	  #endif
-	#endif
+#if XCHAL_TIMER3_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
+#if XCHAL_INT_LEVEL(XCHAL_TIMER3_INTERRUPT) <= XCHAL_EXCM_LEVEL
+#undef XT_TIMER_INDEX
+#define XT_TIMER_INDEX 3
+#endif
+#endif
+#if XCHAL_TIMER2_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
+#if XCHAL_INT_LEVEL(XCHAL_TIMER2_INTERRUPT) <= XCHAL_EXCM_LEVEL
+#undef XT_TIMER_INDEX
+#define XT_TIMER_INDEX 2
+#endif
+#endif
+#if XCHAL_TIMER1_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
+#if XCHAL_INT_LEVEL(XCHAL_TIMER1_INTERRUPT) <= XCHAL_EXCM_LEVEL
+#undef XT_TIMER_INDEX
+#define XT_TIMER_INDEX 1
+#endif
+#endif
+#if XCHAL_TIMER0_INTERRUPT != XTHAL_TIMER_UNCONFIGURED
+#if XCHAL_INT_LEVEL(XCHAL_TIMER0_INTERRUPT) <= XCHAL_EXCM_LEVEL
+#undef XT_TIMER_INDEX
+#define XT_TIMER_INDEX 0
+#endif
+#endif
 #endif
 #ifndef XT_TIMER_INDEX
 #error "There is no suitable timer in this Xtensa configuration."
 #endif
 
-#define XT_CCOMPARE             ((CCOMPARE) + (XT_TIMER_INDEX))
-#define XT_TIMER_INTNUM         XCHAL_TIMER_INTERRUPT(XT_TIMER_INDEX)
+#define XT_CCOMPARE ((CCOMPARE) + (XT_TIMER_INDEX))
+#define XT_TIMER_INTNUM XCHAL_TIMER_INTERRUPT(XT_TIMER_INDEX)
 #if XT_TIMER_INTNUM == XTHAL_TIMER_UNCONFIGURED
 #error "The timer selected by XT_TIMER_INDEX does not exist in this core."
 #endif
 #else /* Case of an external timer which is not emulated by internal timer */
-#define XT_TIMER_INTNUM         EXTERNAL_TIMER_IRQ
+#define XT_TIMER_INTNUM EXTERNAL_TIMER_IRQ
 #endif /* USE_INTERNAL_TIMER || (EXTERNAL_TIMER_IRQ < 0) */
 
 #if USE_INTERNAL_TIMER
-#define XT_TIMER_INTPRI         XCHAL_INT_LEVEL(XT_TIMER_INTNUM)
+#define XT_TIMER_INTPRI XCHAL_INT_LEVEL(XT_TIMER_INTNUM)
 #else
-#define XT_TIMER_INTPRI         EXTERNAL_TIMER_IRQ_PRIORITY
+#define XT_TIMER_INTPRI EXTERNAL_TIMER_IRQ_PRIORITY
 #endif /* USE_INTERNAL_TIMER */
 
 #if XT_TIMER_INTPRI > XCHAL_EXCM_LEVEL
 #error "The timer interrupt cannot be high priority (use medium or low)."
 #endif
 
-#define XT_TIMER_INTEN          (1 << (XT_TIMER_INTNUM))
+#define XT_TIMER_INTEN (1 << (XT_TIMER_INTNUM))
 
 /*
  * Set processor clock frequency, used to determine clock divisor for timer
@@ -115,7 +115,7 @@
  * anyway!).
  */
 #if defined(XT_SIMULATOR) && !defined(XT_CLOCK_FREQ)
-#define XT_CLOCK_FREQ	DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency)
+#define XT_CLOCK_FREQ DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency)
 #endif
 
 #if !defined(XT_CLOCK_FREQ) && !defined(XT_BOARD)
@@ -131,17 +131,17 @@
  */
 #ifndef XT_TICK_PER_SEC
 #if CONFIG_TICKLESS_KERNEL
-#define XT_TICK_PER_SEC         1000	/* In tickless kernel 1TICK  = 1msec */
+#define XT_TICK_PER_SEC 1000 /* In tickless kernel 1TICK  = 1msec */
 #else
-#define XT_TICK_PER_SEC         CONFIG_SYS_CLOCK_TICKS_PER_SEC
-#endif  /* CONFIG_TICKLESS_KERNEL */
+#define XT_TICK_PER_SEC CONFIG_SYS_CLOCK_TICKS_PER_SEC
+#endif /* CONFIG_TICKLESS_KERNEL */
 #endif /* XT_TICK_PER_SEC */
 
 /*
  * Derivation of clock divisor for timer tick and interrupt (one per tick).
  */
 #ifdef XT_CLOCK_FREQ
-#define XT_TICK_DIVISOR     (XT_CLOCK_FREQ / XT_TICK_PER_SEC)
+#define XT_TICK_DIVISOR (XT_CLOCK_FREQ / XT_TICK_PER_SEC)
 #endif
 
 #if USE_INTERNAL_TIMER || (EXTERNAL_TIMER_IRQ < 0)
@@ -152,4 +152,4 @@ extern void z_xt_tick_divisor_init(void);
 
 #endif // Internal/External timer
 
-#endif  /* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_TIMER_H_ */
+#endif /* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_TIMER_H_ */

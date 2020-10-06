@@ -35,21 +35,19 @@ struct k_mem_pool {
 	_wait_q_t wait_q;
 };
 
-#define Z_MEM_POOL_DEFINE(name, minsz, maxsz, nmax, align)		\
-	char __aligned(WB_UP(align)) _mpool_buf_##name[WB_UP(maxsz) * nmax \
-				  + _MPOOL_BITS_SIZE(maxsz, minsz, nmax)]; \
-	struct sys_mem_pool_lvl						\
-		_mpool_lvls_##name[Z_MPOOL_LVLS(maxsz, minsz)]; \
-	Z_STRUCT_SECTION_ITERABLE(k_mem_pool, name) = { \
-		.base = {						\
-			.buf = _mpool_buf_##name,			\
-			.max_sz = WB_UP(maxsz),				\
-			.n_max = nmax,					\
-			.n_levels = Z_MPOOL_LVLS(maxsz, minsz),		\
-			.levels = _mpool_lvls_##name,			\
-			.flags = SYS_MEM_POOL_KERNEL			\
-		} \
-	}; \
+#define Z_MEM_POOL_DEFINE(name, minsz, maxsz, nmax, align)                      \
+	char __aligned(WB_UP(align))                                            \
+		_mpool_buf_##name[WB_UP(maxsz) * nmax +                         \
+				  _MPOOL_BITS_SIZE(maxsz, minsz, nmax)];        \
+	struct sys_mem_pool_lvl _mpool_lvls_##name[Z_MPOOL_LVLS(maxsz, minsz)]; \
+	Z_STRUCT_SECTION_ITERABLE(k_mem_pool, name) = {                         \
+		.base = { .buf = _mpool_buf_##name,                             \
+			  .max_sz = WB_UP(maxsz),                               \
+			  .n_max = nmax,                                        \
+			  .n_levels = Z_MPOOL_LVLS(maxsz, minsz),               \
+			  .levels = _mpool_lvls_##name,                         \
+			  .flags = SYS_MEM_POOL_KERNEL }                        \
+	};                                                                      \
 	BUILD_ASSERT(WB_UP(maxsz) >= _MPOOL_MINBLK)
 
 #endif /* ZEPHYR_INCLUDE_MEMPOOL_SYS_H_ */

@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-#define Z_DEVICE_MAX_NAME_LEN	48
+#define Z_DEVICE_MAX_NAME_LEN 48
 
 /**
  * @def DEVICE_NAME_GET
@@ -55,9 +55,8 @@ extern "C" {
  * (@p pm_control_fn), no API (@p api_ptr), and a device name derived from
  * the @p init_fn name (@p dev_name).
  */
-#define SYS_DEVICE_DEFINE(drv_name, init_fn, pm_control_fn, level, prio) \
-	DEVICE_DEFINE(Z_SYS_NAME(init_fn), drv_name, init_fn,		\
-		      pm_control_fn,					\
+#define SYS_DEVICE_DEFINE(drv_name, init_fn, pm_control_fn, level, prio)     \
+	DEVICE_DEFINE(Z_SYS_NAME(init_fn), drv_name, init_fn, pm_control_fn, \
 		      NULL, NULL, level, prio, NULL)
 
 /**
@@ -66,10 +65,9 @@ extern "C" {
  * @brief Invoke DEVICE_DEFINE() with no power management support (@p
  * pm_control_fn) and no API (@p api_ptr).
  */
-#define DEVICE_INIT(dev_name, drv_name, init_fn,			\
-		    data_ptr, cfg_ptr, level, prio)			\
-	DEVICE_DEFINE(dev_name, drv_name, init_fn,			\
-		      device_pm_control_nop,				\
+#define DEVICE_INIT(dev_name, drv_name, init_fn, data_ptr, cfg_ptr, level, \
+		    prio)                                                  \
+	DEVICE_DEFINE(dev_name, drv_name, init_fn, device_pm_control_nop,  \
 		      data_ptr, cfg_ptr, level, prio, NULL)
 
 /**
@@ -78,10 +76,9 @@ extern "C" {
  * @brief Invoke DEVICE_DEFINE() with no power management support (@p
  * pm_control_fn).
  */
-#define DEVICE_AND_API_INIT(dev_name, drv_name, init_fn,		\
-			    data_ptr, cfg_ptr, level, prio, api_ptr)	\
-	DEVICE_DEFINE(dev_name, drv_name, init_fn,			\
-		      device_pm_control_nop,				\
+#define DEVICE_AND_API_INIT(dev_name, drv_name, init_fn, data_ptr, cfg_ptr, \
+			    level, prio, api_ptr)                           \
+	DEVICE_DEFINE(dev_name, drv_name, init_fn, device_pm_control_nop,   \
 		      data_ptr, cfg_ptr, level, prio, api_ptr)
 
 /**
@@ -123,19 +120,19 @@ extern "C" {
  * @param api_ptr Provides an initial pointer to the API function struct
  * used by the driver. Can be NULL.
  */
-#define DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn,	\
-		      data_ptr, cfg_ptr, level, prio, api_ptr)		\
-	Z_DEVICE_DEFINE_PM(dev_name)					\
-	static const Z_DECL_ALIGN(struct device)			\
-		DEVICE_NAME_GET(dev_name) __used			\
-	__attribute__((__section__(".device_" #level STRINGIFY(prio)))) = { \
-		.name = drv_name,					\
-		.config = (cfg_ptr),					\
-		.api = (api_ptr),					\
-		.data = (data_ptr),					\
-		Z_DEVICE_DEFINE_PM_INIT(dev_name, pm_control_fn)	\
-	};								\
-	Z_INIT_ENTRY_DEFINE(_CONCAT(__device_, dev_name), init_fn,	\
+#define DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn, data_ptr,   \
+		      cfg_ptr, level, prio, api_ptr)                          \
+	Z_DEVICE_DEFINE_PM(dev_name)                                          \
+	static const Z_DECL_ALIGN(struct device) DEVICE_NAME_GET(dev_name)    \
+		__used __attribute__(                                         \
+			(__section__(".device_" #level STRINGIFY(prio)))) = { \
+			.name = drv_name,                                     \
+			.config = (cfg_ptr),                                  \
+			.api = (api_ptr),                                     \
+			.data = (data_ptr),                                   \
+			Z_DEVICE_DEFINE_PM_INIT(dev_name, pm_control_fn)      \
+		};                                                            \
+	Z_INIT_ENTRY_DEFINE(_CONCAT(__device_, dev_name), init_fn,            \
 			    (&_CONCAT(__device_, dev_name)), level, prio)
 
 /**
@@ -169,8 +166,8 @@ extern "C" {
  */
 #define DEVICE_DECLARE(name) static const struct device DEVICE_NAME_GET(name)
 
-typedef void (*device_pm_cb)(const struct device *dev,
-			     int status, void *context, void *arg);
+typedef void (*device_pm_cb)(const struct device *dev, int status,
+			     void *context, void *arg);
 
 /**
  * @brief Device PM info
@@ -205,13 +202,13 @@ struct device {
 	/** Address of the API structure exposed by the device instance */
 	const void *api;
 	/** Address of the device instance private data */
-	void * const data;
+	void *const data;
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
 	/** Power Management function */
 	int (*device_pm_control)(const struct device *dev, uint32_t command,
 				 void *context, device_pm_cb cb, void *arg);
 	/** Pointer to device instance power management data */
-	struct device_pm * const pm;
+	struct device_pm *const pm;
 #endif
 };
 
@@ -237,7 +234,7 @@ __syscall const struct device *device_get_binding(const char *name);
  *
  * @return the number of statically allocated devices.
  */
-size_t z_device_get_all_static(const struct device * *devices);
+size_t z_device_get_all_static(const struct device **devices);
 
 /** @brief Determine whether a device has been successfully initialized.
  *
@@ -266,7 +263,7 @@ bool z_device_ready(const struct device *dev);
  *
  * @details Normal operation of the device. All device context is retained.
  */
-#define DEVICE_PM_ACTIVE_STATE          1
+#define DEVICE_PM_ACTIVE_STATE 1
 
 /** @def DEVICE_PM_LOW_POWER_STATE
  *
@@ -275,7 +272,7 @@ bool z_device_ready(const struct device *dev);
  * @details Device context is preserved by the HW and need not be
  * restored by the driver.
  */
-#define DEVICE_PM_LOW_POWER_STATE       2
+#define DEVICE_PM_LOW_POWER_STATE 2
 
 /** @def DEVICE_PM_SUSPEND_STATE
  *
@@ -285,7 +282,7 @@ bool z_device_ready(const struct device *dev);
  * Device drivers must save and restore or reinitialize any context
  * lost by the hardware
  */
-#define DEVICE_PM_SUSPEND_STATE         3
+#define DEVICE_PM_SUSPEND_STATE 3
 
 /** @def DEVICE_PM_FORCE_SUSPEND_STATE
  *
@@ -297,7 +294,7 @@ bool z_device_ready(const struct device *dev);
  * Most device context is lost by the hardware. Device drivers must
  * save and restore or reinitialize any context lost by the hardware.
  */
-#define DEVICE_PM_FORCE_SUSPEND_STATE	4
+#define DEVICE_PM_FORCE_SUSPEND_STATE 4
 
 /** @def DEVICE_PM_OFF_STATE
  *
@@ -307,11 +304,11 @@ bool z_device_ready(const struct device *dev);
  * The device context is lost when this state is entered, so the OS
  * software will reinitialize the device when powering it back on
  */
-#define DEVICE_PM_OFF_STATE             5
+#define DEVICE_PM_OFF_STATE 5
 
 /* Constants defining support device power commands */
-#define DEVICE_PM_SET_POWER_STATE       1
-#define DEVICE_PM_GET_POWER_STATE       2
+#define DEVICE_PM_SET_POWER_STATE 1
+#define DEVICE_PM_GET_POWER_STATE 2
 
 #endif /* CONFIG_DEVICE_POWER_MANAGEMENT */
 
@@ -361,10 +358,8 @@ void device_busy_clear(const struct device *busy_dev);
  * @retval -ENOTSUP for all operations.
  */
 int device_pm_control_nop(const struct device *unused_device,
-			  uint32_t unused_ctrl_command,
-			  void *unused_context,
-			  device_pm_cb cb,
-			  void *unused_arg);
+			  uint32_t unused_ctrl_command, void *unused_context,
+			  device_pm_cb cb, void *unused_arg);
 /**
  * @brief Call the set power state function of a device
  *
@@ -383,9 +378,8 @@ static inline int device_set_power_state(const struct device *dev,
 					 uint32_t device_power_state,
 					 device_pm_cb cb, void *arg)
 {
-	return dev->device_pm_control(dev,
-					 DEVICE_PM_SET_POWER_STATE,
-					 &device_power_state, cb, arg);
+	return dev->device_pm_control(dev, DEVICE_PM_SET_POWER_STATE,
+				      &device_power_state, cb, arg);
 }
 
 /**
@@ -404,10 +398,8 @@ static inline int device_set_power_state(const struct device *dev,
 static inline int device_get_power_state(const struct device *dev,
 					 uint32_t *device_power_state)
 {
-	return dev->device_pm_control(dev,
-					 DEVICE_PM_GET_POWER_STATE,
-					 device_power_state,
-					 NULL, NULL);
+	return dev->device_pm_control(dev, DEVICE_PM_GET_POWER_STATE,
+				      device_power_state, NULL, NULL);
 }
 
 /**
@@ -423,8 +415,8 @@ static inline int device_get_power_state(const struct device *dev,
  *
  * @deprecated in 2.4 release, replace with z_device_get_all_static()
  */
-__deprecated static inline void device_list_get(const struct device * *device_list,
-						int *device_count)
+__deprecated static inline void
+device_list_get(const struct device **device_list, int *device_count)
 {
 	*device_count = z_device_get_all_static(device_list);
 }
@@ -548,12 +540,28 @@ int device_pm_put(const struct device *dev);
  */
 int device_pm_put_sync(const struct device *dev);
 #else
-static inline void device_pm_enable(const struct device *dev) { }
-static inline void device_pm_disable(const struct device *dev) { }
-static inline int device_pm_get(const struct device *dev) { return -ENOTSUP; }
-static inline int device_pm_get_sync(const struct device *dev) { return -ENOTSUP; }
-static inline int device_pm_put(const struct device *dev) { return -ENOTSUP; }
-static inline int device_pm_put_sync(const struct device *dev) { return -ENOTSUP; }
+static inline void device_pm_enable(const struct device *dev)
+{
+}
+static inline void device_pm_disable(const struct device *dev)
+{
+}
+static inline int device_pm_get(const struct device *dev)
+{
+	return -ENOTSUP;
+}
+static inline int device_pm_get_sync(const struct device *dev)
+{
+	return -ENOTSUP;
+}
+static inline int device_pm_put(const struct device *dev)
+{
+	return -ENOTSUP;
+}
+static inline int device_pm_put_sync(const struct device *dev)
+{
+	return -ENOTSUP;
+}
 #endif
 #else
 #define device_pm_control_nop(...) NULL
@@ -564,21 +572,19 @@ static inline int device_pm_put_sync(const struct device *dev) { return -ENOTSUP
  */
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-#define Z_DEVICE_DEFINE_PM(dev_name)					\
-	static struct device_pm _CONCAT(__pm_, dev_name) __used  = {	\
-		.usage = ATOMIC_INIT(0),				\
-		.lock = Z_SEM_INITIALIZER(				\
-			_CONCAT(__pm_, dev_name).lock, 1, 1),		\
-		.signal = K_POLL_SIGNAL_INITIALIZER(			\
-			_CONCAT(__pm_, dev_name).signal),		\
-		.event = K_POLL_EVENT_INITIALIZER(			\
-			K_POLL_TYPE_SIGNAL,				\
-			K_POLL_MODE_NOTIFY_ONLY,			\
-			&_CONCAT(__pm_, dev_name).signal),		\
+#define Z_DEVICE_DEFINE_PM(dev_name)                                        \
+	static struct device_pm _CONCAT(__pm_, dev_name) __used = {         \
+		.usage = ATOMIC_INIT(0),                                    \
+		.lock = Z_SEM_INITIALIZER(_CONCAT(__pm_, dev_name).lock, 1, \
+					  1),                               \
+		.signal = K_POLL_SIGNAL_INITIALIZER(                        \
+			_CONCAT(__pm_, dev_name).signal),                   \
+		.event = K_POLL_EVENT_INITIALIZER(                          \
+			K_POLL_TYPE_SIGNAL, K_POLL_MODE_NOTIFY_ONLY,        \
+			&_CONCAT(__pm_, dev_name).signal),                  \
 	};
-#define Z_DEVICE_DEFINE_PM_INIT(dev_name, pm_control_fn)		\
-	.device_pm_control = (pm_control_fn),				\
-	.pm  = &_CONCAT(__pm_, dev_name),
+#define Z_DEVICE_DEFINE_PM_INIT(dev_name, pm_control_fn) \
+	.device_pm_control = (pm_control_fn), .pm = &_CONCAT(__pm_, dev_name),
 #else
 #define Z_DEVICE_DEFINE_PM(dev_name)
 #define Z_DEVICE_DEFINE_PM_INIT(dev_name, pm_control_fn)

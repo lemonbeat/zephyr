@@ -60,20 +60,20 @@ struct shell_uart {
 };
 
 /** @brief Macro for creating shell UART transport instance. */
-#define SHELL_UART_DEFINE(_name, _tx_ringbuf_size, _rx_ringbuf_size)	\
-	static struct shell_uart_ctrl_blk _name##_ctrl_blk;		\
-	UART_SHELL_RX_TIMER_DECLARE(_name);				\
-	UART_SHELL_TX_RINGBUF_DECLARE(_name, _tx_ringbuf_size);		\
-	RING_BUF_DECLARE(_name##_rx_ringbuf, _rx_ringbuf_size);		\
-	static const struct shell_uart _name##_shell_uart = {		\
-		.ctrl_blk = &_name##_ctrl_blk,				\
-		.timer = UART_SHELL_RX_TIMER_PTR(_name),		\
-		.tx_ringbuf = UART_SHELL_TX_RINGBUF_PTR(_name),		\
-		.rx_ringbuf = &_name##_rx_ringbuf,			\
-	};								\
-	struct shell_transport _name = {				\
-		.api = &shell_uart_transport_api,			\
-		.ctx = (struct shell_uart *)&_name##_shell_uart		\
+#define SHELL_UART_DEFINE(_name, _tx_ringbuf_size, _rx_ringbuf_size) \
+	static struct shell_uart_ctrl_blk _name##_ctrl_blk;          \
+	UART_SHELL_RX_TIMER_DECLARE(_name);                          \
+	UART_SHELL_TX_RINGBUF_DECLARE(_name, _tx_ringbuf_size);      \
+	RING_BUF_DECLARE(_name##_rx_ringbuf, _rx_ringbuf_size);      \
+	static const struct shell_uart _name##_shell_uart = {        \
+		.ctrl_blk = &_name##_ctrl_blk,                       \
+		.timer = UART_SHELL_RX_TIMER_PTR(_name),             \
+		.tx_ringbuf = UART_SHELL_TX_RINGBUF_PTR(_name),      \
+		.rx_ringbuf = &_name##_rx_ringbuf,                   \
+	};                                                           \
+	struct shell_transport _name = {                             \
+		.api = &shell_uart_transport_api,                    \
+		.ctx = (struct shell_uart *)&_name##_shell_uart      \
 	}
 
 /**

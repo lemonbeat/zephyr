@@ -17,7 +17,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @defgroup file_system_storage File System Storage
  * @{
@@ -30,10 +29,10 @@ extern "C" {
  * @{
  */
 
-#define SETTINGS_MAX_DIR_DEPTH	8	/* max depth of settings tree */
-#define SETTINGS_MAX_NAME_LEN	(8 * SETTINGS_MAX_DIR_DEPTH)
-#define SETTINGS_MAX_VAL_LEN	256
-#define SETTINGS_NAME_SEPARATOR	'/'
+#define SETTINGS_MAX_DIR_DEPTH 8 /* max depth of settings tree */
+#define SETTINGS_MAX_NAME_LEN (8 * SETTINGS_MAX_DIR_DEPTH)
+#define SETTINGS_MAX_VAL_LEN 256
+#define SETTINGS_NAME_SEPARATOR '/'
 #define SETTINGS_NAME_END '='
 
 /* pleace for settings additions:
@@ -62,7 +61,6 @@ typedef ssize_t (*settings_read_cb)(void *cb_arg, void *data, size_t len);
  * These are registered using a call to @ref settings_register.
  */
 struct settings_handler {
-
 	const char *name;
 	/**< Name of subtree. */
 
@@ -128,7 +126,6 @@ struct settings_handler {
  * These are registered using a call to SETTINGS_REGISTER_STATIC().
  */
 struct settings_handler_static {
-
 	const char *name;
 	/**< Name of subtree. */
 
@@ -197,15 +194,15 @@ struct settings_handler_static {
  *
  */
 
-#define SETTINGS_STATIC_HANDLER_DEFINE(_hname, _tree, _get, _set, _commit,   \
-				       _export)				     \
-	const Z_STRUCT_SECTION_ITERABLE(settings_handler_static,	     \
-					settings_handler_ ## _hname) = {     \
-		.name = _tree,						     \
-		.h_get = _get,						     \
-		.h_set = _set,						     \
-		.h_commit = _commit,					     \
-		.h_export = _export,					     \
+#define SETTINGS_STATIC_HANDLER_DEFINE(_hname, _tree, _get, _set, _commit, \
+				       _export)                            \
+	const Z_STRUCT_SECTION_ITERABLE(settings_handler_static,           \
+					settings_handler_##_hname) = {     \
+		.name = _tree,                                             \
+		.h_get = _get,                                             \
+		.h_set = _set,                                             \
+		.h_commit = _commit,                                       \
+		.h_export = _export,                                       \
 	}
 
 /**
@@ -271,12 +268,9 @@ int settings_load_subtree(const char *subtree);
  *         Use with care as some settings backends would iterate through old
  *         values, and the current value is returned last.
  */
-typedef int (*settings_load_direct_cb)(
-	const char      *key,
-	size_t           len,
-	settings_read_cb read_cb,
-	void            *cb_arg,
-	void            *param);
+typedef int (*settings_load_direct_cb)(const char *key, size_t len,
+				       settings_read_cb read_cb, void *cb_arg,
+				       void *param);
 
 /**
  * Load limited set of serialized items using given callback.
@@ -295,10 +289,8 @@ typedef int (*settings_load_direct_cb)(
  *                        function is called.
  * @return 0 on success, non-zero on failure.
  */
-int settings_load_subtree_direct(
-	const char             *subtree,
-	settings_load_direct_cb cb,
-	void                   *param);
+int settings_load_subtree_direct(const char *subtree,
+				 settings_load_direct_cb cb, void *param);
 
 /**
  * Save currently running serialized items. All serialized items which are
@@ -354,7 +346,6 @@ int settings_commit_subtree(const char *subtree);
 /**
  * @} settings
  */
-
 
 /**
  * @defgroup settings_backend Settings backend interface
@@ -467,7 +458,6 @@ void settings_src_register(struct settings_store *cs);
  */
 void settings_dst_register(struct settings_store *cs);
 
-
 /*
  * API for handler lookup
  */
@@ -496,10 +486,8 @@ struct settings_handler_static *settings_parse_and_lookup(const char *name,
  *
  * @return 0 or negative error code
  */
-int settings_call_set_handler(const char *name,
-			      size_t len,
-			      settings_read_cb read_cb,
-			      void *read_cb_arg,
+int settings_call_set_handler(const char *name, size_t len,
+			      settings_read_cb read_cb, void *read_cb_arg,
 			      const struct settings_load_arg *load_arg);
 /**
  * @}
@@ -593,7 +581,6 @@ int settings_runtime_commit(const char *name);
  */
 
 #endif /* CONFIG_SETTINGS_RUNTIME */
-
 
 #ifdef __cplusplus
 }

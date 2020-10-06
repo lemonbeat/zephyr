@@ -30,8 +30,7 @@ static int mcux_lptmr_start(const struct device *dev)
 {
 	const struct mcux_lptmr_config *config = dev->config;
 
-	LPTMR_EnableInterrupts(config->base,
-			       kLPTMR_TimerInterruptEnable);
+	LPTMR_EnableInterrupts(config->base, kLPTMR_TimerInterruptEnable);
 	LPTMR_StartTimer(config->base);
 
 	return 0;
@@ -41,8 +40,7 @@ static int mcux_lptmr_stop(const struct device *dev)
 {
 	const struct mcux_lptmr_config *config = dev->config;
 
-	LPTMR_DisableInterrupts(config->base,
-				kLPTMR_TimerInterruptEnable);
+	LPTMR_DisableInterrupts(config->base, kLPTMR_TimerInterruptEnable);
 	LPTMR_StopTimer(config->base);
 
 	return 0;
@@ -163,38 +161,38 @@ static const struct counter_driver_api mcux_lptmr_driver_api = {
 #define TO_LPTMR_PIN_SEL(val) _DO_CONCAT(kLPTMR_PinSelectInput_, val)
 
 /* Prescaler mapping */
-#define LPTMR_PRESCALER_2     kLPTMR_Prescale_Glitch_0
-#define LPTMR_PRESCALER_4     kLPTMR_Prescale_Glitch_1
-#define LPTMR_PRESCALER_8     kLPTMR_Prescale_Glitch_2
-#define LPTMR_PRESCALER_16    kLPTMR_Prescale_Glitch_3
-#define LPTMR_PRESCALER_32    kLPTMR_Prescale_Glitch_4
-#define LPTMR_PRESCALER_64    kLPTMR_Prescale_Glitch_5
-#define LPTMR_PRESCALER_128   kLPTMR_Prescale_Glitch_6
-#define LPTMR_PRESCALER_256   kLPTMR_Prescale_Glitch_7
-#define LPTMR_PRESCALER_512   kLPTMR_Prescale_Glitch_8
-#define LPTMR_PRESCALER_1024  kLPTMR_Prescale_Glitch_9
-#define LPTMR_PRESCALER_2048  kLPTMR_Prescale_Glitch_10
-#define LPTMR_PRESCALER_4096  kLPTMR_Prescale_Glitch_11
-#define LPTMR_PRESCALER_8192  kLPTMR_Prescale_Glitch_12
+#define LPTMR_PRESCALER_2 kLPTMR_Prescale_Glitch_0
+#define LPTMR_PRESCALER_4 kLPTMR_Prescale_Glitch_1
+#define LPTMR_PRESCALER_8 kLPTMR_Prescale_Glitch_2
+#define LPTMR_PRESCALER_16 kLPTMR_Prescale_Glitch_3
+#define LPTMR_PRESCALER_32 kLPTMR_Prescale_Glitch_4
+#define LPTMR_PRESCALER_64 kLPTMR_Prescale_Glitch_5
+#define LPTMR_PRESCALER_128 kLPTMR_Prescale_Glitch_6
+#define LPTMR_PRESCALER_256 kLPTMR_Prescale_Glitch_7
+#define LPTMR_PRESCALER_512 kLPTMR_Prescale_Glitch_8
+#define LPTMR_PRESCALER_1024 kLPTMR_Prescale_Glitch_9
+#define LPTMR_PRESCALER_2048 kLPTMR_Prescale_Glitch_10
+#define LPTMR_PRESCALER_4096 kLPTMR_Prescale_Glitch_11
+#define LPTMR_PRESCALER_8192 kLPTMR_Prescale_Glitch_12
 #define LPTMR_PRESCALER_16384 kLPTMR_Prescale_Glitch_13
 #define LPTMR_PRESCALER_32768 kLPTMR_Prescale_Glitch_14
 #define LPTMR_PRESCALER_65536 kLPTMR_Prescale_Glitch_15
 #define TO_LPTMR_PRESCALER(val) _DO_CONCAT(LPTMR_PRESCALER_, val)
 
 /* Glitch filter mapping */
-#define LPTMR_GLITCH_2     kLPTMR_Prescale_Glitch_1
-#define LPTMR_GLITCH_4     kLPTMR_Prescale_Glitch_2
-#define LPTMR_GLITCH_8     kLPTMR_Prescale_Glitch_3
-#define LPTMR_GLITCH_16    kLPTMR_Prescale_Glitch_4
-#define LPTMR_GLITCH_32    kLPTMR_Prescale_Glitch_5
-#define LPTMR_GLITCH_64    kLPTMR_Prescale_Glitch_6
-#define LPTMR_GLITCH_128   kLPTMR_Prescale_Glitch_7
-#define LPTMR_GLITCH_256   kLPTMR_Prescale_Glitch_8
-#define LPTMR_GLITCH_512   kLPTMR_Prescale_Glitch_9
-#define LPTMR_GLITCH_1024  kLPTMR_Prescale_Glitch_10
-#define LPTMR_GLITCH_2048  kLPTMR_Prescale_Glitch_11
-#define LPTMR_GLITCH_4096  kLPTMR_Prescale_Glitch_12
-#define LPTMR_GLITCH_8192  kLPTMR_Prescale_Glitch_13
+#define LPTMR_GLITCH_2 kLPTMR_Prescale_Glitch_1
+#define LPTMR_GLITCH_4 kLPTMR_Prescale_Glitch_2
+#define LPTMR_GLITCH_8 kLPTMR_Prescale_Glitch_3
+#define LPTMR_GLITCH_16 kLPTMR_Prescale_Glitch_4
+#define LPTMR_GLITCH_32 kLPTMR_Prescale_Glitch_5
+#define LPTMR_GLITCH_64 kLPTMR_Prescale_Glitch_6
+#define LPTMR_GLITCH_128 kLPTMR_Prescale_Glitch_7
+#define LPTMR_GLITCH_256 kLPTMR_Prescale_Glitch_8
+#define LPTMR_GLITCH_512 kLPTMR_Prescale_Glitch_9
+#define LPTMR_GLITCH_1024 kLPTMR_Prescale_Glitch_10
+#define LPTMR_GLITCH_2048 kLPTMR_Prescale_Glitch_11
+#define LPTMR_GLITCH_4096 kLPTMR_Prescale_Glitch_12
+#define LPTMR_GLITCH_8192 kLPTMR_Prescale_Glitch_13
 #define LPTMR_GLITCH_16384 kLPTMR_Prescale_Glitch_14
 #define LPTMR_GLITCH_32768 kLPTMR_Prescale_Glitch_15
 #define TO_LPTMR_GLITCH(val) _DO_CONCAT(LPTMR_GLITCH_, val)
@@ -241,16 +239,14 @@ static struct mcux_lptmr_config mcux_lptmr_config_0 = {
 	.irq_config_func = mcux_lptmr_irq_config_0,
 };
 
-DEVICE_AND_API_INIT(mcux_lptmr_0, DT_INST_LABEL(0),
-		    &mcux_lptmr_init, &mcux_lptmr_data_0,
-		    &mcux_lptmr_config_0,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &mcux_lptmr_driver_api);
+DEVICE_AND_API_INIT(mcux_lptmr_0, DT_INST_LABEL(0), &mcux_lptmr_init,
+		    &mcux_lptmr_data_0, &mcux_lptmr_config_0, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &mcux_lptmr_driver_api);
 
 static void mcux_lptmr_irq_config_0(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
-		    mcux_lptmr_isr, DEVICE_GET(mcux_lptmr_0), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), mcux_lptmr_isr,
+		    DEVICE_GET(mcux_lptmr_0), 0);
 	irq_enable(DT_INST_IRQN(0));
 }
-#endif	/* DT_NODE_HAS_STATUS(DT_DRV_INST(0), okay) */
+#endif /* DT_NODE_HAS_STATUS(DT_DRV_INST(0), okay) */

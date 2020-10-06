@@ -13,8 +13,8 @@
 
 #include "biquad_f32.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)98)
-#define REL_ERROR_THRESH	(1.2e-3)
+#define SNR_ERROR_THRESH ((float32_t)98)
+#define REL_ERROR_THRESH (1.2e-3)
 
 static void test_arm_biquad_cascade_df1_f32_default(void)
 {
@@ -52,13 +52,13 @@ static void test_arm_biquad_cascade_df1_f32_default(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -101,13 +101,13 @@ static void test_arm_biquad_cascade_df2t_f32_default(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -142,8 +142,8 @@ static void test_arm_biquad_cascade_df1_f32_rand(void)
 		block_size = config[1];
 
 		/* Initialise instance */
-		arm_biquad_cascade_df1_init_f32(
-			&inst, stage_count, coeff, state);
+		arm_biquad_cascade_df1_init_f32(&inst, stage_count, coeff,
+						state);
 
 		/* TODO: Add MVEF support */
 
@@ -158,13 +158,13 @@ static void test_arm_biquad_cascade_df1_f32_rand(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -199,8 +199,8 @@ static void test_arm_biquad_cascade_df2t_f32_rand(void)
 		block_size = config[1];
 
 		/* Initialise instance */
-		arm_biquad_cascade_df2T_init_f32(
-			&inst, stage_count, coeff, state);
+		arm_biquad_cascade_df2T_init_f32(&inst, stage_count, coeff,
+						 state);
 
 		/* TODO: Add NEON support */
 
@@ -215,13 +215,13 @@ static void test_arm_biquad_cascade_df2t_f32_rand(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -256,12 +256,12 @@ static void test_arm_biquad_cascade_stereo_df2t_f32_rand(void)
 		block_size = config[1];
 
 		/* Initialise instance */
-		arm_biquad_cascade_stereo_df2T_init_f32(
-			&inst, stage_count, coeff, state);
+		arm_biquad_cascade_stereo_df2T_init_f32(&inst, stage_count,
+							coeff, state);
 
 		/* Run test function */
-		arm_biquad_cascade_stereo_df2T_f32(
-			&inst, input, output, block_size);
+		arm_biquad_cascade_stereo_df2T_f32(&inst, input, output,
+						   block_size);
 
 		/* Increment pointers */
 		input += 2 * block_size;
@@ -271,13 +271,13 @@ static void test_arm_biquad_cascade_stereo_df2t_f32_rand(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -286,13 +286,13 @@ static void test_arm_biquad_cascade_stereo_df2t_f32_rand(void)
 
 void test_filtering_biquad_f32(void)
 {
-	ztest_test_suite(filtering_biquad_f32,
+	ztest_test_suite(
+		filtering_biquad_f32,
 		ztest_unit_test(test_arm_biquad_cascade_df1_f32_default),
 		ztest_unit_test(test_arm_biquad_cascade_df2t_f32_default),
 		ztest_unit_test(test_arm_biquad_cascade_df1_f32_rand),
 		ztest_unit_test(test_arm_biquad_cascade_df2t_f32_rand),
-		ztest_unit_test(test_arm_biquad_cascade_stereo_df2t_f32_rand)
-		);
+		ztest_unit_test(test_arm_biquad_cascade_stereo_df2t_f32_rand));
 
 	ztest_run_test_suite(filtering_biquad_f32);
 }

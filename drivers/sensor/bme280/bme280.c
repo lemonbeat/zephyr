@@ -125,7 +125,8 @@ static inline const struct device *to_bus(const struct device *dev)
 	return to_data(dev)->bus;
 }
 
-static inline const union bme280_bus_config *to_bus_config(const struct device *dev)
+static inline const union bme280_bus_config *
+to_bus_config(const struct device *dev)
 {
 	return &to_config(dev)->bus_config;
 }
@@ -142,19 +143,10 @@ static int bme280_reg_read_spi(const struct device *bus,
 			       uint8_t start, uint8_t *buf, int size)
 {
 	uint8_t addr;
-	const struct spi_buf tx_buf = {
-		.buf = &addr,
-		.len = 1
-	};
-	const struct spi_buf_set tx = {
-		.buffers = &tx_buf,
-		.count = 1
-	};
+	const struct spi_buf tx_buf = { .buf = &addr, .len = 1 };
+	const struct spi_buf_set tx = { .buffers = &tx_buf, .count = 1 };
 	struct spi_buf rx_buf[2];
-	const struct spi_buf_set rx = {
-		.buffers = rx_buf,
-		.count = 2
-	};
+	const struct spi_buf_set rx = { .buffers = rx_buf, .count = 2 };
 	int i;
 
 	rx_buf[0].buf = NULL;
@@ -183,14 +175,8 @@ static int bme280_reg_write_spi(const struct device *bus,
 				uint8_t reg, uint8_t val)
 {
 	uint8_t cmd[2] = { reg & 0x7F, val };
-	const struct spi_buf tx_buf = {
-		.buf = cmd,
-		.len = 2
-	};
-	const struct spi_buf_set tx = {
-		.buffers = &tx_buf,
-		.count = 1
-	};
+	const struct spi_buf tx_buf = { .buf = cmd, .len = 2 };
+	const struct spi_buf_set tx = { .buffers = &tx_buf, .count = 1 };
 	int ret;
 
 	ret = spi_write(bus, to_spi_config(bus_config), &tx);
@@ -212,16 +198,14 @@ static int bme280_reg_read_i2c(const struct device *bus,
 			       const union bme280_bus_config *bus_config,
 			       uint8_t start, uint8_t *buf, int size)
 {
-	return i2c_burst_read(bus, bus_config->i2c_addr,
-			      start, buf, size);
+	return i2c_burst_read(bus, bus_config->i2c_addr, start, buf, size);
 }
 
 static int bme280_reg_write_i2c(const struct device *bus,
 				const union bme280_bus_config *bus_config,
 				uint8_t reg, uint8_t val)
 {
-	return i2c_reg_write_byte(bus, bus_config->i2c_addr,
-				  reg, val);
+	return i2c_reg_write_byte(bus, bus_config->i2c_addr, reg, val);
 }
 
 static const struct bme280_reg_io bme280_reg_io_i2c = {
@@ -230,8 +214,8 @@ static const struct bme280_reg_io bme280_reg_io_i2c = {
 };
 #endif /* BME280_BUS_I2C */
 
-static inline int bme280_reg_read(const struct device *dev,
-				  uint8_t start, uint8_t *buf, int size)
+static inline int bme280_reg_read(const struct device *dev, uint8_t start,
+				  uint8_t *buf, int size)
 {
 	return to_config(dev)->reg_io->read(to_bus(dev), to_bus_config(dev),
 					    start, buf, size);
@@ -253,10 +237,13 @@ static void bme280_compensate_temp(struct bme280_data *data, int32_t adc_temp)
 	int32_t var1, var2;
 
 	var1 = (((adc_temp >> 3) - ((int32_t)data->dig_t1 << 1)) *
-		((int32_t)data->dig_t2)) >> 11;
+		((int32_t)data->dig_t2)) >>
+	       11;
 	var2 = (((((adc_temp >> 4) - ((int32_t)data->dig_t1)) *
-		  ((adc_temp >> 4) - ((int32_t)data->dig_t1))) >> 12) *
-		((int32_t)data->dig_t3)) >> 14;
+		  ((adc_temp >> 4) - ((int32_t)data->dig_t1))) >>
+		 12) *
+		((int32_t)data->dig_t3)) >>
+	       14;
 
 	data->t_fine = var1 + var2;
 	data->comp_temp = (data->t_fine * 5 + 128) >> 8;
@@ -271,7 +258,7 @@ static void bme280_compensate_press(struct bme280_data *data, int32_t adc_press)
 	var2 = var2 + ((var1 * (int64_t)data->dig_p5) << 17);
 	var2 = var2 + (((int64_t)data->dig_p4) << 35);
 	var1 = ((var1 * var1 * (int64_t)data->dig_p3) >> 8) +
-		((var1 * (int64_t)data->dig_p2) << 12);
+	       ((var1 * (int64_t)data->dig_p2) << 12);
 	var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)data->dig_p1) >> 33;
 
 	/* Avoid exception caused by division by zero. */
@@ -296,12 +283,18 @@ static void bme280_compensate_humidity(struct bme280_data *data,
 
 	h = (data->t_fine - ((int32_t)76800));
 	h = ((((adc_humidity << 14) - (((int32_t)data->dig_h4) << 20) -
-		(((int32_t)data->dig_h5) * h)) + ((int32_t)16384)) >> 15) *
-		(((((((h * ((int32_t)data->dig_h6)) >> 10) * (((h *
-		((int32_t)data->dig_h3)) >> 11) + ((int32_t)32768))) >> 10) +
-		((int32_t)2097152)) * ((int32_t)data->dig_h2) + 8192) >> 14);
-	h = (h - (((((h >> 15) * (h >> 15)) >> 7) *
-		((int32_t)data->dig_h1)) >> 4));
+	       (((int32_t)data->dig_h5) * h)) +
+	      ((int32_t)16384)) >>
+	     15) *
+	    (((((((h * ((int32_t)data->dig_h6)) >> 10) *
+		 (((h * ((int32_t)data->dig_h3)) >> 11) + ((int32_t)32768))) >>
+		10) +
+	       ((int32_t)2097152)) *
+		      ((int32_t)data->dig_h2) +
+	      8192) >>
+	     14);
+	h = (h -
+	     (((((h >> 15) * (h >> 15)) >> 7) * ((int32_t)data->dig_h1)) >> 4));
 	h = (h > 419430400 ? 419430400 : h);
 
 	data->comp_humidity = (uint32_t)(h >> 12);
@@ -378,7 +371,7 @@ static int bme280_channel_get(const struct device *dev,
 		 */
 		val->val1 = (data->comp_press >> 8) / 1000U;
 		val->val2 = (data->comp_press >> 8) % 1000 * 1000U +
-			(((data->comp_press & 0xff) * 1000U) >> 8);
+			    (((data->comp_press & 0xff) * 1000U) >> 8);
 		break;
 	case SENSOR_CHAN_HUMIDITY:
 		/*
@@ -387,7 +380,8 @@ static int bme280_channel_get(const struct device *dev,
 		 * 47445/1024 = 46.333 %RH
 		 */
 		val->val1 = (data->comp_humidity >> 10);
-		val->val2 = (((data->comp_humidity & 0x3ff) * 1000U * 1000U) >> 10);
+		val->val2 =
+			(((data->comp_humidity & 0x3ff) * 1000U * 1000U) >> 10);
 		break;
 	default:
 		return -EINVAL;
@@ -408,8 +402,8 @@ static int bme280_read_compensation(const struct device *dev)
 	uint8_t hbuf[7];
 	int err = 0;
 
-	err = bme280_reg_read(dev, BME280_REG_COMP_START,
-			      (uint8_t *)buf, sizeof(buf));
+	err = bme280_reg_read(dev, BME280_REG_COMP_START, (uint8_t *)buf,
+			      sizeof(buf));
 
 	if (err < 0) {
 		LOG_DBG("COMP_START read failed: %d", err);
@@ -489,15 +483,13 @@ static int bme280_chip_init(const struct device *dev)
 		}
 	}
 
-	err = bme280_reg_write(dev, BME280_REG_CTRL_MEAS,
-			       BME280_CTRL_MEAS_VAL);
+	err = bme280_reg_write(dev, BME280_REG_CTRL_MEAS, BME280_CTRL_MEAS_VAL);
 	if (err < 0) {
 		LOG_DBG("CTRL_MEAS write failed: %d", err);
 		return err;
 	}
 
-	err = bme280_reg_write(dev, BME280_REG_CONFIG,
-			       BME280_CONFIG_VAL);
+	err = bme280_reg_write(dev, BME280_REG_CONFIG, BME280_CONFIG_VAL);
 	if (err < 0) {
 		LOG_DBG("CONFIG write failed: %d", err);
 		return err;
@@ -518,8 +510,8 @@ static inline int bme280_spi_init(const struct device *dev)
 	const struct bme280_spi_cfg *spi_cfg = to_bus_config(dev)->spi_cfg;
 
 	if (spi_cfg->cs_gpios_label != NULL) {
-		data->spi_cs.gpio_dev = device_get_binding(
-			spi_cfg->cs_gpios_label);
+		data->spi_cs.gpio_dev =
+			device_get_binding(spi_cfg->cs_gpios_label);
 		if (!data->spi_cs.gpio_dev) {
 			LOG_DBG("can't get GPIO SPI CS device %s",
 				spi_cfg->cs_gpios_label);
@@ -589,14 +581,10 @@ done:
  * BME280_DEFINE_I2C().
  */
 
-#define BME280_DEVICE_INIT(inst)					\
-	DEVICE_AND_API_INIT(bme280_##inst,				\
-			    DT_INST_LABEL(inst),			\
-			    bme280_init,				\
-			    &bme280_data_##inst,			\
-			    &bme280_config_##inst,			\
-			    POST_KERNEL,				\
-			    CONFIG_SENSOR_INIT_PRIORITY,		\
+#define BME280_DEVICE_INIT(inst)                                             \
+	DEVICE_AND_API_INIT(bme280_##inst, DT_INST_LABEL(inst), bme280_init, \
+			    &bme280_data_##inst, &bme280_config_##inst,      \
+			    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,        \
 			    &bme280_api_funcs);
 
 /*
@@ -605,28 +593,25 @@ done:
 
 #define BME280_HAS_CS(inst) DT_INST_SPI_DEV_HAS_CS_GPIOS(inst)
 
-#define BME280_DATA_SPI_CS(inst)					\
-	{ .spi_cs = {							\
-		.gpio_pin = DT_INST_SPI_DEV_CS_GPIOS_PIN(inst),		\
-		.gpio_dt_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(inst),	\
-		},							\
+#define BME280_DATA_SPI_CS(inst)                                               \
+	{                                                                      \
+		.spi_cs = {                                                    \
+			.gpio_pin = DT_INST_SPI_DEV_CS_GPIOS_PIN(inst),        \
+			.gpio_dt_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(inst), \
+		},                                                             \
 	}
 
-#define BME280_DATA_SPI(inst)						\
-	COND_CODE_1(BME280_HAS_CS(inst),				\
-		    (BME280_DATA_SPI_CS(inst)),				\
-		    ({}))
+#define BME280_DATA_SPI(inst) \
+	COND_CODE_1(BME280_HAS_CS(inst), (BME280_DATA_SPI_CS(inst)), ({}))
 
-#define BME280_SPI_CS_PTR(inst)						\
-	COND_CODE_1(BME280_HAS_CS(inst),				\
-		    (&(bme280_data_##inst.spi_cs)),			\
-		    (NULL))
+#define BME280_SPI_CS_PTR(inst) \
+	COND_CODE_1(BME280_HAS_CS(inst), (&(bme280_data_##inst.spi_cs)), (NULL))
 
-#define BME280_SPI_CS_LABEL(inst)					\
-	COND_CODE_1(BME280_HAS_CS(inst),				\
+#define BME280_SPI_CS_LABEL(inst)        \
+	COND_CODE_1(BME280_HAS_CS(inst), \
 		    (DT_INST_SPI_DEV_CS_GPIOS_LABEL(inst)), (NULL))
 
-#define BME280_SPI_CFG(inst)						\
+#define BME280_SPI_CFG(inst) \
 	(&(struct bme280_spi_cfg) {					\
 		.spi_cfg = {						\
 			.frequency =					\
@@ -641,35 +626,36 @@ done:
 		.cs_gpios_label = BME280_SPI_CS_LABEL(inst),		\
 	})
 
-#define BME280_CONFIG_SPI(inst)						\
-	{								\
-		.bus_label = DT_INST_BUS_LABEL(inst),			\
-		.reg_io = &bme280_reg_io_spi,				\
-		.bus_config = { .spi_cfg = BME280_SPI_CFG(inst)	}	\
+#define BME280_CONFIG_SPI(inst)                               \
+	{                                                     \
+		.bus_label = DT_INST_BUS_LABEL(inst),         \
+		.reg_io = &bme280_reg_io_spi, .bus_config = { \
+			.spi_cfg = BME280_SPI_CFG(inst)       \
+		}                                             \
 	}
 
-#define BME280_DEFINE_SPI(inst)						\
-	static struct bme280_data bme280_data_##inst =			\
-		BME280_DATA_SPI(inst);					\
-	static const struct bme280_config bme280_config_##inst =	\
-		BME280_CONFIG_SPI(inst);				\
+#define BME280_DEFINE_SPI(inst)                                               \
+	static struct bme280_data bme280_data_##inst = BME280_DATA_SPI(inst); \
+	static const struct bme280_config bme280_config_##inst =              \
+		BME280_CONFIG_SPI(inst);                                      \
 	BME280_DEVICE_INIT(inst)
 
 /*
  * Instantiation macros used when a device is on an I2C bus.
  */
 
-#define BME280_CONFIG_I2C(inst)						\
-	{								\
-		.bus_label = DT_INST_BUS_LABEL(inst),			\
-		.reg_io = &bme280_reg_io_i2c,				\
-		.bus_config =  { .i2c_addr = DT_INST_REG_ADDR(inst), }	\
+#define BME280_CONFIG_I2C(inst)                               \
+	{                                                     \
+		.bus_label = DT_INST_BUS_LABEL(inst),         \
+		.reg_io = &bme280_reg_io_i2c, .bus_config = { \
+			.i2c_addr = DT_INST_REG_ADDR(inst),   \
+		}                                             \
 	}
 
-#define BME280_DEFINE_I2C(inst)						\
-	static struct bme280_data bme280_data_##inst;			\
-	static const struct bme280_config bme280_config_##inst =	\
-		BME280_CONFIG_I2C(inst);				\
+#define BME280_DEFINE_I2C(inst)                                  \
+	static struct bme280_data bme280_data_##inst;            \
+	static const struct bme280_config bme280_config_##inst = \
+		BME280_CONFIG_I2C(inst);                         \
 	BME280_DEVICE_INIT(inst)
 
 /*
@@ -677,9 +663,8 @@ done:
  * bus-specific macro at preprocessor time.
  */
 
-#define BME280_DEFINE(inst)						\
-	COND_CODE_1(DT_INST_ON_BUS(inst, spi),				\
-		    (BME280_DEFINE_SPI(inst)),				\
+#define BME280_DEFINE(inst)                                               \
+	COND_CODE_1(DT_INST_ON_BUS(inst, spi), (BME280_DEFINE_SPI(inst)), \
 		    (BME280_DEFINE_I2C(inst)))
 
 DT_INST_FOREACH_STATUS_OKAY(BME280_DEFINE)

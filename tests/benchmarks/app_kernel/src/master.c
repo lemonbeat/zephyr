@@ -21,7 +21,7 @@ char msg[MAX_MSG];
 char data_bench[MESSAGE_SIZE];
 
 #ifdef PIPE_BENCH
-struct k_pipe *test_pipes[] = {&PIPE_NOBUFF, &PIPE_SMALLBUFF, &PIPE_BIGBUFF};
+struct k_pipe *test_pipes[] = { &PIPE_NOBUFF, &PIPE_SMALLBUFF, &PIPE_BIGBUFF };
 #endif
 char sline[SLINE_LEN + 1];
 const char newline[] = "\n";
@@ -33,7 +33,6 @@ FILE *output_file;
  * Used for correction in time measurements.
  */
 uint32_t tm_off;
-
 
 /********************************************************************/
 /* static allocation  */
@@ -63,7 +62,6 @@ K_PIPE_DEFINE(PIPE_BIGBUFF, 4096, 4);
 
 K_MEM_POOL_DEFINE(DEMOPOOL, 16, 16, 1, 4);
 
-
 /**
  *
  * @brief Check for keypress
@@ -74,7 +72,6 @@ int kbhit(void)
 {
 	return 0;
 }
-
 
 /**
  *
@@ -107,8 +104,9 @@ void output_close(void)
 }
 
 /* no need to wait for user key press when using console */
-#define WAIT_FOR_USER() {}
-
+#define WAIT_FOR_USER() \
+	{               \
+	}
 
 /**
  *
@@ -128,8 +126,8 @@ void main(void)
 	do {
 		PRINT_STRING(dashline, output_file);
 		PRINT_STRING("|          S I M P L E   S E R V I C E    "
-					 "M E A S U R E M E N T S  |  nsec    |\n",
-					 output_file);
+			     "M E A S U R E M E N T S  |  nsec    |\n",
+			     output_file);
 		PRINT_STRING(dashline, output_file);
 		queue_test();
 		sema_test();
@@ -139,8 +137,8 @@ void main(void)
 		mailbox_test();
 		pipe_test();
 		PRINT_STRING("|         END OF TESTS                     "
-					 "                                   |\n",
-					 output_file);
+			     "                                   |\n",
+			     output_file);
 		PRINT_STRING(dashline, output_file);
 		PRINT_STRING("PROJECT EXECUTION SUCCESSFUL\n", output_file);
 		TC_PRINT_RUNID;
@@ -152,7 +150,6 @@ void main(void)
 
 	output_close();
 }
-
 
 /**
  *

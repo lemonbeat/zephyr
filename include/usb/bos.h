@@ -14,9 +14,9 @@
 	static __in_section(usb, bos_desc_area, 1) __aligned(1) __used
 
 /* BOS descriptor type */
-#define DESCRIPTOR_TYPE_BOS		0x0F
+#define DESCRIPTOR_TYPE_BOS 0x0F
 
-#define USB_BOS_CAPABILITY_PLATFORM	0x05
+#define USB_BOS_CAPABILITY_PLATFORM 0x05
 
 /* BOS Capability Descriptor */
 struct usb_bos_platform_descriptor {
@@ -54,9 +54,10 @@ size_t usb_bos_get_length(void);
 void usb_bos_fix_total_length(void);
 void usb_bos_register_cap(struct usb_bos_platform_descriptor *hdr);
 const void *usb_bos_get_header(void);
-int usb_handle_bos(struct usb_setup_packet *setup, int32_t *len, uint8_t **data);
+int usb_handle_bos(struct usb_setup_packet *setup, int32_t *len,
+		   uint8_t **data);
 #else
-#define usb_handle_bos(x, y, z)		-ENOTSUP
+#define usb_handle_bos(x, y, z) -ENOTSUP
 #endif
 
-#endif	/* ZEPHYR_INCLUDE_USB_BOS_H_ */
+#endif /* ZEPHYR_INCLUDE_USB_BOS_H_ */

@@ -10,7 +10,6 @@
 #include <errno.h>
 #include "coverage.h"
 
-
 #ifdef CONFIG_X86
 #define MALLOC_MAX_HEAP_SIZE 32768
 #define MALLOC_MIN_BLOCK_SIZE 128
@@ -19,11 +18,8 @@
 #define MALLOC_MIN_BLOCK_SIZE 64
 #endif
 
-
-K_MEM_POOL_DEFINE(gcov_heap_mem_pool,
-		  MALLOC_MIN_BLOCK_SIZE,
+K_MEM_POOL_DEFINE(gcov_heap_mem_pool, MALLOC_MIN_BLOCK_SIZE,
 		  MALLOC_MAX_HEAP_SIZE, 1, 4);
-
 
 static struct gcov_info *gcov_info_head;
 
@@ -54,9 +50,10 @@ void __gcov_exit(void)
 #define MASK_32BIT (0xffffffffUL)
 static inline void buff_write_u64(void *buffer, size_t *off, uint64_t v)
 {
-	*((uint32_t *)((uint8_t *)buffer + *off) + 0) = (uint32_t)(v & MASK_32BIT);
-	*((uint32_t *)((uint8_t *)buffer + *off) + 1) = (uint32_t)((v >> 32) &
-							  MASK_32BIT);
+	*((uint32_t *)((uint8_t *)buffer + *off) + 0) =
+		(uint32_t)(v & MASK_32BIT);
+	*((uint32_t *)((uint8_t *)buffer + *off) + 1) =
+		(uint32_t)((v >> 32) & MASK_32BIT);
 	*off = *off + sizeof(uint64_t);
 }
 
@@ -68,7 +65,6 @@ static inline void buff_write_u32(void *buffer, size_t *off, uint32_t v)
 	*((uint32_t *)((uint8_t *)buffer + *off)) = v;
 	*off = *off + sizeof(uint32_t);
 }
-
 
 size_t calculate_buff_size(struct gcov_info *info)
 {
@@ -97,19 +93,14 @@ size_t calculate_buff_size(struct gcov_info *info)
 			for (iter_2 = 0U;
 			     iter_2 < info->functions[iter]->ctrs->num;
 			     iter_2++) {
-
 				/* Iter for values which is uint64_t */
 				size += (sizeof(uint64_t));
 			}
-
 		}
-
-
 	}
 
 	return size;
 }
-
 
 /**
  * populate_buffer - convert from gcov data set (info) to
@@ -127,71 +118,52 @@ size_t populate_buffer(uint8_t *buffer, struct gcov_info *info)
 	size_t buffer_write_position = 0;
 
 	/* File header. */
-	buff_write_u32(buffer,
-		       &buffer_write_position,
-		       GCOV_DATA_MAGIC);
+	buff_write_u32(buffer, &buffer_write_position, GCOV_DATA_MAGIC);
 
-	buff_write_u32(buffer,
-		       &buffer_write_position,
-		       info->version);
+	buff_write_u32(buffer, &buffer_write_position, info->version);
 
-	buff_write_u32(buffer,
-		       &buffer_write_position,
-		       info->stamp);
+	buff_write_u32(buffer, &buffer_write_position, info->stamp);
 
-	for (iter_functions = 0U;
-	     iter_functions < info->n_functions;
+	for (iter_functions = 0U; iter_functions < info->n_functions;
 	     iter_functions++) {
-
 		functions = info->functions[iter_functions];
 
-
-		buff_write_u32(buffer,
-			       &buffer_write_position,
+		buff_write_u32(buffer, &buffer_write_position,
 			       GCOV_TAG_FUNCTION);
 
-		buff_write_u32(buffer,
-			       &buffer_write_position,
+		buff_write_u32(buffer, &buffer_write_position,
 			       GCOV_TAG_FUNCTION_LENGTH);
 
-		buff_write_u32(buffer,
-			       &buffer_write_position,
+		buff_write_u32(buffer, &buffer_write_position,
 			       functions->ident);
 
-		buff_write_u32(buffer,
-			       &buffer_write_position,
+		buff_write_u32(buffer, &buffer_write_position,
 			       functions->lineno_checksum);
 
-		buff_write_u32(buffer,
-			       &buffer_write_position,
+		buff_write_u32(buffer, &buffer_write_position,
 			       functions->cfg_checksum);
 
 		counters_per_func = functions->ctrs;
 
-		for (iter_counts = 0U;
-		     iter_counts < GCOV_COUNTERS;
+		for (iter_counts = 0U; iter_counts < GCOV_COUNTERS;
 		     iter_counts++) {
-
 			if (!info->merge[iter_counts]) {
 				continue;
 			}
 
-			buff_write_u32(buffer,
-				       &buffer_write_position,
+			buff_write_u32(buffer, &buffer_write_position,
 				       GCOV_TAG_FOR_COUNTER(iter_counts));
 
-			buff_write_u32(buffer,
-				       &buffer_write_position,
+			buff_write_u32(buffer, &buffer_write_position,
 				       counters_per_func->num * 2U);
 
 			for (iter_counter_values = 0U;
 			     iter_counter_values < counters_per_func->num;
 			     iter_counter_values++) {
-
-				buff_write_u64(buffer,
-					       &buffer_write_position,
-					       counters_per_func->\
-					       values[iter_counter_values]);
+				buff_write_u64(
+					buffer, &buffer_write_position,
+					counters_per_func
+						->values[iter_counter_values]);
 			}
 
 			counters_per_func++;
@@ -230,10 +202,10 @@ void gcov_coverage_dump(void)
 	k_sched_lock();
 	printk("\nGCOV_COVERAGE_DUMP_START");
 	while (gcov_list) {
-
 		size = calculate_buff_size(gcov_list);
 
-		buffer = (uint8_t *) k_mem_pool_malloc(&gcov_heap_mem_pool, size);
+		buffer =
+			(uint8_t *)k_mem_pool_malloc(&gcov_heap_mem_pool, size);
 		if (!buffer) {
 			printk("No Mem available to continue dump\n");
 			goto coverage_dump_end;
@@ -256,18 +228,17 @@ coverage_dump_end:
 	return;
 }
 
-
 /* Initialize the gcov by calling the required constructors */
 void gcov_static_init(void)
 {
 	extern uint32_t __init_array_start, __init_array_end;
-	uint32_t func_pointer_start = (uint32_t) &__init_array_start;
-	uint32_t func_pointer_end = (uint32_t) &__init_array_end;
+	uint32_t func_pointer_start = (uint32_t)&__init_array_start;
+	uint32_t func_pointer_end = (uint32_t)&__init_array_end;
 
 	while (func_pointer_start < func_pointer_end) {
 		void (**p)(void);
 		/* get function pointer */
-		p = (void (**)(void)) func_pointer_start;
+		p = (void (**)(void))func_pointer_start;
 		(*p)();
 		func_pointer_start += sizeof(p);
 	}

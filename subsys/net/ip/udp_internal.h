@@ -42,8 +42,8 @@ extern "C" {
 #if defined(CONFIG_NET_NATIVE_UDP)
 int net_udp_create(struct net_pkt *pkt, uint16_t src_port, uint16_t dst_port);
 #else
-static inline int net_udp_create(struct net_pkt *pkt,
-				 uint16_t src_port, uint16_t dst_port)
+static inline int net_udp_create(struct net_pkt *pkt, uint16_t src_port,
+				 uint16_t dst_port)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(src_port);
@@ -85,9 +85,8 @@ static inline int net_udp_finalize(struct net_pkt *pkt)
 struct net_udp_hdr *net_udp_input(struct net_pkt *pkt,
 				  struct net_pkt_data_access *udp_access);
 #else
-static inline
-struct net_udp_hdr *net_udp_input(struct net_pkt *pkt,
-				  struct net_pkt_data_access *udp_access)
+static inline struct net_udp_hdr *
+net_udp_input(struct net_pkt *pkt, struct net_pkt_data_access *udp_access)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(udp_access);
@@ -111,13 +110,9 @@ struct net_udp_hdr *net_udp_input(struct net_pkt *pkt,
  *
  * @return Return 0 if the registration succeed, <0 otherwise.
  */
-int net_udp_register(uint8_t family,
-		     const struct sockaddr *remote_addr,
-		     const struct sockaddr *local_addr,
-		     uint16_t remote_port,
-		     uint16_t local_port,
-		     net_conn_cb_t cb,
-		     void *user_data,
+int net_udp_register(uint8_t family, const struct sockaddr *remote_addr,
+		     const struct sockaddr *local_addr, uint16_t remote_port,
+		     uint16_t local_port, net_conn_cb_t cb, void *user_data,
 		     struct net_conn_handle **handle);
 
 /**

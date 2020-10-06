@@ -17,8 +17,8 @@
 
 #define COUNTER_MAX 0xFFFFFFFFUL
 #define COUNTER_HALF_SPAN 0x80000000UL
-#define CYC_PER_TICK (sys_clock_hw_cycles_per_sec()	\
-		      / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define CYC_PER_TICK \
+	(sys_clock_hw_cycles_per_sec() / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 #define MAX_TICKS ((COUNTER_HALF_SPAN - CYC_PER_TICK) / CYC_PER_TICK)
 #define MAX_CYCLES (MAX_TICKS * CYC_PER_TICK)
 
@@ -58,8 +58,8 @@ static void int_enable(void)
 
 static uint32_t counter(void)
 {
-	nrf_timer_task_trigger(TIMER,
-		nrf_timer_capture_task_get(NRF_TIMER_CC_CHANNEL1));
+	nrf_timer_task_trigger(
+		TIMER, nrf_timer_capture_task_get(NRF_TIMER_CC_CHANNEL1));
 
 	return nrf_timer_cc_get(TIMER, NRF_TIMER_CC_CHANNEL1);
 }
@@ -144,7 +144,6 @@ void timer0_nrf_isr(void *arg)
 	ARG_UNUSED(arg);
 	event_clear();
 
-
 	uint32_t t = get_comparator();
 	uint32_t dticks = counter_sub(t, last_count) / CYC_PER_TICK;
 
@@ -157,7 +156,8 @@ void timer0_nrf_isr(void *arg)
 		set_absolute_ticks(last_count + CYC_PER_TICK);
 	}
 
-	z_clock_announce(IS_ENABLED(CONFIG_TICKLESS_KERNEL) ? dticks : (dticks > 0));
+	z_clock_announce(IS_ENABLED(CONFIG_TICKLESS_KERNEL) ? dticks :
+								    (dticks > 0));
 }
 
 int z_clock_driver_init(const struct device *device)
@@ -207,7 +207,6 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 	if (unannounced >= COUNTER_HALF_SPAN) {
 		ticks = 0;
 	}
-
 
 	/* Get the cycles from last_count to the tick boundary after
 	 * the requested ticks have passed starting now.

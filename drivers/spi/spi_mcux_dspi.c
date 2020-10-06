@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define DT_DRV_COMPAT	nxp_kinetis_dspi
+#define DT_DRV_COMPAT nxp_kinetis_dspi
 
 #include <errno.h>
 #include <drivers/spi.h>
@@ -61,12 +61,12 @@ static int spi_mcux_transfer_next_packet(const struct device *dev)
 		transfer.dataSize = ctx->rx_len;
 	} else if (ctx->rx_len == 0) {
 		/* tx only, nothing to rx */
-		transfer.txData = (uint8_t *) ctx->tx_buf;
+		transfer.txData = (uint8_t *)ctx->tx_buf;
 		transfer.rxData = NULL;
 		transfer.dataSize = ctx->tx_len;
 	} else if (ctx->tx_len == ctx->rx_len) {
 		/* rx and tx are the same length */
-		transfer.txData = (uint8_t *) ctx->tx_buf;
+		transfer.txData = (uint8_t *)ctx->tx_buf;
 		transfer.rxData = ctx->rx_buf;
 		transfer.dataSize = ctx->tx_len;
 	} else if (ctx->tx_len > ctx->rx_len) {
@@ -74,7 +74,7 @@ static int spi_mcux_transfer_next_packet(const struct device *dev)
 		 * rx into a longer intermediate buffer. Leave chip select
 		 * active between transfers.
 		 */
-		transfer.txData = (uint8_t *) ctx->tx_buf;
+		transfer.txData = (uint8_t *)ctx->tx_buf;
 		transfer.rxData = ctx->rx_buf;
 		transfer.dataSize = ctx->rx_len;
 		transfer.configFlags |= kDSPI_MasterActiveAfterTransfer;
@@ -83,7 +83,7 @@ static int spi_mcux_transfer_next_packet(const struct device *dev)
 		 * tx from a longer intermediate buffer. Leave chip select
 		 * active between transfers.
 		 */
-		transfer.txData = (uint8_t *) ctx->tx_buf;
+		transfer.txData = (uint8_t *)ctx->tx_buf;
 		transfer.rxData = ctx->rx_buf;
 		transfer.dataSize = ctx->tx_len;
 		transfer.configFlags |= kDSPI_MasterActiveAfterTransfer;
@@ -101,7 +101,8 @@ static int spi_mcux_transfer_next_packet(const struct device *dev)
 	}
 
 	return status == kStatus_Success ? 0 :
-	       status == kDSPI_Busy ? -EBUSY : -EINVAL;
+	       status == kDSPI_Busy	 ? -EBUSY :
+						 -EINVAL;
 }
 
 static void spi_mcux_isr(const struct device *dev)
@@ -114,7 +115,8 @@ static void spi_mcux_isr(const struct device *dev)
 }
 
 static void spi_mcux_master_transfer_callback(SPI_Type *base,
-		dspi_master_handle_t *handle, status_t status, void *userData)
+					      dspi_master_handle_t *handle,
+					      status_t status, void *userData)
 {
 	struct spi_mcux_data *data = userData;
 
@@ -145,34 +147,31 @@ static int spi_mcux_configure(const struct device *dev,
 	DSPI_MasterGetDefaultConfig(&master_config);
 
 	if (spi_cfg->slave > FSL_FEATURE_DSPI_CHIP_SELECT_COUNT) {
-		LOG_ERR("Slave %d is greater than %d",
-			    spi_cfg->slave, FSL_FEATURE_DSPI_CHIP_SELECT_COUNT);
+		LOG_ERR("Slave %d is greater than %d", spi_cfg->slave,
+			FSL_FEATURE_DSPI_CHIP_SELECT_COUNT);
 		return -EINVAL;
 	}
 
 	word_size = SPI_WORD_SIZE_GET(spi_cfg->operation);
 	if (word_size > FSL_FEATURE_DSPI_MAX_DATA_WIDTH) {
-		LOG_ERR("Word size %d is greater than %d",
-			    word_size, FSL_FEATURE_DSPI_MAX_DATA_WIDTH);
+		LOG_ERR("Word size %d is greater than %d", word_size,
+			FSL_FEATURE_DSPI_MAX_DATA_WIDTH);
 		return -EINVAL;
 	}
 
 	ctar_config->bitsPerFrame = word_size;
 
-	ctar_config->cpol =
-		(SPI_MODE_GET(spi_cfg->operation) & SPI_MODE_CPOL)
-		? kDSPI_ClockPolarityActiveLow
-		: kDSPI_ClockPolarityActiveHigh;
+	ctar_config->cpol = (SPI_MODE_GET(spi_cfg->operation) & SPI_MODE_CPOL) ?
+					  kDSPI_ClockPolarityActiveLow :
+					  kDSPI_ClockPolarityActiveHigh;
 
-	ctar_config->cpha =
-		(SPI_MODE_GET(spi_cfg->operation) & SPI_MODE_CPHA)
-		? kDSPI_ClockPhaseSecondEdge
-		: kDSPI_ClockPhaseFirstEdge;
+	ctar_config->cpha = (SPI_MODE_GET(spi_cfg->operation) & SPI_MODE_CPHA) ?
+					  kDSPI_ClockPhaseSecondEdge :
+					  kDSPI_ClockPhaseFirstEdge;
 
-	ctar_config->direction =
-		(spi_cfg->operation & SPI_TRANSFER_LSB)
-		? kDSPI_LsbFirst
-		: kDSPI_MsbFirst;
+	ctar_config->direction = (spi_cfg->operation & SPI_TRANSFER_LSB) ?
+					       kDSPI_LsbFirst :
+					       kDSPI_MsbFirst;
 
 	ctar_config->baudRate = spi_cfg->frequency;
 
@@ -192,9 +191,8 @@ static int spi_mcux_configure(const struct device *dev,
 
 	DSPI_MasterInit(base, &master_config, clock_freq);
 
-	DSPI_MasterTransferCreateHandle(base, &data->handle,
-					spi_mcux_master_transfer_callback,
-					data);
+	DSPI_MasterTransferCreateHandle(
+		base, &data->handle, spi_mcux_master_transfer_callback, data);
 
 	DSPI_SetDummyData(base, 0);
 
@@ -207,8 +205,7 @@ static int spi_mcux_configure(const struct device *dev,
 static int transceive(const struct device *dev,
 		      const struct spi_config *spi_cfg,
 		      const struct spi_buf_set *tx_bufs,
-		      const struct spi_buf_set *rx_bufs,
-		      bool asynchronous,
+		      const struct spi_buf_set *rx_bufs, bool asynchronous,
 		      struct k_poll_signal *signal)
 {
 	struct spi_mcux_data *data = dev->data;
@@ -288,43 +285,37 @@ static const struct spi_driver_api spi_mcux_driver_api = {
 	.release = spi_mcux_release,
 };
 
-#define SPI_MCUX_DSPI_DEVICE(id)					\
-	static void spi_mcux_config_func_##id(const struct device *dev); \
-	static const struct spi_mcux_config spi_mcux_config_##id = {	\
-		.base = (SPI_Type *)DT_INST_REG_ADDR(id),		\
-		.clock_name = DT_INST_CLOCKS_LABEL(id),			\
-		.clock_subsys = 					\
-		(clock_control_subsys_t)DT_INST_CLOCKS_CELL(id, name),	\
-		.irq_config_func = spi_mcux_config_func_##id,		\
-		.pcs_sck_delay = UTIL_AND(				\
-			DT_INST_NODE_HAS_PROP(id, pcs_sck_delay),	\
-			DT_INST_PROP(id, pcs_sck_delay)),		\
-		.sck_pcs_delay = UTIL_AND(				\
-			DT_INST_NODE_HAS_PROP(id, sck_pcs_delay),	\
-			DT_INST_PROP(id, sck_pcs_delay)),		\
-		.transfer_delay = UTIL_AND(				\
-			DT_INST_NODE_HAS_PROP(id, transfer_delay),	\
-			DT_INST_PROP(id, transfer_delay)),		\
-	};								\
-	static struct spi_mcux_data spi_mcux_data_##id = {		\
-		SPI_CONTEXT_INIT_LOCK(spi_mcux_data_##id, ctx),		\
-		SPI_CONTEXT_INIT_SYNC(spi_mcux_data_##id, ctx),		\
-	};								\
-	DEVICE_AND_API_INIT(spi_mcux_##id,				\
-			    DT_INST_LABEL(id),				\
-			    &spi_mcux_init,				\
-			    &spi_mcux_data_##id,			\
-			    &spi_mcux_config_##id,			\
-			    POST_KERNEL,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &spi_mcux_driver_api);			\
-	static void spi_mcux_config_func_##id(const struct device *dev)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(id),				\
-			    DT_INST_IRQ(id, priority),			\
-			    spi_mcux_isr, DEVICE_GET(spi_mcux_##id),	\
-			    0);						\
-		irq_enable(DT_INST_IRQN(id));				\
+#define SPI_MCUX_DSPI_DEVICE(id)                                               \
+	static void spi_mcux_config_func_##id(const struct device *dev);       \
+	static const struct spi_mcux_config spi_mcux_config_##id = {           \
+		.base = (SPI_Type *)DT_INST_REG_ADDR(id),                      \
+		.clock_name = DT_INST_CLOCKS_LABEL(id),                        \
+		.clock_subsys =                                                \
+			(clock_control_subsys_t)DT_INST_CLOCKS_CELL(id, name), \
+		.irq_config_func = spi_mcux_config_func_##id,                  \
+		.pcs_sck_delay =                                               \
+			UTIL_AND(DT_INST_NODE_HAS_PROP(id, pcs_sck_delay),     \
+				 DT_INST_PROP(id, pcs_sck_delay)),             \
+		.sck_pcs_delay =                                               \
+			UTIL_AND(DT_INST_NODE_HAS_PROP(id, sck_pcs_delay),     \
+				 DT_INST_PROP(id, sck_pcs_delay)),             \
+		.transfer_delay =                                              \
+			UTIL_AND(DT_INST_NODE_HAS_PROP(id, transfer_delay),    \
+				 DT_INST_PROP(id, transfer_delay)),            \
+	};                                                                     \
+	static struct spi_mcux_data spi_mcux_data_##id = {                     \
+		SPI_CONTEXT_INIT_LOCK(spi_mcux_data_##id, ctx),                \
+		SPI_CONTEXT_INIT_SYNC(spi_mcux_data_##id, ctx),                \
+	};                                                                     \
+	DEVICE_AND_API_INIT(spi_mcux_##id, DT_INST_LABEL(id), &spi_mcux_init,  \
+			    &spi_mcux_data_##id, &spi_mcux_config_##id,        \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,   \
+			    &spi_mcux_driver_api);                             \
+	static void spi_mcux_config_func_##id(const struct device *dev)        \
+	{                                                                      \
+		IRQ_CONNECT(DT_INST_IRQN(id), DT_INST_IRQ(id, priority),       \
+			    spi_mcux_isr, DEVICE_GET(spi_mcux_##id), 0);       \
+		irq_enable(DT_INST_IRQN(id));                                  \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(SPI_MCUX_DSPI_DEVICE)

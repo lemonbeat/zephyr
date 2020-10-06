@@ -30,7 +30,6 @@
 
 #include "enc.h"
 
-
 /*
  * for a pt character encrypt a ct character and update wheels
  * Each wheel must be indexed into and out of the wheel arrays
@@ -64,7 +63,7 @@ char enig_enc(char pt)
 #ifdef DBUG
 	printk("EE i1: %02x\n", tmpIndex);
 #endif
-	tmpIndex = (W2[IMOD(IW2, tmpIndex)] +  WHEEL_SIZE - IW2) % WHEEL_SIZE;
+	tmpIndex = (W2[IMOD(IW2, tmpIndex)] + WHEEL_SIZE - IW2) % WHEEL_SIZE;
 #ifdef DBUG
 	printk("EE i2: %02x\n", tmpIndex);
 #endif
@@ -105,7 +104,6 @@ char enig_enc(char pt)
  */
 int calc_rev_wheel(BYTE *wheel, BYTE *backpath)
 {
-
 	int i;
 
 	for (i = 0; i < WHEEL_SIZE; i++) {
@@ -116,7 +114,6 @@ int calc_rev_wheel(BYTE *wheel, BYTE *backpath)
 	}
 	return 1;
 }
-
 
 /*
  * convert a-z to 0-25
@@ -159,5 +156,4 @@ void update_wheel_index(void)
 	if (IW3 >= WHEEL_SIZE) {
 		IW3 %= WHEEL_SIZE;
 	}
-
 }

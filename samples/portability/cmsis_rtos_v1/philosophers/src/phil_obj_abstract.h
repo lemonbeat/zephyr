@@ -31,33 +31,33 @@
 #define phil_obj_abstract__h
 
 #if FORKS == SEMAPHORES
-	osSemaphoreDef(0);
-	osSemaphoreDef(1);
-	osSemaphoreDef(2);
-	osSemaphoreDef(3);
-	osSemaphoreDef(4);
-	osSemaphoreDef(5);
+osSemaphoreDef(0);
+osSemaphoreDef(1);
+osSemaphoreDef(2);
+osSemaphoreDef(3);
+osSemaphoreDef(4);
+osSemaphoreDef(5);
 
-	#define fork_init(x)  osSemaphoreCreate(osSemaphore(##x), 1)
-	#define take(x) osSemaphoreWait(x, osWaitForever)
-	#define drop(x) osSemaphoreRelease(x)
-	#define fork_type_str "semaphores"
-	#define fork_t osSemaphoreId
+#define fork_init(x) osSemaphoreCreate(osSemaphore(##x), 1)
+#define take(x) osSemaphoreWait(x, osWaitForever)
+#define drop(x) osSemaphoreRelease(x)
+#define fork_type_str "semaphores"
+#define fork_t osSemaphoreId
 
 #elif FORKS == MUTEXES
-	osMutexDef(0);
-	osMutexDef(1);
-	osMutexDef(2);
-	osMutexDef(3);
-	osMutexDef(4);
-	osMutexDef(5);
+osMutexDef(0);
+osMutexDef(1);
+osMutexDef(2);
+osMutexDef(3);
+osMutexDef(4);
+osMutexDef(5);
 
-	#define fork_init(x) osMutexCreate(osMutex(##x));
-	#define take(x)  osMutexWait(x, 0)
-	#define drop(x) osMutexRelease(x)
-	#define fork_type_str "mutexes"
-	#define fork_t osMutexId
+#define fork_init(x) osMutexCreate(osMutex(##x));
+#define take(x) osMutexWait(x, 0)
+#define drop(x) osMutexRelease(x)
+#define fork_type_str "mutexes"
+#define fork_t osMutexId
 #else
-	    #error unknown fork type
+#error unknown fork type
 #endif
 #endif /* phil_obj_abstract__h */

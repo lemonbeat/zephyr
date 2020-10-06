@@ -62,8 +62,7 @@ static int hmc5883l_sample_fetch(const struct device *dev,
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);
 
 	/* fetch magnetometer sample */
-	if (i2c_burst_read(drv_data->i2c,
-			   DT_INST_REG_ADDR(0),
+	if (i2c_burst_read(drv_data->i2c, DT_INST_REG_ADDR(0),
 			   HMC5883L_REG_DATA_START, (uint8_t *)buf, 6) < 0) {
 		LOG_ERR("Failed to fetch megnetometer sample.");
 		return -EIO;
@@ -89,8 +88,7 @@ int hmc5883l_init(const struct device *dev)
 	struct hmc5883l_data *drv_data = dev->data;
 	uint8_t chip_cfg[3], id[3], idx;
 
-	drv_data->i2c = device_get_binding(
-		DT_INST_BUS_LABEL(0));
+	drv_data->i2c = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (drv_data->i2c == NULL) {
 		LOG_ERR("Failed to get pointer to %s device.",
 			DT_INST_BUS_LABEL(0));
@@ -98,8 +96,7 @@ int hmc5883l_init(const struct device *dev)
 	}
 
 	/* check chip ID */
-	if (i2c_burst_read(drv_data->i2c,
-			   DT_INST_REG_ADDR(0),
+	if (i2c_burst_read(drv_data->i2c, DT_INST_REG_ADDR(0),
 			   HMC5883L_REG_CHIP_ID, id, 3) < 0) {
 		LOG_ERR("Failed to read chip ID.");
 		return -EIO;
@@ -142,8 +139,7 @@ int hmc5883l_init(const struct device *dev)
 	chip_cfg[1] = drv_data->gain_idx << HMC5883L_GAIN_SHIFT;
 	chip_cfg[2] = HMC5883L_MODE_CONTINUOUS;
 
-	if (i2c_burst_write(drv_data->i2c,
-			    DT_INST_REG_ADDR(0),
+	if (i2c_burst_write(drv_data->i2c, DT_INST_REG_ADDR(0),
 			    HMC5883L_REG_CONFIG_A, chip_cfg, 3) < 0) {
 		LOG_ERR("Failed to configure chip.");
 		return -EIO;
@@ -161,6 +157,6 @@ int hmc5883l_init(const struct device *dev)
 
 struct hmc5883l_data hmc5883l_driver;
 
-DEVICE_AND_API_INIT(hmc5883l, DT_INST_LABEL(0),
-		    hmc5883l_init, &hmc5883l_driver, NULL, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &hmc5883l_driver_api);
+DEVICE_AND_API_INIT(hmc5883l, DT_INST_LABEL(0), hmc5883l_init, &hmc5883l_driver,
+		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &hmc5883l_driver_api);

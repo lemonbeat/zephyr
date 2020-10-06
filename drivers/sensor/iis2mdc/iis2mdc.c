@@ -55,8 +55,8 @@ static int iis2mdc_set_odr(const struct device *dev,
 #endif /* CONFIG_IIS2MDC_MAG_ODR_RUNTIME */
 
 static int iis2mdc_set_hard_iron(const struct device *dev,
-				   enum sensor_channel chan,
-				   const struct sensor_value *val)
+				 enum sensor_channel chan,
+				 const struct sensor_value *val)
 {
 	struct iis2mdc_data *iis2mdc = dev->data;
 	uint8_t i;
@@ -71,8 +71,8 @@ static int iis2mdc_set_hard_iron(const struct device *dev,
 }
 
 static void iis2mdc_channel_get_mag(const struct device *dev,
-				      enum sensor_channel chan,
-				      struct sensor_value *val)
+				    enum sensor_channel chan,
+				    struct sensor_value *val)
 {
 	int32_t cval;
 	int i;
@@ -91,7 +91,8 @@ static void iis2mdc_channel_get_mag(const struct device *dev,
 		ofs_start = ofs_stop = 2U;
 		break;
 	default:
-		ofs_start = 0U; ofs_stop = 2U;
+		ofs_start = 0U;
+		ofs_stop = 2U;
 		break;
 	}
 
@@ -105,7 +106,7 @@ static void iis2mdc_channel_get_mag(const struct device *dev,
 
 /* read internal temperature */
 static void iis2mdc_channel_get_temp(const struct device *dev,
-				       struct sensor_value *val)
+				     struct sensor_value *val)
 {
 	struct iis2mdc_data *drv_data = dev->data;
 
@@ -114,8 +115,8 @@ static void iis2mdc_channel_get_temp(const struct device *dev,
 }
 
 static int iis2mdc_channel_get(const struct device *dev,
-				 enum sensor_channel chan,
-				 struct sensor_value *val)
+			       enum sensor_channel chan,
+			       struct sensor_value *val)
 {
 	switch (chan) {
 	case SENSOR_CHAN_MAGN_X:
@@ -136,8 +137,8 @@ static int iis2mdc_channel_get(const struct device *dev,
 }
 
 static int iis2mdc_config(const struct device *dev, enum sensor_channel chan,
-			    enum sensor_attribute attr,
-			    const struct sensor_value *val)
+			  enum sensor_attribute attr,
+			  const struct sensor_value *val)
 {
 	switch (attr) {
 #ifdef CONFIG_IIS2MDC_MAG_ODR_RUNTIME
@@ -154,10 +155,9 @@ static int iis2mdc_config(const struct device *dev, enum sensor_channel chan,
 	return 0;
 }
 
-static int iis2mdc_attr_set(const struct device *dev,
-			      enum sensor_channel chan,
-			      enum sensor_attribute attr,
-			      const struct sensor_value *val)
+static int iis2mdc_attr_set(const struct device *dev, enum sensor_channel chan,
+			    enum sensor_attribute attr,
+			    const struct sensor_value *val)
 {
 	switch (chan) {
 	case SENSOR_CHAN_ALL:
@@ -252,7 +252,7 @@ static int iis2mdc_init_interface(const struct device *dev)
 	iis2mdc->bus = device_get_binding(config->master_dev_name);
 	if (!iis2mdc->bus) {
 		LOG_DBG("Could not get pointer to %s device",
-			    config->master_dev_name);
+			config->master_dev_name);
 		return -EINVAL;
 	}
 
@@ -265,22 +265,22 @@ static const struct iis2mdc_config iis2mdc_dev_config = {
 	.drdy_port = DT_INST_GPIO_LABEL(0, drdy_gpios),
 	.drdy_pin = DT_INST_GPIO_PIN(0, drdy_gpios),
 	.drdy_flags = DT_INST_GPIO_FLAGS(0, drdy_gpios),
-#endif  /* CONFIG_IIS2MDC_TRIGGER */
+#endif /* CONFIG_IIS2MDC_TRIGGER */
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
 	.bus_init = iis2mdc_spi_init,
 	.spi_conf.frequency = DT_INST_PROP(0, spi_max_frequency),
-	.spi_conf.operation = (SPI_OP_MODE_MASTER | SPI_MODE_CPOL |
-			       SPI_MODE_CPHA | SPI_WORD_SET(8) |
-			       SPI_LINES_SINGLE),
-	.spi_conf.slave     = DT_INST_REG_ADDR(0),
+	.spi_conf.operation =
+		(SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_MODE_CPHA |
+		 SPI_WORD_SET(8) | SPI_LINES_SINGLE),
+	.spi_conf.slave = DT_INST_REG_ADDR(0),
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	.gpio_cs_port	    = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
-	.cs_gpio	    = DT_INST_SPI_DEV_CS_GPIOS_PIN(0),
-	.cs_gpio_flags	    = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
+	.gpio_cs_port = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
+	.cs_gpio = DT_INST_SPI_DEV_CS_GPIOS_PIN(0),
+	.cs_gpio_flags = DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
 
-	.spi_conf.cs        =  &iis2mdc_data.cs_ctrl,
+	.spi_conf.cs = &iis2mdc_data.cs_ctrl,
 #else
-	.spi_conf.cs        = NULL,
+	.spi_conf.cs = NULL,
 #endif
 #elif DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	.bus_init = iis2mdc_i2c_init,
@@ -367,6 +367,6 @@ static int iis2mdc_init(const struct device *dev)
 	return 0;
 }
 
-DEVICE_AND_API_INIT(iis2mdc, DT_INST_LABEL(0), iis2mdc_init,
-		     &iis2mdc_data, &iis2mdc_dev_config, POST_KERNEL,
-		     CONFIG_SENSOR_INIT_PRIORITY, &iis2mdc_driver_api);
+DEVICE_AND_API_INIT(iis2mdc, DT_INST_LABEL(0), iis2mdc_init, &iis2mdc_data,
+		    &iis2mdc_dev_config, POST_KERNEL,
+		    CONFIG_SENSOR_INIT_PRIORITY, &iis2mdc_driver_api);

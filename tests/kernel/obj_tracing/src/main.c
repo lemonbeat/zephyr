@@ -11,7 +11,7 @@
 extern void test_obj_tracing(void);
 
 #define STSIZE (1024 + CONFIG_TEST_EXTRA_STACKSIZE)
-#define N_PHILOSOPHERS  5
+#define N_PHILOSOPHERS 5
 
 #define TOTAL_TEST_NUMBER 2
 #define ZTEST_THREADS_CREATED 1
@@ -58,15 +58,11 @@ static inline void thread_list_cb(const struct k_thread *thread, void *data)
 	int *ctr = data;
 
 	if (thread->base.prio == -1) {
-		TC_PRINT("PREMPT: %p OPTIONS: 0x%02x, STATE: 0x%02x\n",
-			 thread,
-			 thread->base.user_options,
-			 thread->base.thread_state);
+		TC_PRINT("PREMPT: %p OPTIONS: 0x%02x, STATE: 0x%02x\n", thread,
+			 thread->base.user_options, thread->base.thread_state);
 	} else {
-		TC_PRINT("COOP: %p OPTIONS: 0x%02x, STATE: 0x%02x\n",
-			 thread,
-			 thread->base.user_options,
-			 thread->base.thread_state);
+		TC_PRINT("COOP: %p OPTIONS: 0x%02x, STATE: 0x%02x\n", thread,
+			 thread->base.user_options, thread->base.thread_state);
 	}
 	(*ctr)++;
 }
@@ -86,13 +82,13 @@ static void object_monitor(void)
 	int obj_counter = 0;
 	int thread_counter = 0, sem = 0;
 
-	void *obj_list   = NULL;
+	void *obj_list = NULL;
 
 	k_sem_take(&f3, K_NO_WAIT);
 	/* ztest use one semaphore so use one count less than expected to pass
 	 * test
 	 */
-	obj_list   = SYS_TRACING_HEAD(OBJ_LIST_TYPE, OBJ_LIST_NAME);
+	obj_list = SYS_TRACING_HEAD(OBJ_LIST_TYPE, OBJ_LIST_NAME);
 	while (obj_list != NULL) {
 		TC_PRINT("SEMAPHORE REF: %p\n", obj_list);
 		obj_list = SYS_TRACING_NEXT(OBJ_LIST_TYPE, OBJ_LIST_NAME,
@@ -110,17 +106,18 @@ static void object_monitor(void)
 	thread_counter += thread_monitor();
 
 	zassert_true(((thread_counter == (TOTAL_THREADS + initial_count)) &&
-		      (obj_counter == TOTAL_OBJECTS)), "test failed");
+		      (obj_counter == TOTAL_OBJECTS)),
+		     "test failed");
 }
 
 static void phil_entry(void)
 {
 	int counter;
-	struct k_sem *f1;       /* fork #1 */
-	struct k_sem *f2;       /* fork #2 */
-	static int myId;        /* next philosopher ID */
-	unsigned int pri = irq_lock();   /* interrupt lock level */
-	int id = myId++;        /* current philosopher ID */
+	struct k_sem *f1; /* fork #1 */
+	struct k_sem *f2; /* fork #2 */
+	static int myId; /* next philosopher ID */
+	unsigned int pri = irq_lock(); /* interrupt lock level */
+	int id = myId++; /* current philosopher ID */
 
 	irq_unlock(pri);
 
@@ -179,7 +176,6 @@ void test_philosophers_tracing(void)
 
 void test_main(void)
 {
-
 	initial_count = thread_monitor();
 
 	ztest_test_suite(obj_tracing,

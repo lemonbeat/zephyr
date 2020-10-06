@@ -26,7 +26,6 @@
 #define TEST_SOFT_INT 60
 #define TEST_SPUR_INT 61
 
-
 #define MY_STACK_SIZE 2048
 #define MY_PRIORITY 5
 
@@ -116,20 +115,22 @@ void test_idt_stub(void)
 
 	TC_PRINT("Testing to see if IDT has address of test stubs()\n");
 	/* Check for the interrupt stub */
-	p_idt_entry = (struct segment_descriptor *)
-		      (_idt_base_address + (TEST_SOFT_INT << 3));
+	p_idt_entry = (struct segment_descriptor *)(_idt_base_address +
+						    (TEST_SOFT_INT << 3));
 	offset = (uint32_t)(&int_stub);
 	zassert_equal(DTE_OFFSET(p_idt_entry), offset,
 		      "Failed to find offset of int_stub (0x%x)"
-		      " at vector %d\n", offset, TEST_SOFT_INT);
+		      " at vector %d\n",
+		      offset, TEST_SOFT_INT);
 
 	/* Check for the exception stub */
-	p_idt_entry = (struct segment_descriptor *)
-		      (_idt_base_address + (IV_DIVIDE_ERROR << 3));
+	p_idt_entry = (struct segment_descriptor *)(_idt_base_address +
+						    (IV_DIVIDE_ERROR << 3));
 	offset = (uint32_t)(&_EXCEPTION_STUB_NAME(exc_divide_error_handler, 0));
 	zassert_equal(DTE_OFFSET(p_idt_entry), offset,
 		      "Failed to find offset of exc stub (0x%x)"
-		      " at vector %d\n", offset, IV_DIVIDE_ERROR);
+		      " at vector %d\n",
+		      offset, IV_DIVIDE_ERROR);
 
 	/*
 	 * If the other fields are wrong, the system will crash when the
@@ -146,7 +147,6 @@ void idt_spur_task(void *arg1, void *arg2, void *arg3)
 
 	/* Shouldn't get here */
 	spur_handler_aborted_thread = 0;
-
 }
 
 /**
@@ -158,8 +158,7 @@ void idt_spur_task(void *arg1, void *arg2, void *arg3)
  */
 void test_static_idt(void)
 {
-	volatile int error;     /* used to create a divide by zero error */
-
+	volatile int error; /* used to create a divide by zero error */
 
 	TC_PRINT("Testing to see interrupt handler executes properly\n");
 	_trigger_isr_handler();
@@ -176,7 +175,7 @@ void test_static_idt(void)
 	 * Use exc_handler_executed instead of 0 to prevent the compiler
 	 * issuing a 'divide by zero' warning.
 	 */
-	error = 32;     /* avoid static checker uninitialized warnings */
+	error = 32; /* avoid static checker uninitialized warnings */
 	error = error / exc_handler_executed;
 
 	zassert_not_equal(exc_handler_executed, 0,
@@ -188,9 +187,8 @@ void test_static_idt(void)
 	 * Start task to trigger the spurious interrupt handler
 	 */
 	TC_PRINT("Testing to see spurious handler executes properly\n");
-	k_thread_create(&my_thread, my_stack_area, MY_STACK_SIZE,
-			idt_spur_task, NULL, NULL, NULL,
-			MY_PRIORITY, 0, K_NO_WAIT);
+	k_thread_create(&my_thread, my_stack_area, MY_STACK_SIZE, idt_spur_task,
+			NULL, NULL, NULL, MY_PRIORITY, 0, K_NO_WAIT);
 
 	/*
 	 * The thread should not run past where the spurious interrupt is
@@ -202,9 +200,7 @@ void test_static_idt(void)
 
 void test_main(void)
 {
-	ztest_test_suite(static_idt,
-			 ztest_unit_test(test_idt_stub),
-			 ztest_unit_test(test_static_idt)
-			 );
+	ztest_test_suite(static_idt, ztest_unit_test(test_idt_stub),
+			 ztest_unit_test(test_static_idt));
 	ztest_run_test_suite(static_idt);
 }

@@ -19,8 +19,7 @@ void test_posix_clock(void)
 	printk("POSIX clock APIs\n");
 
 	/* TESTPOINT: Pass invalid clock type */
-	zassert_equal(clock_gettime(CLOCK_INVALID, &ts), -1,
-			NULL);
+	zassert_equal(clock_gettime(CLOCK_INVALID, &ts), -1, NULL);
 	zassert_equal(errno, EINVAL, NULL);
 
 	clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -39,7 +38,7 @@ void test_posix_clock(void)
 
 	/*TESTPOINT: Check if POSIX clock API test passes*/
 	zassert_equal(secs_elapsed, (2 * SLEEP_SECONDS),
-			"POSIX clock API test failed");
+		      "POSIX clock API test failed");
 
 	printk("POSIX clock APIs test done\n");
 }
@@ -82,8 +81,7 @@ void test_posix_realtime(void)
 	nts.tv_nsec = NSEC_PER_SEC / 2U;
 
 	/* TESTPOINT: Pass invalid clock type */
-	zassert_equal(clock_settime(CLOCK_INVALID, &nts), -1,
-			NULL);
+	zassert_equal(clock_settime(CLOCK_INVALID, &nts), -1, NULL);
 	zassert_equal(errno, EINVAL, NULL);
 
 	ret = clock_settime(CLOCK_MONOTONIC, &nts);
@@ -104,10 +102,9 @@ void test_posix_realtime(void)
 		ret = clock_gettime(CLOCK_REALTIME, &rts);
 		zassert_equal(ret, 0, "Fail to read realitime clock");
 
-		int64_t delta =
-			((int64_t)rts.tv_sec * NSEC_PER_SEC -
-			 (int64_t)nts.tv_sec * NSEC_PER_SEC) +
-			((int64_t)rts.tv_nsec - (int64_t)nts.tv_nsec);
+		int64_t delta = ((int64_t)rts.tv_sec * NSEC_PER_SEC -
+				 (int64_t)nts.tv_sec * NSEC_PER_SEC) +
+				((int64_t)rts.tv_nsec - (int64_t)nts.tv_nsec);
 
 		/* Make the delta milliseconds. */
 		delta /= (NSEC_PER_SEC / 1000U);
@@ -138,9 +135,9 @@ void test_posix_realtime(void)
 	 * from clock_gettime
 	 */
 	zassert_true(rts.tv_sec >= tv.tv_sec, "gettimeofday didn't"
-			" provide correct result");
+					      " provide correct result");
 	zassert_true(rts.tv_nsec >= tv.tv_usec * NSEC_PER_USEC,
-			"gettimeofday didn't provide correct result");
+		     "gettimeofday didn't provide correct result");
 
 	printk("POSIX clock set APIs test done\n");
 }

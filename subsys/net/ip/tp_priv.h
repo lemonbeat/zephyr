@@ -16,22 +16,24 @@ extern "C" {
 #include <zephyr.h>
 #include <net/net_pkt.h>
 
-#define tp_dbg(fmt, args...) printk("%s: " fmt "\n", __func__, ## args)
-#define tp_err(fmt, args...) do {				\
-	printk("%s: Error: " fmt "\n", __func__, ## args);	\
-	k_oops();						\
-} while (0)
+#define tp_dbg(fmt, args...) printk("%s: " fmt "\n", __func__, ##args)
+#define tp_err(fmt, args...)                                      \
+	do {                                                      \
+		printk("%s: Error: " fmt "\n", __func__, ##args); \
+		k_oops();                                         \
+	} while (0)
 
-#define tp_assert(cond, fmt, args...) do {			\
-	if ((cond) == false) {					\
-		printk("%s: Assertion failed: %s, " fmt "\n",	\
-			__func__, #cond, ## args);		\
-		k_oops();					\
-	}							\
-} while (0)
+#define tp_assert(cond, fmt, args...)                                 \
+	do {                                                          \
+		if ((cond) == false) {                                \
+			printk("%s: Assertion failed: %s, " fmt "\n", \
+			       __func__, #cond, ##args);              \
+			k_oops();                                     \
+		}                                                     \
+	} while (0)
 
 #define is(_a, _b) (strcmp((_a), (_b)) == 0)
-#define ip_get(_x) ((struct net_ipv4_hdr *) net_pkt_ip_data((_x)))
+#define ip_get(_x) ((struct net_ipv4_hdr *)net_pkt_ip_data((_x)))
 
 #define TP_MEM_HEADER_COOKIE 0xAAAAAAAA
 #define TP_MEM_FOOTER_COOKIE 0xBBBBBBBB

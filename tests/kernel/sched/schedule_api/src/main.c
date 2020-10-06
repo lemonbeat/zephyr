@@ -45,27 +45,26 @@ void test_main(void)
 			      &ustack);
 #endif /* CONFIG_USERSPACE */
 
-	ztest_test_suite(threads_scheduling,
-			 ztest_unit_test(test_bad_priorities),
-			 ztest_unit_test(test_priority_cooperative),
-			 ztest_unit_test(test_priority_preemptible),
-			 ztest_1cpu_unit_test(test_priority_preemptible_wait_prio),
-			 ztest_unit_test(test_yield_cooperative),
-			 ztest_unit_test(test_sleep_cooperative),
-			 ztest_unit_test(test_sleep_wakeup_preemptible),
-			 ztest_unit_test(test_pending_thread_wakeup),
-			 ztest_unit_test(test_time_slicing_preemptible),
-			 ztest_unit_test(test_time_slicing_disable_preemptible),
-			 ztest_unit_test(test_lock_preemptible),
-			 ztest_unit_test(test_unlock_preemptible),
-			 ztest_unit_test(test_unlock_nested_sched_lock),
-			 ztest_unit_test(test_sched_is_preempt_thread),
-			 ztest_unit_test(test_slice_reset),
-			 ztest_unit_test(test_slice_scheduling),
-			 ztest_unit_test(test_priority_scheduling),
-			 ztest_unit_test(test_wakeup_expired_timer_thread),
-			 ztest_user_unit_test(test_user_k_wakeup),
-			 ztest_user_unit_test(test_user_k_is_preempt)
-			 );
+	ztest_test_suite(
+		threads_scheduling, ztest_unit_test(test_bad_priorities),
+		ztest_unit_test(test_priority_cooperative),
+		ztest_unit_test(test_priority_preemptible),
+		ztest_1cpu_unit_test(test_priority_preemptible_wait_prio),
+		ztest_unit_test(test_yield_cooperative),
+		ztest_unit_test(test_sleep_cooperative),
+		ztest_unit_test(test_sleep_wakeup_preemptible),
+		ztest_unit_test(test_pending_thread_wakeup),
+		ztest_unit_test(test_time_slicing_preemptible),
+		ztest_unit_test(test_time_slicing_disable_preemptible),
+		ztest_unit_test(test_lock_preemptible),
+		ztest_unit_test(test_unlock_preemptible),
+		ztest_unit_test(test_unlock_nested_sched_lock),
+		ztest_unit_test(test_sched_is_preempt_thread),
+		ztest_unit_test(test_slice_reset),
+		ztest_unit_test(test_slice_scheduling),
+		ztest_unit_test(test_priority_scheduling),
+		ztest_unit_test(test_wakeup_expired_timer_thread),
+		ztest_user_unit_test(test_user_k_wakeup),
+		ztest_user_unit_test(test_user_k_is_preempt));
 	ztest_run_test_suite(threads_scheduling);
 }

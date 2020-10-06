@@ -16,12 +16,12 @@
 #if defined(CONFIG_X86)
 static inline void timestamp_serialize(void)
 {
-	__asm__ __volatile__ (/* serialize */
-	"xorl %%eax,%%eax;\n\t"
-	"cpuid;\n\t"
-	:
-	:
-	: "%eax", "%ebx", "%ecx", "%edx");
+	__asm__ __volatile__(/* serialize */
+			     "xorl %%eax,%%eax;\n\t"
+			     "cpuid;\n\t"
+			     :
+			     :
+			     : "%eax", "%ebx", "%ecx", "%edx");
 }
 #elif defined(CONFIG_CPU_CORTEX_M)
 #include <arch/arm/aarch32/cortex_m/cmsis.h>

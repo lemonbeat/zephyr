@@ -19,7 +19,7 @@
 #include <zephyr.h>
 #include <sys/mutex.h>
 
-static int tc_rc = TC_PASS;         /* test case return code */
+static int tc_rc = TC_PASS; /* test case return code */
 
 extern struct sys_mutex private_mutex;
 
@@ -47,5 +47,4 @@ void thread_12(void)
 
 	k_sleep(K_MSEC(500));
 	sys_mutex_unlock(&private_mutex);
-
 }

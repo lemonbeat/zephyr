@@ -32,4 +32,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_ASSERT_H_ */
+#endif /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_ASSERT_H_ */

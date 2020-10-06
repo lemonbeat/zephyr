@@ -65,8 +65,8 @@ static int spi_config(const struct spi_config *config, uint16_t *control)
 		litex_write8(SPI_ENABLE, SPI_LOOPBACK_REG);
 	}
 	/* Set word size */
-	*control = (uint16_t) (SPI_WORD_SIZE_GET(config->operation)
-			<< POSITION_WORD_SIZE);
+	*control = (uint16_t)(SPI_WORD_SIZE_GET(config->operation)
+			      << POSITION_WORD_SIZE);
 	/* Write configurations */
 	litex_write8(cs, SPI_CS_REG);
 	litex_write16(*control, SPI_CONTROL_REG);
@@ -75,7 +75,7 @@ static int spi_config(const struct spi_config *config, uint16_t *control)
 }
 
 static void spi_litespi_send(const struct device *dev, uint8_t frame,
-		             uint16_t control)
+			     uint16_t control)
 {
 	/* Write frame to register */
 	litex_write8(frame, SPI_MOSI_DATA_REG);
@@ -88,13 +88,12 @@ static void spi_litespi_send(const struct device *dev, uint8_t frame,
 
 static uint8_t spi_litespi_recv(void)
 {
-    /* Return data inside MISO register */
+	/* Return data inside MISO register */
 	return litex_read8(SPI_MISO_DATA_REG);
 }
 
 static void spi_litespi_xfer(const struct device *dev,
-			     const struct spi_config *config,
-			     uint16_t control)
+			     const struct spi_config *config, uint16_t control)
 {
 	struct spi_context *ctx = &SPI_DATA(dev)->ctx;
 	uint32_t send_len = spi_context_longest_current_buf(ctx);
@@ -103,8 +102,8 @@ static void spi_litespi_xfer(const struct device *dev,
 	for (uint32_t i = 0; i < send_len; i++) {
 		/* Send a frame */
 		if (i < ctx->tx_len) {
-			spi_litespi_send(dev, (uint8_t) (ctx->tx_buf)[i],
-					control);
+			spi_litespi_send(dev, (uint8_t)(ctx->tx_buf)[i],
+					 control);
 		} else {
 			/* Send dummy bytes */
 			spi_litespi_send(dev, 0, control);
@@ -167,21 +166,17 @@ static struct spi_driver_api spi_litespi_api = {
 	.release = spi_litespi_release,
 };
 
-#define SPI_INIT(n)	\
-	static struct spi_litespi_data spi_litespi_data_##n = { \
-		SPI_CONTEXT_INIT_LOCK(spi_litespi_data_##n, ctx), \
-		SPI_CONTEXT_INIT_SYNC(spi_litespi_data_##n, ctx), \
-	}; \
-	static struct spi_litespi_cfg spi_litespi_cfg_##n = { \
-		.base = DT_INST_REG_ADDR_BY_NAME(n, control), \
-	}; \
-	DEVICE_AND_API_INIT(spi_##n, \
-			DT_INST_LABEL(n), \
-			spi_litespi_init, \
-			&spi_litespi_data_##n, \
-			&spi_litespi_cfg_##n, \
-			POST_KERNEL, \
-			CONFIG_SPI_INIT_PRIORITY, \
-			&spi_litespi_api);
+#define SPI_INIT(n)                                                      \
+	static struct spi_litespi_data spi_litespi_data_##n = {          \
+		SPI_CONTEXT_INIT_LOCK(spi_litespi_data_##n, ctx),        \
+		SPI_CONTEXT_INIT_SYNC(spi_litespi_data_##n, ctx),        \
+	};                                                               \
+	static struct spi_litespi_cfg spi_litespi_cfg_##n = {            \
+		.base = DT_INST_REG_ADDR_BY_NAME(n, control),            \
+	};                                                               \
+	DEVICE_AND_API_INIT(spi_##n, DT_INST_LABEL(n), spi_litespi_init, \
+			    &spi_litespi_data_##n, &spi_litespi_cfg_##n, \
+			    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,       \
+			    &spi_litespi_api);
 
 DT_INST_FOREACH_STATUS_OKAY(SPI_INIT)

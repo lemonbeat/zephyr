@@ -17,7 +17,7 @@ LOG_MODULE_REGISTER(audio_core);
  * stereo speaker out
  * stereo host out
  */
-#define AUDIO_ACTIVE_CHANNELS	2
+#define AUDIO_ACTIVE_CHANNELS 2
 
 /* core audio processing buffers with interleaved samples */
 static int32_t mic_input[AUDIO_ACTIVE_CHANNELS][AUDIO_SAMPLES_PER_FRAME];
@@ -27,8 +27,8 @@ static bool tuning_reply_ready;
 static uint32_t *tuning_command_buffer;
 static uint32_t tuning_cmd_buf_size_in_words;
 
-#define CMD_START_AUDIO		1
-#define CMD_STOP_AUDIO		2
+#define CMD_START_AUDIO 1
+#define CMD_STOP_AUDIO 2
 
 int audio_core_initialize(void)
 {
@@ -116,7 +116,8 @@ int audio_core_notify_frame_tick(void)
 	return 0;
 }
 
-int audio_core_tuning_interface_init(uint32_t *command_buffer, uint32_t size_in_words)
+int audio_core_tuning_interface_init(uint32_t *command_buffer,
+				     uint32_t size_in_words)
 {
 	tuning_command_buffer = command_buffer;
 	tuning_cmd_buf_size_in_words = size_in_words;

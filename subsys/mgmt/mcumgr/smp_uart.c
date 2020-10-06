@@ -38,8 +38,8 @@ static void smp_uart_process_frag(struct uart_mcumgr_rx_buf *rx_buf)
 	/* Decode the fragment and write the result to the global receive
 	 * context.
 	 */
-	nb = mcumgr_serial_process_frag(&smp_uart_rx_ctxt,
-					rx_buf->data, rx_buf->length);
+	nb = mcumgr_serial_process_frag(&smp_uart_rx_ctxt, rx_buf->data,
+					rx_buf->length);
 
 	/* Release the encoded fragment. */
 	uart_mcumgr_free_rx_buf(rx_buf);
@@ -76,8 +76,7 @@ static uint16_t smp_uart_get_mtu(const struct net_buf *nb)
 	return CONFIG_MCUMGR_SMP_UART_MTU;
 }
 
-static int smp_uart_tx_pkt(struct zephyr_smp_transport *zst,
-			   struct net_buf *nb)
+static int smp_uart_tx_pkt(struct zephyr_smp_transport *zst, struct net_buf *nb)
 {
 	int rc;
 

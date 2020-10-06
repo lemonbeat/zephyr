@@ -47,7 +47,7 @@ void test_isr_dynamic(void)
 				 argval, 0);
 
 	zassert_true(_sw_isr_table[i].isr == dyn_isr &&
-		     _sw_isr_table[i].arg == argval,
+			     _sw_isr_table[i].arg == argval,
 		     "dynamic isr did not install successfully");
 }
 #else

@@ -17,7 +17,6 @@
 #include <dt-bindings/interrupt-controller/openisa-intmux.h>
 #include "ll_irqs.h"
 
-
 #define PCS_SOURCE_RTC 2
 
 void cntr_init(void)

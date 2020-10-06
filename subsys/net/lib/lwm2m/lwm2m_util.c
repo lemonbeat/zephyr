@@ -191,13 +191,13 @@ int lwm2m_b32_to_f32(uint8_t *b32, size_t len, float32_value_t *f32)
 	sign = SHIFT_RIGHT(b32[0], 7, 0x1);
 
 	/* calc exponent: bits 30-23 */
-	e  = SHIFT_LEFT(b32[0], 1, 0xFF);
+	e = SHIFT_LEFT(b32[0], 1, 0xFF);
 	e += SHIFT_RIGHT(b32[1], 7, 0x1);
 	/* remove bias */
 	e -= 127;
 
 	/* enable "hidden" fraction bit 23 which is always 1 */
-	f  = ((int32_t)1 << 22);
+	f = ((int32_t)1 << 22);
 	/* calc fraction: bits 22-0 */
 	f += ((int32_t)(b32[1] & 0x7F) << 16);
 	f += ((int32_t)b32[2] << 8);
@@ -226,7 +226,6 @@ int lwm2m_b32_to_f32(uint8_t *b32, size_t len, float32_value_t *f32)
 		k /= 2;
 		if (f & (1 << i)) {
 			f32->val2 += k;
-
 		}
 	}
 
@@ -251,13 +250,13 @@ int lwm2m_b64_to_f64(uint8_t *b64, size_t len, float64_value_t *f64)
 	sign = SHIFT_RIGHT(b64[0], 7, 0x1);
 
 	/* get exponent: bits 62-52 */
-	e  = SHIFT_LEFT((uint16_t)b64[0], 4, 0x7F0);
+	e = SHIFT_LEFT((uint16_t)b64[0], 4, 0x7F0);
 	e += SHIFT_RIGHT(b64[1], 4, 0xF);
 	/* remove bias */
 	e -= 1023;
 
 	/* enable "hidden" fraction bit 53 which is always 1 */
-	f  = ((int64_t)1 << 52);
+	f = ((int64_t)1 << 52);
 	/* get fraction: bits 51-0 */
 	f += ((int64_t)(b64[1] & 0xF) << 48);
 	f += ((int64_t)b64[2] << 40);
@@ -290,7 +289,6 @@ int lwm2m_b64_to_f64(uint8_t *b64, size_t len, float64_value_t *f64)
 		k /= 2;
 		if (f & ((int64_t)1 << i)) {
 			f64->val2 += k;
-
 		}
 	}
 

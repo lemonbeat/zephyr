@@ -71,7 +71,6 @@ static void calculate_pi_low(void)
 
 	/* Loop until the test finishes, or an error is detected. */
 	for (calc_pi_low_count = 0; !test_exited; calc_pi_low_count++) {
-
 		sign = -1.0f;
 		pi = 1.0f;
 		divisor = 3.0f;
@@ -87,12 +86,11 @@ static void calculate_pi_low(void)
 		if (reference_pi == 0.0f) {
 			reference_pi = pi;
 		} else if (reference_pi != pi) {
-			printf("Computed pi %1.6f, reference pi %1.6f\n",
-			       pi, reference_pi);
+			printf("Computed pi %1.6f, reference pi %1.6f\n", pi,
+			       reference_pi);
 		}
 
-		zassert_equal(reference_pi, pi,
-			      "pi computation error");
+		zassert_equal(reference_pi, pi, "pi computation error");
 	}
 }
 
@@ -109,10 +107,8 @@ static void calculate_pi_high(void)
 	unsigned int ix;
 
 	/* Run the test until the specified maximum test count is reached */
-	for (calc_pi_high_count = 0;
-	     calc_pi_high_count <= MAX_TESTS;
+	for (calc_pi_high_count = 0; calc_pi_high_count <= MAX_TESTS;
 	     calc_pi_high_count++) {
-
 		sign = -1.0f;
 		pi = 1.0f;
 		divisor = 3.0f;
@@ -140,12 +136,11 @@ static void calculate_pi_high(void)
 		if (reference_pi == 0.0f) {
 			reference_pi = pi;
 		} else if (reference_pi != pi) {
-			printf("Computed pi %1.6f, reference pi %1.6f\n",
-			       pi, reference_pi);
+			printf("Computed pi %1.6f, reference pi %1.6f\n", pi,
+			       reference_pi);
 		}
 
-		zassert_equal(reference_pi, pi,
-			      "pi computation error");
+		zassert_equal(reference_pi, pi, "pi computation error");
 
 		/* Periodically issue progress report */
 		if ((calc_pi_high_count % 100) == 50) {

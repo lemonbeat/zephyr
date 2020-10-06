@@ -48,5 +48,4 @@ static inline bool arch_irq_unlocked(unsigned int key)
 
 #include <sys/arch_interface.h>
 
-
 #endif /* ZEPHYR_SUBSYS_TESTSUITE_ZTEST_INCLUDE_ARCH_CPU_H */

@@ -10,7 +10,6 @@
  *
  */
 
-
 #include <tc_util.h>
 #include <stdbool.h>
 #include <zephyr.h>
@@ -30,7 +29,6 @@ K_THREAD_STACK_ARRAY_DEFINE(stacks, NUM_THREADS, STACK_SIZE);
 static struct k_thread threads[NUM_THREADS];
 static k_tid_t tids[NUM_THREADS];
 
-
 /* Thread entry point, used for multiple threads. Thread is logging some data
  * (data length varies for each thread) and sleeps. Threads have different
  * priorities so on wakeup other thread will be preempted, interrupting logging.
@@ -38,13 +36,13 @@ static k_tid_t tids[NUM_THREADS];
 static void thread_func(void *p1, void *p2, void *p3)
 {
 	intptr_t id = (intptr_t)p1;
-	int buf_len = 8*id + 8;
+	int buf_len = 8 * id + 8;
 	uint8_t *buf = alloca(buf_len);
 
 	while (1) {
 		LOG_INF("test string printed %d %d %p", 1, 2, k_current_get());
 		LOG_HEXDUMP_INF(buf, buf_len, "data:");
-		k_msleep(20+id);
+		k_msleep(20 + id);
 	}
 }
 
@@ -61,10 +59,11 @@ static void test_log_immediate_preemption(void)
 			" Text output will be garbled.");
 	}
 	for (intptr_t i = 0; i < NUM_THREADS; i++) {
-		tids[i] = k_thread_create(&threads[i], stacks[i], STACK_SIZE,
-				thread_func, (void *)i, NULL, NULL,
-				k_thread_priority_get(k_current_get()) + i,
-				0, K_MSEC(10));
+		tids[i] = k_thread_create(
+			&threads[i], stacks[i], STACK_SIZE, thread_func,
+			(void *)i, NULL, NULL,
+			k_thread_priority_get(k_current_get()) + i, 0,
+			K_MSEC(10));
 	}
 	k_msleep(3000);
 

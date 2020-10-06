@@ -94,56 +94,64 @@ static inline uint32_t hal_radio_tx_power_floor(int8_t tx_power_lvl)
 	return RADIO_TXPOWER_TXPOWER_Neg40dBm;
 }
 
-static inline uint32_t hal_radio_tx_ready_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_ready_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
 	return HAL_RADIO_NRF51_TXEN_TXIDLE_TX_US;
 }
 
-static inline uint32_t hal_radio_rx_ready_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_ready_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
 	return HAL_RADIO_NRF51_RXEN_RXIDLE_RX_US;
 }
 
-static inline uint32_t hal_radio_tx_chain_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_chain_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
 	return HAL_RADIO_NRF51_TX_CHAIN_DELAY_US;
 }
 
-static inline uint32_t hal_radio_rx_chain_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_chain_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
 	return HAL_RADIO_NRF51_RX_CHAIN_DELAY_US;
 }
 
-static inline uint32_t hal_radio_tx_ready_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_ready_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
 	return HAL_RADIO_NRF51_TXEN_TXIDLE_TX_NS;
 }
 
-static inline uint32_t hal_radio_rx_ready_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_ready_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
 	return HAL_RADIO_NRF51_RXEN_RXIDLE_RX_NS;
 }
 
-static inline uint32_t hal_radio_tx_chain_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_chain_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
 	return HAL_RADIO_NRF51_TX_CHAIN_DELAY_NS;
 }
 
-static inline uint32_t hal_radio_rx_chain_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_chain_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);

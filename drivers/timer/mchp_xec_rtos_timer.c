@@ -19,8 +19,9 @@ BUILD_ASSERT(CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC == 32768,
 
 #if DEBUG_RTOS_TIMER != 0
 /* Enable feature to halt timer on JTAG/SWD CPU halt */
-#define TIMER_START_VAL (MCHP_RTMR_CTRL_BLK_EN | MCHP_RTMR_CTRL_START \
-			 | MCHP_RTMR_CTRL_HW_HALT_EN)
+#define TIMER_START_VAL                                 \
+	(MCHP_RTMR_CTRL_BLK_EN | MCHP_RTMR_CTRL_START | \
+	 MCHP_RTMR_CTRL_HW_HALT_EN)
 #else
 #define TIMER_START_VAL (MCHP_RTMR_CTRL_BLK_EN | MCHP_RTMR_CTRL_START)
 #endif
@@ -49,19 +50,18 @@ BUILD_ASSERT(CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC == 32768,
 #define CYCLES_PER_TICK \
 	(CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 
-#define TIMER_REGS	\
-	((RTMR_Type *) DT_INST_REG_ADDR(0))
+#define TIMER_REGS ((RTMR_Type *)DT_INST_REG_ADDR(0))
 
 /* Mask off bits[31:28] of 32-bit count */
-#define TIMER_MAX	0x0FFFFFFFUL
+#define TIMER_MAX 0x0FFFFFFFUL
 
-#define TIMER_COUNT_MASK	0x0FFFFFFFUL
+#define TIMER_COUNT_MASK 0x0FFFFFFFUL
 
-#define TIMER_STOPPED	0xF0000000UL
+#define TIMER_STOPPED 0xF0000000UL
 
 /* Adjust cycle count programmed into timer for HW restart latency */
-#define TIMER_ADJUST_LIMIT	2
-#define TIMER_ADJUST_CYCLES	1
+#define TIMER_ADJUST_LIMIT 2
+#define TIMER_ADJUST_CYCLES 1
 
 /* max number of ticks we can load into the timer in one shot */
 #define MAX_TICKS (TIMER_MAX / CYCLES_PER_TICK)
@@ -112,7 +112,7 @@ static inline uint32_t timer_count(void)
 
 #ifdef CONFIG_TICKLESS_KERNEL
 
-static uint32_t last_announcement;	/* last time we called z_clock_announce() */
+static uint32_t last_announcement; /* last time we called z_clock_announce() */
 
 /*
  * Request a timeout n Zephyr ticks in the future from now.
@@ -131,9 +131,9 @@ void z_clock_set_timeout(int32_t n, bool idle)
 	ARG_UNUSED(idle);
 
 	uint32_t ccr, temp;
-	int   full_ticks;	/* number of complete ticks we'll wait */
-	uint32_t full_cycles;	/* full_ticks represented as cycles */
-	uint32_t partial_cycles;	/* number of cycles to first tick boundary */
+	int full_ticks; /* number of complete ticks we'll wait */
+	uint32_t full_cycles; /* full_ticks represented as cycles */
+	uint32_t partial_cycles; /* number of cycles to first tick boundary */
 
 	if (idle && (n == K_TICKS_FOREVER)) {
 		/*
@@ -161,8 +161,7 @@ void z_clock_set_timeout(int32_t n, bool idle)
 
 	/* turn off to clear any pending interrupt status */
 	TIMER_REGS->CTRL = 0U;
-	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) =
-		BIT(DT_INST_PROP(0, girq_bit));
+	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) = BIT(DT_INST_PROP(0, girq_bit));
 	NVIC_ClearPendingIRQ(RTMR_IRQn);
 
 	temp = total_cycles;
@@ -222,8 +221,7 @@ static void xec_rtos_timer_isr(const void *arg)
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
 
-	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) =
-		BIT(DT_INST_PROP(0, girq_bit));
+	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) = BIT(DT_INST_PROP(0, girq_bit));
 
 	/* Restart the timer as early as possible to minimize drift... */
 	timer_restart(MAX_TICKS * CYCLES_PER_TICK);
@@ -255,8 +253,7 @@ static void xec_rtos_timer_isr(const void *arg)
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
 
-	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) =
-		BIT(DT_INST_PROP(0, girq_bit));
+	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) = BIT(DT_INST_PROP(0, girq_bit));
 
 	/* Restart the timer as early as possible to minimize drift... */
 	timer_restart(cached_icr);
@@ -325,23 +322,20 @@ int z_clock_driver_init(const struct device *device)
 #endif
 
 	TIMER_REGS->CTRL = 0U;
-	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) =
-		BIT(DT_INST_PROP(0, girq_bit));
+	MCHP_GIRQ_SRC(DT_INST_PROP(0, girq)) = BIT(DT_INST_PROP(0, girq_bit));
 	NVIC_ClearPendingIRQ(RTMR_IRQn);
 
-	IRQ_CONNECT(RTMR_IRQn,
-		    DT_INST_IRQ(0, priority),
-		    xec_rtos_timer_isr, 0, 0);
+	IRQ_CONNECT(RTMR_IRQn, DT_INST_IRQ(0, priority), xec_rtos_timer_isr, 0,
+		    0);
 
-	MCHP_GIRQ_ENSET(DT_INST_PROP(0, girq)) =
-		BIT(DT_INST_PROP(0, girq_bit));
+	MCHP_GIRQ_ENSET(DT_INST_PROP(0, girq)) = BIT(DT_INST_PROP(0, girq_bit));
 	irq_enable(RTMR_IRQn);
 
 #ifdef CONFIG_ARCH_HAS_CUSTOM_BUSY_WAIT
-	uint32_t btmr_ctrl = B32TMR0_REGS->CTRL = (MCHP_BTMR_CTRL_ENABLE
-			  | MCHP_BTMR_CTRL_AUTO_RESTART
-			  | MCHP_BTMR_CTRL_COUNT_UP
-			  | (47UL << MCHP_BTMR_CTRL_PRESCALE_POS));
+	uint32_t btmr_ctrl = B32TMR0_REGS->CTRL =
+		(MCHP_BTMR_CTRL_ENABLE | MCHP_BTMR_CTRL_AUTO_RESTART |
+		 MCHP_BTMR_CTRL_COUNT_UP |
+		 (47UL << MCHP_BTMR_CTRL_PRESCALE_POS));
 	B32TMR0_REGS->CTRL = MCHP_BTMR_CTRL_SOFT_RESET;
 	B32TMR0_REGS->CTRL = btmr_ctrl;
 	B32TMR0_REGS->PRLD = 0xFFFFFFFFUL;

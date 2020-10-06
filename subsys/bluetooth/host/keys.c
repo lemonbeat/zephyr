@@ -80,7 +80,7 @@ struct bt_keys *bt_keys_get_addr(uint8_t id, const bt_addr_le_t *addr)
 		}
 	}
 
-#endif  /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
+#endif /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
 	if (first_free_slot < ARRAY_SIZE(key_pool)) {
 		keys = &key_pool[first_free_slot];
 		keys->id = id;
@@ -88,7 +88,7 @@ struct bt_keys *bt_keys_get_addr(uint8_t id, const bt_addr_le_t *addr)
 #if IS_ENABLED(CONFIG_BT_KEYS_OVERWRITE_OLDEST)
 		keys->aging_counter = ++aging_counter_val;
 		last_keys_updated = keys;
-#endif  /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
+#endif /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
 		BT_DBG("created %p for %s", keys, bt_addr_le_str(addr));
 		return keys;
 	}
@@ -98,8 +98,9 @@ struct bt_keys *bt_keys_get_addr(uint8_t id, const bt_addr_le_t *addr)
 	return NULL;
 }
 
-void bt_foreach_bond(uint8_t id, void (*func)(const struct bt_bond_info *info,
-					   void *user_data),
+void bt_foreach_bond(uint8_t id,
+		     void (*func)(const struct bt_bond_info *info,
+				  void *user_data),
 		     void *user_data)
 {
 	int i;
@@ -379,7 +380,7 @@ static int keys_set(const char *name, size_t len_rd, settings_read_cb read_cb,
 	if (aging_counter_val < keys->aging_counter) {
 		aging_counter_val = keys->aging_counter;
 	}
-#endif  /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
+#endif /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
 	return 0;
 }
 
@@ -434,4 +435,4 @@ void bt_keys_update_usage(uint8_t id, const bt_addr_le_t *addr)
 	}
 }
 
-#endif  /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
+#endif /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */

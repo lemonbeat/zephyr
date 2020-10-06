@@ -36,8 +36,7 @@ static void process_sample(const struct device *dev)
 	printf("Temperature:%.1f C\n", sensor_value_to_double(&temp));
 
 	/* display humidity */
-	printf("Relative Humidity:%.1f%%\n",
-	       sensor_value_to_double(&hum));
+	printf("Relative Humidity:%.1f%%\n", sensor_value_to_double(&hum));
 }
 
 static void hts221_handler(const struct device *dev,

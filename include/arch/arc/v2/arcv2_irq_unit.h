@@ -45,11 +45,8 @@ extern "C" {
  * @return N/A
  */
 
-static ALWAYS_INLINE
-void z_arc_v2_irq_unit_irq_enable_set(
-	int irq,
-	unsigned char enable
-	)
+static ALWAYS_INLINE void z_arc_v2_irq_unit_irq_enable_set(int irq,
+							   unsigned char enable)
 {
 	unsigned int key = arch_irq_lock();
 
@@ -67,8 +64,7 @@ void z_arc_v2_irq_unit_irq_enable_set(
  * @return N/A
  */
 
-static ALWAYS_INLINE
-void z_arc_v2_irq_unit_int_enable(int irq)
+static ALWAYS_INLINE void z_arc_v2_irq_unit_int_enable(int irq)
 {
 	z_arc_v2_irq_unit_irq_enable_set(irq, _ARC_V2_INT_ENABLE);
 }
@@ -81,8 +77,7 @@ void z_arc_v2_irq_unit_int_enable(int irq)
  * @return N/A
  */
 
-static ALWAYS_INLINE
-void z_arc_v2_irq_unit_int_disable(int irq)
+static ALWAYS_INLINE void z_arc_v2_irq_unit_int_disable(int irq)
 {
 	z_arc_v2_irq_unit_irq_enable_set(irq, _ARC_V2_INT_DISABLE);
 }
@@ -95,8 +90,7 @@ void z_arc_v2_irq_unit_int_disable(int irq)
  * @return 1 enabled, 0 disabled
  */
 
-static ALWAYS_INLINE
-bool z_arc_v2_irq_unit_int_enabled(int irq)
+static ALWAYS_INLINE bool z_arc_v2_irq_unit_int_enabled(int irq)
 {
 	bool ret;
 	unsigned int key = arch_irq_lock();
@@ -109,7 +103,6 @@ bool z_arc_v2_irq_unit_int_enabled(int irq)
 	return ret;
 }
 
-
 /*
  * @brief Set interrupt priority
  *
@@ -118,17 +111,17 @@ bool z_arc_v2_irq_unit_int_enabled(int irq)
  * @return N/A
  */
 
-static ALWAYS_INLINE
-void z_arc_v2_irq_unit_prio_set(int irq, unsigned char prio)
+static ALWAYS_INLINE void z_arc_v2_irq_unit_prio_set(int irq,
+						     unsigned char prio)
 {
-
 	unsigned int key = arch_irq_lock();
 
 	z_arc_v2_aux_reg_write(_ARC_V2_IRQ_SELECT, irq);
 #if defined(CONFIG_ARC_SECURE_FIRMWARE)
 	z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY,
-	(z_arc_v2_aux_reg_read(_ARC_V2_IRQ_PRIORITY) & (~_ARC_V2_INT_PRIO_MASK))
-	| prio);
+			       (z_arc_v2_aux_reg_read(_ARC_V2_IRQ_PRIORITY) &
+				(~_ARC_V2_INT_PRIO_MASK)) |
+				       prio);
 #else
 	z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY, prio);
 #endif
@@ -143,21 +136,22 @@ void z_arc_v2_irq_unit_prio_set(int irq, unsigned char prio)
  *
  * @return N/A
  */
-static ALWAYS_INLINE
-void z_arc_v2_irq_uinit_secure_set(int irq, bool secure)
+static ALWAYS_INLINE void z_arc_v2_irq_uinit_secure_set(int irq, bool secure)
 {
 	unsigned int key = arch_irq_lock();
 
 	z_arc_v2_aux_reg_write(_ARC_V2_IRQ_SELECT, irq);
 
 	if (secure) {
-		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY,
-		z_arc_v2_aux_reg_read(_ARC_V2_IRQ_PRIORITY)  |
-		_ARC_V2_IRQ_PRIORITY_SECURE);
+		z_arc_v2_aux_reg_write(
+			_ARC_V2_IRQ_PRIORITY,
+			z_arc_v2_aux_reg_read(_ARC_V2_IRQ_PRIORITY) |
+				_ARC_V2_IRQ_PRIORITY_SECURE);
 	} else {
-		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY,
-		z_arc_v2_aux_reg_read(_ARC_V2_IRQ_PRIORITY) &
-		_ARC_V2_INT_PRIO_MASK);
+		z_arc_v2_aux_reg_write(
+			_ARC_V2_IRQ_PRIORITY,
+			z_arc_v2_aux_reg_read(_ARC_V2_IRQ_PRIORITY) &
+				_ARC_V2_INT_PRIO_MASK);
 	}
 
 	arch_irq_unlock(key);
@@ -175,8 +169,7 @@ void z_arc_v2_irq_uinit_secure_set(int irq, bool secure)
  * @return N/A
  */
 
-static ALWAYS_INLINE
-void z_arc_v2_irq_unit_sensitivity_set(int irq, int s)
+static ALWAYS_INLINE void z_arc_v2_irq_unit_sensitivity_set(int irq, int s)
 {
 	unsigned int key = arch_irq_lock();
 
@@ -193,8 +186,7 @@ void z_arc_v2_irq_unit_sensitivity_set(int irq, int s)
  *
  * @return 1 in interrupt/exception state; 0 not in
  */
-static ALWAYS_INLINE
-bool z_arc_v2_irq_unit_is_in_isr(void)
+static ALWAYS_INLINE bool z_arc_v2_irq_unit_is_in_isr(void)
 {
 	uint32_t act = z_arc_v2_aux_reg_read(_ARC_V2_AUX_IRQ_ACT);
 
@@ -215,8 +207,8 @@ bool z_arc_v2_irq_unit_is_in_isr(void)
  *
  * @return N/A
  */
-static ALWAYS_INLINE
-void z_arc_v2_irq_unit_trigger_set(int irq, unsigned int trigger)
+static ALWAYS_INLINE void z_arc_v2_irq_unit_trigger_set(int irq,
+							unsigned int trigger)
 {
 	unsigned int key = arch_irq_lock();
 
@@ -234,8 +226,7 @@ void z_arc_v2_irq_unit_trigger_set(int irq, unsigned int trigger)
  *
  * @return trigger state
  */
-static ALWAYS_INLINE
-unsigned int z_arc_v2_irq_unit_trigger_get(int irq)
+static ALWAYS_INLINE unsigned int z_arc_v2_irq_unit_trigger_get(int irq)
 {
 	unsigned int ret;
 	unsigned int key = arch_irq_lock();
@@ -256,8 +247,7 @@ unsigned int z_arc_v2_irq_unit_trigger_get(int irq)
  *
  * @return N/A
  */
-static ALWAYS_INLINE
-void z_arc_v2_irq_unit_int_eoi(int irq)
+static ALWAYS_INLINE void z_arc_v2_irq_unit_int_eoi(int irq)
 {
 	unsigned int key = arch_irq_lock();
 

@@ -77,7 +77,7 @@ GEN_ABSOLUTE_SYM(___callee_saved_t_SIZEOF, sizeof(struct _callee_saved));
 GEN_OFFSET_SYM(_thread_stack_info_t, start);
 
 GEN_ABSOLUTE_SYM(___thread_stack_info_t_SIZEOF,
-	 sizeof(struct _thread_stack_info));
+		 sizeof(struct _thread_stack_info));
 #endif
 
 /*
@@ -86,8 +86,8 @@ GEN_ABSOLUTE_SYM(___thread_stack_info_t_SIZEOF,
  */
 
 #if defined(CONFIG_FPU) && defined(CONFIG_FPU_SHARING)
-GEN_ABSOLUTE_SYM(_K_THREAD_NO_FLOAT_SIZEOF, sizeof(struct k_thread) -
-					    sizeof(struct _preempt_float));
+GEN_ABSOLUTE_SYM(_K_THREAD_NO_FLOAT_SIZEOF,
+		 sizeof(struct k_thread) - sizeof(struct _preempt_float));
 #else
 GEN_ABSOLUTE_SYM(_K_THREAD_NO_FLOAT_SIZEOF, sizeof(struct k_thread));
 #endif

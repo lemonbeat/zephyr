@@ -11,8 +11,7 @@
 LOG_MODULE_DECLARE(FXAS21002, CONFIG_SENSOR_LOG_LEVEL);
 
 static void fxas21002_gpio_callback(const struct device *dev,
-				    struct gpio_callback *cb,
-				    uint32_t pin_mask)
+				    struct gpio_callback *cb, uint32_t pin_mask)
 {
 	struct fxas21002_data *data =
 		CONTAINER_OF(cb, struct fxas21002_data, gpio_cb);
@@ -56,8 +55,7 @@ static void fxas21002_handle_int(const struct device *dev)
 	k_sem_take(&data->sem, K_FOREVER);
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      FXAS21002_REG_INT_SOURCE,
-			      &int_source)) {
+			      FXAS21002_REG_INT_SOURCE, &int_source)) {
 		LOG_ERR("Could not read interrupt source");
 		int_source = 0U;
 	}
@@ -135,8 +133,7 @@ int fxas21002_trigger_set(const struct device *dev,
 
 	/* Configure the sensor interrupt */
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-				FXAS21002_REG_CTRLREG2,
-				mask,
+				FXAS21002_REG_CTRLREG2, mask,
 				handler ? mask : 0)) {
 		LOG_ERR("Could not configure interrupt");
 		ret = -EIO;
@@ -152,8 +149,7 @@ int fxas21002_trigger_set(const struct device *dev,
 
 	/* Wait the transition time from ready mode */
 	transition_time = fxas21002_get_transition_time(FXAS21002_POWER_READY,
-							power,
-							config->dr);
+							power, config->dr);
 	k_busy_wait(transition_time);
 
 exit:
@@ -175,8 +171,8 @@ int fxas21002_trigger_init(const struct device *dev)
 	k_thread_create(&data->thread, data->thread_stack,
 			CONFIG_FXAS21002_THREAD_STACK_SIZE,
 			(k_thread_entry_t)fxas21002_thread_main, data, 0, NULL,
-			K_PRIO_COOP(CONFIG_FXAS21002_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			K_PRIO_COOP(CONFIG_FXAS21002_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_FXAS21002_TRIGGER_GLOBAL_THREAD)
 	data->work.handler = fxas21002_work_handler;
 #endif

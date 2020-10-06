@@ -47,8 +47,8 @@ bool arm_gic_irq_is_enabled(unsigned int irq)
 	return (enabler & (1 << int_off)) != 0;
 }
 
-void arm_gic_irq_set_priority(
-	unsigned int irq, unsigned int prio, uint32_t flags)
+void arm_gic_irq_set_priority(unsigned int irq, unsigned int prio,
+			      uint32_t flags)
 {
 	int int_grp, int_off;
 	uint32_t val;

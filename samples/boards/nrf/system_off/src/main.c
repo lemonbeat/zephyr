@@ -50,7 +50,8 @@ void main(void)
 	k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
 
 	printk("Busy-wait %u s with UART off\n", BUSY_WAIT_S);
-	rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+	rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL,
+				    NULL);
 	k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
 	rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
 
@@ -58,7 +59,8 @@ void main(void)
 	k_sleep(K_SECONDS(SLEEP_S));
 
 	printk("Sleep %u s with UART off\n", SLEEP_S);
-	rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+	rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL,
+				    NULL);
 	k_sleep(K_SECONDS(SLEEP_S));
 	rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
 

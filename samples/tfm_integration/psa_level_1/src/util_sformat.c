@@ -25,9 +25,9 @@ void sf_hex_tabulate_16(struct sf_hex_tbl_fmt *fmt, unsigned char *data,
 			size_t len)
 {
 	uint32_t idx;
-	uint32_t cpos;     /* Current position. */
-	uint32_t ca;       /* Current address. */
-	uint32_t ea;       /* End address. */
+	uint32_t cpos; /* Current position. */
+	uint32_t ca; /* Current address. */
+	uint32_t ea; /* End address. */
 
 	if (!len) {
 		return;
@@ -78,20 +78,20 @@ void sf_hex_tabulate_16(struct sf_hex_tbl_fmt *fmt, unsigned char *data,
 						sf_hex_ascii(
 							&data[idx - (ca % 16)],
 							ca - fmt->addr < 16 ?
-							idx % 16 : ca % 16,
+								      idx % 16 :
+								      ca % 16,
 							'.');
 					} else {
 						/* FULL row. */
-						sf_hex_ascii(
-							&data[idx - 16],
-							16, '.');
+						sf_hex_ascii(&data[idx - 16],
+							     16, '.');
 					}
 				} else if (ca < fmt->addr + 15) {
 					/* Handle first row. */
 					printf("%.*s", fmt->addr % 16,
 					       "                ");
-					sf_hex_ascii(data,
-						     16 - fmt->addr % 16, '.');
+					sf_hex_ascii(data, 16 - fmt->addr % 16,
+						     '.');
 				} else {
 					/* Full row. */
 					sf_hex_ascii(&data[idx - 16], 16, '.');

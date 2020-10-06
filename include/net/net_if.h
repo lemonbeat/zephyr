@@ -187,10 +187,10 @@ enum net_if_flag {
 	 */
 	NET_IF_FORWARD_MULTICASTS,
 
-/** @cond INTERNAL_HIDDEN */
+	/** @cond INTERNAL_HIDDEN */
 	/* Total number of flags - must be at the end of the enum */
 	NET_IF_NUM_FLAGS
-/** @endcond */
+	/** @endcond */
 };
 
 #if defined(CONFIG_NET_OFFLOAD)
@@ -412,7 +412,7 @@ struct net_if_dev {
 	const struct device *dev;
 
 	/** Interface's L2 layer */
-	const struct net_l2 * const l2;
+	const struct net_l2 *const l2;
 
 	/** Interface's private L2 data pointer */
 	void *l2_data;
@@ -475,8 +475,7 @@ struct net_if {
  * @param iface Pointer to network interface
  * @param value Flag value
  */
-static inline void net_if_flag_set(struct net_if *iface,
-				   enum net_if_flag value)
+static inline void net_if_flag_set(struct net_if *iface, enum net_if_flag value)
 {
 	NET_ASSERT(iface);
 
@@ -546,7 +545,7 @@ enum net_verdict net_if_send_data(struct net_if *iface, struct net_pkt *pkt);
  *
  * @return a pointer to the iface L2
  */
-static inline const struct net_l2 * const net_if_l2(struct net_if *iface)
+static inline const struct net_l2 *const net_if_l2(struct net_if *iface)
 {
 	if (!iface || !iface->if_dev) {
 		return NULL;
@@ -694,7 +693,6 @@ static inline void net_if_start_dad(struct net_if *iface)
  */
 void net_if_start_rs(struct net_if *iface);
 
-
 /**
  * @brief Stop neighbor discovery.
  *
@@ -720,9 +718,8 @@ static inline void net_if_stop_rs(struct net_if *iface)
  *
  * @return 0 on success
  */
-static inline int net_if_set_link_addr(struct net_if *iface,
-				       uint8_t *addr, uint8_t len,
-				       enum net_link_type type)
+static inline int net_if_set_link_addr(struct net_if *iface, uint8_t *addr,
+				       uint8_t len, enum net_link_type type)
 {
 	if (net_if_flag_is_set(iface, NET_IF_UP)) {
 		return -EPERM;
@@ -755,8 +752,7 @@ static inline uint16_t net_if_get_mtu(struct net_if *iface)
  * @param iface Pointer to a network interface structure
  * @param mtu New MTU, note that we store only 16 bit mtu value.
  */
-static inline void net_if_set_mtu(struct net_if *iface,
-				  uint16_t mtu)
+static inline void net_if_set_mtu(struct net_if *iface, uint16_t mtu)
 {
 	iface->if_dev->mtu = mtu;
 }
@@ -855,8 +851,7 @@ static inline struct net_if *net_if_get_ieee802154(void)
  *
  * @return 0 if ok, <0 if error
  */
-int net_if_config_ipv6_get(struct net_if *iface,
-			   struct net_if_ipv6 **ipv6);
+int net_if_config_ipv6_get(struct net_if *iface, struct net_if_ipv6 **ipv6);
 
 /**
  * @brief Release network interface IPv6 config.
@@ -924,8 +919,7 @@ struct net_if_addr *net_if_ipv6_addr_add(struct net_if *iface,
  *
  * @return True if ok, false if address could not be added
  */
-__syscall bool net_if_ipv6_addr_add_by_index(int index,
-					     struct in6_addr *addr,
+__syscall bool net_if_ipv6_addr_add_by_index(int index, struct in6_addr *addr,
 					     enum net_addr_type addr_type,
 					     uint32_t vlifetime);
 
@@ -1414,8 +1408,8 @@ static inline uint32_t net_if_ipv6_get_retrans_timer(struct net_if *iface)
 const struct in6_addr *net_if_ipv6_select_src_addr(struct net_if *iface,
 						   const struct in6_addr *dst);
 #else
-static inline const struct in6_addr *net_if_ipv6_select_src_addr(
-	struct net_if *iface, const struct in6_addr *dst)
+static inline const struct in6_addr *
+net_if_ipv6_select_src_addr(struct net_if *iface, const struct in6_addr *dst)
 {
 	ARG_UNUSED(iface);
 	ARG_UNUSED(dst);
@@ -1436,8 +1430,8 @@ static inline const struct in6_addr *net_if_ipv6_select_src_addr(
 #if defined(CONFIG_NET_NATIVE_IPV6)
 struct net_if *net_if_ipv6_select_src_iface(const struct in6_addr *dst);
 #else
-static inline struct net_if *net_if_ipv6_select_src_iface(
-	const struct in6_addr *dst)
+static inline struct net_if *
+net_if_ipv6_select_src_iface(const struct in6_addr *dst)
 {
 	ARG_UNUSED(dst);
 
@@ -1502,8 +1496,7 @@ struct in6_addr *net_if_ipv6_get_global_addr(enum net_addr_state state,
  *
  * @return 0 if ok, <0 if error
  */
-int net_if_config_ipv4_get(struct net_if *iface,
-			   struct net_if_ipv4 **ipv4);
+int net_if_config_ipv4_get(struct net_if *iface, struct net_if_ipv4 **ipv4);
 
 /**
  * @brief Release network interface IPv4 config.
@@ -1590,8 +1583,7 @@ __syscall int net_if_ipv4_addr_lookup_by_index(const struct in_addr *addr);
  *
  * @return True if ok, false if the address could not be added
  */
-__syscall bool net_if_ipv4_addr_add_by_index(int index,
-					     struct in_addr *addr,
+__syscall bool net_if_ipv4_addr_add_by_index(int index, struct in_addr *addr,
 					     enum net_addr_type addr_type,
 					     uint32_t vlifetime);
 
@@ -1743,8 +1735,8 @@ bool net_if_ipv4_is_addr_bcast(struct net_if *iface,
 #if defined(CONFIG_NET_NATIVE_IPV4)
 struct net_if *net_if_ipv4_select_src_iface(const struct in_addr *dst);
 #else
-static inline struct net_if *net_if_ipv4_select_src_iface(
-	const struct in_addr *dst)
+static inline struct net_if *
+net_if_ipv4_select_src_iface(const struct in_addr *dst)
 {
 	ARG_UNUSED(dst);
 
@@ -1767,8 +1759,8 @@ static inline struct net_if *net_if_ipv4_select_src_iface(
 const struct in_addr *net_if_ipv4_select_src_addr(struct net_if *iface,
 						  const struct in_addr *dst);
 #else
-static inline const struct in_addr *net_if_ipv4_select_src_addr(
-	struct net_if *iface, const struct in_addr *dst)
+static inline const struct in_addr *
+net_if_ipv4_select_src_addr(struct net_if *iface, const struct in_addr *dst)
 {
 	ARG_UNUSED(iface);
 	ARG_UNUSED(dst);
@@ -1862,8 +1854,7 @@ struct net_if *net_if_select_src_iface(const struct sockaddr *dst);
  * @param "int status" Send status, 0 is ok, < 0 error.
  */
 typedef void (*net_if_link_callback_t)(struct net_if *iface,
-				       struct net_linkaddr *dst,
-				       int status);
+				       struct net_linkaddr *dst, int status);
 
 /**
  * @brief Link callback handler struct.
@@ -2048,8 +2039,7 @@ struct net_if_timestamp_cb {
  * @param cb Callback to register.
  */
 void net_if_register_timestamp_cb(struct net_if_timestamp_cb *handle,
-				  struct net_pkt *pkt,
-				  struct net_if *iface,
+				  struct net_pkt *pkt, struct net_if *iface,
 				  net_if_timestamp_callback_t cb);
 
 /**
@@ -2162,49 +2152,45 @@ struct net_if_api {
 #define NET_IF_DHCPV4_INIT
 #endif
 
-#define NET_IF_CONFIG_INIT				\
-	.config = {					\
-		.ip = {					\
-		},					\
-		NET_IF_DHCPV4_INIT			\
-	}
+#define NET_IF_CONFIG_INIT .config = { .ip = {}, NET_IF_DHCPV4_INIT }
 
 #define NET_IF_GET_NAME(dev_name, sfx) __net_if_##dev_name##_##sfx
 #define NET_IF_DEV_GET_NAME(dev_name, sfx) __net_if_dev_##dev_name##_##sfx
 
-#define NET_IF_GET(dev_name, sfx)					\
+#define NET_IF_GET(dev_name, sfx) \
 	((struct net_if *)&NET_IF_GET_NAME(dev_name, sfx))
 
-#define NET_IF_INIT(dev_name, sfx, _l2, _mtu, _num_configs)		\
-	static Z_STRUCT_SECTION_ITERABLE(net_if_dev,			\
-				NET_IF_DEV_GET_NAME(dev_name, sfx)) = { \
-		.dev = &(DEVICE_NAME_GET(dev_name)),			\
-		.l2 = &(NET_L2_GET_NAME(_l2)),				\
-		.l2_data = &(NET_L2_GET_DATA(dev_name, sfx)),		\
-		.mtu = _mtu,						\
-	};								\
-	static Z_DECL_ALIGN(struct net_if)				\
-		       NET_IF_GET_NAME(dev_name, sfx)[_num_configs]	\
-		       __used __in_section(_net_if, static, net_if) = {	\
-		[0 ... (_num_configs - 1)] = {				\
-			.if_dev = &(NET_IF_DEV_GET_NAME(dev_name, sfx)), \
-			NET_IF_CONFIG_INIT				\
-		}							\
+#define NET_IF_INIT(dev_name, sfx, _l2, _mtu, _num_configs)                    \
+	static Z_STRUCT_SECTION_ITERABLE(                                      \
+		net_if_dev, NET_IF_DEV_GET_NAME(dev_name, sfx)) = {            \
+		.dev = &(DEVICE_NAME_GET(dev_name)),                           \
+		.l2 = &(NET_L2_GET_NAME(_l2)),                                 \
+		.l2_data = &(NET_L2_GET_DATA(dev_name, sfx)),                  \
+		.mtu = _mtu,                                                   \
+	};                                                                     \
+	static Z_DECL_ALIGN(struct net_if) NET_IF_GET_NAME(                    \
+		dev_name, sfx)[_num_configs] __used __in_section(_net_if,      \
+								 static,       \
+								 net_if) = {   \
+		[0 ...(_num_configs - 1)] = { .if_dev = &(NET_IF_DEV_GET_NAME( \
+						      dev_name, sfx)),         \
+					      NET_IF_CONFIG_INIT }             \
 	}
 
-#define NET_IF_OFFLOAD_INIT(dev_name, sfx, _mtu)			\
-	static Z_STRUCT_SECTION_ITERABLE(net_if_dev,			\
-				NET_IF_DEV_GET_NAME(dev_name, sfx)) = {	\
-		.dev = &(DEVICE_NAME_GET(dev_name)),			\
-		.mtu = _mtu,						\
-	};								\
-	static Z_DECL_ALIGN(struct net_if)				\
-		NET_IF_GET_NAME(dev_name, sfx)[NET_IF_MAX_CONFIGS]	\
-		       __used __in_section(_net_if, static, net_if) = {	\
-		[0 ... (NET_IF_MAX_CONFIGS - 1)] = {			\
-			.if_dev = &(NET_IF_DEV_GET_NAME(dev_name, sfx)), \
-			NET_IF_CONFIG_INIT				\
-		}							\
+#define NET_IF_OFFLOAD_INIT(dev_name, sfx, _mtu)                              \
+	static Z_STRUCT_SECTION_ITERABLE(                                     \
+		net_if_dev, NET_IF_DEV_GET_NAME(dev_name, sfx)) = {           \
+		.dev = &(DEVICE_NAME_GET(dev_name)),                          \
+		.mtu = _mtu,                                                  \
+	};                                                                    \
+	static Z_DECL_ALIGN(struct net_if) NET_IF_GET_NAME(                   \
+		dev_name,                                                     \
+		sfx)[NET_IF_MAX_CONFIGS] __used __in_section(_net_if, static, \
+							     net_if) = {      \
+		[0 ...(NET_IF_MAX_CONFIGS -                                   \
+		       1)] = { .if_dev =                                      \
+				       &(NET_IF_DEV_GET_NAME(dev_name, sfx)), \
+			       NET_IF_CONFIG_INIT }                           \
 	}
 
 /** @endcond */
@@ -2232,12 +2218,11 @@ struct net_if_api {
  * @param l2_ctx_type Type of L2 context data.
  * @param mtu Maximum transfer unit in bytes for this network interface.
  */
-#define NET_DEVICE_INIT(dev_name, drv_name, init_fn, pm_control_fn,	\
-			data, cfg, prio, api, l2,			\
-			l2_ctx_type, mtu)				\
-	DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn, data, \
-		      cfg, POST_KERNEL, prio, api);			\
-	NET_L2_DATA_INIT(dev_name, 0, l2_ctx_type);			\
+#define NET_DEVICE_INIT(dev_name, drv_name, init_fn, pm_control_fn, data, cfg, \
+			prio, api, l2, l2_ctx_type, mtu)                       \
+	DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn, data, cfg,   \
+		      POST_KERNEL, prio, api);                                 \
+	NET_L2_DATA_INIT(dev_name, 0, l2_ctx_type);                            \
 	NET_IF_INIT(dev_name, 0, l2, mtu, NET_IF_MAX_CONFIGS)
 
 /**
@@ -2265,12 +2250,12 @@ struct net_if_api {
  * @param l2_ctx_type Type of L2 context data.
  * @param mtu Maximum transfer unit in bytes for this network interface.
  */
-#define NET_DEVICE_INIT_INSTANCE(dev_name, drv_name, instance, init_fn,	\
-				 pm_control_fn, data, cfg, prio,	\
-				 api, l2, l2_ctx_type, mtu)		\
-	DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn, data,	\
-		      cfg, POST_KERNEL, prio, api);			\
-	NET_L2_DATA_INIT(dev_name, instance, l2_ctx_type);		\
+#define NET_DEVICE_INIT_INSTANCE(dev_name, drv_name, instance, init_fn,      \
+				 pm_control_fn, data, cfg, prio, api, l2,    \
+				 l2_ctx_type, mtu)                           \
+	DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn, data, cfg, \
+		      POST_KERNEL, prio, api);                               \
+	NET_L2_DATA_INIT(dev_name, instance, l2_ctx_type);                   \
 	NET_IF_INIT(dev_name, instance, l2, mtu, NET_IF_MAX_CONFIGS)
 
 /**
@@ -2294,11 +2279,10 @@ struct net_if_api {
  * used by the driver. Can be NULL.
  * @param mtu Maximum transfer unit in bytes for this network interface.
  */
-#define NET_DEVICE_OFFLOAD_INIT(dev_name, drv_name, init_fn,		\
-				pm_control_fn, data, cfg, prio,		\
-				api, mtu)				\
-	DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn, data,	\
-		      cfg, POST_KERNEL, prio, api);			\
+#define NET_DEVICE_OFFLOAD_INIT(dev_name, drv_name, init_fn, pm_control_fn,  \
+				data, cfg, prio, api, mtu)                   \
+	DEVICE_DEFINE(dev_name, drv_name, init_fn, pm_control_fn, data, cfg, \
+		      POST_KERNEL, prio, api);                               \
 	NET_IF_OFFLOAD_INIT(dev_name, 0, mtu)
 
 #ifdef __cplusplus

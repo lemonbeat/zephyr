@@ -39,9 +39,9 @@ enum screen_ids {
 struct font_info {
 	uint8_t columns;
 } fonts[] = {
-	[FONT_BIG] =    { .columns = 12 },
+	[FONT_BIG] = { .columns = 12 },
 	[FONT_MEDIUM] = { .columns = 16 },
-	[FONT_SMALL] =  { .columns = 25 },
+	[FONT_SMALL] = { .columns = 25 },
 };
 
 #define LONG_PRESS_TIMEOUT K_SECONDS(1)
@@ -61,17 +61,15 @@ static struct {
 	const char *name;
 	gpio_pin_t pin;
 	gpio_flags_t flags;
-} leds[] = {
-	{ .name = DT_GPIO_LABEL(DT_ALIAS(led0), gpios),
-	  .pin = DT_GPIO_PIN(DT_ALIAS(led0), gpios),
-	  .flags = DT_GPIO_FLAGS(DT_ALIAS(led0), gpios)},
-	{ .name = DT_GPIO_LABEL(DT_ALIAS(led1), gpios),
-	  .pin = DT_GPIO_PIN(DT_ALIAS(led1), gpios),
-	  .flags = DT_GPIO_FLAGS(DT_ALIAS(led1), gpios)},
-	{ .name = DT_GPIO_LABEL(DT_ALIAS(led2), gpios),
-	  .pin = DT_GPIO_PIN(DT_ALIAS(led2), gpios),
-	  .flags = DT_GPIO_FLAGS(DT_ALIAS(led2), gpios)}
-};
+} leds[] = { { .name = DT_GPIO_LABEL(DT_ALIAS(led0), gpios),
+	       .pin = DT_GPIO_PIN(DT_ALIAS(led0), gpios),
+	       .flags = DT_GPIO_FLAGS(DT_ALIAS(led0), gpios) },
+	     { .name = DT_GPIO_LABEL(DT_ALIAS(led1), gpios),
+	       .pin = DT_GPIO_PIN(DT_ALIAS(led1), gpios),
+	       .flags = DT_GPIO_FLAGS(DT_ALIAS(led1), gpios) },
+	     { .name = DT_GPIO_LABEL(DT_ALIAS(led2), gpios),
+	       .pin = DT_GPIO_PIN(DT_ALIAS(led2), gpios),
+	       .flags = DT_GPIO_FLAGS(DT_ALIAS(led2), gpios) } };
 
 struct k_delayed_work led_timer;
 
@@ -278,12 +276,11 @@ static void show_statistics(void)
 
 	cfb_framebuffer_clear(epd_dev, false);
 
-	len = snprintk(str, sizeof(str),
-		       "Own Address: 0x%04x", mesh_get_addr());
+	len = snprintk(str, sizeof(str), "Own Address: 0x%04x",
+		       mesh_get_addr());
 	print_line(FONT_SMALL, line++, str, len, false);
 
-	len = snprintk(str, sizeof(str),
-		       "Node Count:  %u", stat_count + 1);
+	len = snprintk(str, sizeof(str), "Node Count:  %u", stat_count + 1);
 	print_line(FONT_SMALL, line++, str, len, false);
 
 	/* Find the top sender */
@@ -447,8 +444,7 @@ static bool button_is_pressed(void)
 	return gpio_pin_get(gpio, DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) > 0;
 }
 
-static void button_interrupt(const struct device *dev,
-			     struct gpio_callback *cb,
+static void button_interrupt(const struct device *dev, struct gpio_callback *cb,
 			     uint32_t pins)
 {
 	if (button_is_pressed() == pressed) {
@@ -567,8 +563,7 @@ static int configure_leds(void)
 		}
 
 		gpio_pin_configure(leds[i].dev, leds[i].pin,
-				   leds[i].flags |
-				   GPIO_OUTPUT_INACTIVE);
+				   leds[i].flags | GPIO_OUTPUT_INACTIVE);
 	}
 
 	k_delayed_work_init(&led_timer, led_timeout);

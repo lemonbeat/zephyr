@@ -21,9 +21,9 @@ extern "C" {
  * register/bit to turn on/off its source clock.
  */
 struct npcx_clk_cfg {
-	uint16_t bus:8;
-	uint16_t ctrl:5;
-	uint16_t bit:3;
+	uint16_t bus : 8;
+	uint16_t ctrl : 5;
+	uint16_t bit : 3;
 };
 
 /*
@@ -37,11 +37,11 @@ struct npcx_clk_cfg {
  */
 
 /* Target OSC_CLK freq */
-#define OSC_CLK   CONFIG_CLOCK_NPCX_OSC_CYCLES_PER_SEC
+#define OSC_CLK CONFIG_CLOCK_NPCX_OSC_CYCLES_PER_SEC
 /* Core domain clock */
-#define CORE_CLK  CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC
+#define CORE_CLK CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC
 /* Low Frequency clock */
-#define LFCLK     32768
+#define LFCLK 32768
 /* Core clock prescaler */
 #define FPRED_VAL ((OSC_CLK / CORE_CLK) - 1)
 
@@ -82,40 +82,40 @@ struct npcx_clk_cfg {
  * OSC_CLK (Unit:Hz).
  */
 #if (OSC_CLK > 80000000)
-#define HFCGN_VAL    0x82 /* Set XF_RANGE as 1 if OSC_CLK >= 80MHz */
+#define HFCGN_VAL 0x82 /* Set XF_RANGE as 1 if OSC_CLK >= 80MHz */
 #else
-#define HFCGN_VAL    0x02
+#define HFCGN_VAL 0x02
 #endif
-#if   (OSC_CLK == 100000000)
-#define HFCGMH_VAL   0x0B
-#define HFCGML_VAL   0xEC
+#if (OSC_CLK == 100000000)
+#define HFCGMH_VAL 0x0B
+#define HFCGML_VAL 0xEC
 #elif (OSC_CLK == 90000000)
-#define HFCGMH_VAL   0x0A
-#define HFCGML_VAL   0xBA
+#define HFCGMH_VAL 0x0A
+#define HFCGML_VAL 0xBA
 #elif (OSC_CLK == 80000000)
-#define HFCGMH_VAL   0x09
-#define HFCGML_VAL   0x89
+#define HFCGMH_VAL 0x09
+#define HFCGML_VAL 0x89
 #elif (OSC_CLK == 66000000)
-#define HFCGMH_VAL   0x0F
-#define HFCGML_VAL   0xBC
+#define HFCGMH_VAL 0x0F
+#define HFCGML_VAL 0xBC
 #elif (OSC_CLK == 50000000)
-#define HFCGMH_VAL   0x0B
-#define HFCGML_VAL   0xEC
+#define HFCGMH_VAL 0x0B
+#define HFCGML_VAL 0xEC
 #elif (OSC_CLK == 48000000)
-#define HFCGMH_VAL   0x0B
-#define HFCGML_VAL   0x72
+#define HFCGMH_VAL 0x0B
+#define HFCGML_VAL 0x72
 #elif (OSC_CLK == 40000000)
-#define HFCGMH_VAL   0x09
-#define HFCGML_VAL   0x89
+#define HFCGMH_VAL 0x09
+#define HFCGML_VAL 0x89
 #elif (OSC_CLK == 33000000)
-#define HFCGMH_VAL   0x07
-#define HFCGML_VAL   0xDE
+#define HFCGMH_VAL 0x07
+#define HFCGML_VAL 0xDE
 #elif (OSC_CLK == 30000000)
-#define HFCGMH_VAL   0x07
-#define HFCGML_VAL   0x27
+#define HFCGMH_VAL 0x07
+#define HFCGML_VAL 0x27
 #elif (OSC_CLK == 26000000)
-#define HFCGMH_VAL   0x06
-#define HFCGML_VAL   0x33
+#define HFCGMH_VAL 0x06
+#define HFCGML_VAL 0x33
 #else
 #error "Unsupported OSC_CLK Frequency"
 #endif

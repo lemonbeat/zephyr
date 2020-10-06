@@ -21,7 +21,7 @@ static bool clock_is_off(void)
 		device_get_binding(DT_LABEL(DT_INST(0, nordic_nrf_clock)));
 
 	return clock_control_get_status(clk, CLOCK_CONTROL_NRF_SUBSYS_HF) ==
-			CLOCK_CONTROL_STATUS_OFF;
+	       CLOCK_CONTROL_STATUS_OFF;
 }
 
 static void clock_off(void)
@@ -80,7 +80,7 @@ void test_clock_spinwait_release_before_start(void)
 }
 
 static void request_cb(struct onoff_manager *mgr, struct onoff_client *cli,
-			uint32_t state, int res)
+		       uint32_t state, int res)
 {
 	int err;
 
@@ -111,13 +111,12 @@ void test_clock_release_from_callback(void)
 	zassert_true(clock_is_off(), "clock should be off");
 }
 
-
 void test_main(void)
 {
-	ztest_test_suite(test_clock_control_onoff,
+	ztest_test_suite(
+		test_clock_control_onoff,
 		ztest_unit_test(test_clock_blocking_on),
 		ztest_unit_test(test_clock_spinwait_release_before_start),
-		ztest_unit_test(test_clock_release_from_callback)
-			 );
+		ztest_unit_test(test_clock_release_from_callback));
 	ztest_run_test_suite(test_clock_control_onoff);
 }

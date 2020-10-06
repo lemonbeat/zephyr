@@ -31,9 +31,8 @@ static inline void log_stack_usage(const struct k_thread *thread)
 			tname = "unknown";
 		}
 
-		LOG_INF("%p (%s):\tunused %zu\tusage %zu / %zu (%u %%)",
-			thread, log_strdup(tname), unused, size - unused, size,
-			pcnt);
+		LOG_INF("%p (%s):\tunused %zu\tusage %zu / %zu (%u %%)", thread,
+			log_strdup(tname), unused, size - unused, size, pcnt);
 	}
 #endif
 }

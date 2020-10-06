@@ -20,14 +20,14 @@
 
 #include "board.h"
 
-#define SCROLL_SPEED   300
+#define SCROLL_SPEED 300
 
-#define BUZZER_PIN     EXT_P0_GPIO_PIN
-#define BEEP_DURATION  K_MSEC(60)
+#define BUZZER_PIN EXT_P0_GPIO_PIN
+#define BEEP_DURATION K_MSEC(60)
 
-#define SEQ_PER_BIT  976
-#define SEQ_PAGE     (NRF_FICR->CODEPAGESIZE * (NRF_FICR->CODESIZE - 1))
-#define SEQ_MAX      (NRF_FICR->CODEPAGESIZE * 8 * SEQ_PER_BIT)
+#define SEQ_PER_BIT 976
+#define SEQ_PAGE (NRF_FICR->CODEPAGESIZE * (NRF_FICR->CODESIZE - 1))
+#define SEQ_MAX (NRF_FICR->CODEPAGESIZE * 8 * SEQ_PER_BIT)
 
 static const struct device *gpio;
 static const struct device *nvm;
@@ -56,23 +56,20 @@ static void button_pressed(const struct device *dev, struct gpio_callback *cb,
 					 2 * MSEC_PER_SEC, "A");
 		} else {
 			mb_display_print(disp, MB_DISPLAY_MODE_SINGLE,
-					 2 * MSEC_PER_SEC, "%X", (target & 0xf));
+					 2 * MSEC_PER_SEC, "%X",
+					 (target & 0xf));
 		}
 	}
 }
 
 static const struct {
-	char  note;
+	char note;
 	uint32_t period;
 	uint32_t sharp;
 } period_map[] = {
-	{ 'C',  3822,  3608 },
-	{ 'D',  3405,  3214 },
-	{ 'E',  3034,  3034 },
-	{ 'F',  2863,  2703 },
-	{ 'G',  2551,  2407 },
-	{ 'A',  2273,  2145 },
-	{ 'B',  2025,  2025 },
+	{ 'C', 3822, 3608 }, { 'D', 3405, 3214 }, { 'E', 3034, 3034 },
+	{ 'F', 2863, 2703 }, { 'G', 2551, 2407 }, { 'A', 2273, 2145 },
+	{ 'B', 2025, 2025 },
 };
 
 static uint32_t get_period(char note, bool sharp)
@@ -141,30 +138,20 @@ void board_heartbeat(uint8_t hops, uint16_t feat)
 {
 	struct mb_display *disp = mb_display_get();
 	const struct mb_image hops_img[] = {
-		MB_IMAGE({ 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
+		MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 },
+			 { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 },
 			 { 1, 1, 1, 1, 1 }),
-		MB_IMAGE({ 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
-			 { 1, 1, 0, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
+		MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 },
+			 { 1, 1, 0, 1, 1 }, { 1, 1, 1, 1, 1 },
 			 { 1, 1, 1, 1, 1 }),
-		MB_IMAGE({ 1, 1, 1, 1, 1 },
-			 { 1, 0, 0, 0, 1 },
-			 { 1, 0, 0, 0, 1 },
-			 { 1, 0, 0, 0, 1 },
+		MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 0, 0, 0, 1 },
+			 { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 },
 			 { 1, 1, 1, 1, 1 }),
-		MB_IMAGE({ 1, 1, 1, 1, 1 },
-			 { 1, 0, 0, 0, 1 },
-			 { 1, 0, 0, 0, 1 },
-			 { 1, 0, 0, 0, 1 },
+		MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 0, 0, 0, 1 },
+			 { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 },
 			 { 1, 1, 1, 1, 1 }),
-		MB_IMAGE({ 1, 0, 1, 0, 1 },
-			 { 0, 0, 0, 0, 0 },
-			 { 1, 0, 0, 0, 1 },
-			 { 0, 0, 0, 0, 0 },
+		MB_IMAGE({ 1, 0, 1, 0, 1 }, { 0, 0, 0, 0, 0 },
+			 { 1, 0, 0, 0, 1 }, { 0, 0, 0, 0, 0 },
 			 { 1, 0, 1, 0, 1 })
 	};
 
@@ -191,25 +178,17 @@ void board_attention(bool attention)
 {
 	struct mb_display *disp = mb_display_get();
 	static const struct mb_image attn_img[] = {
-		MB_IMAGE({ 0, 0, 0, 0, 0 },
-			 { 0, 0, 0, 0, 0 },
-			 { 0, 0, 1, 0, 0 },
-			 { 0, 0, 0, 0, 0 },
+		MB_IMAGE({ 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0 },
+			 { 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0 },
 			 { 0, 0, 0, 0, 0 }),
-		MB_IMAGE({ 0, 0, 0, 0, 0 },
-			 { 0, 1, 1, 1, 0 },
-			 { 0, 1, 1, 1, 0 },
-			 { 0, 1, 1, 1, 0 },
+		MB_IMAGE({ 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 },
+			 { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 },
 			 { 0, 0, 0, 0, 0 }),
-		MB_IMAGE({ 1, 1, 1, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
-			 { 1, 1, 0, 1, 1 },
-			 { 1, 1, 1, 1, 1 },
+		MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 },
+			 { 1, 1, 0, 1, 1 }, { 1, 1, 1, 1, 1 },
 			 { 1, 1, 1, 1, 1 }),
-		MB_IMAGE({ 1, 1, 1, 1, 1 },
-			 { 1, 0, 0, 0, 1 },
-			 { 1, 0, 0, 0, 1 },
-			 { 1, 0, 0, 0, 1 },
+		MB_IMAGE({ 1, 1, 1, 1, 1 }, { 1, 0, 0, 0, 1 },
+			 { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 },
 			 { 1, 1, 1, 1, 1 }),
 	};
 
@@ -242,7 +221,7 @@ static void configure_button(void)
 
 	gpio_init_callback(&button_cb, button_pressed,
 			   BIT(DT_GPIO_PIN(DT_ALIAS(sw0), gpios)) |
-			   BIT(DT_GPIO_PIN(DT_ALIAS(sw1), gpios)));
+				   BIT(DT_GPIO_PIN(DT_ALIAS(sw1), gpios)));
 	gpio_add_callback(gpio, &button_cb);
 }
 
@@ -262,8 +241,8 @@ void board_init(uint16_t *addr)
 #endif
 	}
 
-	mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, SCROLL_SPEED,
-			 "0x%04x", *addr);
+	mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, SCROLL_SPEED, "0x%04x",
+			 *addr);
 
 	configure_button();
 }

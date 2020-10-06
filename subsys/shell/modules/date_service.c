@@ -11,20 +11,16 @@
 #include <posix/time.h>
 #include <sys/timeutil.h>
 
-#define HELP_NONE      "[none]"
-#define HELP_DATE_SET  "[Y-m-d] <H:M:S>"
+#define HELP_NONE "[none]"
+#define HELP_DATE_SET "[Y-m-d] <H:M:S>"
 
 static void date_print(const struct shell *shell, struct tm *tm)
 {
 	shell_print(shell,
 		    "%d-%02u-%02u "
 		    "%02u:%02u:%02u UTC",
-		    tm->tm_year + 1900,
-		    tm->tm_mon + 1,
-		    tm->tm_mday,
-		    tm->tm_hour,
-		    tm->tm_min,
-		    tm->tm_sec);
+		    tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+		    tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
 
 static int get_y_m_d(const struct shell *shell, struct tm *tm, char *date_str)
@@ -201,9 +197,10 @@ static int cmd_date_get(const struct shell *shell, size_t argc, char **argv)
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_date,
-	SHELL_CMD(set, NULL, HELP_DATE_SET, cmd_date_set),
-	SHELL_CMD(get, NULL, HELP_NONE, cmd_date_get),
-	SHELL_SUBCMD_SET_END /* Array terminated. */
+			       SHELL_CMD(set, NULL, HELP_DATE_SET,
+					 cmd_date_set),
+			       SHELL_CMD(get, NULL, HELP_NONE, cmd_date_get),
+			       SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 
 SHELL_CMD_REGISTER(date, &sub_date, "Date commands", NULL);

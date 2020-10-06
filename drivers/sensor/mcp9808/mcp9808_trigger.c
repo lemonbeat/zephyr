@@ -21,7 +21,7 @@ static int mcp9808_reg_write(const struct device *dev, uint8_t reg,
 	const struct mcp9808_config *cfg = dev->config;
 	uint8_t buf[3] = {
 		reg,
-		val >> 8,	/* big-endian register storage */
+		val >> 8, /* big-endian register storage */
 		val & 0xFF,
 	};
 
@@ -29,8 +29,7 @@ static int mcp9808_reg_write(const struct device *dev, uint8_t reg,
 }
 
 int mcp9808_attr_set(const struct device *dev, enum sensor_channel chan,
-		     enum sensor_attribute attr,
-		     const struct sensor_value *val)
+		     enum sensor_attribute attr, const struct sensor_value *val)
 {
 	uint8_t reg_addr;
 	int temp;
@@ -58,14 +57,12 @@ int mcp9808_attr_set(const struct device *dev, enum sensor_channel chan,
 				 mcp9808_temp_reg_from_signed(temp));
 }
 
-static inline void setup_int(const struct device *dev,
-			     bool enable)
+static inline void setup_int(const struct device *dev, bool enable)
 {
 	const struct mcp9808_data *data = dev->data;
 	const struct mcp9808_config *cfg = dev->config;
-	unsigned int flags = enable
-		? GPIO_INT_EDGE_TO_ACTIVE
-		: GPIO_INT_DISABLE;
+	unsigned int flags = enable ? GPIO_INT_EDGE_TO_ACTIVE :
+					    GPIO_INT_DISABLE;
 
 	gpio_pin_interrupt_configure(data->alert_gpio, cfg->alert_pin, flags);
 }
@@ -143,7 +140,8 @@ static void mcp9808_thread_main(struct mcp9808_data *data)
 	}
 }
 
-static K_KERNEL_STACK_DEFINE(mcp9808_thread_stack, CONFIG_MCP9808_THREAD_STACK_SIZE);
+static K_KERNEL_STACK_DEFINE(mcp9808_thread_stack,
+			     CONFIG_MCP9808_THREAD_STACK_SIZE);
 static struct k_thread mcp9808_thread;
 #else /* CONFIG_MCP9808_TRIGGER_GLOBAL_THREAD */
 
@@ -177,8 +175,8 @@ int mcp9808_setup_interrupt(const struct device *dev)
 	k_thread_create(&mcp9808_thread, mcp9808_thread_stack,
 			CONFIG_MCP9808_THREAD_STACK_SIZE,
 			(k_thread_entry_t)mcp9808_thread_main, data, NULL, NULL,
-			K_PRIO_COOP(CONFIG_MCP9808_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			K_PRIO_COOP(CONFIG_MCP9808_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #else /* CONFIG_MCP9808_TRIGGER_GLOBAL_THREAD */
 	data->work.handler = mcp9808_gpio_thread_cb;
 #endif /* trigger type */
@@ -196,7 +194,8 @@ int mcp9808_setup_interrupt(const struct device *dev)
 	}
 
 	if (rc == 0) {
-		gpio_init_callback(&data->alert_cb, alert_cb, BIT(cfg->alert_pin));
+		gpio_init_callback(&data->alert_cb, alert_cb,
+				   BIT(cfg->alert_pin));
 
 		rc = gpio_add_callback(gpio, &data->alert_cb);
 	}

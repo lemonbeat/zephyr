@@ -30,7 +30,8 @@
  * @param array_size Size of the array
  * @return The original index value if < size, or 0
  */
-static inline uint32_t k_array_index_sanitize(uint32_t index, uint32_t array_size)
+static inline uint32_t k_array_index_sanitize(uint32_t index,
+					      uint32_t array_size)
 {
 #ifdef CONFIG_BOUNDS_CHECK_BYPASS_MITIGATION
 	int32_t signed_index = index, signed_array_size = array_size;
@@ -43,7 +44,8 @@ static inline uint32_t k_array_index_sanitize(uint32_t index, uint32_t array_siz
 	 * Sign-extend just the sign bit to produce a mask of all 1s (accept)
 	 * or all 0s (truncate).
 	 */
-	uint32_t mask = ((signed_index - signed_array_size) & ~signed_index) >> 31;
+	uint32_t mask = ((signed_index - signed_array_size) & ~signed_index) >>
+			31;
 
 	return index & mask;
 #else

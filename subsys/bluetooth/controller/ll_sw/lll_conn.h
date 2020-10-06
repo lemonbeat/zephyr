@@ -8,7 +8,7 @@
 #endif /* CONFIG_BT_CTLR_CONN_META */
 
 #define LLL_CONN_RSSI_SAMPLE_COUNT 10
-#define LLL_CONN_RSSI_THRESHOLD    4
+#define LLL_CONN_RSSI_THRESHOLD 4
 
 #define LLL_CONN_MIC_NONE 0
 #define LLL_CONN_MIC_PASS 1
@@ -21,7 +21,7 @@ struct lll_tx {
 
 struct node_tx {
 	union {
-		void        *next;
+		void *next;
 		memq_link_t *link;
 	};
 
@@ -43,9 +43,9 @@ struct lll_conn {
 	uint16_t event_counter;
 
 	uint8_t data_chan_map[5];
-	uint8_t data_chan_count:6;
-	uint8_t data_chan_sel:1;
-	uint8_t role:1;
+	uint8_t data_chan_count : 6;
+	uint8_t data_chan_sel : 1;
+	uint8_t role : 1;
 
 	union {
 		struct {
@@ -58,7 +58,7 @@ struct lll_conn {
 
 #if defined(CONFIG_BT_PERIPHERAL)
 	struct {
-		uint8_t  latency_enabled:1;
+		uint8_t latency_enabled : 1;
 		uint32_t window_widening_periodic_us;
 		uint32_t window_widening_max_us;
 		uint32_t window_widening_prepare_us;
@@ -79,35 +79,35 @@ struct lll_conn {
 #endif /* CONFIG_BT_CTLR_DATA_LENGTH */
 
 #if defined(CONFIG_BT_CTLR_PHY)
-	uint8_t phy_tx:3;
-	uint8_t phy_flags:1;
-	uint8_t phy_tx_time:3;
-	uint8_t phy_rx:3;
+	uint8_t phy_tx : 3;
+	uint8_t phy_flags : 1;
+	uint8_t phy_tx_time : 3;
+	uint8_t phy_rx : 3;
 #endif /* CONFIG_BT_CTLR_PHY */
 
 	MEMQ_DECLARE(tx);
 	memq_link_t link_tx;
 	memq_link_t *link_tx_free;
-	uint8_t  packet_tx_head_len;
-	uint8_t  packet_tx_head_offset;
+	uint8_t packet_tx_head_len;
+	uint8_t packet_tx_head_offset;
 
-	uint8_t sn:1;
-	uint8_t nesn:1;
-	uint8_t empty:1;
+	uint8_t sn : 1;
+	uint8_t nesn : 1;
+	uint8_t empty : 1;
 
 #if defined(CONFIG_BT_CTLR_LE_ENC)
-	uint8_t enc_rx:1;
-	uint8_t enc_tx:1;
+	uint8_t enc_rx : 1;
+	uint8_t enc_tx : 1;
 
 	struct ccm ccm_rx;
 	struct ccm ccm_tx;
 #endif /* CONFIG_BT_CTLR_LE_ENC */
 
 #if defined(CONFIG_BT_CTLR_CONN_RSSI)
-	uint8_t  rssi_latest;
+	uint8_t rssi_latest;
 #if defined(CONFIG_BT_CTLR_CONN_RSSI_EVENT)
-	uint8_t  rssi_reported;
-	uint8_t  rssi_sample_count;
+	uint8_t rssi_reported;
+	uint8_t rssi_sample_count;
 #endif /* CONFIG_BT_CTLR_CONN_RSSI_EVENT */
 #endif /* CONFIG_BT_CTLR_CONN_RSSI */
 

@@ -38,50 +38,49 @@
 #include "settings.h"
 #include "prov_bearer.h"
 
+#define AUTH_METHOD_NO_OOB 0x00
+#define AUTH_METHOD_STATIC 0x01
+#define AUTH_METHOD_OUTPUT 0x02
+#define AUTH_METHOD_INPUT 0x03
 
-#define AUTH_METHOD_NO_OOB     0x00
-#define AUTH_METHOD_STATIC     0x01
-#define AUTH_METHOD_OUTPUT     0x02
-#define AUTH_METHOD_INPUT      0x03
+#define OUTPUT_OOB_BLINK 0x00
+#define OUTPUT_OOB_BEEP 0x01
+#define OUTPUT_OOB_VIBRATE 0x02
+#define OUTPUT_OOB_NUMBER 0x03
+#define OUTPUT_OOB_STRING 0x04
 
-#define OUTPUT_OOB_BLINK       0x00
-#define OUTPUT_OOB_BEEP        0x01
-#define OUTPUT_OOB_VIBRATE     0x02
-#define OUTPUT_OOB_NUMBER      0x03
-#define OUTPUT_OOB_STRING      0x04
+#define INPUT_OOB_PUSH 0x00
+#define INPUT_OOB_TWIST 0x01
+#define INPUT_OOB_NUMBER 0x02
+#define INPUT_OOB_STRING 0x03
 
-#define INPUT_OOB_PUSH         0x00
-#define INPUT_OOB_TWIST        0x01
-#define INPUT_OOB_NUMBER       0x02
-#define INPUT_OOB_STRING       0x03
+#define PUB_KEY_NO_OOB 0x00
+#define PUB_KEY_OOB 0x01
 
-#define PUB_KEY_NO_OOB         0x00
-#define PUB_KEY_OOB            0x01
+#define PROV_INVITE 0x00
+#define PROV_CAPABILITIES 0x01
+#define PROV_START 0x02
+#define PROV_PUB_KEY 0x03
+#define PROV_INPUT_COMPLETE 0x04
+#define PROV_CONFIRM 0x05
+#define PROV_RANDOM 0x06
+#define PROV_DATA 0x07
+#define PROV_COMPLETE 0x08
+#define PROV_FAILED 0x09
 
-#define PROV_INVITE            0x00
-#define PROV_CAPABILITIES      0x01
-#define PROV_START             0x02
-#define PROV_PUB_KEY           0x03
-#define PROV_INPUT_COMPLETE    0x04
-#define PROV_CONFIRM           0x05
-#define PROV_RANDOM            0x06
-#define PROV_DATA              0x07
-#define PROV_COMPLETE          0x08
-#define PROV_FAILED            0x09
+#define PROV_NO_PDU 0xff
 
-#define PROV_NO_PDU            0xff
-
-#define PROV_ALG_P256          0x00
+#define PROV_ALG_P256 0x00
 
 enum {
-	WAIT_PUB_KEY,           /* Waiting for local PubKey to be generated */
-	LINK_ACTIVE,            /* Link has been opened */
-	WAIT_NUMBER,            /* Waiting for number input from user */
-	WAIT_STRING,            /* Waiting for string input from user */
-	NOTIFY_INPUT_COMPLETE,  /* Notify that input has been completed. */
-	PROVISIONER,            /* The link was opened as provisioner */
-	PUB_KEY_SENT,           /* Public key has been sent */
-	INPUT_COMPLETE,         /* Device input completed */
+	WAIT_PUB_KEY, /* Waiting for local PubKey to be generated */
+	LINK_ACTIVE, /* Link has been opened */
+	WAIT_NUMBER, /* Waiting for number input from user */
+	WAIT_STRING, /* Waiting for string input from user */
+	NOTIFY_INPUT_COMPLETE, /* Notify that input has been completed. */
+	PROVISIONER, /* The link was opened as provisioner */
+	PUB_KEY_SENT, /* Public key has been sent */
+	INPUT_COMPLETE, /* Device input completed */
 
 	NUM_FLAGS,
 };
@@ -90,8 +89,8 @@ struct provisioner_link {
 	struct bt_mesh_cdb_node *node;
 	uint16_t addr;
 	uint16_t net_idx;
-	uint8_t  attention_duration;
-	uint8_t  uuid[16];
+	uint8_t attention_duration;
+	uint8_t uuid[16];
 };
 
 struct prov_link {
@@ -100,21 +99,21 @@ struct prov_link {
 	struct provisioner_link provisioner;
 #endif
 
-	uint8_t  dhkey[32];         /* Calculated DHKey */
-	uint8_t  expect;            /* Next expected PDU */
+	uint8_t dhkey[32]; /* Calculated DHKey */
+	uint8_t expect; /* Next expected PDU */
 
-	uint8_t  oob_method;
-	uint8_t  oob_action;
-	uint8_t  oob_size;
+	uint8_t oob_method;
+	uint8_t oob_action;
+	uint8_t oob_size;
 
-	uint8_t  conf[16];          /* Remote Confirmation */
-	uint8_t  rand[16];          /* Local Random */
-	uint8_t  auth[16];          /* Authentication Value */
+	uint8_t conf[16]; /* Remote Confirmation */
+	uint8_t rand[16]; /* Local Random */
+	uint8_t auth[16]; /* Authentication Value */
 
-	uint8_t  conf_salt[16];     /* ConfirmationSalt */
-	uint8_t  conf_key[16];      /* ConfirmationKey */
-	uint8_t  conf_inputs[145];  /* ConfirmationInputs */
-	uint8_t  prov_salt[16];     /* Provisioning Salt */
+	uint8_t conf_salt[16]; /* ConfirmationSalt */
+	uint8_t conf_key[16]; /* ConfirmationKey */
+	uint8_t conf_inputs[145]; /* ConfirmationInputs */
+	uint8_t prov_salt[16]; /* Provisioning Salt */
 
 	const struct prov_bearer *bearer;
 };
@@ -340,10 +339,9 @@ static void prov_capabilities(const uint8_t *data)
 		return;
 	}
 
-	link.provisioner.node =
-		bt_mesh_cdb_node_alloc(link.provisioner.uuid,
-				       link.provisioner.addr, data[0],
-				       link.provisioner.net_idx);
+	link.provisioner.node = bt_mesh_cdb_node_alloc(
+		link.provisioner.uuid, link.provisioner.addr, data[0],
+		link.provisioner.net_idx);
 	if (link.provisioner.node == NULL) {
 		BT_ERR("Failed allocating node 0x%04x", link.provisioner.addr);
 		prov_fail(PROV_ERR_RESOURCES);
@@ -408,8 +406,8 @@ static int prov_auth(uint8_t method, uint8_t action, uint8_t size)
 			return -EINVAL;
 		}
 
-		memcpy(link.auth + 16 - prov->static_val_len,
-		       prov->static_val, prov->static_val_len);
+		memcpy(link.auth + 16 - prov->static_val_len, prov->static_val,
+		       prov->static_val_len);
 		(void)memset(link.auth, 0,
 			     sizeof(link.auth) - prov->static_val_len);
 		return 0;
@@ -453,8 +451,10 @@ static int prov_auth(uint8_t method, uint8_t action, uint8_t size)
 
 			return prov->output_string((char *)str);
 		} else {
-			uint32_t div[8] = { 10, 100, 1000, 10000, 100000,
-					    1000000, 10000000, 100000000 };
+			uint32_t div[8] = {
+				10,	100,	 1000,	   10000,
+				100000, 1000000, 10000000, 100000000
+			};
 			uint32_t num;
 
 			bt_rand(&num, sizeof(num));
@@ -519,8 +519,8 @@ static void prov_start(const uint8_t *data)
 
 	if (prov_auth(data[2], data[3], data[4]) < 0) {
 		BT_ERR("Invalid authentication method: 0x%02x; "
-			"action: 0x%02x; size: 0x%02x", data[2], data[3],
-			data[4]);
+		       "action: 0x%02x; size: 0x%02x",
+		       data[2], data[3], data[4]);
 		prov_fail(PROV_ERR_NVAL_FMT);
 	}
 }
@@ -921,7 +921,7 @@ static void prov_random(const uint8_t *data)
 	if (memcmp(conf_verify, link.conf, 16)) {
 		BT_ERR("Invalid confirmation value");
 		BT_DBG("Received:   %s", bt_hex(link.conf, 16));
-		BT_DBG("Calculated: %s",  bt_hex(conf_verify, 16));
+		BT_DBG("Calculated: %s", bt_hex(conf_verify, 16));
 		prov_fail(PROV_ERR_CFM_FAILED);
 		return;
 	}
@@ -1028,8 +1028,8 @@ static void prov_data(const uint8_t *data)
 	iv_index = sys_get_be32(&pdu[19]);
 	addr = sys_get_be16(&pdu[23]);
 
-	BT_DBG("net_idx %u iv_index 0x%08x, addr 0x%04x",
-	       net_idx, iv_index, addr);
+	BT_DBG("net_idx %u iv_index 0x%08x, addr 0x%04x", net_idx, iv_index,
+	       addr);
 
 	prov_buf_init(&msg, PROV_COMPLETE);
 	if (prov_send(&msg, NULL)) {
@@ -1073,7 +1073,10 @@ static const struct {
 } prov_handlers[] = {
 	{ prov_invite, 1 },
 	{ prov_capabilities, 11 },
-	{ prov_start, 5, },
+	{
+		prov_start,
+		5,
+	},
 	{ prov_pub_key, 64 },
 	{ prov_input_complete, 0 },
 	{ prov_confirm, 16 },
@@ -1234,8 +1237,7 @@ int bt_mesh_prov_enable(bt_mesh_prov_bearer_t bearers)
 		BT_INFO("Device UUID: %s", bt_uuid_str(&uuid.uuid));
 	}
 
-	if (IS_ENABLED(CONFIG_BT_MESH_PB_ADV) &&
-	    (bearers & BT_MESH_PROV_ADV)) {
+	if (IS_ENABLED(CONFIG_BT_MESH_PB_ADV) && (bearers & BT_MESH_PROV_ADV)) {
 		pb_adv.link_accept(&prov_bearer_cb, NULL);
 	}
 
@@ -1253,8 +1255,7 @@ int bt_mesh_prov_disable(bt_mesh_prov_bearer_t bearers)
 		return -EALREADY;
 	}
 
-	if (IS_ENABLED(CONFIG_BT_MESH_PB_ADV) &&
-	    (bearers & BT_MESH_PROV_ADV)) {
+	if (IS_ENABLED(CONFIG_BT_MESH_PB_ADV) && (bearers & BT_MESH_PROV_ADV)) {
 		bt_mesh_beacon_disable();
 		bt_mesh_scan_disable();
 	}

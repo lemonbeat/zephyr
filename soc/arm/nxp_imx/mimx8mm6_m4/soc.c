@@ -18,7 +18,7 @@
 static void SOC_RdcInit(void)
 {
 	/* Move M4 core to specific RDC domain 1 */
-	rdc_domain_assignment_t assignment = {0};
+	rdc_domain_assignment_t assignment = { 0 };
 
 	assignment.domainId = M4_DOMAIN_ID;
 	RDC_SetMasterDomainAssignment(RDC, kRDC_Master_M4, &assignment);
@@ -55,19 +55,19 @@ static void SOC_RdcInit(void)
 
 /* AUDIO PLL1 configuration */
 static const ccm_analog_frac_pll_config_t g_audioPll1Config = {
-	.refSel  = kANALOG_PllRefOsc24M, /* PLL reference OSC24M */
+	.refSel = kANALOG_PllRefOsc24M, /* PLL reference OSC24M */
 	.mainDiv = 655U,
-	.dsm     = 23593U,
-	.preDiv  = 5U,
+	.dsm = 23593U,
+	.preDiv = 5U,
 	.postDiv = 2U, /* AUDIO PLL1 frequency  = 786432000HZ */
 };
 
 /* AUDIO PLL2 configuration */
 static const ccm_analog_frac_pll_config_t g_audioPll2Config = {
-	.refSel  = kANALOG_PllRefOsc24M, /* PLL reference OSC24M */
+	.refSel = kANALOG_PllRefOsc24M, /* PLL reference OSC24M */
 	.mainDiv = 301U,
-	.dsm     = 3670U,
-	.preDiv  = 5U,
+	.dsm = 3670U,
+	.preDiv = 5U,
 	.postDiv = 1U, /* AUDIO PLL2 frequency  = 722534399HZ */
 };
 

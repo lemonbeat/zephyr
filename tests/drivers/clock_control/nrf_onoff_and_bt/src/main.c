@@ -73,20 +73,21 @@ static void check_hf_status(const struct device *dev, bool exp_on,
 	nrf_clock_hfclk_t type;
 
 	nrf_clock_is_running(NRF_CLOCK, NRF_CLOCK_DOMAIN_HFCLK, &type);
-	zassert_equal(type, exp_on ? NRF_CLOCK_HFCLK_HIGH_ACCURACY :
-				NRF_CLOCK_HFCLK_LOW_ACCURACY,
-			"%d: Clock expected to be %s",
-			iteration, exp_on ? "on" : "off");
+	zassert_equal(type,
+		      exp_on ? NRF_CLOCK_HFCLK_HIGH_ACCURACY :
+				     NRF_CLOCK_HFCLK_LOW_ACCURACY,
+		      "%d: Clock expected to be %s", iteration,
+		      exp_on ? "on" : "off");
 
 	if (sw_check) {
-		enum clock_control_status status =
-		     clock_control_get_status(dev, CLOCK_CONTROL_NRF_SUBSYS_HF);
+		enum clock_control_status status = clock_control_get_status(
+			dev, CLOCK_CONTROL_NRF_SUBSYS_HF);
 
-		zassert_equal(status, exp_on ? CLOCK_CONTROL_STATUS_ON :
-						CLOCK_CONTROL_STATUS_OFF,
-				"%d: Unexpected status: %d", iteration, status);
+		zassert_equal(status,
+			      exp_on ? CLOCK_CONTROL_STATUS_ON :
+					     CLOCK_CONTROL_STATUS_OFF,
+			      "%d: Unexpected status: %d", iteration, status);
 	}
-
 }
 
 /* Test controls HF clock from two contexts: thread and timer interrupt.
@@ -243,10 +244,9 @@ static void test_bt_interrupted(void)
 void test_main(void)
 {
 	ztest_test_suite(test_nrf_onoff_and_bt,
-		ztest_unit_test_setup_teardown(test_onoff_interrupted,
-					       setup, teardown),
-		ztest_unit_test_setup_teardown(test_bt_interrupted,
-					       setup, teardown)
-			);
+			 ztest_unit_test_setup_teardown(test_onoff_interrupted,
+							setup, teardown),
+			 ztest_unit_test_setup_teardown(test_bt_interrupted,
+							setup, teardown));
 	ztest_run_test_suite(test_nrf_onoff_and_bt);
 }

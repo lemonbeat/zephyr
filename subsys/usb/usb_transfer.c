@@ -198,8 +198,7 @@ int usb_transfer(uint8_t ep, uint8_t *data, size_t dlen, unsigned int flags,
 	struct usb_transfer_data *trans = NULL;
 	int i, key, ret = 0;
 
-	LOG_DBG("Transfer start, ep 0x%02x, data %p, dlen %zd",
-		ep, data, dlen);
+	LOG_DBG("Transfer start, ep 0x%02x, data %p, dlen %zd", ep, data, dlen);
 
 	key = irq_lock();
 
@@ -301,7 +300,8 @@ static void usb_transfer_sync_cb(uint8_t ep, int size, void *priv)
 	k_sem_give(&pdata->sem);
 }
 
-int usb_transfer_sync(uint8_t ep, uint8_t *data, size_t dlen, unsigned int flags)
+int usb_transfer_sync(uint8_t ep, uint8_t *data, size_t dlen,
+		      unsigned int flags)
 {
 	struct usb_transfer_sync_priv pdata;
 	int ret;

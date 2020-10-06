@@ -11,7 +11,6 @@
 #ifndef ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_TYPES_H_
 #define ZEPHYR_DRIVERS_SENSOR_VL53L0X_VL53L0X_TYPES_H_
 
-
 /* Zephyr provides stdint.h and stddef.h, so this is enough to include it.
  * If it was not the case, we would defined here all signed and unsigned
  * basic types...

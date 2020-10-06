@@ -11,18 +11,18 @@
 
 #if defined(RCC_CFGR_I2SSRC)
 /* single selector for the I2S clock source (SEL_1 == SEL_2) */
-#define CLK_SEL_1	LL_RCC_I2S1_CLKSOURCE_PLLI2S
-#define CLK_SEL_2	LL_RCC_I2S1_CLKSOURCE_PLLI2S
+#define CLK_SEL_1 LL_RCC_I2S1_CLKSOURCE_PLLI2S
+#define CLK_SEL_2 LL_RCC_I2S1_CLKSOURCE_PLLI2S
 #else
 #if defined(RCC_DCKCFGR_I2SSRC)
 /* single selector for the I2S clock source (SEL_1 == SEL_2) */
-#define CLK_SEL_1	LL_RCC_I2S1_CLKSOURCE_PLL
-#define CLK_SEL_2	LL_RCC_I2S1_CLKSOURCE_PLL
+#define CLK_SEL_1 LL_RCC_I2S1_CLKSOURCE_PLL
+#define CLK_SEL_2 LL_RCC_I2S1_CLKSOURCE_PLL
 #else
 #if defined(RCC_DCKCFGR_I2S1SRC) && defined(RCC_DCKCFGR_I2S2SRC)
 /* double selector for the I2S clock source (SEL_1 != SEL_2) */
-#define CLK_SEL_1	LL_RCC_I2S1_CLKSOURCE_PLLI2S
-#define CLK_SEL_2	LL_RCC_I2S2_CLKSOURCE_PLLI2S
+#define CLK_SEL_1 LL_RCC_I2S1_CLKSOURCE_PLLI2S
+#define CLK_SEL_2 LL_RCC_I2S2_CLKSOURCE_PLLI2S
 #endif /* RCC_DCKCFGR_I2S1SRC && RCC_DCKCFGR_I2S2SRC */
 #endif /* RCC_DCKCFGR_I2SSRC */
 #endif /* RCC_CFGR_I2SSRC */
@@ -31,28 +31,26 @@
 
 #if defined(RCC_CFGR_I2SSRC)
 /* single selector for the I2S clock source (SEL_1 == SEL_2) */
-#define CLK_SEL_1	LL_RCC_I2S1_CLKSOURCE_PIN
-#define CLK_SEL_2	LL_RCC_I2S1_CLKSOURCE_PIN
+#define CLK_SEL_1 LL_RCC_I2S1_CLKSOURCE_PIN
+#define CLK_SEL_2 LL_RCC_I2S1_CLKSOURCE_PIN
 #else
 #if defined(RCC_DCKCFGR_I2SSRC)
 /* single selector for the I2S clock source (SEL_1 == SEL_2) */
-#define CLK_SEL_1	LL_RCC_I2S1_CLKSOURCE_PLLSRC
-#define CLK_SEL_2	LL_RCC_I2S1_CLKSOURCE_PLLSRC
+#define CLK_SEL_1 LL_RCC_I2S1_CLKSOURCE_PLLSRC
+#define CLK_SEL_2 LL_RCC_I2S1_CLKSOURCE_PLLSRC
 #else
 #if defined(RCC_DCKCFGR_I2S1SRC) && defined(RCC_DCKCFGR_I2S2SRC)
 /* double selector for the I2S clock source (SEL_1 != SEL_2) */
-#define CLK_SEL_1	LL_RCC_I2S1_CLKSOURCE_PLLSRC
-#define CLK_SEL_2	LL_RCC_I2S2_CLKSOURCE_PLLSRC
+#define CLK_SEL_1 LL_RCC_I2S1_CLKSOURCE_PLLSRC
+#define CLK_SEL_2 LL_RCC_I2S2_CLKSOURCE_PLLSRC
 #endif /* RCC_DCKCFGR_I2S1SRC && RCC_DCKCFGR_I2S2SRC */
 #endif /* RCC_DCKCFGR_I2SSRC */
 #endif /* RCC_CFGR_I2SSRC */
 
 #endif /* CONFIG_I2S_STM32_USE_PLLI2S_ENABLE */
 
-#define DEV_CFG(dev) \
-	(const struct i2s_stm32_cfg * const)((dev)->config)
-#define DEV_DATA(dev) \
-	((struct i2s_stm32_data *const)(dev)->data)
+#define DEV_CFG(dev) (const struct i2s_stm32_cfg *const)((dev)->config)
+#define DEV_DATA(dev) ((struct i2s_stm32_data *const)(dev)->data)
 
 struct queue_item {
 	void *mem_block;
@@ -105,4 +103,4 @@ struct i2s_stm32_data {
 	struct stream tx;
 };
 
-#endif	/* _STM32_I2S_H_ */
+#endif /* _STM32_I2S_H_ */

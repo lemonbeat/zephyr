@@ -30,24 +30,24 @@ LOG_MODULE_REGISTER(IIS2DH, CONFIG_SENSOR_LOG_LEVEL);
 static const uint32_t iis2dh_gain[3][4] = {
 	{
 		/* HR mode */
-		980/16,		/* 2G */
-		1950/16,	/* 4G */
-		3910/16,	/* 8G */
-		11720/16,	/* 16G */
+		980 / 16, /* 2G */
+		1950 / 16, /* 4G */
+		3910 / 16, /* 8G */
+		11720 / 16, /* 16G */
 	},
 	{
 		/* NM mode */
-		3910/64,	/* 2G */
-		7810/64,	/* 4G */
-		15630/64,	/* 8G */
-		46950/64,	/* 16G */
+		3910 / 64, /* 2G */
+		7810 / 64, /* 4G */
+		15630 / 64, /* 8G */
+		46950 / 64, /* 16G */
 	},
 	{
 		/* LP mode */
-		15630/256,	/* 2G */
-		31250/256,	/* 4G */
-		62500/256,	/* 8G */
-		188680/256,	/* 16G */
+		15630 / 256, /* 2G */
+		31250 / 256, /* 4G */
+		62500 / 256, /* 8G */
+		188680 / 256, /* 16G */
 	},
 };
 
@@ -133,11 +133,12 @@ static inline void iis2dh_channel_get_acc(const struct device *dev,
 		ofs_start = ofs_stop = 2U;
 		break;
 	default:
-		ofs_start = 0U; ofs_stop = 2U;
+		ofs_start = 0U;
+		ofs_stop = 2U;
 		break;
 	}
 
-	for (i = ofs_start; i <= ofs_stop ; i++) {
+	for (i = ofs_start; i <= ofs_stop; i++) {
 		iis2dh_convert(pval++, iis2dh->acc[i], iis2dh->gain);
 	}
 }
@@ -311,6 +312,6 @@ const struct iis2dh_device_config iis2dh_cfg = {
 
 struct iis2dh_data iis2dh_data;
 
-DEVICE_AND_API_INIT(iis2dh, DT_INST_LABEL(0), iis2dh_init,
-	     &iis2dh_data, &iis2dh_cfg, POST_KERNEL,
-	     CONFIG_SENSOR_INIT_PRIORITY, &iis2dh_driver_api);
+DEVICE_AND_API_INIT(iis2dh, DT_INST_LABEL(0), iis2dh_init, &iis2dh_data,
+		    &iis2dh_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &iis2dh_driver_api);

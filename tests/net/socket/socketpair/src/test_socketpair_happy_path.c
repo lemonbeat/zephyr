@@ -22,14 +22,11 @@ LOG_MODULE_DECLARE(net_test, CONFIG_NET_SOCKETS_LOG_LEVEL);
 #undef write
 #define write(fd, buf, len) zsock_send(fd, buf, len, 0)
 
-static void happy_path(
-	const int family, const char *family_s,
-	const int type, const char *type_s,
-	const int proto, const char *proto_s
-)
+static void happy_path(const int family, const char *family_s, const int type,
+		       const char *type_s, const int proto, const char *proto_s)
 {
 	int res;
-	int sv[2] = {-1, -1};
+	int sv[2] = { -1, -1 };
 
 	const char *expected_msg = "Hello, socketpair(2) world!";
 	const unsigned int expected_msg_len = strlen(expected_msg);
@@ -49,7 +46,6 @@ static void happy_path(
 
 	/* sockets are bidirectional. test functions from both ends */
 	for (int i = 0; i < 2; ++i) {
-
 		/*
 		 * Test with write(2) / read(2)
 		 */
@@ -61,7 +57,7 @@ static void happy_path(
 		zassert_not_equal(res, -1, "write(2) failed: %d", errno);
 		actual_msg_len = res;
 		zassert_equal(actual_msg_len, expected_msg_len,
-				  "did not write entire message");
+			      "did not write entire message");
 
 		memset(actual_msg, 0, sizeof(actual_msg));
 
@@ -74,8 +70,8 @@ static void happy_path(
 		zassert_equal(actual_msg_len, expected_msg_len,
 			      "wrong return value");
 
-		zassert_true(strncmp(expected_msg, actual_msg,
-			actual_msg_len) == 0,
+		zassert_true(
+			strncmp(expected_msg, actual_msg, actual_msg_len) == 0,
 			"the wrong message was passed through the socketpair");
 
 		/*
@@ -87,7 +83,7 @@ static void happy_path(
 		zassert_not_equal(res, -1, "send(2) failed: %d", errno);
 		actual_msg_len = res;
 		zassert_equal(actual_msg_len, expected_msg_len,
-				  "did not send entire message");
+			      "did not send entire message");
 
 		memset(actual_msg, 0, sizeof(actual_msg));
 
@@ -98,8 +94,8 @@ static void happy_path(
 		zassert_equal(actual_msg_len, expected_msg_len,
 			      "wrong return value");
 
-		zassert_true(strncmp(expected_msg, actual_msg,
-			actual_msg_len) == 0,
+		zassert_true(
+			strncmp(expected_msg, actual_msg, actual_msg_len) == 0,
 			"the wrong message was passed through the socketpair");
 
 		/*
@@ -111,20 +107,20 @@ static void happy_path(
 		zassert_not_equal(res, -1, "sendto(2) failed: %d", errno);
 		actual_msg_len = res;
 		zassert_equal(actual_msg_len, expected_msg_len,
-				  "did not sendto entire message");
+			      "did not sendto entire message");
 
 		memset(actual_msg, 0, sizeof(actual_msg));
 
 		len = 0;
 		res = recvfrom(sv[(!i) & 1], actual_msg, sizeof(actual_msg), 0,
-			NULL, &len);
+			       NULL, &len);
 		zassert_true(res >= 0, "recvfrom(2) failed: %d", errno);
 		actual_msg_len = res;
 		zassert_equal(actual_msg_len, expected_msg_len,
 			      "wrong return value");
 
-		zassert_true(strncmp(expected_msg, actual_msg,
-			actual_msg_len) == 0,
+		zassert_true(
+			strncmp(expected_msg, actual_msg, actual_msg_len) == 0,
 			"the wrong message was passed through the socketpair");
 
 		/*
@@ -142,7 +138,7 @@ static void happy_path(
 		zassert_not_equal(res, -1, "sendmsg(2) failed: %d", errno);
 		actual_msg_len = res;
 		zassert_equal(actual_msg_len, expected_msg_len,
-				  "did not sendmsg entire message");
+			      "did not sendmsg entire message");
 
 		res = read(sv[(!i) & 1], actual_msg, sizeof(actual_msg));
 
@@ -151,8 +147,8 @@ static void happy_path(
 		zassert_equal(actual_msg_len, expected_msg_len,
 			      "wrong return value");
 
-		zassert_true(strncmp(expected_msg, actual_msg,
-			actual_msg_len) == 0,
+		zassert_true(
+			strncmp(expected_msg, actual_msg, actual_msg_len) == 0,
 			"the wrong message was passed through the socketpair");
 	}
 
@@ -165,18 +161,10 @@ static void happy_path(
 
 void test_socketpair_AF_LOCAL__SOCK_STREAM__0(void)
 {
-	happy_path(
-		AF_LOCAL, "AF_LOCAL",
-		SOCK_STREAM, "SOCK_STREAM",
-		0, "0"
-	);
+	happy_path(AF_LOCAL, "AF_LOCAL", SOCK_STREAM, "SOCK_STREAM", 0, "0");
 }
 
 void test_socketpair_AF_UNIX__SOCK_STREAM__0(void)
 {
-	happy_path(
-		AF_UNIX, "AF_UNIX",
-		SOCK_STREAM, "SOCK_STREAM",
-		0, "0"
-	);
+	happy_path(AF_UNIX, "AF_UNIX", SOCK_STREAM, "SOCK_STREAM", 0, "0");
 }

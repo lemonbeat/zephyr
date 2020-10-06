@@ -21,10 +21,10 @@ struct spi_stm32_config {
 
 #ifdef CONFIG_SPI_STM32_DMA
 
-#define SPI_STM32_DMA_ERROR_FLAG	0x01
-#define SPI_STM32_DMA_RX_DONE_FLAG	0x02
-#define SPI_STM32_DMA_TX_DONE_FLAG	0x04
-#define SPI_STM32_DMA_DONE_FLAG	\
+#define SPI_STM32_DMA_ERROR_FLAG 0x01
+#define SPI_STM32_DMA_RX_DONE_FLAG 0x02
+#define SPI_STM32_DMA_TX_DONE_FLAG 0x04
+#define SPI_STM32_DMA_DONE_FLAG \
 	(SPI_STM32_DMA_RX_DONE_FLAG | SPI_STM32_DMA_TX_DONE_FLAG)
 
 struct stream {
@@ -188,4 +188,4 @@ static inline void ll_func_disable_spi(SPI_TypeDef *spi)
 #endif
 }
 
-#endif	/* ZEPHYR_DRIVERS_SPI_SPI_LL_STM32_H_ */
+#endif /* ZEPHYR_DRIVERS_SPI_SPI_LL_STM32_H_ */

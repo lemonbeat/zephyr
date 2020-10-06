@@ -34,10 +34,10 @@
 #define MONITOR_INIT_PRIORITY 60
 
 /* These defines follow the values used by syslog(2) */
-#define BT_LOG_ERR      3
-#define BT_LOG_WARN     4
-#define BT_LOG_INFO     6
-#define BT_LOG_DBG      7
+#define BT_LOG_ERR 3
+#define BT_LOG_WARN 4
+#define BT_LOG_INFO 6
+#define BT_LOG_DBG 7
 
 /* TS resolution is 1/10th of a millisecond */
 #define MONITOR_TS_FREQ 10000
@@ -66,8 +66,7 @@ static struct {
 	atomic_t other;
 } drops;
 
-extern int z_prf(int (*func)(), void *dest,
-		const char *format, va_list vargs);
+extern int z_prf(int (*func)(), void *dest, const char *format, va_list vargs);
 
 static void monitor_send(const void *data, size_t len)
 {
@@ -101,8 +100,8 @@ static inline void encode_hdr(struct bt_monitor_hdr *hdr, uint32_t timestamp,
 {
 	struct bt_monitor_ts32 *ts;
 
-	hdr->opcode   = sys_cpu_to_le16(opcode);
-	hdr->flags    = 0U;
+	hdr->opcode = sys_cpu_to_le16(opcode);
+	hdr->flags = 0U;
 
 	ts = (void *)hdr->ext;
 	ts->type = BT_MONITOR_TS32;
@@ -249,11 +248,9 @@ LOG_OUTPUT_DEFINE(monitor_log_output, monitor_log_out, &buf, 1);
 static inline uint8_t monitor_priority_get(uint8_t log_level)
 {
 	static const uint8_t prios[] = {
-		[LOG_LEVEL_NONE]  = 0,
-		[LOG_LEVEL_ERR]   = BT_LOG_ERR,
-		[LOG_LEVEL_WRN]   = BT_LOG_WARN,
-		[LOG_LEVEL_INF]   = BT_LOG_INFO,
-		[LOG_LEVEL_DBG]   = BT_LOG_DBG,
+		[LOG_LEVEL_NONE] = 0,	       [LOG_LEVEL_ERR] = BT_LOG_ERR,
+		[LOG_LEVEL_WRN] = BT_LOG_WARN, [LOG_LEVEL_INF] = BT_LOG_INFO,
+		[LOG_LEVEL_DBG] = BT_LOG_DBG,
 	};
 
 	if (log_level < ARRAY_SIZE(prios)) {

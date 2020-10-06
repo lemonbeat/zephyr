@@ -78,7 +78,7 @@ void arc_core_mpu_default(uint32_t region_attr);
  * @param   region_attr region attribute
  */
 int arc_core_mpu_region(uint32_t index, uint32_t base, uint32_t size,
-			 uint32_t region_attr);
+			uint32_t region_attr);
 
 #endif /* CONFIG_ARC_CORE_MPU */
 
@@ -86,7 +86,7 @@ int arc_core_mpu_region(uint32_t index, uint32_t base, uint32_t size,
 void arc_core_mpu_configure_mem_domain(struct k_thread *thread);
 void arc_core_mpu_remove_mem_domain(struct k_mem_domain *mem_domain);
 void arc_core_mpu_remove_mem_partition(struct k_mem_domain *domain,
-			uint32_t partition_id);
+				       uint32_t partition_id);
 int arc_core_mpu_get_max_domain_partition_regions(void);
 int arc_core_mpu_buffer_validate(void *addr, size_t size, int write);
 

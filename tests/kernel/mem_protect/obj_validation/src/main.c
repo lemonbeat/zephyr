@@ -9,7 +9,7 @@
 #include <ztest.h>
 #include <kernel_internal.h>
 
-#define SEM_ARRAY_SIZE	16
+#define SEM_ARRAY_SIZE 16
 
 /* Show that extern declarations don't interfere with detecting kernel
  * objects, this was at one point a problem.
@@ -34,8 +34,8 @@ static int test_object(struct k_sem *sem, int retval)
 		 */
 		ret = z_object_validate(z_object_find(sem), K_OBJ_SEM, 0);
 	} else {
-		ret = z_obj_validation_check(z_object_find(sem), sem,
-					    K_OBJ_SEM, 0);
+		ret = z_obj_validation_check(z_object_find(sem), sem, K_OBJ_SEM,
+					     0);
 	}
 
 	if (ret != retval) {

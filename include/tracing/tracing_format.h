@@ -24,28 +24,29 @@ typedef struct tracing_data {
 /**
  * @brief Macro to trace a message in string format.
  */
-#define TRACING_STRING(fmt, ...)					       \
-	do {								       \
-		tracing_format_string(fmt, ##__VA_ARGS__);		       \
+#define TRACING_STRING(fmt, ...)                           \
+	do {                                               \
+		tracing_format_string(fmt, ##__VA_ARGS__); \
 	} while (false)
 
 /**
  * @brief Macro to format data to tracing data format.
  */
-#define TRACING_FORMAT_DATA(x)						       \
-	((struct tracing_data){.data = (uint8_t *)&(x), .length = sizeof((x))})
+#define TRACING_FORMAT_DATA(x)                           \
+	((struct tracing_data){ .data = (uint8_t *)&(x), \
+				.length = sizeof((x)) })
 
 /**
  * @brief Macro to trace a message in tracing data format.
  *
  * All the parameters should be struct tracing_data.
  */
-#define TRACING_DATA(...)						       \
-	do {								       \
-		struct tracing_data arg[] = {__VA_ARGS__};		       \
-									       \
-		tracing_format_data(arg, sizeof(arg) /			       \
-				    sizeof(struct tracing_data));	       \
+#define TRACING_DATA(...)                                                      \
+	do {                                                                   \
+		struct tracing_data arg[] = { __VA_ARGS__ };                   \
+                                                                               \
+		tracing_format_data(arg, sizeof(arg) /                         \
+						 sizeof(struct tracing_data)); \
 	} while (false)
 
 /**

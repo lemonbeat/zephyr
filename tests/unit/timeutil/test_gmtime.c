@@ -18,8 +18,7 @@ void test_gmtime(void)
 	};
 	time_t time = 1561994005;
 
-	zassert_equal(&tm, gmtime_r(&time, &tm),
-		      "gmtime_r return failed");
+	zassert_equal(&tm, gmtime_r(&time, &tm), "gmtime_r return failed");
 
 	struct tm *tp = gmtime(&time);
 

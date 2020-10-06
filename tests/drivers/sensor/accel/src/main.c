@@ -14,15 +14,11 @@
 #include <ztest.h>
 #include <drivers/sensor.h>
 
-#define ACCEL_LABEL	DT_LABEL(DT_ALIAS(accel_0))
+#define ACCEL_LABEL DT_LABEL(DT_ALIAS(accel_0))
 
 static enum sensor_channel channel[] = {
-	SENSOR_CHAN_ACCEL_X,
-	SENSOR_CHAN_ACCEL_Y,
-	SENSOR_CHAN_ACCEL_Z,
-	SENSOR_CHAN_GYRO_X,
-	SENSOR_CHAN_GYRO_Y,
-	SENSOR_CHAN_GYRO_Z,
+	SENSOR_CHAN_ACCEL_X, SENSOR_CHAN_ACCEL_Y, SENSOR_CHAN_ACCEL_Z,
+	SENSOR_CHAN_GYRO_X,  SENSOR_CHAN_GYRO_Y,  SENSOR_CHAN_GYRO_Z,
 };
 
 void test_sensor_accel_basic(void)

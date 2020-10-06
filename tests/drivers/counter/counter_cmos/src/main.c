@@ -11,9 +11,9 @@
  * Basic test to ensure that the clock is ticking at roughly 1Hz.
  */
 
-#define DELAY_MS 1200	/* pause 1.2 seconds should always pass */
-#define MIN_BOUND 1	/* counter must report at least MIN_BOUND .. */
-#define MAX_BOUND 2	/* .. but at most MAX_BOUND seconds elapsed */
+#define DELAY_MS 1200 /* pause 1.2 seconds should always pass */
+#define MIN_BOUND 1 /* counter must report at least MIN_BOUND .. */
+#define MAX_BOUND 2 /* .. but at most MAX_BOUND seconds elapsed */
 
 void test_cmos_rate(void)
 {

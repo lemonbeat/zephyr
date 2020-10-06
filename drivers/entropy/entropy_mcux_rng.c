@@ -18,8 +18,7 @@ struct mcux_entropy_config {
 };
 
 static int entropy_mcux_rng_get_entropy(const struct device *dev,
-					 uint8_t *buffer,
-					 uint16_t length)
+					uint8_t *buffer, uint16_t length)
 {
 	const struct mcux_entropy_config *config = dev->config;
 	status_t status;
@@ -42,9 +41,9 @@ static const struct mcux_entropy_config entropy_mcux_config = {
 
 static int entropy_mcux_rng_init(const struct device *);
 
-DEVICE_AND_API_INIT(entropy_mcux_rng, DT_INST_LABEL(0),
-		    entropy_mcux_rng_init, NULL, &entropy_mcux_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(entropy_mcux_rng, DT_INST_LABEL(0), entropy_mcux_rng_init,
+		    NULL, &entropy_mcux_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_mcux_rng_api_funcs);
 
 static int entropy_mcux_rng_init(const struct device *dev)

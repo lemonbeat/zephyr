@@ -20,7 +20,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief DMA Interface
  * @defgroup dma_interface DMA Interface
@@ -90,15 +89,15 @@ struct dma_block_config {
 	uint16_t source_gather_count;
 	uint32_t block_size;
 	struct dma_block_config *next_block;
-	uint16_t  source_gather_en :  1;
-	uint16_t  dest_scatter_en :   1;
-	uint16_t  source_addr_adj :   2;
-	uint16_t  dest_addr_adj :     2;
-	uint16_t  source_reload_en :  1;
-	uint16_t  dest_reload_en :    1;
-	uint16_t  fifo_mode_control : 4;
-	uint16_t  flow_control_mode : 1;
-	uint16_t  reserved :          3;
+	uint16_t source_gather_en : 1;
+	uint16_t dest_scatter_en : 1;
+	uint16_t source_addr_adj : 2;
+	uint16_t dest_addr_adj : 2;
+	uint16_t source_reload_en : 1;
+	uint16_t dest_reload_en : 1;
+	uint16_t fifo_mode_control : 4;
+	uint16_t flow_control_mode : 1;
+	uint16_t reserved : 3;
 };
 
 /**
@@ -157,21 +156,21 @@ typedef void (*dma_callback_t)(const struct device *dev, void *user_data,
  *     dma_callback see dma_callback_t for details
  */
 struct dma_config {
-	uint32_t  dma_slot :             7;
-	uint32_t  channel_direction :    3;
-	uint32_t  complete_callback_en : 1;
-	uint32_t  error_callback_en :    1;
-	uint32_t  source_handshake :     1;
-	uint32_t  dest_handshake :       1;
-	uint32_t  channel_priority :     4;
-	uint32_t  source_chaining_en :   1;
-	uint32_t  dest_chaining_en :     1;
-	uint32_t  linked_channel   :     7;
-	uint32_t  reserved :             5;
-	uint32_t  source_data_size :    16;
-	uint32_t  dest_data_size :      16;
-	uint32_t  source_burst_length : 16;
-	uint32_t  dest_burst_length :   16;
+	uint32_t dma_slot : 7;
+	uint32_t channel_direction : 3;
+	uint32_t complete_callback_en : 1;
+	uint32_t error_callback_en : 1;
+	uint32_t source_handshake : 1;
+	uint32_t dest_handshake : 1;
+	uint32_t channel_priority : 4;
+	uint32_t source_chaining_en : 1;
+	uint32_t dest_chaining_en : 1;
+	uint32_t linked_channel : 7;
+	uint32_t reserved : 5;
+	uint32_t source_data_size : 16;
+	uint32_t dest_data_size : 16;
+	uint32_t source_burst_length : 16;
+	uint32_t dest_burst_length : 16;
 	uint32_t block_count;
 	struct dma_block_config *head_block;
 	void *user_data;
@@ -267,7 +266,7 @@ static inline int dma_reload(const struct device *dev, uint32_t channel,
 			     uint64_t src, uint64_t dst, size_t size)
 #else
 static inline int dma_reload(const struct device *dev, uint32_t channel,
-		uint32_t src, uint32_t dst, size_t size)
+			     uint32_t src, uint32_t dst, size_t size)
 #endif
 {
 	const struct dma_driver_api *api =

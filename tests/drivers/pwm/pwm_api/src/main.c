@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <zephyr.h>
 #include <ztest.h>
 
@@ -14,8 +13,7 @@ void test_pwm_nsec(void);
 
 void test_main(void)
 {
-	ztest_test_suite(pwm_basic_test,
-			 ztest_unit_test(test_pwm_usec),
+	ztest_test_suite(pwm_basic_test, ztest_unit_test(test_pwm_usec),
 			 ztest_unit_test(test_pwm_nsec),
 			 ztest_unit_test(test_pwm_cycle));
 	ztest_run_test_suite(pwm_basic_test);

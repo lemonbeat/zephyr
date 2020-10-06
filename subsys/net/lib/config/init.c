@@ -54,8 +54,7 @@ static inline bool services_are_ready(int flags)
 static struct net_mgmt_event_callback mgmt4_cb;
 
 static void ipv4_addr_add_handler(struct net_mgmt_event_callback *cb,
-				  uint32_t mgmt_event,
-				  struct net_if *iface)
+				  uint32_t mgmt_event, struct net_if *iface)
 {
 #if CONFIG_NET_CONFIG_LOG_LEVEL >= LOG_LEVEL_INF
 	char hr_addr[NET_IPV4_ADDR_LEN];
@@ -68,7 +67,7 @@ static void ipv4_addr_add_handler(struct net_mgmt_event_callback *cb,
 
 	for (i = 0; i < NET_IF_MAX_IPV4_ADDR; i++) {
 		struct net_if_addr *if_addr =
-					&iface->config.ip.ipv4->unicast[i];
+			&iface->config.ip.ipv4->unicast[i];
 
 		if (if_addr->addr_type != NET_ADDR_DHCP || !if_addr->is_used) {
 			continue;
@@ -82,9 +81,9 @@ static void ipv4_addr_add_handler(struct net_mgmt_event_callback *cb,
 		NET_INFO("Lease time: %u seconds",
 			 iface->config.dhcpv4.lease_time);
 		NET_INFO("Subnet: %s",
-			 log_strdup(net_addr_ntop(AF_INET,
-				       &iface->config.ip.ipv4->netmask,
-				       hr_addr, sizeof(hr_addr))));
+			 log_strdup(net_addr_ntop(
+				 AF_INET, &iface->config.ip.ipv4->netmask,
+				 hr_addr, sizeof(hr_addr))));
 		NET_INFO("Router: %s",
 			 log_strdup(net_addr_ntop(AF_INET,
 						  &iface->config.ip.ipv4->gw,
@@ -275,8 +274,8 @@ static void setup_ipv6(struct net_if *iface, uint32_t flags)
 	 */
 	if ((mask & NET_EVENT_IPV6_CMD_ADDR_ADD) ==
 	    NET_EVENT_IPV6_CMD_ADDR_ADD) {
-		ifaddr = net_if_ipv6_addr_add(iface, &laddr,
-					      NET_ADDR_MANUAL, 0);
+		ifaddr =
+			net_if_ipv6_addr_add(iface, &laddr, NET_ADDR_MANUAL, 0);
 		if (!ifaddr) {
 			NET_ERR("Cannot add %s to interface",
 				CONFIG_NET_CONFIG_MY_IPV6_ADDR);
@@ -414,8 +413,7 @@ int net_config_init_by_iface(struct net_if *iface, const char *app_info,
 	return 0;
 }
 
-int net_config_init(const char *app_info, uint32_t flags,
-		    int32_t timeout)
+int net_config_init(const char *app_info, uint32_t flags, int32_t timeout)
 {
 	return net_config_init_by_iface(NULL, app_info, flags, timeout);
 }
@@ -461,7 +459,8 @@ int net_config_init_app(const struct device *dev, const char *app_info)
 
 	/* Initialize the application automatically if needed */
 	ret = net_config_init_by_iface(iface, app_info, flags,
-				CONFIG_NET_CONFIG_INIT_TIMEOUT * MSEC_PER_SEC);
+				       CONFIG_NET_CONFIG_INIT_TIMEOUT *
+					       MSEC_PER_SEC);
 	if (ret < 0) {
 		NET_ERR("Network initialization failed (%d)", ret);
 	}

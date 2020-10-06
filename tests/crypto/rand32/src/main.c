@@ -12,13 +12,11 @@
  * uint32_t sys_rand32_get(void);
  */
 
-
 #include <ztest.h>
 #include <kernel_internal.h>
 #include <random/rand32.h>
 
 #define N_VALUES 10
-
 
 /**
  *
@@ -38,8 +36,7 @@ void test_rand32(void)
 	/* Test early boot random number generation function */
 	z_early_boot_rand_get((uint8_t *)&last_gen, sizeof(last_gen));
 	z_early_boot_rand_get((uint8_t *)&gen, sizeof(gen));
-	zassert_true(last_gen != gen,
-			"z_early_boot_rand_get failed");
+	zassert_true(last_gen != gen, "z_early_boot_rand_get failed");
 
 	/*
 	 * Test subsequently calls sys_rand32_get(), checking
@@ -64,8 +61,9 @@ void test_rand32(void)
 	}
 
 	if (equal_count > N_VALUES / 2) {
-		zassert_false((equal_count > N_VALUES / 2),
-		"random numbers returned same value with high probability");
+		zassert_false(
+			(equal_count > N_VALUES / 2),
+			"random numbers returned same value with high probability");
 	}
 
 	printk("Generating bulk fill random numbers\n");
@@ -81,8 +79,9 @@ void test_rand32(void)
 	}
 
 	if (equal_count > N_VALUES / 2) {
-		zassert_false((equal_count > N_VALUES / 2),
-		"random numbers returned same value with high probability");
+		zassert_false(
+			(equal_count > N_VALUES / 2),
+			"random numbers returned same value with high probability");
 	}
 
 #if defined(CONFIG_CSPRING_ENABLED)
@@ -101,8 +100,9 @@ void test_rand32(void)
 	}
 
 	if (equal_count > N_VALUES / 2) {
-		zassert_false((equal_count > N_VALUES / 2),
-		"random numbers returned same value with high probability");
+		zassert_false(
+			(equal_count > N_VALUES / 2),
+			"random numbers returned same value with high probability");
 	}
 
 #else
@@ -111,7 +111,6 @@ void test_rand32(void)
 
 #endif /* CONFIG_CSPRING_ENABLED */
 }
-
 
 void test_main(void)
 {

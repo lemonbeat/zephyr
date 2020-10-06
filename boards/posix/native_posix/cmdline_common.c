@@ -87,8 +87,7 @@ int cmd_is_help_option(const char *arg)
 	if (arg[0] == '-') {
 		arg++;
 	}
-	if ((strcasecmp(arg, "?") == 0) ||
-	    (strcasecmp(arg, "h") == 0) ||
+	if ((strcasecmp(arg, "?") == 0) || (strcasecmp(arg, "h") == 0) ||
 	    (strcasecmp(arg, "help") == 0)) {
 		return 1;
 	} else {
@@ -97,7 +96,8 @@ int cmd_is_help_option(const char *arg)
 }
 
 #define CMD_TYPE_ERROR "Coding error: type %c not understood"
-#define CMD_ERR_BOOL_SWI "Programming error: I only know how to "\
+#define CMD_ERR_BOOL_SWI                         \
+	"Programming error: I only know how to " \
 	"automatically read boolean switches\n"
 
 /**
@@ -185,7 +185,6 @@ void cmd_args_set_defaults(struct args_struct_t args_struct[])
 	int count = 0;
 
 	while (args_struct[count].option != NULL) {
-
 		if (args_struct[count].dest == NULL) {
 			count++;
 			continue;
@@ -250,11 +249,11 @@ static void cmd_gen_switch_syntax(char *buf, int size,
 		ret = snprintf(buf, size, "-%s", args_s_el->option);
 	} else {
 		if (args_s_el->type != 'l') {
-			ret = snprintf(buf, size, "-%s=<%s>",
-					args_s_el->option, args_s_el->name);
+			ret = snprintf(buf, size, "-%s=<%s>", args_s_el->option,
+				       args_s_el->name);
 		} else {
 			ret = snprintf(buf, size, "-%s <%s>...",
-					args_s_el->option, args_s_el->name);
+				       args_s_el->option, args_s_el->name);
 		}
 	}
 
@@ -320,8 +319,8 @@ void cmd_print_long_help(struct args_struct_t args_struct[])
 
 	cmd_print_switches_help(args_struct);
 
-	fprintf(stdout, "\n %-*s:%s\n", _LONG_HELP_ALIGN-1,
-		_HELP_SWITCH, _HELP_DESCR);
+	fprintf(stdout, "\n %-*s:%s\n", _LONG_HELP_ALIGN - 1, _HELP_SWITCH,
+		_HELP_DESCR);
 
 	while (args_struct[count].option != NULL) {
 		int printed_right;
@@ -331,14 +330,14 @@ void cmd_print_long_help(struct args_struct_t args_struct[])
 		cmd_gen_switch_syntax(stringy, _MAX_STRINGY_LEN,
 				      &args_struct[count]);
 
-		ret = fprintf(stdout, " %-*s:", _LONG_HELP_ALIGN-1, stringy);
+		ret = fprintf(stdout, " %-*s:", _LONG_HELP_ALIGN - 1, stringy);
 		printed_in_line = ret;
 		printed_right = 0;
 		toprint = args_struct[count].descript;
 		total_to_print = strlen(toprint);
 		ret = fprintf(stdout, "%.*s\n",
-				_MAX_LINE_WIDTH - printed_in_line,
-				&toprint[printed_right]);
+			      _MAX_LINE_WIDTH - printed_in_line,
+			      &toprint[printed_right]);
 		printed_right += ret - 1;
 
 		while (printed_right < total_to_print) {
@@ -352,7 +351,7 @@ void cmd_print_long_help(struct args_struct_t args_struct[])
 	}
 	fprintf(stdout, "\n");
 	fprintf(stdout, "Note that which options are available depends on the "
-		"enabled features/drivers\n\n");
+			"enabled features/drivers\n\n");
 }
 
 /*
@@ -372,8 +371,7 @@ static void cmd_handle_this_matched_arg(char *argv, int offset,
 				posix_print_error_and_exit(CMD_ERR_BOOL_SWI);
 			}
 		} else { /* if not a switch we need to read its value */
-			cmd_read_option_value(&argv[offset],
-					      arg_element->dest,
+			cmd_read_option_value(&argv[offset], arg_element->dest,
 					      arg_element->type,
 					      arg_element->option);
 		}
@@ -407,8 +405,7 @@ bool cmd_parse_one_arg(char *argv, struct args_struct_t args_struct[])
 		ret = cmd_is_option(argv, args_struct[count].option,
 				    !args_struct[count].is_switch);
 		if (ret) {
-			cmd_handle_this_matched_arg(argv,
-						    ret,
+			cmd_handle_this_matched_arg(argv, ret,
 						    &args_struct[count]);
 			return true;
 		}

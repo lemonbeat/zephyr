@@ -16,7 +16,6 @@
 #include <soc.h>
 #include <init.h>
 
-
 #ifndef IRQ_ICI
 #define IRQ_ICI 19
 #endif
@@ -119,15 +118,14 @@ static int arc_smp_init(const struct device *dev)
 	bcr.val = z_arc_v2_aux_reg_read(_ARC_V2_CONNECT_BCR);
 
 	if (bcr.ipi) {
-	/* register ici interrupt, just need master core to register once */
+		/* register ici interrupt, just need master core to register once */
 		z_arc_connect_ici_clear();
-		IRQ_CONNECT(IRQ_ICI, ARCV2_ICI_IRQ_PRIORITY,
-		    sched_ipi_handler, NULL, 0);
+		IRQ_CONNECT(IRQ_ICI, ARCV2_ICI_IRQ_PRIORITY, sched_ipi_handler,
+			    NULL, 0);
 
 		irq_enable(IRQ_ICI);
 	} else {
-		__ASSERT(0,
-			"ARC connect has no inter-core interrupt\n");
+		__ASSERT(0, "ARC connect has no inter-core interrupt\n");
 		return -ENODEV;
 	}
 
@@ -139,8 +137,7 @@ static int arc_smp_init(const struct device *dev)
 		z_arc_connect_gfrc_core_set((1 << CONFIG_MP_NUM_CPUS) - 1);
 		z_arc_connect_gfrc_clear();
 	} else {
-		__ASSERT(0,
-			"ARC connect has no global free running counter\n");
+		__ASSERT(0, "ARC connect has no global free running counter\n");
 		return -ENODEV;
 	}
 

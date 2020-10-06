@@ -72,8 +72,8 @@ static int spi_sam0_configure(const struct device *dev,
 	const struct spi_sam0_config *cfg = dev->config;
 	struct spi_sam0_data *data = dev->data;
 	SercomSpi *regs = cfg->regs;
-	SERCOM_SPI_CTRLA_Type ctrla = {.reg = 0};
-	SERCOM_SPI_CTRLB_Type ctrlb = {.reg = 0};
+	SERCOM_SPI_CTRLA_Type ctrla = { .reg = 0 };
+	SERCOM_SPI_CTRLB_Type ctrlb = { .reg = 0 };
 	int div;
 
 	if (spi_context_configured(&data->ctx, config)) {
@@ -249,8 +249,7 @@ static void spi_sam0_fast_rx(SercomSpi *regs, const struct spi_buf *rx_buf)
 }
 
 /* Fast path that writes and reads bufs of the same length */
-static void spi_sam0_fast_txrx(SercomSpi *regs,
-			       const struct spi_buf *tx_buf,
+static void spi_sam0_fast_txrx(SercomSpi *regs, const struct spi_buf *tx_buf,
 			       const struct spi_buf *rx_buf)
 {
 	const uint8_t *tx = tx_buf->buf;
@@ -278,7 +277,6 @@ static void spi_sam0_fast_txrx(SercomSpi *regs,
 	regs->DATA.reg = *tx++;
 
 	while (tx != txend) {
-
 		/* Read byte N+0 from the receive register */
 		while (!regs->INTFLAG.bit.RXC) {
 		}
@@ -473,8 +471,7 @@ static int spi_sam0_dma_rx_load(const struct device *dev, uint8_t *buf,
 	dma_blk.source_address = (uint32_t)(&(regs->DATA.reg));
 	dma_blk.source_addr_adj = DMA_ADDR_ADJ_NO_CHANGE;
 
-	retval = dma_config(data->dma, cfg->rx_dma_channel,
-			    &dma_cfg);
+	retval = dma_config(data->dma, cfg->rx_dma_channel, &dma_cfg);
 	if (retval != 0) {
 		return retval;
 	}
@@ -513,8 +510,7 @@ static int spi_sam0_dma_tx_load(const struct device *dev, const uint8_t *buf,
 	dma_blk.dest_address = (uint32_t)(&(regs->DATA.reg));
 	dma_blk.dest_addr_adj = DMA_ADDR_ADJ_NO_CHANGE;
 
-	retval = dma_config(data->dma, cfg->tx_dma_channel,
-			    &dma_cfg);
+	retval = dma_config(data->dma, cfg->tx_dma_channel, &dma_cfg);
 
 	if (retval != 0) {
 		return retval;
@@ -614,7 +610,6 @@ static void spi_sam0_dma_rx_done(const struct device *dma_dev, void *arg,
 		return;
 	}
 }
-
 
 static int spi_sam0_transceive_async(const struct device *dev,
 				     const struct spi_config *config,
@@ -730,51 +725,51 @@ static const struct spi_driver_api spi_sam0_driver_api = {
 };
 
 #if CONFIG_SPI_ASYNC
-#define SPI_SAM0_DMA_CHANNELS(n)					\
-	.dma_dev = ATMEL_SAM0_DT_INST_DMA_NAME(n, tx),			\
-	.tx_dma_request = ATMEL_SAM0_DT_INST_DMA_TRIGSRC(n, tx),	\
-	.tx_dma_channel = ATMEL_SAM0_DT_INST_DMA_CHANNEL(n, tx),	\
-	.rx_dma_request = ATMEL_SAM0_DT_INST_DMA_TRIGSRC(n, rx),	\
+#define SPI_SAM0_DMA_CHANNELS(n)                                 \
+	.dma_dev = ATMEL_SAM0_DT_INST_DMA_NAME(n, tx),           \
+	.tx_dma_request = ATMEL_SAM0_DT_INST_DMA_TRIGSRC(n, tx), \
+	.tx_dma_channel = ATMEL_SAM0_DT_INST_DMA_CHANNEL(n, tx), \
+	.rx_dma_request = ATMEL_SAM0_DT_INST_DMA_TRIGSRC(n, rx), \
 	.rx_dma_channel = ATMEL_SAM0_DT_INST_DMA_CHANNEL(n, rx),
 #else
 #define SPI_SAM0_DMA_CHANNELS(n)
 #endif
 
-#define SPI_SAM0_SERCOM_PADS(n) \
+#define SPI_SAM0_SERCOM_PADS(n)                        \
 	SERCOM_SPI_CTRLA_DIPO(DT_INST_PROP(n, dipo)) | \
-	SERCOM_SPI_CTRLA_DOPO(DT_INST_PROP(n, dopo))
+		SERCOM_SPI_CTRLA_DOPO(DT_INST_PROP(n, dopo))
 
 #ifdef MCLK
-#define SPI_SAM0_DEFINE_CONFIG(n)					\
-static const struct spi_sam0_config spi_sam0_config_##n = {		\
-	.regs = (SercomSpi *)DT_INST_REG_ADDR(n),			\
-	.mclk = (volatile uint32_t *)MCLK_MASK_DT_INT_REG_ADDR(n),	\
-	.mclk_mask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(n, mclk, bit)),	\
-	.gclk_core_id = DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, periph_ch),\
-	.pads = SPI_SAM0_SERCOM_PADS(n)					\
-}
+#define SPI_SAM0_DEFINE_CONFIG(n)                                            \
+	static const struct spi_sam0_config spi_sam0_config_##n = {          \
+		.regs = (SercomSpi *)DT_INST_REG_ADDR(n),                    \
+		.mclk = (volatile uint32_t *)MCLK_MASK_DT_INT_REG_ADDR(n),   \
+		.mclk_mask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(n, mclk, bit)), \
+		.gclk_core_id =                                              \
+			DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, periph_ch),     \
+		.pads = SPI_SAM0_SERCOM_PADS(n)                              \
+	}
 #else
-#define SPI_SAM0_DEFINE_CONFIG(n)					\
-static const struct spi_sam0_config spi_sam0_config_##n = {		\
-	.regs = (SercomSpi *)DT_INST_REG_ADDR(n),			\
-	.pm_apbcmask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(n, pm, bit)),	\
-	.gclk_clkctrl_id = DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, clkctrl_id),\
-	.pads = SPI_SAM0_SERCOM_PADS(n),				\
-	SPI_SAM0_DMA_CHANNELS(n)					\
-}
+#define SPI_SAM0_DEFINE_CONFIG(n)                                            \
+	static const struct spi_sam0_config spi_sam0_config_##n = {          \
+		.regs = (SercomSpi *)DT_INST_REG_ADDR(n),                    \
+		.pm_apbcmask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(n, pm, bit)), \
+		.gclk_clkctrl_id =                                           \
+			DT_INST_CLOCKS_CELL_BY_NAME(n, gclk, clkctrl_id),    \
+		.pads = SPI_SAM0_SERCOM_PADS(n),                             \
+		SPI_SAM0_DMA_CHANNELS(n)                                     \
+	}
 #endif /* MCLK */
 
-#define SPI_SAM0_DEVICE_INIT(n)						\
-	SPI_SAM0_DEFINE_CONFIG(n);					\
-	static struct spi_sam0_data spi_sam0_dev_data_##n = {		\
-		SPI_CONTEXT_INIT_LOCK(spi_sam0_dev_data_##n, ctx),	\
-		SPI_CONTEXT_INIT_SYNC(spi_sam0_dev_data_##n, ctx),	\
-	};								\
-	DEVICE_AND_API_INIT(spi_sam0_##n,				\
-			    DT_INST_LABEL(n),				\
-			    &spi_sam0_init, &spi_sam0_dev_data_##n,	\
-			    &spi_sam0_config_##n, POST_KERNEL,		\
-			    CONFIG_SPI_INIT_PRIORITY,			\
+#define SPI_SAM0_DEVICE_INIT(n)                                             \
+	SPI_SAM0_DEFINE_CONFIG(n);                                          \
+	static struct spi_sam0_data spi_sam0_dev_data_##n = {               \
+		SPI_CONTEXT_INIT_LOCK(spi_sam0_dev_data_##n, ctx),          \
+		SPI_CONTEXT_INIT_SYNC(spi_sam0_dev_data_##n, ctx),          \
+	};                                                                  \
+	DEVICE_AND_API_INIT(spi_sam0_##n, DT_INST_LABEL(n), &spi_sam0_init, \
+			    &spi_sam0_dev_data_##n, &spi_sam0_config_##n,   \
+			    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,          \
 			    &spi_sam0_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(SPI_SAM0_DEVICE_INIT)

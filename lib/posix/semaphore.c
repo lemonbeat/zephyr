@@ -40,7 +40,7 @@ int sem_getvalue(sem_t *semaphore, int *value)
 		return -1;
 	}
 
-	*value = (int) k_sem_count_get(semaphore);
+	*value = (int)k_sem_count_get(semaphore);
 
 	return 0;
 }

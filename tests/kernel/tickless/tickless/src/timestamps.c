@@ -23,7 +23,7 @@
  * (RTC mode's resolution of 1 second is insufficient.)
  */
 
-#define _TIMESTAMP_NUM 0  /* set to timer # for use by timestamp (0-3) */
+#define _TIMESTAMP_NUM 0 /* set to timer # for use by timestamp (0-3) */
 
 #define _CLKGATECTRL (*((volatile uint32_t *)0x400FE104))
 #define _CLKGATECTRL_TIMESTAMP_EN (1 << (16 + _TIMESTAMP_NUM))
@@ -68,16 +68,16 @@ void _timestamp_open(void)
 	/* minimum 3 clk delay is required before timer register access */
 	k_sleep(K_TICKS(3));
 
-	_TIMESTAMP_CTRL = 0x0;                  /* disable/reset timer */
-	_TIMESTAMP_CFG = 0x0;                   /* 32-bit timer */
-	_TIMESTAMP_MODE = 0x2;                  /* periodic mode */
+	_TIMESTAMP_CTRL = 0x0; /* disable/reset timer */
+	_TIMESTAMP_CFG = 0x0; /* 32-bit timer */
+	_TIMESTAMP_MODE = 0x2; /* periodic mode */
 
 	/* maximum interval to reduce rollovers */
 	_TIMESTAMP_LOAD = _TIMESTAMP_MAX;
-	_TIMESTAMP_IMASK = 0x70F;               /* mask all timer interrupts */
-	_TIMESTAMP_ICLEAR = 0x70F;              /* clear all interrupt status */
+	_TIMESTAMP_IMASK = 0x70F; /* mask all timer interrupts */
+	_TIMESTAMP_ICLEAR = 0x70F; /* clear all interrupt status */
 
-	_TIMESTAMP_CTRL = 0x1;                  /* enable timer */
+	_TIMESTAMP_CTRL = 0x1; /* enable timer */
 }
 
 /**
@@ -123,7 +123,6 @@ uint32_t _timestamp_read(void)
  */
 void _timestamp_close(void)
 {
-
 	/* disable/reset timer */
 	_TIMESTAMP_CTRL = 0x0;
 	_TIMESTAMP_CFG = 0x0;
@@ -173,15 +172,15 @@ void _timestamp_open(void)
 	/* set 32 KHz RTC clk */
 	_SYSOPTCTRL2 |= _SYSOPTCTRL2_32KHZRTCCLK;
 
-	_TIMESTAMP_STATUS = 0x0;        /* disable counter */
-	_TIMESTAMP_CTRL = 0x100;        /* enable oscillator */
+	_TIMESTAMP_STATUS = 0x0; /* disable counter */
+	_TIMESTAMP_CTRL = 0x100; /* enable oscillator */
 
-	_TIMESTAMP_LOCK = 0xFF;         /* unlock registers */
-	_TIMESTAMP_PRESCALE = 0x0;      /* reset prescale value */
-	_TIMESTAMP_COMP = 0x0;          /* reset compensation values */
-	_TIMESTAMP_RACCESS = 0xFF;      /* allow register read access */
-	_TIMESTAMP_WACCESS = 0xFF;      /* allow register write access */
-	_TIMESTAMP_IMASK = 0x0;         /* mask all timer interrupts */
+	_TIMESTAMP_LOCK = 0xFF; /* unlock registers */
+	_TIMESTAMP_PRESCALE = 0x0; /* reset prescale value */
+	_TIMESTAMP_COMP = 0x0; /* reset compensation values */
+	_TIMESTAMP_RACCESS = 0xFF; /* allow register read access */
+	_TIMESTAMP_WACCESS = 0xFF; /* allow register write access */
+	_TIMESTAMP_IMASK = 0x0; /* mask all timer interrupts */
 
 	/* minimum 0.3 sec delay required for oscillator stabilization */
 	k_msleep(0.3 * MSEC_PER_SEC);
@@ -189,7 +188,7 @@ void _timestamp_open(void)
 	/* clear invalid time flag in status register */
 	_TIMESTAMP_VAL = 0x0;
 
-	_TIMESTAMP_STATUS = 0x10;       /* enable counter */
+	_TIMESTAMP_STATUS = 0x10; /* enable counter */
 }
 
 /**
@@ -238,8 +237,8 @@ uint32_t _timestamp_read(void)
  */
 void _timestamp_close(void)
 {
-	_TIMESTAMP_STATUS = 0x0;        /* disable counter */
-	_TIMESTAMP_CTRL = 0x0;          /* disable oscillator */
+	_TIMESTAMP_STATUS = 0x0; /* disable counter */
+	_TIMESTAMP_CTRL = 0x0; /* disable oscillator */
 }
 
 #elif defined(CONFIG_SOC_FAMILY_SAM)

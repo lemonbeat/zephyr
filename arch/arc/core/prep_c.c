@@ -23,7 +23,6 @@
 #include <kernel_structs.h>
 #include <kernel_internal.h>
 
-
 /* XXX - keep for future use in full-featured cache APIs */
 #if 0
 /**

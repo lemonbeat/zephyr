@@ -51,25 +51,24 @@ LOG_MODULE_REGISTER(net_test, NET_LOG_LEVEL);
 static char *test_data = "Test data to be sent";
 
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 2 addresses */
-static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 3 addresses */
-static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 2, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Destination address for test packets */
-static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 /* Keep track of all ethernet interfaces */
 static struct net_if *eth_interfaces[NET_VLAN_MAX_COUNT + 1];
@@ -100,8 +99,7 @@ static void eth_vlan_iface_init(struct net_if *iface)
 	struct eth_context *context = dev->data;
 
 	net_if_set_link_addr(iface, context->mac_addr,
-			     sizeof(context->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(context->mac_addr), NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 }
@@ -123,11 +121,9 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 		struct net_eth_vlan_hdr *hdr =
 			(struct net_eth_vlan_hdr *)NET_ETH_HDR(pkt);
 
-		zassert_equal(context->expecting_tag,
-			      net_pkt_vlan_tag(pkt),
+		zassert_equal(context->expecting_tag, net_pkt_vlan_tag(pkt),
 			      "Invalid VLAN tag (%d vs %d) in TX pkt\n",
-			      net_pkt_vlan_tag(pkt),
-			      context->expecting_tag);
+			      net_pkt_vlan_tag(pkt), context->expecting_tag);
 
 		zassert_equal(context->expecting_tag,
 			      net_eth_vlan_get_vid(ntohs(hdr->vlan.tci)),
@@ -171,10 +167,9 @@ static int eth_vlan_init(const struct device *dev)
 	return 0;
 }
 
-ETH_NET_DEVICE_INIT(eth_vlan_test, "eth_vlan_test",
-		    eth_vlan_init, device_pm_control_nop,
-		    &eth_vlan_context, NULL, CONFIG_ETH_INIT_PRIORITY,
-		    &api_funcs, NET_ETH_MTU);
+ETH_NET_DEVICE_INIT(eth_vlan_test, "eth_vlan_test", eth_vlan_init,
+		    device_pm_control_nop, &eth_vlan_context, NULL,
+		    CONFIG_ETH_INIT_PRIORITY, &api_funcs, NET_ETH_MTU);
 
 static int eth_init(const struct device *dev)
 {
@@ -190,9 +185,8 @@ static int eth_init(const struct device *dev)
  * purposes create it here.
  */
 NET_DEVICE_INIT(eth_test, "eth_test", eth_init, device_pm_control_nop,
-		&eth_vlan_context, NULL, CONFIG_ETH_INIT_PRIORITY,
-		&api_funcs, ETHERNET_L2, NET_L2_GET_CTX_TYPE(ETHERNET_L2),
-		NET_ETH_MTU);
+		&eth_vlan_context, NULL, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
+		ETHERNET_L2, NET_L2_GET_CTX_TYPE(ETHERNET_L2), NET_ETH_MTU);
 
 struct net_if_test {
 	uint8_t idx; /* not used for anything, just a dummy value */
@@ -249,31 +243,15 @@ static struct dummy_api net_iface_api = {
 /* For testing purposes, create two dummy network interfaces so we can check
  * that no VLANs are created for it.
  */
-NET_DEVICE_INIT_INSTANCE(net_iface1_test,
-			 "iface1",
-			 iface1,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface1_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 DUMMY_L2,
-			 NET_L2_GET_CTX_TYPE(DUMMY_L2),
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface1_test, "iface1", iface1, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface1_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 DUMMY_L2, NET_L2_GET_CTX_TYPE(DUMMY_L2), 127);
 
-NET_DEVICE_INIT_INSTANCE(net_iface2_test,
-			 "iface2",
-			 iface2,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface2_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 DUMMY_L2,
-			 NET_L2_GET_CTX_TYPE(DUMMY_L2),
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface2_test, "iface2", iface2, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface2_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 DUMMY_L2, NET_L2_GET_CTX_TYPE(DUMMY_L2), 127);
 
 struct user_data {
 	int eth_if_count;
@@ -340,8 +318,8 @@ static void test_vlan_setup(void)
 
 	/* One extra eth interface without vlan support */
 	zassert_equal(ud.eth_if_count, NET_VLAN_MAX_COUNT,
-		      "Invalid number of VLANs %d vs %d\n",
-		      ud.eth_if_count, NET_VLAN_MAX_COUNT);
+		      "Invalid number of VLANs %d vs %d\n", ud.eth_if_count,
+		      NET_VLAN_MAX_COUNT);
 
 	zassert_equal(ud.total_if_count, NET_VLAN_MAX_COUNT + 1 + 2,
 		      "Invalid number of interfaces");
@@ -368,42 +346,38 @@ static void test_address_setup(void)
 	zassert_not_null(iface2, "Interface 2");
 	zassert_not_null(iface3, "Interface 3");
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1");
 	}
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr2));
+		    net_sprint_ipv6_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface3, &my_addr3,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface3, &my_addr3, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr3));
+		    net_sprint_ipv6_addr(&my_addr3));
 		zassert_not_null(ifaddr, "addr3");
 	}
 
@@ -730,8 +704,7 @@ static void test_vlan_send_data(void)
 	/* Setup the interfaces */
 	test_vlan_enable();
 
-	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v6_ctx);
+	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &udp_v6_ctx);
 	zassert_equal(ret, 0, "Create IPv6 UDP context failed");
 
 	memcpy(&src_addr6.sin6_addr, &my_addr1, sizeof(struct in6_addr));
@@ -762,8 +735,8 @@ static void test_vlan_send_data(void)
 
 	ret = net_context_sendto(udp_v6_ctx, test_data, strlen(test_data),
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_NO_WAIT, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_NO_WAIT,
+				 NULL);
 	zassert_true(ret > 0, "Send UDP pkt failed");
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -776,16 +749,14 @@ static void test_vlan_send_data(void)
 
 void test_main(void)
 {
-	ztest_test_suite(net_vlan_test,
-			 ztest_unit_test(test_vlan_setup),
+	ztest_test_suite(net_vlan_test, ztest_unit_test(test_vlan_setup),
 			 ztest_unit_test(test_address_setup),
 			 ztest_unit_test(test_vlan_tci),
 			 ztest_unit_test(test_vlan_enable),
 			 ztest_unit_test(test_vlan_disable),
 			 ztest_unit_test(test_vlan_enable_all),
 			 ztest_unit_test(test_vlan_disable_all),
-			 ztest_unit_test(test_vlan_send_data)
-			 );
+			 ztest_unit_test(test_vlan_send_data));
 
 	ztest_run_test_suite(net_vlan_test);
 }

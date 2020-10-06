@@ -31,7 +31,7 @@ static void tlifo_get(struct k_lifo *plifo)
 	void *rx_data;
 
 	/*get lifo data*/
-	for (int i = LIST_LEN-1; i >= 0; i--) {
+	for (int i = LIST_LEN - 1; i >= 0; i--) {
 		/**TESTPOINT: lifo get*/
 		rx_data = k_lifo_get(plifo, K_FOREVER);
 		zassert_equal(rx_data, (void *)&data[i], NULL);
@@ -59,9 +59,9 @@ static void tlifo_thread_thread(struct k_lifo *plifo)
 {
 	k_sem_init(&end_sema, 0, 1);
 	/**TESTPOINT: thread-thread data passing via lifo*/
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-		tThread_entry, plifo, NULL, NULL,
-		K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, tThread_entry,
+				      plifo, NULL, NULL, K_PRIO_PREEMPT(0), 0,
+				      K_NO_WAIT);
 	tlifo_put(plifo);
 	k_sem_take(&end_sema, K_FOREVER);
 	k_thread_abort(tid);

@@ -46,10 +46,10 @@ static void eos_s3_cru_init(void)
 	}
 
 	/* Enable all clocks for every domain */
-	CRU->CLK_DIVIDER_CLK_GATING = (CLK_DIVIDER_A_CG | CLK_DIVIDER_B_CG
-		| CLK_DIVIDER_C_CG | CLK_DIVIDER_D_CG | CLK_DIVIDER_F_CG
-		| CLK_DIVIDER_G_CG | CLK_DIVIDER_H_CG | CLK_DIVIDER_I_CG
-		| CLK_DIVIDER_J_CG);
+	CRU->CLK_DIVIDER_CLK_GATING =
+		(CLK_DIVIDER_A_CG | CLK_DIVIDER_B_CG | CLK_DIVIDER_C_CG |
+		 CLK_DIVIDER_D_CG | CLK_DIVIDER_F_CG | CLK_DIVIDER_G_CG |
+		 CLK_DIVIDER_H_CG | CLK_DIVIDER_I_CG | CLK_DIVIDER_J_CG);
 
 	/* Turn off divisor for A0 domain */
 	CRU->CLK_CTRL_A_0 = 0;
@@ -58,11 +58,9 @@ static void eos_s3_cru_init(void)
 	CRU->C11_CLK_GATE = C11_CLK_GATE_PATH_0_ON;
 
 	/* Set divider for domain C11 to ~ 5.12MHz */
-	CRU->CLK_CTRL_D_0 = (CLK_CTRL_CLK_DIVIDER_ENABLE |
-		CLK_CTRL_CLK_DIVIDER_RATIO_12);
+	CRU->CLK_CTRL_D_0 =
+		(CLK_CTRL_CLK_DIVIDER_ENABLE | CLK_CTRL_CLK_DIVIDER_RATIO_12);
 }
-
-
 
 static int eos_s3_init(const struct device *arg)
 {

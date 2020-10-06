@@ -12,11 +12,11 @@
 #define SKIP_EXECUTE_TESTS
 #endif
 
-#define BASE_FLAGS	(K_MEM_CACHE_WB)
+#define BASE_FLAGS (K_MEM_CACHE_WB)
 volatile bool expect_fault;
 
-static uint8_t __aligned(CONFIG_MMU_PAGE_SIZE)
-			test_page[2 * CONFIG_MMU_PAGE_SIZE];
+static uint8_t
+	__aligned(CONFIG_MMU_PAGE_SIZE) test_page[2 * CONFIG_MMU_PAGE_SIZE];
 
 void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *pEsf)
 {
@@ -31,12 +31,11 @@ void k_sys_fatal_error_handler(unsigned int reason, const z_arch_esf_t *pEsf)
 	}
 }
 
-
 /* z_mem_map() doesn't have alignment requirements, any oddly-sized buffer
  * can get mapped. This will span two pages.
  */
-#define BUF_SIZE	5003
-#define BUF_OFFSET	1238
+#define BUF_SIZE 5003
+#define BUF_OFFSET 1238
 
 /**
  * Show that mapping an irregular size buffer works and RW flag is respected
@@ -51,8 +50,8 @@ void test_z_mem_map_rw(void)
 	expect_fault = false;
 
 	/* Map in a page that allows writes */
-	z_mem_map(&mapped_rw, (uintptr_t)buf,
-		  BUF_SIZE, BASE_FLAGS | K_MEM_PERM_RW);
+	z_mem_map(&mapped_rw, (uintptr_t)buf, BUF_SIZE,
+		  BASE_FLAGS | K_MEM_PERM_RW);
 
 	/* Initialize buf with some bytes */
 	for (int i = 0; i < BUF_SIZE; i++) {
@@ -60,13 +59,12 @@ void test_z_mem_map_rw(void)
 	}
 
 	/* Map again this time only allowing reads */
-	z_mem_map(&mapped_ro, (uintptr_t)buf,
-		  BUF_SIZE, BASE_FLAGS);
+	z_mem_map(&mapped_ro, (uintptr_t)buf, BUF_SIZE, BASE_FLAGS);
 
 	/* Check that the mapped area contains the expected data. */
 	for (int i = 0; i < BUF_SIZE; i++) {
-		zassert_equal(buf[i], mapped_ro[i],
-			      "unequal byte at index %d", i);
+		zassert_equal(buf[i], mapped_ro[i], "unequal byte at index %d",
+			      i);
 	}
 
 	/* This should explode since writes are forbidden */
@@ -97,22 +95,22 @@ void test_z_mem_map_exec(void)
 	expect_fault = false;
 
 	/* Map with write permissions and copy the function into the page */
-	z_mem_map(&mapped_rw, (uintptr_t)test_page,
-		  sizeof(test_page), BASE_FLAGS | K_MEM_PERM_RW);
+	z_mem_map(&mapped_rw, (uintptr_t)test_page, sizeof(test_page),
+		  BASE_FLAGS | K_MEM_PERM_RW);
 
 	memcpy(mapped_rw, (void *)&transplanted_function, CONFIG_MMU_PAGE_SIZE);
 
 	/* Now map with execution enabled and try to run the copied fn */
-	z_mem_map(&mapped_exec, (uintptr_t)test_page,
-		  sizeof(test_page), BASE_FLAGS | K_MEM_PERM_EXEC);
+	z_mem_map(&mapped_exec, (uintptr_t)test_page, sizeof(test_page),
+		  BASE_FLAGS | K_MEM_PERM_EXEC);
 
 	func = (void (*)(bool *executed))mapped_exec;
 	func(&executed);
 	zassert_true(executed, "function did not execute");
 
 	/* Now map without execution and execution should now fail */
-	z_mem_map(&mapped_ro, (uintptr_t)test_page,
-		  sizeof(test_page), BASE_FLAGS);
+	z_mem_map(&mapped_ro, (uintptr_t)test_page, sizeof(test_page),
+		  BASE_FLAGS);
 
 	func = (void (*)(bool *executed))mapped_ro;
 	expect_fault = true;
@@ -143,8 +141,7 @@ void test_z_mem_map_side_effect(void)
 	 * Show that by mapping test_page to an RO region, we can still
 	 * modify test_page.
 	 */
-	z_mem_map(&mapped, (uintptr_t)test_page,
-		  sizeof(test_page), BASE_FLAGS);
+	z_mem_map(&mapped, (uintptr_t)test_page, sizeof(test_page), BASE_FLAGS);
 
 	/* Should NOT fault */
 	test_page[0] = 42;
@@ -159,10 +156,8 @@ void test_z_mem_map_side_effect(void)
 /* ztest main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_mem_map,
-			ztest_unit_test(test_z_mem_map_rw),
-			ztest_unit_test(test_z_mem_map_exec),
-			ztest_unit_test(test_z_mem_map_side_effect)
-			);
+	ztest_test_suite(test_mem_map, ztest_unit_test(test_z_mem_map_rw),
+			 ztest_unit_test(test_z_mem_map_exec),
+			 ztest_unit_test(test_z_mem_map_side_effect));
 	ztest_run_test_suite(test_mem_map);
 }

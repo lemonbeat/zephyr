@@ -12,7 +12,8 @@
 
 void main(void)
 {
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, st_vl53l0x)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, st_vl53l0x)));
 	struct sensor_value value;
 	int ret;
 
@@ -31,9 +32,7 @@ void main(void)
 		ret = sensor_channel_get(dev, SENSOR_CHAN_PROX, &value);
 		printk("prox is %d\n", value.val1);
 
-		ret = sensor_channel_get(dev,
-					 SENSOR_CHAN_DISTANCE,
-					 &value);
+		ret = sensor_channel_get(dev, SENSOR_CHAN_DISTANCE, &value);
 		printf("distance is %.3fm\n", sensor_value_to_double(&value));
 
 		k_sleep(K_MSEC(1000));

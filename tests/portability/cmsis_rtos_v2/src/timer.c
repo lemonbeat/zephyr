@@ -7,27 +7,22 @@
 #include <ztest.h>
 #include <cmsis_os2.h>
 
-#define ONESHOT_TIME_TICKS      100
-#define PERIOD_TICKS            MAX(50, k_ms_to_ticks_ceil32(5))
-#define NUM_PERIODS             5
+#define ONESHOT_TIME_TICKS 100
+#define PERIOD_TICKS MAX(50, k_ms_to_ticks_ceil32(5))
+#define NUM_PERIODS 5
 
 uint32_t num_oneshots_executed;
 uint32_t num_periods_executed;
 
-const osTimerAttr_t timer_attr = {
-	"myTimer",
-	0,
-	NULL,
-	0U
-};
+const osTimerAttr_t timer_attr = { "myTimer", 0, NULL, 0U };
 
 void Timer1_Callback(void *arg)
 {
 	uint32_t Tmr = *(uint32_t *)arg;
 
 	num_oneshots_executed++;
-	TC_PRINT("oneshot_callback (Timer %d) = %d\n",
-		 Tmr, num_oneshots_executed);
+	TC_PRINT("oneshot_callback (Timer %d) = %d\n", Tmr,
+		 num_oneshots_executed);
 }
 
 void Timer2_Callback(void *arg)
@@ -35,8 +30,8 @@ void Timer2_Callback(void *arg)
 	uint32_t Tmr = *(uint32_t *)arg;
 
 	num_periods_executed++;
-	TC_PRINT("periodic_callback (Timer %d) = %d\n",
-		 Tmr, num_periods_executed);
+	TC_PRINT("periodic_callback (Timer %d) = %d\n", Tmr,
+		 num_periods_executed);
 }
 
 void test_timer(void)

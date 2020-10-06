@@ -9,6 +9,6 @@
 #define _BOARD__H_
 
 /* Define CMSIS configurations */
-#define __CR_REV		1U
+#define __CR_REV 1U
 
 #endif /* _BOARD__H_ */

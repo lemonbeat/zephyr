@@ -24,7 +24,6 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(flash_mcux);
 
-
 #if DT_NODE_HAS_STATUS(DT_INST(0, nxp_kinetis_ftfa), okay)
 #define DT_DRV_COMPAT nxp_kinetis_ftfa
 #elif DT_NODE_HAS_STATUS(DT_INST(0, nxp_kinetis_ftfe), okay)
@@ -40,16 +39,15 @@ LOG_MODULE_REGISTER(flash_mcux);
 #define SOC_NV_FLASH_NODE DT_INST(0, soc_nv_flash)
 
 #ifdef CONFIG_CHECK_BEFORE_READING
-#define FMC_STATUS_FAIL	FLASH_INT_CLR_ENABLE_FAIL_MASK
-#define FMC_STATUS_ERR	FLASH_INT_CLR_ENABLE_ERR_MASK
-#define FMC_STATUS_DONE	FLASH_INT_CLR_ENABLE_DONE_MASK
-#define FMC_STATUS_ECC	FLASH_INT_CLR_ENABLE_ECC_ERR_MASK
+#define FMC_STATUS_FAIL FLASH_INT_CLR_ENABLE_FAIL_MASK
+#define FMC_STATUS_ERR FLASH_INT_CLR_ENABLE_ERR_MASK
+#define FMC_STATUS_DONE FLASH_INT_CLR_ENABLE_DONE_MASK
+#define FMC_STATUS_ECC FLASH_INT_CLR_ENABLE_ECC_ERR_MASK
 
-#define FMC_STATUS_FAILURES	\
-	(FMC_STATUS_FAIL | FMC_STATUS_ERR | FMC_STATUS_ECC)
+#define FMC_STATUS_FAILURES (FMC_STATUS_FAIL | FMC_STATUS_ERR | FMC_STATUS_ECC)
 
-#define FMC_CMD_BLANK_CHECK		5
-#define FMC_CMD_MARGIN_CHECK	6
+#define FMC_CMD_BLANK_CHECK 5
+#define FMC_CMD_MARGIN_CHECK 6
 
 /* Issue single command that uses an a start and stop address. */
 static uint32_t get_cmd_status(uint32_t cmd, uint32_t addr, size_t len)
@@ -59,8 +57,8 @@ static uint32_t get_cmd_status(uint32_t cmd, uint32_t addr, size_t len)
 
 	/* issue low level command */
 	p_fmc->INT_CLR_STATUS = 0xF;
-	p_fmc->STARTA = (addr>>4) & 0x3FFFF;
-	p_fmc->STOPA = ((addr+len-1)>>4) & 0x3FFFF;
+	p_fmc->STARTA = (addr >> 4) & 0x3FFFF;
+	p_fmc->STOPA = ((addr + len - 1) >> 4) & 0x3FFFF;
 	p_fmc->CMD = cmd;
 	__DSB();
 	__ISB();
@@ -97,8 +95,8 @@ static status_t is_area_readable(uint32_t addr, size_t len)
 			irq_unlock(key);
 			return -ENODATA;
 		}
-		LOG_DBG("read request error for addr:0x%08x size:%d",
-			addr, len);
+		LOG_DBG("read request error for addr:0x%08x size:%d", addr,
+			len);
 		irq_unlock(key);
 		return -EIO;
 	}
@@ -136,8 +134,7 @@ static const struct flash_parameters flash_mcux_parameters = {
  *
  */
 
-static int flash_mcux_erase(const struct device *dev, off_t offset,
-			    size_t len)
+static int flash_mcux_erase(const struct device *dev, off_t offset, size_t len)
 {
 	struct flash_priv *priv = dev->data;
 	uint32_t addr;
@@ -159,7 +156,6 @@ static int flash_mcux_erase(const struct device *dev, off_t offset,
 	return (rc == kStatus_Success) ? 0 : -EINVAL;
 }
 
-
 /*
  * @brief Read a flash memory area.
  *
@@ -170,8 +166,8 @@ static int flash_mcux_erase(const struct device *dev, off_t offset,
  * @return 	0 on success,
  * 			-EIO for erroneous area
  */
-static int flash_mcux_read(const struct device *dev, off_t offset,
-				void *data, size_t len)
+static int flash_mcux_read(const struct device *dev, off_t offset, void *data,
+			   size_t len)
 {
 	struct flash_priv *priv = dev->data;
 	uint32_t addr;
@@ -189,7 +185,7 @@ static int flash_mcux_read(const struct device *dev, off_t offset,
 #endif
 
 	if (!rc) {
-		memcpy(data, (void *) addr, len);
+		memcpy(data, (void *)addr, len);
 #ifdef CONFIG_CHECK_BEFORE_READING
 	} else if (rc == -ENODATA) {
 		/* Erased area, return dummy data as an erased page. */
@@ -202,7 +198,7 @@ static int flash_mcux_read(const struct device *dev, off_t offset,
 }
 
 static int flash_mcux_write(const struct device *dev, off_t offset,
-				const void *data, size_t len)
+			    const void *data, size_t len)
 {
 	struct flash_priv *priv = dev->data;
 	uint32_t addr;
@@ -216,7 +212,7 @@ static int flash_mcux_write(const struct device *dev, off_t offset,
 	addr = offset + priv->pflash_block_base;
 
 	key = irq_lock();
-	rc = FLASH_Program(&priv->config, addr, (uint8_t *) data, len);
+	rc = FLASH_Program(&priv->config, addr, (uint8_t *)data, len);
 	irq_unlock(key);
 
 	k_sem_give(&priv->write_lock);
@@ -241,7 +237,7 @@ static int flash_mcux_write_protection(const struct device *dev, bool enable)
 #if defined(CONFIG_FLASH_PAGE_LAYOUT)
 static const struct flash_pages_layout dev_layout = {
 	.pages_count = DT_REG_SIZE(SOC_NV_FLASH_NODE) /
-				DT_PROP(SOC_NV_FLASH_NODE, erase_block_size),
+		       DT_PROP(SOC_NV_FLASH_NODE, erase_block_size),
 	.pages_size = DT_PROP(SOC_NV_FLASH_NODE, erase_block_size),
 };
 
@@ -292,11 +288,11 @@ static int flash_mcux_init(const struct device *dev)
 	FLASH_GetProperty(&priv->config, kFLASH_PropertyPflash0BlockBaseAddr,
 			  &pflash_block_base);
 #endif
-	priv->pflash_block_base = (uint32_t) pflash_block_base;
+	priv->pflash_block_base = (uint32_t)pflash_block_base;
 
 	return (rc == kStatus_Success) ? 0 : -EIO;
 }
 
-DEVICE_AND_API_INIT(flash_mcux, DT_INST_LABEL(0),
-			flash_mcux_init, &flash_data, NULL, POST_KERNEL,
-			CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &flash_mcux_api);
+DEVICE_AND_API_INIT(flash_mcux, DT_INST_LABEL(0), flash_mcux_init, &flash_data,
+		    NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &flash_mcux_api);

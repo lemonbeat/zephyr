@@ -37,8 +37,8 @@ static int gic_wait_rwp(uint32_t intid)
 	return 0;
 }
 
-void arm_gic_irq_set_priority(unsigned int intid,
-			      unsigned int prio, uint32_t flags)
+void arm_gic_irq_set_priority(unsigned int intid, unsigned int prio,
+			      uint32_t flags)
 {
 	uint32_t mask = BIT(intid & (GIC_NUM_INTR_PER_REG - 1));
 	uint32_t idx = intid / GIC_NUM_INTR_PER_REG;
@@ -138,8 +138,8 @@ void gic_raise_sgi(unsigned int sgi_id, uint64_t target_aff,
 	aff2 = MPIDR_AFFLVL(target_aff, 2);
 	aff3 = MPIDR_AFFLVL(target_aff, 3);
 
-	sgi_val = GICV3_SGIR_VALUE(aff3, aff2, aff1, sgi_id,
-				   SGIR_IRM_TO_AFF, target_list);
+	sgi_val = GICV3_SGIR_VALUE(aff3, aff2, aff1, sgi_id, SGIR_IRM_TO_AFF,
+				   target_list);
 
 	__DSB();
 	write_sysreg(sgi_val, ICC_SGI1R);
@@ -208,8 +208,8 @@ static void gicv3_cpuif_init(void)
 	icc_sre = read_sysreg(ICC_SRE_EL1);
 
 	if (!(icc_sre & ICC_SRE_ELx_SRE)) {
-		icc_sre = (icc_sre | ICC_SRE_ELx_SRE |
-			   ICC_SRE_ELx_DIB | ICC_SRE_ELx_DFB);
+		icc_sre = (icc_sre | ICC_SRE_ELx_SRE | ICC_SRE_ELx_DIB |
+			   ICC_SRE_ELx_DFB);
 		write_sysreg(icc_sre, ICC_SRE_EL1);
 		icc_sre = read_sysreg(ICC_SRE_EL1);
 
@@ -246,13 +246,11 @@ static void gicv3_dist_init(void)
 		sys_write32(BIT_MASK(GIC_NUM_INTR_PER_REG),
 			    ICENABLER(base, idx));
 		/* Clear pending */
-		sys_write32(BIT_MASK(GIC_NUM_INTR_PER_REG),
-			    ICPENDR(base, idx));
+		sys_write32(BIT_MASK(GIC_NUM_INTR_PER_REG), ICPENDR(base, idx));
 		/* All SPIs are G1S and owned by Zephyr */
 		sys_write32(0, IGROUPR(base, idx));
 		sys_write32(BIT_MASK(GIC_NUM_INTR_PER_REG),
 			    IGROUPMODR(base, idx));
-
 	}
 	/* wait for rwp on GICD */
 	gic_wait_rwp(GIC_SPI_INT_BASE);

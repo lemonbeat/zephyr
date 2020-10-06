@@ -17,13 +17,11 @@
  *
  * @return 0 on success, negative value otherwise
  */
-extern int ieee802154_radio_send(struct net_if *iface,
-				 struct net_pkt *pkt,
+extern int ieee802154_radio_send(struct net_if *iface, struct net_pkt *pkt,
 				 struct net_buf *frag);
 
 static inline bool prepare_for_ack(struct ieee802154_context *ctx,
-				   struct net_pkt *pkt,
-				   struct net_buf *frag)
+				   struct net_pkt *pkt, struct net_buf *frag)
 {
 	if (ieee802154_is_ar_flag_set(frag)) {
 		struct ieee802154_fcf_seq *fs;
@@ -40,11 +38,9 @@ static inline bool prepare_for_ack(struct ieee802154_context *ctx,
 	return false;
 }
 
-static inline int wait_for_ack(struct net_if *iface,
-			       bool ack_required)
+static inline int wait_for_ack(struct net_if *iface, bool ack_required)
 {
 	struct ieee802154_context *ctx = net_if_l2_data(iface);
-
 
 	if (!ack_required ||
 	    (ieee802154_get_hw_capabilities(iface) & IEEE802154_HW_TX_RX_ACK)) {

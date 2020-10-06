@@ -15,12 +15,12 @@
 #include "wdt_iwdg_stm32.h"
 
 /* Minimal timeout in microseconds. */
-#define IWDG_TIMEOUT_MIN	100
+#define IWDG_TIMEOUT_MIN 100
 /* Maximal timeout in microseconds. */
-#define IWDG_TIMEOUT_MAX	26214400
+#define IWDG_TIMEOUT_MAX 26214400
 
-#define IS_IWDG_TIMEOUT(__TIMEOUT__)		\
-	(((__TIMEOUT__) >= IWDG_TIMEOUT_MIN) &&	\
+#define IS_IWDG_TIMEOUT(__TIMEOUT__)            \
+	(((__TIMEOUT__) >= IWDG_TIMEOUT_MIN) && \
 	 ((__TIMEOUT__) <= IWDG_TIMEOUT_MAX))
 
 /*
@@ -29,7 +29,7 @@
  * we need to wait at least 6 cycles so 48 ms.
  */
 
-#define IWDG_DEFAULT_TIMEOUT	48u
+#define IWDG_DEFAULT_TIMEOUT 48u
 
 /**
  * @brief Calculates prescaler & reload values.
@@ -38,11 +38,9 @@
  * @param prescaler Pointer to prescaler value.
  * @param reload Pointer to reload value.
  */
-static void iwdg_stm32_convert_timeout(uint32_t timeout,
-				       uint32_t *prescaler,
+static void iwdg_stm32_convert_timeout(uint32_t timeout, uint32_t *prescaler,
 				       uint32_t *reload)
 {
-
 	uint16_t divider = 0U;
 	uint8_t shift = 0U;
 
@@ -108,7 +106,7 @@ static int iwdg_stm32_install_timeout(const struct device *dev,
 	iwdg_stm32_convert_timeout(timeout, &prescaler, &reload);
 
 	if (!(IS_IWDG_TIMEOUT(timeout) && IS_IWDG_PRESCALER(prescaler) &&
-	    IS_IWDG_RELOAD(reload))) {
+	      IS_IWDG_RELOAD(reload))) {
 		/* One of the parameters provided is invalid */
 		return -EINVAL;
 	}
@@ -179,7 +177,6 @@ static struct iwdg_stm32_data iwdg_stm32_dev_data = {
 	.Instance = (IWDG_TypeDef *)DT_INST_REG_ADDR(0)
 };
 
-DEVICE_AND_API_INIT(iwdg_stm32, DT_INST_LABEL(0),
-		    iwdg_stm32_init, &iwdg_stm32_dev_data, NULL,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &iwdg_stm32_api);
+DEVICE_AND_API_INIT(iwdg_stm32, DT_INST_LABEL(0), iwdg_stm32_init,
+		    &iwdg_stm32_dev_data, NULL, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &iwdg_stm32_api);

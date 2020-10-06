@@ -23,8 +23,8 @@ static void thread(void *p1, void *p2, void *p3)
 	uintptr_t id = (uintptr_t)p1;
 
 	k_timer_status_sync(&timer[id]);
-	printk("%s %" PRIxPTR " synced on timer %" PRIxPTR "\n",
-	       __func__, id, id);
+	printk("%s %" PRIxPTR " synced on timer %" PRIxPTR "\n", __func__, id,
+	       id);
 
 	/* no need to protect cur, all threads have the same prio */
 	results[cur++] = id;
@@ -55,13 +55,12 @@ void test_timeout_order(void)
 
 	for (ii = 0; ii < NUM_TIMEOUTS; ii++) {
 		(void)k_thread_create(&threads[ii], stacks[ii], STACKSIZE,
-				      thread, INT_TO_POINTER(ii), 0, 0,
-				      prio, 0, K_NO_WAIT);
+				      thread, INT_TO_POINTER(ii), 0, 0, prio, 0,
+				      K_NO_WAIT);
 		k_timer_init(&timer[ii], 0, 0);
 		k_sem_init(&sem[ii], 0, 1);
 		results[ii] = -1;
 	}
-
 
 	uint32_t uptime = k_uptime_get_32();
 
@@ -91,8 +90,8 @@ void test_timeout_order(void)
 	k_thread_priority_set(k_current_get(), prio - 1);
 
 	for (ii = 0; ii < NUM_TIMEOUTS; ii++) {
-		zassert_equal(poll_events[ii].state,
-			      K_POLL_STATE_SEM_AVAILABLE, "");
+		zassert_equal(poll_events[ii].state, K_POLL_STATE_SEM_AVAILABLE,
+			      "");
 	}
 	for (ii = 0; ii < NUM_TIMEOUTS; ii++) {
 		zassert_equal(results[ii], ii, "");

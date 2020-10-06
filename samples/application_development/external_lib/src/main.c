@@ -6,7 +6,6 @@
 
 /* hello world example: calling functions from a static library */
 
-
 #include <zephyr.h>
 #include <stdio.h>
 

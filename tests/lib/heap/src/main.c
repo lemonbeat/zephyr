@@ -17,23 +17,23 @@
  * hard faults on boot in qemu before entry to cstart() once MEMSZ is
  * allowed to get near 256kb.
  */
-# define MEMSZ (192 * 1024)
+#define MEMSZ (192 * 1024)
 #elif defined(CONFIG_ARCH_POSIX)
 /* native_posix doesn't support CONFIG_SRAM_SIZE at all (because
  * it can link anything big enough to fit on the host), so just use a
  * reasonable value.
  */
-# define MEMSZ (2 * 1024 * 1024)
+#define MEMSZ (2 * 1024 * 1024)
 #elif defined(CONFIG_SOC_ARC_EMSDP) || defined(CONFIG_SOC_EMSK)
 /* Various ARC platforms set CONFIG_SRAM_SIZE to 16-128M, but have a
  * much lower limit of (32-64k) in their linker scripts.  Pick a
  * conservative fallback.
  */
-# define MEMSZ (16 * 1024)
+#define MEMSZ (16 * 1024)
 #else
 /* Otherwise just trust CONFIG_SRAM_SIZE
  */
-# define MEMSZ (1024 * (size_t) CONFIG_SRAM_SIZE)
+#define MEMSZ (1024 * (size_t)CONFIG_SRAM_SIZE)
 #endif
 
 #define BIG_HEAP_SZ MIN(256 * 1024, MEMSZ / 3)
@@ -55,7 +55,7 @@ void *scratchmem[SCRATCH_SZ / sizeof(void *)];
 /* Simple dumb hash function of the size and address */
 static size_t fill_token(void *p, size_t sz)
 {
-	size_t pi = (size_t) p;
+	size_t pi = (size_t)p;
 
 	return (pi * sz) ^ ((sz ^ 0xea6d) * ((pi << 11) | (pi >> 21)));
 }
@@ -79,7 +79,7 @@ static void fill_block(void *p, size_t sz)
 		((size_t *)p)[1] = tok;
 	}
 
-	if (sz > 3*sizeof(size_t)) {
+	if (sz > 3 * sizeof(size_t)) {
 		((size_t *)p)[sz / sizeof(size_t) - 1] = tok;
 	}
 }
@@ -120,15 +120,17 @@ void testfree(void *arg, void *p)
 static void log_result(size_t sz, struct z_heap_stress_result *r)
 {
 	uint32_t tot = r->total_allocs + r->total_frees;
-	uint32_t avg = (uint32_t)((r->accumulated_in_use_bytes + tot/2) / tot);
+	uint32_t avg =
+		(uint32_t)((r->accumulated_in_use_bytes + tot / 2) / tot);
 	uint32_t avg_pct = (uint32_t)((100ULL * avg + sz / 2) / sz);
-	uint32_t succ_pct = ((100ULL * r->successful_allocs + r->total_allocs / 2)
-			  / r->total_allocs);
+	uint32_t succ_pct =
+		((100ULL * r->successful_allocs + r->total_allocs / 2) /
+		 r->total_allocs);
 
 	TC_PRINT("successful allocs: %d/%d (%d%%), frees: %d,"
 		 "  avg usage: %d/%d (%d%%)\n",
 		 r->successful_allocs, r->total_allocs, succ_pct,
-		 r->total_frees, avg, (int) sz, avg_pct);
+		 r->total_frees, avg, (int)sz, avg_pct);
 }
 
 /* Do a heavy test over a small heap, with many iterations that need
@@ -141,14 +143,13 @@ static void test_small_heap(void)
 	struct sys_heap heap;
 	struct z_heap_stress_result result;
 
-	TC_PRINT("Testing small (%d byte) heap\n", (int) SMALL_HEAP_SZ);
+	TC_PRINT("Testing small (%d byte) heap\n", (int)SMALL_HEAP_SZ);
 
 	sys_heap_init(&heap, heapmem, SMALL_HEAP_SZ);
 	zassert_true(sys_heap_validate(&heap), "");
-	sys_heap_stress(testalloc, testfree, &heap,
-			SMALL_HEAP_SZ, ITERATION_COUNT,
-			scratchmem, sizeof(scratchmem),
-			50, &result);
+	sys_heap_stress(testalloc, testfree, &heap, SMALL_HEAP_SZ,
+			ITERATION_COUNT, scratchmem, sizeof(scratchmem), 50,
+			&result);
 
 	log_result(SMALL_HEAP_SZ, &result);
 }
@@ -170,14 +171,13 @@ static void test_fragmentation(void)
 	struct z_heap_stress_result result;
 
 	TC_PRINT("Testing maximally fragmented (%d byte) heap\n",
-		 (int) SMALL_HEAP_SZ);
+		 (int)SMALL_HEAP_SZ);
 
 	sys_heap_init(&heap, heapmem, SMALL_HEAP_SZ);
 	zassert_true(sys_heap_validate(&heap), "");
-	sys_heap_stress(testalloc, testfree, &heap,
-			SMALL_HEAP_SZ, ITERATION_COUNT,
-			scratchmem, sizeof(scratchmem),
-			100, &result);
+	sys_heap_stress(testalloc, testfree, &heap, SMALL_HEAP_SZ,
+			ITERATION_COUNT, scratchmem, sizeof(scratchmem), 100,
+			&result);
 
 	log_result(SMALL_HEAP_SZ, &result);
 }
@@ -192,25 +192,22 @@ static void test_big_heap(void)
 	struct sys_heap heap;
 	struct z_heap_stress_result result;
 
-	TC_PRINT("Testing big (%d byte) heap\n", (int) BIG_HEAP_SZ);
+	TC_PRINT("Testing big (%d byte) heap\n", (int)BIG_HEAP_SZ);
 
 	sys_heap_init(&heap, heapmem, BIG_HEAP_SZ);
 	zassert_true(sys_heap_validate(&heap), "");
-	sys_heap_stress(testalloc, testfree, &heap,
-			BIG_HEAP_SZ, ITERATION_COUNT,
-			scratchmem, sizeof(scratchmem),
-			100, &result);
+	sys_heap_stress(testalloc, testfree, &heap, BIG_HEAP_SZ,
+			ITERATION_COUNT, scratchmem, sizeof(scratchmem), 100,
+			&result);
 
 	log_result(BIG_HEAP_SZ, &result);
 }
 
 void test_main(void)
 {
-	ztest_test_suite(lib_heap_test,
-			 ztest_unit_test(test_small_heap),
+	ztest_test_suite(lib_heap_test, ztest_unit_test(test_small_heap),
 			 ztest_unit_test(test_fragmentation),
-			 ztest_unit_test(test_big_heap)
-			 );
+			 ztest_unit_test(test_big_heap));
 
 	ztest_run_test_suite(lib_heap_test);
 }

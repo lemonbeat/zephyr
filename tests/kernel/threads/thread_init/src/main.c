@@ -24,12 +24,12 @@
 
 static void thread_entry(void *p1, void *p2, void *p3);
 
-K_THREAD_DEFINE(T_KDEFINE_COOP_THREAD, INIT_COOP_STACK_SIZE,
-		thread_entry, INIT_COOP_P1, INIT_COOP_P2, INIT_COOP_P3,
-		INIT_COOP_PRIO, INIT_COOP_OPTION, INIT_COOP_DELAY);
+K_THREAD_DEFINE(T_KDEFINE_COOP_THREAD, INIT_COOP_STACK_SIZE, thread_entry,
+		INIT_COOP_P1, INIT_COOP_P2, INIT_COOP_P3, INIT_COOP_PRIO,
+		INIT_COOP_OPTION, INIT_COOP_DELAY);
 
-K_THREAD_DEFINE(T_KDEFINE_PREEMPT_THREAD, INIT_PREEMPT_STACK_SIZE,
-		thread_entry, INIT_PREEMPT_P1, INIT_PREEMPT_P2, INIT_PREEMPT_P3,
+K_THREAD_DEFINE(T_KDEFINE_PREEMPT_THREAD, INIT_PREEMPT_STACK_SIZE, thread_entry,
+		INIT_PREEMPT_P1, INIT_PREEMPT_P2, INIT_PREEMPT_P3,
 		INIT_PREEMPT_PRIO, INIT_PREEMPT_OPTION, INIT_PREEMPT_DELAY);
 
 K_SEM_DEFINE(start_sema, 0, 1);
@@ -142,8 +142,9 @@ void test_kinit_preempt_thread(void)
 {
 	/*create preempt thread*/
 	k_tid_t pthread = k_thread_create(&thread_preempt, stack_preempt,
-					  INIT_PREEMPT_STACK_SIZE, thread_entry, INIT_PREEMPT_P1,
-					  INIT_PREEMPT_P2, INIT_PREEMPT_P3, INIT_PREEMPT_PRIO,
+					  INIT_PREEMPT_STACK_SIZE, thread_entry,
+					  INIT_PREEMPT_P1, INIT_PREEMPT_P2,
+					  INIT_PREEMPT_P3, INIT_PREEMPT_PRIO,
 					  INIT_PREEMPT_OPTION,
 					  K_MSEC(INIT_PREEMPT_DELAY));
 
@@ -175,10 +176,10 @@ void test_kinit_preempt_thread(void)
 void test_kinit_coop_thread(void)
 {
 	/*create coop thread*/
-	k_tid_t pthread = k_thread_create(&thread_coop, stack_coop,
-			  INIT_COOP_STACK_SIZE, thread_entry, INIT_COOP_P1,
-			  INIT_COOP_P2, INIT_COOP_P3, INIT_COOP_PRIO,
-			  INIT_COOP_OPTION, K_MSEC(INIT_COOP_DELAY));
+	k_tid_t pthread = k_thread_create(
+		&thread_coop, stack_coop, INIT_COOP_STACK_SIZE, thread_entry,
+		INIT_COOP_P1, INIT_COOP_P2, INIT_COOP_P3, INIT_COOP_PRIO,
+		INIT_COOP_OPTION, K_MSEC(INIT_COOP_DELAY));
 
 	/*record time stamp of thread creation*/
 	t_create = k_uptime_get();
@@ -198,7 +199,6 @@ void test_kinit_coop_thread(void)
 	k_sem_take(&end_sema, K_FOREVER);
 }
 
-
 /**
  * @}
  */
@@ -210,7 +210,8 @@ void test_main(void)
 			      &start_sema, &end_sema);
 #ifdef CONFIG_USERSPACE
 	k_mem_domain_add_thread(&k_mem_domain_default, T_KDEFINE_COOP_THREAD);
-	k_mem_domain_add_thread(&k_mem_domain_default, T_KDEFINE_PREEMPT_THREAD);
+	k_mem_domain_add_thread(&k_mem_domain_default,
+				T_KDEFINE_PREEMPT_THREAD);
 #endif
 
 	ztest_test_suite(thread_init,

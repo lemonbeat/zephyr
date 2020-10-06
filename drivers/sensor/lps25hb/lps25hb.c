@@ -61,11 +61,11 @@ static int lps25hb_sample_fetch(const struct device *dev,
 		}
 	}
 
-	data->sample_press = (int32_t)((uint32_t)(out[0]) |
-					((uint32_t)(out[1]) << 8) |
-					((uint32_t)(out[2]) << 16));
-	data->sample_temp = (int16_t)((uint16_t)(out[3]) |
-					((uint16_t)(out[4]) << 8));
+	data->sample_press =
+		(int32_t)((uint32_t)(out[0]) | ((uint32_t)(out[1]) << 8) |
+			  ((uint32_t)(out[2]) << 16));
+	data->sample_temp =
+		(int16_t)((uint16_t)(out[3]) | ((uint16_t)(out[4]) << 8));
 
 	return 0;
 }
@@ -139,8 +139,7 @@ static int lps25hb_init_chip(const struct device *dev)
 
 	LOG_DBG("chip id 0x%x", chip_id);
 
-	if (lps25hb_set_odr_raw(dev, LPS25HB_DEFAULT_SAMPLING_RATE)
-				< 0) {
+	if (lps25hb_set_odr_raw(dev, LPS25HB_DEFAULT_SAMPLING_RATE) < 0) {
 		LOG_DBG("failed to set sampling rate");
 		goto err_poweroff;
 	}
@@ -162,13 +161,13 @@ err_poweroff:
 
 static int lps25hb_init(const struct device *dev)
 {
-	const struct lps25hb_config * const config = dev->config;
+	const struct lps25hb_config *const config = dev->config;
 	struct lps25hb_data *data = dev->data;
 
 	data->i2c_master = device_get_binding(config->i2c_master_dev_name);
 	if (!data->i2c_master) {
 		LOG_DBG("i2c master not found: %s",
-			    config->i2c_master_dev_name);
+			config->i2c_master_dev_name);
 		return -EINVAL;
 	}
 
@@ -187,6 +186,6 @@ static const struct lps25hb_config lps25hb_config = {
 
 static struct lps25hb_data lps25hb_data;
 
-DEVICE_AND_API_INIT(lps25hb, DT_INST_LABEL(0), lps25hb_init,
-		    &lps25hb_data, &lps25hb_config, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &lps25hb_api_funcs);
+DEVICE_AND_API_INIT(lps25hb, DT_INST_LABEL(0), lps25hb_init, &lps25hb_data,
+		    &lps25hb_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &lps25hb_api_funcs);

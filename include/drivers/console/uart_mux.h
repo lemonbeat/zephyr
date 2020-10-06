@@ -39,8 +39,7 @@ struct gsm_dlci;
  * @param connected True if DLCI is connected, false otherwise.
  * @param user_data Arbitrary user data.
  */
-typedef void (*uart_mux_attach_cb_t)(const struct device *mux,
-				     int dlci_address,
+typedef void (*uart_mux_attach_cb_t)(const struct device *mux, int dlci_address,
 				     bool connected, void *user_data);
 
 /** @brief UART mux driver API structure. */
@@ -74,9 +73,8 @@ __subsystem struct uart_mux_driver_api {
  * @retval <0 Error
  */
 static inline int uart_mux_attach(const struct device *mux,
-				  const struct device *uart,
-				  int dlci_address, uart_mux_attach_cb_t cb,
-				  void *user_data)
+				  const struct device *uart, int dlci_address,
+				  uart_mux_attach_cb_t cb, void *user_data)
 {
 	const struct uart_mux_driver_api *api =
 		(const struct uart_mux_driver_api *)mux->api;
@@ -116,8 +114,8 @@ const struct device *uart_mux_alloc(void);
  * @param user_data A valid pointer to user data or NULL
  */
 typedef void (*uart_mux_cb_t)(const struct device *uart,
-			      const struct device *dev,
-			      int dlci_address, void *user_data);
+			      const struct device *dev, int dlci_address,
+			      void *user_data);
 
 /**
  * @brief Go through all the UART muxes and call callback

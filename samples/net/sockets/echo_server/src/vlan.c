@@ -61,11 +61,11 @@ static int setup_iface(struct net_if *iface, const char *ipv6_addr,
 			return -EINVAL;
 		}
 
-		ifaddr = net_if_ipv6_addr_add(iface, &addr6,
-					      NET_ADDR_MANUAL, 0);
+		ifaddr =
+			net_if_ipv6_addr_add(iface, &addr6, NET_ADDR_MANUAL, 0);
 		if (!ifaddr) {
-			LOG_ERR("Cannot add %s to interface %p",
-				ipv6_addr, iface);
+			LOG_ERR("Cannot add %s to interface %p", ipv6_addr,
+				iface);
 			return -EINVAL;
 		}
 	}
@@ -76,11 +76,11 @@ static int setup_iface(struct net_if *iface, const char *ipv6_addr,
 			return -EINVAL;
 		}
 
-		ifaddr = net_if_ipv4_addr_add(iface, &addr4,
-					      NET_ADDR_MANUAL, 0);
+		ifaddr =
+			net_if_ipv4_addr_add(iface, &addr4, NET_ADDR_MANUAL, 0);
 		if (!ifaddr) {
-			LOG_ERR("Cannot add %s to interface %p",
-				ipv4_addr, iface);
+			LOG_ERR("Cannot add %s to interface %p", ipv4_addr,
+				iface);
 			return -EINVAL;
 		}
 	}
@@ -103,16 +103,14 @@ int init_vlan(void)
 	 * create IP address for this test. But first the VLAN needs to be
 	 * added to the interface so that IPv6 DAD can work properly.
 	 */
-	ret = setup_iface(ud.second,
-			  CONFIG_NET_SAMPLE_IFACE2_MY_IPV6_ADDR,
+	ret = setup_iface(ud.second, CONFIG_NET_SAMPLE_IFACE2_MY_IPV6_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE2_MY_IPV4_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE2_VLAN_TAG);
 	if (ret < 0) {
 		return ret;
 	}
 
-	ret = setup_iface(ud.third,
-			  CONFIG_NET_SAMPLE_IFACE3_MY_IPV6_ADDR,
+	ret = setup_iface(ud.third, CONFIG_NET_SAMPLE_IFACE3_MY_IPV6_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE3_MY_IPV4_ADDR,
 			  CONFIG_NET_SAMPLE_IFACE3_VLAN_TAG);
 	if (ret < 0) {

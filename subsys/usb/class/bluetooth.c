@@ -28,14 +28,13 @@ LOG_MODULE_REGISTER(usb_bluetooth);
 static K_FIFO_DEFINE(rx_queue);
 static K_FIFO_DEFINE(tx_queue);
 
-#define BLUETOOTH_INT_EP_ADDR		0x81
-#define BLUETOOTH_OUT_EP_ADDR		0x02
-#define BLUETOOTH_IN_EP_ADDR		0x82
+#define BLUETOOTH_INT_EP_ADDR 0x81
+#define BLUETOOTH_OUT_EP_ADDR 0x02
+#define BLUETOOTH_IN_EP_ADDR 0x82
 
 /* TODO: Replace use of USB_MAX_FS_INT_MPS if higher speeds are supported */
-#define BLUETOOTH_BULK_EP_MPS           MIN(BT_BUF_ACL_SIZE, \
-					    USB_MAX_FS_BULK_MPS)
-#define BLUETOOTH_INT_EP_MPS            MIN(BT_BUF_RX_SIZE, USB_MAX_FS_INT_MPS)
+#define BLUETOOTH_BULK_EP_MPS MIN(BT_BUF_ACL_SIZE, USB_MAX_FS_BULK_MPS)
+#define BLUETOOTH_INT_EP_MPS MIN(BT_BUF_RX_SIZE, USB_MAX_FS_INT_MPS)
 
 /* HCI RX/TX threads */
 static K_KERNEL_STACK_DEFINE(rx_thread_stack, CONFIG_BT_HCI_TX_STACK_SIZE);
@@ -51,7 +50,7 @@ struct usb_bluetooth_config {
 } __packed;
 
 USBD_CLASS_DESCR_DEFINE(primary, 0)
-	struct usb_bluetooth_config bluetooth_cfg = {
+struct usb_bluetooth_config bluetooth_cfg = {
 	/* Interface descriptor 0 */
 	.if0 = {
 		.bLength = sizeof(struct usb_if_descriptor),
@@ -96,9 +95,9 @@ USBD_CLASS_DESCR_DEFINE(primary, 0)
 	},
 };
 
-#define HCI_INT_EP_IDX			0
-#define HCI_OUT_EP_IDX			1
-#define HCI_IN_EP_IDX			2
+#define HCI_INT_EP_IDX 0
+#define HCI_OUT_EP_IDX 1
+#define HCI_IN_EP_IDX 2
 
 static struct usb_ep_cfg_data bluetooth_ep_data[] = {
 	{
@@ -140,8 +139,7 @@ static void hci_tx_thread(void)
 		case BT_BUF_ACL_IN:
 			usb_transfer_sync(
 				bluetooth_ep_data[HCI_IN_EP_IDX].ep_addr,
-				buf->data, buf->len,
-				USB_TRANS_WRITE);
+				buf->data, buf->len, USB_TRANS_WRITE);
 			break;
 		default:
 			LOG_ERR("Unknown type %u", bt_buf_get_type(buf));
@@ -293,8 +291,8 @@ static struct bt_hci_raw_cmd_ext cmd_ext[] = {
 			   vs_set_usb_transport_mode),
 };
 
-static int bluetooth_class_handler(struct usb_setup_packet *setup,
-				   int32_t *len, uint8_t **data)
+static int bluetooth_class_handler(struct usb_setup_packet *setup, int32_t *len,
+				   uint8_t **data)
 {
 	struct net_buf *buf;
 

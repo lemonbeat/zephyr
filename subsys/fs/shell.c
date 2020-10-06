@@ -18,7 +18,7 @@
 /* FAT */
 #ifdef CONFIG_FAT_FILESYSTEM_ELM
 #include <ff.h>
-#define FATFS_MNTP      "/RAM:"
+#define FATFS_MNTP "/RAM:"
 /* FatFs work area */
 FATFS fat_fs;
 /* mounting info */
@@ -46,7 +46,7 @@ static struct fs_mount_t littlefs_mnt = {
 #define MAX_FILENAME_LEN 128
 #define MAX_INPUT_LEN 20
 
-#define SHELL_FS    "fs"
+#define SHELL_FS "fs"
 
 /* Maintenance guarantees this begins with '/' and is NUL-terminated. */
 static char cwd[MAX_PATH_LEN] = "/";
@@ -158,7 +158,7 @@ static int cmd_ls(const struct shell *shell, size_t argc, char **argv)
 		}
 
 		shell_print(shell, "%s%s", entry.name,
-			      (entry.type == FS_DIR_ENTRY_DIR) ? "/" : "");
+			    (entry.type == FS_DIR_ENTRY_DIR) ? "/" : "");
 	}
 
 	fs_closedir(&dir);
@@ -191,7 +191,8 @@ static int cmd_trunc(const struct shell *shell, size_t argc, char **argv)
 	err = fs_open(&file, path, FS_O_CREATE | FS_O_RDWR);
 	if (err) {
 		shell_error(shell, "Failed to open %s (%d)", path, err);
-		return -ENOEXEC;;
+		return -ENOEXEC;
+		;
 	}
 
 	err = fs_truncate(&file, length);
@@ -265,8 +266,8 @@ static int cmd_read(const struct shell *shell, size_t argc, char **argv)
 
 	err = fs_stat(path, &dirent);
 	if (err) {
-		shell_error(shell, "Failed to obtain file %s (err: %d)",
-			    path, err);
+		shell_error(shell, "Failed to obtain file %s (err: %d)", path,
+			    err);
 		return -ENOEXEC;
 	}
 
@@ -286,8 +287,7 @@ static int cmd_read(const struct shell *shell, size_t argc, char **argv)
 	if (offset > 0) {
 		err = fs_seek(&file, offset, FS_SEEK_SET);
 		if (err) {
-			shell_error(shell, "Failed to seek %s (%d)",
-				    path, err);
+			shell_error(shell, "Failed to seek %s (%d)", path, err);
 			fs_close(&file);
 			return -ENOEXEC;
 		}
@@ -312,11 +312,12 @@ static int cmd_read(const struct shell *shell, size_t argc, char **argv)
 			shell_fprintf(shell, SHELL_NORMAL, "   ");
 		}
 		i = sizeof(buf) - i;
-		shell_fprintf(shell, SHELL_NORMAL, "%*c", i*3, ' ');
+		shell_fprintf(shell, SHELL_NORMAL, "%*c", i * 3, ' ');
 
 		for (i = 0; i < read; i++) {
-			shell_fprintf(shell, SHELL_NORMAL, "%c", buf[i] < 32 ||
-				      buf[i] > 127 ? '.' : buf[i]);
+			shell_fprintf(shell, SHELL_NORMAL, "%c",
+				      buf[i] < 32 || buf[i] > 127 ? '.' :
+									  buf[i]);
 		}
 
 		shell_print(shell, "");
@@ -401,7 +402,7 @@ static int cmd_write(const struct shell *shell, size_t argc, char **argv)
 			err = fs_write(&file, buf, buf_len);
 			if (err < 0) {
 				shell_error(shell, "Failed to write %s (%d)",
-					      path, err);
+					    path, err);
 				fs_close(&file);
 				return -ENOEXEC;
 			}
@@ -415,8 +416,7 @@ static int cmd_write(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 
-#if defined(CONFIG_FAT_FILESYSTEM_ELM)		\
-	|| defined(CONFIG_FILE_SYSTEM_LITTLEFS)
+#if defined(CONFIG_FAT_FILESYSTEM_ELM) || defined(CONFIG_FILE_SYSTEM_LITTLEFS)
 static char *mntpt_prepare(char *mntpt)
 {
 	char *cpy_mntpt;
@@ -445,13 +445,13 @@ static int cmd_mount_fat(const struct shell *shell, size_t argc, char **argv)
 	fatfs_mnt.mnt_point = (const char *)mntpt;
 	res = fs_mount(&fatfs_mnt);
 	if (res != 0) {
-		shell_error(shell,
-			"Error mounting fat fs.Error Code [%d]", res);
+		shell_error(shell, "Error mounting fat fs.Error Code [%d]",
+			    res);
 		return -ENOEXEC;
 	}
 
 	shell_print(shell, "Successfully mounted fat fs:%s",
-			fatfs_mnt.mnt_point);
+		    fatfs_mnt.mnt_point);
 
 	return 0;
 }
@@ -459,7 +459,8 @@ static int cmd_mount_fat(const struct shell *shell, size_t argc, char **argv)
 
 #if defined(CONFIG_FILE_SYSTEM_LITTLEFS)
 
-static int cmd_mount_littlefs(const struct shell *shell, size_t argc, char **argv)
+static int cmd_mount_littlefs(const struct shell *shell, size_t argc,
+			      char **argv)
 {
 	if (littlefs_mnt.mnt_point != NULL) {
 		return -EBUSY;
@@ -485,12 +486,11 @@ static int cmd_mount_littlefs(const struct shell *shell, size_t argc, char **arg
 }
 #endif
 
-#if defined(CONFIG_FAT_FILESYSTEM_ELM)		\
-	|| defined(CONFIG_FILE_SYSTEM_LITTLEFS)
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_fs_mount,
+#if defined(CONFIG_FAT_FILESYSTEM_ELM) || defined(CONFIG_FILE_SYSTEM_LITTLEFS)
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_fs_mount,
 #if defined(CONFIG_FAT_FILESYSTEM_ELM)
-	SHELL_CMD_ARG(fat, NULL,
-		      "Mount fatfs. fs mount fat <mount-point>",
+	SHELL_CMD_ARG(fat, NULL, "Mount fatfs. fs mount fat <mount-point>",
 		      cmd_mount_fat, 2, 0),
 #endif
 
@@ -500,26 +500,24 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_fs_mount,
 		      cmd_mount_littlefs, 2, 0),
 #endif
 
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 #endif
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_fs,
-	SHELL_CMD(cd, NULL, "Change working directory", cmd_cd),
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_fs, SHELL_CMD(cd, NULL, "Change working directory", cmd_cd),
 	SHELL_CMD(ls, NULL, "List files in current directory", cmd_ls),
 	SHELL_CMD_ARG(mkdir, NULL, "Create directory", cmd_mkdir, 2, 0),
-#if defined(CONFIG_FAT_FILESYSTEM_ELM)		\
-	|| defined(CONFIG_FILE_SYSTEM_LITTLEFS)
+#if defined(CONFIG_FAT_FILESYSTEM_ELM) || defined(CONFIG_FILE_SYSTEM_LITTLEFS)
 	SHELL_CMD(mount, &sub_fs_mount,
 		  "<Mount fs, syntax:- fs mount <fs type> <mount-point>", NULL),
 #endif
 	SHELL_CMD(pwd, NULL, "Print current working directory", cmd_pwd),
 	SHELL_CMD_ARG(read, NULL, "Read from file", cmd_read, 2, 255),
 	SHELL_CMD_ARG(rm, NULL, "Remove file", cmd_rm, 2, 0),
-	SHELL_CMD_ARG(statvfs, NULL, "Show file system state", cmd_statvfs, 2, 0),
+	SHELL_CMD_ARG(statvfs, NULL, "Show file system state", cmd_statvfs, 2,
+		      0),
 	SHELL_CMD_ARG(trunc, NULL, "Truncate file", cmd_trunc, 2, 255),
 	SHELL_CMD_ARG(write, NULL, "Write file", cmd_write, 3, 255),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(fs, &sub_fs, "File system commands", NULL);

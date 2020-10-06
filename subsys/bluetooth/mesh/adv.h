@@ -28,9 +28,8 @@ struct bt_mesh_adv {
 	const struct bt_mesh_send_cb *cb;
 	void *cb_data;
 
-	uint8_t      type:2,
-		  busy:1;
-	uint8_t      xmit;
+	uint8_t type : 2, busy : 1;
+	uint8_t xmit;
 };
 
 typedef struct bt_mesh_adv *(*bt_mesh_adv_alloc_t)(int id);

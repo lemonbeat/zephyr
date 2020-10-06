@@ -39,7 +39,6 @@ static void process_sample(const struct device *dev)
 
 	/* display temperature */
 	printf("Temperature: %.2f C\n", sensor_value_to_double(&temp));
-
 }
 
 static void lps22hh_handler(const struct device *dev,
@@ -67,7 +66,8 @@ void main(void)
 		};
 
 		if (sensor_attr_set(dev, SENSOR_CHAN_ALL,
-				    SENSOR_ATTR_SAMPLING_FREQUENCY, &attr) < 0) {
+				    SENSOR_ATTR_SAMPLING_FREQUENCY,
+				    &attr) < 0) {
 			printf("Cannot configure sampling rate\n");
 			return;
 		}

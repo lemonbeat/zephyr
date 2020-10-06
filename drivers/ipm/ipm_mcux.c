@@ -62,9 +62,7 @@ static void mcux_mailbox_isr(const struct device *dev)
 #endif
 }
 
-
-static int mcux_mailbox_ipm_send(const struct device *d, int wait,
-				 uint32_t id,
+static int mcux_mailbox_ipm_send(const struct device *d, int wait, uint32_t id,
 				 const void *data, int size)
 {
 	const struct mcux_mailbox_config *config = d->config;
@@ -99,14 +97,12 @@ static int mcux_mailbox_ipm_send(const struct device *d, int wait,
 	return 0;
 }
 
-
 static int mcux_mailbox_ipm_max_data_size_get(const struct device *d)
 {
 	ARG_UNUSED(d);
 	/* Only a single 32-bit register available */
-	return MCUX_IPM_DATA_REGS*sizeof(uint32_t);
+	return MCUX_IPM_DATA_REGS * sizeof(uint32_t);
 }
-
 
 static uint32_t mcux_mailbox_ipm_max_id_val_get(const struct device *d)
 {
@@ -116,8 +112,7 @@ static uint32_t mcux_mailbox_ipm_max_id_val_get(const struct device *d)
 }
 
 static void mcux_mailbox_ipm_register_callback(const struct device *d,
-					       ipm_callback_t cb,
-					       void *context)
+					       ipm_callback_t cb, void *context)
 {
 	struct mcux_mailbox_data *driver_data = d->data;
 
@@ -125,13 +120,11 @@ static void mcux_mailbox_ipm_register_callback(const struct device *d,
 	driver_data->callback_ctx = context;
 }
 
-
 static int mcux_mailbox_ipm_set_enabled(const struct device *d, int enable)
 {
 	/* For now: nothing to be done */
 	return 0;
 }
-
 
 static int mcux_mailbox_init(const struct device *dev)
 {
@@ -150,7 +143,6 @@ static const struct ipm_driver_api mcux_mailbox_driver_api = {
 	.set_enabled = mcux_mailbox_ipm_set_enabled
 };
 
-
 /* Config MAILBOX 0 */
 
 static void mcux_mailbox_config_func_0(const struct device *dev);
@@ -162,18 +154,15 @@ static const struct mcux_mailbox_config mcux_mailbox_0_config = {
 
 static struct mcux_mailbox_data mcux_mailbox_0_data;
 
-DEVICE_AND_API_INIT(mailbox_0, DT_INST_LABEL(0),
-		    &mcux_mailbox_init,
-		    &mcux_mailbox_0_data, &mcux_mailbox_0_config,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+DEVICE_AND_API_INIT(mailbox_0, DT_INST_LABEL(0), &mcux_mailbox_init,
+		    &mcux_mailbox_0_data, &mcux_mailbox_0_config, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &mcux_mailbox_driver_api);
-
 
 static void mcux_mailbox_config_func_0(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    mcux_mailbox_isr, DEVICE_GET(mailbox_0), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), mcux_mailbox_isr,
+		    DEVICE_GET(mailbox_0), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 }

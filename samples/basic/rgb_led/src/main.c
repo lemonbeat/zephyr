@@ -22,50 +22,50 @@
 #define BLUE_NODE DT_ALIAS(blue_pwm_led)
 
 #if DT_NODE_HAS_STATUS(RED_NODE, okay)
-#define RED_LABEL	DT_PWMS_LABEL(RED_NODE)
-#define RED_CHANNEL	DT_PWMS_CHANNEL(RED_NODE)
-#define RED_FLAGS	DT_PWMS_FLAGS(RED_NODE)
+#define RED_LABEL DT_PWMS_LABEL(RED_NODE)
+#define RED_CHANNEL DT_PWMS_CHANNEL(RED_NODE)
+#define RED_FLAGS DT_PWMS_FLAGS(RED_NODE)
 #else
 #error "Unsupported board: red-pwm-led devicetree alias is not defined"
-#define RED_LABEL	""
-#define RED_CHANNEL	0
-#define RED_FLAGS	0
+#define RED_LABEL ""
+#define RED_CHANNEL 0
+#define RED_FLAGS 0
 #endif
 
 #if DT_NODE_HAS_STATUS(GREEN_NODE, okay)
-#define GREEN_LABEL	DT_PWMS_LABEL(GREEN_NODE)
-#define GREEN_CHANNEL	DT_PWMS_CHANNEL(GREEN_NODE)
-#define GREEN_FLAGS	DT_PWMS_FLAGS(GREEN_NODE)
+#define GREEN_LABEL DT_PWMS_LABEL(GREEN_NODE)
+#define GREEN_CHANNEL DT_PWMS_CHANNEL(GREEN_NODE)
+#define GREEN_FLAGS DT_PWMS_FLAGS(GREEN_NODE)
 #else
 #error "Unsupported board: green-pwm-led devicetree alias is not defined"
-#define GREEN_LABEL	""
-#define GREEN_CHANNEL	0
-#define GREEN_FLAGS	0
+#define GREEN_LABEL ""
+#define GREEN_CHANNEL 0
+#define GREEN_FLAGS 0
 #endif
 
 #if DT_NODE_HAS_STATUS(BLUE_NODE, okay)
-#define BLUE_LABEL	DT_PWMS_LABEL(BLUE_NODE)
-#define BLUE_CHANNEL	DT_PWMS_CHANNEL(BLUE_NODE)
-#define BLUE_FLAGS	DT_PWMS_FLAGS(BLUE_NODE)
+#define BLUE_LABEL DT_PWMS_LABEL(BLUE_NODE)
+#define BLUE_CHANNEL DT_PWMS_CHANNEL(BLUE_NODE)
+#define BLUE_FLAGS DT_PWMS_FLAGS(BLUE_NODE)
 #else
 #error "Unsupported board: blue-pwm-led devicetree alias is not defined"
-#define BLUE_LABEL	""
-#define BLUE_CHANNEL	0
-#define BLUE_FLAGS	0
+#define BLUE_LABEL ""
+#define BLUE_CHANNEL 0
+#define BLUE_FLAGS 0
 #endif
 
 /*
  * 50 is flicker fusion threshold. Modulated light will be perceived
  * as steady by our eyes when blinking rate is at least 50.
  */
-#define PERIOD_USEC	(USEC_PER_SEC / 50U)
-#define STEPSIZE_USEC	2000
+#define PERIOD_USEC (USEC_PER_SEC / 50U)
+#define STEPSIZE_USEC 2000
 
 static int pwm_set(const struct device *pwm_dev, uint32_t pwm_pin,
-		     uint32_t pulse_width, pwm_flags_t flags)
+		   uint32_t pulse_width, pwm_flags_t flags)
 {
-	return pwm_pin_set_usec(pwm_dev, pwm_pin, PERIOD_USEC,
-				pulse_width, flags);
+	return pwm_pin_set_usec(pwm_dev, pwm_pin, PERIOD_USEC, pulse_width,
+				flags);
 }
 
 enum { RED, GREEN, BLUE };
@@ -89,8 +89,8 @@ void main(void)
 	while (1) {
 		for (pulse_red = 0U; pulse_red <= PERIOD_USEC;
 		     pulse_red += STEPSIZE_USEC) {
-			ret = pwm_set(pwm_dev[RED], RED_CHANNEL,
-				      pulse_red, RED_FLAGS);
+			ret = pwm_set(pwm_dev[RED], RED_CHANNEL, pulse_red,
+				      RED_FLAGS);
 			if (ret != 0) {
 				printk("Error %d: "
 				       "red write failed\n",
@@ -112,8 +112,7 @@ void main(void)
 				for (pulse_blue = 0U; pulse_blue <= PERIOD_USEC;
 				     pulse_blue += STEPSIZE_USEC) {
 					ret = pwm_set(pwm_dev[BLUE],
-						      BLUE_CHANNEL,
-						      pulse_blue,
+						      BLUE_CHANNEL, pulse_blue,
 						      BLUE_FLAGS);
 					if (ret != 0) {
 						printk("Error %d: "

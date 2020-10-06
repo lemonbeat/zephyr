@@ -18,8 +18,7 @@ LOG_MODULE_DECLARE(net_l2_ppp, CONFIG_NET_L2_PPP_LOG_LEVEL);
 
 #define ALLOC_TIMEOUT K_MSEC(100)
 
-int ppp_parse_options(struct ppp_fsm *fsm, struct net_pkt *pkt,
-		      uint16_t length,
+int ppp_parse_options(struct ppp_fsm *fsm, struct net_pkt *pkt, uint16_t length,
 		      int (*parse)(struct net_pkt *pkt, uint8_t code,
 				   uint8_t len, void *user_data),
 		      void *user_data)
@@ -79,8 +78,7 @@ int ppp_parse_options(struct ppp_fsm *fsm, struct net_pkt *pkt,
 
 static const struct ppp_peer_option_info *
 ppp_peer_option_info_get(const struct ppp_peer_option_info *options,
-			 size_t num_options,
-			 uint8_t code)
+			 size_t num_options, uint8_t code)
 {
 	size_t i;
 
@@ -114,13 +112,10 @@ static int ppp_parse_option_conf_req_unsupported(struct net_pkt *pkt,
 	struct net_pkt *ret_pkt = parse_data->ret_pkt;
 	const struct ppp_peer_option_info *option_info =
 		ppp_peer_option_info_get(parse_data->options_info,
-					 parse_data->num_options_info,
-					 code);
+					 parse_data->num_options_info, code);
 
-	NET_DBG("[%s/%p] %s option %s (%d) len %d",
-		fsm->name, fsm, "Check",
-		ppp_option2str(parse_data->protocol, code),
-		code, len);
+	NET_DBG("[%s/%p] %s option %s (%d) len %d", fsm->name, fsm, "Check",
+		ppp_option2str(parse_data->protocol, code), code, len);
 
 	if (option_info) {
 		return 0;
@@ -146,8 +141,7 @@ static int ppp_parse_option_conf_req_supported(struct net_pkt *pkt,
 	struct ppp_fsm *fsm = parse_data->fsm;
 	const struct ppp_peer_option_info *option_info =
 		ppp_peer_option_info_get(parse_data->options_info,
-					 parse_data->num_options_info,
-					 code);
+					 parse_data->num_options_info, code);
 	int ret;
 
 	ret = option_info->parse(fsm, pkt, parse_data->user_data);
@@ -160,14 +154,11 @@ static int ppp_parse_option_conf_req_supported(struct net_pkt *pkt,
 	return ret;
 }
 
-int ppp_config_info_req(struct ppp_fsm *fsm,
-			struct net_pkt *pkt,
-			uint16_t length,
-			struct net_pkt *ret_pkt,
+int ppp_config_info_req(struct ppp_fsm *fsm, struct net_pkt *pkt,
+			uint16_t length, struct net_pkt *ret_pkt,
 			enum ppp_protocol_type protocol,
 			const struct ppp_peer_option_info *options_info,
-			size_t num_options_info,
-			void *user_data)
+			size_t num_options_info, void *user_data)
 {
 	struct ppp_parse_option_conf_req_data parse_data = {
 		.fsm = fsm,
@@ -281,8 +272,8 @@ static int ppp_my_option_get(struct ppp_fsm *fsm, uint8_t code,
 	return -ENOENT;
 }
 
-static int ppp_my_option_parse(struct net_pkt *pkt, uint8_t code,
-			       uint8_t len, void *user_data)
+static int ppp_my_option_parse(struct net_pkt *pkt, uint8_t code, uint8_t len,
+			       void *user_data)
 {
 	struct ppp_my_option_handle_data *d = user_data;
 	struct ppp_context *ctx = ppp_fsm_ctx(d->fsm);
@@ -298,10 +289,8 @@ static int ppp_my_option_parse(struct net_pkt *pkt, uint8_t code,
 	return d->handle(ctx, pkt, len, info, data);
 }
 
-static int ppp_my_options_parse(struct ppp_fsm *fsm,
-				struct net_pkt *pkt,
-				uint16_t length,
-				ppp_my_option_handle_t handle)
+static int ppp_my_options_parse(struct ppp_fsm *fsm, struct net_pkt *pkt,
+				uint16_t length, ppp_my_option_handle_t handle)
 {
 	struct ppp_my_option_handle_data parse_data = {
 		.fsm = fsm,
@@ -326,8 +315,7 @@ static int ppp_my_option_parse_conf_ack(struct ppp_context *ctx,
 	return 0;
 }
 
-int ppp_my_options_parse_conf_ack(struct ppp_fsm *fsm,
-				  struct net_pkt *pkt,
+int ppp_my_options_parse_conf_ack(struct ppp_fsm *fsm, struct net_pkt *pkt,
 				  uint16_t length)
 {
 	return ppp_my_options_parse(fsm, pkt, length,
@@ -342,8 +330,7 @@ static int ppp_my_option_parse_conf_nak(struct ppp_context *ctx,
 	return info->conf_nak_handle(ctx, pkt, len);
 }
 
-int ppp_my_options_parse_conf_nak(struct ppp_fsm *fsm,
-				  struct net_pkt *pkt,
+int ppp_my_options_parse_conf_nak(struct ppp_fsm *fsm, struct net_pkt *pkt,
 				  uint16_t length)
 {
 	return ppp_my_options_parse(fsm, pkt, length,
@@ -360,8 +347,7 @@ static int ppp_my_option_parse_conf_rej(struct ppp_context *ctx,
 	return 0;
 }
 
-int ppp_my_options_parse_conf_rej(struct ppp_fsm *fsm,
-				  struct net_pkt *pkt,
+int ppp_my_options_parse_conf_rej(struct ppp_fsm *fsm, struct net_pkt *pkt,
 				  uint16_t length)
 {
 	return ppp_my_options_parse(fsm, pkt, length,

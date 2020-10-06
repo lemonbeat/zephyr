@@ -50,35 +50,35 @@ struct bt_ots_obj_type {
 /** @brief Properties of an OTS object. */
 enum {
 	/** Bit 0 Deletion of this object is permitted */
-	BT_OTS_OBJ_PROP_DELETE    = 0,
+	BT_OTS_OBJ_PROP_DELETE = 0,
 
 	/** Bit 1 Execution of this object is permitted */
-	BT_OTS_OBJ_PROP_EXECUTE   = 1,
+	BT_OTS_OBJ_PROP_EXECUTE = 1,
 
 	/** Bit 2 Reading this object is permitted */
-	BT_OTS_OBJ_PROP_READ      = 2,
+	BT_OTS_OBJ_PROP_READ = 2,
 
 	/** Bit 3 Writing data to this object is permitted */
-	BT_OTS_OBJ_PROP_WRITE     = 3,
+	BT_OTS_OBJ_PROP_WRITE = 3,
 
 	/** @brief Bit 4 Appending data to this object is permitted.
 	 *
 	 * Appending data increases its Allocated Size.
 	 */
-	BT_OTS_OBJ_PROP_APPEND    = 4,
+	BT_OTS_OBJ_PROP_APPEND = 4,
 
 	/** Bit 5 Truncation of this object is permitted */
-	BT_OTS_OBJ_PROP_TRUNCATE  = 5,
+	BT_OTS_OBJ_PROP_TRUNCATE = 5,
 
 	/** @brief Bit 6 Patching this object is permitted
 	 *
 	 *  Patching this object overwrites some of
 	 *  the object's existing contents.
 	 */
-	BT_OTS_OBJ_PROP_PATCH     = 6,
+	BT_OTS_OBJ_PROP_PATCH = 6,
 
 	/** Bit 7 This object is a marked object */
-	BT_OTS_OBJ_PROP_MARKED    = 7,
+	BT_OTS_OBJ_PROP_MARKED = 7,
 };
 
 /** @brief Set @ref BT_OTS_OBJ_PROP_DELETE property.
@@ -99,8 +99,7 @@ enum {
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_SET_PROP_READ(prop) \
-	WRITE_BIT(prop, BT_OTS_OBJ_PROP_READ, 1)
+#define BT_OTS_OBJ_SET_PROP_READ(prop) WRITE_BIT(prop, BT_OTS_OBJ_PROP_READ, 1)
 
 /** @brief Set @ref BT_OTS_OBJ_PROP_WRITE property.
  *
@@ -141,57 +140,50 @@ enum {
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_GET_PROP_DELETE(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_DELETE))
+#define BT_OTS_OBJ_GET_PROP_DELETE(prop) ((prop)&BIT(BT_OTS_OBJ_PROP_DELETE))
 
 /** @brief Get @ref BT_OTS_OBJ_PROP_EXECUTE property.
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_GET_PROP_EXECUTE(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_EXECUTE))
+#define BT_OTS_OBJ_GET_PROP_EXECUTE(prop) ((prop)&BIT(BT_OTS_OBJ_PROP_EXECUTE))
 
 /** @brief Get @ref BT_OTS_OBJ_PROP_READ property.
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_GET_PROP_READ(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_READ))
+#define BT_OTS_OBJ_GET_PROP_READ(prop) ((prop)&BIT(BT_OTS_OBJ_PROP_READ))
 
 /** @brief Get @ref BT_OTS_OBJ_PROP_WRITE property.
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_GET_PROP_WRITE(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_WRITE))
+#define BT_OTS_OBJ_GET_PROP_WRITE(prop) ((prop)&BIT(BT_OTS_OBJ_PROP_WRITE))
 
 /** @brief Get @ref BT_OTS_OBJ_PROP_APPEND property.
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_GET_PROP_APPEND(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_APPEND))
+#define BT_OTS_OBJ_GET_PROP_APPEND(prop) ((prop)&BIT(BT_OTS_OBJ_PROP_APPEND))
 
 /** @brief Get @ref BT_OTS_OBJ_PROP_TRUNCATE property.
  *
  *  @param prop Object properties.
  */
 #define BT_OTS_OBJ_GET_PROP_TRUNCATE(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_TRUNCATE))
+	((prop)&BIT(BT_OTS_OBJ_PROP_TRUNCATE))
 
 /** @brief Get @ref BT_OTS_OBJ_PROP_PATCH property.
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_GET_PROP_PATCH(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_PATCH))
+#define BT_OTS_OBJ_GET_PROP_PATCH(prop) ((prop)&BIT(BT_OTS_OBJ_PROP_PATCH))
 
 /** @brief Get @ref BT_OTS_OBJ_PROP_MARKED property.
  *
  *  @param prop Object properties.
  */
-#define BT_OTS_OBJ_GET_PROP_MARKED(prop) \
-	((prop) & BIT(BT_OTS_OBJ_PROP_MARKED))
+#define BT_OTS_OBJ_GET_PROP_MARKED(prop) ((prop)&BIT(BT_OTS_OBJ_PROP_MARKED))
 
 /** @brief Descriptor for OTS Object Size parameter. */
 struct bt_ots_obj_size {
@@ -205,7 +197,7 @@ struct bt_ots_obj_size {
 /** @brief Descriptor for OTS object initialization. */
 struct bt_ots_obj_metadata {
 	/* Object Name */
-	char                   *name;
+	char *name;
 
 	/* Object Type */
 	struct bt_ots_obj_type type;
@@ -214,40 +206,40 @@ struct bt_ots_obj_metadata {
 	struct bt_ots_obj_size size;
 
 	/* Object Properties */
-	uint32_t               props;
+	uint32_t props;
 };
 
 /** @brief Object Action Control Point Feature bits. */
 enum {
 	/** Bit 0 OACP Create Op Code Supported */
-	BT_OTS_OACP_FEAT_CREATE     = 0,
+	BT_OTS_OACP_FEAT_CREATE = 0,
 
 	/** Bit 1 OACP Delete Op Code Supported  */
-	BT_OTS_OACP_FEAT_DELETE     = 1,
+	BT_OTS_OACP_FEAT_DELETE = 1,
 
 	/** Bit 2 OACP Calculate Checksum Op Code Supported */
-	BT_OTS_OACP_FEAT_CHECKSUM   = 2,
+	BT_OTS_OACP_FEAT_CHECKSUM = 2,
 
 	/** Bit 3 OACP Execute Op Code Supported */
-	BT_OTS_OACP_FEAT_EXECUTE    = 3,
+	BT_OTS_OACP_FEAT_EXECUTE = 3,
 
 	/** Bit 4 OACP Read Op Code Supported */
-	BT_OTS_OACP_FEAT_READ       = 4,
+	BT_OTS_OACP_FEAT_READ = 4,
 
 	/** Bit 5 OACP Write Op Code Supported */
-	BT_OTS_OACP_FEAT_WRITE      = 5,
+	BT_OTS_OACP_FEAT_WRITE = 5,
 
 	/** Bit 6 Appending Additional Data to Objects Supported  */
-	BT_OTS_OACP_FEAT_APPEND     = 6,
+	BT_OTS_OACP_FEAT_APPEND = 6,
 
 	/** Bit 7 Truncation of Objects Supported */
-	BT_OTS_OACP_FEAT_TRUNCATE   = 7,
+	BT_OTS_OACP_FEAT_TRUNCATE = 7,
 
 	/** Bit 8 Patching of Objects Supported  */
-	BT_OTS_OACP_FEAT_PATCH      = 8,
+	BT_OTS_OACP_FEAT_PATCH = 8,
 
 	/** Bit 9 OACP Abort Op Code Supported */
-	BT_OTS_OACP_FEAT_ABORT      = 9,
+	BT_OTS_OACP_FEAT_ABORT = 9,
 };
 
 /** @brief Set @ref BT_OTS_OACP_SET_FEAT_CREATE feature.
@@ -324,85 +316,78 @@ enum {
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OACP_GET_FEAT_CREATE(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_CREATE))
+#define BT_OTS_OACP_GET_FEAT_CREATE(feat) ((feat)&BIT(BT_OTS_OACP_FEAT_CREATE))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_DELETE feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OACP_GET_FEAT_DELETE(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_DELETE))
+#define BT_OTS_OACP_GET_FEAT_DELETE(feat) ((feat)&BIT(BT_OTS_OACP_FEAT_DELETE))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_CHECKSUM feature.
  *
  *  @param feat OTS features.
  */
 #define BT_OTS_OACP_GET_FEAT_CHECKSUM(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_CHECKSUM))
+	((feat)&BIT(BT_OTS_OACP_FEAT_CHECKSUM))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_EXECUTE feature.
  *
  *  @param feat OTS features.
  */
 #define BT_OTS_OACP_GET_FEAT_EXECUTE(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_EXECUTE))
+	((feat)&BIT(BT_OTS_OACP_FEAT_EXECUTE))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_READ feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OACP_GET_FEAT_READ(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_READ))
+#define BT_OTS_OACP_GET_FEAT_READ(feat) ((feat)&BIT(BT_OTS_OACP_FEAT_READ))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_WRITE feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OACP_GET_FEAT_WRITE(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_WRITE))
+#define BT_OTS_OACP_GET_FEAT_WRITE(feat) ((feat)&BIT(BT_OTS_OACP_FEAT_WRITE))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_APPEND feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OACP_GET_FEAT_APPEND(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_APPEND))
+#define BT_OTS_OACP_GET_FEAT_APPEND(feat) ((feat)&BIT(BT_OTS_OACP_FEAT_APPEND))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_TRUNCATE feature.
  *
  *  @param feat OTS features.
  */
 #define BT_OTS_OACP_GET_FEAT_TRUNCATE(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_TRUNCATE))
+	((feat)&BIT(BT_OTS_OACP_FEAT_TRUNCATE))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_PATCH feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OACP_GET_FEAT_PATCH(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_PATCH))
+#define BT_OTS_OACP_GET_FEAT_PATCH(feat) ((feat)&BIT(BT_OTS_OACP_FEAT_PATCH))
 
 /** @brief Get @ref BT_OTS_OACP_FEAT_ABORT feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OACP_GET_FEAT_ABORT(feat) \
-	((feat) & BIT(BT_OTS_OACP_FEAT_ABORT))
+#define BT_OTS_OACP_GET_FEAT_ABORT(feat) ((feat)&BIT(BT_OTS_OACP_FEAT_ABORT))
 
 /** @brief Object List Control Point Feature bits. */
 enum {
 	/** Bit 0 OLCP Go To Op Code Supported */
-	BT_OTS_OLCP_FEAT_GO_TO      = 0,
+	BT_OTS_OLCP_FEAT_GO_TO = 0,
 
 	/** Bit 1 OLCP Order Op Code Supported */
-	BT_OTS_OLCP_FEAT_ORDER      = 1,
+	BT_OTS_OLCP_FEAT_ORDER = 1,
 
 	/** Bit 2 OLCP Request Number of Objects Op Code Supported */
-	BT_OTS_OLCP_FEAT_NUM_REQ    = 2,
+	BT_OTS_OLCP_FEAT_NUM_REQ = 2,
 
 	/** Bit 3 OLCP Clear Marking Op Code Supported*/
-	BT_OTS_OLCP_FEAT_CLEAR      = 3,
+	BT_OTS_OLCP_FEAT_CLEAR = 3,
 };
 
 /** @brief Set @ref BT_OTS_OLCP_FEAT_GO_TO feature.
@@ -437,29 +422,26 @@ enum {
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OLCP_GET_FEAT_GO_TO(feat) \
-	((feat) & BIT(BT_OTS_OLCP_FEAT_GO_TO))
+#define BT_OTS_OLCP_GET_FEAT_GO_TO(feat) ((feat)&BIT(BT_OTS_OLCP_FEAT_GO_TO))
 
 /** @brief Get @ref BT_OTS_OLCP_GET_FEAT_ORDER feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OLCP_GET_FEAT_ORDER(feat) \
-	((feat) & BIT(BT_OTS_OLCP_FEAT_ORDER))
+#define BT_OTS_OLCP_GET_FEAT_ORDER(feat) ((feat)&BIT(BT_OTS_OLCP_FEAT_ORDER))
 
 /** @brief Get @ref BT_OTS_OLCP_GET_FEAT_NUM_REQ feature.
  *
  *  @param feat OTS features.
  */
 #define BT_OTS_OLCP_GET_FEAT_NUM_REQ(feat) \
-	((feat) & BIT(BT_OTS_OLCP_FEAT_NUM_REQ))
+	((feat)&BIT(BT_OTS_OLCP_FEAT_NUM_REQ))
 
 /** @brief Get @ref BT_OTS_OLCP_GET_FEAT_CLEAR feature.
  *
  *  @param feat OTS features.
  */
-#define BT_OTS_OLCP_GET_FEAT_CLEAR(feat) \
-	((feat) & BIT(BT_OTS_OLCP_FEAT_CLEAR))
+#define BT_OTS_OLCP_GET_FEAT_CLEAR(feat) ((feat)&BIT(BT_OTS_OLCP_FEAT_CLEAR))
 
 /**@brief Features of the OTS. */
 struct bt_ots_feat {
@@ -495,8 +477,7 @@ struct bt_ots_cb {
 	 *  -ENOMEM if no available space for new object.
 	 */
 	int (*obj_created)(struct bt_ots *ots, struct bt_conn *conn,
-			   uint64_t id,
-			   const struct bt_ots_obj_metadata *init);
+			   uint64_t id, const struct bt_ots_obj_metadata *init);
 
 	/** @brief Object deleted callback
 	 *
@@ -626,8 +607,8 @@ static inline int bt_ots_obj_id_to_str(uint64_t obj_id, char *str, size_t len)
 
 	sys_put_le48(obj_id, id);
 
-	return snprintk(str, len, "0x%02X%02X%02X%02X%02X%02X",
-			id[5], id[4], id[3], id[2], id[1], id[0]);
+	return snprintk(str, len, "0x%02X%02X%02X%02X%02X%02X", id[5], id[4],
+			id[3], id[2], id[1], id[0]);
 }
 
 #ifdef __cplusplus

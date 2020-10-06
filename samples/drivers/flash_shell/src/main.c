@@ -17,13 +17,13 @@
 
 LOG_MODULE_REGISTER(app);
 
-#define PR_SHELL(shell, fmt, ...)				\
+#define PR_SHELL(shell, fmt, ...) \
 	shell_fprintf(shell, SHELL_NORMAL, fmt, ##__VA_ARGS__)
-#define PR_ERROR(shell, fmt, ...)				\
+#define PR_ERROR(shell, fmt, ...) \
 	shell_fprintf(shell, SHELL_ERROR, fmt, ##__VA_ARGS__)
-#define PR_INFO(shell, fmt, ...)				\
+#define PR_INFO(shell, fmt, ...) \
 	shell_fprintf(shell, SHELL_INFO, fmt, ##__VA_ARGS__)
-#define PR_WARNING(shell, fmt, ...)				\
+#define PR_WARNING(shell, fmt, ...) \
 	shell_fprintf(shell, SHELL_WARNING, fmt, ##__VA_ARGS__)
 /*
  * When DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL is available, we use it here.
@@ -34,55 +34,54 @@ LOG_MODULE_REGISTER(app);
 #endif
 
 /* Command usage info. */
-#define WRITE_BLOCK_SIZE_HELP \
+#define WRITE_BLOCK_SIZE_HELP                                               \
 	("Print the device's write block size. This is the smallest amount" \
 	 " of data which may be written to the device, in bytes.")
-#define READ_HELP \
+#define READ_HELP        \
 	("<off> <len>\n" \
 	 "Read <len> bytes from device offset <off>.")
-#define ERASE_HELP \
-	("<off> <len>\n\n" \
+#define ERASE_HELP                                      \
+	("<off> <len>\n\n"                              \
 	 "Erase <len> bytes from device offset <off>, " \
 	 "subject to hardware page limitations.")
-#define WRITE_HELP \
-	("<off> <byte1> [... byteN]\n\n" \
+#define WRITE_HELP                                               \
+	("<off> <byte1> [... byteN]\n\n"                         \
 	 "Write given bytes, starting at device offset <off>.\n" \
 	 "Pages must be erased before they can be written.")
-#define WRITE_UNALIGNED_HELP \
-	("<off> <byte1> [... byteN]\n\n" \
-	 "Write given bytes, starting at device offset <off>.\n" \
+#define WRITE_UNALIGNED_HELP                                                       \
+	("<off> <byte1> [... byteN]\n\n"                                           \
+	 "Write given bytes, starting at device offset <off>.\n"                   \
 	 "Being unaligned, affected memory areas are backed up, erased, protected" \
-	 " and then overwritten.\n" \
+	 " and then overwritten.\n"                                                \
 	 "This command is designed to test writing to large flash pages.")
-#define WRITE_PATTERN_HELP \
-	("<off> <len>\n\n" \
-	 "Writes a pattern of (0x00 0x01 .. 0xFF 0x00 ..) of length" \
-	 "<len> at the offset <off>.\n" \
+#define WRITE_PATTERN_HELP                                                       \
+	("<off> <len>\n\n"                                                       \
+	 "Writes a pattern of (0x00 0x01 .. 0xFF 0x00 ..) of length"             \
+	 "<len> at the offset <off>.\n"                                          \
 	 "Unaligned writing is used, i.e. protection and erasing are automated." \
 	 "This command is designed to test writing to large flash pages.")
 #ifdef CONFIG_FLASH_PAGE_LAYOUT
-#define PAGE_COUNT_HELP \
-	"\n\nPrint the number of pages on the flash device."
-#define PAGE_LAYOUT_HELP \
-	("[start_page] [end_page]\n\n" \
-	 "Print layout of flash pages in the range [start_page, end_page],"   \
+#define PAGE_COUNT_HELP "\n\nPrint the number of pages on the flash device."
+#define PAGE_LAYOUT_HELP                                                    \
+	("[start_page] [end_page]\n\n"                                      \
+	 "Print layout of flash pages in the range [start_page, end_page]," \
 	 " which is inclusive. By default, all pages are printed.")
-#define PAGE_READ_HELP \
-	("<page> <len> OR <page> <off> <len>\n\n" \
+#define PAGE_READ_HELP                                                      \
+	("<page> <len> OR <page> <off> <len>\n\n"                           \
 	 "Read <len> bytes from given page, starting at page offset <off>," \
-	  "or offset 0 if not given. No checks are made that bytes read are" \
+	 "or offset 0 if not given. No checks are made that bytes read are" \
 	 " all within the page.")
-#define PAGE_ERASE_HELP \
+#define PAGE_ERASE_HELP     \
 	("<page> [num]\n\n" \
 	 "Erase [num] pages (default 1), starting at page <page>.")
-#define PAGE_WRITE_HELP \
-	("<page> <off> <byte1> [... byteN]\n\n" \
+#define PAGE_WRITE_HELP                                                    \
+	("<page> <off> <byte1> [... byteN]\n\n"                            \
 	 "Write given bytes to given page, starting at page offset <off>." \
-	 " No checks are made that the bytes all fall within the page." \
+	 " No checks are made that the bytes all fall within the page."    \
 	 " Pages must be erased before they can be written.")
 #endif
-#define SET_DEV_HELP \
-	("<device_name>\n\n" \
+#define SET_DEV_HELP                                                  \
+	("<device_name>\n\n"                                          \
 	 "Set flash device by name. If a flash device was not found," \
 	 " this command must be run first to bind a device to this module.")
 
@@ -110,23 +109,24 @@ static void dump_buffer(const struct shell *shell, uint8_t *buf, size_t size)
 	uint8_t *p = buf;
 
 	while (size >= 16) {
-		PR_SHELL(shell, "%02x %02x %02x %02x | %02x %02x %02x %02x |" \
-		       "%02x %02x %02x %02x | %02x %02x %02x %02x\n",
-		       p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-			   p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+		PR_SHELL(shell,
+			 "%02x %02x %02x %02x | %02x %02x %02x %02x |"
+			 "%02x %02x %02x %02x | %02x %02x %02x %02x\n",
+			 p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8],
+			 p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
 		p += 16;
 		size -= 16;
 	}
 	if (size >= 8) {
 		PR_SHELL(shell, "%02x %02x %02x %02x | %02x %02x %02x %02x\n",
-		       p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+			 p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 		p += 8;
 		size -= 8;
 		newline = true;
 	}
 	if (size > 4) {
-		PR_SHELL(shell, "%02x %02x %02x %02x | ",
-		       p[0], p[1], p[2], p[3]);
+		PR_SHELL(shell, "%02x %02x %02x %02x | ", p[0], p[1], p[2],
+			 p[3]);
 		p += 4;
 		size -= 4;
 		newline = true;
@@ -188,7 +188,7 @@ static int do_read(const struct shell *shell, off_t offset, size_t len)
 	dump_buffer(shell, buf, len);
 	return 0;
 
- err_read:
+err_read:
 	PR_ERROR(shell, "flash_read error: %d\n", ret);
 	return ret;
 }
@@ -200,8 +200,10 @@ static int do_erase(const struct shell *shell, off_t offset, size_t size)
 
 	ret = flash_write_protection_set(flash_device, false);
 	if (ret) {
-		PR_ERROR(shell, "Failed to disable flash protection (err: %d)."
-				"\n", ret);
+		PR_ERROR(shell,
+			 "Failed to disable flash protection (err: %d)."
+			 "\n",
+			 ret);
 		return ret;
 	}
 	ret = flash_erase(flash_device, offset, size);
@@ -211,8 +213,10 @@ static int do_erase(const struct shell *shell, off_t offset, size_t size)
 	}
 	ret = flash_write_protection_set(flash_device, true);
 	if (ret) {
-		PR_ERROR(shell, "Failed to enable flash protection (err: %d)."
-				"\n", ret);
+		PR_ERROR(shell,
+			 "Failed to enable flash protection (err: %d)."
+			 "\n",
+			 ret);
 	}
 	return ret;
 }
@@ -225,8 +229,10 @@ static int do_write(const struct shell *shell, off_t offset, uint8_t *buf,
 
 	ret = flash_write_protection_set(flash_device, false);
 	if (ret) {
-		PR_ERROR(shell, "Failed to disable flash protection (err: %d)."
-				"\n", ret);
+		PR_ERROR(shell,
+			 "Failed to disable flash protection (err: %d)."
+			 "\n",
+			 ret);
 		return ret;
 	}
 	ret = flash_write(flash_device, offset, buf, len);
@@ -236,8 +242,10 @@ static int do_write(const struct shell *shell, off_t offset, uint8_t *buf,
 	}
 	ret = flash_write_protection_set(flash_device, true);
 	if (ret) {
-		PR_ERROR(shell, "Failed to enable flash protection (err: %d)."
-				"\n", ret);
+		PR_ERROR(shell,
+			 "Failed to enable flash protection (err: %d)."
+			 "\n",
+			 ret);
 		return ret;
 	}
 	if (read_back) {
@@ -247,16 +255,16 @@ static int do_write(const struct shell *shell, off_t offset, uint8_t *buf,
 	return ret;
 }
 
-static int do_write_unaligned(const struct shell *shell, off_t offset, uint8_t *buf,
-		    size_t len, bool read_back)
+static int do_write_unaligned(const struct shell *shell, off_t offset,
+			      uint8_t *buf, size_t len, bool read_back)
 {
 	int ret;
 	size_t page_size = flash_get_write_block_size(flash_device);
 	size_t size_before = offset % page_size;
 	size_t size_after = page_size - ((size_before + len) % page_size);
 	size_t aligned_size = size_before + len + size_after;
-	off_t  start_page = offset - size_before;
-	off_t  last_page = start_page + aligned_size - page_size;
+	off_t start_page = offset - size_before;
+	off_t last_page = start_page + aligned_size - page_size;
 	bool single_page_write = (size_before + len < page_size);
 
 	char *before_data;
@@ -264,8 +272,10 @@ static int do_write_unaligned(const struct shell *shell, off_t offset, uint8_t *
 
 	ret = flash_write_protection_set(flash_device, false);
 	if (ret) {
-		PR_ERROR(shell, "Failed to disable flash protection (err: %d)."
-				"\n", ret);
+		PR_ERROR(shell,
+			 "Failed to disable flash protection (err: %d)."
+			 "\n",
+			 ret);
 		return ret;
 	}
 
@@ -275,8 +285,10 @@ static int do_write_unaligned(const struct shell *shell, off_t offset, uint8_t *
 		flash_write(flash_device, offset, buf, len);
 		ret = flash_write_protection_set(flash_device, true);
 		if (ret) {
-			PR_ERROR(shell, "Failed to enable flash protection (err: %d)."
-					"\n", ret);
+			PR_ERROR(shell,
+				 "Failed to enable flash protection (err: %d)."
+				 "\n",
+				 ret);
 		}
 		return ret;
 	}
@@ -294,21 +306,21 @@ static int do_write_unaligned(const struct shell *shell, off_t offset, uint8_t *
 	if (single_page_write) {
 		/* Read old data before new data is written. */
 		if (size_before) {
-			flash_read(flash_device, start_page, before_data, size_before);
+			flash_read(flash_device, start_page, before_data,
+				   size_before);
 		}
 		/* Fill the with new data. */
 		memcpy(before_data + size_before, buf, len);
 		/* Fill the last part of old data. */
 		if (size_after) {
 			flash_read(flash_device, offset + len,
-					before_data + size_before + len,
-					size_after);
+				   before_data + size_before + len, size_after);
 		}
 	} else {
 		/* Multipage write, different start and end pages. */
 		if (size_before) {
 			flash_read(flash_device, start_page, before_data,
-					size_before);
+				   size_before);
 			/* Fill the rest with new data. */
 			memcpy(before_data + size_before, buf,
 			       page_size - size_before);
@@ -317,12 +329,12 @@ static int do_write_unaligned(const struct shell *shell, off_t offset, uint8_t *
 			/* Copy ending part of new data. */
 			memcpy((void *)after_data,
 			       (void *)(buf + len -
-				   ((len + size_before) % page_size)),
+					((len + size_before) % page_size)),
 			       page_size - size_after);
 			/* Copy ending part of flash page. */
 			flash_read(flash_device, offset + len,
-					after_data + (page_size - size_after),
-					size_after);
+				   after_data + (page_size - size_after),
+				   size_after);
 		}
 	}
 
@@ -332,8 +344,7 @@ static int do_write_unaligned(const struct shell *shell, off_t offset, uint8_t *
 	/* Write stashed and new data. */
 	if (single_page_write || size_before > 0) {
 		/* Write first page if available. */
-		flash_write(flash_device, start_page, before_data,
-				 page_size);
+		flash_write(flash_device, start_page, before_data, page_size);
 	}
 	if (!single_page_write) {
 		size_t middle_data_len = aligned_size;
@@ -351,14 +362,13 @@ static int do_write_unaligned(const struct shell *shell, off_t offset, uint8_t *
 		}
 		if (middle_data_len > 0) {
 			flash_write(flash_device, middle_page_start,
-					 (const void *)data_offset,
-					 middle_data_len);
+				    (const void *)data_offset, middle_data_len);
 		}
 
 		/* Write the last page if needed. */
 		if (size_after > 0) {
 			flash_write(flash_device, last_page, after_data,
-					 page_size);
+				    page_size);
 		}
 	}
 
@@ -373,8 +383,10 @@ free_buffers:
 
 	int ret1 = flash_write_protection_set(flash_device, true);
 	if (ret1) {
-		PR_ERROR(shell, "Failed to enable flash protection (err: %d)."
-				"\n", ret1);
+		PR_ERROR(shell,
+			 "Failed to enable flash protection (err: %d)."
+			 "\n",
+			 ret1);
 		return ret1;
 	}
 
@@ -439,7 +451,8 @@ exit:
 	return err;
 }
 
-static int cmd_write_template(const struct shell *shell, size_t argc, char **argv, bool unaligned)
+static int cmd_write_template(const struct shell *shell, size_t argc,
+			      char **argv, bool unaligned)
 {
 	unsigned long int i, offset;
 	uint8_t buf[ARGC_MAX];
@@ -458,9 +471,10 @@ static int cmd_write_template(const struct shell *shell, size_t argc, char **arg
 
 	if ((argc - 2) > ARGC_MAX) {
 		/* Can only happen if Zephyr limit is increased. */
-		PR_ERROR(shell, "At most %lu bytes can be written.\n"
-				"In order to write more bytes please increase"
-				" parameter: CONFIG_SHELL_ARGC_MAX.\n",
+		PR_ERROR(shell,
+			 "At most %lu bytes can be written.\n"
+			 "In order to write more bytes please increase"
+			 " parameter: CONFIG_SHELL_ARGC_MAX.\n",
 			 (unsigned long)ARGC_MAX);
 		err = -EINVAL;
 		goto exit;
@@ -471,9 +485,10 @@ static int cmd_write_template(const struct shell *shell, size_t argc, char **arg
 	argv += 2;
 	for (i = 0; i < argc; i++) {
 		if (parse_u8(argv[i], &buf[i])) {
-			PR_ERROR(shell, "Argument %lu (%s) is not a byte.\n"
-					"Bytes shall be passed in decimal"
-					" notation.\n",
+			PR_ERROR(shell,
+				 "Argument %lu (%s) is not a byte.\n"
+				 "Bytes shall be passed in decimal"
+				 " notation.\n",
 				 i + 1, argv[i]);
 			err = -EINVAL;
 			goto exit;
@@ -495,12 +510,14 @@ static int cmd_write(const struct shell *shell, size_t argc, char **argv)
 	return cmd_write_template(shell, argc, argv, false);
 }
 
-static int cmd_write_unaligned(const struct shell *shell, size_t argc, char **argv)
+static int cmd_write_unaligned(const struct shell *shell, size_t argc,
+			       char **argv)
 {
 	return cmd_write_template(shell, argc, argv, true);
 }
 
-static int cmd_write_pattern(const struct shell *shell, size_t argc, char **argv)
+static int cmd_write_pattern(const struct shell *shell, size_t argc,
+			     char **argv)
 {
 	int err = check_flash_device(shell);
 	unsigned long int offset, len, i;
@@ -643,21 +660,23 @@ static int cmd_page_read(const struct shell *shell, size_t argc, char **argv)
 		offset = 0;
 	} else if (parse_ul(argv[1], &page) || parse_ul(argv[2], &offset) ||
 		   parse_ul(argv[3], &len)) {
-			ret = -EINVAL;
-			goto bail;
+		ret = -EINVAL;
+		goto bail;
 	}
 
 	ret = flash_get_page_info_by_idx(flash_device, page, &info);
 	if (ret) {
-		PR_ERROR(shell, "Function flash_page_info_by_idx returned an"
-				" error: %d\n", ret);
+		PR_ERROR(shell,
+			 "Function flash_page_info_by_idx returned an"
+			 " error: %d\n",
+			 ret);
 		return ret;
 	}
 	offset += info.start_offset;
 	ret = do_read(shell, offset, len);
 	return ret;
 
- bail:
+bail:
 	PR_ERROR(shell, "Invalid arguments.\n");
 	return ret;
 }
@@ -686,13 +705,16 @@ static int cmd_page_erase(const struct shell *shell, size_t argc, char **argv)
 	for (i = 0; i < num; i++) {
 		ret = flash_get_page_info_by_idx(flash_device, page + i, &info);
 		if (ret) {
-			PR_ERROR(shell, "flash_get_page_info_by_idx error:"
-				" %d\n", ret);
+			PR_ERROR(shell,
+				 "flash_get_page_info_by_idx error:"
+				 " %d\n",
+				 ret);
 			return ret;
 		}
-		PR_SHELL(shell, "Erasing page %u (start offset 0x%x,"
-				" size 0x%x)\n",
-		       info.index, info.start_offset, info.size);
+		PR_SHELL(shell,
+			 "Erasing page %u (start offset 0x%x,"
+			 " size 0x%x)\n",
+			 info.index, info.start_offset, info.size);
 		ret = do_erase(shell, info.start_offset, info.size);
 		if (ret) {
 			return ret;
@@ -701,7 +723,7 @@ static int cmd_page_erase(const struct shell *shell, size_t argc, char **argv)
 
 	return ret;
 
- bail:
+bail:
 	PR_ERROR(shell, "Invalid arguments.\n");
 	return ret;
 }
@@ -743,11 +765,11 @@ static int cmd_page_write(const struct shell *shell, size_t argc, char **argv)
 	ret = do_write(shell, info.start_offset + off, buf, i, true);
 	return ret;
 
- bail:
+bail:
 	PR_ERROR(shell, "Invalid arguments.\n");
 	return ret;
 }
-#endif	/* CONFIG_FLASH_PAGE_LAYOUT */
+#endif /* CONFIG_FLASH_PAGE_LAYOUT */
 
 static int cmd_set_dev(const struct shell *shell, size_t argc, char **argv)
 {
@@ -777,7 +799,7 @@ void main(void)
 		device_get_binding(DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 	if (flash_device) {
 		printk("Found flash controller %s.\n",
-			DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
+		       DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL);
 		printk("Flash I/O commands can be run.\n");
 	} else {
 		printk("**No flash controller found!**\n");
@@ -786,28 +808,28 @@ void main(void)
 	}
 }
 
-
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_flash,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_flash,
 	/* Alphabetically sorted to ensure correct Tab autocompletion. */
-	SHELL_CMD_ARG(erase,	NULL,	ERASE_HELP,	cmd_erase, 3, 0),
+	SHELL_CMD_ARG(erase, NULL, ERASE_HELP, cmd_erase, 3, 0),
 #ifdef CONFIG_FLASH_PAGE_LAYOUT
-	SHELL_CMD_ARG(page_count,  NULL, PAGE_COUNT_HELP, cmd_page_count, 1, 0),
+	SHELL_CMD_ARG(page_count, NULL, PAGE_COUNT_HELP, cmd_page_count, 1, 0),
 	SHELL_CMD_ARG(page_erase, NULL, PAGE_ERASE_HELP, cmd_page_erase, 2, 1),
-	SHELL_CMD_ARG(page_layout, NULL, PAGE_LAYOUT_HELP,
-		      cmd_page_layout, 1, 2),
-	SHELL_CMD_ARG(page_read,   NULL, PAGE_READ_HELP,  cmd_page_read, 3, 1),
-	SHELL_CMD_ARG(page_write,  NULL, PAGE_WRITE_HELP,
-		      cmd_page_write, 3, 255),
+	SHELL_CMD_ARG(page_layout, NULL, PAGE_LAYOUT_HELP, cmd_page_layout, 1,
+		      2),
+	SHELL_CMD_ARG(page_read, NULL, PAGE_READ_HELP, cmd_page_read, 3, 1),
+	SHELL_CMD_ARG(page_write, NULL, PAGE_WRITE_HELP, cmd_page_write, 3,
+		      255),
 #endif
-	SHELL_CMD_ARG(read,		NULL,	READ_HELP,	cmd_read, 3, 0),
+	SHELL_CMD_ARG(read, NULL, READ_HELP, cmd_read, 3, 0),
 	SHELL_CMD_ARG(set_device, NULL, SET_DEV_HELP, cmd_set_dev, 2, 0),
-	SHELL_CMD_ARG(write,	  NULL,	WRITE_HELP,	cmd_write, 3, 255),
-	SHELL_CMD_ARG(write_block_size,	NULL,	WRITE_BLOCK_SIZE_HELP,
-						    cmd_write_block_size, 1, 0),
-	SHELL_CMD_ARG(write_unaligned,  NULL,	WRITE_UNALIGNED_HELP,
-							cmd_write_unaligned, 3, 255),
-	SHELL_CMD_ARG(write_pattern,  	NULL,	WRITE_PATTERN_HELP,
-							cmd_write_pattern, 3, 255),
+	SHELL_CMD_ARG(write, NULL, WRITE_HELP, cmd_write, 3, 255),
+	SHELL_CMD_ARG(write_block_size, NULL, WRITE_BLOCK_SIZE_HELP,
+		      cmd_write_block_size, 1, 0),
+	SHELL_CMD_ARG(write_unaligned, NULL, WRITE_UNALIGNED_HELP,
+		      cmd_write_unaligned, 3, 255),
+	SHELL_CMD_ARG(write_pattern, NULL, WRITE_PATTERN_HELP,
+		      cmd_write_pattern, 3, 255),
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 

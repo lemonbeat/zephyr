@@ -16,7 +16,7 @@
 
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
 
-#define LIS2MDL_SPI_READ		(1 << 7)
+#define LIS2MDL_SPI_READ (1 << 7)
 
 #define LOG_LEVEL CONFIG_SENSOR_LOG_LEVEL
 LOG_MODULE_DECLARE(LIS2MDL);
@@ -28,28 +28,19 @@ static int lis2mdl_spi_read(struct lis2mdl_data *data, uint8_t reg_addr,
 	const struct spi_config *spi_cfg = &cfg->spi_conf;
 	uint8_t buffer_tx[2] = { reg_addr | LIS2MDL_SPI_READ, 0 };
 	const struct spi_buf tx_buf = {
-			.buf = buffer_tx,
-			.len = 2,
+		.buf = buffer_tx,
+		.len = 2,
 	};
-	const struct spi_buf_set tx = {
-		.buffers = &tx_buf,
-		.count = 1
-	};
-	const struct spi_buf rx_buf[2] = {
-		{
-			.buf = NULL,
-			.len = 1,
-		},
-		{
-			.buf = value,
-			.len = len,
-		}
-	};
-	const struct spi_buf_set rx = {
-		.buffers = rx_buf,
-		.count = 2
-	};
-
+	const struct spi_buf_set tx = { .buffers = &tx_buf, .count = 1 };
+	const struct spi_buf rx_buf[2] = { {
+						   .buf = NULL,
+						   .len = 1,
+					   },
+					   {
+						   .buf = value,
+						   .len = len,
+					   } };
+	const struct spi_buf_set rx = { .buffers = rx_buf, .count = 2 };
 
 	if (len > 64) {
 		return -EIO;
@@ -68,21 +59,15 @@ static int lis2mdl_spi_write(struct lis2mdl_data *data, uint8_t reg_addr,
 	const struct lis2mdl_config *cfg = data->dev->config;
 	const struct spi_config *spi_cfg = &cfg->spi_conf;
 	uint8_t buffer_tx[1] = { reg_addr & ~LIS2MDL_SPI_READ };
-	const struct spi_buf tx_buf[2] = {
-		{
-			.buf = buffer_tx,
-			.len = 1,
-		},
-		{
-			.buf = value,
-			.len = len,
-		}
-	};
-	const struct spi_buf_set tx = {
-		.buffers = tx_buf,
-		.count = 2
-	};
-
+	const struct spi_buf tx_buf[2] = { {
+						   .buf = buffer_tx,
+						   .len = 1,
+					   },
+					   {
+						   .buf = value,
+						   .len = len,
+					   } };
+	const struct spi_buf_set tx = { .buffers = tx_buf, .count = 2 };
 
 	if (len > 64) {
 		return -EIO;
@@ -99,8 +84,8 @@ int lis2mdl_spi_init(const struct device *dev)
 {
 	struct lis2mdl_data *data = dev->data;
 
-	data->ctx_spi.read_reg = (stmdev_read_ptr) lis2mdl_spi_read;
-	data->ctx_spi.write_reg = (stmdev_write_ptr) lis2mdl_spi_write;
+	data->ctx_spi.read_reg = (stmdev_read_ptr)lis2mdl_spi_read;
+	data->ctx_spi.write_reg = (stmdev_write_ptr)lis2mdl_spi_write;
 
 	data->ctx = &data->ctx_spi;
 	data->ctx->handle = data;
@@ -119,8 +104,8 @@ int lis2mdl_spi_init(const struct device *dev)
 	data->cs_ctrl.gpio_dt_flags = cfg->cs_gpio_flags;
 	data->cs_ctrl.delay = 0;
 
-	LOG_DBG("SPI GPIO CS configured on %s:%u",
-		cfg->gpio_cs_port, cfg->cs_gpio);
+	LOG_DBG("SPI GPIO CS configured on %s:%u", cfg->gpio_cs_port,
+		cfg->cs_gpio);
 #endif
 
 #if CONFIG_LIS2MDL_SPI_FULL_DUPLEX

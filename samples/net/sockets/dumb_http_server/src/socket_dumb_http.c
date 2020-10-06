@@ -30,13 +30,19 @@
 #define USE_BIG_PAYLOAD 1
 #endif
 
-#define CHECK(r) { if (r == -1) { printf("Error: " #r "\n"); exit(1); } }
+#define CHECK(r)                                   \
+	{                                          \
+		if (r == -1) {                     \
+			printf("Error: " #r "\n"); \
+			exit(1);                   \
+		}                                  \
+	}
 
 static const char content[] = {
 #if USE_BIG_PAYLOAD
-    #include "response_big.html.bin.inc"
+#include "response_big.html.bin.inc"
 #else
-    #include "response_small.html.bin.inc"
+#include "response_small.html.bin.inc"
 #endif
 };
 
@@ -58,7 +64,8 @@ void main(void)
 	CHECK(listen(serv, 5));
 
 	printf("Single-threaded dumb HTTP server waits for a connection on "
-	       "port %d...\n", BIND_PORT);
+	       "port %d...\n",
+	       BIND_PORT);
 
 	while (1) {
 		struct sockaddr_in client_addr;
@@ -97,7 +104,8 @@ void main(void)
 				}
 
 				printf("Got error %d when receiving from "
-				       "socket\n", errno);
+				       "socket\n",
+				       errno);
 				goto close_client;
 			}
 			if (req_state == 0 && c == '\r') {
@@ -119,20 +127,22 @@ void main(void)
 			int sent_len = send(client, data, len, 0);
 
 			if (sent_len == -1) {
-				printf("Error sending data to peer, errno: %d\n", errno);
+				printf("Error sending data to peer, errno: %d\n",
+				       errno);
 				break;
 			}
 			data += sent_len;
 			len -= sent_len;
 		}
 
-close_client:
+	close_client:
 		ret = close(client);
 		if (ret == 0) {
 			printf("Connection from %s closed\n", addr_str);
 		} else {
 			printf("Got error %d while closing the "
-			       "socket\n", errno);
+			       "socket\n",
+			       errno);
 		}
 
 #if defined(__ZEPHYR__) && defined(CONFIG_NET_BUF_POOL_USAGE)
@@ -140,9 +150,8 @@ close_client:
 		struct net_buf_pool *rx_data, *tx_data;
 
 		net_pkt_get_info(&rx, &tx, &rx_data, &tx_data);
-		printf("rx buf: %d, tx buf: %d\n",
-		       rx_data->avail_count, tx_data->avail_count);
+		printf("rx buf: %d, tx buf: %d\n", rx_data->avail_count,
+		       tx_data->avail_count);
 #endif
-
 	}
 }

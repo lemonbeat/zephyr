@@ -16,7 +16,6 @@
 
 LOG_MODULE_REGISTER(temp_nrf5, CONFIG_SENSOR_LOG_LEVEL);
 
-
 /* The nRF5 temperature device returns measurements in 0.25C
  * increments.  Scale to mDegrees C.
  */
@@ -30,9 +29,7 @@ struct temp_nrf5_data {
 };
 
 static void hfclk_on_callback(struct onoff_manager *mgr,
-			      struct onoff_client *cli,
-			      uint32_t state,
-			      int res)
+			      struct onoff_client *cli, uint32_t state, int res)
 {
 	nrf_temp_task_trigger(NRF_TEMP, NRF_TEMP_TASK_START);
 }
@@ -80,7 +77,6 @@ static int temp_nrf5_channel_get(const struct device *dev,
 	struct temp_nrf5_data *data = dev->data;
 	int32_t uval;
 
-
 	if (chan != SENSOR_CHAN_DIE_TEMP) {
 		return -ENOTSUP;
 	}
@@ -124,12 +120,8 @@ static int temp_nrf5_init(const struct device *dev)
 	k_sem_init(&data->device_sync_sem, 0, UINT_MAX);
 	k_mutex_init(&data->mutex);
 
-	IRQ_CONNECT(
-		DT_INST_IRQN(0),
-		DT_INST_IRQ(0, priority),
-		temp_nrf5_isr,
-		DEVICE_GET(temp_nrf5),
-		0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), temp_nrf5_isr,
+		    DEVICE_GET(temp_nrf5), 0);
 	irq_enable(DT_INST_IRQN(0));
 
 	nrf_temp_int_enable(NRF_TEMP, NRF_TEMP_INT_DATARDY_MASK);
@@ -139,11 +131,6 @@ static int temp_nrf5_init(const struct device *dev)
 
 static struct temp_nrf5_data temp_nrf5_driver;
 
-DEVICE_AND_API_INIT(temp_nrf5,
-		    DT_INST_LABEL(0),
-		    temp_nrf5_init,
-		    &temp_nrf5_driver,
-		    NULL,
-		    POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY,
-		    &temp_nrf5_driver_api);
+DEVICE_AND_API_INIT(temp_nrf5, DT_INST_LABEL(0), temp_nrf5_init,
+		    &temp_nrf5_driver, NULL, POST_KERNEL,
+		    CONFIG_SENSOR_INIT_PRIORITY, &temp_nrf5_driver_api);

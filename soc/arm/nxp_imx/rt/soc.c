@@ -21,23 +21,17 @@
 
 #ifdef CONFIG_INIT_ARM_PLL
 /* ARM PLL configuration for RUN mode */
-const clock_arm_pll_config_t armPllConfig = {
-	.loopDivider = 100U
-};
+const clock_arm_pll_config_t armPllConfig = { .loopDivider = 100U };
 #endif
 
 #ifdef CONFIG_INIT_SYS_PLL
 /* SYS PLL configuration for RUN mode */
-const clock_sys_pll_config_t sysPllConfig = {
-	.loopDivider = 1U
-};
+const clock_sys_pll_config_t sysPllConfig = { .loopDivider = 1U };
 #endif
 
 #ifdef CONFIG_INIT_USB1_PLL
 /* USB1 PLL configuration for RUN mode */
-const clock_usb_pll_config_t usb1PllConfig = {
-	.loopDivider = 0U
-};
+const clock_usb_pll_config_t usb1PllConfig = { .loopDivider = 0U };
 #endif
 
 #if CONFIG_USB_DC_NXP_EHCI
@@ -50,7 +44,8 @@ const clock_usb_pll_config_t usb1PllConfig = {
 #ifdef CONFIG_INIT_ENET_PLL
 /* ENET PLL configuration for RUN mode */
 const clock_enet_pll_config_t ethPllConfig = {
-#if defined(CONFIG_SOC_MIMXRT1021) || defined(CONFIG_SOC_MIMXRT1015) || defined(CONFIG_SOC_MIMXRT1011)
+#if defined(CONFIG_SOC_MIMXRT1021) || defined(CONFIG_SOC_MIMXRT1015) || \
+	defined(CONFIG_SOC_MIMXRT1011)
 	.enableClkOutput500M = true,
 #endif
 #ifdef CONFIG_ETH_MCUX
@@ -62,9 +57,11 @@ const clock_enet_pll_config_t ethPllConfig = {
 #endif
 
 #if CONFIG_USB_DC_NXP_EHCI
-	usb_phy_config_struct_t usbPhyConfig = {
-		BOARD_USB_PHY_D_CAL, BOARD_USB_PHY_TXCAL45DP, BOARD_USB_PHY_TXCAL45DM,
-	};
+usb_phy_config_struct_t usbPhyConfig = {
+	BOARD_USB_PHY_D_CAL,
+	BOARD_USB_PHY_TXCAL45DP,
+	BOARD_USB_PHY_TXCAL45DM,
+};
 #endif
 
 #ifdef CONFIG_INIT_VIDEO_PLL
@@ -86,15 +83,15 @@ const __imx_boot_data_section BOOT_DATA_T boot_data = {
 
 const __imx_boot_ivt_section ivt image_vector_table = {
 	.hdr = IVT_HEADER,
-	.entry = (uint32_t) _vector_start,
+	.entry = (uint32_t)_vector_start,
 	.reserved1 = IVT_RSVD,
 #ifdef CONFIG_DEVICE_CONFIGURATION_DATA
-	.dcd = (uint32_t) dcd_data,
+	.dcd = (uint32_t)dcd_data,
 #else
-	.dcd = (uint32_t) NULL,
+	.dcd = (uint32_t)NULL,
 #endif
-	.boot_data = (uint32_t) &boot_data,
-	.self = (uint32_t) &image_vector_table,
+	.boot_data = (uint32_t)&boot_data,
+	.self = (uint32_t)&image_vector_table,
 	.csf = (uint32_t)CSF_ADDRESS,
 	.reserved2 = IVT_RSVD,
 };
@@ -126,7 +123,7 @@ static ALWAYS_INLINE void clock_init(void)
 	DCDC->REG3 = (DCDC->REG3 & (~DCDC_REG3_TRG_MASK)) | DCDC_REG3_TRG(0x12);
 	/* Waiting for DCDC_STS_DC_OK bit is asserted */
 	while (DCDC_REG0_STS_DC_OK_MASK !=
-			(DCDC_REG0_STS_DC_OK_MASK & DCDC->REG0)) {
+	       (DCDC_REG0_STS_DC_OK_MASK & DCDC->REG0)) {
 		;
 	}
 
@@ -181,15 +178,16 @@ static ALWAYS_INLINE void clock_init(void)
 #endif
 
 #if CONFIG_USB_DC_NXP_EHCI
-	CLOCK_EnableUsbhs0PhyPllClock(kCLOCK_Usb480M,
-				DT_PROP_BY_PHANDLE(DT_INST(0, nxp_kinetis_usbd), clocks, clock_frequency));
+	CLOCK_EnableUsbhs0PhyPllClock(
+		kCLOCK_Usb480M, DT_PROP_BY_PHANDLE(DT_INST(0, nxp_kinetis_usbd),
+						   clocks, clock_frequency));
 	CLOCK_EnableUsbhs0Clock(kCLOCK_Usb480M,
-				DT_PROP_BY_PHANDLE(DT_INST(0, nxp_kinetis_usbd), clocks, clock_frequency));
+				DT_PROP_BY_PHANDLE(DT_INST(0, nxp_kinetis_usbd),
+						   clocks, clock_frequency));
 	USB_EhciPhyInit(kUSB_ControllerEhci0, CPU_XTAL_CLK_HZ, &usbPhyConfig);
 #endif
 
-#if defined(CONFIG_DISK_ACCESS_USDHC1) ||       \
-	defined(CONFIG_DISK_ACCESS_USDHC2)
+#if defined(CONFIG_DISK_ACCESS_USDHC1) || defined(CONFIG_DISK_ACCESS_USDHC2)
 	CLOCK_InitSysPfd(kCLOCK_Pfd0, 0x12U);
 	/* Configure USDHC clock source and divider */
 #ifdef CONFIG_DISK_ACCESS_USDHC1
@@ -217,11 +215,9 @@ static ALWAYS_INLINE void clock_init(void)
 	 * wfi.
 	 */
 	CLOCK_SetMode(kCLOCK_ModeRun);
-
 }
 
-#if defined(CONFIG_DISK_ACCESS_USDHC1) ||	\
-	defined(CONFIG_DISK_ACCESS_USDHC2)
+#if defined(CONFIG_DISK_ACCESS_USDHC1) || defined(CONFIG_DISK_ACCESS_USDHC2)
 
 /* Usdhc driver needs to re-configure pinmux
  * Pinmux depends on board design.
@@ -239,12 +235,11 @@ void imxrt_usdhc_pinmux_cb_register(usdhc_pin_cfg_cb cb)
 	g_usdhc_pin_cfg_cb = cb;
 }
 
-void imxrt_usdhc_pinmux(uint16_t nusdhc, bool init,
-	uint32_t speed, uint32_t strength)
+void imxrt_usdhc_pinmux(uint16_t nusdhc, bool init, uint32_t speed,
+			uint32_t strength)
 {
 	if (g_usdhc_pin_cfg_cb)
-		g_usdhc_pin_cfg_cb(nusdhc, init,
-			speed, strength);
+		g_usdhc_pin_cfg_cb(nusdhc, init, speed, strength);
 }
 #endif
 
@@ -278,8 +273,8 @@ static int imxrt_init(const struct device *arg)
 
 	RTWDOG->CNT = 0xD928C520U; /* 0xD928C520U is the update key */
 	RTWDOG->TOVAL = 0xFFFF;
-	RTWDOG->CS = (uint32_t) ((RTWDOG->CS) & ~RTWDOG_CS_EN_MASK)
-		| RTWDOG_CS_UPDATE_MASK;
+	RTWDOG->CS = (uint32_t)((RTWDOG->CS) & ~RTWDOG_CS_EN_MASK) |
+		     RTWDOG_CS_UPDATE_MASK;
 
 	/* Disable Systick which might be enabled by bootrom */
 	if ((SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) != 0) {

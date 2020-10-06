@@ -54,7 +54,8 @@ static int disk_ram_access_write(struct disk_info *disk, const uint8_t *buff,
 	return 0;
 }
 
-static int disk_ram_access_ioctl(struct disk_info *disk, uint8_t cmd, void *buff)
+static int disk_ram_access_ioctl(struct disk_info *disk, uint8_t cmd,
+				 void *buff)
 {
 	switch (cmd) {
 	case DISK_IOCTL_CTRL_SYNC:
@@ -66,7 +67,7 @@ static int disk_ram_access_ioctl(struct disk_info *disk, uint8_t cmd, void *buff
 		*(uint32_t *)buff = RAMDISK_SECTOR_SIZE;
 		break;
 	case DISK_IOCTL_GET_ERASE_BLOCK_SZ:
-		*(uint32_t *)buff  = 1U;
+		*(uint32_t *)buff = 1U;
 		break;
 	default:
 		return -EINVAL;

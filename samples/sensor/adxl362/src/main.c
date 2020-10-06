@@ -34,7 +34,8 @@ void main(void)
 {
 	struct sensor_value accel[3];
 
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, adi_adxl362)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, adi_adxl362)));
 	if (dev == NULL) {
 		printf("Device get binding device\n");
 		return;
@@ -66,17 +67,20 @@ void main(void)
 			}
 		}
 
-		if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_X, &accel[0]) < 0) {
+		if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_X, &accel[0]) <
+		    0) {
 			printf("Channel get error\n");
 			return;
 		}
 
-		if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_Y, &accel[1]) < 0) {
+		if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_Y, &accel[1]) <
+		    0) {
 			printf("Channel get error\n");
 			return;
 		}
 
-		if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_Z, &accel[2]) < 0) {
+		if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_Z, &accel[2]) <
+		    0) {
 			printf("Channel get error\n");
 			return;
 		}

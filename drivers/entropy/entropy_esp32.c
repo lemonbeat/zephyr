@@ -28,8 +28,8 @@ static inline uint32_t entropy_esp32_get_u32(void)
 	return *rng_data_reg;
 }
 
-static int entropy_esp32_get_entropy(const struct device *device,
-				     uint8_t *buf, uint16_t len)
+static int entropy_esp32_get_entropy(const struct device *device, uint8_t *buf,
+				     uint16_t len)
 {
 	while (len) {
 		uint32_t v = entropy_esp32_get_u32();
@@ -57,7 +57,6 @@ static struct entropy_driver_api entropy_esp32_api_funcs = {
 	.get_entropy = entropy_esp32_get_entropy
 };
 
-DEVICE_AND_API_INIT(entropy_esp32, DT_INST_LABEL(0),
-		    entropy_esp32_init, NULL, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(entropy_esp32, DT_INST_LABEL(0), entropy_esp32_init, NULL,
+		    NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_esp32_api_funcs);

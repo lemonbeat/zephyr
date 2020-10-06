@@ -24,7 +24,7 @@
 LOG_MODULE_REGISTER(dma_sam_xdmac);
 
 #define XDMAC_INT_ERR (XDMAC_CIE_RBIE | XDMAC_CIE_WBIE | XDMAC_CIE_ROIE)
-#define DMA_CHANNELS_NO  XDMACCHID_NUMBER
+#define DMA_CHANNELS_NO XDMACCHID_NUMBER
 
 /* DMA channel configuration */
 struct sam_xdmac_channel_cfg {
@@ -46,10 +46,8 @@ struct sam_xdmac_dev_data {
 };
 
 #define DEV_NAME(dev) ((dev)->name)
-#define DEV_CFG(dev) \
-	((const struct sam_xdmac_dev_cfg *const)(dev)->config)
-#define DEV_DATA(dev) \
-	((struct sam_xdmac_dev_data *const)(dev)->data)
+#define DEV_CFG(dev) ((const struct sam_xdmac_dev_cfg *const)(dev)->config)
+#define DEV_DATA(dev) ((struct sam_xdmac_dev_data *const)(dev)->data)
 
 static void sam_xdmac_isr(const struct device *dev)
 {
@@ -200,7 +198,7 @@ static int sam_xdmac_config(const struct device *dev, uint32_t channel,
 
 	if (cfg->block_count != 1U) {
 		LOG_ERR("Only single block transfer is currently supported."
-			    " Please submit a patch.");
+			" Please submit a patch.");
 		return -EINVAL;
 	}
 
@@ -212,44 +210,37 @@ static int sam_xdmac_config(const struct device *dev, uint32_t channel,
 	switch (cfg->channel_direction) {
 	case MEMORY_TO_MEMORY:
 		channel_cfg.cfg =
-			  XDMAC_CC_TYPE_MEM_TRAN
-			| XDMAC_CC_MBSIZE(burst_size == 0U ? 0 : burst_size - 1)
-			| XDMAC_CC_SAM_INCREMENTED_AM
-			| XDMAC_CC_DAM_INCREMENTED_AM;
+			XDMAC_CC_TYPE_MEM_TRAN |
+			XDMAC_CC_MBSIZE(burst_size == 0U ? 0 : burst_size - 1) |
+			XDMAC_CC_SAM_INCREMENTED_AM |
+			XDMAC_CC_DAM_INCREMENTED_AM;
 		break;
 	case MEMORY_TO_PERIPHERAL:
 		channel_cfg.cfg =
-			  XDMAC_CC_TYPE_PER_TRAN
-			| XDMAC_CC_CSIZE(burst_size)
-			| XDMAC_CC_DSYNC_MEM2PER
-			| XDMAC_CC_SAM_INCREMENTED_AM
-			| XDMAC_CC_DAM_FIXED_AM;
+			XDMAC_CC_TYPE_PER_TRAN | XDMAC_CC_CSIZE(burst_size) |
+			XDMAC_CC_DSYNC_MEM2PER | XDMAC_CC_SAM_INCREMENTED_AM |
+			XDMAC_CC_DAM_FIXED_AM;
 		break;
 	case PERIPHERAL_TO_MEMORY:
 		channel_cfg.cfg =
-			  XDMAC_CC_TYPE_PER_TRAN
-			| XDMAC_CC_CSIZE(burst_size)
-			| XDMAC_CC_DSYNC_PER2MEM
-			| XDMAC_CC_SAM_FIXED_AM
-			| XDMAC_CC_DAM_INCREMENTED_AM;
+			XDMAC_CC_TYPE_PER_TRAN | XDMAC_CC_CSIZE(burst_size) |
+			XDMAC_CC_DSYNC_PER2MEM | XDMAC_CC_SAM_FIXED_AM |
+			XDMAC_CC_DAM_INCREMENTED_AM;
 		break;
 	default:
 		LOG_ERR("'channel_direction' value %d is not supported",
-			    cfg->channel_direction);
+			cfg->channel_direction);
 		return -EINVAL;
 	}
 
-	channel_cfg.cfg |=
-		  XDMAC_CC_DWIDTH(data_size)
-		| XDMAC_CC_SIF_AHB_IF1
-		| XDMAC_CC_DIF_AHB_IF1
-		| XDMAC_CC_PERID(cfg->dma_slot);
+	channel_cfg.cfg |= XDMAC_CC_DWIDTH(data_size) | XDMAC_CC_SIF_AHB_IF1 |
+			   XDMAC_CC_DIF_AHB_IF1 | XDMAC_CC_PERID(cfg->dma_slot);
 	channel_cfg.ds_msp = 0U;
 	channel_cfg.sus = 0U;
 	channel_cfg.dus = 0U;
 	channel_cfg.cie =
-		  (cfg->complete_callback_en ? XDMAC_CIE_BIE : XDMAC_CIE_LIE)
-		| (cfg->error_callback_en ? XDMAC_INT_ERR : 0);
+		(cfg->complete_callback_en ? XDMAC_CIE_BIE : XDMAC_CIE_LIE) |
+		(cfg->error_callback_en ? XDMAC_INT_ERR : 0);
 
 	ret = sam_xdmac_channel_configure(dev, channel, &channel_cfg);
 	if (ret < 0) {

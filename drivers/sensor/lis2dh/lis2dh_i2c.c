@@ -21,36 +21,34 @@
 LOG_MODULE_DECLARE(lis2dh, CONFIG_SENSOR_LOG_LEVEL);
 
 static int lis2dh_i2c_read_data(const struct device *dev, uint8_t reg_addr,
-				 uint8_t *value, uint8_t len)
+				uint8_t *value, uint8_t len)
 {
 	struct lis2dh_data *data = dev->data;
 	const struct lis2dh_config *cfg = dev->config;
 
 	return i2c_burst_read(data->bus, cfg->bus_cfg.i2c_slv_addr,
-			      reg_addr | LIS2DH_AUTOINCREMENT_ADDR,
-			      value, len);
+			      reg_addr | LIS2DH_AUTOINCREMENT_ADDR, value, len);
 }
 
 static int lis2dh_i2c_write_data(const struct device *dev, uint8_t reg_addr,
-				  uint8_t *value, uint8_t len)
+				 uint8_t *value, uint8_t len)
 {
 	struct lis2dh_data *data = dev->data;
 	const struct lis2dh_config *cfg = dev->config;
 
 	return i2c_burst_write(data->bus, cfg->bus_cfg.i2c_slv_addr,
-			       reg_addr | LIS2DH_AUTOINCREMENT_ADDR,
-			       value, len);
+			       reg_addr | LIS2DH_AUTOINCREMENT_ADDR, value,
+			       len);
 }
 
 static int lis2dh_i2c_read_reg(const struct device *dev, uint8_t reg_addr,
-				uint8_t *value)
+			       uint8_t *value)
 {
 	struct lis2dh_data *data = dev->data;
 	const struct lis2dh_config *cfg = dev->config;
 
-	return i2c_reg_read_byte(data->bus,
-				 cfg->bus_cfg.i2c_slv_addr,
-				 reg_addr, value);
+	return i2c_reg_read_byte(data->bus, cfg->bus_cfg.i2c_slv_addr, reg_addr,
+				 value);
 }
 
 static int lis2dh_i2c_write_reg(const struct device *dev, uint8_t reg_addr,
@@ -59,27 +57,25 @@ static int lis2dh_i2c_write_reg(const struct device *dev, uint8_t reg_addr,
 	struct lis2dh_data *data = dev->data;
 	const struct lis2dh_config *cfg = dev->config;
 
-	return i2c_reg_write_byte(data->bus,
-				  cfg->bus_cfg.i2c_slv_addr,
+	return i2c_reg_write_byte(data->bus, cfg->bus_cfg.i2c_slv_addr,
 				  reg_addr, value);
 }
 
 static int lis2dh_i2c_update_reg(const struct device *dev, uint8_t reg_addr,
-				  uint8_t mask, uint8_t value)
+				 uint8_t mask, uint8_t value)
 {
 	struct lis2dh_data *data = dev->data;
 	const struct lis2dh_config *cfg = dev->config;
 
-	return i2c_reg_update_byte(data->bus,
-				   cfg->bus_cfg.i2c_slv_addr,
+	return i2c_reg_update_byte(data->bus, cfg->bus_cfg.i2c_slv_addr,
 				   reg_addr, mask, value);
 }
 
 static const struct lis2dh_transfer_function lis2dh_i2c_transfer_fn = {
 	.read_data = lis2dh_i2c_read_data,
 	.write_data = lis2dh_i2c_write_data,
-	.read_reg  = lis2dh_i2c_read_reg,
-	.write_reg  = lis2dh_i2c_write_reg,
+	.read_reg = lis2dh_i2c_read_reg,
+	.write_reg = lis2dh_i2c_write_reg,
 	.update_reg = lis2dh_i2c_update_reg,
 };
 

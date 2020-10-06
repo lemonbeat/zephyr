@@ -31,24 +31,24 @@
 #include "l2cap_internal.h"
 #include "rfcomm_internal.h"
 
-#define RFCOMM_CHANNEL_START	0x01
-#define RFCOMM_CHANNEL_END	0x1e
+#define RFCOMM_CHANNEL_START 0x01
+#define RFCOMM_CHANNEL_END 0x1e
 
-#define RFCOMM_MIN_MTU		BT_RFCOMM_SIG_MIN_MTU
-#define RFCOMM_DEFAULT_MTU	127
+#define RFCOMM_MIN_MTU BT_RFCOMM_SIG_MIN_MTU
+#define RFCOMM_DEFAULT_MTU 127
 
 #if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)
-#define RFCOMM_MAX_CREDITS		(CONFIG_BT_ACL_RX_COUNT - 1)
+#define RFCOMM_MAX_CREDITS (CONFIG_BT_ACL_RX_COUNT - 1)
 #else
-#define RFCOMM_MAX_CREDITS		(CONFIG_BT_RX_BUF_COUNT - 1)
+#define RFCOMM_MAX_CREDITS (CONFIG_BT_RX_BUF_COUNT - 1)
 #endif
 
-#define RFCOMM_CREDITS_THRESHOLD	(RFCOMM_MAX_CREDITS / 2)
-#define RFCOMM_DEFAULT_CREDIT		RFCOMM_MAX_CREDITS
+#define RFCOMM_CREDITS_THRESHOLD (RFCOMM_MAX_CREDITS / 2)
+#define RFCOMM_DEFAULT_CREDIT RFCOMM_MAX_CREDITS
 
-#define RFCOMM_CONN_TIMEOUT     K_SECONDS(60)
-#define RFCOMM_DISC_TIMEOUT     K_SECONDS(20)
-#define RFCOMM_IDLE_TIMEOUT     K_SECONDS(2)
+#define RFCOMM_CONN_TIMEOUT K_SECONDS(60)
+#define RFCOMM_DISC_TIMEOUT K_SECONDS(20)
+#define RFCOMM_IDLE_TIMEOUT K_SECONDS(2)
 
 #define DLC_RTX(_w) CONTAINER_OF(_w, struct bt_rfcomm_dlc, rtx_work)
 
@@ -59,52 +59,44 @@ static struct bt_rfcomm_server *servers;
 /* Pool for dummy buffers to wake up the tx threads */
 NET_BUF_POOL_DEFINE(dummy_pool, CONFIG_BT_MAX_CONN, 0, 0, NULL);
 
-#define RFCOMM_SESSION(_ch) CONTAINER_OF(_ch, \
-					 struct bt_rfcomm_session, br_chan.chan)
+#define RFCOMM_SESSION(_ch) \
+	CONTAINER_OF(_ch, struct bt_rfcomm_session, br_chan.chan)
 
 static struct bt_rfcomm_session bt_rfcomm_pool[CONFIG_BT_MAX_CONN];
 
 /* reversed, 8-bit, poly=0x07 */
 static const uint8_t rfcomm_crc_table[256] = {
-	0x00, 0x91, 0xe3, 0x72, 0x07, 0x96, 0xe4, 0x75,
-	0x0e, 0x9f, 0xed, 0x7c, 0x09, 0x98, 0xea, 0x7b,
-	0x1c, 0x8d, 0xff, 0x6e, 0x1b, 0x8a, 0xf8, 0x69,
-	0x12, 0x83, 0xf1, 0x60, 0x15, 0x84, 0xf6, 0x67,
+	0x00, 0x91, 0xe3, 0x72, 0x07, 0x96, 0xe4, 0x75, 0x0e, 0x9f, 0xed,
+	0x7c, 0x09, 0x98, 0xea, 0x7b, 0x1c, 0x8d, 0xff, 0x6e, 0x1b, 0x8a,
+	0xf8, 0x69, 0x12, 0x83, 0xf1, 0x60, 0x15, 0x84, 0xf6, 0x67,
 
-	0x38, 0xa9, 0xdb, 0x4a, 0x3f, 0xae, 0xdc, 0x4d,
-	0x36, 0xa7, 0xd5, 0x44, 0x31, 0xa0, 0xd2, 0x43,
-	0x24, 0xb5, 0xc7, 0x56, 0x23, 0xb2, 0xc0, 0x51,
-	0x2a, 0xbb, 0xc9, 0x58, 0x2d, 0xbc, 0xce, 0x5f,
+	0x38, 0xa9, 0xdb, 0x4a, 0x3f, 0xae, 0xdc, 0x4d, 0x36, 0xa7, 0xd5,
+	0x44, 0x31, 0xa0, 0xd2, 0x43, 0x24, 0xb5, 0xc7, 0x56, 0x23, 0xb2,
+	0xc0, 0x51, 0x2a, 0xbb, 0xc9, 0x58, 0x2d, 0xbc, 0xce, 0x5f,
 
-	0x70, 0xe1, 0x93, 0x02, 0x77, 0xe6, 0x94, 0x05,
-	0x7e, 0xef, 0x9d, 0x0c, 0x79, 0xe8, 0x9a, 0x0b,
-	0x6c, 0xfd, 0x8f, 0x1e, 0x6b, 0xfa, 0x88, 0x19,
-	0x62, 0xf3, 0x81, 0x10, 0x65, 0xf4, 0x86, 0x17,
+	0x70, 0xe1, 0x93, 0x02, 0x77, 0xe6, 0x94, 0x05, 0x7e, 0xef, 0x9d,
+	0x0c, 0x79, 0xe8, 0x9a, 0x0b, 0x6c, 0xfd, 0x8f, 0x1e, 0x6b, 0xfa,
+	0x88, 0x19, 0x62, 0xf3, 0x81, 0x10, 0x65, 0xf4, 0x86, 0x17,
 
-	0x48, 0xd9, 0xab, 0x3a, 0x4f, 0xde, 0xac, 0x3d,
-	0x46, 0xd7, 0xa5, 0x34, 0x41, 0xd0, 0xa2, 0x33,
-	0x54, 0xc5, 0xb7, 0x26, 0x53, 0xc2, 0xb0, 0x21,
-	0x5a, 0xcb, 0xb9, 0x28, 0x5d, 0xcc, 0xbe, 0x2f,
+	0x48, 0xd9, 0xab, 0x3a, 0x4f, 0xde, 0xac, 0x3d, 0x46, 0xd7, 0xa5,
+	0x34, 0x41, 0xd0, 0xa2, 0x33, 0x54, 0xc5, 0xb7, 0x26, 0x53, 0xc2,
+	0xb0, 0x21, 0x5a, 0xcb, 0xb9, 0x28, 0x5d, 0xcc, 0xbe, 0x2f,
 
-	0xe0, 0x71, 0x03, 0x92, 0xe7, 0x76, 0x04, 0x95,
-	0xee, 0x7f, 0x0d, 0x9c, 0xe9, 0x78, 0x0a, 0x9b,
-	0xfc, 0x6d, 0x1f, 0x8e, 0xfb, 0x6a, 0x18, 0x89,
-	0xf2, 0x63, 0x11, 0x80, 0xf5, 0x64, 0x16, 0x87,
+	0xe0, 0x71, 0x03, 0x92, 0xe7, 0x76, 0x04, 0x95, 0xee, 0x7f, 0x0d,
+	0x9c, 0xe9, 0x78, 0x0a, 0x9b, 0xfc, 0x6d, 0x1f, 0x8e, 0xfb, 0x6a,
+	0x18, 0x89, 0xf2, 0x63, 0x11, 0x80, 0xf5, 0x64, 0x16, 0x87,
 
-	0xd8, 0x49, 0x3b, 0xaa, 0xdf, 0x4e, 0x3c, 0xad,
-	0xd6, 0x47, 0x35, 0xa4, 0xd1, 0x40, 0x32, 0xa3,
-	0xc4, 0x55, 0x27, 0xb6, 0xc3, 0x52, 0x20, 0xb1,
-	0xca, 0x5b, 0x29, 0xb8, 0xcd, 0x5c, 0x2e, 0xbf,
+	0xd8, 0x49, 0x3b, 0xaa, 0xdf, 0x4e, 0x3c, 0xad, 0xd6, 0x47, 0x35,
+	0xa4, 0xd1, 0x40, 0x32, 0xa3, 0xc4, 0x55, 0x27, 0xb6, 0xc3, 0x52,
+	0x20, 0xb1, 0xca, 0x5b, 0x29, 0xb8, 0xcd, 0x5c, 0x2e, 0xbf,
 
-	0x90, 0x01, 0x73, 0xe2, 0x97, 0x06, 0x74, 0xe5,
-	0x9e, 0x0f, 0x7d, 0xec, 0x99, 0x08, 0x7a, 0xeb,
-	0x8c, 0x1d, 0x6f, 0xfe, 0x8b, 0x1a, 0x68, 0xf9,
-	0x82, 0x13, 0x61, 0xf0, 0x85, 0x14, 0x66, 0xf7,
+	0x90, 0x01, 0x73, 0xe2, 0x97, 0x06, 0x74, 0xe5, 0x9e, 0x0f, 0x7d,
+	0xec, 0x99, 0x08, 0x7a, 0xeb, 0x8c, 0x1d, 0x6f, 0xfe, 0x8b, 0x1a,
+	0x68, 0xf9, 0x82, 0x13, 0x61, 0xf0, 0x85, 0x14, 0x66, 0xf7,
 
-	0xa8, 0x39, 0x4b, 0xda, 0xaf, 0x3e, 0x4c, 0xdd,
-	0xa6, 0x37, 0x45, 0xd4, 0xa1, 0x30, 0x42, 0xd3,
-	0xb4, 0x25, 0x57, 0xc6, 0xb3, 0x22, 0x50, 0xc1,
-	0xba, 0x2b, 0x59, 0xc8, 0xbd, 0x2c, 0x5e, 0xcf
+	0xa8, 0x39, 0x4b, 0xda, 0xaf, 0x3e, 0x4c, 0xdd, 0xa6, 0x37, 0x45,
+	0xd4, 0xa1, 0x30, 0x42, 0xd3, 0xb4, 0x25, 0x57, 0xc6, 0xb3, 0x22,
+	0x50, 0xc1, 0xba, 0x2b, 0x59, 0xc8, 0xbd, 0x2c, 0x5e, 0xcf
 };
 
 static uint8_t rfcomm_calc_fcs(uint16_t len, const uint8_t *data)
@@ -312,9 +304,9 @@ struct net_buf *bt_rfcomm_create_pdu(struct net_buf_pool *pool)
 	/* Length in RFCOMM header can be 2 bytes depending on length of user
 	 * data
 	 */
-	return bt_conn_create_pdu(pool,
-				  sizeof(struct bt_l2cap_hdr) +
-				  sizeof(struct bt_rfcomm_hdr) + 1);
+	return bt_conn_create_pdu(pool, sizeof(struct bt_l2cap_hdr) +
+						sizeof(struct bt_rfcomm_hdr) +
+						1);
 }
 
 static int rfcomm_send_sabm(struct bt_rfcomm_session *session, uint8_t dlci)
@@ -400,9 +392,8 @@ static void rfcomm_connected(struct bt_l2cap_chan *chan)
 	BT_DBG("Session %p", session);
 
 	/* Need to include UIH header and FCS*/
-	session->mtu = MIN(session->br_chan.rx.mtu,
-			   session->br_chan.tx.mtu) -
-			   BT_RFCOMM_HDR_SIZE + BT_RFCOMM_FCS_SIZE;
+	session->mtu = MIN(session->br_chan.rx.mtu, session->br_chan.tx.mtu) -
+		       BT_RFCOMM_HDR_SIZE + BT_RFCOMM_FCS_SIZE;
 
 	if (session->state == BT_RFCOMM_STATE_CONNECTING) {
 		rfcomm_send_sabm(session, 0);
@@ -433,8 +424,7 @@ static void rfcomm_dlc_rtx_timeout(struct k_work *work)
 }
 
 static void rfcomm_dlc_init(struct bt_rfcomm_dlc *dlc,
-			    struct bt_rfcomm_session *session,
-			    uint8_t dlci,
+			    struct bt_rfcomm_session *session, uint8_t dlci,
 			    bt_rfcomm_role_t role)
 {
 	BT_DBG("dlc %p", dlc);
@@ -453,8 +443,8 @@ static void rfcomm_dlc_init(struct bt_rfcomm_dlc *dlc,
 	session->dlcs = dlc;
 }
 
-static struct bt_rfcomm_dlc *rfcomm_dlc_accept(struct bt_rfcomm_session *session,
-					       uint8_t dlci)
+static struct bt_rfcomm_dlc *
+rfcomm_dlc_accept(struct bt_rfcomm_session *session, uint8_t dlci)
 {
 	struct bt_rfcomm_server *server;
 	struct bt_rfcomm_dlc *dlc;
@@ -690,8 +680,8 @@ static int rfcomm_send_nsc(struct bt_rfcomm_session *session, uint8_t cmd_type)
 	struct net_buf *buf;
 	uint8_t fcs;
 
-	buf = rfcomm_make_uih_msg(session, BT_RFCOMM_MSG_RESP_CR,
-				  BT_RFCOMM_NSC, sizeof(cmd_type));
+	buf = rfcomm_make_uih_msg(session, BT_RFCOMM_MSG_RESP_CR, BT_RFCOMM_NSC,
+				  sizeof(cmd_type));
 
 	net_buf_add_u8(buf, cmd_type);
 
@@ -752,9 +742,8 @@ static void rfcomm_dlc_connected(struct bt_rfcomm_dlc *dlc)
 
 	k_fifo_init(&dlc->tx_queue);
 	k_thread_create(&dlc->tx_thread, dlc->stack,
-			K_KERNEL_STACK_SIZEOF(dlc->stack),
-			rfcomm_dlc_tx_thread, dlc, NULL, NULL, K_PRIO_COOP(7),
-			0, K_NO_WAIT);
+			K_KERNEL_STACK_SIZEOF(dlc->stack), rfcomm_dlc_tx_thread,
+			dlc, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 	k_thread_name_set(&dlc->tx_thread, "BT DLC");
 
 	if (dlc->ops && dlc->ops->connected) {
@@ -942,8 +931,8 @@ static int rfcomm_send_credit(struct bt_rfcomm_dlc *dlc, uint8_t credits)
 	hdr = net_buf_add(buf, sizeof(*hdr));
 	cr = BT_RFCOMM_UIH_CR(dlc->session->role);
 	hdr->address = BT_RFCOMM_SET_ADDR(dlc->dlci, cr);
-	hdr->control = BT_RFCOMM_SET_CTRL(BT_RFCOMM_UIH,
-					  BT_RFCOMM_PF_UIH_CREDIT);
+	hdr->control =
+		BT_RFCOMM_SET_CTRL(BT_RFCOMM_UIH, BT_RFCOMM_PF_UIH_CREDIT);
 	hdr->length = BT_RFCOMM_SET_LEN_8(0);
 	net_buf_add_u8(buf, credits);
 	fcs = rfcomm_calc_fcs(BT_RFCOMM_FCS_LEN_UIH, buf->data);
@@ -1145,9 +1134,8 @@ static void rfcomm_handle_rpn(struct bt_rfcomm_session *session,
 	data_bits = BT_RFCOMM_RPN_DATA_BITS_8;
 	stop_bits = BT_RFCOMM_RPN_STOP_BITS_1;
 	parity_bits = BT_RFCOMM_RPN_PARITY_NONE;
-	default_rpn.line_settings = BT_RFCOMM_SET_LINE_SETTINGS(data_bits,
-								stop_bits,
-								parity_bits);
+	default_rpn.line_settings =
+		BT_RFCOMM_SET_LINE_SETTINGS(data_bits, stop_bits, parity_bits);
 	default_rpn.param_mask = sys_cpu_to_le16(BT_RFCOMM_RPN_PARAM_MASK_ALL);
 
 	rfcomm_send_rpn(session, BT_RFCOMM_MSG_RESP_CR, &default_rpn);
@@ -1428,8 +1416,8 @@ int bt_rfcomm_dlc_send(struct bt_rfcomm_dlc *dlc, struct net_buf *buf)
 		/* Length is 2 byte */
 		hdr = net_buf_push(buf, sizeof(*hdr) + 1);
 		len = (uint16_t *)&hdr->length;
-		*len = BT_RFCOMM_SET_LEN_16(sys_cpu_to_le16(buf->len -
-							    sizeof(*hdr) - 1));
+		*len = BT_RFCOMM_SET_LEN_16(
+			sys_cpu_to_le16(buf->len - sizeof(*hdr) - 1));
 	} else {
 		hdr = net_buf_push(buf, sizeof(*hdr));
 		hdr->length = BT_RFCOMM_SET_LEN_8(buf->len - sizeof(*hdr));
@@ -1437,8 +1425,8 @@ int bt_rfcomm_dlc_send(struct bt_rfcomm_dlc *dlc, struct net_buf *buf)
 
 	cr = BT_RFCOMM_UIH_CR(dlc->session->role);
 	hdr->address = BT_RFCOMM_SET_ADDR(dlc->dlci, cr);
-	hdr->control = BT_RFCOMM_SET_CTRL(BT_RFCOMM_UIH,
-					  BT_RFCOMM_PF_UIH_NO_CREDIT);
+	hdr->control =
+		BT_RFCOMM_SET_CTRL(BT_RFCOMM_UIH, BT_RFCOMM_PF_UIH_NO_CREDIT);
 
 	fcs = rfcomm_calc_fcs(BT_RFCOMM_FCS_LEN_UIH, buf->data);
 	net_buf_add_u8(buf, fcs);
@@ -1466,7 +1454,7 @@ static int rfcomm_recv(struct bt_l2cap_chan *chan, struct net_buf *buf)
 	BT_DBG("session %p dlci %x type %x", session, dlci, frame_type);
 
 	fcs_len = (frame_type == BT_RFCOMM_UIH) ? BT_RFCOMM_FCS_LEN_UIH :
-		   BT_RFCOMM_FCS_LEN_NON_UIH;
+							BT_RFCOMM_FCS_LEN_NON_UIH;
 	fcs = *(net_buf_tail(buf) - 1);
 	if (!rfcomm_check_fcs(fcs_len, buf->data, fcs)) {
 		BT_ERR("FCS check failed");
@@ -1582,7 +1570,7 @@ static struct bt_rfcomm_session *rfcomm_session_new(bt_rfcomm_role_t role)
 		BT_DBG("session %p initialized", session);
 
 		session->br_chan.chan.ops = &ops;
-		session->br_chan.rx.mtu	= CONFIG_BT_RFCOMM_L2CAP_MTU;
+		session->br_chan.rx.mtu = CONFIG_BT_RFCOMM_L2CAP_MTU;
 		session->state = BT_RFCOMM_STATE_INIT;
 		session->role = role;
 		session->cfc = BT_RFCOMM_CFC_UNKNOWN;
@@ -1724,8 +1712,8 @@ static int rfcomm_accept(struct bt_conn *conn, struct bt_l2cap_chan **chan)
 void bt_rfcomm_init(void)
 {
 	static struct bt_l2cap_server server = {
-		.psm       = BT_L2CAP_PSM_RFCOMM,
-		.accept    = rfcomm_accept,
+		.psm = BT_L2CAP_PSM_RFCOMM,
+		.accept = rfcomm_accept,
 		.sec_level = BT_SECURITY_L1,
 	};
 

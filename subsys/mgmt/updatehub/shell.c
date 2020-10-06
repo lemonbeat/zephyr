@@ -18,8 +18,7 @@
 #define UPDATEHUB_SERVER "coap.updatehub.io"
 #endif
 
-static int cmd_run(const struct shell *shell, size_t argc,
-		   char **argv)
+static int cmd_run(const struct shell *shell, size_t argc, char **argv)
 {
 	int ret = -1;
 
@@ -32,7 +31,8 @@ static int cmd_run(const struct shell *shell, size_t argc,
 			ret = 0;
 			break;
 		default:
-			shell_fprintf(shell, SHELL_ERROR, "Error installing update.\n");
+			shell_fprintf(shell, SHELL_ERROR,
+				      "Error installing update.\n");
 			break;
 		}
 		break;
@@ -59,10 +59,10 @@ static int cmd_info(const struct shell *shell, size_t argc, char **argv)
 	char *firmware_version = k_malloc(BOOT_IMG_VER_STRLEN_MAX);
 
 	updatehub_get_device_identity(device_id, DEVICE_ID_HEX_MAX_SIZE);
-	updatehub_get_firmware_version(firmware_version, BOOT_IMG_VER_STRLEN_MAX);
+	updatehub_get_firmware_version(firmware_version,
+				       BOOT_IMG_VER_STRLEN_MAX);
 
-	shell_fprintf(shell, SHELL_NORMAL, "Unique device id: %s\n",
-		      device_id);
+	shell_fprintf(shell, SHELL_NORMAL, "Unique device id: %s\n", device_id);
 	shell_fprintf(shell, SHELL_NORMAL, "Firmware Version: %s\n",
 		      firmware_version);
 	shell_fprintf(shell, SHELL_NORMAL, "Product uid: %s\n",
@@ -75,9 +75,10 @@ static int cmd_info(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_updatehub, SHELL_CMD(info, NULL, "Dump UpdateHub information",
-							cmd_info),
-			       SHELL_CMD(run, NULL, "Trigger an UpdateHub update run", cmd_run),
-			       SHELL_SUBCMD_SET_END);
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_updatehub,
+	SHELL_CMD(info, NULL, "Dump UpdateHub information", cmd_info),
+	SHELL_CMD(run, NULL, "Trigger an UpdateHub update run", cmd_run),
+	SHELL_SUBCMD_SET_END);
 
 SHELL_CMD_REGISTER(updatehub, &sub_updatehub, "UpdateHub commands", NULL);

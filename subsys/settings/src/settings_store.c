@@ -43,9 +43,7 @@ int settings_load_subtree(const char *subtree)
 {
 	struct settings_store *cs;
 	int rc;
-	const struct settings_load_arg arg = {
-		.subtree = subtree
-	};
+	const struct settings_load_arg arg = { .subtree = subtree };
 
 	/*
 	 * for every config store
@@ -62,18 +60,14 @@ int settings_load_subtree(const char *subtree)
 	return rc;
 }
 
-int settings_load_subtree_direct(
-	const char             *subtree,
-	settings_load_direct_cb cb,
-	void                   *param)
+int settings_load_subtree_direct(const char *subtree,
+				 settings_load_direct_cb cb, void *param)
 {
 	struct settings_store *cs;
 
-	const struct settings_load_arg arg = {
-		.subtree = subtree,
-		.cb = cb,
-		.param = param
-	};
+	const struct settings_load_arg arg = { .subtree = subtree,
+					       .cb = cb,
+					       .param = param };
 	/*
 	 * for every config store
 	 *    load config
@@ -131,7 +125,8 @@ int settings_save(void)
 	}
 	rc = 0;
 
-	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch) {
+	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch)
+	{
 		if (ch->h_export) {
 			rc2 = ch->h_export(settings_save_one);
 			if (!rc) {

@@ -21,11 +21,9 @@ LOG_MODULE_DECLARE(app, CONFIG_LOG_DEFAULT_LEVEL);
  * @brief Default config settings. These settings will be used when a new
  *        config record is created, or when the config record is reset.
  */
-static struct cfg_data cfg_data_dflt = {
-	.magic = 0x55CFDA7A,
-	.version = 1,
-	.scratch = { 0 }
-};
+static struct cfg_data cfg_data_dflt = { .magic = 0x55CFDA7A,
+					 .version = 1,
+					 .scratch = { 0 } };
 
 psa_status_t cfg_create_data(void)
 {

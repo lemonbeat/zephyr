@@ -54,7 +54,7 @@ void main(void)
 
 	/* configure LCD */
 	glcd_function_set(glcd, GLCD_FS_ROWS_2 | GLCD_FS_DOT_SIZE_LITTLE |
-			  GLCD_FS_8BIT_MODE);
+					GLCD_FS_8BIT_MODE);
 	glcd_display_state_set(glcd, GLCD_DS_DISPLAY_ON);
 #endif
 

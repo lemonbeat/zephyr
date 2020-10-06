@@ -57,9 +57,18 @@ LOG_MODULE_REGISTER(spi_nor, CONFIG_FLASH_LOG_LEVEL);
 #define T_RES1_MS ceiling_fraction(DT_INST_PROP(0, t_exit_dpd), NSEC_PER_MSEC)
 #endif /* T_EXIT_DPD */
 #if DT_INST_NODE_HAS_PROP(0, dpd_wakeup_sequence)
-#define T_DPDD_MS ceiling_fraction(DT_PROP_BY_IDX(DT_DRV_INST(0), dpd_wakeup_sequence, 0), NSEC_PER_MSEC)
-#define T_CRDP_MS ceiling_fraction(DT_PROP_BY_IDX(DT_DRV_INST(0), dpd_wakeup_sequence, 1), NSEC_PER_MSEC)
-#define T_RDP_MS ceiling_fraction(DT_PROP_BY_IDX(DT_DRV_INST(0), dpd_wakeup_sequence, 2), NSEC_PER_MSEC)
+#define T_DPDD_MS                                                            \
+	ceiling_fraction(DT_PROP_BY_IDX(DT_DRV_INST(0), dpd_wakeup_sequence, \
+					0),                                  \
+			 NSEC_PER_MSEC)
+#define T_CRDP_MS                                                            \
+	ceiling_fraction(DT_PROP_BY_IDX(DT_DRV_INST(0), dpd_wakeup_sequence, \
+					1),                                  \
+			 NSEC_PER_MSEC)
+#define T_RDP_MS                                                             \
+	ceiling_fraction(DT_PROP_BY_IDX(DT_DRV_INST(0), dpd_wakeup_sequence, \
+					2),                                  \
+			 NSEC_PER_MSEC)
 #else /* DPD_WAKEUP_SEQUENCE */
 #define T_DPDD_MS 0
 #endif /* DPD_WAKEUP_SEQUENCE */
@@ -137,16 +146,17 @@ struct spi_nor_data {
 
 #ifdef CONFIG_SPI_NOR_SFDP_MINIMAL
 /* The historically supported erase sizes. */
-static const struct jesd216_erase_type minimal_erase_types[JESD216_NUM_ERASE_TYPES] = {
-	{
-		.cmd = SPI_NOR_CMD_BE,
-		.exp = 16,
-	},
-	{
-		.cmd = SPI_NOR_CMD_SE,
-		.exp = 12,
-	},
-};
+static const struct jesd216_erase_type
+	minimal_erase_types[JESD216_NUM_ERASE_TYPES] = {
+		{
+			.cmd = SPI_NOR_CMD_BE,
+			.exp = 16,
+		},
+		{
+			.cmd = SPI_NOR_CMD_SE,
+			.exp = 12,
+		},
+	};
 #endif /* CONFIG_SPI_NOR_SFDP_MINIMAL */
 
 /* Get pointer to array of supported erase types.  Static const for
@@ -216,7 +226,8 @@ static inline void delay_until_exit_dpd_ok(const struct device *const dev)
 {
 #if DT_INST_NODE_HAS_PROP(0, has_dpd)
 	struct spi_nor_data *const driver_data = dev->data;
-	int32_t since = (int32_t)(k_uptime_get_32() - driver_data->ts_enter_dpd);
+	int32_t since =
+		(int32_t)(k_uptime_get_32() - driver_data->ts_enter_dpd);
 
 	/* If the time is negative the 32-bit counter has wrapped,
 	 * which is certainly long enough no further delay is
@@ -253,9 +264,9 @@ static inline void delay_until_exit_dpd_ok(const struct device *const dev)
  * @param is_write A flag to define if it's a read or a write command
  * @return 0 on success, negative errno code otherwise
  */
-static int spi_nor_access(const struct device *const dev,
-			  uint8_t opcode, bool is_addressed, off_t addr,
-			  void *data, size_t length, bool is_write)
+static int spi_nor_access(const struct device *const dev, uint8_t opcode,
+			  bool is_addressed, off_t addr, void *data,
+			  size_t length, bool is_write)
 {
 	struct spi_nor_data *const driver_data = dev->data;
 
@@ -266,33 +277,23 @@ static int spi_nor_access(const struct device *const dev,
 		(addr & 0xFF),
 	};
 
-	struct spi_buf spi_buf[2] = {
-		{
-			.buf = buf,
-			.len = (is_addressed) ? 4 : 1,
-		},
-		{
-			.buf = data,
-			.len = length
-		}
-	};
-	const struct spi_buf_set tx_set = {
-		.buffers = spi_buf,
-		.count = (length) ? 2 : 1
-	};
+	struct spi_buf spi_buf[2] = { {
+					      .buf = buf,
+					      .len = (is_addressed) ? 4 : 1,
+				      },
+				      { .buf = data, .len = length } };
+	const struct spi_buf_set tx_set = { .buffers = spi_buf,
+					    .count = (length) ? 2 : 1 };
 
-	const struct spi_buf_set rx_set = {
-		.buffers = spi_buf,
-		.count = 2
-	};
+	const struct spi_buf_set rx_set = { .buffers = spi_buf, .count = 2 };
 
 	if (is_write) {
-		return spi_write(driver_data->spi,
-			&driver_data->spi_cfg, &tx_set);
+		return spi_write(driver_data->spi, &driver_data->spi_cfg,
+				 &tx_set);
 	}
 
-	return spi_transceive(driver_data->spi,
-		&driver_data->spi_cfg, &tx_set, &rx_set);
+	return spi_transceive(driver_data->spi, &driver_data->spi_cfg, &tx_set,
+			      &rx_set);
 }
 
 #define spi_nor_cmd_read(dev, opcode, dest, length) \
@@ -314,8 +315,8 @@ static int spi_nor_access(const struct device *const dev,
  * @param length The size of the buffer
  * @return 0 on success, negative errno code otherwise
  */
-static int read_sfdp(const struct device *const dev,
-		     off_t addr, void *data, size_t length)
+static int read_sfdp(const struct device *const dev, off_t addr, void *data,
+		     size_t length)
 {
 	struct spi_nor_data *const driver_data = dev->data;
 	uint8_t buf[] = {
@@ -323,25 +324,23 @@ static int read_sfdp(const struct device *const dev,
 		addr >> 16,
 		addr >> 8,
 		addr,
-		0,		/* wait state */
+		0, /* wait state */
 	};
-	struct spi_buf spi_buf[] = {
-		{
-			.buf = buf,
-			.len = sizeof(buf),
-		},
-		{
-			.buf = data,
-			.len = length,
-		}
-	};
+	struct spi_buf spi_buf[] = { {
+					     .buf = buf,
+					     .len = sizeof(buf),
+				     },
+				     {
+					     .buf = data,
+					     .len = length,
+				     } };
 	const struct spi_buf_set buf_set = {
 		.buffers = spi_buf,
 		.count = ARRAY_SIZE(spi_buf),
 	};
 
-	return spi_transceive(driver_data->spi, &driver_data->spi_cfg,
-			      &buf_set, &buf_set);
+	return spi_transceive(driver_data->spi, &driver_data->spi_cfg, &buf_set,
+			      &buf_set);
 }
 #endif /* CONFIG_SPI_NOR_SFDP_RUNTIME */
 
@@ -466,8 +465,7 @@ static int spi_nor_read(const struct device *dev, off_t addr, void *dest,
 	return ret;
 }
 
-static int spi_nor_write(const struct device *dev, off_t addr,
-			 const void *src,
+static int spi_nor_write(const struct device *dev, off_t addr, const void *src,
 			 size_t size)
 {
 	const size_t flash_size = dev_flash_size(dev);
@@ -490,14 +488,14 @@ static int spi_nor_write(const struct device *dev, off_t addr,
 		}
 
 		/* Don't write across a page boundary */
-		if (((addr + to_write - 1U) / page_size)
-		    != (addr / page_size)) {
+		if (((addr + to_write - 1U) / page_size) !=
+		    (addr / page_size)) {
 			to_write = page_size - (addr % page_size);
 		}
 
 		spi_nor_cmd_write(dev, SPI_NOR_CMD_WREN);
-		ret = spi_nor_cmd_addr_write(dev, SPI_NOR_CMD_PP, addr,
-					     src, to_write);
+		ret = spi_nor_cmd_addr_write(dev, SPI_NOR_CMD_PP, addr, src,
+					     to_write);
 		if (ret != 0) {
 			goto out;
 		}
@@ -548,25 +546,26 @@ static int spi_nor_erase(const struct device *dev, off_t addr, size_t size)
 				dev_erase_types(dev);
 			const struct jesd216_erase_type *bet = NULL;
 
-			for (uint8_t ei = 0; ei < JESD216_NUM_ERASE_TYPES; ++ei) {
+			for (uint8_t ei = 0; ei < JESD216_NUM_ERASE_TYPES;
+			     ++ei) {
 				const struct jesd216_erase_type *etp =
 					&erase_types[ei];
 
-				if ((etp->exp != 0)
-				    && SPI_NOR_IS_ALIGNED(addr, etp->exp)
-				    && SPI_NOR_IS_ALIGNED(size, etp->exp)
-				    && ((bet == NULL)
-					|| (etp->exp > bet->exp))) {
+				if ((etp->exp != 0) &&
+				    SPI_NOR_IS_ALIGNED(addr, etp->exp) &&
+				    SPI_NOR_IS_ALIGNED(size, etp->exp) &&
+				    ((bet == NULL) || (etp->exp > bet->exp))) {
 					bet = etp;
 				}
 			}
 			if (bet != NULL) {
-				spi_nor_cmd_addr_write(dev, bet->cmd, addr, NULL, 0);
+				spi_nor_cmd_addr_write(dev, bet->cmd, addr,
+						       NULL, 0);
 				addr += BIT(bet->exp);
 				size -= BIT(bet->exp);
 			} else {
-				LOG_DBG("Can't erase %zu at 0x%lx",
-					size, (long)addr);
+				LOG_DBG("Can't erase %zu at 0x%lx", size,
+					(long)addr);
 				ret = -EINVAL;
 			}
 		}
@@ -587,12 +586,11 @@ static int spi_nor_write_protection_set(const struct device *dev,
 
 	spi_nor_wait_until_ready(dev);
 
-	ret = spi_nor_cmd_write(dev, (write_protect) ?
-	      SPI_NOR_CMD_WRDI : SPI_NOR_CMD_WREN);
+	ret = spi_nor_cmd_write(dev, (write_protect) ? SPI_NOR_CMD_WRDI :
+							     SPI_NOR_CMD_WREN);
 
-	if (IS_ENABLED(DT_INST_PROP(0, requires_ulbpr))
-	    && (ret == 0)
-	    && !write_protect) {
+	if (IS_ENABLED(DT_INST_PROP(0, requires_ulbpr)) && (ret == 0) &&
+	    !write_protect) {
 		ret = spi_nor_cmd_write(dev, SPI_NOR_CMD_ULBPR);
 	}
 
@@ -603,8 +601,8 @@ static int spi_nor_write_protection_set(const struct device *dev,
 
 #if defined(CONFIG_FLASH_JESD216_API)
 
-static int spi_nor_sfdp_read(const struct device *dev, off_t addr,
-			     void *dest, size_t size)
+static int spi_nor_sfdp_read(const struct device *dev, off_t addr, void *dest,
+			     size_t size)
 {
 	acquire_device(dev);
 
@@ -619,8 +617,7 @@ static int spi_nor_sfdp_read(const struct device *dev, off_t addr,
 
 #endif /* CONFIG_FLASH_JESD216_API */
 
-static int spi_nor_read_jedec_id(const struct device *dev,
-				 uint8_t *id)
+static int spi_nor_read_jedec_id(const struct device *dev, uint8_t *id)
 {
 	if (id == NULL) {
 		return -EINVAL;
@@ -630,7 +627,8 @@ static int spi_nor_read_jedec_id(const struct device *dev,
 
 	spi_nor_wait_until_ready(dev);
 
-	int ret = spi_nor_cmd_read(dev, SPI_NOR_CMD_RDID, id, SPI_NOR_MAX_ID_LEN);
+	int ret =
+		spi_nor_cmd_read(dev, SPI_NOR_CMD_RDID, id, SPI_NOR_MAX_ID_LEN);
 
 	release_device(dev);
 
@@ -655,7 +653,8 @@ static int spi_nor_process_bfp(const struct device *dev,
 	memset(data->erase_types, 0, sizeof(data->erase_types));
 	for (uint8_t ti = 1; ti <= ARRAY_SIZE(data->erase_types); ++ti) {
 		if (jesd216_bfp_erase(bfp, ti, etp) == 0) {
-			LOG_DBG("Erase %u with %02x", (uint32_t)BIT(etp->exp), etp->cmd);
+			LOG_DBG("Erase %u with %02x", (uint32_t)BIT(etp->exp),
+				etp->cmd);
 		}
 		++etp;
 	}
@@ -703,8 +702,8 @@ static int spi_nor_process_sfdp(const struct device *dev)
 		return -EINVAL;
 	}
 
-	LOG_INF("%s: SFDP v %u.%u AP %x with %u PH", dev->name,
-		hp->rev_major, hp->rev_minor, hp->access, hp->nph);
+	LOG_INF("%s: SFDP v %u.%u AP %x with %u PH", dev->name, hp->rev_major,
+		hp->rev_minor, hp->access, hp->nph);
 
 	const struct jesd216_param_header *php = hp->phdr;
 	const struct jesd216_param_header *phpe = php + MIN(decl_nph, hp->nph);
@@ -712,9 +711,9 @@ static int spi_nor_process_sfdp(const struct device *dev)
 	while (php != phpe) {
 		uint16_t id = jesd216_param_id(php);
 
-		LOG_INF("PH%u: %04x rev %u.%u: %u DW @ %x",
-			(php - hp->phdr), id, php->rev_major, php->rev_minor,
-			php->len_dw, jesd216_param_addr(php));
+		LOG_INF("PH%u: %04x rev %u.%u: %u DW @ %x", (php - hp->phdr),
+			id, php->rev_major, php->rev_minor, php->len_dw,
+			jesd216_param_addr(php));
 
 		if (id == JESD216_SFDP_PARAM_ID_BFP) {
 			union {
@@ -723,7 +722,8 @@ static int spi_nor_process_sfdp(const struct device *dev)
 			} u;
 			const struct jesd216_bfp *bfp = &u.bfp;
 
-			rc = read_sfdp(dev, jesd216_param_addr(php), u.dw, sizeof(u.dw));
+			rc = read_sfdp(dev, jesd216_param_addr(php), u.dw,
+				       sizeof(u.dw));
 			if (rc == 0) {
 				rc = spi_nor_process_bfp(dev, php, bfp);
 			}
@@ -767,8 +767,7 @@ static int setup_pages_layout(const struct device *dev)
 	for (size_t i = 0; i < ARRAY_SIZE(data->erase_types); ++i) {
 		const struct jesd216_erase_type *etp = &data->erase_types[i];
 
-		if ((etp->cmd != 0)
-		    && ((exp == 0) || (etp->exp < exp))) {
+		if ((etp->cmd != 0) && ((exp == 0) || (etp->exp < exp))) {
 			exp = etp->exp;
 		}
 	}
@@ -798,7 +797,8 @@ static int setup_pages_layout(const struct device *dev)
 
 	data->layout.pages_size = layout_page_size;
 	data->layout.pages_count = flash_size / layout_page_size;
-	LOG_DBG("layout %u x %u By pages", data->layout.pages_count, data->layout.pages_size);
+	LOG_DBG("layout %u x %u By pages", data->layout.pages_count,
+		data->layout.pages_size);
 #elif defined(CONFIG_SPI_NOR_SFDP_DEVICETREE)
 	const struct spi_nor_config *cfg = dev->config;
 	const struct flash_pages_layout *layout = &cfg->layout;
@@ -879,8 +879,8 @@ static int spi_nor_configure(const struct device *dev)
 
 	if (memcmp(jedec_id, cfg->jedec_id, sizeof(jedec_id)) != 0) {
 		LOG_ERR("Device id %02x %02x %02x does not match config %02x %02x %02x",
-			jedec_id[0], jedec_id[1], jedec_id[2],
-			cfg->jedec_id[0], cfg->jedec_id[1], cfg->jedec_id[2]);
+			jedec_id[0], jedec_id[1], jedec_id[2], cfg->jedec_id[0],
+			cfg->jedec_id[1], cfg->jedec_id[2]);
 		return -EINVAL;
 	}
 #endif
@@ -904,8 +904,7 @@ static int spi_nor_configure(const struct device *dev)
 #endif /* CONFIG_FLASH_PAGE_LAYOUT */
 #endif /* CONFIG_SPI_NOR_SFDP_MINIMAL */
 
-	if (IS_ENABLED(CONFIG_SPI_NOR_IDLE_IN_DPD)
-	    && (enter_dpd(dev) != 0)) {
+	if (IS_ENABLED(CONFIG_SPI_NOR_IDLE_IN_DPD) && (enter_dpd(dev) != 0)) {
 		return -ENODEV;
 	}
 
@@ -998,10 +997,11 @@ BUILD_ASSERT(SPI_NOR_IS_SECTOR_ALIGNED(CONFIG_SPI_NOR_FLASH_LAYOUT_PAGE_SIZE),
 	     "SPI_NOR_FLASH_LAYOUT_PAGE_SIZE must be multiple of 4096");
 
 /* instance 0 page count */
-#define LAYOUT_PAGES_COUNT (INST_0_BYTES / CONFIG_SPI_NOR_FLASH_LAYOUT_PAGE_SIZE)
+#define LAYOUT_PAGES_COUNT \
+	(INST_0_BYTES / CONFIG_SPI_NOR_FLASH_LAYOUT_PAGE_SIZE)
 
-BUILD_ASSERT((CONFIG_SPI_NOR_FLASH_LAYOUT_PAGE_SIZE * LAYOUT_PAGES_COUNT)
-	     == INST_0_BYTES,
+BUILD_ASSERT((CONFIG_SPI_NOR_FLASH_LAYOUT_PAGE_SIZE * LAYOUT_PAGES_COUNT) ==
+		     INST_0_BYTES,
 	     "SPI_NOR_FLASH_LAYOUT_PAGE_SIZE incompatible with flash size");
 
 #endif /* CONFIG_FLASH_PAGE_LAYOUT */
@@ -1039,7 +1039,6 @@ static const struct spi_nor_config spi_nor_config_0 = {
 
 static struct spi_nor_data spi_nor_data_0;
 
-DEVICE_AND_API_INIT(spi_flash_memory, DT_INST_LABEL(0),
-		    &spi_nor_init, &spi_nor_data_0, &spi_nor_config_0,
-		    POST_KERNEL, CONFIG_SPI_NOR_INIT_PRIORITY,
-		    &spi_nor_api);
+DEVICE_AND_API_INIT(spi_flash_memory, DT_INST_LABEL(0), &spi_nor_init,
+		    &spi_nor_data_0, &spi_nor_config_0, POST_KERNEL,
+		    CONFIG_SPI_NOR_INIT_PRIORITY, &spi_nor_api);

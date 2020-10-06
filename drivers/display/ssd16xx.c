@@ -42,21 +42,20 @@ LOG_MODULE_REGISTER(ssd16xx);
 #define SSD16XX_RESET_CNTRL DT_INST_GPIO_LABEL(0, reset_gpios)
 #define SSD16XX_RESET_FLAGS DT_INST_GPIO_FLAGS(0, reset_gpios)
 
-#define EPD_PANEL_WIDTH			DT_INST_PROP(0, width)
-#define EPD_PANEL_HEIGHT		DT_INST_PROP(0, height)
-#define EPD_PANEL_NUMOF_COLUMS		EPD_PANEL_WIDTH
-#define EPD_PANEL_NUMOF_ROWS_PER_PAGE	8
-#define EPD_PANEL_NUMOF_PAGES		(EPD_PANEL_HEIGHT / \
-					 EPD_PANEL_NUMOF_ROWS_PER_PAGE)
+#define EPD_PANEL_WIDTH DT_INST_PROP(0, width)
+#define EPD_PANEL_HEIGHT DT_INST_PROP(0, height)
+#define EPD_PANEL_NUMOF_COLUMS EPD_PANEL_WIDTH
+#define EPD_PANEL_NUMOF_ROWS_PER_PAGE 8
+#define EPD_PANEL_NUMOF_PAGES (EPD_PANEL_HEIGHT / EPD_PANEL_NUMOF_ROWS_PER_PAGE)
 
-#define SSD16XX_PANEL_FIRST_PAGE	0
-#define SSD16XX_PANEL_LAST_PAGE		(EPD_PANEL_NUMOF_PAGES - 1)
-#define SSD16XX_PANEL_FIRST_GATE	0
-#define SSD16XX_PANEL_LAST_GATE		(EPD_PANEL_NUMOF_COLUMS - 1)
+#define SSD16XX_PANEL_FIRST_PAGE 0
+#define SSD16XX_PANEL_LAST_PAGE (EPD_PANEL_NUMOF_PAGES - 1)
+#define SSD16XX_PANEL_FIRST_GATE 0
+#define SSD16XX_PANEL_LAST_GATE (EPD_PANEL_NUMOF_COLUMS - 1)
 
-#define SSD16XX_PIXELS_PER_BYTE		8
-#define SSD16XX_DEFAULT_TR_VALUE	25U
-#define SSD16XX_TR_SCALE_FACTOR		256U
+#define SSD16XX_PIXELS_PER_BYTE 8
+#define SSD16XX_DEFAULT_TR_VALUE 25U
+#define SSD16XX_TR_SCALE_FACTOR 256U
 
 struct ssd16xx_data {
 	const struct device *reset;
@@ -83,12 +82,12 @@ static uint8_t ssd16xx_softstart[] = DT_INST_PROP(0, softstart);
 static uint8_t ssd16xx_gdv[] = DT_INST_PROP(0, gdv);
 static uint8_t ssd16xx_sdv[] = DT_INST_PROP(0, sdv);
 
-static inline int ssd16xx_write_cmd(struct ssd16xx_data *driver,
-				    uint8_t cmd, uint8_t *data, size_t len)
+static inline int ssd16xx_write_cmd(struct ssd16xx_data *driver, uint8_t cmd,
+				    uint8_t *data, size_t len)
 {
 	int err;
-	struct spi_buf buf = {.buf = &cmd, .len = sizeof(cmd)};
-	struct spi_buf_set buf_set = {.buffers = &buf, .count = 1};
+	struct spi_buf buf = { .buf = &cmd, .len = sizeof(cmd) };
+	struct spi_buf_set buf_set = { .buffers = &buf, .count = 1 };
 
 	gpio_pin_set(driver->dc, SSD16XX_DC_PIN, 1);
 	err = spi_write(driver->spi_dev, &driver->spi_config, &buf_set);
@@ -146,24 +145,24 @@ static inline size_t push_y_param(uint8_t *data, uint16_t y)
 #endif
 }
 
-
 static inline int ssd16xx_set_ram_param(struct ssd16xx_data *driver,
-					uint16_t sx, uint16_t ex, uint16_t sy, uint16_t ey)
+					uint16_t sx, uint16_t ex, uint16_t sy,
+					uint16_t ey)
 {
 	int err;
 	uint8_t tmp[4];
 	size_t len;
 
-	len  = push_x_param(tmp, sx);
+	len = push_x_param(tmp, sx);
 	len += push_x_param(tmp + len, ex);
 	err = ssd16xx_write_cmd(driver, SSD16XX_CMD_RAM_XPOS_CTRL, tmp, len);
 	if (err < 0) {
 		return err;
 	}
 
-	len  = push_y_param(tmp, sy);
+	len = push_y_param(tmp, sy);
 	len += push_y_param(tmp + len, ey);
-	err = ssd16xx_write_cmd(driver, SSD16XX_CMD_RAM_YPOS_CTRL, tmp,	len);
+	err = ssd16xx_write_cmd(driver, SSD16XX_CMD_RAM_YPOS_CTRL, tmp, len);
 	if (err < 0) {
 		return err;
 	}
@@ -171,8 +170,8 @@ static inline int ssd16xx_set_ram_param(struct ssd16xx_data *driver,
 	return 0;
 }
 
-static inline int ssd16xx_set_ram_ptr(struct ssd16xx_data *driver,
-				      uint16_t x, uint16_t y)
+static inline int ssd16xx_set_ram_ptr(struct ssd16xx_data *driver, uint16_t x,
+				      uint16_t y)
 {
 	int err;
 	uint8_t tmp[2];
@@ -219,8 +218,8 @@ static int ssd16xx_update_display(const struct device *dev)
 		return err;
 	}
 
-	return ssd16xx_write_cmd(driver, SSD16XX_CMD_MASTER_ACTIVATION,
-				 NULL, 0);
+	return ssd16xx_write_cmd(driver, SSD16XX_CMD_MASTER_ACTIVATION, NULL,
+				 0);
 }
 
 static int ssd16xx_write(const struct device *dev, const uint16_t x,
@@ -236,7 +235,7 @@ static int ssd16xx_write(const struct device *dev, const uint16_t x,
 	uint16_t y_start;
 	uint16_t y_end;
 	uint16_t panel_h = EPD_PANEL_HEIGHT -
-			EPD_PANEL_HEIGHT % EPD_PANEL_NUMOF_ROWS_PER_PAGE;
+			   EPD_PANEL_HEIGHT % EPD_PANEL_NUMOF_ROWS_PER_PAGE;
 
 	if (desc->pitch < desc->width) {
 		LOG_ERR("Pitch is smaller than width");
@@ -266,13 +265,13 @@ static int ssd16xx_write(const struct device *dev, const uint16_t x,
 
 	if ((desc->height % EPD_PANEL_NUMOF_ROWS_PER_PAGE) != 0U) {
 		LOG_ERR("Buffer height not multiple of %d",
-				EPD_PANEL_NUMOF_ROWS_PER_PAGE);
+			EPD_PANEL_NUMOF_ROWS_PER_PAGE);
 		return -EINVAL;
 	}
 
 	if ((y % EPD_PANEL_NUMOF_ROWS_PER_PAGE) != 0U) {
 		LOG_ERR("Y coordinate not multiple of %d",
-				EPD_PANEL_NUMOF_ROWS_PER_PAGE);
+			EPD_PANEL_NUMOF_ROWS_PER_PAGE);
 		return -EINVAL;
 	}
 
@@ -324,8 +323,7 @@ static int ssd16xx_write(const struct device *dev, const uint16_t x,
 
 static int ssd16xx_read(const struct device *dev, const uint16_t x,
 			const uint16_t y,
-			const struct display_buffer_descriptor *desc,
-			void *buf)
+			const struct display_buffer_descriptor *desc, void *buf)
 {
 	LOG_ERR("not supported");
 	return -ENOTSUP;
@@ -360,14 +358,12 @@ static void ssd16xx_get_capabilities(const struct device *dev,
 	caps->supported_pixel_formats = PIXEL_FORMAT_MONO10;
 	caps->current_pixel_format = PIXEL_FORMAT_MONO10;
 	caps->screen_info = SCREEN_INFO_MONO_VTILED |
-			    SCREEN_INFO_MONO_MSB_FIRST |
-			    SCREEN_INFO_EPD |
+			    SCREEN_INFO_MONO_MSB_FIRST | SCREEN_INFO_EPD |
 			    SCREEN_INFO_DOUBLE_BUFFER;
 }
 
 static int ssd16xx_set_orientation(const struct device *dev,
-				   const enum display_orientation
-				   orientation)
+				   const enum display_orientation orientation)
 {
 	LOG_ERR("Unsupported");
 	return -ENOTSUP;
@@ -389,8 +385,7 @@ static int ssd16xx_clear_cntlr_mem(const struct device *dev, uint8_t ram_cmd,
 {
 	struct ssd16xx_data *driver = dev->data;
 	uint8_t clear_page[EPD_PANEL_WIDTH];
-	uint16_t panel_h = EPD_PANEL_HEIGHT /
-			EPD_PANEL_NUMOF_ROWS_PER_PAGE;
+	uint16_t panel_h = EPD_PANEL_HEIGHT / EPD_PANEL_NUMOF_ROWS_PER_PAGE;
 	uint8_t scan_mode = SSD16XX_DATA_ENTRY_XIYDY;
 
 	/*
@@ -405,8 +400,7 @@ static int ssd16xx_clear_cntlr_mem(const struct device *dev, uint8_t ram_cmd,
 		return -EIO;
 	}
 
-	if (ssd16xx_set_ram_param(driver, SSD16XX_PANEL_FIRST_PAGE,
-				  panel_h - 1,
+	if (ssd16xx_set_ram_param(driver, SSD16XX_PANEL_FIRST_PAGE, panel_h - 1,
 				  SSD16XX_PANEL_LAST_GATE,
 				  SSD16XX_PANEL_FIRST_GATE)) {
 		return -EIO;
@@ -416,7 +410,6 @@ static int ssd16xx_clear_cntlr_mem(const struct device *dev, uint8_t ram_cmd,
 				SSD16XX_PANEL_LAST_GATE)) {
 		return -EIO;
 	}
-
 
 	memset(clear_page, 0xff, sizeof(clear_page));
 	for (int i = 0; i < panel_h; i++) {
@@ -446,9 +439,7 @@ static inline int ssd16xx_load_ws_from_otp(const struct device *dev)
 	LOG_INF("Select and load WS from OTP");
 
 	tmp[0] = DT_INST_PROP(0, tssv);
-	if (ssd16xx_write_cmd(driver,
-			      SSD16XX_CMD_TSENSOR_SELECTION,
-			      tmp, 1)) {
+	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_TSENSOR_SELECTION, tmp, 1)) {
 		return -EIO;
 	}
 
@@ -462,13 +453,11 @@ static inline int ssd16xx_load_ws_from_otp(const struct device *dev)
 	LOG_INF("Load default WS (25 degrees Celsius) from OTP");
 
 	tmp[0] = SSD16XX_CTRL2_ENABLE_CLK;
-	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_UPDATE_CTRL2,
-			      tmp, 1)) {
+	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_UPDATE_CTRL2, tmp, 1)) {
 		return -EIO;
 	}
 
-	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_MASTER_ACTIVATION,
-			      NULL, 0)) {
+	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_MASTER_ACTIVATION, NULL, 0)) {
 		return -EIO;
 	}
 
@@ -476,19 +465,16 @@ static inline int ssd16xx_load_ws_from_otp(const struct device *dev)
 
 	/* Load temperature value */
 	sys_put_be16(t, tmp);
-	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_TSENS_CTRL,
-			      tmp, 2)) {
+	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_TSENS_CTRL, tmp, 2)) {
 		return -EIO;
 	}
 
 	tmp[0] = SSD16XX_CTRL2_DISABLE_CLK;
-	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_UPDATE_CTRL2,
-			      tmp, 1)) {
+	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_UPDATE_CTRL2, tmp, 1)) {
 		return -EIO;
 	}
 
-	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_MASTER_ACTIVATION,
-			      NULL, 0)) {
+	if (ssd16xx_write_cmd(driver, SSD16XX_CMD_MASTER_ACTIVATION, NULL, 0)) {
 		return -EIO;
 	}
 
@@ -609,11 +595,10 @@ static int ssd16xx_controller_init(const struct device *dev)
 	}
 
 	ssd16xx_set_orientation_internall(driver);
-	driver->update_cmd = (SSD16XX_CTRL2_ENABLE_CLK |
-			      SSD16XX_CTRL2_ENABLE_ANALOG |
-			      SSD16XX_CTRL2_TO_PATTERN |
-			      SSD16XX_CTRL2_DISABLE_ANALOG |
-			      SSD16XX_CTRL2_DISABLE_CLK);
+	driver->update_cmd =
+		(SSD16XX_CTRL2_ENABLE_CLK | SSD16XX_CTRL2_ENABLE_ANALOG |
+		 SSD16XX_CTRL2_TO_PATTERN | SSD16XX_CTRL2_DISABLE_ANALOG |
+		 SSD16XX_CTRL2_DISABLE_CLK);
 
 	if (ssd16xx_load_ws_initial(dev)) {
 		return -EIO;
@@ -626,8 +611,7 @@ static int ssd16xx_controller_init(const struct device *dev)
 
 	ssd16xx_busy_wait(driver);
 
-	err = ssd16xx_clear_cntlr_mem(dev, SSD16XX_CMD_WRITE_RED_RAM,
-					     false);
+	err = ssd16xx_clear_cntlr_mem(dev, SSD16XX_CMD_WRITE_RED_RAM, false);
 	if (err < 0) {
 		return err;
 	}
@@ -716,8 +700,6 @@ static struct display_driver_api ssd16xx_driver_api = {
 	.set_orientation = ssd16xx_set_orientation,
 };
 
-
-DEVICE_AND_API_INIT(ssd16xx, DT_INST_LABEL(0), ssd16xx_init,
-		    &ssd16xx_driver, NULL,
-		    POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
+DEVICE_AND_API_INIT(ssd16xx, DT_INST_LABEL(0), ssd16xx_init, &ssd16xx_driver,
+		    NULL, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY,
 		    &ssd16xx_driver_api);

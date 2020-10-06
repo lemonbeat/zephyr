@@ -94,8 +94,9 @@ static void write_disable(FLASH_TypeDef *regs)
 
 static void erase_page_begin(FLASH_TypeDef *regs, unsigned int page)
 {
-	volatile flash_prg_t *page_base = (flash_prg_t *)(
-		CONFIG_FLASH_BASE_ADDRESS + page * FLASH_PAGE_SIZE);
+	volatile flash_prg_t *page_base =
+		(flash_prg_t *)(CONFIG_FLASH_BASE_ADDRESS +
+				page * FLASH_PAGE_SIZE);
 	/* Enable programming in erase mode. An erase is triggered by
 	 * writing 0 to the first word of a page.
 	 */
@@ -115,11 +116,10 @@ static void erase_page_end(FLASH_TypeDef *regs)
 }
 #endif
 
-static int write_value(const struct device *dev, off_t offset,
-		       flash_prg_t val)
+static int write_value(const struct device *dev, off_t offset, flash_prg_t val)
 {
-	volatile flash_prg_t *flash = (flash_prg_t *)(
-		offset + CONFIG_FLASH_BASE_ADDRESS);
+	volatile flash_prg_t *flash =
+		(flash_prg_t *)(offset + CONFIG_FLASH_BASE_ADDRESS);
 	FLASH_TypeDef *regs = FLASH_STM32_REGS(dev);
 	int rc;
 
@@ -163,15 +163,13 @@ static int write_value(const struct device *dev, off_t offset,
  * positive and not beyond end of flash
  */
 bool flash_stm32_valid_range(const struct device *dev, off_t offset,
-			     uint32_t len,
-			     bool write)
+			     uint32_t len, bool write)
 {
 	return (!write || (offset % 2 == 0 && len % 2 == 0U)) &&
-		flash_stm32_range_exists(dev, offset, len);
+	       flash_stm32_range_exists(dev, offset, len);
 }
 
-int flash_stm32_block_erase_loop(const struct device *dev,
-				 unsigned int offset,
+int flash_stm32_block_erase_loop(const struct device *dev, unsigned int offset,
 				 unsigned int len)
 {
 	FLASH_TypeDef *regs = FLASH_STM32_REGS(dev);
@@ -236,8 +234,8 @@ void flash_stm32_page_layout(const struct device *dev,
 		flash_layout.pages_count =
 			DT_REG_SIZE(DT_INST(0, soc_nv_flash)) / FLASH_PAGE_SIZE;
 #else
-		flash_layout.pages_count = (CONFIG_FLASH_SIZE * 1024) /
-			FLASH_PAGE_SIZE;
+		flash_layout.pages_count =
+			(CONFIG_FLASH_SIZE * 1024) / FLASH_PAGE_SIZE;
 #endif
 		flash_layout.pages_size = FLASH_PAGE_SIZE;
 	}

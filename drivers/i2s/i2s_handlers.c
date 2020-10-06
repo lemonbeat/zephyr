@@ -8,7 +8,6 @@
 #include <syscall_handler.h>
 #include <drivers/i2s.h>
 
-
 static inline int z_vrfy_i2s_configure(const struct device *dev,
 				       enum i2s_dir dir,
 				       struct i2s_config *cfg_ptr)
@@ -43,8 +42,8 @@ out:
 }
 #include <syscalls/i2s_configure_mrsh.c>
 
-static inline int z_vrfy_i2s_buf_read(const struct device *dev,
-				      void *buf, size_t *size)
+static inline int z_vrfy_i2s_buf_read(const struct device *dev, void *buf,
+				      size_t *size)
 {
 	void *mem_block;
 	size_t data_size;
@@ -61,11 +60,10 @@ static inline int z_vrfy_i2s_buf_read(const struct device *dev,
 		/* Presumed to be configured otherwise the i2s_read() call
 		 * would have failed.
 		 */
-		rx_cfg = i2s_config_get((const struct device *)dev,
-					I2S_DIR_RX);
+		rx_cfg = i2s_config_get((const struct device *)dev, I2S_DIR_RX);
 
-		copy_success = z_user_to_copy((void *)buf, mem_block,
-					      data_size);
+		copy_success =
+			z_user_to_copy((void *)buf, mem_block, data_size);
 
 		k_mem_slab_free(rx_cfg->mem_slab, &mem_block);
 		Z_OOPS(copy_success);
@@ -77,8 +75,8 @@ static inline int z_vrfy_i2s_buf_read(const struct device *dev,
 }
 #include <syscalls/i2s_buf_read_mrsh.c>
 
-static inline int z_vrfy_i2s_buf_write(const struct device *dev,
-				       void *buf, size_t size)
+static inline int z_vrfy_i2s_buf_write(const struct device *dev, void *buf,
+				       size_t size)
 {
 	int ret;
 	struct i2s_config *tx_cfg;
@@ -114,8 +112,7 @@ static inline int z_vrfy_i2s_buf_write(const struct device *dev,
 }
 #include <syscalls/i2s_buf_write_mrsh.c>
 
-static inline int z_vrfy_i2s_trigger(const struct device *dev,
-				     enum i2s_dir dir,
+static inline int z_vrfy_i2s_trigger(const struct device *dev, enum i2s_dir dir,
 				     enum i2s_trigger_cmd cmd)
 {
 	Z_OOPS(Z_SYSCALL_DRIVER_I2S(dev, trigger));

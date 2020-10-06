@@ -25,11 +25,11 @@
  * @param inst instance number for compatible defined in DT_DRV_COMPAT.
  * @return npcx_clk_cfg item.
  */
-#define DT_NPCX_CLK_CFG_ITEM(inst)                                             \
-	{                                                                      \
-	  .bus  = DT_PHA(DT_DRV_INST(inst), clocks, bus),                      \
-	  .ctrl = DT_PHA(DT_DRV_INST(inst), clocks, ctl),                      \
-	  .bit  = DT_PHA(DT_DRV_INST(inst), clocks, bit),                      \
+#define DT_NPCX_CLK_CFG_ITEM(inst)                              \
+	{                                                       \
+		.bus = DT_PHA(DT_DRV_INST(inst), clocks, bus),  \
+		.ctrl = DT_PHA(DT_DRV_INST(inst), clocks, ctl), \
+		.bit = DT_PHA(DT_DRV_INST(inst), clocks, bit),  \
 	}
 
 /**
@@ -39,11 +39,11 @@
  * @param i index of clocks prop which type is 'phandle-array'
  * @return npcx_clk_cfg item from 'clocks' property at index 'i'
  */
-#define DT_NPCX_CLK_CFG_ITEM_BY_IDX(inst, i)                                   \
-	{                                                                      \
-	  .bus  = DT_CLOCKS_CELL_BY_IDX(DT_DRV_INST(inst), i, bus),            \
-	  .ctrl = DT_CLOCKS_CELL_BY_IDX(DT_DRV_INST(inst), i, ctl),            \
-	  .bit  = DT_CLOCKS_CELL_BY_IDX(DT_DRV_INST(inst), i, bit),            \
+#define DT_NPCX_CLK_CFG_ITEM_BY_IDX(inst, i)                              \
+	{                                                                 \
+		.bus = DT_CLOCKS_CELL_BY_IDX(DT_DRV_INST(inst), i, bus),  \
+		.ctrl = DT_CLOCKS_CELL_BY_IDX(DT_DRV_INST(inst), i, ctl), \
+		.bit = DT_CLOCKS_CELL_BY_IDX(DT_DRV_INST(inst), i, bit),  \
 	},
 
 /**
@@ -63,7 +63,7 @@
  * @return macro function to construct a npcx_clk_cfg structure.
  */
 #define DT_NPCX_CLK_CFG_ITEMS_FUC(child, inst) \
-					DT_NPCX_CLK_CFG_ITEM_BY_IDX(inst, child)
+	DT_NPCX_CLK_CFG_ITEM_BY_IDX(inst, child)
 
 /**
  * @brief Macro function to construct a list of npcx_clk_cfg items by
@@ -85,10 +85,10 @@
  * @param inst instance number for compatible defined in DT_DRV_COMPAT.
  * @return an array of npcx_clk_cfg items.
  */
-#define DT_NPCX_CLK_CFG_ITEMS_LIST(inst) {             \
-	UTIL_LISTIFY(DT_NPCX_CLK_CFG_ITEMS_LEN(inst),  \
-		     DT_NPCX_CLK_CFG_ITEMS_FUC,        \
-		     inst)                             \
+#define DT_NPCX_CLK_CFG_ITEMS_LIST(inst)                      \
+	{                                                     \
+		UTIL_LISTIFY(DT_NPCX_CLK_CFG_ITEMS_LEN(inst), \
+			     DT_NPCX_CLK_CFG_ITEMS_FUC, inst) \
 	}
 
 /**
@@ -110,9 +110,11 @@
  */
 #define DT_NPCX_ALT_ITEM_BY_IDX(inst, i)                                       \
 	{                                                                      \
-	  .group    = DT_PHA(DT_PHANDLE_FROM_PINCTRL(inst, i), alts, group),   \
-	  .bit      = DT_PHA(DT_PHANDLE_FROM_PINCTRL(inst, i), alts, bit),     \
-	  .inverted = DT_PHA(DT_PHANDLE_FROM_PINCTRL(inst, i), alts, inv),     \
+		.group =                                                       \
+			DT_PHA(DT_PHANDLE_FROM_PINCTRL(inst, i), alts, group), \
+		.bit = DT_PHA(DT_PHANDLE_FROM_PINCTRL(inst, i), alts, bit),    \
+		.inverted =                                                    \
+			DT_PHA(DT_PHANDLE_FROM_PINCTRL(inst, i), alts, inv),   \
 	},
 
 /**
@@ -159,10 +161,10 @@
  * @param inst instance number for compatible defined in DT_DRV_COMPAT.
  * @return an array of npcx_alt items.
  */
-#define DT_NPCX_ALT_ITEMS_LIST(inst) {             \
-	UTIL_LISTIFY(DT_NPCX_ALT_ITEMS_LEN(inst),  \
-		     DT_NPCX_ALT_ITEMS_FUC,        \
-		     inst)                         \
+#define DT_NPCX_ALT_ITEMS_LIST(inst)                      \
+	{                                                 \
+		UTIL_LISTIFY(DT_NPCX_ALT_ITEMS_LEN(inst), \
+			     DT_NPCX_ALT_ITEMS_FUC, inst) \
 	}
 
 /**
@@ -172,8 +174,7 @@
  * @param name property 'name' which type is 'phandle' and contains wui info.
  * @return phandle from 'name' property.
  */
-#define DT_PHANDLE_FROM_WUI_NAME(inst, name) \
-	DT_INST_PHANDLE(inst, name)
+#define DT_PHANDLE_FROM_WUI_NAME(inst, name) DT_INST_PHANDLE(inst, name)
 
 /**
  * @brief Construct a npcx_wui structure from 'name' property
@@ -182,12 +183,16 @@
  * @param name property 'name'which type is 'phandle' and contains wui info.
  * @return npcx_wui item from 'name' property.
  */
-#define DT_NPCX_WUI_ITEM_BY_NAME(inst, name)				       \
-	{                                                                      \
-	  .table = DT_PROP(DT_PHANDLE(DT_PHANDLE_FROM_WUI_NAME(inst, name),    \
-					miwus), index),                        \
-	  .group = DT_PHA(DT_PHANDLE_FROM_WUI_NAME(inst, name), miwus, group), \
-	  .bit   = DT_PHA(DT_PHANDLE_FROM_WUI_NAME(inst, name), miwus, bit),   \
+#define DT_NPCX_WUI_ITEM_BY_NAME(inst, name)                                 \
+	{                                                                    \
+		.table = DT_PROP(                                            \
+			DT_PHANDLE(DT_PHANDLE_FROM_WUI_NAME(inst, name),     \
+				   miwus),                                   \
+			index),                                              \
+		.group = DT_PHA(DT_PHANDLE_FROM_WUI_NAME(inst, name), miwus, \
+				group),                                      \
+		.bit = DT_PHA(DT_PHANDLE_FROM_WUI_NAME(inst, name), miwus,   \
+			      bit),                                          \
 	}
 
 /**
@@ -207,12 +212,14 @@
  * @param i index of 'wui_maps' prop which type is 'phandles'
  * @return npcx_wui item at index 'i'
  */
-#define DT_NPCX_WUI_ITEM_BY_IDX(inst, i) \
+#define DT_NPCX_WUI_ITEM_BY_IDX(inst, i)                                       \
 	{                                                                      \
-	  .table = DT_PROP(DT_PHANDLE(DT_PHANDLE_FROM_WUI_MAPS(inst, i),       \
-					miwus), index),                        \
-	  .group = DT_PHA(DT_PHANDLE_FROM_WUI_MAPS(inst, i), miwus, group),    \
-	  .bit   = DT_PHA(DT_PHANDLE_FROM_WUI_MAPS(inst, i), miwus, bit),      \
+		.table = DT_PROP(DT_PHANDLE(DT_PHANDLE_FROM_WUI_MAPS(inst, i), \
+					    miwus),                            \
+				 index),                                       \
+		.group = DT_PHA(DT_PHANDLE_FROM_WUI_MAPS(inst, i), miwus,      \
+				group),                                        \
+		.bit = DT_PHA(DT_PHANDLE_FROM_WUI_MAPS(inst, i), miwus, bit),  \
 	},
 
 /**
@@ -257,10 +264,10 @@
  * @param inst instance number for compatible defined in DT_DRV_COMPAT.
  * @return an array of npcx_wui items.
  */
-#define DT_NPCX_WUI_ITEMS_LIST(inst) {             \
-	UTIL_LISTIFY(DT_NPCX_WUI_ITEMS_LEN(inst),  \
-		     DT_NPCX_WUI_ITEMS_FUC,        \
-		     inst)                         \
+#define DT_NPCX_WUI_ITEMS_LIST(inst)                      \
+	{                                                 \
+		UTIL_LISTIFY(DT_NPCX_WUI_ITEMS_LEN(inst), \
+			     DT_NPCX_WUI_ITEMS_FUC, inst) \
 	}
 
 /**
@@ -269,8 +276,8 @@
  * @param i index of npcx miwu devices
  * @return node identifier with that path.
  */
-#define DT_NODE_FROM_MIWU_MAP(i)  DT_PATH(npcx7_miwus_int_map, \
-					  map_miwu##i##_groups)
+#define DT_NODE_FROM_MIWU_MAP(i) \
+	DT_PATH(npcx7_miwus_int_map, map_miwu##i##_groups)
 /**
  * @brief Get the index prop from parent MIWU device node.
  *
@@ -289,14 +296,12 @@
  * @return implementation to initialize interrupts of MIWU groups and enable
  * them.
  */
-#define DT_MIWU_IRQ_CONNECT_IMPL_CHILD_FUNC(child) \
-	{                                                                      \
-		IRQ_CONNECT(DT_PROP(child, irq),		               \
-			DT_PROP(child, irq_prio),		               \
-			NPCX_MIWU_ISR_FUNC(DT_MIWU_IRQ_TABLE_IDX(child)),      \
-			DT_PROP(child, group_mask),                            \
-			0);						       \
-		irq_enable(DT_PROP(child, irq));                               \
+#define DT_MIWU_IRQ_CONNECT_IMPL_CHILD_FUNC(child)                            \
+	{                                                                     \
+		IRQ_CONNECT(DT_PROP(child, irq), DT_PROP(child, irq_prio),    \
+			    NPCX_MIWU_ISR_FUNC(DT_MIWU_IRQ_TABLE_IDX(child)), \
+			    DT_PROP(child, group_mask), 0);                   \
+		irq_enable(DT_PROP(child, irq));                              \
 	}
 
 /**
@@ -322,11 +327,12 @@
  * @param name a path which name is /npcx7_espi_vws_map/'name'.
  * @return npcx_wui item with that path.
  */
-#define DT_NPCX_VW_WUI_ITEM(name)			                       \
-	{                                                                      \
-	  .table = DT_PROP(DT_PHANDLE(DT_PHANDLE_VW_WUI(name), miwus),  index),\
-	  .group = DT_PHA(DT_PHANDLE_VW_WUI(name), miwus, group),              \
-	  .bit   = DT_PHA(DT_PHANDLE_VW_WUI(name), miwus, bit),                \
+#define DT_NPCX_VW_WUI_ITEM(name)                                            \
+	{                                                                    \
+		.table = DT_PROP(DT_PHANDLE(DT_PHANDLE_VW_WUI(name), miwus), \
+				 index),                                     \
+		.group = DT_PHA(DT_PHANDLE_VW_WUI(name), miwus, group),      \
+		.bit = DT_PHA(DT_PHANDLE_VW_WUI(name), miwus, bit),          \
 	}
 
 /**
@@ -339,10 +345,12 @@
  */
 #define DT_NPCX_VW_IN_CONF(signal, name)                                       \
 	{                                                                      \
-	  .sig = signal,                                                       \
-	  .reg_idx = DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 0),    \
-	  .bitmask = DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 1),    \
-	  .vw_wui  = DT_NPCX_VW_WUI_ITEM(name),                                \
+		.sig = signal,                                                 \
+		.reg_idx =                                                     \
+			DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 0), \
+		.bitmask =                                                     \
+			DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 1), \
+		.vw_wui = DT_NPCX_VW_WUI_ITEM(name),                           \
 	}
 
 /**
@@ -355,9 +363,11 @@
  */
 #define DT_NPCX_VW_OUT_CONF(signal, name)                                      \
 	{                                                                      \
-	  .sig = signal,                                                       \
-	  .reg_idx = DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 0),    \
-	  .bitmask = DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 1),    \
+		.sig = signal,                                                 \
+		.reg_idx =                                                     \
+			DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 0), \
+		.bitmask =                                                     \
+			DT_PROP_BY_IDX(DT_NODE_FROM_VWTABLE(name), vw_reg, 1), \
 	}
 
 #endif /* _NUVOTON_NPCX_SOC_DT_H_ */

@@ -7,12 +7,10 @@
 #include <zephyr.h>
 #include <sys/printk.h>
 
-
 /*
  * @file
  * @brief Hello World demo
  */
-
 
 void main(void)
 {

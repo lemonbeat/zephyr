@@ -16,13 +16,12 @@ static int semihost_console_out(int ch)
 	static unsigned char c;
 
 	c = ch;
-	__asm__ __volatile__ (
-		"movs	r1, %0\n"
-		"movs	r0, #3\n"
-		"bkpt	0xab\n"
-		:
-		: "r" (&c)
-		: "r0", "r1");
+	__asm__ __volatile__("movs	r1, %0\n"
+			     "movs	r0, #3\n"
+			     "bkpt	0xab\n"
+			     :
+			     : "r"(&c)
+			     : "r0", "r1");
 	return ch;
 }
 
@@ -36,4 +35,5 @@ static int semihost_console_init(const struct device *dev)
 	return 0;
 }
 
-SYS_INIT(semihost_console_init, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+SYS_INIT(semihost_console_init, PRE_KERNEL_1,
+	 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

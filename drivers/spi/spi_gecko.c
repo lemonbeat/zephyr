@@ -29,7 +29,7 @@ LOG_MODULE_REGISTER(spi_gecko);
 
 #define SPI_WORD_SIZE 8
 
-#define DEV_DATA(dev) ((struct spi_gecko_data *) ((dev)->data))
+#define DEV_DATA(dev) ((struct spi_gecko_data *)((dev)->data))
 
 /* Structure Declarations */
 
@@ -48,10 +48,8 @@ struct spi_gecko_config {
 	uint8_t loc_clk;
 };
 
-
 /* Helper Functions */
-static int spi_config(const struct device *dev,
-		      const struct spi_config *config,
+static int spi_config(const struct device *dev, const struct spi_config *config,
 		      uint16_t *control)
 {
 	const struct spi_gecko_config *gecko_config = dev->config;
@@ -100,9 +98,9 @@ static int spi_config(const struct device *dev,
 	}
 
 	/* Set word size */
-	gecko_config->base->FRAME = usartDatabits8
-	    | USART_FRAME_STOPBITS_DEFAULT
-	    | USART_FRAME_PARITY_DEFAULT;
+	gecko_config->base->FRAME = usartDatabits8 |
+				    USART_FRAME_STOPBITS_DEFAULT |
+				    USART_FRAME_PARITY_DEFAULT;
 
 	/* At this point, it's mandatory to set this on the context! */
 	data->ctx.config = config;
@@ -163,7 +161,6 @@ static int spi_gecko_shift_frames(USART_TypeDef *usart,
 	return 0;
 }
 
-
 static void spi_gecko_xfer(const struct device *dev,
 			   const struct spi_config *config)
 {
@@ -201,9 +198,8 @@ static void spi_gecko_init_pins(const struct device *dev)
 	config->base->ROUTELOC1 = _USART_ROUTELOC1_RESETVALUE;
 
 	config->base->ROUTEPEN = USART_ROUTEPEN_RXPEN | USART_ROUTEPEN_TXPEN |
-		USART_ROUTEPEN_CLKPEN;
+				 USART_ROUTEPEN_CLKPEN;
 }
-
 
 /* API Functions */
 
@@ -238,7 +234,7 @@ static int spi_gecko_init(const struct device *dev)
 	spi_gecko_init_pins(dev);
 
 	/* Enable the peripheral */
-	config->base->CMD = (uint32_t) usartEnable;
+	config->base->CMD = (uint32_t)usartEnable;
 
 	return 0;
 }
@@ -287,36 +283,31 @@ static struct spi_driver_api spi_gecko_api = {
 	.release = spi_gecko_release,
 };
 
-#define SPI_INIT2(n, usart)				    \
-	static struct spi_gecko_data spi_gecko_data_##n = { \
-		SPI_CONTEXT_INIT_LOCK(spi_gecko_data_##n, ctx), \
-		SPI_CONTEXT_INIT_SYNC(spi_gecko_data_##n, ctx), \
-	}; \
-	static struct spi_gecko_config spi_gecko_cfg_##n = { \
-	    .base = (USART_TypeDef *) \
-		 DT_INST_REG_ADDR(n), \
-	    .clock = CLOCK_USART(usart), \
-	    .pin_rx = { DT_INST_PROP_BY_IDX(n, location_rx, 1), \
-			DT_INST_PROP_BY_IDX(n, location_rx, 2), \
-			gpioModeInput, 1},				\
-	    .pin_tx = { DT_INST_PROP_BY_IDX(n, location_tx, 1), \
-			DT_INST_PROP_BY_IDX(n, location_tx, 2), \
-			gpioModePushPull, 1},				\
-	    .pin_clk = { DT_INST_PROP_BY_IDX(n, location_clk, 1), \
-			DT_INST_PROP_BY_IDX(n, location_clk, 2), \
-			gpioModePushPull, 1},				\
-	    .loc_rx = DT_INST_PROP_BY_IDX(n, location_rx, 0), \
-	    .loc_tx = DT_INST_PROP_BY_IDX(n, location_tx, 0), \
-	    .loc_clk = DT_INST_PROP_BY_IDX(n, location_clk, 0), \
-	}; \
-	DEVICE_AND_API_INIT(spi_##n, \
-			DT_INST_LABEL(n), \
-			spi_gecko_init, \
-			&spi_gecko_data_##n, \
-			&spi_gecko_cfg_##n, \
-			POST_KERNEL, \
-			CONFIG_SPI_INIT_PRIORITY, \
-			&spi_gecko_api);
+#define SPI_INIT2(n, usart)                                            \
+	static struct spi_gecko_data spi_gecko_data_##n = {            \
+		SPI_CONTEXT_INIT_LOCK(spi_gecko_data_##n, ctx),        \
+		SPI_CONTEXT_INIT_SYNC(spi_gecko_data_##n, ctx),        \
+	};                                                             \
+	static struct spi_gecko_config spi_gecko_cfg_##n = {           \
+		.base = (USART_TypeDef *)DT_INST_REG_ADDR(n),          \
+		.clock = CLOCK_USART(usart),                           \
+		.pin_rx = { DT_INST_PROP_BY_IDX(n, location_rx, 1),    \
+			    DT_INST_PROP_BY_IDX(n, location_rx, 2),    \
+			    gpioModeInput, 1 },                        \
+		.pin_tx = { DT_INST_PROP_BY_IDX(n, location_tx, 1),    \
+			    DT_INST_PROP_BY_IDX(n, location_tx, 2),    \
+			    gpioModePushPull, 1 },                     \
+		.pin_clk = { DT_INST_PROP_BY_IDX(n, location_clk, 1),  \
+			     DT_INST_PROP_BY_IDX(n, location_clk, 2),  \
+			     gpioModePushPull, 1 },                    \
+		.loc_rx = DT_INST_PROP_BY_IDX(n, location_rx, 0),      \
+		.loc_tx = DT_INST_PROP_BY_IDX(n, location_tx, 0),      \
+		.loc_clk = DT_INST_PROP_BY_IDX(n, location_clk, 0),    \
+	};                                                             \
+	DEVICE_AND_API_INIT(spi_##n, DT_INST_LABEL(n), spi_gecko_init, \
+			    &spi_gecko_data_##n, &spi_gecko_cfg_##n,   \
+			    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,     \
+			    &spi_gecko_api);
 
 #define SPI_ID(n) DT_INST_PROP(n, peripheral_id)
 

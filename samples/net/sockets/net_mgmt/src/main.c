@@ -61,9 +61,8 @@ static void trigger_events(void)
 	}
 }
 
-K_THREAD_DEFINE(trigger_events_thread_id, STACK_SIZE,
-		trigger_events, NULL, NULL, NULL,
-		THREAD_PRIORITY, 0, -1);
+K_THREAD_DEFINE(trigger_events_thread_id, STACK_SIZE, trigger_events, NULL,
+		NULL, NULL, THREAD_PRIORITY, 0, -1);
 
 static char *get_ip_addr(char *ipaddr, size_t len, sa_family_t family,
 			 struct net_mgmt_msghdr *hdr)
@@ -99,8 +98,7 @@ static void listener(void)
 	sockaddr.nm_ifindex = 0; /* Any network interface */
 	sockaddr.nm_pid = (uintptr_t)k_current_get();
 	sockaddr.nm_mask = NET_EVENT_IPV6_DAD_SUCCEED |
-			    NET_EVENT_IPV6_ADDR_ADD |
-			    NET_EVENT_IPV6_ADDR_DEL;
+			   NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
 
 	ret = bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 	if (ret < 0) {
@@ -115,8 +113,7 @@ static void listener(void)
 		event_addr_len = sizeof(event_addr);
 
 		ret = recvfrom(fd, buf, sizeof(buf), 0,
-			       (struct sockaddr *)&event_addr,
-			       &event_addr_len);
+			       (struct sockaddr *)&event_addr, &event_addr_len);
 		if (ret < 0) {
 			continue;
 		}
@@ -132,20 +129,20 @@ static void listener(void)
 		case NET_EVENT_IPV6_DAD_SUCCEED:
 			printk("DAD succeed for interface %d (%s)\n",
 			       event_addr.nm_ifindex,
-			       get_ip_addr(ipaddr, sizeof(ipaddr),
-					   AF_INET6, hdr));
+			       get_ip_addr(ipaddr, sizeof(ipaddr), AF_INET6,
+					   hdr));
 			break;
 		case NET_EVENT_IPV6_ADDR_ADD:
 			printk("IPv6 address added to interface %d (%s)\n",
 			       event_addr.nm_ifindex,
-			       get_ip_addr(ipaddr, sizeof(ipaddr),
-					   AF_INET6, hdr));
+			       get_ip_addr(ipaddr, sizeof(ipaddr), AF_INET6,
+					   hdr));
 			break;
 		case NET_EVENT_IPV6_ADDR_DEL:
 			printk("IPv6 address removed from interface %d (%s)\n",
 			       event_addr.nm_ifindex,
-			       get_ip_addr(ipaddr, sizeof(ipaddr),
-					   AF_INET6, hdr));
+			       get_ip_addr(ipaddr, sizeof(ipaddr), AF_INET6,
+					   hdr));
 			break;
 		}
 	}
@@ -159,8 +156,8 @@ void main(void)
 	k_thread_start(trigger_events_thread_id);
 
 	if (IS_ENABLED(CONFIG_USERSPACE)) {
-		k_thread_user_mode_enter((k_thread_entry_t)listener,
-					 NULL, NULL, NULL);
+		k_thread_user_mode_enter((k_thread_entry_t)listener, NULL, NULL,
+					 NULL);
 	} else {
 		listener();
 	}

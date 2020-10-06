@@ -12,8 +12,8 @@
 
 #define I2C_SLV_ADDR 0x10
 #define I2C0_LABEL DT_LABEL(DT_NODELABEL(i2c0))
-#define EXT_P13_GPIO_PIN 23     /* P13, SPI1 SCK */
-#define EXT_P14_GPIO_PIN 22     /* P14, SPI1 MISO */
+#define EXT_P13_GPIO_PIN 23 /* P13, SPI1 SCK */
+#define EXT_P14_GPIO_PIN 22 /* P14, SPI1 MISO */
 
 static const struct device *gpio;
 const struct device *i2c_dev;
@@ -73,7 +73,7 @@ void motor_right_control(int right_speed)
 		buf[2] = decimal_to_hex(right_speed);
 	}
 
-/* Right motor write data*/
+	/* Right motor write data*/
 	i2c_write(i2c_dev, buf, 3, 0x10);
 }
 
@@ -96,12 +96,12 @@ void line_follow(void)
 				motor_left_control(200);
 				motor_right_control(0);
 				if ((left_line[0] == 1) &&
-					(right_line[0] == 1)) {
+				    (right_line[0] == 1)) {
 					motor_left_control(200);
 					motor_right_control(0);
 				}
 				if ((left_line[0] == 1) &&
-					(right_line[0] == 0)) {
+				    (right_line[0] == 0)) {
 					motor_left_control(200);
 				} else {
 					motor_right_control(0);

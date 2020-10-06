@@ -70,15 +70,16 @@ static int arc_v2_irq_unit_init(const struct device *unused)
 	 * values in this loop.
 	 */
 	for (irq = 16; irq < CONFIG_NUM_IRQS; irq++) {
-
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_SELECT, irq);
 #ifdef CONFIG_ARC_SECURE_FIRMWARE
-		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY,
-			 (CONFIG_NUM_IRQ_PRIO_LEVELS-1) |
-			 _ARC_V2_IRQ_PRIORITY_SECURE); /* lowest priority */
+		z_arc_v2_aux_reg_write(
+			_ARC_V2_IRQ_PRIORITY,
+			(CONFIG_NUM_IRQ_PRIO_LEVELS -
+			 1) | _ARC_V2_IRQ_PRIORITY_SECURE); /* lowest priority */
 #else
-		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY,
-			 (CONFIG_NUM_IRQ_PRIO_LEVELS-1)); /* lowest priority */
+		z_arc_v2_aux_reg_write(
+			_ARC_V2_IRQ_PRIORITY,
+			(CONFIG_NUM_IRQ_PRIO_LEVELS - 1)); /* lowest priority */
 #endif
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_ENABLE, _ARC_V2_INT_DISABLE);
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_TRIGGER, _ARC_V2_INT_LEVEL);
@@ -147,16 +148,17 @@ static int arc_v2_irq_unit_resume(const struct device *dev)
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_SELECT, irq);
 #ifdef CONFIG_ARC_SECURE_FIRMWARE
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY,
-				ctx.irq_config[irq - 16] >> 2 |
-				_ARC_V2_IRQ_PRIORITY_SECURE);
+				       ctx.irq_config[irq - 16] >> 2 |
+					       _ARC_V2_IRQ_PRIORITY_SECURE);
 #else
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_PRIORITY,
-				ctx.irq_config[irq - 16] >> 2);
+				       ctx.irq_config[irq - 16] >> 2);
 #endif
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_TRIGGER,
-				(ctx.irq_config[irq - 16] >> 1) & BIT(0));
+				       (ctx.irq_config[irq - 16] >> 1) &
+					       BIT(0));
 		z_arc_v2_aux_reg_write(_ARC_V2_IRQ_ENABLE,
-				ctx.irq_config[irq - 16] & BIT(0));
+				       ctx.irq_config[irq - 16] & BIT(0));
 	}
 
 #ifdef CONFIG_ARC_NORMAL_FIRMWARE
@@ -222,5 +224,5 @@ SYS_DEVICE_DEFINE("arc_v2_irq_unit", arc_v2_irq_unit_init,
 		  CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 #else
 SYS_INIT(arc_v2_irq_unit_init, PRE_KERNEL_1,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
-#endif   /* CONFIG_DEVICE_POWER_MANAGEMENT */
+	 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+#endif /* CONFIG_DEVICE_POWER_MANAGEMENT */

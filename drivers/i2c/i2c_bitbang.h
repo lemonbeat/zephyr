@@ -26,9 +26,9 @@ struct i2c_bitbang_io {
  * Structure members are private, and shouldn't be accessed directly.
  */
 struct i2c_bitbang {
-	const struct i2c_bitbang_io	*io;
-	void				*io_context;
-	uint32_t				delays[2];
+	const struct i2c_bitbang_io *io;
+	void *io_context;
+	uint32_t delays[2];
 };
 
 /**
@@ -40,7 +40,7 @@ struct i2c_bitbang {
  *			called.
  */
 void i2c_bitbang_init(struct i2c_bitbang *bitbang,
-			const struct i2c_bitbang_io *io, void *io_context);
+		      const struct i2c_bitbang_io *io, void *io_context);
 
 /**
  * Implementation of the functionality required by the 'configure' function
@@ -58,6 +58,5 @@ int i2c_bitbang_recover_bus(struct i2c_bitbang *bitbang);
  * Implementation of the functionality required by the 'transfer' function
  * in struct i2c_driver_api.
  */
-int i2c_bitbang_transfer(struct i2c_bitbang *bitbang,
-			   struct i2c_msg *msgs, uint8_t num_msgs,
-			   uint16_t slave_address);
+int i2c_bitbang_transfer(struct i2c_bitbang *bitbang, struct i2c_msg *msgs,
+			 uint8_t num_msgs, uint16_t slave_address);

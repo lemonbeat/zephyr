@@ -14,29 +14,29 @@
  */
 
 /** No caching. Most drivers want this. */
-#define K_MEM_CACHE_NONE	0
+#define K_MEM_CACHE_NONE 0
 
 /** Write-through caching. Used by certain drivers. */
-#define K_MEM_CACHE_WT		1
+#define K_MEM_CACHE_WT 1
 
 /** Full write-back caching. Any RAM mapped wants this. */
-#define K_MEM_CACHE_WB		2
+#define K_MEM_CACHE_WB 2
 
 /** Reserved bits for cache modes in k_map() flags argument */
-#define K_MEM_CACHE_MASK	(BIT(3) - 1)
+#define K_MEM_CACHE_MASK (BIT(3) - 1)
 
 /*
  * Region permission attributes. Default is read-only, no user, no exec
  */
 
 /** Region will have read/write access (and not read-only) */
-#define K_MEM_PERM_RW		BIT(3)
+#define K_MEM_PERM_RW BIT(3)
 
 /** Region will be executable (normally forbidden) */
-#define K_MEM_PERM_EXEC		BIT(4)
+#define K_MEM_PERM_EXEC BIT(4)
 
 /** Region will be accessible to user mode (normally supervisor-only) */
-#define K_MEM_PERM_USER		BIT(5)
+#define K_MEM_PERM_USER BIT(5)
 
 #ifndef _ASMLANGUAGE
 #include <stdint.h>

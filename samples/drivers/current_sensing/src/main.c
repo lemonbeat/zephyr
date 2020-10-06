@@ -15,7 +15,7 @@
  * @file Sample app using the TI INA219 through I2C.
  */
 
-#define I2C_SLV_ADDR	0x40
+#define I2C_SLV_ADDR 0x40
 
 /* The calibration value is based on components on
  * Adafruit's breakout board
@@ -23,17 +23,16 @@
  * the current sensing resistor is 0.1 ohm.
  * This enables measurements up to 32V, 2A.
  */
-#define CAL_VAL		(4096)
+#define CAL_VAL (4096)
 
 /* With default calibration above,
  * Each current LSB is 100 uA == 0.1 mA == 0.0001 A.
  * Each power LSB is 2000 uW == 2 mW = 0.002W.
  */
-#define CUR_LSB		100
-#define PWR_LSB		2000
+#define CUR_LSB 100
+#define PWR_LSB 2000
 
-int read_reg16(const struct device *i2c_dev, uint8_t reg_addr,
-	       uint8_t *data)
+int read_reg16(const struct device *i2c_dev, uint8_t reg_addr, uint8_t *data)
 {
 	uint8_t wr_addr;
 	struct i2c_msg msgs[2];
@@ -56,8 +55,7 @@ int read_reg16(const struct device *i2c_dev, uint8_t reg_addr,
 	return i2c_transfer(i2c_dev, &msgs[0], 2, I2C_SLV_ADDR);
 }
 
-int write_reg16(const struct device *i2c_dev, uint8_t reg_addr,
-		uint8_t *data)
+int write_reg16(const struct device *i2c_dev, uint8_t reg_addr, uint8_t *data)
 {
 	uint8_t wr_addr;
 	struct i2c_msg msgs[2];

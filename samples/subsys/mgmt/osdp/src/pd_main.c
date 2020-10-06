@@ -13,17 +13,17 @@
 #define LED0_NODE DT_ALIAS(led0)
 
 #if DT_NODE_HAS_STATUS(LED0_NODE, okay)
-#define LED0    DT_GPIO_LABEL(LED0_NODE, gpios)
-#define PIN     DT_GPIO_PIN(LED0_NODE, gpios)
-#define FLAGS   DT_GPIO_FLAGS(LED0_NODE, gpios)
+#define LED0 DT_GPIO_LABEL(LED0_NODE, gpios)
+#define PIN DT_GPIO_PIN(LED0_NODE, gpios)
+#define FLAGS DT_GPIO_FLAGS(LED0_NODE, gpios)
 #else
 #error "BOARD does not define a debug LED"
-#define LED0    ""
-#define PIN     0
-#define FLAGS   0
+#define LED0 ""
+#define PIN 0
+#define FLAGS 0
 #endif
 
-#define SLEEP_TIME_MS                  10
+#define SLEEP_TIME_MS 10
 
 int cmd_handler(struct osdp_cmd *p)
 {

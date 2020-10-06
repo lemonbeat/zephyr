@@ -10,22 +10,22 @@
 
 #define CID_ZEPHYR 0x0002
 
-#define STATE_OFF       0x00
-#define STATE_ON        0x01
-#define STATE_DEFAULT   0x01
-#define STATE_RESTORE   0x02
+#define STATE_OFF 0x00
+#define STATE_ON 0x01
+#define STATE_DEFAULT 0x01
+#define STATE_RESTORE 0x02
 
 /* Following 4 values are as per Mesh Model specification */
-#define LIGHTNESS_MIN   0x0001
-#define LIGHTNESS_MAX   0xFFFF
-#define TEMP_MIN	0x0320
-#define TEMP_MAX	0x4E20
-#define DELTA_UV_DEF	0x0000
+#define LIGHTNESS_MIN 0x0001
+#define LIGHTNESS_MAX 0xFFFF
+#define TEMP_MIN 0x0320
+#define TEMP_MAX 0x4E20
+#define DELTA_UV_DEF 0x0000
 
 /* Refer 7.2 of Mesh Model Specification */
-#define RANGE_SUCCESSFULLY_UPDATED      0x00
-#define CANNOT_SET_RANGE_MIN            0x01
-#define CANNOT_SET_RANGE_MAX            0x02
+#define RANGE_SUCCESSFULLY_UPDATED 0x00
+#define CANNOT_SET_RANGE_MIN 0x01
+#define CANNOT_SET_RANGE_MAX 0x02
 
 struct vendor_state {
 	int current;
@@ -64,7 +64,6 @@ struct temperature {
 
 	int delta;
 };
-
 
 struct delta_uv {
 	int16_t current;

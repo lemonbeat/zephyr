@@ -17,19 +17,16 @@
 
 LOG_MODULE_DECLARE(LSM6DSL, CONFIG_SENSOR_LOG_LEVEL);
 
-static inline void setup_irq(struct lsm6dsl_data *drv_data,
-			     uint32_t irq_pin, bool enable)
+static inline void setup_irq(struct lsm6dsl_data *drv_data, uint32_t irq_pin,
+			     bool enable)
 {
-	unsigned int flags = enable
-		? GPIO_INT_EDGE_TO_ACTIVE
-		: GPIO_INT_DISABLE;
+	unsigned int flags = enable ? GPIO_INT_EDGE_TO_ACTIVE :
+					    GPIO_INT_DISABLE;
 
-	gpio_pin_interrupt_configure(drv_data->gpio,
-				     irq_pin, flags);
+	gpio_pin_interrupt_configure(drv_data->gpio, irq_pin, flags);
 }
 
-static inline void handle_irq(struct lsm6dsl_data *drv_data,
-			      uint32_t irq_pin)
+static inline void handle_irq(struct lsm6dsl_data *drv_data, uint32_t irq_pin)
 {
 	setup_irq(drv_data, irq_pin, false);
 
@@ -126,8 +123,8 @@ int lsm6dsl_init_interrupt(const struct device *dev)
 	gpio_pin_configure(drv_data->gpio, config->irq_pin,
 			   GPIO_INPUT | config->irq_flags);
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   lsm6dsl_gpio_callback, BIT(config->irq_pin));
+	gpio_init_callback(&drv_data->gpio_cb, lsm6dsl_gpio_callback,
+			   BIT(config->irq_pin));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
 		LOG_ERR("Could not set gpio callback.");
@@ -135,12 +132,12 @@ int lsm6dsl_init_interrupt(const struct device *dev)
 	}
 
 	/* enable data-ready interrupt */
-	if (drv_data->hw_tf->update_reg(dev,
-			       LSM6DSL_REG_INT1_CTRL,
-			       LSM6DSL_MASK_INT1_CTRL_DRDY_XL |
-			       LSM6DSL_MASK_INT1_CTRL_DRDY_G,
-			       BIT(LSM6DSL_SHIFT_INT1_CTRL_DRDY_XL) |
-			       BIT(LSM6DSL_SHIFT_INT1_CTRL_DRDY_G)) < 0) {
+	if (drv_data->hw_tf->update_reg(
+		    dev, LSM6DSL_REG_INT1_CTRL,
+		    LSM6DSL_MASK_INT1_CTRL_DRDY_XL |
+			    LSM6DSL_MASK_INT1_CTRL_DRDY_G,
+		    BIT(LSM6DSL_SHIFT_INT1_CTRL_DRDY_XL) |
+			    BIT(LSM6DSL_SHIFT_INT1_CTRL_DRDY_G)) < 0) {
 		LOG_ERR("Could not enable data-ready interrupt.");
 		return -EIO;
 	}
@@ -152,9 +149,9 @@ int lsm6dsl_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_LSM6DSL_THREAD_STACK_SIZE,
-			(k_thread_entry_t)lsm6dsl_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_LSM6DSL_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)lsm6dsl_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_LSM6DSL_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_LSM6DSL_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = lsm6dsl_work_cb;
 #endif

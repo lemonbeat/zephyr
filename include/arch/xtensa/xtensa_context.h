@@ -19,13 +19,13 @@
 #ifndef ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_CONTEXT_H_
 #define ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_CONTEXT_H_
 
-#include    <xtensa/config/tie.h>
-#include    <xtensa/corebits.h>
-#include    <xtensa/config/system.h>
-#include    <xtensa/xtruntime-frames.h>
+#include <xtensa/config/tie.h>
+#include <xtensa/corebits.h>
+#include <xtensa/config/system.h>
+#include <xtensa/xtruntime-frames.h>
 
 #ifdef __ASSEMBLER__
-#include    <xtensa/coreasm.h>
+#include <xtensa/coreasm.h>
 #else /* __ASSEMBLER__ */
 #ifdef __cplusplus
 extern "C" {
@@ -54,70 +54,70 @@ extern "C" {
  */
 
 STRUCT_BEGIN
-STRUCT_FIELD(long, 4, XT_STK_,     exit) /* exit point for dispatch */
-STRUCT_FIELD(long, 4, XT_STK_,       pc)   /* return PC */
-STRUCT_FIELD(long, 4, XT_STK_,       ps)   /* return PS */
-STRUCT_FIELD(long, 4, XT_STK_,       a0)
-STRUCT_FIELD(long, 4, XT_STK_,       a1)   /* stack pointer before irq */
-STRUCT_FIELD(long, 4, XT_STK_,       a2)
-STRUCT_FIELD(long, 4, XT_STK_,       a3)
-STRUCT_FIELD(long, 4, XT_STK_,       a4)
-STRUCT_FIELD(long, 4, XT_STK_,       a5)
-STRUCT_FIELD(long, 4, XT_STK_,       a6)
-STRUCT_FIELD(long, 4, XT_STK_,       a7)
-STRUCT_FIELD(long, 4, XT_STK_,       a8)
-STRUCT_FIELD(long, 4, XT_STK_,       a9)
-STRUCT_FIELD(long, 4, XT_STK_,      a10)
-STRUCT_FIELD(long, 4, XT_STK_,      a11)
-STRUCT_FIELD(long, 4, XT_STK_,      a12)
-STRUCT_FIELD(long, 4, XT_STK_,      a13)
-STRUCT_FIELD(long, 4, XT_STK_,      a14)
-STRUCT_FIELD(long, 4, XT_STK_,      a15)
-STRUCT_FIELD(long, 4, XT_STK_,      sar)
+STRUCT_FIELD(long, 4, XT_STK_, exit) /* exit point for dispatch */
+STRUCT_FIELD(long, 4, XT_STK_, pc) /* return PC */
+STRUCT_FIELD(long, 4, XT_STK_, ps) /* return PS */
+STRUCT_FIELD(long, 4, XT_STK_, a0)
+STRUCT_FIELD(long, 4, XT_STK_, a1) /* stack pointer before irq */
+STRUCT_FIELD(long, 4, XT_STK_, a2)
+STRUCT_FIELD(long, 4, XT_STK_, a3)
+STRUCT_FIELD(long, 4, XT_STK_, a4)
+STRUCT_FIELD(long, 4, XT_STK_, a5)
+STRUCT_FIELD(long, 4, XT_STK_, a6)
+STRUCT_FIELD(long, 4, XT_STK_, a7)
+STRUCT_FIELD(long, 4, XT_STK_, a8)
+STRUCT_FIELD(long, 4, XT_STK_, a9)
+STRUCT_FIELD(long, 4, XT_STK_, a10)
+STRUCT_FIELD(long, 4, XT_STK_, a11)
+STRUCT_FIELD(long, 4, XT_STK_, a12)
+STRUCT_FIELD(long, 4, XT_STK_, a13)
+STRUCT_FIELD(long, 4, XT_STK_, a14)
+STRUCT_FIELD(long, 4, XT_STK_, a15)
+STRUCT_FIELD(long, 4, XT_STK_, sar)
 STRUCT_FIELD(long, 4, XT_STK_, exccause)
 STRUCT_FIELD(long, 4, XT_STK_, excvaddr)
 #if XCHAL_HAVE_LOOPS
-STRUCT_FIELD(long, 4, XT_STK_,   lbeg)
-STRUCT_FIELD(long, 4, XT_STK_,   lend)
+STRUCT_FIELD(long, 4, XT_STK_, lbeg)
+STRUCT_FIELD(long, 4, XT_STK_, lend)
 STRUCT_FIELD(long, 4, XT_STK_, lcount)
 #endif
 #ifndef __XTENSA_CALL0_ABI__
 /* Temporary space for saving stuff during window spill */
-STRUCT_FIELD(long, 4, XT_STK_,   tmp0)
-STRUCT_FIELD(long, 4, XT_STK_,   tmp1)
-STRUCT_FIELD(long, 4, XT_STK_,   tmp2)
+STRUCT_FIELD(long, 4, XT_STK_, tmp0)
+STRUCT_FIELD(long, 4, XT_STK_, tmp1)
+STRUCT_FIELD(long, 4, XT_STK_, tmp2)
 #endif
 #ifdef XT_USE_SWPRI
 /* Storage for virtual priority mask */
-STRUCT_FIELD(long, 4, XT_STK_,   vpri)
+STRUCT_FIELD(long, 4, XT_STK_, vpri)
 #endif
 #ifdef XT_USE_OVLY
 /* Storage for overlay state */
-STRUCT_FIELD(long, 4, XT_STK_,   ovly)
+STRUCT_FIELD(long, 4, XT_STK_, ovly)
 #endif
 STRUCT_END(XtExcFrame)
 
 #if defined(_ASMLANGUAGE) || defined(__ASSEMBLER__)
-#define XT_STK_NEXT1      XtExcFrameSize
+#define XT_STK_NEXT1 XtExcFrameSize
 #else
-#define XT_STK_NEXT1      sizeof(XtExcFrame)
+#define XT_STK_NEXT1 sizeof(XtExcFrame)
 #endif
 
 /* Allocate extra storage if needed */
 #if XCHAL_EXTRA_SA_SIZE != 0
 
 #if XCHAL_EXTRA_SA_ALIGN <= 16
-#define XT_STK_EXTRA            ALIGNUP(XCHAL_EXTRA_SA_ALIGN, XT_STK_NEXT1)
+#define XT_STK_EXTRA ALIGNUP(XCHAL_EXTRA_SA_ALIGN, XT_STK_NEXT1)
 #else
 /* If need more alignment than stack, add space for dynamic alignment */
-#define XT_STK_EXTRA		(ALIGNUP(XCHAL_EXTRA_SA_ALIGN, XT_STK_NEXT1) \
-				 + XCHAL_EXTRA_SA_ALIGN)
+#define XT_STK_EXTRA \
+	(ALIGNUP(XCHAL_EXTRA_SA_ALIGN, XT_STK_NEXT1) + XCHAL_EXTRA_SA_ALIGN)
 #endif
-#define XT_STK_NEXT2            (XT_STK_EXTRA + XCHAL_EXTRA_SA_SIZE)
+#define XT_STK_NEXT2 (XT_STK_EXTRA + XCHAL_EXTRA_SA_SIZE)
 
 #else
 
-#define XT_STK_NEXT2            XT_STK_NEXT1
+#define XT_STK_NEXT2 XT_STK_NEXT1
 
 #endif
 
@@ -125,8 +125,7 @@ STRUCT_END(XtExcFrame)
  * This is the frame size. Add space for 4 registers (interruptee's base save
  * area) and some space for gcc nested functions if any.
  */
-#define XT_STK_FRMSZ            (ALIGNUP(0x10, XT_STK_NEXT2) + 0x20)
-
+#define XT_STK_FRMSZ (ALIGNUP(0x10, XT_STK_NEXT2) + 0x20)
 
 /*
  * SOLICITED STACK FRAME FOR A THREAD
@@ -152,25 +151,24 @@ STRUCT_END(XtExcFrame)
 
 STRUCT_BEGIN
 STRUCT_FIELD(long, 4, XT_SOL_, exit)
-STRUCT_FIELD(long, 4, XT_SOL_,   pc)
-STRUCT_FIELD(long, 4, XT_SOL_,   ps)
+STRUCT_FIELD(long, 4, XT_SOL_, pc)
+STRUCT_FIELD(long, 4, XT_SOL_, ps)
 STRUCT_FIELD(long, 4, XT_SOL_, next)
 #ifdef __XTENSA_CALL0_ABI__
-STRUCT_FIELD(long, 4, XT_SOL_,  a12)    /* should be on 16-byte alignment */
-STRUCT_FIELD(long, 4, XT_SOL_,  a13)
-STRUCT_FIELD(long, 4, XT_SOL_,  a14)
-STRUCT_FIELD(long, 4, XT_SOL_,  a15)
+STRUCT_FIELD(long, 4, XT_SOL_, a12) /* should be on 16-byte alignment */
+STRUCT_FIELD(long, 4, XT_SOL_, a13)
+STRUCT_FIELD(long, 4, XT_SOL_, a14)
+STRUCT_FIELD(long, 4, XT_SOL_, a15)
 #else
-STRUCT_FIELD(long, 4, XT_SOL_,   a0)    /* should be on 16-byte alignment */
-STRUCT_FIELD(long, 4, XT_SOL_,   a1)
-STRUCT_FIELD(long, 4, XT_SOL_,   a2)
-STRUCT_FIELD(long, 4, XT_SOL_,   a3)
+STRUCT_FIELD(long, 4, XT_SOL_, a0) /* should be on 16-byte alignment */
+STRUCT_FIELD(long, 4, XT_SOL_, a1)
+STRUCT_FIELD(long, 4, XT_SOL_, a2)
+STRUCT_FIELD(long, 4, XT_SOL_, a3)
 #endif
 STRUCT_END(XtSolFrame)
 
 /* Size of solicited stack frame */
-#define XT_SOL_FRMSZ            ALIGNUP(0x10, XtSolFrameSize)
-
+#define XT_SOL_FRMSZ ALIGNUP(0x10, XtSolFrameSize)
 
 /*
  * CO-PROCESSOR STATE SAVE AREA FOR A THREAD
@@ -241,37 +239,36 @@ STRUCT_END(XtSolFrame)
 #if XCHAL_CP_NUM > 0
 
 /*  Offsets of each coprocessor save area within the 'aligned save area':  */
-#define XT_CP0_SA   0
-#define XT_CP1_SA   ALIGNUP(XCHAL_CP1_SA_ALIGN, XT_CP0_SA + XCHAL_CP0_SA_SIZE)
-#define XT_CP2_SA   ALIGNUP(XCHAL_CP2_SA_ALIGN, XT_CP1_SA + XCHAL_CP1_SA_SIZE)
-#define XT_CP3_SA   ALIGNUP(XCHAL_CP3_SA_ALIGN, XT_CP2_SA + XCHAL_CP2_SA_SIZE)
-#define XT_CP4_SA   ALIGNUP(XCHAL_CP4_SA_ALIGN, XT_CP3_SA + XCHAL_CP3_SA_SIZE)
-#define XT_CP5_SA   ALIGNUP(XCHAL_CP5_SA_ALIGN, XT_CP4_SA + XCHAL_CP4_SA_SIZE)
-#define XT_CP6_SA   ALIGNUP(XCHAL_CP6_SA_ALIGN, XT_CP5_SA + XCHAL_CP5_SA_SIZE)
-#define XT_CP7_SA   ALIGNUP(XCHAL_CP7_SA_ALIGN, XT_CP6_SA + XCHAL_CP6_SA_SIZE)
-#define XT_CP_SA_SIZE   ALIGNUP(16, XT_CP7_SA + XCHAL_CP7_SA_SIZE)
+#define XT_CP0_SA 0
+#define XT_CP1_SA ALIGNUP(XCHAL_CP1_SA_ALIGN, XT_CP0_SA + XCHAL_CP0_SA_SIZE)
+#define XT_CP2_SA ALIGNUP(XCHAL_CP2_SA_ALIGN, XT_CP1_SA + XCHAL_CP1_SA_SIZE)
+#define XT_CP3_SA ALIGNUP(XCHAL_CP3_SA_ALIGN, XT_CP2_SA + XCHAL_CP2_SA_SIZE)
+#define XT_CP4_SA ALIGNUP(XCHAL_CP4_SA_ALIGN, XT_CP3_SA + XCHAL_CP3_SA_SIZE)
+#define XT_CP5_SA ALIGNUP(XCHAL_CP5_SA_ALIGN, XT_CP4_SA + XCHAL_CP4_SA_SIZE)
+#define XT_CP6_SA ALIGNUP(XCHAL_CP6_SA_ALIGN, XT_CP5_SA + XCHAL_CP5_SA_SIZE)
+#define XT_CP7_SA ALIGNUP(XCHAL_CP7_SA_ALIGN, XT_CP6_SA + XCHAL_CP6_SA_SIZE)
+#define XT_CP_SA_SIZE ALIGNUP(16, XT_CP7_SA + XCHAL_CP7_SA_SIZE)
 
 /*  Offsets within the overall save area:  */
 
 /* (2 bytes) coprocessors active for this thread */
 #define XT_CPENABLE 0
 
- /* (2 bytes) coprocessors saved for this thread */
+/* (2 bytes) coprocessors saved for this thread */
 #define XT_CPSTORED 2
 
 /* (2 bytes) coprocessor callee-saved regs stored for this thread */
 #define XT_CP_CS_ST 4
 
 /* (4 bytes) ptr to aligned save area */
-#define XT_CP_ASA   8
+#define XT_CP_ASA 8
 
 /* Overall size allows for dynamic alignment:  */
-#define XT_CP_SIZE ALIGNUP(XCHAL_TOTAL_SA_ALIGN, \
-	XT_CP_DESCR_SIZE + XT_CP_SA_SIZE)
+#define XT_CP_SIZE \
+	ALIGNUP(XCHAL_TOTAL_SA_ALIGN, XT_CP_DESCR_SIZE + XT_CP_SA_SIZE)
 #else
-#define XT_CP_SIZE  0
+#define XT_CP_SIZE 0
 #endif
-
 
 /*
  * MACROS TO HANDLE ABI SPECIFICS OF FUNCTION ENTRY AND RETURN
@@ -293,31 +290,26 @@ STRUCT_END(XtSolFrame)
 #ifdef __ASSEMBLER__
 #ifdef __XTENSA_CALL0_ABI__
 /* Call0 */
-#define ENTRY(sz)     entry1  sz
-.macro  entry1 size=0x10
-addi    sp, sp, -\size
-s32i    a0, sp, 0
-.endm
+#define ENTRY(sz) entry1 sz
+	.macro entry1 size = 0x10 addi sp,
+		      sp, -\size s32i a0, sp,
+		      0.endm
 #define ENTRY0
-#define RET(sz)       ret1    sz
-.macro  ret1 size=0x10
-l32i    a0, sp, 0
-addi    sp, sp, \size
-ret
-.endm
-#define RET0          ret
+#define RET(sz) ret1 sz
+			      .macro ret1 size = 0x10 l32i a0,
+		      sp, 0 addi sp, sp, \size ret.endm
+#define RET0 ret
 #else
 /* Windowed */
-#define ENTRY(sz)     entry   sp, sz
-#define ENTRY0        entry   sp, 0x10
-#define RET(sz)       retw
-#define RET0          retw
+#define ENTRY(sz) entry sp, sz
+#define ENTRY0 entry sp, 0x10
+#define RET(sz) retw
+#define RET0 retw
 #endif /* __XTENSA_CALL0_ABI__ */
 #else /* __ASSEMBLER__ */
 #ifdef __cplusplus
 }
 #endif
 #endif /* __ASSEMBLER__ */
-
 
 #endif /* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_CONTEXT_H_ */

@@ -29,10 +29,10 @@ static void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
 void main(void)
 {
 	struct bt_le_scan_param scan_param = {
-		.type       = BT_HCI_LE_SCAN_PASSIVE,
-		.options    = BT_LE_SCAN_OPT_NONE,
-		.interval   = 0x0010,
-		.window     = 0x0010,
+		.type = BT_HCI_LE_SCAN_PASSIVE,
+		.options = BT_LE_SCAN_OPT_NONE,
+		.interval = 0x0010,
+		.window = 0x0010,
 	};
 	int err;
 
@@ -57,8 +57,8 @@ void main(void)
 		k_sleep(K_MSEC(400));
 
 		/* Start advertising */
-		err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad),
-				      NULL, 0);
+		err = bt_le_adv_start(BT_LE_ADV_NCONN, ad, ARRAY_SIZE(ad), NULL,
+				      0);
 		if (err) {
 			printk("Advertising failed to start (err %d)\n", err);
 			return;

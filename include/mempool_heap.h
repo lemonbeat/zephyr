@@ -42,14 +42,10 @@ struct k_mem_pool {
  * able to allocate the blocks promised and ones that make assumptions about
  * when memory will run out).
  */
-#define Z_MEM_POOL_DEFINE(name, minsz, maxsz, nmax, align)		\
-		K_HEAP_DEFINE(poolheap_##name,				\
-			      ((maxsz) * (nmax))			\
-			      + 8 * ((maxsz) * (nmax) / (minsz))	\
-			      + 15 * sizeof(void *));			\
-		struct k_mem_pool name = {				\
-			.heap = &poolheap_##name			\
-		}
-
+#define Z_MEM_POOL_DEFINE(name, minsz, maxsz, nmax, align)                    \
+	K_HEAP_DEFINE(poolheap_##name,                                        \
+		      ((maxsz) * (nmax)) + 8 * ((maxsz) * (nmax) / (minsz)) + \
+			      15 * sizeof(void *));                           \
+	struct k_mem_pool name = { .heap = &poolheap_##name }
 
 #endif /* ZEPHYR_INCLUDE_MEMPOOL_HEAP_H_ */

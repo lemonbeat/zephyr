@@ -28,7 +28,7 @@ LOG_MODULE_DECLARE(mpu);
 #endif
 
 #if DT_NODE_HAS_PROP(MPU_NODEID, arm_num_mpu_regions)
-#define NUM_MPU_REGIONS   DT_PROP(MPU_NODEID, arm_num_mpu_regions)
+#define NUM_MPU_REGIONS DT_PROP(MPU_NODEID, arm_num_mpu_regions)
 #endif
 
 /*
@@ -43,8 +43,7 @@ static uint8_t static_regions_num;
  */
 static inline uint8_t get_num_regions(void)
 {
-#if defined(CONFIG_CPU_CORTEX_M0PLUS) || \
-	defined(CONFIG_CPU_CORTEX_M3) || \
+#if defined(CONFIG_CPU_CORTEX_M0PLUS) || defined(CONFIG_CPU_CORTEX_M3) || \
 	defined(CONFIG_CPU_CORTEX_M4)
 	/* Cortex-M0+, Cortex-M3, and Cortex-M4 MCUs may
 	 * have a fixed number of 8 MPU regions.
@@ -64,24 +63,20 @@ static inline uint8_t get_num_regions(void)
 }
 
 /* Include architecture-specific internal headers. */
-#if defined(CONFIG_CPU_CORTEX_M0PLUS) || \
-	defined(CONFIG_CPU_CORTEX_M3) || \
-	defined(CONFIG_CPU_CORTEX_M4) || \
-	defined(CONFIG_CPU_CORTEX_M7)
+#if defined(CONFIG_CPU_CORTEX_M0PLUS) || defined(CONFIG_CPU_CORTEX_M3) || \
+	defined(CONFIG_CPU_CORTEX_M4) || defined(CONFIG_CPU_CORTEX_M7)
 #include "arm_mpu_v7_internal.h"
-#elif defined(CONFIG_CPU_CORTEX_M23) || \
-	defined(CONFIG_CPU_CORTEX_M33)
+#elif defined(CONFIG_CPU_CORTEX_M23) || defined(CONFIG_CPU_CORTEX_M33)
 #include "arm_mpu_v8_internal.h"
 #else
 #error "Unsupported ARM CPU"
 #endif
 
 static int region_allocate_and_init(const uint8_t index,
-	const struct arm_mpu_region *region_conf)
+				    const struct arm_mpu_region *region_conf)
 {
 	/* Attempt to allocate new region index. */
 	if (index > (get_num_regions() - 1U)) {
-
 		/* No available MPU region index. */
 		LOG_ERR("Failed to allocate new MPU region %u\n", index);
 		return -EINVAL;
@@ -99,7 +94,7 @@ static int region_allocate_and_init(const uint8_t index,
  * of a given configuration at a given MPU index.
  */
 static int mpu_configure_region(const uint8_t index,
-	const struct k_mem_partition *new_region)
+				const struct k_mem_partition *new_region)
 {
 	struct arm_mpu_region region_conf;
 
@@ -108,11 +103,13 @@ static int mpu_configure_region(const uint8_t index,
 	/* Populate internal ARM MPU region configuration structure. */
 	region_conf.base = new_region->start;
 	get_region_attr_from_k_mem_partition_info(&region_conf.attr,
-		&new_region->attr, new_region->start, new_region->size);
+						  &new_region->attr,
+						  new_region->start,
+						  new_region->size);
 
 	/* Allocate and program region */
-	return region_allocate_and_init(index,
-		(const struct arm_mpu_region *)&region_conf);
+	return region_allocate_and_init(
+		index, (const struct arm_mpu_region *)&region_conf);
 }
 
 #if !defined(CONFIG_MPU_REQUIRES_NON_OVERLAPPING_REGIONS) || \
@@ -121,9 +118,9 @@ static int mpu_configure_region(const uint8_t index,
  * over a background memory area, optionally performing a
  * sanity check of the memory regions to be programmed.
  */
-static int mpu_configure_regions(const struct k_mem_partition
-	*regions[], uint8_t regions_num, uint8_t start_reg_index,
-	bool do_sanity_check)
+static int mpu_configure_regions(const struct k_mem_partition *regions[],
+				 uint8_t regions_num, uint8_t start_reg_index,
+				 bool do_sanity_check)
 {
 	int i;
 	int reg_index = start_reg_index;
@@ -134,8 +131,7 @@ static int mpu_configure_regions(const struct k_mem_partition
 		}
 		/* Non-empty region. */
 
-		if (do_sanity_check &&
-				(!mpu_partition_is_valid(regions[i]))) {
+		if (do_sanity_check && (!mpu_partition_is_valid(regions[i]))) {
 			LOG_ERR("Partition %u: sanity check failed.", i);
 			return -EINVAL;
 		}
@@ -187,9 +183,8 @@ void arm_core_mpu_disable(void)
 /**
  * @brief update configuration of an active memory partition
  */
-void arm_core_mpu_mem_partition_config_update(
-	struct k_mem_partition *partition,
-	k_mem_partition_attr_t *new_attr)
+void arm_core_mpu_mem_partition_config_update(struct k_mem_partition *partition,
+					      k_mem_partition_attr_t *new_attr)
 {
 	/* Find the partition. ASSERT if not found. */
 	uint8_t i;
@@ -249,15 +244,16 @@ int arm_core_mpu_buffer_validate(void *addr, size_t size, int write)
 /**
  * @brief configure fixed (static) MPU regions.
  */
-void arm_core_mpu_configure_static_mpu_regions(const struct k_mem_partition
-	*static_regions[], const uint8_t regions_num,
-	const uint32_t background_area_start, const uint32_t background_area_end)
+void arm_core_mpu_configure_static_mpu_regions(
+	const struct k_mem_partition *static_regions[],
+	const uint8_t regions_num, const uint32_t background_area_start,
+	const uint32_t background_area_end)
 {
 	if (mpu_configure_static_mpu_regions(static_regions, regions_num,
-					       background_area_start, background_area_end) == -EINVAL) {
-
+					     background_area_start,
+					     background_area_end) == -EINVAL) {
 		__ASSERT(0, "Configuring %u static MPU regions failed\n",
-			regions_num);
+			 regions_num);
 	}
 }
 
@@ -269,11 +265,10 @@ void arm_core_mpu_mark_areas_for_dynamic_regions(
 	const struct k_mem_partition dyn_region_areas[],
 	const uint8_t dyn_region_areas_num)
 {
-	if (mpu_mark_areas_for_dynamic_regions(dyn_region_areas,
-						 dyn_region_areas_num) == -EINVAL) {
-
+	if (mpu_mark_areas_for_dynamic_regions(
+		    dyn_region_areas, dyn_region_areas_num) == -EINVAL) {
 		__ASSERT(0, "Marking %u areas for dynamic regions failed\n",
-			dyn_region_areas_num);
+			 dyn_region_areas_num);
 	}
 }
 #endif /* CONFIG_MPU_REQUIRES_NON_OVERLAPPING_REGIONS */
@@ -281,14 +276,13 @@ void arm_core_mpu_mark_areas_for_dynamic_regions(
 /**
  * @brief configure dynamic MPU regions.
  */
-void arm_core_mpu_configure_dynamic_mpu_regions(const struct k_mem_partition
-	*dynamic_regions[], uint8_t regions_num)
+void arm_core_mpu_configure_dynamic_mpu_regions(
+	const struct k_mem_partition *dynamic_regions[], uint8_t regions_num)
 {
-	if (mpu_configure_dynamic_mpu_regions(dynamic_regions, regions_num)
-		== -EINVAL) {
-
+	if (mpu_configure_dynamic_mpu_regions(dynamic_regions, regions_num) ==
+	    -EINVAL) {
 		__ASSERT(0, "Configuring %u dynamic MPU regions failed\n",
-			regions_num);
+			 regions_num);
 	}
 }
 
@@ -312,10 +306,8 @@ static int arm_mpu_init(const struct device *arg)
 		 * perform invalid configuration.
 		 */
 		__ASSERT(0,
-			"Request to configure: %u regions (supported: %u)\n",
-			mpu_config.num_regions,
-			get_num_regions()
-		);
+			 "Request to configure: %u regions (supported: %u)\n",
+			 mpu_config.num_regions, get_num_regions());
 		return -1;
 	}
 
@@ -338,24 +330,20 @@ static int arm_mpu_init(const struct device *arg)
 	/* Update the number of programmed MPU regions. */
 	static_regions_num = mpu_config.num_regions;
 
-
 	arm_core_mpu_enable();
 
 	/* Sanity check for number of regions in Cortex-M0+, M3, and M4. */
-#if defined(CONFIG_CPU_CORTEX_M0PLUS) || \
-	defined(CONFIG_CPU_CORTEX_M3) || \
+#if defined(CONFIG_CPU_CORTEX_M0PLUS) || defined(CONFIG_CPU_CORTEX_M3) || \
 	defined(CONFIG_CPU_CORTEX_M4)
-	__ASSERT(
-		(MPU->TYPE & MPU_TYPE_DREGION_Msk) >> MPU_TYPE_DREGION_Pos == 8,
-		"Invalid number of MPU regions\n");
+	__ASSERT((MPU->TYPE & MPU_TYPE_DREGION_Msk) >> MPU_TYPE_DREGION_Pos ==
+			 8,
+		 "Invalid number of MPU regions\n");
 #elif defined(NUM_MPU_REGIONS)
-	__ASSERT(
-		(MPU->TYPE & MPU_TYPE_DREGION_Msk) >> MPU_TYPE_DREGION_Pos ==
-		NUM_MPU_REGIONS,
-		"Invalid number of MPU regions\n");
+	__ASSERT((MPU->TYPE & MPU_TYPE_DREGION_Msk) >> MPU_TYPE_DREGION_Pos ==
+			 NUM_MPU_REGIONS,
+		 "Invalid number of MPU regions\n");
 #endif /* CORTEX_M0PLUS || CPU_CORTEX_M3 || CPU_CORTEX_M4 */
 	return 0;
 }
 
-SYS_INIT(arm_mpu_init, PRE_KERNEL_1,
-	 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+SYS_INIT(arm_mpu_init, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

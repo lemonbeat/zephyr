@@ -17,7 +17,7 @@
 LOG_MODULE_REGISTER(canopen_storage);
 
 /* 's', 'a', 'v', 'e' from LSB to MSB */
-#define STORE_PARAM_MAGIC   0x65766173UL
+#define STORE_PARAM_MAGIC 0x65766173UL
 
 /* 'l', 'o', 'a', 'd' from LSB to MSB */
 #define RESTORE_PARAM_MAGIC 0x64616F6CUL
@@ -92,7 +92,8 @@ static CO_SDO_abortCode_t canopen_odf_1011(CO_ODF_arg_t *odf_arg)
 		LOG_DBG("no object dictionary ROM entries to delete");
 	} else if (err) {
 		LOG_ERR("failed to delete object dictionary ROM entries"
-			" (err %d)", err);
+			" (err %d)",
+			err);
 		CO_errorReport(em, CO_EM_NON_VOLATILE_MEMORY, CO_EMC_HARDWARE,
 			       err);
 		failed = true;
@@ -106,7 +107,8 @@ static CO_SDO_abortCode_t canopen_odf_1011(CO_ODF_arg_t *odf_arg)
 		LOG_DBG("no object dictionary EEPROM entries to delete");
 	} else if (err) {
 		LOG_ERR("failed to delete object dictionary EEPROM entries"
-			" (err %d)", err);
+			" (err %d)",
+			err);
 		CO_errorReport(em, CO_EM_NON_VOLATILE_MEMORY, CO_EMC_HARDWARE,
 			       err);
 		failed = true;
@@ -137,7 +139,8 @@ static int canopen_settings_set(const char *key, size_t len_rd,
 		len = read_cb(cb_arg, &eeprom, sizeof(eeprom));
 		if (len < 0) {
 			LOG_ERR("failed to restore object dictionary EEPROM"
-				" entries (err %d)", len);
+				" entries (err %d)",
+				len);
 			canopen_storage_eeprom_error = len;
 		} else {
 			if ((eeprom.FirstWord == CO_OD_FIRST_LAST_WORD) &&
@@ -160,7 +163,8 @@ static int canopen_settings_set(const char *key, size_t len_rd,
 		len = read_cb(cb_arg, &rom, sizeof(rom));
 		if (len < 0) {
 			LOG_ERR("failed to restore object dictionary ROM"
-				" entries (err %d)", len);
+				" entries (err %d)",
+				len);
 			canopen_storage_rom_error = len;
 		} else {
 			if ((rom.FirstWord == CO_OD_FIRST_LAST_WORD) &&
@@ -181,15 +185,15 @@ static int canopen_settings_set(const char *key, size_t len_rd,
 	return 0;
 }
 
-SETTINGS_STATIC_HANDLER_DEFINE(canopen, "canopen", NULL,
-			       canopen_settings_set, NULL, NULL);
+SETTINGS_STATIC_HANDLER_DEFINE(canopen, "canopen", NULL, canopen_settings_set,
+			       NULL, NULL);
 
 void canopen_storage_attach(CO_SDO_t *sdo, CO_EM_t *em)
 {
-	CO_OD_configure(sdo, OD_H1010_STORE_PARAM_FUNC, canopen_odf_1010,
-			em, 0U, 0U);
-	CO_OD_configure(sdo, OD_H1011_REST_PARAM_FUNC, canopen_odf_1011,
-			em, 0U, 0U);
+	CO_OD_configure(sdo, OD_H1010_STORE_PARAM_FUNC, canopen_odf_1010, em,
+			0U, 0U);
+	CO_OD_configure(sdo, OD_H1011_REST_PARAM_FUNC, canopen_odf_1011, em, 0U,
+			0U);
 
 	if (canopen_storage_eeprom_error) {
 		CO_errorReport(em, CO_EM_NON_VOLATILE_MEMORY, CO_EMC_HARDWARE,

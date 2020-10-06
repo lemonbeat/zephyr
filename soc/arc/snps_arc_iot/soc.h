@@ -17,7 +17,7 @@
 #include <sys/util.h>
 
 /* default system clock */
-#define SYSCLK_DEFAULT_IOSC_HZ			MHZ(16)
+#define SYSCLK_DEFAULT_IOSC_HZ MHZ(16)
 
 /*
  * UART: use lr and sr to access subsystem uart IP
@@ -25,20 +25,17 @@
 #define UART_NS16550_ACCESS_IOPORT
 #define UART_REG_ADDR_INTERVAL 4
 
-
 /* ARC EM Core IRQs */
-#define IRQ_TIMER0				16
-#define IRQ_TIMER1				17
+#define IRQ_TIMER0 16
+#define IRQ_TIMER1 17
 #include "soc_irq.h"
 
-#define BASE_ADDR_SYSCONFIG		0xF000A000
+#define BASE_ADDR_SYSCONFIG 0xF000A000
 
 #ifndef _ASMLANGUAGE
 
-
 #include <sys/util.h>
 #include <random/rand32.h>
-
 
 #endif /* !_ASMLANGUAGE */
 

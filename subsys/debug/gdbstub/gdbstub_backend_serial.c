@@ -22,8 +22,8 @@ int z_gdb_backend_init(void)
 	};
 
 	if (uart_dev == NULL) {
-		uart_dev = device_get_binding(
-			CONFIG_GDBSTUB_SERIAL_BACKEND_NAME);
+		uart_dev =
+			device_get_binding(CONFIG_GDBSTUB_SERIAL_BACKEND_NAME);
 
 		__ASSERT(uart_dev != NULL, "Could not get uart device");
 

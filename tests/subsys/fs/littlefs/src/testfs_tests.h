@@ -5,7 +5,7 @@
  */
 
 #ifndef _ZEPHYR_TESTS_SUBSYS_FS_LITTLEFS_TESTFS_TESTS_H_
-#define  _ZEPHYR_TESTS_SUBSYS_FS_LITTLEFS_TESTFS_TESTS_H_
+#define _ZEPHYR_TESTS_SUBSYS_FS_LITTLEFS_TESTFS_TESTS_H_
 
 /* Tests in test_util */
 void test_util_path_init_base(void);

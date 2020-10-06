@@ -45,7 +45,8 @@ static int send_udp_data(struct data *data)
 	return ret < 0 ? -EIO : 0;
 }
 
-static int compare_udp_data(struct data *data, const char *buf, uint32_t received)
+static int compare_udp_data(struct data *data, const char *buf,
+			    uint32_t received)
 {
 	if (received != data->udp.expecting) {
 		LOG_ERR("Invalid amount of data received: UDP %s", data->proto);
@@ -137,8 +138,8 @@ static int process_udp_proto(struct data *data)
 {
 	int ret, received;
 
-	received = recv(data->udp.sock, recv_buf, sizeof(recv_buf),
-			MSG_DONTWAIT);
+	received =
+		recv(data->udp.sock, recv_buf, sizeof(recv_buf), MSG_DONTWAIT);
 
 	if (received == 0) {
 		return -EIO;
@@ -155,13 +156,14 @@ static int process_udp_proto(struct data *data)
 	ret = compare_udp_data(data, recv_buf, received);
 	if (ret != 0) {
 		LOG_WRN("%s UDP: Received and compared %d bytes, data "
-			"mismatch", data->proto, received);
+			"mismatch",
+			data->proto, received);
 		return 0;
 	}
 
 	/* Correct response received */
-	LOG_DBG("%s UDP: Received and compared %d bytes, all ok",
-		data->proto, received);
+	LOG_DBG("%s UDP: Received and compared %d bytes, all ok", data->proto,
+		received);
 
 	if (++data->udp.counter % 1000 == 0U) {
 		LOG_INF("%s UDP: Exchanged %u packets", data->proto,

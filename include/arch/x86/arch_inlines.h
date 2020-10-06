@@ -20,8 +20,8 @@ static inline struct _cpu *arch_curr_cpu(void)
 	struct _cpu *cpu;
 
 	__asm__ volatile("movq %%gs:(%c1), %0"
-			 : "=r" (cpu)
-			 : "i" (offsetof(x86_tss64_t, cpu)));
+			 : "=r"(cpu)
+			 : "i"(offsetof(x86_tss64_t, cpu)));
 
 	return cpu;
 }

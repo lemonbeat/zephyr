@@ -15,7 +15,7 @@
 #include "master.h"
 
 /* type defines. */
-struct getinfo{
+struct getinfo {
 	int count;
 	unsigned int time;
 	int size;

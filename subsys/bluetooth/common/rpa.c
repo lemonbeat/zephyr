@@ -38,12 +38,13 @@ static int internal_rand(void *buf, size_t len)
 }
 #endif /* defined(CONFIG_BT_PRIVACY) || defined(CONFIG_BT_CTLR_PRIVACY) */
 
-static int internal_encrypt_le(const uint8_t key[16], const uint8_t plaintext[16],
+static int internal_encrypt_le(const uint8_t key[16],
+			       const uint8_t plaintext[16],
 			       uint8_t enc_data[16])
 {
 /* Force using controller encrypt function if supported. */
 #if defined(CONFIG_BT_CTLR) && defined(CONFIG_BT_HOST_CRYPTO) && \
-    defined(CONFIG_BT_CTLR_LE_ENC)
+	defined(CONFIG_BT_CTLR_LE_ENC)
 	ecb_encrypt(key, plaintext, enc_data, NULL);
 	return 0;
 #else

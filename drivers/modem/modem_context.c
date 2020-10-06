@@ -25,13 +25,13 @@ char *modem_context_sprint_ip_addr(const struct sockaddr *addr)
 	static char buf[NET_IPV6_ADDR_LEN];
 
 	if (addr->sa_family == AF_INET6) {
-		return net_addr_ntop(AF_INET6, &net_sin6(addr)->sin6_addr,
-				     buf, sizeof(buf));
+		return net_addr_ntop(AF_INET6, &net_sin6(addr)->sin6_addr, buf,
+				     sizeof(buf));
 	}
 
 	if (addr->sa_family == AF_INET) {
-		return net_addr_ntop(AF_INET, &net_sin(addr)->sin_addr,
-				     buf, sizeof(buf));
+		return net_addr_ntop(AF_INET, &net_sin(addr)->sin_addr, buf,
+				     sizeof(buf));
 	}
 
 	LOG_ERR("Unknown IP address family:%d", addr->sa_family);

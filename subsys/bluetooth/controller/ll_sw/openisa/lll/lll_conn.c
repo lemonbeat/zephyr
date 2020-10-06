@@ -40,7 +40,7 @@ static int isr_rx_pdu(struct lll_conn *lll, struct pdu_data *pdu_data_rx,
 		      struct node_tx **tx_release, uint8_t *is_rx_enqueue);
 static struct pdu_data *empty_tx_enqueue(struct lll_conn *lll);
 
-static uint16_t const sca_ppm_lut[] = {500, 250, 150, 100, 75, 50, 30, 20};
+static uint16_t const sca_ppm_lut[] = { 500, 250, 150, 100, 75, 50, 30, 20 };
 static uint8_t crc_expire;
 static uint8_t crc_valid;
 static uint16_t trx_cnt;
@@ -157,8 +157,7 @@ void lll_conn_isr_rx(void *param)
 	radio_tmr_status_reset();
 	radio_rssi_status_reset();
 
-#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || \
-	defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
+#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 	radio_gpio_pa_lna_disable();
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
 
@@ -213,7 +212,7 @@ void lll_conn_isr_rx(void *param)
 
 		if (0) {
 #if defined(CONFIG_BT_CENTRAL)
-		/* Event done for master */
+			/* Event done for master */
 		} else if (!lll->role) {
 			radio_disable();
 
@@ -228,7 +227,7 @@ void lll_conn_isr_rx(void *param)
 			goto lll_conn_isr_rx_exit;
 #endif /* CONFIG_BT_CENTRAL */
 #if defined(CONFIG_BT_PERIPHERAL)
-		/* Event done for slave */
+			/* Event done for slave */
 		} else {
 			radio_switch_complete_and_disable();
 #endif /* CONFIG_BT_PERIPHERAL */
@@ -347,8 +346,7 @@ void lll_conn_isr_tx(void *param)
 	radio_status_reset();
 	radio_tmr_status_reset();
 
-#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || \
-	defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
+#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 	radio_gpio_pa_lna_disable();
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
 	/* TODO: MOVE ^^ */
@@ -356,8 +354,7 @@ void lll_conn_isr_tx(void *param)
 	/* setup tIFS switching */
 	radio_tmr_tifs_set(EVENT_IFS_US);
 #if defined(CONFIG_BT_CTLR_PHY)
-	radio_switch_complete_and_tx(lll->phy_rx, 0,
-				     lll->phy_tx,
+	radio_switch_complete_and_tx(lll->phy_rx, 0, lll->phy_tx,
 				     lll->phy_flags);
 #else /* !CONFIG_BT_CTLR_PHY */
 	radio_switch_complete_and_tx(0, 0, 0, 0);
@@ -369,8 +366,8 @@ void lll_conn_isr_tx(void *param)
 	LL_ASSERT(!radio_is_ready());
 
 	/* +/- 2us active clock jitter, +1 us hcto compensation */
-	hcto = radio_tmr_tifs_base_get() + EVENT_IFS_US + 4 +
-		RANGE_DELAY_US + 1;
+	hcto = radio_tmr_tifs_base_get() + EVENT_IFS_US + 4 + RANGE_DELAY_US +
+	       1;
 #if defined(CONFIG_BT_CTLR_PHY)
 	hcto += radio_rx_chain_delay_get(lll->phy_rx, 1);
 	hcto += addr_us_get(lll->phy_rx);
@@ -389,18 +386,17 @@ void lll_conn_isr_tx(void *param)
 	}
 #endif /* CONFIG_BT_CENTRAL && CONFIG_BT_CTLR_CONN_RSSI */
 
-#if defined(CONFIG_BT_CTLR_PROFILE_ISR) || \
-	defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
+#if defined(CONFIG_BT_CTLR_PROFILE_ISR) || defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
 	radio_tmr_end_capture();
 #endif /* CONFIG_BT_CTLR_PROFILE_ISR */
 
 #if defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 	radio_gpio_lna_setup();
 #if defined(CONFIG_BT_CTLR_PHY)
-	radio_gpio_pa_lna_enable(radio_tmr_tifs_base_get() + EVENT_IFS_US - 4 -
-				 radio_tx_chain_delay_get(lll->phy_tx,
-							  lll->phy_flags) -
-				 CONFIG_BT_CTLR_GPIO_LNA_OFFSET);
+	radio_gpio_pa_lna_enable(
+		radio_tmr_tifs_base_get() + EVENT_IFS_US - 4 -
+		radio_tx_chain_delay_get(lll->phy_tx, lll->phy_flags) -
+		CONFIG_BT_CTLR_GPIO_LNA_OFFSET);
 #else /* !CONFIG_BT_CTLR_PHY */
 	radio_gpio_pa_lna_enable(radio_tmr_tifs_base_get() + EVENT_IFS_US - 4 -
 				 radio_tx_chain_delay_get(0, 0) -
@@ -456,8 +452,8 @@ void lll_conn_rx_pkt_set(struct lll_conn *lll)
 	} else if (lll->enc_rx) {
 		radio_pkt_configure(8, (max_rx_octets + 4), (phy << 1) | 0x01);
 
-		radio_pkt_rx_set(radio_ccm_rx_pkt_set(&lll->ccm_rx, phy,
-						      node_rx->pdu));
+		radio_pkt_rx_set(
+			radio_ccm_rx_pkt_set(&lll->ccm_rx, phy, node_rx->pdu));
 #endif /* CONFIG_BT_CTLR_LE_ENC */
 	} else {
 		radio_pkt_configure(8, max_rx_octets, (phy << 1) | 0x01);
@@ -490,11 +486,10 @@ void lll_conn_tx_pkt_set(struct lll_conn *lll, struct pdu_data *pdu_data_tx)
 	if (0) {
 #if defined(CONFIG_BT_CTLR_LE_ENC)
 	} else if (lll->enc_tx) {
-		radio_pkt_configure(8, (max_tx_octets + 4U),
-				    (phy << 1) | 0x01);
+		radio_pkt_configure(8, (max_tx_octets + 4U), (phy << 1) | 0x01);
 
-		radio_pkt_tx_set(radio_ccm_tx_pkt_set(&lll->ccm_tx,
-						      pdu_data_tx));
+		radio_pkt_tx_set(
+			radio_ccm_tx_pkt_set(&lll->ccm_tx, pdu_data_tx));
 #endif /* CONFIG_BT_CTLR_LE_ENC */
 	} else {
 		radio_pkt_configure(8, max_tx_octets, (phy << 1) | 0x01);
@@ -511,13 +506,13 @@ void lll_conn_pdu_tx_prep(struct lll_conn *lll, struct pdu_data **pdu_data_tx)
 
 	if (lll->empty
 #if defined(CONFIG_BT_CTLR_LE_ENC)
-			|| (lll->enc_tx && !radio_ccm_is_available())
-			/* TODO: If CAUv3 is already used by the RX decrypt,
+	    || (lll->enc_tx && !radio_ccm_is_available())
+	/* TODO: If CAUv3 is already used by the RX decrypt,
 			 * there is no time to use it for TX if the link
 			 * needs it, thus stall and send an empty packet w/ MD.
 			 */
 #endif
-			) {
+	) {
 		*pdu_data_tx = empty_tx_enqueue(lll);
 		return;
 	}
@@ -581,8 +576,7 @@ static void isr_done(void *param)
 	radio_ar_status_reset();
 	radio_rssi_status_reset();
 
-#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || \
-	defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
+#if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 	radio_gpio_pa_lna_disable();
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
 	/* TODO: MOVE ^^ */
@@ -606,11 +600,9 @@ static void isr_done(void *param)
 			uint32_t preamble_to_addr_us;
 
 #if defined(CONFIG_BT_CTLR_PHY)
-			preamble_to_addr_us =
-				addr_us_get(lll->phy_rx);
+			preamble_to_addr_us = addr_us_get(lll->phy_rx);
 #else /* !CONFIG_BT_CTLR_PHY */
-			preamble_to_addr_us =
-				addr_us_get(0);
+			preamble_to_addr_us = addr_us_get(0);
 #endif /* !CONFIG_BT_CTLR_PHY */
 
 			e->slave.start_to_address_actual_us =
@@ -652,7 +644,6 @@ static inline bool ctrl_pdu_len_check(uint8_t len)
 {
 	return len <= (offsetof(struct pdu_data, llctrl) +
 		       sizeof(struct pdu_data_llctrl));
-
 }
 
 static int isr_rx_pdu(struct lll_conn *lll, struct pdu_data *pdu_data_rx,
@@ -688,8 +679,8 @@ static int isr_rx_pdu(struct lll_conn *lll, struct pdu_data *pdu_data_rx,
 			uint8_t pdu_data_tx_len;
 			uint8_t offset;
 
-			pdu_data_tx = (void *)(tx->pdu +
-					       lll->packet_tx_head_offset);
+			pdu_data_tx =
+				(void *)(tx->pdu + lll->packet_tx_head_offset);
 
 			pdu_data_tx_len = pdu_data_tx->len;
 #if defined(CONFIG_BT_CTLR_LE_ENC)
@@ -743,8 +734,7 @@ static int isr_rx_pdu(struct lll_conn *lll, struct pdu_data *pdu_data_rx,
 
 				bool mic_failure = !radio_ccm_mic_is_valid();
 
-				if (mic_failure &&
-				    lll->ccm_rx.counter == 0 &&
+				if (mic_failure && lll->ccm_rx.counter == 0 &&
 				    (pdu_data_rx->ll_id ==
 				     PDU_DATA_LLID_CTRL)) {
 					/* Received an LL control packet in the
@@ -756,12 +746,12 @@ static int isr_rx_pdu(struct lll_conn *lll, struct pdu_data *pdu_data_rx,
 						radio_pkt_scratch_get();
 
 					if (ctrl_pdu_len_check(
-						scratch_pkt->len)) {
-						memcpy(pdu_data_rx,
-						       scratch_pkt,
+						    scratch_pkt->len)) {
+						memcpy(pdu_data_rx, scratch_pkt,
 						       scratch_pkt->len +
-						       offsetof(struct pdu_data,
-							llctrl));
+							       offsetof(
+								       struct pdu_data,
+								       llctrl));
 						mic_failure = false;
 						lll->ccm_rx.counter--;
 					}

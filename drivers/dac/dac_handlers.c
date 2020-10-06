@@ -8,8 +8,9 @@
 #include <syscall_handler.h>
 #include <kernel.h>
 
-static inline int z_vrfy_dac_channel_setup(const struct device *dev,
-					   const struct dac_channel_cfg *user_channel_cfg)
+static inline int
+z_vrfy_dac_channel_setup(const struct device *dev,
+			 const struct dac_channel_cfg *user_channel_cfg)
 {
 	struct dac_channel_cfg channel_cfg;
 

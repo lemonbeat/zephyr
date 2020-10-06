@@ -84,7 +84,7 @@ int bt_hci_raw_set_mode(uint8_t mode);
  */
 uint8_t bt_hci_raw_get_mode(void);
 
-#define BT_HCI_ERR_EXT_HANDLED  0xff
+#define BT_HCI_ERR_EXT_HANDLED 0xff
 
 /** Helper macro to define a command extension
  *
@@ -92,16 +92,14 @@ uint8_t bt_hci_raw_get_mode(void);
  *  @param _min_len Minimal length of the command.
  *  @param _func Handler function to be called.
  */
-#define BT_HCI_RAW_CMD_EXT(_op, _min_len, _func) \
-	{ \
-		.op = _op, \
-		.min_len = _min_len, \
-		.func = _func, \
+#define BT_HCI_RAW_CMD_EXT(_op, _min_len, _func)               \
+	{                                                      \
+		.op = _op, .min_len = _min_len, .func = _func, \
 	}
 
 struct bt_hci_raw_cmd_ext {
 	/** Opcode of the command */
-	uint16_t  op;
+	uint16_t op;
 
 	/** Minimal length of the command */
 	size_t min_len;
@@ -117,7 +115,7 @@ struct bt_hci_raw_cmd_ext {
 	 *  BT_HCI_ERR_SUCCESS which just indicates that the command can be
 	 *  sent to the controller to be processed.
 	 */
-	uint8_t   (*func)(struct net_buf *buf);
+	uint8_t (*func)(struct net_buf *buf);
 };
 
 /** @brief Register Bluetooth RAW command extension table

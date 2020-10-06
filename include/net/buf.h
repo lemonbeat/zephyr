@@ -43,13 +43,13 @@ extern "C" {
  *  @param _name Name of the net_buf_simple object.
  *  @param _size Maximum data storage for the buffer.
  */
-#define NET_BUF_SIMPLE_DEFINE(_name, _size)     \
-	uint8_t net_buf_data_##_name[_size];       \
-	struct net_buf_simple _name = {         \
-		.data   = net_buf_data_##_name, \
-		.len    = 0,                    \
-		.size   = _size,                \
-		.__buf  = net_buf_data_##_name, \
+#define NET_BUF_SIMPLE_DEFINE(_name, _size)    \
+	uint8_t net_buf_data_##_name[_size];   \
+	struct net_buf_simple _name = {        \
+		.data = net_buf_data_##_name,  \
+		.len = 0,                      \
+		.size = _size,                 \
+		.__buf = net_buf_data_##_name, \
 	}
 
 /**
@@ -62,13 +62,13 @@ extern "C" {
  * @param _name Name of the net_buf_simple object.
  * @param _size Maximum data storage for the buffer.
  */
-#define NET_BUF_SIMPLE_DEFINE_STATIC(_name, _size)        \
+#define NET_BUF_SIMPLE_DEFINE_STATIC(_name, _size)           \
 	static __noinit uint8_t net_buf_data_##_name[_size]; \
-	static struct net_buf_simple _name = {            \
-		.data   = net_buf_data_##_name,           \
-		.len    = 0,                              \
-		.size   = _size,                          \
-		.__buf  = net_buf_data_##_name,           \
+	static struct net_buf_simple _name = {               \
+		.data = net_buf_data_##_name,                \
+		.len = 0,                                    \
+		.size = _size,                               \
+		.__buf = net_buf_data_##_name,               \
 	}
 
 /**
@@ -116,12 +116,12 @@ struct net_buf_simple {
  *
  * @return Pointer to stack-allocated net_buf_simple object.
  */
-#define NET_BUF_SIMPLE(_size)                        \
-	((struct net_buf_simple *)(&(struct {        \
-		struct net_buf_simple buf;           \
-		uint8_t data[_size];                 \
-	}) {                                         \
-		.buf.size = _size,                   \
+#define NET_BUF_SIMPLE(_size)                 \
+	((struct net_buf_simple *)(&(struct { \
+		struct net_buf_simple buf;    \
+		uint8_t data[_size];          \
+	}){                                   \
+		.buf.size = _size,            \
 	}))
 
 /**
@@ -153,8 +153,8 @@ static inline void net_buf_simple_init(struct net_buf_simple *buf,
  * @param data External data pointer
  * @param size Amount of data the pointed data buffer if able to fit.
  */
-void net_buf_simple_init_with_data(struct net_buf_simple *buf,
-				   void *data, size_t size);
+void net_buf_simple_init_with_data(struct net_buf_simple *buf, void *data,
+				   size_t size);
 
 /**
  * @brief Reset buffer
@@ -165,7 +165,7 @@ void net_buf_simple_init_with_data(struct net_buf_simple *buf,
  */
 static inline void net_buf_simple_reset(struct net_buf_simple *buf)
 {
-	buf->len  = 0U;
+	buf->len = 0U;
 	buf->data = buf->__buf;
 }
 
@@ -723,7 +723,7 @@ static inline void net_buf_simple_restore(struct net_buf_simple *buf,
  * in practice always for the user for this API, the buf->frags pointer
  * should be used instead.
  */
-#define NET_BUF_FRAGS        BIT(0)
+#define NET_BUF_FRAGS BIT(0)
 /**
  * Flag indicating that the buffer's associated data pointer, points to
  * externally allocated memory. Therefore once ref goes down to zero, the
@@ -733,7 +733,7 @@ static inline void net_buf_simple_restore(struct net_buf_simple *buf,
  * Reference count mechanism however will behave the same way, and ref
  * count going to 0 will free the net_buf but no the data pointer in it.
  */
-#define NET_BUF_EXTERNAL_DATA  BIT(1)
+#define NET_BUF_EXTERNAL_DATA BIT(1)
 
 /**
  * @brief Network buffer representation.
@@ -790,10 +790,10 @@ struct net_buf {
 };
 
 struct net_buf_data_cb {
-	uint8_t * (*alloc)(struct net_buf *buf, size_t *size,
-			   k_timeout_t timeout);
-	uint8_t * (*ref)(struct net_buf *buf, uint8_t *data);
-	void   (*unref)(struct net_buf *buf, uint8_t *data);
+	uint8_t *(*alloc)(struct net_buf *buf, size_t *size,
+			  k_timeout_t timeout);
+	uint8_t *(*ref)(struct net_buf *buf, uint8_t *data);
+	void (*unref)(struct net_buf *buf, uint8_t *data);
 };
 
 struct net_buf_data_alloc {
@@ -834,31 +834,24 @@ struct net_buf_pool {
 	const struct net_buf_data_alloc *alloc;
 
 	/** Start of buffer storage array */
-	struct net_buf * const __bufs;
+	struct net_buf *const __bufs;
 };
 
 /** @cond INTERNAL_HIDDEN */
 #if defined(CONFIG_NET_BUF_POOL_USAGE)
-#define NET_BUF_POOL_INITIALIZER(_pool, _alloc, _bufs, _count, _destroy) \
-	{                                                                    \
-		.free = Z_LIFO_INITIALIZER(_pool.free),                      \
-		.buf_count = _count,                                         \
-		.uninit_count = _count,                                      \
-		.avail_count = _count,                                       \
-		.name = STRINGIFY(_pool),                                    \
-		.destroy = _destroy,                                         \
-		.alloc = _alloc,                                             \
-		.__bufs = _bufs,                                             \
-	}
-#else
 #define NET_BUF_POOL_INITIALIZER(_pool, _alloc, _bufs, _count, _destroy)     \
 	{                                                                    \
-		.free = Z_LIFO_INITIALIZER(_pool.free),                      \
-		.buf_count = _count,                                         \
-		.uninit_count = _count,                                      \
-		.destroy = _destroy,                                         \
-		.alloc = _alloc,                                             \
-		.__bufs = _bufs,                                             \
+		.free = Z_LIFO_INITIALIZER(_pool.free), .buf_count = _count, \
+		.uninit_count = _count, .avail_count = _count,               \
+		.name = STRINGIFY(_pool), .destroy = _destroy,               \
+		.alloc = _alloc, .__bufs = _bufs,                            \
+	}
+#else
+#define NET_BUF_POOL_INITIALIZER(_pool, _alloc, _bufs, _count, _destroy)      \
+	{                                                                     \
+		.free = Z_LIFO_INITIALIZER(_pool.free), .buf_count = _count,  \
+		.uninit_count = _count, .destroy = _destroy, .alloc = _alloc, \
+		.__bufs = _bufs,                                              \
 	}
 #endif /* CONFIG_NET_BUF_POOL_USAGE */
 
@@ -891,11 +884,11 @@ extern const struct net_buf_data_alloc net_buf_heap_alloc;
  * @param _count     Number of buffers in the pool.
  * @param _destroy   Optional destroy callback when buffer is freed.
  */
-#define NET_BUF_POOL_HEAP_DEFINE(_name, _count, _destroy)                     \
-	static struct net_buf net_buf_##_name[_count] __noinit;               \
-	static struct net_buf_pool _name __net_buf_align                      \
-			__in_section(_net_buf_pool, static, _name) =          \
-		NET_BUF_POOL_INITIALIZER(_name, &net_buf_heap_alloc,          \
+#define NET_BUF_POOL_HEAP_DEFINE(_name, _count, _destroy)              \
+	static struct net_buf net_buf_##_name[_count] __noinit;        \
+	static struct net_buf_pool _name __net_buf_align __in_section( \
+		_net_buf_pool, static, _name) =                        \
+		NET_BUF_POOL_INITIALIZER(_name, &net_buf_heap_alloc,   \
 					 net_buf_##_name, _count, _destroy)
 
 struct net_buf_pool_fixed {
@@ -934,20 +927,20 @@ extern const struct net_buf_data_cb net_buf_fixed_cb;
  * @param _data_size Maximum data payload per buffer.
  * @param _destroy   Optional destroy callback when buffer is freed.
  */
-#define NET_BUF_POOL_FIXED_DEFINE(_name, _count, _data_size, _destroy)        \
-	static struct net_buf net_buf_##_name[_count] __noinit;               \
-	static uint8_t __noinit net_buf_data_##_name[_count][_data_size];     \
-	static const struct net_buf_pool_fixed net_buf_fixed_##_name = {      \
-		.data_size = _data_size,                                      \
-		.data_pool = (uint8_t *)net_buf_data_##_name,                 \
-	};                                                                    \
-	static const struct net_buf_data_alloc net_buf_fixed_alloc_##_name = {\
-		.cb = &net_buf_fixed_cb,                                      \
-		.alloc_data = (void *)&net_buf_fixed_##_name,                 \
-	};                                                                    \
-	static struct net_buf_pool _name __net_buf_align                      \
-			__in_section(_net_buf_pool, static, _name) =          \
-		NET_BUF_POOL_INITIALIZER(_name, &net_buf_fixed_alloc_##_name, \
+#define NET_BUF_POOL_FIXED_DEFINE(_name, _count, _data_size, _destroy)         \
+	static struct net_buf net_buf_##_name[_count] __noinit;                \
+	static uint8_t __noinit net_buf_data_##_name[_count][_data_size];      \
+	static const struct net_buf_pool_fixed net_buf_fixed_##_name = {       \
+		.data_size = _data_size,                                       \
+		.data_pool = (uint8_t *)net_buf_data_##_name,                  \
+	};                                                                     \
+	static const struct net_buf_data_alloc net_buf_fixed_alloc_##_name = { \
+		.cb = &net_buf_fixed_cb,                                       \
+		.alloc_data = (void *)&net_buf_fixed_##_name,                  \
+	};                                                                     \
+	static struct net_buf_pool _name __net_buf_align __in_section(         \
+		_net_buf_pool, static, _name) =                                \
+		NET_BUF_POOL_INITIALIZER(_name, &net_buf_fixed_alloc_##_name,  \
 					 net_buf_##_name, _count, _destroy)
 
 /** @cond INTERNAL_HIDDEN */
@@ -984,8 +977,8 @@ extern const struct net_buf_data_cb net_buf_var_cb;
 		.cb = &net_buf_var_cb,                                        \
 		.alloc_data = &net_buf_mem_pool_##_name,                      \
 	};                                                                    \
-	static struct net_buf_pool _name __net_buf_align                      \
-			__in_section(_net_buf_pool, static, _name) =          \
+	static struct net_buf_pool _name __net_buf_align __in_section(        \
+		_net_buf_pool, static, _name) =                               \
 		NET_BUF_POOL_INITIALIZER(_name, &net_buf_data_alloc_##_name,  \
 					 _net_buf_##_name, _count, _destroy)
 
@@ -1010,8 +1003,8 @@ extern const struct net_buf_data_cb net_buf_var_cb;
  * @param _ud_size  Amount of user data space to reserve.
  * @param _destroy  Optional destroy callback when buffer is freed.
  */
-#define NET_BUF_POOL_DEFINE(_name, _count, _size, _ud_size, _destroy)        \
-	BUILD_ASSERT(_ud_size <= CONFIG_NET_BUF_USER_DATA_SIZE);             \
+#define NET_BUF_POOL_DEFINE(_name, _count, _size, _ud_size, _destroy) \
+	BUILD_ASSERT(_ud_size <= CONFIG_NET_BUF_USER_DATA_SIZE);      \
 	NET_BUF_POOL_FIXED_DEFINE(_name, _count, _size, _destroy)
 
 /**
@@ -1119,13 +1112,12 @@ struct net_buf *net_buf_alloc_with_data_debug(struct net_buf_pool *pool,
 					      void *data, size_t size,
 					      k_timeout_t timeout,
 					      const char *func, int line);
-#define net_buf_alloc_with_data(_pool, _data_, _size, _timeout)		\
-	net_buf_alloc_with_data_debug(_pool, _data_, _size, _timeout,	\
+#define net_buf_alloc_with_data(_pool, _data_, _size, _timeout)       \
+	net_buf_alloc_with_data_debug(_pool, _data_, _size, _timeout, \
 				      __func__, __LINE__)
 #else
-struct net_buf *net_buf_alloc_with_data(struct net_buf_pool *pool,
-					void *data, size_t size,
-					k_timeout_t timeout);
+struct net_buf *net_buf_alloc_with_data(struct net_buf_pool *pool, void *data,
+					size_t size, k_timeout_t timeout);
 #endif
 
 /**
@@ -1141,7 +1133,7 @@ struct net_buf *net_buf_alloc_with_data(struct net_buf_pool *pool,
 #if defined(CONFIG_NET_BUF_LOG)
 struct net_buf *net_buf_get_debug(struct k_fifo *fifo, k_timeout_t timeout,
 				  const char *func, int line);
-#define	net_buf_get(_fifo, _timeout) \
+#define net_buf_get(_fifo, _timeout) \
 	net_buf_get_debug(_fifo, _timeout, __func__, __LINE__)
 #else
 struct net_buf *net_buf_get(struct k_fifo *fifo, k_timeout_t timeout);
@@ -1225,8 +1217,7 @@ void net_buf_put(struct k_fifo *fifo, struct net_buf *buf);
  */
 #if defined(CONFIG_NET_BUF_LOG)
 void net_buf_unref_debug(struct net_buf *buf, const char *func, int line);
-#define	net_buf_unref(_buf) \
-	net_buf_unref_debug(_buf, __func__, __LINE__)
+#define net_buf_unref(_buf) net_buf_unref_debug(_buf, __func__, __LINE__)
 #else
 void net_buf_unref(struct net_buf *buf);
 #endif
@@ -1276,8 +1267,7 @@ static inline void *net_buf_user_data(const struct net_buf *buf)
  * @param buf Buffer to initialize.
  * @param reserve How much headroom to reserve.
  */
-#define net_buf_reserve(buf, reserve) net_buf_simple_reserve(&(buf)->b, \
-							     reserve)
+#define net_buf_reserve(buf, reserve) net_buf_simple_reserve(&(buf)->b, reserve)
 
 /**
  * @def net_buf_add
@@ -1306,8 +1296,8 @@ static inline void *net_buf_user_data(const struct net_buf *buf)
  *
  * @return The original tail of the buffer.
  */
-#define net_buf_add_mem(buf, mem, len) net_buf_simple_add_mem(&(buf)->b, \
-							      mem, len)
+#define net_buf_add_mem(buf, mem, len) \
+	net_buf_simple_add_mem(&(buf)->b, mem, len)
 
 /**
  * @def net_buf_add_u8
@@ -1852,8 +1842,8 @@ struct net_buf *net_buf_frag_add(struct net_buf *head, struct net_buf *frag);
  */
 #if defined(CONFIG_NET_BUF_LOG)
 struct net_buf *net_buf_frag_del_debug(struct net_buf *parent,
-				       struct net_buf *frag,
-				       const char *func, int line);
+				       struct net_buf *frag, const char *func,
+				       int line);
 #define net_buf_frag_del(_parent, _frag) \
 	net_buf_frag_del_debug(_parent, _frag, __func__, __LINE__)
 #else
@@ -1875,8 +1865,8 @@ struct net_buf *net_buf_frag_del(struct net_buf *parent, struct net_buf *frag);
  * @param len Number of bytes to copy
  * @return number of bytes actually copied
  */
-size_t net_buf_linearize(void *dst, size_t dst_len,
-			 struct net_buf *src, size_t offset, size_t len);
+size_t net_buf_linearize(void *dst, size_t dst_len, struct net_buf *src,
+			 size_t offset, size_t len);
 
 /**
  * @typedef net_buf_allocator_cb
@@ -1915,8 +1905,8 @@ typedef struct net_buf *(*net_buf_allocator_cb)(k_timeout_t timeout,
  *         length if other timeout than K_FOREVER was used, and there
  *         were no free fragments in a pool to accommodate all data.
  */
-size_t net_buf_append_bytes(struct net_buf *buf, size_t len,
-			    const void *value, k_timeout_t timeout,
+size_t net_buf_append_bytes(struct net_buf *buf, size_t len, const void *value,
+			    k_timeout_t timeout,
 			    net_buf_allocator_cb allocate_cb, void *user_data);
 
 /**

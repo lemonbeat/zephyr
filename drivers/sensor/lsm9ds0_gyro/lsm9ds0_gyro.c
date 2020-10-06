@@ -35,9 +35,9 @@ static inline int lsm9ds0_gyro_power_ctrl(const struct device *dev, int power,
 	return i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				   LSM9DS0_GYRO_REG_CTRL_REG1_G,
 				   LSM9DS0_GYRO_MASK_CTRL_REG1_G_PD |
-				   LSM9DS0_GYRO_MASK_CTRL_REG1_G_XEN |
-				   LSM9DS0_GYRO_MASK_CTRL_REG1_G_YEN |
-				   LSM9DS0_GYRO_MASK_CTRL_REG1_G_ZEN,
+					   LSM9DS0_GYRO_MASK_CTRL_REG1_G_XEN |
+					   LSM9DS0_GYRO_MASK_CTRL_REG1_G_YEN |
+					   LSM9DS0_GYRO_MASK_CTRL_REG1_G_ZEN,
 				   state);
 }
 
@@ -64,9 +64,7 @@ static int lsm9ds0_gyro_set_fs_raw(const struct device *dev, uint8_t fs)
 static const struct {
 	int fs;
 	uint8_t reg_val;
-} lsm9ds0_gyro_fs_table[] = { {245, 0},
-			      {500, 1},
-			      {2000, 2} };
+} lsm9ds0_gyro_fs_table[] = { { 245, 0 }, { 500, 1 }, { 2000, 2 } };
 
 static int lsm9ds0_gyro_set_fs(const struct device *dev, int fs)
 {
@@ -74,7 +72,8 @@ static int lsm9ds0_gyro_set_fs(const struct device *dev, int fs)
 
 	for (i = 0; i < ARRAY_SIZE(lsm9ds0_gyro_fs_table); ++i) {
 		if (fs <= lsm9ds0_gyro_fs_table[i].fs) {
-			return lsm9ds0_gyro_set_fs_raw(dev, lsm9ds0_gyro_fs_table[i].reg_val);
+			return lsm9ds0_gyro_set_fs_raw(
+				dev, lsm9ds0_gyro_fs_table[i].reg_val);
 		}
 	}
 
@@ -98,10 +97,10 @@ static inline int lsm9ds0_gyro_set_odr_raw(const struct device *dev,
 static const struct {
 	int freq;
 	uint8_t reg_val;
-} lsm9ds0_gyro_samp_freq_table[] = { {95, 0},
-				     {190, 1},
-				     {380, 2},
-				     {760, 3} };
+} lsm9ds0_gyro_samp_freq_table[] = { { 95, 0 },
+				     { 190, 1 },
+				     { 380, 2 },
+				     { 760, 3 } };
 
 static int lsm9ds0_gyro_set_odr(const struct device *dev, int odr)
 {
@@ -109,9 +108,8 @@ static int lsm9ds0_gyro_set_odr(const struct device *dev, int odr)
 
 	for (i = 0; i < ARRAY_SIZE(lsm9ds0_gyro_samp_freq_table); ++i) {
 		if (odr <= lsm9ds0_gyro_samp_freq_table[i].freq) {
-			return lsm9ds0_gyro_set_odr_raw(dev,
-							lsm9ds0_gyro_samp_freq_table[i].
-							reg_val);
+			return lsm9ds0_gyro_set_odr_raw(
+				dev, lsm9ds0_gyro_samp_freq_table[i].reg_val);
 		}
 	}
 
@@ -161,7 +159,7 @@ static inline void lsm9ds0_gyro_convert(struct sensor_value *val, int raw_val,
 {
 	double dval;
 
-	dval = (double)(raw_val) * numerator / 1000.0 * DEG2RAD;
+	dval = (double)(raw_val)*numerator / 1000.0 * DEG2RAD;
 	val->val1 = (int32_t)dval;
 	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
 }
@@ -292,19 +290,19 @@ static int lsm9ds0_gyro_init_chip(const struct device *dev)
 		goto err_poweroff;
 	}
 
-	if (lsm9ds0_gyro_set_odr_raw(dev, LSM9DS0_GYRO_DEFAULT_SAMPLING_RATE)
-				     < 0) {
+	if (lsm9ds0_gyro_set_odr_raw(dev, LSM9DS0_GYRO_DEFAULT_SAMPLING_RATE) <
+	    0) {
 		LOG_DBG("failed to set sampling rate");
 		goto err_poweroff;
 	}
 
-	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
-				LSM9DS0_GYRO_REG_CTRL_REG4_G,
-				LSM9DS0_GYRO_MASK_CTRL_REG4_G_BDU |
-				LSM9DS0_GYRO_MASK_CTRL_REG4_G_BLE,
-				(1 << LSM9DS0_GYRO_SHIFT_CTRL_REG4_G_BDU) |
-				(0 << LSM9DS0_GYRO_SHIFT_CTRL_REG4_G_BLE))
-				< 0) {
+	if (i2c_reg_update_byte(
+		    data->i2c_master, config->i2c_slave_addr,
+		    LSM9DS0_GYRO_REG_CTRL_REG4_G,
+		    LSM9DS0_GYRO_MASK_CTRL_REG4_G_BDU |
+			    LSM9DS0_GYRO_MASK_CTRL_REG4_G_BLE,
+		    (1 << LSM9DS0_GYRO_SHIFT_CTRL_REG4_G_BDU) |
+			    (0 << LSM9DS0_GYRO_SHIFT_CTRL_REG4_G_BLE)) < 0) {
 		LOG_DBG("failed to set BDU and BLE");
 		goto err_poweroff;
 	}
@@ -318,13 +316,13 @@ err_poweroff:
 
 static int lsm9ds0_gyro_init(const struct device *dev)
 {
-	const struct lsm9ds0_gyro_config * const config = dev->config;
+	const struct lsm9ds0_gyro_config *const config = dev->config;
 	struct lsm9ds0_gyro_data *data = dev->data;
 
 	data->i2c_master = device_get_binding(config->i2c_master_dev_name);
 	if (!data->i2c_master) {
 		LOG_DBG("i2c master not found: %s",
-			    config->i2c_master_dev_name);
+			config->i2c_master_dev_name);
 		return -EINVAL;
 	}
 
@@ -355,7 +353,6 @@ static const struct lsm9ds0_gyro_config lsm9ds0_gyro_config = {
 
 static struct lsm9ds0_gyro_data lsm9ds0_gyro_data;
 
-DEVICE_AND_API_INIT(lsm9ds0_gyro, DT_INST_LABEL(0),
-		    lsm9ds0_gyro_init, &lsm9ds0_gyro_data, &lsm9ds0_gyro_config,
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
-		    &lsm9ds0_gyro_api_funcs);
+DEVICE_AND_API_INIT(lsm9ds0_gyro, DT_INST_LABEL(0), lsm9ds0_gyro_init,
+		    &lsm9ds0_gyro_data, &lsm9ds0_gyro_config, POST_KERNEL,
+		    CONFIG_SENSOR_INIT_PRIORITY, &lsm9ds0_gyro_api_funcs);

@@ -14,10 +14,9 @@ extern void test_mqtt_disconnect(void);
 
 void test_main(void)
 {
-	ztest_test_suite(mqtt_test,
-			ztest_unit_test(test_mqtt_connect),
-			ztest_unit_test(test_mqtt_subscribe),
-			ztest_unit_test(test_mqtt_unsubscribe),
-			ztest_unit_test(test_mqtt_disconnect));
+	ztest_test_suite(mqtt_test, ztest_unit_test(test_mqtt_connect),
+			 ztest_unit_test(test_mqtt_subscribe),
+			 ztest_unit_test(test_mqtt_unsubscribe),
+			 ztest_unit_test(test_mqtt_disconnect));
 	ztest_run_test_suite(mqtt_test);
 }

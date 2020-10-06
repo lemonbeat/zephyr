@@ -78,8 +78,8 @@ int lis3mdl_sample_fetch(const struct device *dev, enum sensor_channel chan)
 	 * burst read to fetch the temperature sample
 	 */
 	if (i2c_burst_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-			   LIS3MDL_REG_SAMPLE_START + 6,
-			   (uint8_t *)(buf + 3), 2) < 0) {
+			   LIS3MDL_REG_SAMPLE_START + 6, (uint8_t *)(buf + 3),
+			   2) < 0) {
 		LOG_DBG("Failed to fetch temperature sample.");
 		return -EIO;
 	}
@@ -143,13 +143,14 @@ int lis3mdl_init(const struct device *dev)
 	chip_cfg[1] = LIS3MDL_TEMP_EN_MASK | lis3mdl_odr_bits[idx];
 	chip_cfg[2] = LIS3MDL_FS_IDX << LIS3MDL_FS_SHIFT;
 	chip_cfg[3] = lis3mdl_odr_bits[idx] & LIS3MDL_FAST_ODR_MASK ?
-		      LIS3MDL_MD_SINGLE : LIS3MDL_MD_CONTINUOUS;
-	chip_cfg[4] = ((lis3mdl_odr_bits[idx] & LIS3MDL_OM_MASK) >>
-		       LIS3MDL_OM_SHIFT) << LIS3MDL_OMZ_SHIFT;
+				    LIS3MDL_MD_SINGLE :
+				    LIS3MDL_MD_CONTINUOUS;
+	chip_cfg[4] =
+		((lis3mdl_odr_bits[idx] & LIS3MDL_OM_MASK) >> LIS3MDL_OM_SHIFT)
+		<< LIS3MDL_OMZ_SHIFT;
 	chip_cfg[5] = LIS3MDL_BDU_EN;
 
-	if (i2c_write(drv_data->i2c,
-		      chip_cfg, 6, DT_INST_REG_ADDR(0)) < 0) {
+	if (i2c_write(drv_data->i2c, chip_cfg, 6, DT_INST_REG_ADDR(0)) < 0) {
 		LOG_DBG("Failed to configure chip.");
 		return -EIO;
 	}
@@ -166,6 +167,6 @@ int lis3mdl_init(const struct device *dev)
 
 struct lis3mdl_data lis3mdl_driver;
 
-DEVICE_AND_API_INIT(lis3mdl, DT_INST_LABEL(0), lis3mdl_init,
-		    &lis3mdl_driver, NULL, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &lis3mdl_driver_api);
+DEVICE_AND_API_INIT(lis3mdl, DT_INST_LABEL(0), lis3mdl_init, &lis3mdl_driver,
+		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &lis3mdl_driver_api);

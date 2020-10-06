@@ -33,7 +33,7 @@ void main(void)
 	addr.sin_port = htons(SNTP_PORT);
 	inet_pton(AF_INET, SERVER_ADDR, &addr.sin_addr);
 
-	rv = sntp_init(&ctx, (struct sockaddr *) &addr,
+	rv = sntp_init(&ctx, (struct sockaddr *)&addr,
 		       sizeof(struct sockaddr_in));
 	if (rv < 0) {
 		LOG_ERR("Failed to init SNTP IPv4 ctx: %d", rv);
@@ -49,7 +49,8 @@ void main(void)
 
 	LOG_INF("status: %d", rv);
 	LOG_INF("time since Epoch: high word: %u, low word: %u",
-		(uint32_t)(sntp_time.seconds >> 32), (uint32_t)sntp_time.seconds);
+		(uint32_t)(sntp_time.seconds >> 32),
+		(uint32_t)sntp_time.seconds);
 
 #if defined(CONFIG_NET_IPV6)
 	sntp_close(&ctx);
@@ -60,7 +61,7 @@ void main(void)
 	addr6.sin6_port = htons(SNTP_PORT);
 	inet_pton(AF_INET6, SERVER_ADDR6, &addr6.sin6_addr);
 
-	rv = sntp_init(&ctx, (struct sockaddr *) &addr6,
+	rv = sntp_init(&ctx, (struct sockaddr *)&addr6,
 		       sizeof(struct sockaddr_in6));
 	if (rv < 0) {
 		LOG_ERR("Failed to init SNTP IPv6 ctx: %d", rv);
@@ -77,7 +78,8 @@ void main(void)
 
 	LOG_INF("status: %d", rv);
 	LOG_INF("time since Epoch: high word: %u, low word: %u",
-		(uint32_t)(sntp_time.seconds >> 32), (uint32_t)sntp_time.seconds);
+		(uint32_t)(sntp_time.seconds >> 32),
+		(uint32_t)sntp_time.seconds);
 #endif
 
 end:

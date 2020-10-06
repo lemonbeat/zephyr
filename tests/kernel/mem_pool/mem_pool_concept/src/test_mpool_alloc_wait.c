@@ -20,15 +20,17 @@ void tmpool_alloc_wait_timeout(void *p1, void *p2, void *p3)
 {
 	struct k_mem_block block;
 
-	zassert_true(k_mem_pool_alloc(&mpool1, &block, BLK_SIZE_MIN,
-				      TIMEOUT) == -EAGAIN, NULL);
+	zassert_true(k_mem_pool_alloc(&mpool1, &block, BLK_SIZE_MIN, TIMEOUT) ==
+			     -EAGAIN,
+		     NULL);
 	k_sem_give(&sync_sema);
 }
 
 void tmpool_alloc_wait_ok(void *p1, void *p2, void *p3)
 {
 	zassert_true(k_mem_pool_alloc(&mpool1, &block_ok, BLK_SIZE_MIN,
-				      TIMEOUT) == 0, NULL);
+				      TIMEOUT) == 0,
+		     NULL);
 	k_sem_give(&sync_sema);
 }
 
@@ -73,7 +75,6 @@ void test_mpool_alloc_wait_prio(void)
 #else
 	zassert_true(nb == BLK_NUM_MIN, NULL);
 #endif
-
 
 	/**
 	 * TESTPOINT: when a suitable memory block becomes available, it is

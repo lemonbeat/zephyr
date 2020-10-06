@@ -32,10 +32,8 @@ LOG_MODULE_REGISTER(soc);
  * With Processor Clock prescaler at 1
  * Processor Clock (HCLK)=300 MHz.
  */
-#define PMC_CKGR_PLLAR_MULA	\
-	(CKGR_PLLAR_MULA(CONFIG_SOC_ATMEL_SAME70_PLLA_MULA))
-#define PMC_CKGR_PLLAR_DIVA	\
-	(CKGR_PLLAR_DIVA(CONFIG_SOC_ATMEL_SAME70_PLLA_DIVA))
+#define PMC_CKGR_PLLAR_MULA (CKGR_PLLAR_MULA(CONFIG_SOC_ATMEL_SAME70_PLLA_MULA))
+#define PMC_CKGR_PLLAR_DIVA (CKGR_PLLAR_DIVA(CONFIG_SOC_ATMEL_SAME70_PLLA_DIVA))
 
 #if CONFIG_SOC_ATMEL_SAME70_MDIV == 1
 #define SOC_ATMEL_SAME70_MDIV PMC_MCKR_MDIV_EQ_PCK
@@ -77,7 +75,7 @@ static ALWAYS_INLINE void clock_init(void)
 
 	if (!(PMC->CKGR_MOR & CKGR_MOR_MOSCSEL_Msk)) {
 		/* Start the external crystal oscillator */
-		PMC->CKGR_MOR =   CKGR_MOR_KEY_PASSWD
+		PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD
 				/* We select maximum setup time.
 				 * While start up time could be shortened
 				 * this optimization is not deemed
@@ -85,8 +83,7 @@ static ALWAYS_INLINE void clock_init(void)
 				 */
 				| CKGR_MOR_MOSCXTST(0xFFu)
 				/* RC OSC must stay on */
-				| CKGR_MOR_MOSCRCEN
-				| CKGR_MOR_MOSCXTEN;
+				| CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
 
 		/* Wait for oscillator to be stabilized */
 		while (!(PMC->PMC_SR & PMC_SR_MOSCXTS)) {
@@ -94,11 +91,9 @@ static ALWAYS_INLINE void clock_init(void)
 		}
 
 		/* Select the external crystal oscillator as main clock */
-		PMC->CKGR_MOR =   CKGR_MOR_KEY_PASSWD
-				| CKGR_MOR_MOSCSEL
-				| CKGR_MOR_MOSCXTST(0xFFu)
-				| CKGR_MOR_MOSCRCEN
-				| CKGR_MOR_MOSCXTEN;
+		PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCSEL |
+				CKGR_MOR_MOSCXTST(0xFFu) | CKGR_MOR_MOSCRCEN |
+				CKGR_MOR_MOSCXTEN;
 
 		/* Wait for external oscillator to be selected */
 		while (!(PMC->PMC_SR & PMC_SR_MOSCSELS)) {
@@ -107,10 +102,8 @@ static ALWAYS_INLINE void clock_init(void)
 	}
 
 	/* Turn off RC OSC, not used any longer, to save power */
-	PMC->CKGR_MOR =   CKGR_MOR_KEY_PASSWD
-			| CKGR_MOR_MOSCSEL
-			| CKGR_MOR_MOSCXTST(0xFFu)
-			| CKGR_MOR_MOSCXTEN;
+	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCSEL |
+			CKGR_MOR_MOSCXTST(0xFFu) | CKGR_MOR_MOSCXTEN;
 
 	/* Wait for RC OSC to be turned off */
 	while (PMC->PMC_SR & PMC_SR_MOSCRCS) {
@@ -137,9 +130,8 @@ static ALWAYS_INLINE void clock_init(void)
 	}
 
 	/* Set main fast RC oscillator to 12 MHz */
-	PMC->CKGR_MOR =   CKGR_MOR_KEY_PASSWD
-			| CKGR_MOR_MOSCRCF_12_MHz
-			| CKGR_MOR_MOSCRCEN;
+	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | CKGR_MOR_MOSCRCF_12_MHz |
+			CKGR_MOR_MOSCRCEN;
 
 	/* Wait for oscillator to be stabilized */
 	while (!(PMC->PMC_SR & PMC_SR_MOSCRCS)) {
@@ -161,10 +153,8 @@ static ALWAYS_INLINE void clock_init(void)
 	}
 
 	/* Setup PLLA */
-	PMC->CKGR_PLLAR =   CKGR_PLLAR_ONE
-			  | PMC_CKGR_PLLAR_MULA
-			  | CKGR_PLLAR_PLLACOUNT(0x3Fu)
-			  | PMC_CKGR_PLLAR_DIVA;
+	PMC->CKGR_PLLAR = CKGR_PLLAR_ONE | PMC_CKGR_PLLAR_MULA |
+			  CKGR_PLLAR_PLLACOUNT(0x3Fu) | PMC_CKGR_PLLAR_DIVA;
 
 	/*
 	 * NOTE: Both MULA and DIVA must be set to a value greater than 0 or

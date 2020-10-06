@@ -18,35 +18,35 @@ LOG_MODULE_REGISTER(audio_io);
 #include <audio/dmic.h>
 #include "audio_core.h"
 
-#define DMIC_DEV_NAME		"PDM"
-#define SPK_OUT_DEV_NAME	"I2S_1"
-#define HOST_INOUT_DEV_NAME	"I2S_2"
+#define DMIC_DEV_NAME "PDM"
+#define SPK_OUT_DEV_NAME "I2S_1"
+#define HOST_INOUT_DEV_NAME "I2S_2"
 
-#define NUM_HOST_CHANNELS	2
-#define NUM_SPK_CHANNELS	2
-#define NUM_MIC_CHANNELS	8
+#define NUM_HOST_CHANNELS 2
+#define NUM_SPK_CHANNELS 2
+#define NUM_MIC_CHANNELS 8
 
-#define AUDIO_SAMPLE_FREQ	48000
-#define AUDIO_SAMPLE_WIDTH	32
+#define AUDIO_SAMPLE_FREQ 48000
+#define AUDIO_SAMPLE_WIDTH 32
 
-#define HOST_FRAME_SAMPLES	(AUDIO_SAMPLES_PER_FRAME * NUM_HOST_CHANNELS)
-#define MIC_FRAME_SAMPLES	(AUDIO_SAMPLES_PER_FRAME * NUM_MIC_CHANNELS)
-#define SPK_FRAME_SAMPLES	(AUDIO_SAMPLES_PER_FRAME * NUM_SPK_CHANNELS)
+#define HOST_FRAME_SAMPLES (AUDIO_SAMPLES_PER_FRAME * NUM_HOST_CHANNELS)
+#define MIC_FRAME_SAMPLES (AUDIO_SAMPLES_PER_FRAME * NUM_MIC_CHANNELS)
+#define SPK_FRAME_SAMPLES (AUDIO_SAMPLES_PER_FRAME * NUM_SPK_CHANNELS)
 
-#define HOST_FRAME_BYTES	(HOST_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
-#define MIC_FRAME_BYTES		(MIC_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
-#define SPK_FRAME_BYTES		(SPK_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
+#define HOST_FRAME_BYTES (HOST_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
+#define MIC_FRAME_BYTES (MIC_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
+#define SPK_FRAME_BYTES (SPK_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
 
-#define SPK_OUT_BUF_COUNT	2
-#define MIC_IN_BUF_COUNT	2
-#define HOST_INOUT_BUF_COUNT	4 /* 2 for TX and 2 for RX */
+#define SPK_OUT_BUF_COUNT 2
+#define MIC_IN_BUF_COUNT 2
+#define HOST_INOUT_BUF_COUNT 4 /* 2 for TX and 2 for RX */
 
 static void audio_drv_thread(void);
 
 __attribute__((section(".dma_buffers"))) static struct {
-	int32_t	host_inout[HOST_INOUT_BUF_COUNT][HOST_FRAME_SAMPLES];
-	int32_t	spk_out[SPK_OUT_BUF_COUNT][SPK_FRAME_SAMPLES];
-	int32_t	mic_in[MIC_IN_BUF_COUNT][MIC_FRAME_SAMPLES];
+	int32_t host_inout[HOST_INOUT_BUF_COUNT][HOST_FRAME_SAMPLES];
+	int32_t spk_out[SPK_OUT_BUF_COUNT][SPK_FRAME_SAMPLES];
+	int32_t mic_in[MIC_IN_BUF_COUNT][MIC_FRAME_SAMPLES];
 } audio_buffers;
 
 static const struct device *codec_dev;
@@ -73,7 +73,8 @@ static void audio_driver_process_audio_input(void)
 	int ret;
 
 	/* read capture input buffer */
-	ret = dmic_read(dmic_device, 0, (void **)&mic_in_buf, &size, SYS_FOREVER_MS);
+	ret = dmic_read(dmic_device, 0, (void **)&mic_in_buf, &size,
+			SYS_FOREVER_MS);
 	if (ret) {
 		LOG_ERR("dmic_device read failed %d", ret);
 		return;
@@ -101,14 +102,14 @@ static void audio_driver_process_audio_output(void)
 	int ret;
 
 	ret = k_mem_slab_alloc(&spk_out_mem_slab, (void *)&spk_out_buf,
-			K_NO_WAIT);
+			       K_NO_WAIT);
 	if (ret) {
-		LOG_ERR("speaker out buffer alloc failed %d mem_slab %p",
-				ret, &spk_out_mem_slab);
+		LOG_ERR("speaker out buffer alloc failed %d mem_slab %p", ret,
+			&spk_out_mem_slab);
 	}
 
 	ret = k_mem_slab_alloc(&host_inout_mem_slab, (void *)&host_out_buf,
-			K_NO_WAIT);
+			       K_NO_WAIT);
 	if (ret) {
 		LOG_ERR("host out audio buffer alloc failed %d", ret);
 	}
@@ -212,7 +213,7 @@ static void audio_driver_config_host_streams(void)
 
 	i2s_host_dev = device_get_binding(HOST_INOUT_DEV_NAME);
 	if (!i2s_host_dev) {
-		LOG_ERR("unable to find device %s",  HOST_INOUT_DEV_NAME);
+		LOG_ERR("unable to find device %s", HOST_INOUT_DEV_NAME);
 		return;
 	}
 
@@ -255,10 +256,10 @@ static void audio_driver_config_periph_streams(void)
 		},
 	};
 	struct pcm_stream_cfg stream = {
-		.pcm_rate		= AUDIO_SAMPLE_FREQ,
-		.pcm_width		= AUDIO_SAMPLE_WIDTH,
-		.block_size		= MIC_FRAME_BYTES,
-		.mem_slab		= &mic_in_mem_slab,
+		.pcm_rate = AUDIO_SAMPLE_FREQ,
+		.pcm_width = AUDIO_SAMPLE_WIDTH,
+		.block_size = MIC_FRAME_BYTES,
+		.mem_slab = &mic_in_mem_slab,
 	};
 	struct dmic_cfg cfg = {
 		.io = {
@@ -300,13 +301,14 @@ static void audio_driver_config_periph_streams(void)
 
 	i2s_spk_out_dev = device_get_binding(SPK_OUT_DEV_NAME);
 	if (!i2s_spk_out_dev) {
-		LOG_ERR("unable to find device %s",  SPK_OUT_DEV_NAME);
+		LOG_ERR("unable to find device %s", SPK_OUT_DEV_NAME);
 		return;
 	}
 
 	codec_dev = device_get_binding(DT_LABEL(DT_INST(0, ti_tlv320dac)));
 	if (!codec_dev) {
-		LOG_ERR("unable to find device %s", DT_LABEL(DT_INST(0, ti_tlv320dac)));
+		LOG_ERR("unable to find device %s",
+			DT_LABEL(DT_INST(0, ti_tlv320dac)));
 		return;
 	}
 

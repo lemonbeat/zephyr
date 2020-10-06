@@ -26,9 +26,9 @@ int64_t timespec_to_timeoutms(const struct timespec *abstime)
 	if (secs < 0 || (secs == 0 && nsecs < NSEC_PER_MSEC)) {
 		milli_secs = 0;
 	} else {
-		milli_secs =  secs * MSEC_PER_SEC + nsecs / NSEC_PER_MSEC;
+		milli_secs = secs * MSEC_PER_SEC + nsecs / NSEC_PER_MSEC;
 	}
 
 	return milli_secs;
 }
-#endif	/* CONFIG_POSIX_CLOCK */
+#endif /* CONFIG_POSIX_CLOCK */

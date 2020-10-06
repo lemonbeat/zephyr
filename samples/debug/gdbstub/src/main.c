@@ -33,5 +33,5 @@ void main(void)
 	printk("%d\n", ret);
 }
 
-K_THREAD_DEFINE(thread, STACKSIZE, thread_entry, NULL, NULL, NULL,
-		7, K_USER, 0);
+K_THREAD_DEFINE(thread, STACKSIZE, thread_entry, NULL, NULL, NULL, 7, K_USER,
+		0);

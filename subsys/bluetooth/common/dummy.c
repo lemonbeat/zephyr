@@ -31,8 +31,8 @@ BUILD_ASSERT(CONFIG_BT_DRIVER_RX_HIGH_PRIO < CONFIG_BT_HCI_TX_PRIO);
 #if (defined(CONFIG_LOG_BACKEND_RTT) &&                     \
      (defined(CONFIG_SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL) || \
       defined(CONFIG_LOG_BACKEND_RTT_MODE_BLOCK))) ||       \
-    defined(CONFIG_LOG_BACKEND_NET) ||                      \
-    defined(CONFIG_LOG_IMMEDIATE_CLEAN_OUTPUT)
+	defined(CONFIG_LOG_BACKEND_NET) ||                  \
+	defined(CONFIG_LOG_IMMEDIATE_CLEAN_OUTPUT)
 #define INCOMPATIBLE_IMMEDIATE_LOG_BACKEND 1
 #endif
 
@@ -41,9 +41,10 @@ BUILD_ASSERT(CONFIG_BT_DRIVER_RX_HIGH_PRIO < CONFIG_BT_HCI_TX_PRIO);
  * due to outputting log messages with interrupts disabled.
  */
 #if !defined(CONFIG_TEST) && !defined(CONFIG_ARCH_POSIX) && \
-    defined(CONFIG_BT_LL_SW_SPLIT) &&                       \
-    defined(INCOMPATIBLE_IMMEDIATE_LOG_BACKEND)
-BUILD_ASSERT(!IS_ENABLED(CONFIG_LOG_IMMEDIATE), "Immediate logging "
+	defined(CONFIG_BT_LL_SW_SPLIT) &&                   \
+	defined(INCOMPATIBLE_IMMEDIATE_LOG_BACKEND)
+BUILD_ASSERT(!IS_ENABLED(CONFIG_LOG_IMMEDIATE),
+	     "Immediate logging "
 	     "on selected backend(s) not "
 	     "supported with the software Link Layer");
 #endif

@@ -46,7 +46,6 @@ static TCCtrPrng_t ctr_ctx;
 
 #endif /* CONFIG_MBEDTLS */
 
-
 static int ctr_drbg_initialize(void)
 {
 	int ret;
@@ -56,7 +55,8 @@ static int ctr_drbg_initialize(void)
 	 */
 	entropy_driver = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
 	if (!entropy_driver) {
-		__ASSERT((entropy_driver != NULL),
+		__ASSERT(
+			(entropy_driver != NULL),
 			"Device driver for %s (DT_CHOSEN_ZEPHYR_ENTROPY_LABEL) not found. "
 			"Check your build configuration!",
 			DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
@@ -67,11 +67,8 @@ static int ctr_drbg_initialize(void)
 
 	mbedtls_ctr_drbg_init(&ctr_ctx);
 
-	ret = mbedtls_ctr_drbg_seed(&ctr_ctx,
-				    ctr_drbg_entropy_func,
-				    NULL,
-				    drbg_seed,
-				    sizeof(drbg_seed));
+	ret = mbedtls_ctr_drbg_seed(&ctr_ctx, ctr_drbg_entropy_func, NULL,
+				    drbg_seed, sizeof(drbg_seed));
 
 	if (ret != 0) {
 		mbedtls_ctr_drbg_free(&ctr_ctx);
@@ -88,11 +85,8 @@ static int ctr_drbg_initialize(void)
 		return -EIO;
 	}
 
-	ret = tc_ctr_prng_init(&ctr_ctx,
-			       (uint8_t *)&entropy,
-			       sizeof(entropy),
-			       (uint8_t *)drbg_seed,
-			       sizeof(drbg_seed));
+	ret = tc_ctr_prng_init(&ctr_ctx, (uint8_t *)&entropy, sizeof(entropy),
+			       (uint8_t *)drbg_seed, sizeof(drbg_seed));
 
 	if (ret == TC_CRYPTO_FAIL) {
 		return -EIO;
@@ -102,7 +96,6 @@ static int ctr_drbg_initialize(void)
 
 	return 0;
 }
-
 
 int z_impl_sys_csrand_get(void *dst, uint32_t outlen)
 {
@@ -129,18 +122,14 @@ int z_impl_sys_csrand_get(void *dst, uint32_t outlen)
 	if (ret == TC_CRYPTO_SUCCESS) {
 		ret = 0;
 	} else if (ret == TC_CTR_PRNG_RESEED_REQ) {
+		entropy_get_entropy(entropy_driver, (void *)&entropy,
+				    sizeof(entropy));
 
-		entropy_get_entropy(entropy_driver,
-				    (void *)&entropy, sizeof(entropy));
+		ret = tc_ctr_prng_reseed(&ctr_ctx, entropy, sizeof(entropy),
+					 drbg_seed, sizeof(drbg_seed));
 
-		ret = tc_ctr_prng_reseed(&ctr_ctx,
-					entropy,
-					sizeof(entropy),
-					drbg_seed,
-					sizeof(drbg_seed));
-
-		ret = tc_ctr_prng_generate(&ctr_ctx, 0, 0,
-					   (uint8_t *)dst, outlen);
+		ret = tc_ctr_prng_generate(&ctr_ctx, 0, 0, (uint8_t *)dst,
+					   outlen);
 
 		ret = (ret == TC_CRYPTO_SUCCESS) ? 0 : -EIO;
 	} else {

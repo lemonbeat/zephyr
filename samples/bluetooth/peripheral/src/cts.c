@@ -56,14 +56,16 @@ static ssize_t write_ct(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 }
 
 /* Current Time Service Declaration */
-BT_GATT_SERVICE_DEFINE(cts_cvs,
-	BT_GATT_PRIMARY_SERVICE(BT_UUID_CTS),
-	BT_GATT_CHARACTERISTIC(BT_UUID_CTS_CURRENT_TIME, BT_GATT_CHRC_READ |
-			       BT_GATT_CHRC_NOTIFY | BT_GATT_CHRC_WRITE,
-			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-			       read_ct, write_ct, ct),
-	BT_GATT_CCC(ct_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-);
+BT_GATT_SERVICE_DEFINE(cts_cvs, BT_GATT_PRIMARY_SERVICE(BT_UUID_CTS),
+		       BT_GATT_CHARACTERISTIC(BT_UUID_CTS_CURRENT_TIME,
+					      BT_GATT_CHRC_READ |
+						      BT_GATT_CHRC_NOTIFY |
+						      BT_GATT_CHRC_WRITE,
+					      BT_GATT_PERM_READ |
+						      BT_GATT_PERM_WRITE,
+					      read_ct, write_ct, ct),
+		       BT_GATT_CCC(ct_ccc_cfg_changed,
+				   BT_GATT_PERM_READ | BT_GATT_PERM_WRITE), );
 
 static void generate_current_time(uint8_t *buf)
 {
@@ -75,7 +77,7 @@ static void generate_current_time(uint8_t *buf)
 	 */
 
 	year = sys_cpu_to_le16(2015);
-	memcpy(buf,  &year, 2); /* year */
+	memcpy(buf, &year, 2); /* year */
 	buf[2] = 5U; /* months starting from 1 */
 	buf[3] = 30U; /* day */
 	buf[4] = 12U; /* hours */
@@ -99,7 +101,7 @@ void cts_init(void)
 }
 
 void cts_notify(void)
-{	/* Current Time Service updates only when time is changed */
+{ /* Current Time Service updates only when time is changed */
 	if (!ct_update) {
 		return;
 	}

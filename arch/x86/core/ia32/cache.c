@@ -54,8 +54,11 @@ void arch_dcache_flush(void *start_addr, size_t size)
 	size = ROUND_UP(size, sys_cache_line_size);
 	end = (uintptr_t)start_addr + size;
 
-	for (; (uintptr_t)start_addr < end; (uintptr_t)start_addr += sys_cache_line_size) {
-		__asm__ volatile("clflush %0;\n\t" :  : "m"((uintptr_t)start_addr));
+	for (; (uintptr_t)start_addr < end;
+	     (uintptr_t)start_addr += sys_cache_line_size) {
+		__asm__ volatile("clflush %0;\n\t"
+				 :
+				 : "m"((uintptr_t)start_addr));
 	}
 
 	__asm__ volatile("mfence;\n\t");
@@ -74,7 +77,9 @@ static void init_cache_line_size(void)
 	sys_cache_line_size = z_cache_line_size_get();
 }
 #else
-#define init_cache_line_size() do { } while ((0))
+#define init_cache_line_size() \
+	do {                   \
+	} while ((0))
 #endif
 
 size_t arch_cache_line_size_get(void)

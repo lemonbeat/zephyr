@@ -35,7 +35,8 @@ int init_static_pools(const struct device *unused)
 {
 	ARG_UNUSED(unused);
 
-	Z_STRUCT_SECTION_FOREACH(k_mem_pool, p) {
+	Z_STRUCT_SECTION_FOREACH(k_mem_pool, p)
+	{
 		k_mem_pool_init(p);
 	}
 
@@ -57,9 +58,8 @@ int k_mem_pool_alloc(struct k_mem_pool *p, struct k_mem_block *block,
 	while (true) {
 		uint32_t level_num, block_num;
 
-		ret = z_sys_mem_pool_block_alloc(&p->base, size,
-						 &level_num, &block_num,
-						 &block->data);
+		ret = z_sys_mem_pool_block_alloc(&p->base, size, &level_num,
+						 &block_num, &block->data);
 		block->id.pool = pool_id(p);
 		block->id.level = level_num;
 		block->id.block = block_num;

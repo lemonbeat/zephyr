@@ -16,8 +16,6 @@
 
 #include "ipm_dummy.h"
 
-
-
 /* Implemented as a software interrupt so that callbacks are executed
  * in the expected context
  */
@@ -34,13 +32,12 @@ static void ipm_dummy_isr(const void *data)
 	}
 
 	if (driver_data->cb) {
-		driver_data->cb(d,
-				driver_data->cb_context, driver_data->regs.id,
+		driver_data->cb(d, driver_data->cb_context,
+				driver_data->regs.id,
 				(volatile void *)&driver_data->regs.data);
 	}
 	driver_data->regs.busy = 0U;
 }
-
 
 /* IPM API functions for the dummy driver */
 
@@ -81,8 +78,7 @@ static int ipm_dummy_send(const struct device *d, int wait, uint32_t id,
 }
 
 static void ipm_dummy_register_callback(const struct device *d,
-					ipm_callback_t cb,
-					void *cb_context)
+					ipm_callback_t cb, void *cb_context)
 {
 	struct ipm_dummy_driver_data *driver_data;
 

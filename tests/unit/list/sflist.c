@@ -137,10 +137,8 @@ static inline bool verify_content_amount(sys_sflist_t *list, int amount)
 	return true;
 }
 
-static inline bool verify_tail_head(sys_sflist_t *list,
-				    sys_sfnode_t *head,
-				    sys_sfnode_t *tail,
-				    bool same)
+static inline bool verify_tail_head(sys_sflist_t *list, sys_sfnode_t *head,
+				    sys_sfnode_t *tail, bool same)
 {
 	if (sys_sflist_peek_head(list) != head) {
 		return false;
@@ -183,7 +181,7 @@ void test_sflist(void)
 	sys_sflist_init(&test_list);
 
 	zassert_true((verify_emptyness(&test_list)),
-		      "test_list should be empty");
+		     "test_list should be empty");
 
 	/* Appending node 1 */
 	sys_sflist_append(&test_list, &test_node_1.node);
@@ -287,12 +285,8 @@ void test_sflist(void)
 		sys_sfnode_t node;
 		int data;
 	} data_node[6] = {
-		{ .data = 0 },
-		{ .data = 1 },
-		{ .data = 2 },
-		{ .data = 3 },
-		{ .data = 4 },
-		{ .data = 5 },
+		{ .data = 0 }, { .data = 1 }, { .data = 2 },
+		{ .data = 3 }, { .data = 4 }, { .data = 5 },
 	};
 	sys_sfnode_t *node = NULL;
 	int ii;
@@ -304,7 +298,8 @@ void test_sflist(void)
 	}
 
 	ii = 0;
-	SYS_SFLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_SFLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		ii++;
 		if (((struct data_node *)node)->data == 2) {
 			break;
@@ -313,7 +308,8 @@ void test_sflist(void)
 	zassert_equal(ii, 3, "");
 
 	ii = 0;
-	SYS_SFLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_SFLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		ii++;
 		if (((struct data_node *)node)->data == 3) {
 			break;
@@ -322,7 +318,8 @@ void test_sflist(void)
 	zassert_equal(ii, 1, "");
 
 	ii = 0;
-	SYS_SFLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_SFLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		ii++;
 	}
 	zassert_equal(ii, 2, "");
@@ -346,12 +343,8 @@ void test_sflist(void)
 	/* test sys_sflist_append_list() */
 	sys_sflist_init(&append_list);
 	struct data_node data_node_append[6] = {
-		{ .data = 6 },
-		{ .data = 7 },
-		{ .data = 8 },
-		{ .data = 9 },
-		{ .data = 10 },
-		{ .data = 11 },
+		{ .data = 6 }, { .data = 7 },  { .data = 8 },
+		{ .data = 9 }, { .data = 10 }, { .data = 11 },
 	};
 	for (ii = 0; ii < 6; ii++) {
 		/* regenerate test_list, which we just emptied */
@@ -360,7 +353,7 @@ void test_sflist(void)
 		sys_sflist_append(&append_list, &data_node_append[ii].node);
 	}
 	sys_sflist_append_list(&test_list, &data_node_append[0].node,
-			      &data_node_append[5].node);
+			       &data_node_append[5].node);
 	for (ii = 0; ii < 12; ii++) {
 		node = sys_sflist_get(&test_list);
 		zassert_equal(((struct data_node *)node)->data, ii,

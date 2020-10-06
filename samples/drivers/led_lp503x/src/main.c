@@ -15,15 +15,15 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(main);
 
-#define LP503X_DEV_NAME	DT_LABEL(DT_INST(0, ti_lp503x))
+#define LP503X_DEV_NAME DT_LABEL(DT_INST(0, ti_lp503x))
 
-#define MAX_BRIGHTNESS	100
+#define MAX_BRIGHTNESS 100
 
-#define SLEEP_DELAY_MS	1000
-#define FADE_DELAY_MS	10
+#define SLEEP_DELAY_MS 1000
+#define FADE_DELAY_MS 10
 
-#define FADE_DELAY	K_MSEC(FADE_DELAY_MS)
-#define SLEEP_DELAY	K_MSEC(SLEEP_DELAY_MS)
+#define FADE_DELAY K_MSEC(FADE_DELAY_MS)
+#define SLEEP_DELAY K_MSEC(SLEEP_DELAY_MS)
 
 /*
  * The following colors are shown in the given order.
@@ -59,8 +59,8 @@ static int run_led_test(const struct device *lp503x_dev, uint8_t led)
 		err = led_set_color(lp503x_dev, led, 3, colors[idx]);
 		if (err < 0) {
 			LOG_ERR("Failed to set LED %d color to "
-				"%02x:%02x:%02x, err=%d", led,
-				colors[idx][0], colors[idx][1],
+				"%02x:%02x:%02x, err=%d",
+				led, colors[idx][0], colors[idx][1],
 				colors[idx][2], err);
 			return err;
 		}
@@ -87,7 +87,8 @@ static int run_led_test(const struct device *lp503x_dev, uint8_t led)
 			err = led_set_brightness(lp503x_dev, led, level);
 			if (err < 0) {
 				LOG_ERR("Failed to set LED %d brightness to %d"
-					", err=%d\n", led, level, err);
+					", err=%d\n",
+					led, level, err);
 				return err;
 			}
 			k_sleep(FADE_DELAY);
@@ -131,13 +132,13 @@ static int run_channel_test(const struct device *lp503x_dev)
 			col[1] = colors[idx][1];
 			col[2] = colors[idx][2];
 		}
-		err = led_write_channels(lp503x_dev, LP503X_LED_COL1_CHAN(0),
-					 LP503X_COLORS_PER_LED *
-					 LP503X_MAX_LEDS,
-					 buffer);
+		err = led_write_channels(
+			lp503x_dev, LP503X_LED_COL1_CHAN(0),
+			LP503X_COLORS_PER_LED * LP503X_MAX_LEDS, buffer);
 		if (err < 0) {
 			LOG_ERR("Failed to write channels, start=%d num=%d"
-				" err=%d\n", LP503X_LED_COL1_CHAN(0),
+				" err=%d\n",
+				LP503X_LED_COL1_CHAN(0),
 				LP503X_COLORS_PER_LED * LP503X_MAX_LEDS, err);
 			return err;
 		}
@@ -147,13 +148,13 @@ static int run_channel_test(const struct device *lp503x_dev)
 		for (led = 0; led < LP503X_MAX_LEDS; led++) {
 			buffer[led] = MAX_BRIGHTNESS;
 		}
-		err = led_write_channels(lp503x_dev,
-					 LP503X_LED_BRIGHT_CHAN(0),
+		err = led_write_channels(lp503x_dev, LP503X_LED_BRIGHT_CHAN(0),
 					 LP503X_MAX_LEDS, buffer);
 		if (err < 0) {
 			LOG_ERR("Failed to write channels, start=%d num=%d"
-				" err=%d\n", LP503X_LED_BRIGHT_CHAN(0),
-				LP503X_MAX_LEDS, err);
+				" err=%d\n",
+				LP503X_LED_BRIGHT_CHAN(0), LP503X_MAX_LEDS,
+				err);
 			return err;
 		}
 		k_sleep(SLEEP_DELAY);
@@ -162,13 +163,13 @@ static int run_channel_test(const struct device *lp503x_dev)
 		for (led = 0; led < LP503X_MAX_LEDS; led++) {
 			buffer[led] = 0;
 		}
-		err = led_write_channels(lp503x_dev,
-					 LP503X_LED_BRIGHT_CHAN(0),
+		err = led_write_channels(lp503x_dev, LP503X_LED_BRIGHT_CHAN(0),
 					 LP503X_MAX_LEDS, buffer);
 		if (err < 0) {
 			LOG_ERR("Failed to write channels, start=%d num=%d"
-				" err=%d\n", LP503X_LED_BRIGHT_CHAN(0),
-				LP503X_MAX_LEDS, err);
+				" err=%d\n",
+				LP503X_LED_BRIGHT_CHAN(0), LP503X_MAX_LEDS,
+				err);
 			return err;
 		}
 		k_sleep(SLEEP_DELAY);
@@ -179,8 +180,8 @@ static int run_channel_test(const struct device *lp503x_dev)
 				buffer[led] = level;
 			}
 			err = led_write_channels(lp503x_dev,
-					LP503X_LED_BRIGHT_CHAN(0),
-					LP503X_MAX_LEDS, buffer);
+						 LP503X_LED_BRIGHT_CHAN(0),
+						 LP503X_MAX_LEDS, buffer);
 			if (err < 0) {
 				LOG_ERR("Failed to write channels, start=%d"
 					" num=%d err=%d\n",
@@ -196,13 +197,13 @@ static int run_channel_test(const struct device *lp503x_dev)
 		for (led = 0; led < LP503X_MAX_LEDS; led++) {
 			buffer[led] = 0;
 		}
-		err = led_write_channels(lp503x_dev,
-					 LP503X_LED_BRIGHT_CHAN(0),
+		err = led_write_channels(lp503x_dev, LP503X_LED_BRIGHT_CHAN(0),
 					 LP503X_MAX_LEDS, buffer);
 		if (err < 0) {
 			LOG_ERR("Failed to write channels, start=%d "
-				"num=%d err=%d\n", LP503X_LED_BRIGHT_CHAN(0),
-				LP503X_MAX_LEDS, err);
+				"num=%d err=%d\n",
+				LP503X_LED_BRIGHT_CHAN(0), LP503X_MAX_LEDS,
+				err);
 			return err;
 		}
 		k_sleep(SLEEP_DELAY);

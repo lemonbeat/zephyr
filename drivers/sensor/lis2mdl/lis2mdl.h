@@ -34,7 +34,7 @@ struct lis2mdl_config {
 	char *gpio_name;
 	uint32_t gpio_pin;
 	uint8_t gpio_flags;
-#endif  /* CONFIG_LIS2MDL_TRIGGER */
+#endif /* CONFIG_LIS2MDL_TRIGGER */
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	uint16_t i2c_slv_addr;
 #elif DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
@@ -79,8 +79,8 @@ struct lis2mdl_data {
 	struct k_sem gpio_sem;
 #elif defined(CONFIG_LIS2MDL_TRIGGER_GLOBAL_THREAD)
 	struct k_work work;
-#endif  /* CONFIG_LIS2MDL_TRIGGER_GLOBAL_THREAD */
-#endif  /* CONFIG_LIS2MDL_TRIGGER */
+#endif /* CONFIG_LIS2MDL_TRIGGER_GLOBAL_THREAD */
+#endif /* CONFIG_LIS2MDL_TRIGGER */
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
 	struct spi_cs_control cs_ctrl;
 #endif /* DT_INST_SPI_DEV_HAS_CS_GPIOS(0) */
@@ -92,8 +92,8 @@ int lis2mdl_i2c_init(const struct device *dev);
 #ifdef CONFIG_LIS2MDL_TRIGGER
 int lis2mdl_init_interrupt(const struct device *dev);
 int lis2mdl_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler);
+			const struct sensor_trigger *trig,
+			sensor_trigger_handler_t handler);
 #endif /* CONFIG_LIS2MDL_TRIGGER */
 
 #endif /* __MAG_LIS2MDL_H */

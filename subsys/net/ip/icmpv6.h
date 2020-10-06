@@ -89,63 +89,61 @@ struct net_icmpv6_mld_mcast_record {
 	struct in6_addr mcast_address;
 } __packed;
 
+#define NET_ICMPV6_ND_O_FLAG(flag) ((flag)&0x40)
+#define NET_ICMPV6_ND_M_FLAG(flag) ((flag)&0x80)
 
-#define NET_ICMPV6_ND_O_FLAG(flag) ((flag) & 0x40)
-#define NET_ICMPV6_ND_M_FLAG(flag) ((flag) & 0x80)
-
-#define NET_ICMPV6_ND_OPT_SLLAO       1
-#define NET_ICMPV6_ND_OPT_TLLAO       2
+#define NET_ICMPV6_ND_OPT_SLLAO 1
+#define NET_ICMPV6_ND_OPT_TLLAO 2
 #define NET_ICMPV6_ND_OPT_PREFIX_INFO 3
-#define NET_ICMPV6_ND_OPT_MTU         5
-#define NET_ICMPV6_ND_OPT_ROUTE       24
-#define NET_ICMPV6_ND_OPT_RDNSS       25
-#define NET_ICMPV6_ND_OPT_DNSSL       31
-#define NET_ICMPV6_ND_OPT_6CO         34
+#define NET_ICMPV6_ND_OPT_MTU 5
+#define NET_ICMPV6_ND_OPT_ROUTE 24
+#define NET_ICMPV6_ND_OPT_RDNSS 25
+#define NET_ICMPV6_ND_OPT_DNSSL 31
+#define NET_ICMPV6_ND_OPT_6CO 34
 
-#define NET_ICMPV6_OPT_TYPE_OFFSET   0
-#define NET_ICMPV6_OPT_LEN_OFFSET    1
-#define NET_ICMPV6_OPT_DATA_OFFSET   2
+#define NET_ICMPV6_OPT_TYPE_OFFSET 0
+#define NET_ICMPV6_OPT_LEN_OFFSET 1
+#define NET_ICMPV6_OPT_DATA_OFFSET 2
 
-#define NET_ICMPV6_NA_FLAG_ROUTER     0x80
-#define NET_ICMPV6_NA_FLAG_SOLICITED  0x40
-#define NET_ICMPV6_NA_FLAG_OVERRIDE   0x20
-#define NET_ICMPV6_RA_FLAG_ONLINK     0x80
+#define NET_ICMPV6_NA_FLAG_ROUTER 0x80
+#define NET_ICMPV6_NA_FLAG_SOLICITED 0x40
+#define NET_ICMPV6_NA_FLAG_OVERRIDE 0x20
+#define NET_ICMPV6_RA_FLAG_ONLINK 0x80
 #define NET_ICMPV6_RA_FLAG_AUTONOMOUS 0x40
 
-#define NET_ICMPV6_DST_UNREACH    1	/* Destination unreachable */
-#define NET_ICMPV6_PACKET_TOO_BIG 2	/* Packet too big */
-#define NET_ICMPV6_TIME_EXCEEDED  3	/* Time exceeded */
-#define NET_ICMPV6_PARAM_PROBLEM  4	/* IPv6 header is bad */
+#define NET_ICMPV6_DST_UNREACH 1 /* Destination unreachable */
+#define NET_ICMPV6_PACKET_TOO_BIG 2 /* Packet too big */
+#define NET_ICMPV6_TIME_EXCEEDED 3 /* Time exceeded */
+#define NET_ICMPV6_PARAM_PROBLEM 4 /* IPv6 header is bad */
 #define NET_ICMPV6_ECHO_REQUEST 128
-#define NET_ICMPV6_ECHO_REPLY   129
-#define NET_ICMPV6_MLD_QUERY    130	/* Multicast Listener Query */
-#define NET_ICMPV6_RS           133	/* Router Solicitation */
-#define NET_ICMPV6_RA           134	/* Router Advertisement */
-#define NET_ICMPV6_NS           135	/* Neighbor Solicitation */
-#define NET_ICMPV6_NA           136	/* Neighbor Advertisement */
-#define NET_ICMPV6_MLDv2        143	/* Multicast Listener Report v2 */
+#define NET_ICMPV6_ECHO_REPLY 129
+#define NET_ICMPV6_MLD_QUERY 130 /* Multicast Listener Query */
+#define NET_ICMPV6_RS 133 /* Router Solicitation */
+#define NET_ICMPV6_RA 134 /* Router Advertisement */
+#define NET_ICMPV6_NS 135 /* Neighbor Solicitation */
+#define NET_ICMPV6_NA 136 /* Neighbor Advertisement */
+#define NET_ICMPV6_MLDv2 143 /* Multicast Listener Report v2 */
 
 /* Codes for ICMPv6 Destination Unreachable message */
-#define NET_ICMPV6_DST_UNREACH_NO_ROUTE  0 /* No route to destination */
-#define NET_ICMPV6_DST_UNREACH_ADMIN     1 /* Admin prohibited communication */
-#define NET_ICMPV6_DST_UNREACH_SCOPE     2 /* Beoynd scope of source address */
-#define NET_ICMPV6_DST_UNREACH_NO_ADDR   3 /* Address unrechable */
-#define NET_ICMPV6_DST_UNREACH_NO_PORT   4 /* Port unreachable */
-#define NET_ICMPV6_DST_UNREACH_SRC_ADDR  5 /* Source address failed */
+#define NET_ICMPV6_DST_UNREACH_NO_ROUTE 0 /* No route to destination */
+#define NET_ICMPV6_DST_UNREACH_ADMIN 1 /* Admin prohibited communication */
+#define NET_ICMPV6_DST_UNREACH_SCOPE 2 /* Beoynd scope of source address */
+#define NET_ICMPV6_DST_UNREACH_NO_ADDR 3 /* Address unrechable */
+#define NET_ICMPV6_DST_UNREACH_NO_PORT 4 /* Port unreachable */
+#define NET_ICMPV6_DST_UNREACH_SRC_ADDR 5 /* Source address failed */
 #define NET_ICMPV6_DST_UNREACH_REJ_ROUTE 6 /* Reject route to destination */
 
 /* Codes for ICMPv6 Parameter Problem message */
-#define NET_ICMPV6_PARAM_PROB_HEADER     0 /* Erroneous header field */
+#define NET_ICMPV6_PARAM_PROB_HEADER 0 /* Erroneous header field */
 #define NET_ICMPV6_PARAM_PROB_NEXTHEADER 1 /* Unrecognized next header */
-#define NET_ICMPV6_PARAM_PROB_OPTION     2 /* Unrecognized option */
+#define NET_ICMPV6_PARAM_PROB_OPTION 2 /* Unrecognized option */
 
 /* ICMPv6 header has 4 unused bytes that must be zero, RFC 4443 ch 3.1 */
 #define NET_ICMPV6_UNUSED_LEN 4
 
 typedef enum net_verdict (*icmpv6_callback_handler_t)(
-						struct net_pkt *pkt,
-						struct net_ipv6_hdr *ip_hdr,
-						struct net_icmp_hdr *icmp_hdr);
+	struct net_pkt *pkt, struct net_ipv6_hdr *ip_hdr,
+	struct net_icmp_hdr *icmp_hdr);
 
 const char *net_icmpv6_type2str(int icmpv6_type);
 
@@ -185,19 +183,14 @@ int net_icmpv6_send_error(struct net_pkt *pkt, uint8_t type, uint8_t code,
  * @return Return 0 if the sending succeed, <0 otherwise.
  */
 #if defined(CONFIG_NET_NATIVE_IPV6)
-int net_icmpv6_send_echo_request(struct net_if *iface,
-				 struct in6_addr *dst,
-				 uint16_t identifier,
-				 uint16_t sequence,
-				 const void *data,
-				 size_t data_size);
+int net_icmpv6_send_echo_request(struct net_if *iface, struct in6_addr *dst,
+				 uint16_t identifier, uint16_t sequence,
+				 const void *data, size_t data_size);
 #else
-static inline int net_icmpv6_send_echo_request(struct net_if *iface,
-					       struct in6_addr *dst,
-					       uint16_t identifier,
-					       uint16_t sequence,
-					       const void *data,
-					       size_t data_size)
+static inline int
+net_icmpv6_send_echo_request(struct net_if *iface, struct in6_addr *dst,
+			     uint16_t identifier, uint16_t sequence,
+			     const void *data, size_t data_size)
 {
 	ARG_UNUSED(iface);
 	ARG_UNUSED(dst);
@@ -216,7 +209,8 @@ void net_icmpv6_unregister_handler(struct net_icmpv6_handler *handler);
 enum net_verdict net_icmpv6_input(struct net_pkt *pkt,
 				  struct net_ipv6_hdr *ip_hdr);
 
-int net_icmpv6_create(struct net_pkt *pkt, uint8_t icmp_type, uint8_t icmp_code);
+int net_icmpv6_create(struct net_pkt *pkt, uint8_t icmp_type,
+		      uint8_t icmp_code);
 int net_icmpv6_finalize(struct net_pkt *pkt);
 
 void net_icmpv6_init(void);

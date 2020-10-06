@@ -17,7 +17,7 @@ LOG_MODULE_REGISTER(net_sock_addr, CONFIG_NET_SOCKETS_LOG_LEVEL);
 #include <net/socket_offload.h>
 #include <syscall_handler.h>
 
-#define AI_ARR_MAX	2
+#define AI_ARR_MAX 2
 
 #if defined(CONFIG_DNS_RESOLVER)
 
@@ -42,12 +42,13 @@ struct getaddrinfo_state {
 /* Initialize static fields of addrinfo structure. A macro to let it work
  * with any sockaddr_* type.
  */
-#define INIT_ADDRINFO(addrinfo, sockaddr) { \
-		(addrinfo)->ai_addr = &(addrinfo)->_ai_addr; \
-		(addrinfo)->ai_addrlen = sizeof(*sockaddr); \
+#define INIT_ADDRINFO(addrinfo, sockaddr)                             \
+	{                                                             \
+		(addrinfo)->ai_addr = &(addrinfo)->_ai_addr;          \
+		(addrinfo)->ai_addrlen = sizeof(*sockaddr);           \
 		(addrinfo)->ai_canonname = (addrinfo)->_ai_canonname; \
-		(addrinfo)->_ai_canonname[0] = '\0'; \
-		(addrinfo)->ai_next = NULL; \
+		(addrinfo)->_ai_canonname[0] = '\0';                  \
+		(addrinfo)->ai_next = NULL;                           \
 	}
 
 static void dns_resolve_cb(enum dns_resolve_status status,
@@ -110,17 +111,15 @@ static int exec_query(const char *host, int family,
 		qtype = DNS_QUERY_TYPE_AAAA;
 	}
 
-	return dns_get_addr_info(host, qtype, NULL,
-				 dns_resolve_cb, ai_state,
+	return dns_get_addr_info(host, qtype, NULL, dns_resolve_cb, ai_state,
 				 CONFIG_NET_SOCKETS_DNS_TIMEOUT);
 }
 
 static int getaddrinfo_null_host(int port, const struct zsock_addrinfo *hints,
-				struct zsock_addrinfo *res)
+				 struct zsock_addrinfo *res)
 {
 	if (hints && (hints->ai_flags & AI_PASSIVE)) {
-		struct sockaddr_in *addr =
-		    (struct sockaddr_in *)&res->_ai_addr;
+		struct sockaddr_in *addr = (struct sockaddr_in *)&res->_ai_addr;
 		addr->sin_addr.s_addr = INADDR_ANY;
 		addr->sin_port = htons(port);
 		addr->sin_family = AF_INET;
@@ -135,8 +134,8 @@ static int getaddrinfo_null_host(int port, const struct zsock_addrinfo *hints,
 }
 
 int z_impl_z_zsock_getaddrinfo_internal(const char *host, const char *service,
-				       const struct zsock_addrinfo *hints,
-				       struct zsock_addrinfo *res)
+					const struct zsock_addrinfo *hints,
+					struct zsock_addrinfo *res)
 {
 	int family = AF_UNSPEC;
 	int ai_flags = 0;
@@ -174,12 +173,9 @@ int z_impl_z_zsock_getaddrinfo_internal(const char *host, const char *service,
 	 * of first char of the address, then do long validating inet_pton()
 	 * call if needed.
 	 */
-	if (RESOLVE_IPV4(family) &&
-	    isdigit((int)*host) &&
-	    zsock_inet_pton(AF_INET, host,
-			    &SIN_ADDR(&res->_ai_addr)) == 1) {
-		struct sockaddr_in *addr =
-			(struct sockaddr_in *)&res->_ai_addr;
+	if (RESOLVE_IPV4(family) && isdigit((int)*host) &&
+	    zsock_inet_pton(AF_INET, host, &SIN_ADDR(&res->_ai_addr)) == 1) {
+		struct sockaddr_in *addr = (struct sockaddr_in *)&res->_ai_addr;
 
 		addr->sin_port = htons(port);
 		addr->sin_family = AF_INET;
@@ -215,9 +211,9 @@ int z_impl_z_zsock_getaddrinfo_internal(const char *host, const char *service,
 		 * So make the sem timeout longer than the DNS timeout so that
 		 * we do not need to start to cancel any pending DNS queries.
 		 */
-		int ret = k_sem_take(&ai_state.sem,
-				     K_MSEC(CONFIG_NET_SOCKETS_DNS_TIMEOUT +
-					    100));
+		int ret = k_sem_take(
+			&ai_state.sem,
+			K_MSEC(CONFIG_NET_SOCKETS_DNS_TIMEOUT + 100));
 		if (ret == -EAGAIN) {
 			return DNS_EAI_AGAIN;
 		}
@@ -277,10 +273,10 @@ int z_impl_z_zsock_getaddrinfo_internal(const char *host, const char *service,
 }
 
 #ifdef CONFIG_USERSPACE
-static inline int z_vrfy_z_zsock_getaddrinfo_internal(const char *host,
-					const char *service,
-				       const struct zsock_addrinfo *hints,
-				       struct zsock_addrinfo *res)
+static inline int
+z_vrfy_z_zsock_getaddrinfo_internal(const char *host, const char *service,
+				    const struct zsock_addrinfo *hints,
+				    struct zsock_addrinfo *res)
 {
 	struct zsock_addrinfo hints_copy;
 	char *host_copy = NULL, *service_copy = NULL;
@@ -310,8 +306,8 @@ static inline int z_vrfy_z_zsock_getaddrinfo_internal(const char *host,
 	}
 
 	ret = z_impl_z_zsock_getaddrinfo_internal(host_copy, service_copy,
-						 hints ? &hints_copy : NULL,
-						 (struct zsock_addrinfo *)res);
+						  hints ? &hints_copy : NULL,
+						  (struct zsock_addrinfo *)res);
 out:
 	k_free(service_copy);
 	k_free(host_copy);
@@ -358,18 +354,20 @@ void zsock_freeaddrinfo(struct zsock_addrinfo *ai)
 	free(ai);
 }
 
-#define ERR(e) case DNS_ ## e: return #e
+#define ERR(e)        \
+	case DNS_##e: \
+		return #e
 const char *zsock_gai_strerror(int errcode)
 {
 	switch (errcode) {
-	ERR(EAI_BADFLAGS);
-	ERR(EAI_NONAME);
-	ERR(EAI_AGAIN);
-	ERR(EAI_FAIL);
-	ERR(EAI_NODATA);
-	ERR(EAI_MEMORY);
-	ERR(EAI_SYSTEM);
-	ERR(EAI_SERVICE);
+		ERR(EAI_BADFLAGS);
+		ERR(EAI_NONAME);
+		ERR(EAI_AGAIN);
+		ERR(EAI_FAIL);
+		ERR(EAI_NODATA);
+		ERR(EAI_MEMORY);
+		ERR(EAI_SYSTEM);
+		ERR(EAI_SERVICE);
 
 	default:
 		return "EAI_UNKNOWN";

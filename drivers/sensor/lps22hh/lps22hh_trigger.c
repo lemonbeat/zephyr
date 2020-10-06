@@ -28,19 +28,17 @@ static int lps22hh_enable_int(const struct device *dev, int enable)
 	lps22hh_reg_t int_route;
 
 	/* set interrupt */
-	lps22hh_pin_int_route_get(lps22hh->ctx,
-				   &int_route.ctrl_reg3);
+	lps22hh_pin_int_route_get(lps22hh->ctx, &int_route.ctrl_reg3);
 	int_route.ctrl_reg3.drdy = enable;
-	return lps22hh_pin_int_route_set(lps22hh->ctx,
-					  &int_route.ctrl_reg3);
+	return lps22hh_pin_int_route_set(lps22hh->ctx, &int_route.ctrl_reg3);
 }
 
 /**
  * lps22hh_trigger_set - link external trigger to event data ready
  */
 int lps22hh_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler)
+			const struct sensor_trigger *trig,
+			sensor_trigger_handler_t handler)
 {
 	struct lps22hh_data *lps22hh = dev->data;
 	union axis1bit32_t raw_press;
@@ -50,7 +48,7 @@ int lps22hh_trigger_set(const struct device *dev,
 		if (handler) {
 			/* dummy read: re-trigger interrupt */
 			if (lps22hh_pressure_raw_get(lps22hh->ctx,
-			    raw_press.u8bit) < 0) {
+						     raw_press.u8bit) < 0) {
 				LOG_DBG("Failed to read sample");
 				return -EIO;
 			}
@@ -139,10 +137,10 @@ int lps22hh_init_interrupt(const struct device *dev)
 	k_sem_init(&lps22hh->gpio_sem, 0, UINT_MAX);
 
 	k_thread_create(&lps22hh->thread, lps22hh->thread_stack,
-		       CONFIG_LPS22HH_THREAD_STACK_SIZE,
-		       (k_thread_entry_t)lps22hh_thread, lps22hh,
-		       NULL, NULL, K_PRIO_COOP(CONFIG_LPS22HH_THREAD_PRIORITY),
-		       0, K_NO_WAIT);
+			CONFIG_LPS22HH_THREAD_STACK_SIZE,
+			(k_thread_entry_t)lps22hh_thread, lps22hh, NULL, NULL,
+			K_PRIO_COOP(CONFIG_LPS22HH_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_LPS22HH_TRIGGER_GLOBAL_THREAD)
 	lps22hh->work.handler = lps22hh_work_cb;
 #endif /* CONFIG_LPS22HH_TRIGGER_OWN_THREAD */
@@ -163,8 +161,8 @@ int lps22hh_init_interrupt(const struct device *dev)
 	}
 
 	/* enable interrupt in pulse mode */
-	if (lps22hh_int_notification_set(lps22hh->ctx,
-					 LPS22HH_INT_PULSED) < 0) {
+	if (lps22hh_int_notification_set(lps22hh->ctx, LPS22HH_INT_PULSED) <
+	    0) {
 		return -EIO;
 	}
 

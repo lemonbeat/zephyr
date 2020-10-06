@@ -30,11 +30,11 @@ static uint8_t uart_output_buf;
 
 LOG_OUTPUT_DEFINE(log_output_uart, char_out, &uart_output_buf, 1);
 
-static void put(const struct log_backend *const backend,
-		struct log_msg *msg)
+static void put(const struct log_backend *const backend, struct log_msg *msg)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_UART_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
 	log_backend_std_put(&log_output_uart, flag, msg);
 }
@@ -58,11 +58,12 @@ static void dropped(const struct log_backend *const backend, uint32_t cnt)
 }
 
 static void sync_string(const struct log_backend *const backend,
-		     struct log_msg_ids src_level, uint32_t timestamp,
-		     const char *fmt, va_list ap)
+			struct log_msg_ids src_level, uint32_t timestamp,
+			const char *fmt, va_list ap)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_UART_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
 	log_backend_std_sync_string(&log_output_uart, flag, src_level,
 				    timestamp, fmt, ap);
@@ -70,10 +71,12 @@ static void sync_string(const struct log_backend *const backend,
 
 static void sync_hexdump(const struct log_backend *const backend,
 			 struct log_msg_ids src_level, uint32_t timestamp,
-			 const char *metadata, const uint8_t *data, uint32_t length)
+			 const char *metadata, const uint8_t *data,
+			 uint32_t length)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_UART_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
 	log_backend_std_sync_hexdump(&log_output_uart, flag, src_level,
 				     timestamp, metadata, data, length);
@@ -81,10 +84,10 @@ static void sync_hexdump(const struct log_backend *const backend,
 
 const struct log_backend_api log_backend_uart_api = {
 	.put = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : put,
-	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_string : NULL,
-	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_hexdump : NULL,
+	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_string :
+								    NULL,
+	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_hexdump :
+								     NULL,
 	.panic = panic,
 	.init = log_backend_uart_init,
 	.dropped = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : dropped,

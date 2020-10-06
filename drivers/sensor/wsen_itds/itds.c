@@ -21,20 +21,20 @@
 LOG_MODULE_REGISTER(ITDS, CONFIG_SENSOR_LOG_LEVEL);
 
 static const struct itds_odr itds_odr_map[ITDS_ODR_MAX] = {
-	{0}, {1, 600}, {12, 500}, {25}, {50}, {100}, {200},
-	{400}, {800}, {1600}
+	{ 0 },	 { 1, 600 }, { 12, 500 }, { 25 },  { 50 },
+	{ 100 }, { 200 },    { 400 },	  { 800 }, { 1600 }
 };
 
 static const unsigned int itds_sensitivity_scale[][ITDS_ACCL_RANGE_END] = {
-	{976, 1952, 3904, 7808},
+	{ 976, 1952, 3904, 7808 },
 
 	/* high performance mode */
-	{244, 488, 976, 1952}
+	{ 244, 488, 976, 1952 }
 };
 
 static int itds_get_odr_for_index(const struct device *dev,
-				  enum itds_odr_const idx,
-				  uint16_t *freq, uint16_t *mfreq)
+				  enum itds_odr_const idx, uint16_t *freq,
+				  uint16_t *mfreq)
 {
 	struct itds_device_data *ddata = dev->data;
 	int start, end;
@@ -80,9 +80,9 @@ static int itds_accl_odr_set(const struct device *dev, uint16_t freq,
 	for (i = start; i <= end; i++) {
 		if ((freq == itds_odr_map[i].freq) &&
 		    (mfreq == itds_odr_map[i].mfreq)) {
-
 			return i2c_reg_update_byte(ddata->i2c, cfg->i2c_addr,
-					 ITDS_REG_CTRL1, ITDS_MASK_ODR, i << 4);
+						   ITDS_REG_CTRL1,
+						   ITDS_MASK_ODR, i << 4);
 		}
 	}
 
@@ -125,10 +125,8 @@ static int itds_attr_set(const struct device *dev, enum sensor_channel chan,
 			 enum sensor_attribute attr,
 			 const struct sensor_value *val)
 {
-	if (chan != SENSOR_CHAN_ACCEL_X &&
-	    chan != SENSOR_CHAN_ACCEL_Y &&
-	    chan != SENSOR_CHAN_ACCEL_Z &&
-	    chan != SENSOR_CHAN_ACCEL_XYZ) {
+	if (chan != SENSOR_CHAN_ACCEL_X && chan != SENSOR_CHAN_ACCEL_Y &&
+	    chan != SENSOR_CHAN_ACCEL_Z && chan != SENSOR_CHAN_ACCEL_XYZ) {
 		LOG_ERR("attr_set() not supported on this channel.");
 		return -ENOTSUP;
 	}
@@ -180,8 +178,8 @@ static int itds_fetch_accel(struct itds_device_data *ddata,
 	size_t i, ret;
 	uint8_t rval;
 
-	ret = i2c_reg_read_byte(ddata->i2c, cfg->i2c_addr,
-				ITDS_REG_STATUS, &rval);
+	ret = i2c_reg_read_byte(ddata->i2c, cfg->i2c_addr, ITDS_REG_STATUS,
+				&rval);
 	if (ret) {
 		return ret;
 	}
@@ -199,7 +197,7 @@ static int itds_fetch_accel(struct itds_device_data *ddata,
 
 	/* convert samples to cpu endianness */
 	for (i = 0; i < ITDS_SAMPLE_SIZE; i += 2) {
-		int16_t *sample =	(int16_t *) &ddata->samples[i];
+		int16_t *sample = (int16_t *)&ddata->samples[i];
 
 		*sample = sys_le16_to_cpu(*sample);
 		if (ddata->op_mode & ITDS_OP_MODE_NORMAL ||
@@ -214,8 +212,7 @@ static int itds_fetch_accel(struct itds_device_data *ddata,
 	return 0;
 }
 
-static int itds_sample_fetch(const struct device *dev,
-			     enum sensor_channel chan)
+static int itds_sample_fetch(const struct device *dev, enum sensor_channel chan)
 {
 	struct itds_device_data *ddata = dev->data;
 	const struct itds_device_config *cfg = dev->config;
@@ -254,17 +251,18 @@ static inline void itds_accl_channel_get(const struct device *dev,
 		ofs_start = ofs_stop = 2U;
 		break;
 	default:
-		ofs_start = 0U; ofs_stop = 2U;
+		ofs_start = 0U;
+		ofs_stop = 2U;
 		break;
 	}
 
-	for (i = ofs_start; i <= ofs_stop ; i++, val++) {
+	for (i = ofs_start; i <= ofs_stop; i++, val++) {
 		int64_t dval;
 
 		/* Sensitivity is exposed in ug/LSB */
 		/* Convert to m/s^2 */
 		dval = (int64_t)((ddata->samples[i] * ddata->scale * SENSOR_G) /
-				1000000LL);
+				 1000000LL);
 		val->val1 = (int32_t)(dval / 1000000);
 		val->val2 = (int32_t)(dval % 1000000);
 	}
@@ -284,8 +282,7 @@ static int itds_temp_channel_get(const struct device *dev,
 	return 0;
 }
 
-static int itds_channel_get(const struct device *dev,
-			    enum sensor_channel chan,
+static int itds_channel_get(const struct device *dev, enum sensor_channel chan,
 			    struct sensor_value *val)
 {
 	switch (chan) {
@@ -321,8 +318,8 @@ static int itds_init(const struct device *dev)
 		return -EINVAL;
 	}
 
-	ret = i2c_reg_read_byte(ddata->i2c, cfg->i2c_addr,
-				ITDS_REG_DEV_ID, &rval);
+	ret = i2c_reg_read_byte(ddata->i2c, cfg->i2c_addr, ITDS_REG_DEV_ID,
+				&rval);
 	if (ret) {
 		LOG_ERR("device init fail: %d", ret);
 		return ret;
@@ -387,23 +384,22 @@ static const struct sensor_driver_api itds_api = {
 	.channel_get = itds_channel_get,
 };
 
-#define WSEN_ITDS_INIT(idx)						\
-									\
-static struct itds_device_data itds_data_##idx;				\
-									\
-static const struct itds_device_config itds_config_##idx = {		\
-	.i2c_addr = DT_INST_REG_ADDR(idx),				\
-	.bus_name = DT_INST_BUS_LABEL(idx),				\
-	.gpio_port = DT_INST_GPIO_LABEL(idx, int_gpios),		\
-	.int_pin = DT_INST_GPIO_PIN(idx, int_gpios),			\
-	.int_flags = DT_INST_GPIO_FLAGS(idx, int_gpios),		\
-	.def_odr = DT_ENUM_IDX(DT_DRV_INST(idx), odr),			\
-	.def_op_mode = DT_ENUM_IDX(DT_DRV_INST(idx), op_mode),		\
-};									\
-									\
-DEVICE_AND_API_INIT(itds_##idx, DT_INST_LABEL(idx), itds_init,		\
-		    &itds_data_##idx, &itds_config_##idx,		\
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,		\
-		    &itds_api);						\
+#define WSEN_ITDS_INIT(idx)                                                    \
+                                                                               \
+	static struct itds_device_data itds_data_##idx;                        \
+                                                                               \
+	static const struct itds_device_config itds_config_##idx = {           \
+		.i2c_addr = DT_INST_REG_ADDR(idx),                             \
+		.bus_name = DT_INST_BUS_LABEL(idx),                            \
+		.gpio_port = DT_INST_GPIO_LABEL(idx, int_gpios),               \
+		.int_pin = DT_INST_GPIO_PIN(idx, int_gpios),                   \
+		.int_flags = DT_INST_GPIO_FLAGS(idx, int_gpios),               \
+		.def_odr = DT_ENUM_IDX(DT_DRV_INST(idx), odr),                 \
+		.def_op_mode = DT_ENUM_IDX(DT_DRV_INST(idx), op_mode),         \
+	};                                                                     \
+                                                                               \
+	DEVICE_AND_API_INIT(itds_##idx, DT_INST_LABEL(idx), itds_init,         \
+			    &itds_data_##idx, &itds_config_##idx, POST_KERNEL, \
+			    CONFIG_SENSOR_INIT_PRIORITY, &itds_api);
 
 DT_INST_FOREACH_STATUS_OKAY(WSEN_ITDS_INIT)

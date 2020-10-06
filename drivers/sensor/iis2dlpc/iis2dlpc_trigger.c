@@ -32,7 +32,7 @@ static int iis2dlpc_enable_int(const struct device *dev,
 	if (cfg->int_pin == 1U) {
 		/* set interrupt for pin INT1 */
 		iis2dlpc_pin_int1_route_get(iis2dlpc->ctx,
-				&int_route.ctrl4_int1_pad_ctrl);
+					    &int_route.ctrl4_int1_pad_ctrl);
 
 		switch (type) {
 		case SENSOR_TRIG_DATA_READY:
@@ -51,8 +51,8 @@ static int iis2dlpc_enable_int(const struct device *dev,
 			return -ENOTSUP;
 		}
 
-		return iis2dlpc_pin_int1_route_set(iis2dlpc->ctx,
-				&int_route.ctrl4_int1_pad_ctrl);
+		return iis2dlpc_pin_int1_route_set(
+			iis2dlpc->ctx, &int_route.ctrl4_int1_pad_ctrl);
 	} else {
 		/* set interrupt for pin INT2 */
 		iis2dlpc_pin_int2_route_get(iis2dlpc->ctx,
@@ -67,8 +67,8 @@ static int iis2dlpc_enable_int(const struct device *dev,
 			return -ENOTSUP;
 		}
 
-		return iis2dlpc_pin_int2_route_set(iis2dlpc->ctx,
-				&int_route.ctrl5_int2_pad_ctrl);
+		return iis2dlpc_pin_int2_route_set(
+			iis2dlpc->ctx, &int_route.ctrl5_int2_pad_ctrl);
 	}
 }
 
@@ -76,8 +76,8 @@ static int iis2dlpc_enable_int(const struct device *dev,
  * iis2dlpc_trigger_set - link external trigger to event data ready
  */
 int iis2dlpc_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler)
+			 const struct sensor_trigger *trig,
+			 sensor_trigger_handler_t handler)
 {
 	struct iis2dlpc_data *iis2dlpc = dev->data;
 	union axis3bit16_t raw;
@@ -186,7 +186,7 @@ static void iis2dlpc_handle_interrupt(const struct device *dev)
 }
 
 static void iis2dlpc_gpio_callback(const struct device *dev,
-				    struct gpio_callback *cb, uint32_t pins)
+				   struct gpio_callback *cb, uint32_t pins)
 {
 	struct iis2dlpc_data *iis2dlpc =
 		CONTAINER_OF(cb, struct iis2dlpc_data, gpio_cb);
@@ -195,8 +195,7 @@ static void iis2dlpc_gpio_callback(const struct device *dev,
 		return;
 	}
 
-	gpio_pin_interrupt_configure(dev, iis2dlpc->gpio_pin,
-				     GPIO_INT_DISABLE);
+	gpio_pin_interrupt_configure(dev, iis2dlpc->gpio_pin, GPIO_INT_DISABLE);
 
 #if defined(CONFIG_IIS2DLPC_TRIGGER_OWN_THREAD)
 	k_sem_give(&iis2dlpc->gpio_sem);
@@ -234,8 +233,7 @@ int iis2dlpc_init_interrupt(const struct device *dev)
 	/* setup data ready gpio interrupt (INT1 or INT2) */
 	iis2dlpc->gpio = device_get_binding(cfg->int_gpio_port);
 	if (iis2dlpc->gpio == NULL) {
-		LOG_DBG("Cannot get pointer to %s device",
-			    cfg->int_gpio_port);
+		LOG_DBG("Cannot get pointer to %s device", cfg->int_gpio_port);
 		return -EINVAL;
 	}
 
@@ -245,10 +243,10 @@ int iis2dlpc_init_interrupt(const struct device *dev)
 	k_sem_init(&iis2dlpc->gpio_sem, 0, UINT_MAX);
 
 	k_thread_create(&iis2dlpc->thread, iis2dlpc->thread_stack,
-		       CONFIG_IIS2DLPC_THREAD_STACK_SIZE,
-		       (k_thread_entry_t)iis2dlpc_thread, iis2dlpc,
-		       NULL, NULL, K_PRIO_COOP(CONFIG_IIS2DLPC_THREAD_PRIORITY),
-		       0, K_NO_WAIT);
+			CONFIG_IIS2DLPC_THREAD_STACK_SIZE,
+			(k_thread_entry_t)iis2dlpc_thread, iis2dlpc, NULL, NULL,
+			K_PRIO_COOP(CONFIG_IIS2DLPC_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_IIS2DLPC_TRIGGER_GLOBAL_THREAD)
 	iis2dlpc->work.handler = iis2dlpc_work_cb;
 #endif /* CONFIG_IIS2DLPC_TRIGGER_OWN_THREAD */
@@ -262,8 +260,7 @@ int iis2dlpc_init_interrupt(const struct device *dev)
 		return ret;
 	}
 
-	gpio_init_callback(&iis2dlpc->gpio_cb,
-			   iis2dlpc_gpio_callback,
+	gpio_init_callback(&iis2dlpc->gpio_cb, iis2dlpc_gpio_callback,
 			   BIT(cfg->int_gpio_pin));
 
 	if (gpio_add_callback(iis2dlpc->gpio, &iis2dlpc->gpio_cb) < 0) {

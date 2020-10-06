@@ -61,8 +61,8 @@ int cmd_ticker_info(const struct shell *shell, size_t argc, char *argv[])
 
 		err = ticker_next_slot_get(0, MAYFLY_CALL_ID_PROGRAM,
 					   &ticker_id, &ticks_current,
-					   &ticks_to_expire,
-					   ticker_op_done, (void *)&err_cb);
+					   &ticks_to_expire, ticker_op_done,
+					   (void *)&err_cb);
 		if (err == TICKER_STATUS_BUSY) {
 			while (err_cb == TICKER_STATUS_BUSY) {
 				ticker_job_sched(0, MAYFLY_CALL_ID_PROGRAM);
@@ -81,7 +81,7 @@ int cmd_ticker_info(const struct shell *shell, size_t argc, char *argv[])
 			retry--;
 			if (!retry) {
 				shell_print(shell, "Retry again, tickers too "
-					    "busy now.");
+						   "busy now.");
 
 				return -EAGAIN;
 			}
@@ -89,8 +89,10 @@ int cmd_ticker_info(const struct shell *shell, size_t argc, char *argv[])
 			if (tickers_count) {
 				tickers_count = 0U;
 
-				shell_print(shell, "Query reset, %u retries "
-					    "remaining.", retry);
+				shell_print(shell,
+					    "Query reset, %u retries "
+					    "remaining.",
+					    retry);
 			}
 		}
 
@@ -102,7 +104,7 @@ int cmd_ticker_info(const struct shell *shell, size_t argc, char *argv[])
 
 	shell_print(shell, "Tickers: %u.", tickers_count);
 	shell_print(shell, "Tick: %u (%uus).", ticks_current,
-	       HAL_TICKER_TICKS_TO_US(ticks_current));
+		    HAL_TICKER_TICKS_TO_US(ticks_current));
 
 	if (!tickers_count) {
 		return 0;
@@ -114,8 +116,8 @@ int cmd_ticker_info(const struct shell *shell, size_t argc, char *argv[])
 	shell_print(shell, "---------------------");
 	for (i = 0U; i < tickers_count; i++) {
 		shell_print(shell, "%03u %08u %08u", tickers[i].id,
-		       tickers[i].ticks_to_expire,
-		       HAL_TICKER_TICKS_TO_US(tickers[i].ticks_to_expire));
+			    tickers[i].ticks_to_expire,
+			    HAL_TICKER_TICKS_TO_US(tickers[i].ticks_to_expire));
 	}
 	shell_print(shell, "---------------------");
 
@@ -125,9 +127,9 @@ int cmd_ticker_info(const struct shell *shell, size_t argc, char *argv[])
 #define HELP_NONE "[none]"
 
 SHELL_STATIC_SUBCMD_SET_CREATE(ticker_cmds,
-	SHELL_CMD_ARG(info, NULL, HELP_NONE, cmd_ticker_info, 1, 0),
-	SHELL_SUBCMD_SET_END
-);
+			       SHELL_CMD_ARG(info, NULL, HELP_NONE,
+					     cmd_ticker_info, 1, 0),
+			       SHELL_SUBCMD_SET_END);
 
 static int cmd_ticker(const struct shell *shell, size_t argc, char **argv)
 {

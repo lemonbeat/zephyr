@@ -180,8 +180,11 @@ extern struct z_kernel _kernel;
  */
 bool z_smp_cpu_mobile(void);
 
-#define _current_cpu ({ __ASSERT_NO_MSG(!z_smp_cpu_mobile()); \
-			arch_curr_cpu(); })
+#define _current_cpu                                  \
+	({                                            \
+		__ASSERT_NO_MSG(!z_smp_cpu_mobile()); \
+		arch_curr_cpu();                      \
+	})
 #define _current k_current_get()
 
 #else
@@ -201,7 +204,14 @@ typedef struct {
 
 extern bool z_priq_rb_lessthan(struct rbnode *a, struct rbnode *b);
 
-#define Z_WAIT_Q_INIT(wait_q) { { { .lessthan_fn = z_priq_rb_lessthan } } }
+#define Z_WAIT_Q_INIT(wait_q)                                     \
+	{                                                         \
+		{                                                 \
+			{                                         \
+				.lessthan_fn = z_priq_rb_lessthan \
+			}                                         \
+		}                                                 \
+	}
 
 #else
 
@@ -209,7 +219,10 @@ typedef struct {
 	sys_dlist_t waitq;
 } _wait_q_t;
 
-#define Z_WAIT_Q_INIT(wait_q) { SYS_DLIST_STATIC_INIT(&(wait_q)->waitq) }
+#define Z_WAIT_Q_INIT(wait_q)                           \
+	{                                               \
+		SYS_DLIST_STATIC_INIT(&(wait_q)->waitq) \
+	}
 
 #endif
 

@@ -15,10 +15,8 @@ LOG_MODULE_DECLARE(CCS811);
 
 #define IRQ_PIN DT_INST_GPIO_PIN(0, irq_gpios)
 
-int ccs811_attr_set(const struct device *dev,
-		    enum sensor_channel chan,
-		    enum sensor_attribute attr,
-		    const struct sensor_value *thr)
+int ccs811_attr_set(const struct device *dev, enum sensor_channel chan,
+		    enum sensor_attribute attr, const struct sensor_value *thr)
 {
 	struct ccs811_data *drv_data = dev->data;
 	int rc;
@@ -27,15 +25,15 @@ int ccs811_attr_set(const struct device *dev,
 		rc = -ENOTSUP;
 	} else if (attr == SENSOR_ATTR_LOWER_THRESH) {
 		rc = -EINVAL;
-		if ((thr->val1 >= CCS811_CO2_MIN_PPM)
-		    && (thr->val1 <= CCS811_CO2_MAX_PPM)) {
+		if ((thr->val1 >= CCS811_CO2_MIN_PPM) &&
+		    (thr->val1 <= CCS811_CO2_MAX_PPM)) {
 			drv_data->co2_l2m = thr->val1;
 			rc = 0;
 		}
 	} else if (attr == SENSOR_ATTR_UPPER_THRESH) {
 		rc = -EINVAL;
-		if ((thr->val1 >= CCS811_CO2_MIN_PPM)
-		    && (thr->val1 <= CCS811_CO2_MAX_PPM)) {
+		if ((thr->val1 >= CCS811_CO2_MIN_PPM) &&
+		    (thr->val1 <= CCS811_CO2_MAX_PPM)) {
 			drv_data->co2_m2h = thr->val1;
 			rc = 0;
 		}
@@ -45,13 +43,10 @@ int ccs811_attr_set(const struct device *dev,
 	return rc;
 }
 
-static inline void setup_irq(const struct device *dev,
-			     bool enable)
+static inline void setup_irq(const struct device *dev, bool enable)
 {
 	struct ccs811_data *data = dev->data;
-	unsigned int flags = enable
-			     ? GPIO_INT_LEVEL_ACTIVE
-			     : GPIO_INT_DISABLE;
+	unsigned int flags = enable ? GPIO_INT_LEVEL_ACTIVE : GPIO_INT_DISABLE;
 
 	gpio_pin_interrupt_configure(data->irq_gpio, IRQ_PIN, flags);
 }
@@ -82,8 +77,7 @@ static void process_irq(const struct device *dev)
 	}
 }
 
-static void gpio_callback(const struct device *dev,
-			  struct gpio_callback *cb,
+static void gpio_callback(const struct device *dev, struct gpio_callback *cb,
 			  uint32_t pins)
 {
 	struct ccs811_data *data =
@@ -134,11 +128,11 @@ int ccs811_trigger_set(const struct device *dev,
 					     CCS811_MODE_THRESH);
 	} else if (trig->type == SENSOR_TRIG_THRESHOLD) {
 		rc = -EINVAL;
-		if ((drv_data->co2_l2m >= CCS811_CO2_MIN_PPM)
-		    && (drv_data->co2_l2m <= CCS811_CO2_MAX_PPM)
-		    && (drv_data->co2_m2h >= CCS811_CO2_MIN_PPM)
-		    && (drv_data->co2_m2h <= CCS811_CO2_MAX_PPM)
-		    && (drv_data->co2_l2m <= drv_data->co2_m2h)) {
+		if ((drv_data->co2_l2m >= CCS811_CO2_MIN_PPM) &&
+		    (drv_data->co2_l2m <= CCS811_CO2_MAX_PPM) &&
+		    (drv_data->co2_m2h >= CCS811_CO2_MIN_PPM) &&
+		    (drv_data->co2_m2h <= CCS811_CO2_MAX_PPM) &&
+		    (drv_data->co2_l2m <= drv_data->co2_m2h)) {
 			rc = ccs811_set_thresholds(dev);
 		}
 		if (rc == 0) {
@@ -184,9 +178,9 @@ int ccs811_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_CCS811_THREAD_STACK_SIZE,
-			(k_thread_entry_t)irq_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_CCS811_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)irq_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_CCS811_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_CCS811_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = work_cb;
 #else

@@ -13,23 +13,23 @@
 #include <tracing/tracing.h>
 #include <stdbool.h>
 
-BUILD_ASSERT(K_LOWEST_APPLICATION_THREAD_PRIO
-	     >= K_HIGHEST_APPLICATION_THREAD_PRIO);
+BUILD_ASSERT(K_LOWEST_APPLICATION_THREAD_PRIO >=
+	     K_HIGHEST_APPLICATION_THREAD_PRIO);
 
 #ifdef CONFIG_MULTITHREADING
-#define Z_VALID_PRIO(prio, entry_point)				     \
+#define Z_VALID_PRIO(prio, entry_point)                                    \
 	(((prio) == K_IDLE_PRIO && z_is_idle_thread_entry(entry_point)) || \
-	 ((K_LOWEST_APPLICATION_THREAD_PRIO			     \
-	   >= K_HIGHEST_APPLICATION_THREAD_PRIO)		     \
-	  && (prio) >= K_HIGHEST_APPLICATION_THREAD_PRIO	     \
-	  && (prio) <= K_LOWEST_APPLICATION_THREAD_PRIO))
+	 ((K_LOWEST_APPLICATION_THREAD_PRIO >=                             \
+	   K_HIGHEST_APPLICATION_THREAD_PRIO) &&                           \
+	  (prio) >= K_HIGHEST_APPLICATION_THREAD_PRIO &&                   \
+	  (prio) <= K_LOWEST_APPLICATION_THREAD_PRIO))
 
-#define Z_ASSERT_VALID_PRIO(prio, entry_point) do { \
-	__ASSERT(Z_VALID_PRIO((prio), (entry_point)), \
-		 "invalid priority (%d); allowed range: %d to %d", \
-		 (prio), \
-		 K_LOWEST_APPLICATION_THREAD_PRIO, \
-		 K_HIGHEST_APPLICATION_THREAD_PRIO); \
+#define Z_ASSERT_VALID_PRIO(prio, entry_point)                             \
+	do {                                                               \
+		__ASSERT(Z_VALID_PRIO((prio), (entry_point)),              \
+			 "invalid priority (%d); allowed range: %d to %d", \
+			 (prio), K_LOWEST_APPLICATION_THREAD_PRIO,         \
+			 K_HIGHEST_APPLICATION_THREAD_PRIO);               \
 	} while (false)
 #else
 #define Z_VALID_PRIO(prio, entry_point) ((prio) == -1)
@@ -42,7 +42,7 @@ void z_remove_thread_from_ready_q(struct k_thread *thread);
 int z_is_thread_time_slicing(struct k_thread *thread);
 void z_unpend_thread_no_timeout(struct k_thread *thread);
 int z_pend_curr(struct k_spinlock *lock, k_spinlock_key_t key,
-	       _wait_q_t *wait_q, k_timeout_t timeout);
+		_wait_q_t *wait_q, k_timeout_t timeout);
 int z_pend_curr_irqlock(uint32_t key, _wait_q_t *wait_q, k_timeout_t timeout);
 void z_pend_thread(struct k_thread *thread, _wait_q_t *wait_q,
 		   k_timeout_t timeout);
@@ -55,7 +55,7 @@ void z_thread_priority_set(struct k_thread *thread, int prio);
 bool z_set_prio(struct k_thread *thread, int prio);
 void *z_get_next_switch_handle(void *interrupted);
 struct k_thread *z_find_first_thread_to_unpend(_wait_q_t *wait_q,
-					      struct k_thread *from);
+					       struct k_thread *from);
 void idle(void *a, void *b, void *c);
 void z_time_slice(int ticks);
 void z_reset_time_slice(void);
@@ -68,12 +68,12 @@ FUNC_NORETURN void z_self_abort(void);
 
 static inline void z_pend_curr_unlocked(_wait_q_t *wait_q, k_timeout_t timeout)
 {
-	(void) z_pend_curr_irqlock(arch_irq_lock(), wait_q, timeout);
+	(void)z_pend_curr_irqlock(arch_irq_lock(), wait_q, timeout);
 }
 
 static inline void z_reschedule_unlocked(void)
 {
-	(void) z_reschedule_irqlock(arch_irq_lock());
+	(void)z_reschedule_irqlock(arch_irq_lock());
 }
 
 /* find which one is the next thread to run */
@@ -116,7 +116,6 @@ static inline bool z_is_thread_prevented_from_running(struct k_thread *thread)
 
 	return (state & (_THREAD_PENDING | _THREAD_PRESTART | _THREAD_DEAD |
 			 _THREAD_DUMMY | _THREAD_SUSPENDED)) != 0U;
-
 }
 
 static inline bool z_is_thread_timeout_active(struct k_thread *thread)
@@ -135,7 +134,8 @@ static inline bool z_has_thread_started(struct k_thread *thread)
 	return (thread->base.thread_state & _THREAD_PRESTART) == 0U;
 }
 
-static inline bool z_is_thread_state_set(struct k_thread *thread, uint32_t state)
+static inline bool z_is_thread_state_set(struct k_thread *thread,
+					 uint32_t state)
 {
 	return (thread->base.thread_state & state) != 0U;
 }
@@ -178,7 +178,7 @@ static inline void z_set_thread_states(struct k_thread *thread, uint32_t states)
 }
 
 static inline void z_reset_thread_states(struct k_thread *thread,
-					uint32_t states)
+					 uint32_t states)
 {
 	thread->base.thread_state &= ~states;
 }
@@ -203,7 +203,8 @@ static inline int z_get_new_prio_with_ceiling(int prio)
 	return z_is_under_prio_ceiling(prio) ? prio : CONFIG_PRIORITY_CEILING;
 }
 
-static inline bool z_is_prio1_higher_than_or_equal_to_prio2(int prio1, int prio2)
+static inline bool z_is_prio1_higher_than_or_equal_to_prio2(int prio1,
+							    int prio2)
 {
 	return prio1 <= prio2;
 }

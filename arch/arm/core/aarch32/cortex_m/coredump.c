@@ -7,21 +7,21 @@
 #include <string.h>
 #include <debug/coredump.h>
 
-#define ARCH_HDR_VER			1
+#define ARCH_HDR_VER 1
 
 uint32_t z_arm_coredump_fault_sp;
 
 struct arm_arch_block {
 	struct {
-		uint32_t	r0;
-		uint32_t	r1;
-		uint32_t	r2;
-		uint32_t	r3;
-		uint32_t	r12;
-		uint32_t	lr;
-		uint32_t	pc;
-		uint32_t	xpsr;
-		uint32_t	sp;
+		uint32_t r0;
+		uint32_t r1;
+		uint32_t r2;
+		uint32_t r3;
+		uint32_t r12;
+		uint32_t lr;
+		uint32_t pc;
+		uint32_t xpsr;
+		uint32_t sp;
 	} r;
 } __packed;
 

@@ -18,8 +18,7 @@
 
 uint64_t irq_ctrl_timer = NEVER;
 
-
-static uint64_t irq_status;  /* pending interrupts */
+static uint64_t irq_status; /* pending interrupts */
 static uint64_t irq_premask; /* interrupts before the mask */
 
 /*
@@ -52,7 +51,7 @@ void hw_irq_ctrl_init(void)
 	irqs_locked = false;
 	lock_ignore = false;
 
-	for (int i = 0 ; i < N_IRQS; i++) {
+	for (int i = 0; i < N_IRQS; i++) {
 		irq_prio[i] = 255U;
 	}
 }
@@ -101,16 +100,15 @@ int hw_irq_ctrl_get_highest_prio_irq(void)
 	while (irq_status != 0U) {
 		int irq_nbr = find_lsb_set(irq_status) - 1;
 
-		irq_status &= ~((uint64_t) 1 << irq_nbr);
-		if ((winner_prio > (int)irq_prio[irq_nbr])
-		   && (currently_running_prio > (int)irq_prio[irq_nbr])) {
+		irq_status &= ~((uint64_t)1 << irq_nbr);
+		if ((winner_prio > (int)irq_prio[irq_nbr]) &&
+		    (currently_running_prio > (int)irq_prio[irq_nbr])) {
 			winner = irq_nbr;
 			winner_prio = irq_prio[irq_nbr];
 		}
 	}
 	return winner;
 }
-
 
 uint32_t hw_irq_ctrl_get_current_lock(void)
 {
@@ -138,24 +136,24 @@ uint64_t hw_irq_ctrl_get_irq_status(void)
 
 void hw_irq_ctrl_clear_all_enabled_irqs(void)
 {
-	irq_status  = 0U;
+	irq_status = 0U;
 	irq_premask &= ~irq_mask;
 }
 
 void hw_irq_ctrl_clear_all_irqs(void)
 {
-	irq_status  = 0U;
+	irq_status = 0U;
 	irq_premask = 0U;
 }
 
 void hw_irq_ctrl_disable_irq(unsigned int irq)
 {
-	irq_mask &= ~((uint64_t)1<<irq);
+	irq_mask &= ~((uint64_t)1 << irq);
 }
 
 int hw_irq_ctrl_is_irq_enabled(unsigned int irq)
 {
-	return (irq_mask & ((uint64_t)1 << irq))?1:0;
+	return (irq_mask & ((uint64_t)1 << irq)) ? 1 : 0;
 }
 
 uint64_t hw_irq_ctrl_get_irq_mask(void)
@@ -165,10 +163,9 @@ uint64_t hw_irq_ctrl_get_irq_mask(void)
 
 void hw_irq_ctrl_clear_irq(unsigned int irq)
 {
-	irq_status  &= ~((uint64_t)1<<irq);
-	irq_premask &= ~((uint64_t)1<<irq);
+	irq_status &= ~((uint64_t)1 << irq);
+	irq_premask &= ~((uint64_t)1 << irq);
 }
-
 
 /**
  * Enable an interrupt
@@ -180,20 +177,19 @@ void hw_irq_ctrl_clear_irq(unsigned int irq)
  */
 void hw_irq_ctrl_enable_irq(unsigned int irq)
 {
-	irq_mask |= ((uint64_t)1<<irq);
-	if (irq_premask & ((uint64_t)1<<irq)) { /* if IRQ is pending */
+	irq_mask |= ((uint64_t)1 << irq);
+	if (irq_premask & ((uint64_t)1 << irq)) { /* if IRQ is pending */
 		hw_irq_ctrl_raise_im_from_sw(irq);
 	}
 }
 
-
 static inline void hw_irq_ctrl_irq_raise_prefix(unsigned int irq)
 {
 	if (irq < N_IRQS) {
-		irq_premask |= ((uint64_t)1<<irq);
+		irq_premask |= ((uint64_t)1 << irq);
 
 		if (irq_mask & (1 << irq)) {
-			irq_status |= ((uint64_t)1<<irq);
+			irq_status |= ((uint64_t)1 << irq);
 		}
 	} else if (irq == PHONY_HARD_IRQ) {
 		lock_ignore = true;
@@ -221,8 +217,6 @@ void hw_irq_ctrl_set_irq(unsigned int irq)
 		hwm_find_next_timer();
 	}
 }
-
-
 
 static void irq_raising_from_hw_now(void)
 {

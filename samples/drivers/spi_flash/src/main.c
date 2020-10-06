@@ -11,8 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if (CONFIG_SPI_NOR - 0) ||				\
-	DT_NODE_HAS_STATUS(DT_INST(0, jedec_spi_nor), okay)
+#if (CONFIG_SPI_NOR - 0) || DT_NODE_HAS_STATUS(DT_INST(0, jedec_spi_nor), okay)
 #define FLASH_DEVICE DT_LABEL(DT_INST(0, jedec_spi_nor))
 #define FLASH_NAME "JEDEC SPI-NOR"
 #elif (CONFIG_NORDIC_QSPI_NOR - 0) || \
@@ -33,7 +32,7 @@
 #else
 #define FLASH_TEST_REGION_OFFSET 0xff000
 #endif
-#define FLASH_SECTOR_SIZE        4096
+#define FLASH_SECTOR_SIZE 4096
 
 void main(void)
 {
@@ -49,8 +48,7 @@ void main(void)
 	flash_dev = device_get_binding(FLASH_DEVICE);
 
 	if (!flash_dev) {
-		printf("SPI flash driver %s was not found!\n",
-		       FLASH_DEVICE);
+		printf("SPI flash driver %s was not found!\n", FLASH_DEVICE);
 		return;
 	}
 
@@ -97,7 +95,8 @@ void main(void)
 		printf("Data read does not match data written!!\n");
 		while (rp < rpe) {
 			printf("%08x wrote %02x read %02x %s\n",
-			       (uint32_t)(FLASH_TEST_REGION_OFFSET + (rp - buf)),
+			       (uint32_t)(FLASH_TEST_REGION_OFFSET +
+					  (rp - buf)),
 			       *wp, *rp, (*rp == *wp) ? "match" : "MISMATCH");
 			++rp;
 			++wp;

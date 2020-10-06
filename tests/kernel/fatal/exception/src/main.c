@@ -20,7 +20,7 @@
 #if defined(CONFIG_X86) && defined(CONFIG_X86_MMU)
 #define STACKSIZE (8192)
 #else
-#define  STACKSIZE (2048 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define STACKSIZE (2048 + CONFIG_TEST_EXTRA_STACKSIZE)
 #endif
 #define MAIN_PRIORITY 7
 #define PRIORITY 5
@@ -30,7 +30,7 @@ static K_THREAD_STACK_DEFINE(alt_stack, STACKSIZE);
 #if defined(CONFIG_STACK_SENTINEL) && !defined(CONFIG_ARCH_POSIX)
 #define OVERFLOW_STACKSIZE (STACKSIZE / 2)
 static k_thread_stack_t *overflow_stack =
-		alt_stack + (STACKSIZE - OVERFLOW_STACKSIZE);
+	alt_stack + (STACKSIZE - OVERFLOW_STACKSIZE);
 #else
 #if defined(CONFIG_USERSPACE) && defined(CONFIG_ARC)
 /* for ARC, privilege stack is merged into defined stack */
@@ -73,23 +73,22 @@ void entry_cpu_exception(void *p1, void *p2, void *p3)
 	expected_reason = K_ERR_CPU_EXCEPTION;
 
 #if defined(CONFIG_X86)
-	__asm__ volatile ("ud2");
+	__asm__ volatile("ud2");
 #elif defined(CONFIG_NIOS2)
-	__asm__ volatile ("trap");
+	__asm__ volatile("trap");
 #elif defined(CONFIG_ARC)
-	__asm__ volatile ("swi");
+	__asm__ volatile("swi");
 #else
 	/* Triggers usage fault on ARM, illegal instruction on RISCV
 	 * and xtensa
 	 */
 	{
 		volatile long illegal = 0;
-		((void(*)(void))&illegal)();
+		((void (*)(void)) & illegal)();
 	}
 #endif
 	rv = TC_FAIL;
 }
-
 
 void entry_oops(void *p1, void *p2, void *p3)
 {
@@ -240,9 +239,8 @@ void check_stack_overflow(k_thread_entry_t handler, uint32_t flags)
 	k_thread_create(&alt_thread, alt_stack,
 			K_THREAD_STACK_SIZEOF(alt_stack),
 #endif /* CONFIG_STACK_SENTINEL */
-			handler,
-			NULL, NULL, NULL, K_PRIO_PREEMPT(PRIORITY), flags,
-			K_NO_WAIT);
+			handler, NULL, NULL, NULL, K_PRIO_PREEMPT(PRIORITY),
+			flags, K_NO_WAIT);
 
 	zassert_not_equal(rv, TC_FAIL, "thread was not aborted");
 }
@@ -271,10 +269,8 @@ void test_fatal(void)
 #ifndef CONFIG_ARCH_POSIX
 	TC_PRINT("test alt thread 1: generic CPU exception\n");
 	k_thread_create(&alt_thread, alt_stack,
-			K_THREAD_STACK_SIZEOF(alt_stack),
-			entry_cpu_exception,
-			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0,
-			K_NO_WAIT);
+			K_THREAD_STACK_SIZEOF(alt_stack), entry_cpu_exception,
+			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0, K_NO_WAIT);
 	zassert_not_equal(rv, TC_FAIL, "thread was not aborted");
 #else
 	/*
@@ -286,37 +282,30 @@ void test_fatal(void)
 
 	TC_PRINT("test alt thread 2: initiate kernel oops\n");
 	k_thread_create(&alt_thread, alt_stack,
-			K_THREAD_STACK_SIZEOF(alt_stack),
-			entry_oops,
-			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0,
-			K_NO_WAIT);
+			K_THREAD_STACK_SIZEOF(alt_stack), entry_oops, NULL,
+			NULL, NULL, K_PRIO_COOP(PRIORITY), 0, K_NO_WAIT);
 	k_thread_abort(&alt_thread);
 	zassert_not_equal(rv, TC_FAIL, "thread was not aborted");
 
 	TC_PRINT("test alt thread 3: initiate kernel panic\n");
 	k_thread_create(&alt_thread, alt_stack,
-			K_THREAD_STACK_SIZEOF(alt_stack),
-			entry_panic,
-			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0,
-			K_NO_WAIT);
+			K_THREAD_STACK_SIZEOF(alt_stack), entry_panic, NULL,
+			NULL, NULL, K_PRIO_COOP(PRIORITY), 0, K_NO_WAIT);
 	k_thread_abort(&alt_thread);
 	zassert_not_equal(rv, TC_FAIL, "thread was not aborted");
 
 	TC_PRINT("test alt thread 4: fail assertion\n");
 	k_thread_create(&alt_thread, alt_stack,
-			K_THREAD_STACK_SIZEOF(alt_stack),
-			entry_zephyr_assert,
-			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0,
-			K_NO_WAIT);
+			K_THREAD_STACK_SIZEOF(alt_stack), entry_zephyr_assert,
+			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0, K_NO_WAIT);
 	k_thread_abort(&alt_thread);
 	zassert_not_equal(rv, TC_FAIL, "thread was not aborted");
 
 	TC_PRINT("test alt thread 5: initiate arbitrary SW exception\n");
 	k_thread_create(&alt_thread, alt_stack,
 			K_THREAD_STACK_SIZEOF(alt_stack),
-			entry_arbitrary_reason,
-			NULL, NULL, NULL, K_PRIO_COOP(PRIORITY), 0,
-			K_NO_WAIT);
+			entry_arbitrary_reason, NULL, NULL, NULL,
+			K_PRIO_COOP(PRIORITY), 0, K_NO_WAIT);
 	k_thread_abort(&alt_thread);
 	zassert_not_equal(rv, TC_FAIL, "thread was not aborted");
 
@@ -382,7 +371,6 @@ void test_fatal(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(fatal,
-			ztest_unit_test(test_fatal));
+	ztest_test_suite(fatal, ztest_unit_test(test_fatal));
 	ztest_run_test_suite(fatal);
 }

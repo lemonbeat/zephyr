@@ -48,7 +48,7 @@ typedef int64_t k_ticks_t;
 typedef uint32_t k_ticks_t;
 #endif
 
-#define K_TICKS_FOREVER ((k_ticks_t) -1)
+#define K_TICKS_FOREVER ((k_ticks_t)-1)
 
 #ifndef CONFIG_LEGACY_TIMEOUT_API
 
@@ -81,20 +81,28 @@ typedef struct {
  */
 #define K_TIMEOUT_EQ(a, b) ((a).ticks == (b).ticks)
 
-#define Z_TIMEOUT_NO_WAIT ((k_timeout_t) {})
-#define Z_TIMEOUT_TICKS(t) ((k_timeout_t) { .ticks = (t) })
+#define Z_TIMEOUT_NO_WAIT ((k_timeout_t){})
+#define Z_TIMEOUT_TICKS(t) ((k_timeout_t){ .ticks = (t) })
 #define Z_FOREVER Z_TIMEOUT_TICKS(K_TICKS_FOREVER)
 
 #ifdef CONFIG_TIMEOUT_64BIT
-# define Z_TIMEOUT_MS(t) Z_TIMEOUT_TICKS((k_ticks_t)k_ms_to_ticks_ceil64(MAX(t, 0)))
-# define Z_TIMEOUT_US(t) Z_TIMEOUT_TICKS((k_ticks_t)k_us_to_ticks_ceil64(MAX(t, 0)))
-# define Z_TIMEOUT_NS(t) Z_TIMEOUT_TICKS((k_ticks_t)k_ns_to_ticks_ceil64(MAX(t, 0)))
-# define Z_TIMEOUT_CYC(t) Z_TIMEOUT_TICKS((k_ticks_t)k_cyc_to_ticks_ceil64(MAX(t, 0)))
+#define Z_TIMEOUT_MS(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_ms_to_ticks_ceil64(MAX(t, 0)))
+#define Z_TIMEOUT_US(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_us_to_ticks_ceil64(MAX(t, 0)))
+#define Z_TIMEOUT_NS(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_ns_to_ticks_ceil64(MAX(t, 0)))
+#define Z_TIMEOUT_CYC(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_cyc_to_ticks_ceil64(MAX(t, 0)))
 #else
-# define Z_TIMEOUT_MS(t) Z_TIMEOUT_TICKS((k_ticks_t)k_ms_to_ticks_ceil32(MAX(t, 0)))
-# define Z_TIMEOUT_US(t) Z_TIMEOUT_TICKS((k_ticks_t)k_us_to_ticks_ceil32(MAX(t, 0)))
-# define Z_TIMEOUT_NS(t) Z_TIMEOUT_TICKS((k_ticks_t)k_ns_to_ticks_ceil32(MAX(t, 0)))
-# define Z_TIMEOUT_CYC(t) Z_TIMEOUT_TICKS((k_ticks_t)k_cyc_to_ticks_ceil32(MAX(t, 0)))
+#define Z_TIMEOUT_MS(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_ms_to_ticks_ceil32(MAX(t, 0)))
+#define Z_TIMEOUT_US(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_us_to_ticks_ceil32(MAX(t, 0)))
+#define Z_TIMEOUT_NS(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_ns_to_ticks_ceil32(MAX(t, 0)))
+#define Z_TIMEOUT_CYC(t) \
+	Z_TIMEOUT_TICKS((k_ticks_t)k_cyc_to_ticks_ceil32(MAX(t, 0)))
 #endif
 
 /* Converts between absolute timeout expiration values (packed into
@@ -149,7 +157,6 @@ extern void z_enable_sys_clock(void);
 /* number of nanoseconds per second */
 #define NSEC_PER_SEC ((NSEC_PER_USEC) * (USEC_PER_MSEC) * (MSEC_PER_SEC))
 
-
 /* kernel clocks */
 
 /*
@@ -161,15 +168,14 @@ extern void z_enable_sys_clock(void);
 #ifdef CONFIG_SYS_CLOCK_EXISTS
 
 #if defined(CONFIG_TIMER_READS_ITS_FREQUENCY_AT_RUNTIME) || \
-	(MSEC_PER_SEC % CONFIG_SYS_CLOCK_TICKS_PER_SEC) || \
+	(MSEC_PER_SEC % CONFIG_SYS_CLOCK_TICKS_PER_SEC) ||  \
 	(CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC % CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 #define _NEED_PRECISE_TICK_MS_CONVERSION
 #endif
 
 #endif
 
-#define z_ms_to_ticks(t) \
-	((int32_t)k_ms_to_ticks_ceil32((uint32_t)(t)))
+#define z_ms_to_ticks(t) ((int32_t)k_ms_to_ticks_ceil32((uint32_t)(t)))
 
 /* added tick needed to account for tick in progress */
 #define _TICK_ALIGN 1

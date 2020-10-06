@@ -25,8 +25,7 @@ static const char *now_str(void)
 	now /= 60U;
 	h = now;
 
-	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u",
-		 h, min, s, ms);
+	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u", h, min, s, ms);
 	return buf;
 }
 
@@ -62,8 +61,7 @@ void main(void)
 			break;
 		}
 
-		printf("[%s]: %.1f Cel ; %.1f %%RH\n",
-		       now_str(),
+		printf("[%s]: %.1f Cel ; %.1f %%RH\n", now_str(),
 		       sensor_value_to_double(&temperature),
 		       sensor_value_to_double(&humidity));
 		k_sleep(K_SECONDS(2));

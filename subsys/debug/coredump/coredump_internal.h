@@ -17,8 +17,8 @@
  */
 
 struct z_coredump_memory_region_t {
-	uintptr_t	start;
-	uintptr_t	end;
+	uintptr_t start;
+	uintptr_t end;
 };
 
 extern struct z_coredump_memory_region_t z_coredump_memory_regions[];
@@ -55,16 +55,16 @@ typedef int (*z_coredump_backend_buffer_output_t)(uint8_t *buf, size_t buflen);
 
 struct z_coredump_backend_api {
 	/* Signal to backend of the start of coredump. */
-	z_coredump_backend_start_t		start;
+	z_coredump_backend_start_t start;
 
 	/* Signal to backend of the end of coredump. */
-	z_coredump_backend_end_t		end;
+	z_coredump_backend_end_t end;
 
 	/* Signal to backend an error has been encountered. */
-	z_coredump_backend_error_t		error;
+	z_coredump_backend_error_t error;
 
 	/* Raw buffer output */
-	z_coredump_backend_buffer_output_t	buffer_output;
+	z_coredump_backend_buffer_output_t buffer_output;
 };
 
 /**

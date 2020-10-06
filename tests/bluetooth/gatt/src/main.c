@@ -15,32 +15,33 @@
 #include <bluetooth/gatt.h>
 
 /* Custom Service Variables */
-static struct bt_uuid_128 test_uuid = BT_UUID_INIT_128(
-	0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12,
-	0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
-static struct bt_uuid_128 test_chrc_uuid = BT_UUID_INIT_128(
-	0xf2, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12,
-	0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
+static struct bt_uuid_128 test_uuid =
+	BT_UUID_INIT_128(0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x78,
+			 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
+static struct bt_uuid_128 test_chrc_uuid =
+	BT_UUID_INIT_128(0xf2, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x78,
+			 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
 
 static uint8_t test_value[] = { 'T', 'e', 's', 't', '\0' };
 
-static struct bt_uuid_128 test1_uuid = BT_UUID_INIT_128(
-	0xf4, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12,
-	0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
+static struct bt_uuid_128 test1_uuid =
+	BT_UUID_INIT_128(0xf4, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x78,
+			 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
 
-static const struct bt_uuid_128 test1_nfy_uuid = BT_UUID_INIT_128(
-	0xf5, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12,
-	0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
+static const struct bt_uuid_128 test1_nfy_uuid =
+	BT_UUID_INIT_128(0xf5, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x78,
+			 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
 
 static uint8_t nfy_enabled;
 
-static void test1_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void test1_ccc_cfg_changed(const struct bt_gatt_attr *attr,
+				  uint16_t value)
 {
 	nfy_enabled = (value == BT_GATT_CCC_NOTIFY) ? 1 : 0;
 }
 
 static ssize_t read_test(struct bt_conn *conn, const struct bt_gatt_attr *attr,
-			void *buf, uint16_t len, uint16_t offset)
+			 void *buf, uint16_t len, uint16_t offset)
 {
 	const char *value = attr->user_data;
 
@@ -49,8 +50,8 @@ static ssize_t read_test(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 }
 
 static ssize_t write_test(struct bt_conn *conn, const struct bt_gatt_attr *attr,
-			 const void *buf, uint16_t len, uint16_t offset,
-			 uint8_t flags)
+			  const void *buf, uint16_t len, uint16_t offset,
+			  uint8_t flags)
 {
 	uint8_t *value = attr->user_data;
 
@@ -67,11 +68,10 @@ static struct bt_gatt_attr test_attrs[] = {
 	/* Vendor Primary Service Declaration */
 	BT_GATT_PRIMARY_SERVICE(&test_uuid),
 
-	BT_GATT_CHARACTERISTIC(&test_chrc_uuid.uuid,
-			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
-			       BT_GATT_PERM_READ_AUTHEN |
-			       BT_GATT_PERM_WRITE_AUTHEN,
-			       read_test, write_test, test_value),
+	BT_GATT_CHARACTERISTIC(
+		&test_chrc_uuid.uuid, BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+		BT_GATT_PERM_READ_AUTHEN | BT_GATT_PERM_WRITE_AUTHEN, read_test,
+		write_test, test_value),
 };
 
 static struct bt_gatt_service test_svc = BT_GATT_SERVICE(test_attrs);
@@ -80,9 +80,8 @@ static struct bt_gatt_attr test1_attrs[] = {
 	/* Vendor Primary Service Declaration */
 	BT_GATT_PRIMARY_SERVICE(&test1_uuid),
 
-	BT_GATT_CHARACTERISTIC(&test1_nfy_uuid.uuid,
-			       BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_NONE,
-			       NULL, NULL, &nfy_enabled),
+	BT_GATT_CHARACTERISTIC(&test1_nfy_uuid.uuid, BT_GATT_CHRC_NOTIFY,
+			       BT_GATT_PERM_NONE, NULL, NULL, &nfy_enabled),
 	BT_GATT_CCC(test1_ccc_cfg_changed,
 		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 };
@@ -93,9 +92,9 @@ void test_gatt_register(void)
 {
 	/* Attempt to register services */
 	zassert_false(bt_gatt_service_register(&test_svc),
-		     "Test service registration failed");
+		      "Test service registration failed");
 	zassert_false(bt_gatt_service_register(&test1_svc),
-		     "Test service1 registration failed");
+		      "Test service1 registration failed");
 
 	/* Attempt to register already registered services */
 	zassert_true(bt_gatt_service_register(&test_svc),
@@ -108,32 +107,32 @@ void test_gatt_unregister(void)
 {
 	/* Attempt to unregister last */
 	zassert_false(bt_gatt_service_unregister(&test1_svc),
-		     "Test service1 unregister failed");
+		      "Test service1 unregister failed");
 	zassert_false(bt_gatt_service_register(&test1_svc),
-		     "Test service1 re-registration failed");
+		      "Test service1 re-registration failed");
 
 	/* Attempt to unregister first/middle */
 	zassert_false(bt_gatt_service_unregister(&test_svc),
-		     "Test service unregister failed");
+		      "Test service unregister failed");
 	zassert_false(bt_gatt_service_register(&test_svc),
-		     "Test service re-registration failed");
+		      "Test service re-registration failed");
 
 	/* Attempt to unregister all reverse order */
 	zassert_false(bt_gatt_service_unregister(&test1_svc),
-		     "Test service1 unregister failed");
+		      "Test service1 unregister failed");
 	zassert_false(bt_gatt_service_unregister(&test_svc),
-		     "Test service unregister failed");
+		      "Test service unregister failed");
 
 	zassert_false(bt_gatt_service_register(&test_svc),
-		     "Test service registration failed");
+		      "Test service registration failed");
 	zassert_false(bt_gatt_service_register(&test1_svc),
-		     "Test service1 registration failed");
+		      "Test service1 registration failed");
 
 	/* Attempt to unregister all same order */
 	zassert_false(bt_gatt_service_unregister(&test_svc),
-		     "Test service1 unregister failed");
+		      "Test service1 unregister failed");
 	zassert_false(bt_gatt_service_unregister(&test1_svc),
-		     "Test service unregister failed");
+		      "Test service unregister failed");
 }
 
 static uint8_t count_attr(const struct bt_gatt_attr *attr, uint16_t handle,
@@ -163,9 +162,9 @@ void test_gatt_foreach(void)
 
 	/* Attempt to register services */
 	zassert_false(bt_gatt_service_register(&test_svc),
-		     "Test service registration failed");
+		      "Test service registration failed");
 	zassert_false(bt_gatt_service_register(&test1_svc),
-		     "Test service1 registration failed");
+		      "Test service1 registration failed");
 
 	/* Iterate attributes */
 	bt_gatt_foreach_attr(test_attrs[0].handle, 0xffff, count_attr, &num);
@@ -237,7 +236,7 @@ void test_gatt_read(void)
 				  &attr);
 	zassert_not_null(attr, "Attribute don't match");
 	zassert_equal(attr->uuid, &test_chrc_uuid.uuid,
-			      "Attribute UUID don't match");
+		      "Attribute UUID don't match");
 
 	ret = attr->read(NULL, attr, (void *)buf, sizeof(buf), 0);
 	zassert_equal(ret, strlen(test_value),
@@ -268,8 +267,7 @@ void test_gatt_write(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_gatt,
-			 ztest_unit_test(test_gatt_register),
+	ztest_test_suite(test_gatt, ztest_unit_test(test_gatt_register),
 			 ztest_unit_test(test_gatt_unregister),
 			 ztest_unit_test(test_gatt_foreach),
 			 ztest_unit_test(test_gatt_read),

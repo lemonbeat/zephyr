@@ -34,26 +34,22 @@ struct soc_gpio_pinctrl {
  * @brief helper to extract IO port number from STM32_PINMUX() encoded
  * value
  */
-#define STM32_DT_PINMUX_PORT(__pin) \
-	(((__pin) >> 12) & 0xf)
+#define STM32_DT_PINMUX_PORT(__pin) (((__pin) >> 12) & 0xf)
 
 /**
  * @brief helper to extract IO pin number from STM32_PINMUX() encoded
  * value
  */
-#define STM32_DT_PINMUX_LINE(__pin) \
-	(((__pin) >> 8) & 0xf)
+#define STM32_DT_PINMUX_LINE(__pin) (((__pin) >> 8) & 0xf)
 
 /**
  * @brief helper to extract IO pin func from STM32_PINMUX() encoded
  * value
  */
 #if DT_HAS_COMPAT_STATUS_OKAY(st_stm32f1_pinctrl)
-#define STM32_DT_PINMUX_FUNC(__pin) \
-	(((__pin) >> 6) & 0x3)
+#define STM32_DT_PINMUX_FUNC(__pin) (((__pin) >> 6) & 0x3)
 #else
-#define STM32_DT_PINMUX_FUNC(__pin) \
-	((__pin) & 0xff)
+#define STM32_DT_PINMUX_FUNC(__pin) ((__pin)&0xff)
 #endif
 
 #if DT_HAS_COMPAT_STATUS_OKAY(st_stm32f1_pinctrl)
@@ -61,8 +57,7 @@ struct soc_gpio_pinctrl {
  * @brief helper to extract IO pin remap from STM32_PINMUX() encoded
  * value
  */
-#define STM32_DT_PINMUX_REMAP(__pin) \
-	((__pin) & 0x1f)
+#define STM32_DT_PINMUX_REMAP(__pin) ((__pin)&0x1f)
 #endif
 
 /* pretend that array will cover pin functions */
@@ -75,11 +70,11 @@ typedef int stm32_pin_func_t;
  * in @funcs array
  */
 struct stm32_pinmux_conf {
-	uint32_t pin;                      /* pin ID */
-	const stm32_pin_func_t *funcs;  /* functions array, indexed with
+	uint32_t pin; /* pin ID */
+	const stm32_pin_func_t *funcs; /* functions array, indexed with
 					 * (stm32_pin_alt_func - 1)
 					 */
-	const size_t nfuncs;            /* number of alternate functions, not
+	const size_t nfuncs; /* number of alternate functions, not
 					 * counting GPIO
 					 */
 };
@@ -88,16 +83,13 @@ struct stm32_pinmux_conf {
  * @brief helper to extract IO port number from STM32PIN() encoded
  * value
  */
-#define STM32_PORT(__pin) \
-	((__pin) >> 4)
+#define STM32_PORT(__pin) ((__pin) >> 4)
 
 /**
  * @brief helper to extract IO pin number from STM32PIN() encoded
  * value
  */
-#define STM32_PIN(__pin) \
-	((__pin) & 0xf)
-
+#define STM32_PIN(__pin) ((__pin)&0xf)
 
 /**
  * @brief helper for mapping IO port to its clock subsystem
@@ -120,8 +112,7 @@ clock_control_subsys_t stm32_get_port_clock(int port);
  * @param clk clock control device, for enabling/disabling clock gate
  * for the port
  */
-int z_pinmux_stm32_set(uint32_t pin, uint32_t func,
-		      const struct device *clk);
+int z_pinmux_stm32_set(uint32_t pin, uint32_t func, const struct device *clk);
 
 /**
  * @brief helper for obtaining pin configuration for the board
@@ -135,8 +126,7 @@ int z_pinmux_stm32_set(uint32_t pin, uint32_t func,
  * STM32PIN() encoded.
  *
  */
-void stm32_setup_pins(const struct pin_config *pinconf,
-		      size_t pins);
+void stm32_setup_pins(const struct pin_config *pinconf, size_t pins);
 
 /**
  * @brief helper for converting dt stm32 pinctrl format to existing pin config
@@ -159,7 +149,7 @@ void stm32_dt_pinctrl_configure(const struct soc_gpio_pinctrl *pinctrl,
  * @return remap value on success, -EINVAL otherwise
  */
 int stm32_dt_pinctrl_remap_check(const struct soc_gpio_pinctrl *pinctrl,
-				size_t list_size);
+				 size_t list_size);
 
 /* common pinmux device name for all STM32 chips */
 #define STM32_PINMUX_NAME "stm32-pinmux"
@@ -196,4 +186,4 @@ int stm32_dt_pinctrl_remap_check(const struct soc_gpio_pinctrl *pinctrl,
 #include "pinmux_stm32wbx.h"
 #endif
 
-#endif  /* ZEPHYR_DRIVERS_PINMUX_STM32_PINMUX_STM32_H_ */
+#endif /* ZEPHYR_DRIVERS_PINMUX_STM32_PINMUX_STM32_H_ */

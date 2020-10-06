@@ -54,9 +54,9 @@ void native_add_command_line_opts(struct args_struct_t *args)
 			growby = ARGS_ALLOC_CHUNK_SIZE;
 		}
 
-		struct args_struct_t *new_args_struct = realloc(args_struct,
-				      (args_aval + growby)*
-				      sizeof(struct args_struct_t));
+		struct args_struct_t *new_args_struct = realloc(
+			args_struct,
+			(args_aval + growby) * sizeof(struct args_struct_t));
 		args_aval += growby;
 		/* LCOV_EXCL_START */
 		if (new_args_struct == NULL) {
@@ -68,7 +68,7 @@ void native_add_command_line_opts(struct args_struct_t *args)
 	}
 
 	memcpy(&args_struct[used_args], args,
-		count*sizeof(struct args_struct_t));
+	       count * sizeof(struct args_struct_t));
 
 	used_args += count - 1;
 	/*
@@ -87,12 +87,12 @@ void native_add_testargs_option(void)
 		 * destination, callback,
 		 * description
 		 */
-		{true, false, false,
-		"testargs", "arg", 'l',
-		(void *)NULL, NULL,
-		"Any argument that follows will be ignored by the top level, "
-		"and made available for possible tests"},
-		ARG_TABLE_ENDMARKER};
+		{ true, false, false, "testargs", "arg", 'l', (void *)NULL,
+		  NULL,
+		  "Any argument that follows will be ignored by the top level, "
+		  "and made available for possible tests" },
+		ARG_TABLE_ENDMARKER
+	};
 
 	native_add_command_line_opts(testargs_options);
 }
@@ -103,7 +103,6 @@ static void print_invalid_opt_error(char *argv)
 				   " Is that feature supported in this build?"
 				   "\n",
 				   argv);
-
 }
 
 /**
@@ -124,10 +123,9 @@ void native_handle_cmd_line(int argc, char *argv[])
 	cmd_args_set_defaults(args_struct);
 
 	for (i = 1; i < argc; i++) {
-
 		if ((cmd_is_option(argv[i], "testargs", 0))) {
 			test_argc = argc - i - 1;
-			test_argv = &argv[i+1];
+			test_argv = &argv[i + 1];
 			break;
 		}
 

@@ -14,14 +14,13 @@
 
 #include <driverlib/ioc.h>
 
-
-#define PORT    DT_GPIO_LABEL(DT_ALIAS(sw0), gpios)
-#define PIN     DT_GPIO_PIN(DT_ALIAS(sw0), gpios)
+#define PORT DT_GPIO_LABEL(DT_ALIAS(sw0), gpios)
+#define PIN DT_GPIO_PIN(DT_ALIAS(sw0), gpios)
 #define PULL_UP DT_GPIO_FLAGS(DT_ALIAS(sw0), gpios)
 
 #define BUSY_WAIT_S 5U
 #define SLEEP_US 2000U
-#define SLEEP_S     3U
+#define SLEEP_S 3U
 
 extern void CC1352R1_LAUNCHXL_shutDownExtFlash(void);
 

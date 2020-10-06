@@ -81,8 +81,7 @@ int z_impl_k_futex_wait(struct k_futex *futex, int expected,
 		return -EAGAIN;
 	}
 
-	ret = z_pend_curr(&futex_data->lock,
-			key, &futex_data->wait_q, timeout);
+	ret = z_pend_curr(&futex_data->lock, key, &futex_data->wait_q, timeout);
 	if (ret == -EAGAIN) {
 		ret = -ETIMEDOUT;
 	}

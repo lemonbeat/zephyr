@@ -84,7 +84,7 @@ enum mqtt_evt_type {
 /** @brief MQTT version protocol level. */
 enum mqtt_version {
 	MQTT_VERSION_3_1_0 = 3, /**< Protocol level for 3.1.0. */
-	MQTT_VERSION_3_1_1 = 4  /**< Protocol level for 3.1.1. */
+	MQTT_VERSION_3_1_1 = 4 /**< Protocol level for 3.1.1. */
 };
 
 /** @brief MQTT Quality of Service types. */
@@ -103,34 +103,34 @@ enum mqtt_qos {
 	 *  shall be published only once. Message not published to interested
 	 *  parties unless client issues a PUBREL.
 	 */
-	MQTT_QOS_2_EXACTLY_ONCE  = 0x02
+	MQTT_QOS_2_EXACTLY_ONCE = 0x02
 };
 
 /** @brief MQTT CONNACK return codes. */
 enum mqtt_conn_return_code {
 	/** Connection accepted. */
-	MQTT_CONNECTION_ACCEPTED                = 0x00,
+	MQTT_CONNECTION_ACCEPTED = 0x00,
 
 	/** The Server does not support the level of the MQTT protocol
 	 * requested by the Client.
 	 */
-	MQTT_UNACCEPTABLE_PROTOCOL_VERSION      = 0x01,
+	MQTT_UNACCEPTABLE_PROTOCOL_VERSION = 0x01,
 
 	/** The Client identifier is correct UTF-8 but not allowed by the
 	 *  Server.
 	 */
-	MQTT_IDENTIFIER_REJECTED                = 0x02,
+	MQTT_IDENTIFIER_REJECTED = 0x02,
 
 	/** The Network Connection has been made but the MQTT service is
 	 *  unavailable.
 	 */
-	MQTT_SERVER_UNAVAILABLE                 = 0x03,
+	MQTT_SERVER_UNAVAILABLE = 0x03,
 
 	/** The data in the user name or password is malformed. */
-	MQTT_BAD_USER_NAME_OR_PASSWORD          = 0x04,
+	MQTT_BAD_USER_NAME_OR_PASSWORD = 0x04,
 
 	/** The Client is not authorized to connect. */
-	MQTT_NOT_AUTHORIZED                     = 0x05
+	MQTT_NOT_AUTHORIZED = 0x05
 };
 
 /** @brief MQTT SUBACK return codes. */
@@ -150,8 +150,8 @@ enum mqtt_suback_return_code {
 
 /** @brief Abstracts UTF-8 encoded strings. */
 struct mqtt_utf8 {
-	const uint8_t *utf8;       /**< Pointer to UTF-8 string. */
-	uint32_t size;             /**< Size of UTF string, in bytes. */
+	const uint8_t *utf8; /**< Pointer to UTF-8 string. */
+	uint32_t size; /**< Size of UTF string, in bytes. */
 };
 
 /**
@@ -163,13 +163,13 @@ struct mqtt_utf8 {
  *
  * @param[in] literal Literal string from which to generate mqtt_utf8 object.
  */
-#define MQTT_UTF8_LITERAL(literal)				\
-	((struct mqtt_utf8) {literal, sizeof(literal) - 1})
+#define MQTT_UTF8_LITERAL(literal) \
+	((struct mqtt_utf8){ literal, sizeof(literal) - 1 })
 
 /** @brief Abstracts binary strings. */
 struct mqtt_binstr {
-	uint8_t *data;             /**< Pointer to binary stream. */
-	uint32_t len;              /**< Length of binary stream. */
+	uint8_t *data; /**< Pointer to binary stream. */
+	uint32_t len; /**< Length of binary stream. */
 };
 
 /** @brief Abstracts MQTT UTF-8 encoded topic that can be subscribed
@@ -187,7 +187,7 @@ struct mqtt_topic {
 
 /** @brief Parameters for a publish message. */
 struct mqtt_publish_message {
-	struct mqtt_topic topic;     /**< Topic on which data was published. */
+	struct mqtt_topic topic; /**< Topic on which data was published. */
 	struct mqtt_binstr payload; /**< Payload on the topic published. */
 };
 
@@ -552,8 +552,7 @@ void mqtt_client_init(struct mqtt_client *client);
  * @note Must be called before calling mqtt_connect().
  */
 int mqtt_client_set_proxy(struct mqtt_client *client,
-			  struct sockaddr *proxy_addr,
-			  socklen_t addrlen);
+			  struct sockaddr *proxy_addr, socklen_t addrlen);
 #endif
 
 /**

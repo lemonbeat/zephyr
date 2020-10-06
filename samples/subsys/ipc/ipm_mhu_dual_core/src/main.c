@@ -52,12 +52,12 @@ void main(void)
 	mhu0 = device_get_binding(DT_LABEL(DT_INST(0, arm_mhu)));
 	if (!mhu0) {
 		printk("CPU %d, get MHU0 fail!\n",
-				sse_200_platform_get_cpu_id());
+		       sse_200_platform_get_cpu_id());
 		while (1) {
 		}
 	} else {
 		printk("CPU %d, get MHU0 success!\n",
-				sse_200_platform_get_cpu_id());
+		       sse_200_platform_get_cpu_id());
 		ipm_register_callback(mhu0, mhu_isr_callback, NULL);
 	}
 

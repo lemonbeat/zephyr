@@ -21,8 +21,8 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include <net/buf.h>
 
 #if defined(CONFIG_NET_BUF_LOG)
-#define NET_BUF_DBG(fmt, ...) LOG_DBG("(%p) " fmt, k_current_get(), \
-				      ##__VA_ARGS__)
+#define NET_BUF_DBG(fmt, ...) \
+	LOG_DBG("(%p) " fmt, k_current_get(), ##__VA_ARGS__)
 #define NET_BUF_ERR(fmt, ...) LOG_ERR(fmt, ##__VA_ARGS__)
 #define NET_BUF_WARN(fmt, ...) LOG_WRN(fmt, ##__VA_ARGS__)
 #define NET_BUF_INFO(fmt, ...) LOG_INF(fmt, ##__VA_ARGS__)
@@ -93,7 +93,7 @@ static uint8_t *generic_data_ref(struct net_buf *buf, uint8_t *data)
 }
 
 static uint8_t *mem_pool_data_alloc(struct net_buf *buf, size_t *size,
-				 k_timeout_t timeout)
+				    k_timeout_t timeout)
 {
 	struct net_buf_pool *buf_pool = net_buf_pool_get(buf->pool_id);
 	struct k_mem_pool *pool = buf_pool->alloc->alloc_data;
@@ -134,12 +134,12 @@ static void mem_pool_data_unref(struct net_buf *buf, uint8_t *data)
 
 const struct net_buf_data_cb net_buf_var_cb = {
 	.alloc = mem_pool_data_alloc,
-	.ref   = generic_data_ref,
+	.ref = generic_data_ref,
 	.unref = mem_pool_data_unref,
 };
 
 static uint8_t *fixed_data_alloc(struct net_buf *buf, size_t *size,
-			      k_timeout_t timeout)
+				 k_timeout_t timeout)
 {
 	struct net_buf_pool *pool = net_buf_pool_get(buf->pool_id);
 	const struct net_buf_pool_fixed *fixed = pool->alloc->alloc_data;
@@ -162,7 +162,7 @@ const struct net_buf_data_cb net_buf_fixed_cb = {
 #if (CONFIG_HEAP_MEM_POOL_SIZE > 0)
 
 static uint8_t *heap_data_alloc(struct net_buf *buf, size_t *size,
-			     k_timeout_t timeout)
+				k_timeout_t timeout)
 {
 	uint8_t *ref_count;
 
@@ -190,7 +190,7 @@ static void heap_data_unref(struct net_buf *buf, uint8_t *data)
 
 static const struct net_buf_data_cb net_buf_heap_cb = {
 	.alloc = heap_data_alloc,
-	.ref   = generic_data_ref,
+	.ref = generic_data_ref,
 	.unref = heap_data_unref,
 };
 
@@ -200,7 +200,8 @@ const struct net_buf_data_alloc net_buf_heap_alloc = {
 
 #endif /* CONFIG_HEAP_MEM_POOL_SIZE > 0 */
 
-static uint8_t *data_alloc(struct net_buf *buf, size_t *size, k_timeout_t timeout)
+static uint8_t *data_alloc(struct net_buf *buf, size_t *size,
+			   k_timeout_t timeout)
 {
 	struct net_buf_pool *pool = net_buf_pool_get(buf->pool_id);
 
@@ -280,11 +281,11 @@ struct net_buf *net_buf_alloc_len(struct net_buf_pool *pool, size_t size,
 		buf = k_lifo_get(&pool->free, K_NO_WAIT);
 		while (!buf) {
 #if defined(CONFIG_NET_BUF_POOL_USAGE)
-			NET_BUF_WARN("%s():%d: Pool %s low on buffers.",
-				     func, line, pool->name);
+			NET_BUF_WARN("%s():%d: Pool %s low on buffers.", func,
+				     line, pool->name);
 #else
-			NET_BUF_WARN("%s():%d: Pool %p low on buffers.",
-				     func, line, pool);
+			NET_BUF_WARN("%s():%d: Pool %p low on buffers.", func,
+				     line, pool);
 #endif
 			buf = k_lifo_get(&pool->free, WARN_ALLOC_INTERVAL);
 #if defined(CONFIG_NET_BUF_POOL_USAGE)
@@ -328,8 +329,8 @@ success:
 
 		buf->__buf = data_alloc(buf, &size, timeout);
 		if (!buf->__buf) {
-			NET_BUF_ERR("%s():%d: Failed to allocate data",
-				    func, line);
+			NET_BUF_ERR("%s():%d: Failed to allocate data", func,
+				    line);
 			net_buf_destroy(buf);
 			return NULL;
 		}
@@ -339,10 +340,10 @@ success:
 		buf->__buf = NULL;
 	}
 
-	buf->ref   = 1U;
+	buf->ref = 1U;
 	buf->flags = 0U;
 	buf->frags = NULL;
-	buf->size  = size;
+	buf->size = size;
 	net_buf_reset(buf);
 
 #if defined(CONFIG_NET_BUF_POOL_USAGE)
@@ -378,9 +379,8 @@ struct net_buf *net_buf_alloc_with_data_debug(struct net_buf_pool *pool,
 					      k_timeout_t timeout,
 					      const char *func, int line)
 #else
-struct net_buf *net_buf_alloc_with_data(struct net_buf_pool *pool,
-					void *data, size_t size,
-					k_timeout_t timeout)
+struct net_buf *net_buf_alloc_with_data(struct net_buf_pool *pool, void *data,
+					size_t size, k_timeout_t timeout)
 #endif
 {
 	struct net_buf *buf;
@@ -433,13 +433,13 @@ struct net_buf *net_buf_get(struct k_fifo *fifo, k_timeout_t timeout)
 	return buf;
 }
 
-void net_buf_simple_init_with_data(struct net_buf_simple *buf,
-				   void *data, size_t size)
+void net_buf_simple_init_with_data(struct net_buf_simple *buf, void *data,
+				   size_t size)
 {
 	buf->__buf = data;
-	buf->data  = data;
-	buf->size  = size;
-	buf->len   = size;
+	buf->data = data;
+	buf->size = size;
+	buf->len = size;
 }
 
 void net_buf_simple_reserve(struct net_buf_simple *buf, size_t reserve)
@@ -570,8 +570,8 @@ struct net_buf *net_buf_ref(struct net_buf *buf)
 {
 	__ASSERT_NO_MSG(buf);
 
-	NET_BUF_DBG("buf %p (old) ref %u pool_id %u",
-		    buf, buf->ref, buf->pool_id);
+	NET_BUF_DBG("buf %p (old) ref %u pool_id %u", buf, buf->ref,
+		    buf->pool_id);
 	buf->ref++;
 	return buf;
 }
@@ -665,8 +665,8 @@ struct net_buf *net_buf_frag_add(struct net_buf *head, struct net_buf *frag)
 
 #if defined(CONFIG_NET_BUF_LOG)
 struct net_buf *net_buf_frag_del_debug(struct net_buf *parent,
-				       struct net_buf *frag,
-				       const char *func, int line)
+				       struct net_buf *frag, const char *func,
+				       int line)
 #else
 struct net_buf *net_buf_frag_del(struct net_buf *parent, struct net_buf *frag)
 #endif
@@ -734,8 +734,8 @@ size_t net_buf_linearize(void *dst, size_t dst_len, struct net_buf *src,
  * the data in current fragment then create new fragment and add it to
  * the buffer. It assumes that the buffer has at least one fragment.
  */
-size_t net_buf_append_bytes(struct net_buf *buf, size_t len,
-			    const void *value, k_timeout_t timeout,
+size_t net_buf_append_bytes(struct net_buf *buf, size_t len, const void *value,
+			    k_timeout_t timeout,
 			    net_buf_allocator_cb allocate_cb, void *user_data)
 {
 	struct net_buf *frag = net_buf_frag_last(buf);
@@ -1031,7 +1031,7 @@ uint16_t net_buf_simple_pull_be16(struct net_buf_simple *buf)
 uint32_t net_buf_simple_pull_le24(struct net_buf_simple *buf)
 {
 	struct uint24 {
-		uint32_t u24:24;
+		uint32_t u24 : 24;
 	} __packed val;
 
 	val = UNALIGNED_GET((struct uint24 *)buf->data);
@@ -1043,7 +1043,7 @@ uint32_t net_buf_simple_pull_le24(struct net_buf_simple *buf)
 uint32_t net_buf_simple_pull_be24(struct net_buf_simple *buf)
 {
 	struct uint24 {
-		uint32_t u24:24;
+		uint32_t u24 : 24;
 	} __packed val;
 
 	val = UNALIGNED_GET((struct uint24 *)buf->data);
@@ -1075,7 +1075,7 @@ uint32_t net_buf_simple_pull_be32(struct net_buf_simple *buf)
 uint64_t net_buf_simple_pull_le48(struct net_buf_simple *buf)
 {
 	struct uint48 {
-		uint64_t u48:48;
+		uint64_t u48 : 48;
 	} __packed val;
 
 	val = UNALIGNED_GET((struct uint48 *)buf->data);
@@ -1087,7 +1087,7 @@ uint64_t net_buf_simple_pull_le48(struct net_buf_simple *buf)
 uint64_t net_buf_simple_pull_be48(struct net_buf_simple *buf)
 {
 	struct uint48 {
-		uint64_t u48:48;
+		uint64_t u48 : 48;
 	} __packed val;
 
 	val = UNALIGNED_GET((struct uint48 *)buf->data);

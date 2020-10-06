@@ -30,8 +30,7 @@ struct crypto_stm32_session {
 #define CRYPTO_STM32_CFG(dev) \
 	((const struct crypto_stm32_config *const)(dev)->config)
 
-#define CRYPTO_STM32_DATA(dev) \
-	((struct crypto_stm32_data *const)(dev)->data)
+#define CRYPTO_STM32_DATA(dev) ((struct crypto_stm32_data *const)(dev)->data)
 
 #define CRYPTO_STM32_SESSN(ctx) \
 	((struct crypto_stm32_session *const)(ctx)->drv_sessn_state)

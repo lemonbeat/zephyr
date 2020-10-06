@@ -14,8 +14,7 @@
  * Given offset in flash sector, fill in rest of the fcb_entry, and crc8 over
  * the data.
  */
-int
-fcb_elem_crc8(struct fcb *fcb, struct fcb_entry *loc, uint8_t *c8p)
+int fcb_elem_crc8(struct fcb *fcb, struct fcb_entry *loc, uint8_t *c8p)
 {
 	uint8_t tmp_str[FCB_TMP_BUF_SZ];
 	int cnt;
@@ -76,7 +75,8 @@ int fcb_elem_info(struct fcb *fcb, struct fcb_entry *loc)
 	}
 	off = loc->fe_data_off + fcb_len_in_flash(fcb, loc->fe_data_len);
 
-	rc = fcb_flash_read(fcb, loc->fe_sector, off, &fl_crc8, sizeof(fl_crc8));
+	rc = fcb_flash_read(fcb, loc->fe_sector, off, &fl_crc8,
+			    sizeof(fl_crc8));
 	if (rc) {
 		return -EIO;
 	}

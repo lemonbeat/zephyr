@@ -17,15 +17,15 @@
 extern "C" {
 #endif
 
-#define IPM_CONSOLE_STDOUT	(BIT(0))
-#define IPM_CONSOLE_PRINTK	(BIT(1))
+#define IPM_CONSOLE_STDOUT (BIT(0))
+#define IPM_CONSOLE_PRINTK (BIT(1))
 
 /*
  * Good way to determine these numbers other than trial-and-error?
  * using printf() in the thread seems to require a lot more stack space
  */
-#define IPM_CONSOLE_STACK_SIZE		CONFIG_IPM_CONSOLE_STACK_SIZE
-#define IPM_CONSOLE_PRI			2
+#define IPM_CONSOLE_STACK_SIZE CONFIG_IPM_CONSOLE_STACK_SIZE
+#define IPM_CONSOLE_PRI 2
 
 struct ipm_console_receiver_config_info {
 	/** Name of the low-level IPM driver to bind to */

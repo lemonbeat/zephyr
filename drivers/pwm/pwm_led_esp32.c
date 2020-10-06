@@ -37,15 +37,12 @@ enum {
 	PWM_LED_ESP32_APB_CLK_FREQ,
 };
 
-enum {
-	PWM_LED_ESP32_HIGH_SPEED,
-	PWM_LED_ESP32_LOW_SPEED
-};
+enum { PWM_LED_ESP32_HIGH_SPEED, PWM_LED_ESP32_LOW_SPEED };
 
 struct pwm_led_esp32_timer {
 	int freq;
 	uint8_t bit_num;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 struct pwm_led_esp32_channel {
 	uint8_t timer : 2;
@@ -54,11 +51,11 @@ struct pwm_led_esp32_channel {
 
 union pwm_led_esp32_duty {
 	struct {
-		uint32_t start: 1;
-		uint32_t direction: 1;
-		uint32_t num: 3;
-		uint32_t cycle: 3;
-		uint32_t scale: 3;
+		uint32_t start : 1;
+		uint32_t direction : 1;
+		uint32_t num : 3;
+		uint32_t cycle : 3;
+		uint32_t scale : 3;
 	};
 	uint32_t val;
 };
@@ -108,8 +105,9 @@ static const char *esp32_get_gpio_for_pin(int pin)
 }
 /* end Remove after PR 5113 */
 
-static uint8_t pwm_led_esp32_get_gpio_config(uint8_t pin,
-		const struct pwm_led_esp32_channel *ch_cfg)
+static uint8_t
+pwm_led_esp32_get_gpio_config(uint8_t pin,
+			      const struct pwm_led_esp32_channel *ch_cfg)
 {
 	uint8_t i;
 
@@ -150,9 +148,7 @@ static void pwm_led_esp32_update_duty(int speed_mode, int channel)
 	pwm_led_esp32_low_speed_update(speed_mode, channel);
 }
 
-static void pwm_led_esp32_duty_config(int speed_mode,
-				      int channel,
-				      int duty_val,
+static void pwm_led_esp32_duty_config(int speed_mode, int channel, int duty_val,
 				      union pwm_led_esp32_duty duty)
 {
 	volatile uint32_t hpoint_addr;
@@ -190,8 +186,7 @@ static void pwm_led_esp32_duty_set(int speed_mode, int channel, int duty_val)
 	pwm_led_esp32_duty_config(speed_mode, channel, duty_val << 4, duty);
 }
 
-static void pwm_led_esp32_bind_channel_timer(int speed_mode,
-					     int channel,
+static void pwm_led_esp32_bind_channel_timer(int speed_mode, int channel,
 					     int timer)
 {
 	volatile uint32_t timer_addr;
@@ -250,8 +245,8 @@ static int pwm_led_esp32_channel_set(int pin, bool speed_mode, int channel,
 	return 0;
 }
 
-static int pwm_led_esp32_timer_set(int speed_mode, int timer,
-				   int bit_num, int frequency)
+static int pwm_led_esp32_timer_set(int speed_mode, int timer, int bit_num,
+				   int frequency)
 {
 	uint32_t timer_addr;
 	uint64_t div_num;
@@ -264,7 +259,7 @@ static int pwm_led_esp32_timer_set(int speed_mode, int timer,
 	 * Manual chapter 13.2.2 Timers.
 	 * div_num is a fixed point value (Q10.8).
 	 */
-	div_num = ((uint64_t) APB_CLK_FREQ << 8) / frequency / precision;
+	div_num = ((uint64_t)APB_CLK_FREQ << 8) / frequency / precision;
 
 	if (div_num < 0x100) {
 		/* Since Q10.8 is a fixed point value, then div_num < 0x100
@@ -277,7 +272,7 @@ static int pwm_led_esp32_timer_set(int speed_mode, int timer,
 		/* Since Q10.8 is a fixed point value, then div_num > 0x3FFFF
 		 * means divisor is too high. We can try to use the REF_TICK.
 		 */
-		div_num = ((uint64_t) 1000000 << 8) / frequency / precision;
+		div_num = ((uint64_t)1000000 << 8) / frequency / precision;
 		if (div_num < 0x100 || div_num > 0x3FFFF) {
 			return -EINVAL;
 		}
@@ -311,16 +306,17 @@ static int pwm_led_esp32_timer_set(int speed_mode, int timer,
 }
 
 /* period_cycles is not used, set frequency on menuconfig instead. */
-static int pwm_led_esp32_pin_set_cycles(const struct device *dev,
-					uint32_t pwm, uint32_t period_cycles,
-					uint32_t pulse_cycles, pwm_flags_t flags)
+static int pwm_led_esp32_pin_set_cycles(const struct device *dev, uint32_t pwm,
+					uint32_t period_cycles,
+					uint32_t pulse_cycles,
+					pwm_flags_t flags)
 {
 	int speed_mode;
 	int channel;
 	int timer;
 	int ret;
-	const struct pwm_led_esp32_config * const config =
-		(const struct pwm_led_esp32_config *) dev->config;
+	const struct pwm_led_esp32_config *const config =
+		(const struct pwm_led_esp32_config *)dev->config;
 
 	ARG_UNUSED(period_cycles);
 
@@ -334,7 +330,7 @@ static int pwm_led_esp32_pin_set_cycles(const struct device *dev,
 		return -EINVAL;
 	}
 	speed_mode = channel < 8 ? PWM_LED_ESP32_HIGH_SPEED :
-				   PWM_LED_ESP32_LOW_SPEED;
+					 PWM_LED_ESP32_LOW_SPEED;
 
 	timer = config->ch_cfg[channel].timer;
 	/* Now we know which speed_mode and timer is set, then we will convert
@@ -347,9 +343,9 @@ static int pwm_led_esp32_pin_set_cycles(const struct device *dev,
 	clear_mask32(DPORT_LEDC_RST, DPORT_PERIP_RST_EN_REG);
 
 	/* Set timer */
-	ret = pwm_led_esp32_timer_set(speed_mode, timer,
-			config->timer_cfg[speed_mode][timer].bit_num,
-			config->timer_cfg[speed_mode][timer].freq);
+	ret = pwm_led_esp32_timer_set(
+		speed_mode, timer, config->timer_cfg[speed_mode][timer].bit_num,
+		config->timer_cfg[speed_mode][timer].freq);
 	if (ret < 0) {
 		return ret;
 	}
@@ -366,22 +362,21 @@ static int pwm_led_esp32_pin_set_cycles(const struct device *dev,
 }
 
 static int pwm_led_esp32_get_cycles_per_sec(const struct device *dev,
-					    uint32_t pwm,
-					    uint64_t *cycles)
+					    uint32_t pwm, uint64_t *cycles)
 {
 	const struct pwm_led_esp32_config *config;
 	int channel;
 	int timer;
 	int speed_mode;
 
-	config = (const struct pwm_led_esp32_config *) dev->config;
+	config = (const struct pwm_led_esp32_config *)dev->config;
 
 	channel = pwm_led_esp32_get_gpio_config(pwm, config->ch_cfg);
 	if (channel < 0) {
 		return -EINVAL;
 	}
 	speed_mode = channel < 8 ? PWM_LED_ESP32_HIGH_SPEED :
-				   PWM_LED_ESP32_LOW_SPEED;
+					 PWM_LED_ESP32_LOW_SPEED;
 
 	timer = config->ch_cfg[channel].timer;
 
@@ -406,15 +401,15 @@ int pwm_led_esp32_init(const struct device *dev)
 
 DEVICE_DECLARE(pwm_led_esp32_0);
 
-#define CH_HS_TIMER(i) ((CONFIG_PWM_LED_ESP32_HS_CH ## i ## _TIMER) & 0x2)
-#define CH_HS_GPIO(i) ((CONFIG_PWM_LED_ESP32_HS_CH ## i ## _GPIO) & 0xfff)
-#define CH_LS_TIMER(i) ((CONFIG_PWM_LED_ESP32_LS_CH ## i ## _TIMER) & 0x2)
-#define CH_LS_GPIO(i) ((CONFIG_PWM_LED_ESP32_LS_CH ## i ## _GPIO) & 0xfff)
+#define CH_HS_TIMER(i) ((CONFIG_PWM_LED_ESP32_HS_CH##i##_TIMER) & 0x2)
+#define CH_HS_GPIO(i) ((CONFIG_PWM_LED_ESP32_HS_CH##i##_GPIO) & 0xfff)
+#define CH_LS_TIMER(i) ((CONFIG_PWM_LED_ESP32_LS_CH##i##_TIMER) & 0x2)
+#define CH_LS_GPIO(i) ((CONFIG_PWM_LED_ESP32_LS_CH##i##_GPIO) & 0xfff)
 
-#define TIMER_HS_FREQ(i) (CONFIG_PWM_LED_ESP32_HS_TIMER ## i ## _FREQ)
-#define TIMER_LS_FREQ(i) (CONFIG_PWM_LED_ESP32_LS_TIMER ## i ## _FREQ)
-#define TIMER_HS_BIT_NUM(i) (CONFIG_PWM_LED_ESP32_HS_TIMER ## i ## _BIT_NUM)
-#define TIMER_LS_BIT_NUM(i) (CONFIG_PWM_LED_ESP32_LS_TIMER ## i ## _BIT_NUM)
+#define TIMER_HS_FREQ(i) (CONFIG_PWM_LED_ESP32_HS_TIMER##i##_FREQ)
+#define TIMER_LS_FREQ(i) (CONFIG_PWM_LED_ESP32_LS_TIMER##i##_FREQ)
+#define TIMER_HS_BIT_NUM(i) (CONFIG_PWM_LED_ESP32_HS_TIMER##i##_BIT_NUM)
+#define TIMER_LS_BIT_NUM(i) (CONFIG_PWM_LED_ESP32_LS_TIMER##i##_BIT_NUM)
 
 const static struct pwm_led_esp32_config pwm_led_esp32_config = {
 	.timer_cfg[PWM_LED_ESP32_HIGH_SPEED][0] = {

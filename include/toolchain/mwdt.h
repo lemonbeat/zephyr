@@ -16,44 +16,37 @@
 #define FUNC_CODE()
 #define FUNC_INSTR(a)
 
-.macro section_var_mwdt, section, symbol
-	.section .\&section\&.\&symbol, "aw"
-	symbol :
-.endm
+.macro section_var_mwdt, section, symbol.section.\&section\&.\&symbol,
+	"aw" symbol
+	:.endm
 
-.macro section_func_mwdt, section, symbol
-	.section .\&section\&.\&symbol, "ax"
-	FUNC_CODE()
-	PERFOPT_ALIGN
-	symbol :
-	FUNC_INSTR(symbol)
-.endm
+		 .macro section_func_mwdt,
+	section, symbol.section.\&section\&.\&symbol,
+	"ax" FUNC_CODE() PERFOPT_ALIGN symbol
+	: FUNC_INSTR(symbol)
+		  .endm
 
-.macro section_subsec_func_mwdt, section, subsection, symbol
-	.section .\&section\&.\&subsection, "ax"
-	PERFOPT_ALIGN
-	symbol :
-.endm
+		  .macro section_subsec_func_mwdt,
+	section, subsection, symbol.section.\&section\&.\&subsection,
+	"ax" PERFOPT_ALIGN symbol
+	:.endm
 
 #define SECTION_VAR(sect, sym) section_var_mwdt sect, sym
 #define SECTION_FUNC(sect, sym) section_func_mwdt sect, sym
 #define SECTION_SUBSEC_FUNC(sect, subsec, sym) \
 	section_subsec_func_mwdt sect, subsec, sym
 
-.macro glbl_text_mwdt, symbol
-	.globl symbol
-	.type symbol, @function
-.endm
+		 .macro glbl_text_mwdt,
+	symbol.globl symbol.type symbol,
+	@function
+		.endm
 
-.macro glbl_data_mwdt, symbol
-	.globl symbol
-	.type symbol, @object
-.endm
+		.macro glbl_data_mwdt,
+	symbol.globl symbol.type symbol,
+	@object.endm
 
-.macro weak_data_mwdt, symbol
-	.weak symbol
-	.type symbol, @object
-.endm
+		.macro weak_data_mwdt,
+	symbol.weak symbol.type symbol, @object.endm
 
 #define GTEXT(sym) glbl_text_mwdt sym
 #define GDATA(sym) glbl_data_mwdt sym
@@ -71,7 +64,7 @@
 #undef BUILD_ASSERT
 #define BUILD_ASSERT(EXPR, MSG...)
 
-#define __builtin_arc_nop()	_nop()
+#define __builtin_arc_nop() _nop()
 
 #endif /* _ASMLANGUAGE */
 

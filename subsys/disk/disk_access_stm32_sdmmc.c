@@ -43,8 +43,7 @@ static int stm32_sdmmc_clock_enable(struct stm32_sdmmc_priv *priv)
 #if CONFIG_SOC_SERIES_STM32L4X
 	LL_RCC_PLLSAI1_Disable();
 	/* Configure PLLSA11 to enable 48M domain */
-	LL_RCC_PLLSAI1_ConfigDomain_48M(LL_RCC_PLLSOURCE_HSI,
-					LL_RCC_PLLM_DIV_1,
+	LL_RCC_PLLSAI1_ConfigDomain_48M(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_1,
 					8, LL_RCC_PLLSAI1Q_DIV_8);
 
 	/* Enable PLLSA1 */
@@ -133,8 +132,8 @@ static int stm32_sdmmc_access_read(struct disk_info *disk, uint8_t *data_buf,
 	struct stm32_sdmmc_priv *priv = dev->data;
 	int err;
 
-	err = HAL_SD_ReadBlocks(&priv->hsd, data_buf, start_sector,
-				num_sector, 30000);
+	err = HAL_SD_ReadBlocks(&priv->hsd, data_buf, start_sector, num_sector,
+				30000);
 	if (err != HAL_OK) {
 		LOG_ERR("sd read block failed %d", err);
 		return -EIO;
@@ -237,9 +236,8 @@ static bool stm32_sdmmc_card_present(struct stm32_sdmmc_priv *priv)
 
 static void stm32_sdmmc_cd_handler(struct k_work *item)
 {
-	struct stm32_sdmmc_priv *priv = CONTAINER_OF(item,
-						     struct stm32_sdmmc_priv,
-						     work);
+	struct stm32_sdmmc_priv *priv =
+		CONTAINER_OF(item, struct stm32_sdmmc_priv, work);
 
 	if (stm32_sdmmc_card_present(priv)) {
 		LOG_DBG("card inserted");
@@ -252,12 +250,10 @@ static void stm32_sdmmc_cd_handler(struct k_work *item)
 }
 
 static void stm32_sdmmc_cd_callback(const struct device *gpiodev,
-				    struct gpio_callback *cb,
-				    uint32_t pin)
+				    struct gpio_callback *cb, uint32_t pin)
 {
-	struct stm32_sdmmc_priv *priv = CONTAINER_OF(cb,
-						     struct stm32_sdmmc_priv,
-						     cd_cb);
+	struct stm32_sdmmc_priv *priv =
+		CONTAINER_OF(cb, struct stm32_sdmmc_priv, cd_cb);
 
 	k_work_submit(&priv->work);
 }
@@ -412,9 +408,7 @@ static struct stm32_sdmmc_priv stm32_sdmmc_priv_1 = {
 	},
 };
 
-DEVICE_AND_API_INIT(stm32_sdmmc_dev1,
-		    DT_INST_LABEL(0), disk_stm32_sdmmc_init,
+DEVICE_AND_API_INIT(stm32_sdmmc_dev1, DT_INST_LABEL(0), disk_stm32_sdmmc_init,
 		    &stm32_sdmmc_priv_1, NULL, APPLICATION,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    NULL);
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, NULL);
 #endif

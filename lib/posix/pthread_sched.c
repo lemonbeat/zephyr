@@ -63,7 +63,6 @@ int sched_get_priority_max(int policy)
 			 */
 			return (CONFIG_NUM_COOP_PRIORITIES - 1);
 		}
-
 	}
 
 	if (IS_ENABLED(CONFIG_PREEMPT_ENABLED)) {

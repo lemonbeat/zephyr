@@ -32,11 +32,10 @@ extern void z_SpuriousIntNoErrCodeHandler(void *handler);
  * section. The genIdt tool can then populate any unused vectors with
  * these routines.
  */
-void *__attribute__((section(".spurIsr"))) MK_ISR_NAME(z_SpuriousIntHandler) =
-	&z_SpuriousIntHandler;
+void *__attribute__((section(".spurIsr")))
+MK_ISR_NAME(z_SpuriousIntHandler) = &z_SpuriousIntHandler;
 void *__attribute__((section(".spurNoErrIsr")))
-	MK_ISR_NAME(z_SpuriousIntNoErrCodeHandler) =
-		&z_SpuriousIntNoErrCodeHandler;
+MK_ISR_NAME(z_SpuriousIntNoErrCodeHandler) = &z_SpuriousIntNoErrCodeHandler;
 
 void arch_isr_direct_footer_swap(unsigned int key)
 {
@@ -106,7 +105,7 @@ static unsigned int priority_to_free_vector(unsigned int requested_priority)
 	unsigned int vector_block;
 	unsigned int vector;
 
-	static unsigned int mask[2] = {0x0000ffffU, 0xffff0000U};
+	static unsigned int mask[2] = { 0x0000ffffU, 0xffff0000U };
 
 	vector_block = requested_priority + 2;
 
@@ -138,7 +137,7 @@ static unsigned int priority_to_free_vector(unsigned int requested_priority)
 	 * the argument is zero.
 	 */
 	search_set = mask[vector_block & 1] &
-			z_interrupt_vectors_allocated[entry];
+		     z_interrupt_vectors_allocated[entry];
 	fsb = find_lsb_set(search_set);
 
 	__ASSERT(fsb != 0U, "No remaning vectors for priority level %d",
@@ -178,8 +177,8 @@ static void *get_dynamic_stub(int stub_idx)
 	 * a larger jump instruction to common dynamic IRQ handling code
 	 */
 	offset = (stub_idx * Z_DYN_STUB_SIZE) +
-		((stub_idx / Z_DYN_STUB_PER_BLOCK) *
-		 Z_DYN_STUB_LONG_JMP_EXTRA_SIZE);
+		 ((stub_idx / Z_DYN_STUB_PER_BLOCK) *
+		  Z_DYN_STUB_LONG_JMP_EXTRA_SIZE);
 
 	return (void *)((uint32_t)&z_dynamic_stubs_begin + offset);
 }
@@ -192,7 +191,7 @@ static void idt_vector_install(int vector, void *irq_handler)
 
 	key = irq_lock();
 	z_init_irq_gate(&z_x86_idt.entries[vector], CODE_SEG,
-		       (uint32_t)irq_handler, 0);
+			(uint32_t)irq_handler, 0);
 	irq_unlock(key);
 }
 

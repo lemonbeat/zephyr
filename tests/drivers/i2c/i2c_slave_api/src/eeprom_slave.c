@@ -34,11 +34,9 @@ struct i2c_eeprom_slave_config {
 };
 
 /* convenience defines */
-#define DEV_CFG(dev)							\
-	((const struct i2c_eeprom_slave_config * const)			\
-		(dev)->config)
-#define DEV_DATA(dev)							\
-	((struct i2c_eeprom_slave_data * const)(dev)->data)
+#define DEV_CFG(dev) \
+	((const struct i2c_eeprom_slave_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct i2c_eeprom_slave_data *const)(dev)->data)
 
 int eeprom_slave_program(const struct device *dev, const uint8_t *eeprom_data,
 			 unsigned int length)
@@ -70,9 +68,8 @@ int eeprom_slave_read(const struct device *dev, uint8_t *eeprom_data,
 
 static int eeprom_slave_write_requested(struct i2c_slave_config *config)
 {
-	struct i2c_eeprom_slave_data *data = CONTAINER_OF(config,
-						struct i2c_eeprom_slave_data,
-						config);
+	struct i2c_eeprom_slave_data *data =
+		CONTAINER_OF(config, struct i2c_eeprom_slave_data, config);
 
 	LOG_DBG("eeprom: write req");
 
@@ -84,9 +81,8 @@ static int eeprom_slave_write_requested(struct i2c_slave_config *config)
 static int eeprom_slave_read_requested(struct i2c_slave_config *config,
 				       uint8_t *val)
 {
-	struct i2c_eeprom_slave_data *data = CONTAINER_OF(config,
-						struct i2c_eeprom_slave_data,
-						config);
+	struct i2c_eeprom_slave_data *data =
+		CONTAINER_OF(config, struct i2c_eeprom_slave_data, config);
 
 	*val = data->buffer[data->buffer_idx];
 
@@ -100,9 +96,8 @@ static int eeprom_slave_read_requested(struct i2c_slave_config *config,
 static int eeprom_slave_write_received(struct i2c_slave_config *config,
 				       uint8_t val)
 {
-	struct i2c_eeprom_slave_data *data = CONTAINER_OF(config,
-						struct i2c_eeprom_slave_data,
-						config);
+	struct i2c_eeprom_slave_data *data =
+		CONTAINER_OF(config, struct i2c_eeprom_slave_data, config);
 
 	LOG_DBG("eeprom: write done, val=0x%x", val);
 
@@ -126,9 +121,8 @@ static int eeprom_slave_write_received(struct i2c_slave_config *config,
 static int eeprom_slave_read_processed(struct i2c_slave_config *config,
 				       uint8_t *val)
 {
-	struct i2c_eeprom_slave_data *data = CONTAINER_OF(config,
-						struct i2c_eeprom_slave_data,
-						config);
+	struct i2c_eeprom_slave_data *data =
+		CONTAINER_OF(config, struct i2c_eeprom_slave_data, config);
 
 	/* Increment here */
 	data->buffer_idx = (data->buffer_idx + 1) % data->buffer_size;
@@ -146,9 +140,8 @@ static int eeprom_slave_read_processed(struct i2c_slave_config *config,
 
 static int eeprom_slave_stop(struct i2c_slave_config *config)
 {
-	struct i2c_eeprom_slave_data *data = CONTAINER_OF(config,
-						struct i2c_eeprom_slave_data,
-						config);
+	struct i2c_eeprom_slave_data *data =
+		CONTAINER_OF(config, struct i2c_eeprom_slave_data, config);
 
 	LOG_DBG("eeprom: stop");
 
@@ -189,11 +182,10 @@ static int i2c_eeprom_slave_init(const struct device *dev)
 	struct i2c_eeprom_slave_data *data = DEV_DATA(dev);
 	const struct i2c_eeprom_slave_config *cfg = DEV_CFG(dev);
 
-	data->i2c_controller =
-		device_get_binding(cfg->controller_dev_name);
+	data->i2c_controller = device_get_binding(cfg->controller_dev_name);
 	if (!data->i2c_controller) {
 		LOG_ERR("i2c controller not found: %s",
-			    cfg->controller_dev_name);
+			cfg->controller_dev_name);
 		return -EINVAL;
 	}
 
@@ -205,28 +197,24 @@ static int i2c_eeprom_slave_init(const struct device *dev)
 	return 0;
 }
 
-#define I2C_EEPROM_INIT(inst)						\
-	static struct i2c_eeprom_slave_data				\
-		i2c_eeprom_slave_##inst##_dev_data;			\
-									\
-	static uint8_t							\
-	i2c_eeprom_slave_##inst##_buffer[(DT_INST_PROP(inst, size))];	\
-									\
-	static const struct i2c_eeprom_slave_config			\
-		i2c_eeprom_slave_##inst##_cfg = {			\
-		.controller_dev_name = DT_INST_BUS_LABEL(inst),		\
-		.address = DT_INST_REG_ADDR(inst),			\
-		.buffer_size = DT_INST_PROP(inst, size),		\
-		.buffer = i2c_eeprom_slave_##inst##_buffer		\
-	};								\
-									\
-	DEVICE_AND_API_INIT(i2c_eeprom_slave_##inst,			\
-			    DT_INST_LABEL(inst),			\
-			    &i2c_eeprom_slave_init,			\
-			    &i2c_eeprom_slave_##inst##_dev_data,	\
-			    &i2c_eeprom_slave_##inst##_cfg,		\
-			    APPLICATION,				\
-			    0,						\
+#define I2C_EEPROM_INIT(inst)                                                   \
+	static struct i2c_eeprom_slave_data i2c_eeprom_slave_##inst##_dev_data; \
+                                                                                \
+	static uint8_t                                                          \
+		i2c_eeprom_slave_##inst##_buffer[(DT_INST_PROP(inst, size))];   \
+                                                                                \
+	static const struct i2c_eeprom_slave_config                             \
+		i2c_eeprom_slave_##inst##_cfg = {                               \
+			.controller_dev_name = DT_INST_BUS_LABEL(inst),         \
+			.address = DT_INST_REG_ADDR(inst),                      \
+			.buffer_size = DT_INST_PROP(inst, size),                \
+			.buffer = i2c_eeprom_slave_##inst##_buffer              \
+		};                                                              \
+                                                                                \
+	DEVICE_AND_API_INIT(i2c_eeprom_slave_##inst, DT_INST_LABEL(inst),       \
+			    &i2c_eeprom_slave_init,                             \
+			    &i2c_eeprom_slave_##inst##_dev_data,                \
+			    &i2c_eeprom_slave_##inst##_cfg, APPLICATION, 0,     \
 			    &api_funcs);
 
 DT_INST_FOREACH_STATUS_OKAY(I2C_EEPROM_INIT)

@@ -17,23 +17,23 @@
 #include "mesh.h"
 #include "board.h"
 
-#define MOD_LF            0x0000
-#define OP_HELLO          0xbb
-#define OP_HEARTBEAT      0xbc
-#define OP_BADUSER        0xbd
-#define OP_VND_HELLO      BT_MESH_MODEL_OP_3(OP_HELLO, BT_COMP_ID_LF)
-#define OP_VND_HEARTBEAT  BT_MESH_MODEL_OP_3(OP_HEARTBEAT, BT_COMP_ID_LF)
-#define OP_VND_BADUSER    BT_MESH_MODEL_OP_3(OP_BADUSER, BT_COMP_ID_LF)
+#define MOD_LF 0x0000
+#define OP_HELLO 0xbb
+#define OP_HEARTBEAT 0xbc
+#define OP_BADUSER 0xbd
+#define OP_VND_HELLO BT_MESH_MODEL_OP_3(OP_HELLO, BT_COMP_ID_LF)
+#define OP_VND_HEARTBEAT BT_MESH_MODEL_OP_3(OP_HEARTBEAT, BT_COMP_ID_LF)
+#define OP_VND_BADUSER BT_MESH_MODEL_OP_3(OP_BADUSER, BT_COMP_ID_LF)
 
-#define IV_INDEX          0
-#define DEFAULT_TTL       31
-#define GROUP_ADDR        0xc123
-#define NET_IDX           0x000
-#define APP_IDX           0x000
-#define FLAGS             0
+#define IV_INDEX 0
+#define DEFAULT_TTL 31
+#define GROUP_ADDR 0xc123
+#define NET_IDX 0x000
+#define APP_IDX 0x000
+#define FLAGS 0
 
 /* Maximum characters in "hello" message */
-#define HELLO_MAX         8
+#define HELLO_MAX 8
 
 #define MAX_SENS_STATUS_LEN 8
 
@@ -45,14 +45,14 @@ enum {
 };
 
 struct sensor_hdr_a {
-	uint16_t prop_id:11;
-	uint16_t length:4;
-	uint16_t format:1;
+	uint16_t prop_id : 11;
+	uint16_t length : 4;
+	uint16_t format : 1;
 } __packed;
 
 struct sensor_hdr_b {
-	uint8_t length:7;
-	uint8_t format:1;
+	uint8_t length : 7;
+	uint8_t format : 1;
 	uint16_t prop_id;
 } __packed;
 
@@ -83,8 +83,7 @@ static struct bt_mesh_cfg_srv cfg_srv = {
 	.hb_sub.func = heartbeat,
 };
 
-static struct bt_mesh_cfg_cli cfg_cli = {
-};
+static struct bt_mesh_cfg_cli cfg_cli = {};
 
 static void attention_on(struct bt_mesh_model *model)
 {
@@ -113,8 +112,8 @@ static void gen_onoff_get(struct bt_mesh_model *model,
 	NET_BUF_SIMPLE_DEFINE(msg, 2 + 1 + 4);
 	struct led_onoff_state *state = model->user_data;
 
-	printk("addr 0x%04x onoff 0x%02x\n",
-	       bt_mesh_model_elem(model)->addr, state->current);
+	printk("addr 0x%04x onoff 0x%02x\n", bt_mesh_model_elem(model)->addr,
+	       state->current);
 	bt_mesh_model_msg_init(&msg, BT_MESH_MODEL_OP_GEN_ONOFF_STATUS);
 	net_buf_simple_add_u8(&msg, state->current);
 
@@ -153,8 +152,8 @@ static void gen_onoff_set_unack(struct bt_mesh_model *model,
 	state->last_tx_addr = ctx->addr;
 	state->last_msg_timestamp = now;
 
-	printk("addr 0x%02x state 0x%02x\n",
-	       bt_mesh_model_elem(model)->addr, state->current);
+	printk("addr 0x%02x state 0x%02x\n", bt_mesh_model_elem(model)->addr,
+	       state->current);
 
 	if (set_led_state(state->dev_id, onoff)) {
 		printk("Failed to set led state\n");
@@ -173,11 +172,10 @@ static void gen_onoff_set_unack(struct bt_mesh_model *model,
 
 	if (state->previous != state->current &&
 	    model->pub->addr != BT_MESH_ADDR_UNASSIGNED) {
-		printk("publish last 0x%02x cur 0x%02x\n",
-		       state->previous, state->current);
+		printk("publish last 0x%02x cur 0x%02x\n", state->previous,
+		       state->current);
 		state->previous = state->current;
-		bt_mesh_model_msg_init(msg,
-				       BT_MESH_MODEL_OP_GEN_ONOFF_STATUS);
+		bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_GEN_ONOFF_STATUS);
 		net_buf_simple_add_u8(msg, state->current);
 		err = bt_mesh_model_publish(model);
 		if (err) {
@@ -253,8 +251,7 @@ static void sensor_create_status(uint16_t id, struct net_buf_simple *msg)
 	}
 }
 
-static void sensor_get(struct bt_mesh_model *model,
-		       struct bt_mesh_msg_ctx *ctx,
+static void sensor_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
 		       struct net_buf_simple *buf)
 {
 	NET_BUF_SIMPLE_DEFINE(msg, 1 + MAX_SENS_STATUS_LEN + 4);
@@ -306,15 +303,12 @@ static struct bt_mesh_model root_models[] = {
 	BT_MESH_MODEL_CFG_SRV(&cfg_srv),
 	BT_MESH_MODEL_CFG_CLI(&cfg_cli),
 	BT_MESH_MODEL_HEALTH_SRV(&health_srv, &health_pub),
-	BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_SRV,
-		      gen_onoff_srv_op, &gen_onoff_srv_pub_root,
-		      &led_onoff_state[0]),
-	BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV,
-		      sensor_srv_op, NULL, NULL),
+	BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_SRV, gen_onoff_srv_op,
+		      &gen_onoff_srv_pub_root, &led_onoff_state[0]),
+	BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV, sensor_srv_op, NULL, NULL),
 };
 
-static void vnd_hello(struct bt_mesh_model *model,
-		      struct bt_mesh_msg_ctx *ctx,
+static void vnd_hello(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
 		      struct net_buf_simple *buf)
 {
 	char str[32];
@@ -340,8 +334,7 @@ static void vnd_hello(struct bt_mesh_model *model,
 }
 
 static void vnd_baduser(struct bt_mesh_model *model,
-			struct bt_mesh_msg_ctx *ctx,
-			struct net_buf_simple *buf)
+			struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
 {
 	char str[32];
 	size_t len;
@@ -377,8 +370,8 @@ static void vnd_heartbeat(struct bt_mesh_model *model,
 	init_ttl = net_buf_simple_pull_u8(buf);
 	hops = init_ttl - ctx->recv_ttl + 1;
 
-	printk("Heartbeat from 0x%04x over %u hop%s\n", ctx->addr,
-	       hops, hops == 1U ? "" : "s");
+	printk("Heartbeat from 0x%04x over %u hop%s\n", ctx->addr, hops,
+	       hops == 1U ? "" : "s");
 
 	board_add_heartbeat(ctx->addr, hops);
 }
@@ -534,8 +527,8 @@ static int provision_and_configure(void)
 	bt_mesh_cfg_app_key_add(NET_IDX, addr, NET_IDX, APP_IDX, app_key, NULL);
 
 	/* Bind to vendor model */
-	bt_mesh_cfg_mod_app_bind_vnd(NET_IDX, addr, addr, APP_IDX,
-				     MOD_LF, BT_COMP_ID_LF, NULL);
+	bt_mesh_cfg_mod_app_bind_vnd(NET_IDX, addr, addr, APP_IDX, MOD_LF,
+				     BT_COMP_ID_LF, NULL);
 
 	bt_mesh_cfg_mod_app_bind(NET_IDX, addr, addr, APP_IDX,
 				 BT_MESH_MODEL_ID_GEN_ONOFF_SRV, NULL);
@@ -548,8 +541,8 @@ static int provision_and_configure(void)
 				 BT_MESH_MODEL_ID_HEALTH_SRV, NULL);
 
 	/* Add model subscription */
-	bt_mesh_cfg_mod_sub_add_vnd(NET_IDX, addr, addr, GROUP_ADDR,
-				    MOD_LF, BT_COMP_ID_LF, NULL);
+	bt_mesh_cfg_mod_sub_add_vnd(NET_IDX, addr, addr, GROUP_ADDR, MOD_LF,
+				    BT_COMP_ID_LF, NULL);
 
 	bt_mesh_cfg_mod_pub_set_vnd(NET_IDX, addr, addr, MOD_LF, BT_COMP_ID_LF,
 				    &pub, NULL);
@@ -565,13 +558,11 @@ static void start_mesh(struct k_work *work)
 
 	err = provision_and_configure();
 	if (err < 0) {
-		board_show_text("Starting Mesh Failed", false,
-				K_SECONDS(2));
+		board_show_text("Starting Mesh Failed", false, K_SECONDS(2));
 	} else {
 		char buf[32];
 
-		snprintk(buf, sizeof(buf),
-			 "Mesh Started\nAddr: 0x%04x", err);
+		snprintk(buf, sizeof(buf), "Mesh Started\nAddr: 0x%04x", err);
 		board_show_text(buf, false, K_SECONDS(4));
 	}
 }

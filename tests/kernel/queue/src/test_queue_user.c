@@ -9,7 +9,7 @@
 #ifdef CONFIG_USERSPACE
 
 #define STACK_SIZE (512 + CONFIG_TEST_EXTRA_STACKSIZE)
-#define LIST_LEN        5
+#define LIST_LEN 5
 
 static K_THREAD_STACK_DEFINE(child_stack, STACK_SIZE);
 static struct k_thread child_thread;
@@ -34,8 +34,8 @@ void child_thread_get(void *p1, void *p2, void *p3)
 	qd = k_queue_peek_head(q);
 	zassert_equal(qd->data, 0, NULL);
 	qd = k_queue_peek_tail(q);
-	zassert_equal(qd->data, (LIST_LEN * 2) - 1,
-		      "got %d expected %d", qd->data, (LIST_LEN * 2) - 1);
+	zassert_equal(qd->data, (LIST_LEN * 2) - 1, "got %d expected %d",
+		      qd->data, (LIST_LEN * 2) - 1);
 
 	for (int i = 0; i < (LIST_LEN * 2); i++) {
 		qd = k_queue_get(q, K_FOREVER);
@@ -46,7 +46,6 @@ void child_thread_get(void *p1, void *p2, void *p3)
 			zassert_is_null(qd->snode.next, NULL);
 		}
 	}
-
 
 	zassert_true(k_queue_is_empty(q), NULL);
 

@@ -15,28 +15,22 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(BMC150_MAGN, CONFIG_SENSOR_LOG_LEVEL);
 
-static inline void setup_drdy(const struct device *dev,
-			      bool enable)
+static inline void setup_drdy(const struct device *dev, bool enable)
 {
 	struct bmc150_magn_data *data = dev->data;
-	const struct bmc150_magn_config *const cfg =
-		dev->config;
+	const struct bmc150_magn_config *const cfg = dev->config;
 
-	gpio_pin_interrupt_configure(data->gpio_drdy,
-				     cfg->gpio_drdy_int_pin,
-				     enable
-				     ? GPIO_INT_EDGE_TO_ACTIVE
-				     : GPIO_INT_DISABLE);
+	gpio_pin_interrupt_configure(data->gpio_drdy, cfg->gpio_drdy_int_pin,
+				     enable ? GPIO_INT_EDGE_TO_ACTIVE :
+						    GPIO_INT_DISABLE);
 }
-
 
 int bmc150_magn_trigger_set(const struct device *dev,
 			    const struct sensor_trigger *trig,
 			    sensor_trigger_handler_t handler)
 {
 	struct bmc150_magn_data *data = dev->data;
-	const struct bmc150_magn_config * const config =
-					dev->config;
+	const struct bmc150_magn_config *const config = dev->config;
 	uint8_t state;
 
 #if defined(CONFIG_BMC150_MAGN_TRIGGER_DRDY)
@@ -51,12 +45,10 @@ int bmc150_magn_trigger_set(const struct device *dev,
 		data->handler_drdy = handler;
 		data->trigger_drdy = *trig;
 
-		if (i2c_reg_update_byte(data->i2c_master,
-					config->i2c_slave_addr,
-					BMC150_MAGN_REG_INT_DRDY,
-					BMC150_MAGN_MASK_DRDY_EN,
-					state << BMC150_MAGN_SHIFT_DRDY_EN)
-					< 0) {
+		if (i2c_reg_update_byte(
+			    data->i2c_master, config->i2c_slave_addr,
+			    BMC150_MAGN_REG_INT_DRDY, BMC150_MAGN_MASK_DRDY_EN,
+			    state << BMC150_MAGN_SHIFT_DRDY_EN) < 0) {
 			LOG_DBG("failed to set DRDY interrupt");
 			return -EIO;
 		}
@@ -90,10 +82,9 @@ static void bmc150_magn_thread_main(struct bmc150_magn_data *data)
 	while (1) {
 		k_sem_take(&data->sem, K_FOREVER);
 
-		while (i2c_reg_read_byte(data->i2c_master,
-					 config->i2c_slave_addr,
-					 BMC150_MAGN_REG_INT_STATUS,
-					 &reg_val) < 0) {
+		while (i2c_reg_read_byte(
+			       data->i2c_master, config->i2c_slave_addr,
+			       BMC150_MAGN_REG_INT_STATUS, &reg_val) < 0) {
 			LOG_DBG("failed to clear data ready interrupt");
 		}
 
@@ -122,10 +113,8 @@ static int bmc150_magn_set_drdy_polarity(const struct device *dev, int state)
 
 int bmc150_magn_init_interrupt(const struct device *dev)
 {
-	const struct bmc150_magn_config * const config =
-						dev->config;
+	const struct bmc150_magn_config *const config = dev->config;
 	struct bmc150_magn_data *data = dev->data;
-
 
 #if defined(CONFIG_BMC150_MAGN_TRIGGER_DRDY)
 	if (bmc150_magn_set_drdy_polarity(dev, 0) < 0) {
@@ -148,23 +137,21 @@ int bmc150_magn_init_interrupt(const struct device *dev)
 
 	k_thread_create(&data->thread, data->thread_stack,
 			CONFIG_BMC150_MAGN_TRIGGER_THREAD_STACK,
-			(k_thread_entry_t)bmc150_magn_thread_main,
-			data, NULL, NULL,
-			K_PRIO_COOP(10), 0, K_NO_WAIT);
+			(k_thread_entry_t)bmc150_magn_thread_main, data, NULL,
+			NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
 
 	data->gpio_drdy = device_get_binding(config->gpio_drdy_dev_name);
 	if (!data->gpio_drdy) {
 		LOG_DBG("gpio controller %s not found",
-			    config->gpio_drdy_dev_name);
+			config->gpio_drdy_dev_name);
 		return -EINVAL;
 	}
 
 	gpio_pin_configure(data->gpio_drdy, config->gpio_drdy_int_pin,
-			   config->gpio_drdy_int_flags
-			   | GPIO_INT_EDGE_TO_ACTIVE);
+			   config->gpio_drdy_int_flags |
+				   GPIO_INT_EDGE_TO_ACTIVE);
 
-	gpio_init_callback(&data->gpio_cb,
-			   bmc150_magn_gpio_drdy_callback,
+	gpio_init_callback(&data->gpio_cb, bmc150_magn_gpio_drdy_callback,
 			   BIT(config->gpio_drdy_int_pin));
 
 	if (gpio_add_callback(data->gpio_drdy, &data->gpio_cb) < 0) {

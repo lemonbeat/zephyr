@@ -15,7 +15,7 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(main);
 
-#define DEV_DATA(dev) ((struct i2c_virtual_data * const)(dev)->data)
+#define DEV_DATA(dev) ((struct i2c_virtual_data *const)(dev)->data)
 
 struct i2c_virtual_data {
 	sys_slist_t slaves;
@@ -67,7 +67,6 @@ int i2c_virtual_slave_register(const struct device *dev,
 	return 0;
 }
 
-
 int i2c_virtual_slave_unregister(const struct device *dev,
 				 struct i2c_slave_config *config)
 {
@@ -84,8 +83,7 @@ int i2c_virtual_slave_unregister(const struct device *dev,
 	return 0;
 }
 
-static int i2c_virtual_msg_write(const struct device *dev,
-				 struct i2c_msg *msg,
+static int i2c_virtual_msg_write(const struct device *dev, struct i2c_msg *msg,
 				 struct i2c_slave_config *config,
 				 bool prev_write)
 {
@@ -99,7 +97,6 @@ static int i2c_virtual_msg_write(const struct device *dev,
 
 	len = msg->len;
 	while (len) {
-
 		ret = config->callbacks->write_received(config, *buf);
 		if (ret) {
 			goto error;
@@ -146,7 +143,7 @@ static int i2c_virtual_msg_read(const struct device *dev, struct i2c_msg *msg,
 	return 0;
 }
 
-#define OPERATION(msg) (((struct i2c_msg *) msg)->flags & I2C_MSG_RW_MASK)
+#define OPERATION(msg) (((struct i2c_msg *)msg)->flags & I2C_MSG_RW_MASK)
 
 static int i2c_virtual_transfer(const struct device *dev, struct i2c_msg *msg,
 				uint8_t num_msgs, uint16_t slave)
@@ -187,8 +184,8 @@ static int i2c_virtual_transfer(const struct device *dev, struct i2c_msg *msg,
 		}
 
 		if ((current->flags & I2C_MSG_RW_MASK) == I2C_MSG_WRITE) {
-			ret = i2c_virtual_msg_write(dev, current,
-						    cfg, is_write);
+			ret = i2c_virtual_msg_write(dev, current, cfg,
+						    is_write);
 			is_write = true;
 		} else {
 			ret = i2c_virtual_msg_read(dev, current, cfg);
@@ -225,6 +222,5 @@ static int i2c_virtual_init(const struct device *dev)
 static struct i2c_virtual_data i2c_virtual_dev_data_0;
 
 DEVICE_AND_API_INIT(i2c_virtual_0, CONFIG_I2C_VIRTUAL_NAME, &i2c_virtual_init,
-		    &i2c_virtual_dev_data_0, NULL,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &api_funcs);
+		    &i2c_virtual_dev_data_0, NULL, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &api_funcs);

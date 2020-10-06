@@ -41,7 +41,7 @@ struct bmi160_emul_cfg {
 };
 
 /* Names for the PMU components */
-static const char *const pmu_name[] = {"acc", "gyr", "mag", "INV"};
+static const char *const pmu_name[] = { "acc", "gyr", "mag", "INV" };
 
 static void sample_read(struct bmi160_emul_data *data, union bmi160_sample *buf)
 {
@@ -84,7 +84,7 @@ static void reg_write(const struct bmi160_emul_cfg *cfg, int regn, int val)
 		default:
 			if ((val & BMI160_CMD_PMU_BIT) == BMI160_CMD_PMU_BIT) {
 				int which = (val & BMI160_CMD_PMU_MASK) >>
-					 BMI160_CMD_PMU_SHIFT;
+					    BMI160_CMD_PMU_SHIFT;
 				int shift;
 				int pmu_val = val & BMI160_CMD_PMU_VAL_MASK;
 
@@ -253,16 +253,16 @@ static int emul_bosch_bmi160_init(const struct emul *emul,
 	return rc;
 }
 
-#define BMI160_EMUL(n) \
-	static uint8_t bmi160_emul_reg_##n[BMI160_REG_COUNT]; \
-	static struct bmi160_emul_data bmi160_emul_data_##n; \
+#define BMI160_EMUL(n)                                              \
+	static uint8_t bmi160_emul_reg_##n[BMI160_REG_COUNT];       \
+	static struct bmi160_emul_data bmi160_emul_data_##n;        \
 	static const struct bmi160_emul_cfg bmi160_emul_cfg_##n = { \
-		.spi_label = DT_INST_BUS_LABEL(n), \
-		.data = &bmi160_emul_data_##n, \
-		.reg = bmi160_emul_reg_##n, \
-		.chipsel = DT_INST_REG_ADDR(n) \
-	}; \
-	EMUL_DEFINE(emul_bosch_bmi160_init, DT_DRV_INST(n), \
-		&bmi160_emul_cfg_##n)
+		.spi_label = DT_INST_BUS_LABEL(n),                  \
+		.data = &bmi160_emul_data_##n,                      \
+		.reg = bmi160_emul_reg_##n,                         \
+		.chipsel = DT_INST_REG_ADDR(n)                      \
+	};                                                          \
+	EMUL_DEFINE(emul_bosch_bmi160_init, DT_DRV_INST(n),         \
+		    &bmi160_emul_cfg_##n)
 
 DT_INST_FOREACH_STATUS_OKAY(BMI160_EMUL)

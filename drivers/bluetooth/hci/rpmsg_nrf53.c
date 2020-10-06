@@ -29,27 +29,27 @@ static const struct device *ipm_rx_handle;
 
 /* Configuration defines */
 
-#define SHM_NODE            DT_CHOSEN(zephyr_ipc_shm)
-#define SHM_BASE_ADDRESS    DT_REG_ADDR(SHM_NODE)
+#define SHM_NODE DT_CHOSEN(zephyr_ipc_shm)
+#define SHM_BASE_ADDRESS DT_REG_ADDR(SHM_NODE)
 
-#define SHM_START_ADDR      (SHM_BASE_ADDRESS + 0x400)
-#define SHM_SIZE            0x7c00
-#define SHM_DEVICE_NAME     "sram0.shm"
+#define SHM_START_ADDR (SHM_BASE_ADDRESS + 0x400)
+#define SHM_SIZE 0x7c00
+#define SHM_DEVICE_NAME "sram0.shm"
 
-BUILD_ASSERT((SHM_START_ADDR + SHM_SIZE - SHM_BASE_ADDRESS)
-		<= DT_REG_SIZE(SHM_NODE),
-	"Allocated size exceeds available shared memory reserved for IPC");
+BUILD_ASSERT((SHM_START_ADDR + SHM_SIZE - SHM_BASE_ADDRESS) <=
+		     DT_REG_SIZE(SHM_NODE),
+	     "Allocated size exceeds available shared memory reserved for IPC");
 
-#define VRING_COUNT         2
-#define VRING_TX_ADDRESS    (SHM_START_ADDR + SHM_SIZE - 0x400)
-#define VRING_RX_ADDRESS    (VRING_TX_ADDRESS - 0x400)
-#define VRING_ALIGNMENT     4
-#define VRING_SIZE          16
+#define VRING_COUNT 2
+#define VRING_TX_ADDRESS (SHM_START_ADDR + SHM_SIZE - 0x400)
+#define VRING_RX_ADDRESS (VRING_TX_ADDRESS - 0x400)
+#define VRING_ALIGNMENT 4
+#define VRING_SIZE 16
 
-#define VDEV_STATUS_ADDR    SHM_BASE_ADDRESS
+#define VDEV_STATUS_ADDR SHM_BASE_ADDRESS
 
 BUILD_ASSERT(CONFIG_HEAP_MEM_POOL_SIZE >= 1024,
-	"Not enough heap memory for RPMsg queue allocation");
+	     "Not enough heap memory for RPMsg queue allocation");
 
 /* End of configuration defines */
 
@@ -115,15 +115,15 @@ const struct virtio_dispatch dispatch = {
 	.notify = virtio_notify,
 };
 
-static void ipm_callback(const struct device *dev, void *context,
-			 uint32_t id, volatile void *data)
+static void ipm_callback(const struct device *dev, void *context, uint32_t id,
+			 volatile void *data)
 {
 	BT_DBG("Got callback of id %u", id);
 	k_sem_give(&rx_sem);
 }
 
 static int endpoint_cb(struct rpmsg_endpoint *ept, void *data, size_t len,
-	uint32_t src, void *priv)
+		       uint32_t src, void *priv)
 {
 	BT_DBG("Received message of %u bytes.", len);
 	BT_HEXDUMP_DBG((uint8_t *)data, len, "Data:");
@@ -138,15 +138,11 @@ static void rpmsg_service_unbind(struct rpmsg_endpoint *ep)
 	rpmsg_destroy_ept(ep);
 }
 
-static void ns_bind_cb(struct rpmsg_device *rdev, const char *name, uint32_t dest)
+static void ns_bind_cb(struct rpmsg_device *rdev, const char *name,
+		       uint32_t dest)
 {
-	(void)rpmsg_create_ept(&ep,
-				rdev,
-				name,
-				RPMSG_ADDR_ANY,
-				dest,
-				endpoint_cb,
-				rpmsg_service_unbind);
+	(void)rpmsg_create_ept(&ep, rdev, name, RPMSG_ADDR_ANY, dest,
+			       endpoint_cb, rpmsg_service_unbind);
 
 	k_sem_give(&ready_sem);
 }
@@ -171,19 +167,19 @@ int bt_rpmsg_platform_init(void)
 	int err;
 	struct metal_init_params metal_params = METAL_INIT_DEFAULTS;
 
-	static struct virtio_vring_info     rvrings[2];
+	static struct virtio_vring_info rvrings[2];
 	static struct rpmsg_virtio_shm_pool shpool;
-	static struct virtio_device         vdev;
-	static struct rpmsg_virtio_device   rvdev;
-	static struct metal_io_region       *io;
-	static struct metal_device          *device;
+	static struct virtio_device vdev;
+	static struct rpmsg_virtio_device rvdev;
+	static struct metal_io_region *io;
+	static struct metal_device *device;
 
 	/* Setup thread for RX data processing. */
 	k_thread_create(&bt_rpmsg_rx_thread_data, bt_rpmsg_rx_thread_stack,
 			K_KERNEL_STACK_SIZEOF(bt_rpmsg_rx_thread_stack),
 			bt_rpmsg_rx_thread, NULL, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BT_RPMSG_NRF53_RX_PRIO),
-			0, K_NO_WAIT);
+			K_PRIO_COOP(CONFIG_BT_RPMSG_NRF53_RX_PRIO), 0,
+			K_NO_WAIT);
 
 	/* Libmetal setup */
 	err = metal_init(&metal_params);

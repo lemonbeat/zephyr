@@ -32,8 +32,8 @@ static struct bt_gatt_subscribe_params subscribe_params;
 
 #define UPDATE_PARAM_INTERVAL_MIN 25
 #define UPDATE_PARAM_INTERVAL_MAX 45
-#define UPDATE_PARAM_LATENCY      1
-#define UPDATE_PARAM_TIMEOUT      250
+#define UPDATE_PARAM_LATENCY 1
+#define UPDATE_PARAM_TIMEOUT 250
 
 static struct bt_le_conn_param update_params = {
 	.interval_min = UPDATE_PARAM_INTERVAL_MIN,
@@ -60,21 +60,21 @@ static bool encrypt_link;
 #define WAIT_TIME 6 /*seconds*/
 extern enum bst_result_t bst_result;
 
-#define FAIL(...)					\
-	do {						\
-		bst_result = Failed;			\
-		bs_trace_error_time_line(__VA_ARGS__);	\
+#define FAIL(...)                                      \
+	do {                                           \
+		bst_result = Failed;                   \
+		bs_trace_error_time_line(__VA_ARGS__); \
 	} while (0)
 
-#define PASS(...)					\
-	do {						\
-		bst_result = Passed;			\
-		bs_trace_info_time(1, __VA_ARGS__);	\
+#define PASS(...)                                   \
+	do {                                        \
+		bst_result = Passed;                \
+		bs_trace_info_time(1, __VA_ARGS__); \
 	} while (0)
 
 static void test_con1_init(void)
 {
-	bst_ticker_set_next_tick_absolute(WAIT_TIME*1e6);
+	bst_ticker_set_next_tick_absolute(WAIT_TIME * 1e6);
 	bst_result = In_progress;
 }
 
@@ -97,8 +97,8 @@ static void test_con1_tick(bs_time_t HW_device_time)
 }
 
 static uint8_t notify_func(struct bt_conn *conn,
-			struct bt_gatt_subscribe_params *params,
-			const void *data, uint16_t length)
+			   struct bt_gatt_subscribe_params *params,
+			   const void *data, uint16_t length)
 {
 	static int notify_count;
 	if (!data) {
@@ -129,8 +129,8 @@ static uint8_t notify_func(struct bt_conn *conn,
 }
 
 static uint8_t discover_func(struct bt_conn *conn,
-		const struct bt_gatt_attr *attr,
-		struct bt_gatt_discover_params *params)
+			     const struct bt_gatt_attr *attr,
+			     struct bt_gatt_discover_params *params)
 {
 	int err;
 
@@ -153,7 +153,7 @@ static uint8_t discover_func(struct bt_conn *conn,
 			FAIL("Discover failed (err %d)\n", err);
 		}
 	} else if (!bt_uuid_cmp(discover_params.uuid,
-			BT_UUID_HRS_MEASUREMENT)) {
+				BT_UUID_HRS_MEASUREMENT)) {
 		memcpy(&uuid, BT_UUID_GATT_CCC, sizeof(uuid));
 		discover_params.uuid = &uuid.uuid;
 		discover_params.start_handle = attr->handle + 2;
@@ -322,13 +322,13 @@ static bool eir_found(struct bt_data *data, void *user_data)
 }
 
 static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
-		struct net_buf_simple *ad)
+			 struct net_buf_simple *ad)
 {
 	char dev[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(addr, dev, sizeof(dev));
-	printk("[DEVICE]: %s, AD evt type %u, AD data len %u, RSSI %i\n",
-			dev, type, ad->len, rssi);
+	printk("[DEVICE]: %s, AD evt type %u, AD data len %u, RSSI %i\n", dev,
+	       type, ad->len, rssi);
 
 	/* We're only interested in connectable events */
 	if (type == BT_GAP_ADV_TYPE_ADV_IND ||
@@ -392,23 +392,19 @@ static void test_con1_main(void)
 }
 
 static const struct bst_test_instance test_connect[] = {
-	{
-		.test_id = "central",
-		.test_descr = "Basic connection test. It expects that a "
-			      "peripheral device can be found. The test will "
-			      "pass if it can connect to it, and receive a "
-			      "notification in less than 5 seconds.",
-		.test_post_init_f = test_con1_init,
-		.test_tick_f = test_con1_tick,
-		.test_main_f = test_con1_main
-	},
-	{
-		.test_id = "central_encrypted",
-		.test_descr = "Same as central but with an encrypted link",
-		.test_post_init_f = test_con_encrypted_init,
-		.test_tick_f = test_con1_tick,
-		.test_main_f = test_con1_main
-	},
+	{ .test_id = "central",
+	  .test_descr = "Basic connection test. It expects that a "
+			"peripheral device can be found. The test will "
+			"pass if it can connect to it, and receive a "
+			"notification in less than 5 seconds.",
+	  .test_post_init_f = test_con1_init,
+	  .test_tick_f = test_con1_tick,
+	  .test_main_f = test_con1_main },
+	{ .test_id = "central_encrypted",
+	  .test_descr = "Same as central but with an encrypted link",
+	  .test_post_init_f = test_con_encrypted_init,
+	  .test_tick_f = test_con1_tick,
+	  .test_main_f = test_con1_main },
 	BSTEST_END_MARKER
 };
 

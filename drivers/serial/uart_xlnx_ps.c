@@ -38,98 +38,99 @@
  */
 
 /* Register offsets within the UART device's register space */
-#define XUARTPS_CR_OFFSET	0x0000U  /**< Control Register [8:0] */
-#define XUARTPS_MR_OFFSET	0x0004U  /**< Mode Register [9:0] */
-#define XUARTPS_IER_OFFSET	0x0008U  /**< Interrupt Enable [12:0] */
-#define XUARTPS_IDR_OFFSET	0x000CU  /**< Interrupt Disable [12:0] */
-#define XUARTPS_IMR_OFFSET	0x0010U  /**< Interrupt Mask [12:0] */
-#define XUARTPS_ISR_OFFSET	0x0014U  /**< Interrupt Status [12:0]*/
-#define XUARTPS_BAUDGEN_OFFSET	0x0018U  /**< Baud Rate Generator [15:0] */
-#define XUARTPS_RXTOUT_OFFSET	0x001CU  /**< RX Timeout [7:0] */
-#define XUARTPS_RXWM_OFFSET	0x0020U  /**< RX FIFO Trigger Level [5:0] */
-#define XUARTPS_MODEMCR_OFFSET	0x0024U  /**< Modem Control [5:0] */
-#define XUARTPS_MODEMSR_OFFSET	0x0028U  /**< Modem Status [8:0] */
-#define XUARTPS_SR_OFFSET	0x002CU  /**< Channel Status [14:0] */
-#define XUARTPS_FIFO_OFFSET	0x0030U  /**< FIFO [7:0] */
-#define XUARTPS_BAUDDIV_OFFSET	0x0034U  /**< Baud Rate Divider [7:0] */
-#define XUARTPS_FLOWDEL_OFFSET	0x0038U  /**< Flow Delay [5:0] */
-#define XUARTPS_TXWM_OFFSET	0x0044U  /**< TX FIFO Trigger Level [5:0] */
-#define XUARTPS_RXBS_OFFSET	0x0048U  /**< RX FIFO Byte Status [11:0] */
+#define XUARTPS_CR_OFFSET 0x0000U /**< Control Register [8:0] */
+#define XUARTPS_MR_OFFSET 0x0004U /**< Mode Register [9:0] */
+#define XUARTPS_IER_OFFSET 0x0008U /**< Interrupt Enable [12:0] */
+#define XUARTPS_IDR_OFFSET 0x000CU /**< Interrupt Disable [12:0] */
+#define XUARTPS_IMR_OFFSET 0x0010U /**< Interrupt Mask [12:0] */
+#define XUARTPS_ISR_OFFSET 0x0014U /**< Interrupt Status [12:0]*/
+#define XUARTPS_BAUDGEN_OFFSET 0x0018U /**< Baud Rate Generator [15:0] */
+#define XUARTPS_RXTOUT_OFFSET 0x001CU /**< RX Timeout [7:0] */
+#define XUARTPS_RXWM_OFFSET 0x0020U /**< RX FIFO Trigger Level [5:0] */
+#define XUARTPS_MODEMCR_OFFSET 0x0024U /**< Modem Control [5:0] */
+#define XUARTPS_MODEMSR_OFFSET 0x0028U /**< Modem Status [8:0] */
+#define XUARTPS_SR_OFFSET 0x002CU /**< Channel Status [14:0] */
+#define XUARTPS_FIFO_OFFSET 0x0030U /**< FIFO [7:0] */
+#define XUARTPS_BAUDDIV_OFFSET 0x0034U /**< Baud Rate Divider [7:0] */
+#define XUARTPS_FLOWDEL_OFFSET 0x0038U /**< Flow Delay [5:0] */
+#define XUARTPS_TXWM_OFFSET 0x0044U /**< TX FIFO Trigger Level [5:0] */
+#define XUARTPS_RXBS_OFFSET 0x0048U /**< RX FIFO Byte Status [11:0] */
 
 /* Control Register Bits Definition */
-#define XUARTPS_CR_STOPBRK	0x00000100U  /**< Stop transmission of break */
-#define XUARTPS_CR_STARTBRK	0x00000080U  /**< Set break */
-#define XUARTPS_CR_TORST	0x00000040U  /**< RX timeout counter restart */
-#define XUARTPS_CR_TX_DIS	0x00000020U  /**< TX disabled. */
-#define XUARTPS_CR_TX_EN	0x00000010U  /**< TX enabled */
-#define XUARTPS_CR_RX_DIS	0x00000008U  /**< RX disabled. */
-#define XUARTPS_CR_RX_EN	0x00000004U  /**< RX enabled */
-#define XUARTPS_CR_EN_DIS_MASK	0x0000003CU  /**< Enable/disable Mask */
-#define XUARTPS_CR_TXRST	0x00000002U  /**< TX logic reset */
-#define XUARTPS_CR_RXRST	0x00000001U  /**< RX logic reset */
+#define XUARTPS_CR_STOPBRK 0x00000100U /**< Stop transmission of break */
+#define XUARTPS_CR_STARTBRK 0x00000080U /**< Set break */
+#define XUARTPS_CR_TORST 0x00000040U /**< RX timeout counter restart */
+#define XUARTPS_CR_TX_DIS 0x00000020U /**< TX disabled. */
+#define XUARTPS_CR_TX_EN 0x00000010U /**< TX enabled */
+#define XUARTPS_CR_RX_DIS 0x00000008U /**< RX disabled. */
+#define XUARTPS_CR_RX_EN 0x00000004U /**< RX enabled */
+#define XUARTPS_CR_EN_DIS_MASK 0x0000003CU /**< Enable/disable Mask */
+#define XUARTPS_CR_TXRST 0x00000002U /**< TX logic reset */
+#define XUARTPS_CR_RXRST 0x00000001U /**< RX logic reset */
 
 /* Mode Register Bits Definition */
-#define XUARTPS_MR_CCLK			0x00000400U /**< Input clock select */
-#define XUARTPS_MR_CHMODE_R_LOOP	0x00000300U /**< Remote loopback mode */
-#define XUARTPS_MR_CHMODE_L_LOOP	0x00000200U /**< Local loopback mode */
-#define XUARTPS_MR_CHMODE_ECHO		0x00000100U /**< Auto echo mode */
-#define XUARTPS_MR_CHMODE_NORM		0x00000000U /**< Normal mode */
-#define XUARTPS_MR_CHMODE_SHIFT		8U  /**< Mode shift */
-#define XUARTPS_MR_CHMODE_MASK		0x00000300U /**< Mode mask */
-#define XUARTPS_MR_STOPMODE_2_BIT	0x00000080U /**< 2 stop bits */
-#define XUARTPS_MR_STOPMODE_1_5_BIT	0x00000040U /**< 1.5 stop bits */
-#define XUARTPS_MR_STOPMODE_1_BIT	0x00000000U /**< 1 stop bit */
-#define XUARTPS_MR_STOPMODE_SHIFT	6U  /**< Stop bits shift */
-#define XUARTPS_MR_STOPMODE_MASK	0x000000A0U /**< Stop bits mask */
-#define XUARTPS_MR_PARITY_NONE		0x00000020U /**< No parity mode */
-#define XUARTPS_MR_PARITY_MARK		0x00000018U /**< Mark parity mode */
-#define XUARTPS_MR_PARITY_SPACE		0x00000010U /**< Space parity mode */
-#define XUARTPS_MR_PARITY_ODD		0x00000008U /**< Odd parity mode */
-#define XUARTPS_MR_PARITY_EVEN		0x00000000U /**< Even parity mode */
-#define XUARTPS_MR_PARITY_SHIFT		3U  /**< Parity setting shift */
-#define XUARTPS_MR_PARITY_MASK		0x00000038U /**< Parity mask */
-#define XUARTPS_MR_CHARLEN_6_BIT	0x00000006U /**< 6 bits data */
-#define XUARTPS_MR_CHARLEN_7_BIT	0x00000004U /**< 7 bits data */
-#define XUARTPS_MR_CHARLEN_8_BIT	0x00000000U /**< 8 bits data */
-#define XUARTPS_MR_CHARLEN_SHIFT	1U  /**< Data Length shift */
-#define XUARTPS_MR_CHARLEN_MASK		0x00000006U /**< Data length mask */
-#define XUARTPS_MR_CLKSEL		0x00000001U /**< Input clock select */
+#define XUARTPS_MR_CCLK 0x00000400U /**< Input clock select */
+#define XUARTPS_MR_CHMODE_R_LOOP 0x00000300U /**< Remote loopback mode */
+#define XUARTPS_MR_CHMODE_L_LOOP 0x00000200U /**< Local loopback mode */
+#define XUARTPS_MR_CHMODE_ECHO 0x00000100U /**< Auto echo mode */
+#define XUARTPS_MR_CHMODE_NORM 0x00000000U /**< Normal mode */
+#define XUARTPS_MR_CHMODE_SHIFT 8U /**< Mode shift */
+#define XUARTPS_MR_CHMODE_MASK 0x00000300U /**< Mode mask */
+#define XUARTPS_MR_STOPMODE_2_BIT 0x00000080U /**< 2 stop bits */
+#define XUARTPS_MR_STOPMODE_1_5_BIT 0x00000040U /**< 1.5 stop bits */
+#define XUARTPS_MR_STOPMODE_1_BIT 0x00000000U /**< 1 stop bit */
+#define XUARTPS_MR_STOPMODE_SHIFT 6U /**< Stop bits shift */
+#define XUARTPS_MR_STOPMODE_MASK 0x000000A0U /**< Stop bits mask */
+#define XUARTPS_MR_PARITY_NONE 0x00000020U /**< No parity mode */
+#define XUARTPS_MR_PARITY_MARK 0x00000018U /**< Mark parity mode */
+#define XUARTPS_MR_PARITY_SPACE 0x00000010U /**< Space parity mode */
+#define XUARTPS_MR_PARITY_ODD 0x00000008U /**< Odd parity mode */
+#define XUARTPS_MR_PARITY_EVEN 0x00000000U /**< Even parity mode */
+#define XUARTPS_MR_PARITY_SHIFT 3U /**< Parity setting shift */
+#define XUARTPS_MR_PARITY_MASK 0x00000038U /**< Parity mask */
+#define XUARTPS_MR_CHARLEN_6_BIT 0x00000006U /**< 6 bits data */
+#define XUARTPS_MR_CHARLEN_7_BIT 0x00000004U /**< 7 bits data */
+#define XUARTPS_MR_CHARLEN_8_BIT 0x00000000U /**< 8 bits data */
+#define XUARTPS_MR_CHARLEN_SHIFT 1U /**< Data Length shift */
+#define XUARTPS_MR_CHARLEN_MASK 0x00000006U /**< Data length mask */
+#define XUARTPS_MR_CLKSEL 0x00000001U /**< Input clock select */
 
 /* Interrupt Register Bits Definition */
-#define XUARTPS_IXR_RBRK	0x00002000U /**< Rx FIFO break detect interrupt */
-#define XUARTPS_IXR_TOVR	0x00001000U /**< Tx FIFO Overflow interrupt */
-#define XUARTPS_IXR_TNFUL	0x00000800U /**< Tx FIFO Nearly Full interrupt */
-#define XUARTPS_IXR_TTRIG	0x00000400U /**< Tx Trig interrupt */
-#define XUARTPS_IXR_DMS		0x00000200U /**< Modem status change interrupt */
-#define XUARTPS_IXR_TOUT	0x00000100U /**< Timeout error interrupt */
-#define XUARTPS_IXR_PARITY	0x00000080U /**< Parity error interrupt */
-#define XUARTPS_IXR_FRAMING	0x00000040U /**< Framing error interrupt */
-#define XUARTPS_IXR_RXOVR	0x00000020U /**< Overrun error interrupt */
-#define XUARTPS_IXR_TXFULL	0x00000010U /**< TX FIFO full interrupt. */
-#define XUARTPS_IXR_TXEMPTY	0x00000008U /**< TX FIFO empty interrupt. */
-#define XUARTPS_IXR_RXFULL	0x00000004U /**< RX FIFO full interrupt. */
-#define XUARTPS_IXR_RXEMPTY	0x00000002U /**< RX FIFO empty interrupt. */
-#define XUARTPS_IXR_RTRIG	0x00000001U /**< RX FIFO trigger interrupt. */
-#define XUARTPS_IXR_MASK	0x00003FFFU /**< Valid bit mask */
+#define XUARTPS_IXR_RBRK 0x00002000U /**< Rx FIFO break detect interrupt */
+#define XUARTPS_IXR_TOVR 0x00001000U /**< Tx FIFO Overflow interrupt */
+#define XUARTPS_IXR_TNFUL 0x00000800U /**< Tx FIFO Nearly Full interrupt */
+#define XUARTPS_IXR_TTRIG 0x00000400U /**< Tx Trig interrupt */
+#define XUARTPS_IXR_DMS 0x00000200U /**< Modem status change interrupt */
+#define XUARTPS_IXR_TOUT 0x00000100U /**< Timeout error interrupt */
+#define XUARTPS_IXR_PARITY 0x00000080U /**< Parity error interrupt */
+#define XUARTPS_IXR_FRAMING 0x00000040U /**< Framing error interrupt */
+#define XUARTPS_IXR_RXOVR 0x00000020U /**< Overrun error interrupt */
+#define XUARTPS_IXR_TXFULL 0x00000010U /**< TX FIFO full interrupt. */
+#define XUARTPS_IXR_TXEMPTY 0x00000008U /**< TX FIFO empty interrupt. */
+#define XUARTPS_IXR_RXFULL 0x00000004U /**< RX FIFO full interrupt. */
+#define XUARTPS_IXR_RXEMPTY 0x00000002U /**< RX FIFO empty interrupt. */
+#define XUARTPS_IXR_RTRIG 0x00000001U /**< RX FIFO trigger interrupt. */
+#define XUARTPS_IXR_MASK 0x00003FFFU /**< Valid bit mask */
 
 /* Modem Control Register Bits Definition */
-#define XUARTPS_MODEMCR_FCM_RTS_CTS	0x00000020 /**< RTS/CTS hardware flow control. */
-#define XUARTPS_MODEMCR_FCM_NONE	0x00000000 /**< No hardware flow control. */
-#define XUARTPS_MODEMCR_FCM_MASK	0x00000020 /**< Hardware flow control mask. */
-#define XUARTPS_MODEMCR_RTS_SHIFT	1U         /**< RTS bit shift */
-#define XUARTPS_MODEMCR_DTR_SHIFT	0U         /**< DTR bit shift */
+#define XUARTPS_MODEMCR_FCM_RTS_CTS \
+	0x00000020 /**< RTS/CTS hardware flow control. */
+#define XUARTPS_MODEMCR_FCM_NONE 0x00000000 /**< No hardware flow control. */
+#define XUARTPS_MODEMCR_FCM_MASK 0x00000020 /**< Hardware flow control mask. */
+#define XUARTPS_MODEMCR_RTS_SHIFT 1U /**< RTS bit shift */
+#define XUARTPS_MODEMCR_DTR_SHIFT 0U /**< DTR bit shift */
 
 /* Channel Status Register */
-#define XUARTPS_SR_TNFUL	0x00004000U /**< TX FIFO Nearly Full Status */
-#define XUARTPS_SR_TTRIG	0x00002000U /**< TX FIFO Trigger Status */
-#define XUARTPS_SR_FLOWDEL	0x00001000U /**< RX FIFO fill over flow delay */
-#define XUARTPS_SR_TACTIVE	0x00000800U /**< TX active */
-#define XUARTPS_SR_RACTIVE	0x00000400U /**< RX active */
-#define XUARTPS_SR_TXFULL	0x00000010U /**< TX FIFO full */
-#define XUARTPS_SR_TXEMPTY	0x00000008U /**< TX FIFO empty */
-#define XUARTPS_SR_RXFULL	0x00000004U /**< RX FIFO full */
-#define XUARTPS_SR_RXEMPTY	0x00000002U /**< RX FIFO empty */
-#define XUARTPS_SR_RTRIG	0x00000001U /**< RX FIFO fill over trigger */
+#define XUARTPS_SR_TNFUL 0x00004000U /**< TX FIFO Nearly Full Status */
+#define XUARTPS_SR_TTRIG 0x00002000U /**< TX FIFO Trigger Status */
+#define XUARTPS_SR_FLOWDEL 0x00001000U /**< RX FIFO fill over flow delay */
+#define XUARTPS_SR_TACTIVE 0x00000800U /**< TX active */
+#define XUARTPS_SR_RACTIVE 0x00000400U /**< RX active */
+#define XUARTPS_SR_TXFULL 0x00000010U /**< TX FIFO full */
+#define XUARTPS_SR_TXEMPTY 0x00000008U /**< TX FIFO empty */
+#define XUARTPS_SR_RXFULL 0x00000004U /**< RX FIFO full */
+#define XUARTPS_SR_RXEMPTY 0x00000002U /**< RX FIFO empty */
+#define XUARTPS_SR_RTRIG 0x00000001U /**< RX FIFO fill over trigger */
 
 /** Device configuration structure */
 struct uart_xlnx_ps_dev_config {
@@ -151,10 +152,8 @@ struct uart_xlnx_ps_dev_data_t {
 };
 
 #define DEV_CFG(dev) \
-	((const struct uart_xlnx_ps_dev_config * const) \
-	 (dev)->config)
-#define DEV_DATA(dev) \
-	((struct uart_xlnx_ps_dev_data_t *)(dev)->data)
+	((const struct uart_xlnx_ps_dev_config *const)(dev)->config)
+#define DEV_DATA(dev) ((struct uart_xlnx_ps_dev_data_t *)(dev)->data)
 
 static const struct uart_driver_api uart_xlnx_ps_driver_api;
 
@@ -295,7 +294,7 @@ static int uart_xlnx_ps_init(const struct device *dev)
 	/* Set initial character length / start/stop bit / parity configuration */
 	reg_val = sys_read32(reg_base + XUARTPS_MR_OFFSET);
 	reg_val &= (~(XUARTPS_MR_CHARLEN_MASK | XUARTPS_MR_STOPMODE_MASK |
-		    XUARTPS_MR_PARITY_MASK));
+		      XUARTPS_MR_PARITY_MASK));
 	reg_val |= XUARTPS_MR_CHARLEN_8_BIT | XUARTPS_MR_STOPMODE_1_BIT |
 		   XUARTPS_MR_PARITY_NONE;
 	sys_write32(reg_val, reg_base + XUARTPS_MR_OFFSET);
@@ -344,8 +343,7 @@ static int uart_xlnx_ps_poll_in(const struct device *dev, unsigned char *c)
 	reg_base = dev_cfg->uconf.regs;
 	reg_val = sys_read32(reg_base + XUARTPS_SR_OFFSET);
 	if ((reg_val & XUARTPS_SR_RXEMPTY) == 0) {
-		*c = (unsigned char)sys_read32(reg_base +
-						XUARTPS_FIFO_OFFSET);
+		*c = (unsigned char)sys_read32(reg_base + XUARTPS_FIFO_OFFSET);
 		return 0;
 	} else {
 		return -1;
@@ -404,9 +402,8 @@ static void uart_xlnx_ps_poll_out(const struct device *dev, unsigned char c)
  *         as all parity modes supported by the API are also supported
  *         by the hardware.
  */
-static inline bool uart_xlnx_ps_cfg2ll_parity(
-	uint32_t *mode_reg,
-	enum uart_config_parity parity)
+static inline bool uart_xlnx_ps_cfg2ll_parity(uint32_t *mode_reg,
+					      enum uart_config_parity parity)
 {
 	/*
 	 * Translate the new parity configuration to the mode register's
@@ -458,9 +455,9 @@ static inline bool uart_xlnx_ps_cfg2ll_parity(
  * @return Indication of success or failure in case of an unsupported
  *         stop bit configuration being provided by the caller.
  */
-static inline bool uart_xlnx_ps_cfg2ll_stopbits(
-	uint32_t *mode_reg,
-	enum uart_config_stop_bits stopbits)
+static inline bool
+uart_xlnx_ps_cfg2ll_stopbits(uint32_t *mode_reg,
+			     enum uart_config_stop_bits stopbits)
 {
 	/*
 	 * Translate the new stop bit configuration to the mode register's
@@ -508,9 +505,9 @@ static inline bool uart_xlnx_ps_cfg2ll_stopbits(
  * @return Indication of success or failure in case of an unsupported
  *         data bit configuration being provided by the caller.
  */
-static inline bool uart_xlnx_ps_cfg2ll_databits(
-	uint32_t *mode_reg,
-	enum uart_config_data_bits databits)
+static inline bool
+uart_xlnx_ps_cfg2ll_databits(uint32_t *mode_reg,
+			     enum uart_config_data_bits databits)
 {
 	/*
 	 * Translate the new data bit configuration to the mode register's
@@ -560,9 +557,9 @@ static inline bool uart_xlnx_ps_cfg2ll_databits(
  * @return Indication of success or failure in case of an unsupported
  *         flow control configuration being provided by the caller.
  */
-static inline bool uart_xlnx_ps_cfg2ll_hwctrl(
-	uint32_t *modemcr_reg,
-	enum uart_config_flow_control hwctrl)
+static inline bool
+uart_xlnx_ps_cfg2ll_hwctrl(uint32_t *modemcr_reg,
+			   enum uart_config_flow_control hwctrl)
 {
 	/*
 	 * Translate the new flow control configuration to the modem
@@ -573,7 +570,7 @@ static inline bool uart_xlnx_ps_cfg2ll_hwctrl(
 
 	if (hwctrl == UART_CFG_FLOW_CTRL_RTS_CTS) {
 		*modemcr_reg |= XUARTPS_MODEMCR_FCM_RTS_CTS;
-	} else if (hwctrl ==  UART_CFG_FLOW_CTRL_NONE) {
+	} else if (hwctrl == UART_CFG_FLOW_CTRL_NONE) {
 		*modemcr_reg |= XUARTPS_MODEMCR_FCM_NONE;
 	} else {
 		/* Only no flow control or RTS/CTS is supported. */
@@ -599,27 +596,27 @@ static int uart_xlnx_ps_configure(const struct device *dev,
 				  const struct uart_config *cfg)
 {
 	struct uart_xlnx_ps_dev_config *dev_cfg =
-	(struct uart_xlnx_ps_dev_config *)DEV_CFG(dev);
+		(struct uart_xlnx_ps_dev_config *)DEV_CFG(dev);
 
-	uint32_t reg_base    = dev_cfg->uconf.regs;
-	uint32_t mode_reg    = 0;
+	uint32_t reg_base = dev_cfg->uconf.regs;
+	uint32_t mode_reg = 0;
 	uint32_t modemcr_reg = 0;
 
 	/* Read the current mode register & modem control register values */
-	mode_reg    = sys_read32(reg_base + XUARTPS_MR_OFFSET);
+	mode_reg = sys_read32(reg_base + XUARTPS_MR_OFFSET);
 	modemcr_reg = sys_read32(reg_base + XUARTPS_MODEMCR_OFFSET);
 
 	/* Mask out all items that might be re-configured */
-	mode_reg    &= (~XUARTPS_MR_PARITY_MASK);
-	mode_reg    &= (~XUARTPS_MR_STOPMODE_MASK);
-	mode_reg    &= (~XUARTPS_MR_CHARLEN_MASK);
+	mode_reg &= (~XUARTPS_MR_PARITY_MASK);
+	mode_reg &= (~XUARTPS_MR_STOPMODE_MASK);
+	mode_reg &= (~XUARTPS_MR_CHARLEN_MASK);
 	modemcr_reg &= (~XUARTPS_MODEMCR_FCM_MASK);
 
 	/* Assemble the updated registers, validity checks contained within */
 	if ((!uart_xlnx_ps_cfg2ll_parity(&mode_reg, cfg->parity)) ||
-		(!uart_xlnx_ps_cfg2ll_stopbits(&mode_reg, cfg->stop_bits)) ||
-		(!uart_xlnx_ps_cfg2ll_databits(&mode_reg, cfg->data_bits)) ||
-		(!uart_xlnx_ps_cfg2ll_hwctrl(&modemcr_reg, cfg->flow_ctrl))) {
+	    (!uart_xlnx_ps_cfg2ll_stopbits(&mode_reg, cfg->stop_bits)) ||
+	    (!uart_xlnx_ps_cfg2ll_databits(&mode_reg, cfg->data_bits)) ||
+	    (!uart_xlnx_ps_cfg2ll_hwctrl(&modemcr_reg, cfg->flow_ctrl))) {
 		return -ENOTSUP;
 	}
 
@@ -631,7 +628,7 @@ static int uart_xlnx_ps_configure(const struct device *dev,
 	dev_cfg->baud_rate = cfg->baudrate;
 
 	/* Write the two control registers */
-	sys_write32(mode_reg,    reg_base + XUARTPS_MR_OFFSET);
+	sys_write32(mode_reg, reg_base + XUARTPS_MR_OFFSET);
 	sys_write32(modemcr_reg, reg_base + XUARTPS_MODEMCR_OFFSET);
 
 	/* Re-enable the controller */
@@ -654,8 +651,8 @@ static int uart_xlnx_ps_configure(const struct device *dev,
  * @return The current parity setting mapped to the UART driver API's
  *         enum type.
  */
-static inline enum uart_config_parity uart_xlnx_ps_ll2cfg_parity(
-	uint32_t mode_reg)
+static inline enum uart_config_parity
+uart_xlnx_ps_ll2cfg_parity(uint32_t mode_reg)
 {
 	/*
 	 * Obtain the current parity configuration from the mode register's
@@ -696,8 +693,8 @@ static inline enum uart_config_parity uart_xlnx_ps_ll2cfg_parity(
  * @return The current stop bit setting mapped to the UART driver API's
  *         enum type.
  */
-static inline enum uart_config_stop_bits uart_xlnx_ps_ll2cfg_stopbits(
-	uint32_t mode_reg)
+static inline enum uart_config_stop_bits
+uart_xlnx_ps_ll2cfg_stopbits(uint32_t mode_reg)
 {
 	/*
 	 * Obtain the current stop bit configuration from the mode register's
@@ -733,8 +730,8 @@ static inline enum uart_config_stop_bits uart_xlnx_ps_ll2cfg_stopbits(
  * @return The current data bit setting mapped to the UART driver API's
  *         enum type.
  */
-static inline enum uart_config_data_bits uart_xlnx_ps_ll2cfg_databits(
-	uint32_t mode_reg)
+static inline enum uart_config_data_bits
+uart_xlnx_ps_ll2cfg_databits(uint32_t mode_reg)
 {
 	/*
 	 * Obtain the current data bit configuration from the mode register's
@@ -769,8 +766,8 @@ static inline enum uart_config_data_bits uart_xlnx_ps_ll2cfg_databits(
  * @return The current flow control setting mapped to the UART driver API's
  *         enum type.
  */
-static inline enum uart_config_flow_control uart_xlnx_ps_ll2cfg_hwctrl(
-	uint32_t modemcr_reg)
+static inline enum uart_config_flow_control
+uart_xlnx_ps_ll2cfg_hwctrl(uint32_t modemcr_reg)
 {
 	/*
 	 * Obtain the current flow control configuration from the modem
@@ -779,8 +776,8 @@ static inline enum uart_config_flow_control uart_xlnx_ps_ll2cfg_hwctrl(
 	 *  1b : RTS/CTS
 	 */
 
-	if ((modemcr_reg & XUARTPS_MODEMCR_FCM_MASK)
-		== XUARTPS_MODEMCR_FCM_RTS_CTS) {
+	if ((modemcr_reg & XUARTPS_MODEMCR_FCM_MASK) ==
+	    XUARTPS_MODEMCR_FCM_RTS_CTS) {
 		return UART_CFG_FLOW_CTRL_RTS_CTS;
 	}
 
@@ -812,12 +809,12 @@ static int uart_xlnx_ps_config_get(const struct device *dev,
 	 * Control register).
 	 */
 
-	uint32_t reg_base    = dev_cfg->uconf.regs;
-	uint32_t mode_reg    = sys_read32(reg_base + XUARTPS_MR_OFFSET);
+	uint32_t reg_base = dev_cfg->uconf.regs;
+	uint32_t mode_reg = sys_read32(reg_base + XUARTPS_MR_OFFSET);
 	uint32_t modemcr_reg = sys_read32(reg_base + XUARTPS_MODEMCR_OFFSET);
 
-	cfg->baudrate  = dev_cfg->baud_rate;
-	cfg->parity    = uart_xlnx_ps_ll2cfg_parity(mode_reg);
+	cfg->baudrate = dev_cfg->baud_rate;
+	cfg->parity = uart_xlnx_ps_ll2cfg_parity(mode_reg);
 	cfg->stop_bits = uart_xlnx_ps_ll2cfg_stopbits(mode_reg);
 	cfg->data_bits = uart_xlnx_ps_ll2cfg_databits(mode_reg);
 	cfg->flow_ctrl = uart_xlnx_ps_ll2cfg_hwctrl(modemcr_reg);
@@ -837,8 +834,7 @@ static int uart_xlnx_ps_config_get(const struct device *dev,
  * @return Number of bytes sent
  */
 static int uart_xlnx_ps_fifo_fill(const struct device *dev,
-				  const uint8_t *tx_data,
-				  int size)
+				  const uint8_t *tx_data, int size)
 {
 	const struct uart_xlnx_ps_dev_config *dev_cfg = DEV_CFG(dev);
 	uint32_t reg_val;
@@ -849,7 +845,7 @@ static int uart_xlnx_ps_fifo_fill(const struct device *dev,
 	reg_val = sys_read32(reg_base + XUARTPS_SR_OFFSET);
 	while (onum < size && (reg_val & XUARTPS_SR_TXFULL) == 0) {
 		sys_write32((uint32_t)(tx_data[onum] & 0xFF),
-				reg_base + XUARTPS_FIFO_OFFSET);
+			    reg_base + XUARTPS_FIFO_OFFSET);
 		onum++;
 		reg_val = sys_read32(reg_base + XUARTPS_SR_OFFSET);
 	}
@@ -878,8 +874,8 @@ static int uart_xlnx_ps_fifo_read(const struct device *dev, uint8_t *rx_data,
 	reg_val = sys_read32(reg_base + XUARTPS_SR_OFFSET);
 
 	while (inum < size && (reg_val & XUARTPS_SR_RXEMPTY) == 0) {
-		rx_data[inum] = (uint8_t)sys_read32(reg_base
-				+ XUARTPS_FIFO_OFFSET);
+		rx_data[inum] =
+			(uint8_t)sys_read32(reg_base + XUARTPS_FIFO_OFFSET);
 		inum++;
 		reg_val = sys_read32(reg_base + XUARTPS_SR_OFFSET);
 	}
@@ -900,9 +896,8 @@ static void uart_xlnx_ps_irq_tx_enable(const struct device *dev)
 	uint32_t reg_base;
 
 	reg_base = dev_cfg->uconf.regs;
-	sys_write32(
-		(XUARTPS_IXR_TTRIG | XUARTPS_IXR_TXEMPTY),
-		reg_base + XUARTPS_IER_OFFSET);
+	sys_write32((XUARTPS_IXR_TTRIG | XUARTPS_IXR_TXEMPTY),
+		    reg_base + XUARTPS_IER_OFFSET);
 }
 
 /**
@@ -918,9 +913,8 @@ static void uart_xlnx_ps_irq_tx_disable(const struct device *dev)
 	uint32_t reg_base;
 
 	reg_base = dev_cfg->uconf.regs;
-	sys_write32(
-		(XUARTPS_IXR_TTRIG | XUARTPS_IXR_TXEMPTY),
-		reg_base + XUARTPS_IDR_OFFSET);
+	sys_write32((XUARTPS_IXR_TTRIG | XUARTPS_IXR_TXEMPTY),
+		    reg_base + XUARTPS_IDR_OFFSET);
 }
 
 /**
@@ -941,9 +935,8 @@ static int uart_xlnx_ps_irq_tx_ready(const struct device *dev)
 	if ((reg_val & (XUARTPS_IXR_TTRIG | XUARTPS_IXR_TXEMPTY)) == 0) {
 		return 0;
 	} else {
-		sys_write32(
-			(XUARTPS_IXR_TTRIG | XUARTPS_IXR_TXEMPTY),
-			reg_base + XUARTPS_ISR_OFFSET);
+		sys_write32((XUARTPS_IXR_TTRIG | XUARTPS_IXR_TXEMPTY),
+			    reg_base + XUARTPS_ISR_OFFSET);
 		return 1;
 	}
 }
@@ -1039,12 +1032,12 @@ static void uart_xlnx_ps_irq_err_enable(const struct device *dev)
 
 	reg_base = dev_cfg->uconf.regs;
 	sys_write32(
-		  XUARTPS_IXR_TOVR    /* [12] Transmitter FIFO Overflow */
-		| XUARTPS_IXR_TOUT    /* [8]  Receiver Timerout */
-		| XUARTPS_IXR_PARITY  /* [7]  Parity Error */
-		| XUARTPS_IXR_FRAMING /* [6]  Receiver Framing Error */
-		| XUARTPS_IXR_RXOVR,  /* [5]  Receiver Overflow Error */
-	    reg_base + XUARTPS_IER_OFFSET);
+		XUARTPS_IXR_TOVR /* [12] Transmitter FIFO Overflow */
+			| XUARTPS_IXR_TOUT /* [8]  Receiver Timerout */
+			| XUARTPS_IXR_PARITY /* [7]  Parity Error */
+			| XUARTPS_IXR_FRAMING /* [6]  Receiver Framing Error */
+			| XUARTPS_IXR_RXOVR, /* [5]  Receiver Overflow Error */
+		reg_base + XUARTPS_IER_OFFSET);
 }
 
 /**
@@ -1061,12 +1054,12 @@ static void uart_xlnx_ps_irq_err_disable(const struct device *dev)
 
 	reg_base = dev_cfg->uconf.regs;
 	sys_write32(
-		  XUARTPS_IXR_TOVR    /* [12] Transmitter FIFO Overflow */
-		| XUARTPS_IXR_TOUT    /* [8]  Receiver Timerout */
-		| XUARTPS_IXR_PARITY  /* [7]  Parity Error */
-		| XUARTPS_IXR_FRAMING /* [6]  Receiver Framing Error */
-		| XUARTPS_IXR_RXOVR,  /* [5]  Receiver Overflow Error */
-	    reg_base + XUARTPS_IDR_OFFSET);
+		XUARTPS_IXR_TOVR /* [12] Transmitter FIFO Overflow */
+			| XUARTPS_IXR_TOUT /* [8]  Receiver Timerout */
+			| XUARTPS_IXR_PARITY /* [7]  Parity Error */
+			| XUARTPS_IXR_FRAMING /* [6]  Receiver Framing Error */
+			| XUARTPS_IXR_RXOVR, /* [5]  Receiver Overflow Error */
+		reg_base + XUARTPS_IDR_OFFSET);
 }
 
 /**
@@ -1116,8 +1109,8 @@ static int uart_xlnx_ps_irq_update(const struct device *dev)
  * @return N/A
  */
 static void uart_xlnx_ps_irq_callback_set(const struct device *dev,
-					    uart_irq_callback_user_data_t cb,
-					    void *cb_data)
+					  uart_irq_callback_user_data_t cb,
+					  void *cb_data)
 {
 	struct uart_xlnx_ps_dev_data_t *dev_data = DEV_DATA(dev);
 
@@ -1172,17 +1165,16 @@ static const struct uart_driver_api uart_xlnx_ps_driver_api = {
 #define UART_XLNX_PS_IRQ_CONF_FUNC_SET(port) \
 	.irq_config_func = uart_xlnx_ps_irq_config_##port,
 
-#define UART_XLNX_PS_IRQ_CONF_FUNC(port) \
-DEVICE_DECLARE(uart_xlnx_ps_##port); \
-\
-static void uart_xlnx_ps_irq_config_##port(const struct device *dev) \
-{ \
-	IRQ_CONNECT(DT_INST_IRQN(port), \
-	DT_INST_IRQ(port, priority), \
-	uart_xlnx_ps_isr, DEVICE_GET(uart_xlnx_ps_##port), \
-	0); \
-	irq_enable(DT_INST_IRQN(port)); \
-}
+#define UART_XLNX_PS_IRQ_CONF_FUNC(port)                                       \
+	DEVICE_DECLARE(uart_xlnx_ps_##port);                                   \
+                                                                               \
+	static void uart_xlnx_ps_irq_config_##port(const struct device *dev)   \
+	{                                                                      \
+		IRQ_CONNECT(DT_INST_IRQN(port), DT_INST_IRQ(port, priority),   \
+			    uart_xlnx_ps_isr, DEVICE_GET(uart_xlnx_ps_##port), \
+			    0);                                                \
+		irq_enable(DT_INST_IRQN(port));                                \
+	}
 
 #else
 
@@ -1192,30 +1184,28 @@ static void uart_xlnx_ps_irq_config_##port(const struct device *dev) \
 #endif /*CONFIG_UART_INTERRUPT_DRIVEN */
 
 #define UART_XLNX_PS_DEV_DATA(port) \
-static struct uart_xlnx_ps_dev_data_t uart_xlnx_ps_dev_data_##port
+	static struct uart_xlnx_ps_dev_data_t uart_xlnx_ps_dev_data_##port
 
-#define UART_XLNX_PS_DEV_CFG(port) \
-static struct uart_xlnx_ps_dev_config uart_xlnx_ps_dev_cfg_##port = { \
-	.uconf = { \
-		.regs = DT_INST_REG_ADDR(port), \
-		.sys_clk_freq = DT_INST_PROP(port, clock_frequency), \
-		UART_XLNX_PS_IRQ_CONF_FUNC_SET(port) \
-	}, \
-	.baud_rate = DT_INST_PROP(port, current_speed), \
-}
+#define UART_XLNX_PS_DEV_CFG(port)                                            \
+	static struct uart_xlnx_ps_dev_config uart_xlnx_ps_dev_cfg_##port = { \
+		.uconf = { .regs = DT_INST_REG_ADDR(port),                    \
+			   .sys_clk_freq =                                    \
+				   DT_INST_PROP(port, clock_frequency),       \
+			   UART_XLNX_PS_IRQ_CONF_FUNC_SET(port) },            \
+		.baud_rate = DT_INST_PROP(port, current_speed),               \
+	}
 
-#define UART_XLNX_PS_INIT(port) \
-DEVICE_AND_API_INIT(uart_xlnx_ps_##port, DT_INST_LABEL(port), \
-	uart_xlnx_ps_init, \
-	&uart_xlnx_ps_dev_data_##port, \
-	&uart_xlnx_ps_dev_cfg_##port, \
-	PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
-	&uart_xlnx_ps_driver_api)
+#define UART_XLNX_PS_INIT(port)                                               \
+	DEVICE_AND_API_INIT(uart_xlnx_ps_##port, DT_INST_LABEL(port),         \
+			    uart_xlnx_ps_init, &uart_xlnx_ps_dev_data_##port, \
+			    &uart_xlnx_ps_dev_cfg_##port, PRE_KERNEL_1,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,               \
+			    &uart_xlnx_ps_driver_api)
 
-#define UART_XLNX_INSTANTIATE(inst)		\
-	UART_XLNX_PS_IRQ_CONF_FUNC(inst);	\
-	UART_XLNX_PS_DEV_DATA(inst);		\
-	UART_XLNX_PS_DEV_CFG(inst);		\
+#define UART_XLNX_INSTANTIATE(inst)       \
+	UART_XLNX_PS_IRQ_CONF_FUNC(inst); \
+	UART_XLNX_PS_DEV_DATA(inst);      \
+	UART_XLNX_PS_DEV_CFG(inst);       \
 	UART_XLNX_PS_INIT(inst);
 
 DT_INST_FOREACH_STATUS_OKAY(UART_XLNX_INSTANTIATE)

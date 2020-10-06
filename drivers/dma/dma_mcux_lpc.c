@@ -42,19 +42,18 @@ struct dma_mcux_lpc_dma_data {
 	uint32_t num_channels_used;
 };
 
-#define DEV_CFG(dev) \
-	((const struct dma_mcux_lpc_config *const)(dev)->config)
+#define DEV_CFG(dev) ((const struct dma_mcux_lpc_config *const)(dev)->config)
 #define DEV_DATA(dev) ((struct dma_mcux_lpc_dma_data *)dev->data)
 #define DEV_BASE(dev) ((DMA_Type *)DEV_CFG(dev)->base)
 
-#define DEV_CHANNEL_DATA(dev, ch)                                              \
-		((struct call_back *)(&(DEV_DATA(dev)->data_cb[ch])))
+#define DEV_CHANNEL_DATA(dev, ch) \
+	((struct call_back *)(&(DEV_DATA(dev)->data_cb[ch])))
 
-#define DEV_DMA_HANDLE(dev, ch)                                               \
-		((dma_handle_t *)(&(DEV_CHANNEL_DATA(dev, ch)->dma_handle)))
+#define DEV_DMA_HANDLE(dev, ch) \
+	((dma_handle_t *)(&(DEV_CHANNEL_DATA(dev, ch)->dma_handle)))
 
 static void nxp_lpc_dma_callback(dma_handle_t *handle, void *param,
-			      bool transferDone, uint32_t intmode)
+				 bool transferDone, uint32_t intmode)
 {
 	int ret = 1;
 	struct call_back *data = (struct call_back *)param;
@@ -120,16 +119,14 @@ static int dma_mcux_lpc_configure(const struct device *dev, uint32_t channel,
 		return -EINVAL;
 	}
 
-	if (config->source_data_size != 4U &&
-		config->source_data_size != 2U &&
-		config->source_data_size != 1U) {
+	if (config->source_data_size != 4U && config->source_data_size != 2U &&
+	    config->source_data_size != 1U) {
 		LOG_ERR("Source unit size error, %d", config->source_data_size);
 		return -EINVAL;
 	}
 
-	if (config->dest_data_size != 4U &&
-		config->dest_data_size != 2U &&
-		config->dest_data_size != 1U) {
+	if (config->dest_data_size != 4U && config->dest_data_size != 2U &&
+	    config->dest_data_size != 1U) {
 		LOG_ERR("Dest unit size error, %d", config->dest_data_size);
 		return -EINVAL;
 	}
@@ -217,13 +214,12 @@ static int dma_mcux_lpc_configure(const struct device *dev, uint32_t channel,
 
 	} else {
 		/* block_count shall be 1 */
-		DMA_PrepareTransfer(
-			&(data->transferConfig[0]),
-			(void *)block_config->source_address,
-			(void *)block_config->dest_address,
-			config->dest_data_size,
-			block_config->block_size, transfer_type,
-			NULL);
+		DMA_PrepareTransfer(&(data->transferConfig[0]),
+				    (void *)block_config->source_address,
+				    (void *)block_config->dest_address,
+				    config->dest_data_size,
+				    block_config->block_size, transfer_type,
+				    NULL);
 	}
 	DMA_SubmitTransfer(p_handle, &(data->transferConfig[0]));
 
@@ -283,7 +279,8 @@ static int dma_mcux_lpc_get_status(const struct device *dev, uint32_t channel,
 
 	if (data->busy) {
 		status->busy = true;
-		status->pending_length = DMA_GetRemainingBytes(DEV_BASE(dev), channel);
+		status->pending_length =
+			DMA_GetRemainingBytes(DEV_BASE(dev), channel);
 	} else {
 		status->busy = false;
 		status->pending_length = 0;
@@ -339,7 +336,6 @@ static int dma_mcux_lpc_init(const struct device *dev)
 
 	data->num_channels_used = 0;
 
-
 	DMA_Init(DEV_BASE(dev));
 	INPUTMUX_Init(INPUTMUX);
 
@@ -354,44 +350,43 @@ static const struct dma_driver_api dma_mcux_lpc_api = {
 	.get_status = dma_mcux_lpc_get_status,
 };
 
-#define DMA_MCUX_LPC_CONFIG_FUNC(n)				\
-	static void dma_mcux_lpc_config_func_##n(const struct device *dev)	\
-	{								\
-		IRQ_CONNECT(DT_INST_IRQN(n),				\
-			    DT_INST_IRQ(n, priority),			\
-			    dma_mcux_lpc_irq_handler, DEVICE_GET(dma_mcux_lpc_##n), 0);\
-									\
-		irq_enable(DT_INST_IRQN(n));				\
+#define DMA_MCUX_LPC_CONFIG_FUNC(n)                                        \
+	static void dma_mcux_lpc_config_func_##n(const struct device *dev) \
+	{                                                                  \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),     \
+			    dma_mcux_lpc_irq_handler,                      \
+			    DEVICE_GET(dma_mcux_lpc_##n), 0);              \
+                                                                           \
+		irq_enable(DT_INST_IRQN(n));                               \
 	}
-#define DMA_MCUX_LPC_IRQ_CFG_FUNC_INIT(n)				\
+#define DMA_MCUX_LPC_IRQ_CFG_FUNC_INIT(n) \
 	.irq_config_func = dma_mcux_lpc_config_func_##n
-#define DMA_MCUX_LPC_INIT_CFG(n)					\
-	DMA_MCUX_LPC_DECLARE_CFG(n,				\
-				       DMA_MCUX_LPC_IRQ_CFG_FUNC_INIT(n))
+#define DMA_MCUX_LPC_INIT_CFG(n) \
+	DMA_MCUX_LPC_DECLARE_CFG(n, DMA_MCUX_LPC_IRQ_CFG_FUNC_INIT(n))
 
-#define DMA_MCUX_LPC_DECLARE_CFG(n, IRQ_FUNC_INIT)		\
-static const struct dma_mcux_lpc_config dma_##n##_config = {	\
-	.base = (DMA_Type *)DT_INST_REG_ADDR(n),			\
-	.num_of_channels = DT_INST_PROP(n, dma_channels),			\
-	IRQ_FUNC_INIT							\
-}
+#define DMA_MCUX_LPC_DECLARE_CFG(n, IRQ_FUNC_INIT)                   \
+	static const struct dma_mcux_lpc_config dma_##n##_config = { \
+		.base = (DMA_Type *)DT_INST_REG_ADDR(n),             \
+		.num_of_channels = DT_INST_PROP(n, dma_channels),    \
+		IRQ_FUNC_INIT                                        \
+	}
 
-#define DMA_INIT(n) \
-									\
-	static const struct dma_mcux_lpc_config dma_##n##_config;\
-									\
-	static struct dma_mcux_lpc_dma_data dma_data_##n = {	\
-		.data_cb = NULL,					\
-	};								\
-									\
-	DEVICE_AND_API_INIT(dma_mcux_lpc_##n, DT_INST_LABEL(n),	\
-			    &dma_mcux_lpc_init,				\
-			    &dma_data_##n, &dma_##n##_config,\
-			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,\
-			    &dma_mcux_lpc_api);			\
-									\
-	DMA_MCUX_LPC_CONFIG_FUNC(n)				\
-									\
+#define DMA_INIT(n)                                               \
+                                                                  \
+	static const struct dma_mcux_lpc_config dma_##n##_config; \
+                                                                  \
+	static struct dma_mcux_lpc_dma_data dma_data_##n = {      \
+		.data_cb = NULL,                                  \
+	};                                                        \
+                                                                  \
+	DEVICE_AND_API_INIT(dma_mcux_lpc_##n, DT_INST_LABEL(n),   \
+			    &dma_mcux_lpc_init, &dma_data_##n,    \
+			    &dma_##n##_config, POST_KERNEL,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,  \
+			    &dma_mcux_lpc_api);                   \
+                                                                  \
+	DMA_MCUX_LPC_CONFIG_FUNC(n)                               \
+                                                                  \
 	DMA_MCUX_LPC_INIT_CFG(n);
 
 DT_INST_FOREACH_STATUS_OKAY(DMA_INIT)

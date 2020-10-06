@@ -15,34 +15,33 @@ extern "C" {
 
 static inline int isupper(int a)
 {
-	return (int)(((unsigned)(a)-(unsigned)'A') < 26U);
+	return (int)(((unsigned)(a) - (unsigned)'A') < 26U);
 }
 
 static inline int isalpha(int c)
 {
-	return (int)((((unsigned)c|32u)-(unsigned)'a') < 26U);
+	return (int)((((unsigned)c | 32u) - (unsigned)'a') < 26U);
 }
 
 static inline int isspace(int c)
 {
-	return (int)(c == (int)' ' || ((unsigned)c-(unsigned)'\t') < 5U);
+	return (int)(c == (int)' ' || ((unsigned)c - (unsigned)'\t') < 5U);
 }
 
 static inline int isgraph(int c)
 {
-	return (int)((((unsigned)c) > ' ') &&
-			(((unsigned)c) <= (unsigned)'~'));
+	return (int)((((unsigned)c) > ' ') && (((unsigned)c) <= (unsigned)'~'));
 }
 
 static inline int isprint(int c)
 {
 	return (int)((((unsigned)c) >= ' ') &&
-			(((unsigned)c) <= (unsigned)'~'));
+		     (((unsigned)c) <= (unsigned)'~'));
 }
 
 static inline int isdigit(int a)
 {
-	return (int)(((unsigned)(a)-(unsigned)'0') < 10U);
+	return (int)(((unsigned)(a) - (unsigned)'0') < 10U);
 }
 
 static inline int isxdigit(int a)
@@ -50,7 +49,7 @@ static inline int isxdigit(int a)
 	unsigned int ua = (unsigned int)a;
 
 	return (int)(((ua - (unsigned)'0') < 10U) ||
-			((ua | 32U) - (unsigned)'a' < 6U));
+		     ((ua | 32U) - (unsigned)'a' < 6U));
 }
 
 static inline int tolower(int chr)
@@ -60,8 +59,7 @@ static inline int tolower(int chr)
 
 static inline int toupper(int chr)
 {
-	return (int)((chr >= (int)'a' && chr <=
-				(int)'z') ? (chr - 32) : (chr));
+	return (int)((chr >= (int)'a' && chr <= (int)'z') ? (chr - 32) : (chr));
 }
 
 static inline int isalnum(int chr)
@@ -73,4 +71,4 @@ static inline int isalnum(int chr)
 }
 #endif
 
-#endif  /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_CTYPE_H_ */
+#endif /* ZEPHYR_LIB_LIBC_MINIMAL_INCLUDE_CTYPE_H_ */

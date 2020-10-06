@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <limits.h>
 #include <sys/util.h>
 #include "test_gpio_api.h"
@@ -16,18 +15,17 @@ static void callback_edge(const struct device *port, struct gpio_callback *cb,
 			  gpio_port_pins_t pins)
 {
 	zassert_equal(pins, BIT(TEST_PIN),
-		     "Detected interrupt on an invalid pin");
+		      "Detected interrupt on an invalid pin");
 	cb_count++;
 }
 
-static void callback_level(const struct device *port,
-			   struct gpio_callback *cb,
+static void callback_level(const struct device *port, struct gpio_callback *cb,
 			   gpio_port_pins_t pins)
 {
 	int ret;
 
 	zassert_equal(pins, BIT(TEST_PIN),
-		     "Detected interrupt on an invalid pin");
+		      "Detected interrupt on an invalid pin");
 
 	ret = gpio_pin_interrupt_configure(port, TEST_PIN, GPIO_INT_DISABLE);
 	zassert_equal(ret, 0,
@@ -37,8 +35,7 @@ static void callback_level(const struct device *port,
 }
 
 static void pin_set_and_verify(const struct device *port, unsigned int pin,
-			       int val,
-			       int idx)
+			       int val, int idx)
 {
 	zassert_equal(gpio_pin_set(port, pin, val), 0,
 		      "Test point %d: failed to set logical pin value", idx);
@@ -71,8 +68,8 @@ void test_gpio_pin_interrupt_edge(unsigned int cfg_flags,
 	} else {
 		cfg_out_flag = GPIO_OUTPUT_LOW;
 	}
-	ret = gpio_pin_configure(port, TEST_PIN, GPIO_INPUT | cfg_out_flag |
-				 cfg_flags);
+	ret = gpio_pin_configure(port, TEST_PIN,
+				 GPIO_INPUT | cfg_out_flag | cfg_flags);
 	zassert_equal(ret, 0, "Failed to configure the pin");
 
 	cb_count = 0;
@@ -96,7 +93,8 @@ void test_gpio_pin_interrupt_edge(unsigned int cfg_flags,
 		}
 		zassert_equal(cb_count, cb_count_expected,
 			      "Test point %d: Pin interrupt triggered invalid "
-			      "number of times on rising/to active edge", i);
+			      "number of times on rising/to active edge",
+			      i);
 
 		pin_set_and_verify(port, TEST_PIN, 0, i);
 		if (int_flags & GPIO_INT_LOW_0) {
@@ -104,7 +102,8 @@ void test_gpio_pin_interrupt_edge(unsigned int cfg_flags,
 		}
 		zassert_equal(cb_count, cb_count_expected,
 			      "Test point %d: Pin interrupt triggered invalid "
-			      "number of times on falling/to inactive edge", i);
+			      "number of times on falling/to inactive edge",
+			      i);
 	}
 
 	ret = gpio_pin_interrupt_configure(port, TEST_PIN, GPIO_INT_DISABLE);
@@ -144,14 +143,14 @@ void test_gpio_pin_interrupt_level(unsigned int cfg_flags,
 
 	if ((cfg_flags & GPIO_ACTIVE_LOW) != 0) {
 		cfg_out_flag = (pin_out_val != 0) ? GPIO_OUTPUT_LOW :
-						    GPIO_OUTPUT_HIGH;
+							  GPIO_OUTPUT_HIGH;
 	} else {
 		cfg_out_flag = (pin_out_val != 0) ? GPIO_OUTPUT_HIGH :
-						    GPIO_OUTPUT_LOW;
+							  GPIO_OUTPUT_LOW;
 	}
 
-	ret = gpio_pin_configure(port, TEST_PIN, GPIO_INPUT | cfg_out_flag |
-				 cfg_flags);
+	ret = gpio_pin_configure(port, TEST_PIN,
+				 GPIO_INPUT | cfg_out_flag | cfg_flags);
 	zassert_equal(ret, 0, "Failed to configure the pin");
 
 	cb_count = 0;
@@ -177,13 +176,15 @@ void test_gpio_pin_interrupt_level(unsigned int cfg_flags,
 		cb_count_expected++;
 		zassert_equal(cb_count, cb_count_expected,
 			      "Test point %d: Pin interrupt triggered invalid "
-			      "number of times on level %d", i, pin_out_val);
+			      "number of times on level %d",
+			      i, pin_out_val);
 
 		pin_out_val = (pin_out_val != 0) ? 0 : 1;
 		pin_set_and_verify(port, TEST_PIN, pin_out_val, i);
 		zassert_equal(cb_count, cb_count_expected,
 			      "Test point %d: Pin interrupt triggered invalid "
-			      "number of times on level %d", i, pin_out_val);
+			      "number of times on level %d",
+			      i, pin_out_val);
 
 		/* Re-enable pin level interrupt */
 		ret = gpio_pin_interrupt_configure(port, TEST_PIN, int_flags);
@@ -233,9 +234,11 @@ void test_gpio_int_edge_to_active(void)
 void test_gpio_int_edge_to_inactive(void)
 {
 	TC_PRINT("Step 1: Configure pin as active high\n");
-	test_gpio_pin_interrupt_edge(GPIO_ACTIVE_HIGH, GPIO_INT_EDGE_TO_INACTIVE);
+	test_gpio_pin_interrupt_edge(GPIO_ACTIVE_HIGH,
+				     GPIO_INT_EDGE_TO_INACTIVE);
 	TC_PRINT("Step 2: Configure pin as active low\n");
-	test_gpio_pin_interrupt_edge(GPIO_ACTIVE_LOW, GPIO_INT_EDGE_TO_INACTIVE);
+	test_gpio_pin_interrupt_edge(GPIO_ACTIVE_LOW,
+				     GPIO_INT_EDGE_TO_INACTIVE);
 }
 
 /** @brief Verify GPIO_INT_LEVEL_HIGH flag. */
@@ -263,7 +266,8 @@ void test_gpio_int_level_active(void)
 void test_gpio_int_level_inactive(void)
 {
 	TC_PRINT("Step 1: Configure pin as active high\n");
-	test_gpio_pin_interrupt_level(GPIO_ACTIVE_HIGH, GPIO_INT_LEVEL_INACTIVE);
+	test_gpio_pin_interrupt_level(GPIO_ACTIVE_HIGH,
+				      GPIO_INT_LEVEL_INACTIVE);
 	TC_PRINT("Step 2: Configure pin as active low\n");
 	test_gpio_pin_interrupt_level(GPIO_ACTIVE_LOW, GPIO_INT_LEVEL_INACTIVE);
 }

@@ -68,7 +68,7 @@ static inline uint8_t *get_glyph_ptr(const struct cfb_font *fptr, char c)
 	if (fptr->caps & CFB_FONT_MONO_VPACKED) {
 		return (uint8_t *)fptr->data +
 		       (c - fptr->first_char) *
-		       (fptr->width * fptr->height / 8U);
+			       (fptr->width * fptr->height / 8U);
 	}
 
 	return NULL;
@@ -78,13 +78,13 @@ static inline uint8_t *get_glyph_ptr(const struct cfb_font *fptr, char c)
  * Draw the monochrome character in the monochrome tiled framebuffer,
  * a byte is interpreted as 8 pixels ordered vertically among each other.
  */
-static uint8_t draw_char_vtmono(const struct char_framebuffer *fb,
-			     char c, uint16_t x, uint16_t y)
+static uint8_t draw_char_vtmono(const struct char_framebuffer *fb, char c,
+				uint16_t x, uint16_t y)
 {
 	const struct cfb_font *fptr = &(fb->fonts[fb->font_idx]);
 	uint8_t *glyph_ptr;
-	bool need_reverse = (((fb->screen_info & SCREEN_INFO_MONO_MSB_FIRST) != 0)
-			     != ((fptr->caps & CFB_FONT_MSB_FIRST) != 0));
+	bool need_reverse = (((fb->screen_info & SCREEN_INFO_MONO_MSB_FIRST) !=
+			      0) != ((fptr->caps & CFB_FONT_MSB_FIRST) != 0));
 
 	if (c < fptr->first_char || c > fptr->last_char) {
 		c = ' ';
@@ -113,7 +113,6 @@ static uint8_t draw_char_vtmono(const struct char_framebuffer *fb,
 
 			fb->buf[fb_y + x + g_x] = byte;
 		}
-
 	}
 
 	return fptr->width;
@@ -177,7 +176,6 @@ int cfb_framebuffer_clear(const struct device *dev, bool clear_display)
 	return 0;
 }
 
-
 int cfb_framebuffer_invert(const struct device *dev)
 {
 	struct char_framebuffer *fb = &char_fb;
@@ -214,7 +212,7 @@ int cfb_framebuffer_finalize(const struct device *dev)
 }
 
 int cfb_get_display_parameter(const struct device *dev,
-			       enum cfb_display_param param)
+			      enum cfb_display_param param)
 {
 	const struct char_framebuffer *fb = &char_fb;
 

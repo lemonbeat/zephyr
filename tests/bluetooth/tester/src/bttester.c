@@ -43,7 +43,7 @@ static K_FIFO_DEFINE(avail_queue);
 static void supported_commands(uint8_t *data, uint16_t len)
 {
 	uint8_t buf[1];
-	struct core_read_supported_commands_rp *rp = (void *) buf;
+	struct core_read_supported_commands_rp *rp = (void *)buf;
 
 	(void)memset(buf, 0, sizeof(buf));
 
@@ -53,13 +53,13 @@ static void supported_commands(uint8_t *data, uint16_t len)
 	tester_set_bit(buf, CORE_UNREGISTER_SERVICE);
 
 	tester_send(BTP_SERVICE_ID_CORE, CORE_READ_SUPPORTED_COMMANDS,
-		    BTP_INDEX_NONE, (uint8_t *) rp, sizeof(buf));
+		    BTP_INDEX_NONE, (uint8_t *)rp, sizeof(buf));
 }
 
 static void supported_services(uint8_t *data, uint16_t len)
 {
 	uint8_t buf[1];
-	struct core_read_supported_services_rp *rp = (void *) buf;
+	struct core_read_supported_services_rp *rp = (void *)buf;
 
 	(void)memset(buf, 0, sizeof(buf));
 
@@ -74,12 +74,12 @@ static void supported_services(uint8_t *data, uint16_t len)
 #endif /* CONFIG_BT_MESH */
 
 	tester_send(BTP_SERVICE_ID_CORE, CORE_READ_SUPPORTED_SERVICES,
-		    BTP_INDEX_NONE, (uint8_t *) rp, sizeof(buf));
+		    BTP_INDEX_NONE, (uint8_t *)rp, sizeof(buf));
 }
 
 static void register_service(uint8_t *data, uint16_t len)
 {
-	struct core_register_service_cmd *cmd = (void *) data;
+	struct core_register_service_cmd *cmd = (void *)data;
 	uint8_t status;
 
 	switch (cmd->id) {
@@ -116,7 +116,7 @@ rsp:
 
 static void unregister_service(uint8_t *data, uint16_t len)
 {
-	struct core_unregister_service_cmd *cmd = (void *) data;
+	struct core_unregister_service_cmd *cmd = (void *)data;
 	uint8_t status;
 
 	switch (cmd->id) {
@@ -151,7 +151,8 @@ static void handle_core(uint8_t opcode, uint8_t index, uint8_t *data,
 {
 	if (index != BTP_INDEX_NONE) {
 		LOG_WRN("index != BTP_INDEX_NONE: 0x%x", index);
-		tester_rsp(BTP_SERVICE_ID_CORE, opcode, index, BTP_STATUS_FAILED);
+		tester_rsp(BTP_SERVICE_ID_CORE, opcode, index,
+			   BTP_STATUS_FAILED);
 		return;
 	}
 
@@ -228,7 +229,7 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 
 static uint8_t *recv_cb(uint8_t *buf, size_t *off)
 {
-	struct btp_hdr *cmd = (void *) buf;
+	struct btp_hdr *cmd = (void *)buf;
 	struct btp_buf *new_buf;
 	uint16_t len;
 
@@ -247,7 +248,7 @@ static uint8_t *recv_cb(uint8_t *buf, size_t *off)
 		return buf;
 	}
 
-	new_buf =  k_fifo_get(&avail_queue, K_NO_WAIT);
+	new_buf = k_fifo_get(&avail_queue, K_NO_WAIT);
 	if (!new_buf) {
 		LOG_ERR("BT tester: RX overflow");
 		*off = 0;
@@ -271,8 +272,8 @@ void tester_init(void)
 		k_fifo_put(&avail_queue, &cmd_buf[i]);
 	}
 
-	k_thread_create(&cmd_thread, stack, STACKSIZE, cmd_handler,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+	k_thread_create(&cmd_thread, stack, STACKSIZE, cmd_handler, NULL, NULL,
+			NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 
 	buf = k_fifo_get(&avail_queue, K_NO_WAIT);
 	uart_pipe_register(buf->data, BTP_MTU, recv_cb);
@@ -307,5 +308,5 @@ void tester_rsp(uint8_t service, uint8_t opcode, uint8_t index, uint8_t status)
 	}
 
 	s.code = status;
-	tester_send(service, BTP_STATUS, index, (uint8_t *) &s, sizeof(s));
+	tester_send(service, BTP_STATUS, index, (uint8_t *)&s, sizeof(s));
 }

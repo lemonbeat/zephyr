@@ -18,7 +18,7 @@
 #include "footprint.h"
 #include "userspace.h"
 
-#define STACK_SIZE	512
+#define STACK_SIZE 512
 
 K_SEM_DEFINE(test_sema, 1, 10);
 
@@ -50,7 +50,6 @@ static inline int z_vrfy_validation_overhead_syscall(void)
 }
 #include <syscalls/validation_overhead_syscall_mrsh.c>
 
-
 void test_drop_to_user_mode_1(void *p1, void *p2, void *p3)
 {
 	volatile uint32_t dummy = 100U;
@@ -66,9 +65,8 @@ void drop_to_user_mode_thread(void *p1, void *p2, void *p3)
 void drop_to_user_mode(void)
 {
 	k_thread_create(&my_thread_user, my_stack_area_0, STACK_SIZE,
-			drop_to_user_mode_thread,
-			NULL, NULL, NULL,
-			-1, K_INHERIT_PERMS, K_NO_WAIT);
+			drop_to_user_mode_thread, NULL, NULL, NULL, -1,
+			K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_yield();
 }
@@ -76,9 +74,8 @@ void drop_to_user_mode(void)
 void user_thread_creation(void)
 {
 	k_thread_create(&my_thread_user, my_stack_area, STACK_SIZE,
-			test_drop_to_user_mode_1,
-			NULL, NULL, NULL,
-			0, K_INHERIT_PERMS | K_USER, K_FOREVER);
+			test_drop_to_user_mode_1, NULL, NULL, NULL, 0,
+			K_INHERIT_PERMS | K_USER, K_FOREVER);
 
 	k_thread_abort(&my_thread_user);
 }
@@ -93,9 +90,8 @@ void syscall_overhead_user_thread(void *p1, void *p2, void *p3)
 void syscall_overhead(void)
 {
 	k_thread_create(&my_thread_user, my_stack_area_0, STACK_SIZE,
-			syscall_overhead_user_thread,
-			NULL, NULL, NULL,
-			-1, K_INHERIT_PERMS | K_USER, K_NO_WAIT);
+			syscall_overhead_user_thread, NULL, NULL, NULL, -1,
+			K_INHERIT_PERMS | K_USER, K_NO_WAIT);
 }
 
 void validation_overhead_user_thread(void *p1, void *p2, void *p3)
@@ -109,8 +105,7 @@ void validation_overhead(void)
 	k_thread_access_grant(k_current_get(), &test_sema);
 
 	k_thread_create(&my_thread_user, my_stack_area, STACK_SIZE,
-			validation_overhead_user_thread,
-			NULL, NULL, NULL,
+			validation_overhead_user_thread, NULL, NULL, NULL,
 			-1 /*priority*/, K_INHERIT_PERMS | K_USER, K_NO_WAIT);
 }
 
@@ -125,5 +120,4 @@ void run_userspace(void)
 	syscall_overhead();
 
 	validation_overhead();
-
 }

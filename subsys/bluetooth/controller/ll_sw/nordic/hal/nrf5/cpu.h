@@ -7,8 +7,7 @@
 
 static inline void cpu_sleep(void)
 {
-#if defined(CONFIG_CPU_CORTEX_M0) || \
-	defined(CONFIG_CPU_CORTEX_M4) || \
+#if defined(CONFIG_CPU_CORTEX_M0) || defined(CONFIG_CPU_CORTEX_M4) || \
 	defined(CONFIG_CPU_CORTEX_M33)
 	__WFE();
 	__SEV();

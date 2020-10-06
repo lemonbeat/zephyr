@@ -140,13 +140,13 @@ enum gptp_info_is {
 } __packed;
 
 enum gptp_time_source {
-	GPTP_TS_ATOMIC_CLOCK        = 0x10,
-	GPTP_TS_GPS                 = 0x20,
-	GPTP_TS_TERRESTRIAL_AUDIO   = 0x30,
-	GPTS_TS_PTP                 = 0x40,
-	GPTP_TS_NTP                 = 0x50,
-	GPTP_TS_HAND_SET            = 0x60,
-	GPTP_TS_OTHER               = 0x90,
+	GPTP_TS_ATOMIC_CLOCK = 0x10,
+	GPTP_TS_GPS = 0x20,
+	GPTP_TS_TERRESTRIAL_AUDIO = 0x30,
+	GPTS_TS_PTP = 0x40,
+	GPTP_TS_NTP = 0x50,
+	GPTP_TS_HAND_SET = 0x60,
+	GPTP_TS_OTHER = 0x90,
 	GPTP_TS_INTERNAL_OSCILLATOR = 0xA0,
 } __packed;
 

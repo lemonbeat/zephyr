@@ -31,9 +31,8 @@ static const struct bt_mesh_comp *dev_comp;
 static uint16_t dev_primary_addr;
 
 void bt_mesh_model_foreach(void (*func)(struct bt_mesh_model *mod,
-					struct bt_mesh_elem *elem,
-					bool vnd, bool primary,
-					void *user_data),
+					struct bt_mesh_elem *elem, bool vnd,
+					bool primary, void *user_data),
 			   void *user_data)
 {
 	int i, j;
@@ -197,9 +196,8 @@ static void publish_retransmit_end(int err, struct bt_mesh_model_pub *pub)
 
 static void mod_publish(struct k_work *work)
 {
-	struct bt_mesh_model_pub *pub = CONTAINER_OF(work,
-						     struct bt_mesh_model_pub,
-						     timer.work);
+	struct bt_mesh_model_pub *pub =
+		CONTAINER_OF(work, struct bt_mesh_model_pub, timer.work);
 	int32_t period_ms;
 	int err;
 
@@ -251,7 +249,8 @@ struct bt_mesh_elem *bt_mesh_model_elem(struct bt_mesh_model *mod)
 	return &dev_comp->elem[mod->elem_idx];
 }
 
-struct bt_mesh_model *bt_mesh_model_get(bool vnd, uint8_t elem_idx, uint8_t mod_idx)
+struct bt_mesh_model *bt_mesh_model_get(bool vnd, uint8_t elem_idx,
+					uint8_t mod_idx)
 {
 	struct bt_mesh_elem *elem;
 
@@ -340,8 +339,8 @@ void bt_mesh_comp_provision(uint16_t addr)
 
 		elem->addr = addr++;
 
-		BT_DBG("addr 0x%04x mod_count %u vnd_mod_count %u",
-		       elem->addr, elem->model_count, elem->vnd_model_count);
+		BT_DBG("addr 0x%04x mod_count %u vnd_mod_count %u", elem->addr,
+		       elem->model_count, elem->vnd_model_count);
 	}
 }
 
@@ -493,7 +492,8 @@ static bool model_has_dst(struct bt_mesh_model *mod, uint16_t dst)
 }
 
 static const struct bt_mesh_model_op *find_op(struct bt_mesh_model *models,
-					      uint8_t model_count, uint32_t opcode,
+					      uint8_t model_count,
+					      uint32_t opcode,
 					      struct bt_mesh_model **model)
 {
 	uint8_t i;
@@ -658,9 +658,8 @@ void bt_mesh_model_msg_init(struct net_buf_simple *msg, uint32_t opcode)
 	}
 }
 
-static int model_send(struct bt_mesh_model *model,
-		      struct bt_mesh_net_tx *tx, bool implicit_bind,
-		      struct net_buf_simple *msg,
+static int model_send(struct bt_mesh_model *model, struct bt_mesh_net_tx *tx,
+		      bool implicit_bind, struct net_buf_simple *msg,
 		      const struct bt_mesh_send_cb *cb, void *cb_data)
 {
 	BT_DBG("net_idx 0x%04x app_idx 0x%04x dst 0x%04x", tx->ctx->net_idx,
@@ -690,8 +689,7 @@ static int model_send(struct bt_mesh_model *model,
 	return bt_mesh_trans_send(tx, msg, cb, cb_data);
 }
 
-int bt_mesh_model_send(struct bt_mesh_model *model,
-		       struct bt_mesh_msg_ctx *ctx,
+int bt_mesh_model_send(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
 		       struct net_buf_simple *msg,
 		       const struct bt_mesh_send_cb *cb, void *cb_data)
 {
@@ -723,8 +721,7 @@ int bt_mesh_model_publish(struct bt_mesh_model *model)
 	NET_BUF_SIMPLE_DEFINE(sdu, BT_MESH_TX_SDU_MAX);
 	struct bt_mesh_model_pub *pub = model->pub;
 	struct bt_mesh_app_key *key;
-	struct bt_mesh_msg_ctx ctx = {
-	};
+	struct bt_mesh_msg_ctx ctx = {};
 	struct bt_mesh_net_tx tx = {
 		.ctx = &ctx,
 		.src = bt_mesh_model_elem(model)->addr,

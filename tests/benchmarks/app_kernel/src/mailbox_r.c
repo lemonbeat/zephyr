@@ -14,10 +14,8 @@
 /*
  * Function prototypes.
  */
-void mailbox_get(struct k_mbox *mailbox,
-		int size,
-		int count,
-		unsigned int *time);
+void mailbox_get(struct k_mbox *mailbox, int size, int count,
+		 unsigned int *time);
 
 /*
  * Function declarations.
@@ -58,7 +56,6 @@ void mailrecvtask(void)
 	}
 }
 
-
 /**
  *
  * @brief Receive data portions from the specified mailbox
@@ -70,9 +67,7 @@ void mailrecvtask(void)
  * @param count     Number of data portions.
  * @param time      Resulting time.
  */
-void mailbox_get(struct k_mbox *mailbox,
-		 int size,
-		 int count,
+void mailbox_get(struct k_mbox *mailbox, int size, int count,
 		 unsigned int *time)
 {
 	int i;
@@ -87,10 +82,8 @@ void mailbox_get(struct k_mbox *mailbox,
 	k_sem_take(&SEM0, K_FOREVER);
 	t = BENCH_START();
 	for (i = 0; i < count; i++) {
-		return_value |= k_mbox_get(mailbox,
-					  &Message,
-					  &data_recv,
-					  K_FOREVER);
+		return_value |=
+			k_mbox_get(mailbox, &Message, &data_recv, K_FOREVER);
 	}
 
 	t = TIME_STAMP_DELTA_GET(t);

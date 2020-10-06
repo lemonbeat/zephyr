@@ -28,9 +28,9 @@ LOG_MODULE_REGISTER(gdbstub);
  * used. There are informal values used by others gdbstub
  * implementation, like qemu. Lets use the same here.
  */
-#define GDB_ERROR_GENERAL   "E01"
-#define GDB_ERROR_MEMORY    "E14"
-#define GDB_ERROR_OVERFLOW  "E22"
+#define GDB_ERROR_GENERAL "E01"
+#define GDB_ERROR_MEMORY "E14"
+#define GDB_ERROR_OVERFLOW "E22"
 
 /**
  * Add preamble and termination to the given data.
@@ -132,8 +132,8 @@ static int gdb_get_packet(uint8_t *buf, size_t buf_len, size_t *len)
  *
  * Return 0 in case of success, otherwise -1
  */
-static int gdb_mem_read(uint8_t *buf, size_t buf_len,
-			uintptr_t addr, size_t len)
+static int gdb_mem_read(uint8_t *buf, size_t buf_len, uintptr_t addr,
+			size_t len)
 {
 	uint8_t data;
 	size_t pos, count = 0;
@@ -156,8 +156,7 @@ static int gdb_mem_read(uint8_t *buf, size_t buf_len,
  *
  * Return 0 in case of success, otherwise -1
  */
-static int gdb_mem_write(const uint8_t *buf, uintptr_t addr,
-			 size_t len)
+static int gdb_mem_write(const uint8_t *buf, uintptr_t addr, size_t len)
 {
 	uint8_t data;
 
@@ -203,11 +202,7 @@ static int gdb_send_exception(uint8_t *buf, size_t len, uint8_t exception)
 int z_gdb_main_loop(struct gdb_ctx *ctx, bool start)
 {
 	uint8_t buf[GDB_PACKET_SIZE];
-	enum loop_state {
-		RECEIVING,
-		CONTINUE,
-		FAILED
-	} state;
+	enum loop_state { RECEIVING, CONTINUE, FAILED } state;
 
 	state = RECEIVING;
 
@@ -215,24 +210,24 @@ int z_gdb_main_loop(struct gdb_ctx *ctx, bool start)
 		gdb_send_exception(buf, sizeof(buf), ctx->exception);
 	}
 
-#define CHECK_FAILURE(condition)		\
-	{					\
-		if ((condition)) {		\
-			state = FAILED;	\
-			break;			\
-		}				\
+#define CHECK_FAILURE(condition)        \
+	{                               \
+		if ((condition)) {      \
+			state = FAILED; \
+			break;          \
+		}                       \
 	}
 
-#define CHECK_SYMBOL(c)					\
-	{							\
-		CHECK_FAILURE(ptr == NULL || *ptr != (c));	\
-		ptr++;						\
+#define CHECK_SYMBOL(c)                                    \
+	{                                                  \
+		CHECK_FAILURE(ptr == NULL || *ptr != (c)); \
+		ptr++;                                     \
 	}
 
-#define CHECK_INT(arg)							\
-	{								\
-		arg = strtol((const char *)ptr, (char **)&ptr, 16);	\
-		CHECK_FAILURE(ptr == NULL);				\
+#define CHECK_INT(arg)                                              \
+	{                                                           \
+		arg = strtol((const char *)ptr, (char **)&ptr, 16); \
+		CHECK_FAILURE(ptr == NULL);                         \
 	}
 
 	while (state == RECEIVING) {
@@ -251,7 +246,6 @@ int z_gdb_main_loop(struct gdb_ctx *ctx, bool start)
 		ptr = buf;
 
 		switch (*ptr++) {
-
 		/**
 		 * Read from the memory
 		 * Format: m addr,length
@@ -324,7 +318,8 @@ int z_gdb_main_loop(struct gdb_ctx *ctx, bool start)
 		 */
 		case 'g':
 			pkt_len = bin2hex((const uint8_t *)&(ctx->registers),
-				  sizeof(ctx->registers), buf, sizeof(buf));
+					  sizeof(ctx->registers), buf,
+					  sizeof(buf));
 			CHECK_FAILURE(pkt_len == 0);
 			gdb_send_packet(buf, pkt_len);
 			break;
@@ -335,8 +330,8 @@ int z_gdb_main_loop(struct gdb_ctx *ctx, bool start)
 		 */
 		case 'G':
 			pkt_len = hex2bin(ptr, pkt_len - 1,
-					 (uint8_t *)&(ctx->registers),
-					 sizeof(ctx->registers));
+					  (uint8_t *)&(ctx->registers),
+					  sizeof(ctx->registers));
 			CHECK_FAILURE(pkt_len == 0);
 			gdb_send_packet("OK", 2);
 			break;
@@ -352,8 +347,7 @@ int z_gdb_main_loop(struct gdb_ctx *ctx, bool start)
 			/* Read Register */
 			pkt_len = bin2hex(
 				(const uint8_t *)&(ctx->registers[addr]),
-				sizeof(ctx->registers[addr]),
-				buf, sizeof(buf));
+				sizeof(ctx->registers[addr]), buf, sizeof(buf));
 			CHECK_FAILURE(pkt_len == 0);
 			gdb_send_packet(buf, pkt_len);
 			break;
@@ -373,19 +367,18 @@ int z_gdb_main_loop(struct gdb_ctx *ctx, bool start)
 			 * send "OK" and ignore it.
 			 */
 			if (addr < ARCH_GDB_NUM_REGISTERS) {
-				pkt_len = hex2bin(ptr, strlen(ptr),
-					  (uint8_t *)&(ctx->registers[addr]),
-					  sizeof(ctx->registers[addr]));
+				pkt_len = hex2bin(
+					ptr, strlen(ptr),
+					(uint8_t *)&(ctx->registers[addr]),
+					sizeof(ctx->registers[addr]));
 				CHECK_FAILURE(pkt_len == 0);
 			}
 			gdb_send_packet("OK", 2);
 			break;
 
-
 		/* What cause the pause  */
 		case '?':
-			gdb_send_exception(buf, sizeof(buf),
-					   ctx->exception);
+			gdb_send_exception(buf, sizeof(buf), ctx->exception);
 			break;
 
 		/*

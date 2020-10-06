@@ -16,11 +16,11 @@
 
 #include <bluetooth/services/ots.h>
 
-#define DEVICE_NAME      CONFIG_BT_DEVICE_NAME
-#define DEVICE_NAME_LEN  (sizeof(DEVICE_NAME) - 1)
+#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 
 #define OBJ_POOL_SIZE 2
-#define OBJ_MAX_SIZE  100
+#define OBJ_MAX_SIZE 100
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -50,13 +50,12 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 }
 
 static struct bt_conn_cb conn_callbacks = {
-	.connected        = connected,
-	.disconnected     = disconnected,
+	.connected = connected,
+	.disconnected = disconnected,
 };
 
 static int ots_obj_created(struct bt_ots *ots, struct bt_conn *conn,
-			   uint64_t id,
-			   const struct bt_ots_obj_metadata *init)
+			   uint64_t id, const struct bt_ots_obj_metadata *init)
 {
 	char id_str[BT_OTS_OBJ_ID_STR_LEN];
 
@@ -64,7 +63,8 @@ static int ots_obj_created(struct bt_ots *ots, struct bt_conn *conn,
 
 	if (obj_cnt >= ARRAY_SIZE(objects)) {
 		printk("No item from Object pool is available for Object "
-		       "with %s ID\n", id_str);
+		       "with %s ID\n",
+		       id_str);
 		return -ENOMEM;
 	}
 
@@ -128,8 +128,8 @@ static uint32_t ots_obj_read(struct bt_ots *ots, struct bt_conn *conn,
 	}
 
 	printk("Object with %s ID is being read\n"
-		"Offset = %d, Length = %d\n",
-		id_str, offset, len);
+	       "Offset = %d, Length = %d\n",
+	       id_str, offset, len);
 
 	return len;
 }
@@ -230,8 +230,8 @@ void main(void)
 		return;
 	}
 
-	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad),
-			      sd, ARRAY_SIZE(sd));
+	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
+			      ARRAY_SIZE(sd));
 	if (err) {
 		printk("Advertising failed to start (err %d)\n", err);
 		return;

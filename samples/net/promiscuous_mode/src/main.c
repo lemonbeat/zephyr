@@ -90,8 +90,8 @@ static void print_info(struct net_pkt *pkt)
 	}
 
 	if (family == AF_UNSPEC) {
-		LOG_INF("Recv %p len %zd (unknown address family)",
-			pkt, net_pkt_get_len(pkt));
+		LOG_INF("Recv %p len %zd (unknown address family)", pkt,
+			net_pkt_get_len(pkt));
 		return;
 	}
 
@@ -120,40 +120,36 @@ static void print_info(struct net_pkt *pkt)
 		return;
 	}
 
-	src_addr = net_addr_ntop(family, src,
-				 src_addr_buf, sizeof(src_addr_buf));
-	dst_addr = net_addr_ntop(family, dst,
-				 dst_addr_buf, sizeof(dst_addr_buf));
+	src_addr =
+		net_addr_ntop(family, src, src_addr_buf, sizeof(src_addr_buf));
+	dst_addr =
+		net_addr_ntop(family, dst, dst_addr_buf, sizeof(dst_addr_buf));
 
 	len = net_pkt_get_len(pkt);
 
 	if (family == AF_INET) {
 		if (next_hdr == IPPROTO_TCP || next_hdr == IPPROTO_UDP) {
-			LOG_INF("%s %s (%zd) %s:%u -> %s:%u",
-				"IPv4", proto, len,
-				log_strdup(src_addr), src_port,
+			LOG_INF("%s %s (%zd) %s:%u -> %s:%u", "IPv4", proto,
+				len, log_strdup(src_addr), src_port,
 				log_strdup(dst_addr), dst_port);
 		} else {
-			LOG_INF("%s %s (%zd) %s -> %s", "IPv4", proto,
-				len, log_strdup(src_addr),
-				log_strdup(dst_addr));
+			LOG_INF("%s %s (%zd) %s -> %s", "IPv4", proto, len,
+				log_strdup(src_addr), log_strdup(dst_addr));
 		}
 	} else {
 		if (next_hdr == IPPROTO_TCP || next_hdr == IPPROTO_UDP) {
-			LOG_INF("%s %s (%zd) [%s]:%u -> [%s]:%u",
-				"IPv6", proto, len,
-				log_strdup(src_addr), src_port,
+			LOG_INF("%s %s (%zd) [%s]:%u -> [%s]:%u", "IPv6", proto,
+				len, log_strdup(src_addr), src_port,
 				log_strdup(dst_addr), dst_port);
 		} else {
-			LOG_INF("%s %s (%zd) %s -> %s", "IPv6", proto,
-				len, log_strdup(src_addr),
-				log_strdup(dst_addr));
+			LOG_INF("%s %s (%zd) %s -> %s", "IPv6", proto, len,
+				log_strdup(src_addr), log_strdup(dst_addr));
 		}
 	}
 }
 
-static int set_promisc_mode(const struct shell *shell,
-			    size_t argc, char *argv[], bool enable)
+static int set_promisc_mode(const struct shell *shell, size_t argc,
+			    char *argv[], bool enable)
 {
 	struct net_if *iface;
 	char *endptr;
@@ -201,33 +197,32 @@ static int set_promisc_mode(const struct shell *shell,
 	return 0;
 }
 
-static int cmd_promisc_on(const struct shell *shell,
-			  size_t argc, char *argv[])
+static int cmd_promisc_on(const struct shell *shell, size_t argc, char *argv[])
 {
 	return set_promisc_mode(shell, argc, argv, true);
 }
 
-static int cmd_promisc_off(const struct shell *shell,
-			   size_t argc, char *argv[])
+static int cmd_promisc_off(const struct shell *shell, size_t argc, char *argv[])
 {
 	return set_promisc_mode(shell, argc, argv, false);
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(promisc_commands,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	promisc_commands,
 	SHELL_CMD(on, NULL,
 		  "Turn promiscuous mode on\n"
 		  "promisc on  <interface index>  "
-		      "Turn on promiscuous mode for the interface\n",
+		  "Turn on promiscuous mode for the interface\n",
 		  cmd_promisc_on),
-	SHELL_CMD(off, NULL, "Turn promiscuous mode off\n"
+	SHELL_CMD(off, NULL,
+		  "Turn promiscuous mode off\n"
 		  "promisc off <interface index>  "
-		      "Turn off promiscuous mode for the interface\n",
+		  "Turn off promiscuous mode for the interface\n",
 		  cmd_promisc_off),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
-SHELL_CMD_REGISTER(promisc, &promisc_commands,
-		   "Promiscuous mode commands", NULL);
+SHELL_CMD_REGISTER(promisc, &promisc_commands, "Promiscuous mode commands",
+		   NULL);
 
 void main(void)
 {

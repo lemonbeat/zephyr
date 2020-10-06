@@ -66,9 +66,9 @@ static enum shell_wildcard_status command_add(char *buff, uint16_t *buff_len,
  *					     is too small.
  * @retval WILDCARD_CMD_NO_MATCH_FOUND No matching command found.
  */
-static enum shell_wildcard_status commands_expand(const struct shell *shell,
-					const struct shell_static_entry *cmd,
-					const char *pattern)
+static enum shell_wildcard_status
+commands_expand(const struct shell *shell, const struct shell_static_entry *cmd,
+		const char *pattern)
 {
 	enum shell_wildcard_status ret_val = SHELL_WILDCARD_CMD_NO_MATCH_FOUND;
 	struct shell_static_entry const *entry = NULL;
@@ -77,18 +77,17 @@ static enum shell_wildcard_status commands_expand(const struct shell *shell,
 	size_t cnt = 0;
 
 	while ((entry = shell_cmd_get(cmd, cmd_idx++, &dloc)) != NULL) {
-
 		if (fnmatch(pattern, entry->syntax, 0) == 0) {
 			ret_val = command_add(shell->ctx->temp_buff,
 					      &shell->ctx->cmd_tmp_buff_len,
 					      entry->syntax, pattern);
 			if (ret_val == SHELL_WILDCARD_CMD_MISSING_SPACE) {
-				shell_internal_fprintf(shell,
-					      SHELL_WARNING,
-					      "Command buffer is too short to"
-					      " expand all commands matching"
-					      " wildcard pattern: %s\n",
-					      pattern);
+				shell_internal_fprintf(
+					shell, SHELL_WARNING,
+					"Command buffer is too short to"
+					" expand all commands matching"
+					" wildcard pattern: %s\n",
+					pattern);
 				break;
 			} else if (ret_val != SHELL_WILDCARD_CMD_ADDED) {
 				break;
@@ -143,9 +142,8 @@ void shell_wildcard_prepare(const struct shell *shell)
 	 */
 
 	memset(shell->ctx->temp_buff, 0, sizeof(shell->ctx->temp_buff));
-	memcpy(shell->ctx->temp_buff,
-			shell->ctx->cmd_buff,
-			shell->ctx->cmd_buff_len);
+	memcpy(shell->ctx->temp_buff, shell->ctx->cmd_buff,
+	       shell->ctx->cmd_buff_len);
 
 	/* Function shell_spaces_trim must be used instead of shell_make_argv.
 	 * At this point it is important to keep temp_buff as one string.
@@ -157,10 +155,10 @@ void shell_wildcard_prepare(const struct shell *shell)
 	shell->ctx->cmd_tmp_buff_len = shell_strlen(shell->ctx->temp_buff) + 1;
 }
 
-
-enum shell_wildcard_status shell_wildcard_process(const struct shell *shell,
-					const struct shell_static_entry *cmd,
-					const char *pattern)
+enum shell_wildcard_status
+shell_wildcard_process(const struct shell *shell,
+		       const struct shell_static_entry *cmd,
+		       const char *pattern)
 {
 	enum shell_wildcard_status ret_val = SHELL_WILDCARD_NOT_FOUND;
 
@@ -186,8 +184,7 @@ enum shell_wildcard_status shell_wildcard_process(const struct shell *shell,
 
 void shell_wildcard_finalize(const struct shell *shell)
 {
-	memcpy(shell->ctx->cmd_buff,
-	       shell->ctx->temp_buff,
+	memcpy(shell->ctx->cmd_buff, shell->ctx->temp_buff,
 	       shell->ctx->cmd_tmp_buff_len);
 	shell->ctx->cmd_buff_len = shell->ctx->cmd_tmp_buff_len;
 }

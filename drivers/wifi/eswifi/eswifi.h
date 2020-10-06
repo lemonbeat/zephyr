@@ -118,8 +118,8 @@ static inline int __select_socket(struct eswifi_dev *eswifi, uint8_t idx)
 	return eswifi_at_cmd(eswifi, eswifi->buf);
 }
 
-static inline
-struct eswifi_dev *eswifi_socket_to_dev(struct eswifi_off_socket *socket)
+static inline struct eswifi_dev *
+eswifi_socket_to_dev(struct eswifi_off_socket *socket)
 {
 	return CONTAINER_OF(socket - socket->index, struct eswifi_dev, socket);
 }
@@ -137,7 +137,8 @@ int __eswifi_socket_new(struct eswifi_dev *eswifi, int family, int type,
 			int proto, void *context);
 int __eswifi_off_start_client(struct eswifi_dev *eswifi,
 			      struct eswifi_off_socket *socket);
-int __eswifi_accept(struct eswifi_dev *eswifi, struct eswifi_off_socket *socket);
+int __eswifi_accept(struct eswifi_dev *eswifi,
+		    struct eswifi_off_socket *socket);
 int __eswifi_bind(struct eswifi_dev *eswifi, struct eswifi_off_socket *socket,
 		  const struct sockaddr *addr, socklen_t addrlen);
 #if defined(CONFIG_NET_SOCKETS_OFFLOAD)

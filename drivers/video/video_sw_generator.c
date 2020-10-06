@@ -7,8 +7,8 @@
 
 #include <drivers/video.h>
 
-#define VIDEO_PATTERN_COLOR_BAR	0
-#define VIDEO_PATTERN_FPS	30
+#define VIDEO_PATTERN_COLOR_BAR 0
+#define VIDEO_PATTERN_FPS 30
 
 struct video_sw_generator_data {
 	const struct device *dev;
@@ -70,7 +70,7 @@ static int video_sw_generator_stream_stop(const struct device *dev)
 
 /* Black, Blue, Red, Purple, Green, Aqua, Yellow, White */
 uint16_t rgb565_colorbar_value[] = { 0x0000, 0x001F, 0xF800, 0xF81F,
-				  0x07E0, 0x07FF, 0xFFE0, 0xFFFF };
+				     0x07E0, 0x07FF, 0xFFE0, 0xFFFF };
 
 static void __fill_buffer_colorbar(struct video_sw_generator_data *data,
 				   struct video_buffer *vbuf)
@@ -80,7 +80,7 @@ static void __fill_buffer_colorbar(struct video_sw_generator_data *data,
 
 	for (h = 0; h < data->fmt.height; h++) {
 		for (w = 0; w < data->fmt.width; w++) {
-			int color_idx =  data->ctrl_vflip ? 7 - w / bw : w / bw;
+			int color_idx = data->ctrl_vflip ? 7 - w / bw : w / bw;
 			if (data->fmt.pixelformat == VIDEO_PIX_FMT_RGB565) {
 				uint16_t *pixel = (uint16_t *)&vbuf->buffer[i];
 				*pixel = rgb565_colorbar_value[color_idx];
@@ -158,8 +158,7 @@ static int video_sw_generator_dequeue(const struct device *dev,
 }
 
 static int video_sw_generator_flush(const struct device *dev,
-				    enum video_endpoint_id ep,
-				    bool cancel)
+				    enum video_endpoint_id ep, bool cancel)
 {
 	struct video_sw_generator_data *data = dev->data;
 	struct video_buffer *vbuf;
@@ -223,8 +222,7 @@ static int video_sw_generator_set_signal(const struct device *dev,
 #endif
 
 static inline int video_sw_generator_set_ctrl(const struct device *dev,
-					      unsigned int cid,
-					      void *value)
+					      unsigned int cid, void *value)
 {
 	struct video_sw_generator_data *data = dev->data;
 
@@ -257,7 +255,7 @@ static const struct video_driver_api video_sw_generator_driver_api = {
 static struct video_sw_generator_data video_sw_generator_data_0 = {
 	.fmt.width = 320,
 	.fmt.height = 160,
-	.fmt.pitch = 320*2,
+	.fmt.pitch = 320 * 2,
 	.fmt.pixelformat = VIDEO_PIX_FMT_RGB565,
 };
 

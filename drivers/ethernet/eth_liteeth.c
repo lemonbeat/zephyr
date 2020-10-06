@@ -25,37 +25,37 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "eth.h"
 
 /* flags */
-#define LITEETH_EV_TX		0x1
-#define LITEETH_EV_RX		0x1
+#define LITEETH_EV_TX 0x1
+#define LITEETH_EV_RX 0x1
 
 /* slots */
-#define LITEETH_SLOT_BASE	DT_INST_REG_ADDR_BY_NAME(0, buffers)
-#define LITEETH_SLOT_RX0	((LITEETH_SLOT_BASE) + 0x0000)
-#define LITEETH_SLOT_RX1	((LITEETH_SLOT_BASE) + 0x0800)
-#define LITEETH_SLOT_TX0	((LITEETH_SLOT_BASE) + 0x1000)
-#define LITEETH_SLOT_TX1	((LITEETH_SLOT_BASE) + 0x1800)
+#define LITEETH_SLOT_BASE DT_INST_REG_ADDR_BY_NAME(0, buffers)
+#define LITEETH_SLOT_RX0 ((LITEETH_SLOT_BASE) + 0x0000)
+#define LITEETH_SLOT_RX1 ((LITEETH_SLOT_BASE) + 0x0800)
+#define LITEETH_SLOT_TX0 ((LITEETH_SLOT_BASE) + 0x1000)
+#define LITEETH_SLOT_TX1 ((LITEETH_SLOT_BASE) + 0x1800)
 
 /* sram - rx */
-#define LITEETH_RX_BASE		DT_INST_REG_ADDR_BY_NAME(0, control)
-#define LITEETH_RX_SLOT		((LITEETH_RX_BASE) + 0x00)
-#define LITEETH_RX_LENGTH	((LITEETH_RX_BASE) + 0x04)
-#define LITEETH_RX_EV_PENDING	((LITEETH_RX_BASE) + 0x28)
-#define LITEETH_RX_EV_ENABLE	((LITEETH_RX_BASE) + 0x2c)
+#define LITEETH_RX_BASE DT_INST_REG_ADDR_BY_NAME(0, control)
+#define LITEETH_RX_SLOT ((LITEETH_RX_BASE) + 0x00)
+#define LITEETH_RX_LENGTH ((LITEETH_RX_BASE) + 0x04)
+#define LITEETH_RX_EV_PENDING ((LITEETH_RX_BASE) + 0x28)
+#define LITEETH_RX_EV_ENABLE ((LITEETH_RX_BASE) + 0x2c)
 
 /* sram - tx */
-#define LITEETH_TX_BASE		((DT_INST_REG_ADDR_BY_NAME(0, control)) + 0x30)
-#define LITEETH_TX_START	((LITEETH_TX_BASE) + 0x00)
-#define LITEETH_TX_READY	((LITEETH_TX_BASE) + 0x04)
-#define LITEETH_TX_SLOT		((LITEETH_TX_BASE) + 0x0c)
-#define LITEETH_TX_LENGTH	((LITEETH_TX_BASE) + 0x10)
-#define LITEETH_TX_EV_PENDING	((LITEETH_TX_BASE) + 0x1c)
+#define LITEETH_TX_BASE ((DT_INST_REG_ADDR_BY_NAME(0, control)) + 0x30)
+#define LITEETH_TX_START ((LITEETH_TX_BASE) + 0x00)
+#define LITEETH_TX_READY ((LITEETH_TX_BASE) + 0x04)
+#define LITEETH_TX_SLOT ((LITEETH_TX_BASE) + 0x0c)
+#define LITEETH_TX_LENGTH ((LITEETH_TX_BASE) + 0x10)
+#define LITEETH_TX_EV_PENDING ((LITEETH_TX_BASE) + 0x1c)
 
 /* irq */
-#define LITEETH_IRQ		DT_INST_IRQN(0)
-#define LITEETH_IRQ_PRIORITY	CONFIG_ETH_LITEETH_0_IRQ_PRI
+#define LITEETH_IRQ DT_INST_IRQN(0)
+#define LITEETH_IRQ_PRIORITY CONFIG_ETH_LITEETH_0_IRQ_PRI
 
 /* label */
-#define LITEETH_LABEL		DT_INST_LABEL(0)
+#define LITEETH_LABEL DT_INST_LABEL(0)
 
 struct eth_liteeth_dev_data {
 	struct net_if *iface;
@@ -141,7 +141,8 @@ static void eth_rx(const struct device *port)
 	}
 
 	/* copy data to buffer */
-	if (net_pkt_write(pkt, (void *)context->rx_buf[context->rxslot], len) != 0) {
+	if (net_pkt_write(pkt, (void *)context->rx_buf[context->rxslot], len) !=
+	    0) {
 		LOG_ERR("Failed to append RX buffer to context buffer");
 		net_pkt_unref(pkt);
 		goto out;
@@ -179,9 +180,8 @@ static void eth_irq_handler(const struct device *port)
 
 #ifdef CONFIG_ETH_LITEETH_0
 
-static struct eth_liteeth_dev_data eth_data = {
-	.mac_addr =  DT_INST_PROP(0, local_mac_address)
-};
+static struct eth_liteeth_dev_data eth_data = { .mac_addr = DT_INST_PROP(
+							0, local_mac_address) };
 
 static void eth_irq_config(void);
 static const struct eth_liteeth_config eth_config = {
@@ -211,8 +211,8 @@ static void eth_iface_init(struct net_if *iface)
 #endif
 
 	/* set MAC address */
-	net_if_set_link_addr(iface, context->mac_addr, sizeof(context->mac_addr),
-			     NET_LINK_ETHERNET);
+	net_if_set_link_addr(iface, context->mac_addr,
+			     sizeof(context->mac_addr), NET_LINK_ETHERNET);
 
 	/* clear pending events */
 	sys_write8(LITEETH_EV_TX, LITEETH_TX_EV_PENDING);
@@ -238,11 +238,9 @@ static enum ethernet_hw_caps eth_caps(const struct device *dev)
 	       ETHERNET_LINK_1000BASE_T;
 }
 
-static const struct ethernet_api eth_api = {
-	.iface_api.init = eth_iface_init,
-	.get_capabilities = eth_caps,
-	.send = eth_tx
-};
+static const struct ethernet_api eth_api = { .iface_api.init = eth_iface_init,
+					     .get_capabilities = eth_caps,
+					     .send = eth_tx };
 
 NET_DEVICE_INIT(eth0, LITEETH_LABEL, eth_initialize, device_pm_control_nop,
 		&eth_data, &eth_config, CONFIG_ETH_INIT_PRIORITY, &eth_api,

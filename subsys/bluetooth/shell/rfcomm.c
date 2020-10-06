@@ -37,63 +37,36 @@ NET_BUF_POOL_FIXED_DEFINE(pool, 1, DATA_MTU, NULL);
 
 static struct bt_sdp_attribute spp_attrs[] = {
 	BT_SDP_NEW_SERVICE,
-	BT_SDP_LIST(
-		BT_SDP_ATTR_SVCLASS_ID_LIST,
-		BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 3),
-		BT_SDP_DATA_ELEM_LIST(
-		{
-			BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
-			BT_SDP_ARRAY_16(BT_SDP_SERIAL_PORT_SVCLASS)
-		},
-		)
-	),
+	BT_SDP_LIST(BT_SDP_ATTR_SVCLASS_ID_LIST,
+		    BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 3),
+		    BT_SDP_DATA_ELEM_LIST(
+			    { BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
+			      BT_SDP_ARRAY_16(BT_SDP_SERIAL_PORT_SVCLASS) }, )),
 	BT_SDP_LIST(
 		BT_SDP_ATTR_PROTO_DESC_LIST,
 		BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 12),
 		BT_SDP_DATA_ELEM_LIST(
-		{
-			BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 3),
-			BT_SDP_DATA_ELEM_LIST(
-			{
-				BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
-				BT_SDP_ARRAY_16(BT_SDP_PROTO_L2CAP)
-			},
-			)
-		},
-		{
-			BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 5),
-			BT_SDP_DATA_ELEM_LIST(
-			{
-				BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
-				BT_SDP_ARRAY_16(BT_SDP_PROTO_RFCOMM)
-			},
-			{
-				BT_SDP_TYPE_SIZE(BT_SDP_UINT8),
-				BT_SDP_ARRAY_8(BT_RFCOMM_CHAN_SPP)
-			},
-			)
-		},
-		)
-	),
-	BT_SDP_LIST(
-		BT_SDP_ATTR_PROFILE_DESC_LIST,
-		BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 8),
-		BT_SDP_DATA_ELEM_LIST(
-		{
-			BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 6),
-			BT_SDP_DATA_ELEM_LIST(
-			{
-				BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
-				BT_SDP_ARRAY_16(BT_SDP_SERIAL_PORT_SVCLASS)
-			},
-			{
-				BT_SDP_TYPE_SIZE(BT_SDP_UINT16),
-				BT_SDP_ARRAY_16(0x0102)
-			},
-			)
-		},
-		)
-	),
+			{ BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 3),
+			  BT_SDP_DATA_ELEM_LIST(
+				  { BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
+				    BT_SDP_ARRAY_16(BT_SDP_PROTO_L2CAP) }, ) },
+			{ BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 5),
+			  BT_SDP_DATA_ELEM_LIST(
+				  { BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
+				    BT_SDP_ARRAY_16(BT_SDP_PROTO_RFCOMM) },
+				  { BT_SDP_TYPE_SIZE(BT_SDP_UINT8),
+				    BT_SDP_ARRAY_8(
+					    BT_RFCOMM_CHAN_SPP) }, ) }, )),
+	BT_SDP_LIST(BT_SDP_ATTR_PROFILE_DESC_LIST,
+		    BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 8),
+		    BT_SDP_DATA_ELEM_LIST(
+			    { BT_SDP_TYPE_SIZE_VAR(BT_SDP_SEQ8, 6),
+			      BT_SDP_DATA_ELEM_LIST(
+				      { BT_SDP_TYPE_SIZE(BT_SDP_UUID16),
+					BT_SDP_ARRAY_16(
+						BT_SDP_SERIAL_PORT_SVCLASS) },
+				      { BT_SDP_TYPE_SIZE(BT_SDP_UINT16),
+					BT_SDP_ARRAY_16(0x0102) }, ) }, )),
 	BT_SDP_SERVICE_NAME("Serial Port"),
 };
 
@@ -115,9 +88,9 @@ static void rfcomm_disconnected(struct bt_rfcomm_dlc *dlci)
 }
 
 static struct bt_rfcomm_dlc_ops rfcomm_ops = {
-	.recv		= rfcomm_recv,
-	.connected	= rfcomm_connected,
-	.disconnected	= rfcomm_disconnected,
+	.recv = rfcomm_recv,
+	.connected = rfcomm_connected,
+	.disconnected = rfcomm_disconnected,
 };
 
 static struct bt_rfcomm_dlc rfcomm_dlc = {
@@ -193,7 +166,7 @@ static int cmd_connect(const struct shell *shell, size_t argc, char *argv[])
 
 static int cmd_send(const struct shell *shell, size_t argc, char *argv[])
 {
-	uint8_t buf_data[DATA_MTU] = { [0 ... (DATA_MTU - 1)] = 0xff };
+	uint8_t buf_data[DATA_MTU] = { [0 ...(DATA_MTU - 1)] = 0xff };
 	int ret, len, count = 1;
 	struct net_buf *buf;
 
@@ -233,13 +206,13 @@ static int cmd_disconnect(const struct shell *shell, size_t argc, char *argv[])
 #define HELP_NONE "[none]"
 #define HELP_ADDR_LE "<address: XX:XX:XX:XX:XX:XX> <type: (public|random)>"
 
-SHELL_STATIC_SUBCMD_SET_CREATE(rfcomm_cmds,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	rfcomm_cmds,
 	SHELL_CMD_ARG(register, NULL, "<channel>", cmd_register, 2, 0),
 	SHELL_CMD_ARG(connect, NULL, "<channel>", cmd_connect, 2, 0),
 	SHELL_CMD_ARG(disconnect, NULL, HELP_NONE, cmd_disconnect, 1, 0),
 	SHELL_CMD_ARG(send, NULL, "<number of packets>", cmd_send, 2, 0),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 static int cmd_rfcomm(const struct shell *shell, size_t argc, char **argv)
 {

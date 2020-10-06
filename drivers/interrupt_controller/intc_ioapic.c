@@ -67,13 +67,14 @@
 DEVICE_MMIO_TOPLEVEL_STATIC(ioapic_regs, DT_DRV_INST(0));
 
 #define IOAPIC_REG DEVICE_MMIO_TOPLEVEL_GET(ioapic_regs)
-#define BITS_PER_IRQ  4
-#define IOAPIC_BITFIELD_HI_LO	0
+#define BITS_PER_IRQ 4
+#define IOAPIC_BITFIELD_HI_LO 0
 #define IOAPIC_BITFIELD_LVL_EDGE 1
 #define IOAPIC_BITFIELD_ENBL_DSBL 2
 #define IOAPIC_BITFIELD_DELIV_MODE 3
-#define BIT_POS_FOR_IRQ_OPTION(irq, option) ((irq) * BITS_PER_IRQ + (option))
-#define SUSPEND_BITS_REQD (ROUND_UP((CONFIG_IOAPIC_NUM_RTES * BITS_PER_IRQ), 32))
+#define BIT_POS_FOR_IRQ_OPTION(irq, option) ((irq)*BITS_PER_IRQ + (option))
+#define SUSPEND_BITS_REQD \
+	(ROUND_UP((CONFIG_IOAPIC_NUM_RTES * BITS_PER_IRQ), 32))
 
 /*
  * Destination field (bits[56:63]) defines a set of processors, which is
@@ -90,11 +91,11 @@ DEVICE_MMIO_TOPLEVEL_STATIC(ioapic_regs, DT_DRV_INST(0));
  * In either case, regardless how many CPUs in the system, 0xff implies that
  * it's intended to deliver to all possible 8 local APICs.
  */
-#define DEFAULT_RTE_DEST	(0xFF << 24)
+#define DEFAULT_RTE_DEST (0xFF << 24)
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
 #include <power/power.h>
-uint32_t ioapic_suspend_buf[SUSPEND_BITS_REQD / 32] = {0};
+uint32_t ioapic_suspend_buf[SUSPEND_BITS_REQD / 32] = { 0 };
 static uint32_t ioapic_device_power_state = DEVICE_PM_ACTIVE_STATE;
 #endif
 
@@ -103,8 +104,7 @@ static void __IoApicSet(int32_t offset, uint32_t value);
 static void ioApicRedSetHi(unsigned int irq, uint32_t upper32);
 static void ioApicRedSetLo(unsigned int irq, uint32_t lower32);
 static uint32_t ioApicRedGetLo(unsigned int irq);
-static void IoApicRedUpdateLo(unsigned int irq, uint32_t value,
-					uint32_t mask);
+static void IoApicRedUpdateLo(unsigned int irq, uint32_t value, uint32_t mask);
 
 /*
  * The functions irq_enable() and irq_disable() are implemented in the
@@ -127,7 +127,7 @@ int ioapic_init(const struct device *unused)
 	DEVICE_MMIO_TOPLEVEL_MAP(ioapic_regs, K_MEM_CACHE_NONE);
 
 #ifdef CONFIG_IOAPIC_MASK_RTE
-	int32_t ix;	/* redirection table index */
+	int32_t ix; /* redirection table index */
 	uint32_t rteValue; /* value to copy into redirection table entry */
 
 	/*
@@ -178,24 +178,26 @@ void z_ioapic_irq_disable(unsigned int irq)
 	IoApicRedUpdateLo(irq, IOAPIC_INT_MASK, IOAPIC_INT_MASK);
 }
 
-
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
 
 void store_flags(unsigned int irq, uint32_t flags)
 {
 	/* Currently only the following four flags are modified */
 	if (flags & IOAPIC_LOW) {
-		sys_bitfield_set_bit((mem_addr_t) ioapic_suspend_buf,
+		sys_bitfield_set_bit(
+			(mem_addr_t)ioapic_suspend_buf,
 			BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_HI_LO));
 	}
 
 	if (flags & IOAPIC_LEVEL) {
-		sys_bitfield_set_bit((mem_addr_t) ioapic_suspend_buf,
+		sys_bitfield_set_bit(
+			(mem_addr_t)ioapic_suspend_buf,
 			BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_LVL_EDGE));
 	}
 
 	if (flags & IOAPIC_INT_MASK) {
-		sys_bitfield_set_bit((mem_addr_t) ioapic_suspend_buf,
+		sys_bitfield_set_bit(
+			(mem_addr_t)ioapic_suspend_buf,
 			BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_ENBL_DSBL));
 	}
 
@@ -204,8 +206,9 @@ void store_flags(unsigned int irq, uint32_t flags)
 	 * needs to be saved.
 	 */
 	if (flags & IOAPIC_LOWEST) {
-		sys_bitfield_set_bit((mem_addr_t) ioapic_suspend_buf,
-			BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_DELIV_MODE));
+		sys_bitfield_set_bit((mem_addr_t)ioapic_suspend_buf,
+				     BIT_POS_FOR_IRQ_OPTION(
+					     irq, IOAPIC_BITFIELD_DELIV_MODE));
 	}
 }
 
@@ -213,29 +216,32 @@ uint32_t restore_flags(unsigned int irq)
 {
 	uint32_t flags = 0U;
 
-	if (sys_bitfield_test_bit((mem_addr_t) ioapic_suspend_buf,
-		BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_HI_LO))) {
+	if (sys_bitfield_test_bit(
+		    (mem_addr_t)ioapic_suspend_buf,
+		    BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_HI_LO))) {
 		flags |= IOAPIC_LOW;
 	}
 
-	if (sys_bitfield_test_bit((mem_addr_t) ioapic_suspend_buf,
-		BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_LVL_EDGE))) {
+	if (sys_bitfield_test_bit(
+		    (mem_addr_t)ioapic_suspend_buf,
+		    BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_LVL_EDGE))) {
 		flags |= IOAPIC_LEVEL;
 	}
 
-	if (sys_bitfield_test_bit((mem_addr_t) ioapic_suspend_buf,
-		BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_ENBL_DSBL))) {
+	if (sys_bitfield_test_bit(
+		    (mem_addr_t)ioapic_suspend_buf,
+		    BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_ENBL_DSBL))) {
 		flags |= IOAPIC_INT_MASK;
 	}
 
-	if (sys_bitfield_test_bit((mem_addr_t) ioapic_suspend_buf,
-		BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_DELIV_MODE))) {
+	if (sys_bitfield_test_bit(
+		    (mem_addr_t)ioapic_suspend_buf,
+		    BIT_POS_FOR_IRQ_OPTION(irq, IOAPIC_BITFIELD_DELIV_MODE))) {
 		flags |= IOAPIC_LOWEST;
 	}
 
 	return flags;
 }
-
 
 int ioapic_suspend(const struct device *port)
 {
@@ -275,12 +281,13 @@ int ioapic_resume_from_suspend(const struct device *port)
 			flags = flags | IOAPIC_LOGICAL;
 
 			rteValue = (_irq_to_interrupt_vector[irq] &
-					IOAPIC_VEC_MASK) | flags;
+				    IOAPIC_VEC_MASK) |
+				   flags;
 		} else {
 			/* Initialize the other RTEs to sane values */
-			rteValue = IOAPIC_EDGE | IOAPIC_HIGH |
-				IOAPIC_FIXED | IOAPIC_INT_MASK |
-				IOAPIC_LOGICAL | 0 ; /* dummy vector*/
+			rteValue = IOAPIC_EDGE | IOAPIC_HIGH | IOAPIC_FIXED |
+				   IOAPIC_INT_MASK | IOAPIC_LOGICAL |
+				   0; /* dummy vector*/
 		}
 		ioApicRedSetHi(irq, DEFAULT_RTE_DEST);
 		ioApicRedSetLo(irq, rteValue);
@@ -294,8 +301,8 @@ int ioapic_resume_from_suspend(const struct device *port)
 * the *context may include IN data or/and OUT data
 */
 static int ioapic_device_ctrl(const struct device *device,
-			      uint32_t ctrl_command,
-			      void *context, device_pm_cb cb, void *arg)
+			      uint32_t ctrl_command, void *context,
+			      device_pm_cb cb, void *arg)
 {
 	int ret = 0;
 
@@ -316,8 +323,7 @@ static int ioapic_device_ctrl(const struct device *device,
 	return ret;
 }
 
-
-#endif  /*CONFIG_DEVICE_POWER_MANAGEMENT*/
+#endif /*CONFIG_DEVICE_POWER_MANAGEMENT*/
 
 /**
  *
@@ -332,7 +338,7 @@ static int ioapic_device_ctrl(const struct device *device,
  */
 void z_ioapic_irq_set(unsigned int irq, unsigned int vector, uint32_t flags)
 {
-	uint32_t rteValue;   /* value to copy into redirection table entry */
+	uint32_t rteValue; /* value to copy into redirection table entry */
 
 	/* the delivery mode is determined by the flags passed from drivers */
 	rteValue = IOAPIC_INT_MASK | IOAPIC_LOGICAL |
@@ -369,13 +375,13 @@ void z_ioapic_int_vec_set(unsigned int irq, unsigned int vector)
 static uint32_t __IoApicGet(int32_t offset)
 {
 	uint32_t value; /* value */
-	unsigned int key;	/* interrupt lock level */
+	unsigned int key; /* interrupt lock level */
 
 	/* lock interrupts to ensure indirect addressing works "atomically" */
 
 	key = irq_lock();
 
-	*((volatile uint32_t *) (IOAPIC_REG + IOAPIC_IND)) = (char)offset;
+	*((volatile uint32_t *)(IOAPIC_REG + IOAPIC_IND)) = (char)offset;
 	value = *((volatile uint32_t *)(IOAPIC_REG + IOAPIC_DATA));
 
 	irq_unlock(key);
@@ -469,13 +475,10 @@ static void ioApicRedSetHi(unsigned int irq, uint32_t upper32)
  * @param mask  Mask of bits to be modified
  * @return N/A
  */
-static void IoApicRedUpdateLo(unsigned int irq,
-				uint32_t value,
-				uint32_t mask)
+static void IoApicRedUpdateLo(unsigned int irq, uint32_t value, uint32_t mask)
 {
 	ioApicRedSetLo(irq, (ioApicRedGetLo(irq) & ~mask) | (value & mask));
 }
-
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
 SYS_DEVICE_DEFINE("ioapic", ioapic_init, ioapic_device_ctrl, PRE_KERNEL_1,

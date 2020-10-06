@@ -66,22 +66,19 @@ static int cmd_battery(const struct shell *shell, size_t argc, char **argv)
 		shell_error(shell, "Failed to read sensor: %d", err);
 	}
 
-	err = get_channels(dev,
-			   SENSOR_CHAN_GAUGE_TEMP, &temp,
+	err = get_channels(dev, SENSOR_CHAN_GAUGE_TEMP, &temp,
 			   SENSOR_CHAN_GAUGE_VOLTAGE, &volt,
 			   SENSOR_CHAN_GAUGE_AVG_CURRENT, &current,
 			   SENSOR_CHAN_GAUGE_DESIRED_VOLTAGE, &v_desired,
 			   SENSOR_CHAN_GAUGE_DESIRED_CHARGING_CURRENT,
-			   &i_desired,
-			   SENSOR_CHAN_GAUGE_STATE_OF_CHARGE, &charge,
-			   SENSOR_CHAN_GAUGE_DESIGN_VOLTAGE, &v_design,
+			   &i_desired, SENSOR_CHAN_GAUGE_STATE_OF_CHARGE,
+			   &charge, SENSOR_CHAN_GAUGE_DESIGN_VOLTAGE, &v_design,
 			   SENSOR_CHAN_GAUGE_REMAINING_CHARGE_CAPACITY,
 			   &charge_remain,
 			   SENSOR_CHAN_GAUGE_FULL_CHARGE_CAPACITY, &cap,
 			   SENSOR_CHAN_GAUGE_NOM_AVAIL_CAPACITY, &nom_cap,
 			   SENSOR_CHAN_GAUGE_TIME_TO_FULL, &full,
-			   SENSOR_CHAN_GAUGE_TIME_TO_EMPTY, &empty,
-			   -1);
+			   SENSOR_CHAN_GAUGE_TIME_TO_EMPTY, &empty, -1);
 	if (err < 0) {
 		return err;
 	}

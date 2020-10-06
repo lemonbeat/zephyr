@@ -76,26 +76,26 @@ enum net_tcp_state {
 /* RFC 1122 4.2.2.6 "If an MSS option is not received at connection
  * setup, TCP MUST assume a default send MSS of 536"
  */
-#define NET_TCP_DEFAULT_MSS   536
+#define NET_TCP_DEFAULT_MSS 536
 
 /* TCP max window size */
-#define NET_TCP_MAX_WIN   (4 * 1024)
+#define NET_TCP_MAX_WIN (4 * 1024)
 
 /* Maximal value of the sequence number */
-#define NET_TCP_MAX_SEQ   0xffffffff
+#define NET_TCP_MAX_SEQ 0xffffffff
 
-#define NET_TCP_MAX_OPT_SIZE  8
+#define NET_TCP_MAX_OPT_SIZE 8
 
 /* TCP Option codes */
-#define NET_TCP_END_OPT          0
-#define NET_TCP_NOP_OPT          1
-#define NET_TCP_MSS_OPT          2
+#define NET_TCP_END_OPT 0
+#define NET_TCP_NOP_OPT 1
+#define NET_TCP_MSS_OPT 2
 #define NET_TCP_WINDOW_SCALE_OPT 3
 
 /* TCP Option sizes */
-#define NET_TCP_END_SIZE          1
-#define NET_TCP_NOP_SIZE          1
-#define NET_TCP_MSS_SIZE          4
+#define NET_TCP_END_SIZE 1
+#define NET_TCP_NOP_SIZE 1
+#define NET_TCP_MSS_SIZE 4
 #define NET_TCP_WINDOW_SCALE_SIZE 3
 
 /** Parsed TCP option values for net_tcp_parse_opts()  */
@@ -203,10 +203,8 @@ static inline bool net_tcp_is_used(struct net_tcp *tcp)
 static inline int net_tcp_register(uint8_t family,
 				   const struct sockaddr *remote_addr,
 				   const struct sockaddr *local_addr,
-				   uint16_t remote_port,
-				   uint16_t local_port,
-				   net_conn_cb_t cb,
-				   void *user_data,
+				   uint16_t remote_port, uint16_t local_port,
+				   net_conn_cb_t cb, void *user_data,
 				   struct net_conn_handle **handle)
 {
 	return net_conn_register(IPPROTO_TCP, family, remote_addr, local_addr,
@@ -298,9 +296,8 @@ static inline int net_tcp_release(struct net_tcp *tcp)
  * @return 0 if ok, < 0 if error
  */
 #if defined(CONFIG_NET_NATIVE_TCP)
-int net_tcp_prepare_segment(struct net_tcp *tcp, uint8_t flags,
-			    void *options, size_t optlen,
-			    const struct sockaddr_ptr *local,
+int net_tcp_prepare_segment(struct net_tcp *tcp, uint8_t flags, void *options,
+			    size_t optlen, const struct sockaddr_ptr *local,
 			    const struct sockaddr *remote,
 			    struct net_pkt **send_pkt);
 #else
@@ -356,10 +353,8 @@ static inline int net_tcp_prepare_ack(struct net_tcp *tcp,
  * @return 0 if ok, < 0 if error
  */
 #if defined(CONFIG_NET_NATIVE_TCP)
-int net_tcp_prepare_reset(struct net_tcp *tcp,
-			  const struct sockaddr *local,
-			  const struct sockaddr *remote,
-			  struct net_pkt **pkt);
+int net_tcp_prepare_reset(struct net_tcp *tcp, const struct sockaddr *local,
+			  const struct sockaddr *remote, struct net_pkt **pkt);
 #else
 static inline int net_tcp_prepare_reset(struct net_tcp *tcp,
 					const struct sockaddr *remote,
@@ -403,8 +398,7 @@ int net_tcp_send_data(struct net_context *context, net_context_send_cb_t cb,
 		      void *user_data);
 #else
 static inline int net_tcp_send_data(struct net_context *context,
-				    net_context_send_cb_t cb,
-				    void *user_data)
+				    net_context_send_cb_t cb, void *user_data)
 {
 	ARG_UNUSED(context);
 	ARG_UNUSED(cb);
@@ -736,19 +730,15 @@ static inline int net_tcp_accept(struct net_context *context,
  * @return 0 on success, < 0 on error
  */
 #if defined(CONFIG_NET_NATIVE_TCP)
-int net_tcp_connect(struct net_context *context,
-		    const struct sockaddr *addr,
-		    struct sockaddr *laddr,
-		    uint16_t rport,
-		    uint16_t lport,
-		    k_timeout_t timeout,
-		    net_context_connect_cb_t cb,
+int net_tcp_connect(struct net_context *context, const struct sockaddr *addr,
+		    struct sockaddr *laddr, uint16_t rport, uint16_t lport,
+		    k_timeout_t timeout, net_context_connect_cb_t cb,
 		    void *user_data);
 #else
 static inline int net_tcp_connect(struct net_context *context,
 				  const struct sockaddr *addr,
-				  struct sockaddr *laddr,
-				  uint16_t rport, uint16_t lport, k_timeout_t timeout,
+				  struct sockaddr *laddr, uint16_t rport,
+				  uint16_t lport, k_timeout_t timeout,
 				  net_context_connect_cb_t cb, void *user_data)
 {
 	ARG_UNUSED(context);
@@ -775,9 +765,8 @@ static inline int net_tcp_connect(struct net_context *context,
 struct net_tcp_hdr *net_tcp_input(struct net_pkt *pkt,
 				  struct net_pkt_data_access *tcp_access);
 #else
-static inline
-struct net_tcp_hdr *net_tcp_input(struct net_pkt *pkt,
-				  struct net_pkt_data_access *tcp_access)
+static inline struct net_tcp_hdr *
+net_tcp_input(struct net_pkt *pkt, struct net_pkt_data_access *tcp_access)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(tcp_access);

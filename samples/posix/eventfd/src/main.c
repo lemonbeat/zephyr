@@ -12,11 +12,14 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define fatal(msg) \
-	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+#define fatal(msg)                  \
+	do {                        \
+		perror(msg);        \
+		exit(EXIT_FAILURE); \
+	} while (0)
 
 /* As Zephyr doesn't provide command-line args, emulate them. */
-char *input_argv[] = {"argv0", "1", "2", "3", "4"};
+char *input_argv[] = { "argv0", "1", "2", "3", "4" };
 
 int efd;
 int g_argc;
@@ -51,8 +54,8 @@ void reader(void)
 	if (s != sizeof(uint64_t)) {
 		fatal("read");
 	}
-	printf("Read %llu (0x%llx) from efd\n",
-	       (unsigned long long)u, (unsigned long long)u);
+	printf("Read %llu (0x%llx) from efd\n", (unsigned long long)u,
+	       (unsigned long long)u);
 }
 
 int main(int argc, char *argv[])

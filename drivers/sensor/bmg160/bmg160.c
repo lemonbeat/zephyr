@@ -44,8 +44,8 @@ int bmg160_read(const struct device *dev, uint8_t reg_addr, uint8_t *data,
 
 	k_sem_take(&bmg160->sem, K_FOREVER);
 
-	if (i2c_burst_read(bmg160->i2c, dev_cfg->i2c_addr,
-			   reg_addr, data, len) < 0) {
+	if (i2c_burst_read(bmg160->i2c, dev_cfg->i2c_addr, reg_addr, data,
+			   len) < 0) {
 		ret = -EIO;
 	}
 
@@ -54,15 +54,13 @@ int bmg160_read(const struct device *dev, uint8_t reg_addr, uint8_t *data,
 	return ret;
 }
 
-int bmg160_read_byte(const struct device *dev, uint8_t reg_addr,
-		     uint8_t *byte)
+int bmg160_read_byte(const struct device *dev, uint8_t reg_addr, uint8_t *byte)
 {
 	return bmg160_read(dev, reg_addr, byte, 1);
 }
 
 static int bmg160_write(const struct device *dev, uint8_t reg_addr,
-			uint8_t *data,
-			uint8_t len)
+			uint8_t *data, uint8_t len)
 {
 	const struct bmg160_device_config *dev_cfg = dev->config;
 	struct bmg160_device_data *bmg160 = dev->data;
@@ -72,8 +70,8 @@ static int bmg160_write(const struct device *dev, uint8_t reg_addr,
 
 	k_sem_take(&bmg160->sem, K_FOREVER);
 
-	if (i2c_burst_write(bmg160->i2c, dev_cfg->i2c_addr,
-			    reg_addr, data, len) < 0) {
+	if (i2c_burst_write(bmg160->i2c, dev_cfg->i2c_addr, reg_addr, data,
+			    len) < 0) {
 		ret = -EIO;
 	}
 
@@ -82,14 +80,12 @@ static int bmg160_write(const struct device *dev, uint8_t reg_addr,
 	return ret;
 }
 
-int bmg160_write_byte(const struct device *dev, uint8_t reg_addr,
-		      uint8_t byte)
+int bmg160_write_byte(const struct device *dev, uint8_t reg_addr, uint8_t byte)
 {
 	return bmg160_write(dev, reg_addr, &byte, 1);
 }
 
-int bmg160_update_byte(const struct device *dev, uint8_t reg_addr,
-		       uint8_t mask,
+int bmg160_update_byte(const struct device *dev, uint8_t reg_addr, uint8_t mask,
 		       uint8_t value)
 {
 	const struct bmg160_device_config *dev_cfg = dev->config;
@@ -100,8 +96,8 @@ int bmg160_update_byte(const struct device *dev, uint8_t reg_addr,
 
 	k_sem_take(&bmg160->sem, K_FOREVER);
 
-	if (i2c_reg_update_byte(bmg160->i2c, dev_cfg->i2c_addr,
-				reg_addr, mask, value) < 0) {
+	if (i2c_reg_update_byte(bmg160->i2c, dev_cfg->i2c_addr, reg_addr, mask,
+				value) < 0) {
 		ret = -EIO;
 	}
 
@@ -111,12 +107,12 @@ int bmg160_update_byte(const struct device *dev, uint8_t reg_addr,
 }
 
 /* Allowed range values, in degrees/sec. */
-static const int16_t bmg160_gyro_range_map[] = {2000, 1000, 500, 250, 125};
-#define BMG160_GYRO_RANGE_MAP_SIZE	ARRAY_SIZE(bmg160_gyro_range_map)
+static const int16_t bmg160_gyro_range_map[] = { 2000, 1000, 500, 250, 125 };
+#define BMG160_GYRO_RANGE_MAP_SIZE ARRAY_SIZE(bmg160_gyro_range_map)
 
 /* Allowed sampling frequencies, in Hz */
-static const int16_t bmg160_sampling_freq_map[] = {2000, 1000, 400, 200, 100};
-#define BMG160_SAMPLING_FREQ_MAP_SIZE	ARRAY_SIZE(bmg160_sampling_freq_map)
+static const int16_t bmg160_sampling_freq_map[] = { 2000, 1000, 400, 200, 100 };
+#define BMG160_SAMPLING_FREQ_MAP_SIZE ARRAY_SIZE(bmg160_sampling_freq_map)
 
 static int bmg160_is_val_valid(int16_t val, const int16_t *val_map,
 			       uint16_t map_size)
@@ -148,8 +144,7 @@ static int bmg160_attr_set(const struct device *dev, enum sensor_channel chan,
 	case SENSOR_ATTR_FULL_SCALE:
 		range_dps = sensor_rad_to_degrees(val);
 
-		idx = bmg160_is_val_valid(range_dps,
-					  bmg160_gyro_range_map,
+		idx = bmg160_is_val_valid(range_dps, bmg160_gyro_range_map,
 					  BMG160_GYRO_RANGE_MAP_SIZE);
 		if (idx < 0) {
 			return -ENOTSUP;
@@ -164,8 +159,7 @@ static int bmg160_attr_set(const struct device *dev, enum sensor_channel chan,
 		return 0;
 
 	case SENSOR_ATTR_SAMPLING_FREQUENCY:
-		idx = bmg160_is_val_valid(val->val1,
-					  bmg160_sampling_freq_map,
+		idx = bmg160_is_val_valid(val->val1, bmg160_sampling_freq_map,
 					  BMG160_SAMPLING_FREQ_MAP_SIZE);
 		if (idx < 0) {
 			return -ENOTSUP;
@@ -214,7 +208,7 @@ static int bmg160_sample_fetch(const struct device *dev,
 	bmg160->raw_gyro_xyz[0] = sys_le16_to_cpu(buf.x_axis);
 	bmg160->raw_gyro_xyz[1] = sys_le16_to_cpu(buf.y_axis);
 	bmg160->raw_gyro_xyz[2] = sys_le16_to_cpu(buf.z_axis);
-	bmg160->raw_temp	= buf.temp;
+	bmg160->raw_temp = buf.temp;
 
 	return 0;
 }
@@ -307,8 +301,8 @@ int bmg160_init(const struct device *dev)
 
 	k_busy_wait(1000); /* wait for the chip to come up */
 
-	if (bmg160_write_byte(dev, BMG160_REG_RANGE,
-			      BMG160_DEFAULT_RANGE) < 0) {
+	if (bmg160_write_byte(dev, BMG160_REG_RANGE, BMG160_DEFAULT_RANGE) <
+	    0) {
 		LOG_DBG("Failed to set range.");
 		return -EIO;
 	}
@@ -346,7 +340,6 @@ const struct bmg160_device_config bmg160_config = {
 #endif
 };
 
-DEVICE_AND_API_INIT(bmg160, DT_INST_LABEL(0), bmg160_init,
-		    &bmg160_data,
+DEVICE_AND_API_INIT(bmg160, DT_INST_LABEL(0), bmg160_init, &bmg160_data,
 		    &bmg160_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &bmg160_api);

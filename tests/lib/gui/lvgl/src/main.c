@@ -18,12 +18,10 @@
 
 FS_LITTLEFS_DECLARE_DEFAULT_CONFIG(cstorage);
 
-static struct fs_mount_t mnt = {
-	.type = FS_LITTLEFS,
-	.fs_data = &cstorage,
-	.storage_dev = (void *)FLASH_AREA_ID(storage),
-	.mnt_point = "/mnt"
-};
+static struct fs_mount_t mnt = { .type = FS_LITTLEFS,
+				 .fs_data = &cstorage,
+				 .storage_dev = (void *)FLASH_AREA_ID(storage),
+				 .mnt_point = "/mnt" };
 
 void test_get_default_screen(void)
 {
@@ -56,8 +54,7 @@ void test_add_delete_screen(void)
 
 	act_screen = lv_scr_act();
 	zassert_equal_ptr(act_screen, default_screen,
-			"Default screen not active");
-
+			  "Default screen not active");
 }
 void test_add_img(void)
 {
@@ -70,7 +67,6 @@ void test_add_img(void)
 
 	lv_task_handler();
 }
-
 
 void setup_fs(void)
 {
@@ -126,11 +122,10 @@ void teardown_fs(void)
 
 void test_main(void)
 {
-
 	ztest_test_suite(lvgl_screen, ztest_unit_test(test_get_default_screen),
-			ztest_unit_test(test_add_delete_screen));
+			 ztest_unit_test(test_add_delete_screen));
 	ztest_test_suite(lvgl_fs, ztest_user_unit_test_setup_teardown(
-				test_add_img, setup_fs, teardown_fs));
+					  test_add_img, setup_fs, teardown_fs));
 
 	ztest_run_test_suite(lvgl_screen);
 	ztest_run_test_suite(lvgl_fs);

@@ -32,21 +32,21 @@
 #define LOG_MODULE_NAME bt_driver
 #include "common/log.h"
 
-#define BTPROTO_HCI      1
+#define BTPROTO_HCI 1
 struct sockaddr_hci {
-	sa_family_t     hci_family;
-	unsigned short  hci_dev;
-	unsigned short  hci_channel;
+	sa_family_t hci_family;
+	unsigned short hci_dev;
+	unsigned short hci_channel;
 };
 #define HCI_CHANNEL_USER 1
 
-#define SOL_HCI          0
+#define SOL_HCI 0
 
-#define H4_CMD           0x01
-#define H4_ACL           0x02
-#define H4_SCO           0x03
-#define H4_EVT           0x04
-#define H4_ISO           0x05
+#define H4_CMD 0x01
+#define H4_ACL 0x02
+#define H4_SCO 0x03
+#define H4_EVT 0x04
+#define H4_ISO 0x05
 
 static K_KERNEL_STACK_DEFINE(rx_thread_stack,
 			     CONFIG_ARCH_POSIX_RECOMMENDED_STACK_SIZE);
@@ -204,9 +204,8 @@ static int uc_open(void)
 	BT_DBG("User Channel opened as fd %d", uc_fd);
 
 	k_thread_create(&rx_thread_data, rx_thread_stack,
-			K_KERNEL_STACK_SIZEOF(rx_thread_stack),
-			rx_thread, NULL, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BT_DRIVER_RX_HIGH_PRIO),
+			K_KERNEL_STACK_SIZEOF(rx_thread_stack), rx_thread, NULL,
+			NULL, NULL, K_PRIO_COOP(CONFIG_BT_DRIVER_RX_HIGH_PRIO),
 			0, K_NO_WAIT);
 
 	BT_DBG("returning");
@@ -215,10 +214,10 @@ static int uc_open(void)
 }
 
 static const struct bt_hci_driver drv = {
-	.name		= "HCI User Channel",
-	.bus		= BT_HCI_DRIVER_BUS_UART,
-	.open		= uc_open,
-	.send		= uc_send,
+	.name = "HCI User Channel",
+	.bus = BT_HCI_DRIVER_BUS_UART,
+	.open = uc_open,
+	.send = uc_send,
 };
 
 static int bt_uc_init(const struct device *unused)
@@ -254,10 +253,9 @@ static void add_btuserchan_arg(void)
 		 * destination, callback,
 		 * description
 		 */
-		{ false, true, false,
-		"bt-dev", "hciX", 's',
-		NULL, cmd_bt_dev_found,
-		"A local HCI device to be used for Bluetooth (e.g. hci0)" },
+		{ false, true, false, "bt-dev", "hciX", 's', NULL,
+		  cmd_bt_dev_found,
+		  "A local HCI device to be used for Bluetooth (e.g. hci0)" },
 		ARG_TABLE_ENDMARKER
 	};
 

@@ -47,8 +47,8 @@ LOG_MODULE_REGISTER(net_test, CONFIG_DNS_RESOLVER_LOG_LEVEL);
 
 #if defined(CONFIG_NET_IPV6)
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 #endif
 
 #if defined(CONFIG_NET_IPV4)
@@ -129,21 +129,13 @@ static struct dummy_api net_iface_api = {
 #define _ETH_L2_LAYER DUMMY_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
-NET_DEVICE_INIT_INSTANCE(net_iface1_test,
-			 "iface1",
-			 iface1,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface1_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 _ETH_L2_LAYER,
-			 _ETH_L2_CTX_TYPE,
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface1_test, "iface1", iface1, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface1_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 static void dns_evt_handler(struct net_mgmt_event_callback *cb,
-			      uint32_t mgmt_event, struct net_if *iface)
+			    uint32_t mgmt_event, struct net_if *iface)
 {
 	if (mgmt_event == NET_EVENT_DNS_SERVER_ADD) {
 		k_sem_give(&dns_added);
@@ -161,15 +153,14 @@ static void test_init(void)
 
 	iface1 = net_if_get_by_index(1);
 
-	((struct net_if_test *) net_if_get_device(iface1)->data)->idx =
+	((struct net_if_test *)net_if_get_device(iface1)->data)->idx =
 		net_if_get_by_iface(iface1);
 
 #if defined(CONFIG_NET_IPV6)
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1");
 
 		return;
@@ -180,11 +171,10 @@ static void test_init(void)
 #endif
 
 #if defined(CONFIG_NET_IPV4)
-	ifaddr = net_if_ipv4_addr_add(iface1, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv4_addr_add(iface1, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv4 address %s\n",
-		       net_sprint_ipv4_addr(&my_addr2));
+		    net_sprint_ipv4_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2");
 
 		return;
@@ -200,7 +190,7 @@ static void test_init(void)
 
 	net_mgmt_init_event_callback(&mgmt_cb, dns_evt_handler,
 				     NET_EVENT_DNS_SERVER_ADD |
-				     NET_EVENT_DNS_SERVER_DEL);
+					     NET_EVENT_DNS_SERVER_DEL);
 	net_mgmt_add_event_callback(&mgmt_cb);
 }
 
@@ -212,7 +202,8 @@ static void test_dns_do_not_add_add_callback6(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_added, WAIT_TIME)) {
-		zassert_true(true,
+		zassert_true(
+			true,
 			"Received DNS added callback when should not have");
 	}
 #endif
@@ -277,7 +268,8 @@ static void test_dns_remove_none_callback6(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_removed, WAIT_TIME)) {
-		zassert_true(true,
+		zassert_true(
+			true,
 			"Received DNS removed callback when should not have");
 	}
 #endif
@@ -334,7 +326,8 @@ static void test_dns_add_remove_two_callback6(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_removed, WAIT_TIME)) {
-		zassert_true(true,
+		zassert_true(
+			true,
 			"Received DNS removed callback when should not have");
 	}
 
@@ -356,9 +349,8 @@ static void test_dns_add_remove_two_callback6(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_removed, WAIT_TIME)) {
-		zassert_true(true,
-			     "Received DNS removed callback when should "
-			     "not have");
+		zassert_true(true, "Received DNS removed callback when should "
+				   "not have");
 	}
 
 	/* Check neither DNS server is used */
@@ -381,7 +373,8 @@ static void test_dns_do_not_add_add_callback(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_added, WAIT_TIME)) {
-		zassert_true(true,
+		zassert_true(
+			true,
 			"Received DNS added callback when should not have");
 	}
 #endif
@@ -444,7 +437,8 @@ static void test_dns_remove_none_callback(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_removed, WAIT_TIME)) {
-		zassert_true(true,
+		zassert_true(
+			true,
 			"Received DNS removed callback when should not have");
 	}
 #endif
@@ -501,7 +495,8 @@ static void test_dns_add_remove_two_callback(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_removed, WAIT_TIME)) {
-		zassert_true(true,
+		zassert_true(
+			true,
 			"Received DNS removed callback when should not have");
 	}
 
@@ -523,9 +518,8 @@ static void test_dns_add_remove_two_callback(void)
 	k_yield(); /* mandatory so that net_if send func gets to run */
 
 	if (k_sem_take(&dns_removed, WAIT_TIME)) {
-		zassert_true(true,
-			     "Received DNS removed callback when should "
-			     "not have");
+		zassert_true(true, "Received DNS removed callback when should "
+				   "not have");
 	}
 
 	/* Check neither DNS server is used */
@@ -542,8 +536,7 @@ static void test_dns_add_remove_two_callback(void)
 
 void test_main(void)
 {
-	ztest_test_suite(dns_tests,
-			 ztest_unit_test(test_init),
+	ztest_test_suite(dns_tests, ztest_unit_test(test_init),
 			 ztest_unit_test(test_dns_do_not_add_add_callback6),
 			 ztest_unit_test(test_dns_add_callback6),
 			 ztest_unit_test(test_dns_remove_callback6),
@@ -555,7 +548,7 @@ void test_main(void)
 			 ztest_unit_test(test_dns_remove_none_callback),
 			 ztest_unit_test(test_dns_add_remove_two_callback)
 
-);
+	);
 
 	ztest_run_test_suite(dns_tests);
 }

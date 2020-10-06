@@ -6,11 +6,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define BT_MESH_PROXY_NET_PDU   0x00
-#define BT_MESH_PROXY_BEACON    0x01
-#define BT_MESH_PROXY_CONFIG    0x02
-#define BT_MESH_PROXY_PROV      0x03
-
+#define BT_MESH_PROXY_NET_PDU 0x00
+#define BT_MESH_PROXY_BEACON 0x01
+#define BT_MESH_PROXY_CONFIG 0x02
+#define BT_MESH_PROXY_PROV 0x03
 
 struct bt_mesh_proxy_idle_cb {
 	sys_snode_t n;

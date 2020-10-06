@@ -19,7 +19,7 @@
  * or:
  *   bString_length = sizeof(initializer_string) * 2 - 2
  */
-#define USB_BSTRING_LENGTH(s)		(sizeof(s) * 2 - 2)
+#define USB_BSTRING_LENGTH(s) (sizeof(s) * 2 - 2)
 
 /*
  * The length of the string descriptor (bLength) is calculated from the
@@ -31,11 +31,11 @@
  *   bLength = sizeof(initializer_string) * 2
  * Use this macro to determine the bLength of the string descriptor.
  */
-#define USB_STRING_DESCRIPTOR_LENGTH(s)	(sizeof(s) * 2)
+#define USB_STRING_DESCRIPTOR_LENGTH(s) (sizeof(s) * 2)
 
 /* Automatic endpoint assignment */
-#define AUTO_EP_IN			0x80
-#define AUTO_EP_OUT			0x00
+#define AUTO_EP_IN 0x80
+#define AUTO_EP_OUT 0x00
 
 /* Common part of device data */
 struct usb_dev_data {

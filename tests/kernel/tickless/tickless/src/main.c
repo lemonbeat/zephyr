@@ -35,12 +35,11 @@ static K_THREAD_STACK_DEFINE(thread_tickless_stack, STACKSIZE);
 int32_t _sys_idle_threshold_ticks;
 #endif
 
-#define TICKS_TO_MS  (MSEC_PER_SEC / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
-
+#define TICKS_TO_MS (MSEC_PER_SEC / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 
 /* NOTE: Clock speed may change between platforms */
 
-#define CAL_REPS 16    /* # of loops in timestamp calibration */
+#define CAL_REPS 16 /* # of loops in timestamp calibration */
 
 /*
  * Arch-specific timer resolution/size types, definitions and
@@ -49,35 +48,35 @@ int32_t _sys_idle_threshold_ticks;
 
 #if defined(CONFIG_X86) || defined(CONFIG_ARC) || defined(CONFIG_ARCH_POSIX)
 typedef uint64_t _timer_res_t;
-#define _TIMER_ZERO  0ULL
+#define _TIMER_ZERO 0ULL
 
 /* timestamp routines */
 #define _TIMESTAMP_OPEN()
 #if defined(CONFIG_ARCH_POSIX)
-#define _TIMESTAMP_READ()       (posix_get_hw_cycle())
+#define _TIMESTAMP_READ() (posix_get_hw_cycle())
 #else
-#define _TIMESTAMP_READ()       (z_tsc_read())
+#define _TIMESTAMP_READ() (z_tsc_read())
 #endif
 #define _TIMESTAMP_CLOSE()
 
 #elif defined(CONFIG_ARM)
 
-#  if defined(CONFIG_SOC_TI_LM3S6965_QEMU)
+#if defined(CONFIG_SOC_TI_LM3S6965_QEMU)
 /* A bug in the QEMU ARMv7-M sysTick timer prevents tickless idle support */
 #error "This QEMU target does not support tickless idle!"
-#  endif
+#endif
 
 typedef uint32_t _timer_res_t;
-#define _TIMER_ZERO  0
+#define _TIMER_ZERO 0
 
 /* timestamp routines, from timestamps.c */
 extern void _timestamp_open(void);
 extern uint32_t _timestamp_read(void);
 extern void _timestamp_close(void);
 
-#define _TIMESTAMP_OPEN()       (_timestamp_open())
-#define _TIMESTAMP_READ()       (_timestamp_read())
-#define _TIMESTAMP_CLOSE()      (_timestamp_close())
+#define _TIMESTAMP_OPEN() (_timestamp_open())
+#define _TIMESTAMP_READ() (_timestamp_read())
+#define _TIMESTAMP_CLOSE() (_timestamp_close())
 
 #else
 #error "Unknown target"
@@ -179,10 +178,10 @@ void ticklessTestThread(void)
 	printk("diff  ticks    : %d\n", diff_ticks);
 
 #if defined(CONFIG_X86) || defined(CONFIG_ARC)
-	printk("diff  time stamp: 0x%x%x\n",
-	       (uint32_t)(diff_tsc >> 32), (uint32_t)(diff_tsc & 0xFFFFFFFFULL));
-	printk("Cal   time stamp: 0x%x%x\n",
-	       (uint32_t)(cal_tsc >> 32), (uint32_t)(cal_tsc & 0xFFFFFFFFLL));
+	printk("diff  time stamp: 0x%x%x\n", (uint32_t)(diff_tsc >> 32),
+	       (uint32_t)(diff_tsc & 0xFFFFFFFFULL));
+	printk("Cal   time stamp: 0x%x%x\n", (uint32_t)(cal_tsc >> 32),
+	       (uint32_t)(cal_tsc & 0xFFFFFFFFLL));
 #elif defined(CONFIG_ARCH_POSIX)
 	printk("diff  time stamp: %" PRIu64 "\n", diff_tsc);
 	printk("Cal   time stamp: %" PRIu64 "\n", cal_tsc);
@@ -208,7 +207,6 @@ void ticklessTestThread(void)
 
 	/* release the timer, if necessary */
 	_TIMESTAMP_CLOSE();
-
 }
 /**
  * @brief Tests to verify tickless feature
@@ -226,10 +224,8 @@ void ticklessTestThread(void)
  */
 void test_tickless(void)
 {
-	k_thread_create(&thread_tickless, thread_tickless_stack,
-			STACKSIZE,
-			(k_thread_entry_t) ticklessTestThread,
-			NULL, NULL, NULL,
+	k_thread_create(&thread_tickless, thread_tickless_stack, STACKSIZE,
+			(k_thread_entry_t)ticklessTestThread, NULL, NULL, NULL,
 			PRIORITY, 0, K_NO_WAIT);
 	k_sleep(K_MSEC(4000));
 }
@@ -239,7 +235,6 @@ void test_tickless(void)
  */
 void test_main(void)
 {
-	ztest_test_suite(tickless,
-			 ztest_unit_test(test_tickless));
+	ztest_test_suite(tickless, ztest_unit_test(test_tickless));
 	ztest_run_test_suite(tickless);
 }

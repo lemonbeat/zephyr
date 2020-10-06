@@ -14,20 +14,20 @@
 #include <sys/sys_io.h>
 
 /* AXI UART Lite v2 registers offsets (See Xilinx PG142 for details) */
-#define RX_FIFO_OFFSET  0x00
-#define TX_FIFO_OFFSET  0x04
+#define RX_FIFO_OFFSET 0x00
+#define TX_FIFO_OFFSET 0x04
 #define STAT_REG_OFFSET 0x08
 #define CTRL_REG_OFFSET 0x0c
 
 /* STAT_REG bit definitions */
 #define STAT_REG_RX_FIFO_VALID_DATA BIT(0)
-#define STAT_REG_RX_FIFO_FULL       BIT(1)
-#define STAT_REG_TX_FIFO_EMPTY      BIT(2)
-#define STAT_REG_TX_FIFO_FULL       BIT(3)
-#define STAT_REG_INTR_ENABLED       BIT(4)
-#define STAT_REG_OVERRUN_ERROR      BIT(5)
-#define STAT_REG_FRAME_ERROR        BIT(6)
-#define STAT_REG_PARITY_ERROR       BIT(7)
+#define STAT_REG_RX_FIFO_FULL BIT(1)
+#define STAT_REG_TX_FIFO_EMPTY BIT(2)
+#define STAT_REG_TX_FIFO_FULL BIT(3)
+#define STAT_REG_INTR_ENABLED BIT(4)
+#define STAT_REG_OVERRUN_ERROR BIT(5)
+#define STAT_REG_FRAME_ERROR BIT(6)
+#define STAT_REG_PARITY_ERROR BIT(7)
 
 /* STAT_REG bit masks */
 #define STAT_REG_ERROR_MASK GENMASK(7, 5)
@@ -154,8 +154,7 @@ static inline void xlnx_uartlite_irq_cond_disable(const struct device *dev)
 }
 
 static int xlnx_uartlite_fifo_fill(const struct device *dev,
-				   const uint8_t *tx_data,
-				   int len)
+				   const uint8_t *tx_data, int len)
 {
 	uint32_t status = xlnx_uartlite_read_status(dev);
 	int count = 0U;
@@ -257,8 +256,7 @@ static int xlnx_uartlite_irq_rx_ready(const struct device *dev)
 	struct xlnx_uartlite_data *data = dev->data;
 	uint32_t status = xlnx_uartlite_read_status(dev);
 
-	return ((status & STAT_REG_RX_FIFO_VALID_DATA) &&
-		data->rx_irq_enabled);
+	return ((status & STAT_REG_RX_FIFO_VALID_DATA) && data->rx_irq_enabled);
 }
 
 static int xlnx_uartlite_irq_is_pending(const struct device *dev)
@@ -335,54 +333,51 @@ static const struct uart_driver_api xlnx_uartlite_driver_api = {
 };
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-#define XLNX_UARTLITE_IRQ_INIT(n, i)					\
-	do {								\
-		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, i, irq),		\
-			    DT_INST_IRQ_BY_IDX(n, i, priority),		\
-			    xlnx_uartlite_isr,				\
-			    DEVICE_GET(xlnx_uartlite_##n), 0);		\
-									\
-		irq_enable(DT_INST_IRQ_BY_IDX(n, i, irq));		\
+#define XLNX_UARTLITE_IRQ_INIT(n, i)                                          \
+	do {                                                                  \
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(n, i, irq),                    \
+			    DT_INST_IRQ_BY_IDX(n, i, priority),               \
+			    xlnx_uartlite_isr, DEVICE_GET(xlnx_uartlite_##n), \
+			    0);                                               \
+                                                                              \
+		irq_enable(DT_INST_IRQ_BY_IDX(n, i, irq));                    \
 	} while (0)
-#define XLNX_UARTLITE_CONFIG_FUNC(n)					\
+#define XLNX_UARTLITE_CONFIG_FUNC(n)                                        \
 	static void xlnx_uartlite_config_func_##n(const struct device *dev) \
-	{								\
-		/* IRQ line not always present on all instances */	\
-		IF_ENABLED(DT_INST_IRQ_HAS_IDX(n, 0),			\
-			   (XLNX_UARTLITE_IRQ_INIT(n, 0);))		\
+	{                                                                   \
+		/* IRQ line not always present on all instances */          \
+		IF_ENABLED(DT_INST_IRQ_HAS_IDX(n, 0),                       \
+			   (XLNX_UARTLITE_IRQ_INIT(n, 0);))                 \
 	}
-#define XLNX_UARTLITE_IRQ_CFG_FUNC_INIT(n)				\
+#define XLNX_UARTLITE_IRQ_CFG_FUNC_INIT(n) \
 	.irq_config_func = xlnx_uartlite_config_func_##n
-#define XLNX_UARTLITE_INIT_CFG(n)					\
+#define XLNX_UARTLITE_INIT_CFG(n) \
 	XLNX_UARTLITE_DECLARE_CFG(n, XLNX_UARTLITE_IRQ_CFG_FUNC_INIT(n))
 #else
 #define XLNX_UARTLITE_CONFIG_FUNC(n)
 #define XLNX_UARTLITE_IRQ_CFG_FUNC_INIT
-#define XLNX_UARTLITE_INIT_CFG(n)					\
+#define XLNX_UARTLITE_INIT_CFG(n) \
 	XLNX_UARTLITE_DECLARE_CFG(n, XLNX_UARTLITE_IRQ_CFG_FUNC_INIT)
 #endif
 
-#define XLNX_UARTLITE_DECLARE_CFG(n, IRQ_FUNC_INIT)			\
-static const struct xlnx_uartlite_config xlnx_uartlite_##n##_config = {	\
-	.base = DT_INST_REG_ADDR(n),					\
-	IRQ_FUNC_INIT							\
-}
+#define XLNX_UARTLITE_DECLARE_CFG(n, IRQ_FUNC_INIT)                             \
+	static const struct xlnx_uartlite_config xlnx_uartlite_##n##_config = { \
+		.base = DT_INST_REG_ADDR(n), IRQ_FUNC_INIT                      \
+	}
 
-#define XLNX_UARTLITE_INIT(n)						\
-	static struct xlnx_uartlite_data xlnx_uartlite_##n##_data;	\
-									\
-	static const struct xlnx_uartlite_config xlnx_uartlite_##n##_config;\
-									\
-	DEVICE_AND_API_INIT(xlnx_uartlite_##n, DT_INST_LABEL(n),	\
-			    &xlnx_uartlite_init,			\
-			    &xlnx_uartlite_##n##_data,			\
-			    &xlnx_uartlite_##n##_config,		\
-			    PRE_KERNEL_1,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    &xlnx_uartlite_driver_api);			\
-									\
-	XLNX_UARTLITE_CONFIG_FUNC(n)					\
-									\
+#define XLNX_UARTLITE_INIT(n)                                                \
+	static struct xlnx_uartlite_data xlnx_uartlite_##n##_data;           \
+                                                                             \
+	static const struct xlnx_uartlite_config xlnx_uartlite_##n##_config; \
+                                                                             \
+	DEVICE_AND_API_INIT(xlnx_uartlite_##n, DT_INST_LABEL(n),             \
+			    &xlnx_uartlite_init, &xlnx_uartlite_##n##_data,  \
+			    &xlnx_uartlite_##n##_config, PRE_KERNEL_1,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,              \
+			    &xlnx_uartlite_driver_api);                      \
+                                                                             \
+	XLNX_UARTLITE_CONFIG_FUNC(n)                                         \
+                                                                             \
 	XLNX_UARTLITE_INIT_CFG(n);
 
 DT_INST_FOREACH_STATUS_OKAY(XLNX_UARTLITE_INIT)

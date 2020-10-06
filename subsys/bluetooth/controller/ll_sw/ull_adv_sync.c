@@ -196,9 +196,8 @@ uint8_t ll_adv_sync_enable(uint8_t handle, uint8_t enable)
 		}
 
 		/* Remove sync_info from auxiliary PDU */
-		err = ull_adv_aux_hdr_set_clear(adv, 0,
-						ULL_ADV_PDU_HDR_FIELD_SYNC_INFO,
-						NULL, NULL);
+		err = ull_adv_aux_hdr_set_clear(
+			adv, 0, ULL_ADV_PDU_HDR_FIELD_SYNC_INFO, NULL, NULL);
 		if (err) {
 			return err;
 		}
@@ -237,9 +236,8 @@ uint8_t ll_adv_sync_enable(uint8_t handle, uint8_t enable)
 		ticks_anc_sync = ticker_ticks_now_get();
 
 		/* Add sync_info into auxiliary PDU */
-		err = ull_adv_aux_hdr_set_clear(adv,
-						ULL_ADV_PDU_HDR_FIELD_SYNC_INFO,
-						0, NULL, NULL);
+		err = ull_adv_aux_hdr_set_clear(
+			adv, ULL_ADV_PDU_HDR_FIELD_SYNC_INFO, 0, NULL, NULL);
 		if (err) {
 			return err;
 		}
@@ -287,7 +285,7 @@ uint16_t ull_adv_sync_lll_handle_get(struct lll_adv_sync *lll)
 }
 
 uint32_t ull_adv_sync_start(struct ll_adv_sync_set *sync, uint32_t ticks_anchor,
-			 uint32_t volatile *ret_cb)
+			    uint32_t volatile *ret_cb)
 {
 	uint32_t slot_us = EVENT_OVERHEAD_START_US + EVENT_OVERHEAD_END_US;
 	uint32_t ticks_slot_overhead;
@@ -320,12 +318,11 @@ uint32_t ull_adv_sync_start(struct ll_adv_sync_set *sync, uint32_t ticks_anchor,
 	*ret_cb = TICKER_STATUS_BUSY;
 	ret = ticker_start(TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_THREAD,
 			   (TICKER_ID_ADV_SYNC_BASE + sync_handle),
-			   ticks_anchor, 0,
-			   HAL_TICKER_US_TO_TICKS(interval_us),
+			   ticks_anchor, 0, HAL_TICKER_US_TO_TICKS(interval_us),
 			   HAL_TICKER_REMAINDER(interval_us), TICKER_NULL_LAZY,
 			   (sync->evt.ticks_slot + ticks_slot_overhead),
-			   ticker_cb, sync,
-			   ull_ticker_status_give, (void *)ret_cb);
+			   ticker_cb, sync, ull_ticker_status_give,
+			   (void *)ret_cb);
 
 	return ret;
 }
@@ -333,7 +330,7 @@ uint32_t ull_adv_sync_start(struct ll_adv_sync_set *sync, uint32_t ticks_anchor,
 void ull_adv_sync_offset_get(struct ll_adv_set *adv)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, mfy_sync_offset_get};
+	static struct mayfly mfy = { 0, 0, &link, NULL, mfy_sync_offset_get };
 	uint32_t ret;
 
 	mfy.param = adv;
@@ -431,8 +428,7 @@ static void mfy_sync_offset_get(void *param)
 
 		ret_cb = TICKER_STATUS_BUSY;
 		ret = ticker_next_slot_get(TICKER_INSTANCE_ID_CTLR,
-					   TICKER_USER_ID_ULL_LOW,
-					   &id,
+					   TICKER_USER_ID_ULL_LOW, &id,
 					   &ticks_current, &ticks_to_expire,
 					   ticker_op_cb, (void *)&ret_cb);
 		if (ret == TICKER_STATUS_BUSY) {
@@ -503,7 +499,7 @@ static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 		      uint16_t lazy, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, lll_adv_sync_prepare};
+	static struct mayfly mfy = { 0, 0, &link, NULL, lll_adv_sync_prepare };
 	static struct lll_prepare_param p;
 	struct ll_adv_sync_set *sync = param;
 	struct lll_adv_sync *lll;
@@ -526,8 +522,8 @@ static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 	mfy.param = &p;
 
 	/* Kick LLL prepare */
-	ret = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH,
-			     TICKER_USER_ID_LLL, 0, &mfy);
+	ret = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL, 0,
+			     &mfy);
 	LL_ASSERT(!ret);
 
 	DEBUG_RADIO_PREPARE_A(1);

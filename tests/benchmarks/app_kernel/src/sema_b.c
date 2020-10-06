@@ -10,7 +10,6 @@
 
 #ifdef SEMA_BENCH
 
-
 /**
  *
  * @brief Semaphore signal speed test
@@ -25,13 +24,13 @@ void sema_test(void)
 	PRINT_STRING(dashline, output_file);
 	et = BENCH_START();
 	for (i = 0; i < NR_OF_SEMA_RUNS; i++) {
-	  k_sem_give(&SEM0);
+		k_sem_give(&SEM0);
 	}
 	et = TIME_STAMP_DELTA_GET(et);
 	check_result();
 
 	PRINT_F(output_file, FORMAT, "signal semaphore",
-			SYS_CLOCK_HW_CYCLES_TO_NS_AVG(et, NR_OF_SEMA_RUNS));
+		SYS_CLOCK_HW_CYCLES_TO_NS_AVG(et, NR_OF_SEMA_RUNS));
 
 	k_sem_reset(&SEM1);
 	k_sem_give(&STARTRCV);
@@ -44,7 +43,7 @@ void sema_test(void)
 	check_result();
 
 	PRINT_F(output_file, FORMAT, "signal to waiting high pri task",
-			SYS_CLOCK_HW_CYCLES_TO_NS_AVG(et, NR_OF_SEMA_RUNS));
+		SYS_CLOCK_HW_CYCLES_TO_NS_AVG(et, NR_OF_SEMA_RUNS));
 
 	et = BENCH_START();
 	for (i = 0; i < NR_OF_SEMA_RUNS; i++) {
@@ -54,9 +53,8 @@ void sema_test(void)
 	check_result();
 
 	PRINT_F(output_file, FORMAT,
-			"signal to waiting high pri task, with timeout",
-			SYS_CLOCK_HW_CYCLES_TO_NS_AVG(et, NR_OF_SEMA_RUNS));
-
+		"signal to waiting high pri task, with timeout",
+		SYS_CLOCK_HW_CYCLES_TO_NS_AVG(et, NR_OF_SEMA_RUNS));
 }
 
 #endif /* SEMA_BENCH */

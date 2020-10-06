@@ -9,8 +9,8 @@
 
 #include <device.h>
 
-#define SAMPLE_DRIVER_NAME_0	"SAMPLE_DRIVER_0"
-#define SAMPLE_DRIVER_MSG_SIZE	128
+#define SAMPLE_DRIVER_NAME_0 "SAMPLE_DRIVER_0"
+#define SAMPLE_DRIVER_MSG_SIZE 128
 
 typedef void (*sample_driver_callback_t)(const struct device *dev,
 					 void *context, void *data);
@@ -21,8 +21,7 @@ typedef int (*sample_driver_set_callback_t)(const struct device *dev,
 					    sample_driver_callback_t cb,
 					    void *context);
 
-typedef int (*sample_driver_state_set_t)(const struct device *dev,
-					 bool active);
+typedef int (*sample_driver_state_set_t)(const struct device *dev, bool active);
 
 __subsystem struct sample_driver_api {
 	sample_driver_write_t write;

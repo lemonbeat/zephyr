@@ -22,11 +22,11 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(display_st7789v);
 
-#define ST7789V_CS_PIN		DT_INST_SPI_DEV_CS_GPIOS_PIN(0)
-#define ST7789V_CMD_DATA_PIN	DT_INST_GPIO_PIN(0, cmd_data_gpios)
-#define ST7789V_CMD_DATA_FLAGS	DT_INST_GPIO_FLAGS(0, cmd_data_gpios)
-#define ST7789V_RESET_PIN	DT_INST_GPIO_PIN(0, reset_gpios)
-#define ST7789V_RESET_FLAGS	DT_INST_GPIO_FLAGS(0, reset_gpios)
+#define ST7789V_CS_PIN DT_INST_SPI_DEV_CS_GPIOS_PIN(0)
+#define ST7789V_CMD_DATA_PIN DT_INST_GPIO_PIN(0, cmd_data_gpios)
+#define ST7789V_CMD_DATA_FLAGS DT_INST_GPIO_FLAGS(0, cmd_data_gpios)
+#define ST7789V_RESET_PIN DT_INST_GPIO_PIN(0, reset_gpios)
+#define ST7789V_RESET_FLAGS DT_INST_GPIO_FLAGS(0, reset_gpios)
 
 static uint8_t st7789v_porch_param[] = DT_INST_PROP(0, porch_param);
 static uint8_t st7789v_cmd2en_param[] = DT_INST_PROP(0, cmd2en_param);
@@ -64,7 +64,7 @@ struct st7789v_data {
 #endif
 
 static void st7789v_set_lcd_margins(struct st7789v_data *data,
-			     uint16_t x_offset, uint16_t y_offset)
+				    uint16_t x_offset, uint16_t y_offset)
 {
 	data->x_offset = x_offset;
 	data->y_offset = y_offset;
@@ -76,7 +76,7 @@ static void st7789v_set_cmd(struct st7789v_data *data, int is_cmd)
 }
 
 static void st7789v_transmit(struct st7789v_data *data, uint8_t cmd,
-		uint8_t *tx_data, size_t tx_count)
+			     uint8_t *tx_data, size_t tx_count)
 {
 	struct spi_buf tx_buf = { .buf = &cmd, .len = 1 };
 	struct spi_buf_set tx_bufs = { .buffers = &tx_buf, .count = 1 };
@@ -129,17 +129,16 @@ static int st7789v_blanking_off(const struct device *dev)
 	return 0;
 }
 
-static int st7789v_read(const struct device *dev,
-			const uint16_t x,
+static int st7789v_read(const struct device *dev, const uint16_t x,
 			const uint16_t y,
-			const struct display_buffer_descriptor *desc,
-			void *buf)
+			const struct display_buffer_descriptor *desc, void *buf)
 {
 	return -ENOTSUP;
 }
 
 static void st7789v_set_mem_area(struct st7789v_data *data, const uint16_t x,
-				 const uint16_t y, const uint16_t w, const uint16_t h)
+				 const uint16_t y, const uint16_t w,
+				 const uint16_t h)
 {
 	uint16_t spi_data[2];
 
@@ -155,14 +154,13 @@ static void st7789v_set_mem_area(struct st7789v_data *data, const uint16_t x,
 	st7789v_transmit(data, ST7789V_CMD_RASET, (uint8_t *)&spi_data[0], 4);
 }
 
-static int st7789v_write(const struct device *dev,
-			 const uint16_t x,
+static int st7789v_write(const struct device *dev, const uint16_t x,
 			 const uint16_t y,
 			 const struct display_buffer_descriptor *desc,
 			 const void *buf)
 {
 	struct st7789v_data *data = (struct st7789v_data *)dev->data;
-	const uint8_t *write_data_start = (uint8_t *) buf;
+	const uint8_t *write_data_start = (uint8_t *)buf;
 	struct spi_buf tx_buf;
 	struct spi_buf_set tx_bufs;
 	uint16_t write_cnt;
@@ -170,11 +168,12 @@ static int st7789v_write(const struct device *dev,
 	uint16_t write_h;
 
 	__ASSERT(desc->width <= desc->pitch, "Pitch is smaller then width");
-	__ASSERT((desc->pitch * ST7789V_PIXEL_SIZE * desc->height) <= desc->buf_size,
-			"Input buffer to small");
+	__ASSERT((desc->pitch * ST7789V_PIXEL_SIZE * desc->height) <=
+			 desc->buf_size,
+		 "Input buffer to small");
 
-	LOG_DBG("Writing %dx%d (w,h) @ %dx%d (x,y)",
-			desc->width, desc->height, x, y);
+	LOG_DBG("Writing %dx%d (w,h) @ %dx%d (x,y)", desc->width, desc->height,
+		x, y);
 	st7789v_set_mem_area(data, x, y, desc->width, desc->height);
 
 	if (desc->pitch > desc->width) {
@@ -185,8 +184,7 @@ static int st7789v_write(const struct device *dev,
 		nbr_of_writes = 1U;
 	}
 
-	st7789v_transmit(data, ST7789V_CMD_RAMWR,
-			 (void *) write_data_start,
+	st7789v_transmit(data, ST7789V_CMD_RAMWR, (void *)write_data_start,
 			 desc->width * ST7789V_PIXEL_SIZE * write_h);
 
 	tx_bufs.buffers = &tx_buf;
@@ -209,19 +207,19 @@ static void *st7789v_get_framebuffer(const struct device *dev)
 }
 
 static int st7789v_set_brightness(const struct device *dev,
-			   const uint8_t brightness)
+				  const uint8_t brightness)
 {
 	return -ENOTSUP;
 }
 
 static int st7789v_set_contrast(const struct device *dev,
-			 const uint8_t contrast)
+				const uint8_t contrast)
 {
 	return -ENOTSUP;
 }
 
 static void st7789v_get_capabilities(const struct device *dev,
-			      struct display_capabilities *capabilities)
+				     struct display_capabilities *capabilities)
 {
 	struct st7789v_data *data = (struct st7789v_data *)dev->data;
 
@@ -239,8 +237,9 @@ static void st7789v_get_capabilities(const struct device *dev,
 	capabilities->current_orientation = DISPLAY_ORIENTATION_NORMAL;
 }
 
-static int st7789v_set_pixel_format(const struct device *dev,
-			     const enum display_pixel_format pixel_format)
+static int
+st7789v_set_pixel_format(const struct device *dev,
+			 const enum display_pixel_format pixel_format)
 {
 #ifdef CONFIG_ST7789V_RGB565
 	if (pixel_format == PIXEL_FORMAT_RGB_565) {
@@ -254,7 +253,7 @@ static int st7789v_set_pixel_format(const struct device *dev,
 }
 
 static int st7789v_set_orientation(const struct device *dev,
-			    const enum display_orientation orientation)
+				   const enum display_orientation orientation)
 {
 	if (orientation == DISPLAY_ORIENTATION_NORMAL) {
 		return 0;
@@ -290,8 +289,7 @@ static void st7789v_lcd_init(struct st7789v_data *p_st7789v)
 	tmp = DT_INST_PROP(0, vcom);
 	st7789v_transmit(p_st7789v, ST7789V_CMD_VCOMS, &tmp, 1);
 
-#if (DT_INST_NODE_HAS_PROP(0, vrhs) && \
-	DT_INST_NODE_HAS_PROP(0, vdvs))
+#if (DT_INST_NODE_HAS_PROP(0, vrhs) && DT_INST_NODE_HAS_PROP(0, vdvs))
 	tmp = 0x01;
 	st7789v_transmit(p_st7789v, ST7789V_CMD_VDVVRHEN, &tmp, 1);
 
@@ -344,14 +342,13 @@ static int st7789v_init(const struct device *dev)
 		return -EPERM;
 	}
 
-	data->spi_config.frequency =
-		DT_INST_PROP(0, spi_max_frequency);
+	data->spi_config.frequency = DT_INST_PROP(0, spi_max_frequency);
 	data->spi_config.operation = SPI_OP_MODE_MASTER | SPI_WORD_SET(8);
 	data->spi_config.slave = DT_INST_REG_ADDR(0);
 
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	data->cs_ctrl.gpio_dev = device_get_binding(
-			DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
+	data->cs_ctrl.gpio_dev =
+		device_get_binding(DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
 	data->cs_ctrl.gpio_pin = DT_INST_SPI_DEV_CS_GPIOS_PIN(0);
 	data->cs_ctrl.gpio_dt_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0);
 	data->cs_ctrl.delay = 0U;
@@ -361,8 +358,8 @@ static int st7789v_init(const struct device *dev)
 #endif
 
 #if DT_INST_NODE_HAS_PROP(0, reset_gpios)
-	data->reset_gpio = device_get_binding(
-			DT_INST_GPIO_LABEL(0, reset_gpios));
+	data->reset_gpio =
+		device_get_binding(DT_INST_GPIO_LABEL(0, reset_gpios));
 	if (data->reset_gpio == NULL) {
 		LOG_ERR("Could not get GPIO port for display reset");
 		return -EPERM;
@@ -379,8 +376,8 @@ static int st7789v_init(const struct device *dev)
 	data->pm_state = DEVICE_PM_ACTIVE_STATE;
 #endif
 
-	data->cmd_data_gpio = device_get_binding(
-			DT_INST_GPIO_LABEL(0, cmd_data_gpios));
+	data->cmd_data_gpio =
+		device_get_binding(DT_INST_GPIO_LABEL(0, cmd_data_gpios));
 	if (data->cmd_data_gpio == NULL) {
 		LOG_ERR("Could not get GPIO port for cmd/DATA port");
 		return -EPERM;
@@ -409,7 +406,7 @@ static void st7789v_enter_sleep(struct st7789v_data *data)
 }
 
 static int st7789v_pm_control(const struct device *dev, uint32_t ctrl_command,
-				 void *context, device_pm_cb cb, void *arg)
+			      void *context, device_pm_cb cb, void *arg)
 {
 	int ret = 0;
 	struct st7789v_data *data = (struct st7789v_data *)dev->data;
@@ -461,11 +458,11 @@ static struct st7789v_data st7789v_data = {
 };
 
 #ifndef CONFIG_DEVICE_POWER_MANAGEMENT
-DEVICE_AND_API_INIT(st7789v, DT_INST_LABEL(0), &st7789v_init,
-		    &st7789v_data, NULL, APPLICATION,
-		    CONFIG_APPLICATION_INIT_PRIORITY, &st7789v_api);
+DEVICE_AND_API_INIT(st7789v, DT_INST_LABEL(0), &st7789v_init, &st7789v_data,
+		    NULL, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY,
+		    &st7789v_api);
 #else
-DEVICE_DEFINE(st7789v, DT_INST_LABEL(0), &st7789v_init,
-	      st7789v_pm_control, &st7789v_data, NULL, APPLICATION,
+DEVICE_DEFINE(st7789v, DT_INST_LABEL(0), &st7789v_init, st7789v_pm_control,
+	      &st7789v_data, NULL, APPLICATION,
 	      CONFIG_APPLICATION_INIT_PRIORITY, &st7789v_api);
 #endif /* CONFIG_DEVICE_POWER_MANAGEMENT */

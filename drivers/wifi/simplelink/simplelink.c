@@ -21,7 +21,7 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "simplelink_support.h"
 #include "simplelink_sockets.h"
 
-#define SCAN_RETRY_DELAY 2000  /* ms */
+#define SCAN_RETRY_DELAY 2000 /* ms */
 #define FC_TIMEOUT K_SECONDS(CONFIG_WIFI_SIMPLELINK_FAST_CONNECT_TIMEOUT)
 
 #define SIMPLELINK_IPV4 0x1
@@ -70,7 +70,7 @@ static void simplelink_wifi_cb(uint32_t event, struct sl_connect_state *conn)
 	case SIMPLELINK_WIFI_CB_IPACQUIRED:
 		simplelink_data.mask &= ~SIMPLELINK_IPV4;
 		if ((simplelink_data.mask == 0) &&
-			(!simplelink_data.initialized)) {
+		    (!simplelink_data.initialized)) {
 			simplelink_data.initialized = true;
 			k_sem_give(&ip_acquired);
 		}
@@ -79,7 +79,7 @@ static void simplelink_wifi_cb(uint32_t event, struct sl_connect_state *conn)
 	case SIMPLELINK_WIFI_CB_IPV6ACQUIRED:
 		simplelink_data.mask &= ~SIMPLELINK_IPV6;
 		if ((simplelink_data.mask == 0) &&
-			(!simplelink_data.initialized)) {
+		    (!simplelink_data.initialized)) {
 			simplelink_data.initialized = true;
 			k_sem_give(&ip_acquired);
 		}
@@ -121,8 +121,9 @@ static void simplelink_scan_work_handler(struct k_work *work)
 		/* Try again: */
 		simplelink_data.num_results_or_err = z_simplelink_start_scan();
 		simplelink_data.scan_retries++;
-		delay = (simplelink_data.num_results_or_err > 0 ? 0 :
-			 SCAN_RETRY_DELAY);
+		delay = (simplelink_data.num_results_or_err > 0 ?
+				       0 :
+				       SCAN_RETRY_DELAY);
 		if (delay > 0) {
 			LOG_DBG("Retrying scan...");
 		}
@@ -188,12 +189,10 @@ static int simplelink_mgmt_disconnect(const struct device *dev)
 	return ret ? -EIO : ret;
 }
 
-static int simplelink_dummy_get(sa_family_t family,
-				enum net_sock_type type,
+static int simplelink_dummy_get(sa_family_t family, enum net_sock_type type,
 				enum net_ip_protocol ip_proto,
 				struct net_context **context)
 {
-
 	LOG_ERR("NET_SOCKETS_OFFLOAD must be configured for this driver");
 
 	return -1;
@@ -201,15 +200,15 @@ static int simplelink_dummy_get(sa_family_t family,
 
 /* Placeholders, until Zepyr IP stack updated to handle a NULL net_offload */
 static struct net_offload simplelink_offload = {
-	.get	       = simplelink_dummy_get,
-	.bind	       = NULL,
-	.listen	       = NULL,
-	.connect       = NULL,
-	.accept	       = NULL,
-	.send	       = NULL,
-	.sendto	       = NULL,
-	.recv	       = NULL,
-	.put	       = NULL,
+	.get = simplelink_dummy_get,
+	.bind = NULL,
+	.listen = NULL,
+	.connect = NULL,
+	.accept = NULL,
+	.send = NULL,
+	.sendto = NULL,
+	.recv = NULL,
+	.put = NULL,
 };
 
 static void simplelink_iface_init(struct net_if *iface)
@@ -219,10 +218,10 @@ static void simplelink_iface_init(struct net_if *iface)
 	simplelink_data.iface = iface;
 	simplelink_data.mask = 0;
 
-	simplelink_data.mask |= IS_ENABLED(CONFIG_NET_IPV4) ?
-		SIMPLELINK_IPV4 : 0;
-	simplelink_data.mask |= IS_ENABLED(CONFIG_NET_IPV6) ?
-		SIMPLELINK_IPV6 : 0;
+	simplelink_data.mask |= IS_ENABLED(CONFIG_NET_IPV4) ? SIMPLELINK_IPV4 :
+								    0;
+	simplelink_data.mask |= IS_ENABLED(CONFIG_NET_IPV6) ? SIMPLELINK_IPV6 :
+								    0;
 
 	/* Direct socket offload used instead of net offload: */
 	iface->if_dev->offload = &simplelink_offload;
@@ -246,27 +245,24 @@ static void simplelink_iface_init(struct net_if *iface)
 
 	LOG_DBG("MAC Address %02X:%02X:%02X:%02X:%02X:%02X",
 		simplelink_data.mac[0], simplelink_data.mac[1],
-		simplelink_data.mac[2],
-		simplelink_data.mac[3], simplelink_data.mac[4],
-		simplelink_data.mac[5]);
+		simplelink_data.mac[2], simplelink_data.mac[3],
+		simplelink_data.mac[4], simplelink_data.mac[5]);
 
 	net_if_set_link_addr(iface, simplelink_data.mac,
-			     sizeof(simplelink_data.mac),
-			     NET_LINK_ETHERNET);
+			     sizeof(simplelink_data.mac), NET_LINK_ETHERNET);
 
 #ifdef CONFIG_NET_SOCKETS_OFFLOAD
 	/* Direct socket offload: */
 	socket_offload_dns_register(&simplelink_dns_ops);
 	simplelink_sockets_init();
 #endif
-
 }
 
 static const struct net_wifi_mgmt_offload simplelink_api = {
 	.iface_api.init = simplelink_iface_init,
-	.scan		= simplelink_mgmt_scan,
-	.connect	= simplelink_mgmt_connect,
-	.disconnect	= simplelink_mgmt_disconnect,
+	.scan = simplelink_mgmt_scan,
+	.connect = simplelink_mgmt_connect,
+	.disconnect = simplelink_mgmt_disconnect,
 };
 
 static int simplelink_init(const struct device *dev)
@@ -284,6 +280,6 @@ static int simplelink_init(const struct device *dev)
 
 NET_DEVICE_OFFLOAD_INIT(simplelink, CONFIG_WIFI_SIMPLELINK_NAME,
 			simplelink_init, device_pm_control_nop,
-			&simplelink_data, NULL,
-			CONFIG_WIFI_INIT_PRIORITY, &simplelink_api,
+			&simplelink_data, NULL, CONFIG_WIFI_INIT_PRIORITY,
+			&simplelink_api,
 			CONFIG_WIFI_SIMPLELINK_MAX_PACKET_SIZE);

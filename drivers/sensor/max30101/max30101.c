@@ -25,8 +25,8 @@ static int max30101_sample_fetch(const struct device *dev,
 
 	/* Read all the active channels for one sample */
 	num_bytes = data->num_channels * MAX30101_BYTES_PER_CHANNEL;
-	if (i2c_burst_read(data->i2c, config->i2c_addr,
-			   MAX30101_REG_FIFO_DATA, buffer, num_bytes)) {
+	if (i2c_burst_read(data->i2c, config->i2c_addr, MAX30101_REG_FIFO_DATA,
+			   buffer, num_bytes)) {
 		LOG_ERR("Could not fetch sample");
 		return -EIO;
 	}
@@ -110,14 +110,14 @@ static int max30101_init(const struct device *dev)
 	}
 
 	/* Check the part id to make sure this is MAX30101 */
-	if (i2c_reg_read_byte(data->i2c, config->i2c_addr,
-			      MAX30101_REG_PART_ID, &part_id)) {
+	if (i2c_reg_read_byte(data->i2c, config->i2c_addr, MAX30101_REG_PART_ID,
+			      &part_id)) {
 		LOG_ERR("Could not get Part ID");
 		return -EIO;
 	}
 	if (part_id != MAX30101_PART_ID) {
-		LOG_ERR("Got Part ID 0x%02x, expected 0x%02x",
-			    part_id, MAX30101_PART_ID);
+		LOG_ERR("Got Part ID 0x%02x, expected 0x%02x", part_id,
+			MAX30101_PART_ID);
 		return -EIO;
 	}
 
@@ -197,7 +197,8 @@ static int max30101_init(const struct device *dev)
 	 */
 	for (fifo_chan = 0; fifo_chan < MAX30101_MAX_NUM_CHANNELS;
 	     fifo_chan++) {
-		led_chan = (config->slot[fifo_chan] & MAX30101_SLOT_LED_MASK)-1;
+		led_chan =
+			(config->slot[fifo_chan] & MAX30101_SLOT_LED_MASK) - 1;
 		if (led_chan < MAX30101_MAX_NUM_CHANNELS) {
 			data->map[led_chan] = fifo_chan;
 			data->num_channels++;
@@ -214,8 +215,8 @@ static struct max30101_config max30101_config = {
 #ifdef CONFIG_MAX30101_FIFO_ROLLOVER_EN
 		MAX30101_FIFO_CFG_ROLLOVER_EN_MASK |
 #endif
-		(CONFIG_MAX30101_FIFO_A_FULL <<
-		 MAX30101_FIFO_CFG_FIFO_FULL_SHIFT),
+		(CONFIG_MAX30101_FIFO_A_FULL
+		 << MAX30101_FIFO_CFG_FIFO_FULL_SHIFT),
 
 #if defined(CONFIG_MAX30101_HEART_RATE_MODE)
 	.mode = MAX30101_MODE_HEART_RATE,
@@ -248,7 +249,6 @@ static struct max30101_config max30101_config = {
 
 static struct max30101_data max30101_data;
 
-DEVICE_AND_API_INIT(max30101, DT_INST_LABEL(0), max30101_init,
-		    &max30101_data, &max30101_config,
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(max30101, DT_INST_LABEL(0), max30101_init, &max30101_data,
+		    &max30101_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &max30101_driver_api);

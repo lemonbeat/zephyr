@@ -58,8 +58,7 @@ struct led_rgb {
  * @see led_strip_update_rgb() for argument descriptions.
  */
 typedef int (*led_api_update_rgb)(const struct device *dev,
-				  struct led_rgb *pixels,
-				  size_t num_pixels);
+				  struct led_rgb *pixels, size_t num_pixels);
 
 /**
  * @typedef led_api_update_channels
@@ -68,8 +67,7 @@ typedef int (*led_api_update_rgb)(const struct device *dev,
  * @see led_strip_update_channels() for argument descriptions.
  */
 typedef int (*led_api_update_channels)(const struct device *dev,
-				       uint8_t *channels,
-				       size_t num_channels);
+				       uint8_t *channels, size_t num_channels);
 
 /**
  * @brief LED strip driver API
@@ -98,7 +96,8 @@ struct led_strip_driver_api {
  */
 static inline int led_strip_update_rgb(const struct device *dev,
 				       struct led_rgb *pixels,
-				       size_t num_pixels) {
+				       size_t num_pixels)
+{
 	const struct led_strip_driver_api *api =
 		(const struct led_strip_driver_api *)dev->api;
 
@@ -124,7 +123,8 @@ static inline int led_strip_update_rgb(const struct device *dev,
  */
 static inline int led_strip_update_channels(const struct device *dev,
 					    uint8_t *channels,
-					    size_t num_channels) {
+					    size_t num_channels)
+{
 	const struct led_strip_driver_api *api =
 		(const struct led_strip_driver_api *)dev->api;
 
@@ -139,4 +139,4 @@ static inline int led_strip_update_channels(const struct device *dev,
  * @}
  */
 
-#endif	/* ZEPHYR_INCLUDE_DRIVERS_LED_STRIP_H_ */
+#endif /* ZEPHYR_INCLUDE_DRIVERS_LED_STRIP_H_ */

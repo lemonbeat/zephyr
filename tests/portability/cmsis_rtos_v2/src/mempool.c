@@ -8,8 +8,8 @@
 #include <kernel.h>
 #include <cmsis_os2.h>
 
-#define MAX_BLOCKS      10
-#define TIMEOUT_TICKS   10
+#define MAX_BLOCKS 10
+#define TIMEOUT_TICKS 10
 
 struct mem_block {
 	int member1;
@@ -51,8 +51,7 @@ static void mempool_common_tests(osMemoryPoolId_t mp_id,
 	zassert_equal(osMemoryPoolGetBlockSize(dummy_id), 0,
 		      "Something's wrong with osMemoryPoolGetBlockSize!");
 
-	zassert_equal(osMemoryPoolGetBlockSize(mp_id),
-		      sizeof(struct mem_block),
+	zassert_equal(osMemoryPoolGetBlockSize(mp_id), sizeof(struct mem_block),
 		      "Something's wrong with osMemoryPoolGetBlockSize!");
 
 	/* The memory pool should be completely available at this point */
@@ -62,8 +61,8 @@ static void mempool_common_tests(osMemoryPoolId_t mp_id,
 		      "Something's wrong with osMemoryPoolGetSpace!");
 
 	for (i = 0; i < MAX_BLOCKS; i++) {
-		addr_list[i] = (struct mem_block *)osMemoryPoolAlloc(mp_id,
-								     osWaitForever);
+		addr_list[i] = (struct mem_block *)osMemoryPoolAlloc(
+			mp_id, osWaitForever);
 		zassert_true(addr_list[i] != NULL, "mempool allocation failed");
 	}
 
@@ -76,10 +75,10 @@ static void mempool_common_tests(osMemoryPoolId_t mp_id,
 	/* All blocks in mempool are allocated, any more allocation
 	 * without free should fail
 	 */
-	addr_list[i] = (struct mem_block *)osMemoryPoolAlloc(mp_id,
-							     TIMEOUT_TICKS);
+	addr_list[i] =
+		(struct mem_block *)osMemoryPoolAlloc(mp_id, TIMEOUT_TICKS);
 	zassert_true(addr_list[i] == NULL, "allocation happened."
-		     " Something's wrong!");
+					   " Something's wrong!");
 
 	zassert_equal(osMemoryPoolFree(dummy_id, addr_list[0]),
 		      osErrorParameter, "mempool free worked unexpectedly!");
@@ -105,8 +104,7 @@ void test_mempool_dynamic(void)
 {
 	osMemoryPoolId_t mp_id;
 
-	mp_id = osMemoryPoolNew(MAX_BLOCKS, sizeof(struct mem_block),
-				NULL);
+	mp_id = osMemoryPoolNew(MAX_BLOCKS, sizeof(struct mem_block), NULL);
 	zassert_true(mp_id != NULL, "mempool creation failed");
 
 	mempool_common_tests(mp_id, "ZephyrMemPool");

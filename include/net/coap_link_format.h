@@ -27,12 +27,12 @@ extern "C" {
  * included in the responses of the .well-known/core resource.
  */
 #define COAP_WELL_KNOWN_CORE_PATH \
-	((const char * const[]) { ".well-known", "core", NULL })
+	((const char *const[]){ ".well-known", "core", NULL })
 
 int coap_well_known_core_get(struct coap_resource *resource,
 			     struct coap_packet *request,
-			     struct coap_packet *response,
-			     uint8_t *data, uint16_t len);
+			     struct coap_packet *response, uint8_t *data,
+			     uint16_t len);
 
 /**
  * In case you want to add attributes to the resources included in the
@@ -40,7 +40,7 @@ int coap_well_known_core_get(struct coap_resource *resource,
  * to a valid coap_core_metadata structure.
  */
 struct coap_core_metadata {
-	const char * const *attributes;
+	const char *const *attributes;
 	void *user_data;
 };
 

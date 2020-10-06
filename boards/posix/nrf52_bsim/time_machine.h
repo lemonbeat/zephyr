@@ -9,7 +9,7 @@
 #include "bs_types.h"
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 bs_time_t tm_get_abs_time(void);

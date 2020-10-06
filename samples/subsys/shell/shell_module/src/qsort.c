@@ -36,20 +36,19 @@ static const char sccsid[] = "@(#)qsort.c	8.1 (Berkeley) 6/4/93";
 #include <stdlib.h>
 
 #ifdef I_AM_QSORT_R
-typedef int		 cmp_t(void *, const void *, const void *);
+typedef int cmp_t(void *, const void *, const void *);
 #else
-typedef int		 cmp_t(const void *, const void *);
+typedef int cmp_t(const void *, const void *);
 #endif
-static inline char	*med3(char *, char *, char *, cmp_t *, void *);
+static inline char *med3(char *, char *, char *, cmp_t *, void *);
 
-#define	MIN(a, b)	((a) < (b) ? a : b)
+#define MIN(a, b) ((a) < (b) ? a : b)
 
 /*
  * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
  */
 
-static inline void
-swapfunc(char *a, char *b, size_t es)
+static inline void swapfunc(char *a, char *b, size_t es)
 {
 	char t;
 
@@ -60,31 +59,32 @@ swapfunc(char *a, char *b, size_t es)
 	} while (--es > 0);
 }
 
-#define	vecswap(a, b, n)			\
-	do {					\
-		if ((n) > 0) {			\
-			swapfunc(a, b, n);	\
-		}				\
+#define vecswap(a, b, n)                   \
+	do {                               \
+		if ((n) > 0) {             \
+			swapfunc(a, b, n); \
+		}                          \
 	} while (0)
 
 #ifdef I_AM_QSORT_R
-#define	CMP(t, x, y) (cmp((t), (x), (y)))
+#define CMP(t, x, y) (cmp((t), (x), (y)))
 #else
-#define	CMP(t, x, y) (cmp((x), (y)))
+#define CMP(t, x, y) (cmp((x), (y)))
 #endif
 
-static inline char *
-med3(char *a, char *b, char *c, cmp_t *cmp, void *thunk)
+static inline char *med3(char *a, char *b, char *c, cmp_t *cmp, void *thunk)
 {
 	return CMP(thunk, a, b) < 0 ?
-	       (CMP(thunk, b, c) < 0 ? b : (CMP(thunk, a, c) < 0 ? c : a))
-	      : (CMP(thunk, b, c) > 0 ? b : (CMP(thunk, a, c) < 0 ? a : c));
+			     (CMP(thunk, b, c) < 0 ? b :
+						     (CMP(thunk, a, c) < 0 ? c : a)) :
+			     (CMP(thunk, b, c) > 0 ? b :
+						     (CMP(thunk, a, c) < 0 ? a : c));
 }
 
 #ifdef I_AM_QSORT_R
 void qsort_r(void *a, size_t n, size_t es, void *thunk, cmp_t *cmp)
 #else
-#define	thunk NULL
+#define thunk NULL
 void qsort(void *a, size_t n, size_t es, cmp_t *cmp)
 #endif
 {
@@ -148,7 +148,7 @@ loop:
 		pb += es;
 		pc -= es;
 	}
-	if (swap_cnt == 0) {  /* Switch to insertion sort */
+	if (swap_cnt == 0) { /* Switch to insertion sort */
 		for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es) {
 			for (pl = pm;
 			     pl > (char *)a && CMP(thunk, pl - es, pl) > 0;

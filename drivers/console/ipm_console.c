@@ -44,16 +44,16 @@ static int console_out(int c)
 #if defined(CONFIG_STDOUT_CONSOLE)
 extern void __stdout_hook_install(int (*hook)(int));
 #else
-#define __stdout_hook_install(x)	\
-	do {    /* nothing */		\
+#define __stdout_hook_install(x) \
+	do { /* nothing */       \
 	} while ((0))
 #endif
 
 #if defined(CONFIG_PRINTK)
 extern void __printk_hook_install(int (*fn)(int));
 #else
-#define __printk_hook_install(x)	\
-	do {    /* nothing */		\
+#define __printk_hook_install(x) \
+	do { /* nothing */       \
 	} while ((0))
 #endif
 

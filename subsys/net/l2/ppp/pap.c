@@ -12,8 +12,7 @@ LOG_MODULE_DECLARE(net_l2_ppp, CONFIG_NET_L2_PPP_LOG_LEVEL);
 #include "ppp_internal.h"
 
 static enum net_verdict pap_handle(struct ppp_context *ctx,
-				   struct net_if *iface,
-				   struct net_pkt *pkt)
+				   struct net_if *iface, struct net_pkt *pkt)
 {
 	return ppp_fsm_input(&ctx->pap.fsm, PPP_PAP, pkt);
 }
@@ -35,8 +34,7 @@ static struct net_pkt *pap_config_info_add(struct ppp_fsm *fsm)
 	return pkt;
 }
 
-static int pap_config_info_ack(struct ppp_fsm *fsm,
-			       struct net_pkt *pkt,
+static int pap_config_info_ack(struct ppp_fsm *fsm, struct net_pkt *pkt,
 			       uint16_t length)
 {
 	/*
@@ -72,8 +70,8 @@ static void pap_close(struct ppp_context *ctx, const uint8_t *reason)
 
 static void pap_up(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       pap.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, pap.fsm);
 
 	if (ctx->is_pap_up) {
 		return;
@@ -89,8 +87,8 @@ static void pap_up(struct ppp_fsm *fsm)
 
 static void pap_down(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       pap.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, pap.fsm);
 
 	if (!ctx->is_pap_up) {
 		return;
@@ -101,8 +99,8 @@ static void pap_down(struct ppp_fsm *fsm)
 
 static void pap_finished(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       pap.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, pap.fsm);
 
 	if (!ctx->is_pap_open) {
 		return;
@@ -135,7 +133,5 @@ static void pap_init(struct ppp_context *ctx)
 	ctx->pap.fsm.cb.config_info_ack = pap_config_info_ack;
 }
 
-PPP_PROTOCOL_REGISTER(PAP, PPP_PAP,
-		      pap_init, pap_handle,
-		      pap_lower_up, pap_lower_down,
-		      pap_open, pap_close);
+PPP_PROTOCOL_REGISTER(PAP, PPP_PAP, pap_init, pap_handle, pap_lower_up,
+		      pap_lower_down, pap_open, pap_close);

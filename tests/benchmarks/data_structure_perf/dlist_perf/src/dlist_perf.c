@@ -45,17 +45,14 @@ void test_dlist_container(void)
 	struct container_node *cnode, *s_cnode;
 
 	/* Initialize an user-defiend structure of contains dlist node */
-	struct container_node data_node[NODE_SIZE] = {
-		{ .value = 0 },
-		{ .value = 1 },
-		{ .value = 2 },
-		{ .value = 3 },
-		{ .value = 4 }
-	};
+	struct container_node data_node[NODE_SIZE] = { { .value = 0 },
+						       { .value = 1 },
+						       { .value = 2 },
+						       { .value = 3 },
+						       { .value = 4 } };
 
 	sys_dlist_init(&test_list);
-	zassert_true(sys_dlist_is_empty(&test_list),
-			"sys_dlist_init failed");
+	zassert_true(sys_dlist_is_empty(&test_list), "sys_dlist_init failed");
 
 	/* Add into a doubly-linked list */
 	for (i = 0; i < NODE_SIZE; i++) {
@@ -66,22 +63,23 @@ void test_dlist_container(void)
 	count = 0;
 	SYS_DLIST_FOR_EACH_CONTAINER(&test_list, cnode, node) {
 		zassert_true(cnode->value == count,
-				"SYS_DLIST_FOR_EACH_CONTAINER failed");
+			     "SYS_DLIST_FOR_EACH_CONTAINER failed");
 		count++;
 	}
 	zassert_true(count == NODE_SIZE,
-			"SYS_DLIST_FOR_EACH_CONTAINER failed "
-			"expected %d get %d", NODE_SIZE, count);
+		     "SYS_DLIST_FOR_EACH_CONTAINER failed "
+		     "expected %d get %d",
+		     NODE_SIZE, count);
 
 	/* Enumerate the doubly-linked list */
 	count = 0;
 	SYS_DLIST_FOR_EACH_CONTAINER_SAFE(&test_list, cnode, s_cnode, node) {
 		zassert_true(cnode->value == count,
-				"SYS_DLIST_FOR_EACH_CONTAINER_SAFE failed");
+			     "SYS_DLIST_FOR_EACH_CONTAINER_SAFE failed");
 		count++;
 	}
 	zassert_true(count == NODE_SIZE,
-			"SYS_DLIST_FOR_EACH_CONTAINER_SAFE failed");
+		     "SYS_DLIST_FOR_EACH_CONTAINER_SAFE failed");
 }
 
 /**
@@ -107,17 +105,14 @@ void test_dlist_for_each(void)
 	sys_dnode_t *node, *s_node;
 
 	/* Initialize a doubly-linked list */
-	struct container_node data_node[NODE_SIZE] = {
-		{ .value = 0 },
-		{ .value = 1 },
-		{ .value = 2 },
-		{ .value = 3 },
-		{ .value = 4 }
-	};
+	struct container_node data_node[NODE_SIZE] = { { .value = 0 },
+						       { .value = 1 },
+						       { .value = 2 },
+						       { .value = 3 },
+						       { .value = 4 } };
 
 	sys_dlist_init(&test_list);
-	zassert_true(sys_dlist_is_empty(&test_list),
-			"sys_dlist_init failed");
+	zassert_true(sys_dlist_is_empty(&test_list), "sys_dlist_init failed");
 
 	for (i = 0; i < NODE_SIZE; i++) {
 		sys_dlist_append(&test_list, &data_node[i].node);
@@ -127,27 +122,30 @@ void test_dlist_for_each(void)
 	count = 0;
 	SYS_DLIST_FOR_EACH_NODE(&test_list, node) {
 		val = CONTAINER_OF(node, struct container_node, node)->value;
-		zassert_true(val == count, "SYS_DLIST_FOR_EACH_NODE failed"
-				" expected %d get %d", count, val);
+		zassert_true(val == count,
+			     "SYS_DLIST_FOR_EACH_NODE failed"
+			     " expected %d get %d",
+			     count, val);
 		count++;
 	}
-	zassert_true(count == NODE_SIZE,
-			"SYS_DLIST_FOR_EACH_NODE failed");
+	zassert_true(count == NODE_SIZE, "SYS_DLIST_FOR_EACH_NODE failed");
 
 	/* Enumerate the doubly-linked list */
 	count = 0;
 	SYS_DLIST_FOR_EACH_NODE_SAFE(&test_list, node, s_node) {
 		val = CONTAINER_OF(node, struct container_node, node)->value;
-		zassert_true(val == count, "SYS_DLIST_FOR_EACH_NODE_SAFE failed"
-				" expected %d get %d", count, val);
+		zassert_true(val == count,
+			     "SYS_DLIST_FOR_EACH_NODE_SAFE failed"
+			     " expected %d get %d",
+			     count, val);
 		count++;
 	}
-	zassert_true(count == NODE_SIZE,
-			"SYS_DLIST_FOR_EACH_NODE_SAFE failed");
+	zassert_true(count == NODE_SIZE, "SYS_DLIST_FOR_EACH_NODE_SAFE failed");
 
 	/* Enumerate the doubly-linked list */
 	count = 0;
-	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		count++;
 		val = ((struct container_node *)node)->value;
 		if (val == 1) {
@@ -157,7 +155,8 @@ void test_dlist_for_each(void)
 	zassert_true(count == 2, "SYS_DLIST_ITERATE_FROM_NODE failed");
 
 	count = 0;
-	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		count++;
 		val = ((struct container_node *)node)->value;
 		if (val == 2) {
@@ -167,7 +166,8 @@ void test_dlist_for_each(void)
 	zassert_true(count == 1, "SYS_DLIST_ITERATE_FROM_NODE failed");
 
 	count = 0;
-	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node) {
+	SYS_DLIST_ITERATE_FROM_NODE(&test_list, node)
+	{
 		count++;
 	}
 	zassert_true(count == 2, "SYS_DLIST_ITERATE_FROM_NODE failed");
@@ -198,12 +198,12 @@ void test_dlist_peak_head_tail(void)
 	/* Get 'head' node directly, the time complexity is O(1) */
 	head = list.head;
 	zassert_true(head == &node[0],
-			"dlist can't access 'head' in constant time");
+		     "dlist can't access 'head' in constant time");
 
 	/* Get 'tail' node directly, the time complexity is O(1) */
 	tail = list.tail;
 	zassert_true(tail == &node[ARRAY_SIZE(node) - 1],
-			"dlist can't access 'tail' in constant time");
+		     "dlist can't access 'tail' in constant time");
 }
 
 /**
@@ -230,7 +230,7 @@ void test_dlist_insert_and_remove(void)
 		sys_dlist_append(&list, &node[i]);
 	}
 
-	sys_dnode_t node_ins, *insert_at = &node[ARRAY_SIZE(node)/2];
+	sys_dnode_t node_ins, *insert_at = &node[ARRAY_SIZE(node) / 2];
 	sys_dnode_t *insert_node = &node_ins;
 
 	/* Insert a node and steps are fixed,the time complexity is O(1) */
@@ -239,29 +239,33 @@ void test_dlist_insert_and_remove(void)
 	insert_at->prev->next = insert_node;
 	insert_at->prev = insert_node;
 	/*Check if the node is inserted successfully*/
-	zassert_true(insert_node == sys_dlist_peek_prev(&list,
-		&node[ARRAY_SIZE(node)/2]), "dlist can't insert a node in constant time");
-	zassert_true(insert_node == sys_dlist_peek_next(&list,
-		&node[ARRAY_SIZE(node)/2 - 1]), "dlist can't insert a node in constant time");
+	zassert_true(insert_node == sys_dlist_peek_prev(
+					    &list, &node[ARRAY_SIZE(node) / 2]),
+		     "dlist can't insert a node in constant time");
+	zassert_true(insert_node ==
+			     sys_dlist_peek_next(
+				     &list, &node[ARRAY_SIZE(node) / 2 - 1]),
+		     "dlist can't insert a node in constant time");
 
 	/* Remove a node and steps are fixed,the time complexity is O(1) */
 	insert_node->prev->next = insert_node->next;
 	insert_node->next->prev = insert_node->prev;
 	/*Check if the node is removed successfully*/
-	zassert_true(insert_node != sys_dlist_peek_prev(&list,
-		&node[ARRAY_SIZE(node)/2]), "dlist can't insert a node in constant time");
-	zassert_true(insert_node != sys_dlist_peek_next(&list,
-		&node[ARRAY_SIZE(node)/2 - 1]), "dlist can't remove a node in constant time");
+	zassert_true(insert_node != sys_dlist_peek_prev(
+					    &list, &node[ARRAY_SIZE(node) / 2]),
+		     "dlist can't insert a node in constant time");
+	zassert_true(insert_node !=
+			     sys_dlist_peek_next(
+				     &list, &node[ARRAY_SIZE(node) / 2 - 1]),
+		     "dlist can't remove a node in constant time");
 }
 
 /* ztest main entry */
 void test_main(void)
 {
-	ztest_test_suite(test_dlist,
-			ztest_unit_test(test_dlist_container),
-			ztest_unit_test(test_dlist_for_each),
-			ztest_unit_test(test_dlist_peak_head_tail),
-			ztest_unit_test(test_dlist_insert_and_remove)
-			);
+	ztest_test_suite(test_dlist, ztest_unit_test(test_dlist_container),
+			 ztest_unit_test(test_dlist_for_each),
+			 ztest_unit_test(test_dlist_peak_head_tail),
+			 ztest_unit_test(test_dlist_insert_and_remove));
 	ztest_run_test_suite(test_dlist);
 }

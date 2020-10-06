@@ -51,12 +51,9 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define FREESCALE_OUI_B1 0x04
 #define FREESCALE_OUI_B2 0x9f
 
-#define ETH_MCUX_FIXED_LINK_NODE \
-	DT_CHILD(DT_ALIAS(eth), fixed_link)
-#define ETH_MCUX_FIXED_LINK \
-	DT_NODE_EXISTS(ETH_MCUX_FIXED_LINK_NODE)
-#define ETH_MCUX_FIXED_LINK_SPEED \
-	DT_PROP(ETH_MCUX_FIXED_LINK_NODE, speed)
+#define ETH_MCUX_FIXED_LINK_NODE DT_CHILD(DT_ALIAS(eth), fixed_link)
+#define ETH_MCUX_FIXED_LINK DT_NODE_EXISTS(ETH_MCUX_FIXED_LINK_NODE)
+#define ETH_MCUX_FIXED_LINK_SPEED DT_PROP(ETH_MCUX_FIXED_LINK_NODE, speed)
 #define ETH_MCUX_FIXED_LINK_FULL_DUPLEX \
 	DT_PROP(ETH_MCUX_FIXED_LINK_NODE, full_duplex)
 
@@ -73,21 +70,15 @@ enum eth_mcux_phy_state {
 
 static void eth_mcux_init(const struct device *dev);
 
-static const char *
-phy_state_name(enum eth_mcux_phy_state state)  __attribute__((unused));
+static const char *phy_state_name(enum eth_mcux_phy_state state)
+	__attribute__((unused));
 
 static const char *phy_state_name(enum eth_mcux_phy_state state)
 {
-	static const char * const name[] = {
-		"initial",
-		"reset",
-		"autoneg",
-		"restart",
-		"read-status",
-		"read-duplex",
-		"wait",
-		"closing"
-	};
+	static const char *const name[] = { "initial",	   "reset",
+					    "autoneg",	   "restart",
+					    "read-status", "read-duplex",
+					    "wait",	   "closing" };
 
 	return name[state];
 }
@@ -156,16 +147,16 @@ struct eth_context {
 
 #ifdef CONFIG_HAS_MCUX_CACHE
 static __nocache enet_rx_bd_struct_t __aligned(ENET_BUFF_ALIGNMENT)
-rx_buffer_desc[CONFIG_ETH_MCUX_RX_BUFFERS];
+	rx_buffer_desc[CONFIG_ETH_MCUX_RX_BUFFERS];
 
 static __nocache enet_tx_bd_struct_t __aligned(ENET_BUFF_ALIGNMENT)
-tx_buffer_desc[CONFIG_ETH_MCUX_TX_BUFFERS];
+	tx_buffer_desc[CONFIG_ETH_MCUX_TX_BUFFERS];
 #else
 static enet_rx_bd_struct_t __aligned(ENET_BUFF_ALIGNMENT)
-rx_buffer_desc[CONFIG_ETH_MCUX_RX_BUFFERS];
+	rx_buffer_desc[CONFIG_ETH_MCUX_RX_BUFFERS];
 
 static enet_tx_bd_struct_t __aligned(ENET_BUFF_ALIGNMENT)
-tx_buffer_desc[CONFIG_ETH_MCUX_TX_BUFFERS];
+	tx_buffer_desc[CONFIG_ETH_MCUX_TX_BUFFERS];
 #endif
 
 #if defined(CONFIG_PTP_CLOCK_MCUX)
@@ -189,18 +180,18 @@ static int ts_tx_rd, ts_tx_wr;
 #endif /* CONFIG_NET_VLAN */
 
 static uint8_t __aligned(ENET_BUFF_ALIGNMENT)
-rx_buffer[CONFIG_ETH_MCUX_RX_BUFFERS][ETH_MCUX_BUFFER_SIZE];
+	rx_buffer[CONFIG_ETH_MCUX_RX_BUFFERS][ETH_MCUX_BUFFER_SIZE];
 
 static uint8_t __aligned(ENET_BUFF_ALIGNMENT)
-tx_buffer[CONFIG_ETH_MCUX_TX_BUFFERS][ETH_MCUX_BUFFER_SIZE];
+	tx_buffer[CONFIG_ETH_MCUX_TX_BUFFERS][ETH_MCUX_BUFFER_SIZE];
 
 #ifdef CONFIG_NET_POWER_MANAGEMENT
 static void eth_mcux_phy_enter_reset(struct eth_context *context);
 void eth_mcux_phy_stop(struct eth_context *context);
 
 static int eth_mcux_device_pm_control(const struct device *dev,
-				      uint32_t command,
-				      void *context, device_pm_cb cb, void *arg)
+				      uint32_t command, void *context,
+				      device_pm_cb cb, void *arg)
 {
 	struct eth_context *eth_ctx = (struct eth_context *)dev->data;
 	int ret = 0;
@@ -226,12 +217,14 @@ static int eth_mcux_device_pm_control(const struct device *dev,
 
 			ENET_Reset(eth_ctx->base);
 			ENET_Deinit(eth_ctx->base);
-			clock_control_off(eth_ctx->clock_dev,
+			clock_control_off(
+				eth_ctx->clock_dev,
 				(clock_control_subsys_t)eth_ctx->clock);
 		} else if (*(uint32_t *)context == DEVICE_PM_ACTIVE_STATE) {
 			LOG_DBG("Resuming");
 
-			clock_control_on(eth_ctx->clock_dev,
+			clock_control_on(
+				eth_ctx->clock_dev,
 				(clock_control_subsys_t)eth_ctx->clock);
 			eth_mcux_init(dev);
 			net_if_resume(eth_ctx->iface);
@@ -295,7 +288,8 @@ static void eth_mcux_decode_duplex_and_speed(uint32_t status,
 }
 #endif /* ETH_MCUX_FIXED_LINK */
 
-static inline struct net_if *get_iface(struct eth_context *ctx, uint16_t vlan_tag)
+static inline struct net_if *get_iface(struct eth_context *ctx,
+				       uint16_t vlan_tag)
 {
 #if defined(CONFIG_NET_VLAN)
 	struct net_if *iface;
@@ -318,8 +312,7 @@ static void eth_mcux_phy_enter_reset(struct eth_context *context)
 	/* Reset the PHY. */
 #ifndef CONFIG_ETH_MCUX_NO_PHY_SMI
 	ENET_StartSMIWrite(context->base, context->phy_addr,
-			   PHY_BASICCONTROL_REG,
-			   kENET_MiiWriteValidFrame,
+			   PHY_BASICCONTROL_REG, kENET_MiiWriteValidFrame,
 			   PHY_BCTL_RESET_MASK);
 #endif
 	context->phy_state = eth_mcux_phy_state_reset;
@@ -436,8 +429,7 @@ static void eth_mcux_phy_event(struct eth_context *context)
 			ctrl2 |= PHY_CTL2_REFCLK_SELECT_MASK;
 			ENET_StartSMIWrite(context->base, context->phy_addr,
 					   PHY_CONTROL2_REG,
-					   kENET_MiiWriteValidFrame,
-					   ctrl2);
+					   kENET_MiiWriteValidFrame, ctrl2);
 		}
 		context->phy_state = eth_mcux_phy_state_reset;
 #endif
@@ -448,7 +440,7 @@ static void eth_mcux_phy_event(struct eth_context *context)
 		 * 1ms
 		 */
 		if (context->iface) {
-		       context->phy_state = eth_mcux_phy_state_reset;
+			context->phy_state = eth_mcux_phy_state_reset;
 		}
 
 		k_delayed_work_submit(&context->delayed_phy_work, K_MSEC(1));
@@ -497,8 +489,7 @@ static void eth_mcux_phy_event(struct eth_context *context)
 		/* Start reading the PHY basic status. */
 #ifndef CONFIG_ETH_MCUX_NO_PHY_SMI
 		ENET_StartSMIRead(context->base, context->phy_addr,
-				  PHY_BASICSTATUS_REG,
-				  kENET_MiiReadValidFrame);
+				  PHY_BASICSTATUS_REG, kENET_MiiReadValidFrame);
 #endif
 		context->phy_state = eth_mcux_phy_state_read_status;
 #ifdef CONFIG_ETH_MCUX_NO_PHY_SMI
@@ -511,7 +502,7 @@ static void eth_mcux_phy_event(struct eth_context *context)
 		link_up = true;
 #else
 		status = ENET_ReadSMIData(context->base);
-		link_up =  status & PHY_BSTATUS_LINKSTATUS_MASK;
+		link_up = status & PHY_BSTATUS_LINKSTATUS_MASK;
 #endif
 		if (link_up && !context->link_up) {
 			/* Start reading the PHY control register. */
@@ -534,13 +525,15 @@ static void eth_mcux_phy_event(struct eth_context *context)
 		} else if (!link_up && context->link_up) {
 			LOG_INF("%s link down", eth_name(context->base));
 			context->link_up = link_up;
-			k_delayed_work_submit(&context->delayed_phy_work,
-					K_MSEC(CONFIG_ETH_MCUX_PHY_TICK_MS));
+			k_delayed_work_submit(
+				&context->delayed_phy_work,
+				K_MSEC(CONFIG_ETH_MCUX_PHY_TICK_MS));
 			context->phy_state = eth_mcux_phy_state_wait;
 			net_eth_carrier_off(context->iface);
 		} else {
-			k_delayed_work_submit(&context->delayed_phy_work,
-					K_MSEC(CONFIG_ETH_MCUX_PHY_TICK_MS));
+			k_delayed_work_submit(
+				&context->delayed_phy_work,
+				K_MSEC(CONFIG_ETH_MCUX_PHY_TICK_MS));
 			context->phy_state = eth_mcux_phy_state_wait;
 		}
 
@@ -552,22 +545,19 @@ static void eth_mcux_phy_event(struct eth_context *context)
 		LOG_INF("%s - Fixed Link", eth_name(context->base));
 #else
 		status = ENET_ReadSMIData(context->base);
-		eth_mcux_decode_duplex_and_speed(status,
-						 &phy_duplex,
+		eth_mcux_decode_duplex_and_speed(status, &phy_duplex,
 						 &phy_speed);
 #endif
 		if (phy_speed != context->phy_speed ||
 		    phy_duplex != context->phy_duplex) {
 			context->phy_speed = phy_speed;
 			context->phy_duplex = phy_duplex;
-			ENET_SetMII(context->base,
-				    (enet_mii_speed_t) phy_speed,
-				    (enet_mii_duplex_t) phy_duplex);
+			ENET_SetMII(context->base, (enet_mii_speed_t)phy_speed,
+				    (enet_mii_duplex_t)phy_duplex);
 		}
 
 		LOG_INF("%s enabled %sM %s-duplex mode.",
-			eth_name(context->base),
-			(phy_speed ? "100" : "10"),
+			eth_name(context->base), (phy_speed ? "100" : "10"),
 			(phy_duplex ? "full" : "half"));
 		k_delayed_work_submit(&context->delayed_phy_work,
 				      K_MSEC(CONFIG_ETH_MCUX_PHY_TICK_MS));
@@ -601,8 +591,8 @@ static void eth_mcux_phy_setup(struct eth_context *context)
 	/* Disable MII interrupts to prevent triggering PHY events. */
 	ENET_DisableInterrupts(context->base, ENET_EIR_MII_MASK);
 
-	res = PHY_Read(context->base, context->phy_addr,
-		       PHY_OMS_OVERRIDE_REG, &oms_override);
+	res = PHY_Read(context->base, context->phy_addr, PHY_OMS_OVERRIDE_REG,
+		       &oms_override);
 	if (res != kStatus_Success) {
 		LOG_WRN("Reading PHY reg failed (status 0x%x)", res);
 	} else {
@@ -679,8 +669,7 @@ static bool eth_get_ptp_data(struct net_if *iface, struct net_pkt *pkt,
 
 			hdr = (struct gptp_hdr *)pkt->frags->frags->data;
 		} else {
-			hdr = (struct gptp_hdr *)(pkt->frags->data +
-							   eth_hlen);
+			hdr = (struct gptp_hdr *)(pkt->frags->data + eth_hlen);
 		}
 
 		ptpTsData->version = hdr->ptp_version;
@@ -691,19 +680,13 @@ static bool eth_get_ptp_data(struct net_if *iface, struct net_pkt *pkt,
 
 #ifdef CONFIG_ETH_MCUX_PHY_EXTRA_DEBUG
 		LOG_DBG("PTP packet: ver %d type %d len %d seq %d",
-			ptpTsData->version,
-			ptpTsData->messageType,
-			ntohs(hdr->message_length),
-			ptpTsData->sequenceId);
+			ptpTsData->version, ptpTsData->messageType,
+			ntohs(hdr->message_length), ptpTsData->sequenceId);
 		LOG_DBG("  clk %02x%02x%02x%02x%02x%02x%02x%02x port %d",
-			hdr->port_id.clk_id[0],
-			hdr->port_id.clk_id[1],
-			hdr->port_id.clk_id[2],
-			hdr->port_id.clk_id[3],
-			hdr->port_id.clk_id[4],
-			hdr->port_id.clk_id[5],
-			hdr->port_id.clk_id[6],
-			hdr->port_id.clk_id[7],
+			hdr->port_id.clk_id[0], hdr->port_id.clk_id[1],
+			hdr->port_id.clk_id[2], hdr->port_id.clk_id[3],
+			hdr->port_id.clk_id[4], hdr->port_id.clk_id[5],
+			hdr->port_id.clk_id[6], hdr->port_id.clk_id[7],
 			ntohs(hdr->port_id.port_number));
 #endif
 	}
@@ -739,15 +722,15 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 	 */
 #ifdef ENET_ENHANCEDBUFFERDESCRIPTOR_MODE
 	context->enet_handle.txBdDirtyTime[0] =
-				context->enet_handle.txBdCurrent[0];
+		context->enet_handle.txBdCurrent[0];
 #endif
 
 	status = ENET_SendFrame(context->base, &context->enet_handle,
 				context->frame_buf, total_len);
 
 #if defined(CONFIG_PTP_CLOCK_MCUX)
-	timestamped_frame = eth_get_ptp_data(net_pkt_iface(pkt), pkt, NULL,
-					     true);
+	timestamped_frame =
+		eth_get_ptp_data(net_pkt_iface(pkt), pkt, NULL, true);
 	if (timestamped_frame) {
 		if (!status) {
 			ts_tx_pkt[ts_tx_wr] = net_pkt_ref(pkt);
@@ -847,7 +830,7 @@ static void eth_rx(struct eth_context *context)
 				enum net_priority prio;
 
 				prio = net_vlan2priority(
-						net_pkt_vlan_priority(pkt));
+					net_pkt_vlan_priority(pkt));
 				net_pkt_set_priority(pkt, prio);
 			}
 #endif
@@ -856,10 +839,10 @@ static void eth_rx(struct eth_context *context)
 #endif
 
 #if defined(CONFIG_PTP_CLOCK_MCUX)
-	if (eth_get_ptp_data(get_iface(context, vlan_tag), pkt,
-			     &ptpTimeData, false) &&
-	    (ENET_GetRxFrameTime(&context->enet_handle,
-				 &ptpTimeData) == kStatus_Success)) {
+	if (eth_get_ptp_data(get_iface(context, vlan_tag), pkt, &ptpTimeData,
+			     false) &&
+	    (ENET_GetRxFrameTime(&context->enet_handle, &ptpTimeData) ==
+	     kStatus_Success)) {
 		pkt->timestamp.nanosecond = ptpTimeData.timeStamp.nanosecond;
 		pkt->timestamp.second = ptpTimeData.timeStamp.second;
 	} else {
@@ -963,17 +946,17 @@ static void eth_callback(ENET_Type *base, enet_handle_t *handle,
 }
 
 #if DT_INST_PROP(0, zephyr_random_mac_address) || \
-    DT_INST_PROP(1, zephyr_random_mac_address)
+	DT_INST_PROP(1, zephyr_random_mac_address)
 static void generate_random_mac(uint8_t *mac_addr)
 {
-	gen_random_mac(mac_addr, FREESCALE_OUI_B0,
-		       FREESCALE_OUI_B1, FREESCALE_OUI_B2);
+	gen_random_mac(mac_addr, FREESCALE_OUI_B0, FREESCALE_OUI_B1,
+		       FREESCALE_OUI_B2);
 }
 #endif
 
 #if !DT_INST_NODE_HAS_PROP(0, local_mac_address) || \
 	DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay) && \
-	!DT_INST_NODE_HAS_PROP(1, local_mac_address)
+		!DT_INST_NODE_HAS_PROP(1, local_mac_address)
 static void generate_eth0_unique_mac(uint8_t *mac_addr)
 {
 	/* Trivially "hash" up to 128 bits of MCU unique identifier */
@@ -992,7 +975,8 @@ static void generate_eth0_unique_mac(uint8_t *mac_addr)
 }
 #endif
 
-#if DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay) && !DT_INST_NODE_HAS_PROP(1, local_mac_address)
+#if DT_NODE_HAS_STATUS(DT_DRV_INST(1), okay) && \
+	!DT_INST_NODE_HAS_PROP(1, local_mac_address)
 static void generate_eth1_unique_mac(uint8_t *mac_addr)
 {
 	generate_eth0_unique_mac(mac_addr);
@@ -1043,21 +1027,14 @@ static void eth_mcux_init(const struct device *dev)
 	}
 
 	if (IS_ENABLED(CONFIG_ETH_MCUX_HW_ACCELERATION)) {
-		enet_config.txAccelerConfig |=
-			kENET_TxAccelIpCheckEnabled |
-			kENET_TxAccelProtoCheckEnabled;
-		enet_config.rxAccelerConfig |=
-			kENET_RxAccelIpCheckEnabled |
-			kENET_RxAccelProtoCheckEnabled;
+		enet_config.txAccelerConfig |= kENET_TxAccelIpCheckEnabled |
+					       kENET_TxAccelProtoCheckEnabled;
+		enet_config.rxAccelerConfig |= kENET_RxAccelIpCheckEnabled |
+					       kENET_RxAccelProtoCheckEnabled;
 	}
 
-	ENET_Init(context->base,
-		  &context->enet_handle,
-		  &enet_config,
-		  &buffer_config,
-		  context->mac_addr,
-		  sys_clock);
-
+	ENET_Init(context->base, &context->enet_handle, &enet_config,
+		  &buffer_config, context->mac_addr, sys_clock);
 
 #if defined(CONFIG_PTP_CLOCK_MCUX)
 	ENET_AddMulticastGroup(context->base, ptp_multicast);
@@ -1068,7 +1045,7 @@ static void eth_mcux_init(const struct device *dev)
 	context->ptp_config.txPtpTsData = ptp_tx_buffer;
 	context->ptp_config.channel = kENET_PtpTimerChannel1;
 	context->ptp_config.ptp1588ClockSrc_Hz =
-					CONFIG_ETH_MCUX_PTP_CLOCK_SRC_HZ;
+		CONFIG_ETH_MCUX_PTP_CLOCK_SRC_HZ;
 	context->clk_ratio = 1.0;
 
 	ENET_Ptp1588Configure(context->base, &context->enet_handle,
@@ -1105,12 +1082,10 @@ static int eth_init(const struct device *dev)
 	context->clock_dev = device_get_binding(context->clock_name);
 #endif
 
-	k_sem_init(&context->tx_buf_sem,
-		   0, CONFIG_ETH_MCUX_TX_BUFFERS);
+	k_sem_init(&context->tx_buf_sem, 0, CONFIG_ETH_MCUX_TX_BUFFERS);
 	k_work_init(&context->phy_work, eth_mcux_phy_work);
 	k_delayed_work_init(&context->delayed_phy_work,
 			    eth_mcux_delayed_phy_work);
-
 
 	/* Initialize/override OUI which may not be correct in
 	 * devicetree.
@@ -1124,17 +1099,16 @@ static int eth_init(const struct device *dev)
 
 	eth_mcux_init(dev);
 
-	LOG_DBG("MAC %02x:%02x:%02x:%02x:%02x:%02x",
-		context->mac_addr[0], context->mac_addr[1],
-		context->mac_addr[2], context->mac_addr[3],
-		context->mac_addr[4], context->mac_addr[5]);
+	LOG_DBG("MAC %02x:%02x:%02x:%02x:%02x:%02x", context->mac_addr[0],
+		context->mac_addr[1], context->mac_addr[2],
+		context->mac_addr[3], context->mac_addr[4],
+		context->mac_addr[5]);
 
 	return 0;
 }
 
 #if defined(CONFIG_NET_IPV6)
-static void net_if_mcast_cb(struct net_if *iface,
-			    const struct in6_addr *addr,
+static void net_if_mcast_cb(struct net_if *iface, const struct in6_addr *addr,
 			    bool is_joined)
 {
 	const struct device *dev = net_if_get_device(iface);
@@ -1163,8 +1137,7 @@ static void eth_iface_init(struct net_if *iface)
 #endif /* CONFIG_NET_IPV6 */
 
 	net_if_set_link_addr(iface, context->mac_addr,
-			     sizeof(context->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(context->mac_addr), NET_LINK_ETHERNET);
 
 	/* For VLAN, this value is only used to get the correct L2 driver.
 	 * The iface pointer in context should contain the main interface
@@ -1186,14 +1159,12 @@ static enum ethernet_hw_caps eth_mcux_get_capabilities(const struct device *dev)
 
 	return ETHERNET_HW_VLAN | ETHERNET_LINK_10BASE_T |
 #if defined(CONFIG_PTP_CLOCK_MCUX)
-		ETHERNET_PTP |
+	       ETHERNET_PTP |
 #endif
 #if defined(CONFIG_ETH_MCUX_HW_ACCELERATION)
-		ETHERNET_HW_TX_CHKSUM_OFFLOAD |
-		ETHERNET_HW_RX_CHKSUM_OFFLOAD |
+	       ETHERNET_HW_TX_CHKSUM_OFFLOAD | ETHERNET_HW_RX_CHKSUM_OFFLOAD |
 #endif
-		ETHERNET_AUTO_NEGOTIATION_SET |
-		ETHERNET_LINK_100BASE_T;
+	       ETHERNET_AUTO_NEGOTIATION_SET | ETHERNET_LINK_100BASE_T;
 }
 
 #if defined(CONFIG_PTP_CLOCK_MCUX)
@@ -1206,12 +1177,12 @@ static const struct device *eth_mcux_get_ptp_clock(const struct device *dev)
 #endif
 
 static const struct ethernet_api api_funcs = {
-	.iface_api.init		= eth_iface_init,
+	.iface_api.init = eth_iface_init,
 #if defined(CONFIG_PTP_CLOCK_MCUX)
-	.get_ptp_clock		= eth_mcux_get_ptp_clock,
+	.get_ptp_clock = eth_mcux_get_ptp_clock,
 #endif
-	.get_capabilities	= eth_mcux_get_capabilities,
-	.send			= eth_tx,
+	.get_capabilities = eth_mcux_get_capabilities,
+	.send = eth_tx,
 };
 
 #if defined(CONFIG_PTP_CLOCK_MCUX)
@@ -1299,23 +1270,23 @@ static struct eth_context eth_0_context = {
 #endif
 };
 
-ETH_NET_DEVICE_INIT(eth_mcux_0, DT_INST_LABEL(0), eth_init,
-		    ETH_MCUX_PM_FUNC, &eth_0_context, NULL,
-		    CONFIG_ETH_INIT_PRIORITY, &api_funcs, NET_ETH_MTU);
+ETH_NET_DEVICE_INIT(eth_mcux_0, DT_INST_LABEL(0), eth_init, ETH_MCUX_PM_FUNC,
+		    &eth_0_context, NULL, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
+		    NET_ETH_MTU);
 
 static void eth_0_config_func(void)
 {
 #if DT_INST_IRQ_HAS_NAME(0, rx)
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, rx, irq),
-		    DT_INST_IRQ_BY_NAME(0, rx, priority),
-		    eth_mcux_rx_isr, DEVICE_GET(eth_mcux_0), 0);
+		    DT_INST_IRQ_BY_NAME(0, rx, priority), eth_mcux_rx_isr,
+		    DEVICE_GET(eth_mcux_0), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, rx, irq));
 #endif
 
 #if DT_INST_IRQ_HAS_NAME(0, tx)
 	IRQ_CONNECT(DT_INST_IRQ_BY_NAME(0, tx, irq),
-		    DT_INST_IRQ_BY_NAME(0, tx, priority),
-		    eth_mcux_tx_isr, DEVICE_GET(eth_mcux_0), 0);
+		    DT_INST_IRQ_BY_NAME(0, tx, priority), eth_mcux_tx_isr,
+		    DEVICE_GET(eth_mcux_0), 0);
 	irq_enable(DT_INST_IRQ_BY_NAME(0, tx, irq));
 #endif
 
@@ -1365,9 +1336,9 @@ static struct eth_context eth_1_context = {
 #endif
 };
 
-ETH_NET_DEVICE_INIT(eth_mcux_1, DT_INST_LABEL(1), eth_init,
-		    ETH_MCUX_PM_FUNC, &eth_1_context, NULL,
-		    CONFIG_ETH_INIT_PRIORITY, &api_funcs, NET_ETH_MTU);
+ETH_NET_DEVICE_INIT(eth_mcux_1, DT_INST_LABEL(1), eth_init, ETH_MCUX_PM_FUNC,
+		    &eth_1_context, NULL, CONFIG_ETH_INIT_PRIORITY, &api_funcs,
+		    NET_ETH_MTU);
 
 static void eth_1_config_func(void)
 {
@@ -1379,9 +1350,11 @@ static void eth_1_config_func(void)
 #endif
 
 #if defined(CONFIG_PTP_CLOCK_MCUX)
-	IRQ_CONNECT(DT_IRQ_BY_NAME(PTP_INST_NODEID(1), ieee1588_tmr, irq),
-		    DT_IRQ_BY_NAME(PTP_INST_NODEID(1), ieee1588_tmr, priority),
-		    eth_mcux_ptp_isr, DEVICE_GET(eth_mcux_1), 0);
+		IRQ_CONNECT(DT_IRQ_BY_NAME(PTP_INST_NODEID(1), ieee1588_tmr,
+					   irq),
+			    DT_IRQ_BY_NAME(PTP_INST_NODEID(1), ieee1588_tmr,
+					   priority),
+			    eth_mcux_ptp_isr, DEVICE_GET(eth_mcux_1), 0);
 	irq_enable(DT_IRQ_BY_NAME(PTP_INST_NODEID(1), ieee1588_tmr, irq));
 #endif
 }
@@ -1394,8 +1367,7 @@ struct ptp_context {
 
 static struct ptp_context ptp_mcux_0_context;
 
-static int ptp_clock_mcux_set(const struct device *dev,
-			      struct net_ptp_time *tm)
+static int ptp_clock_mcux_set(const struct device *dev, struct net_ptp_time *tm)
 {
 	struct ptp_context *ptp_context = dev->data;
 	struct eth_context *context = ptp_context->eth_context;
@@ -1408,8 +1380,7 @@ static int ptp_clock_mcux_set(const struct device *dev,
 	return 0;
 }
 
-static int ptp_clock_mcux_get(const struct device *dev,
-			      struct net_ptp_time *tm)
+static int ptp_clock_mcux_get(const struct device *dev, struct net_ptp_time *tm)
 {
 	struct ptp_context *ptp_context = dev->data;
 	struct eth_context *context = ptp_context->eth_context;
@@ -1466,8 +1437,8 @@ static int ptp_clock_mcux_rate_adjust(const struct device *dev, float ratio)
 	ratio *= context->clk_ratio;
 
 	/* Limit possible ratio. */
-	if ((ratio > 1.0 + 1.0/(2 * hw_inc)) ||
-			(ratio < 1.0 - 1.0/(2 * hw_inc))) {
+	if ((ratio > 1.0 + 1.0 / (2 * hw_inc)) ||
+	    (ratio < 1.0 - 1.0 / (2 * hw_inc))) {
 		return -EINVAL;
 	}
 
@@ -1479,7 +1450,7 @@ static int ptp_clock_mcux_rate_adjust(const struct device *dev, float ratio)
 		val = 1.0 / (hw_inc * (1.0 - ratio));
 	} else if (ratio > 1.0) {
 		corr = hw_inc + 1;
-		val = 1.0 / (hw_inc * (ratio-1.0));
+		val = 1.0 / (hw_inc * (ratio - 1.0));
 	} else {
 		val = 0;
 		corr = hw_inc;
@@ -1493,7 +1464,6 @@ static int ptp_clock_mcux_rate_adjust(const struct device *dev, float ratio)
 	} else {
 		mul = val;
 	}
-
 
 	ENET_Ptp1588AdjustTimer(context->base, corr, mul);
 

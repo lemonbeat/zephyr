@@ -20,13 +20,13 @@ LOG_MODULE_REGISTER(modem_gsm, CONFIG_MODEM_LOG_LEVEL);
 #include "modem_cmd_handler.h"
 #include "../console/gsm_mux.h"
 
-#define GSM_CMD_READ_BUF       128
-#define GSM_CMD_AT_TIMEOUT     K_SECONDS(2)
-#define GSM_CMD_SETUP_TIMEOUT  K_SECONDS(6)
-#define GSM_RX_STACK_SIZE      CONFIG_MODEM_GSM_RX_STACK_SIZE
-#define GSM_RECV_MAX_BUF       30
-#define GSM_RECV_BUF_SIZE      128
-#define GSM_BUF_ALLOC_TIMEOUT  K_SECONDS(1)
+#define GSM_CMD_READ_BUF 128
+#define GSM_CMD_AT_TIMEOUT K_SECONDS(2)
+#define GSM_CMD_SETUP_TIMEOUT K_SECONDS(6)
+#define GSM_RX_STACK_SIZE CONFIG_MODEM_GSM_RX_STACK_SIZE
+#define GSM_RECV_MAX_BUF 30
+#define GSM_RECV_BUF_SIZE 128
+#define GSM_BUF_ALLOC_TIMEOUT K_SECONDS(1)
 
 /* During the modem setup, we first create DLCI control channel and then
  * PPP and AT channels. Currently the modem does not create possible GNSS
@@ -65,8 +65,8 @@ static struct gsm_modem {
 	bool setup_done : 1;
 } gsm;
 
-NET_BUF_POOL_DEFINE(gsm_recv_pool, GSM_RECV_MAX_BUF, GSM_RECV_BUF_SIZE,
-		    0, NULL);
+NET_BUF_POOL_DEFINE(gsm_recv_pool, GSM_RECV_MAX_BUF, GSM_RECV_BUF_SIZE, 0,
+		    NULL);
 K_KERNEL_STACK_DEFINE(gsm_rx_stack, GSM_RX_STACK_SIZE);
 
 struct k_thread gsm_rx_thread;
@@ -107,12 +107,12 @@ static struct modem_cmd response_cmds[] = {
 };
 
 #if defined(CONFIG_MODEM_SHELL)
-#define MDM_MANUFACTURER_LENGTH  10
-#define MDM_MODEL_LENGTH         16
-#define MDM_REVISION_LENGTH      64
-#define MDM_IMEI_LENGTH          16
-#define MDM_IMSI_LENGTH          16
-#define MDM_ICCID_LENGTH         32
+#define MDM_MANUFACTURER_LENGTH 10
+#define MDM_MODEL_LENGTH 16
+#define MDM_REVISION_LENGTH 64
+#define MDM_IMEI_LENGTH 16
+#define MDM_IMSI_LENGTH 16
+#define MDM_ICCID_LENGTH 32
 
 struct modem_info {
 	char mdm_manufacturer[MDM_MANUFACTURER_LENGTH];
@@ -152,8 +152,8 @@ MODEM_CMD_DEFINE(on_cmd_atcmdinfo_model)
 	size_t out_len;
 
 	out_len = net_buf_linearize(minfo.mdm_model,
-				    sizeof(minfo.mdm_model) - 1,
-				    data->rx_buf, 0, len);
+				    sizeof(minfo.mdm_model) - 1, data->rx_buf,
+				    0, len);
 	minfo.mdm_model[out_len] = '\0';
 	LOG_INF("Model: %s", log_strdup(minfo.mdm_model));
 
@@ -206,8 +206,9 @@ MODEM_CMD_DEFINE(on_cmd_atcmdinfo_iccid)
 {
 	size_t out_len;
 
-	out_len = net_buf_linearize(minfo.mdm_iccid, sizeof(minfo.mdm_iccid) - 1,
-				    data->rx_buf, 0, len);
+	out_len = net_buf_linearize(minfo.mdm_iccid,
+				    sizeof(minfo.mdm_iccid) - 1, data->rx_buf,
+				    0, len);
 	minfo.mdm_iccid[out_len] = '\0';
 	if (minfo.mdm_iccid[0] == '+') {
 		/* Seen on U-blox SARA: "+CCID: nnnnnnnnnnnnnnnnnnnn".
@@ -216,9 +217,9 @@ MODEM_CMD_DEFINE(on_cmd_atcmdinfo_iccid)
 		char *p = strchr(minfo.mdm_iccid, ' ');
 
 		if (p) {
-			size_t len = strlen(p+1);
+			size_t len = strlen(p + 1);
 
-			memmove(minfo.mdm_iccid, p+1, len+1);
+			memmove(minfo.mdm_iccid, p + 1, len + 1);
 		}
 	}
 	LOG_INF("ICCID: %s", log_strdup(minfo.mdm_iccid));
@@ -241,10 +242,10 @@ static struct setup_cmd setup_cmds[] = {
 	SETUP_CMD("AT+CGMI", "", on_cmd_atcmdinfo_manufacturer, 0U, ""),
 	SETUP_CMD("AT+CGMM", "", on_cmd_atcmdinfo_model, 0U, ""),
 	SETUP_CMD("AT+CGMR", "", on_cmd_atcmdinfo_revision, 0U, ""),
-# if defined(CONFIG_MODEM_SIM_NUMBERS)
+#if defined(CONFIG_MODEM_SIM_NUMBERS)
 	SETUP_CMD("AT+CIMI", "", on_cmd_atcmdinfo_imsi, 0U, ""),
 	SETUP_CMD("AT+CCID", "", on_cmd_atcmdinfo_iccid, 0U, ""),
-# endif
+#endif
 	SETUP_CMD("AT+CGSN", "", on_cmd_atcmdinfo_imei, 0U, ""),
 #endif
 
@@ -266,20 +267,15 @@ static int gsm_setup_mccmno(struct gsm_modem *gsm)
 
 	if (CONFIG_MODEM_GSM_MANUAL_MCCMNO[0]) {
 		/* use manual MCC/MNO entry */
-		ret = modem_cmd_send(&gsm->context.iface,
-				     &gsm->context.cmd_handler,
-				     NULL, 0,
-				     "AT+COPS=1,2,\""
-				     CONFIG_MODEM_GSM_MANUAL_MCCMNO
-				     "\"",
-				     &gsm->sem_response,
-				     GSM_CMD_AT_TIMEOUT);
+		ret = modem_cmd_send(
+			&gsm->context.iface, &gsm->context.cmd_handler, NULL, 0,
+			"AT+COPS=1,2,\"" CONFIG_MODEM_GSM_MANUAL_MCCMNO "\"",
+			&gsm->sem_response, GSM_CMD_AT_TIMEOUT);
 	} else {
 		/* register operator automatically */
 		ret = modem_cmd_send(&gsm->context.iface,
-				     &gsm->context.cmd_handler,
-				     NULL, 0, "AT+COPS=0,0",
-				     &gsm->sem_response,
+				     &gsm->context.cmd_handler, NULL, 0,
+				     "AT+COPS=0,0", &gsm->sem_response,
 				     GSM_CMD_AT_TIMEOUT);
 	}
 
@@ -292,7 +288,8 @@ static int gsm_setup_mccmno(struct gsm_modem *gsm)
 
 static void set_ppp_carrier_on(struct gsm_modem *gsm)
 {
-	const struct device *ppp_dev = device_get_binding(CONFIG_NET_PPP_DRV_NAME);
+	const struct device *ppp_dev =
+		device_get_binding(CONFIG_NET_PPP_DRV_NAME);
 	const struct ppp_api *api;
 
 	if (!ppp_dev) {
@@ -312,12 +309,11 @@ static void gsm_finalize_connection(struct gsm_modem *gsm)
 		ret = modem_cmd_send(&gsm->context.iface,
 				     &gsm->context.cmd_handler,
 				     &response_cmds[0],
-				     ARRAY_SIZE(response_cmds),
-				     "AT", &gsm->sem_response,
-				     GSM_CMD_AT_TIMEOUT);
+				     ARRAY_SIZE(response_cmds), "AT",
+				     &gsm->sem_response, GSM_CMD_AT_TIMEOUT);
 		if (ret < 0) {
-			LOG_DBG("modem setup returned %d, %s",
-				ret, "retrying...");
+			LOG_DBG("modem setup returned %d, %s", ret,
+				"retrying...");
 			(void)k_delayed_work_submit(&gsm->gsm_configure_work,
 						    K_SECONDS(1));
 			return;
@@ -328,13 +324,11 @@ static void gsm_finalize_connection(struct gsm_modem *gsm)
 
 	ret = modem_cmd_handler_setup_cmds(&gsm->context.iface,
 					   &gsm->context.cmd_handler,
-					   setup_cmds,
-					   ARRAY_SIZE(setup_cmds),
+					   setup_cmds, ARRAY_SIZE(setup_cmds),
 					   &gsm->sem_response,
 					   GSM_CMD_SETUP_TIMEOUT);
 	if (ret < 0) {
-		LOG_DBG("modem setup returned %d, %s",
-			ret, "retrying...");
+		LOG_DBG("modem setup returned %d, %s", ret, "retrying...");
 		(void)k_delayed_work_submit(&gsm->gsm_configure_work,
 					    K_SECONDS(1));
 		return;
@@ -342,15 +336,12 @@ static void gsm_finalize_connection(struct gsm_modem *gsm)
 
 	LOG_DBG("modem setup returned %d, %s", ret, "enable PPP");
 
-	ret = modem_cmd_handler_setup_cmds(&gsm->context.iface,
-					   &gsm->context.cmd_handler,
-					   connect_cmds,
-					   ARRAY_SIZE(connect_cmds),
-					   &gsm->sem_response,
-					   GSM_CMD_SETUP_TIMEOUT);
+	ret = modem_cmd_handler_setup_cmds(
+		&gsm->context.iface, &gsm->context.cmd_handler, connect_cmds,
+		ARRAY_SIZE(connect_cmds), &gsm->sem_response,
+		GSM_CMD_SETUP_TIMEOUT);
 	if (ret < 0) {
-		LOG_DBG("modem setup returned %d, %s",
-			ret, "retrying...");
+		LOG_DBG("modem setup returned %d, %s", ret, "retrying...");
 		(void)k_delayed_work_submit(&gsm->gsm_configure_work,
 					    K_SECONDS(1));
 		return;
@@ -375,15 +366,13 @@ static void gsm_finalize_connection(struct gsm_modem *gsm)
 			LOG_DBG("iface %suart error %d", "AT ", ret);
 		} else {
 			/* Do a test and try to send AT command to modem */
-			ret = modem_cmd_send(&gsm->context.iface,
-					     &gsm->context.cmd_handler,
-					     &response_cmds[0],
-					     ARRAY_SIZE(response_cmds),
-					     "AT", &gsm->sem_response,
-					     GSM_CMD_AT_TIMEOUT);
+			ret = modem_cmd_send(
+				&gsm->context.iface, &gsm->context.cmd_handler,
+				&response_cmds[0], ARRAY_SIZE(response_cmds),
+				"AT", &gsm->sem_response, GSM_CMD_AT_TIMEOUT);
 			if (ret < 0) {
-				LOG_DBG("modem setup returned %d, %s",
-					ret, "AT cmds failed");
+				LOG_DBG("modem setup returned %d, %s", ret,
+					"AT cmds failed");
 			} else {
 				LOG_INF("AT channel %d connected to %s",
 					DLCI_AT, gsm->at_dev->name);
@@ -399,34 +388,32 @@ static int mux_enable(struct gsm_modem *gsm)
 	/* Turn on muxing */
 	if (IS_ENABLED(CONFIG_MODEM_GSM_SIMCOM)) {
 		ret = modem_cmd_send(
-			&gsm->context.iface,
-			&gsm->context.cmd_handler,
-			&response_cmds[0],
-			ARRAY_SIZE(response_cmds),
+			&gsm->context.iface, &gsm->context.cmd_handler,
+			&response_cmds[0], ARRAY_SIZE(response_cmds),
 #if defined(SIMCOM_LTE)
 			/* FIXME */
 			/* Some SIMCOM modems can set the channels */
 			/* Control channel always at DLCI 0 */
 			"AT+CMUXSRVPORT=0,0;"
 			/* PPP should be at DLCI 1 */
-			"+CMUXSRVPORT=" STRINGIFY(DLCI_PPP) ",1;"
-			/* AT should be at DLCI 2 */
-			"+CMUXSRVPORT=" STRINGIFY(DLCI_AT) ",1;"
+			"+CMUXSRVPORT=" STRINGIFY(
+				DLCI_PPP) ",1;"
+					  /* AT should be at DLCI 2 */
+					  "+CMUXSRVPORT=" STRINGIFY(
+						  DLCI_AT) ",1;"
 #else
 			"AT"
 #endif
-			"+CMUX=0,0,5,"
-			STRINGIFY(CONFIG_GSM_MUX_MRU_DEFAULT_LEN),
-			&gsm->sem_response,
-			GSM_CMD_AT_TIMEOUT);
+							   "+CMUX=0,0,5," STRINGIFY(
+								   CONFIG_GSM_MUX_MRU_DEFAULT_LEN),
+			&gsm->sem_response, GSM_CMD_AT_TIMEOUT);
 	} else {
 		/* Generic GSM modem */
 		ret = modem_cmd_send(&gsm->context.iface,
 				     &gsm->context.cmd_handler,
 				     &response_cmds[0],
-				     ARRAY_SIZE(response_cmds),
-				     "AT+CMUX=0", &gsm->sem_response,
-				     GSM_CMD_AT_TIMEOUT);
+				     ARRAY_SIZE(response_cmds), "AT+CMUX=0",
+				     &gsm->sem_response, GSM_CMD_AT_TIMEOUT);
 	}
 
 	if (ret < 0) {
@@ -471,9 +458,10 @@ static int mux_attach(const struct device *mux, const struct device *uart,
 
 static void mux_setup(struct k_work *work)
 {
-	struct gsm_modem *gsm = CONTAINER_OF(work, struct gsm_modem,
-					     gsm_configure_work);
-	const struct device *uart = device_get_binding(CONFIG_MODEM_GSM_UART_NAME);
+	struct gsm_modem *gsm =
+		CONTAINER_OF(work, struct gsm_modem, gsm_configure_work);
+	const struct device *uart =
+		device_get_binding(CONFIG_MODEM_GSM_UART_NAME);
 	int ret;
 
 	switch (gsm->state) {
@@ -542,8 +530,8 @@ static void mux_setup(struct k_work *work)
 			goto fail;
 		}
 
-		LOG_INF("PPP channel %d connected to %s",
-			DLCI_PPP, gsm->ppp_dev->name);
+		LOG_INF("PPP channel %d connected to %s", DLCI_PPP,
+			gsm->ppp_dev->name);
 
 		gsm_finalize_connection(gsm);
 		break;
@@ -558,18 +546,15 @@ fail:
 
 static void gsm_configure(struct k_work *work)
 {
-	struct gsm_modem *gsm = CONTAINER_OF(work, struct gsm_modem,
-					     gsm_configure_work);
+	struct gsm_modem *gsm =
+		CONTAINER_OF(work, struct gsm_modem, gsm_configure_work);
 	int ret = -1;
 
 	LOG_DBG("Starting modem %p configuration", gsm);
 
-	ret = modem_cmd_send(&gsm->context.iface,
-			     &gsm->context.cmd_handler,
-			     &response_cmds[0],
-			     ARRAY_SIZE(response_cmds),
-			     "AT", &gsm->sem_response,
-			     GSM_CMD_AT_TIMEOUT);
+	ret = modem_cmd_send(&gsm->context.iface, &gsm->context.cmd_handler,
+			     &response_cmds[0], ARRAY_SIZE(response_cmds), "AT",
+			     &gsm->sem_response, GSM_CMD_AT_TIMEOUT);
 	if (ret < 0) {
 		LOG_DBG("modem not ready %d", ret);
 
@@ -590,8 +575,8 @@ static void gsm_configure(struct k_work *work)
 			gsm->mux_enabled = false;
 		}
 
-		LOG_DBG("GSM muxing %s", gsm->mux_enabled ? "enabled" :
-							    "disabled");
+		LOG_DBG("GSM muxing %s",
+			gsm->mux_enabled ? "enabled" : "disabled");
 
 		if (gsm->mux_enabled) {
 			gsm->state = STATE_INIT;
@@ -643,8 +628,8 @@ static int gsm_init(const struct device *device)
 #if defined(CONFIG_MODEM_SIM_NUMBERS)
 	gsm->context.data_imsi = minfo.mdm_imsi;
 	gsm->context.data_iccid = minfo.mdm_iccid;
-#endif	/* CONFIG_MODEM_SIM_NUMBERS */
-#endif	/* CONFIG_MODEM_SHELL */
+#endif /* CONFIG_MODEM_SIM_NUMBERS */
+#endif /* CONFIG_MODEM_SHELL */
 
 	gsm->gsm_data.rx_rb_buf = &gsm->gsm_rx_rb_buf[0];
 	gsm->gsm_data.rx_rb_buf_len = sizeof(gsm->gsm_rx_rb_buf);
@@ -662,13 +647,13 @@ static int gsm_init(const struct device *device)
 		return r;
 	}
 
-	LOG_DBG("iface->read %p iface->write %p",
-		gsm->context.iface.read, gsm->context.iface.write);
+	LOG_DBG("iface->read %p iface->write %p", gsm->context.iface.read,
+		gsm->context.iface.write);
 
 	k_thread_create(&gsm_rx_thread, gsm_rx_stack,
 			K_KERNEL_STACK_SIZEOF(gsm_rx_stack),
-			(k_thread_entry_t) gsm_rx,
-			gsm, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+			(k_thread_entry_t)gsm_rx, gsm, NULL, NULL,
+			K_PRIO_COOP(7), 0, K_NO_WAIT);
 	k_thread_name_set(&gsm_rx_thread, "gsm_rx");
 
 	k_delayed_work_init(&gsm->gsm_configure_work, gsm_configure);

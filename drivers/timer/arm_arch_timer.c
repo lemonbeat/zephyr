@@ -10,10 +10,11 @@
 #include <spinlock.h>
 #include <arch/cpu.h>
 
-#define CYC_PER_TICK	((uint64_t)sys_clock_hw_cycles_per_sec() \
-			/ (uint64_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC)
-#define MAX_TICKS	INT32_MAX
-#define MIN_DELAY	(1000)
+#define CYC_PER_TICK                               \
+	((uint64_t)sys_clock_hw_cycles_per_sec() / \
+	 (uint64_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define MAX_TICKS INT32_MAX
+#define MIN_DELAY (1000)
 
 static struct k_spinlock lock;
 static volatile uint64_t last_cycle;
@@ -25,7 +26,8 @@ static void arm_arch_timer_compare_isr(const void *arg)
 	k_spinlock_key_t key = k_spin_lock(&lock);
 
 	uint64_t curr_cycle = arm_arch_timer_count();
-	uint32_t delta_ticks = (uint32_t)((curr_cycle - last_cycle) / CYC_PER_TICK);
+	uint32_t delta_ticks =
+		(uint32_t)((curr_cycle - last_cycle) / CYC_PER_TICK);
 
 	last_cycle += delta_ticks * CYC_PER_TICK;
 
@@ -66,8 +68,8 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 		return;
 	}
 
-	ticks = (ticks == K_TICKS_FOREVER) ? MAX_TICKS : \
-		MIN(MAX_TICKS,  MAX(ticks - 1,  0));
+	ticks = (ticks == K_TICKS_FOREVER) ? MAX_TICKS :
+						   MIN(MAX_TICKS, MAX(ticks - 1, 0));
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
 	uint64_t curr_cycle = arm_arch_timer_count();
@@ -95,8 +97,8 @@ uint32_t z_clock_elapsed(void)
 	}
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
-	uint32_t ret = (uint32_t)((arm_arch_timer_count() - last_cycle)
-		    / CYC_PER_TICK);
+	uint32_t ret = (uint32_t)((arm_arch_timer_count() - last_cycle) /
+				  CYC_PER_TICK);
 
 	k_spin_unlock(&lock, key);
 	return ret;

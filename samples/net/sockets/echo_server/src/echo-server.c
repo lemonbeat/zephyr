@@ -38,8 +38,7 @@ K_APPMEM_PARTITION_DEFINE(app_partition);
 struct k_mem_domain app_domain;
 #endif
 
-#define EVENT_MASK (NET_EVENT_L4_CONNECTED | \
-		    NET_EVENT_L4_DISCONNECTED)
+#define EVENT_MASK (NET_EVENT_L4_CONNECTED | NET_EVENT_L4_DISCONNECTED)
 
 APP_DMEM struct configs conf = {
 	.ipv4 = {
@@ -141,8 +140,7 @@ static void init_app(void)
 #if defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS)
 #if defined(CONFIG_NET_SAMPLE_CERTS_WITH_SC)
 	err = tls_credential_add(SERVER_CERTIFICATE_TAG,
-				 TLS_CREDENTIAL_CA_CERTIFICATE,
-				 ca_certificate,
+				 TLS_CREDENTIAL_CA_CERTIFICATE, ca_certificate,
 				 sizeof(ca_certificate));
 	if (err < 0) {
 		LOG_ERR("Failed to register CA certificate: %d", err);
@@ -157,35 +155,29 @@ static void init_app(void)
 		LOG_ERR("Failed to register public certificate: %d", err);
 	}
 
-
 	err = tls_credential_add(SERVER_CERTIFICATE_TAG,
-				 TLS_CREDENTIAL_PRIVATE_KEY,
-				 private_key, sizeof(private_key));
+				 TLS_CREDENTIAL_PRIVATE_KEY, private_key,
+				 sizeof(private_key));
 	if (err < 0) {
 		LOG_ERR("Failed to register private key: %d", err);
 	}
 #endif
 
 #if defined(CONFIG_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED)
-	err = tls_credential_add(PSK_TAG,
-				TLS_CREDENTIAL_PSK,
-				psk,
-				sizeof(psk));
+	err = tls_credential_add(PSK_TAG, TLS_CREDENTIAL_PSK, psk, sizeof(psk));
 	if (err < 0) {
 		LOG_ERR("Failed to register PSK: %d", err);
 	}
-	err = tls_credential_add(PSK_TAG,
-				TLS_CREDENTIAL_PSK_ID,
-				psk_id,
-				sizeof(psk_id) - 1);
+	err = tls_credential_add(PSK_TAG, TLS_CREDENTIAL_PSK_ID, psk_id,
+				 sizeof(psk_id) - 1);
 	if (err < 0) {
 		LOG_ERR("Failed to register PSK ID: %d", err);
 	}
 #endif
 
 	if (IS_ENABLED(CONFIG_NET_CONNECTION_MANAGER)) {
-		net_mgmt_init_event_callback(&mgmt_cb,
-					     event_handler, EVENT_MASK);
+		net_mgmt_init_event_callback(&mgmt_cb, event_handler,
+					     EVENT_MASK);
 		net_mgmt_add_event_callback(&mgmt_cb);
 
 		net_conn_mgr_resend_status();
@@ -194,8 +186,7 @@ static void init_app(void)
 	init_vlan();
 }
 
-static int cmd_sample_quit(const struct shell *shell,
-			  size_t argc, char *argv[])
+static int cmd_sample_quit(const struct shell *shell, size_t argc, char *argv[])
 {
 	want_to_quit = true;
 
@@ -207,14 +198,13 @@ static int cmd_sample_quit(const struct shell *shell,
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sample_commands,
-	SHELL_CMD(quit, NULL,
-		  "Quit the sample application\n",
-		  cmd_sample_quit),
-	SHELL_SUBCMD_SET_END
-);
+			       SHELL_CMD(quit, NULL,
+					 "Quit the sample application\n",
+					 cmd_sample_quit),
+			       SHELL_SUBCMD_SET_END);
 
-SHELL_CMD_REGISTER(sample, &sample_commands,
-		   "Sample application commands", NULL);
+SHELL_CMD_REGISTER(sample, &sample_commands, "Sample application commands",
+		   NULL);
 
 void main(void)
 {

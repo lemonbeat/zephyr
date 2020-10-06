@@ -12,7 +12,7 @@ LOG_MODULE_REGISTER(net_socket_can_sample, LOG_LEVEL_DBG);
 #include <net/socket.h>
 #include <net/socket_can.h>
 
-#define PRIORITY  k_thread_priority_get(k_current_get())
+#define PRIORITY k_thread_priority_get(k_current_get())
 #define STACKSIZE 1024
 #define SLEEP_PERIOD K_SECONDS(1)
 
@@ -29,21 +29,19 @@ static struct k_thread rx_data;
 
 #define CLOSE_PERIOD 15
 
-static const struct zcan_filter zfilter = {
-	.id_type = CAN_STANDARD_IDENTIFIER,
-	.rtr = CAN_DATAFRAME,
-	.std_id = 0x1,
-	.rtr_mask = 1,
-	.std_id_mask = CAN_STD_ID_MASK
-};
+static const struct zcan_filter zfilter = { .id_type = CAN_STANDARD_IDENTIFIER,
+					    .rtr = CAN_DATAFRAME,
+					    .std_id = 0x1,
+					    .rtr_mask = 1,
+					    .std_id_mask = CAN_STD_ID_MASK };
 
 static struct can_filter filter;
 
 static void tx(int *can_fd)
 {
 	int fd = POINTER_TO_INT(can_fd);
-	struct zcan_frame msg = {0};
-	struct can_frame frame = {0};
+	struct zcan_frame msg = { 0 };
+	struct can_frame frame = { 0 };
 	int ret, i;
 
 	msg.dlc = 8U;
@@ -116,8 +114,8 @@ static void rx(int *can_fd, int *do_close_period,
 		memset(&frame, 0, sizeof(frame));
 		addr_len = sizeof(can_addr);
 
-		ret = recvfrom(fd, &frame, sizeof(struct can_frame),
-			       0, (struct sockaddr *)&can_addr, &addr_len);
+		ret = recvfrom(fd, &frame, sizeof(struct can_frame), 0,
+			       (struct sockaddr *)&can_addr, &addr_len);
 		if (ret < 0) {
 			LOG_ERR("[%d] Cannot receive CAN message (%d)", fd,
 				-errno);
@@ -204,8 +202,8 @@ static int setup_socket(void)
 	/* Delay TX startup so that RX is ready to receive */
 	tx_tid = k_thread_create(&tx_data, tx_stack,
 				 K_THREAD_STACK_SIZEOF(tx_stack),
-				 (k_thread_entry_t)tx, INT_TO_POINTER(fd),
-				 NULL, NULL, PRIORITY, 0, K_SECONDS(1));
+				 (k_thread_entry_t)tx, INT_TO_POINTER(fd), NULL,
+				 NULL, PRIORITY, 0, K_SECONDS(1));
 	if (!tx_tid) {
 		ret = -ENOENT;
 		errno = -ret;
@@ -226,8 +224,8 @@ static int setup_socket(void)
 					 K_THREAD_STACK_SIZEOF(rx_stack),
 					 (k_thread_entry_t)rx,
 					 INT_TO_POINTER(fd),
-					 INT_TO_POINTER(CLOSE_PERIOD),
-					 &filter, PRIORITY, 0, K_NO_WAIT);
+					 INT_TO_POINTER(CLOSE_PERIOD), &filter,
+					 PRIORITY, 0, K_NO_WAIT);
 		if (!rx_tid) {
 			ret = -ENOENT;
 			errno = -ret;

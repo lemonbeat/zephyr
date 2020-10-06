@@ -41,7 +41,6 @@ GEN_OFFSET_SYM(_thread_arch_t, u_stack_top);
 GEN_OFFSET_SYM(_thread_arch_t, priv_stack_start);
 #endif
 
-
 /* ARCv2-specific IRQ stack frame structure member offsets */
 GEN_OFFSET_SYM(_isf_t, r0);
 GEN_OFFSET_SYM(_isf_t, r1);

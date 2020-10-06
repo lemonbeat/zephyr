@@ -26,11 +26,11 @@ void posix_atomic_halt_cpu(unsigned int imask);
 
 void posix_irq_enable(unsigned int irq);
 void posix_irq_disable(unsigned int irq);
-int  posix_irq_is_enabled(unsigned int irq);
+int posix_irq_is_enabled(unsigned int irq);
 unsigned int posix_irq_lock(void);
 void posix_irq_unlock(unsigned int key);
 void posix_irq_full_unlock(void);
-int  posix_get_current_irq(void);
+int posix_get_current_irq(void);
 #ifdef CONFIG_IRQ_OFFLOAD
 void posix_irq_offload(void (*routine)(const void *), const void *parameter);
 #endif

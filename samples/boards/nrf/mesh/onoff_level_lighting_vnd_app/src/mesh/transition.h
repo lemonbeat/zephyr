@@ -13,10 +13,7 @@
 #define UNKNOWN_VALUE 0x3F
 #define DEVICE_SPECIFIC_RESOLUTION 10
 
-enum transition_types {
-	MOVE = 0x01,
-	NON_MOVE
-};
+enum transition_types { MOVE = 0x01, NON_MOVE };
 
 struct transition {
 	bool just_started;

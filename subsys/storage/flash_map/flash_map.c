@@ -27,7 +27,7 @@ struct layout_data {
 	uint32_t area_idx;
 	uint32_t area_off;
 	uint32_t area_len;
-	void *ret;        /* struct flash_area* or struct flash_sector* */
+	void *ret; /* struct flash_area* or struct flash_sector* */
 	uint32_t ret_idx;
 	uint32_t ret_len;
 	int status;
@@ -98,8 +98,7 @@ static inline bool is_in_flash_area_bounds(const struct flash_area *fa,
  * "bail_value" if the callback should exit early.
  */
 static bool should_bail(const struct flash_pages_info *info,
-						struct layout_data *data,
-						bool *bail_value)
+			struct layout_data *data, bool *bail_value)
 {
 	if (info->start_offset < data->area_off) {
 		*bail_value = true;
@@ -123,7 +122,7 @@ static bool should_bail(const struct flash_pages_info *info,
  * flash_area_to_sectors() is removed.
  */
 static int flash_area_layout(int idx, uint32_t *cnt, void *ret,
-flash_page_cb cb, struct layout_data *cb_data)
+			     flash_page_cb cb, struct layout_data *cb_data)
 {
 	const struct device *flash_dev;
 
@@ -218,7 +217,7 @@ int flash_area_write(const struct flash_area *fa, off_t off, const void *src,
 	rc = flash_write(flash_dev, fa->fa_off + off, (void *)src, len);
 
 	/* Ignore errors here - this does not affect write operation */
-	(void) flash_write_protection_set(flash_dev, true);
+	(void)flash_write_protection_set(flash_dev, true);
 
 	return rc;
 }
@@ -242,7 +241,7 @@ int flash_area_erase(const struct flash_area *fa, off_t off, size_t len)
 	rc = flash_erase(flash_dev, fa->fa_off + off, len);
 
 	/* Ignore errors here - this does not affect write operation */
-	(void) flash_write_protection_set(flash_dev, true);
+	(void)flash_write_protection_set(flash_dev, true);
 
 	return rc;
 }
@@ -302,15 +301,14 @@ int flash_area_check_int_sha256(const struct flash_area *fa,
 			to_read = fac->clen - pos;
 		}
 
-		rc = flash_read(dev, (fa->fa_off + fac->off + pos),
-				fac->rbuf, to_read);
+		rc = flash_read(dev, (fa->fa_off + fac->off + pos), fac->rbuf,
+				to_read);
 		if (rc != 0) {
 			return rc;
 		}
 
-		if (tc_sha256_update(&sha,
-				     fac->rbuf,
-				     to_read) != TC_CRYPTO_SUCCESS) {
+		if (tc_sha256_update(&sha, fac->rbuf, to_read) !=
+		    TC_CRYPTO_SUCCESS) {
 			return -ESRCH;
 		}
 	}

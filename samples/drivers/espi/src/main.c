@@ -15,34 +15,34 @@
 LOG_MODULE_DECLARE(espi, CONFIG_ESPI_LOG_LEVEL);
 
 /* eSPI host entity address  */
-#define DEST_SLV_ADDR         0x02u
-#define SRC_SLV_ADDR          0x21u
+#define DEST_SLV_ADDR 0x02u
+#define SRC_SLV_ADDR 0x21u
 
 /* Temperature command opcode */
-#define OOB_CMDCODE           0x01u
-#define OOB_RESPONSE_LEN      0x05u
-#define OOB_RESPONSE_INDEX    0x03u
+#define OOB_CMDCODE 0x01u
+#define OOB_RESPONSE_LEN 0x05u
+#define OOB_RESPONSE_INDEX 0x03u
 
 /* Maximum bytes for OOB transactions */
-#define MAX_RESP_SIZE         20u
+#define MAX_RESP_SIZE 20u
 
 /* eSPI flash parameters */
-#define MAX_TEST_BUF_SIZE     1024u
-#define MAX_FLASH_REQUEST     64u
-#define TARGET_FLASH_REGION   0x72000ul
+#define MAX_TEST_BUF_SIZE 1024u
+#define MAX_FLASH_REQUEST 64u
+#define TARGET_FLASH_REGION 0x72000ul
 
-#define ESPI_FREQ_20MHZ       20u
-#define ESPI_FREQ_25MHZ       25u
-#define ESPI_FREQ_66MHZ       66u
+#define ESPI_FREQ_20MHZ 20u
+#define ESPI_FREQ_25MHZ 25u
+#define ESPI_FREQ_66MHZ 66u
 
-#define K_WAIT_DELAY          100u
+#define K_WAIT_DELAY 100u
 
 /* eSPI event */
-#define EVENT_MASK            0x0000FFFFu
-#define EVENT_DETAILS_MASK    0xFFFF0000u
-#define EVENT_DETAILS_POS     16u
-#define EVENT_TYPE(x)         (x & EVENT_MASK)
-#define EVENT_DETAILS(x)      ((x & EVENT_DETAILS_MASK) >> EVENT_DETAILS_POS)
+#define EVENT_MASK 0x0000FFFFu
+#define EVENT_DETAILS_MASK 0xFFFF0000u
+#define EVENT_DETAILS_POS 16u
+#define EVENT_TYPE(x) (x & EVENT_MASK)
+#define EVENT_DETAILS(x) ((x & EVENT_DETAILS_MASK) >> EVENT_DETAILS_POS)
 
 struct oob_header {
 	uint8_t dest_slave_addr;
@@ -51,22 +51,22 @@ struct oob_header {
 	uint8_t src_slave_addr;
 };
 
-#define PWR_SEQ_TIMEOUT    3000u
+#define PWR_SEQ_TIMEOUT 3000u
 
 /* The devicetree node identifier for the board power rails pins. */
 #define BRD_PWR_NODE DT_INST(0, microchip_mec15xx_board_power)
 
 #if DT_NODE_HAS_STATUS(BRD_PWR_NODE, okay)
-#define BRD_PWR_PWRGD           DT_GPIO_LABEL(BRD_PWR_NODE, pwrg_gpios)
-#define BRD_PWR_RSMRST          DT_GPIO_LABEL(BRD_PWR_NODE, rsm_gpios)
-#define BRD_PWR_RSMRST_PIN      DT_GPIO_PIN(BRD_PWR_NODE, rsm_gpios)
-#define BRD_PWR_PWRGD_PIN       DT_GPIO_PIN(BRD_PWR_NODE, pwrg_gpios)
+#define BRD_PWR_PWRGD DT_GPIO_LABEL(BRD_PWR_NODE, pwrg_gpios)
+#define BRD_PWR_RSMRST DT_GPIO_LABEL(BRD_PWR_NODE, rsm_gpios)
+#define BRD_PWR_RSMRST_PIN DT_GPIO_PIN(BRD_PWR_NODE, rsm_gpios)
+#define BRD_PWR_PWRGD_PIN DT_GPIO_PIN(BRD_PWR_NODE, pwrg_gpios)
 
 static const struct device *pwrgd_dev;
 static const struct device *rsm_dev;
 #endif
 
-#define ESPI_DEV      DT_LABEL(DT_NODELABEL(espi0))
+#define ESPI_DEV DT_LABEL(DT_NODELABEL(espi0))
 
 static const struct device *espi_dev;
 static struct espi_callback espi_bus_cb;
@@ -89,8 +89,7 @@ static void host_warn_handler(uint32_t signal, uint32_t status)
 		if (!IS_ENABLED(CONFIG_ESPI_AUTOMATIC_WARNING_ACKNOWLEDGE)) {
 			LOG_INF("HOST RST ACK %d", status);
 			espi_send_vwire(espi_dev,
-					ESPI_VWIRE_SIGNAL_HOST_RST_ACK,
-					status);
+					ESPI_VWIRE_SIGNAL_HOST_RST_ACK, status);
 		}
 		break;
 	case ESPI_VWIRE_SIGNAL_SUS_WARN:
@@ -118,8 +117,7 @@ static void espi_reset_handler(const struct device *dev,
 }
 
 /* eSPI logical channels enable/disable event handler */
-static void espi_ch_handler(const struct device *dev,
-			    struct espi_callback *cb,
+static void espi_ch_handler(const struct device *dev, struct espi_callback *cb,
 			    struct espi_event event)
 {
 	if (event.evt_type == ESPI_BUS_EVENT_CHANNEL_READY) {
@@ -155,8 +153,7 @@ static void vwire_handler(const struct device *dev, struct espi_callback *cb,
 			break;
 		case ESPI_VWIRE_SIGNAL_SUS_WARN:
 		case ESPI_VWIRE_SIGNAL_HOST_RST_WARN:
-			host_warn_handler(event.evt_details,
-					      event.evt_data);
+			host_warn_handler(event.evt_details, event.evt_data);
 			break;
 		}
 	}
@@ -238,8 +235,7 @@ int espi_init(void)
 }
 
 #if DT_NODE_HAS_STATUS(BRD_PWR_NODE, okay)
-static int wait_for_pin(const struct device *dev, uint8_t pin,
-			uint16_t timeout,
+static int wait_for_pin(const struct device *dev, uint8_t pin, uint16_t timeout,
 			int exp_level)
 {
 	uint16_t loop_cnt = timeout;
@@ -271,8 +267,8 @@ static int wait_for_pin(const struct device *dev, uint8_t pin,
 #endif
 
 static int wait_for_vwire(const struct device *espi_dev,
-			  enum espi_vwire_signal signal,
-			  uint16_t timeout, uint8_t exp_level)
+			  enum espi_vwire_signal signal, uint16_t timeout,
+			  uint8_t exp_level)
 {
 	int ret;
 	uint8_t level;
@@ -373,7 +369,7 @@ int read_test_block(uint8_t *buf, uint32_t start_flash_adr, uint16_t block_len)
 {
 	uint8_t i = 0;
 	uint32_t flash_addr = start_flash_adr;
-	uint16_t transactions = block_len/MAX_FLASH_REQUEST;
+	uint16_t transactions = block_len / MAX_FLASH_REQUEST;
 	int ret = 0;
 	struct espi_flash_packet pckt;
 
@@ -400,7 +396,7 @@ int write_test_block(uint8_t *buf, uint32_t start_flash_adr, uint16_t block_len)
 {
 	uint8_t i = 0;
 	uint32_t flash_addr = start_flash_adr;
-	uint16_t transactions = block_len/MAX_FLASH_REQUEST;
+	uint16_t transactions = block_len / MAX_FLASH_REQUEST;
 	int ret = 0;
 	struct espi_flash_packet pckt;
 
@@ -466,8 +462,8 @@ static int espi_flash_test(uint32_t start_flash_addr, uint8_t blocks)
 				 sizeof(flash_write_buf));
 
 		if (cmp != 0) {
-			LOG_ERR("eSPI read mismmatch at %d expected %x",
-				cmp, pattern);
+			LOG_ERR("eSPI read mismmatch at %d expected %x", cmp,
+				pattern);
 		}
 
 		flash_addr += sizeof(flash_read_buf);
@@ -579,23 +575,20 @@ int espi_test(void)
 	ret = gpio_pin_configure(pwrgd_dev, BRD_PWR_PWRGD_PIN,
 				 GPIO_INPUT | GPIO_ACTIVE_HIGH);
 	if (ret) {
-		LOG_ERR("Unable to configure %d:%d",
-			BRD_PWR_PWRGD_PIN, ret);
+		LOG_ERR("Unable to configure %d:%d", BRD_PWR_PWRGD_PIN, ret);
 		return ret;
 	}
 
 	ret = gpio_pin_configure(rsm_dev, BRD_PWR_RSMRST_PIN,
 				 GPIO_OUTPUT | GPIO_ACTIVE_HIGH);
 	if (ret) {
-		LOG_ERR("Unable to config %d: %d",
-			BRD_PWR_RSMRST_PIN, ret);
+		LOG_ERR("Unable to config %d: %d", BRD_PWR_RSMRST_PIN, ret);
 		return ret;
 	}
 
 	ret = gpio_pin_set(rsm_dev, BRD_PWR_RSMRST_PIN, 0);
 	if (ret) {
-		LOG_ERR("Unable to initialize %d",
-			BRD_PWR_RSMRST_PIN);
+		LOG_ERR("Unable to initialize %d", BRD_PWR_RSMRST_PIN);
 		return -1;
 	}
 #endif
@@ -603,8 +596,7 @@ int espi_test(void)
 	espi_init();
 
 #if DT_NODE_HAS_STATUS(BRD_PWR_NODE, okay)
-	ret = wait_for_pin(pwrgd_dev, BRD_PWR_PWRGD_PIN,
-			   PWR_SEQ_TIMEOUT, 1);
+	ret = wait_for_pin(pwrgd_dev, BRD_PWR_PWRGD_PIN, PWR_SEQ_TIMEOUT, 1);
 	if (ret) {
 		LOG_ERR("RSMRST_PWRGD timeout");
 		return ret;
@@ -632,15 +624,13 @@ int espi_test(void)
 	k_sleep(K_SECONDS(2));
 
 	do {
-		vw_ch_sts = espi_get_channel_status(espi_dev,
-						    ESPI_CHANNEL_VWIRE);
+		vw_ch_sts =
+			espi_get_channel_status(espi_dev, ESPI_CHANNEL_VWIRE);
 		k_busy_wait(100);
 	} while (!vw_ch_sts);
 
-
 	send_slave_bootdone();
 #endif
-
 
 #ifdef CONFIG_ESPI_FLASH_CHANNEL
 	/* Flash operation need to be perform before VW handshake or
@@ -651,8 +641,8 @@ int espi_test(void)
 	bool flash_sts;
 
 	do {
-		flash_sts = espi_get_channel_status(espi_dev,
-						    ESPI_CHANNEL_FLASH);
+		flash_sts =
+			espi_get_channel_status(espi_dev, ESPI_CHANNEL_FLASH);
 		k_busy_wait(100);
 	} while (!flash_sts);
 
@@ -677,7 +667,7 @@ int espi_test(void)
 		int temp;
 
 		ret = get_pch_temp(espi_dev, &temp);
-		if (ret)  {
+		if (ret) {
 			LOG_ERR("eSPI OOB transaction failed %d", ret);
 		} else {
 			LOG_INF("Temp: %d ", temp);

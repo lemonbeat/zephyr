@@ -36,9 +36,9 @@ static inline void xor16(uint8_t *dst, const uint8_t *a, const uint8_t *b)
 }
 
 /* pmsg is assumed to have the nonce already present in bytes 1-13 */
-static int ccm_calculate_X0(const uint8_t key[16], const uint8_t *aad, uint8_t aad_len,
-			    size_t mic_size, uint8_t msg_len, uint8_t b[16],
-			    uint8_t X0[16])
+static int ccm_calculate_X0(const uint8_t key[16], const uint8_t *aad,
+			    uint8_t aad_len, size_t mic_size, uint8_t msg_len,
+			    uint8_t b[16], uint8_t X0[16])
 {
 	int i, j, err;
 
@@ -95,8 +95,9 @@ static int ccm_calculate_X0(const uint8_t key[16], const uint8_t *aad, uint8_t a
 }
 
 static int ccm_auth(const uint8_t key[16], uint8_t nonce[13],
-		    const uint8_t *cleartext_msg, size_t msg_len, const uint8_t *aad,
-		    size_t aad_len, uint8_t *mic, size_t mic_size)
+		    const uint8_t *cleartext_msg, size_t msg_len,
+		    const uint8_t *aad, size_t aad_len, uint8_t *mic,
+		    size_t mic_size)
 {
 	uint8_t b[16], Xn[16], s0[16];
 	uint16_t blk_cnt, last_blk;
@@ -178,17 +179,17 @@ static int ccm_crypt(const uint8_t key[16], const uint8_t nonce[13],
 			xor16(&out_msg[j * 16], s_i, &in_msg[j * 16]);
 		} else {
 			for (i = 0; i < last_blk; i++) {
-				out_msg[(j * 16) + i] =
-					in_msg[(j * 16) + i] ^ s_i[i];
+				out_msg[(j * 16) + i] = in_msg[(j * 16) + i] ^
+							s_i[i];
 			}
 		}
 	}
 	return 0;
 }
 
-int bt_ccm_decrypt(const uint8_t key[16], uint8_t nonce[13], const uint8_t *enc_msg,
-		   size_t msg_len, const uint8_t *aad, size_t aad_len,
-		   uint8_t *out_msg, size_t mic_size)
+int bt_ccm_decrypt(const uint8_t key[16], uint8_t nonce[13],
+		   const uint8_t *enc_msg, size_t msg_len, const uint8_t *aad,
+		   size_t aad_len, uint8_t *out_msg, size_t mic_size)
 {
 	uint8_t mic[16];
 

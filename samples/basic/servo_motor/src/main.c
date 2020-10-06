@@ -26,10 +26,10 @@
  * Unlike pulse width, the PWM period is not a critical parameter for
  * motor control. 20 ms is commonly used.
  */
-#define PERIOD_USEC	(20U * USEC_PER_MSEC)
-#define STEP_USEC	100
-#define MIN_PULSE_USEC	700
-#define MAX_PULSE_USEC	2300
+#define PERIOD_USEC (20U * USEC_PER_MSEC)
+#define STEP_USEC 100
+#define MIN_PULSE_USEC 700
+#define MAX_PULSE_USEC 2300
 
 enum direction {
 	DOWN,

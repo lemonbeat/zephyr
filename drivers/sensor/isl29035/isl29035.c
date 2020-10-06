@@ -28,12 +28,12 @@ static int isl29035_sample_fetch(const struct device *dev,
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);
 
 	if (i2c_reg_read_byte(drv_data->i2c, ISL29035_I2C_ADDRESS,
-				ISL29035_DATA_MSB_REG, &msb) < 0) {
+			      ISL29035_DATA_MSB_REG, &msb) < 0) {
 		return -EIO;
 	}
 
 	if (i2c_reg_read_byte(drv_data->i2c, ISL29035_I2C_ADDRESS,
-				ISL29035_DATA_LSB_REG, &lsb) < 0) {
+			      ISL29035_DATA_LSB_REG, &lsb) < 0) {
 		return -EIO;
 	}
 
@@ -100,16 +100,15 @@ static int isl29035_init(const struct device *dev)
 	}
 
 	if (i2c_reg_write_byte(drv_data->i2c, ISL29035_I2C_ADDRESS,
-				 ISL29035_COMMAND_II_REG, 0) < 0) {
+			       ISL29035_COMMAND_II_REG, 0) < 0) {
 		LOG_DBG("Failed to clear COMMAND-II.");
 		return -EIO;
 	}
 
 	/* set operation mode */
 	if (i2c_reg_update_byte(drv_data->i2c, ISL29035_I2C_ADDRESS,
-				  ISL29035_COMMAND_I_REG,
-				  ISL29035_OPMODE_MASK,
-				  ISL29035_ACTIVE_OPMODE_BITS) < 0) {
+				ISL29035_COMMAND_I_REG, ISL29035_OPMODE_MASK,
+				ISL29035_ACTIVE_OPMODE_BITS) < 0) {
 		LOG_DBG("Failed to set opmode.");
 		return -EIO;
 	}
@@ -125,8 +124,7 @@ static int isl29035_init(const struct device *dev)
 
 	/* set ADC resolution */
 	if (i2c_reg_update_byte(drv_data->i2c, ISL29035_I2C_ADDRESS,
-				ISL29035_COMMAND_II_REG,
-				ISL29035_ADC_RES_MASK,
+				ISL29035_COMMAND_II_REG, ISL29035_ADC_RES_MASK,
 				ISL29035_ADC_RES_BITS) < 0) {
 		LOG_DBG("Failed to set ADC resolution.");
 		return -EIO;

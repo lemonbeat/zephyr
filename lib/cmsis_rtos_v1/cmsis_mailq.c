@@ -39,17 +39,17 @@ void *osMailAlloc(osMailQId queue_id, uint32_t millisec)
 	}
 
 	if (millisec == 0U) {
-		retval = k_mem_slab_alloc(
-				(struct k_mem_slab *)(queue_def->pool),
-				(void **)&ptr, K_NO_WAIT);
+		retval =
+			k_mem_slab_alloc((struct k_mem_slab *)(queue_def->pool),
+					 (void **)&ptr, K_NO_WAIT);
 	} else if (millisec == osWaitForever) {
-		retval = k_mem_slab_alloc(
-				(struct k_mem_slab *)(queue_def->pool),
-				(void **)&ptr, K_FOREVER);
+		retval =
+			k_mem_slab_alloc((struct k_mem_slab *)(queue_def->pool),
+					 (void **)&ptr, K_FOREVER);
 	} else {
-		retval = k_mem_slab_alloc(
-				(struct k_mem_slab *)(queue_def->pool),
-				(void **)&ptr, K_MSEC(millisec));
+		retval =
+			k_mem_slab_alloc((struct k_mem_slab *)(queue_def->pool),
+					 (void **)&ptr, K_MSEC(millisec));
 	}
 
 	if (retval == 0) {
@@ -73,17 +73,17 @@ void *osMailCAlloc(osMailQId queue_id, uint32_t millisec)
 	}
 
 	if (millisec == 0U) {
-		retval = k_mem_slab_alloc(
-				(struct k_mem_slab *)(queue_def->pool),
-				(void **)&ptr, K_NO_WAIT);
+		retval =
+			k_mem_slab_alloc((struct k_mem_slab *)(queue_def->pool),
+					 (void **)&ptr, K_NO_WAIT);
 	} else if (millisec == osWaitForever) {
-		retval = k_mem_slab_alloc(
-				(struct k_mem_slab *)(queue_def->pool),
-				(void **)&ptr, K_FOREVER);
+		retval =
+			k_mem_slab_alloc((struct k_mem_slab *)(queue_def->pool),
+					 (void **)&ptr, K_FOREVER);
 	} else {
-		retval = k_mem_slab_alloc(
-				(struct k_mem_slab *)(queue_def->pool),
-				(void **)&ptr, K_MSEC(millisec));
+		retval =
+			k_mem_slab_alloc((struct k_mem_slab *)(queue_def->pool),
+					 (void **)&ptr, K_MSEC(millisec));
 	}
 
 	if (retval == 0) {
@@ -126,7 +126,7 @@ osEvent osMailGet(osMailQId queue_id, uint32_t millisec)
 {
 	osMailQDef_t *queue_def = (osMailQDef_t *)queue_id;
 	struct k_mbox_msg mmsg;
-	osEvent evt = {0};
+	osEvent evt = { 0 };
 	int retval;
 
 	if (queue_def == NULL) {
@@ -170,7 +170,7 @@ osStatus osMailFree(osMailQId queue_id, void *mail)
 {
 	osMailQDef_t *queue_def = (osMailQDef_t *)queue_id;
 
-	k_mem_slab_free((struct k_mem_slab *)(queue_def->pool), (void *) &mail);
+	k_mem_slab_free((struct k_mem_slab *)(queue_def->pool), (void *)&mail);
 
 	return osOK;
 }

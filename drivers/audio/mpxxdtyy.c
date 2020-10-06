@@ -12,25 +12,20 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(mpxxdtyy);
 
-#define CHANNEL_MASK	0x55
+#define CHANNEL_MASK 0x55
 
 static uint8_t ch_demux[128] = {
-  0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03,
-  0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03,
-  0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07,
-  0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07,
-  0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03,
-  0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03,
-  0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07,
-  0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07,
-  0x08, 0x09, 0x08, 0x09, 0x0a, 0x0b, 0x0a, 0x0b,
-  0x08, 0x09, 0x08, 0x09, 0x0a, 0x0b, 0x0a, 0x0b,
-  0x0c, 0x0d, 0x0c, 0x0d, 0x0e, 0x0f, 0x0e, 0x0f,
-  0x0c, 0x0d, 0x0c, 0x0d, 0x0e, 0x0f, 0x0e, 0x0f,
-  0x08, 0x09, 0x08, 0x09, 0x0a, 0x0b, 0x0a, 0x0b,
-  0x08, 0x09, 0x08, 0x09, 0x0a, 0x0b, 0x0a, 0x0b,
-  0x0c, 0x0d, 0x0c, 0x0d, 0x0e, 0x0f, 0x0e, 0x0f,
-  0x0c, 0x0d, 0x0c, 0x0d, 0x0e, 0x0f, 0x0e, 0x0f
+	0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03, 0x00, 0x01, 0x00, 0x01,
+	0x02, 0x03, 0x02, 0x03, 0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07,
+	0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07, 0x00, 0x01, 0x00, 0x01,
+	0x02, 0x03, 0x02, 0x03, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03,
+	0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07, 0x04, 0x05, 0x04, 0x05,
+	0x06, 0x07, 0x06, 0x07, 0x08, 0x09, 0x08, 0x09, 0x0a, 0x0b, 0x0a, 0x0b,
+	0x08, 0x09, 0x08, 0x09, 0x0a, 0x0b, 0x0a, 0x0b, 0x0c, 0x0d, 0x0c, 0x0d,
+	0x0e, 0x0f, 0x0e, 0x0f, 0x0c, 0x0d, 0x0c, 0x0d, 0x0e, 0x0f, 0x0e, 0x0f,
+	0x08, 0x09, 0x08, 0x09, 0x0a, 0x0b, 0x0a, 0x0b, 0x08, 0x09, 0x08, 0x09,
+	0x0a, 0x0b, 0x0a, 0x0b, 0x0c, 0x0d, 0x0c, 0x0d, 0x0e, 0x0f, 0x0e, 0x0f,
+	0x0c, 0x0d, 0x0c, 0x0d, 0x0e, 0x0f, 0x0e, 0x0f
 };
 
 static uint8_t left_channel(uint8_t a, uint8_t b)
@@ -55,8 +50,8 @@ uint16_t sw_filter_lib_init(const struct device *dev, struct dmic_cfg *cfg)
 
 	/* calculate oversampling factor based on pdm clock */
 	for (factor = 64U; factor <= 128U; factor += 64U) {
-		uint32_t pdm_bit_clk = (audio_freq * factor *
-				     cfg->channel.req_num_chan);
+		uint32_t pdm_bit_clk =
+			(audio_freq * factor * cfg->channel.req_num_chan);
 
 		if (pdm_bit_clk >= cfg->io.min_pdm_clk_freq &&
 		    pdm_bit_clk <= cfg->io.max_pdm_clk_freq) {
@@ -84,9 +79,8 @@ uint16_t sw_filter_lib_init(const struct device *dev, struct dmic_cfg *cfg)
 	return factor;
 }
 
-int sw_filter_lib_run(TPDMFilter_InitStruct *pdm_filter,
-		      void *pdm_block, void *pcm_block,
-		      size_t pdm_size, size_t pcm_size)
+int sw_filter_lib_run(TPDMFilter_InitStruct *pdm_filter, void *pdm_block,
+		      void *pcm_block, size_t pdm_size, size_t pcm_size)
 {
 	int i;
 	uint8_t a, b;
@@ -95,19 +89,22 @@ int sw_filter_lib_run(TPDMFilter_InitStruct *pdm_filter,
 		return -EINVAL;
 	}
 
-	for (i = 0; i < pdm_size/2; i++) {
+	for (i = 0; i < pdm_size / 2; i++) {
 		switch (pdm_filter[0].In_MicChannels) {
 		case 1: /* MONO */
-			((uint16_t *)pdm_block)[i] = HTONS(((uint16_t *)pdm_block)[i]);
+			((uint16_t *)pdm_block)[i] =
+				HTONS(((uint16_t *)pdm_block)[i]);
 			break;
 
 		case 2: /* STEREO */
 			if (pdm_filter[0].In_MicChannels > 1) {
-				a = ((uint8_t *)pdm_block)[2*i];
-				b = ((uint8_t *)pdm_block)[2*i + 1];
+				a = ((uint8_t *)pdm_block)[2 * i];
+				b = ((uint8_t *)pdm_block)[2 * i + 1];
 
-				((uint8_t *)pdm_block)[2*i] = left_channel(a, b);
-				((uint8_t *)pdm_block)[2*i + 1] = right_channel(a, b);
+				((uint8_t *)pdm_block)[2 * i] =
+					left_channel(a, b);
+				((uint8_t *)pdm_block)[2 * i + 1] =
+					right_channel(a, b);
 			}
 			break;
 
@@ -119,16 +116,16 @@ int sw_filter_lib_run(TPDMFilter_InitStruct *pdm_filter,
 	switch (pdm_filter[0].Decimation) {
 	case 64:
 		for (i = 0; i < pdm_filter[0].In_MicChannels; i++) {
-			Open_PDM_Filter_64(&((uint8_t *) pdm_block)[i],
-					   &((uint16_t *) pcm_block)[i],
+			Open_PDM_Filter_64(&((uint8_t *)pdm_block)[i],
+					   &((uint16_t *)pcm_block)[i],
 					   pdm_filter->MaxVolume,
 					   &pdm_filter[i]);
 		}
 		break;
 	case 128:
 		for (i = 0; i < pdm_filter[0].In_MicChannels; i++) {
-			Open_PDM_Filter_128(&((uint8_t *) pdm_block)[i],
-					    &((uint16_t *) pcm_block)[i],
+			Open_PDM_Filter_128(&((uint8_t *)pdm_block)[i],
+					    &((uint16_t *)pcm_block)[i],
 					    pdm_filter->MaxVolume,
 					    &pdm_filter[i]);
 		}
@@ -142,9 +139,9 @@ int sw_filter_lib_run(TPDMFilter_InitStruct *pdm_filter,
 
 static const struct _dmic_ops mpxxdtyy_driver_api = {
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(i2s)
-	.configure		= mpxxdtyy_i2s_configure,
-	.trigger		= mpxxdtyy_i2s_trigger,
-	.read			= mpxxdtyy_i2s_read,
+	.configure = mpxxdtyy_i2s_configure,
+	.trigger = mpxxdtyy_i2s_trigger,
+	.read = mpxxdtyy_i2s_read,
 #endif /* DT_ANY_INST_ON_BUS_STATUS_OKAY(i2s) */
 };
 
@@ -166,5 +163,5 @@ static int mpxxdtyy_initialize(const struct device *dev)
 static struct mpxxdtyy_data mpxxdtyy_data;
 
 DEVICE_AND_API_INIT(mpxxdtyy, DT_INST_LABEL(0), mpxxdtyy_initialize,
-		&mpxxdtyy_data, NULL, POST_KERNEL,
-		CONFIG_AUDIO_DMIC_INIT_PRIORITY, &mpxxdtyy_driver_api);
+		    &mpxxdtyy_data, NULL, POST_KERNEL,
+		    CONFIG_AUDIO_DMIC_INIT_PRIORITY, &mpxxdtyy_driver_api);

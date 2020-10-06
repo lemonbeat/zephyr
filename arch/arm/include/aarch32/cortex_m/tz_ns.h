@@ -46,25 +46,23 @@
  *                  the functions have been called. This instruction must leave
  *                  r0-r3 unmodified.
  */
-#define __TZ_WRAP_FUNC_RAW(preface, name, postface, store_lr, load_lr) \
-	do { \
-		__asm__ volatile( \
-			".global "#preface"; .type "#preface", %function"); \
-		__asm__ volatile( \
-			".global "#name"; .type "#name", %function"); \
-		__asm__ volatile( \
-			".global "#postface"; .type "#postface", %function"); \
-		__asm__ volatile( \
-			store_lr "\n\t" \
-			"push {r0-r3}\n\t" \
-			"bl " #preface "\n\t" \
-			"pop {r0-r3}\n\t" \
-			"bl " #name " \n\t" \
-			"push {r0-r3}\n\t" \
-			"bl " #postface "\n\t" \
-			"pop {r0-r3}\n\t" \
-			load_lr "\n\t" \
-			::); \
+#define __TZ_WRAP_FUNC_RAW(preface, name, postface, store_lr, load_lr)     \
+	do {                                                               \
+		__asm__ volatile(".global " #preface "; .type " #preface   \
+				 ", %function");                           \
+		__asm__ volatile(".global " #name "; .type " #name         \
+				 ", %function");                           \
+		__asm__ volatile(".global " #postface "; .type " #postface \
+				 ", %function");                           \
+		__asm__ volatile(store_lr "\n\t"                           \
+					  "push {r0-r3}\n\t"               \
+					  "bl " #preface "\n\t"            \
+					  "pop {r0-r3}\n\t"                \
+					  "bl " #name " \n\t"              \
+					  "push {r0-r3}\n\t"               \
+					  "bl " #postface "\n\t"           \
+					  "pop {r0-r3}\n\t" load_lr        \
+					  "\n\t" ::);                      \
 	} while (0)
 
 /**
@@ -100,10 +98,9 @@
  *
  * See @ref __TZ_WRAP_FUNC_RAW for more information.
  */
-#define __TZ_WRAP_FUNC(preface, name, postface) \
+#define __TZ_WRAP_FUNC(preface, name, postface)                      \
 	__TZ_WRAP_FUNC_RAW(preface, name, postface, "push {r4, lr}", \
-			"pop {r4, pc}")
-
+			   "pop {r4, pc}")
 
 #ifdef CONFIG_ARM_FIRMWARE_USES_SECURE_ENTRY_FUNCS
 /**
@@ -132,9 +129,9 @@
  * @param ...   The rest of the signature of the function. This must be the same
  *              signature as the corresponding NS entry function.
  */
-#define TZ_THREAD_SAFE_NONSECURE_ENTRY_FUNC(name, ret, nsc_name, ...) \
-	ret __attribute__((naked)) name(__VA_ARGS__) \
-	{ \
+#define TZ_THREAD_SAFE_NONSECURE_ENTRY_FUNC(name, ret, nsc_name, ...)   \
+	ret __attribute__((naked)) name(__VA_ARGS__)                    \
+	{                                                               \
 		__TZ_WRAP_FUNC(k_sched_lock, nsc_name, k_sched_unlock); \
 	}
 

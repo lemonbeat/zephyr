@@ -31,44 +31,44 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "eth_stm32_hal_priv.h"
 
 #if defined(CONFIG_ETH_STM32_HAL_USE_DTCM_FOR_DMA_BUFFER) && \
-	    !DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_dtcm), okay)
+	!DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_dtcm), okay)
 #error DTCM for DMA buffer is activated but zephyr,dtcm is not present in dts
 #endif
 
-#define PHY_ADDR	CONFIG_ETH_STM32_HAL_PHY_ADDRESS
+#define PHY_ADDR CONFIG_ETH_STM32_HAL_PHY_ADDRESS
 
 #if defined(CONFIG_SOC_SERIES_STM32H7X)
 
-#define PHY_BSR  ((uint16_t)0x0001U)  /*!< Transceiver Basic Status Register */
-#define PHY_LINKED_STATUS  ((uint16_t)0x0004U)  /*!< Valid link established */
+#define PHY_BSR ((uint16_t)0x0001U) /*!< Transceiver Basic Status Register */
+#define PHY_LINKED_STATUS ((uint16_t)0x0004U) /*!< Valid link established */
 
-#define GET_FIRST_DMA_TX_DESC(heth)	(heth->Init.TxDesc)
-#define IS_ETH_DMATXDESC_OWN(dma_tx_desc)	(dma_tx_desc->DESC3 & \
-							ETH_DMATXNDESCRF_OWN)
+#define GET_FIRST_DMA_TX_DESC(heth) (heth->Init.TxDesc)
+#define IS_ETH_DMATXDESC_OWN(dma_tx_desc) \
+	(dma_tx_desc->DESC3 & ETH_DMATXNDESCRF_OWN)
 
-#define ETH_RXBUFNB	ETH_RX_DESC_CNT
-#define ETH_TXBUFNB	ETH_TX_DESC_CNT
+#define ETH_RXBUFNB ETH_RX_DESC_CNT
+#define ETH_TXBUFNB ETH_TX_DESC_CNT
 
-#define ETH_MEDIA_INTERFACE_MII		HAL_ETH_MII_MODE
-#define ETH_MEDIA_INTERFACE_RMII	HAL_ETH_RMII_MODE
+#define ETH_MEDIA_INTERFACE_MII HAL_ETH_MII_MODE
+#define ETH_MEDIA_INTERFACE_RMII HAL_ETH_RMII_MODE
 
-#define ETH_DMA_TX_TIMEOUT_MS	20U  /* transmit timeout in milliseconds */
+#define ETH_DMA_TX_TIMEOUT_MS 20U /* transmit timeout in milliseconds */
 
 /* Only one tx_buffer is sufficient to pass only 1 dma_buffer */
-#define ETH_TXBUF_DEF_NB	1U
+#define ETH_TXBUF_DEF_NB 1U
 #else
 
-#define GET_FIRST_DMA_TX_DESC(heth)	(heth->TxDesc)
-#define IS_ETH_DMATXDESC_OWN(dma_tx_desc)	(dma_tx_desc->Status & \
-							ETH_DMATXDESC_OWN)
+#define GET_FIRST_DMA_TX_DESC(heth) (heth->TxDesc)
+#define IS_ETH_DMATXDESC_OWN(dma_tx_desc) \
+	(dma_tx_desc->Status & ETH_DMATXDESC_OWN)
 
 #endif /* CONFIG_SOC_SERIES_STM32H7X */
 
 #if defined(CONFIG_ETH_STM32_HAL_USE_DTCM_FOR_DMA_BUFFER) && \
-	    DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_dtcm), okay)
-#define ETH_DMA_MEM	__dtcm_noinit_section
+	DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_dtcm), okay)
+#define ETH_DMA_MEM __dtcm_noinit_section
 #else
-#define ETH_DMA_MEM	__aligned(4)
+#define ETH_DMA_MEM __aligned(4)
 #endif /* CONFIG_ETH_STM32_HAL_USE_DTCM_FOR_DMA_BUFFER */
 
 #if defined(CONFIG_NOCACHE_MEMORY)
@@ -109,16 +109,16 @@ static void enable_canbus_eth_translator_filter(ETH_HandleTypeDef *heth,
 				  ETH_MACAHR_MBC_HBITS7_0;
 #else
 	/*enable filter 1 and ignore byte 5 and 6 for filtering*/
-	heth->Instance->MACA1HR = ETH_MACA1HR_AE |  ETH_MACA1HR_MBC_HBits15_8 |
+	heth->Instance->MACA1HR = ETH_MACA1HR_AE | ETH_MACA1HR_MBC_HBits15_8 |
 				  ETH_MACA1HR_MBC_HBits7_0;
-#endif  /* CONFIG_SOC_SERIES_STM32H7X */
+#endif /* CONFIG_SOC_SERIES_STM32H7X */
 }
 #endif /*CONFIG_NET_L2_CANBUS_ETH_TRANSLATOR*/
 
 static HAL_StatusTypeDef read_eth_phy_register(ETH_HandleTypeDef *heth,
-						uint32_t PHYAddr,
-						uint32_t PHYReg,
-						uint32_t *RegVal)
+					       uint32_t PHYAddr,
+					       uint32_t PHYReg,
+					       uint32_t *RegVal)
 {
 #if defined(CONFIG_SOC_SERIES_STM32H7X)
 	return HAL_ETH_ReadPHYRegister(heth, PHYAddr, PHYReg, RegVal);
@@ -192,7 +192,7 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 	}
 
 #if defined(CONFIG_SOC_SERIES_STM32H7X)
-	const uint32_t cur_tx_desc_idx = 0;  /* heth->TxDescList.CurTxDesc; */
+	const uint32_t cur_tx_desc_idx = 0; /* heth->TxDescList.CurTxDesc; */
 #endif
 
 	dma_tx_desc = GET_FIRST_DMA_TX_DESC(heth);
@@ -214,7 +214,7 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 #if defined(CONFIG_SOC_SERIES_STM32H7X)
 	ETH_BufferTypeDef tx_buffer_def[ETH_TXBUF_DEF_NB];
 
-	memset(tx_buffer_def, 0, ETH_TXBUF_DEF_NB*sizeof(ETH_BufferTypeDef));
+	memset(tx_buffer_def, 0, ETH_TXBUF_DEF_NB * sizeof(ETH_BufferTypeDef));
 
 	tx_buffer_def[cur_tx_desc_idx].buffer = dma_buffer;
 	tx_buffer_def[cur_tx_desc_idx].len = total_len;
@@ -240,9 +240,8 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 	/* Wait for end of TX buffer transmission */
 	/* If the semaphore timeout breaks, it means */
 	/* an error occurred or IT was not fired */
-	if (k_sem_take(&dev_data->tx_int_sem,
-			K_MSEC(ETH_DMA_TX_TIMEOUT_MS)) != 0) {
-
+	if (k_sem_take(&dev_data->tx_int_sem, K_MSEC(ETH_DMA_TX_TIMEOUT_MS)) !=
+	    0) {
 		LOG_ERR("HAL_ETH_TransmitIT tx_int_sem take timeout");
 		res = -EIO;
 
@@ -254,15 +253,13 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 		/* Error state is unrecoverable ? */
 		if (HAL_ETH_GetState(heth) == HAL_ETH_STATE_ERROR) {
 			LOG_ERR("%s: ETH in error state: errorcode:%x",
-				__func__,
-				HAL_ETH_GetError(heth));
+				__func__, HAL_ETH_GetError(heth));
 			/* TODO recover from error state by restarting eth */
 		}
 
 		/* Check for DMA errors */
 		if (HAL_ETH_GetDMAError(heth)) {
-			LOG_ERR("%s: ETH DMA error: dmaerror:%x",
-				__func__,
+			LOG_ERR("%s: ETH DMA error: dmaerror:%x", __func__,
 				HAL_ETH_GetDMAError(heth));
 			/* DMA fatal bus errors are putting in error state*/
 			/* TODO recover from this */
@@ -270,8 +267,7 @@ static int eth_tx(const struct device *dev, struct net_pkt *pkt)
 
 		/* Check for MAC errors */
 		if (HAL_ETH_GetDMAError(heth)) {
-			LOG_ERR("%s: ETH DMA error: macerror:%x",
-				__func__,
+			LOG_ERR("%s: ETH DMA error: macerror:%x", __func__,
 				HAL_ETH_GetDMAError(heth));
 			/* MAC errors are putting in error state*/
 			/* TODO recover from this */
@@ -411,8 +407,8 @@ release_desc:
 	/* Set Own bit in Rx descriptors: gives the buffers back to DMA */
 	for (int i = 0; i < heth->RxFrameInfos.SegCount; i++) {
 		dma_rx_desc->Status |= ETH_DMARXDESC_OWN;
-		dma_rx_desc = (ETH_DMADescTypeDef *)
-			(dma_rx_desc->Buffer2NextDescAddr);
+		dma_rx_desc =
+			(ETH_DMADescTypeDef *)(dma_rx_desc->Buffer2NextDescAddr);
 	}
 
 	/* Clear Segment_Count */
@@ -477,43 +473,45 @@ static void rx_thread(void *arg1, void *unused1, void *unused2)
 	__ASSERT_NO_MSG(dev_data != NULL);
 
 	while (1) {
-		res = k_sem_take(&dev_data->rx_int_sem,
+		res = k_sem_take(
+			&dev_data->rx_int_sem,
 			K_MSEC(CONFIG_ETH_STM32_CARRIER_CHECK_RX_IDLE_TIMEOUT_MS));
 		if (res == 0) {
 			/* semaphore taken, update link status and receive packets */
 			if (dev_data->link_up != true) {
 				dev_data->link_up = true;
-				net_eth_carrier_on(get_iface(dev_data,
-							     vlan_tag));
+				net_eth_carrier_on(
+					get_iface(dev_data, vlan_tag));
 			}
 			while ((pkt = eth_rx(dev, &vlan_tag)) != NULL) {
 				res = net_recv_data(net_pkt_iface(pkt), pkt);
 				if (res < 0) {
 					eth_stats_update_errors_rx(
-							net_pkt_iface(pkt));
+						net_pkt_iface(pkt));
 					LOG_ERR("Failed to enqueue frame "
-						"into RX queue: %d", res);
+						"into RX queue: %d",
+						res);
 					net_pkt_unref(pkt);
 				}
 			}
 		} else if (res == -EAGAIN) {
 			/* semaphore timeout period expired, check link status */
 			hal_ret = read_eth_phy_register(&dev_data->heth,
-				    PHY_ADDR, PHY_BSR, (uint32_t *) &status);
+							PHY_ADDR, PHY_BSR,
+							(uint32_t *)&status);
 			if (hal_ret == HAL_OK) {
-				if ((status & PHY_LINKED_STATUS) == PHY_LINKED_STATUS) {
+				if ((status & PHY_LINKED_STATUS) ==
+				    PHY_LINKED_STATUS) {
 					if (dev_data->link_up != true) {
 						dev_data->link_up = true;
-						net_eth_carrier_on(
-							get_iface(dev_data,
-								  vlan_tag));
+						net_eth_carrier_on(get_iface(
+							dev_data, vlan_tag));
 					}
 				} else {
 					if (dev_data->link_up != false) {
 						dev_data->link_up = false;
-						net_eth_carrier_off(
-							get_iface(dev_data,
-								  vlan_tag));
+						net_eth_carrier_off(get_iface(
+							dev_data, vlan_tag));
 					}
 				}
 			}
@@ -549,15 +547,13 @@ void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *heth_handle)
 	__ASSERT_NO_MSG(dev_data != NULL);
 
 	k_sem_give(&dev_data->tx_int_sem);
-
 }
 /* DMA and MAC errors callback only appear in H7 series */
 void HAL_ETH_DMAErrorCallback(ETH_HandleTypeDef *heth_handle)
 {
 	__ASSERT_NO_MSG(heth_handle != NULL);
 
-	LOG_ERR("%s errorcode:%x dmaerror:%x",
-		__func__,
+	LOG_ERR("%s errorcode:%x dmaerror:%x", __func__,
 		HAL_ETH_GetError(heth_handle),
 		HAL_ETH_GetDMAError(heth_handle));
 
@@ -576,16 +572,13 @@ void HAL_ETH_DMAErrorCallback(ETH_HandleTypeDef *heth_handle)
 	/* TODO Check if we were TX transmitting and the unlock semaphore */
 	/* To return the error as soon as possible else we'll just wait */
 	/* for the timeout */
-
-
 }
 void HAL_ETH_MACErrorCallback(ETH_HandleTypeDef *heth_handle)
 {
 	__ASSERT_NO_MSG(heth_handle != NULL);
 
 	/* MAC errors dumping */
-	LOG_ERR("%s errorcode:%x macerror:%x",
-		__func__,
+	LOG_ERR("%s errorcode:%x macerror:%x", __func__,
 		HAL_ETH_GetError(heth_handle),
 		HAL_ETH_GetMACError(heth_handle));
 
@@ -639,14 +632,14 @@ static int eth_initialize(const struct device *dev)
 
 	/* enable clock */
 	ret = clock_control_on(dev_data->clock,
-		(clock_control_subsys_t *)&cfg->pclken);
+			       (clock_control_subsys_t *)&cfg->pclken);
 	ret |= clock_control_on(dev_data->clock,
-		(clock_control_subsys_t *)&cfg->pclken_tx);
+				(clock_control_subsys_t *)&cfg->pclken_tx);
 	ret |= clock_control_on(dev_data->clock,
-		(clock_control_subsys_t *)&cfg->pclken_rx);
+				(clock_control_subsys_t *)&cfg->pclken_rx);
 #if !defined(CONFIG_SOC_SERIES_STM32H7X)
 	ret |= clock_control_on(dev_data->clock,
-		(clock_control_subsys_t *)&cfg->pclken_ptp);
+				(clock_control_subsys_t *)&cfg->pclken_ptp);
 #endif /* !defined(CONFIG_SOC_SERIES_STM32H7X) */
 
 	if (ret) {
@@ -686,7 +679,7 @@ static int eth_initialize(const struct device *dev)
 	/* Tx config init: */
 	memset(&tx_config, 0, sizeof(ETH_TxPacketConfig));
 	tx_config.Attributes = ETH_TX_PACKETS_FEATURES_CSUM |
-				ETH_TX_PACKETS_FEATURES_CRCPAD;
+			       ETH_TX_PACKETS_FEATURES_CRCPAD;
 	tx_config.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
 	tx_config.CRCPadCtrl = ETH_CRC_PAD_INSERT;
 #endif /* CONFIG_SOC_SERIES_STM32H7X */
@@ -703,9 +696,9 @@ static int eth_initialize(const struct device *dev)
 	/* Start interruption-poll thread */
 	k_thread_create(&dev_data->rx_thread, dev_data->rx_thread_stack,
 			K_KERNEL_STACK_SIZEOF(dev_data->rx_thread_stack),
-			rx_thread, (void *) dev, NULL, NULL,
-			K_PRIO_COOP(CONFIG_ETH_STM32_HAL_RX_THREAD_PRIO),
-			0, K_NO_WAIT);
+			rx_thread, (void *)dev, NULL, NULL,
+			K_PRIO_COOP(CONFIG_ETH_STM32_HAL_RX_THREAD_PRIO), 0,
+			K_NO_WAIT);
 
 	k_thread_name_set(&dev_data->rx_thread, "stm_eth");
 
@@ -722,10 +715,10 @@ static int eth_initialize(const struct device *dev)
 
 	hal_ret = HAL_ETH_Start_IT(heth);
 #else
-	HAL_ETH_DMATxDescListInit(heth, dma_tx_desc_tab,
-		&dma_tx_buffer[0][0], ETH_TXBUFNB);
-	HAL_ETH_DMARxDescListInit(heth, dma_rx_desc_tab,
-		&dma_rx_buffer[0][0], ETH_RXBUFNB);
+	HAL_ETH_DMATxDescListInit(heth, dma_tx_desc_tab, &dma_tx_buffer[0][0],
+				  ETH_TXBUFNB);
+	HAL_ETH_DMARxDescListInit(heth, dma_rx_desc_tab, &dma_rx_buffer[0][0],
+				  ETH_RXBUFNB);
 
 	hal_ret = HAL_ETH_Start(heth);
 #endif /* CONFIG_SOC_SERIES_STM32H7X */
@@ -754,10 +747,10 @@ static int eth_initialize(const struct device *dev)
 	HAL_ETH_SetMACConfig(heth, &mac_config);
 #endif /* CONFIG_SOC_SERIES_STM32H7X */
 
-	LOG_DBG("MAC %02x:%02x:%02x:%02x:%02x:%02x",
-		dev_data->mac_addr[0], dev_data->mac_addr[1],
-		dev_data->mac_addr[2], dev_data->mac_addr[3],
-		dev_data->mac_addr[4], dev_data->mac_addr[5]);
+	LOG_DBG("MAC %02x:%02x:%02x:%02x:%02x:%02x", dev_data->mac_addr[0],
+		dev_data->mac_addr[1], dev_data->mac_addr[2],
+		dev_data->mac_addr[3], dev_data->mac_addr[4],
+		dev_data->mac_addr[5]);
 
 	return 0;
 }
@@ -789,21 +782,21 @@ static void eth_iface_init(struct net_if *iface)
 
 	/* Register Ethernet MAC Address with the upper layer */
 	net_if_set_link_addr(iface, dev_data->mac_addr,
-			     sizeof(dev_data->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(dev_data->mac_addr), NET_LINK_ETHERNET);
 
 	ethernet_init(iface);
 
 	net_if_flag_set(iface, NET_IF_NO_AUTO_START);
 }
 
-static enum ethernet_hw_caps eth_stm32_hal_get_capabilities(const struct device *dev)
+static enum ethernet_hw_caps
+eth_stm32_hal_get_capabilities(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
 	return ETHERNET_LINK_10BASE_T | ETHERNET_LINK_100BASE_T
 #if defined(CONFIG_NET_VLAN)
-		| ETHERNET_HW_VLAN
+	       | ETHERNET_HW_VLAN
 #endif
 		;
 }
@@ -822,11 +815,11 @@ static int eth_stm32_hal_set_config(const struct device *dev,
 
 		memcpy(dev_data->mac_addr, config->mac_address.addr, 6);
 		heth->Instance->MACA0HR = (dev_data->mac_addr[5] << 8) |
-			dev_data->mac_addr[4];
+					  dev_data->mac_addr[4];
 		heth->Instance->MACA0LR = (dev_data->mac_addr[3] << 24) |
-			(dev_data->mac_addr[2] << 16) |
-			(dev_data->mac_addr[1] << 8) |
-			dev_data->mac_addr[0];
+					  (dev_data->mac_addr[2] << 16) |
+					  (dev_data->mac_addr[1] << 8) |
+					  dev_data->mac_addr[0];
 		return 0;
 	default:
 		break;
@@ -854,15 +847,18 @@ static void eth0_irq_config(void)
 
 static const struct eth_stm32_hal_dev_cfg eth0_config = {
 	.config_func = eth0_irq_config,
-	.pclken = {.bus = DT_INST_CLOCKS_CELL_BY_NAME(0, stmmaceth, bus),
-		   .enr = DT_INST_CLOCKS_CELL_BY_NAME(0, stmmaceth, bits)},
-	.pclken_tx = {.bus = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_tx, bus),
-		      .enr = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_tx, bits)},
-	.pclken_rx = {.bus = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_rx, bus),
-		      .enr = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_rx, bits)},
+	.pclken = { .bus = DT_INST_CLOCKS_CELL_BY_NAME(0, stmmaceth, bus),
+		    .enr = DT_INST_CLOCKS_CELL_BY_NAME(0, stmmaceth, bits) },
+	.pclken_tx = { .bus = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_tx, bus),
+		       .enr = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_tx,
+							  bits) },
+	.pclken_rx = { .bus = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_rx, bus),
+		       .enr = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_rx,
+							  bits) },
 #if !defined(CONFIG_SOC_SERIES_STM32H7X)
-	.pclken_ptp = {.bus = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_ptp, bus),
-		       .enr = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_ptp, bits)},
+	.pclken_ptp = { .bus = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_ptp, bus),
+			.enr = DT_INST_CLOCKS_CELL_BY_NAME(0, mac_clk_ptp,
+							   bits) },
 #endif /* !CONFIG_SOC_SERIES_STM32H7X */
 };
 

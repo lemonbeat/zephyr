@@ -26,14 +26,12 @@ LOG_MODULE_REGISTER(soc);
 /* Configuring TI Power module to not use its policy function (we use Zephyr's
  * instead), and disable oscillator calibration functionality for now.
  */
-const PowerCC26X2_Config PowerCC26X2_config = {
-	.policyInitFxn      = NULL,
-	.policyFxn          = NULL,
-	.calibrateFxn       = NULL,
-	.enablePolicy       = false,
-	.calibrateRCOSC_LF  = false,
-	.calibrateRCOSC_HF  = false
-};
+const PowerCC26X2_Config PowerCC26X2_config = { .policyInitFxn = NULL,
+						.policyFxn = NULL,
+						.calibrateFxn = NULL,
+						.enablePolicy = false,
+						.calibrateRCOSC_LF = false,
+						.calibrateRCOSC_HF = false };
 
 extern PowerCC26X2_ModuleState PowerCC26X2_module;
 
@@ -80,7 +78,7 @@ void sys_set_power_state(enum power_states state)
 		 * 6. Enter IDLE
 		 */
 		if ((constraints & (1 << PowerCC26XX_NEED_FLASH_IN_IDLE)) ||
-			(modeVIMS == VIMS_MODE_DISABLED)) {
+		    (modeVIMS == VIMS_MODE_DISABLED)) {
 			SysCtrlIdle(VIMS_ON_BUS_ON_MODE);
 		} else {
 			SysCtrlIdle(VIMS_ON_CPU_ON_MODE);
@@ -92,13 +90,13 @@ void sys_set_power_state(enum power_states state)
 
 	case SYS_POWER_STATE_SLEEP_2:
 		/* schedule the wakeup event */
-		ClockP_start(ClockP_handle((ClockP_Struct *)
-			&PowerCC26X2_module.clockObj));
+		ClockP_start(ClockP_handle(
+			(ClockP_Struct *)&PowerCC26X2_module.clockObj));
 
 		/* go to standby mode */
 		Power_sleep(PowerCC26XX_STANDBY);
-		ClockP_stop(ClockP_handle((ClockP_Struct *)
-			&PowerCC26X2_module.clockObj));
+		ClockP_stop(ClockP_handle(
+			(ClockP_Struct *)&PowerCC26X2_module.clockObj));
 		break;
 #endif
 

@@ -23,57 +23,56 @@
 #include <bluetooth/gatt.h>
 #include <bluetooth/services/bas.h>
 
-#define CSC_SUPPORTED_LOCATIONS		{ CSC_LOC_OTHER, \
-					  CSC_LOC_FRONT_WHEEL, \
-					  CSC_LOC_REAR_WHEEL, \
-					  CSC_LOC_LEFT_CRANK, \
-					  CSC_LOC_RIGHT_CRANK }
-#define CSC_FEATURE			(CSC_FEAT_WHEEL_REV | \
-					 CSC_FEAT_CRANK_REV | \
-					 CSC_FEAT_MULTI_SENSORS)
+#define CSC_SUPPORTED_LOCATIONS                                         \
+	{                                                               \
+		CSC_LOC_OTHER, CSC_LOC_FRONT_WHEEL, CSC_LOC_REAR_WHEEL, \
+			CSC_LOC_LEFT_CRANK, CSC_LOC_RIGHT_CRANK         \
+	}
+#define CSC_FEATURE \
+	(CSC_FEAT_WHEEL_REV | CSC_FEAT_CRANK_REV | CSC_FEAT_MULTI_SENSORS)
 
 /* CSC Sensor Locations */
-#define CSC_LOC_OTHER			0x00
-#define CSC_LOC_TOP_OF_SHOE		0x01
-#define CSC_LOC_IN_SHOE			0x02
-#define CSC_LOC_HIP			0x03
-#define CSC_LOC_FRONT_WHEEL		0x04
-#define CSC_LOC_LEFT_CRANK		0x05
-#define CSC_LOC_RIGHT_CRANK		0x06
-#define CSC_LOC_LEFT_PEDAL		0x07
-#define CSC_LOC_RIGHT_PEDAL		0x08
-#define CSC_LOC_FRONT_HUB		0x09
-#define CSC_LOC_REAR_DROPOUT		0x0a
-#define CSC_LOC_CHAINSTAY		0x0b
-#define CSC_LOC_REAR_WHEEL		0x0c
-#define CSC_LOC_REAR_HUB		0x0d
-#define CSC_LOC_CHEST			0x0e
+#define CSC_LOC_OTHER 0x00
+#define CSC_LOC_TOP_OF_SHOE 0x01
+#define CSC_LOC_IN_SHOE 0x02
+#define CSC_LOC_HIP 0x03
+#define CSC_LOC_FRONT_WHEEL 0x04
+#define CSC_LOC_LEFT_CRANK 0x05
+#define CSC_LOC_RIGHT_CRANK 0x06
+#define CSC_LOC_LEFT_PEDAL 0x07
+#define CSC_LOC_RIGHT_PEDAL 0x08
+#define CSC_LOC_FRONT_HUB 0x09
+#define CSC_LOC_REAR_DROPOUT 0x0a
+#define CSC_LOC_CHAINSTAY 0x0b
+#define CSC_LOC_REAR_WHEEL 0x0c
+#define CSC_LOC_REAR_HUB 0x0d
+#define CSC_LOC_CHEST 0x0e
 
 /* CSC Application error codes */
-#define CSC_ERR_IN_PROGRESS		0x80
-#define CSC_ERR_CCC_CONFIG		0x81
+#define CSC_ERR_IN_PROGRESS 0x80
+#define CSC_ERR_CCC_CONFIG 0x81
 
 /* SC Control Point Opcodes */
-#define SC_CP_OP_SET_CWR		0x01
-#define SC_CP_OP_CALIBRATION		0x02
-#define SC_CP_OP_UPDATE_LOC		0x03
-#define SC_CP_OP_REQ_SUPP_LOC		0x04
-#define SC_CP_OP_RESPONSE		0x10
+#define SC_CP_OP_SET_CWR 0x01
+#define SC_CP_OP_CALIBRATION 0x02
+#define SC_CP_OP_UPDATE_LOC 0x03
+#define SC_CP_OP_REQ_SUPP_LOC 0x04
+#define SC_CP_OP_RESPONSE 0x10
 
 /* SC Control Point Response Values */
-#define SC_CP_RSP_SUCCESS		0x01
-#define SC_CP_RSP_OP_NOT_SUPP		0x02
-#define SC_CP_RSP_INVAL_PARAM		0x03
-#define SC_CP_RSP_FAILED		0x04
+#define SC_CP_RSP_SUCCESS 0x01
+#define SC_CP_RSP_OP_NOT_SUPP 0x02
+#define SC_CP_RSP_INVAL_PARAM 0x03
+#define SC_CP_RSP_FAILED 0x04
 
 /* CSC Feature */
-#define CSC_FEAT_WHEEL_REV		BIT(0)
-#define CSC_FEAT_CRANK_REV		BIT(1)
-#define CSC_FEAT_MULTI_SENSORS		BIT(2)
+#define CSC_FEAT_WHEEL_REV BIT(0)
+#define CSC_FEAT_CRANK_REV BIT(1)
+#define CSC_FEAT_MULTI_SENSORS BIT(2)
 
 /* CSC Measurement Flags */
-#define CSC_WHEEL_REV_DATA_PRESENT	BIT(0)
-#define CSC_CRANK_REV_DATA_PRESENT	BIT(1)
+#define CSC_WHEEL_REV_DATA_PRESENT BIT(0)
+#define CSC_CRANK_REV_DATA_PRESENT BIT(1)
 
 /* Cycling Speed and Cadence Service declaration */
 
@@ -111,8 +110,8 @@ static ssize_t read_csc_feature(struct bt_conn *conn,
 {
 	uint16_t csc_feature = CSC_FEATURE;
 
-	return bt_gatt_attr_read(conn, attr, buf, len, offset,
-				 &csc_feature, sizeof(csc_feature));
+	return bt_gatt_attr_read(conn, attr, buf, len, offset, &csc_feature,
+				 sizeof(csc_feature));
 }
 
 static void ctrl_point_ind(struct bt_conn *conn, uint8_t req_op, uint8_t status,
@@ -199,8 +198,8 @@ static ssize_t write_ctrl_point(struct bt_conn *conn,
 	return len;
 }
 
-BT_GATT_SERVICE_DEFINE(csc_svc,
-	BT_GATT_PRIMARY_SERVICE(BT_UUID_CSC),
+BT_GATT_SERVICE_DEFINE(
+	csc_svc, BT_GATT_PRIMARY_SERVICE(BT_UUID_CSC),
 	BT_GATT_CHARACTERISTIC(BT_UUID_CSC_MEASUREMENT, BT_GATT_CHRC_NOTIFY,
 			       0x00, NULL, NULL, NULL),
 	BT_GATT_CCC(csc_meas_ccc_cfg_changed,
@@ -215,8 +214,7 @@ BT_GATT_SERVICE_DEFINE(csc_svc,
 			       BT_GATT_PERM_WRITE, NULL, write_ctrl_point,
 			       &sensor_location),
 	BT_GATT_CCC(ctrl_point_ccc_cfg_changed,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-);
+		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE), );
 
 struct sc_ctrl_point_ind {
 	uint8_t op;
@@ -231,7 +229,7 @@ static void ctrl_point_ind(struct bt_conn *conn, uint8_t req_op, uint8_t status,
 	struct sc_ctrl_point_ind *ind;
 	uint8_t buf[sizeof(*ind) + data_len];
 
-	ind = (void *) buf;
+	ind = (void *)buf;
 	ind->op = SC_CP_OP_RESPONSE;
 	ind->req_op = req_op;
 	ind->status = status;
@@ -263,12 +261,11 @@ static void measurement_nfy(struct bt_conn *conn, uint32_t cwr, uint16_t lwet,
 			    uint16_t ccr, uint16_t lcet)
 {
 	struct csc_measurement_nfy *nfy;
-	uint8_t buf[sizeof(*nfy) +
-		    (cwr ? sizeof(struct wheel_rev_data_nfy) : 0) +
+	uint8_t buf[sizeof(*nfy) + (cwr ? sizeof(struct wheel_rev_data_nfy) : 0) +
 		    (ccr ? sizeof(struct crank_rev_data_nfy) : 0)];
 	uint16_t len = 0U;
 
-	nfy = (void *) buf;
+	nfy = (void *)buf;
 	nfy->flags = 0U;
 
 	/* Send Wheel Revolution data is present */
@@ -298,7 +295,7 @@ static void measurement_nfy(struct bt_conn *conn, uint32_t cwr, uint16_t lwet,
 }
 
 static uint16_t lwet; /* Last Wheel Event Time */
-static uint16_t ccr;  /* Cumulative Crank Revolutions */
+static uint16_t ccr; /* Cumulative Crank Revolutions */
 static uint16_t lcet; /* Last Crank Event Time */
 
 static void csc_simulation(void)
@@ -363,8 +360,7 @@ static struct bt_conn_cb conn_callbacks = {
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      BT_UUID_16_ENCODE(BT_UUID_CSC_VAL),
+	BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(BT_UUID_CSC_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL))
 };
 

@@ -18,37 +18,37 @@
  * This driver only supports one instance of this IP block, so the
  * instance number is always 0.
  */
-#define DT_DRV_COMPAT	nordic_nrf_uart
+#define DT_DRV_COMPAT nordic_nrf_uart
 
-#define PROP(prop)	DT_INST_PROP(0, prop)
-#define HAS_PROP(prop)	DT_INST_NODE_HAS_PROP(0, prop)
+#define PROP(prop) DT_INST_PROP(0, prop)
+#define HAS_PROP(prop) DT_INST_NODE_HAS_PROP(0, prop)
 
-#define BAUDRATE	PROP(current_speed)
-#define TX_PIN		PROP(tx_pin)
+#define BAUDRATE PROP(current_speed)
+#define TX_PIN PROP(tx_pin)
 
-#define RX_PIN_USED	HAS_PROP(rx_pin)
+#define RX_PIN_USED HAS_PROP(rx_pin)
 #if RX_PIN_USED
-#define RX_PIN		PROP(rx_pin)
+#define RX_PIN PROP(rx_pin)
 #else
-#define RX_PIN		NRF_UART_PSEL_DISCONNECTED
+#define RX_PIN NRF_UART_PSEL_DISCONNECTED
 #endif
 
-#define HW_FLOW_CONTROL_AVAILABLE	(HAS_PROP(rts_pin) || HAS_PROP(cts_pin))
+#define HW_FLOW_CONTROL_AVAILABLE (HAS_PROP(rts_pin) || HAS_PROP(cts_pin))
 
 /* Protect against enabling flow control without pins set. */
 BUILD_ASSERT((PROP(hw_flow_control) && HW_FLOW_CONTROL_AVAILABLE) ||
-		!PROP(hw_flow_control));
+	     !PROP(hw_flow_control));
 
-#define RTS_PIN \
-	COND_CODE_1(HAS_PROP(rts_pin), \
-		(PROP(rts_pin)), (NRF_UART_PSEL_DISCONNECTED))
+#define RTS_PIN                                         \
+	COND_CODE_1(HAS_PROP(rts_pin), (PROP(rts_pin)), \
+		    (NRF_UART_PSEL_DISCONNECTED))
 
-#define CTS_PIN \
-	COND_CODE_1(HAS_PROP(cts_pin), \
-		(PROP(cts_pin)), (NRF_UART_PSEL_DISCONNECTED))
+#define CTS_PIN                                         \
+	COND_CODE_1(HAS_PROP(cts_pin), (PROP(cts_pin)), \
+		    (NRF_UART_PSEL_DISCONNECTED))
 
-#define IRQN		DT_INST_IRQN(0)
-#define IRQ_PRIO	DT_INST_IRQ(0, priority)
+#define IRQN DT_INST_IRQN(0)
+#define IRQ_PRIO DT_INST_IRQ(0, priority)
 
 static NRF_UART_Type *const uart0_addr = (NRF_UART_Type *)DT_INST_REG_ADDR(0);
 
@@ -92,7 +92,8 @@ static struct {
 
 #ifdef CONFIG_UART_0_INTERRUPT_DRIVEN
 
-static uart_irq_callback_user_data_t irq_callback; /**< Callback function pointer */
+static uart_irq_callback_user_data_t
+	irq_callback; /**< Callback function pointer */
 static void *irq_cb_data; /**< Callback function arg */
 
 /* Variable used to override the state of the TXDRDY event in the initial state
@@ -105,14 +106,13 @@ static volatile bool disable_tx_irq;
 
 #endif /* CONFIG_UART_0_INTERRUPT_DRIVEN */
 
-
 static bool event_txdrdy_check(void)
 {
 	return (nrf_uart_event_check(uart0_addr, NRF_UART_EVENT_TXDRDY)
 #ifdef CONFIG_UART_0_INTERRUPT_DRIVEN
 		|| uart_sw_event_txdrdy
 #endif
-	       );
+	);
 }
 
 static void event_txdrdy_clear(void)
@@ -122,7 +122,6 @@ static void event_txdrdy_clear(void)
 	uart_sw_event_txdrdy = 0U;
 #endif
 }
-
 
 /**
  * @brief Set the baud rate
@@ -271,9 +270,8 @@ static void uart_nrfx_poll_out(const struct device *dev, unsigned char c)
 	if (!k_is_in_isr()) {
 		uint8_t safety_cnt = 100;
 
-		while (atomic_cas((atomic_t *) lock,
-				  (atomic_val_t) 0,
-				  (atomic_val_t) 1) == false) {
+		while (atomic_cas((atomic_t *)lock, (atomic_val_t)0,
+				  (atomic_val_t)1) == false) {
 			/* k_sleep allows other threads to execute and finish
 			 * their transactions.
 			 */
@@ -394,7 +392,6 @@ static int uart_nrfx_config_get(const struct device *dev,
 	return 0;
 }
 
-
 #ifdef CONFIG_UART_0_ASYNC
 
 static void user_callback(const struct device *dev, struct uart_event *event)
@@ -405,8 +402,7 @@ static void user_callback(const struct device *dev, struct uart_event *event)
 }
 
 static int uart_nrfx_callback_set(const struct device *dev,
-				  uart_callback_t callback,
-				  void *user_data)
+				  uart_callback_t callback, void *user_data)
 {
 	uart0_cb.callback = callback;
 	uart0_cb.user_data = user_data;
@@ -415,17 +411,15 @@ static int uart_nrfx_callback_set(const struct device *dev,
 }
 
 static int uart_nrfx_tx(const struct device *dev, const uint8_t *buf,
-			size_t len,
-			int32_t timeout)
+			size_t len, int32_t timeout)
 {
-	if (atomic_cas((atomic_t *) &uart0_cb.tx_buffer_length,
-		       (atomic_val_t) 0,
-		       (atomic_val_t) len) == false) {
+	if (atomic_cas((atomic_t *)&uart0_cb.tx_buffer_length, (atomic_val_t)0,
+		       (atomic_val_t)len) == false) {
 		return -EBUSY;
 	}
 
 	uart0_cb.tx_buffer = buf;
-#if	HW_FLOW_CONTROL_AVAILABLE
+#if HW_FLOW_CONTROL_AVAILABLE
 	uart0_cb.tx_timeout = timeout;
 #endif
 	nrf_uart_event_clear(uart0_addr, NRF_UART_EVENT_TXDRDY);
@@ -444,18 +438,16 @@ static int uart_nrfx_tx_abort(const struct device *dev)
 	if (uart0_cb.tx_buffer_length == 0) {
 		return -EINVAL;
 	}
-#if	HW_FLOW_CONTROL_AVAILABLE
+#if HW_FLOW_CONTROL_AVAILABLE
 	if (uart0_cb.tx_timeout != SYS_FOREVER_MS) {
 		k_delayed_work_cancel(&uart0_cb.tx_timeout_work);
 	}
 #endif
 	nrf_uart_task_trigger(uart0_addr, NRF_UART_TASK_STOPTX);
 
-	struct uart_event evt = {
-		.type = UART_TX_ABORTED,
-		.data.tx.buf = uart0_cb.tx_buffer,
-		.data.tx.len = uart0_cb.tx_counter
-	};
+	struct uart_event evt = { .type = UART_TX_ABORTED,
+				  .data.tx.buf = uart0_cb.tx_buffer,
+				  .data.tx.len = uart0_cb.tx_counter };
 
 	uart0_cb.tx_buffer_length = 0;
 	uart0_cb.tx_counter = 0;
@@ -466,8 +458,7 @@ static int uart_nrfx_tx_abort(const struct device *dev)
 }
 
 static int uart_nrfx_rx_enable(const struct device *dev, uint8_t *buf,
-			       size_t len,
-			       int32_t timeout)
+			       size_t len, int32_t timeout)
 {
 	if (!RX_PIN_USED) {
 		__ASSERT(false, "TX only UART instance");
@@ -490,8 +481,8 @@ static int uart_nrfx_rx_enable(const struct device *dev, uint8_t *buf,
 	nrf_uart_event_clear(uart0_addr, NRF_UART_EVENT_RXTO);
 	nrf_uart_task_trigger(uart0_addr, NRF_UART_TASK_STARTRX);
 	nrf_uart_int_enable(uart0_addr, NRF_UART_INT_MASK_RXDRDY |
-					NRF_UART_INT_MASK_ERROR |
-					NRF_UART_INT_MASK_RXTO);
+						NRF_UART_INT_MASK_ERROR |
+						NRF_UART_INT_MASK_RXTO);
 
 	return 0;
 }
@@ -549,27 +540,22 @@ static void rx_rdy_evt(const struct device *dev)
 
 static void buf_released_evt(const struct device *dev)
 {
-	struct uart_event event = {
-		.type = UART_RX_BUF_RELEASED,
-		.data.rx_buf.buf = uart0_cb.rx_buffer
-	};
+	struct uart_event event = { .type = UART_RX_BUF_RELEASED,
+				    .data.rx_buf.buf = uart0_cb.rx_buffer };
 	user_callback(dev, &event);
 }
 
 static void rx_disabled_evt(const struct device *dev)
 {
-	struct uart_event event = {
-		.type = UART_RX_DISABLED
-	};
+	struct uart_event event = { .type = UART_RX_DISABLED };
 	user_callback(dev, &event);
 }
 
 static void rx_reset_state(void)
 {
-	nrf_uart_int_disable(uart0_addr,
-			     NRF_UART_INT_MASK_RXDRDY |
-			     NRF_UART_INT_MASK_ERROR |
-			     NRF_UART_INT_MASK_RXTO);
+	nrf_uart_int_disable(uart0_addr, NRF_UART_INT_MASK_RXDRDY |
+						 NRF_UART_INT_MASK_ERROR |
+						 NRF_UART_INT_MASK_RXTO);
 	uart0_cb.rx_buffer_length = 0;
 	uart0_cb.rx_enabled = 0;
 	uart0_cb.rx_counter = 0;
@@ -638,7 +624,7 @@ static void tx_isr(const struct device *dev)
 	uart0_cb.tx_counter++;
 	if (uart0_cb.tx_counter < uart0_cb.tx_buffer_length &&
 	    !uart0_cb.tx_abort) {
-#if	HW_FLOW_CONTROL_AVAILABLE
+#if HW_FLOW_CONTROL_AVAILABLE
 		if (uart0_cb.tx_timeout != SYS_FOREVER_MS) {
 			k_delayed_work_submit(&uart0_cb.tx_timeout_work,
 					      K_MSEC(uart0_cb.tx_timeout));
@@ -650,18 +636,17 @@ static void tx_isr(const struct device *dev)
 
 		nrf_uart_txd_set(uart0_addr, txd);
 	} else {
-#if	HW_FLOW_CONTROL_AVAILABLE
+#if HW_FLOW_CONTROL_AVAILABLE
 
 		if (uart0_cb.tx_timeout != SYS_FOREVER_MS) {
 			k_delayed_work_cancel(&uart0_cb.tx_timeout_work);
 		}
 #endif
 		nrf_uart_task_trigger(uart0_addr, NRF_UART_TASK_STOPTX);
-		struct uart_event event = {
-			.type = UART_TX_DONE,
-			.data.tx.buf = uart0_cb.tx_buffer,
-			.data.tx.len = uart0_cb.tx_counter
-		};
+		struct uart_event event = { .type = UART_TX_DONE,
+					    .data.tx.buf = uart0_cb.tx_buffer,
+					    .data.tx.len =
+						    uart0_cb.tx_counter };
 		nrf_uart_event_clear(uart0_addr, NRF_UART_EVENT_TXDRDY);
 		uart0_cb.tx_buffer_length = 0;
 		uart0_cb.tx_counter = 0;
@@ -672,12 +657,12 @@ static void tx_isr(const struct device *dev)
 	}
 }
 
-#define UART_ERROR_FROM_MASK(mask) \
-	(mask & NRF_UART_ERROR_OVERRUN_MASK ? UART_ERROR_OVERRUN	\
-	 : mask & NRF_UART_ERROR_PARITY_MASK ? UART_ERROR_PARITY	\
-	 : mask & NRF_UART_ERROR_FRAMING_MASK ? UART_ERROR_FRAMING	\
-	 : mask & NRF_UART_ERROR_BREAK_MASK ? UART_BREAK		\
-	 : 0)
+#define UART_ERROR_FROM_MASK(mask)                                 \
+	(mask & NRF_UART_ERROR_OVERRUN_MASK ? UART_ERROR_OVERRUN : \
+	 mask & NRF_UART_ERROR_PARITY_MASK  ? UART_ERROR_PARITY :  \
+	 mask & NRF_UART_ERROR_FRAMING_MASK ? UART_ERROR_FRAMING : \
+	 mask & NRF_UART_ERROR_BREAK_MASK   ? UART_BREAK :         \
+						    0)
 
 static void error_isr(const struct device *dev)
 {
@@ -691,11 +676,10 @@ static void error_isr(const struct device *dev)
 	}
 	struct uart_event event = {
 		.type = UART_RX_STOPPED,
-		.data.rx_stop.reason =
-			UART_ERROR_FROM_MASK(
-				nrf_uart_errorsrc_get_and_clear(uart0_addr)),
-		.data.rx_stop.data.len = uart0_cb.rx_counter
-					 - uart0_cb.rx_offset,
+		.data.rx_stop.reason = UART_ERROR_FROM_MASK(
+			nrf_uart_errorsrc_get_and_clear(uart0_addr)),
+		.data.rx_stop.data.len =
+			uart0_cb.rx_counter - uart0_cb.rx_offset,
 		.data.rx_stop.data.offset = uart0_cb.rx_offset,
 		.data.rx_stop.data.buf = uart0_cb.rx_buffer
 	};
@@ -740,9 +724,8 @@ void uart_nrfx_isr(const struct device *uart)
 		rx_isr(uart);
 	}
 
-	if (nrf_uart_event_check(uart0_addr, NRF_UART_EVENT_TXDRDY)
-	    && nrf_uart_int_enable_check(uart0_addr,
-					 NRF_UART_INT_MASK_TXDRDY)) {
+	if (nrf_uart_event_check(uart0_addr, NRF_UART_EVENT_TXDRDY) &&
+	    nrf_uart_int_enable_check(uart0_addr, NRF_UART_INT_MASK_TXDRDY)) {
 		tx_isr(uart);
 	}
 
@@ -771,25 +754,20 @@ static void tx_timeout(struct k_work *work)
 	uart0_cb.tx_buffer_length = 0;
 	uart0_cb.tx_counter = 0;
 	user_callback(DEVICE_GET(uart_nrfx_uart0), &evt);
-
 }
 #endif
 
 #endif /* CONFIG_UART_0_ASYNC */
 
-
 #ifdef CONFIG_UART_0_INTERRUPT_DRIVEN
 
 /** Interrupt driven FIFO fill function */
-static int uart_nrfx_fifo_fill(const struct device *dev,
-			       const uint8_t *tx_data,
+static int uart_nrfx_fifo_fill(const struct device *dev, const uint8_t *tx_data,
 			       int len)
 {
 	uint8_t num_tx = 0U;
 
-	while ((len - num_tx > 0) &&
-	       event_txdrdy_check()) {
-
+	while ((len - num_tx > 0) && event_txdrdy_check()) {
 		/* Clear the interrupt */
 		event_txdrdy_clear();
 
@@ -801,8 +779,7 @@ static int uart_nrfx_fifo_fill(const struct device *dev,
 }
 
 /** Interrupt driven FIFO read function */
-static int uart_nrfx_fifo_read(const struct device *dev,
-			       uint8_t *rx_data,
+static int uart_nrfx_fifo_read(const struct device *dev, uint8_t *rx_data,
 			       const int size)
 {
 	uint8_t num_rx = 0U;
@@ -879,8 +856,7 @@ static int uart_nrfx_irq_tx_ready_complete(const struct device *dev)
 	 */
 	return nrf_uart_int_enable_check(uart0_addr,
 					 NRF_UART_INT_MASK_TXDRDY) &&
-	       !disable_tx_irq &&
-	       event_txdrdy_check();
+	       !disable_tx_irq && event_txdrdy_check();
 }
 
 /** Interrupt driven receiver ready function */
@@ -906,8 +882,7 @@ static int uart_nrfx_irq_is_pending(const struct device *dev)
 {
 	return ((nrf_uart_int_enable_check(uart0_addr,
 					   NRF_UART_INT_MASK_TXDRDY) &&
-		 uart_nrfx_irq_tx_ready_complete(dev))
-		||
+		 uart_nrfx_irq_tx_ready_complete(dev)) ||
 		(nrf_uart_int_enable_check(uart0_addr,
 					   NRF_UART_INT_MASK_RXDRDY) &&
 		 uart_nrfx_irq_rx_ready(dev)));
@@ -1038,10 +1013,7 @@ static int uart_nrfx_init(const struct device *dev)
 
 #if defined(CONFIG_UART_0_ASYNC) || defined(CONFIG_UART_0_INTERRUPT_DRIVEN)
 
-	IRQ_CONNECT(IRQN,
-		    IRQ_PRIO,
-		    uart_nrfx_isr,
-		    DEVICE_GET(uart_nrfx_uart0),
+	IRQ_CONNECT(IRQN, IRQ_PRIO, uart_nrfx_isr, DEVICE_GET(uart_nrfx_uart0),
 		    0);
 	irq_enable(IRQN);
 #endif
@@ -1060,32 +1032,32 @@ static int uart_nrfx_init(const struct device *dev)
  */
 static const struct uart_driver_api uart_nrfx_uart_driver_api = {
 #ifdef CONFIG_UART_0_ASYNC
-	.callback_set	  = uart_nrfx_callback_set,
-	.tx		  = uart_nrfx_tx,
-	.tx_abort	  = uart_nrfx_tx_abort,
-	.rx_enable	  = uart_nrfx_rx_enable,
-	.rx_buf_rsp	  = uart_nrfx_rx_buf_rsp,
-	.rx_disable	  = uart_nrfx_rx_disable,
+	.callback_set = uart_nrfx_callback_set,
+	.tx = uart_nrfx_tx,
+	.tx_abort = uart_nrfx_tx_abort,
+	.rx_enable = uart_nrfx_rx_enable,
+	.rx_buf_rsp = uart_nrfx_rx_buf_rsp,
+	.rx_disable = uart_nrfx_rx_disable,
 #endif /* CONFIG_UART_0_ASYNC */
-	.poll_in          = uart_nrfx_poll_in,
-	.poll_out         = uart_nrfx_poll_out,
-	.err_check        = uart_nrfx_err_check,
-	.configure        = uart_nrfx_configure,
-	.config_get       = uart_nrfx_config_get,
+	.poll_in = uart_nrfx_poll_in,
+	.poll_out = uart_nrfx_poll_out,
+	.err_check = uart_nrfx_err_check,
+	.configure = uart_nrfx_configure,
+	.config_get = uart_nrfx_config_get,
 #ifdef CONFIG_UART_0_INTERRUPT_DRIVEN
-	.fifo_fill        = uart_nrfx_fifo_fill,
-	.fifo_read        = uart_nrfx_fifo_read,
-	.irq_tx_enable    = uart_nrfx_irq_tx_enable,
-	.irq_tx_disable   = uart_nrfx_irq_tx_disable,
-	.irq_tx_ready     = uart_nrfx_irq_tx_ready_complete,
-	.irq_rx_enable    = uart_nrfx_irq_rx_enable,
-	.irq_rx_disable   = uart_nrfx_irq_rx_disable,
-	.irq_tx_complete  = uart_nrfx_irq_tx_ready_complete,
-	.irq_rx_ready     = uart_nrfx_irq_rx_ready,
-	.irq_err_enable   = uart_nrfx_irq_err_enable,
-	.irq_err_disable  = uart_nrfx_irq_err_disable,
-	.irq_is_pending   = uart_nrfx_irq_is_pending,
-	.irq_update       = uart_nrfx_irq_update,
+	.fifo_fill = uart_nrfx_fifo_fill,
+	.fifo_read = uart_nrfx_fifo_read,
+	.irq_tx_enable = uart_nrfx_irq_tx_enable,
+	.irq_tx_disable = uart_nrfx_irq_tx_disable,
+	.irq_tx_ready = uart_nrfx_irq_tx_ready_complete,
+	.irq_rx_enable = uart_nrfx_irq_rx_enable,
+	.irq_rx_disable = uart_nrfx_irq_rx_disable,
+	.irq_tx_complete = uart_nrfx_irq_tx_ready_complete,
+	.irq_rx_ready = uart_nrfx_irq_rx_ready,
+	.irq_err_enable = uart_nrfx_irq_err_enable,
+	.irq_err_disable = uart_nrfx_irq_err_disable,
+	.irq_is_pending = uart_nrfx_irq_is_pending,
+	.irq_update = uart_nrfx_irq_update,
 	.irq_callback_set = uart_nrfx_irq_callback_set,
 #endif /* CONFIG_UART_0_INTERRUPT_DRIVEN */
 };
@@ -1115,8 +1087,7 @@ static void uart_nrfx_pins_enable(const struct device *dev, bool enable)
 			nrf_gpio_cfg_output(rts_pin);
 		}
 		if (HAS_PROP(cts_pin)) {
-			nrf_gpio_cfg_input(cts_pin,
-					   NRF_GPIO_PIN_NOPULL);
+			nrf_gpio_cfg_input(cts_pin, NRF_GPIO_PIN_NOPULL);
 		}
 	} else {
 		nrf_gpio_cfg_default(tx_pin);
@@ -1153,8 +1124,7 @@ static void uart_nrfx_set_power_state(const struct device *dev,
 	}
 }
 
-static int uart_nrfx_pm_control(const struct device *dev,
-				uint32_t ctrl_command,
+static int uart_nrfx_pm_control(const struct device *dev, uint32_t ctrl_command,
 				void *context, device_pm_cb cb, void *arg)
 {
 	static uint32_t current_state = DEVICE_PM_ACTIVE_STATE;
@@ -1179,28 +1149,24 @@ static int uart_nrfx_pm_control(const struct device *dev,
 }
 #endif /* CONFIG_DEVICE_POWER_MANAGEMENT */
 
-static struct uart_nrfx_data uart_nrfx_uart0_data = {
-	.uart_config = {
-		.stop_bits = UART_CFG_STOP_BITS_1,
-		.data_bits = UART_CFG_DATA_BITS_8,
-		.baudrate  = BAUDRATE,
+static struct uart_nrfx_data
+	uart_nrfx_uart0_data = { .uart_config = {
+					 .stop_bits = UART_CFG_STOP_BITS_1,
+					 .data_bits = UART_CFG_DATA_BITS_8,
+					 .baudrate = BAUDRATE,
 #ifdef CONFIG_UART_0_NRF_PARITY_BIT
-		.parity    = UART_CFG_PARITY_EVEN,
+					 .parity = UART_CFG_PARITY_EVEN,
 #else
-		.parity    = UART_CFG_PARITY_NONE,
+					 .parity = UART_CFG_PARITY_NONE,
 #endif /* CONFIG_UART_0_NRF_PARITY_BIT */
-		.flow_ctrl = PROP(hw_flow_control) ?
-			UART_CFG_FLOW_CTRL_RTS_CTS : UART_CFG_FLOW_CTRL_NONE,
-	}
-};
+					 .flow_ctrl =
+						 PROP(hw_flow_control) ?
+							       UART_CFG_FLOW_CTRL_RTS_CTS :
+							       UART_CFG_FLOW_CTRL_NONE,
+				 } };
 
-DEVICE_DEFINE(uart_nrfx_uart0,
-	      DT_INST_LABEL(0),
-	      uart_nrfx_init,
-	      uart_nrfx_pm_control,
-	      &uart_nrfx_uart0_data,
-	      NULL,
+DEVICE_DEFINE(uart_nrfx_uart0, DT_INST_LABEL(0), uart_nrfx_init,
+	      uart_nrfx_pm_control, &uart_nrfx_uart0_data, NULL,
 	      /* Initialize UART device before UART console. */
-	      PRE_KERNEL_1,
-	      CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+	      PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 	      &uart_nrfx_uart_driver_api);

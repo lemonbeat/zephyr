@@ -49,7 +49,9 @@ typedef size_t chunkid_t;
 
 #define CHUNK_UNIT 8U
 
-typedef struct { char bytes[CHUNK_UNIT]; } chunk_unit_t;
+typedef struct {
+	char bytes[CHUNK_UNIT];
+} chunk_unit_t;
 
 enum chunk_fields { LEFT_SIZE, SIZE_AND_USED, FREE_PREV, FREE_NEXT };
 
@@ -58,7 +60,7 @@ struct z_heap_bucket {
 };
 
 struct z_heap {
-	uint64_t chunk0_hdr_area;  /* matches the largest header */
+	uint64_t chunk0_hdr_area; /* matches the largest header */
 	uint32_t len;
 	uint32_t avail_buckets;
 	struct z_heap_bucket buckets[0];
@@ -98,8 +100,8 @@ static inline size_t chunk_field(struct z_heap *h, chunkid_t c,
 	}
 }
 
-static inline void chunk_set(struct z_heap *h, chunkid_t c,
-			     enum chunk_fields f, chunkid_t val)
+static inline void chunk_set(struct z_heap *h, chunkid_t c, enum chunk_fields f,
+			     chunkid_t val)
 {
 	CHECK(c <= h->len);
 

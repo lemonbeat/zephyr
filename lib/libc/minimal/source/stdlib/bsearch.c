@@ -39,7 +39,6 @@ void *bsearch(const void *key, const void *array, size_t count, size_t size,
 			low = index + 1;
 		} else {
 			high = index;
-
 		}
 	}
 	return NULL;

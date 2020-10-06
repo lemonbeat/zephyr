@@ -24,15 +24,13 @@ void bt_settings_encode_key(char *path, size_t path_size, const char *subsys,
 			    const bt_addr_le_t *addr, const char *key)
 {
 	if (key) {
-		snprintk(path, path_size,
-			 "bt/%s/%02x%02x%02x%02x%02x%02x%u/%s", subsys,
-			 addr->a.val[5], addr->a.val[4], addr->a.val[3],
+		snprintk(path, path_size, "bt/%s/%02x%02x%02x%02x%02x%02x%u/%s",
+			 subsys, addr->a.val[5], addr->a.val[4], addr->a.val[3],
 			 addr->a.val[2], addr->a.val[1], addr->a.val[0],
 			 addr->type, key);
 	} else {
-		snprintk(path, path_size,
-			 "bt/%s/%02x%02x%02x%02x%02x%02x%u", subsys,
-			 addr->a.val[5], addr->a.val[4], addr->a.val[3],
+		snprintk(path, path_size, "bt/%s/%02x%02x%02x%02x%02x%02x%u",
+			 subsys, addr->a.val[5], addr->a.val[4], addr->a.val[3],
 			 addr->a.val[2], addr->a.val[1], addr->a.val[0],
 			 addr->type);
 	}
@@ -137,14 +135,14 @@ static int set(const char *name, size_t len_rd, settings_read_cb read_cb,
 		if (len < sizeof(bt_dev.id_addr[0])) {
 			if (len < 0) {
 				BT_ERR("Failed to read ID address from storage"
-				       " (err %zd)", len);
+				       " (err %zd)",
+				       len);
 			} else {
 				BT_ERR("Invalid length ID address in storage");
 				BT_HEXDUMP_DBG(&bt_dev.id_addr, len,
 					       "data read");
 			}
-			(void)memset(bt_dev.id_addr, 0,
-				     sizeof(bt_dev.id_addr));
+			(void)memset(bt_dev.id_addr, 0, sizeof(bt_dev.id_addr));
 			bt_dev.id_count = 0U;
 		} else {
 			int i;
@@ -164,7 +162,8 @@ static int set(const char *name, size_t len_rd, settings_read_cb read_cb,
 		len = read_cb(cb_arg, &bt_dev.name, sizeof(bt_dev.name) - 1);
 		if (len < 0) {
 			BT_ERR("Failed to read device name from storage"
-			       " (err %zd)", len);
+			       " (err %zd)",
+			       len);
 		} else {
 			bt_dev.name[len] = '\0';
 
@@ -180,7 +179,8 @@ static int set(const char *name, size_t len_rd, settings_read_cb read_cb,
 		if (len < sizeof(bt_dev.irk[0])) {
 			if (len < 0) {
 				BT_ERR("Failed to read IRK from storage"
-				       " (err %zd)", len);
+				       " (err %zd)",
+				       len);
 			} else {
 				BT_ERR("Invalid length IRK in storage");
 				(void)memset(bt_dev.irk, 0, sizeof(bt_dev.irk));

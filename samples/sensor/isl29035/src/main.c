@@ -40,8 +40,7 @@ static const char *now_str(void)
 	now /= 60U;
 	h = now;
 
-	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u",
-		 h, min, s, ms);
+	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u", h, min, s, ms);
 	return buf;
 }
 
@@ -62,15 +61,16 @@ static void process_sample(const struct device *dev)
 
 	int lux = val.val1;
 
-	if (IS_ENABLED(CONFIG_ISL29035_TRIGGER)
-	    && (alerted != last_alerted)) {
+	if (IS_ENABLED(CONFIG_ISL29035_TRIGGER) && (alerted != last_alerted)) {
 		static int last_lux;
 		int rc;
 		struct sensor_trigger trig = {
 			.type = SENSOR_TRIG_THRESHOLD,
 			.chan = SENSOR_CHAN_ALL,
 		};
-		struct sensor_value lo_thr = { MAX(lux - LUX_ALERT_DELTA, 0), };
+		struct sensor_value lo_thr = {
+			MAX(lux - LUX_ALERT_DELTA, 0),
+		};
 		struct sensor_value hi_thr = { lux + LUX_ALERT_DELTA };
 
 		printf("ALERT %d lux outside range centered on %d lux."
@@ -94,9 +94,8 @@ static void process_sample(const struct device *dev)
 	}
 
 	printf("[%s] %s: %g\n", now_str(),
-	       IS_ENABLED(CONFIG_ISL29035_MODE_ALS)
-	       ? "Ambient light sense"
-	       : "IR sense",
+	       IS_ENABLED(CONFIG_ISL29035_MODE_ALS) ? "Ambient light sense" :
+							    "IR sense",
 	       sensor_value_to_double(&val));
 }
 

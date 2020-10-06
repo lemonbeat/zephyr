@@ -31,19 +31,19 @@
 #include "proxy.h"
 
 /* Convert from ms to 0.625ms units */
-#define ADV_SCAN_UNIT(_ms) ((_ms) * 8 / 5)
+#define ADV_SCAN_UNIT(_ms) ((_ms)*8 / 5)
 
 /* Window and Interval are equal for continuous scanning */
 #define MESH_SCAN_INTERVAL_MS 30
-#define MESH_SCAN_WINDOW_MS   30
-#define MESH_SCAN_INTERVAL    ADV_SCAN_UNIT(MESH_SCAN_INTERVAL_MS)
-#define MESH_SCAN_WINDOW      ADV_SCAN_UNIT(MESH_SCAN_WINDOW_MS)
+#define MESH_SCAN_WINDOW_MS 30
+#define MESH_SCAN_INTERVAL ADV_SCAN_UNIT(MESH_SCAN_INTERVAL_MS)
+#define MESH_SCAN_WINDOW ADV_SCAN_UNIT(MESH_SCAN_WINDOW_MS)
 
 /* Pre-5.0 controllers enforce a minimum interval of 100ms
  * whereas 5.0+ controllers can go down to 20ms.
  */
 #define ADV_INT_DEFAULT_MS 100
-#define ADV_INT_FAST_MS    20
+#define ADV_INT_FAST_MS 20
 
 static K_FIFO_DEFINE(adv_queue);
 static struct k_thread adv_thread_data;
@@ -79,13 +79,15 @@ static inline void adv_send_end(int err, const struct bt_mesh_send_cb *cb,
 static inline void adv_send(struct net_buf *buf)
 {
 	static const uint8_t adv_type[] = {
-		[BT_MESH_ADV_PROV]   = BT_DATA_MESH_PROV,
-		[BT_MESH_ADV_DATA]   = BT_DATA_MESH_MESSAGE,
+		[BT_MESH_ADV_PROV] = BT_DATA_MESH_PROV,
+		[BT_MESH_ADV_DATA] = BT_DATA_MESH_MESSAGE,
 		[BT_MESH_ADV_BEACON] = BT_DATA_MESH_BEACON,
-		[BT_MESH_ADV_URI]    = BT_DATA_URI,
+		[BT_MESH_ADV_URI] = BT_DATA_URI,
 	};
-	const int32_t adv_int_min = ((bt_dev.hci_version >= BT_HCI_VERSION_5_0) ?
-				   ADV_INT_FAST_MS : ADV_INT_DEFAULT_MS);
+	const int32_t adv_int_min =
+		((bt_dev.hci_version >= BT_HCI_VERSION_5_0) ?
+			       ADV_INT_FAST_MS :
+			       ADV_INT_DEFAULT_MS);
 	const struct bt_mesh_send_cb *cb = BT_MESH_ADV(buf)->cb;
 	void *cb_data = BT_MESH_ADV(buf)->cb_data;
 	struct bt_le_adv_param param = {};
@@ -93,14 +95,14 @@ static inline void adv_send(struct net_buf *buf)
 	struct bt_data ad;
 	int err;
 
-	adv_int = MAX(adv_int_min,
-		      BT_MESH_TRANSMIT_INT(BT_MESH_ADV(buf)->xmit));
+	adv_int =
+		MAX(adv_int_min, BT_MESH_TRANSMIT_INT(BT_MESH_ADV(buf)->xmit));
 	duration = (MESH_SCAN_WINDOW_MS +
 		    ((BT_MESH_TRANSMIT_COUNT(BT_MESH_ADV(buf)->xmit) + 1) *
 		     (adv_int + 10)));
 
-	BT_DBG("type %u len %u: %s", BT_MESH_ADV(buf)->type,
-	       buf->len, bt_hex(buf->data, buf->len));
+	BT_DBG("type %u len %u: %s", BT_MESH_ADV(buf)->type, buf->len,
+	       bt_hex(buf->data, buf->len));
 	BT_DBG("count %u interval %ums duration %ums",
 	       BT_MESH_TRANSMIT_COUNT(BT_MESH_ADV(buf)->xmit) + 1, adv_int,
 	       duration);
@@ -210,8 +212,8 @@ struct net_buf *bt_mesh_adv_create_from_pool(struct net_buf_pool *pool,
 
 	(void)memset(adv, 0, sizeof(*adv));
 
-	adv->type         = type;
-	adv->xmit         = xmit;
+	adv->type = type;
+	adv->xmit = xmit;
 
 	return buf;
 }
@@ -297,11 +299,11 @@ void bt_mesh_adv_init(void)
 
 int bt_mesh_scan_enable(void)
 {
-	struct bt_le_scan_param scan_param = {
-			.type       = BT_HCI_LE_SCAN_PASSIVE,
-			.filter_dup = BT_LE_SCAN_OPT_NONE,
-			.interval   = MESH_SCAN_INTERVAL,
-			.window     = MESH_SCAN_WINDOW };
+	struct bt_le_scan_param scan_param = { .type = BT_HCI_LE_SCAN_PASSIVE,
+					       .filter_dup =
+						       BT_LE_SCAN_OPT_NONE,
+					       .interval = MESH_SCAN_INTERVAL,
+					       .window = MESH_SCAN_WINDOW };
 	int err;
 
 	BT_DBG("");

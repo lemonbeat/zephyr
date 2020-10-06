@@ -68,13 +68,13 @@ char *strncpy(char *_MLIBC_RESTRICT d, const char *_MLIBC_RESTRICT s, size_t n)
 
 char *strchr(const char *s, int c)
 {
-	char tmp = (char) c;
+	char tmp = (char)c;
 
 	while ((*s != tmp) && (*s != '\0')) {
 		s++;
 	}
 
-	return (*s == tmp) ? (char *) s : NULL;
+	return (*s == tmp) ? (char *)s : NULL;
 }
 
 /**
@@ -263,9 +263,9 @@ int memcmp(const void *m1, const void *m2, size_t n)
 void *memmove(void *d, const void *s, size_t n)
 {
 	char *dest = d;
-	const char *src  = s;
+	const char *src = s;
 
-	if ((size_t) (dest - src) < n) {
+	if ((size_t)(dest - src) < n) {
 		/*
 		 * The <src> buffer overlaps with the start of the <dest> buffer.
 		 * Copy backwards to prevent the premature corruption of <src>.
@@ -304,7 +304,6 @@ void *memcpy(void *_MLIBC_RESTRICT d, const void *_MLIBC_RESTRICT s, size_t n)
 	const uintptr_t mask = sizeof(mem_word_t) - 1;
 
 	if ((((uintptr_t)d ^ (uintptr_t)s_byte) & mask) == 0) {
-
 		/* do byte-sized copying until word-aligned or finished */
 
 		while (((uintptr_t)d_byte) & mask) {

@@ -82,14 +82,12 @@ static uint8_t report_map[] = {
 	0x75, 0x08, /*     Report Size (8) */
 	0x95, 0x02, /*     Report Count (2) */
 	0x81, 0x06, /*     Input (Data,Var,Rel,No Wrap,Linear,...) */
-	0xC0,       /*   End Collection */
-	0xC0,       /* End Collection */
+	0xC0, /*   End Collection */
+	0xC0, /* End Collection */
 };
 
-
-static ssize_t read_info(struct bt_conn *conn,
-			  const struct bt_gatt_attr *attr, void *buf,
-			  uint16_t len, uint16_t offset)
+static ssize_t read_info(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+			 void *buf, uint16_t len, uint16_t offset)
 {
 	return bt_gatt_attr_read(conn, attr, buf, len, offset, attr->user_data,
 				 sizeof(struct hids_info));
@@ -140,25 +138,24 @@ static ssize_t write_ctrl_point(struct bt_conn *conn,
 }
 
 /* HID Service Declaration */
-BT_GATT_SERVICE_DEFINE(hog_svc,
-	BT_GATT_PRIMARY_SERVICE(BT_UUID_HIDS),
+BT_GATT_SERVICE_DEFINE(
+	hog_svc, BT_GATT_PRIMARY_SERVICE(BT_UUID_HIDS),
 	BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_INFO, BT_GATT_CHRC_READ,
 			       BT_GATT_PERM_READ, read_info, NULL, &info),
 	BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_REPORT_MAP, BT_GATT_CHRC_READ,
 			       BT_GATT_PERM_READ, read_report_map, NULL, NULL),
 	BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_REPORT,
 			       BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_READ_AUTHEN,
-			       read_input_report, NULL, NULL),
+			       BT_GATT_PERM_READ_AUTHEN, read_input_report,
+			       NULL, NULL),
 	BT_GATT_CCC(input_ccc_changed,
 		    BT_GATT_PERM_READ_AUTHEN | BT_GATT_PERM_WRITE_AUTHEN),
 	BT_GATT_DESCRIPTOR(BT_UUID_HIDS_REPORT_REF, BT_GATT_PERM_READ,
 			   read_report, NULL, &input),
 	BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_CTRL_POINT,
 			       BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-			       BT_GATT_PERM_WRITE,
-			       NULL, write_ctrl_point, &ctrl_point),
-);
+			       BT_GATT_PERM_WRITE, NULL, write_ctrl_point,
+			       &ctrl_point), );
 
 void hog_init(void)
 {

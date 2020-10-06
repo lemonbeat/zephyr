@@ -7,8 +7,7 @@
 #include <string.h>
 #include <string.h>
 
-size_t strspn(const char *s,
-	      const char *accept)
+size_t strspn(const char *s, const char *accept)
 {
 	const char *ins = s;
 
@@ -19,8 +18,7 @@ size_t strspn(const char *s,
 	return s - ins;
 }
 
-size_t strcspn(const char *s,
-	       const char *reject)
+size_t strcspn(const char *s, const char *reject)
 {
 	const char *ins = s;
 

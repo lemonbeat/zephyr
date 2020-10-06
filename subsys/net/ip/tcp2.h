@@ -82,7 +82,7 @@ int net_tcp_listen(struct net_context *context);
  * @return 0 if successful, < 0 on error
  */
 int net_tcp_accept(struct net_context *context, net_tcp_accept_cb_t cb,
-			void *user_data);
+		   void *user_data);
 /**
  * @brief Enqueue data for transmission
  *
@@ -110,7 +110,7 @@ int net_tcp_queue(struct net_context *context, const void *buf, size_t len,
  * @return Pointer to the TCP header on success, NULL on error
  */
 struct net_tcp_hdr *net_tcp_input(struct net_pkt *pkt,
-					struct net_pkt_data_access *tcp_access);
+				  struct net_pkt_data_access *tcp_access);
 /* TODO: net_tcp_input() isn't used by TCP and might be dropped with little
  *       re-factorig
  */

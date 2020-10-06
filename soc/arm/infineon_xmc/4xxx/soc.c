@@ -10,7 +10,7 @@
 #include <init.h>
 #include <soc.h>
 
-#define PMU_FLASH_WS		(0x3U)
+#define PMU_FLASH_WS (0x3U)
 
 void z_platform_init(void)
 {

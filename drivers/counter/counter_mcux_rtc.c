@@ -35,8 +35,8 @@ static int mcux_rtc_start(const struct device *dev)
 	RTC_StartTimer(config->base);
 	RTC_EnableInterrupts(config->base,
 			     kRTC_AlarmInterruptEnable |
-			     kRTC_TimeOverflowInterruptEnable |
-			     kRTC_TimeInvalidInterruptEnable);
+				     kRTC_TimeOverflowInterruptEnable |
+				     kRTC_TimeInvalidInterruptEnable);
 
 	return 0;
 }
@@ -49,8 +49,8 @@ static int mcux_rtc_stop(const struct device *dev)
 
 	RTC_DisableInterrupts(config->base,
 			      kRTC_AlarmInterruptEnable |
-			      kRTC_TimeOverflowInterruptEnable |
-			      kRTC_TimeInvalidInterruptEnable);
+				      kRTC_TimeOverflowInterruptEnable |
+				      kRTC_TimeInvalidInterruptEnable);
 	RTC_StopTimer(config->base);
 
 	/* clear out any set alarms */
@@ -146,7 +146,7 @@ static int mcux_rtc_set_top_value(const struct device *dev,
 {
 	const struct counter_config_info *info = dev->config;
 	const struct mcux_rtc_config *config =
-			CONTAINER_OF(info, struct mcux_rtc_config, info);
+		CONTAINER_OF(info, struct mcux_rtc_config, info);
 	struct mcux_rtc_data *data = dev->data;
 
 	if (cfg->ticks != info->max_top_value) {
@@ -197,7 +197,6 @@ static void mcux_rtc_isr(const struct device *dev)
 	struct mcux_rtc_data *data = dev->data;
 	counter_alarm_callback_t cb;
 	uint32_t current = mcux_rtc_read(dev);
-
 
 	LOG_DBG("Current time is %d ticks", current);
 
@@ -277,15 +276,13 @@ static struct mcux_rtc_config mcux_rtc_config_0 = {
 	},
 };
 
-DEVICE_AND_API_INIT(rtc, DT_INST_LABEL(0), &mcux_rtc_init,
-		    &mcux_rtc_data_0, &mcux_rtc_config_0.info,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &mcux_rtc_driver_api);
+DEVICE_AND_API_INIT(rtc, DT_INST_LABEL(0), &mcux_rtc_init, &mcux_rtc_data_0,
+		    &mcux_rtc_config_0.info, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &mcux_rtc_driver_api);
 
 static void mcux_rtc_irq_config_0(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    mcux_rtc_isr, DEVICE_GET(rtc), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), mcux_rtc_isr,
+		    DEVICE_GET(rtc), 0);
 	irq_enable(DT_INST_IRQN(0));
 }

@@ -54,16 +54,16 @@
  * additional fields in the stack object, using the below macros to compute how
  * many pages we need.
  */
-#define Z_X86_THREAD_PT_AREA	(Z_X86_NUM_TABLE_PAGES * \
-				     (uintptr_t)CONFIG_MMU_PAGE_SIZE)
+#define Z_X86_THREAD_PT_AREA \
+	(Z_X86_NUM_TABLE_PAGES * (uintptr_t)CONFIG_MMU_PAGE_SIZE)
 #else
-#define Z_X86_THREAD_PT_AREA	0UL
+#define Z_X86_THREAD_PT_AREA 0UL
 #endif
 
 #if defined(CONFIG_HW_STACK_PROTECTION) || defined(CONFIG_USERSPACE)
-#define Z_X86_STACK_BASE_ALIGN	CONFIG_MMU_PAGE_SIZE
+#define Z_X86_STACK_BASE_ALIGN CONFIG_MMU_PAGE_SIZE
 #else
-#define Z_X86_STACK_BASE_ALIGN	ARCH_STACK_PTR_ALIGN
+#define Z_X86_STACK_BASE_ALIGN ARCH_STACK_PTR_ALIGN
 #endif
 
 #ifdef CONFIG_USERSPACE
@@ -71,9 +71,9 @@
  * the access control granularity and we don't want other kernel data to
  * unintentionally fall in the latter part of the page
  */
-#define Z_X86_STACK_SIZE_ALIGN	CONFIG_MMU_PAGE_SIZE
+#define Z_X86_STACK_SIZE_ALIGN CONFIG_MMU_PAGE_SIZE
 #else
-#define Z_X86_STACK_SIZE_ALIGN	ARCH_STACK_PTR_ALIGN
+#define Z_X86_STACK_SIZE_ALIGN ARCH_STACK_PTR_ALIGN
 #endif
 
 #ifndef _ASMLANGUAGE
@@ -139,27 +139,26 @@ struct z_x86_thread_stack_header {
 	char privilege_stack[CONFIG_MMU_PAGE_SIZE];
 #else
 	char privilege_stack[CONFIG_MMU_PAGE_SIZE -
-		sizeof(struct z_x86_kernel_stack_data)];
+			     sizeof(struct z_x86_kernel_stack_data)];
 
 	struct z_x86_kernel_stack_data kernel_data;
 #endif /* CONFIG_X86_64 */
 #endif /* CONFIG_USERSPACE */
 } __packed __aligned(Z_X86_STACK_BASE_ALIGN);
 
-#define ARCH_THREAD_STACK_OBJ_ALIGN(size)	Z_X86_STACK_BASE_ALIGN
+#define ARCH_THREAD_STACK_OBJ_ALIGN(size) Z_X86_STACK_BASE_ALIGN
 
 #define ARCH_THREAD_STACK_SIZE_ADJUST(size) \
 	ROUND_UP((size), Z_X86_STACK_SIZE_ALIGN)
 
-#define ARCH_THREAD_STACK_RESERVED \
-	sizeof(struct z_x86_thread_stack_header)
+#define ARCH_THREAD_STACK_RESERVED sizeof(struct z_x86_thread_stack_header)
 
 #ifdef CONFIG_HW_STACK_PROTECTION
-#define ARCH_KERNEL_STACK_RESERVED	CONFIG_MMU_PAGE_SIZE
-#define ARCH_KERNEL_STACK_OBJ_ALIGN	CONFIG_MMU_PAGE_SIZE
+#define ARCH_KERNEL_STACK_RESERVED CONFIG_MMU_PAGE_SIZE
+#define ARCH_KERNEL_STACK_OBJ_ALIGN CONFIG_MMU_PAGE_SIZE
 #else
-#define ARCH_KERNEL_STACK_RESERVED	0
-#define ARCH_KERNEL_STACK_OBJ_ALIGN	ARCH_STACK_PTR_ALIGN
+#define ARCH_KERNEL_STACK_RESERVED 0
+#define ARCH_KERNEL_STACK_OBJ_ALIGN ARCH_STACK_PTR_ALIGN
 #endif
 
 #endif /* !_ASMLANGUAGE */

@@ -21,13 +21,13 @@ extern "C" {
  * stack. The remaining levels are executed in the kernel's main task.
  */
 
-#define _SYS_INIT_LEVEL_PRE_KERNEL_1	0
-#define _SYS_INIT_LEVEL_PRE_KERNEL_2	1
-#define _SYS_INIT_LEVEL_POST_KERNEL	2
-#define _SYS_INIT_LEVEL_APPLICATION	3
+#define _SYS_INIT_LEVEL_PRE_KERNEL_1 0
+#define _SYS_INIT_LEVEL_PRE_KERNEL_2 1
+#define _SYS_INIT_LEVEL_POST_KERNEL 2
+#define _SYS_INIT_LEVEL_APPLICATION 3
 
 #ifdef CONFIG_SMP
-#define _SYS_INIT_LEVEL_SMP		4
+#define _SYS_INIT_LEVEL_SMP 4
 #endif
 
 struct device;
@@ -82,13 +82,13 @@ void z_sys_init_run_level(int32_t _level);
  * @param prio The initialization priority of the object, relative to
  * other objects of the same initialization level. See SYS_INIT().
  */
-#define Z_INIT_ENTRY_DEFINE(_entry_name, _init_fn, _device, _level, _prio)	\
-	static const Z_DECL_ALIGN(struct init_entry)			\
-		_CONCAT(__init_, _entry_name) __used			\
-	__attribute__((__section__(".init_" #_level STRINGIFY(_prio)))) = { \
-		.init = (_init_fn),					\
-		.dev = (_device),					\
-	}
+#define Z_INIT_ENTRY_DEFINE(_entry_name, _init_fn, _device, _level, _prio)    \
+	static const Z_DECL_ALIGN(struct init_entry)                          \
+		_CONCAT(__init_, _entry_name) __used __attribute__(           \
+			(__section__(".init_" #_level STRINGIFY(_prio)))) = { \
+			.init = (_init_fn),                                   \
+			.dev = (_device),                                     \
+		}
 
 /**
  * @def SYS_INIT
@@ -132,7 +132,7 @@ void z_sys_init_run_level(int32_t _level);
  * expressions are *not* permitted
  * (e.g. CONFIG_KERNEL_INIT_PRIORITY_DEFAULT + 5).
  */
-#define SYS_INIT(_init_fn, _level, _prio)					\
+#define SYS_INIT(_init_fn, _level, _prio) \
 	Z_INIT_ENTRY_DEFINE(Z_SYS_NAME(_init_fn), _init_fn, NULL, _level, _prio)
 
 #ifdef __cplusplus

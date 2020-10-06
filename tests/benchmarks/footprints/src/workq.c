@@ -80,21 +80,20 @@ void run_workq(void)
 
 	k_sem_init(&sync_sema, 0, 1);
 
-	k_work_q_start(&workq, workq_stack,
-		       K_THREAD_STACK_SIZEOF(workq_stack),
+	k_work_q_start(&workq, workq_stack, K_THREAD_STACK_SIZEOF(workq_stack),
 		       CONFIG_MAIN_THREAD_PRIORITY);
 
 	/* Exercise simple workqueue */
 	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
-			      simple_workq_thread, NULL, NULL, NULL,
-			      0, 0, K_NO_WAIT);
+			      simple_workq_thread, NULL, NULL, NULL, 0, 0,
+			      K_NO_WAIT);
 
 	k_thread_join(tid, K_FOREVER);
 
 	/* Exercise delayed workqueue */
 	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
-			      delayed_workq_thread, NULL, NULL, NULL,
-			      0, 0, K_NO_WAIT);
+			      delayed_workq_thread, NULL, NULL, NULL, 0, 0,
+			      K_NO_WAIT);
 
 	k_thread_join(tid, K_FOREVER);
 
@@ -108,12 +107,11 @@ void run_workq(void)
 	k_thread_access_grant(&user_workq.thread, &sync_sema);
 
 	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
-			      simple_user_workq_thread, NULL, NULL, NULL,
-			      0, K_USER, K_NO_WAIT);
+			      simple_user_workq_thread, NULL, NULL, NULL, 0,
+			      K_USER, K_NO_WAIT);
 
-	k_thread_access_grant(tid, &sync_sema,
-			      &user_workq.thread, &user_workq.queue,
-			      &user_workq_stack);
+	k_thread_access_grant(tid, &sync_sema, &user_workq.thread,
+			      &user_workq.queue, &user_workq_stack);
 
 	k_mem_domain_add_thread(&footprint_mem_domain, tid);
 

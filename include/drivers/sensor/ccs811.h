@@ -23,26 +23,26 @@ extern "C" {
 #include <drivers/sensor.h>
 
 /* Status register fields */
-#define CCS811_STATUS_ERROR             BIT(0)
-#define CCS811_STATUS_DATA_READY        BIT(3)
-#define CCS811_STATUS_APP_VALID         BIT(4)
-#define CCS811_STATUS_FW_MODE           BIT(7)
+#define CCS811_STATUS_ERROR BIT(0)
+#define CCS811_STATUS_DATA_READY BIT(3)
+#define CCS811_STATUS_APP_VALID BIT(4)
+#define CCS811_STATUS_FW_MODE BIT(7)
 
 /* Error register fields */
-#define CCS811_ERROR_WRITE_REG_INVALID  BIT(0)
-#define CCS811_ERROR_READ_REG_INVALID   BIT(1)
-#define CCS811_ERROR_MEASMODE_INVALID   BIT(2)
-#define CCS811_ERROR_MAX_RESISTANCE     BIT(3)
-#define CCS811_ERROR_HEATER_FAULT       BIT(4)
-#define CCS811_ERROR_HEATER_SUPPLY      BIT(5)
+#define CCS811_ERROR_WRITE_REG_INVALID BIT(0)
+#define CCS811_ERROR_READ_REG_INVALID BIT(1)
+#define CCS811_ERROR_MEASMODE_INVALID BIT(2)
+#define CCS811_ERROR_MAX_RESISTANCE BIT(3)
+#define CCS811_ERROR_HEATER_FAULT BIT(4)
+#define CCS811_ERROR_HEATER_SUPPLY BIT(5)
 
 /* Measurement mode constants */
-#define CCS811_MODE_IDLE                0x00
-#define CCS811_MODE_IAQ_1SEC            0x10
-#define CCS811_MODE_IAQ_10SEC           0x20
-#define CCS811_MODE_IAQ_60SEC           0x30
-#define CCS811_MODE_IAQ_250MSEC         0x40
-#define CCS811_MODE_MSK                 0x70
+#define CCS811_MODE_IDLE 0x00
+#define CCS811_MODE_IAQ_1SEC 0x10
+#define CCS811_MODE_IAQ_10SEC 0x20
+#define CCS811_MODE_IAQ_60SEC 0x30
+#define CCS811_MODE_IAQ_250MSEC 0x40
+#define CCS811_MODE_MSK 0x70
 
 /** @brief Information collected from the sensor on each fetch. */
 struct ccs811_result_type {

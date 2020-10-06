@@ -39,8 +39,7 @@ static void tfifo_thread_thread(struct k_fifo *pfifo)
 	 * from the call, leading to crash.
 	 */
 	k_thread_abort(tid);
-	zassert_is_null(ret,
-			"k_fifo_get didn't get 'timeout expired' status");
+	zassert_is_null(ret, "k_fifo_get didn't get 'timeout expired' status");
 	/* 80 includes generous fuzz factor as k_sleep() will add an extra
 	 * tick for non-tickless systems, and we may cross another tick
 	 * boundary while doing this. We just want to ensure we didn't

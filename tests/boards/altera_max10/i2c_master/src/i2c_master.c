@@ -14,19 +14,19 @@
  * https://ez.analog.com/docs/DOC-1986
  */
 
-#define ADV7513_HDMI_I2C_SLAVE_ADDR	0x39
+#define ADV7513_HDMI_I2C_SLAVE_ADDR 0x39
 
-#define ADV7513_CHIP_REVISION_REG	0x0
-#define CHIP_REVISION_VAL		0x13
+#define ADV7513_CHIP_REVISION_REG 0x0
+#define CHIP_REVISION_VAL 0x13
 
-#define ADV7513_MAIN_POWER_REG		0x41
-#define POWER_ON_VAL			0x10
+#define ADV7513_MAIN_POWER_REG 0x41
+#define POWER_ON_VAL 0x10
 
-#define ADV7513_HPD_CTRL_REG		0xD6
-#define HPD_CTRL_VAL			0xC0
+#define ADV7513_HPD_CTRL_REG 0xD6
+#define HPD_CTRL_VAL 0xC0
 
-#define ADV7513_WRITE_TEST_REG		0x2
-#define WRITE_TEST_VAL			0x66
+#define ADV7513_WRITE_TEST_REG 0x2
+#define WRITE_TEST_VAL 0x66
 
 static int powerup_adv7513(const struct device *i2c_dev)
 {
@@ -35,12 +35,12 @@ static int powerup_adv7513(const struct device *i2c_dev)
 	TC_PRINT("Powering up ADV7513\n");
 	/* write to HPD control registers */
 	if (i2c_reg_write_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR,
-				ADV7513_HPD_CTRL_REG, HPD_CTRL_VAL)) {
+			       ADV7513_HPD_CTRL_REG, HPD_CTRL_VAL)) {
 		TC_PRINT("i2c write fail\n");
 		return TC_FAIL;
 	}
-	if (i2c_reg_read_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR,
-				0xD6, &data)) {
+	if (i2c_reg_read_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR, 0xD6,
+			      &data)) {
 		TC_PRINT("failed to read HPD control\n");
 		return TC_FAIL;
 	}
@@ -48,13 +48,13 @@ static int powerup_adv7513(const struct device *i2c_dev)
 
 	/* write to power control registers */
 	if (i2c_reg_write_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR,
-				ADV7513_MAIN_POWER_REG, POWER_ON_VAL)) {
+			       ADV7513_MAIN_POWER_REG, POWER_ON_VAL)) {
 		TC_PRINT("i2c write fail\n");
 		return TC_FAIL;
 	}
 
-	if (i2c_reg_read_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR,
-				0x41, &data)) {
+	if (i2c_reg_read_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR, 0x41,
+			      &data)) {
 		TC_PRINT("failed to read Power state\n");
 		return TC_FAIL;
 	}
@@ -65,7 +65,8 @@ static int powerup_adv7513(const struct device *i2c_dev)
 
 static int test_i2c_adv7513(void)
 {
-	const struct device *i2c_dev = device_get_binding(DT_LABEL(DT_INST(0, nios2_i2c)));
+	const struct device *i2c_dev =
+		device_get_binding(DT_LABEL(DT_INST(0, nios2_i2c)));
 	uint32_t i2c_cfg = I2C_SPEED_SET(I2C_SPEED_STANDARD) | I2C_MODE_MASTER;
 	uint8_t data;
 
@@ -82,13 +83,13 @@ static int test_i2c_adv7513(void)
 
 	/* Power up ADV7513 */
 	zassert_true(powerup_adv7513(i2c_dev) == TC_PASS,
-					"ADV7513 power up failed");
+		     "ADV7513 power up failed");
 
 	TC_PRINT("*** Running i2c read/write tests ***\n");
 	/* Test i2c byte read */
 	data = 0x0;
 	if (i2c_reg_read_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR,
-				ADV7513_CHIP_REVISION_REG, &data)) {
+			      ADV7513_CHIP_REVISION_REG, &data)) {
 		TC_PRINT("failed to read chip revision\n");
 		return TC_FAIL;
 	}
@@ -98,17 +99,16 @@ static int test_i2c_adv7513(void)
 	}
 	TC_PRINT("i2c read test passed\n");
 
-
 	/* Test i2c byte write */
 	data = WRITE_TEST_VAL;
 	if (i2c_reg_write_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR,
-				ADV7513_WRITE_TEST_REG, data)) {
+			       ADV7513_WRITE_TEST_REG, data)) {
 		TC_PRINT("i2c write fail\n");
 		return TC_FAIL;
 	}
 	data = 0x0;
 	if (i2c_reg_read_byte(i2c_dev, ADV7513_HDMI_I2C_SLAVE_ADDR,
-				ADV7513_WRITE_TEST_REG, &data)) {
+			      ADV7513_WRITE_TEST_REG, &data)) {
 		TC_PRINT("i2c read fail\n");
 		return TC_FAIL;
 	}

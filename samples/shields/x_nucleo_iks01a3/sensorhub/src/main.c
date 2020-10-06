@@ -179,8 +179,10 @@ void main(void)
 	struct sensor_value accel1[3], accel2[3];
 	struct sensor_value gyro[3];
 	struct sensor_value magn[3];
-	const struct device *lis2dw12 = device_get_binding(DT_LABEL(DT_INST(0, st_lis2dw12)));
-	const struct device *lsm6dso = device_get_binding(DT_LABEL(DT_INST(0, st_lsm6dso)));
+	const struct device *lis2dw12 =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lis2dw12)));
+	const struct device *lsm6dso =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lsm6dso)));
 	int cnt = 1;
 
 	if (lis2dw12 == NULL) {
@@ -237,19 +239,19 @@ void main(void)
 		printf("X-NUCLEO-IKS01A3 sensor dashboard\n\n");
 
 		printf("LIS2DW12: Accel (m.s-2): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&accel2[0]),
-			sensor_value_to_double(&accel2[1]),
-			sensor_value_to_double(&accel2[2]));
+		       sensor_value_to_double(&accel2[0]),
+		       sensor_value_to_double(&accel2[1]),
+		       sensor_value_to_double(&accel2[2]));
 
 		printf("LSM6DSO: Accel (m.s-2): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&accel1[0]),
-			sensor_value_to_double(&accel1[1]),
-			sensor_value_to_double(&accel1[2]));
+		       sensor_value_to_double(&accel1[0]),
+		       sensor_value_to_double(&accel1[1]),
+		       sensor_value_to_double(&accel1[2]));
 
 		printf("LSM6DSO: GYro (dps): x: %.3f, y: %.3f, z: %.3f\n",
-			sensor_value_to_double(&gyro[0]),
-			sensor_value_to_double(&gyro[1]),
-			sensor_value_to_double(&gyro[2]));
+		       sensor_value_to_double(&gyro[0]),
+		       sensor_value_to_double(&gyro[1]),
+		       sensor_value_to_double(&gyro[2]));
 
 #ifdef CONFIG_LSM6DSO_ENABLE_TEMP
 		/* temperature */
@@ -286,7 +288,7 @@ void main(void)
 		printk("%d:: lsm6dso acc trig %d\n", cnt, lsm6dso_acc_trig_cnt);
 		printk("%d:: lsm6dso gyr trig %d\n", cnt, lsm6dso_gyr_trig_cnt);
 		printk("%d:: lsm6dso temp trig %d\n", cnt,
-			lsm6dso_temp_trig_cnt);
+		       lsm6dso_temp_trig_cnt);
 #endif
 
 		cnt++;

@@ -14,8 +14,8 @@
 #include <drivers/sensor.h>
 #include <drivers/i2c.h>
 
-#define MAX_TEST_TIME	5000
-#define SLEEPTIME	300
+#define MAX_TEST_TIME 5000
+#define SLEEPTIME 300
 
 static void print_accl_data(const struct device *itds)
 {
@@ -27,9 +27,8 @@ static void print_accl_data(const struct device *itds)
 	}
 
 	printf("Accl (m/s): X=%f, Y=%f, Z=%f\n",
-		sensor_value_to_double(&val[0]),
-		sensor_value_to_double(&val[1]),
-		sensor_value_to_double(&val[2]));
+	       sensor_value_to_double(&val[0]), sensor_value_to_double(&val[1]),
+	       sensor_value_to_double(&val[2]));
 }
 
 static void print_temp_data(const struct device *itds)
@@ -41,8 +40,7 @@ static void print_temp_data(const struct device *itds)
 		return;
 	}
 
-	printf("Temperature (Celsius): %f\n",
-		sensor_value_to_double(&val));
+	printf("Temperature (Celsius): %f\n", sensor_value_to_double(&val));
 }
 
 static void test_polling_mode(const struct device *itds)
@@ -122,7 +120,6 @@ static void test_trigger_mode(const struct device *itds)
 
 	printf("Data ready trigger test finished.\n");
 #endif
-
 }
 
 void main(void)
@@ -143,8 +140,8 @@ void main(void)
 	 */
 	sensor_g_to_ms2(4, &attr);
 
-	if (sensor_attr_set(itds, SENSOR_CHAN_ACCEL_XYZ,
-			    SENSOR_ATTR_FULL_SCALE, &attr) < 0) {
+	if (sensor_attr_set(itds, SENSOR_CHAN_ACCEL_XYZ, SENSOR_ATTR_FULL_SCALE,
+			    &attr) < 0) {
 		printf("Cannot set accl range.\n");
 		return;
 	}

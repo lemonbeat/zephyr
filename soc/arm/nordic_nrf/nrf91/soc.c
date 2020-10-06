@@ -67,5 +67,4 @@ void z_platform_init(void)
 	SystemInit();
 }
 
-
 SYS_INIT(nordicsemi_nrf91_init, PRE_KERNEL_1, 0);

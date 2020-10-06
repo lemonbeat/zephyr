@@ -32,13 +32,13 @@ extern "C" {
 
 #define GPTP_OFFSET_SCALED_LOG_VAR_UNKNOWN 0x436A
 
-#define GPTP_PRIORITY1_NON_GM_CAPABLE      255
-#define GPTP_PRIORITY1_GM_CAPABLE          248
+#define GPTP_PRIORITY1_NON_GM_CAPABLE 255
+#define GPTP_PRIORITY1_GM_CAPABLE 248
 
 #if defined(CONFIG_NET_GPTP_BMCA_PRIORITY2)
-#define GPTP_PRIORITY2_DEFAULT             CONFIG_NET_GPTP_BMCA_PRIORITY2
+#define GPTP_PRIORITY2_DEFAULT CONFIG_NET_GPTP_BMCA_PRIORITY2
 #else
-#define GPTP_PRIORITY2_DEFAULT             248
+#define GPTP_PRIORITY2_DEFAULT 248
 #endif
 
 /** @endcond */
@@ -95,27 +95,27 @@ static inline double gptp_pow2(int exp)
 
 /* Pre-calculated constants */
 /* 2^16 */
-#define GPTP_POW2_16	65536.0
+#define GPTP_POW2_16 65536.0
 /* 2^41 */
-#define GPTP_POW2_41	2199023255552.0
+#define GPTP_POW2_41 2199023255552.0
 
 /* Message types. Event messages have BIT(3) set to 0, and general messages
  * have that bit set to 1. IEEE 802.1AS chapter 10.5.2.2.2
  */
-#define GPTP_SYNC_MESSAGE                0x00
-#define GPTP_DELAY_REQ_MESSAGE           0x01
-#define GPTP_PATH_DELAY_REQ_MESSAGE      0x02
-#define GPTP_PATH_DELAY_RESP_MESSAGE     0x03
-#define GPTP_FOLLOWUP_MESSAGE            0x08
-#define GPTP_DELAY_RESP_MESSAGE          0x09
+#define GPTP_SYNC_MESSAGE 0x00
+#define GPTP_DELAY_REQ_MESSAGE 0x01
+#define GPTP_PATH_DELAY_REQ_MESSAGE 0x02
+#define GPTP_PATH_DELAY_RESP_MESSAGE 0x03
+#define GPTP_FOLLOWUP_MESSAGE 0x08
+#define GPTP_DELAY_RESP_MESSAGE 0x09
 #define GPTP_PATH_DELAY_FOLLOWUP_MESSAGE 0x0a
-#define GPTP_ANNOUNCE_MESSAGE            0x0b
-#define GPTP_SIGNALING_MESSAGE           0x0c
-#define GPTP_MANAGEMENT_MESSAGE          0x0d
+#define GPTP_ANNOUNCE_MESSAGE 0x0b
+#define GPTP_SIGNALING_MESSAGE 0x0c
+#define GPTP_MANAGEMENT_MESSAGE 0x0d
 
-#define GPTP_IS_EVENT_MSG(msg_type)      (!((msg_type) & BIT(3)))
+#define GPTP_IS_EVENT_MSG(msg_type) (!((msg_type)&BIT(3)))
 
-#define GPTP_CLOCK_ID_LEN                8
+#define GPTP_CLOCK_ID_LEN 8
 
 /** @endcond */
 
@@ -142,16 +142,16 @@ struct gptp_flags {
 
 struct gptp_hdr {
 	/** Type of the message. */
-	uint8_t message_type:4;
+	uint8_t message_type : 4;
 
 	/** Transport specific, always 1. */
-	uint8_t transport_specific:4;
+	uint8_t transport_specific : 4;
 
 	/** Version of the PTP, always 2. */
-	uint8_t ptp_version:4;
+	uint8_t ptp_version : 4;
 
 	/** Reserved field. */
-	uint8_t reserved0:4;
+	uint8_t reserved0 : 4;
 
 	/** Total length of the message from the header to the last TLV. */
 	uint16_t message_length;
@@ -186,11 +186,11 @@ struct gptp_hdr {
 
 /** @cond INTERNAL_HIDDEN */
 
-#define GPTP_GET_CURRENT_TIME_USCALED_NS(port, uscaled_ns_ptr)		\
-	do {								\
-		(uscaled_ns_ptr)->low =					\
-			gptp_get_current_time_nanosecond(port) << 16;	\
-		(uscaled_ns_ptr)->high = 0;				\
+#define GPTP_GET_CURRENT_TIME_USCALED_NS(port, uscaled_ns_ptr)                 \
+	do {                                                                   \
+		(uscaled_ns_ptr)->low = gptp_get_current_time_nanosecond(port) \
+					<< 16;                                 \
+		(uscaled_ns_ptr)->high = 0;                                    \
 	} while (false)
 
 /** @endcond */
@@ -209,10 +209,8 @@ struct gptp_hdr {
  *        lastGmFreqChange received from the grandmaster.
  */
 typedef void (*gptp_phase_dis_callback_t)(
-	uint8_t *gm_identity,
-	uint16_t *time_base,
-	struct gptp_scaled_ns *last_gm_ph_change,
-	double *last_gm_freq_change);
+	uint8_t *gm_identity, uint16_t *time_base,
+	struct gptp_scaled_ns *last_gm_ph_change, double *last_gm_freq_change);
 
 /**
  * @brief Phase discontinuity callback structure.
@@ -301,8 +299,7 @@ char *gptp_sprint_clock_id(const uint8_t *clk_id, char *output,
  * @param iface Pointer to network interface
  * @param user_data A valid pointer to user data or NULL
  */
-typedef void (*gptp_port_cb_t)(int port, struct net_if *iface,
-			       void *user_data);
+typedef void (*gptp_port_cb_t)(int port, struct net_if *iface, void *user_data);
 
 /**
  * @brief Go through all the gPTP ports and call callback for each of them.

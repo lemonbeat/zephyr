@@ -55,8 +55,7 @@ int testfs_lfs_wipe_partition(const struct fs_mount_t *mp)
 	int rc = flash_area_open(id, &pfa);
 
 	if (rc < 0) {
-		TC_PRINT("Error accessing flash area %u [%d]\n",
-			 id, rc);
+		TC_PRINT("Error accessing flash area %u [%d]\n", id, rc);
 		return TC_FAIL;
 	}
 
@@ -65,8 +64,7 @@ int testfs_lfs_wipe_partition(const struct fs_mount_t *mp)
 	(void)flash_area_close(pfa);
 
 	if (rc < 0) {
-		TC_PRINT("Error wiping flash area %u [%d]\n",
-			 id, rc);
+		TC_PRINT("Error wiping flash area %u [%d]\n", id, rc);
 		return TC_FAIL;
 	}
 

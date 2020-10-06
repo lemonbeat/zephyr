@@ -40,21 +40,21 @@ extern "C" {
  */
 
 /** Enables pin as input. */
-#define GPIO_INPUT              (1U << 8)
+#define GPIO_INPUT (1U << 8)
 
 /** Enables pin as output, no change to the output state. */
-#define GPIO_OUTPUT             (1U << 9)
+#define GPIO_OUTPUT (1U << 9)
 
 /** Disables pin for both input and output. */
-#define GPIO_DISCONNECTED	0
+#define GPIO_DISCONNECTED 0
 
 /** @cond INTERNAL_HIDDEN */
 
 /* Initializes output to a low state. */
-#define GPIO_OUTPUT_INIT_LOW    (1U << 10)
+#define GPIO_OUTPUT_INIT_LOW (1U << 10)
 
 /* Initializes output to a high state. */
-#define GPIO_OUTPUT_INIT_HIGH   (1U << 11)
+#define GPIO_OUTPUT_INIT_HIGH (1U << 11)
 
 /* Initializes output based on logic level */
 #define GPIO_OUTPUT_INIT_LOGICAL (1U << 12)
@@ -62,17 +62,15 @@ extern "C" {
 /** @endcond */
 
 /** Configures GPIO pin as output and initializes it to a low state. */
-#define GPIO_OUTPUT_LOW         (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)
+#define GPIO_OUTPUT_LOW (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)
 /** Configures GPIO pin as output and initializes it to a high state. */
-#define GPIO_OUTPUT_HIGH        (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)
+#define GPIO_OUTPUT_HIGH (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)
 /** Configures GPIO pin as output and initializes it to a logic 0. */
-#define GPIO_OUTPUT_INACTIVE    (GPIO_OUTPUT |			\
-				 GPIO_OUTPUT_INIT_LOW |		\
-				 GPIO_OUTPUT_INIT_LOGICAL)
+#define GPIO_OUTPUT_INACTIVE \
+	(GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_LOGICAL)
 /** Configures GPIO pin as output and initializes it to a logic 1. */
-#define GPIO_OUTPUT_ACTIVE      (GPIO_OUTPUT |			\
-				 GPIO_OUTPUT_INIT_HIGH |	\
-				 GPIO_OUTPUT_INIT_LOGICAL)
+#define GPIO_OUTPUT_ACTIVE \
+	(GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH | GPIO_OUTPUT_INIT_LOGICAL)
 
 /** @} */
 
@@ -88,19 +86,19 @@ extern "C" {
  */
 
 /** Disables GPIO pin interrupt. */
-#define GPIO_INT_DISABLE               (1U << 13)
+#define GPIO_INT_DISABLE (1U << 13)
 
 /** @cond INTERNAL_HIDDEN */
 
 /* Enables GPIO pin interrupt. */
-#define GPIO_INT_ENABLE                (1U << 14)
+#define GPIO_INT_ENABLE (1U << 14)
 
 /* GPIO interrupt is sensitive to logical levels.
  *
  * This is a component flag that should be combined with other
  * `GPIO_INT_*` flags to produce a meaningful configuration.
  */
-#define GPIO_INT_LEVELS_LOGICAL        (1U << 15)
+#define GPIO_INT_LEVELS_LOGICAL (1U << 15)
 
 /* GPIO interrupt is edge sensitive.
  *
@@ -109,7 +107,7 @@ extern "C" {
  * This is a component flag that should be combined with other
  * `GPIO_INT_*` flags to produce a meaningful configuration.
  */
-#define GPIO_INT_EDGE                  (1U << 16)
+#define GPIO_INT_EDGE (1U << 16)
 
 /* Trigger detection when input state is (or transitions to) physical low or
  * logical 0 level.
@@ -117,7 +115,7 @@ extern "C" {
  * This is a component flag that should be combined with other
  * `GPIO_INT_*` flags to produce a meaningful configuration.
  */
-#define GPIO_INT_LOW_0                 (1U << 17)
+#define GPIO_INT_LOW_0 (1U << 17)
 
 /* Trigger detection on input state is (or transitions to) physical high or
  * logical 1 level.
@@ -125,72 +123,60 @@ extern "C" {
  * This is a component flag that should be combined with other
  * `GPIO_INT_*` flags to produce a meaningful configuration.
  */
-#define GPIO_INT_HIGH_1                (1U << 18)
+#define GPIO_INT_HIGH_1 (1U << 18)
 
 /** @endcond */
 
 /** Configures GPIO interrupt to be triggered on pin rising edge and enables it.
  */
-#define GPIO_INT_EDGE_RISING           (GPIO_INT_ENABLE | \
-					GPIO_INT_EDGE | \
-					GPIO_INT_HIGH_1)
+#define GPIO_INT_EDGE_RISING (GPIO_INT_ENABLE | GPIO_INT_EDGE | GPIO_INT_HIGH_1)
 
 /** Configures GPIO interrupt to be triggered on pin falling edge and enables
  * it.
  */
-#define GPIO_INT_EDGE_FALLING          (GPIO_INT_ENABLE | \
-					GPIO_INT_EDGE | \
-					GPIO_INT_LOW_0)
+#define GPIO_INT_EDGE_FALLING (GPIO_INT_ENABLE | GPIO_INT_EDGE | GPIO_INT_LOW_0)
 
 /** Configures GPIO interrupt to be triggered on pin rising or falling edge and
  * enables it.
  */
-#define GPIO_INT_EDGE_BOTH             (GPIO_INT_ENABLE | \
-					GPIO_INT_EDGE | \
-					GPIO_INT_LOW_0 | \
-					GPIO_INT_HIGH_1)
+#define GPIO_INT_EDGE_BOTH \
+	(GPIO_INT_ENABLE | GPIO_INT_EDGE | GPIO_INT_LOW_0 | GPIO_INT_HIGH_1)
 
 /** Configures GPIO interrupt to be triggered on pin physical level low and
  * enables it.
  */
-#define GPIO_INT_LEVEL_LOW             (GPIO_INT_ENABLE | \
-					GPIO_INT_LOW_0)
+#define GPIO_INT_LEVEL_LOW (GPIO_INT_ENABLE | GPIO_INT_LOW_0)
 
 /** Configures GPIO interrupt to be triggered on pin physical level high and
  * enables it.
  */
-#define GPIO_INT_LEVEL_HIGH            (GPIO_INT_ENABLE | \
-					GPIO_INT_HIGH_1)
+#define GPIO_INT_LEVEL_HIGH (GPIO_INT_ENABLE | GPIO_INT_HIGH_1)
 
 /** Configures GPIO interrupt to be triggered on pin state change to logical
  * level 0 and enables it.
  */
-#define GPIO_INT_EDGE_TO_INACTIVE      (GPIO_INT_ENABLE | \
-					GPIO_INT_LEVELS_LOGICAL | \
-					GPIO_INT_EDGE | \
-					GPIO_INT_LOW_0)
+#define GPIO_INT_EDGE_TO_INACTIVE                                    \
+	(GPIO_INT_ENABLE | GPIO_INT_LEVELS_LOGICAL | GPIO_INT_EDGE | \
+	 GPIO_INT_LOW_0)
 
 /** Configures GPIO interrupt to be triggered on pin state change to logical
  * level 1 and enables it.
  */
-#define GPIO_INT_EDGE_TO_ACTIVE        (GPIO_INT_ENABLE | \
-					GPIO_INT_LEVELS_LOGICAL | \
-					GPIO_INT_EDGE | \
-					GPIO_INT_HIGH_1)
+#define GPIO_INT_EDGE_TO_ACTIVE                                      \
+	(GPIO_INT_ENABLE | GPIO_INT_LEVELS_LOGICAL | GPIO_INT_EDGE | \
+	 GPIO_INT_HIGH_1)
 
 /** Configures GPIO interrupt to be triggered on pin logical level 0 and enables
  * it.
  */
-#define GPIO_INT_LEVEL_INACTIVE        (GPIO_INT_ENABLE | \
-					GPIO_INT_LEVELS_LOGICAL | \
-					GPIO_INT_LOW_0)
+#define GPIO_INT_LEVEL_INACTIVE \
+	(GPIO_INT_ENABLE | GPIO_INT_LEVELS_LOGICAL | GPIO_INT_LOW_0)
 
 /** Configures GPIO interrupt to be triggered on pin logical level 1 and enables
  * it.
  */
-#define GPIO_INT_LEVEL_ACTIVE          (GPIO_INT_ENABLE | \
-					GPIO_INT_LEVELS_LOGICAL | \
-					GPIO_INT_HIGH_1)
+#define GPIO_INT_LEVEL_ACTIVE \
+	(GPIO_INT_ENABLE | GPIO_INT_LEVELS_LOGICAL | GPIO_INT_HIGH_1)
 
 /** @} */
 
@@ -199,7 +185,7 @@ extern "C" {
  * @note Drivers that do not support a debounce feature should ignore
  * this flag rather than rejecting the configuration with -ENOTSUP.
  */
-#define GPIO_INT_DEBOUNCE              (1U << 19)
+#define GPIO_INT_DEBOUNCE (1U << 19)
 
 /**
  * @name GPIO drive strength flags
@@ -255,7 +241,7 @@ extern "C" {
 /** @} */
 
 /** @cond INTERNAL_HIDDEN */
-#define GPIO_DIR_MASK		(GPIO_INPUT | GPIO_OUTPUT)
+#define GPIO_DIR_MASK (GPIO_INPUT | GPIO_OUTPUT)
 /** @endcond */
 
 /**
@@ -424,19 +410,18 @@ __subsystem struct gpio_driver_api {
 	int (*port_toggle_bits)(const struct device *port,
 				gpio_port_pins_t pins);
 	int (*pin_interrupt_configure)(const struct device *port,
-				       gpio_pin_t pin,
-				       enum gpio_int_mode, enum gpio_int_trig);
+				       gpio_pin_t pin, enum gpio_int_mode,
+				       enum gpio_int_trig);
 	int (*manage_callback)(const struct device *port,
-			       struct gpio_callback *cb,
-			       bool set);
+			       struct gpio_callback *cb, bool set);
 	uint32_t (*get_pending_int)(const struct device *dev);
 };
 
 __syscall int gpio_config(const struct device *port, gpio_pin_t pin,
 			  gpio_flags_t flags);
 
-static inline int z_impl_gpio_config(const struct device *port,
-				     gpio_pin_t pin, gpio_flags_t flags)
+static inline int z_impl_gpio_config(const struct device *port, gpio_pin_t pin,
+				     gpio_flags_t flags)
 {
 	const struct gpio_driver_api *api =
 		(const struct gpio_driver_api *)port->api;
@@ -469,8 +454,7 @@ static inline int z_impl_gpio_config(const struct device *port,
  * @retval -EWOULDBLOCK if operation would block.
  */
 __syscall int gpio_pin_interrupt_configure(const struct device *port,
-					   gpio_pin_t pin,
-					   gpio_flags_t flags);
+					   gpio_pin_t pin, gpio_flags_t flags);
 
 static inline int z_impl_gpio_pin_interrupt_configure(const struct device *port,
 						      gpio_pin_t pin,
@@ -487,22 +471,22 @@ static inline int z_impl_gpio_pin_interrupt_configure(const struct device *port,
 
 	__ASSERT_NO_MSG((flags & GPIO_INT_DEBOUNCE) == 0);
 
-	__ASSERT((flags & (GPIO_INT_DISABLE | GPIO_INT_ENABLE))
-		 != (GPIO_INT_DISABLE | GPIO_INT_ENABLE),
+	__ASSERT((flags & (GPIO_INT_DISABLE | GPIO_INT_ENABLE)) !=
+			 (GPIO_INT_DISABLE | GPIO_INT_ENABLE),
 		 "Cannot both enable and disable interrupts");
 
 	__ASSERT((flags & (GPIO_INT_DISABLE | GPIO_INT_ENABLE)) != 0U,
 		 "Must either enable or disable interrupts");
 
 	__ASSERT(((flags & GPIO_INT_ENABLE) == 0) ||
-		 ((flags & GPIO_INT_EDGE) != 0) ||
-		 ((flags & (GPIO_INT_LOW_0 | GPIO_INT_HIGH_1)) !=
-		  (GPIO_INT_LOW_0 | GPIO_INT_HIGH_1)),
+			 ((flags & GPIO_INT_EDGE) != 0) ||
+			 ((flags & (GPIO_INT_LOW_0 | GPIO_INT_HIGH_1)) !=
+			  (GPIO_INT_LOW_0 | GPIO_INT_HIGH_1)),
 		 "Only one of GPIO_INT_LOW_0, GPIO_INT_HIGH_1 can be "
 		 "enabled for a level interrupt.");
 
 	__ASSERT(((flags & GPIO_INT_ENABLE) == 0) ||
-		 ((flags & (GPIO_INT_LOW_0 | GPIO_INT_HIGH_1)) != 0),
+			 ((flags & (GPIO_INT_LOW_0 | GPIO_INT_HIGH_1)) != 0),
 		 "At least one of GPIO_INT_LOW_0, GPIO_INT_HIGH_1 has to be "
 		 "enabled.");
 
@@ -517,7 +501,8 @@ static inline int z_impl_gpio_pin_interrupt_configure(const struct device *port,
 	}
 
 	trig = (enum gpio_int_trig)(flags & (GPIO_INT_LOW_0 | GPIO_INT_HIGH_1));
-	mode = (enum gpio_int_mode)(flags & (GPIO_INT_EDGE | GPIO_INT_DISABLE | GPIO_INT_ENABLE));
+	mode = (enum gpio_int_mode)(
+		flags & (GPIO_INT_EDGE | GPIO_INT_DISABLE | GPIO_INT_ENABLE));
 
 	return api->pin_interrupt_configure(port, pin, mode, trig);
 }
@@ -538,20 +523,18 @@ static inline int z_impl_gpio_pin_interrupt_configure(const struct device *port,
  * @retval -EIO I/O error when accessing an external GPIO chip.
  * @retval -EWOULDBLOCK if operation would block.
  */
-static inline int gpio_pin_configure(const struct device *port,
-				     gpio_pin_t pin,
+static inline int gpio_pin_configure(const struct device *port, gpio_pin_t pin,
 				     gpio_flags_t flags)
 {
 	const struct gpio_driver_api *api =
 		(const struct gpio_driver_api *)port->api;
 	const struct gpio_driver_config *const cfg =
 		(const struct gpio_driver_config *)port->config;
-	struct gpio_driver_data *data =
-		(struct gpio_driver_data *)port->data;
+	struct gpio_driver_data *data = (struct gpio_driver_data *)port->data;
 	int ret;
 
 	__ASSERT((flags & (GPIO_PULL_UP | GPIO_PULL_DOWN)) !=
-		 (GPIO_PULL_UP | GPIO_PULL_DOWN),
+			 (GPIO_PULL_UP | GPIO_PULL_DOWN),
 		 "Pull Up and Pull Down should not be enabled simultaneously");
 
 	__ASSERT((flags & GPIO_OUTPUT) != 0 || (flags & GPIO_SINGLE_ENDED) == 0,
@@ -561,19 +544,20 @@ static inline int gpio_pin_configure(const struct device *port,
 	__ASSERT_NO_MSG((flags & GPIO_SINGLE_ENDED) != 0 ||
 			(flags & GPIO_LINE_OPEN_DRAIN) == 0);
 
-	__ASSERT((flags & (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH)) == 0
-		 || (flags & GPIO_OUTPUT) != 0,
+	__ASSERT((flags & (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH)) ==
+				 0 ||
+			 (flags & GPIO_OUTPUT) != 0,
 		 "Output needs to be enabled to be initialized low or high");
 
-	__ASSERT((flags & (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH))
-		 != (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH),
+	__ASSERT((flags & (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH)) !=
+			 (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH),
 		 "Output cannot be initialized low and high");
 
-	if (((flags & GPIO_OUTPUT_INIT_LOGICAL) != 0)
-	    && ((flags & (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH)) != 0)
-	    && ((flags & GPIO_ACTIVE_LOW) != 0)) {
-		flags ^= GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH
-			| GPIO_OUTPUT_INIT_LOGICAL;
+	if (((flags & GPIO_OUTPUT_INIT_LOGICAL) != 0) &&
+	    ((flags & (GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH)) != 0) &&
+	    ((flags & GPIO_ACTIVE_LOW) != 0)) {
+		flags ^= GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH |
+			 GPIO_OUTPUT_INIT_LOGICAL;
 	}
 
 	(void)cfg;
@@ -590,8 +574,8 @@ static inline int gpio_pin_configure(const struct device *port,
 	} else {
 		data->invert &= ~(gpio_port_pins_t)BIT(pin);
 	}
-	if (((flags & (GPIO_INT_DISABLE | GPIO_INT_ENABLE)) != 0U)
-	    && (api->pin_interrupt_configure != NULL)) {
+	if (((flags & (GPIO_INT_DISABLE | GPIO_INT_ENABLE)) != 0U) &&
+	    (api->pin_interrupt_configure != NULL)) {
 		flags &= ~GPIO_INT_DEBOUNCE;
 		ret = z_impl_gpio_pin_interrupt_configure(port, pin, flags);
 	}
@@ -650,7 +634,7 @@ static inline int gpio_port_get(const struct device *port,
 				gpio_port_value_t *value)
 {
 	const struct gpio_driver_data *const data =
-			(const struct gpio_driver_data *)port->data;
+		(const struct gpio_driver_data *)port->data;
 	int ret;
 
 	ret = gpio_port_get_raw(port, value);
@@ -717,7 +701,7 @@ static inline int gpio_port_set_masked(const struct device *port,
 				       gpio_port_value_t value)
 {
 	const struct gpio_driver_data *const data =
-			(const struct gpio_driver_data *)port->data;
+		(const struct gpio_driver_data *)port->data;
 
 	value ^= data->invert;
 
@@ -960,10 +944,11 @@ static inline int gpio_pin_set_raw(const struct device *port, gpio_pin_t pin,
 	__ASSERT((cfg->port_pin_mask & (gpio_port_pins_t)BIT(pin)) != 0U,
 		 "Unsupported pin");
 
-	if (value != 0)	{
+	if (value != 0) {
 		ret = gpio_port_set_bits_raw(port, (gpio_port_pins_t)BIT(pin));
 	} else {
-		ret = gpio_port_clear_bits_raw(port, (gpio_port_pins_t)BIT(pin));
+		ret = gpio_port_clear_bits_raw(port,
+					       (gpio_port_pins_t)BIT(pin));
 	}
 
 	return ret;
@@ -996,7 +981,7 @@ static inline int gpio_pin_set(const struct device *port, gpio_pin_t pin,
 	const struct gpio_driver_config *const cfg =
 		(const struct gpio_driver_config *)port->config;
 	const struct gpio_driver_data *const data =
-			(const struct gpio_driver_data *)port->data;
+		(const struct gpio_driver_data *)port->data;
 
 	(void)cfg;
 	__ASSERT((cfg->port_pin_mask & (gpio_port_pins_t)BIT(pin)) != 0U,

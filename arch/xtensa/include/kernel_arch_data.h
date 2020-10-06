@@ -25,7 +25,7 @@
 #include <arch/cpu.h>
 
 #if !defined(_ASMLANGUAGE) && !defined(__ASSEMBLER__)
-#include <kernel.h>            /* public kernel API */
+#include <kernel.h> /* public kernel API */
 #include <zephyr/types.h>
 #include <sys/dlist.h>
 #include <sys/util.h>

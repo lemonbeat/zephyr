@@ -21,8 +21,8 @@ LOG_MODULE_REGISTER(mdm_receiver, CONFIG_MODEM_LOG_LEVEL);
 
 #include "modem_receiver.h"
 
-#define MAX_MDM_CTX	CONFIG_MODEM_RECEIVER_MAX_CONTEXTS
-#define MAX_READ_SIZE	128
+#define MAX_MDM_CTX CONFIG_MODEM_RECEIVER_MAX_CONTEXTS
+#define MAX_READ_SIZE 128
 
 static struct mdm_receiver_context *contexts[MAX_MDM_CTX];
 
@@ -123,8 +123,8 @@ static void mdm_receiver_isr(const struct device *uart_dev, void *user_data)
 			ret = ring_buf_put(&ctx->rx_rb, read_buf, rx);
 			if (ret != rx) {
 				LOG_ERR("Rx buffer doesn't have enough space. "
-						"Bytes pending: %d, written: %d",
-						rx, ret);
+					"Bytes pending: %d, written: %d",
+					rx, ret);
 				mdm_receiver_flush(ctx);
 				k_sem_give(&ctx->rx_sem);
 				break;
@@ -161,8 +161,8 @@ struct mdm_receiver_context *mdm_receiver_context_from_id(int id)
 	}
 }
 
-int mdm_receiver_recv(struct mdm_receiver_context *ctx,
-		      uint8_t *buf, size_t size, size_t *bytes_read)
+int mdm_receiver_recv(struct mdm_receiver_context *ctx, uint8_t *buf,
+		      size_t size, size_t *bytes_read)
 {
 	if (!ctx) {
 		return -EINVAL;
@@ -177,8 +177,8 @@ int mdm_receiver_recv(struct mdm_receiver_context *ctx,
 	return 0;
 }
 
-int mdm_receiver_send(struct mdm_receiver_context *ctx,
-		      const uint8_t *buf, size_t size)
+int mdm_receiver_send(struct mdm_receiver_context *ctx, const uint8_t *buf,
+		      size_t size)
 {
 	if (!ctx) {
 		return -EINVAL;
@@ -199,7 +199,8 @@ int mdm_receiver_sleep(struct mdm_receiver_context *ctx)
 {
 	uart_irq_rx_disable(ctx->uart_dev);
 #ifdef DEVICE_PM_LOW_POWER_STATE
-	device_set_power_state(ctx->uart_dev, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+	device_set_power_state(ctx->uart_dev, DEVICE_PM_LOW_POWER_STATE, NULL,
+			       NULL);
 #endif
 	return 0;
 }
@@ -207,7 +208,8 @@ int mdm_receiver_sleep(struct mdm_receiver_context *ctx)
 int mdm_receiver_wake(struct mdm_receiver_context *ctx)
 {
 #ifdef DEVICE_PM_LOW_POWER_STATE
-	device_set_power_state(ctx->uart_dev, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
+	device_set_power_state(ctx->uart_dev, DEVICE_PM_ACTIVE_STATE, NULL,
+			       NULL);
 #endif
 	uart_irq_rx_enable(ctx->uart_dev);
 
@@ -215,8 +217,7 @@ int mdm_receiver_wake(struct mdm_receiver_context *ctx)
 }
 
 int mdm_receiver_register(struct mdm_receiver_context *ctx,
-			  const char *uart_dev_name,
-			  uint8_t *buf, size_t size)
+			  const char *uart_dev_name, uint8_t *buf, size_t size)
 {
 	int ret;
 

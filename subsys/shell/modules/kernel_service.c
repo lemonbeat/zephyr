@@ -15,8 +15,8 @@
 #include <device.h>
 #include <drivers/timer/system_timer.h>
 
-static int cmd_kernel_version(const struct shell *shell,
-			      size_t argc, char **argv)
+static int cmd_kernel_version(const struct shell *shell, size_t argc,
+			      char **argv)
 {
 	uint32_t version = sys_kernel_version_get();
 
@@ -24,14 +24,14 @@ static int cmd_kernel_version(const struct shell *shell,
 	ARG_UNUSED(argv);
 
 	shell_print(shell, "Zephyr version %d.%d.%d",
-		      SYS_KERNEL_VER_MAJOR(version),
-		      SYS_KERNEL_VER_MINOR(version),
-		      SYS_KERNEL_VER_PATCHLEVEL(version));
+		    SYS_KERNEL_VER_MAJOR(version),
+		    SYS_KERNEL_VER_MINOR(version),
+		    SYS_KERNEL_VER_PATCHLEVEL(version));
 	return 0;
 }
 
-static int cmd_kernel_uptime(const struct shell *shell,
-			     size_t argc, char **argv)
+static int cmd_kernel_uptime(const struct shell *shell, size_t argc,
+			     char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -40,8 +40,8 @@ static int cmd_kernel_uptime(const struct shell *shell,
 	return 0;
 }
 
-static int cmd_kernel_cycles(const struct shell *shell,
-			      size_t argc, char **argv)
+static int cmd_kernel_cycles(const struct shell *shell, size_t argc,
+			     char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -65,13 +65,11 @@ static void shell_tdata_dump(const struct k_thread *cthread, void *user_data)
 	tname = k_thread_name_get(thread);
 
 	shell_print(shell, "%s%p %-10s",
-		      (thread == k_current_get()) ? "*" : " ",
-		      thread,
-		      tname ? tname : "NA");
+		    (thread == k_current_get()) ? "*" : " ", thread,
+		    tname ? tname : "NA");
 	shell_print(shell, "\toptions: 0x%x, priority: %d timeout: %d",
-		      thread->base.user_options,
-		      thread->base.prio,
-		      thread->base.timeout.dticks);
+		    thread->base.user_options, thread->base.prio,
+		    thread->base.timeout.dticks);
 	shell_print(shell, "\tstate: %s", k_thread_state_str(thread));
 
 	ret = k_thread_stack_space_get(thread, &unused);
@@ -83,15 +81,15 @@ static void shell_tdata_dump(const struct k_thread *cthread, void *user_data)
 		/* Calculate the real size reserved for the stack */
 		pcnt = ((size - unused) * 100U) / size;
 
-		shell_print(shell,
-			    "\tstack size %zu, unused %zu, usage %zu / %zu (%u %%)\n",
-			    size, unused, size - unused, size, pcnt);
+		shell_print(
+			shell,
+			"\tstack size %zu, unused %zu, usage %zu / %zu (%u %%)\n",
+			size, unused, size - unused, size, pcnt);
 	}
-
 }
 
-static int cmd_kernel_threads(const struct shell *shell,
-			      size_t argc, char **argv)
+static int cmd_kernel_threads(const struct shell *shell, size_t argc,
+			      char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -124,18 +122,18 @@ static void shell_stack_dump(const struct k_thread *thread, void *user_data)
 	/* Calculate the real size reserved for the stack */
 	pcnt = ((size - unused) * 100U) / size;
 
-	shell_print((const struct shell *)user_data,
+	shell_print(
+		(const struct shell *)user_data,
 		"%p %-10s (real size %u):\tunused %u\tusage %u / %u (%u %%)",
-		      thread,
-		      tname ? tname : "NA",
-		      size, unused, size - unused, size, pcnt);
+		thread, tname ? tname : "NA", size, unused, size - unused, size,
+		pcnt);
 }
 
 extern K_KERNEL_STACK_ARRAY_DEFINE(z_interrupt_stacks, CONFIG_MP_NUM_CPUS,
 				   CONFIG_ISR_STACK_SIZE);
 
-static int cmd_kernel_stacks(const struct shell *shell,
-			     size_t argc, char **argv)
+static int cmd_kernel_stacks(const struct shell *shell, size_t argc,
+			     char **argv)
 {
 	uint8_t *buf;
 	size_t size, unused = 0;
@@ -160,11 +158,11 @@ static int cmd_kernel_stacks(const struct shell *shell,
 			}
 		}
 
-		shell_print(shell,
+		shell_print(
+			shell,
 			"%p IRQ %02d     (real size %zu):\tunused %zu\tusage %zu / %zu (%zu %%)",
-			      &z_interrupt_stacks[i], i, size, unused,
-			      size - unused, size,
-			      ((size - unused) * 100U) / size);
+			&z_interrupt_stacks[i], i, size, unused, size - unused,
+			size, ((size - unused) * 100U) / size);
 	}
 
 	return 0;
@@ -172,8 +170,8 @@ static int cmd_kernel_stacks(const struct shell *shell,
 #endif
 
 #if defined(CONFIG_REBOOT)
-static int cmd_kernel_reboot_warm(const struct shell *shell,
-				  size_t argc, char **argv)
+static int cmd_kernel_reboot_warm(const struct shell *shell, size_t argc,
+				  char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -181,8 +179,8 @@ static int cmd_kernel_reboot_warm(const struct shell *shell,
 	return 0;
 }
 
-static int cmd_kernel_reboot_cold(const struct shell *shell,
-				  size_t argc, char **argv)
+static int cmd_kernel_reboot_cold(const struct shell *shell, size_t argc,
+				  char **argv)
 {
 	ARG_UNUSED(argc);
 	ARG_UNUSED(argv);
@@ -190,20 +188,22 @@ static int cmd_kernel_reboot_cold(const struct shell *shell,
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_kernel_reboot,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_kernel_reboot,
 	SHELL_CMD(cold, NULL, "Cold reboot.", cmd_kernel_reboot_cold),
 	SHELL_CMD(warm, NULL, "Warm reboot.", cmd_kernel_reboot_warm),
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 #endif
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_kernel,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_kernel,
 	SHELL_CMD(cycles, NULL, "Kernel cycles.", cmd_kernel_cycles),
 #if defined(CONFIG_REBOOT)
 	SHELL_CMD(reboot, &sub_kernel_reboot, "Reboot.", NULL),
 #endif
 #if defined(CONFIG_INIT_STACKS) && defined(CONFIG_THREAD_STACK_INFO) && \
-		defined(CONFIG_THREAD_MONITOR)
+	defined(CONFIG_THREAD_MONITOR)
 	SHELL_CMD(stacks, NULL, "List threads stack usage.", cmd_kernel_stacks),
 	SHELL_CMD(threads, NULL, "List kernel threads.", cmd_kernel_threads),
 #endif

@@ -25,25 +25,25 @@ void stm32h7_m4_boot_stop(void)
 	 * external memory configuration.. )
 	 */
 
-	 /* Clear pending events if any */
-	 __SEV();
-	 __WFE();
+	/* Clear pending events if any */
+	__SEV();
+	__WFE();
 
-	 /* Select the domain Power Down DeepSleep */
-	 LL_PWR_SetRegulModeDS(LL_PWR_REGU_DSMODE_MAIN);
-	 /* Keep DSTOP mode when D2 domain enters Deepsleep */
-	 LL_PWR_CPU_SetD2PowerMode(LL_PWR_CPU_MODE_D2STOP);
-	 LL_PWR_CPU2_SetD2PowerMode(LL_PWR_CPU2_MODE_D2STOP);
-	 /* Set SLEEPDEEP bit of Cortex System Control Register */
-	 LL_LPM_EnableDeepSleep();
+	/* Select the domain Power Down DeepSleep */
+	LL_PWR_SetRegulModeDS(LL_PWR_REGU_DSMODE_MAIN);
+	/* Keep DSTOP mode when D2 domain enters Deepsleep */
+	LL_PWR_CPU_SetD2PowerMode(LL_PWR_CPU_MODE_D2STOP);
+	LL_PWR_CPU2_SetD2PowerMode(LL_PWR_CPU2_MODE_D2STOP);
+	/* Set SLEEPDEEP bit of Cortex System Control Register */
+	LL_LPM_EnableDeepSleep();
 
-	 /* Ensure that all instructions done before entering STOP mode */
-	 __DSB();
-	 __ISB();
-	 /* Request Wait For Event */
-	 __WFE();
+	/* Ensure that all instructions done before entering STOP mode */
+	__DSB();
+	__ISB();
+	/* Request Wait For Event */
+	__WFE();
 
-	 /* Reset SLEEPDEEP bit of Cortex System Control Register,
+	/* Reset SLEEPDEEP bit of Cortex System Control Register,
 	  * the following LL API Clear SLEEPDEEP bit of Cortex
 	  * System Control Register
 	  */
@@ -85,7 +85,8 @@ static int stm32h7_m4_init(const struct device *arg)
 		stm32h7_m4_boot_stop();
 
 		/* Clear HSEM flag */
-		LL_HSEM_ClearFlag_C2ICR(HSEM, CFG_HW_ENTRY_STOP_MODE_MASK_SEMID);
+		LL_HSEM_ClearFlag_C2ICR(HSEM,
+					CFG_HW_ENTRY_STOP_MODE_MASK_SEMID);
 	}
 
 	return 0;

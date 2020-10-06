@@ -66,13 +66,13 @@ static int barrier_return[N_THR_E];
 
 void *thread_top_exec(void *p1)
 {
-	int i, j, id = (int) POINTER_TO_INT(p1);
+	int i, j, id = (int)POINTER_TO_INT(p1);
 	int policy;
 	struct sched_param schedparam;
 
 	pthread_getschedparam(pthread_self(), &policy, &schedparam);
 	printk("Thread %d starting with scheduling policy %d & priority %d\n",
-		 id, policy, schedparam.sched_priority);
+	       id, policy, schedparam.sched_priority);
 	/* Try a double-lock here to exercise the failing case of
 	 * trylock.  We don't support RECURSIVE locks, so this is
 	 * guaranteed to fail.
@@ -87,7 +87,6 @@ void *thread_top_exec(void *p1)
 	pthread_mutex_unlock(&lock);
 
 	for (i = 0; i < BOUNCES; i++) {
-
 		pthread_mutex_lock(&lock);
 
 		/* Wait for the current owner to signal us, unless we
@@ -202,11 +201,10 @@ void *thread_top_term(void *p1)
 		      "Unable to set thread priority!");
 
 	zassert_false(pthread_getschedparam(self, &policy, &getschedparam),
-			"Unable to get thread priority!");
+		      "Unable to get thread priority!");
 
-	printk("Thread %d starting with a priority of %d\n",
-			id,
-			getschedparam.sched_priority);
+	printk("Thread %d starting with a priority of %d\n", id,
+	       getschedparam.sched_priority);
 
 	if (id % 2) {
 		ret = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
@@ -248,12 +246,11 @@ void test_posix_pthread_execution(void)
 	max_prio = sched_get_priority_max(schedpolicy);
 
 	ret = (min_prio < 0 || max_prio < 0 ||
-			schedparam.sched_priority < min_prio ||
-			schedparam.sched_priority > max_prio);
+	       schedparam.sched_priority < min_prio ||
+	       schedparam.sched_priority > max_prio);
 
 	/* TESTPOINT: Check if scheduling priority is valid */
-	zassert_false(ret,
-			"Scheduling priority outside valid priority range");
+	zassert_false(ret, "Scheduling priority outside valid priority range");
 
 	/* TESTPOINTS: Try setting attributes before init */
 	ret = pthread_attr_setschedparam(&attr[0], &schedparam);
@@ -302,15 +299,15 @@ void test_posix_pthread_execution(void)
 	zassert_equal(ret, ESRCH, "uninitialized setname!");
 
 	/* TESTPOINT: Try creating thread before attr init */
-	ret = pthread_create(&newthread[0], &attr[0],
-				thread_top_exec, NULL);
+	ret = pthread_create(&newthread[0], &attr[0], thread_top_exec, NULL);
 	zassert_equal(ret, EINVAL, "thread created before attr init!");
 
 	for (i = 0; i < N_THR_E; i++) {
 		ret = pthread_attr_init(&attr[i]);
 		if (ret != 0) {
-			zassert_false(pthread_attr_destroy(&attr[i]),
-				      "Unable to destroy pthread object attrib");
+			zassert_false(
+				pthread_attr_destroy(&attr[i]),
+				"Unable to destroy pthread object attrib");
 			zassert_false(pthread_attr_init(&attr[i]),
 				      "Unable to create pthread object attrib");
 		}
@@ -319,7 +316,7 @@ void test_posix_pthread_execution(void)
 		pthread_attr_setstack(&attr[i], &stack_e[i][0], STACKS);
 		pthread_attr_getstack(&attr[i], &stackaddr, &stacksize);
 		zassert_equal_ptr(attr[i].stack, stackaddr,
-				"stack attribute addresses do not match!");
+				  "stack attribute addresses do not match!");
 		zassert_equal(STACKS, stacksize, "stack sizes do not match!");
 
 		pthread_attr_getstacksize(&attr[i], &stacksize);
@@ -328,7 +325,7 @@ void test_posix_pthread_execution(void)
 		pthread_attr_setschedpolicy(&attr[i], schedpolicy);
 		pthread_attr_getschedpolicy(&attr[i], &policy);
 		zassert_equal(schedpolicy, policy,
-				"scheduling policies do not match!");
+			      "scheduling policies do not match!");
 
 		pthread_attr_setschedparam(&attr[i], &schedparam);
 		pthread_attr_getschedparam(&attr[i], &getschedparam);
@@ -337,7 +334,7 @@ void test_posix_pthread_execution(void)
 			      "scheduling priorities do not match!");
 
 		ret = pthread_create(&newthread[i], &attr[i], thread_top_exec,
-				INT_TO_POINTER(i));
+				     INT_TO_POINTER(i));
 
 		/* TESTPOINT: Check if thread is created successfully */
 		zassert_false(ret, "Number of threads exceed max limit");
@@ -361,8 +358,8 @@ void test_posix_pthread_execution(void)
 	zassert_false(ret, "Get thread name failed!");
 
 	/* TESTPOINT: Thread names match */
-	ret = strncmp(thr_name, thr_name_buf, min(strlen(thr_name),
-						  strlen(thr_name_buf)));
+	ret = strncmp(thr_name, thr_name_buf,
+		      min(strlen(thr_name), strlen(thr_name_buf)));
 	zassert_false(ret, "Thread names don't match!");
 
 	while (!bounce_test_done()) {
@@ -415,8 +412,9 @@ void test_posix_pthread_termination(void)
 	for (i = 0; i < N_THR_T; i++) {
 		ret = pthread_attr_init(&attr[i]);
 		if (ret != 0) {
-			zassert_false(pthread_attr_destroy(&attr[i]),
-				      "Unable to destroy pthread object attrib");
+			zassert_false(
+				pthread_attr_destroy(&attr[i]),
+				"Unable to destroy pthread object attrib");
 			zassert_false(pthread_attr_init(&attr[i]),
 				      "Unable to create pthread object attrib");
 		}
@@ -457,10 +455,11 @@ void test_posix_pthread_termination(void)
 	zassert_equal(ret, EDEADLK, "thread joined with self inexplicably!");
 
 	/* TESTPOINT: Try canceling a terminated thread */
-	ret = pthread_cancel(newthread[N_THR_T/2]);
+	ret = pthread_cancel(newthread[N_THR_T / 2]);
 	zassert_equal(ret, ESRCH, "cancelled a terminated thread!");
 
 	/* TESTPOINT: Try getting scheduling info from terminated thread */
-	ret = pthread_getschedparam(newthread[N_THR_T/2], &policy, &schedparam);
+	ret = pthread_getschedparam(newthread[N_THR_T / 2], &policy,
+				    &schedparam);
 	zassert_equal(ret, ESRCH, "got attr from terminated thread!");
 }

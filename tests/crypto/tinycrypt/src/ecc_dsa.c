@@ -81,7 +81,6 @@ int sign_vectors(TCSha256State_t hash, char **d_vec, char **k_vec,
 		 char **msg_vec, char **qx_vec, char **qy_vec, char **r_vec,
 		 char **s_vec, int tests, bool verbose)
 {
-
 	unsigned int k[NUM_ECC_WORDS];
 	unsigned int private[NUM_ECC_WORDS];
 	uint8_t private_bytes[NUM_ECC_BYTES];
@@ -99,7 +98,6 @@ int sign_vectors(TCSha256State_t hash, char **d_vec, char **k_vec,
 	size_t msglen;
 
 	for (int i = 0; i < tests; i++) {
-
 		/* use keygen test to generate and validate pubkey */
 		keygen_vectors(d_vec + i, qx_vec + i, qy_vec + i, 1, false);
 		string2scalar(private, NUM_ECC_WORDS, d_vec[i]);
@@ -133,18 +131,24 @@ int sign_vectors(TCSha256State_t hash, char **d_vec, char **k_vec,
 
 		/**TESTPOINT: Check ECDSA_sign*/
 		zassert_true(uECC_sign_with_k(private_bytes, digest_bytes,
-				     sizeof(digest_bytes), k, sig_bytes, uECC_secp256r1()),
-					"ECDSA_sign failed!");
+					      sizeof(digest_bytes), k,
+					      sig_bytes, uECC_secp256r1()),
+			     "ECDSA_sign failed!");
 
 		uECC_vli_bytesToNative(sig, sig_bytes, NUM_ECC_BYTES);
-		uECC_vli_bytesToNative(sig + NUM_ECC_WORDS, sig_bytes + NUM_ECC_BYTES, NUM_ECC_BYTES);
+		uECC_vli_bytesToNative(sig + NUM_ECC_WORDS,
+				       sig_bytes + NUM_ECC_BYTES,
+				       NUM_ECC_BYTES);
 
-		result = check_ecc_result(i, "sig.r", exp_r, sig,  NUM_ECC_WORDS, verbose);
+		result = check_ecc_result(i, "sig.r", exp_r, sig, NUM_ECC_WORDS,
+					  verbose);
 
 		/**TESTPOINT: Check ECC result*/
 		zassert_false(result, "ECC check failed");
 
-		result = check_ecc_result(i, "sig.s", exp_s, sig + NUM_ECC_WORDS,  NUM_ECC_WORDS, verbose);
+		result = check_ecc_result(i, "sig.s", exp_s,
+					  sig + NUM_ECC_WORDS, NUM_ECC_WORDS,
+					  verbose);
 
 		/**TESTPOINT: Check ECC result*/
 		zassert_false(result, "ECC check failed");
@@ -156,7 +160,6 @@ int sign_vectors(TCSha256State_t hash, char **d_vec, char **k_vec,
 
 int cavp_sign(bool verbose)
 {
-
 	/*
 	 * [P-256,SHA-256]
 	 */
@@ -339,10 +342,10 @@ int cavp_sign(bool verbose)
 	return sign_vectors(&sha256_ctx, d, k, Msg, Qx, Qy, R, S, 15, verbose);
 }
 
-int vrfy_vectors(TCSha256State_t hash, char **msg_vec, char **qx_vec, char **qy_vec,
-		 char **r_vec, char **s_vec, int res_vec[], int tests, bool verbose)
+int vrfy_vectors(TCSha256State_t hash, char **msg_vec, char **qx_vec,
+		 char **qy_vec, char **r_vec, char **s_vec, int res_vec[],
+		 int tests, bool verbose)
 {
-
 	const struct uECC_Curve_t *curve = uECC_secp256r1();
 	unsigned int pub[2 * NUM_ECC_WORDS];
 	uint8_t pub_bytes[2 * NUM_ECC_BYTES];
@@ -359,7 +362,6 @@ int vrfy_vectors(TCSha256State_t hash, char **msg_vec, char **qx_vec, char **qy_
 	size_t msglen;
 
 	for (int i = 0; i < tests; i++) {
-
 		string2scalar(pub, NUM_ECC_WORDS, qx_vec[i]);
 		string2scalar(pub + NUM_ECC_WORDS, NUM_ECC_WORDS, qy_vec[i]);
 		string2scalar(sig, NUM_ECC_WORDS, r_vec[i]);
@@ -385,8 +387,8 @@ int vrfy_vectors(TCSha256State_t hash, char **msg_vec, char **qx_vec, char **qy_
 		}
 
 		(void)memset(digest, 0, NUM_ECC_BYTES - 4 * hash_dwords);
-		uECC_vli_bytesToNative(digest + (NUM_ECC_WORDS - hash_dwords), digest_bytes,
-				       TC_SHA256_DIGEST_SIZE);
+		uECC_vli_bytesToNative(digest + (NUM_ECC_WORDS - hash_dwords),
+				       digest_bytes, TC_SHA256_DIGEST_SIZE);
 
 		uECC_vli_nativeToBytes(pub_bytes, NUM_ECC_BYTES, pub);
 		uECC_vli_nativeToBytes(pub_bytes + NUM_ECC_BYTES, NUM_ECC_BYTES,
@@ -398,10 +400,12 @@ int vrfy_vectors(TCSha256State_t hash, char **msg_vec, char **qx_vec, char **qy_
 			rc = 4;
 		} else {
 			uECC_vli_nativeToBytes(sig_bytes, NUM_ECC_BYTES, sig);
-			uECC_vli_nativeToBytes(sig_bytes + NUM_ECC_BYTES, NUM_ECC_BYTES,
+			uECC_vli_nativeToBytes(sig_bytes + NUM_ECC_BYTES,
+					       NUM_ECC_BYTES,
 					       sig + NUM_ECC_WORDS);
 
-			rc = uECC_verify(pub_bytes, digest_bytes, sizeof(digest_bytes), sig_bytes,
+			rc = uECC_verify(pub_bytes, digest_bytes,
+					 sizeof(digest_bytes), sig_bytes,
 					 uECC_secp256r1());
 			/* CAVP expects 0 for success, others for fail */
 			rc = !rc;
@@ -421,7 +425,6 @@ int vrfy_vectors(TCSha256State_t hash, char **msg_vec, char **qx_vec, char **qy_
 
 int cavp_verify(bool verbose)
 {
-
 	/*
 	 * [P-256,SHA-256]
 	 */
@@ -567,12 +570,14 @@ int cavp_verify(bool verbose)
 	printf("Test #2: ECDSAvrfy ");
 	printf("NIST-p256, SHA2-256\n");
 
-	return vrfy_vectors(&sha256_ctx, Msg, Qx, Qy, R, S, results, 15, verbose);
+	return vrfy_vectors(&sha256_ctx, Msg, Qx, Qy, R, S, results, 15,
+			    verbose);
 }
 
 int montecarlo_signverify(int num_tests, bool verbose)
 {
-	printf("Test #3: Monte Carlo (%d Randomized EC-DSA signatures) ", num_tests);
+	printf("Test #3: Monte Carlo (%d Randomized EC-DSA signatures) ",
+	       num_tests);
 	printf("NIST-p256, SHA2-256\n  ");
 	int i;
 	uint8_t private[NUM_ECC_BYTES];
@@ -588,20 +593,22 @@ int montecarlo_signverify(int num_tests, bool verbose)
 			TC_PRINT(".");
 		}
 
-		uECC_generate_random_int(hash_words, curve->n, BITS_TO_WORDS(curve->num_n_bits));
+		uECC_generate_random_int(hash_words, curve->n,
+					 BITS_TO_WORDS(curve->num_n_bits));
 		uECC_vli_nativeToBytes(hash, NUM_ECC_BYTES, hash_words);
 
 		/**TESTPOINT: Check uECC_make_key*/
 		zassert_true(uECC_make_key(public, private, curve),
-				"uECC_make_key() failed");
+			     "uECC_make_key() failed");
 
 		/**TESTPOINT: Check uECC_sign*/
 		zassert_true(uECC_sign(private, hash, sizeof(hash), sig, curve),
-				"uECC_sign() failed");
+			     "uECC_sign() failed");
 
 		/**TESTPOINT: Check uECC_verify*/
-		zassert_true(uECC_verify(public, hash, sizeof(hash), sig, curve),
-				"uECC_verify() failed");
+		zassert_true(uECC_verify(public, hash, sizeof(hash), sig,
+					 curve),
+			     "uECC_verify() failed");
 
 		if (verbose) {
 			printf(".");
@@ -617,7 +624,8 @@ int default_CSPRNG(uint8_t *dest, unsigned int size)
 	 * system at this point in time.  */
 
 	while (size) {
-		uint32_t len = size >= sizeof(uint32_t) ? sizeof(uint32_t) : size;
+		uint32_t len = size >= sizeof(uint32_t) ? sizeof(uint32_t) :
+								size;
 		uint32_t rv = sys_rand32_get();
 
 		memcpy(dest, &rv, len);

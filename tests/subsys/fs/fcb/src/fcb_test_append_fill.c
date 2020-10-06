@@ -14,15 +14,11 @@ void test_fcb_append_fill(void)
 	int i;
 	struct fcb_entry loc;
 	uint8_t test_data[128];
-	int elem_cnts[2] = {0, 0};
+	int elem_cnts[2] = { 0, 0 };
 	int aa_together_cnts[2];
-	struct append_arg aa_together = {
-		.elem_cnts = aa_together_cnts
-	};
+	struct append_arg aa_together = { .elem_cnts = aa_together_cnts };
 	int aa_separate_cnts[2];
-	struct append_arg aa_separate = {
-		.elem_cnts = aa_separate_cnts
-	};
+	struct append_arg aa_separate = { .elem_cnts = aa_separate_cnts };
 
 	fcb = &test_fcb;
 
@@ -66,10 +62,10 @@ void test_fcb_append_fill(void)
 
 	(void)memset(&aa_separate_cnts, 0, sizeof(aa_separate_cnts));
 	rc = fcb_walk(fcb, &test_fcb_sector[0], fcb_test_cnt_elems_cb,
-	  &aa_separate);
+		      &aa_separate);
 	zassert_true(rc == 0, "fcb_walk call failure");
 	rc = fcb_walk(fcb, &test_fcb_sector[1], fcb_test_cnt_elems_cb,
-	  &aa_separate);
+		      &aa_separate);
 	zassert_true(rc == 0, "fcb_walk call failure");
 	zassert_true(aa_separate.elem_cnts[0] == elem_cnts[0],
 		     "fcb_walk: elements count read different than expected");

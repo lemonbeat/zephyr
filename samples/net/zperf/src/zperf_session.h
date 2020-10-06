@@ -27,11 +27,7 @@ enum state {
 	STATE_COMPLETED /* Session completed, stats pkt can be sent if needed */
 };
 
-enum session_proto {
-	SESSION_UDP = 0,
-	SESSION_TCP = 1,
-	SESSION_PROTO_END
-};
+enum session_proto { SESSION_UDP = 0, SESSION_TCP = 1, SESSION_PROTO_END };
 
 struct session {
 	/* Tuple for UDP */
@@ -58,8 +54,7 @@ struct session {
 	struct zperf_server_hdr stat;
 };
 
-struct session *get_session(struct net_pkt *pkt,
-			    union net_ip_header *ip_hdr,
+struct session *get_session(struct net_pkt *pkt, union net_ip_header *ip_hdr,
 			    union net_proto_header *proto_hdr,
 			    enum session_proto proto);
 struct session *get_tcp_session(struct net_context *ctx);

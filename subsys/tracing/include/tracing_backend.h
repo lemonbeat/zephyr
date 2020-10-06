@@ -28,8 +28,8 @@ struct tracing_backend;
  */
 struct tracing_backend_api {
 	void (*init)(void);
-	void (*output)(const struct tracing_backend *backend,
-		       uint8_t *data, uint32_t length);
+	void (*output)(const struct tracing_backend *backend, uint8_t *data,
+		       uint32_t length);
 };
 
 /**
@@ -46,11 +46,9 @@ struct tracing_backend {
  * @param _name Instance name.
  * @param _api  Tracing backend API.
  */
-#define TRACING_BACKEND_DEFINE(_name, _api)                              \
-	static const Z_STRUCT_SECTION_ITERABLE(tracing_backend, _name) = \
-	{                                                                \
-		.name = STRINGIFY(_name),                                \
-		.api = &_api                                             \
+#define TRACING_BACKEND_DEFINE(_name, _api)                                \
+	static const Z_STRUCT_SECTION_ITERABLE(tracing_backend, _name) = { \
+		.name = STRINGIFY(_name), .api = &_api                     \
 	}
 
 /**
@@ -58,8 +56,7 @@ struct tracing_backend {
  *
  * @param backend Pointer to tracing_backend instance.
  */
-static inline void tracing_backend_init(
-		const struct tracing_backend *backend)
+static inline void tracing_backend_init(const struct tracing_backend *backend)
 {
 	if (backend && backend->api && backend->api->init) {
 		backend->api->init();
@@ -73,9 +70,8 @@ static inline void tracing_backend_init(
  * @param data    Address of outputing buffer.
  * @param length  Length of outputing buffer.
  */
-static inline void tracing_backend_output(
-		const struct tracing_backend *backend,
-		uint8_t *data, uint32_t length)
+static inline void tracing_backend_output(const struct tracing_backend *backend,
+					  uint8_t *data, uint32_t length)
 {
 	if (backend && backend->api) {
 		backend->api->output(backend, data, length);
@@ -92,7 +88,8 @@ static inline void tracing_backend_output(
  */
 static inline struct tracing_backend *tracing_backend_get(char *name)
 {
-	Z_STRUCT_SECTION_FOREACH(tracing_backend, backend) {
+	Z_STRUCT_SECTION_FOREACH(tracing_backend, backend)
+	{
 		if (strcmp(backend->name, name) == 0) {
 			return backend;
 		}

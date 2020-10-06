@@ -17,9 +17,9 @@
 #define _MLIBC_RESTRICT_defined
 
 #ifdef __cplusplus
-	#define _MLIBC_RESTRICT __restrict__
+#define _MLIBC_RESTRICT __restrict__
 #else
-	#define _MLIBC_RESTRICT restrict
+#define _MLIBC_RESTRICT restrict
 #endif
 
 #endif

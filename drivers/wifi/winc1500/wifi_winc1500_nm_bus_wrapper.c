@@ -24,25 +24,23 @@ LOG_MODULE_REGISTER(winc1500);
 
 #include "wifi_winc1500_config.h"
 
-static
-struct winc1500_gpio_configuration winc1500_gpios[WINC1500_GPIO_IDX_MAX] = {
-	{ .dev = NULL, .pin = DT_INST_GPIO_PIN(0, enable_gpios) },
-	{ .dev = NULL, .pin = DT_INST_GPIO_PIN(0, irq_gpios) },
-	{ .dev = NULL, .pin = DT_INST_GPIO_PIN(0, reset_gpios) },
-};
+static struct winc1500_gpio_configuration
+	winc1500_gpios[WINC1500_GPIO_IDX_MAX] = {
+		{ .dev = NULL, .pin = DT_INST_GPIO_PIN(0, enable_gpios) },
+		{ .dev = NULL, .pin = DT_INST_GPIO_PIN(0, irq_gpios) },
+		{ .dev = NULL, .pin = DT_INST_GPIO_PIN(0, reset_gpios) },
+	};
 
-#define NM_BUS_MAX_TRX_SZ	256
+#define NM_BUS_MAX_TRX_SZ 256
 
-tstrNmBusCapabilities egstrNmBusCapabilities = {
-	NM_BUS_MAX_TRX_SZ
-};
+tstrNmBusCapabilities egstrNmBusCapabilities = { NM_BUS_MAX_TRX_SZ };
 
 #ifdef CONF_WINC_USE_I2C
 
-#define SLAVE_ADDRESS		0x60
+#define SLAVE_ADDRESS 0x60
 
 /** Number of times to try to send packet if failed. */
-#define I2C_TIMEOUT		100
+#define I2C_TIMEOUT 100
 
 static int8_t nm_i2c_write(uint8_t *b, uint16_t sz)
 {
@@ -54,8 +52,8 @@ static int8_t nm_i2c_read(uint8_t *rb, uint16_t sz)
 	/* Not implemented */
 }
 
-static int8_t nm_i2c_write_special(uint8_t *wb1, uint16_t sz1,
-				 uint8_t *wb2, uint16_t sz2)
+static int8_t nm_i2c_write_special(uint8_t *wb1, uint16_t sz1, uint8_t *wb2,
+				   uint16_t sz2)
 {
 	/* Not implemented */
 }
@@ -69,22 +67,10 @@ struct spi_cs_control cs_ctrl;
 
 static int8_t spi_rw(uint8_t *mosi, uint8_t *miso, uint16_t size)
 {
-	const struct spi_buf buf_tx = {
-		.buf = mosi,
-		.len = size
-	};
-	const struct spi_buf_set tx = {
-		.buffers = &buf_tx,
-		.count = 1
-	};
-	const struct spi_buf buf_rx = {
-		.buf = miso,
-		.len = miso ? size : 0
-	};
-	const struct spi_buf_set rx = {
-		.buffers = &buf_rx,
-		.count = 1
-	};
+	const struct spi_buf buf_tx = { .buf = mosi, .len = size };
+	const struct spi_buf_set tx = { .buffers = &buf_tx, .count = 1 };
+	const struct spi_buf buf_rx = { .buf = miso, .len = miso ? size : 0 };
+	const struct spi_buf_set rx = { .buffers = &buf_rx, .count = 1 };
 
 	if (spi_transceive(winc1500.spi, &winc1500.spi_cfg, &tx, &rx)) {
 		LOG_ERR("spi_transceive fail");
@@ -100,25 +86,18 @@ struct winc1500_gpio_configuration *winc1500_configure_gpios(void)
 {
 	const struct device *gpio_en, *gpio_irq, *gpio_reset;
 
-	gpio_en = device_get_binding(
-		DT_INST_GPIO_LABEL(0, enable_gpios));
-	gpio_irq = device_get_binding(
-		DT_INST_GPIO_LABEL(0, irq_gpios));
-	gpio_reset = device_get_binding(
-		DT_INST_GPIO_LABEL(0, reset_gpios));
+	gpio_en = device_get_binding(DT_INST_GPIO_LABEL(0, enable_gpios));
+	gpio_irq = device_get_binding(DT_INST_GPIO_LABEL(0, irq_gpios));
+	gpio_reset = device_get_binding(DT_INST_GPIO_LABEL(0, reset_gpios));
 
-	gpio_pin_configure(gpio_en,
-			   winc1500_gpios[WINC1500_GPIO_IDX_CHIP_EN].pin,
-			   GPIO_OUTPUT_LOW |
-			   DT_INST_GPIO_FLAGS(0, enable_gpios));
-	gpio_pin_configure(gpio_irq,
-			   winc1500_gpios[WINC1500_GPIO_IDX_IRQN].pin,
-			   GPIO_INPUT |
-			   DT_INST_GPIO_FLAGS(0, irq_gpios));
-	gpio_pin_configure(gpio_reset,
-			   winc1500_gpios[WINC1500_GPIO_IDX_RESET_N].pin,
-			   GPIO_OUTPUT_LOW |
-			   DT_INST_GPIO_FLAGS(0, reset_gpios));
+	gpio_pin_configure(
+		gpio_en, winc1500_gpios[WINC1500_GPIO_IDX_CHIP_EN].pin,
+		GPIO_OUTPUT_LOW | DT_INST_GPIO_FLAGS(0, enable_gpios));
+	gpio_pin_configure(gpio_irq, winc1500_gpios[WINC1500_GPIO_IDX_IRQN].pin,
+			   GPIO_INPUT | DT_INST_GPIO_FLAGS(0, irq_gpios));
+	gpio_pin_configure(
+		gpio_reset, winc1500_gpios[WINC1500_GPIO_IDX_RESET_N].pin,
+		GPIO_OUTPUT_LOW | DT_INST_GPIO_FLAGS(0, reset_gpios));
 
 	winc1500_gpios[WINC1500_GPIO_IDX_CHIP_EN].dev = gpio_en;
 	winc1500_gpios[WINC1500_GPIO_IDX_IRQN].dev = gpio_irq;
@@ -147,8 +126,8 @@ int8_t nm_bus_init(void *pvinit)
 	winc1500.spi_cfg.slave = DT_INST_REG_ADDR(0);
 
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-	cs_ctrl.gpio_dev = device_get_binding(
-		DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
+	cs_ctrl.gpio_dev =
+		device_get_binding(DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
 	if (!cs_ctrl.gpio_dev) {
 		LOG_ERR("Unable to get GPIO SPI CS device");
 		return -ENODEV;
@@ -161,8 +140,8 @@ int8_t nm_bus_init(void *pvinit)
 	winc1500.spi_cfg.cs = &cs_ctrl;
 
 	LOG_DBG("SPI GPIO CS configured on %s:%u",
-		    DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
-		    DT_INST_SPI_DEV_CS_GPIOS_PIN(0));
+		DT_INST_SPI_DEV_CS_GPIOS_LABEL(0),
+		DT_INST_SPI_DEV_CS_GPIOS_PIN(0));
 #endif
 
 	nm_bsp_reset();
@@ -186,30 +165,26 @@ int8_t nm_bus_ioctl(uint8_t cmd, void *parameter)
 			(struct nm_i2c_default *)parameter;
 
 		ret = nm_i2c_read(param->buffer, param->size);
-	}
-	break;
+	} break;
 	case NM_BUS_IOCTL_W: {
 		struct nm_i2c_default *param =
 			(struct nm_i2c_default *)parameter;
 
 		ret = nm_i2c_write(param->buffer, param->size);
-	}
-	break;
+	} break;
 	case NM_BUS_IOCTL_W_SPECIAL: {
 		struct nm_i2c_special *param =
 			(struct nm_i2c_special *)parameter;
 
 		ret = nm_i2c_write_special(param->buffer1, param->size1,
 					   param->buffer2, param->size2);
-	}
-	break;
+	} break;
 #elif defined CONF_WINC_USE_SPI
 	case NM_BUS_IOCTL_RW: {
 		tstrNmSpiRw *param = (tstrNmSpiRw *)parameter;
 
 		ret = spi_rw(param->pu8InBuf, param->pu8OutBuf, param->u16Sz);
-	}
-	break;
+	} break;
 #endif
 	default:
 		ret = -1;

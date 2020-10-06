@@ -11,8 +11,8 @@
 #define COUNTER_MAX 0x00ffffff
 #define TIMER_STOPPED 0xff000000
 
-#define CYC_PER_TICK (sys_clock_hw_cycles_per_sec()	\
-		      / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define CYC_PER_TICK \
+	(sys_clock_hw_cycles_per_sec() / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 #define MAX_TICKS ((COUNTER_MAX / CYC_PER_TICK) - 1)
 #define MAX_CYCLES (MAX_TICKS * CYC_PER_TICK)
 
@@ -25,7 +25,7 @@
  * masked.  Choosing a fraction of a tick is probably a good enough
  * default, with an absolute minimum of 1k cyc.
  */
-#define MIN_DELAY MAX(1024, (CYC_PER_TICK/16))
+#define MIN_DELAY MAX(1024, (CYC_PER_TICK / 16))
 
 #define TICKLESS (IS_ENABLED(CONFIG_TICKLESS_KERNEL))
 
@@ -82,9 +82,9 @@ static volatile uint32_t overflow_cyc;
  */
 static uint32_t elapsed(void)
 {
-	uint32_t val1 = SysTick->VAL;	/* A */
-	uint32_t ctrl = SysTick->CTRL;	/* B */
-	uint32_t val2 = SysTick->VAL;	/* C */
+	uint32_t val1 = SysTick->VAL; /* A */
+	uint32_t ctrl = SysTick->CTRL; /* B */
+	uint32_t val2 = SysTick->VAL; /* C */
 
 	/* SysTick behavior: The counter wraps at zero automatically,
 	 * setting the COUNTFLAG field of the CTRL register when it
@@ -100,8 +100,7 @@ static uint32_t elapsed(void)
 	 * So the count in val2 is post-wrap and last_load needs to be
 	 * added if and only if COUNTFLAG is set or val1 < val2.
 	 */
-	if ((ctrl & SysTick_CTRL_COUNTFLAG_Msk)
-	    || (val1 < val2)) {
+	if ((ctrl & SysTick_CTRL_COUNTFLAG_Msk) || (val1 < val2)) {
 		overflow_cyc += last_load;
 
 		/* We know there was a wrap, but we might not have
@@ -158,8 +157,7 @@ int z_clock_driver_init(const struct device *device)
 	overflow_cyc = 0U;
 	SysTick->LOAD = last_load;
 	SysTick->VAL = 0; /* resets timer to last_load */
-	SysTick->CTRL |= (SysTick_CTRL_ENABLE_Msk |
-			  SysTick_CTRL_TICKINT_Msk |
+	SysTick->CTRL |= (SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk |
 			  SysTick_CTRL_CLKSOURCE_Msk);
 	return 0;
 }
@@ -172,8 +170,8 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 	 * the counter. (Note: we can assume if idle==true that
 	 * interrupts are already disabled)
 	 */
-	if (IS_ENABLED(CONFIG_TICKLESS_IDLE) && idle
-	    && ticks == K_TICKS_FOREVER) {
+	if (IS_ENABLED(CONFIG_TICKLESS_IDLE) && idle &&
+	    ticks == K_TICKS_FOREVER) {
 		SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
 		last_load = TIMER_STOPPED;
 		return;
@@ -208,8 +206,8 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 
 		/* Round delay up to next tick boundary */
 		delay += unannounced;
-		delay =
-		 ((delay + CYC_PER_TICK - 1) / CYC_PER_TICK) * CYC_PER_TICK;
+		delay = ((delay + CYC_PER_TICK - 1) / CYC_PER_TICK) *
+			CYC_PER_TICK;
 		delay -= unannounced;
 		delay = MAX(delay, MIN_DELAY);
 		if (delay > MAX_CYCLES) {

@@ -17,29 +17,29 @@
 
 LOG_MODULE_REGISTER(TMP112, CONFIG_SENSOR_LOG_LEVEL);
 
-#define TMP112_I2C_ADDRESS		DT_INST_REG_ADDR(0)
+#define TMP112_I2C_ADDRESS DT_INST_REG_ADDR(0)
 
-#define TMP112_REG_TEMPERATURE		0x00
-#define TMP112_D0_BIT			BIT(0)
+#define TMP112_REG_TEMPERATURE 0x00
+#define TMP112_D0_BIT BIT(0)
 
-#define TMP112_REG_CONFIG		0x01
-#define TMP112_EM_BIT			BIT(4)
-#define TMP112_CR0_BIT			BIT(6)
-#define TMP112_CR1_BIT			BIT(7)
+#define TMP112_REG_CONFIG 0x01
+#define TMP112_EM_BIT BIT(4)
+#define TMP112_CR0_BIT BIT(6)
+#define TMP112_CR1_BIT BIT(7)
 
 /* scale in micro degrees Celsius */
-#define TMP112_TEMP_SCALE		62500
+#define TMP112_TEMP_SCALE 62500
 
 struct tmp112_data {
 	const struct device *i2c;
 	int16_t sample;
 };
 
-static int tmp112_reg_read(struct tmp112_data *drv_data,
-			   uint8_t reg, uint16_t *val)
+static int tmp112_reg_read(struct tmp112_data *drv_data, uint8_t reg,
+			   uint16_t *val)
 {
-	if (i2c_burst_read(drv_data->i2c, TMP112_I2C_ADDRESS,
-			   reg, (uint8_t *) val, 2) < 0) {
+	if (i2c_burst_read(drv_data->i2c, TMP112_I2C_ADDRESS, reg,
+			   (uint8_t *)val, 2) < 0) {
 		return -EIO;
 	}
 
@@ -48,13 +48,13 @@ static int tmp112_reg_read(struct tmp112_data *drv_data,
 	return 0;
 }
 
-static int tmp112_reg_write(struct tmp112_data *drv_data,
-			    uint8_t reg, uint16_t val)
+static int tmp112_reg_write(struct tmp112_data *drv_data, uint8_t reg,
+			    uint16_t val)
 {
 	uint16_t val_be = sys_cpu_to_be16(val);
 
-	return i2c_burst_write(drv_data->i2c, TMP112_I2C_ADDRESS,
-			       reg, (uint8_t *)&val_be, 2);
+	return i2c_burst_write(drv_data->i2c, TMP112_I2C_ADDRESS, reg,
+			       (uint8_t *)&val_be, 2);
 }
 
 static int tmp112_reg_update(struct tmp112_data *drv_data, uint8_t reg,
@@ -73,8 +73,7 @@ static int tmp112_reg_update(struct tmp112_data *drv_data, uint8_t reg,
 	return tmp112_reg_write(drv_data, reg, new_val);
 }
 
-static int tmp112_attr_set(const struct device *dev,
-			   enum sensor_channel chan,
+static int tmp112_attr_set(const struct device *dev, enum sensor_channel chan,
 			   enum sensor_attribute attr,
 			   const struct sensor_value *val)
 {
@@ -155,7 +154,8 @@ static int tmp112_sample_fetch(const struct device *dev,
 	struct tmp112_data *drv_data = dev->data;
 	uint16_t val;
 
-	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_AMBIENT_TEMP);
+	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL ||
+			chan == SENSOR_CHAN_AMBIENT_TEMP);
 
 	if (tmp112_reg_read(drv_data, TMP112_REG_TEMPERATURE, &val) < 0) {
 		return -EIO;
@@ -201,7 +201,7 @@ int tmp112_init(const struct device *dev)
 	drv_data->i2c = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (drv_data->i2c == NULL) {
 		LOG_DBG("Failed to get pointer to %s device!",
-			    DT_INST_BUS_LABEL(0));
+			DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -210,5 +210,6 @@ int tmp112_init(const struct device *dev)
 
 static struct tmp112_data tmp112_driver;
 
-DEVICE_AND_API_INIT(tmp112, DT_INST_LABEL(0), tmp112_init, &tmp112_driver,
-	    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &tmp112_driver_api);
+DEVICE_AND_API_INIT(tmp112, DT_INST_LABEL(0), tmp112_init, &tmp112_driver, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &tmp112_driver_api);

@@ -106,8 +106,6 @@ struct _irq_stack_frame {
 
 typedef struct _irq_stack_frame _isf_t;
 
-
-
 /* callee-saved registers pushed on the stack, not in k_thread */
 struct _callee_saved_stack {
 	uint32_t r13;

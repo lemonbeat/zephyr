@@ -180,7 +180,7 @@ int z_soc_irq_connect_dynamic(unsigned int irq, unsigned int priority,
 	}
 
 	table_idx = CONFIG_CAVS_ISR_TBL_OFFSET +
-		CONFIG_MAX_IRQ_PER_AGGREGATOR * cavs_idx;
+		    CONFIG_MAX_IRQ_PER_AGGREGATOR * cavs_idx;
 	table_idx += cavs_irq;
 
 	_sw_isr_table[table_idx].arg = parameter;
@@ -208,19 +208,15 @@ static inline void soc_set_power_and_clock(void)
 	 * Tensilica Core Prevent Local Clock Gating (Core 1)
 	 */
 	dsp_shim_regs->clkctl =
-		SOC_CLKCTL_DPCS_DIV1(0) |
-		SOC_CLKCTL_DPCS_DIV1(1) |
-		SOC_CLKCTL_LDCS_LMPCS |
-		SOC_CLKCTL_HDCS_HMPCS |
+		SOC_CLKCTL_DPCS_DIV1(0) | SOC_CLKCTL_DPCS_DIV1(1) |
+		SOC_CLKCTL_LDCS_LMPCS | SOC_CLKCTL_HDCS_HMPCS |
 		SOC_CLKCTL_LPMEM_PLL_CLK_SEL_DIV4 |
-		SOC_CLKCTL_HPMEM_PLL_CLK_SEL_DIV2 |
-		SOC_CLKCTL_TCPAPLLS |
-		SOC_CLKCTL_TCPLCG_DIS(0) |
-		SOC_CLKCTL_TCPLCG_DIS(1);
+		SOC_CLKCTL_HPMEM_PLL_CLK_SEL_DIV2 | SOC_CLKCTL_TCPAPLLS |
+		SOC_CLKCTL_TCPLCG_DIS(0) | SOC_CLKCTL_TCPLCG_DIS(1);
 
 	/* Disable power gating for both cores */
 	dsp_shim_regs->pwrctl |= SOC_PWRCTL_DISABLE_PWR_GATING_DSP1 |
-		SOC_PWRCTL_DISABLE_PWR_GATING_DSP0;
+				 SOC_PWRCTL_DISABLE_PWR_GATING_DSP0;
 
 	/* Rewrite the low power sequencing control bits */
 	dsp_shim_regs->lpsctl = dsp_shim_regs->lpsctl;

@@ -95,8 +95,7 @@ static inline struct net_route_entry *net_route_lookup(struct net_if *iface,
  * @return Return created route entry, NULL if could not be created.
  */
 struct net_route_entry *net_route_add(struct net_if *iface,
-				      struct in6_addr *addr,
-				      uint8_t prefix_len,
+				      struct in6_addr *addr, uint8_t prefix_len,
 				      struct in6_addr *nexthop);
 
 /**
@@ -116,8 +115,7 @@ int net_route_del(struct net_route_entry *entry);
  *
  * @return number of routes deleted, <0 if error
  */
-int net_route_del_by_nexthop(struct net_if *iface,
-			     struct in6_addr *nexthop);
+int net_route_del_by_nexthop(struct net_if *iface, struct in6_addr *nexthop);
 
 /**
  * @brief Delete a route from routing table by nexthop if the routing engine
@@ -132,8 +130,7 @@ int net_route_del_by_nexthop(struct net_if *iface,
  * @return number of routes deleted, <0 if error
  */
 int net_route_del_by_nexthop_data(struct net_if *iface,
-				  struct in6_addr *nexthop,
-				  void *data);
+				  struct in6_addr *nexthop, void *data);
 
 /**
  * @brief Get nexthop IPv6 address tied to this route.
@@ -156,8 +153,7 @@ struct in6_addr *net_route_get_nexthop(struct net_route_entry *entry);
  */
 struct net_nbr *net_route_get_nbr(struct net_route_entry *route);
 
-typedef void (*net_route_cb_t)(struct net_route_entry *entry,
-			       void *user_data);
+typedef void (*net_route_cb_t)(struct net_route_entry *entry, void *user_data);
 
 /**
  * @brief Go through all the routing entries and call callback
@@ -219,8 +215,7 @@ int net_route_mcast_forward_packet(struct net_pkt *pkt,
  *
  * @return Total number of multicast routing entries that are in use.
  */
-int net_route_mcast_foreach(net_route_mcast_cb_t cb,
-			    struct in6_addr *skip,
+int net_route_mcast_foreach(net_route_mcast_cb_t cb, struct in6_addr *skip,
 			    void *user_data);
 
 /**
@@ -252,8 +247,7 @@ bool net_route_mcast_del(struct net_route_entry_mcast *route);
  *
  * @return Routing entry corresponding this multicast group.
  */
-struct net_route_entry_mcast *
-net_route_mcast_lookup(struct in6_addr *group);
+struct net_route_entry_mcast *net_route_mcast_lookup(struct in6_addr *group);
 
 /**
  * @brief Return a route to destination via some intermediate host.
@@ -265,8 +259,7 @@ net_route_mcast_lookup(struct in6_addr *group);
  *
  * @return True if there is a route to the destination, False otherwise
  */
-bool net_route_get_info(struct net_if *iface,
-			struct in6_addr *dst,
+bool net_route_get_info(struct net_if *iface, struct in6_addr *dst,
 			struct net_route_entry **route,
 			struct in6_addr **nexthop);
 

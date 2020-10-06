@@ -33,47 +33,46 @@
 #define BR_CHAN(_ch) CONTAINER_OF(_ch, struct bt_l2cap_br_chan, chan)
 #define BR_CHAN_RTX(_w) CONTAINER_OF(_w, struct bt_l2cap_br_chan, chan.rtx_work)
 
-#define L2CAP_BR_PSM_START	0x0001
-#define L2CAP_BR_PSM_END	0xffff
+#define L2CAP_BR_PSM_START 0x0001
+#define L2CAP_BR_PSM_END 0xffff
 
-#define L2CAP_BR_CID_DYN_START	0x0040
-#define L2CAP_BR_CID_DYN_END	0xffff
+#define L2CAP_BR_CID_DYN_START 0x0040
+#define L2CAP_BR_CID_DYN_END 0xffff
 #define L2CAP_BR_CID_IS_DYN(_cid) \
 	(_cid >= L2CAP_BR_CID_DYN_START && _cid <= L2CAP_BR_CID_DYN_END)
 
-#define L2CAP_BR_MIN_MTU	48
-#define L2CAP_BR_DEFAULT_MTU	672
+#define L2CAP_BR_MIN_MTU 48
+#define L2CAP_BR_DEFAULT_MTU 672
 
-#define L2CAP_BR_PSM_SDP	0x0001
+#define L2CAP_BR_PSM_SDP 0x0001
 
-#define L2CAP_BR_INFO_TIMEOUT		K_SECONDS(4)
-#define L2CAP_BR_CFG_TIMEOUT		K_SECONDS(4)
-#define L2CAP_BR_DISCONN_TIMEOUT	K_SECONDS(1)
-#define L2CAP_BR_CONN_TIMEOUT		K_SECONDS(40)
+#define L2CAP_BR_INFO_TIMEOUT K_SECONDS(4)
+#define L2CAP_BR_CFG_TIMEOUT K_SECONDS(4)
+#define L2CAP_BR_DISCONN_TIMEOUT K_SECONDS(1)
+#define L2CAP_BR_CONN_TIMEOUT K_SECONDS(40)
 
 /*
  * L2CAP extended feature mask:
  * BR/EDR fixed channel support enabled
  */
-#define L2CAP_FEAT_FIXED_CHAN_MASK	0x00000080
+#define L2CAP_FEAT_FIXED_CHAN_MASK 0x00000080
 
 enum {
 	/* Connection oriented channels flags */
-	L2CAP_FLAG_CONN_LCONF_DONE,	/* local config accepted by remote */
-	L2CAP_FLAG_CONN_RCONF_DONE,	/* remote config accepted by local */
-	L2CAP_FLAG_CONN_ACCEPTOR,	/* getting incoming connection req */
-	L2CAP_FLAG_CONN_PENDING,	/* remote sent pending result in rsp */
+	L2CAP_FLAG_CONN_LCONF_DONE, /* local config accepted by remote */
+	L2CAP_FLAG_CONN_RCONF_DONE, /* remote config accepted by local */
+	L2CAP_FLAG_CONN_ACCEPTOR, /* getting incoming connection req */
+	L2CAP_FLAG_CONN_PENDING, /* remote sent pending result in rsp */
 
 	/* Signaling channel flags */
-	L2CAP_FLAG_SIG_INFO_PENDING,	/* retrieving remote l2cap info */
-	L2CAP_FLAG_SIG_INFO_DONE,	/* remote l2cap info is done */
+	L2CAP_FLAG_SIG_INFO_PENDING, /* retrieving remote l2cap info */
+	L2CAP_FLAG_SIG_INFO_DONE, /* remote l2cap info is done */
 
 	/* fixed channels flags */
-	L2CAP_FLAG_FIXED_CONNECTED,		/* fixed connected */
+	L2CAP_FLAG_FIXED_CONNECTED, /* fixed connected */
 };
 
 static sys_slist_t br_servers;
-
 
 /* Pool for outgoing BR/EDR signaling packets, min MTU is 48 */
 NET_BUF_POOL_FIXED_DEFINE(br_sig_pool, CONFIG_BT_MAX_CONN,
@@ -82,10 +81,10 @@ NET_BUF_POOL_FIXED_DEFINE(br_sig_pool, CONFIG_BT_MAX_CONN,
 /* BR/EDR L2CAP signalling channel specific context */
 struct bt_l2cap_br {
 	/* The channel this context is associated with */
-	struct bt_l2cap_br_chan	chan;
-	uint8_t			info_ident;
-	uint8_t			info_fixed_chan;
-	uint32_t			info_feat_mask;
+	struct bt_l2cap_br_chan chan;
+	uint8_t info_ident;
+	uint8_t info_fixed_chan;
+	uint32_t info_feat_mask;
 };
 
 static struct bt_l2cap_br bt_l2cap_br_pool[CONFIG_BT_MAX_CONN];
@@ -118,7 +117,7 @@ struct bt_l2cap_chan *bt_l2cap_br_lookup_tx_cid(struct bt_conn *conn,
 	return NULL;
 }
 
-static struct bt_l2cap_br_chan*
+static struct bt_l2cap_br_chan *
 l2cap_br_chan_alloc_cid(struct bt_conn *conn, struct bt_l2cap_chan *chan)
 {
 	struct bt_l2cap_br_chan *ch = BR_CHAN(chan);
@@ -175,8 +174,7 @@ static void l2cap_br_rtx_timeout(struct k_work *work)
 	}
 
 	BT_DBG("chan %p %s scid 0x%04x", chan,
-	       bt_l2cap_chan_state_str(chan->chan.state),
-	       chan->rx.cid);
+	       bt_l2cap_chan_state_str(chan->chan.state), chan->rx.cid);
 
 	switch (chan->chan.state) {
 	case BT_L2CAP_CONFIG:
@@ -376,7 +374,8 @@ static uint8_t get_fixed_channels_mask(void)
 	uint8_t mask = 0U;
 
 	/* this needs to be enhanced if AMP Test Manager support is added */
-	Z_STRUCT_SECTION_FOREACH(bt_l2cap_br_fixed_chan, fchan) {
+	Z_STRUCT_SECTION_FOREACH(bt_l2cap_br_fixed_chan, fchan)
+	{
 		mask |= BIT(fchan->cid);
 	}
 
@@ -414,7 +413,8 @@ static int l2cap_br_info_req(struct bt_l2cap_br *l2cap, uint8_t ident,
 		rsp->type = sys_cpu_to_le16(BT_L2CAP_INFO_FEAT_MASK);
 		rsp->result = sys_cpu_to_le16(BT_L2CAP_INFO_SUCCESS);
 		net_buf_add_le32(rsp_buf, L2CAP_FEAT_FIXED_CHAN_MASK);
-		hdr_info->len = sys_cpu_to_le16(sizeof(*rsp) + sizeof(uint32_t));
+		hdr_info->len =
+			sys_cpu_to_le16(sizeof(*rsp) + sizeof(uint32_t));
 		break;
 	case BT_L2CAP_INFO_FIXED_CHAN:
 		rsp->type = sys_cpu_to_le16(BT_L2CAP_INFO_FIXED_CHAN);
@@ -441,7 +441,8 @@ void bt_l2cap_br_connected(struct bt_conn *conn)
 {
 	struct bt_l2cap_chan *chan;
 
-	Z_STRUCT_SECTION_FOREACH(bt_l2cap_br_fixed_chan, fchan) {
+	Z_STRUCT_SECTION_FOREACH(bt_l2cap_br_fixed_chan, fchan)
+	{
 		struct bt_l2cap_br_chan *ch;
 
 		if (!fchan->accept) {
@@ -593,8 +594,7 @@ l2cap_br_conn_security(struct bt_l2cap_chan *chan, const uint16_t psm)
 	 * bt_conn_set_security API returns 0 what implies also there was no
 	 * need to trigger authentication.
 	 */
-	if (check == 0 &&
-	    chan->conn->sec_level >= chan->required_sec_level) {
+	if (check == 0 && chan->conn->sec_level >= chan->required_sec_level) {
 		return L2CAP_CONN_SECURITY_PASSED;
 	}
 
@@ -616,7 +616,8 @@ l2cap_br_conn_security(struct bt_l2cap_chan *chan, const uint16_t psm)
 }
 
 static void l2cap_br_send_conn_rsp(struct bt_conn *conn, uint16_t scid,
-				  uint16_t dcid, uint8_t ident, uint16_t result)
+				   uint16_t dcid, uint8_t ident,
+				   uint16_t result)
 {
 	struct net_buf *buf;
 	struct bt_l2cap_conn_rsp *rsp;
@@ -728,8 +729,8 @@ static void l2cap_br_conn_req(struct bt_l2cap_br *l2cap, uint8_t ident,
 	atomic_set_bit(BR_CHAN(chan)->flags, L2CAP_FLAG_CONN_ACCEPTOR);
 
 	/* Disable fragmentation of l2cap rx pdu */
-	BR_CHAN(chan)->rx.mtu = MIN(BR_CHAN(chan)->rx.mtu,
-				    CONFIG_BT_L2CAP_RX_MTU);
+	BR_CHAN(chan)->rx.mtu =
+		MIN(BR_CHAN(chan)->rx.mtu, CONFIG_BT_L2CAP_RX_MTU);
 
 	switch (l2cap_br_conn_security(chan, psm)) {
 	case L2CAP_CONN_SECURITY_PENDING:
@@ -800,7 +801,8 @@ static void l2cap_br_conf_rsp(struct bt_l2cap_br *l2cap, uint8_t ident,
 	 */
 	switch (result) {
 	case BT_L2CAP_CONF_SUCCESS:
-		atomic_set_bit(BR_CHAN(chan)->flags, L2CAP_FLAG_CONN_LCONF_DONE);
+		atomic_set_bit(BR_CHAN(chan)->flags,
+			       L2CAP_FLAG_CONN_LCONF_DONE);
 
 		if (chan->state == BT_L2CAP_CONFIG &&
 		    atomic_test_bit(BR_CHAN(chan)->flags,
@@ -883,7 +885,7 @@ static void l2cap_br_send_reject(struct bt_conn *conn, uint8_t ident,
 }
 
 static uint16_t l2cap_br_conf_opt_mtu(struct bt_l2cap_chan *chan,
-				   struct net_buf *buf, size_t len)
+				      struct net_buf *buf, size_t len)
 {
 	uint16_t mtu, result = BT_L2CAP_CONF_SUCCESS;
 
@@ -935,9 +937,10 @@ static void l2cap_br_conf_req(struct bt_l2cap_br *l2cap, uint8_t ident,
 	chan = bt_l2cap_br_lookup_rx_cid(conn, dcid);
 	if (!chan) {
 		BT_ERR("rx channel mismatch!");
-		struct bt_l2cap_cmd_reject_cid_data data = {.scid = req->dcid,
-							    .dcid = 0,
-							   };
+		struct bt_l2cap_cmd_reject_cid_data data = {
+			.scid = req->dcid,
+			.dcid = 0,
+		};
 
 		l2cap_br_send_reject(conn, ident, BT_L2CAP_REJ_INVALID_CID,
 				     &data, sizeof(data));
@@ -1133,8 +1136,7 @@ int bt_l2cap_br_chan_disconnect(struct bt_l2cap_chan *chan)
 
 	ch = BR_CHAN(chan);
 
-	BT_DBG("chan %p scid 0x%04x dcid 0x%04x", chan, ch->rx.cid,
-	       ch->tx.cid);
+	BT_DBG("chan %p scid 0x%04x dcid 0x%04x", chan, ch->rx.cid, ch->tx.cid);
 
 	buf = bt_l2cap_create_pdu(&br_sig_pool, 0);
 
@@ -1235,7 +1237,7 @@ int bt_l2cap_br_chan_connect(struct bt_conn *conn, struct bt_l2cap_chan *chan,
 		 * Authentication was triggered, wait with sending request on
 		 * connection security changed callback context.
 		 */
-		 return 0;
+		return 0;
 	case L2CAP_CONN_SECURITY_PASSED:
 		break;
 	case L2CAP_CONN_SECURITY_REJECT:
@@ -1328,7 +1330,8 @@ int bt_l2cap_br_chan_send(struct bt_l2cap_chan *chan, struct net_buf *buf)
 
 static int l2cap_br_recv(struct bt_l2cap_chan *chan, struct net_buf *buf)
 {
-	struct bt_l2cap_br *l2cap = CONTAINER_OF(chan, struct bt_l2cap_br, chan);
+	struct bt_l2cap_br *l2cap =
+		CONTAINER_OF(chan, struct bt_l2cap_br, chan);
 	struct bt_l2cap_sig_hdr *hdr;
 	uint16_t len;
 
@@ -1340,8 +1343,8 @@ static int l2cap_br_recv(struct bt_l2cap_chan *chan, struct net_buf *buf)
 	hdr = net_buf_pull_mem(buf, sizeof(*hdr));
 	len = sys_le16_to_cpu(hdr->len);
 
-	BT_DBG("Signaling code 0x%02x ident %u len %u", hdr->code,
-	       hdr->ident, len);
+	BT_DBG("Signaling code 0x%02x ident %u len %u", hdr->code, hdr->ident,
+	       len);
 
 	if (buf->len != len) {
 		BT_ERR("L2CAP length mismatch (%u != %u)", buf->len, len);

@@ -34,20 +34,21 @@ LOG_MODULE_REGISTER(i2c_dw);
 
 #include "i2c-priv.h"
 
-static inline volatile struct i2c_dw_registers *get_regs(const struct device *dev)
+static inline volatile struct i2c_dw_registers *
+get_regs(const struct device *dev)
 {
 	return (volatile struct i2c_dw_registers *)DEVICE_MMIO_GET(dev);
 }
 
 static inline void i2c_dw_data_ask(const struct device *dev)
 {
-	struct i2c_dw_dev_config * const dw = dev->data;
+	struct i2c_dw_dev_config *const dw = dev->data;
 	uint32_t data;
 	uint8_t tx_empty;
 	int8_t rx_empty;
 	uint8_t cnt;
 
-	volatile struct i2c_dw_registers * const regs = get_regs(dev);
+	volatile struct i2c_dw_registers *const regs = get_regs(dev);
 
 	/* No more bytes to request, so command queue is no longer needed */
 	if (dw->request_bytes == 0U) {
@@ -83,8 +84,8 @@ static inline void i2c_dw_data_ask(const struct device *dev)
 		}
 
 		/* After receiving the last byte, send STOP if needed */
-		if ((dw->xfr_flags & I2C_MSG_STOP)
-		    && (dw->request_bytes == 1U)) {
+		if ((dw->xfr_flags & I2C_MSG_STOP) &&
+		    (dw->request_bytes == 1U)) {
 			data |= IC_DATA_CMD_STOP;
 		}
 
@@ -98,9 +99,9 @@ static inline void i2c_dw_data_ask(const struct device *dev)
 
 static void i2c_dw_data_read(const struct device *dev)
 {
-	struct i2c_dw_dev_config * const dw = dev->data;
+	struct i2c_dw_dev_config *const dw = dev->data;
 
-	volatile struct i2c_dw_registers * const regs = get_regs(dev);
+	volatile struct i2c_dw_registers *const regs = get_regs(dev);
 
 	while (regs->ic_status.bits.rfne && (dw->xfr_len > 0)) {
 		dw->xfr_buf[0] = regs->ic_data_cmd.raw;
@@ -121,13 +122,12 @@ static void i2c_dw_data_read(const struct device *dev)
 	}
 }
 
-
 static int i2c_dw_data_send(const struct device *dev)
 {
-	struct i2c_dw_dev_config * const dw = dev->data;
+	struct i2c_dw_dev_config *const dw = dev->data;
 	uint32_t data = 0U;
 
-	volatile struct i2c_dw_registers * const regs = get_regs(dev);
+	volatile struct i2c_dw_registers *const regs = get_regs(dev);
 
 	/* Nothing to send anymore, mask the interrupt */
 	if (dw->xfr_len == 0U) {
@@ -168,10 +168,10 @@ static int i2c_dw_data_send(const struct device *dev)
 
 static inline void i2c_dw_transfer_complete(const struct device *dev)
 {
-	struct i2c_dw_dev_config * const dw = dev->data;
+	struct i2c_dw_dev_config *const dw = dev->data;
 	uint32_t value;
 
-	volatile struct i2c_dw_registers * const regs = get_regs(dev);
+	volatile struct i2c_dw_registers *const regs = get_regs(dev);
 
 	regs->ic_intr_mask.raw = DW_DISABLE_ALL_I2C_INT;
 	value = regs->ic_clr_intr;
@@ -182,12 +182,12 @@ static inline void i2c_dw_transfer_complete(const struct device *dev)
 static void i2c_dw_isr(void *arg)
 {
 	const struct device *port = (const struct device *)arg;
-	struct i2c_dw_dev_config * const dw = port->data;
+	struct i2c_dw_dev_config *const dw = port->data;
 	union ic_interrupt_register intr_stat;
 	uint32_t value;
 	int ret = 0;
 
-	volatile struct i2c_dw_registers * const regs = get_regs(port);
+	volatile struct i2c_dw_registers *const regs = get_regs(port);
 
 	/* Cache ic_intr_stat for processing, so there is no need to read
 	 * the register multiple times.
@@ -229,8 +229,8 @@ static void i2c_dw_isr(void *arg)
 		 * are written to TX FIFO.
 		 */
 		if (intr_stat.bits.tx_empty) {
-			if ((dw->xfr_flags & I2C_MSG_RW_MASK)
-			    == I2C_MSG_WRITE) {
+			if ((dw->xfr_flags & I2C_MSG_RW_MASK) ==
+			    I2C_MSG_WRITE) {
 				ret = i2c_dw_data_send(port);
 			} else {
 				i2c_dw_data_ask(port);
@@ -239,9 +239,9 @@ static void i2c_dw_isr(void *arg)
 			/* If STOP is not expected, finish processing this
 			 * message if there is nothing left to do anymore.
 			 */
-			if (((dw->xfr_len == 0U)
-			     && !(dw->xfr_flags & I2C_MSG_STOP))
-			    || (ret != 0)) {
+			if (((dw->xfr_len == 0U) &&
+			     !(dw->xfr_flags & I2C_MSG_STOP)) ||
+			    (ret != 0)) {
 				goto done;
 			}
 		}
@@ -259,13 +259,12 @@ done:
 	i2c_dw_transfer_complete(port);
 }
 
-
 static int i2c_dw_setup(const struct device *dev, uint16_t slave_address)
 {
-	struct i2c_dw_dev_config * const dw = dev->data;
+	struct i2c_dw_dev_config *const dw = dev->data;
 	uint32_t value;
 	union ic_con_register ic_con;
-	volatile struct i2c_dw_registers * const regs = get_regs(dev);
+	volatile struct i2c_dw_registers *const regs = get_regs(dev);
 
 	ic_con.raw = 0U;
 
@@ -382,17 +381,16 @@ static int i2c_dw_setup(const struct device *dev, uint16_t slave_address)
 	return 0;
 }
 
-static int i2c_dw_transfer(const struct device *dev,
-			   struct i2c_msg *msgs, uint8_t num_msgs,
-			   uint16_t slave_address)
+static int i2c_dw_transfer(const struct device *dev, struct i2c_msg *msgs,
+			   uint8_t num_msgs, uint16_t slave_address)
 {
-	struct i2c_dw_dev_config * const dw = dev->data;
+	struct i2c_dw_dev_config *const dw = dev->data;
 	struct i2c_msg *cur_msg = msgs;
 	uint8_t msg_left = num_msgs;
 	uint8_t pflags;
 	int ret;
 
-	volatile struct i2c_dw_registers * const regs = get_regs(dev);
+	volatile struct i2c_dw_registers *const regs = get_regs(dev);
 
 	__ASSERT_NO_MSG(msgs);
 	if (!num_msgs) {
@@ -429,7 +427,7 @@ static int i2c_dw_transfer(const struct device *dev,
 	 */
 	device_busy_set(dev);
 
-		/* Process all the messages */
+	/* Process all the messages */
 	while (msg_left > 0) {
 		pflags = dw->xfr_flags;
 
@@ -439,8 +437,8 @@ static int i2c_dw_transfer(const struct device *dev,
 		dw->rx_pending = 0U;
 
 		/* Need to RESTART if changing transfer direction */
-		if ((pflags & I2C_MSG_RW_MASK)
-		    != (dw->xfr_flags & I2C_MSG_RW_MASK)) {
+		if ((pflags & I2C_MSG_RW_MASK) !=
+		    (dw->xfr_flags & I2C_MSG_RW_MASK)) {
 			dw->xfr_flags |= I2C_MSG_RESTART;
 		}
 
@@ -496,11 +494,11 @@ static int i2c_dw_transfer(const struct device *dev,
 
 static int i2c_dw_runtime_configure(const struct device *dev, uint32_t config)
 {
-	struct i2c_dw_dev_config * const dw = dev->data;
-	uint32_t	value = 0U;
-	uint32_t	rc = 0U;
+	struct i2c_dw_dev_config *const dw = dev->data;
+	uint32_t value = 0U;
+	uint32_t rc = 0U;
 
-	volatile struct i2c_dw_registers * const regs = get_regs(dev);
+	volatile struct i2c_dw_registers *const regs = get_regs(dev);
 
 	dw->app_config = config;
 
@@ -605,8 +603,8 @@ static const struct i2c_driver_api funcs = {
 
 static int i2c_dw_initialize(const struct device *dev)
 {
-	const struct i2c_dw_rom_config * const rom = dev->config;
-	struct i2c_dw_dev_config * const dw = dev->data;
+	const struct i2c_dw_rom_config *const rom = dev->config;
+	struct i2c_dw_dev_config *const dw = dev->data;
 	volatile struct i2c_dw_registers *regs;
 
 #ifdef I2C_DW_PCIE_ENABLED
@@ -620,8 +618,8 @@ static int i2c_dw_initialize(const struct device *dev)
 		mmio_phys_addr = pcie_get_mbar(rom->pcie_bdf, 0);
 		pcie_set_cmd(rom->pcie_bdf, PCIE_CONF_CMDSTAT_MEM, true);
 
-		device_map(DEVICE_MMIO_RAM_PTR(dev), mmio_phys_addr,
-			   0x1000, K_MEM_CACHE_NONE);
+		device_map(DEVICE_MMIO_RAM_PTR(dev), mmio_phys_addr, 0x1000,
+			   K_MEM_CACHE_NONE);
 	} else
 #endif
 	{
@@ -634,7 +632,7 @@ static int i2c_dw_initialize(const struct device *dev)
 	/* verify that we have a valid DesignWare register first */
 	if (regs->ic_comp_type != I2C_DW_MAGIC_KEY) {
 		LOG_DBG("I2C: DesignWare magic key not found, check base "
-			    "address. Stopping initialization");
+			"address. Stopping initialization");
 		return -EIO;
 	}
 

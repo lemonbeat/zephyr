@@ -39,7 +39,8 @@ void test_mpool_alloc_merge_failed_diff_parent(void)
 	for (int i = 0; i < BLK_NUM_MIN; i++) {
 		/* 1. allocated up all blocks*/
 		zassert_true(k_mem_pool_alloc(&mpool1, &block[i], BLK_SIZE_MIN,
-					      K_NO_WAIT) == 0, NULL);
+					      K_NO_WAIT) == 0,
+			     NULL);
 	}
 	/* 2. free adjacent blocks belong to different parent quad-blocks*/
 	for (int i = 2; i < 6; i++) {
@@ -47,7 +48,8 @@ void test_mpool_alloc_merge_failed_diff_parent(void)
 	}
 	/* 3. request a big block, expected failed to merge*/
 	zassert_true(k_mem_pool_alloc(&mpool1, &block_fail, BLK_SIZE_MAX,
-				      TIMEOUT) == -EAGAIN, NULL);
+				      TIMEOUT) == -EAGAIN,
+		     NULL);
 
 	/* 4. test case tear down*/
 	k_mem_pool_free(&block[0]);

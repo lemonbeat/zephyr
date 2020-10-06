@@ -58,7 +58,7 @@ static void read_excess_bytes(uint16_t size)
 static void error_response(int error)
 {
 	uint16_t response = sys_cpu_to_le16(waiting_response);
-	int   le_error = sys_cpu_to_le32(error);
+	int le_error = sys_cpu_to_le32(error);
 	uint16_t size = sys_cpu_to_le16(sizeof(le_error));
 
 	edtt_write((uint8_t *)&response, sizeof(response), EDTTT_BLOCK);
@@ -107,7 +107,8 @@ static struct net_buf *acl_data_create(struct bt_hci_acl_hdr *le_hdr)
  * @brief Allocate buffer for HCI command, fill in parameters and send the
  * command...
  */
-static int send_hci_command(uint16_t opcode, uint8_t param_len, uint16_t response)
+static int send_hci_command(uint16_t opcode, uint8_t param_len,
+			    uint16_t response)
 {
 	struct net_buf *buf;
 	void *cp;
@@ -185,7 +186,8 @@ static void command_complete(struct net_buf *buf)
 		waiting_opcode = 0;
 	} else {
 		LOG_WRN("Not waiting for 0x(%04x) command status,"
-			" expected 0x(%04x)", opcode, waiting_opcode);
+			" expected 0x(%04x)",
+			opcode, waiting_opcode);
 	}
 
 	net_buf_simple_restore(&buf->b, &state);
@@ -218,7 +220,8 @@ static void command_status(struct net_buf *buf)
 		waiting_opcode = 0;
 	} else {
 		LOG_WRN("Not waiting for 0x(%04x) command status,"
-			" expected 0x(%04x)", opcode, waiting_opcode);
+			" expected 0x(%04x)",
+			opcode, waiting_opcode);
 	}
 
 	net_buf_simple_restore(&buf->b, &state);
@@ -263,7 +266,6 @@ static void service_events(void *p1, void *p2, void *p3)
 	while (1) {
 		buf = net_buf_get(&rx_queue, K_FOREVER);
 		if (bt_buf_get_type(buf) == BT_BUF_EVT) {
-
 			evt = queue_event(buf);
 			if (!evt) {
 				bs_trace_raw_time(4,
@@ -300,8 +302,8 @@ static void service_events(void *p1, void *p2, void *p3)
 			data = net_buf_alloc(&data_pool, K_NO_WAIT);
 			if (data) {
 				bt_buf_set_type(data, BT_BUF_ACL_IN);
-				net_buf_add_le32(data,
-					sys_cpu_to_le32(k_uptime_get()));
+				net_buf_add_le32(
+					data, sys_cpu_to_le32(k_uptime_get()));
 				net_buf_add_mem(data, buf->data, buf->len);
 				net_buf_put(&data_queue, data);
 			}
@@ -317,7 +319,7 @@ static void service_events(void *p1, void *p2, void *p3)
  */
 static void flush_events(uint16_t size)
 {
-	uint16_t  response = sys_cpu_to_le16(CMD_FLUSH_EVENTS_RSP);
+	uint16_t response = sys_cpu_to_le16(CMD_FLUSH_EVENTS_RSP);
 	struct net_buf *buf;
 
 	while ((buf = net_buf_get(&event_queue, K_NO_WAIT))) {
@@ -336,7 +338,7 @@ static void flush_events(uint16_t size)
  */
 static void get_event(uint16_t size)
 {
-	uint16_t  response = sys_cpu_to_le16(CMD_GET_EVENT_RSP);
+	uint16_t response = sys_cpu_to_le16(CMD_GET_EVENT_RSP);
 	struct net_buf *buf;
 
 	read_excess_bytes(size);
@@ -387,13 +389,12 @@ static void has_event(uint16_t size)
 	struct has_event_resp {
 		uint16_t response;
 		uint16_t size;
-		uint8_t  count;
+		uint8_t count;
 	} __packed;
-	struct has_event_resp le_response = {
-		.response = sys_cpu_to_le16(CMD_HAS_EVENT_RSP),
-		.size = sys_cpu_to_le16(1),
-		.count = m_events
-	};
+	struct has_event_resp le_response = { .response = sys_cpu_to_le16(
+						      CMD_HAS_EVENT_RSP),
+					      .size = sys_cpu_to_le16(1),
+					      .count = m_events };
 
 	if (size > 0) {
 		read_excess_bytes(size);
@@ -406,7 +407,7 @@ static void has_event(uint16_t size)
  */
 static void le_flush_data(uint16_t size)
 {
-	uint16_t  response = sys_cpu_to_le16(CMD_LE_FLUSH_DATA_RSP);
+	uint16_t response = sys_cpu_to_le16(CMD_LE_FLUSH_DATA_RSP);
 	struct net_buf *buf;
 
 	while ((buf = net_buf_get(&data_queue, K_NO_WAIT))) {
@@ -427,13 +428,12 @@ static void le_data_ready(uint16_t size)
 	struct has_data_resp {
 		uint16_t response;
 		uint16_t size;
-		uint8_t  empty;
+		uint8_t empty;
 	} __packed;
-	struct has_data_resp le_response = {
-		.response = sys_cpu_to_le16(CMD_LE_DATA_READY_RSP),
-		.size = sys_cpu_to_le16(1),
-		.empty = 0
-	};
+	struct has_data_resp le_response = { .response = sys_cpu_to_le16(
+						     CMD_LE_DATA_READY_RSP),
+					     .size = sys_cpu_to_le16(1),
+					     .empty = 0 };
 
 	if (size > 0) {
 		read_excess_bytes(size);
@@ -449,7 +449,7 @@ static void le_data_ready(uint16_t size)
  */
 static void le_data_read(uint16_t size)
 {
-	uint16_t  response = sys_cpu_to_le16(CMD_LE_DATA_READ_RSP);
+	uint16_t response = sys_cpu_to_le16(CMD_LE_DATA_READ_RSP);
 	struct net_buf *buf;
 
 	read_excess_bytes(size);
@@ -475,13 +475,12 @@ static void le_data_write(uint16_t size)
 	struct data_write_resp {
 		uint16_t code;
 		uint16_t size;
-		uint8_t  status;
+		uint8_t status;
 	} __packed;
-	struct data_write_resp response = {
-		.code = sys_cpu_to_le16(CMD_LE_DATA_WRITE_RSP),
-		.size = sys_cpu_to_le16(1),
-		.status = 0
-	};
+	struct data_write_resp response = { .code = sys_cpu_to_le16(
+						    CMD_LE_DATA_WRITE_RSP),
+					    .size = sys_cpu_to_le16(1),
+					    .status = 0 };
 	struct net_buf *buf;
 	struct bt_hci_acl_hdr hdr;
 	int err;
@@ -517,8 +516,7 @@ static void le_data_write(uint16_t size)
 	edtt_write((uint8_t *)&response, sizeof(response), EDTTT_BLOCK);
 }
 
-static K_THREAD_STACK_DEFINE(service_events_stack,
-			     CONFIG_BT_HCI_TX_STACK_SIZE);
+static K_THREAD_STACK_DEFINE(service_events_stack, CONFIG_BT_HCI_TX_STACK_SIZE);
 static struct k_thread service_events_data;
 
 /**
@@ -557,8 +555,8 @@ void main(void)
 	 */
 	k_thread_create(&service_events_data, service_events_stack,
 			K_THREAD_STACK_SIZEOF(service_events_stack),
-			service_events, NULL, NULL, NULL, K_PRIO_COOP(7),
-			0, K_NO_WAIT);
+			service_events, NULL, NULL, NULL, K_PRIO_COOP(7), 0,
+			K_NO_WAIT);
 
 	while (1) {
 		/**
@@ -568,7 +566,8 @@ void main(void)
 		command = sys_le16_to_cpu(command);
 		edtt_read((uint8_t *)&size, sizeof(size), EDTTT_BLOCK);
 		size = sys_le16_to_cpu(size);
-		bs_trace_raw_time(4, "command 0x%04X received (size %u) "
+		bs_trace_raw_time(4,
+				  "command 0x%04X received (size %u) "
 				  "events=%u\n",
 				  command, size, m_events);
 
@@ -582,8 +581,7 @@ void main(void)
 		case CMD_HAS_EVENT_REQ:
 			has_event(size);
 			break;
-		case CMD_GET_EVENT_REQ:
-		{
+		case CMD_GET_EVENT_REQ: {
 			uint8_t multiple;
 
 			edtt_read((uint8_t *)&multiple, sizeof(multiple),
@@ -592,8 +590,7 @@ void main(void)
 				get_events(--size);
 			else
 				get_event(--size);
-		}
-		break;
+		} break;
 		case CMD_LE_FLUSH_DATA_REQ:
 			le_flush_data(size);
 			break;

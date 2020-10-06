@@ -26,7 +26,8 @@ static int init_timer_module(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	Z_STRUCT_SECTION_FOREACH(k_timer, timer) {
+	Z_STRUCT_SECTION_FOREACH(k_timer, timer)
+	{
 		SYS_TRACING_OBJ_INIT(k_timer, timer);
 	}
 	return 0;
@@ -55,7 +56,7 @@ void z_timer_expiration_handler(struct _timeout *t)
 	if (!K_TIMEOUT_EQ(timer->period, K_NO_WAIT) &&
 	    !K_TIMEOUT_EQ(timer->period, K_FOREVER)) {
 		z_add_timeout(&timer->timeout, z_timer_expiration_handler,
-			     timer->period);
+			      timer->period);
 	}
 
 	/* update timer's status */
@@ -87,10 +88,8 @@ void z_timer_expiration_handler(struct _timeout *t)
 	arch_thread_return_value_set(thread, 0);
 }
 
-
-void k_timer_init(struct k_timer *timer,
-			 k_timer_expiry_t expiry_fn,
-			 k_timer_stop_t stop_fn)
+void k_timer_init(struct k_timer *timer, k_timer_expiry_t expiry_fn,
+		  k_timer_stop_t stop_fn)
 {
 	timer->expiry_fn = expiry_fn;
 	timer->stop_fn = stop_fn;
@@ -104,7 +103,6 @@ void k_timer_init(struct k_timer *timer,
 
 	z_object_init(timer);
 }
-
 
 void z_impl_k_timer_start(struct k_timer *timer, k_timeout_t duration,
 			  k_timeout_t period)
@@ -142,8 +140,7 @@ void z_impl_k_timer_start(struct k_timer *timer, k_timeout_t duration,
 	timer->period = period;
 	timer->status = 0U;
 
-	z_add_timeout(&timer->timeout, z_timer_expiration_handler,
-		     duration);
+	z_add_timeout(&timer->timeout, z_timer_expiration_handler, duration);
 }
 
 #ifdef CONFIG_USERSPACE
@@ -216,7 +213,8 @@ uint32_t z_impl_k_timer_status_sync(struct k_timer *timer)
 	if (result == 0U) {
 		if (!z_is_inactive_timeout(&timer->timeout)) {
 			/* wait for timer to expire or stop */
-			(void)z_pend_curr(&lock, key, &timer->wait_q, K_FOREVER);
+			(void)z_pend_curr(&lock, key, &timer->wait_q,
+					  K_FOREVER);
 
 			/* get updated timer status */
 			key = k_spin_lock(&lock);

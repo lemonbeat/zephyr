@@ -23,17 +23,16 @@ int mqtt_client_tcp_connect(struct mqtt_client *client)
 	const struct sockaddr *broker = client->broker;
 	int ret;
 
-	client->transport.tcp.sock = zsock_socket(broker->sa_family, SOCK_STREAM,
-						  IPPROTO_TCP);
+	client->transport.tcp.sock =
+		zsock_socket(broker->sa_family, SOCK_STREAM, IPPROTO_TCP);
 	if (client->transport.tcp.sock < 0) {
 		return -errno;
 	}
 
 #if defined(CONFIG_SOCKS)
 	if (client->transport.proxy.addrlen != 0) {
-		ret = setsockopt(client->transport.tcp.sock,
-				 SOL_SOCKET, SO_SOCKS5,
-				 &client->transport.proxy.addr,
+		ret = setsockopt(client->transport.tcp.sock, SOL_SOCKET,
+				 SO_SOCKS5, &client->transport.proxy.addr,
 				 client->transport.proxy.addrlen);
 		if (ret < 0) {
 			return -errno;
@@ -52,7 +51,7 @@ int mqtt_client_tcp_connect(struct mqtt_client *client)
 	ret = zsock_connect(client->transport.tcp.sock, client->broker,
 			    peer_addr_size);
 	if (ret < 0) {
-		(void) zsock_close(client->transport.tcp.sock);
+		(void)zsock_close(client->transport.tcp.sock);
 		return -errno;
 	}
 
@@ -93,8 +92,8 @@ int mqtt_client_tcp_write_msg(struct mqtt_client *client,
 	return 0;
 }
 
-int mqtt_client_tcp_read(struct mqtt_client *client, uint8_t *data, uint32_t buflen,
-			 bool shall_block)
+int mqtt_client_tcp_read(struct mqtt_client *client, uint8_t *data,
+			 uint32_t buflen, bool shall_block)
 {
 	int flags = 0;
 	int ret;

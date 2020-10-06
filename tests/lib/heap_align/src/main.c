@@ -20,8 +20,8 @@ uint8_t *heap_start, *heap_end;
  * are returned low-adddress to high, and that freed blocks are merged
  * immediately with adjacent free blocks.
  */
-static void check_heap_align(struct sys_heap *h,
-			     size_t prefix, size_t align, size_t size)
+static void check_heap_align(struct sys_heap *h, size_t prefix, size_t align,
+			     size_t size)
 {
 	void *p, *q, *r, *s;
 
@@ -41,7 +41,7 @@ static void check_heap_align(struct sys_heap *h,
 	 */
 	s = sys_heap_alloc(h, (heap_end - (uint8_t *)r) - size - 8);
 	zassert_true(s != NULL, "suffix allocation failed (%zd/%zd/%zd)",
-				prefix, align, size);
+		     prefix, align, size);
 
 	sys_heap_free(h, p);
 	sys_heap_free(h, q);

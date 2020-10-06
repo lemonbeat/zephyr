@@ -320,17 +320,17 @@ static void health_period_set(struct bt_mesh_model *model,
 }
 
 const struct bt_mesh_model_op bt_mesh_health_srv_op[] = {
-	{ OP_HEALTH_FAULT_GET,         2,   health_fault_get },
-	{ OP_HEALTH_FAULT_CLEAR,       2,   health_fault_clear },
-	{ OP_HEALTH_FAULT_CLEAR_UNREL, 2,   health_fault_clear_unrel },
-	{ OP_HEALTH_FAULT_TEST,        3,   health_fault_test },
-	{ OP_HEALTH_FAULT_TEST_UNREL,  3,   health_fault_test_unrel },
-	{ OP_HEALTH_PERIOD_GET,        0,   health_period_get },
-	{ OP_HEALTH_PERIOD_SET,        1,   health_period_set },
-	{ OP_HEALTH_PERIOD_SET_UNREL,  1,   health_period_set_unrel },
-	{ OP_ATTENTION_GET,            0,   attention_get },
-	{ OP_ATTENTION_SET,            1,   attention_set },
-	{ OP_ATTENTION_SET_UNREL,      1,   attention_set_unrel },
+	{ OP_HEALTH_FAULT_GET, 2, health_fault_get },
+	{ OP_HEALTH_FAULT_CLEAR, 2, health_fault_clear },
+	{ OP_HEALTH_FAULT_CLEAR_UNREL, 2, health_fault_clear_unrel },
+	{ OP_HEALTH_FAULT_TEST, 3, health_fault_test },
+	{ OP_HEALTH_FAULT_TEST_UNREL, 3, health_fault_test_unrel },
+	{ OP_HEALTH_PERIOD_GET, 0, health_period_get },
+	{ OP_HEALTH_PERIOD_SET, 1, health_period_set },
+	{ OP_HEALTH_PERIOD_SET_UNREL, 1, health_period_set_unrel },
+	{ OP_ATTENTION_GET, 0, attention_get },
+	{ OP_ATTENTION_SET, 1, attention_set },
+	{ OP_ATTENTION_SET_UNREL, 1, attention_set_unrel },
 	BT_MESH_MODEL_OP_END,
 };
 
@@ -374,9 +374,8 @@ int bt_mesh_fault_update(struct bt_mesh_elem *elem)
 
 static void attention_off(struct k_work *work)
 {
-	struct bt_mesh_health_srv *srv = CONTAINER_OF(work,
-						      struct bt_mesh_health_srv,
-						      attn_timer.work);
+	struct bt_mesh_health_srv *srv =
+		CONTAINER_OF(work, struct bt_mesh_health_srv, attn_timer.work);
 	BT_DBG("");
 
 	if (srv->cb && srv->cb->attn_off) {

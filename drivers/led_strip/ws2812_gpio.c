@@ -76,27 +76,23 @@ static const struct ws2812_gpio_cfg *dev_cfg(const struct device *dev)
  * constraint in the below assembly.
  */
 #define SET_HIGH "str %[p], [%[r], #0]\n" /* OUTSET = BIT(LED_PIN) */
-#define SET_LOW "str %[p], [%[r], #4]\n"  /* OUTCLR = BIT(LED_PIN) */
+#define SET_LOW "str %[p], [%[r], #4]\n" /* OUTCLR = BIT(LED_PIN) */
 
 /* Send out a 1 bit's pulse */
-#define ONE_BIT(base, pin) do {			\
-	__asm volatile (SET_HIGH			\
-			DELAY_T1H			\
-			SET_LOW			\
-			DELAY_TxL			\
-			::				\
-			[r] "l" (base),		\
-			[p] "l" (pin)); } while (0)
+#define ONE_BIT(base, pin)                                                    \
+	do {                                                                  \
+		__asm volatile(                                               \
+			SET_HIGH DELAY_T1H SET_LOW DELAY_TxL ::[r] "l"(base), \
+			[p] "l"(pin));                                        \
+	} while (0)
 
 /* Send out a 0 bit's pulse */
-#define ZERO_BIT(base, pin) do {			\
-	__asm volatile (SET_HIGH			\
-			DELAY_T0H			\
-			SET_LOW			\
-			DELAY_TxL			\
-			::				\
-			[r] "l" (base),		\
-			[p] "l" (pin)); } while (0)
+#define ZERO_BIT(base, pin)                                                   \
+	do {                                                                  \
+		__asm volatile(                                               \
+			SET_HIGH DELAY_T0H SET_LOW DELAY_TxL ::[r] "l"(base), \
+			[p] "l"(pin));                                        \
+	} while (0)
 
 static int send_buf(const struct device *dev, uint8_t *buf, size_t len)
 {
@@ -154,8 +150,7 @@ static int send_buf(const struct device *dev, uint8_t *buf, size_t len)
 }
 
 static int ws2812_gpio_update_rgb(const struct device *dev,
-				  struct led_rgb *pixels,
-				  size_t num_pixels)
+				  struct led_rgb *pixels, size_t num_pixels)
 {
 	const struct ws2812_gpio_cfg *config = dev->config;
 	const bool has_white = config->has_white;
@@ -176,12 +171,12 @@ static int ws2812_gpio_update_rgb(const struct device *dev,
 		}
 	}
 
-	return send_buf(dev, (uint8_t *)pixels, num_pixels * (has_white ? 4 : 3));
+	return send_buf(dev, (uint8_t *)pixels,
+			num_pixels * (has_white ? 4 : 3));
 }
 
 static int ws2812_gpio_update_channels(const struct device *dev,
-				       uint8_t *channels,
-				       size_t num_channels)
+				       uint8_t *channels, size_t num_channels)
 {
 	LOG_ERR("update_channels not implemented");
 	return -ENOTSUP;
@@ -192,16 +187,11 @@ static const struct led_strip_driver_api ws2812_gpio_api = {
 	.update_channels = ws2812_gpio_update_channels,
 };
 
-#define WS2812_GPIO_LABEL(idx) \
-	(DT_INST_LABEL(idx))
-#define WS2812_GPIO_HAS_WHITE(idx) \
-	(DT_INST_PROP(idx, has_white_channel) == 1)
-#define WS2812_GPIO_DEV(idx) \
-	(DT_INST_GPIO_LABEL(idx, in_gpios))
-#define WS2812_GPIO_PIN(idx) \
-	(DT_INST_GPIO_PIN(idx, in_gpios))
-#define WS2812_GPIO_FLAGS(idx) \
-	(DT_INST_GPIO_FLAGS(idx, in_gpios))
+#define WS2812_GPIO_LABEL(idx) (DT_INST_LABEL(idx))
+#define WS2812_GPIO_HAS_WHITE(idx) (DT_INST_PROP(idx, has_white_channel) == 1)
+#define WS2812_GPIO_DEV(idx) (DT_INST_GPIO_LABEL(idx, in_gpios))
+#define WS2812_GPIO_PIN(idx) (DT_INST_GPIO_PIN(idx, in_gpios))
+#define WS2812_GPIO_FLAGS(idx) (DT_INST_GPIO_FLAGS(idx, in_gpios))
 /*
  * The inline assembly above is designed to work on nRF51 devices with
  * the 16 MHz clock enabled.
@@ -210,37 +200,35 @@ static const struct led_strip_driver_api ws2812_gpio_api = {
  */
 #define WS2812_GPIO_CLK(idx) DT_LABEL(DT_INST(0, nordic_nrf_clock))
 
-#define WS2812_GPIO_DEVICE(idx)					\
-									\
-	static int ws2812_gpio_##idx##_init(const struct device *dev)	\
-	{								\
-		struct ws2812_gpio_data *data = dev_data(dev);		\
-									\
-		data->gpio = device_get_binding(WS2812_GPIO_DEV(idx));	\
-		if (!data->gpio) {					\
-			LOG_ERR("Unable to find GPIO controller %s",	\
-				WS2812_GPIO_DEV(idx));			\
-			return -ENODEV;				\
-		}							\
-									\
-		return gpio_pin_configure(data->gpio,			\
-					  WS2812_GPIO_PIN(idx),	\
-					  WS2812_GPIO_FLAGS(idx) |	\
-					  GPIO_OUTPUT);		\
-	}								\
-									\
-	static struct ws2812_gpio_data ws2812_gpio_##idx##_data;	\
-									\
-	static const struct ws2812_gpio_cfg ws2812_gpio_##idx##_cfg = { \
-		.pin = WS2812_GPIO_PIN(idx),				\
-		.has_white = WS2812_GPIO_HAS_WHITE(idx),		\
-	};								\
-									\
-	DEVICE_AND_API_INIT(ws2812_gpio_##idx, WS2812_GPIO_LABEL(idx),	\
-			    ws2812_gpio_##idx##_init,			\
-			    &ws2812_gpio_##idx##_data,			\
-			    &ws2812_gpio_##idx##_cfg, POST_KERNEL,	\
-			    CONFIG_LED_STRIP_INIT_PRIORITY,		\
-			    &ws2812_gpio_api);
+#define WS2812_GPIO_DEVICE(idx)                                             \
+                                                                            \
+	static int ws2812_gpio_##idx##_init(const struct device *dev)       \
+	{                                                                   \
+		struct ws2812_gpio_data *data = dev_data(dev);              \
+                                                                            \
+		data->gpio = device_get_binding(WS2812_GPIO_DEV(idx));      \
+		if (!data->gpio) {                                          \
+			LOG_ERR("Unable to find GPIO controller %s",        \
+				WS2812_GPIO_DEV(idx));                      \
+			return -ENODEV;                                     \
+		}                                                           \
+                                                                            \
+		return gpio_pin_configure(data->gpio, WS2812_GPIO_PIN(idx), \
+					  WS2812_GPIO_FLAGS(idx) |          \
+						  GPIO_OUTPUT);             \
+	}                                                                   \
+                                                                            \
+	static struct ws2812_gpio_data ws2812_gpio_##idx##_data;            \
+                                                                            \
+	static const struct ws2812_gpio_cfg ws2812_gpio_##idx##_cfg = {     \
+		.pin = WS2812_GPIO_PIN(idx),                                \
+		.has_white = WS2812_GPIO_HAS_WHITE(idx),                    \
+	};                                                                  \
+                                                                            \
+	DEVICE_AND_API_INIT(ws2812_gpio_##idx, WS2812_GPIO_LABEL(idx),      \
+			    ws2812_gpio_##idx##_init,                       \
+			    &ws2812_gpio_##idx##_data,                      \
+			    &ws2812_gpio_##idx##_cfg, POST_KERNEL,          \
+			    CONFIG_LED_STRIP_INIT_PRIORITY, &ws2812_gpio_api);
 
 DT_INST_FOREACH_STATUS_OKAY(WS2812_GPIO_DEVICE)

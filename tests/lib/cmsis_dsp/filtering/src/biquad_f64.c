@@ -13,8 +13,8 @@
 
 #include "biquad_f64.pat"
 
-#define SNR_ERROR_THRESH	((float64_t)98)
-#define REL_ERROR_THRESH	(1.2e-3)
+#define SNR_ERROR_THRESH ((float64_t)98)
+#define REL_ERROR_THRESH (1.2e-3)
 
 static void test_arm_biquad_cascade_df2t_f64_default(void)
 {
@@ -44,8 +44,7 @@ static void test_arm_biquad_cascade_df2t_f64_default(void)
 	/* Enumerate blocks */
 	for (index = 0; index < 2; index++) {
 		/* Run test function */
-		arm_biquad_cascade_df2T_f64(
-			&inst, input, output, block_size);
+		arm_biquad_cascade_df2T_f64(&inst, input, output, block_size);
 
 		/* Increment pointers */
 		input += block_size;
@@ -53,13 +52,13 @@ static void test_arm_biquad_cascade_df2t_f64_default(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f64(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f64(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f64(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f64(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -94,14 +93,13 @@ static void test_arm_biquad_cascade_df2t_f64_rand(void)
 		block_size = config[1];
 
 		/* Initialise instance */
-		arm_biquad_cascade_df2T_init_f64(
-			&inst, stage_count, coeff, state);
+		arm_biquad_cascade_df2T_init_f64(&inst, stage_count, coeff,
+						 state);
 
 		/* TODO: Add NEON support */
 
 		/* Run test function */
-		arm_biquad_cascade_df2T_f64(
-			&inst, input, output, block_size);
+		arm_biquad_cascade_df2T_f64(&inst, input, output, block_size);
 
 		/* Increment pointers */
 		input += block_size;
@@ -111,13 +109,13 @@ static void test_arm_biquad_cascade_df2t_f64_rand(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f64(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f64(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f64(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f64(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -126,10 +124,10 @@ static void test_arm_biquad_cascade_df2t_f64_rand(void)
 
 void test_filtering_biquad_f64(void)
 {
-	ztest_test_suite(filtering_biquad_f64,
+	ztest_test_suite(
+		filtering_biquad_f64,
 		ztest_unit_test(test_arm_biquad_cascade_df2t_f64_default),
-		ztest_unit_test(test_arm_biquad_cascade_df2t_f64_rand)
-		);
+		ztest_unit_test(test_arm_biquad_cascade_df2t_f64_rand));
 
 	ztest_run_test_suite(filtering_biquad_f64);
 }

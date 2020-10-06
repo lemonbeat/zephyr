@@ -21,10 +21,10 @@ static void *thread_top(void *p1)
 	struct sched_param param;
 	int id = POINTER_TO_INT(p1);
 
-	pthread = (pthread_t) pthread_self();
+	pthread = (pthread_t)pthread_self();
 	pthread_getschedparam(pthread, &policy, &param);
-	printk("Thread %d scheduling policy = %d & priority %d started\n",
-	       id, policy, param.sched_priority);
+	printk("Thread %d scheduling policy = %d & priority %d started\n", id,
+	       policy, param.sched_priority);
 
 	ret = pthread_rwlock_tryrdlock(&rwlock);
 	if (ret) {
@@ -95,7 +95,6 @@ void test_posix_rw_lock(void)
 		ret = pthread_create(&newthread[i], &attr[i], thread_top,
 				     INT_TO_POINTER(i));
 		zassert_false(ret, "Low memory to thread new thread");
-
 	}
 
 	/* Delay to give change to child threads to run */

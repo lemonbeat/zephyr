@@ -16,10 +16,10 @@
 #ifndef ZEPHYR_INCLUDE_ARCH_ARM_AARCH32_SYSCALL_H_
 #define ZEPHYR_INCLUDE_ARCH_ARM_AARCH32_SYSCALL_H_
 
-#define _SVC_CALL_CONTEXT_SWITCH	0
-#define _SVC_CALL_IRQ_OFFLOAD		1
-#define _SVC_CALL_RUNTIME_EXCEPT	2
-#define _SVC_CALL_SYSTEM_CALL		3
+#define _SVC_CALL_CONTEXT_SWITCH 0
+#define _SVC_CALL_IRQ_OFFLOAD 1
+#define _SVC_CALL_RUNTIME_EXCEPT 2
+#define _SVC_CALL_SYSTEM_CALL 3
 
 #ifdef CONFIG_USERSPACE
 #ifndef _ASMLANGUAGE
@@ -31,7 +31,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /* Syscall invocation macros. arm-specific machine constraints used to ensure
  * args land in the proper registers.
@@ -51,9 +50,8 @@ static inline uintptr_t arch_syscall_invoke6(uintptr_t arg1, uintptr_t arg2,
 
 	__asm__ volatile("svc %[svid]\n"
 			 : "=r"(ret)
-			 : [svid] "i" (_SVC_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r3),
-			   "r" (r4), "r" (r5), "r" (r6)
+			 : [svid] "i"(_SVC_CALL_SYSTEM_CALL), "r"(ret), "r"(r1),
+			   "r"(r2), "r"(r3), "r"(r4), "r"(r5), "r"(r6)
 			 : "r8", "memory", "ip");
 
 	return ret;
@@ -61,8 +59,7 @@ static inline uintptr_t arch_syscall_invoke6(uintptr_t arg1, uintptr_t arg2,
 
 static inline uintptr_t arch_syscall_invoke5(uintptr_t arg1, uintptr_t arg2,
 					     uintptr_t arg3, uintptr_t arg4,
-					     uintptr_t arg5,
-					     uintptr_t call_id)
+					     uintptr_t arg5, uintptr_t call_id)
 {
 	register uint32_t ret __asm__("r0") = arg1;
 	register uint32_t r1 __asm__("r1") = arg2;
@@ -73,9 +70,8 @@ static inline uintptr_t arch_syscall_invoke5(uintptr_t arg1, uintptr_t arg2,
 
 	__asm__ volatile("svc %[svid]\n"
 			 : "=r"(ret)
-			 : [svid] "i" (_SVC_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r3),
-			   "r" (r4), "r" (r6)
+			 : [svid] "i"(_SVC_CALL_SYSTEM_CALL), "r"(ret), "r"(r1),
+			   "r"(r2), "r"(r3), "r"(r4), "r"(r6)
 			 : "r8", "memory", "ip");
 
 	return ret;
@@ -93,17 +89,15 @@ static inline uintptr_t arch_syscall_invoke4(uintptr_t arg1, uintptr_t arg2,
 
 	__asm__ volatile("svc %[svid]\n"
 			 : "=r"(ret)
-			 : [svid] "i" (_SVC_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r3),
-			   "r" (r6)
+			 : [svid] "i"(_SVC_CALL_SYSTEM_CALL), "r"(ret), "r"(r1),
+			   "r"(r2), "r"(r3), "r"(r6)
 			 : "r8", "memory", "ip");
 
 	return ret;
 }
 
 static inline uintptr_t arch_syscall_invoke3(uintptr_t arg1, uintptr_t arg2,
-					     uintptr_t arg3,
-					     uintptr_t call_id)
+					     uintptr_t arg3, uintptr_t call_id)
 {
 	register uint32_t ret __asm__("r0") = arg1;
 	register uint32_t r1 __asm__("r1") = arg2;
@@ -112,8 +106,8 @@ static inline uintptr_t arch_syscall_invoke3(uintptr_t arg1, uintptr_t arg2,
 
 	__asm__ volatile("svc %[svid]\n"
 			 : "=r"(ret)
-			 : [svid] "i" (_SVC_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r2), "r" (r6)
+			 : [svid] "i"(_SVC_CALL_SYSTEM_CALL), "r"(ret), "r"(r1),
+			   "r"(r2), "r"(r6)
 			 : "r8", "memory", "r3", "ip");
 
 	return ret;
@@ -128,23 +122,21 @@ static inline uintptr_t arch_syscall_invoke2(uintptr_t arg1, uintptr_t arg2,
 
 	__asm__ volatile("svc %[svid]\n"
 			 : "=r"(ret)
-			 : [svid] "i" (_SVC_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r1), "r" (r6)
+			 : [svid] "i"(_SVC_CALL_SYSTEM_CALL), "r"(ret), "r"(r1),
+			   "r"(r6)
 			 : "r8", "memory", "r2", "r3", "ip");
 
 	return ret;
 }
 
-static inline uintptr_t arch_syscall_invoke1(uintptr_t arg1,
-					     uintptr_t call_id)
+static inline uintptr_t arch_syscall_invoke1(uintptr_t arg1, uintptr_t call_id)
 {
 	register uint32_t ret __asm__("r0") = arg1;
 	register uint32_t r6 __asm__("r6") = call_id;
 
 	__asm__ volatile("svc %[svid]\n"
 			 : "=r"(ret)
-			 : [svid] "i" (_SVC_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r6)
+			 : [svid] "i"(_SVC_CALL_SYSTEM_CALL), "r"(ret), "r"(r6)
 			 : "r8", "memory", "r1", "r2", "r3", "ip");
 	return ret;
 }
@@ -156,8 +148,7 @@ static inline uintptr_t arch_syscall_invoke0(uintptr_t call_id)
 
 	__asm__ volatile("svc %[svid]\n"
 			 : "=r"(ret)
-			 : [svid] "i" (_SVC_CALL_SYSTEM_CALL),
-			   "r" (ret), "r" (r6)
+			 : [svid] "i"(_SVC_CALL_SYSTEM_CALL), "r"(ret), "r"(r6)
 			 : "r8", "memory", "r1", "r2", "r3", "ip");
 
 	return ret;

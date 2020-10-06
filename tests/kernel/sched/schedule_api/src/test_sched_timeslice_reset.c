@@ -19,7 +19,7 @@ BUILD_ASSERT(NUM_THREAD <= MAX_NUM_THREAD);
 #define BUSY_MS (SLICE_SIZE + 20)
 /* a half timeslice*/
 #define HALF_SLICE_SIZE (SLICE_SIZE >> 1)
-#define HALF_SLICE_SIZE_CYCLES                                                 \
+#define HALF_SLICE_SIZE_CYCLES \
 	((uint64_t)(HALF_SLICE_SIZE)*sys_clock_hw_cycles_per_sec() / 1000)
 
 /* Task switch tolerance ... */
@@ -68,14 +68,12 @@ static void thread_time_slice(void *p1, void *p2, void *p3)
 		 * Other threads are sliced with tick granularity. Here, we
 		 * also expecting task switch below the switching tolerance.
 		 */
-		expected_slice_min =
-			(k_ms_to_ticks_ceil32(SLICE_SIZE)
-			 - TASK_SWITCH_TOLERANCE)
-			* k_ticks_to_cyc_floor32(1);
-		expected_slice_max =
-			(k_ms_to_ticks_ceil32(SLICE_SIZE)
-			 + TASK_SWITCH_TOLERANCE)
-			* k_ticks_to_cyc_floor32(1);
+		expected_slice_min = (k_ms_to_ticks_ceil32(SLICE_SIZE) -
+				      TASK_SWITCH_TOLERANCE) *
+				     k_ticks_to_cyc_floor32(1);
+		expected_slice_max = (k_ms_to_ticks_ceil32(SLICE_SIZE) +
+				      TASK_SWITCH_TOLERANCE) *
+				     k_ticks_to_cyc_floor32(1);
 	}
 
 #ifdef CONFIG_DEBUG

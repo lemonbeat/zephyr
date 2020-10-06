@@ -27,10 +27,9 @@ struct init_stack_frame {
 	/* least recently pushed */
 };
 
-
 void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
-		     char *stack_ptr, k_thread_entry_t entry,
-		     void *arg1, void *arg2, void *arg3)
+		     char *stack_ptr, k_thread_entry_t entry, void *arg1,
+		     void *arg2, void *arg3)
 {
 	struct init_stack_frame *iframe;
 

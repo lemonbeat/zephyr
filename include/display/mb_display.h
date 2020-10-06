@@ -37,11 +37,7 @@ extern "C" {
 struct mb_image {
 	union {
 		struct {
-			uint8_t c1:1,
-				c2:1,
-				c3:1,
-				c4:1,
-				c5:1;
+			uint8_t c1 : 1, c2 : 1, c3 : 1, c4 : 1, c5 : 1;
 		} r[5];
 		uint8_t row[5];
 	};
@@ -65,7 +61,7 @@ enum mb_display_mode {
 	/* Display flags, i.e. modifiers to the chosen mode */
 
 	/** Loop back to the beginning when reaching the last image. */
-	MB_DISPLAY_FLAG_LOOP        = BIT(16),
+	MB_DISPLAY_FLAG_LOOP = BIT(16),
 };
 
 /**
@@ -93,7 +89,10 @@ enum mb_display_mode {
  *
  * @return Image bitmap that can be passed e.g. to mb_display_image().
  */
-#define MB_IMAGE(_rows...) { .r = { _rows } }
+#define MB_IMAGE(_rows...)     \
+	{                      \
+		.r = { _rows } \
+	}
 
 /**
  * @brief Opaque struct representing the BBC micro:bit display.

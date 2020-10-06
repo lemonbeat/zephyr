@@ -23,9 +23,9 @@
 #include <arch/cpu.h>
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
 
-#define TIMESRC_OSCERCLK        (2)
+#define TIMESRC_OSCERCLK (2)
 
-#define RUNM_HSRUN              (3)
+#define RUNM_HSRUN (3)
 
 static const osc_config_t oscConfig = {
 	.freq = CONFIG_OSC_XTAL0_FREQ,
@@ -44,7 +44,7 @@ static const osc_config_t oscConfig = {
 	.oscerConfig = {
 		.enableMode = kOSC_ErClkEnable,
 #if (defined(FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER) && \
-	FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
+     FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
 		.erclkDiv = 0U,
 #endif
 	},
@@ -154,7 +154,7 @@ static int k6x_init(const struct device *arg)
 	/* Switch to HSRUN mode */
 	SMC->PMPROT |= SMC_PMPROT_AHSRUN_MASK;
 	SMC->PMCTRL = (SMC->PMCTRL & ~SMC_PMCTRL_RUNM_MASK) |
-		SMC_PMCTRL_RUNM(RUNM_HSRUN);
+		      SMC_PMCTRL_RUNM(RUNM_HSRUN);
 #endif
 	/* Initialize PLL/system clock up to 180 MHz */
 	clock_init();

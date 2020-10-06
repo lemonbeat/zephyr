@@ -42,8 +42,8 @@ static void thread_entry_abort(void *p1, void *p2, void *p3)
 void test_threads_abort_self(void)
 {
 	execute_flag = 0;
-	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_abort,
-			NULL, NULL, NULL, 0, K_USER, K_NO_WAIT);
+	k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry_abort, NULL,
+			NULL, NULL, 0, K_USER, K_NO_WAIT);
 	k_msleep(100);
 	/**TESTPOINT: spawned thread executed but abort itself*/
 	zassert_true(execute_flag == 1, NULL);
@@ -62,18 +62,16 @@ void test_threads_abort_self(void)
 void test_threads_abort_others(void)
 {
 	execute_flag = 0;
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      thread_entry, NULL, NULL, NULL,
-				      0, K_USER, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry,
+				      NULL, NULL, NULL, 0, K_USER, K_NO_WAIT);
 
 	k_thread_abort(tid);
 	k_msleep(100);
 	/**TESTPOINT: check not-started thread is aborted*/
 	zassert_true(execute_flag == 0, NULL);
 
-	tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-			      thread_entry, NULL, NULL, NULL,
-			      0, K_USER, K_NO_WAIT);
+	tid = k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry, NULL,
+			      NULL, NULL, 0, K_USER, K_NO_WAIT);
 	k_msleep(50);
 	k_thread_abort(tid);
 	/**TESTPOINT: check running thread is aborted*/
@@ -91,9 +89,8 @@ void test_threads_abort_others(void)
 void test_threads_abort_repeat(void)
 {
 	execute_flag = 0;
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      thread_entry, NULL, NULL, NULL,
-				      0, K_USER, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, thread_entry,
+				      NULL, NULL, NULL, 0, K_USER, K_NO_WAIT);
 
 	k_thread_abort(tid);
 	k_msleep(100);
@@ -132,8 +129,8 @@ static void uthread_entry(void)
 void test_abort_handler(void)
 {
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      (k_thread_entry_t)uthread_entry, NULL, NULL, NULL,
-				      0, 0, K_NO_WAIT);
+				      (k_thread_entry_t)uthread_entry, NULL,
+				      NULL, NULL, 0, 0, K_NO_WAIT);
 
 	tdata.fn_abort = &abort_function;
 
@@ -145,7 +142,7 @@ void test_abort_handler(void)
 	k_thread_abort(tid);
 
 	zassert_true(abort_called == true, "Abort handler"
-		     " is not called");
+					   " is not called");
 }
 
 static void delayed_thread_entry(void *p1, void *p2, void *p3)
@@ -173,21 +170,22 @@ void test_delayed_thread_abort(void)
 	 * current thread
 	 */
 	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      (k_thread_entry_t)delayed_thread_entry, NULL, NULL, NULL,
-				      K_PRIO_PREEMPT(1), 0, K_MSEC(100));
+				      (k_thread_entry_t)delayed_thread_entry,
+				      NULL, NULL, NULL, K_PRIO_PREEMPT(1), 0,
+				      K_MSEC(100));
 
 	/* Give up CPU */
 	k_msleep(50);
 
 	/* Test point: check if thread delayed for 100ms has not started*/
 	zassert_true(execute_flag == 0, "Delayed thread created is not"
-		     " put to wait queue");
+					" put to wait queue");
 
 	k_thread_abort(tid);
 
 	/* Test point: Test abort of thread before its execution*/
 	zassert_false(execute_flag == 1, "Delayed thread is has executed"
-		      " before cancellation");
+					 " before cancellation");
 
 	/* Restore the priority */
 	k_thread_priority_set(k_current_get(), current_prio);
@@ -223,9 +221,8 @@ static void entry_abort_isr(void *p1, void *p2, void *p3)
 void test_abort_from_isr(void)
 {
 	isr_finished = false;
-	k_thread_create(&tdata, tstack, STACK_SIZE, entry_abort_isr,
-			NULL, NULL, NULL, 0, 0, K_NO_WAIT);
-
+	k_thread_create(&tdata, tstack, STACK_SIZE, entry_abort_isr, NULL, NULL,
+			NULL, 0, 0, K_NO_WAIT);
 
 	k_thread_join(&tdata, K_FOREVER);
 	zassert_true(isr_finished, "ISR did not complete");

@@ -22,23 +22,23 @@
 #include <sys/check.h>
 
 struct k_pipe_desc {
-	unsigned char *buffer;           /* Position in src/dest buffer */
-	size_t bytes_to_xfer;            /* # bytes left to transfer */
+	unsigned char *buffer; /* Position in src/dest buffer */
+	size_t bytes_to_xfer; /* # bytes left to transfer */
 #if (CONFIG_NUM_PIPE_ASYNC_MSGS > 0)
-	struct k_mem_block *block;       /* Pointer to memory block */
-	struct k_mem_block  copy_block;  /* For backwards compatibility */
-	struct k_sem *sem;               /* Semaphore to give if async */
+	struct k_mem_block *block; /* Pointer to memory block */
+	struct k_mem_block copy_block; /* For backwards compatibility */
+	struct k_sem *sem; /* Semaphore to give if async */
 #endif
 };
 
 struct k_pipe_async {
-	struct _thread_base thread;   /* Dummy thread object */
-	struct k_pipe_desc  desc;     /* Pipe message descriptor */
+	struct _thread_base thread; /* Dummy thread object */
+	struct k_pipe_desc desc; /* Pipe message descriptor */
 };
 
 #ifdef CONFIG_OBJECT_TRACING
 struct k_pipe *_trace_list_k_pipe;
-#endif	/* CONFIG_OBJECT_TRACING */
+#endif /* CONFIG_OBJECT_TRACING */
 
 #if (CONFIG_NUM_PIPE_ASYNC_MSGS > 0)
 
@@ -75,8 +75,7 @@ static void pipe_async_finish(struct k_pipe_async *async_desc)
 }
 #endif /* CONFIG_NUM_PIPE_ASYNC_MSGS > 0 */
 
-#if (CONFIG_NUM_PIPE_ASYNC_MSGS > 0) || \
-	defined(CONFIG_OBJECT_TRACING)
+#if (CONFIG_NUM_PIPE_ASYNC_MSGS > 0) || defined(CONFIG_OBJECT_TRACING)
 
 /*
  * Do run-time initialization of pipe object subsystem.
@@ -86,7 +85,8 @@ static int init_pipes_module(const struct device *dev)
 	ARG_UNUSED(dev);
 
 	/* Array of asynchronous message descriptors */
-	static struct k_pipe_async __noinit async_msg[CONFIG_NUM_PIPE_ASYNC_MSGS];
+	static struct k_pipe_async __noinit
+		async_msg[CONFIG_NUM_PIPE_ASYNC_MSGS];
 
 #if (CONFIG_NUM_PIPE_ASYNC_MSGS > 0)
 	/*
@@ -114,7 +114,8 @@ static int init_pipes_module(const struct device *dev)
 	/* Complete initialization of statically defined mailboxes. */
 
 #ifdef CONFIG_OBJECT_TRACING
-	Z_STRUCT_SECTION_FOREACH(k_pipe, pipe) {
+	Z_STRUCT_SECTION_FOREACH(k_pipe, pipe)
+	{
 		SYS_TRACING_OBJ_INIT(k_pipe, pipe);
 	}
 #endif /* CONFIG_OBJECT_TRACING */
@@ -176,7 +177,8 @@ static inline int z_vrfy_k_pipe_alloc_init(struct k_pipe *pipe, size_t size)
 int k_pipe_cleanup(struct k_pipe *pipe)
 {
 	CHECKIF(z_waitq_head(&pipe->wait_q.readers) != NULL ||
-			z_waitq_head(&pipe->wait_q.writers) != NULL) {
+		z_waitq_head(&pipe->wait_q.writers) != NULL)
+	{
 		return -EAGAIN;
 	}
 
@@ -194,7 +196,7 @@ int k_pipe_cleanup(struct k_pipe *pipe)
  * @return Number of bytes copied
  */
 static size_t pipe_xfer(unsigned char *dest, size_t dest_size,
-			 const unsigned char *src, size_t src_size)
+			const unsigned char *src, size_t src_size)
 {
 	size_t num_bytes = MIN(dest_size, src_size);
 	const unsigned char *end = src + num_bytes;
@@ -216,23 +218,21 @@ static size_t pipe_xfer(unsigned char *dest, size_t dest_size,
  *
  * @return Number of bytes written to the pipe's circular buffer
  */
-static size_t pipe_buffer_put(struct k_pipe *pipe,
-			       const unsigned char *src, size_t src_size)
+static size_t pipe_buffer_put(struct k_pipe *pipe, const unsigned char *src,
+			      size_t src_size)
 {
-	size_t  bytes_copied;
-	size_t  run_length;
-	size_t  num_bytes_written = 0;
-	int     i;
-
+	size_t bytes_copied;
+	size_t run_length;
+	size_t num_bytes_written = 0;
+	int i;
 
 	for (i = 0; i < 2; i++) {
 		run_length = MIN(pipe->size - pipe->bytes_used,
 				 pipe->size - pipe->write_index);
 
 		bytes_copied = pipe_xfer(pipe->buffer + pipe->write_index,
-					  run_length,
-					  src + num_bytes_written,
-					  src_size - num_bytes_written);
+					 run_length, src + num_bytes_written,
+					 src_size - num_bytes_written);
 
 		num_bytes_written += bytes_copied;
 		pipe->bytes_used += bytes_copied;
@@ -253,22 +253,22 @@ static size_t pipe_buffer_put(struct k_pipe *pipe,
  *
  * @return Number of bytes read from the pipe's circular buffer
  */
-static size_t pipe_buffer_get(struct k_pipe *pipe,
-			       unsigned char *dest, size_t dest_size)
+static size_t pipe_buffer_get(struct k_pipe *pipe, unsigned char *dest,
+			      size_t dest_size)
 {
-	size_t  bytes_copied;
-	size_t  run_length;
-	size_t  num_bytes_read = 0;
-	int     i;
+	size_t bytes_copied;
+	size_t run_length;
+	size_t num_bytes_read = 0;
+	int i;
 
 	for (i = 0; i < 2; i++) {
-		run_length = MIN(pipe->bytes_used,
-				 pipe->size - pipe->read_index);
+		run_length =
+			MIN(pipe->bytes_used, pipe->size - pipe->read_index);
 
 		bytes_copied = pipe_xfer(dest + num_bytes_read,
-					  dest_size - num_bytes_read,
-					  pipe->buffer + pipe->read_index,
-					  run_length);
+					 dest_size - num_bytes_read,
+					 pipe->buffer + pipe->read_index,
+					 run_length);
 
 		num_bytes_read += bytes_copied;
 		pipe->bytes_used -= bytes_copied;
@@ -311,15 +311,12 @@ static size_t pipe_buffer_get(struct k_pipe *pipe,
  *
  * @return false if request is unsatisfiable, otherwise true
  */
-static bool pipe_xfer_prepare(sys_dlist_t      *xfer_list,
-			       struct k_thread **waiter,
-			       _wait_q_t        *wait_q,
-			       size_t            pipe_space,
-			       size_t            bytes_to_xfer,
-			       size_t            min_xfer,
-			       k_timeout_t           timeout)
+static bool pipe_xfer_prepare(sys_dlist_t *xfer_list, struct k_thread **waiter,
+			      _wait_q_t *wait_q, size_t pipe_space,
+			      size_t bytes_to_xfer, size_t min_xfer,
+			      k_timeout_t timeout)
 {
-	struct k_thread  *thread;
+	struct k_thread *thread;
 	struct k_pipe_desc *desc;
 	size_t num_bytes = 0;
 
@@ -389,7 +386,7 @@ static bool pipe_xfer_prepare(sys_dlist_t      *xfer_list,
  * @return See table above
  */
 static int pipe_return_code(size_t min_xfer, size_t bytes_remaining,
-			     size_t bytes_requested)
+			    size_t bytes_requested)
 {
 	if (bytes_requested - bytes_remaining >= min_xfer) {
 		/*
@@ -426,21 +423,22 @@ static void pipe_thread_ready(struct k_thread *thread)
  * @brief Internal API used to send data to a pipe
  */
 int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
-			 unsigned char *data, size_t bytes_to_write,
-			 size_t *bytes_written, size_t min_xfer,
-			 k_timeout_t timeout)
+			unsigned char *data, size_t bytes_to_write,
+			size_t *bytes_written, size_t min_xfer,
+			k_timeout_t timeout)
 {
-	struct k_thread    *reader;
+	struct k_thread *reader;
 	struct k_pipe_desc *desc;
-	sys_dlist_t    xfer_list;
-	size_t         num_bytes_written = 0;
-	size_t         bytes_copied;
+	sys_dlist_t xfer_list;
+	size_t num_bytes_written = 0;
+	size_t bytes_copied;
 
 #if (CONFIG_NUM_PIPE_ASYNC_MSGS == 0)
 	ARG_UNUSED(async_desc);
 #endif
 
-	CHECKIF((min_xfer > bytes_to_write) || bytes_written == NULL) {
+	CHECKIF((min_xfer > bytes_to_write) || bytes_written == NULL)
+	{
 		return -EINVAL;
 	}
 
@@ -452,8 +450,8 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 	 */
 
 	if (!pipe_xfer_prepare(&xfer_list, &reader, &pipe->wait_q.readers,
-				pipe->size - pipe->bytes_used, bytes_to_write,
-				min_xfer, timeout)) {
+			       pipe->size - pipe->bytes_used, bytes_to_write,
+			       min_xfer, timeout)) {
 		k_spin_unlock(&pipe->lock, key);
 		*bytes_written = 0;
 		return -EIO;
@@ -474,16 +472,15 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 	 * is complete so it is still safe to copy data to it.
 	 */
 
-	struct k_thread *thread = (struct k_thread *)
-				  sys_dlist_get(&xfer_list);
+	struct k_thread *thread = (struct k_thread *)sys_dlist_get(&xfer_list);
 	while (thread != NULL) {
 		desc = (struct k_pipe_desc *)thread->base.swap_data;
 		bytes_copied = pipe_xfer(desc->buffer, desc->bytes_to_xfer,
-					  data + num_bytes_written,
-					  bytes_to_write - num_bytes_written);
+					 data + num_bytes_written,
+					 bytes_to_write - num_bytes_written);
 
-		num_bytes_written   += bytes_copied;
-		desc->buffer        += bytes_copied;
+		num_bytes_written += bytes_copied;
+		desc->buffer += bytes_copied;
 		desc->bytes_to_xfer -= bytes_copied;
 
 		/* The thread's read request has been satisfied. Ready it. */
@@ -499,11 +496,11 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 	if (reader != NULL) {
 		desc = (struct k_pipe_desc *)reader->base.swap_data;
 		bytes_copied = pipe_xfer(desc->buffer, desc->bytes_to_xfer,
-					  data + num_bytes_written,
-					  bytes_to_write - num_bytes_written);
+					 data + num_bytes_written,
+					 bytes_to_write - num_bytes_written);
 
-		num_bytes_written   += bytes_copied;
-		desc->buffer        += bytes_copied;
+		num_bytes_written += bytes_copied;
+		desc->buffer += bytes_copied;
 		desc->bytes_to_xfer -= bytes_copied;
 	}
 
@@ -514,7 +511,7 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 
 	num_bytes_written +=
 		pipe_buffer_put(pipe, data + num_bytes_written,
-				 bytes_to_write - num_bytes_written);
+				bytes_to_write - num_bytes_written);
 
 	if (num_bytes_written == bytes_to_write) {
 		*bytes_written = num_bytes_written;
@@ -527,9 +524,8 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 		return 0;
 	}
 
-	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)
-	    && num_bytes_written >= min_xfer
-	    && min_xfer > 0) {
+	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT) &&
+	    num_bytes_written >= min_xfer && min_xfer > 0) {
 		*bytes_written = num_bytes_written;
 #if (CONFIG_NUM_PIPE_ASYNC_MSGS > 0)
 		if (async_desc != NULL) {
@@ -555,17 +551,17 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 		async_desc->desc.bytes_to_xfer =
 			bytes_to_write - num_bytes_written;
 
-		z_pend_thread((struct k_thread *) &async_desc->thread,
-			     &pipe->wait_q.writers, K_FOREVER);
+		z_pend_thread((struct k_thread *)&async_desc->thread,
+			      &pipe->wait_q.writers, K_FOREVER);
 		z_reschedule(&pipe->lock, key2);
 		return 0;
 	}
 #endif
 
-	struct k_pipe_desc  pipe_desc;
+	struct k_pipe_desc pipe_desc;
 
-	pipe_desc.buffer         = data + num_bytes_written;
-	pipe_desc.bytes_to_xfer  = bytes_to_write - num_bytes_written;
+	pipe_desc.buffer = data + num_bytes_written;
+	pipe_desc.bytes_to_xfer = bytes_to_write - num_bytes_written;
 
 	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
 		_current->base.swap_data = &pipe_desc;
@@ -575,8 +571,8 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 		 */
 		k_spinlock_key_t key2 = k_spin_lock(&pipe->lock);
 		z_sched_unlock_no_reschedule();
-		(void)z_pend_curr(&pipe->lock, key2,
-				 &pipe->wait_q.writers, timeout);
+		(void)z_pend_curr(&pipe->lock, key2, &pipe->wait_q.writers,
+				  timeout);
 	} else {
 		k_sched_unlock();
 	}
@@ -584,19 +580,20 @@ int z_pipe_put_internal(struct k_pipe *pipe, struct k_pipe_async *async_desc,
 	*bytes_written = bytes_to_write - pipe_desc.bytes_to_xfer;
 
 	return pipe_return_code(min_xfer, pipe_desc.bytes_to_xfer,
-				 bytes_to_write);
+				bytes_to_write);
 }
 
 int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
-		     size_t *bytes_read, size_t min_xfer, k_timeout_t timeout)
+		      size_t *bytes_read, size_t min_xfer, k_timeout_t timeout)
 {
-	struct k_thread    *writer;
+	struct k_thread *writer;
 	struct k_pipe_desc *desc;
-	sys_dlist_t    xfer_list;
-	size_t         num_bytes_read = 0;
-	size_t         bytes_copied;
+	sys_dlist_t xfer_list;
+	size_t num_bytes_read = 0;
+	size_t bytes_copied;
 
-	CHECKIF((min_xfer > bytes_to_read) || bytes_read == NULL) {
+	CHECKIF((min_xfer > bytes_to_read) || bytes_read == NULL)
+	{
 		return -EINVAL;
 	}
 
@@ -607,8 +604,8 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 	 * directly copied.
 	 */
 	if (!pipe_xfer_prepare(&xfer_list, &writer, &pipe->wait_q.writers,
-				pipe->bytes_used, bytes_to_read,
-				min_xfer, timeout)) {
+			       pipe->bytes_used, bytes_to_read, min_xfer,
+			       timeout)) {
 		k_spin_unlock(&pipe->lock, key);
 		*bytes_read = 0;
 		return -EIO;
@@ -633,17 +630,16 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 	 *    call is complete so it is still safe to copy data from it.
 	 */
 
-	struct k_thread *thread = (struct k_thread *)
-				  sys_dlist_get(&xfer_list);
+	struct k_thread *thread = (struct k_thread *)sys_dlist_get(&xfer_list);
 	while ((thread != NULL) && (num_bytes_read < bytes_to_read)) {
 		desc = (struct k_pipe_desc *)thread->base.swap_data;
 		bytes_copied = pipe_xfer((uint8_t *)data + num_bytes_read,
-					  bytes_to_read - num_bytes_read,
-					  desc->buffer, desc->bytes_to_xfer);
+					 bytes_to_read - num_bytes_read,
+					 desc->buffer, desc->bytes_to_xfer);
 
-		num_bytes_read       += bytes_copied;
-		desc->buffer         += bytes_copied;
-		desc->bytes_to_xfer  -= bytes_copied;
+		num_bytes_read += bytes_copied;
+		desc->buffer += bytes_copied;
+		desc->bytes_to_xfer -= bytes_copied;
 
 		/*
 		 * It is expected that the write request will be satisfied.
@@ -662,12 +658,12 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 	if ((writer != NULL) && (num_bytes_read < bytes_to_read)) {
 		desc = (struct k_pipe_desc *)writer->base.swap_data;
 		bytes_copied = pipe_xfer((uint8_t *)data + num_bytes_read,
-					  bytes_to_read - num_bytes_read,
-					  desc->buffer, desc->bytes_to_xfer);
+					 bytes_to_read - num_bytes_read,
+					 desc->buffer, desc->bytes_to_xfer);
 
-		num_bytes_read       += bytes_copied;
-		desc->buffer         += bytes_copied;
-		desc->bytes_to_xfer  -= bytes_copied;
+		num_bytes_read += bytes_copied;
+		desc->buffer += bytes_copied;
+		desc->bytes_to_xfer -= bytes_copied;
 	}
 
 	/*
@@ -678,10 +674,10 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 	while (thread != NULL) {
 		desc = (struct k_pipe_desc *)thread->base.swap_data;
 		bytes_copied = pipe_buffer_put(pipe, desc->buffer,
-						desc->bytes_to_xfer);
+					       desc->bytes_to_xfer);
 
-		desc->buffer         += bytes_copied;
-		desc->bytes_to_xfer  -= bytes_copied;
+		desc->buffer += bytes_copied;
+		desc->bytes_to_xfer -= bytes_copied;
 
 		/* Write request has been satisfied */
 		pipe_thread_ready(thread);
@@ -692,10 +688,10 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 	if (writer != NULL) {
 		desc = (struct k_pipe_desc *)writer->base.swap_data;
 		bytes_copied = pipe_buffer_put(pipe, desc->buffer,
-						desc->bytes_to_xfer);
+					       desc->bytes_to_xfer);
 
-		desc->buffer         += bytes_copied;
-		desc->bytes_to_xfer  -= bytes_copied;
+		desc->buffer += bytes_copied;
+		desc->bytes_to_xfer -= bytes_copied;
 	}
 
 	if (num_bytes_read == bytes_to_read) {
@@ -706,9 +702,8 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 		return 0;
 	}
 
-	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)
-	    && num_bytes_read >= min_xfer
-	    && min_xfer > 0) {
+	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT) && num_bytes_read >= min_xfer &&
+	    min_xfer > 0) {
 		k_sched_unlock();
 
 		*bytes_read = num_bytes_read;
@@ -718,9 +713,9 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 
 	/* Not all data was read */
 
-	struct k_pipe_desc  pipe_desc;
+	struct k_pipe_desc pipe_desc;
 
-	pipe_desc.buffer        = (uint8_t *)data + num_bytes_read;
+	pipe_desc.buffer = (uint8_t *)data + num_bytes_read;
 	pipe_desc.bytes_to_xfer = bytes_to_read - num_bytes_read;
 
 	if (!K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
@@ -728,8 +723,8 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 		k_spinlock_key_t key2 = k_spin_lock(&pipe->lock);
 
 		z_sched_unlock_no_reschedule();
-		(void)z_pend_curr(&pipe->lock, key2,
-				 &pipe->wait_q.readers, timeout);
+		(void)z_pend_curr(&pipe->lock, key2, &pipe->wait_q.readers,
+				  timeout);
 	} else {
 		k_sched_unlock();
 	}
@@ -737,7 +732,7 @@ int z_impl_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 	*bytes_read = bytes_to_read - pipe_desc.bytes_to_xfer;
 
 	return pipe_return_code(min_xfer, pipe_desc.bytes_to_xfer,
-				 bytes_to_read);
+				bytes_to_read);
 }
 
 #ifdef CONFIG_USERSPACE
@@ -749,24 +744,22 @@ int z_vrfy_k_pipe_get(struct k_pipe *pipe, void *data, size_t bytes_to_read,
 	Z_OOPS(Z_SYSCALL_MEMORY_WRITE((void *)data, bytes_to_read));
 
 	return z_impl_k_pipe_get((struct k_pipe *)pipe, (void *)data,
-				bytes_to_read, bytes_read, min_xfer,
-				timeout);
+				 bytes_to_read, bytes_read, min_xfer, timeout);
 }
 #include <syscalls/k_pipe_get_mrsh.c>
 #endif
 
 int z_impl_k_pipe_put(struct k_pipe *pipe, void *data, size_t bytes_to_write,
-		     size_t *bytes_written, size_t min_xfer,
+		      size_t *bytes_written, size_t min_xfer,
 		      k_timeout_t timeout)
 {
-	return z_pipe_put_internal(pipe, NULL, data,
-				    bytes_to_write, bytes_written,
-				    min_xfer, timeout);
+	return z_pipe_put_internal(pipe, NULL, data, bytes_to_write,
+				   bytes_written, min_xfer, timeout);
 }
 
 #ifdef CONFIG_USERSPACE
 int z_vrfy_k_pipe_put(struct k_pipe *pipe, void *data, size_t bytes_to_write,
-		     size_t *bytes_written, size_t min_xfer,
+		      size_t *bytes_written, size_t min_xfer,
 		      k_timeout_t timeout)
 {
 	Z_OOPS(Z_SYSCALL_OBJ(pipe, K_OBJ_PIPE));
@@ -774,8 +767,8 @@ int z_vrfy_k_pipe_put(struct k_pipe *pipe, void *data, size_t bytes_to_write,
 	Z_OOPS(Z_SYSCALL_MEMORY_READ((void *)data, bytes_to_write));
 
 	return z_impl_k_pipe_put((struct k_pipe *)pipe, (void *)data,
-				bytes_to_write, bytes_written, min_xfer,
-				timeout);
+				 bytes_to_write, bytes_written, min_xfer,
+				 timeout);
 }
 #include <syscalls/k_pipe_put_mrsh.c>
 #endif
@@ -784,8 +777,8 @@ int z_vrfy_k_pipe_put(struct k_pipe *pipe, void *data, size_t bytes_to_write,
 void k_pipe_block_put(struct k_pipe *pipe, struct k_mem_block *block,
 		      size_t bytes_to_write, struct k_sem *sem)
 {
-	struct k_pipe_async  *async_desc;
-	size_t                dummy_bytes_written;
+	struct k_pipe_async *async_desc;
+	size_t dummy_bytes_written;
 
 	/* For simplicity, always allocate an asynchronous descriptor */
 	pipe_async_alloc(&async_desc);
@@ -798,9 +791,9 @@ void k_pipe_block_put(struct k_pipe *pipe, struct k_mem_block *block,
 	async_desc->thread.is_idle = 0;
 #endif
 
-	(void) z_pipe_put_internal(pipe, async_desc, block->data,
-				    bytes_to_write, &dummy_bytes_written,
-				    bytes_to_write, K_FOREVER);
+	(void)z_pipe_put_internal(pipe, async_desc, block->data, bytes_to_write,
+				  &dummy_bytes_written, bytes_to_write,
+				  K_FOREVER);
 }
 #endif
 

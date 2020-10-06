@@ -41,8 +41,9 @@ const struct log_backend *log_backend_net_get(void);
 NET_PKT_SLAB_DEFINE(syslog_tx_pkts, CONFIG_LOG_BACKEND_NET_MAX_BUF);
 NET_PKT_DATA_POOL_DEFINE(syslog_tx_bufs,
 			 ROUND_UP(CONFIG_LOG_BACKEND_NET_MAX_BUF_SIZE /
-				  CONFIG_NET_BUF_DATA_SIZE, 1) *
-			 CONFIG_LOG_BACKEND_NET_MAX_BUF);
+					  CONFIG_NET_BUF_DATA_SIZE,
+				  1) *
+				 CONFIG_LOG_BACKEND_NET_MAX_BUF);
 
 static struct k_mem_slab *get_tx_slab(void)
 {
@@ -111,7 +112,8 @@ static int do_net_init(void)
 	}
 
 	if (IS_ENABLED(CONFIG_NET_HOSTNAME_ENABLE)) {
-		(void)strncpy(dev_hostname, net_hostname_get(), MAX_HOSTNAME_LEN);
+		(void)strncpy(dev_hostname, net_hostname_get(),
+			      MAX_HOSTNAME_LEN);
 
 	} else if (IS_ENABLED(CONFIG_NET_IPV6) &&
 		   server_addr.sa_family == AF_INET6) {
@@ -133,7 +135,7 @@ static int do_net_init(void)
 		const struct in_addr *src;
 
 		src = net_if_ipv4_select_src_addr(
-				  NULL, &net_sin(&server_addr)->sin_addr);
+			NULL, &net_sin(&server_addr)->sin_addr);
 
 		if (src) {
 			net_addr_ntop(AF_INET, src, dev_hostname,
@@ -156,8 +158,8 @@ static int do_net_init(void)
 		return ret;
 	}
 
-	(void)net_context_connect(ctx, &server_addr, server_addr_len,
-				  NULL, K_NO_WAIT, NULL);
+	(void)net_context_connect(ctx, &server_addr, server_addr_len, NULL,
+				  K_NO_WAIT, NULL);
 
 	/* We do not care about return value for this UDP connect call that
 	 * basically does nothing. Calling the connect is only useful so that
@@ -185,11 +187,12 @@ static void send_output(const struct log_backend *const backend,
 
 	log_msg_get(msg);
 
-	log_output_msg_process(&log_output_net, msg,
-			       LOG_OUTPUT_FLAG_FORMAT_SYSLOG |
-			       LOG_OUTPUT_FLAG_TIMESTAMP |
+	log_output_msg_process(
+		&log_output_net, msg,
+		LOG_OUTPUT_FLAG_FORMAT_SYSLOG | LOG_OUTPUT_FLAG_TIMESTAMP |
 			(IS_ENABLED(CONFIG_LOG_BACKEND_NET_SYST_ENABLE) ?
-			LOG_OUTPUT_FLAG_FORMAT_SYST : 0));
+				       LOG_OUTPUT_FLAG_FORMAT_SYST :
+				       0));
 
 	log_msg_put(msg);
 }
@@ -217,13 +220,14 @@ static void panic(struct log_backend const *const backend)
 }
 
 static void sync_string(const struct log_backend *const backend,
-		     struct log_msg_ids src_level, uint32_t timestamp,
-		     const char *fmt, va_list ap)
+			struct log_msg_ids src_level, uint32_t timestamp,
+			const char *fmt, va_list ap)
 {
 	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL | LOG_OUTPUT_FLAG_FORMAT_SYSLOG |
-		LOG_OUTPUT_FLAG_TIMESTAMP |
-		(IS_ENABLED(CONFIG_LOG_BACKEND_NET_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0);
+			 LOG_OUTPUT_FLAG_TIMESTAMP |
+			 (IS_ENABLED(CONFIG_LOG_BACKEND_NET_SYST_ENABLE) ?
+					LOG_OUTPUT_FLAG_FORMAT_SYST :
+					0);
 	uint32_t key;
 
 	if (!net_init_done && do_net_init() == 0) {
@@ -231,8 +235,8 @@ static void sync_string(const struct log_backend *const backend,
 	}
 
 	key = irq_lock();
-	log_output_string(&log_output_net, src_level,
-			  timestamp, fmt, ap, flags);
+	log_output_string(&log_output_net, src_level, timestamp, fmt, ap,
+			  flags);
 	irq_unlock(key);
 }
 
@@ -240,8 +244,8 @@ const struct log_backend_api log_backend_net_api = {
 	.panic = panic,
 	.init = init_net,
 	.put = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : send_output,
-	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-							sync_string : NULL,
+	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_string :
+								    NULL,
 	/* Currently we do not send hexdumps over network to remote server
 	 * in CONFIG_LOG_IMMEDIATE mode. This is just to save resources,
 	 * this can be revisited if needed.

@@ -25,10 +25,10 @@
 #include "gpio_utils.h"
 
 /* bits 16-18 in iocfg registers correspond to interrupt settings */
-#define IOCFG_INT_MASK    0x00070000
+#define IOCFG_INT_MASK 0x00070000
 
 /* the rest are for general (non-interrupt) config */
-#define IOCFG_GEN_MASK    (~IOCFG_INT_MASK)
+#define IOCFG_GEN_MASK (~IOCFG_INT_MASK)
 
 struct gpio_cc13xx_cc26xx_data {
 	/* gpio_driver_data needs to be first */
@@ -47,8 +47,7 @@ static int gpio_cc13xx_cc26xx_port_set_bits_raw(const struct device *port,
 static int gpio_cc13xx_cc26xx_port_clear_bits_raw(const struct device *port,
 						  uint32_t mask);
 
-static int gpio_cc13xx_cc26xx_config(const struct device *port,
-				     gpio_pin_t pin,
+static int gpio_cc13xx_cc26xx_config(const struct device *port, gpio_pin_t pin,
 				     gpio_flags_t flags)
 {
 	uint32_t config = 0;
@@ -62,7 +61,7 @@ static int gpio_cc13xx_cc26xx_config(const struct device *port,
 	case GPIO_OUTPUT:
 		config = IOC_INPUT_DISABLE;
 		break;
-	case 0:  /* disconnected */
+	case 0: /* disconnected */
 		IOCPortConfigureSet(pin, IOC_PORT_GPIO, IOC_NO_IOPULL);
 		GPIO_setOutputEnableDio(pin, GPIO_OUTPUT_DISABLE);
 		return 0;
@@ -71,10 +70,10 @@ static int gpio_cc13xx_cc26xx_config(const struct device *port,
 	}
 
 	config |= IOC_CURRENT_2MA | IOC_STRENGTH_AUTO | IOC_SLEW_DISABLE |
-		 IOC_NO_WAKE_UP;
+		  IOC_NO_WAKE_UP;
 
 	config |= (flags & GPIO_INT_DEBOUNCE) ? IOC_HYST_ENABLE :
-							IOC_HYST_DISABLE;
+						      IOC_HYST_DISABLE;
 
 	switch (flags & (GPIO_PULL_UP | GPIO_PULL_DOWN)) {
 	case 0:
@@ -118,8 +117,7 @@ static int gpio_cc13xx_cc26xx_port_get_raw(const struct device *port,
 }
 
 static int gpio_cc13xx_cc26xx_port_set_masked_raw(const struct device *port,
-						  uint32_t mask,
-						  uint32_t value)
+						  uint32_t mask, uint32_t value)
 {
 	GPIO_setMultiDio(mask & value);
 	GPIO_clearMultiDio(mask & ~value);
@@ -231,12 +229,11 @@ static int gpio_cc13xx_cc26xx_init(const struct device *dev)
 	/* Enable edge detection on any pad as a wakeup source */
 	HWREG(AON_EVENT_BASE + AON_EVENT_O_MCUWUSEL) =
 		(HWREG(AON_EVENT_BASE + AON_EVENT_O_MCUWUSEL) &
-		(~AON_EVENT_MCUWUSEL_WU1_EV_M)) |
+		 (~AON_EVENT_MCUWUSEL_WU1_EV_M)) |
 		AON_EVENT_MCUWUSEL_WU1_EV_PAD;
 
 	/* Enable IRQ */
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
 		    gpio_cc13xx_cc26xx_isr, DEVICE_GET(gpio_cc13xx_cc26xx), 0);
 	irq_enable(DT_INST_IRQN(0));
 
@@ -263,6 +260,6 @@ static const struct gpio_driver_api gpio_cc13xx_cc26xx_driver_api = {
 
 DEVICE_AND_API_INIT(gpio_cc13xx_cc26xx, DT_INST_LABEL(0),
 		    gpio_cc13xx_cc26xx_init, &gpio_cc13xx_cc26xx_data_0,
-		    &gpio_cc13xx_cc26xx_cfg_0,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &gpio_cc13xx_cc26xx_cfg_0, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &gpio_cc13xx_cc26xx_driver_api);

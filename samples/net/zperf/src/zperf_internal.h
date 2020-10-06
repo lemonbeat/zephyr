@@ -35,33 +35,25 @@
 #define DST_IP4ADDR NULL
 #endif
 
-#define PACKET_SIZE_MAX      1024
+#define PACKET_SIZE_MAX 1024
 
-#define HW_CYCLES_TO_USEC(__hw_cycle__) \
-	( \
-		((uint64_t)(__hw_cycle__) * (uint64_t)USEC_PER_SEC) / \
-		((uint64_t)sys_clock_hw_cycles_per_sec())		\
-	)
+#define HW_CYCLES_TO_USEC(__hw_cycle__)                        \
+	(((uint64_t)(__hw_cycle__) * (uint64_t)USEC_PER_SEC) / \
+	 ((uint64_t)sys_clock_hw_cycles_per_sec()))
 
-#define HW_CYCLES_TO_SEC(__hw_cycle__) \
-	( \
-		((uint64_t)(HW_CYCLES_TO_USEC(__hw_cycle__))) / \
-		((uint64_t)USEC_PER_SEC) \
-	)
+#define HW_CYCLES_TO_SEC(__hw_cycle__)                   \
+	(((uint64_t)(HW_CYCLES_TO_USEC(__hw_cycle__))) / \
+	 ((uint64_t)USEC_PER_SEC))
 
-#define USEC_TO_HW_CYCLES(__usec__) \
-	( \
-	 ((uint64_t)(__usec__) * (uint64_t)sys_clock_hw_cycles_per_sec()) /	\
-		((uint64_t)USEC_PER_SEC) \
-	)
+#define USEC_TO_HW_CYCLES(__usec__)                                         \
+	(((uint64_t)(__usec__) * (uint64_t)sys_clock_hw_cycles_per_sec()) / \
+	 ((uint64_t)USEC_PER_SEC))
 
 #define SEC_TO_HW_CYCLES(__sec__) \
-	USEC_TO_HW_CYCLES((uint64_t)(__sec__) * \
-	(uint64_t)USEC_PER_SEC)
+	USEC_TO_HW_CYCLES((uint64_t)(__sec__) * (uint64_t)USEC_PER_SEC)
 
 #define MSEC_TO_HW_CYCLES(__msec__) \
-		USEC_TO_HW_CYCLES((uint64_t)(__msec__) * \
-		(uint64_t)MSEC_PER_SEC)
+	USEC_TO_HW_CYCLES((uint64_t)(__msec__) * (uint64_t)MSEC_PER_SEC)
 
 struct zperf_udp_datagram {
 	int32_t id;
@@ -96,8 +88,8 @@ static inline uint32_t time_delta(uint32_t ts, uint32_t t)
 	return (t >= ts) ? (t - ts) : (ULONG_MAX - ts + t);
 }
 
-int zperf_get_ipv6_addr(const struct shell *shell, char *host,
-			char *prefix_str, struct in6_addr *addr);
+int zperf_get_ipv6_addr(const struct shell *shell, char *host, char *prefix_str,
+			struct in6_addr *addr);
 struct sockaddr_in6 *zperf_get_sin6(void);
 
 int zperf_get_ipv4_addr(const struct shell *shell, char *host,
@@ -105,8 +97,7 @@ int zperf_get_ipv4_addr(const struct shell *shell, char *host,
 struct sockaddr_in *zperf_get_sin(void);
 
 extern void zperf_udp_upload(const struct shell *shell,
-			     struct net_context *context,
-			     int port,
+			     struct net_context *context, int port,
 			     unsigned int duration_in_ms,
 			     unsigned int packet_size,
 			     unsigned int rate_in_kbps,

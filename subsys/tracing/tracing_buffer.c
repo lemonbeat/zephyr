@@ -49,8 +49,8 @@ uint32_t tracing_buffer_get(uint8_t *data, uint32_t size)
 
 void tracing_buffer_init(void)
 {
-	ring_buf_init(&tracing_ring_buf,
-		      sizeof(tracing_buffer), tracing_buffer);
+	ring_buf_init(&tracing_ring_buf, sizeof(tracing_buffer),
+		      tracing_buffer);
 }
 
 bool tracing_buffer_is_empty(void)

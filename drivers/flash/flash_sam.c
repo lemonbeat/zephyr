@@ -31,7 +31,6 @@ LOG_MODULE_REGISTER(flash_sam0);
  * flash by 8-KiB blocks (called "pages" in the Zephyr terminology).
  */
 
-
 /*
  * We only use block mode erases. The datasheet gives a maximum erase time
  * of 200ms for a 8KiB block.
@@ -51,12 +50,9 @@ static const struct flash_parameters flash_sam_parameters = {
 	.erase_value = 0xff,
 };
 
-#define DEV_CFG(dev) \
-	((const struct flash_sam_dev_cfg *const)(dev)->config)
+#define DEV_CFG(dev) ((const struct flash_sam_dev_cfg *const)(dev)->config)
 
-#define DEV_DATA(dev) \
-	((struct flash_sam_dev_data *const)(dev)->data)
-
+#define DEV_DATA(dev) ((struct flash_sam_dev_data *const)(dev)->data)
 
 static inline void flash_sam_sem_take(const struct device *dev)
 {
@@ -136,7 +132,8 @@ static int flash_sam_write_page(const struct device *dev, off_t offset,
 {
 	Efc *const efc = DEV_CFG(dev)->regs;
 	const uint32_t *src = data;
-	uint32_t *dst = (uint32_t *)((uint8_t *)CONFIG_FLASH_BASE_ADDRESS + offset);
+	uint32_t *dst =
+		(uint32_t *)((uint8_t *)CONFIG_FLASH_BASE_ADDRESS + offset);
 
 	LOG_DBG("offset = 0x%lx, len = %zu", (long)offset, len);
 
@@ -158,7 +155,7 @@ static int flash_sam_write_page(const struct device *dev, off_t offset,
 
 /* Write data to the flash, page by page */
 static int flash_sam_write(const struct device *dev, off_t offset,
-			    const void *data, size_t len)
+			   const void *data, size_t len)
 {
 	int rc;
 	const uint8_t *data8 = data;
@@ -289,7 +286,8 @@ done:
 	 * Invalidate the cache addresses corresponding to the erased blocks,
 	 * so that they really appear as erased.
 	 */
-	SCB_InvalidateDCache_by_Addr((void *)(CONFIG_FLASH_BASE_ADDRESS + offset), len);
+	SCB_InvalidateDCache_by_Addr(
+		(void *)(CONFIG_FLASH_BASE_ADDRESS + offset), len);
 
 	return rc;
 }
@@ -370,7 +368,6 @@ static const struct flash_sam_dev_cfg flash_sam_cfg = {
 
 static struct flash_sam_dev_data flash_sam_data;
 
-DEVICE_AND_API_INIT(flash_sam, DT_INST_LABEL(0),
-		    flash_sam_init, &flash_sam_data, &flash_sam_cfg,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &flash_sam_api);
+DEVICE_AND_API_INIT(flash_sam, DT_INST_LABEL(0), flash_sam_init,
+		    &flash_sam_data, &flash_sam_cfg, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &flash_sam_api);

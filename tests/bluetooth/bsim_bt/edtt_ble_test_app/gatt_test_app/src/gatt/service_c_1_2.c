@@ -21,34 +21,34 @@ extern struct bt_gatt_attr service_d_2_attrs[];
 /** @def BT_UUID_SERVICE_C_1
  *  @brief UUID for the Service C.1
  */
-#define BT_UUID_SERVICE_C_1             BT_UUID_DECLARE_128( \
-		0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
-		0x00, 0x00, 0x00, 0x00, 0x0c, 0xa0, 0x00, 0x00)
+#define BT_UUID_SERVICE_C_1                                                 \
+	BT_UUID_DECLARE_128(0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
+			    0x00, 0x00, 0x00, 0x00, 0x0c, 0xa0, 0x00, 0x00)
 
 /** @def BT_UUID_VALUE_V9__128_BIT_UUID
  *  @brief UUID for the Value V9 (128-bit UUID) Characteristic
  */
-#define BT_UUID_VALUE_V9__128_BIT_UUID  BT_UUID_DECLARE_128( \
-		0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
-		0x00, 0x00, 0x00, 0x00, 0x09, 0xb0, 0x00, 0x00)
+#define BT_UUID_VALUE_V9__128_BIT_UUID                                      \
+	BT_UUID_DECLARE_128(0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
+			    0x00, 0x00, 0x00, 0x00, 0x09, 0xb0, 0x00, 0x00)
 
 /** @def BT_UUID_DES_V9D2__128_BIT_UUID
  *  @brief UUID for the Descriptor V9D2 (128-bit UUID) Characteristic
  */
-#define BT_UUID_DES_V9D2__128_BIT_UUID  BT_UUID_DECLARE_128( \
-		0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
-		0x00, 0x00, 0x00, 0x00, 0xd2, 0xd9, 0x00, 0x00)
+#define BT_UUID_DES_V9D2__128_BIT_UUID                                      \
+	BT_UUID_DECLARE_128(0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
+			    0x00, 0x00, 0x00, 0x00, 0xd2, 0xd9, 0x00, 0x00)
 
 /** @def BT_UUID_DES_V9D3__128_BIT_UUID
  *  @brief UUID for the Descriptor V9D3 (128-bit UUID) Characteristic
  */
-#define BT_UUID_DES_V9D3__128_BIT_UUID  BT_UUID_DECLARE_128( \
-		0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
-		0x00, 0x00, 0x00, 0x00, 0xd3, 0xd9, 0x00, 0x00)
+#define BT_UUID_DES_V9D3__128_BIT_UUID                                      \
+	BT_UUID_DECLARE_128(0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, \
+			    0x00, 0x00, 0x00, 0x00, 0xd3, 0xd9, 0x00, 0x00)
 
-static uint8_t   value_v9__128_bit_uuid_value = 0x09;
-static uint8_t   des_v9d2__128_bit_uuid_value = 0x22;
-static uint8_t   des_v9d3__128_bit_uuid_value = 0x33;
+static uint8_t value_v9__128_bit_uuid_value = 0x09;
+static uint8_t des_v9d2__128_bit_uuid_value = 0x22;
+static uint8_t des_v9d3__128_bit_uuid_value = 0x33;
 static struct bt_gatt_cep cha_ext_pro_value = { 0x0001 };
 
 /**
@@ -65,7 +65,8 @@ static struct bt_gatt_cep cha_ext_pro_value = { 0x0001 };
  */
 static ssize_t read_value_v9__128_bit_uuid(struct bt_conn *conn,
 					   const struct bt_gatt_attr *attr,
-					   void *buf, uint16_t len, uint16_t offset)
+					   void *buf, uint16_t len,
+					   uint16_t offset)
 {
 	const uint8_t *value = attr->user_data;
 
@@ -118,7 +119,8 @@ static ssize_t write_value_v9__128_bit_uuid(struct bt_conn *conn,
  */
 static ssize_t read_des_v9d2__128_bit_uuid(struct bt_conn *conn,
 					   const struct bt_gatt_attr *attr,
-					   void *buf, uint16_t len, uint16_t offset)
+					   void *buf, uint16_t len,
+					   uint16_t offset)
 {
 	const uint8_t *value = attr->user_data;
 
@@ -191,24 +193,25 @@ static ssize_t write_des_v9d3__128_bit_uuid(struct bt_conn *conn,
 struct bt_gatt_attr service_c_1_2_attrs[] = {
 	BT_GATT_H_PRIMARY_SERVICE(BT_UUID_SERVICE_C_1, 0x20),
 	BT_GATT_H_INCLUDE_SERVICE(service_d_2_attrs, 0x21),
-	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V9__128_BIT_UUID,
+	BT_GATT_H_CHARACTERISTIC(
+		BT_UUID_VALUE_V9__128_BIT_UUID,
 		BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE | BT_GATT_CHRC_EXT_PROP,
 		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
 		read_value_v9__128_bit_uuid, write_value_v9__128_bit_uuid,
 		&value_v9__128_bit_uuid_value, 0x22),
 	BT_GATT_H_DESCRIPTOR(BT_UUID_DES_V9D2__128_BIT_UUID,
-		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-		read_des_v9d2__128_bit_uuid, write_des_v9d2__128_bit_uuid,
-		&des_v9d2__128_bit_uuid_value, 0x24),
-	BT_GATT_H_DESCRIPTOR(BT_UUID_DES_V9D3__128_BIT_UUID,
-		BT_GATT_PERM_WRITE,
-		NULL, write_des_v9d3__128_bit_uuid,
-		&des_v9d3__128_bit_uuid_value, 0x25),
+			     BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+			     read_des_v9d2__128_bit_uuid,
+			     write_des_v9d2__128_bit_uuid,
+			     &des_v9d2__128_bit_uuid_value, 0x24),
+	BT_GATT_H_DESCRIPTOR(BT_UUID_DES_V9D3__128_BIT_UUID, BT_GATT_PERM_WRITE,
+			     NULL, write_des_v9d3__128_bit_uuid,
+			     &des_v9d3__128_bit_uuid_value, 0x25),
 	BT_GATT_H_CEP(&cha_ext_pro_value, 0x26)
 };
 
 static struct bt_gatt_service service_c_1_2_svc =
-		    BT_GATT_SERVICE(service_c_1_2_attrs);
+	BT_GATT_SERVICE(service_c_1_2_attrs);
 
 /**
  * @brief Register the Service C.1 and all its Characteristics...

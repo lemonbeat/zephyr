@@ -24,15 +24,11 @@ static inline void external_antenna(bool on)
 	}
 
 	gpio_pin_configure(ufl_gpio_dev, SKY_UFLn_GPIO_PIN,
-			   SKY_UFLn_GPIO_FLAGS
-			   | (on
-			      ? GPIO_OUTPUT_ACTIVE
-			      : GPIO_OUTPUT_INACTIVE));
+			   SKY_UFLn_GPIO_FLAGS | (on ? GPIO_OUTPUT_ACTIVE :
+							     GPIO_OUTPUT_INACTIVE));
 	gpio_pin_configure(pcb_gpio_dev, SKY_PCBn_GPIO_PIN,
-			   SKY_PCBn_GPIO_FLAGS
-			   | (on
-			      ? GPIO_OUTPUT_INACTIVE
-			      : GPIO_OUTPUT_ACTIVE));
+			   SKY_PCBn_GPIO_FLAGS | (on ? GPIO_OUTPUT_INACTIVE :
+							     GPIO_OUTPUT_ACTIVE));
 }
 
 static int board_particle_argon_init(const struct device *dev)

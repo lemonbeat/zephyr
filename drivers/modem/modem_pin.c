@@ -22,8 +22,7 @@ int modem_pin_read(struct modem_context *ctx, uint32_t pin)
 		return -ENODEV;
 	}
 
-	return gpio_pin_get(ctx->pins[pin].gpio_port_dev,
-				ctx->pins[pin].pin);
+	return gpio_pin_get(ctx->pins[pin].gpio_port_dev, ctx->pins[pin].pin);
 }
 
 int modem_pin_write(struct modem_context *ctx, uint32_t pin, uint32_t value)
@@ -32,8 +31,8 @@ int modem_pin_write(struct modem_context *ctx, uint32_t pin, uint32_t value)
 		return -ENODEV;
 	}
 
-	return gpio_pin_set(ctx->pins[pin].gpio_port_dev,
-				ctx->pins[pin].pin, value);
+	return gpio_pin_set(ctx->pins[pin].gpio_port_dev, ctx->pins[pin].pin,
+			    value);
 }
 
 int modem_pin_config(struct modem_context *ctx, uint32_t pin, bool enable)
@@ -42,10 +41,9 @@ int modem_pin_config(struct modem_context *ctx, uint32_t pin, bool enable)
 		return -ENODEV;
 	}
 
-	return gpio_pin_configure(ctx->pins[pin].gpio_port_dev,
-				  ctx->pins[pin].pin,
-				  enable ? ctx->pins[pin].init_flags :
-					   GPIO_INPUT);
+	return gpio_pin_configure(
+		ctx->pins[pin].gpio_port_dev, ctx->pins[pin].pin,
+		enable ? ctx->pins[pin].init_flags : GPIO_INPUT);
 }
 
 int modem_pin_init(struct modem_context *ctx)
@@ -55,7 +53,7 @@ int modem_pin_init(struct modem_context *ctx)
 	/* setup port devices and pin directions */
 	for (i = 0; i < ctx->pins_len; i++) {
 		ctx->pins[i].gpio_port_dev =
-				device_get_binding(ctx->pins[i].dev_name);
+			device_get_binding(ctx->pins[i].dev_name);
 		if (!ctx->pins[i].gpio_port_dev) {
 			return -ENODEV;
 		}

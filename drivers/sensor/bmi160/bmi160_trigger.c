@@ -74,11 +74,11 @@ static void bmi160_handle_interrupts(const struct device *dev)
 	if (buf.int_status[1] & BMI160_INT_STATUS1_DRDY) {
 		bmi160_handle_drdy(dev, buf.status);
 	}
-
 }
 
 #ifdef CONFIG_BMI160_TRIGGER_OWN_THREAD
-static K_KERNEL_STACK_DEFINE(bmi160_thread_stack, CONFIG_BMI160_THREAD_STACK_SIZE);
+static K_KERNEL_STACK_DEFINE(bmi160_thread_stack,
+			     CONFIG_BMI160_THREAD_STACK_SIZE);
 static struct k_thread bmi160_thread;
 
 static void bmi160_thread_main(struct bmi160_device_data *bmi160)
@@ -145,8 +145,8 @@ static int bmi160_trigger_drdy_set(const struct device *dev,
 	}
 #endif
 
-	if (bmi160_reg_update(dev, BMI160_REG_INT_EN1,
-			      BMI160_INT_DRDY_EN, drdy_en) < 0) {
+	if (bmi160_reg_update(dev, BMI160_REG_INT_EN1, BMI160_INT_DRDY_EN,
+			      drdy_en) < 0) {
 		return -EIO;
 	}
 
@@ -163,13 +163,12 @@ static int bmi160_trigger_anym_set(const struct device *dev,
 	bmi160->handler_anymotion = handler;
 
 	if (handler) {
-		anym_en = BMI160_INT_ANYM_X_EN |
-			  BMI160_INT_ANYM_Y_EN |
+		anym_en = BMI160_INT_ANYM_X_EN | BMI160_INT_ANYM_Y_EN |
 			  BMI160_INT_ANYM_Z_EN;
 	}
 
-	if (bmi160_reg_update(dev, BMI160_REG_INT_EN0,
-			      BMI160_INT_ANYM_MASK, anym_en) < 0) {
+	if (bmi160_reg_update(dev, BMI160_REG_INT_EN0, BMI160_INT_ANYM_MASK,
+			      anym_en) < 0) {
 		return -EIO;
 	}
 
@@ -212,8 +211,8 @@ int bmi160_acc_slope_config(const struct device *dev,
 
 		reg_val = (slope_th_ums2 - 1) * 512U / (acc_range_g * SENSOR_G);
 
-		if (bmi160_byte_write(dev, BMI160_REG_INT_MOTION1,
-				      reg_val) < 0) {
+		if (bmi160_byte_write(dev, BMI160_REG_INT_MOTION1, reg_val) <
+		    0) {
 			return -EIO;
 		}
 	} else { /* SENSOR_ATTR_SLOPE_DUR */
@@ -222,10 +221,9 @@ int bmi160_acc_slope_config(const struct device *dev,
 			return -ENOTSUP;
 		}
 
-		if (bmi160_reg_field_update(dev, BMI160_REG_INT_MOTION0,
-					    BMI160_ANYM_DUR_POS,
-					    BMI160_ANYM_DUR_MASK,
-					    val->val1) < 0) {
+		if (bmi160_reg_field_update(
+			    dev, BMI160_REG_INT_MOTION0, BMI160_ANYM_DUR_POS,
+			    BMI160_ANYM_DUR_MASK, val->val1) < 0) {
 			return -EIO;
 		}
 	}
@@ -283,10 +281,9 @@ int bmi160_trigger_mode_init(const struct device *dev)
 
 	k_thread_create(&bmi160_thread, bmi160_thread_stack,
 			CONFIG_BMI160_THREAD_STACK_SIZE,
-			(k_thread_entry_t)bmi160_thread_main,
-			bmi160, NULL, NULL,
-			K_PRIO_COOP(CONFIG_BMI160_THREAD_PRIORITY),
-			 0, K_NO_WAIT);
+			(k_thread_entry_t)bmi160_thread_main, bmi160, NULL,
+			NULL, K_PRIO_COOP(CONFIG_BMI160_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_BMI160_TRIGGER_GLOBAL_THREAD)
 	bmi160->work.handler = bmi160_work_handler;
 #endif
@@ -300,8 +297,7 @@ int bmi160_trigger_mode_init(const struct device *dev)
 	gpio_pin_configure(bmi160->gpio, cfg->int_pin,
 			   GPIO_INPUT | cfg->int_flags);
 
-	gpio_init_callback(&bmi160->gpio_cb,
-			   bmi160_gpio_callback,
+	gpio_init_callback(&bmi160->gpio_cb, bmi160_gpio_callback,
 			   BIT(cfg->int_pin));
 
 	gpio_add_callback(bmi160->gpio, &bmi160->gpio_cb);

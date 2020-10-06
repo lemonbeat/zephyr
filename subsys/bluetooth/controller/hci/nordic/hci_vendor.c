@@ -12,14 +12,14 @@
 #include <nrf.h>
 
 uint8_t hci_vendor_read_static_addr(struct bt_hci_vs_static_addr addrs[],
-				 uint8_t size)
+				    uint8_t size)
 {
 	/* only one supported */
 	ARG_UNUSED(size);
 
 	if (((NRF_FICR->DEVICEADDR[0] != UINT32_MAX) ||
-	    ((NRF_FICR->DEVICEADDR[1] & UINT16_MAX) != UINT16_MAX)) &&
-	     (NRF_FICR->DEVICEADDRTYPE & 0x01)) {
+	     ((NRF_FICR->DEVICEADDR[1] & UINT16_MAX) != UINT16_MAX)) &&
+	    (NRF_FICR->DEVICEADDRTYPE & 0x01)) {
 		sys_put_le32(NRF_FICR->DEVICEADDR[0], &addrs[0].bdaddr.val[0]);
 		sys_put_le16(NRF_FICR->DEVICEADDR[1], &addrs[0].bdaddr.val[4]);
 

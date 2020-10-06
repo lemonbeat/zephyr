@@ -16,8 +16,7 @@ K_SEM_DEFINE(pthread_key_sem, 1, 1);
  *
  * See IEEE 1003.1
  */
-int pthread_key_create(pthread_key_t *key,
-		void (*destructor)(void *))
+int pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 {
 	pthread_key_obj *new_key;
 
@@ -51,12 +50,11 @@ int pthread_key_delete(pthread_key_t key)
 	k_sem_take(&pthread_key_sem, K_FOREVER);
 
 	/* Delete thread-specific elements associated with the key */
-	SYS_SLIST_FOR_EACH_NODE_SAFE(&(key_obj->key_data_l),
-			node_l, next_node_l) {
-
+	SYS_SLIST_FOR_EACH_NODE_SAFE(&(key_obj->key_data_l), node_l,
+				     next_node_l) {
 		/* Remove the object from the list key_data_l */
-		key_data = (pthread_key_data *)
-			sys_slist_get(&(key_obj->key_data_l));
+		key_data = (pthread_key_data *)sys_slist_get(
+			&(key_obj->key_data_l));
 
 		/* Deallocate the object's memory */
 		k_free((void *)key_data);
@@ -90,17 +88,15 @@ int pthread_setspecific(pthread_key_t key, const void *value)
 	k_sem_take(&pthread_key_sem, K_FOREVER);
 
 	SYS_SLIST_FOR_EACH_NODE(&(thread->key_list), node_l) {
+		thread_spec_data = (pthread_thread_data *)node_l;
 
-			thread_spec_data = (pthread_thread_data *)node_l;
-
-			if (thread_spec_data->key == key_obj) {
-
-				/* Key is already present so
+		if (thread_spec_data->key == key_obj) {
+			/* Key is already present so
 				 * associate thread specific data
 				 */
-				thread_spec_data->spec_data = (void *)value;
-				goto out;
-			}
+			thread_spec_data->spec_data = (void *)value;
+			goto out;
+		}
 	}
 
 	if (node_l == NULL) {
@@ -116,12 +112,13 @@ int pthread_setspecific(pthread_key_t key, const void *value)
 			key_data->thread_data.spec_data = (void *)value;
 
 			/* Append new thread key data to thread's key list */
-			sys_slist_append((&thread->key_list),
+			sys_slist_append(
+				(&thread->key_list),
 				(sys_snode_t *)(&key_data->thread_data));
 
 			/* Append new key data to the key object's list */
 			sys_slist_append(&(key_obj->key_data_l),
-					(sys_snode_t *)key_data);
+					 (sys_snode_t *)key_data);
 		}
 	}
 

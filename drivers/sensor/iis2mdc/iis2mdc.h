@@ -34,7 +34,7 @@ struct iis2mdc_config {
 	const char *drdy_port;
 	gpio_pin_t drdy_pin;
 	gpio_dt_flags_t drdy_flags;
-#endif  /* CONFIG_IIS2MDC_TRIGGER */
+#endif /* CONFIG_IIS2MDC_TRIGGER */
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(i2c)
 	uint16_t i2c_slv_addr;
 #elif DT_ANY_INST_ON_BUS_STATUS_OKAY(spi)
@@ -75,8 +75,8 @@ struct iis2mdc_data {
 	struct k_sem gpio_sem;
 #elif defined(CONFIG_IIS2MDC_TRIGGER_GLOBAL_THREAD)
 	struct k_work work;
-#endif  /* CONFIG_IIS2MDC_TRIGGER_GLOBAL_THREAD */
-#endif  /* CONFIG_IIS2MDC_TRIGGER */
+#endif /* CONFIG_IIS2MDC_TRIGGER_GLOBAL_THREAD */
+#endif /* CONFIG_IIS2MDC_TRIGGER */
 #if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
 	struct spi_cs_control cs_ctrl;
 #endif /* DT_INST_SPI_DEV_HAS_CS_GPIOS(0) */
@@ -88,8 +88,8 @@ int iis2mdc_i2c_init(const struct device *dev);
 #ifdef CONFIG_IIS2MDC_TRIGGER
 int iis2mdc_init_interrupt(const struct device *dev);
 int iis2mdc_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler);
+			const struct sensor_trigger *trig,
+			sensor_trigger_handler_t handler);
 #endif /* CONFIG_IIS2MDC_TRIGGER */
 
 #endif /* __MAG_IIS2MDC_H */

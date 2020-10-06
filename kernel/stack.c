@@ -30,7 +30,8 @@ static int init_stack_module(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	Z_STRUCT_SECTION_FOREACH(k_stack, stack) {
+	Z_STRUCT_SECTION_FOREACH(k_stack, stack)
+	{
 		SYS_TRACING_OBJ_INIT(k_stack, stack);
 	}
 	return 0;
@@ -44,7 +45,7 @@ void k_stack_init(struct k_stack *stack, stack_data_t *buffer,
 		  uint32_t num_entries)
 {
 	z_waitq_init(&stack->wait_q);
-	stack->lock = (struct k_spinlock) {};
+	stack->lock = (struct k_spinlock){};
 	stack->next = stack->base = buffer;
 	stack->top = stack->base + num_entries;
 
@@ -71,7 +72,7 @@ int32_t z_impl_k_stack_alloc_init(struct k_stack *stack, uint32_t num_entries)
 
 #ifdef CONFIG_USERSPACE
 static inline int32_t z_vrfy_k_stack_alloc_init(struct k_stack *stack,
-					      uint32_t num_entries)
+						uint32_t num_entries)
 {
 	Z_OOPS(Z_SYSCALL_OBJ_NEVER_INIT(stack, K_OBJ_STACK));
 	Z_OOPS(Z_SYSCALL_VERIFY(num_entries > 0));
@@ -82,7 +83,8 @@ static inline int32_t z_vrfy_k_stack_alloc_init(struct k_stack *stack,
 
 int k_stack_cleanup(struct k_stack *stack)
 {
-	CHECKIF(z_waitq_head(&stack->wait_q) != NULL) {
+	CHECKIF(z_waitq_head(&stack->wait_q) != NULL)
+	{
 		return -EAGAIN;
 	}
 
@@ -99,7 +101,8 @@ int z_impl_k_stack_push(struct k_stack *stack, stack_data_t data)
 	struct k_thread *first_pending_thread;
 	k_spinlock_key_t key;
 
-	CHECKIF(stack->next == stack->top) {
+	CHECKIF(stack->next == stack->top)
+	{
 		return -ENOMEM;
 	}
 
@@ -110,8 +113,8 @@ int z_impl_k_stack_push(struct k_stack *stack, stack_data_t data)
 	if (first_pending_thread != NULL) {
 		z_ready_thread(first_pending_thread);
 
-		z_thread_return_value_set_with_data(first_pending_thread,
-						   0, (void *)data);
+		z_thread_return_value_set_with_data(first_pending_thread, 0,
+						    (void *)data);
 		z_reschedule(&stack->lock, key);
 	} else {
 		*(stack->next) = data;
@@ -162,8 +165,8 @@ int z_impl_k_stack_pop(struct k_stack *stack, stack_data_t *data,
 }
 
 #ifdef CONFIG_USERSPACE
-static inline int z_vrfy_k_stack_pop(struct k_stack *stack,
-				     stack_data_t *data, k_timeout_t timeout)
+static inline int z_vrfy_k_stack_pop(struct k_stack *stack, stack_data_t *data,
+				     k_timeout_t timeout)
 {
 	Z_OOPS(Z_SYSCALL_OBJ(stack, K_OBJ_STACK));
 	Z_OOPS(Z_SYSCALL_MEMORY_WRITE(data, sizeof(stack_data_t)));

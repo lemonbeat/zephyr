@@ -13,7 +13,7 @@
  * attempt to repeat the test RETRIES times before reporting failure.
  */
 
-#define RETRIES		10
+#define RETRIES 10
 
 /*
  * We need to know how many ticks will elapse when we ask for the
@@ -58,9 +58,10 @@
  * fast tick rates, and cycle layer may inject another to guarantee
  * the timeout deadline is met.
  */
-#define LOWER_BOUND_MS	((1000 * LOOPS) / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
-#define UPPER_BOUND_MS	(((3 + MAXIMUM_SHORTEST_TICKS) * 1000 * LOOPS)	\
-			 / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define LOWER_BOUND_MS ((1000 * LOOPS) / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define UPPER_BOUND_MS                                   \
+	(((3 + MAXIMUM_SHORTEST_TICKS) * 1000 * LOOPS) / \
+	 CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 
 void test_usleep(void)
 {

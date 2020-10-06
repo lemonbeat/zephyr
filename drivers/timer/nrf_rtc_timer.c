@@ -19,8 +19,8 @@
 #define COUNTER_SPAN BIT(24)
 #define COUNTER_MAX (COUNTER_SPAN - 1U)
 #define COUNTER_HALF_SPAN (COUNTER_SPAN / 2U)
-#define CYC_PER_TICK (sys_clock_hw_cycles_per_sec()	\
-		      / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define CYC_PER_TICK \
+	(sys_clock_hw_cycles_per_sec() / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 #define MAX_TICKS ((COUNTER_HALF_SPAN - CYC_PER_TICK) / CYC_PER_TICK)
 #define MAX_CYCLES (MAX_TICKS * CYC_PER_TICK)
 
@@ -183,7 +183,8 @@ void rtc_nrf_isr(const void *arg)
 		set_absolute_alarm(last_count + CYC_PER_TICK);
 	}
 
-	z_clock_announce(IS_ENABLED(CONFIG_TICKLESS_KERNEL) ? dticks : (dticks > 0));
+	z_clock_announce(IS_ENABLED(CONFIG_TICKLESS_KERNEL) ? dticks :
+								    (dticks > 0));
 }
 
 int z_clock_driver_init(const struct device *device)
@@ -191,10 +192,10 @@ int z_clock_driver_init(const struct device *device)
 	ARG_UNUSED(device);
 	static const enum nrf_lfclk_start_mode mode =
 		IS_ENABLED(CONFIG_SYSTEM_CLOCK_NO_WAIT) ?
-			CLOCK_CONTROL_NRF_LF_START_NOWAIT :
-			(IS_ENABLED(CONFIG_SYSTEM_CLOCK_WAIT_FOR_AVAILABILITY) ?
-			CLOCK_CONTROL_NRF_LF_START_AVAILABLE :
-			CLOCK_CONTROL_NRF_LF_START_STABLE);
+			      CLOCK_CONTROL_NRF_LF_START_NOWAIT :
+			      (IS_ENABLED(CONFIG_SYSTEM_CLOCK_WAIT_FOR_AVAILABILITY) ?
+				       CLOCK_CONTROL_NRF_LF_START_AVAILABLE :
+				       CLOCK_CONTROL_NRF_LF_START_STABLE);
 
 	/* TODO: replace with counter driver to access RTC */
 	nrf_rtc_prescaler_set(RTC, 0);

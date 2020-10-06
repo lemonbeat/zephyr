@@ -168,8 +168,8 @@ struct bt_mesh_health_srv {
  *
  *  @return New mesh model instance.
  */
-#define BT_MESH_MODEL_HEALTH_SRV(srv, pub)                                     \
-	BT_MESH_MODEL_CB(BT_MESH_MODEL_ID_HEALTH_SRV, bt_mesh_health_srv_op,   \
+#define BT_MESH_MODEL_HEALTH_SRV(srv, pub)                                   \
+	BT_MESH_MODEL_CB(BT_MESH_MODEL_ID_HEALTH_SRV, bt_mesh_health_srv_op, \
 			 pub, srv, &bt_mesh_health_srv_cb)
 
 /** @brief Notify the stack that the fault array state of the given element has

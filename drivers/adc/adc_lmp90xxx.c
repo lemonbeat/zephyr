@@ -26,33 +26,33 @@ LOG_MODULE_REGISTER(adc_lmp90xxx);
 #include "adc_context.h"
 
 /* LMP90xxx register addresses */
-#define LMP90XXX_REG_RESETCN         0x00U
+#define LMP90XXX_REG_RESETCN 0x00U
 #define LMP90XXX_REG_SPI_HANDSHAKECN 0x01U
-#define LMP90XXX_REG_SPI_RESET       0x02U
-#define LMP90XXX_REG_SPI_STREAMCN    0x03U
-#define LMP90XXX_REG_PWRCN           0x08U
-#define LMP90XXX_REG_DATA_ONLY_1     0x09U
-#define LMP90XXX_REG_DATA_ONLY_2     0x0AU
-#define LMP90XXX_REG_ADC_RESTART     0x0BU
-#define LMP90XXX_REG_GPIO_DIRCN      0x0EU
-#define LMP90XXX_REG_GPIO_DAT        0x0FU
-#define LMP90XXX_REG_BGCALCN         0x10U
-#define LMP90XXX_REG_SPI_DRDYBCN     0x11U
-#define LMP90XXX_REG_ADC_AUXCN       0x12U
-#define LMP90XXX_REG_SPI_CRC_CN      0x13U
-#define LMP90XXX_REG_SENDIAG_THLDH   0x14U
-#define LMP90XXX_REG_SENDIAG_THLDL   0x15U
-#define LMP90XXX_REG_SCALCN          0x17U
-#define LMP90XXX_REG_ADC_DONE        0x18U
-#define LMP90XXX_REG_SENDIAG_FLAGS   0x19U
-#define LMP90XXX_REG_ADC_DOUT        0x1AU
-#define LMP90XXX_REG_SPI_CRC_DAT     0x1DU
-#define LMP90XXX_REG_CH_STS          0x1EU
-#define LMP90XXX_REG_CH_SCAN         0x1FU
+#define LMP90XXX_REG_SPI_RESET 0x02U
+#define LMP90XXX_REG_SPI_STREAMCN 0x03U
+#define LMP90XXX_REG_PWRCN 0x08U
+#define LMP90XXX_REG_DATA_ONLY_1 0x09U
+#define LMP90XXX_REG_DATA_ONLY_2 0x0AU
+#define LMP90XXX_REG_ADC_RESTART 0x0BU
+#define LMP90XXX_REG_GPIO_DIRCN 0x0EU
+#define LMP90XXX_REG_GPIO_DAT 0x0FU
+#define LMP90XXX_REG_BGCALCN 0x10U
+#define LMP90XXX_REG_SPI_DRDYBCN 0x11U
+#define LMP90XXX_REG_ADC_AUXCN 0x12U
+#define LMP90XXX_REG_SPI_CRC_CN 0x13U
+#define LMP90XXX_REG_SENDIAG_THLDH 0x14U
+#define LMP90XXX_REG_SENDIAG_THLDL 0x15U
+#define LMP90XXX_REG_SCALCN 0x17U
+#define LMP90XXX_REG_ADC_DONE 0x18U
+#define LMP90XXX_REG_SENDIAG_FLAGS 0x19U
+#define LMP90XXX_REG_ADC_DOUT 0x1AU
+#define LMP90XXX_REG_SPI_CRC_DAT 0x1DU
+#define LMP90XXX_REG_CH_STS 0x1EU
+#define LMP90XXX_REG_CH_SCAN 0x1FU
 
 /* LMP90xxx channel input and configuration registers */
 #define LMP90XXX_REG_CH_INPUTCN(ch) (0x20U + (2 * ch))
-#define LMP90XXX_REG_CH_CONFIG(ch)  (0x21U + (2 * ch))
+#define LMP90XXX_REG_CH_CONFIG(ch) (0x21U + (2 * ch))
 
 /* LMP90xxx upper (URA) and lower (LRA) register addresses */
 #define LMP90XXX_URA(addr) ((addr >> 4U) & GENMASK(2, 0))
@@ -60,36 +60,36 @@ LOG_MODULE_REGISTER(adc_lmp90xxx);
 
 /* LMP90xxx instruction byte 1 (INST1) */
 #define LMP90XXX_INST1_WAB 0x10U
-#define LMP90XXX_INST1_RA  0x90U
+#define LMP90XXX_INST1_RA 0x90U
 
 /* LMP90xxx instruction byte 2 (INST2) */
-#define LMP90XXX_INST2_WB        0U
-#define LMP90XXX_INST2_R         BIT(7)
-#define LMP90XXX_INST2_SZ_1      (0x0U << 5)
-#define LMP90XXX_INST2_SZ_2      (0x1U << 5)
-#define LMP90XXX_INST2_SZ_3      (0x2U << 5)
+#define LMP90XXX_INST2_WB 0U
+#define LMP90XXX_INST2_R BIT(7)
+#define LMP90XXX_INST2_SZ_1 (0x0U << 5)
+#define LMP90XXX_INST2_SZ_2 (0x1U << 5)
+#define LMP90XXX_INST2_SZ_3 (0x2U << 5)
 #define LMP90XXX_INST2_SZ_STREAM (0x3U << 5)
 
 /* LMP90xxx register values/commands */
-#define LMP90XXX_REG_AND_CNV_RST     0xC3U
+#define LMP90XXX_REG_AND_CNV_RST 0xC3U
 #define LMP90XXX_SDO_DRDYB_DRIVER(x) ((x & BIT_MASK(3)) << 1)
-#define LMP90XXX_PWRCN(x)            (x & BIT_MASK(2))
-#define LMP90XXX_RTD_CUR_SEL(x)      (x & BIT_MASK(4))
-#define LMP90XXX_SPI_DRDYB_D6(x)     ((x & BIT(0)) << 7)
-#define LMP90XXX_EN_CRC(x)           ((x & BIT(0)) << 4)
-#define LMP90XXX_DRDYB_AFT_CRC(x)    ((x & BIT(0)) << 2)
-#define LMP90XXX_CH_SCAN_SEL(x)      ((x & BIT_MASK(2)) << 6)
-#define LMP90XXX_LAST_CH(x)          ((x & BIT_MASK(3)) << 3)
-#define LMP90XXX_FIRST_CH(x)         (x & BIT_MASK(3))
-#define LMP90XXX_BURNOUT_EN(x)       ((x & BIT(0)) << 7)
-#define LMP90XXX_VREF_SEL(x)         ((x & BIT(0)) << 6)
-#define LMP90XXX_VINP(x)             ((x & BIT_MASK(3)) << 3)
-#define LMP90XXX_VINN(x)             (x & BIT_MASK(3))
-#define LMP90XXX_BGCALN(x)           (x & BIT_MASK(3))
-#define LMP90XXX_ODR_SEL(x)          ((x & BIT_MASK(3)) << 4)
-#define LMP90XXX_GAIN_SEL(x)         ((x & BIT_MASK(3)) << 1)
-#define LMP90XXX_BUF_EN(x)           (x & BIT(0))
-#define LMP90XXX_GPIO_DAT_MASK       BIT_MASK(LMP90XXX_GPIO_MAX)
+#define LMP90XXX_PWRCN(x) (x & BIT_MASK(2))
+#define LMP90XXX_RTD_CUR_SEL(x) (x & BIT_MASK(4))
+#define LMP90XXX_SPI_DRDYB_D6(x) ((x & BIT(0)) << 7)
+#define LMP90XXX_EN_CRC(x) ((x & BIT(0)) << 4)
+#define LMP90XXX_DRDYB_AFT_CRC(x) ((x & BIT(0)) << 2)
+#define LMP90XXX_CH_SCAN_SEL(x) ((x & BIT_MASK(2)) << 6)
+#define LMP90XXX_LAST_CH(x) ((x & BIT_MASK(3)) << 3)
+#define LMP90XXX_FIRST_CH(x) (x & BIT_MASK(3))
+#define LMP90XXX_BURNOUT_EN(x) ((x & BIT(0)) << 7)
+#define LMP90XXX_VREF_SEL(x) ((x & BIT(0)) << 6)
+#define LMP90XXX_VINP(x) ((x & BIT_MASK(3)) << 3)
+#define LMP90XXX_VINN(x) (x & BIT_MASK(3))
+#define LMP90XXX_BGCALN(x) (x & BIT_MASK(3))
+#define LMP90XXX_ODR_SEL(x) ((x & BIT_MASK(3)) << 4)
+#define LMP90XXX_GAIN_SEL(x) ((x & BIT_MASK(3)) << 1)
+#define LMP90XXX_BUF_EN(x) (x & BIT(0))
+#define LMP90XXX_GPIO_DAT_MASK BIT_MASK(LMP90XXX_GPIO_MAX)
 
 /* Invalid (never used) Upper Register Address */
 #define LMP90XXX_INVALID_URA UINT8_MAX
@@ -142,8 +142,8 @@ struct lmp90xxx_data {
 	struct k_sem acq_sem;
 	struct k_sem drdyb_sem;
 
-	K_KERNEL_STACK_MEMBER(stack,
-			CONFIG_ADC_LMP90XXX_ACQUISITION_THREAD_STACK_SIZE);
+	K_KERNEL_STACK_MEMBER(
+		stack, CONFIG_ADC_LMP90XXX_ACQUISITION_THREAD_STACK_SIZE);
 };
 
 /*
@@ -154,11 +154,11 @@ static const int32_t lmp90xxx_odr_delay_tbl[8] = {
 	596, /* 13.42/8 = 1.6775 SPS */
 	298, /* 13.42/4 = 3.355 SPS */
 	149, /* 13.42/2 = 6.71 SPS */
-	75,  /* 13.42 SPS */
-	37,  /* 214.65/8 = 26.83125 SPS */
-	19,  /* 214.65/4 = 53.6625 SPS */
-	9,   /* 214.65/2 = 107.325 SPS */
-	5,   /* 214.65 SPS (default) */
+	75, /* 13.42 SPS */
+	37, /* 214.65/8 = 26.83125 SPS */
+	19, /* 214.65/4 = 53.6625 SPS */
+	9, /* 214.65/2 = 107.325 SPS */
+	5, /* 214.65 SPS (default) */
 };
 
 static inline uint8_t lmp90xxx_inst2_sz(size_t len)
@@ -175,8 +175,7 @@ static inline uint8_t lmp90xxx_inst2_sz(size_t len)
 }
 
 static int lmp90xxx_read_reg(const struct device *dev, uint8_t addr,
-			     uint8_t *dptr,
-			     size_t len)
+			     uint8_t *dptr, size_t len)
 {
 	const struct lmp90xxx_config *config = dev->config;
 	struct lmp90xxx_data *data = dev->data;
@@ -251,8 +250,7 @@ static int lmp90xxx_read_reg8(const struct device *dev, uint8_t addr,
 }
 
 static int lmp90xxx_write_reg(const struct device *dev, uint8_t addr,
-			      uint8_t *dptr,
-			      size_t len)
+			      uint8_t *dptr, size_t len)
 {
 	const struct lmp90xxx_config *config = dev->config;
 	struct lmp90xxx_data *data = dev->data;
@@ -388,7 +386,7 @@ static int lmp90xxx_adc_channel_setup(const struct device *dev,
 {
 	struct lmp90xxx_data *data = dev->data;
 	uint8_t chx_inputcn = LMP90XXX_BURNOUT_EN(0); /* No burnout currents */
-	uint8_t chx_config = LMP90XXX_BUF_EN(0);      /* No buffer */
+	uint8_t chx_config = LMP90XXX_BUF_EN(0); /* No buffer */
 	uint8_t payload[2];
 	uint8_t addr;
 	int ret;
@@ -573,8 +571,7 @@ static void adc_context_update_buffer_pointer(struct adc_context *ctx,
 	}
 }
 
-static int lmp90xxx_adc_read_channel(const struct device *dev,
-				     uint8_t channel,
+static int lmp90xxx_adc_read_channel(const struct device *dev, uint8_t channel,
 				     int32_t *result)
 {
 	const struct lmp90xxx_config *config = dev->config;
@@ -614,7 +611,7 @@ static int lmp90xxx_adc_read_channel(const struct device *dev,
 		/* Poll for data ready */
 		do {
 			err = lmp90xxx_read_reg8(dev, LMP90XXX_REG_ADC_DONE,
-						&adc_done);
+						 &adc_done);
 			if (adc_done == 0xFFU) {
 				LOG_DBG("sleeping for 1 ms");
 				k_msleep(1);
@@ -670,13 +667,14 @@ static void lmp90xxx_acquisition_thread(struct lmp90xxx_data *data)
 		}
 
 		LOG_DBG("using BGCALCN = 0x%02x", bgcalcn);
-		err = lmp90xxx_write_reg8(data->dev,
-					  LMP90XXX_REG_BGCALCN, bgcalcn);
+		err = lmp90xxx_write_reg8(data->dev, LMP90XXX_REG_BGCALCN,
+					  bgcalcn);
 		if (err) {
 			LOG_ERR("failed to setup background calibration "
-				"(err %d)", err);
-				adc_context_complete(&data->ctx, err);
-				break;
+				"(err %d)",
+				err);
+			adc_context_complete(&data->ctx, err);
+			break;
 		}
 
 		while (data->channels) {
@@ -684,8 +682,8 @@ static void lmp90xxx_acquisition_thread(struct lmp90xxx_data *data)
 
 			LOG_DBG("reading channel %d", channel);
 
-			err = lmp90xxx_adc_read_channel(data->dev,
-							channel, &result);
+			err = lmp90xxx_adc_read_channel(data->dev, channel,
+							&result);
 			if (err) {
 				adc_context_complete(&data->ctx, err);
 				break;
@@ -974,14 +972,14 @@ static int lmp90xxx_init(const struct device *dev)
 	err = lmp90xxx_write_reg8(dev, LMP90XXX_REG_SPI_HANDSHAKECN,
 				  LMP90XXX_SDO_DRDYB_DRIVER(0x4));
 	if (err) {
-		LOG_ERR("failed to set SPI handshake control (err %d)",
-			err);
+		LOG_ERR("failed to set SPI handshake control (err %d)", err);
 		return err;
 	}
 
 	if (config->rtd_current) {
-		err = lmp90xxx_write_reg8(dev, LMP90XXX_REG_ADC_AUXCN,
-				LMP90XXX_RTD_CUR_SEL(config->rtd_current));
+		err = lmp90xxx_write_reg8(
+			dev, LMP90XXX_REG_ADC_AUXCN,
+			LMP90XXX_RTD_CUR_SEL(config->rtd_current));
 		if (err) {
 			LOG_ERR("failed to set RTD current (err %d)", err);
 			return err;
@@ -990,8 +988,8 @@ static int lmp90xxx_init(const struct device *dev)
 
 	if (IS_ENABLED(CONFIG_ADC_LMP90XXX_CRC)) {
 		err = lmp90xxx_write_reg8(dev, LMP90XXX_REG_SPI_CRC_CN,
-					LMP90XXX_EN_CRC(1) |
-					LMP90XXX_DRDYB_AFT_CRC(1));
+					  LMP90XXX_EN_CRC(1) |
+						  LMP90XXX_DRDYB_AFT_CRC(1));
 		if (err) {
 			LOG_ERR("failed to enable CRC (err %d)", err);
 			return err;
@@ -1044,8 +1042,8 @@ static int lmp90xxx_init(const struct device *dev)
 			      CONFIG_ADC_LMP90XXX_ACQUISITION_THREAD_STACK_SIZE,
 			      (k_thread_entry_t)lmp90xxx_acquisition_thread,
 			      data, NULL, NULL,
-			      CONFIG_ADC_LMP90XXX_ACQUISITION_THREAD_PRIO,
-			      0, K_NO_WAIT);
+			      CONFIG_ADC_LMP90XXX_ACQUISITION_THREAD_PRIO, 0,
+			      K_NO_WAIT);
 	k_thread_name_set(tid, "adc_lmp90xxx");
 
 	/* Put device in stand-by to prepare it for single-shot conversion */
@@ -1068,25 +1066,25 @@ static const struct adc_driver_api lmp90xxx_adc_api = {
 #endif
 };
 
-#define ASSERT_LMP90XXX_CURRENT_VALID(v) \
-	BUILD_ASSERT(v == 0 || v == 100 || v == 200 || v == 300 ||	\
-		     v == 400 || v == 500 || v == 600 || v == 700 ||	\
-		     v == 800 || v == 900 || v == 1000,			\
+#define ASSERT_LMP90XXX_CURRENT_VALID(v)                                       \
+	BUILD_ASSERT(v == 0 || v == 100 || v == 200 || v == 300 || v == 400 || \
+			     v == 500 || v == 600 || v == 700 || v == 800 ||   \
+			     v == 900 || v == 1000,                            \
 		     "unsupported RTD current (" #v ")")
 
 #define LMP90XXX_UAMPS_TO_RTD_CUR_SEL(x) (x / 100)
 
 #define DT_INST_LMP90XXX(inst, t) DT_INST(inst, ti_lmp##t)
 
-#define LMP90XXX_DEVICE(t, n, res, ch) \
-	ASSERT_LMP90XXX_CURRENT_VALID(UTIL_AND(	\
-		DT_NODE_HAS_PROP(DT_INST_LMP90XXX(n, t), rtd_current), \
-		DT_PROP(DT_INST_LMP90XXX(n, t),	rtd_current))); \
-	static struct lmp90xxx_data lmp##t##_data_##n = { \
-		ADC_CONTEXT_INIT_TIMER(lmp##t##_data_##n, ctx), \
-		ADC_CONTEXT_INIT_LOCK(lmp##t##_data_##n, ctx), \
-		ADC_CONTEXT_INIT_SYNC(lmp##t##_data_##n, ctx), \
-	}; \
+#define LMP90XXX_DEVICE(t, n, res, ch)                                      \
+	ASSERT_LMP90XXX_CURRENT_VALID(UTIL_AND(                             \
+		DT_NODE_HAS_PROP(DT_INST_LMP90XXX(n, t), rtd_current),      \
+		DT_PROP(DT_INST_LMP90XXX(n, t), rtd_current)));             \
+	static struct lmp90xxx_data lmp##t##_data_##n = {                   \
+		ADC_CONTEXT_INIT_TIMER(lmp##t##_data_##n, ctx),             \
+		ADC_CONTEXT_INIT_LOCK(lmp##t##_data_##n, ctx),              \
+		ADC_CONTEXT_INIT_SYNC(lmp##t##_data_##n, ctx),              \
+	};                                                                  \
 	static const struct lmp90xxx_config lmp##t##_config_##n = { \
 		.spi_dev_name = DT_BUS_LABEL(DT_INST_LMP90XXX(n, t)), \
 		.spi_cs_dev_name = UTIL_AND( \
@@ -1128,12 +1126,11 @@ static const struct adc_driver_api lmp90xxx_adc_api = {
 			), \
 		.resolution = res, \
 		.channels = ch, \
-	}; \
-	DEVICE_AND_API_INIT(lmp##t##_##n, \
-			    DT_LABEL(DT_INST_LMP90XXX(n, t)), \
-			    &lmp90xxx_init, &lmp##t##_data_##n, \
-			    &lmp##t##_config_##n, POST_KERNEL, \
-			    CONFIG_ADC_LMP90XXX_INIT_PRIORITY, \
+	};       \
+	DEVICE_AND_API_INIT(lmp##t##_##n, DT_LABEL(DT_INST_LMP90XXX(n, t)), \
+			    &lmp90xxx_init, &lmp##t##_data_##n,             \
+			    &lmp##t##_config_##n, POST_KERNEL,              \
+			    CONFIG_ADC_LMP90XXX_INIT_PRIORITY,              \
 			    &lmp90xxx_adc_api)
 
 /*

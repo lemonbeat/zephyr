@@ -30,7 +30,7 @@ static bool is_mesh_local(struct openthread_context *context,
 			  const uint8_t *address)
 {
 	const otMeshLocalPrefix *ml_prefix =
-				otThreadGetMeshLocalPrefix(context->instance);
+		otThreadGetMeshLocalPrefix(context->instance);
 
 	return (memcmp(address, ml_prefix->m8, sizeof(ml_prefix)) == 0);
 }
@@ -78,7 +78,6 @@ struct net_pkt *pkt_list_peek(struct openthread_context *context)
 {
 	if ((context->pkt_list_in_idx == context->pkt_list_out_idx) &&
 	    (!context->pkt_list_full)) {
-
 		return NULL;
 	}
 	return context->pkt_list[context->pkt_list_out_idx].pkt;
@@ -88,7 +87,6 @@ void pkt_list_remove_last(struct openthread_context *context)
 {
 	if ((context->pkt_list_in_idx == context->pkt_list_out_idx) &&
 	    (!context->pkt_list_full)) {
-
 		return;
 	}
 
@@ -105,9 +103,8 @@ void add_ipv6_addr_to_zephyr(struct openthread_context *context)
 	const otNetifAddress *address;
 	struct net_if_addr *if_addr;
 
-	for (address = otIp6GetUnicastAddresses(context->instance);
-	     address; address = address->mNext) {
-
+	for (address = otIp6GetUnicastAddresses(context->instance); address;
+	     address = address->mNext) {
 		if (address->mRloc || is_anycast_locator(address)) {
 			continue;
 		}
@@ -116,9 +113,10 @@ void add_ipv6_addr_to_zephyr(struct openthread_context *context)
 			char buf[NET_IPV6_ADDR_LEN];
 
 			NET_DBG("Adding %s",
-				log_strdup(net_addr_ntop(AF_INET6,
-				       (struct in6_addr *)(&address->mAddress),
-				       buf, sizeof(buf))));
+				log_strdup(net_addr_ntop(
+					AF_INET6,
+					(struct in6_addr *)(&address->mAddress),
+					buf, sizeof(buf))));
 		}
 
 		/* Thread and SLAAC are clearly AUTOCONF, handle
@@ -127,21 +125,21 @@ void add_ipv6_addr_to_zephyr(struct openthread_context *context)
 		if ((address->mAddressOrigin == OT_ADDRESS_ORIGIN_THREAD) ||
 		    (address->mAddressOrigin == OT_ADDRESS_ORIGIN_SLAAC)) {
 			if_addr = net_if_ipv6_addr_add(
-					context->iface,
-					(struct in6_addr *)(&address->mAddress),
-					NET_ADDR_AUTOCONF, 0);
+				context->iface,
+				(struct in6_addr *)(&address->mAddress),
+				NET_ADDR_AUTOCONF, 0);
 		} else if (address->mAddressOrigin ==
 			   OT_ADDRESS_ORIGIN_DHCPV6) {
 			if_addr = net_if_ipv6_addr_add(
-					context->iface,
-					(struct in6_addr *)(&address->mAddress),
-					NET_ADDR_DHCP, 0);
+				context->iface,
+				(struct in6_addr *)(&address->mAddress),
+				NET_ADDR_DHCP, 0);
 		} else if (address->mAddressOrigin ==
-			  OT_ADDRESS_ORIGIN_MANUAL) {
+			   OT_ADDRESS_ORIGIN_MANUAL) {
 			if_addr = net_if_ipv6_addr_add(
-					context->iface,
-					(struct in6_addr *)(&address->mAddress),
-					NET_ADDR_MANUAL, 0);
+				context->iface,
+				(struct in6_addr *)(&address->mAddress),
+				NET_ADDR_MANUAL, 0);
 		} else {
 			NET_ERR("Unknown OpenThread address origin ignored.");
 			continue;
@@ -152,8 +150,8 @@ void add_ipv6_addr_to_zephyr(struct openthread_context *context)
 			continue;
 		}
 
-		if_addr->is_mesh_local = is_mesh_local(
-					context, address->mAddress.mFields.m8);
+		if_addr->is_mesh_local =
+			is_mesh_local(context, address->mAddress.mFields.m8);
 	}
 }
 
@@ -182,7 +180,7 @@ void add_ipv6_addr_to_ot(struct openthread_context *context)
 	}
 
 	ipv6->unicast[i].is_mesh_local = is_mesh_local(
-			context, ipv6->unicast[i].address.in6_addr.s6_addr);
+		context, ipv6->unicast[i].address.in6_addr.s6_addr);
 
 	addr.mValid = true;
 	addr.mPreferred = true;
@@ -207,8 +205,7 @@ void add_ipv6_addr_to_ot(struct openthread_context *context)
 		char buf[NET_IPV6_ADDR_LEN];
 
 		NET_DBG("Added %s",
-			log_strdup(net_addr_ntop(AF_INET6,
-						 &addr.mAddress, buf,
+			log_strdup(net_addr_ntop(AF_INET6, &addr.mAddress, buf,
 						 sizeof(buf))));
 	}
 }
@@ -227,8 +224,7 @@ void add_ipv6_maddr_to_ot(struct openthread_context *context)
 	/* save the last added IP address for this interface */
 	for (i = NET_IF_MAX_IPV6_MADDR - 1; i >= 0; i--) {
 		if (ipv6->mcast[i].is_used) {
-			memcpy(&addr,
-			       &ipv6->mcast[i].address.in6_addr,
+			memcpy(&addr, &ipv6->mcast[i].address.in6_addr,
 			       sizeof(addr));
 			break;
 		}
@@ -242,8 +238,8 @@ void add_ipv6_maddr_to_ot(struct openthread_context *context)
 		char buf[NET_IPV6_ADDR_LEN];
 
 		NET_DBG("Added multicast %s",
-			log_strdup(net_addr_ntop(AF_INET6, &addr,
-						 buf, sizeof(buf))));
+			log_strdup(net_addr_ntop(AF_INET6, &addr, buf,
+						 sizeof(buf))));
 	}
 }
 
@@ -251,11 +247,11 @@ void add_ipv6_maddr_to_zephyr(struct openthread_context *context)
 {
 	const otNetifMulticastAddress *maddress;
 
-	for (maddress = otIp6GetMulticastAddresses(context->instance);
-	     maddress; maddress = maddress->mNext) {
+	for (maddress = otIp6GetMulticastAddresses(context->instance); maddress;
+	     maddress = maddress->mNext) {
 		if (net_if_ipv6_maddr_lookup(
-				(struct in6_addr *)(&maddress->mAddress),
-				&context->iface) != NULL) {
+			    (struct in6_addr *)(&maddress->mAddress),
+			    &context->iface) != NULL) {
 			continue;
 		}
 
@@ -263,10 +259,10 @@ void add_ipv6_maddr_to_zephyr(struct openthread_context *context)
 			char buf[NET_IPV6_ADDR_LEN];
 
 			NET_DBG("Adding multicast %s",
-				log_strdup(net_addr_ntop(AF_INET6,
-							 (struct in6_addr *)
-							 (&maddress->mAddress),
-							 buf, sizeof(buf))));
+				log_strdup(net_addr_ntop(
+					AF_INET6,
+					(struct in6_addr *)(&maddress->mAddress),
+					buf, sizeof(buf))));
 		}
 
 		net_if_ipv6_maddr_add(context->iface,
@@ -297,11 +293,9 @@ void rm_ipv6_addr_from_zephyr(struct openthread_context *context)
 
 		for (address = otIp6GetUnicastAddresses(context->instance);
 		     address; address = address->mNext) {
-
 			ot_addr = (struct in6_addr *)(&address->mAddress);
 			if (net_ipv6_addr_cmp(ot_addr,
 					      &zephyr_addr->address.in6_addr)) {
-
 				used = true;
 				break;
 			}
@@ -311,9 +305,10 @@ void rm_ipv6_addr_from_zephyr(struct openthread_context *context)
 				char buf[NET_IPV6_ADDR_LEN];
 
 				NET_DBG("Removing %s",
-					log_strdup(net_addr_ntop(AF_INET6,
-					      &zephyr_addr->address.in6_addr,
-					      buf, sizeof(buf))));
+					log_strdup(net_addr_ntop(
+						AF_INET6,
+						&zephyr_addr->address.in6_addr,
+						buf, sizeof(buf))));
 			}
 
 			net_if_ipv6_addr_rm(context->iface,
@@ -345,11 +340,9 @@ void rm_ipv6_maddr_from_zephyr(struct openthread_context *context)
 
 		for (maddress = otIp6GetMulticastAddresses(context->instance);
 		     maddress; maddress = maddress->mNext) {
-
 			ot_addr = (struct in6_addr *)(&maddress->mAddress);
 			if (net_ipv6_addr_cmp(ot_addr,
 					      &zephyr_addr->address.in6_addr)) {
-
 				used = true;
 				break;
 			}
@@ -359,9 +352,10 @@ void rm_ipv6_maddr_from_zephyr(struct openthread_context *context)
 				char buf[NET_IPV6_ADDR_LEN];
 
 				NET_DBG("Removing multicast %s",
-					log_strdup(net_addr_ntop(AF_INET6,
-					      &zephyr_addr->address.in6_addr,
-					      buf, sizeof(buf))));
+					log_strdup(net_addr_ntop(
+						AF_INET6,
+						&zephyr_addr->address.in6_addr,
+						buf, sizeof(buf))));
 			}
 
 			net_if_ipv6_maddr_rm(context->iface,

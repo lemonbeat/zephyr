@@ -114,7 +114,7 @@ static int pms7003_sample_fetch(const struct device *dev,
 	 * 00 4E 00 03 00 00 00 00 00 00 71 00 02 06
 	 */
 
-	uint8_t pms7003_start_bytes[] = {0x42, 0x4d};
+	uint8_t pms7003_start_bytes[] = { 0x42, 0x4d };
 	uint8_t pms7003_receive_buffer[30];
 
 	if (uart_wait_for(drv_data->uart_dev, pms7003_start_bytes,
@@ -130,11 +130,11 @@ static int pms7003_sample_fetch(const struct device *dev,
 	}
 
 	drv_data->pm_1_0 =
-	    (pms7003_receive_buffer[8] << 8) + pms7003_receive_buffer[9];
+		(pms7003_receive_buffer[8] << 8) + pms7003_receive_buffer[9];
 	drv_data->pm_2_5 =
-	    (pms7003_receive_buffer[10] << 8) + pms7003_receive_buffer[11];
+		(pms7003_receive_buffer[10] << 8) + pms7003_receive_buffer[11];
 	drv_data->pm_10 =
-	    (pms7003_receive_buffer[12] << 8) + pms7003_receive_buffer[13];
+		(pms7003_receive_buffer[12] << 8) + pms7003_receive_buffer[13];
 
 	LOG_DBG("pm1.0 = %d", drv_data->pm_1_0);
 	LOG_DBG("pm2.5 = %d", drv_data->pm_2_5);
@@ -175,8 +175,7 @@ static int pms7003_init(const struct device *dev)
 	drv_data->uart_dev = device_get_binding(DT_INST_BUS_LABEL(0));
 
 	if (!drv_data->uart_dev) {
-		LOG_DBG("uart device is not found: %s",
-			    DT_INST_BUS_LABEL(0));
+		LOG_DBG("uart device is not found: %s", DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -185,6 +184,6 @@ static int pms7003_init(const struct device *dev)
 
 static struct pms7003_data pms7003_data;
 
-DEVICE_AND_API_INIT(gts_dev, DT_INST_LABEL(0), &pms7003_init,
-		    &pms7003_data, NULL, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &pms7003_api);
+DEVICE_AND_API_INIT(gts_dev, DT_INST_LABEL(0), &pms7003_init, &pms7003_data,
+		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &pms7003_api);

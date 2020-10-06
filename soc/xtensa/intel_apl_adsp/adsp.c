@@ -35,7 +35,7 @@ static const struct adsp_ipc_fw_ready fw_ready_apl
 	.flags = 0,
 };
 
-#define NUM_WINDOWS			2
+#define NUM_WINDOWS 2
 
 static const struct adsp_ipc_window sram_window = {
 	.ext_hdr = {
@@ -74,7 +74,7 @@ static void prepare_host_windows(void)
 	sys_write32((HP_SRAM_WIN0_BASE | DMWBA_READONLY | DMWBA_ENABLE),
 		    DMWBA(0));
 	memset((void *)(HP_SRAM_WIN0_BASE + SRAM_REG_FW_END), 0,
-	      HP_SRAM_WIN0_SIZE - SRAM_REG_FW_END);
+	       HP_SRAM_WIN0_SIZE - SRAM_REG_FW_END);
 	SOC_DCACHE_FLUSH((void *)(HP_SRAM_WIN0_BASE + SRAM_REG_FW_END),
 			 HP_SRAM_WIN0_SIZE - SRAM_REG_FW_END);
 
@@ -102,8 +102,8 @@ static void prepare_host_windows(void)
  */
 static void send_fw_ready(void)
 {
-	memcpy((void *)MAILBOX_DSPBOX_BASE,
-	       &fw_ready_apl, sizeof(fw_ready_apl));
+	memcpy((void *)MAILBOX_DSPBOX_BASE, &fw_ready_apl,
+	       sizeof(fw_ready_apl));
 
 	memcpy((void *)(MAILBOX_DSPBOX_BASE + sizeof(fw_ready_apl)),
 	       &sram_window, sizeof(sram_window));

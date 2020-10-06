@@ -13,7 +13,7 @@
 
 static int _stdout_hook_default(int c)
 {
-	(void)(c);  /* Prevent warning about unused argument */
+	(void)(c); /* Prevent warning about unused argument */
 
 	return EOF;
 }
@@ -69,7 +69,7 @@ size_t z_impl_zephyr_fwrite(const void *_MLIBC_RESTRICT ptr, size_t size,
 	do {
 		j = size;
 		do {
-			if (_stdout_hook((int) *p++) == EOF) {
+			if (_stdout_hook((int)*p++) == EOF) {
 				goto done;
 			}
 			j--;
@@ -87,20 +87,18 @@ static inline size_t z_vrfy_zephyr_fwrite(const void *_MLIBC_RESTRICT ptr,
 					  size_t size, size_t nitems,
 					  FILE *_MLIBC_RESTRICT stream)
 {
-
 	Z_OOPS(Z_SYSCALL_MEMORY_ARRAY_READ(ptr, nitems, size));
 	return z_impl_zephyr_fwrite((const void *_MLIBC_RESTRICT)ptr, size,
-				    nitems, (FILE *_MLIBC_RESTRICT)stream);
+				    nitems, (FILE * _MLIBC_RESTRICT) stream);
 }
 #include <syscalls/zephyr_fwrite_mrsh.c>
 #endif
 
 size_t fwrite(const void *_MLIBC_RESTRICT ptr, size_t size, size_t nitems,
-			  FILE *_MLIBC_RESTRICT stream)
+	      FILE *_MLIBC_RESTRICT stream)
 {
 	return zephyr_fwrite(ptr, size, nitems, stream);
 }
-
 
 int puts(const char *string)
 {

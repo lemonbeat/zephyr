@@ -20,9 +20,9 @@
 #include "common/log.h"
 #include "hal/debug.h"
 
-#define MAYFLY_CALL_ID_LLL    TICKER_USER_ID_LLL
+#define MAYFLY_CALL_ID_LLL TICKER_USER_ID_LLL
 #define MAYFLY_CALL_ID_WORKER TICKER_USER_ID_ULL_HIGH
-#define MAYFLY_CALL_ID_JOB    TICKER_USER_ID_ULL_LOW
+#define MAYFLY_CALL_ID_JOB TICKER_USER_ID_ULL_LOW
 
 void mayfly_enable_cb(uint8_t caller_id, uint8_t callee_id, uint8_t enable)
 {

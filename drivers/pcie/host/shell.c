@@ -73,19 +73,17 @@ static void show(const struct shell *shell, pcie_bdf_t bdf)
 	}
 
 	shell_fprintf(shell, SHELL_NORMAL, "%d:%x.%d ID %x:%x ",
-		     PCIE_BDF_TO_BUS(bdf),
-		     PCIE_BDF_TO_DEV(bdf),
-		     PCIE_BDF_TO_FUNC(bdf),
-		     PCIE_ID_TO_VEND(data),
-		     PCIE_ID_TO_DEV(data));
+		      PCIE_BDF_TO_BUS(bdf), PCIE_BDF_TO_DEV(bdf),
+		      PCIE_BDF_TO_FUNC(bdf), PCIE_ID_TO_VEND(data),
+		      PCIE_ID_TO_DEV(data));
 
 	data = pcie_conf_read(bdf, PCIE_CONF_CLASSREV);
 	shell_fprintf(shell, SHELL_NORMAL,
-		     "class %x subclass %x prog i/f %x rev %x",
-		     PCIE_CONF_CLASSREV_CLASS(data),
-		     PCIE_CONF_CLASSREV_SUBCLASS(data),
-		     PCIE_CONF_CLASSREV_PROGIF(data),
-		     PCIE_CONF_CLASSREV_REV(data));
+		      "class %x subclass %x prog i/f %x rev %x",
+		      PCIE_CONF_CLASSREV_CLASS(data),
+		      PCIE_CONF_CLASSREV_SUBCLASS(data),
+		      PCIE_CONF_CLASSREV_PROGIF(data),
+		      PCIE_CONF_CLASSREV_REV(data));
 
 	data = pcie_conf_read(bdf, PCIE_CONF_TYPE);
 
@@ -120,10 +118,10 @@ static int cmd_pcie_ls(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_pcie_cmds,
-			       SHELL_CMD(ls, NULL,
-					 "List PCIE devices", cmd_pcie_ls),
+			       SHELL_CMD(ls, NULL, "List PCIE devices",
+					 cmd_pcie_ls),
 			       SHELL_SUBCMD_SET_END /* Array terminated. */
-		);
+);
 
-
-SHELL_CMD_REGISTER(pcie, &sub_pcie_cmds, "PCI(e) device information", cmd_pcie_ls);
+SHELL_CMD_REGISTER(pcie, &sub_pcie_cmds, "PCI(e) device information",
+		   cmd_pcie_ls);

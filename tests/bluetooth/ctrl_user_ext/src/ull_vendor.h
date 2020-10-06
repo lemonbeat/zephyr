@@ -19,8 +19,7 @@ static inline int ull_user_init(void)
 
 static inline int rx_demux_rx_proprietary(memq_link_t *link,
 					  struct node_rx_hdr *rx,
-					  memq_link_t *tail,
-					  memq_link_t **head)
+					  memq_link_t *tail, memq_link_t **head)
 {
 	return 0;
 }

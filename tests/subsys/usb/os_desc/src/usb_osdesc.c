@@ -12,7 +12,7 @@
 #include <usb/usb_common.h>
 #include <os_desc.h>
 
-#define MSOS_STRING_LENGTH	18
+#define MSOS_STRING_LENGTH 18
 static struct string_desc {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
@@ -23,12 +23,10 @@ static struct string_desc {
 	.bLength = MSOS_STRING_LENGTH,
 	.bDescriptorType = USB_STRING_DESC,
 	/* Signature MSFT100 */
-	.bString = {
-		'M', 0x00, 'S', 0x00, 'F', 0x00, 'T', 0x00,
-		'1', 0x00, '0', 0x00, '0', 0x00
-	},
-	.bMS_VendorCode = 0x03,	/* Vendor Code, used for a control request */
-	.bPad = 0x00,		/* Padding byte for VendorCode look as UTF16 */
+	.bString = { 'M', 0x00, 'S', 0x00, 'F', 0x00, 'T', 0x00, '1', 0x00, '0',
+		     0x00, '0', 0x00 },
+	.bMS_VendorCode = 0x03, /* Vendor Code, used for a control request */
+	.bPad = 0x00, /* Padding byte for VendorCode look as UTF16 */
 };
 
 static struct compat_id_desc {
@@ -46,31 +44,32 @@ static struct compat_id_desc {
 		uint8_t subCompatibleID[8];
 		uint8_t Reserved2[6];
 	} __packed func[1];
-} __packed msosv1_compatid_descriptor = {
-	.dwLength = sys_cpu_to_le32(40),
-	.bcdVersion = sys_cpu_to_le16(0x0100),
-	.wIndex = sys_cpu_to_le16(USB_OSDESC_EXTENDED_COMPAT_ID),
-	.bCount = 0x01, /* One function section */
-	.Reserved = {
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-	},
+} __packed
+	msosv1_compatid_descriptor = { .dwLength = sys_cpu_to_le32(40),
+				       .bcdVersion = sys_cpu_to_le16(0x0100),
+				       .wIndex = sys_cpu_to_le16(
+					       USB_OSDESC_EXTENDED_COMPAT_ID),
+				       .bCount =
+					       0x01, /* One function section */
+				       .Reserved = { 0x00, 0x00, 0x00, 0x00,
+						     0x00, 0x00, 0x00 },
 
-	.func = {
-		{
-			.bFirstInterfaceNumber = 0x00,
-			.Reserved1 = 0x01,
-			.compatibleID = {
-				'R', 'N', 'D', 'I', 'S', 0x00, 0x00, 0x00
-			},
-			.subCompatibleID = {
-				'5', '1', '6', '2', '0', '0', '1', 0x00
-			},
-			.Reserved2 = {
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-			}
-		},
-	}
-};
+				       .func = {
+					       { .bFirstInterfaceNumber = 0x00,
+						 .Reserved1 = 0x01,
+						 .compatibleID = { 'R', 'N',
+								   'D', 'I',
+								   'S', 0x00,
+								   0x00, 0x00 },
+						 .subCompatibleID = { '5', '1',
+								      '6', '2',
+								      '0', '0',
+								      '1',
+								      0x00 },
+						 .Reserved2 = { 0x00, 0x00,
+								0x00, 0x00,
+								0x00, 0x00 } },
+				       } };
 
 static struct usb_os_descriptor os_desc = {
 	.string = (uint8_t *)&msosv1_string_descriptor,
@@ -142,8 +141,7 @@ static void test_osdesc_feature(void)
 /* test case main entry */
 void test_main(void)
 {
-	ztest_test_suite(test_osdesc,
-			 ztest_unit_test(test_osdesc_string),
+	ztest_test_suite(test_osdesc, ztest_unit_test(test_osdesc_string),
 			 ztest_unit_test(test_osdesc_feature));
 	ztest_run_test_suite(test_osdesc);
 }

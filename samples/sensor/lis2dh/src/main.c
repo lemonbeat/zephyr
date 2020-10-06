@@ -25,15 +25,13 @@ static void fetch_and_display(const struct device *sensor)
 		rc = 0;
 	}
 	if (rc == 0) {
-		rc = sensor_channel_get(sensor,
-					SENSOR_CHAN_ACCEL_XYZ,
-					accel);
+		rc = sensor_channel_get(sensor, SENSOR_CHAN_ACCEL_XYZ, accel);
 	}
 	if (rc < 0) {
 		printf("ERROR: Update failed: %d\n", rc);
 	} else {
-		printf("#%u @ %u ms: %sx %f , y %f , z %f\n",
-		       count, k_uptime_get_32(), overrun,
+		printf("#%u @ %u ms: %sx %f , y %f , z %f\n", count,
+		       k_uptime_get_32(), overrun,
 		       sensor_value_to_double(&accel[0]),
 		       sensor_value_to_double(&accel[1]),
 		       sensor_value_to_double(&accel[2]));
@@ -50,7 +48,8 @@ static void trigger_handler(const struct device *dev,
 
 void main(void)
 {
-	const struct device *sensor = device_get_binding(DT_LABEL(DT_INST(0, st_lis2dh)));
+	const struct device *sensor =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lis2dh)));
 
 	if (sensor == NULL) {
 		printf("Could not get %s device\n",

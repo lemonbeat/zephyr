@@ -23,7 +23,7 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(cdc_acm_composite, LOG_LEVEL_INF);
 
-#define RING_BUF_SIZE	(64 * 2)
+#define RING_BUF_SIZE (64 * 2)
 
 uint8_t buffer0[RING_BUF_SIZE];
 uint8_t buffer1[RING_BUF_SIZE];
@@ -47,7 +47,7 @@ static void interrupt_handler(const struct device *dev, void *user_data)
 			uint8_t buf[64];
 			size_t read, wrote;
 			struct ring_buf *ringbuf =
-					&dev_data->peer_data->ringbuf;
+				&dev_data->peer_data->ringbuf;
 
 			read = uart_fifo_read(dev, buf, sizeof(buf));
 			if (read) {
@@ -58,8 +58,8 @@ static void interrupt_handler(const struct device *dev, void *user_data)
 
 				uart_irq_tx_enable(dev_data->peer);
 
-				LOG_DBG("dev %p -> dev %p send %u bytes",
-					dev, peer, wrote);
+				LOG_DBG("dev %p -> dev %p send %u bytes", dev,
+					peer, wrote);
 			}
 		}
 

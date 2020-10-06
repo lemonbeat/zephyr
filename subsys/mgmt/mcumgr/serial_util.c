@@ -63,8 +63,8 @@ static int mcumgr_serial_decode_frag(struct mcumgr_serial_rx_ctxt *rx_ctxt,
 	int rc;
 
 	rc = base64_decode(rx_ctxt->nb->data + rx_ctxt->nb->len,
-				   net_buf_tailroom(rx_ctxt->nb), &dec_len,
-				   frag, frag_len);
+			   net_buf_tailroom(rx_ctxt->nb), &dec_len, frag,
+			   frag_len);
 	if (rc != 0) {
 		return -EINVAL;
 	}
@@ -81,9 +81,9 @@ static int mcumgr_serial_decode_frag(struct mcumgr_serial_rx_ctxt *rx_ctxt,
  *                              false if the frame is invalid or if additional
  *                                  fragments are expected.
  */
-struct net_buf *mcumgr_serial_process_frag(
-	struct mcumgr_serial_rx_ctxt *rx_ctxt,
-	const uint8_t *frag, int frag_len)
+struct net_buf *
+mcumgr_serial_process_frag(struct mcumgr_serial_rx_ctxt *rx_ctxt,
+			   const uint8_t *frag, int frag_len)
 {
 	struct net_buf *nb;
 	uint16_t crc;
@@ -114,8 +114,7 @@ struct net_buf *mcumgr_serial_process_frag(
 		return NULL;
 	}
 
-	rc = mcumgr_serial_decode_frag(rx_ctxt,
-				       frag + sizeof(op),
+	rc = mcumgr_serial_decode_frag(rx_ctxt, frag + sizeof(op),
 				       frag_len - sizeof(op));
 	if (rc != 0) {
 		mcumgr_serial_free_rx_ctxt(rx_ctxt);
@@ -316,10 +315,8 @@ int mcumgr_serial_tx_pkt(const uint8_t *data, int len, mcumgr_serial_tx_cb cb,
 	/* Transmit packet as a sequence of frames. */
 	src_off = 0;
 	while (src_off < len) {
-		rc = mcumgr_serial_tx_frame(data + src_off,
-					    src_off == 0,
-					    len - src_off,
-					    crc, cb, arg,
+		rc = mcumgr_serial_tx_frame(data + src_off, src_off == 0,
+					    len - src_off, crc, cb, arg,
 					    &data_bytes_txed);
 		if (rc != 0) {
 			return rc;

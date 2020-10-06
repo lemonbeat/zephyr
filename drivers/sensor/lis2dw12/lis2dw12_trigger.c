@@ -32,7 +32,7 @@ static int lis2dw12_enable_int(const struct device *dev,
 	if (cfg->int_pin == 1U) {
 		/* set interrupt for pin INT1 */
 		lis2dw12_pin_int1_route_get(lis2dw12->ctx,
-				&int_route.ctrl4_int1_pad_ctrl);
+					    &int_route.ctrl4_int1_pad_ctrl);
 
 		switch (type) {
 		case SENSOR_TRIG_DATA_READY:
@@ -51,8 +51,8 @@ static int lis2dw12_enable_int(const struct device *dev,
 			return -ENOTSUP;
 		}
 
-		return lis2dw12_pin_int1_route_set(lis2dw12->ctx,
-				&int_route.ctrl4_int1_pad_ctrl);
+		return lis2dw12_pin_int1_route_set(
+			lis2dw12->ctx, &int_route.ctrl4_int1_pad_ctrl);
 	} else {
 		/* set interrupt for pin INT2 */
 		lis2dw12_pin_int2_route_get(lis2dw12->ctx,
@@ -67,8 +67,8 @@ static int lis2dw12_enable_int(const struct device *dev,
 			return -ENOTSUP;
 		}
 
-		return lis2dw12_pin_int2_route_set(lis2dw12->ctx,
-				&int_route.ctrl5_int2_pad_ctrl);
+		return lis2dw12_pin_int2_route_set(
+			lis2dw12->ctx, &int_route.ctrl5_int2_pad_ctrl);
 	}
 }
 
@@ -76,8 +76,8 @@ static int lis2dw12_enable_int(const struct device *dev,
  * lis2dw12_trigger_set - link external trigger to event data ready
  */
 int lis2dw12_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler)
+			 const struct sensor_trigger *trig,
+			 sensor_trigger_handler_t handler)
 {
 	struct lis2dw12_data *lis2dw12 = dev->data;
 	union axis3bit16_t raw;
@@ -189,7 +189,7 @@ static void lis2dw12_handle_interrupt(const struct device *dev)
 }
 
 static void lis2dw12_gpio_callback(const struct device *dev,
-				    struct gpio_callback *cb, uint32_t pins)
+				   struct gpio_callback *cb, uint32_t pins)
 {
 	struct lis2dw12_data *lis2dw12 =
 		CONTAINER_OF(cb, struct lis2dw12_data, gpio_cb);
@@ -198,8 +198,7 @@ static void lis2dw12_gpio_callback(const struct device *dev,
 		return;
 	}
 
-	gpio_pin_interrupt_configure(dev, lis2dw12->gpio_pin,
-				     GPIO_INT_DISABLE);
+	gpio_pin_interrupt_configure(dev, lis2dw12->gpio_pin, GPIO_INT_DISABLE);
 
 #if defined(CONFIG_LIS2DW12_TRIGGER_OWN_THREAD)
 	k_sem_give(&lis2dw12->gpio_sem);
@@ -237,8 +236,7 @@ int lis2dw12_init_interrupt(const struct device *dev)
 	/* setup data ready gpio interrupt (INT1 or INT2) */
 	lis2dw12->gpio = device_get_binding(cfg->int_gpio_port);
 	if (lis2dw12->gpio == NULL) {
-		LOG_DBG("Cannot get pointer to %s device",
-			    cfg->int_gpio_port);
+		LOG_DBG("Cannot get pointer to %s device", cfg->int_gpio_port);
 		return -EINVAL;
 	}
 
@@ -248,10 +246,10 @@ int lis2dw12_init_interrupt(const struct device *dev)
 	k_sem_init(&lis2dw12->gpio_sem, 0, UINT_MAX);
 
 	k_thread_create(&lis2dw12->thread, lis2dw12->thread_stack,
-		       CONFIG_LIS2DW12_THREAD_STACK_SIZE,
-		       (k_thread_entry_t)lis2dw12_thread, lis2dw12,
-		       NULL, NULL, K_PRIO_COOP(CONFIG_LIS2DW12_THREAD_PRIORITY),
-		       0, K_NO_WAIT);
+			CONFIG_LIS2DW12_THREAD_STACK_SIZE,
+			(k_thread_entry_t)lis2dw12_thread, lis2dw12, NULL, NULL,
+			K_PRIO_COOP(CONFIG_LIS2DW12_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_LIS2DW12_TRIGGER_GLOBAL_THREAD)
 	lis2dw12->work.handler = lis2dw12_work_cb;
 #endif /* CONFIG_LIS2DW12_TRIGGER_OWN_THREAD */
@@ -265,8 +263,7 @@ int lis2dw12_init_interrupt(const struct device *dev)
 		return ret;
 	}
 
-	gpio_init_callback(&lis2dw12->gpio_cb,
-			   lis2dw12_gpio_callback,
+	gpio_init_callback(&lis2dw12->gpio_cb, lis2dw12_gpio_callback,
 			   BIT(cfg->int_gpio_pin));
 
 	if (gpio_add_callback(lis2dw12->gpio, &lis2dw12->gpio_cb) < 0) {

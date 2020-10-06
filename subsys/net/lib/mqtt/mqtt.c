@@ -135,7 +135,8 @@ static int client_write(struct mqtt_client *client, const uint8_t *data,
 	err_code = mqtt_transport_write(client, data, datalen);
 	if (err_code < 0) {
 		MQTT_TRC("Transport write failed, err_code = %d, "
-			 "closing connection", err_code);
+			 "closing connection",
+			 err_code);
 		client_disconnect(client, err_code, true);
 		return err_code;
 	}
@@ -156,7 +157,8 @@ static int client_write_msg(struct mqtt_client *client,
 	err_code = mqtt_transport_write_msg(client, message);
 	if (err_code < 0) {
 		MQTT_TRC("Transport write failed, err_code = %d, "
-			 "closing connection", err_code);
+			 "closing connection",
+			 err_code);
 		client_disconnect(client, err_code, true);
 		return err_code;
 	}
@@ -183,8 +185,7 @@ void mqtt_client_init(struct mqtt_client *client)
 
 #if defined(CONFIG_SOCKS)
 int mqtt_client_set_proxy(struct mqtt_client *client,
-			  struct sockaddr *proxy_addr,
-			  socklen_t addrlen)
+			  struct sockaddr *proxy_addr, socklen_t addrlen)
 {
 	if (IS_ENABLED(CONFIG_SOCKS)) {
 		if (!client || !proxy_addr) {
@@ -248,9 +249,9 @@ int mqtt_publish(struct mqtt_client *client,
 	NULL_PARAM_CHECK(param);
 
 	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Topic size 0x%08x, "
-		 "Data size 0x%08x", client, client->internal.state,
-		 param->message.topic.topic.size,
-		 param->message.payload.len);
+		 "Data size 0x%08x",
+		 client, client->internal.state,
+		 param->message.topic.topic.size, param->message.payload.len);
 
 	mqtt_mutex_lock(client);
 
@@ -279,8 +280,8 @@ int mqtt_publish(struct mqtt_client *client,
 	err_code = client_write_msg(client, &msg);
 
 error:
-	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x",
-			 client, client->internal.state, err_code);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x", client,
+		 client->internal.state, err_code);
 
 	mqtt_mutex_unlock(client);
 
@@ -296,8 +297,8 @@ int mqtt_publish_qos1_ack(struct mqtt_client *client,
 	NULL_PARAM_CHECK(client);
 	NULL_PARAM_CHECK(param);
 
-	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x",
-		 client, client->internal.state, param->message_id);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x", client,
+		 client->internal.state, param->message_id);
 
 	mqtt_mutex_lock(client);
 
@@ -316,8 +317,8 @@ int mqtt_publish_qos1_ack(struct mqtt_client *client,
 	err_code = client_write(client, packet.cur, packet.end - packet.cur);
 
 error:
-	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x",
-		 client, client->internal.state, err_code);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x", client,
+		 client->internal.state, err_code);
 
 	mqtt_mutex_unlock(client);
 
@@ -333,8 +334,8 @@ int mqtt_publish_qos2_receive(struct mqtt_client *client,
 	NULL_PARAM_CHECK(client);
 	NULL_PARAM_CHECK(param);
 
-	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x",
-		 client, client->internal.state, param->message_id);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x", client,
+		 client->internal.state, param->message_id);
 
 	mqtt_mutex_lock(client);
 
@@ -353,8 +354,8 @@ int mqtt_publish_qos2_receive(struct mqtt_client *client,
 	err_code = client_write(client, packet.cur, packet.end - packet.cur);
 
 error:
-	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x",
-		 client, client->internal.state, err_code);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x", client,
+		 client->internal.state, err_code);
 
 	mqtt_mutex_unlock(client);
 
@@ -370,8 +371,8 @@ int mqtt_publish_qos2_release(struct mqtt_client *client,
 	NULL_PARAM_CHECK(client);
 	NULL_PARAM_CHECK(param);
 
-	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x",
-		 client, client->internal.state, param->message_id);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x", client,
+		 client->internal.state, param->message_id);
 
 	mqtt_mutex_lock(client);
 
@@ -390,8 +391,8 @@ int mqtt_publish_qos2_release(struct mqtt_client *client,
 	err_code = client_write(client, packet.cur, packet.end - packet.cur);
 
 error:
-	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x",
-		 client, client->internal.state, err_code);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x", client,
+		 client->internal.state, err_code);
 
 	mqtt_mutex_unlock(client);
 
@@ -407,8 +408,8 @@ int mqtt_publish_qos2_complete(struct mqtt_client *client,
 	NULL_PARAM_CHECK(client);
 	NULL_PARAM_CHECK(param);
 
-	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x",
-		 client, client->internal.state, param->message_id);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: >> Message id 0x%04x", client,
+		 client->internal.state, param->message_id);
 
 	mqtt_mutex_lock(client);
 
@@ -430,8 +431,8 @@ int mqtt_publish_qos2_complete(struct mqtt_client *client,
 	}
 
 error:
-	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x",
-		 client, client->internal.state, err_code);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x", client,
+		 client->internal.state, err_code);
 
 	mqtt_mutex_unlock(client);
 
@@ -482,8 +483,9 @@ int mqtt_subscribe(struct mqtt_client *client,
 	NULL_PARAM_CHECK(param);
 
 	MQTT_TRC("[CID %p]:[State 0x%02x]: >> message id 0x%04x "
-		 "topic count 0x%04x", client, client->internal.state,
-		 param->message_id, param->list_count);
+		 "topic count 0x%04x",
+		 client, client->internal.state, param->message_id,
+		 param->list_count);
 
 	mqtt_mutex_lock(client);
 
@@ -502,8 +504,8 @@ int mqtt_subscribe(struct mqtt_client *client,
 	err_code = client_write(client, packet.cur, packet.end - packet.cur);
 
 error:
-	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x",
-		 client, client->internal.state, err_code);
+	MQTT_TRC("[CID %p]:[State 0x%02x]: << result 0x%08x", client,
+		 client->internal.state, err_code);
 
 	mqtt_mutex_unlock(client);
 
@@ -601,8 +603,8 @@ int mqtt_live(struct mqtt_client *client)
 
 	mqtt_mutex_lock(client);
 
-	elapsed_time = mqtt_elapsed_time_in_ms_get(
-				client->internal.last_activity);
+	elapsed_time =
+		mqtt_elapsed_time_in_ms_get(client->internal.last_activity);
 	if ((client->keepalive > 0) &&
 	    (elapsed_time >= (client->keepalive * 1000))) {
 		err_code = mqtt_ping(client);
@@ -620,8 +622,8 @@ int mqtt_live(struct mqtt_client *client)
 
 uint32_t mqtt_keepalive_time_left(const struct mqtt_client *client)
 {
-	uint32_t elapsed_time = mqtt_elapsed_time_in_ms_get(
-					client->internal.last_activity);
+	uint32_t elapsed_time =
+		mqtt_elapsed_time_in_ms_get(client->internal.last_activity);
 	uint32_t keepalive_ms = 1000U * client->keepalive;
 
 	if (client->keepalive == 0) {

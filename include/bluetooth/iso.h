@@ -29,9 +29,8 @@ extern "C" {
 /** @def BT_ISO_CHAN_SEND_RESERVE
  *  @brief Headroom needed for outgoing buffers
  */
-#define BT_ISO_CHAN_SEND_RESERVE (CONFIG_BT_HCI_RESERVE + \
-				  BT_HCI_ISO_HDR_SIZE + \
-				  BT_HCI_ISO_DATA_HDR_SIZE)
+#define BT_ISO_CHAN_SEND_RESERVE \
+	(CONFIG_BT_HCI_RESERVE + BT_HCI_ISO_HDR_SIZE + BT_HCI_ISO_DATA_HDR_SIZE)
 
 struct bt_iso_chan;
 
@@ -55,24 +54,20 @@ enum {
 /** @brief ISO Channel structure. */
 struct bt_iso_chan {
 	/** Channel connection reference */
-	struct bt_conn			*conn;
+	struct bt_conn *conn;
 	/** Channel operations reference */
-	struct bt_iso_chan_ops		*ops;
+	struct bt_iso_chan_ops *ops;
 	/** Channel QoS reference */
-	struct bt_iso_chan_qos		*qos;
+	struct bt_iso_chan_qos *qos;
 	/** Channel data path reference*/
-	struct bt_iso_chan_path		*path;
-	sys_snode_t			node;
-	uint8_t				state;
-	bt_security_t			required_sec_level;
+	struct bt_iso_chan_path *path;
+	sys_snode_t node;
+	uint8_t state;
+	bt_security_t required_sec_level;
 };
 
 /** @brief Audio QoS direction */
-enum {
-	BT_ISO_CHAN_QOS_IN,
-	BT_ISO_CHAN_QOS_OUT,
-	BT_ISO_CHAN_QOS_INOUT
-};
+enum { BT_ISO_CHAN_QOS_IN, BT_ISO_CHAN_QOS_OUT, BT_ISO_CHAN_QOS_INOUT };
 
 /** @brief ISO Channel QoS structure. */
 struct bt_iso_chan_qos {
@@ -81,41 +76,41 @@ struct bt_iso_chan_qos {
 	 *  Possible values: BT_ISO_CHAN_QOS_IN, BT_ISO_CHAN_QOS_OUT or
 	 *  BT_ISO_CHAN_QOS_INOUT.
 	 */
-	uint8_t				dir;
+	uint8_t dir;
 	/** Channel interval */
-	uint32_t			interval;
+	uint32_t interval;
 	/** Channel SCA */
-	uint8_t				sca;
+	uint8_t sca;
 	/** Channel packing mode */
-	uint8_t				packing;
+	uint8_t packing;
 	/** Channel framing mode */
-	uint8_t				framing;
+	uint8_t framing;
 	/** Channel Latency */
-	uint16_t			latency;
+	uint16_t latency;
 	/** Channel SDU */
-	uint8_t				sdu;
+	uint8_t sdu;
 	/** Channel PHY */
-	uint8_t				phy;
+	uint8_t phy;
 	/** Channel Retransmission Number */
-	uint8_t				rtn;
+	uint8_t rtn;
 };
 
 /** @brief ISO Channel Data Path structure. */
 struct bt_iso_chan_path {
 	/** Default path ID */
-	uint8_t				pid;
+	uint8_t pid;
 	/** Coding Format */
-	uint8_t				format;
+	uint8_t format;
 	/** Company ID */
-	uint16_t			cid;
+	uint16_t cid;
 	/** Vendor-defined Codec ID */
-	uint16_t			vid;
+	uint16_t vid;
 	/** Controller Delay */
-	uint32_t			delay;
+	uint32_t delay;
 	/** Codec Configuration length*/
-	uint8_t				cc_len;
+	uint8_t cc_len;
 	/** Codec Configuration */
-	uint8_t				cc[0];
+	uint8_t cc[0];
 };
 
 /** @brief ISO Channel operations structure. */
@@ -161,7 +156,7 @@ struct bt_iso_chan_ops {
 /** @brief ISO Server structure. */
 struct bt_iso_server {
 	/** Required minimim security level */
-	bt_security_t		sec_level;
+	bt_security_t sec_level;
 
 	/** @brief Server accept callback
 	 *

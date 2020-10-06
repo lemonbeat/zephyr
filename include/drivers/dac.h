@@ -55,8 +55,8 @@ typedef int (*dac_api_channel_setup)(const struct device *dev,
  * Type definition of DAC API function for setting a write request.
  * See dac_write_value() for argument descriptions.
  */
-typedef int (*dac_api_write_value)(const struct device *dev,
-				    uint8_t channel, uint32_t value);
+typedef int (*dac_api_write_value)(const struct device *dev, uint8_t channel,
+				   uint32_t value);
 
 /*
  * DAC driver API
@@ -65,7 +65,7 @@ typedef int (*dac_api_write_value)(const struct device *dev,
  */
 __subsystem struct dac_driver_api {
 	dac_api_channel_setup channel_setup;
-	dac_api_write_value   write_value;
+	dac_api_write_value write_value;
 };
 
 /**
@@ -88,11 +88,12 @@ __subsystem struct dac_driver_api {
 __syscall int dac_channel_setup(const struct device *dev,
 				const struct dac_channel_cfg *channel_cfg);
 
-static inline int z_impl_dac_channel_setup(const struct device *dev,
-					   const struct dac_channel_cfg *channel_cfg)
+static inline int
+z_impl_dac_channel_setup(const struct device *dev,
+			 const struct dac_channel_cfg *channel_cfg)
 {
 	const struct dac_driver_api *api =
-				(const struct dac_driver_api *)dev->api;
+		(const struct dac_driver_api *)dev->api;
 
 	return api->channel_setup(dev, channel_cfg);
 }
@@ -111,10 +112,10 @@ __syscall int dac_write_value(const struct device *dev, uint8_t channel,
 			      uint32_t value);
 
 static inline int z_impl_dac_write_value(const struct device *dev,
-						uint8_t channel, uint32_t value)
+					 uint8_t channel, uint32_t value)
 {
 	const struct dac_driver_api *api =
-				(const struct dac_driver_api *)dev->api;
+		(const struct dac_driver_api *)dev->api;
 
 	return api->write_value(dev, channel, value);
 }
@@ -129,4 +130,4 @@ static inline int z_impl_dac_write_value(const struct device *dev,
 
 #include <syscalls/dac.h>
 
-#endif  /* ZEPHYR_INCLUDE_DRIVERS_DAC_H_ */
+#endif /* ZEPHYR_INCLUDE_DRIVERS_DAC_H_ */

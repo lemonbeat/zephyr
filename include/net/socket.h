@@ -123,7 +123,7 @@ struct zsock_pollfd {
 /** @} */
 
 /* Valid values for TLS_PEER_VERIFY option */
-#define TLS_PEER_VERIFY_NONE 0     /**< Peer verification disabled. */
+#define TLS_PEER_VERIFY_NONE 0 /**< Peer verification disabled. */
 #define TLS_PEER_VERIFY_OPTIONAL 1 /**< Peer verification optional. */
 #define TLS_PEER_VERIFY_REQUIRED 2 /**< Peer verification required. */
 
@@ -314,8 +314,8 @@ __syscall int zsock_accept(int sock, struct sockaddr *addr, socklen_t *addrlen);
  * if :option:`CONFIG_NET_SOCKETS_POSIX_NAMES` is defined.
  * @endrst
  */
-__syscall ssize_t zsock_sendto(int sock, const void *buf, size_t len,
-			       int flags, const struct sockaddr *dest_addr,
+__syscall ssize_t zsock_sendto(int sock, const void *buf, size_t len, int flags,
+			       const struct sockaddr *dest_addr,
 			       socklen_t addrlen);
 
 /**
@@ -348,8 +348,7 @@ static inline ssize_t zsock_send(int sock, const void *buf, size_t len,
  * if :option:`CONFIG_NET_SOCKETS_POSIX_NAMES` is defined.
  * @endrst
  */
-__syscall ssize_t zsock_sendmsg(int sock, const struct msghdr *msg,
-				int flags);
+__syscall ssize_t zsock_sendmsg(int sock, const struct msghdr *msg, int flags);
 
 /**
  * @brief Receive data from an arbitrary network address
@@ -363,9 +362,8 @@ __syscall ssize_t zsock_sendmsg(int sock, const struct msghdr *msg,
  * if :option:`CONFIG_NET_SOCKETS_POSIX_NAMES` is defined.
  * @endrst
  */
-__syscall ssize_t zsock_recvfrom(int sock, void *buf, size_t max_len,
-				 int flags, struct sockaddr *src_addr,
-				 socklen_t *addrlen);
+__syscall ssize_t zsock_recvfrom(int sock, void *buf, size_t max_len, int flags,
+				 struct sockaddr *src_addr, socklen_t *addrlen);
 
 /**
  * @brief Receive data from a connected peer
@@ -379,8 +377,7 @@ __syscall ssize_t zsock_recvfrom(int sock, void *buf, size_t max_len,
  * if :option:`CONFIG_NET_SOCKETS_POSIX_NAMES` is defined.
  * @endrst
  */
-static inline ssize_t zsock_recv(int sock, void *buf, size_t max_len,
-				 int flags)
+static inline ssize_t zsock_recv(int sock, void *buf, size_t max_len, int flags)
 {
 	return zsock_recvfrom(sock, buf, max_len, flags, NULL, NULL);
 }
@@ -430,8 +427,8 @@ __syscall int zsock_poll(struct zsock_pollfd *fds, int nfds, int timeout);
  * if :option:`CONFIG_NET_SOCKETS_POSIX_NAMES` is defined.
  * @endrst
  */
-__syscall int zsock_getsockopt(int sock, int level, int optname,
-			       void *optval, socklen_t *optlen);
+__syscall int zsock_getsockopt(int sock, int level, int optname, void *optval,
+			       socklen_t *optlen);
 
 /**
  * @brief Set various socket options
@@ -611,8 +608,8 @@ const char *zsock_gai_strerror(int errcode);
  * @endrst
  */
 int zsock_getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
-		      char *host, socklen_t hostlen,
-		      char *serv, socklen_t servlen, int flags);
+		      char *host, socklen_t hostlen, char *serv,
+		      socklen_t servlen, int flags);
 
 #if defined(CONFIG_NET_SOCKETS_POSIX_NAMES)
 
@@ -679,8 +676,7 @@ static inline ssize_t sendto(int sock, const void *buf, size_t len, int flags,
 	return zsock_sendto(sock, buf, len, flags, dest_addr, addrlen);
 }
 
-static inline ssize_t sendmsg(int sock, const struct msghdr *message,
-			      int flags)
+static inline ssize_t sendmsg(int sock, const struct msghdr *message, int flags)
 {
 	return zsock_sendmsg(sock, message, flags);
 }
@@ -696,8 +692,8 @@ static inline int poll(struct zsock_pollfd *fds, int nfds, int timeout)
 	return zsock_poll(fds, nfds, timeout);
 }
 
-static inline int getsockopt(int sock, int level, int optname,
-			     void *optval, socklen_t *optlen)
+static inline int getsockopt(int sock, int level, int optname, void *optval,
+			     socklen_t *optlen)
 {
 	return zsock_getsockopt(sock, level, optname, optval, optlen);
 }
@@ -732,11 +728,11 @@ static inline const char *gai_strerror(int errcode)
 }
 
 static inline int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
-			      char *host, socklen_t hostlen,
-			      char *serv, socklen_t servlen, int flags)
+			      char *host, socklen_t hostlen, char *serv,
+			      socklen_t servlen, int flags)
 {
-	return zsock_getnameinfo(addr, addrlen, host, hostlen,
-				 serv, servlen, flags);
+	return zsock_getnameinfo(addr, addrlen, host, hostlen, serv, servlen,
+				 flags);
 }
 
 #define addrinfo zsock_addrinfo
@@ -821,15 +817,14 @@ struct net_socket_register {
 	int (*handler)(int family, int type, int proto);
 };
 
-#define NET_SOCKET_GET_NAME(socket_name)	\
-	(__net_socket_register_##socket_name)
+#define NET_SOCKET_GET_NAME(socket_name) (__net_socket_register_##socket_name)
 
 #define NET_SOCKET_REGISTER(socket_name, _family, _is_supported, _handler) \
-	static const Z_STRUCT_SECTION_ITERABLE(net_socket_register,	\
-			NET_SOCKET_GET_NAME(socket_name)) = {		\
-		.family = _family,					\
-		.is_supported = _is_supported,				\
-		.handler = _handler,					\
+	static const Z_STRUCT_SECTION_ITERABLE(                            \
+		net_socket_register, NET_SOCKET_GET_NAME(socket_name)) = { \
+		.family = _family,                                         \
+		.is_supported = _is_supported,                             \
+		.handler = _handler,                                       \
 	}
 
 /** @endcond */

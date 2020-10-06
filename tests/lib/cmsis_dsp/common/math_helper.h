@@ -52,26 +52,26 @@
  */
 
 /* If NaN, force SNR to 0.0 to ensure test will fail */
-#define IFNANRETURNZERO(val)		\
-	do {				\
-		if (isnan((val))) {	\
-			return 0.0;	\
-		}			\
+#define IFNANRETURNZERO(val)        \
+	do {                        \
+		if (isnan((val))) { \
+			return 0.0; \
+		}                   \
 	} while (0)
 
-#define IFINFINITERETURN(val, def)		\
-	do {					\
-		if (isinf((val))) {		\
-			if ((val) > 0) {	\
-				return def;	\
-			} else {		\
-				return -def;	\
-			}			\
-		}				\
+#define IFINFINITERETURN(val, def)           \
+	do {                                 \
+		if (isinf((val))) {          \
+			if ((val) > 0) {     \
+				return def;  \
+			} else {             \
+				return -def; \
+			}                    \
+		}                            \
 	} while (0)
 
 static inline double arm_snr_f64(const double *pRef, const double *pTest,
-	uint32_t buffSize)
+				 uint32_t buffSize)
 {
 	double EnergySignal = 0.0, EnergyError = 0.0;
 	uint32_t i;
@@ -101,7 +101,7 @@ static inline double arm_snr_f64(const double *pRef, const double *pTest,
 }
 
 static inline float arm_snr_f32(const float *pRef, const float *pTest,
-	uint32_t buffSize)
+				uint32_t buffSize)
 {
 	float EnergySignal = 0.0, EnergyError = 0.0;
 	uint32_t i;
@@ -121,7 +121,6 @@ static inline float arm_snr_f32(const float *pRef, const float *pTest,
 	/* Checking for a NAN value in EnergyError */
 	IFNANRETURNZERO(EnergyError);
 
-
 	SNR = 10 * log10f(EnergySignal / EnergyError);
 
 	/* Checking for a NAN value in SNR */
@@ -132,7 +131,7 @@ static inline float arm_snr_f32(const float *pRef, const float *pTest,
 }
 
 static inline float arm_snr_q63(const q63_t *pRef, const q63_t *pTest,
-	uint32_t buffSize)
+				uint32_t buffSize)
 {
 	double EnergySignal = 0.0, EnergyError = 0.0;
 	uint32_t i;
@@ -148,7 +147,6 @@ static inline float arm_snr_q63(const q63_t *pRef, const q63_t *pTest,
 		EnergyError += (refVal - testVal) * (refVal - testVal);
 	}
 
-
 	SNR = 10 * log10(EnergySignal / EnergyError);
 
 	/* Checking for a NAN value in SNR */
@@ -159,7 +157,7 @@ static inline float arm_snr_q63(const q63_t *pRef, const q63_t *pTest,
 }
 
 static inline float arm_snr_q31(const q31_t *pRef, const q31_t *pTest,
-	uint32_t buffSize)
+				uint32_t buffSize)
 {
 	float EnergySignal = 0.0, EnergyError = 0.0;
 	uint32_t i;
@@ -168,14 +166,12 @@ static inline float arm_snr_q31(const q31_t *pRef, const q31_t *pTest,
 	float32_t testVal, refVal;
 
 	for (i = 0; i < buffSize; i++) {
-
 		testVal = ((float32_t)pTest[i]) / 2147483648.0f;
 		refVal = ((float32_t)pRef[i]) / 2147483648.0f;
 
 		EnergySignal += refVal * refVal;
 		EnergyError += (refVal - testVal) * (refVal - testVal);
 	}
-
 
 	SNR = 10 * log10f(EnergySignal / EnergyError);
 
@@ -187,7 +183,7 @@ static inline float arm_snr_q31(const q31_t *pRef, const q31_t *pTest,
 }
 
 static inline float arm_snr_q15(const q15_t *pRef, const q15_t *pTest,
-	uint32_t buffSize)
+				uint32_t buffSize)
 {
 	float EnergySignal = 0.0, EnergyError = 0.0;
 	uint32_t i;
@@ -213,7 +209,7 @@ static inline float arm_snr_q15(const q15_t *pRef, const q15_t *pTest,
 }
 
 static inline float arm_snr_q7(const q7_t *pRef, const q7_t *pTest,
-	uint32_t buffSize)
+			       uint32_t buffSize)
 {
 	float EnergySignal = 0.0, EnergyError = 0.0;
 	uint32_t i;

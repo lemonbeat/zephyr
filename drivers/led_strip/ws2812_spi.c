@@ -39,8 +39,9 @@ LOG_MODULE_REGISTER(ws2812_spi);
  * - no shenanigans (don't hold CS, don't hold the device lock, this
  *   isn't an EEPROM)
  */
-#define SPI_OPER (SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB | \
-		  SPI_WORD_SET(SPI_FRAME_BITS) | SPI_LINES_SINGLE)
+#define SPI_OPER                                 \
+	(SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB | \
+	 SPI_WORD_SET(SPI_FRAME_BITS) | SPI_LINES_SINGLE)
 
 #define BYTES_PER_PX(has_white) ((has_white) ? 32 : 24)
 
@@ -73,7 +74,8 @@ static const struct ws2812_spi_cfg *dev_cfg(const struct device *dev)
  * one_frame, and zero bit becomes zero_frame.
  */
 static inline void ws2812_spi_ser(uint8_t buf[8], uint8_t color,
-				  const uint8_t one_frame, const uint8_t zero_frame)
+				  const uint8_t one_frame,
+				  const uint8_t zero_frame)
 {
 	int i;
 
@@ -110,8 +112,7 @@ static inline void ws2812_reset_delay(void)
 }
 
 static int ws2812_strip_update_rgb(const struct device *dev,
-				   struct led_rgb *pixels,
-				   size_t num_pixels)
+				   struct led_rgb *pixels, size_t num_pixels)
 {
 	const struct ws2812_spi_cfg *cfg = dev_cfg(dev);
 	const uint8_t one = cfg->one_frame, zero = cfg->zero_frame;
@@ -119,10 +120,7 @@ static int ws2812_strip_update_rgb(const struct device *dev,
 		.buf = cfg->px_buf,
 		.len = cfg->px_buf_size,
 	};
-	const struct spi_buf_set tx = {
-		.buffers = &buf,
-		.count = 1
-	};
+	const struct spi_buf_set tx = { .buffers = &buf, .count = 1 };
 	uint8_t *px_buf = cfg->px_buf;
 	size_t i;
 	int rc;
@@ -158,8 +156,7 @@ static int ws2812_strip_update_rgb(const struct device *dev,
 }
 
 static int ws2812_strip_update_channels(const struct device *dev,
-					uint8_t *channels,
-					size_t num_channels)
+					uint8_t *channels, size_t num_channels)
 {
 	LOG_ERR("update_channels not implemented");
 	return -ENOTSUP;
@@ -170,31 +167,23 @@ static const struct led_strip_driver_api ws2812_spi_api = {
 	.update_channels = ws2812_strip_update_channels,
 };
 
-#define WS2812_SPI_LABEL(idx) \
-	(DT_INST_LABEL(idx))
-#define WS2812_SPI_NUM_PIXELS(idx) \
-	(DT_INST_PROP(idx, chain_length))
-#define WS2812_SPI_HAS_WHITE(idx) \
-	(DT_INST_PROP(idx, has_white_channel) == 1)
-#define WS2812_SPI_BUS(idx) \
-	(DT_INST_BUS_LABEL(idx))
-#define WS2812_SPI_SLAVE(idx) \
-	(DT_INST_REG_ADDR(idx))
-#define WS2812_SPI_FREQ(idx) \
-	(DT_INST_PROP(idx, spi_max_frequency))
-#define WS2812_SPI_ONE_FRAME(idx) \
-	(DT_INST_PROP(idx, spi_one_frame))
-#define WS2812_SPI_ZERO_FRAME(idx)\
-	(DT_INST_PROP(idx, spi_zero_frame))
+#define WS2812_SPI_LABEL(idx) (DT_INST_LABEL(idx))
+#define WS2812_SPI_NUM_PIXELS(idx) (DT_INST_PROP(idx, chain_length))
+#define WS2812_SPI_HAS_WHITE(idx) (DT_INST_PROP(idx, has_white_channel) == 1)
+#define WS2812_SPI_BUS(idx) (DT_INST_BUS_LABEL(idx))
+#define WS2812_SPI_SLAVE(idx) (DT_INST_REG_ADDR(idx))
+#define WS2812_SPI_FREQ(idx) (DT_INST_PROP(idx, spi_max_frequency))
+#define WS2812_SPI_ONE_FRAME(idx) (DT_INST_PROP(idx, spi_one_frame))
+#define WS2812_SPI_ZERO_FRAME(idx) (DT_INST_PROP(idx, spi_zero_frame))
 #define WS2812_SPI_BUFSZ(idx) \
 	(BYTES_PER_PX(WS2812_SPI_HAS_WHITE(idx)) * WS2812_SPI_NUM_PIXELS(idx))
 
-#define WS2812_SPI_DEVICE(idx)						\
-									\
-	static struct ws2812_spi_data ws2812_spi_##idx##_data;		\
-									\
-	static uint8_t ws2812_spi_##idx##_px_buf[WS2812_SPI_BUFSZ(idx)];	\
-									\
+#define WS2812_SPI_DEVICE(idx)                                                 \
+                                                                               \
+	static struct ws2812_spi_data ws2812_spi_##idx##_data;                 \
+                                                                               \
+	static uint8_t ws2812_spi_##idx##_px_buf[WS2812_SPI_BUFSZ(idx)];       \
+                                                                               \
 	static const struct ws2812_spi_cfg ws2812_spi_##idx##_cfg = {	\
 		.spi_cfg = {						\
 			.frequency = WS2812_SPI_FREQ(idx),		\
@@ -207,29 +196,25 @@ static const struct led_strip_driver_api ws2812_spi_api = {
 		.one_frame = WS2812_SPI_ONE_FRAME(idx),		\
 		.zero_frame = WS2812_SPI_ZERO_FRAME(idx),		\
 		.has_white = WS2812_SPI_HAS_WHITE(idx),		\
-	};								\
-									\
-	static int ws2812_spi_##idx##_init(const struct device *dev)	\
-	{								\
-		struct ws2812_spi_data *data = dev_data(dev);		\
-									\
-		data->spi = device_get_binding(WS2812_SPI_BUS(idx));	\
-		if (!data->spi) {					\
-			LOG_ERR("SPI device %s not found",		\
-				WS2812_SPI_BUS(idx));			\
-			return -ENODEV;				\
-		}							\
-									\
-		return 0;						\
-	}								\
-									\
-	DEVICE_AND_API_INIT(ws2812_spi_##idx,				\
-			    WS2812_SPI_LABEL(idx),			\
-			    ws2812_spi_##idx##_init,			\
-			    &ws2812_spi_##idx##_data,			\
-			    &ws2812_spi_##idx##_cfg,			\
-			    POST_KERNEL,				\
-			    CONFIG_LED_STRIP_INIT_PRIORITY,		\
-			    &ws2812_spi_api);
+	};        \
+                                                                               \
+	static int ws2812_spi_##idx##_init(const struct device *dev)           \
+	{                                                                      \
+		struct ws2812_spi_data *data = dev_data(dev);                  \
+                                                                               \
+		data->spi = device_get_binding(WS2812_SPI_BUS(idx));           \
+		if (!data->spi) {                                              \
+			LOG_ERR("SPI device %s not found",                     \
+				WS2812_SPI_BUS(idx));                          \
+			return -ENODEV;                                        \
+		}                                                              \
+                                                                               \
+		return 0;                                                      \
+	}                                                                      \
+                                                                               \
+	DEVICE_AND_API_INIT(ws2812_spi_##idx, WS2812_SPI_LABEL(idx),           \
+			    ws2812_spi_##idx##_init, &ws2812_spi_##idx##_data, \
+			    &ws2812_spi_##idx##_cfg, POST_KERNEL,              \
+			    CONFIG_LED_STRIP_INIT_PRIORITY, &ws2812_spi_api);
 
 DT_INST_FOREACH_STATUS_OKAY(WS2812_SPI_DEVICE)

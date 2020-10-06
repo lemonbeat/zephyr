@@ -58,7 +58,7 @@ static int xoroshiro128_initialize(const struct device *dev)
 	}
 
 	int32_t rc = entropy_get_entropy_isr(dev, (uint8_t *)&state,
-					   sizeof(state), ENTROPY_BUSYWAIT);
+					     sizeof(state), ENTROPY_BUSYWAIT);
 
 	if (rc == -ENOTSUP) {
 		/* Driver does not provide an ISR-specific API, assume it can
@@ -105,7 +105,7 @@ void z_impl_sys_rand_get(void *dst, size_t outlen)
 
 	while (len < outlen) {
 		ret = xoroshiro128_next();
-		if ((outlen-len) < sizeof(ret)) {
+		if ((outlen - len) < sizeof(ret)) {
 			blocksize = len;
 			(void)memcpy(udst, &ret, blocksize);
 		} else {

@@ -43,7 +43,7 @@ enum miwu_int_mode {
 enum miwu_int_trig {
 
 	NPCX_MIWU_TRIG_NONE, /** No trigger detection */
-	NPCX_MIWU_TRIG_LOW,  /** Edge failing or active low detection */
+	NPCX_MIWU_TRIG_LOW, /** Edge failing or active low detection */
 	NPCX_MIWU_TRIG_HIGH, /** Edge rising or active high detection */
 	NPCX_MIWU_TRIG_BOTH, /** Both edge rising and failing detection */
 };
@@ -55,9 +55,9 @@ enum miwu_int_trig {
  * of Multi-Input Wake-Up Unit (MIWU) modules.
  */
 struct npcx_wui {
-	uint8_t table:2; /** A source belongs to which MIWU table. */
-	uint8_t group:3; /** A source belongs to which group of MIWU table. */
-	uint8_t bit:3; /** A source belongs to which bit of MIWU group. */
+	uint8_t table : 2; /** A source belongs to which MIWU table. */
+	uint8_t group : 3; /** A source belongs to which group of MIWU table. */
+	uint8_t bit : 3; /** A source belongs to which bit of MIWU group. */
 };
 
 /**
@@ -66,7 +66,7 @@ struct npcx_wui {
  * and corresponding WUI source.
  */
 typedef void (*miwu_dev_callback_handler_t)(const struct device *source,
-							struct npcx_wui *wui);
+					    struct npcx_wui *wui);
 
 /**
  * @brief MIWU/GPIO information structure
@@ -153,7 +153,8 @@ unsigned int soc_miwu_irq_get_state(const struct npcx_wui *wui);
  * @retval -EINVAL Invalid parameters
  */
 int soc_miwu_interrupt_configure(const struct npcx_wui *wui,
-		enum miwu_int_mode mode, enum miwu_int_trig trig);
+				 enum miwu_int_mode mode,
+				 enum miwu_int_trig trig);
 
 /**
  * @brief Function to initialize a struct miwu_io_callback properly
@@ -163,7 +164,7 @@ int soc_miwu_interrupt_configure(const struct npcx_wui *wui,
  * @param port GPIO port issued a callback function
  */
 void soc_miwu_init_gpio_callback(struct miwu_io_callback *callback,
-				const struct npcx_wui *io_wui, int port);
+				 const struct npcx_wui *io_wui, int port);
 
 /**
  * @brief Function to initialize a struct miwu_dev_callback properly
@@ -188,7 +189,6 @@ void soc_miwu_init_dev_callback(struct miwu_dev_callback *callback,
  * @retval -EINVAL Invalid parameters
  */
 int soc_miwu_manage_gpio_callback(struct miwu_io_callback *callback, bool set);
-
 
 /**
  * @brief Function to insert or remove a device callback from a callback list

@@ -21,23 +21,21 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "lwm2m_object.h"
 #include "lwm2m_engine.h"
 
-#define URI_LEN		255
+#define URI_LEN 255
 
-#define NETWORK_INIT_TIMEOUT	K_SECONDS(10)
-#define NETWORK_CONNECT_TIMEOUT	K_SECONDS(10)
-#define PACKET_TRANSFER_RETRY_MAX	3
+#define NETWORK_INIT_TIMEOUT K_SECONDS(10)
+#define NETWORK_CONNECT_TIMEOUT K_SECONDS(10)
+#define PACKET_TRANSFER_RETRY_MAX 3
 
 static struct k_work firmware_work;
 static char firmware_uri[URI_LEN];
-static struct lwm2m_ctx firmware_ctx = {
-	.sock_fd = -1
-};
+static struct lwm2m_ctx firmware_ctx = { .sock_fd = -1 };
 static int firmware_retry;
 static struct coap_block_context firmware_block_ctx;
 
 #if defined(CONFIG_LWM2M_FIRMWARE_UPDATE_PULL_COAP_PROXY_SUPPORT)
-#define COAP2COAP_PROXY_URI_PATH	"coap2coap"
-#define COAP2HTTP_PROXY_URI_PATH	"coap2http"
+#define COAP2COAP_PROXY_URI_PATH "coap2coap"
+#define COAP2HTTP_PROXY_URI_PATH "coap2http"
 
 static char proxy_uri[URI_LEN];
 #endif
@@ -63,9 +61,8 @@ static void set_update_result_from_error(int error_code)
 	}
 }
 
-static int transfer_request(struct coap_block_context *ctx,
-			    uint8_t *token, uint8_t tkl,
-			    coap_reply_t reply_cb)
+static int transfer_request(struct coap_block_context *ctx, uint8_t *token,
+			    uint8_t tkl, coap_reply_t reply_cb)
 {
 	struct lwm2m_message *msg;
 	int ret;
@@ -149,9 +146,8 @@ static int transfer_request(struct coap_block_context *ctx,
 
 	if (len > 0) {
 		/* flush the rest */
-		ret = coap_packet_append_option(&msg->cpkt,
-						COAP_OPTION_URI_PATH,
-						cursor, len);
+		ret = coap_packet_append_option(
+			&msg->cpkt, COAP_OPTION_URI_PATH, cursor, len);
 		if (ret < 0) {
 			LOG_ERR("Error adding URI_PATH");
 			goto cleanup;
@@ -229,10 +225,9 @@ cleanup:
 	return ret;
 }
 
-static int
-do_firmware_transfer_reply_cb(const struct coap_packet *response,
-			      struct coap_reply *reply,
-			      const struct sockaddr *from)
+static int do_firmware_transfer_reply_cb(const struct coap_packet *response,
+					 struct coap_reply *reply,
+					 const struct sockaddr *from)
 {
 	int ret;
 	bool last_block;
@@ -326,7 +321,8 @@ do_firmware_transfer_reply_cb(const struct coap_packet *response,
 			/* flush incoming data to write_cb */
 			while (payload_len > 0) {
 				len = (payload_len > write_buflen) ?
-				       write_buflen : payload_len;
+						    write_buflen :
+						    payload_len;
 				payload_len -= len;
 				/* check for end of packet */
 				if (buf_read(write_buf, len,
@@ -337,10 +333,9 @@ do_firmware_transfer_reply_cb(const struct coap_packet *response,
 					goto error;
 				}
 
-				ret = write_cb(0, 0, 0,
-					       write_buf, len,
+				ret = write_cb(0, 0, 0, write_buf, len,
 					       last_block &&
-							(payload_len == 0U),
+						       (payload_len == 0U),
 					       firmware_block_ctx.total_size);
 				if (ret < 0) {
 					goto error;
@@ -378,9 +373,8 @@ static void do_transmit_timeout_cb(struct lwm2m_message *msg)
 		/* retry block */
 		LOG_WRN("TIMEOUT - Sending a retry packet!");
 
-		ret = transfer_request(&firmware_block_ctx,
-				       msg->token, msg->tkl,
-				       do_firmware_transfer_reply_cb);
+		ret = transfer_request(&firmware_block_ctx, msg->token,
+				       msg->tkl, do_firmware_transfer_reply_cb);
 		if (ret < 0) {
 			/* abort retries / transfer */
 			set_update_result_from_error(ret);

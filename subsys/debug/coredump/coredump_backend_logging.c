@@ -13,21 +13,21 @@
 #include <logging/log.h>
 LOG_MODULE_DECLARE(coredump, CONFIG_KERNEL_LOG_LEVEL);
 
-#define COREDUMP_BEGIN_STR	"BEGIN#"
-#define COREDUMP_END_STR	"END#"
-#define COREDUMP_ERROR_STR	"ERROR CANNOT DUMP#"
+#define COREDUMP_BEGIN_STR "BEGIN#"
+#define COREDUMP_END_STR "END#"
+#define COREDUMP_ERROR_STR "ERROR CANNOT DUMP#"
 
 /*
  * Need to prefix coredump strings to make it easier to parse
  * as log module adds its own prefixes.
  */
-#define COREDUMP_PREFIX_STR	"#CD:"
+#define COREDUMP_PREFIX_STR "#CD:"
 
 /* Length of buffer of printable size */
-#define LOG_BUF_SZ		64
+#define LOG_BUF_SZ 64
 
 /* Length of buffer of printable size plus null character */
-#define LOG_BUF_SZ_RAW		(LOG_BUF_SZ + 1)
+#define LOG_BUF_SZ_RAW (LOG_BUF_SZ + 1)
 
 /* Log Buffer */
 char log_buf[LOG_BUF_SZ_RAW];

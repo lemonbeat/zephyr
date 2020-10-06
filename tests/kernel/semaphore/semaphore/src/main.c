@@ -9,7 +9,7 @@
 
 /* Macro declarations */
 #define SEM_INIT_VAL (0U)
-#define SEM_MAX_VAL  (10U)
+#define SEM_MAX_VAL (10U)
 
 #define sem_give_from_isr(sema) irq_offload(isr_sem_give, (const void *)sema)
 #define sem_take_from_isr(sema) irq_offload(isr_sem_take, (const void *)sema)
@@ -18,7 +18,7 @@
 #define STACK_SIZE (512 + CONFIG_TEST_EXTRA_STACKSIZE)
 #define TOTAL_THREADS_WAITING (5)
 
-#define SEC2MS(s) ((s) * 1000)
+#define SEC2MS(s) ((s)*1000)
 
 /* global variable for mutual exclusion test */
 uint32_t critical_var;
@@ -69,9 +69,8 @@ void isr_sem_give(const void *semaphore)
 static void tsema_thread_thread(struct k_sem *psem)
 {
 	/**TESTPOINT: thread-thread sync via sema*/
-	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
-				      sem_give_task, psem, NULL, NULL,
-				      K_PRIO_PREEMPT(0),
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE, sem_give_task,
+				      psem, NULL, NULL, K_PRIO_PREEMPT(0),
 				      K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	zassert_false(k_sem_take(psem, K_FOREVER), NULL);
@@ -87,13 +86,10 @@ static void tsema_thread_isr(struct k_sem *psem)
 	zassert_false(k_sem_take(psem, K_FOREVER), NULL);
 }
 
-
 void isr_sem_take(const void *semaphore)
 {
 	k_sem_take((struct k_sem *)semaphore, K_NO_WAIT);
 }
-
-
 
 void sem_take_timeout_forever_helper(void *p1, void *p2, void *p3)
 {
@@ -112,11 +108,11 @@ void sem_take_multiple_low_prio_helper(void *p1, void *p2, void *p3)
 
 	ret_value = k_sem_take(&low_prio_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	ret_value = k_sem_take(&multiple_thread_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	k_sem_give(&low_prio_sem);
 }
@@ -127,11 +123,11 @@ void sem_take_multiple_mid_prio_helper(void *p1, void *p2, void *p3)
 
 	ret_value = k_sem_take(&mid_prio_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	ret_value = k_sem_take(&multiple_thread_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	k_sem_give(&mid_prio_sem);
 }
@@ -142,11 +138,11 @@ void sem_take_multiple_high_prio_helper(void *p1, void *p2, void *p3)
 
 	ret_value = k_sem_take(&high_prio_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	ret_value = k_sem_take(&multiple_thread_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	k_sem_give(&high_prio_sem);
 }
@@ -193,11 +189,11 @@ void sem_take_multiple_high_prio_long_helper(void *p1, void *p2, void *p3)
 
 	ret_value = k_sem_take(&high_prio_long_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	ret_value = k_sem_take(&multiple_thread_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-		ret_value);
+		     ret_value);
 
 	k_sem_give(&high_prio_long_sem);
 }
@@ -206,7 +202,6 @@ void sem_take_multiple_high_prio_long_helper(void *p1, void *p2, void *p3)
  * @ingroup kernel_semaphore_tests
  * @{
  */
-
 
 /**
  * @brief Test semaphore defined at compile time
@@ -292,9 +287,7 @@ void test_k_sem_init(void)
 	/* initialize a semaphore with invalid count */
 	ret = k_sem_init(&sema, SEM_MAX_VAL + 1, SEM_MAX_VAL);
 	zassert_equal(ret, -EINVAL, "k_sem_init with invalid count");
-
 }
-
 
 /**
  * @brief Test k_sem_reset() API
@@ -345,7 +338,6 @@ void test_sem_count_get(void)
 	zassert_equal(k_sem_count_get(&sema), SEM_MAX_VAL, NULL);
 }
 
-
 /**
  * @brief Test whether a semaphore can be given by an ISR
  * @details
@@ -376,7 +368,6 @@ void test_sem_give_from_isr(void)
 			     "signal count missmatch - expected %d, got %d",
 			     (i + 1), signal_count);
 	}
-
 }
 
 /**
@@ -409,7 +400,6 @@ void test_sem_give_from_thread(void)
 			     "signal count missmatch - expected %d, got %d",
 			     (i + 1), signal_count);
 	}
-
 }
 
 /**
@@ -439,10 +429,9 @@ void test_sem_take_no_wait(void)
 
 		signal_count = k_sem_count_get(&simple_sem);
 		zassert_true(signal_count == i,
-			     "signal count missmatch - expected %d, got %d",
-			     i, signal_count);
+			     "signal count missmatch - expected %d, got %d", i,
+			     signal_count);
 	}
-
 }
 
 /**
@@ -471,7 +460,6 @@ void test_sem_take_no_wait_fails(void)
 			     "signal count missmatch - expected 0, got %d",
 			     signal_count);
 	}
-
 }
 
 /**
@@ -500,7 +488,7 @@ void test_sem_take_timeout_fails(void)
 	for (int i = 4; i >= 0; i--) {
 		ret_value = k_sem_take(&simple_sem, SEM_TIMEOUT);
 		zassert_true(ret_value == -EAGAIN,
-				"k_sem_take succeeded when it's not possible");
+			     "k_sem_take succeeded when it's not possible");
 	}
 }
 
@@ -525,10 +513,9 @@ void test_sem_take_timeout(void)
 	 */
 
 	/* create a new thread, it will give semaphore */
-	k_thread_create(&sem_tid_1, stack_1, STACK_SIZE,
-			sem_give_task, &simple_sem, NULL, NULL,
-			K_PRIO_PREEMPT(0), K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&sem_tid_1, stack_1, STACK_SIZE, sem_give_task,
+			&simple_sem, NULL, NULL, K_PRIO_PREEMPT(0),
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_sem_reset(&simple_sem);
 
@@ -540,9 +527,8 @@ void test_sem_take_timeout(void)
 	 */
 	ret_value = k_sem_take(&simple_sem, SEM_TIMEOUT);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-			ret_value);
+		     ret_value);
 	k_thread_abort(&sem_tid_1);
-
 }
 
 /**
@@ -567,8 +553,7 @@ void test_sem_take_timeout_forever(void)
 
 	k_thread_create(&sem_tid_1, stack_1, STACK_SIZE,
 			sem_take_timeout_forever_helper, NULL, NULL, NULL,
-			K_PRIO_PREEMPT(0), K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+			K_PRIO_PREEMPT(0), K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_sem_reset(&simple_sem);
 
@@ -580,9 +565,8 @@ void test_sem_take_timeout_forever(void)
 	 */
 	ret_value = k_sem_take(&simple_sem, K_FOREVER);
 	zassert_true(ret_value == 0, "k_sem_take failed with returned %d",
-			ret_value);
+		     ret_value);
 	k_thread_abort(&sem_tid_1);
-
 }
 
 /**
@@ -630,21 +614,16 @@ void test_sem_take_multiple(void)
 	 */
 
 	k_thread_create(&sem_tid_1, stack_1, STACK_SIZE,
-			sem_take_multiple_low_prio_helper,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(3), K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+			sem_take_multiple_low_prio_helper, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(3), K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_thread_create(&sem_tid_2, stack_2, STACK_SIZE,
-			sem_take_multiple_mid_prio_helper,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(2), K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+			sem_take_multiple_mid_prio_helper, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(2), K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_thread_create(&sem_tid_3, stack_3, STACK_SIZE,
-			sem_take_multiple_high_prio_long_helper,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(1), K_USER | K_INHERIT_PERMS,
+			sem_take_multiple_high_prio_long_helper, NULL, NULL,
+			NULL, K_PRIO_PREEMPT(1), K_USER | K_INHERIT_PERMS,
 			K_NO_WAIT);
 
 	/* Create another high priority thread, the same priority with sem_tid_3
@@ -656,9 +635,8 @@ void test_sem_take_multiple(void)
 	 * it should be given to the highest priority and longest waiting thread
 	 */
 	k_thread_create(&sem_tid_4, stack_4, STACK_SIZE,
-			sem_take_multiple_high_prio_helper, NULL, NULL,
-			NULL, K_PRIO_PREEMPT(1), K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+			sem_take_multiple_high_prio_helper, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(1), K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* time for those 4 threads to complete */
 	k_sleep(K_MSEC(20));
@@ -685,12 +663,12 @@ void test_sem_take_multiple(void)
 	/* check which threads completed */
 	signal_count = k_sem_count_get(&high_prio_long_sem);
 	zassert_true(signal_count == 1U,
-			"High priority and long waiting thread "
-			"don't get the sem");
+		     "High priority and long waiting thread "
+		     "don't get the sem");
 
 	signal_count = k_sem_count_get(&high_prio_sem);
 	zassert_true(signal_count == 0U,
-			"High priority thread shouldn't get the sem");
+		     "High priority thread shouldn't get the sem");
 
 	signal_count = k_sem_count_get(&mid_prio_sem);
 	zassert_true(signal_count == 0U,
@@ -707,7 +685,7 @@ void test_sem_take_multiple(void)
 	/* check which threads completed */
 	signal_count = k_sem_count_get(&high_prio_long_sem);
 	zassert_true(signal_count == 1U, "High priority and long waiting thread"
-			" executed again");
+					 " executed again");
 
 	signal_count = k_sem_count_get(&high_prio_sem);
 	zassert_true(signal_count == 1U,
@@ -728,11 +706,10 @@ void test_sem_take_multiple(void)
 	/* check which threads completed */
 	signal_count = k_sem_count_get(&high_prio_long_sem);
 	zassert_true(signal_count == 1U, "High priority and long waiting thread"
-			" executed again");
+					 " executed again");
 
 	signal_count = k_sem_count_get(&high_prio_sem);
-	zassert_true(signal_count == 1U,
-		     "High priority thread executed again");
+	zassert_true(signal_count == 1U, "High priority thread executed again");
 
 	signal_count = k_sem_count_get(&mid_prio_sem);
 	zassert_true(signal_count == 1U,
@@ -749,7 +726,7 @@ void test_sem_take_multiple(void)
 	/* check the thread completed */
 	signal_count = k_sem_count_get(&high_prio_long_sem);
 	zassert_true(signal_count == 1U, "High priority and long waiting thread"
-			" executed again");
+					 " executed again");
 
 	signal_count = k_sem_count_get(&high_prio_sem);
 	zassert_true(signal_count == 1U, "High priority thread executed again");
@@ -884,7 +861,6 @@ void sem_multiple_threads_wait_helper(void *p1, void *p2, void *p3)
 	k_sem_give(&simple_sem);
 }
 
-
 /**
  * @brief Test multiple semaphore take and give with wait
  * @ingroup kernel_semaphore_tests
@@ -901,11 +877,10 @@ void test_sem_multiple_threads_wait(void)
 
 	do {
 		for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
-			k_thread_create(&multiple_tid[i],
-					multiple_stack[i], STACK_SIZE,
-					sem_multiple_threads_wait_helper,
-					NULL, NULL, NULL,
-					K_PRIO_PREEMPT(1),
+			k_thread_create(&multiple_tid[i], multiple_stack[i],
+					STACK_SIZE,
+					sem_multiple_threads_wait_helper, NULL,
+					NULL, NULL, K_PRIO_PREEMPT(1),
 					K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 		}
 
@@ -923,9 +898,9 @@ void test_sem_multiple_threads_wait(void)
 		/* check if all the threads are done. */
 		for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
 			ret_value = k_sem_take(&simple_sem, K_FOREVER);
-			zassert_true(ret_value == 0,
-				     "Some of the threads did not get multiple_thread_sem"
-				     );
+			zassert_true(
+				ret_value == 0,
+				"Some of the threads did not get multiple_thread_sem");
 		}
 
 		signal_count = k_sem_count_get(&simple_sem);
@@ -967,8 +942,8 @@ void test_sem_measure_timeouts(void)
 	zassert_true(ret_value == -EAGAIN, "k_sem_take failed");
 
 	zassert_true((end_ticks - start_ticks >= SEC2MS(1)),
-		     "time missmatch - expected %d, got %d",
-		     SEC2MS(1), end_ticks - start_ticks);
+		     "time missmatch - expected %d, got %d", SEC2MS(1),
+		     end_ticks - start_ticks);
 
 	/* with 0 as the timeout */
 	start_ticks = k_uptime_get();
@@ -980,9 +955,8 @@ void test_sem_measure_timeouts(void)
 	zassert_true(ret_value == -EBUSY, "k_sem_take failed");
 
 	zassert_true((end_ticks - start_ticks < 1),
-		     "time missmatch - expected %d, got %d",
-		     1, end_ticks - start_ticks);
-
+		     "time missmatch - expected %d, got %d", 1,
+		     end_ticks - start_ticks);
 }
 
 void sem_measure_timeout_from_thread_helper(void *p1, void *p2, void *p3)
@@ -992,9 +966,7 @@ void sem_measure_timeout_from_thread_helper(void *p1, void *p2, void *p3)
 
 	/* give the semaphore */
 	k_sem_give(&multiple_thread_sem);
-
 }
-
 
 /**
  * @brief Test timeout of semaphore from thread
@@ -1011,10 +983,8 @@ void test_sem_measure_timeout_from_thread(void)
 
 	/* give a semaphore from a thread and calculate the time taken */
 	k_thread_create(&sem_tid_1, stack_1, STACK_SIZE,
-			sem_measure_timeout_from_thread_helper,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(3), 0, K_NO_WAIT);
-
+			sem_measure_timeout_from_thread_helper, NULL, NULL,
+			NULL, K_PRIO_PREEMPT(3), 0, K_NO_WAIT);
 
 	/* first sync the 2 threads */
 	k_sem_take(&simple_sem, K_FOREVER);
@@ -1029,9 +999,8 @@ void test_sem_measure_timeout_from_thread(void)
 	zassert_true(ret_value == 0, "k_sem_take failed");
 
 	zassert_true((end_ticks - start_ticks <= SEC2MS(1)),
-		     "time missmatch - expected less than%d ,got %d",
-		     SEC2MS(1), end_ticks - start_ticks);
-
+		     "time missmatch - expected less than%d ,got %d", SEC2MS(1),
+		     end_ticks - start_ticks);
 }
 
 void sem_multiple_take_and_timeouts_helper(void *p1, void *p2, void *p3)
@@ -1047,13 +1016,11 @@ void sem_multiple_take_and_timeouts_helper(void *p1, void *p2, void *p3)
 	end_ticks = k_uptime_get();
 
 	zassert_true((end_ticks - start_ticks >= timeout),
-		     "time missmatch - expected less than %d ,got %d",
-		     timeout, end_ticks - start_ticks);
+		     "time missmatch - expected less than %d ,got %d", timeout,
+		     end_ticks - start_ticks);
 
-
-	k_pipe_put(&timeout_info_pipe, &timeout, sizeof(int),
-		   &bytes_written, sizeof(int), K_FOREVER);
-
+	k_pipe_put(&timeout_info_pipe, &timeout, sizeof(int), &bytes_written,
+		   sizeof(int), K_FOREVER);
 }
 
 /**
@@ -1072,8 +1039,7 @@ void test_sem_multiple_take_and_timeouts(void)
 	 * is pushed into a pipe and checked later on.
 	 */
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
-		k_thread_create(&multiple_tid[i],
-				multiple_stack[i], STACK_SIZE,
+		k_thread_create(&multiple_tid[i], multiple_stack[i], STACK_SIZE,
 				sem_multiple_take_and_timeouts_helper,
 				INT_TO_POINTER(SEC2MS(i + 1)), NULL, NULL,
 				K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
@@ -1090,7 +1056,6 @@ void test_sem_multiple_take_and_timeouts(void)
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
 		k_thread_abort(&multiple_tid[i]);
 	}
-
 }
 
 void sem_multi_take_timeout_diff_sem_helper(void *p1, void *p2, void *p3)
@@ -1100,10 +1065,7 @@ void sem_multi_take_timeout_diff_sem_helper(void *p1, void *p2, void *p3)
 	uint32_t start_ticks, end_ticks;
 	int32_t ret_value;
 	size_t bytes_written;
-	struct timeout_info info = {
-		.timeout = timeout,
-		.sema = sema
-	};
+	struct timeout_info info = { .timeout = timeout, .sema = sema };
 
 	start_ticks = k_uptime_get();
 
@@ -1112,13 +1074,11 @@ void sem_multi_take_timeout_diff_sem_helper(void *p1, void *p2, void *p3)
 	end_ticks = k_uptime_get();
 
 	zassert_true((end_ticks - start_ticks >= timeout),
-		     "time missmatch - expected less than %d, got %d",
-		     timeout, end_ticks - start_ticks);
-
+		     "time missmatch - expected less than %d, got %d", timeout,
+		     end_ticks - start_ticks);
 
 	k_pipe_put(&timeout_info_pipe, &info, sizeof(struct timeout_info),
 		   &bytes_written, sizeof(struct timeout_info), K_FOREVER);
-
 }
 
 /**
@@ -1130,10 +1090,8 @@ void test_sem_multi_take_timeout_diff_sem(void)
 {
 	size_t bytes_read;
 	struct timeout_info seq_info[] = {
-		{ SEC2MS(2), &simple_sem },
-		{ SEC2MS(1), &multiple_thread_sem },
-		{ SEC2MS(3), &simple_sem },
-		{ SEC2MS(5), &multiple_thread_sem },
+		{ SEC2MS(2), &simple_sem }, { SEC2MS(1), &multiple_thread_sem },
+		{ SEC2MS(3), &simple_sem }, { SEC2MS(5), &multiple_thread_sem },
 		{ SEC2MS(4), &simple_sem },
 	};
 
@@ -1146,28 +1104,21 @@ void test_sem_multi_take_timeout_diff_sem(void)
 	 * in which it times out is pushed into a pipe and checked later on.
 	 */
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
-
-		k_thread_create(&multiple_tid[i],
-				multiple_stack[i], STACK_SIZE,
+		k_thread_create(&multiple_tid[i], multiple_stack[i], STACK_SIZE,
 				sem_multi_take_timeout_diff_sem_helper,
 				INT_TO_POINTER(seq_info[i].timeout),
-				seq_info[i].sema, NULL,
-				K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+				seq_info[i].sema, NULL, K_PRIO_PREEMPT(1), 0,
+				K_NO_WAIT);
 	}
 
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
-		k_pipe_get(&timeout_info_pipe,
-			   &retrieved_info,
-			   sizeof(struct timeout_info),
-			   &bytes_read,
-			   sizeof(struct timeout_info),
-			   K_FOREVER);
-
+		k_pipe_get(&timeout_info_pipe, &retrieved_info,
+			   sizeof(struct timeout_info), &bytes_read,
+			   sizeof(struct timeout_info), K_FOREVER);
 
 		zassert_true(retrieved_info.timeout == SEC2MS(i + 1),
 			     "timeout did not occur properly");
 	}
-
 }
 
 /**
@@ -1185,13 +1136,11 @@ void test_sem_queue_mutual_exclusion(void)
 	k_sem_init(&mut_sem, 0, 1);
 
 	k_thread_create(&sem_tid_1, stack_1, STACK_SIZE,
-			sem_queue_mutual_exclusion1, NULL, NULL,
-			NULL, 1, 0,
+			sem_queue_mutual_exclusion1, NULL, NULL, NULL, 1, 0,
 			K_NO_WAIT);
 
 	k_thread_create(&sem_tid_2, stack_2, STACK_SIZE,
-			sem_queue_mutual_exclusion2, NULL, NULL,
-			NULL, 1, 0,
+			sem_queue_mutual_exclusion2, NULL, NULL, NULL, 1, 0,
 			K_NO_WAIT);
 
 	k_sleep(K_MSEC(100));
@@ -1202,37 +1151,37 @@ void test_sem_queue_mutual_exclusion(void)
 /* ztest main entry*/
 void test_main(void)
 {
-	k_thread_access_grant(k_current_get(),
-			      &simple_sem, &multiple_thread_sem, &low_prio_sem,
-				  &mid_prio_sem, &high_prio_sem, &ksema, &sema,
-				  &high_prio_long_sem, &stack_1, &stack_2,
-				  &stack_3, &stack_4, &timeout_info_pipe,
-				  &sem_tid_1, &sem_tid_2, &sem_tid_3, &sem_tid_4,
-				  &tstack, &tdata, &mut_sem);
+	k_thread_access_grant(k_current_get(), &simple_sem,
+			      &multiple_thread_sem, &low_prio_sem,
+			      &mid_prio_sem, &high_prio_sem, &ksema, &sema,
+			      &high_prio_long_sem, &stack_1, &stack_2, &stack_3,
+			      &stack_4, &timeout_info_pipe, &sem_tid_1,
+			      &sem_tid_2, &sem_tid_3, &sem_tid_4, &tstack,
+			      &tdata, &mut_sem);
 
-	ztest_test_suite(test_semaphore,
-			 ztest_user_unit_test(test_k_sem_define),
-			 ztest_user_unit_test(test_k_sem_init),
-			 ztest_user_unit_test(test_sem_thread2thread),
-			 ztest_unit_test(test_sem_thread2isr),
-			 ztest_user_unit_test(test_sem_reset),
-			 ztest_user_unit_test(test_sem_count_get),
-			 ztest_unit_test(test_sem_give_from_isr),
-			 ztest_user_unit_test(test_sem_give_from_thread),
-			 ztest_user_unit_test(test_sem_take_no_wait),
-			 ztest_user_unit_test(test_sem_take_no_wait_fails),
-			 ztest_1cpu_user_unit_test(test_sem_take_timeout_fails),
-			 ztest_user_unit_test(test_sem_take_timeout),
-			 ztest_1cpu_user_unit_test(test_sem_take_timeout_forever),
-			 ztest_unit_test(test_sem_take_timeout_isr),
-			 ztest_1cpu_user_unit_test(test_sem_take_multiple),
-			 ztest_unit_test(test_sem_give_take_from_isr),
-			 ztest_user_unit_test(test_k_sem_correct_count_limit),
-			 ztest_unit_test(test_sem_multiple_threads_wait),
-			 ztest_unit_test(test_sem_measure_timeouts),
-			 ztest_unit_test(test_sem_measure_timeout_from_thread),
-			 ztest_1cpu_unit_test(test_sem_multiple_take_and_timeouts),
-			 ztest_unit_test(test_sem_multi_take_timeout_diff_sem),
-			 ztest_1cpu_unit_test(test_sem_queue_mutual_exclusion));
+	ztest_test_suite(
+		test_semaphore, ztest_user_unit_test(test_k_sem_define),
+		ztest_user_unit_test(test_k_sem_init),
+		ztest_user_unit_test(test_sem_thread2thread),
+		ztest_unit_test(test_sem_thread2isr),
+		ztest_user_unit_test(test_sem_reset),
+		ztest_user_unit_test(test_sem_count_get),
+		ztest_unit_test(test_sem_give_from_isr),
+		ztest_user_unit_test(test_sem_give_from_thread),
+		ztest_user_unit_test(test_sem_take_no_wait),
+		ztest_user_unit_test(test_sem_take_no_wait_fails),
+		ztest_1cpu_user_unit_test(test_sem_take_timeout_fails),
+		ztest_user_unit_test(test_sem_take_timeout),
+		ztest_1cpu_user_unit_test(test_sem_take_timeout_forever),
+		ztest_unit_test(test_sem_take_timeout_isr),
+		ztest_1cpu_user_unit_test(test_sem_take_multiple),
+		ztest_unit_test(test_sem_give_take_from_isr),
+		ztest_user_unit_test(test_k_sem_correct_count_limit),
+		ztest_unit_test(test_sem_multiple_threads_wait),
+		ztest_unit_test(test_sem_measure_timeouts),
+		ztest_unit_test(test_sem_measure_timeout_from_thread),
+		ztest_1cpu_unit_test(test_sem_multiple_take_and_timeouts),
+		ztest_unit_test(test_sem_multi_take_timeout_diff_sem),
+		ztest_1cpu_unit_test(test_sem_queue_mutual_exclusion));
 	ztest_run_test_suite(test_semaphore);
 }

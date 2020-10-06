@@ -8,8 +8,9 @@
 #include <spinlock.h>
 #include <soc.h>
 
-#define CYC_PER_TICK ((uint32_t)((uint64_t)sys_clock_hw_cycles_per_sec()	\
-			      / (uint64_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC))
+#define CYC_PER_TICK                                          \
+	((uint32_t)((uint64_t)sys_clock_hw_cycles_per_sec() / \
+		    (uint64_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC))
 #define MAX_CYC 0xffffffffu
 #define MAX_TICKS ((MAX_CYC - CYC_PER_TICK) / CYC_PER_TICK)
 #define MIN_DELAY 1000
@@ -137,7 +138,8 @@ uint32_t z_clock_elapsed(void)
 	}
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
-	uint32_t ret = ((uint32_t)mtime() - (uint32_t)last_count) / CYC_PER_TICK;
+	uint32_t ret =
+		((uint32_t)mtime() - (uint32_t)last_count) / CYC_PER_TICK;
 
 	k_spin_unlock(&lock, key);
 	return ret;

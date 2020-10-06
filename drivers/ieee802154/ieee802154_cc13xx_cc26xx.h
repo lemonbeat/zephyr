@@ -38,8 +38,8 @@
  * The macAckWaitDuration attribute does not include aUnitBackoffPeriod for
  * non-beacon enabled PANs (See IEEE 802.15.4-2006 7.5.6.4.2)
  */
-#define IEEE802154_MAC_ACK_WAIT_DURATION                                       \
-	(IEEE802154_TURNAROUND_TIME + IEEE802154_PHY_SHR_DURATION +            \
+#define IEEE802154_MAC_ACK_WAIT_DURATION                            \
+	(IEEE802154_TURNAROUND_TIME + IEEE802154_PHY_SHR_DURATION + \
 	 IEEE802154_ACK_FRAME_OCTETS * IEEE802154_PHY_SYMBOLS_PER_OCTET)
 
 /* Reserve two bytes for 16-bit CRC */
@@ -73,7 +73,7 @@ struct ieee802154_cc13xx_cc26xx_data {
 	dataQueue_t rx_queue;
 	rfc_dataEntryPointer_t rx_entry[CC13XX_CC26XX_RX_BUF_SIZE];
 	uint8_t rx_data[CC13XX_CC26XX_NUM_RX_BUF]
-		    [CC13XX_CC26XX_RX_BUF_SIZE] __aligned(4);
+		       [CC13XX_CC26XX_RX_BUF_SIZE] __aligned(4);
 
 	volatile rfc_CMD_IEEE_CCA_REQ_t cmd_ieee_cca_req;
 	volatile rfc_CMD_CLEAR_RX_t cmd_clear_rx;

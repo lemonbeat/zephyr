@@ -17,25 +17,25 @@
 
 #include "pwm_pca9685.h"
 
-#define REG_MODE1		0x00
-#define REG_MODE2		0x01
+#define REG_MODE1 0x00
+#define REG_MODE2 0x01
 
-#define REG_LED_ON_L(n)		((4 * n) + 0x06)
-#define	REG_LED_ON_H(n)		((4 * n) + 0x07)
-#define REG_LED_OFF_L(n)	((4 * n) + 0x08)
-#define REG_LED_OFF_H(n)	((4 * n) + 0x09)
+#define REG_LED_ON_L(n) ((4 * n) + 0x06)
+#define REG_LED_ON_H(n) ((4 * n) + 0x07)
+#define REG_LED_OFF_L(n) ((4 * n) + 0x08)
+#define REG_LED_OFF_H(n) ((4 * n) + 0x09)
 
-#define REG_ALL_LED_ON_L	0xFA
-#define REG_ALL_LED_ON_H	0xFB
-#define REG_ALL_LED_OFF_L	0xFC
-#define REG_ALL_LED_OFF_H	0xFD
-#define REG_PRE_SCALE		0xFE
+#define REG_ALL_LED_ON_L 0xFA
+#define REG_ALL_LED_ON_H 0xFB
+#define REG_ALL_LED_OFF_L 0xFC
+#define REG_ALL_LED_OFF_H 0xFD
+#define REG_PRE_SCALE 0xFE
 
 /* Maximum PWM outputs */
-#define MAX_PWM_OUT		16
+#define MAX_PWM_OUT 16
 
 /* How many ticks per one period */
-#define PWM_ONE_PERIOD_TICKS	4096
+#define PWM_ONE_PERIOD_TICKS 4096
 
 /**
  * @brief Check to see if a I2C master is identified for communication.
@@ -45,8 +45,8 @@
  */
 static inline int has_i2c_master(const struct device *dev)
 {
-	struct pwm_pca9685_drv_data * const drv_data =
-		(struct pwm_pca9685_drv_data * const)dev->data;
+	struct pwm_pca9685_drv_data *const drv_data =
+		(struct pwm_pca9685_drv_data *const)dev->data;
 	const struct device *i2c_master = drv_data->i2c_master;
 
 	if (i2c_master) {
@@ -61,16 +61,15 @@ static inline int has_i2c_master(const struct device *dev)
  * value to pulse_count
  */
 static int pwm_pca9685_pin_set_cycles(const struct device *dev, uint32_t pwm,
-				      uint32_t period_count, uint32_t pulse_count,
-				      pwm_flags_t flags)
+				      uint32_t period_count,
+				      uint32_t pulse_count, pwm_flags_t flags)
 {
-	const struct pwm_pca9685_config * const config =
-		dev->config;
-	struct pwm_pca9685_drv_data * const drv_data =
-		(struct pwm_pca9685_drv_data * const)dev->data;
+	const struct pwm_pca9685_config *const config = dev->config;
+	struct pwm_pca9685_drv_data *const drv_data =
+		(struct pwm_pca9685_drv_data *const)dev->data;
 	const struct device *i2c_master = drv_data->i2c_master;
 	uint16_t i2c_addr = config->i2c_slave_addr;
-	uint8_t buf[] = { 0, 0, 0, 0, 0};
+	uint8_t buf[] = { 0, 0, 0, 0, 0 };
 
 	ARG_UNUSED(period_count);
 	if (!has_i2c_master(dev)) {
@@ -114,9 +113,8 @@ static int pwm_pca9685_pin_set_cycles(const struct device *dev, uint32_t pwm,
 	return i2c_write(i2c_master, buf, sizeof(buf), i2c_addr);
 }
 
-
 static const struct pwm_driver_api pwm_pca9685_drv_api_funcs = {
-	.pin_set =  pwm_pca9685_pin_set_cycles
+	.pin_set = pwm_pca9685_pin_set_cycles
 };
 
 /**
@@ -127,12 +125,11 @@ static const struct pwm_driver_api pwm_pca9685_drv_api_funcs = {
  */
 int pwm_pca9685_init(const struct device *dev)
 {
-	const struct pwm_pca9685_config * const config =
-		dev->config;
-	struct pwm_pca9685_drv_data * const drv_data =
-		(struct pwm_pca9685_drv_data * const)dev->data;
+	const struct pwm_pca9685_config *const config = dev->config;
+	struct pwm_pca9685_drv_data *const drv_data =
+		(struct pwm_pca9685_drv_data *const)dev->data;
 	const struct device *i2c_master;
-	uint8_t buf[] = {0, 0};
+	uint8_t buf[] = { 0, 0 };
 	int ret;
 
 	/* Find out the device struct of the I2C master */
@@ -169,9 +166,9 @@ static struct pwm_pca9685_drv_data pwm_pca9685_0_drvdata;
 
 /* This has to init after I2C master */
 DEVICE_AND_API_INIT(pwm_pca9685_0, CONFIG_PWM_PCA9685_0_DEV_NAME,
-			pwm_pca9685_init,
-			&pwm_pca9685_0_drvdata, &pwm_pca9685_0_cfg,
-			POST_KERNEL, CONFIG_PWM_PCA9685_INIT_PRIORITY,
-			&pwm_pca9685_drv_api_funcs);
+		    pwm_pca9685_init, &pwm_pca9685_0_drvdata,
+		    &pwm_pca9685_0_cfg, POST_KERNEL,
+		    CONFIG_PWM_PCA9685_INIT_PRIORITY,
+		    &pwm_pca9685_drv_api_funcs);
 
 #endif /* CONFIG_PWM_PCA9685_0 */

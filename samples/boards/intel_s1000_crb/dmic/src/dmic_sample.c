@@ -11,34 +11,34 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(dmic_sample);
 
-#define AUDIO_SAMPLE_FREQ	48000
-#define AUDIO_SAMPLE_WIDTH	32
-#define SAMPLES_PER_FRAME	(64)
+#define AUDIO_SAMPLE_FREQ 48000
+#define AUDIO_SAMPLE_WIDTH 32
+#define SAMPLES_PER_FRAME (64)
 
-#define NUM_MIC_CHANNELS	8
-#define MIC_FRAME_SAMPLES	(SAMPLES_PER_FRAME * NUM_MIC_CHANNELS)
-#define MIC_FRAME_BYTES		(MIC_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
+#define NUM_MIC_CHANNELS 8
+#define MIC_FRAME_SAMPLES (SAMPLES_PER_FRAME * NUM_MIC_CHANNELS)
+#define MIC_FRAME_BYTES (MIC_FRAME_SAMPLES * AUDIO_SAMPLE_WIDTH / 8)
 
-#define DMIC_DEV_NAME		"PDM"
-#define MIC_IN_BUF_COUNT	2
+#define DMIC_DEV_NAME "PDM"
+#define MIC_IN_BUF_COUNT 2
 
-#define FRAMES_PER_ITERATION	100
-#define NUM_ITERATIONS		4
-#define DELAY_BTW_ITERATIONS	K_MSEC(20)
+#define FRAMES_PER_ITERATION 100
+#define NUM_ITERATIONS 4
+#define DELAY_BTW_ITERATIONS K_MSEC(20)
 
 static struct k_mem_slab dmic_mem_slab;
-__attribute__((section(".dma_buffers")))
-static char audio_buffers[MIC_FRAME_BYTES][MIC_IN_BUF_COUNT];
+__attribute__((section(".dma_buffers"))) static char
+	audio_buffers[MIC_FRAME_BYTES][MIC_IN_BUF_COUNT];
 static const struct device *dmic_device;
 
 static void dmic_init(void)
 {
 	int ret;
 	struct pcm_stream_cfg stream = {
-		.pcm_rate		= AUDIO_SAMPLE_FREQ,
-		.pcm_width		= AUDIO_SAMPLE_WIDTH,
-		.block_size		= MIC_FRAME_BYTES,
-		.mem_slab		= &dmic_mem_slab,
+		.pcm_rate = AUDIO_SAMPLE_FREQ,
+		.pcm_width = AUDIO_SAMPLE_WIDTH,
+		.block_size = MIC_FRAME_BYTES,
+		.mem_slab = &dmic_mem_slab,
 	};
 	struct dmic_cfg cfg = {
 		.io = {
@@ -104,7 +104,7 @@ static void dmic_receive(void)
 			LOG_ERR("dmic_read failed %d", ret);
 		} else {
 			LOG_DBG("dmic_read buffer %p size %u frame %d",
-					mic_in_buf, size, frame_counter);
+				mic_in_buf, size, frame_counter);
 			k_mem_slab_free(&dmic_mem_slab, (void **)&mic_in_buf);
 		}
 	}
@@ -135,11 +135,9 @@ static void dmic_sample_app(void *p1, void *p2, void *p3)
 		dmic_stop();
 		k_sleep(DELAY_BTW_ITERATIONS);
 		LOG_INF("Iteration %d/%d complete, %d audio frames received.",
-				loop_count, NUM_ITERATIONS,
-				FRAMES_PER_ITERATION);
+			loop_count, NUM_ITERATIONS, FRAMES_PER_ITERATION);
 	}
 	LOG_INF("Exiting DMIC sample app ...");
 }
 
-K_THREAD_DEFINE(dmic_sample, 1024, dmic_sample_app, NULL, NULL, NULL, 10, 0,
-		0);
+K_THREAD_DEFINE(dmic_sample, 1024, dmic_sample_app, NULL, NULL, NULL, 10, 0, 0);

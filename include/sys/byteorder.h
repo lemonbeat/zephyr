@@ -17,28 +17,22 @@
 #include <toolchain.h>
 
 /* Internal helpers only used by the sys_* APIs further below */
-#define __bswap_16(x) ((uint16_t) ((((x) >> 8) & 0xff) | (((x) & 0xff) << 8)))
-#define __bswap_24(x) ((uint32_t) ((((x) >> 16) & 0xff) | \
-				   (((x)) & 0xff00) | \
-				   (((x) & 0xff) << 16)))
-#define __bswap_32(x) ((uint32_t) ((((x) >> 24) & 0xff) | \
-				   (((x) >> 8) & 0xff00) | \
-				   (((x) & 0xff00) << 8) | \
-				   (((x) & 0xff) << 24)))
-#define __bswap_48(x) ((uint64_t) ((((x) >> 40) & 0xff) | \
-				   (((x) >> 24) & 0xff00) | \
-				   (((x) >> 8) & 0xff0000) | \
-				   (((x) & 0xff0000) << 8) | \
-				   (((x) & 0xff00) << 24) | \
-				   (((x) & 0xff) << 40)))
-#define __bswap_64(x) ((uint64_t) ((((x) >> 56) & 0xff) | \
-				   (((x) >> 40) & 0xff00) | \
-				   (((x) >> 24) & 0xff0000) | \
-				   (((x) >> 8) & 0xff000000) | \
-				   (((x) & 0xff000000) << 8) | \
-				   (((x) & 0xff0000) << 24) | \
-				   (((x) & 0xff00) << 40) | \
-				   (((x) & 0xff) << 56)))
+#define __bswap_16(x) ((uint16_t)((((x) >> 8) & 0xff) | (((x)&0xff) << 8)))
+#define __bswap_24(x)                                         \
+	((uint32_t)((((x) >> 16) & 0xff) | (((x)) & 0xff00) | \
+		    (((x)&0xff) << 16)))
+#define __bswap_32(x)                                              \
+	((uint32_t)((((x) >> 24) & 0xff) | (((x) >> 8) & 0xff00) | \
+		    (((x)&0xff00) << 8) | (((x)&0xff) << 24)))
+#define __bswap_48(x)                                                 \
+	((uint64_t)((((x) >> 40) & 0xff) | (((x) >> 24) & 0xff00) |   \
+		    (((x) >> 8) & 0xff0000) | (((x)&0xff0000) << 8) | \
+		    (((x)&0xff00) << 24) | (((x)&0xff) << 40)))
+#define __bswap_64(x)                                                      \
+	((uint64_t)((((x) >> 56) & 0xff) | (((x) >> 40) & 0xff00) |        \
+		    (((x) >> 24) & 0xff0000) | (((x) >> 8) & 0xff000000) | \
+		    (((x)&0xff000000) << 8) | (((x)&0xff0000) << 24) |     \
+		    (((x)&0xff00) << 40) | (((x)&0xff) << 56)))
 
 /** @def sys_le16_to_cpu
  *  @brief Convert 16-bit integer from little-endian to host endianness.
@@ -557,7 +551,7 @@ static inline void sys_mem_swap(void *buf, size_t length)
 {
 	size_t i;
 
-	for (i = 0; i < (length/2); i++) {
+	for (i = 0; i < (length / 2); i++) {
 		uint8_t tmp = ((uint8_t *)buf)[i];
 
 		((uint8_t *)buf)[i] = ((uint8_t *)buf)[length - 1 - i];

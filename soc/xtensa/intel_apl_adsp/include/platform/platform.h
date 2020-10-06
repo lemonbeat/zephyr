@@ -14,13 +14,13 @@
 
 #include <platform/memory.h>
 
-#define PLATFORM_RESET_MHE_AT_BOOT		1
+#define PLATFORM_RESET_MHE_AT_BOOT 1
 
-#define PLATFORM_DISABLE_L2CACHE_AT_BOOT	1
+#define PLATFORM_DISABLE_L2CACHE_AT_BOOT 1
 
-#define PLATFORM_MASTER_CORE_ID			0
+#define PLATFORM_MASTER_CORE_ID 0
 
-#define MAX_CORE_COUNT				2
+#define MAX_CORE_COUNT 2
 
 #if PLATFORM_CORE_COUNT > MAX_CORE_COUNT
 #error "Invalid core count - exceeding core limit"
@@ -33,7 +33,7 @@
 #include <platform/shim.h>
 
 /* Host page size */
-#define HOST_PAGE_SIZE		4096
+#define HOST_PAGE_SIZE 4096
 
 #endif /* !defined(__ASSEMBLER__) && !defined(LINKER) */
 

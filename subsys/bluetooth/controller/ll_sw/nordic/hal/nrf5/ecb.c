@@ -49,8 +49,9 @@ static void do_ecb(struct ecb_param *ecb)
 	NRF_ECB->ECBDATAPTR = 0;
 }
 
-void ecb_encrypt_be(uint8_t const *const key_be, uint8_t const *const clear_text_be,
-		    uint8_t * const cipher_text_be)
+void ecb_encrypt_be(uint8_t const *const key_be,
+		    uint8_t const *const clear_text_be,
+		    uint8_t *const cipher_text_be)
 {
 	struct ecb_param ecb;
 
@@ -62,8 +63,9 @@ void ecb_encrypt_be(uint8_t const *const key_be, uint8_t const *const clear_text
 	memcpy(cipher_text_be, &ecb.cipher_text[0], sizeof(ecb.cipher_text));
 }
 
-void ecb_encrypt(uint8_t const *const key_le, uint8_t const *const clear_text_le,
-		 uint8_t * const cipher_text_le, uint8_t * const cipher_text_be)
+void ecb_encrypt(uint8_t const *const key_le,
+		 uint8_t const *const clear_text_le,
+		 uint8_t *const cipher_text_le, uint8_t *const cipher_text_be)
 {
 	struct ecb_param ecb;
 
@@ -79,7 +81,7 @@ void ecb_encrypt(uint8_t const *const key_le, uint8_t const *const clear_text_le
 
 	if (cipher_text_be) {
 		memcpy(cipher_text_be, &ecb.cipher_text[0],
-			 sizeof(ecb.cipher_text));
+		       sizeof(ecb.cipher_text));
 	}
 }
 
@@ -91,8 +93,7 @@ uint32_t ecb_encrypt_nonblocking(struct ecb *ecb)
 			  sizeof(ecb->in_key_be));
 	}
 	if (ecb->in_clear_text_le) {
-		mem_rcopy(&ecb->in_clear_text_be[0],
-			  ecb->in_clear_text_le,
+		mem_rcopy(&ecb->in_clear_text_be[0], ecb->in_clear_text_le,
 			  sizeof(ecb->in_clear_text_be));
 	}
 
@@ -100,8 +101,8 @@ uint32_t ecb_encrypt_nonblocking(struct ecb *ecb)
 	NRF_ECB->ECBDATAPTR = (uint32_t)ecb;
 	NRF_ECB->EVENTS_ENDECB = 0;
 	NRF_ECB->EVENTS_ERRORECB = 0;
-	nrf_ecb_int_enable(NRF_ECB, ECB_INTENSET_ERRORECB_Msk
-				    | ECB_INTENSET_ENDECB_Msk);
+	nrf_ecb_int_enable(NRF_ECB,
+			   ECB_INTENSET_ERRORECB_Msk | ECB_INTENSET_ENDECB_Msk);
 
 	/* enable interrupt */
 	NVIC_ClearPendingIRQ(ECB_IRQn);
@@ -140,8 +141,7 @@ void isr_ecb(void *param)
 
 		ecb_cleanup();
 
-		ecb->fp_ecb(0, &ecb->out_cipher_text_be[0],
-			      ecb->context);
+		ecb->fp_ecb(0, &ecb->out_cipher_text_be[0], ecb->context);
 	}
 
 	else {
@@ -152,7 +152,7 @@ void isr_ecb(void *param)
 struct ecb_ut_context {
 	uint32_t volatile done;
 	uint32_t status;
-	uint8_t  cipher_text[16];
+	uint8_t cipher_text[16];
 };
 
 static void ecb_cb(uint32_t status, uint8_t *cipher_be, void *context)
@@ -170,11 +170,11 @@ static void ecb_cb(uint32_t status, uint8_t *cipher_be, void *context)
 
 uint32_t ecb_ut(void)
 {
-	uint8_t key[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
-			 0x99, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
-	uint8_t clear_text[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-				0x88, 0x99, 0x00, 0x11, 0x22, 0x33, 0x44,
-				0x55 };
+	uint8_t key[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+			    0x88, 0x99, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
+	uint8_t clear_text[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+				   0x66, 0x77, 0x88, 0x99, 0x00, 0x11,
+				   0x22, 0x33, 0x44, 0x55 };
 	uint8_t cipher_text[16];
 	uint32_t status = 0U;
 	struct ecb ecb;

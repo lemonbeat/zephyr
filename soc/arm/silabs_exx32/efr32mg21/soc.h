@@ -25,6 +25,6 @@
 /* Add include for DTS generated information */
 #include <devicetree.h>
 
-#endif  /* !_ASMLANGUAGE */
+#endif /* !_ASMLANGUAGE */
 
-#endif  /* ZEPHYR_SOC_ARM_SILABS_EXX32_EFR32MG21_SOC_H */
+#endif /* ZEPHYR_SOC_ARM_SILABS_EXX32_EFR32MG21_SOC_H */

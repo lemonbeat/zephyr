@@ -43,15 +43,14 @@ void blink(const struct led *led, uint32_t sleep_ms, uint32_t id)
 
 	gpio_dev = device_get_binding(led->gpio_dev_name);
 	if (gpio_dev == NULL) {
-		printk("Error: didn't find %s device\n",
-		       led->gpio_dev_name);
+		printk("Error: didn't find %s device\n", led->gpio_dev_name);
 		return;
 	}
 
 	ret = gpio_pin_configure(gpio_dev, led->gpio_pin, led->gpio_flags);
 	if (ret != 0) {
-		printk("Error %d: failed to configure pin %d '%s'\n",
-			ret, led->gpio_pin, led->gpio_pin_name);
+		printk("Error %d: failed to configure pin %d '%s'\n", ret,
+		       led->gpio_pin, led->gpio_pin_name);
 		return;
 	}
 
@@ -108,17 +107,15 @@ void blink1(void)
 void uart_out(void)
 {
 	while (1) {
-		struct printk_data_t *rx_data = k_fifo_get(&printk_fifo,
-							   K_FOREVER);
-		printk("Toggled led%d; counter=%d\n",
-		       rx_data->led, rx_data->cnt);
+		struct printk_data_t *rx_data =
+			k_fifo_get(&printk_fifo, K_FOREVER);
+		printk("Toggled led%d; counter=%d\n", rx_data->led,
+		       rx_data->cnt);
 		k_free(rx_data);
 	}
 }
 
-K_THREAD_DEFINE(blink0_id, STACKSIZE, blink0, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
-K_THREAD_DEFINE(blink1_id, STACKSIZE, blink1, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
-K_THREAD_DEFINE(uart_out_id, STACKSIZE, uart_out, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+K_THREAD_DEFINE(blink0_id, STACKSIZE, blink0, NULL, NULL, NULL, PRIORITY, 0, 0);
+K_THREAD_DEFINE(blink1_id, STACKSIZE, blink1, NULL, NULL, NULL, PRIORITY, 0, 0);
+K_THREAD_DEFINE(uart_out_id, STACKSIZE, uart_out, NULL, NULL, NULL, PRIORITY, 0,
+		0);

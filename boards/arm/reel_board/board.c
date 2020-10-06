@@ -8,7 +8,7 @@
 #include <soc.h>
 
 /* Peripheral voltage ON/OFF GPIO */
-#define PERIPH_PON_PIN		0
+#define PERIPH_PON_PIN 0
 
 static int board_reel_board_init(const struct device *dev)
 {
@@ -41,7 +41,6 @@ static int board_reel_board_init(const struct device *dev)
 		(GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos) |
 		(GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos) |
 		(GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
-
 
 	return 0;
 }

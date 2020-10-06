@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include "test_fat.h"
 #include <stdio.h>
 
@@ -85,8 +84,8 @@ static int test_lsdir(const char *path)
 		if (entry.type == FS_DIR_ENTRY_DIR) {
 			TC_PRINT("[DIR ] %s\n", entry.name);
 		} else {
-			TC_PRINT("[FILE] %s (size = %zu)\n",
-				entry.name, entry.size);
+			TC_PRINT("[FILE] %s (size = %zu)\n", entry.name,
+				 entry.size);
 		}
 	}
 

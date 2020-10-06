@@ -36,13 +36,13 @@ static void test_credential_add(void)
 	 */
 	ret = tls_credential_add(common_tag, TLS_CREDENTIAL_SERVER_CERTIFICATE,
 				 test_server_cert, sizeof(test_server_cert));
-	zassert_equal(ret, 0, "Failed to add credential %d %d",
-		      common_tag, TLS_CREDENTIAL_SERVER_CERTIFICATE);
+	zassert_equal(ret, 0, "Failed to add credential %d %d", common_tag,
+		      TLS_CREDENTIAL_SERVER_CERTIFICATE);
 
 	ret = tls_credential_add(common_tag, TLS_CREDENTIAL_PRIVATE_KEY,
 				 test_server_key, sizeof(test_server_key));
-	zassert_equal(ret, 0, "Failed to add credential %d %d",
-		      common_tag, TLS_CREDENTIAL_PRIVATE_KEY);
+	zassert_equal(ret, 0, "Failed to add credential %d %d", common_tag,
+		      TLS_CREDENTIAL_PRIVATE_KEY);
 
 	/* Try to register another credential - should not have memory for that
 	 */
@@ -70,10 +70,10 @@ static void test_credential_get(void)
 	/* Read existing credential */
 	(void)memset(cred, 0, sizeof(cred));
 	credlen = sizeof(cred);
-	ret = tls_credential_get(common_tag, TLS_CREDENTIAL_PRIVATE_KEY,
-				 cred, &credlen);
-	zassert_equal(ret, 0, "Failed to read credential %d %d",
-		      0, TLS_CREDENTIAL_CA_CERTIFICATE);
+	ret = tls_credential_get(common_tag, TLS_CREDENTIAL_PRIVATE_KEY, cred,
+				 &credlen);
+	zassert_equal(ret, 0, "Failed to read credential %d %d", 0,
+		      TLS_CREDENTIAL_CA_CERTIFICATE);
 	ret = strcmp(cred, test_server_key);
 	zassert_equal(ret, 0, "Invalid credential content");
 	zassert_equal(credlen, sizeof(test_server_key),
@@ -81,8 +81,8 @@ static void test_credential_get(void)
 
 	/* Try to read non-existing credentials */
 	credlen = sizeof(cred);
-	ret = tls_credential_get(invalid_tag, TLS_CREDENTIAL_PSK,
-				 cred, &credlen);
+	ret = tls_credential_get(invalid_tag, TLS_CREDENTIAL_PSK, cred,
+				 &credlen);
 	zassert_equal(ret, -ENOENT, "Should have failed with ENOENT");
 
 	/* Try to read with too small buffer */
@@ -156,22 +156,21 @@ static void test_credential_delete(void)
 
 	/* Should remove existing credential. */
 	ret = tls_credential_delete(common_tag, TLS_CREDENTIAL_PRIVATE_KEY);
-	zassert_equal(ret, 0, "Failed to delete credential %d %d",
-		      common_tag, TLS_CREDENTIAL_PRIVATE_KEY);
+	zassert_equal(ret, 0, "Failed to delete credential %d %d", common_tag,
+		      TLS_CREDENTIAL_PRIVATE_KEY);
 
-	ret = tls_credential_get(common_tag, TLS_CREDENTIAL_PRIVATE_KEY,
-				 cred, &credlen);
+	ret = tls_credential_get(common_tag, TLS_CREDENTIAL_PRIVATE_KEY, cred,
+				 &credlen);
 	zassert_equal(ret, -ENOENT, "Should have failed with ENOENT");
 }
 
 void test_main(void)
 {
 	ztest_test_suite(tls_crecentials_tests,
-		ztest_unit_test(test_credential_add),
-		ztest_unit_test(test_credential_get),
-		ztest_unit_test(test_credential_internal_iterate),
-		ztest_unit_test(test_credential_delete)
-	);
+			 ztest_unit_test(test_credential_add),
+			 ztest_unit_test(test_credential_get),
+			 ztest_unit_test(test_credential_internal_iterate),
+			 ztest_unit_test(test_credential_delete));
 
 	ztest_run_test_suite(tls_crecentials_tests);
 }

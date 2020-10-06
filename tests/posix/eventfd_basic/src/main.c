@@ -64,9 +64,7 @@ static void test_eventfd_write_then_read(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_eventfd_basic,
-				ztest_unit_test(test_eventfd),
-				ztest_unit_test(test_eventfd_write_then_read)
-				);
+	ztest_test_suite(test_eventfd_basic, ztest_unit_test(test_eventfd),
+			 ztest_unit_test(test_eventfd_write_then_read));
 	ztest_run_test_suite(test_eventfd_basic);
 }

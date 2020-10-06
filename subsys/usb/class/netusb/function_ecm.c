@@ -9,7 +9,7 @@
 LOG_MODULE_REGISTER(usb_ecm);
 
 /* Enable verbose debug printing extra hexdumps */
-#define VERBOSE_DEBUG	0
+#define VERBOSE_DEBUG 0
 
 #include <net/net_pkt.h>
 #include <net/ethernet.h>
@@ -22,13 +22,12 @@ LOG_MODULE_REGISTER(usb_ecm);
 
 #include "netusb.h"
 
-#define USB_CDC_ECM_REQ_TYPE		0x21
-#define USB_CDC_SET_ETH_PKT_FILTER	0x43
+#define USB_CDC_ECM_REQ_TYPE 0x21
+#define USB_CDC_SET_ETH_PKT_FILTER 0x43
 
-#define ECM_INT_EP_IDX			0
-#define ECM_OUT_EP_IDX			1
-#define ECM_IN_EP_IDX			2
-
+#define ECM_INT_EP_IDX 0
+#define ECM_OUT_EP_IDX 1
+#define ECM_IN_EP_IDX 2
 
 static uint8_t tx_buf[NET_ETH_MAX_FRAME_SIZE], rx_buf[NET_ETH_MAX_FRAME_SIZE];
 
@@ -176,28 +175,20 @@ static void ecm_int_in(uint8_t ep, enum usb_dc_ep_cb_status_code ep_status)
 
 static struct usb_ep_cfg_data ecm_ep_data[] = {
 	/* Configuration ECM */
-	{
-		.ep_cb = ecm_int_in,
-		.ep_addr = CDC_ECM_INT_EP_ADDR
-	},
-	{
-		/* high-level transfer mgmt */
-		.ep_cb = usb_transfer_ep_callback,
-		.ep_addr = CDC_ECM_OUT_EP_ADDR
-	},
-	{
-		/* high-level transfer mgmt */
-		.ep_cb = usb_transfer_ep_callback,
-		.ep_addr = CDC_ECM_IN_EP_ADDR
-	},
+	{ .ep_cb = ecm_int_in, .ep_addr = CDC_ECM_INT_EP_ADDR },
+	{ /* high-level transfer mgmt */
+	  .ep_cb = usb_transfer_ep_callback,
+	  .ep_addr = CDC_ECM_OUT_EP_ADDR },
+	{ /* high-level transfer mgmt */
+	  .ep_cb = usb_transfer_ep_callback,
+	  .ep_addr = CDC_ECM_IN_EP_ADDR },
 };
 
 static int ecm_class_handler(struct usb_setup_packet *setup, int32_t *len,
 			     uint8_t **data)
 {
-	LOG_DBG("len %d req_type 0x%x req 0x%x enabled %u",
-		*len, setup->bmRequestType, setup->bRequest,
-		netusb_enabled());
+	LOG_DBG("len %d req_type 0x%x req 0x%x enabled %u", *len,
+		setup->bmRequestType, setup->bRequest, netusb_enabled());
 
 	if (!netusb_enabled()) {
 		LOG_ERR("interface disabled");
@@ -267,8 +258,8 @@ static int ecm_send(struct net_pkt *pkt)
 	}
 
 	/* transfer data to host */
-	ret = usb_transfer_sync(ecm_ep_data[ECM_IN_EP_IDX].ep_addr,
-				tx_buf, len, USB_TRANS_WRITE);
+	ret = usb_transfer_sync(ecm_ep_data[ECM_IN_EP_IDX].ep_addr, tx_buf, len,
+				USB_TRANS_WRITE);
 	if (ret != len) {
 		LOG_ERR("Transfer failure");
 		return -EINVAL;
@@ -297,8 +288,8 @@ static void ecm_read_cb(uint8_t ep, int size, void *priv)
 		}
 	}
 
-	pkt = net_pkt_alloc_with_buffer(netusb_net_iface(), size,
-					AF_UNSPEC, 0, K_FOREVER);
+	pkt = net_pkt_alloc_with_buffer(netusb_net_iface(), size, AF_UNSPEC, 0,
+					K_FOREVER);
 	if (!pkt) {
 		LOG_ERR("no memory for network packet\n");
 		goto done;
@@ -357,8 +348,7 @@ static inline void ecm_status_interface(const uint8_t *desc)
 }
 
 static void ecm_status_cb(struct usb_cfg_data *cfg,
-			  enum usb_dc_status_code status,
-			  const uint8_t *param)
+			  enum usb_dc_status_code status, const uint8_t *param)
 {
 	ARG_UNUSED(cfg);
 
@@ -399,9 +389,10 @@ struct usb_cdc_ecm_mac_descr {
 	uint8_t bString[USB_BSTRING_LENGTH(CONFIG_USB_DEVICE_NETWORK_ECM_MAC)];
 } __packed;
 
-USBD_STRING_DESCR_DEFINE(primary) struct usb_cdc_ecm_mac_descr utf16le_mac = {
-	.bLength = USB_STRING_DESCRIPTOR_LENGTH(
-			CONFIG_USB_DEVICE_NETWORK_ECM_MAC),
+USBD_STRING_DESCR_DEFINE(primary)
+struct usb_cdc_ecm_mac_descr utf16le_mac = {
+	.bLength =
+		USB_STRING_DESCRIPTOR_LENGTH(CONFIG_USB_DEVICE_NETWORK_ECM_MAC),
 	.bDescriptorType = USB_STRING_DESC,
 	.bString = CONFIG_USB_DEVICE_NETWORK_ECM_MAC
 };

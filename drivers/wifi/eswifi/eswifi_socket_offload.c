@@ -31,17 +31,15 @@ LOG_MODULE_DECLARE(LOG_MODULE_NAME);
 #define SD_TO_OBJ(sd) ((void *)(sd + 1))
 #define OBJ_TO_SD(obj) (((int)obj) - 1)
 /* Default socket context (50CE) */
-#define ESWIFI_INIT_CONTEXT	INT_TO_POINTER(0x50CE)
+#define ESWIFI_INIT_CONTEXT INT_TO_POINTER(0x50CE)
 
 static struct eswifi_dev *eswifi;
 static const struct socket_op_vtable eswifi_socket_fd_op_vtable;
 
-static void __process_received(struct net_context *context,
-			      struct net_pkt *pkt,
-			      union net_ip_header *ip_hdr,
-			      union net_proto_header *proto_hdr,
-			      int status,
-			      void *user_data)
+static void __process_received(struct net_context *context, struct net_pkt *pkt,
+			       union net_ip_header *ip_hdr,
+			       union net_proto_header *proto_hdr, int status,
+			       void *user_data)
 {
 	struct eswifi_off_socket *socket = user_data;
 
@@ -131,8 +129,7 @@ static int eswifi_socket_accept(void *obj, struct sockaddr *addr,
 	}
 
 	z_finalize_fd(fd, SD_TO_OBJ(sock),
-		      (const struct fd_op_vtable *)
-					&eswifi_socket_fd_op_vtable);
+		      (const struct fd_op_vtable *)&eswifi_socket_fd_op_vtable);
 
 	return fd;
 }
@@ -184,7 +181,7 @@ static int map_credentials(int sd, const void *optval, socklen_t optlen)
 			bytes += cert->len;
 			LOG_DBG("cert write len %d\n", cert->len);
 			ret = eswifi_request(eswifi, eswifi->buf, bytes + 1,
-				     eswifi->buf, sizeof(eswifi->buf));
+					     eswifi->buf, sizeof(eswifi->buf));
 			LOG_DBG("cert write err %d\n", ret);
 			if (ret < 0) {
 				return ret;
@@ -265,7 +262,7 @@ static ssize_t eswifi_socket_send(void *obj, const void *buf, size_t len,
 	offset += len;
 
 	ret = eswifi_request(eswifi, eswifi->buf, offset + 1, eswifi->buf,
-				sizeof(eswifi->buf));
+			     sizeof(eswifi->buf));
 	if (ret < 0) {
 		LOG_DBG("Unable to send data");
 		ret = -EIO;
@@ -398,7 +395,8 @@ static int eswifi_socket_open(int family, int type, int proto)
 
 	eswifi_lock(eswifi);
 
-	idx = __eswifi_socket_new(eswifi, family, type, proto, ESWIFI_INIT_CONTEXT);
+	idx = __eswifi_socket_new(eswifi, family, type, proto,
+				  ESWIFI_INIT_CONTEXT);
 	if (idx < 0) {
 		goto unlock;
 	}
@@ -411,7 +409,7 @@ static int eswifi_socket_open(int family, int type, int proto)
 	socket->recv_data = socket;
 
 	k_delayed_work_submit_to_queue(&eswifi->work_q, &socket->read_work,
-					K_MSEC(500));
+				       K_MSEC(500));
 
 unlock:
 	eswifi_unlock(eswifi);
@@ -429,10 +427,9 @@ static int eswifi_socket_poll(struct zsock_pollfd *fds, int nfds, int msecs)
 		return -1;
 	}
 
-	obj = z_get_fd_obj(fds[0].fd,
-			   (const struct fd_op_vtable *)
-						&eswifi_socket_fd_op_vtable,
-			   0);
+	obj = z_get_fd_obj(
+		fds[0].fd,
+		(const struct fd_op_vtable *)&eswifi_socket_fd_op_vtable, 0);
 	if (obj != NULL) {
 		sock = OBJ_TO_SD(obj);
 	} else {
@@ -458,7 +455,7 @@ static int eswifi_socket_poll(struct zsock_pollfd *fds, int nfds, int msecs)
 		return -1;
 	}
 
-	ret = k_sem_take(&socket->read_sem, K_MSEC(msecs*10));
+	ret = k_sem_take(&socket->read_sem, K_MSEC(msecs * 10));
 	if (ret) {
 		errno = ETIMEDOUT;
 		return -1;
@@ -511,8 +508,7 @@ static int eswifi_socket_create(int family, int type, int proto)
 	}
 
 	z_finalize_fd(fd, SD_TO_OBJ(sock),
-		      (const struct fd_op_vtable *)
-					&eswifi_socket_fd_op_vtable);
+		      (const struct fd_op_vtable *)&eswifi_socket_fd_op_vtable);
 
 	return fd;
 }
@@ -549,8 +545,7 @@ static ssize_t eswifi_socket_read(void *obj, void *buffer, size_t count)
 	return eswifi_socket_recvfrom(obj, buffer, count, 0, NULL, 0);
 }
 
-static ssize_t eswifi_socket_write(void *obj, const void *buffer,
-				   size_t count)
+static ssize_t eswifi_socket_write(void *obj, const void *buffer, size_t count)
 {
 	return eswifi_socket_sendto(obj, buffer, count, 0, NULL, 0);
 }
@@ -632,7 +627,8 @@ static int eswifi_off_getaddrinfo(const char *node, const char *service,
 
 	ai->ai_family = AF_INET;
 	ai->ai_socktype = hints ? hints->ai_socktype : SOCK_STREAM;
-	ai->ai_protocol = ai->ai_socktype == SOCK_STREAM ? IPPROTO_UDP : IPPROTO_TCP;
+	ai->ai_protocol = ai->ai_socktype == SOCK_STREAM ? IPPROTO_UDP :
+								 IPPROTO_TCP;
 
 	ai_addr->sin_family = ai->ai_family;
 	ai_addr->sin_port = htons(port);

@@ -41,20 +41,20 @@ extern "C" {
  */
 
 /** @brief Cast @p x, a pointer, to an unsigned integer. */
-#define POINTER_TO_UINT(x) ((uintptr_t) (x))
+#define POINTER_TO_UINT(x) ((uintptr_t)(x))
 /** @brief Cast @p x, an unsigned integer, to a <tt>void*</tt>. */
-#define UINT_TO_POINTER(x) ((void *) (uintptr_t) (x))
+#define UINT_TO_POINTER(x) ((void *)(uintptr_t)(x))
 /** @brief Cast @p x, a pointer, to a signed integer. */
-#define POINTER_TO_INT(x)  ((intptr_t) (x))
+#define POINTER_TO_INT(x) ((intptr_t)(x))
 /** @brief Cast @p x, a signed integer, to a <tt>void*</tt>. */
-#define INT_TO_POINTER(x)  ((void *) (intptr_t) (x))
+#define INT_TO_POINTER(x) ((void *)(intptr_t)(x))
 
 #if !(defined(__CHAR_BIT__) && defined(__SIZEOF_LONG__))
-#	error Missing required predefined macros for BITS_PER_LONG calculation
+#error Missing required predefined macros for BITS_PER_LONG calculation
 #endif
 
 /** Number of bits in a long int. */
-#define BITS_PER_LONG	(__CHAR_BIT__ * __SIZEOF_LONG__)
+#define BITS_PER_LONG (__CHAR_BIT__ * __SIZEOF_LONG__)
 
 /**
  * @brief Create a contiguous bitmask starting at bit position @p l
@@ -64,7 +64,7 @@ extern "C" {
 	(((~0UL) - (1UL << (l)) + 1) & (~0UL >> (BITS_PER_LONG - 1 - (h))))
 
 /** @brief 0 if @p cond is true-ish; causes a compile error otherwise. */
-#define ZERO_OR_COMPILE_ERROR(cond) ((int) sizeof(char[1 - 2 * !(cond)]) - 1)
+#define ZERO_OR_COMPILE_ERROR(cond) ((int)sizeof(char[1 - 2 * !(cond)]) - 1)
 
 #if defined(__cplusplus)
 
@@ -80,10 +80,9 @@ extern "C" {
  *
  * This macro is available only from C, not C++.
  */
-#define IS_ARRAY(array) \
-	ZERO_OR_COMPILE_ERROR( \
-		!__builtin_types_compatible_p(__typeof__(array), \
-					      __typeof__(&(array)[0])))
+#define IS_ARRAY(array)                                      \
+	ZERO_OR_COMPILE_ERROR(!__builtin_types_compatible_p( \
+		__typeof__(array), __typeof__(&(array)[0])))
 
 /**
  * @brief Number of elements in the given @p array
@@ -95,7 +94,7 @@ extern "C" {
  * In C, passing a pointer as @p array causes a compile error.
  */
 #define ARRAY_SIZE(array) \
-	((long) (IS_ARRAY(array) + (sizeof(array) / sizeof((array)[0]))))
+	((long)(IS_ARRAY(array) + (sizeof(array) / sizeof((array)[0]))))
 
 #endif /* __cplusplus */
 
@@ -141,15 +140,14 @@ extern "C" {
  *        which must be a power of 2.
  */
 #define ROUND_UP(x, align)                                   \
-	(((unsigned long)(x) + ((unsigned long)(align) - 1)) & \
-	 ~((unsigned long)(align) - 1))
+	(((unsigned long)(x) + ((unsigned long)(align)-1)) & \
+	 ~((unsigned long)(align)-1))
 
 /**
  * @brief Value of @p x rounded down to the previous multiple of @p
  *        align, which must be a power of 2.
  */
-#define ROUND_DOWN(x, align)                                 \
-	((unsigned long)(x) & ~((unsigned long)(align) - 1))
+#define ROUND_DOWN(x, align) ((unsigned long)(x) & ~((unsigned long)(align)-1))
 
 /** @brief Value of @p x rounded up to the next word boundary. */
 #define WB_UP(x) ROUND_UP(x, sizeof(void *))
@@ -161,7 +159,7 @@ extern "C" {
  * @brief Ceiling function applied to @p numerator / @p divider as a fraction.
  */
 #define ceiling_fraction(numerator, divider) \
-	(((numerator) + ((divider) - 1)) / (divider))
+	(((numerator) + ((divider)-1)) / (divider))
 
 /**
  * @def MAX
@@ -292,19 +290,19 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
 #define GB(x) (MB(x) << 10)
 
 /** @brief Number of Hz in @p x kHz */
-#define KHZ(x) ((x) * 1000)
+#define KHZ(x) ((x)*1000)
 /** @brief Number of Hz in @p x MHz */
 #define MHZ(x) (KHZ(x) * 1000)
 
 #ifndef BIT
 #if defined(_ASMLANGUAGE)
-#define BIT(n)  (1 << (n))
+#define BIT(n) (1 << (n))
 #else
 /**
  * @brief Unsigned integer with bit position @p n set (signed in
  * assembly language).
  */
-#define BIT(n)  (1UL << (n))
+#define BIT(n) (1UL << (n))
 #endif
 #endif
 
@@ -454,8 +452,7 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  * @param _flag evaluated flag
  * @param _code result if @p _flag expands to 1; must be in parentheses
  */
-#define IF_ENABLED(_flag, _code) \
-	COND_CODE_1(_flag, _code, ())
+#define IF_ENABLED(_flag, _code) COND_CODE_1(_flag, _code, ())
 
 /**
  * @brief Check if a macro has a replacement expression
@@ -493,7 +490,7 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  *
  * @param a macro to check for emptiness
  */
-#define IS_EMPTY(a) Z_IS_EMPTY_(a, 1, 0,)
+#define IS_EMPTY(a) Z_IS_EMPTY_(a, 1, 0, )
 
 /**
  * @brief Remove empty arguments from list.
@@ -654,10 +651,10 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  * @param ... Variable argument list. The macro @p F is invoked as
  *            <tt>F(element)</tt> for each element in the list.
  */
-#define FOR_EACH(F, sep, ...) \
-	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), \
-			0, Z_FOR_EACH_SWALLOW_INDEX_FIXED_ARG, sep, \
-			F, 0, __VA_ARGS__)
+#define FOR_EACH(F, sep, ...)                                          \
+	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), 0,         \
+			Z_FOR_EACH_SWALLOW_INDEX_FIXED_ARG, sep, F, 0, \
+			__VA_ARGS__)
 
 /**
  * @brief Like FOR_EACH(), but with a terminator instead of a separator,
@@ -711,18 +708,16 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  * @param ... Variable argument list. The macro @p F is invoked as
  *            <tt>F(element)</tt> for each nonempty element in the list.
  */
-#define FOR_EACH_NONEMPTY_TERM(F, term, ...)				\
-	COND_CODE_0(							\
-		/* are there zero non-empty arguments ? */		\
-		NUM_VA_ARGS_LESS_1(LIST_DROP_EMPTY(__VA_ARGS__, _)),	\
-		/* if so, expand to nothing */				\
-		(),							\
-		/* otherwise, expand to: */				\
-		(/* FOR_EACH() on nonempty elements, */		\
-			FOR_EACH(F, term, LIST_DROP_EMPTY(__VA_ARGS__))	\
-			/* plus a final terminator */			\
-			__DEBRACKET term				\
-		))
+#define FOR_EACH_NONEMPTY_TERM(F, term, ...)                                      \
+	COND_CODE_0(/* are there zero non-empty arguments ? */                    \
+		    NUM_VA_ARGS_LESS_1(LIST_DROP_EMPTY(                           \
+			    __VA_ARGS__, _)), /* if so, expand to nothing */      \
+		    (), /* otherwise, expand to: */                               \
+		    (/* FOR_EACH() on nonempty elements, */                       \
+		     FOR_EACH(F, term,                                            \
+			      LIST_DROP_EMPTY(                                    \
+				      __VA_ARGS__)) /* plus a final terminator */ \
+		     __DEBRACKET term))
 
 /**
  * @brief Call macro @p F on each provided argument, with the argument's index
@@ -748,10 +743,9 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  * @param ... Variable argument list. The macro @p F is invoked as
  *            <tt>F(index, element)</tt> for each element in the list.
  */
-#define FOR_EACH_IDX(F, sep, ...) \
-	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), \
-			0, Z_FOR_EACH_SWALLOW_FIXED_ARG, sep, \
-			F, 0, __VA_ARGS__)
+#define FOR_EACH_IDX(F, sep, ...)                              \
+	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), 0, \
+			Z_FOR_EACH_SWALLOW_FIXED_ARG, sep, F, 0, __VA_ARGS__)
 
 /**
  * @brief Call macro @p F on each provided argument, with an additional fixed
@@ -778,10 +772,10 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  * @param ... Variable argument list. The macro @p F is invoked as
  *            <tt>F(element, fixed_arg)</tt> for each element in the list.
  */
-#define FOR_EACH_FIXED_ARG(F, sep, fixed_arg, ...) \
-	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), \
-			0, Z_FOR_EACH_SWALLOW_INDEX, sep, \
-			F, fixed_arg, __VA_ARGS__)
+#define FOR_EACH_FIXED_ARG(F, sep, fixed_arg, ...)                   \
+	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), 0,       \
+			Z_FOR_EACH_SWALLOW_INDEX, sep, F, fixed_arg, \
+			__VA_ARGS__)
 
 /**
  * @brief Calls macro @p F for each variable argument with an index and fixed
@@ -808,10 +802,10 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  *            <tt>F(index, element, fixed_arg)</tt> for each element in
  *            the list.
  */
-#define FOR_EACH_IDX_FIXED_ARG(F, sep, fixed_arg, ...) \
-	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), \
-			0, Z_FOR_EACH_SWALLOW_NOTHING, sep, \
-			F, fixed_arg, __VA_ARGS__)
+#define FOR_EACH_IDX_FIXED_ARG(F, sep, fixed_arg, ...)                 \
+	Z_FOR_EACH_IDX2(NUM_VA_ARGS_LESS_1(__VA_ARGS__, _), 0,         \
+			Z_FOR_EACH_SWALLOW_NOTHING, sep, F, fixed_arg, \
+			__VA_ARGS__)
 
 /**
  * @brief Number of arguments in the variable arguments list minus one.
@@ -819,14 +813,13 @@ uint8_t u8_to_dec(char *buf, uint8_t buflen, uint8_t value);
  * @param ... List of arguments
  * @return  Number of variadic arguments in the argument list, minus one
  */
-#define NUM_VA_ARGS_LESS_1(...) \
-	NUM_VA_ARGS_LESS_1_IMPL(__VA_ARGS__, 63, 62, 61, \
-	60, 59, 58, 57, 56, 55, 54, 53, 52, 51,		 \
-	50, 49, 48, 47, 46, 45, 44, 43, 42, 41,		 \
-	40, 39, 38, 37, 36, 35, 34, 33, 32, 31,		 \
-	30, 29, 28, 27, 26, 25, 24, 23, 22, 21,		 \
-	20, 19, 18, 17, 16, 15, 14, 13, 12, 11,		 \
-	10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, ~)
+#define NUM_VA_ARGS_LESS_1(...)                                              \
+	NUM_VA_ARGS_LESS_1_IMPL(__VA_ARGS__, 63, 62, 61, 60, 59, 58, 57, 56, \
+				55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45,  \
+				44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34,  \
+				33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23,  \
+				22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12,  \
+				11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, ~)
 
 /**
  * @brief Mapping macro that pastes results together

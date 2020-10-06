@@ -45,7 +45,7 @@
 extern "C" {
 #endif
 
-#define ARCH_STACK_PTR_ALIGN	4
+#define ARCH_STACK_PTR_ALIGN 4
 
 /* Indicate, for a minimally sized MPU region, how large it must be and what
  * its base address must be aligned to.
@@ -57,18 +57,18 @@ extern "C" {
  */
 #ifdef CONFIG_ARC_CORE_MPU
 #if CONFIG_ARC_MPU_VER == 2
-#define Z_ARC_MPU_ALIGN	2048
+#define Z_ARC_MPU_ALIGN 2048
 #elif CONFIG_ARC_MPU_VER == 3
-#define Z_ARC_MPU_ALIGN	32
+#define Z_ARC_MPU_ALIGN 32
 #else
 #error "Unsupported MPU version"
 #endif
 #endif
 
 #ifdef CONFIG_MPU_STACK_GUARD
-#define Z_ARC_STACK_GUARD_SIZE	Z_ARC_MPU_ALIGN
+#define Z_ARC_STACK_GUARD_SIZE Z_ARC_MPU_ALIGN
 #else
-#define Z_ARC_STACK_GUARD_SIZE	0
+#define Z_ARC_STACK_GUARD_SIZE 0
 #endif
 
 /* Kernel-only stacks have the following layout if a stack guard is enabled:
@@ -84,8 +84,8 @@ extern "C" {
  * +------------+ <- thread.stack_info.start + thread.stack_info.size
  */
 #ifdef CONFIG_MPU_STACK_GUARD
-#define ARCH_KERNEL_STACK_RESERVED	Z_ARC_STACK_GUARD_SIZE
-#define ARCH_KERNEL_STACK_OBJ_ALIGN	Z_ARC_MPU_ALIGN
+#define ARCH_KERNEL_STACK_RESERVED Z_ARC_STACK_GUARD_SIZE
+#define ARCH_KERNEL_STACK_OBJ_ALIGN Z_ARC_MPU_ALIGN
 #endif
 
 #ifdef CONFIG_USERSPACE
@@ -113,14 +113,13 @@ extern "C" {
  * | TLS        | } thread.stack_info.delta
  * +------------+ <- thread.stack_info.start + thread.stack_info.size
  */
-#define ARCH_THREAD_STACK_RESERVED	(Z_ARC_STACK_GUARD_SIZE + \
-					 CONFIG_PRIVILEGED_STACK_SIZE)
-#define ARCH_THREAD_STACK_OBJ_ALIGN(size)	Z_ARC_MPU_ALIGN
+#define ARCH_THREAD_STACK_RESERVED \
+	(Z_ARC_STACK_GUARD_SIZE + CONFIG_PRIVILEGED_STACK_SIZE)
+#define ARCH_THREAD_STACK_OBJ_ALIGN(size) Z_ARC_MPU_ALIGN
 /* We need to be able to exactly cover the stack buffer with an MPU region,
  * so round its size up to the required granularity of the MPU
  */
-#define ARCH_THREAD_STACK_SIZE_ADJUST(size) \
-		(ROUND_UP((size), Z_ARC_MPU_ALIGN))
+#define ARCH_THREAD_STACK_SIZE_ADJUST(size) (ROUND_UP((size), Z_ARC_MPU_ALIGN))
 BUILD_ASSERT(CONFIG_PRIVILEGED_STACK_SIZE % Z_ARC_MPU_ALIGN == 0,
 	     "improper privilege stack size");
 #else /* !CONFIG_MPU_STACK_GUARD */
@@ -142,10 +141,9 @@ BUILD_ASSERT(CONFIG_PRIVILEGED_STACK_SIZE % Z_ARC_MPU_ALIGN == 0,
  * +------------+ <- thread.stack_info.start + thread.stack_info.size
  */
 #define ARCH_THREAD_STACK_SIZE_ADJUST(size) \
-		Z_POW2_CEIL(ROUND_UP((size), Z_ARC_MPU_ALIGN))
-#define ARCH_THREAD_STACK_OBJ_ALIGN(size) \
-		ARCH_THREAD_STACK_SIZE_ADJUST(size)
-#define ARCH_THREAD_STACK_RESERVED		0
+	Z_POW2_CEIL(ROUND_UP((size), Z_ARC_MPU_ALIGN))
+#define ARCH_THREAD_STACK_OBJ_ALIGN(size) ARCH_THREAD_STACK_SIZE_ADJUST(size)
+#define ARCH_THREAD_STACK_RESERVED 0
 #else /* !CONFIG_MPU_REQUIRES_POWER_OF_TWO_ALIGNMENT */
 /* Reserved area of the thread object just contains the privilege stack:
  *
@@ -159,10 +157,9 @@ BUILD_ASSERT(CONFIG_PRIVILEGED_STACK_SIZE % Z_ARC_MPU_ALIGN == 0,
  * | TLS        | } thread.stack_info.delta
  * +------------+ <- thread.stack_info.start + thread.stack_info.size
  */
-#define ARCH_THREAD_STACK_RESERVED		CONFIG_PRIVILEGED_STACK_SIZE
-#define ARCH_THREAD_STACK_SIZE_ADJUST(size) \
-		(ROUND_UP((size), Z_ARC_MPU_ALIGN))
-#define ARCH_THREAD_STACK_OBJ_ALIGN(size)	Z_ARC_MPU_ALIGN
+#define ARCH_THREAD_STACK_RESERVED CONFIG_PRIVILEGED_STACK_SIZE
+#define ARCH_THREAD_STACK_SIZE_ADJUST(size) (ROUND_UP((size), Z_ARC_MPU_ALIGN))
+#define ARCH_THREAD_STACK_OBJ_ALIGN(size) Z_ARC_MPU_ALIGN
 
 BUILD_ASSERT(CONFIG_PRIVILEGED_STACK_SIZE % Z_ARC_MPU_ALIGN == 0,
 	     "improper privilege stack size");
@@ -186,8 +183,8 @@ BUILD_ASSERT(CONFIG_PRIVILEGED_STACK_SIZE % Z_ARC_MPU_ALIGN == 0,
  * | TLS        | } thread.stack_info.delta
  * +------------+ <- thread.stack_info.start + thread.stack_info.size
  */
-#define ARCH_THREAD_STACK_RESERVED		Z_ARC_STACK_GUARD_SIZE
-#define ARCH_THREAD_STACK_OBJ_ALIGN(size)	Z_ARC_MPU_ALIGN
+#define ARCH_THREAD_STACK_RESERVED Z_ARC_STACK_GUARD_SIZE
+#define ARCH_THREAD_STACK_OBJ_ALIGN(size) Z_ARC_MPU_ALIGN
 /* Default for ARCH_THREAD_STACK_SIZE_ADJUST */
 #else /* !CONFIG_MPU_STACK_GUARD */
 /* No stack guard, no userspace, Use defaults for everything. */
@@ -199,58 +196,58 @@ BUILD_ASSERT(CONFIG_PRIVILEGED_STACK_SIZE % Z_ARC_MPU_ALIGN == 0,
 /* Legacy case: retain containing extern "C" with C++ */
 #include <arch/arc/v2/mpu/arc_mpu.h>
 
-#define K_MEM_PARTITION_P_NA_U_NA	AUX_MPU_ATTR_N
-#define K_MEM_PARTITION_P_RW_U_RW	(AUX_MPU_ATTR_UW | AUX_MPU_ATTR_UR | \
-					 AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR)
-#define K_MEM_PARTITION_P_RW_U_RO	(AUX_MPU_ATTR_UR | \
-					 AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR)
-#define K_MEM_PARTITION_P_RW_U_NA	(AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR)
-#define K_MEM_PARTITION_P_RO_U_RO	(AUX_MPU_ATTR_UR | AUX_MPU_ATTR_KR)
-#define K_MEM_PARTITION_P_RO_U_NA	(AUX_MPU_ATTR_KR)
+#define K_MEM_PARTITION_P_NA_U_NA AUX_MPU_ATTR_N
+#define K_MEM_PARTITION_P_RW_U_RW \
+	(AUX_MPU_ATTR_UW | AUX_MPU_ATTR_UR | AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR)
+#define K_MEM_PARTITION_P_RW_U_RO \
+	(AUX_MPU_ATTR_UR | AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR)
+#define K_MEM_PARTITION_P_RW_U_NA (AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR)
+#define K_MEM_PARTITION_P_RO_U_RO (AUX_MPU_ATTR_UR | AUX_MPU_ATTR_KR)
+#define K_MEM_PARTITION_P_RO_U_NA (AUX_MPU_ATTR_KR)
 
 /* Execution-allowed attributes */
-#define K_MEM_PARTITION_P_RWX_U_RWX	(AUX_MPU_ATTR_UW | AUX_MPU_ATTR_UR | \
-					 AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR | \
-					 AUX_MPU_ATTR_KE | AUX_MPU_ATTR_UE)
-#define K_MEM_PARTITION_P_RWX_U_RX	(AUX_MPU_ATTR_UR | \
-					 AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR | \
-					 AUX_MPU_ATTR_KE | AUX_MPU_ATTR_UE)
-#define K_MEM_PARTITION_P_RX_U_RX	(AUX_MPU_ATTR_UR | \
-					 AUX_MPU_ATTR_KR | \
-					 AUX_MPU_ATTR_KE | AUX_MPU_ATTR_UE)
+#define K_MEM_PARTITION_P_RWX_U_RWX                            \
+	(AUX_MPU_ATTR_UW | AUX_MPU_ATTR_UR | AUX_MPU_ATTR_KW | \
+	 AUX_MPU_ATTR_KR | AUX_MPU_ATTR_KE | AUX_MPU_ATTR_UE)
+#define K_MEM_PARTITION_P_RWX_U_RX                             \
+	(AUX_MPU_ATTR_UR | AUX_MPU_ATTR_KW | AUX_MPU_ATTR_KR | \
+	 AUX_MPU_ATTR_KE | AUX_MPU_ATTR_UE)
+#define K_MEM_PARTITION_P_RX_U_RX \
+	(AUX_MPU_ATTR_UR | AUX_MPU_ATTR_KR | AUX_MPU_ATTR_KE | AUX_MPU_ATTR_UE)
 
-#define K_MEM_PARTITION_IS_WRITABLE(attr) \
-	({ \
-		int __is_writable__; \
+#define K_MEM_PARTITION_IS_WRITABLE(attr)                             \
+	({                                                            \
+		int __is_writable__;                                  \
 		switch (attr & (AUX_MPU_ATTR_UW | AUX_MPU_ATTR_KW)) { \
-		case (AUX_MPU_ATTR_UW | AUX_MPU_ATTR_KW): \
-		case AUX_MPU_ATTR_UW: \
-		case AUX_MPU_ATTR_KW: \
-			__is_writable__ = 1; \
-			break; \
-		default: \
-			__is_writable__ = 0; \
-			break; \
-		} \
-		__is_writable__; \
+		case (AUX_MPU_ATTR_UW | AUX_MPU_ATTR_KW):             \
+		case AUX_MPU_ATTR_UW:                                 \
+		case AUX_MPU_ATTR_KW:                                 \
+			__is_writable__ = 1;                          \
+			break;                                        \
+		default:                                              \
+			__is_writable__ = 0;                          \
+			break;                                        \
+		}                                                     \
+		__is_writable__;                                      \
 	})
 #define K_MEM_PARTITION_IS_EXECUTABLE(attr) \
 	((attr) & (AUX_MPU_ATTR_KE | AUX_MPU_ATTR_UE))
 
 #if CONFIG_ARC_MPU_VER == 2
-#define _ARCH_MEM_PARTITION_ALIGN_CHECK(start, size) \
-	BUILD_ASSERT(!(((size) & ((size) - 1))) && (size) >= Z_ARC_MPU_ALIGN \
-		 && !((uint32_t)(start) & ((size) - 1)), \
-		"the size of the partition must be power of 2" \
+#define _ARCH_MEM_PARTITION_ALIGN_CHECK(start, size)                        \
+	BUILD_ASSERT(                                                       \
+		!(((size) & ((size)-1))) && (size) >= Z_ARC_MPU_ALIGN &&    \
+			!((uint32_t)(start) & ((size)-1)),                  \
+		"the size of the partition must be power of 2"              \
 		" and greater than or equal to the mpu adddress alignment." \
 		"start address of the partition must align with size.")
 #elif CONFIG_ARC_MPU_VER == 3
-#define _ARCH_MEM_PARTITION_ALIGN_CHECK(start, size) \
-	BUILD_ASSERT((size) % Z_ARC_MPU_ALIGN == 0 && \
-		     (size) >= Z_ARC_MPU_ALIGN && \
-		     (uint32_t)(start) % Z_ARC_MPU_ALIGN == 0, \
-		     "the size of the partition must align with 32" \
-		     " and greater than or equal to 32." \
+#define _ARCH_MEM_PARTITION_ALIGN_CHECK(start, size)                   \
+	BUILD_ASSERT((size) % Z_ARC_MPU_ALIGN == 0 &&                  \
+			     (size) >= Z_ARC_MPU_ALIGN &&              \
+			     (uint32_t)(start) % Z_ARC_MPU_ALIGN == 0, \
+		     "the size of the partition must align with 32"    \
+		     " and greater than or equal to 32."               \
 		     "start address of the partition must align with 32.")
 #endif
 #endif /* CONFIG_ARC_MPU*/

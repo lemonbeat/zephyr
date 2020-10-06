@@ -56,8 +56,8 @@ int emul_init_for_bus_from_list(const struct device *dev,
 		int rc = emul->init(emul, dev);
 
 		if (rc != 0) {
-			LOG_WRN("Init %s emulator failed: %d\n",
-				 elp->label, rc);
+			LOG_WRN("Init %s emulator failed: %d\n", elp->label,
+				rc);
 		}
 	}
 

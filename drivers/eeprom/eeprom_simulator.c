@@ -54,12 +54,12 @@ static struct k_sem sem_lock;
 
 /* simulator statistcs */
 STATS_SECT_START(eeprom_sim_stats)
-STATS_SECT_ENTRY32(bytes_read)		/* total bytes read */
-STATS_SECT_ENTRY32(bytes_written)	/* total bytes written */
-STATS_SECT_ENTRY32(eeprom_read_calls)	/* calls to eeprom_read() */
+STATS_SECT_ENTRY32(bytes_read) /* total bytes read */
+STATS_SECT_ENTRY32(bytes_written) /* total bytes written */
+STATS_SECT_ENTRY32(eeprom_read_calls) /* calls to eeprom_read() */
 STATS_SECT_ENTRY32(eeprom_read_time_us) /* time spent in eeprom_read() */
-STATS_SECT_ENTRY32(eeprom_write_calls)  /* calls to eeprom_write() */
-STATS_SECT_ENTRY32(eeprom_write_time_us)/* time spent in eeprom_write() */
+STATS_SECT_ENTRY32(eeprom_write_calls) /* calls to eeprom_write() */
+STATS_SECT_ENTRY32(eeprom_write_time_us) /* time spent in eeprom_write() */
 STATS_SECT_END;
 
 STATS_SECT_DECL(eeprom_sim_stats) eeprom_sim_stats;
@@ -135,8 +135,7 @@ static int eeprom_sim_read(const struct device *dev, off_t offset, void *data,
 }
 
 static int eeprom_sim_write(const struct device *dev, off_t offset,
-			    const void *data,
-			    size_t len)
+			    const void *data, size_t len)
 {
 	const struct eeprom_sim_config *config = DEV_CONFIG(dev);
 
@@ -162,10 +161,10 @@ static int eeprom_sim_write(const struct device *dev, off_t offset,
 
 	if (eeprom_sim_thresholds.max_write_calls != 0) {
 		if (eeprom_sim_stats.eeprom_write_calls >
-			eeprom_sim_thresholds.max_write_calls) {
+		    eeprom_sim_thresholds.max_write_calls) {
 			goto end;
 		} else if (eeprom_sim_stats.eeprom_write_calls ==
-				eeprom_sim_thresholds.max_write_calls) {
+			   eeprom_sim_thresholds.max_write_calls) {
 			if (eeprom_sim_thresholds.max_len == 0) {
 				goto end;
 			}
@@ -223,20 +222,20 @@ static int eeprom_mock_init(const struct device *dev)
 	eeprom_fd = open(eeprom_file_path, O_RDWR | O_CREAT, (mode_t)0600);
 	if (eeprom_fd == -1) {
 		posix_print_warning("Failed to open eeprom device file ",
-				    "%s: %s\n",
-				    eeprom_file_path, strerror(errno));
+				    "%s: %s\n", eeprom_file_path,
+				    strerror(errno));
 		return -EIO;
 	}
 
 	if (ftruncate(eeprom_fd, DT_INST_PROP(0, size)) == -1) {
 		posix_print_warning("Failed to resize eeprom device file ",
-				    "%s: %s\n",
-				    eeprom_file_path, strerror(errno));
+				    "%s: %s\n", eeprom_file_path,
+				    strerror(errno));
 		return -EIO;
 	}
 
-	mock_eeprom = mmap(NULL, DT_INST_PROP(0, size),
-			  PROT_WRITE | PROT_READ, MAP_SHARED, eeprom_fd, 0);
+	mock_eeprom = mmap(NULL, DT_INST_PROP(0, size), PROT_WRITE | PROT_READ,
+			   MAP_SHARED, eeprom_fd, 0);
 	if (mock_eeprom == MAP_FAILED) {
 		posix_print_warning("Failed to mmap eeprom device file "
 				    "%s: %s\n",
@@ -267,8 +266,8 @@ static int eeprom_sim_init(const struct device *dev)
 	return eeprom_mock_init(dev);
 }
 
-DEVICE_AND_API_INIT(eeprom_sim_0, DT_INST_LABEL(0),
-		    &eeprom_sim_init, NULL, &eeprom_sim_config_0, POST_KERNEL,
+DEVICE_AND_API_INIT(eeprom_sim_0, DT_INST_LABEL(0), &eeprom_sim_init, NULL,
+		    &eeprom_sim_config_0, POST_KERNEL,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &eeprom_sim_api);
 
 #ifdef CONFIG_ARCH_POSIX
@@ -301,7 +300,6 @@ static void eeprom_native_posix_options(void)
 
 	native_add_command_line_opts(eeprom_options);
 }
-
 
 NATIVE_TASK(eeprom_native_posix_options, PRE_BOOT_1, 1);
 NATIVE_TASK(eeprom_native_posix_cleanup, ON_EXIT, 1);

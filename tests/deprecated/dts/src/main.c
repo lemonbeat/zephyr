@@ -20,6 +20,6 @@ void main(void)
 	BUILD_ASSERT(DT_FLASH_AREA_IMAGE_1_ID == FLASH_AREA_ID(image_1),
 		     "FLASH AREA ID mismatch for IMAGE_1 partition");
 	BUILD_ASSERT(DT_FLASH_AREA_IMAGE_SCRATCH_ID ==
-		     FLASH_AREA_ID(image_scratch),
+			     FLASH_AREA_ID(image_scratch),
 		     "FLASH AREA ID mismatch for IMAGE_SCRATCH partition");
 }

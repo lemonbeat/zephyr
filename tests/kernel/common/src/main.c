@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <ztest.h>
 #include <kernel_version.h>
 #include <sys/speculation.h>
@@ -84,7 +83,6 @@ static void test_version(void)
 		     "minor version mismatch");
 	zassert_true(SYS_KERNEL_VER_PATCHLEVEL(version) == KERNEL_PATCHLEVEL,
 		     "patchlevel version match");
-
 }
 
 static void test_bounds_check_mitigation(void)
@@ -107,8 +105,7 @@ static void test_bounds_check_mitigation(void)
 
 void test_main(void)
 {
-	ztest_test_suite(common,
-			 ztest_unit_test(test_bootdelay),
+	ztest_test_suite(common, ztest_unit_test(test_bootdelay),
 			 ztest_unit_test(test_irq_offload),
 			 ztest_unit_test(test_byteorder_memcpy_swap),
 			 ztest_unit_test(test_byteorder_mem_swap),
@@ -142,8 +139,7 @@ void test_main(void)
 			 ztest_unit_test(test_multilib),
 			 ztest_unit_test(test_thread_context),
 			 ztest_unit_test(test_ms_time_duration),
-			 ztest_unit_test(test_bounds_check_mitigation)
-			 );
+			 ztest_unit_test(test_bounds_check_mitigation));
 
 	ztest_run_test_suite(common);
 }

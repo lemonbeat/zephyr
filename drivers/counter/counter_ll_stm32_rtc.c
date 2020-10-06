@@ -29,18 +29,18 @@ LOG_MODULE_REGISTER(counter_rtc_stm32, CONFIG_COUNTER_LOG_LEVEL);
 #define T_TIME_OFFSET 946684800
 
 #if defined(CONFIG_SOC_SERIES_STM32L4X)
-#define RTC_EXTI_LINE	LL_EXTI_LINE_18
-#elif defined(CONFIG_SOC_SERIES_STM32F4X) \
-	|| defined(CONFIG_SOC_SERIES_STM32F0X) \
-	|| defined(CONFIG_SOC_SERIES_STM32F2X) \
-	|| defined(CONFIG_SOC_SERIES_STM32F3X) \
-	|| defined(CONFIG_SOC_SERIES_STM32F7X) \
-	|| defined(CONFIG_SOC_SERIES_STM32WBX) \
-	|| defined(CONFIG_SOC_SERIES_STM32G4X) \
-	|| defined(CONFIG_SOC_SERIES_STM32L0X) \
-	|| defined(CONFIG_SOC_SERIES_STM32L1X) \
-	|| defined(CONFIG_SOC_SERIES_STM32H7X)
-#define RTC_EXTI_LINE	LL_EXTI_LINE_17
+#define RTC_EXTI_LINE LL_EXTI_LINE_18
+#elif defined(CONFIG_SOC_SERIES_STM32F4X) ||   \
+	defined(CONFIG_SOC_SERIES_STM32F0X) || \
+	defined(CONFIG_SOC_SERIES_STM32F2X) || \
+	defined(CONFIG_SOC_SERIES_STM32F3X) || \
+	defined(CONFIG_SOC_SERIES_STM32F7X) || \
+	defined(CONFIG_SOC_SERIES_STM32WBX) || \
+	defined(CONFIG_SOC_SERIES_STM32G4X) || \
+	defined(CONFIG_SOC_SERIES_STM32L0X) || \
+	defined(CONFIG_SOC_SERIES_STM32L1X) || \
+	defined(CONFIG_SOC_SERIES_STM32H7X)
+#define RTC_EXTI_LINE LL_EXTI_LINE_17
 #endif
 
 struct rtc_stm32_config {
@@ -55,14 +55,10 @@ struct rtc_stm32_data {
 	void *user_data;
 };
 
-
 #define DEV_DATA(dev) ((struct rtc_stm32_data *)(dev)->data)
-#define DEV_CFG(dev)	\
-((const struct rtc_stm32_config * const)(dev)->config)
-
+#define DEV_CFG(dev) ((const struct rtc_stm32_config *const)(dev)->config)
 
 static void rtc_stm32_irq_config(const struct device *dev);
-
 
 static int rtc_stm32_start(const struct device *dev)
 {
@@ -75,7 +71,6 @@ static int rtc_stm32_start(const struct device *dev)
 	return 0;
 }
 
-
 static int rtc_stm32_stop(const struct device *dev)
 {
 	ARG_UNUSED(dev);
@@ -86,7 +81,6 @@ static int rtc_stm32_stop(const struct device *dev)
 
 	return 0;
 }
-
 
 static uint32_t rtc_stm32_read(const struct device *dev)
 {
@@ -103,8 +97,8 @@ static uint32_t rtc_stm32_read(const struct device *dev)
 	/* Convert calendar datetime to UNIX timestamp */
 	/* RTC start time: 1st, Jan, 2000 */
 	/* time_t start:   1st, Jan, 1900 */
-	now.tm_year = 100 +
-			__LL_RTC_CONVERT_BCD2BIN(__LL_RTC_GET_YEAR(rtc_date));
+	now.tm_year =
+		100 + __LL_RTC_CONVERT_BCD2BIN(__LL_RTC_GET_YEAR(rtc_date));
 	/* tm_mon allowed values are 0-11 */
 	now.tm_mon = __LL_RTC_CONVERT_BCD2BIN(__LL_RTC_GET_MONTH(rtc_date)) - 1;
 	now.tm_mday = __LL_RTC_CONVERT_BCD2BIN(__LL_RTC_GET_DAY(rtc_date));
@@ -131,7 +125,7 @@ static int rtc_stm32_get_value(const struct device *dev, uint32_t *ticks)
 }
 
 static int rtc_stm32_set_alarm(const struct device *dev, uint8_t chan_id,
-				const struct counter_alarm_cfg *alarm_cfg)
+			       const struct counter_alarm_cfg *alarm_cfg)
 {
 	struct tm alarm_tm;
 	time_t alarm_val;
@@ -145,7 +139,6 @@ static int rtc_stm32_set_alarm(const struct device *dev, uint8_t chan_id,
 		LOG_DBG("Alarm busy\n");
 		return -EBUSY;
 	}
-
 
 	data->callback = alarm_cfg->callback;
 	data->user_data = alarm_cfg->user_data;
@@ -192,7 +185,6 @@ static int rtc_stm32_set_alarm(const struct device *dev, uint8_t chan_id,
 	return 0;
 }
 
-
 static int rtc_stm32_cancel_alarm(const struct device *dev, uint8_t chan_id)
 {
 	LL_RTC_DisableWriteProtection(RTC);
@@ -206,12 +198,10 @@ static int rtc_stm32_cancel_alarm(const struct device *dev, uint8_t chan_id)
 	return 0;
 }
 
-
 static uint32_t rtc_stm32_get_pending_int(const struct device *dev)
 {
 	return LL_RTC_IsActiveFlag_ALRA(RTC) != 0;
 }
-
 
 static uint32_t rtc_stm32_get_top_value(const struct device *dev)
 {
@@ -220,22 +210,18 @@ static uint32_t rtc_stm32_get_top_value(const struct device *dev)
 	return info->max_top_value;
 }
 
-
 static int rtc_stm32_set_top_value(const struct device *dev,
 				   const struct counter_top_cfg *cfg)
 {
 	const struct counter_config_info *info = dev->config;
 
 	if ((cfg->ticks != info->max_top_value) ||
-		!(cfg->flags & COUNTER_TOP_CFG_DONT_RESET)) {
+	    !(cfg->flags & COUNTER_TOP_CFG_DONT_RESET)) {
 		return -ENOTSUP;
 	} else {
 		return 0;
 	}
-
-
 }
-
 
 static uint32_t rtc_stm32_get_max_relative_alarm(const struct device *dev)
 {
@@ -243,7 +229,6 @@ static uint32_t rtc_stm32_get_max_relative_alarm(const struct device *dev)
 
 	return info->max_top_value;
 }
-
 
 void rtc_stm32_isr(const struct device *dev)
 {
@@ -253,7 +238,6 @@ void rtc_stm32_isr(const struct device *dev)
 	uint32_t now = rtc_stm32_read(dev);
 
 	if (LL_RTC_IsActiveFlag_ALRA(RTC) != 0) {
-
 		LL_RTC_DisableWriteProtection(RTC);
 		LL_RTC_ClearFlag_ALRA(RTC);
 		LL_RTC_DisableIT_ALRA(RTC);
@@ -273,7 +257,6 @@ void rtc_stm32_isr(const struct device *dev)
 #endif
 }
 
-
 static int rtc_stm32_init(const struct device *dev)
 {
 	const struct device *clk = device_get_binding(STM32_CLOCK_CONTROL_NAME);
@@ -283,7 +266,7 @@ static int rtc_stm32_init(const struct device *dev)
 
 	DEV_DATA(dev)->callback = NULL;
 
-	clock_control_on(clk, (clock_control_subsys_t *) &cfg->pclken);
+	clock_control_on(clk, (clock_control_subsys_t *)&cfg->pclken);
 
 	z_stm32_hsem_lock(CFG_HW_RCC_SEMID, HSEM_LOCK_DEFAULT_RETRY);
 
@@ -310,7 +293,7 @@ static int rtc_stm32_init(const struct device *dev)
 
 #else /* CONFIG_COUNTER_RTC_STM32_CLOCK_LSE */
 
-#if !defined(CONFIG_SOC_SERIES_STM32F4X) &&	\
+#if !defined(CONFIG_SOC_SERIES_STM32F4X) &&     \
 	!defined(CONFIG_SOC_SERIES_STM32F2X) && \
 	!defined(CONFIG_SOC_SERIES_STM32L1X)
 
@@ -350,8 +333,8 @@ static int rtc_stm32_init(const struct device *dev)
 		return -EIO;
 	}
 
-	if (LL_RTC_Init(RTC, ((LL_RTC_InitTypeDef *)
-			      &cfg->ll_rtc_config)) != SUCCESS) {
+	if (LL_RTC_Init(RTC, ((LL_RTC_InitTypeDef *)&cfg->ll_rtc_config)) !=
+	    SUCCESS) {
 		return -EIO;
 	}
 
@@ -400,27 +383,25 @@ static const struct rtc_stm32_config rtc_config = {
 	},
 };
 
-
 static const struct counter_driver_api rtc_stm32_driver_api = {
-		.start = rtc_stm32_start,
-		.stop = rtc_stm32_stop,
-		.get_value = rtc_stm32_get_value,
-		.set_alarm = rtc_stm32_set_alarm,
-		.cancel_alarm = rtc_stm32_cancel_alarm,
-		.set_top_value = rtc_stm32_set_top_value,
-		.get_pending_int = rtc_stm32_get_pending_int,
-		.get_top_value = rtc_stm32_get_top_value,
-		.get_max_relative_alarm = rtc_stm32_get_max_relative_alarm,
+	.start = rtc_stm32_start,
+	.stop = rtc_stm32_stop,
+	.get_value = rtc_stm32_get_value,
+	.set_alarm = rtc_stm32_set_alarm,
+	.cancel_alarm = rtc_stm32_cancel_alarm,
+	.set_top_value = rtc_stm32_set_top_value,
+	.get_pending_int = rtc_stm32_get_pending_int,
+	.get_top_value = rtc_stm32_get_top_value,
+	.get_max_relative_alarm = rtc_stm32_get_max_relative_alarm,
 };
 
-DEVICE_AND_API_INIT(rtc_stm32, DT_INST_LABEL(0), &rtc_stm32_init,
-		    &rtc_data, &rtc_config, PRE_KERNEL_1,
+DEVICE_AND_API_INIT(rtc_stm32, DT_INST_LABEL(0), &rtc_stm32_init, &rtc_data,
+		    &rtc_config, PRE_KERNEL_1,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &rtc_stm32_driver_api);
 
 static void rtc_stm32_irq_config(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    rtc_stm32_isr, DEVICE_GET(rtc_stm32), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), rtc_stm32_isr,
+		    DEVICE_GET(rtc_stm32), 0);
 	irq_enable(DT_INST_IRQN(0));
 }

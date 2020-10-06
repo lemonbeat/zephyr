@@ -38,7 +38,6 @@ static void adc_context_update_buffer_pointer(struct adc_context *ctx,
 static void adc_context_enable_timer(struct adc_context *ctx);
 static void adc_context_disable_timer(struct adc_context *ctx);
 
-
 struct adc_context {
 	atomic_t sampling_requested;
 #ifdef ADC_CONTEXT_USES_KERNEL_TIMER
@@ -61,9 +60,8 @@ struct adc_context {
 
 #ifdef ADC_CONTEXT_USES_KERNEL_TIMER
 #define ADC_CONTEXT_INIT_TIMER(_data, _ctx_name) \
-	._ctx_name.timer = Z_TIMER_INITIALIZER(_data._ctx_name.timer, \
-						adc_context_on_timer_expired, \
-						NULL)
+	._ctx_name.timer = Z_TIMER_INITIALIZER(  \
+		_data._ctx_name.timer, adc_context_on_timer_expired, NULL)
 #endif /* ADC_CONTEXT_USES_KERNEL_TIMER */
 
 #define ADC_CONTEXT_INIT_LOCK(_data, _ctx_name) \
@@ -71,7 +69,6 @@ struct adc_context {
 
 #define ADC_CONTEXT_INIT_SYNC(_data, _ctx_name) \
 	._ctx_name.sync = Z_SEM_INITIALIZER(_data._ctx_name.sync, 0, 1)
-
 
 static inline void adc_context_request_next_sampling(struct adc_context *ctx)
 {
@@ -109,9 +106,7 @@ static void adc_context_on_timer_expired(struct k_timer *timer_id)
 }
 #endif /* ADC_CONTEXT_USES_KERNEL_TIMER */
 
-
-static inline void adc_context_lock(struct adc_context *ctx,
-				    bool asynchronous,
+static inline void adc_context_lock(struct adc_context *ctx, bool asynchronous,
 				    struct k_poll_signal *signal)
 {
 	k_sem_take(&ctx->lock, K_FOREVER);
@@ -212,8 +207,7 @@ static inline void adc_context_on_sampling_done(struct adc_context *ctx,
 		bool repeat = false;
 
 		if (callback) {
-			action = callback(dev,
-					  &ctx->sequence,
+			action = callback(dev, &ctx->sequence,
 					  ctx->sampling_index);
 		} else {
 			action = ADC_ACTION_CONTINUE;

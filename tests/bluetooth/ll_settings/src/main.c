@@ -50,8 +50,7 @@ void test_subversion_number(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_ll_settings,
-			 ztest_unit_test(test_company_id),
+	ztest_test_suite(test_ll_settings, ztest_unit_test(test_company_id),
 			 ztest_unit_test(test_subversion_number));
 	ztest_run_test_suite(test_ll_settings);
 }

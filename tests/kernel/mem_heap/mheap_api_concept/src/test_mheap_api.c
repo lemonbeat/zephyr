@@ -54,9 +54,9 @@ void test_mheap_malloc_free(void)
 	k_free(NULL);
 }
 
-#define NMEMB   8
-#define SIZE    16
-#define BOUNDS  (NMEMB * SIZE)
+#define NMEMB 8
+#define SIZE 16
+#define BOUNDS (NMEMB * SIZE)
 
 /**
  * @brief Test to demonstrate k_calloc() API functionality.

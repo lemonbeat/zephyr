@@ -27,8 +27,8 @@ LOG_MODULE_REGISTER(main);
 /* Predefined response to control commands related to MS OS 2.0 descriptors */
 static const uint8_t msos2_descriptor[] = {
 	/* MS OS 2.0 set header descriptor   */
-	0x0A, 0x00,             /* Descriptor size (10 bytes)                 */
-	0x00, 0x00,             /* MS_OS_20_SET_HEADER_DESCRIPTOR             */
+	0x0A, 0x00, /* Descriptor size (10 bytes)                 */
+	0x00, 0x00, /* MS_OS_20_SET_HEADER_DESCRIPTOR             */
 	0x00, 0x00, 0x03, 0x06, /* Windows version (8.1) (0x06030000)         */
 	(0x0A + 0x14 + 0x08), 0x00, /* Length of the MS OS 2.0 descriptor set */
 
@@ -38,16 +38,16 @@ static const uint8_t msos2_descriptor[] = {
 	 */
 	0x08, 0x00, /* Descriptor size (8 bytes) */
 	0x02, 0x00, /* MS_OS_20_SUBSET_HEADER_FUNCTION */
-	0x02,       /* Index of first interface this subset applies to. */
-	0x00,       /* reserved */
+	0x02, /* Index of first interface this subset applies to. */
+	0x00, /* reserved */
 	(0x08 + 0x14), 0x00, /* Length of the MS OS 2.0 descriptor subset */
 
 	/* MS OS 2.0 compatible ID descriptor */
 	0x14, 0x00, /* Descriptor size                */
 	0x03, 0x00, /* MS_OS_20_FEATURE_COMPATIBLE_ID */
 	/* 8-byte compatible ID string, then 8-byte sub-compatible ID string */
-	'W',  'I',  'N',  'U',  'S',  'B',  0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00
 };
 
 USB_DEVICE_BOS_DESC_DEFINE_CAP struct usb_bos_webusb_desc {
@@ -139,20 +139,20 @@ static const uint8_t webusb_allowed_origins[] = {
 };
 
 /* Number of allowed origins */
-#define NUMBER_OF_ALLOWED_ORIGINS   1
+#define NUMBER_OF_ALLOWED_ORIGINS 1
 
 /* URL Descriptor: https://wicg.github.io/webusb/#url-descriptor */
 static const uint8_t webusb_origin_url[] = {
 	/* Length, DescriptorType, Scheme */
-	0x11, 0x03, 0x00,
-	'l', 'o', 'c', 'a', 'l', 'h', 'o', 's', 't', ':', '8', '0', '0', '0'
+	0x11, 0x03, 0x00, 'l', 'o', 'c', 'a', 'l', 'h',
+	'o',  's',  't',  ':', '8', '0', '0', '0'
 };
 
 /* Predefined response to control commands related to MS OS 1.0 descriptors
  * Please note that this code only defines "extended compat ID OS feature
  * descriptors" and not "extended properties OS features descriptors"
  */
-#define MSOS_STRING_LENGTH	18
+#define MSOS_STRING_LENGTH 18
 static struct string_desc {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
@@ -174,18 +174,17 @@ static const uint8_t msos1_compatid_descriptor[] = {
 	/* See https://github.com/pbatard/libwdi/wiki/WCID-Devices */
 	/* MS OS 1.0 header section */
 	0x28, 0x00, 0x00, 0x00, /* Descriptor size (40 bytes)          */
-	0x00, 0x01,             /* Version 1.00                        */
-	0x04, 0x00,             /* Type: Extended compat ID descriptor */
-	0x01,                   /* Number of function sections         */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,       /* reserved    */
+	0x00, 0x01, /* Version 1.00                        */
+	0x04, 0x00, /* Type: Extended compat ID descriptor */
+	0x01, /* Number of function sections         */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* reserved    */
 
 	/* MS OS 1.0 function section */
-	0x02,     /* Index of interface this section applies to. */
-	0x01,     /* reserved */
+	0x02, /* Index of interface this section applies to. */
+	0x01, /* reserved */
 	/* 8-byte compatible ID string, then 8-byte sub-compatible ID string */
-	'W',  'I',  'N',  'U',  'S',  'B',  0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00 /* reserved */
+	'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 /* reserved */
 };
 
 /**
@@ -199,8 +198,8 @@ static const uint8_t msos1_compatid_descriptor[] = {
  *
  * @return  0 on success, negative errno code on fail
  */
-int custom_handle_req(struct usb_setup_packet *pSetup,
-		      int32_t *len, uint8_t **data)
+int custom_handle_req(struct usb_setup_packet *pSetup, int32_t *len,
+		      uint8_t **data)
 {
 	if (GET_DESC_TYPE(pSetup->wValue) == USB_STRING_DESC &&
 	    GET_DESC_INDEX(pSetup->wValue) == 0xEE) {
@@ -225,8 +224,8 @@ int custom_handle_req(struct usb_setup_packet *pSetup,
  *
  * @return  0 on success, negative errno code on fail.
  */
-int vendor_handle_req(struct usb_setup_packet *pSetup,
-		      int32_t *len, uint8_t **data)
+int vendor_handle_req(struct usb_setup_packet *pSetup, int32_t *len,
+		      uint8_t **data)
 {
 	/* Get Allowed origins request */
 	if (pSetup->bRequest == 0x01 && pSetup->wIndex == 0x01) {

@@ -4,7 +4,6 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-
 #ifndef ENC_H
 #define ENC_H
 

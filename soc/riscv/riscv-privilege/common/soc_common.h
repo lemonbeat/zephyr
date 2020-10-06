@@ -13,30 +13,30 @@
 #define __SOC_COMMON_H_
 
 /* IRQ numbers */
-#define RISCV_MACHINE_SOFT_IRQ       3  /* Machine Software Interrupt */
-#define RISCV_MACHINE_TIMER_IRQ      7  /* Machine Timer Interrupt */
-#define RISCV_MACHINE_EXT_IRQ        11 /* Machine External Interrupt */
+#define RISCV_MACHINE_SOFT_IRQ 3 /* Machine Software Interrupt */
+#define RISCV_MACHINE_TIMER_IRQ 7 /* Machine Timer Interrupt */
+#define RISCV_MACHINE_EXT_IRQ 11 /* Machine External Interrupt */
 
 /* Exception numbers */
-#define RISCV_MACHINE_ECALL_EXP      11 /* Machine ECALL instruction */
+#define RISCV_MACHINE_ECALL_EXP 11 /* Machine ECALL instruction */
 
 /* SOC-specific MCAUSE bitfields */
 #ifdef CONFIG_64BIT
 /* Interrupt Mask */
-#define SOC_MCAUSE_IRQ_MASK          (1 << 63)
+#define SOC_MCAUSE_IRQ_MASK (1 << 63)
 /* Exception code Mask */
-#define SOC_MCAUSE_EXP_MASK          0x7FFFFFFFFFFFFFFF
+#define SOC_MCAUSE_EXP_MASK 0x7FFFFFFFFFFFFFFF
 #else
 /* Interrupt Mask */
-#define SOC_MCAUSE_IRQ_MASK          (1 << 31)
+#define SOC_MCAUSE_IRQ_MASK (1 << 31)
 /* Exception code Mask */
-#define SOC_MCAUSE_EXP_MASK          0x7FFFFFFF
+#define SOC_MCAUSE_EXP_MASK 0x7FFFFFFF
 #endif
 /* ECALL exception number */
-#define SOC_MCAUSE_ECALL_EXP         RISCV_MACHINE_ECALL_EXP
+#define SOC_MCAUSE_ECALL_EXP RISCV_MACHINE_ECALL_EXP
 
 /* SOC-Specific EXIT ISR command */
-#define SOC_ERET                     mret
+#define SOC_ERET mret
 
 #ifndef _ASMLANGUAGE
 

@@ -26,18 +26,17 @@
 #include "bs_tracing.h"
 #include "commands.h"
 
-#define DEVICE_NAME		CONFIG_BT_DEVICE_NAME
-#define DEVICE_NAME_LEN		(sizeof(DEVICE_NAME) - 1)
+#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
+	BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_CTS_VAL)),
-	BT_DATA_BYTES(BT_DATA_UUID128_ALL,
-		      0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12,
-		      0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12),
+	BT_DATA_BYTES(BT_DATA_UUID128_ALL, 0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56,
+		      0x34, 0x12, 0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34,
+		      0x12),
 };
 
 static const struct bt_data sd[] = {
@@ -80,7 +79,8 @@ static void service_setup(int set)
 {
 	if (set == service_set) {
 		printk("Ignored request to change GATT services set to #%d - "
-			"already selected!\n", set);
+		       "already selected!\n",
+		       set);
 		return;
 	}
 	switch (service_set) {
@@ -279,7 +279,7 @@ static void read_excess_bytes(uint16_t size)
 static void switch_service_set(uint16_t size)
 {
 	uint16_t response = sys_cpu_to_le16(CMD_GATT_SERVICE_SET_RSP);
-	uint8_t  set;
+	uint8_t set;
 
 	if (size > 0) {
 		edtt_read((uint8_t *)&set, sizeof(set), EDTTT_BLOCK);
@@ -359,7 +359,7 @@ void main(void)
 		edtt_read((uint8_t *)&size, sizeof(size), EDTTT_BLOCK);
 		size = sys_le16_to_cpu(size);
 		bs_trace_raw_time(4, "command 0x%04X received (size %u)\n",
-				command, size);
+				  command, size);
 
 		switch (command) {
 		case CMD_GATT_SERVICE_SET_REQ:

@@ -31,12 +31,11 @@ static struct bt_mesh_cfg_srv cfg_srv = {
 	.relay_retransmit = BT_MESH_TRANSMIT(3, 20),
 };
 
-static struct bt_mesh_cfg_cli cfg_cli = {
-};
+static struct bt_mesh_cfg_cli cfg_cli = {};
 
 static void health_current_status(struct bt_mesh_health_cli *cli, uint16_t addr,
-				  uint8_t test_id, uint16_t cid, uint8_t *faults,
-				  size_t fault_count)
+				  uint8_t test_id, uint16_t cid,
+				  uint8_t *faults, size_t fault_count)
 {
 	size_t i;
 
@@ -194,7 +193,8 @@ static void unprovisioned_beacon(uint8_t uuid[16],
 	k_sem_give(&sem_unprov_beacon);
 }
 
-static void node_added(uint16_t net_idx, uint8_t uuid[16], uint16_t addr, uint8_t num_elem)
+static void node_added(uint16_t net_idx, uint8_t uuid[16], uint16_t addr,
+		       uint8_t num_elem)
 {
 	node_addr = addr;
 	k_sem_give(&sem_node_added);

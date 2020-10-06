@@ -7,24 +7,24 @@
 #include <string.h>
 #include <debug/coredump.h>
 
-#define ARCH_HDR_VER			1
+#define ARCH_HDR_VER 1
 
 struct x86_arch_block {
-	uint32_t	vector;
-	uint32_t	code;
+	uint32_t vector;
+	uint32_t code;
 
 	struct {
-		uint32_t	eax;
-		uint32_t	ecx;
-		uint32_t	edx;
-		uint32_t	ebx;
-		uint32_t	esp;
-		uint32_t	ebp;
-		uint32_t	esi;
-		uint32_t	edi;
-		uint32_t	eip;
-		uint32_t	eflags;
-		uint32_t	cs;
+		uint32_t eax;
+		uint32_t ecx;
+		uint32_t edx;
+		uint32_t ebx;
+		uint32_t esp;
+		uint32_t ebp;
+		uint32_t esi;
+		uint32_t edi;
+		uint32_t eip;
+		uint32_t eflags;
+		uint32_t cs;
 	} r;
 } __packed;
 

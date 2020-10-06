@@ -234,23 +234,21 @@ int eswifi_spi_init(struct eswifi_dev *eswifi)
 	}
 
 	/* SPI DATA READY PIN */
-	spi->dr.dev = device_get_binding(
-			DT_INST_GPIO_LABEL(0, data_gpios));
+	spi->dr.dev = device_get_binding(DT_INST_GPIO_LABEL(0, data_gpios));
 	if (!spi->dr.dev) {
 		LOG_ERR("Failed to initialize GPIO driver: %s",
-			    DT_INST_GPIO_LABEL(0, data_gpios));
+			DT_INST_GPIO_LABEL(0, data_gpios));
 		return -ENODEV;
 	}
 	spi->dr.pin = DT_INST_GPIO_PIN(0, data_gpios);
 	gpio_pin_configure(spi->dr.dev, spi->dr.pin,
-			   DT_INST_GPIO_FLAGS(0, data_gpios) |
-			   GPIO_INPUT);
+			   DT_INST_GPIO_FLAGS(0, data_gpios) | GPIO_INPUT);
 
 	/* SPI CONFIG/CS */
 	spi->spi_cfg.frequency = DT_INST_PROP(0, spi_max_frequency);
-	spi->spi_cfg.operation = (SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB |
-				  SPI_WORD_SET(16) | SPI_LINES_SINGLE |
-				  SPI_HOLD_ON_CS | SPI_LOCK_ON);
+	spi->spi_cfg.operation =
+		(SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB | SPI_WORD_SET(16) |
+		 SPI_LINES_SINGLE | SPI_HOLD_ON_CS | SPI_LOCK_ON);
 	spi->spi_cfg.slave = DT_INST_REG_ADDR(0);
 	spi->spi_cs.gpio_dev =
 		device_get_binding(DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));

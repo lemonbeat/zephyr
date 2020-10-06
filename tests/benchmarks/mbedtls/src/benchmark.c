@@ -29,10 +29,10 @@
 #include "mbedtls/platform.h"
 #else
 #include <stdio.h>
-#define mbedtls_exit       exit
-#define mbedtls_printf     printf
-#define mbedtls_snprintf   snprintf
-#define mbedtls_free       free
+#define mbedtls_exit exit
+#define mbedtls_printf printf
+#define mbedtls_snprintf snprintf
+#define mbedtls_free free
 #endif
 
 #include <string.h>
@@ -74,10 +74,10 @@
 #include "kernel.h"
 
 #include <sys/printk.h>
-#define  MBEDTLS_PRINT ((int(*)(const char *, ...)) printk)
+#define MBEDTLS_PRINT ((int (*)(const char *, ...))printk)
 
-static void my_debug(void *ctx, int level,
-		     const char *file, int line, const char *str)
+static void my_debug(void *ctx, int level, const char *file, int line,
+		     const char *str)
 {
 	const char *p, *basename;
 	int len;
@@ -126,83 +126,87 @@ void mbedtls_set_alarm(int seconds)
  * block. ptmalloc2/3 (used in gnu libc for instance) uses 2 size_t per block,
  * so use that as our baseline.
  */
-#define MEM_BLOCK_OVERHEAD  (2 * sizeof(size_t))
+#define MEM_BLOCK_OVERHEAD (2 * sizeof(size_t))
 
-#define BUFSIZE         1024
-#define HEADER_FORMAT   "  %-24s :  "
-#define TITLE_LEN       25
+#define BUFSIZE 1024
+#define HEADER_FORMAT "  %-24s :  "
+#define TITLE_LEN 25
 
-#define OPTIONS                                                    \
-	"md4, md5, ripemd160, sha1, sha256, sha512,\n"             \
-	"arc4, des3, des, camellia, blowfish, chacha20,\n"         \
-	"aes_cbc, aes_gcm, aes_ccm, aes_ctx, chachapoly,\n"        \
-	"aes_cmac, des3_cmac, poly1305,\n"                         \
-	"havege, ctr_drbg, hmac_drbg,\n"                           \
+#define OPTIONS                                             \
+	"md4, md5, ripemd160, sha1, sha256, sha512,\n"      \
+	"arc4, des3, des, camellia, blowfish, chacha20,\n"  \
+	"aes_cbc, aes_gcm, aes_ccm, aes_ctx, chachapoly,\n" \
+	"aes_cmac, des3_cmac, poly1305,\n"                  \
+	"havege, ctr_drbg, hmac_drbg,\n"                    \
 	"rsa, dhm, ecdsa, ecdh.\n"
 
 #if defined(MBEDTLS_ERROR_C)
-#define PRINT_ERROR {                                            \
-	mbedtls_strerror(ret, (char *)tmp, sizeof(tmp));         \
-	mbedtls_printf("FAILED: %s\n", tmp);                     \
+#define PRINT_ERROR                                              \
+	{                                                        \
+		mbedtls_strerror(ret, (char *)tmp, sizeof(tmp)); \
+		mbedtls_printf("FAILED: %s\n", tmp);             \
 	}
 #else
-#define PRINT_ERROR {                                            \
-	mbedtls_printf("FAILED: -0x%04x\n", -ret);               \
+#define PRINT_ERROR                                        \
+	{                                                  \
+		mbedtls_printf("FAILED: -0x%04x\n", -ret); \
 	}
 #endif
 
-#define TIME_AND_TSC(TITLE, CODE)                                     \
-do {                                                                  \
-	unsigned long ii, jj;                                         \
-	uint32_t tsc;                                                    \
-	uint64_t delta;                                                  \
-	int ret = 0;                                                  \
-								      \
-	mbedtls_printf(HEADER_FORMAT, TITLE);                         \
-								      \
-	mbedtls_set_alarm(1);                                         \
-	for (ii = 1; ret == 0 && !mbedtls_timing_alarmed; ii++) {     \
-		ret = CODE;                                           \
-	}                                                             \
-								      \
-	tsc = k_cycle_get_32();                                       \
-	for (jj = 0; ret == 0 && jj < 1024; jj++) {                   \
-		ret = CODE;                                           \
-	}                                                             \
-								      \
-	if (ret != 0) {                                               \
-		PRINT_ERROR;                                          \
-	}                                                             \
-								      \
-	delta = k_cycle_get_32() - tsc;                               \
-	delta = k_cyc_to_ns_floor64(delta);                   \
-								      \
-	mbedtls_printf("%9lu KiB/s,  %9lu ns/byte\n",                 \
-		       ii * BUFSIZE / 1024,                           \
-		       (unsigned long)(delta / (jj * BUFSIZE)));      \
-} while (0)
+#define TIME_AND_TSC(TITLE, CODE)                                         \
+	do {                                                              \
+		unsigned long ii, jj;                                     \
+		uint32_t tsc;                                             \
+		uint64_t delta;                                           \
+		int ret = 0;                                              \
+                                                                          \
+		mbedtls_printf(HEADER_FORMAT, TITLE);                     \
+                                                                          \
+		mbedtls_set_alarm(1);                                     \
+		for (ii = 1; ret == 0 && !mbedtls_timing_alarmed; ii++) { \
+			ret = CODE;                                       \
+		}                                                         \
+                                                                          \
+		tsc = k_cycle_get_32();                                   \
+		for (jj = 0; ret == 0 && jj < 1024; jj++) {               \
+			ret = CODE;                                       \
+		}                                                         \
+                                                                          \
+		if (ret != 0) {                                           \
+			PRINT_ERROR;                                      \
+		}                                                         \
+                                                                          \
+		delta = k_cycle_get_32() - tsc;                           \
+		delta = k_cyc_to_ns_floor64(delta);                       \
+                                                                          \
+		mbedtls_printf("%9lu KiB/s,  %9lu ns/byte\n",             \
+			       ii *BUFSIZE / 1024,                        \
+			       (unsigned long)(delta / (jj * BUFSIZE)));  \
+	} while (0)
 
 #if defined(MBEDTLS_MEMORY_BUFFER_ALLOC_C) && defined(MBEDTLS_MEMORY_DEBUG)
 
-#define MEMORY_MEASURE_INIT {                                           \
-	size_t max_used, max_blocks, max_bytes;                         \
-	size_t prv_used, prv_blocks;                                    \
-	mbedtls_memory_buffer_alloc_cur_get(&prv_used, &prv_blocks);    \
-	mbedtls_memory_buffer_alloc_max_reset();                        \
-}
+#define MEMORY_MEASURE_INIT                                                  \
+	{                                                                    \
+		size_t max_used, max_blocks, max_bytes;                      \
+		size_t prv_used, prv_blocks;                                 \
+		mbedtls_memory_buffer_alloc_cur_get(&prv_used, &prv_blocks); \
+		mbedtls_memory_buffer_alloc_max_reset();                     \
+	}
 
-#define MEMORY_MEASURE_PRINT(title_len) {                             \
-	mbedtls_memory_buffer_alloc_max_get(&max_used, &max_blocks);  \
-								      \
-	for (ii = 12 - title_len; ii != 0; ii--) {                    \
-		mbedtls_printf(" ");                                  \
-	}                                                             \
-								      \
-	max_used -= prv_used;                                         \
-	max_blocks -= prv_blocks;                                     \
-	max_bytes = max_used + MEM_BLOCK_OVERHEAD * max_blocks;       \
-	mbedtls_printf("%6u heap bytes", (unsigned int) max_bytes);   \
-}
+#define MEMORY_MEASURE_PRINT(title_len)                                      \
+	{                                                                    \
+		mbedtls_memory_buffer_alloc_max_get(&max_used, &max_blocks); \
+                                                                             \
+		for (ii = 12 - title_len; ii != 0; ii--) {                   \
+			mbedtls_printf(" ");                                 \
+		}                                                            \
+                                                                             \
+		max_used -= prv_used;                                        \
+		max_blocks -= prv_blocks;                                    \
+		max_bytes = max_used + MEM_BLOCK_OVERHEAD * max_blocks;      \
+		mbedtls_printf("%6u heap bytes", (unsigned int)max_bytes);   \
+	}
 
 #else
 #define MEMORY_MEASURE_INIT
@@ -210,27 +214,27 @@ do {                                                                  \
 #endif
 
 #define TIME_PUBLIC(TITLE, TYPE, CODE)                                \
-do {                                                                  \
-	unsigned long ii;                                             \
-	int ret;                                                      \
-	MEMORY_MEASURE_INIT;                                          \
-								      \
-	mbedtls_printf(HEADER_FORMAT, TITLE);                         \
-	mbedtls_set_alarm(3);                                         \
-								      \
-	ret = 0;                                                      \
-	for (ii = 1; !mbedtls_timing_alarmed && !ret ; ii++) {        \
-		CODE;                                                 \
-	}                                                             \
-								      \
-	if (ret != 0) {                                               \
-		PRINT_ERROR;                                          \
-	} else {                                                      \
-		mbedtls_printf("%6lu " TYPE "/s", ii / 3);            \
-		MEMORY_MEASURE_PRINT(sizeof(TYPE) + 1);               \
-		mbedtls_printf("\n");                                 \
-	}                                                             \
-} while (0)
+	do {                                                          \
+		unsigned long ii;                                     \
+		int ret;                                              \
+		MEMORY_MEASURE_INIT;                                  \
+                                                                      \
+		mbedtls_printf(HEADER_FORMAT, TITLE);                 \
+		mbedtls_set_alarm(3);                                 \
+                                                                      \
+		ret = 0;                                              \
+		for (ii = 1; !mbedtls_timing_alarmed && !ret; ii++) { \
+			CODE;                                         \
+		}                                                     \
+                                                                      \
+		if (ret != 0) {                                       \
+			PRINT_ERROR;                                  \
+		} else {                                              \
+			mbedtls_printf("%6lu " TYPE "/s", ii / 3);    \
+			MEMORY_MEASURE_PRINT(sizeof(TYPE) + 1);       \
+			mbedtls_printf("\n");                         \
+		}                                                     \
+	} while (0)
 
 static int myrand(void *rng_state, unsigned char *output, size_t len)
 {
@@ -238,7 +242,7 @@ static int myrand(void *rng_state, unsigned char *output, size_t len)
 	int rnd;
 
 	if (rng_state != NULL) {
-		rng_state  = NULL;
+		rng_state = NULL;
 	}
 
 	while (len > 0) {
@@ -254,7 +258,7 @@ static int myrand(void *rng_state, unsigned char *output, size_t len)
 		len -= use_len;
 	}
 
-	return(0);
+	return (0);
 }
 
 /*
@@ -284,9 +288,9 @@ unsigned char buf[BUFSIZE];
 
 typedef struct {
 	char md4, md5, ripemd160, sha1, sha256, sha512, arc4, des3, des,
-	     aes_cbc, aes_gcm, aes_ccm, aes_xts, chachapoly, aes_cmac,
-	     des3_cmac, aria, camellia, blowfish, chacha20, poly1305,
-	     havege, ctr_drbg, hmac_drbg, rsa, dhm, ecdsa, ecdh;
+		aes_cbc, aes_gcm, aes_ccm, aes_xts, chachapoly, aes_cmac,
+		des3_cmac, aria, camellia, blowfish, chacha20, poly1305, havege,
+		ctr_drbg, hmac_drbg, rsa, dhm, ecdsa, ecdh;
 } todo_list;
 
 void main(void)
@@ -338,15 +342,15 @@ void main(void)
 
 #if defined(MBEDTLS_SHA256_C)
 	if (todo.sha256) {
-		TIME_AND_TSC("SHA-256", mbedtls_sha256_ret(buf,
-							   BUFSIZE, tmp, 0));
+		TIME_AND_TSC("SHA-256",
+			     mbedtls_sha256_ret(buf, BUFSIZE, tmp, 0));
 	}
 #endif
 
 #if defined(MBEDTLS_SHA512_C)
 	if (todo.sha512) {
-		TIME_AND_TSC("SHA-512", mbedtls_sha512_ret(buf,
-							   BUFSIZE, tmp, 0));
+		TIME_AND_TSC("SHA-512",
+			     mbedtls_sha512_ret(buf, BUFSIZE, tmp, 0));
 	}
 #endif
 
@@ -357,8 +361,8 @@ void main(void)
 		mbedtls_arc4_init(&arc4);
 		mbedtls_arc4_setup(&arc4, tmp, 32);
 
-		TIME_AND_TSC("ARC4", mbedtls_arc4_crypt(
-						&arc4, BUFSIZE, buf, buf));
+		TIME_AND_TSC("ARC4",
+			     mbedtls_arc4_crypt(&arc4, BUFSIZE, buf, buf));
 		mbedtls_arc4_free(&arc4);
 	}
 #endif
@@ -372,10 +376,8 @@ void main(void)
 		mbedtls_des3_set3key_enc(&des3, tmp);
 
 		TIME_AND_TSC("3DES",
-			     mbedtls_des3_crypt_cbc(
-						&des3,
-						MBEDTLS_DES_ENCRYPT,
-						BUFSIZE, tmp, buf, buf));
+			     mbedtls_des3_crypt_cbc(&des3, MBEDTLS_DES_ENCRYPT,
+						    BUFSIZE, tmp, buf, buf));
 		mbedtls_des3_free(&des3);
 	}
 
@@ -386,11 +388,9 @@ void main(void)
 		mbedtls_des_setkey_enc(&des, tmp);
 
 		TIME_AND_TSC("DES",
-			     mbedtls_des_crypt_cbc(&des,
-						   MBEDTLS_DES_ENCRYPT,
+			     mbedtls_des_crypt_cbc(&des, MBEDTLS_DES_ENCRYPT,
 						   BUFSIZE, tmp, buf, buf));
 		mbedtls_des_free(&des);
-
 	}
 #endif /* MBEDTLS_CIPHER_MODE_CBC */
 #if defined(MBEDTLS_CMAC_C)
@@ -402,7 +402,7 @@ void main(void)
 		memset(tmp, 0, sizeof(tmp));
 
 		cipher_info = mbedtls_cipher_info_from_type(
-						MBEDTLS_CIPHER_DES_EDE3_ECB);
+			MBEDTLS_CIPHER_DES_EDE3_ECB);
 
 		TIME_AND_TSC("3DES-CMAC",
 			     mbedtls_cipher_cmac(cipher_info, tmp, 192, buf,
@@ -420,17 +420,15 @@ void main(void)
 		mbedtls_aes_init(&aes);
 
 		for (keysize = 128; keysize <= 256; keysize += 64) {
-			snprintk(title, sizeof(title),
-				 "AES-CBC-%d", keysize);
+			snprintk(title, sizeof(title), "AES-CBC-%d", keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
 			mbedtls_aes_setkey_enc(&aes, tmp, keysize);
 
-			TIME_AND_TSC(title,
-				     mbedtls_aes_crypt_cbc(&aes,
-						   MBEDTLS_AES_ENCRYPT,
-						   BUFSIZE, tmp, buf, buf));
+			TIME_AND_TSC(title, mbedtls_aes_crypt_cbc(
+						    &aes, MBEDTLS_AES_ENCRYPT,
+						    BUFSIZE, tmp, buf, buf));
 		}
 
 		mbedtls_aes_free(&aes);
@@ -444,18 +442,16 @@ void main(void)
 		mbedtls_aes_xts_init(&ctx);
 
 		for (keysize = 128; keysize <= 256; keysize += 128) {
-			snprintk(title, sizeof(title),
-				 "AES-XTS-%d", keysize);
+			snprintk(title, sizeof(title), "AES-XTS-%d", keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
 
 			mbedtls_aes_xts_setkey_enc(&ctx, tmp, keysize * 2);
 
-			TIME_AND_TSC(title,
-				     mbedtls_aes_crypt_xts(&ctx,
-						MBEDTLS_AES_ENCRYPT, BUFSIZE,
-						tmp, buf, buf));
+			TIME_AND_TSC(title, mbedtls_aes_crypt_xts(
+						    &ctx, MBEDTLS_AES_ENCRYPT,
+						    BUFSIZE, tmp, buf, buf));
 
 			mbedtls_aes_xts_free(&ctx);
 		}
@@ -469,20 +465,17 @@ void main(void)
 		mbedtls_gcm_init(&gcm);
 
 		for (keysize = 128; keysize <= 256; keysize += 64) {
-			snprintk(title, sizeof(title), "AES-GCM-%d",
-				 keysize);
+			snprintk(title, sizeof(title), "AES-GCM-%d", keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
 			mbedtls_gcm_setkey(&gcm, MBEDTLS_CIPHER_ID_AES, tmp,
 					   keysize);
 
-			TIME_AND_TSC(title,
-				     mbedtls_gcm_crypt_and_tag(&gcm,
-							MBEDTLS_GCM_ENCRYPT,
-							BUFSIZE, tmp,
-							12, NULL, 0, buf, buf,
-							16, tmp));
+			TIME_AND_TSC(title, mbedtls_gcm_crypt_and_tag(
+						    &gcm, MBEDTLS_GCM_ENCRYPT,
+						    BUFSIZE, tmp, 12, NULL, 0,
+						    buf, buf, 16, tmp));
 			mbedtls_gcm_free(&gcm);
 		}
 	}
@@ -495,8 +488,7 @@ void main(void)
 		mbedtls_ccm_init(&ccm);
 
 		for (keysize = 128; keysize <= 256; keysize += 64) {
-			snprintk(title, sizeof(title), "AES-CCM-%d",
-				 keysize);
+			snprintk(title, sizeof(title), "AES-CCM-%d", keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
@@ -504,9 +496,9 @@ void main(void)
 					   keysize);
 
 			TIME_AND_TSC(title,
-				     mbedtls_ccm_encrypt_and_tag(&ccm, BUFSIZE,
-							tmp, 12, NULL, 0, buf,
-							buf, tmp, 16));
+				     mbedtls_ccm_encrypt_and_tag(
+					     &ccm, BUFSIZE, tmp, 12, NULL, 0,
+					     buf, buf, tmp, 16));
 
 			mbedtls_ccm_free(&ccm);
 		}
@@ -525,9 +517,9 @@ void main(void)
 
 		mbedtls_chachapoly_setkey(&chachapoly, tmp);
 
-		TIME_AND_TSC(title,
-			     mbedtls_chachapoly_encrypt_and_tag(&chachapoly,
-				BUFSIZE, tmp, NULL, 0, buf, buf, tmp));
+		TIME_AND_TSC(title, mbedtls_chachapoly_encrypt_and_tag(
+					    &chachapoly, BUFSIZE, tmp, NULL, 0,
+					    buf, buf, tmp));
 
 		mbedtls_chachapoly_free(&chachapoly);
 	}
@@ -541,20 +533,17 @@ void main(void)
 
 		for (keysize = 128, cipher_type = MBEDTLS_CIPHER_AES_128_ECB;
 		     keysize <= 256; keysize += 64, cipher_type++) {
-			snprintk(title, sizeof(title), "AES-CMAC-%d",
-				 keysize);
+			snprintk(title, sizeof(title), "AES-CMAC-%d", keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
 
-			cipher_info = mbedtls_cipher_info_from_type(
-							cipher_type);
+			cipher_info =
+				mbedtls_cipher_info_from_type(cipher_type);
 
-			TIME_AND_TSC(title,
-				     mbedtls_cipher_cmac(cipher_info,
-							 tmp, keysize,
-							 buf, BUFSIZE,
-							 output));
+			TIME_AND_TSC(title, mbedtls_cipher_cmac(
+						    cipher_info, tmp, keysize,
+						    buf, BUFSIZE, output));
 		}
 
 		memset(buf, 0, sizeof(buf));
@@ -575,18 +564,16 @@ void main(void)
 		mbedtls_aria_init(&aria);
 
 		for (keysize = 128; keysize <= 256; keysize += 64) {
-			snprintk(title, sizeof(title),
-				 "ARIA-CBC-%d", keysize);
+			snprintk(title, sizeof(title), "ARIA-CBC-%d", keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
 
 			mbedtls_aria_setkey_enc(&aria, tmp, keysize);
 
-			TIME_AND_TSC(title,
-				     mbedtls_aria_crypt_cbc(&aria,
-						MBEDTLS_ARIA_ENCRYPT,
-						BUFSIZE, tmp, buf, buf));
+			TIME_AND_TSC(title, mbedtls_aria_crypt_cbc(
+						    &aria, MBEDTLS_ARIA_ENCRYPT,
+						    BUFSIZE, tmp, buf, buf));
 		}
 
 		mbedtls_aria_free(&aria);
@@ -601,18 +588,18 @@ void main(void)
 		mbedtls_camellia_init(&camellia);
 
 		for (keysize = 128; keysize <= 256; keysize += 64) {
-			snprintk(title, sizeof(title),
-				 "CAMELLIA-CBC-%d", keysize);
+			snprintk(title, sizeof(title), "CAMELLIA-CBC-%d",
+				 keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
 
 			mbedtls_camellia_setkey_enc(&camellia, tmp, keysize);
 
-			TIME_AND_TSC(title,
-				     mbedtls_camellia_crypt_cbc(&camellia,
-						MBEDTLS_CAMELLIA_ENCRYPT,
-						BUFSIZE, tmp, buf, buf));
+			TIME_AND_TSC(title, mbedtls_camellia_crypt_cbc(
+						    &camellia,
+						    MBEDTLS_CAMELLIA_ENCRYPT,
+						    BUFSIZE, tmp, buf, buf));
 		}
 
 		mbedtls_camellia_free(&camellia);
@@ -621,17 +608,16 @@ void main(void)
 
 #if defined(MBEDTLS_CHACHA20_C)
 	if (todo.chacha20) {
-		TIME_AND_TSC("ChaCha20", mbedtls_chacha20_crypt(
-						buf, buf, 0U, BUFSIZE,
-						buf, buf));
+		TIME_AND_TSC("ChaCha20",
+			     mbedtls_chacha20_crypt(buf, buf, 0U, BUFSIZE, buf,
+						    buf));
 	}
 #endif
 
 #if defined(MBEDTLS_POLY1305_C)
 	if (todo.poly1305) {
-		TIME_AND_TSC("Poly1305", mbedtls_poly1305_mac(
-						buf, buf, BUFSIZE,
-						buf));
+		TIME_AND_TSC("Poly1305",
+			     mbedtls_poly1305_mac(buf, buf, BUFSIZE, buf));
 	}
 #endif
 
@@ -644,22 +630,21 @@ void main(void)
 		mbedtls_blowfish_init(&blowfish);
 
 		for (keysize = 128; keysize <= 256; keysize += 64) {
-			snprintk(title, sizeof(title),
-				 "BLOWFISH-CBC-%d", keysize);
+			snprintk(title, sizeof(title), "BLOWFISH-CBC-%d",
+				 keysize);
 
 			memset(buf, 0, sizeof(buf));
 			memset(tmp, 0, sizeof(tmp));
 
 			mbedtls_blowfish_setkey(&blowfish, tmp, keysize);
 
-			TIME_AND_TSC(title,
-				     mbedtls_blowfish_crypt_cbc(&blowfish,
-						MBEDTLS_BLOWFISH_ENCRYPT,
-						BUFSIZE, tmp, buf, buf));
+			TIME_AND_TSC(title, mbedtls_blowfish_crypt_cbc(
+						    &blowfish,
+						    MBEDTLS_BLOWFISH_ENCRYPT,
+						    BUFSIZE, tmp, buf, buf));
 		}
 
 		mbedtls_blowfish_free(&blowfish);
-
 	}
 #endif
 
@@ -669,8 +654,8 @@ void main(void)
 
 		mbedtls_havege_init(&hs);
 
-		TIME_AND_TSC("HAVEGE", mbedtls_havege_random(&hs,
-							     buf, BUFSIZE));
+		TIME_AND_TSC("HAVEGE",
+			     mbedtls_havege_random(&hs, buf, BUFSIZE));
 		mbedtls_havege_free(&hs);
 	}
 #endif
@@ -681,21 +666,21 @@ void main(void)
 
 		mbedtls_ctr_drbg_init(&ctr_drbg);
 
-		if (mbedtls_ctr_drbg_seed(&ctr_drbg, myrand,
-					  NULL, NULL, 0) != 0) {
+		if (mbedtls_ctr_drbg_seed(&ctr_drbg, myrand, NULL, NULL, 0) !=
+		    0) {
 			mbedtls_exit(1);
 		}
 
 		TIME_AND_TSC("CTR_DRBG (NOPR)",
 			     mbedtls_ctr_drbg_random(&ctr_drbg, buf, BUFSIZE));
 
-		if (mbedtls_ctr_drbg_seed(&ctr_drbg, myrand,
-					  NULL, NULL, 0) != 0) {
+		if (mbedtls_ctr_drbg_seed(&ctr_drbg, myrand, NULL, NULL, 0) !=
+		    0) {
 			mbedtls_exit(1);
 		}
 
-		mbedtls_ctr_drbg_set_prediction_resistance(&ctr_drbg,
-						MBEDTLS_CTR_DRBG_PR_ON);
+		mbedtls_ctr_drbg_set_prediction_resistance(
+			&ctr_drbg, MBEDTLS_CTR_DRBG_PR_ON);
 
 		TIME_AND_TSC("CTR_DRBG (PR)",
 			     mbedtls_ctr_drbg_random(&ctr_drbg, buf, BUFSIZE));
@@ -717,8 +702,8 @@ void main(void)
 			mbedtls_exit(1);
 		}
 
-		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info,
-					   myrand, NULL, NULL, 0) != 0) {
+		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info, myrand, NULL,
+					   NULL, 0) != 0) {
 			mbedtls_exit(1);
 		}
 
@@ -726,13 +711,13 @@ void main(void)
 			     mbedtls_hmac_drbg_random(&hmac_drbg, buf,
 						      BUFSIZE));
 
-		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info, myrand,
-					   NULL, NULL, 0) != 0) {
+		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info, myrand, NULL,
+					   NULL, 0) != 0) {
 			mbedtls_exit(1);
 		}
 
-		mbedtls_hmac_drbg_set_prediction_resistance(&hmac_drbg,
-						MBEDTLS_HMAC_DRBG_PR_ON);
+		mbedtls_hmac_drbg_set_prediction_resistance(
+			&hmac_drbg, MBEDTLS_HMAC_DRBG_PR_ON);
 
 		TIME_AND_TSC("HMAC_DRBG SHA-1 (PR)",
 			     mbedtls_hmac_drbg_random(&hmac_drbg, buf,
@@ -745,8 +730,8 @@ void main(void)
 			mbedtls_exit(1);
 		}
 
-		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info,
-					   myrand, NULL, NULL, 0) != 0) {
+		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info, myrand, NULL,
+					   NULL, 0) != 0) {
 			mbedtls_exit(1);
 		}
 
@@ -754,13 +739,13 @@ void main(void)
 			     mbedtls_hmac_drbg_random(&hmac_drbg, buf,
 						      BUFSIZE));
 
-		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info, myrand,
-					   NULL, NULL, 0) != 0) {
+		if (mbedtls_hmac_drbg_seed(&hmac_drbg, md_info, myrand, NULL,
+					   NULL, 0) != 0) {
 			mbedtls_exit(1);
 		}
 
-		mbedtls_hmac_drbg_set_prediction_resistance(&hmac_drbg,
-					MBEDTLS_HMAC_DRBG_PR_ON);
+		mbedtls_hmac_drbg_set_prediction_resistance(
+			&hmac_drbg, MBEDTLS_HMAC_DRBG_PR_ON);
 
 		TIME_AND_TSC("HMAC_DRBG SHA-256 (PR)",
 			     mbedtls_hmac_drbg_random(&hmac_drbg, buf,
@@ -776,19 +761,15 @@ void main(void)
 		mbedtls_rsa_context rsa;
 
 		for (keysize = 2048; keysize <= 4096; keysize *= 2) {
-			snprintk(title, sizeof(title), "RSA-%d",
-				 keysize);
+			snprintk(title, sizeof(title), "RSA-%d", keysize);
 
 			mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, 0);
-			mbedtls_rsa_gen_key(&rsa, myrand, NULL, keysize,
-					    65537);
+			mbedtls_rsa_gen_key(&rsa, myrand, NULL, keysize, 65537);
 
-			TIME_PUBLIC(title, " public",
-				    buf[0] = 0;
+			TIME_PUBLIC(title, " public", buf[0] = 0;
 				    ret = mbedtls_rsa_public(&rsa, buf, buf));
 
-			TIME_PUBLIC(title, "private",
-				    buf[0] = 0;
+			TIME_PUBLIC(title, "private", buf[0] = 0;
 				    ret = mbedtls_rsa_private(&rsa, myrand,
 							      NULL, buf, buf));
 
@@ -799,15 +780,15 @@ void main(void)
 
 #if defined(MBEDTLS_DHM_C) && defined(MBEDTLS_BIGNUM_C)
 	if (todo.dhm) {
-		int dhm_sizes[] = {2048, 3072};
+		int dhm_sizes[] = { 2048, 3072 };
 		static const unsigned char dhm_P_2048[] =
-					MBEDTLS_DHM_RFC3526_MODP_2048_P_BIN;
+			MBEDTLS_DHM_RFC3526_MODP_2048_P_BIN;
 		static const unsigned char dhm_P_3072[] =
-					MBEDTLS_DHM_RFC3526_MODP_3072_P_BIN;
+			MBEDTLS_DHM_RFC3526_MODP_3072_P_BIN;
 		static const unsigned char dhm_G_2048[] =
-					MBEDTLS_DHM_RFC3526_MODP_2048_G_BIN;
+			MBEDTLS_DHM_RFC3526_MODP_2048_G_BIN;
 		static const unsigned char dhm_G_3072[] =
-					MBEDTLS_DHM_RFC3526_MODP_3072_G_BIN;
+			MBEDTLS_DHM_RFC3526_MODP_3072_G_BIN;
 
 		const unsigned char *dhm_P[] = { dhm_P_2048, dhm_P_3072 };
 		const size_t dhm_P_size[] = { sizeof(dhm_P_2048),
@@ -838,19 +819,19 @@ void main(void)
 			snprintk(title, sizeof(title), "DHE-%d", dhm_sizes[i]);
 
 			TIME_PUBLIC(title, "handshake",
-				    ret |= mbedtls_dhm_make_public(&dhm,
-						(int)dhm.len, buf, dhm.len,
-						myrand, NULL);
-				    ret |= mbedtls_dhm_calc_secret(&dhm, buf,
-						sizeof(buf), &olen, myrand,
-						NULL));
+				    ret |= mbedtls_dhm_make_public(
+					    &dhm, (int)dhm.len, buf, dhm.len,
+					    myrand, NULL);
+				    ret |= mbedtls_dhm_calc_secret(
+					    &dhm, buf, sizeof(buf), &olen,
+					    myrand, NULL));
 
 			snprintk(title, sizeof(title), "DH-%d", dhm_sizes[i]);
 
 			TIME_PUBLIC(title, "handshake",
-				    ret |= mbedtls_dhm_calc_secret(&dhm, buf,
-						sizeof(buf), &olen, myrand,
-						NULL));
+				    ret |= mbedtls_dhm_calc_secret(
+					    &dhm, buf, sizeof(buf), &olen,
+					    myrand, NULL));
 
 			mbedtls_dhm_free(&dhm);
 		}
@@ -866,8 +847,7 @@ void main(void)
 		memset(buf, 0x2A, sizeof(buf));
 
 		for (curve_info = mbedtls_ecp_curve_list();
-		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE;
-		     curve_info++) {
+		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE; curve_info++) {
 			mbedtls_ecdsa_init(&ecdsa);
 
 			if (mbedtls_ecdsa_genkey(&ecdsa, curve_info->grp_id,
@@ -882,25 +862,23 @@ void main(void)
 
 			TIME_PUBLIC(title, "sign",
 				    ret = mbedtls_ecdsa_write_signature(
-						&ecdsa, MBEDTLS_MD_SHA256,
-						buf, curve_info->bit_size,
-						tmp, &sig_len, myrand, NULL));
+					    &ecdsa, MBEDTLS_MD_SHA256, buf,
+					    curve_info->bit_size, tmp, &sig_len,
+					    myrand, NULL));
 
 			mbedtls_ecdsa_free(&ecdsa);
 		}
 
 		for (curve_info = mbedtls_ecp_curve_list();
-		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE;
-		     curve_info++) {
+		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE; curve_info++) {
 			mbedtls_ecdsa_init(&ecdsa);
 
 			if (mbedtls_ecdsa_genkey(&ecdsa, curve_info->grp_id,
 						 myrand, NULL) != 0 ||
-			    mbedtls_ecdsa_write_signature(&ecdsa,
-						MBEDTLS_MD_SHA256, buf,
-						curve_info->bit_size,
-						tmp, &sig_len, myrand,
-						NULL) != 0) {
+			    mbedtls_ecdsa_write_signature(
+				    &ecdsa, MBEDTLS_MD_SHA256, buf,
+				    curve_info->bit_size, tmp, &sig_len, myrand,
+				    NULL) != 0) {
 				mbedtls_exit(1);
 			}
 
@@ -910,9 +888,9 @@ void main(void)
 				 curve_info->name);
 
 			TIME_PUBLIC(title, "verify",
-				    ret = mbedtls_ecdsa_read_signature(&ecdsa,
-						buf, curve_info->bit_size,
-						tmp, sig_len));
+				    ret = mbedtls_ecdsa_read_signature(
+					    &ecdsa, buf, curve_info->bit_size,
+					    tmp, sig_len));
 
 			mbedtls_ecdsa_free(&ecdsa);
 		}
@@ -931,20 +909,19 @@ void main(void)
 			{ MBEDTLS_ECP_DP_CURVE448, 0, 0, "Curve448" },
 #endif
 			{ MBEDTLS_ECP_DP_NONE, 0, 0, 0 }
-			};
+		};
 		const mbedtls_ecp_curve_info *curve_info;
 		size_t olen;
 
 		for (curve_info = mbedtls_ecp_curve_list();
-		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE;
-		     curve_info++) {
+		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE; curve_info++) {
 			mbedtls_ecdh_init(&ecdh);
 
 			if (mbedtls_ecp_group_load(&ecdh.grp,
-						curve_info->grp_id) != 0 ||
+						   curve_info->grp_id) != 0 ||
 			    mbedtls_ecdh_make_public(&ecdh, &olen, buf,
-						     sizeof(buf),
-						     myrand, NULL) != 0 ||
+						     sizeof(buf), myrand,
+						     NULL) != 0 ||
 			    mbedtls_ecp_copy(&ecdh.Qp, &ecdh.Q) != 0) {
 				mbedtls_exit(1);
 			}
@@ -955,27 +932,26 @@ void main(void)
 				 curve_info->name);
 
 			TIME_PUBLIC(title, "handshake",
-				    ret |= mbedtls_ecdh_make_public(&ecdh,
-						&olen, buf, sizeof(buf),
-						myrand, NULL);
-				    ret |= mbedtls_ecdh_calc_secret(&ecdh,
-						&olen, buf, sizeof(buf),
-						myrand, NULL));
+				    ret |= mbedtls_ecdh_make_public(
+					    &ecdh, &olen, buf, sizeof(buf),
+					    myrand, NULL);
+				    ret |= mbedtls_ecdh_calc_secret(
+					    &ecdh, &olen, buf, sizeof(buf),
+					    myrand, NULL));
 			mbedtls_ecdh_free(&ecdh);
 		}
 
 		/* Montgomery curves need to be handled separately */
 		for (curve_info = montgomery_curve_list;
-		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE;
-		     curve_info++) {
+		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE; curve_info++) {
 			mbedtls_ecdh_init(&ecdh);
 			mbedtls_mpi_init(&z);
 
 			if (mbedtls_ecp_group_load(&ecdh.grp,
 						   curve_info->grp_id) != 0 ||
 			    mbedtls_ecdh_gen_public(&ecdh.grp, &ecdh.d,
-						    &ecdh.Qp, myrand, NULL)
-			    != 0) {
+						    &ecdh.Qp, myrand,
+						    NULL) != 0) {
 				mbedtls_exit(1);
 			}
 
@@ -983,24 +959,18 @@ void main(void)
 				 curve_info->name);
 
 			TIME_PUBLIC(title, "handshake",
-				    ret |= mbedtls_ecdh_gen_public(&ecdh.grp,
-								   &ecdh.d,
-								   &ecdh.Q,
-								   myrand,
-								   NULL);
+				    ret |= mbedtls_ecdh_gen_public(
+					    &ecdh.grp, &ecdh.d, &ecdh.Q, myrand,
+					    NULL);
 				    ret |= mbedtls_ecdh_compute_shared(
-								&ecdh.grp, &z,
-								&ecdh.Qp,
-								&ecdh.d,
-								myrand,
-								NULL));
+					    &ecdh.grp, &z, &ecdh.Qp, &ecdh.d,
+					    myrand, NULL));
 			mbedtls_ecdh_free(&ecdh);
 			mbedtls_mpi_free(&z);
 		}
 
 		for (curve_info = mbedtls_ecp_curve_list();
-		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE;
-		     curve_info++) {
+		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE; curve_info++) {
 			mbedtls_ecdh_init(&ecdh);
 
 			if (mbedtls_ecp_group_load(&ecdh.grp,
@@ -1021,17 +991,15 @@ void main(void)
 				 curve_info->name);
 
 			TIME_PUBLIC(title, "handshake",
-				    ret |= mbedtls_ecdh_calc_secret(&ecdh,
-							&olen,
-							buf, sizeof(buf),
-							myrand, NULL));
+				    ret |= mbedtls_ecdh_calc_secret(
+					    &ecdh, &olen, buf, sizeof(buf),
+					    myrand, NULL));
 			mbedtls_ecdh_free(&ecdh);
 		}
 
 		/* Montgomery curves need to be handled separately */
 		for (curve_info = montgomery_curve_list;
-		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE;
-		     curve_info++) {
+		     curve_info->grp_id != MBEDTLS_ECP_DP_NONE; curve_info++) {
 			mbedtls_ecdh_init(&ecdh);
 			mbedtls_mpi_init(&z);
 
@@ -1040,9 +1008,8 @@ void main(void)
 			    mbedtls_ecdh_gen_public(&ecdh.grp, &ecdh.d,
 						    &ecdh.Qp, myrand,
 						    NULL) != 0 ||
-			    mbedtls_ecdh_gen_public(&ecdh.grp, &ecdh.d,
-						    &ecdh.Q, myrand,
-						    NULL) != 0) {
+			    mbedtls_ecdh_gen_public(&ecdh.grp, &ecdh.d, &ecdh.Q,
+						    myrand, NULL) != 0) {
 				mbedtls_exit(1);
 			}
 
@@ -1051,11 +1018,8 @@ void main(void)
 
 			TIME_PUBLIC(title, "handshake",
 				    ret |= mbedtls_ecdh_compute_shared(
-								&ecdh.grp,
-								&z, &ecdh.Qp,
-								&ecdh.d,
-								myrand,
-								NULL));
+					    &ecdh.grp, &z, &ecdh.Qp, &ecdh.d,
+					    myrand, NULL));
 
 			mbedtls_ecdh_free(&ecdh);
 			mbedtls_mpi_free(&z);

@@ -39,8 +39,7 @@ static uint8_t entropy_mcux_rnga_get_uint8(void)
 }
 
 static int entropy_mcux_rnga_get_entropy(const struct device *dev,
-					 uint8_t *buffer,
-					 uint16_t length)
+					 uint8_t *buffer, uint16_t length)
 {
 	int i;
 
@@ -59,9 +58,9 @@ static const struct entropy_driver_api entropy_mcux_rnga_api_funcs = {
 
 static int entropy_mcux_rnga_init(const struct device *);
 
-DEVICE_AND_API_INIT(entropy_mcux_rnga, DT_INST_LABEL(0),
-		    entropy_mcux_rnga_init, NULL, NULL,
-		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(entropy_mcux_rnga, DT_INST_LABEL(0), entropy_mcux_rnga_init,
+		    NULL, NULL, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &entropy_mcux_rnga_api_funcs);
 
 static int entropy_mcux_rnga_init(const struct device *dev)

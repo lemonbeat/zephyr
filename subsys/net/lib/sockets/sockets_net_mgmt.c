@@ -47,7 +47,7 @@ __net_socket struct net_mgmt_socket {
 };
 
 static struct net_mgmt_socket
-		mgmt_sockets[CONFIG_NET_SOCKETS_NET_MGMT_MAX_LISTENERS];
+	mgmt_sockets[CONFIG_NET_SOCKETS_NET_MGMT_MAX_LISTENERS];
 
 static const struct socket_op_vtable net_mgmt_sock_fd_op_vtable;
 
@@ -81,14 +81,13 @@ int znet_mgmt_socket(int family, int type, int proto)
 	mgmt->wait_timeout = K_FOREVER;
 
 	z_finalize_fd(fd, mgmt,
-		     (const struct fd_op_vtable *)&net_mgmt_sock_fd_op_vtable);
+		      (const struct fd_op_vtable *)&net_mgmt_sock_fd_op_vtable);
 
 	return fd;
 }
 
 static int znet_mgmt_bind(struct net_mgmt_socket *mgmt,
-			  const struct sockaddr *addr,
-			  socklen_t addrlen)
+			  const struct sockaddr *addr, socklen_t addrlen)
 {
 	struct sockaddr_nm *nm_addr = (struct sockaddr_nm *)addr;
 
@@ -119,10 +118,9 @@ static int znet_mgmt_bind(struct net_mgmt_socket *mgmt,
 	return 0;
 }
 
-ssize_t znet_mgmt_sendto(struct net_mgmt_socket *mgmt,
-			 const void *buf, size_t len,
-			 int flags, const struct sockaddr *dest_addr,
-			 socklen_t addrlen)
+ssize_t znet_mgmt_sendto(struct net_mgmt_socket *mgmt, const void *buf,
+			 size_t len, int flags,
+			 const struct sockaddr *dest_addr, socklen_t addrlen)
 {
 	if (mgmt->proto == NET_MGMT_EVENT_PROTO) {
 		/* For net_mgmt events, we only listen and never send */
@@ -140,8 +138,7 @@ ssize_t znet_mgmt_sendto(struct net_mgmt_socket *mgmt,
 
 static ssize_t znet_mgmt_recvfrom(struct net_mgmt_socket *mgmt, void *buf,
 				  size_t max_len, int flags,
-				  struct sockaddr *src_addr,
-				  socklen_t *addrlen)
+				  struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	struct sockaddr_nm *nm_addr = (struct sockaddr_nm *)src_addr;
 	k_timeout_t timeout = mgmt->wait_timeout;
@@ -159,16 +156,14 @@ static ssize_t znet_mgmt_recvfrom(struct net_mgmt_socket *mgmt, void *buf,
 
 again:
 	if (mgmt->iface == NULL) {
-		ret = net_mgmt_event_wait(mgmt->mask, &raised_event,
-					  &iface, (const void **)&info,
-					  &info_len, timeout);
+		ret = net_mgmt_event_wait(mgmt->mask, &raised_event, &iface,
+					  (const void **)&info, &info_len,
+					  timeout);
 	} else {
-		ret = net_mgmt_event_wait_on_iface(mgmt->iface,
-						   mgmt->mask,
+		ret = net_mgmt_event_wait_on_iface(mgmt->iface, mgmt->mask,
 						   &raised_event,
 						   (const void **)&info,
-						   &info_len,
-						   timeout);
+						   &info_len, timeout);
 		iface = mgmt->iface;
 	}
 
@@ -296,14 +291,12 @@ static ssize_t net_mgmt_sock_read(void *obj, void *buffer, size_t count)
 	return znet_mgmt_recvfrom(obj, buffer, count, 0, NULL, 0);
 }
 
-static ssize_t net_mgmt_sock_write(void *obj, const void *buffer,
-				   size_t count)
+static ssize_t net_mgmt_sock_write(void *obj, const void *buffer, size_t count)
 {
 	return znet_mgmt_sendto(obj, buffer, count, 0, NULL, 0);
 }
 
-static int net_mgmt_sock_ioctl(void *obj, unsigned int request,
-			       va_list args)
+static int net_mgmt_sock_ioctl(void *obj, unsigned int request, va_list args)
 {
 	return 0;
 }
@@ -335,21 +328,18 @@ static int net_mgmt_sock_accept(void *obj, struct sockaddr *addr,
 	return 0;
 }
 
-static ssize_t net_mgmt_sock_sendto(void *obj, const void *buf,
-				    size_t len, int flags,
-				    const struct sockaddr *dest_addr,
+static ssize_t net_mgmt_sock_sendto(void *obj, const void *buf, size_t len,
+				    int flags, const struct sockaddr *dest_addr,
 				    socklen_t addrlen)
 {
 	return znet_mgmt_sendto(obj, buf, len, flags, dest_addr, addrlen);
 }
 
-static ssize_t net_mgmt_sock_recvfrom(void *obj, void *buf,
-				      size_t max_len, int flags,
-				      struct sockaddr *src_addr,
+static ssize_t net_mgmt_sock_recvfrom(void *obj, void *buf, size_t max_len,
+				      int flags, struct sockaddr *src_addr,
 				      socklen_t *addrlen)
 {
-	return znet_mgmt_recvfrom(obj, buf, max_len, flags,
-				  src_addr, addrlen);
+	return znet_mgmt_recvfrom(obj, buf, max_len, flags, src_addr, addrlen);
 }
 
 static int net_mgmt_sock_getsockopt(void *obj, int level, int optname,

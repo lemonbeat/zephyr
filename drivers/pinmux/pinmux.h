@@ -21,7 +21,7 @@ struct pin_config {
 };
 
 struct pinmux_config {
-	uint32_t	base_address;
+	uint32_t base_address;
 };
 
 #ifdef __cplusplus

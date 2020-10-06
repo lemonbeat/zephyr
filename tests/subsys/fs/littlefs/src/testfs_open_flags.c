@@ -11,7 +11,7 @@
 
 void test_fs_open_flags(void);
 /* Expected by test_fs_open_flags() */
-const char *test_fs_open_flags_file_path = TESTFS_MNT_POINT_SMALL"/the_file";
+const char *test_fs_open_flags_file_path = TESTFS_MNT_POINT_SMALL "/the_file";
 
 static void mount(struct fs_mount_t *mp)
 {
@@ -24,8 +24,7 @@ static void unmount(struct fs_mount_t *mp)
 {
 	TC_PRINT("Unmounting %s\n", mp->mnt_point);
 
-	zassert_equal(fs_unmount(mp), 0,
-		      "Failed to unmount partition");
+	zassert_equal(fs_unmount(mp), 0, "Failed to unmount partition");
 }
 
 static void cleanup(struct fs_mount_t *mp)
@@ -49,5 +48,4 @@ void test_fs_open_flags_lfs(void)
 	test_fs_open_flags();
 
 	unmount(mp);
-
 }

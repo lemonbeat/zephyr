@@ -24,8 +24,8 @@
  */
 static const struct bt_uuid_128 uuid128_base = {
 	.uuid = { BT_UUID_TYPE_128 },
-	.val = { BT_UUID_128_ENCODE(
-		0x00000000, 0x0000, 0x1000, 0x8000, 0x00805F9B34FB) }
+	.val = { BT_UUID_128_ENCODE(0x00000000, 0x0000, 0x1000, 0x8000,
+				    0x00805F9B34FB) }
 };
 
 static void uuid_to_uuid128(const struct bt_uuid *src, struct bt_uuid_128 *dst)
@@ -118,8 +118,8 @@ void bt_uuid_to_str(const struct bt_uuid *uuid, char *str, size_t len)
 		memcpy(&tmp4, &BT_UUID_128(uuid)->val[10], sizeof(tmp4));
 		memcpy(&tmp5, &BT_UUID_128(uuid)->val[12], sizeof(tmp5));
 
-		snprintk(str, len, "%08x-%04x-%04x-%04x-%08x%04x",
-			 tmp5, tmp4, tmp3, tmp2, tmp1, tmp0);
+		snprintk(str, len, "%08x-%04x-%04x-%04x-%08x%04x", tmp5, tmp4,
+			 tmp3, tmp2, tmp1, tmp0);
 		break;
 	default:
 		(void)memset(str, 0, len);

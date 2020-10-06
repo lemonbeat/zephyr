@@ -55,7 +55,6 @@ volatile long long_one = 1L;
 
 void test_limits(void)
 {
-
 	zassert_true((long_max + long_one == LONG_MIN), NULL);
 }
 
@@ -77,7 +76,6 @@ void test_ssize_t(void)
 
 void test_stdbool(void)
 {
-
 	zassert_true((true == 1), "true value");
 	zassert_true((false == 0), "false value");
 }
@@ -122,7 +120,6 @@ volatile uint32_t unsigned_int = 0xffffff00;
 void test_stdint(void)
 {
 	zassert_true((unsigned_int + unsigned_byte + 1u == 0U), NULL);
-
 }
 
 /*
@@ -194,7 +191,6 @@ void test_strncmp(void)
 		     "strncmp 10");
 }
 
-
 /**
  *
  * @brief Test string copy function
@@ -225,7 +221,6 @@ void test_strncpy(void)
 	/* Purposely different values */
 	ret = strncmp(buffer, "This is over 20 characters", BUFSIZE);
 	zassert_true((ret == 0), "strncpy");
-
 }
 
 /**
@@ -246,10 +241,8 @@ void test_strchr(void)
 
 	zassert_not_null(rs, "strchr");
 
-
 	ret = strncmp(rs, "10", 2);
 	zassert_true((ret == 0), "strchr");
-
 }
 
 /**
@@ -287,7 +280,6 @@ void test_memcmp(void)
 	int ret;
 	unsigned char m1[5] = { 1, 2, 3, 4, 5 };
 	unsigned char m2[5] = { 1, 2, 3, 4, 6 };
-
 
 	ret = memcmp(m1, m2, 4);
 	zassert_true((ret == 0), "memcmp 4");
@@ -374,7 +366,7 @@ void test_checktype(void)
 		"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 	static const char exp_print[] =
 		" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-	static const char exp_space[] = {"\x9\xa\xb\xc\xd\x20"};
+	static const char exp_space[] = { "\x9\xa\xb\xc\xd\x20" };
 
 	static const char exp_upper[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static const char exp_xdigit[] = "0123456789ABCDEFabcdef";
@@ -460,18 +452,16 @@ void test_memstr(void)
 	static const char num[6] = "12121";
 
 	zassert_equal(memchr(str, ch1, strlen(str)), str + 1,
-		     "memchr 'testfunction' 'e' ");
+		      "memchr 'testfunction' 'e' ");
 	zassert_equal(memchr(str, ch2, strlen(str)), NULL,
-		     "memchr 'testfunction' 'z'");
+		      "memchr 'testfunction' 'z'");
 
 	zassert_equal(memcpy(arr, num, sizeof(num)), arr, "memcpy error");
-	zassert_equal(memcmp(num, arr, sizeof(num)), 0,
-		     "memcpy failed");
+	zassert_equal(memcmp(num, arr, sizeof(num)), 0, "memcpy failed");
 
 	zassert_equal(memmove(move_arr + 2, move_arr, 3), move_arr + 2,
-		     "memmove error");
-	zassert_equal(memcmp(num, move_arr, 6), 0,
-		     "memmove failed");
+		      "memmove error");
+	zassert_equal(memcmp(num, move_arr, 6), 0, "memmove failed");
 }
 
 /**
@@ -501,7 +491,7 @@ void test_str_operate(void)
 	zassert_equal(strcmp(ncat, "ddeeaa"), 0, "strncat failed");
 
 	zassert_is_null(strrchr(ncat, 'z'),
-		       "strrchr not found this word. failed");
+			"strrchr not found this word. failed");
 	ptr = strrchr(ncat, 'e');
 	zassert_equal(strcmp(ptr, "eaa"), 0, "strrchr failed");
 
@@ -558,11 +548,11 @@ void test_tolower_toupper(void)
 	zassert_equal(strcmp(lw, tolw), 0, "tolower error");
 }
 
-void test_strtok_r_do(char *str, char *sep, int tlen,
-		      const char * const *toks, bool expect)
+void test_strtok_r_do(char *str, char *sep, int tlen, const char *const *toks,
+		      bool expect)
 {
 	int len = 0;
-	char *state, *tok, buf[64+1] = {0};
+	char *state, *tok, buf[64 + 1] = { 0 };
 
 	strncpy(buf, str, 64);
 
@@ -575,53 +565,43 @@ void test_strtok_r_do(char *str, char *sep, int tlen,
 		len++;
 	}
 	if (expect) {
-		zassert_equal(len, tlen,
-			      "strtok_r error '%s' / '%s'", str, sep);
+		zassert_equal(len, tlen, "strtok_r error '%s' / '%s'", str,
+			      sep);
 	} else {
-		zassert_not_equal(len, tlen,
-				  "strtok_r error '%s' / '%s'", str, sep);
+		zassert_not_equal(len, tlen, "strtok_r error '%s' / '%s'", str,
+				  sep);
 	}
 }
 
 void test_strtok_r(void)
 {
-	static const char * const tc01[] = { "1", "2", "3", "4", "5" };
+	static const char *const tc01[] = { "1", "2", "3", "4", "5" };
 
-	test_strtok_r_do("1,2,3,4,5",           ",",  5, tc01, true);
+	test_strtok_r_do("1,2,3,4,5", ",", 5, tc01, true);
 	test_strtok_r_do(",, 1 ,2  ,3   4,5  ", ", ", 5, tc01, true);
-	test_strtok_r_do("1,,,2 3,,,4 5",       ", ", 5, tc01, true);
-	test_strtok_r_do("1,2 3,,,4 5  ",       ", ", 5, tc01, true);
-	test_strtok_r_do("0,1,,,2 3,,,4 5",     ", ", 5, tc01, false);
-	test_strtok_r_do("1,,,2 3,,,4 5",       ",",  5, tc01, false);
-	test_strtok_r_do("A,,,2,3,,,4 5",       ",",  5, tc01, false);
-	test_strtok_r_do("1,,,2,3,,,",          ",",  5, tc01, false);
-	test_strtok_r_do("1|2|3,4|5",           "| ", 5, tc01, false);
+	test_strtok_r_do("1,,,2 3,,,4 5", ", ", 5, tc01, true);
+	test_strtok_r_do("1,2 3,,,4 5  ", ", ", 5, tc01, true);
+	test_strtok_r_do("0,1,,,2 3,,,4 5", ", ", 5, tc01, false);
+	test_strtok_r_do("1,,,2 3,,,4 5", ",", 5, tc01, false);
+	test_strtok_r_do("A,,,2,3,,,4 5", ",", 5, tc01, false);
+	test_strtok_r_do("1,,,2,3,,,", ",", 5, tc01, false);
+	test_strtok_r_do("1|2|3,4|5", "| ", 5, tc01, false);
 }
 
 void test_main(void)
 {
-	ztest_test_suite(test_c_lib,
-			 ztest_unit_test(test_limits),
-			 ztest_unit_test(test_ssize_t),
-			 ztest_unit_test(test_stdbool),
-			 ztest_unit_test(test_stddef),
-			 ztest_unit_test(test_stdint),
-			 ztest_unit_test(test_memcmp),
-			 ztest_unit_test(test_strchr),
-			 ztest_unit_test(test_strcpy),
-			 ztest_unit_test(test_strncpy),
-			 ztest_unit_test(test_memset),
-			 ztest_unit_test(test_strlen),
-			 ztest_unit_test(test_strcmp),
-			 ztest_unit_test(test_strxspn),
-			 ztest_unit_test(test_bsearch),
-			 ztest_unit_test(test_abs),
-			 ztest_unit_test(test_atoi),
-			 ztest_unit_test(test_checktype),
-			 ztest_unit_test(test_memstr),
-			 ztest_unit_test(test_str_operate),
-			 ztest_unit_test(test_tolower_toupper),
-			 ztest_unit_test(test_strtok_r)
-			 );
+	ztest_test_suite(
+		test_c_lib, ztest_unit_test(test_limits),
+		ztest_unit_test(test_ssize_t), ztest_unit_test(test_stdbool),
+		ztest_unit_test(test_stddef), ztest_unit_test(test_stdint),
+		ztest_unit_test(test_memcmp), ztest_unit_test(test_strchr),
+		ztest_unit_test(test_strcpy), ztest_unit_test(test_strncpy),
+		ztest_unit_test(test_memset), ztest_unit_test(test_strlen),
+		ztest_unit_test(test_strcmp), ztest_unit_test(test_strxspn),
+		ztest_unit_test(test_bsearch), ztest_unit_test(test_abs),
+		ztest_unit_test(test_atoi), ztest_unit_test(test_checktype),
+		ztest_unit_test(test_memstr), ztest_unit_test(test_str_operate),
+		ztest_unit_test(test_tolower_toupper),
+		ztest_unit_test(test_strtok_r));
 	ztest_run_test_suite(test_c_lib);
 }

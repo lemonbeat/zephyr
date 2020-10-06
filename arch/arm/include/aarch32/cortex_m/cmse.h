@@ -133,13 +133,14 @@ int arm_cmse_addr_range_read_ok(uint32_t addr, uint32_t size, int force_npriv);
  *
  * @return 1 if address range is Read and Writable, 0 otherwise.
  */
-int arm_cmse_addr_range_readwrite_ok(uint32_t addr, uint32_t size, int force_npriv);
+int arm_cmse_addr_range_readwrite_ok(uint32_t addr, uint32_t size,
+				     int force_npriv);
 
 /* Required for C99 compilation (required for GCC-8.x version,
  * where typeof is used instead of __typeof__)
  */
 #ifndef typeof
-#define typeof  __typeof__
+#define typeof __typeof__
 #endif
 
 /**
@@ -343,7 +344,7 @@ int arm_cmse_addr_nonsecure_readwrite_ok(uint32_t addr, int force_npriv);
  * @return 1 if address range is readable, 0 otherwise.
  */
 int arm_cmse_addr_range_nonsecure_read_ok(uint32_t addr, uint32_t size,
-	int force_npriv);
+					  int force_npriv);
 
 /**
  * @brief Non-Secure Read and Write accessibility of an address range
@@ -366,7 +367,7 @@ int arm_cmse_addr_range_nonsecure_read_ok(uint32_t addr, uint32_t size,
  * @return 1 if address range is readable, 0 otherwise.
  */
 int arm_cmse_addr_range_nonsecure_readwrite_ok(uint32_t addr, uint32_t size,
-	int force_npriv);
+					       int force_npriv);
 
 /**
  * @brief Non-Secure Read accessibility of an object
@@ -401,9 +402,9 @@ int arm_cmse_addr_range_nonsecure_readwrite_ok(uint32_t addr, uint32_t size,
  *
  * @return p_obj if object is readable from Non-Secure state, NULL otherwise.
  */
-#define ARM_CMSE_OBJECT_NONSECURE_UNPRIV_READ_OK(p_obj) \
-	cmse_check_pointed_object(p_obj, \
-		CMSE_NONSECURE | CMSE_MPU_UNPRIV | CMSE_MPU_READ)
+#define ARM_CMSE_OBJECT_NONSECURE_UNPRIV_READ_OK(p_obj)                     \
+	cmse_check_pointed_object(p_obj, CMSE_NONSECURE | CMSE_MPU_UNPRIV | \
+						 CMSE_MPU_READ)
 
 /**
  * @brief Non-Secure Read and Write accessibility of an object
@@ -438,9 +439,9 @@ int arm_cmse_addr_range_nonsecure_readwrite_ok(uint32_t addr, uint32_t size,
  *
  * @return p_obj if object is Non-Secure Read and Writable, NULL otherwise.
  */
-#define ARM_CMSE_OBJECT_NON_SECURE_UNPRIV_READWRITE_OK(p_obj) \
-	cmse_check_pointed_object(p_obj, \
-			CMSE_NONSECURE | CMSE_MPU_UNPRIV | CMSE_MPU_READWRITE)
+#define ARM_CMSE_OBJECT_NON_SECURE_UNPRIV_READWRITE_OK(p_obj)               \
+	cmse_check_pointed_object(p_obj, CMSE_NONSECURE | CMSE_MPU_UNPRIV | \
+						 CMSE_MPU_READWRITE)
 
 #endif /* CONFIG_ARM_SECURE_FIRMWARE */
 

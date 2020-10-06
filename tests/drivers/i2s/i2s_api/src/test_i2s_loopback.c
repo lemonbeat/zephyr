@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <zephyr.h>
 #include <ztest.h>
 #include <drivers/i2s.h>
@@ -138,7 +137,7 @@ void test_i2s_transfer_short(void)
 	 */
 }
 
-#define TEST_I2S_TRANSFER_LONG_REPEAT_COUNT  100
+#define TEST_I2S_TRANSFER_LONG_REPEAT_COUNT 100
 
 /** @brief Long I2S transfer.
  *

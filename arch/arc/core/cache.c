@@ -35,17 +35,16 @@
 #define DCACHE_LINE_SIZE CONFIG_CACHE_LINE_SIZE
 #endif
 
-#define DC_CTRL_DC_ENABLE            0x0  /* enable d-cache */
-#define DC_CTRL_DC_DISABLE           0x1  /* disable d-cache */
-#define DC_CTRL_INVALID_ONLY         0x0  /* invalid d-cache only */
-#define DC_CTRL_INVALID_FLUSH        0x40 /* invalid and flush d-cache */
-#define DC_CTRL_ENABLE_FLUSH_LOCKED  0x80 /* locked d-cache can be flushed */
-#define DC_CTRL_DISABLE_FLUSH_LOCKED 0x0  /* locked d-cache cannot be flushed */
-#define DC_CTRL_FLUSH_STATUS         0x100/* flush status */
-#define DC_CTRL_DIRECT_ACCESS        0x0  /* direct access mode  */
-#define DC_CTRL_INDIRECT_ACCESS      0x20 /* indirect access mode */
-#define DC_CTRL_OP_SUCCEEDED         0x4  /* d-cache operation succeeded */
-
+#define DC_CTRL_DC_ENABLE 0x0 /* enable d-cache */
+#define DC_CTRL_DC_DISABLE 0x1 /* disable d-cache */
+#define DC_CTRL_INVALID_ONLY 0x0 /* invalid d-cache only */
+#define DC_CTRL_INVALID_FLUSH 0x40 /* invalid and flush d-cache */
+#define DC_CTRL_ENABLE_FLUSH_LOCKED 0x80 /* locked d-cache can be flushed */
+#define DC_CTRL_DISABLE_FLUSH_LOCKED 0x0 /* locked d-cache cannot be flushed */
+#define DC_CTRL_FLUSH_STATUS 0x100 /* flush status */
+#define DC_CTRL_DIRECT_ACCESS 0x0 /* direct access mode  */
+#define DC_CTRL_INDIRECT_ACCESS 0x20 /* indirect access mode */
+#define DC_CTRL_OP_SUCCEEDED 0x4 /* d-cache operation succeeded */
 
 static bool dcache_available(void)
 {
@@ -99,7 +98,6 @@ void arch_dcache_flush(void *start_addr_ptr, size_t size)
 	} while (start_addr < end_addr);
 
 	arch_irq_unlock(key); /* --exit critical section-- */
-
 }
 
 void arch_dcache_invd(void *start_addr_ptr, size_t size)
@@ -133,10 +131,10 @@ static void init_dcache_line_size(void)
 	uint32_t val;
 
 	val = z_arc_v2_aux_reg_read(_ARC_V2_D_CACHE_BUILD);
-	__ASSERT((val&0xff) != 0U, "d-cache is not present");
-	val = ((val>>16) & 0xf) + 1;
+	__ASSERT((val & 0xff) != 0U, "d-cache is not present");
+	val = ((val >> 16) & 0xf) + 1;
 	val *= 16U;
-	sys_cache_line_size = (size_t) val;
+	sys_cache_line_size = (size_t)val;
 }
 #endif
 

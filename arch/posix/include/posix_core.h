@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-
 typedef struct {
 	k_thread_entry_t entry_point;
 	void *arg1;
@@ -37,7 +36,6 @@ typedef struct {
 	 * 40 bytes ( 4*8 + 2*4 ).
 	 */
 } posix_thread_status_t;
-
 
 void posix_new_thread(posix_thread_status_t *ptr);
 void posix_swap(int next_allowed_thread_nbr, int this_thread_nbr);

@@ -57,7 +57,7 @@ static int send_tcp_data(struct data *data)
 
 	data->tcp.received = 0U;
 
-	ret =  sendall(data->tcp.sock, lorem_ipsum, data->tcp.expecting);
+	ret = sendall(data->tcp.sock, lorem_ipsum, data->tcp.expecting);
 
 	if (ret < 0) {
 		LOG_ERR("%s TCP: Failed to send data, errno %d", data->proto,
@@ -70,7 +70,8 @@ static int send_tcp_data(struct data *data)
 	return ret;
 }
 
-static int compare_tcp_data(struct data *data, const char *buf, uint32_t received)
+static int compare_tcp_data(struct data *data, const char *buf,
+			    uint32_t received)
 {
 	if (data->tcp.received + received > data->tcp.expecting) {
 		LOG_ERR("Too much data received: TCP %s", data->proto);
@@ -204,7 +205,6 @@ static int process_tcp_proto(struct data *data)
 		/* Response complete */
 		LOG_DBG("%s TCP: Received and compared %d bytes, all ok",
 			data->proto, data->tcp.received);
-
 
 		if (++data->tcp.counter % 1000 == 0U) {
 			LOG_INF("%s TCP: Exchanged %u packets", data->proto,

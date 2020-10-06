@@ -51,8 +51,8 @@ void main(void)
 	if (rc == 0) {
 		rc = sensor_trigger_set(dev, &trig, trigger_handler);
 	}
-	printf("Alert outside %d..%d %%RH got %d\n", lo_thr.val1,
-	       hi_thr.val1, rc);
+	printf("Alert outside %d..%d %%RH got %d\n", lo_thr.val1, hi_thr.val1,
+	       rc);
 #endif
 
 	while (true) {
@@ -75,11 +75,11 @@ void main(void)
 #ifdef CONFIG_SHT3XD_TRIGGER
 		if (alerted != last_alerted) {
 			if (lo_thr.val1 > hum.val1) {
-				printf("ALERT: humidity %d < %d\n",
-				       hum.val1, lo_thr.val1);
+				printf("ALERT: humidity %d < %d\n", hum.val1,
+				       lo_thr.val1);
 			} else if (hi_thr.val1 < hum.val1) {
-				printf("ALERT: humidity %d > %d\n",
-				       hum.val1, hi_thr.val1);
+				printf("ALERT: humidity %d > %d\n", hum.val1,
+				       hi_thr.val1);
 			} else {
 				printf("ALERT: humidity %d <= %d <= %d\n",
 				       lo_thr.val1, hum.val1, hi_thr.val1);

@@ -10,5 +10,5 @@
  * higher-addressed chunk considered "ROM"
  */
 
-#define _RESET_VECTOR		_ROM_ADDR
-#define	_EXC_VECTOR		ALT_CPU_EXCEPTION_ADDR
+#define _RESET_VECTOR _ROM_ADDR
+#define _EXC_VECTOR ALT_CPU_EXCEPTION_ADDR

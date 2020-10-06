@@ -158,8 +158,8 @@ void main(void)
 
 		/* Flush remaining buffers */
 		do {
-			ret = video_dequeue(video, VIDEO_EP_OUT,
-					    &vbuf, K_NO_WAIT);
+			ret = video_dequeue(video, VIDEO_EP_OUT, &vbuf,
+					    K_NO_WAIT);
 		} while (!ret);
 
 	} while (1);

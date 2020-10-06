@@ -17,11 +17,11 @@
 #include <nrfx_qspi.h>
 
 struct qspi_nor_config {
-       /* JEDEC id from devicetree */
-       uint8_t id[SPI_NOR_MAX_ID_LEN];
+	/* JEDEC id from devicetree */
+	uint8_t id[SPI_NOR_MAX_ID_LEN];
 
-       /* Size from devicetree, in bytes */
-       uint32_t size;
+	/* Size from devicetree, in bytes */
+	uint32_t size;
 };
 
 #define QSPI_NOR_MAX_ID_LEN SPI_NOR_MAX_ID_LEN
@@ -129,7 +129,7 @@ static inline int qspi_get_lines_write(uint8_t lines)
 
 	switch (lines) {
 	case 3:
-		ret =  NRF_QSPI_WRITEOC_PP4IO;
+		ret = NRF_QSPI_WRITEOC_PP4IO;
 		break;
 	case 2:
 		ret = NRF_QSPI_WRITEOC_PP4O;
@@ -287,7 +287,6 @@ static void qspi_handler(nrfx_qspi_evt_t event, void *p_context)
 	}
 }
 
-
 /* QSPI send custom command */
 static int qspi_send_cmd(const struct device *dev, const struct qspi_cmd *cmd)
 {
@@ -358,7 +357,8 @@ static int qspi_erase(const struct device *dev, uint32_t addr, uint32_t size)
 			adj = QSPI_SECTOR_SIZE;
 		} else {
 			/* minimal erase size is at least a sector size */
-			LOG_ERR("unsupported at 0x%lx size %zu", (long)addr, size);
+			LOG_ERR("unsupported at 0x%lx size %zu", (long)addr,
+				size);
 			rv = -EINVAL;
 		}
 
@@ -367,7 +367,8 @@ static int qspi_erase(const struct device *dev, uint32_t addr, uint32_t size)
 			addr += adj;
 			size -= adj;
 		} else {
-			LOG_ERR("erase error at 0x%lx size %zu", (long)addr, size);
+			LOG_ERR("erase error at 0x%lx size %zu", (long)addr,
+				size);
 			rv = qspi_get_zephyr_ret_code(res);
 		}
 	}
@@ -404,15 +405,15 @@ static inline void qspi_fill_init_struct(nrfx_qspi_config_t *initstruct)
 
 	/* Configure Protocol interface */
 #if DT_INST_NODE_HAS_PROP(0, readoc)
-	initstruct->prot_if.readoc =
-		(nrf_qspi_writeoc_t)qspi_get_lines_read(DT_ENUM_IDX(DT_DRV_INST(0), readoc));
+	initstruct->prot_if.readoc = (nrf_qspi_writeoc_t)qspi_get_lines_read(
+		DT_ENUM_IDX(DT_DRV_INST(0), readoc));
 #else
 	initstruct->prot_if.readoc = NRF_QSPI_READOC_FASTREAD;
 #endif
 
 #if DT_INST_NODE_HAS_PROP(0, writeoc)
-	initstruct->prot_if.writeoc =
-		(nrf_qspi_writeoc_t)qspi_get_lines_write(DT_ENUM_IDX(DT_DRV_INST(0), writeoc));
+	initstruct->prot_if.writeoc = (nrf_qspi_writeoc_t)qspi_get_lines_write(
+		DT_ENUM_IDX(DT_DRV_INST(0), writeoc));
 #else
 	initstruct->prot_if.writeoc = NRF_QSPI_WRITEOC_PP;
 #endif
@@ -425,8 +426,8 @@ static inline void qspi_fill_init_struct(nrfx_qspi_config_t *initstruct)
 	initstruct->phy_if.sck_freq =
 		get_nrf_qspi_prescaler(DT_INST_PROP(0, sck_frequency));
 	initstruct->phy_if.sck_delay = DT_INST_PROP(0, sck_delay);
-	initstruct->phy_if.spi_mode = qspi_get_mode(DT_INST_PROP(0, cpol),
-						    DT_INST_PROP(0, cpha));
+	initstruct->phy_if.spi_mode =
+		qspi_get_mode(DT_INST_PROP(0, cpol), DT_INST_PROP(0, cpha));
 
 	initstruct->phy_if.dpmen = false;
 }
@@ -448,9 +449,8 @@ static int qspi_nrfx_configure(const struct device *dev)
 
 	if (res == NRFX_SUCCESS) {
 		/* If quad transfer was chosen - enable it now */
-		if ((qspi_is_used_write_quad_mode(QSPIconfig.prot_if.writeoc))
-		    || (qspi_is_used_read_quad_mode(QSPIconfig.prot_if.readoc))) {
-
+		if ((qspi_is_used_write_quad_mode(QSPIconfig.prot_if.writeoc)) ||
+		    (qspi_is_used_read_quad_mode(QSPIconfig.prot_if.readoc))) {
 			/* WRITE ENABLE has to be sent before QUAR ENABLE */
 			struct qspi_cmd cmd = { .op_code = SPI_NOR_CMD_WREN };
 
@@ -460,7 +460,10 @@ static int qspi_nrfx_configure(const struct device *dev)
 
 			uint8_t tx = BIT(CONFIG_NORDIC_QSPI_NOR_QE_BIT);
 
-			const struct qspi_buf tx_buff = { .buf = &tx, .len = sizeof(tx), };
+			const struct qspi_buf tx_buff = {
+				.buf = &tx,
+				.len = sizeof(tx),
+			};
 
 			cmd.op_code = SPI_NOR_CMD_WRSR;
 			cmd.tx_buf = &tx_buff;
@@ -487,15 +490,11 @@ static inline int qspi_nor_read_id(const struct device *dev,
 				   const struct qspi_nor_config *const flash_id)
 {
 	uint8_t rx_b[QSPI_NOR_MAX_ID_LEN];
-	const struct qspi_buf q_rx_buf = {
-		.buf = rx_b,
-		.len = QSPI_NOR_MAX_ID_LEN
-	};
-	const struct qspi_cmd cmd = {
-		.op_code = SPI_NOR_CMD_RDID,
-		.rx_buf = &q_rx_buf,
-		.tx_buf = NULL
-	};
+	const struct qspi_buf q_rx_buf = { .buf = rx_b,
+					   .len = QSPI_NOR_MAX_ID_LEN };
+	const struct qspi_cmd cmd = { .op_code = SPI_NOR_CMD_RDID,
+				      .rx_buf = &q_rx_buf,
+				      .tx_buf = NULL };
 
 	if (qspi_send_cmd(dev, &cmd) != 0) {
 		return -EIO;
@@ -511,8 +510,7 @@ static inline int qspi_nor_read_id(const struct device *dev,
 	return 0;
 }
 
-static inline nrfx_err_t read_non_aligned(const struct device *dev,
-					  off_t addr,
+static inline nrfx_err_t read_non_aligned(const struct device *dev, off_t addr,
 					  void *dest, size_t size)
 {
 	uint8_t __aligned(WORD_SIZE) buf[WORD_SIZE * 2];
@@ -532,8 +530,8 @@ static inline nrfx_err_t read_non_aligned(const struct device *dev,
 
 	off_t flash_suffix = (size - flash_prefix) % WORD_SIZE;
 	off_t flash_middle = size - flash_prefix - flash_suffix;
-	off_t dest_middle = size - dest_prefix -
-			    (size - dest_prefix) % WORD_SIZE;
+	off_t dest_middle =
+		size - dest_prefix - (size - dest_prefix) % WORD_SIZE;
 
 	if (flash_middle > dest_middle) {
 		flash_middle = dest_middle;
@@ -553,14 +551,15 @@ static inline nrfx_err_t read_non_aligned(const struct device *dev,
 
 		/* perform shift in RAM */
 		if (flash_prefix != dest_prefix) {
-			memmove(dptr + flash_prefix, dptr + dest_prefix, flash_middle);
+			memmove(dptr + flash_prefix, dptr + dest_prefix,
+				flash_middle);
 		}
 	}
 
 	/* read prefix */
 	if (flash_prefix != 0) {
-		res = nrfx_qspi_read(buf, WORD_SIZE, addr -
-				     (WORD_SIZE - flash_prefix));
+		res = nrfx_qspi_read(buf, WORD_SIZE,
+				     addr - (WORD_SIZE - flash_prefix));
 		qspi_wait_for_completion(dev, res);
 		if (res != NRFX_SUCCESS) {
 			return res;
@@ -597,11 +596,11 @@ static int qspi_nor_read(const struct device *dev, off_t addr, void *dest,
 	const struct qspi_nor_config *params = dev->config;
 
 	/* affected region should be within device */
-	if (addr < 0 ||
-	    (addr + size) > params->size) {
+	if (addr < 0 || (addr + size) > params->size) {
 		LOG_ERR("read error: address or size "
 			"exceeds expected values."
-			"Addr: 0x%lx size %zu", (long)addr, size);
+			"Addr: 0x%lx size %zu",
+			(long)addr, size);
 		return -EINVAL;
 	}
 
@@ -652,7 +651,8 @@ static inline nrfx_err_t write_from_nvmc(const struct device *dev, off_t addr,
 					 const void *sptr, size_t slen)
 {
 #if NVMC_WRITE_OK
-	uint8_t __aligned(4) buf[CONFIG_NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE];
+	uint8_t __aligned(4)
+		buf[CONFIG_NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE];
 	const uint8_t *sp = sptr;
 	nrfx_err_t res = NRFX_SUCCESS;
 
@@ -660,8 +660,7 @@ static inline nrfx_err_t write_from_nvmc(const struct device *dev, off_t addr,
 		size_t len = MIN(slen, sizeof(buf));
 
 		memcpy(buf, sp, len);
-		res = nrfx_qspi_write(buf, sizeof(buf),
-				      addr);
+		res = nrfx_qspi_write(buf, sizeof(buf), addr);
 		qspi_wait_for_completion(dev, res);
 
 		if (res == NRFX_SUCCESS) {
@@ -676,8 +675,7 @@ static inline nrfx_err_t write_from_nvmc(const struct device *dev, off_t addr,
 	return res;
 }
 
-static int qspi_nor_write(const struct device *dev, off_t addr,
-			  const void *src,
+static int qspi_nor_write(const struct device *dev, off_t addr, const void *src,
 			  size_t size)
 {
 	if (!src) {
@@ -685,8 +683,7 @@ static int qspi_nor_write(const struct device *dev, off_t addr,
 	}
 
 	/* write size must be non-zero, less than 4, or a multiple of 4 */
-	if ((size == 0)
-	    || ((size > 4) && ((size % 4U) != 0))) {
+	if ((size == 0) || ((size > 4) && ((size % 4U) != 0))) {
 		return -EINVAL;
 	}
 	/* address must be 4-byte aligned */
@@ -702,11 +699,11 @@ static int qspi_nor_write(const struct device *dev, off_t addr,
 	}
 
 	/* affected region should be within device */
-	if (addr < 0 ||
-	    (addr + size) > params->size) {
+	if (addr < 0 || (addr + size) > params->size) {
 		LOG_ERR("write error: address or size "
 			"exceeds expected values."
-			"Addr: 0x%lx size %zu", (long)addr, size);
+			"Addr: 0x%lx size %zu",
+			(long)addr, size);
 		return -EINVAL;
 	}
 
@@ -738,11 +735,11 @@ static int qspi_nor_erase(const struct device *dev, off_t addr, size_t size)
 	}
 
 	/* affected region should be within device */
-	if (addr < 0 ||
-	    (addr + size) > params->size) {
+	if (addr < 0 || (addr + size) > params->size) {
 		LOG_ERR("erase error: address or size "
 			"exceeds expected values."
-			"Addr: 0x%lx size %zu", (long)addr, size);
+			"Addr: 0x%lx size %zu",
+			(long)addr, size);
 		return -EINVAL;
 	}
 
@@ -758,7 +755,8 @@ static int qspi_nor_write_protection_set(const struct device *dev,
 
 	int ret = 0;
 	struct qspi_cmd cmd = {
-		.op_code = ((write_protect) ? SPI_NOR_CMD_WRDI : SPI_NOR_CMD_WREN),
+		.op_code =
+			((write_protect) ? SPI_NOR_CMD_WRDI : SPI_NOR_CMD_WREN),
 	};
 
 	driver_data->write_protection = write_protect;
@@ -803,20 +801,19 @@ static int qspi_nor_configure(const struct device *dev)
  */
 static int qspi_nor_init(const struct device *dev)
 {
-	IRQ_CONNECT(DT_IRQN(QSPI_NODE), DT_IRQ(QSPI_NODE, priority),
-		    nrfx_isr, nrfx_qspi_irq_handler, 0);
+	IRQ_CONNECT(DT_IRQN(QSPI_NODE), DT_IRQ(QSPI_NODE, priority), nrfx_isr,
+		    nrfx_qspi_irq_handler, 0);
 	return qspi_nor_configure(dev);
 }
 
 #if defined(CONFIG_FLASH_PAGE_LAYOUT)
 
 /* instance 0 page count */
-#define LAYOUT_PAGES_COUNT (INST_0_BYTES / \
-			    CONFIG_NORDIC_QSPI_NOR_FLASH_LAYOUT_PAGE_SIZE)
+#define LAYOUT_PAGES_COUNT \
+	(INST_0_BYTES / CONFIG_NORDIC_QSPI_NOR_FLASH_LAYOUT_PAGE_SIZE)
 
 BUILD_ASSERT((CONFIG_NORDIC_QSPI_NOR_FLASH_LAYOUT_PAGE_SIZE *
-	      LAYOUT_PAGES_COUNT)
-	     == INST_0_BYTES,
+	      LAYOUT_PAGES_COUNT) == INST_0_BYTES,
 	     "QSPI_NOR_FLASH_LAYOUT_PAGE_SIZE incompatible with flash size");
 
 static const struct flash_pages_layout dev_layout = {
@@ -853,13 +850,11 @@ static const struct flash_driver_api qspi_nor_api = {
 #endif
 };
 
-
 static const struct qspi_nor_config flash_id = {
 	.id = DT_INST_PROP(0, jedec_id),
 	.size = INST_0_BYTES,
 };
 
-DEVICE_AND_API_INIT(qspi_flash_memory, DT_INST_LABEL(0),
-		    &qspi_nor_init, &qspi_nor_memory_data,
-		    &flash_id, POST_KERNEL, CONFIG_NORDIC_QSPI_NOR_INIT_PRIORITY,
-		    &qspi_nor_api);
+DEVICE_AND_API_INIT(qspi_flash_memory, DT_INST_LABEL(0), &qspi_nor_init,
+		    &qspi_nor_memory_data, &flash_id, POST_KERNEL,
+		    CONFIG_NORDIC_QSPI_NOR_INIT_PRIORITY, &qspi_nor_api);

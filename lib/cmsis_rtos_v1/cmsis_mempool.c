@@ -8,7 +8,7 @@
 #include <cmsis_os.h>
 #include <string.h>
 
-#define TIME_OUT	K_MSEC(100)
+#define TIME_OUT K_MSEC(100)
 
 /**
  * @brief Create and Initialize a memory pool.
@@ -30,8 +30,8 @@ void *osPoolAlloc(osPoolId pool_id)
 	osPoolDef_t *osPool = (osPoolDef_t *)pool_id;
 	void *ptr;
 
-	if (k_mem_slab_alloc((struct k_mem_slab *)(osPool->pool),
-				&ptr, TIME_OUT) == 0) {
+	if (k_mem_slab_alloc((struct k_mem_slab *)(osPool->pool), &ptr,
+			     TIME_OUT) == 0) {
 		return ptr;
 	} else {
 		return NULL;
@@ -46,8 +46,8 @@ void *osPoolCAlloc(osPoolId pool_id)
 	osPoolDef_t *osPool = (osPoolDef_t *)pool_id;
 	void *ptr;
 
-	if (k_mem_slab_alloc((struct k_mem_slab *)(osPool->pool),
-				&ptr, TIME_OUT) == 0) {
+	if (k_mem_slab_alloc((struct k_mem_slab *)(osPool->pool), &ptr,
+			     TIME_OUT) == 0) {
 		(void)memset(ptr, 0, osPool->item_sz);
 		return ptr;
 	} else {

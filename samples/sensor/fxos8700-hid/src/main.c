@@ -19,23 +19,23 @@ LOG_MODULE_REGISTER(main);
 #define SW1_NODE DT_ALIAS(sw1)
 
 #if DT_NODE_HAS_STATUS(SW0_NODE, okay)
-#define PORT0		DT_GPIO_LABEL(SW0_NODE, gpios)
-#define PIN0		DT_GPIO_PIN(SW0_NODE, gpios)
-#define PIN0_FLAGS	DT_GPIO_FLAGS(SW0_NODE, gpios)
+#define PORT0 DT_GPIO_LABEL(SW0_NODE, gpios)
+#define PIN0 DT_GPIO_PIN(SW0_NODE, gpios)
+#define PIN0_FLAGS DT_GPIO_FLAGS(SW0_NODE, gpios)
 #else
 #error SW0 is not available
 #endif
 
 /* If second button exists, use it as right-click. */
 #if DT_NODE_HAS_STATUS(SW1_NODE, okay)
-#define PORT1		DT_GPIO_LABEL(SW1_NODE, gpios)
-#define PIN1		DT_GPIO_PIN(SW1_NODE, gpios)
-#define PIN1_FLAGS	DT_GPIO_FLAGS(SW1_NODE, gpios)
+#define PORT1 DT_GPIO_LABEL(SW1_NODE, gpios)
+#define PIN1 DT_GPIO_PIN(SW1_NODE, gpios)
+#define PIN1_FLAGS DT_GPIO_FLAGS(SW1_NODE, gpios)
 #endif
 
-#define LED_PORT	DT_GPIO_LABEL(DT_ALIAS(led0), gpios)
-#define LED		DT_GPIO_PIN(DT_ALIAS(led0), gpios)
-#define LED_FLAGS	DT_GPIO_FLAGS(DT_ALIAS(led0), gpios)
+#define LED_PORT DT_GPIO_LABEL(DT_ALIAS(led0), gpios)
+#define LED DT_GPIO_PIN(DT_ALIAS(led0), gpios)
+#define LED_FLAGS DT_GPIO_FLAGS(DT_ALIAS(led0), gpios)
 
 #ifdef CONFIG_FXOS8700
 #include <drivers/sensor.h>
@@ -46,17 +46,16 @@ static const uint8_t hid_report_desc[] = HID_MOUSE_REPORT_DESC(2);
 
 static uint32_t def_val[4];
 static volatile uint8_t status[4];
-static K_SEM_DEFINE(sem, 0, 1);	/* starts off "not available" */
+static K_SEM_DEFINE(sem, 0, 1); /* starts off "not available" */
 static struct gpio_callback callback[4];
 
-#define MOUSE_BTN_REPORT_POS	0
-#define MOUSE_X_REPORT_POS	1
-#define MOUSE_Y_REPORT_POS	2
+#define MOUSE_BTN_REPORT_POS 0
+#define MOUSE_X_REPORT_POS 1
+#define MOUSE_Y_REPORT_POS 2
 
-#define MOUSE_BTN_LEFT		BIT(0)
-#define MOUSE_BTN_RIGHT		BIT(1)
-#define MOUSE_BTN_MIDDLE	BIT(2)
-
+#define MOUSE_BTN_LEFT BIT(0)
+#define MOUSE_BTN_RIGHT BIT(1)
+#define MOUSE_BTN_MIDDLE BIT(2)
 
 static void left_button(const struct device *gpio, struct gpio_callback *cb,
 			uint32_t pins)
@@ -99,8 +98,8 @@ static void right_button(const struct device *gpio, struct gpio_callback *cb,
 #endif
 
 int callbacks_configure(const struct device *gpio, uint32_t pin, int flags,
-			void (*handler)(const struct device *, struct gpio_callback*,
-					uint32_t),
+			void (*handler)(const struct device *,
+					struct gpio_callback *, uint32_t),
 			struct gpio_callback *callback, uint32_t *val)
 {
 	int ret;
@@ -110,8 +109,7 @@ int callbacks_configure(const struct device *gpio, uint32_t pin, int flags,
 		return -ENXIO;
 	}
 
-	gpio_pin_configure(gpio, pin,
-			   GPIO_INPUT | GPIO_INT_DEBOUNCE | flags);
+	gpio_pin_configure(gpio, pin, GPIO_INPUT | GPIO_INT_DEBOUNCE | flags);
 	ret = gpio_pin_get(gpio, pin);
 	if (ret < 0) {
 		return ret;
@@ -159,8 +157,7 @@ static bool read_accel(const struct device *dev)
 	}
 }
 
-static void trigger_handler(const struct device *dev,
-			    struct sensor_trigger *tr)
+static void trigger_handler(const struct device *dev, struct sensor_trigger *tr)
 {
 	ARG_UNUSED(tr);
 

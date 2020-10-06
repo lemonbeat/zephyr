@@ -42,7 +42,7 @@ typedef unsigned long log_arg_t;
 
 /** @brief Number of arguments in the head of extended standard log message..*/
 #define LOG_MSG_NARGS_HEAD_CHUNK \
-	(LOG_MSG_NARGS_SINGLE_CHUNK - (sizeof(void *)/sizeof(log_arg_t)))
+	(LOG_MSG_NARGS_SINGLE_CHUNK - (sizeof(void *) / sizeof(log_arg_t)))
 
 /** @brief Maximal amount of bytes in the hexdump entry which fits in one chunk.
  */
@@ -58,8 +58,7 @@ typedef unsigned long log_arg_t;
 /** @brief Number of bytes that can be stored in chunks following head chunk
  *         in hexdump log message.
  */
-#define HEXDUMP_BYTES_CONT_MSG \
-	(sizeof(struct log_msg) - sizeof(void *))
+#define HEXDUMP_BYTES_CONT_MSG (sizeof(struct log_msg) - sizeof(void *))
 
 #define ARGS_CONT_MSG (HEXDUMP_BYTES_CONT_MSG / sizeof(log_arg_t))
 
@@ -71,7 +70,7 @@ typedef unsigned long log_arg_t;
 
 /** @brief Common part of log message header. */
 #define COMMON_PARAM_HDR() \
-	uint16_t type : 1;	   \
+	uint16_t type : 1; \
 	uint16_t ext : 1
 
 /** @brief Number of bits used for storing length of hexdump log message. */
@@ -82,9 +81,9 @@ typedef unsigned long log_arg_t;
 
 /** @brief Part of log message header identifying source and level. */
 struct log_msg_ids {
-	uint16_t level     : 3;    /*!< Severity. */
-	uint16_t domain_id : 3;    /*!< Originating domain. */
-	uint16_t source_id : 10;   /*!< Source ID. */
+	uint16_t level : 3; /*!< Severity. */
+	uint16_t domain_id : 3; /*!< Originating domain. */
+	uint16_t source_id : 10; /*!< Source ID. */
 };
 
 /** Part of log message header common to standard and hexdump log message. */
@@ -97,13 +96,13 @@ struct log_msg_generic_hdr {
 struct log_msg_std_hdr {
 	COMMON_PARAM_HDR();
 	uint16_t reserved : 10;
-	uint16_t nargs    : 4;
+	uint16_t nargs : 4;
 };
 
 /** Part of log message header specific to hexdump log message. */
 struct log_msg_hexdump_hdr {
 	COMMON_PARAM_HDR();
-	uint16_t length     : LOG_MSG_HEXDUMP_LENGTH_BITS;
+	uint16_t length : LOG_MSG_HEXDUMP_LENGTH_BITS;
 };
 
 /** Log message header structure */
@@ -116,7 +115,7 @@ struct log_msg_hdr {
 		uint16_t raw;
 	} params;
 	struct log_msg_ids ids; /*!< Identification part of the message.*/
-	uint32_t timestamp;        /*!< Timestamp. */
+	uint32_t timestamp; /*!< Timestamp. */
 };
 
 /** @brief Data part of log message. */
@@ -136,13 +135,13 @@ struct log_msg_ext_head_data {
 
 /** @brief Log message structure. */
 struct log_msg {
-	struct log_msg *next;   /*!< Used by logger core list.*/
+	struct log_msg *next; /*!< Used by logger core list.*/
 	struct log_msg_hdr hdr; /*!< Message header. */
 	const char *str;
 	union log_msg_data {
 		union log_msg_head_data single;
 		struct log_msg_ext_head_data ext;
-	} payload;                 /*!< Message data. */
+	} payload; /*!< Message data. */
 };
 
 /** @brief Chunks following message head when message is extended. */
@@ -234,7 +233,7 @@ static inline uint32_t log_msg_timestamp_get(struct log_msg *msg)
  */
 static inline bool log_msg_is_std(struct log_msg *msg)
 {
-	return  (msg->hdr.params.generic.type == LOG_MSG_TYPE_STD);
+	return (msg->hdr.params.generic.type == LOG_MSG_TYPE_STD);
 }
 
 /** @brief Returns number of arguments in standard log message.
@@ -254,7 +253,6 @@ uint32_t log_msg_nargs_get(struct log_msg *msg);
  *	   message.
  */
 log_arg_t log_msg_arg_get(struct log_msg *msg, uint32_t arg_idx);
-
 
 /** @brief Gets pointer to the unformatted string from standard log message.
  *
@@ -278,8 +276,7 @@ const char *log_msg_str_get(struct log_msg *msg);
  *
  * @return Pointer to allocated head of the message or NULL
  */
-struct log_msg *log_msg_hexdump_create(const char *str,
-				       const uint8_t *data,
+struct log_msg *log_msg_hexdump_create(const char *str, const uint8_t *data,
 				       uint32_t length);
 
 /** @brief Put data into hexdump log message.
@@ -289,10 +286,8 @@ struct log_msg *log_msg_hexdump_create(const char *str,
  * @param[in, out]	length   Input: requested amount. Output: actual amount.
  * @param[in]		offset   Offset.
  */
-void log_msg_hexdump_data_put(struct log_msg *msg,
-			      uint8_t *data,
-			      size_t *length,
-			      size_t offset);
+void log_msg_hexdump_data_put(struct log_msg *msg, uint8_t *data,
+			      size_t *length, size_t offset);
 
 /** @brief Get data from hexdump log message.
  *
@@ -301,10 +296,8 @@ void log_msg_hexdump_data_put(struct log_msg *msg,
  * @param[in, out]	length   Input: requested amount. Output: actual amount.
  * @param[in]		offset   Offset.
  */
-void log_msg_hexdump_data_get(struct log_msg *msg,
-			      uint8_t *data,
-			      size_t *length,
-			      size_t offset);
+void log_msg_hexdump_data_get(struct log_msg *msg, uint8_t *data,
+			      size_t *length, size_t offset);
 
 union log_msg_chunk *log_msg_no_space_handle(void);
 
@@ -320,7 +313,7 @@ union log_msg_chunk *log_msg_chunk_alloc(void);
  */
 static inline struct log_msg *z_log_msg_std_alloc(void)
 {
-	struct  log_msg *msg = (struct  log_msg *)log_msg_chunk_alloc();
+	struct log_msg *msg = (struct log_msg *)log_msg_chunk_alloc();
 
 	if (msg != NULL) {
 		/* all fields reset to 0, reference counter to 1 */
@@ -371,10 +364,9 @@ static inline struct log_msg *log_msg_create_0(const char *str)
  *
  *  @return Pointer to allocated head of the message or NULL.
  */
-static inline struct log_msg *log_msg_create_1(const char *str,
-					       log_arg_t arg1)
+static inline struct log_msg *log_msg_create_1(const char *str, log_arg_t arg1)
 {
-	struct  log_msg *msg = z_log_msg_std_alloc();
+	struct log_msg *msg = z_log_msg_std_alloc();
 
 	if (msg != NULL) {
 		msg->str = str;
@@ -399,11 +391,10 @@ static inline struct log_msg *log_msg_create_1(const char *str,
  *
  *  @return Pointer to allocated head of the message or NULL.
  */
-static inline struct log_msg *log_msg_create_2(const char *str,
-					       log_arg_t arg1,
+static inline struct log_msg *log_msg_create_2(const char *str, log_arg_t arg1,
 					       log_arg_t arg2)
 {
-	struct  log_msg *msg = z_log_msg_std_alloc();
+	struct log_msg *msg = z_log_msg_std_alloc();
 
 	if (msg != NULL) {
 		msg->str = str;
@@ -430,12 +421,10 @@ static inline struct log_msg *log_msg_create_2(const char *str,
  *
  *  @return Pointer to allocated head of the message or NULL.
  */
-static inline struct log_msg *log_msg_create_3(const char *str,
-					       log_arg_t arg1,
-					       log_arg_t arg2,
-					       log_arg_t arg3)
+static inline struct log_msg *log_msg_create_3(const char *str, log_arg_t arg1,
+					       log_arg_t arg2, log_arg_t arg3)
 {
-	struct  log_msg *msg = z_log_msg_std_alloc();
+	struct log_msg *msg = z_log_msg_std_alloc();
 
 	if (msg != NULL) {
 		msg->str = str;
@@ -462,8 +451,7 @@ static inline struct log_msg *log_msg_create_3(const char *str,
  *
  *  @return Pointer to allocated head of the message or NULL.
  */
-struct log_msg *log_msg_create_n(const char *str,
-				 log_arg_t *args,
+struct log_msg *log_msg_create_n(const char *str, log_arg_t *args,
 				 uint32_t nargs);
 
 /**

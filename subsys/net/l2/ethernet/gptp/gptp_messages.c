@@ -22,36 +22,34 @@ static bool sync_cb_registered;
 static bool ts_cb_registered;
 
 static const struct net_eth_addr gptp_multicast_eth_addr = {
-	{ 0x01, 0x80, 0xc2, 0x00, 0x00, 0x0e } };
+	{ 0x01, 0x80, 0xc2, 0x00, 0x00, 0x0e }
+};
 
-#define NET_GPTP_INFO(msg, pkt)						\
-	if (CONFIG_NET_GPTP_LOG_LEVEL >= LOG_LEVEL_DBG) {		\
-		struct gptp_hdr *hdr = GPTP_HDR(pkt);			\
-									\
-		if (hdr->message_type == GPTP_ANNOUNCE_MESSAGE) {	\
-			struct gptp_announce *ann = GPTP_ANNOUNCE(pkt);	\
-			char output[sizeof("xx:xx:xx:xx:xx:xx:xx:xx")];	\
-									\
-			gptp_sprint_clock_id(				\
-				ann->root_system_id.grand_master_id,	\
-				output,					\
-				sizeof(output));			\
-									\
-			NET_DBG("Sending %s seq %d pkt %p",		\
-				msg,					\
-				ntohs(hdr->sequence_id), pkt);		\
-									\
-			NET_DBG("  GM %d/%d/0x%x/%d/%s",\
-				ann->root_system_id.grand_master_prio1, \
-				ann->root_system_id.clk_quality.clock_class, \
-				ann->root_system_id.clk_quality.clock_accuracy,\
-				ann->root_system_id.grand_master_prio2,	\
-				log_strdup(output));			\
-		} else {						\
-			NET_DBG("Sending %s seq %d pkt %p",		\
-				msg,					\
-				ntohs(hdr->sequence_id), pkt);		\
-		}							\
+#define NET_GPTP_INFO(msg, pkt)                                                 \
+	if (CONFIG_NET_GPTP_LOG_LEVEL >= LOG_LEVEL_DBG) {                       \
+		struct gptp_hdr *hdr = GPTP_HDR(pkt);                           \
+                                                                                \
+		if (hdr->message_type == GPTP_ANNOUNCE_MESSAGE) {               \
+			struct gptp_announce *ann = GPTP_ANNOUNCE(pkt);         \
+			char output[sizeof("xx:xx:xx:xx:xx:xx:xx:xx")];         \
+                                                                                \
+			gptp_sprint_clock_id(                                   \
+				ann->root_system_id.grand_master_id, output,    \
+				sizeof(output));                                \
+                                                                                \
+			NET_DBG("Sending %s seq %d pkt %p", msg,                \
+				ntohs(hdr->sequence_id), pkt);                  \
+                                                                                \
+			NET_DBG("  GM %d/%d/0x%x/%d/%s",                        \
+				ann->root_system_id.grand_master_prio1,         \
+				ann->root_system_id.clk_quality.clock_class,    \
+				ann->root_system_id.clk_quality.clock_accuracy, \
+				ann->root_system_id.grand_master_prio2,         \
+				log_strdup(output));                            \
+		} else {                                                        \
+			NET_DBG("Sending %s seq %d pkt %p", msg,                \
+				ntohs(hdr->sequence_id), pkt);                  \
+		}                                                               \
 	}
 
 struct gptp_hdr *gptp_get_hdr(struct net_pkt *pkt)
@@ -135,7 +133,7 @@ static void gptp_pdelay_response_timestamp_callback(struct net_pkt *pkt)
 		gptp_send_pdelay_follow_up(port, follow_up,
 					   net_pkt_timestamp(pkt));
 
-out:
+	out:
 		/* The pkt was ref'ed in gptp_handle_pdelay_req() */
 		net_pkt_unref(pkt);
 	}
@@ -144,9 +142,8 @@ out:
 #if defined(CONFIG_NET_DEBUG_NET_PKT_ALLOC)
 static struct net_pkt *setup_gptp_frame_debug(struct net_if *iface,
 					      size_t extra_header,
-					      const char *caller,
-					      int line)
-#define setup_gptp_frame(iface, extra_header)				\
+					      const char *caller, int line)
+#define setup_gptp_frame(iface, extra_header) \
 	setup_gptp_frame_debug(iface, extra_header, __func__, __LINE__)
 #else
 static struct net_pkt *setup_gptp_frame(struct net_if *iface,
@@ -156,13 +153,13 @@ static struct net_pkt *setup_gptp_frame(struct net_if *iface,
 	struct net_pkt *pkt;
 
 #if defined(CONFIG_NET_DEBUG_NET_PKT_ALLOC)
-	pkt = net_pkt_alloc_with_buffer_debug(iface, sizeof(struct gptp_hdr) +
-					      extra_header, AF_UNSPEC, 0,
-					      NET_BUF_TIMEOUT, caller, line);
+	pkt = net_pkt_alloc_with_buffer_debug(
+		iface, sizeof(struct gptp_hdr) + extra_header, AF_UNSPEC, 0,
+		NET_BUF_TIMEOUT, caller, line);
 #else
-	pkt = net_pkt_alloc_with_buffer(iface, sizeof(struct gptp_hdr) +
-					extra_header, AF_UNSPEC, 0,
-					NET_BUF_TIMEOUT);
+	pkt = net_pkt_alloc_with_buffer(iface,
+					sizeof(struct gptp_hdr) + extra_header,
+					AF_UNSPEC, 0, NET_BUF_TIMEOUT);
 #endif
 	if (!pkt) {
 		return NULL;
@@ -217,8 +214,8 @@ struct net_pkt *gptp_prepare_sync(int port)
 	hdr->correction_field = 0;
 	hdr->flags.octets[0] = GPTP_FLAG_TWO_STEP;
 	hdr->flags.octets[1] = GPTP_FLAG_PTP_TIMESCALE;
-	hdr->message_length = htons(sizeof(struct gptp_hdr) +
-				    sizeof(struct gptp_sync));
+	hdr->message_length =
+		htons(sizeof(struct gptp_hdr) + sizeof(struct gptp_sync));
 	hdr->control = GPTP_SYNC_CONTROL_VALUE;
 
 	/* Clear reserved fields. */
@@ -273,8 +270,8 @@ struct net_pkt *gptp_prepare_follow_up(int port, struct net_pkt *sync)
 	hdr->correction_field = gptp_timestamp_to_nsec(&sync->timestamp);
 	hdr->flags.octets[0] = 0U;
 	hdr->flags.octets[1] = GPTP_FLAG_PTP_TIMESCALE;
-	hdr->message_length = htons(sizeof(struct gptp_hdr) +
-				    sizeof(struct gptp_follow_up));
+	hdr->message_length =
+		htons(sizeof(struct gptp_hdr) + sizeof(struct gptp_follow_up));
 	hdr->control = GPTP_FUP_CONTROL_VALUE;
 
 	/* Clear reserved fields. */
@@ -321,8 +318,8 @@ struct net_pkt *gptp_prepare_pdelay_req(int port)
 	hdr->flags.octets[0] = 0U;
 	hdr->flags.octets[1] = GPTP_FLAG_PTP_TIMESCALE;
 
-	hdr->message_length = htons(sizeof(struct gptp_hdr) +
-				    sizeof(struct gptp_pdelay_req));
+	hdr->message_length =
+		htons(sizeof(struct gptp_hdr) + sizeof(struct gptp_pdelay_req));
 	hdr->port_id.port_number = htons(port_ds->port_id.port_number);
 	hdr->control = GPTP_OTHER_CONTROL_VALUE;
 	hdr->log_msg_interval = port_ds->cur_log_pdelay_req_itv;
@@ -332,8 +329,7 @@ struct net_pkt *gptp_prepare_pdelay_req(int port)
 	hdr->reserved1 = 0U;
 	hdr->reserved2 = 0U;
 
-	memcpy(hdr->port_id.clk_id,
-	       port_ds->port_id.clk_id, GPTP_CLOCK_ID_LEN);
+	memcpy(hdr->port_id.clk_id, port_ds->port_id.clk_id, GPTP_CLOCK_ID_LEN);
 
 	/* PTP configuration. */
 	(void)memset(&req->reserved1, 0, sizeof(req->reserved1));
@@ -345,8 +341,7 @@ struct net_pkt *gptp_prepare_pdelay_req(int port)
 	return pkt;
 }
 
-struct net_pkt *gptp_prepare_pdelay_resp(int port,
-					 struct net_pkt *req)
+struct net_pkt *gptp_prepare_pdelay_resp(int port, struct net_pkt *req)
 {
 	struct net_if *iface = net_pkt_iface(req);
 	struct gptp_pdelay_resp *pdelay_resp;
@@ -392,22 +387,20 @@ struct net_pkt *gptp_prepare_pdelay_resp(int port,
 	hdr->reserved1 = 0U;
 	hdr->reserved2 = 0U;
 
-	memcpy(hdr->port_id.clk_id, port_ds->port_id.clk_id,
-	       GPTP_CLOCK_ID_LEN);
+	memcpy(hdr->port_id.clk_id, port_ds->port_id.clk_id, GPTP_CLOCK_ID_LEN);
 
 	/* PTP configuration. */
 	pdelay_resp->req_receipt_ts_secs_high = 0U;
 	pdelay_resp->req_receipt_ts_secs_low = 0U;
 	pdelay_resp->req_receipt_ts_nsecs = 0U;
 
-	memcpy(&pdelay_resp->requesting_port_id,
-	       &query->port_id, sizeof(struct gptp_port_identity));
+	memcpy(&pdelay_resp->requesting_port_id, &query->port_id,
+	       sizeof(struct gptp_port_identity));
 
 	return pkt;
 }
 
-struct net_pkt *gptp_prepare_pdelay_follow_up(int port,
-					      struct net_pkt *resp)
+struct net_pkt *gptp_prepare_pdelay_follow_up(int port, struct net_pkt *resp)
 {
 	struct net_if *iface = net_pkt_iface(resp);
 	struct gptp_pdelay_resp_follow_up *follow_up;
@@ -454,16 +447,14 @@ struct net_pkt *gptp_prepare_pdelay_follow_up(int port,
 	hdr->reserved1 = 0U;
 	hdr->reserved2 = 0U;
 
-	memcpy(hdr->port_id.clk_id, port_ds->port_id.clk_id,
-	       GPTP_CLOCK_ID_LEN);
+	memcpy(hdr->port_id.clk_id, port_ds->port_id.clk_id, GPTP_CLOCK_ID_LEN);
 
 	/* PTP configuration. */
 	follow_up->resp_orig_ts_secs_high = 0U;
 	follow_up->resp_orig_ts_secs_low = 0U;
 	follow_up->resp_orig_ts_nsecs = 0U;
 
-	memcpy(&follow_up->requesting_port_id,
-	       &pdelay_resp->requesting_port_id,
+	memcpy(&follow_up->requesting_port_id, &pdelay_resp->requesting_port_id,
 	       sizeof(struct gptp_port_identity));
 
 	return pkt;
@@ -486,7 +477,7 @@ struct net_pkt *gptp_prepare_announce(int port)
 	NET_ASSERT(iface);
 
 	pkt = setup_gptp_frame(iface, sizeof(struct gptp_announce) - 8 +
-			       ntohs(global_ds->path_trace.len));
+					      ntohs(global_ds->path_trace.len));
 	if (!pkt) {
 		NET_DBG("Cannot get gPTP frame");
 		return NULL;
@@ -509,8 +500,8 @@ struct net_pkt *gptp_prepare_announce(int port)
 	/* Copy leap61, leap59, current UTC offset valid, time traceable and
 	 * frequency traceable flags.
 	 */
-	hdr->flags.octets[1] =
-		global_ds->global_flags.octets[1] | GPTP_FLAG_PTP_TIMESCALE;
+	hdr->flags.octets[1] = global_ds->global_flags.octets[1] |
+			       GPTP_FLAG_PTP_TIMESCALE;
 
 	memcpy(hdr->port_id.clk_id, GPTP_DEFAULT_DS()->clk_id,
 	       GPTP_CLOCK_ID_LEN);
@@ -536,14 +527,13 @@ struct net_pkt *gptp_prepare_announce(int port)
 		       &default_ds->clk_quality,
 		       sizeof(struct gptp_clock_quality));
 
-		memcpy(&ann->root_system_id.grand_master_id,
-		       default_ds->clk_id,
+		memcpy(&ann->root_system_id.grand_master_id, default_ds->clk_id,
 		       GPTP_CLOCK_ID_LEN);
 		break;
 	case GPTP_INFO_IS_RECEIVED:
 		memcpy(&ann->root_system_id,
-		       &GPTP_PORT_BMCA_DATA(port)->
-				master_priority.root_system_id,
+		       &GPTP_PORT_BMCA_DATA(port)
+				->master_priority.root_system_id,
 		       sizeof(struct gptp_root_system_identity));
 		break;
 	default:
@@ -560,9 +550,9 @@ struct net_pkt *gptp_prepare_announce(int port)
 	(void)memset(ann->reserved1, 0, sizeof(ann->reserved1));
 	ann->reserved2 = 0U;
 
-	hdr->message_length = htons(sizeof(struct gptp_hdr) +
-				    sizeof(struct gptp_announce) - 8 +
-				    ntohs(global_ds->path_trace.len));
+	hdr->message_length =
+		htons(sizeof(struct gptp_hdr) + sizeof(struct gptp_announce) -
+		      8 + ntohs(global_ds->path_trace.len));
 
 	ann->tlv.len = global_ds->path_trace.len;
 
@@ -574,7 +564,7 @@ struct net_pkt *gptp_prepare_announce(int port)
 	net_pkt_set_overwrite(pkt, true);
 
 	if (net_pkt_skip(pkt, sizeof(struct gptp_hdr) +
-			 sizeof(struct gptp_announce) - 8) ||
+				      sizeof(struct gptp_announce) - 8) ||
 	    net_pkt_write(pkt, &global_ds->path_trace.path_sequence[0][0],
 			  ntohs(global_ds->path_trace.len))) {
 		goto fail;
@@ -624,10 +614,9 @@ int gptp_handle_follow_up(int port, struct net_pkt *pkt)
 	hdr = GPTP_HDR(pkt);
 
 	if (sync_hdr->sequence_id != hdr->sequence_id) {
-		NET_WARN("%s sequence id %d %s %s %d",
-			 "FOLLOWUP", ntohs(hdr->sequence_id),
-			 "does not match",
-			 "SYNC", ntohs(sync_hdr->sequence_id));
+		NET_WARN("%s sequence id %d %s %s %d", "FOLLOWUP",
+			 ntohs(hdr->sequence_id), "does not match", "SYNC",
+			 ntohs(sync_hdr->sequence_id));
 		return -EINVAL;
 	}
 
@@ -657,8 +646,7 @@ void gptp_handle_pdelay_req(int port, struct net_pkt *pkt)
 		return;
 	}
 
-	net_if_register_timestamp_cb(&pdelay_response_timestamp_cb,
-				     reply,
+	net_if_register_timestamp_cb(&pdelay_response_timestamp_cb, reply,
 				     net_pkt_iface(pkt),
 				     gptp_pdelay_response_timestamp_callback);
 
@@ -715,10 +703,8 @@ int gptp_handle_pdelay_resp(int port, struct net_pkt *pkt)
 
 	/* Check sequence id. */
 	if (hdr->sequence_id != req_hdr->sequence_id) {
-		NET_WARN("Sequence Id %d %s %d",
-			 ntohs(hdr->sequence_id),
-			 "does not match",
-			 ntohs(req_hdr->sequence_id));
+		NET_WARN("Sequence Id %d %s %d", ntohs(hdr->sequence_id),
+			 "does not match", ntohs(req_hdr->sequence_id));
 		goto reset;
 	}
 
@@ -779,18 +765,16 @@ int gptp_handle_pdelay_follow_up(int port, struct net_pkt *pkt)
 
 	/* Check sequence id. */
 	if (hdr->sequence_id != req_hdr->sequence_id) {
-		NET_WARN("Sequence Id %d %s %d",
-			 ntohs(hdr->sequence_id),
-			 "does not match",
-			 ntohs(req_hdr->sequence_id));
+		NET_WARN("Sequence Id %d %s %d", ntohs(hdr->sequence_id),
+			 "does not match", ntohs(req_hdr->sequence_id));
 		goto reset;
 	}
 
 	/* Check source port. */
-	if (memcmp(&hdr->port_id, &resp_hdr->port_id,
-		   sizeof(hdr->port_id)) != 0) {
+	if (memcmp(&hdr->port_id, &resp_hdr->port_id, sizeof(hdr->port_id)) !=
+	    0) {
 		NET_WARN("pDelay response and follow up port IDs %s",
-			"does not match");
+			 "does not match");
 		goto reset;
 	}
 
@@ -833,8 +817,7 @@ void gptp_handle_signaling(int port, struct net_pkt *pkt)
 void gptp_send_sync(int port, struct net_pkt *pkt)
 {
 	if (!sync_cb_registered) {
-		net_if_register_timestamp_cb(&sync_timestamp_cb,
-					     pkt,
+		net_if_register_timestamp_cb(&sync_timestamp_cb, pkt,
 					     net_pkt_iface(pkt),
 					     gptp_sync_timestamp_callback);
 		sync_cb_registered = true;

@@ -43,7 +43,8 @@ void main(void)
 
 		if (dev == NULL) {
 			LOG_ERR("Video device %s not found, "
-				"fallback to software generator.", VIDEO_DEV);
+				"fallback to software generator.",
+				VIDEO_DEV);
 		} else {
 			video = dev;
 		}
@@ -63,12 +64,11 @@ void main(void)
 		const struct video_format_cap *fcap = &caps.format_caps[i];
 		/* fourcc to string */
 		printk("  %c%c%c%c width [%u; %u; %u] height [%u; %u; %u]\n",
-		       (char)fcap->pixelformat,
-		       (char)(fcap->pixelformat >> 8),
+		       (char)fcap->pixelformat, (char)(fcap->pixelformat >> 8),
 		       (char)(fcap->pixelformat >> 16),
-		       (char)(fcap->pixelformat >> 24),
-		       fcap->width_min, fcap->width_max, fcap->width_step,
-		       fcap->height_min, fcap->height_max, fcap->height_step);
+		       (char)(fcap->pixelformat >> 24), fcap->width_min,
+		       fcap->width_max, fcap->width_step, fcap->height_min,
+		       fcap->height_max, fcap->height_step);
 		i++;
 	}
 
@@ -79,10 +79,8 @@ void main(void)
 	}
 
 	printk("- Default format: %c%c%c%c %ux%u\n", (char)fmt.pixelformat,
-	       (char)(fmt.pixelformat >> 8),
-	       (char)(fmt.pixelformat >> 16),
-	       (char)(fmt.pixelformat >> 24),
-	       fmt.width, fmt.height);
+	       (char)(fmt.pixelformat >> 8), (char)(fmt.pixelformat >> 16),
+	       (char)(fmt.pixelformat >> 24), fmt.width, fmt.height);
 
 	/* Size to allocate for each buffer */
 	bsize = fmt.pitch * fmt.height;
@@ -116,8 +114,8 @@ void main(void)
 			return;
 		}
 
-		printk("\rGot frame %u! size: %u; timestamp %u ms",
-		       frame++, vbuf->bytesused, vbuf->timestamp);
+		printk("\rGot frame %u! size: %u; timestamp %u ms", frame++,
+		       vbuf->bytesused, vbuf->timestamp);
 
 		err = video_enqueue(video, VIDEO_EP_OUT, vbuf);
 		if (err) {

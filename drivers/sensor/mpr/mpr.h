@@ -7,15 +7,14 @@
 #ifndef ZEPHYR_DRIVERS_SENSOR_MPR_H_
 #define ZEPHYR_DRIVERS_SENSOR_MPR_H_
 
-
 /* MPR output measurement command */
 #define MPR_OUTPUT_MEASUREMENT_COMMAND (0xAA)
 
 /* MPR status byte masks */
-#define MPR_STATUS_MASK_MATH_SATURATION       (0x01)
+#define MPR_STATUS_MASK_MATH_SATURATION (0x01)
 #define MPR_STATUS_MASK_INTEGRITY_TEST_FAILED (0x04)
-#define MPR_STATUS_MASK_BUSY                  (0x20)
-#define MPR_STATUS_MASK_POWER_ON              (0x40)
+#define MPR_STATUS_MASK_BUSY (0x20)
+#define MPR_STATUS_MASK_POWER_ON (0x40)
 
 /* MPR register read maximum retries */
 #ifndef MPR_REG_READ_MAX_RETRIES

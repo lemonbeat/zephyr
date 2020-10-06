@@ -32,11 +32,13 @@ struct log_backend_api {
 	void (*put)(const struct log_backend *const backend,
 		    struct log_msg *msg);
 	void (*put_sync_string)(const struct log_backend *const backend,
-			 struct log_msg_ids src_level, uint32_t timestamp,
-			 const char *fmt, va_list ap);
+				struct log_msg_ids src_level,
+				uint32_t timestamp, const char *fmt,
+				va_list ap);
 	void (*put_sync_hexdump)(const struct log_backend *const backend,
-			 struct log_msg_ids src_level, uint32_t timestamp,
-			 const char *metadata, const uint8_t *data, uint32_t len);
+				 struct log_msg_ids src_level,
+				 uint32_t timestamp, const char *metadata,
+				 const uint8_t *data, uint32_t len);
 
 	void (*dropped)(const struct log_backend *const backend, uint32_t cnt);
 	void (*panic)(const struct log_backend *const backend);
@@ -73,20 +75,17 @@ extern const struct log_backend __log_backends_end[];
  * @param _autostart	If true backend is initialized and activated together
  *			with the logger subsystem.
  */
-#define LOG_BACKEND_DEFINE(_name, _api, _autostart)			       \
-	static struct log_backend_control_block UTIL_CAT(backend_cb_, _name) = \
-	{								       \
-		.id = 0,						       \
-		.active = false,					       \
-	};								       \
-	static const Z_STRUCT_SECTION_ITERABLE(log_backend, _name) =	       \
-	{								       \
-		.api = &_api,						       \
-		.cb = &UTIL_CAT(backend_cb_, _name),			       \
-		.name = STRINGIFY(_name),				       \
-		.autostart = _autostart					       \
-	}
-
+#define LOG_BACKEND_DEFINE(_name, _api, _autostart)                          \
+	static struct log_backend_control_block UTIL_CAT(backend_cb_,        \
+							 _name) = {          \
+		.id = 0,                                                     \
+		.active = false,                                             \
+	};                                                                   \
+	static const Z_STRUCT_SECTION_ITERABLE(                              \
+		log_backend, _name) = { .api = &_api,                        \
+					.cb = &UTIL_CAT(backend_cb_, _name), \
+					.name = STRINGIFY(_name),            \
+					.autostart = _autostart }
 
 /**
  * @brief Put message with log entry to the backend.
@@ -111,17 +110,16 @@ static inline void log_backend_put(const struct log_backend *const backend,
  * @param[in] fmt       Log string.
  * @param[in] ap        Log string arguments.
  */
-static inline void log_backend_put_sync_string(
-					const struct log_backend *const backend,
-					struct log_msg_ids src_level,
-					uint32_t timestamp, const char *fmt,
-					va_list ap)
+static inline void
+log_backend_put_sync_string(const struct log_backend *const backend,
+			    struct log_msg_ids src_level, uint32_t timestamp,
+			    const char *fmt, va_list ap)
 {
 	__ASSERT_NO_MSG(backend != NULL);
 
 	if (backend->api->put_sync_string) {
-		backend->api->put_sync_string(backend, src_level,
-					      timestamp, fmt, ap);
+		backend->api->put_sync_string(backend, src_level, timestamp,
+					      fmt, ap);
 	}
 }
 
@@ -135,11 +133,11 @@ static inline void log_backend_put_sync_string(
  * @param[in] data      Data.
  * @param[in] len       Data length.
  */
-static inline void log_backend_put_sync_hexdump(
-					const struct log_backend *const backend,
-					struct log_msg_ids src_level,
-					uint32_t timestamp, const char *metadata,
-					const uint8_t *data, uint32_t len)
+static inline void
+log_backend_put_sync_hexdump(const struct log_backend *const backend,
+			     struct log_msg_ids src_level, uint32_t timestamp,
+			     const char *metadata, const uint8_t *data,
+			     uint32_t len)
 {
 	__ASSERT_NO_MSG(backend != NULL);
 
@@ -201,7 +199,8 @@ static inline void log_backend_id_set(const struct log_backend *const backend,
  * @param[in] backend  Pointer to the backend instance.
  * @return    Id.
  */
-static inline uint8_t log_backend_id_get(const struct log_backend *const backend)
+static inline uint8_t
+log_backend_id_get(const struct log_backend *const backend)
 {
 	__ASSERT_NO_MSG(backend != NULL);
 	return backend->cb->id;
@@ -248,8 +247,8 @@ static inline void log_backend_activate(const struct log_backend *const backend,
  *
  * @param[in] backend  Pointer to the backend instance.
  */
-static inline void log_backend_deactivate(
-				const struct log_backend *const backend)
+static inline void
+log_backend_deactivate(const struct log_backend *const backend)
 {
 	__ASSERT_NO_MSG(backend != NULL);
 	backend->cb->active = false;
@@ -262,8 +261,8 @@ static inline void log_backend_deactivate(
  *
  * @return True if backend is active, false otherwise.
  */
-static inline bool log_backend_is_active(
-				const struct log_backend *const backend)
+static inline bool
+log_backend_is_active(const struct log_backend *const backend)
 {
 	__ASSERT_NO_MSG(backend != NULL);
 	return backend->cb->active;

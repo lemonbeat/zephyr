@@ -142,12 +142,12 @@ void soc_interrupt_init(void)
 {
 	EVENT_UNIT->INTPTPENDCLEAR = 0xFFFFFFFF;
 	(void)(EVENT_UNIT->INTPTPENDCLEAR); /* Ensures write has finished. */
-	EVENT_UNIT->EVTPENDCLEAR   = 0xFFFFFFFF;
+	EVENT_UNIT->EVTPENDCLEAR = 0xFFFFFFFF;
 	(void)(EVENT_UNIT->EVTPENDCLEAR); /* Ensures write has finished. */
 
 	if (IS_ENABLED(CONFIG_MULTI_LEVEL_INTERRUPTS)) {
 		dev_intmux = device_get_binding(
-				DT_LABEL(DT_INST(0, openisa_rv32m1_intmux)));
+			DT_LABEL(DT_INST(0, openisa_rv32m1_intmux)));
 		__ASSERT(dev_intmux, "no INTMUX device found");
 	}
 }

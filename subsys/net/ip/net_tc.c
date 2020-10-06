@@ -92,25 +92,53 @@ static uint8_t tx_tc2thread(uint8_t tc)
 		7
 #endif
 #if NET_TC_TX_COUNT == 2
-		8, 7
+		8,
+		7
 #endif
 #if NET_TC_TX_COUNT == 3
-		8, 7, 6
+		8,
+		7,
+		6
 #endif
 #if NET_TC_TX_COUNT == 4
-		8, 7, 6, 5
+		8,
+		7,
+		6,
+		5
 #endif
 #if NET_TC_TX_COUNT == 5
-		8, 7, 6, 5, 4
+		8,
+		7,
+		6,
+		5,
+		4
 #endif
 #if NET_TC_TX_COUNT == 6
-		8, 7, 6, 5, 4, 3
+		8,
+		7,
+		6,
+		5,
+		4,
+		3
 #endif
 #if NET_TC_TX_COUNT == 7
-		8, 7, 6, 5, 4, 3, 2
+		8,
+		7,
+		6,
+		5,
+		4,
+		3,
+		2
 #endif
 #if NET_TC_TX_COUNT == 8
-		8, 7, 6, 5, 4, 3, 2, 1
+		8,
+		7,
+		6,
+		5,
+		4,
+		3,
+		2,
+		1
 #endif
 	};
 
@@ -145,25 +173,53 @@ static uint8_t rx_tc2thread(uint8_t tc)
 		7
 #endif
 #if NET_TC_RX_COUNT == 2
-		8, 7
+		8,
+		7
 #endif
 #if NET_TC_RX_COUNT == 3
-		8, 7, 6
+		8,
+		7,
+		6
 #endif
 #if NET_TC_RX_COUNT == 4
-		8, 7, 6, 5
+		8,
+		7,
+		6,
+		5
 #endif
 #if NET_TC_RX_COUNT == 5
-		8, 7, 6, 5, 4
+		8,
+		7,
+		6,
+		5,
+		4
 #endif
 #if NET_TC_RX_COUNT == 6
-		8, 7, 6, 5, 4, 3
+		8,
+		7,
+		6,
+		5,
+		4,
+		3
 #endif
 #if NET_TC_RX_COUNT == 7
-		8, 7, 6, 5, 4, 3, 2
+		8,
+		7,
+		6,
+		5,
+		4,
+		3,
+		2
 #endif
 #if NET_TC_RX_COUNT == 8
-		8, 7, 6, 5, 4, 3, 2, 1
+		8,
+		7,
+		6,
+		5,
+		4,
+		3,
+		2,
+		1
 #endif
 	};
 
@@ -236,13 +292,12 @@ void net_tc_tx_init(void)
 		thread_priority = tx_tc2thread(i);
 
 		NET_DBG("[%d] Starting TX queue %p stack size %zd "
-			"prio %d (%d)", i,
-			&tx_classes[i].work_q.queue,
-			K_KERNEL_STACK_SIZEOF(tx_stack[i]),
-			thread_priority, K_PRIO_COOP(thread_priority));
+			"prio %d (%d)",
+			i, &tx_classes[i].work_q.queue,
+			K_KERNEL_STACK_SIZEOF(tx_stack[i]), thread_priority,
+			K_PRIO_COOP(thread_priority));
 
-		k_work_q_start(&tx_classes[i].work_q,
-			       tx_stack[i],
+		k_work_q_start(&tx_classes[i].work_q, tx_stack[i],
 			       K_KERNEL_STACK_SIZEOF(tx_stack[i]),
 			       K_PRIO_COOP(thread_priority));
 		k_thread_name_set(&tx_classes[i].work_q.thread, "tx_workq");
@@ -265,13 +320,12 @@ void net_tc_rx_init(void)
 		thread_priority = rx_tc2thread(i);
 
 		NET_DBG("[%d] Starting RX queue %p stack size %zd "
-			"prio %d (%d)", i,
-			&rx_classes[i].work_q.queue,
-			K_KERNEL_STACK_SIZEOF(rx_stack[i]),
-			thread_priority, K_PRIO_COOP(thread_priority));
+			"prio %d (%d)",
+			i, &rx_classes[i].work_q.queue,
+			K_KERNEL_STACK_SIZEOF(rx_stack[i]), thread_priority,
+			K_PRIO_COOP(thread_priority));
 
-		k_work_q_start(&rx_classes[i].work_q,
-			       rx_stack[i],
+		k_work_q_start(&rx_classes[i].work_q, rx_stack[i],
 			       K_KERNEL_STACK_SIZEOF(rx_stack[i]),
 			       K_PRIO_COOP(thread_priority));
 		k_thread_name_set(&rx_classes[i].work_q.thread, "rx_workq");

@@ -27,9 +27,8 @@ void do_main(const struct device *dev)
 		ret = sensor_channel_get(dev, SENSOR_CHAN_MAGN_Z, &z);
 
 		printf("( x y z ) = ( %f  %f  %f )\n",
-				sensor_value_to_double(&x),
-				sensor_value_to_double(&y),
-				sensor_value_to_double(&z));
+		       sensor_value_to_double(&x), sensor_value_to_double(&y),
+		       sensor_value_to_double(&z));
 
 		k_sleep(K_MSEC(500));
 	}
@@ -62,8 +61,7 @@ void main(void)
 
 	dev = sensor_search();
 	if (dev) {
-		printk("Found device is %p, name is %s\n",
-				dev, dev->name);
+		printk("Found device is %p, name is %s\n", dev, dev->name);
 		do_main(dev);
 	} else {
 		printk("There is no available Geomagnetic device.\n");

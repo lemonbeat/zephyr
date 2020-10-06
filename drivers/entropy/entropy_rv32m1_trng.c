@@ -18,8 +18,7 @@ struct rv32m1_entropy_config {
 };
 
 static int entropy_rv32m1_trng_get_entropy(const struct device *dev,
-					   uint8_t *buffer,
-					   uint16_t length)
+					   uint8_t *buffer, uint16_t length)
 {
 	const struct rv32m1_entropy_config *config = dev->config;
 	status_t status;

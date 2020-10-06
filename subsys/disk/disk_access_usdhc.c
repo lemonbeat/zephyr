@@ -34,62 +34,43 @@ enum usdhc_cmd_type {
 };
 
 enum usdhc_status_flag {
-	USDHC_CMD_INHIBIT_FLAG =
-		USDHC_PRES_STATE_CIHB_MASK,
+	USDHC_CMD_INHIBIT_FLAG = USDHC_PRES_STATE_CIHB_MASK,
 	/*!< Command inhibit */
-	USDHC_DATA_INHIBIT_FLAG =
-		USDHC_PRES_STATE_CDIHB_MASK,
+	USDHC_DATA_INHIBIT_FLAG = USDHC_PRES_STATE_CDIHB_MASK,
 	/*!< Data inhibit */
-	USDHC_DATA_LINE_ACTIVE_FLAG =
-		USDHC_PRES_STATE_DLA_MASK,
+	USDHC_DATA_LINE_ACTIVE_FLAG = USDHC_PRES_STATE_DLA_MASK,
 	/*!< Data line active */
-	USDHC_SD_CLK_STATUS_FLAG =
-		USDHC_PRES_STATE_SDSTB_MASK,
+	USDHC_SD_CLK_STATUS_FLAG = USDHC_PRES_STATE_SDSTB_MASK,
 	/*!< SD bus clock stable */
-	USDHC_WRITE_ACTIVE_FLAG =
-		USDHC_PRES_STATE_WTA_MASK,
+	USDHC_WRITE_ACTIVE_FLAG = USDHC_PRES_STATE_WTA_MASK,
 	/*!< Write transfer active */
-	USDHC_READ_ACTIVE_FLAG =
-		USDHC_PRES_STATE_RTA_MASK,
+	USDHC_READ_ACTIVE_FLAG = USDHC_PRES_STATE_RTA_MASK,
 	/*!< Read transfer active */
-	USDHC_BUF_WRITE_ENABLE_FLAG =
-		USDHC_PRES_STATE_BWEN_MASK,
+	USDHC_BUF_WRITE_ENABLE_FLAG = USDHC_PRES_STATE_BWEN_MASK,
 	/*!< Buffer write enable */
-	USDHC_BUF_READ_ENABLE_FLAG =
-		USDHC_PRES_STATE_BREN_MASK,
+	USDHC_BUF_READ_ENABLE_FLAG = USDHC_PRES_STATE_BREN_MASK,
 	/*!< Buffer read enable */
-	USDHC_RETUNING_REQ_FLAG =
-		USDHC_PRES_STATE_RTR_MASK,
+	USDHC_RETUNING_REQ_FLAG = USDHC_PRES_STATE_RTR_MASK,
 	/*!< re-tuning request flag ,only used for SDR104 mode */
-	USDHC_DELAY_SETTING_DONE_FLAG =
-		USDHC_PRES_STATE_TSCD_MASK,
+	USDHC_DELAY_SETTING_DONE_FLAG = USDHC_PRES_STATE_TSCD_MASK,
 	/*!< delay setting finished flag */
-	USDHC_CARD_INSERTED_FLAG =
-		USDHC_PRES_STATE_CINST_MASK,
+	USDHC_CARD_INSERTED_FLAG = USDHC_PRES_STATE_CINST_MASK,
 	/*!< Card inserted */
-	USDHC_CMD_LINE_LEVEL_FLAG =
-		USDHC_PRES_STATE_CLSL_MASK,
+	USDHC_CMD_LINE_LEVEL_FLAG = USDHC_PRES_STATE_CLSL_MASK,
 	/*!< Command line signal level */
-	USDHC_DATA0_LINE_LEVEL_FLAG =
-		1U << USDHC_PRES_STATE_DLSL_SHIFT,
+	USDHC_DATA0_LINE_LEVEL_FLAG = 1U << USDHC_PRES_STATE_DLSL_SHIFT,
 	/*!< Data0 line signal level */
-	USDHC_DATA1_LINE_LEVEL_FLAG =
-		1U << (USDHC_PRES_STATE_DLSL_SHIFT + 1U),
+	USDHC_DATA1_LINE_LEVEL_FLAG = 1U << (USDHC_PRES_STATE_DLSL_SHIFT + 1U),
 	/*!< Data1 line signal level */
-	USDHC_DATA2_LINE_LEVEL_FLAG =
-		1U << (USDHC_PRES_STATE_DLSL_SHIFT + 2U),
+	USDHC_DATA2_LINE_LEVEL_FLAG = 1U << (USDHC_PRES_STATE_DLSL_SHIFT + 2U),
 	/*!< Data2 line signal level */
-	USDHC_DATA3_LINE_LEVEL_FLAG =
-		1U << (USDHC_PRES_STATE_DLSL_SHIFT + 3U),
+	USDHC_DATA3_LINE_LEVEL_FLAG = 1U << (USDHC_PRES_STATE_DLSL_SHIFT + 3U),
 	/*!< Data3 line signal level */
-	USDHC_DATA4_LINE_LEVEL_FLAG =
-		1U << (USDHC_PRES_STATE_DLSL_SHIFT + 4U),
+	USDHC_DATA4_LINE_LEVEL_FLAG = 1U << (USDHC_PRES_STATE_DLSL_SHIFT + 4U),
 	/*!< Data4 line signal level */
-	USDHC_DATA5_LINE_LEVEL_FLAG =
-		1U << (USDHC_PRES_STATE_DLSL_SHIFT + 5U),
+	USDHC_DATA5_LINE_LEVEL_FLAG = 1U << (USDHC_PRES_STATE_DLSL_SHIFT + 5U),
 	/*!< Data5 line signal level */
-	USDHC_DATA6_LINE_LEVEL_FLAG =
-		1U << (USDHC_PRES_STATE_DLSL_SHIFT + 6U),
+	USDHC_DATA6_LINE_LEVEL_FLAG = 1U << (USDHC_PRES_STATE_DLSL_SHIFT + 6U),
 	/*!< Data6 line signal level */
 	USDHC_DATA7_LINE_LEVEL_FLAG =
 		(int)(1U << (USDHC_PRES_STATE_DLSL_SHIFT + 7U)),
@@ -97,168 +78,118 @@ enum usdhc_status_flag {
 };
 
 enum usdhc_transfer_flag {
-	USDHC_ENABLE_DMA_FLAG =
-		USDHC_MIX_CTRL_DMAEN_MASK,
+	USDHC_ENABLE_DMA_FLAG = USDHC_MIX_CTRL_DMAEN_MASK,
 	/*!< Enable DMA */
 
-	USDHC_CMD_TYPE_SUSPEND_FLAG =
-		(USDHC_CMD_XFR_TYP_CMDTYP(1U)),
+	USDHC_CMD_TYPE_SUSPEND_FLAG = (USDHC_CMD_XFR_TYP_CMDTYP(1U)),
 	/*!< Suspend command */
-	USDHC_CMD_TYPE_RESUME_FLAG =
-		(USDHC_CMD_XFR_TYP_CMDTYP(2U)),
+	USDHC_CMD_TYPE_RESUME_FLAG = (USDHC_CMD_XFR_TYP_CMDTYP(2U)),
 	/*!< Resume command */
-	USDHC_CMD_TYPE_ABORT_FLAG =
-		(USDHC_CMD_XFR_TYP_CMDTYP(3U)),
+	USDHC_CMD_TYPE_ABORT_FLAG = (USDHC_CMD_XFR_TYP_CMDTYP(3U)),
 	/*!< Abort command */
 
-	USDHC_BLOCK_COUNT_FLAG =
-		USDHC_MIX_CTRL_BCEN_MASK,
+	USDHC_BLOCK_COUNT_FLAG = USDHC_MIX_CTRL_BCEN_MASK,
 	/*!< Enable block count */
-	USDHC_AUTO_CMD12_FLAG =
-		USDHC_MIX_CTRL_AC12EN_MASK,
+	USDHC_AUTO_CMD12_FLAG = USDHC_MIX_CTRL_AC12EN_MASK,
 	/*!< Enable auto CMD12 */
-	USDHC_DATA_READ_FLAG =
-		USDHC_MIX_CTRL_DTDSEL_MASK,
+	USDHC_DATA_READ_FLAG = USDHC_MIX_CTRL_DTDSEL_MASK,
 	/*!< Enable data read */
-	USDHC_MULTIPLE_BLOCK_FLAG =
-		USDHC_MIX_CTRL_MSBSEL_MASK,
+	USDHC_MULTIPLE_BLOCK_FLAG = USDHC_MIX_CTRL_MSBSEL_MASK,
 	/*!< Multiple block data read/write */
-	USDHC_AUTO_CMD23FLAG =
-		USDHC_MIX_CTRL_AC23EN_MASK,
+	USDHC_AUTO_CMD23FLAG = USDHC_MIX_CTRL_AC23EN_MASK,
 	/*!< Enable auto CMD23 */
-	USDHC_RSP_LEN_136_FLAG =
-		USDHC_CMD_XFR_TYP_RSPTYP(1U),
+	USDHC_RSP_LEN_136_FLAG = USDHC_CMD_XFR_TYP_RSPTYP(1U),
 	/*!< 136 bit response length */
-	USDHC_RSP_LEN_48_FLAG =
-		USDHC_CMD_XFR_TYP_RSPTYP(2U),
+	USDHC_RSP_LEN_48_FLAG = USDHC_CMD_XFR_TYP_RSPTYP(2U),
 	/*!< 48 bit response length */
-	USDHC_RSP_LEN_48_BUSY_FLAG =
-		USDHC_CMD_XFR_TYP_RSPTYP(3U),
+	USDHC_RSP_LEN_48_BUSY_FLAG = USDHC_CMD_XFR_TYP_RSPTYP(3U),
 	/*!< 48 bit response length with busy status */
 
-	USDHC_CRC_CHECK_FLAG =
-		USDHC_CMD_XFR_TYP_CCCEN_MASK,
+	USDHC_CRC_CHECK_FLAG = USDHC_CMD_XFR_TYP_CCCEN_MASK,
 	/*!< Enable CRC check */
-	USDHC_IDX_CHECK_FLAG =
-		USDHC_CMD_XFR_TYP_CICEN_MASK,
+	USDHC_IDX_CHECK_FLAG = USDHC_CMD_XFR_TYP_CICEN_MASK,
 	/*!< Enable index check */
-	USDHC_DATA_PRESENT_FLAG =
-		USDHC_CMD_XFR_TYP_DPSEL_MASK,
+	USDHC_DATA_PRESENT_FLAG = USDHC_CMD_XFR_TYP_DPSEL_MASK,
 	/*!< Data present flag */
 };
 
 enum usdhc_int_status_flag {
-	USDHC_INT_CMD_DONE_FLAG =
-		USDHC_INT_STATUS_CC_MASK,
+	USDHC_INT_CMD_DONE_FLAG = USDHC_INT_STATUS_CC_MASK,
 	/*!< Command complete */
-	USDHC_INT_DATA_DONE_FLAG =
-		USDHC_INT_STATUS_TC_MASK,
+	USDHC_INT_DATA_DONE_FLAG = USDHC_INT_STATUS_TC_MASK,
 	/*!< Data complete */
-	USDHC_INT_BLK_GAP_EVENT_FLAG =
-		USDHC_INT_STATUS_BGE_MASK,
+	USDHC_INT_BLK_GAP_EVENT_FLAG = USDHC_INT_STATUS_BGE_MASK,
 	/*!< Block gap event */
-	USDHC_INT_DMA_DONE_FLAG =
-		USDHC_INT_STATUS_DINT_MASK,
+	USDHC_INT_DMA_DONE_FLAG = USDHC_INT_STATUS_DINT_MASK,
 	/*!< DMA interrupt */
-	USDHC_INT_BUF_WRITE_READY_FLAG =
-		USDHC_INT_STATUS_BWR_MASK,
+	USDHC_INT_BUF_WRITE_READY_FLAG = USDHC_INT_STATUS_BWR_MASK,
 	/*!< Buffer write ready */
-	USDHC_INT_BUF_READ_READY_FLAG =
-		USDHC_INT_STATUS_BRR_MASK,
+	USDHC_INT_BUF_READ_READY_FLAG = USDHC_INT_STATUS_BRR_MASK,
 	/*!< Buffer read ready */
-	USDHC_INT_CARD_INSERTED_FLAG =
-		USDHC_INT_STATUS_CINS_MASK,
+	USDHC_INT_CARD_INSERTED_FLAG = USDHC_INT_STATUS_CINS_MASK,
 	/*!< Card inserted */
-	USDHC_INT_CARD_REMOVED_FLAG =
-		USDHC_INT_STATUS_CRM_MASK,
+	USDHC_INT_CARD_REMOVED_FLAG = USDHC_INT_STATUS_CRM_MASK,
 	/*!< Card removed */
-	USDHC_INT_CARD_INTERRUPT_FLAG =
-		USDHC_INT_STATUS_CINT_MASK,
+	USDHC_INT_CARD_INTERRUPT_FLAG = USDHC_INT_STATUS_CINT_MASK,
 	/*!< Card interrupt */
 
-	USDHC_INT_RE_TUNING_EVENT_FLAG =
-		USDHC_INT_STATUS_RTE_MASK,
+	USDHC_INT_RE_TUNING_EVENT_FLAG = USDHC_INT_STATUS_RTE_MASK,
 	/*!< Re-Tuning event,only for SD3.0 SDR104 mode */
-	USDHC_INT_TUNING_PASS_FLAG =
-		USDHC_INT_STATUS_TP_MASK,
+	USDHC_INT_TUNING_PASS_FLAG = USDHC_INT_STATUS_TP_MASK,
 	/*!< SDR104 mode tuning pass flag */
-	USDHC_INT_TUNING_ERR_FLAG =
-		USDHC_INT_STATUS_TNE_MASK,
+	USDHC_INT_TUNING_ERR_FLAG = USDHC_INT_STATUS_TNE_MASK,
 	/*!< SDR104 tuning error flag */
 
-	USDHC_INT_CMD_TIMEOUT_FLAG =
-		USDHC_INT_STATUS_CTOE_MASK,
+	USDHC_INT_CMD_TIMEOUT_FLAG = USDHC_INT_STATUS_CTOE_MASK,
 	/*!< Command timeout error */
-	USDHC_INT_CMD_CRC_ERR_FLAG =
-		USDHC_INT_STATUS_CCE_MASK,
+	USDHC_INT_CMD_CRC_ERR_FLAG = USDHC_INT_STATUS_CCE_MASK,
 	/*!< Command CRC error */
-	USDHC_INT_CMD_ENDBIT_ERR_FLAG =
-		USDHC_INT_STATUS_CEBE_MASK,
+	USDHC_INT_CMD_ENDBIT_ERR_FLAG = USDHC_INT_STATUS_CEBE_MASK,
 	/*!< Command end bit error */
-	USDHC_INT_CMD_IDX_ERR_FLAG =
-		USDHC_INT_STATUS_CIE_MASK,
+	USDHC_INT_CMD_IDX_ERR_FLAG = USDHC_INT_STATUS_CIE_MASK,
 	/*!< Command index error */
-	USDHC_INT_DATA_TIMEOUT_FLAG =
-		USDHC_INT_STATUS_DTOE_MASK,
+	USDHC_INT_DATA_TIMEOUT_FLAG = USDHC_INT_STATUS_DTOE_MASK,
 	/*!< Data timeout error */
-	USDHC_INT_DATA_CRC_ERR_FLAG =
-		USDHC_INT_STATUS_DCE_MASK,
+	USDHC_INT_DATA_CRC_ERR_FLAG = USDHC_INT_STATUS_DCE_MASK,
 	/*!< Data CRC error */
-	USDHC_INT_DATA_ENDBIT_ERR_FLAG =
-		USDHC_INT_STATUS_DEBE_MASK,
+	USDHC_INT_DATA_ENDBIT_ERR_FLAG = USDHC_INT_STATUS_DEBE_MASK,
 	/*!< Data end bit error */
-	USDHC_INT_AUTO_CMD12_ERR_FLAG =
-		USDHC_INT_STATUS_AC12E_MASK,
+	USDHC_INT_AUTO_CMD12_ERR_FLAG = USDHC_INT_STATUS_AC12E_MASK,
 	/*!< Auto CMD12 error */
-	USDHC_INT_DMA_ERR_FLAG =
-		USDHC_INT_STATUS_DMAE_MASK,
+	USDHC_INT_DMA_ERR_FLAG = USDHC_INT_STATUS_DMAE_MASK,
 	/*!< DMA error */
 
 	USDHC_INT_CMD_ERR_FLAG =
-		(USDHC_INT_CMD_TIMEOUT_FLAG |
-		USDHC_INT_CMD_CRC_ERR_FLAG |
-		USDHC_INT_CMD_ENDBIT_ERR_FLAG |
-		USDHC_INT_CMD_IDX_ERR_FLAG),
+		(USDHC_INT_CMD_TIMEOUT_FLAG | USDHC_INT_CMD_CRC_ERR_FLAG |
+		 USDHC_INT_CMD_ENDBIT_ERR_FLAG | USDHC_INT_CMD_IDX_ERR_FLAG),
 	/*!< Command error */
 	USDHC_INT_DATA_ERR_FLAG =
-		(USDHC_INT_DATA_TIMEOUT_FLAG |
-		USDHC_INT_DATA_CRC_ERR_FLAG |
-		USDHC_INT_DATA_ENDBIT_ERR_FLAG |
-		USDHC_INT_AUTO_CMD12_ERR_FLAG),
+		(USDHC_INT_DATA_TIMEOUT_FLAG | USDHC_INT_DATA_CRC_ERR_FLAG |
+		 USDHC_INT_DATA_ENDBIT_ERR_FLAG |
+		 USDHC_INT_AUTO_CMD12_ERR_FLAG),
 	/*!< Data error */
-	USDHC_INT_ERR_FLAG =
-		(USDHC_INT_CMD_ERR_FLAG |
-		USDHC_INT_DATA_ERR_FLAG |
-		USDHC_INT_DMA_ERR_FLAG),
+	USDHC_INT_ERR_FLAG = (USDHC_INT_CMD_ERR_FLAG | USDHC_INT_DATA_ERR_FLAG |
+			      USDHC_INT_DMA_ERR_FLAG),
 	/*!< All error */
 	USDHC_INT_DATA_FLAG =
-		(USDHC_INT_DATA_DONE_FLAG |
-		USDHC_INT_DMA_DONE_FLAG |
-		USDHC_INT_BUF_WRITE_READY_FLAG |
-		USDHC_INT_BUF_READ_READY_FLAG |
-		USDHC_INT_DATA_ERR_FLAG |
-		USDHC_INT_DMA_ERR_FLAG),
+		(USDHC_INT_DATA_DONE_FLAG | USDHC_INT_DMA_DONE_FLAG |
+		 USDHC_INT_BUF_WRITE_READY_FLAG |
+		 USDHC_INT_BUF_READ_READY_FLAG | USDHC_INT_DATA_ERR_FLAG |
+		 USDHC_INT_DMA_ERR_FLAG),
 	/*!< Data interrupts */
-	USDHC_INT_CMD_FLAG =
-		(USDHC_INT_CMD_DONE_FLAG |
-		USDHC_INT_CMD_ERR_FLAG),
+	USDHC_INT_CMD_FLAG = (USDHC_INT_CMD_DONE_FLAG | USDHC_INT_CMD_ERR_FLAG),
 	/*!< Command interrupts */
 	USDHC_INT_CARD_DETECT_FLAG =
-		(USDHC_INT_CARD_INSERTED_FLAG |
-		USDHC_INT_CARD_REMOVED_FLAG),
+		(USDHC_INT_CARD_INSERTED_FLAG | USDHC_INT_CARD_REMOVED_FLAG),
 	/*!< Card detection interrupts */
 	USDHC_INT_SDR104_TUNING_FLAG =
-		(USDHC_INT_RE_TUNING_EVENT_FLAG |
-		USDHC_INT_TUNING_PASS_FLAG |
-		USDHC_INT_TUNING_ERR_FLAG),
+		(USDHC_INT_RE_TUNING_EVENT_FLAG | USDHC_INT_TUNING_PASS_FLAG |
+		 USDHC_INT_TUNING_ERR_FLAG),
 
 	USDHC_INT_ALL_FLAGS =
-		(USDHC_INT_BLK_GAP_EVENT_FLAG |
-		USDHC_INT_CARD_INTERRUPT_FLAG |
-		USDHC_INT_CMD_FLAG |
-		USDHC_INT_DATA_FLAG |
-		USDHC_INT_ERR_FLAG |
-		USDHC_INT_SDR104_TUNING_FLAG),
+		(USDHC_INT_BLK_GAP_EVENT_FLAG | USDHC_INT_CARD_INTERRUPT_FLAG |
+		 USDHC_INT_CMD_FLAG | USDHC_INT_DATA_FLAG | USDHC_INT_ERR_FLAG |
+		 USDHC_INT_SDR104_TUNING_FLAG),
 	/*!< All flags mask */
 };
 
@@ -271,13 +202,12 @@ enum usdhc_data_bus_width {
 	/*!< 8-bit mode */
 };
 
-#define USDHC_MAX_BLOCK_COUNT	\
-	(USDHC_BLK_ATT_BLKCNT_MASK >>	\
-	USDHC_BLK_ATT_BLKCNT_SHIFT)
+#define USDHC_MAX_BLOCK_COUNT \
+	(USDHC_BLK_ATT_BLKCNT_MASK >> USDHC_BLK_ATT_BLKCNT_SHIFT)
 
 struct usdhc_cmd {
-	uint32_t index;	/*cmd idx*/
-	uint32_t argument;	/*cmd arg*/
+	uint32_t index; /*cmd idx*/
+	uint32_t argument; /*cmd arg*/
 	enum usdhc_cmd_type cmd_type;
 	enum sdhc_rsp_type rsp_type;
 	uint32_t response[4U];
@@ -494,7 +424,7 @@ enum usdhc_xfer_data_type {
 
 #define USDHC_ADMA2_DESCRIPTOR_LENGTH_SHIFT (16U)
 #define USDHC_ADMA2_DESCRIPTOR_LENGTH_MASK (0xFFFFU)
-#define USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY	\
+#define USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY \
 	(USDHC_ADMA2_DESCRIPTOR_LENGTH_MASK - 3U)
 
 #define SWAP_WORD_BYTE_SEQUENCE(x) (__REV(x))
@@ -538,24 +468,20 @@ enum usdhc_adma2_descriptor_flag {
 	/* Activity 2 mask
 	 */
 
-	USDHC_ADMA2_NOP_FLAG =
-		(USDHC_ADMA2_VALID_FLAG),
+	USDHC_ADMA2_NOP_FLAG = (USDHC_ADMA2_VALID_FLAG),
 	/* No operation
 	 */
 	USDHC_ADMA2_RESERVED_FLAG =
-		(USDHC_ADMA2_ACTIVITY1_FLAG |
-		USDHC_ADMA2_VALID_FLAG),
+		(USDHC_ADMA2_ACTIVITY1_FLAG | USDHC_ADMA2_VALID_FLAG),
 	/* Reserved
 	 */
 	USDHC_ADMA2_XFER_FLAG =
-		(USDHC_ADMA2_ACTIVITY2_FLAG |
-		USDHC_ADMA2_VALID_FLAG),
+		(USDHC_ADMA2_ACTIVITY2_FLAG | USDHC_ADMA2_VALID_FLAG),
 	/* Transfer type
 	 */
 	USDHC_ADMA2_LINK_FLAG =
-		(USDHC_ADMA2_ACTIVITY1_FLAG |
-		USDHC_ADMA2_ACTIVITY2_FLAG |
-		USDHC_ADMA2_VALID_FLAG),
+		(USDHC_ADMA2_ACTIVITY1_FLAG | USDHC_ADMA2_ACTIVITY2_FLAG |
+		 USDHC_ADMA2_VALID_FLAG),
 	/* Link type
 	 */
 };
@@ -568,89 +494,70 @@ struct usdhc_adma2_descriptor {
 };
 
 enum usdhc_card_flag {
-	USDHC_HIGH_CAPACITY_FLAG =
-		(1U << 1U),
+	USDHC_HIGH_CAPACITY_FLAG = (1U << 1U),
 	/* Support high capacity
 	 */
-	USDHC_4BIT_WIDTH_FLAG =
-		(1U << 2U),
+	USDHC_4BIT_WIDTH_FLAG = (1U << 2U),
 	/* Support 4-bit data width
 	 */
-	USDHC_SDHC_FLAG =
-		(1U << 3U),
+	USDHC_SDHC_FLAG = (1U << 3U),
 	/* Card is SDHC
 	 */
-	USDHC_SDXC_FLAG =
-		(1U << 4U),
+	USDHC_SDXC_FLAG = (1U << 4U),
 	/* Card is SDXC
 	 */
-	USDHC_VOL_1_8V_FLAG =
-		(1U << 5U),
+	USDHC_VOL_1_8V_FLAG = (1U << 5U),
 	/* card support 1.8v voltage
 	 */
-	USDHC_SET_BLK_CNT_CMD23_FLAG =
-		(1U << 6U),
+	USDHC_SET_BLK_CNT_CMD23_FLAG = (1U << 6U),
 	/* card support cmd23 flag
 	 */
-	USDHC_SPEED_CLASS_CONTROL_CMD_FLAG =
-		(1U << 7U),
+	USDHC_SPEED_CLASS_CONTROL_CMD_FLAG = (1U << 7U),
 	/* card support speed class control flag
 	 */
 };
 
 enum usdhc_capability_flag {
-	USDHC_SUPPORT_ADMA_FLAG =
-		USDHC_HOST_CTRL_CAP_ADMAS_MASK,
+	USDHC_SUPPORT_ADMA_FLAG = USDHC_HOST_CTRL_CAP_ADMAS_MASK,
 	/*!< Support ADMA */
-	USDHC_SUPPORT_HIGHSPEED_FLAG =
-		USDHC_HOST_CTRL_CAP_HSS_MASK,
+	USDHC_SUPPORT_HIGHSPEED_FLAG = USDHC_HOST_CTRL_CAP_HSS_MASK,
 	/*!< Support high-speed */
-	USDHC_SUPPORT_DMA_FLAG =
-		USDHC_HOST_CTRL_CAP_DMAS_MASK,
+	USDHC_SUPPORT_DMA_FLAG = USDHC_HOST_CTRL_CAP_DMAS_MASK,
 	/*!< Support DMA */
-	USDHC_SUPPORT_SUSPEND_RESUME_FLAG =
-		USDHC_HOST_CTRL_CAP_SRS_MASK,
+	USDHC_SUPPORT_SUSPEND_RESUME_FLAG = USDHC_HOST_CTRL_CAP_SRS_MASK,
 	/*!< Support suspend/resume */
-	USDHC_SUPPORT_V330_FLAG =
-		USDHC_HOST_CTRL_CAP_VS33_MASK,
+	USDHC_SUPPORT_V330_FLAG = USDHC_HOST_CTRL_CAP_VS33_MASK,
 	/*!< Support voltage 3.3V */
-	USDHC_SUPPORT_V300_FLAG =
-		USDHC_HOST_CTRL_CAP_VS30_MASK,
+	USDHC_SUPPORT_V300_FLAG = USDHC_HOST_CTRL_CAP_VS30_MASK,
 	/*!< Support voltage 3.0V */
-	USDHC_SUPPORT_V180_FLAG =
-		USDHC_HOST_CTRL_CAP_VS18_MASK,
+	USDHC_SUPPORT_V180_FLAG = USDHC_HOST_CTRL_CAP_VS18_MASK,
 	/*!< Support voltage 1.8V */
 	/* Put additional two flags in
 	 * HTCAPBLT_MBL's position.
 	 */
-	USDHC_SUPPORT_4BIT_FLAG =
-		(USDHC_HOST_CTRL_CAP_MBL_SHIFT << 0U),
+	USDHC_SUPPORT_4BIT_FLAG = (USDHC_HOST_CTRL_CAP_MBL_SHIFT << 0U),
 	/*!< Support 4 bit mode */
-	USDHC_SUPPORT_8BIT_FLAG =
-		(USDHC_HOST_CTRL_CAP_MBL_SHIFT << 1U),
+	USDHC_SUPPORT_8BIT_FLAG = (USDHC_HOST_CTRL_CAP_MBL_SHIFT << 1U),
 	/*!< Support 8 bit mode */
 	/* sd version 3.0 new feature */
-	USDHC_SUPPORT_DDR50_FLAG =
-		USDHC_HOST_CTRL_CAP_DDR50_SUPPORT_MASK,
-	/*!< support DDR50 mode */
+	USDHC_SUPPORT_DDR50_FLAG = USDHC_HOST_CTRL_CAP_DDR50_SUPPORT_MASK,
+/*!< support DDR50 mode */
 
-#if defined(FSL_FEATURE_USDHC_HAS_SDR104_MODE) &&\
+#if defined(FSL_FEATURE_USDHC_HAS_SDR104_MODE) && \
 	(!FSL_FEATURE_USDHC_HAS_SDR104_MODE)
 	USDHC_SUPPORT_SDR104_FLAG = 0,
-	/*!< not support SDR104 mode */
+/*!< not support SDR104 mode */
 #else
-	USDHC_SUPPORT_SDR104_FLAG =
-		USDHC_HOST_CTRL_CAP_SDR104_SUPPORT_MASK,
-	/*!< support SDR104 mode */
+	USDHC_SUPPORT_SDR104_FLAG = USDHC_HOST_CTRL_CAP_SDR104_SUPPORT_MASK,
+/*!< support SDR104 mode */
 #endif
-#if defined(FSL_FEATURE_USDHC_HAS_SDR50_MODE) &&\
+#if defined(FSL_FEATURE_USDHC_HAS_SDR50_MODE) && \
 	(!FSL_FEATURE_USDHC_HAS_SDR50_MODE)
 	USDHC_SUPPORT_SDR50_FLAG = 0U,
-	/*!< not support SDR50 mode */
+/*!< not support SDR50 mode */
 #else
-	USDHC_SUPPORT_SDR50_FLAG =
-		USDHC_HOST_CTRL_CAP_SDR50_SUPPORT_MASK,
-	/*!< support SDR50 mode */
+	USDHC_SUPPORT_SDR50_FLAG = USDHC_HOST_CTRL_CAP_SDR50_SUPPORT_MASK,
+/*!< support SDR50 mode */
 #endif
 };
 
@@ -669,12 +576,10 @@ enum usdhc_capability_flag {
 #define SDHC_RETUNING_TIMER_COUNT (0U)
 /*!< Re-tuning timer */
 
-#define USDHC_MAX_DVS	\
-	((USDHC_SYS_CTRL_DVS_MASK >>	\
-	USDHC_SYS_CTRL_DVS_SHIFT) + 1U)
-#define USDHC_MAX_CLKFS	\
-	((USDHC_SYS_CTRL_SDCLKFS_MASK >>	\
-	USDHC_SYS_CTRL_SDCLKFS_SHIFT) + 1U)
+#define USDHC_MAX_DVS \
+	((USDHC_SYS_CTRL_DVS_MASK >> USDHC_SYS_CTRL_DVS_SHIFT) + 1U)
+#define USDHC_MAX_CLKFS \
+	((USDHC_SYS_CTRL_SDCLKFS_MASK >> USDHC_SYS_CTRL_SDCLKFS_SHIFT) + 1U)
 #define USDHC_PREV_DVS(x) ((x) -= 1U)
 #define USDHC_PREV_CLKFS(x, y) ((x) >>= (y))
 
@@ -690,30 +595,24 @@ enum usdhc_capability_flag {
 #define USDHC_WRITE_WATERMARK_LEVEL (0x80U)
 
 enum usdhc_reset {
-	USDHC_RESET_ALL =
-		USDHC_SYS_CTRL_RSTA_MASK,
+	USDHC_RESET_ALL = USDHC_SYS_CTRL_RSTA_MASK,
 	/*!< Reset all except card detection */
-	USDHC_RESET_CMD =
-		USDHC_SYS_CTRL_RSTC_MASK,
+	USDHC_RESET_CMD = USDHC_SYS_CTRL_RSTC_MASK,
 	/*!< Reset command line */
-	USDHC_RESET_DATA =
-		USDHC_SYS_CTRL_RSTD_MASK,
-	/*!< Reset data line */
+	USDHC_RESET_DATA = USDHC_SYS_CTRL_RSTD_MASK,
+/*!< Reset data line */
 
-#if defined(FSL_FEATURE_USDHC_HAS_SDR50_MODE) &&\
+#if defined(FSL_FEATURE_USDHC_HAS_SDR50_MODE) && \
 	(!FSL_FEATURE_USDHC_HAS_SDR50_MODE)
 	USDHC_RESET_TUNING = 0U,
-	/*!< no reset tuning circuit bit */
+/*!< no reset tuning circuit bit */
 #else
 	USDHC_RESET_TUNING = USDHC_SYS_CTRL_RSTT_MASK,
-	/*!< reset tuning circuit */
+/*!< reset tuning circuit */
 #endif
 
-	USDHC_RESETS_All =
-		(USDHC_RESET_ALL |
-		USDHC_RESET_CMD |
-		USDHC_RESET_DATA |
-		USDHC_RESET_TUNING),
+	USDHC_RESETS_All = (USDHC_RESET_ALL | USDHC_RESET_CMD |
+			    USDHC_RESET_DATA | USDHC_RESET_TUNING),
 	/*!< All reset types */
 };
 
@@ -728,13 +627,14 @@ static void usdhc_millsec_delay(unsigned int cycles_to_wait)
 uint32_t g_usdhc_boot_dummy __aligned(64);
 uint32_t g_usdhc_rx_dummy[2048] __aligned(64);
 
-static int usdhc_adma2_descriptor_cfg(
-	uint32_t *adma_table, uint32_t adma_table_words,
-	const uint32_t *data_addr, uint32_t data_size, uint32_t flags)
+static int usdhc_adma2_descriptor_cfg(uint32_t *adma_table,
+				      uint32_t adma_table_words,
+				      const uint32_t *data_addr,
+				      uint32_t data_size, uint32_t flags)
 {
 	uint32_t min_entries, start_entry = 0U;
 	uint32_t max_entries = (adma_table_words * sizeof(uint32_t)) /
-		sizeof(struct usdhc_adma2_descriptor);
+			       sizeof(struct usdhc_adma2_descriptor);
 	struct usdhc_adma2_descriptor *adma2_addr =
 		(struct usdhc_adma2_descriptor *)(adma_table);
 	uint32_t i, dma_buf_len = 0U;
@@ -751,11 +651,12 @@ static int usdhc_adma2_descriptor_cfg(
 
 	/* Check if ADMA descriptor's number is enough. */
 	if (!(data_size % USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY)) {
-		min_entries = data_size /
-			USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY;
+		min_entries =
+			data_size / USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY;
 	} else {
 		min_entries = ((data_size /
-			USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY) + 1U);
+				USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY) +
+			       1U);
 	}
 	/* calcucate the start entry for multiple descriptor mode,
 	 * ADMA engine is not stop, so update the descriptor
@@ -781,20 +682,21 @@ static int usdhc_adma2_descriptor_cfg(
 				USDHC_ADMA2_DESCRIPTOR_MAX_LENGTH_PER_ENTRY;
 		} else {
 			dma_buf_len = (data_size == 0U ? sizeof(uint32_t) :
-				data_size);
+							       data_size);
 			/* adma don't support 0 data length transfer
 			 * descriptor
 			 */
 		}
 
 		/* Each descriptor for ADMA2 is 64-bit in length */
-		adma2_addr[i].address = (data_size == 0U) ?
-			&g_usdhc_boot_dummy : data_addr;
-		adma2_addr[i].attribute = (dma_buf_len <<
-			USDHC_ADMA2_DESCRIPTOR_LENGTH_SHIFT);
+		adma2_addr[i].address =
+			(data_size == 0U) ? &g_usdhc_boot_dummy : data_addr;
+		adma2_addr[i].attribute =
+			(dma_buf_len << USDHC_ADMA2_DESCRIPTOR_LENGTH_SHIFT);
 		adma2_addr[i].attribute |=
-			(data_size == 0U) ? 0U :
-				(USDHC_ADMA2_XFER_FLAG | USDHC_ADMA2_INT_FLAG);
+			(data_size == 0U) ?
+				      0U :
+				      (USDHC_ADMA2_XFER_FLAG | USDHC_ADMA2_INT_FLAG);
 		data_addr += (dma_buf_len / sizeof(uint32_t));
 
 		if (data_size != 0U)
@@ -816,8 +718,8 @@ static int usdhc_adma2_descriptor_cfg(
 }
 
 static int usdhc_Internal_dma_cfg(struct usdhc_priv *priv,
-	struct usdhc_adma_config *dma_cfg,
-	const uint32_t *data_addr)
+				  struct usdhc_adma_config *dma_cfg,
+				  const uint32_t *data_addr)
 {
 	USDHC_Type *base = priv->config->base;
 	bool cmd23 = priv->op_context.data.cmd23;
@@ -843,40 +745,46 @@ static int usdhc_Internal_dma_cfg(struct usdhc_priv *priv,
 
 	/* select DMA mode and config the burst length */
 	base->PROT_CTRL &= ~(USDHC_PROT_CTRL_DMASEL_MASK |
-		USDHC_PROT_CTRL_BURST_LEN_EN_MASK);
+			     USDHC_PROT_CTRL_BURST_LEN_EN_MASK);
 	base->PROT_CTRL |= USDHC_PROT_CTRL_DMASEL(dma_cfg->dma_mode) |
-		USDHC_PROT_CTRL_BURST_LEN_EN(dma_cfg->burst_len);
+			   USDHC_PROT_CTRL_BURST_LEN_EN(dma_cfg->burst_len);
 	/* enable DMA */
 	base->MIX_CTRL |= USDHC_MIX_CTRL_DMAEN_MASK;
 
 	return 0;
 }
 
-
 static int usdhc_adma_table_cfg(struct usdhc_priv *priv, uint32_t flags)
 {
 	int error = -EIO;
 	struct usdhc_data *data = &priv->op_context.data;
 	struct usdhc_adma_config *dma_cfg = &priv->op_context.dma_cfg;
-	uint32_t boot_dummy_off = data->data_type == USDHC_XFER_BOOT_CONTINUOUS ?
-		sizeof(uint32_t) : 0U;
-	const uint32_t *data_addr = (const uint32_t *)((uint32_t)((!data->rx_data) ?
-		data->tx_data : data->rx_data) + boot_dummy_off);
-	uint32_t data_size = data->block_size * data->block_count - boot_dummy_off;
+	uint32_t boot_dummy_off = data->data_type ==
+						  USDHC_XFER_BOOT_CONTINUOUS ?
+						sizeof(uint32_t) :
+						0U;
+	const uint32_t *data_addr =
+		(const uint32_t *)((uint32_t)((!data->rx_data) ?
+							    data->tx_data :
+							    data->rx_data) +
+				   boot_dummy_off);
+	uint32_t data_size =
+		data->block_size * data->block_count - boot_dummy_off;
 
 	switch (dma_cfg->dma_mode) {
 	case USDHC_DMA_SIMPLE:
 		error = 0;
-	break;
+		break;
 
 	case USDHC_DMA_ADMA1:
 		error = -EINVAL;
-	break;
+		break;
 
 	case USDHC_DMA_ADMA2:
 		error = usdhc_adma2_descriptor_cfg(dma_cfg->adma_table,
-			dma_cfg->adma_table_words, data_addr, data_size, flags);
-	break;
+						   dma_cfg->adma_table_words,
+						   data_addr, data_size, flags);
+		break;
 	default:
 		return -EINVAL;
 	}
@@ -892,8 +800,7 @@ static int usdhc_adma_table_cfg(struct usdhc_priv *priv, uint32_t flags)
 	return error;
 }
 
-static int usdhc_data_xfer_cfg(struct usdhc_priv *priv,
-	bool en_dma)
+static int usdhc_data_xfer_cfg(struct usdhc_priv *priv, bool en_dma)
 {
 	USDHC_Type *base = priv->config->base;
 	uint32_t mix_ctrl = base->MIX_CTRL;
@@ -917,14 +824,14 @@ static int usdhc_data_xfer_cfg(struct usdhc_priv *priv,
 			return -EBUSY;
 		/* check transfer block count */
 		if ((data->block_count > USDHC_MAX_BLOCK_COUNT) ||
-			(!data->tx_data && !data->rx_data))
+		    (!data->tx_data && !data->rx_data))
 			return -EINVAL;
 
 		/* config mix parameter */
 		mix_ctrl &= ~(USDHC_MIX_CTRL_MSBSEL_MASK |
-			USDHC_MIX_CTRL_BCEN_MASK |
-			USDHC_MIX_CTRL_DTDSEL_MASK |
-			USDHC_MIX_CTRL_AC12EN_MASK);
+			      USDHC_MIX_CTRL_BCEN_MASK |
+			      USDHC_MIX_CTRL_DTDSEL_MASK |
+			      USDHC_MIX_CTRL_AC12EN_MASK);
 
 		if (data->rx_data) {
 			mix_ctrl |= USDHC_MIX_CTRL_DTDSEL_MASK;
@@ -932,7 +839,7 @@ static int usdhc_data_xfer_cfg(struct usdhc_priv *priv,
 
 		if (data->block_count > 1U) {
 			mix_ctrl |= USDHC_MIX_CTRL_MSBSEL_MASK |
-				USDHC_MIX_CTRL_BCEN_MASK;
+				    USDHC_MIX_CTRL_BCEN_MASK;
 			/* auto command 12 */
 			if (data->cmd12) {
 				mix_ctrl |= USDHC_MIX_CTRL_AC12EN_MASK;
@@ -957,15 +864,15 @@ static int usdhc_data_xfer_cfg(struct usdhc_priv *priv,
 		if (data->data_type != USDHC_XFER_BOOT) {
 			/* config data block size/block count */
 			base->BLK_ATT =
-				((base->BLK_ATT & ~(USDHC_BLK_ATT_BLKSIZE_MASK |
-				USDHC_BLK_ATT_BLKCNT_MASK)) |
-				(USDHC_BLK_ATT_BLKSIZE(data->block_size) |
-				USDHC_BLK_ATT_BLKCNT(data->block_count)));
+				((base->BLK_ATT &
+				  ~(USDHC_BLK_ATT_BLKSIZE_MASK |
+				    USDHC_BLK_ATT_BLKCNT_MASK)) |
+				 (USDHC_BLK_ATT_BLKSIZE(data->block_size) |
+				  USDHC_BLK_ATT_BLKCNT(data->block_count)));
 		} else {
 			mix_ctrl |= USDHC_MIX_CTRL_MSBSEL_MASK |
-				USDHC_MIX_CTRL_BCEN_MASK;
-			base->PROT_CTRL |=
-				USDHC_PROT_CTRL_RD_DONE_NO_8CLK_MASK;
+				    USDHC_MIX_CTRL_BCEN_MASK;
+			base->PROT_CTRL |= USDHC_PROT_CTRL_RD_DONE_NO_8CLK_MASK;
 		}
 
 		/* data present flag */
@@ -974,27 +881,25 @@ static int usdhc_data_xfer_cfg(struct usdhc_priv *priv,
 		if (en_dma) {
 			base->INT_SIGNAL_EN &=
 				~(USDHC_INT_BUF_WRITE_READY_FLAG |
-				USDHC_INT_BUF_READ_READY_FLAG |
-				USDHC_INT_DMA_DONE_FLAG);
+				  USDHC_INT_BUF_READ_READY_FLAG |
+				  USDHC_INT_DMA_DONE_FLAG);
 			base->INT_STATUS_EN &=
 				~(USDHC_INT_BUF_WRITE_READY_FLAG |
-				USDHC_INT_BUF_READ_READY_FLAG |
-				USDHC_INT_DMA_DONE_FLAG);
+				  USDHC_INT_BUF_READ_READY_FLAG |
+				  USDHC_INT_DMA_DONE_FLAG);
 		} else {
-			base->INT_SIGNAL_EN |=
-				USDHC_INT_BUF_WRITE_READY_FLAG |
-				USDHC_INT_BUF_READ_READY_FLAG;
-			base->INT_STATUS_EN |=
-				USDHC_INT_BUF_WRITE_READY_FLAG |
-				USDHC_INT_BUF_READ_READY_FLAG;
+			base->INT_SIGNAL_EN |= USDHC_INT_BUF_WRITE_READY_FLAG |
+					       USDHC_INT_BUF_READ_READY_FLAG;
+			base->INT_STATUS_EN |= USDHC_INT_BUF_WRITE_READY_FLAG |
+					       USDHC_INT_BUF_READ_READY_FLAG;
 		}
 	} else {
 		/* clear data flags */
 		mix_ctrl &= ~(USDHC_MIX_CTRL_MSBSEL_MASK |
-					USDHC_MIX_CTRL_BCEN_MASK |
-					USDHC_MIX_CTRL_DTDSEL_MASK |
-					USDHC_MIX_CTRL_AC12EN_MASK |
-					USDHC_MIX_CTRL_AC23EN_MASK);
+			      USDHC_MIX_CTRL_BCEN_MASK |
+			      USDHC_MIX_CTRL_DTDSEL_MASK |
+			      USDHC_MIX_CTRL_AC12EN_MASK |
+			      USDHC_MIX_CTRL_AC23EN_MASK);
 
 		if (base->PRES_STATE & USDHC_CMD_INHIBIT_FLAG)
 			return -EBUSY;
@@ -1011,8 +916,8 @@ static void usdhc_send_cmd(USDHC_Type *base, struct usdhc_cmd *command)
 	uint32_t xfer_type = base->CMD_XFR_TYP;
 	uint32_t flags = command->flags;
 
-	if (!(base->PRES_STATE & USDHC_CMD_INHIBIT_FLAG)
-		&& (command->cmd_type != USDHC_CMD_TYPE_EMPTY)) {
+	if (!(base->PRES_STATE & USDHC_CMD_INHIBIT_FLAG) &&
+	    (command->cmd_type != USDHC_CMD_TYPE_EMPTY)) {
 		/* Define the flag corresponding to each response type. */
 		switch (command->rsp_type) {
 		case SDHC_RSP_TYPE_NONE:
@@ -1021,27 +926,25 @@ static void usdhc_send_cmd(USDHC_Type *base, struct usdhc_cmd *command)
 		case SDHC_RSP_TYPE_R5: /* Response 5 */
 		case SDHC_RSP_TYPE_R6: /* Response 6 */
 		case SDHC_RSP_TYPE_R7: /* Response 7 */
-			flags |= (USDHC_RSP_LEN_48_FLAG |
-					USDHC_CRC_CHECK_FLAG |
-					USDHC_IDX_CHECK_FLAG);
-		break;
+			flags |= (USDHC_RSP_LEN_48_FLAG | USDHC_CRC_CHECK_FLAG |
+				  USDHC_IDX_CHECK_FLAG);
+			break;
 
 		case SDHC_RSP_TYPE_R1b: /* Response 1 with busy */
 		case SDHC_RSP_TYPE_R5b: /* Response 5 with busy */
 			flags |= (USDHC_RSP_LEN_48_BUSY_FLAG |
-					USDHC_CRC_CHECK_FLAG |
-					USDHC_IDX_CHECK_FLAG);
-		break;
+				  USDHC_CRC_CHECK_FLAG | USDHC_IDX_CHECK_FLAG);
+			break;
 
 		case SDHC_RSP_TYPE_R2: /* Response 2 */
-			flags |= (USDHC_RSP_LEN_136_FLAG |
-				USDHC_CRC_CHECK_FLAG);
-		break;
+			flags |=
+				(USDHC_RSP_LEN_136_FLAG | USDHC_CRC_CHECK_FLAG);
+			break;
 
 		case SDHC_RSP_TYPE_R3: /* Response 3 */
 		case SDHC_RSP_TYPE_R4: /* Response 4 */
 			flags |= (USDHC_RSP_LEN_48_FLAG);
-		break;
+			break;
 
 		default:
 			break;
@@ -1052,20 +955,20 @@ static void usdhc_send_cmd(USDHC_Type *base, struct usdhc_cmd *command)
 
 		/* config cmd index */
 		xfer_type &= ~(USDHC_CMD_XFR_TYP_CMDINX_MASK |
-					USDHC_CMD_XFR_TYP_CMDTYP_MASK |
-					USDHC_CMD_XFR_TYP_CICEN_MASK |
-					USDHC_CMD_XFR_TYP_CCCEN_MASK |
-					USDHC_CMD_XFR_TYP_RSPTYP_MASK |
-					USDHC_CMD_XFR_TYP_DPSEL_MASK);
+			       USDHC_CMD_XFR_TYP_CMDTYP_MASK |
+			       USDHC_CMD_XFR_TYP_CICEN_MASK |
+			       USDHC_CMD_XFR_TYP_CCCEN_MASK |
+			       USDHC_CMD_XFR_TYP_RSPTYP_MASK |
+			       USDHC_CMD_XFR_TYP_DPSEL_MASK);
 
 		xfer_type |=
 			(((command->index << USDHC_CMD_XFR_TYP_CMDINX_SHIFT) &
-				USDHC_CMD_XFR_TYP_CMDINX_MASK) |
-				((flags) & (USDHC_CMD_XFR_TYP_CMDTYP_MASK |
-				USDHC_CMD_XFR_TYP_CICEN_MASK |
-				USDHC_CMD_XFR_TYP_CCCEN_MASK |
-				USDHC_CMD_XFR_TYP_RSPTYP_MASK |
-				USDHC_CMD_XFR_TYP_DPSEL_MASK)));
+			  USDHC_CMD_XFR_TYP_CMDINX_MASK) |
+			 ((flags) & (USDHC_CMD_XFR_TYP_CMDTYP_MASK |
+				     USDHC_CMD_XFR_TYP_CICEN_MASK |
+				     USDHC_CMD_XFR_TYP_CCCEN_MASK |
+				     USDHC_CMD_XFR_TYP_RSPTYP_MASK |
+				     USDHC_CMD_XFR_TYP_DPSEL_MASK)));
 
 		/* config the command xfertype and argument */
 		base->CMD_ARG = command->argument;
@@ -1102,18 +1005,18 @@ static int usdhc_cmd_rsp(struct usdhc_priv *priv)
 				if (i > 1U) {
 					cmd->response[i - 1U] |=
 						((cmd->response[i - 2U] &
-						0xFF000000U) >> 24U);
+						  0xFF000000U) >>
+						 24U);
 				}
 				i--;
 			} while (i);
 		}
 	}
 	/* check response error flag */
-	if ((cmd->rsp_err_flags) &&
-		((cmd->rsp_type == SDHC_RSP_TYPE_R1) ||
-		(cmd->rsp_type == SDHC_RSP_TYPE_R1b) ||
-		(cmd->rsp_type == SDHC_RSP_TYPE_R6) ||
-		(cmd->rsp_type == SDHC_RSP_TYPE_R5))) {
+	if ((cmd->rsp_err_flags) && ((cmd->rsp_type == SDHC_RSP_TYPE_R1) ||
+				     (cmd->rsp_type == SDHC_RSP_TYPE_R1b) ||
+				     (cmd->rsp_type == SDHC_RSP_TYPE_R6) ||
+				     (cmd->rsp_type == SDHC_RSP_TYPE_R5))) {
 		if (((cmd->rsp_err_flags) & (cmd->response[0U])))
 			return -EIO;
 	}
@@ -1121,8 +1024,7 @@ static int usdhc_cmd_rsp(struct usdhc_priv *priv)
 	return 0;
 }
 
-static int usdhc_wait_cmd_done(struct usdhc_priv *priv,
-	bool poll_cmd)
+static int usdhc_wait_cmd_done(struct usdhc_priv *priv, bool poll_cmd)
 {
 	int error = 0;
 	uint32_t int_status = 0U;
@@ -1131,13 +1033,13 @@ static int usdhc_wait_cmd_done(struct usdhc_priv *priv,
 	/* check if need polling command done or not */
 	if (poll_cmd) {
 		/* Wait command complete or USDHC encounters error. */
-		while (!(int_status & (USDHC_INT_CMD_DONE_FLAG |
-			USDHC_INT_CMD_ERR_FLAG))) {
+		while (!(int_status &
+			 (USDHC_INT_CMD_DONE_FLAG | USDHC_INT_CMD_ERR_FLAG))) {
 			int_status = base->INT_STATUS;
 		}
 
 		if ((int_status & USDHC_INT_TUNING_ERR_FLAG) ||
-			(int_status & USDHC_INT_CMD_ERR_FLAG)) {
+		    (int_status & USDHC_INT_CMD_ERR_FLAG)) {
 			error = -EIO;
 		}
 		/* Receive response when command completes successfully. */
@@ -1148,9 +1050,9 @@ static int usdhc_wait_cmd_done(struct usdhc_priv *priv,
 				priv->op_context.cmd.index);
 		}
 
-		base->INT_STATUS = (USDHC_INT_CMD_DONE_FLAG |
-				USDHC_INT_CMD_ERR_FLAG |
-				USDHC_INT_TUNING_ERR_FLAG);
+		base->INT_STATUS =
+			(USDHC_INT_CMD_DONE_FLAG | USDHC_INT_CMD_ERR_FLAG |
+			 USDHC_INT_TUNING_ERR_FLAG);
 	}
 
 	return error;
@@ -1167,14 +1069,14 @@ static inline uint32_t usdhc_read_data(USDHC_Type *base)
 }
 
 static uint32_t usdhc_read_data_port(struct usdhc_priv *priv,
-	uint32_t xfered_words)
+				     uint32_t xfered_words)
 {
 	USDHC_Type *base = priv->config->base;
 	struct usdhc_data *data = &priv->op_context.data;
 	uint32_t i, total_words, remaing_words;
 	/* The words can be read at this time. */
 	uint32_t watermark = ((base->WTMK_LVL & USDHC_WTMK_LVL_RD_WML_MASK) >>
-		USDHC_WTMK_LVL_RD_WML_SHIFT);
+			      USDHC_WTMK_LVL_RD_WML_SHIFT);
 
 	/* If DMA is enable, do not need to polling data port */
 	if (!(base->MIX_CTRL & USDHC_MIX_CTRL_DMAEN_MASK)) {
@@ -1187,12 +1089,12 @@ static uint32_t usdhc_read_data_port(struct usdhc_priv *priv,
 		}
 
 		total_words = ((data->block_count * data->block_size) /
-			sizeof(uint32_t));
+			       sizeof(uint32_t));
 
 		if (watermark >= total_words) {
 			remaing_words = total_words;
 		} else if ((watermark < total_words) &&
-			((total_words - xfered_words) >= watermark)) {
+			   ((total_words - xfered_words) >= watermark)) {
 			remaing_words = watermark;
 		} else {
 			remaing_words = (total_words - xfered_words);
@@ -1217,28 +1119,26 @@ static int usdhc_read_data_port_sync(struct usdhc_priv *priv)
 	int error = 0;
 
 	if (data->block_size % sizeof(uint32_t)) {
-		data->block_size +=
-			sizeof(uint32_t) -
-			(data->block_size % sizeof(uint32_t));
+		data->block_size += sizeof(uint32_t) -
+				    (data->block_size % sizeof(uint32_t));
 	}
 
 	total_words =
-		((data->block_count * data->block_size) /
-		sizeof(uint32_t));
+		((data->block_count * data->block_size) / sizeof(uint32_t));
 
 	while ((!error) && (xfered_words < total_words)) {
-		while (!(int_status & (USDHC_INT_BUF_READ_READY_FLAG |
-			USDHC_INT_DATA_ERR_FLAG |
-			USDHC_INT_TUNING_ERR_FLAG)))
+		while (!(int_status &
+			 (USDHC_INT_BUF_READ_READY_FLAG |
+			  USDHC_INT_DATA_ERR_FLAG | USDHC_INT_TUNING_ERR_FLAG)))
 			int_status = base->INT_STATUS;
 
 		/* during std tuning process, software do not need to read data,
 		 * but wait BRR is enough
 		 */
 		if ((data->data_type == USDHC_XFER_TUNING) &&
-			(int_status & USDHC_INT_BUF_READ_READY_FLAG)) {
+		    (int_status & USDHC_INT_BUF_READ_READY_FLAG)) {
 			base->INT_STATUS = USDHC_INT_BUF_READ_READY_FLAG |
-				USDHC_INT_TUNING_PASS_FLAG;
+					   USDHC_INT_TUNING_PASS_FLAG;
 
 			return 0;
 		} else if ((int_status & USDHC_INT_TUNING_ERR_FLAG)) {
@@ -1267,14 +1167,14 @@ static int usdhc_read_data_port_sync(struct usdhc_priv *priv)
 }
 
 static uint32_t usdhc_write_data_port(struct usdhc_priv *priv,
-	uint32_t xfered_words)
+				      uint32_t xfered_words)
 {
 	USDHC_Type *base = priv->config->base;
 	struct usdhc_data *data = &priv->op_context.data;
 	uint32_t i, total_words, remaing_words;
 	/* Words can be wrote at this time. */
 	uint32_t watermark = ((base->WTMK_LVL & USDHC_WTMK_LVL_WR_WML_MASK) >>
-		USDHC_WTMK_LVL_WR_WML_SHIFT);
+			      USDHC_WTMK_LVL_WR_WML_SHIFT);
 
 	/* If DMA is enable, do not need to polling data port */
 	if (!(base->MIX_CTRL & USDHC_MIX_CTRL_DMAEN_MASK)) {
@@ -1284,14 +1184,13 @@ static uint32_t usdhc_write_data_port(struct usdhc_priv *priv,
 				(data->block_size % sizeof(uint32_t));
 		}
 
-		total_words =
-			((data->block_count * data->block_size) /
-			sizeof(uint32_t));
+		total_words = ((data->block_count * data->block_size) /
+			       sizeof(uint32_t));
 
 		if (watermark >= total_words) {
 			remaing_words = total_words;
 		} else if ((watermark < total_words) &&
-			((total_words - xfered_words) >= watermark)) {
+			   ((total_words - xfered_words) >= watermark)) {
 			remaing_words = watermark;
 		} else {
 			remaing_words = (total_words - xfered_words);
@@ -1316,16 +1215,16 @@ static status_t usdhc_write_data_port_sync(struct usdhc_priv *priv)
 	int error = 0;
 
 	if (data->block_size % sizeof(uint32_t)) {
-		data->block_size +=
-			sizeof(uint32_t) - (data->block_size % sizeof(uint32_t));
+		data->block_size += sizeof(uint32_t) -
+				    (data->block_size % sizeof(uint32_t));
 	}
 
 	total_words = (data->block_count * data->block_size) / sizeof(uint32_t);
 
 	while ((!error) && (xfered_words < total_words)) {
 		while (!(int_status & (USDHC_INT_BUF_WRITE_READY_FLAG |
-				USDHC_INT_DATA_ERR_FLAG |
-				USDHC_INT_TUNING_ERR_FLAG))) {
+				       USDHC_INT_DATA_ERR_FLAG |
+				       USDHC_INT_TUNING_ERR_FLAG))) {
 			int_status = base->INT_STATUS;
 		}
 
@@ -1341,8 +1240,8 @@ static status_t usdhc_write_data_port_sync(struct usdhc_priv *priv)
 		}
 
 		if (!error) {
-			xfered_words = usdhc_write_data_port(priv,
-				xfered_words);
+			xfered_words =
+				usdhc_write_data_port(priv, xfered_words);
 			/* clear buffer write ready */
 			base->INT_STATUS = USDHC_INT_BUF_WRITE_READY_FLAG;
 			int_status = 0U;
@@ -1352,8 +1251,8 @@ static status_t usdhc_write_data_port_sync(struct usdhc_priv *priv)
 	/* Wait write data complete or data transfer error
 	 * after the last writing operation.
 	 */
-	while (!(int_status & (USDHC_INT_DATA_DONE_FLAG |
-		USDHC_INT_DATA_ERR_FLAG))) {
+	while (!(int_status &
+		 (USDHC_INT_DATA_DONE_FLAG | USDHC_INT_DATA_ERR_FLAG))) {
 		int_status = base->INT_STATUS;
 	}
 
@@ -1361,8 +1260,7 @@ static status_t usdhc_write_data_port_sync(struct usdhc_priv *priv)
 		if (!(data->ignore_err))
 			error = -EIO;
 	}
-	base->INT_STATUS = USDHC_INT_DATA_DONE_FLAG |
-		USDHC_INT_DATA_ERR_FLAG;
+	base->INT_STATUS = USDHC_INT_DATA_DONE_FLAG | USDHC_INT_DATA_ERR_FLAG;
 
 	return error;
 }
@@ -1377,18 +1275,18 @@ static int usdhc_data_sync_xfer(struct usdhc_priv *priv, bool en_dma)
 	if (en_dma) {
 		/* Wait data complete or USDHC encounters error. */
 		while (!((int_status &
-			(USDHC_INT_DATA_DONE_FLAG | USDHC_INT_DATA_ERR_FLAG |
-			USDHC_INT_CMD_ERR_FLAG | USDHC_INT_TUNING_ERR_FLAG)))) {
+			  (USDHC_INT_DATA_DONE_FLAG | USDHC_INT_DATA_ERR_FLAG |
+			   USDHC_INT_CMD_ERR_FLAG |
+			   USDHC_INT_TUNING_ERR_FLAG)))) {
 			int_status = base->INT_STATUS;
 		}
 
 		if (int_status & USDHC_INT_TUNING_ERR_FLAG) {
 			error = -EIO;
 		} else if ((int_status & (USDHC_INT_DATA_ERR_FLAG |
-			USDHC_INT_DMA_ERR_FLAG))) {
+					  USDHC_INT_DMA_ERR_FLAG))) {
 			if ((!(data->ignore_err)) ||
-				(int_status &
-				USDHC_INT_DATA_TIMEOUT_FLAG)) {
+			    (int_status & USDHC_INT_DATA_TIMEOUT_FLAG)) {
 				error = -EIO;
 			}
 		}
@@ -1396,11 +1294,10 @@ static int usdhc_data_sync_xfer(struct usdhc_priv *priv, bool en_dma)
 		if ((data->data_type == USDHC_XFER_BOOT_CONTINUOUS) && (!error))
 			*(data->rx_data) = g_usdhc_boot_dummy;
 
-		base->INT_STATUS = (USDHC_INT_DATA_DONE_FLAG |
-			USDHC_INT_DATA_ERR_FLAG |
-			USDHC_INT_DMA_ERR_FLAG |
-			USDHC_INT_TUNING_PASS_FLAG |
-			USDHC_INT_TUNING_ERR_FLAG);
+		base->INT_STATUS =
+			(USDHC_INT_DATA_DONE_FLAG | USDHC_INT_DATA_ERR_FLAG |
+			 USDHC_INT_DMA_ERR_FLAG | USDHC_INT_TUNING_PASS_FLAG |
+			 USDHC_INT_TUNING_ERR_FLAG);
 	} else {
 		if (data->rx_data) {
 			error = usdhc_read_data_port_sync(priv);
@@ -1439,9 +1336,10 @@ static int usdhc_xfer(struct usdhc_priv *priv)
 	 */
 
 	if (data && (!execute_tuning) && priv->op_context.dma_cfg.adma_table)
-		error = usdhc_adma_table_cfg(priv,
-			(data->data_type & USDHC_XFER_BOOT) ?
-			USDHC_ADMA_MUTI_FLAG : USDHC_ADMA_SINGLE_FLAG);
+		error = usdhc_adma_table_cfg(
+			priv, (data->data_type & USDHC_XFER_BOOT) ?
+					    USDHC_ADMA_MUTI_FLAG :
+					    USDHC_ADMA_SINGLE_FLAG);
 
 	/* if the DMA descriptor configure fail or not needed , disable it */
 	if (error) {
@@ -1458,8 +1356,8 @@ static int usdhc_xfer(struct usdhc_priv *priv)
 	/* send command first */
 	usdhc_send_cmd(base, &priv->op_context.cmd);
 	/* wait command done */
-	error = usdhc_wait_cmd_done(priv, (data == NULL) ||
-		(data->data_type == USDHC_XFER_NORMAL));
+	error = usdhc_wait_cmd_done(
+		priv, (data == NULL) || (data->data_type == USDHC_XFER_NORMAL));
 	/* wait transfer data finish */
 	if (data && (!error)) {
 		return usdhc_data_sync_xfer(priv, en_dma);
@@ -1484,7 +1382,8 @@ static inline void usdhc_force_clk_on(USDHC_Type *base, bool on)
 		base->VEND_SPEC &= ~USDHC_VEND_SPEC_FRC_SDCLK_ON_MASK;
 }
 
-static void usdhc_tuning(USDHC_Type *base, uint32_t start, uint32_t step, bool enable)
+static void usdhc_tuning(USDHC_Type *base, uint32_t start, uint32_t step,
+			 bool enable)
 {
 	uint32_t tuning_ctrl = 0U;
 
@@ -1494,23 +1393,23 @@ static void usdhc_tuning(USDHC_Type *base, uint32_t start, uint32_t step, bool e
 		/* config tuning start and step */
 		tuning_ctrl = base->TUNING_CTRL;
 		tuning_ctrl &= ~(USDHC_TUNING_CTRL_TUNING_START_TAP_MASK |
-			USDHC_TUNING_CTRL_TUNING_STEP_MASK);
+				 USDHC_TUNING_CTRL_TUNING_STEP_MASK);
 		tuning_ctrl |= (USDHC_TUNING_CTRL_TUNING_START_TAP(start) |
-			USDHC_TUNING_CTRL_TUNING_STEP(step) |
-			USDHC_TUNING_CTRL_STD_TUNING_EN_MASK);
+				USDHC_TUNING_CTRL_TUNING_STEP(step) |
+				USDHC_TUNING_CTRL_STD_TUNING_EN_MASK);
 		base->TUNING_CTRL = tuning_ctrl;
 
 		/* excute tuning */
 		base->AUTOCMD12_ERR_STATUS |=
 			(USDHC_AUTOCMD12_ERR_STATUS_EXECUTE_TUNING_MASK |
-			USDHC_AUTOCMD12_ERR_STATUS_SMP_CLK_SEL_MASK);
+			 USDHC_AUTOCMD12_ERR_STATUS_SMP_CLK_SEL_MASK);
 	} else {
 		/* disable the standard tuning */
 		base->TUNING_CTRL &= ~USDHC_TUNING_CTRL_STD_TUNING_EN_MASK;
 		/* clear excute tuning */
 		base->AUTOCMD12_ERR_STATUS &=
 			~(USDHC_AUTOCMD12_ERR_STATUS_EXECUTE_TUNING_MASK |
-			USDHC_AUTOCMD12_ERR_STATUS_SMP_CLK_SEL_MASK);
+			  USDHC_AUTOCMD12_ERR_STATUS_SMP_CLK_SEL_MASK);
 	}
 }
 
@@ -1528,8 +1427,8 @@ int usdhc_adjust_tuning_timing(USDHC_Type *base, uint32_t delay)
 	base->CLK_TUNE_CTRL_STATUS = clk_tune_ctrl;
 	/* check delat setting error */
 	if (base->CLK_TUNE_CTRL_STATUS &
-		(USDHC_CLK_TUNE_CTRL_STATUS_PRE_ERR_MASK |
-		USDHC_CLK_TUNE_CTRL_STATUS_NXT_ERR_MASK))
+	    (USDHC_CLK_TUNE_CTRL_STATUS_PRE_ERR_MASK |
+	     USDHC_CLK_TUNE_CTRL_STATUS_NXT_ERR_MASK))
 		return -EIO;
 
 	return 0;
@@ -1542,10 +1441,10 @@ static inline void usdhc_set_retuning_timer(USDHC_Type *base, uint32_t counter)
 }
 
 static inline void usdhc_set_bus_width(USDHC_Type *base,
-	enum usdhc_data_bus_width width)
+				       enum usdhc_data_bus_width width)
 {
 	base->PROT_CTRL = ((base->PROT_CTRL & ~USDHC_PROT_CTRL_DTW_MASK) |
-		USDHC_PROT_CTRL_DTW(width));
+			   USDHC_PROT_CTRL_DTW(width));
 }
 
 static int usdhc_execute_tuning(struct usdhc_priv *priv)
@@ -1567,21 +1466,21 @@ static int usdhc_execute_tuning(struct usdhc_priv *priv)
 
 		/*wait excute tuning bit clear*/
 		if ((base->AUTOCMD12_ERR_STATUS &
-			USDHC_AUTOCMD12_ERR_STATUS_EXECUTE_TUNING_MASK)) {
+		     USDHC_AUTOCMD12_ERR_STATUS_EXECUTE_TUNING_MASK)) {
 			continue;
 		}
 
 		/* if tuning error , re-tuning again */
 		if ((base->CLK_TUNE_CTRL_STATUS &
-			(USDHC_CLK_TUNE_CTRL_STATUS_NXT_ERR_MASK |
-			USDHC_CLK_TUNE_CTRL_STATUS_PRE_ERR_MASK)) &&
-			tuning_err) {
+		     (USDHC_CLK_TUNE_CTRL_STATUS_NXT_ERR_MASK |
+		      USDHC_CLK_TUNE_CTRL_STATUS_PRE_ERR_MASK)) &&
+		    tuning_err) {
 			tuning_err = false;
 			/* enable the standard tuning */
 			usdhc_tuning(base, SDHC_STANDARD_TUNING_START,
-				SDHC_TUINIG_STEP, true);
+				     SDHC_TUINIG_STEP, true);
 			usdhc_adjust_tuning_timing(base,
-				SDHC_STANDARD_TUNING_START);
+						   SDHC_STANDARD_TUNING_START);
 		} else {
 			break;
 		}
@@ -1592,7 +1491,7 @@ static int usdhc_execute_tuning(struct usdhc_priv *priv)
 
 	/* check tuning result*/
 	if (!(base->AUTOCMD12_ERR_STATUS &
-		USDHC_AUTOCMD12_ERR_STATUS_SMP_CLK_SEL_MASK)) {
+	      USDHC_AUTOCMD12_ERR_STATUS_SMP_CLK_SEL_MASK)) {
 		return -EIO;
 	}
 
@@ -1607,7 +1506,7 @@ static int usdhc_vol_switch(struct usdhc_priv *priv)
 	int retry = 0xffff;
 
 	while (base->PRES_STATE &
-		(CARD_DATA1_STATUS_MASK | CARD_DATA2_STATUS_MASK |
+	       (CARD_DATA1_STATUS_MASK | CARD_DATA2_STATUS_MASK |
 		CARD_DATA3_STATUS_MASK | CARD_DATA0_NOT_BUSY)) {
 		retry--;
 		if (retry <= 0) {
@@ -1630,8 +1529,8 @@ static int usdhc_vol_switch(struct usdhc_priv *priv)
 	/* check data line and cmd line status */
 	retry = 0xffff;
 	while (!(base->PRES_STATE &
-		(CARD_DATA1_STATUS_MASK | CARD_DATA2_STATUS_MASK |
-		CARD_DATA3_STATUS_MASK | CARD_DATA0_NOT_BUSY))) {
+		 (CARD_DATA1_STATUS_MASK | CARD_DATA2_STATUS_MASK |
+		  CARD_DATA3_STATUS_MASK | CARD_DATA0_NOT_BUSY))) {
 		retry--;
 		if (retry <= 0) {
 			return -EBUSY;
@@ -1641,8 +1540,9 @@ static int usdhc_vol_switch(struct usdhc_priv *priv)
 	return 0;
 }
 
-static inline void usdhc_op_ctx_init(struct usdhc_priv *priv,
-	bool cmd_only, uint8_t cmd_idx, uint32_t arg, enum sdhc_rsp_type rsp_type)
+static inline void usdhc_op_ctx_init(struct usdhc_priv *priv, bool cmd_only,
+				     uint8_t cmd_idx, uint32_t arg,
+				     enum sdhc_rsp_type rsp_type)
 {
 	struct usdhc_cmd *cmd = &priv->op_context.cmd;
 	struct usdhc_data *data = &priv->op_context.data;
@@ -1657,12 +1557,12 @@ static inline void usdhc_op_ctx_init(struct usdhc_priv *priv,
 	cmd->rsp_type = rsp_type;
 }
 
-static int usdhc_select_fun(struct usdhc_priv *priv,
-	uint32_t group, uint32_t function)
+static int usdhc_select_fun(struct usdhc_priv *priv, uint32_t group,
+			    uint32_t function)
 {
 	const struct usdhc_config *config = priv->config;
 	uint32_t *fun_status;
-	uint16_t fun_grp_info[6U] = {0};
+	uint16_t fun_grp_info[6U] = { 0 };
 	uint32_t current_fun_status = 0U, arg;
 	struct usdhc_cmd *cmd = &priv->op_context.cmd;
 	struct usdhc_data *data = &priv->op_context.data;
@@ -1670,7 +1570,7 @@ static int usdhc_select_fun(struct usdhc_priv *priv,
 
 	/* check if card support CMD6 */
 	if ((priv->card_info.version <= SD_SPEC_VER1_0) ||
-		(!(priv->card_info.csd.cmd_class & SD_CMD_CLASS_SWITCH))) {
+	    (!(priv->card_info.csd.cmd_class & SD_CMD_CLASS_SWITCH))) {
 		return -EINVAL;
 	}
 
@@ -1720,12 +1620,11 @@ static int usdhc_select_fun(struct usdhc_priv *priv,
 	fun_grp_info[1U] = (uint16_t)(fun_status[2U]);
 	fun_grp_info[0U] = (uint16_t)(fun_status[3U] >> 16U);
 	current_fun_status = ((fun_status[3U] & 0xFFU) << 8U) |
-		(fun_status[4U] >> 24U);
+			     (fun_status[4U] >> 24U);
 
 	/* check if function is support */
 	if (((fun_grp_info[group] & (1 << function)) == 0U) ||
-		((current_fun_status >>
-		(group * 4U)) & 0xFU) != function) {
+	    ((current_fun_status >> (group * 4U)) & 0xFU) != function) {
 		return -ENOTSUP;
 	}
 
@@ -1766,17 +1665,17 @@ static int usdhc_select_fun(struct usdhc_priv *priv,
 	 * if bits 379~376 equal value 1;
 	 */
 	current_fun_status = ((fun_status[3U] & 0xFFU) << 8U) |
-		(fun_status[4U] >> 24U);
+			     (fun_status[4U] >> 24U);
 
-	if (((current_fun_status >>
-		(group * 4U)) & 0xFU) != function) {
+	if (((current_fun_status >> (group * 4U)) & 0xFU) != function) {
 		return -EINVAL;
 	}
 
 	return 0;
 }
 
-uint32_t usdhc_set_sd_clk(USDHC_Type *base, uint32_t src_clk_hz, uint32_t sd_clk_hz)
+uint32_t usdhc_set_sd_clk(USDHC_Type *base, uint32_t src_clk_hz,
+			  uint32_t sd_clk_hz)
 {
 	uint32_t total_div = 0U;
 	uint32_t divisor = 0U;
@@ -1805,7 +1704,7 @@ uint32_t usdhc_set_sd_clk(USDHC_Type *base, uint32_t src_clk_hz, uint32_t sd_clk
 			 * smaller than SDHC_MAX_CLKFS
 			 */
 			while (((USDHC_MAX_CLKFS % prescaler) != 0U) ||
-				(prescaler == 1U))
+			       (prescaler == 1U))
 				prescaler++;
 			/* calculate the divisor */
 			divisor = total_div / prescaler;
@@ -1816,10 +1715,10 @@ uint32_t usdhc_set_sd_clk(USDHC_Type *base, uint32_t src_clk_hz, uint32_t sd_clk
 				divisor++;
 				if (divisor > USDHC_MAX_DVS) {
 					if ((prescaler <<= 1U) >
-						USDHC_MAX_CLKFS) {
+					    USDHC_MAX_CLKFS) {
 						return 0;
 					}
-				divisor = total_div / prescaler;
+					divisor = total_div / prescaler;
 				}
 			}
 		} else {
@@ -1835,8 +1734,8 @@ uint32_t usdhc_set_sd_clk(USDHC_Type *base, uint32_t src_clk_hz, uint32_t sd_clk
 				prescaler = total_div;
 			}
 		}
-		nearest_freq = src_clk_hz / (divisor == 0U ? 1U : divisor) /
-			prescaler;
+		nearest_freq =
+			src_clk_hz / (divisor == 0U ? 1U : divisor) / prescaler;
 	} else {
 		/* in this condition , src_clk_hz = busClock_Hz, */
 		/* in DDR mode , set SDCLKFS to 0, divisor = 0, actually the
@@ -1860,10 +1759,9 @@ uint32_t usdhc_set_sd_clk(USDHC_Type *base, uint32_t src_clk_hz, uint32_t sd_clk
 	 * data timeout counter value.
 	 */
 	sysctl = base->SYS_CTRL;
-	sysctl &= ~(USDHC_SYS_CTRL_DVS_MASK |
-		USDHC_SYS_CTRL_SDCLKFS_MASK);
+	sysctl &= ~(USDHC_SYS_CTRL_DVS_MASK | USDHC_SYS_CTRL_SDCLKFS_MASK);
 	sysctl |= (USDHC_SYS_CTRL_DVS(divisor) |
-		USDHC_SYS_CTRL_SDCLKFS(prescaler));
+		   USDHC_SYS_CTRL_SDCLKFS(prescaler));
 	base->SYS_CTRL = sysctl;
 
 	/* Wait until the SD clock is stable. */
@@ -1874,16 +1772,16 @@ uint32_t usdhc_set_sd_clk(USDHC_Type *base, uint32_t src_clk_hz, uint32_t sd_clk
 	return nearest_freq;
 }
 
-static void usdhc_enable_ddr_mode(USDHC_Type *base,
-	bool enable, uint32_t nibble_pos)
+static void usdhc_enable_ddr_mode(USDHC_Type *base, bool enable,
+				  uint32_t nibble_pos)
 {
 	uint32_t prescaler = (base->SYS_CTRL & USDHC_SYS_CTRL_SDCLKFS_MASK) >>
-		USDHC_SYS_CTRL_SDCLKFS_SHIFT;
+			     USDHC_SYS_CTRL_SDCLKFS_SHIFT;
 
 	if (enable) {
 		base->MIX_CTRL &= ~USDHC_MIX_CTRL_NIBBLE_POS_MASK;
 		base->MIX_CTRL |= (USDHC_MIX_CTRL_DDR_EN_MASK |
-			USDHC_MIX_CTRL_NIBBLE_POS(nibble_pos));
+				   USDHC_MIX_CTRL_NIBBLE_POS(nibble_pos));
 		prescaler >>= 1U;
 	} else {
 		base->MIX_CTRL &= ~USDHC_MIX_CTRL_DDR_EN_MASK;
@@ -1896,7 +1794,7 @@ static void usdhc_enable_ddr_mode(USDHC_Type *base,
 	}
 
 	base->SYS_CTRL = (base->SYS_CTRL & (~USDHC_SYS_CTRL_SDCLKFS_MASK)) |
-		USDHC_SYS_CTRL_SDCLKFS(prescaler);
+			 USDHC_SYS_CTRL_SDCLKFS(prescaler);
 }
 
 static int usdhc_select_bus_timing(struct usdhc_priv *priv)
@@ -1907,9 +1805,10 @@ static int usdhc_select_bus_timing(struct usdhc_priv *priv)
 	if (priv->card_info.voltage != SD_VOL_1_8_V) {
 		/* Switch the card to high speed mode */
 		if (priv->host_capability.host_flags &
-			USDHC_SUPPORT_HIGHSPEED_FLAG) {
+		    USDHC_SUPPORT_HIGHSPEED_FLAG) {
 			/* group 1, function 1 ->high speed mode*/
-			error = usdhc_select_fun(priv, SD_GRP_TIMING_MODE,
+			error = usdhc_select_fun(
+				priv, SD_GRP_TIMING_MODE,
 				SD_TIMING_SDR25_HIGH_SPEED_MODE);
 			/* If the result isn't "switching to
 			 * high speed mode(50MHZ)
@@ -1920,10 +1819,9 @@ static int usdhc_select_bus_timing(struct usdhc_priv *priv)
 			if (!error) {
 				priv->card_info.sd_timing =
 					SD_TIMING_SDR25_HIGH_SPEED_MODE;
-				priv->card_info.busclk_hz =
-					usdhc_set_sd_clk(config->base,
-						priv->src_clk_hz,
-						SD_CLOCK_50MHZ);
+				priv->card_info.busclk_hz = usdhc_set_sd_clk(
+					config->base, priv->src_clk_hz,
+					SD_CLOCK_50MHZ);
 			} else if (error == -ENOTSUP) {
 				/* if not support high speed,
 				 * keep the card work at default mode
@@ -1936,10 +1834,9 @@ static int usdhc_select_bus_timing(struct usdhc_priv *priv)
 			 */
 			return 0;
 		}
-	} else if ((USDHC_SUPPORT_SDR104_FLAG !=
-		SDMMCHOST_NOT_SUPPORT) ||
-		(USDHC_SUPPORT_SDR50_FLAG != SDMMCHOST_NOT_SUPPORT) ||
-		(USDHC_SUPPORT_DDR50_FLAG != SDMMCHOST_NOT_SUPPORT)) {
+	} else if ((USDHC_SUPPORT_SDR104_FLAG != SDMMCHOST_NOT_SUPPORT) ||
+		   (USDHC_SUPPORT_SDR50_FLAG != SDMMCHOST_NOT_SUPPORT) ||
+		   (USDHC_SUPPORT_DDR50_FLAG != SDMMCHOST_NOT_SUPPORT)) {
 		/* card is in UHS_I mode */
 		switch (priv->card_info.sd_timing) {
 			/* if not select timing mode,
@@ -1948,55 +1845,48 @@ static int usdhc_select_bus_timing(struct usdhc_priv *priv)
 		case SD_TIMING_SDR12_DFT_MODE:
 		case SD_TIMING_SDR104_MODE:
 			error = usdhc_select_fun(priv, SD_GRP_TIMING_MODE,
-				SD_TIMING_SDR104_MODE);
+						 SD_TIMING_SDR104_MODE);
 			if (!error) {
 				priv->card_info.sd_timing =
 					SD_TIMING_SDR104_MODE;
-				priv->card_info.busclk_hz =
-					usdhc_set_sd_clk(config->base,
-						priv->src_clk_hz,
-						SDMMCHOST_SUPPORT_SDR104_FREQ);
+				priv->card_info.busclk_hz = usdhc_set_sd_clk(
+					config->base, priv->src_clk_hz,
+					SDMMCHOST_SUPPORT_SDR104_FREQ);
 				break;
 			}
 		case SD_TIMING_DDR50_MODE:
 			error = usdhc_select_fun(priv, SD_GRP_TIMING_MODE,
-				SD_TIMING_DDR50_MODE);
+						 SD_TIMING_DDR50_MODE);
 			if (!error) {
 				priv->card_info.sd_timing =
 					SD_TIMING_DDR50_MODE;
-				priv->card_info.busclk_hz =
-					usdhc_set_sd_clk(
-						config->base,
-						priv->src_clk_hz,
-						SD_CLOCK_50MHZ);
+				priv->card_info.busclk_hz = usdhc_set_sd_clk(
+					config->base, priv->src_clk_hz,
+					SD_CLOCK_50MHZ);
 				usdhc_enable_ddr_mode(config->base, true, 0U);
 			}
 			break;
 		case SD_TIMING_SDR50_MODE:
-			error = usdhc_select_fun(priv,
-				SD_GRP_TIMING_MODE,
-				SD_TIMING_SDR50_MODE);
+			error = usdhc_select_fun(priv, SD_GRP_TIMING_MODE,
+						 SD_TIMING_SDR50_MODE);
 			if (!error) {
 				priv->card_info.sd_timing =
 					SD_TIMING_SDR50_MODE;
-				priv->card_info.busclk_hz =
-					usdhc_set_sd_clk(
-						config->base,
-						priv->src_clk_hz,
-						SD_CLOCK_100MHZ);
+				priv->card_info.busclk_hz = usdhc_set_sd_clk(
+					config->base, priv->src_clk_hz,
+					SD_CLOCK_100MHZ);
 			}
 			break;
 		case SD_TIMING_SDR25_HIGH_SPEED_MODE:
-			error = usdhc_select_fun(priv, SD_GRP_TIMING_MODE,
+			error = usdhc_select_fun(
+				priv, SD_GRP_TIMING_MODE,
 				SD_TIMING_SDR25_HIGH_SPEED_MODE);
 			if (!error) {
 				priv->card_info.sd_timing =
 					SD_TIMING_SDR25_HIGH_SPEED_MODE;
-				priv->card_info.busclk_hz =
-					usdhc_set_sd_clk(
-						config->base,
-						priv->src_clk_hz,
-						SD_CLOCK_50MHZ);
+				priv->card_info.busclk_hz = usdhc_set_sd_clk(
+					config->base, priv->src_clk_hz,
+					SD_CLOCK_50MHZ);
 			}
 			break;
 
@@ -2007,19 +1897,19 @@ static int usdhc_select_bus_timing(struct usdhc_priv *priv)
 
 	/* SDR50 and SDR104 mode need tuning */
 	if ((priv->card_info.sd_timing == SD_TIMING_SDR50_MODE) ||
-		(priv->card_info.sd_timing == SD_TIMING_SDR104_MODE)) {
+	    (priv->card_info.sd_timing == SD_TIMING_SDR104_MODE)) {
 		struct usdhc_cmd *cmd = &priv->op_context.cmd;
 		struct usdhc_data *data = &priv->op_context.data;
 
 		/* config IO strength in IOMUX*/
 		if (priv->card_info.sd_timing == SD_TIMING_SDR50_MODE) {
 			imxrt_usdhc_pinmux(config->nusdhc, false,
-				CARD_BUS_FREQ_100MHZ1,
-				CARD_BUS_STRENGTH_7);
+					   CARD_BUS_FREQ_100MHZ1,
+					   CARD_BUS_STRENGTH_7);
 		} else {
 			imxrt_usdhc_pinmux(config->nusdhc, false,
-				CARD_BUS_FREQ_200MHZ,
-				CARD_BUS_STRENGTH_7);
+					   CARD_BUS_FREQ_200MHZ,
+					   CARD_BUS_STRENGTH_7);
 		}
 		/* execute tuning */
 		priv->op_context.cmd_only = 0;
@@ -2041,16 +1931,15 @@ static int usdhc_select_bus_timing(struct usdhc_priv *priv)
 		/* set default IO strength to 4 to cover card adapter driver
 		 * strength difference
 		 */
-		imxrt_usdhc_pinmux(config->nusdhc, false,
-			CARD_BUS_FREQ_100MHZ1,
-			CARD_BUS_STRENGTH_4);
+		imxrt_usdhc_pinmux(config->nusdhc, false, CARD_BUS_FREQ_100MHZ1,
+				   CARD_BUS_STRENGTH_4);
 	}
 
 	return error;
 }
 
-static int usdhc_write_sector(void *bus_data, const uint8_t *buf, uint32_t sector,
-		     uint32_t count)
+static int usdhc_write_sector(void *bus_data, const uint8_t *buf,
+			      uint32_t sector, uint32_t count)
 {
 	struct usdhc_priv *priv = bus_data;
 	struct usdhc_cmd *cmd = &priv->op_context.cmd;
@@ -2079,7 +1968,7 @@ static int usdhc_write_sector(void *bus_data, const uint8_t *buf, uint32_t secto
 }
 
 static int usdhc_read_sector(void *bus_data, uint8_t *buf, uint32_t sector,
-		     uint32_t count)
+			     uint32_t count)
 {
 	struct usdhc_priv *priv = bus_data;
 	struct usdhc_cmd *cmd = &priv->op_context.cmd;
@@ -2117,7 +2006,7 @@ static bool usdhc_set_sd_active(USDHC_Type *base)
 	base->SYS_CTRL |= USDHC_SYS_CTRL_INITA_MASK;
 	/* Delay some time to wait card become active state. */
 	while ((base->SYS_CTRL & USDHC_SYS_CTRL_INITA_MASK) ==
-		USDHC_SYS_CTRL_INITA_MASK) {
+	       USDHC_SYS_CTRL_INITA_MASK) {
 		if (!timeout) {
 			break;
 		}
@@ -2128,7 +2017,7 @@ static bool usdhc_set_sd_active(USDHC_Type *base)
 }
 
 static void usdhc_get_host_capability(USDHC_Type *base,
-	struct usdhc_capability *capability)
+				      struct usdhc_capability *capability)
 {
 	uint32_t host_cap;
 	uint32_t max_blk_len;
@@ -2137,28 +2026,30 @@ static void usdhc_get_host_capability(USDHC_Type *base,
 
 	/* Get the capability of USDHC. */
 	max_blk_len = ((host_cap & USDHC_HOST_CTRL_CAP_MBL_MASK) >>
-		USDHC_HOST_CTRL_CAP_MBL_SHIFT);
+		       USDHC_HOST_CTRL_CAP_MBL_SHIFT);
 	capability->max_blk_len = (512U << max_blk_len);
 	/* Other attributes not in HTCAPBLT register. */
 	capability->max_blk_cnt = USDHC_MAX_BLOCK_COUNT;
-	capability->host_flags = (host_cap & (USDHC_SUPPORT_ADMA_FLAG |
-		USDHC_SUPPORT_HIGHSPEED_FLAG | USDHC_SUPPORT_DMA_FLAG |
-		USDHC_SUPPORT_SUSPEND_RESUME_FLAG | USDHC_SUPPORT_V330_FLAG));
+	capability->host_flags =
+		(host_cap &
+		 (USDHC_SUPPORT_ADMA_FLAG | USDHC_SUPPORT_HIGHSPEED_FLAG |
+		  USDHC_SUPPORT_DMA_FLAG | USDHC_SUPPORT_SUSPEND_RESUME_FLAG |
+		  USDHC_SUPPORT_V330_FLAG));
 	capability->host_flags |= (host_cap & USDHC_SUPPORT_V300_FLAG);
 	capability->host_flags |= (host_cap & USDHC_SUPPORT_V180_FLAG);
-	capability->host_flags |=
-		(host_cap & (USDHC_SUPPORT_DDR50_FLAG |
-			USDHC_SUPPORT_SDR104_FLAG |
-			USDHC_SUPPORT_SDR50_FLAG));
+	capability->host_flags |= (host_cap & (USDHC_SUPPORT_DDR50_FLAG |
+					       USDHC_SUPPORT_SDR104_FLAG |
+					       USDHC_SUPPORT_SDR50_FLAG));
 	/* USDHC support 4/8 bit data bus width. */
-	capability->host_flags |= (USDHC_SUPPORT_4BIT_FLAG |
-		USDHC_SUPPORT_8BIT_FLAG);
+	capability->host_flags |=
+		(USDHC_SUPPORT_4BIT_FLAG | USDHC_SUPPORT_8BIT_FLAG);
 }
 
 static bool usdhc_hw_reset(USDHC_Type *base, uint32_t mask, uint32_t timeout)
 {
-	base->SYS_CTRL |= (mask & (USDHC_SYS_CTRL_RSTA_MASK |
-		USDHC_SYS_CTRL_RSTC_MASK | USDHC_SYS_CTRL_RSTD_MASK));
+	base->SYS_CTRL |=
+		(mask & (USDHC_SYS_CTRL_RSTA_MASK | USDHC_SYS_CTRL_RSTC_MASK |
+			 USDHC_SYS_CTRL_RSTD_MASK));
 	/* Delay some time to wait reset success. */
 	while ((base->SYS_CTRL & mask)) {
 		if (!timeout) {
@@ -2171,7 +2062,7 @@ static bool usdhc_hw_reset(USDHC_Type *base, uint32_t mask, uint32_t timeout)
 }
 
 static void usdhc_host_hw_init(USDHC_Type *base,
-	const struct usdhc_config *config)
+			       const struct usdhc_config *config)
 {
 	uint32_t proctl, sysctl, wml;
 	uint32_t int_mask;
@@ -2195,14 +2086,13 @@ static void usdhc_host_hw_init(USDHC_Type *base,
 	proctl |= USDHC_PROT_CTRL_EMODE(config->endian);
 
 	/* Watermark level */
-	wml &= ~(USDHC_WTMK_LVL_RD_WML_MASK |
-			USDHC_WTMK_LVL_WR_WML_MASK |
-			USDHC_WTMK_LVL_RD_BRST_LEN_MASK |
-			USDHC_WTMK_LVL_WR_BRST_LEN_MASK);
+	wml &= ~(USDHC_WTMK_LVL_RD_WML_MASK | USDHC_WTMK_LVL_WR_WML_MASK |
+		 USDHC_WTMK_LVL_RD_BRST_LEN_MASK |
+		 USDHC_WTMK_LVL_WR_BRST_LEN_MASK);
 	wml |= (USDHC_WTMK_LVL_RD_WML(config->read_watermark) |
-			USDHC_WTMK_LVL_WR_WML(config->write_watermark) |
-			USDHC_WTMK_LVL_RD_BRST_LEN(config->read_burst_len) |
-			USDHC_WTMK_LVL_WR_BRST_LEN(config->write_burst_len));
+		USDHC_WTMK_LVL_WR_WML(config->write_watermark) |
+		USDHC_WTMK_LVL_RD_BRST_LEN(config->read_burst_len) |
+		USDHC_WTMK_LVL_WR_BRST_LEN(config->write_burst_len));
 
 	/* config the data timeout value */
 	sysctl &= ~USDHC_SYS_CTRL_DTOCV_MASK;
@@ -2213,19 +2103,18 @@ static void usdhc_host_hw_init(USDHC_Type *base,
 	base->PROT_CTRL = proctl;
 
 	/* disable internal DMA and DDR mode */
-	base->MIX_CTRL &= ~(USDHC_MIX_CTRL_DMAEN_MASK |
-		USDHC_MIX_CTRL_DDR_EN_MASK);
+	base->MIX_CTRL &=
+		~(USDHC_MIX_CTRL_DMAEN_MASK | USDHC_MIX_CTRL_DDR_EN_MASK);
 
 	int_mask = (USDHC_INT_CMD_FLAG | USDHC_INT_CARD_DETECT_FLAG |
-		USDHC_INT_DATA_FLAG | USDHC_INT_SDR104_TUNING_FLAG |
-		USDHC_INT_BLK_GAP_EVENT_FLAG);
+		    USDHC_INT_DATA_FLAG | USDHC_INT_SDR104_TUNING_FLAG |
+		    USDHC_INT_BLK_GAP_EVENT_FLAG);
 
 	base->INT_STATUS_EN |= int_mask;
-
 }
 
-static void usdhc_cd_gpio_cb(const struct device *dev,
-				  struct gpio_callback *cb, uint32_t pins)
+static void usdhc_cd_gpio_cb(const struct device *dev, struct gpio_callback *cb,
+			     uint32_t pins)
 {
 	struct usdhc_priv *priv =
 		CONTAINER_OF(cb, struct usdhc_priv, detect_cb);
@@ -2234,8 +2123,8 @@ static void usdhc_cd_gpio_cb(const struct device *dev,
 	gpio_pin_interrupt_configure(dev, config->detect_pin, GPIO_INT_DISABLE);
 }
 
-static int usdhc_cd_gpio_init(const struct device *detect_gpio,
-			      uint32_t pin, gpio_dt_flags_t flags,
+static int usdhc_cd_gpio_init(const struct device *detect_gpio, uint32_t pin,
+			      gpio_dt_flags_t flags,
 			      struct gpio_callback *callback)
 {
 	int ret;
@@ -2263,9 +2152,11 @@ static void usdhc_host_reset(struct usdhc_priv *priv)
 #endif
 }
 
-static int usdhc_app_host_cmd(struct usdhc_priv *priv, int retry,
-	uint32_t arg, uint8_t app_cmd, uint32_t app_arg, enum sdhc_rsp_type rsp_type,
-	enum sdhc_rsp_type app_rsp_type, bool app_cmd_only)
+static int usdhc_app_host_cmd(struct usdhc_priv *priv, int retry, uint32_t arg,
+			      uint8_t app_cmd, uint32_t app_arg,
+			      enum sdhc_rsp_type rsp_type,
+			      enum sdhc_rsp_type app_rsp_type,
+			      bool app_cmd_only)
 {
 	struct usdhc_cmd *cmd = &priv->op_context.cmd;
 	int ret;
@@ -2312,8 +2203,7 @@ static int usdhc_sd_init(struct usdhc_priv *priv)
 	usdhc_set_bus_width(base, USDHC_DATA_BUS_WIDTH_1BIT);
 	/*set card freq to 400KHZ at begging*/
 	priv->card_info.busclk_hz =
-		usdhc_set_sd_clk(base, priv->src_clk_hz,
-			SDMMC_CLOCK_400KHZ);
+		usdhc_set_sd_clk(base, priv->src_clk_hz, SDMMC_CLOCK_400KHZ);
 	/* send card active */
 	ret = usdhc_set_sd_active(base);
 	if (ret == false) {
@@ -2347,8 +2237,8 @@ static int usdhc_sd_init(struct usdhc_priv *priv)
 	}
 
 	/* Check card's supported interface condition. */
-	usdhc_op_ctx_init(priv, 1, SDHC_SEND_IF_COND,
-		SDHC_VHS_3V3 | SDHC_CHECK, SDHC_RSP_TYPE_R7);
+	usdhc_op_ctx_init(priv, 1, SDHC_SEND_IF_COND, SDHC_VHS_3V3 | SDHC_CHECK,
+			  SDHC_RSP_TYPE_R7);
 
 	retry = 10;
 	while (retry) {
@@ -2379,8 +2269,8 @@ static int usdhc_sd_init(struct usdhc_priv *priv)
 APP_SEND_OP_COND_AGAIN:
 	usdhc_op_ctx_init(priv, 1, 0, 0, SDHC_RSP_TYPE_NONE);
 	ret = usdhc_app_host_cmd(priv, NXP_SDMMC_MAX_VOLTAGE_RETRIES, 0,
-		SDHC_APP_SEND_OP_COND, app_cmd_41_arg,
-		SDHC_RSP_TYPE_R1, SDHC_RSP_TYPE_R3, 1);
+				 SDHC_APP_SEND_OP_COND, app_cmd_41_arg,
+				 SDHC_RSP_TYPE_R1, SDHC_RSP_TYPE_R3, 1);
 	if (ret) {
 		LOG_ERR("APP Condition CMD failed:%d\r\n", ret);
 		return ret;
@@ -2401,8 +2291,8 @@ APP_SEND_OP_COND_AGAIN:
 
 	/* check if card support 1.8V */
 	if ((priv->card_info.card_flags & USDHC_VOL_1_8V_FLAG)) {
-		usdhc_op_ctx_init(priv, 1, SDHC_VOL_SWITCH,
-			0, SDHC_RSP_TYPE_R1);
+		usdhc_op_ctx_init(priv, 1, SDHC_VOL_SWITCH, 0,
+				  SDHC_RSP_TYPE_R1);
 
 		ret = usdhc_xfer(priv);
 		if (!ret) {
@@ -2421,16 +2311,15 @@ APP_SEND_OP_COND_AGAIN:
 	ret = usdhc_xfer(priv);
 	if (!ret) {
 		memcpy(priv->card_info.raw_cid, cmd->response,
-			sizeof(priv->card_info.raw_cid));
-		sdhc_decode_cid(&priv->card_info.cid,
-			priv->card_info.raw_cid);
+		       sizeof(priv->card_info.raw_cid));
+		sdhc_decode_cid(&priv->card_info.cid, priv->card_info.raw_cid);
 	} else {
 		LOG_ERR("All send CID CMD failed: %d\r\n", ret);
 		return ret;
 	}
 
-	usdhc_op_ctx_init(priv, 1, SDHC_SEND_RELATIVE_ADDR,
-		0, SDHC_RSP_TYPE_R6);
+	usdhc_op_ctx_init(priv, 1, SDHC_SEND_RELATIVE_ADDR, 0,
+			  SDHC_RSP_TYPE_R6);
 
 	ret = usdhc_xfer(priv);
 	if (!ret) {
@@ -2441,23 +2330,24 @@ APP_SEND_OP_COND_AGAIN:
 	}
 
 	usdhc_op_ctx_init(priv, 1, SDHC_SEND_CSD,
-		(priv->card_info.relative_addr << 16U), SDHC_RSP_TYPE_R2);
+			  (priv->card_info.relative_addr << 16U),
+			  SDHC_RSP_TYPE_R2);
 
 	ret = usdhc_xfer(priv);
 	if (!ret) {
 		memcpy(priv->card_info.raw_csd, cmd->response,
-			sizeof(priv->card_info.raw_csd));
+		       sizeof(priv->card_info.raw_csd));
 		sdhc_decode_csd(&priv->card_info.csd, priv->card_info.raw_csd,
-			&priv->card_info.sd_block_count,
-			&priv->card_info.sd_block_size);
+				&priv->card_info.sd_block_count,
+				&priv->card_info.sd_block_size);
 	} else {
 		LOG_ERR("Send CSD CMD failed: %d\r\n", ret);
 		return ret;
 	}
 
 	usdhc_op_ctx_init(priv, 1, SDHC_SELECT_CARD,
-		priv->card_info.relative_addr << 16U,
-		SDHC_RSP_TYPE_R1);
+			  priv->card_info.relative_addr << 16U,
+			  SDHC_RSP_TYPE_R1);
 
 	ret = usdhc_xfer(priv);
 	if (ret || (cmd->response[0U] & SDHC_R1ERR_All_FLAG)) {
@@ -2470,8 +2360,8 @@ APP_SEND_OP_COND_AGAIN:
 	data->block_count = 1;
 	data->rx_data = &priv->card_info.raw_scr[0];
 	ret = usdhc_app_host_cmd(priv, 1, (priv->card_info.relative_addr << 16),
-		SDHC_APP_SEND_SCR, 0,
-		SDHC_RSP_TYPE_R1, SDHC_RSP_TYPE_R1, 0);
+				 SDHC_APP_SEND_SCR, 0, SDHC_RSP_TYPE_R1,
+				 SDHC_RSP_TYPE_R1, 0);
 
 	if (ret) {
 		LOG_ERR("Send SCR following APP CMD failed: %d\r\n", ret);
@@ -2484,26 +2374,23 @@ APP_SEND_OP_COND_AGAIN:
 			SWAP_WORD_BYTE_SEQUENCE(priv->card_info.raw_scr[0]);
 		priv->card_info.raw_scr[1] =
 			SWAP_WORD_BYTE_SEQUENCE(priv->card_info.raw_scr[1]);
-	break;
+		break;
 	case USDHC_BIG_ENDIAN:
-	break;
+		break;
 	case USDHC_HALF_WORD_BIG_ENDIAN:
-		priv->card_info.raw_scr[0U] =
-			SWAP_HALF_WROD_BYTE_SEQUENCE(
-				priv->card_info.raw_scr[0U]);
-		priv->card_info.raw_scr[1U] =
-			SWAP_HALF_WROD_BYTE_SEQUENCE(
-				priv->card_info.raw_scr[1U]);
-	break;
+		priv->card_info.raw_scr[0U] = SWAP_HALF_WROD_BYTE_SEQUENCE(
+			priv->card_info.raw_scr[0U]);
+		priv->card_info.raw_scr[1U] = SWAP_HALF_WROD_BYTE_SEQUENCE(
+			priv->card_info.raw_scr[1U]);
+		break;
 	default:
 		return -EINVAL;
 	}
 
 	sdhc_decode_scr(&priv->card_info.scr, priv->card_info.raw_scr,
-		&priv->card_info.version);
+			&priv->card_info.version);
 	if (priv->card_info.scr.sd_width & 0x4U) {
-		priv->card_info.card_flags |=
-			USDHC_4BIT_WIDTH_FLAG;
+		priv->card_info.card_flags |= USDHC_4BIT_WIDTH_FLAG;
 	}
 	/* speed class control cmd */
 	if (priv->card_info.scr.cmd_support & 0x01U) {
@@ -2512,23 +2399,22 @@ APP_SEND_OP_COND_AGAIN:
 	}
 	/* set block count cmd */
 	if (priv->card_info.scr.cmd_support & 0x02U) {
-		priv->card_info.card_flags |=
-			USDHC_SET_BLK_CNT_CMD23_FLAG;
+		priv->card_info.card_flags |= USDHC_SET_BLK_CNT_CMD23_FLAG;
 	}
 
 	/* Set to max frequency in non-high speed mode. */
-	priv->card_info.busclk_hz = usdhc_set_sd_clk(base,
-		priv->src_clk_hz, SD_CLOCK_25MHZ);
+	priv->card_info.busclk_hz =
+		usdhc_set_sd_clk(base, priv->src_clk_hz, SD_CLOCK_25MHZ);
 
 	/* Set to 4-bit data bus mode. */
 	if ((priv->host_capability.host_flags & USDHC_SUPPORT_4BIT_FLAG) &&
-		(priv->card_info.card_flags & USDHC_4BIT_WIDTH_FLAG)) {
+	    (priv->card_info.card_flags & USDHC_4BIT_WIDTH_FLAG)) {
 		usdhc_op_ctx_init(priv, 1, 0, 0, SDHC_RSP_TYPE_NONE);
 
 		ret = usdhc_app_host_cmd(priv, 1,
-				(priv->card_info.relative_addr << 16),
-				SDHC_APP_SET_BUS_WIDTH, 2,
-				SDHC_RSP_TYPE_R1, SDHC_RSP_TYPE_R1, 1);
+					 (priv->card_info.relative_addr << 16),
+					 SDHC_APP_SET_BUS_WIDTH, 2,
+					 SDHC_RSP_TYPE_R1, SDHC_RSP_TYPE_R1, 1);
 
 		if (ret) {
 			LOG_ERR("Set bus width failed: %d\r\n", ret);
@@ -2539,7 +2425,7 @@ APP_SEND_OP_COND_AGAIN:
 
 	/* set sd card driver strength */
 	ret = usdhc_select_fun(priv, SD_GRP_DRIVER_STRENGTH_MODE,
-		priv->card_info.driver_strength);
+			       priv->card_info.driver_strength);
 	if (ret) {
 		LOG_ERR("Set SD driver strehgth failed: %d\r\n", ret);
 		return ret;
@@ -2547,7 +2433,7 @@ APP_SEND_OP_COND_AGAIN:
 
 	/* set sd card current limit */
 	ret = usdhc_select_fun(priv, SD_GRP_CURRENT_LIMIT_MODE,
-		priv->card_info.max_current);
+			       priv->card_info.max_current);
 	if (ret) {
 		LOG_ERR("Set SD current limit failed: %d\r\n", ret);
 		return ret;
@@ -2555,7 +2441,7 @@ APP_SEND_OP_COND_AGAIN:
 
 	/* set block size */
 	usdhc_op_ctx_init(priv, 1, SDHC_SET_BLOCK_SIZE,
-		priv->card_info.sd_block_size, SDHC_RSP_TYPE_R1);
+			  priv->card_info.sd_block_size, SDHC_RSP_TYPE_R1);
 
 	ret = usdhc_xfer(priv);
 	if (ret || cmd->response[0U] & SDHC_R1ERR_All_FLAG) {
@@ -2573,7 +2459,8 @@ APP_SEND_OP_COND_AGAIN:
 	retry = 10;
 	ret = -EIO;
 	while (ret && retry >= 0) {
-		ret = usdhc_read_sector(priv, (uint8_t *)g_usdhc_rx_dummy, 0, 1);
+		ret = usdhc_read_sector(priv, (uint8_t *)g_usdhc_rx_dummy, 0,
+					1);
 		if (!ret) {
 			break;
 		}
@@ -2611,10 +2498,9 @@ static int usdhc_board_access_init(struct usdhc_priv *priv)
 	}
 
 	if (priv->pwr_gpio) {
-		ret = gpio_pin_configure(priv->pwr_gpio,
-				config->pwr_pin,
-				GPIO_OUTPUT_ACTIVE |
-				config->pwr_flags);
+		ret = gpio_pin_configure(priv->pwr_gpio, config->pwr_pin,
+					 GPIO_OUTPUT_ACTIVE |
+						 config->pwr_flags);
 		if (ret) {
 			return ret;
 		}
@@ -2630,10 +2516,8 @@ static int usdhc_board_access_init(struct usdhc_priv *priv)
 		return 0;
 	}
 
-	ret = usdhc_cd_gpio_init(priv->detect_gpio,
-			config->detect_pin,
-			config->detect_flags,
-			&priv->detect_cb);
+	ret = usdhc_cd_gpio_init(priv->detect_gpio, config->detect_pin,
+				 config->detect_flags, &priv->detect_cb);
 	if (ret) {
 		return ret;
 	}
@@ -2679,8 +2563,7 @@ static int usdhc_access_init(const struct device *dev)
 		return -ENODEV;
 	}
 
-	if (clock_control_get_rate(priv->clock_dev,
-				   config->clock_subsys,
+	if (clock_control_get_rate(priv->clock_dev, config->clock_subsys,
 				   &priv->src_clk_hz)) {
 		return -EINVAL;
 	}
@@ -2716,7 +2599,7 @@ static int disk_usdhc_access_status(struct disk_info *disk)
 }
 
 static int disk_usdhc_access_read(struct disk_info *disk, uint8_t *buf,
-				 uint32_t sector, uint32_t count)
+				  uint32_t sector, uint32_t count)
 {
 	const struct device *dev = disk->dev;
 	struct usdhc_priv *priv = dev->data;
@@ -2727,7 +2610,7 @@ static int disk_usdhc_access_read(struct disk_info *disk, uint8_t *buf,
 }
 
 static int disk_usdhc_access_write(struct disk_info *disk, const uint8_t *buf,
-				  uint32_t sector, uint32_t count)
+				   uint32_t sector, uint32_t count)
 {
 	const struct device *dev = disk->dev;
 	struct usdhc_priv *priv = dev->data;
@@ -2737,7 +2620,8 @@ static int disk_usdhc_access_write(struct disk_info *disk, const uint8_t *buf,
 	return usdhc_write_sector(priv, buf, sector, count);
 }
 
-static int disk_usdhc_access_ioctl(struct disk_info *disk, uint8_t cmd, void *buf)
+static int disk_usdhc_access_ioctl(struct disk_info *disk, uint8_t cmd,
+				   void *buf)
 {
 	const struct device *dev = disk->dev;
 	struct usdhc_priv *priv = dev->data;
@@ -2804,36 +2688,31 @@ static int disk_usdhc_init(const struct device *dev)
 	return disk_access_register(&usdhc_disk);
 }
 
-#define DISK_ACCESS_USDHC_INIT(n)					\
-	static const struct usdhc_config usdhc_config_##n = {		\
-		.base = (USDHC_Type  *) DT_INST_REG_ADDR(n),		\
-		.clock_name = DT_INST_CLOCKS_LABEL(n),			\
-		.clock_subsys =						\
-		(clock_control_subsys_t)DT_INST_CLOCKS_CELL(n, name),	\
-		.nusdhc = n,						\
-		.pwr_name = DT_INST_GPIO_LABEL(n, pwr_gpios),		\
-		.pwr_pin = DT_INST_GPIO_PIN(n, pwr_gpios),		\
-		.pwr_flags = DT_INST_GPIO_FLAGS(n, pwr_gpios),		\
-		.detect_name = DT_INST_GPIO_LABEL(n, cd_gpios),		\
-		.detect_pin = DT_INST_GPIO_PIN(n, cd_gpios),		\
-		.detect_flags = DT_INST_GPIO_FLAGS(n, cd_gpios),	\
-		.data_timeout = USDHC_DATA_TIMEOUT,			\
-		.endian = USDHC_LITTLE_ENDIAN,				\
-		.read_watermark = USDHC_READ_WATERMARK_LEVEL,		\
-		.write_watermark =  USDHC_WRITE_WATERMARK_LEVEL,	\
-		.read_burst_len = USDHC_READ_BURST_LEN,			\
-		.write_burst_len = USDHC_WRITE_BURST_LEN,		\
-	};								\
-									\
-	static struct usdhc_priv usdhc_priv_##n;			\
-									\
-	DEVICE_AND_API_INIT(usdhc_dev##n,				\
-			    DT_INST_LABEL(n),				\
-			    &disk_usdhc_init,				\
-			    &usdhc_priv_##n,				\
-			    &usdhc_config_##n,				\
-			    APPLICATION,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
-			    NULL);
+#define DISK_ACCESS_USDHC_INIT(n)                                             \
+	static const struct usdhc_config usdhc_config_##n = {                 \
+		.base = (USDHC_Type *)DT_INST_REG_ADDR(n),                    \
+		.clock_name = DT_INST_CLOCKS_LABEL(n),                        \
+		.clock_subsys =                                               \
+			(clock_control_subsys_t)DT_INST_CLOCKS_CELL(n, name), \
+		.nusdhc = n,                                                  \
+		.pwr_name = DT_INST_GPIO_LABEL(n, pwr_gpios),                 \
+		.pwr_pin = DT_INST_GPIO_PIN(n, pwr_gpios),                    \
+		.pwr_flags = DT_INST_GPIO_FLAGS(n, pwr_gpios),                \
+		.detect_name = DT_INST_GPIO_LABEL(n, cd_gpios),               \
+		.detect_pin = DT_INST_GPIO_PIN(n, cd_gpios),                  \
+		.detect_flags = DT_INST_GPIO_FLAGS(n, cd_gpios),              \
+		.data_timeout = USDHC_DATA_TIMEOUT,                           \
+		.endian = USDHC_LITTLE_ENDIAN,                                \
+		.read_watermark = USDHC_READ_WATERMARK_LEVEL,                 \
+		.write_watermark = USDHC_WRITE_WATERMARK_LEVEL,               \
+		.read_burst_len = USDHC_READ_BURST_LEN,                       \
+		.write_burst_len = USDHC_WRITE_BURST_LEN,                     \
+	};                                                                    \
+                                                                              \
+	static struct usdhc_priv usdhc_priv_##n;                              \
+                                                                              \
+	DEVICE_AND_API_INIT(usdhc_dev##n, DT_INST_LABEL(n), &disk_usdhc_init, \
+			    &usdhc_priv_##n, &usdhc_config_##n, APPLICATION,  \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(DISK_ACCESS_USDHC_INIT)

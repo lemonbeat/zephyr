@@ -36,7 +36,6 @@ struct flash_sector test_fcb_sector[] = {
 	}
 };
 
-
 void test_fcb_wipe(void)
 {
 	int i;
@@ -77,13 +76,13 @@ int fcb_test_data_walk_cb(struct fcb_entry_ctx *entry_ctx, void *arg)
 	zassert_true(len == *var_cnt, "");
 
 	rc = flash_area_read(entry_ctx->fap,
-			     FCB_ENTRY_FA_DATA_OFF(entry_ctx->loc),
-			     test_data, len);
+			     FCB_ENTRY_FA_DATA_OFF(entry_ctx->loc), test_data,
+			     len);
 	zassert_true(rc == 0, "read call failure");
 
 	for (i = 0; i < len; i++) {
 		zassert_true(test_data[i] == fcb_test_append_data(len, i),
-		"fcb_test_append_data redout misrepresentation");
+			     "fcb_test_append_data redout misrepresentation");
 	}
 	(*var_cnt)++;
 	return 0;
@@ -175,8 +174,7 @@ void test_main(void)
 			  * flash.bin file without any random content */
 			 ztest_unit_test_setup_teardown(test_fcb_reset,
 							fcb_pretest_2_sectors,
-							teardown_nothing)
-			 );
+							teardown_nothing));
 
 	ztest_run_test_suite(test_fcb);
 }

@@ -18,41 +18,41 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "lwm2m_engine.h"
 
 /* Security resource IDs */
-#define SECURITY_SERVER_URI_ID			0
-#define SECURITY_BOOTSTRAP_FLAG_ID		1
-#define SECURITY_MODE_ID			2
-#define SECURITY_CLIENT_PK_ID			3
-#define SECURITY_SERVER_PK_ID			4
-#define SECURITY_SECRET_KEY_ID			5
-#define SECURITY_SMS_MODE_ID			6
-#define SECURITY_SMS_BINDING_KEY_PARAM_ID	7
-#define SECURITY_SMS_BINDING_SECRET_KEY_ID	8
-#define SECURITY_LWM2M_SERVER_SMS_NUM_ID	9
-#define SECURITY_SHORT_SERVER_ID		10
-#define SECURITY_CLIENT_HOLD_OFF_TIME_ID	11
-#define SECURITY_BS_SERVER_ACCOUNT_TIMEOUT_ID	12
+#define SECURITY_SERVER_URI_ID 0
+#define SECURITY_BOOTSTRAP_FLAG_ID 1
+#define SECURITY_MODE_ID 2
+#define SECURITY_CLIENT_PK_ID 3
+#define SECURITY_SERVER_PK_ID 4
+#define SECURITY_SECRET_KEY_ID 5
+#define SECURITY_SMS_MODE_ID 6
+#define SECURITY_SMS_BINDING_KEY_PARAM_ID 7
+#define SECURITY_SMS_BINDING_SECRET_KEY_ID 8
+#define SECURITY_LWM2M_SERVER_SMS_NUM_ID 9
+#define SECURITY_SHORT_SERVER_ID 10
+#define SECURITY_CLIENT_HOLD_OFF_TIME_ID 11
+#define SECURITY_BS_SERVER_ACCOUNT_TIMEOUT_ID 12
 
-#define SECURITY_MAX_ID				13
+#define SECURITY_MAX_ID 13
 
-#define MAX_INSTANCE_COUNT		CONFIG_LWM2M_SECURITY_INSTANCE_COUNT
+#define MAX_INSTANCE_COUNT CONFIG_LWM2M_SECURITY_INSTANCE_COUNT
 
-#define SECURITY_URI_LEN		255
-#define IDENTITY_LEN			128
-#define KEY_LEN				CONFIG_LWM2M_SECURITY_KEY_SIZE
+#define SECURITY_URI_LEN 255
+#define IDENTITY_LEN 128
+#define KEY_LEN CONFIG_LWM2M_SECURITY_KEY_SIZE
 
 /*
  * Calculate resource instances as follows:
  * start with SECURITY_MAX_ID
  */
-#define RESOURCE_INSTANCE_COUNT	(SECURITY_MAX_ID)
+#define RESOURCE_INSTANCE_COUNT (SECURITY_MAX_ID)
 
 /* resource state variables */
-static char  security_uri[MAX_INSTANCE_COUNT][SECURITY_URI_LEN];
-static uint8_t  client_identity[MAX_INSTANCE_COUNT][IDENTITY_LEN];
-static uint8_t  server_pk[MAX_INSTANCE_COUNT][KEY_LEN];
-static uint8_t  secret_key[MAX_INSTANCE_COUNT][KEY_LEN];
-static bool  bootstrap_flag[MAX_INSTANCE_COUNT];
-static uint8_t  security_mode[MAX_INSTANCE_COUNT];
+static char security_uri[MAX_INSTANCE_COUNT][SECURITY_URI_LEN];
+static uint8_t client_identity[MAX_INSTANCE_COUNT][IDENTITY_LEN];
+static uint8_t server_pk[MAX_INSTANCE_COUNT][KEY_LEN];
+static uint8_t secret_key[MAX_INSTANCE_COUNT][KEY_LEN];
+static bool bootstrap_flag[MAX_INSTANCE_COUNT];
+static uint8_t security_mode[MAX_INSTANCE_COUNT];
 static uint16_t short_server_id[MAX_INSTANCE_COUNT];
 
 static struct lwm2m_engine_obj security;
@@ -74,8 +74,8 @@ static struct lwm2m_engine_obj_field fields[] = {
 
 static struct lwm2m_engine_obj_inst inst[MAX_INSTANCE_COUNT];
 static struct lwm2m_engine_res res[MAX_INSTANCE_COUNT][SECURITY_MAX_ID];
-static struct lwm2m_engine_res_inst
-			res_inst[MAX_INSTANCE_COUNT][RESOURCE_INSTANCE_COUNT];
+static struct lwm2m_engine_res_inst res_inst[MAX_INSTANCE_COUNT]
+					    [RESOURCE_INSTANCE_COUNT];
 
 static struct lwm2m_engine_obj_inst *security_create(uint16_t obj_inst_id)
 {
@@ -85,7 +85,8 @@ static struct lwm2m_engine_obj_inst *security_create(uint16_t obj_inst_id)
 	for (index = 0; index < MAX_INSTANCE_COUNT; index++) {
 		if (inst[index].obj && inst[index].obj_inst_id == obj_inst_id) {
 			LOG_ERR("Can not create instance - "
-				"already existing: %u", obj_inst_id);
+				"already existing: %u",
+				obj_inst_id);
 			return NULL;
 		}
 	}
@@ -98,7 +99,8 @@ static struct lwm2m_engine_obj_inst *security_create(uint16_t obj_inst_id)
 
 	if (index >= MAX_INSTANCE_COUNT) {
 		LOG_ERR("Can not create instance - "
-			"no more room: %u", obj_inst_id);
+			"no more room: %u",
+			obj_inst_id);
 		return NULL;
 	}
 
@@ -115,26 +117,22 @@ static struct lwm2m_engine_obj_inst *security_create(uint16_t obj_inst_id)
 
 	/* initialize instance resource data */
 	INIT_OBJ_RES_DATA(SECURITY_SERVER_URI_ID, res[index], i,
-			  res_inst[index], j,
-			  security_uri[index], SECURITY_URI_LEN);
+			  res_inst[index], j, security_uri[index],
+			  SECURITY_URI_LEN);
 	INIT_OBJ_RES_DATA(SECURITY_BOOTSTRAP_FLAG_ID, res[index], i,
-			  res_inst[index], j,
-			  &bootstrap_flag[index], sizeof(*bootstrap_flag));
-	INIT_OBJ_RES_DATA(SECURITY_MODE_ID, res[index], i,
-			  res_inst[index], j,
+			  res_inst[index], j, &bootstrap_flag[index],
+			  sizeof(*bootstrap_flag));
+	INIT_OBJ_RES_DATA(SECURITY_MODE_ID, res[index], i, res_inst[index], j,
 			  &security_mode[index], sizeof(*security_mode));
-	INIT_OBJ_RES_DATA(SECURITY_CLIENT_PK_ID, res[index], i,
-			  res_inst[index], j,
-			  &client_identity[index], IDENTITY_LEN);
-	INIT_OBJ_RES_DATA(SECURITY_SERVER_PK_ID, res[index], i,
-			  res_inst[index], j,
-			  &server_pk[index], KEY_LEN);
+	INIT_OBJ_RES_DATA(SECURITY_CLIENT_PK_ID, res[index], i, res_inst[index],
+			  j, &client_identity[index], IDENTITY_LEN);
+	INIT_OBJ_RES_DATA(SECURITY_SERVER_PK_ID, res[index], i, res_inst[index],
+			  j, &server_pk[index], KEY_LEN);
 	INIT_OBJ_RES_DATA(SECURITY_SECRET_KEY_ID, res[index], i,
-			  res_inst[index], j,
-			  &secret_key[index], KEY_LEN);
+			  res_inst[index], j, &secret_key[index], KEY_LEN);
 	INIT_OBJ_RES_DATA(SECURITY_SHORT_SERVER_ID, res[index], i,
-			  res_inst[index], j,
-			  &short_server_id[index], sizeof(*short_server_id));
+			  res_inst[index], j, &short_server_id[index],
+			  sizeof(*short_server_id));
 
 	inst[index].resources = res[index];
 	inst[index].resource_count = i;

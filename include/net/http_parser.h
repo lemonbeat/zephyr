@@ -58,12 +58,11 @@ extern "C" {
  * to a very large number (e.g. -DHTTP_MAX_HEADER_SIZE=0x7fffffff)
  */
 #ifndef HTTP_MAX_HEADER_SIZE
-# define HTTP_MAX_HEADER_SIZE (80 * 1024)
+#define HTTP_MAX_HEADER_SIZE (80 * 1024)
 #endif
 
 struct http_parser;
 struct http_parser_settings;
-
 
 /* Callbacks should return non-zero to indicate an error. The parser will
  * then halt execution.
@@ -127,14 +126,14 @@ enum http_parser_type { HTTP_REQUEST, HTTP_RESPONSE, HTTP_BOTH };
 
 /* Flag values for http_parser.flags field */
 enum flags {
-	F_CHUNKED               = 1 << 0,
+	F_CHUNKED = 1 << 0,
 	F_CONNECTION_KEEP_ALIVE = 1 << 1,
-	F_CONNECTION_CLOSE      = 1 << 2,
-	F_CONNECTION_UPGRADE    = 1 << 3,
-	F_TRAILING              = 1 << 4,
-	F_UPGRADE               = 1 << 5,
-	F_SKIPBODY              = 1 << 6,
-	F_CONTENTLENGTH         = 1 << 7
+	F_CONNECTION_CLOSE = 1 << 2,
+	F_CONNECTION_UPGRADE = 1 << 3,
+	F_TRAILING = 1 << 4,
+	F_UPGRADE = 1 << 5,
+	F_SKIPBODY = 1 << 6,
+	F_CONTENTLENGTH = 1 << 7
 };
 
 enum http_errno {
@@ -174,22 +173,21 @@ enum http_errno {
 };
 
 /* Get an http_errno value from an http_parser */
-#define HTTP_PARSER_ERRNO(p)            ((enum http_errno) (p)->http_errno)
-
+#define HTTP_PARSER_ERRNO(p) ((enum http_errno)(p)->http_errno)
 
 struct http_parser {
 	/** PRIVATE **/
-	unsigned int type : 2;         /* enum http_parser_type */
-	unsigned int flags : 8;		/* F_xxx values from 'flags' enum;
+	unsigned int type : 2; /* enum http_parser_type */
+	unsigned int flags : 8; /* F_xxx values from 'flags' enum;
 					 * semi-public
 					 */
-	unsigned int state : 7;        /* enum state from http_parser.c */
+	unsigned int state : 7; /* enum state from http_parser.c */
 	unsigned int header_state : 7; /* enum header_state from http_parser.c
 					*/
-	unsigned int index : 7;        /* index into current matcher */
+	unsigned int index : 7; /* index into current matcher */
 	unsigned int lenient_http_headers : 1;
 
-	uint32_t nread;          /* # bytes read in various scenarios */
+	uint32_t nread; /* # bytes read in various scenarios */
 	uint64_t content_length; /* # bytes in body (0 if no Content-Length
 				  * header)
 				  */
@@ -197,7 +195,7 @@ struct http_parser {
 	unsigned short http_major;
 	unsigned short http_minor;
 	unsigned int status_code : 16; /* responses only */
-	unsigned int method : 8;       /* requests only */
+	unsigned int method : 8; /* requests only */
 	unsigned int http_errno : 7;
 
 	/* 1 = Upgrade header was present and the parser has exited because of
@@ -219,23 +217,21 @@ struct http_parser {
 	const struct sockaddr *addr;
 };
 
-
 struct http_parser_settings {
-	http_cb      on_message_begin;
+	http_cb on_message_begin;
 	http_data_cb on_url;
 	http_data_cb on_status;
 	http_data_cb on_header_field;
 	http_data_cb on_header_value;
-	http_cb      on_headers_complete;
+	http_cb on_headers_complete;
 	http_data_cb on_body;
-	http_cb      on_message_complete;
+	http_cb on_message_complete;
 	/* When on_chunk_header is called, the current chunk length is stored
 	 * in parser->content_length.
 	 */
-	http_cb      on_chunk_header;
-	http_cb      on_chunk_complete;
+	http_cb on_chunk_header;
+	http_cb on_chunk_complete;
 };
-
 
 /* Returns the library version. Bits 16-23 contain the major version number,
  * bits 8-15 the minor version number and bits 0-7 the patch level.
@@ -251,11 +247,9 @@ unsigned long http_parser_version(void);
 
 void http_parser_init(struct http_parser *parser, enum http_parser_type type);
 
-
 /* Initialize http_parser_settings members to 0
  */
 void http_parser_settings_init(struct http_parser_settings *settings);
-
 
 /* Executes the parser. Returns number of parsed bytes. Sets
  * `parser->http_errno` on error.

@@ -17,18 +17,18 @@ static int console_out(int c)
 {
 	char buf[16];
 
-	register int a2 __asm__ ("a2") = SYS_write;
-	register int a3 __asm__ ("a3") = 1;
-	register char *a4 __asm__ ("a4") = buf;
-	register int a5 __asm__ ("a5") = 1;
-	register int ret_val __asm__ ("a2");
-	register int ret_err __asm__ ("a3");
+	register int a2 __asm__("a2") = SYS_write;
+	register int a3 __asm__("a3") = 1;
+	register char *a4 __asm__("a4") = buf;
+	register int a5 __asm__("a5") = 1;
+	register int ret_val __asm__("a2");
+	register int ret_err __asm__("a3");
 
 	buf[0] = (char)c;
-	__asm__ volatile ("simcall"
-				: "=a" (ret_val), "=a" (ret_err)
-				: "a" (a2), "a" (a3), "a" (a4), "a" (a5)
-				: "memory");
+	__asm__ volatile("simcall"
+			 : "=a"(ret_val), "=a"(ret_err)
+			 : "a"(a2), "a"(a3), "a"(a4), "a"(a5)
+			 : "memory");
 	return c;
 }
 #endif
@@ -36,16 +36,16 @@ static int console_out(int c)
 #if defined(CONFIG_STDOUT_CONSOLE)
 extern void __stdout_hook_install(int (*hook)(int));
 #else
-#define __stdout_hook_install(x)		\
-	do {/* nothing */			\
+#define __stdout_hook_install(x) \
+	do { /* nothing */       \
 	} while ((0))
 #endif
 
 #if defined(CONFIG_PRINTK)
 extern void __printk_hook_install(int (*fn)(int));
 #else
-#define __printk_hook_install(x)		\
-	do {/* nothing */			\
+#define __printk_hook_install(x) \
+	do { /* nothing */       \
 	} while ((0))
 #endif
 

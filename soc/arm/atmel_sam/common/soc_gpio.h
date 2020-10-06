@@ -23,74 +23,74 @@
  * in gpio.h, once the official API is clean.
  */
 
-#define SOC_GPIO_DEFAULT                (0)
+#define SOC_GPIO_DEFAULT (0)
 
-#define SOC_GPIO_FLAGS_POS              (0)
-#define SOC_GPIO_FLAGS_MASK             (7 << SOC_GPIO_FLAGS_POS)
-#define SOC_GPIO_PULLUP_POS             (0)
-#define SOC_GPIO_PULLUP                 (1 << SOC_GPIO_PULLUP_POS)
-#define SOC_GPIO_PULLDOWN_POS           (1)
-#define SOC_GPIO_PULLDOWN               (1 << SOC_GPIO_PULLDOWN_POS)
-#define SOC_GPIO_OPENDRAIN_POS          (2)
-#define SOC_GPIO_OPENDRAIN              (1 << SOC_GPIO_OPENDRAIN_POS)
+#define SOC_GPIO_FLAGS_POS (0)
+#define SOC_GPIO_FLAGS_MASK (7 << SOC_GPIO_FLAGS_POS)
+#define SOC_GPIO_PULLUP_POS (0)
+#define SOC_GPIO_PULLUP (1 << SOC_GPIO_PULLUP_POS)
+#define SOC_GPIO_PULLDOWN_POS (1)
+#define SOC_GPIO_PULLDOWN (1 << SOC_GPIO_PULLDOWN_POS)
+#define SOC_GPIO_OPENDRAIN_POS (2)
+#define SOC_GPIO_OPENDRAIN (1 << SOC_GPIO_OPENDRAIN_POS)
 
 /* Bit field: SOC_GPIO_IN_FILTER */
-#define SOC_GPIO_IN_FILTER_POS          (3)
-#define SOC_GPIO_IN_FILTER_MASK         (3 << SOC_GPIO_IN_FILTER_POS)
-#define SOC_GPIO_IN_FILTER_NONE         (0 << SOC_GPIO_IN_FILTER_POS)
-#define SOC_GPIO_IN_FILTER_DEBOUNCE     (1 << SOC_GPIO_IN_FILTER_POS)
-#define SOC_GPIO_IN_FILTER_DEGLITCH     (2 << SOC_GPIO_IN_FILTER_POS)
+#define SOC_GPIO_IN_FILTER_POS (3)
+#define SOC_GPIO_IN_FILTER_MASK (3 << SOC_GPIO_IN_FILTER_POS)
+#define SOC_GPIO_IN_FILTER_NONE (0 << SOC_GPIO_IN_FILTER_POS)
+#define SOC_GPIO_IN_FILTER_DEBOUNCE (1 << SOC_GPIO_IN_FILTER_POS)
+#define SOC_GPIO_IN_FILTER_DEGLITCH (2 << SOC_GPIO_IN_FILTER_POS)
 
-#define SOC_GPIO_INT_ENABLE             (1 << 5)
+#define SOC_GPIO_INT_ENABLE (1 << 5)
 
 /* Bit field: SOC_GPIO_INT_TRIG */
-#define SOC_GPIO_INT_TRIG_POS           (6)
-#define SOC_GPIO_INT_TRIG_MASK          (3 << SOC_GPIO_INT_TRIG_POS)
+#define SOC_GPIO_INT_TRIG_POS (6)
+#define SOC_GPIO_INT_TRIG_MASK (3 << SOC_GPIO_INT_TRIG_POS)
 /** Interrupt is triggered by a level detection event. */
-#define SOC_GPIO_INT_TRIG_LEVEL         (0 << SOC_GPIO_INT_TRIG_POS)
+#define SOC_GPIO_INT_TRIG_LEVEL (0 << SOC_GPIO_INT_TRIG_POS)
 /** Interrupt is triggered by an edge detection event. */
-#define SOC_GPIO_INT_TRIG_EDGE          (1 << SOC_GPIO_INT_TRIG_POS)
+#define SOC_GPIO_INT_TRIG_EDGE (1 << SOC_GPIO_INT_TRIG_POS)
 /** Interrupt is triggered by any edge detection event. */
-#define SOC_GPIO_INT_TRIG_DOUBLE_EDGE   (2 << SOC_GPIO_INT_TRIG_POS)
+#define SOC_GPIO_INT_TRIG_DOUBLE_EDGE (2 << SOC_GPIO_INT_TRIG_POS)
 
 /** Interrupt is triggered by a high level / rising edge detection event */
-#define SOC_GPIO_INT_ACTIVE_HIGH        (1 << 8)
+#define SOC_GPIO_INT_ACTIVE_HIGH (1 << 8)
 
 /* Bit field: SOC_GPIO_FUNC */
-#define SOC_GPIO_FUNC_POS               (16)
-#define SOC_GPIO_FUNC_MASK              (15 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_POS (16)
+#define SOC_GPIO_FUNC_MASK (15 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral A. */
-#define SOC_GPIO_FUNC_A                 (0 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_A (0 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral B. */
-#define SOC_GPIO_FUNC_B                 (1 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_B (1 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral C. */
-#define SOC_GPIO_FUNC_C                 (2 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_C (2 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral D. */
-#define SOC_GPIO_FUNC_D                 (3 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_D (3 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral E. */
-#define SOC_GPIO_FUNC_E                 (4 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_E (4 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral F. */
-#define SOC_GPIO_FUNC_F                 (5 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_F (5 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral G. */
-#define SOC_GPIO_FUNC_G                 (6 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_G (6 << SOC_GPIO_FUNC_POS)
 /** Connect pin to peripheral H. */
-#define SOC_GPIO_FUNC_H                 (7 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_H (7 << SOC_GPIO_FUNC_POS)
 /** Configure pin as input. */
-#define SOC_GPIO_FUNC_IN                (8 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_IN (8 << SOC_GPIO_FUNC_POS)
 /** Configure pin as output and set it initial value to 0. */
-#define SOC_GPIO_FUNC_OUT_0             (9 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_OUT_0 (9 << SOC_GPIO_FUNC_POS)
 /** Configure pin as output and set it initial value to 1. */
-#define SOC_GPIO_FUNC_OUT_1             (10 << SOC_GPIO_FUNC_POS)
+#define SOC_GPIO_FUNC_OUT_1 (10 << SOC_GPIO_FUNC_POS)
 
 struct soc_gpio_pin {
-	uint32_t mask;     /** pin(s) bit mask */
+	uint32_t mask; /** pin(s) bit mask */
 #ifdef ID_GPIO
-	Gpio *regs;        /** pointer to registers of the GPIO controller */
+	Gpio *regs; /** pointer to registers of the GPIO controller */
 #else
-	Pio *regs;         /** pointer to registers of the PIO controller */
+	Pio *regs; /** pointer to registers of the PIO controller */
 #endif
 	uint8_t periph_id; /** peripheral ID of the PIO controller */
-	uint32_t flags;    /** pin flags/attributes */
+	uint32_t flags; /** pin flags/attributes */
 };
 
 /**

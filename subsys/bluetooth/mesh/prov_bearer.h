@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define PROTOCOL_TIMEOUT     K_SECONDS(60)
+#define PROTOCOL_TIMEOUT K_SECONDS(60)
 
 /** @def PROV_BEARER_BUF_HEADROOM
  *
@@ -28,7 +28,6 @@ struct prov_bearer;
 
 /** Callbacks from bearer to host */
 struct prov_bearer_cb {
-
 	void (*link_opened)(const struct prov_bearer *bearer, void *cb_data);
 
 	void (*link_closed)(const struct prov_bearer *bearer, void *cb_data,

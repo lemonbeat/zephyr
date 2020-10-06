@@ -20,9 +20,9 @@
  */
 
 /** GPIO pin is active (has logical value '1') in low state. */
-#define GPIO_ACTIVE_LOW         (1 << 0)
+#define GPIO_ACTIVE_LOW (1 << 0)
 /** GPIO pin is active (has logical value '1') in high state. */
-#define GPIO_ACTIVE_HIGH        (0 << 0)
+#define GPIO_ACTIVE_HIGH (0 << 0)
 
 /** @} */
 
@@ -34,14 +34,14 @@
 /** @cond INTERNAL_HIDDEN */
 
 /* Configures GPIO output in single-ended mode (open drain or open source). */
-#define GPIO_SINGLE_ENDED       (1 << 1)
+#define GPIO_SINGLE_ENDED (1 << 1)
 /* Configures GPIO output in push-pull mode */
-#define GPIO_PUSH_PULL          (0 << 1)
+#define GPIO_PUSH_PULL (0 << 1)
 
 /* Indicates single ended open drain mode (wired AND). */
-#define GPIO_LINE_OPEN_DRAIN    (1 << 2)
+#define GPIO_LINE_OPEN_DRAIN (1 << 2)
 /* Indicates single ended open source mode (wired OR). */
-#define GPIO_LINE_OPEN_SOURCE   (0 << 2)
+#define GPIO_LINE_OPEN_SOURCE (0 << 2)
 
 /** @endcond */
 
@@ -51,7 +51,7 @@
  * configuration which behaves like a switch that is either connected to ground
  * or disconnected.
  */
-#define GPIO_OPEN_DRAIN         (GPIO_SINGLE_ENDED | GPIO_LINE_OPEN_DRAIN)
+#define GPIO_OPEN_DRAIN (GPIO_SINGLE_ENDED | GPIO_LINE_OPEN_DRAIN)
 /** Configures GPIO output in open source mode (wired OR).
  *
  * @note 'Open Source' is a term used by software engineers to describe output
@@ -59,7 +59,7 @@
  * connected to power supply or disconnected. There exist no corresponding
  * hardware schematic and the term is generally unknown to hardware engineers.
  */
-#define GPIO_OPEN_SOURCE        (GPIO_SINGLE_ENDED | GPIO_LINE_OPEN_SOURCE)
+#define GPIO_OPEN_SOURCE (GPIO_SINGLE_ENDED | GPIO_LINE_OPEN_SOURCE)
 
 /** @} */
 
@@ -69,10 +69,10 @@
  */
 
 /** Enables GPIO pin pull-up. */
-#define GPIO_PULL_UP            (1 << 4)
+#define GPIO_PULL_UP (1 << 4)
 
 /** Enable GPIO pin pull-down. */
-#define GPIO_PULL_DOWN          (1 << 5)
+#define GPIO_PULL_DOWN (1 << 5)
 
 /** @} */
 

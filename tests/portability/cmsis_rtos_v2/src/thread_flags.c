@@ -11,12 +11,12 @@
 #include <irq_offload.h>
 #include <kernel_structs.h>
 
-#define TIMEOUT_TICKS   (10)
-#define FLAG1           (0x00000020)
-#define FLAG2           (0x00000004)
-#define FLAG            (FLAG1 | FLAG2)
-#define ISR_FLAG        (0x50)
-#define STACKSZ         CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
+#define TIMEOUT_TICKS (10)
+#define FLAG1 (0x00000020)
+#define FLAG2 (0x00000004)
+#define FLAG (FLAG1 | FLAG2)
+#define ISR_FLAG (0x50)
+#define STACKSZ CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
 
 static void thread1(void *arg)
 {
@@ -146,8 +146,8 @@ void test_thread_flags_from_isr(void *thread_id)
 	irq_offload(offload_function, (const void *)osThreadGetId());
 
 	flags = osThreadFlagsWait(ISR_FLAG, osFlagsWaitAll, TIMEOUT_TICKS);
-	zassert_equal((flags & ISR_FLAG),
-		      ISR_FLAG, "unexpected Thread flags value");
+	zassert_equal((flags & ISR_FLAG), ISR_FLAG,
+		      "unexpected Thread flags value");
 }
 
 static K_THREAD_STACK_DEFINE(test_stack3, STACKSZ);

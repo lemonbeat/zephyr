@@ -44,7 +44,7 @@ static void sntp_pkt_dump(struct sntp_pkt *pkt)
 }
 
 static int32_t parse_response(uint8_t *data, uint16_t len, uint32_t orig_ts,
-			    struct sntp_time *time)
+			      struct sntp_time *time)
 {
 	struct sntp_pkt *pkt = (struct sntp_pkt *)data;
 	uint32_t ts;
@@ -126,8 +126,7 @@ static int sntp_recv_response(struct sntp_ctx *sntp, uint32_t timeout,
 	}
 
 	status = parse_response((uint8_t *)&buf, sizeof(buf),
-				sntp->expected_orig_ts,
-				time);
+				sntp->expected_orig_ts, time);
 	return status;
 }
 

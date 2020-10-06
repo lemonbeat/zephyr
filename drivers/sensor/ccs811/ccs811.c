@@ -29,9 +29,9 @@ static void set_wake(struct ccs811_data *drv_data, bool enable)
 {
 	gpio_pin_set(drv_data->wake_gpio, WAKE_PIN, enable);
 	if (enable) {
-		k_busy_wait(50);        /* t_WAKE = 50 us */
+		k_busy_wait(50); /* t_WAKE = 50 us */
 	} else {
-		k_busy_wait(20);        /* t_DWAKE = 20 us */
+		k_busy_wait(20); /* t_DWAKE = 20 us */
 	}
 }
 #else
@@ -47,8 +47,8 @@ static int fetch_status(const struct device *i2c)
 	uint8_t status;
 	int rv;
 
-	if (i2c_reg_read_byte(i2c, DT_INST_REG_ADDR(0),
-			      CCS811_REG_STATUS, &status) < 0) {
+	if (i2c_reg_read_byte(i2c, DT_INST_REG_ADDR(0), CCS811_REG_STATUS,
+			      &status) < 0) {
 		LOG_ERR("Failed to read Status register");
 		return -EIO;
 	}
@@ -94,13 +94,13 @@ int ccs811_configver_fetch(const struct device *dev,
 
 	set_wake(drv_data, true);
 	cmd = CCS811_REG_HW_VERSION;
-	rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-			    &cmd, sizeof(cmd),
-			    &ptr->hw_version, sizeof(ptr->hw_version));
+	rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0), &cmd,
+			    sizeof(cmd), &ptr->hw_version,
+			    sizeof(ptr->hw_version));
 	if (rc == 0) {
 		cmd = CCS811_REG_FW_BOOT_VERSION;
-		rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-				    &cmd, sizeof(cmd),
+		rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0), &cmd,
+				    sizeof(cmd),
 				    (uint8_t *)&ptr->fw_boot_version,
 				    sizeof(ptr->fw_boot_version));
 		ptr->fw_boot_version = sys_be16_to_cpu(ptr->fw_boot_version);
@@ -108,16 +108,15 @@ int ccs811_configver_fetch(const struct device *dev,
 
 	if (rc == 0) {
 		cmd = CCS811_REG_FW_APP_VERSION;
-		rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-				    &cmd, sizeof(cmd),
+		rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0), &cmd,
+				    sizeof(cmd),
 				    (uint8_t *)&ptr->fw_app_version,
 				    sizeof(ptr->fw_app_version));
 		ptr->fw_app_version = sys_be16_to_cpu(ptr->fw_app_version);
 	}
 	if (rc == 0) {
-		LOG_INF("HW %x FW %x APP %x",
-			ptr->hw_version, ptr->fw_boot_version,
-			ptr->fw_app_version);
+		LOG_INF("HW %x FW %x APP %x", ptr->hw_version,
+			ptr->fw_boot_version, ptr->fw_app_version);
 	}
 
 	set_wake(drv_data, false);
@@ -135,9 +134,9 @@ int ccs811_baseline_fetch(const struct device *dev)
 
 	set_wake(drv_data, true);
 
-	rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-			    &cmd, sizeof(cmd),
-			    (uint8_t *)&baseline, sizeof(baseline));
+	rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0), &cmd,
+			    sizeof(cmd), (uint8_t *)&baseline,
+			    sizeof(baseline));
 	set_wake(drv_data, false);
 	if (rc <= 0) {
 		rc = baseline;
@@ -146,8 +145,7 @@ int ccs811_baseline_fetch(const struct device *dev)
 	return rc;
 }
 
-int ccs811_baseline_update(const struct device *dev,
-			   uint16_t baseline)
+int ccs811_baseline_update(const struct device *dev, uint16_t baseline)
 {
 	struct ccs811_data *drv_data = dev->data;
 	uint8_t buf[1 + sizeof(baseline)];
@@ -190,8 +188,8 @@ int ccs811_envdata_update(const struct device *dev,
 		} else if (value > (2 * 100)) {
 			value = 2 * 100;
 		}
-		LOG_DBG("HUM %d.%06d becomes %d",
-			humidity->val1, humidity->val2, value);
+		LOG_DBG("HUM %d.%06d becomes %d", humidity->val1,
+			humidity->val2, value);
 		buf[1] = value;
 	} else {
 		buf[1] = 2 * 50;
@@ -216,8 +214,8 @@ int ccs811_envdata_update(const struct device *dev,
 		} else {
 			value += 2 * 25;
 		}
-		LOG_DBG("TEMP %d.%06d becomes %d",
-			temperature->val1, temperature->val2, value);
+		LOG_DBG("TEMP %d.%06d becomes %d", temperature->val1,
+			temperature->val2, value);
 		buf[3] = value;
 	} else {
 		buf[3] = 2 * (25 + 25);
@@ -240,9 +238,8 @@ static int ccs811_sample_fetch(const struct device *dev,
 	unsigned int status;
 
 	set_wake(drv_data, true);
-	rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-			    &cmd, sizeof(cmd),
-			    (uint8_t *)buf, sizeof(buf));
+	rc = i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0), &cmd,
+			    sizeof(cmd), (uint8_t *)buf, sizeof(buf));
 	set_wake(drv_data, false);
 	if (rc < 0) {
 		return -EIO;
@@ -260,8 +257,7 @@ static int ccs811_sample_fetch(const struct device *dev,
 	 * old firmware is valid for the purposes of claiming the
 	 * fetch was fresh.
 	 */
-	if ((drv_data->app_fw_ver <= 0x11)
-	    && (rp->co2 != 0)) {
+	if ((drv_data->app_fw_ver <= 0x11) && (rp->co2 != 0)) {
 		status |= CCS811_STATUS_DATA_READY;
 	}
 	return (status & CCS811_STATUS_DATA_READY) ? 0 : -EAGAIN;
@@ -290,8 +286,9 @@ static int ccs811_channel_get(const struct device *dev,
 		/*
 		 * Raw ADC readings are contained in least significant 10 bits
 		 */
-		uval = ((rp->raw & CCS811_RAW_VOLTAGE_MSK)
-			>> CCS811_RAW_VOLTAGE_POS) * CCS811_RAW_VOLTAGE_SCALE;
+		uval = ((rp->raw & CCS811_RAW_VOLTAGE_MSK) >>
+			CCS811_RAW_VOLTAGE_POS) *
+		       CCS811_RAW_VOLTAGE_SCALE;
 		val->val1 = uval / 1000000U;
 		val->val2 = uval % 1000000;
 
@@ -301,8 +298,9 @@ static int ccs811_channel_get(const struct device *dev,
 		 * Current readings are contained in most
 		 * significant 6 bits in microAmps
 		 */
-		uval = ((rp->raw & CCS811_RAW_CURRENT_MSK)
-			>> CCS811_RAW_CURRENT_POS) * CCS811_RAW_CURRENT_SCALE;
+		uval = ((rp->raw & CCS811_RAW_CURRENT_MSK) >>
+			CCS811_RAW_CURRENT_POS) *
+		       CCS811_RAW_CURRENT_SCALE;
 		val->val1 = uval / 1000000U;
 		val->val2 = uval % 1000000;
 
@@ -354,7 +352,7 @@ static int switch_to_app_mode(const struct device *i2c)
 		return -EIO;
 	}
 
-	k_msleep(1);             /* t_APP_START */
+	k_msleep(1); /* t_APP_START */
 	status = fetch_status(i2c);
 	if (status < 0) {
 		return -EIO;
@@ -373,8 +371,7 @@ static int switch_to_app_mode(const struct device *i2c)
 
 #ifdef CONFIG_CCS811_TRIGGER
 
-int ccs811_mutate_meas_mode(const struct device *dev,
-			    uint8_t set,
+int ccs811_mutate_meas_mode(const struct device *dev, uint8_t set,
 			    uint8_t clear)
 {
 	struct ccs811_data *drv_data = dev->data;
@@ -392,8 +389,7 @@ int ccs811_mutate_meas_mode(const struct device *dev,
 	if (mode != drv_data->mode) {
 		set_wake(drv_data, true);
 		rc = i2c_reg_write_byte(drv_data->i2c, DT_INST_REG_ADDR(0),
-					CCS811_REG_MEAS_MODE,
-					mode);
+					CCS811_REG_MEAS_MODE, mode);
 		LOG_DBG("CCS811 meas mode change %02x to %02x got %d",
 			drv_data->mode, mode, rc);
 		if (rc < 0) {
@@ -414,10 +410,8 @@ int ccs811_set_thresholds(const struct device *dev)
 {
 	struct ccs811_data *drv_data = dev->data;
 	const uint8_t buf[5] = {
-		CCS811_REG_THRESHOLDS,
-		drv_data->co2_l2m >> 8,
-		drv_data->co2_l2m,
-		drv_data->co2_m2h >> 8,
+		CCS811_REG_THRESHOLDS, drv_data->co2_l2m >> 8,
+		drv_data->co2_l2m,     drv_data->co2_m2h >> 8,
 		drv_data->co2_m2h,
 	};
 	int rc;
@@ -448,7 +442,8 @@ static int ccs811_init(const struct device *dev)
 	}
 
 #if DT_INST_NODE_HAS_PROP(0, wake_gpios)
-	drv_data->wake_gpio = device_get_binding(DT_INST_GPIO_LABEL(0, wake_gpios));
+	drv_data->wake_gpio =
+		device_get_binding(DT_INST_GPIO_LABEL(0, wake_gpios));
 	if (drv_data->wake_gpio == NULL) {
 		LOG_ERR("Failed to get pointer to WAKE device: %s",
 			DT_INST_GPIO_LABEL(0, wake_gpios));
@@ -461,28 +456,30 @@ static int ccs811_init(const struct device *dev)
 	 * default, skip this part.
 	 */
 	gpio_pin_configure(drv_data->wake_gpio, WAKE_PIN,
-			   GPIO_OUTPUT_INACTIVE
-			   | DT_INST_GPIO_FLAGS(0, wake_gpios));
+			   GPIO_OUTPUT_INACTIVE |
+				   DT_INST_GPIO_FLAGS(0, wake_gpios));
 
 	set_wake(drv_data, true);
 	k_msleep(1);
 #endif
 #if DT_INST_NODE_HAS_PROP(0, reset_gpios)
-	drv_data->reset_gpio = device_get_binding(DT_INST_GPIO_LABEL(0, reset_gpios));
+	drv_data->reset_gpio =
+		device_get_binding(DT_INST_GPIO_LABEL(0, reset_gpios));
 	if (drv_data->reset_gpio == NULL) {
 		LOG_ERR("Failed to get pointer to RESET device: %s",
 			DT_INST_GPIO_LABEL(0, reset_gpios));
 		return -EINVAL;
 	}
 	gpio_pin_configure(drv_data->reset_gpio, RESET_PIN,
-			   GPIO_OUTPUT_ACTIVE
-			   | DT_INST_GPIO_FLAGS(0, reset_gpios));
+			   GPIO_OUTPUT_ACTIVE |
+				   DT_INST_GPIO_FLAGS(0, reset_gpios));
 
 	k_msleep(1);
 #endif
 
 #if DT_INST_NODE_HAS_PROP(0, irq_gpios)
-	drv_data->irq_gpio = device_get_binding(DT_INST_GPIO_LABEL(0, irq_gpios));
+	drv_data->irq_gpio =
+		device_get_binding(DT_INST_GPIO_LABEL(0, irq_gpios));
 	if (drv_data->irq_gpio == NULL) {
 		LOG_ERR("Failed to get pointer to INT device: %s",
 			DT_INST_GPIO_LABEL(0, irq_gpios));
@@ -496,7 +493,7 @@ static int ccs811_init(const struct device *dev)
 	 */
 #if DT_INST_NODE_HAS_PROP(0, reset_gpios)
 	gpio_pin_set(drv_data->reset_gpio, RESET_PIN, 1);
-	k_busy_wait(15);        /* t_RESET */
+	k_busy_wait(15); /* t_RESET */
 	gpio_pin_set(drv_data->reset_gpio, RESET_PIN, 0);
 #else
 	{
@@ -512,7 +509,7 @@ static int ccs811_init(const struct device *dev)
 		}
 	}
 #endif
-	k_msleep(20);            /* t_START assuming recent power-on */
+	k_msleep(20); /* t_START assuming recent power-on */
 
 	/* Switch device to application mode */
 	ret = switch_to_app_mode(drv_data->i2c);
@@ -536,9 +533,8 @@ static int ccs811_init(const struct device *dev)
 
 	/* Check application firmware version (first byte) */
 	cmd = CCS811_REG_FW_APP_VERSION;
-	if (i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0),
-			   &cmd, sizeof(cmd),
-			   &fw_ver, sizeof(fw_ver)) < 0) {
+	if (i2c_write_read(drv_data->i2c, DT_INST_REG_ADDR(0), &cmd,
+			   sizeof(cmd), &fw_ver, sizeof(fw_ver)) < 0) {
 		LOG_ERR("Failed to read App Firmware Version register");
 		ret = -EIO;
 		goto out;
@@ -559,8 +555,7 @@ static int ccs811_init(const struct device *dev)
 	meas_mode = CCS811_MODE_IAQ_250MSEC;
 #endif
 	if (i2c_reg_write_byte(drv_data->i2c, DT_INST_REG_ADDR(0),
-			       CCS811_REG_MEAS_MODE,
-			       meas_mode) < 0) {
+			       CCS811_REG_MEAS_MODE, meas_mode) < 0) {
 		LOG_ERR("Failed to set Measurement mode");
 		ret = -EIO;
 		goto out;
@@ -593,6 +588,6 @@ out:
 
 static struct ccs811_data ccs811_driver;
 
-DEVICE_AND_API_INIT(ccs811, DT_INST_LABEL(0), ccs811_init, &ccs811_driver,
-		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(ccs811, DT_INST_LABEL(0), ccs811_init, &ccs811_driver, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &ccs811_driver_api);

@@ -78,7 +78,6 @@ static int settings_nvs_load(struct settings_store *cs,
 	name_id = cf->last_name_id + 1;
 
 	while (1) {
-
 		name_id--;
 		if (name_id == NVS_NAMECNT_ID) {
 			break;
@@ -89,8 +88,8 @@ static int settings_nvs_load(struct settings_store *cs,
 		 * setting's value.
 		 */
 		rc1 = nvs_read(&cf->cf_nvs, name_id, &name, sizeof(name));
-		rc2 = nvs_read(&cf->cf_nvs, name_id + NVS_NAME_ID_OFFSET,
-			       &buf, sizeof(buf));
+		rc2 = nvs_read(&cf->cf_nvs, name_id + NVS_NAME_ID_OFFSET, &buf,
+			       sizeof(buf));
 
 		if ((rc1 <= 0) && (rc2 <= 0)) {
 			continue;
@@ -117,10 +116,8 @@ static int settings_nvs_load(struct settings_store *cs,
 		read_fn_arg.fs = &cf->cf_nvs;
 		read_fn_arg.id = name_id + NVS_NAME_ID_OFFSET;
 
-		ret = settings_call_set_handler(
-			name, rc2,
-			settings_nvs_read_fn, &read_fn_arg,
-			(void *)arg);
+		ret = settings_call_set_handler(name, rc2, settings_nvs_read_fn,
+						&read_fn_arg, (void *)arg);
 		if (ret) {
 			break;
 		}
@@ -186,8 +183,8 @@ static int settings_nvs_save(struct settings_store *cs, const char *name,
 			rc = nvs_delete(&cf->cf_nvs, name_id);
 
 			if (rc >= 0) {
-				rc = nvs_delete(&cf->cf_nvs, name_id +
-					NVS_NAME_ID_OFFSET);
+				rc = nvs_delete(&cf->cf_nvs,
+						name_id + NVS_NAME_ID_OFFSET);
 			}
 
 			if (rc < 0) {
@@ -211,8 +208,8 @@ static int settings_nvs_save(struct settings_store *cs, const char *name,
 	}
 
 	/* write the value */
-	rc = nvs_write(&cf->cf_nvs, write_name_id + NVS_NAME_ID_OFFSET,
-		       value, val_len);
+	rc = nvs_write(&cf->cf_nvs, write_name_id + NVS_NAME_ID_OFFSET, value,
+		       val_len);
 
 	/* write the name if required */
 	if (write_name) {
@@ -282,8 +279,8 @@ int settings_backend_init(void)
 		k_panic();
 	}
 
-	nvs_sector_size = CONFIG_SETTINGS_NVS_SECTOR_SIZE_MULT *
-			  hw_flash_sector.fs_size;
+	nvs_sector_size =
+		CONFIG_SETTINGS_NVS_SECTOR_SIZE_MULT * hw_flash_sector.fs_size;
 
 	if (nvs_sector_size > UINT16_MAX) {
 		return -EDOM;

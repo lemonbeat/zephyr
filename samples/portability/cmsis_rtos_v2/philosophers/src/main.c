@@ -70,45 +70,30 @@ osSemaphoreId_t forks[NUM_PHIL];
 
 #define STACK_SIZE CONFIG_CMSIS_V2_THREAD_MAX_STACK_SIZE
 static K_THREAD_STACK_ARRAY_DEFINE(stacks, NUM_PHIL, STACK_SIZE);
-static osThreadAttr_t thread_attr[] = {
-	{
-		.name       = "Thread0",
-		.stack_mem  = &stacks[0][0],
-		.stack_size = STACK_SIZE,
-		.priority   = osPriorityHigh
-	},
-	{
-		.name       = "Thread1",
-		.stack_mem  = &stacks[1][0],
-		.stack_size = STACK_SIZE,
-		.priority   = osPriorityHigh
-	},
-	{
-		.name       = "Thread2",
-		.stack_mem  = &stacks[2][0],
-		.stack_size = STACK_SIZE,
-		.priority   = osPriorityHigh
-	},
-	{
-		.name       = "Thread3",
-		.stack_mem  = &stacks[3][0],
-		.stack_size = STACK_SIZE,
-		.priority   = osPriorityHigh
-	},
-	{
-		.name       = "Thread4",
-		.stack_mem  = &stacks[4][0],
-		.stack_size = STACK_SIZE,
-		.priority   = osPriorityHigh
-	},
-	{
-		.name       = "Thread5",
-		.stack_mem  = &stacks[5][0],
-		.stack_size = STACK_SIZE,
-		.priority   = osPriorityHigh
-	}
-};
-
+static osThreadAttr_t thread_attr[] = { { .name = "Thread0",
+					  .stack_mem = &stacks[0][0],
+					  .stack_size = STACK_SIZE,
+					  .priority = osPriorityHigh },
+					{ .name = "Thread1",
+					  .stack_mem = &stacks[1][0],
+					  .stack_size = STACK_SIZE,
+					  .priority = osPriorityHigh },
+					{ .name = "Thread2",
+					  .stack_mem = &stacks[2][0],
+					  .stack_size = STACK_SIZE,
+					  .priority = osPriorityHigh },
+					{ .name = "Thread3",
+					  .stack_mem = &stacks[3][0],
+					  .stack_size = STACK_SIZE,
+					  .priority = osPriorityHigh },
+					{ .name = "Thread4",
+					  .stack_mem = &stacks[4][0],
+					  .stack_size = STACK_SIZE,
+					  .priority = osPriorityHigh },
+					{ .name = "Thread5",
+					  .stack_mem = &stacks[5][0],
+					  .stack_size = STACK_SIZE,
+					  .priority = osPriorityHigh } };
 
 #if DEBUG_PRINTF
 #define PR_DEBUG printk
@@ -132,10 +117,8 @@ static void print_phil_state(int id, const char *fmt, int32_t delay)
 
 	set_phil_state_pos(id);
 
-	printk("Philosopher %d [%s:%s%d] ",
-	       id, prio < 0 ? "C" : "P",
-	       prio < 0 ? "" : " ",
-	       prio);
+	printk("Philosopher %d [%s:%s%d] ", id, prio < 0 ? "C" : "P",
+	       prio < 0 ? "" : " ", prio);
 
 	if (delay) {
 		printk(fmt, delay < 1000 ? " " : "", delay);
@@ -153,7 +136,7 @@ static int32_t get_random_delay(int id, int period_in_ms)
 	 * and the current uptime to create some pseudo-randomness. It produces
 	 * a value between 0 and 31.
 	 */
-	int32_t delay = (k_uptime_get_32()/100 * (id + 1)) & 0x1f;
+	int32_t delay = (k_uptime_get_32() / 100 * (id + 1)) & 0x1f;
 
 	/* add 1 to not generate a delay of 0 */
 	int32_t ms = (delay + 1) * period_in_ms;
@@ -202,7 +185,6 @@ void philosopher(void *id)
 		print_phil_state(my_id, " THINKING [ %s%d ms ] ", delay);
 		osDelay(delay);
 	}
-
 }
 
 static int new_prio(int phil)
@@ -230,15 +212,16 @@ static void start_threads(void)
 	}
 }
 
-#define DEMO_DESCRIPTION  \
-	"\x1b[2J\x1b[15;1H"   \
-	"Demo Description\n"  \
-	"----------------\n"  \
-	"An implementation of a solution to the Dining Philosophers\n" \
-	"problem (a classic multi-thread synchronization problem) using\n" \
+#define DEMO_DESCRIPTION                                                        \
+	"\x1b[2J\x1b[15;1H"                                                     \
+	"Demo Description\n"                                                    \
+	"----------------\n"                                                    \
+	"An implementation of a solution to the Dining Philosophers\n"          \
+	"problem (a classic multi-thread synchronization problem) using\n"      \
 	"CMSIS RTOS V2 APIs. This particular implementation demonstrates the\n" \
-	"usage of multiple preemptible threads of differing\n" \
-	"priorities, as well as %s and thread sleeping.\n", fork_type_str
+	"usage of multiple preemptible threads of differing\n"                  \
+	"priorities, as well as %s and thread sleeping.\n",                     \
+		fork_type_str
 
 static void display_demo_description(void)
 {

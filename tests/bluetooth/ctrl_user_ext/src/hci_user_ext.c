@@ -26,7 +26,8 @@ int8_t hci_user_ext_get_class(struct node_rx_pdu *node_rx)
 	return 0;
 }
 
-void hci_user_ext_encode_control(struct node_rx_pdu *node_rx, struct pdu_data *pdu_data, struct net_buf *buf)
+void hci_user_ext_encode_control(struct node_rx_pdu *node_rx,
+				 struct pdu_data *pdu_data, struct net_buf *buf)
 {
 	return;
 }

@@ -30,11 +30,11 @@
 #include <soc.h>
 
 /** The stimulus port from which SWO data is received and displayed */
-#define ITM_PORT_LOGGER       0
+#define ITM_PORT_LOGGER 0
 
 /* Set TPIU prescaler for the current debug trace clock frequency. */
 #if CONFIG_LOG_BACKEND_SWO_FREQ_HZ == 0
-#define SWO_FREQ_DIV  1
+#define SWO_FREQ_DIV 1
 #else
 #if DT_NODE_HAS_PROP(DT_PATH(cpus, cpu_0), clock_frequency)
 #define CPU_FREQ DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency)
@@ -42,7 +42,7 @@
 #error "Missing DT 'clock-frequency' property on cpu@0 node"
 #endif
 #define SWO_FREQ (CPU_FREQ + (CONFIG_LOG_BACKEND_SWO_FREQ_HZ / 2))
-#define SWO_FREQ_DIV  (SWO_FREQ / CONFIG_LOG_BACKEND_SWO_FREQ_HZ)
+#define SWO_FREQ_DIV (SWO_FREQ / CONFIG_LOG_BACKEND_SWO_FREQ_HZ)
 #if SWO_FREQ_DIV > 0xFFFF
 #error CONFIG_LOG_BACKEND_SWO_FREQ_HZ is too low. SWO clock divider is 16-bit. \
 	Minimum supported SWO clock frequency is \
@@ -66,10 +66,11 @@ static int char_out(uint8_t *data, size_t length, void *ctx)
 LOG_OUTPUT_DEFINE(log_output_swo, char_out, buf, sizeof(buf));
 
 static void log_backend_swo_put(const struct log_backend *const backend,
-		struct log_msg *msg)
+				struct log_msg *msg)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_SWO_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
 	log_backend_std_put(&log_output_swo, flag, msg);
 }
@@ -79,25 +80,25 @@ static void log_backend_swo_init(void)
 	/* Enable DWT and ITM units */
 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	/* Enable access to ITM registers */
-	ITM->LAR  = 0xC5ACCE55;
+	ITM->LAR = 0xC5ACCE55;
 	/* Disable stimulus ports ITM_STIM0-ITM_STIM31 */
-	ITM->TER  = 0x0;
+	ITM->TER = 0x0;
 	/* Disable ITM */
-	ITM->TCR  = 0x0;
+	ITM->TCR = 0x0;
 	/* Select NRZ (UART) encoding protocol */
 	TPI->SPPR = 2;
 	/* Set SWO baud rate prescaler value: SWO_clk = ref_clock/(ACPR + 1) */
 	TPI->ACPR = SWO_FREQ_DIV - 1;
 	/* Enable unprivileged access to ITM stimulus ports */
-	ITM->TPR  = 0x0;
+	ITM->TPR = 0x0;
 	/* Configure Debug Watchpoint and Trace */
 	DWT->CTRL = 0x400003FE;
 	/* Configure Formatter and Flush Control Register */
 	TPI->FFCR = 0x00000100;
 	/* Enable ITM, set TraceBusID=1, no local timestamp generation */
-	ITM->TCR  = 0x0001000D;
+	ITM->TCR = 0x0001000D;
 	/* Enable stimulus port used by the logger */
-	ITM->TER  = 1 << ITM_PORT_LOGGER;
+	ITM->TER = 1 << ITM_PORT_LOGGER;
 }
 
 static void log_backend_swo_panic(struct log_backend const *const backend)
@@ -112,23 +113,27 @@ static void dropped(const struct log_backend *const backend, uint32_t cnt)
 }
 
 static void log_backend_swo_sync_string(const struct log_backend *const backend,
-		struct log_msg_ids src_level, uint32_t timestamp,
-		const char *fmt, va_list ap)
+					struct log_msg_ids src_level,
+					uint32_t timestamp, const char *fmt,
+					va_list ap)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_SWO_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
-	log_backend_std_sync_string(&log_output_swo, flag, src_level,
-				    timestamp, fmt, ap);
+	log_backend_std_sync_string(&log_output_swo, flag, src_level, timestamp,
+				    fmt, ap);
 }
 
-static void log_backend_swo_sync_hexdump(
-		const struct log_backend *const backend,
-		struct log_msg_ids src_level, uint32_t timestamp,
-		const char *metadata, const uint8_t *data, uint32_t length)
+static void
+log_backend_swo_sync_hexdump(const struct log_backend *const backend,
+			     struct log_msg_ids src_level, uint32_t timestamp,
+			     const char *metadata, const uint8_t *data,
+			     uint32_t length)
 {
 	uint32_t flag = IS_ENABLED(CONFIG_LOG_BACKEND_SWO_SYST_ENABLE) ?
-		LOG_OUTPUT_FLAG_FORMAT_SYST : 0;
+				      LOG_OUTPUT_FLAG_FORMAT_SYST :
+				      0;
 
 	log_backend_std_sync_hexdump(&log_output_swo, flag, src_level,
 				     timestamp, metadata, data, length);
@@ -137,9 +142,11 @@ static void log_backend_swo_sync_hexdump(
 const struct log_backend_api log_backend_swo_api = {
 	.put = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : log_backend_swo_put,
 	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			log_backend_swo_sync_string : NULL,
+					 log_backend_swo_sync_string :
+					 NULL,
 	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			log_backend_swo_sync_hexdump : NULL,
+					  log_backend_swo_sync_hexdump :
+					  NULL,
 	.panic = log_backend_swo_panic,
 	.init = log_backend_swo_init,
 	.dropped = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : dropped,

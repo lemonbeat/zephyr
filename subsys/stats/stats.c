@@ -10,13 +10,12 @@
 #include <zephyr/types.h>
 #include <stats/stats.h>
 
-#define STATS_GEN_NAME_MAX_LEN  (sizeof("s255"))
+#define STATS_GEN_NAME_MAX_LEN (sizeof("s255"))
 
 /* The global list of registered statistic groups. */
 static struct stats_hdr *stats_list;
 
-static const char *
-stats_get_name(const struct stats_hdr *hdr, int idx)
+static const char *stats_get_name(const struct stats_hdr *hdr, int idx)
 {
 #ifdef CONFIG_STATS_NAMES
 	const struct stats_name_map *cur;
@@ -40,8 +39,7 @@ stats_get_name(const struct stats_hdr *hdr, int idx)
 	return NULL;
 }
 
-static uint16_t
-stats_get_off(const struct stats_hdr *hdr, int idx)
+static uint16_t stats_get_off(const struct stats_hdr *hdr, int idx)
 {
 	return sizeof(*hdr) + idx * hdr->s_size;
 }
@@ -53,8 +51,7 @@ stats_get_off(const struct stats_hdr *hdr, int idx)
  * This function assumes the supplied destination buffer is large enough to
  * accommodate the name.
  */
-static void
-stats_gen_name(int idx, char *dst)
+static void stats_gen_name(int idx, char *dst)
 {
 	char c;
 	int len;
@@ -92,8 +89,7 @@ stats_gen_name(int idx, char *dst)
  * @return 0 on success, the return code of the walk_func on abort.
  *
  */
-int
-stats_walk(struct stats_hdr *hdr, stats_walk_fn *walk_func, void *arg)
+int stats_walk(struct stats_hdr *hdr, stats_walk_fn *walk_func, void *arg)
 {
 	const char *name;
 	char name_buf[STATS_GEN_NAME_MAX_LEN];
@@ -129,9 +125,8 @@ stats_walk(struct stats_hdr *hdr, stats_walk_fn *walk_func, void *arg)
  * @param map The mapping of statistics name to statistic entry
  * @param map_cnt The number of items in the statistics map
  */
-void
-stats_init(struct stats_hdr *hdr, uint8_t size, uint16_t cnt,
-	   const struct stats_name_map *map, uint16_t map_cnt)
+void stats_init(struct stats_hdr *hdr, uint8_t size, uint16_t cnt,
+		const struct stats_name_map *map, uint16_t map_cnt)
 {
 	hdr->s_size = size;
 	hdr->s_cnt = cnt;
@@ -155,8 +150,7 @@ stats_init(struct stats_hdr *hdr, uint8_t size, uint16_t cnt,
  *
  * @return 0 on success, non-zero error code on failure
  */
-int
-stats_group_walk(stats_group_walk_fn *walk_func, void *arg)
+int stats_group_walk(stats_group_walk_fn *walk_func, void *arg)
 {
 	struct stats_hdr *hdr;
 	int rc;
@@ -171,8 +165,7 @@ stats_group_walk(stats_group_walk_fn *walk_func, void *arg)
 	return 0;
 }
 
-struct stats_hdr *
-stats_group_get_next(const struct stats_hdr *cur)
+struct stats_hdr *stats_group_get_next(const struct stats_hdr *cur)
 {
 	if (cur == NULL) {
 		return stats_list;
@@ -190,8 +183,7 @@ stats_group_get_next(const struct stats_hdr *cur)
  *
  * @return statistic structure if found, NULL if not found.
  */
-struct stats_hdr *
-stats_group_find(const char *name)
+struct stats_hdr *stats_group_find(const char *name)
 {
 	struct stats_hdr *hdr;
 
@@ -215,8 +207,7 @@ stats_group_find(const char *name)
  *
  * @return 0 on success, non-zero error code on failure.
  */
-int
-stats_register(const char *name, struct stats_hdr *hdr)
+int stats_register(const char *name, struct stats_hdr *hdr)
 {
 	struct stats_hdr *prev;
 	struct stats_hdr *cur;
@@ -255,10 +246,9 @@ stats_register(const char *name, struct stats_hdr *hdr)
  *
  * @return 0 on success, non-zero error code on failure.
  */
-int
-stats_init_and_reg(struct stats_hdr *shdr, uint8_t size, uint16_t cnt,
-		   const struct stats_name_map *map, uint16_t map_cnt,
-		   const char *name)
+int stats_init_and_reg(struct stats_hdr *shdr, uint8_t size, uint16_t cnt,
+		       const struct stats_name_map *map, uint16_t map_cnt,
+		       const char *name)
 {
 	int rc;
 
@@ -277,8 +267,8 @@ stats_init_and_reg(struct stats_hdr *shdr, uint8_t size, uint16_t cnt,
  *
  * @param shdr The statistics header to zero
  */
-void
-stats_reset(struct stats_hdr *hdr)
+void stats_reset(struct stats_hdr *hdr)
 {
-	(void)memset((uint8_t *)hdr + sizeof(*hdr), 0, hdr->s_size * hdr->s_cnt);
+	(void)memset((uint8_t *)hdr + sizeof(*hdr), 0,
+		     hdr->s_size * hdr->s_cnt);
 }

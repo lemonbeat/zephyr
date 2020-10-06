@@ -14,8 +14,8 @@
 
 #include <net/ieee802154_radio.h>
 
-static inline
-enum ieee802154_hw_caps ieee802154_get_hw_capabilities(struct net_if *iface)
+static inline enum ieee802154_hw_caps
+ieee802154_get_hw_capabilities(struct net_if *iface)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->api;
@@ -65,8 +65,7 @@ static inline int ieee802154_set_tx_power(struct net_if *iface, int16_t dbm)
 
 static inline int ieee802154_tx(struct net_if *iface,
 				enum ieee802154_tx_mode mode,
-				struct net_pkt *pkt,
-				struct net_buf *buf)
+				struct net_pkt *pkt, struct net_buf *buf)
 {
 	const struct ieee802154_radio_api *radio =
 		net_if_get_device(iface)->api;

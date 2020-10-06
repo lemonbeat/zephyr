@@ -26,8 +26,8 @@ static ALWAYS_INLINE void arch_kernel_init(void)
 {
 }
 
-static ALWAYS_INLINE void
-arch_thread_return_value_set(struct k_thread *thread, unsigned int value)
+static ALWAYS_INLINE void arch_thread_return_value_set(struct k_thread *thread,
+						       unsigned int value)
 {
 	thread->arch.swap_return_value = value;
 }

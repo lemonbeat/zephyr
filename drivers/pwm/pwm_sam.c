@@ -22,8 +22,7 @@ struct sam_pwm_config {
 	uint8_t divider;
 };
 
-#define DEV_CFG(dev) \
-	((const struct sam_pwm_config * const)(dev)->config)
+#define DEV_CFG(dev) ((const struct sam_pwm_config *const)(dev)->config)
 
 static int sam_pwm_get_cycles_per_sec(const struct device *dev, uint32_t pwm,
 				      uint64_t *cycles)
@@ -31,8 +30,7 @@ static int sam_pwm_get_cycles_per_sec(const struct device *dev, uint32_t pwm,
 	uint8_t prescaler = DEV_CFG(dev)->prescaler;
 	uint8_t divider = DEV_CFG(dev)->divider;
 
-	*cycles = SOC_ATMEL_SAM_MCK_FREQ_HZ /
-		  ((1 << prescaler) * divider);
+	*cycles = SOC_ATMEL_SAM_MCK_FREQ_HZ / ((1 << prescaler) * divider);
 
 	return 0;
 }
@@ -98,19 +96,17 @@ static const struct pwm_driver_api sam_pwm_driver_api = {
 	.get_cycles_per_sec = sam_pwm_get_cycles_per_sec,
 };
 
-#define SAM_INST_INIT(inst)						\
-	static const struct sam_pwm_config sam_pwm_config_##inst = {	\
-		.regs = (Pwm *)DT_INST_REG_ADDR(inst),			\
-		.id = DT_INST_PROP(inst, peripheral_id),		\
-		.prescaler = DT_INST_PROP(inst, prescaler),		\
-		.divider = DT_INST_PROP(inst, divider),			\
-	};								\
-									\
-	DEVICE_AND_API_INIT(sam_pwm_##inst, DT_INST_LABEL(inst),	\
-			    &sam_pwm_init,				\
-			    NULL, &sam_pwm_config_##inst,		\
-			    POST_KERNEL,				\
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		\
+#define SAM_INST_INIT(inst)                                                  \
+	static const struct sam_pwm_config sam_pwm_config_##inst = {         \
+		.regs = (Pwm *)DT_INST_REG_ADDR(inst),                       \
+		.id = DT_INST_PROP(inst, peripheral_id),                     \
+		.prescaler = DT_INST_PROP(inst, prescaler),                  \
+		.divider = DT_INST_PROP(inst, divider),                      \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(sam_pwm_##inst, DT_INST_LABEL(inst),             \
+			    &sam_pwm_init, NULL, &sam_pwm_config_##inst,     \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
 			    &sam_pwm_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(SAM_INST_INIT)

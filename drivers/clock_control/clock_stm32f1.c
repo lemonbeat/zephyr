@@ -5,13 +5,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <soc.h>
 #include <drivers/clock_control.h>
 #include <sys/util.h>
 #include <drivers/clock_control/stm32_clock_control.h>
 #include "clock_stm32_ll_common.h"
-
 
 #ifdef CONFIG_CLOCK_STM32_SYSCLK_SRC_PLL
 
@@ -25,7 +23,6 @@
 #else
 #undef RCC_PREDIV1_SOURCE_PLL2
 #endif /* CONFIG_CLOCK_STM32_PLL_SRC_PLL2 */
-
 
 /**
  * @brief fill in pll configuration structure
@@ -41,7 +38,7 @@ void config_pll_init(LL_UTILS_PLLInitTypeDef *pllinit)
 	 *
 	 */
 	pllinit->PLLMul = ((CONFIG_CLOCK_STM32_PLL_MULTIPLIER - 2)
-					<< RCC_CFGR_PLLMULL_Pos);
+			   << RCC_CFGR_PLLMULL_Pos);
 
 	/*
 	 * SOC_STM32F10X_CONNECTIVITY_LINE_DEVICE

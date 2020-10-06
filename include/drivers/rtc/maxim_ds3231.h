@@ -371,7 +371,8 @@ static inline uint32_t maxim_ds3231_read_syncclock(const struct device *dev)
  *
  * @return the frequency of the selected synchronization clock.
  */
-static inline uint32_t maxim_ds3231_syncclock_frequency(const struct device *dev)
+static inline uint32_t
+maxim_ds3231_syncclock_frequency(const struct device *dev)
 {
 	return 1000U;
 }
@@ -393,8 +394,7 @@ static inline uint32_t maxim_ds3231_syncclock_frequency(const struct device *dev
  * @return the non-negative updated value of the register, or a
  * negative error code from an I2C transaction.
  */
-int maxim_ds3231_ctrl_update(const struct device *dev,
-			     uint8_t set_bits,
+int maxim_ds3231_ctrl_update(const struct device *dev, uint8_t set_bits,
 			     uint8_t clear_bits);
 
 /**
@@ -426,8 +426,7 @@ int maxim_ds3231_ctrl_update(const struct device *dev,
  * (disregarding the effect of clears and sets), or a negative error
  * code from an I2C transaction.
  */
-int maxim_ds3231_stat_update(const struct device *dev,
-			     uint8_t set_bits,
+int maxim_ds3231_stat_update(const struct device *dev, uint8_t set_bits,
 			     uint8_t clear_bits);
 
 /** @brief Read a DS3231 alarm configuration.
@@ -448,8 +447,7 @@ int maxim_ds3231_stat_update(const struct device *dev,
  * @return a non-negative value indicating successful conversion, or a
  * negative error code from an I2C transaction or invalid parameter.
  */
-int maxim_ds3231_get_alarm(const struct device *dev,
-			   uint8_t id,
+int maxim_ds3231_get_alarm(const struct device *dev, uint8_t id,
 			   struct maxim_ds3231_alarm *cfg);
 
 /** @brief Configure a DS3231 alarm.
@@ -472,8 +470,7 @@ int maxim_ds3231_get_alarm(const struct device *dev,
  * @return a non-negative value on success, or a negative error code
  * from an I2C transaction or an invalid parameter.
  */
-int maxim_ds3231_set_alarm(const struct device *dev,
-			   uint8_t id,
+int maxim_ds3231_set_alarm(const struct device *dev, uint8_t id,
 			   const struct maxim_ds3231_alarm *cfg);
 
 /** @brief Synchronize the RTC against the local clock.
@@ -535,8 +532,9 @@ __syscall int maxim_ds3231_req_syncpoint(const struct device *dev,
  * @retval non-negative on success
  * @retval -ENOENT if no syncpoint has been captured
  */
-__syscall int maxim_ds3231_get_syncpoint(const struct device *dev,
-					 struct maxim_ds3231_syncpoint *syncpoint);
+__syscall int
+maxim_ds3231_get_syncpoint(const struct device *dev,
+			   struct maxim_ds3231_syncpoint *syncpoint);
 
 /** @brief Set the RTC to a time consistent with the provided
  * synchronization.

@@ -4,13 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <limits.h>
 #include <sys/util.h>
 #include "test_gpio_api.h"
 
-static void pin_get_raw_and_verify(const struct device *port,
-				   unsigned int pin,
+static void pin_get_raw_and_verify(const struct device *port, unsigned int pin,
 				   int val_expected, int idx)
 {
 	int val_actual;
@@ -34,8 +32,7 @@ static void pin_get_and_verify(const struct device *port, unsigned int pin,
 		      "Test point %d: invalid logical pin get value", idx);
 }
 
-static void pin_set_raw_and_verify(const struct device *port,
-				   unsigned int pin,
+static void pin_set_raw_and_verify(const struct device *port, unsigned int pin,
 				   int val, int idx)
 {
 	zassert_equal(gpio_pin_set_raw(port, pin, val), 0,
@@ -44,8 +41,7 @@ static void pin_set_raw_and_verify(const struct device *port,
 }
 
 static void pin_set_and_verify(const struct device *port, unsigned int pin,
-			       int val,
-			       int idx)
+			       int val, int idx)
 {
 	zassert_equal(gpio_pin_set(port, pin, val), 0,
 		      "Test point %d: failed to set logical pin value", idx);
@@ -110,8 +106,8 @@ void test_gpio_pin_toggle_visual(void)
 
 	TC_PRINT("Running test on port=%s, pin=%d\n", TEST_DEV, TEST_PIN);
 
-	ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT |
-				 TEST_PIN_DTS_FLAGS);
+	ret = gpio_pin_configure(port, TEST_PIN,
+				 GPIO_OUTPUT | TEST_PIN_DTS_FLAGS);
 	zassert_equal(ret, 0, "Failed to configure the pin");
 
 	pin_set_and_verify(port, TEST_PIN, 1, 0);
@@ -140,9 +136,8 @@ void test_gpio_pin_set_get_raw(void)
 	int val_expected;
 	int ret;
 
-	const int test_vector[] = {
-		4, 1, 45, 0, 0, -7, 0, 0, 0, INT_MAX, INT_MIN, 0
-	};
+	const int test_vector[] = { 4, 1, 45, 0,       0,	-7,
+				    0, 0, 0,  INT_MAX, INT_MIN, 0 };
 
 	port = device_get_binding(TEST_DEV);
 	zassert_not_null(port, "device " TEST_DEV " not found");
@@ -177,9 +172,8 @@ void test_gpio_pin_set_get(void)
 	int val_expected;
 	int ret;
 
-	const int test_vector[] = {
-		1, 2, 3, 0, 4, 0, 0, 0, 17, INT_MAX, INT_MIN, 0
-	};
+	const int test_vector[] = { 1, 2, 3,  0,       4,	0,
+				    0, 0, 17, INT_MAX, INT_MIN, 0 };
 
 	port = device_get_binding(TEST_DEV);
 	zassert_not_null(port, "device " TEST_DEV " not found");
@@ -216,15 +210,15 @@ void test_gpio_pin_set_get_active_high(void)
 	int val_expected;
 	int ret;
 
-	const int test_vector[] = {0, 2, 0, 9, -1, 0, 0, 1, INT_MAX, INT_MIN};
+	const int test_vector[] = { 0, 2, 0, 9, -1, 0, 0, 1, INT_MAX, INT_MIN };
 
 	port = device_get_binding(TEST_DEV);
 	zassert_not_null(port, "device " TEST_DEV " not found");
 
 	TC_PRINT("Running test on port=%s, pin=%d\n", TEST_DEV, TEST_PIN);
 
-	ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT | GPIO_INPUT |
-				 GPIO_ACTIVE_HIGH);
+	ret = gpio_pin_configure(port, TEST_PIN,
+				 GPIO_OUTPUT | GPIO_INPUT | GPIO_ACTIVE_HIGH);
 	if (ret == -ENOTSUP) {
 		TC_PRINT("Simultaneous pin in/out mode is not supported.\n");
 		ztest_test_skip();
@@ -266,15 +260,15 @@ void test_gpio_pin_set_get_active_low(void)
 	int val_expected, val_raw_expected;
 	int ret;
 
-	const int test_vector[] = {0, 4, 0, 0, 1, 8, -3, -12, 0};
+	const int test_vector[] = { 0, 4, 0, 0, 1, 8, -3, -12, 0 };
 
 	port = device_get_binding(TEST_DEV);
 	zassert_not_null(port, "device " TEST_DEV " not found");
 
 	TC_PRINT("Running test on port=%s, pin=%d\n", TEST_DEV, TEST_PIN);
 
-	ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT | GPIO_INPUT |
-				 GPIO_ACTIVE_LOW);
+	ret = gpio_pin_configure(port, TEST_PIN,
+				 GPIO_OUTPUT | GPIO_INPUT | GPIO_ACTIVE_LOW);
 	if (ret == -ENOTSUP) {
 		TC_PRINT("Simultaneous pin in/out mode is not supported.\n");
 		ztest_test_skip();

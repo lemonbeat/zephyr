@@ -7,17 +7,17 @@
  */
 
 /* LL connection parameters */
-#define LE_CONN_LATENCY		0x0000
-#define LE_CONN_TIMEOUT		0x002a
+#define LE_CONN_LATENCY 0x0000
+#define LE_CONN_TIMEOUT 0x002a
 
 #if defined(CONFIG_BT_BREDR)
-#define LMP_FEAT_PAGES_COUNT	3
+#define LMP_FEAT_PAGES_COUNT 3
 #else
-#define LMP_FEAT_PAGES_COUNT	1
+#define LMP_FEAT_PAGES_COUNT 1
 #endif
 
 /* SCO  settings */
-#define BT_VOICE_CVSD_16BIT     0x0060
+#define BT_VOICE_CVSD_16BIT 0x0060
 
 /* k_poll event tags */
 enum {
@@ -58,8 +58,7 @@ enum {
 };
 
 /* Flags which should not be cleared upon HCI_Reset */
-#define BT_DEV_PERSISTENT_FLAGS (BIT(BT_DEV_ENABLE) | \
-				 BIT(BT_DEV_PRESET_ID))
+#define BT_DEV_PERSISTENT_FLAGS (BIT(BT_DEV_ENABLE) | BIT(BT_DEV_PRESET_ID))
 
 enum {
 	/* Advertising set has been created in the host. */
@@ -111,16 +110,16 @@ enum {
 
 struct bt_le_ext_adv {
 	/* ID Address used for advertising */
-	uint8_t                    id;
+	uint8_t id;
 
 	/* Advertising handle */
-	uint16_t			handle;
+	uint16_t handle;
 
 	/* Current local Random Address */
-	bt_addr_le_t		random_addr;
+	bt_addr_le_t random_addr;
 
 	/* Current target address */
-	bt_addr_le_t            target_addr;
+	bt_addr_le_t target_addr;
 
 	ATOMIC_DEFINE(flags, BT_ADV_NUM_FLAGS);
 
@@ -128,10 +127,9 @@ struct bt_le_ext_adv {
 	const struct bt_le_ext_adv_cb *cb;
 
 	/* TX Power in use by the controller */
-	int8_t                    tx_power;
+	int8_t tx_power;
 #endif /* defined(CONFIG_BT_EXT_ADV) */
 };
-
 
 enum {
 	/** Periodic Advertising Sync has been created in the host. */
@@ -174,38 +172,38 @@ struct bt_le_per_adv_sync {
 
 struct bt_dev_le {
 	/* LE features */
-	uint8_t			features[8];
+	uint8_t features[8];
 	/* LE states */
-	uint64_t			states;
+	uint64_t states;
 
 #if defined(CONFIG_BT_CONN)
 	/* Controller buffer information */
-	uint16_t		mtu;
-	struct k_sem		pkts;
-	uint16_t		acl_mtu;
-	struct k_sem		acl_pkts;
+	uint16_t mtu;
+	struct k_sem pkts;
+	uint16_t acl_mtu;
+	struct k_sem acl_pkts;
 #if defined(CONFIG_BT_ISO)
-	uint16_t		iso_mtu;
-	struct k_sem		iso_pkts;
+	uint16_t iso_mtu;
+	struct k_sem iso_pkts;
 #endif /* CONFIG_BT_ISO */
 #endif /* CONFIG_BT_CONN */
 
 #if defined(CONFIG_BT_SMP)
 	/* Size of the the controller resolving list */
-	uint8_t                    rl_size;
+	uint8_t rl_size;
 	/* Number of entries in the resolving list. rl_entries > rl_size
 	 * means that host-side resolving is used.
 	 */
-	uint8_t                    rl_entries;
+	uint8_t rl_entries;
 #endif /* CONFIG_BT_SMP */
 };
 
 #if defined(CONFIG_BT_BREDR)
 struct bt_dev_br {
 	/* Max controller's acceptable ACL packet length */
-	uint16_t         mtu;
-	struct k_sem  pkts;
-	uint16_t         esco_pkt_type;
+	uint16_t mtu;
+	struct k_sem pkts;
+	uint16_t esco_pkt_type;
 };
 #endif
 
@@ -214,79 +212,79 @@ struct bt_dev_br {
  * These values must be updated whenever the host implementation is
  * extended beyond the current values.
  */
-#define BT_DEV_VS_FEAT_MAX  1
-#define BT_DEV_VS_CMDS_MAX  2
+#define BT_DEV_VS_FEAT_MAX 1
+#define BT_DEV_VS_CMDS_MAX 2
 
 /* State tracking for the local Bluetooth controller */
 struct bt_dev {
 	/* Local Identity Address(es) */
-	bt_addr_le_t            id_addr[CONFIG_BT_ID_MAX];
-	uint8_t                    id_count;
+	bt_addr_le_t id_addr[CONFIG_BT_ID_MAX];
+	uint8_t id_count;
 
 	struct bt_conn_le_create_param create_param;
 
 #if !defined(CONFIG_BT_EXT_ADV)
 	/* Legacy advertiser */
-	struct bt_le_ext_adv    adv;
+	struct bt_le_ext_adv adv;
 #else
 	/* Pointer to reserved advertising set */
-	struct bt_le_ext_adv    *adv;
+	struct bt_le_ext_adv *adv;
 #endif
 	/* Current local Random Address */
-	bt_addr_le_t            random_addr;
-	uint8_t                    adv_conn_id;
+	bt_addr_le_t random_addr;
+	uint8_t adv_conn_id;
 
 	/* Controller version & manufacturer information */
-	uint8_t			hci_version;
-	uint8_t			lmp_version;
-	uint16_t			hci_revision;
-	uint16_t			lmp_subversion;
-	uint16_t			manufacturer;
+	uint8_t hci_version;
+	uint8_t lmp_version;
+	uint16_t hci_revision;
+	uint16_t lmp_subversion;
+	uint16_t manufacturer;
 
 	/* LMP features (pages 0, 1, 2) */
-	uint8_t			features[LMP_FEAT_PAGES_COUNT][8];
+	uint8_t features[LMP_FEAT_PAGES_COUNT][8];
 
 	/* Supported commands */
-	uint8_t			supported_commands[64];
+	uint8_t supported_commands[64];
 
 #if defined(CONFIG_BT_HCI_VS_EXT)
 	/* Vendor HCI support */
-	uint8_t                    vs_features[BT_DEV_VS_FEAT_MAX];
-	uint8_t                    vs_commands[BT_DEV_VS_CMDS_MAX];
+	uint8_t vs_features[BT_DEV_VS_FEAT_MAX];
+	uint8_t vs_commands[BT_DEV_VS_CMDS_MAX];
 #endif
 
-	struct k_work           init;
+	struct k_work init;
 
 	ATOMIC_DEFINE(flags, BT_DEV_NUM_FLAGS);
 
 	/* LE controller specific features */
-	struct bt_dev_le	le;
+	struct bt_dev_le le;
 
 #if defined(CONFIG_BT_BREDR)
 	/* BR/EDR controller specific features */
-	struct bt_dev_br	br;
+	struct bt_dev_br br;
 #endif
 
 	/* Number of commands controller can accept */
-	struct k_sem		ncmd_sem;
+	struct k_sem ncmd_sem;
 
 	/* Last sent HCI command */
-	struct net_buf		*sent_cmd;
+	struct net_buf *sent_cmd;
 
 #if !defined(CONFIG_BT_RECV_IS_RX_THREAD)
 	/* Queue for incoming HCI events & ACL data */
-	struct k_fifo		rx_queue;
+	struct k_fifo rx_queue;
 #endif
 
 	/* Queue for outgoing HCI commands */
-	struct k_fifo		cmd_tx_queue;
+	struct k_fifo cmd_tx_queue;
 
 	/* Registered HCI driver */
 	const struct bt_hci_driver *drv;
 
 #if defined(CONFIG_BT_PRIVACY)
 	/* Local Identity Resolving Key */
-	uint8_t			irk[CONFIG_BT_ID_MAX][16];
+	uint8_t irk[CONFIG_BT_ID_MAX][16];
 
 	/* Work used for RPA rotation */
 	struct k_delayed_work rpa_update;
@@ -294,7 +292,7 @@ struct bt_dev {
 
 	/* Local Name */
 #if defined(CONFIG_BT_DEVICE_NAME_DYNAMIC)
-	char			name[CONFIG_BT_DEVICE_NAME_MAX + 1];
+	char name[CONFIG_BT_DEVICE_NAME_MAX + 1];
 #endif
 };
 
@@ -308,9 +306,10 @@ enum bt_security_err bt_security_err_get(uint8_t hci_err);
 int bt_hci_disconnect(uint16_t handle, uint8_t reason);
 
 bool bt_le_conn_params_valid(const struct bt_le_conn_param *param);
-int bt_le_set_data_len(struct bt_conn *conn, uint16_t tx_octets, uint16_t tx_time);
-int bt_le_set_phy(struct bt_conn *conn, uint8_t all_phys,
-		  uint8_t pref_tx_phy, uint8_t pref_rx_phy, uint8_t phy_opts);
+int bt_le_set_data_len(struct bt_conn *conn, uint16_t tx_octets,
+		       uint16_t tx_time);
+int bt_le_set_phy(struct bt_conn *conn, uint8_t all_phys, uint8_t pref_tx_phy,
+		  uint8_t pref_rx_phy, uint8_t phy_opts);
 
 int bt_le_scan_update(bool fast_scan);
 

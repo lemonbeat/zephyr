@@ -65,10 +65,10 @@ static APP_BMEM bool connected;
 
 static APP_DMEM sec_tag_t m_sec_tags[] = {
 #if defined(MBEDTLS_X509_CRT_PARSE_C) || defined(CONFIG_NET_SOCKETS_OFFLOAD)
-		APP_CA_CERT_TAG,
+	APP_CA_CERT_TAG,
 #endif
 #if defined(MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED)
-		APP_PSK_TAG,
+	APP_PSK_TAG,
 #endif
 };
 
@@ -86,8 +86,8 @@ static int tls_init(void)
 #endif
 
 #if defined(MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED)
-	err = tls_credential_add(APP_PSK_TAG, TLS_CREDENTIAL_PSK,
-				 client_psk, sizeof(client_psk));
+	err = tls_credential_add(APP_PSK_TAG, TLS_CREDENTIAL_PSK, client_psk,
+				 sizeof(client_psk));
 	if (err < 0) {
 		LOG_ERR("Failed to register PSK: %d", err);
 		return err;
@@ -199,8 +199,7 @@ void mqtt_evt_handler(struct mqtt_client *const client,
 			break;
 		}
 
-		LOG_INF("PUBCOMP packet id: %u",
-			evt->param.pubcomp.message_id);
+		LOG_INF("PUBCOMP packet id: %u", evt->param.pubcomp.message_id);
 
 		break;
 
@@ -232,8 +231,8 @@ static char *get_mqtt_payload(enum mqtt_qos qos)
 static char *get_mqtt_topic(void)
 {
 #if APP_BLUEMIX_TOPIC
-	return "iot-2/type/"BLUEMIX_DEVTYPE"/id/"BLUEMIX_DEVID
-	       "/evt/"BLUEMIX_EVENT"/fmt/"BLUEMIX_FORMAT;
+	return "iot-2/type/" BLUEMIX_DEVTYPE "/id/" BLUEMIX_DEVID
+	       "/evt/" BLUEMIX_EVENT "/fmt/" BLUEMIX_FORMAT;
 #else
 	return "sensors";
 #endif
@@ -245,11 +244,9 @@ static int publish(struct mqtt_client *client, enum mqtt_qos qos)
 
 	param.message.topic.qos = qos;
 	param.message.topic.topic.utf8 = (uint8_t *)get_mqtt_topic();
-	param.message.topic.topic.size =
-			strlen(param.message.topic.topic.utf8);
+	param.message.topic.topic.size = strlen(param.message.topic.topic.utf8);
 	param.message.payload.data = get_mqtt_payload(qos);
-	param.message.payload.len =
-			strlen(param.message.payload.data);
+	param.message.payload.len = strlen(param.message.payload.data);
 	param.message_id = sys_rand32_get();
 	param.dup_flag = 0U;
 	param.retain_flag = 0U;
@@ -259,8 +256,7 @@ static int publish(struct mqtt_client *client, enum mqtt_qos qos)
 
 #define RC_STR(rc) ((rc) == 0 ? "OK" : "ERROR")
 
-#define PRINT_RESULT(func, rc) \
-	LOG_INF("%s: %d <%s>", (func), rc, RC_STR(rc))
+#define PRINT_RESULT(func, rc) LOG_INF("%s: %d <%s>", (func), rc, RC_STR(rc))
 
 static void broker_init(void)
 {
@@ -347,16 +343,15 @@ static void client_init(struct mqtt_client *client)
 	client->transport.websocket.config.host = SERVER_ADDR;
 	client->transport.websocket.config.url = "/mqtt";
 	client->transport.websocket.config.tmp_buf = temp_ws_rx_buf;
-	client->transport.websocket.config.tmp_buf_len =
-						sizeof(temp_ws_rx_buf);
+	client->transport.websocket.config.tmp_buf_len = sizeof(temp_ws_rx_buf);
 	client->transport.websocket.timeout = 5 * MSEC_PER_SEC;
 #endif
 
 #if defined(CONFIG_SOCKS)
 	mqtt_client_set_proxy(client, &socks5_proxy,
 			      socks5_proxy.sa_family == AF_INET ?
-			      sizeof(struct sockaddr_in) :
-			      sizeof(struct sockaddr_in6));
+					    sizeof(struct sockaddr_in) :
+					    sizeof(struct sockaddr_in6));
 #endif
 }
 
@@ -366,7 +361,6 @@ static int try_to_connect(struct mqtt_client *client)
 	int rc, i = 0;
 
 	while (i++ < APP_CONNECT_TRIES && !connected) {
-
 		client_init(client);
 
 		rc = mqtt_connect(client);
@@ -427,8 +421,18 @@ static int process_mqtt_and_sleep(struct mqtt_client *client, int timeout)
 	return 0;
 }
 
-#define SUCCESS_OR_EXIT(rc) { if (rc != 0) { return 1; } }
-#define SUCCESS_OR_BREAK(rc) { if (rc != 0) { break; } }
+#define SUCCESS_OR_EXIT(rc)       \
+	{                         \
+		if (rc != 0) {    \
+			return 1; \
+		}                 \
+	}
+#define SUCCESS_OR_BREAK(rc)   \
+	{                      \
+		if (rc != 0) { \
+			break; \
+		}              \
+	}
 
 static int publisher(void)
 {
@@ -500,12 +504,11 @@ static void start_app(void)
 #define STACK_SIZE 2048
 #define THREAD_PRIORITY K_PRIO_COOP(8)
 
-K_THREAD_DEFINE(app_thread, STACK_SIZE,
-		start_app, NULL, NULL, NULL,
+K_THREAD_DEFINE(app_thread, STACK_SIZE, start_app, NULL, NULL, NULL,
 		THREAD_PRIORITY, K_USER, -1);
 
-static K_MEM_POOL_DEFINE(app_mem_pool, sizeof(uintptr_t), 1024,
-			 2, sizeof(uintptr_t));
+static K_MEM_POOL_DEFINE(app_mem_pool, sizeof(uintptr_t), 1024, 2,
+			 sizeof(uintptr_t));
 #endif
 
 void main(void)

@@ -20,24 +20,24 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(usb_dc_kinetis);
 
-#define NUM_OF_EP_MAX		DT_INST_PROP(0, num_bidir_endpoints)
+#define NUM_OF_EP_MAX DT_INST_PROP(0, num_bidir_endpoints)
 
-#define BD_OWN_MASK		(1 << 5)
-#define BD_DATA01_MASK		(1 << 4)
-#define BD_KEEP_MASK		(1 << 3)
-#define BD_NINC_MASK		(1 << 2)
-#define BD_DTS_MASK		(1 << 1)
-#define BD_STALL_MASK		(1 << 0)
+#define BD_OWN_MASK (1 << 5)
+#define BD_DATA01_MASK (1 << 4)
+#define BD_KEEP_MASK (1 << 3)
+#define BD_NINC_MASK (1 << 2)
+#define BD_DTS_MASK (1 << 1)
+#define BD_STALL_MASK (1 << 0)
 
-#define KINETIS_SETUP_TOKEN	0x0d
-#define KINETIS_IN_TOKEN	0x09
-#define KINETIS_OUT_TOKEN	0x01
+#define KINETIS_SETUP_TOKEN 0x0d
+#define KINETIS_IN_TOKEN 0x09
+#define KINETIS_OUT_TOKEN 0x01
 
-#define USBFSOTG_PERID		0x04
-#define USBFSOTG_REV		0x33
+#define USBFSOTG_PERID 0x04
+#define USBFSOTG_REV 0x33
 
-#define KINETIS_EP_NUMOF_MASK	0xf
-#define KINETIS_ADDR2IDX(addr)	((addr) & (KINETIS_EP_NUMOF_MASK))
+#define KINETIS_EP_NUMOF_MASK 0xf
+#define KINETIS_ADDR2IDX(addr) ((addr) & (KINETIS_EP_NUMOF_MASK))
 
 /*
  * Buffer Descriptor (BD) entry provides endpoint buffer control
@@ -65,7 +65,7 @@ struct buf_descriptor {
 		} set __packed;
 
 	} __packed;
-	uint32_t   buf_addr;
+	uint32_t buf_addr;
 } __packed;
 
 /*
@@ -73,12 +73,12 @@ struct buf_descriptor {
  * The driver configuration with 16 fully bidirectional endpoints would require
  * four BD entries per endpoint and 512 bytes of memory.
  */
-static struct buf_descriptor __aligned(512) bdt[(NUM_OF_EP_MAX) * 2 * 2];
+static struct buf_descriptor __aligned(512) bdt[(NUM_OF_EP_MAX)*2 * 2];
 
-#define BD_IDX_EP0TX_EVEN		2
-#define BD_IDX_EP0TX_ODD		3
+#define BD_IDX_EP0TX_EVEN 2
+#define BD_IDX_EP0TX_ODD 3
 
-#define EP_BUF_NUMOF_BLOCKS		(NUM_OF_EP_MAX / 2)
+#define EP_BUF_NUMOF_BLOCKS (NUM_OF_EP_MAX / 2)
 
 K_MEM_POOL_DEFINE(ep_buf_pool, 16, 512, EP_BUF_NUMOF_BLOCKS, 4);
 
@@ -101,7 +101,7 @@ struct usb_ep_ctrl_data {
 	usb_dc_ep_callback cb_out;
 };
 
-#define USBD_THREAD_STACK_SIZE		1024
+#define USBD_THREAD_STACK_SIZE 1024
 
 struct usb_device_data {
 	usb_dc_status_callback status_cb;
@@ -116,8 +116,8 @@ struct usb_device_data {
 
 static struct usb_device_data dev_data;
 
-#define USB_DC_CB_TYPE_MGMT		0
-#define USB_DC_CB_TYPE_EP		1
+#define USB_DC_CB_TYPE_MGMT 0
+#define USB_DC_CB_TYPE_EP 1
 
 struct cb_msg {
 	uint8_t ep;
@@ -136,7 +136,7 @@ static void usb_kinetis_thread_main(void *arg1, void *unused1, void *unused2);
 static inline uint8_t get_bdt_idx(uint8_t ep, uint8_t odd)
 {
 	if (ep & USB_EP_DIR_IN) {
-		return ((((KINETIS_ADDR2IDX(ep)) * 4) + 2  + (odd & 1)));
+		return ((((KINETIS_ADDR2IDX(ep)) * 4) + 2 + (odd & 1)));
 	}
 	return ((((KINETIS_ADDR2IDX(ep)) * 4) + (odd & 1)));
 }
@@ -153,8 +153,7 @@ static int kinetis_usb_init(void)
 	/* enable USB module, AKA USBEN bit in CTL1 register */
 	USB0->CTL |= USB_CTL_USBENSOFEN_MASK;
 
-	if ((USB0->PERID != USBFSOTG_PERID) ||
-	    (USB0->REV != USBFSOTG_REV)) {
+	if ((USB0->PERID != USBFSOTG_PERID) || (USB0->REV != USBFSOTG_REV)) {
 		return -1;
 	}
 
@@ -171,9 +170,8 @@ static int kinetis_usb_init(void)
 	USB0->USBCTRL = USB_USBCTRL_PDE_MASK;
 
 	k_thread_create(&dev_data.thread, dev_data.thread_stack,
-			USBD_THREAD_STACK_SIZE,
-			usb_kinetis_thread_main, NULL, NULL, NULL,
-			K_PRIO_COOP(2), 0, K_NO_WAIT);
+			USBD_THREAD_STACK_SIZE, usb_kinetis_thread_main, NULL,
+			NULL, NULL, K_PRIO_COOP(2), 0, K_NO_WAIT);
 
 	/* Connect and enable USB interrupt */
 	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
@@ -207,12 +205,9 @@ int usb_dc_reset(void)
 	/* Reset default address */
 	USB0->ADDR = 0x00;
 
-	USB0->INTEN = (USB_INTEN_USBRSTEN_MASK |
-		       USB_INTEN_TOKDNEEN_MASK |
-		       USB_INTEN_SLEEPEN_MASK  |
-		       USB_INTEN_SOFTOKEN_MASK |
-		       USB_INTEN_STALLEN_MASK |
-		       USB_INTEN_ERROREN_MASK);
+	USB0->INTEN = (USB_INTEN_USBRSTEN_MASK | USB_INTEN_TOKDNEEN_MASK |
+		       USB_INTEN_SLEEPEN_MASK | USB_INTEN_SOFTOKEN_MASK |
+		       USB_INTEN_STALLEN_MASK | USB_INTEN_ERROREN_MASK);
 
 	LOG_DBG("");
 
@@ -246,7 +241,7 @@ int usb_dc_detach(void)
 {
 	LOG_DBG("");
 	/* disable USB and DP Pullup */
-	USB0->CTL  &= ~USB_CTL_USBENSOFEN_MASK;
+	USB0->CTL &= ~USB_CTL_USBENSOFEN_MASK;
 	USB0->CONTROL &= ~USB_CONTROL_DPPULLUPNONOTG_MASK;
 
 	return 0;
@@ -271,7 +266,7 @@ int usb_dc_set_address(const uint8_t addr)
 	return 0;
 }
 
-int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data * const cfg)
+int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data *const cfg)
 {
 	uint8_t ep_idx = USB_EP_GET_IDX(cfg->ep_addr);
 
@@ -321,7 +316,7 @@ int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data * const cfg)
 	return 0;
 }
 
-int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const cfg)
+int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data *const cfg)
 {
 	uint8_t ep_idx = USB_EP_GET_IDX(cfg->ep_addr);
 	struct usb_ep_ctrl_data *ep_ctrl;
@@ -338,7 +333,7 @@ int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const cfg)
 	ep_ctrl = &dev_data.ep_ctrl[ep_idx];
 
 	if (ep_idx && (dev_data.ep_ctrl[ep_idx].status.in_enabled ||
-	    dev_data.ep_ctrl[ep_idx].status.out_enabled)) {
+		       dev_data.ep_ctrl[ep_idx].status.out_enabled)) {
 		LOG_WRN("endpoint already configured");
 		return -EALREADY;
 	}
@@ -360,7 +355,8 @@ int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const cfg)
 	(void)memset(&bdt[idx_even], 0, sizeof(struct buf_descriptor));
 	(void)memset(&bdt[idx_odd], 0, sizeof(struct buf_descriptor));
 
-	if (k_mem_pool_alloc(&ep_buf_pool, block, cfg->ep_mps * 2U, K_MSEC(10)) == 0) {
+	if (k_mem_pool_alloc(&ep_buf_pool, block, cfg->ep_mps * 2U,
+			     K_MSEC(10)) == 0) {
 		(void)memset(block->data, 0, cfg->ep_mps * 2U);
 	} else {
 		LOG_ERR("Memory allocation time-out");
@@ -369,7 +365,8 @@ int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const cfg)
 
 	bdt[idx_even].buf_addr = (uint32_t)block->data;
 	LOG_INF("idx_even %x", (uint32_t)block->data);
-	bdt[idx_odd].buf_addr = (uint32_t)((uint8_t *)block->data + cfg->ep_mps);
+	bdt[idx_odd].buf_addr =
+		(uint32_t)((uint8_t *)block->data + cfg->ep_mps);
 	LOG_INF("idx_odd %x", (uint32_t)((uint8_t *)block->data + cfg->ep_mps));
 
 	if (cfg->ep_addr & USB_EP_DIR_IN) {
@@ -387,9 +384,9 @@ int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const cfg)
 	switch (cfg->ep_type) {
 	case USB_DC_EP_CONTROL:
 		LOG_DBG("configure control endpoint");
-		USB0->ENDPOINT[ep_idx].ENDPT |= (USB_ENDPT_EPHSHK_MASK |
-						 USB_ENDPT_EPRXEN_MASK |
-						 USB_ENDPT_EPTXEN_MASK);
+		USB0->ENDPOINT[ep_idx].ENDPT |=
+			(USB_ENDPT_EPHSHK_MASK | USB_ENDPT_EPRXEN_MASK |
+			 USB_ENDPT_EPTXEN_MASK);
 		break;
 	case USB_DC_EP_BULK:
 	case USB_DC_EP_INTERRUPT:
@@ -432,8 +429,8 @@ int usb_dc_ep_set_stall(const uint8_t ep)
 				     ~dev_data.ep_ctrl[ep_idx].status.out_odd);
 	} else {
 		dev_data.ep_ctrl[ep_idx].status.in_stalled = 1U;
-		bd_idx = get_bdt_idx(ep,
-				     dev_data.ep_ctrl[ep_idx].status.in_odd);
+		bd_idx =
+			get_bdt_idx(ep, dev_data.ep_ctrl[ep_idx].status.in_odd);
 	}
 
 	bdt[bd_idx].set.bd_ctrl = BD_STALL_MASK | BD_DTS_MASK | BD_OWN_MASK;
@@ -464,8 +461,8 @@ int usb_dc_ep_clear_stall(const uint8_t ep)
 	} else {
 		dev_data.ep_ctrl[ep_idx].status.in_stalled = 0U;
 		dev_data.ep_ctrl[ep_idx].status.in_data1 = false;
-		bd_idx = get_bdt_idx(ep,
-				     dev_data.ep_ctrl[ep_idx].status.in_odd);
+		bd_idx =
+			get_bdt_idx(ep, dev_data.ep_ctrl[ep_idx].status.in_odd);
 		bdt[bd_idx].set.bd_ctrl = 0U;
 	}
 
@@ -498,11 +495,10 @@ int usb_dc_ep_is_stalled(const uint8_t ep, uint8_t *const stalled)
 		*stalled = dev_data.ep_ctrl[ep_idx].status.in_stalled;
 	}
 
-	uint8_t bd_idx = get_bdt_idx(ep,
-			dev_data.ep_ctrl[ep_idx].status.in_odd);
+	uint8_t bd_idx =
+		get_bdt_idx(ep, dev_data.ep_ctrl[ep_idx].status.in_odd);
 	LOG_WRN("active bd ctrl: %x", bdt[bd_idx].set.bd_ctrl);
-	bd_idx = get_bdt_idx(ep,
-			~dev_data.ep_ctrl[ep_idx].status.in_odd);
+	bd_idx = get_bdt_idx(ep, ~dev_data.ep_ctrl[ep_idx].status.in_odd);
 	LOG_WRN("next bd ctrl: %x", bdt[bd_idx].set.bd_ctrl);
 
 	return 0;
@@ -528,7 +524,7 @@ int usb_dc_ep_enable(const uint8_t ep)
 	idx_odd = get_bdt_idx(ep, 1);
 
 	if (ep_idx && (dev_data.ep_ctrl[ep_idx].status.in_enabled ||
-	    dev_data.ep_ctrl[ep_idx].status.out_enabled)) {
+		       dev_data.ep_ctrl[ep_idx].status.out_enabled)) {
 		LOG_WRN("endpoint 0x%x already enabled", ep);
 		return -EALREADY;
 	}
@@ -596,7 +592,7 @@ int usb_dc_ep_flush(const uint8_t ep)
 }
 
 int usb_dc_ep_write(const uint8_t ep, const uint8_t *const data,
-		    const uint32_t data_len, uint32_t * const ret_bytes)
+		    const uint32_t data_len, uint32_t *const ret_bytes)
 {
 	uint8_t ep_idx = USB_EP_GET_IDX(ep);
 	uint32_t len_to_send = data_len;
@@ -642,8 +638,7 @@ int usb_dc_ep_write(const uint8_t ep, const uint8_t *const data,
 
 	dev_data.ep_ctrl[ep_idx].status.in_odd = ~odd;
 	if (dev_data.ep_ctrl[ep_idx].status.in_data1) {
-		bdt[bd_idx].set.bd_ctrl = BD_DTS_MASK |
-					  BD_DATA01_MASK |
+		bdt[bd_idx].set.bd_ctrl = BD_DTS_MASK | BD_DATA01_MASK |
 					  BD_OWN_MASK;
 	} else {
 		bdt[bd_idx].set.bd_ctrl = BD_DTS_MASK | BD_OWN_MASK;
@@ -699,7 +694,7 @@ int usb_dc_ep_read_wait(uint8_t ep, uint8_t *data, uint32_t max_data_len,
 		return -EBUSY;
 	}
 
-	data_len  = bdt[bd_idx].get.bc;
+	data_len = bdt[bd_idx].get.bc;
 
 	if (!data && !max_data_len) {
 		/*
@@ -733,7 +728,6 @@ int usb_dc_ep_read_wait(uint8_t ep, uint8_t *data, uint32_t max_data_len,
 	return 0;
 }
 
-
 int usb_dc_ep_read_continue(uint8_t ep)
 {
 	uint8_t ep_idx = USB_EP_GET_IDX(ep);
@@ -765,8 +759,7 @@ int usb_dc_ep_read_continue(uint8_t ep)
 
 	/* Reset next buffer descriptor and set next toggle bit  */
 	if (dev_data.ep_ctrl[ep_idx].status.out_data1) {
-		bdt[bd_idx].set.bd_ctrl = BD_DTS_MASK |
-					  BD_DATA01_MASK |
+		bdt[bd_idx].set.bd_ctrl = BD_DTS_MASK | BD_DATA01_MASK |
 					  BD_OWN_MASK;
 	} else {
 		bdt[bd_idx].set.bd_ctrl = BD_DTS_MASK | BD_OWN_MASK;
@@ -867,10 +860,9 @@ static inline void reenable_all_endpoints(void)
 
 static void usb_kinetis_isr_handler(void)
 {
-	uint8_t istatus  = USB0->ISTAT;
-	uint8_t status  = USB0->STAT;
+	uint8_t istatus = USB0->ISTAT;
+	uint8_t status = USB0->STAT;
 	struct cb_msg msg;
-
 
 	if (istatus & USB_ISTAT_USBRST_MASK) {
 		dev_data.address = 0U;
@@ -908,10 +900,10 @@ static void usb_kinetis_isr_handler(void)
 	}
 
 	if (istatus & USB_ISTAT_TOKDNE_MASK) {
-
 		uint8_t ep_idx = status >> USB_STAT_ENDP_SHIFT;
 		uint8_t ep = ((status << 4) & USB_EP_DIR_IN) | ep_idx;
-		uint8_t odd = (status & USB_STAT_ODD_MASK) >> USB_STAT_ODD_SHIFT;
+		uint8_t odd = (status & USB_STAT_ODD_MASK) >>
+			      USB_STAT_ODD_SHIFT;
 		uint8_t idx = get_bdt_idx(ep, odd);
 		uint8_t token_pid = bdt[idx].get.tok_pid;
 
@@ -1000,20 +992,20 @@ static void usb_kinetis_thread_main(void *arg1, void *unused1, void *unused2)
 			switch (msg.cb) {
 			case USB_DC_EP_SETUP:
 				if (dev_data.ep_ctrl[ep_idx].cb_out) {
-					dev_data.ep_ctrl[ep_idx].cb_out(msg.ep,
-						USB_DC_EP_SETUP);
+					dev_data.ep_ctrl[ep_idx].cb_out(
+						msg.ep, USB_DC_EP_SETUP);
 				}
 				break;
 			case USB_DC_EP_DATA_OUT:
 				if (dev_data.ep_ctrl[ep_idx].cb_out) {
-					dev_data.ep_ctrl[ep_idx].cb_out(msg.ep,
-						USB_DC_EP_DATA_OUT);
+					dev_data.ep_ctrl[ep_idx].cb_out(
+						msg.ep, USB_DC_EP_DATA_OUT);
 				}
 				break;
 			case USB_DC_EP_DATA_IN:
 				if (dev_data.ep_ctrl[ep_idx].cb_in) {
-					dev_data.ep_ctrl[ep_idx].cb_in(msg.ep,
-						USB_DC_EP_DATA_IN);
+					dev_data.ep_ctrl[ep_idx].cb_in(
+						msg.ep, USB_DC_EP_DATA_IN);
 				}
 				break;
 			default:

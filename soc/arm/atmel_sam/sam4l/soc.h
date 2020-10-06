@@ -61,10 +61,10 @@
 #include "../common/atmel_sam_dt.h"
 
 /** Processor Clock (HCLK) Frequency */
-#define SOC_ATMEL_SAM_HCLK_FREQ_HZ      ATMEL_SAM_DT_CPU_CLK_FREQ_HZ
+#define SOC_ATMEL_SAM_HCLK_FREQ_HZ ATMEL_SAM_DT_CPU_CLK_FREQ_HZ
 
 /** Master Clock (MCK) Frequency */
-#define SOC_ATMEL_SAM_MCK_FREQ_HZ       SOC_ATMEL_SAM_HCLK_FREQ_HZ
+#define SOC_ATMEL_SAM_MCK_FREQ_HZ SOC_ATMEL_SAM_HCLK_FREQ_HZ
 
 /** Oscillator identifiers
  *    External Oscillator 0
@@ -75,13 +75,13 @@
  *    Internal 1 MHz RC oscillator
  *    Internal System RC oscillator
  */
-#define OSC_ID_OSC0             0
-#define OSC_ID_OSC32            1
-#define OSC_ID_RC32K            2
-#define OSC_ID_RC80M            3
-#define OSC_ID_RCFAST           4
-#define OSC_ID_RC1M             5
-#define OSC_ID_RCSYS            6
+#define OSC_ID_OSC0 0
+#define OSC_ID_OSC32 1
+#define OSC_ID_RC32K 2
+#define OSC_ID_RC80M 3
+#define OSC_ID_RCFAST 4
+#define OSC_ID_RC1M 5
+#define OSC_ID_RCSYS 6
 
 /** System clock source
  *    System RC oscillator
@@ -92,104 +92,104 @@
  *    4-8-12 MHz RC oscillator
  *    1 MHz RC oscillator
  */
-#define OSC_SRC_RCSYS           0
-#define OSC_SRC_OSC0            1
-#define OSC_SRC_PLL0            2
-#define OSC_SRC_DFLL            3
-#define OSC_SRC_RC80M           4
-#define OSC_SRC_RCFAST          5
-#define OSC_SRC_RC1M            6
+#define OSC_SRC_RCSYS 0
+#define OSC_SRC_OSC0 1
+#define OSC_SRC_PLL0 2
+#define OSC_SRC_DFLL 3
+#define OSC_SRC_RC80M 4
+#define OSC_SRC_RCFAST 5
+#define OSC_SRC_RC1M 6
 
 #define PM_CLOCK_MASK(bus, per) ((bus << 5) + per)
 
 /** Bus index of maskable module clocks. Peripheral ids are defined out of
  * order.  It start from PBA up to PBD, then move to HSB, and finaly CPU.
  */
-#define PM_CLK_GRP_CPU          5
-#define PM_CLK_GRP_HSB          4
-#define PM_CLK_GRP_PBA          0
-#define PM_CLK_GRP_PBB          1
-#define PM_CLK_GRP_PBC          2
-#define PM_CLK_GRP_PBD          3
+#define PM_CLK_GRP_CPU 5
+#define PM_CLK_GRP_HSB 4
+#define PM_CLK_GRP_PBA 0
+#define PM_CLK_GRP_PBB 1
+#define PM_CLK_GRP_PBC 2
+#define PM_CLK_GRP_PBD 3
 
 /** Clocks derived from the CPU clock
  */
-#define SYSCLK_OCD              0
+#define SYSCLK_OCD 0
 
 /** Clocks derived from the HSB clock
  */
-#define SYSCLK_PDCA_HSB         0
-#define SYSCLK_HFLASHC_DATA     1
-#define SYSCLK_HRAMC1_DATA      2
-#define SYSCLK_USBC_DATA        3
-#define SYSCLK_CRCCU_DATA       4
-#define SYSCLK_PBA_BRIDGE       5
-#define SYSCLK_PBB_BRIDGE       6
-#define SYSCLK_PBC_BRIDGE       7
-#define SYSCLK_PBD_BRIDGE       8
-#define SYSCLK_AESA_HSB         9
+#define SYSCLK_PDCA_HSB 0
+#define SYSCLK_HFLASHC_DATA 1
+#define SYSCLK_HRAMC1_DATA 2
+#define SYSCLK_USBC_DATA 3
+#define SYSCLK_CRCCU_DATA 4
+#define SYSCLK_PBA_BRIDGE 5
+#define SYSCLK_PBB_BRIDGE 6
+#define SYSCLK_PBC_BRIDGE 7
+#define SYSCLK_PBD_BRIDGE 8
+#define SYSCLK_AESA_HSB 9
 
 /** Clocks derived from the PBA clock
  */
-#define SYSCLK_IISC             0
-#define SYSCLK_SPI              1
-#define SYSCLK_TC0              2
-#define SYSCLK_TC1              3
-#define SYSCLK_TWIM0            4
-#define SYSCLK_TWIS0            5
-#define SYSCLK_TWIM1            6
-#define SYSCLK_TWIS1            7
-#define SYSCLK_USART0           8
-#define SYSCLK_USART1           9
-#define SYSCLK_USART2           10
-#define SYSCLK_USART3           11
-#define SYSCLK_ADCIFE           12
-#define SYSCLK_DACC             13
-#define SYSCLK_ACIFC            14
-#define SYSCLK_GLOC             15
-#define SYSCLK_ABDACB           16
-#define SYSCLK_TRNG             17
-#define SYSCLK_PARC             18
-#define SYSCLK_CATB             19
-#define SYSCLK_TWIM2            21
-#define SYSCLK_TWIM3            22
-#define SYSCLK_LCDCA            23
+#define SYSCLK_IISC 0
+#define SYSCLK_SPI 1
+#define SYSCLK_TC0 2
+#define SYSCLK_TC1 3
+#define SYSCLK_TWIM0 4
+#define SYSCLK_TWIS0 5
+#define SYSCLK_TWIM1 6
+#define SYSCLK_TWIS1 7
+#define SYSCLK_USART0 8
+#define SYSCLK_USART1 9
+#define SYSCLK_USART2 10
+#define SYSCLK_USART3 11
+#define SYSCLK_ADCIFE 12
+#define SYSCLK_DACC 13
+#define SYSCLK_ACIFC 14
+#define SYSCLK_GLOC 15
+#define SYSCLK_ABDACB 16
+#define SYSCLK_TRNG 17
+#define SYSCLK_PARC 18
+#define SYSCLK_CATB 19
+#define SYSCLK_TWIM2 21
+#define SYSCLK_TWIM3 22
+#define SYSCLK_LCDCA 23
 
 /** Clocks derived from the PBB clock
  */
-#define SYSCLK_HFLASHC_REGS     0
-#define SYSCLK_HRAMC1_REGS      1
-#define SYSCLK_HMATRIX          2
-#define SYSCLK_PDCA_PB          3
-#define SYSCLK_CRCCU_REGS       4
-#define SYSCLK_USBC_REGS        5
-#define SYSCLK_PEVC             6
+#define SYSCLK_HFLASHC_REGS 0
+#define SYSCLK_HRAMC1_REGS 1
+#define SYSCLK_HMATRIX 2
+#define SYSCLK_PDCA_PB 3
+#define SYSCLK_CRCCU_REGS 4
+#define SYSCLK_USBC_REGS 5
+#define SYSCLK_PEVC 6
 
 /** Clocks derived from the PBC clock
  */
-#define SYSCLK_PM               0
-#define SYSCLK_CHIPID           1
-#define SYSCLK_SCIF             2
-#define SYSCLK_FREQM            3
-#define SYSCLK_GPIO             4
+#define SYSCLK_PM 0
+#define SYSCLK_CHIPID 1
+#define SYSCLK_SCIF 2
+#define SYSCLK_FREQM 3
+#define SYSCLK_GPIO 4
 
 /** Clocks derived from the PBD clock
  */
-#define SYSCLK_BPM              0
-#define SYSCLK_BSCIF            1
-#define SYSCLK_AST              2
-#define SYSCLK_WDT              3
-#define SYSCLK_EIC              4
-#define SYSCLK_PICOUART         5
+#define SYSCLK_BPM 0
+#define SYSCLK_BSCIF 1
+#define SYSCLK_AST 2
+#define SYSCLK_WDT 3
+#define SYSCLK_EIC 4
+#define SYSCLK_PICOUART 5
 
 /** Divided clock mask derived from the PBA clock
  */
-#define PBA_DIVMASK_TIMER_CLOCK2     (1u << 0)
-#define PBA_DIVMASK_TIMER_CLOCK3     (1u << 2)
-#define PBA_DIVMASK_CLK_USART        (1u << 2)
-#define PBA_DIVMASK_TIMER_CLOCK4     (1u << 4)
-#define PBA_DIVMASK_TIMER_CLOCK5     (1u << 6)
-#define PBA_DIVMASK_Msk              (0x7Fu << 0)
+#define PBA_DIVMASK_TIMER_CLOCK2 (1u << 0)
+#define PBA_DIVMASK_TIMER_CLOCK3 (1u << 2)
+#define PBA_DIVMASK_CLK_USART (1u << 2)
+#define PBA_DIVMASK_TIMER_CLOCK4 (1u << 4)
+#define PBA_DIVMASK_TIMER_CLOCK5 (1u << 6)
+#define PBA_DIVMASK_Msk (0x7Fu << 0)
 
 /** Generic Clock Instances
  *    0- DFLLIF main reference and GCLK0 pin (CLK_DFLLIF_REF)
@@ -205,18 +205,18 @@
  *   10- ADCIFE
  *   11- Master generic clock. Can be used as source for other generic clocks.
  */
-#define GEN_CLK_DFLL_REF	0
-#define GEN_CLK_DFLL_DITHER	1
-#define GEN_CLK_AST		2
-#define GEN_CLK_CATB		3
-#define GEN_CLK_AESA		4
-#define GEN_CLK_GLOC		5
-#define GEN_CLK_ABDACB		6
-#define GEN_CLK_USBC		7
-#define GEN_CLK_TC1_PEVC0	8
-#define GEN_CLK_PLL0_PEVC1	9
-#define GEN_CLK_ADCIFE		10
-#define GEN_CLK_MASTER_GEN	11
+#define GEN_CLK_DFLL_REF 0
+#define GEN_CLK_DFLL_DITHER 1
+#define GEN_CLK_AST 2
+#define GEN_CLK_CATB 3
+#define GEN_CLK_AESA 4
+#define GEN_CLK_GLOC 5
+#define GEN_CLK_ABDACB 6
+#define GEN_CLK_USBC 7
+#define GEN_CLK_TC1_PEVC0 8
+#define GEN_CLK_PLL0_PEVC1 9
+#define GEN_CLK_ADCIFE 10
+#define GEN_CLK_MASTER_GEN 11
 
 #endif /* !_ASMLANGUAGE */
 

@@ -22,17 +22,15 @@
 
 #if defined(CONFIG_BT_LL_SW_SPLIT)
 #include "ll_sw/lll.h"
-#define TICKER_MAYFLY_CALL_ID_ISR     TICKER_USER_ID_LLL
+#define TICKER_MAYFLY_CALL_ID_ISR TICKER_USER_ID_LLL
 #define TICKER_MAYFLY_CALL_ID_TRIGGER TICKER_USER_ID_ULL_HIGH
-#define TICKER_MAYFLY_CALL_ID_WORKER  TICKER_USER_ID_ULL_HIGH
-#define TICKER_MAYFLY_CALL_ID_JOB     TICKER_USER_ID_ULL_LOW
+#define TICKER_MAYFLY_CALL_ID_WORKER TICKER_USER_ID_ULL_HIGH
+#define TICKER_MAYFLY_CALL_ID_JOB TICKER_USER_ID_ULL_LOW
 #define TICKER_MAYFLY_CALL_ID_PROGRAM TICKER_USER_ID_THREAD
-static uint8_t const caller_id_lut[] = {
-	TICKER_CALL_ID_ISR,
-	TICKER_CALL_ID_WORKER,
-	TICKER_CALL_ID_JOB,
-	TICKER_CALL_ID_PROGRAM
-};
+static uint8_t const caller_id_lut[] = { TICKER_CALL_ID_ISR,
+					 TICKER_CALL_ID_WORKER,
+					 TICKER_CALL_ID_JOB,
+					 TICKER_CALL_ID_PROGRAM };
 #else
 #error Unknown LL variant.
 #endif
@@ -49,8 +47,8 @@ uint8_t hal_ticker_instance0_caller_id_get(uint8_t user_id)
 	return caller_id;
 }
 
-void hal_ticker_instance0_sched(uint8_t caller_id, uint8_t callee_id, uint8_t chain,
-				void *instance)
+void hal_ticker_instance0_sched(uint8_t caller_id, uint8_t callee_id,
+				uint8_t chain, void *instance)
 {
 	/* return value not checked as we allow multiple calls to schedule
 	 * before being actually needing the work to complete before new
@@ -60,21 +58,17 @@ void hal_ticker_instance0_sched(uint8_t caller_id, uint8_t callee_id, uint8_t ch
 #if defined(CONFIG_BT_LL_SW_SPLIT)
 	case TICKER_CALL_ID_ISR:
 		switch (callee_id) {
-		case TICKER_CALL_ID_JOB:
-		{
+		case TICKER_CALL_ID_JOB: {
 			static memq_link_t link;
-			static struct mayfly m = {0, 0, &link, NULL,
-						  ticker_job};
+			static struct mayfly m = { 0, 0, &link, NULL,
+						   ticker_job };
 
 			m.param = instance;
 
 			/* TODO: scheduler lock, if preemptive threads used */
 			mayfly_enqueue(TICKER_MAYFLY_CALL_ID_ISR,
-				       TICKER_MAYFLY_CALL_ID_JOB,
-				       chain,
-				       &m);
-		}
-		break;
+				       TICKER_MAYFLY_CALL_ID_JOB, chain, &m);
+		} break;
 
 		default:
 			LL_ASSERT(0);
@@ -85,20 +79,16 @@ void hal_ticker_instance0_sched(uint8_t caller_id, uint8_t callee_id, uint8_t ch
 
 	case TICKER_CALL_ID_TRIGGER:
 		switch (callee_id) {
-		case TICKER_CALL_ID_WORKER:
-		{
+		case TICKER_CALL_ID_WORKER: {
 			static memq_link_t link;
-			static struct mayfly m = {0, 0, &link, NULL,
-						  ticker_worker};
+			static struct mayfly m = { 0, 0, &link, NULL,
+						   ticker_worker };
 
 			m.param = instance;
 
 			mayfly_enqueue(TICKER_MAYFLY_CALL_ID_TRIGGER,
-				       TICKER_MAYFLY_CALL_ID_WORKER,
-				       chain,
-				       &m);
-		}
-		break;
+				       TICKER_MAYFLY_CALL_ID_WORKER, chain, &m);
+		} break;
 
 		default:
 			LL_ASSERT(0);
@@ -108,20 +98,16 @@ void hal_ticker_instance0_sched(uint8_t caller_id, uint8_t callee_id, uint8_t ch
 
 	case TICKER_CALL_ID_WORKER:
 		switch (callee_id) {
-		case TICKER_CALL_ID_JOB:
-		{
+		case TICKER_CALL_ID_JOB: {
 			static memq_link_t link;
-			static struct mayfly m = {0, 0, &link, NULL,
-						  ticker_job};
+			static struct mayfly m = { 0, 0, &link, NULL,
+						   ticker_job };
 
 			m.param = instance;
 
 			mayfly_enqueue(TICKER_MAYFLY_CALL_ID_WORKER,
-				       TICKER_MAYFLY_CALL_ID_JOB,
-				       chain,
-				       &m);
-		}
-		break;
+				       TICKER_MAYFLY_CALL_ID_JOB, chain, &m);
+		} break;
 
 		default:
 			LL_ASSERT(0);
@@ -131,35 +117,27 @@ void hal_ticker_instance0_sched(uint8_t caller_id, uint8_t callee_id, uint8_t ch
 
 	case TICKER_CALL_ID_JOB:
 		switch (callee_id) {
-		case TICKER_CALL_ID_WORKER:
-		{
+		case TICKER_CALL_ID_WORKER: {
 			static memq_link_t link;
-			static struct mayfly m = {0, 0, &link, NULL,
-						  ticker_worker};
+			static struct mayfly m = { 0, 0, &link, NULL,
+						   ticker_worker };
 
 			m.param = instance;
 
 			mayfly_enqueue(TICKER_MAYFLY_CALL_ID_JOB,
-				       TICKER_MAYFLY_CALL_ID_WORKER,
-				       chain,
-				       &m);
-		}
-		break;
+				       TICKER_MAYFLY_CALL_ID_WORKER, chain, &m);
+		} break;
 
-		case TICKER_CALL_ID_JOB:
-		{
+		case TICKER_CALL_ID_JOB: {
 			static memq_link_t link;
-			static struct mayfly m = {0, 0, &link, NULL,
-						  ticker_job};
+			static struct mayfly m = { 0, 0, &link, NULL,
+						   ticker_job };
 
 			m.param = instance;
 
 			mayfly_enqueue(TICKER_MAYFLY_CALL_ID_JOB,
-				       TICKER_MAYFLY_CALL_ID_JOB,
-				       chain,
-				       &m);
-		}
-		break;
+				       TICKER_MAYFLY_CALL_ID_JOB, chain, &m);
+		} break;
 
 		default:
 			LL_ASSERT(0);
@@ -169,21 +147,17 @@ void hal_ticker_instance0_sched(uint8_t caller_id, uint8_t callee_id, uint8_t ch
 
 	case TICKER_CALL_ID_PROGRAM:
 		switch (callee_id) {
-		case TICKER_CALL_ID_JOB:
-		{
+		case TICKER_CALL_ID_JOB: {
 			static memq_link_t link;
-			static struct mayfly m = {0, 0, &link, NULL,
-						  ticker_job};
+			static struct mayfly m = { 0, 0, &link, NULL,
+						   ticker_job };
 
 			m.param = instance;
 
 			/* TODO: scheduler lock, if preemptive threads used */
 			mayfly_enqueue(TICKER_MAYFLY_CALL_ID_PROGRAM,
-				       TICKER_MAYFLY_CALL_ID_JOB,
-				       chain,
-				       &m);
-		}
-		break;
+				       TICKER_MAYFLY_CALL_ID_JOB, chain, &m);
+		} break;
 
 		default:
 			LL_ASSERT(0);

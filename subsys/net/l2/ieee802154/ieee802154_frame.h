@@ -17,60 +17,60 @@
 #include <net/ieee802154.h>
 #include <toolchain.h>
 
-#define IEEE802154_MTU				127
-#define IEEE802154_MIN_LENGTH			3
+#define IEEE802154_MTU 127
+#define IEEE802154_MIN_LENGTH 3
 /* See Section 5.2.1.4 */
-#define IEEE802154_BROADCAST_ADDRESS		0xFFFF
-#define IEEE802154_BROADCAST_PAN_ID		0xFFFF
+#define IEEE802154_BROADCAST_ADDRESS 0xFFFF
+#define IEEE802154_BROADCAST_PAN_ID 0xFFFF
 /* ACK packet size is the minimum size, see Section 5.2.2.3 */
-#define IEEE802154_ACK_PKT_LENGTH		IEEE802154_MIN_LENGTH
-#define IEEE802154_MFR_LENGTH			2
+#define IEEE802154_ACK_PKT_LENGTH IEEE802154_MIN_LENGTH
+#define IEEE802154_MFR_LENGTH 2
 
-#define IEEE802154_FCF_SEQ_LENGTH		3
-#define IEEE802154_EXT_ADDR_LENGTH		8
-#define IEEE802154_SHORT_ADDR_LENGTH		2
-#define IEEE802154_SIMPLE_ADDR_LENGTH		1
-#define IEEE802154_PAN_ID_LENGTH		2
+#define IEEE802154_FCF_SEQ_LENGTH 3
+#define IEEE802154_EXT_ADDR_LENGTH 8
+#define IEEE802154_SHORT_ADDR_LENGTH 2
+#define IEEE802154_SIMPLE_ADDR_LENGTH 1
+#define IEEE802154_PAN_ID_LENGTH 2
 
-#define IEEE802154_BEACON_MIN_SIZE		4
-#define IEEE802154_BEACON_SF_SIZE		2
-#define IEEE802154_BEACON_GTS_SPEC_SIZE		1
-#define IEEE802154_BEACON_GTS_IF_MIN_SIZE	IEEE802154_BEACON_GTS_SPEC_SIZE
-#define IEEE802154_BEACON_PAS_SPEC_SIZE		1
-#define IEEE802154_BEACON_PAS_IF_MIN_SIZE	IEEE802154_BEACON_PAS_SPEC_SIZE
-#define IEEE802154_BEACON_GTS_DIR_SIZE		1
-#define IEEE802154_BEACON_GTS_SIZE		3
-#define IEEE802154_BEACON_GTS_RX		1
-#define IEEE802154_BEACON_GTS_TX		0
+#define IEEE802154_BEACON_MIN_SIZE 4
+#define IEEE802154_BEACON_SF_SIZE 2
+#define IEEE802154_BEACON_GTS_SPEC_SIZE 1
+#define IEEE802154_BEACON_GTS_IF_MIN_SIZE IEEE802154_BEACON_GTS_SPEC_SIZE
+#define IEEE802154_BEACON_PAS_SPEC_SIZE 1
+#define IEEE802154_BEACON_PAS_IF_MIN_SIZE IEEE802154_BEACON_PAS_SPEC_SIZE
+#define IEEE802154_BEACON_GTS_DIR_SIZE 1
+#define IEEE802154_BEACON_GTS_SIZE 3
+#define IEEE802154_BEACON_GTS_RX 1
+#define IEEE802154_BEACON_GTS_TX 0
 
 /* See Section 5.2.1.1.1 */
 enum ieee802154_frame_type {
-	IEEE802154_FRAME_TYPE_BEACON		= 0x0,
-	IEEE802154_FRAME_TYPE_DATA		= 0x1,
-	IEEE802154_FRAME_TYPE_ACK		= 0x2,
-	IEEE802154_FRAME_TYPE_MAC_COMMAND	= 0x3,
-	IEEE802154_FRAME_TYPE_LLDN		= 0x4,
-	IEEE802154_FRAME_TYPE_MULTIPURPOSE	= 0x5,
-	IEEE802154_FRAME_TYPE_RESERVED		= 0x6,
+	IEEE802154_FRAME_TYPE_BEACON = 0x0,
+	IEEE802154_FRAME_TYPE_DATA = 0x1,
+	IEEE802154_FRAME_TYPE_ACK = 0x2,
+	IEEE802154_FRAME_TYPE_MAC_COMMAND = 0x3,
+	IEEE802154_FRAME_TYPE_LLDN = 0x4,
+	IEEE802154_FRAME_TYPE_MULTIPURPOSE = 0x5,
+	IEEE802154_FRAME_TYPE_RESERVED = 0x6,
 };
 
 /* See Section 5.2.1.1.6 */
 enum ieee802154_addressing_mode {
-	IEEE802154_ADDR_MODE_NONE		= 0x0,
-	IEEE802154_ADDR_MODE_SIMPLE		= 0x1,
-	IEEE802154_ADDR_MODE_SHORT		= 0x2,
-	IEEE802154_ADDR_MODE_EXTENDED		= 0x3,
+	IEEE802154_ADDR_MODE_NONE = 0x0,
+	IEEE802154_ADDR_MODE_SIMPLE = 0x1,
+	IEEE802154_ADDR_MODE_SHORT = 0x2,
+	IEEE802154_ADDR_MODE_EXTENDED = 0x3,
 };
 
 /** Versions 2003/2006 do no support simple addressing mode */
-#define IEEE802154_ADDR_MODE_RESERVED		IEEE802154_ADDR_MODE_SIMPLE
+#define IEEE802154_ADDR_MODE_RESERVED IEEE802154_ADDR_MODE_SIMPLE
 
 /* See Section 5.2.1.1.7 */
 enum ieee802154_version {
-	IEEE802154_VERSION_802154_2003		= 0x0,
-	IEEE802154_VERSION_802154_2006		= 0x1,
-	IEEE802154_VERSION_802154		= 0x2,
-	IEEE802154_VERSION_RESERVED		= 0x3,
+	IEEE802154_VERSION_802154_2003 = 0x0,
+	IEEE802154_VERSION_802154_2006 = 0x1,
+	IEEE802154_VERSION_802154 = 0x2,
+	IEEE802154_VERSION_RESERVED = 0x3,
 };
 
 /*
@@ -80,29 +80,29 @@ enum ieee802154_version {
 struct ieee802154_fcf_seq {
 	struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		uint16_t frame_type		:3;
-		uint16_t security_enabled		:1;
-		uint16_t frame_pending		:1;
-		uint16_t ar			:1;
-		uint16_t pan_id_comp		:1;
-		uint16_t reserved			:1;
-		uint16_t seq_num_suppr		:1;
-		uint16_t ie_list			:1;
-		uint16_t dst_addr_mode		:2;
-		uint16_t frame_version		:2;
-		uint16_t src_addr_mode		:2;
+		uint16_t frame_type : 3;
+		uint16_t security_enabled : 1;
+		uint16_t frame_pending : 1;
+		uint16_t ar : 1;
+		uint16_t pan_id_comp : 1;
+		uint16_t reserved : 1;
+		uint16_t seq_num_suppr : 1;
+		uint16_t ie_list : 1;
+		uint16_t dst_addr_mode : 2;
+		uint16_t frame_version : 2;
+		uint16_t src_addr_mode : 2;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		uint16_t reserved			:1;
-		uint16_t pan_id_comp		:1;
-		uint16_t ar			:1;
-		uint16_t frame_pending		:1;
-		uint16_t security_enabled		:1;
-		uint16_t frame_type		:3;
-		uint16_t src_addr_mode		:2;
-		uint16_t frame_version		:2;
-		uint16_t dst_addr_mode		:2;
-		uint16_t ie_list			:1;
-		uint16_t seq_num_suppr		:1;
+		uint16_t reserved : 1;
+		uint16_t pan_id_comp : 1;
+		uint16_t ar : 1;
+		uint16_t frame_pending : 1;
+		uint16_t security_enabled : 1;
+		uint16_t frame_type : 3;
+		uint16_t src_addr_mode : 2;
+		uint16_t frame_version : 2;
+		uint16_t dst_addr_mode : 2;
+		uint16_t ie_list : 1;
+		uint16_t seq_num_suppr : 1;
 #endif
 	} fc __packed;
 
@@ -135,49 +135,49 @@ struct ieee802154_address_field {
 
 /* See Section 7.4.1.1 */
 enum ieee802154_security_level {
-	IEEE802154_SECURITY_LEVEL_NONE			= 0x0,
-	IEEE802154_SECURITY_LEVEL_MIC_32		= 0x1,
-	IEEE802154_SECURITY_LEVEL_MIC_64		= 0x2,
-	IEEE802154_SECURITY_LEVEL_MIC_128		= 0x3,
-	IEEE802154_SECURITY_LEVEL_ENC			= 0x4,
-	IEEE802154_SECURITY_LEVEL_ENC_MIC_32		= 0x5,
-	IEEE802154_SECURITY_LEVEL_ENC_MIC_64		= 0x6,
-	IEEE802154_SECURITY_LEVEL_ENC_MIC_128		= 0x7,
+	IEEE802154_SECURITY_LEVEL_NONE = 0x0,
+	IEEE802154_SECURITY_LEVEL_MIC_32 = 0x1,
+	IEEE802154_SECURITY_LEVEL_MIC_64 = 0x2,
+	IEEE802154_SECURITY_LEVEL_MIC_128 = 0x3,
+	IEEE802154_SECURITY_LEVEL_ENC = 0x4,
+	IEEE802154_SECURITY_LEVEL_ENC_MIC_32 = 0x5,
+	IEEE802154_SECURITY_LEVEL_ENC_MIC_64 = 0x6,
+	IEEE802154_SECURITY_LEVEL_ENC_MIC_128 = 0x7,
 };
 
 /* This will match above *_MIC_<32/64/128> */
-#define IEEE8021254_AUTH_TAG_LENGTH_32			4
-#define IEEE8021254_AUTH_TAG_LENGTH_64			8
-#define IEEE8021254_AUTH_TAG_LENGTH_128			16
+#define IEEE8021254_AUTH_TAG_LENGTH_32 4
+#define IEEE8021254_AUTH_TAG_LENGTH_64 8
+#define IEEE8021254_AUTH_TAG_LENGTH_128 16
 
 /* See Section 7.4.1.2 */
 enum ieee802154_key_id_mode {
-	IEEE802154_KEY_ID_MODE_IMPLICIT			= 0x0,
-	IEEE802154_KEY_ID_MODE_INDEX			= 0x1,
-	IEEE802154_KEY_ID_MODE_SRC_4_INDEX		= 0x2,
-	IEEE802154_KEY_ID_MODE_SRC_8_INDEX		= 0x3,
+	IEEE802154_KEY_ID_MODE_IMPLICIT = 0x0,
+	IEEE802154_KEY_ID_MODE_INDEX = 0x1,
+	IEEE802154_KEY_ID_MODE_SRC_4_INDEX = 0x2,
+	IEEE802154_KEY_ID_MODE_SRC_8_INDEX = 0x3,
 };
 
-#define IEEE8021254_KEY_ID_FIELD_INDEX_LENGTH		1
-#define IEEE8021254_KEY_ID_FIELD_SRC_4_INDEX_LENGTH	5
-#define IEEE8021254_KEY_ID_FIELD_SRC_8_INDEX_LENGTH	9
+#define IEEE8021254_KEY_ID_FIELD_INDEX_LENGTH 1
+#define IEEE8021254_KEY_ID_FIELD_SRC_4_INDEX_LENGTH 5
+#define IEEE8021254_KEY_ID_FIELD_SRC_8_INDEX_LENGTH 9
 
-#define IEEE802154_KEY_MAX_LEN				16
+#define IEEE802154_KEY_MAX_LEN 16
 
 /* See Section 7.4.1 */
 struct ieee802154_security_control_field {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	uint8_t security_level	:3;
-	uint8_t key_id_mode	:2;
-	uint8_t reserved		:3;
+	uint8_t security_level : 3;
+	uint8_t key_id_mode : 2;
+	uint8_t reserved : 3;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	uint8_t reserved		:3;
-	uint8_t key_id_mode	:2;
-	uint8_t security_level	:3;
+	uint8_t reserved : 3;
+	uint8_t key_id_mode : 2;
+	uint8_t security_level : 3;
 #endif
 } __packed;
 
-#define IEEE802154_SECURITY_CF_LENGTH	1
+#define IEEE802154_SECURITY_CF_LENGTH 1
 
 /* See Section 7.4.3 */
 struct ieee802154_key_identifier_field {
@@ -227,88 +227,88 @@ struct ieee802154_mfr {
 
 struct ieee802154_gts_dir {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	uint8_t mask			: 7;
-	uint8_t reserved			: 1;
+	uint8_t mask : 7;
+	uint8_t reserved : 1;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	uint8_t reserved			: 1;
-	uint8_t mask			: 7;
+	uint8_t reserved : 1;
+	uint8_t mask : 7;
 #endif
 } __packed;
 
 struct ieee802154_gts {
 	uint16_t short_address;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	uint8_t starting_slot		: 4;
-	uint8_t length			: 4;
+	uint8_t starting_slot : 4;
+	uint8_t length : 4;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	uint8_t length			: 4;
-	uint8_t starting_slot		: 4;
+	uint8_t length : 4;
+	uint8_t starting_slot : 4;
 #endif
 } __packed;
 
 struct ieee802154_gts_spec {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	/* Descriptor Count */
-	uint8_t desc_count			: 3;
-	uint8_t reserved			: 4;
+	uint8_t desc_count : 3;
+	uint8_t reserved : 4;
 	/* GTS Permit */
-	uint8_t permit			: 1;
+	uint8_t permit : 1;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	/* GTS Permit */
-	uint8_t permit			: 1;
-	uint8_t reserved			: 4;
+	uint8_t permit : 1;
+	uint8_t reserved : 4;
 	/* Descriptor Count */
-	uint8_t desc_count			: 3;
+	uint8_t desc_count : 3;
 #endif
 } __packed;
 
 struct ieee802154_pas_spec {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	/* Number of Short Addresses Pending */
-	uint8_t nb_sap			: 3;
-	uint8_t reserved_1			: 1;
+	uint8_t nb_sap : 3;
+	uint8_t reserved_1 : 1;
 	/* Number of Extended Addresses Pending */
-	uint8_t nb_eap			: 3;
-	uint8_t reserved_2			: 1;
+	uint8_t nb_eap : 3;
+	uint8_t reserved_2 : 1;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	uint8_t reserved_1			: 1;
+	uint8_t reserved_1 : 1;
 	/* Number of Extended Addresses Pending */
-	uint8_t nb_eap			: 3;
-	uint8_t reserved_2			: 1;
+	uint8_t nb_eap : 3;
+	uint8_t reserved_2 : 1;
 	/* Number of Short Addresses Pending */
-	uint8_t nb_sap			: 3;
+	uint8_t nb_sap : 3;
 #endif
 } __packed;
 
 struct ieee802154_beacon_sf {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	/* Beacon Order*/
-	uint16_t bc_order		: 4;
+	uint16_t bc_order : 4;
 	/* Superframe Order*/
-	uint16_t sf_order		: 4;
+	uint16_t sf_order : 4;
 	/* Final CAP Slot */
-	uint16_t cap_slot		: 4;
+	uint16_t cap_slot : 4;
 	/* Battery Life Extension */
-	uint16_t ble		: 1;
-	uint16_t reserved		: 1;
+	uint16_t ble : 1;
+	uint16_t reserved : 1;
 	/* PAN Coordinator */
-	uint16_t coordinator	: 1;
+	uint16_t coordinator : 1;
 	/* Association Permit */
-	uint16_t association	: 1;
+	uint16_t association : 1;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	/* Superframe Order*/
-	uint16_t sf_order		: 4;
+	uint16_t sf_order : 4;
 	/* Beacon Order*/
-	uint16_t bc_order		: 4;
+	uint16_t bc_order : 4;
 	/* Association Permit */
-	uint16_t association	: 1;
+	uint16_t association : 1;
 	/* PAN Coordinator */
-	uint16_t coordinator	: 1;
-	uint16_t reserved		: 1;
+	uint16_t coordinator : 1;
+	uint16_t reserved : 1;
 	/* Battery Life Extension */
-	uint16_t ble		: 1;
+	uint16_t ble : 1;
 	/* Final CAP Slot */
-	uint16_t cap_slot		: 4;
+	uint16_t cap_slot : 4;
 #endif
 } __packed;
 
@@ -323,34 +323,34 @@ struct ieee802154_beacon {
 struct ieee802154_cmd_assoc_req {
 	struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		uint8_t reserved_1		: 1;
-		uint8_t dev_type		: 1;
-		uint8_t power_src		: 1;
-		uint8_t rx_on		: 1;
-		uint8_t reserved_2		: 2;
-		uint8_t sec_capability	: 1;
-		uint8_t alloc_addr		: 1;
+		uint8_t reserved_1 : 1;
+		uint8_t dev_type : 1;
+		uint8_t power_src : 1;
+		uint8_t rx_on : 1;
+		uint8_t reserved_2 : 2;
+		uint8_t sec_capability : 1;
+		uint8_t alloc_addr : 1;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		uint8_t alloc_addr		: 1;
-		uint8_t sec_capability	: 1;
-		uint8_t reserved_2		: 2;
-		uint8_t rx_on		: 1;
-		uint8_t power_src		: 1;
-		uint8_t dev_type		: 1;
-		uint8_t reserved_1		: 1;
+		uint8_t alloc_addr : 1;
+		uint8_t sec_capability : 1;
+		uint8_t reserved_2 : 2;
+		uint8_t rx_on : 1;
+		uint8_t power_src : 1;
+		uint8_t dev_type : 1;
+		uint8_t reserved_1 : 1;
 #endif
 	} ci;
 } __packed;
 
-#define IEEE802154_CMD_ASSOC_REQ_LENGTH		1
+#define IEEE802154_CMD_ASSOC_REQ_LENGTH 1
 
 /* See Section 5.3.2 */
 enum ieee802154_association_status_field {
-	IEEE802154_ASF_SUCCESSFUL		= 0x00,
-	IEEE802154_ASF_PAN_AT_CAPACITY		= 0x01,
-	IEEE802154_ASF_PAN_ACCESS_DENIED	= 0x02,
-	IEEE802154_ASF_RESERVED			= 0x03,
-	IEEE802154_ASF_RESERVED_PRIMITIVES	= 0x80,
+	IEEE802154_ASF_SUCCESSFUL = 0x00,
+	IEEE802154_ASF_PAN_AT_CAPACITY = 0x01,
+	IEEE802154_ASF_PAN_ACCESS_DENIED = 0x02,
+	IEEE802154_ASF_RESERVED = 0x03,
+	IEEE802154_ASF_RESERVED_PRIMITIVES = 0x80,
 };
 
 struct ieee802154_cmd_assoc_res {
@@ -358,22 +358,22 @@ struct ieee802154_cmd_assoc_res {
 	uint8_t status;
 } __packed;
 
-#define IEEE802154_CMD_ASSOC_RES_LENGTH		3
+#define IEEE802154_CMD_ASSOC_RES_LENGTH 3
 
 /* See Section 5.3.3 */
 enum ieee802154_disassociation_reason_field {
-	IEEE802154_DRF_RESERVED_1		= 0x00,
-	IEEE802154_DRF_COORDINATOR_WISH		= 0x01,
-	IEEE802154_DRF_DEVICE_WISH		= 0x02,
-	IEEE802154_DRF_RESERVED_2		= 0x03,
-	IEEE802154_DRF_RESERVED_PRIMITIVES	= 0x80,
+	IEEE802154_DRF_RESERVED_1 = 0x00,
+	IEEE802154_DRF_COORDINATOR_WISH = 0x01,
+	IEEE802154_DRF_DEVICE_WISH = 0x02,
+	IEEE802154_DRF_RESERVED_2 = 0x03,
+	IEEE802154_DRF_RESERVED_PRIMITIVES = 0x80,
 };
 
 struct ieee802154_cmd_disassoc_note {
 	uint8_t reason;
 } __packed;
 
-#define IEEE802154_CMD_DISASSOC_NOTE_LENGTH	1
+#define IEEE802154_CMD_DISASSOC_NOTE_LENGTH 1
 
 /* See Section 5.3.8 */
 struct ieee802154_cmd_coord_realign {
@@ -384,40 +384,40 @@ struct ieee802154_cmd_coord_realign {
 	uint8_t channel_page; /* Optional */
 } __packed;
 
-#define IEEE802154_CMD_COORD_REALIGN_LENGTH	3
+#define IEEE802154_CMD_COORD_REALIGN_LENGTH 3
 
 /* See Section 5.3.9 */
 struct ieee802154_gts_request {
 	struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		uint8_t length		: 4;
-		uint8_t direction		: 1;
-		uint8_t type		: 1;
-		uint8_t reserved		: 2;
+		uint8_t length : 4;
+		uint8_t direction : 1;
+		uint8_t type : 1;
+		uint8_t reserved : 2;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		uint8_t reserved		: 2;
-		uint8_t type		: 1;
-		uint8_t direction		: 1;
-		uint8_t length		: 4;
+		uint8_t reserved : 2;
+		uint8_t type : 1;
+		uint8_t direction : 1;
+		uint8_t length : 4;
 #endif
 	} gts;
 } __packed;
 
-#define IEEE802154_GTS_REQUEST_LENGTH		1
+#define IEEE802154_GTS_REQUEST_LENGTH 1
 
 /* See Section 5.3 */
 enum ieee802154_cfi {
-	IEEE802154_CFI_UNKNOWN				= 0x00,
-	IEEE802154_CFI_ASSOCIATION_REQUEST		= 0x01,
-	IEEE802154_CFI_ASSOCIATION_RESPONSE		= 0x02,
-	IEEE802154_CFI_DISASSOCIATION_NOTIFICATION	= 0x03,
-	IEEE802154_CFI_DATA_REQUEST			= 0x04,
-	IEEE802154_CFI_PAN_ID_CONLICT_NOTIFICATION	= 0x05,
-	IEEE802154_CFI_ORPHAN_NOTIFICATION		= 0x06,
-	IEEE802154_CFI_BEACON_REQUEST			= 0x07,
-	IEEE802154_CFI_COORDINATOR_REALIGNEMENT		= 0x08,
-	IEEE802154_CFI_GTS_REQUEST			= 0x09,
-	IEEE802154_CFI_RESERVED				= 0x0a,
+	IEEE802154_CFI_UNKNOWN = 0x00,
+	IEEE802154_CFI_ASSOCIATION_REQUEST = 0x01,
+	IEEE802154_CFI_ASSOCIATION_RESPONSE = 0x02,
+	IEEE802154_CFI_DISASSOCIATION_NOTIFICATION = 0x03,
+	IEEE802154_CFI_DATA_REQUEST = 0x04,
+	IEEE802154_CFI_PAN_ID_CONLICT_NOTIFICATION = 0x05,
+	IEEE802154_CFI_ORPHAN_NOTIFICATION = 0x06,
+	IEEE802154_CFI_BEACON_REQUEST = 0x07,
+	IEEE802154_CFI_COORDINATOR_REALIGNEMENT = 0x08,
+	IEEE802154_CFI_GTS_REQUEST = 0x09,
+	IEEE802154_CFI_RESERVED = 0x0a,
 };
 
 struct ieee802154_command {
@@ -434,7 +434,7 @@ struct ieee802154_command {
 	};
 } __packed;
 
-#define IEEE802154_CMD_CFI_LENGTH		1
+#define IEEE802154_CMD_CFI_LENGTH 1
 
 /** Frame */
 struct ieee802154_mpdu {
@@ -465,41 +465,39 @@ struct ieee802154_frame_params {
 
 #ifdef CONFIG_NET_L2_IEEE802154_SECURITY
 struct ieee802154_aux_security_hdr *
-ieee802154_validate_aux_security_hdr(uint8_t *buf, uint8_t **p_buf, uint8_t *length);
+ieee802154_validate_aux_security_hdr(uint8_t *buf, uint8_t **p_buf,
+				     uint8_t *length);
 #endif
 
-struct ieee802154_fcf_seq *ieee802154_validate_fc_seq(uint8_t *buf, uint8_t **p_buf,
-						      uint8_t *length);
+struct ieee802154_fcf_seq *
+ieee802154_validate_fc_seq(uint8_t *buf, uint8_t **p_buf, uint8_t *length);
 
 bool ieee802154_validate_frame(uint8_t *buf, uint8_t length,
 			       struct ieee802154_mpdu *mpdu);
 
 uint8_t ieee802154_compute_header_size(struct net_if *iface,
-				    struct in6_addr *dst);
+				       struct in6_addr *dst);
 
 bool ieee802154_create_data_frame(struct ieee802154_context *ctx,
 				  struct net_linkaddr *dst,
-				  struct net_buf *frag,
-				  uint8_t hdr_size);
+				  struct net_buf *frag, uint8_t hdr_size);
 
 struct net_pkt *
-ieee802154_create_mac_cmd_frame(struct net_if *iface,
-				enum ieee802154_cfi type,
+ieee802154_create_mac_cmd_frame(struct net_if *iface, enum ieee802154_cfi type,
 				struct ieee802154_frame_params *params);
 
-void ieee802154_mac_cmd_finalize(struct net_pkt *pkt,
-				 enum ieee802154_cfi type);
+void ieee802154_mac_cmd_finalize(struct net_pkt *pkt, enum ieee802154_cfi type);
 
-static inline
-struct ieee802154_command *ieee802154_get_mac_command(struct net_pkt *pkt)
+static inline struct ieee802154_command *
+ieee802154_get_mac_command(struct net_pkt *pkt)
 {
 	return (struct ieee802154_command *)(pkt->frags->data +
 					     pkt->frags->len);
 }
 
 #ifdef CONFIG_NET_L2_IEEE802154_ACK_REPLY
-bool ieee802154_create_ack_frame(struct net_if *iface,
-				 struct net_pkt *pkt, uint8_t seq);
+bool ieee802154_create_ack_frame(struct net_if *iface, struct net_pkt *pkt,
+				 uint8_t seq);
 #endif
 
 #ifdef CONFIG_NET_L2_IEEE802154_SECURITY

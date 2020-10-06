@@ -10,7 +10,6 @@
  * @brief dynamic-size QUEUE object.
  */
 
-
 #include <kernel.h>
 #include <kernel_structs.h>
 #include <debug/object_tracing_common.h>
@@ -66,7 +65,8 @@ static int init_queue_module(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	Z_STRUCT_SECTION_FOREACH(k_queue, queue) {
+	Z_STRUCT_SECTION_FOREACH(k_queue, queue)
+	{
 		SYS_TRACING_OBJ_INIT(k_queue, queue);
 	}
 	return 0;
@@ -79,7 +79,7 @@ SYS_INIT(init_queue_module, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_OBJECTS);
 void z_impl_k_queue_init(struct k_queue *queue)
 {
 	sys_sflist_init(&queue->data_q);
-	queue->lock = (struct k_spinlock) {};
+	queue->lock = (struct k_spinlock){};
 	z_waitq_init(&queue->wait_q);
 #if defined(CONFIG_POLL)
 	sys_dlist_init(&queue->poll_events);
@@ -136,7 +136,7 @@ static inline void z_vrfy_k_queue_cancel_wait(struct k_queue *queue)
 #endif
 
 static int32_t queue_insert(struct k_queue *queue, void *prev, void *data,
-			  bool alloc)
+			    bool alloc)
 {
 	k_spinlock_key_t key = k_spin_lock(&queue->lock);
 	struct k_thread *first_pending_thread;
@@ -178,8 +178,8 @@ void k_queue_insert(struct k_queue *queue, void *prev, void *data)
 
 void k_queue_append(struct k_queue *queue, void *data)
 {
-	(void)queue_insert(queue, sys_sflist_peek_tail(&queue->data_q),
-			   data, false);
+	(void)queue_insert(queue, sys_sflist_peek_tail(&queue->data_q), data,
+			   false);
 }
 
 void k_queue_prepend(struct k_queue *queue, void *data)
@@ -195,7 +195,7 @@ int32_t z_impl_k_queue_alloc_append(struct k_queue *queue, void *data)
 
 #ifdef CONFIG_USERSPACE
 static inline int32_t z_vrfy_k_queue_alloc_append(struct k_queue *queue,
-						void *data)
+						  void *data)
 {
 	Z_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));
 	return z_impl_k_queue_alloc_append(queue, data);
@@ -210,7 +210,7 @@ int32_t z_impl_k_queue_alloc_prepend(struct k_queue *queue, void *data)
 
 #ifdef CONFIG_USERSPACE
 static inline int32_t z_vrfy_k_queue_alloc_prepend(struct k_queue *queue,
-						 void *data)
+						   void *data)
 {
 	Z_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));
 	return z_impl_k_queue_alloc_prepend(queue, data);
@@ -221,7 +221,8 @@ static inline int32_t z_vrfy_k_queue_alloc_prepend(struct k_queue *queue,
 int k_queue_append_list(struct k_queue *queue, void *head, void *tail)
 {
 	/* invalid head or tail of list */
-	CHECKIF(head == NULL || tail == NULL) {
+	CHECKIF(head == NULL || tail == NULL)
+	{
 		return -EINVAL;
 	}
 
@@ -252,7 +253,8 @@ int k_queue_merge_slist(struct k_queue *queue, sys_slist_t *list)
 	int ret;
 
 	/* list must not be empty */
-	CHECKIF(sys_slist_is_empty(list)) {
+	CHECKIF(sys_slist_is_empty(list))
+	{
 		return -EINVAL;
 	}
 
@@ -266,7 +268,8 @@ int k_queue_merge_slist(struct k_queue *queue, sys_slist_t *list)
 	 * - source list is really an slist and not an sflist with flags set
 	 */
 	ret = k_queue_append_list(queue, list->head, list->tail);
-	CHECKIF(ret != 0) {
+	CHECKIF(ret != 0)
+	{
 		return ret;
 	}
 	sys_slist_init(list);

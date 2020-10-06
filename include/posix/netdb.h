@@ -32,15 +32,15 @@ static inline const char *gai_strerror(int errcode)
 }
 
 static inline int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
-			      char *host, socklen_t hostlen,
-			      char *serv, socklen_t servlen, int flags)
+			      char *host, socklen_t hostlen, char *serv,
+			      socklen_t servlen, int flags)
 {
-	return zsock_getnameinfo(addr, addrlen, host, hostlen,
-				 serv, servlen, flags);
+	return zsock_getnameinfo(addr, addrlen, host, hostlen, serv, servlen,
+				 flags);
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* ZEPHYR_INCLUDE_POSIX_NETDB_H_ */
+#endif /* ZEPHYR_INCLUDE_POSIX_NETDB_H_ */

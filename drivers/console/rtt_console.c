@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <kernel.h>
 #include <sys/printk.h>
 #include <device.h>
@@ -27,7 +26,7 @@ static void wait(void)
 {
 	if (k_is_in_isr()) {
 		if (IS_ENABLED(CONFIG_RTT_TX_RETRY_IN_INTERRUPT)) {
-			k_busy_wait(1000*CONFIG_RTT_TX_RETRY_DELAY_MS);
+			k_busy_wait(1000 * CONFIG_RTT_TX_RETRY_DELAY_MS);
 		}
 	} else {
 		k_msleep(CONFIG_RTT_TX_RETRY_DELAY_MS);

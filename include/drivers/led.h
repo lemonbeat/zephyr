@@ -129,7 +129,7 @@ __subsystem struct led_driver_api {
  * @return 0 on success, negative on error
  */
 __syscall int led_blink(const struct device *dev, uint32_t led,
-			    uint32_t delay_on, uint32_t delay_off);
+			uint32_t delay_on, uint32_t delay_off);
 
 static inline int z_impl_led_blink(const struct device *dev, uint32_t led,
 				   uint32_t delay_on, uint32_t delay_off)
@@ -181,11 +181,10 @@ static inline int z_impl_led_get_info(const struct device *dev, uint32_t led,
  * @return 0 on success, negative on error
  */
 __syscall int led_set_brightness(const struct device *dev, uint32_t led,
-				     uint8_t value);
+				 uint8_t value);
 
 static inline int z_impl_led_set_brightness(const struct device *dev,
-					    uint32_t led,
-					    uint8_t value)
+					    uint32_t led, uint8_t value)
 {
 	const struct led_driver_api *api =
 		(const struct led_driver_api *)dev->api;
@@ -213,12 +212,13 @@ static inline int z_impl_led_set_brightness(const struct device *dev,
  * @return 0 on success, negative on error
  */
 __syscall int led_write_channels(const struct device *dev,
-				 uint32_t start_channel,
-				 uint32_t num_channels, const uint8_t *buf);
+				 uint32_t start_channel, uint32_t num_channels,
+				 const uint8_t *buf);
 
-static inline int
-z_impl_led_write_channels(const struct device *dev, uint32_t start_channel,
-			  uint32_t num_channels, const uint8_t *buf)
+static inline int z_impl_led_write_channels(const struct device *dev,
+					    uint32_t start_channel,
+					    uint32_t num_channels,
+					    const uint8_t *buf)
 {
 	const struct led_driver_api *api =
 		(const struct led_driver_api *)dev->api;
@@ -241,8 +241,8 @@ z_impl_led_write_channels(const struct device *dev, uint32_t start_channel,
  * @param value Value to configure the channel with
  * @return 0 on success, negative on error
  */
-__syscall int led_set_channel(const struct device *dev,
-			      uint32_t channel, uint8_t value);
+__syscall int led_set_channel(const struct device *dev, uint32_t channel,
+			      uint8_t value);
 
 static inline int z_impl_led_set_channel(const struct device *dev,
 					 uint32_t channel, uint8_t value)
@@ -325,4 +325,4 @@ static inline int z_impl_led_off(const struct device *dev, uint32_t led)
 
 #include <syscalls/led.h>
 
-#endif	/* ZEPHYR_INCLUDE_DRIVERS_LED_H_ */
+#endif /* ZEPHYR_INCLUDE_DRIVERS_LED_H_ */

@@ -28,27 +28,27 @@
 extern "C" {
 #endif
 
-#define CAN_EX_ID      (1 << 31)
+#define CAN_EX_ID (1 << 31)
 #define CAN_MAX_STD_ID (0x7FF)
 #define CAN_STD_ID_MASK CAN_MAX_STD_ID
 #define CAN_EXT_ID_MASK (0x1FFFFFFF)
-#define CAN_MAX_DLC    (8)
-#define CAN_MAX_DLEN    8
+#define CAN_MAX_DLC (8)
+#define CAN_MAX_DLEN 8
 
 /* CAN_TX_* are the error flags from tx_callback and send.*/
 /** send successfully */
-#define CAN_TX_OK       (0)
+#define CAN_TX_OK (0)
 /** general send error */
-#define CAN_TX_ERR      (-2)
+#define CAN_TX_ERR (-2)
 /** bus arbitration lost during sending */
 #define CAN_TX_ARB_LOST (-3)
 /** controller is in bus off state */
-#define CAN_TX_BUS_OFF  (-4)
+#define CAN_TX_BUS_OFF (-4)
 /** unexpected error */
-#define CAN_TX_UNKNOWN  (-5)
+#define CAN_TX_UNKNOWN (-5)
 
 /** invalid parameter */
-#define CAN_TX_EINVAL   (-22)
+#define CAN_TX_EINVAL (-22)
 
 /** attach_* failed because there is no unused filter left*/
 #define CAN_NO_FREE_FILTER (-1)
@@ -72,19 +72,13 @@ extern "C" {
  * Define if the message has a standard (11bit) or extended (29bit)
  * identifier
  */
-enum can_ide {
-	CAN_STANDARD_IDENTIFIER,
-	CAN_EXTENDED_IDENTIFIER
-};
+enum can_ide { CAN_STANDARD_IDENTIFIER, CAN_EXTENDED_IDENTIFIER };
 
 /**
  * @brief can_rtr enum
  * Define if the message is a data or remote frame
  */
-enum can_rtr {
-	CAN_DATAFRAME,
-	CAN_REMOTEREQUEST
-};
+enum can_rtr { CAN_DATAFRAME, CAN_REMOTEREQUEST };
 
 /**
  * @brief can_mode enum
@@ -139,9 +133,9 @@ struct can_frame {
 	uint8_t can_dlc;
 
 	/** @cond INTERNAL_HIDDEN */
-	uint8_t pad;   /* padding */
-	uint8_t res0;  /* reserved / padding */
-	uint8_t res1;  /* reserved / padding */
+	uint8_t pad; /* padding */
+	uint8_t res0; /* reserved / padding */
+	uint8_t res1; /* reserved / padding */
 	/** @endcond */
 
 	/** The message data */
@@ -174,11 +168,11 @@ struct zcan_frame {
 	/** Set the message to a transmission request instead of data frame
 	 * use can_rtr enum for assignment
 	 */
-	uint32_t rtr     : 1;
+	uint32_t rtr : 1;
 	/** Message identifier*/
 	union {
-		uint32_t std_id  : 11;
-		uint32_t ext_id  : 29;
+		uint32_t std_id : 11;
+		uint32_t ext_id : 29;
 	};
 	/** The length of the message (max. 8) in byte */
 	uint8_t dlc;
@@ -209,20 +203,20 @@ struct zcan_filter {
 	/** Indicates the identifier type (standard or extended)
 	 * use can_ide enum for assignment
 	 */
-	uint32_t id_type      : 1;
+	uint32_t id_type : 1;
 	/** target state of the rtr bit */
-	uint32_t rtr          : 1;
+	uint32_t rtr : 1;
 	/** target state of the identifier */
 	union {
-		uint32_t std_id   : 11;
-		uint32_t ext_id   : 29;
+		uint32_t std_id : 11;
+		uint32_t ext_id : 29;
 	};
 	/** rtr bit mask */
-	uint32_t rtr_mask     : 1;
+	uint32_t rtr_mask : 1;
 	/** identifier mask*/
 	union {
-		uint32_t std_id_mask  : 11;
-		uint32_t ext_id_mask  : 29;
+		uint32_t std_id_mask : 11;
+		uint32_t ext_id_mask : 29;
 	};
 } __packed;
 
@@ -262,24 +256,20 @@ typedef void (*can_rx_callback_t)(struct zcan_frame *msg, void *arg);
  * @param state state of the node
  * @param err_cnt struct with the error counter values
  */
-typedef void(*can_state_change_isr_t)(enum can_state state,
-					  struct can_bus_err_cnt err_cnt);
+typedef void (*can_state_change_isr_t)(enum can_state state,
+				       struct can_bus_err_cnt err_cnt);
 
 typedef int (*can_configure_t)(const struct device *dev, enum can_mode mode,
-				uint32_t bitrate);
+			       uint32_t bitrate);
 
 typedef int (*can_send_t)(const struct device *dev,
-			  const struct zcan_frame *msg,
-			  k_timeout_t timeout, can_tx_callback_t callback_isr,
-			  void *callback_arg);
+			  const struct zcan_frame *msg, k_timeout_t timeout,
+			  can_tx_callback_t callback_isr, void *callback_arg);
 
-
-typedef int (*can_attach_msgq_t)(const struct device *dev,
-				 struct k_msgq *msg_q,
+typedef int (*can_attach_msgq_t)(const struct device *dev, struct k_msgq *msg_q,
 				 const struct zcan_filter *filter);
 
-typedef int (*can_attach_isr_t)(const struct device *dev,
-				can_rx_callback_t isr,
+typedef int (*can_attach_isr_t)(const struct device *dev, can_rx_callback_t isr,
 				void *callback_arg,
 				const struct zcan_filter *filter);
 
@@ -290,8 +280,8 @@ typedef int (*can_recover_t)(const struct device *dev, k_timeout_t timeout);
 typedef enum can_state (*can_get_state_t)(const struct device *dev,
 					  struct can_bus_err_cnt *err_cnt);
 
-typedef void(*can_register_state_change_isr_t)(const struct device *dev,
-					       can_state_change_isr_t isr);
+typedef void (*can_register_state_change_isr_t)(const struct device *dev,
+						can_state_change_isr_t isr);
 
 #ifndef CONFIG_CAN_WORKQ_FRAMES_BUF_CNT
 #define CONFIG_CAN_WORKQ_FRAMES_BUF_CNT 4
@@ -325,7 +315,6 @@ __subsystem struct can_driver_api {
 #endif
 	can_get_state_t get_state;
 	can_register_state_change_isr_t register_state_change_isr;
-
 };
 
 /**
@@ -383,8 +372,8 @@ static inline int z_impl_can_send(const struct device *dev,
  * @retval -EINVAL if length > 8.
  */
 static inline int can_write(const struct device *dev, const uint8_t *data,
-			    uint8_t length,
-			    uint32_t id, enum can_rtr rtr, k_timeout_t timeout)
+			    uint8_t length, uint32_t id, enum can_rtr rtr,
+			    k_timeout_t timeout)
 {
 	struct zcan_frame msg;
 
@@ -430,10 +419,9 @@ static inline int can_write(const struct device *dev, const uint8_t *data,
  * @retval filter_id on success.
  * @retval CAN_NO_FREE_FILTER if there is no filter left.
  */
-int can_attach_workq(const struct device *dev, struct k_work_q  *work_q,
-		     struct zcan_work *work,
-		     can_rx_callback_t callback, void *callback_arg,
-		     const struct zcan_filter *filter);
+int can_attach_workq(const struct device *dev, struct k_work_q *work_q,
+		     struct zcan_work *work, can_rx_callback_t callback,
+		     void *callback_arg, const struct zcan_filter *filter);
 
 /**
  * @brief Attach a message queue to a single or group of identifiers.
@@ -477,9 +465,8 @@ __syscall int can_attach_msgq(const struct device *dev, struct k_msgq *msg_q,
  * @retval CAN_NO_FREE_FILTER if there is no filter left.
  */
 static inline int can_attach_isr(const struct device *dev,
-				       can_rx_callback_t isr,
-				       void *callback_arg,
-				       const struct zcan_filter *filter)
+				 can_rx_callback_t isr, void *callback_arg,
+				 const struct zcan_filter *filter)
 {
 	const struct can_driver_api *api =
 		(const struct can_driver_api *)dev->api;
@@ -522,8 +509,7 @@ __syscall int can_configure(const struct device *dev, enum can_mode mode,
 			    uint32_t bitrate);
 
 static inline int z_impl_can_configure(const struct device *dev,
-				       enum can_mode mode,
-				       uint32_t bitrate)
+				       enum can_mode mode, uint32_t bitrate)
 {
 	const struct can_driver_api *api =
 		(const struct can_driver_api *)dev->api;
@@ -544,9 +530,8 @@ static inline int z_impl_can_configure(const struct device *dev,
 __syscall enum can_state can_get_state(const struct device *dev,
 				       struct can_bus_err_cnt *err_cnt);
 
-static inline
-enum can_state z_impl_can_get_state(const struct device *dev,
-				    struct can_bus_err_cnt *err_cnt)
+static inline enum can_state
+z_impl_can_get_state(const struct device *dev, struct can_bus_err_cnt *err_cnt)
 {
 	const struct can_driver_api *api =
 		(const struct can_driver_api *)dev->api;
@@ -594,9 +579,8 @@ static inline int z_impl_can_recover(const struct device *dev,
  * @param dev Pointer to the device structure for the driver instance.
  * @param isr Pointer to ISR
  */
-static inline
-void can_register_state_change_isr(const struct device *dev,
-				   can_state_change_isr_t isr)
+static inline void can_register_state_change_isr(const struct device *dev,
+						 can_state_change_isr_t isr)
 {
 	const struct can_driver_api *api =
 		(const struct can_driver_api *)dev->api;
@@ -630,8 +614,9 @@ static inline void can_copy_zframe_to_frame(const struct zcan_frame *zframe,
 					    struct can_frame *frame)
 {
 	frame->can_id = (zframe->id_type << 31) | (zframe->rtr << 30) |
-		(zframe->id_type == CAN_STANDARD_IDENTIFIER ? zframe->std_id :
-				    zframe->ext_id);
+			(zframe->id_type == CAN_STANDARD_IDENTIFIER ?
+				       zframe->std_id :
+				       zframe->ext_id);
 	frame->can_dlc = zframe->dlc;
 	memcpy(frame->data, zframe->data, sizeof(frame->data));
 }
@@ -643,9 +628,8 @@ static inline void can_copy_zframe_to_frame(const struct zcan_frame *zframe,
  * @param filter Pointer to can_filter struct.
  * @param zfilter Pointer to zcan_frame_filter struct.
  */
-static inline
-void can_copy_filter_to_zfilter(const struct can_filter *filter,
-				struct zcan_filter *zfilter)
+static inline void can_copy_filter_to_zfilter(const struct can_filter *filter,
+					      struct zcan_filter *zfilter)
 {
 	zfilter->id_type = (filter->can_id & BIT(31)) >> 31;
 	zfilter->rtr = (filter->can_id & BIT(30)) >> 30;
@@ -661,14 +645,13 @@ void can_copy_filter_to_zfilter(const struct can_filter *filter,
  * @param zfilter Pointer to zcan_filter struct.
  * @param filter Pointer to can_filter struct.
  */
-static inline
-void can_copy_zfilter_to_filter(const struct zcan_filter *zfilter,
-				struct can_filter *filter)
+static inline void can_copy_zfilter_to_filter(const struct zcan_filter *zfilter,
+					      struct can_filter *filter)
 {
-	filter->can_id = (zfilter->id_type << 31) |
-		(zfilter->rtr << 30) | zfilter->ext_id;
+	filter->can_id = (zfilter->id_type << 31) | (zfilter->rtr << 30) |
+			 zfilter->ext_id;
 	filter->can_mask = (zfilter->rtr_mask << 30) |
-		(zfilter->id_type << 31) | zfilter->ext_id_mask;
+			   (zfilter->id_type << 31) | zfilter->ext_id_mask;
 }
 
 #ifdef __cplusplus

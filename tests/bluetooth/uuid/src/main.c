@@ -14,27 +14,27 @@
 
 static struct bt_uuid_16 uuid_16 = BT_UUID_INIT_16(0xffff);
 
-static struct bt_uuid_128 uuid_128 = BT_UUID_INIT_128(
-	0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-	0x00, 0x10, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00);
+static struct bt_uuid_128 uuid_128 =
+	BT_UUID_INIT_128(0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
+			 0x10, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00);
 
-static struct bt_uuid_128 le_128 = BT_UUID_INIT_128(
-	0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-	0x00, 0x10, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00);
+static struct bt_uuid_128 le_128 =
+	BT_UUID_INIT_128(0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
+			 0x10, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00);
 
 static void test_uuid_cmp(void)
 {
 	/* Compare UUID 16 bits */
 	zassert_false(bt_uuid_cmp(&uuid_16.uuid, BT_UUID_DECLARE_16(0xffff)),
-		     "Test UUIDs don't match");
+		      "Test UUIDs don't match");
 
 	/* Compare UUID 128 bits */
 	zassert_false(bt_uuid_cmp(&uuid_128.uuid, BT_UUID_DECLARE_16(0xffff)),
-		     "Test UUIDs don't match");
+		      "Test UUIDs don't match");
 
 	/* Compare UUID 16 bits with UUID 128 bits */
 	zassert_false(bt_uuid_cmp(&uuid_16.uuid, &uuid_128.uuid),
-		     "Test UUIDs don't match");
+		      "Test UUIDs don't match");
 
 	/* Compare different UUID 16 bits */
 	zassert_true(bt_uuid_cmp(&uuid_16.uuid, BT_UUID_DECLARE_16(0x0000)),
@@ -69,7 +69,7 @@ static void test_uuid_create(void)
 
 	/* Compare swapped UUID 16 bits */
 	zassert_false(bt_uuid_cmp(&u.uuid, BT_UUID_DECLARE_16(0x0100)) == 0,
-		     "Test UUIDs match");
+		      "Test UUIDs match");
 
 	/* Create UUID from BE 16 bit byte array */
 	zassert_true(bt_uuid_create(&u.uuid, be16, sizeof(be16)),
@@ -77,11 +77,11 @@ static void test_uuid_create(void)
 
 	/* Compare UUID 16 bits */
 	zassert_false(bt_uuid_cmp(&u.uuid, BT_UUID_DECLARE_16(0x0001)) == 0,
-		     "Test UUIDs match");
+		      "Test UUIDs match");
 
 	/* Compare UUID 128 bits */
 	zassert_false(bt_uuid_cmp(&u.uuid, &le_128.uuid) == 0,
-		     "Test UUIDs match");
+		      "Test UUIDs match");
 
 	/* Compare swapped UUID 16 bits */
 	zassert_true(bt_uuid_cmp(&u.uuid, BT_UUID_DECLARE_16(0x0100)) == 0,
@@ -91,8 +91,7 @@ static void test_uuid_create(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_uuid,
-			 ztest_unit_test(test_uuid_cmp),
+	ztest_test_suite(test_uuid, ztest_unit_test(test_uuid_cmp),
 			 ztest_unit_test(test_uuid_create));
 	ztest_run_test_suite(test_uuid);
 }

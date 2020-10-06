@@ -8,7 +8,6 @@
 #include <irq_offload.h>
 #include <sys/mutex.h>
 
-
 /**
  * @brief Tests for Kernel Futex objects
  * @defgroup kernel_futex_tests Futex
@@ -28,10 +27,9 @@
 /* declaration */
 K_THREAD_STACK_DEFINE(stack_1, STACK_SIZE);
 K_THREAD_STACK_DEFINE(futex_wake_stack, STACK_SIZE);
-K_THREAD_STACK_ARRAY_DEFINE(multiple_stack,
-		TOTAL_THREADS_WAITING, STACK_SIZE);
-K_THREAD_STACK_ARRAY_DEFINE(multiple_wake_stack,
-		TOTAL_THREADS_WAITING, STACK_SIZE);
+K_THREAD_STACK_ARRAY_DEFINE(multiple_stack, TOTAL_THREADS_WAITING, STACK_SIZE);
+K_THREAD_STACK_ARRAY_DEFINE(multiple_wake_stack, TOTAL_THREADS_WAITING,
+			    STACK_SIZE);
 
 ZTEST_BMEM int woken;
 ZTEST_BMEM int timeout;
@@ -68,24 +66,24 @@ void futex_wait_task(void *p1, void *p2, void *p3)
 	zassert_true(time_val >= (int)K_TICKS_FOREVER,
 		     "invalid timeout parameter");
 
-	ret_value = k_futex_wait(&simple_futex,
-			atomic_get(&simple_futex.val), K_TICKS(time_val));
+	ret_value = k_futex_wait(&simple_futex, atomic_get(&simple_futex.val),
+				 K_TICKS(time_val));
 
 	switch (time_val) {
 	case K_TICKS_FOREVER:
 		zassert_true(ret_value == 0,
-		     "k_futex_wait failed when it shouldn't have");
+			     "k_futex_wait failed when it shouldn't have");
 		zassert_false(ret_value == 0,
-		     "futex wait task wakeup when it shouldn't have");
+			      "futex wait task wakeup when it shouldn't have");
 		break;
 	case 0:
 		zassert_true(ret_value == -ETIMEDOUT,
-		     "k_futex_wait failed when it shouldn't have");
+			     "k_futex_wait failed when it shouldn't have");
 		atomic_sub(&simple_futex.val, 1);
 		break;
 	default:
 		zassert_true(ret_value == -ETIMEDOUT,
-		     "k_futex_wait failed when it shouldn't have");
+			     "k_futex_wait failed when it shouldn't have");
 		atomic_sub(&simple_futex.val, 1);
 		break;
 	}
@@ -96,10 +94,9 @@ void futex_wake_task(void *p1, void *p2, void *p3)
 	int32_t ret_value;
 	int woken_num = *(int *)p1;
 
-	ret_value = k_futex_wake(&simple_futex,
-				woken_num == 1 ? false : true);
+	ret_value = k_futex_wake(&simple_futex, woken_num == 1 ? false : true);
 	zassert_true(ret_value == woken_num,
-		"k_futex_wake failed when it shouldn't have");
+		     "k_futex_wake failed when it shouldn't have");
 }
 
 void futex_wait_wake_task(void *p1, void *p2, void *p3)
@@ -107,23 +104,24 @@ void futex_wait_wake_task(void *p1, void *p2, void *p3)
 	int32_t ret_value;
 	int time_val = *(int *)p1;
 
-	zassert_true(time_val >= (int)K_TICKS_FOREVER, "invalid timeout parameter");
+	zassert_true(time_val >= (int)K_TICKS_FOREVER,
+		     "invalid timeout parameter");
 
-	ret_value = k_futex_wait(&simple_futex,
-			atomic_get(&simple_futex.val), K_TICKS(time_val));
+	ret_value = k_futex_wait(&simple_futex, atomic_get(&simple_futex.val),
+				 K_TICKS(time_val));
 
 	switch (time_val) {
 	case K_TICKS_FOREVER:
 		zassert_true(ret_value == 0,
-		     "k_futex_wait failed when it shouldn't have");
+			     "k_futex_wait failed when it shouldn't have");
 		break;
 	case 0:
 		zassert_true(ret_value == -ETIMEDOUT,
-		     "k_futex_wait failed when it shouldn't have");
+			     "k_futex_wait failed when it shouldn't have");
 		break;
 	default:
 		zassert_true(ret_value == 0,
-		     "k_futex_wait failed when it shouldn't have");
+			     "k_futex_wait failed when it shouldn't have");
 		break;
 	}
 
@@ -139,9 +137,9 @@ void futex_multiple_wake_task(void *p1, void *p2, void *p3)
 	zassert_true(woken_num > 0, "invalid woken number");
 
 	ret_value = k_futex_wake(&multiple_futex[idx],
-			woken_num == 1 ? false : true);
+				 woken_num == 1 ? false : true);
 	zassert_true(ret_value == woken_num,
-		"k_futex_wake failed when it shouldn't have");
+		     "k_futex_wake failed when it shouldn't have");
 }
 
 void futex_multiple_wait_wake_task(void *p1, void *p2, void *p3)
@@ -150,12 +148,14 @@ void futex_multiple_wait_wake_task(void *p1, void *p2, void *p3)
 	int time_val = *(int *)p1;
 	int idx = *(int *)p2;
 
-	zassert_true(time_val == (int)K_TICKS_FOREVER, "invalid timeout parameter");
+	zassert_true(time_val == (int)K_TICKS_FOREVER,
+		     "invalid timeout parameter");
 
 	ret_value = k_futex_wait(&multiple_futex[idx],
-		atomic_get(&(multiple_futex[idx].val)), K_TICKS(time_val));
+				 atomic_get(&(multiple_futex[idx].val)),
+				 K_TICKS(time_val));
 	zassert_true(ret_value == 0,
-	     "k_futex_wait failed when it shouldn't have");
+		     "k_futex_wait failed when it shouldn't have");
 
 	atomic_sub(&(multiple_futex[idx].val), 1);
 }
@@ -174,16 +174,15 @@ void test_futex_wait_forever(void)
 
 	atomic_set(&simple_futex.val, 1);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_task, &timeout, NULL, NULL,
-			PRIO_WAIT, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_task,
+			&timeout, NULL, NULL, PRIO_WAIT,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wait_task to execute */
 	k_yield();
 
 	zassert_false(atomic_get(&simple_futex.val) == 0,
-			"wait forever shouldn't wake");
+		      "wait forever shouldn't wake");
 
 	k_thread_abort(&futex_tid);
 }
@@ -194,16 +193,15 @@ void test_futex_wait_timeout(void)
 
 	atomic_set(&simple_futex.val, 1);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_task, &timeout, NULL, NULL,
-			PRIO_WAIT, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_task,
+			&timeout, NULL, NULL, PRIO_WAIT,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wait_task to execute */
 	k_sleep(K_MSEC(100));
 
 	zassert_true(atomic_get(&simple_futex.val) == 0,
-			"wait timeout doesn't timeout");
+		     "wait timeout doesn't timeout");
 
 	k_thread_abort(&futex_tid);
 }
@@ -214,10 +212,9 @@ void test_futex_wait_nowait(void)
 
 	atomic_set(&simple_futex.val, 1);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_task, &timeout, NULL, NULL,
-			PRIO_WAIT, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_task,
+			&timeout, NULL, NULL, PRIO_WAIT,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wait_task to execute */
 	k_sleep(K_MSEC(100));
@@ -237,18 +234,16 @@ void test_futex_wait_forever_wake(void)
 
 	atomic_set(&simple_futex.val, 1);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_wake_task, &timeout, NULL, NULL,
-			PRIO_WAIT, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_wake_task,
+			&timeout, NULL, NULL, PRIO_WAIT,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wait_wake_task to execute */
 	k_yield();
 
 	k_thread_create(&futex_wake_tid, futex_wake_stack, STACK_SIZE,
-			futex_wake_task, &woken, NULL, NULL,
-			PRIO_WAKE, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+			futex_wake_task, &woken, NULL, NULL, PRIO_WAKE,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wake_task
 	 * and futex_wait_wake_task to execute
@@ -256,7 +251,7 @@ void test_futex_wait_forever_wake(void)
 	k_yield();
 
 	zassert_true(atomic_get(&simple_futex.val) == 0,
-			"wait forever doesn't wake");
+		     "wait forever doesn't wake");
 
 	k_thread_abort(&futex_wake_tid);
 	k_thread_abort(&futex_tid);
@@ -269,18 +264,16 @@ void test_futex_wait_timeout_wake(void)
 
 	atomic_set(&simple_futex.val, 1);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_wake_task, &timeout, NULL, NULL,
-			PRIO_WAIT, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_wake_task,
+			&timeout, NULL, NULL, PRIO_WAIT,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wait_wake_task to execute */
 	k_yield();
 
 	k_thread_create(&futex_wake_tid, futex_wake_stack, STACK_SIZE,
-			futex_wake_task, &woken, NULL, NULL,
-			PRIO_WAKE, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+			futex_wake_task, &woken, NULL, NULL, PRIO_WAKE,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/*
 	 * giving time for the futex_wake_task
@@ -289,7 +282,7 @@ void test_futex_wait_timeout_wake(void)
 	k_yield();
 
 	zassert_true(atomic_get(&simple_futex.val) == 0,
-			"wait timeout doesn't wake");
+		     "wait timeout doesn't wake");
 
 	k_thread_abort(&futex_wake_tid);
 	k_thread_abort(&futex_tid);
@@ -302,18 +295,16 @@ void test_futex_wait_nowait_wake(void)
 
 	atomic_set(&simple_futex.val, 1);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_wake_task, &timeout, NULL, NULL,
-			PRIO_WAIT, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_wake_task,
+			&timeout, NULL, NULL, PRIO_WAIT,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wait_wake_task to execute */
 	k_sleep(K_MSEC(100));
 
 	k_thread_create(&futex_wake_tid, futex_wake_stack, STACK_SIZE,
-			futex_wake_task, &woken, NULL, NULL,
-			PRIO_WAKE, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+			futex_wake_task, &woken, NULL, NULL, PRIO_WAKE,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wake_task to execute */
 	k_yield();
@@ -328,10 +319,9 @@ void test_futex_wait_forever_wake_from_isr(void)
 
 	atomic_set(&simple_futex.val, 1);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_wake_task, &timeout, NULL, NULL,
-			PRIO_WAIT, K_USER | K_INHERIT_PERMS,
-			K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_wake_task,
+			&timeout, NULL, NULL, PRIO_WAIT,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the futex_wait_wake_task to execute */
 	k_yield();
@@ -342,7 +332,7 @@ void test_futex_wait_forever_wake_from_isr(void)
 	k_yield();
 
 	zassert_true(atomic_get(&simple_futex.val) == 0,
-			"wait forever wake from isr doesn't wake");
+		     "wait forever wake from isr doesn't wake");
 
 	k_thread_abort(&futex_tid);
 }
@@ -356,25 +346,23 @@ void test_futex_multiple_threads_wait_wake(void)
 
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
 		atomic_inc(&simple_futex.val);
-		k_thread_create(&multiple_tid[i], multiple_stack[i],
-				STACK_SIZE, futex_wait_wake_task,
-				&timeout, NULL, NULL, PRIO_WAIT,
-				K_USER | K_INHERIT_PERMS, K_NO_WAIT);
+		k_thread_create(&multiple_tid[i], multiple_stack[i], STACK_SIZE,
+				futex_wait_wake_task, &timeout, NULL, NULL,
+				PRIO_WAIT, K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 	}
 
 	/* giving time for the other threads to execute */
 	k_yield();
 
-	k_thread_create(&futex_wake_tid, futex_wake_stack,
-			STACK_SIZE, futex_wake_task, &woken,
-			NULL, NULL, PRIO_WAKE,
+	k_thread_create(&futex_wake_tid, futex_wake_stack, STACK_SIZE,
+			futex_wake_task, &woken, NULL, NULL, PRIO_WAKE,
 			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/* giving time for the other threads to execute */
 	k_yield();
 
 	zassert_true(atomic_get(&simple_futex.val) == 0,
-			"wait forever wake doesn't wake all threads");
+		     "wait forever wake doesn't wake all threads");
 
 	k_thread_abort(&futex_wake_tid);
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
@@ -390,9 +378,9 @@ void test_multiple_futex_wait_wake(void)
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
 		index[i] = i;
 		atomic_set(&multiple_futex[i].val, 1);
-		k_thread_create(&multiple_tid[i], multiple_stack[i],
-				STACK_SIZE, futex_multiple_wait_wake_task,
-				&timeout, &index[i], NULL, PRIO_WAIT,
+		k_thread_create(&multiple_tid[i], multiple_stack[i], STACK_SIZE,
+				futex_multiple_wait_wake_task, &timeout,
+				&index[i], NULL, PRIO_WAIT,
 				K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 	}
 
@@ -401,8 +389,8 @@ void test_multiple_futex_wait_wake(void)
 
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
 		k_thread_create(&multiple_wake_tid[i], multiple_wake_stack[i],
-				STACK_SIZE, futex_multiple_wake_task,
-				&woken, &index[i], NULL, PRIO_WAKE,
+				STACK_SIZE, futex_multiple_wake_task, &woken,
+				&index[i], NULL, PRIO_WAKE,
 				K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 	}
 
@@ -411,7 +399,7 @@ void test_multiple_futex_wait_wake(void)
 
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
 		zassert_true(atomic_get(&multiple_futex[i].val) == 0,
-			"wait forever wake doesn't wake %d thread", i);
+			     "wait forever wake doesn't wake %d thread", i);
 	}
 
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
@@ -506,19 +494,18 @@ void futex_wake(void *p1, void *p2, void *p3)
  */
 void test_futex_locate_access(void)
 {
-
 	atomic_set(&simple_futex.val, 13);
 
-	k_thread_create(&futex_tid, stack_1, STACK_SIZE,
-			futex_wait_wake, NULL, NULL, NULL,
-			PRIORITY, K_USER | K_INHERIT_PERMS, K_NO_WAIT);
+	k_thread_create(&futex_tid, stack_1, STACK_SIZE, futex_wait_wake, NULL,
+			NULL, NULL, PRIORITY, K_USER | K_INHERIT_PERMS,
+			K_NO_WAIT);
 
 	/* giving time for the futex_wait_wake_task to execute */
 	k_yield();
 
 	k_thread_create(&futex_wake_tid, futex_wake_stack, STACK_SIZE,
-			futex_wake, NULL, NULL, NULL,
-			PRIORITY, K_USER | K_INHERIT_PERMS, K_NO_WAIT);
+			futex_wake, NULL, NULL, NULL, PRIORITY,
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	/*
 	 * giving time for the futex_wake_task
@@ -530,12 +517,11 @@ void test_futex_locate_access(void)
 /* ztest main entry*/
 void test_main(void)
 {
-	k_thread_access_grant(k_current_get(),
-					&futex_tid, &stack_1, &futex_wake_tid, &futex_wake_stack,
-					&simple_futex);
+	k_thread_access_grant(k_current_get(), &futex_tid, &stack_1,
+			      &futex_wake_tid, &futex_wake_stack,
+			      &simple_futex);
 
-	ztest_test_suite(test_futex,
-			 ztest_user_unit_test(test_user_futex_bad),
+	ztest_test_suite(test_futex, ztest_user_unit_test(test_user_futex_bad),
 			 ztest_unit_test(test_futex_wait_forever_wake),
 			 ztest_unit_test(test_futex_wait_timeout_wake),
 			 ztest_unit_test(test_futex_wait_nowait_wake),
@@ -545,8 +531,7 @@ void test_main(void)
 			 ztest_unit_test(test_futex_wait_forever),
 			 ztest_unit_test(test_futex_wait_timeout),
 			 ztest_unit_test(test_futex_wait_nowait),
-			 ztest_user_unit_test(test_futex_locate_access)
-			 );
+			 ztest_user_unit_test(test_futex_locate_access));
 	ztest_run_test_suite(test_futex);
 }
 

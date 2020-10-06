@@ -31,12 +31,12 @@
 
 #include "bt.h"
 
-#define CREDITS			10
-#define DATA_MTU		(23 * CREDITS)
+#define CREDITS 10
+#define DATA_MTU (23 * CREDITS)
 
-#define L2CAP_POLICY_NONE		0x00
-#define L2CAP_POLICY_WHITELIST		0x01
-#define L2CAP_POLICY_16BYTE_KEY		0x02
+#define L2CAP_POLICY_NONE 0x00
+#define L2CAP_POLICY_WHITELIST 0x01
+#define L2CAP_POLICY_16BYTE_KEY 0x02
 
 NET_BUF_POOL_FIXED_DEFINE(data_tx_pool, 1, DATA_MTU, NULL);
 NET_BUF_POOL_FIXED_DEFINE(data_rx_pool, 1, DATA_MTU, NULL);
@@ -157,17 +157,17 @@ static struct net_buf *l2cap_alloc_buf(struct bt_l2cap_chan *chan)
 }
 
 static const struct bt_l2cap_chan_ops l2cap_ops = {
-	.alloc_buf	= l2cap_alloc_buf,
-	.recv		= l2cap_recv,
-	.sent		= l2cap_sent,
-	.status		= l2cap_status,
-	.connected	= l2cap_connected,
-	.disconnected	= l2cap_disconnected,
+	.alloc_buf = l2cap_alloc_buf,
+	.recv = l2cap_recv,
+	.sent = l2cap_sent,
+	.status = l2cap_status,
+	.connected = l2cap_connected,
+	.disconnected = l2cap_disconnected,
 };
 
 static struct l2ch l2ch_chan = {
-	.ch.chan.ops	= &l2cap_ops,
-	.ch.rx.mtu	= DATA_MTU,
+	.ch.chan.ops = &l2cap_ops,
+	.ch.rx.mtu = DATA_MTU,
 };
 
 static void l2cap_whitelist_remove(struct bt_conn *conn, uint8_t reason)
@@ -231,7 +231,7 @@ static int l2cap_accept(struct bt_conn *conn, struct bt_l2cap_chan **chan)
 }
 
 static struct bt_l2cap_server server = {
-	.accept		= l2cap_accept,
+	.accept = l2cap_accept,
 };
 
 static int cmd_register(const struct shell *shell, size_t argc, char *argv[])
@@ -325,7 +325,7 @@ static int cmd_disconnect(const struct shell *shell, size_t argc, char *argv[])
 
 static int cmd_send(const struct shell *shell, size_t argc, char *argv[])
 {
-	static uint8_t buf_data[DATA_MTU] = { [0 ... (DATA_MTU - 1)] = 0xff };
+	static uint8_t buf_data[DATA_MTU] = { [0 ...(DATA_MTU - 1)] = 0xff };
 	int ret, len, count = 1;
 	struct net_buf *buf;
 
@@ -388,7 +388,8 @@ static int cmd_metrics(const struct shell *shell, size_t argc, char *argv[])
 	return 0;
 }
 
-static int cmd_whitelist_add(const struct shell *shell, size_t argc, char *argv[])
+static int cmd_whitelist_add(const struct shell *shell, size_t argc,
+			     char *argv[])
 {
 	int i;
 
@@ -407,7 +408,8 @@ static int cmd_whitelist_add(const struct shell *shell, size_t argc, char *argv[
 	return -ENOMEM;
 }
 
-static int cmd_whitelist_remove(const struct shell *shell, size_t argc, char *argv[])
+static int cmd_whitelist_remove(const struct shell *shell, size_t argc,
+				char *argv[])
 {
 	if (!default_conn) {
 		shell_error(shell, "Not connected");
@@ -422,22 +424,25 @@ static int cmd_whitelist_remove(const struct shell *shell, size_t argc, char *ar
 #define HELP_NONE "[none]"
 
 SHELL_STATIC_SUBCMD_SET_CREATE(whitelist_cmds,
-	SHELL_CMD_ARG(add, NULL, HELP_NONE, cmd_whitelist_add, 1, 0),
-	SHELL_CMD_ARG(remove, NULL, HELP_NONE, cmd_whitelist_remove, 1, 0),
-	SHELL_SUBCMD_SET_END
-);
+			       SHELL_CMD_ARG(add, NULL, HELP_NONE,
+					     cmd_whitelist_add, 1, 0),
+			       SHELL_CMD_ARG(remove, NULL, HELP_NONE,
+					     cmd_whitelist_remove, 1, 0),
+			       SHELL_SUBCMD_SET_END);
 
-SHELL_STATIC_SUBCMD_SET_CREATE(l2cap_cmds,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	l2cap_cmds,
 	SHELL_CMD_ARG(connect, NULL, "<psm> [sec_level]", cmd_connect, 2, 1),
 	SHELL_CMD_ARG(disconnect, NULL, HELP_NONE, cmd_disconnect, 1, 0),
 	SHELL_CMD_ARG(metrics, NULL, "<value on, off>", cmd_metrics, 2, 0),
 	SHELL_CMD_ARG(recv, NULL, "[delay (in miliseconds)", cmd_recv, 1, 1),
-	SHELL_CMD_ARG(register, NULL, "<psm> [sec_level] "
-		      "[policy: whitelist, 16byte_key]", cmd_register, 2, 2),
+	SHELL_CMD_ARG(register, NULL,
+		      "<psm> [sec_level] "
+		      "[policy: whitelist, 16byte_key]",
+		      cmd_register, 2, 2),
 	SHELL_CMD_ARG(send, NULL, "<number of packets>", cmd_send, 2, 0),
 	SHELL_CMD_ARG(whitelist, &whitelist_cmds, HELP_NONE, NULL, 1, 0),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 static int cmd_l2cap(const struct shell *shell, size_t argc, char **argv)
 {

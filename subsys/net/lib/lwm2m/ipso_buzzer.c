@@ -22,25 +22,25 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "lwm2m_engine.h"
 
 /* resource IDs */
-#define BUZZER_ON_OFF_ID		5850
-#define BUZZER_LEVEL_ID			5548
-#define BUZZER_DELAY_DURATION_ID	5521
-#define BUZZER_MINIMUM_OFF_TIME_ID	5525
-#define BUZZER_APPLICATION_TYPE_ID	5750
+#define BUZZER_ON_OFF_ID 5850
+#define BUZZER_LEVEL_ID 5548
+#define BUZZER_DELAY_DURATION_ID 5521
+#define BUZZER_MINIMUM_OFF_TIME_ID 5525
+#define BUZZER_APPLICATION_TYPE_ID 5750
 /* This field is actually not in the spec, so nothing sets it except here
  * users can listen for post_write events to it for buzzer on/off events
  */
-#define BUZZER_DIGITAL_STATE_ID		5500
+#define BUZZER_DIGITAL_STATE_ID 5500
 
-#define BUZZER_MAX_ID			6
+#define BUZZER_MAX_ID 6
 
-#define MAX_INSTANCE_COUNT		CONFIG_LWM2M_IPSO_BUZZER_INSTANCE_COUNT
+#define MAX_INSTANCE_COUNT CONFIG_LWM2M_IPSO_BUZZER_INSTANCE_COUNT
 
 /*
  * Calculate resource instances as follows:
  * start with BUZZER_MAX_ID
  */
-#define RESOURCE_INSTANCE_COUNT        (BUZZER_MAX_ID)
+#define RESOURCE_INSTANCE_COUNT (BUZZER_MAX_ID)
 
 /* resource state */
 struct ipso_buzzer_data {
@@ -71,8 +71,8 @@ static struct lwm2m_engine_obj_field fields[] = {
 
 static struct lwm2m_engine_obj_inst inst[MAX_INSTANCE_COUNT];
 static struct lwm2m_engine_res res[MAX_INSTANCE_COUNT][BUZZER_MAX_ID];
-static struct lwm2m_engine_res_inst
-		res_inst[MAX_INSTANCE_COUNT][RESOURCE_INSTANCE_COUNT];
+static struct lwm2m_engine_res_inst res_inst[MAX_INSTANCE_COUNT]
+					    [RESOURCE_INSTANCE_COUNT];
 
 static int float2ms(float64_value_t *f, uint32_t *ms)
 {
@@ -147,10 +147,10 @@ static int stop_buzzer(struct ipso_buzzer_data *buzzer, bool cancel)
 	return 0;
 }
 
-static int onoff_post_write_cb(uint16_t obj_inst_id,
-			       uint16_t res_id, uint16_t res_inst_id,
-			       uint8_t *data, uint16_t data_len,
-			       bool last_block, size_t total_size)
+static int onoff_post_write_cb(uint16_t obj_inst_id, uint16_t res_id,
+			       uint16_t res_inst_id, uint8_t *data,
+			       uint16_t data_len, bool last_block,
+			       size_t total_size)
 {
 	int i;
 
@@ -170,9 +170,8 @@ static int onoff_post_write_cb(uint16_t obj_inst_id,
 
 static void buzzer_work_cb(struct k_work *work)
 {
-	struct ipso_buzzer_data *buzzer = CONTAINER_OF(work,
-						      struct ipso_buzzer_data,
-						      buzzer_work);
+	struct ipso_buzzer_data *buzzer =
+		CONTAINER_OF(work, struct ipso_buzzer_data, buzzer_work);
 	stop_buzzer(buzzer, false);
 }
 
@@ -184,7 +183,8 @@ static struct lwm2m_engine_obj_inst *buzzer_create(uint16_t obj_inst_id)
 	for (index = 0; index < ARRAY_SIZE(inst); index++) {
 		if (inst[index].obj && inst[index].obj_inst_id == obj_inst_id) {
 			LOG_ERR("Can not create instance - "
-				"already existing: %u", obj_inst_id);
+				"already existing: %u",
+				obj_inst_id);
 			return NULL;
 		}
 
@@ -212,11 +212,10 @@ static struct lwm2m_engine_obj_inst *buzzer_create(uint16_t obj_inst_id)
 	init_res_instance(res_inst[avail], ARRAY_SIZE(res_inst[avail]));
 
 	/* initialize instance resource data */
-	INIT_OBJ_RES(BUZZER_ON_OFF_ID, res[avail], i,
-		     res_inst[avail], j, 1, true,
-		     &buzzer_data[avail].onoff,
-		     sizeof(buzzer_data[avail].onoff),
-		     NULL, NULL, onoff_post_write_cb, NULL);
+	INIT_OBJ_RES(BUZZER_ON_OFF_ID, res[avail], i, res_inst[avail], j, 1,
+		     true, &buzzer_data[avail].onoff,
+		     sizeof(buzzer_data[avail].onoff), NULL, NULL,
+		     onoff_post_write_cb, NULL);
 	INIT_OBJ_RES_DATA(BUZZER_LEVEL_ID, res[avail], i, res_inst[avail], j,
 			  &buzzer_data[avail].level,
 			  sizeof(buzzer_data[avail].level));
@@ -225,14 +224,12 @@ static struct lwm2m_engine_obj_inst *buzzer_create(uint16_t obj_inst_id)
 			  &buzzer_data[avail].delay_duration,
 			  sizeof(buzzer_data[avail].delay_duration));
 	INIT_OBJ_RES_DATA(BUZZER_MINIMUM_OFF_TIME_ID, res[avail], i,
-			  res_inst[avail], j,
-			  &buzzer_data[avail].min_off_time,
+			  res_inst[avail], j, &buzzer_data[avail].min_off_time,
 			  sizeof(buzzer_data[avail].min_off_time));
 	INIT_OBJ_RES_OPTDATA(BUZZER_APPLICATION_TYPE_ID, res[avail], i,
 			     res_inst[avail], j);
 	INIT_OBJ_RES_DATA(BUZZER_DIGITAL_STATE_ID, res[avail], i,
-			  res_inst[avail], j,
-			  &buzzer_data[avail].active,
+			  res_inst[avail], j, &buzzer_data[avail].active,
 			  sizeof(buzzer_data[avail].active));
 
 	inst[avail].resources = res[avail];

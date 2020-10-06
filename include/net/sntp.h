@@ -57,8 +57,7 @@ struct sntp_time {
  *
  * @return 0 if ok, <0 if error.
  */
-int sntp_init(struct sntp_ctx *ctx, struct sockaddr *addr,
-	      socklen_t addr_len);
+int sntp_init(struct sntp_ctx *ctx, struct sockaddr *addr, socklen_t addr_len);
 
 /**
  * @brief Perform SNTP query
@@ -70,8 +69,7 @@ int sntp_init(struct sntp_ctx *ctx, struct sockaddr *addr,
  *
  * @return 0 if ok, <0 if error (-ETIMEDOUT if timeout).
  */
-int sntp_query(struct sntp_ctx *ctx, uint32_t timeout,
-	       struct sntp_time *time);
+int sntp_query(struct sntp_ctx *ctx, uint32_t timeout, struct sntp_time *time);
 
 /**
  * @brief Release SNTP context
@@ -93,8 +91,7 @@ void sntp_close(struct sntp_ctx *ctx);
  *
  * @return 0 if ok, <0 if error (-ETIMEDOUT if timeout).
  */
-int sntp_simple(const char *server, uint32_t timeout,
-		struct sntp_time *time);
+int sntp_simple(const char *server, uint32_t timeout, struct sntp_time *time);
 
 #ifdef __cplusplus
 }

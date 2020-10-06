@@ -67,7 +67,7 @@ struct paging_level {
  *
  * PCD/PWT always 0. Caching properties again done at leaf level.
  */
-#define INT_FLAGS	(MMU_P | MMU_RW | MMU_US)
+#define INT_FLAGS (MMU_P | MMU_RW | MMU_US)
 
 /* Paging level ontology for the selected paging mode.
  *
@@ -76,28 +76,26 @@ struct paging_level {
 static const struct paging_level paging_levels[] = {
 #ifdef CONFIG_X86_64
 	/* Page Map Level 4 */
-	{
-		.mask = 0x7FFFFFFFFFFFF000ULL,
-		.entries = 512U,
-		.shift = 39U,
+	{ .mask = 0x7FFFFFFFFFFFF000ULL,
+	  .entries = 512U,
+	  .shift = 39U,
 #ifdef CONFIG_EXCEPTION_DEBUG
-		.name = "PML4"
+	  .name = "PML4"
 #endif
 	},
 #endif /* CONFIG_X86_64 */
 #if defined(CONFIG_X86_64) || defined(CONFIG_X86_PAE)
 	/* Page Directory Pointer Table */
-	{
-		.mask = 0x7FFFFFFFFFFFF000ULL,
+	{ .mask = 0x7FFFFFFFFFFFF000ULL,
 #ifdef CONFIG_X86_64
-		.entries = 512U,
+	  .entries = 512U,
 #else
 		/* PAE version */
 		.entries = 4U,
 #endif
-		.shift = 30U,
+	  .shift = 30U,
 #ifdef CONFIG_EXCEPTION_DEBUG
-		.name = "PDPT"
+	  .name = "PDPT"
 #endif
 	},
 #endif /* CONFIG_X86_64 || CONFIG_X86_PAE */
@@ -135,7 +133,7 @@ static const struct paging_level paging_levels[] = {
 	}
 };
 
-#define NUM_LEVELS	ARRAY_SIZE(paging_levels)
+#define NUM_LEVELS ARRAY_SIZE(paging_levels)
 
 /*
  * Utility functions
@@ -214,7 +212,7 @@ static inline void tlb_flush_page(void *addr)
 	 */
 	char *page = (char *)addr;
 
-	__asm__ ("invlpg %0" :: "m" (*page));
+	__asm__("invlpg %0" ::"m"(*page));
 
 	/* TODO: Need to implement TLB shootdown for SMP */
 }
@@ -247,21 +245,23 @@ static inline void assert_region_page_aligned(void *addr, size_t size)
 #ifdef CONFIG_EXCEPTION_DEBUG
 
 /* Add colors to page table dumps to indicate mapping type */
-#define COLOR_PAGE_TABLES	1
+#define COLOR_PAGE_TABLES 1
 
 #if COLOR_PAGE_TABLES
 #define ANSI_DEFAULT "\x1B[0m"
-#define ANSI_RED     "\x1B[1;31m"
-#define ANSI_GREEN   "\x1B[1;32m"
-#define ANSI_YELLOW  "\x1B[1;33m"
-#define ANSI_BLUE    "\x1B[1;34m"
+#define ANSI_RED "\x1B[1;31m"
+#define ANSI_GREEN "\x1B[1;32m"
+#define ANSI_YELLOW "\x1B[1;33m"
+#define ANSI_BLUE "\x1B[1;34m"
 #define ANSI_MAGENTA "\x1B[1;35m"
-#define ANSI_CYAN    "\x1B[1;36m"
-#define ANSI_GREY    "\x1B[1;90m"
+#define ANSI_CYAN "\x1B[1;36m"
+#define ANSI_GREY "\x1B[1;90m"
 
-#define COLOR(x)	printk(_CONCAT(ANSI_, x))
+#define COLOR(x) printk(_CONCAT(ANSI_, x))
 #else
-#define COLOR(x)	do { } while (0)
+#define COLOR(x) \
+	do {     \
+	} while (0)
 #endif
 
 static char get_entry_code(pentry_t value)
@@ -308,8 +308,7 @@ static void print_entries(pentry_t entries_array[], uint8_t *base, int level,
 		pentry_t entry = entries_array[i];
 
 		uintptr_t phys = get_entry_phys(entry, level);
-		uintptr_t virt =
-			(uintptr_t)base + (get_entry_scope(level) * i);
+		uintptr_t virt = (uintptr_t)base + (get_entry_scope(level) * i);
 
 		if (entry & MMU_P) {
 			if (is_leaf(level, entry)) {
@@ -373,8 +372,7 @@ static void dump_ptables(pentry_t *table, uint8_t *base, int level)
 		pentry_t entry = table[j];
 		pentry_t *next;
 
-		if ((entry & MMU_P) == 0U ||
-			(entry & MMU_PS) != 0U) {
+		if ((entry & MMU_P) == 0U || (entry & MMU_PS) != 0U) {
 			/* Not present or big page, skip */
 			continue;
 		}
@@ -417,7 +415,6 @@ static void str_append(char **buf, size_t *size, const char *str)
 		*size -= ret;
 		*buf += ret;
 	}
-
 }
 
 static void dump_entry(int level, void *virt, pentry_t entry)
@@ -428,11 +425,12 @@ static void dump_entry(int level, void *virt, pentry_t entry)
 	size_t sz = sizeof(buf);
 	uint8_t *virtmap = (uint8_t *)ROUND_DOWN(virt, get_entry_scope(level));
 
-	#define DUMP_BIT(bit) do { \
-			if ((entry & MMU_##bit) != 0U) { \
-				str_append(&pos, &sz, #bit " "); \
-			} \
-		} while (0)
+#define DUMP_BIT(bit)                                    \
+	do {                                             \
+		if ((entry & MMU_##bit) != 0U) {         \
+			str_append(&pos, &sz, #bit " "); \
+		}                                        \
+	} while (0)
 
 	DUMP_BIT(RW);
 	DUMP_BIT(US);
@@ -443,10 +441,10 @@ static void dump_entry(int level, void *virt, pentry_t entry)
 	DUMP_BIT(G);
 	DUMP_BIT(XD);
 
-	LOG_ERR("%sE: %p -> " PRI_ENTRY ": %s", info->name,
-		virtmap, entry & info->mask, log_strdup(buf));
+	LOG_ERR("%sE: %p -> " PRI_ENTRY ": %s", info->name, virtmap,
+		entry & info->mask, log_strdup(buf));
 
-	#undef DUMP_BIT
+#undef DUMP_BIT
 }
 
 void z_x86_pentry_get(int *paging_level, pentry_t *val, pentry_t *ptables,
@@ -487,7 +485,7 @@ void z_x86_dump_mmu_flags(pentry_t *ptables, void *virt)
 #endif /* CONFIG_EXCEPTION_DEBUG */
 
 /* Page allocation function prototype, passed to map_page() */
-typedef void * (*page_get_func_t)(void *);
+typedef void *(*page_get_func_t)(void *);
 
 /*
  * Pool of free memory pages for creating new page tables, as needed.
@@ -495,9 +493,9 @@ typedef void * (*page_get_func_t)(void *);
  * This is very crude, once obtained, pages may not be returned. Fine for
  * permanent kernel mappings.
  */
-static uint8_t __noinit
-	page_pool[CONFIG_MMU_PAGE_SIZE * CONFIG_X86_MMU_PAGE_POOL_PAGES]
-	__aligned(CONFIG_MMU_PAGE_SIZE);
+static uint8_t __noinit page_pool
+	[CONFIG_MMU_PAGE_SIZE * CONFIG_X86_MMU_PAGE_POOL_PAGES] __aligned(
+		CONFIG_MMU_PAGE_SIZE);
 
 static uint8_t *page_pos = page_pool + sizeof(page_pool);
 
@@ -595,7 +593,7 @@ static int page_map_set(pentry_t *ptables, void *virt, pentry_t entry_val,
 			 * in a PML4 entry) it is always reserved and must be 0
 			 */
 			__ASSERT((*entryp & MMU_PS) == 0U,
-				  "large page encountered");
+				 "large page encountered");
 			table = next_table(*entryp, level);
 		}
 	}
@@ -609,8 +607,8 @@ int arch_mem_map(void *virt, uintptr_t phys, size_t size, uint32_t flags)
 	pentry_t entry_flags = MMU_P;
 	pentry_t *ptables;
 
-	LOG_DBG("%s: %p -> %p (%zu) flags 0x%x",
-		__func__, (void *)phys, virt, size, flags);
+	LOG_DBG("%s: %p -> %p (%zu) flags 0x%x", __func__, (void *)phys, virt,
+		size, flags);
 
 #ifdef CONFIG_X86_64
 	/* There's a gap in the "64-bit" address space, as 4-level paging
@@ -618,8 +616,8 @@ int arch_mem_map(void *virt, uintptr_t phys, size_t size, uint32_t flags)
 	 * by treating as a signed value and shifting.
 	 */
 	__ASSERT(((((intptr_t)virt) << 16) >> 16) == (intptr_t)virt,
-		 "non-canonical virtual address mapping %p (size %zu)",
-		 virt, size);
+		 "non-canonical virtual address mapping %p (size %zu)", virt,
+		 size);
 #endif /* CONFIG_X86_64 */
 
 	/* For now, always map in the kernel's page tables, we're just using
@@ -664,8 +662,8 @@ int arch_mem_map(void *virt, uintptr_t phys, size_t size, uint32_t flags)
 		pentry_t entry_val = (phys + offset) | entry_flags;
 		uint8_t *dest_virt = (uint8_t *)virt + offset;
 
-		ret = page_map_set(ptables, dest_virt, entry_val,
-				   page_pool_get, NULL);
+		ret = page_map_set(ptables, dest_virt, entry_val, page_pool_get,
+				   NULL);
 
 		/* Currently used for new mappings, no TLB flush. Re-visit
 		 * as capabilities increase
@@ -697,8 +695,8 @@ static void stack_guard_set(void *guard_page)
 	/* Always modify the kernel's page tables since this is for
 	 * supervisor threads or handling syscalls
 	 */
-	ret = page_map_set(z_x86_kernel_ptables, guard_page, pte,
-			   page_pool_get, NULL);
+	ret = page_map_set(z_x86_kernel_ptables, guard_page, pte, page_pool_get,
+			   NULL);
 	/* Literally should never happen */
 	__ASSERT(ret == 0, "stack guard mapping failed for %p", guard_page);
 	(void)ret;
@@ -757,7 +755,7 @@ static bool page_validate(pentry_t *ptables, uint8_t *addr, bool write)
 static inline void bcb_fence(void)
 {
 #ifdef CONFIG_X86_BOUNDS_CHECK_BYPASS_MITIGATION
-	__asm__ volatile ("lfence" : : : "memory");
+	__asm__ volatile("lfence" : : : "memory");
 #endif
 }
 
@@ -769,8 +767,8 @@ int arch_buffer_validate(void *addr, size_t size, int write)
 	int ret = 0;
 
 	/* addr/size arbitrary, fix this up into an aligned region */
-	k_mem_region_align((uintptr_t *)&virt, &aligned_size,
-			   (uintptr_t)addr, size, CONFIG_MMU_PAGE_SIZE);
+	k_mem_region_align((uintptr_t *)&virt, &aligned_size, (uintptr_t)addr,
+			   size, CONFIG_MMU_PAGE_SIZE);
 
 	for (size_t offset = 0; offset < aligned_size;
 	     offset += CONFIG_MMU_PAGE_SIZE) {
@@ -811,8 +809,8 @@ static void *thread_page_pool_get(void *context)
 	return ret;
 }
 
-#define RAM_BASE	((uintptr_t)CONFIG_SRAM_BASE_ADDRESS)
-#define RAM_END		(RAM_BASE + (CONFIG_SRAM_SIZE * 1024UL))
+#define RAM_BASE ((uintptr_t)CONFIG_SRAM_BASE_ADDRESS)
+#define RAM_END (RAM_BASE + (CONFIG_SRAM_SIZE * 1024UL))
 
 /* Establish a mapping in the thread's page tables */
 static void thread_map(struct k_thread *thread, void *ptr, size_t size,
@@ -825,10 +823,8 @@ static void thread_map(struct k_thread *thread, void *ptr, size_t size,
 	/* Only mapping system RAM addresses is supported in thread page tables,
 	 * as the thread does not have its own copies of tables outside of it
 	 */
-	__ASSERT((uintptr_t)ptr >= RAM_BASE,
-		 "%p below system RAM", ptr);
-	__ASSERT((uintptr_t)ptr < RAM_END,
-		 "%p above system ram", ptr);
+	__ASSERT((uintptr_t)ptr >= RAM_BASE, "%p below system RAM", ptr);
+	__ASSERT((uintptr_t)ptr < RAM_END, "%p above system ram", ptr);
 
 	for (size_t offset = 0; offset < size; offset += CONFIG_MMU_PAGE_SIZE) {
 		pentry_t pte;
@@ -897,8 +893,8 @@ static void page_reset(struct k_thread *thread, void *virt)
 	}
 #endif /* CONFIG_X86_KPTI */
 
-	ret = page_map_set(thread_ptables, virt,
-			   kern_pte, thread_page_pool_get, thread);
+	ret = page_map_set(thread_ptables, virt, kern_pte, thread_page_pool_get,
+			   thread);
 	__ASSERT(ret == 0, "mapping failed for %p", virt);
 	(void)ret;
 }
@@ -947,12 +943,12 @@ static pentry_t *page_entry_ptr_get(pentry_t *toplevel, void *virt, int level)
 {
 	pentry_t *table = page_table_get(toplevel, virt, level);
 
-	__ASSERT(table != NULL, "no table mapping for %p at level %d",
-		 virt, level);
+	__ASSERT(table != NULL, "no table mapping for %p at level %d", virt,
+		 level);
 	return get_entry_ptr(table, virt, level);
 }
 
- /* Non-KPTI version. The thread-level page tables are used even during
+/* Non-KPTI version. The thread-level page tables are used even during
   * interrupts, exceptions, and syscalls, so we need all mappings.
   * Copies will be made of all tables that provide mappings for system RAM,
   * otherwise the kernel table will just be linked instead.
@@ -1038,8 +1034,7 @@ void z_x86_thread_pt_init(struct k_thread *thread)
 
 	/* Enable access to the thread's own stack buffer */
 	thread_map(thread, (void *)thread->stack_info.start,
-		   ROUND_UP(thread->stack_info.size,
-			    CONFIG_MMU_PAGE_SIZE),
+		   ROUND_UP(thread->stack_info.size, CONFIG_MMU_PAGE_SIZE),
 		   MMU_P | MMU_RW | MMU_US | MMU_XD, false);
 }
 

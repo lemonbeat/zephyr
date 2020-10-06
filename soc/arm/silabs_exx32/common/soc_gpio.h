@@ -20,9 +20,9 @@ extern "C" {
 
 struct soc_gpio_pin {
 	GPIO_Port_TypeDef port; /** GPIO port */
-	unsigned int pin;       /** GPIO pin on the port */
+	unsigned int pin; /** GPIO pin on the port */
 	GPIO_Mode_TypeDef mode; /** mode of the pin, e.g. gpioModeInput */
-	unsigned int out;       /** out register value */
+	unsigned int out; /** out register value */
 };
 
 /**

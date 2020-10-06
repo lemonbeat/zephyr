@@ -10,7 +10,7 @@
 
 /* Macro declarations */
 #define SEM_INIT_VAL (0U)
-#define SEM_MAX_VAL  (10U)
+#define SEM_MAX_VAL (10U)
 #define SEM_TIMEOUT (K_MSEC(100))
 #define STACK_SIZE (512 + CONFIG_TEST_EXTRA_STACKSIZE)
 #define TOTAL_THREADS_WAITING (3)
@@ -169,7 +169,6 @@ void test_simple_sem_from_isr(void)
 			     "signal count missmatch Expected %d, got %d",
 			     (i + 1), signal_count);
 	}
-
 }
 
 /**
@@ -189,7 +188,6 @@ void test_simple_sem_from_task(void)
 			     "signal count missmatch Expected %d, got %d",
 			     (i + 1), signal_count);
 	}
-
 }
 
 /**
@@ -208,10 +206,9 @@ void test_sem_take_no_wait(void)
 
 		signal_count = sys_sem_count_get(&simple_sem);
 		zassert_true(signal_count == i,
-			     "signal count missmatch Expected %d, got %d",
-			     i, signal_count);
+			     "signal count missmatch Expected %d, got %d", i,
+			     signal_count);
 	}
-
 }
 
 /**
@@ -234,7 +231,6 @@ void test_sem_take_no_wait_fails(void)
 			     "signal count missmatch Expected 0, got %d",
 			     signal_count);
 	}
-
 }
 
 /**
@@ -251,7 +247,6 @@ void test_sem_take_timeout_fails(void)
 		zassert_true(ret_value == -ETIMEDOUT,
 			     "sys_sem_take succeeded when its not possible");
 	}
-
 }
 
 /**
@@ -268,10 +263,8 @@ void test_sem_take_timeout(void)
 
 	sys_sem_init(&simple_sem, SEM_INIT_VAL, SEM_MAX_VAL);
 
-	k_thread_create(&sem_tid, stack_1, STACK_SIZE,
-			sem_give_task, NULL, NULL, NULL,
-			K_PRIO_PREEMPT(0), thread_flags,
-			K_NO_WAIT);
+	k_thread_create(&sem_tid, stack_1, STACK_SIZE, sem_give_task, NULL,
+			NULL, NULL, K_PRIO_PREEMPT(0), thread_flags, K_NO_WAIT);
 
 	ret_value = sys_sem_take(&simple_sem, SEM_TIMEOUT);
 	zassert_true(ret_value == 0,
@@ -293,9 +286,8 @@ void test_sem_take_timeout_forever(void)
 	sys_sem_init(&simple_sem, SEM_INIT_VAL, SEM_MAX_VAL);
 
 	k_thread_create(&sem_tid, stack_1, STACK_SIZE,
-			sem_take_timeout_forever_helper, NULL,
-			NULL, NULL, K_PRIO_PREEMPT(0), thread_flags,
-			K_NO_WAIT);
+			sem_take_timeout_forever_helper, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(0), thread_flags, K_NO_WAIT);
 
 	ret_value = sys_sem_take(&simple_sem, K_FOREVER);
 	zassert_true(ret_value == 0,
@@ -337,23 +329,16 @@ void test_sem_take_multiple(void)
 	sys_sem_init(&low_prio_sem, SEM_INIT_VAL, SEM_MAX_VAL);
 
 	k_thread_create(&sem_tid, stack_1, STACK_SIZE,
-			sem_take_multiple_low_prio_helper,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(3), thread_flags,
-			K_NO_WAIT);
+			sem_take_multiple_low_prio_helper, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(3), thread_flags, K_NO_WAIT);
 
 	k_thread_create(&sem_tid_1, stack_2, STACK_SIZE,
-			sem_take_multiple_mid_prio_helper,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(2), thread_flags,
-			K_NO_WAIT);
+			sem_take_multiple_mid_prio_helper, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(2), thread_flags, K_NO_WAIT);
 
 	k_thread_create(&sem_tid_2, stack_3, STACK_SIZE,
-			sem_take_multiple_high_prio_helper,
-			NULL, NULL, NULL,
-			K_PRIO_PREEMPT(1), thread_flags,
-			K_NO_WAIT);
-
+			sem_take_multiple_high_prio_helper, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(1), thread_flags, K_NO_WAIT);
 
 	/* Lower the priority */
 	k_thread_priority_set(k_current_get(), K_PRIO_PREEMPT(3));
@@ -417,7 +402,6 @@ void test_sem_take_multiple(void)
 	signal_count = sys_sem_count_get(&low_prio_sem);
 	zassert_true(signal_count == 1U,
 		     "low priority thread didn't get executed");
-
 }
 
 /**
@@ -476,14 +460,16 @@ void test_sem_give_limit(void)
 		ret_value = sys_sem_give(&simple_sem);
 		if (ret_value == -EAGAIN) {
 			signal_count = sys_sem_count_get(&simple_sem);
-			zassert_true(signal_count == SEM_MAX_VAL,
+			zassert_true(
+				signal_count == SEM_MAX_VAL,
 				"signal count missmatch Expected %d, got %d",
 				SEM_MAX_VAL, signal_count);
 
 			sys_sem_take(&simple_sem, K_FOREVER);
 		} else if (ret_value == 0) {
 			signal_count = sys_sem_count_get(&simple_sem);
-			zassert_true(signal_count == SEM_MAX_VAL,
+			zassert_true(
+				signal_count == SEM_MAX_VAL,
 				"signal count missmatch Expected %d, got %d",
 				SEM_MAX_VAL, signal_count);
 		}
@@ -508,10 +494,10 @@ void test_sem_multiple_threads_wait(void)
 
 	do {
 		for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
-			k_thread_create(&multiple_tid[i],
-					multiple_stack[i], STACK_SIZE,
-					sem_multiple_threads_wait_helper,
-					NULL, NULL, NULL,
+			k_thread_create(&multiple_tid[i], multiple_stack[i],
+					STACK_SIZE,
+					sem_multiple_threads_wait_helper, NULL,
+					NULL, NULL,
 					CONFIG_ZTEST_THREAD_PRIORITY,
 					thread_flags, K_NO_WAIT);
 		}
@@ -530,9 +516,9 @@ void test_sem_multiple_threads_wait(void)
 		/* check if all the threads are done. */
 		for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
 			ret_value = sys_sem_take(&simple_sem, K_FOREVER);
-			zassert_true(ret_value == 0,
-				     "Some of the threads didn't get multiple_thread_sem"
-				     );
+			zassert_true(
+				ret_value == 0,
+				"Some of the threads didn't get multiple_thread_sem");
 		}
 
 		signal_count = sys_sem_count_get(&simple_sem);
@@ -557,44 +543,43 @@ void test_sem_multiple_threads_wait(void)
 void test_main(void)
 {
 #ifdef CONFIG_USERSPACE
-	k_thread_access_grant(k_current_get(),
-			      &stack_1, &stack_2, &stack_3,
+	k_thread_access_grant(k_current_get(), &stack_1, &stack_2, &stack_3,
 			      &sem_tid, &sem_tid_1, &sem_tid_2);
 
 	for (int i = 0; i < TOTAL_THREADS_WAITING; i++) {
-		k_thread_access_grant(k_current_get(),
-			&multiple_tid[i], &multiple_stack[i]);
+		k_thread_access_grant(k_current_get(), &multiple_tid[i],
+				      &multiple_stack[i]);
 	}
 
-	ztest_test_suite(test_sys_sem,
-			ztest_unit_test(test_basic_sem_test),
-			ztest_unit_test(test_simple_sem_from_isr),
-			ztest_1cpu_unit_test(test_sem_take_timeout_isr),
-			ztest_unit_test(test_sem_give_take_from_isr),
-			ztest_user_unit_test(test_simple_sem_from_task),
-			ztest_user_unit_test(test_sem_take_no_wait),
-			ztest_user_unit_test(test_sem_take_no_wait_fails),
-			ztest_1cpu_user_unit_test(test_sem_take_timeout_fails),
-			ztest_user_unit_test(test_sem_take_timeout),
-			ztest_1cpu_user_unit_test(test_sem_take_timeout_forever),
-			ztest_1cpu_user_unit_test(test_sem_take_multiple),
-			ztest_user_unit_test(test_sem_give_limit),
-			ztest_1cpu_user_unit_test(test_sem_multiple_threads_wait));
+	ztest_test_suite(
+		test_sys_sem, ztest_unit_test(test_basic_sem_test),
+		ztest_unit_test(test_simple_sem_from_isr),
+		ztest_1cpu_unit_test(test_sem_take_timeout_isr),
+		ztest_unit_test(test_sem_give_take_from_isr),
+		ztest_user_unit_test(test_simple_sem_from_task),
+		ztest_user_unit_test(test_sem_take_no_wait),
+		ztest_user_unit_test(test_sem_take_no_wait_fails),
+		ztest_1cpu_user_unit_test(test_sem_take_timeout_fails),
+		ztest_user_unit_test(test_sem_take_timeout),
+		ztest_1cpu_user_unit_test(test_sem_take_timeout_forever),
+		ztest_1cpu_user_unit_test(test_sem_take_multiple),
+		ztest_user_unit_test(test_sem_give_limit),
+		ztest_1cpu_user_unit_test(test_sem_multiple_threads_wait));
 	ztest_run_test_suite(test_sys_sem);
 #else
 	ztest_test_suite(test_sys_sem,
-			ztest_unit_test(test_simple_sem_from_isr),
-			ztest_1cpu_unit_test(test_sem_take_timeout_isr),
-			ztest_unit_test(test_sem_give_take_from_isr),
-			ztest_unit_test(test_simple_sem_from_task),
-			ztest_unit_test(test_sem_take_no_wait),
-			ztest_unit_test(test_sem_take_no_wait_fails),
-			ztest_1cpu_unit_test(test_sem_take_timeout_fails),
-			ztest_unit_test(test_sem_take_timeout),
-			ztest_1cpu_unit_test(test_sem_take_timeout_forever),
-			ztest_1cpu_unit_test(test_sem_take_multiple),
-			ztest_unit_test(test_sem_give_limit),
-			ztest_1cpu_unit_test(test_sem_multiple_threads_wait));
+			 ztest_unit_test(test_simple_sem_from_isr),
+			 ztest_1cpu_unit_test(test_sem_take_timeout_isr),
+			 ztest_unit_test(test_sem_give_take_from_isr),
+			 ztest_unit_test(test_simple_sem_from_task),
+			 ztest_unit_test(test_sem_take_no_wait),
+			 ztest_unit_test(test_sem_take_no_wait_fails),
+			 ztest_1cpu_unit_test(test_sem_take_timeout_fails),
+			 ztest_unit_test(test_sem_take_timeout),
+			 ztest_1cpu_unit_test(test_sem_take_timeout_forever),
+			 ztest_1cpu_unit_test(test_sem_take_multiple),
+			 ztest_unit_test(test_sem_give_limit),
+			 ztest_1cpu_unit_test(test_sem_multiple_threads_wait));
 	ztest_run_test_suite(test_sys_sem);
 #endif
 }

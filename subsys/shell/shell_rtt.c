@@ -32,10 +32,8 @@ static void timer_handler(struct k_timer *timer)
 	}
 }
 
-static int init(const struct shell_transport *transport,
-		const void *config,
-		shell_transport_handler_t evt_handler,
-		void *context)
+static int init(const struct shell_transport *transport, const void *config,
+		shell_transport_handler_t evt_handler, void *context)
 {
 	struct shell_rtt *sh_rtt = (struct shell_rtt *)transport->ctx;
 
@@ -71,8 +69,8 @@ static int enable(const struct shell_transport *transport, bool blocking)
 	return 0;
 }
 
-static int write(const struct shell_transport *transport,
-		 const void *data, size_t length, size_t *cnt)
+static int write(const struct shell_transport *transport, const void *data,
+		 size_t length, size_t *cnt)
 {
 	struct shell_rtt *sh_rtt = (struct shell_rtt *)transport->ctx;
 	const uint8_t *data8 = (const uint8_t *)data;
@@ -91,28 +89,27 @@ static int write(const struct shell_transport *transport,
 	return 0;
 }
 
-static int read(const struct shell_transport *transport,
-		void *data, size_t length, size_t *cnt)
+static int read(const struct shell_transport *transport, void *data,
+		size_t length, size_t *cnt)
 {
 	*cnt = SEGGER_RTT_Read(0, data, length);
 
 	return 0;
 }
 
-const struct shell_transport_api shell_rtt_transport_api = {
-	.init = init,
-	.uninit = uninit,
-	.enable = enable,
-	.write = write,
-	.read = read
-};
+const struct shell_transport_api shell_rtt_transport_api = { .init = init,
+							     .uninit = uninit,
+							     .enable = enable,
+							     .write = write,
+							     .read = read };
 
 static int enable_shell_rtt(const struct device *arg)
 {
 	ARG_UNUSED(arg);
 	bool log_backend = CONFIG_SHELL_RTT_INIT_LOG_LEVEL > 0;
 	uint32_t level = (CONFIG_SHELL_RTT_INIT_LOG_LEVEL > LOG_LEVEL_DBG) ?
-		      CONFIG_LOG_MAX_LEVEL : CONFIG_SHELL_RTT_INIT_LOG_LEVEL;
+				       CONFIG_LOG_MAX_LEVEL :
+				       CONFIG_SHELL_RTT_INIT_LOG_LEVEL;
 
 	shell_init(&shell_rtt, NULL, true, log_backend, level);
 

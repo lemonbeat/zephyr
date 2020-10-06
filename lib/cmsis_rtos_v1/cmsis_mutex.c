@@ -9,7 +9,7 @@
 #include <string.h>
 
 K_MEM_SLAB_DEFINE(cmsis_mutex_slab, sizeof(struct k_mutex),
-		CONFIG_CMSIS_MUTEX_MAX_COUNT, 4);
+		  CONFIG_CMSIS_MUTEX_MAX_COUNT, 4);
 
 /**
  * @brief Create and Initialize a Mutex object.
@@ -26,7 +26,8 @@ osMutexId osMutexCreate(const osMutexDef_t *mutex_def)
 		return NULL;
 	}
 
-	if (k_mem_slab_alloc(&cmsis_mutex_slab, (void **)&mutex, K_MSEC(100)) == 0) {
+	if (k_mem_slab_alloc(&cmsis_mutex_slab, (void **)&mutex, K_MSEC(100)) ==
+	    0) {
 		(void)memset(mutex, 0, sizeof(struct k_mutex));
 	} else {
 		return NULL;
@@ -42,7 +43,7 @@ osMutexId osMutexCreate(const osMutexDef_t *mutex_def)
  */
 osStatus osMutexWait(osMutexId mutex_id, uint32_t timeout)
 {
-	struct k_mutex *mutex = (struct k_mutex *) mutex_id;
+	struct k_mutex *mutex = (struct k_mutex *)mutex_id;
 	int status;
 
 	if (mutex_id == NULL) {
@@ -75,7 +76,7 @@ osStatus osMutexWait(osMutexId mutex_id, uint32_t timeout)
  */
 osStatus osMutexRelease(osMutexId mutex_id)
 {
-	struct k_mutex *mutex = (struct k_mutex *) mutex_id;
+	struct k_mutex *mutex = (struct k_mutex *)mutex_id;
 
 	if (mutex_id == NULL) {
 		return osErrorParameter;
@@ -100,7 +101,7 @@ osStatus osMutexRelease(osMutexId mutex_id)
  */
 osStatus osMutexDelete(osMutexId mutex_id)
 {
-	struct k_mutex *mutex = (struct k_mutex *) mutex_id;
+	struct k_mutex *mutex = (struct k_mutex *)mutex_id;
 
 	if (mutex_id == NULL) {
 		return osErrorParameter;
@@ -114,7 +115,7 @@ osStatus osMutexDelete(osMutexId mutex_id)
 	 * not be deleted) is not supported in Zephyr.
 	 */
 
-	k_mem_slab_free(&cmsis_mutex_slab, (void *) &mutex);
+	k_mem_slab_free(&cmsis_mutex_slab, (void *)&mutex);
 
 	return osOK;
 }

@@ -30,15 +30,14 @@ void test_config_save_in_file(void)
 	zassert_true(rc == 0, "can't register FS as configuration source");
 
 	rc = settings_file_dst(&cf);
-	zassert_true(rc == 0,
-		     "can't register FS as configuration destination");
+	zassert_true(rc == 0, "can't register FS as configuration destination");
 
 	val8 = 8U;
 	rc = settings_save();
 	zassert_true(rc == 0, "fs write error");
 
 	rc = settings_test_file_strstr(cf.cf_name, cf_pattern_1,
-				       sizeof(cf_pattern_1)-1);
+				       sizeof(cf_pattern_1) - 1);
 	zassert_true(rc == 0, "bad value read");
 
 	val8 = 43U;
@@ -46,6 +45,6 @@ void test_config_save_in_file(void)
 	zassert_true(rc == 0, "fs write error");
 
 	rc = settings_test_file_strstr(cf.cf_name, cf_pattern_2,
-				       sizeof(cf_pattern_2)-1);
+				       sizeof(cf_pattern_2) - 1);
 	zassert_true(rc == 0, "bad value read");
 }

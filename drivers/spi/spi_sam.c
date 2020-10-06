@@ -17,7 +17,7 @@ LOG_MODULE_REGISTER(spi_sam);
 #include <drivers/spi.h>
 #include <soc.h>
 
-#define SAM_SPI_CHIP_SELECT_COUNT			4
+#define SAM_SPI_CHIP_SELECT_COUNT 4
 
 /* Device constant configuration parameters */
 struct spi_sam_config {
@@ -34,7 +34,7 @@ struct spi_sam_data {
 
 static int spi_slave_to_mr_pcs(int slave)
 {
-	int pcs[SAM_SPI_CHIP_SELECT_COUNT] = {0x0, 0x1, 0x3, 0x7};
+	int pcs[SAM_SPI_CHIP_SELECT_COUNT] = { 0x0, 0x1, 0x3, 0x7 };
 
 	/* SPI worked in fixed perieral mode(SPI_MR.PS = 0) and disabled chip
 	 * select decode(SPI_MR.PCSDEC = 0), based on Atmel | SMART ARM-based
@@ -67,8 +67,8 @@ static int spi_sam_configure(const struct device *dev,
 	}
 
 	if (config->slave > (SAM_SPI_CHIP_SELECT_COUNT - 1)) {
-		LOG_ERR("Slave %d is greater than %d",
-			config->slave, SAM_SPI_CHIP_SELECT_COUNT - 1);
+		LOG_ERR("Slave %d is greater than %d", config->slave,
+			SAM_SPI_CHIP_SELECT_COUNT - 1);
 		return -EINVAL;
 	}
 
@@ -212,8 +212,7 @@ static void spi_sam_fast_rx(Spi *regs, const struct spi_buf *rx_buf)
 }
 
 /* Fast path that writes and reads bufs of the same length */
-static void spi_sam_fast_txrx(Spi *regs,
-			      const struct spi_buf *tx_buf,
+static void spi_sam_fast_txrx(Spi *regs, const struct spi_buf *tx_buf,
 			      const struct spi_buf *rx_buf)
 {
 	const uint8_t *tx = tx_buf->buf;
@@ -398,19 +397,19 @@ done:
 }
 
 static int spi_sam_transceive_sync(const struct device *dev,
-				    const struct spi_config *config,
-				    const struct spi_buf_set *tx_bufs,
-				    const struct spi_buf_set *rx_bufs)
+				   const struct spi_config *config,
+				   const struct spi_buf_set *tx_bufs,
+				   const struct spi_buf_set *rx_bufs)
 {
 	return spi_sam_transceive(dev, config, tx_bufs, rx_bufs);
 }
 
 #ifdef CONFIG_SPI_ASYNC
 static int spi_sam_transceive_async(const struct device *dev,
-				     const struct spi_config *config,
-				     const struct spi_buf_set *tx_bufs,
-				     const struct spi_buf_set *rx_bufs,
-				     struct k_poll_signal *async)
+				    const struct spi_config *config,
+				    const struct spi_buf_set *tx_bufs,
+				    const struct spi_buf_set *rx_bufs,
+				    struct k_poll_signal *async)
 {
 	/* TODO: implement asyc transceive */
 	return -ENOTSUP;
@@ -453,24 +452,23 @@ static const struct spi_driver_api spi_sam_driver_api = {
 	.release = spi_sam_release,
 };
 
-#define SPI_SAM_DEFINE_CONFIG(n)					\
-	static const struct spi_sam_config spi_sam_config_##n = {	\
-		.regs = (Spi *)DT_INST_REG_ADDR(n),			\
-		.periph_id = DT_INST_PROP(n, peripheral_id),		\
-		.num_pins = ATMEL_SAM_DT_NUM_PINS(n),			\
-		.pins = ATMEL_SAM_DT_PINS(n),				\
+#define SPI_SAM_DEFINE_CONFIG(n)                                  \
+	static const struct spi_sam_config spi_sam_config_##n = { \
+		.regs = (Spi *)DT_INST_REG_ADDR(n),               \
+		.periph_id = DT_INST_PROP(n, peripheral_id),      \
+		.num_pins = ATMEL_SAM_DT_NUM_PINS(n),             \
+		.pins = ATMEL_SAM_DT_PINS(n),                     \
 	}
 
-#define SPI_SAM_DEVICE_INIT(n)						\
-	SPI_SAM_DEFINE_CONFIG(n);					\
-	static struct spi_sam_data spi_sam_dev_data_##n = {		\
-		SPI_CONTEXT_INIT_LOCK(spi_sam_dev_data_##n, ctx),	\
-		SPI_CONTEXT_INIT_SYNC(spi_sam_dev_data_##n, ctx),	\
-	};								\
-	DEVICE_AND_API_INIT(spi_sam_##n,				\
-			    DT_INST_LABEL(n),				\
-			    &spi_sam_init, &spi_sam_dev_data_##n,	\
-			    &spi_sam_config_##n, POST_KERNEL,		\
-			    CONFIG_SPI_INIT_PRIORITY, &spi_sam_driver_api);
+#define SPI_SAM_DEVICE_INIT(n)                                            \
+	SPI_SAM_DEFINE_CONFIG(n);                                         \
+	static struct spi_sam_data spi_sam_dev_data_##n = {               \
+		SPI_CONTEXT_INIT_LOCK(spi_sam_dev_data_##n, ctx),         \
+		SPI_CONTEXT_INIT_SYNC(spi_sam_dev_data_##n, ctx),         \
+	};                                                                \
+	DEVICE_AND_API_INIT(spi_sam_##n, DT_INST_LABEL(n), &spi_sam_init, \
+			    &spi_sam_dev_data_##n, &spi_sam_config_##n,   \
+			    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,        \
+			    &spi_sam_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(SPI_SAM_DEVICE_INIT)

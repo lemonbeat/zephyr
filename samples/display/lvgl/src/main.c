@@ -18,7 +18,7 @@ LOG_MODULE_REGISTER(app);
 void main(void)
 {
 	uint32_t count = 0U;
-	char count_str[11] = {0};
+	char count_str[11] = { 0 };
 	const struct device *display_dev;
 	lv_obj_t *hello_world_label;
 	lv_obj_t *count_label;
@@ -52,7 +52,7 @@ void main(void)
 
 	while (1) {
 		if ((count % 100) == 0U) {
-			sprintf(count_str, "%d", count/100U);
+			sprintf(count_str, "%d", count / 100U);
 			lv_label_set_text(count_label, count_str);
 		}
 		lv_task_handler();

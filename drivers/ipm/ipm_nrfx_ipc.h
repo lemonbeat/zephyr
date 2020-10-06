@@ -6,7 +6,7 @@
 
 #include <nrfx_ipc.h>
 
-#define NRFX_IPC_ID_MAX_VALUE	 IPC_CONF_NUM
+#define NRFX_IPC_ID_MAX_VALUE IPC_CONF_NUM
 
 /*
  * Group IPC signals, events and channels into message channels.
@@ -24,28 +24,15 @@
  * EVENT1 <- CHANNEL1 <- SIGNAL1
  */
 
-#define IPC_EVENT_BIT(idx) \
-	((IS_ENABLED(CONFIG_IPM_MSG_CH_##idx##_RX)) << idx)
+#define IPC_EVENT_BIT(idx) ((IS_ENABLED(CONFIG_IPM_MSG_CH_##idx##_RX)) << idx)
 
-#define IPC_EVENT_BITS		\
-	(			\
-	 IPC_EVENT_BIT(0)  |	\
-	 IPC_EVENT_BIT(1)  |	\
-	 IPC_EVENT_BIT(2)  |	\
-	 IPC_EVENT_BIT(3)  |	\
-	 IPC_EVENT_BIT(4)  |	\
-	 IPC_EVENT_BIT(5)  |	\
-	 IPC_EVENT_BIT(6)  |	\
-	 IPC_EVENT_BIT(7)  |	\
-	 IPC_EVENT_BIT(8)  |	\
-	 IPC_EVENT_BIT(9)  |	\
-	 IPC_EVENT_BIT(10) |	\
-	 IPC_EVENT_BIT(11) |	\
-	 IPC_EVENT_BIT(12) |	\
-	 IPC_EVENT_BIT(13) |	\
-	 IPC_EVENT_BIT(14) |	\
-	 IPC_EVENT_BIT(15)	\
-	)
+#define IPC_EVENT_BITS                                               \
+	(IPC_EVENT_BIT(0) | IPC_EVENT_BIT(1) | IPC_EVENT_BIT(2) |    \
+	 IPC_EVENT_BIT(3) | IPC_EVENT_BIT(4) | IPC_EVENT_BIT(5) |    \
+	 IPC_EVENT_BIT(6) | IPC_EVENT_BIT(7) | IPC_EVENT_BIT(8) |    \
+	 IPC_EVENT_BIT(9) | IPC_EVENT_BIT(10) | IPC_EVENT_BIT(11) |  \
+	 IPC_EVENT_BIT(12) | IPC_EVENT_BIT(13) | IPC_EVENT_BIT(14) | \
+	 IPC_EVENT_BIT(15))
 
 static const nrfx_ipc_config_t ipc_cfg = {
 	.send_task_config = {

@@ -17,43 +17,43 @@
 #include <stdio.h>
 #include <string.h>
 
-struct fs_file_system_t null_fs = {NULL};
+struct fs_file_system_t null_fs = { NULL };
 static struct test_fs_data test_data;
 
 static struct fs_mount_t test_fs_mnt_1 = {
-		.type = TEST_FS_1,
-		.mnt_point = TEST_FS_MNTP,
-		.fs_data = &test_data,
+	.type = TEST_FS_1,
+	.mnt_point = TEST_FS_MNTP,
+	.fs_data = &test_data,
 };
 
 static struct fs_mount_t test_fs_mnt_unsupported_fs = {
-		.type = FS_TYPE_EXTERNAL_BASE,
-		.mnt_point = "/MMCBLOCK:",
-		.fs_data = &test_data,
+	.type = FS_TYPE_EXTERNAL_BASE,
+	.mnt_point = "/MMCBLOCK:",
+	.fs_data = &test_data,
 };
 
 static struct fs_mount_t test_fs_mnt_invalid_root = {
-		.type = TEST_FS_2,
-		.mnt_point = "SDA:",
-		.fs_data = &test_data,
+	.type = TEST_FS_2,
+	.mnt_point = "SDA:",
+	.fs_data = &test_data,
 };
 
 static struct fs_mount_t test_fs_mnt_already_mounted = {
-		.type = TEST_FS_2,
-		.mnt_point = TEST_FS_MNTP,
-		.fs_data = &test_data,
+	.type = TEST_FS_2,
+	.mnt_point = TEST_FS_MNTP,
+	.fs_data = &test_data,
 };
 
 static struct fs_mount_t test_fs_mnt_invalid_parm = {
-		.type = TEST_FS_2,
-		.mnt_point = "/SDA",
-		.fs_data = &test_data,
+	.type = TEST_FS_2,
+	.mnt_point = "/SDA",
+	.fs_data = &test_data,
 };
 
 static struct fs_mount_t test_fs_mnt_no_op = {
-		.type = TEST_FS_2,
-		.mnt_point = "/SDA:",
-		.fs_data = &test_data,
+	.type = TEST_FS_2,
+	.mnt_point = "/SDA:",
+	.fs_data = &test_data,
 };
 
 static struct fs_file_t filep;
@@ -288,8 +288,8 @@ static int _test_lsdir(const char *path)
 		if (entry.type == FS_DIR_ENTRY_DIR) {
 			TC_PRINT("[DIR ] %s\n", entry.name);
 		} else {
-			TC_PRINT("[FILE] %s (size = %zu)\n",
-				entry.name, entry.size);
+			TC_PRINT("[FILE] %s (size = %zu)\n", entry.name,
+				 entry.size);
 		}
 	}
 
@@ -424,7 +424,6 @@ static int _test_file_sync(void)
 			fs_close(&filep);
 			return ret;
 		}
-
 	}
 
 	TC_PRINT("Sync a overflowed file\n");
@@ -479,7 +478,7 @@ void test_file_read(void)
 	TC_PRINT("Data read:\"%s\"\n\n", read_buff);
 
 	zassert_true(strcmp(test_str, read_buff) == 0,
-		    "Error - Data read does not match data written");
+		     "Error - Data read does not match data written");
 
 	TC_PRINT("Data read matches data written\n");
 }
@@ -546,7 +545,7 @@ static int _test_file_truncate(void)
 
 	fs_seek(&filep, 0, FS_SEEK_END);
 	TC_PRINT("File size after shrinking by 5 bytes = %d\n",
-						(int)fs_tell(&filep));
+		 (int)fs_tell(&filep));
 	if (fs_tell(&filep) != (orig_pos - 5)) {
 		TC_PRINT("File size after fs_truncate not as expected\n");
 		fs_close(&filep);
@@ -566,7 +565,7 @@ static int _test_file_truncate(void)
 
 	fs_seek(&filep, 0, FS_SEEK_END);
 	TC_PRINT("File size after expanding by 10 bytes = %d\n",
-						(int)fs_tell(&filep));
+		 (int)fs_tell(&filep));
 	if (fs_tell(&filep) != (orig_pos + 10)) {
 		TC_PRINT("File size after fs_truncate not as expected\n");
 		fs_close(&filep);

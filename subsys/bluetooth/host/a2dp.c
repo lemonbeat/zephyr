@@ -100,10 +100,8 @@ static struct bt_avdtp_ind_cb cb_ind = {
 };
 
 /* The above callback structures need to be packed and passed to AVDTP */
-static struct bt_avdtp_event_cb avdtp_cb = {
-	.ind = &cb_ind,
-	.accept = a2dp_accept
-};
+static struct bt_avdtp_event_cb avdtp_cb = { .ind = &cb_ind,
+					     .accept = a2dp_accept };
 
 int bt_a2dp_init(void)
 {

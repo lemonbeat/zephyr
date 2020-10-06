@@ -24,8 +24,8 @@ int mqtt_client_tls_connect(struct mqtt_client *client)
 	struct mqtt_sec_config *tls_config = &client->transport.tls.config;
 	int ret;
 
-	client->transport.tls.sock = zsock_socket(broker->sa_family,
-						  SOCK_STREAM, IPPROTO_TLS_1_2);
+	client->transport.tls.sock =
+		zsock_socket(broker->sa_family, SOCK_STREAM, IPPROTO_TLS_1_2);
 	if (client->transport.tls.sock < 0) {
 		return -errno;
 	}
@@ -34,9 +34,8 @@ int mqtt_client_tls_connect(struct mqtt_client *client)
 
 #if defined(CONFIG_SOCKS)
 	if (client->transport.proxy.addrlen != 0) {
-		ret = setsockopt(client->transport.tls.sock,
-				 SOL_SOCKET, SO_SOCKS5,
-				 &client->transport.proxy.addr,
+		ret = setsockopt(client->transport.tls.sock, SOL_SOCKET,
+				 SO_SOCKS5, &client->transport.proxy.addr,
 				 client->transport.proxy.addrlen);
 		if (ret < 0) {
 			return -errno;
@@ -44,8 +43,8 @@ int mqtt_client_tls_connect(struct mqtt_client *client)
 	}
 #endif
 	/* Set secure socket options. */
-	ret = zsock_setsockopt(client->transport.tls.sock, SOL_TLS, TLS_PEER_VERIFY,
-			       &tls_config->peer_verify,
+	ret = zsock_setsockopt(client->transport.tls.sock, SOL_TLS,
+			       TLS_PEER_VERIFY, &tls_config->peer_verify,
 			       sizeof(tls_config->peer_verify));
 	if (ret < 0) {
 		goto error;
@@ -53,7 +52,8 @@ int mqtt_client_tls_connect(struct mqtt_client *client)
 
 	if (tls_config->cipher_list != NULL && tls_config->cipher_count > 0) {
 		ret = zsock_setsockopt(client->transport.tls.sock, SOL_TLS,
-				       TLS_CIPHERSUITE_LIST, tls_config->cipher_list,
+				       TLS_CIPHERSUITE_LIST,
+				       tls_config->cipher_list,
 				       sizeof(int) * tls_config->cipher_count);
 		if (ret < 0) {
 			goto error;
@@ -61,9 +61,10 @@ int mqtt_client_tls_connect(struct mqtt_client *client)
 	}
 
 	if (tls_config->sec_tag_list != NULL && tls_config->sec_tag_count > 0) {
-		ret = zsock_setsockopt(client->transport.tls.sock, SOL_TLS,
-				       TLS_SEC_TAG_LIST, tls_config->sec_tag_list,
-				       sizeof(sec_tag_t) * tls_config->sec_tag_count);
+		ret = zsock_setsockopt(
+			client->transport.tls.sock, SOL_TLS, TLS_SEC_TAG_LIST,
+			tls_config->sec_tag_list,
+			sizeof(sec_tag_t) * tls_config->sec_tag_count);
 		if (ret < 0) {
 			goto error;
 		}
@@ -94,7 +95,7 @@ int mqtt_client_tls_connect(struct mqtt_client *client)
 	return 0;
 
 error:
-	(void) zsock_close(client->transport.tls.sock);
+	(void)zsock_close(client->transport.tls.sock);
 	return -errno;
 }
 
@@ -130,8 +131,8 @@ int mqtt_client_tls_write_msg(struct mqtt_client *client,
 	return 0;
 }
 
-int mqtt_client_tls_read(struct mqtt_client *client, uint8_t *data, uint32_t buflen,
-			 bool shall_block)
+int mqtt_client_tls_read(struct mqtt_client *client, uint8_t *data,
+			 uint32_t buflen, bool shall_block)
 {
 	int flags = 0;
 	int ret;

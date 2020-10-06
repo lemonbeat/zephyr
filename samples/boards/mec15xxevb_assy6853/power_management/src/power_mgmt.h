@@ -7,7 +7,6 @@
 #ifndef __TEST_PWRMGMT_H__
 #define __TEST_PWRMGMT_H__
 
-
 /** @brief Alternates between light and deep sleep cycles.
  *
  * For light sleep, the test sleeps in main thread for 500 ms longer than

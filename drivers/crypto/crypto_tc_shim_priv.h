@@ -24,4 +24,4 @@ struct tc_shim_drv_state {
 	struct tc_aes_key_sched_struct session_key;
 };
 
-#endif  /* ZEPHYR_DRIVERS_CRYPTO_CRYPTO_TC_SHIM_PRIV_H_ */
+#endif /* ZEPHYR_DRIVERS_CRYPTO_CRYPTO_TC_SHIM_PRIV_H_ */

@@ -20,11 +20,10 @@
 
 LOG_MODULE_REGISTER(TMP007, CONFIG_SENSOR_LOG_LEVEL);
 
-int tmp007_reg_read(struct tmp007_data *drv_data,
-		uint8_t reg, uint16_t *val)
+int tmp007_reg_read(struct tmp007_data *drv_data, uint8_t reg, uint16_t *val)
 {
-	if (i2c_burst_read(drv_data->i2c, TMP007_I2C_ADDRESS,
-				reg, (uint8_t *) val, 2) < 0) {
+	if (i2c_burst_read(drv_data->i2c, TMP007_I2C_ADDRESS, reg,
+			   (uint8_t *)val, 2) < 0) {
 		LOG_ERR("I2C read failed");
 		return -EIO;
 	}
@@ -36,14 +35,14 @@ int tmp007_reg_read(struct tmp007_data *drv_data,
 
 int tmp007_reg_write(struct tmp007_data *drv_data, uint8_t reg, uint16_t val)
 {
-	uint8_t tx_buf[3] = {reg, val >> 8, val & 0xFF};
+	uint8_t tx_buf[3] = { reg, val >> 8, val & 0xFF };
 
 	return i2c_write(drv_data->i2c, tx_buf, sizeof(tx_buf),
 			 TMP007_I2C_ADDRESS);
 }
 
-int tmp007_reg_update(struct tmp007_data *drv_data, uint8_t reg,
-		      uint16_t mask, uint16_t val)
+int tmp007_reg_update(struct tmp007_data *drv_data, uint8_t reg, uint16_t mask,
+		      uint16_t val)
 {
 	uint16_t old_val = 0U;
 	uint16_t new_val;
@@ -64,7 +63,8 @@ static int tmp007_sample_fetch(const struct device *dev,
 	struct tmp007_data *drv_data = dev->data;
 	uint16_t val;
 
-	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_AMBIENT_TEMP);
+	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL ||
+			chan == SENSOR_CHAN_AMBIENT_TEMP);
 
 	if (tmp007_reg_read(drv_data, TMP007_REG_TOBJ, &val) < 0) {
 		return -EIO;
@@ -80,8 +80,8 @@ static int tmp007_sample_fetch(const struct device *dev,
 }
 
 static int tmp007_channel_get(const struct device *dev,
-			       enum sensor_channel chan,
-			       struct sensor_value *val)
+			      enum sensor_channel chan,
+			      struct sensor_value *val)
 {
 	struct tmp007_data *drv_data = dev->data;
 	int32_t uval;
@@ -113,7 +113,7 @@ int tmp007_init(const struct device *dev)
 	drv_data->i2c = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (drv_data->i2c == NULL) {
 		LOG_DBG("Failed to get pointer to %s device!",
-			    DT_INST_BUS_LABEL(0));
+			DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -129,7 +129,6 @@ int tmp007_init(const struct device *dev)
 
 struct tmp007_data tmp007_driver;
 
-DEVICE_AND_API_INIT(tmp007, DT_INST_LABEL(0), tmp007_init,
-		    &tmp007_driver,
-		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(tmp007, DT_INST_LABEL(0), tmp007_init, &tmp007_driver, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &tmp007_driver_api);

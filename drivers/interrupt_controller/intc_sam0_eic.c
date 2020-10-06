@@ -27,11 +27,9 @@ struct sam0_eic_data {
 	struct sam0_eic_line_assignment lines[EIC_EXTINT_NUM];
 };
 
-#define DEV_DATA(dev) \
-	((struct sam0_eic_data *const)(dev)->data)
+#define DEV_DATA(dev) ((struct sam0_eic_data *const)(dev)->data)
 
 DEVICE_DECLARE(sam0_eic);
-
 
 static void wait_synchronization(void)
 {
@@ -200,8 +198,7 @@ static bool sam0_eic_check_ownership(int port, int pin, int line_index)
 		return false;
 	}
 
-	if (line_assignment->port != port ||
-	    line_assignment->pin != pin) {
+	if (line_assignment->port != port || line_assignment->pin != pin) {
 		return false;
 	}
 
@@ -328,13 +325,12 @@ uint32_t sam0_eic_interrupt_pending(int port)
 	return mask;
 }
 
-
-#define SAM0_EIC_IRQ_CONNECT(n)						\
-	do {								\
-		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(0, n, irq),		\
-			    DT_INST_IRQ_BY_IDX(0, n, priority),		\
-			    sam0_eic_isr, DEVICE_GET(sam0_eic), 0);	\
-		irq_enable(DT_INST_IRQ_BY_IDX(0, n, irq));		\
+#define SAM0_EIC_IRQ_CONNECT(n)                                               \
+	do {                                                                  \
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(0, n, irq),                    \
+			    DT_INST_IRQ_BY_IDX(0, n, priority), sam0_eic_isr, \
+			    DEVICE_GET(sam0_eic), 0);                         \
+		irq_enable(DT_INST_IRQ_BY_IDX(0, n, irq));                    \
 	} while (0)
 
 static int sam0_eic_init(const struct device *dev)
@@ -413,6 +409,5 @@ static int sam0_eic_init(const struct device *dev)
 }
 
 static struct sam0_eic_data eic_data;
-DEVICE_INIT(sam0_eic, DT_INST_LABEL(0), sam0_eic_init,
-	    &eic_data, NULL,
+DEVICE_INIT(sam0_eic, DT_INST_LABEL(0), sam0_eic_init, &eic_data, NULL,
 	    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);

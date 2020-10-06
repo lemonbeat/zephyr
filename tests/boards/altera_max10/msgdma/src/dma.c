@@ -10,7 +10,7 @@
 #include <device.h>
 #include <drivers/dma.h>
 
-#define DMA_BUFF_SIZE		1024
+#define DMA_BUFF_SIZE 1024
 
 enum dma_op_status {
 	DMA_OP_STAT_NONE = 0,
@@ -23,8 +23,8 @@ static enum dma_op_status dma_stat;
 static char tx_data[DMA_BUFF_SIZE];
 static char rx_data[DMA_BUFF_SIZE];
 
-static struct dma_config dma_cfg = {0};
-static struct dma_block_config dma_block_cfg = {0};
+static struct dma_config dma_cfg = { 0 };
+static struct dma_block_config dma_block_cfg = { 0 };
 
 static void dma_user_callback(const struct device *dma_dev, void *arg,
 			      uint32_t id, int error_code)
@@ -75,7 +75,7 @@ void test_msgdma(void)
 
 	/* Configure DMA */
 	zassert_true(dma_config(dma, chan_id, &dma_cfg) == 0,
-						"DMA config error");
+		     "DMA config error");
 
 	/* Make sure all the data is written out to memory */
 	z_nios2_dcache_flush_all();
@@ -91,16 +91,14 @@ void test_msgdma(void)
 	z_nios2_dcache_flush_no_writeback(rx_data, DMA_BUFF_SIZE);
 
 	zassert_true(dma_stat == DMA_OP_STAT_SUCCESS,
-			"Nios-II DMA operation failed!!");
+		     "Nios-II DMA operation failed!!");
 
 	zassert_true(!memcmp(&tx_data, &rx_data, DMA_BUFF_SIZE),
-					"Nios-II DMA Test failed!!");
-
+		     "Nios-II DMA Test failed!!");
 }
 
 void test_main(void)
 {
-	ztest_test_suite(nios2_msgdma_test,
-			 ztest_unit_test(test_msgdma));
+	ztest_test_suite(nios2_msgdma_test, ztest_unit_test(test_msgdma));
 	ztest_run_test_suite(nios2_msgdma_test);
 }

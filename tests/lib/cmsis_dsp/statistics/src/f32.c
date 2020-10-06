@@ -13,11 +13,11 @@
 
 #include "f32.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)120)
-#define REL_ERROR_THRESH	(1.0e-5)
+#define SNR_ERROR_THRESH ((float32_t)120)
+#define REL_ERROR_THRESH (1.0e-5)
 
-static void test_arm_max_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_max_f32(const uint32_t *input1, int ref_index,
+			     size_t length)
 {
 	float32_t val;
 	uint32_t index;
@@ -27,18 +27,18 @@ static void test_arm_max_f32(
 
 	/* Validate output */
 	zassert_equal(val, ((float32_t *)ref_max_val)[ref_index],
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+		      ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	zassert_equal(index, ref_max_idx[ref_index],
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+		      ASSERT_MSG_INCORRECT_COMP_RESULT);
 }
 
 DEFINE_TEST_VARIANT3(arm_max_f32, 3, in_com1, 0, 3);
 DEFINE_TEST_VARIANT3(arm_max_f32, 8, in_com1, 1, 8);
 DEFINE_TEST_VARIANT3(arm_max_f32, 11, in_com1, 2, 11);
 
-static void test_arm_max_no_idx_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_max_no_idx_f32(const uint32_t *input1, int ref_index,
+				    size_t length)
 {
 	float32_t val;
 
@@ -47,15 +47,15 @@ static void test_arm_max_no_idx_f32(
 
 	/* Validate output */
 	zassert_equal(val, ((float32_t *)ref_max_val)[ref_index],
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+		      ASSERT_MSG_INCORRECT_COMP_RESULT);
 }
 
 DEFINE_TEST_VARIANT3(arm_max_no_idx_f32, 3, in_com1, 0, 3);
 DEFINE_TEST_VARIANT3(arm_max_no_idx_f32, 8, in_com1, 1, 8);
 DEFINE_TEST_VARIANT3(arm_max_no_idx_f32, 11, in_com1, 2, 11);
 
-static void test_arm_min_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_min_f32(const uint32_t *input1, int ref_index,
+			     size_t length)
 {
 	float32_t val;
 	uint32_t index;
@@ -65,18 +65,18 @@ static void test_arm_min_f32(
 
 	/* Validate output */
 	zassert_equal(val, ((float32_t *)ref_min_val)[ref_index],
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+		      ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 	zassert_equal(index, ref_min_idx[ref_index],
-		ASSERT_MSG_INCORRECT_COMP_RESULT);
+		      ASSERT_MSG_INCORRECT_COMP_RESULT);
 }
 
 DEFINE_TEST_VARIANT3(arm_min_f32, 3, in_com1, 0, 3);
 DEFINE_TEST_VARIANT3(arm_min_f32, 8, in_com1, 1, 8);
 DEFINE_TEST_VARIANT3(arm_min_f32, 11, in_com1, 2, 11);
 
-static void test_arm_mean_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_mean_f32(const uint32_t *input1, int ref_index,
+			      size_t length)
 {
 	float32_t ref[1];
 	float32_t *output;
@@ -92,13 +92,11 @@ static void test_arm_mean_f32(
 	arm_mean_f32((float32_t *)input1, length, &output[0]);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -108,8 +106,8 @@ DEFINE_TEST_VARIANT3(arm_mean_f32, 3, in_com2, 0, 3);
 DEFINE_TEST_VARIANT3(arm_mean_f32, 8, in_com2, 1, 8);
 DEFINE_TEST_VARIANT3(arm_mean_f32, 11, in_com2, 2, 11);
 
-static void test_arm_power_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_power_f32(const uint32_t *input1, int ref_index,
+			       size_t length)
 {
 	float32_t ref[1];
 	float32_t *output;
@@ -125,13 +123,11 @@ static void test_arm_power_f32(
 	arm_power_f32((float32_t *)input1, length, &output[0]);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -141,8 +137,8 @@ DEFINE_TEST_VARIANT3(arm_power_f32, 3, in_com1, 0, 3);
 DEFINE_TEST_VARIANT3(arm_power_f32, 8, in_com1, 1, 8);
 DEFINE_TEST_VARIANT3(arm_power_f32, 11, in_com1, 2, 11);
 
-static void test_arm_rms_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_rms_f32(const uint32_t *input1, int ref_index,
+			     size_t length)
 {
 	float32_t ref[1];
 	float32_t *output;
@@ -158,13 +154,11 @@ static void test_arm_rms_f32(
 	arm_rms_f32((float32_t *)input1, length, &output[0]);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -174,8 +168,8 @@ DEFINE_TEST_VARIANT3(arm_rms_f32, 3, in_com1, 0, 3);
 DEFINE_TEST_VARIANT3(arm_rms_f32, 8, in_com1, 1, 8);
 DEFINE_TEST_VARIANT3(arm_rms_f32, 11, in_com1, 2, 11);
 
-static void test_arm_std_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_std_f32(const uint32_t *input1, int ref_index,
+			     size_t length)
 {
 	float32_t ref[1];
 	float32_t *output;
@@ -191,13 +185,11 @@ static void test_arm_std_f32(
 	arm_std_f32((float32_t *)input1, length, &output[0]);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -207,8 +199,8 @@ DEFINE_TEST_VARIANT3(arm_std_f32, 3, in_com1, 0, 3);
 DEFINE_TEST_VARIANT3(arm_std_f32, 8, in_com1, 1, 8);
 DEFINE_TEST_VARIANT3(arm_std_f32, 11, in_com1, 2, 11);
 
-static void test_arm_var_f32(
-	const uint32_t *input1, int ref_index, size_t length)
+static void test_arm_var_f32(const uint32_t *input1, int ref_index,
+			     size_t length)
 {
 	float32_t ref[1];
 	float32_t *output;
@@ -224,13 +216,11 @@ static void test_arm_var_f32(
 	arm_var_f32((float32_t *)input1, length, &output[0]);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(1, output, ref, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(1, output, ref, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -263,13 +253,11 @@ static void test_arm_entropy_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -298,13 +286,11 @@ static void test_arm_logsumexp_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -328,22 +314,19 @@ static void test_arm_kullback_leibler_f32(void)
 
 	/* Run test function */
 	for (index = 0; index < length; index++) {
-		output[index] =
-			arm_kullback_leibler_f32(
-				input1, input2, in_kl_dim[index + 1]);
+		output[index] = arm_kullback_leibler_f32(input1, input2,
+							 in_kl_dim[index + 1]);
 
 		input1 += in_kl_dim[index + 1];
 		input2 += in_kl_dim[index + 1];
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -371,23 +354,19 @@ static void test_arm_logsumexp_dot_prod_f32(void)
 
 	/* Run test function */
 	for (index = 0; index < length; index++) {
-		output[index] =
-			arm_logsumexp_dot_prod_f32(
-				input1, input2,
-				in_logsumexp_dp_dim[index + 1], tmp);
+		output[index] = arm_logsumexp_dot_prod_f32(
+			input1, input2, in_logsumexp_dp_dim[index + 1], tmp);
 
 		input1 += in_logsumexp_dp_dim[index + 1];
 		input2 += in_logsumexp_dp_dim[index + 1];
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, ref, output, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_f32(length, ref, output, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(output);
@@ -396,36 +375,34 @@ static void test_arm_logsumexp_dot_prod_f32(void)
 
 void test_statistics_f32(void)
 {
-	ztest_test_suite(statistics_f32,
-		ztest_unit_test(test_arm_max_f32_3),
-		ztest_unit_test(test_arm_max_f32_8),
-		ztest_unit_test(test_arm_max_f32_11),
-		ztest_unit_test(test_arm_min_f32_3),
-		ztest_unit_test(test_arm_min_f32_8),
-		ztest_unit_test(test_arm_min_f32_11),
-		ztest_unit_test(test_arm_mean_f32_3),
-		ztest_unit_test(test_arm_mean_f32_8),
-		ztest_unit_test(test_arm_mean_f32_11),
-		ztest_unit_test(test_arm_power_f32_3),
-		ztest_unit_test(test_arm_power_f32_8),
-		ztest_unit_test(test_arm_power_f32_11),
-		ztest_unit_test(test_arm_rms_f32_3),
-		ztest_unit_test(test_arm_rms_f32_8),
-		ztest_unit_test(test_arm_rms_f32_11),
-		ztest_unit_test(test_arm_std_f32_3),
-		ztest_unit_test(test_arm_std_f32_8),
-		ztest_unit_test(test_arm_std_f32_11),
-		ztest_unit_test(test_arm_var_f32_3),
-		ztest_unit_test(test_arm_var_f32_8),
-		ztest_unit_test(test_arm_var_f32_11),
-		ztest_unit_test(test_arm_entropy_f32),
-		ztest_unit_test(test_arm_logsumexp_f32),
-		ztest_unit_test(test_arm_kullback_leibler_f32),
-		ztest_unit_test(test_arm_logsumexp_dot_prod_f32),
-		ztest_unit_test(test_arm_max_no_idx_f32_3),
-		ztest_unit_test(test_arm_max_no_idx_f32_8),
-		ztest_unit_test(test_arm_max_no_idx_f32_11)
-		);
+	ztest_test_suite(statistics_f32, ztest_unit_test(test_arm_max_f32_3),
+			 ztest_unit_test(test_arm_max_f32_8),
+			 ztest_unit_test(test_arm_max_f32_11),
+			 ztest_unit_test(test_arm_min_f32_3),
+			 ztest_unit_test(test_arm_min_f32_8),
+			 ztest_unit_test(test_arm_min_f32_11),
+			 ztest_unit_test(test_arm_mean_f32_3),
+			 ztest_unit_test(test_arm_mean_f32_8),
+			 ztest_unit_test(test_arm_mean_f32_11),
+			 ztest_unit_test(test_arm_power_f32_3),
+			 ztest_unit_test(test_arm_power_f32_8),
+			 ztest_unit_test(test_arm_power_f32_11),
+			 ztest_unit_test(test_arm_rms_f32_3),
+			 ztest_unit_test(test_arm_rms_f32_8),
+			 ztest_unit_test(test_arm_rms_f32_11),
+			 ztest_unit_test(test_arm_std_f32_3),
+			 ztest_unit_test(test_arm_std_f32_8),
+			 ztest_unit_test(test_arm_std_f32_11),
+			 ztest_unit_test(test_arm_var_f32_3),
+			 ztest_unit_test(test_arm_var_f32_8),
+			 ztest_unit_test(test_arm_var_f32_11),
+			 ztest_unit_test(test_arm_entropy_f32),
+			 ztest_unit_test(test_arm_logsumexp_f32),
+			 ztest_unit_test(test_arm_kullback_leibler_f32),
+			 ztest_unit_test(test_arm_logsumexp_dot_prod_f32),
+			 ztest_unit_test(test_arm_max_no_idx_f32_3),
+			 ztest_unit_test(test_arm_max_no_idx_f32_8),
+			 ztest_unit_test(test_arm_max_no_idx_f32_11));
 
 	ztest_run_test_suite(statistics_f32);
 }

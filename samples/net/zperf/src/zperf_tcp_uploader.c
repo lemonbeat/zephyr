@@ -21,10 +21,8 @@ LOG_MODULE_DECLARE(net_zperf_sample, LOG_LEVEL_DBG);
 
 static char sample_packet[PACKET_SIZE_MAX];
 
-void zperf_tcp_upload(const struct shell *shell,
-		      struct net_context *ctx,
-		      unsigned int duration_in_ms,
-		      unsigned int packet_size,
+void zperf_tcp_upload(const struct shell *shell, struct net_context *ctx,
+		      unsigned int duration_in_ms, unsigned int packet_size,
 		      struct zperf_results *results)
 {
 	uint32_t duration = MSEC_TO_HW_CYCLES(duration_in_ms);
@@ -44,8 +42,7 @@ void zperf_tcp_upload(const struct shell *shell,
 	start_time = k_cycle_get_32();
 	last_print_time = start_time;
 
-	shell_fprintf(shell, SHELL_NORMAL,
-		      "New session started\n");
+	shell_fprintf(shell, SHELL_NORMAL, "New session started\n");
 
 	(void)memset(sample_packet, 'z', sizeof(sample_packet));
 
@@ -63,14 +60,14 @@ void zperf_tcp_upload(const struct shell *shell,
 		loop_time = k_cycle_get_32();
 
 		/* Send the packet */
-		ret = net_context_send(ctx, sample_packet,
-				       packet_size, NULL,
+		ret = net_context_send(ctx, sample_packet, packet_size, NULL,
 				       K_NO_WAIT, NULL);
 		if (ret < 0) {
 			if (nb_errors == 0 && ret != -ENOMEM) {
-				shell_fprintf(shell, SHELL_WARNING,
-				      "Failed to send the packet (%d)\n",
-				      ret);
+				shell_fprintf(
+					shell, SHELL_WARNING,
+					"Failed to send the packet (%d)\n",
+					ret);
 			}
 
 			nb_errors++;
@@ -93,8 +90,8 @@ void zperf_tcp_upload(const struct shell *shell,
 			}
 		}
 
-		if (!time_elapsed && time_delta(start_time,
-						loop_time) > duration) {
+		if (!time_elapsed &&
+		    time_delta(start_time, loop_time) > duration) {
 			time_elapsed = 1U;
 		}
 

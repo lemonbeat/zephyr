@@ -17,9 +17,9 @@ LOG_MODULE_REGISTER(i2s_litex);
 #define DEV_CFG(dev) ((struct i2s_litex_cfg *const)(dev)->config)
 #define DEV_DATA(dev) ((struct i2s_litex_data *const)(dev)->data)
 
-#define MODULO_INC(val, max)                                                   \
-	{					                               \
-		val = (val == max - 1) ? 0 : val + 1;                          \
+#define MODULO_INC(val, max)                          \
+	{                                             \
+		val = (val == max - 1) ? 0 : val + 1; \
 	}
 
 /**
@@ -201,8 +201,8 @@ static void i2s_copy_from_fifo(uint8_t *dst, size_t size, int sample_width,
 		data = sys_read32(I2S_RX_FIFO_ADDR);
 		for (int off = max_off; off >= 0; off--) {
 #if CONFIG_I2S_LITEX_DATA_BIG_ENDIAN
-			*(dst + i * chan_size + (max_off - off)) =
-				data >> 8 * off;
+			*(dst + i * chan_size + (max_off - off)) = data >>
+								   8 * off;
 #else
 			*(dst + i * chan_size + off) = data >> 8 * off;
 #endif
@@ -413,14 +413,14 @@ static int i2s_litex_configure(const struct device *dev, enum i2s_dir dir,
 #if CONFIG_I2S_LITEX_CHANNELS_CONCATENATED
 #if CONFIG_I2S_LITEX_DATA_BIG_ENDIAN
 	LOG_ERR("Big endian is not uspported "
-			"when channels are conncatenated");
+		"when channels are conncatenated");
 	return -EINVAL;
 #endif
 	if (channels_concatenated == 0) {
 		LOG_ERR("invalid state. "
-				"Your device is configured to send "
-				"channels with padding. "
-				"Please reconfigure driver");
+			"Your device is configured to send "
+			"channels with padding. "
+			"Please reconfigure driver");
 		return -EINVAL;
 	}
 
@@ -565,9 +565,9 @@ static void i2s_litex_isr_rx(void *arg)
 			stream->cfg.block_size);
 	if (ret < 0) {
 		LOG_WRN("Couldn't copy data "
-				"from RX fifo to the ring "
-				"buffer (no space left) - "
-				"dropping a frame");
+			"from RX fifo to the ring "
+			"buffer (no space left) - "
+			"dropping a frame");
 		return;
 	}
 
@@ -605,18 +605,18 @@ static const struct i2s_driver_api i2s_litex_driver_api = {
 };
 
 #define I2S_INIT(dir)                                                          \
-									       \
+                                                                               \
 	static struct queue_item rx_ring_buf[CONFIG_I2S_LITEX_RX_BLOCK_COUNT]; \
 	static struct queue_item tx_ring_buf[CONFIG_I2S_LITEX_TX_BLOCK_COUNT]; \
-									       \
+                                                                               \
 	static struct i2s_litex_data i2s_litex_data_##dir = {                  \
 		.dir.mem_block_queue.buf = dir##_ring_buf,                     \
 		.dir.mem_block_queue.len =                                     \
 			sizeof(dir##_ring_buf) / sizeof(struct queue_item),    \
 	};                                                                     \
-									       \
+                                                                               \
 	static void i2s_litex_irq_config_func_##dir(const struct device *dev); \
-									       \
+                                                                               \
 	static struct i2s_litex_cfg i2s_litex_cfg_##dir = {                    \
 		.base = DT_REG_ADDR_BY_NAME(DT_NODELABEL(i2s_##dir), control), \
 		.fifo_base =                                                   \
@@ -625,18 +625,15 @@ static const struct i2s_driver_api i2s_litex_driver_api = {
 		.irq_config = i2s_litex_irq_config_func_##dir                  \
 	};                                                                     \
 	DEVICE_AND_API_INIT(i2s_##dir, DT_LABEL(DT_NODELABEL(i2s_##dir)),      \
-				i2s_litex_initialize, &i2s_litex_data_##dir,   \
-				&i2s_litex_cfg_##dir, POST_KERNEL,             \
-				CONFIG_I2S_INIT_PRIORITY,		       \
-				&i2s_litex_driver_api);			       \
-									       \
+			    i2s_litex_initialize, &i2s_litex_data_##dir,       \
+			    &i2s_litex_cfg_##dir, POST_KERNEL,                 \
+			    CONFIG_I2S_INIT_PRIORITY, &i2s_litex_driver_api);  \
+                                                                               \
 	static void i2s_litex_irq_config_func_##dir(const struct device *dev)  \
 	{                                                                      \
 		IRQ_CONNECT(DT_IRQN(DT_NODELABEL(i2s_##dir)),                  \
-					DT_IRQ(DT_NODELABEL(i2s_##dir),	       \
-						priority),		       \
-					i2s_litex_isr_##dir,		       \
-					DEVICE_GET(i2s_##dir), 0);	       \
+			    DT_IRQ(DT_NODELABEL(i2s_##dir), priority),         \
+			    i2s_litex_isr_##dir, DEVICE_GET(i2s_##dir), 0);    \
 		irq_enable(DT_IRQN(DT_NODELABEL(i2s_##dir)));                  \
 	}
 

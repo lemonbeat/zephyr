@@ -18,9 +18,7 @@
 
 LOG_MODULE_REGISTER(HTS221, CONFIG_SENSOR_LOG_LEVEL);
 
-static const char * const hts221_odr_strings[] = {
-	"1", "7", "12.5"
-};
+static const char *const hts221_odr_strings[] = { "1", "7", "12.5" };
 
 static int hts221_channel_get(const struct device *dev,
 			      enum sensor_channel chan,
@@ -35,8 +33,8 @@ static int hts221_channel_get(const struct device *dev,
 	 */
 	if (chan == SENSOR_CHAN_AMBIENT_TEMP) {
 		conv_val = (int32_t)(data->t1_degc_x8 - data->t0_degc_x8) *
-			   (data->t_sample - data->t0_out) /
-			   (data->t1_out - data->t0_out) +
+				   (data->t_sample - data->t0_out) /
+				   (data->t1_out - data->t0_out) +
 			   data->t0_degc_x8;
 
 		/* convert temperature x8 to degrees Celsius */
@@ -44,8 +42,8 @@ static int hts221_channel_get(const struct device *dev,
 		val->val2 = (conv_val % 8) * (1000000 / 8);
 	} else if (chan == SENSOR_CHAN_HUMIDITY) {
 		conv_val = (int32_t)(data->h1_rh_x2 - data->h0_rh_x2) *
-			   (data->rh_sample - data->h0_t0_out) /
-			   (data->h1_t0_out - data->h0_t0_out) +
+				   (data->rh_sample - data->h0_t0_out) /
+				   (data->h1_t0_out - data->h0_t0_out) +
 			   data->h0_rh_x2;
 
 		/* convert humidity x2 to percent */
@@ -88,7 +86,8 @@ static int hts221_read_conversion_data(const struct device *dev)
 
 	if (i2c_burst_read(data->i2c, cfg->i2c_addr,
 			   HTS221_REG_CONVERSION_START |
-			   HTS221_AUTOINCREMENT_ADDR, buf, 16) < 0) {
+				   HTS221_AUTOINCREMENT_ADDR,
+			   buf, 16) < 0) {
 		LOG_ERR("Failed to read conversion data.");
 		return -EIO;
 	}
@@ -126,8 +125,8 @@ int hts221_init(const struct device *dev)
 	}
 
 	/* check chip ID */
-	if (i2c_reg_read_byte(data->i2c, cfg->i2c_addr,
-			      HTS221_REG_WHO_AM_I, &id) < 0) {
+	if (i2c_reg_read_byte(data->i2c, cfg->i2c_addr, HTS221_REG_WHO_AM_I,
+			      &id) < 0) {
 		LOG_ERR("Failed to read chip ID.");
 		return -EIO;
 	}
@@ -149,10 +148,9 @@ int hts221_init(const struct device *dev)
 		return -EINVAL;
 	}
 
-	if (i2c_reg_write_byte(data->i2c, cfg->i2c_addr,
-			       HTS221_REG_CTRL1,
+	if (i2c_reg_write_byte(data->i2c, cfg->i2c_addr, HTS221_REG_CTRL1,
 			       (idx + 1) << HTS221_ODR_SHIFT | HTS221_BDU_BIT |
-			       HTS221_PD_BIT) < 0) {
+				       HTS221_PD_BIT) < 0) {
 		LOG_ERR("Failed to configure chip.");
 		return -EIO;
 	}
@@ -191,6 +189,6 @@ static const struct hts221_config hts221_cfg = {
 #endif /* HTS221_TRIGGER_ENABLED */
 };
 
-DEVICE_AND_API_INIT(hts221, DT_INST_LABEL(0), hts221_init,
-		    &hts221_driver, &hts221_cfg, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &hts221_driver_api);
+DEVICE_AND_API_INIT(hts221, DT_INST_LABEL(0), hts221_init, &hts221_driver,
+		    &hts221_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &hts221_driver_api);

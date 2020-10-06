@@ -14,7 +14,6 @@
  * Chapter 2.2: Memory organization
  */
 
-
 #ifndef _STM32F0_SOC_H_
 #define _STM32F0_SOC_H_
 

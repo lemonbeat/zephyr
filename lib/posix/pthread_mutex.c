@@ -74,8 +74,7 @@ int pthread_mutex_trylock(pthread_mutex_t *m)
  *
  * See IEEE 1003.1
  */
-int pthread_mutex_timedlock(pthread_mutex_t *m,
-			    const struct timespec *abstime)
+int pthread_mutex_timedlock(pthread_mutex_t *m, const struct timespec *abstime)
 {
 	int32_t timeout = (int32_t)timespec_to_timeoutms(abstime);
 	return acquire_mutex(m, K_MSEC(timeout));
@@ -86,8 +85,7 @@ int pthread_mutex_timedlock(pthread_mutex_t *m,
  *
  * See IEEE 1003.1
  */
-int pthread_mutex_init(pthread_mutex_t *m,
-				     const pthread_mutexattr_t *attr)
+int pthread_mutex_init(pthread_mutex_t *m, const pthread_mutexattr_t *attr)
 {
 	const pthread_mutexattr_t *mattr;
 
@@ -102,7 +100,6 @@ int pthread_mutex_init(pthread_mutex_t *m,
 
 	return 0;
 }
-
 
 /**
  * @brief Lock POSIX mutex with blocking call.
@@ -148,7 +145,6 @@ int pthread_mutex_unlock(pthread_mutex_t *m)
 			return 0;
 		}
 		m->owner = NULL;
-
 	}
 	irq_unlock(key);
 	return 0;

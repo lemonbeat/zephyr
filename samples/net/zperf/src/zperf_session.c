@@ -19,15 +19,14 @@ LOG_MODULE_DECLARE(net_zperf_sample, LOG_LEVEL_DBG);
 static struct session sessions[SESSION_PROTO_END][SESSION_MAX];
 
 /* Get session from a given packet */
-struct session *get_session(struct net_pkt *pkt,
-			    union net_ip_header *ip_hdr,
+struct session *get_session(struct net_pkt *pkt, union net_ip_header *ip_hdr,
 			    union net_proto_header *proto_hdr,
 			    enum session_proto proto)
 {
 	struct session *active = NULL;
 	struct session *free = NULL;
-	struct in6_addr ipv6 = { };
-	struct in_addr ipv4 = { };
+	struct in6_addr ipv6 = {};
+	struct in_addr ipv4 = {};
 	struct net_udp_hdr *udp_hdr;
 	int i = 0;
 	uint16_t port;
@@ -52,8 +51,7 @@ struct session *get_session(struct net_pkt *pkt,
 	} else if (net_pkt_family(pkt) == AF_INET) {
 		net_ipaddr_copy(&ipv4, &ip_hdr->ipv4->src);
 	} else {
-		printk("Error! unsupported protocol %d\n",
-		       net_pkt_family(pkt));
+		printk("Error! unsupported protocol %d\n", net_pkt_family(pkt));
 		return NULL;
 	}
 
@@ -62,23 +60,22 @@ struct session *get_session(struct net_pkt *pkt,
 		struct session *ptr = &sessions[proto][i];
 
 #if defined(CONFIG_NET_IPV4)
-		if (ptr->port == port &&
-		    net_pkt_family(pkt) == AF_INET &&
+		if (ptr->port == port && net_pkt_family(pkt) == AF_INET &&
 		    net_ipv4_addr_cmp(&ptr->ip.in_addr, &ipv4)) {
 			/* We found an active session */
 			active = ptr;
 		} else
 #endif
 #if defined(CONFIG_NET_IPV6)
-		if (ptr->port == port &&
-		    net_pkt_family(pkt) == AF_INET6 &&
-		    net_ipv6_addr_cmp(&ptr->ip.in6_addr, &ipv6)) {
+			if (ptr->port == port &&
+			    net_pkt_family(pkt) == AF_INET6 &&
+			    net_ipv6_addr_cmp(&ptr->ip.in6_addr, &ipv6)) {
 			/* We found an active session */
 			active = ptr;
 		} else
 #endif
-		if (!free && (ptr->state == STATE_NULL ||
-			      ptr->state == STATE_COMPLETED)) {
+			if (!free && (ptr->state == STATE_NULL ||
+				      ptr->state == STATE_COMPLETED)) {
 			/* We found a free slot - just in case */
 			free = ptr;
 		}
@@ -124,8 +121,7 @@ struct session *get_tcp_session(struct net_context *ctx)
 			return ptr;
 		}
 
-		if (ptr->state == STATE_NULL ||
-		    ptr->state == STATE_COMPLETED) {
+		if (ptr->state == STATE_NULL || ptr->state == STATE_COMPLETED) {
 			/* We found a free slot - just in case */
 			free = ptr;
 			break;

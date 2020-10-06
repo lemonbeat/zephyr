@@ -17,37 +17,26 @@ void log_0(const char *str, struct log_msg_ids src_level)
 {
 }
 
-void log_1(const char *str,
-	   log_arg_t arg1,
+void log_1(const char *str, log_arg_t arg1, struct log_msg_ids src_level)
+{
+}
+
+void log_2(const char *str, log_arg_t arg1, log_arg_t arg2,
 	   struct log_msg_ids src_level)
 {
 }
 
-void log_2(const char *str,
-	   log_arg_t arg1,
-	   log_arg_t arg2,
+void log_3(const char *str, log_arg_t arg1, log_arg_t arg2, log_arg_t arg3,
 	   struct log_msg_ids src_level)
 {
 }
 
-void log_3(const char *str,
-	   log_arg_t arg1,
-	   log_arg_t arg2,
-	   log_arg_t arg3,
+void log_n(const char *str, log_arg_t *args, uint32_t narg,
 	   struct log_msg_ids src_level)
 {
 }
 
-void log_n(const char *str,
-	   log_arg_t *args,
-	   uint32_t narg,
-	   struct log_msg_ids src_level)
-{
-}
-
-void log_hexdump(const char *str,
-		 const uint8_t *data,
-		 uint32_t length,
+void log_hexdump(const char *str, const uint8_t *data, uint32_t length,
 		 struct log_msg_ids src_level)
 {
 }
@@ -66,8 +55,8 @@ void log_generic(struct log_msg_ids src_level, const char *fmt, va_list ap,
 {
 }
 
-void log_generic_from_user(struct log_msg_ids src_level,
-			   const char *fmt, va_list ap)
+void log_generic_from_user(struct log_msg_ids src_level, const char *fmt,
+			   va_list ap)
 {
 }
 
@@ -94,8 +83,8 @@ void log_dropped(void)
 {
 }
 
-void __printf_like(2, 3) log_from_user(struct log_msg_ids src_level,
-				       const char *fmt, ...)
+void __printf_like(2, 3)
+	log_from_user(struct log_msg_ids src_level, const char *fmt, ...)
 {
 }
 

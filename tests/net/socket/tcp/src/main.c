@@ -24,37 +24,28 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_SOCKETS_LOG_LEVEL);
 
 static void test_bind(int sock, struct sockaddr *addr, socklen_t addrlen)
 {
-	zassert_equal(bind(sock, addr, addrlen),
-		      0,
-		      "bind failed");
+	zassert_equal(bind(sock, addr, addrlen), 0, "bind failed");
 }
 
 static void test_listen(int sock)
 {
-	zassert_equal(listen(sock, MAX_CONNS),
-		      0,
-		      "listen failed");
+	zassert_equal(listen(sock, MAX_CONNS), 0, "listen failed");
 }
 
 static void test_connect(int sock, struct sockaddr *addr, socklen_t addrlen)
 {
-	zassert_equal(connect(sock, addr, addrlen),
-		      0,
-		      "connect failed");
+	zassert_equal(connect(sock, addr, addrlen), 0, "connect failed");
 }
 
 static void test_send(int sock, const void *buf, size_t len, int flags)
 {
-	zassert_equal(send(sock, buf, len, flags),
-		      len,
-		      "send failed");
+	zassert_equal(send(sock, buf, len, flags), len, "send failed");
 }
 
 static void test_sendto(int sock, const void *buf, size_t len, int flags,
 			const struct sockaddr *addr, socklen_t addrlen)
 {
-	zassert_equal(sendto(sock, buf, len, flags, addr, addrlen),
-		      len,
+	zassert_equal(sendto(sock, buf, len, flags, addr, addrlen), len,
 		      "send failed");
 }
 
@@ -85,44 +76,31 @@ static void test_fcntl(int sock, int cmd, int val)
 static void test_recv(int sock, int flags)
 {
 	ssize_t recved = 0;
-	char rx_buf[30] = {0};
+	char rx_buf[30] = { 0 };
 
 	recved = recv(sock, rx_buf, sizeof(rx_buf), flags);
-	zassert_equal(recved,
-		      strlen(TEST_STR_SMALL),
+	zassert_equal(recved, strlen(TEST_STR_SMALL),
 		      "unexpected received bytes");
 	zassert_equal(strncmp(rx_buf, TEST_STR_SMALL, strlen(TEST_STR_SMALL)),
-		      0,
-		      "unexpected data");
+		      0, "unexpected data");
 }
 
-static void test_recvfrom(int sock,
-			  int flags,
-			  struct sockaddr *addr,
+static void test_recvfrom(int sock, int flags, struct sockaddr *addr,
 			  socklen_t *addrlen)
 {
 	ssize_t recved = 0;
-	char rx_buf[30] = {0};
+	char rx_buf[30] = { 0 };
 
-	recved = recvfrom(sock,
-			  rx_buf,
-			  sizeof(rx_buf),
-			  flags,
-			  addr,
-			  addrlen);
-	zassert_equal(recved,
-		      strlen(TEST_STR_SMALL),
+	recved = recvfrom(sock, rx_buf, sizeof(rx_buf), flags, addr, addrlen);
+	zassert_equal(recved, strlen(TEST_STR_SMALL),
 		      "unexpected received bytes");
 	zassert_equal(strncmp(rx_buf, TEST_STR_SMALL, strlen(TEST_STR_SMALL)),
-		      0,
-		      "unexpected data");
+		      0, "unexpected data");
 }
 
 static void test_close(int sock)
 {
-	zassert_equal(close(sock),
-		      0,
-		      "close failed");
+	zassert_equal(close(sock), 0, "close failed");
 }
 
 /* Test that EOF handling works correctly. Should be called with socket
@@ -158,8 +136,8 @@ void test_v4_send_recv(void)
 	struct sockaddr addr;
 	socklen_t addrlen = sizeof(addr);
 
-	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT,
-			    &c_sock, &c_saddr);
+	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT, &c_sock,
+			    &c_saddr);
 	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, SERVER_PORT,
 			    &s_sock, &s_saddr);
 
@@ -195,8 +173,8 @@ void test_v6_send_recv(void)
 	struct sockaddr addr;
 	socklen_t addrlen = sizeof(addr);
 
-	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, ANY_PORT,
-			    &c_sock, &c_saddr);
+	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, ANY_PORT, &c_sock,
+			    &c_saddr);
 	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, SERVER_PORT,
 			    &s_sock, &s_saddr);
 
@@ -231,8 +209,8 @@ void test_v4_sendto_recvfrom(void)
 	struct sockaddr addr;
 	socklen_t addrlen = sizeof(addr);
 
-	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT,
-			    &c_sock, &c_saddr);
+	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT, &c_sock,
+			    &c_saddr);
 	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, SERVER_PORT,
 			    &s_sock, &s_saddr);
 
@@ -269,8 +247,8 @@ void test_v6_sendto_recvfrom(void)
 	struct sockaddr addr;
 	socklen_t addrlen = sizeof(addr);
 
-	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, ANY_PORT,
-			    &c_sock, &c_saddr);
+	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, ANY_PORT, &c_sock,
+			    &c_saddr);
 
 	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, SERVER_PORT,
 			    &s_sock, &s_saddr);
@@ -309,8 +287,8 @@ void test_v4_sendto_recvfrom_null_dest(void)
 	struct sockaddr addr;
 	socklen_t addrlen = sizeof(addr);
 
-	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT,
-			    &c_sock, &c_saddr);
+	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT, &c_sock,
+			    &c_saddr);
 	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, SERVER_PORT,
 			    &s_sock, &s_saddr);
 
@@ -344,8 +322,8 @@ void test_v6_sendto_recvfrom_null_dest(void)
 	struct sockaddr addr;
 	socklen_t addrlen = sizeof(addr);
 
-	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, ANY_PORT,
-			    &c_sock, &c_saddr);
+	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, ANY_PORT, &c_sock,
+			    &c_saddr);
 	prepare_sock_tcp_v6(CONFIG_NET_CONFIG_MY_IPV6_ADDR, SERVER_PORT,
 			    &s_sock, &s_saddr);
 
@@ -386,8 +364,8 @@ void test_open_close_immediately(void)
 	int c_sock;
 	int s_sock;
 
-	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT,
-			    &c_sock, &c_saddr);
+	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT, &c_sock,
+			    &c_saddr);
 	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, SERVER_PORT,
 			    &s_sock, &s_saddr);
 
@@ -447,7 +425,7 @@ void test_v4_accept_timeout(void)
 }
 
 #ifdef CONFIG_USERSPACE
-#define CHILD_STACK_SZ		(2048 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define CHILD_STACK_SZ (2048 + CONFIG_TEST_EXTRA_STACKSIZE)
 struct k_thread child_thread;
 K_THREAD_STACK_DEFINE(child_stack, CHILD_STACK_SZ);
 ZTEST_BMEM volatile int result;
@@ -463,8 +441,7 @@ static void spawn_child(int sock)
 {
 	k_thread_create(&child_thread, child_stack,
 			K_THREAD_STACK_SIZEOF(child_stack), child_entry,
-			(void *)sock, NULL, NULL, 0, K_USER,
-			K_FOREVER);
+			(void *)sock, NULL, NULL, 0, K_USER, K_FOREVER);
 }
 #endif
 
@@ -475,8 +452,8 @@ void test_socket_permission(void)
 	struct sockaddr_in saddr;
 	struct net_context *ctx;
 
-	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT,
-			    &sock, &saddr);
+	prepare_sock_tcp_v4(CONFIG_NET_CONFIG_MY_IPV4_ADDR, ANY_PORT, &sock,
+			    &saddr);
 
 	ctx = zsock_get_context_object(sock);
 	zassert_not_null(ctx, "zsock_get_context_object() failed");
@@ -514,8 +491,7 @@ void test_main(void)
 #endif
 
 	ztest_test_suite(
-		socket_tcp,
-		ztest_user_unit_test(test_v4_send_recv),
+		socket_tcp, ztest_user_unit_test(test_v4_send_recv),
 		ztest_user_unit_test(test_v6_send_recv),
 		ztest_user_unit_test(test_v4_sendto_recvfrom),
 		ztest_user_unit_test(test_v6_sendto_recvfrom),
@@ -523,8 +499,7 @@ void test_main(void)
 		ztest_user_unit_test(test_v6_sendto_recvfrom_null_dest),
 		ztest_unit_test(test_open_close_immediately),
 		ztest_user_unit_test(test_v4_accept_timeout),
-		ztest_user_unit_test(test_socket_permission)
-		);
+		ztest_user_unit_test(test_socket_permission));
 
 	ztest_run_test_suite(socket_tcp);
 }

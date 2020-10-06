@@ -33,8 +33,7 @@ extern "C" {
 #endif
 
 typedef int (*eeprom_api_read)(const struct device *dev, off_t offset,
-			       void *data,
-			       size_t len);
+			       void *data, size_t len);
 typedef int (*eeprom_api_write)(const struct device *dev, off_t offset,
 				const void *data, size_t len);
 typedef size_t (*eeprom_api_size)(const struct device *dev);
@@ -78,8 +77,7 @@ static inline int z_impl_eeprom_read(const struct device *dev, off_t offset,
  *  @return 0 on success, negative errno code on failure.
  */
 __syscall int eeprom_write(const struct device *dev, off_t offset,
-			   const void *data,
-			   size_t len);
+			   const void *data, size_t len);
 
 static inline int z_impl_eeprom_write(const struct device *dev, off_t offset,
 				      const void *data, size_t len)

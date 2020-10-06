@@ -118,7 +118,7 @@ uint8_t ll_adv_set_by_hci_handle_get(uint8_t hci_handle, uint8_t *handle)
 	struct ll_adv_set *adv;
 	uint8_t idx;
 
-	adv =  &ll_adv[0];
+	adv = &ll_adv[0];
 
 	for (idx = 0U; idx < BT_CTLR_ADV_SET; idx++, adv++) {
 		if (adv->is_created && (adv->hci_handle == hci_handle)) {
@@ -135,7 +135,7 @@ uint8_t ll_adv_set_by_hci_handle_get_or_new(uint8_t hci_handle, uint8_t *handle)
 	struct ll_adv_set *adv, *adv_empty;
 	uint8_t idx;
 
-	adv =  &ll_adv[0];
+	adv = &ll_adv[0];
 	adv_empty = NULL;
 
 	for (idx = 0U; idx < BT_CTLR_ADV_SET; idx++, adv++) {
@@ -161,30 +161,30 @@ uint8_t ll_adv_set_by_hci_handle_get_or_new(uint8_t hci_handle, uint8_t *handle)
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 uint8_t ll_adv_params_set(uint8_t handle, uint16_t evt_prop, uint32_t interval,
-		       uint8_t adv_type, uint8_t own_addr_type,
-		       uint8_t direct_addr_type, uint8_t const *const direct_addr,
-		       uint8_t chan_map, uint8_t filter_policy,
-		       uint8_t *const tx_pwr, uint8_t phy_p, uint8_t skip,
-		       uint8_t phy_s, uint8_t sid, uint8_t sreq)
+			  uint8_t adv_type, uint8_t own_addr_type,
+			  uint8_t direct_addr_type,
+			  uint8_t const *const direct_addr, uint8_t chan_map,
+			  uint8_t filter_policy, uint8_t *const tx_pwr,
+			  uint8_t phy_p, uint8_t skip, uint8_t phy_s,
+			  uint8_t sid, uint8_t sreq)
 {
-	uint8_t const pdu_adv_type[] = {PDU_ADV_TYPE_ADV_IND,
-				     PDU_ADV_TYPE_DIRECT_IND,
-				     PDU_ADV_TYPE_SCAN_IND,
-				     PDU_ADV_TYPE_NONCONN_IND,
-				     PDU_ADV_TYPE_DIRECT_IND,
-				     PDU_ADV_TYPE_EXT_IND};
+	uint8_t const pdu_adv_type[] = {
+		PDU_ADV_TYPE_ADV_IND,	 PDU_ADV_TYPE_DIRECT_IND,
+		PDU_ADV_TYPE_SCAN_IND,	 PDU_ADV_TYPE_NONCONN_IND,
+		PDU_ADV_TYPE_DIRECT_IND, PDU_ADV_TYPE_EXT_IND
+	};
 	uint8_t is_pdu_type_changed = 0;
 #else /* !CONFIG_BT_CTLR_ADV_EXT */
 uint8_t ll_adv_params_set(uint16_t interval, uint8_t adv_type,
-		       uint8_t own_addr_type, uint8_t direct_addr_type,
-		       uint8_t const *const direct_addr, uint8_t chan_map,
-		       uint8_t filter_policy)
+			  uint8_t own_addr_type, uint8_t direct_addr_type,
+			  uint8_t const *const direct_addr, uint8_t chan_map,
+			  uint8_t filter_policy)
 {
-	uint8_t const pdu_adv_type[] = {PDU_ADV_TYPE_ADV_IND,
-				     PDU_ADV_TYPE_DIRECT_IND,
-				     PDU_ADV_TYPE_SCAN_IND,
-				     PDU_ADV_TYPE_NONCONN_IND,
-				     PDU_ADV_TYPE_DIRECT_IND};
+	uint8_t const pdu_adv_type[] = { PDU_ADV_TYPE_ADV_IND,
+					 PDU_ADV_TYPE_DIRECT_IND,
+					 PDU_ADV_TYPE_SCAN_IND,
+					 PDU_ADV_TYPE_NONCONN_IND,
+					 PDU_ADV_TYPE_DIRECT_IND };
 	uint8_t const handle = 0;
 #endif /* !CONFIG_BT_CTLR_ADV_EXT */
 
@@ -210,7 +210,7 @@ uint8_t ll_adv_params_set(uint16_t interval, uint8_t adv_type,
 				0x03, /* PDU_ADV_TYPE_NONCONN_IND */
 				0x04, /* PDU_ADV_TYPE_DIRECT_IND */
 				0x02, /* PDU_ADV_TYPE_SCAN_IND */
-				0x00  /* PDU_ADV_TYPE_ADV_IND */
+				0x00 /* PDU_ADV_TYPE_ADV_IND */
 			};
 
 			adv_type = leg_adv_type[evt_prop & 0x03];
@@ -226,7 +226,7 @@ uint8_t ll_adv_params_set(uint16_t interval, uint8_t adv_type,
 			 * - High duty cycle directed connectable not allowed
 			 */
 			if (((evt_prop & (BT_HCI_LE_ADV_PROP_CONN |
-					 BT_HCI_LE_ADV_PROP_SCAN)) ==
+					  BT_HCI_LE_ADV_PROP_SCAN)) ==
 			     (BT_HCI_LE_ADV_PROP_CONN |
 			      BT_HCI_LE_ADV_PROP_SCAN)) ||
 			    (evt_prop & BT_HCI_LE_ADV_PROP_HI_DC_CONN)) {
@@ -242,7 +242,7 @@ uint8_t ll_adv_params_set(uint16_t interval, uint8_t adv_type,
 #endif
 
 			adv_type = 0x05; /* PDU_ADV_TYPE_EXT_IND in */
-					 /* pdu_adv_type array. */
+			/* pdu_adv_type array. */
 
 			adv->lll.phy_p = phy_p;
 		}
@@ -398,8 +398,8 @@ uint8_t ll_adv_params_set(uint16_t interval, uint8_t adv_type,
 		/* AuxPtr flag */
 		/* Need aux for connectable or scannable extended advertising */
 		if (pri_hdr_prev.aux_ptr ||
-		    ((evt_prop & (BT_HCI_LE_ADV_PROP_CONN |
-				  BT_HCI_LE_ADV_PROP_SCAN)))) {
+		    ((evt_prop &
+		      (BT_HCI_LE_ADV_PROP_CONN | BT_HCI_LE_ADV_PROP_SCAN)))) {
 			pri_hdr->aux_ptr = 1;
 			pri_dptr += sizeof(struct pdu_adv_aux_ptr);
 		}
@@ -482,10 +482,9 @@ uint8_t ll_adv_params_set(uint16_t interval, uint8_t adv_type,
 		if (pri_hdr->aux_ptr) {
 			uint8_t err;
 
-			err = ull_adv_aux_hdr_set_clear(adv,
-							ULL_ADV_PDU_HDR_FIELD_ADVA,
-							0, &own_addr_type,
-							NULL);
+			err = ull_adv_aux_hdr_set_clear(
+				adv, ULL_ADV_PDU_HDR_FIELD_ADVA, 0,
+				&own_addr_type, NULL);
 			if (err) {
 				/* TODO: cleanup? */
 				return err;
@@ -557,13 +556,13 @@ uint8_t ll_adv_scan_rsp_set(uint8_t len, uint8_t const *const data)
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT) || defined(CONFIG_BT_HCI_MESH_EXT)
 #if defined(CONFIG_BT_HCI_MESH_EXT)
-uint8_t ll_adv_enable(uint8_t handle, uint8_t enable,
-		   uint8_t at_anchor, uint32_t ticks_anchor, uint8_t retry,
-		   uint8_t scan_window, uint8_t scan_delay)
+uint8_t ll_adv_enable(uint8_t handle, uint8_t enable, uint8_t at_anchor,
+		      uint32_t ticks_anchor, uint8_t retry, uint8_t scan_window,
+		      uint8_t scan_delay)
 {
 #else /* !CONFIG_BT_HCI_MESH_EXT */
-uint8_t ll_adv_enable(uint8_t handle, uint8_t enable,
-		   uint16_t duration, uint8_t max_ext_adv_evts)
+uint8_t ll_adv_enable(uint8_t handle, uint8_t enable, uint16_t duration,
+		      uint8_t max_ext_adv_evts)
 {
 #if defined(CONFIG_BT_CTLR_ADV_PERIODIC)
 	struct ll_adv_sync_set *sync = NULL;
@@ -603,7 +602,6 @@ uint8_t ll_adv_enable(uint8_t enable)
 	pdu_scan = lll_adv_scan_rsp_peek(lll);
 
 	if (0) {
-
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 	} else if (pdu_adv->type == PDU_ADV_TYPE_EXT_IND) {
 		struct pdu_adv_com_ext_adv *pri_com_hdr;
@@ -617,7 +615,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 		/* AdvA, fill here at enable */
 		if (pri_hdr->adv_addr) {
 			uint8_t const *tx_addr =
-					ll_adv_aux_random_addr_get(adv, NULL);
+				ll_adv_aux_random_addr_get(adv, NULL);
 
 			/* TODO: Privacy */
 
@@ -642,7 +640,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 
 			if (sec_hdr->adv_addr) {
 				uint8_t const *tx_addr =
-					ll_adv_aux_random_addr_get(adv,	NULL);
+					ll_adv_aux_random_addr_get(adv, NULL);
 
 				/* TODO: Privacy */
 
@@ -696,8 +694,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 				tx_addr = ll_addr_get(pdu_adv->tx_addr, NULL);
 			}
 
-			memcpy(&pdu_adv->adv_ind.addr[0], tx_addr,
-			       BDADDR_SIZE);
+			memcpy(&pdu_adv->adv_ind.addr[0], tx_addr, BDADDR_SIZE);
 			memcpy(&pdu_scan->scan_rsp.addr[0], tx_addr,
 			       BDADDR_SIZE);
 		}
@@ -878,7 +875,7 @@ uint8_t ll_adv_enable(uint8_t enable)
 #endif /* CONFIG_BT_CTLR_PHY */
 
 		conn->tx_head = conn->tx_ctrl = conn->tx_ctrl_last =
-		conn->tx_data = conn->tx_data_last = 0;
+			conn->tx_data = conn->tx_data_last = 0;
 
 		/* NOTE: using same link as supplied for terminate ind */
 		adv->link_cc_free = link;
@@ -938,8 +935,8 @@ uint8_t ll_adv_enable(uint8_t enable)
 
 	adv->event_counter = 0;
 	adv->max_events = max_ext_adv_evts;
-	adv->ticks_remain_duration = HAL_TICKER_US_TO_TICKS((uint64_t)duration *
-							    10000);
+	adv->ticks_remain_duration =
+		HAL_TICKER_US_TO_TICKS((uint64_t)duration * 10000);
 #else
 	/* Legacy ADV only supports LE_1M PHY */
 	const uint8_t phy = 1;
@@ -947,7 +944,8 @@ uint8_t ll_adv_enable(uint8_t enable)
 
 	/* For now we adv on all channels enabled in channel map */
 	uint8_t ch_map = lll->chan_map;
-	const uint8_t adv_chn_cnt = util_ones_count_get(&ch_map, sizeof(ch_map));
+	const uint8_t adv_chn_cnt =
+		util_ones_count_get(&ch_map, sizeof(ch_map));
 	uint32_t slot_us = EVENT_OVERHEAD_START_US + EVENT_OVERHEAD_END_US;
 
 	if (adv_chn_cnt == 0) {
@@ -962,22 +960,18 @@ uint8_t ll_adv_enable(uint8_t enable)
 	} else
 #endif
 	{
-		uint32_t adv_size		= PDU_OVERHEAD_SIZE(phy) +
-					  ADVA_SIZE;
+		uint32_t adv_size = PDU_OVERHEAD_SIZE(phy) + ADVA_SIZE;
 		const uint16_t conn_ind_us =
-					BYTES2US((PDU_OVERHEAD_SIZE(PHY_1M) +
-						  INITA_SIZE + ADVA_SIZE +
-						  LLDATA_SIZE),
-						 phy);
-		const uint8_t scan_req_us  =
-					BYTES2US((PDU_OVERHEAD_SIZE(PHY_1M) +
-						  SCANA_SIZE + ADVA_SIZE),
-						 phy);
-		const uint16_t scan_rsp_us =
-					BYTES2US((PDU_OVERHEAD_SIZE(PHY_1M) +
-						  ADVA_SIZE + pdu_scan->len),
-						 phy);
-		const uint8_t rx_to_us	= EVENT_RX_TO_US(phy);
+			BYTES2US((PDU_OVERHEAD_SIZE(PHY_1M) + INITA_SIZE +
+				  ADVA_SIZE + LLDATA_SIZE),
+				 phy);
+		const uint8_t scan_req_us = BYTES2US(
+			(PDU_OVERHEAD_SIZE(PHY_1M) + SCANA_SIZE + ADVA_SIZE),
+			phy);
+		const uint16_t scan_rsp_us = BYTES2US(
+			(PDU_OVERHEAD_SIZE(PHY_1M) + ADVA_SIZE + pdu_scan->len),
+			phy);
+		const uint8_t rx_to_us = EVENT_RX_TO_US(phy);
 		const uint8_t rxtx_turn_us = EVENT_RX_TX_TURNAROUND(phy);
 
 		if (phy != 0x01) {
@@ -996,16 +990,18 @@ uint8_t ll_adv_enable(uint8_t enable)
 			} else if (pdu_adv->type == PDU_ADV_TYPE_ADV_IND) {
 				adv_size += pdu_adv->len;
 				slot_us += MAX(scan_req_us + EVENT_IFS_MAX_US +
-						scan_rsp_us, conn_ind_us);
+						       scan_rsp_us,
+					       conn_ind_us);
 			} else if (pdu_adv->type == PDU_ADV_TYPE_SCAN_IND) {
 				adv_size += pdu_adv->len;
 				slot_us += scan_req_us + EVENT_IFS_MAX_US +
 					   scan_rsp_us;
 			}
 
-			slot_us += (BYTES2US(adv_size, phy) + EVENT_IFS_MAX_US
-				  + rx_to_us + rxtx_turn_us) * (adv_chn_cnt-1)
-				  + BYTES2US(adv_size, phy) + EVENT_IFS_MAX_US;
+			slot_us += (BYTES2US(adv_size, phy) + EVENT_IFS_MAX_US +
+				    rx_to_us + rxtx_turn_us) *
+					   (adv_chn_cnt - 1) +
+				   BYTES2US(adv_size, phy) + EVENT_IFS_MAX_US;
 		}
 	}
 
@@ -1074,15 +1070,13 @@ uint8_t ll_adv_enable(uint8_t enable)
 	lll->is_hdcd = !interval && (pdu_adv->type == PDU_ADV_TYPE_DIRECT_IND);
 	if (lll->is_hdcd) {
 		ret_cb = TICKER_STATUS_BUSY;
-		ret = ticker_start(TICKER_INSTANCE_ID_CTLR,
-				   TICKER_USER_ID_THREAD,
-				   (TICKER_ID_ADV_BASE + handle),
-				   ticks_anchor, 0,
-				   (adv->evt.ticks_slot + ticks_slot_overhead),
-				   TICKER_NULL_REMAINDER, TICKER_NULL_LAZY,
-				   (adv->evt.ticks_slot + ticks_slot_overhead),
-				   ticker_cb, adv,
-				   ull_ticker_status_give, (void *)&ret_cb);
+		ret = ticker_start(
+			TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_THREAD,
+			(TICKER_ID_ADV_BASE + handle), ticks_anchor, 0,
+			(adv->evt.ticks_slot + ticks_slot_overhead),
+			TICKER_NULL_REMAINDER, TICKER_NULL_LAZY,
+			(adv->evt.ticks_slot + ticks_slot_overhead), ticker_cb,
+			adv, ull_ticker_status_give, (void *)&ret_cb);
 		ret = ull_ticker_status_take(ret, &ret_cb);
 		if (ret != TICKER_STATUS_SUCCESS) {
 			goto failure_cleanup;
@@ -1090,19 +1084,19 @@ uint8_t ll_adv_enable(uint8_t enable)
 
 		ret_cb = TICKER_STATUS_BUSY;
 		ret = ticker_start(TICKER_INSTANCE_ID_CTLR,
-				   TICKER_USER_ID_THREAD,
-				   TICKER_ID_ADV_STOP, ticks_anchor,
+				   TICKER_USER_ID_THREAD, TICKER_ID_ADV_STOP,
+				   ticks_anchor,
 				   HAL_TICKER_US_TO_TICKS(ticks_slot_offset +
 							  (1280 * 1000)),
 				   TICKER_NULL_PERIOD, TICKER_NULL_REMAINDER,
 				   TICKER_NULL_LAZY, TICKER_NULL_SLOT,
-				   ticker_stop_cb, adv,
-				   ull_ticker_status_give, (void *)&ret_cb);
+				   ticker_stop_cb, adv, ull_ticker_status_give,
+				   (void *)&ret_cb);
 	} else
 #endif /* CONFIG_BT_PERIPHERAL */
 	{
-		const uint32_t ticks_slot = adv->evt.ticks_slot +
-					 ticks_slot_overhead;
+		const uint32_t ticks_slot =
+			adv->evt.ticks_slot + ticks_slot_overhead;
 
 #if (CONFIG_BT_CTLR_ADV_AUX_SET > 0)
 		if (lll->aux) {
@@ -1132,10 +1126,12 @@ uint8_t ll_adv_enable(uint8_t enable)
 					uint32_t ticks_anchor_sync =
 						ticks_anchor_aux +
 						ticks_slot_aux +
-						HAL_TICKER_US_TO_TICKS(EVENT_MAFS_US);
+						HAL_TICKER_US_TO_TICKS(
+							EVENT_MAFS_US);
 
 					/* Add sync_info into auxiliary PDU */
-					ret = ull_adv_aux_hdr_set_clear(adv,
+					ret = ull_adv_aux_hdr_set_clear(
+						adv,
 						ULL_ADV_PDU_HDR_FIELD_SYNC_INFO,
 						0, NULL, NULL);
 					if (ret) {
@@ -1144,9 +1140,9 @@ uint8_t ll_adv_enable(uint8_t enable)
 
 					ull_hdr_init(&sync->ull);
 
-					ret = ull_adv_sync_start(sync,
-								 ticks_anchor_sync,
-								 &ret_cb);
+					ret = ull_adv_sync_start(
+						sync, ticks_anchor_sync,
+						&ret_cb);
 					if (ret) {
 						goto failure_cleanup;
 					}
@@ -1188,29 +1184,24 @@ uint8_t ll_adv_enable(uint8_t enable)
 #else
 		ret = ticker_start(
 #endif /* CONFIG_BT_TICKER_EXT */
-				   TICKER_INSTANCE_ID_CTLR,
-				   TICKER_USER_ID_THREAD,
-				   (TICKER_ID_ADV_BASE + handle),
-				   ticks_anchor, 0,
-				   HAL_TICKER_US_TO_TICKS((uint64_t)interval *
-							  625),
-				   TICKER_NULL_REMAINDER,
+			TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_THREAD,
+			(TICKER_ID_ADV_BASE + handle), ticks_anchor, 0,
+			HAL_TICKER_US_TO_TICKS((uint64_t)interval * 625),
+			TICKER_NULL_REMAINDER,
 #if !defined(CONFIG_BT_TICKER_COMPATIBILITY_MODE) && \
 	!defined(CONFIG_BT_CTLR_LOW_LAT)
-				   /* Force expiry to ensure timing update */
-				   TICKER_LAZY_MUST_EXPIRE,
+			/* Force expiry to ensure timing update */
+			TICKER_LAZY_MUST_EXPIRE,
 #else
-				   TICKER_NULL_LAZY,
+			TICKER_NULL_LAZY,
 #endif
-				   ticks_slot,
-				   ticker_cb, adv,
-				   ull_ticker_status_give,
-				   (void *)&ret_cb
+			ticks_slot, ticker_cb, adv, ull_ticker_status_give,
+			(void *)&ret_cb
 #if defined(CONFIG_BT_TICKER_EXT)
-				   ,
-				   &ll_adv_ticker_ext[handle]
+			,
+			&ll_adv_ticker_ext[handle]
 #endif /* CONFIG_BT_TICKER_EXT */
-				   );
+		);
 	}
 
 	ret = ull_ticker_status_take(ret, &ret_cb);
@@ -1542,11 +1533,11 @@ static inline struct ll_adv_set *is_disabled_get(uint8_t handle)
 	return adv;
 }
 
-static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder, uint16_t lazy,
-		      void *param)
+static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
+		      uint16_t lazy, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, lll_adv_prepare};
+	static struct mayfly mfy = { 0, 0, &link, NULL, lll_adv_prepare };
 	static struct lll_prepare_param p;
 	struct ll_adv_set *adv = param;
 	struct lll_adv *lll;
@@ -1588,13 +1579,10 @@ static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder, uint16_t laz
 		random_delay %= ULL_ADV_RANDOM_DELAY;
 		random_delay += 1;
 
-		ret = ticker_update(TICKER_INSTANCE_ID_CTLR,
-				    TICKER_USER_ID_ULL_HIGH,
-				    (TICKER_ID_ADV_BASE +
-				     ull_adv_handle_get(adv)),
-				    random_delay,
-				    0, 0, 0, 0, 0,
-				    ticker_op_update_cb, adv);
+		ret = ticker_update(
+			TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_ULL_HIGH,
+			(TICKER_ID_ADV_BASE + ull_adv_handle_get(adv)),
+			random_delay, 0, 0, 0, 0, 0, ticker_op_update_cb, adv);
 		LL_ASSERT((ret == TICKER_STATUS_SUCCESS) ||
 			  (ret == TICKER_STATUS_BUSY));
 
@@ -1602,9 +1590,8 @@ static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder, uint16_t laz
 		adv->event_counter += (lazy + 1);
 
 		if (adv->ticks_remain_duration) {
-			uint32_t ticks_interval =
-				HAL_TICKER_US_TO_TICKS((uint64_t)adv->interval *
-						       625U);
+			uint32_t ticks_interval = HAL_TICKER_US_TO_TICKS(
+				(uint64_t)adv->interval * 625U);
 			if (adv->ticks_remain_duration > ticks_interval) {
 				adv->ticks_remain_duration -= ticks_interval;
 
@@ -1644,8 +1631,7 @@ static void ticker_stop_cb(uint32_t ticks_at_expire, uint32_t remainder,
 	LL_ASSERT(handle < BT_CTLR_ADV_SET);
 
 	ret = ticker_stop(TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_ULL_HIGH,
-			  TICKER_ID_ADV_BASE + handle,
-			  ticker_op_stop_cb, adv);
+			  TICKER_ID_ADV_BASE + handle, ticker_op_stop_cb, adv);
 	LL_ASSERT((ret == TICKER_STATUS_SUCCESS) ||
 		  (ret == TICKER_STATUS_BUSY));
 }
@@ -1653,7 +1639,7 @@ static void ticker_stop_cb(uint32_t ticks_at_expire, uint32_t remainder,
 static void ticker_op_stop_cb(uint32_t status, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, NULL};
+	static struct mayfly mfy = { 0, 0, &link, NULL, NULL };
 	struct ll_adv_set *adv;
 	struct ull_hdr *hdr;
 	uint32_t ret;
@@ -1681,8 +1667,8 @@ static void ticker_op_stop_cb(uint32_t status, void *param)
 		hdr->disabled_cb = disabled_cb;
 
 		mfy.fp = lll_disable;
-		ret = mayfly_enqueue(TICKER_USER_ID_ULL_LOW,
-				     TICKER_USER_ID_LLL, 0, &mfy);
+		ret = mayfly_enqueue(TICKER_USER_ID_ULL_LOW, TICKER_USER_ID_LLL,
+				     0, &mfy);
 		LL_ASSERT(!ret);
 	} else {
 		mfy.fp = disabled_cb;
@@ -1748,7 +1734,7 @@ static void conn_release(struct ll_adv_set *adv)
 static void ticker_op_ext_stop_cb(uint32_t status, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, NULL};
+	static struct mayfly mfy = { 0, 0, &link, NULL, NULL };
 	struct ll_adv_set *adv;
 	uint32_t ret;
 
@@ -1834,8 +1820,8 @@ static inline uint8_t disable(uint8_t handle)
 
 	ret_cb = TICKER_STATUS_BUSY;
 	ret = ticker_stop(TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_THREAD,
-			  TICKER_ID_ADV_BASE + handle,
-			  ull_ticker_status_give, (void *)&ret_cb);
+			  TICKER_ID_ADV_BASE + handle, ull_ticker_status_give,
+			  (void *)&ret_cb);
 	ret = ull_ticker_status_take(ret, &ret_cb);
 	if (ret) {
 		mark = ull_disable_unmark(adv);

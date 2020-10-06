@@ -24,10 +24,8 @@ static inline void external_antenna(bool on)
 	}
 
 	gpio_pin_configure(gpio_dev, ANT_UFLn_GPIO_PIN,
-			   ANT_UFLn_GPIO_FLAGS
-			   | (on
-			      ? GPIO_OUTPUT_ACTIVE
-			      : GPIO_OUTPUT_INACTIVE));
+			   ANT_UFLn_GPIO_FLAGS | (on ? GPIO_OUTPUT_ACTIVE :
+							     GPIO_OUTPUT_INACTIVE));
 }
 
 static int board_particle_boron_init(const struct device *dev)
@@ -49,8 +47,8 @@ static int board_particle_boron_init(const struct device *dev)
 			   GPIO_INPUT | V_INT_DETECT_GPIO_FLAGS);
 
 	gpio_pin_configure(gpio_dev, SERIAL_BUFFER_ENABLE_GPIO_PIN,
-			   GPIO_OUTPUT_ACTIVE
-			   | SERIAL_BUFFER_ENABLE_GPIO_FLAGS);
+			   GPIO_OUTPUT_ACTIVE |
+				   SERIAL_BUFFER_ENABLE_GPIO_FLAGS);
 #endif
 
 	return 0;

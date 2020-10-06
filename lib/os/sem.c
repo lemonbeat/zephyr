@@ -8,8 +8,8 @@
 #include <syscall_handler.h>
 
 #ifdef CONFIG_USERSPACE
-#define SYS_SEM_MINIMUM      0
-#define SYS_SEM_CONTENDED    (SYS_SEM_MINIMUM - 1)
+#define SYS_SEM_MINIMUM 0
+#define SYS_SEM_CONTENDED (SYS_SEM_MINIMUM - 1)
 
 static inline atomic_t bounded_dec(atomic_t *val, atomic_t minimum)
 {
@@ -38,8 +38,7 @@ static inline atomic_t bounded_inc(atomic_t *val, atomic_t minimum,
 			break;
 		}
 
-		new_value = old_value < minimum ?
-			    minimum + 1 : old_value + 1;
+		new_value = old_value < minimum ? minimum + 1 : old_value + 1;
 	} while (atomic_cas(val, old_value, new_value) == 0U);
 
 	return old_value;
@@ -48,8 +47,8 @@ static inline atomic_t bounded_inc(atomic_t *val, atomic_t minimum,
 int sys_sem_init(struct sys_sem *sem, unsigned int initial_count,
 		 unsigned int limit)
 {
-	if (sem == NULL || limit == SYS_SEM_MINIMUM ||
-	    initial_count > limit || limit > INT_MAX) {
+	if (sem == NULL || limit == SYS_SEM_MINIMUM || initial_count > limit ||
+	    limit > INT_MAX) {
 		return -EINVAL;
 	}
 
@@ -64,8 +63,7 @@ int sys_sem_give(struct sys_sem *sem)
 	int ret = 0;
 	atomic_t old_value;
 
-	old_value = bounded_inc(&sem->futex.val,
-				SYS_SEM_MINIMUM, sem->limit);
+	old_value = bounded_inc(&sem->futex.val, SYS_SEM_MINIMUM, sem->limit);
 	if (old_value < 0) {
 		ret = k_futex_wake(&sem->futex, true);
 
@@ -85,14 +83,12 @@ int sys_sem_take(struct sys_sem *sem, k_timeout_t timeout)
 	atomic_t old_value;
 
 	do {
-		old_value = bounded_dec(&sem->futex.val,
-					SYS_SEM_MINIMUM);
+		old_value = bounded_dec(&sem->futex.val, SYS_SEM_MINIMUM);
 		if (old_value > 0) {
 			return 0;
 		}
 
-		ret = k_futex_wait(&sem->futex,
-				   SYS_SEM_CONTENDED, timeout);
+		ret = k_futex_wait(&sem->futex, SYS_SEM_CONTENDED, timeout);
 	} while (ret == 0 || ret == -EAGAIN);
 
 	return ret;

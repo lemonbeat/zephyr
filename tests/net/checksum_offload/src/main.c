@@ -45,21 +45,20 @@ LOG_MODULE_REGISTER(net_test, NET_LOG_LEVEL);
 static char *test_data = "Test data to be sent";
 
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 2 addresses */
-static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr2 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Destination address for test packets */
-static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr dst_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 9, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 static struct in_addr in4addr_my = { { { 192, 0, 2, 1 } } };
 static struct in_addr in4addr_dst = { { { 192, 168, 1, 1 } } };
@@ -100,8 +99,7 @@ static void eth_iface_init(struct net_if *iface)
 	struct eth_context *context = dev->data;
 
 	net_if_set_link_addr(iface, context->mac_addr,
-			     sizeof(context->mac_addr),
-			     NET_LINK_ETHERNET);
+			     sizeof(context->mac_addr), NET_LINK_ETHERNET);
 
 	DBG("Iface %p addr %s\n", iface,
 	    net_sprint_ll_addr(context->mac_addr, sizeof(context->mac_addr)));
@@ -121,8 +119,8 @@ static uint16_t get_udp_chksum(struct net_pkt *pkt)
 
 	/* Let's move the cursor to UDP header */
 	if (net_pkt_skip(pkt, sizeof(struct net_eth_hdr) +
-			 net_pkt_ip_hdr_len(pkt) +
-			 net_pkt_ipv6_ext_len(pkt))) {
+				      net_pkt_ip_hdr_len(pkt) +
+				      net_pkt_ipv6_ext_len(pkt))) {
 		return 0;
 	}
 
@@ -247,8 +245,7 @@ static int eth_tx_offloading_enabled(const struct device *dev,
 
 static enum ethernet_hw_caps eth_offloading_enabled(const struct device *dev)
 {
-	return ETHERNET_HW_TX_CHKSUM_OFFLOAD |
-		ETHERNET_HW_RX_CHKSUM_OFFLOAD;
+	return ETHERNET_HW_TX_CHKSUM_OFFLOAD | ETHERNET_HW_RX_CHKSUM_OFFLOAD;
 }
 
 static enum ethernet_hw_caps eth_offloading_disabled(const struct device *dev)
@@ -291,19 +288,15 @@ static int eth_init(const struct device *dev)
 }
 
 ETH_NET_DEVICE_INIT(eth_offloading_disabled_test,
-		    "eth_offloading_disabled_test",
-		    eth_init, device_pm_control_nop,
-		    &eth_context_offloading_disabled, NULL,
-		    CONFIG_ETH_INIT_PRIORITY,
-		    &api_funcs_offloading_disabled,
-		    NET_ETH_MTU);
+		    "eth_offloading_disabled_test", eth_init,
+		    device_pm_control_nop, &eth_context_offloading_disabled,
+		    NULL, CONFIG_ETH_INIT_PRIORITY,
+		    &api_funcs_offloading_disabled, NET_ETH_MTU);
 
-ETH_NET_DEVICE_INIT(eth_offloading_enabled_test,
-		    "eth_offloading_enabled_test",
+ETH_NET_DEVICE_INIT(eth_offloading_enabled_test, "eth_offloading_enabled_test",
 		    eth_init, device_pm_control_nop,
 		    &eth_context_offloading_enabled, NULL,
-		    CONFIG_ETH_INIT_PRIORITY,
-		    &api_funcs_offloading_enabled,
+		    CONFIG_ETH_INIT_PRIORITY, &api_funcs_offloading_enabled,
 		    NET_ETH_MTU);
 
 struct user_data {
@@ -338,8 +331,7 @@ static void iface_cb(struct net_if *iface, void *user_data)
 	    net_if_get_by_iface(iface));
 
 	if (net_if_l2(iface) == &NET_L2_GET_NAME(ETHERNET)) {
-		struct eth_context *eth_ctx =
-			net_if_get_device(iface)->data;
+		struct eth_context *eth_ctx = net_if_get_device(iface)->data;
 
 		if (eth_ctx == &eth_context_offloading_disabled) {
 			DBG("Iface %p without offloading\n", iface);
@@ -369,8 +361,7 @@ static void test_eth_setup(void)
 
 	zassert_equal(ud.eth_if_count, sizeof(eth_interfaces) / sizeof(void *),
 		      "Invalid number of interfaces (%d vs %d)\n",
-		      ud.eth_if_count,
-		      sizeof(eth_interfaces) / sizeof(void *));
+		      ud.eth_if_count, sizeof(eth_interfaces) / sizeof(void *));
 }
 
 static void test_address_setup(void)
@@ -384,43 +375,38 @@ static void test_address_setup(void)
 	zassert_not_null(iface1, "Interface 1");
 	zassert_not_null(iface2, "Interface 2");
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1");
 	}
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv4_addr_add(iface1, &in4addr_my,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv4_addr_add(iface1, &in4addr_my, NET_ADDR_MANUAL, 0);
 	zassert_not_null(ifaddr, "Cannot add IPv4 address");
 
-	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface2, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr2));
+		    net_sprint_ipv6_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2");
 	}
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv4_addr_add(iface2, &in4addr_my2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv4_addr_add(iface2, &in4addr_my2, NET_ADDR_MANUAL, 0);
 	zassert_not_null(ifaddr, "Cannot add IPv4 address");
 
 	net_if_up(iface1);
@@ -475,8 +461,7 @@ static void test_tx_chksum_offload_disabled_test_v6(void)
 		.sin6_port = 0,
 	};
 
-	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v6_ctx_1);
+	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &udp_v6_ctx_1);
 	zassert_equal(ret, 0, "Create IPv6 UDP context failed");
 
 	memcpy(&src_addr6.sin6_addr, &my_addr1, sizeof(struct in6_addr));
@@ -500,8 +485,8 @@ static void test_tx_chksum_offload_disabled_test_v6(void)
 
 	ret = net_context_sendto(udp_v6_ctx_1, test_data, len,
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -526,8 +511,7 @@ static void test_tx_chksum_offload_disabled_test_v4(void)
 		.sin_port = 0,
 	};
 
-	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v4_ctx_1);
+	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &udp_v4_ctx_1);
 	zassert_equal(ret, 0, "Create IPv4 UDP context failed");
 
 	memcpy(&src_addr4.sin_addr, &in4addr_my, sizeof(struct in_addr));
@@ -551,8 +535,8 @@ static void test_tx_chksum_offload_disabled_test_v4(void)
 
 	ret = net_context_sendto(udp_v4_ctx_1, test_data, len,
 				 (struct sockaddr *)&dst_addr4,
-				 sizeof(struct sockaddr_in),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -577,8 +561,7 @@ static void test_tx_chksum_offload_enabled_test_v6(void)
 		.sin6_port = 0,
 	};
 
-	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v6_ctx_2);
+	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &udp_v6_ctx_2);
 	zassert_equal(ret, 0, "Create IPv6 UDP context failed");
 
 	memcpy(&src_addr6.sin6_addr, &my_addr2, sizeof(struct in6_addr));
@@ -602,8 +585,8 @@ static void test_tx_chksum_offload_enabled_test_v6(void)
 
 	ret = net_context_sendto(udp_v6_ctx_2, test_data, len,
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -628,8 +611,7 @@ static void test_tx_chksum_offload_enabled_test_v4(void)
 		.sin_port = 0,
 	};
 
-	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v4_ctx_2);
+	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &udp_v4_ctx_2);
 	zassert_equal(ret, 0, "Create IPv4 UDP context failed");
 
 	memcpy(&src_addr4.sin_addr, &in4addr_my2, sizeof(struct in_addr));
@@ -653,8 +635,8 @@ static void test_tx_chksum_offload_enabled_test_v4(void)
 
 	ret = net_context_sendto(udp_v4_ctx_2, test_data, len,
 				 (struct sockaddr *)&dst_addr4,
-				 sizeof(struct sockaddr_in),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -669,8 +651,7 @@ static void recv_cb_offload_disabled(struct net_context *context,
 				     struct net_pkt *pkt,
 				     union net_ip_header *ip_hdr,
 				     union net_proto_header *proto_hdr,
-				     int status,
-				     void *user_data)
+				     int status, void *user_data)
 {
 	zassert_not_null(proto_hdr->udp, "UDP header missing");
 	zassert_not_equal(proto_hdr->udp->chksum, 0, "Checksum is not set");
@@ -678,8 +659,7 @@ static void recv_cb_offload_disabled(struct net_context *context,
 	if (net_pkt_family(pkt) == AF_INET) {
 		struct net_ipv4_hdr *ipv4 = NET_IPV4_HDR(pkt);
 
-		zassert_not_equal(ipv4->chksum, 0,
-				  "IPv4 checksum is not set");
+		zassert_not_equal(ipv4->chksum, 0, "IPv4 checksum is not set");
 	}
 
 	k_sem_give(&wait_data);
@@ -691,8 +671,7 @@ static void recv_cb_offload_enabled(struct net_context *context,
 				    struct net_pkt *pkt,
 				    union net_ip_header *ip_hdr,
 				    union net_proto_header *proto_hdr,
-				    int status,
-				    void *user_data)
+				    int status, void *user_data)
 {
 	zassert_not_null(proto_hdr->udp, "UDP header missing");
 	zassert_equal(proto_hdr->udp->chksum, 0, "Checksum is set");
@@ -722,8 +701,7 @@ static void test_rx_chksum_offload_disabled_test_v6(void)
 		.sin6_port = 0,
 	};
 
-	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v6_ctx_1);
+	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &udp_v6_ctx_1);
 	zassert_equal(ret, 0, "Create IPv6 UDP context failed");
 
 	memcpy(&src_addr6.sin6_addr, &my_addr1, sizeof(struct in6_addr));
@@ -751,8 +729,8 @@ static void test_rx_chksum_offload_disabled_test_v6(void)
 
 	ret = net_context_sendto(udp_v6_ctx_1, test_data, len,
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -778,8 +756,7 @@ static void test_rx_chksum_offload_disabled_test_v4(void)
 		.sin_port = 0,
 	};
 
-	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v4_ctx_1);
+	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &udp_v4_ctx_1);
 	zassert_equal(ret, 0, "Create IPv4 UDP context failed");
 
 	memcpy(&src_addr4.sin_addr, &in4addr_my, sizeof(struct in_addr));
@@ -807,8 +784,8 @@ static void test_rx_chksum_offload_disabled_test_v4(void)
 
 	ret = net_context_sendto(udp_v4_ctx_1, test_data, len,
 				 (struct sockaddr *)&dst_addr4,
-				 sizeof(struct sockaddr_in),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -834,8 +811,7 @@ static void test_rx_chksum_offload_enabled_test_v6(void)
 		.sin6_port = 0,
 	};
 
-	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v6_ctx_2);
+	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &udp_v6_ctx_2);
 	zassert_equal(ret, 0, "Create IPv6 UDP context failed");
 
 	memcpy(&src_addr6.sin6_addr, &my_addr2, sizeof(struct in6_addr));
@@ -855,14 +831,14 @@ static void test_rx_chksum_offload_enabled_test_v6(void)
 	test_started = true;
 	start_receiving = true;
 
-	ret = net_context_recv(udp_v6_ctx_2, recv_cb_offload_enabled,
-			       K_NO_WAIT, NULL);
+	ret = net_context_recv(udp_v6_ctx_2, recv_cb_offload_enabled, K_NO_WAIT,
+			       NULL);
 	zassert_equal(ret, 0, "Recv UDP failed (%d)\n", ret);
 
 	ret = net_context_sendto(udp_v6_ctx_2, test_data, len,
 				 (struct sockaddr *)&dst_addr6,
-				 sizeof(struct sockaddr_in6),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in6), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -888,8 +864,7 @@ static void test_rx_chksum_offload_enabled_test_v4(void)
 		.sin_port = 0,
 	};
 
-	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_v4_ctx_2);
+	ret = net_context_get(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &udp_v4_ctx_2);
 	zassert_equal(ret, 0, "Create IPv4 UDP context failed");
 
 	memcpy(&src_addr4.sin_addr, &in4addr_my2, sizeof(struct in_addr));
@@ -909,14 +884,14 @@ static void test_rx_chksum_offload_enabled_test_v4(void)
 	test_started = true;
 	start_receiving = true;
 
-	ret = net_context_recv(udp_v4_ctx_2, recv_cb_offload_enabled,
-			       K_NO_WAIT, NULL);
+	ret = net_context_recv(udp_v4_ctx_2, recv_cb_offload_enabled, K_NO_WAIT,
+			       NULL);
 	zassert_equal(ret, 0, "Recv UDP failed (%d)\n", ret);
 
 	ret = net_context_sendto(udp_v4_ctx_2, test_data, len,
 				 (struct sockaddr *)&dst_addr4,
-				 sizeof(struct sockaddr_in),
-				 NULL, K_FOREVER, NULL);
+				 sizeof(struct sockaddr_in), NULL, K_FOREVER,
+				 NULL);
 	zassert_equal(ret, len, "Send UDP pkt failed (%d)\n", ret);
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -930,18 +905,17 @@ static void test_rx_chksum_offload_enabled_test_v4(void)
 
 void test_main(void)
 {
-	ztest_test_suite(net_chksum_offload_test,
-			 ztest_unit_test(test_eth_setup),
-			 ztest_unit_test(test_address_setup),
-			 ztest_unit_test(test_tx_chksum_offload_disabled_test_v6),
-			 ztest_unit_test(test_tx_chksum_offload_disabled_test_v4),
-			 ztest_unit_test(test_tx_chksum_offload_enabled_test_v6),
-			 ztest_unit_test(test_tx_chksum_offload_enabled_test_v4),
-			 ztest_unit_test(test_rx_chksum_offload_disabled_test_v6),
-			 ztest_unit_test(test_rx_chksum_offload_disabled_test_v4),
-			 ztest_unit_test(test_rx_chksum_offload_enabled_test_v6),
-			 ztest_unit_test(test_rx_chksum_offload_enabled_test_v4)
-			 );
+	ztest_test_suite(
+		net_chksum_offload_test, ztest_unit_test(test_eth_setup),
+		ztest_unit_test(test_address_setup),
+		ztest_unit_test(test_tx_chksum_offload_disabled_test_v6),
+		ztest_unit_test(test_tx_chksum_offload_disabled_test_v4),
+		ztest_unit_test(test_tx_chksum_offload_enabled_test_v6),
+		ztest_unit_test(test_tx_chksum_offload_enabled_test_v4),
+		ztest_unit_test(test_rx_chksum_offload_disabled_test_v6),
+		ztest_unit_test(test_rx_chksum_offload_disabled_test_v4),
+		ztest_unit_test(test_rx_chksum_offload_enabled_test_v6),
+		ztest_unit_test(test_rx_chksum_offload_enabled_test_v4));
 
 	ztest_run_test_suite(net_chksum_offload_test);
 }

@@ -28,7 +28,7 @@ void arch_irq_offload(irq_offload_routine_t routine, const void *parameter)
 	 */
 	unsigned int key;
 
-	__asm__ volatile("mrs %0, PRIMASK;" : "=r" (key) : : "memory");
+	__asm__ volatile("mrs %0, PRIMASK;" : "=r"(key) : : "memory");
 	__ASSERT(key == 0U, "irq_offload called with interrupts locked\n");
 #endif /* CONFIG_ARMV6_M_ARMV8_M_BASELINE && CONFIG_ASSERT */
 
@@ -36,10 +36,10 @@ void arch_irq_offload(irq_offload_routine_t routine, const void *parameter)
 	offload_routine = routine;
 	offload_param = parameter;
 
-	__asm__ volatile ("svc %[id]"
-			  :
-			  : [id] "i" (_SVC_CALL_IRQ_OFFLOAD)
-			  : "memory");
+	__asm__ volatile("svc %[id]"
+			 :
+			 : [id] "i"(_SVC_CALL_IRQ_OFFLOAD)
+			 : "memory");
 
 	offload_routine = NULL;
 	k_sched_unlock();

@@ -33,8 +33,8 @@ static void mpu6050_convert_gyro(struct sensor_value *val, int16_t raw_val,
 {
 	int64_t conv_val;
 
-	conv_val = ((int64_t)raw_val * SENSOR_PI * 10) /
-		   (sensitivity_x10 * 180U);
+	conv_val =
+		((int64_t)raw_val * SENSOR_PI * 10) / (sensitivity_x10 * 180U);
 	val->val1 = conv_val / 1000000;
 	val->val2 = conv_val % 1000000;
 }
@@ -116,8 +116,8 @@ static int mpu6050_sample_fetch(const struct device *dev,
 	const struct mpu6050_config *cfg = dev->config;
 	int16_t buf[7];
 
-	if (i2c_burst_read(drv_data->i2c, cfg->i2c_addr,
-			   MPU6050_REG_DATA_START, (uint8_t *)buf, 14) < 0) {
+	if (i2c_burst_read(drv_data->i2c, cfg->i2c_addr, MPU6050_REG_DATA_START,
+			   (uint8_t *)buf, 14) < 0) {
 		LOG_ERR("Failed to read data sample.");
 		return -EIO;
 	}
@@ -149,14 +149,13 @@ int mpu6050_init(const struct device *dev)
 
 	drv_data->i2c = device_get_binding(cfg->i2c_label);
 	if (drv_data->i2c == NULL) {
-		LOG_ERR("Failed to get pointer to %s device",
-			    cfg->i2c_label);
+		LOG_ERR("Failed to get pointer to %s device", cfg->i2c_label);
 		return -EINVAL;
 	}
 
 	/* check chip ID */
-	if (i2c_reg_read_byte(drv_data->i2c, cfg->i2c_addr,
-			      MPU6050_REG_CHIP_ID, &id) < 0) {
+	if (i2c_reg_read_byte(drv_data->i2c, cfg->i2c_addr, MPU6050_REG_CHIP_ID,
+			      &id) < 0) {
 		LOG_ERR("Failed to read chip ID.");
 		return -EIO;
 	}
@@ -176,7 +175,7 @@ int mpu6050_init(const struct device *dev)
 
 	/* set accelerometer full-scale range */
 	for (i = 0U; i < 4; i++) {
-		if (BIT(i+1) == CONFIG_MPU6050_ACCEL_FS) {
+		if (BIT(i + 1) == CONFIG_MPU6050_ACCEL_FS) {
 			break;
 		}
 	}
@@ -237,7 +236,6 @@ static const struct mpu6050_config mpu6050_cfg = {
 #endif /* CONFIG_MPU6050_TRIGGER */
 };
 
-DEVICE_AND_API_INIT(mpu6050, DT_INST_LABEL(0),
-		    mpu6050_init, &mpu6050_driver, &mpu6050_cfg,
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(mpu6050, DT_INST_LABEL(0), mpu6050_init, &mpu6050_driver,
+		    &mpu6050_cfg, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &mpu6050_driver_api);

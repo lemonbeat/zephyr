@@ -130,11 +130,9 @@ static inline uint32_t receive_get_sf_length(struct net_buf *buf)
 
 static void receive_send_fc(struct isotp_recv_ctx *ctx, uint8_t fs)
 {
-	struct zcan_frame frame = {
-		.id_type = ctx->tx_addr.id_type,
-		.rtr = CAN_DATAFRAME,
-		.ext_id = ctx->tx_addr.ext_id
-	};
+	struct zcan_frame frame = { .id_type = ctx->tx_addr.id_type,
+				    .rtr = CAN_DATAFRAME,
+				    .ext_id = ctx->tx_addr.ext_id };
 	uint8_t *data = frame.data;
 	int ret;
 
@@ -184,8 +182,10 @@ static inline struct net_buf *receive_alloc_buffer_chain(uint32_t len)
 
 		net_buf_frag_insert(last, frag);
 		last = frag;
-		remaining_len = remaining_len > CONFIG_ISOTP_RX_BUF_SIZE ?
-				remaining_len - CONFIG_ISOTP_RX_BUF_SIZE : 0;
+		remaining_len =
+			remaining_len > CONFIG_ISOTP_RX_BUF_SIZE ?
+				      remaining_len - CONFIG_ISOTP_RX_BUF_SIZE :
+				      0;
 	}
 
 	return buf;
@@ -193,8 +193,8 @@ static inline struct net_buf *receive_alloc_buffer_chain(uint32_t len)
 
 static void receive_timeout_handler(struct _timeout *to)
 {
-	struct isotp_recv_ctx *ctx = CONTAINER_OF(to, struct isotp_recv_ctx,
-						  timeout);
+	struct isotp_recv_ctx *ctx =
+		CONTAINER_OF(to, struct isotp_recv_ctx, timeout);
 
 	switch (ctx->state) {
 	case ISOTP_RX_STATE_WAIT_CF:
@@ -279,11 +279,11 @@ static void receive_state_machine(struct isotp_recv_ctx *ctx)
 		ctx->length -= ctx->buf->len;
 		if (ctx->opts.bs == 0 &&
 		    ctx->length > CONFIG_ISOTP_RX_BUF_COUNT *
-		    CONFIG_ISOTP_RX_BUF_SIZE) {
+					  CONFIG_ISOTP_RX_BUF_SIZE) {
 			LOG_ERR("Pkt length is %d but buffer has only %d bytes",
 				ctx->length,
 				CONFIG_ISOTP_RX_BUF_COUNT *
-				CONFIG_ISOTP_RX_BUF_SIZE);
+					CONFIG_ISOTP_RX_BUF_SIZE);
 			receive_report_error(ctx, ISOTP_N_BUFFER_OVERFLW);
 			receive_state_machine(ctx);
 			break;
@@ -371,8 +371,8 @@ static void receive_state_machine(struct isotp_recv_ctx *ctx)
 
 static void receive_work_handler(struct k_work *item)
 {
-	struct isotp_recv_ctx *ctx = CONTAINER_OF(item, struct isotp_recv_ctx,
-						  work);
+	struct isotp_recv_ctx *ctx =
+		CONTAINER_OF(item, struct isotp_recv_ctx, work);
 
 	receive_state_machine(ctx);
 }
@@ -401,8 +401,9 @@ static void process_ff_sf(struct isotp_recv_ctx *ctx, struct zcan_frame *frame)
 
 	case ISOTP_PCI_TYPE_SF:
 		LOG_DBG("Got SF IRQ");
-		if ((frame->data[index] & ISOTP_PCI_FF_DL_UPPER_MASK) +
-		    index + 1 != frame->dlc) {
+		if ((frame->data[index] & ISOTP_PCI_FF_DL_UPPER_MASK) + index +
+			    1 !=
+		    frame->dlc) {
 			LOG_INF("SF DL does not match. Ignore");
 			return;
 		}
@@ -460,8 +461,7 @@ static void process_cf(struct isotp_recv_ctx *ctx, struct zcan_frame *frame)
 	}
 
 	z_abort_timeout(&ctx->timeout);
-	z_add_timeout(&ctx->timeout, receive_timeout_handler,
-		      K_MSEC(ISOTP_CR));
+	z_add_timeout(&ctx->timeout, receive_timeout_handler, K_MSEC(ISOTP_CR));
 
 	if ((frame->data[index++] & ISOTP_PCI_SN_MASK) != ctx->sn_expected++) {
 		LOG_ERR("Sequence number missmatch");
@@ -529,16 +529,14 @@ static void receive_can_rx_isr(struct zcan_frame *frame, void *arg)
 
 static inline int attach_ff_filter(struct isotp_recv_ctx *ctx)
 {
-	struct zcan_filter filter = {
-		.id_type = ctx->rx_addr.id_type,
-		.rtr = CAN_DATAFRAME,
-		.ext_id = ctx->rx_addr.ext_id,
-		.rtr_mask = 1,
-		.ext_id_mask = CAN_EXT_ID_MASK
-	};
+	struct zcan_filter filter = { .id_type = ctx->rx_addr.id_type,
+				      .rtr = CAN_DATAFRAME,
+				      .ext_id = ctx->rx_addr.ext_id,
+				      .rtr_mask = 1,
+				      .ext_id_mask = CAN_EXT_ID_MASK };
 
-	ctx->filter_id = can_attach_isr(ctx->can_dev, receive_can_rx_isr, ctx,
-					&filter);
+	ctx->filter_id =
+		can_attach_isr(ctx->can_dev, receive_can_rx_isr, ctx, &filter);
 	if (ctx->filter_id < 0) {
 		LOG_ERR("Error attaching FF filter [%d]", ctx->filter_id);
 		return ISOTP_NO_FREE_FILTER;
@@ -550,8 +548,7 @@ static inline int attach_ff_filter(struct isotp_recv_ctx *ctx)
 int isotp_bind(struct isotp_recv_ctx *ctx, const struct device *can_dev,
 	       const struct isotp_msg_id *rx_addr,
 	       const struct isotp_msg_id *tx_addr,
-	       const struct isotp_fc_opts *opts,
-	       k_timeout_t timeout)
+	       const struct isotp_fc_opts *opts, k_timeout_t timeout)
 {
 	int ret;
 
@@ -567,7 +564,8 @@ int isotp_bind(struct isotp_recv_ctx *ctx, const struct device *can_dev,
 
 	__ASSERT(opts->stmin < ISOTP_STMIN_MAX, "STmin limit");
 	__ASSERT(opts->stmin <= ISOTP_STMIN_MS_MAX ||
-		 opts->stmin >= ISOTP_STMIN_US_BEGIN, "STmin reserved");
+			 opts->stmin >= ISOTP_STMIN_US_BEGIN,
+		 "STmin reserved");
 
 	ctx->opts = *opts;
 	ctx->state = ISOTP_RX_STATE_WAIT_FF_SF;
@@ -607,8 +605,7 @@ void isotp_unbind(struct isotp_recv_ctx *ctx)
 
 	sys_slist_find_and_remove(&global_ctx.ff_sf_alloc_list,
 				  &ctx->alloc_node);
-	sys_slist_find_and_remove(&global_ctx.alloc_list,
-				  &ctx->alloc_node);
+	sys_slist_find_and_remove(&global_ctx.alloc_list, &ctx->alloc_node);
 
 	ctx->state = ISOTP_RX_STATE_UNBOUND;
 
@@ -727,8 +724,8 @@ static void send_can_tx_isr(uint32_t err_flags, void *arg)
 
 static void send_timeout_handler(struct _timeout *to)
 {
-	struct isotp_send_ctx *ctx = CONTAINER_OF(to, struct isotp_send_ctx,
-						  timeout);
+	struct isotp_send_ctx *ctx =
+		CONTAINER_OF(to, struct isotp_send_ctx, timeout);
 
 	if (ctx->state != ISOTP_TX_SEND_CF) {
 		send_report_error(ctx, ISOTP_N_TIMEOUT_BS);
@@ -831,11 +828,9 @@ static void pull_data_ctx(struct isotp_send_ctx *ctx, size_t len)
 
 static inline int send_sf(struct isotp_send_ctx *ctx)
 {
-	struct zcan_frame frame = {
-		.id_type = ctx->tx_addr.id_type,
-		.rtr = CAN_DATAFRAME,
-		.ext_id = ctx->tx_addr.ext_id
-	};
+	struct zcan_frame frame = { .id_type = ctx->tx_addr.id_type,
+				    .rtr = CAN_DATAFRAME,
+				    .ext_id = ctx->tx_addr.ext_id };
 	size_t len = get_ctx_data_length(ctx);
 	int index = 0;
 	int ret;
@@ -856,19 +851,17 @@ static inline int send_sf(struct isotp_send_ctx *ctx)
 	frame.dlc = len + index;
 
 	ctx->state = ISOTP_TX_SEND_SF;
-	ret = can_send(ctx->can_dev, &frame, K_MSEC(ISOTP_A),
-		       send_can_tx_isr, ctx);
+	ret = can_send(ctx->can_dev, &frame, K_MSEC(ISOTP_A), send_can_tx_isr,
+		       ctx);
 	return ret;
 }
 
 static inline int send_ff(struct isotp_send_ctx *ctx)
 {
-	struct zcan_frame frame = {
-		.id_type = ctx->tx_addr.id_type,
-		.rtr = CAN_DATAFRAME,
-		.ext_id = ctx->tx_addr.ext_id,
-		.dlc = ISOTP_CAN_DL
-	};
+	struct zcan_frame frame = { .id_type = ctx->tx_addr.id_type,
+				    .rtr = CAN_DATAFRAME,
+				    .ext_id = ctx->tx_addr.ext_id,
+				    .dlc = ISOTP_CAN_DL };
 	int index = 0;
 	size_t len = get_ctx_data_length(ctx);
 	int ret;
@@ -883,7 +876,7 @@ static inline int send_ff(struct isotp_send_ctx *ctx)
 		frame.data[index++] = 0;
 		frame.data[index++] = (len >> 3 * 8) & 0xFF;
 		frame.data[index++] = (len >> 2 * 8) & 0xFF;
-		frame.data[index++] = (len >>   8) & 0xFF;
+		frame.data[index++] = (len >> 8) & 0xFF;
 		frame.data[index++] = len & 0xFF;
 	} else {
 		frame.data[index++] = ISOTP_PCI_TYPE_FF | (len >> 8);
@@ -898,8 +891,8 @@ static inline int send_ff(struct isotp_send_ctx *ctx)
 	pull_data_ctx(ctx, ISOTP_CAN_DL - index);
 	memcpy(&frame.data[index], data, ISOTP_CAN_DL - index);
 
-	ret = can_send(ctx->can_dev, &frame, K_MSEC(ISOTP_A),
-		       send_can_tx_isr, ctx);
+	ret = can_send(ctx->can_dev, &frame, K_MSEC(ISOTP_A), send_can_tx_isr,
+		       ctx);
 	return ret;
 }
 
@@ -930,8 +923,8 @@ static inline int send_cf(struct isotp_send_ctx *ctx)
 	data = get_data_ctx(ctx);
 	memcpy(&frame.data[index], data, len);
 
-	ret = can_send(ctx->can_dev, &frame, K_MSEC(ISOTP_A),
-		       send_can_tx_isr, ctx);
+	ret = can_send(ctx->can_dev, &frame, K_MSEC(ISOTP_A), send_can_tx_isr,
+		       ctx);
 	if (ret == CAN_TX_OK) {
 		ctx->sn++;
 		pull_data_ctx(ctx, len);
@@ -993,7 +986,6 @@ static void send_state_machine(struct isotp_send_ctx *ctx)
 	int ret;
 
 	switch (ctx->state) {
-
 	case ISOTP_TX_SEND_FF:
 		LOG_DBG("SM send FF");
 		send_ff(ctx);
@@ -1014,9 +1006,10 @@ static void send_state_machine(struct isotp_send_ctx *ctx)
 
 			if (ret < 0) {
 				LOG_ERR("Failed to send CF");
-				send_report_error(ctx, ret == CAN_TIMEOUT ?
-						ISOTP_N_TIMEOUT_A :
-						ISOTP_N_ERROR);
+				send_report_error(ctx,
+						  ret == CAN_TIMEOUT ?
+								ISOTP_N_TIMEOUT_A :
+								ISOTP_N_ERROR);
 				break;
 			}
 
@@ -1070,24 +1063,22 @@ static void send_state_machine(struct isotp_send_ctx *ctx)
 
 static void send_work_handler(struct k_work *item)
 {
-	struct isotp_send_ctx *ctx = CONTAINER_OF(item, struct isotp_send_ctx,
-						  work);
+	struct isotp_send_ctx *ctx =
+		CONTAINER_OF(item, struct isotp_send_ctx, work);
 
 	send_state_machine(ctx);
 }
 
 static inline int attach_fc_filter(struct isotp_send_ctx *ctx)
 {
-	struct zcan_filter filter = {
-		.id_type = ctx->rx_addr.id_type,
-		.rtr = CAN_DATAFRAME,
-		.ext_id = ctx->rx_addr.ext_id,
-		.rtr_mask = 1,
-		.ext_id_mask = CAN_EXT_ID_MASK
-	};
+	struct zcan_filter filter = { .id_type = ctx->rx_addr.id_type,
+				      .rtr = CAN_DATAFRAME,
+				      .ext_id = ctx->rx_addr.ext_id,
+				      .rtr_mask = 1,
+				      .ext_id_mask = CAN_EXT_ID_MASK };
 
-	ctx->filter_id = can_attach_isr(ctx->can_dev, send_can_rx_isr, ctx,
-					&filter);
+	ctx->filter_id =
+		can_attach_isr(ctx->can_dev, send_can_rx_isr, ctx, &filter);
 	if (ctx->filter_id < 0) {
 		LOG_ERR("Error attaching FC filter [%d]", ctx->filter_id);
 		return ISOTP_NO_FREE_FILTER;
@@ -1144,8 +1135,8 @@ static int send(struct isotp_send_ctx *ctx, const struct device *can_dev,
 		ret = send_sf(ctx);
 		ctx->state = ISOTP_TX_WAIT_FIN;
 		if (ret) {
-			return ret == CAN_TIMEOUT ?
-			       ISOTP_N_TIMEOUT_A : ISOTP_N_ERROR;
+			return ret == CAN_TIMEOUT ? ISOTP_N_TIMEOUT_A :
+							  ISOTP_N_ERROR;
 		}
 	}
 
@@ -1175,9 +1166,8 @@ int isotp_send(struct isotp_send_ctx *ctx, const struct device *can_dev,
 
 #ifdef CONFIG_ISOTP_ENABLE_CONTEXT_BUFFERS
 
-int isotp_send_ctx_buf(const struct device *can_dev,
-		       const uint8_t *data, size_t len,
-		       const struct isotp_msg_id *tx_addr,
+int isotp_send_ctx_buf(const struct device *can_dev, const uint8_t *data,
+		       size_t len, const struct isotp_msg_id *tx_addr,
 		       const struct isotp_msg_id *rx_addr,
 		       isotp_tx_callback_t complete_cb, void *cb_arg,
 		       k_timeout_t timeout)
@@ -1199,8 +1189,7 @@ int isotp_send_ctx_buf(const struct device *can_dev,
 	return send(ctx, can_dev, tx_addr, rx_addr, complete_cb, cb_arg);
 }
 
-int isotp_send_net_ctx_buf(const struct device *can_dev,
-			   struct net_buf *data,
+int isotp_send_net_ctx_buf(const struct device *can_dev, struct net_buf *data,
 			   const struct isotp_msg_id *tx_addr,
 			   const struct isotp_msg_id *rx_addr,
 			   isotp_tx_callback_t complete_cb, void *cb_arg,
@@ -1223,9 +1212,8 @@ int isotp_send_net_ctx_buf(const struct device *can_dev,
 }
 
 #ifdef CONFIG_ISOTP_USE_TX_BUF
-int isotp_send_buf(const struct device *can_dev,
-		   const uint8_t *data, size_t len,
-		   const struct isotp_msg_id *tx_addr,
+int isotp_send_buf(const struct device *can_dev, const uint8_t *data,
+		   size_t len, const struct isotp_msg_id *tx_addr,
 		   const struct isotp_msg_id *rx_addr,
 		   isotp_tx_callback_t complete_cb, void *cb_arg,
 		   k_timeout_t timeout)
@@ -1254,16 +1242,14 @@ int isotp_send_buf(const struct device *can_dev,
 
 	return send(ctx, can_dev, tx_addr, rx_addr, complete_cb, cb_arg);
 }
-#endif  /*CONFIG_ISOTP_USE_TX_BUF*/
-#endif  /*CONFIG_ISOTP_ENABLE_CONTEXT_BUFFERS*/
+#endif /*CONFIG_ISOTP_USE_TX_BUF*/
+#endif /*CONFIG_ISOTP_ENABLE_CONTEXT_BUFFERS*/
 
 static int isotp_workq_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 	LOG_DBG("Starting workqueue");
-	k_work_q_start(&isotp_workq,
-		       tx_stack,
-		       K_KERNEL_STACK_SIZEOF(tx_stack),
+	k_work_q_start(&isotp_workq, tx_stack, K_KERNEL_STACK_SIZEOF(tx_stack),
 		       CONFIG_ISOTP_WORKQUEUE_PRIO);
 	k_thread_name_set(&isotp_workq.thread, "isotp_work");
 

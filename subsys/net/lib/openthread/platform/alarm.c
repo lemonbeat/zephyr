@@ -64,7 +64,6 @@ void otPlatAlarmMilliStop(otInstance *aInstance)
 	k_timer_stop(&ot_timer);
 }
 
-
 void platformAlarmProcess(otInstance *aInstance)
 {
 	if (timer_fired) {

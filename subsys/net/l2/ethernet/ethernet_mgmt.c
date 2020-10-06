@@ -25,8 +25,7 @@ static inline bool is_hw_caps_supported(const struct device *dev,
 	return !!(api->get_capabilities(dev) & caps);
 }
 
-static int ethernet_set_config(uint32_t mgmt_request,
-			       struct net_if *iface,
+static int ethernet_set_config(uint32_t mgmt_request, struct net_if *iface,
 			       void *data, size_t len)
 {
 	struct ethernet_req_params *params = (struct ethernet_req_params *)data;
@@ -48,8 +47,7 @@ static int ethernet_set_config(uint32_t mgmt_request,
 	}
 
 	if (mgmt_request == NET_REQUEST_ETHERNET_SET_AUTO_NEGOTIATION) {
-		if (!is_hw_caps_supported(dev,
-					  ETHERNET_AUTO_NEGOTIATION_SET)) {
+		if (!is_hw_caps_supported(dev, ETHERNET_AUTO_NEGOTIATION_SET)) {
 			return -ENOTSUP;
 		}
 
@@ -171,8 +169,7 @@ NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_ETHERNET_SET_QAV_PARAM,
 NET_MGMT_REGISTER_REQUEST_HANDLER(NET_REQUEST_ETHERNET_SET_PROMISC_MODE,
 				  ethernet_set_config);
 
-static int ethernet_get_config(uint32_t mgmt_request,
-			       struct net_if *iface,
+static int ethernet_get_config(uint32_t mgmt_request, struct net_if *iface,
 			       void *data, size_t len)
 {
 	struct ethernet_req_params *params = (struct ethernet_req_params *)data;
@@ -273,8 +270,7 @@ void ethernet_mgmt_raise_vlan_enabled_event(struct net_if *iface, uint16_t tag)
 	net_mgmt_event_notify_with_info(NET_EVENT_ETHERNET_VLAN_TAG_ENABLED,
 					iface, &tag, sizeof(tag));
 #else
-	net_mgmt_event_notify(NET_EVENT_ETHERNET_VLAN_TAG_ENABLED,
-			      iface);
+	net_mgmt_event_notify(NET_EVENT_ETHERNET_VLAN_TAG_ENABLED, iface);
 #endif
 }
 

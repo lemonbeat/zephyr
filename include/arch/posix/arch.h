@@ -13,7 +13,6 @@
  *
  */
 
-
 #ifndef ZEPHYR_INCLUDE_ARCH_POSIX_ARCH_H_
 #define ZEPHYR_INCLUDE_ARCH_POSIX_ARCH_H_
 
@@ -65,7 +64,6 @@ static ALWAYS_INLINE unsigned int arch_irq_lock(void)
 {
 	return posix_irq_lock();
 }
-
 
 static ALWAYS_INLINE void arch_irq_unlock(unsigned int key)
 {

@@ -115,8 +115,8 @@ exit:
 	return ret;
 }
 
-int tls_credential_get(sec_tag_t tag, enum tls_credential_type type,
-		       void *cred, size_t *credlen)
+int tls_credential_get(sec_tag_t tag, enum tls_credential_type type, void *cred,
+		       size_t *credlen)
 {
 	struct tls_credential *credential;
 	int ret = 0;

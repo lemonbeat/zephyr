@@ -15,7 +15,7 @@ extern "C" {
 
 void posix_interrupt_raised(void);
 void posix_boot_cpu(void);
-int  posix_is_cpu_running(void);
+int posix_is_cpu_running(void);
 
 #ifdef __cplusplus
 }

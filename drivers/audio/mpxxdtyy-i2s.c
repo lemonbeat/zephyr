@@ -15,8 +15,8 @@ LOG_MODULE_DECLARE(mpxxdtyy);
 
 #if DT_ANY_INST_ON_BUS_STATUS_OKAY(i2s)
 
-#define NUM_RX_BLOCKS			4
-#define PDM_BLOCK_MAX_SIZE_BYTES	512
+#define NUM_RX_BLOCKS 4
+#define PDM_BLOCK_MAX_SIZE_BYTES 512
 
 K_MEM_SLAB_DEFINE(rx_pdm_i2s_mslab, PDM_BLOCK_MAX_SIZE_BYTES, NUM_RX_BLOCKS, 1);
 
@@ -35,8 +35,7 @@ int mpxxdtyy_i2s_read(const struct device *dev, uint8_t stream, void **buffer,
 		return ret;
 	}
 
-	ret = k_mem_slab_alloc(data->pcm_mem_slab,
-			       &pcm_block, K_NO_WAIT);
+	ret = k_mem_slab_alloc(data->pcm_mem_slab, &pcm_block, K_NO_WAIT);
 	if (ret < 0) {
 		return ret;
 	}

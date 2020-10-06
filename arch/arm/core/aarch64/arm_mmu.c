@@ -14,43 +14,40 @@
 #include <sys/util.h>
 
 /* Set below flag to get debug prints */
-#define MMU_DEBUG_PRINTS	0
+#define MMU_DEBUG_PRINTS 0
 /* To get prints from MMU driver, it has to initialized after console driver */
-#define MMU_DEBUG_PRIORITY	70
+#define MMU_DEBUG_PRIORITY 70
 
 #if MMU_DEBUG_PRINTS
 /* To dump page table entries while filling them, set DUMP_PTE macro */
-#define DUMP_PTE		0
-#define MMU_DEBUG(fmt, ...)	printk(fmt, ##__VA_ARGS__)
+#define DUMP_PTE 0
+#define MMU_DEBUG(fmt, ...) printk(fmt, ##__VA_ARGS__)
 #else
 #define MMU_DEBUG(...)
 #endif
 
 /* We support only 4kB translation granule */
-#define PAGE_SIZE_SHIFT		12U
-#define PAGE_SIZE		(1U << PAGE_SIZE_SHIFT)
-#define XLAT_TABLE_SIZE_SHIFT   PAGE_SIZE_SHIFT /* Size of one complete table */
-#define XLAT_TABLE_SIZE		(1U << XLAT_TABLE_SIZE_SHIFT)
+#define PAGE_SIZE_SHIFT 12U
+#define PAGE_SIZE (1U << PAGE_SIZE_SHIFT)
+#define XLAT_TABLE_SIZE_SHIFT PAGE_SIZE_SHIFT /* Size of one complete table */
+#define XLAT_TABLE_SIZE (1U << XLAT_TABLE_SIZE_SHIFT)
 
-#define XLAT_TABLE_ENTRY_SIZE_SHIFT	3U /* Each table entry is 8 bytes */
-#define XLAT_TABLE_LEVEL_MAX	3U
+#define XLAT_TABLE_ENTRY_SIZE_SHIFT 3U /* Each table entry is 8 bytes */
+#define XLAT_TABLE_LEVEL_MAX 3U
 
 #define XLAT_TABLE_ENTRIES_SHIFT \
-			(XLAT_TABLE_SIZE_SHIFT - XLAT_TABLE_ENTRY_SIZE_SHIFT)
-#define XLAT_TABLE_ENTRIES	(1U << XLAT_TABLE_ENTRIES_SHIFT)
+	(XLAT_TABLE_SIZE_SHIFT - XLAT_TABLE_ENTRY_SIZE_SHIFT)
+#define XLAT_TABLE_ENTRIES (1U << XLAT_TABLE_ENTRIES_SHIFT)
 
 /* Address size covered by each entry at given translation table level */
-#define L3_XLAT_VA_SIZE_SHIFT	PAGE_SIZE_SHIFT
-#define L2_XLAT_VA_SIZE_SHIFT	\
-			(L3_XLAT_VA_SIZE_SHIFT + XLAT_TABLE_ENTRIES_SHIFT)
-#define L1_XLAT_VA_SIZE_SHIFT	\
-			(L2_XLAT_VA_SIZE_SHIFT + XLAT_TABLE_ENTRIES_SHIFT)
-#define L0_XLAT_VA_SIZE_SHIFT	\
-			(L1_XLAT_VA_SIZE_SHIFT + XLAT_TABLE_ENTRIES_SHIFT)
+#define L3_XLAT_VA_SIZE_SHIFT PAGE_SIZE_SHIFT
+#define L2_XLAT_VA_SIZE_SHIFT (L3_XLAT_VA_SIZE_SHIFT + XLAT_TABLE_ENTRIES_SHIFT)
+#define L1_XLAT_VA_SIZE_SHIFT (L2_XLAT_VA_SIZE_SHIFT + XLAT_TABLE_ENTRIES_SHIFT)
+#define L0_XLAT_VA_SIZE_SHIFT (L1_XLAT_VA_SIZE_SHIFT + XLAT_TABLE_ENTRIES_SHIFT)
 
 #define LEVEL_TO_VA_SIZE_SHIFT(level) \
-				(PAGE_SIZE_SHIFT + (XLAT_TABLE_ENTRIES_SHIFT * \
-				(XLAT_TABLE_LEVEL_MAX - (level))))
+	(PAGE_SIZE_SHIFT +            \
+	 (XLAT_TABLE_ENTRIES_SHIFT * (XLAT_TABLE_LEVEL_MAX - (level))))
 
 /* Virtual Address Index within given translation table level */
 #define XLAT_TABLE_VA_IDX(va_addr, level) \
@@ -64,37 +61,37 @@
  * (31 <= va_bits <= 39) - base level 1
  * (40 <= va_bits <= 48) - base level 0
  */
-#define GET_XLAT_TABLE_BASE_LEVEL(va_bits)	\
-	((va_bits > L0_XLAT_VA_SIZE_SHIFT)	\
-	? 0U					\
-	: (va_bits > L1_XLAT_VA_SIZE_SHIFT)	\
-	? 1U					\
-	: (va_bits > L2_XLAT_VA_SIZE_SHIFT)	\
-	? 2U : 3U)
+#define GET_XLAT_TABLE_BASE_LEVEL(va_bits)        \
+	((va_bits > L0_XLAT_VA_SIZE_SHIFT) ? 0U : \
+	 (va_bits > L1_XLAT_VA_SIZE_SHIFT) ? 1U : \
+	 (va_bits > L2_XLAT_VA_SIZE_SHIFT) ? 2U : \
+						   3U)
 
-#define XLAT_TABLE_BASE_LEVEL	GET_XLAT_TABLE_BASE_LEVEL(CONFIG_ARM64_VA_BITS)
+#define XLAT_TABLE_BASE_LEVEL GET_XLAT_TABLE_BASE_LEVEL(CONFIG_ARM64_VA_BITS)
 
-#define GET_NUM_BASE_LEVEL_ENTRIES(va_bits)	\
+#define GET_NUM_BASE_LEVEL_ENTRIES(va_bits) \
 	(1U << (va_bits - LEVEL_TO_VA_SIZE_SHIFT(XLAT_TABLE_BASE_LEVEL)))
 
-#define NUM_BASE_LEVEL_ENTRIES	GET_NUM_BASE_LEVEL_ENTRIES(CONFIG_ARM64_VA_BITS)
+#define NUM_BASE_LEVEL_ENTRIES GET_NUM_BASE_LEVEL_ENTRIES(CONFIG_ARM64_VA_BITS)
 
 #if DUMP_PTE
 #define L0_SPACE ""
 #define L1_SPACE "  "
 #define L2_SPACE "    "
 #define L3_SPACE "      "
-#define XLAT_TABLE_LEVEL_SPACE(level)		\
-	(((level) == 0) ? L0_SPACE :		\
-	((level) == 1) ? L1_SPACE :		\
-	((level) == 2) ? L2_SPACE : L3_SPACE)
+#define XLAT_TABLE_LEVEL_SPACE(level) \
+	(((level) == 0) ? L0_SPACE :  \
+	 ((level) == 1) ? L1_SPACE :  \
+	 ((level) == 2) ? L2_SPACE :  \
+				L3_SPACE)
 #endif
 
-static uint64_t base_xlat_table[NUM_BASE_LEVEL_ENTRIES]
-		__aligned(NUM_BASE_LEVEL_ENTRIES * sizeof(uint64_t));
+static uint64_t base_xlat_table[NUM_BASE_LEVEL_ENTRIES] __aligned(
+	NUM_BASE_LEVEL_ENTRIES * sizeof(uint64_t));
 
-static uint64_t xlat_tables[CONFIG_MAX_XLAT_TABLES][XLAT_TABLE_ENTRIES]
-		__aligned(XLAT_TABLE_ENTRIES * sizeof(uint64_t));
+static uint64_t
+	xlat_tables[CONFIG_MAX_XLAT_TABLES][XLAT_TABLE_ENTRIES] __aligned(
+		XLAT_TABLE_ENTRIES * sizeof(uint64_t));
 
 #if (CONFIG_ARM64_PA_BITS == 48)
 #define TCR_PS_BITS TCR_PS_BITS_256TB
@@ -170,7 +167,8 @@ static uint64_t *calculate_pte_index(uint64_t addr, int level)
 	return NULL;
 }
 
-static void set_pte_table_desc(uint64_t *pte, uint64_t *table, unsigned int level)
+static void set_pte_table_desc(uint64_t *pte, uint64_t *table,
+			       unsigned int level)
 {
 #if DUMP_PTE
 	MMU_DEBUG("%s", XLAT_TABLE_LEVEL_SPACE(level));
@@ -229,8 +227,9 @@ static void set_pte_block_desc(uint64_t *pte, uint64_t addr_pa,
 #if DUMP_PTE
 	MMU_DEBUG("%s", XLAT_TABLE_LEVEL_SPACE(level));
 	MMU_DEBUG("%p: ", pte);
-	MMU_DEBUG((mem_type == MT_NORMAL) ? "MEM" :
-		  ((mem_type == MT_NORMAL_NC) ? "NC" : "DEV"));
+	MMU_DEBUG((mem_type == MT_NORMAL) ?
+				"MEM" :
+				((mem_type == MT_NORMAL_NC) ? "NC" : "DEV"));
 	MMU_DEBUG((attrs & MT_RW) ? "-RW" : "-RO");
 	MMU_DEBUG((attrs & MT_NS) ? "-NS" : "-S");
 	MMU_DEBUG((attrs & MT_EXECUTE_NEVER) ? "-XN" : "-EXEC");
@@ -246,7 +245,7 @@ static uint64_t *new_prealloc_table(void)
 	static unsigned int table_idx;
 
 	__ASSERT(table_idx < CONFIG_MAX_XLAT_TABLES,
-		"Enough xlat tables not allocated");
+		 "Enough xlat tables not allocated");
 
 	return (uint64_t *)(xlat_tables[table_idx++]);
 }
@@ -290,7 +289,7 @@ static void init_xlat_tables(const struct arm_mmu_region *region)
 	MMU_DEBUG("mmap: virt %llx phys %llx size %llx\n", virt, phys, size);
 	/* check minimum alignment requirement for given mmap region */
 	__ASSERT(((virt & (PAGE_SIZE - 1)) == 0) &&
-		 ((size & (PAGE_SIZE - 1)) == 0),
+			 ((size & (PAGE_SIZE - 1)) == 0),
 		 "address/size are not page aligned\n");
 
 	while (size) {
@@ -330,14 +329,11 @@ static void init_xlat_tables(const struct arm_mmu_region *region)
 static const struct arm_mmu_region mmu_zephyr_regions[] = {
 
 	/* Mark text segment cacheable,read only and executable */
-	MMU_REGION_FLAT_ENTRY("zephyr_code",
-			      (uintptr_t)_image_text_start,
-			      (uintptr_t)_image_text_size,
-			      MT_CODE | MT_SECURE),
+	MMU_REGION_FLAT_ENTRY("zephyr_code", (uintptr_t)_image_text_start,
+			      (uintptr_t)_image_text_size, MT_CODE | MT_SECURE),
 
 	/* Mark rodata segment cacheable, read only and execute-never */
-	MMU_REGION_FLAT_ENTRY("zephyr_rodata",
-			      (uintptr_t)_image_rodata_start,
+	MMU_REGION_FLAT_ENTRY("zephyr_rodata", (uintptr_t)_image_rodata_start,
 			      (uintptr_t)_image_rodata_size,
 			      MT_RODATA | MT_SECURE),
 
@@ -345,8 +341,7 @@ static const struct arm_mmu_region mmu_zephyr_regions[] = {
 	 * cacheable, read-write
 	 * Note: read-write region is marked execute-ever internally
 	 */
-	MMU_REGION_FLAT_ENTRY("zephyr_data",
-			      (uintptr_t)__kernel_ram_start,
+	MMU_REGION_FLAT_ENTRY("zephyr_data", (uintptr_t)__kernel_ram_start,
 			      (uintptr_t)__kernel_ram_size,
 			      MT_NORMAL | MT_RW | MT_SECURE),
 };
@@ -390,27 +385,27 @@ static void enable_mmu_el1(unsigned int flags)
 
 	/* Set MAIR, TCR and TBBR registers */
 	__asm__ volatile("msr mair_el1, %0"
-			:
-			: "r" (MEMORY_ATTRIBUTES)
-			: "memory", "cc");
+			 :
+			 : "r"(MEMORY_ATTRIBUTES)
+			 : "memory", "cc");
 	__asm__ volatile("msr tcr_el1, %0"
-			:
-			: "r" (get_tcr(1))
-			: "memory", "cc");
+			 :
+			 : "r"(get_tcr(1))
+			 : "memory", "cc");
 	__asm__ volatile("msr ttbr0_el1, %0"
-			:
-			: "r" ((uint64_t)base_xlat_table)
-			: "memory", "cc");
+			 :
+			 : "r"((uint64_t)base_xlat_table)
+			 : "memory", "cc");
 
 	/* Ensure these changes are seen before MMU is enabled */
 	__ISB();
 
 	/* Enable the MMU and data cache */
-	__asm__ volatile("mrs %0, sctlr_el1" : "=r" (val));
+	__asm__ volatile("mrs %0, sctlr_el1" : "=r"(val));
 	__asm__ volatile("msr sctlr_el1, %0"
-			:
-			: "r" (val | SCTLR_M_BIT | SCTLR_C_BIT)
-			: "memory", "cc");
+			 :
+			 : "r"(val | SCTLR_M_BIT | SCTLR_C_BIT)
+			 : "memory", "cc");
 
 	/* Ensure the MMU enable takes effect immediately */
 	__ISB();
@@ -432,18 +427,18 @@ static int arm_mmu_init(const struct device *arg)
 	unsigned int idx, flags = 0;
 
 	/* Current MMU code supports only EL1 */
-	__asm__ volatile("mrs %0, CurrentEL" : "=r" (val));
+	__asm__ volatile("mrs %0, CurrentEL" : "=r"(val));
 
 	__ASSERT(GET_EL(val) == MODE_EL1,
 		 "Exception level not EL1, MMU not enabled!\n");
 
 	/* Ensure that MMU is already not enabled */
-	__asm__ volatile("mrs %0, sctlr_el1" : "=r" (val));
+	__asm__ volatile("mrs %0, sctlr_el1" : "=r"(val));
 	__ASSERT((val & SCTLR_M_BIT) == 0, "MMU is already enabled\n");
 
 	MMU_DEBUG("xlat tables:\n");
 	MMU_DEBUG("base table(L%d): %p, %d entries\n", XLAT_TABLE_BASE_LEVEL,
-			(uint64_t *)base_xlat_table, NUM_BASE_LEVEL_ENTRIES);
+		  (uint64_t *)base_xlat_table, NUM_BASE_LEVEL_ENTRIES);
 	for (idx = 0; idx < CONFIG_MAX_XLAT_TABLES; idx++)
 		MMU_DEBUG("%d: %p\n", idx, (uint64_t *)(xlat_tables + idx));
 

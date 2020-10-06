@@ -18,8 +18,8 @@ struct timer_obj {
 	struct k_timer ztimer;
 	void (*sigev_notify_function)(sigval val);
 	sigval val;
-	struct timespec interval;	/* Reload value */
-	uint32_t reload;			/* Reload value in ms */
+	struct timespec interval; /* Reload value */
+	uint32_t reload; /* Reload value in ms */
 	uint32_t status;
 };
 
@@ -58,7 +58,8 @@ int timer_create(clockid_t clockid, struct sigevent *evp, timer_t *timerid)
 		return -1;
 	}
 
-	if (k_mem_slab_alloc(&posix_timer_slab, (void **)&timer, K_MSEC(100)) == 0) {
+	if (k_mem_slab_alloc(&posix_timer_slab, (void **)&timer, K_MSEC(100)) ==
+	    0) {
 		(void)memset(timer, 0, sizeof(struct timer_obj));
 	} else {
 		errno = ENOMEM;
@@ -92,7 +93,7 @@ int timer_gettime(timer_t timerid, struct itimerspec *its)
 {
 	struct timer_obj *timer = (struct timer_obj *)timerid;
 	int32_t remaining, leftover;
-	int64_t   nsecs, secs;
+	int64_t nsecs, secs;
 
 	if (timer == NULL) {
 		errno = EINVAL;
@@ -101,11 +102,11 @@ int timer_gettime(timer_t timerid, struct itimerspec *its)
 
 	if (timer->status == ACTIVE) {
 		remaining = k_timer_remaining_get(&timer->ztimer);
-		secs =  remaining / MSEC_PER_SEC;
+		secs = remaining / MSEC_PER_SEC;
 		leftover = remaining - (secs * MSEC_PER_SEC);
 		nsecs = (int64_t)leftover * NSEC_PER_MSEC;
-		its->it_value.tv_sec = (int32_t) secs;
-		its->it_value.tv_nsec = (int32_t) nsecs;
+		its->it_value.tv_sec = (int32_t)secs;
+		its->it_value.tv_nsec = (int32_t)nsecs;
 	} else {
 		/* Timer is disarmed */
 		its->it_value.tv_sec = 0;
@@ -125,11 +126,10 @@ int timer_gettime(timer_t timerid, struct itimerspec *its)
 int timer_settime(timer_t timerid, int flags, const struct itimerspec *value,
 		  struct itimerspec *ovalue)
 {
-	struct timer_obj *timer = (struct timer_obj *) timerid;
+	struct timer_obj *timer = (struct timer_obj *)timerid;
 	uint32_t duration, current;
 
-	if (timer == NULL ||
-	    value->it_interval.tv_nsec < 0 ||
+	if (timer == NULL || value->it_interval.tv_nsec < 0 ||
 	    value->it_interval.tv_nsec >= NSEC_PER_SEC ||
 	    value->it_value.tv_nsec < 0 ||
 	    value->it_value.tv_nsec >= NSEC_PER_SEC) {
@@ -185,7 +185,7 @@ int timer_settime(timer_t timerid, int flags, const struct itimerspec *value,
  */
 int timer_delete(timer_t timerid)
 {
-	struct timer_obj *timer = (struct timer_obj *) timerid;
+	struct timer_obj *timer = (struct timer_obj *)timerid;
 
 	if (timer == NULL) {
 		errno = EINVAL;
@@ -197,7 +197,7 @@ int timer_delete(timer_t timerid)
 		k_timer_stop(&timer->ztimer);
 	}
 
-	k_mem_slab_free(&posix_timer_slab, (void *) &timer);
+	k_mem_slab_free(&posix_timer_slab, (void *)&timer);
 
 	return 0;
 }

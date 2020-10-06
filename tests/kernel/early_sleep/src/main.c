@@ -31,14 +31,14 @@
 #include <tc_util.h>
 #include <ztest.h>
 
-#define THREAD_STACK		(384 + CONFIG_TEST_EXTRA_STACKSIZE)
+#define THREAD_STACK (384 + CONFIG_TEST_EXTRA_STACKSIZE)
 
-#define TEST_TICKS_TO_SLEEP	(CONFIG_SYS_CLOCK_TICKS_PER_SEC / 2)
+#define TEST_TICKS_TO_SLEEP (CONFIG_SYS_CLOCK_TICKS_PER_SEC / 2)
 
 /* Helper thread data */
 static K_THREAD_STACK_DEFINE(helper_tstack, THREAD_STACK);
 static struct k_thread helper_tdata;
-static k_tid_t  helper_ttid;
+static k_tid_t helper_ttid;
 
 /* time that the thread was actually sleeping */
 static int actual_sleep_ticks;
@@ -64,7 +64,6 @@ static int ticks_to_sleep(int ticks)
 	return (stop_time - start_time) / k_ticks_to_cyc_floor32(1);
 }
 
-
 static int test_early_sleep_post_kernel(const struct device *unused)
 {
 	ARG_UNUSED(unused);
@@ -72,8 +71,8 @@ static int test_early_sleep_post_kernel(const struct device *unused)
 	return 0;
 }
 
-SYS_INIT(test_early_sleep_post_kernel,
-		POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
+SYS_INIT(test_early_sleep_post_kernel, POST_KERNEL,
+	 CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
 
 static int test_early_sleep_app(const struct device *unused)
 {
@@ -102,33 +101,29 @@ static void test_early_sleep(void)
 	 */
 	k_thread_priority_set(k_current_get(), 0);
 
-	TC_PRINT("msec per tick: %" PRId64 ".%03" PRId64 ", ticks to sleep: %d\n",
-			k_ticks_to_ms_floor64(1000) / 1000U,
-			k_ticks_to_ms_floor64(1000) % 1000,
-			TEST_TICKS_TO_SLEEP);
+	TC_PRINT("msec per tick: %" PRId64 ".%03" PRId64
+		 ", ticks to sleep: %d\n",
+		 k_ticks_to_ms_floor64(1000) / 1000U,
+		 k_ticks_to_ms_floor64(1000) % 1000, TEST_TICKS_TO_SLEEP);
 
 	/* Create a lower priority thread */
-	helper_ttid = k_thread_create(&helper_tdata,
-				   helper_tstack, THREAD_STACK,
-				   helper_thread, NULL, NULL, NULL,
-				   k_thread_priority_get(k_current_get()) + 1,
-				   K_INHERIT_PERMS, K_NO_WAIT);
+	helper_ttid = k_thread_create(
+		&helper_tdata, helper_tstack, THREAD_STACK, helper_thread, NULL,
+		NULL, NULL, k_thread_priority_get(k_current_get()) + 1,
+		K_INHERIT_PERMS, K_NO_WAIT);
 
 	TC_PRINT("k_sleep() ticks at POST_KERNEL level: %d\n",
-					actual_post_kernel_sleep_ticks);
-	zassert_true((actual_post_kernel_sleep_ticks + 1) >
-					TEST_TICKS_TO_SLEEP, NULL);
+		 actual_post_kernel_sleep_ticks);
+	zassert_true((actual_post_kernel_sleep_ticks + 1) > TEST_TICKS_TO_SLEEP,
+		     NULL);
 
 	TC_PRINT("k_sleep() ticks at APPLICATION level: %d\n",
-					actual_app_sleep_ticks);
-	zassert_true((actual_app_sleep_ticks + 1) >
-					TEST_TICKS_TO_SLEEP, NULL);
+		 actual_app_sleep_ticks);
+	zassert_true((actual_app_sleep_ticks + 1) > TEST_TICKS_TO_SLEEP, NULL);
 
 	actual_sleep_ticks = ticks_to_sleep(TEST_TICKS_TO_SLEEP);
-	TC_PRINT("k_sleep() ticks on running system: %d\n",
-					actual_sleep_ticks);
-	zassert_true((actual_sleep_ticks + 1) >
-					TEST_TICKS_TO_SLEEP, NULL);
+	TC_PRINT("k_sleep() ticks on running system: %d\n", actual_sleep_ticks);
+	zassert_true((actual_sleep_ticks + 1) > TEST_TICKS_TO_SLEEP, NULL);
 
 	zassert_false(test_failure, "Lower priority thread not ran!!");
 }
@@ -137,6 +132,6 @@ static void test_early_sleep(void)
 void test_main(void)
 {
 	ztest_test_suite(test_earlysleep,
-			ztest_1cpu_unit_test(test_early_sleep));
+			 ztest_1cpu_unit_test(test_early_sleep));
 	ztest_run_test_suite(test_earlysleep);
 }

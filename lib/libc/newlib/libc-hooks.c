@@ -17,12 +17,12 @@
 #include <init.h>
 #include <sys/sem.h>
 
-#define LIBC_BSS	K_APP_BMEM(z_libc_partition)
-#define LIBC_DATA	K_APP_DMEM(z_libc_partition)
+#define LIBC_BSS K_APP_BMEM(z_libc_partition)
+#define LIBC_DATA K_APP_DMEM(z_libc_partition)
 
 #if CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE
 K_APPMEM_PARTITION_DEFINE(z_malloc_partition);
-#define MALLOC_BSS	K_APP_BMEM(z_malloc_partition)
+#define MALLOC_BSS K_APP_BMEM(z_malloc_partition)
 
 /* Compiler will throw an error if the provided value isn't a power of two */
 MALLOC_BSS static unsigned char __aligned(CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE)
@@ -34,7 +34,7 @@ MALLOC_BSS static unsigned char __aligned(CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE)
  * in the interval from a properly aligned address after the linker symbol
  * `_end`, to the end of SRAM
  */
-#define USED_RAM_END_ADDR   POINTER_TO_UINT(&_end)
+#define USED_RAM_END_ADDR POINTER_TO_UINT(&_end)
 
 #ifdef Z_MALLOC_PARTITION_EXISTS
 /* Need to be able to program a memory protection region from HEAP_BASE
@@ -44,29 +44,29 @@ MALLOC_BSS static unsigned char __aligned(CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE)
  */
 #ifdef CONFIG_MMU
 /* Linker script may already have done this, but just to be safe */
-#define HEAP_BASE	ROUND_UP(USED_RAM_END_ADDR, CONFIG_MMU_PAGE_SIZE)
+#define HEAP_BASE ROUND_UP(USED_RAM_END_ADDR, CONFIG_MMU_PAGE_SIZE)
 #else /* MPU-based systems */
 /* TODO: Need a generic Kconfig for the MPU region granularity */
 #if defined(CONFIG_ARM)
-#define HEAP_BASE	ROUND_UP(USED_RAM_END_ADDR, \
-				 CONFIG_ARM_MPU_REGION_MIN_ALIGN_AND_SIZE)
+#define HEAP_BASE \
+	ROUND_UP(USED_RAM_END_ADDR, CONFIG_ARM_MPU_REGION_MIN_ALIGN_AND_SIZE)
 #elif defined(CONFIG_ARC)
-#define HEAP_BASE	ROUND_UP(USED_RAM_END_ADDR, Z_ARC_MPU_ALIGN)
+#define HEAP_BASE ROUND_UP(USED_RAM_END_ADDR, Z_ARC_MPU_ALIGN)
 #else
 #error "Unsupported platform"
 #endif /* CONFIG_<arch> */
 #endif /* !CONFIG_MMU */
 #else /* !Z_MALLOC_PARTITION_EXISTS */
 /* No partition, heap can just start wherever _end is */
-#define HEAP_BASE	USED_RAM_END_ADDR
+#define HEAP_BASE USED_RAM_END_ADDR
 #endif /* Z_MALLOC_PARTITION_EXISTS */
 
 #ifdef CONFIG_XTENSA
 extern void *_heap_sentry;
-#define MAX_HEAP_SIZE  (POINTER_TO_UINT(&_heap_sentry) - HEAP_BASE)
+#define MAX_HEAP_SIZE (POINTER_TO_UINT(&_heap_sentry) - HEAP_BASE)
 #else
-#define MAX_HEAP_SIZE	(KB(CONFIG_SRAM_SIZE) - \
-			 (HEAP_BASE - CONFIG_SRAM_BASE_ADDRESS))
+#define MAX_HEAP_SIZE \
+	(KB(CONFIG_SRAM_SIZE) - (HEAP_BASE - CONFIG_SRAM_BASE_ADDRESS))
 #endif
 
 #if Z_MALLOC_PARTITION_EXISTS
@@ -90,7 +90,7 @@ LIBC_BSS static unsigned int heap_sz;
 
 static int _stdout_hook_default(int c)
 {
-	(void)(c);  /* Prevent warning about unused argument */
+	(void)(c); /* Prevent warning about unused argument */
 
 	return EOF;
 }
@@ -196,7 +196,7 @@ int _lseek(int file, int ptr, int dir)
 __weak FUNC_ALIAS(_lseek, lseek, int);
 #else
 extern ssize_t write(int file, const char *buffer, size_t count);
-#define _write	write
+#define _write write
 #endif
 
 int _isatty(int file)

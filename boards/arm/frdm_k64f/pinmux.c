@@ -53,13 +53,13 @@ static int frdm_k64f_pinmux_init(const struct device *dev)
 	pinmux_pin_set(portc, 17, PORT_PCR_MUX(kPORT_MuxAlt3));
 #endif
 	/* SW2 / FXOS8700 INT1 */
-	pinmux_pin_set(portc,  6, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portc, 6, PORT_PCR_MUX(kPORT_MuxAsGpio));
 
 	/* FXOS8700 INT2 */
 	pinmux_pin_set(portc, 13, PORT_PCR_MUX(kPORT_MuxAsGpio));
 
 	/* SW3 */
-	pinmux_pin_set(porta,  4, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(porta, 4, PORT_PCR_MUX(kPORT_MuxAsGpio));
 
 	/* Red, green, blue LEDs */
 	pinmux_pin_set(portb, 22, PORT_PCR_MUX(kPORT_MuxAsGpio));
@@ -68,7 +68,7 @@ static int frdm_k64f_pinmux_init(const struct device *dev)
 
 #ifdef CONFIG_MODEM_WNCM14A2A
 	/* WNC-M14A2A Modem POWER_ON */
-	pinmux_pin_set(portb,  9, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portb, 9, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* WNC-M14A2A Shield PMOD_D1 */
 	pinmux_pin_set(portb, 10, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* WNC-M14A2A Shield PMOD_D2 */
@@ -76,11 +76,11 @@ static int frdm_k64f_pinmux_init(const struct device *dev)
 	/* WNC-M14A2A Modem WWAN_STATE */
 	pinmux_pin_set(portb, 23, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* WNC-M14A2A Modem WAKEUP_ENABLE */
-	pinmux_pin_set(portc,  2, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portc, 2, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* WNC-M14A2A Modem HTS221_DRDY */
-	pinmux_pin_set(portc,  3, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portc, 3, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* WNC-M14A2A Shield LEVEL_TRANSFORM_ENABLE */
-	pinmux_pin_set(portc,  4, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portc, 4, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* WNC-M14A2A Modem RESET */
 	pinmux_pin_set(portc, 12, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* WNC-M14A2A Modem BOOT_MODE_SELECT */
@@ -89,32 +89,32 @@ static int frdm_k64f_pinmux_init(const struct device *dev)
 
 #ifdef CONFIG_MODEM_UBLOX_SARA_R4
 	/* Modem RESET */
-	pinmux_pin_set(portc,  2, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portc, 2, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* Modem POWER_ON */
-	pinmux_pin_set(porta,  2, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(porta, 2, PORT_PCR_MUX(kPORT_MuxAsGpio));
 #endif
 
 #ifdef CONFIG_IEEE802154_MCR20A
 	/* FRDM-MCR20A Reset (D5) */
-	pinmux_pin_set(porta,  2, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(porta, 2, PORT_PCR_MUX(kPORT_MuxAsGpio));
 	/* FRDM-MCR20A IRQ_B (D2) */
-	pinmux_pin_set(portb,  9, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portb, 9, PORT_PCR_MUX(kPORT_MuxAsGpio));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(spi0), okay) && CONFIG_SPI
 	/* SPI0 CS0, SCK, SOUT, SIN */
-	pinmux_pin_set(portd,  0, PORT_PCR_MUX(kPORT_MuxAlt2));
-	pinmux_pin_set(portd,  1, PORT_PCR_MUX(kPORT_MuxAlt2));
-	pinmux_pin_set(portd,  2, PORT_PCR_MUX(kPORT_MuxAlt2));
-	pinmux_pin_set(portd,  3, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portd, 0, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portd, 1, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portd, 2, PORT_PCR_MUX(kPORT_MuxAlt2));
+	pinmux_pin_set(portd, 3, PORT_PCR_MUX(kPORT_MuxAlt2));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(i2c0), okay) && CONFIG_I2C
 	/* I2C0 SCL, SDA */
-	pinmux_pin_set(porte, 24, PORT_PCR_MUX(kPORT_MuxAlt5)
-					| PORT_PCR_ODE_MASK);
-	pinmux_pin_set(porte, 25, PORT_PCR_MUX(kPORT_MuxAlt5)
-					| PORT_PCR_ODE_MASK);
+	pinmux_pin_set(porte, 24,
+		       PORT_PCR_MUX(kPORT_MuxAlt5) | PORT_PCR_ODE_MASK);
+	pinmux_pin_set(porte, 25,
+		       PORT_PCR_MUX(kPORT_MuxAlt5) | PORT_PCR_ODE_MASK);
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(adc1), okay) && CONFIG_ADC
@@ -122,13 +122,15 @@ static int frdm_k64f_pinmux_init(const struct device *dev)
 	pinmux_pin_set(portb, 10, PORT_PCR_MUX(kPORT_PinDisabledOrAnalog));
 #endif
 
-#if DT_NODE_HAS_COMPAT_STATUS(DT_NODELABEL(ftm3), nxp_kinetis_ftm_pwm, okay) && CONFIG_PWM
-	pinmux_pin_set(portc,  8, PORT_PCR_MUX(kPORT_MuxAlt3));
-	pinmux_pin_set(portc,  9, PORT_PCR_MUX(kPORT_MuxAlt3));
+#if DT_NODE_HAS_COMPAT_STATUS(DT_NODELABEL(ftm3), nxp_kinetis_ftm_pwm, \
+			      okay) &&                                 \
+	CONFIG_PWM
+	pinmux_pin_set(portc, 8, PORT_PCR_MUX(kPORT_MuxAlt3));
+	pinmux_pin_set(portc, 9, PORT_PCR_MUX(kPORT_MuxAlt3));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(enet), okay) && CONFIG_NET_L2_ETHERNET
-	pinmux_pin_set(porta,  5, PORT_PCR_MUX(kPORT_MuxAlt4));
+	pinmux_pin_set(porta, 5, PORT_PCR_MUX(kPORT_MuxAlt4));
 	pinmux_pin_set(porta, 12, PORT_PCR_MUX(kPORT_MuxAlt4));
 	pinmux_pin_set(porta, 13, PORT_PCR_MUX(kPORT_MuxAlt4));
 	pinmux_pin_set(porta, 14, PORT_PCR_MUX(kPORT_MuxAlt4));
@@ -137,10 +139,11 @@ static int frdm_k64f_pinmux_init(const struct device *dev)
 	pinmux_pin_set(porta, 17, PORT_PCR_MUX(kPORT_MuxAlt4));
 	pinmux_pin_set(porta, 28, PORT_PCR_MUX(kPORT_MuxAlt4));
 
-	pinmux_pin_set(portb,  0, PORT_PCR_MUX(kPORT_MuxAlt4)
-		| PORT_PCR_ODE_MASK | PORT_PCR_PE_MASK | PORT_PCR_PS_MASK);
+	pinmux_pin_set(portb, 0,
+		       PORT_PCR_MUX(kPORT_MuxAlt4) | PORT_PCR_ODE_MASK |
+			       PORT_PCR_PE_MASK | PORT_PCR_PS_MASK);
 
-	pinmux_pin_set(portb,  1, PORT_PCR_MUX(kPORT_MuxAlt4));
+	pinmux_pin_set(portb, 1, PORT_PCR_MUX(kPORT_MuxAlt4));
 
 	pinmux_pin_set(portc, 16, PORT_PCR_MUX(kPORT_MuxAlt4));
 	pinmux_pin_set(portc, 17, PORT_PCR_MUX(kPORT_MuxAlt4));
@@ -151,15 +154,16 @@ static int frdm_k64f_pinmux_init(const struct device *dev)
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(flexcan0), okay) && CONFIG_CAN
 	/* FlexCAN0 RX, TX */
 	pinmux_pin_set(portb, 18, PORT_PCR_MUX(kPORT_MuxAlt2));
-	pinmux_pin_set(portb, 19, PORT_PCR_MUX(kPORT_MuxAlt2) |
-		       PORT_PCR_PE_MASK | PORT_PCR_PS_MASK);
+	pinmux_pin_set(portb, 19,
+		       PORT_PCR_MUX(kPORT_MuxAlt2) | PORT_PCR_PE_MASK |
+			       PORT_PCR_PS_MASK);
 #endif
 
 #if CONFIG_SHIELD_ADAFRUIT_WINC1500
 	/* IRQ, ENable, RST */
-	pinmux_pin_set(portc,  3, PORT_PCR_MUX(kPORT_MuxAsGpio));
-	pinmux_pin_set(portc,  2, PORT_PCR_MUX(kPORT_MuxAsGpio));
-	pinmux_pin_set(porta,  2, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portc, 3, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(portc, 2, PORT_PCR_MUX(kPORT_MuxAsGpio));
+	pinmux_pin_set(porta, 2, PORT_PCR_MUX(kPORT_MuxAsGpio));
 #endif
 
 	return 0;

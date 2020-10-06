@@ -111,8 +111,8 @@ size_t stream_flash_bytes_written(struct stream_flash_ctx *ctx);
  *
  * @return non-negative on success, negative errno code on fail
  */
-int stream_flash_buffered_write(struct stream_flash_ctx *ctx, const uint8_t *data,
-				size_t len, bool flush);
+int stream_flash_buffered_write(struct stream_flash_ctx *ctx,
+				const uint8_t *data, size_t len, bool flush);
 
 /**
  * @brief Erase the flash page to which a given offset belongs.

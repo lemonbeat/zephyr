@@ -19,7 +19,7 @@
 static void canopen_sync_thread(void *p1, void *p2, void *p3)
 {
 	uint32_t start; /* cycles */
-	uint32_t stop;  /* cycles */
+	uint32_t stop; /* cycles */
 	uint32_t delta; /* cycles */
 	uint32_t elapsed = 0; /* microseconds */
 	bool sync;

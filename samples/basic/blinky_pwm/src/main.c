@@ -14,21 +14,21 @@
 #include <device.h>
 #include <drivers/pwm.h>
 
-#define PWM_LED0_NODE	DT_ALIAS(pwm_led0)
+#define PWM_LED0_NODE DT_ALIAS(pwm_led0)
 
 #if DT_NODE_HAS_STATUS(PWM_LED0_NODE, okay)
-#define PWM_LABEL	DT_PWMS_LABEL(PWM_LED0_NODE)
-#define PWM_CHANNEL	DT_PWMS_CHANNEL(PWM_LED0_NODE)
-#define PWM_FLAGS	DT_PWMS_FLAGS(PWM_LED0_NODE)
+#define PWM_LABEL DT_PWMS_LABEL(PWM_LED0_NODE)
+#define PWM_CHANNEL DT_PWMS_CHANNEL(PWM_LED0_NODE)
+#define PWM_FLAGS DT_PWMS_FLAGS(PWM_LED0_NODE)
 #else
 #error "Unsupported board: pwm-led0 devicetree alias is not defined"
-#define PWM_LABEL	""
-#define PWM_CHANNEL	0
-#define PWM_FLAGS	0
+#define PWM_LABEL ""
+#define PWM_CHANNEL 0
+#define PWM_FLAGS 0
 #endif
 
-#define MIN_PERIOD_USEC	(USEC_PER_SEC / 64U)
-#define MAX_PERIOD_USEC	USEC_PER_SEC
+#define MIN_PERIOD_USEC (USEC_PER_SEC / 64U)
+#define MAX_PERIOD_USEC USEC_PER_SEC
 
 void main(void)
 {
@@ -53,11 +53,11 @@ void main(void)
 	 * Keep its value at least MIN_PERIOD_USEC * 4 to make sure
 	 * the sample changes frequency at least once.
 	 */
-	printk("Calibrating for device %s channel %d...\n",
-	       PWM_LABEL, PWM_CHANNEL);
+	printk("Calibrating for device %s channel %d...\n", PWM_LABEL,
+	       PWM_CHANNEL);
 	max_period = MAX_PERIOD_USEC;
-	while (pwm_pin_set_usec(pwm, PWM_CHANNEL,
-				max_period, max_period / 2U, PWM_FLAGS)) {
+	while (pwm_pin_set_usec(pwm, PWM_CHANNEL, max_period, max_period / 2U,
+				PWM_FLAGS)) {
 		max_period /= 2U;
 		if (max_period < (4U * MIN_PERIOD_USEC)) {
 			printk("Error: PWM device %s "
@@ -72,8 +72,8 @@ void main(void)
 
 	period = max_period;
 	while (1) {
-		ret = pwm_pin_set_usec(pwm, PWM_CHANNEL,
-				       period, period / 2U, PWM_FLAGS);
+		ret = pwm_pin_set_usec(pwm, PWM_CHANNEL, period, period / 2U,
+				       PWM_FLAGS);
 		if (ret) {
 			printk("Error %d: failed to set pulse width\n", ret);
 			return;

@@ -13,12 +13,12 @@
 
 #include "unary_f64.pat"
 
-#define SNR_ERROR_THRESH_INV	((float32_t)120)
-#define REL_ERROR_THRESH_INV	(1.0e-6)
-#define ABS_ERROR_THRESH_INV	(1.0e-5)
+#define SNR_ERROR_THRESH_INV ((float32_t)120)
+#define REL_ERROR_THRESH_INV (1.0e-6)
+#define ABS_ERROR_THRESH_INV (1.0e-5)
 
-#define NUM_MATRICES_INV	ARRAY_SIZE(in_inv_dims)
-#define MAX_MATRIX_DIM		(40)
+#define NUM_MATRICES_INV ARRAY_SIZE(in_inv_dims)
+#define MAX_MATRIX_DIM (40)
 
 static void test_arm_mat_inverse_f64(void)
 {
@@ -60,7 +60,7 @@ static void test_arm_mat_inverse_f64(void)
 		status = arm_mat_inverse_f64(&mat_in1, &mat_out);
 
 		zassert_equal(status, ARM_MATH_SUCCESS,
-			ASSERT_MSG_INCORRECT_COMP_RESULT);
+			      ASSERT_MSG_INCORRECT_COMP_RESULT);
 
 		/* Increment pointers */
 		input += (rows * columns);
@@ -68,15 +68,14 @@ static void test_arm_mat_inverse_f64(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f64(length, output, (float64_t *)ref_inv,
-			SNR_ERROR_THRESH_INV),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f64(length, output, (float64_t *)ref_inv,
+					SNR_ERROR_THRESH_INV),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f64(length, output, (float64_t *)ref_inv,
-			ABS_ERROR_THRESH_INV, REL_ERROR_THRESH_INV),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f64(length, output, (float64_t *)ref_inv,
+					  ABS_ERROR_THRESH_INV,
+					  REL_ERROR_THRESH_INV),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -86,8 +85,7 @@ static void test_arm_mat_inverse_f64(void)
 void test_matrix_unary_f64(void)
 {
 	ztest_test_suite(matrix_unary_f64,
-		ztest_unit_test(test_arm_mat_inverse_f64)
-		);
+			 ztest_unit_test(test_arm_mat_inverse_f64));
 
 	ztest_run_test_suite(matrix_unary_f64);
 }

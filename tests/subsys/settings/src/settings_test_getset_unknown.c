@@ -29,14 +29,12 @@ void test_config_getset_unknown(void)
 	strcpy(name, "myfoo/bar");
 	rc = settings_runtime_set(name, "tmp", 4);
 	zassert_true(rc == -ENOENT, "unexpected failure retval\n");
-	zassert_true(test_set_called == 1,
-		     "the GET handler wasn't called");
+	zassert_true(test_set_called == 1, "the GET handler wasn't called");
 	ctest_clear_call_state();
 
 	strcpy(name, "myfoo/bar");
 	rc = settings_runtime_get(name, tmp, sizeof(tmp));
 	zassert_true(rc == -ENOENT, "value should been unreachable\n");
-	zassert_true(test_get_called == 1,
-		     "the SET handler wasn't called");
+	zassert_true(test_get_called == 1, "the SET handler wasn't called");
 	ctest_clear_call_state();
 }

@@ -62,7 +62,9 @@ void test_rbtree_container(void)
 
 	RB_FOR_EACH(&test_tree_l, foreach_node) {
 		zassert_true(CONTAINER_OF(foreach_node, struct container_node,
-		node)->value == count, "RB_FOR_EACH failed");
+					  node)
+					     ->value == count,
+			     "RB_FOR_EACH failed");
 		count++;
 	}
 
@@ -70,7 +72,7 @@ void test_rbtree_container(void)
 
 	RB_FOR_EACH_CONTAINER(&test_tree_l, c_foreach_node, node) {
 		zassert_true(c_foreach_node->value == count,
-		"RB_FOR_EACH_CONTAINER failed");
+			     "RB_FOR_EACH_CONTAINER failed");
 		count++;
 	}
 }
@@ -85,8 +87,8 @@ void init_tree(struct rbtree *tree, int size)
 	}
 }
 
-int search_height_recurse(struct rbnode *node, struct rbnode
-			*final_node, uint32_t current_height)
+int search_height_recurse(struct rbnode *node, struct rbnode *final_node,
+			  uint32_t current_height)
 {
 	if (node == NULL) {
 		return -1;
@@ -97,8 +99,8 @@ int search_height_recurse(struct rbnode *node, struct rbnode
 	}
 
 	current_height++;
-	struct rbnode *ch = z_rb_child(node,
-			!tree.lessthan_fn(final_node, node));
+	struct rbnode *ch =
+		z_rb_child(node, !tree.lessthan_fn(final_node, node));
 
 	return search_height_recurse(ch, final_node, current_height);
 }
@@ -143,15 +145,13 @@ void test_rbtree_perf(void)
 	 * verify that searching times is less than 2logN
 	 * using the height of this node.
 	 */
-	test = &nodes[TREE_SIZE/2];
+	test = &nodes[TREE_SIZE / 2];
 	verify_rbtree_perf(root, test);
 }
 
 void test_main(void)
 {
-	ztest_test_suite(rbtree,
-			 ztest_unit_test(test_rbtree_container),
-			 ztest_unit_test(test_rbtree_perf)
-			 );
+	ztest_test_suite(rbtree, ztest_unit_test(test_rbtree_container),
+			 ztest_unit_test(test_rbtree_perf));
 	ztest_run_test_suite(rbtree);
 }

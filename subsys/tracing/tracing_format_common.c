@@ -30,7 +30,7 @@ static int str_put(int c, void *ctx)
 
 bool tracing_format_string_put(const char *str, va_list args)
 {
-	tracing_ctx_t str_ctx = {0};
+	tracing_ctx_t str_ctx = { 0 };
 
 #if !defined(CONFIG_NEWLIB_LIBC) && !defined(CONFIG_ARCH_POSIX)
 	(void)z_prf(str_put, (void *)&str_ctx, (char *)str, args);
@@ -64,8 +64,7 @@ bool tracing_format_data_put(tracing_data_t *tracing_data_array, uint32_t count)
 	uint32_t total_size = 0U;
 
 	for (uint32_t i = 0; i < count; i++) {
-		tracing_data_t *tracing_data =
-				tracing_data_array + i;
+		tracing_data_t *tracing_data = tracing_data_array + i;
 		uint8_t *data = tracing_data->data, *buf;
 		uint32_t length = tracing_data->length, claimed_size;
 

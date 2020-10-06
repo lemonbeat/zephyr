@@ -32,10 +32,10 @@ enum bt_hfp_hf_at_cmd {
 /*
  * Command complete types for the application
  */
-#define HFP_HF_CMD_OK             0
-#define HFP_HF_CMD_ERROR          1
-#define HFP_HF_CMD_CME_ERROR      2
-#define HFP_HF_CMD_UNKNOWN_ERROR  4
+#define HFP_HF_CMD_OK 0
+#define HFP_HF_CMD_ERROR 1
+#define HFP_HF_CMD_CME_ERROR 2
+#define HFP_HF_CMD_UNKNOWN_ERROR 4
 
 /** @brief HFP HF Command completion field */
 struct bt_hfp_hf_cmd_complete {
@@ -136,7 +136,7 @@ struct bt_hfp_hf_cb {
 	 *  @param cmd structure contains status of the command including cme.
 	 */
 	void (*cmd_complete_cb)(struct bt_conn *conn,
-			      struct bt_hfp_hf_cmd_complete *cmd);
+				struct bt_hfp_hf_cmd_complete *cmd);
 };
 
 /** @brief Register HFP HF profile

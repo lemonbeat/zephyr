@@ -45,12 +45,12 @@ int z_net_config_ieee802154_setup(void)
 		return -EINVAL;
 	}
 
-	if (net_mgmt(NET_REQUEST_IEEE802154_SET_PAN_ID,
-		     iface, &pan_id, sizeof(uint16_t)) ||
-	    net_mgmt(NET_REQUEST_IEEE802154_SET_CHANNEL,
-		     iface, &channel, sizeof(uint16_t)) ||
-	    net_mgmt(NET_REQUEST_IEEE802154_SET_TX_POWER,
-		     iface, &tx_power, sizeof(int16_t))) {
+	if (net_mgmt(NET_REQUEST_IEEE802154_SET_PAN_ID, iface, &pan_id,
+		     sizeof(uint16_t)) ||
+	    net_mgmt(NET_REQUEST_IEEE802154_SET_CHANNEL, iface, &channel,
+		     sizeof(uint16_t)) ||
+	    net_mgmt(NET_REQUEST_IEEE802154_SET_TX_POWER, iface, &tx_power,
+		     sizeof(int16_t))) {
 		return -EINVAL;
 	}
 

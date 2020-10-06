@@ -138,7 +138,7 @@ void ull_sched_after_mstr_slot_get(uint8_t user_id, uint32_t ticks_slot_abs,
 	if (ticker_id_prev != 0xff) {
 		*us_offset = HAL_TICKER_TICKS_TO_US(ticks_to_expire_prev +
 						    ticks_slot_abs_prev) +
-						    (EVENT_JITTER_US << 3);
+			     (EVENT_JITTER_US << 3);
 	}
 }
 
@@ -213,7 +213,9 @@ void ull_sched_mfy_win_offset_select(void *param)
 {
 #define OFFSET_S_MAX 6
 #define OFFSET_M_MAX 6
-	uint16_t win_offset_m[OFFSET_M_MAX] = {0, };
+	uint16_t win_offset_m[OFFSET_M_MAX] = {
+		0,
+	};
 	uint8_t offset_m_max = OFFSET_M_MAX;
 	struct ll_conn *conn = param;
 	uint8_t offset_index_s = 0U;
@@ -221,8 +223,8 @@ void ull_sched_mfy_win_offset_select(void *param)
 	uint32_t ticks_to_offset;
 	uint16_t win_offset_s;
 
-	ticks_to_offset = HAL_TICKER_US_TO_TICKS(conn->llcp_conn_param.offset0 *
-						 1250);
+	ticks_to_offset =
+		HAL_TICKER_US_TO_TICKS(conn->llcp_conn_param.offset0 * 1250);
 
 	win_offset_calc(conn, 1, &ticks_to_offset,
 			conn->llcp_conn_param.interval_max, &offset_m_max,
@@ -276,10 +278,10 @@ void ull_sched_mfy_win_offset_select(void *param)
 		ull_conn_upd_curr_reset();
 
 		/* send reject_ind_ext */
-		pdu_ctrl_tx = (void *)
-			((uint8_t *)conn->llcp.conn_upd.pdu_win_offset -
-			 offsetof(struct pdu_data,
-				  llctrl.conn_update_ind.win_offset));
+		pdu_ctrl_tx =
+			(void *)((uint8_t *)conn->llcp.conn_upd.pdu_win_offset -
+				 offsetof(struct pdu_data,
+					  llctrl.conn_update_ind.win_offset));
 		pdu_ctrl_tx->ll_id = PDU_DATA_LLID_CTRL;
 		pdu_ctrl_tx->len =
 			offsetof(struct pdu_data_llctrl, reject_ext_ind) +
@@ -351,10 +353,9 @@ static void win_offset_calc(struct ll_conn *conn_curr, uint8_t is_select,
 
 		ret_cb = TICKER_STATUS_BUSY;
 		ret = ticker_next_slot_get(TICKER_INSTANCE_ID_CTLR,
-					   TICKER_USER_ID_ULL_LOW,
-					   &ticker_id, &ticks_anchor,
-					   &ticks_to_expire, ticker_op_cb,
-					   (void *)&ret_cb);
+					   TICKER_USER_ID_ULL_LOW, &ticker_id,
+					   &ticks_anchor, &ticks_to_expire,
+					   ticker_op_cb, (void *)&ret_cb);
 		if (ret == TICKER_STATUS_BUSY) {
 			while (ret_cb == TICKER_STATUS_BUSY) {
 				ticker_job_sched(TICKER_INSTANCE_ID_CTLR,
@@ -452,13 +453,14 @@ static void win_offset_calc(struct ll_conn *conn_curr, uint8_t is_select,
 
 				while ((offset_index < *offset_max) &&
 				       (ticker_ticks_diff_get(
-							ticks_to_expire_normal,
-							ticks_to_expire_prev) >=
+						ticks_to_expire_normal,
+						ticks_to_expire_prev) >=
 					(ticks_slot_abs_prev + ticks_slot_abs +
 					 ticks_slot_margin))) {
 					offset = HAL_TICKER_TICKS_TO_US(
-						ticks_to_expire_prev +
-						ticks_slot_abs_prev) / 1250;
+							 ticks_to_expire_prev +
+							 ticks_slot_abs_prev) /
+						 1250;
 					if (offset >= conn_interval) {
 						ticks_to_expire_prev = 0U;
 
@@ -532,13 +534,11 @@ static void after_mstr_offset_get(uint16_t conn_interval, uint32_t ticks_slot,
 	}
 
 	if ((ticks_anchor_offset - ticks_anchor) & BIT(HAL_TICKER_CNTR_MSBIT)) {
-		*win_offset_us -= HAL_TICKER_TICKS_TO_US(
-			ticker_ticks_diff_get(ticks_anchor,
-					      ticks_anchor_offset));
+		*win_offset_us -= HAL_TICKER_TICKS_TO_US(ticker_ticks_diff_get(
+			ticks_anchor, ticks_anchor_offset));
 	} else {
-		*win_offset_us += HAL_TICKER_TICKS_TO_US(
-			ticker_ticks_diff_get(ticks_anchor_offset,
-					      ticks_anchor));
+		*win_offset_us += HAL_TICKER_TICKS_TO_US(ticker_ticks_diff_get(
+			ticks_anchor_offset, ticks_anchor));
 	}
 
 	if ((*win_offset_us & BIT(31)) == 0) {

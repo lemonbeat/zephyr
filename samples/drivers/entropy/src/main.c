@@ -20,12 +20,11 @@ void main(void)
 		return;
 	}
 
-	printf("entropy device is %p, name is %s\n",
-	       dev, dev->name);
+	printf("entropy device is %p, name is %s\n", dev, dev->name);
 
 	while (1) {
 #define BUFFER_LENGTH 10
-		uint8_t buffer[BUFFER_LENGTH] = {0};
+		uint8_t buffer[BUFFER_LENGTH] = { 0 };
 		int r;
 
 		/* The BUFFER_LENGTH-1 is used so the driver will not
@@ -34,17 +33,17 @@ void main(void)
 		 * outside the passed buffer, and that should never
 		 * happen.
 		 */
-		r = entropy_get_entropy(dev, buffer, BUFFER_LENGTH-1);
+		r = entropy_get_entropy(dev, buffer, BUFFER_LENGTH - 1);
 		if (r) {
 			printf("entropy_get_entropy failed: %d\n", r);
 			break;
 		}
 
-		if (buffer[BUFFER_LENGTH-1] != 0U) {
+		if (buffer[BUFFER_LENGTH - 1] != 0U) {
 			printf("entropy_get_entropy buffer overflow\n");
 		}
 
-		for (int i = 0; i < BUFFER_LENGTH-1; i++) {
+		for (int i = 0; i < BUFFER_LENGTH - 1; i++) {
 			printf("  0x%02x", buffer[i]);
 		}
 

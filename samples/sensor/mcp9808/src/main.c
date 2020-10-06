@@ -31,8 +31,7 @@ static const char *now_str(void)
 	now /= 60U;
 	h = now;
 
-	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u",
-		 h, min, s, ms);
+	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u", h, min, s, ms);
 	return buf;
 }
 
@@ -40,8 +39,7 @@ static const char *now_str(void)
 
 static struct sensor_trigger trig;
 
-static int set_window(const struct device *dev,
-		      const struct sensor_value *temp)
+static int set_window(const struct device *dev, const struct sensor_value *temp)
 {
 	const int temp_ucel = temp->val1 * UCEL_PER_CEL + temp->val2;
 	const int low_ucel = temp_ucel - TEMP_WINDOW_HALF_UCEL;
@@ -61,15 +59,13 @@ static int set_window(const struct device *dev,
 
 	if (rc == 0) {
 		printf("Alert on temp outside [%d, %d] milli-Celsius\n",
-		       low_ucel / UCEL_PER_MCEL,
-		       high_ucel / UCEL_PER_MCEL);
+		       low_ucel / UCEL_PER_MCEL, high_ucel / UCEL_PER_MCEL);
 	}
 
 	return rc;
 }
 
-static inline int set_window_ucel(const struct device *dev,
-				  int temp_ucel)
+static inline int set_window_ucel(const struct device *dev, int temp_ucel)
 {
 	struct sensor_value val = {
 		.val1 = temp_ucel / UCEL_PER_CEL,
@@ -136,8 +132,7 @@ void main(void)
 			break;
 		}
 
-		printf("%s: %g C\n", now_str(),
-		       sensor_value_to_double(&temp));
+		printf("%s: %g C\n", now_str(), sensor_value_to_double(&temp));
 
 		k_sleep(K_SECONDS(2));
 	}

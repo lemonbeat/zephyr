@@ -29,7 +29,7 @@ extern int pwm_pca9685_init(const struct device *dev);
 /** Configuration data */
 struct pwm_pca9685_config {
 	/** The master I2C device's name */
-	const char * const i2c_master_dev_name;
+	const char *const i2c_master_dev_name;
 
 	/** The slave address of the chip */
 	uint16_t i2c_slave_addr;

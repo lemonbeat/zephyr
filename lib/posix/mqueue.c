@@ -22,7 +22,7 @@ typedef struct mqueue_object {
 typedef struct mqueue_desc {
 	char *mem_desc;
 	mqueue_object *mqueue;
-	uint32_t  flags;
+	uint32_t flags;
 } mqueue_desc;
 
 K_SEM_DEFINE(mq_sem, 1, 1);
@@ -32,8 +32,8 @@ sys_slist_t mq_list = SYS_SLIST_STATIC_INIT(&mq_list);
 
 int64_t timespec_to_timeoutms(const struct timespec *abstime);
 static mqueue_object *find_in_list(const char *name);
-static int32_t send_message(mqueue_desc *mqd, const char *msg_ptr, size_t msg_len,
-			  k_timeout_t timeout);
+static int32_t send_message(mqueue_desc *mqd, const char *msg_ptr,
+			    size_t msg_len, k_timeout_t timeout);
 static int receive_message(mqueue_desc *mqd, char *msg_ptr, size_t msg_len,
 			   k_timeout_t timeout);
 static void remove_mq(mqueue_object *msg_queue);
@@ -59,7 +59,7 @@ mqd_t mq_open(const char *name, int oflags, ...)
 	va_start(va, oflags);
 	if ((oflags & O_CREAT) != 0) {
 		mode = va_arg(va, mode_t);
-		attrs = va_arg(va, mq_attr*);
+		attrs = va_arg(va, mq_attr *);
 	}
 	va_end(va);
 
@@ -68,13 +68,13 @@ mqd_t mq_open(const char *name, int oflags, ...)
 		max_msgs = attrs->mq_maxmsg;
 	}
 
-	if ((name == NULL) || ((oflags & O_CREAT) != 0 && (msg_size <= 0 ||
-						      max_msgs <= 0))) {
+	if ((name == NULL) ||
+	    ((oflags & O_CREAT) != 0 && (msg_size <= 0 || max_msgs <= 0))) {
 		errno = EINVAL;
 		return (mqd_t)mqd;
 	}
 
-	if ((strlen(name) + 1)  > CONFIG_MQUEUE_NAMELEN_MAX) {
+	if ((strlen(name) + 1) > CONFIG_MQUEUE_NAMELEN_MAX) {
 		errno = ENAMETOOLONG;
 		return (mqd_t)mqd;
 	}
@@ -105,10 +105,8 @@ mqd_t mq_open(const char *name, int oflags, ...)
 		goto free_mq_desc;
 	}
 
-
 	/* Allocate mqueue object for new message queue */
 	if (msg_queue == NULL) {
-
 		/* Check for message quantity and size in message queue */
 		if (attrs->mq_msgsize > CONFIG_MSG_SIZE_MAX &&
 		    attrs->mq_maxmsg > CONFIG_MSG_COUNT_MAX) {
@@ -248,7 +246,7 @@ int mq_timedsend(mqd_t mqdes, const char *msg_ptr, size_t msg_len,
 		 unsigned int msg_prio, const struct timespec *abstime)
 {
 	mqueue_desc *mqd = (mqueue_desc *)mqdes;
-	int32_t timeout = (int32_t) timespec_to_timeoutms(abstime);
+	int32_t timeout = (int32_t)timespec_to_timeoutms(abstime);
 
 	return send_message(mqd, msg_ptr, msg_len, K_MSEC(timeout));
 }
@@ -261,7 +259,7 @@ int mq_timedsend(mqd_t mqdes, const char *msg_ptr, size_t msg_len,
  * See IEEE 1003.1
  */
 int mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len,
-		   unsigned int *msg_prio)
+	       unsigned int *msg_prio)
 {
 	mqueue_desc *mqd = (mqueue_desc *)mqdes;
 
@@ -276,10 +274,10 @@ int mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len,
  * See IEEE 1003.1
  */
 int mq_timedreceive(mqd_t mqdes, char *msg_ptr, size_t msg_len,
-			unsigned int *msg_prio, const struct timespec *abstime)
+		    unsigned int *msg_prio, const struct timespec *abstime)
 {
 	mqueue_desc *mqd = (mqueue_desc *)mqdes;
-	int32_t timeout = (int32_t) timespec_to_timeoutms(abstime);
+	int32_t timeout = (int32_t)timespec_to_timeoutms(abstime);
 
 	return receive_message(mqd, msg_ptr, msg_len, K_MSEC(timeout));
 }
@@ -360,8 +358,8 @@ static mqueue_object *find_in_list(const char *name)
 	return NULL;
 }
 
-static int32_t send_message(mqueue_desc *mqd, const char *msg_ptr, size_t msg_len,
-			  k_timeout_t timeout)
+static int32_t send_message(mqueue_desc *mqd, const char *msg_ptr,
+			    size_t msg_len, k_timeout_t timeout)
 {
 	int32_t ret = -1;
 
@@ -374,7 +372,7 @@ static int32_t send_message(mqueue_desc *mqd, const char *msg_ptr, size_t msg_le
 		timeout = K_NO_WAIT;
 	}
 
-	if (msg_len >  mqd->mqueue->queue.msg_size) {
+	if (msg_len > mqd->mqueue->queue.msg_size) {
 		errno = EMSGSIZE;
 		return ret;
 	}
@@ -388,7 +386,7 @@ static int32_t send_message(mqueue_desc *mqd, const char *msg_ptr, size_t msg_le
 }
 
 static int32_t receive_message(mqueue_desc *mqd, char *msg_ptr, size_t msg_len,
-			     k_timeout_t timeout)
+			       k_timeout_t timeout)
 {
 	int ret = -1;
 
@@ -419,7 +417,7 @@ static void remove_mq(mqueue_object *msg_queue)
 {
 	if (atomic_cas(&msg_queue->ref_count, 0, 0)) {
 		k_sem_take(&mq_sem, K_FOREVER);
-		sys_slist_find_and_remove(&mq_list, (sys_snode_t *) msg_queue);
+		sys_slist_find_and_remove(&mq_list, (sys_snode_t *)msg_queue);
 		k_sem_give(&mq_sem);
 
 		/* Free mq buffer and pbject */

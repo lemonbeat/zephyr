@@ -16,9 +16,9 @@
 extern "C" {
 #endif
 
-#define EFD_IN_USE    0x1
+#define EFD_IN_USE 0x1
 #define EFD_SEMAPHORE 0x2
-#define EFD_NONBLOCK  O_NONBLOCK
+#define EFD_NONBLOCK O_NONBLOCK
 #define EFD_FLAGS_SET (EFD_SEMAPHORE | EFD_NONBLOCK)
 
 typedef uint64_t eventfd_t;

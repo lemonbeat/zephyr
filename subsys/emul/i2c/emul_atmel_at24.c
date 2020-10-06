@@ -77,7 +77,7 @@ static int at24_emul_transfer(struct i2c_emul *emul, struct i2c_msg *msgs,
 
 	/* For testing purposes, fail if the bus speed is above standard */
 	too_fast = (I2C_SPEED_GET(i2c_emul_get_config(data->i2c)) >
-		 I2C_SPEED_STANDARD);
+		    I2C_SPEED_STANDARD);
 	if (too_fast) {
 		LOG_ERR("Speed too high");
 		return -EIO;
@@ -157,17 +157,17 @@ static int emul_atmel_at24_init(const struct emul *emul,
 	return rc;
 }
 
-#define EEPROM_AT24_EMUL(n) \
+#define EEPROM_AT24_EMUL(n)                                      \
 	static uint8_t at24_emul_buf_##n[DT_INST_PROP(n, size)]; \
-	static struct at24_emul_data at24_emul_data_##n; \
-	static const struct at24_emul_cfg at24_emul_cfg_##n = { \
-		.i2c_label = DT_INST_BUS_LABEL(n), \
-		.data = &at24_emul_data_##n, \
-		.buf = at24_emul_buf_##n, \
-		.size = DT_INST_PROP(n, size), \
-		.addr = DT_INST_REG_ADDR(n), \
-		.addr_width = 8, \
-	}; \
+	static struct at24_emul_data at24_emul_data_##n;         \
+	static const struct at24_emul_cfg at24_emul_cfg_##n = {  \
+		.i2c_label = DT_INST_BUS_LABEL(n),               \
+		.data = &at24_emul_data_##n,                     \
+		.buf = at24_emul_buf_##n,                        \
+		.size = DT_INST_PROP(n, size),                   \
+		.addr = DT_INST_REG_ADDR(n),                     \
+		.addr_width = 8,                                 \
+	};                                                       \
 	EMUL_DEFINE(emul_atmel_at24_init, DT_DRV_INST(n), &at24_emul_cfg_##n)
 
 DT_INST_FOREACH_STATUS_OKAY(EEPROM_AT24_EMUL)

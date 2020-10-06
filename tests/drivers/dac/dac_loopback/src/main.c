@@ -18,7 +18,6 @@ extern void test_dac_loopback(void);
 
 void test_main(void)
 {
-	ztest_test_suite(dac_loopback_test,
-			 ztest_unit_test(test_dac_loopback));
+	ztest_test_suite(dac_loopback_test, ztest_unit_test(test_dac_loopback));
 	ztest_run_test_suite(dac_loopback_test);
 }

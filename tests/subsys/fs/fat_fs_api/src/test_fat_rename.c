@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
-
 #include "test_fat.h"
 
 static int delete_it(const char *path, int quiet)
@@ -50,11 +48,10 @@ static int create_dir(const char *path)
 	return res;
 }
 
-
 static int test_rename_dir(void)
 {
-	const char *dn = FATFS_MNTP"/td";
-	const char *ndn = FATFS_MNTP"/ntd";
+	const char *dn = FATFS_MNTP "/td";
+	const char *ndn = FATFS_MNTP "/ntd";
 	int res = TC_FAIL;
 
 	TC_PRINT("\nRename directory tests:\n");
@@ -78,9 +75,7 @@ static int test_rename_dir(void)
 	}
 
 	res = fs_rename(dn, ndn);
-	if (!!res ||
-	    !check_file_dir_exists(ndn) ||
-	    check_file_dir_exists(dn)) {
+	if (!!res || !check_file_dir_exists(ndn) || check_file_dir_exists(dn)) {
 		TC_PRINT("Renaming %s to %s failed [%d]\n", dn, ndn, res);
 		res = TC_FAIL;
 		goto cleanup;
@@ -89,9 +84,7 @@ static int test_rename_dir(void)
 	/* Rename existing file to existing file */
 	create_file(dn);
 	res = fs_rename(dn, ndn);
-	if (!!res ||
-	    !check_file_dir_exists(ndn) ||
-	    check_file_dir_exists(dn)) {
+	if (!!res || !check_file_dir_exists(ndn) || check_file_dir_exists(dn)) {
 		TC_PRINT("Renaming %s to %s failed [%d]\n", dn, ndn, res);
 		res = TC_FAIL;
 		goto cleanup;
@@ -106,8 +99,8 @@ cleanup:
 
 static int test_rename_file(void)
 {
-	const char *fn = FATFS_MNTP"/tf.txt";
-	const char *nfn = FATFS_MNTP"/ntf.txt";
+	const char *fn = FATFS_MNTP "/tf.txt";
+	const char *nfn = FATFS_MNTP "/ntf.txt";
 	int res = TC_FAIL;
 
 	TC_PRINT("\nRename file tests:\n");
@@ -131,9 +124,7 @@ static int test_rename_file(void)
 	}
 
 	res = fs_rename(fn, nfn);
-	if (!!res ||
-	    !check_file_dir_exists(nfn) ||
-	    check_file_dir_exists(fn)) {
+	if (!!res || !check_file_dir_exists(nfn) || check_file_dir_exists(fn)) {
 		TC_PRINT("Renaming %s to %s failed [%d]\n", fn, nfn, res);
 		res = TC_FAIL;
 		goto cleanup;
@@ -142,9 +133,7 @@ static int test_rename_file(void)
 	/* Rename existing file to existing file */
 	create_file(fn);
 	res = fs_rename(fn, nfn);
-	if (!!res ||
-	    !check_file_dir_exists(nfn) ||
-	    check_file_dir_exists(fn)) {
+	if (!!res || !check_file_dir_exists(nfn) || check_file_dir_exists(fn)) {
 		TC_PRINT("Renaming %s to %s failed [%d]\n", fn, nfn, res);
 		res = TC_FAIL;
 		goto cleanup;

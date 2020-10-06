@@ -19,22 +19,17 @@ extern struct tmp007_data tmp007_driver;
 #include <logging/log.h>
 LOG_MODULE_DECLARE(TMP007, CONFIG_SENSOR_LOG_LEVEL);
 
-static inline void setup_int(const struct device *dev,
-			     bool enable)
+static inline void setup_int(const struct device *dev, bool enable)
 {
 	struct tmp007_data *data = dev->data;
 
-	gpio_pin_interrupt_configure(data->gpio,
-				     DT_INST_GPIO_PIN(0, int_gpios),
-				     enable
-				     ? GPIO_INT_LEVEL_ACTIVE
-				     : GPIO_INT_DISABLE);
+	gpio_pin_interrupt_configure(data->gpio, DT_INST_GPIO_PIN(0, int_gpios),
+				     enable ? GPIO_INT_LEVEL_ACTIVE :
+						    GPIO_INT_DISABLE);
 }
 
-int tmp007_attr_set(const struct device *dev,
-		    enum sensor_channel chan,
-		    enum sensor_attribute attr,
-		    const struct sensor_value *val)
+int tmp007_attr_set(const struct device *dev, enum sensor_channel chan,
+		    enum sensor_attribute attr, const struct sensor_value *val)
 {
 	struct tmp007_data *drv_data = dev->data;
 	int64_t value;
@@ -92,8 +87,7 @@ static void tmp007_thread_cb(const struct device *dev)
 		drv_data->drdy_handler(dev, &drv_data->drdy_trigger);
 	}
 
-	if (status & TMP007_TOBJ_TH_INT_BITS &&
-	    drv_data->th_handler != NULL) {
+	if (status & TMP007_TOBJ_TH_INT_BITS && drv_data->th_handler != NULL) {
 		drv_data->th_handler(dev, &drv_data->th_trigger);
 	}
 
@@ -145,8 +139,8 @@ int tmp007_init_interrupt(const struct device *dev)
 {
 	struct tmp007_data *drv_data = dev->data;
 
-	if (tmp007_reg_update(drv_data, TMP007_REG_CONFIG,
-			      TMP007_ALERT_EN_BIT, TMP007_ALERT_EN_BIT) < 0) {
+	if (tmp007_reg_update(drv_data, TMP007_REG_CONFIG, TMP007_ALERT_EN_BIT,
+			      TMP007_ALERT_EN_BIT) < 0) {
 		LOG_DBG("Failed to enable interrupt pin!");
 		return -EIO;
 	}
@@ -157,16 +151,15 @@ int tmp007_init_interrupt(const struct device *dev)
 	drv_data->gpio = device_get_binding(DT_INST_GPIO_LABEL(0, int_gpios));
 	if (drv_data->gpio == NULL) {
 		LOG_DBG("Failed to get pointer to %s device!",
-		    DT_INST_GPIO_LABEL(0, int_gpios));
+			DT_INST_GPIO_LABEL(0, int_gpios));
 		return -EINVAL;
 	}
 
 	gpio_pin_configure(drv_data->gpio, DT_INST_GPIO_PIN(0, int_gpios),
-			   DT_INST_GPIO_FLAGS(0, int_gpios)
-			   | GPIO_INT_LEVEL_ACTIVE);
+			   DT_INST_GPIO_FLAGS(0, int_gpios) |
+				   GPIO_INT_LEVEL_ACTIVE);
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   tmp007_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, tmp007_gpio_callback,
 			   BIT(DT_INST_GPIO_PIN(0, int_gpios)));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -179,9 +172,9 @@ int tmp007_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_TMP007_THREAD_STACK_SIZE,
-			(k_thread_entry_t)tmp007_thread, drv_data,
-			NULL, NULL, K_PRIO_COOP(CONFIG_TMP007_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)tmp007_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_TMP007_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_TMP007_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = tmp007_work_cb;
 #endif

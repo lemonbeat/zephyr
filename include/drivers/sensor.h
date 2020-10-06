@@ -569,12 +569,12 @@ static inline int z_impl_sensor_channel_get(const struct device *dev,
 /**
  * @brief The value of gravitational constant in micro m/s^2.
  */
-#define SENSOR_G		9806650LL
+#define SENSOR_G 9806650LL
 
 /**
  * @brief The value of constant PI in micros.
  */
-#define SENSOR_PI		3141592LL
+#define SENSOR_PI 3141592LL
 
 /**
  * @brief Helper function to convert acceleration from m/s^2 to Gs

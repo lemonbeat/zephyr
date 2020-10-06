@@ -6,7 +6,8 @@
 #include <zephyr.h>
 #include <console/console.h>
 
-static const char prompt[] = "Start typing characters to see them echoed back\r\n";
+static const char prompt[] =
+	"Start typing characters to see them echoed back\r\n";
 
 void main(void)
 {

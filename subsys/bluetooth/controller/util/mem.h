@@ -34,10 +34,11 @@
  *    MROUND( 9) = 12
  *    MROUND(13) = 16
  */
-#define MROUND(x) (((uint32_t)(x)+3) & (~((uint32_t)3)))
+#define MROUND(x) (((uint32_t)(x) + 3) & (~((uint32_t)3)))
 #endif
 
-void mem_init(void *mem_pool, uint16_t mem_size, uint16_t mem_count, void **mem_head);
+void mem_init(void *mem_pool, uint16_t mem_size, uint16_t mem_count,
+	      void **mem_head);
 void *mem_acquire(void **mem_head);
 void mem_release(void *mem, void **mem_head);
 

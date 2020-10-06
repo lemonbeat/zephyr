@@ -59,8 +59,8 @@ static int smp_udp4_tx(struct zephyr_smp_transport *zst, struct net_buf *nb)
 	ARG_UNUSED(zst);
 
 	struct sockaddr *addr = net_buf_user_data(nb);
-	int ret = sendto(configs.ipv4.sock, nb->data, nb->len,
-			 0, addr, sizeof(*addr));
+	int ret = sendto(configs.ipv4.sock, nb->data, nb->len, 0, addr,
+			 sizeof(*addr));
 	mcumgr_buf_free(nb);
 
 	return ret < 0 ? MGMT_ERR_EINVAL : MGMT_ERR_EOK;
@@ -73,8 +73,8 @@ static int smp_udp6_tx(struct zephyr_smp_transport *zst, struct net_buf *nb)
 	ARG_UNUSED(zst);
 
 	struct sockaddr *addr = net_buf_user_data(nb);
-	int ret = sendto(configs.ipv6.sock, nb->data, nb->len,
-			 0, addr, sizeof(*addr));
+	int ret = sendto(configs.ipv6.sock, nb->data, nb->len, 0, addr,
+			 sizeof(*addr));
 	mcumgr_buf_free(nb);
 
 	return ret < 0 ? MGMT_ERR_EINVAL : MGMT_ERR_EOK;
@@ -112,8 +112,8 @@ static void smp_udp_receive_thread(void *p1, void *p2, void *p3)
 		socklen_t addr_len = sizeof(addr);
 
 		int len = recvfrom(conf->sock, conf->recv_buffer,
-				   CONFIG_MCUMGR_SMP_UDP_MTU,
-				   0, &addr, &addr_len);
+				   CONFIG_MCUMGR_SMP_UDP_MTU, 0, &addr,
+				   &addr_len);
 
 		if (len > 0) {
 			struct sockaddr *ud;
@@ -137,15 +137,13 @@ static int smp_udp_init(const struct device *dev)
 	ARG_UNUSED(dev);
 
 #if CONFIG_MCUMGR_SMP_UDP_IPV4
-	zephyr_smp_transport_init(&configs.ipv4.smp_transport,
-				  smp_udp4_tx, smp_udp_get_mtu,
-				  smp_udp_ud_copy, NULL);
+	zephyr_smp_transport_init(&configs.ipv4.smp_transport, smp_udp4_tx,
+				  smp_udp_get_mtu, smp_udp_ud_copy, NULL);
 #endif
 
 #if CONFIG_MCUMGR_SMP_UDP_IPV6
-	zephyr_smp_transport_init(&configs.ipv6.smp_transport,
-				  smp_udp6_tx, smp_udp_get_mtu,
-				  smp_udp_ud_copy, NULL);
+	zephyr_smp_transport_init(&configs.ipv6.smp_transport, smp_udp6_tx,
+				  smp_udp_get_mtu, smp_udp_ud_copy, NULL);
 #endif
 
 	return MGMT_ERR_EOK;
@@ -157,16 +155,16 @@ static int create_socket(struct sockaddr *addr, const char *proto)
 	int err = errno;
 
 	if (sock < 0) {
-		LOG_ERR("Could not open receive socket (%s), err: %i",
-			proto, err);
+		LOG_ERR("Could not open receive socket (%s), err: %i", proto,
+			err);
 
 		return -err;
 	}
 
 	if (bind(sock, addr, sizeof(*addr)) < 0) {
 		err = errno;
-		LOG_ERR("Could not bind to receive socket (%s), err: %i",
-			proto, err);
+		LOG_ERR("Could not bind to receive socket (%s), err: %i", proto,
+			err);
 
 		close(sock);
 

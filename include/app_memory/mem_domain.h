@@ -31,13 +31,11 @@ typedef struct k_thread *k_tid_t;
  */
 #ifdef _ARCH_MEM_PARTITION_ALIGN_CHECK
 #define K_MEM_PARTITION_DEFINE(name, start, size, attr) \
-	_ARCH_MEM_PARTITION_ALIGN_CHECK(start, size); \
-	struct k_mem_partition name =\
-		{ (uintptr_t)start, size, attr}
+	_ARCH_MEM_PARTITION_ALIGN_CHECK(start, size);   \
+	struct k_mem_partition name = { (uintptr_t)start, size, attr }
 #else
 #define K_MEM_PARTITION_DEFINE(name, start, size, attr) \
-	struct k_mem_partition name =\
-		{ (uintptr_t)start, size, attr}
+	struct k_mem_partition name = { (uintptr_t)start, size, attr }
 #endif /* _ARCH_MEM_PARTITION_ALIGN_CHECK */
 
 /**
@@ -131,8 +129,7 @@ extern void k_mem_domain_init(struct k_mem_domain *domain, uint8_t num_parts,
  *
  * @param domain The memory domain to be destroyed.
  */
-__deprecated
-extern void k_mem_domain_destroy(struct k_mem_domain *domain);
+__deprecated extern void k_mem_domain_destroy(struct k_mem_domain *domain);
 
 /**
  * @brief Add a memory partition into a memory domain.
@@ -160,7 +157,7 @@ extern void k_mem_domain_destroy(struct k_mem_domain *domain);
  * @param part The memory partition to be added
  */
 extern void k_mem_domain_add_partition(struct k_mem_domain *domain,
-				      struct k_mem_partition *part);
+				       struct k_mem_partition *part);
 
 /**
  * @brief Remove a memory partition from a memory domain.
@@ -171,7 +168,7 @@ extern void k_mem_domain_add_partition(struct k_mem_domain *domain,
  * @param part The memory partition to be removed
  */
 extern void k_mem_domain_remove_partition(struct k_mem_domain *domain,
-					 struct k_mem_partition *part);
+					  struct k_mem_partition *part);
 
 /**
  * @brief Add a thread into a memory domain.
@@ -194,8 +191,7 @@ extern void k_mem_domain_add_thread(struct k_mem_domain *domain,
  *
  * @param thread ID of thread going to be removed from its memory domain.
  */
-__deprecated
-extern void k_mem_domain_remove_thread(k_tid_t thread);
+__deprecated extern void k_mem_domain_remove_thread(k_tid_t thread);
 
 /** @} */
 #endif /* INCLUDE_APP_MEMORY_MEM_DOMAIN_H */

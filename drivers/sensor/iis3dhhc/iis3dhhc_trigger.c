@@ -79,7 +79,7 @@ static void iis3dhhc_handle_interrupt(const struct device *dev)
 }
 
 static void iis3dhhc_gpio_callback(const struct device *dev,
-				    struct gpio_callback *cb, uint32_t pins)
+				   struct gpio_callback *cb, uint32_t pins)
 {
 	struct iis3dhhc_data *iis3dhhc =
 		CONTAINER_OF(cb, struct iis3dhhc_data, gpio_cb);
@@ -135,10 +135,10 @@ int iis3dhhc_init_interrupt(const struct device *dev)
 	k_sem_init(&iis3dhhc->gpio_sem, 0, UINT_MAX);
 
 	k_thread_create(&iis3dhhc->thread, iis3dhhc->thread_stack,
-		       CONFIG_IIS3DHHC_THREAD_STACK_SIZE,
-		       (k_thread_entry_t)iis3dhhc_thread, iis3dhhc,
-		       NULL, NULL, K_PRIO_COOP(CONFIG_IIS3DHHC_THREAD_PRIORITY),
-		       0, K_NO_WAIT);
+			CONFIG_IIS3DHHC_THREAD_STACK_SIZE,
+			(k_thread_entry_t)iis3dhhc_thread, iis3dhhc, NULL, NULL,
+			K_PRIO_COOP(CONFIG_IIS3DHHC_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_IIS3DHHC_TRIGGER_GLOBAL_THREAD)
 	iis3dhhc->work.handler = iis3dhhc_work_cb;
 #endif /* CONFIG_IIS3DHHC_TRIGGER_OWN_THREAD */
@@ -150,8 +150,7 @@ int iis3dhhc_init_interrupt(const struct device *dev)
 		return ret;
 	}
 
-	gpio_init_callback(&iis3dhhc->gpio_cb,
-			   iis3dhhc_gpio_callback,
+	gpio_init_callback(&iis3dhhc->gpio_cb, iis3dhhc_gpio_callback,
 			   BIT(cfg->int_pin));
 
 	if (gpio_add_callback(iis3dhhc->gpio, &iis3dhhc->gpio_cb) < 0) {
@@ -160,7 +159,8 @@ int iis3dhhc_init_interrupt(const struct device *dev)
 	}
 
 	/* enable interrupt on int1/int2 in pulse mode */
-	if (iis3dhhc_drdy_notification_mode_set(iis3dhhc->ctx, IIS3DHHC_PULSED)) {
+	if (iis3dhhc_drdy_notification_mode_set(iis3dhhc->ctx,
+						IIS3DHHC_PULSED)) {
 		return -EIO;
 	}
 

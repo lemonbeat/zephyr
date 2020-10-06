@@ -12,24 +12,25 @@
 #include <zephyr/types.h>
 #include <drivers/gpio.h>
 
-#define HTS221_TRIGGER_ENABLED (DT_INST_NODE_HAS_PROP(0, drdy_gpios) && \
-				IS_ENABLED(CONFIG_HTS221_TRIGGER))
+#define HTS221_TRIGGER_ENABLED                   \
+	(DT_INST_NODE_HAS_PROP(0, drdy_gpios) && \
+	 IS_ENABLED(CONFIG_HTS221_TRIGGER))
 
-#define HTS221_AUTOINCREMENT_ADDR	BIT(7)
+#define HTS221_AUTOINCREMENT_ADDR BIT(7)
 
-#define HTS221_REG_WHO_AM_I		0x0F
-#define HTS221_CHIP_ID			0xBC
+#define HTS221_REG_WHO_AM_I 0x0F
+#define HTS221_CHIP_ID 0xBC
 
-#define HTS221_REG_CTRL1		0x20
-#define HTS221_PD_BIT			BIT(7)
-#define HTS221_BDU_BIT			BIT(2)
-#define HTS221_ODR_SHIFT		0
+#define HTS221_REG_CTRL1 0x20
+#define HTS221_PD_BIT BIT(7)
+#define HTS221_BDU_BIT BIT(2)
+#define HTS221_ODR_SHIFT 0
 
-#define HTS221_REG_CTRL3		0x22
-#define HTS221_DRDY_EN			BIT(2)
+#define HTS221_REG_CTRL3 0x22
+#define HTS221_DRDY_EN BIT(2)
 
-#define HTS221_REG_DATA_START		0x28
-#define HTS221_REG_CONVERSION_START	0x30
+#define HTS221_REG_DATA_START 0x28
+#define HTS221_REG_CONVERSION_START 0x30
 
 struct hts221_data {
 	const struct device *i2c;
@@ -76,8 +77,8 @@ struct hts221_config {
 
 #if HTS221_TRIGGER_ENABLED
 int hts221_trigger_set(const struct device *dev,
-			const struct sensor_trigger *trig,
-			sensor_trigger_handler_t handler);
+		       const struct sensor_trigger *trig,
+		       sensor_trigger_handler_t handler);
 
 int hts221_init_interrupt(const struct device *dev);
 #endif

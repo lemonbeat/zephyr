@@ -14,15 +14,15 @@
 
 #define BUF_LEN 512
 #define MAX_PAGE_SIZE 0x1000 /* Max supported page size to run test on */
-#define MAX_NUM_PAGES 4      /* Max number of pages used in these tests */
+#define MAX_NUM_PAGES 4 /* Max number of pages used in these tests */
 #define TESTBUF_SIZE (MAX_PAGE_SIZE * MAX_NUM_PAGES)
 #define SOC_NV_FLASH_NODE DT_INST(0, soc_nv_flash)
 #define FLASH_SIZE DT_REG_SIZE(SOC_NV_FLASH_NODE)
 #define FLASH_NAME DT_CHOSEN_ZEPHYR_FLASH_CONTROLLER_LABEL
 
 /* so that we don't overwrite the application when running on hw */
-#define FLASH_BASE (64*1024)
-#define FLASH_AVAILABLE (FLASH_SIZE-FLASH_BASE)
+#define FLASH_BASE (64 * 1024)
+#define FLASH_AVAILABLE (FLASH_SIZE - FLASH_BASE)
 
 static const struct device *fdev;
 static const struct flash_driver_api *api;
@@ -37,16 +37,20 @@ static int cb_ret;
 
 static uint8_t buf[BUF_LEN];
 static uint8_t read_buf[TESTBUF_SIZE];
-const static uint8_t write_buf[TESTBUF_SIZE] = {[0 ... TESTBUF_SIZE - 1] = 0xaa};
-static uint8_t written_pattern[TESTBUF_SIZE] = {[0 ... TESTBUF_SIZE - 1] = 0xaa};
-static uint8_t erased_pattern[TESTBUF_SIZE]  = {[0 ... TESTBUF_SIZE - 1] = 0xff};
+const static uint8_t write_buf[TESTBUF_SIZE] = { [0 ... TESTBUF_SIZE - 1] =
+							 0xaa };
+static uint8_t written_pattern[TESTBUF_SIZE] = { [0 ... TESTBUF_SIZE - 1] =
+							 0xaa };
+static uint8_t erased_pattern[TESTBUF_SIZE] = { [0 ... TESTBUF_SIZE - 1] =
+							0xff };
 
-#define VERIFY_BUF(start, size, buf) \
-do { \
-	rc = flash_read(fdev, FLASH_BASE + start, read_buf, size); \
-	zassert_equal(rc, 0, "should succeed"); \
-	zassert_mem_equal(read_buf, buf, size, "should equal %s", #buf);\
-} while (0)
+#define VERIFY_BUF(start, size, buf)                                       \
+	do {                                                               \
+		rc = flash_read(fdev, FLASH_BASE + start, read_buf, size); \
+		zassert_equal(rc, 0, "should succeed");                    \
+		zassert_mem_equal(read_buf, buf, size, "should equal %s",  \
+				  #buf);                                   \
+	} while (0)
 
 #define VERIFY_WRITTEN(start, size) VERIFY_BUF(start, size, written_pattern)
 #define VERIFY_ERASED(start, size) VERIFY_BUF(start, size, erased_pattern)
@@ -70,8 +74,7 @@ static void erase_flash(void)
 	zassert_equal(rc, 0, "should succeed");
 
 	for (int i = 0; i < MAX_NUM_PAGES; i++) {
-		rc = flash_erase(fdev,
-				 FLASH_BASE + (i * layout->pages_size),
+		rc = flash_erase(fdev, FLASH_BASE + (i * layout->pages_size),
 				 layout->pages_size);
 		zassert_equal(rc, 0, "should succeed");
 	}
@@ -79,7 +82,6 @@ static void erase_flash(void)
 	rc = flash_write_protection_set(fdev, true);
 	zassert_equal(rc, 0, "should succeed");
 }
-
 
 static void init_target(void)
 {
@@ -110,7 +112,7 @@ static void test_stream_flash_init(void)
 
 	/* End address out of range */
 	rc = stream_flash_init(&ctx, fdev, buf, BUF_LEN, FLASH_BASE,
-		      FLASH_AVAILABLE + 4, NULL);
+			       FLASH_AVAILABLE + 4, NULL);
 	zassert_true(rc < 0, "should fail as size is more than available");
 
 	rc = stream_flash_init(NULL, fdev, buf, BUF_LEN, FLASH_BASE, 0, NULL);
@@ -167,7 +169,7 @@ static void test_stream_flash_buffered_write_cross_buf_border(void)
 	VERIFY_WRITTEN(BUF_LEN, BUF_LEN);
 
 	/* Fill half of the buffer */
-	rc = stream_flash_buffered_write(&ctx, write_buf, BUF_LEN/2, false);
+	rc = stream_flash_buffered_write(&ctx, write_buf, BUF_LEN / 2, false);
 	zassert_equal(rc, 0, "expected success");
 
 	/* Flush the buffer */
@@ -223,8 +225,8 @@ static void test_stream_flash_buffered_write_multi_page(void)
 	VERIFY_WRITTEN(0, page_size * num_pages);
 
 	/* Fill rest of the page */
-	rc = stream_flash_buffered_write(&ctx, write_buf,
-					 page_size - 128, false);
+	rc = stream_flash_buffered_write(&ctx, write_buf, page_size - 128,
+					 false);
 	zassert_equal(rc, 0, "expected success");
 
 	/* First four pages should be written */
@@ -293,10 +295,10 @@ static void test_stream_flash_buffered_write_callback(void)
 	VERIFY_WRITTEN(BUF_LEN, BUF_LEN);
 
 	/* Fill half of the buffer and flush it to flash */
-	cb_len = BUF_LEN/2;
+	cb_len = BUF_LEN / 2;
 	cb_offset = FLASH_BASE + (2 * BUF_LEN);
 
-	rc = stream_flash_buffered_write(&ctx, write_buf, BUF_LEN/2, true);
+	rc = stream_flash_buffered_write(&ctx, write_buf, BUF_LEN / 2, true);
 	zassert_equal(rc, 0, "expected success");
 
 	/* Ensure that failing callback trickles up to caller */
@@ -384,19 +386,20 @@ void test_main(void)
 	page_size = layout->pages_size;
 	__ASSERT_NO_MSG(page_size > BUF_LEN);
 
-	ztest_test_suite(lib_stream_flash_test,
-	     ztest_unit_test(test_stream_flash_init),
-	     ztest_unit_test(test_stream_flash_buffered_write),
-	     ztest_unit_test(test_stream_flash_buffered_write_cross_buf_border),
-	     ztest_unit_test(test_stream_flash_buffered_write_unaligned),
-	     ztest_unit_test(test_stream_flash_buffered_write_multi_page),
-	     ztest_unit_test(test_stream_flash_buf_size_greater_than_page_size),
-	     ztest_unit_test(test_stream_flash_buffered_write_callback),
-	     ztest_unit_test(test_stream_flash_flush),
-	     ztest_unit_test(test_stream_flash_buffered_write_whole_page),
-	     ztest_unit_test(test_stream_flash_erase_page),
-	     ztest_unit_test(test_stream_flash_bytes_written)
-	 );
+	ztest_test_suite(
+		lib_stream_flash_test, ztest_unit_test(test_stream_flash_init),
+		ztest_unit_test(test_stream_flash_buffered_write),
+		ztest_unit_test(
+			test_stream_flash_buffered_write_cross_buf_border),
+		ztest_unit_test(test_stream_flash_buffered_write_unaligned),
+		ztest_unit_test(test_stream_flash_buffered_write_multi_page),
+		ztest_unit_test(
+			test_stream_flash_buf_size_greater_than_page_size),
+		ztest_unit_test(test_stream_flash_buffered_write_callback),
+		ztest_unit_test(test_stream_flash_flush),
+		ztest_unit_test(test_stream_flash_buffered_write_whole_page),
+		ztest_unit_test(test_stream_flash_erase_page),
+		ztest_unit_test(test_stream_flash_bytes_written));
 
 	ztest_run_test_suite(lib_stream_flash_test);
 }

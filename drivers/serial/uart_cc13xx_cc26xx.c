@@ -19,10 +19,8 @@
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26X2.h>
 
-#define GET_PIN(n, pin_name) \
-	DT_INST_PROP_BY_IDX(n, pin_name, 0)
-#define GET_PORT(n, pin_name) \
-	DT_INST_PROP_BY_IDX(n, pin_name, 1)
+#define GET_PIN(n, pin_name) DT_INST_PROP_BY_IDX(n, pin_name, 0)
+#define GET_PORT(n, pin_name) DT_INST_PROP_BY_IDX(n, pin_name, 1)
 
 struct uart_cc13xx_cc26xx_data {
 	struct uart_config uart_config;
@@ -40,12 +38,14 @@ struct uart_cc13xx_cc26xx_data {
 #endif
 };
 
-static inline struct uart_cc13xx_cc26xx_data *get_dev_data(const struct device *dev)
+static inline struct uart_cc13xx_cc26xx_data *
+get_dev_data(const struct device *dev)
 {
 	return dev->data;
 }
 
-static inline const struct uart_device_config *get_dev_conf(const struct device *dev)
+static inline const struct uart_device_config *
+get_dev_conf(const struct device *dev)
 {
 	return dev->config;
 }
@@ -165,9 +165,9 @@ static int uart_cc13xx_cc26xx_configure(const struct device *dev,
 
 	/* Clear all UART interrupts */
 	UARTIntClear(get_dev_conf(dev)->regs,
-		UART_INT_OE | UART_INT_BE | UART_INT_PE |
-		UART_INT_FE | UART_INT_RT | UART_INT_TX |
-		UART_INT_RX | UART_INT_CTS);
+		     UART_INT_OE | UART_INT_BE | UART_INT_PE | UART_INT_FE |
+			     UART_INT_RT | UART_INT_TX | UART_INT_RX |
+			     UART_INT_CTS);
 
 	if (flow_ctrl) {
 		UARTHwFlowControlEnable(get_dev_conf(dev)->regs);
@@ -196,8 +196,7 @@ static int uart_cc13xx_cc26xx_config_get(const struct device *dev,
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
 
 static int uart_cc13xx_cc26xx_fifo_fill(const struct device *dev,
-					const uint8_t *buf,
-					int len)
+					const uint8_t *buf, int len)
 {
 	int n = 0;
 
@@ -211,8 +210,7 @@ static int uart_cc13xx_cc26xx_fifo_fill(const struct device *dev,
 	return n;
 }
 
-static int uart_cc13xx_cc26xx_fifo_read(const struct device *dev,
-					uint8_t *buf,
+static int uart_cc13xx_cc26xx_fifo_read(const struct device *dev, uint8_t *buf,
 					const int len)
 {
 	int c, n;
@@ -338,9 +336,10 @@ static int uart_cc13xx_cc26xx_irq_update(const struct device *dev)
 	return 1;
 }
 
-static void uart_cc13xx_cc26xx_irq_callback_set(const struct device *dev,
-						uart_irq_callback_user_data_t cb,
-						void *user_data)
+static void
+uart_cc13xx_cc26xx_irq_callback_set(const struct device *dev,
+				    uart_irq_callback_user_data_t cb,
+				    void *user_data)
 {
 	struct uart_cc13xx_cc26xx_data *data = get_dev_data(dev);
 
@@ -369,7 +368,7 @@ static void uart_cc13xx_cc26xx_isr(const struct device *dev)
  *  on and reconfiguring it.
  */
 static int postNotifyFxn(unsigned int eventType, uintptr_t eventArg,
-	uintptr_t clientArg)
+			 uintptr_t clientArg)
 {
 	const struct device *dev = (const struct device *)clientArg;
 	int ret = Power_NOTIFYDONE;
@@ -377,8 +376,7 @@ static int postNotifyFxn(unsigned int eventType, uintptr_t eventArg,
 
 	/* Reconfigure the hardware if returning from standby */
 	if (eventType == PowerCC26XX_AWAKE_STANDBY) {
-		if (get_dev_conf(dev)->regs ==
-			DT_INST_REG_ADDR(0)) {
+		if (get_dev_conf(dev)->regs == DT_INST_REG_ADDR(0)) {
 			res_id = PowerCC26XX_PERIPH_UART0;
 		} else { /* DT_INST_REG_ADDR(1) */
 			res_id = PowerCC26X2_PERIPH_UART1;
@@ -389,8 +387,9 @@ static int postNotifyFxn(unsigned int eventType, uintptr_t eventArg,
 			 * Reconfigure and enable UART only if not
 			 * actively powered down
 			 */
-			if (uart_cc13xx_cc26xx_configure(dev,
-				&get_dev_data(dev)->uart_config) != 0) {
+			if (uart_cc13xx_cc26xx_configure(
+				    dev, &get_dev_data(dev)->uart_config) !=
+			    0) {
 				ret = Power_NOTIFYERROR;
 			}
 		}
@@ -407,23 +406,22 @@ static int uart_cc13xx_cc26xx_set_power_state(const struct device *dev,
 	int ret = 0;
 
 	if ((new_state == DEVICE_PM_ACTIVE_STATE) &&
-		(new_state != get_dev_data(dev)->pm_state)) {
-		if (get_dev_conf(dev)->regs ==
-			DT_INST_REG_ADDR(0)) {
+	    (new_state != get_dev_data(dev)->pm_state)) {
+		if (get_dev_conf(dev)->regs == DT_INST_REG_ADDR(0)) {
 			Power_setDependency(PowerCC26XX_PERIPH_UART0);
 		} else {
 			Power_setDependency(PowerCC26X2_PERIPH_UART1);
 		}
 		/* Configure and enable UART */
-		ret = uart_cc13xx_cc26xx_configure(dev,
-			&get_dev_data(dev)->uart_config);
+		ret = uart_cc13xx_cc26xx_configure(
+			dev, &get_dev_data(dev)->uart_config);
 		if (ret == 0) {
 			get_dev_data(dev)->pm_state = new_state;
 		}
 	} else {
 		__ASSERT_NO_MSG(new_state == DEVICE_PM_LOW_POWER_STATE ||
-			new_state == DEVICE_PM_SUSPEND_STATE ||
-			new_state == DEVICE_PM_OFF_STATE);
+				new_state == DEVICE_PM_SUSPEND_STATE ||
+				new_state == DEVICE_PM_OFF_STATE);
 
 		if (get_dev_data(dev)->pm_state == DEVICE_PM_ACTIVE_STATE) {
 			UARTDisable(get_dev_conf(dev)->regs);
@@ -431,8 +429,7 @@ static int uart_cc13xx_cc26xx_set_power_state(const struct device *dev,
 			 * Release power dependency - i.e. potentially power
 			 * down serial domain.
 			 */
-			if (get_dev_conf(dev)->regs ==
-			    DT_INST_REG_ADDR(0)) {
+			if (get_dev_conf(dev)->regs == DT_INST_REG_ADDR(0)) {
 				Power_releaseDependency(
 					PowerCC26XX_PERIPH_UART0);
 			} else {
@@ -447,9 +444,8 @@ static int uart_cc13xx_cc26xx_set_power_state(const struct device *dev,
 }
 
 static int uart_cc13xx_cc26xx_pm_control(const struct device *dev,
-					 uint32_t ctrl_command,
-					 void *context, device_pm_cb cb,
-					 void *arg)
+					 uint32_t ctrl_command, void *context,
+					 device_pm_cb cb, void *arg)
 {
 	int ret = 0;
 
@@ -458,7 +454,7 @@ static int uart_cc13xx_cc26xx_pm_control(const struct device *dev,
 
 		if (new_state != get_dev_data(dev)->pm_state) {
 			ret = uart_cc13xx_cc26xx_set_power_state(dev,
-				new_state);
+								 new_state);
 		}
 	} else {
 		__ASSERT_NO_MSG(ctrl_command == DEVICE_PM_GET_POWER_STATE);
@@ -498,147 +494,141 @@ static const struct uart_driver_api uart_cc13xx_cc26xx_driver_api = {
 };
 
 #ifdef CONFIG_SYS_POWER_MANAGEMENT
-#define UART_CC13XX_CC26XX_POWER_UART(n)				\
-	do {								\
-		get_dev_data(dev)->rx_constrained = false;		\
-		get_dev_data(dev)->tx_constrained = false;		\
-									\
-		/* Set Power dependencies */				\
-		if (DT_INST_REG_ADDR(n) == 0x40001000) {		\
-			Power_setDependency(PowerCC26XX_PERIPH_UART0);	\
-		} else {						\
-			Power_setDependency(PowerCC26X2_PERIPH_UART1);	\
-		}							\
-									\
-		/* Register notification function */			\
-		Power_registerNotify(&get_dev_data(dev)->postNotify,	\
-			PowerCC26XX_AWAKE_STANDBY,			\
-			postNotifyFxn, (uintptr_t)dev);			\
+#define UART_CC13XX_CC26XX_POWER_UART(n)                                       \
+	do {                                                                   \
+		get_dev_data(dev)->rx_constrained = false;                     \
+		get_dev_data(dev)->tx_constrained = false;                     \
+                                                                               \
+		/* Set Power dependencies */                                   \
+		if (DT_INST_REG_ADDR(n) == 0x40001000) {                       \
+			Power_setDependency(PowerCC26XX_PERIPH_UART0);         \
+		} else {                                                       \
+			Power_setDependency(PowerCC26X2_PERIPH_UART1);         \
+		}                                                              \
+                                                                               \
+		/* Register notification function */                           \
+		Power_registerNotify(&get_dev_data(dev)->postNotify,           \
+				     PowerCC26XX_AWAKE_STANDBY, postNotifyFxn, \
+				     (uintptr_t)dev);                          \
 	} while (0)
 #else
-#define UART_CC13XX_CC26XX_POWER_UART(n)				\
-	do {								\
-		uint32_t domain, periph;					\
-									\
-		/* Enable UART power domain */				\
-		if (DT_INST_REG_ADDR(n) == 0x40001000) {		\
-			domain = PRCM_DOMAIN_SERIAL;			\
-			periph = PRCM_PERIPH_UART0;			\
-		} else {						\
-			domain = PRCM_DOMAIN_PERIPH;			\
-			periph = PRCM_PERIPH_UART1;			\
-		}							\
-		PRCMPowerDomainOn(domain);				\
-									\
-		/* Enable UART peripherals */				\
-		PRCMPeripheralRunEnable(periph);			\
-		PRCMPeripheralSleepEnable(periph);			\
-									\
-		/* Load PRCM settings */				\
-		PRCMLoadSet();						\
-		while (!PRCMLoadGet()) {				\
-			continue;					\
-		}							\
-									     \
-		/* UART should not be accessed until power domain is on. */  \
-		while (PRCMPowerDomainStatus(domain) !=			     \
-			PRCM_DOMAIN_POWER_ON) {				     \
-			continue;					     \
-		}							     \
+#define UART_CC13XX_CC26XX_POWER_UART(n)                                    \
+	do {                                                                \
+		uint32_t domain, periph;                                    \
+                                                                            \
+		/* Enable UART power domain */                              \
+		if (DT_INST_REG_ADDR(n) == 0x40001000) {                    \
+			domain = PRCM_DOMAIN_SERIAL;                        \
+			periph = PRCM_PERIPH_UART0;                         \
+		} else {                                                    \
+			domain = PRCM_DOMAIN_PERIPH;                        \
+			periph = PRCM_PERIPH_UART1;                         \
+		}                                                           \
+		PRCMPowerDomainOn(domain);                                  \
+                                                                            \
+		/* Enable UART peripherals */                               \
+		PRCMPeripheralRunEnable(periph);                            \
+		PRCMPeripheralSleepEnable(periph);                          \
+                                                                            \
+		/* Load PRCM settings */                                    \
+		PRCMLoadSet();                                              \
+		while (!PRCMLoadGet()) {                                    \
+			continue;                                           \
+		}                                                           \
+                                                                            \
+		/* UART should not be accessed until power domain is on. */ \
+		while (PRCMPowerDomainStatus(domain) !=                     \
+		       PRCM_DOMAIN_POWER_ON) {                              \
+			continue;                                           \
+		}                                                           \
 	} while (0)
 #endif
 
 #ifdef CONFIG_UART_INTERRUPT_DRIVEN
-#define UART_CC13XX_CC26XX_IRQ_CFG(n)					\
-	do {								\
-		UARTIntClear(get_dev_conf(dev)->regs, UART_INT_RX);	\
-									\
-		IRQ_CONNECT(DT_INST_IRQN(n),				\
-				DT_INST_IRQ(n, priority),		\
-				uart_cc13xx_cc26xx_isr,			\
-				DEVICE_GET(uart_cc13xx_cc26xx_##n),	\
-				0);					\
-		irq_enable(DT_INST_IRQN(n));				\
-		/* Causes an initial TX ready INT when TX INT enabled */\
-		UARTCharPutNonBlocking(get_dev_conf(dev)->regs, '\0');  \
+#define UART_CC13XX_CC26XX_IRQ_CFG(n)                                    \
+	do {                                                             \
+		UARTIntClear(get_dev_conf(dev)->regs, UART_INT_RX);      \
+                                                                         \
+		IRQ_CONNECT(DT_INST_IRQN(n), DT_INST_IRQ(n, priority),   \
+			    uart_cc13xx_cc26xx_isr,                      \
+			    DEVICE_GET(uart_cc13xx_cc26xx_##n), 0);      \
+		irq_enable(DT_INST_IRQN(n));                             \
+		/* Causes an initial TX ready INT when TX INT enabled */ \
+		UARTCharPutNonBlocking(get_dev_conf(dev)->regs, '\0');   \
 	} while (0)
 
-#define UART_CC13XX_CC26XX_INT_FIELDS					\
-	.callback = NULL,						\
-	.user_data = NULL,
+#define UART_CC13XX_CC26XX_INT_FIELDS .callback = NULL, .user_data = NULL,
 #else
 #define UART_CC13XX_CC26XX_IRQ_CFG(n)
 #define UART_CC13XX_CC26XX_INT_FIELDS
 #endif /* CONFIG_UART_INTERRUPT_DRIVEN */
 
-#define UART_CC13XX_CC26XX_DEVICE_DEFINE(n)				     \
-	DEVICE_DEFINE(uart_cc13xx_cc26xx_##n, DT_INST_LABEL(n),		     \
-		uart_cc13xx_cc26xx_init_##n,				     \
-		uart_cc13xx_cc26xx_pm_control,				     \
-		&uart_cc13xx_cc26xx_data_##n, &uart_cc13xx_cc26xx_config_##n,\
-		PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,	     \
-		&uart_cc13xx_cc26xx_driver_api)
+#define UART_CC13XX_CC26XX_DEVICE_DEFINE(n)                         \
+	DEVICE_DEFINE(uart_cc13xx_cc26xx_##n, DT_INST_LABEL(n),     \
+		      uart_cc13xx_cc26xx_init_##n,                  \
+		      uart_cc13xx_cc26xx_pm_control,                \
+		      &uart_cc13xx_cc26xx_data_##n,                 \
+		      &uart_cc13xx_cc26xx_config_##n, PRE_KERNEL_1, \
+		      CONFIG_KERNEL_INIT_PRIORITY_DEVICE,           \
+		      &uart_cc13xx_cc26xx_driver_api)
 
-#define UART_CC13XX_CC26XX_DEVICE_API_INIT(n)				     \
-	DEVICE_AND_API_INIT(uart_cc13xx_cc26xx_##n, DT_INST_LABEL(n),	     \
-		uart_cc13xx_cc26xx_init_##n, &uart_cc13xx_cc26xx_data_##n,   \
-		&uart_cc13xx_cc26xx_config_##n, PRE_KERNEL_1,		     \
-		CONFIG_KERNEL_INIT_PRIORITY_DEVICE,			     \
-		&uart_cc13xx_cc26xx_driver_api)
+#define UART_CC13XX_CC26XX_DEVICE_API_INIT(n)                             \
+	DEVICE_AND_API_INIT(uart_cc13xx_cc26xx_##n, DT_INST_LABEL(n),     \
+			    uart_cc13xx_cc26xx_init_##n,                  \
+			    &uart_cc13xx_cc26xx_data_##n,                 \
+			    &uart_cc13xx_cc26xx_config_##n, PRE_KERNEL_1, \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,           \
+			    &uart_cc13xx_cc26xx_driver_api)
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-#define UART_CC13XX_CC26XX_DEVICE_INIT(n)				\
-	UART_CC13XX_CC26XX_DEVICE_DEFINE(n)
+#define UART_CC13XX_CC26XX_DEVICE_INIT(n) UART_CC13XX_CC26XX_DEVICE_DEFINE(n)
 
-#define UART_CC13XX_CC26XX_INIT_PM_STATE				\
-	do {								\
-		get_dev_data(dev)->pm_state = DEVICE_PM_ACTIVE_STATE;	\
+#define UART_CC13XX_CC26XX_INIT_PM_STATE                              \
+	do {                                                          \
+		get_dev_data(dev)->pm_state = DEVICE_PM_ACTIVE_STATE; \
 	} while (0)
 #else
-#define UART_CC13XX_CC26XX_DEVICE_INIT(n)				\
-	UART_CC13XX_CC26XX_DEVICE_API_INIT(n)
+#define UART_CC13XX_CC26XX_DEVICE_INIT(n) UART_CC13XX_CC26XX_DEVICE_API_INIT(n)
 
 #define UART_CC13XX_CC26XX_INIT_PM_STATE
 #endif
 
-#define UART_CC13XX_CC26XX_INIT_FUNC(n)					    \
-	static int uart_cc13xx_cc26xx_init_##n(const struct device *dev)	    \
-	{								    \
-		int ret;						    \
-									    \
-		UART_CC13XX_CC26XX_INIT_PM_STATE;			    \
-									    \
-		UART_CC13XX_CC26XX_POWER_UART(n);			    \
-									    \
-		/* Configure IOC module to map UART signals to pins */	    \
-		IOCPortConfigureSet(GET_PIN(n, tx_pin), GET_PORT(n, tx_pin),\
-			IOC_STD_OUTPUT);				    \
-		IOCPortConfigureSet(GET_PIN(n, rx_pin), GET_PORT(n, rx_pin),\
-			IOC_STD_INPUT);					    \
-									    \
-		/* Configure and enable UART */				    \
-		ret = uart_cc13xx_cc26xx_configure(dev,			    \
-			&get_dev_data(dev)->uart_config);		    \
-									    \
-		/* Enable interrupts */					    \
-		UART_CC13XX_CC26XX_IRQ_CFG(n);				    \
-									    \
-		return ret;						    \
+#define UART_CC13XX_CC26XX_INIT_FUNC(n)                                      \
+	static int uart_cc13xx_cc26xx_init_##n(const struct device *dev)     \
+	{                                                                    \
+		int ret;                                                     \
+                                                                             \
+		UART_CC13XX_CC26XX_INIT_PM_STATE;                            \
+                                                                             \
+		UART_CC13XX_CC26XX_POWER_UART(n);                            \
+                                                                             \
+		/* Configure IOC module to map UART signals to pins */       \
+		IOCPortConfigureSet(GET_PIN(n, tx_pin), GET_PORT(n, tx_pin), \
+				    IOC_STD_OUTPUT);                         \
+		IOCPortConfigureSet(GET_PIN(n, rx_pin), GET_PORT(n, rx_pin), \
+				    IOC_STD_INPUT);                          \
+                                                                             \
+		/* Configure and enable UART */                              \
+		ret = uart_cc13xx_cc26xx_configure(                          \
+			dev, &get_dev_data(dev)->uart_config);               \
+                                                                             \
+		/* Enable interrupts */                                      \
+		UART_CC13XX_CC26XX_IRQ_CFG(n);                               \
+                                                                             \
+		return ret;                                                  \
 	}
 
-
-#define UART_CC13XX_CC26XX_INIT(n)				     \
-	DEVICE_DECLARE(uart_cc13xx_cc26xx_##n);			     \
-								     \
-	UART_CC13XX_CC26XX_INIT_FUNC(n);			     \
-								     \
-	static const struct uart_device_config			     \
-		uart_cc13xx_cc26xx_config_##n = {		     \
-		.regs = DT_INST_REG_ADDR(n),			     \
-		.sys_clk_freq = DT_INST_PROP_BY_PHANDLE(n, clocks,   \
-			clock_frequency)			     \
-	};							     \
-								     \
+#define UART_CC13XX_CC26XX_INIT(n)                                               \
+	DEVICE_DECLARE(uart_cc13xx_cc26xx_##n);                                  \
+                                                                                 \
+	UART_CC13XX_CC26XX_INIT_FUNC(n);                                         \
+                                                                                 \
+	static const struct uart_device_config uart_cc13xx_cc26xx_config_##n = { \
+		.regs = DT_INST_REG_ADDR(n),                                     \
+		.sys_clk_freq =                                                  \
+			DT_INST_PROP_BY_PHANDLE(n, clocks, clock_frequency)      \
+	};                                                                       \
+                                                                                 \
 	static struct uart_cc13xx_cc26xx_data			     \
 		uart_cc13xx_cc26xx_data_##n = {			     \
 		.uart_config = {				     \
@@ -649,8 +639,8 @@ static const struct uart_driver_api uart_cc13xx_cc26xx_driver_api = {
 			.flow_ctrl = UART_CFG_FLOW_CTRL_NONE,	     \
 		},						     \
 		UART_CC13XX_CC26XX_INT_FIELDS			     \
-	};							     \
-								     \
+	};                           \
+                                                                                 \
 	UART_CC13XX_CC26XX_DEVICE_INIT(n);
 
 DT_INST_FOREACH_STATUS_OKAY(UART_CC13XX_CC26XX_INIT)

@@ -20,7 +20,7 @@
 static __attribute__((section(".runtime_data_end")))
 uint64_t runtime_data_end[1] = { 0x1111aa8888aa1111L };
 
-#define EXT_DATA_START ((void *) &runtime_data_end[1])
+#define EXT_DATA_START ((void *)&runtime_data_end[1])
 
 static struct efi_system_table *efi;
 
@@ -71,7 +71,7 @@ uintptr_t __abi efi_entry(void *img_handle, struct efi_system_table *sys_tab)
 	z_putchar = efi_putchar;
 	printf("*** Zephyr EFI Loader ***\n");
 
-	for (int i = 0; i < sizeof(zefi_zsegs)/sizeof(zefi_zsegs[0]); i++) {
+	for (int i = 0; i < sizeof(zefi_zsegs) / sizeof(zefi_zsegs[0]); i++) {
 		int nwords = zefi_zsegs[i].sz;
 		uint32_t *dst = (uint32_t *)zefi_zsegs[i].addr;
 
@@ -81,7 +81,7 @@ uintptr_t __abi efi_entry(void *img_handle, struct efi_system_table *sys_tab)
 		}
 	}
 
-	for (int i = 0; i < sizeof(zefi_dsegs)/sizeof(zefi_dsegs[0]); i++) {
+	for (int i = 0; i < sizeof(zefi_dsegs) / sizeof(zefi_dsegs[0]); i++) {
 		int nwords = zefi_dsegs[i].sz;
 		int off = zefi_dsegs[i].off;
 		uint32_t *dst = (uint32_t *)zefi_dsegs[i].addr;
@@ -96,9 +96,8 @@ uintptr_t __abi efi_entry(void *img_handle, struct efi_system_table *sys_tab)
 
 	unsigned char *code = (void *)zefi_entry;
 
-	printf("Jumping to Entry Point: %p (%x %x %x %x %x %x %x)\n",
-	       code, code[0], code[1], code[2], code[3],
-	       code[4], code[5], code[6]);
+	printf("Jumping to Entry Point: %p (%x %x %x %x %x %x %x)\n", code,
+	       code[0], code[1], code[2], code[3], code[4], code[5], code[6]);
 
 	disable_hpet();
 
@@ -109,7 +108,7 @@ uintptr_t __abi efi_entry(void *img_handle, struct efi_system_table *sys_tab)
 	for (volatile int i = 0; i < 50000000; i++) {
 	}
 
-	__asm__ volatile("cli; jmp *%0" :: "r"(code));
+	__asm__ volatile("cli; jmp *%0" ::"r"(code));
 
 	return 0;
 }

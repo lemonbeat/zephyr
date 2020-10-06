@@ -6,7 +6,7 @@
 
 #include <kernel.h>
 
-#define OPENOCD_UNIMPLEMENTED	0xffffffff
+#define OPENOCD_UNIMPLEMENTED 0xffffffff
 
 #if defined(CONFIG_OPENOCD_SUPPORT) && defined(CONFIG_THREAD_MONITOR)
 enum {
@@ -45,34 +45,34 @@ size_t _kernel_openocd_offsets[] = {
 	[OPENOCD_OFFSET_T_ENTRY] = offsetof(struct k_thread, entry),
 	[OPENOCD_OFFSET_T_NEXT_THREAD] = offsetof(struct k_thread, next_thread),
 	[OPENOCD_OFFSET_T_STATE] = offsetof(struct _thread_base, thread_state),
-	[OPENOCD_OFFSET_T_USER_OPTIONS] = offsetof(struct _thread_base,
-						   user_options),
+	[OPENOCD_OFFSET_T_USER_OPTIONS] =
+		offsetof(struct _thread_base, user_options),
 	[OPENOCD_OFFSET_T_PRIO] = offsetof(struct _thread_base, prio),
 #if defined(CONFIG_ARM64)
-	[OPENOCD_OFFSET_T_STACK_PTR] = offsetof(struct k_thread,
-						callee_saved.sp),
+	[OPENOCD_OFFSET_T_STACK_PTR] =
+		offsetof(struct k_thread, callee_saved.sp),
 #elif defined(CONFIG_ARM)
-	[OPENOCD_OFFSET_T_STACK_PTR] = offsetof(struct k_thread,
-						callee_saved.psp),
+	[OPENOCD_OFFSET_T_STACK_PTR] =
+		offsetof(struct k_thread, callee_saved.psp),
 #elif defined(CONFIG_ARC)
-	[OPENOCD_OFFSET_T_STACK_PTR] = offsetof(struct k_thread,
-						callee_saved.sp),
+	[OPENOCD_OFFSET_T_STACK_PTR] =
+		offsetof(struct k_thread, callee_saved.sp),
 #elif defined(CONFIG_X86)
 #if defined(CONFIG_X86_64)
-	[OPENOCD_OFFSET_T_STACK_PTR] = offsetof(struct k_thread,
-						callee_saved.rsp),
+	[OPENOCD_OFFSET_T_STACK_PTR] =
+		offsetof(struct k_thread, callee_saved.rsp),
 #else
-	[OPENOCD_OFFSET_T_STACK_PTR] = offsetof(struct k_thread,
-						callee_saved.esp),
+	[OPENOCD_OFFSET_T_STACK_PTR] =
+		offsetof(struct k_thread, callee_saved.esp),
 #endif
 #elif defined(CONFIG_NIOS2)
-	[OPENOCD_OFFSET_T_STACK_PTR] = offsetof(struct k_thread,
-						callee_saved.sp),
+	[OPENOCD_OFFSET_T_STACK_PTR] =
+		offsetof(struct k_thread, callee_saved.sp),
 #elif defined(CONFIG_RISCV)
-	[OPENOCD_OFFSET_T_STACK_PTR] = offsetof(struct k_thread,
-						callee_saved.sp),
+	[OPENOCD_OFFSET_T_STACK_PTR] =
+		offsetof(struct k_thread, callee_saved.sp),
 #else
-	/* Use a special value so that OpenOCD knows that obtaining the stack
+/* Use a special value so that OpenOCD knows that obtaining the stack
 	 * pointer is not possible on this particular architecture.
 	 */
 #warning Please define OPENOCD_OFFSET_T_STACK_PTR for this architecture
@@ -83,15 +83,15 @@ size_t _kernel_openocd_offsets[] = {
 	[OPENOCD_OFFSET_T_NAME] = offsetof(struct k_thread, name),
 	[OPENOCD_OFFSET_T_ARCH] = offsetof(struct k_thread, arch),
 #if defined(CONFIG_FPU) && defined(CONFIG_FPU_SHARING) && defined(CONFIG_ARM)
-	[OPENOCD_OFFSET_T_PREEMPT_FLOAT] = offsetof(struct _thread_arch,
-						    preempt_float),
+	[OPENOCD_OFFSET_T_PREEMPT_FLOAT] =
+		offsetof(struct _thread_arch, preempt_float),
 	[OPENOCD_OFFSET_T_COOP_FLOAT] = OPENOCD_UNIMPLEMENTED,
 #elif defined(CONFIG_FPU) && defined(CONFIG_X86)
 #if defined(CONFIG_X86_64)
 	[OPENOCD_OFFSET_T_PREEMPT_FLOAT] = offsetof(struct _thread_arch, sse),
 #else
-	[OPENOCD_OFFSET_T_PREEMPT_FLOAT] = offsetof(struct _thread_arch,
-						    preempFloatReg),
+	[OPENOCD_OFFSET_T_PREEMPT_FLOAT] =
+		offsetof(struct _thread_arch, preempFloatReg),
 #endif
 	[OPENOCD_OFFSET_T_COOP_FLOAT] = OPENOCD_UNIMPLEMENTED,
 #else

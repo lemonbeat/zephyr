@@ -16,8 +16,8 @@ static void xtal_check(bool on, nrf_clock_lfclk_t type)
 	if (IS_ENABLED(CONFIG_SYSTEM_CLOCK_NO_WAIT)) {
 		zassert_false(on, "Clock should be off");
 	} else if (IS_ENABLED(CONFIG_SYSTEM_CLOCK_WAIT_FOR_AVAILABILITY)) {
-		bool is_running =
-			rtc_cnt || (on && (type == NRF_CLOCK_LFCLK_RC));
+		bool is_running = rtc_cnt ||
+				  (on && (type == NRF_CLOCK_LFCLK_RC));
 
 		zassert_true(is_running, "Clock should be on");
 	} else {
@@ -38,10 +38,9 @@ static void rc_check(bool on, nrf_clock_lfclk_t type)
 
 static void synth_check(bool on, nrf_clock_lfclk_t type)
 {
-	#if !defined(CLOCK_LFCLKSRC_SRC_Synth) && \
-	    !defined(CLOCK_LFCLKSRC_SRC_LFSYNT)
-	#define NRF_CLOCK_LFCLK_Synth 0
-	#endif
+#if !defined(CLOCK_LFCLKSRC_SRC_Synth) && !defined(CLOCK_LFCLKSRC_SRC_LFSYNT)
+#define NRF_CLOCK_LFCLK_Synth 0
+#endif
 
 	if (!IS_ENABLED(CONFIG_SYSTEM_CLOCK_NO_WAIT)) {
 		zassert_true(on, "Clock should be on");
@@ -54,8 +53,8 @@ void test_clock_check(void)
 	bool xtal;
 
 	xtal = IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL) |
-		IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_LOW_SWING) |
-		IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_FULL_SWING);
+	       IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_LOW_SWING) |
+	       IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_FULL_SWING);
 
 	if (xtal) {
 		xtal_check(on, type);
@@ -72,7 +71,7 @@ void test_wait_in_thread(void)
 	bool o;
 
 	if (!(IS_ENABLED(CONFIG_SYSTEM_CLOCK_NO_WAIT) &&
-		IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL))) {
+	      IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL))) {
 		return;
 	}
 
@@ -98,23 +97,22 @@ void test_main(void)
 	k_busy_wait(100);
 	rtc_cnt = k_cycle_get_32();
 
-	 TC_PRINT("CLOCK_CONTROL_NRF_K32SRC=%s\n",
-		IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC) ? "RC"
-		: IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_SYNTH) ? "SYNTH"
-		: IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL) ? "XTAL"
-		: "???");
+	TC_PRINT("CLOCK_CONTROL_NRF_K32SRC=%s\n",
+		 IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC)	   ? "RC" :
+		 IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_SYNTH) ? "SYNTH" :
+		 IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL)  ? "XTAL" :
+									   "???");
 	TC_PRINT("SYSTEM_CLOCK_NO_WAIT=%c\n",
 		 IS_ENABLED(CONFIG_SYSTEM_CLOCK_NO_WAIT) ? 'y' : 'n');
 	TC_PRINT("SYSTEM_CLOCK_WAIT_FOR_AVAILABILITY=%c\n",
-		 IS_ENABLED(CONFIG_SYSTEM_CLOCK_WAIT_FOR_AVAILABILITY) ?
-		 'y' : 'n');
+		 IS_ENABLED(CONFIG_SYSTEM_CLOCK_WAIT_FOR_AVAILABILITY) ? 'y' :
+									       'n');
 	TC_PRINT("SYSTEM_CLOCK_WAIT_FOR_STABILITY=%c\n",
-		 IS_ENABLED(CONFIG_SYSTEM_CLOCK_WAIT_FOR_STABILITY) ?
-		 'y' : 'n');
+		 IS_ENABLED(CONFIG_SYSTEM_CLOCK_WAIT_FOR_STABILITY) ? 'y' :
+									    'n');
 
 	ztest_test_suite(test_nrf_lf_clock_start,
-		ztest_unit_test(test_clock_check),
-		ztest_unit_test(test_wait_in_thread)
-			);
+			 ztest_unit_test(test_clock_check),
+			 ztest_unit_test(test_wait_in_thread));
 	ztest_run_test_suite(test_nrf_lf_clock_start);
 }

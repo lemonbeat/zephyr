@@ -23,15 +23,15 @@
 #define NET_IPV4_IHL_MASK 0x0F
 
 /* IPv4 Options */
-#define NET_IPV4_OPTS_EO   0   /* End of Options */
-#define NET_IPV4_OPTS_NOP  1   /* No operation */
-#define NET_IPV4_OPTS_RR   7   /* Record Route */
-#define NET_IPV4_OPTS_TS   68  /* Timestamp */
+#define NET_IPV4_OPTS_EO 0 /* End of Options */
+#define NET_IPV4_OPTS_NOP 1 /* No operation */
+#define NET_IPV4_OPTS_RR 7 /* Record Route */
+#define NET_IPV4_OPTS_TS 68 /* Timestamp */
 
 /* IPv4 Options Timestamp flags */
-#define NET_IPV4_TS_OPT_TS_ONLY	0 /* Timestamp only */
-#define NET_IPV4_TS_OPT_TS_ADDR	1 /* Timestamp and address */
-#define NET_IPV4_TS_OPT_TS_PRES	3 /* Timestamp prespecified hops*/
+#define NET_IPV4_TS_OPT_TS_ONLY 0 /* Timestamp only */
+#define NET_IPV4_TS_OPT_TS_ADDR 1 /* Timestamp and address */
+#define NET_IPV4_TS_OPT_TS_PRES 3 /* Timestamp prespecified hops*/
 
 #define NET_IPV4_HDR_OPTNS_MAX_LEN 40
 
@@ -45,8 +45,7 @@
  * @return 0 on success, negative errno otherwise.
  */
 #if defined(CONFIG_NET_NATIVE_IPV4)
-int net_ipv4_create(struct net_pkt *pkt,
-		    const struct in_addr *src,
+int net_ipv4_create(struct net_pkt *pkt, const struct in_addr *src,
 		    const struct in_addr *dst);
 #else
 static inline int net_ipv4_create(struct net_pkt *pkt,

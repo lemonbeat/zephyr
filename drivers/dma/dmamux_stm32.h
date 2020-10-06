@@ -17,25 +17,21 @@ struct dmamux_stm32_channel {
 struct dmamux_stm32_data {
 	struct dmamux_stm32_channel *mux_channels;
 	void *callback_arg;
-	void (*dmamux_callback)(void *arg, uint32_t id,
-				int error_code);
+	void (*dmamux_callback)(void *arg, uint32_t id, int error_code);
 };
 
 /* this is the configuration of the dmamux IP */
 struct dmamux_stm32_config {
 	struct stm32_pclken pclken;
 	uint32_t base;
-	uint8_t channel_nb;	/* total nb of channels */
-	uint8_t gen_nb;	/* total nb of Request generator */
-	uint8_t req_nb;	/* total nb of Peripheral Request inputs */
+	uint8_t channel_nb; /* total nb of channels */
+	uint8_t gen_nb; /* total nb of Request generator */
+	uint8_t req_nb; /* total nb of Peripheral Request inputs */
 };
 
 uint32_t table_ll_channel[] = {
-	LL_DMAMUX_CHANNEL_0,
-	LL_DMAMUX_CHANNEL_1,
-	LL_DMAMUX_CHANNEL_2,
-	LL_DMAMUX_CHANNEL_3,
-	LL_DMAMUX_CHANNEL_4,
+	LL_DMAMUX_CHANNEL_0,  LL_DMAMUX_CHANNEL_1, LL_DMAMUX_CHANNEL_2,
+	LL_DMAMUX_CHANNEL_3,  LL_DMAMUX_CHANNEL_4,
 #if defined(LL_DMAMUX_CHANNEL_5)
 	LL_DMAMUX_CHANNEL_5,
 #endif /* LL_DMAMUX_CHANNEL_5 */
@@ -72,12 +68,9 @@ uint32_t table_ll_channel[] = {
 };
 
 uint32_t (*func_ll_is_active_so[])(DMAMUX_Channel_TypeDef *DMAMUXx) = {
-	LL_DMAMUX_IsActiveFlag_SO0,
-	LL_DMAMUX_IsActiveFlag_SO1,
-	LL_DMAMUX_IsActiveFlag_SO2,
-	LL_DMAMUX_IsActiveFlag_SO3,
-	LL_DMAMUX_IsActiveFlag_SO4,
-	LL_DMAMUX_IsActiveFlag_SO5,
+	LL_DMAMUX_IsActiveFlag_SO0,  LL_DMAMUX_IsActiveFlag_SO1,
+	LL_DMAMUX_IsActiveFlag_SO2,  LL_DMAMUX_IsActiveFlag_SO3,
+	LL_DMAMUX_IsActiveFlag_SO4,  LL_DMAMUX_IsActiveFlag_SO5,
 #if defined(DMAMUX_CSR_SOF6)
 	LL_DMAMUX_IsActiveFlag_SO6,
 #endif /* DMAMUX_CSR_SOF6 */
@@ -111,12 +104,9 @@ uint32_t (*func_ll_is_active_so[])(DMAMUX_Channel_TypeDef *DMAMUXx) = {
 };
 
 void (*func_ll_clear_so[])(DMAMUX_Channel_TypeDef *DMAMUXx) = {
-	LL_DMAMUX_ClearFlag_SO0,
-	LL_DMAMUX_ClearFlag_SO1,
-	LL_DMAMUX_ClearFlag_SO2,
-	LL_DMAMUX_ClearFlag_SO3,
-	LL_DMAMUX_ClearFlag_SO4,
-	LL_DMAMUX_ClearFlag_SO5,
+	LL_DMAMUX_ClearFlag_SO0,  LL_DMAMUX_ClearFlag_SO1,
+	LL_DMAMUX_ClearFlag_SO2,  LL_DMAMUX_ClearFlag_SO3,
+	LL_DMAMUX_ClearFlag_SO4,  LL_DMAMUX_ClearFlag_SO5,
 #if defined(DMAMUX_CSR_SOF6)
 	LL_DMAMUX_ClearFlag_SO6,
 #endif /* DMAMUX_CSR_SOF6 */

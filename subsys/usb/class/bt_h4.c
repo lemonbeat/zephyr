@@ -26,13 +26,13 @@ LOG_MODULE_REGISTER(usb_bt_h4);
 static K_FIFO_DEFINE(rx_queue);
 static K_FIFO_DEFINE(tx_queue);
 
-#define BT_H4_OUT_EP_ADDR               0x01
-#define BT_H4_IN_EP_ADDR                0x81
+#define BT_H4_OUT_EP_ADDR 0x01
+#define BT_H4_IN_EP_ADDR 0x81
 
-#define BT_H4_OUT_EP_IDX                0
-#define BT_H4_IN_EP_IDX                 1
+#define BT_H4_OUT_EP_IDX 0
+#define BT_H4_IN_EP_IDX 1
 
-#define BT_H4_BULK_EP_MPS               MIN(BT_BUF_TX_SIZE, USB_MAX_FS_BULK_MPS)
+#define BT_H4_BULK_EP_MPS MIN(BT_BUF_TX_SIZE, USB_MAX_FS_BULK_MPS)
 
 /* HCI RX/TX threads */
 static K_KERNEL_STACK_DEFINE(rx_thread_stack, 512);
@@ -143,7 +143,8 @@ static void hci_rx_thread(void)
 }
 
 static void bt_h4_status_cb(struct usb_cfg_data *cfg,
-			    enum usb_dc_status_code status, const uint8_t *param)
+			    enum usb_dc_status_code status,
+			    const uint8_t *param)
 {
 	ARG_UNUSED(cfg);
 
@@ -173,8 +174,8 @@ static void bt_h4_status_cb(struct usb_cfg_data *cfg,
 	}
 }
 
-static int bt_h4_vendor_handler(struct usb_setup_packet *setup,
-				int32_t *len, uint8_t **data)
+static int bt_h4_vendor_handler(struct usb_setup_packet *setup, int32_t *len,
+				uint8_t **data)
 {
 	LOG_DBG("Class request: bRequest 0x%x bmRequestType 0x%x len %d",
 		setup->bRequest, setup->bmRequestType, *len);
@@ -191,8 +192,8 @@ static int bt_h4_vendor_handler(struct usb_setup_packet *setup,
 
 	if ((REQTYPE_GET_DIR(setup->bmRequestType) == REQTYPE_DIR_TO_HOST) &&
 	    (setup->bRequest == 0x5c)) {
-		LOG_DBG("Device-to-Host, wLength %d, data %p",
-			setup->wLength, *data);
+		LOG_DBG("Device-to-Host, wLength %d, data %p", setup->wLength,
+			*data);
 		return 0;
 	}
 

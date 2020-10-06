@@ -33,13 +33,15 @@ osMutexId_t osMutexNew(const osMutexAttr_t *attr)
 		attr = &init_mutex_attrs;
 	}
 
-	__ASSERT(attr->attr_bits & osMutexPrioInherit,
-		 "Zephyr supports osMutexPrioInherit by default. Do not unselect it\n");
+	__ASSERT(
+		attr->attr_bits & osMutexPrioInherit,
+		"Zephyr supports osMutexPrioInherit by default. Do not unselect it\n");
 
 	__ASSERT(!(attr->attr_bits & osMutexRobust),
 		 "Zephyr does not support osMutexRobust.\n");
 
-	if (k_mem_slab_alloc(&cv2_mutex_slab, (void **)&mutex, K_MSEC(100)) == 0) {
+	if (k_mem_slab_alloc(&cv2_mutex_slab, (void **)&mutex, K_MSEC(100)) ==
+	    0) {
 		memset(mutex, 0, sizeof(struct cv2_mutex));
 	} else {
 		return NULL;
@@ -63,7 +65,7 @@ osMutexId_t osMutexNew(const osMutexAttr_t *attr)
  */
 osStatus_t osMutexAcquire(osMutexId_t mutex_id, uint32_t timeout)
 {
-	struct cv2_mutex *mutex = (struct cv2_mutex *) mutex_id;
+	struct cv2_mutex *mutex = (struct cv2_mutex *)mutex_id;
 	int status;
 
 	if (mutex_id == NULL) {
@@ -93,8 +95,7 @@ osStatus_t osMutexAcquire(osMutexId_t mutex_id, uint32_t timeout)
 	} else if (timeout == 0U) {
 		status = k_mutex_lock(&mutex->z_mutex, K_NO_WAIT);
 	} else {
-		status = k_mutex_lock(&mutex->z_mutex,
-				      K_TICKS(timeout));
+		status = k_mutex_lock(&mutex->z_mutex, K_TICKS(timeout));
 	}
 
 	if (status == -EBUSY) {
@@ -111,7 +112,7 @@ osStatus_t osMutexAcquire(osMutexId_t mutex_id, uint32_t timeout)
  */
 osStatus_t osMutexRelease(osMutexId_t mutex_id)
 {
-	struct cv2_mutex *mutex = (struct cv2_mutex *) mutex_id;
+	struct cv2_mutex *mutex = (struct cv2_mutex *)mutex_id;
 
 	if (mutex_id == NULL) {
 		return osErrorParameter;
@@ -151,11 +152,10 @@ osStatus_t osMutexDelete(osMutexId_t mutex_id)
 	 * mutex_id is in an invalid mutex state) is not supported in Zephyr.
 	 */
 
-	k_mem_slab_free(&cv2_mutex_slab, (void *) &mutex);
+	k_mem_slab_free(&cv2_mutex_slab, (void *)&mutex);
 
 	return osOK;
 }
-
 
 osThreadId_t osMutexGetOwner(osMutexId_t mutex_id)
 {

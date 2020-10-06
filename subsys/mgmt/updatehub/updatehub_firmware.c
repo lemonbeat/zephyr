@@ -17,10 +17,8 @@ bool updatehub_get_firmware_version(char *version, int version_len)
 		return false;
 	}
 
-	snprintk(version, version_len, "%d.%d.%d",
-		 header.h.v1.sem_ver.major,
-		 header.h.v1.sem_ver.minor,
-		 header.h.v1.sem_ver.revision);
+	snprintk(version, version_len, "%d.%d.%d", header.h.v1.sem_ver.major,
+		 header.h.v1.sem_ver.minor, header.h.v1.sem_ver.revision);
 
 	return true;
 }

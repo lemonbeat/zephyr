@@ -13,8 +13,8 @@
 
 #include "fir_q7.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)10)
-#define ABS_ERROR_THRESH_Q7	((q7_t)2)
+#define SNR_ERROR_THRESH ((float32_t)10)
+#define ABS_ERROR_THRESH_Q7 ((q7_t)2)
 
 static void test_arm_fir_q7(void)
 {
@@ -68,14 +68,13 @@ static void test_arm_fir_q7(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_q7(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_q7(length, output_buf, ref,
+				       SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_q7(length, output_buf, ref,
-			ABS_ERROR_THRESH_Q7),
-		ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_q7(length, output_buf, ref,
+					ABS_ERROR_THRESH_Q7),
+		     ASSERT_MSG_ABS_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -84,9 +83,7 @@ static void test_arm_fir_q7(void)
 
 void test_filtering_fir_q7(void)
 {
-	ztest_test_suite(filtering_fir_q7,
-		ztest_unit_test(test_arm_fir_q7)
-		);
+	ztest_test_suite(filtering_fir_q7, ztest_unit_test(test_arm_fir_q7));
 
 	ztest_run_test_suite(filtering_fir_q7);
 }

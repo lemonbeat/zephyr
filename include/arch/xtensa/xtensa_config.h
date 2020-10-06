@@ -8,7 +8,7 @@
 
 #include <xtensa/hal.h>
 #include <xtensa/config/core.h>
-#include <xtensa/config/system.h>	/* required for XSHAL_CLIB */
+#include <xtensa/config/system.h> /* required for XSHAL_CLIB */
 
 #include "xtensa_context.h"
 
@@ -64,35 +64,35 @@
 
 /* Extra space required for interrupt/exception hooks. */
 #ifdef XT_INTEXC_HOOKS
-  #ifdef __XTENSA_CALL0_ABI__
-    #define STK_INTEXC_EXTRA        0x200
-  #else
-    #define STK_INTEXC_EXTRA        0x180
-  #endif
+#ifdef __XTENSA_CALL0_ABI__
+#define STK_INTEXC_EXTRA 0x200
 #else
-  #define STK_INTEXC_EXTRA          0
+#define STK_INTEXC_EXTRA 0x180
+#endif
+#else
+#define STK_INTEXC_EXTRA 0
 #endif
 
 /* Check C library thread safety support and compute size of C library save
  * area.
  */
 #if XT_USE_THREAD_SAFE_CLIB > 0u
-  #if XSHAL_CLIB == XTHAL_CLIB_XCLIB
-    #define XT_HAVE_THREAD_SAFE_CLIB	0
-    #error "Thread-safe operation is not yet supported for the XCLIB C library."
-  #elif XSHAL_CLIB == XTHAL_CLIB_NEWLIB
-    #define XT_HAVE_THREAD_SAFE_CLIB	1
-    #if !defined __ASSEMBLER__
-      #include <sys/reent.h>
-      #define XT_CLIB_CONTEXT_AREA_SIZE ((sizeof(struct _reent) + 15) + (-16))
-      #define XT_CLIB_GLOBAL_PTR        _impure_ptr
-    #endif
-  #else
-    #define XT_HAVE_THREAD_SAFE_CLIB	0
-    #error "The selected C runtime library is not thread safe."
-  #endif
+#if XSHAL_CLIB == XTHAL_CLIB_XCLIB
+#define XT_HAVE_THREAD_SAFE_CLIB 0
+#error "Thread-safe operation is not yet supported for the XCLIB C library."
+#elif XSHAL_CLIB == XTHAL_CLIB_NEWLIB
+#define XT_HAVE_THREAD_SAFE_CLIB 1
+#if !defined __ASSEMBLER__
+#include <sys/reent.h>
+#define XT_CLIB_CONTEXT_AREA_SIZE ((sizeof(struct _reent) + 15) + (-16))
+#define XT_CLIB_GLOBAL_PTR _impure_ptr
+#endif
 #else
-  #define XT_CLIB_CONTEXT_AREA_SIZE	0
+#define XT_HAVE_THREAD_SAFE_CLIB 0
+#error "The selected C runtime library is not thread safe."
+#endif
+#else
+#define XT_CLIB_CONTEXT_AREA_SIZE 0
 #endif
 
 /* Extra size -- interrupt frame plus coprocessor save area plus hook space.
@@ -101,9 +101,9 @@
  * hooks.
  */
 #ifdef __XTENSA_CALL0_ABI__
-  #define XT_XTRA_SIZE  (XT_STK_FRMSZ + STK_INTEXC_EXTRA + 0x10 + XT_CP_SIZE)
+#define XT_XTRA_SIZE (XT_STK_FRMSZ + STK_INTEXC_EXTRA + 0x10 + XT_CP_SIZE)
 #else
-  #define XT_XTRA_SIZE  (XT_STK_FRMSZ + STK_INTEXC_EXTRA + 0x20 + XT_CP_SIZE)
+#define XT_XTRA_SIZE (XT_STK_FRMSZ + STK_INTEXC_EXTRA + 0x20 + XT_CP_SIZE)
 #endif
 
 /*
@@ -115,9 +115,9 @@
  * has to be reserved for spilling register windows.
  */
 #ifdef __XTENSA_CALL0_ABI__
-  #define XT_USER_SIZE            0x200
+#define XT_USER_SIZE 0x200
 #else
-  #define XT_USER_SIZE            0x400
+#define XT_USER_SIZE 0x400
 #endif
 
 /* Minimum recommended stack size. */
@@ -125,8 +125,7 @@
 	((XT_XTRA_SIZE + XT_USER_SIZE) / sizeof(unsigned char))
 
 /* OS overhead with and without C library thread context. */
-#define XT_STACK_EXTRA              (XT_XTRA_SIZE)
-#define XT_STACK_EXTRA_CLIB         (XT_XTRA_SIZE + XT_CLIB_CONTEXT_AREA_SIZE)
-
+#define XT_STACK_EXTRA (XT_XTRA_SIZE)
+#define XT_STACK_EXTRA_CLIB (XT_XTRA_SIZE + XT_CLIB_CONTEXT_AREA_SIZE)
 
 #endif /* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_CONFIG_H_ */

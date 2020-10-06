@@ -56,7 +56,8 @@ void z_soc_irq_enable(uint32_t irq)
 
 	switch (CAVS_IRQ_NUMBER(irq)) {
 	case DW_ICTL_IRQ_CAVS_OFFSET:
-		dev_ictl = device_get_binding(DT_LABEL(DT_INST(0, snps_designware_intc)));
+		dev_ictl = device_get_binding(
+			DT_LABEL(DT_INST(0, snps_designware_intc)));
 		break;
 	default:
 		/* The source of the interrupt is in CAVS interrupt logic */
@@ -114,7 +115,8 @@ void z_soc_irq_disable(uint32_t irq)
 
 	switch (CAVS_IRQ_NUMBER(irq)) {
 	case DW_ICTL_IRQ_CAVS_OFFSET:
-		dev_ictl = device_get_binding(DT_LABEL(DT_INST(0, snps_designware_intc)));
+		dev_ictl = device_get_binding(
+			DT_LABEL(DT_INST(0, snps_designware_intc)));
 		break;
 	default:
 		/* The source of the interrupt is in CAVS interrupt logic */
@@ -181,7 +183,8 @@ int z_soc_irq_is_enabled(unsigned int irq)
 
 	switch (CAVS_IRQ_NUMBER(irq)) {
 	case DW_ICTL_IRQ_CAVS_OFFSET:
-		dev_ictl = device_get_binding(DT_LABEL(DT_INST(0, snps_designware_intc)));
+		dev_ictl = device_get_binding(
+			DT_LABEL(DT_INST(0, snps_designware_intc)));
 		break;
 	default:
 		/* The source of the interrupt is in CAVS interrupt logic */
@@ -206,9 +209,8 @@ static inline void soc_set_resource_ownership(void)
 {
 	volatile struct soc_resource_alloc_regs *regs =
 		(volatile struct soc_resource_alloc_regs *)
-		SOC_RESOURCE_ALLOC_REG_BASE;
+			SOC_RESOURCE_ALLOC_REG_BASE;
 	int index;
-
 
 	/* set ownership of DMA controllers and channels */
 	for (index = 0; index < SOC_NUM_LPGPDMAC; index++) {
@@ -216,12 +218,10 @@ static inline void soc_set_resource_ownership(void)
 	}
 
 	/* set ownership of I2S and DMIC controllers */
-	regs->dspiopo = SOC_DSPIOP_I2S_OWNSEL_DSP |
-		SOC_DSPIOP_DMIC_OWNSEL_DSP;
+	regs->dspiopo = SOC_DSPIOP_I2S_OWNSEL_DSP | SOC_DSPIOP_DMIC_OWNSEL_DSP;
 
 	/* set ownership of timestamp and M/N dividers */
-	regs->geno = SOC_GENO_TIMESTAMP_OWNER_DSP |
-		SOC_GENO_MNDIV_OWNER_DSP;
+	regs->geno = SOC_GENO_TIMESTAMP_OWNER_DSP | SOC_GENO_MNDIV_OWNER_DSP;
 }
 
 uint32_t soc_get_ref_clk_freq(void)
@@ -285,7 +285,7 @@ static inline void soc_set_power_and_clock(void)
 		(volatile struct soc_dsp_shim_regs *)SOC_DSP_SHIM_REG_BASE;
 
 	dsp_shim_regs->clkctl |= SOC_CLKCTL_REQ_FAST_CLK |
-		SOC_CLKCTL_OCS_FAST_CLK;
+				 SOC_CLKCTL_OCS_FAST_CLK;
 	dsp_shim_regs->pwrctl |= SOC_PWRCTL_DISABLE_PWR_GATING_DSP0;
 
 	soc_set_dmic_power();

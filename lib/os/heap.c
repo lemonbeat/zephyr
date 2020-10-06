@@ -271,11 +271,11 @@ void *sys_heap_aligned_alloc(struct sys_heap *heap, size_t align, size_t bytes)
 
 	/* Align allocated memory */
 	void *mem = chunk_mem(h, c0);
-	mem = (void *) ROUND_UP(mem, align);
+	mem = (void *)ROUND_UP(mem, align);
 
 	/* Get corresponding chunk */
 	chunkid_t c = mem_to_chunkid(h, mem);
-	CHECK(c >= c0 && c  < c0 + padded_sz);
+	CHECK(c >= c0 && c < c0 + padded_sz);
 
 	/* Split and free unused prefix */
 	if (c > c0) {
@@ -308,7 +308,8 @@ void sys_heap_init(struct sys_heap *heap, void *mem, size_t bytes)
 	size_t buf_sz = (end - addr) / CHUNK_UNIT;
 
 	CHECK(end > addr);
-	__ASSERT(buf_sz > chunksz(sizeof(struct z_heap)), "heap size is too small");
+	__ASSERT(buf_sz > chunksz(sizeof(struct z_heap)),
+		 "heap size is too small");
 
 	struct z_heap *h = (struct z_heap *)addr;
 	heap->heap = h;
@@ -320,7 +321,8 @@ void sys_heap_init(struct sys_heap *heap, void *mem, size_t bytes)
 	size_t chunk0_size = chunksz(sizeof(struct z_heap) +
 				     nb_buckets * sizeof(struct z_heap_bucket));
 
-	__ASSERT(chunk0_size + min_chunk_size(h) < buf_sz, "heap size is too small");
+	__ASSERT(chunk0_size + min_chunk_size(h) < buf_sz,
+		 "heap size is too small");
 
 	for (int i = 0; i < nb_buckets; i++) {
 		h->buckets[i].next = 0;

@@ -23,60 +23,58 @@ union axis3bit16_t {
 };
 
 #if defined(CONFIG_IIS2DLPC_ODR_1_6)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_1Hz6_LP_ONLY
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_1Hz6_LP_ONLY
 #elif defined(CONFIG_IIS2DLPC_ODR_12_5)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_12Hz5
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_12Hz5
 #elif defined(CONFIG_IIS2DLPC_ODR_25)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_25Hz
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_25Hz
 #elif defined(CONFIG_IIS2DLPC_ODR_50)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_50Hz
-#elif defined(CONFIG_IIS2DLPC_ODR_100) || \
-	defined(CONFIG_IIS2DLPC_ODR_RUNTIME)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_100Hz
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_50Hz
+#elif defined(CONFIG_IIS2DLPC_ODR_100) || defined(CONFIG_IIS2DLPC_ODR_RUNTIME)
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_100Hz
 #elif defined(CONFIG_IIS2DLPC_ODR_200)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_200Hz
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_200Hz
 #elif defined(CONFIG_IIS2DLPC_ODR_400)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_400Hz
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_400Hz
 #elif defined(CONFIG_IIS2DLPC_ODR_800)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_800Hz
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_800Hz
 #elif defined(CONFIG_IIS2DLPC_ODR_1600)
-	#define IIS2DLPC_DEFAULT_ODR	IIS2DLPC_XL_ODR_1k6Hz
+#define IIS2DLPC_DEFAULT_ODR IIS2DLPC_XL_ODR_1k6Hz
 #endif
 
 /* Return ODR reg value based on data rate set */
-#define IIS2DLPC_ODR_TO_REG(_odr) \
-	((_odr <= 1) ? IIS2DLPC_XL_ODR_1Hz6_LP_ONLY : \
-	 (_odr <= 12) ? IIS2DLPC_XL_ODR_12Hz5 : \
-	 ((31 - __builtin_clz(_odr / 25))) + 3)
+#define IIS2DLPC_ODR_TO_REG(_odr)                      \
+	((_odr <= 1)  ? IIS2DLPC_XL_ODR_1Hz6_LP_ONLY : \
+	 (_odr <= 12) ? IIS2DLPC_XL_ODR_12Hz5 :        \
+			      ((31 - __builtin_clz(_odr / 25))) + 3)
 
 /* FS reg value from Full Scale */
-#define IIS2DLPC_FS_TO_REG(_fs)	(30 - __builtin_clz(_fs))
+#define IIS2DLPC_FS_TO_REG(_fs) (30 - __builtin_clz(_fs))
 
 #if defined(CONFIG_IIS2DLPC_ACCEL_RANGE_RUNTIME) || \
 	defined(CONFIG_IIS2DLPC_ACCEL_RANGE_2G)
-	#define IIS2DLPC_ACC_FS		IIS2DLPC_2g
+#define IIS2DLPC_ACC_FS IIS2DLPC_2g
 #elif defined(CONFIG_IIS2DLPC_ACCEL_RANGE_4G)
-	#define IIS2DLPC_ACC_FS		IIS2DLPC_4g
+#define IIS2DLPC_ACC_FS IIS2DLPC_4g
 #elif defined(CONFIG_IIS2DLPC_ACCEL_RANGE_8G)
-	#define IIS2DLPC_ACC_FS		IIS2DLPC_8g
+#define IIS2DLPC_ACC_FS IIS2DLPC_8g
 #elif defined(CONFIG_IIS2DLPC_ACCEL_RANGE_16G)
-	#define IIS2DLPC_ACC_FS		IIS2DLPC_16g
+#define IIS2DLPC_ACC_FS IIS2DLPC_16g
 #endif
 
 /* Acc Gain value in ug/LSB in High Perf mode */
-#define IIS2DLPC_FS_2G_GAIN		244
-#define IIS2DLPC_FS_4G_GAIN		488
-#define IIS2DLPC_FS_8G_GAIN		976
-#define IIS2DLPC_FS_16G_GAIN		1952
+#define IIS2DLPC_FS_2G_GAIN 244
+#define IIS2DLPC_FS_4G_GAIN 488
+#define IIS2DLPC_FS_8G_GAIN 976
+#define IIS2DLPC_FS_16G_GAIN 1952
 
-#define IIS2DLPC_SHFT_GAIN_NOLP1	2
+#define IIS2DLPC_SHFT_GAIN_NOLP1 2
 #define IIS2DLPC_ACCEL_GAIN_DEFAULT_VAL IIS2DLPC_FS_2G_GAIN
-#define IIS2DLPC_FS_TO_GAIN(_fs, _lp1) \
-		(IIS2DLPC_FS_2G_GAIN << ((_fs) + (_lp1)))
+#define IIS2DLPC_FS_TO_GAIN(_fs, _lp1) (IIS2DLPC_FS_2G_GAIN << ((_fs) + (_lp1)))
 
 /* shift value for power mode */
-#define IIS2DLPC_SHIFT_PM1		4
-#define IIS2DLPC_SHIFT_PMOTHER		2
+#define IIS2DLPC_SHIFT_PM1 4
+#define IIS2DLPC_SHIFT_PMOTHER 2
 
 /**
  * struct iis2dlpc_device_config - iis2dlpc hw configuration
@@ -109,7 +107,7 @@ struct iis2dlpc_data {
 	const struct device *bus;
 	int16_t acc[3];
 
-	 /* save sensitivity */
+	/* save sensitivity */
 	uint16_t gain;
 
 	stmdev_ctx_t *ctx;
@@ -142,8 +140,8 @@ int iis2dlpc_spi_init(const struct device *dev);
 #ifdef CONFIG_IIS2DLPC_TRIGGER
 int iis2dlpc_init_interrupt(const struct device *dev);
 int iis2dlpc_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler);
+			 const struct sensor_trigger *trig,
+			 sensor_trigger_handler_t handler);
 #endif /* CONFIG_IIS2DLPC_TRIGGER */
 
 #endif /* ZEPHYR_DRIVERS_SENSOR_IIS2DLPC_IIS2DLPC_H_ */

@@ -28,8 +28,8 @@ static int lis2mdl_enable_int(const struct device *dev, int enable)
 
 /* link external trigger to event data ready */
 int lis2mdl_trigger_set(const struct device *dev,
-			  const struct sensor_trigger *trig,
-			  sensor_trigger_handler_t handler)
+			const struct sensor_trigger *trig,
+			sensor_trigger_handler_t handler)
 {
 	struct lis2mdl_data *lis2mdl = dev->data;
 	union axis3bit16_t raw;
@@ -67,7 +67,7 @@ static void lis2mdl_handle_interrupt(const struct device *dev)
 }
 
 static void lis2mdl_gpio_callback(const struct device *dev,
-				    struct gpio_callback *cb, uint32_t pins)
+				  struct gpio_callback *cb, uint32_t pins)
 {
 	struct lis2mdl_data *lis2mdl =
 		CONTAINER_OF(cb, struct lis2mdl_data, gpio_cb);
@@ -112,8 +112,7 @@ int lis2mdl_init_interrupt(const struct device *dev)
 	/* setup data ready gpio interrupt */
 	lis2mdl->gpio = device_get_binding(config->gpio_name);
 	if (lis2mdl->gpio == NULL) {
-		LOG_DBG("Cannot get pointer to %s device",
-			    config->gpio_name);
+		LOG_DBG("Cannot get pointer to %s device", config->gpio_name);
 		return -EINVAL;
 	}
 
@@ -121,9 +120,9 @@ int lis2mdl_init_interrupt(const struct device *dev)
 	k_sem_init(&lis2mdl->gpio_sem, 0, UINT_MAX);
 	k_thread_create(&lis2mdl->thread, lis2mdl->thread_stack,
 			CONFIG_LIS2MDL_THREAD_STACK_SIZE,
-			(k_thread_entry_t)lis2mdl_thread, lis2mdl,
-			NULL, NULL, K_PRIO_COOP(CONFIG_LIS2MDL_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)lis2mdl_thread, lis2mdl, NULL, NULL,
+			K_PRIO_COOP(CONFIG_LIS2MDL_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_LIS2MDL_TRIGGER_GLOBAL_THREAD)
 	lis2mdl->work.handler = lis2mdl_work_cb;
 #endif
@@ -131,8 +130,7 @@ int lis2mdl_init_interrupt(const struct device *dev)
 	gpio_pin_configure(lis2mdl->gpio, config->gpio_pin,
 			   GPIO_INPUT | config->gpio_flags);
 
-	gpio_init_callback(&lis2mdl->gpio_cb,
-			   lis2mdl_gpio_callback,
+	gpio_init_callback(&lis2mdl->gpio_cb, lis2mdl_gpio_callback,
 			   BIT(config->gpio_pin));
 
 	if (gpio_add_callback(lis2mdl->gpio, &lis2mdl->gpio_cb) < 0) {

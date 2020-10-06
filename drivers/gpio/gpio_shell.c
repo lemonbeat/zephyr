@@ -39,12 +39,10 @@ static const struct args_index args_indx = {
 	.value = 3,
 };
 
-static const struct args_number args_no = {
-	.conf = 4,
-	.set = 4,
-	.get = 3,
-	.listen = 7
-};
+static const struct args_number args_no = { .conf = 4,
+					    .set = 4,
+					    .get = 3,
+					    .listen = 7 };
 
 static int cmd_gpio_conf(const struct shell *shell, size_t argc, char **argv)
 {
@@ -80,14 +78,14 @@ static int cmd_gpio_conf(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 
-static int cmd_gpio_get(const struct shell *shell,
-			size_t argc, char **argv)
+static int cmd_gpio_get(const struct shell *shell, size_t argc, char **argv)
 {
 	const struct device *dev;
 	uint8_t index = 0U;
 	int rc;
 
-	if (argc == args_no.get && isdigit((unsigned char)argv[args_indx.index][0])) {
+	if (argc == args_no.get &&
+	    isdigit((unsigned char)argv[args_indx.index][0])) {
 		index = (uint8_t)atoi(argv[args_indx.index]);
 	} else {
 		shell_error(shell, "Wrong parameters for get");
@@ -98,8 +96,8 @@ static int cmd_gpio_get(const struct shell *shell,
 
 	if (dev != NULL) {
 		index = (uint8_t)atoi(argv[2]);
-		shell_print(shell, "Reading %s pin %d",
-			     argv[args_indx.port], index);
+		shell_print(shell, "Reading %s pin %d", argv[args_indx.port],
+			    index);
 		rc = gpio_pin_get(dev, index);
 		if (rc >= 0) {
 			shell_print(shell, "Value %d", rc);
@@ -112,8 +110,7 @@ static int cmd_gpio_get(const struct shell *shell,
 	return 0;
 }
 
-static int cmd_gpio_set(const struct shell *shell,
-			size_t argc, char **argv)
+static int cmd_gpio_set(const struct shell *shell, size_t argc, char **argv)
 {
 	const struct device *dev;
 	uint8_t index = 0U;
@@ -132,17 +129,16 @@ static int cmd_gpio_set(const struct shell *shell,
 
 	if (dev != NULL) {
 		index = (uint8_t)atoi(argv[2]);
-		shell_print(shell, "Writing to %s pin %d",
-			    argv[args_indx.port], index);
+		shell_print(shell, "Writing to %s pin %d", argv[args_indx.port],
+			    index);
 		gpio_pin_set(dev, index, value);
 	}
 
 	return 0;
 }
 
-
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_gpio,
-	SHELL_CMD(conf, NULL, "Configure GPIO", cmd_gpio_conf),
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_gpio, SHELL_CMD(conf, NULL, "Configure GPIO", cmd_gpio_conf),
 	SHELL_CMD(get, NULL, "Get GPIO value", cmd_gpio_get),
 	SHELL_CMD(set, NULL, "Set GPIO", cmd_gpio_set),
 	SHELL_SUBCMD_SET_END /* Array terminated. */

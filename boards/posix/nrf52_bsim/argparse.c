@@ -62,8 +62,8 @@ static void save_test_arg(struct NRF_bsim_args_t *args, char *argv)
 {
 	if (args->test_case_argc >= MAXPARAMS_TESTCASES) {
 		bs_trace_error_line("Too many testcase arguments (at '%s'), "
-				    "maximum is %i\n", argv,
-				    MAXPARAMS_TESTCASES);
+				    "maximum is %i\n",
+				    argv, MAXPARAMS_TESTCASES);
 	} else {
 		bs_trace_raw(9, "cmdarg: adding '%s' to testcase args[%i]\n",
 			     argv, args->test_case_argc);
@@ -74,10 +74,10 @@ static void save_test_arg(struct NRF_bsim_args_t *args, char *argv)
 static void print_no_sim_warning(void)
 {
 	bs_trace_warning("Neither simulation id or the device number "
-			"have been set. I assume you want to run "
-			"without a BabbleSim phy (-nosim)\n");
+			 "have been set. I assume you want to run "
+			 "without a BabbleSim phy (-nosim)\n");
 	bs_trace_warning("If this is not what you wanted, check with "
-			"--help how to set them\n");
+			 "--help how to set them\n");
 	bs_trace_raw(3, "setting sim_id to 'bogus', device number to 0 "
 			"and nosim\n");
 }
@@ -106,36 +106,27 @@ void nrfbsim_register_args(void)
 		 * destination, callback,
 		 * description
 		 */
-		{false, false, true,
-		"nosim", "", 'b',
-		(void *)&nosim, cmd_nosim_found,
-		"(debug feature) Do not connect to the phy"},
+		{ false, false, true, "nosim", "", 'b', (void *)&nosim,
+		  cmd_nosim_found,
+		  "(debug feature) Do not connect to the phy" },
 		BS_DUMP_FILES_ARGS,
-		{false, false, false,
-		"testid", "testid", 's',
-		(void *)&testid, cmd_testid_found,
-		"Which of the tests shall be run. Run -testslist for more info"
-		},
-		{false, false, true,
-		"testslist", "", 'b',
-		NULL, cmd_testlist_found,
-		"Print information about the available FW application tests"},
-		{true, false, false,
-		"argstest", "arg", 'l',
-		NULL, NULL,
-		"The arguments that follow will be passed straight to the "
-		"testcase init function"},
-		{true, false, false,
-		"argsmain", "arg", 'l',
-		NULL, NULL,
-		"The arguments that follow will be passed to main (default)"},
+		{ false, false, false, "testid", "testid", 's', (void *)&testid,
+		  cmd_testid_found,
+		  "Which of the tests shall be run. Run -testslist for more info" },
+		{ false, false, true, "testslist", "", 'b', NULL,
+		  cmd_testlist_found,
+		  "Print information about the available FW application tests" },
+		{ true, false, false, "argstest", "arg", 'l', NULL, NULL,
+		  "The arguments that follow will be passed straight to the "
+		  "testcase init function" },
+		{ true, false, false, "argsmain", "arg", 'l', NULL, NULL,
+		  "The arguments that follow will be passed to main (default)" },
 		ARG_TABLE_ENDMARKER
 	};
 #undef args
 
 	bs_add_dynargs(&args_struct, args_struct_toadd);
 }
-
 
 void bs_add_extra_dynargs(bs_args_struct_t *args_struct_toadd)
 {
@@ -156,7 +147,7 @@ struct NRF_bsim_args_t *nrfbsim_argsparse(int argc, char *argv[])
 	nrf_hw_sub_cmline_set_defaults(&arg.nrf_hw);
 	static const char default_phy[] = "2G4";
 
-	enum {Main = 0, Test = 1} parsing = Main;
+	enum { Main = 0, Test = 1 } parsing = Main;
 
 	for (int i = 1; i < argc; i++) {
 		if (bs_is_option(argv[i], "argstest", 0)) {

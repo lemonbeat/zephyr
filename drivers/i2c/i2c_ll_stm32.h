@@ -68,11 +68,9 @@ struct i2c_stm32_data {
 };
 
 int32_t stm32_i2c_msg_write(const struct device *dev, struct i2c_msg *msg,
-			    uint8_t *flg,
-			    uint16_t sadr);
+			    uint8_t *flg, uint16_t sadr);
 int32_t stm32_i2c_msg_read(const struct device *dev, struct i2c_msg *msg,
-			   uint8_t *flg,
-			   uint16_t sadr);
+			   uint8_t *flg, uint16_t sadr);
 int32_t stm32_i2c_configure_timing(const struct device *dev, uint32_t clk);
 int i2c_stm32_runtime_configure(const struct device *dev, uint32_t config);
 
@@ -89,8 +87,7 @@ int i2c_stm32_slave_unregister(const struct device *dev,
 			       struct i2c_slave_config *config);
 #endif
 
-#define DEV_DATA(dev) ((struct i2c_stm32_data * const)(dev)->data)
-#define DEV_CFG(dev)	\
-((const struct i2c_stm32_config * const)(dev)->config)
+#define DEV_DATA(dev) ((struct i2c_stm32_data *const)(dev)->data)
+#define DEV_CFG(dev) ((const struct i2c_stm32_config *const)(dev)->config)
 
-#endif	/* ZEPHYR_DRIVERS_I2C_I2C_LL_STM32_H_ */
+#endif /* ZEPHYR_DRIVERS_I2C_I2C_LL_STM32_H_ */

@@ -15,11 +15,8 @@
 #include <shell/shell.h>
 #include <shell/shell_dummy.h>
 
-#define MAX_CMD_SYNTAX_LEN	(11)
-static char dynamic_cmd_buffer[][MAX_CMD_SYNTAX_LEN] = {
-		"dynamic",
-		"command"
-};
+#define MAX_CMD_SYNTAX_LEN (11)
+static char dynamic_cmd_buffer[][MAX_CMD_SYNTAX_LEN] = { "dynamic", "command" };
 
 static void test_shell_execute_cmd(const char *cmd, int result)
 {
@@ -29,8 +26,8 @@ static void test_shell_execute_cmd(const char *cmd, int result)
 
 	TC_PRINT("shell_execute_cmd(%s): %d\n", cmd, ret);
 
-	zassert_true(ret == result, "cmd: %s, got:%d, expected:%d",
-							cmd, ret, result);
+	zassert_true(ret == result, "cmd: %s, got:%d, expected:%d", cmd, ret,
+		     result);
 }
 
 static void test_cmd_help(void)
@@ -68,14 +65,14 @@ static void test_cmd_shell(void)
 	test_shell_execute_cmd("shell backspace_mode backspace --help", 1);
 	test_shell_execute_cmd("shell backspace_mode backspace dummy", -EINVAL);
 	test_shell_execute_cmd("shell backspace_mode backspace dummy dummy",
-				-EINVAL);
+			       -EINVAL);
 
 	test_shell_execute_cmd("shell backspace_mode delete", 0);
 	test_shell_execute_cmd("shell backspace_mode delete -h", 1);
 	test_shell_execute_cmd("shell backspace_mode delete --help", 1);
 	test_shell_execute_cmd("shell backspace_mode delete dummy", -EINVAL);
 	test_shell_execute_cmd("shell backspace_mode delete dummy dummy",
-				-EINVAL);
+			       -EINVAL);
 
 	/* subcommand: colors */
 	test_shell_execute_cmd("shell colors -h", 1);
@@ -193,7 +190,6 @@ static void test_shell_wildcards_dynamic(void)
 	test_shell_execute_cmd("test_dynamic d* c*", 2);
 }
 
-
 static int cmd_test_module(const struct shell *shell, size_t argc, char **argv)
 {
 	ARG_UNUSED(argv);
@@ -202,7 +198,6 @@ static int cmd_test_module(const struct shell *shell, size_t argc, char **argv)
 	return 0;
 }
 SHELL_CMD_ARG_REGISTER(test_shell_cmd, NULL, "help", cmd_test_module, 1, 0);
-
 
 static int cmd_wildcard(const struct shell *shell, size_t argc, char **argv)
 {
@@ -225,13 +220,11 @@ static int cmd_wildcard(const struct shell *shell, size_t argc, char **argv)
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(m_sub_test_shell_cmdl,
-	SHELL_CMD(argument_1, NULL, NULL, NULL),
-	SHELL_CMD(argument_2, NULL, NULL, NULL),
-	SHELL_CMD(dummy, NULL, NULL, NULL),
-	SHELL_SUBCMD_SET_END
-);
+			       SHELL_CMD(argument_1, NULL, NULL, NULL),
+			       SHELL_CMD(argument_2, NULL, NULL, NULL),
+			       SHELL_CMD(dummy, NULL, NULL, NULL),
+			       SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(test_wildcard, &m_sub_test_shell_cmdl, NULL, cmd_wildcard);
-
 
 static int cmd_dynamic(const struct shell *shell, size_t argc, char **argv)
 {
@@ -247,7 +240,6 @@ static int cmd_dynamic(const struct shell *shell, size_t argc, char **argv)
 		}
 	}
 
-
 	return valid_arguments;
 }
 /* dynamic command creation */
@@ -258,7 +250,7 @@ static void dynamic_cmd_get(size_t idx, struct shell_static_entry *entry)
 		 * correct CLI completion
 		 */
 		entry->syntax = dynamic_cmd_buffer[idx];
-		entry->handler  = NULL;
+		entry->handler = NULL;
 		entry->subcmd = NULL;
 		entry->help = NULL;
 	} else {
@@ -329,8 +321,8 @@ static void test_shell_fprintf(void)
 	/* Clear the output buffer */
 	shell_backend_dummy_clear_output(shell);
 
-	shell_fprintf(shell, SHELL_VT100_COLOR_DEFAULT, "testing %d %s %c",
-		      1, "2", '3');
+	shell_fprintf(shell, SHELL_VT100_COLOR_DEFAULT, "testing %d %s %c", 1,
+		      "2", '3');
 	buf = shell_backend_dummy_get_output(shell, &size);
 	zassert_true(size >= sizeof(expect), "Expected size > %u, got %d",
 		     sizeof(expect), size);
@@ -391,21 +383,19 @@ static void test_max_argc(void)
 
 void test_main(void)
 {
-	ztest_test_suite(shell_test_suite,
-			ztest_1cpu_unit_test(test_cmd_help),
-			ztest_unit_test(test_cmd_clear),
-			ztest_unit_test(test_cmd_shell),
-			ztest_unit_test(test_cmd_history),
-			ztest_unit_test(test_cmd_select),
-			ztest_unit_test(test_cmd_resize),
-			ztest_unit_test(test_shell_module),
-			ztest_unit_test(test_shell_wildcards_static),
-			ztest_unit_test(test_shell_wildcards_dynamic),
-			ztest_unit_test(test_shell_fprintf),
-			ztest_unit_test(test_set_root_cmd),
-			ztest_unit_test(test_raw_arg),
-			ztest_unit_test(test_max_argc)
-			);
+	ztest_test_suite(shell_test_suite, ztest_1cpu_unit_test(test_cmd_help),
+			 ztest_unit_test(test_cmd_clear),
+			 ztest_unit_test(test_cmd_shell),
+			 ztest_unit_test(test_cmd_history),
+			 ztest_unit_test(test_cmd_select),
+			 ztest_unit_test(test_cmd_resize),
+			 ztest_unit_test(test_shell_module),
+			 ztest_unit_test(test_shell_wildcards_static),
+			 ztest_unit_test(test_shell_wildcards_dynamic),
+			 ztest_unit_test(test_shell_fprintf),
+			 ztest_unit_test(test_set_root_cmd),
+			 ztest_unit_test(test_raw_arg),
+			 ztest_unit_test(test_max_argc));
 
 	/* Let the shell backend initialize. */
 	k_msleep(20);

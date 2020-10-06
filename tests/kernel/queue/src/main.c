@@ -8,10 +8,10 @@
 #include "test_queue.h"
 
 #ifndef CONFIG_USERSPACE
-#define dummy_test(_name)		\
-	static void _name(void)		\
-	{				\
-		ztest_test_skip();	\
+#define dummy_test(_name)          \
+	static void _name(void)    \
+	{                          \
+		ztest_test_skip(); \
 	}
 
 dummy_test(test_queue_supv_to_user);
@@ -21,9 +21,9 @@ dummy_test(test_auto_free);
 #endif
 
 #ifdef CONFIG_64BIT
-#define MAX_SZ	128
+#define MAX_SZ 128
 #else
-#define MAX_SZ	96
+#define MAX_SZ 96
 #endif
 K_MEM_POOL_DEFINE(test_pool, 16, MAX_SZ, 4, 4);
 

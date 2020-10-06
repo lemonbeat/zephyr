@@ -45,7 +45,7 @@ static int test_flash_ram_erase(const struct device *dev, off_t offset,
 }
 
 static int test_flash_ram_write(const struct device *dev, off_t offset,
-						const void *data, size_t len)
+				const void *data, size_t len)
 {
 	zassert_true(offset >= 0, "invalid offset");
 	zassert_true(offset + len <= FLASH_AREA_SIZE(storage),
@@ -57,8 +57,7 @@ static int test_flash_ram_write(const struct device *dev, off_t offset,
 }
 
 static int test_flash_ram_read(const struct device *dev, off_t offset,
-								void *data,
-								size_t len)
+			       void *data, size_t len)
 {
 	zassert_true(offset >= 0, "invalid offset");
 	zassert_true(offset + len <= FLASH_AREA_SIZE(storage),
@@ -69,9 +68,10 @@ static int test_flash_ram_read(const struct device *dev, off_t offset,
 	return 0;
 }
 
-static void test_flash_ram_pages_layout(const struct device *dev,
-					const struct flash_pages_layout **layout,
-					size_t *layout_size)
+static void
+test_flash_ram_pages_layout(const struct device *dev,
+			    const struct flash_pages_layout **layout,
+			    size_t *layout_size)
 {
 	/* Same as used in Mynewt native "flash" backend */
 	static struct flash_pages_layout dev_layout[] = {
@@ -93,6 +93,5 @@ static const struct flash_driver_api flash_ram_api = {
 };
 
 DEVICE_AND_API_INIT(flash_ram_test, "ram_flash_test_drv", test_ram_flash_init,
-					NULL, NULL, POST_KERNEL,
-					CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-					&flash_ram_api);
+		    NULL, NULL, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &flash_ram_api);

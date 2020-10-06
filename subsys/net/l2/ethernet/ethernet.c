@@ -34,10 +34,11 @@ LOG_MODULE_REGISTER(net_ethernet, CONFIG_NET_L2_ETHERNET_LOG_LEVEL);
 #define NET_BUF_TIMEOUT K_MSEC(100)
 
 static const struct net_eth_addr multicast_eth_addr __unused = {
-	{ 0x33, 0x33, 0x00, 0x00, 0x00, 0x00 } };
+	{ 0x33, 0x33, 0x00, 0x00, 0x00, 0x00 }
+};
 
-static const struct net_eth_addr broadcast_eth_addr = {
-	{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } };
+static const struct net_eth_addr broadcast_eth_addr = { { 0xff, 0xff, 0xff,
+							  0xff, 0xff, 0xff } };
 
 const struct net_eth_addr *net_eth_broadcast_addr(void)
 {
@@ -58,38 +59,38 @@ void net_eth_ipv6_mcast_to_mac_addr(const struct in6_addr *ipv6_addr,
 	memcpy(mac_addr->addr + 2, &ipv6_addr->s6_addr[12], 4);
 }
 
-#define print_ll_addrs(pkt, type, len, src, dst)			   \
-	if (CONFIG_NET_L2_ETHERNET_LOG_LEVEL >= LOG_LEVEL_DBG) {	   \
-		char out[sizeof("xx:xx:xx:xx:xx:xx")];			   \
-									   \
-		snprintk(out, sizeof(out), "%s",			   \
-			 net_sprint_ll_addr((src)->addr,		   \
-					    sizeof(struct net_eth_addr))); \
-									   \
-		NET_DBG("iface %p src %s dst %s type 0x%x len %zu",	   \
-			net_pkt_iface(pkt), log_strdup(out),		   \
-			log_strdup(net_sprint_ll_addr((dst)->addr,	   \
-					    sizeof(struct net_eth_addr))), \
-			type, (size_t)len);				   \
+#define print_ll_addrs(pkt, type, len, src, dst)                            \
+	if (CONFIG_NET_L2_ETHERNET_LOG_LEVEL >= LOG_LEVEL_DBG) {            \
+		char out[sizeof("xx:xx:xx:xx:xx:xx")];                      \
+                                                                            \
+		snprintk(out, sizeof(out), "%s",                            \
+			 net_sprint_ll_addr((src)->addr,                    \
+					    sizeof(struct net_eth_addr)));  \
+                                                                            \
+		NET_DBG("iface %p src %s dst %s type 0x%x len %zu",         \
+			net_pkt_iface(pkt), log_strdup(out),                \
+			log_strdup(net_sprint_ll_addr(                      \
+				(dst)->addr, sizeof(struct net_eth_addr))), \
+			type, (size_t)len);                                 \
 	}
 
 #ifdef CONFIG_NET_VLAN
-#define print_vlan_ll_addrs(pkt, type, tci, len, src, dst, tagstrip)       \
-	if (CONFIG_NET_L2_ETHERNET_LOG_LEVEL >= LOG_LEVEL_DBG) {	   \
-		char out[sizeof("xx:xx:xx:xx:xx:xx")];			   \
-									   \
-		snprintk(out, sizeof(out), "%s",			   \
-			 net_sprint_ll_addr((src)->addr,		   \
-					    sizeof(struct net_eth_addr))); \
-									   \
-		NET_DBG("iface %p src %s dst %s type 0x%x "		   \
-			"tag %d %spri %d len %zu",			   \
-			net_pkt_iface(pkt), log_strdup(out),		   \
-			log_strdup(net_sprint_ll_addr((dst)->addr,	   \
-				   sizeof(struct net_eth_addr))),	   \
-			type, net_eth_vlan_get_vid(tci),		   \
-			tagstrip ? "(stripped) " : "",			   \
-			net_eth_vlan_get_pcp(tci), (size_t)len);	   \
+#define print_vlan_ll_addrs(pkt, type, tci, len, src, dst, tagstrip)        \
+	if (CONFIG_NET_L2_ETHERNET_LOG_LEVEL >= LOG_LEVEL_DBG) {            \
+		char out[sizeof("xx:xx:xx:xx:xx:xx")];                      \
+                                                                            \
+		snprintk(out, sizeof(out), "%s",                            \
+			 net_sprint_ll_addr((src)->addr,                    \
+					    sizeof(struct net_eth_addr)));  \
+                                                                            \
+		NET_DBG("iface %p src %s dst %s type 0x%x "                 \
+			"tag %d %spri %d len %zu",                          \
+			net_pkt_iface(pkt), log_strdup(out),                \
+			log_strdup(net_sprint_ll_addr(                      \
+				(dst)->addr, sizeof(struct net_eth_addr))), \
+			type, net_eth_vlan_get_vid(tci),                    \
+			tagstrip ? "(stripped) " : "",                      \
+			net_eth_vlan_get_pcp(tci), (size_t)len);            \
 	}
 #else
 #define print_vlan_ll_addrs(...)
@@ -126,8 +127,8 @@ static inline void ethernet_update_length(struct net_if *iface,
 	}
 }
 
-static void ethernet_update_rx_stats(struct net_if *iface,
-				     struct net_pkt *pkt, size_t length)
+static void ethernet_update_rx_stats(struct net_if *iface, struct net_pkt *pkt,
+				     size_t length)
 {
 #if defined(CONFIG_NET_STATISTICS_ETHERNET)
 	struct net_eth_hdr *hdr = NET_ETH_HDR(pkt);
@@ -154,9 +155,8 @@ static inline bool eth_is_vlan_tag_stripped(struct net_if *iface)
 /* Drop packet if it has broadcast destination MAC address but the IP
  * address is not multicast or broadcast address. See RFC 1122 ch 3.3.6
  */
-static inline
-enum net_verdict ethernet_check_ipv4_bcast_addr(struct net_pkt *pkt,
-						struct net_eth_hdr *hdr)
+static inline enum net_verdict
+ethernet_check_ipv4_bcast_addr(struct net_pkt *pkt, struct net_eth_hdr *hdr)
 {
 	if (net_eth_is_addr_broadcast(&hdr->dst) &&
 	    !(net_ipv4_is_addr_mcast(&NET_IPV4_HDR(pkt)->dst) ||
@@ -168,8 +168,7 @@ enum net_verdict ethernet_check_ipv4_bcast_addr(struct net_pkt *pkt,
 	return NET_OK;
 }
 
-static enum net_verdict ethernet_recv(struct net_if *iface,
-				      struct net_pkt *pkt)
+static enum net_verdict ethernet_recv(struct net_if *iface, struct net_pkt *pkt)
 {
 	struct ethernet_context *ctx = net_if_l2_data(iface);
 	struct net_eth_hdr *hdr = NET_ETH_HDR(pkt);
@@ -189,8 +188,7 @@ static enum net_verdict ethernet_recv(struct net_if *iface,
 
 	type = ntohs(hdr->type);
 
-	if (net_eth_is_vlan_enabled(ctx, iface) &&
-	    type == NET_ETH_PTYPE_VLAN &&
+	if (net_eth_is_vlan_enabled(ctx, iface) && type == NET_ETH_PTYPE_VLAN &&
 	    !eth_is_vlan_tag_stripped(iface)) {
 		struct net_eth_vlan_hdr *hdr_vlan =
 			(struct net_eth_vlan_hdr *)NET_ETH_HDR(pkt);
@@ -275,8 +273,8 @@ static enum net_verdict ethernet_recv(struct net_if *iface,
 		 */
 		NET_DBG("Dropping frame, not for me [%s]",
 			log_strdup(net_sprint_ll_addr(
-					   net_if_get_link_addr(iface)->addr,
-					   sizeof(struct net_eth_addr))));
+				net_if_get_link_addr(iface)->addr,
+				sizeof(struct net_eth_addr))));
 		goto drop;
 	}
 
@@ -289,12 +287,12 @@ static enum net_verdict ethernet_recv(struct net_if *iface,
 
 	ethernet_update_rx_stats(iface, pkt, net_pkt_get_len(pkt) + hdr_len);
 
-	if (IS_ENABLED(CONFIG_NET_ARP) &&
-	    family == AF_INET && type == NET_ETH_PTYPE_ARP) {
+	if (IS_ENABLED(CONFIG_NET_ARP) && family == AF_INET &&
+	    type == NET_ETH_PTYPE_ARP) {
 		NET_DBG("ARP packet from %s received",
 			log_strdup(net_sprint_ll_addr(
-					   (uint8_t *)hdr->src.addr,
-					   sizeof(struct net_eth_addr))));
+				(uint8_t *)hdr->src.addr,
+				sizeof(struct net_eth_addr))));
 
 		if (IS_ENABLED(CONFIG_NET_IPV4_AUTO) &&
 		    net_ipv4_autoconf_input(iface, pkt) == NET_DROP) {
@@ -371,8 +369,8 @@ static struct net_pkt *ethernet_ll_prepare_on_ipv4(struct net_if *iface,
 			return arp_pkt;
 		}
 
-		NET_DBG("Found ARP entry, sending pkt %p to iface %p",
-			pkt, iface);
+		NET_DBG("Found ARP entry, sending pkt %p to iface %p", pkt,
+			iface);
 	}
 
 	return pkt;
@@ -406,8 +404,7 @@ static bool ethernet_fill_in_dst_on_ipv6_mcast(struct net_pkt *pkt,
 
 #if defined(CONFIG_NET_VLAN)
 static enum net_verdict set_vlan_tag(struct ethernet_context *ctx,
-				     struct net_if *iface,
-				     struct net_pkt *pkt)
+				     struct net_if *iface, struct net_pkt *pkt)
 {
 	int i;
 
@@ -419,11 +416,9 @@ static enum net_verdict set_vlan_tag(struct ethernet_context *ctx,
 	if (net_pkt_family(pkt) == AF_INET6) {
 		struct net_if *target;
 
-		if (net_if_ipv6_addr_lookup(&NET_IPV6_HDR(pkt)->src,
-					    &target)) {
+		if (net_if_ipv6_addr_lookup(&NET_IPV6_HDR(pkt)->src, &target)) {
 			if (target != iface) {
-				NET_DBG("Iface %p should be %p", iface,
-					target);
+				NET_DBG("Iface %p should be %p", iface, target);
 
 				iface = target;
 			}
@@ -435,11 +430,9 @@ static enum net_verdict set_vlan_tag(struct ethernet_context *ctx,
 	if (net_pkt_family(pkt) == AF_INET) {
 		struct net_if *target;
 
-		if (net_if_ipv4_addr_lookup(&NET_IPV4_HDR(pkt)->src,
-					    &target)) {
+		if (net_if_ipv4_addr_lookup(&NET_IPV4_HDR(pkt)->src, &target)) {
 			if (target != iface) {
-				NET_DBG("Iface %p should be %p", iface,
-					target);
+				NET_DBG("Iface %p should be %p", iface, target);
 				iface = target;
 			}
 		}
@@ -463,8 +456,7 @@ static enum net_verdict set_vlan_tag(struct ethernet_context *ctx,
 	return NET_DROP;
 }
 
-static void set_vlan_priority(struct ethernet_context *ctx,
-			      struct net_pkt *pkt)
+static void set_vlan_priority(struct ethernet_context *ctx, struct net_pkt *pkt)
 {
 	uint8_t vlan_priority;
 
@@ -477,8 +469,7 @@ static void set_vlan_priority(struct ethernet_context *ctx,
 #endif /* CONFIG_NET_VLAN */
 
 static struct net_buf *ethernet_fill_header(struct ethernet_context *ctx,
-					    struct net_pkt *pkt,
-					    uint32_t ptype)
+					    struct net_pkt *pkt, uint32_t ptype)
 {
 	struct net_buf *hdr_frag;
 	struct net_eth_hdr *hdr;
@@ -509,8 +500,7 @@ static struct net_buf *ethernet_fill_header(struct ethernet_context *ctx,
 		net_buf_add(hdr_frag, sizeof(struct net_eth_vlan_hdr));
 
 		print_vlan_ll_addrs(pkt, ntohs(hdr_vlan->type),
-				    net_pkt_vlan_tci(pkt),
-				    hdr_frag->len,
+				    net_pkt_vlan_tci(pkt), hdr_frag->len,
 				    &hdr_vlan->src, &hdr_vlan->dst, false);
 	} else {
 		hdr = (struct net_eth_hdr *)(hdr_frag->data);
@@ -527,8 +517,8 @@ static struct net_buf *ethernet_fill_header(struct ethernet_context *ctx,
 		hdr->type = ptype;
 		net_buf_add(hdr_frag, sizeof(struct net_eth_hdr));
 
-		print_ll_addrs(pkt, ntohs(hdr->type),
-			       hdr_frag->len, &hdr->src, &hdr->dst);
+		print_ll_addrs(pkt, ntohs(hdr->type), hdr_frag->len, &hdr->src,
+			       &hdr->dst);
 	}
 
 	net_pkt_frag_insert(pkt, hdr_frag);
@@ -578,8 +568,7 @@ static int ethernet_send(struct net_if *iface, struct net_pkt *pkt)
 		goto error;
 	}
 
-	if (IS_ENABLED(CONFIG_NET_IPV4) &&
-	    net_pkt_family(pkt) == AF_INET) {
+	if (IS_ENABLED(CONFIG_NET_IPV4) && net_pkt_family(pkt) == AF_INET) {
 		struct net_pkt *tmp;
 
 		if (net_pkt_ipv4_auto(pkt)) {
@@ -619,10 +608,10 @@ static int ethernet_send(struct net_if *iface, struct net_pkt *pkt)
 
 			net_pkt_lladdr_dst(pkt)->addr = dst_addr->sll_addr;
 			net_pkt_lladdr_dst(pkt)->len =
-						sizeof(struct net_eth_addr);
+				sizeof(struct net_eth_addr);
 			net_pkt_lladdr_src(pkt)->addr = src_addr->sll_addr;
 			net_pkt_lladdr_src(pkt)->len =
-						sizeof(struct net_eth_addr);
+				sizeof(struct net_eth_addr);
 			ptype = dst_addr->sll_protocol;
 		} else {
 			goto send;
@@ -646,7 +635,8 @@ static int ethernet_send(struct net_if *iface, struct net_pkt *pkt)
 	 * it might detect this should be multicast and act accordingly.
 	 */
 	if (!net_pkt_lladdr_dst(pkt)->addr) {
-		net_pkt_lladdr_dst(pkt)->addr = (uint8_t *)broadcast_eth_addr.addr;
+		net_pkt_lladdr_dst(pkt)->addr =
+			(uint8_t *)broadcast_eth_addr.addr;
 		net_pkt_lladdr_dst(pkt)->len = sizeof(struct net_eth_addr);
 	}
 
@@ -689,8 +679,7 @@ error:
 
 static inline int ethernet_enable(struct net_if *iface, bool state)
 {
-	const struct ethernet_api *eth =
-		net_if_get_device(iface)->api;
+	const struct ethernet_api *eth = net_if_get_device(iface)->api;
 
 	if (!eth) {
 		return -ENOENT;
@@ -787,8 +776,7 @@ static bool is_vlan_enabled_for_iface(struct ethernet_context *ctx,
 	return !!atomic_test_bit(ctx->interfaces, iface_idx);
 }
 
-bool net_eth_is_vlan_enabled(struct ethernet_context *ctx,
-			     struct net_if *iface)
+bool net_eth_is_vlan_enabled(struct ethernet_context *ctx, struct net_if *iface)
 {
 	if (ctx->vlan_enabled) {
 		if (ctx->vlan_enabled == NET_VLAN_MAX_COUNT) {
@@ -833,8 +821,7 @@ bool net_eth_get_vlan_status(struct net_if *iface)
 }
 
 static struct ethernet_vlan *get_vlan(struct ethernet_context *ctx,
-				      struct net_if *iface,
-				      uint16_t vlan_tag)
+				      struct net_if *iface, uint16_t vlan_tag)
 {
 	int i;
 
@@ -884,8 +871,7 @@ static void setup_ipv6_link_local_addr(struct net_if *iface)
 int net_eth_vlan_enable(struct net_if *iface, uint16_t tag)
 {
 	struct ethernet_context *ctx = net_if_l2_data(iface);
-	const struct ethernet_api *eth =
-		net_if_get_device(iface)->api;
+	const struct ethernet_api *eth = net_if_get_device(iface)->api;
 	struct ethernet_vlan *vlan;
 	int i;
 
@@ -937,8 +923,8 @@ int net_eth_vlan_enable(struct net_if *iface, uint16_t tag)
 		enable_vlan_iface(ctx, iface);
 
 		if (eth->vlan_setup) {
-			eth->vlan_setup(net_if_get_device(iface),
-					iface, tag, true);
+			eth->vlan_setup(net_if_get_device(iface), iface, tag,
+					true);
 		}
 
 		ctx->vlan_enabled++;
@@ -957,8 +943,7 @@ int net_eth_vlan_enable(struct net_if *iface, uint16_t tag)
 int net_eth_vlan_disable(struct net_if *iface, uint16_t tag)
 {
 	struct ethernet_context *ctx = net_if_l2_data(iface);
-	const struct ethernet_api *eth =
-		net_if_get_device(iface)->api;
+	const struct ethernet_api *eth = net_if_get_device(iface)->api;
 	struct ethernet_vlan *vlan;
 
 	if (!eth) {
@@ -1004,9 +989,8 @@ NET_L2_INIT(ETHERNET_L2, ethernet_recv, ethernet_send, ethernet_enable,
 
 static void carrier_on(struct k_work *work)
 {
-	struct ethernet_context *ctx = CONTAINER_OF(work,
-						    struct ethernet_context,
-						    carrier_mgmt.work);
+	struct ethernet_context *ctx =
+		CONTAINER_OF(work, struct ethernet_context, carrier_mgmt.work);
 
 	NET_DBG("Carrier ON for interface %p", ctx->carrier_mgmt.iface);
 
@@ -1017,9 +1001,8 @@ static void carrier_on(struct k_work *work)
 
 static void carrier_off(struct k_work *work)
 {
-	struct ethernet_context *ctx = CONTAINER_OF(work,
-						    struct ethernet_context,
-						    carrier_mgmt.work);
+	struct ethernet_context *ctx =
+		CONTAINER_OF(work, struct ethernet_context, carrier_mgmt.work);
 
 	NET_DBG("Carrier OFF for interface %p", ctx->carrier_mgmt.iface);
 
@@ -1028,8 +1011,7 @@ static void carrier_off(struct k_work *work)
 	net_if_carrier_down(ctx->carrier_mgmt.iface);
 }
 
-static void handle_carrier(struct ethernet_context *ctx,
-			   struct net_if *iface,
+static void handle_carrier(struct ethernet_context *ctx, struct net_if *iface,
 			   k_work_handler_t handler)
 {
 	k_work_init(&ctx->carrier_mgmt.work, handler);
@@ -1093,7 +1075,8 @@ const struct device *z_impl_net_eth_get_ptp_clock_by_index(int index)
 }
 
 #ifdef CONFIG_USERSPACE
-static inline const struct device *z_vrfy_net_eth_get_ptp_clock_by_index(int index)
+static inline const struct device *
+z_vrfy_net_eth_get_ptp_clock_by_index(int index)
 {
 	return z_impl_net_eth_get_ptp_clock_by_index(index);
 }
@@ -1134,8 +1117,8 @@ int net_eth_promisc_mode(struct net_if *iface, bool enable)
 
 	params.promisc_mode = enable;
 
-	return net_mgmt(NET_REQUEST_ETHERNET_SET_PROMISC_MODE, iface,
-			&params, sizeof(struct ethernet_req_params));
+	return net_mgmt(NET_REQUEST_ETHERNET_SET_PROMISC_MODE, iface, &params,
+			sizeof(struct ethernet_req_params));
 }
 
 void ethernet_init(struct net_if *iface)

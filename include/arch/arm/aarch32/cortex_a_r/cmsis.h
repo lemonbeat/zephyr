@@ -21,11 +21,11 @@ extern "C" {
 #endif
 
 #ifndef __CR_REV
-#define __CR_REV                0U
+#define __CR_REV 0U
 #endif
 
 #ifndef __FPU_PRESENT
-#define __FPU_PRESENT           CONFIG_CPU_HAS_FPU
+#define __FPU_PRESENT CONFIG_CPU_HAS_FPU
 #endif
 
 #ifdef __cplusplus

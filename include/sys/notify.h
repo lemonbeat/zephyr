@@ -220,7 +220,7 @@ int sys_notify_validate(struct sys_notify *notify);
  * function returns, and a null pointer is returned.
  */
 sys_notify_generic_callback sys_notify_finalize(struct sys_notify *notify,
-						    int res);
+						int res);
 
 /**
  * @brief Check for and read the result of an asynchronous operation.
@@ -235,7 +235,7 @@ sys_notify_generic_callback sys_notify_finalize(struct sys_notify *notify,
  * @retval -EAGAIN if the operation has not completed.
  */
 static inline int sys_notify_fetch_result(const struct sys_notify *notify,
-					    int *result)
+					  int *result)
 {
 	__ASSERT_NO_MSG(notify != NULL);
 	__ASSERT_NO_MSG(result != NULL);
@@ -290,7 +290,7 @@ static inline void sys_notify_init_spinwait(struct sys_notify *notify)
  * object is passed to the on-off service API.
  */
 static inline void sys_notify_init_signal(struct sys_notify *notify,
-					    struct k_poll_signal *sigp)
+					  struct k_poll_signal *sigp)
 {
 	__ASSERT_NO_MSG(notify != NULL);
 	__ASSERT_NO_MSG(sigp != NULL);
@@ -319,7 +319,7 @@ static inline void sys_notify_init_signal(struct sys_notify *notify,
  * @param handler a function pointer to use for notification.
  */
 static inline void sys_notify_init_callback(struct sys_notify *notify,
-					      sys_notify_generic_callback handler)
+					    sys_notify_generic_callback handler)
 {
 	__ASSERT_NO_MSG(notify != NULL);
 	__ASSERT_NO_MSG(handler != NULL);

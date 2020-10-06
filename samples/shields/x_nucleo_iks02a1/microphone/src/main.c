@@ -13,11 +13,11 @@
 /* uncomment if you want PCM output in ascii */
 /*#define PCM_OUTPUT_IN_ASCII		1  */
 
-#define AUDIO_FREQ		16000
-#define CHAN_SIZE		16
-#define PCM_BLK_SIZE_MS		((AUDIO_FREQ/1000) * sizeof(int16_t))
+#define AUDIO_FREQ 16000
+#define CHAN_SIZE 16
+#define PCM_BLK_SIZE_MS ((AUDIO_FREQ / 1000) * sizeof(int16_t))
 
-#define NUM_MS		1000
+#define NUM_MS 1000
 
 K_MEM_SLAB_DEFINE(rx_mem_slab, PCM_BLK_SIZE_MS, NUM_MS, 1);
 
@@ -49,7 +49,8 @@ void main(void)
 	uint32_t ms;
 	int ret;
 
-	const struct device *mic_dev = device_get_binding(DT_LABEL(DT_INST(0, st_mpxxdtyy)));
+	const struct device *mic_dev =
+		device_get_binding(DT_LABEL(DT_INST(0, st_mpxxdtyy)));
 
 	if (!mic_dev) {
 		printk("Could not get pointer to mic device\n");
@@ -91,7 +92,7 @@ void main(void)
 	for (i = 0; i < NUM_MS; i++) {
 		uint16_t *pcm_out = rx_block[i];
 
-		for (j = 0; j < rx_size/2; j++) {
+		for (j = 0; j < rx_size / 2; j++) {
 			printk("0x%04x,\n", pcm_out[j]);
 		}
 	}
@@ -103,7 +104,7 @@ void main(void)
 	for (i = 0; i < NUM_MS; i++) {
 		uint16_t *pcm_out = rx_block[i];
 
-		for (j = 0; j < rx_size/2; j++) {
+		for (j = 0; j < rx_size / 2; j++) {
 			pcm_l = (char)(pcm_out[j] & 0xFF);
 			pcm_h = (char)((pcm_out[j] >> 8) & 0xFF);
 

@@ -15,8 +15,7 @@
 #include <zephyr/types.h>
 #include <stddef.h>
 
-static ALWAYS_INLINE
-	void sys_io_set_bit(io_port_t port, unsigned int bit)
+static ALWAYS_INLINE void sys_io_set_bit(io_port_t port, unsigned int bit)
 {
 	uint32_t reg = 0;
 
@@ -24,11 +23,10 @@ static ALWAYS_INLINE
 			 "btsl	%2, %0;\n\t"
 			 "outl	%0, %w1;\n\t"
 			 :
-			 : "a" (reg), "Nd" (port), "Ir" (bit));
+			 : "a"(reg), "Nd"(port), "Ir"(bit));
 }
 
-static ALWAYS_INLINE
-	void sys_io_clear_bit(io_port_t port, unsigned int bit)
+static ALWAYS_INLINE void sys_io_clear_bit(io_port_t port, unsigned int bit)
 {
 	uint32_t reg = 0;
 
@@ -36,24 +34,23 @@ static ALWAYS_INLINE
 			 "btrl	%2, %0;\n\t"
 			 "outl	%0, %w1;\n\t"
 			 :
-			 : "a" (reg), "Nd" (port), "Ir" (bit));
+			 : "a"(reg), "Nd"(port), "Ir"(bit));
 }
 
-static ALWAYS_INLINE
-	int sys_io_test_bit(io_port_t port, unsigned int bit)
+static ALWAYS_INLINE int sys_io_test_bit(io_port_t port, unsigned int bit)
 {
 	uint32_t ret;
 
 	__asm__ volatile("inl	%w1, %0\n\t"
 			 "btl	%2, %0\n\t"
-			 : "=a" (ret)
-			 : "Nd" (port), "Ir" (bit));
+			 : "=a"(ret)
+			 : "Nd"(port), "Ir"(bit));
 
 	return (ret & 1U);
 }
 
-static ALWAYS_INLINE
-	int sys_io_test_and_set_bit(io_port_t port, unsigned int bit)
+static ALWAYS_INLINE int sys_io_test_and_set_bit(io_port_t port,
+						 unsigned int bit)
 {
 	int ret;
 
@@ -63,8 +60,8 @@ static ALWAYS_INLINE
 	return ret;
 }
 
-static ALWAYS_INLINE
-	int sys_io_test_and_clear_bit(io_port_t port, unsigned int bit)
+static ALWAYS_INLINE int sys_io_test_and_clear_bit(io_port_t port,
+						   unsigned int bit)
 {
 	int ret;
 

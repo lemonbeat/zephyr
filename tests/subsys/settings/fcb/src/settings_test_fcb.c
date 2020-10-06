@@ -27,44 +27,37 @@ int c1_handle_get(const char *name, char *val, int val_len_max);
 int c1_handle_set(const char *name, size_t len, settings_read_cb read_cb,
 		  void *cb_arg);
 int c1_handle_commit(void);
-int c1_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len));
+int c1_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len));
 
 int c2_handle_get(const char *name, char *val, int val_len_max);
 int c2_handle_set(const char *name, size_t len, settings_read_cb read_cb,
 		  void *cb_arg);
-int c2_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len));
+int c2_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len));
 
 int c3_handle_get(const char *name, char *val, int val_len_max);
 int c3_handle_set(const char *name, size_t len, settings_read_cb read_cb,
 		  void *cb_arg);
-int c3_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len));
+int c3_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len));
 
-struct settings_handler c_test_handlers[] = {
-	{
-		.name = "myfoo",
-		.h_get = c1_handle_get,
-		.h_set = c1_handle_set,
-		.h_commit = c1_handle_commit,
-		.h_export = c1_handle_export
-	},
-	{
-		.name = "2nd",
-		.h_get = c2_handle_get,
-		.h_set = c2_handle_set,
-		.h_commit = NULL,
-		.h_export = c2_handle_export
-	},
-	{
-		.name = "3",
-		.h_get = c3_handle_get,
-		.h_set = c3_handle_set,
-		.h_commit = NULL,
-		.h_export = c3_handle_export
-	}
-};
+struct settings_handler c_test_handlers[] = { { .name = "myfoo",
+						.h_get = c1_handle_get,
+						.h_set = c1_handle_set,
+						.h_commit = c1_handle_commit,
+						.h_export = c1_handle_export },
+					      { .name = "2nd",
+						.h_get = c2_handle_get,
+						.h_set = c2_handle_set,
+						.h_commit = NULL,
+						.h_export = c2_handle_export },
+					      { .name = "3",
+						.h_get = c3_handle_get,
+						.h_set = c3_handle_set,
+						.h_commit = NULL,
+						.h_export =
+							c3_handle_export } };
 
 char val_string[SETTINGS_TEST_FCB_VAL_STR_CNT][SETTINGS_MAX_VAL_LEN];
 char test_ref_value[SETTINGS_TEST_FCB_VAL_STR_CNT][SETTINGS_MAX_VAL_LEN];
@@ -128,8 +121,8 @@ int c1_handle_commit(void)
 	return 0;
 }
 
-int c1_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len))
+int c1_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len))
 {
 	if (test_export_block) {
 		return 0;
@@ -163,22 +156,10 @@ void config_wipe_srcs(void)
 }
 
 struct flash_sector fcb_sectors[SETTINGS_TEST_FCB_FLASH_CNT] = {
-	[0] = {
-		.fs_off = 0x00000000,
-		.fs_size = 16 * 1024
-	},
-	[1] = {
-		.fs_off = 0x00004000,
-		.fs_size = 16 * 1024
-	},
-	[2] = {
-		.fs_off = 0x00008000,
-		.fs_size = 16 * 1024
-	},
-	[3] = {
-		.fs_off = 0x0000c000,
-		.fs_size = 16 * 1024
-	}
+	[0] = { .fs_off = 0x00000000, .fs_size = 16 * 1024 },
+	[1] = { .fs_off = 0x00004000, .fs_size = 16 * 1024 },
+	[2] = { .fs_off = 0x00008000, .fs_size = 16 * 1024 },
+	[3] = { .fs_off = 0x0000c000, .fs_size = 16 * 1024 }
 };
 
 void config_wipe_fcb(struct flash_sector *fs, int cnt)
@@ -195,10 +176,9 @@ void config_wipe_fcb(struct flash_sector *fs, int cnt)
 	}
 }
 
-void
-test_config_fill_area(char test_value[SETTINGS_TEST_FCB_VAL_STR_CNT]
-				     [SETTINGS_MAX_VAL_LEN],
-		      int iteration)
+void test_config_fill_area(
+	char test_value[SETTINGS_TEST_FCB_VAL_STR_CNT][SETTINGS_MAX_VAL_LEN],
+	int iteration)
 {
 	int i, j;
 
@@ -287,8 +267,8 @@ int c2_handle_set(const char *name, size_t len, settings_read_cb read_cb,
 	return -ENOENT;
 }
 
-int c2_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len))
+int c2_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len))
 {
 	int i;
 	char name[32];
@@ -332,11 +312,10 @@ int c3_handle_set(const char *name, size_t len, settings_read_cb read_cb,
 	return -ENOENT;
 }
 
-int c3_handle_export(int (*cb)(const char *name,
-			       const void *value, size_t val_len))
+int c3_handle_export(int (*cb)(const char *name, const void *value,
+			       size_t val_len))
 {
 	(void)cb("3/v", &val32, sizeof(val32));
-
 
 	return 0;
 }
@@ -351,7 +330,8 @@ void tests_settings_check_target(void)
 	zassert_true(rc == 0, "Can't open storage flash area");
 
 	wbs = flash_area_align(fap);
-	zassert_true(wbs <= 16,
+	zassert_true(
+		wbs <= 16,
 		"Flash driver is not compatible with the settings fcb-backend");
 }
 
@@ -399,8 +379,7 @@ void test_main(void)
 			 ztest_unit_test(test_config_save_3_fcb),
 			 ztest_unit_test(test_config_compress_reset),
 			 ztest_unit_test(test_config_save_one_fcb),
-			 ztest_unit_test(test_config_compress_deleted)
-			);
+			 ztest_unit_test(test_config_compress_deleted));
 
 	ztest_run_test_suite(test_config_fcb);
 }

@@ -32,7 +32,6 @@
 #define N_RUNS 1000
 #define N_SETTLE 10
 
-
 static K_THREAD_STACK_DEFINE(partner_stack, 1024);
 static struct k_thread partner_thread;
 
@@ -95,8 +94,8 @@ void main(void)
 
 	k_tid_t th = k_thread_create(&partner_thread, partner_stack,
 				     K_THREAD_STACK_SIZEOF(partner_stack),
-				     partner_fn, NULL, NULL, NULL,
-				     partner_prio, 0, K_NO_WAIT);
+				     partner_fn, NULL, NULL, NULL, partner_prio,
+				     0, K_NO_WAIT);
 
 	/* Let it start running and pend */
 	k_sleep(K_MSEC(100));
@@ -142,11 +141,9 @@ void main(void)
 		 * unpend 132 ready 257 switch 278 pend 321 tot 988 (avg 900)
 		 */
 		printk("unpend %4d ready %4d switch %4d pend %4d tot %4d (avg %4d)\n",
-		       stamps[1] - stamps[0],
-		       stamps[2] - stamps[1],
-		       stamps[3] - stamps[2],
-		       stamps[4] - stamps[3],
-		       whole, avg);
+		       stamps[1] - stamps[0], stamps[2] - stamps[1],
+		       stamps[3] - stamps[2], stamps[4] - stamps[3], whole,
+		       avg);
 	}
 	printk("fin\n");
 }

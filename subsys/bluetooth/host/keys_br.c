@@ -101,8 +101,8 @@ void bt_keys_link_key_clear(struct bt_keys_link_key *link_key)
 
 		le_addr.type = BT_ADDR_LE_PUBLIC;
 		bt_addr_copy(&le_addr.a, &link_key->addr);
-		bt_settings_encode_key(key, sizeof(key), "link_key",
-				       &le_addr, NULL);
+		bt_settings_encode_key(key, sizeof(key), "link_key", &le_addr,
+				       NULL);
 		settings_delete(key);
 	}
 
@@ -138,8 +138,8 @@ void bt_keys_link_key_store(struct bt_keys_link_key *link_key)
 
 		le_addr.type = BT_ADDR_LE_PUBLIC;
 		bt_addr_copy(&le_addr.a, &link_key->addr);
-		bt_settings_encode_key(key, sizeof(key), "link_key",
-				       &le_addr, NULL);
+		bt_settings_encode_key(key, sizeof(key), "link_key", &le_addr,
+				       NULL);
 
 		err = settings_save_one(key, link_key->storage_start,
 					BT_KEYS_LINK_KEY_STORAGE_LEN);
@@ -200,7 +200,7 @@ static int link_key_set(const char *name, size_t len_rd,
 	if (aging_counter_val < link_key->aging_counter) {
 		aging_counter_val = link_key->aging_counter;
 	}
-#endif  /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
+#endif /* CONFIG_BT_KEYS_OVERWRITE_OLDEST */
 
 	return 0;
 }

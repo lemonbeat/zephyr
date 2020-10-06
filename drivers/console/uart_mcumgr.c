@@ -126,7 +126,6 @@ static void uart_mcumgr_isr(const struct device *unused, void *user_data)
 
 	while (uart_irq_update(uart_mcumgr_dev) &&
 	       uart_irq_is_pending(uart_mcumgr_dev)) {
-
 		chunk_len = uart_mcumgr_read_chunk(buf, sizeof(buf));
 		if (chunk_len == 0) {
 			continue;

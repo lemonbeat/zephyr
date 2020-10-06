@@ -43,7 +43,6 @@ int at_resp(struct at_client *hf_at, struct net_buf *buf)
 	return 0;
 }
 
-
 static void test_at(void)
 {
 	struct net_buf *buf;
@@ -59,7 +58,7 @@ static void test_at(void)
 	len = strlen(example_data);
 
 	zassert_true(net_buf_tailroom(buf) >= len,
-		    "Allocated buffer is too small");
+		     "Allocated buffer is too small");
 	strncpy((char *)buf->data, example_data, len);
 	net_buf_add(buf, len);
 
@@ -68,9 +67,7 @@ static void test_at(void)
 
 void test_main(void)
 {
-	ztest_test_suite(at_tests,
-		ztest_unit_test(test_at)
-	);
+	ztest_test_suite(at_tests, ztest_unit_test(test_at));
 
 	ztest_run_test_suite(at_tests);
 }

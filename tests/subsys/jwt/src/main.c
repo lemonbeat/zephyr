@@ -59,8 +59,7 @@ void test_jwt(void)
 
 void test_main(void)
 {
-	ztest_test_suite(lib_jwt_test,
-		ztest_unit_test(test_jwt));
+	ztest_test_suite(lib_jwt_test, ztest_unit_test(test_jwt));
 
 	ztest_run_test_suite(lib_jwt_test);
 }

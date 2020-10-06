@@ -53,7 +53,7 @@
  */
 #ifndef _LINKER
 #if !defined(__BYTE_ORDER__) || !defined(__ORDER_BIG_ENDIAN__) || \
-    !defined(__ORDER_LITTLE_ENDIAN__)
+	!defined(__ORDER_LITTLE_ENDIAN__)
 
 #error "__BYTE_ORDER__ is not defined"
 

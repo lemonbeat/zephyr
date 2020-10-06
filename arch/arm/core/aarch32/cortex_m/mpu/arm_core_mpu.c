@@ -27,9 +27,9 @@ LOG_MODULE_REGISTER(mpu);
  * array of dynamic regions passed to the underlying driver.
  */
 #if defined(CONFIG_USERSPACE)
-#define _MAX_DYNAMIC_MPU_REGIONS_NUM \
+#define _MAX_DYNAMIC_MPU_REGIONS_NUM                               \
 	CONFIG_MAX_DOMAIN_PARTITIONS + /* User thread stack */ 1 + \
-	(IS_ENABLED(CONFIG_MPU_STACK_GUARD) ? 1 : 0)
+		(IS_ENABLED(CONFIG_MPU_STACK_GUARD) ? 1 : 0)
 #else
 #define _MAX_DYNAMIC_MPU_REGIONS_NUM \
 	(IS_ENABLED(CONFIG_MPU_STACK_GUARD) ? 1 : 0)
@@ -43,8 +43,8 @@ LOG_MODULE_REGISTER(mpu);
 #else
 #define _MPU_DYNAMIC_REGIONS_AREA_START ((uint32_t)&__kernel_ram_start)
 #endif /* CONFIG_USERSPACE */
-#define _MPU_DYNAMIC_REGIONS_AREA_SIZE ((uint32_t)&__kernel_ram_end - \
-		_MPU_DYNAMIC_REGIONS_AREA_START)
+#define _MPU_DYNAMIC_REGIONS_AREA_SIZE \
+	((uint32_t)&__kernel_ram_end - _MPU_DYNAMIC_REGIONS_AREA_START)
 
 #if !defined(CONFIG_MULTITHREADING) && defined(CONFIG_MPU_STACK_GUARD)
 extern K_THREAD_STACK_DEFINE(z_main_stack, CONFIG_MAIN_STACK_SIZE);
@@ -66,32 +66,29 @@ extern K_THREAD_STACK_DEFINE(z_main_stack, CONFIG_MAIN_STACK_SIZE);
 void z_arm_configure_static_mpu_regions(void)
 {
 #if defined(CONFIG_COVERAGE_GCOV) && defined(CONFIG_USERSPACE)
-		const struct k_mem_partition gcov_region =
-		{
+	const struct k_mem_partition gcov_region = {
 		.start = (uint32_t)&__gcov_bss_start,
 		.size = (uint32_t)&__gcov_bss_size,
 		.attr = K_MEM_PARTITION_P_RW_U_RW,
-		};
+	};
 #endif /* CONFIG_COVERAGE_GCOV && CONFIG_USERSPACE */
 #if defined(CONFIG_NOCACHE_MEMORY)
-		const struct k_mem_partition nocache_region =
-		{
+	const struct k_mem_partition nocache_region = {
 		.start = (uint32_t)&_nocache_ram_start,
 		.size = (uint32_t)&_nocache_ram_size,
 		.attr = K_MEM_PARTITION_P_RW_U_NA_NOCACHE,
-		};
+	};
 #endif /* CONFIG_NOCACHE_MEMORY */
 #if defined(CONFIG_ARCH_HAS_RAMFUNC_SUPPORT)
-		const struct k_mem_partition ramfunc_region =
-		{
+	const struct k_mem_partition ramfunc_region = {
 		.start = (uint32_t)&_ramfunc_ram_start,
 		.size = (uint32_t)&_ramfunc_ram_size,
 		.attr = K_MEM_PARTITION_P_RX_U_RX,
-		};
+	};
 #endif /* CONFIG_ARCH_HAS_RAMFUNC_SUPPORT */
 
 #if !defined(CONFIG_MULTITHREADING) && defined(CONFIG_MPU_STACK_GUARD)
-		/* Main stack MPU guard to detect overflow.
+	/* Main stack MPU guard to detect overflow.
 		 * Note:
 		 * FPU_SHARING and USERSPACE are not supported features
 		 * under CONFIG_MULTITHREADING=n, so the MPU guard (if
@@ -99,11 +96,11 @@ void z_arm_configure_static_mpu_regions(void)
 		 * and there is no requirement for larger guard area (FP
 		 * context is not stacked).
 		 */
-		const struct k_mem_partition main_stack_guard_region = {
-			.start = (uint32_t)z_main_stack,
-			.size = (uint32_t)MPU_GUARD_ALIGN_AND_SIZE,
-			.attr = K_MEM_PARTITION_P_RO_U_NA,
-		};
+	const struct k_mem_partition main_stack_guard_region = {
+		.start = (uint32_t)z_main_stack,
+		.size = (uint32_t)MPU_GUARD_ALIGN_AND_SIZE,
+		.attr = K_MEM_PARTITION_P_RO_U_NA,
+	};
 #endif /* !CONFIG_MULTITHREADING && CONFIG_MPU_STACK_GUARD */
 	/* Define a constant array of k_mem_partition objects
 	 * to hold the configuration of the respective static
@@ -130,9 +127,9 @@ void z_arm_configure_static_mpu_regions(void)
 	 * into account the unused SRAM area, as well.
 	 */
 	arm_core_mpu_configure_static_mpu_regions(static_regions,
-		ARRAY_SIZE(static_regions),
-		(uint32_t)&_image_ram_start,
-		(uint32_t)&__kernel_ram_end);
+						  ARRAY_SIZE(static_regions),
+						  (uint32_t)&_image_ram_start,
+						  (uint32_t)&__kernel_ram_end);
 
 #if defined(CONFIG_MPU_REQUIRES_NON_OVERLAPPING_REGIONS) && \
 	defined(CONFIG_MULTITHREADING)
@@ -141,15 +138,13 @@ void z_arm_configure_static_mpu_regions(void)
 	 * is allowed. The information is passed to the underlying driver at
 	 * initialization.
 	 */
-	const struct k_mem_partition dyn_region_areas[] = {
-		{
+	const struct k_mem_partition dyn_region_areas[] = { {
 		.start = _MPU_DYNAMIC_REGIONS_AREA_START,
-		.size =  _MPU_DYNAMIC_REGIONS_AREA_SIZE,
-		}
-	};
+		.size = _MPU_DYNAMIC_REGIONS_AREA_SIZE,
+	} };
 
-	arm_core_mpu_mark_areas_for_dynamic_regions(dyn_region_areas,
-		ARRAY_SIZE(dyn_region_areas));
+	arm_core_mpu_mark_areas_for_dynamic_regions(
+		dyn_region_areas, ARRAY_SIZE(dyn_region_areas));
 #endif /* CONFIG_MPU_REQUIRES_NON_OVERLAPPING_REGIONS */
 }
 
@@ -214,10 +209,10 @@ void z_arm_configure_dynamic_mpu_regions(struct k_thread *thread)
 				 */
 				continue;
 			}
-			LOG_DBG("set region 0x%lx 0x%x",
-				partition.start, partition.size);
+			LOG_DBG("set region 0x%lx 0x%x", partition.start,
+				partition.size);
 			__ASSERT(region_num < _MAX_DYNAMIC_MPU_REGIONS_NUM,
-				"Out-of-bounds error for dynamic region map.");
+				 "Out-of-bounds error for dynamic region map.");
 			dynamic_regions[region_num] =
 				&mem_domain->partitions[i];
 
@@ -234,12 +229,13 @@ void z_arm_configure_dynamic_mpu_regions(struct k_thread *thread)
 		/* K_USER thread stack needs a region */
 		uint32_t base = (uint32_t)thread->stack_obj;
 		uint32_t size = thread->stack_info.size +
-			(thread->stack_info.start - base);
+				(thread->stack_info.start - base);
 
 		__ASSERT(region_num < _MAX_DYNAMIC_MPU_REGIONS_NUM,
-			"Out-of-bounds error for dynamic region map.");
-		thread_stack = (const struct k_mem_partition)
-			{base, size, K_MEM_PARTITION_P_RW_U_RW};
+			 "Out-of-bounds error for dynamic region map.");
+		thread_stack = (const struct k_mem_partition){
+			base, size, K_MEM_PARTITION_P_RW_U_RW
+		};
 
 		dynamic_regions[region_num] = &thread_stack;
 
@@ -272,30 +268,28 @@ void z_arm_configure_dynamic_mpu_regions(struct k_thread *thread)
 		 */
 		guard_start = thread->arch.priv_stack_start - guard_size;
 
-		__ASSERT((uint32_t)&z_priv_stacks_ram_start <= guard_start,
-		"Guard start: (0x%x) below privilege stacks boundary: (0x%x)",
-		guard_start, (uint32_t)&z_priv_stacks_ram_start);
+		__ASSERT(
+			(uint32_t)&z_priv_stacks_ram_start <= guard_start,
+			"Guard start: (0x%x) below privilege stacks boundary: (0x%x)",
+			guard_start, (uint32_t)&z_priv_stacks_ram_start);
 	} else {
 		/* A supervisor thread only has the normal thread stack to
 		 * protect with a stack guard.
 		 */
 		guard_start = thread->stack_info.start - guard_size;
-	__ASSERT((uint32_t)thread->stack_obj == guard_start,
-		"Guard start (0x%x) not beginning at stack object (0x%x)\n",
-		guard_start, (uint32_t)thread->stack_obj);
+		__ASSERT(
+			(uint32_t)thread->stack_obj == guard_start,
+			"Guard start (0x%x) not beginning at stack object (0x%x)\n",
+			guard_start, (uint32_t)thread->stack_obj);
 	}
 #else
 	guard_start = thread->stack_info.start - guard_size;
 #endif /* CONFIG_USERSPACE */
 
 	__ASSERT(region_num < _MAX_DYNAMIC_MPU_REGIONS_NUM,
-		"Out-of-bounds error for dynamic region map.");
-	guard = (const struct k_mem_partition)
-	{
-		guard_start,
-		guard_size,
-		K_MEM_PARTITION_P_RO_U_NA
-	};
+		 "Out-of-bounds error for dynamic region map.");
+	guard = (const struct k_mem_partition){ guard_start, guard_size,
+						K_MEM_PARTITION_P_RO_U_NA };
 	dynamic_regions[region_num] = &guard;
 
 	region_num++;
@@ -303,8 +297,7 @@ void z_arm_configure_dynamic_mpu_regions(struct k_thread *thread)
 
 	/* Configure the dynamic MPU regions */
 	arm_core_mpu_configure_dynamic_mpu_regions(
-		(const struct k_mem_partition **)dynamic_regions,
-		region_num);
+		(const struct k_mem_partition **)dynamic_regions, region_num);
 }
 
 #if defined(CONFIG_USERSPACE)
@@ -312,8 +305,7 @@ int arch_mem_domain_max_partitions_get(void)
 {
 	int available_regions = arm_core_mpu_get_max_available_dyn_regions();
 
-	available_regions -=
-		ARM_CORE_MPU_NUM_MPU_REGIONS_FOR_THREAD_STACK;
+	available_regions -= ARM_CORE_MPU_NUM_MPU_REGIONS_FOR_THREAD_STACK;
 
 	if (IS_ENABLED(CONFIG_MPU_STACK_GUARD)) {
 		available_regions -=

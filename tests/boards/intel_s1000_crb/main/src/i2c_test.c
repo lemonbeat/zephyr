@@ -33,24 +33,24 @@
 #include <device.h>
 #include <drivers/i2c.h>
 
-#define I2C_DEV                 "I2C_0"
-#define I2C_ADDR_LED_MAT0       0x65
-#define I2C_ADDR_LED_MAT1       0x69
-#define LED0                    0x02
-#define LED1                    0x03
-#define LED2                    0x04
-#define LED3                    0x05
-#define LED4                    0x06
-#define LED5                    0x07
+#define I2C_DEV "I2C_0"
+#define I2C_ADDR_LED_MAT0 0x65
+#define I2C_ADDR_LED_MAT1 0x69
+#define LED0 0x02
+#define LED1 0x03
+#define LED2 0x04
+#define LED3 0x05
+#define LED4 0x06
+#define LED5 0x07
 
 /* size of stack area used by each thread */
-#define STACKSIZE               1024
+#define STACKSIZE 1024
 
 /* scheduling priority used by each thread */
-#define PRIORITY                7
+#define PRIORITY 7
 
 /* delay between greetings (in ms) */
-#define SLEEPTIME               500
+#define SLEEPTIME 500
 
 extern struct k_sem thread_sem;
 

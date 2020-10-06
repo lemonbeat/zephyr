@@ -15,14 +15,13 @@ static const char *test_str = "Hello world FAT";
 void test_fat_open(void)
 {
 	zassert_true(test_file_open(&test_file, TEST_FILE_PATH) == TC_PASS,
-		NULL);
+		     NULL);
 }
 
 void test_fat_write(void)
 {
 	TC_PRINT("Write to file %s\n", TEST_FILE_PATH);
-	zassert_true(test_file_write(&test_file, test_str) == TC_PASS,
-		NULL);
+	zassert_true(test_file_write(&test_file, test_str) == TC_PASS, NULL);
 }
 
 void test_fat_read(void)

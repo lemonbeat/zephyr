@@ -4,29 +4,26 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <limits.h>
 #include <sys/util.h>
 #include "test_gpio_api.h"
 
-#define TEST_GPIO_MAX_SINGLE_ENDED_RISE_FALL_TIME_MS    100
-#define TEST_POINT(n)   (n)
+#define TEST_GPIO_MAX_SINGLE_ENDED_RISE_FALL_TIME_MS 100
+#define TEST_POINT(n) (n)
 
-static void pin_get_raw_and_verify(const struct device *port,
-				   unsigned int pin,
+static void pin_get_raw_and_verify(const struct device *port, unsigned int pin,
 				   int val_expected, int idx)
 {
 	int val_actual;
 
 	val_actual = gpio_pin_get_raw(port, pin);
-	zassert_true(val_actual >= 0,
-		     "Test point %d: failed to get pin value", idx);
+	zassert_true(val_actual >= 0, "Test point %d: failed to get pin value",
+		     idx);
 	zassert_equal(val_expected, val_actual,
 		      "Test point %d: invalid pin get value", idx);
 }
 
-static void pin_set_raw_and_verify(const struct device *port,
-				   unsigned int pin,
+static void pin_set_raw_and_verify(const struct device *port, unsigned int pin,
 				   int val, int idx)
 {
 	zassert_equal(gpio_pin_set_raw(port, pin, val), 0,
@@ -123,8 +120,8 @@ void test_gpio_pin_configure_push_pull(void)
 	int pin_in_val;
 
 	pin_in_val = gpio_pin_get_raw(port, TEST_PIN);
-	zassert_true(pin_in_val >= 0,
-		     "Test point %d: failed to get pin value", TEST_POINT(9));
+	zassert_true(pin_in_val >= 0, "Test point %d: failed to get pin value",
+		     TEST_POINT(9));
 
 	pin_set_raw_and_verify(port, TEST_PIN, 0, TEST_POINT(10));
 	pin_get_raw_and_verify(port, TEST_PIN, pin_in_val, TEST_POINT(10));
@@ -202,7 +199,8 @@ void test_gpio_pin_configure_single_ended(void)
 	zassert_true(pin_in_val >= 0, "Failed to get pin value");
 
 	if (pin_val != pin_in_val) {
-		TC_PRINT("Board configuration does not allow to run the test\n");
+		TC_PRINT(
+			"Board configuration does not allow to run the test\n");
 		ztest_test_skip();
 		return;
 	}
@@ -214,8 +212,9 @@ void test_gpio_pin_configure_single_ended(void)
 		 * as input is high. Drivers that do not support Open Drain flag
 		 * return -ENOTSUP.
 		 */
-		ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT_HIGH |
-				GPIO_OPEN_DRAIN | GPIO_INPUT | GPIO_PULL_UP);
+		ret = gpio_pin_configure(port, TEST_PIN,
+					 GPIO_OUTPUT_HIGH | GPIO_OPEN_DRAIN |
+						 GPIO_INPUT | GPIO_PULL_UP);
 		if (ret == -ENOTSUP) {
 			TC_PRINT("Open Drain configuration or Pull Up pin "
 				 "bias is not supported\n");
@@ -238,15 +237,17 @@ void test_gpio_pin_configure_single_ended(void)
 		 * configured as input is high. Drivers that do not support Open
 		 * Source flag return -ENOTSUP.
 		 */
-		ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT_LOW |
-				GPIO_OPEN_SOURCE | GPIO_INPUT | GPIO_PULL_UP);
+		ret = gpio_pin_configure(port, TEST_PIN,
+					 GPIO_OUTPUT_LOW | GPIO_OPEN_SOURCE |
+						 GPIO_INPUT | GPIO_PULL_UP);
 		if (ret == -ENOTSUP) {
 			TC_PRINT("Open Source configuration or Pull Up pin "
 				 "bias is not supported\n");
 			return;
 		}
-		zassert_equal(ret, 0,
-			      "Failed to configure the pin in Open Source mode");
+		zassert_equal(
+			ret, 0,
+			"Failed to configure the pin in Open Source mode");
 
 		k_sleep(K_MSEC(TEST_GPIO_MAX_SINGLE_ENDED_RISE_FALL_TIME_MS));
 
@@ -261,16 +262,18 @@ void test_gpio_pin_configure_single_ended(void)
 		 * configured as input is low. Drivers that do not support Open
 		 * Source flag return -ENOTSUP.
 		 */
-		ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT_LOW |
-				GPIO_OPEN_SOURCE | GPIO_INPUT | GPIO_PULL_DOWN);
+		ret = gpio_pin_configure(port, TEST_PIN,
+					 GPIO_OUTPUT_LOW | GPIO_OPEN_SOURCE |
+						 GPIO_INPUT | GPIO_PULL_DOWN);
 		if (ret == -ENOTSUP) {
 			TC_PRINT("Open Source configuration or Pull Down pin "
 				 "bias is not supported\n");
 			ztest_test_skip();
 			return;
 		}
-		zassert_equal(ret, 0,
-			      "Failed to configure the pin in Open Source mode");
+		zassert_equal(
+			ret, 0,
+			"Failed to configure the pin in Open Source mode");
 
 		pin_get_raw_and_verify(port, TEST_PIN, 0, TEST_POINT(5));
 
@@ -285,8 +288,9 @@ void test_gpio_pin_configure_single_ended(void)
 		 * configured as input is low. Drivers that do not support Open
 		 * Drain flag return -ENOTSUP.
 		 */
-		ret = gpio_pin_configure(port, TEST_PIN, GPIO_OUTPUT_HIGH |
-				GPIO_OPEN_DRAIN | GPIO_INPUT | GPIO_PULL_DOWN);
+		ret = gpio_pin_configure(port, TEST_PIN,
+					 GPIO_OUTPUT_HIGH | GPIO_OPEN_DRAIN |
+						 GPIO_INPUT | GPIO_PULL_DOWN);
 		if (ret == -ENOTSUP) {
 			TC_PRINT("Open Drain configuration or Pull Down pin "
 				 "bias is not supported\n");

@@ -30,28 +30,28 @@ struct devlist_device {
 	uint8_t bNumInterfaces;
 } __packed;
 
-#define OP_REQUEST		(0x80 << 8)
-#define OP_REPLY		(0x00 << 8)
+#define OP_REQUEST (0x80 << 8)
+#define OP_REPLY (0x00 << 8)
 
 /* Devlist */
-#define OP_DEVLIST		0x05
-#define OP_REQ_DEVLIST		(OP_REQUEST | OP_DEVLIST)
-#define OP_REP_DEVLIST		(OP_REPLY | OP_DEVLIST)
+#define OP_DEVLIST 0x05
+#define OP_REQ_DEVLIST (OP_REQUEST | OP_DEVLIST)
+#define OP_REP_DEVLIST (OP_REPLY | OP_DEVLIST)
 
 /* Import USB device */
-#define OP_IMPORT		0x03
-#define OP_REQ_IMPORT		(OP_REQUEST | OP_IMPORT)
-#define OP_REP_IMPORT		(OP_REPLY | OP_IMPORT)
+#define OP_IMPORT 0x03
+#define OP_REQ_IMPORT (OP_REQUEST | OP_IMPORT)
+#define OP_REP_IMPORT (OP_REPLY | OP_IMPORT)
 
 /* USBIP requests */
-#define USBIP_CMD_SUBMIT	0x0001
-#define USBIP_CMD_UNLINK	0x0002
-#define USBIP_RET_SUBMIT	0x0003
-#define USBIP_RET_UNLINK	0x0004
+#define USBIP_CMD_SUBMIT 0x0001
+#define USBIP_CMD_UNLINK 0x0002
+#define USBIP_RET_SUBMIT 0x0003
+#define USBIP_RET_UNLINK 0x0004
 
 /* USBIP direction */
-#define USBIP_DIR_OUT		0x00
-#define USBIP_DIR_IN		0x01
+#define USBIP_DIR_OUT 0x00
+#define USBIP_DIR_IN 0x01
 
 struct usbip_header_common {
 	uint32_t command;

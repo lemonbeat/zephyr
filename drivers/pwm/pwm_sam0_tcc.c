@@ -107,8 +107,8 @@ static int pwm_sam0_init(const struct device *dev)
 
 	/* Enable the clocks */
 #ifdef MCLK
-	GCLK->PCHCTRL[cfg->gclk_id].reg =
-		GCLK_PCHCTRL_GEN_GCLK0 | GCLK_PCHCTRL_CHEN;
+	GCLK->PCHCTRL[cfg->gclk_id].reg = GCLK_PCHCTRL_GEN_GCLK0 |
+					  GCLK_PCHCTRL_CHEN;
 	*cfg->mclk |= cfg->mclk_mask;
 #else
 	GCLK->CLKCTRL.reg = cfg->gclk_clkctrl_id | GCLK_CLKCTRL_GEN_GCLK0 |
@@ -135,31 +135,31 @@ static const struct pwm_driver_api pwm_sam0_driver_api = {
 };
 
 #ifdef MCLK
-#define PWM_SAM0_INIT_CLOCKS(inst)					       \
-	.mclk = (volatile uint32_t *)MCLK_MASK_DT_INT_REG_ADDR(inst),	       \
-	.mclk_mask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(inst, mclk, bit)),	       \
+#define PWM_SAM0_INIT_CLOCKS(inst)                                      \
+	.mclk = (volatile uint32_t *)MCLK_MASK_DT_INT_REG_ADDR(inst),   \
+	.mclk_mask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(inst, mclk, bit)), \
 	.gclk_id = DT_INST_CLOCKS_CELL_BY_NAME(inst, gclk, periph_ch)
 #else
-#define PWM_SAM0_INIT_CLOCKS(inst)					       \
-	.pm_apbcmask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(inst, pm, bit)),	       \
+#define PWM_SAM0_INIT_CLOCKS(inst)                                      \
+	.pm_apbcmask = BIT(DT_INST_CLOCKS_CELL_BY_NAME(inst, pm, bit)), \
 	.gclk_clkctrl_id = DT_INST_CLOCKS_CELL_BY_NAME(inst, gclk, clkctrl_id)
 #endif
 
-#define PWM_SAM0_INIT(inst)						       \
-	static const struct pwm_sam0_config pwm_sam0_config_##inst = {	       \
-		.regs = (Tcc *)DT_INST_REG_ADDR(inst),			       \
-		.channels = DT_INST_PROP(inst, channels),		       \
-		.counter_size = DT_INST_PROP(inst, counter_size),	       \
-		.prescaler = UTIL_CAT(TCC_CTRLA_PRESCALER_DIV,		       \
-				      DT_INST_PROP(inst, prescaler)),	       \
-		.freq = SOC_ATMEL_SAM0_GCLK0_FREQ_HZ /			       \
-			DT_INST_PROP(inst, prescaler),			       \
-		PWM_SAM0_INIT_CLOCKS(inst),				       \
-	};								       \
-									       \
-	DEVICE_AND_API_INIT(pwm_sam0_##inst, DT_INST_LABEL(inst),	       \
-			    &pwm_sam0_init, NULL, &pwm_sam0_config_##inst,     \
-			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,   \
+#define PWM_SAM0_INIT(inst)                                                  \
+	static const struct pwm_sam0_config pwm_sam0_config_##inst = {       \
+		.regs = (Tcc *)DT_INST_REG_ADDR(inst),                       \
+		.channels = DT_INST_PROP(inst, channels),                    \
+		.counter_size = DT_INST_PROP(inst, counter_size),            \
+		.prescaler = UTIL_CAT(TCC_CTRLA_PRESCALER_DIV,               \
+				      DT_INST_PROP(inst, prescaler)),        \
+		.freq = SOC_ATMEL_SAM0_GCLK0_FREQ_HZ /                       \
+			DT_INST_PROP(inst, prescaler),                       \
+		PWM_SAM0_INIT_CLOCKS(inst),                                  \
+	};                                                                   \
+                                                                             \
+	DEVICE_AND_API_INIT(pwm_sam0_##inst, DT_INST_LABEL(inst),            \
+			    &pwm_sam0_init, NULL, &pwm_sam0_config_##inst,   \
+			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
 			    &pwm_sam0_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(PWM_SAM0_INIT)

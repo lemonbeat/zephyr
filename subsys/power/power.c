@@ -53,15 +53,24 @@ void sys_pm_dump_debug_info(void)
 {
 	for (int i = 0; i < SYS_POWER_STATE_MAX; i++) {
 		LOG_DBG("PM:state = %d, count = %d last_res = %d, "
-			"total_res = %d\n", i, pm_dbg_info[i].count,
-			pm_dbg_info[i].last_res, pm_dbg_info[i].total_res);
+			"total_res = %d\n",
+			i, pm_dbg_info[i].count, pm_dbg_info[i].last_res,
+			pm_dbg_info[i].total_res);
 	}
 }
 #else
-static inline void sys_pm_debug_start_timer(void) { }
-static inline void sys_pm_debug_stop_timer(void) { }
-static void sys_pm_log_debug_info(enum power_states state) { }
-void sys_pm_dump_debug_info(void) { }
+static inline void sys_pm_debug_start_timer(void)
+{
+}
+static inline void sys_pm_debug_stop_timer(void)
+{
+}
+static void sys_pm_log_debug_info(enum power_states state)
+{
+}
+void sys_pm_dump_debug_info(void)
+{
+}
 #endif
 
 __weak void sys_pm_notify_power_state_entry(enum power_states state)
@@ -76,8 +85,7 @@ __weak void sys_pm_notify_power_state_exit(enum power_states state)
 
 void sys_pm_force_power_state(enum power_states state)
 {
-	__ASSERT(state >= SYS_POWER_STATE_AUTO &&
-		 state <  SYS_POWER_STATE_MAX,
+	__ASSERT(state >= SYS_POWER_STATE_AUTO && state < SYS_POWER_STATE_MAX,
 		 "Invalid power state %d!", state);
 
 #ifdef CONFIG_SYS_PM_DIRECT_FORCE_MODE
@@ -97,7 +105,8 @@ enum power_states _sys_suspend(int32_t ticks)
 #endif
 
 	pm_state = (forced_pm_state == SYS_POWER_STATE_AUTO) ?
-		   sys_pm_policy_next_state(ticks) : forced_pm_state;
+				 sys_pm_policy_next_state(ticks) :
+				 forced_pm_state;
 
 	if (pm_state == SYS_POWER_STATE_ACTIVE) {
 		LOG_DBG("No PM operations done.");
@@ -105,7 +114,8 @@ enum power_states _sys_suspend(int32_t ticks)
 	}
 
 	deep_sleep = IS_ENABLED(CONFIG_SYS_POWER_DEEP_SLEEP_STATES) ?
-		     sys_pm_is_deep_sleep_state(pm_state) : 0;
+				   sys_pm_is_deep_sleep_state(pm_state) :
+				   0;
 
 	post_ops_done = 0;
 	sys_pm_notify_power_state_entry(pm_state);

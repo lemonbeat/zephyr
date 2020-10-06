@@ -21,7 +21,7 @@
  * - no tickless
  */
 
-#define CYCLES_PER_SEC  sys_clock_hw_cycles_per_sec()
+#define CYCLES_PER_SEC sys_clock_hw_cycles_per_sec()
 #define CYCLES_PER_TICK (CYCLES_PER_SEC / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 
 /*
@@ -29,18 +29,17 @@
  * SIRC reset rate of 8MHz.
  */
 #if defined(CONFIG_TIMER_READS_ITS_FREQUENCY_AT_RUNTIME) || \
-    (MHZ(8) != CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC)
+	(MHZ(8) != CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC)
 #error "system timer misconfiguration; unsupported clock rate"
 #endif
 
-#define SYSTEM_TIMER_INSTANCE \
-	((LPTMR_Type *)(DT_INST_REG_ADDR(0)))
+#define SYSTEM_TIMER_INSTANCE ((LPTMR_Type *)(DT_INST_REG_ADDR(0)))
 
-#define SIRC_RANGE_8MHZ      SCG_SIRCCFG_RANGE(1)
+#define SIRC_RANGE_8MHZ SCG_SIRCCFG_RANGE(1)
 #define SIRCDIV3_DIVIDE_BY_1 1
-#define PCS_SOURCE_SIRCDIV3  0
+#define PCS_SOURCE_SIRCDIV3 0
 
-struct device;	       /* forward declaration; type is not used. */
+struct device; /* forward declaration; type is not used. */
 
 static volatile uint32_t cycle_count;
 
@@ -49,8 +48,8 @@ static void lptmr_irq_handler(const struct device *unused)
 	ARG_UNUSED(unused);
 
 	SYSTEM_TIMER_INSTANCE->CSR |= LPTMR_CSR_TCF(1); /* Rearm timer. */
-	cycle_count += CYCLES_PER_TICK;          /* Track cycles. */
-	z_clock_announce(1);                     /* Poke the scheduler. */
+	cycle_count += CYCLES_PER_TICK; /* Track cycles. */
+	z_clock_announce(1); /* Poke the scheduler. */
 }
 
 int z_clock_driver_init(const struct device *unused)
@@ -58,8 +57,7 @@ int z_clock_driver_init(const struct device *unused)
 	uint32_t csr, psr, sircdiv; /* LPTMR registers */
 
 	ARG_UNUSED(unused);
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    0, lptmr_irq_handler, NULL, 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), 0, lptmr_irq_handler, NULL, 0);
 
 	if ((SCG->SIRCCSR & SCG_SIRCCSR_SIRCEN_MASK) == SCG_SIRCCSR_SIRCEN(0)) {
 		/*

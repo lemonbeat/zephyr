@@ -34,10 +34,9 @@ size_t tp_str_to_hex(void *buf, size_t bufsize, const char *s)
 	tp_assert((len % 2) == 0, "Invalid string: %s", s);
 
 	for (i = 0, j = 0; i < len; i += 2, j++) {
-
 		uint8_t byte = (s[i] - '0') << 4 | (s[i + 1] - '0');
 
-		((uint8_t *) buf)[j] = byte;
+		((uint8_t *)buf)[j] = byte;
 	}
 
 	return j;
@@ -45,8 +44,8 @@ size_t tp_str_to_hex(void *buf, size_t bufsize, const char *s)
 
 void *tp_malloc(size_t size, const char *file, int line, const char *func)
 {
-	struct tp_mem *mem = k_malloc(sizeof(struct tp_mem) + size +
-					sizeof(*mem->footer));
+	struct tp_mem *mem =
+		k_malloc(sizeof(struct tp_mem) + size + sizeof(*mem->footer));
 
 	mem->file = file;
 	mem->line = line;
@@ -56,10 +55,10 @@ void *tp_malloc(size_t size, const char *file, int line, const char *func)
 
 	mem->header = TP_MEM_HEADER_COOKIE;
 
-	mem->footer = (void *) ((uint8_t *) &mem->mem + size);
+	mem->footer = (void *)((uint8_t *)&mem->mem + size);
 	*mem->footer = TP_MEM_FOOTER_COOKIE;
 
-	sys_slist_append(&tp_mem, (sys_snode_t *) mem);
+	sys_slist_append(&tp_mem, (sys_snode_t *)mem);
 
 	return &mem->mem;
 }
@@ -70,7 +69,6 @@ static void dump(void *data, size_t len)
 	size_t i, width = 8;
 
 	for (i = 0; i < len; i++) {
-
 		if ((i % width) == 0) {
 			printk("0x%08lx\t", POINTER_TO_INT(buf + i));
 		}
@@ -86,36 +84,35 @@ static void dump(void *data, size_t len)
 void tp_mem_chk(struct tp_mem *mem)
 {
 	if (mem->header != TP_MEM_HEADER_COOKIE ||
-		*mem->footer != TP_MEM_FOOTER_COOKIE) {
-
-		tp_dbg("%s:%d %s() %p size: %zu",
-			mem->file, mem->line, mem->func, mem->mem, mem->size);
+	    *mem->footer != TP_MEM_FOOTER_COOKIE) {
+		tp_dbg("%s:%d %s() %p size: %zu", mem->file, mem->line,
+		       mem->func, mem->mem, mem->size);
 
 		dump(&mem->header, sizeof(mem->header));
 		dump(mem->mem, mem->size);
 		dump(mem->footer, sizeof(*mem->footer));
 
 		tp_assert(mem->header == TP_MEM_HEADER_COOKIE,
-				"%s:%d %s() %p Corrupt header cookie: 0x%x",
-				mem->file, mem->line, mem->func, mem->mem,
-				mem->header);
+			  "%s:%d %s() %p Corrupt header cookie: 0x%x",
+			  mem->file, mem->line, mem->func, mem->mem,
+			  mem->header);
 
 		tp_assert(*mem->footer == TP_MEM_FOOTER_COOKIE,
-				"%s:%d %s() %p Corrupt footer cookie: 0x%x",
-				mem->file, mem->line, mem->func, mem->mem,
-				*mem->footer);
+			  "%s:%d %s() %p Corrupt footer cookie: 0x%x",
+			  mem->file, mem->line, mem->func, mem->mem,
+			  *mem->footer);
 	}
 }
 
 void tp_free(void *ptr, const char *file, int line, const char *func)
 {
-	struct tp_mem *mem = (void *)((uint8_t *) ptr - sizeof(struct tp_mem));
+	struct tp_mem *mem = (void *)((uint8_t *)ptr - sizeof(struct tp_mem));
 
 	tp_mem_chk(mem);
 
-	if (!sys_slist_find_and_remove(&tp_mem, (sys_snode_t *) mem)) {
-		tp_assert(false, "%s:%d %s() Invalid free(%p)",
-				file, line, func, ptr);
+	if (!sys_slist_find_and_remove(&tp_mem, (sys_snode_t *)mem)) {
+		tp_assert(false, "%s:%d %s() Invalid free(%p)", file, line,
+			  func, ptr);
 	}
 
 	memset(mem, 0, sizeof(tp_mem) + mem->size + sizeof(*mem->footer));
@@ -144,7 +141,7 @@ void tp_mem_stat(void)
 }
 
 struct net_buf *tp_nbuf_alloc(struct net_buf_pool *pool, size_t len,
-				const char *file, int line, const char *func)
+			      const char *file, int line, const char *func)
 {
 	struct net_buf *nbuf = net_buf_alloc_len(pool, len, K_NO_WAIT);
 	struct tp_nbuf *tp_nbuf = k_malloc(sizeof(struct tp_nbuf));
@@ -158,13 +155,13 @@ struct net_buf *tp_nbuf_alloc(struct net_buf_pool *pool, size_t len,
 	tp_nbuf->file = file;
 	tp_nbuf->line = line;
 
-	sys_slist_append(&tp_nbufs, (sys_snode_t *) tp_nbuf);
+	sys_slist_append(&tp_nbufs, (sys_snode_t *)tp_nbuf);
 
 	return nbuf;
 }
 
 struct net_buf *tp_nbuf_clone(struct net_buf *buf, const char *file, int line,
-				const char *func)
+			      const char *func)
 {
 	struct net_buf *clone = net_buf_clone(buf, K_NO_WAIT);
 	struct tp_nbuf *tb = k_malloc(sizeof(struct tp_nbuf));
@@ -178,11 +175,10 @@ struct net_buf *tp_nbuf_clone(struct net_buf *buf, const char *file, int line,
 	sys_slist_append(&tp_nbufs, &tb->next);
 
 	return clone;
-
 }
 
 void tp_nbuf_unref(struct net_buf *nbuf, const char *file, int line,
-			const char *func)
+		   const char *func)
 {
 	bool found = false;
 	struct tp_nbuf *tp_nbuf;
@@ -198,7 +194,7 @@ void tp_nbuf_unref(struct net_buf *nbuf, const char *file, int line,
 
 	tp_assert(found, "Invalid %s(%p): %s:%d", __func__, nbuf, file, line);
 
-	sys_slist_find_and_remove(&tp_nbufs, (sys_snode_t *) tp_nbuf);
+	sys_slist_find_and_remove(&tp_nbufs, (sys_snode_t *)tp_nbuf);
 
 	net_buf_unref(nbuf);
 
@@ -211,12 +207,11 @@ void tp_nbuf_stat(void)
 
 	SYS_SLIST_FOR_EACH_CONTAINER(&tp_nbufs, tp_nbuf, next) {
 		tp_dbg("%s:%d len=%d", tp_nbuf->file, tp_nbuf->line,
-			tp_nbuf->nbuf->len);
+		       tp_nbuf->nbuf->len);
 	}
 }
 
-void tp_pkt_alloc(struct net_pkt *pkt,
-		  const char *file, int line)
+void tp_pkt_alloc(struct net_pkt *pkt, const char *file, int line)
 {
 	struct tp_pkt *tp_pkt = k_malloc(sizeof(struct tp_pkt));
 
@@ -227,7 +222,7 @@ void tp_pkt_alloc(struct net_pkt *pkt,
 	tp_pkt->file = file;
 	tp_pkt->line = line;
 
-	sys_slist_append(&tp_pkts, (sys_snode_t *) tp_pkt);
+	sys_slist_append(&tp_pkts, (sys_snode_t *)tp_pkt);
 }
 
 struct net_pkt *tp_pkt_clone(struct net_pkt *pkt, const char *file, int line)
@@ -240,7 +235,7 @@ struct net_pkt *tp_pkt_clone(struct net_pkt *pkt, const char *file, int line)
 	tp_pkt->file = file;
 	tp_pkt->line = line;
 
-	sys_slist_append(&tp_pkts, (sys_snode_t *) tp_pkt);
+	sys_slist_append(&tp_pkts, (sys_snode_t *)tp_pkt);
 
 	return pkt;
 }
@@ -259,7 +254,7 @@ void tp_pkt_unref(struct net_pkt *pkt, const char *file, int line)
 
 	tp_assert(found, "Invalid %s(%p): %s:%d", __func__, pkt, file, line);
 
-	sys_slist_find_and_remove(&tp_pkts, (sys_snode_t *) tp_pkt);
+	sys_slist_find_and_remove(&tp_pkts, (sys_snode_t *)tp_pkt);
 
 	net_pkt_unref(tp_pkt->pkt);
 
@@ -275,18 +270,17 @@ void tp_pkt_stat(void)
 	}
 }
 
-#define tp_seq_dump(_seq)						\
-{									\
-	tp_dbg("%s %u->%u (%s%d) %s:%d %s() %s",			\
-		(_seq)->kind == TP_SEQ ? "SEQ" : "ACK",			\
-		(_seq)->old_value, (_seq)->value,			\
-		(_seq)->req >= 0 ? "+" : "", (_seq)->req,		\
-		(_seq)->file, (_seq)->line, (_seq)->func,		\
-		(_seq)->of ? "OF" : "");				\
-}
+#define tp_seq_dump(_seq)                                                      \
+	{                                                                      \
+		tp_dbg("%s %u->%u (%s%d) %s:%d %s() %s",                       \
+		       (_seq)->kind == TP_SEQ ? "SEQ" : "ACK",                 \
+		       (_seq)->old_value, (_seq)->value,                       \
+		       (_seq)->req >= 0 ? "+" : "", (_seq)->req, (_seq)->file, \
+		       (_seq)->line, (_seq)->func, (_seq)->of ? "OF" : "");    \
+	}
 
-uint32_t tp_seq_track(int kind, uint32_t *pvalue, int req,
-			const char *file, int line, const char *func)
+uint32_t tp_seq_track(int kind, uint32_t *pvalue, int req, const char *file,
+		      int line, const char *func)
 {
 	struct tp_seq *seq = k_calloc(1, sizeof(struct tp_seq));
 
@@ -301,14 +295,14 @@ uint32_t tp_seq_track(int kind, uint32_t *pvalue, int req,
 
 	if (req > 0) {
 		seq->of = __builtin_uadd_overflow(seq->old_value, seq->req,
-							&seq->value);
+						  &seq->value);
 	} else {
 		seq->value += req;
 	}
 
 	*pvalue = seq->value;
 
-	sys_slist_append(&tp_seq, (sys_snode_t *) seq);
+	sys_slist_append(&tp_seq, (sys_snode_t *)seq);
 
 	tp_seq_dump(seq);
 
@@ -319,7 +313,7 @@ void tp_seq_stat(void)
 {
 	struct tp_seq *seq;
 
-	while ((seq = (struct tp_seq *) sys_slist_get(&tp_seq))) {
+	while ((seq = (struct tp_seq *)sys_slist_get(&tp_seq))) {
 		tp_seq_dump(seq);
 		k_free(seq);
 	}
@@ -329,12 +323,13 @@ enum tp_type tp_msg_to_type(const char *s)
 {
 	enum tp_type type = TP_NONE;
 
-#define is_tp(_s, _type) do {		\
-	if (is(#_type, _s)) {		\
-		type = _type;		\
-		goto out;		\
-	}				\
-} while (0)
+#define is_tp(_s, _type)              \
+	do {                          \
+		if (is(#_type, _s)) { \
+			type = _type; \
+			goto out;     \
+		}                     \
+	} while (0)
 
 	is_tp(s, TP_COMMAND);
 	is_tp(s, TP_CONFIG_REQUEST);
@@ -404,24 +399,23 @@ static void tp_pkt_send(struct net_pkt *pkt)
 	tp_pkt_unref(pkt, tp_basename(__FILE__), __LINE__);
 }
 
-static struct net_pkt *tp_output_pkt_alloc(sa_family_t af,
-					   struct net_if *iface,
-					   size_t len,
-					   const char *file, int line)
+static struct net_pkt *tp_output_pkt_alloc(sa_family_t af, struct net_if *iface,
+					   size_t len, const char *file,
+					   int line)
 {
 	struct tp_pkt *tp_pkt = k_malloc(sizeof(struct tp_pkt));
 
 	tp_assert(tp_pkt, "");
 
-	tp_pkt->pkt = net_pkt_alloc_with_buffer(iface,
-					sizeof(struct net_udp_hdr) + len,
-					af, IPPROTO_UDP, K_NO_WAIT);
+	tp_pkt->pkt = net_pkt_alloc_with_buffer(
+		iface, sizeof(struct net_udp_hdr) + len, af, IPPROTO_UDP,
+		K_NO_WAIT);
 	tp_assert(tp_pkt->pkt, "");
 
 	tp_pkt->file = file;
 	tp_pkt->line = line;
 
-	sys_slist_append(&tp_pkts, (sys_snode_t *) tp_pkt);
+	sys_slist_append(&tp_pkts, (sys_snode_t *)tp_pkt);
 
 	return tp_pkt->pkt;
 }
@@ -429,8 +423,8 @@ static struct net_pkt *tp_output_pkt_alloc(sa_family_t af,
 void _tp_output(sa_family_t af, struct net_if *iface, void *data,
 		size_t data_len, const char *file, int line)
 {
-	struct net_pkt *pkt = tp_output_pkt_alloc(af, iface, data_len,
-						  file, line);
+	struct net_pkt *pkt =
+		tp_output_pkt_alloc(af, iface, data_len, file, line);
 	int ret;
 
 	ret = ip_header_add(pkt);
@@ -466,7 +460,7 @@ struct tp *json_to_tp(void *data, size_t data_len)
 	memset(&tp, 0, sizeof(tp));
 
 	if (json_obj_parse(data, data_len, tp_descr, ARRAY_SIZE(tp_descr),
-			&tp) < 0) {
+			   &tp) < 0) {
 		tp_err("json_obj_parse()");
 	}
 
@@ -476,7 +470,7 @@ struct tp *json_to_tp(void *data, size_t data_len)
 }
 
 void tp_new_find_and_apply(struct tp_new *tp, const char *key, void *value,
-				int type)
+			   int type)
 {
 	bool found = false;
 	int i;
@@ -491,18 +485,18 @@ void tp_new_find_and_apply(struct tp_new *tp, const char *key, void *value,
 	if (found) {
 		switch (type) {
 		case TP_BOOL: {
-			bool new_value, old = *((bool *) value);
+			bool new_value, old = *((bool *)value);
 
 			new_value = atoi(tp->data[i].value);
-			*((bool *) value) = new_value;
+			*((bool *)value) = new_value;
 			tp_dbg("%s %d->%d", key, old, new_value);
 			break;
 		}
 		case TP_INT: {
-			int new_value, old_value = *((int *) value);
+			int new_value, old_value = *((int *)value);
 
 			new_value = atoi(tp->data[i].value);
-			*((int *) value) = new_value;
+			*((int *)value) = new_value;
 			tp_dbg("%s %d->%d", key, old_value, new_value);
 			break;
 		}
@@ -520,7 +514,7 @@ enum tp_type json_decode_msg(void *data, size_t data_len)
 	memset(&tp, 0, sizeof(tp));
 
 	decoded = json_obj_parse(data, data_len, tp_msg_dsc,
-					ARRAY_SIZE(tp_msg_dsc), &tp);
+				 ARRAY_SIZE(tp_msg_dsc), &tp);
 #if 0
 	if ((decoded & 1) == false) { /* TODO: this fails, why? */
 		tp_err("json_obj_parse()");
@@ -539,7 +533,7 @@ struct tp_new *json_to_tp_new(void *data, size_t data_len)
 	memset(&tp, 0, sizeof(tp));
 
 	if (json_obj_parse(data, data_len, tp_new_dsc, ARRAY_SIZE(tp_new_dsc),
-				&tp) < 0) {
+			   &tp) < 0) {
 		tp_err("json_obj_parse()");
 	}
 
@@ -556,15 +550,14 @@ void tp_encode(struct tp *tp, void *data, size_t *data_len)
 {
 	int error;
 
-	error = json_obj_encode_buf(tp_descr, ARRAY_SIZE(tp_descr), tp,
-					data, *data_len);
+	error = json_obj_encode_buf(tp_descr, ARRAY_SIZE(tp_descr), tp, data,
+				    *data_len);
 	if (error) {
 		tp_err("json_obj_encode_buf()");
 	}
 
 	*data_len = error ? 0 : strlen(data);
 }
-
 
 void tp_new_to_json(struct tp_new *tp, void *data, size_t *data_len)
 {
@@ -585,11 +578,9 @@ void tp_out(sa_family_t af, struct net_if *iface, const char *msg,
 		static uint8_t buf[128]; /* TODO: Merge all static buffers and
 				       * eventually drop them
 				       */
-		struct tp_new tp = {
-			.msg = msg,
-			.data = { { .key = key, .value = value } },
-			.num_entries = 1
-		};
+		struct tp_new tp = { .msg = msg,
+				     .data = { { .key = key, .value = value } },
+				     .num_entries = 1 };
 		json_len = sizeof(buf);
 		tp_new_to_json(&tp, buf, &json_len);
 		if (json_len) {

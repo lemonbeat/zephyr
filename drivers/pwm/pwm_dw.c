@@ -23,13 +23,13 @@
 #include <drivers/pwm.h>
 
 /* Register for component version */
-#define REG_COMP_VER		0xAC
+#define REG_COMP_VER 0xAC
 
 /* Timer Load Count register, for pin to stay low. */
-#define REG_TMR_LOAD_CNT	0x00
+#define REG_TMR_LOAD_CNT 0x00
 
 /* Control for timer */
-#define REG_TMR_CTRL		0x08
+#define REG_TMR_CTRL 0x08
 
 /* Offset from Timer 1 Load Count address
  * for other timers. (e.g. Timer 2 address +0x14,
@@ -38,28 +38,28 @@
  * This also applies to other registers for
  * different timers (except load count 2).
  */
-#define REG_OFFSET		0x14
+#define REG_OFFSET 0x14
 
 /* Timer Load Count 2 register, for pin to stay high. */
-#define REG_TMR_LOAD_CNT2	0xB0
+#define REG_TMR_LOAD_CNT2 0xB0
 
 /* Offset from Timer 1 Load Count 2 address
  * for other timers. (e.g. Timer 2 address +0x04,
  * timer 3 address + 0x08, etc.)
  */
-#define REG_OFFSET_LOAD_CNT2	0x04
+#define REG_OFFSET_LOAD_CNT2 0x04
 
 /* Default for control register:
  * PWM mode, interrupt masked, user-defined count mode, but disabled
  */
-#define TIMER_INIT_CTRL		0x0E
+#define TIMER_INIT_CTRL 0x0E
 
 struct pwm_dw_config {
 	/** Base address of registers */
-	uint32_t	addr;
+	uint32_t addr;
 
 	/** Number of ports */
-	uint32_t	num_ports;
+	uint32_t num_ports;
 };
 
 /**
@@ -73,8 +73,8 @@ struct pwm_dw_config {
 static inline int pwm_dw_timer_base_addr(const struct device *dev,
 					 uint32_t timer)
 {
-	const struct pwm_dw_config * const cfg =
-	    (const struct pwm_dw_config *)dev->config;
+	const struct pwm_dw_config *const cfg =
+		(const struct pwm_dw_config *)dev->config;
 
 	return (cfg->addr + (timer * REG_OFFSET));
 }
@@ -90,15 +90,14 @@ static inline int pwm_dw_timer_base_addr(const struct device *dev,
 static inline int pwm_dw_timer_ldcnt2_addr(const struct device *dev,
 					   uint32_t timer)
 {
-	const struct pwm_dw_config * const cfg =
-	    (const struct pwm_dw_config *)dev->config;
+	const struct pwm_dw_config *const cfg =
+		(const struct pwm_dw_config *)dev->config;
 
 	return (cfg->addr + REG_TMR_LOAD_CNT2 + (timer * REG_OFFSET_LOAD_CNT2));
 }
 
-
-static int __set_one_port(const struct device *dev, uint32_t pwm,
-			  uint32_t on, uint32_t off)
+static int __set_one_port(const struct device *dev, uint32_t pwm, uint32_t on,
+			  uint32_t off)
 {
 	uint32_t reg_addr;
 
@@ -141,12 +140,12 @@ static int __set_one_port(const struct device *dev, uint32_t pwm,
  *
  * @return 0
  */
-static int pwm_dw_pin_set_cycles(const struct device *dev,
-				 uint32_t pwm, uint32_t period_cycles,
-				 uint32_t pulse_cycles, pwm_flags_t flags)
+static int pwm_dw_pin_set_cycles(const struct device *dev, uint32_t pwm,
+				 uint32_t period_cycles, uint32_t pulse_cycles,
+				 pwm_flags_t flags)
 {
-	const struct pwm_dw_config * const cfg =
-	    (const struct pwm_dw_config *)dev->config;
+	const struct pwm_dw_config *const cfg =
+		(const struct pwm_dw_config *)dev->config;
 	int i;
 	uint32_t on, off;
 
@@ -172,7 +171,6 @@ static int pwm_dw_pin_set_cycles(const struct device *dev,
 	}
 
 	return __set_one_port(dev, pwm, on, off);
-
 }
 
 static struct pwm_driver_api pwm_dw_drv_api_funcs = {
@@ -200,9 +198,8 @@ static struct pwm_dw_config pwm_dw_cfg = {
 	.num_ports = PWM_DW_NUM_PORTS,
 };
 
-DEVICE_AND_API_INIT(pwm_dw_0, CONFIG_PWM_DW_0_DRV_NAME, pwm_dw_init,
-		    NULL, &pwm_dw_cfg,
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &pwm_dw_drv_api_funcs);
+DEVICE_AND_API_INIT(pwm_dw_0, CONFIG_PWM_DW_0_DRV_NAME, pwm_dw_init, NULL,
+		    &pwm_dw_cfg, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &pwm_dw_drv_api_funcs);
 
 #endif /* CONFIG_PWM_DW */

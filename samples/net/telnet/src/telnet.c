@@ -20,8 +20,7 @@ LOG_MODULE_REGISTER(net_telnet_sample, LOG_LEVEL_DBG);
 static struct net_mgmt_event_callback mgmt_cb;
 
 static void ipv4_addr_add_handler(struct net_mgmt_event_callback *cb,
-				  uint32_t mgmt_event,
-				  struct net_if *iface)
+				  uint32_t mgmt_event, struct net_if *iface)
 {
 	char hr_addr[NET_IPV4_ADDR_LEN];
 	int i = 0;
@@ -41,14 +40,14 @@ static void ipv4_addr_add_handler(struct net_mgmt_event_callback *cb,
 
 		LOG_INF("IPv4 address: %s",
 			log_strdup(net_addr_ntop(AF_INET,
-					       &if_addr->address.in_addr,
-					       hr_addr, NET_IPV4_ADDR_LEN)));
+						 &if_addr->address.in_addr,
+						 hr_addr, NET_IPV4_ADDR_LEN)));
 		LOG_INF("Lease time: %u seconds",
-			 iface->config.dhcpv4.lease_time);
+			iface->config.dhcpv4.lease_time);
 		LOG_INF("Subnet: %s",
-			log_strdup(net_addr_ntop(AF_INET,
-					       &iface->config.ip.ipv4->netmask,
-					       hr_addr, NET_IPV4_ADDR_LEN)));
+			log_strdup(net_addr_ntop(
+				AF_INET, &iface->config.ip.ipv4->netmask,
+				hr_addr, NET_IPV4_ADDR_LEN)));
 		LOG_INF("Router: %s",
 			log_strdup(net_addr_ntop(AF_INET,
 						 &iface->config.ip.ipv4->gw,

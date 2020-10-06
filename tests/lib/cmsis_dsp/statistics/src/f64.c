@@ -13,8 +13,8 @@
 
 #include "f64.pat"
 
-#define SNR_ERROR_THRESH	((float64_t)300)
-#define REL_ERROR_THRESH	(1.0e-14)
+#define SNR_ERROR_THRESH ((float64_t)300)
+#define REL_ERROR_THRESH (1.0e-14)
 
 static void test_arm_entropy_f64(void)
 {
@@ -39,13 +39,11 @@ static void test_arm_entropy_f64(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f64(length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f64(length, ref, output, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_f64(length, ref, output, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_f64(length, ref, output, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -69,22 +67,19 @@ static void test_arm_kullback_leibler_f64(void)
 
 	/* Run test function */
 	for (index = 0; index < length; index++) {
-		output[index] =
-			arm_kullback_leibler_f64(
-				input1, input2, in_kl_dim[index + 1]);
+		output[index] = arm_kullback_leibler_f64(input1, input2,
+							 in_kl_dim[index + 1]);
 
 		input1 += in_kl_dim[index + 1];
 		input2 += in_kl_dim[index + 1];
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f64(length, ref, output, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f64(length, ref, output, SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_near_equal_f64(length, ref, output, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_near_equal_f64(length, ref, output, REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -92,10 +87,8 @@ static void test_arm_kullback_leibler_f64(void)
 
 void test_statistics_f64(void)
 {
-	ztest_test_suite(statistics_f64,
-		ztest_unit_test(test_arm_entropy_f64),
-		ztest_unit_test(test_arm_kullback_leibler_f64)
-		);
+	ztest_test_suite(statistics_f64, ztest_unit_test(test_arm_entropy_f64),
+			 ztest_unit_test(test_arm_kullback_leibler_f64));
 
 	ztest_run_test_suite(statistics_f64);
 }

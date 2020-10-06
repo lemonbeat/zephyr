@@ -15,12 +15,10 @@
 
 #if defined(CONFIG_DEBUG_COREDUMP_BACKEND_LOGGING)
 extern struct z_coredump_backend_api z_coredump_backend_logging;
-static struct z_coredump_backend_api
-	*backend_api = &z_coredump_backend_logging;
+static struct z_coredump_backend_api *backend_api = &z_coredump_backend_logging;
 #elif defined(DEBUG_COREDUMP_BACKEND_NULL)
 extern struct z_coredump_backend_api z_coredump_backend_null;
-static struct z_coredump_backend_api
-	*backend_api = &z_coredump_backend_null;
+static struct z_coredump_backend_api *backend_api = &z_coredump_backend_null;
 #else
 #error "Need to select a coredump backend"
 #endif
@@ -30,7 +28,7 @@ static int error;
 static int dump_header(unsigned int reason)
 {
 	struct z_coredump_hdr_t hdr = {
-		.id = {'Z', 'E'},
+		.id = { 'Z', 'E' },
 		.hdr_version = Z_COREDUMP_HDR_VER,
 		.reason = sys_cpu_to_le16(reason),
 	};
@@ -112,7 +110,7 @@ void z_coredump(unsigned int reason, const z_arch_esf_t *esf,
 
 	process_memory_region_list();
 
-	if (error != 0)	{
+	if (error != 0) {
 		z_coredump_error();
 	}
 
@@ -173,10 +171,10 @@ void z_coredump_memory_dump(uintptr_t start_addr, uintptr_t end_addr)
 	m.hdr_version = Z_COREDUMP_MEM_HDR_VER;
 
 	if (sizeof(uintptr_t) == 8) {
-		m.start	= sys_cpu_to_le64(start_addr);
+		m.start = sys_cpu_to_le64(start_addr);
 		m.end = sys_cpu_to_le64(end_addr);
 	} else if (sizeof(uintptr_t) == 4) {
-		m.start	= sys_cpu_to_le32(start_addr);
+		m.start = sys_cpu_to_le32(start_addr);
 		m.end = sys_cpu_to_le32(end_addr);
 	}
 

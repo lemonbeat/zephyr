@@ -34,7 +34,7 @@
 
 #define _ARC_V2_TMR_CTRL_IE 0x1 /* interrupt enable */
 #define _ARC_V2_TMR_CTRL_NH 0x2 /* count only while not halted */
-#define _ARC_V2_TMR_CTRL_W  0x4 /* watchdog mode enable */
+#define _ARC_V2_TMR_CTRL_W 0x4 /* watchdog mode enable */
 #define _ARC_V2_TMR_CTRL_IP 0x8 /* interrupt pending flag */
 
 /* Minimum cycles in the future to try to program. */
@@ -44,8 +44,8 @@
  */
 #define COUNTER_MAX 0x7fffffff
 #define TIMER_STOPPED 0x0
-#define CYC_PER_TICK (sys_clock_hw_cycles_per_sec()	\
-		      / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define CYC_PER_TICK \
+	(sys_clock_hw_cycles_per_sec() / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
 
 #define MAX_TICKS ((COUNTER_MAX / CYC_PER_TICK) - 1)
 #define MAX_CYCLES (MAX_TICKS * CYC_PER_TICK)
@@ -56,14 +56,12 @@
 
 static struct k_spinlock lock;
 
-
 #if SMP_TIMER_DRIVER
 volatile static uint64_t last_time;
 volatile static uint64_t start_time;
 
 #else
 static uint32_t last_load;
-
 
 /*
  * This local variable holds the amount of timer cycles elapsed
@@ -82,7 +80,6 @@ static uint32_t cycle_count;
  * that have been announced to the kernel.
  */
 static uint32_t announced_cycles;
-
 
 /*
  * This local variable holds the amount of elapsed HW cycles due to
@@ -185,7 +182,7 @@ static uint32_t elapsed(void)
 	uint32_t val, ctrl;
 
 	do {
-		val =  timer0_count_register_get();
+		val = timer0_count_register_get();
 		ctrl = timer0_control_register_get();
 	} while (timer0_count_register_get() < val);
 
@@ -229,8 +226,7 @@ static void timer_int_handler(const void *unused)
 	k_spinlock_key_t key;
 
 	/* clear the IP bit of the control register */
-	timer0_control_register_set(_ARC_V2_TMR_CTRL_NH |
-				    _ARC_V2_TMR_CTRL_IE);
+	timer0_control_register_set(_ARC_V2_TMR_CTRL_NH | _ARC_V2_TMR_CTRL_IE);
 	key = k_spin_lock(&lock);
 	/* gfrc is the wall clock */
 	curr_time = z_arc_connect_gfrc_read();
@@ -264,9 +260,7 @@ static void timer_int_handler(const void *unused)
 	announced_cycles += dticks * CYC_PER_TICK;
 	z_clock_announce(TICKLESS ? dticks : 1);
 #endif
-
 }
-
 
 /**
  *
@@ -350,14 +344,13 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 
 	timer0_limit_register_set(delay - 1);
 	timer0_count_register_set(0);
-	timer0_control_register_set(_ARC_V2_TMR_CTRL_NH |
-						_ARC_V2_TMR_CTRL_IE);
+	timer0_control_register_set(_ARC_V2_TMR_CTRL_NH | _ARC_V2_TMR_CTRL_IE);
 
 	arch_irq_unlock(key);
 #endif
 #else
-	if (IS_ENABLED(CONFIG_TICKLESS_IDLE) && idle
-	    && ticks == K_TICKS_FOREVER) {
+	if (IS_ENABLED(CONFIG_TICKLESS_IDLE) && idle &&
+	    ticks == K_TICKS_FOREVER) {
 		timer0_control_register_set(0);
 		timer0_count_register_set(0);
 		timer0_limit_register_set(0);
@@ -373,7 +366,6 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
 
-
 	cycle_count += elapsed();
 	/* clear counter early to avoid cycle loss as few as possible,
 	 * between cycle_count and clearing 0, few cycles are possible
@@ -381,7 +373,6 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 	 */
 	timer0_count_register_set(0);
 	overflow_cycles = 0U;
-
 
 	/* normal case */
 	unannounced = cycle_count - announced_cycles;
@@ -400,8 +391,8 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 
 		/* Round delay up to next tick boundary */
 		delay += unannounced;
-		delay =
-		 ((delay + CYC_PER_TICK - 1) / CYC_PER_TICK) * CYC_PER_TICK;
+		delay = ((delay + CYC_PER_TICK - 1) / CYC_PER_TICK) *
+			CYC_PER_TICK;
 
 		delay -= unannounced;
 		delay = MAX(delay, MIN_DELAY);
@@ -429,7 +420,7 @@ uint32_t z_clock_elapsed(void)
 #if SMP_TIMER_DRIVER
 	cyc = (z_arc_connect_gfrc_read() - last_time);
 #else
-	cyc =  elapsed() + cycle_count - announced_cycles;
+	cyc = elapsed() + cycle_count - announced_cycles;
 #endif
 
 	k_spin_unlock(&lock, key);

@@ -179,12 +179,9 @@ void main(void)
 	LOG_INF("Testing leds");
 
 	while (1) {
-
 		for (i = 0; i < COLORS_TO_SHOW; i++) {
-			ret = set_static_color(dev,
-					colors[i][0],
-					colors[i][1],
-					colors[i][2]);
+			ret = set_static_color(dev, colors[i][0], colors[i][1],
+					       colors[i][2]);
 			if (ret) {
 				return;
 			}
@@ -199,7 +196,7 @@ void main(void)
 
 		/* Blink white. */
 		ret = blink_color(dev, true, true, true, BLINK_DELAY_ON,
-				BLINK_DELAY_OFF);
+				  BLINK_DELAY_OFF);
 		if (ret) {
 			return;
 		}
@@ -209,10 +206,8 @@ void main(void)
 
 		/* Change the color of the LEDs while keeping blinking. */
 		for (i = 0; i < COLORS_TO_SHOW; i++) {
-			ret = set_static_color(dev,
-					colors[i][0],
-					colors[i][1],
-					colors[i][2]);
+			ret = set_static_color(dev, colors[i][0], colors[i][1],
+					       colors[i][2]);
 			if (ret) {
 				return;
 			}

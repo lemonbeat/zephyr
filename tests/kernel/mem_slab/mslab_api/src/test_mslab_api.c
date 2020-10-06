@@ -76,8 +76,7 @@ static void tmslab_alloc_timeout(void *data)
 	/** TESTPOINT: -EAGAIN Waiting period timed out*/
 	tms = k_uptime_get();
 	zassert_equal(k_mem_slab_alloc(pslab, &block_fail, K_MSEC(TIMEOUT)),
-		      -EAGAIN,
-		      NULL);
+		      -EAGAIN, NULL);
 	/**
 	 * TESTPOINT: timeout Maximum time to wait for operation to
 	 * complete (in milliseconds)
@@ -102,7 +101,8 @@ static void tmslab_used_get(void *data)
 		/**
 		 * TESTPOINT: Get the number of unused blocks in a memory slab.
 		 */
-		zassert_equal(k_mem_slab_num_free_get(pslab), BLK_NUM - 1 - i, NULL);
+		zassert_equal(k_mem_slab_num_free_get(pslab), BLK_NUM - 1 - i,
+			      NULL);
 	}
 
 	zassert_equal(k_mem_slab_alloc(pslab, &block_fail, K_NO_WAIT), -ENOMEM,
@@ -113,15 +113,15 @@ static void tmslab_used_get(void *data)
 	zassert_equal(k_mem_slab_num_used_get(pslab), BLK_NUM, NULL);
 
 	zassert_equal(k_mem_slab_alloc(pslab, &block_fail, K_MSEC(TIMEOUT)),
-		      -EAGAIN,
-		      NULL);
+		      -EAGAIN, NULL);
 	zassert_equal(k_mem_slab_num_free_get(pslab), 0, NULL);
 	zassert_equal(k_mem_slab_num_used_get(pslab), BLK_NUM, NULL);
 
 	for (int i = 0; i < BLK_NUM; i++) {
 		k_mem_slab_free(pslab, &block[i]);
 		zassert_equal(k_mem_slab_num_free_get(pslab), i + 1, NULL);
-		zassert_equal(k_mem_slab_num_used_get(pslab), BLK_NUM - 1 - i, NULL);
+		zassert_equal(k_mem_slab_num_used_get(pslab), BLK_NUM - 1 - i,
+			      NULL);
 	}
 }
 
@@ -165,7 +165,6 @@ void test_mslab_kdefine(void)
  */
 void test_mslab_alloc_free_thread(void)
 {
-
 	tmslab_alloc_free(&mslab);
 }
 

@@ -43,7 +43,8 @@ LOG_MODULE_REGISTER(flash_sam0);
 
 #define PAGES_PER_ROW (ROW_SIZE / FLASH_PAGE_SIZE)
 
-#define FLASH_MEM(_a) ((uint32_t *)((uint8_t *)((_a) + CONFIG_FLASH_BASE_ADDRESS)))
+#define FLASH_MEM(_a) \
+	((uint32_t *)((uint8_t *)((_a) + CONFIG_FLASH_BASE_ADDRESS)))
 
 struct flash_sam0_data {
 #if CONFIG_SOC_FLASH_SAM0_EMULATE_BYTE_PAGES
@@ -210,9 +211,9 @@ static int flash_sam0_commit(const struct device *dev)
 	}
 
 	for (page = 0; page < PAGES_PER_ROW; page++) {
-		err = flash_sam0_write_page(
-			dev, offset + page * FLASH_PAGE_SIZE,
-			&ctx->buf[page * FLASH_PAGE_SIZE]);
+		err = flash_sam0_write_page(dev,
+					    offset + page * FLASH_PAGE_SIZE,
+					    &ctx->buf[page * FLASH_PAGE_SIZE]);
 		if (err != 0) {
 			return err;
 		}
@@ -313,8 +314,7 @@ static int flash_sam0_read(const struct device *dev, off_t offset, void *data,
 	return 0;
 }
 
-static int flash_sam0_erase(const struct device *dev, off_t offset,
-			    size_t size)
+static int flash_sam0_erase(const struct device *dev, off_t offset, size_t size)
 {
 	int err;
 
@@ -440,6 +440,6 @@ static const struct flash_driver_api flash_sam0_api = {
 
 static struct flash_sam0_data flash_sam0_data_0;
 
-DEVICE_AND_API_INIT(flash_sam0, DT_INST_LABEL(0),
-		    flash_sam0_init, &flash_sam0_data_0, NULL, POST_KERNEL,
+DEVICE_AND_API_INIT(flash_sam0, DT_INST_LABEL(0), flash_sam0_init,
+		    &flash_sam0_data_0, NULL, POST_KERNEL,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &flash_sam0_api);

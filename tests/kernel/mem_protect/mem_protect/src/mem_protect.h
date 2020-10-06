@@ -91,7 +91,7 @@ static inline void set_fault_valid(bool valid)
 #define BLK_SIZE_MAX_MD 16
 #define BLK_NUM_MAX_MD 4
 #define BLK_ALIGN_MD BLK_SIZE_MIN_MD
-#define DESC_SIZE	sizeof(struct sys_mem_pool_block)
+#define DESC_SIZE sizeof(struct sys_mem_pool_block)
 #define STACK_SIZE_MD (512 + CONFIG_TEST_EXTRA_STACKSIZE)
 #define PRIORITY_MD 5
 

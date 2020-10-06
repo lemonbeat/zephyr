@@ -42,15 +42,14 @@ LOG_MODULE_REGISTER(net_test, CONFIG_DNS_RESOLVER_LOG_LEVEL);
 
 #if defined(CONFIG_NET_IPV6)
 /* Interface 1 addresses */
-static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
-static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr1 = { { { 0x20, 0x01, 0x0d, 0xb8, 1, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr3 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0x1 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 #endif
 
 #if defined(CONFIG_NET_IPV4)
@@ -155,15 +154,12 @@ static int sender_iface(const struct device *dev, struct net_pkt *pkt)
 		 */
 		k_delayed_work_cancel(&ctx->queries[slot].timer);
 
-		DBG("Calling cb %p with user data %p\n",
-		    ctx->queries[slot].cb,
+		DBG("Calling cb %p with user data %p\n", ctx->queries[slot].cb,
 		    ctx->queries[slot].user_data);
 
-		ctx->queries[slot].cb(DNS_EAI_INPROGRESS,
-				      &addrinfo,
+		ctx->queries[slot].cb(DNS_EAI_INPROGRESS, &addrinfo,
 				      ctx->queries[slot].user_data);
-		ctx->queries[slot].cb(DNS_EAI_ALLDONE,
-				      NULL,
+		ctx->queries[slot].cb(DNS_EAI_ALLDONE, NULL,
 				      ctx->queries[slot].user_data);
 
 		ctx->queries[slot].cb = NULL;
@@ -183,18 +179,10 @@ static struct dummy_api net_iface_api = {
 #define _ETH_L2_LAYER DUMMY_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
-NET_DEVICE_INIT_INSTANCE(net_iface1_test,
-			 "iface1",
-			 iface1,
-			 net_iface_dev_init,
-			 device_pm_control_nop,
-			 &net_iface1_data,
-			 NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_iface_api,
-			 _ETH_L2_LAYER,
-			 _ETH_L2_CTX_TYPE,
-			 127);
+NET_DEVICE_INIT_INSTANCE(net_iface1_test, "iface1", iface1, net_iface_dev_init,
+			 device_pm_control_nop, &net_iface1_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_iface_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 static void test_init(void)
 {
@@ -209,15 +197,14 @@ static void test_init(void)
 
 	iface1 = net_if_get_by_index(1);
 
-	((struct net_if_test *) net_if_get_device(iface1)->data)->idx =
+	((struct net_if_test *)net_if_get_device(iface1)->data)->idx =
 		net_if_get_by_iface(iface1);
 
 #if defined(CONFIG_NET_IPV6)
-	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &my_addr1, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&my_addr1));
+		    net_sprint_ipv6_addr(&my_addr1));
 		zassert_not_null(ifaddr, "addr1");
 
 		return;
@@ -226,11 +213,10 @@ static void test_init(void)
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface1, &ll_addr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv6 address %s\n",
-		       net_sprint_ipv6_addr(&ll_addr));
+		    net_sprint_ipv6_addr(&ll_addr));
 		zassert_not_null(ifaddr, "ll_addr");
 
 		return;
@@ -240,11 +226,10 @@ static void test_init(void)
 #endif
 
 #if defined(CONFIG_NET_IPV4)
-	ifaddr = net_if_ipv4_addr_add(iface1, &my_addr2,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv4_addr_add(iface1, &my_addr2, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add IPv4 address %s\n",
-		       net_sprint_ipv4_addr(&my_addr2));
+		    net_sprint_ipv4_addr(&my_addr2));
 		zassert_not_null(ifaddr, "addr2");
 
 		return;
@@ -265,8 +250,7 @@ static void test_init(void)
 }
 
 void dns_result_cb_dummy(enum dns_resolve_status status,
-			 struct dns_addrinfo *info,
-			 void *user_data)
+			 struct dns_addrinfo *info, void *user_data)
 {
 	return;
 }
@@ -275,12 +259,8 @@ static void test_dns_query_invalid_timeout(void)
 {
 	int ret;
 
-	ret = dns_get_addr_info(NAME6,
-				DNS_QUERY_TYPE_AAAA,
-				NULL,
-				dns_result_cb_dummy,
-				NULL,
-				0);
+	ret = dns_get_addr_info(NAME6, DNS_QUERY_TYPE_AAAA, NULL,
+				dns_result_cb_dummy, NULL, 0);
 	zassert_equal(ret, -EINVAL, "Wrong return code for timeout");
 }
 
@@ -288,13 +268,8 @@ static void test_dns_query_invalid_context(void)
 {
 	int ret;
 
-	ret = dns_resolve_name(NULL,
-			       NAME6,
-			       DNS_QUERY_TYPE_AAAA,
-			       NULL,
-			       dns_result_cb_dummy,
-			       NULL,
-			       DNS_TIMEOUT);
+	ret = dns_resolve_name(NULL, NAME6, DNS_QUERY_TYPE_AAAA, NULL,
+			       dns_result_cb_dummy, NULL, DNS_TIMEOUT);
 	zassert_equal(ret, -EINVAL, "Wrong return code for context");
 }
 
@@ -302,11 +277,7 @@ static void test_dns_query_invalid_callback(void)
 {
 	int ret;
 
-	ret = dns_get_addr_info(NAME6,
-				DNS_QUERY_TYPE_AAAA,
-				NULL,
-				NULL,
-				NULL,
+	ret = dns_get_addr_info(NAME6, DNS_QUERY_TYPE_AAAA, NULL, NULL, NULL,
 				DNS_TIMEOUT);
 	zassert_equal(ret, -EINVAL, "Wrong return code for callback");
 }
@@ -315,18 +286,13 @@ static void test_dns_query_invalid_query(void)
 {
 	int ret;
 
-	ret = dns_get_addr_info(NULL,
-				DNS_QUERY_TYPE_AAAA,
-				NULL,
-				dns_result_cb_dummy,
-				NULL,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(NULL, DNS_QUERY_TYPE_AAAA, NULL,
+				dns_result_cb_dummy, NULL, DNS_TIMEOUT);
 	zassert_equal(ret, -EINVAL, "Wrong return code for query");
 }
 
 void dns_result_cb_timeout(enum dns_resolve_status status,
-			   struct dns_addrinfo *info,
-			   void *user_data)
+			   struct dns_addrinfo *info, void *user_data)
 {
 	int expected_status = POINTER_TO_INT(user_data);
 
@@ -358,7 +324,7 @@ static void test_dns_query_server_count(void)
 	}
 
 	zassert_equal(count, CONFIG_DNS_RESOLVER_MAX_SERVERS,
-		     "Invalid number of servers");
+		      "Invalid number of servers");
 }
 
 static void test_dns_query_ipv4_server_count(void)
@@ -433,20 +399,14 @@ static void test_dns_query_too_many(void)
 
 	timeout_query = true;
 
-	ret = dns_get_addr_info(NAME4,
-				DNS_QUERY_TYPE_A,
-				NULL,
+	ret = dns_get_addr_info(NAME4, DNS_QUERY_TYPE_A, NULL,
 				dns_result_cb_timeout,
-				INT_TO_POINTER(expected_status),
-				DNS_TIMEOUT);
+				INT_TO_POINTER(expected_status), DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv4 query");
 
-	ret = dns_get_addr_info(NAME4,
-				DNS_QUERY_TYPE_A,
-				NULL,
+	ret = dns_get_addr_info(NAME4, DNS_QUERY_TYPE_A, NULL,
 				dns_result_cb_dummy,
-				INT_TO_POINTER(expected_status),
-				DNS_TIMEOUT);
+				INT_TO_POINTER(expected_status), DNS_TIMEOUT);
 	zassert_equal(ret, -EAGAIN, "Should have run out of space");
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -463,12 +423,9 @@ static void test_dns_query_ipv4_timeout(void)
 
 	timeout_query = true;
 
-	ret = dns_get_addr_info(NAME4,
-				DNS_QUERY_TYPE_A,
-				NULL,
+	ret = dns_get_addr_info(NAME4, DNS_QUERY_TYPE_A, NULL,
 				dns_result_cb_timeout,
-				INT_TO_POINTER(expected_status),
-				DNS_TIMEOUT);
+				INT_TO_POINTER(expected_status), DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv4 query");
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -485,12 +442,9 @@ static void test_dns_query_ipv6_timeout(void)
 
 	timeout_query = true;
 
-	ret = dns_get_addr_info(NAME6,
-				DNS_QUERY_TYPE_AAAA,
-				NULL,
+	ret = dns_get_addr_info(NAME6, DNS_QUERY_TYPE_AAAA, NULL,
 				dns_result_cb_timeout,
-				INT_TO_POINTER(expected_status),
-				DNS_TIMEOUT);
+				INT_TO_POINTER(expected_status), DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv6 query");
 
 	if (k_sem_take(&wait_data, WAIT_TIME)) {
@@ -527,12 +481,9 @@ static void test_dns_query_ipv4_cancel(void)
 
 	timeout_query = true;
 
-	ret = dns_get_addr_info(NAME4,
-				DNS_QUERY_TYPE_A,
-				&dns_id,
+	ret = dns_get_addr_info(NAME4, DNS_QUERY_TYPE_A, &dns_id,
 				dns_result_cb_timeout,
-				INT_TO_POINTER(expected_status),
-				DNS_TIMEOUT);
+				INT_TO_POINTER(expected_status), DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv4 query");
 
 	ret = dns_cancel_addr_info(dns_id);
@@ -553,12 +504,9 @@ static void test_dns_query_ipv6_cancel(void)
 
 	timeout_query = true;
 
-	ret = dns_get_addr_info(NAME6,
-				DNS_QUERY_TYPE_AAAA,
-				&dns_id,
+	ret = dns_get_addr_info(NAME6, DNS_QUERY_TYPE_AAAA, &dns_id,
 				dns_result_cb_timeout,
-				INT_TO_POINTER(expected_status),
-				DNS_TIMEOUT);
+				INT_TO_POINTER(expected_status), DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv6 query");
 
 	ret = dns_cancel_addr_info(dns_id);
@@ -577,8 +525,7 @@ struct expected_status {
 	const char *caller;
 };
 
-void dns_result_cb(enum dns_resolve_status status,
-		   struct dns_addrinfo *info,
+void dns_result_cb(enum dns_resolve_status status, struct dns_addrinfo *info,
 		   void *user_data)
 {
 	struct expected_status *expected = user_data;
@@ -606,12 +553,8 @@ static void test_dns_query_ipv4(void)
 
 	timeout_query = false;
 
-	ret = dns_get_addr_info(NAME4,
-				DNS_QUERY_TYPE_A,
-				&current_dns_id,
-				dns_result_cb,
-				&status,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(NAME4, DNS_QUERY_TYPE_A, &current_dns_id,
+				dns_result_cb, &status, DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv4 query");
 
 	DBG("Query id %u\n", current_dns_id);
@@ -635,12 +578,8 @@ static void test_dns_query_ipv6(void)
 
 	timeout_query = false;
 
-	ret = dns_get_addr_info(NAME6,
-				DNS_QUERY_TYPE_AAAA,
-				&current_dns_id,
-				dns_result_cb,
-				&status,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(NAME6, DNS_QUERY_TYPE_AAAA, &current_dns_id,
+				dns_result_cb, &status, DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv6 query");
 
 	DBG("Query id %u\n", current_dns_id);
@@ -661,8 +600,7 @@ struct expected_addr_status {
 };
 
 void dns_result_numeric_cb(enum dns_resolve_status status,
-			   struct dns_addrinfo *info,
-			   void *user_data)
+			   struct dns_addrinfo *info, void *user_data)
 {
 	struct expected_addr_status *expected = user_data;
 
@@ -705,12 +643,8 @@ static void test_dns_query_ipv4_numeric(void)
 
 	timeout_query = false;
 
-	ret = dns_get_addr_info(NAME_IPV4,
-				DNS_QUERY_TYPE_A,
-				&current_dns_id,
-				dns_result_numeric_cb,
-				&status,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(NAME_IPV4, DNS_QUERY_TYPE_A, &current_dns_id,
+				dns_result_numeric_cb, &status, DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv4 numeric query");
 
 	DBG("Query id %u\n", current_dns_id);
@@ -734,12 +668,8 @@ static void test_dns_query_ipv6_numeric(void)
 
 	timeout_query = false;
 
-	ret = dns_get_addr_info(NAME_IPV6,
-				DNS_QUERY_TYPE_AAAA,
-				&current_dns_id,
-				dns_result_numeric_cb,
-				&status,
-				DNS_TIMEOUT);
+	ret = dns_get_addr_info(NAME_IPV6, DNS_QUERY_TYPE_AAAA, &current_dns_id,
+				dns_result_numeric_cb, &status, DNS_TIMEOUT);
 	zassert_equal(ret, 0, "Cannot create IPv6 query");
 
 	DBG("Query id %u\n", current_dns_id);
@@ -754,8 +684,7 @@ static void test_dns_query_ipv6_numeric(void)
 
 void test_main(void)
 {
-	ztest_test_suite(dns_tests,
-			 ztest_unit_test(test_init),
+	ztest_test_suite(dns_tests, ztest_unit_test(test_init),
 			 ztest_unit_test(test_dns_query_invalid_timeout),
 			 ztest_unit_test(test_dns_query_invalid_context),
 			 ztest_unit_test(test_dns_query_invalid_callback),

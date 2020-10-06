@@ -61,10 +61,10 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 #define LWM2M_RD_CLIENT_URI "rd"
 
-#define SECONDS_TO_UPDATE_EARLY	CONFIG_LWM2M_SECONDS_TO_UPDATE_EARLY
+#define SECONDS_TO_UPDATE_EARLY CONFIG_LWM2M_SECONDS_TO_UPDATE_EARLY
 #define STATE_MACHINE_UPDATE_INTERVAL_MS 500
 
-#define CLIENT_EP_LEN		CONFIG_LWM2M_RD_CLIENT_ENDPOINT_NAME_MAX_LENGTH
+#define CLIENT_EP_LEN CONFIG_LWM2M_RD_CLIENT_ENDPOINT_NAME_MAX_LENGTH
 
 /* Up to 3 characters + NULL */
 #define CLIENT_BINDING_LEN sizeof("UQS")
@@ -131,8 +131,8 @@ static void set_sm_state(uint8_t sm_state)
 		event = LWM2M_RD_CLIENT_EVENT_BOOTSTRAP_TRANSFER_COMPLETE;
 	} else
 #endif
-	if (client.engine_state == ENGINE_UPDATE_SENT &&
-	    sm_state == ENGINE_REGISTRATION_DONE) {
+		if (client.engine_state == ENGINE_UPDATE_SENT &&
+		    sm_state == ENGINE_REGISTRATION_DONE) {
 		event = LWM2M_RD_CLIENT_EVENT_REG_UPDATE_COMPLETE;
 	} else if (sm_state == ENGINE_REGISTRATION_DONE) {
 		event = LWM2M_RD_CLIENT_EVENT_REGISTRATION_COMPLETE;
@@ -175,7 +175,7 @@ static void sm_handle_timeout_state(struct lwm2m_message *msg,
 		event = LWM2M_RD_CLIENT_EVENT_BOOTSTRAP_REG_FAILURE;
 	} else
 #endif
-	if (client.engine_state == ENGINE_REGISTRATION_SENT) {
+		if (client.engine_state == ENGINE_REGISTRATION_SENT) {
 		event = LWM2M_RD_CLIENT_EVENT_REGISTRATION_FAILURE;
 	} else if (client.engine_state == ENGINE_UPDATE_SENT) {
 		event = LWM2M_RD_CLIENT_EVENT_REG_UPDATE_FAILURE;
@@ -288,14 +288,12 @@ static int do_registration_reply_cb(const struct coap_packet *response,
 
 		if (options[1].len + 1 > sizeof(client.server_ep)) {
 			LOG_ERR("Unexpected length of query: "
-				    "%u (expected %zu)\n",
-				    options[1].len,
-				    sizeof(client.server_ep));
+				"%u (expected %zu)\n",
+				options[1].len, sizeof(client.server_ep));
 			return -EINVAL;
 		}
 
-		memcpy(client.server_ep, options[1].value,
-		       options[1].len);
+		memcpy(client.server_ep, options[1].value, options[1].len);
 		client.server_ep[options[1].len] = '\0';
 		set_sm_state(ENGINE_REGISTRATION_DONE);
 		LOG_INF("Registration Done (EP='%s')",
@@ -337,8 +335,7 @@ static int do_update_reply_cb(const struct coap_packet *response,
 	uint8_t code;
 
 	code = coap_header_get_code(response);
-	LOG_INF("Update callback (code:%u.%u)",
-		COAP_RESPONSE_CODE_CLASS(code),
+	LOG_INF("Update callback (code:%u.%u)", COAP_RESPONSE_CODE_CLASS(code),
 		COAP_RESPONSE_CODE_DETAIL(code));
 
 	/* If NOT_FOUND just continue on */
@@ -558,8 +555,8 @@ static int sm_do_bootstrap_reg(void)
 	}
 
 	/* TODO: handle return error */
-	coap_packet_append_option(&msg->cpkt, COAP_OPTION_URI_PATH,
-				  "bs", strlen("bs"));
+	coap_packet_append_option(&msg->cpkt, COAP_OPTION_URI_PATH, "bs",
+				  strlen("bs"));
 
 	snprintk(query_buffer, sizeof(query_buffer) - 1, "ep=%s",
 		 client.ep_name);
@@ -573,8 +570,7 @@ static int sm_do_bootstrap_reg(void)
 
 	ret = lwm2m_send_message(msg);
 	if (ret < 0) {
-		LOG_ERR("Error sending LWM2M packet (err:%d).",
-			    ret);
+		LOG_ERR("Error sending LWM2M packet (err:%d).", ret);
 		goto cleanup;
 	}
 
@@ -646,13 +642,13 @@ static int sm_send_registration(bool send_obj_support_data,
 		/* include client endpoint in URI QUERY on 1st registration */
 		coap_append_option_int(&msg->cpkt, COAP_OPTION_CONTENT_FORMAT,
 				       LWM2M_FORMAT_APP_LINK_FORMAT);
-		snprintk(query_buffer, sizeof(query_buffer) - 1,
-			 "lwm2m=%s", LWM2M_PROTOCOL_VERSION);
+		snprintk(query_buffer, sizeof(query_buffer) - 1, "lwm2m=%s",
+			 LWM2M_PROTOCOL_VERSION);
 		/* TODO: handle return error */
 		coap_packet_append_option(&msg->cpkt, COAP_OPTION_URI_QUERY,
 					  query_buffer, strlen(query_buffer));
-		snprintk(query_buffer, sizeof(query_buffer) - 1,
-			 "ep=%s", client.ep_name);
+		snprintk(query_buffer, sizeof(query_buffer) - 1, "ep=%s",
+			 client.ep_name);
 		/* TODO: handle return error */
 		coap_packet_append_option(&msg->cpkt, COAP_OPTION_URI_QUERY,
 					  query_buffer, strlen(query_buffer));
@@ -664,8 +660,8 @@ static int sm_send_registration(bool send_obj_support_data,
 					  strlen(client.server_ep));
 	}
 
-	snprintk(query_buffer, sizeof(query_buffer) - 1,
-		 "lt=%d", client.lifetime);
+	snprintk(query_buffer, sizeof(query_buffer) - 1, "lt=%d",
+		 client.lifetime);
 	/* TODO: handle return error */
 	coap_packet_append_option(&msg->cpkt, COAP_OPTION_URI_QUERY,
 				  query_buffer, strlen(query_buffer));
@@ -673,8 +669,8 @@ static int sm_send_registration(bool send_obj_support_data,
 	lwm2m_engine_get_binding(binding);
 	/* UDP is a default binding, no need to add option if UDP is used. */
 	if (strcmp(binding, "U") != 0) {
-		snprintk(query_buffer, sizeof(query_buffer) - 1,
-			 "b=%s", binding);
+		snprintk(query_buffer, sizeof(query_buffer) - 1, "b=%s",
+			 binding);
 		/* TODO: handle return error */
 		coap_packet_append_option(&msg->cpkt, COAP_OPTION_URI_QUERY,
 					  query_buffer, strlen(query_buffer));
@@ -687,8 +683,8 @@ static int sm_send_registration(bool send_obj_support_data,
 		}
 
 		/* generate the rd data */
-		client_data_len = lwm2m_get_rd_data(client_data,
-						    sizeof(client_data));
+		client_data_len =
+			lwm2m_get_rd_data(client_data, sizeof(client_data));
 		ret = buf_append(CPKT_BUF_WRITE(&msg->cpkt), client_data,
 				 client_data_len);
 		if (ret < 0) {
@@ -749,8 +745,7 @@ static int sm_do_registration(void)
 		return ret;
 	}
 
-	ret = sm_send_registration(true,
-				   do_registration_reply_cb,
+	ret = sm_send_registration(true, do_registration_reply_cb,
 				   do_registration_timeout_cb);
 	if (!ret) {
 		set_sm_state(ENGINE_REGISTRATION_SENT);
@@ -784,8 +779,7 @@ static int sm_registration_done(void)
 		 */
 		sm_update_lifetime(client.ctx->srv_obj_inst, &client.lifetime);
 
-		ret = sm_send_registration(forced_update,
-					   do_update_reply_cb,
+		ret = sm_send_registration(forced_update, do_update_reply_cb,
 					   do_update_timeout_cb);
 		if (!ret) {
 			set_sm_state(ENGINE_UPDATE_SENT);
@@ -835,8 +829,7 @@ static int sm_do_deregister(void)
 				  strlen(LWM2M_RD_CLIENT_URI));
 	/* include server endpoint in URI PATH */
 	coap_packet_append_option(&msg->cpkt, COAP_OPTION_URI_PATH,
-				  client.server_ep,
-				  strlen(client.server_ep));
+				  client.server_ep, strlen(client.server_ep));
 
 	LOG_INF("Deregister from '%s'", log_strdup(client.server_ep));
 
@@ -859,7 +852,6 @@ static void lwm2m_rd_client_service(struct k_work *work)
 {
 	if (client.ctx) {
 		switch (get_sm_state()) {
-
 		case ENGINE_INIT:
 			sm_do_init();
 			break;
@@ -915,7 +907,6 @@ static void lwm2m_rd_client_service(struct k_work *work)
 
 		default:
 			LOG_ERR("Unhandled state: %d", get_sm_state());
-
 		}
 	}
 }
@@ -933,7 +924,7 @@ void lwm2m_rd_client_start(struct lwm2m_ctx *client_ctx, const char *ep_name,
 }
 
 void lwm2m_rd_client_stop(struct lwm2m_ctx *client_ctx,
-			   lwm2m_ctx_event_cb_t event_cb)
+			  lwm2m_ctx_event_cb_t event_cb)
 {
 	client.ctx = client_ctx;
 	client.event_cb = event_cb;
@@ -946,7 +937,6 @@ static int lwm2m_rd_client_init(const struct device *dev)
 {
 	return lwm2m_engine_add_service(lwm2m_rd_client_service,
 					STATE_MACHINE_UPDATE_INTERVAL_MS);
-
 }
 
 SYS_INIT(lwm2m_rd_client_init, APPLICATION,

@@ -14,7 +14,7 @@
 #include "espi_utils.h"
 
 /* Minimum delay before acknowledging a virtual wire */
-#define ESPI_XEC_VWIRE_ACK_DELAY    10ul
+#define ESPI_XEC_VWIRE_ACK_DELAY 10ul
 
 /* Maximum timeout to transmit a virtual wire packet.
  * 10 ms expresed in multiples of 100us
@@ -22,34 +22,34 @@
 #define ESPI_XEC_VWIRE_SEND_TIMEOUT 100ul
 
 /* 100ms */
-#define MAX_OOB_TIMEOUT             100ul
+#define MAX_OOB_TIMEOUT 100ul
 /* 1s */
-#define MAX_FLASH_TIMEOUT           1000ul
+#define MAX_FLASH_TIMEOUT 1000ul
 
 /* OOB maximum address configuration */
-#define ESPI_XEC_OOB_ADDR_MSW       0x1FFFul
-#define ESPI_XEC_OOB_ADDR_LSW       0xFFFFul
+#define ESPI_XEC_OOB_ADDR_MSW 0x1FFFul
+#define ESPI_XEC_OOB_ADDR_LSW 0xFFFFul
 
 /* OOB Rx length */
-#define ESPI_XEC_OOB_RX_LEN         0x7F00ul
+#define ESPI_XEC_OOB_RX_LEN 0x7F00ul
 
 /* BARs as defined in LPC spec chapter 11 */
-#define ESPI_XEC_KBC_BAR_ADDRESS    0x00600000
-#define ESPI_XEC_UART0_BAR_ADDRESS  0x03F80000
-#define ESPI_XEC_MBOX_BAR_ADDRESS   0x03600000
+#define ESPI_XEC_KBC_BAR_ADDRESS 0x00600000
+#define ESPI_XEC_UART0_BAR_ADDRESS 0x03F80000
+#define ESPI_XEC_MBOX_BAR_ADDRESS 0x03600000
 #define ESPI_XEC_PORT80_BAR_ADDRESS 0x00800000
 #define ESPI_XEC_PORT81_BAR_ADDRESS 0x00810000
 
 /* Espi peripheral has 3 uart ports */
-#define ESPI_PERIPHERAL_UART_PORT0  0
-#define ESPI_PERIPHERAL_UART_PORT1  1
-#define ESPI_PERIPHERAL_UART_PORT2  2
+#define ESPI_PERIPHERAL_UART_PORT0 0
+#define ESPI_PERIPHERAL_UART_PORT1 1
+#define ESPI_PERIPHERAL_UART_PORT2 2
 
-#define UART_DEFAULT_IRQ_POS	    2u
-#define UART_DEFAULT_IRQ	    BIT(UART_DEFAULT_IRQ_POS)
+#define UART_DEFAULT_IRQ_POS 2u
+#define UART_DEFAULT_IRQ BIT(UART_DEFAULT_IRQ_POS)
 
-#define MAX_OOB_BUFFER_SIZE         128ul
-#define MAX_SLAVE_BUFFER_SIZE       128ul
+#define MAX_OOB_BUFFER_SIZE 128ul
+#define MAX_SLAVE_BUFFER_SIZE 128ul
 
 LOG_MODULE_REGISTER(espi, CONFIG_ESPI_LOG_LEVEL);
 
@@ -133,70 +133,70 @@ enum mchp_smvw_regs {
 
 static const struct xec_signal vw_tbl[] = {
 	/* MSVW00 */
-	[ESPI_VWIRE_SIGNAL_SLP_S3]        = {MCHP_MSVW00, ESPI_VWIRE_SRC_ID0,
-					     ESPI_MASTER_TO_SLAVE},
-	[ESPI_VWIRE_SIGNAL_SLP_S4]        = {MCHP_MSVW00, ESPI_VWIRE_SRC_ID1,
-					     ESPI_MASTER_TO_SLAVE},
-	[ESPI_VWIRE_SIGNAL_SLP_S5]        = {MCHP_MSVW00, ESPI_VWIRE_SRC_ID2,
-					     ESPI_MASTER_TO_SLAVE},
+	[ESPI_VWIRE_SIGNAL_SLP_S3] = { MCHP_MSVW00, ESPI_VWIRE_SRC_ID0,
+				       ESPI_MASTER_TO_SLAVE },
+	[ESPI_VWIRE_SIGNAL_SLP_S4] = { MCHP_MSVW00, ESPI_VWIRE_SRC_ID1,
+				       ESPI_MASTER_TO_SLAVE },
+	[ESPI_VWIRE_SIGNAL_SLP_S5] = { MCHP_MSVW00, ESPI_VWIRE_SRC_ID2,
+				       ESPI_MASTER_TO_SLAVE },
 	/* MSVW01 */
-	[ESPI_VWIRE_SIGNAL_SUS_STAT]      = {MCHP_MSVW01, ESPI_VWIRE_SRC_ID0,
-					     ESPI_MASTER_TO_SLAVE},
-	[ESPI_VWIRE_SIGNAL_PLTRST]        = {MCHP_MSVW01, ESPI_VWIRE_SRC_ID1,
-					     ESPI_MASTER_TO_SLAVE},
-	[ESPI_VWIRE_SIGNAL_OOB_RST_WARN]  = {MCHP_MSVW01, ESPI_VWIRE_SRC_ID2,
-					     ESPI_MASTER_TO_SLAVE},
+	[ESPI_VWIRE_SIGNAL_SUS_STAT] = { MCHP_MSVW01, ESPI_VWIRE_SRC_ID0,
+					 ESPI_MASTER_TO_SLAVE },
+	[ESPI_VWIRE_SIGNAL_PLTRST] = { MCHP_MSVW01, ESPI_VWIRE_SRC_ID1,
+				       ESPI_MASTER_TO_SLAVE },
+	[ESPI_VWIRE_SIGNAL_OOB_RST_WARN] = { MCHP_MSVW01, ESPI_VWIRE_SRC_ID2,
+					     ESPI_MASTER_TO_SLAVE },
 	/* SMVW00 */
-	[ESPI_VWIRE_SIGNAL_OOB_RST_ACK]   = {MCHP_SMVW00, ESPI_VWIRE_SRC_ID0,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_WAKE]          = {MCHP_SMVW00, ESPI_VWIRE_SRC_ID2,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_PME]           = {MCHP_SMVW00, ESPI_VWIRE_SRC_ID3,
-					     ESPI_SLAVE_TO_MASTER},
+	[ESPI_VWIRE_SIGNAL_OOB_RST_ACK] = { MCHP_SMVW00, ESPI_VWIRE_SRC_ID0,
+					    ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_WAKE] = { MCHP_SMVW00, ESPI_VWIRE_SRC_ID2,
+				     ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_PME] = { MCHP_SMVW00, ESPI_VWIRE_SRC_ID3,
+				    ESPI_SLAVE_TO_MASTER },
 	/* SMVW01 */
-	[ESPI_VWIRE_SIGNAL_SLV_BOOT_DONE] = {MCHP_SMVW01, ESPI_VWIRE_SRC_ID0,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_ERR_FATAL]     = {MCHP_SMVW01, ESPI_VWIRE_SRC_ID1,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_ERR_NON_FATAL] = {MCHP_SMVW01, ESPI_VWIRE_SRC_ID2,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_SLV_BOOT_STS]  = {MCHP_SMVW01, ESPI_VWIRE_SRC_ID3,
-					     ESPI_SLAVE_TO_MASTER},
+	[ESPI_VWIRE_SIGNAL_SLV_BOOT_DONE] = { MCHP_SMVW01, ESPI_VWIRE_SRC_ID0,
+					      ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_ERR_FATAL] = { MCHP_SMVW01, ESPI_VWIRE_SRC_ID1,
+					  ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_ERR_NON_FATAL] = { MCHP_SMVW01, ESPI_VWIRE_SRC_ID2,
+					      ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_SLV_BOOT_STS] = { MCHP_SMVW01, ESPI_VWIRE_SRC_ID3,
+					     ESPI_SLAVE_TO_MASTER },
 	/* SMVW02 */
-	[ESPI_VWIRE_SIGNAL_SCI]           = {MCHP_SMVW02, ESPI_VWIRE_SRC_ID0,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_SMI]           = {MCHP_SMVW02, ESPI_VWIRE_SRC_ID1,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_RST_CPU_INIT]  = {MCHP_SMVW02, ESPI_VWIRE_SRC_ID2,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_HOST_RST_ACK]  = {MCHP_SMVW02, ESPI_VWIRE_SRC_ID3,
-					     ESPI_SLAVE_TO_MASTER},
+	[ESPI_VWIRE_SIGNAL_SCI] = { MCHP_SMVW02, ESPI_VWIRE_SRC_ID0,
+				    ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_SMI] = { MCHP_SMVW02, ESPI_VWIRE_SRC_ID1,
+				    ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_RST_CPU_INIT] = { MCHP_SMVW02, ESPI_VWIRE_SRC_ID2,
+					     ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_HOST_RST_ACK] = { MCHP_SMVW02, ESPI_VWIRE_SRC_ID3,
+					     ESPI_SLAVE_TO_MASTER },
 	/* MSVW02 */
-	[ESPI_VWIRE_SIGNAL_HOST_RST_WARN] = {MCHP_MSVW02, ESPI_VWIRE_SRC_ID0,
-					     ESPI_MASTER_TO_SLAVE},
+	[ESPI_VWIRE_SIGNAL_HOST_RST_WARN] = { MCHP_MSVW02, ESPI_VWIRE_SRC_ID0,
+					      ESPI_MASTER_TO_SLAVE },
 	/* SMVW03 */
-	[ESPI_VWIRE_SIGNAL_SUS_ACK]       = {MCHP_SMVW03, ESPI_VWIRE_SRC_ID0,
-					     ESPI_SLAVE_TO_MASTER},
-	[ESPI_VWIRE_SIGNAL_DNX_ACK]       = {MCHP_SMVW03, ESPI_VWIRE_SRC_ID1,
-					     ESPI_SLAVE_TO_MASTER},
+	[ESPI_VWIRE_SIGNAL_SUS_ACK] = { MCHP_SMVW03, ESPI_VWIRE_SRC_ID0,
+					ESPI_SLAVE_TO_MASTER },
+	[ESPI_VWIRE_SIGNAL_DNX_ACK] = { MCHP_SMVW03, ESPI_VWIRE_SRC_ID1,
+					ESPI_SLAVE_TO_MASTER },
 	/* MSVW03 */
-	[ESPI_VWIRE_SIGNAL_SUS_WARN]      = {MCHP_MSVW03, ESPI_VWIRE_SRC_ID0,
-					     ESPI_MASTER_TO_SLAVE},
-	[ESPI_VWIRE_SIGNAL_SUS_PWRDN_ACK] = {MCHP_MSVW03, ESPI_VWIRE_SRC_ID1,
-					     ESPI_MASTER_TO_SLAVE},
-	[ESPI_VWIRE_SIGNAL_SLP_A]         = {MCHP_MSVW03, ESPI_VWIRE_SRC_ID3,
-					     ESPI_MASTER_TO_SLAVE},
+	[ESPI_VWIRE_SIGNAL_SUS_WARN] = { MCHP_MSVW03, ESPI_VWIRE_SRC_ID0,
+					 ESPI_MASTER_TO_SLAVE },
+	[ESPI_VWIRE_SIGNAL_SUS_PWRDN_ACK] = { MCHP_MSVW03, ESPI_VWIRE_SRC_ID1,
+					      ESPI_MASTER_TO_SLAVE },
+	[ESPI_VWIRE_SIGNAL_SLP_A] = { MCHP_MSVW03, ESPI_VWIRE_SRC_ID3,
+				      ESPI_MASTER_TO_SLAVE },
 	/* MSVW04 */
-	[ESPI_VWIRE_SIGNAL_SLP_LAN]       = {MCHP_MSVW04, ESPI_VWIRE_SRC_ID0,
-					     ESPI_MASTER_TO_SLAVE},
-	[ESPI_VWIRE_SIGNAL_SLP_WLAN]      = {MCHP_MSVW04, ESPI_VWIRE_SRC_ID1,
-					     ESPI_MASTER_TO_SLAVE},
+	[ESPI_VWIRE_SIGNAL_SLP_LAN] = { MCHP_MSVW04, ESPI_VWIRE_SRC_ID0,
+					ESPI_MASTER_TO_SLAVE },
+	[ESPI_VWIRE_SIGNAL_SLP_WLAN] = { MCHP_MSVW04, ESPI_VWIRE_SRC_ID1,
+					 ESPI_MASTER_TO_SLAVE },
 	/* MSVW07 */
-	[ESPI_VWIRE_SIGNAL_HOST_C10]      = {MCHP_MSVW07, ESPI_VWIRE_SRC_ID0,
-					     ESPI_MASTER_TO_SLAVE},
+	[ESPI_VWIRE_SIGNAL_HOST_C10] = { MCHP_MSVW07, ESPI_VWIRE_SRC_ID0,
+					 ESPI_MASTER_TO_SLAVE },
 	/* MSVW08 */
-	[ESPI_VWIRE_SIGNAL_DNX_WARN]      = {MCHP_MSVW08, ESPI_VWIRE_SRC_ID1,
-					     ESPI_MASTER_TO_SLAVE},
+	[ESPI_VWIRE_SIGNAL_DNX_WARN] = { MCHP_MSVW08, ESPI_VWIRE_SRC_ID1,
+					 ESPI_MASTER_TO_SLAVE },
 };
 
 static uint32_t slave_rx_mem[MAX_OOB_BUFFER_SIZE];
@@ -209,7 +209,7 @@ static int espi_xec_configure(const struct device *dev, struct espi_cfg *cfg)
 	uint8_t cap0 = ESPI_CAP_REGS->GLB_CAP0;
 	uint8_t cap1 = ESPI_CAP_REGS->GLB_CAP1;
 	uint8_t cur_iomode = (cap1 & MCHP_ESPI_GBL_CAP1_IO_MODE_MASK) >>
-			   MCHP_ESPI_GBL_CAP1_IO_MODE_POS;
+			     MCHP_ESPI_GBL_CAP1_IO_MODE_POS;
 
 	/* Set frequency */
 	cap1 &= ~MCHP_ESPI_GBL_CAP1_MAX_FREQ_MASK;
@@ -241,8 +241,8 @@ static int espi_xec_configure(const struct device *dev, struct espi_cfg *cfg)
 	}
 
 	if (iomode != cur_iomode) {
-		cap1 &= ~(MCHP_ESPI_GBL_CAP1_IO_MODE_MASK0 <<
-			MCHP_ESPI_GBL_CAP1_IO_MODE_POS);
+		cap1 &= ~(MCHP_ESPI_GBL_CAP1_IO_MODE_MASK0
+			  << MCHP_ESPI_GBL_CAP1_IO_MODE_POS);
 		cap1 |= (iomode << MCHP_ESPI_GBL_CAP1_IO_MODE_POS);
 	}
 
@@ -322,7 +322,7 @@ static bool espi_xec_channel_ready(const struct device *dev,
 
 static int espi_xec_read_lpc_request(const struct device *dev,
 				     enum lpc_peripheral_opcode op,
-				     uint32_t  *data)
+				     uint32_t *data)
 {
 	ARG_UNUSED(dev);
 
@@ -361,7 +361,7 @@ static int espi_xec_write_lpc_request(const struct device *dev,
 				      uint32_t *data)
 {
 	struct espi_xec_config *config =
-		(struct espi_xec_config *) (dev->config);
+		(struct espi_xec_config *)(dev->config);
 
 	volatile uint32_t __attribute__((unused)) dummy;
 
@@ -405,7 +405,6 @@ static int espi_xec_write_lpc_request(const struct device *dev,
 		}
 	} else {
 		return -ENOTSUP;
-
 	}
 
 	return 0;
@@ -427,14 +426,14 @@ static int espi_xec_send_vwire(const struct device *dev,
 		ESPI_MSVW_REG *reg = &(ESPI_M2S_VW_REGS->MSVW00) + xec_id;
 		uint8_t *p8 = (uint8_t *)&reg->SRC;
 
-		*(p8 + (uintptr_t) src_id) = level;
+		*(p8 + (uintptr_t)src_id) = level;
 	}
 
 	if (signal_info.dir == ESPI_SLAVE_TO_MASTER) {
 		ESPI_SMVW_REG *reg = &(ESPI_S2M_VW_REGS->SMVW00) + xec_id;
 		uint8_t *p8 = (uint8_t *)&reg->SRC;
 
-		*(p8 + (uintptr_t) src_id) = level;
+		*(p8 + (uintptr_t)src_id) = level;
 
 		/* Ensure eSPI virtual wire packet is transmitted
 		 * There is no interrupt, so need to poll register
@@ -480,8 +479,8 @@ static int espi_xec_send_oob(const struct device *dev,
 	int ret;
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 	uint8_t err_mask = MCHP_ESPI_OOB_TX_STS_IBERR |
-			MCHP_ESPI_OOB_TX_STS_OVRUN |
-			MCHP_ESPI_OOB_TX_STS_BADREQ;
+			   MCHP_ESPI_OOB_TX_STS_OVRUN |
+			   MCHP_ESPI_OOB_TX_STS_BADREQ;
 
 	LOG_DBG("%s", __func__);
 
@@ -526,7 +525,7 @@ static int espi_xec_receive_oob(const struct device *dev,
 {
 	int ret;
 	uint8_t err_mask = MCHP_ESPI_OOB_RX_STS_IBERR |
-			MCHP_ESPI_OOB_RX_STS_OVRUN;
+			   MCHP_ESPI_OOB_RX_STS_OVRUN;
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 
 	if (ESPI_OOB_REGS->TX_STS & err_mask) {
@@ -562,10 +561,8 @@ static int espi_xec_flash_read(const struct device *dev,
 {
 	int ret;
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
-	uint32_t err_mask = MCHP_ESPI_FC_STS_IBERR |
-			MCHP_ESPI_FC_STS_FAIL |
-			MCHP_ESPI_FC_STS_OVFL |
-			MCHP_ESPI_FC_STS_BADREQ;
+	uint32_t err_mask = MCHP_ESPI_FC_STS_IBERR | MCHP_ESPI_FC_STS_FAIL |
+			    MCHP_ESPI_FC_STS_OVFL | MCHP_ESPI_FC_STS_BADREQ;
 
 	LOG_DBG("%s", __func__);
 
@@ -609,10 +606,8 @@ static int espi_xec_flash_write(const struct device *dev,
 				struct espi_flash_packet *pckt)
 {
 	int ret;
-	uint32_t err_mask = MCHP_ESPI_FC_STS_IBERR |
-			MCHP_ESPI_FC_STS_OVRUN |
-			MCHP_ESPI_FC_STS_FAIL |
-			MCHP_ESPI_FC_STS_BADREQ;
+	uint32_t err_mask = MCHP_ESPI_FC_STS_IBERR | MCHP_ESPI_FC_STS_OVRUN |
+			    MCHP_ESPI_FC_STS_FAIL | MCHP_ESPI_FC_STS_BADREQ;
 
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 
@@ -684,11 +679,11 @@ static void send_slave_bootdone(const struct device *dev)
 static void espi_init_oob(const struct device *dev)
 {
 	struct espi_xec_config *config =
-		(struct espi_xec_config *) (dev->config);
+		(struct espi_xec_config *)(dev->config);
 
 	/* Enable OOB Tx/Rx interrupts */
-	MCHP_GIRQ_ENSET(config->bus_girq_id) = (MCHP_ESPI_OOB_UP_GIRQ_VAL |
-			MCHP_ESPI_OOB_DN_GIRQ_VAL);
+	MCHP_GIRQ_ENSET(config->bus_girq_id) =
+		(MCHP_ESPI_OOB_UP_GIRQ_VAL | MCHP_ESPI_OOB_DN_GIRQ_VAL);
 
 	ESPI_OOB_REGS->TX_ADDR_MSW = 0;
 	ESPI_OOB_REGS->RX_ADDR_MSW = 0;
@@ -698,7 +693,7 @@ static void espi_init_oob(const struct device *dev)
 
 	/* Enable OOB Tx channel enable change status interrupt */
 	ESPI_OOB_REGS->TX_IEN |= MCHP_ESPI_OOB_TX_IEN_CHG_EN |
-				MCHP_ESPI_OOB_TX_IEN_DONE;
+				 MCHP_ESPI_OOB_TX_IEN_DONE;
 }
 #endif
 
@@ -706,7 +701,7 @@ static void espi_init_oob(const struct device *dev)
 static void espi_init_flash(const struct device *dev)
 {
 	struct espi_xec_config *config =
-	    (struct espi_xec_config *)(dev->config);
+		(struct espi_xec_config *)(dev->config);
 
 	LOG_DBG("%s", __func__);
 
@@ -723,7 +718,8 @@ static void espi_bus_init(const struct device *dev)
 
 	/* Enable bus interrupts */
 	MCHP_GIRQ_ENSET(config->bus_girq_id) = MCHP_ESPI_ESPI_RST_GIRQ_VAL |
-		MCHP_ESPI_VW_EN_GIRQ_VAL | MCHP_ESPI_PC_GIRQ_VAL;
+					       MCHP_ESPI_VW_EN_GIRQ_VAL |
+					       MCHP_ESPI_PC_GIRQ_VAL;
 }
 
 static void espi_rst_isr(const struct device *dev)
@@ -770,15 +766,15 @@ static void config_sub_devices(const struct device *dev)
 	switch (CONFIG_ESPI_PERIPHERAL_UART_SOC_MAPPING) {
 	case 0:
 		ESPI_EIO_BAR_REGS->EC_BAR_UART_0 = ESPI_XEC_UART0_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+						   MCHP_ESPI_IO_BAR_HOST_VALID;
 		break;
 	case 1:
 		ESPI_EIO_BAR_REGS->EC_BAR_UART_1 = ESPI_XEC_UART0_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+						   MCHP_ESPI_IO_BAR_HOST_VALID;
 		break;
 	case 2:
 		ESPI_EIO_BAR_REGS->EC_BAR_UART_2 = ESPI_XEC_UART0_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+						   MCHP_ESPI_IO_BAR_HOST_VALID;
 		break;
 	}
 #endif
@@ -788,27 +784,27 @@ static void config_sub_devices(const struct device *dev)
 	/* This is the activate register, but the HAL has a funny name */
 	KBC_REGS->KBC_PORT92_EN = MCHP_KBC_PORT92_EN;
 	ESPI_EIO_BAR_REGS->EC_BAR_KBC = ESPI_XEC_KBC_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+					MCHP_ESPI_IO_BAR_HOST_VALID;
 #endif
 #ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO
 	ESPI_EIO_BAR_REGS->EC_BAR_ACPI_EC_0 |= MCHP_ESPI_IO_BAR_HOST_VALID;
 	ESPI_EIO_BAR_REGS->EC_BAR_MBOX = ESPI_XEC_MBOX_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+					 MCHP_ESPI_IO_BAR_HOST_VALID;
 #endif
 #ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT
 	ESPI_EIO_BAR_REGS->EC_BAR_ACPI_EC_1 =
-	       CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT_PORT_NUM |
+		CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT_PORT_NUM |
 		MCHP_ESPI_IO_BAR_HOST_VALID;
 	ESPI_EIO_BAR_REGS->EC_BAR_MBOX = ESPI_XEC_MBOX_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+					 MCHP_ESPI_IO_BAR_HOST_VALID;
 #endif
 
 #ifdef CONFIG_ESPI_PERIPHERAL_DEBUG_PORT_80
 	ESPI_EIO_BAR_REGS->EC_BAR_P80CAP_0 = ESPI_XEC_PORT80_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+					     MCHP_ESPI_IO_BAR_HOST_VALID;
 	PORT80_CAP0_REGS->ACTV = 1;
 	ESPI_EIO_BAR_REGS->EC_BAR_P80CAP_1 = ESPI_XEC_PORT81_BAR_ADDRESS |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+					     MCHP_ESPI_IO_BAR_HOST_VALID;
 	PORT80_CAP1_REGS->ACTV = 1;
 #endif
 }
@@ -838,13 +834,13 @@ static void setup_espi_io_config(const struct device *dev,
 				 uint16_t host_address)
 {
 	ESPI_EIO_BAR_REGS->EC_BAR_IOC = (host_address << 16) |
-		MCHP_ESPI_IO_BAR_HOST_VALID;
+					MCHP_ESPI_IO_BAR_HOST_VALID;
 
 	config_sub_devices(dev);
 	configure_sirq();
 
-	ESPI_PC_REGS->PC_STATUS = (MCHP_ESPI_PC_STS_EN_CHG |
-				    MCHP_ESPI_PC_STS_BM_EN_CHG_POS);
+	ESPI_PC_REGS->PC_STATUS =
+		(MCHP_ESPI_PC_STS_EN_CHG | MCHP_ESPI_PC_STS_BM_EN_CHG_POS);
 	ESPI_PC_REGS->PC_IEN |= MCHP_ESPI_PC_IEN_EN_CHG;
 	ESPI_CAP_REGS->PC_RDY = 1;
 }
@@ -912,8 +908,7 @@ static void espi_oob_up_isr(const struct device *dev)
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 	struct espi_event evt = { .evt_type = ESPI_BUS_EVENT_CHANNEL_READY,
 				  .evt_details = ESPI_CHANNEL_OOB,
-				  .evt_data = 0
-				};
+				  .evt_data = 0 };
 
 	status = ESPI_OOB_REGS->TX_STS;
 	LOG_DBG("%s sts:%x", __func__, status);
@@ -943,10 +938,11 @@ static void espi_flash_isr(const struct device *dev)
 {
 	uint32_t status;
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
-	struct espi_event evt = { .evt_type = ESPI_BUS_EVENT_CHANNEL_READY,
-				  .evt_details = ESPI_CHANNEL_FLASH,
-				  .evt_data = 0,
-				};
+	struct espi_event evt = {
+		.evt_type = ESPI_BUS_EVENT_CHANNEL_READY,
+		.evt_details = ESPI_CHANNEL_FLASH,
+		.evt_data = 0,
+	};
 
 	status = ESPI_FC_REGS->STS;
 	LOG_DBG("%s %x", __func__, status);
@@ -978,8 +974,7 @@ static void vw_pltrst_isr(const struct device *dev)
 {
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 	struct espi_event evt = { ESPI_BUS_EVENT_VWIRE_RECEIVED,
-		ESPI_VWIRE_SIGNAL_PLTRST, 0
-	};
+				  ESPI_VWIRE_SIGNAL_PLTRST, 0 };
 	uint8_t status = 0;
 
 	espi_xec_receive_vwire(dev, ESPI_VWIRE_SIGNAL_PLTRST, &status);
@@ -1023,7 +1018,7 @@ static void notify_host_warning(const struct device *dev,
 	if (!IS_ENABLED(CONFIG_ESPI_AUTOMATIC_WARNING_ACKNOWLEDGE)) {
 		struct espi_xec_data *data =
 			(struct espi_xec_data *)(dev->data);
-		struct espi_event evt = {ESPI_BUS_EVENT_VWIRE_RECEIVED, 0, 0 };
+		struct espi_event evt = { ESPI_BUS_EVENT_VWIRE_RECEIVED, 0, 0 };
 
 		evt.evt_details = signal;
 		evt.evt_data = status;
@@ -1032,8 +1027,7 @@ static void notify_host_warning(const struct device *dev,
 		k_busy_wait(ESPI_XEC_VWIRE_ACK_DELAY);
 		switch (signal) {
 		case ESPI_VWIRE_SIGNAL_HOST_RST_WARN:
-			espi_xec_send_vwire(dev,
-					    ESPI_VWIRE_SIGNAL_HOST_RST_ACK,
+			espi_xec_send_vwire(dev, ESPI_VWIRE_SIGNAL_HOST_RST_ACK,
 					    status);
 			break;
 		case ESPI_VWIRE_SIGNAL_SUS_WARN:
@@ -1089,8 +1083,8 @@ static void ibf_isr(const struct device *dev)
 {
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 	struct espi_event evt = { ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		ESPI_PERIPHERAL_HOST_IO, ESPI_PERIPHERAL_NODATA
-	};
+				  ESPI_PERIPHERAL_HOST_IO,
+				  ESPI_PERIPHERAL_NODATA };
 
 	espi_send_callbacks(&data->callbacks, dev, evt);
 }
@@ -1099,11 +1093,9 @@ static void ibf_isr(const struct device *dev)
 static void ibf_pvt_isr(const struct device *dev)
 {
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
-	struct espi_event evt = {
-		.evt_type = ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		.evt_details = ESPI_PERIPHERAL_HOST_IO_PVT,
-		.evt_data = ESPI_PERIPHERAL_NODATA
-	};
+	struct espi_event evt = { .evt_type = ESPI_BUS_PERIPHERAL_NOTIFICATION,
+				  .evt_details = ESPI_PERIPHERAL_HOST_IO_PVT,
+				  .evt_data = ESPI_PERIPHERAL_NODATA };
 
 	espi_send_callbacks(&data->callbacks, dev, evt);
 }
@@ -1118,14 +1110,12 @@ static void ibf_kbc_isr(const struct device *dev)
 	 * a command or data. 1 = Command.
 	 */
 	uint32_t isr_data = ((KBC_REGS->EC_DATA & 0xFF) << E8042_ISR_DATA_POS) |
-				((KBC_REGS->EC_KBC_STS & MCHP_KBC_STS_CD) <<
-				 E8042_ISR_CMD_DATA_POS);
+			    ((KBC_REGS->EC_KBC_STS & MCHP_KBC_STS_CD)
+			     << E8042_ISR_CMD_DATA_POS);
 
-	struct espi_event evt = {
-		.evt_type = ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		.evt_details = ESPI_PERIPHERAL_8042_KBC,
-		.evt_data = isr_data
-	};
+	struct espi_event evt = { .evt_type = ESPI_BUS_PERIPHERAL_NOTIFICATION,
+				  .evt_details = ESPI_PERIPHERAL_8042_KBC,
+				  .evt_data = isr_data };
 
 	espi_send_callbacks(&data->callbacks, dev, evt);
 }
@@ -1134,9 +1124,9 @@ static void port80_isr(const struct device *dev)
 {
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 	struct espi_event evt = { ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		(ESPI_PERIPHERAL_INDEX_0 << 16) | ESPI_PERIPHERAL_DEBUG_PORT80,
-		ESPI_PERIPHERAL_NODATA
-	};
+				  (ESPI_PERIPHERAL_INDEX_0 << 16) |
+					  ESPI_PERIPHERAL_DEBUG_PORT80,
+				  ESPI_PERIPHERAL_NODATA };
 
 	evt.evt_data = PORT80_CAP0_REGS->EC_DATA;
 	espi_send_callbacks(&data->callbacks, dev, evt);
@@ -1146,63 +1136,60 @@ static void port81_isr(const struct device *dev)
 {
 	struct espi_xec_data *data = (struct espi_xec_data *)(dev->data);
 	struct espi_event evt = { ESPI_BUS_PERIPHERAL_NOTIFICATION,
-		(ESPI_PERIPHERAL_INDEX_1 << 16) | ESPI_PERIPHERAL_DEBUG_PORT80,
-		ESPI_PERIPHERAL_NODATA
-	};
+				  (ESPI_PERIPHERAL_INDEX_1 << 16) |
+					  ESPI_PERIPHERAL_DEBUG_PORT80,
+				  ESPI_PERIPHERAL_NODATA };
 
 	evt.evt_data = PORT80_CAP1_REGS->EC_DATA;
 	espi_send_callbacks(&data->callbacks, dev, evt);
 }
 
 const struct espi_isr espi_bus_isr[] = {
-	{MCHP_ESPI_PC_GIRQ_VAL, espi_pc_isr},
+	{ MCHP_ESPI_PC_GIRQ_VAL, espi_pc_isr },
 #ifdef CONFIG_ESPI_OOB_CHANNEL
-	{MCHP_ESPI_OOB_UP_GIRQ_VAL, espi_oob_up_isr},
-	{MCHP_ESPI_OOB_DN_GIRQ_VAL, espi_oob_down_isr},
+	{ MCHP_ESPI_OOB_UP_GIRQ_VAL, espi_oob_up_isr },
+	{ MCHP_ESPI_OOB_DN_GIRQ_VAL, espi_oob_down_isr },
 #endif
 #ifdef CONFIG_ESPI_FLASH_CHANNEL
-	{MCHP_ESPI_FC_GIRQ_VAL, espi_flash_isr},
+	{ MCHP_ESPI_FC_GIRQ_VAL, espi_flash_isr },
 #endif
-	{MCHP_ESPI_ESPI_RST_GIRQ_VAL, espi_rst_isr},
-	{MCHP_ESPI_VW_EN_GIRQ_VAL, espi_vwire_chanel_isr},
+	{ MCHP_ESPI_ESPI_RST_GIRQ_VAL, espi_rst_isr },
+	{ MCHP_ESPI_VW_EN_GIRQ_VAL, espi_vwire_chanel_isr },
 };
 
 uint8_t vw_wires_int_en[] = {
-	ESPI_VWIRE_SIGNAL_SLP_S3,
-	ESPI_VWIRE_SIGNAL_SLP_S4,
-	ESPI_VWIRE_SIGNAL_SLP_S5,
-	ESPI_VWIRE_SIGNAL_PLTRST,
-	ESPI_VWIRE_SIGNAL_OOB_RST_WARN,
-	ESPI_VWIRE_SIGNAL_HOST_RST_WARN,
-	ESPI_VWIRE_SIGNAL_SUS_WARN,
-	ESPI_VWIRE_SIGNAL_SUS_PWRDN_ACK,
+	ESPI_VWIRE_SIGNAL_SLP_S3,	ESPI_VWIRE_SIGNAL_SLP_S4,
+	ESPI_VWIRE_SIGNAL_SLP_S5,	ESPI_VWIRE_SIGNAL_PLTRST,
+	ESPI_VWIRE_SIGNAL_OOB_RST_WARN, ESPI_VWIRE_SIGNAL_HOST_RST_WARN,
+	ESPI_VWIRE_SIGNAL_SUS_WARN,	ESPI_VWIRE_SIGNAL_SUS_PWRDN_ACK,
 };
 
 const struct espi_isr m2s_vwires_isr[] = {
-	{MEC_ESPI_MSVW00_SRC0_VAL, vw_slp3_isr},
-	{MEC_ESPI_MSVW00_SRC1_VAL, vw_slp4_isr},
-	{MEC_ESPI_MSVW00_SRC2_VAL, vw_slp5_isr},
-	{MEC_ESPI_MSVW01_SRC1_VAL, vw_pltrst_isr},
-	{MEC_ESPI_MSVW01_SRC2_VAL, vw_oob_rst_isr},
-	{MEC_ESPI_MSVW02_SRC0_VAL, vw_host_rst_warn_isr},
-	{MEC_ESPI_MSVW03_SRC0_VAL, vw_sus_warn_isr},
-	{MEC_ESPI_MSVW03_SRC3_VAL, vw_sus_slp_a_isr},
+	{ MEC_ESPI_MSVW00_SRC0_VAL, vw_slp3_isr },
+	{ MEC_ESPI_MSVW00_SRC1_VAL, vw_slp4_isr },
+	{ MEC_ESPI_MSVW00_SRC2_VAL, vw_slp5_isr },
+	{ MEC_ESPI_MSVW01_SRC1_VAL, vw_pltrst_isr },
+	{ MEC_ESPI_MSVW01_SRC2_VAL, vw_oob_rst_isr },
+	{ MEC_ESPI_MSVW02_SRC0_VAL, vw_host_rst_warn_isr },
+	{ MEC_ESPI_MSVW03_SRC0_VAL, vw_sus_warn_isr },
+	{ MEC_ESPI_MSVW03_SRC3_VAL, vw_sus_slp_a_isr },
 };
 
 const struct espi_isr peripherals_isr[] = {
-	{MCHP_ACPI_EC_0_IBF_GIRQ, ibf_isr},
+	{ MCHP_ACPI_EC_0_IBF_GIRQ, ibf_isr },
 #ifdef CONFIG_ESPI_PERIPHERAL_HOST_IO_PVT
-	{MCHP_ACPI_EC_1_IBF_GIRQ, ibf_pvt_isr},
+	{ MCHP_ACPI_EC_1_IBF_GIRQ, ibf_pvt_isr },
 #endif
-	{MCHP_KBC_IBF_GIRQ, ibf_kbc_isr},
-	{MCHP_PORT80_DEBUG0_GIRQ_VAL, port80_isr},
-	{MCHP_PORT80_DEBUG1_GIRQ_VAL, port81_isr},
+	{ MCHP_KBC_IBF_GIRQ, ibf_kbc_isr },
+	{ MCHP_PORT80_DEBUG0_GIRQ_VAL, port80_isr },
+	{ MCHP_PORT80_DEBUG1_GIRQ_VAL, port81_isr },
 };
 
 static uint8_t bus_isr_cnt = sizeof(espi_bus_isr) / sizeof(struct espi_isr);
 static uint8_t m2s_vwires_isr_cnt =
 	sizeof(m2s_vwires_isr) / sizeof(struct espi_isr);
-static uint8_t periph_isr_cnt = sizeof(peripherals_isr) / sizeof(struct espi_isr);
+static uint8_t periph_isr_cnt =
+	sizeof(peripherals_isr) / sizeof(struct espi_isr);
 
 static void espi_xec_bus_isr(const struct device *dev)
 {
@@ -1289,10 +1276,9 @@ static const struct espi_xec_config espi_xec_config = {
 	.pc_girq_id = DT_INST_PROP(0, pc_girq),
 };
 
-DEVICE_AND_API_INIT(espi_xec_0, DT_INST_LABEL(0),
-		    &espi_xec_init, &espi_xec_data, &espi_xec_config,
-		    PRE_KERNEL_2, CONFIG_ESPI_INIT_PRIORITY,
-		    &espi_xec_driver_api);
+DEVICE_AND_API_INIT(espi_xec_0, DT_INST_LABEL(0), &espi_xec_init,
+		    &espi_xec_data, &espi_xec_config, PRE_KERNEL_2,
+		    CONFIG_ESPI_INIT_PRIORITY, &espi_xec_driver_api);
 
 static int espi_xec_init(const struct device *dev)
 {
@@ -1353,7 +1339,8 @@ static int espi_xec_init(const struct device *dev)
 
 	/* Enable interrupts for each logical channel enable assertion */
 	MCHP_GIRQ_ENSET(config->bus_girq_id) = MCHP_ESPI_ESPI_RST_GIRQ_VAL |
-		MCHP_ESPI_VW_EN_GIRQ_VAL | MCHP_ESPI_PC_GIRQ_VAL;
+					       MCHP_ESPI_VW_EN_GIRQ_VAL |
+					       MCHP_ESPI_PC_GIRQ_VAL;
 
 #ifdef CONFIG_ESPI_OOB_CHANNEL
 	espi_init_oob(dev);
@@ -1362,10 +1349,11 @@ static int espi_xec_init(const struct device *dev)
 	espi_init_flash(dev);
 #endif
 	/* Enable aggregated block interrupts for VWires */
-	MCHP_GIRQ_ENSET(config->vw_girq_id) = MEC_ESPI_MSVW00_SRC0_VAL |
-		MEC_ESPI_MSVW00_SRC1_VAL | MEC_ESPI_MSVW00_SRC2_VAL |
-		MEC_ESPI_MSVW01_SRC1_VAL | MEC_ESPI_MSVW01_SRC2_VAL |
-		MEC_ESPI_MSVW02_SRC0_VAL | MEC_ESPI_MSVW03_SRC0_VAL;
+	MCHP_GIRQ_ENSET(config->vw_girq_id) =
+		MEC_ESPI_MSVW00_SRC0_VAL | MEC_ESPI_MSVW00_SRC1_VAL |
+		MEC_ESPI_MSVW00_SRC2_VAL | MEC_ESPI_MSVW01_SRC1_VAL |
+		MEC_ESPI_MSVW01_SRC2_VAL | MEC_ESPI_MSVW02_SRC0_VAL |
+		MEC_ESPI_MSVW03_SRC0_VAL;
 
 	/* Enable aggregated block interrupts for peripherals supported */
 #ifdef CONFIG_ESPI_PERIPHERAL_8042_KBC
@@ -1380,29 +1368,25 @@ static int espi_xec_init(const struct device *dev)
 #endif
 #ifdef CONFIG_ESPI_PERIPHERAL_DEBUG_PORT_80
 	MCHP_GIRQ_ENSET(config->pc_girq_id) = MCHP_PORT80_DEBUG0_GIRQ_VAL |
-		MCHP_PORT80_DEBUG1_GIRQ_VAL;
+					      MCHP_PORT80_DEBUG1_GIRQ_VAL;
 #endif
 	/* Enable aggregated interrupt block for eSPI bus events */
 	MCHP_GIRQ_BLK_SETEN(config->bus_girq_id);
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    espi_xec_bus_isr,
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), espi_xec_bus_isr,
 		    DEVICE_GET(espi_xec_0), 0);
 	irq_enable(DT_INST_IRQN(0));
 
 	/* Enable aggregated interrupt block for eSPI VWire events */
 	MCHP_GIRQ_BLK_SETEN(config->vw_girq_id);
 	IRQ_CONNECT(DT_INST_IRQ_BY_IDX(0, 1, irq),
-		    DT_INST_IRQ_BY_IDX(0, 1, priority),
-		    espi_xec_vw_isr,
+		    DT_INST_IRQ_BY_IDX(0, 1, priority), espi_xec_vw_isr,
 		    DEVICE_GET(espi_xec_0), 0);
 	irq_enable(DT_INST_IRQ_BY_IDX(0, 1, irq));
 
 	/* Enable aggregated interrupt block for eSPI peripheral channel */
 	MCHP_GIRQ_BLK_SETEN(config->pc_girq_id);
 	IRQ_CONNECT(DT_INST_IRQ_BY_IDX(0, 2, irq),
-		    DT_INST_IRQ_BY_IDX(0, 2, priority),
-		    espi_xec_periph_isr,
+		    DT_INST_IRQ_BY_IDX(0, 2, priority), espi_xec_periph_isr,
 		    DEVICE_GET(espi_xec_0), 0);
 	irq_enable(DT_INST_IRQ_BY_IDX(0, 2, irq));
 

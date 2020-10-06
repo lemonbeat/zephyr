@@ -29,8 +29,8 @@
 #include <drivers/gpio/gpio_mmio32.h>
 #include <errno.h>
 
-static int gpio_mmio32_config(const struct device *dev,
-			      gpio_pin_t pin, gpio_flags_t flags)
+static int gpio_mmio32_config(const struct device *dev, gpio_pin_t pin,
+			      gpio_flags_t flags)
 {
 	struct gpio_mmio32_context *context = dev->data;
 	const struct gpio_mmio32_config *config = context->config;
@@ -39,9 +39,8 @@ static int gpio_mmio32_config(const struct device *dev,
 		return -EINVAL; /* Pin not in our validity mask */
 	}
 
-	if (flags & ~(GPIO_INPUT | GPIO_OUTPUT |
-		      GPIO_OUTPUT_INIT_LOW | GPIO_OUTPUT_INIT_HIGH |
-		      GPIO_ACTIVE_LOW)) {
+	if (flags & ~(GPIO_INPUT | GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW |
+		      GPIO_OUTPUT_INIT_HIGH | GPIO_ACTIVE_LOW)) {
 		/* We ignore direction and fake polarity, rest is unsupported */
 		return -ENOTSUP;
 	}
@@ -73,8 +72,7 @@ static int gpio_mmio32_port_get_raw(const struct device *dev, uint32_t *value)
 }
 
 static int gpio_mmio32_port_set_masked_raw(const struct device *dev,
-					   uint32_t mask,
-					   uint32_t value)
+					   uint32_t mask, uint32_t value)
 {
 	struct gpio_mmio32_context *context = dev->data;
 	const struct gpio_mmio32_config *config = context->config;
@@ -128,8 +126,7 @@ static int gpio_mmio32_port_clear_bits_raw(const struct device *dev,
 	return 0;
 }
 
-static int gpio_mmio32_port_toggle_bits(const struct device *dev,
-					uint32_t mask)
+static int gpio_mmio32_port_toggle_bits(const struct device *dev, uint32_t mask)
 {
 	struct gpio_mmio32_context *context = dev->data;
 	const struct gpio_mmio32_config *config = context->config;

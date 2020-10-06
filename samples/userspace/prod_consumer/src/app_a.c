@@ -16,7 +16,7 @@
 
 LOG_MODULE_REGISTER(app_a);
 
-#define MAX_MSGS	8
+#define MAX_MSGS 8
 
 /* Resource pool for allocations made by the kernel on behalf of system
  * calls. Needed for k_queue_alloc_append()
@@ -117,7 +117,6 @@ static void monitor_entry(void *p1, void *p2, void *p3)
 			k_oops();
 		}
 
-
 		LOG_INF("monitor thread got data payload #%u", monitor_count);
 		LOG_DBG("pending payloads: %u", pending_count);
 
@@ -193,7 +192,8 @@ void app_a_entry(void *p1, void *p2, void *p3)
 #if Z_LIBC_PARTITION_EXISTS
 		&z_libc_partition,
 #endif
-		&app_a_partition, &shared_partition
+		&app_a_partition,
+		&shared_partition
 	};
 
 	sample_device = device_get_binding(SAMPLE_DRIVER_NAME_0);
@@ -231,9 +231,8 @@ void app_a_entry(void *p1, void *p2, void *p3)
 	 * modify its permissions and then start it.
 	 */
 	k_thread_create(&writeback_thread, writeback_stack,
-			K_THREAD_STACK_SIZEOF(writeback_stack),
-			writeback_entry, NULL, NULL, NULL,
-			-1, K_USER, K_FOREVER);
+			K_THREAD_STACK_SIZEOF(writeback_stack), writeback_entry,
+			NULL, NULL, NULL, -1, K_USER, K_FOREVER);
 	k_thread_access_grant(&writeback_thread, &shared_queue_outgoing,
 			      sample_device);
 	k_thread_start(&writeback_thread);

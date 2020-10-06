@@ -69,23 +69,20 @@
  */
 void string2scalar(unsigned int *scalar, unsigned int num_word32, char *str);
 
-
 void print_ecc_scalar(const char *label, const unsigned int *p_vli,
 		      unsigned int num_word32);
 
 int check_ecc_result(const int num, const char *name,
-		     const unsigned int *expected,
-		     const unsigned int *computed,
+		     const unsigned int *expected, const unsigned int *computed,
 		     const unsigned int num_word32, const bool verbose);
 
 /* Test ecc_make_keys, and also as keygen part of other tests */
-int keygen_vectors(char **d_vec, char **qx_vec, char **qy_vec, int tests, bool verbose);
+int keygen_vectors(char **d_vec, char **qx_vec, char **qy_vec, int tests,
+		   bool verbose);
 
 void vli_print_bytes(uint8_t *vli, unsigned int size);
 
-
-int check_code(const int num, const int expected,
-	       const int computed, const int verbose);
-
+int check_code(const int num, const int expected, const int computed,
+	       const int verbose);
 
 #endif /* __TEST_ECC_UTILS_H__ */

@@ -16,24 +16,24 @@
 LOG_MODULE_REGISTER(ft5336, CONFIG_KSCAN_LOG_LEVEL);
 
 /* FT5336 used registers */
-#define REG_TD_STATUS		0x02U
-#define REG_P1_XH		0x03U
+#define REG_TD_STATUS 0x02U
+#define REG_P1_XH 0x03U
 
 /* REG_TD_STATUS: Touch points. */
-#define TOUCH_POINTS_POS	0U
-#define TOUCH_POINTS_MSK	0x0FU
+#define TOUCH_POINTS_POS 0U
+#define TOUCH_POINTS_MSK 0x0FU
 
 /* REG_Pn_XH: Events. */
-#define EVENT_POS		6U
-#define EVENT_MSK		0x03U
+#define EVENT_POS 6U
+#define EVENT_MSK 0x03U
 
-#define EVENT_PRESS_DOWN	0x00U
-#define EVENT_LIFT_UP		0x01U
-#define EVENT_CONTACT		0x02U
-#define EVENT_NONE		0x03U
+#define EVENT_PRESS_DOWN 0x00U
+#define EVENT_LIFT_UP 0x01U
+#define EVENT_CONTACT 0x02U
+#define EVENT_NONE 0x03U
 
 /* REG_Pn_XH: Position */
-#define POSITION_H_MSK		0x0FU
+#define POSITION_H_MSK 0x0FU
 
 /** GPIO DT information. */
 struct gpio_dt_info {
@@ -134,21 +134,22 @@ static void ft5336_work_handler(struct k_work *work)
 static void ft5336_isr_handler(const struct device *dev,
 			       struct gpio_callback *cb, uint32_t pins)
 {
-	struct ft5336_data *data = CONTAINER_OF(cb, struct ft5336_data, int_gpio_cb);
+	struct ft5336_data *data =
+		CONTAINER_OF(cb, struct ft5336_data, int_gpio_cb);
 
 	k_work_submit(&data->work);
 }
 #else
 static void ft5336_timer_handler(struct k_timer *timer)
 {
-	struct ft5336_data *data = CONTAINER_OF(timer, struct ft5336_data, timer);
+	struct ft5336_data *data =
+		CONTAINER_OF(timer, struct ft5336_data, timer);
 
 	k_work_submit(&data->work);
 }
 #endif
 
-static int ft5336_configure(const struct device *dev,
-			    kscan_callback_t callback)
+static int ft5336_configure(const struct device *dev, kscan_callback_t callback)
 {
 	struct ft5336_data *data = dev->data;
 
@@ -242,34 +243,34 @@ static const struct kscan_driver_api ft5336_driver_api = {
 	.disable_callback = ft5336_disable_callback,
 };
 
-#define DT_INST_GPIO(index, gpio_pha)					       \
-	{								       \
-		DT_INST_GPIO_LABEL(index, gpio_pha),			       \
-		DT_INST_GPIO_PIN(index, gpio_pha),			       \
-		DT_INST_GPIO_FLAGS(index, gpio_pha),			       \
+#define DT_INST_GPIO(index, gpio_pha)                        \
+	{                                                    \
+		DT_INST_GPIO_LABEL(index, gpio_pha),         \
+			DT_INST_GPIO_PIN(index, gpio_pha),   \
+			DT_INST_GPIO_FLAGS(index, gpio_pha), \
 	}
 
 #ifdef CONFIG_KSCAN_FT5336_INTERRUPT
-#define FT5336_DEFINE_CONFIG(index)					       \
-	static const struct ft5336_config ft5336_config_##index = {	       \
-		.i2c_name = DT_INST_BUS_LABEL(index),			       \
-		.i2c_address = DT_INST_REG_ADDR(index),			       \
-		.int_gpio = DT_INST_GPIO(index, int_gpios)		       \
+#define FT5336_DEFINE_CONFIG(index)                                 \
+	static const struct ft5336_config ft5336_config_##index = { \
+		.i2c_name = DT_INST_BUS_LABEL(index),               \
+		.i2c_address = DT_INST_REG_ADDR(index),             \
+		.int_gpio = DT_INST_GPIO(index, int_gpios)          \
 	}
 #else
-#define FT5336_DEFINE_CONFIG(index)					       \
-	static const struct ft5336_config ft5336_config_##index = {	       \
-		.i2c_name = DT_INST_BUS_LABEL(index),			       \
-		.i2c_address = DT_INST_REG_ADDR(index)			       \
+#define FT5336_DEFINE_CONFIG(index)                                 \
+	static const struct ft5336_config ft5336_config_##index = { \
+		.i2c_name = DT_INST_BUS_LABEL(index),               \
+		.i2c_address = DT_INST_REG_ADDR(index)              \
 	}
 #endif
 
 #define FT5336_INIT(index)                                                     \
-	FT5336_DEFINE_CONFIG(index);					       \
-	static struct ft5336_data ft5336_data_##index;			       \
+	FT5336_DEFINE_CONFIG(index);                                           \
+	static struct ft5336_data ft5336_data_##index;                         \
 	DEVICE_AND_API_INIT(ft5336_##index, DT_INST_LABEL(index), ft5336_init, \
 			    &ft5336_data_##index, &ft5336_config_##index,      \
-			    POST_KERNEL, CONFIG_KSCAN_INIT_PRIORITY,	       \
+			    POST_KERNEL, CONFIG_KSCAN_INIT_PRIORITY,           \
 			    &ft5336_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(FT5336_INIT)

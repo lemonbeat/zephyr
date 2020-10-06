@@ -9,7 +9,6 @@
 #include <arch/arm/aarch32/cortex_m/cmsis.h>
 #include <linker/sections.h>
 
-
 /*
  * Offset (starting from the beginning of the vector table)
  * of the location where the ISRs will be manually installed.
@@ -21,7 +20,7 @@
  * platforms requires that the POWER_CLOCK_IRQn line equals 0.
  */
 BUILD_ASSERT(POWER_CLOCK_IRQn == 0,
-	"POWER_CLOCK_IRQn != 0. Consider rework manual vector table.");
+	     "POWER_CLOCK_IRQn != 0. Consider rework manual vector table.");
 
 /* The customized solution for nRF51X-based and nRF52X-based
  * platforms requires that the RTC1 IRQ line equals 17.
@@ -50,9 +49,8 @@ BUILD_ASSERT(TIMER0_IRQn == 8,
 /* The customized solution for nRF91X-based and nRF53X-based
  * platforms requires that the POWER_CLOCK_IRQn line equals 5.
  */
-BUILD_ASSERT(CLOCK_POWER_IRQn == 5,
-	     "POWER_CLOCK_IRQn != 5."
-	     "Consider rework manual vector table.");
+BUILD_ASSERT(CLOCK_POWER_IRQn == 5, "POWER_CLOCK_IRQn != 5."
+				    "Consider rework manual vector table.");
 
 #if !defined(CONFIG_SOC_NRF5340_CPUNET)
 /* The customized solution for nRF91X-based platforms
@@ -75,7 +73,6 @@ BUILD_ASSERT(RTC1_IRQn == 22,
 #define _ISR_OFFSET 8
 
 #endif /* CONFIG_SOC_SERIES_NRF52X */
-
 
 struct k_sem sem[3];
 
@@ -127,7 +124,6 @@ void isr2(void)
  * @{
  */
 
-
 /**
  * @brief Test installation of ISRs directly in the vector table
  *
@@ -152,7 +148,8 @@ void test_arm_irq_vector_table(void)
 
 	zassert_true((k_sem_take(&sem[0], K_NO_WAIT) ||
 		      k_sem_take(&sem[1], K_NO_WAIT) ||
-		      k_sem_take(&sem[2], K_NO_WAIT)), NULL);
+		      k_sem_take(&sem[2], K_NO_WAIT)),
+		     NULL);
 
 	for (int ii = 0; ii < 3; ii++) {
 #if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE) || \
@@ -168,8 +165,8 @@ void test_arm_irq_vector_table(void)
 
 	zassert_false((k_sem_take(&sem[0], K_NO_WAIT) ||
 		       k_sem_take(&sem[1], K_NO_WAIT) ||
-		       k_sem_take(&sem[2], K_NO_WAIT)), NULL);
-
+		       k_sem_take(&sem[2], K_NO_WAIT)),
+		      NULL);
 }
 
 typedef void (*vth)(void); /* Vector Table Handler */
@@ -190,32 +187,52 @@ void nrfx_power_clock_irq_handler(void);
 #if defined(CONFIG_SOC_SERIES_NRF51X) || defined(CONFIG_SOC_SERIES_NRF52X)
 #if defined(CONFIG_BOARD_QEMU_CORTEX_M0)
 void timer0_nrf_isr(void);
-vth __irq_vector_table _irq_vector_table[] = {
-	nrfx_power_clock_irq_handler, 0, 0, 0, 0, 0, 0, 0,
-	timer0_nrf_isr, isr0, isr1, isr2
-};
+vth __irq_vector_table _irq_vector_table[] = { nrfx_power_clock_irq_handler,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       timer0_nrf_isr,
+					       isr0,
+					       isr1,
+					       isr2 };
 #else
-vth __irq_vector_table _irq_vector_table[] = {
-	nrfx_power_clock_irq_handler,
-	isr0, isr1, isr2,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	rtc_nrf_isr
-};
+vth __irq_vector_table _irq_vector_table[] = { nrfx_power_clock_irq_handler,
+					       isr0,
+					       isr1,
+					       isr2,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       0,
+					       rtc_nrf_isr };
 #endif /* CONFIG_BOARD_QEMU_CORTEX_M0 */
 #elif defined(CONFIG_SOC_SERIES_NRF53X) || defined(CONFIG_SOC_SERIES_NRF91X)
 #ifndef CONFIG_SOC_NRF5340_CPUNET
 vth __irq_vector_table _irq_vector_table[] = {
-	0, 0, 0, 0, 0, nrfx_power_clock_irq_handler, 0, 0,
-	isr0, isr1, isr2,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	rtc_nrf_isr
+	0, 0, 0,    0,		0,    nrfx_power_clock_irq_handler,
+	0, 0, isr0, isr1,	isr2, 0,
+	0, 0, 0,    0,		0,    0,
+	0, 0, 0,    rtc_nrf_isr
 };
 #else
 vth __irq_vector_table _irq_vector_table[] = {
-	0, 0, 0, 0, 0, nrfx_power_clock_irq_handler, 0, 0,
-	isr0, isr1, isr2,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	rtc_nrf_isr
+	0, 0, 0,    0,	  0,	      nrfx_power_clock_irq_handler,
+	0, 0, isr0, isr1, isr2,	      0,
+	0, 0, 0,    0,	  0,	      0,
+	0, 0, 0,    0,	  rtc_nrf_isr
 };
 #endif
 #endif
@@ -226,14 +243,9 @@ vth __irq_vector_table _irq_vector_table[] = {
  * the custom vector table to handle the timer "tick" interrupts.
  */
 extern void rtc_isr(void);
-vth __irq_vector_table _irq_vector_table[] = {
-	isr0, isr1, isr2, 0,
-	rtc_isr
-};
+vth __irq_vector_table _irq_vector_table[] = { isr0, isr1, isr2, 0, rtc_isr };
 #else
-vth __irq_vector_table _irq_vector_table[] = {
-	isr0, isr1, isr2
-};
+vth __irq_vector_table _irq_vector_table[] = { isr0, isr1, isr2 };
 #endif /* CONFIG_SOC_FAMILY_NRF */
 
 /**

@@ -21,7 +21,7 @@ BUILD_ASSERT(DT_NODE_HAS_STATUS(DEFAULT_RADIO_NODE, okay),
 #include <logging/log.h>
 LOG_MODULE_REGISTER(lora_send);
 
-char data[MAX_DATA_LEN] = {'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd'};
+char data[MAX_DATA_LEN] = { 'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd' };
 
 void main(void)
 {

@@ -22,18 +22,16 @@
 #include <pinmux/stm32/pinmux_stm32.h>
 
 #ifdef CONFIG_SOC_SERIES_STM32MP1X
-#define GPIO_REG_SIZE         0x1000
+#define GPIO_REG_SIZE 0x1000
 /* 0x1000 between each port, 0x400 gpio registry 0xC00 reserved */
 #else
-#define GPIO_REG_SIZE         0x400
+#define GPIO_REG_SIZE 0x400
 #endif /* CONFIG_SOC_SERIES_STM32MP1X */
 /* base address for where GPIO registers start */
-#define GPIO_PORTS_BASE       (GPIOA_BASE)
+#define GPIO_PORTS_BASE (GPIOA_BASE)
 
 static const uint32_t ports_enable[STM32_PORTS_MAX] = {
-	STM32_PERIPH_GPIOA,
-	STM32_PERIPH_GPIOB,
-	STM32_PERIPH_GPIOC,
+	STM32_PERIPH_GPIOA, STM32_PERIPH_GPIOB, STM32_PERIPH_GPIOC,
 #ifdef GPIOD_BASE
 	STM32_PERIPH_GPIOD,
 #else
@@ -100,7 +98,7 @@ static int enable_port(uint32_t port, const struct device *clk)
 		return -EIO;
 	}
 
-	return clock_control_on(clk, (clock_control_subsys_t *) &pclken);
+	return clock_control_on(clk, (clock_control_subsys_t *)&pclken);
 }
 
 static int stm32_pin_configure(uint32_t pin, uint32_t func, uint32_t altf)
@@ -112,8 +110,8 @@ static int stm32_pin_configure(uint32_t pin, uint32_t func, uint32_t altf)
 	/* not much here, on STM32F10x the alternate function is
 	 * controller by setting up GPIO pins in specific mode.
 	 */
-	return gpio_stm32_configure((uint32_t *)port_base,
-				    STM32_PIN(pin), func, altf);
+	return gpio_stm32_configure((uint32_t *)port_base, STM32_PIN(pin), func,
+				    altf);
 }
 
 /**
@@ -142,10 +140,10 @@ void stm32_dt_pinctrl_configure(const struct soc_gpio_pinctrl *pinctrl,
 
 		if (STM32_DT_PINMUX_FUNC(mux) == ALTERNATE) {
 			func = pinctrl[i].pincfg | STM32_MODE_OUTPUT |
-							STM32_CNF_ALT_FUNC;
+			       STM32_CNF_ALT_FUNC;
 		} else if (STM32_DT_PINMUX_FUNC(mux) == ANALOG) {
 			func = pinctrl[i].pincfg | STM32_MODE_INPUT |
-							STM32_CNF_IN_ANALOG;
+			       STM32_CNF_IN_ANALOG;
 		} else if (STM32_DT_PINMUX_FUNC(mux) == GPIO_IN) {
 			func = pinctrl[i].pincfg | STM32_MODE_INPUT;
 			pupd = func & (STM32_PUPD_MASK << STM32_PUPD_SHIFT);
@@ -176,8 +174,6 @@ void stm32_dt_pinctrl_configure(const struct soc_gpio_pinctrl *pinctrl,
 
 		stm32_pin_configure(pin, func, STM32_DT_PINMUX_FUNC(mux));
 	}
-
-
 }
 
 #if DT_HAS_COMPAT_STATUS_OKAY(st_stm32f1_pinctrl)
@@ -192,7 +188,7 @@ void stm32_dt_pinctrl_configure(const struct soc_gpio_pinctrl *pinctrl,
  */
 
 int stm32_dt_pinctrl_remap_check(const struct soc_gpio_pinctrl *pinctrl,
-				size_t list_size)
+				 size_t list_size)
 {
 	int remap;
 	uint32_t mux;
@@ -222,8 +218,7 @@ int stm32_dt_pinctrl_remap_check(const struct soc_gpio_pinctrl *pinctrl,
  *
  * @return 0 on success, error otherwise
  */
-int z_pinmux_stm32_set(uint32_t pin, uint32_t func,
-				const struct device *clk)
+int z_pinmux_stm32_set(uint32_t pin, uint32_t func, const struct device *clk)
 {
 	/* make sure to enable port clock first */
 	if (enable_port(STM32_PORT(pin), clk)) {
@@ -239,8 +234,7 @@ int z_pinmux_stm32_set(uint32_t pin, uint32_t func,
  * @param pinconf  board pin configuration array
  * @param pins     array size
  */
-void stm32_setup_pins(const struct pin_config *pinconf,
-		      size_t pins)
+void stm32_setup_pins(const struct pin_config *pinconf, size_t pins)
 {
 	const struct device *clk;
 	int i;
@@ -248,8 +242,6 @@ void stm32_setup_pins(const struct pin_config *pinconf,
 	clk = device_get_binding(STM32_CLOCK_CONTROL_NAME);
 
 	for (i = 0; i < pins; i++) {
-		z_pinmux_stm32_set(pinconf[i].pin_num,
-				  pinconf[i].mode,
-				  clk);
+		z_pinmux_stm32_set(pinconf[i].pin_num, pinconf[i].mode, clk);
 	}
 }

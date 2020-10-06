@@ -17,11 +17,11 @@ struct sample_instance {
 	uint32_t cnt;
 };
 
-#define SAMPLE_INSTANCE_DEFINE(_part, _name)				   \
+#define SAMPLE_INSTANCE_DEFINE(_part, _name)                               \
 	LOG_INSTANCE_REGISTER(SAMPLE_INSTANCE_NAME, _name, LOG_LEVEL_INF); \
-	K_APP_DMEM(_part) struct sample_instance _name = {		   \
-		LOG_INSTANCE_PTR_INIT(log, SAMPLE_INSTANCE_NAME, _name)	   \
-	}
+	K_APP_DMEM(_part)                                                  \
+	struct sample_instance _name = { LOG_INSTANCE_PTR_INIT(            \
+		log, SAMPLE_INSTANCE_NAME, _name) }
 
 void sample_instance_call(struct sample_instance *inst);
 

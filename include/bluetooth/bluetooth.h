@@ -301,11 +301,10 @@ struct bt_data {
  * @param _data Pointer to the data field payload
  * @param _data_len Number of bytes behind the _data pointer
  */
-#define BT_DATA(_type, _data, _data_len) \
-	{ \
-		.type = (_type), \
-		.data_len = (_data_len), \
-		.data = (const uint8_t *)(_data), \
+#define BT_DATA(_type, _data, _data_len)                  \
+	{                                                 \
+		.type = (_type), .data_len = (_data_len), \
+		.data = (const uint8_t *)(_data),         \
 	}
 
 /**
@@ -318,8 +317,7 @@ struct bt_data {
  * @param _bytes Variable number of single-byte parameters
  */
 #define BT_DATA_BYTES(_type, _bytes...) \
-	BT_DATA(_type, ((uint8_t []) { _bytes }), \
-		sizeof((uint8_t []) { _bytes }))
+	BT_DATA(_type, ((uint8_t[]){ _bytes }), sizeof((uint8_t[]){ _bytes }))
 
 /** Advertising options */
 enum {
@@ -489,14 +487,14 @@ struct bt_le_adv_param {
 	 * @note It is not possible to have multiple connectable advertising
 	 *       sets advertising simultaneously using different identities.
 	 */
-	uint8_t  id;
+	uint8_t id;
 
 	/**
 	 * @brief Advertising Set Identifier, valid range 0x00 - 0x0f.
 	 *
 	 * @note Requires @ref BT_LE_ADV_OPT_EXT_ADV
 	 **/
-	uint8_t  sid;
+	uint8_t sid;
 
 	/**
 	 * @brief Secondary channel maximum skip count.
@@ -506,7 +504,7 @@ struct bt_le_adv_param {
 	 *
 	 * @note Requires @ref BT_LE_ADV_OPT_EXT_ADV
 	 */
-	uint8_t  secondary_max_skip;
+	uint8_t secondary_max_skip;
 
 	/** Bit-field of advertising options */
 	uint32_t options;
@@ -532,7 +530,6 @@ struct bt_le_adv_param {
 	 */
 	const bt_addr_le_t *peer;
 };
-
 
 /** Periodic Advertising options */
 enum {
@@ -567,16 +564,12 @@ struct bt_le_per_adv_param {
  * @param _peer      Peer address, set to NULL for undirected advertising or
  *                   address of peer for directed advertising.
  */
-#define BT_LE_ADV_PARAM_INIT(_options, _int_min, _int_max, _peer) \
-{ \
-	.id = BT_ID_DEFAULT, \
-	.sid = 0, \
-	.secondary_max_skip = 0, \
-	.options = (_options), \
-	.interval_min = (_int_min), \
-	.interval_max = (_int_max), \
-	.peer = (_peer), \
-}
+#define BT_LE_ADV_PARAM_INIT(_options, _int_min, _int_max, _peer)       \
+	{                                                               \
+		.id = BT_ID_DEFAULT, .sid = 0, .secondary_max_skip = 0, \
+		.options = (_options), .interval_min = (_int_min),      \
+		.interval_max = (_int_max), .peer = (_peer),            \
+	}
 
 /**
  * @brief Helper to declare advertising parameters inline
@@ -588,36 +581,35 @@ struct bt_le_per_adv_param {
  *                   address of peer for directed advertising.
  */
 #define BT_LE_ADV_PARAM(_options, _int_min, _int_max, _peer) \
-	((struct bt_le_adv_param[]) { \
-		BT_LE_ADV_PARAM_INIT(_options, _int_min, _int_max, _peer) \
-	 })
+	((struct bt_le_adv_param[]){                         \
+		BT_LE_ADV_PARAM_INIT(_options, _int_min, _int_max, _peer) })
 
-#define BT_LE_ADV_CONN_DIR(_peer) BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE |  \
-						  BT_LE_ADV_OPT_ONE_TIME, 0, 0,\
-						  _peer)
+#define BT_LE_ADV_CONN_DIR(_peer)                                              \
+	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, 0, \
+			0, _peer)
 
+#define BT_LE_ADV_CONN                                                        \
+	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, BT_GAP_ADV_FAST_INT_MIN_2, \
+			BT_GAP_ADV_FAST_INT_MAX_2, NULL)
 
-#define BT_LE_ADV_CONN BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, \
-				       BT_GAP_ADV_FAST_INT_MIN_2, \
-				       BT_GAP_ADV_FAST_INT_MAX_2, NULL)
+#define BT_LE_ADV_CONN_NAME                                                   \
+	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_USE_NAME,   \
+			BT_GAP_ADV_FAST_INT_MIN_2, BT_GAP_ADV_FAST_INT_MAX_2, \
+			NULL)
 
-#define BT_LE_ADV_CONN_NAME BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | \
-					    BT_LE_ADV_OPT_USE_NAME, \
-					    BT_GAP_ADV_FAST_INT_MIN_2, \
-					    BT_GAP_ADV_FAST_INT_MAX_2, NULL)
-
-#define BT_LE_ADV_CONN_DIR_LOW_DUTY(_peer) \
-	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME | \
-			BT_LE_ADV_OPT_DIR_MODE_LOW_DUTY, \
+#define BT_LE_ADV_CONN_DIR_LOW_DUTY(_peer)                                    \
+	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME |  \
+				BT_LE_ADV_OPT_DIR_MODE_LOW_DUTY,              \
 			BT_GAP_ADV_FAST_INT_MIN_2, BT_GAP_ADV_FAST_INT_MAX_2, \
 			_peer)
 
-#define BT_LE_ADV_NCONN BT_LE_ADV_PARAM(0, BT_GAP_ADV_FAST_INT_MIN_2, \
-					BT_GAP_ADV_FAST_INT_MAX_2, NULL)
+#define BT_LE_ADV_NCONN                               \
+	BT_LE_ADV_PARAM(0, BT_GAP_ADV_FAST_INT_MIN_2, \
+			BT_GAP_ADV_FAST_INT_MAX_2, NULL)
 
-#define BT_LE_ADV_NCONN_NAME BT_LE_ADV_PARAM(BT_LE_ADV_OPT_USE_NAME, \
-					     BT_GAP_ADV_FAST_INT_MIN_2, \
-					     BT_GAP_ADV_FAST_INT_MAX_2, NULL)
+#define BT_LE_ADV_NCONN_NAME                                               \
+	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_USE_NAME, BT_GAP_ADV_FAST_INT_MIN_2, \
+			BT_GAP_ADV_FAST_INT_MAX_2, NULL)
 
 /**
  * Helper to declare periodic advertising parameters inline
@@ -626,12 +618,11 @@ struct bt_le_per_adv_param {
  * @param _int_max     Maximum periodic advertising interval
  * @param _options     Periodic advertising properties bitfield.
  */
-#define BT_LE_PER_ADV_PARAM_INIT(_int_min, _int_max, _options) \
-{ \
-	.interval_min = (_int_min), \
-	.interval_max = (_int_max), \
-	.options = (_options), \
-}
+#define BT_LE_PER_ADV_PARAM_INIT(_int_min, _int_max, _options)          \
+	{                                                               \
+		.interval_min = (_int_min), .interval_max = (_int_max), \
+		.options = (_options),                                  \
+	}
 
 /**
  * Helper to declare periodic advertising parameters inline
@@ -641,13 +632,12 @@ struct bt_le_per_adv_param {
  * @param _options     Periodic advertising properties bitfield.
  */
 #define BT_LE_PER_ADV_PARAM(_int_min, _int_max, _options) \
-	((struct bt_le_per_adv_param[]) { \
-		BT_LE_PER_ADV_PARAM_INIT(_int_min, _int_max, _options) \
-	})
+	((struct bt_le_per_adv_param[]){                  \
+		BT_LE_PER_ADV_PARAM_INIT(_int_min, _int_max, _options) })
 
-#define BT_LE_PER_ADV_DEFAULT BT_LE_PER_ADV_PARAM(BT_GAP_ADV_SLOW_INT_MIN, \
-						  BT_GAP_ADV_SLOW_INT_MAX, \
-						  BT_LE_PER_ADV_OPT_NONE)
+#define BT_LE_PER_ADV_DEFAULT                                                 \
+	BT_LE_PER_ADV_PARAM(BT_GAP_ADV_SLOW_INT_MIN, BT_GAP_ADV_SLOW_INT_MAX, \
+			    BT_LE_PER_ADV_OPT_NONE)
 
 /**
  * @brief Start advertising
@@ -743,7 +733,7 @@ struct bt_le_ext_adv_start_param {
 	 * Application will be notified by the advertiser sent callback.
 	 * Set to zero for no limit.
 	 */
-	uint8_t  num_events;
+	uint8_t num_events;
 };
 
 /**
@@ -808,9 +798,9 @@ int bt_le_ext_adv_stop(struct bt_le_ext_adv *adv);
  *
  * @return Zero on success or (negative) error code otherwise.
  */
-int bt_le_ext_adv_set_data(struct bt_le_ext_adv *adv,
-			   const struct bt_data *ad, size_t ad_len,
-			   const struct bt_data *sd, size_t sd_len);
+int bt_le_ext_adv_set_data(struct bt_le_ext_adv *adv, const struct bt_data *ad,
+			   size_t ad_len, const struct bt_data *sd,
+			   size_t sd_len);
 
 /**
  * @brief Update advertising parameters.
@@ -853,10 +843,10 @@ uint8_t bt_le_ext_adv_get_index(struct bt_le_ext_adv *adv);
 /** @brief Advertising set info structure. */
 struct bt_le_ext_adv_info {
 	/* Local identity */
-	uint8_t                    id;
+	uint8_t id;
 
 	/** Currently selected Transmit Power (dBM). */
-	int8_t                     tx_power;
+	int8_t tx_power;
 };
 
 /**
@@ -1190,7 +1180,7 @@ enum {
 /** LE scan parameters */
 struct bt_le_scan_param {
 	/** Scan type (BT_LE_SCAN_TYPE_ACTIVE or BT_LE_SCAN_TYPE_PASSIVE) */
-	uint8_t  type;
+	uint8_t type;
 
 	union {
 		/** Bit-field of scanning filter options. */
@@ -1270,7 +1260,6 @@ struct bt_le_scan_recv_info {
 
 /** Listener context for (LE) scanning. */
 struct bt_le_scan_cb {
-
 	/**
 	 * @brief Advertisement packet received callback.
 	 *
@@ -1295,16 +1284,12 @@ struct bt_le_scan_cb {
  * @param _interval Scan Interval (N * 0.625 ms)
  * @param _window   Scan Window (N * 0.625 ms)
  */
-#define BT_LE_SCAN_PARAM_INIT(_type, _options, _interval, _window) \
-{ \
-	.type = (_type), \
-	.options = (_options), \
-	.interval = (_interval), \
-	.window = (_window), \
-	.timeout = 0, \
-	.interval_coded = 0, \
-	.window_coded = 0, \
-}
+#define BT_LE_SCAN_PARAM_INIT(_type, _options, _interval, _window)          \
+	{                                                                   \
+		.type = (_type), .options = (_options),                     \
+		.interval = (_interval), .window = (_window), .timeout = 0, \
+		.interval_coded = 0, .window_coded = 0,                     \
+	}
 
 /**
  * @brief Helper to declare scan parameters inline
@@ -1316,15 +1301,14 @@ struct bt_le_scan_cb {
  * @param _window   Scan Window (N * 0.625 ms)
  */
 #define BT_LE_SCAN_PARAM(_type, _options, _interval, _window) \
-	((struct bt_le_scan_param[]) { \
-		BT_LE_SCAN_PARAM_INIT(_type, _options, _interval, _window) \
-	 })
+	((struct bt_le_scan_param[]){                         \
+		BT_LE_SCAN_PARAM_INIT(_type, _options, _interval, _window) })
 
 /** Helper macro to enable active scanning to discover new devices. */
-#define BT_LE_SCAN_ACTIVE BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_ACTIVE, \
-					   BT_LE_SCAN_OPT_FILTER_DUPLICATE, \
-					   BT_GAP_SCAN_FAST_INTERVAL, \
-					   BT_GAP_SCAN_FAST_WINDOW)
+#define BT_LE_SCAN_ACTIVE                                 \
+	BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_ACTIVE,          \
+			 BT_LE_SCAN_OPT_FILTER_DUPLICATE, \
+			 BT_GAP_SCAN_FAST_INTERVAL, BT_GAP_SCAN_FAST_WINDOW)
 
 /**
  * @brief Helper macro to enable passive scanning to discover new devices.
@@ -1332,10 +1316,10 @@ struct bt_le_scan_cb {
  * This macro should be used if information required for device identification
  * (e.g., UUID) are known to be placed in Advertising Data.
  */
-#define BT_LE_SCAN_PASSIVE BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_PASSIVE, \
-					    BT_LE_SCAN_OPT_FILTER_DUPLICATE, \
-					    BT_GAP_SCAN_FAST_INTERVAL, \
-					    BT_GAP_SCAN_FAST_WINDOW)
+#define BT_LE_SCAN_PASSIVE                                \
+	BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_PASSIVE,         \
+			 BT_LE_SCAN_OPT_FILTER_DUPLICATE, \
+			 BT_GAP_SCAN_FAST_INTERVAL, BT_GAP_SCAN_FAST_WINDOW)
 
 /**
  * @brief Start (LE) scanning
@@ -1659,9 +1643,9 @@ int bt_br_oob_get_local(struct bt_br_oob *oob);
  */
 static inline int bt_addr_to_str(const bt_addr_t *addr, char *str, size_t len)
 {
-	return snprintk(str, len, "%02X:%02X:%02X:%02X:%02X:%02X",
-			addr->val[5], addr->val[4], addr->val[3],
-			addr->val[2], addr->val[1], addr->val[0]);
+	return snprintk(str, len, "%02X:%02X:%02X:%02X:%02X:%02X", addr->val[5],
+			addr->val[4], addr->val[3], addr->val[2], addr->val[1],
+			addr->val[0]);
 }
 
 /**
@@ -1777,8 +1761,9 @@ struct bt_bond_info {
  * @param func       Function to call for each bond.
  * @param user_data  Data to pass to the callback function.
  */
-void bt_foreach_bond(uint8_t id, void (*func)(const struct bt_bond_info *info,
-					   void *user_data),
+void bt_foreach_bond(uint8_t id,
+		     void (*func)(const struct bt_bond_info *info,
+				  void *user_data),
 		     void *user_data);
 
 /**

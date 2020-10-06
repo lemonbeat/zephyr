@@ -43,10 +43,10 @@ static inline void sys_trace_thread_info(struct k_thread *thread)
 	SEGGER_SYSVIEW_SendTaskInfo(&Info);
 }
 
-#define sys_trace_thread_create(thread)				       \
-	do {							       \
+#define sys_trace_thread_create(thread)                                   \
+	do {                                                              \
 		SEGGER_SYSVIEW_OnTaskCreate((uint32_t)(uintptr_t)thread); \
-		sys_trace_thread_info(thread);			       \
+		sys_trace_thread_info(thread);                            \
 	} while (0)
 
 #define sys_trace_thread_name_set(thread)

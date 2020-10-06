@@ -44,11 +44,12 @@ static int32_t arc_s_aux_write(uint32_t aux_reg, uint32_t val)
 		 * left prio levels allocated to normal world
 		 */
 		val &= IRQ_PRIO_MASK;
-		z_arc_v2_aux_reg_write(_ARC_V2_AUX_IRQ_ACT, val |
-		(z_arc_v2_aux_reg_read(_ARC_V2_AUX_IRQ_ACT) &
-			(~IRQ_PRIO_MASK)));
+		z_arc_v2_aux_reg_write(
+			_ARC_V2_AUX_IRQ_ACT,
+			val | (z_arc_v2_aux_reg_read(_ARC_V2_AUX_IRQ_ACT) &
+			       (~IRQ_PRIO_MASK)));
 
-		return  0;
+		return 0;
 	}
 
 	return -1;
@@ -70,14 +71,12 @@ static int32_t arc_s_irq_alloc(uint32_t intno)
 	return 0;
 }
 
-
 /*
  * \todo, to access MPU from normal mode, secure mpu service should be
  * created. In the secure mpu service, the parameters should be checked
  * (e.g., not overwrite the mpu regions for secure world)that operations
  * are valid
  */
-
 
 /*
  * \todo, how to add secure service easily

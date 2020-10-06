@@ -164,8 +164,7 @@ void z_irq_spurious(const void *unused)
 #ifdef CONFIG_SYS_POWER_MANAGEMENT
 void _arch_isr_direct_pm(void)
 {
-#if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE) \
-	|| defined(CONFIG_ARMV7_R)
+#if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE) || defined(CONFIG_ARMV7_R)
 	unsigned int key;
 
 	/* irq_lock() does what we wan for this CPU */
@@ -187,15 +186,13 @@ void _arch_isr_direct_pm(void)
 		z_sys_power_save_idle_exit(idle_val);
 	}
 
-#if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE) \
-	|| defined(CONFIG_ARMV7_R)
+#if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE) || defined(CONFIG_ARMV7_R)
 	irq_unlock(key);
 #elif defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
 	__asm__ volatile("cpsie i" : : : "memory");
 #else
 #error Unknown ARM architecture
 #endif /* CONFIG_ARMV6_M_ARMV8_M_BASELINE */
-
 }
 #endif
 
@@ -220,7 +217,7 @@ void _arch_isr_direct_pm(void)
  * @return The resulting target state of the given IRQ
  */
 irq_target_state_t irq_target_state_set(unsigned int irq,
-	irq_target_state_t irq_target_state)
+					irq_target_state_t irq_target_state)
 {
 	uint32_t result;
 

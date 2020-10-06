@@ -12,15 +12,15 @@
 
 /* Root System Description Pointer */
 struct acpi_rsdp {
-	char     signature[8];
-	uint8_t  chksum;
-	char     oem_id[6];
-	uint8_t  revision;
+	char signature[8];
+	uint8_t chksum;
+	char oem_id[6];
+	uint8_t revision;
 	uint32_t rsdt_ptr;
 	uint32_t length;
 	uint64_t xsdt_ptr;
-	uint8_t  ext_chksum;
-	uint8_t  _reserved[3];
+	uint8_t ext_chksum;
+	uint8_t _reserved[3];
 } __packed;
 
 /* Standard table header */
@@ -50,7 +50,7 @@ struct acpi_xsdt {
 
 /* MCFG table storing MMIO addresses for PCI configuration space */
 
-#define ACPI_MCFG_SIGNATURE 0x4746434d  /* 'MCFG' */
+#define ACPI_MCFG_SIGNATURE 0x4746434d /* 'MCFG' */
 
 struct acpi_mcfg {
 	struct acpi_sdt sdt;
@@ -65,10 +65,10 @@ struct acpi_mcfg {
 
 /* MADT table storing IO-APIC and multiprocessor configuration  */
 
-#define ACPI_MADT_SIGNATURE 0x43495041	/* 'APIC' */
+#define ACPI_MADT_SIGNATURE 0x43495041 /* 'APIC' */
 
 struct acpi_madt_entry {
-	uint8_t type;	/* See ACPI_MADT_ENTRY_* below */
+	uint8_t type; /* See ACPI_MADT_ENTRY_* below */
 	uint8_t length;
 } __packed;
 
@@ -81,13 +81,13 @@ struct acpi_madt {
 	struct acpi_madt_entry entries[];
 } __packed;
 
-#define ACPI_MADT_FLAGS_PICS 0x01	/* legacy 8259s installed */
+#define ACPI_MADT_FLAGS_PICS 0x01 /* legacy 8259s installed */
 
 struct acpi_cpu {
 	struct acpi_madt_entry entry;
 	uint8_t acpi_id;
 	uint8_t apic_id; /* local APIC ID */
-	uint8_t flags;   /* see ACPI_CPU_FLAGS_* below */
+	uint8_t flags; /* see ACPI_CPU_FLAGS_* below */
 } __packed;
 
 #define ACPI_CPU_FLAGS_ENABLED 0x01

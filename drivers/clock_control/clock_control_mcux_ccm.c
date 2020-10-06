@@ -25,13 +25,13 @@ static const clock_name_t lpspi_clocks[] = {
 #endif
 
 static int mcux_ccm_on(const struct device *dev,
-			      clock_control_subsys_t sub_system)
+		       clock_control_subsys_t sub_system)
 {
 	return 0;
 }
 
 static int mcux_ccm_off(const struct device *dev,
-			       clock_control_subsys_t sub_system)
+			clock_control_subsys_t sub_system)
 {
 	return 0;
 }
@@ -40,31 +40,29 @@ static int mcux_ccm_get_subsys_rate(const struct device *dev,
 				    clock_control_subsys_t sub_system,
 				    uint32_t *rate)
 {
-	uint32_t clock_name = (uint32_t) sub_system;
+	uint32_t clock_name = (uint32_t)sub_system;
 
 	switch (clock_name) {
-
 #ifdef CONFIG_I2C_MCUX_LPI2C
 	case IMX_CCM_LPI2C_CLK:
 		if (CLOCK_GetMux(kCLOCK_Lpi2cMux) == 0) {
-			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 8
-				/ (CLOCK_GetDiv(kCLOCK_Lpi2cDiv) + 1);
+			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 8 /
+				(CLOCK_GetDiv(kCLOCK_Lpi2cDiv) + 1);
 		} else {
-			*rate = CLOCK_GetOscFreq()
-				/ (CLOCK_GetDiv(kCLOCK_Lpi2cDiv) + 1);
+			*rate = CLOCK_GetOscFreq() /
+				(CLOCK_GetDiv(kCLOCK_Lpi2cDiv) + 1);
 		}
 
 		break;
 #endif
 
 #ifdef CONFIG_SPI_MCUX_LPSPI
-	case IMX_CCM_LPSPI_CLK:
-	{
+	case IMX_CCM_LPSPI_CLK: {
 		uint32_t lpspi_mux = CLOCK_GetMux(kCLOCK_LpspiMux);
 		clock_name_t lpspi_clock = lpspi_clocks[lpspi_mux];
 
-		*rate = CLOCK_GetFreq(lpspi_clock)
-			/ (CLOCK_GetDiv(kCLOCK_LpspiDiv) + 1);
+		*rate = CLOCK_GetFreq(lpspi_clock) /
+			(CLOCK_GetDiv(kCLOCK_LpspiDiv) + 1);
 		break;
 	}
 #endif
@@ -72,11 +70,11 @@ static int mcux_ccm_get_subsys_rate(const struct device *dev,
 #ifdef CONFIG_UART_MCUX_LPUART
 	case IMX_CCM_LPUART_CLK:
 		if (CLOCK_GetMux(kCLOCK_UartMux) == 0) {
-			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6
-				/ (CLOCK_GetDiv(kCLOCK_UartDiv) + 1);
+			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6 /
+				(CLOCK_GetDiv(kCLOCK_UartDiv) + 1);
 		} else {
-			*rate = CLOCK_GetOscFreq()
-				/ (CLOCK_GetDiv(kCLOCK_UartDiv) + 1);
+			*rate = CLOCK_GetOscFreq() /
+				(CLOCK_GetDiv(kCLOCK_UartDiv) + 1);
 		}
 
 		break;
@@ -85,14 +83,14 @@ static int mcux_ccm_get_subsys_rate(const struct device *dev,
 #ifdef CONFIG_DISK_ACCESS_USDHC1
 	case IMX_CCM_USDHC1_CLK:
 		*rate = CLOCK_GetSysPfdFreq(kCLOCK_Pfd0) /
-				(CLOCK_GetDiv(kCLOCK_Usdhc1Div) + 1U);
+			(CLOCK_GetDiv(kCLOCK_Usdhc1Div) + 1U);
 		break;
 #endif
 
 #ifdef CONFIG_DISK_ACCESS_USDHC2
 	case IMX_CCM_USDHC2_CLK:
 		*rate = CLOCK_GetSysPfdFreq(kCLOCK_Pfd0) /
-				(CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
+			(CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
 		break;
 #endif
 
@@ -105,26 +103,24 @@ static int mcux_ccm_get_subsys_rate(const struct device *dev,
 #ifdef CONFIG_UART_MCUX_IUART
 	case IMX_CCM_UART_CLK:
 		*rate = CLOCK_GetPllFreq(kCLOCK_SystemPll1Ctrl) /
-				(CLOCK_GetRootPreDivider(kCLOCK_RootUart4)) /
-				(CLOCK_GetRootPostDivider(kCLOCK_RootUart4)) /
-				10;
+			(CLOCK_GetRootPreDivider(kCLOCK_RootUart4)) /
+			(CLOCK_GetRootPostDivider(kCLOCK_RootUart4)) / 10;
 		break;
 #endif
 
 #ifdef CONFIG_CAN_MCUX_FLEXCAN
-	case IMX_CCM_CAN_CLK:
-	{
+	case IMX_CCM_CAN_CLK: {
 		uint32_t can_mux = CLOCK_GetMux(kCLOCK_CanMux);
 
 		if (can_mux == 0) {
-			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 8
-				/ (CLOCK_GetDiv(kCLOCK_CanDiv) + 1);
-		} else if  (can_mux == 1) {
-			*rate = CLOCK_GetOscFreq()
-				/ (CLOCK_GetDiv(kCLOCK_CanDiv) + 1);
+			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 8 /
+				(CLOCK_GetDiv(kCLOCK_CanDiv) + 1);
+		} else if (can_mux == 1) {
+			*rate = CLOCK_GetOscFreq() /
+				(CLOCK_GetDiv(kCLOCK_CanDiv) + 1);
 		} else {
-			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6
-				/ (CLOCK_GetDiv(kCLOCK_CanDiv) + 1);
+			*rate = CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6 /
+				(CLOCK_GetDiv(kCLOCK_CanDiv) + 1);
 		}
 	} break;
 #endif
@@ -144,8 +140,6 @@ static const struct clock_control_driver_api mcux_ccm_driver_api = {
 	.get_rate = mcux_ccm_get_subsys_rate,
 };
 
-DEVICE_AND_API_INIT(mcux_ccm, DT_INST_LABEL(0),
-		    &mcux_ccm_init,
-		    NULL, NULL,
+DEVICE_AND_API_INIT(mcux_ccm, DT_INST_LABEL(0), &mcux_ccm_init, NULL, NULL,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &mcux_ccm_driver_api);

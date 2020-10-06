@@ -79,9 +79,8 @@ static const struct pinmux_sam0_config pinmux_sam0_config_0 = {
 };
 
 DEVICE_AND_API_INIT(pinmux_sam0_0, DT_LABEL(DT_NODELABEL(pinmux_a)),
-		    pinmux_sam0_init, NULL, &pinmux_sam0_config_0,
-		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
-		    &pinmux_sam0_api);
+		    pinmux_sam0_init, NULL, &pinmux_sam0_config_0, PRE_KERNEL_1,
+		    CONFIG_PINMUX_INIT_PRIORITY, &pinmux_sam0_api);
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_b), okay)
@@ -90,9 +89,8 @@ static const struct pinmux_sam0_config pinmux_sam0_config_1 = {
 };
 
 DEVICE_AND_API_INIT(pinmux_sam0_1, DT_LABEL(DT_NODELABEL(pinmux_b)),
-		    pinmux_sam0_init, NULL, &pinmux_sam0_config_1,
-		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
-		    &pinmux_sam0_api);
+		    pinmux_sam0_init, NULL, &pinmux_sam0_config_1, PRE_KERNEL_1,
+		    CONFIG_PINMUX_INIT_PRIORITY, &pinmux_sam0_api);
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_c), okay)
@@ -101,9 +99,8 @@ static const struct pinmux_sam0_config pinmux_sam0_config_2 = {
 };
 
 DEVICE_AND_API_INIT(pinmux_sam0_2, DT_LABEL(DT_NODELABEL(pinmux_c)),
-		    pinmux_sam0_init, NULL, &pinmux_sam0_config_2,
-		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
-		    &pinmux_sam0_api);
+		    pinmux_sam0_init, NULL, &pinmux_sam0_config_2, PRE_KERNEL_1,
+		    CONFIG_PINMUX_INIT_PRIORITY, &pinmux_sam0_api);
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(pinmux_d), okay)
@@ -112,7 +109,6 @@ static const struct pinmux_sam0_config pinmux_sam0_config_3 = {
 };
 
 DEVICE_AND_API_INIT(pinmux_sam0_3, DT_LABEL(DT_NODELABEL(pinmux_d)),
-		    pinmux_sam0_init, NULL, &pinmux_sam0_config_3,
-		    PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY,
-		    &pinmux_sam0_api);
+		    pinmux_sam0_init, NULL, &pinmux_sam0_config_3, PRE_KERNEL_1,
+		    CONFIG_PINMUX_INIT_PRIORITY, &pinmux_sam0_api);
 #endif

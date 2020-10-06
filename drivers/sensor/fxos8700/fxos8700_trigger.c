@@ -11,8 +11,7 @@
 LOG_MODULE_DECLARE(FXOS8700, CONFIG_SENSOR_LOG_LEVEL);
 
 static void fxos8700_gpio_callback(const struct device *dev,
-				   struct gpio_callback *cb,
-				   uint32_t pin_mask)
+				   struct gpio_callback *cb, uint32_t pin_mask)
 {
 	struct fxos8700_data *data =
 		CONTAINER_OF(cb, struct fxos8700_data, gpio_cb);
@@ -62,8 +61,7 @@ static int fxos8700_handle_pulse_int(const struct device *dev)
 	k_sem_take(&data->sem, K_FOREVER);
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      FXOS8700_REG_PULSE_SRC,
-			      &pulse_source)) {
+			      FXOS8700_REG_PULSE_SRC, &pulse_source)) {
 		LOG_ERR("Could not read pulse source");
 	}
 
@@ -100,8 +98,7 @@ static int fxos8700_handle_motion_int(const struct device *dev)
 	k_sem_take(&data->sem, K_FOREVER);
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      FXOS8700_REG_FF_MT_SRC,
-			      &motion_source)) {
+			      FXOS8700_REG_FF_MT_SRC, &motion_source)) {
 		LOG_ERR("Could not read pulse source");
 	}
 
@@ -144,8 +141,7 @@ static void fxos8700_handle_int(const struct device *dev)
 	k_sem_take(&data->sem, K_FOREVER);
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      FXOS8700_REG_INT_SOURCE,
-			      &int_source)) {
+			      FXOS8700_REG_INT_SOURCE, &int_source)) {
 		LOG_ERR("Could not read interrupt source");
 		int_source = 0U;
 	}
@@ -170,8 +166,7 @@ static void fxos8700_handle_int(const struct device *dev)
 	k_sem_take(&data->sem, K_FOREVER);
 
 	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      FXOS8700_REG_M_INT_SRC,
-			      &int_source)) {
+			      FXOS8700_REG_M_INT_SRC, &int_source)) {
 		LOG_ERR("Could not read magnetometer interrupt source");
 		int_source = 0U;
 	}
@@ -271,8 +266,7 @@ int fxos8700_trigger_set(const struct device *dev,
 
 	/* Configure the sensor interrupt */
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-				FXOS8700_REG_CTRLREG4,
-				mask,
+				FXOS8700_REG_CTRLREG4, mask,
 				handler ? mask : 0)) {
 		LOG_ERR("Could not configure interrupt");
 		ret = -EIO;
@@ -344,13 +338,11 @@ static int fxos8700_motion_init(const struct device *dev)
 	struct fxos8700_data *data = dev->data;
 
 	/* Set Mode 4, Motion detection with ELE = 1, OAE = 1 */
-	if (i2c_reg_write_byte(data->i2c, config->i2c_address,
-			       FXOS8700_REG_FF_MT_CFG,
-			       FXOS8700_FF_MT_CFG_ELE |
-			       FXOS8700_FF_MT_CFG_OAE |
-			       FXOS8700_FF_MT_CFG_ZEFE |
-			       FXOS8700_FF_MT_CFG_YEFE |
-			       FXOS8700_FF_MT_CFG_XEFE)) {
+	if (i2c_reg_write_byte(
+		    data->i2c, config->i2c_address, FXOS8700_REG_FF_MT_CFG,
+		    FXOS8700_FF_MT_CFG_ELE | FXOS8700_FF_MT_CFG_OAE |
+			    FXOS8700_FF_MT_CFG_ZEFE | FXOS8700_FF_MT_CFG_YEFE |
+			    FXOS8700_FF_MT_CFG_XEFE)) {
 		return -EIO;
 	}
 
@@ -388,13 +380,15 @@ static int fxos8700_m_vecm_init(const struct device *dev)
 	 * handle both MSB and LSB registers
 	 */
 	if (i2c_reg_write_byte(data->i2c, config->i2c_address,
-			       FXOS8700_REG_M_VECM_THS_MSB, config->mag_vecm_ths[0])) {
+			       FXOS8700_REG_M_VECM_THS_MSB,
+			       config->mag_vecm_ths[0])) {
 		LOG_ERR("Could not set magnetic vector-magnitude function threshold MSB value");
 		return -EIO;
 	}
 
 	if (i2c_reg_write_byte(data->i2c, config->i2c_address,
-			       FXOS8700_REG_M_VECM_THS_LSB, config->mag_vecm_ths[1])) {
+			       FXOS8700_REG_M_VECM_THS_LSB,
+			       config->mag_vecm_ths[1])) {
 		LOG_ERR("Could not set magnetic vector-magnitude function threshold LSB value");
 		return -EIO;
 	}
@@ -415,10 +409,9 @@ int fxos8700_trigger_init(const struct device *dev)
 	k_sem_init(&data->trig_sem, 0, UINT_MAX);
 	k_thread_create(&data->thread, data->thread_stack,
 			CONFIG_FXOS8700_THREAD_STACK_SIZE,
-			(k_thread_entry_t)fxos8700_thread_main,
-			data, NULL, NULL,
-			K_PRIO_COOP(CONFIG_FXOS8700_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)fxos8700_thread_main, data, NULL,
+			NULL, K_PRIO_COOP(CONFIG_FXOS8700_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_FXOS8700_TRIGGER_GLOBAL_THREAD)
 	data->work.handler = fxos8700_work_handler;
 #endif

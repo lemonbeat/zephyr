@@ -9,13 +9,11 @@
 #include <device.h>
 #include <drivers/ipm.h>
 
-void ping_ipm_callback(const struct device *dev, void *context,
-		       uint32_t id, volatile void *data)
+void ping_ipm_callback(const struct device *dev, void *context, uint32_t id,
+		       volatile void *data)
 {
 	ipm_send(dev, 1, 0, (const void *)data, 4);
 }
-
-
 
 void main(void)
 {

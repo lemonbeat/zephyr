@@ -68,25 +68,27 @@ static sys_slist_t usb_audio_data_devlist;
  * @param [in] it_type	Input terminal type
  * @param [in] ot_type	Output terminal type
  */
-#define DEFINE_AUDIO_DESCRIPTOR(dev, i, id, link, it_type, ot_type, cb, addr) \
-USBD_CLASS_DESCR_DEFINE(primary, audio)					      \
-struct dev##_descriptor_##i dev##_desc_##i = {				      \
-	USB_AUDIO_IAD(2)						      \
-	.std_ac_interface = INIT_STD_IF(USB_AUDIO_AUDIOCONTROL, 0, 0, 0),     \
-	.cs_ac_interface = INIT_CS_AC_IF(dev, i, 1),			      \
-	.input_terminal = INIT_IN_TERMINAL(dev, i, id, it_type),	      \
-	.feature_unit = INIT_FEATURE_UNIT(dev, i, id + 1, id),		      \
-	.output_terminal = INIT_OUT_TERMINAL(id + 2, id + 1, ot_type),	      \
-	.as_interface_alt_0 = INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 1, 0, 0), \
-	.as_interface_alt_1 = INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 1, 1, 1), \
-	.as_cs_interface = INIT_AS_GENERAL(link),			      \
-	.format = INIT_AS_FORMAT_I(CH_CNT(dev, i), GET_RES(dev, i)),	      \
-	.std_ep = INIT_STD_AS_AD_EP(dev, i, addr),			      \
-	.cs_ep = INIT_CS_AS_AD_EP,					      \
-};									      \
-static struct usb_ep_cfg_data dev##_usb_audio_ep_data_##i[] = {		      \
-	INIT_EP_DATA(cb, addr),						      \
-}
+#define DEFINE_AUDIO_DESCRIPTOR(dev, i, id, link, it_type, ot_type, cb, addr)  \
+	USBD_CLASS_DESCR_DEFINE(primary, audio)                                \
+	struct dev##_descriptor_##i dev##_desc_##i = {                         \
+		USB_AUDIO_IAD(2).std_ac_interface =                            \
+			INIT_STD_IF(USB_AUDIO_AUDIOCONTROL, 0, 0, 0),          \
+		.cs_ac_interface = INIT_CS_AC_IF(dev, i, 1),                   \
+		.input_terminal = INIT_IN_TERMINAL(dev, i, id, it_type),       \
+		.feature_unit = INIT_FEATURE_UNIT(dev, i, id + 1, id),         \
+		.output_terminal = INIT_OUT_TERMINAL(id + 2, id + 1, ot_type), \
+		.as_interface_alt_0 =                                          \
+			INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 1, 0, 0),        \
+		.as_interface_alt_1 =                                          \
+			INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 1, 1, 1),        \
+		.as_cs_interface = INIT_AS_GENERAL(link),                      \
+		.format = INIT_AS_FORMAT_I(CH_CNT(dev, i), GET_RES(dev, i)),   \
+		.std_ep = INIT_STD_AS_AD_EP(dev, i, addr),                     \
+		.cs_ep = INIT_CS_AS_AD_EP,                                     \
+	};                                                                     \
+	static struct usb_ep_cfg_data dev##_usb_audio_ep_data_##i[] = {        \
+		INIT_EP_DATA(cb, addr),                                        \
+	}
 
 /**
  * @brief Fill the USB Audio descriptor
@@ -104,67 +106,68 @@ static struct usb_ep_cfg_data dev##_usb_audio_ep_data_##i[] = {		      \
  * @param [in] i	Instance of device of current type (dev)
  * @param [in] id	Param for counting logic entities
  */
-#define DEFINE_AUDIO_DESCRIPTOR_BIDIR(dev, i, id)			  \
-USBD_CLASS_DESCR_DEFINE(primary, audio)					  \
-struct dev##_descriptor_##i dev##_desc_##i = {				  \
-	USB_AUDIO_IAD(3)						  \
-	.std_ac_interface = INIT_STD_IF(USB_AUDIO_AUDIOCONTROL, 0, 0, 0), \
-	.cs_ac_interface = INIT_CS_AC_IF_BIDIR(dev, i, 2),		  \
-	.input_terminal_0 = INIT_IN_TERMINAL(dev##_MIC, i, id,		  \
-						USB_AUDIO_IO_HEADSET),	  \
-	.feature_unit_0 = INIT_FEATURE_UNIT(dev##_MIC, i, id+1, id),	  \
-	.output_terminal_0 = INIT_OUT_TERMINAL(id+2, id+1,		  \
-					USB_AUDIO_USB_STREAMING),	  \
-	.input_terminal_1 = INIT_IN_TERMINAL(dev##_HP, i, id+3,		  \
-					USB_AUDIO_USB_STREAMING),	  \
-	.feature_unit_1 = INIT_FEATURE_UNIT(dev##_HP, i, id+4, id+3),	  \
-	.output_terminal_1 = INIT_OUT_TERMINAL(id+5, id+4,		  \
-						USB_AUDIO_IO_HEADSET),	  \
-	.as_interface_alt_0_0 = INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING,	  \
-						1, 0, 0),		  \
-	.as_interface_alt_0_1 = INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING,	  \
-						1, 1, 1),		  \
-		.as_cs_interface_0 = INIT_AS_GENERAL(id+2),		  \
-		.format_0 = INIT_AS_FORMAT_I(CH_CNT(dev##_MIC, i),	  \
-					     GET_RES(dev##_MIC, i)),	  \
-		.std_ep_0 = INIT_STD_AS_AD_EP(dev##_MIC, i,		  \
-						   AUTO_EP_IN),		  \
-		.cs_ep_0 = INIT_CS_AS_AD_EP,				  \
-	.as_interface_alt_1_0 = INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING,	  \
-						2, 0, 0),		  \
-	.as_interface_alt_1_1 = INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING,	  \
-						2, 1, 1),		  \
-		.as_cs_interface_1 = INIT_AS_GENERAL(id+3),		  \
-		.format_1 = INIT_AS_FORMAT_I(CH_CNT(dev##_HP, i),	  \
-					     GET_RES(dev##_HP, i)),	  \
-		.std_ep_1 = INIT_STD_AS_AD_EP(dev##_HP, i,		  \
-						   AUTO_EP_OUT),	  \
-		.cs_ep_1 = INIT_CS_AS_AD_EP,				  \
-};									  \
-static struct usb_ep_cfg_data dev##_usb_audio_ep_data_##i[] = {		  \
-	INIT_EP_DATA(usb_transfer_ep_callback, AUTO_EP_IN),		  \
-	INIT_EP_DATA(audio_receive_cb, AUTO_EP_OUT),			  \
-}
+#define DEFINE_AUDIO_DESCRIPTOR_BIDIR(dev, i, id)                              \
+	USBD_CLASS_DESCR_DEFINE(primary, audio)                                \
+	struct dev##_descriptor_##i dev##_desc_##i = {                         \
+		USB_AUDIO_IAD(3).std_ac_interface =                            \
+			INIT_STD_IF(USB_AUDIO_AUDIOCONTROL, 0, 0, 0),          \
+		.cs_ac_interface = INIT_CS_AC_IF_BIDIR(dev, i, 2),             \
+		.input_terminal_0 = INIT_IN_TERMINAL(dev##_MIC, i, id,         \
+						     USB_AUDIO_IO_HEADSET),    \
+		.feature_unit_0 = INIT_FEATURE_UNIT(dev##_MIC, i, id + 1, id), \
+		.output_terminal_0 = INIT_OUT_TERMINAL(                        \
+			id + 2, id + 1, USB_AUDIO_USB_STREAMING),              \
+		.input_terminal_1 = INIT_IN_TERMINAL(dev##_HP, i, id + 3,      \
+						     USB_AUDIO_USB_STREAMING), \
+		.feature_unit_1 =                                              \
+			INIT_FEATURE_UNIT(dev##_HP, i, id + 4, id + 3),        \
+		.output_terminal_1 = INIT_OUT_TERMINAL(id + 5, id + 4,         \
+						       USB_AUDIO_IO_HEADSET),  \
+		.as_interface_alt_0_0 =                                        \
+			INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 1, 0, 0),        \
+		.as_interface_alt_0_1 =                                        \
+			INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 1, 1, 1),        \
+		.as_cs_interface_0 = INIT_AS_GENERAL(id + 2),                  \
+		.format_0 = INIT_AS_FORMAT_I(CH_CNT(dev##_MIC, i),             \
+					     GET_RES(dev##_MIC, i)),           \
+		.std_ep_0 = INIT_STD_AS_AD_EP(dev##_MIC, i, AUTO_EP_IN),       \
+		.cs_ep_0 = INIT_CS_AS_AD_EP,                                   \
+		.as_interface_alt_1_0 =                                        \
+			INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 2, 0, 0),        \
+		.as_interface_alt_1_1 =                                        \
+			INIT_STD_IF(USB_AUDIO_AUDIOSTREAMING, 2, 1, 1),        \
+		.as_cs_interface_1 = INIT_AS_GENERAL(id + 3),                  \
+		.format_1 = INIT_AS_FORMAT_I(CH_CNT(dev##_HP, i),              \
+					     GET_RES(dev##_HP, i)),            \
+		.std_ep_1 = INIT_STD_AS_AD_EP(dev##_HP, i, AUTO_EP_OUT),       \
+		.cs_ep_1 = INIT_CS_AS_AD_EP,                                   \
+	};                                                                     \
+	static struct usb_ep_cfg_data dev##_usb_audio_ep_data_##i[] = {        \
+		INIT_EP_DATA(usb_transfer_ep_callback, AUTO_EP_IN),            \
+		INIT_EP_DATA(audio_receive_cb, AUTO_EP_OUT),                   \
+	}
 
-#define DEFINE_AUDIO_DEV_DATA(dev, i, __out_pool, __in_pool_size)   \
-	static uint8_t dev##_controls_##i[FEATURES_SIZE(dev, i)] = {0};\
-	static struct usb_audio_dev_data dev##_audio_dev_data_##i = \
-		{ .pool = __out_pool,				    \
-		  .in_frame_size = __in_pool_size,		    \
-		  .controls = {dev##_controls_##i, NULL},	    \
-		  .ch_cnt = {(CH_CNT(dev, i) + 1), 0}		    \
-		}
+#define DEFINE_AUDIO_DEV_DATA(dev, i, __out_pool, __in_pool_size)         \
+	static uint8_t dev##_controls_##i[FEATURES_SIZE(dev, i)] = { 0 }; \
+	static struct usb_audio_dev_data dev##_audio_dev_data_##i = {     \
+		.pool = __out_pool,                                       \
+		.in_frame_size = __in_pool_size,                          \
+		.controls = { dev##_controls_##i, NULL },                 \
+		.ch_cnt = { (CH_CNT(dev, i) + 1), 0 }                     \
+	}
 
-#define DEFINE_AUDIO_DEV_DATA_BIDIR(dev, i, __out_pool, __in_pool_size)	   \
-	static uint8_t dev##_controls0_##i[FEATURES_SIZE(dev##_MIC, i)] = {0};\
-	static uint8_t dev##_controls1_##i[FEATURES_SIZE(dev##_HP, i)] = {0}; \
-	static struct usb_audio_dev_data dev##_audio_dev_data_##i =	   \
-		{ .pool = __out_pool,					   \
-		  .in_frame_size = __in_pool_size,			   \
-		  .controls = {dev##_controls0_##i, dev##_controls1_##i},  \
-		  .ch_cnt = {(CH_CNT(dev##_MIC, i) + 1),		   \
-			     (CH_CNT(dev##_HP, i) + 1)}			   \
-		}
+#define DEFINE_AUDIO_DEV_DATA_BIDIR(dev, i, __out_pool, __in_pool_size)         \
+	static uint8_t dev##_controls0_##i[FEATURES_SIZE(dev##_MIC, i)] = {     \
+		0                                                               \
+	};                                                                      \
+	static uint8_t dev##_controls1_##i[FEATURES_SIZE(dev##_HP, i)] = { 0 }; \
+	static struct usb_audio_dev_data dev##_audio_dev_data_##i = {           \
+		.pool = __out_pool,                                             \
+		.in_frame_size = __in_pool_size,                                \
+		.controls = { dev##_controls0_##i, dev##_controls1_##i },       \
+		.ch_cnt = { (CH_CNT(dev##_MIC, i) + 1),                         \
+			    (CH_CNT(dev##_HP, i) + 1) }                         \
+	}
 
 /**
  * Helper function for getting channel number directly from the
@@ -172,7 +175,7 @@ static struct usb_ep_cfg_data dev##_usb_audio_ep_data_##i[] = {		  \
  */
 static uint8_t get_num_of_channels(const struct feature_unit_descriptor *fu)
 {
-	return (fu->bLength - FU_FIXED_ELEMS_SIZE)/sizeof(uint16_t);
+	return (fu->bLength - FU_FIXED_ELEMS_SIZE) / sizeof(uint16_t);
 }
 
 /**
@@ -187,12 +190,12 @@ static uint16_t get_controls(const struct feature_unit_descriptor *fu)
 /**
  * Helper function for getting the device streaming direction
  */
-static enum usb_audio_direction get_fu_dir(
-				const struct feature_unit_descriptor *fu)
+static enum usb_audio_direction
+get_fu_dir(const struct feature_unit_descriptor *fu)
 {
 	const struct output_terminal_descriptor *ot =
-		(struct output_terminal_descriptor *)
-		((uint8_t *)fu + fu->bLength);
+		(struct output_terminal_descriptor *)((uint8_t *)fu +
+						      fu->bLength);
 	enum usb_audio_direction dir;
 
 	if (ot->wTerminalType == USB_AUDIO_USB_STREAMING) {
@@ -212,8 +215,8 @@ static void fix_fu_descriptors(struct usb_if_descriptor *iface)
 	struct cs_ac_if_descriptor *header;
 	struct feature_unit_descriptor *fu;
 
-	header = (struct cs_ac_if_descriptor *)
-			((uint8_t *)iface + USB_PASSIVE_IF_DESC_SIZE);
+	header = (struct cs_ac_if_descriptor *)((uint8_t *)iface +
+						USB_PASSIVE_IF_DESC_SIZE);
 
 	fu = (struct feature_unit_descriptor *)((uint8_t *)header +
 						header->bLength +
@@ -225,10 +228,10 @@ static void fix_fu_descriptors(struct usb_if_descriptor *iface)
 	}
 
 	if (header->bInCollection == 2) {
-		fu = (struct feature_unit_descriptor *)((uint8_t *)fu +
-			fu->bLength +
-			INPUT_TERMINAL_DESC_SIZE +
-			OUTPUT_TERMINAL_DESC_SIZE);
+		fu = (struct feature_unit_descriptor
+			      *)((uint8_t *)fu + fu->bLength +
+				 INPUT_TERMINAL_DESC_SIZE +
+				 OUTPUT_TERMINAL_DESC_SIZE);
 		for (int i = 1; i < get_num_of_channels(fu); i++) {
 			*(fu->bmaControls + i) = fu->bmaControls[0];
 		}
@@ -240,26 +243,25 @@ static void fix_fu_descriptors(struct usb_if_descriptor *iface)
  * This is needed in order to address audio specific requests to proper
  * controls struct.
  */
-static struct feature_unit_descriptor *get_feature_unit(
-				struct usb_audio_dev_data *audio_dev_data,
-				uint8_t *device, uint8_t fu_id)
+static struct feature_unit_descriptor *
+get_feature_unit(struct usb_audio_dev_data *audio_dev_data, uint8_t *device,
+		 uint8_t fu_id)
 {
 	struct feature_unit_descriptor *fu;
 
-	fu = (struct feature_unit_descriptor *)
-		((uint8_t *)audio_dev_data->desc_hdr +
-		audio_dev_data->desc_hdr->bLength +
-		INPUT_TERMINAL_DESC_SIZE);
+	fu = (struct feature_unit_descriptor
+		      *)((uint8_t *)audio_dev_data->desc_hdr +
+			 audio_dev_data->desc_hdr->bLength +
+			 INPUT_TERMINAL_DESC_SIZE);
 
 	if (fu->bUnitID == fu_id) {
 		*device = 0;
 		return fu;
 	}
 	/* skip to the next Feature Unit */
-	fu = (struct feature_unit_descriptor *)
-			((uint8_t *)fu + fu->bLength +
-			INPUT_TERMINAL_DESC_SIZE +
-			OUTPUT_TERMINAL_DESC_SIZE);
+	fu = (struct feature_unit_descriptor *)((uint8_t *)fu + fu->bLength +
+						INPUT_TERMINAL_DESC_SIZE +
+						OUTPUT_TERMINAL_DESC_SIZE);
 	*device = 1;
 
 	return fu;
@@ -278,8 +280,7 @@ static void audio_dc_sof(struct usb_cfg_data *cfg,
 	ep_addr = cfg->endpoint[0].ep_addr;
 	if ((ep_addr & USB_EP_DIR_MASK) && (dev_data->tx_enable)) {
 		if (dev_data->ops && dev_data->ops->data_request_cb) {
-			dev_data->ops->data_request_cb(
-				dev_data->common.dev);
+			dev_data->ops->data_request_cb(dev_data->common.dev);
 		}
 	}
 }
@@ -292,45 +293,45 @@ static void audio_interface_config(struct usb_desc_header *head,
 
 #ifdef CONFIG_USB_COMPOSITE_DEVICE
 	struct usb_association_descriptor *iad =
-		(struct usb_association_descriptor *)
-		((char *)iface - sizeof(struct usb_association_descriptor));
+		(struct usb_association_descriptor
+			 *)((char *)iface -
+			    sizeof(struct usb_association_descriptor));
 	iad->bFirstInterface = bInterfaceNumber;
 #endif
 	fix_fu_descriptors(iface);
 
 	/* Audio Control Interface */
 	iface->bInterfaceNumber = bInterfaceNumber;
-	header = (struct cs_ac_if_descriptor *)
-		 ((uint8_t *)iface + iface->bLength);
+	header = (struct cs_ac_if_descriptor *)((uint8_t *)iface +
+						iface->bLength);
 	header->baInterfaceNr[0] = bInterfaceNumber + 1;
 
 	/* Audio Streaming Interface Passive */
-	iface = (struct usb_if_descriptor *)
-			  ((uint8_t *)header + header->wTotalLength);
+	iface = (struct usb_if_descriptor *)((uint8_t *)header +
+					     header->wTotalLength);
 	iface->bInterfaceNumber = bInterfaceNumber + 1;
 
 	/* Audio Streaming Interface Active */
-	iface = (struct usb_if_descriptor *)
-			  ((uint8_t *)iface + iface->bLength);
+	iface = (struct usb_if_descriptor *)((uint8_t *)iface + iface->bLength);
 	iface->bInterfaceNumber = bInterfaceNumber + 1;
 
 	if (header->bInCollection == 2) {
 		header->baInterfaceNr[1] = bInterfaceNumber + 2;
 		/* Audio Streaming Interface Passive */
-		iface = (struct usb_if_descriptor *)
-			((uint8_t *)iface + USB_ACTIVE_IF_DESC_SIZE);
+		iface = (struct usb_if_descriptor *)((uint8_t *)iface +
+						     USB_ACTIVE_IF_DESC_SIZE);
 		iface->bInterfaceNumber = bInterfaceNumber + 2;
 
 		/* Audio Streaming Interface Active */
-		iface = (struct usb_if_descriptor *)
-			((uint8_t *)iface + USB_PASSIVE_IF_DESC_SIZE);
+		iface = (struct usb_if_descriptor *)((uint8_t *)iface +
+						     USB_PASSIVE_IF_DESC_SIZE);
 		iface->bInterfaceNumber = bInterfaceNumber + 2;
 	}
 }
 
 static void audio_cb_usb_status(struct usb_cfg_data *cfg,
-			 enum usb_dc_status_code cb_status,
-			 const uint8_t *param)
+				enum usb_dc_status_code cb_status,
+				const uint8_t *param)
 {
 	struct usb_audio_dev_data *audio_dev_data;
 	struct usb_dev_data *dev_data;
@@ -342,8 +343,8 @@ static void audio_cb_usb_status(struct usb_cfg_data *cfg,
 		return;
 	}
 
-	audio_dev_data = CONTAINER_OF(dev_data, struct usb_audio_dev_data,
-				      common);
+	audio_dev_data =
+		CONTAINER_OF(dev_data, struct usb_audio_dev_data, common);
 
 	switch (cb_status) {
 	case USB_DC_SOF:
@@ -390,10 +391,10 @@ static bool is_entity_valid(struct usb_audio_dev_data *audio_dev_data,
 	}
 
 	if (header->bInCollection == 2) {
-		fu = (struct feature_unit_descriptor *)((uint8_t *)fu +
-			fu->bLength +
-			INPUT_TERMINAL_DESC_SIZE +
-			OUTPUT_TERMINAL_DESC_SIZE);
+		fu = (struct feature_unit_descriptor
+			      *)((uint8_t *)fu + fu->bLength +
+				 INPUT_TERMINAL_DESC_SIZE +
+				 OUTPUT_TERMINAL_DESC_SIZE);
 		if (fu->bUnitID == entity->id) {
 			entity->subtype = fu->bDescriptorSubtype;
 			return true;
@@ -415,16 +416,15 @@ static bool is_entity_valid(struct usb_audio_dev_data *audio_dev_data,
  *
  * @return audio_dev_data for given entity, NULL if not found.
  */
-static struct usb_audio_dev_data *get_audio_dev_data_by_entity(
-					struct usb_audio_entity *entity)
+static struct usb_audio_dev_data *
+get_audio_dev_data_by_entity(struct usb_audio_entity *entity)
 {
 	struct usb_dev_data *dev_data;
 	struct usb_audio_dev_data *audio_dev_data;
 
 	SYS_SLIST_FOR_EACH_CONTAINER(&usb_audio_data_devlist, dev_data, node) {
-		audio_dev_data = CONTAINER_OF(dev_data,
-					      struct usb_audio_dev_data,
-					      common);
+		audio_dev_data = CONTAINER_OF(
+			dev_data, struct usb_audio_dev_data, common);
 
 		if (is_entity_valid(audio_dev_data, entity)) {
 			return audio_dev_data;
@@ -481,9 +481,8 @@ static struct usb_audio_dev_data *get_audio_dev_data_by_iface(uint8_t interface)
 	struct usb_audio_dev_data *audio_dev_data;
 
 	SYS_SLIST_FOR_EACH_CONTAINER(&usb_audio_data_devlist, dev_data, node) {
-		audio_dev_data = CONTAINER_OF(dev_data,
-					      struct usb_audio_dev_data,
-					      common);
+		audio_dev_data = CONTAINER_OF(
+			dev_data, struct usb_audio_dev_data, common);
 
 		if (is_interface_valid(audio_dev_data, interface)) {
 			return audio_dev_data;
@@ -508,9 +507,8 @@ static struct usb_audio_dev_data *get_audio_dev_data_by_iface(uint8_t interface)
  * @return 0 if succesfulf, negative errno otherwise.
  */
 static int handle_fu_mute_req(struct usb_audio_dev_data *audio_dev_data,
-			      struct usb_setup_packet *pSetup,
-			      int32_t *len, uint8_t **data,
-			      struct usb_audio_fu_evt *evt,
+			      struct usb_setup_packet *pSetup, int32_t *len,
+			      uint8_t **data, struct usb_audio_fu_evt *evt,
 			      uint8_t device)
 {
 	uint8_t ch = (pSetup->wValue) & 0xFF;
@@ -585,8 +583,8 @@ static int handle_feature_unit_req(struct usb_audio_dev_data *audio_dev_data,
 
 	switch (cs) {
 	case USB_AUDIO_FU_MUTE_CONTROL:
-		ret = handle_fu_mute_req(audio_dev_data, pSetup,
-					 len, data, &evt, device);
+		ret = handle_fu_mute_req(audio_dev_data, pSetup, len, data,
+					 &evt, device);
 		break;
 	default:
 		return -ENOTSUP;
@@ -603,7 +601,7 @@ static int handle_feature_unit_req(struct usb_audio_dev_data *audio_dev_data,
 			evt.channel = ch;
 			evt.dir = get_fu_dir(fu);
 			audio_dev_data->ops->feature_update_cb(
-					audio_dev_data->common.dev, &evt);
+				audio_dev_data->common.dev, &evt);
 		}
 	}
 
@@ -623,8 +621,7 @@ static int handle_feature_unit_req(struct usb_audio_dev_data *audio_dev_data,
  *
  * @return  0 on success, negative errno code on fail.
  */
-static int handle_interface_req(struct usb_setup_packet *pSetup,
-				int32_t *len,
+static int handle_interface_req(struct usb_setup_packet *pSetup, int32_t *len,
 				uint8_t **data)
 {
 	struct usb_audio_dev_data *audio_dev_data;
@@ -654,8 +651,8 @@ static int handle_interface_req(struct usb_setup_packet *pSetup,
 
 	switch (entity.subtype) {
 	case USB_AUDIO_FEATURE_UNIT:
-		return handle_feature_unit_req(audio_dev_data,
-					       pSetup, len, data);
+		return handle_feature_unit_req(audio_dev_data, pSetup, len,
+					       data);
 	default:
 		LOG_INF("Currently not supported");
 		return -ENODEV;
@@ -702,14 +699,15 @@ static int audio_custom_handler(struct usb_setup_packet *pSetup, int32_t *len,
 
 	/* Skip to the first interface */
 	if_desc = (struct usb_if_descriptor *)((uint8_t *)header +
-						header->wTotalLength +
-						USB_PASSIVE_IF_DESC_SIZE);
+					       header->wTotalLength +
+					       USB_PASSIVE_IF_DESC_SIZE);
 
 	if (if_desc->bInterfaceNumber == iface) {
-		ep_desc = (struct usb_ep_descriptor *)((uint8_t *)if_desc +
-						USB_PASSIVE_IF_DESC_SIZE +
-						USB_AC_CS_IF_DESC_SIZE +
-						USB_FORMAT_TYPE_I_DESC_SIZE);
+		ep_desc = (struct usb_ep_descriptor
+				   *)((uint8_t *)if_desc +
+				      USB_PASSIVE_IF_DESC_SIZE +
+				      USB_AC_CS_IF_DESC_SIZE +
+				      USB_FORMAT_TYPE_I_DESC_SIZE);
 	} else {
 		/* In case first interface address is not the one addressed
 		 * we can be sure the second one is because
@@ -717,11 +715,12 @@ static int audio_custom_handler(struct usb_setup_packet *pSetup, int32_t *len,
 		 * must be the second interface associated with the device.
 		 */
 		if_desc = (struct usb_if_descriptor *)((uint8_t *)if_desc +
-						USB_ACTIVE_IF_DESC_SIZE);
-		ep_desc = (struct usb_ep_descriptor *)((uint8_t *)if_desc +
-						USB_PASSIVE_IF_DESC_SIZE +
-						USB_AC_CS_IF_DESC_SIZE +
-						USB_FORMAT_TYPE_I_DESC_SIZE);
+						       USB_ACTIVE_IF_DESC_SIZE);
+		ep_desc = (struct usb_ep_descriptor
+				   *)((uint8_t *)if_desc +
+				      USB_PASSIVE_IF_DESC_SIZE +
+				      USB_AC_CS_IF_DESC_SIZE +
+				      USB_FORMAT_TYPE_I_DESC_SIZE);
 	}
 
 	if (REQTYPE_GET_RECIP(pSetup->bmRequestType) ==
@@ -758,8 +757,8 @@ static int audio_custom_handler(struct usb_setup_packet *pSetup, int32_t *len,
  *
  * @return  0 on success, negative errno code on fail.
  */
-static int audio_class_handle_req(struct usb_setup_packet *pSetup,
-				  int32_t *len, uint8_t **data)
+static int audio_class_handle_req(struct usb_setup_packet *pSetup, int32_t *len,
+				  uint8_t **data)
 {
 	LOG_DBG("bmRT 0x%02x, bR 0x%02x, wV 0x%04x, wI 0x%04x, wL 0x%04x",
 		pSetup->bmRequestType, pSetup->bRequest, pSetup->wValue,
@@ -790,24 +789,23 @@ static void audio_write_cb(uint8_t ep, int size, void *priv)
 	dev_data = usb_get_dev_data_by_ep(&usb_audio_data_devlist, ep);
 	audio_dev_data = dev_data->dev->data;
 
-	LOG_DBG("Written %d bytes on ep 0x%02x, *audio_dev_data %p",
-		size, ep, audio_dev_data);
+	LOG_DBG("Written %d bytes on ep 0x%02x, *audio_dev_data %p", size, ep,
+		audio_dev_data);
 
 	/* Ask installed callback to process the data.
 	 * User is responsible for freeing the buffer.
 	 * In case no callback is installed free the buffer.
 	 */
 	if (audio_dev_data->ops && audio_dev_data->ops->data_written_cb) {
-		audio_dev_data->ops->data_written_cb(dev_data->dev,
-						     buffer, size);
+		audio_dev_data->ops->data_written_cb(dev_data->dev, buffer,
+						     size);
 	} else {
 		/* Release net_buf back to the pool */
 		net_buf_unref(buffer);
 	}
 }
 
-int usb_audio_send(const struct device *dev, struct net_buf *buffer,
-		   size_t len)
+int usb_audio_send(const struct device *dev, struct net_buf *buffer, size_t len)
 {
 	struct usb_audio_dev_data *audio_dev_data = dev->data;
 	struct usb_cfg_data *cfg = (void *)dev->config;
@@ -859,8 +857,8 @@ static void audio_receive_cb(uint8_t ep, enum usb_dc_ep_cb_status_code status)
 		return;
 	}
 
-	audio_dev_data = CONTAINER_OF(common, struct usb_audio_dev_data,
-				      common);
+	audio_dev_data =
+		CONTAINER_OF(common, struct usb_audio_dev_data, common);
 
 	/** Check if active audiostreaming interface is selected
 	 * If no there is no point to read the data. Return from callback
@@ -891,8 +889,8 @@ static void audio_receive_cb(uint8_t ep, enum usb_dc_ep_cb_status_code status)
 			net_buf_unref(buffer);
 			return;
 		}
-		audio_dev_data->ops->data_received_cb(common->dev,
-						      buffer, ret_bytes);
+		audio_dev_data->ops->data_received_cb(common->dev, buffer,
+						      ret_bytes);
 	}
 }
 
@@ -901,11 +899,10 @@ void usb_audio_register(const struct device *dev,
 {
 	struct usb_audio_dev_data *audio_dev_data = dev->data;
 	const struct usb_cfg_data *cfg = dev->config;
-	const struct std_if_descriptor *iface_descr =
-		cfg->interface_descriptor;
+	const struct std_if_descriptor *iface_descr = cfg->interface_descriptor;
 	const struct cs_ac_if_descriptor *header =
-		(struct cs_ac_if_descriptor *)
-		((uint8_t *)iface_descr + USB_PASSIVE_IF_DESC_SIZE);
+		(struct cs_ac_if_descriptor *)((uint8_t *)iface_descr +
+					       USB_PASSIVE_IF_DESC_SIZE);
 
 	audio_dev_data->ops = ops;
 	audio_dev_data->common.dev = dev;
@@ -915,13 +912,12 @@ void usb_audio_register(const struct device *dev,
 
 	sys_slist_append(&usb_audio_data_devlist, &audio_dev_data->common.node);
 
-	LOG_DBG("Device dev %p dev_data %p cfg %p added to devlist %p",
-		dev, audio_dev_data, dev->config,
-		&usb_audio_data_devlist);
+	LOG_DBG("Device dev %p dev_data %p cfg %p added to devlist %p", dev,
+		audio_dev_data, dev->config, &usb_audio_data_devlist);
 }
 
-#define DEFINE_AUDIO_DEVICE(dev, i)					  \
-	USBD_CFG_DATA_DEFINE(primary, audio)				  \
+#define DEFINE_AUDIO_DEVICE(dev, i)                                            \
+	USBD_CFG_DATA_DEFINE(primary, audio)                                   \
 	struct usb_cfg_data dev##_audio_config_##i = {			  \
 		.usb_device_description	= NULL,				  \
 		.interface_config = audio_interface_config,		  \
@@ -934,44 +930,45 @@ void usb_audio_register(const struct device *dev,
 		},							  \
 		.num_endpoints = ARRAY_SIZE(dev##_usb_audio_ep_data_##i), \
 		.endpoint = dev##_usb_audio_ep_data_##i,		  \
-	};								  \
-	DEVICE_AND_API_INIT(dev##_usb_audio_device_##i,			  \
-			    DT_LABEL(DT_INST(i, COMPAT_##dev)),		  \
-			    &usb_audio_device_init,			  \
-			    &dev##_audio_dev_data_##i,			  \
-			    &dev##_audio_config_##i, APPLICATION,	  \
-			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,		  \
-			    DUMMY_API)
+	};                   \
+	DEVICE_AND_API_INIT(dev##_usb_audio_device_##i,                        \
+			    DT_LABEL(DT_INST(i, COMPAT_##dev)),                \
+			    &usb_audio_device_init, &dev##_audio_dev_data_##i, \
+			    &dev##_audio_config_##i, APPLICATION,              \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, DUMMY_API)
 
 #define DEFINE_BUF_POOL(name, size) \
 	NET_BUF_POOL_FIXED_DEFINE(name, 5, size, net_buf_destroy)
 
 #define UNIDIR_DEVICE(dev, i, out_pool, in_size, it_type, ot_type, cb, addr) \
-	UTIL_EXPAND( \
-	DEFINE_AUDIO_DEV_DATA(dev, i, out_pool, in_size); \
-	DECLARE_DESCRIPTOR(dev, i, 1); \
-	DEFINE_AUDIO_DESCRIPTOR(dev, i, dev##_ID(i), dev##_LINK(i), \
-				it_type, ot_type, cb, addr); \
-	DEFINE_AUDIO_DEVICE(dev, i))
+	UTIL_EXPAND(DEFINE_AUDIO_DEV_DATA(dev, i, out_pool, in_size);        \
+		    DECLARE_DESCRIPTOR(dev, i, 1);                           \
+		    DEFINE_AUDIO_DESCRIPTOR(dev, i, dev##_ID(i),             \
+					    dev##_LINK(i), it_type, ot_type, \
+					    cb, addr);                       \
+		    DEFINE_AUDIO_DEVICE(dev, i))
 
-#define HEADPHONES_DEVICE(i, dev) UTIL_EXPAND( \
-	DEFINE_BUF_POOL(audio_data_pool_hp_##i, EP_SIZE(dev, i));  \
-	UNIDIR_DEVICE(dev, i, &audio_data_pool_hp_##i, 0, \
-		      USB_AUDIO_USB_STREAMING, USB_AUDIO_OUT_HEADPHONES, \
-		      audio_receive_cb, AUTO_EP_OUT);)
+#define HEADPHONES_DEVICE(i, dev)                                             \
+	UTIL_EXPAND(DEFINE_BUF_POOL(audio_data_pool_hp_##i, EP_SIZE(dev, i)); \
+		    UNIDIR_DEVICE(dev, i, &audio_data_pool_hp_##i, 0,         \
+				  USB_AUDIO_USB_STREAMING,                    \
+				  USB_AUDIO_OUT_HEADPHONES, audio_receive_cb, \
+				  AUTO_EP_OUT);)
 
-#define MICROPHONE_DEVICE(i, dev) UTIL_EXPAND( \
-	UNIDIR_DEVICE(dev, i, NULL, EP_SIZE(dev, i), \
-		      USB_AUDIO_IN_MICROPHONE, USB_AUDIO_USB_STREAMING, \
-		      usb_transfer_ep_callback, AUTO_EP_IN);)
+#define MICROPHONE_DEVICE(i, dev)                                \
+	UTIL_EXPAND(UNIDIR_DEVICE(dev, i, NULL, EP_SIZE(dev, i), \
+				  USB_AUDIO_IN_MICROPHONE,       \
+				  USB_AUDIO_USB_STREAMING,       \
+				  usb_transfer_ep_callback, AUTO_EP_IN);)
 
-#define HEADSET_DEVICE(i, dev) UTIL_EXPAND( \
-	DEFINE_BUF_POOL(audio_data_pool_hs_##i, EP_SIZE(dev##_HP, i)); \
-	DEFINE_AUDIO_DEV_DATA_BIDIR(dev, i, &audio_data_pool_hs_##i, \
-				    EP_SIZE(dev##_MIC, i)); \
-	DECLARE_DESCRIPTOR_BIDIR(dev, i, 2); \
-	DEFINE_AUDIO_DESCRIPTOR_BIDIR(dev, i, dev##_ID(i)); \
-	DEFINE_AUDIO_DEVICE(dev, i);)
+#define HEADSET_DEVICE(i, dev)                                                 \
+	UTIL_EXPAND(                                                           \
+		DEFINE_BUF_POOL(audio_data_pool_hs_##i, EP_SIZE(dev##_HP, i)); \
+		DEFINE_AUDIO_DEV_DATA_BIDIR(dev, i, &audio_data_pool_hs_##i,   \
+					    EP_SIZE(dev##_MIC, i));            \
+		DECLARE_DESCRIPTOR_BIDIR(dev, i, 2);                           \
+		DEFINE_AUDIO_DESCRIPTOR_BIDIR(dev, i, dev##_ID(i));            \
+		DEFINE_AUDIO_DEVICE(dev, i);)
 
 UTIL_LISTIFY(HEADPHONES_DEVICE_COUNT, HEADPHONES_DEVICE, HP)
 UTIL_LISTIFY(MICROPHONE_DEVICE_COUNT, MICROPHONE_DEVICE, MIC)

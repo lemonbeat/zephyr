@@ -38,16 +38,15 @@ static struct net_buf frame_buf = {
 	.__buf = frame_buffer_data,
 };
 
-#define PKT_TITLE      "IEEE 802.15.4 packet content:"
-#define TX_PKT_TITLE   "> " PKT_TITLE
-#define RX_PKT_TITLE   "< " PKT_TITLE
+#define PKT_TITLE "IEEE 802.15.4 packet content:"
+#define TX_PKT_TITLE "> " PKT_TITLE
+#define RX_PKT_TITLE "< " PKT_TITLE
 
 #ifdef CONFIG_NET_DEBUG_L2_IEEE802154_DISPLAY_PACKET
 
 #include "net_private.h"
 
-static inline void pkt_hexdump(const char *title, struct net_pkt *pkt,
-			       bool in)
+static inline void pkt_hexdump(const char *title, struct net_pkt *pkt, bool in)
 {
 	if (IS_ENABLED(CONFIG_NET_DEBUG_L2_IEEE802154_DISPLAY_PACKET_RX) &&
 	    in) {
@@ -81,8 +80,8 @@ static inline void ieee802154_acknowledge(struct net_if *iface,
 	}
 
 	if (ieee802154_create_ack_frame(iface, pkt, mpdu->mhr.fs->sequence)) {
-		ieee802154_tx(iface, IEEE802154_TX_MODE_DIRECT,
-			      pkt, pkt->buffer);
+		ieee802154_tx(iface, IEEE802154_TX_MODE_DIRECT, pkt,
+			      pkt->buffer);
 	}
 
 	net_pkt_unref(pkt);
@@ -119,10 +118,9 @@ static inline void set_pkt_ll_addr(struct net_linkaddr *addr, bool comp,
 }
 
 #ifdef CONFIG_NET_6LO
-static inline
-enum net_verdict ieee802154_manage_recv_packet(struct net_if *iface,
-					       struct net_pkt *pkt,
-					       size_t hdr_len)
+static inline enum net_verdict
+ieee802154_manage_recv_packet(struct net_if *iface, struct net_pkt *pkt,
+			      size_t hdr_len)
 {
 	enum net_verdict verdict = NET_CONTINUE;
 	uint32_t src;
@@ -147,11 +145,13 @@ enum net_verdict ieee802154_manage_recv_packet(struct net_if *iface,
 	 * will then be wrong and must be updated according to the new fragment.
 	 */
 	src = net_pkt_lladdr_src(pkt)->addr ?
-		net_pkt_lladdr_src(pkt)->addr -
-		(net_pkt_data(pkt) - hdr_len) : 0;
+			    net_pkt_lladdr_src(pkt)->addr -
+			      (net_pkt_data(pkt) - hdr_len) :
+			    0;
 	dst = net_pkt_lladdr_dst(pkt)->addr ?
-		net_pkt_lladdr_dst(pkt)->addr -
-		(net_pkt_data(pkt) - hdr_len) : 0;
+			    net_pkt_lladdr_dst(pkt)->addr -
+			      (net_pkt_data(pkt) - hdr_len) :
+			    0;
 
 #ifdef CONFIG_NET_L2_IEEE802154_FRAGMENT
 	verdict = ieee802154_reassemble(pkt);
@@ -165,10 +165,10 @@ enum net_verdict ieee802154_manage_recv_packet(struct net_if *iface,
 		goto out;
 	}
 #endif
-	net_pkt_lladdr_src(pkt)->addr = src ?
-		(net_pkt_data(pkt) - hdr_len) + src : NULL;
-	net_pkt_lladdr_dst(pkt)->addr = dst ?
-		(net_pkt_data(pkt) - hdr_len) + dst : NULL;
+	net_pkt_lladdr_src(pkt)->addr =
+		src ? (net_pkt_data(pkt) - hdr_len) + src : NULL;
+	net_pkt_lladdr_dst(pkt)->addr =
+		dst ? (net_pkt_data(pkt) - hdr_len) + dst : NULL;
 
 	pkt_hexdump(RX_PKT_TITLE, pkt, true);
 out:
@@ -184,8 +184,8 @@ static enum net_verdict ieee802154_recv(struct net_if *iface,
 	struct ieee802154_mpdu mpdu;
 	size_t hdr_len;
 
-	if (!ieee802154_validate_frame(net_pkt_data(pkt),
-				       net_pkt_get_len(pkt), &mpdu)) {
+	if (!ieee802154_validate_frame(net_pkt_data(pkt), net_pkt_get_len(pkt),
+				       &mpdu)) {
 		return NET_DROP;
 	}
 
@@ -222,7 +222,6 @@ static enum net_verdict ieee802154_recv(struct net_if *iface,
 	net_buf_pull(pkt->buffer, hdr_len);
 
 	return ieee802154_manage_recv_packet(iface, pkt, hdr_len);
-
 }
 
 static int ieee802154_send(struct net_if *iface, struct net_pkt *pkt)
@@ -238,8 +237,8 @@ static int ieee802154_send(struct net_if *iface, struct net_pkt *pkt)
 		return -EINVAL;
 	}
 
-	ll_hdr_size = ieee802154_compute_header_size(iface,
-						     &NET_IPV6_HDR(pkt)->dst);
+	ll_hdr_size =
+		ieee802154_compute_header_size(iface, &NET_IPV6_HDR(pkt)->dst);
 
 	/* len will hold the hdr size difference on success */
 	len = net_6lo_compress(pkt, true);
@@ -263,8 +262,8 @@ static int ieee802154_send(struct net_if *iface, struct net_pkt *pkt)
 			ieee802154_fragment(&f_ctx, &frame_buf, true);
 			buf = f_ctx.buf;
 		} else {
-			memcpy(frame_buf.data + frame_buf.len,
-			       buf->data, buf->len);
+			memcpy(frame_buf.data + frame_buf.len, buf->data,
+			       buf->len);
 			net_buf_add(&frame_buf, buf->len);
 			buf = buf->frags;
 		}
@@ -276,7 +275,7 @@ static int ieee802154_send(struct net_if *iface, struct net_pkt *pkt)
 
 		if (IS_ENABLED(CONFIG_NET_L2_IEEE802154_RADIO_CSMA_CA) &&
 		    ieee802154_get_hw_capabilities(iface) &
-		    IEEE802154_HW_CSMA) {
+			    IEEE802154_HW_CSMA) {
 			ret = ieee802154_tx(iface, IEEE802154_TX_MODE_CSMA_CA,
 					    pkt, &frame_buf);
 		} else {
@@ -322,9 +321,8 @@ enum net_l2_flags ieee802154_flags(struct net_if *iface)
 	return ctx->flags;
 }
 
-NET_L2_INIT(IEEE802154_L2,
-	    ieee802154_recv, ieee802154_send,
-	    ieee802154_enable, ieee802154_flags);
+NET_L2_INIT(IEEE802154_L2, ieee802154_recv, ieee802154_send, ieee802154_enable,
+	    ieee802154_flags);
 
 void ieee802154_init(struct net_if *iface)
 {

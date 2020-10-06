@@ -26,14 +26,14 @@ uint16_t osdp_compute_crc16(const uint8_t *buf, size_t len)
 
 int64_t osdp_millis_now(void)
 {
-	return (int64_t) k_uptime_get();
+	return (int64_t)k_uptime_get();
 }
 
 int64_t osdp_millis_since(int64_t last)
 {
 	int64_t tmp = last;
 
-	return (int64_t) k_uptime_delta(&tmp);
+	return (int64_t)k_uptime_delta(&tmp);
 }
 
 struct osdp_cmd *osdp_cmd_alloc(struct osdp_pd *pd)

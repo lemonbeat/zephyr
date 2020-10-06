@@ -45,12 +45,10 @@ void test_irq_offload(void)
 
 	key1 = arch_irq_lock();
 	zassert_true(arch_irq_unlocked(key1),
-		     "IRQs should have been unlocked, but key is 0x%x\n",
-		     key1);
+		     "IRQs should have been unlocked, but key is 0x%x\n", key1);
 	key2 = arch_irq_lock();
 	zassert_false(arch_irq_unlocked(key2),
-		      "IRQs should have been locked, but key is 0x%x\n",
-		      key2);
+		      "IRQs should have been locked, but key is 0x%x\n", key2);
 	arch_irq_unlock(key2);
 	arch_irq_unlock(key1);
 

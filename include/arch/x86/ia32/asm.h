@@ -18,11 +18,11 @@
 GTEXT(z_x86_trampoline_to_user)
 GTEXT(z_x86_trampoline_to_kernel)
 
-#define KPTI_IRET	jmp z_x86_trampoline_to_user
-#define KPTI_IRET_USER	jmp z_x86_trampoline_to_user_always
+#define KPTI_IRET jmp z_x86_trampoline_to_user
+#define KPTI_IRET_USER jmp z_x86_trampoline_to_user_always
 #else
-#define KPTI_IRET	iret
-#define KPTI_IRET_USER	iret
+#define KPTI_IRET iret
+#define KPTI_IRET_USER iret
 #endif /* CONFIG_X86_KPTI */
 
 #endif /* _ASMLANGUAGE */

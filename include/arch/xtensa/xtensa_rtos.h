@@ -25,14 +25,13 @@
 #define ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_RTOS_H_
 
 #ifdef __ASSEMBLER__
-#include    <xtensa/coreasm.h>
+#include <xtensa/coreasm.h>
 #else
-#include    <xtensa/config/core.h>
+#include <xtensa/config/core.h>
 #endif
 
-#include    <xtensa/corebits.h>
-#include    <xtensa/config/system.h>
-
+#include <xtensa/corebits.h>
+#include <xtensa/config/system.h>
 
 /*
  * Convert Zephyr definitions to XTENSA definitions.
@@ -41,36 +40,35 @@
 #undef XT_SIMULATOR
 #undef XT_BOARD
 #ifdef CONFIG_SIMULATOR_XTENSA
-  #define XT_SIMULATOR 1
+#define XT_SIMULATOR 1
 #else
-  #define XT_BOARD 1
+#define XT_BOARD 1
 #endif
 
-#undef  XT_CLOCK_FREQ
+#undef XT_CLOCK_FREQ
 #define XT_CLOCK_FREQ DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency)
 
 #ifndef XT_TIMER_INDEX
-  #if defined configXT_TIMER_INDEX
-    /* Index of hardware timer to be used */
-    #define XT_TIMER_INDEX           configXT_TIMER_INDEX
-  #endif
+#if defined configXT_TIMER_INDEX
+/* Index of hardware timer to be used */
+#define XT_TIMER_INDEX configXT_TIMER_INDEX
+#endif
 #endif
 
 #ifndef XT_INTEXC_HOOKS
-  #if configXT_INTEXC_HOOKS
-    #define XT_INTEXC_HOOKS          1  /* Enables exception hooks */
-  #endif
+#if configXT_INTEXC_HOOKS
+#define XT_INTEXC_HOOKS 1 /* Enables exception hooks */
+#endif
 #endif
 
 #if (!XT_SIMULATOR) && (!XT_BOARD)
-  #error Either XT_SIMULATOR or XT_BOARD must be defined.
+#error Either XT_SIMULATOR or XT_BOARD must be defined.
 #endif
-
 
 /*
  * Name of RTOS (for messages).
  */
-#define XT_RTOS_NAME    Zephyr
+#define XT_RTOS_NAME Zephyr
 
 /*
  * Define for enabling RTOS specific code. Enable only one of below lines.
@@ -104,7 +102,7 @@
  * RTOS port can call0 _xt_context_save to save the rest of the context.
  * May only be called from assembly code by the 'call0' instruction.
  */
-#define XT_RTOS_INT_ENTER   _zxt_int_enter
+#define XT_RTOS_INT_ENTER _zxt_int_enter
 
 /*
  * Inform RTOS of completion of an interrupt handler, and give control to
@@ -116,7 +114,7 @@
  * dispatcher. This function does not return to the place it was called from.
  * May only be called from assembly code by the 'call0' instruction.
  */
-#define XT_RTOS_INT_EXIT    _zxt_int_exit
+#define XT_RTOS_INT_EXIT _zxt_int_exit
 
 /*
  * Inform RTOS of the occurrence of a tick timer interrupt.
@@ -124,13 +122,13 @@
  * May be coded in or called from C or assembly, per ABI conventions.
  * RTOS may optionally define XT_TICK_PER_SEC in its own way (eg. macro).
  */
-#define XT_RTOS_TIMER_INT   _zxt_timer_int
+#define XT_RTOS_TIMER_INT _zxt_timer_int
 
 #if CONFIG_TICKLESS_KERNEL
-#define XT_TICK_PER_SEC		1000
+#define XT_TICK_PER_SEC 1000
 #else
-#define XT_TICK_PER_SEC		CONFIG_SYS_CLOCK_TICKS_PER_SEC
-#endif	/* CONFIG_TICKLESS_KERNEL */
+#define XT_TICK_PER_SEC CONFIG_SYS_CLOCK_TICKS_PER_SEC
+#endif /* CONFIG_TICKLESS_KERNEL */
 
 /*
  * Return in a15 the base address of the co-processor state save area for the
@@ -144,8 +142,7 @@
  * The implementation may use only a2-4, a15 (all other regs must be
  * preserved).
  */
-#define XT_RTOS_CP_STATE    _zxt_task_coproc_state
-
+#define XT_RTOS_CP_STATE _zxt_task_coproc_state
 
 /*
  * HOOKS TO DYNAMICALLY INSTALL INTERRUPT AND EXCEPTION HANDLERS PER LEVEL.
@@ -179,13 +176,12 @@
  * To enable interrupt/exception hooks, compile the RTOS with
  * '-DXT_INTEXC_HOOKS'.
  */
-#define XT_INTEXC_HOOK_NUM  (1 + XCHAL_NUM_INTLEVELS + XCHAL_HAVE_NMI)
+#define XT_INTEXC_HOOK_NUM (1 + XCHAL_NUM_INTLEVELS + XCHAL_HAVE_NMI)
 
 #ifndef __ASSEMBLER__
 typedef unsigned int (*XT_INTEXC_HOOK)(unsigned int cause);
-extern  volatile XT_INTEXC_HOOK _xt_intexc_hooks[XT_INTEXC_HOOK_NUM];
+extern volatile XT_INTEXC_HOOK _xt_intexc_hooks[XT_INTEXC_HOOK_NUM];
 #endif
-
 
 /*
  * CONVENIENCE INCLUSIONS.
@@ -195,10 +191,10 @@ extern  volatile XT_INTEXC_HOOK _xt_intexc_hooks[XT_INTEXC_HOOK_NUM];
  * definitions above.
  */
 
-#include    "xtensa_context.h"
+#include "xtensa_context.h"
 
 #ifdef XT_RTOS_TIMER_INT
-#include    "xtensa_timer.h"
+#include "xtensa_timer.h"
 #endif
 
 #endif /* ZEPHYR_ARCH_XTENSA_INCLUDE_XTENSA_RTOS_H_ */

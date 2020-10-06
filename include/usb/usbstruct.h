@@ -36,42 +36,42 @@
 #ifndef ZEPHYR_INCLUDE_USB_USBSTRUCT_H_
 #define ZEPHYR_INCLUDE_USB_USBSTRUCT_H_
 
-#define REQTYPE_GET_DIR(x)          (((x)>>7)&0x01)
-#define REQTYPE_GET_TYPE(x)         (((x)>>5)&0x03U)
-#define REQTYPE_GET_RECIP(x)        ((x)&0x1F)
+#define REQTYPE_GET_DIR(x) (((x) >> 7) & 0x01)
+#define REQTYPE_GET_TYPE(x) (((x) >> 5) & 0x03U)
+#define REQTYPE_GET_RECIP(x) ((x)&0x1F)
 
-#define REQTYPE_DIR_TO_DEVICE       0
-#define REQTYPE_DIR_TO_HOST         1
+#define REQTYPE_DIR_TO_DEVICE 0
+#define REQTYPE_DIR_TO_HOST 1
 
-#define REQTYPE_TYPE_STANDARD       0
-#define REQTYPE_TYPE_CLASS          1
-#define REQTYPE_TYPE_VENDOR         2
-#define REQTYPE_TYPE_RESERVED       3
+#define REQTYPE_TYPE_STANDARD 0
+#define REQTYPE_TYPE_CLASS 1
+#define REQTYPE_TYPE_VENDOR 2
+#define REQTYPE_TYPE_RESERVED 3
 
-#define REQTYPE_RECIP_DEVICE        0
-#define REQTYPE_RECIP_INTERFACE     1
-#define REQTYPE_RECIP_ENDPOINT      2
-#define REQTYPE_RECIP_OTHER         3
+#define REQTYPE_RECIP_DEVICE 0
+#define REQTYPE_RECIP_INTERFACE 1
+#define REQTYPE_RECIP_ENDPOINT 2
+#define REQTYPE_RECIP_OTHER 3
 
 /* standard requests */
-#define REQ_GET_STATUS              0x00
-#define REQ_CLEAR_FEATURE           0x01
-#define REQ_SET_FEATURE             0x03
-#define REQ_SET_ADDRESS             0x05
-#define REQ_GET_DESCRIPTOR          0x06
-#define REQ_SET_DESCRIPTOR          0x07
-#define REQ_GET_CONFIGURATION       0x08
-#define REQ_SET_CONFIGURATION       0x09
-#define REQ_GET_INTERFACE           0x0A
-#define REQ_SET_INTERFACE           0x0B
-#define REQ_SYNCH_FRAME             0x0C
+#define REQ_GET_STATUS 0x00
+#define REQ_CLEAR_FEATURE 0x01
+#define REQ_SET_FEATURE 0x03
+#define REQ_SET_ADDRESS 0x05
+#define REQ_GET_DESCRIPTOR 0x06
+#define REQ_SET_DESCRIPTOR 0x07
+#define REQ_GET_CONFIGURATION 0x08
+#define REQ_SET_CONFIGURATION 0x09
+#define REQ_GET_INTERFACE 0x0A
+#define REQ_SET_INTERFACE 0x0B
+#define REQ_SYNCH_FRAME 0x0C
 
 /* feature selectors */
-#define FEA_ENDPOINT_HALT           0x00
-#define FEA_REMOTE_WAKEUP           0x01
-#define FEA_TEST_MODE               0x02
+#define FEA_ENDPOINT_HALT 0x00
+#define FEA_REMOTE_WAKEUP 0x01
+#define FEA_TEST_MODE 0x02
 
-#define DEVICE_STATUS_SELF_POWERED  0x01
+#define DEVICE_STATUS_SELF_POWERED 0x01
 #define DEVICE_STATUS_REMOTE_WAKEUP 0x02
 
 /*
@@ -80,11 +80,11 @@
 
 /** USB descriptor header */
 struct usb_desc_header {
-	uint8_t bLength;               /**< descriptor length */
-	uint8_t bDescriptorType;       /**< descriptor type */
+	uint8_t bLength; /**< descriptor length */
+	uint8_t bDescriptorType; /**< descriptor type */
 };
 
-#define GET_DESC_TYPE(x)            (((x)>>8)&0xFFU)
-#define GET_DESC_INDEX(x)           ((x)&0xFFU)
+#define GET_DESC_TYPE(x) (((x) >> 8) & 0xFFU)
+#define GET_DESC_INDEX(x) ((x)&0xFFU)
 
 #endif /* ZEPHYR_INCLUDE_USB_USBSTRUCT_H_ */

@@ -13,8 +13,7 @@
 #include <drivers/rtc/maxim_ds3231.h>
 
 /* Format times as: YYYY-MM-DD HH:MM:SS DOW DOY */
-static const char *format_time(time_t time,
-			       long nsec)
+static const char *format_time(time_t time, long nsec)
 {
 	static char buf[64];
 	char *bp = buf;
@@ -30,19 +29,15 @@ static const char *format_time(time_t time,
 	return buf;
 }
 
-static void sec_counter_callback(const struct device *dev,
-				 uint8_t id,
-				 uint32_t ticks,
-				 void *ud)
+static void sec_counter_callback(const struct device *dev, uint8_t id,
+				 uint32_t ticks, void *ud)
 {
 	printk("Counter callback at %u ms, id %d, ticks %u, ud %p\n",
 	       k_uptime_get_32(), id, ticks, ud);
 }
 
-static void sec_alarm_handler(const struct device *dev,
-			      uint8_t id,
-			      uint32_t syncclock,
-			      void *ud)
+static void sec_alarm_handler(const struct device *dev, uint8_t id,
+			      uint32_t syncclock, void *ud)
 {
 	uint32_t now = maxim_ds3231_read_syncclock(dev);
 	struct counter_alarm_cfg alarm = {
@@ -58,14 +53,12 @@ static void sec_alarm_handler(const struct device *dev,
 	       k_uptime_get_32(), ud, now - syncclock, rc);
 }
 
-
 /** Calculate the normalized result of a - b.
  *
  * For both inputs and outputs tv_nsec must be in the range [0,
  * NSEC_PER_SEC).  tv_sec may be negative, zero, or positive.
  */
-void timespec_subtract(struct timespec *amb,
-		       const struct timespec *a,
+void timespec_subtract(struct timespec *amb, const struct timespec *a,
 		       const struct timespec *b)
 {
 	if (a->tv_nsec >= b->tv_nsec) {
@@ -82,8 +75,7 @@ void timespec_subtract(struct timespec *amb,
  * For both inputs and outputs tv_nsec must be in the range [0,
  * NSEC_PER_SEC).  tv_sec may be negative, zero, or positive.
  */
-void timespec_add(struct timespec *apb,
-		  const struct timespec *a,
+void timespec_add(struct timespec *apb, const struct timespec *a,
 		  const struct timespec *b)
 {
 	apb->tv_nsec = a->tv_nsec + b->tv_nsec;
@@ -94,10 +86,8 @@ void timespec_add(struct timespec *apb,
 	}
 }
 
-static void min_alarm_handler(const struct device *dev,
-			      uint8_t id,
-			      uint32_t syncclock,
-			      void *ud)
+static void min_alarm_handler(const struct device *dev, uint8_t id,
+			      uint32_t syncclock, void *ud)
 {
 	uint32_t time = 0;
 	struct maxim_ds3231_syncpoint sp = { 0 };
@@ -124,13 +114,12 @@ static void min_alarm_handler(const struct device *dev,
 	struct timespec adj;
 
 	adj.tv_sec = offset_syncclock / syncclock_Hz;
-	adj.tv_nsec = (offset_syncclock % syncclock_Hz)
-		* (uint64_t)NSEC_PER_SEC / syncclock_Hz;
+	adj.tv_nsec = (offset_syncclock % syncclock_Hz) *
+		      (uint64_t)NSEC_PER_SEC / syncclock_Hz;
 
-	int32_t err_ppm = (int32_t)(offset_syncclock
-				- offset_s * syncclock_Hz)
-			* (int64_t)1000000
-			/ (int32_t)syncclock_Hz / (int32_t)offset_s;
+	int32_t err_ppm =
+		(int32_t)(offset_syncclock - offset_s * syncclock_Hz) *
+		(int64_t)1000000 / (int32_t)syncclock_Hz / (int32_t)offset_s;
 	struct timespec *ts = &sp.rtc;
 
 	ts->tv_sec += adj.tv_sec;
@@ -141,9 +130,8 @@ static void min_alarm_handler(const struct device *dev,
 	}
 
 	printk("%s: adj %d.%09lu, uptime %u:%02u:%02u.%03u, clk err %d ppm\n",
-	       format_time(time, -1),
-	       (uint32_t)(ts->tv_sec - time), ts->tv_nsec,
-	       hr, mn, se, us, err_ppm);
+	       format_time(time, -1), (uint32_t)(ts->tv_sec - time),
+	       ts->tv_nsec, hr, mn, se, us, err_ppm);
 }
 
 struct maxim_ds3231_alarm sec_alarm;
@@ -160,8 +148,7 @@ static void show_counter(const struct device *ds3231)
 	printk("\t%u channels\n", counter_get_num_of_channels(ds3231));
 	printk("\t%u Hz\n", counter_get_frequency(ds3231));
 
-	printk("Top counter value: %u (%08x)\n",
-	       counter_get_top_value(ds3231),
+	printk("Top counter value: %u (%08x)\n", counter_get_top_value(ds3231),
 	       counter_get_top_value(ds3231));
 
 	(void)counter_get_value(ds3231, &now);
@@ -198,9 +185,8 @@ static void set_aligned_clock(const struct device *ds3231)
 
 	struct k_poll_signal ss;
 	struct sys_notify notify;
-	struct k_poll_event sevt = K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
-							    K_POLL_MODE_NOTIFY_ONLY,
-							    &ss);
+	struct k_poll_event sevt = K_POLL_EVENT_INITIALIZER(
+		K_POLL_TYPE_SIGNAL, K_POLL_MODE_NOTIFY_ONLY, &ss);
 
 	k_poll_signal_init(&ss);
 	sys_notify_init_signal(&notify, &ss);
@@ -209,8 +195,8 @@ static void set_aligned_clock(const struct device *ds3231)
 
 	rc = maxim_ds3231_set(ds3231, &sp, &notify);
 
-	printk("\nSet %s at %u ms past: %d\n", format_time(sp.rtc.tv_sec, sp.rtc.tv_nsec),
-	       syncclock, rc);
+	printk("\nSet %s at %u ms past: %d\n",
+	       format_time(sp.rtc.tv_sec, sp.rtc.tv_nsec), syncclock, rc);
 
 	/* Wait for the set to complete */
 	rc = k_poll(&sevt, 1, K_FOREVER);
@@ -222,9 +208,8 @@ static void set_aligned_clock(const struct device *ds3231)
 	printk("Synchronize final: %d %d in %u ms\n", rc, ss.result, t1 - t0);
 
 	rc = maxim_ds3231_get_syncpoint(ds3231, &sp);
-	printk("wrote sync %d: %u %u at %u\n", rc,
-	       (uint32_t)sp.rtc.tv_sec, (uint32_t)sp.rtc.tv_nsec,
-	       sp.syncclock);
+	printk("wrote sync %d: %u %u at %u\n", rc, (uint32_t)sp.rtc.tv_sec,
+	       (uint32_t)sp.rtc.tv_nsec, sp.syncclock);
 }
 
 void main(void)
@@ -266,9 +251,8 @@ void main(void)
 	struct k_poll_signal ss;
 	struct sys_notify notify;
 	struct maxim_ds3231_syncpoint sp = { 0 };
-	struct k_poll_event sevt = K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
-							    K_POLL_MODE_NOTIFY_ONLY,
-							    &ss);
+	struct k_poll_event sevt = K_POLL_EVENT_INITIALIZER(
+		K_POLL_TYPE_SIGNAL, K_POLL_MODE_NOTIFY_ONLY, &ss);
 
 	k_poll_signal_init(&ss);
 	sys_notify_init_signal(&notify, &ss);
@@ -282,14 +266,14 @@ void main(void)
 
 	uint32_t t1 = k_uptime_get_32();
 
-	k_sleep(K_MSEC(100));   /* wait for log messages */
+	k_sleep(K_MSEC(100)); /* wait for log messages */
 
-	printk("Synchronize complete in %u ms: %d %d\n", t1 - t0, rc, ss.result);
+	printk("Synchronize complete in %u ms: %d %d\n", t1 - t0, rc,
+	       ss.result);
 
 	rc = maxim_ds3231_get_syncpoint(ds3231, &sp);
-	printk("\nread sync %d: %u %u at %u\n", rc,
-	       (uint32_t)sp.rtc.tv_sec, (uint32_t)sp.rtc.tv_nsec,
-	       sp.syncclock);
+	printk("\nread sync %d: %u %u at %u\n", rc, (uint32_t)sp.rtc.tv_sec,
+	       (uint32_t)sp.rtc.tv_nsec, sp.syncclock);
 
 	rc = maxim_ds3231_get_alarm(ds3231, 0, &sec_alarm);
 	printk("\nAlarm 1 flags %x at %u: %d\n", sec_alarm.flags,
@@ -303,8 +287,8 @@ void main(void)
 	 * alarm 10 s later.
 	 */
 	sec_alarm.time = sp.rtc.tv_sec + 5;
-	sec_alarm.flags = MAXIM_DS3231_ALARM_FLAGS_AUTODISABLE
-			  | MAXIM_DS3231_ALARM_FLAGS_DOW;
+	sec_alarm.flags = MAXIM_DS3231_ALARM_FLAGS_AUTODISABLE |
+			  MAXIM_DS3231_ALARM_FLAGS_DOW;
 	sec_alarm.handler = sec_alarm_handler;
 	sec_alarm.user_data = &sec_alarm;
 
@@ -312,11 +296,10 @@ void main(void)
 
 	/* Repeating callback at rollover to a new minute. */
 	min_alarm.time = sec_alarm.time;
-	min_alarm.flags = 0
-			  | MAXIM_DS3231_ALARM_FLAGS_IGNDA
-			  | MAXIM_DS3231_ALARM_FLAGS_IGNHR
-			  | MAXIM_DS3231_ALARM_FLAGS_IGNMN
-			  | MAXIM_DS3231_ALARM_FLAGS_IGNSE;
+	min_alarm.flags = 0 | MAXIM_DS3231_ALARM_FLAGS_IGNDA |
+			  MAXIM_DS3231_ALARM_FLAGS_IGNHR |
+			  MAXIM_DS3231_ALARM_FLAGS_IGNMN |
+			  MAXIM_DS3231_ALARM_FLAGS_IGNSE;
 	min_alarm.handler = min_alarm_handler;
 
 	rc = maxim_ds3231_set_alarm(ds3231, 0, &sec_alarm);
@@ -332,10 +315,12 @@ void main(void)
 	       maxim_ds3231_get_alarm(ds3231, 1, &min_alarm));
 	if (rc >= 0) {
 		printk("Sec alarm flags %x at %u ~ %s\n", sec_alarm.flags,
-		       (uint32_t)sec_alarm.time, format_time(sec_alarm.time, -1));
+		       (uint32_t)sec_alarm.time,
+		       format_time(sec_alarm.time, -1));
 
 		printk("Min alarm flags %x at %u ~ %s\n", min_alarm.flags,
-		       (uint32_t)min_alarm.time, format_time(min_alarm.time, -1));
+		       (uint32_t)min_alarm.time,
+		       format_time(min_alarm.time, -1));
 	}
 
 	k_sleep(K_FOREVER);

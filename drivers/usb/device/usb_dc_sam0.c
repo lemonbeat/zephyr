@@ -39,14 +39,10 @@ enum usb_sam0_pcksize_size {
 };
 
 static const uint16_t usb_sam0_pcksize_bytes[] = {
-	[USB_SAM0_PCKSIZE_SIZE_8] = 8,
-	[USB_SAM0_PCKSIZE_SIZE_16] = 16,
-	[USB_SAM0_PCKSIZE_SIZE_32] = 32,
-	[USB_SAM0_PCKSIZE_SIZE_64] = 64,
-	[USB_SAM0_PCKSIZE_SIZE_128] = 128,
-	[USB_SAM0_PCKSIZE_SIZE_256] = 256,
-	[USB_SAM0_PCKSIZE_SIZE_512] = 512,
-	[USB_SAM0_PCKSIZE_SIZE_1023] = 1023,
+	[USB_SAM0_PCKSIZE_SIZE_8] = 8,	   [USB_SAM0_PCKSIZE_SIZE_16] = 16,
+	[USB_SAM0_PCKSIZE_SIZE_32] = 32,   [USB_SAM0_PCKSIZE_SIZE_64] = 64,
+	[USB_SAM0_PCKSIZE_SIZE_128] = 128, [USB_SAM0_PCKSIZE_SIZE_256] = 256,
+	[USB_SAM0_PCKSIZE_SIZE_512] = 512, [USB_SAM0_PCKSIZE_SIZE_1023] = 1023,
 };
 
 BUILD_ASSERT(ARRAY_SIZE(usb_sam0_pcksize_bytes) == 8);
@@ -188,10 +184,10 @@ static void usb_sam0_load_padcal(void)
 #ifdef USB_FUSES_TRIM_ADDR
 	pad_trim = *(uint32_t *)USB_FUSES_TRIM_ADDR;
 #else
-	pad_trim = (*((uint32_t *)(NVMCTRL_OTP4) +
-		      (NVM_USB_PAD_TRIM_POS / 32)) >>
-		    (NVM_USB_PAD_TRIM_POS % 32)) &
-		   ((1 << NVM_USB_PAD_TRIM_SIZE) - 1);
+	pad_trim =
+		(*((uint32_t *)(NVMCTRL_OTP4) + (NVM_USB_PAD_TRIM_POS / 32)) >>
+		 (NVM_USB_PAD_TRIM_POS % 32)) &
+		((1 << NVM_USB_PAD_TRIM_SIZE) - 1);
 
 	if (pad_trim == 0x7) {
 		pad_trim = 3U;
@@ -201,12 +197,12 @@ static void usb_sam0_load_padcal(void)
 	regs->PADCAL.bit.TRIM = pad_trim;
 }
 
-#define SAM0_USB_IRQ_CONNECT(n) 				\
-	do {							\
-	IRQ_CONNECT(DT_INST_IRQ_BY_IDX(0, n, irq),		\
-		    DT_INST_IRQ_BY_IDX(0, n, priority),		\
-		    usb_sam0_isr, 0, 0);			\
-	irq_enable(DT_INST_IRQ_BY_IDX(0, n, irq));		\
+#define SAM0_USB_IRQ_CONNECT(n)                                               \
+	do {                                                                  \
+		IRQ_CONNECT(DT_INST_IRQ_BY_IDX(0, n, irq),                    \
+			    DT_INST_IRQ_BY_IDX(0, n, priority), usb_sam0_isr, \
+			    0, 0);                                            \
+		irq_enable(DT_INST_IRQ_BY_IDX(0, n, irq));                    \
 	} while (0)
 
 /* Attach by initializing the device */
@@ -220,8 +216,8 @@ int usb_dc_attach(void)
 	MCLK->APBBMASK.bit.USB_ = 1;
 
 	/* Enable the GCLK - use 48 MHz source */
-	GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_GEN(2)
-				       | GCLK_PCHCTRL_CHEN;
+	GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_GEN(2) |
+					 GCLK_PCHCTRL_CHEN;
 
 	while (GCLK->SYNCBUSY.reg) {
 	}
@@ -322,7 +318,7 @@ void usb_dc_set_status_callback(const usb_dc_status_callback cb)
 	data->cb = cb;
 }
 
-int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data * const cfg)
+int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data *const cfg)
 {
 	uint8_t ep_idx = USB_EP_GET_IDX(cfg->ep_addr);
 
@@ -541,15 +537,16 @@ int usb_dc_ep_disable(uint8_t ep)
 		return -EINVAL;
 	}
 
-	endpoint->EPINTENCLR.reg = USB_DEVICE_EPINTENCLR_TRCPT0
-				 | USB_DEVICE_EPINTENCLR_TRCPT1
-				 | USB_DEVICE_EPINTENCLR_RXSTP;
+	endpoint->EPINTENCLR.reg = USB_DEVICE_EPINTENCLR_TRCPT0 |
+				   USB_DEVICE_EPINTENCLR_TRCPT1 |
+				   USB_DEVICE_EPINTENCLR_RXSTP;
 
 	return 0;
 }
 
 /* Write a single payload to the IN buffer on the endpoint */
-int usb_dc_ep_write(uint8_t ep, const uint8_t *buf, uint32_t len, uint32_t *ret_bytes)
+int usb_dc_ep_write(uint8_t ep, const uint8_t *buf, uint32_t len,
+		    uint32_t *ret_bytes)
 {
 	struct usb_sam0_data *data = usb_sam0_get_data();
 	UsbDevice *regs = &REGS->DEVICE;
@@ -557,8 +554,8 @@ int usb_dc_ep_write(uint8_t ep, const uint8_t *buf, uint32_t len, uint32_t *ret_
 	UsbDeviceEndpoint *endpoint = &regs->DeviceEndpoint[ep_idx];
 	UsbDeviceDescriptor *desc = &data->descriptors[ep_idx];
 	uint32_t addr = desc->DeviceDescBank[1].ADDR.reg;
-	uint32_t capacity = usb_sam0_pcksize_bytes[
-			desc->DeviceDescBank[1].PCKSIZE.bit.SIZE];
+	uint32_t capacity =
+		usb_sam0_pcksize_bytes[desc->DeviceDescBank[1].PCKSIZE.bit.SIZE];
 
 	if (ep_idx >= USB_NUM_ENDPOINTS) {
 		LOG_ERR("endpoint index/address out of range");
@@ -579,8 +576,8 @@ int usb_dc_ep_write(uint8_t ep, const uint8_t *buf, uint32_t len, uint32_t *ret_
 	memcpy((void *)addr, buf, len);
 	desc->DeviceDescBank[1].PCKSIZE.bit.MULTI_PACKET_SIZE = 0;
 	desc->DeviceDescBank[1].PCKSIZE.bit.BYTE_COUNT = len;
-	endpoint->EPINTFLAG.reg =
-		USB_DEVICE_EPINTFLAG_TRCPT1 | USB_DEVICE_EPINTFLAG_TRFAIL1;
+	endpoint->EPINTFLAG.reg = USB_DEVICE_EPINTFLAG_TRCPT1 |
+				  USB_DEVICE_EPINTFLAG_TRFAIL1;
 	endpoint->EPSTATUSSET.bit.BK1RDY = 1;
 
 	if (ret_bytes != NULL) {
@@ -649,7 +646,8 @@ int usb_dc_ep_read_ex(uint8_t ep, uint8_t *buf, uint32_t max_data_len,
 	return 0;
 }
 
-int usb_dc_ep_read(uint8_t ep, uint8_t *buf, uint32_t max_data_len, uint32_t *read_bytes)
+int usb_dc_ep_read(uint8_t ep, uint8_t *buf, uint32_t max_data_len,
+		   uint32_t *read_bytes)
 {
 	return usb_dc_ep_read_ex(ep, buf, max_data_len, read_bytes, false);
 }
@@ -714,15 +712,15 @@ int usb_dc_ep_mps(const uint8_t ep)
 			return 0;
 		}
 
-		return usb_sam0_pcksize_bytes[
-			desc->DeviceDescBank[1].PCKSIZE.bit.SIZE];
+		return usb_sam0_pcksize_bytes[desc->DeviceDescBank[1]
+						      .PCKSIZE.bit.SIZE];
 	} else {
 		/* if endpoint is not configured, this should return 0 */
 		if (endpoint->EPCFG.bit.EPTYPE0 == 0) {
 			return 0;
 		}
 
-		return usb_sam0_pcksize_bytes[
-			desc->DeviceDescBank[0].PCKSIZE.bit.SIZE];
+		return usb_sam0_pcksize_bytes[desc->DeviceDescBank[0]
+						      .PCKSIZE.bit.SIZE];
 	}
 }

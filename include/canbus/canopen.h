@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 /**
  * @defgroup CAN CAN BUS
  * @{
@@ -132,9 +131,9 @@ typedef void (*canopen_led_callback_t)(bool value, void *arg);
  * @param red_cb callback for changing state on the red LED indicator.
  * @param red_arg argument to pass to the red LED indicator callback.
  */
-void canopen_leds_init(CO_NMT_t *nmt,
-		       canopen_led_callback_t green_cb, void *green_arg,
-		       canopen_led_callback_t red_cb, void *red_arg);
+void canopen_leds_init(CO_NMT_t *nmt, canopen_led_callback_t green_cb,
+		       void *green_arg, canopen_led_callback_t red_cb,
+		       void *red_arg);
 
 /**
  * @brief Indicate CANopen program download in progress

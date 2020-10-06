@@ -18,30 +18,30 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #include "lwm2m_engine.h"
 
 /* Firmware resource IDs */
-#define FIRMWARE_PACKAGE_ID			0
-#define FIRMWARE_PACKAGE_URI_ID			1
-#define FIRMWARE_UPDATE_ID			2
-#define FIRMWARE_STATE_ID			3
-#define FIRMWARE_UPDATE_RESULT_ID		5
-#define FIRMWARE_PACKAGE_NAME_ID		6
-#define FIRMWARE_PACKAGE_VERSION_ID		7
-#define FIRMWARE_UPDATE_PROTO_SUPPORT_ID	8 /* TODO */
-#define FIRMWARE_UPDATE_DELIV_METHOD_ID		9
+#define FIRMWARE_PACKAGE_ID 0
+#define FIRMWARE_PACKAGE_URI_ID 1
+#define FIRMWARE_UPDATE_ID 2
+#define FIRMWARE_STATE_ID 3
+#define FIRMWARE_UPDATE_RESULT_ID 5
+#define FIRMWARE_PACKAGE_NAME_ID 6
+#define FIRMWARE_PACKAGE_VERSION_ID 7
+#define FIRMWARE_UPDATE_PROTO_SUPPORT_ID 8 /* TODO */
+#define FIRMWARE_UPDATE_DELIV_METHOD_ID 9
 
-#define FIRMWARE_MAX_ID				10
+#define FIRMWARE_MAX_ID 10
 
-#define DELIVERY_METHOD_PULL_ONLY		0
-#define DELIVERY_METHOD_PUSH_ONLY		1
-#define DELIVERY_METHOD_BOTH			2
+#define DELIVERY_METHOD_PULL_ONLY 0
+#define DELIVERY_METHOD_PUSH_ONLY 1
+#define DELIVERY_METHOD_BOTH 2
 
-#define PACKAGE_URI_LEN				255
+#define PACKAGE_URI_LEN 255
 
 /*
  * Calculate resource instances as follows:
  * start with FIRMWARE_MAX_ID
  * subtract EXEC resources (1)
  */
-#define RESOURCE_INSTANCE_COUNT	(FIRMWARE_MAX_ID - 1)
+#define RESOURCE_INSTANCE_COUNT (FIRMWARE_MAX_ID - 1)
 
 /* resource state variables */
 static uint8_t update_state;
@@ -109,8 +109,8 @@ void lwm2m_firmware_set_update_state(uint8_t state)
 	}
 
 	if (error) {
-		LOG_ERR("Invalid state transition: %u -> %u",
-			update_state, state);
+		LOG_ERR("Invalid state transition: %u -> %u", update_state,
+			state);
 	}
 
 	update_state = state;
@@ -178,8 +178,8 @@ void lwm2m_firmware_set_update_result(uint8_t result)
 	}
 
 	if (error) {
-		LOG_ERR("Unexpected result(%u) set while state is %u",
-			result, state);
+		LOG_ERR("Unexpected result(%u) set while state is %u", result,
+			state);
 	}
 
 	update_result = result;
@@ -188,8 +188,9 @@ void lwm2m_firmware_set_update_result(uint8_t result)
 }
 
 static int package_write_cb(uint16_t obj_inst_id, uint16_t res_id,
-			    uint16_t res_inst_id, uint8_t *data, uint16_t data_len,
-			    bool last_block, size_t total_size)
+			    uint16_t res_inst_id, uint8_t *data,
+			    uint16_t data_len, bool last_block,
+			    size_t total_size)
 {
 	uint8_t state;
 	int ret;
@@ -211,9 +212,9 @@ static int package_write_cb(uint16_t obj_inst_id, uint16_t res_id,
 		return -EPERM;
 	}
 
-	ret = write_cb ? write_cb(obj_inst_id, res_id, res_inst_id,
-				  data, data_len,
-				  last_block, total_size) : 0;
+	ret = write_cb ? write_cb(obj_inst_id, res_id, res_inst_id, data,
+				  data_len, last_block, total_size) :
+			       0;
 	if (ret >= 0) {
 		if (last_block) {
 			lwm2m_firmware_set_update_state(STATE_DOWNLOADED);
@@ -237,8 +238,9 @@ static int package_write_cb(uint16_t obj_inst_id, uint16_t res_id,
 }
 
 static int package_uri_write_cb(uint16_t obj_inst_id, uint16_t res_id,
-				uint16_t res_inst_id, uint8_t *data, uint16_t data_len,
-				bool last_block, size_t total_size)
+				uint16_t res_inst_id, uint8_t *data,
+				uint16_t data_len, bool last_block,
+				size_t total_size)
 {
 	LOG_DBG("PACKAGE_URI WRITE: %s", log_strdup(package_uri));
 
@@ -303,7 +305,7 @@ static int firmware_update_cb(uint16_t obj_inst_id)
 			LOG_ERR("Failed to update firmware: %d", ret);
 			lwm2m_firmware_set_update_result(
 				ret == -EINVAL ? RESULT_INTEGRITY_FAILED :
-						 RESULT_UPDATE_FAILED);
+						       RESULT_UPDATE_FAILED);
 			return 0;
 		}
 	}
@@ -321,11 +323,11 @@ static struct lwm2m_engine_obj_inst *firmware_create(uint16_t obj_inst_id)
 	INIT_OBJ_RES_OPT(FIRMWARE_PACKAGE_ID, res, i, res_inst, j, 1, true,
 			 NULL, NULL, package_write_cb, NULL);
 	INIT_OBJ_RES(FIRMWARE_PACKAGE_URI_ID, res, i, res_inst, j, 1, true,
-		     package_uri, PACKAGE_URI_LEN,
-		     NULL, NULL, package_uri_write_cb, NULL);
+		     package_uri, PACKAGE_URI_LEN, NULL, NULL,
+		     package_uri_write_cb, NULL);
 	INIT_OBJ_RES_EXECUTE(FIRMWARE_UPDATE_ID, res, i, firmware_update_cb);
-	INIT_OBJ_RES_DATA(FIRMWARE_STATE_ID, res, i, res_inst, j,
-			  &update_state, sizeof(update_state));
+	INIT_OBJ_RES_DATA(FIRMWARE_STATE_ID, res, i, res_inst, j, &update_state,
+			  sizeof(update_state));
 	INIT_OBJ_RES_DATA(FIRMWARE_UPDATE_RESULT_ID, res, i, res_inst, j,
 			  &update_result, sizeof(update_result));
 	INIT_OBJ_RES_DATA(FIRMWARE_UPDATE_DELIV_METHOD_ID, res, i, res_inst, j,

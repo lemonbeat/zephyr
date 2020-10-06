@@ -27,8 +27,7 @@ LOG_MODULE_REGISTER(net_ipv4, CONFIG_NET_IPV4_LOG_LEVEL);
 /* Timeout for various buffer allocations in this file. */
 #define NET_BUF_TIMEOUT K_MSEC(50)
 
-int net_ipv4_create(struct net_pkt *pkt,
-		    const struct in_addr *src,
+int net_ipv4_create(struct net_pkt *pkt, const struct in_addr *src,
 		    const struct in_addr *dst)
 {
 	NET_PKT_DATA_ACCESS_CONTIGUOUS_DEFINE(ipv4_access, struct net_ipv4_hdr);
@@ -39,21 +38,21 @@ int net_ipv4_create(struct net_pkt *pkt,
 		return -ENOBUFS;
 	}
 
-	ipv4_hdr->vhl       = 0x45;
-	ipv4_hdr->tos       = 0x00;
-	ipv4_hdr->len       = 0U;
-	ipv4_hdr->id[0]     = 0U;
-	ipv4_hdr->id[1]     = 0U;
+	ipv4_hdr->vhl = 0x45;
+	ipv4_hdr->tos = 0x00;
+	ipv4_hdr->len = 0U;
+	ipv4_hdr->id[0] = 0U;
+	ipv4_hdr->id[1] = 0U;
 	ipv4_hdr->offset[0] = 0U;
 	ipv4_hdr->offset[1] = 0U;
 
-	ipv4_hdr->ttl       = net_pkt_ipv4_ttl(pkt);
+	ipv4_hdr->ttl = net_pkt_ipv4_ttl(pkt);
 	if (ipv4_hdr->ttl == 0U) {
 		ipv4_hdr->ttl = net_if_ipv4_get_ttl(net_pkt_iface(pkt));
 	}
 
-	ipv4_hdr->proto     = 0U;
-	ipv4_hdr->chksum    = 0U;
+	ipv4_hdr->proto = 0U;
+	ipv4_hdr->chksum = 0U;
 
 	net_ipaddr_copy(&ipv4_hdr->dst, dst);
 	net_ipaddr_copy(&ipv4_hdr->src, src);
@@ -77,13 +76,14 @@ int net_ipv4_finalize(struct net_pkt *pkt, uint8_t next_header_proto)
 
 	if (IS_ENABLED(CONFIG_NET_IPV4_HDR_OPTIONS)) {
 		if (net_pkt_ipv4_opts_len(pkt)) {
-			ipv4_hdr->vhl = 0x40 | (0x0F &
-					((net_pkt_ip_hdr_len(pkt) +
-					  net_pkt_ipv4_opts_len(pkt)) / 4U));
+			ipv4_hdr->vhl = 0x40 |
+					(0x0F & ((net_pkt_ip_hdr_len(pkt) +
+						  net_pkt_ipv4_opts_len(pkt)) /
+						 4U));
 		}
 	}
 
-	ipv4_hdr->len   = htons(net_pkt_get_len(pkt));
+	ipv4_hdr->len = htons(net_pkt_get_len(pkt));
 	ipv4_hdr->proto = next_header_proto;
 
 	if (net_if_need_calc_tx_checksum(net_pkt_iface(pkt))) {
@@ -92,8 +92,7 @@ int net_ipv4_finalize(struct net_pkt *pkt, uint8_t next_header_proto)
 
 	net_pkt_set_data(pkt, &ipv4_access);
 
-	if (IS_ENABLED(CONFIG_NET_UDP) &&
-	    next_header_proto == IPPROTO_UDP) {
+	if (IS_ENABLED(CONFIG_NET_UDP) && next_header_proto == IPPROTO_UDP) {
 		return net_udp_finalize(pkt);
 	} else if (IS_ENABLED(CONFIG_NET_TCP) &&
 		   next_header_proto == IPPROTO_TCP) {
@@ -235,8 +234,8 @@ enum net_verdict net_ipv4_input(struct net_pkt *pkt)
 
 	pkt_len = ntohs(hdr->len);
 	if (real_len < pkt_len) {
-		NET_DBG("DROP: pkt len per hdr %d != pkt real len %d",
-			pkt_len, real_len);
+		NET_DBG("DROP: pkt len per hdr %d != pkt real len %d", pkt_len,
+			real_len);
 		goto drop;
 	} else if (real_len > pkt_len) {
 		net_pkt_update_length(pkt, pkt_len);

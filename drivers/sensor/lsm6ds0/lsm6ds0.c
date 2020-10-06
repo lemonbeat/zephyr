@@ -51,8 +51,8 @@ static inline int lsm6ds0_accel_axis_ctrl(const struct device *dev, int x_en,
 	return i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
 				   LSM6DS0_REG_CTRL_REG5_XL,
 				   LSM6DS0_MASK_CTRL_REG5_XL_XEN_XL |
-				   LSM6DS0_MASK_CTRL_REG5_XL_YEN_XL |
-				   LSM6DS0_MASK_CTRL_REG5_XL_ZEN_XL,
+					   LSM6DS0_MASK_CTRL_REG5_XL_YEN_XL |
+					   LSM6DS0_MASK_CTRL_REG5_XL_ZEN_XL,
 				   state);
 }
 
@@ -87,8 +87,7 @@ static int lsm6ds0_accel_set_odr_raw(const struct device *dev, uint8_t odr)
 }
 
 static inline int lsm6ds0_gyro_axis_ctrl(const struct device *dev, int x_en,
-					 int y_en,
-					 int z_en)
+					 int y_en, int z_en)
 {
 	struct lsm6ds0_data *data = dev->data;
 	const struct lsm6ds0_config *config = dev->config;
@@ -96,12 +95,11 @@ static inline int lsm6ds0_gyro_axis_ctrl(const struct device *dev, int x_en,
 			(y_en << LSM6DS0_SHIFT_CTRL_REG4_YEN_G) |
 			(z_en << LSM6DS0_SHIFT_CTRL_REG4_ZEN_G);
 
-	return i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
-				   LSM6DS0_REG_CTRL_REG4,
-				   LSM6DS0_MASK_CTRL_REG4_XEN_G |
-				   LSM6DS0_MASK_CTRL_REG4_YEN_G |
-				   LSM6DS0_MASK_CTRL_REG4_ZEN_G,
-				   state);
+	return i2c_reg_update_byte(
+		data->i2c_master, config->i2c_slave_addr, LSM6DS0_REG_CTRL_REG4,
+		LSM6DS0_MASK_CTRL_REG4_XEN_G | LSM6DS0_MASK_CTRL_REG4_YEN_G |
+			LSM6DS0_MASK_CTRL_REG4_ZEN_G,
+		state);
 }
 
 static int lsm6ds0_gyro_set_fs_raw(const struct device *dev, uint8_t fs)
@@ -147,16 +145,16 @@ static int lsm6ds0_sample_fetch_accel(const struct device *dev)
 	}
 
 #if defined(CONFIG_LSM6DS0_ACCEL_ENABLE_X_AXIS)
-	data->accel_sample_x = (int16_t)((uint16_t)(buf[0]) |
-				((uint16_t)(buf[1]) << 8));
+	data->accel_sample_x =
+		(int16_t)((uint16_t)(buf[0]) | ((uint16_t)(buf[1]) << 8));
 #endif
 #if defined(CONFIG_LSM6DS0_ACCEL_ENABLE_Y_AXIS)
-	data->accel_sample_y = (int16_t)((uint16_t)(buf[2]) |
-				((uint16_t)(buf[3]) << 8));
+	data->accel_sample_y =
+		(int16_t)((uint16_t)(buf[2]) | ((uint16_t)(buf[3]) << 8));
 #endif
 #if defined(CONFIG_LSM6DS0_ACCEL_ENABLE_Z_AXIS)
-	data->accel_sample_z = (int16_t)((uint16_t)(buf[4]) |
-				((uint16_t)(buf[5]) << 8));
+	data->accel_sample_z =
+		(int16_t)((uint16_t)(buf[4]) | ((uint16_t)(buf[5]) << 8));
 #endif
 
 	return 0;
@@ -175,16 +173,16 @@ static int lsm6ds0_sample_fetch_gyro(const struct device *dev)
 	}
 
 #if defined(CONFIG_LSM6DS0_GYRO_ENABLE_X_AXIS)
-	data->gyro_sample_x = (int16_t)((uint16_t)(buf[0]) |
-				((uint16_t)(buf[1]) << 8));
+	data->gyro_sample_x =
+		(int16_t)((uint16_t)(buf[0]) | ((uint16_t)(buf[1]) << 8));
 #endif
 #if defined(CONFIG_LSM6DS0_GYRO_ENABLE_Y_AXIS)
-	data->gyro_sample_y = (int16_t)((uint16_t)(buf[2]) |
-				((uint16_t)(buf[3]) << 8));
+	data->gyro_sample_y =
+		(int16_t)((uint16_t)(buf[2]) | ((uint16_t)(buf[3]) << 8));
 #endif
 #if defined(CONFIG_LSM6DS0_GYRO_ENABLE_Z_AXIS)
-	data->gyro_sample_z = (int16_t)((uint16_t)(buf[4]) |
-				((uint16_t)(buf[5]) << 8));
+	data->gyro_sample_z =
+		(int16_t)((uint16_t)(buf[4]) | ((uint16_t)(buf[5]) << 8));
 #endif
 
 	return 0;
@@ -203,8 +201,8 @@ static int lsm6ds0_sample_fetch_temp(const struct device *dev)
 		return -EIO;
 	}
 
-	data->temp_sample = (int16_t)((uint16_t)(buf[0]) |
-				((uint16_t)(buf[1]) << 8));
+	data->temp_sample =
+		(int16_t)((uint16_t)(buf[0]) | ((uint16_t)(buf[1]) << 8));
 
 	return 0;
 }
@@ -251,7 +249,7 @@ static inline void lsm6ds0_accel_convert(struct sensor_value *val, int raw_val,
 {
 	double dval;
 
-	dval = (double)(raw_val) * scale / 32767.0;
+	dval = (double)(raw_val)*scale / 32767.0;
 	val->val1 = (int32_t)dval;
 	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
 }
@@ -299,8 +297,8 @@ static int lsm6ds0_accel_channel_get(enum sensor_channel chan,
 				     struct sensor_value *val,
 				     struct lsm6ds0_data *data)
 {
-	return lsm6ds0_accel_get_channel(chan, val, data,
-					LSM6DS0_DEFAULT_ACCEL_FULLSCALE_FACTOR);
+	return lsm6ds0_accel_get_channel(
+		chan, val, data, LSM6DS0_DEFAULT_ACCEL_FULLSCALE_FACTOR);
 }
 
 static inline void lsm6ds0_gyro_convert(struct sensor_value *val, int raw_val,
@@ -308,7 +306,7 @@ static inline void lsm6ds0_gyro_convert(struct sensor_value *val, int raw_val,
 {
 	double dval;
 
-	dval = (double)(raw_val) * numerator / 1000.0 * SENSOR_DEG2RAD_DOUBLE;
+	dval = (double)(raw_val)*numerator / 1000.0 * SENSOR_DEG2RAD_DOUBLE;
 	val->val1 = (int32_t)dval;
 	val->val2 = ((int32_t)(dval * 1000000)) % 1000000;
 }
@@ -435,14 +433,14 @@ static int lsm6ds0_init_chip(const struct device *dev)
 		return -EIO;
 	}
 
-	if (lsm6ds0_accel_set_fs_raw(dev, LSM6DS0_DEFAULT_ACCEL_FULLSCALE)
-				     < 0) {
+	if (lsm6ds0_accel_set_fs_raw(dev, LSM6DS0_DEFAULT_ACCEL_FULLSCALE) <
+	    0) {
 		LOG_DBG("failed to set accelerometer full-scale");
 		return -EIO;
 	}
 
-	if (lsm6ds0_accel_set_odr_raw(dev, LSM6DS0_DEFAULT_ACCEL_SAMPLING_RATE)
-				      < 0) {
+	if (lsm6ds0_accel_set_odr_raw(
+		    dev, LSM6DS0_DEFAULT_ACCEL_SAMPLING_RATE) < 0) {
 		LOG_DBG("failed to set accelerometer sampling rate");
 		return -EIO;
 	}
@@ -454,27 +452,25 @@ static int lsm6ds0_init_chip(const struct device *dev)
 		return -EIO;
 	}
 
-	if (lsm6ds0_gyro_set_fs_raw(dev, LSM6DS0_DEFAULT_GYRO_FULLSCALE)
-				    < 0) {
+	if (lsm6ds0_gyro_set_fs_raw(dev, LSM6DS0_DEFAULT_GYRO_FULLSCALE) < 0) {
 		LOG_DBG("failed to set gyroscope full-scale");
 		return -EIO;
 	}
 
-	if (lsm6ds0_gyro_set_odr_raw(dev, LSM6DS0_DEFAULT_GYRO_SAMPLING_RATE)
-				     < 0) {
+	if (lsm6ds0_gyro_set_odr_raw(dev, LSM6DS0_DEFAULT_GYRO_SAMPLING_RATE) <
+	    0) {
 		LOG_DBG("failed to set gyroscope sampling rate");
 		return -EIO;
 	}
 
-	if (i2c_reg_update_byte(data->i2c_master, config->i2c_slave_addr,
-				LSM6DS0_REG_CTRL_REG8,
-				LSM6DS0_MASK_CTRL_REG8_BDU |
-				LSM6DS0_MASK_CTRL_REG8_BLE |
-				LSM6DS0_MASK_CTRL_REG8_IF_ADD_INC,
-				(1 << LSM6DS0_SHIFT_CTRL_REG8_BDU) |
-				(0 << LSM6DS0_SHIFT_CTRL_REG8_BLE) |
-				(1 << LSM6DS0_SHIFT_CTRL_REG8_IF_ADD_INC))
-				< 0) {
+	if (i2c_reg_update_byte(
+		    data->i2c_master, config->i2c_slave_addr,
+		    LSM6DS0_REG_CTRL_REG8,
+		    LSM6DS0_MASK_CTRL_REG8_BDU | LSM6DS0_MASK_CTRL_REG8_BLE |
+			    LSM6DS0_MASK_CTRL_REG8_IF_ADD_INC,
+		    (1 << LSM6DS0_SHIFT_CTRL_REG8_BDU) |
+			    (0 << LSM6DS0_SHIFT_CTRL_REG8_BLE) |
+			    (1 << LSM6DS0_SHIFT_CTRL_REG8_IF_ADD_INC)) < 0) {
 		LOG_DBG("failed to set BDU, BLE and burst");
 		return -EIO;
 	}
@@ -484,13 +480,13 @@ static int lsm6ds0_init_chip(const struct device *dev)
 
 static int lsm6ds0_init(const struct device *dev)
 {
-	const struct lsm6ds0_config * const config = dev->config;
+	const struct lsm6ds0_config *const config = dev->config;
 	struct lsm6ds0_data *data = dev->data;
 
 	data->i2c_master = device_get_binding(config->i2c_master_dev_name);
 	if (!data->i2c_master) {
 		LOG_DBG("i2c master not found: %s",
-			    config->i2c_master_dev_name);
+			config->i2c_master_dev_name);
 		return -EINVAL;
 	}
 
@@ -509,6 +505,6 @@ static const struct lsm6ds0_config lsm6ds0_config = {
 
 static struct lsm6ds0_data lsm6ds0_data;
 
-DEVICE_AND_API_INIT(lsm6ds0, DT_INST_LABEL(0), lsm6ds0_init,
-		    &lsm6ds0_data, &lsm6ds0_config, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &lsm6ds0_api_funcs);
+DEVICE_AND_API_INIT(lsm6ds0, DT_INST_LABEL(0), lsm6ds0_init, &lsm6ds0_data,
+		    &lsm6ds0_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &lsm6ds0_api_funcs);

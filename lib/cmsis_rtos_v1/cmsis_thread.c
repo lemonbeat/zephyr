@@ -19,17 +19,17 @@ static inline int _is_thread_cmsis_inactive(struct k_thread *thread)
 
 static inline int32_t zephyr_to_cmsis_priority(uint32_t z_prio)
 {
-	return(osPriorityRealtime - z_prio);
+	return (osPriorityRealtime - z_prio);
 }
 
 static inline uint32_t cmsis_to_zephyr_priority(int32_t c_prio)
 {
-	return(osPriorityRealtime - c_prio);
+	return (osPriorityRealtime - c_prio);
 }
 
 static void zephyr_thread_wrapper(void *arg1, void *arg2, void *arg3)
 {
-	void * (*fun_ptr)(void *) = arg3;
+	void *(*fun_ptr)(void *) = arg3;
 
 	fun_ptr(arg1);
 }
@@ -44,17 +44,17 @@ osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *arg)
 	k_tid_t tid;
 	uint32_t stacksz;
 
-	k_thread_stack_t
-	   (*stk_ptr)[K_THREAD_STACK_LEN(CONFIG_CMSIS_THREAD_MAX_STACK_SIZE)];
+	k_thread_stack_t(*stk_ptr)[K_THREAD_STACK_LEN(
+		CONFIG_CMSIS_THREAD_MAX_STACK_SIZE)];
 
 	if ((thread_def == NULL) || (thread_def->instances == 0)) {
 		return NULL;
 	}
 
-	BUILD_ASSERT(
-		CONFIG_NUM_PREEMPT_PRIORITIES >= TOTAL_CMSIS_THREAD_PRIORITIES,
-		"Configure NUM_PREEMPT_PRIORITIES to at least"
-		" TOTAL_CMSIS_THREAD_PRIORITIES");
+	BUILD_ASSERT(CONFIG_NUM_PREEMPT_PRIORITIES >=
+			     TOTAL_CMSIS_THREAD_PRIORITIES,
+		     "Configure NUM_PREEMPT_PRIORITIES to at least"
+		     " TOTAL_CMSIS_THREAD_PRIORITIES");
 
 	__ASSERT(thread_def->stacksize <= CONFIG_CMSIS_THREAD_MAX_STACK_SIZE,
 		 "invalid stack size\n");
@@ -64,7 +64,7 @@ osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *arg)
 	}
 
 	__ASSERT((thread_def->tpriority >= osPriorityIdle) &&
-		 (thread_def->tpriority <= osPriorityRealtime),
+			 (thread_def->tpriority <= osPriorityRealtime),
 		 "invalid priority\n");
 
 	stacksz = thread_def->stacksize;
@@ -74,7 +74,7 @@ osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *arg)
 
 	k_poll_signal_init(thread_def->poll_signal);
 	k_poll_event_init(thread_def->poll_event, K_POLL_TYPE_SIGNAL,
-			K_POLL_MODE_NOTIFY_ONLY, thread_def->poll_signal);
+			  K_POLL_MODE_NOTIFY_ONLY, thread_def->poll_signal);
 
 	cm_thread = thread_def->cm_thread;
 	atomic_dec((atomic_t *)&thread_def->instances);
@@ -83,10 +83,10 @@ osThreadId osThreadCreate(const osThreadDef_t *thread_def, void *arg)
 	k_thread_custom_data_set((void *)thread_def);
 
 	tid = k_thread_create(&cm_thread[thread_def->instances],
-			stk_ptr[thread_def->instances], stacksz,
-			(k_thread_entry_t)zephyr_thread_wrapper,
-			(void *)arg, NULL, thread_def->pthread,
-			prio, 0, K_NO_WAIT);
+			      stk_ptr[thread_def->instances], stacksz,
+			      (k_thread_entry_t)zephyr_thread_wrapper,
+			      (void *)arg, NULL, thread_def->pthread, prio, 0,
+			      K_NO_WAIT);
 
 	return ((osThreadId)tid);
 }
@@ -141,7 +141,7 @@ osStatus osThreadSetPriority(osThreadId thread_id, osPriority priority)
 	}
 
 	k_thread_priority_set((k_tid_t)thread_id,
-				cmsis_to_zephyr_priority(priority));
+			      cmsis_to_zephyr_priority(priority));
 
 	return osOK;
 }

@@ -112,5 +112,4 @@ static inline uint16_t net_eth_vlan_set_pcp(uint16_t tci, uint8_t pcp)
  * @}
  */
 
-
 #endif /* ZEPHYR_INCLUDE_NET_ETHERNET_VLAN_H_ */

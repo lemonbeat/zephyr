@@ -33,8 +33,8 @@
  * @param param Parameter for which the value should be set
  * @param value Value for @a param
  */
-#define ztest_expect_value(func, param, value)                                 \
-	z_ztest_expect_value(STRINGIFY(func), STRINGIFY(param),                \
+#define ztest_expect_value(func, param, value)                  \
+	z_ztest_expect_value(STRINGIFY(func), STRINGIFY(param), \
 			     (uintptr_t)(value))
 
 /**
@@ -48,8 +48,8 @@
  *
  * @param param Parameter to check
  */
-#define ztest_check_expected_value(param)                                      \
-	z_ztest_check_expected_value(__func__, STRINGIFY(param),               \
+#define ztest_check_expected_value(param)                        \
+	z_ztest_check_expected_value(__func__, STRINGIFY(param), \
 				     (uintptr_t)(param))
 
 /**
@@ -64,7 +64,7 @@
  * @param param Parameter for which the data should be set
  * @param data pointer for the data for parameter @a param
  */
-#define ztest_expect_data(func, param, data)                                   \
+#define ztest_expect_data(func, param, data) \
 	z_ztest_expect_data(STRINGIFY(func), STRINGIFY(param), (void *)(data))
 
 /**
@@ -79,8 +79,8 @@
  * @param param Parameter to check
  * @param length Length of the data to compare
  */
-#define ztest_check_expected_data(param, length)                               \
-	z_ztest_check_expected_data(__func__, STRINGIFY(param),                \
+#define ztest_check_expected_data(param, length)                \
+	z_ztest_check_expected_data(__func__, STRINGIFY(param), \
 				    (void *)(param), (length))
 
 /**
@@ -89,7 +89,7 @@
  * @param func Function that should return @a value
  * @param value Value to return from @a func
  */
-#define ztest_returns_value(func, value)                                       \
+#define ztest_returns_value(func, value) \
 	z_ztest_returns_value(STRINGIFY(func), (uintptr_t)(value))
 
 /**
@@ -110,7 +110,7 @@
  *
  * @returns The value the current function should return as a `void *`
  */
-#define ztest_get_return_value_ptr()                                           \
+#define ztest_get_return_value_ptr() \
 	((void *)z_ztest_get_return_value(__func__))
 
 /**

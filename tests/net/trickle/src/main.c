@@ -62,8 +62,7 @@ static bool cb_2_called;
 static struct net_trickle t1;
 static struct net_trickle t2;
 
-static void cb_1(struct net_trickle *trickle, bool do_suppress,
-		 void *user_data)
+static void cb_1(struct net_trickle *trickle, bool do_suppress, void *user_data)
 {
 	TC_PRINT("Trickle 1 %p callback called\n", trickle);
 
@@ -72,8 +71,7 @@ static void cb_1(struct net_trickle *trickle, bool do_suppress,
 	cb_1_called = true;
 }
 
-static void cb_2(struct net_trickle *trickle, bool do_suppress,
-		 void *user_data)
+static void cb_2(struct net_trickle *trickle, bool do_suppress, void *user_data)
 {
 	TC_PRINT("Trickle 2 %p callback called\n", trickle);
 
@@ -109,11 +107,9 @@ static void test_trickle_start(void)
 
 static void test_trickle_stop(void)
 {
-	zassert_false(net_trickle_stop(&t1),
-			"Trickle 1 stop failed");
+	zassert_false(net_trickle_stop(&t1), "Trickle 1 stop failed");
 
-	zassert_false(net_trickle_stop(&t2),
-			"Trickle 2 stop failed");
+	zassert_false(net_trickle_stop(&t2), "Trickle 2 stop failed");
 }
 
 static void test_trickle_1_status(void)
@@ -201,19 +197,18 @@ static void test_init(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_tickle,
-			ztest_unit_test(test_init),
-			ztest_unit_test(test_trickle_create),
-			ztest_unit_test(test_trickle_start),
-			ztest_unit_test(test_trickle_1_status),
-			ztest_unit_test(test_trickle_2_status),
-			ztest_unit_test(test_trickle_1_wait),
-			ztest_unit_test(test_trickle_2_wait),
-			ztest_unit_test(test_trickle_1_update),
-			ztest_unit_test(test_trickle_2_inc),
-			ztest_unit_test(test_trickle_1_status),
-			ztest_unit_test(test_trickle_1_wait_long),
-			ztest_unit_test(test_trickle_stop),
-			ztest_unit_test(test_trickle_1_stopped));
+	ztest_test_suite(test_tickle, ztest_unit_test(test_init),
+			 ztest_unit_test(test_trickle_create),
+			 ztest_unit_test(test_trickle_start),
+			 ztest_unit_test(test_trickle_1_status),
+			 ztest_unit_test(test_trickle_2_status),
+			 ztest_unit_test(test_trickle_1_wait),
+			 ztest_unit_test(test_trickle_2_wait),
+			 ztest_unit_test(test_trickle_1_update),
+			 ztest_unit_test(test_trickle_2_inc),
+			 ztest_unit_test(test_trickle_1_status),
+			 ztest_unit_test(test_trickle_1_wait_long),
+			 ztest_unit_test(test_trickle_stop),
+			 ztest_unit_test(test_trickle_1_stopped));
 	ztest_run_test_suite(test_tickle);
 }

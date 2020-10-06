@@ -15,10 +15,6 @@
  * in the CC3220 TRM: http://www.ti.com/lit/ug/swru465/swru465.pdf
  */
 #ifdef CONFIG_CC3220SF_DEBUG
-__attribute__ ((section(".dbghdr")))
-const unsigned long ulDebugHeader[] = {
-	0x5AA5A55A,
-	0x000FF800,
-	0xEFA3247D
-};
+__attribute__((section(".dbghdr")))
+const unsigned long ulDebugHeader[] = { 0x5AA5A55A, 0x000FF800, 0xEFA3247D };
 #endif

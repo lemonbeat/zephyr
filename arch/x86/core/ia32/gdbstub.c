@@ -10,7 +10,6 @@
 #include <inttypes.h>
 #include <debug/gdbstub.h>
 
-
 static struct gdb_ctx ctx;
 static bool start;
 
@@ -93,7 +92,7 @@ static void z_gdb_interrupt(unsigned int vector, z_arch_esf_t *esf)
 	ctx.registers[GDB_EDI] = esf->edi;
 	ctx.registers[GDB_PC] = esf->eip;
 	ctx.registers[GDB_CS] = esf->cs;
-	ctx.registers[GDB_EFLAGS]  = esf->eflags;
+	ctx.registers[GDB_EFLAGS] = esf->eflags;
 	ctx.registers[GDB_SS] = esf->ss;
 	ctx.registers[GDB_DS] = esf->ds;
 	ctx.registers[GDB_ES] = esf->es;
@@ -146,7 +145,7 @@ static __used void z_gdb_break_isr(z_arch_esf_t *esf)
 void arch_gdb_init(void)
 {
 	start = true;
-	__asm__ volatile ("int3");
+	__asm__ volatile("int3");
 }
 
 /* Hook current IDT. */

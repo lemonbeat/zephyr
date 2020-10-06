@@ -14,27 +14,27 @@ LOG_MODULE_DECLARE(osdp, CONFIG_OSDP_LOG_LEVEL);
 
 #define TAG "PD: "
 
-#define CMD_POLL_DATA_LEN              0
-#define CMD_LSTAT_DATA_LEN             0
-#define CMD_ISTAT_DATA_LEN             0
-#define CMD_OSTAT_DATA_LEN             0
-#define CMD_RSTAT_DATA_LEN             0
-#define CMD_ID_DATA_LEN                1
-#define CMD_CAP_DATA_LEN               1
-#define CMD_OUT_DATA_LEN               4
-#define CMD_LED_DATA_LEN               14
-#define CMD_BUZ_DATA_LEN               5
-#define CMD_TEXT_DATA_LEN              6   /* variable length command */
-#define CMD_COMSET_DATA_LEN            5
+#define CMD_POLL_DATA_LEN 0
+#define CMD_LSTAT_DATA_LEN 0
+#define CMD_ISTAT_DATA_LEN 0
+#define CMD_OSTAT_DATA_LEN 0
+#define CMD_RSTAT_DATA_LEN 0
+#define CMD_ID_DATA_LEN 1
+#define CMD_CAP_DATA_LEN 1
+#define CMD_OUT_DATA_LEN 4
+#define CMD_LED_DATA_LEN 14
+#define CMD_BUZ_DATA_LEN 5
+#define CMD_TEXT_DATA_LEN 6 /* variable length command */
+#define CMD_COMSET_DATA_LEN 5
 
-#define REPLY_ACK_LEN                  1
-#define REPLY_PDID_LEN                 13
-#define REPLY_PDCAP_LEN                1   /* variable length command */
-#define REPLY_PDCAP_ENTITY_LEN         3
-#define REPLY_LSTATR_LEN               3
-#define REPLY_RSTATR_LEN               2
-#define REPLY_COM_LEN                  6
-#define REPLY_NAK_LEN                  2
+#define REPLY_ACK_LEN 1
+#define REPLY_PDID_LEN 13
+#define REPLY_PDCAP_LEN 1 /* variable length command */
+#define REPLY_PDCAP_ENTITY_LEN 3
+#define REPLY_LSTATR_LEN 3
+#define REPLY_RSTATR_LEN 2
+#define REPLY_COM_LEN 6
+#define REPLY_NAK_LEN 2
 
 static struct osdp_pd_id osdp_pd_id = {
 	.version = CONFIG_OSDP_PD_ID_VERSION,
@@ -140,7 +140,7 @@ static void pd_decode_command(struct osdp_pd *pd, uint8_t *buf, int len)
 		if (len != CMD_ID_DATA_LEN) {
 			break;
 		}
-		pos++;		/* Skip reply type info. */
+		pos++; /* Skip reply type info. */
 		pd->reply_id = REPLY_PDID;
 		ret = 0;
 		break;
@@ -148,7 +148,7 @@ static void pd_decode_command(struct osdp_pd *pd, uint8_t *buf, int len)
 		if (len != CMD_CAP_DATA_LEN) {
 			break;
 		}
-		pos++;		/* Skip reply type info. */
+		pos++; /* Skip reply type info. */
 		pd->reply_id = REPLY_PDCAP;
 		ret = 0;
 		break;
@@ -162,9 +162,9 @@ static void pd_decode_command(struct osdp_pd *pd, uint8_t *buf, int len)
 			break;
 		}
 		cmd->id = OSDP_CMD_OUTPUT;
-		cmd->output.output_no    = buf[pos++];
+		cmd->output.output_no = buf[pos++];
 		cmd->output.control_code = buf[pos++];
-		cmd->output.timer_count  = buf[pos++];
+		cmd->output.timer_count = buf[pos++];
 		cmd->output.timer_count |= buf[pos++] << 8;
 		osdp_cmd_enqueue(pd, cmd);
 		pd->reply_id = REPLY_ACK;
@@ -184,18 +184,18 @@ static void pd_decode_command(struct osdp_pd *pd, uint8_t *buf, int len)
 		cmd->led.led_number = buf[pos++];
 
 		cmd->led.temporary.control_code = buf[pos++];
-		cmd->led.temporary.on_count     = buf[pos++];
-		cmd->led.temporary.off_count    = buf[pos++];
-		cmd->led.temporary.on_color     = buf[pos++];
-		cmd->led.temporary.off_color    = buf[pos++];
-		cmd->led.temporary.timer_count  = buf[pos++];
+		cmd->led.temporary.on_count = buf[pos++];
+		cmd->led.temporary.off_count = buf[pos++];
+		cmd->led.temporary.on_color = buf[pos++];
+		cmd->led.temporary.off_color = buf[pos++];
+		cmd->led.temporary.timer_count = buf[pos++];
 		cmd->led.temporary.timer_count |= buf[pos++] << 8;
 
 		cmd->led.permanent.control_code = buf[pos++];
-		cmd->led.permanent.on_count     = buf[pos++];
-		cmd->led.permanent.off_count    = buf[pos++];
-		cmd->led.permanent.on_color     = buf[pos++];
-		cmd->led.permanent.off_color    = buf[pos++];
+		cmd->led.permanent.on_count = buf[pos++];
+		cmd->led.permanent.off_count = buf[pos++];
+		cmd->led.permanent.on_color = buf[pos++];
+		cmd->led.permanent.off_color = buf[pos++];
 		osdp_cmd_enqueue(pd, cmd);
 		pd->reply_id = REPLY_ACK;
 		ret = 0;
@@ -210,11 +210,11 @@ static void pd_decode_command(struct osdp_pd *pd, uint8_t *buf, int len)
 			break;
 		}
 		cmd->id = OSDP_CMD_BUZZER;
-		cmd->buzzer.reader       = buf[pos++];
+		cmd->buzzer.reader = buf[pos++];
 		cmd->buzzer.control_code = buf[pos++];
-		cmd->buzzer.on_count     = buf[pos++];
-		cmd->buzzer.off_count    = buf[pos++];
-		cmd->buzzer.rep_count    = buf[pos++];
+		cmd->buzzer.on_count = buf[pos++];
+		cmd->buzzer.off_count = buf[pos++];
+		cmd->buzzer.rep_count = buf[pos++];
 		osdp_cmd_enqueue(pd, cmd);
 		pd->reply_id = REPLY_ACK;
 		ret = 0;
@@ -229,12 +229,12 @@ static void pd_decode_command(struct osdp_pd *pd, uint8_t *buf, int len)
 			break;
 		}
 		cmd->id = OSDP_CMD_TEXT;
-		cmd->text.reader       = buf[pos++];
+		cmd->text.reader = buf[pos++];
 		cmd->text.control_code = buf[pos++];
-		cmd->text.temp_time    = buf[pos++];
-		cmd->text.offset_row   = buf[pos++];
-		cmd->text.offset_col   = buf[pos++];
-		cmd->text.length       = buf[pos++];
+		cmd->text.temp_time = buf[pos++];
+		cmd->text.offset_row = buf[pos++];
+		cmd->text.offset_col = buf[pos++];
+		cmd->text.length = buf[pos++];
 		if (cmd->text.length > OSDP_CMD_TEXT_MAX_LEN ||
 		    ((len - CMD_TEXT_DATA_LEN) < cmd->text.length) ||
 		    cmd->text.length > OSDP_CMD_TEXT_MAX_LEN) {
@@ -258,8 +258,8 @@ static void pd_decode_command(struct osdp_pd *pd, uint8_t *buf, int len)
 			break;
 		}
 		cmd->id = OSDP_CMD_COMSET;
-		cmd->comset.address    = buf[pos++];
-		cmd->comset.baud_rate  = buf[pos++];
+		cmd->comset.address = buf[pos++];
+		cmd->comset.baud_rate = buf[pos++];
 		cmd->comset.baud_rate |= buf[pos++] << 8;
 		cmd->comset.baud_rate |= buf[pos++] << 16;
 		cmd->comset.baud_rate |= buf[pos++] << 24;
@@ -433,7 +433,7 @@ static int pd_build_reply(struct osdp_pd *pd, uint8_t *buf, int max_len)
 	if (ret != 0) {
 		/* catch all errors and report it as a RECORD error to CP */
 		LOG_ERR(TAG "ReplyID unknown or insufficent space or some other"
-			"error. Sending NAK");
+			    "error. Sending NAK");
 		if (max_len < REPLY_NAK_LEN) {
 			LOG_ERR(TAG "Fatal: insufficent space for sending NAK");
 			return -1;
@@ -519,13 +519,13 @@ static int pd_receve_packet(struct osdp_pd *pd)
 		 * when CONFIG_OSDP_PACKET_TRACE is enabled. This is an early
 		 * print to catch errors so keeping it simple.
 		 */
-		if (pd->rx_buf_len > 8 &&
-		    pd->rx_buf[6] != CMD_POLL && pd->rx_buf[8] != CMD_POLL) {
+		if (pd->rx_buf_len > 8 && pd->rx_buf[6] != CMD_POLL &&
+		    pd->rx_buf[8] != CMD_POLL) {
 			osdp_dump("PD received", pd->rx_buf, pd->rx_buf_len);
 		}
 	}
 
-	pd->reply_id = 0;    /* reset past reply ID so phy can send NAK */
+	pd->reply_id = 0; /* reset past reply ID so phy can send NAK */
 	pd->cmd_data[0] = 0; /* reset past NAK reason */
 	ret = osdp_phy_decode_packet(pd, pd->rx_buf, pd->rx_buf_len);
 	if (ret == OSDP_ERR_PKT_FMT) {
@@ -559,8 +559,9 @@ void osdp_update(struct osdp *ctx)
 		if (ret == 1) {
 			break;
 		}
-		if (ret == -1 || (pd->rx_buf_len > 0 &&
-		    osdp_millis_since(pd->tstamp) > OSDP_RESP_TOUT_MS)) {
+		if (ret == -1 ||
+		    (pd->rx_buf_len > 0 &&
+		     osdp_millis_since(pd->tstamp) > OSDP_RESP_TOUT_MS)) {
 			/**
 			 * When we receive a command from PD after a timeout,
 			 * any established secure channel must be discarded.

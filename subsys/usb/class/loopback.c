@@ -17,11 +17,11 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(usb_loopback);
 
-#define LOOPBACK_OUT_EP_ADDR		0x01
-#define LOOPBACK_IN_EP_ADDR		0x81
+#define LOOPBACK_OUT_EP_ADDR 0x01
+#define LOOPBACK_IN_EP_ADDR 0x81
 
-#define LOOPBACK_OUT_EP_IDX		0
-#define LOOPBACK_IN_EP_IDX		1
+#define LOOPBACK_OUT_EP_IDX 0
+#define LOOPBACK_IN_EP_IDX 1
 
 static uint8_t loopback_buf[1024];
 
@@ -123,8 +123,8 @@ static void loopback_status_cb(struct usb_cfg_data *cfg,
 }
 
 /* usb.rst vendor handler start */
-static int loopback_vendor_handler(struct usb_setup_packet *setup,
-				   int32_t *len, uint8_t **data)
+static int loopback_vendor_handler(struct usb_setup_packet *setup, int32_t *len,
+				   uint8_t **data)
 {
 	LOG_DBG("Class request: bRequest 0x%x bmRequestType 0x%x len %d",
 		setup->bRequest, setup->bmRequestType, *len);
@@ -141,8 +141,8 @@ static int loopback_vendor_handler(struct usb_setup_packet *setup,
 
 	if ((REQTYPE_GET_DIR(setup->bmRequestType) == REQTYPE_DIR_TO_HOST) &&
 	    (setup->bRequest == 0x5c)) {
-		LOG_DBG("Device-to-Host, wLength %d, data %p",
-			setup->wLength, *data);
+		LOG_DBG("Device-to-Host, wLength %d, data %p", setup->wLength,
+			*data);
 		return 0;
 	}
 

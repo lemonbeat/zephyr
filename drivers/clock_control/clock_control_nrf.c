@@ -23,26 +23,26 @@ LOG_MODULE_REGISTER(clock_control, CONFIG_CLOCK_CONTROL_LOG_LEVEL);
 
 #define DT_DRV_COMPAT nordic_nrf_clock
 
-
-#define CTX_ONOFF		BIT(6)
-#define CTX_API			BIT(7)
+#define CTX_ONOFF BIT(6)
+#define CTX_API BIT(7)
 #define CTX_MASK (CTX_ONOFF | CTX_API)
 
-#define STATUS_MASK		0x7
-#define GET_STATUS(flags)	(flags & STATUS_MASK)
-#define GET_CTX(flags)		(flags & CTX_MASK)
+#define STATUS_MASK 0x7
+#define GET_STATUS(flags) (flags & STATUS_MASK)
+#define GET_CTX(flags) (flags & CTX_MASK)
 
 /* Used only by HF clock */
-#define HF_USER_BT		BIT(0)
-#define HF_USER_GENERIC		BIT(1)
+#define HF_USER_BT BIT(0)
+#define HF_USER_GENERIC BIT(1)
 
 /* Helper logging macros which prepends subsys name to the log. */
 #ifdef CONFIG_LOG
-#define CLOCK_LOG(lvl, dev, subsys, ...) \
-	LOG_##lvl("%s: " GET_ARG_N(1, __VA_ARGS__), \
-		get_sub_config(dev, (enum clock_control_nrf_type)subsys)->name \
-		COND_CODE_0(NUM_VA_ARGS_LESS_1(__VA_ARGS__),\
-				(), (, GET_ARGS_LESS_N(1, __VA_ARGS__))))
+#define CLOCK_LOG(lvl, dev, subsys, ...)                                   \
+	LOG_##lvl("%s: " GET_ARG_N(1, __VA_ARGS__),                        \
+		  get_sub_config(dev, (enum clock_control_nrf_type)subsys) \
+			  ->name COND_CODE_0(                              \
+				  NUM_VA_ARGS_LESS_1(__VA_ARGS__), (),     \
+				  (, GET_ARGS_LESS_N(1, __VA_ARGS__))))
 #else
 #define CLOCK_LOG(...)
 #endif
@@ -63,8 +63,8 @@ typedef void (*clk_ctrl_func_t)(void);
 
 /* Clock subsys static configuration */
 struct nrf_clock_control_sub_config {
-	clk_ctrl_func_t start;		/* Clock start function */
-	clk_ctrl_func_t stop;		/* Clock stop function */
+	clk_ctrl_func_t start; /* Clock start function */
+	clk_ctrl_func_t stop; /* Clock stop function */
 #ifdef CONFIG_LOG
 	const char *name;
 #endif
@@ -76,27 +76,25 @@ struct nrf_clock_control_data {
 };
 
 struct nrf_clock_control_config {
-	struct nrf_clock_control_sub_config
-					subsys[CLOCK_CONTROL_NRF_TYPE_COUNT];
+	struct nrf_clock_control_sub_config subsys[CLOCK_CONTROL_NRF_TYPE_COUNT];
 };
 
 static atomic_t hfclk_users;
 static uint64_t hf_start_tstamp;
 static uint64_t hf_stop_tstamp;
 
-static struct nrf_clock_control_sub_data *get_sub_data(const struct device *dev,
-						       enum clock_control_nrf_type type)
+static struct nrf_clock_control_sub_data *
+get_sub_data(const struct device *dev, enum clock_control_nrf_type type)
 {
 	struct nrf_clock_control_data *data = dev->data;
 
 	return &data->subsys[type];
 }
 
-static const struct nrf_clock_control_sub_config *get_sub_config(const struct device *dev,
-								 enum clock_control_nrf_type type)
+static const struct nrf_clock_control_sub_config *
+get_sub_config(const struct device *dev, enum clock_control_nrf_type type)
 {
-	const struct nrf_clock_control_config *config =
-						dev->config;
+	const struct nrf_clock_control_config *config = dev->config;
 
 	return &config->subsys[type];
 }
@@ -114,7 +112,7 @@ DEVICE_DECLARE(clock_nrf);
 struct onoff_manager *z_nrf_clock_control_get_onoff(clock_control_subsys_t sys)
 {
 	return get_onoff_manager(DEVICE_GET(clock_nrf),
-				(enum clock_control_nrf_type)sys);
+				 (enum clock_control_nrf_type)sys);
 }
 
 static enum clock_control_status get_status(const struct device *dev,
@@ -294,7 +292,6 @@ static void generic_hfclk_stop(void)
 	hfclk_stop();
 }
 
-
 void z_nrf_clock_bt_ctlr_hf_request(void)
 {
 	if (atomic_or(&hfclk_users, HF_USER_BT) & HF_USER_GENERIC) {
@@ -339,9 +336,8 @@ static int api_stop(const struct device *dev, clock_control_subsys_t subsys)
 	return stop(dev, subsys, CTX_API);
 }
 
-static int async_start(const struct device *dev,
-			clock_control_subsys_t subsys,
-			struct clock_control_async_data *data, uint32_t ctx)
+static int async_start(const struct device *dev, clock_control_subsys_t subsys,
+		       struct clock_control_async_data *data, uint32_t ctx)
 {
 	enum clock_control_nrf_type type = (enum clock_control_nrf_type)subsys;
 	struct nrf_clock_control_sub_data *subdata = get_sub_data(dev, type);
@@ -355,13 +351,13 @@ static int async_start(const struct device *dev,
 	subdata->cb = data->cb;
 	subdata->user_data = data->user_data;
 
-	 get_sub_config(dev, type)->start();
+	get_sub_config(dev, type)->start();
 
 	return 0;
 }
 
 static int api_start(const struct device *dev, clock_control_subsys_t subsys,
-			     struct clock_control_async_data *data)
+		     struct clock_control_async_data *data)
 {
 	return async_start(dev, subsys, data, CTX_API);
 }
@@ -379,10 +375,8 @@ static int api_blocking_start(const struct device *dev,
 			      clock_control_subsys_t subsys)
 {
 	struct k_sem sem = Z_SEM_INITIALIZER(sem, 0, 1);
-	struct clock_control_async_data data = {
-		.cb = blocking_start_callback,
-		.user_data = &sem
-	};
+	struct clock_control_async_data data = { .cb = blocking_start_callback,
+						 .user_data = &sem };
 	int err;
 
 	if (!IS_ENABLED(CONFIG_MULTITHREADING)) {
@@ -405,8 +399,7 @@ static clock_control_subsys_t get_subsys(struct onoff_manager *mgr)
 	return (clock_control_subsys_t)offset;
 }
 
-static void onoff_stop(struct onoff_manager *mgr,
-			onoff_notify_fn notify)
+static void onoff_stop(struct onoff_manager *mgr, onoff_notify_fn notify)
 {
 	int res;
 
@@ -415,8 +408,7 @@ static void onoff_stop(struct onoff_manager *mgr,
 }
 
 static void onoff_started_callback(const struct device *dev,
-				   clock_control_subsys_t sys,
-				   void *user_data)
+				   clock_control_subsys_t sys, void *user_data)
 {
 	enum clock_control_nrf_type type = (enum clock_control_nrf_type)sys;
 	struct onoff_manager *mgr = get_onoff_manager(dev, type);
@@ -425,17 +417,14 @@ static void onoff_started_callback(const struct device *dev,
 	notify(mgr, 0);
 }
 
-static void onoff_start(struct onoff_manager *mgr,
-			onoff_notify_fn notify)
+static void onoff_start(struct onoff_manager *mgr, onoff_notify_fn notify)
 {
-	struct clock_control_async_data data = {
-		.cb = onoff_started_callback,
-		.user_data = notify
-	};
+	struct clock_control_async_data data = { .cb = onoff_started_callback,
+						 .user_data = notify };
 	int err;
 
-	err = async_start(DEVICE_GET(clock_nrf), get_subsys(mgr),
-			  &data, CTX_ONOFF);
+	err = async_start(DEVICE_GET(clock_nrf), get_subsys(mgr), &data,
+			  CTX_ONOFF);
 	if (err < 0) {
 		notify(mgr, err);
 	}
@@ -465,9 +454,9 @@ static void lfclk_spinwait(enum nrf_lfclk_start_mode mode)
 		 */
 		(IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL) ||
 		 IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_LOW_SWING) ||
-		 IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_FULL_SWING))
-		? NRF_CLOCK_LFCLK_Xtal
-		: CLOCK_CONTROL_NRF_K32SRC;
+		 IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_FULL_SWING)) ?
+			      NRF_CLOCK_LFCLK_Xtal :
+			      CLOCK_CONTROL_NRF_K32SRC;
 	nrf_clock_lfclk_t type;
 
 	if ((mode == CLOCK_CONTROL_NRF_LF_START_AVAILABLE) &&
@@ -489,9 +478,9 @@ static void lfclk_spinwait(enum nrf_lfclk_start_mode mode)
 		nrf_clock_int_disable(NRF_CLOCK, NRF_CLOCK_INT_LF_STARTED_MASK);
 	}
 
-	while (!(nrfx_clock_is_running(d, (void *)&type)
-		 && ((type == target_type)
-		     || (mode == CLOCK_CONTROL_NRF_LF_START_AVAILABLE)))) {
+	while (!(nrfx_clock_is_running(d, (void *)&type) &&
+		 ((type == target_type) ||
+		  (mode == CLOCK_CONTROL_NRF_LF_START_AVAILABLE)))) {
 		/* Synth source start is almost instant and LFCLKSTARTED may
 		 * happen before calling idle. That would lead to deadlock.
 		 */
@@ -504,10 +493,10 @@ static void lfclk_spinwait(enum nrf_lfclk_start_mode mode)
 		}
 
 		/* Clock interrupt is locked, LFCLKSTARTED is handled here. */
-		if ((target_type ==  NRF_CLOCK_LFCLK_Xtal)
-		    && (nrf_clock_lf_src_get(NRF_CLOCK) == NRF_CLOCK_LFCLK_RC)
-		    && nrf_clock_event_check(NRF_CLOCK,
-					     NRF_CLOCK_EVENT_LFCLKSTARTED)) {
+		if ((target_type == NRF_CLOCK_LFCLK_Xtal) &&
+		    (nrf_clock_lf_src_get(NRF_CLOCK) == NRF_CLOCK_LFCLK_RC) &&
+		    nrf_clock_event_check(NRF_CLOCK,
+					  NRF_CLOCK_EVENT_LFCLKSTARTED)) {
 			nrf_clock_event_clear(NRF_CLOCK,
 					      NRF_CLOCK_EVENT_LFCLKSTARTED);
 			nrf_clock_lf_src_set(NRF_CLOCK,
@@ -536,9 +525,8 @@ void z_nrf_clock_control_lf_on(enum nrf_lfclk_start_mode start_mode)
 
 	if (atomic_set(&on, 1) == 0) {
 		int err;
-		struct onoff_manager *mgr =
-				get_onoff_manager(DEVICE_GET(clock_nrf),
-						  CLOCK_CONTROL_NRF_TYPE_LFCLK);
+		struct onoff_manager *mgr = get_onoff_manager(
+			DEVICE_GET(clock_nrf), CLOCK_CONTROL_NRF_TYPE_LFCLK);
 
 		sys_notify_init_spinwait(&cli.notify);
 		err = onoff_request(mgr, &cli);
@@ -569,10 +557,9 @@ static void clock_event_handler(nrfx_clock_evt_type_t event)
 	const struct device *dev = DEVICE_GET(clock_nrf);
 
 	switch (event) {
-	case NRFX_CLOCK_EVT_HFCLK_STARTED:
-	{
+	case NRFX_CLOCK_EVT_HFCLK_STARTED: {
 		struct nrf_clock_control_sub_data *data =
-				get_sub_data(dev, CLOCK_CONTROL_NRF_TYPE_HFCLK);
+			get_sub_data(dev, CLOCK_CONTROL_NRF_TYPE_HFCLK);
 
 		/* Check needed due to anomaly 201:
 		 * HFCLKSTARTED may be generated twice.
@@ -585,13 +572,14 @@ static void clock_event_handler(nrfx_clock_evt_type_t event)
 	}
 	case NRFX_CLOCK_EVT_LFCLK_STARTED:
 		if (IS_ENABLED(
-			CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC_CALIBRATION)) {
+			    CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC_CALIBRATION)) {
 			z_nrf_clock_calibration_lfclk_started();
 		}
 		clkstarted_handle(dev, CLOCK_CONTROL_NRF_TYPE_LFCLK);
 		break;
 	case NRFX_CLOCK_EVT_CAL_DONE:
-		if (IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC_CALIBRATION)) {
+		if (IS_ENABLED(
+			    CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC_CALIBRATION)) {
 			z_nrf_clock_calibration_done_handler();
 		}
 		break;
@@ -606,23 +594,23 @@ static int clk_init(const struct device *dev)
 	nrfx_err_t nrfx_err;
 	int err;
 	static const struct onoff_transitions transitions = {
-		.start = onoff_start,
-		.stop = onoff_stop
+		.start = onoff_start, .stop = onoff_stop
 	};
 
-	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
-		    nrfx_isr, nrfx_power_clock_irq_handler, 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), nrfx_isr,
+		    nrfx_power_clock_irq_handler, 0);
 	irq_enable(DT_INST_IRQN(0));
 
 #if defined(CONFIG_SOC_NRF5340_CPUAPP) && \
 	!defined(CONFIG_TRUSTED_EXECUTION_NONSECURE)
 
-	#define PIN_XL1 0
-	#define PIN_XL2 1
+#define PIN_XL1 0
+#define PIN_XL2 1
 
-	bool ext_clk = IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL) ||
-		    IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_LOW_SWING) ||
-		    IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_FULL_SWING);
+	bool ext_clk =
+		IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_XTAL) ||
+		IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_LOW_SWING) ||
+		IS_ENABLED(CONFIG_CLOCK_CONTROL_NRF_K32SRC_EXT_FULL_SWING);
 
 	if (ext_clk) {
 		nrf_gpio_pin_mcu_select(PIN_XL1,
@@ -645,9 +633,9 @@ static int clk_init(const struct device *dev)
 	nrfx_clock_enable();
 
 	for (enum clock_control_nrf_type i = 0;
-		i < CLOCK_CONTROL_NRF_TYPE_COUNT; i++) {
+	     i < CLOCK_CONTROL_NRF_TYPE_COUNT; i++) {
 		struct nrf_clock_control_sub_data *subdata =
-						get_sub_data(dev, i);
+			get_sub_data(dev, i);
 
 		err = onoff_manager_init(get_onoff_manager(dev, i),
 					 &transitions);
@@ -670,31 +658,32 @@ static const struct clock_control_driver_api clock_control_api = {
 
 static struct nrf_clock_control_data data;
 
-static const struct nrf_clock_control_config config = {
-	.subsys = {
-		[CLOCK_CONTROL_NRF_TYPE_HFCLK] = {
-			.start = generic_hfclk_start,
-			.stop = generic_hfclk_stop,
-			IF_ENABLED(CONFIG_LOG, (.name = "hfclk",))
-		},
-		[CLOCK_CONTROL_NRF_TYPE_LFCLK] = {
-			.start = lfclk_start,
-			.stop = lfclk_stop,
-			IF_ENABLED(CONFIG_LOG, (.name = "lfclk",))
-		},
+static const struct nrf_clock_control_config
+	config = { .subsys = {
+			   [CLOCK_CONTROL_NRF_TYPE_HFCLK] = { .start =
+								      generic_hfclk_start,
+							      .stop = generic_hfclk_stop,
+							      IF_ENABLED(
+								      CONFIG_LOG,
+								      (.name = "hfclk", )) },
+			   [CLOCK_CONTROL_NRF_TYPE_LFCLK] = { .start =
+								      lfclk_start,
+							      .stop = lfclk_stop,
+							      IF_ENABLED(
+								      CONFIG_LOG,
+								      (.name = "lfclk", )) },
 #if NRF_CLOCK_HAS_HFCLK192M
-		[CLOCK_CONTROL_NRF_TYPE_HFCLK192M] = {
-			.start = hfclk192m_start,
-			.stop = hfclk192m_stop,
-			IF_ENABLED(CONFIG_LOG, (.name = "hfclk192m",))
-		},
+			   [CLOCK_CONTROL_NRF_TYPE_HFCLK192M] = { .start =
+									  hfclk192m_start,
+								  .stop = hfclk192m_stop,
+								  IF_ENABLED(
+									  CONFIG_LOG,
+									  (.name = "hfclk192m", )) },
 #endif
-	}
-};
+		   } };
 
-DEVICE_AND_API_INIT(clock_nrf, DT_INST_LABEL(0),
-		    clk_init, &data, &config, PRE_KERNEL_1,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+DEVICE_AND_API_INIT(clock_nrf, DT_INST_LABEL(0), clk_init, &data, &config,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &clock_control_api);
 
 static int cmd_status(const struct shell *shell, size_t argc, char **argv)
@@ -702,12 +691,10 @@ static int cmd_status(const struct shell *shell, size_t argc, char **argv)
 	nrf_clock_hfclk_t hfclk_src;
 	bool hf_status;
 	bool lf_status = nrfx_clock_is_running(NRF_CLOCK_DOMAIN_LFCLK, NULL);
-	struct onoff_manager *hf_mgr =
-				get_onoff_manager(DEVICE_GET(clock_nrf),
-						  CLOCK_CONTROL_NRF_TYPE_HFCLK);
-	struct onoff_manager *lf_mgr =
-				get_onoff_manager(DEVICE_GET(clock_nrf),
-						  CLOCK_CONTROL_NRF_TYPE_LFCLK);
+	struct onoff_manager *hf_mgr = get_onoff_manager(
+		DEVICE_GET(clock_nrf), CLOCK_CONTROL_NRF_TYPE_HFCLK);
+	struct onoff_manager *lf_mgr = get_onoff_manager(
+		DEVICE_GET(clock_nrf), CLOCK_CONTROL_NRF_TYPE_LFCLK);
 	uint32_t abs_start, abs_stop;
 	int key = irq_lock();
 	uint64_t now = k_uptime_get();
@@ -720,25 +707,23 @@ static int cmd_status(const struct shell *shell, size_t argc, char **argv)
 	irq_unlock(key);
 
 	shell_print(shell, "HF clock:");
-	shell_print(shell, "\t- %srunning (users: %u)",
-			hf_status ? "" : "not ", hf_mgr->refs);
+	shell_print(shell, "\t- %srunning (users: %u)", hf_status ? "" : "not ",
+		    hf_mgr->refs);
 	shell_print(shell, "\t- last start: %u ms (%u ms ago)",
-			(uint32_t)abs_start, (uint32_t)(now - abs_start));
+		    (uint32_t)abs_start, (uint32_t)(now - abs_start));
 	shell_print(shell, "\t- last stop: %u ms (%u ms ago)",
-			(uint32_t)abs_stop, (uint32_t)(now - abs_stop));
+		    (uint32_t)abs_stop, (uint32_t)(now - abs_stop));
 	shell_print(shell, "LF clock:");
-	shell_print(shell, "\t- %srunning (users: %u)",
-			lf_status ? "" : "not ", lf_mgr->refs);
+	shell_print(shell, "\t- %srunning (users: %u)", lf_status ? "" : "not ",
+		    lf_mgr->refs);
 
 	return 0;
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(subcmds,
-	SHELL_CMD_ARG(status, NULL, "Status", cmd_status, 1, 0),
-	SHELL_SUBCMD_SET_END
-);
+			       SHELL_CMD_ARG(status, NULL, "Status", cmd_status,
+					     1, 0),
+			       SHELL_SUBCMD_SET_END);
 
-SHELL_COND_CMD_REGISTER(CONFIG_CLOCK_CONTROL_NRF_SHELL,
-			nrf_clock_control, &subcmds,
-			"Clock control commmands",
-			cmd_status);
+SHELL_COND_CMD_REGISTER(CONFIG_CLOCK_CONTROL_NRF_SHELL, nrf_clock_control,
+			&subcmds, "Clock control commmands", cmd_status);

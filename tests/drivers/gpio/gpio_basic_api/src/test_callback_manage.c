@@ -4,21 +4,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include "test_gpio.h"
 
 static struct drv_data cb_data[2];
 static int cb_cnt[2];
 
-static void callback_1(const struct device *dev,
-		       struct gpio_callback *gpio_cb, uint32_t pins)
+static void callback_1(const struct device *dev, struct gpio_callback *gpio_cb,
+		       uint32_t pins)
 {
 	TC_PRINT("%s triggered: %d\n", __func__, ++cb_cnt[0]);
-
 }
 
-static void callback_2(const struct device *dev,
-		       struct gpio_callback *gpio_cb, uint32_t pins)
+static void callback_2(const struct device *dev, struct gpio_callback *gpio_cb,
+		       uint32_t pins)
 {
 	TC_PRINT("%s triggered: %d\n", __func__, ++cb_cnt[1]);
 }
@@ -39,7 +37,8 @@ static int init_callback(const struct device *dev,
 	int rc = gpio_pin_interrupt_configure(dev, PIN_IN, GPIO_INT_DISABLE);
 
 	if (rc == 0) {
-		rc = gpio_pin_interrupt_configure(dev, PIN_OUT, GPIO_INT_DISABLE);
+		rc = gpio_pin_interrupt_configure(dev, PIN_OUT,
+						  GPIO_INT_DISABLE);
 	}
 	if (rc == 0) {
 		/* 1. set PIN_OUT */
@@ -93,8 +92,7 @@ static int test_callback_add_remove(void)
 		TC_PRINT("%s not supported\n", __func__);
 		return TC_PASS;
 	}
-	zassert_equal(rc, 0,
-		      "init_callback failed");
+	zassert_equal(rc, 0, "init_callback failed");
 
 	/* 3. enable callback, trigger PIN_IN interrupt by operate PIN_OUT */
 	trigger_callback(dev, 1);
@@ -142,8 +140,7 @@ static int test_callback_self_remove(void)
 		TC_PRINT("%s not supported\n", __func__);
 		return TC_PASS;
 	}
-	zassert_equal(rc, 0,
-		      "init_callback failed");
+	zassert_equal(rc, 0, "init_callback failed");
 
 	gpio_pin_set(dev, PIN_OUT, 0);
 	k_sleep(K_MSEC(100));
@@ -194,8 +191,7 @@ static int test_callback_enable_disable(void)
 		TC_PRINT("%s not supported\n", __func__);
 		return TC_PASS;
 	}
-	zassert_equal(rc, 0,
-		      "init_callback failed");
+	zassert_equal(rc, 0, "init_callback failed");
 
 	/* 3. enable callback, trigger PIN_IN interrupt by operate PIN_OUT */
 	trigger_callback(dev, 1);
@@ -232,18 +228,15 @@ err_exit:
 
 void test_gpio_callback_add_remove(void)
 {
-	zassert_equal(test_callback_add_remove(), TC_PASS,
-		     NULL);
+	zassert_equal(test_callback_add_remove(), TC_PASS, NULL);
 }
 
 void test_gpio_callback_self_remove(void)
 {
-	zassert_equal(test_callback_self_remove(), TC_PASS,
-		     NULL);
+	zassert_equal(test_callback_self_remove(), TC_PASS, NULL);
 }
 
 void test_gpio_callback_enable_disable(void)
 {
-	zassert_equal(test_callback_enable_disable(), TC_PASS,
-		     NULL);
+	zassert_equal(test_callback_enable_disable(), TC_PASS, NULL);
 }

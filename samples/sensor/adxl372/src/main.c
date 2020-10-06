@@ -48,10 +48,12 @@ void main(void)
 	int i;
 	char meter[200];
 
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, adi_adxl372)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, adi_adxl372)));
 
 	if (dev == NULL) {
-		printf("Could not get %s device\n", DT_LABEL(DT_INST(0, adi_adxl372)));
+		printf("Could not get %s device\n",
+		       DT_LABEL(DT_INST(0, adi_adxl372)));
 		return;
 	}
 
@@ -87,8 +89,8 @@ void main(void)
 
 		if (IS_ENABLED(CONFIG_ADXL372_PEAK_DETECT_MODE)) {
 			mag = sqrt(pow2(sensor_ms2_to_g(&accel[0])) +
-				pow2(sensor_ms2_to_g(&accel[1])) +
-				pow2(sensor_ms2_to_g(&accel[2])));
+				   pow2(sensor_ms2_to_g(&accel[1])) +
+				   pow2(sensor_ms2_to_g(&accel[2])));
 
 			for (i = 0; i <= mag && i < (sizeof(meter) - 1); i++) {
 				meter[i] = '#';
@@ -99,9 +101,9 @@ void main(void)
 			printf("%6.2f g: %s\n", mag, meter);
 		} else {
 			printf("AX=%10.2f AY=%10.2f AZ=%10.2f (m/s^2)\n",
-				sensor_value_to_double(&accel[0]),
-				sensor_value_to_double(&accel[1]),
-				sensor_value_to_double(&accel[2]));
+			       sensor_value_to_double(&accel[0]),
+			       sensor_value_to_double(&accel[1]),
+			       sensor_value_to_double(&accel[2]));
 		}
 
 		if (!IS_ENABLED(CONFIG_ADXL372_TRIGGER)) {

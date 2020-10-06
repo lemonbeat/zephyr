@@ -43,7 +43,7 @@ extern "C" {
  * boundaries
  *
  */
-#define ARCH_STACK_PTR_ALIGN	16
+#define ARCH_STACK_PTR_ALIGN 16
 
 #ifdef __cplusplus
 }

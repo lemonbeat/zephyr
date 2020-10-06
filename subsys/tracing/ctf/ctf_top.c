@@ -9,7 +9,6 @@
 #include <kernel_internal.h>
 #include <ctf_top.h>
 
-
 static void _get_thread_name(struct k_thread *thread,
 			     ctf_bounded_string_t *name)
 {
@@ -58,19 +57,12 @@ void sys_trace_thread_create(struct k_thread *thread)
 	ctf_bounded_string_t name = { "unknown" };
 
 	_get_thread_name(thread, &name);
-	ctf_top_thread_create(
-		(uint32_t)(uintptr_t)thread,
-		thread->base.prio,
-		name
-		);
+	ctf_top_thread_create((uint32_t)(uintptr_t)thread, thread->base.prio,
+			      name);
 
 #if defined(CONFIG_THREAD_STACK_INFO)
-	ctf_top_thread_info(
-		(uint32_t)(uintptr_t)thread,
-		name,
-		thread->stack_info.start,
-		thread->stack_info.size
-		);
+	ctf_top_thread_info((uint32_t)(uintptr_t)thread, name,
+			    thread->stack_info.start, thread->stack_info.size);
 #endif
 }
 
@@ -122,12 +114,8 @@ void sys_trace_thread_info(struct k_thread *thread)
 	ctf_bounded_string_t name = { "unknown" };
 
 	_get_thread_name(thread, &name);
-	ctf_top_thread_info(
-		(uint32_t)(uintptr_t)thread,
-		name,
-		thread->stack_info.start,
-		thread->stack_info.size
-		);
+	ctf_top_thread_info((uint32_t)(uintptr_t)thread, name,
+			    thread->stack_info.start, thread->stack_info.size);
 #endif
 }
 
@@ -136,11 +124,7 @@ void sys_trace_thread_name_set(struct k_thread *thread)
 	ctf_bounded_string_t name = { "unknown" };
 
 	_get_thread_name(thread, &name);
-	ctf_top_thread_name_set(
-		(uint32_t)(uintptr_t)thread,
-		name
-		);
-
+	ctf_top_thread_name_set((uint32_t)(uintptr_t)thread, name);
 }
 
 void sys_trace_isr_enter(void)
@@ -170,44 +154,32 @@ void sys_trace_void(unsigned int id)
 
 void sys_trace_semaphore_init(struct k_sem *sem)
 {
-	ctf_top_semaphore_init(
-		(uint32_t)(uintptr_t)sem
-		);
+	ctf_top_semaphore_init((uint32_t)(uintptr_t)sem);
 }
 
 void sys_trace_semaphore_take(struct k_sem *sem)
 {
-	ctf_top_semaphore_take(
-		(uint32_t)(uintptr_t)sem
-		);
+	ctf_top_semaphore_take((uint32_t)(uintptr_t)sem);
 }
 
 void sys_trace_semaphore_give(struct k_sem *sem)
 {
-	ctf_top_semaphore_give(
-		(uint32_t)(uintptr_t)sem
-		);
+	ctf_top_semaphore_give((uint32_t)(uintptr_t)sem);
 }
 
 void sys_trace_mutex_init(struct k_mutex *mutex)
 {
-	ctf_top_mutex_init(
-		(uint32_t)(uintptr_t)mutex
-		);
+	ctf_top_mutex_init((uint32_t)(uintptr_t)mutex);
 }
 
 void sys_trace_mutex_lock(struct k_mutex *mutex)
 {
-	ctf_top_mutex_lock(
-		(uint32_t)(uintptr_t)mutex
-		);
+	ctf_top_mutex_lock((uint32_t)(uintptr_t)mutex);
 }
 
 void sys_trace_mutex_unlock(struct k_mutex *mutex)
 {
-	ctf_top_mutex_unlock(
-		(uint32_t)(uintptr_t)mutex
-		);
+	ctf_top_mutex_unlock((uint32_t)(uintptr_t)mutex);
 }
 
 void sys_trace_end_call(unsigned int id)

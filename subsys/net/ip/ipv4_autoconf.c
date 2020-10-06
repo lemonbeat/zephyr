@@ -71,8 +71,8 @@ static void ipv4_autoconf_send_probe(struct net_if_ipv4_autoconf *ipv4auto)
 	}
 }
 
-static void ipv4_autoconf_send_announcement(
-	struct net_if_ipv4_autoconf *ipv4auto)
+static void
+ipv4_autoconf_send_announcement(struct net_if_ipv4_autoconf *ipv4auto)
 {
 	struct net_pkt *pkt;
 
@@ -234,7 +234,7 @@ static uint32_t ipv4_autoconf_get_timeout(struct net_if_ipv4_autoconf *ipv4auto)
 		}
 
 		return IPV4_AUTOCONF_PROBE_WAIT * MSEC_PER_SEC +
-			(sys_rand32_get() % MSEC_PER_SEC);
+		       (sys_rand32_get() % MSEC_PER_SEC);
 
 	case NET_IPV4_AUTOCONF_ANNOUNCE:
 		return MSEC_PER_SEC * IPV4_AUTOCONF_ANNOUNCE_INTERVAL;
@@ -258,7 +258,8 @@ static void ipv4_autoconf_submit_work(uint32_t timeout)
 	}
 }
 
-static bool ipv4_autoconf_check_timeout(int64_t start, uint32_t time, int64_t timeout)
+static bool ipv4_autoconf_check_timeout(int64_t start, uint32_t time,
+					int64_t timeout)
 {
 	start += time;
 	if (start < 0) {
@@ -276,13 +277,12 @@ static bool ipv4_autoconf_timedout(struct net_if_ipv4_autoconf *ipv4auto,
 				   int64_t timeout)
 {
 	return ipv4_autoconf_check_timeout(ipv4auto->timer_start,
-					   ipv4auto->timer_timeout,
-					   timeout);
+					   ipv4auto->timer_timeout, timeout);
 }
 
-static uint32_t ipv4_autoconf_manage_timeouts(
-	struct net_if_ipv4_autoconf *ipv4auto,
-	int64_t timeout)
+static uint32_t
+ipv4_autoconf_manage_timeouts(struct net_if_ipv4_autoconf *ipv4auto,
+			      int64_t timeout)
 {
 	if (ipv4_autoconf_timedout(ipv4auto, timeout)) {
 		ipv4_autoconf_send(ipv4auto);

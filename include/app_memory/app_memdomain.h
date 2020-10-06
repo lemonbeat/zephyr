@@ -81,7 +81,7 @@ struct z_app_region {
 /* ARM has a quirk in that '@' denotes a comment, so we have to send
  * %progbits to the assembler instead.
  */
-#define Z_PROGBITS_SYM	"\%"
+#define Z_PROGBITS_SYM "\%"
 #else
 #define Z_PROGBITS_SYM "@"
 #endif
@@ -90,20 +90,19 @@ struct z_app_region {
 /* ARC MWDT assembler has slightly different pushsection/popsection directives
  * names.
  */
-#define Z_PUSHSECTION_DIRECTIV		".pushsect"
-#define Z_POPSECTION_DIRECTIVE		".popsect"
+#define Z_PUSHSECTION_DIRECTIV ".pushsect"
+#define Z_POPSECTION_DIRECTIVE ".popsect"
 #else
-#define Z_PUSHSECTION_DIRECTIV		".pushsection"
-#define Z_POPSECTION_DIRECTIVE		".popsection"
+#define Z_PUSHSECTION_DIRECTIV ".pushsection"
+#define Z_POPSECTION_DIRECTIVE ".popsection"
 #endif
 
-#define Z_APPMEM_PLACEHOLDER(name) \
-	__asm__ ( \
-		Z_PUSHSECTION_DIRECTIV " " STRINGIFY(K_APP_DMEM_SECTION(name)) \
-			",\"aw\"," Z_PROGBITS_SYM "progbits\n\t" \
-		".global " STRINGIFY(name) "_placeholder\n\t" \
-		STRINGIFY(name) "_placeholder:\n\t" \
-		Z_POPSECTION_DIRECTIVE "\n\t")
+#define Z_APPMEM_PLACEHOLDER(name)                                              \
+	__asm__(Z_PUSHSECTION_DIRECTIV " " STRINGIFY(K_APP_DMEM_SECTION(        \
+		name)) ",\"aw\"," Z_PROGBITS_SYM "progbits\n\t"                 \
+		       ".global " STRINGIFY(name) "_placeholder\n\t" STRINGIFY( \
+			       name) "_placeholder:\n\t" Z_POPSECTION_DIRECTIVE \
+				     "\n\t")
 
 /**
  * @brief Define an application memory partition with linker support
@@ -117,21 +116,20 @@ struct z_app_region {
  *
  * @param name Name of the k_mem_partition to declare
  */
-#define K_APPMEM_PARTITION_DEFINE(name) \
-	extern char Z_APP_START(name)[]; \
-	extern char Z_APP_SIZE(name)[]; \
-	struct k_mem_partition name = { \
-		.start = (uintptr_t) &Z_APP_START(name), \
-		.size = (size_t) &Z_APP_SIZE(name), \
-		.attr = K_MEM_PARTITION_P_RW_U_RW \
-	}; \
-	extern char Z_APP_BSS_START(name)[]; \
-	extern char Z_APP_BSS_SIZE(name)[]; \
-	Z_GENERIC_SECTION(.app_regions.name) \
-	const struct z_app_region name##_region = { \
-		.bss_start = &Z_APP_BSS_START(name), \
-		.bss_size = (size_t) &Z_APP_BSS_SIZE(name) \
-	}; \
+#define K_APPMEM_PARTITION_DEFINE(name)                                        \
+	extern char Z_APP_START(name)[];                                       \
+	extern char Z_APP_SIZE(name)[];                                        \
+	struct k_mem_partition name = { .start =                               \
+						(uintptr_t)&Z_APP_START(name), \
+					.size = (size_t)&Z_APP_SIZE(name),     \
+					.attr = K_MEM_PARTITION_P_RW_U_RW };   \
+	extern char Z_APP_BSS_START(name)[];                                   \
+	extern char Z_APP_BSS_SIZE(name)[];                                    \
+	Z_GENERIC_SECTION(.app_regions.name)                                   \
+	const struct z_app_region name##_region = {                            \
+		.bss_start = &Z_APP_BSS_START(name),                           \
+		.bss_size = (size_t)&Z_APP_BSS_SIZE(name)                      \
+	};                                                                     \
 	Z_APPMEM_PLACEHOLDER(name)
 #else
 

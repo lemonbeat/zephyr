@@ -9,15 +9,15 @@
 #include <timing/timing.h>
 #include "altera_avalon_timer_regs.h"
 
-#define NIOS2_SUBTRACT_CLOCK_CYCLES(val)                                       \
-	((IORD_ALTERA_AVALON_TIMER_PERIODH(TIMER_0_BASE) << 16 |               \
-	  (IORD_ALTERA_AVALON_TIMER_PERIODL(TIMER_0_BASE))) -                  \
+#define NIOS2_SUBTRACT_CLOCK_CYCLES(val)                         \
+	((IORD_ALTERA_AVALON_TIMER_PERIODH(TIMER_0_BASE) << 16 | \
+	  (IORD_ALTERA_AVALON_TIMER_PERIODL(TIMER_0_BASE))) -    \
 	 ((uint32_t)val))
 
-#define TIMING_INFO_OS_GET_TIME()                                              \
-	(NIOS2_SUBTRACT_CLOCK_CYCLES(                                          \
-		((uint32_t)IORD_ALTERA_AVALON_TIMER_SNAPH(TIMER_0_BASE)        \
-		 << 16) |                                                      \
+#define TIMING_INFO_OS_GET_TIME()                                       \
+	(NIOS2_SUBTRACT_CLOCK_CYCLES(                                   \
+		((uint32_t)IORD_ALTERA_AVALON_TIMER_SNAPH(TIMER_0_BASE) \
+		 << 16) |                                               \
 		((uint32_t)IORD_ALTERA_AVALON_TIMER_SNAPL(TIMER_0_BASE))))
 
 void timing_init(void)
@@ -39,7 +39,7 @@ timing_t timing_counter_get(void)
 }
 
 uint64_t timing_cycles_get(volatile timing_t *const start,
-				  volatile timing_t *const end)
+			   volatile timing_t *const end)
 {
 	return (*end - *start);
 }

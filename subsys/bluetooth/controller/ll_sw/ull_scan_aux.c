@@ -93,8 +93,8 @@ void ull_scan_aux_setup(memq_link_t *link, struct node_rx_hdr *rx, uint8_t phy)
 	aux = lll->hdr.parent;
 	if (((uint8_t *)aux < (uint8_t *)ll_scan_aux_pool) ||
 	    ((uint8_t *)aux > ((uint8_t *)ll_scan_aux_pool +
-			    (sizeof(struct ll_scan_aux_set) *
-			     (CONFIG_BT_CTLR_SCAN_AUX_SET - 1))))) {
+			       (sizeof(struct ll_scan_aux_set) *
+				(CONFIG_BT_CTLR_SCAN_AUX_SET - 1))))) {
 		aux = NULL;
 	}
 
@@ -191,12 +191,10 @@ void ull_scan_aux_setup(memq_link_t *link, struct node_rx_hdr *rx, uint8_t phy)
 		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_XTAL_US);
 	aux->evt.ticks_preempt_to_start =
 		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_PREEMPT_MIN_US);
-	aux->evt.ticks_slot =
-		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_START_US +
-				       ready_delay_us +
-				       PKT_AC_US(PDU_AC_EXT_PAYLOAD_SIZE_MAX,
-						 0, lll->phy) +
-				       EVENT_OVERHEAD_END_US);
+	aux->evt.ticks_slot = HAL_TICKER_US_TO_TICKS(
+		EVENT_OVERHEAD_START_US + ready_delay_us +
+		PKT_AC_US(PDU_AC_EXT_PAYLOAD_SIZE_MAX, 0, lll->phy) +
+		EVENT_OVERHEAD_END_US);
 
 	ticks_slot_offset = MAX(aux->evt.ticks_active_to_start,
 				aux->evt.ticks_xtal_to_start);
@@ -211,17 +209,14 @@ void ull_scan_aux_setup(memq_link_t *link, struct node_rx_hdr *rx, uint8_t phy)
 
 	aux_handle = aux_handle_get(aux);
 
-	ticker_status = ticker_start(TICKER_INSTANCE_ID_CTLR,
-				     TICKER_USER_ID_ULL_HIGH,
-				     TICKER_ID_SCAN_AUX_BASE + aux_handle,
-				     ftr->ticks_anchor - ticks_slot_offset,
-				     HAL_TICKER_US_TO_TICKS(aux_offset_us),
-				     TICKER_NULL_PERIOD,
-				     TICKER_NULL_REMAINDER,
-				     TICKER_NULL_LAZY,
-				     (aux->evt.ticks_slot +
-				      ticks_slot_overhead),
-				     ticker_cb, aux, ticker_op_cb, aux);
+	ticker_status = ticker_start(
+		TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_ULL_HIGH,
+		TICKER_ID_SCAN_AUX_BASE + aux_handle,
+		ftr->ticks_anchor - ticks_slot_offset,
+		HAL_TICKER_US_TO_TICKS(aux_offset_us), TICKER_NULL_PERIOD,
+		TICKER_NULL_REMAINDER, TICKER_NULL_LAZY,
+		(aux->evt.ticks_slot + ticks_slot_overhead), ticker_cb, aux,
+		ticker_op_cb, aux);
 	LL_ASSERT((ticker_status == TICKER_STATUS_SUCCESS) ||
 		  (ticker_status == TICKER_STATUS_BUSY));
 
@@ -303,7 +298,7 @@ static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 		      uint16_t lazy, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, lll_scan_aux_prepare};
+	static struct mayfly mfy = { 0, 0, &link, NULL, lll_scan_aux_prepare };
 	struct ll_scan_aux_set *aux = param;
 	static struct lll_prepare_param p;
 	uint32_t ret;
@@ -323,8 +318,8 @@ static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 	mfy.param = &p;
 
 	/* Kick LLL prepare */
-	ret = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL,
-			     0, &mfy);
+	ret = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL, 0,
+			     &mfy);
 	LL_ASSERT(!ret);
 
 	DEBUG_RADIO_PREPARE_O(1);
@@ -333,7 +328,7 @@ static void ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 static void ticker_op_cb(uint32_t status, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, ticker_op_aux_failure};
+	static struct mayfly mfy = { 0, 0, &link, NULL, ticker_op_aux_failure };
 	uint32_t ret;
 
 	if (status == TICKER_STATUS_SUCCESS) {
@@ -342,8 +337,8 @@ static void ticker_op_cb(uint32_t status, void *param)
 
 	mfy.param = param;
 
-	ret = mayfly_enqueue(TICKER_USER_ID_ULL_LOW, TICKER_USER_ID_ULL_HIGH,
-			     0, &mfy);
+	ret = mayfly_enqueue(TICKER_USER_ID_ULL_LOW, TICKER_USER_ID_ULL_HIGH, 0,
+			     &mfy);
 	LL_ASSERT(!ret);
 }
 

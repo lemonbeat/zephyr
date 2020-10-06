@@ -76,8 +76,7 @@ typedef uint32_t (*ipm_max_id_val_get_t)(const struct device *ipmdev);
  * See @a ipm_register_callback() for argument definitions.
  */
 typedef void (*ipm_register_callback_t)(const struct device *port,
-					ipm_callback_t cb,
-					void *user_data);
+					ipm_callback_t cb, void *user_data);
 
 /**
  * @typedef ipm_set_enabled_t
@@ -134,8 +133,7 @@ __syscall int ipm_send(const struct device *ipmdev, int wait, uint32_t id,
 		       const void *data, int size);
 
 static inline int z_impl_ipm_send(const struct device *ipmdev, int wait,
-				  uint32_t id,
-				  const void *data, int size)
+				  uint32_t id, const void *data, int size)
 {
 	const struct ipm_driver_api *api =
 		(const struct ipm_driver_api *)ipmdev->api;
@@ -179,7 +177,6 @@ static inline int z_impl_ipm_max_data_size_get(const struct device *ipmdev)
 
 	return api->max_data_size_get(ipmdev);
 }
-
 
 /**
  * @brief Return the maximum id value possible in an outbound message.

@@ -122,8 +122,7 @@ static void cpu_hold(void *arg1, void *arg2, void *arg3)
 	 * logic views it as one "job") and cause other test failures.
 	 */
 	dt = k_uptime_get_32() - start_ms;
-	zassert_true(dt < 3000,
-		     "1cpu test took too long (%d ms)", dt);
+	zassert_true(dt < 3000, "1cpu test took too long (%d ms)", dt);
 	arch_irq_unlock(key);
 }
 
@@ -142,11 +141,11 @@ void z_impl_z_test_1cpu_start(void)
 	 * to flag the following loop as DEADCODE so suppress the warning.
 	 */
 	/* coverity[DEADCODE] */
-	for (int i = 0; i < NUM_CPUHOLD; i++)  {
-		k_thread_create(&cpuhold_threads[i],
-				cpuhold_stacks[i], CPUHOLD_STACK_SZ,
-				(k_thread_entry_t) cpu_hold, NULL, NULL, NULL,
-				K_HIGHEST_THREAD_PRIO, 0, K_NO_WAIT);
+	for (int i = 0; i < NUM_CPUHOLD; i++) {
+		k_thread_create(&cpuhold_threads[i], cpuhold_stacks[i],
+				CPUHOLD_STACK_SZ, (k_thread_entry_t)cpu_hold,
+				NULL, NULL, NULL, K_HIGHEST_THREAD_PRIO, 0,
+				K_NO_WAIT);
 #ifdef CONFIG_THREAD_NAME
 		snprintk(tname, CONFIG_THREAD_MAX_NAME_LEN, "cpuhold%02d", i);
 		k_thread_name_set(&cpuhold_threads[i], tname);
@@ -163,7 +162,7 @@ void z_impl_z_test_1cpu_stop(void)
 	 * to flag the following loop as DEADCODE so suppress the warning.
 	 */
 	/* coverity[DEADCODE] */
-	for (int i = 0; i < NUM_CPUHOLD; i++)  {
+	for (int i = 0; i < NUM_CPUHOLD; i++) {
 		k_thread_abort(&cpuhold_threads[i]);
 	}
 }
@@ -280,8 +279,8 @@ out:
 #define FAIL_FAST 0
 #endif
 
-K_THREAD_STACK_DEFINE(ztest_thread_stack, CONFIG_ZTEST_STACKSIZE +
-		      CONFIG_TEST_EXTRA_STACKSIZE);
+K_THREAD_STACK_DEFINE(ztest_thread_stack,
+		      CONFIG_ZTEST_STACKSIZE + CONFIG_TEST_EXTRA_STACKSIZE);
 static ZTEST_BMEM int test_result;
 
 void ztest_test_fail(void)
@@ -329,10 +328,9 @@ static int run_test(struct unit_test *test)
 	TC_START(test->name);
 	k_thread_create(&ztest_thread, ztest_thread_stack,
 			K_THREAD_STACK_SIZEOF(ztest_thread_stack),
-			(k_thread_entry_t) test_cb, (struct unit_test *)test,
+			(k_thread_entry_t)test_cb, (struct unit_test *)test,
 			NULL, NULL, CONFIG_ZTEST_THREAD_PRIORITY,
-			test->thread_options | K_INHERIT_PERMS,
-				K_NO_WAIT);
+			test->thread_options | K_INHERIT_PERMS, K_NO_WAIT);
 
 	k_thread_name_set(&ztest_thread, "ztest_thread");
 	k_thread_join(&ztest_thread, K_FOREVER);
@@ -420,12 +418,10 @@ void main(void)
 	 * placed in this partition if no other memory domain configuration
 	 * is made.
 	 */
-	k_mem_domain_add_partition(&k_mem_domain_default,
-				   &ztest_mem_partition);
+	k_mem_domain_add_partition(&k_mem_domain_default, &ztest_mem_partition);
 #ifdef Z_MALLOC_PARTITION_EXISTS
 	/* Allow access to malloc() memory */
-	k_mem_domain_add_partition(&k_mem_domain_default,
-				   &z_malloc_partition);
+	k_mem_domain_add_partition(&k_mem_domain_default, &z_malloc_partition);
 #endif
 #endif /* CONFIG_USERSPACE */
 
@@ -445,8 +441,7 @@ void main(void)
 		}
 		state.boots += 1;
 		if (test_status == 0) {
-			PRINT("Reset board #%u to test again\n",
-				state.boots);
+			PRINT("Reset board #%u to test again\n", state.boots);
 			k_msleep(10);
 			sys_reboot(SYS_REBOOT_COLD);
 		} else {

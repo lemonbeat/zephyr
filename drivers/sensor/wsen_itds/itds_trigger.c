@@ -58,7 +58,7 @@ int itds_trigger_set(const struct device *dev,
 static void itds_work_handler(struct k_work *work)
 {
 	struct itds_device_data *ddata =
-			CONTAINER_OF(work, struct itds_device_data, work);
+		CONTAINER_OF(work, struct itds_device_data, work);
 	const struct device *dev = (const struct device *)ddata->dev;
 	const struct itds_device_config *cfg = dev->config;
 	uint8_t status;
@@ -83,7 +83,7 @@ static void itds_gpio_callback(const struct device *port,
 			       struct gpio_callback *cb, uint32_t pin)
 {
 	struct itds_device_data *ddata =
-			CONTAINER_OF(cb, struct itds_device_data, gpio_cb);
+		CONTAINER_OF(cb, struct itds_device_data, gpio_cb);
 
 	ARG_UNUSED(port);
 	ARG_UNUSED(pin);

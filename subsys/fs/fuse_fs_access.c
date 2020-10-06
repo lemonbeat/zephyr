@@ -154,8 +154,8 @@ static int fuse_fs_access_readmount(void *buf, fuse_fill_dir_t filler)
 }
 
 static int fuse_fs_access_readdir(const char *path, void *buf,
-			      fuse_fill_dir_t filler, off_t off,
-			      struct fuse_file_info *fi)
+				  fuse_fill_dir_t filler, off_t off,
+				  struct fuse_file_info *fi)
 {
 	struct fs_dir_t dir;
 	struct fs_dirent entry;
@@ -230,11 +230,10 @@ static int fuse_fs_access_readdir(const char *path, void *buf,
 	fs_closedir(&dir);
 
 	return err;
-
 }
 
 static int fuse_fs_access_create(const char *path, mode_t mode,
-			     struct fuse_file_info *fi)
+				 struct fuse_file_info *fi)
 {
 	int err;
 	ssize_t handle;
@@ -283,7 +282,7 @@ static int fuse_fs_access_release(const char *path, struct fuse_file_info *fi)
 }
 
 static int fuse_fs_access_read(const char *path, char *buf, size_t size,
-		off_t off, struct fuse_file_info *fi)
+			       off_t off, struct fuse_file_info *fi)
 {
 	int err;
 
@@ -304,7 +303,7 @@ static int fuse_fs_access_read(const char *path, char *buf, size_t size,
 }
 
 static int fuse_fs_access_write(const char *path, const char *buf, size_t size,
-		off_t off, struct fuse_file_info *fi)
+				off_t off, struct fuse_file_info *fi)
 {
 	int err;
 
@@ -325,7 +324,7 @@ static int fuse_fs_access_write(const char *path, const char *buf, size_t size,
 }
 
 static int fuse_fs_access_ftruncate(const char *path, off_t size,
-				struct fuse_file_info *fi)
+				    struct fuse_file_info *fi)
 {
 	int err;
 
@@ -394,7 +393,6 @@ static int fuse_fs_access_utimens(const char *path, const struct timespec tv[2])
 	return 0;
 }
 
-
 static struct fuse_operations fuse_fs_access_oper = {
 	.getattr = fuse_fs_access_getattr,
 	.readlink = NULL,
@@ -421,7 +419,7 @@ static struct fuse_operations fuse_fs_access_oper = {
 	.getxattr = NULL,
 	.listxattr = NULL,
 	.removexattr = NULL,
-	.opendir  = NULL,
+	.opendir = NULL,
 	.readdir = fuse_fs_access_readdir,
 	.releasedir = NULL,
 	.fsyncdir = NULL,
@@ -450,12 +448,7 @@ static void *fuse_fs_access_main(void *arg)
 {
 	ARG_UNUSED(arg);
 
-	char *argv[] = {
-		"",
-		"-f",
-		"-s",
-		(char *) fuse_mountpoint
-	};
+	char *argv[] = { "", "-f", "-s", (char *)fuse_mountpoint };
 	int argc = ARRAY_SIZE(argv);
 
 	posix_print_trace("Mounting flash at %s/\n", fuse_mountpoint);
@@ -475,21 +468,20 @@ static void fuse_fs_access_init(void)
 
 	if (stat(fuse_mountpoint, &st) < 0) {
 		if (mkdir(fuse_mountpoint, 0700) < 0) {
-			posix_print_error_and_exit("Failed to create"
+			posix_print_error_and_exit(
+				"Failed to create"
 				" directory for flash mount point (%s): %s\n",
 				fuse_mountpoint, strerror(errno));
 		}
 	} else if (!S_ISDIR(st.st_mode)) {
 		posix_print_error_and_exit("%s is not a directory\n",
 					   fuse_mountpoint);
-
 	}
 
 	err = pthread_create(&fuse_thread, NULL, fuse_fs_access_main, NULL);
 	if (err < 0) {
-		posix_print_error_and_exit(
-					"Failed to create thread for "
-					"fuse_fs_access_main\n");
+		posix_print_error_and_exit("Failed to create thread for "
+					   "fuse_fs_access_main\n");
 	}
 }
 

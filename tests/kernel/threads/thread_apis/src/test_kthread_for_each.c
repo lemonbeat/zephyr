@@ -27,8 +27,8 @@ static void thread_callback(const struct k_thread *thread, void *user_data)
 
 	if (thread == &tdata) {
 		TC_PRINT("%s: Newly added thread found\n", str);
-		TC_PRINT("%s: tid: %p, prio: %d\n",
-				str, thread, thread->base.prio);
+		TC_PRINT("%s: tid: %p, prio: %d\n", str, thread,
+			 thread->base.prio);
 		thread_flag = true;
 	}
 	tcount++;
@@ -55,14 +55,15 @@ void test_k_thread_foreach(void)
 	 * and stack_flag are not set.
 	 */
 	zassert_true(tcount && !thread_flag,
-				"thread_callback() not getting called");
+		     "thread_callback() not getting called");
 	/* Save the initial thread count */
 	count = tcount;
 
 	/* Create new thread which should add a new entry to the thread list */
-	k_tid_t tid = k_thread_create(&tdata, tstack,
-			STACK_SIZE, (k_thread_entry_t)thread_entry, NULL,
-			NULL, NULL, K_PRIO_PREEMPT(0), 0, K_NO_WAIT);
+	k_tid_t tid = k_thread_create(&tdata, tstack, STACK_SIZE,
+				      (k_thread_entry_t)thread_entry, NULL,
+				      NULL, NULL, K_PRIO_PREEMPT(0), 0,
+				      K_NO_WAIT);
 	k_msleep(1);
 
 	/* Call k_thread_foreach() and check
@@ -74,6 +75,6 @@ void test_k_thread_foreach(void)
 
 	/* Check thread_count > temp, thread_flag and stack_flag are set */
 	zassert_true((tcount > count) && thread_flag,
-					"thread_callback() not getting called");
+		     "thread_callback() not getting called");
 	k_thread_abort(tid);
 }

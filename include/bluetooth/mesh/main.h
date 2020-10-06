@@ -23,44 +23,44 @@ extern "C" {
 
 /** Available Provisioning output authentication actions. */
 typedef enum {
-	BT_MESH_NO_OUTPUT       = 0,
-	BT_MESH_BLINK           = BIT(0),
-	BT_MESH_BEEP            = BIT(1),
-	BT_MESH_VIBRATE         = BIT(2),
-	BT_MESH_DISPLAY_NUMBER  = BIT(3),
-	BT_MESH_DISPLAY_STRING  = BIT(4),
+	BT_MESH_NO_OUTPUT = 0,
+	BT_MESH_BLINK = BIT(0),
+	BT_MESH_BEEP = BIT(1),
+	BT_MESH_VIBRATE = BIT(2),
+	BT_MESH_DISPLAY_NUMBER = BIT(3),
+	BT_MESH_DISPLAY_STRING = BIT(4),
 } bt_mesh_output_action_t;
 
 /** Available Provisioning input authentication actions. */
 typedef enum {
-	BT_MESH_NO_INPUT      = 0,
-	BT_MESH_PUSH          = BIT(0),
-	BT_MESH_TWIST         = BIT(1),
-	BT_MESH_ENTER_NUMBER  = BIT(2),
-	BT_MESH_ENTER_STRING  = BIT(3),
+	BT_MESH_NO_INPUT = 0,
+	BT_MESH_PUSH = BIT(0),
+	BT_MESH_TWIST = BIT(1),
+	BT_MESH_ENTER_NUMBER = BIT(2),
+	BT_MESH_ENTER_STRING = BIT(3),
 } bt_mesh_input_action_t;
 
 /** Available Provisioning bearers. */
 typedef enum {
-	BT_MESH_PROV_ADV   = BIT(0),
-	BT_MESH_PROV_GATT  = BIT(1),
+	BT_MESH_PROV_ADV = BIT(0),
+	BT_MESH_PROV_GATT = BIT(1),
 } bt_mesh_prov_bearer_t;
 
 /** Out of Band information location. */
 typedef enum {
-	BT_MESH_PROV_OOB_OTHER     = BIT(0),
-	BT_MESH_PROV_OOB_URI       = BIT(1),
-	BT_MESH_PROV_OOB_2D_CODE   = BIT(2),
-	BT_MESH_PROV_OOB_BAR_CODE  = BIT(3),
-	BT_MESH_PROV_OOB_NFC       = BIT(4),
-	BT_MESH_PROV_OOB_NUMBER    = BIT(5),
-	BT_MESH_PROV_OOB_STRING    = BIT(6),
+	BT_MESH_PROV_OOB_OTHER = BIT(0),
+	BT_MESH_PROV_OOB_URI = BIT(1),
+	BT_MESH_PROV_OOB_2D_CODE = BIT(2),
+	BT_MESH_PROV_OOB_BAR_CODE = BIT(3),
+	BT_MESH_PROV_OOB_NFC = BIT(4),
+	BT_MESH_PROV_OOB_NUMBER = BIT(5),
+	BT_MESH_PROV_OOB_STRING = BIT(6),
 	/* 7 - 10 are reserved */
-	BT_MESH_PROV_OOB_ON_BOX    = BIT(11),
-	BT_MESH_PROV_OOB_IN_BOX    = BIT(12),
-	BT_MESH_PROV_OOB_ON_PAPER  = BIT(13),
+	BT_MESH_PROV_OOB_ON_BOX = BIT(11),
+	BT_MESH_PROV_OOB_IN_BOX = BIT(12),
+	BT_MESH_PROV_OOB_ON_PAPER = BIT(13),
 	BT_MESH_PROV_OOB_IN_MANUAL = BIT(14),
-	BT_MESH_PROV_OOB_ON_DEV    = BIT(15),
+	BT_MESH_PROV_OOB_ON_DEV = BIT(15),
 } bt_mesh_prov_oob_info_t;
 
 /** Provisioning properties & capabilities. */
@@ -81,17 +81,17 @@ struct bt_mesh_prov {
 	/** Static OOB value */
 	const uint8_t *static_val;
 	/** Static OOB value length */
-	uint8_t        static_val_len;
+	uint8_t static_val_len;
 
 	/** Maximum size of Output OOB supported */
-	uint8_t        output_size;
+	uint8_t output_size;
 	/** Supported Output OOB Actions */
-	uint16_t       output_actions;
+	uint16_t output_actions;
 
 	/** Maximum size of Input OOB supported */
-	uint8_t        input_size;
+	uint8_t input_size;
 	/** Supported Input OOB Actions */
-	uint16_t       input_actions;
+	uint16_t input_actions;
 
 	/** @brief Output of a number is requested.
 	 *
@@ -103,7 +103,7 @@ struct bt_mesh_prov {
 	 *
 	 *  @return Zero on success or negative error code otherwise
 	 */
-	int         (*output_number)(bt_mesh_output_action_t act, uint32_t num);
+	int (*output_number)(bt_mesh_output_action_t act, uint32_t num);
 
 	/** @brief Output of a string is requested.
 	 *
@@ -114,7 +114,7 @@ struct bt_mesh_prov {
 	 *
 	 *  @return Zero on success or negative error code otherwise
 	 */
-	int         (*output_string)(const char *str);
+	int (*output_string)(const char *str);
 
 	/** @brief Input is requested.
 	 *
@@ -130,7 +130,7 @@ struct bt_mesh_prov {
 	 *
 	 *  @return Zero on success or negative error code otherwise
 	 */
-	int         (*input)(bt_mesh_input_action_t act, uint8_t size);
+	int (*input)(bt_mesh_input_action_t act, uint8_t size);
 
 	/** @brief The other device finished their OOB input.
 	 *
@@ -138,7 +138,7 @@ struct bt_mesh_prov {
 	 *  displaying its output OOB value, as the other party finished their
 	 *  OOB input.
 	 */
-	void 	    (*input_complete)(void);
+	void (*input_complete)(void);
 
 	/** @brief Unprovisioned beacon has been received.
 	 *
@@ -150,9 +150,9 @@ struct bt_mesh_prov {
 	 *  @param uri_hash Pointer to URI Hash value. NULL if no hash was
 	 *                  present in the beacon.
 	 */
-	void        (*unprovisioned_beacon)(uint8_t uuid[16],
-					    bt_mesh_prov_oob_info_t oob_info,
-					    uint32_t *uri_hash);
+	void (*unprovisioned_beacon)(uint8_t uuid[16],
+				     bt_mesh_prov_oob_info_t oob_info,
+				     uint32_t *uri_hash);
 
 	/** @brief Provisioning link has been opened.
 	 *
@@ -161,7 +161,7 @@ struct bt_mesh_prov {
 	 *
 	 *  @param bearer Provisioning bearer.
 	 */
-	void        (*link_open)(bt_mesh_prov_bearer_t bearer);
+	void (*link_open)(bt_mesh_prov_bearer_t bearer);
 
 	/** @brief Provisioning link has been closed.
 	 *
@@ -170,7 +170,7 @@ struct bt_mesh_prov {
 	 *
 	 *  @param bearer Provisioning bearer.
 	 */
-	void        (*link_close)(bt_mesh_prov_bearer_t bearer);
+	void (*link_close)(bt_mesh_prov_bearer_t bearer);
 
 	/** @brief Provisioning is complete.
 	 *
@@ -181,7 +181,7 @@ struct bt_mesh_prov {
 	 *  @param net_idx NetKeyIndex given during provisioning.
 	 *  @param addr    Primary element address.
 	 */
-	void        (*complete)(uint16_t net_idx, uint16_t addr);
+	void (*complete)(uint16_t net_idx, uint16_t addr);
 
 	/** @brief A new node has been added to the provisioning database.
 	 *
@@ -194,8 +194,8 @@ struct bt_mesh_prov {
 	 *  @param addr     Primary element address.
 	 *  @param num_elem Number of elements that this node has.
 	 */
-	void        (*node_added)(uint16_t net_idx, uint8_t uuid[16], uint16_t addr,
-				  uint8_t num_elem);
+	void (*node_added)(uint16_t net_idx, uint8_t uuid[16], uint16_t addr,
+			   uint8_t num_elem);
 
 	/** @brief Node has been reset.
 	 *
@@ -205,7 +205,7 @@ struct bt_mesh_prov {
 	 *  bt_mesh_prov_enable() API needs to be called to enable
 	 *  unprovisioned advertising on one or more provisioning bearers.
 	 */
-	void        (*reset)(void);
+	void (*reset)(void);
 };
 
 /** @brief Provide provisioning input OOB string.
@@ -279,8 +279,8 @@ int bt_mesh_provision(const uint8_t net_key[16], uint16_t net_idx,
  *
  *  @return Zero on success or (negative) error code otherwise.
  */
-int bt_mesh_provision_adv(const uint8_t uuid[16], uint16_t net_idx, uint16_t addr,
-			  uint8_t attention_duration);
+int bt_mesh_provision_adv(const uint8_t uuid[16], uint16_t net_idx,
+			  uint16_t addr, uint8_t attention_duration);
 
 /** @brief Check if the local node has been provisioned.
  *
@@ -305,36 +305,35 @@ bool bt_mesh_is_provisioned(void);
  */
 
 /* Primary Network Key index */
-#define BT_MESH_NET_PRIMARY                 0x000
+#define BT_MESH_NET_PRIMARY 0x000
 
-#define BT_MESH_RELAY_DISABLED              0x00
-#define BT_MESH_RELAY_ENABLED               0x01
-#define BT_MESH_RELAY_NOT_SUPPORTED         0x02
+#define BT_MESH_RELAY_DISABLED 0x00
+#define BT_MESH_RELAY_ENABLED 0x01
+#define BT_MESH_RELAY_NOT_SUPPORTED 0x02
 
-#define BT_MESH_BEACON_DISABLED             0x00
-#define BT_MESH_BEACON_ENABLED              0x01
+#define BT_MESH_BEACON_DISABLED 0x00
+#define BT_MESH_BEACON_ENABLED 0x01
 
-#define BT_MESH_GATT_PROXY_DISABLED         0x00
-#define BT_MESH_GATT_PROXY_ENABLED          0x01
-#define BT_MESH_GATT_PROXY_NOT_SUPPORTED    0x02
+#define BT_MESH_GATT_PROXY_DISABLED 0x00
+#define BT_MESH_GATT_PROXY_ENABLED 0x01
+#define BT_MESH_GATT_PROXY_NOT_SUPPORTED 0x02
 
-#define BT_MESH_FRIEND_DISABLED             0x00
-#define BT_MESH_FRIEND_ENABLED              0x01
-#define BT_MESH_FRIEND_NOT_SUPPORTED        0x02
+#define BT_MESH_FRIEND_DISABLED 0x00
+#define BT_MESH_FRIEND_ENABLED 0x01
+#define BT_MESH_FRIEND_NOT_SUPPORTED 0x02
 
-#define BT_MESH_NODE_IDENTITY_STOPPED       0x00
-#define BT_MESH_NODE_IDENTITY_RUNNING       0x01
+#define BT_MESH_NODE_IDENTITY_STOPPED 0x00
+#define BT_MESH_NODE_IDENTITY_RUNNING 0x01
 #define BT_MESH_NODE_IDENTITY_NOT_SUPPORTED 0x02
 
 /* Features */
-#define BT_MESH_FEAT_RELAY                  BIT(0)
-#define BT_MESH_FEAT_PROXY                  BIT(1)
-#define BT_MESH_FEAT_FRIEND                 BIT(2)
-#define BT_MESH_FEAT_LOW_POWER              BIT(3)
-#define BT_MESH_FEAT_SUPPORTED              (BT_MESH_FEAT_RELAY |   \
-					     BT_MESH_FEAT_PROXY |   \
-					     BT_MESH_FEAT_FRIEND |  \
-					     BT_MESH_FEAT_LOW_POWER)
+#define BT_MESH_FEAT_RELAY BIT(0)
+#define BT_MESH_FEAT_PROXY BIT(1)
+#define BT_MESH_FEAT_FRIEND BIT(2)
+#define BT_MESH_FEAT_LOW_POWER BIT(3)
+#define BT_MESH_FEAT_SUPPORTED                                           \
+	(BT_MESH_FEAT_RELAY | BT_MESH_FEAT_PROXY | BT_MESH_FEAT_FRIEND | \
+	 BT_MESH_FEAT_LOW_POWER)
 
 /** @brief Initialize Mesh support
  *

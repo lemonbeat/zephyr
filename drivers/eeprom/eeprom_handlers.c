@@ -13,8 +13,7 @@ static inline int z_vrfy_eeprom_read(const struct device *dev, off_t offset,
 	Z_OOPS(Z_SYSCALL_DRIVER_EEPROM(dev, read));
 	Z_OOPS(Z_SYSCALL_MEMORY_WRITE(data, len));
 	return z_impl_eeprom_read((const struct device *)dev, offset,
-				  (void *)data,
-				  len);
+				  (void *)data, len);
 }
 #include <syscalls/eeprom_read_mrsh.c>
 

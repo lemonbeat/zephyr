@@ -53,39 +53,35 @@ static uint8_t dis_serial_number[CONFIG_BT_DIS_STR_MAX] =
 	CONFIG_BT_DIS_SERIAL_NUMBER_STR;
 #endif
 #if defined(CONFIG_BT_DIS_FW_REV)
-static uint8_t dis_fw_rev[CONFIG_BT_DIS_STR_MAX] =
-	CONFIG_BT_DIS_FW_REV_STR;
+static uint8_t dis_fw_rev[CONFIG_BT_DIS_STR_MAX] = CONFIG_BT_DIS_FW_REV_STR;
 #endif
 #if defined(CONFIG_BT_DIS_HW_REV)
-static uint8_t dis_hw_rev[CONFIG_BT_DIS_STR_MAX] =
-	CONFIG_BT_DIS_HW_REV_STR;
+static uint8_t dis_hw_rev[CONFIG_BT_DIS_STR_MAX] = CONFIG_BT_DIS_HW_REV_STR;
 #endif
 #if defined(CONFIG_BT_DIS_SW_REV)
-static uint8_t dis_sw_rev[CONFIG_BT_DIS_STR_MAX] =
-	CONFIG_BT_DIS_SW_REV_STR;
+static uint8_t dis_sw_rev[CONFIG_BT_DIS_STR_MAX] = CONFIG_BT_DIS_SW_REV_STR;
 #endif
 
-#define BT_DIS_MODEL_REF		dis_model
-#define BT_DIS_MANUF_REF		dis_manuf
-#define BT_DIS_SERIAL_NUMBER_STR_REF	dis_serial_number
-#define BT_DIS_FW_REV_STR_REF		dis_fw_rev
-#define BT_DIS_HW_REV_STR_REF		dis_hw_rev
-#define BT_DIS_SW_REV_STR_REF		dis_sw_rev
+#define BT_DIS_MODEL_REF dis_model
+#define BT_DIS_MANUF_REF dis_manuf
+#define BT_DIS_SERIAL_NUMBER_STR_REF dis_serial_number
+#define BT_DIS_FW_REV_STR_REF dis_fw_rev
+#define BT_DIS_HW_REV_STR_REF dis_hw_rev
+#define BT_DIS_SW_REV_STR_REF dis_sw_rev
 
 #else /* CONFIG_BT_DIS_SETTINGS */
 
-#define BT_DIS_MODEL_REF		CONFIG_BT_DIS_MODEL
-#define BT_DIS_MANUF_REF		CONFIG_BT_DIS_MANUF
-#define BT_DIS_SERIAL_NUMBER_STR_REF	CONFIG_BT_DIS_SERIAL_NUMBER_STR
-#define BT_DIS_FW_REV_STR_REF		CONFIG_BT_DIS_FW_REV_STR
-#define BT_DIS_HW_REV_STR_REF		CONFIG_BT_DIS_HW_REV_STR
-#define BT_DIS_SW_REV_STR_REF		CONFIG_BT_DIS_SW_REV_STR
+#define BT_DIS_MODEL_REF CONFIG_BT_DIS_MODEL
+#define BT_DIS_MANUF_REF CONFIG_BT_DIS_MANUF
+#define BT_DIS_SERIAL_NUMBER_STR_REF CONFIG_BT_DIS_SERIAL_NUMBER_STR
+#define BT_DIS_FW_REV_STR_REF CONFIG_BT_DIS_FW_REV_STR
+#define BT_DIS_HW_REV_STR_REF CONFIG_BT_DIS_HW_REV_STR
+#define BT_DIS_SW_REV_STR_REF CONFIG_BT_DIS_SW_REV_STR
 
 #endif /* CONFIG_BT_DIS_SETTINGS */
 
-static ssize_t read_str(struct bt_conn *conn,
-			  const struct bt_gatt_attr *attr, void *buf,
-			  uint16_t len, uint16_t offset)
+static ssize_t read_str(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+			void *buf, uint16_t len, uint16_t offset)
 {
 	return bt_gatt_attr_read(conn, attr, buf, len, offset, attr->user_data,
 				 strlen(attr->user_data));
@@ -102,48 +98,47 @@ static ssize_t read_pnp_id(struct bt_conn *conn,
 #endif
 
 /* Device Information Service Declaration */
-BT_GATT_SERVICE_DEFINE(dis_svc,
-	BT_GATT_PRIMARY_SERVICE(BT_UUID_DIS),
+BT_GATT_SERVICE_DEFINE(
+	dis_svc, BT_GATT_PRIMARY_SERVICE(BT_UUID_DIS),
 
-	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_MODEL_NUMBER,
-			       BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
-			       read_str, NULL, BT_DIS_MODEL_REF),
-	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_MANUFACTURER_NAME,
-			       BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
-			       read_str, NULL, BT_DIS_MANUF_REF),
+	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_MODEL_NUMBER, BT_GATT_CHRC_READ,
+			       BT_GATT_PERM_READ, read_str, NULL,
+			       BT_DIS_MODEL_REF),
+	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_MANUFACTURER_NAME, BT_GATT_CHRC_READ,
+			       BT_GATT_PERM_READ, read_str, NULL,
+			       BT_DIS_MANUF_REF),
 #if CONFIG_BT_DIS_PNP
-	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_PNP_ID,
-			       BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
-			       read_pnp_id, NULL, &dis_pnp_id),
+	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_PNP_ID, BT_GATT_CHRC_READ,
+			       BT_GATT_PERM_READ, read_pnp_id, NULL,
+			       &dis_pnp_id),
 #endif
 
 #if defined(CONFIG_BT_DIS_SERIAL_NUMBER)
-	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_SERIAL_NUMBER,
-			       BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
-			       read_str, NULL,
+	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_SERIAL_NUMBER, BT_GATT_CHRC_READ,
+			       BT_GATT_PERM_READ, read_str, NULL,
 			       BT_DIS_SERIAL_NUMBER_STR_REF),
 #endif
 #if defined(CONFIG_BT_DIS_FW_REV)
-	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_FIRMWARE_REVISION,
-			       BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
-			       read_str, NULL, BT_DIS_FW_REV_STR_REF),
+	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_FIRMWARE_REVISION, BT_GATT_CHRC_READ,
+			       BT_GATT_PERM_READ, read_str, NULL,
+			       BT_DIS_FW_REV_STR_REF),
 #endif
 #if defined(CONFIG_BT_DIS_HW_REV)
-	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_HARDWARE_REVISION,
-			       BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
-			       read_str, NULL, BT_DIS_HW_REV_STR_REF),
+	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_HARDWARE_REVISION, BT_GATT_CHRC_READ,
+			       BT_GATT_PERM_READ, read_str, NULL,
+			       BT_DIS_HW_REV_STR_REF),
 #endif
 #if defined(CONFIG_BT_DIS_SW_REV)
-	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_SOFTWARE_REVISION,
-			       BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
-			       read_str, NULL, BT_DIS_SW_REV_STR_REF),
+	BT_GATT_CHARACTERISTIC(BT_UUID_DIS_SOFTWARE_REVISION, BT_GATT_CHRC_READ,
+			       BT_GATT_PERM_READ, read_str, NULL,
+			       BT_DIS_SW_REV_STR_REF),
 #endif
 
 );
 
 #if defined(CONFIG_BT_SETTINGS) && defined(CONFIG_BT_DIS_SETTINGS)
-static int dis_set(const char *name, size_t len_rd,
-		   settings_read_cb read_cb, void *store)
+static int dis_set(const char *name, size_t len_rd, settings_read_cb read_cb,
+		   void *store)
 {
 	ssize_t len;
 	int nlen;
@@ -154,7 +149,8 @@ static int dis_set(const char *name, size_t len_rd,
 		len = read_cb(store, &dis_manuf, sizeof(dis_manuf) - 1);
 		if (len < 0) {
 			BT_ERR("Failed to read manufacturer from storage"
-				       " (err %zd)", len);
+			       " (err %zd)",
+			       len);
 		} else {
 			dis_manuf[len] = '\0';
 
@@ -166,7 +162,8 @@ static int dis_set(const char *name, size_t len_rd,
 		len = read_cb(store, &dis_model, sizeof(dis_model) - 1);
 		if (len < 0) {
 			BT_ERR("Failed to read model from storage"
-				       " (err %zd)", len);
+			       " (err %zd)",
+			       len);
 		} else {
 			dis_model[len] = '\0';
 
@@ -177,10 +174,11 @@ static int dis_set(const char *name, size_t len_rd,
 #if defined(CONFIG_BT_DIS_SERIAL_NUMBER)
 	if (!strncmp(name, "serial", nlen)) {
 		len = read_cb(store, &dis_serial_number,
-			   sizeof(dis_serial_number) - 1);
+			      sizeof(dis_serial_number) - 1);
 		if (len < 0) {
 			BT_ERR("Failed to read serial number from storage"
-				       " (err %zd)", len);
+			       " (err %zd)",
+			       len);
 		} else {
 			dis_serial_number[len] = '\0';
 
@@ -194,7 +192,8 @@ static int dis_set(const char *name, size_t len_rd,
 		len = read_cb(store, &dis_fw_rev, sizeof(dis_fw_rev) - 1);
 		if (len < 0) {
 			BT_ERR("Failed to read firmware revision from storage"
-				       " (err %zd)", len);
+			       " (err %zd)",
+			       len);
 		} else {
 			dis_fw_rev[len] = '\0';
 
@@ -208,7 +207,8 @@ static int dis_set(const char *name, size_t len_rd,
 		len = read_cb(store, &dis_hw_rev, sizeof(dis_hw_rev) - 1);
 		if (len < 0) {
 			BT_ERR("Failed to read hardware revision from storage"
-				       " (err %zd)", len);
+			       " (err %zd)",
+			       len);
 		} else {
 			dis_hw_rev[len] = '\0';
 
@@ -222,7 +222,8 @@ static int dis_set(const char *name, size_t len_rd,
 		len = read_cb(store, &dis_sw_rev, sizeof(dis_sw_rev) - 1);
 		if (len < 0) {
 			BT_ERR("Failed to read software revision from storage"
-				       " (err %zd)", len);
+			       " (err %zd)",
+			       len);
 		} else {
 			dis_sw_rev[len] = '\0';
 

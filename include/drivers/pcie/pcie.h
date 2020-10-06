@@ -119,30 +119,30 @@ extern void pcie_irq_enable(pcie_bdf_t bdf, unsigned int irq);
  * Configuration word 0 aligns directly with pcie_id_t.
  */
 
-#define PCIE_CONF_ID		0U
+#define PCIE_CONF_ID 0U
 
 /*
  * Configuration word 1 contains command and status bits.
  */
 
-#define PCIE_CONF_CMDSTAT	1U	/* command/status register */
+#define PCIE_CONF_CMDSTAT 1U /* command/status register */
 
-#define PCIE_CONF_CMDSTAT_IO		0x00000001U  /* I/O access enable */
-#define PCIE_CONF_CMDSTAT_MEM		0x00000002U  /* mem access enable */
-#define PCIE_CONF_CMDSTAT_MASTER	0x00000004U  /* bus master enable */
-#define PCIE_CONF_CMDSTAT_CAPS		0x00100000U  /* capabilities list */
+#define PCIE_CONF_CMDSTAT_IO 0x00000001U /* I/O access enable */
+#define PCIE_CONF_CMDSTAT_MEM 0x00000002U /* mem access enable */
+#define PCIE_CONF_CMDSTAT_MASTER 0x00000004U /* bus master enable */
+#define PCIE_CONF_CMDSTAT_CAPS 0x00100000U /* capabilities list */
 
 /*
  * Configuration word 2 has additional function identification that
  * we only care about for debug output (PCIe shell commands).
  */
 
-#define PCIE_CONF_CLASSREV	2U	/* class/revision register */
+#define PCIE_CONF_CLASSREV 2U /* class/revision register */
 
-#define PCIE_CONF_CLASSREV_CLASS(w)	(((w) >> 24) & 0xFFU)
-#define PCIE_CONF_CLASSREV_SUBCLASS(w)  (((w) >> 16) & 0xFFU)
-#define PCIE_CONF_CLASSREV_PROGIF(w)	(((w) >> 8) & 0xFFU)
-#define PCIE_CONF_CLASSREV_REV(w)	((w) & 0xFFU)
+#define PCIE_CONF_CLASSREV_CLASS(w) (((w) >> 24) & 0xFFU)
+#define PCIE_CONF_CLASSREV_SUBCLASS(w) (((w) >> 16) & 0xFFU)
+#define PCIE_CONF_CLASSREV_PROGIF(w) (((w) >> 8) & 0xFFU)
+#define PCIE_CONF_CLASSREV_REV(w) ((w)&0xFFU)
 
 /*
  * The only part of configuration word 3 that is of interest to us is
@@ -150,9 +150,9 @@ extern void pcie_irq_enable(pcie_bdf_t bdf, unsigned int irq);
  * from bridges (which are, for our purposes, transparent).
  */
 
-#define PCIE_CONF_TYPE		3U
+#define PCIE_CONF_TYPE 3U
 
-#define PCIE_CONF_TYPE_BRIDGE(w)	(((w) & 0x007F0000U) != 0U)
+#define PCIE_CONF_TYPE_BRIDGE(w) (((w)&0x007F0000U) != 0U)
 
 /*
  * Words 4-9 are BARs are I/O or memory decoders. Memory decoders may
@@ -160,18 +160,18 @@ extern void pcie_irq_enable(pcie_bdf_t bdf, unsigned int irq);
  * the high-order bits (and is, thus, not a BAR itself).
  */
 
-#define PCIE_CONF_BAR0		4U
-#define PCIE_CONF_BAR1		5U
-#define PCIE_CONF_BAR2		6U
-#define PCIE_CONF_BAR3		7U
-#define PCIE_CONF_BAR4		8U
-#define PCIE_CONF_BAR5		9U
+#define PCIE_CONF_BAR0 4U
+#define PCIE_CONF_BAR1 5U
+#define PCIE_CONF_BAR2 6U
+#define PCIE_CONF_BAR3 7U
+#define PCIE_CONF_BAR4 8U
+#define PCIE_CONF_BAR5 9U
 
-#define PCIE_CONF_BAR_IO(w)		(((w) & 0x00000001U) == 0x00000001U)
-#define PCIE_CONF_BAR_MEM(w)		(((w) & 0x00000001U) != 0x00000001U)
-#define PCIE_CONF_BAR_64(w)		(((w) & 0x00000006U) == 0x00000004U)
-#define PCIE_CONF_BAR_ADDR(w)		((w) & ~0xfUL)
-#define PCIE_CONF_BAR_NONE		0U
+#define PCIE_CONF_BAR_IO(w) (((w)&0x00000001U) == 0x00000001U)
+#define PCIE_CONF_BAR_MEM(w) (((w)&0x00000001U) != 0x00000001U)
+#define PCIE_CONF_BAR_64(w) (((w)&0x00000006U) == 0x00000004U)
+#define PCIE_CONF_BAR_ADDR(w) ((w) & ~0xfUL)
+#define PCIE_CONF_BAR_NONE 0U
 
 /*
  * Word 15 contains information related to interrupts.
@@ -180,10 +180,10 @@ extern void pcie_irq_enable(pcie_bdf_t bdf, unsigned int irq);
  * the firmware to indicate which wire IRQ the device interrupt is routed to.
  */
 
-#define PCIE_CONF_INTR		15U
+#define PCIE_CONF_INTR 15U
 
-#define PCIE_CONF_INTR_IRQ(w)	((w) & 0xFFU)
-#define PCIE_CONF_INTR_IRQ_NONE	0xFFU  /* no interrupt routed */
+#define PCIE_CONF_INTR_IRQ(w) ((w)&0xFFU)
+#define PCIE_CONF_INTR_IRQ_NONE 0xFFU /* no interrupt routed */
 
 #ifdef __cplusplus
 }

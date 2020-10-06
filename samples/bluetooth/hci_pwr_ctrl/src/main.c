@@ -31,13 +31,13 @@ static const struct bt_data ad[] = {
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
-#define DEVICE_BEACON_TXPOWER_NUM  8
+#define DEVICE_BEACON_TXPOWER_NUM 8
 
 static struct k_thread pwr_thread_data;
 static K_THREAD_STACK_DEFINE(pwr_thread_stack, 320);
 
-static const int8_t txp[DEVICE_BEACON_TXPOWER_NUM] = {4, 0, -3, -8,
-						    -15, -18, -23, -30};
+static const int8_t txp[DEVICE_BEACON_TXPOWER_NUM] = { 4,   0,	 -3,  -8,
+						       -15, -18, -23, -30 };
 static const struct bt_le_adv_param *param =
 	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_USE_NAME,
 			0x0020, 0x0020, NULL);
@@ -61,8 +61,9 @@ static void read_conn_rssi(uint16_t handle, int8_t *rssi)
 
 	err = bt_hci_cmd_send_sync(BT_HCI_OP_READ_RSSI, buf, &rsp);
 	if (err) {
-		uint8_t reason = rsp ?
-			((struct bt_hci_rp_read_rssi *)rsp->data)->status : 0;
+		uint8_t reason =
+			rsp ? ((struct bt_hci_rp_read_rssi *)rsp->data)->status :
+				    0;
 		printk("Read RSSI err: %d reason 0x%02x\n", err, reason);
 		return;
 	}
@@ -73,16 +74,15 @@ static void read_conn_rssi(uint16_t handle, int8_t *rssi)
 	net_buf_unref(rsp);
 }
 
-
-static void set_tx_power(uint8_t handle_type, uint16_t handle, int8_t tx_pwr_lvl)
+static void set_tx_power(uint8_t handle_type, uint16_t handle,
+			 int8_t tx_pwr_lvl)
 {
 	struct bt_hci_cp_vs_write_tx_power_level *cp;
 	struct bt_hci_rp_vs_write_tx_power_level *rp;
 	struct net_buf *buf, *rsp = NULL;
 	int err;
 
-	buf = bt_hci_cmd_create(BT_HCI_OP_VS_WRITE_TX_POWER_LEVEL,
-				sizeof(*cp));
+	buf = bt_hci_cmd_create(BT_HCI_OP_VS_WRITE_TX_POWER_LEVEL, sizeof(*cp));
 	if (!buf) {
 		printk("Unable to allocate command buffer\n");
 		return;
@@ -93,12 +93,14 @@ static void set_tx_power(uint8_t handle_type, uint16_t handle, int8_t tx_pwr_lvl
 	cp->handle_type = handle_type;
 	cp->tx_power_level = tx_pwr_lvl;
 
-	err = bt_hci_cmd_send_sync(BT_HCI_OP_VS_WRITE_TX_POWER_LEVEL,
-				   buf, &rsp);
+	err = bt_hci_cmd_send_sync(BT_HCI_OP_VS_WRITE_TX_POWER_LEVEL, buf,
+				   &rsp);
 	if (err) {
-		uint8_t reason = rsp ?
-			((struct bt_hci_rp_vs_write_tx_power_level *)
-			  rsp->data)->status : 0;
+		uint8_t reason =
+			rsp ? ((struct bt_hci_rp_vs_write_tx_power_level *)
+				       rsp->data)
+					->status :
+				    0;
 		printk("Set Tx power err: %d reason 0x%02x\n", err, reason);
 		return;
 	}
@@ -109,7 +111,8 @@ static void set_tx_power(uint8_t handle_type, uint16_t handle, int8_t tx_pwr_lvl
 	net_buf_unref(rsp);
 }
 
-static void get_tx_power(uint8_t handle_type, uint16_t handle, int8_t *tx_pwr_lvl)
+static void get_tx_power(uint8_t handle_type, uint16_t handle,
+			 int8_t *tx_pwr_lvl)
 {
 	struct bt_hci_cp_vs_read_tx_power_level *cp;
 	struct bt_hci_rp_vs_read_tx_power_level *rp;
@@ -117,8 +120,7 @@ static void get_tx_power(uint8_t handle_type, uint16_t handle, int8_t *tx_pwr_lv
 	int err;
 
 	*tx_pwr_lvl = 0xFF;
-	buf = bt_hci_cmd_create(BT_HCI_OP_VS_READ_TX_POWER_LEVEL,
-				sizeof(*cp));
+	buf = bt_hci_cmd_create(BT_HCI_OP_VS_READ_TX_POWER_LEVEL, sizeof(*cp));
 	if (!buf) {
 		printk("Unable to allocate command buffer\n");
 		return;
@@ -128,12 +130,13 @@ static void get_tx_power(uint8_t handle_type, uint16_t handle, int8_t *tx_pwr_lv
 	cp->handle = sys_cpu_to_le16(handle);
 	cp->handle_type = handle_type;
 
-	err = bt_hci_cmd_send_sync(BT_HCI_OP_VS_READ_TX_POWER_LEVEL,
-				   buf, &rsp);
+	err = bt_hci_cmd_send_sync(BT_HCI_OP_VS_READ_TX_POWER_LEVEL, buf, &rsp);
 	if (err) {
-		uint8_t reason = rsp ?
-			((struct bt_hci_rp_vs_read_tx_power_level *)
-			  rsp->data)->status : 0;
+		uint8_t reason =
+			rsp ? ((struct bt_hci_rp_vs_read_tx_power_level *)
+				       rsp->data)
+					->status :
+				    0;
 		printk("Read Tx power err: %d reason 0x%02x\n", err, reason);
 		return;
 	}
@@ -160,8 +163,8 @@ static void connected(struct bt_conn *conn, uint8_t err)
 			printk("No connection handle (err %d)\n", ret);
 		} else {
 			/* Send first at the default selected power */
-			bt_addr_le_to_str(bt_conn_get_dst(conn),
-							  addr, sizeof(addr));
+			bt_addr_le_to_str(bt_conn_get_dst(conn), addr,
+					  sizeof(addr));
 			printk("Connected via connection (%d) at %s\n",
 			       default_conn_handle, addr);
 			get_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_CONN,
@@ -205,8 +208,7 @@ static void bt_ready(int err)
 	printk("Bluetooth initialized\n");
 
 	/* Start advertising */
-	err = bt_le_adv_start(param, ad, ARRAY_SIZE(ad),
-			      NULL, 0);
+	err = bt_le_adv_start(param, ad, ARRAY_SIZE(ad), NULL, 0);
 	if (err) {
 		printk("Advertising failed to start (err %d)\n", err);
 		return;
@@ -236,17 +238,15 @@ void modulate_tx_power(void *p1, void *p2, void *p3)
 	while (1) {
 		if (!default_conn) {
 			printk("Set Tx power level to %d\n", txp[idx]);
-			set_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_ADV,
-				     0, txp[idx]);
+			set_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_ADV, 0, txp[idx]);
 
 			k_sleep(K_SECONDS(5));
 
 			printk("Get Tx power level -> ");
-			get_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_ADV,
-				     0, &txp_get);
+			get_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_ADV, 0, &txp_get);
 			printk("TXP = %d\n", txp_get);
 
-			idx = (idx+1) % DEVICE_BEACON_TXPOWER_NUM;
+			idx = (idx + 1) % DEVICE_BEACON_TXPOWER_NUM;
 		} else {
 			int8_t rssi = 0xFF;
 			int8_t txp_adaptive;
@@ -305,9 +305,8 @@ void main(void)
 
 	k_thread_create(&pwr_thread_data, pwr_thread_stack,
 			K_THREAD_STACK_SIZEOF(pwr_thread_stack),
-			modulate_tx_power, NULL, NULL, NULL,
-			K_PRIO_COOP(10),
-			0, K_NO_WAIT);
+			modulate_tx_power, NULL, NULL, NULL, K_PRIO_COOP(10), 0,
+			K_NO_WAIT);
 	k_thread_name_set(&pwr_thread_data, "DYN TX");
 
 	while (1) {

@@ -33,123 +33,129 @@
 #define MAGIC 0xa5a5ee11
 
 #if (FORKS == FIFOS) || (FORKS == LIFOS)
-	struct packet {
-		void *next;
-		int data;
-	} orig_packet[NUM_PHIL];
+struct packet {
+	void *next;
+	int data;
+} orig_packet[NUM_PHIL];
 #endif
 
 #if FORKS == SEMAPHORES
-	#define fork_t struct k_sem *
-	#if STATIC_OBJS
-		K_SEM_DEFINE(fork0, 1, 1);
-		K_SEM_DEFINE(fork1, 1, 1);
-		K_SEM_DEFINE(fork2, 1, 1);
-		K_SEM_DEFINE(fork3, 1, 1);
-		K_SEM_DEFINE(fork4, 1, 1);
-		K_SEM_DEFINE(fork5, 1, 1);
-	#else
-		#define fork_obj_t struct k_sem
-		#define fork_init(x) k_sem_init(x, 1, 1)
-	#endif
-	#define take(x) k_sem_take(x, K_FOREVER)
-	#define drop(x) k_sem_give(x)
-	#define fork_type_str "semaphores"
+#define fork_t struct k_sem *
+#if STATIC_OBJS
+K_SEM_DEFINE(fork0, 1, 1);
+K_SEM_DEFINE(fork1, 1, 1);
+K_SEM_DEFINE(fork2, 1, 1);
+K_SEM_DEFINE(fork3, 1, 1);
+K_SEM_DEFINE(fork4, 1, 1);
+K_SEM_DEFINE(fork5, 1, 1);
+#else
+#define fork_obj_t struct k_sem
+#define fork_init(x) k_sem_init(x, 1, 1)
+#endif
+#define take(x) k_sem_take(x, K_FOREVER)
+#define drop(x) k_sem_give(x)
+#define fork_type_str "semaphores"
 #elif FORKS == MUTEXES
-	#define fork_t struct k_mutex *
-	#if STATIC_OBJS
-		K_MUTEX_DEFINE(fork0);
-		K_MUTEX_DEFINE(fork1);
-		K_MUTEX_DEFINE(fork2);
-		K_MUTEX_DEFINE(fork3);
-		K_MUTEX_DEFINE(fork4);
-		K_MUTEX_DEFINE(fork5);
-	#else
-		#define fork_obj_t struct k_mutex
-		#define fork_init(x) k_mutex_init(x)
-	#endif
-	#define take(x) k_mutex_lock(x, K_FOREVER)
-	#define drop(x) k_mutex_unlock(x)
-	#define fork_type_str "mutexes"
+#define fork_t struct k_mutex *
+#if STATIC_OBJS
+K_MUTEX_DEFINE(fork0);
+K_MUTEX_DEFINE(fork1);
+K_MUTEX_DEFINE(fork2);
+K_MUTEX_DEFINE(fork3);
+K_MUTEX_DEFINE(fork4);
+K_MUTEX_DEFINE(fork5);
+#else
+#define fork_obj_t struct k_mutex
+#define fork_init(x) k_mutex_init(x)
+#endif
+#define take(x) k_mutex_lock(x, K_FOREVER)
+#define drop(x) k_mutex_unlock(x)
+#define fork_type_str "mutexes"
 #elif FORKS == STACKS
-	#define fork_t struct k_stack *
-	#if STATIC_OBJS
-		#error "not implemented yet."
-	#else
-		typedef struct {
-			struct k_stack stack;
-			uint32_t stack_mem[1];
-		} fork_obj_t;
-		#define fork_init(x) do { \
-			k_stack_init(x, (uint32_t *)((x) + 1), 1); \
-			k_stack_push(x, MAGIC); \
-		} while ((0))
-	#endif
-	#define take(x) do { \
-		uint32_t data; k_stack_pop(x, &data, K_FOREVER); \
+#define fork_t struct k_stack *
+#if STATIC_OBJS
+#error "not implemented yet."
+#else
+typedef struct {
+	struct k_stack stack;
+	uint32_t stack_mem[1];
+} fork_obj_t;
+#define fork_init(x)                                       \
+	do {                                               \
+		k_stack_init(x, (uint32_t *)((x) + 1), 1); \
+		k_stack_push(x, MAGIC);                    \
+	} while ((0))
+#endif
+#define take(x)                                                 \
+	do {                                                    \
+		uint32_t data;                                  \
+		k_stack_pop(x, &data, K_FOREVER);               \
 		__ASSERT(data == MAGIC, "data was %x\n", data); \
 	} while ((0))
-	#define drop(x) k_stack_push(x, MAGIC)
-	#define fork_type_str "stacks"
+#define drop(x) k_stack_push(x, MAGIC)
+#define fork_type_str "stacks"
 #elif FORKS == FIFOS
-	#define fork_t struct k_fifo *
-	#if STATIC_OBJS
-		#error "not implemented yet."
-	#else
-		typedef struct {
-			struct k_fifo fifo;
-			struct packet data;
-		} fork_obj_t;
-		#define fork_init(x) do { \
-			k_fifo_init(x); \
-			((fork_obj_t *)(x))->data.data = MAGIC; \
-			k_fifo_put(x, &(((fork_obj_t *)(x))->data)); \
-		} while ((0))
-	#endif
-	#define take(x) do { \
-		struct packet *data; \
-		data = k_fifo_get(x, K_FOREVER); \
-		__ASSERT(data->data == MAGIC, ""); \
-	} while ((0))
-	#define drop(x) k_fifo_put(x, &(((fork_obj_t *)(x))->data))
-	#define fork_type_str "fifos"
-#elif FORKS == LIFOS
-	#define fork_t struct k_lifo *
-	#if STATIC_OBJS
-		#error "not implemented yet."
-	#else
-		typedef struct {
-			struct k_lifo lifo;
-			struct packet data;
-		} fork_obj_t;
-		#define fork_init(x) do { \
-			k_lifo_init(x); \
-			((fork_obj_t *)(x))->data.data = MAGIC; \
-			k_lifo_put(x, &(((fork_obj_t *)(x))->data)); \
-		} while ((0))
-	#endif
-	#define take(x) do { \
-		struct packet *data; \
-		data = k_lifo_get(x, K_FOREVER); \
-		__ASSERT(data->data == MAGIC, ""); \
-	} while ((0))
-	#define drop(x) k_lifo_put(x, &(((fork_obj_t *)(x))->data))
-	#define fork_type_str "lifos"
+#define fork_t struct k_fifo *
+#if STATIC_OBJS
+#error "not implemented yet."
 #else
-	#error unknown fork type
+typedef struct {
+	struct k_fifo fifo;
+	struct packet data;
+} fork_obj_t;
+#define fork_init(x)                                         \
+	do {                                                 \
+		k_fifo_init(x);                              \
+		((fork_obj_t *)(x))->data.data = MAGIC;      \
+		k_fifo_put(x, &(((fork_obj_t *)(x))->data)); \
+	} while ((0))
+#endif
+#define take(x)                                    \
+	do {                                       \
+		struct packet *data;               \
+		data = k_fifo_get(x, K_FOREVER);   \
+		__ASSERT(data->data == MAGIC, ""); \
+	} while ((0))
+#define drop(x) k_fifo_put(x, &(((fork_obj_t *)(x))->data))
+#define fork_type_str "fifos"
+#elif FORKS == LIFOS
+#define fork_t struct k_lifo *
+#if STATIC_OBJS
+#error "not implemented yet."
+#else
+typedef struct {
+	struct k_lifo lifo;
+	struct packet data;
+} fork_obj_t;
+#define fork_init(x)                                         \
+	do {                                                 \
+		k_lifo_init(x);                              \
+		((fork_obj_t *)(x))->data.data = MAGIC;      \
+		k_lifo_put(x, &(((fork_obj_t *)(x))->data)); \
+	} while ((0))
+#endif
+#define take(x)                                    \
+	do {                                       \
+		struct packet *data;               \
+		data = k_lifo_get(x, K_FOREVER);   \
+		__ASSERT(data->data == MAGIC, ""); \
+	} while ((0))
+#define drop(x) k_lifo_put(x, &(((fork_obj_t *)(x))->data))
+#define fork_type_str "lifos"
+#else
+#error unknown fork type
 #endif
 
 #if STATIC_OBJS
-	#define obj_init_type "static"
+#define obj_init_type "static"
 #else
-	#define obj_init_type "dynamic"
-	fork_obj_t fork_objs[NUM_PHIL];
+#define obj_init_type "dynamic"
+fork_obj_t fork_objs[NUM_PHIL];
 #endif
 
 static fork_t forks[NUM_PHIL] = {
 #if STATIC_OBJS
-	&fork0, &fork1, &fork2,
-	&fork3, &fork4, &fork5,
+	&fork0, &fork1, &fork2, &fork3, &fork4, &fork5,
 #else
 	(fork_t)&fork_objs[0], (fork_t)&fork_objs[1], (fork_t)&fork_objs[2],
 	(fork_t)&fork_objs[3], (fork_t)&fork_objs[4], (fork_t)&fork_objs[5],

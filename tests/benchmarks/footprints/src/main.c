@@ -41,12 +41,10 @@ void main(void)
 	printk("Hello from %s!\n", CONFIG_BOARD);
 
 #ifdef CONFIG_USERSPACE
-	struct k_mem_partition *mem_parts[] = {
-	&footprint_mem_partition
-	};
+	struct k_mem_partition *mem_parts[] = { &footprint_mem_partition };
 
-	k_mem_domain_init(&footprint_mem_domain,
-			  ARRAY_SIZE(mem_parts), mem_parts);
+	k_mem_domain_init(&footprint_mem_domain, ARRAY_SIZE(mem_parts),
+			  mem_parts);
 #endif /* CONFIG_USERSPACE */
 
 	run_thread_system();

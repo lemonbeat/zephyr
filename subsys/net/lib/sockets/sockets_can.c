@@ -79,8 +79,8 @@ int zcan_socket(int family, int type, int proto)
 
 static void zcan_received_cb(struct net_context *ctx, struct net_pkt *pkt,
 			     union net_ip_header *ip_hdr,
-			     union net_proto_header *proto_hdr,
-			     int status, void *user_data)
+			     union net_proto_header *proto_hdr, int status,
+			     void *user_data)
 {
 	/* The ctx parameter is not really relevant here. It refers to first
 	 * net_context that was used when registering CAN socket.
@@ -252,8 +252,7 @@ ssize_t zcan_sendto_ctx(struct net_context *ctx, const void *buf, size_t len,
 
 static ssize_t zcan_recvfrom_ctx(struct net_context *ctx, void *buf,
 				 size_t max_len, int flags,
-				 struct sockaddr *src_addr,
-				 socklen_t *addrlen)
+				 struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	struct zcan_frame zframe;
 	size_t recv_len = 0;
@@ -316,15 +315,15 @@ static int zcan_getsockopt_ctx(struct net_context *ctx, int level, int optname,
 		return -1;
 	}
 
-	return sock_fd_op_vtable.getsockopt(ctx, level, optname,
-					    optval, optlen);
+	return sock_fd_op_vtable.getsockopt(ctx, level, optname, optval,
+					    optlen);
 }
 
 static int zcan_setsockopt_ctx(struct net_context *ctx, int level, int optname,
 			       const void *optval, socklen_t optlen)
 {
-	return sock_fd_op_vtable.setsockopt(ctx, level, optname,
-					    optval, optlen);
+	return sock_fd_op_vtable.setsockopt(ctx, level, optname, optval,
+					    optlen);
 }
 
 static ssize_t can_sock_read_vmeth(void *obj, void *buffer, size_t count)
@@ -332,14 +331,12 @@ static ssize_t can_sock_read_vmeth(void *obj, void *buffer, size_t count)
 	return zcan_recvfrom_ctx(obj, buffer, count, 0, NULL, 0);
 }
 
-static ssize_t can_sock_write_vmeth(void *obj, const void *buffer,
-				    size_t count)
+static ssize_t can_sock_write_vmeth(void *obj, const void *buffer, size_t count)
 {
 	return zcan_sendto_ctx(obj, buffer, count, 0, NULL, 0);
 }
 
-static bool is_already_attached(struct can_filter *filter,
-				struct net_if *iface,
+static bool is_already_attached(struct can_filter *filter, struct net_if *iface,
 				struct net_context *ctx)
 {
 	int i;
@@ -388,9 +385,8 @@ static int can_close_socket(struct net_context *ctx)
 			filter.can_id = receivers[i].can_id;
 			filter.can_mask = receivers[i].can_mask;
 
-			if (!is_already_attached(&filter,
-						net_context_get_iface(ctx),
-						ctx)) {
+			if (!is_already_attached(
+				    &filter, net_context_get_iface(ctx), ctx)) {
 				/* We can detach now as there are no other
 				 * sockets that have same filter.
 				 */
@@ -471,8 +467,7 @@ static ssize_t can_sock_recvfrom_vmeth(void *obj, void *buf, size_t max_len,
 				       int flags, struct sockaddr *src_addr,
 				       socklen_t *addrlen)
 {
-	return zcan_recvfrom_ctx(obj, buf, max_len, flags,
-				 src_addr, addrlen);
+	return zcan_recvfrom_ctx(obj, buf, max_len, flags, src_addr, addrlen);
 }
 
 static int can_sock_getsockopt_vmeth(void *obj, int level, int optname,
@@ -528,14 +523,13 @@ static int can_register_receiver(struct net_if *iface, struct net_context *ctx,
 }
 
 static void can_unregister_receiver(struct net_if *iface,
-				    struct net_context *ctx,
-				    canid_t can_id, canid_t can_mask)
+				    struct net_context *ctx, canid_t can_id,
+				    canid_t can_mask)
 {
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(receivers); i++) {
-		if (receivers[i].ctx == ctx &&
-		    receivers[i].iface == iface &&
+		if (receivers[i].ctx == ctx && receivers[i].iface == iface &&
 		    receivers[i].can_id == can_id &&
 		    receivers[i].can_mask == can_mask) {
 			receivers[i].ctx = NULL;
@@ -572,8 +566,7 @@ revert:
 
 static void can_unregister_filters(struct net_if *iface,
 				   struct net_context *ctx,
-				   const struct can_filter *filters,
-				   int count)
+				   const struct can_filter *filters, int count)
 {
 	int i;
 

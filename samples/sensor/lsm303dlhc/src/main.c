@@ -29,8 +29,8 @@ static int32_t read_sensor(const struct device *sensor,
 	}
 
 	printf("( x y z ) = ( %f  %f  %f )\n", sensor_value_to_double(&val[0]),
-					       sensor_value_to_double(&val[1]),
-					       sensor_value_to_double(&val[2]));
+	       sensor_value_to_double(&val[1]),
+	       sensor_value_to_double(&val[2]));
 
 end:
 	return ret;
@@ -38,20 +38,20 @@ end:
 
 void main(void)
 {
-	const struct device *accelerometer = device_get_binding(
-						DT_LABEL(DT_INST(0, st_lis2dh)));
-	const struct device *magnetometer = device_get_binding(
-						DT_LABEL(DT_INST(0, st_lsm303dlhc_magn)));
+	const struct device *accelerometer =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lis2dh)));
+	const struct device *magnetometer =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lsm303dlhc_magn)));
 
 	if (accelerometer == NULL) {
 		printf("Could not get %s device\n",
-				DT_LABEL(DT_INST(0, st_lis2dh)));
+		       DT_LABEL(DT_INST(0, st_lis2dh)));
 		return;
 	}
 
 	if (magnetometer == NULL) {
 		printf("Could not get %s device\n",
-				DT_LABEL(DT_INST(0, st_lsm303dlhc_magn)));
+		       DT_LABEL(DT_INST(0, st_lsm303dlhc_magn)));
 		return;
 	}
 

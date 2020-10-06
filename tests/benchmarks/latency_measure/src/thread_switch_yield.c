@@ -92,14 +92,16 @@ void thread_switch_yield(void)
 		 * called yield without the other having chance to execute
 		 */
 		error_count++;
-		printk(" Error, iteration:%u, helper iteration:%u",
-			     iterations, helper_thread_iterations);
+		printk(" Error, iteration:%u, helper iteration:%u", iterations,
+		       helper_thread_iterations);
 	} else {
 		/* thread_yield is called (iterations + helper_thread_iterations)
 		 * times in total.
 		 */
 		ts_diff = timing_cycles_get(&timestamp_start, &timestamp_end);
-		PRINT_STATS_AVG("Average thread context switch using yield", ts_diff, (iterations + helper_thread_iterations));
+		PRINT_STATS_AVG("Average thread context switch using yield",
+				ts_diff,
+				(iterations + helper_thread_iterations));
 	}
 
 	timing_stop();

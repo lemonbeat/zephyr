@@ -21,13 +21,11 @@ static void test_assert_skip(void)
  */
 void test_main(void)
 {
-	ztest_test_suite(framework_tests,
-		ztest_unit_test(test_assert_pass),
-		ztest_unit_test(test_assert_pass),
-		ztest_unit_test(test_assert_pass),
-		ztest_unit_test(test_assert_skip),
-		ztest_unit_test(test_assert_skip)
-	);
+	ztest_test_suite(framework_tests, ztest_unit_test(test_assert_pass),
+			 ztest_unit_test(test_assert_pass),
+			 ztest_unit_test(test_assert_pass),
+			 ztest_unit_test(test_assert_skip),
+			 ztest_unit_test(test_assert_skip));
 
 	ztest_run_test_suite(framework_tests);
 }

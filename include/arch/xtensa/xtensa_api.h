@@ -24,7 +24,6 @@ static inline void z_xt_ints_on(unsigned int mask)
 	__asm__ volatile("wsr.intenable %0; rsync" : : "r"(val));
 }
 
-
 /*
  * Call this function to disable the specified interrupts.
  *
@@ -50,7 +49,6 @@ static inline void z_xt_set_intset(unsigned int arg)
 	ARG_UNUSED(arg);
 #endif
 }
-
 
 /* Call this function to clear the specified (s/w or edge-triggered)
  * interrupt.

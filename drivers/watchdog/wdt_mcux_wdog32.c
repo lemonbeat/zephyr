@@ -190,34 +190,28 @@ static const struct wdt_driver_api mcux_wdog32_api = {
 static void mcux_wdog32_config_func_0(const struct device *dev);
 
 static const struct mcux_wdog32_config mcux_wdog32_config_0 = {
-	.base = (WDOG_Type *) DT_INST_REG_ADDR(0),
+	.base = (WDOG_Type *)DT_INST_REG_ADDR(0),
 #if DT_NODE_HAS_PROP(DT_INST_PHANDLE(0, clocks), clock_frequency)
 	.clock_frequency = DT_INST_PROP_BY_PHANDLE(0, clocks, clock_frequency),
 #else /* !DT_NODE_HAS_PROP(DT_INST_PHANDLE(0, clocks), clock_frequency) */
 	.clock_name = DT_INST_CLOCKS_LABEL(0),
-	.clock_subsys = (clock_control_subsys_t)
-		DT_INST_CLOCKS_CELL(0, name),
+	.clock_subsys = (clock_control_subsys_t)DT_INST_CLOCKS_CELL(0, name),
 #endif /* DT_NODE_HAS_PROP(DT_INST_PHANDLE(0, clocks), clock_frequency) */
-	.clk_source =
-		TO_WDOG32_CLK_SRC(DT_INST_PROP(0, clk_source)),
-	.clk_divider =
-		TO_WDOG32_CLK_DIV(DT_INST_PROP(0, clk_divider)),
+	.clk_source = TO_WDOG32_CLK_SRC(DT_INST_PROP(0, clk_source)),
+	.clk_divider = TO_WDOG32_CLK_DIV(DT_INST_PROP(0, clk_divider)),
 	.irq_config_func = mcux_wdog32_config_func_0,
 };
 
 static struct mcux_wdog32_data mcux_wdog32_data_0;
 
-DEVICE_AND_API_INIT(mcux_wdog32_0, DT_INST_LABEL(0),
-		    &mcux_wdog32_init, &mcux_wdog32_data_0,
-		    &mcux_wdog32_config_0, POST_KERNEL,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-		    &mcux_wdog32_api);
+DEVICE_AND_API_INIT(mcux_wdog32_0, DT_INST_LABEL(0), &mcux_wdog32_init,
+		    &mcux_wdog32_data_0, &mcux_wdog32_config_0, POST_KERNEL,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &mcux_wdog32_api);
 
 static void mcux_wdog32_config_func_0(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    mcux_wdog32_isr, DEVICE_GET(mcux_wdog32_0), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), mcux_wdog32_isr,
+		    DEVICE_GET(mcux_wdog32_0), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 }

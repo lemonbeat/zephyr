@@ -44,21 +44,20 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_ROUTE_LOG_LEVEL);
 static struct net_context *udp_ctx;
 
 /* Interface 1 is the default host and it has my_addr assigned to it */
-static struct in6_addr my_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					  0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0, 0, 0, 0, 0x1 } } };
 
 /* Interface 2 is the secondary host for peer device with address peer_addr */
-static struct in6_addr peer_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-				    0, 0, 0, 0, 0x0b, 0x0e, 0x0e, 0x3 } } };
+static struct in6_addr peer_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					 0, 0, 0, 0x0b, 0x0e, 0x0e, 0x3 } } };
 
 /* The dest_addr is only reachable via peer_addr */
-static struct in6_addr dest_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					 0, 0, 0, 0, 0xd, 0xe, 0x5, 0x7 } } };
+static struct in6_addr dest_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					 0, 0, 0, 0xd, 0xe, 0x5, 0x7 } } };
 
 /* Extra address is assigned to ll_addr */
-static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0,
-				       0, 0, 0, 0xf2, 0xaa, 0x29, 0x02,
-				       0x04 } } };
+static struct in6_addr ll_addr = { { { 0xfe, 0x80, 0x43, 0xb8, 0, 0, 0, 0, 0, 0,
+				       0, 0xf2, 0xaa, 0x29, 0x02, 0x04 } } };
 
 static struct in6_addr in6addr_mcast = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
 					     0, 0, 0, 0, 0, 0, 0, 0x1 } } };
@@ -220,9 +219,8 @@ static struct dummy_api net_route_if_api_peer = {
 NET_DEVICE_INIT_INSTANCE(net_route_test, "net_route_test", host,
 			 net_route_dev_init, device_pm_control_nop,
 			 &net_route_data, NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_route_if_api, _ETH_L2_LAYER,
-			 _ETH_L2_CTX_TYPE, 127);
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_route_if_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 NET_DEVICE_INIT_INSTANCE(net_route_test_peer, "net_route_test_peer", peer,
 			 net_route_dev_init, device_pm_control_nop,
@@ -244,32 +242,25 @@ static void test_init(void)
 	    net_if_get_by_iface(my_iface), my_iface,
 	    net_if_get_by_iface(peer_iface), peer_iface);
 
-	zassert_not_null(my_iface,
-			 "Interface is NULL");
+	zassert_not_null(my_iface, "Interface is NULL");
 
-	zassert_not_null(peer_iface,
-			 "Interface is NULL");
+	zassert_not_null(peer_iface, "Interface is NULL");
 
-	ifaddr = net_if_ipv6_addr_add(my_iface, &my_addr,
-				      NET_ADDR_MANUAL, 0);
-	zassert_not_null(ifaddr,
-			 "Cannot add IPv6 address");
+	ifaddr = net_if_ipv6_addr_add(my_iface, &my_addr, NET_ADDR_MANUAL, 0);
+	zassert_not_null(ifaddr, "Cannot add IPv6 address");
 
 	/* For testing purposes we need to set the adddresses preferred */
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
-	ifaddr = net_if_ipv6_addr_add(my_iface, &ll_addr,
-				      NET_ADDR_MANUAL, 0);
-	zassert_not_null(ifaddr,
-			 "Cannot add IPv6 address");
+	ifaddr = net_if_ipv6_addr_add(my_iface, &ll_addr, NET_ADDR_MANUAL, 0);
+	zassert_not_null(ifaddr, "Cannot add IPv6 address");
 
 	ifaddr->addr_state = NET_ADDR_PREFERRED;
 
 	net_ipv6_addr_create(&in6addr_mcast, 0xff02, 0, 0, 0, 0, 0, 0, 0x0001);
 
 	maddr = net_if_ipv6_maddr_add(my_iface, &in6addr_mcast);
-	zassert_not_null(maddr,
-			 "Cannot add multicast IPv6 address");
+	zassert_not_null(maddr, "Cannot add multicast IPv6 address");
 
 	/* The peer and dest interfaces are just simulated, they are not
 	 * really used so we should not add IP addresses for them.
@@ -289,23 +280,15 @@ static void test_net_ctx_create(void)
 {
 	int ret;
 
-	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
-			      &udp_ctx);
-	zassert_equal(ret, 0,
-		      "Context create IPv6 UDP test failed");
+	ret = net_context_get(AF_INET6, SOCK_DGRAM, IPPROTO_UDP, &udp_ctx);
+	zassert_equal(ret, 0, "Context create IPv6 UDP test failed");
 }
 
-static bool net_test_send_ns(struct net_if *iface,
-			     struct in6_addr *addr)
+static bool net_test_send_ns(struct net_if *iface, struct in6_addr *addr)
 {
 	int ret;
 
-	ret = net_ipv6_send_ns(iface,
-			       NULL,
-			       addr,
-			       &my_addr,
-			       &my_addr,
-			       false);
+	ret = net_ipv6_send_ns(iface, NULL, addr, &my_addr, &my_addr, false);
 	if (ret < 0) {
 		TC_ERROR("Cannot send NS (%d)\n", ret);
 		return false;
@@ -314,8 +297,7 @@ static bool net_test_send_ns(struct net_if *iface,
 	return true;
 }
 
-static bool net_test_nbr_lookup_ok(struct net_if *iface,
-				   struct in6_addr *addr)
+static bool net_test_nbr_lookup_ok(struct net_if *iface, struct in6_addr *addr)
 {
 	struct net_nbr *nbr;
 
@@ -341,10 +323,8 @@ static void test_populate_nbr_cache(void)
 
 	zassert_true(net_test_send_ns(peer_iface, &peer_addr), NULL);
 
-	nbr = net_ipv6_nbr_add(net_if_get_default(),
-			       &peer_addr,
-			       &net_route_data_peer.ll_addr,
-			       false,
+	nbr = net_ipv6_nbr_add(net_if_get_default(), &peer_addr,
+			       &net_route_data_peer.ll_addr, false,
 			       NET_IPV6_NBR_STATE_REACHABLE);
 	zassert_not_null(nbr, "Cannot add peer to neighbor cache");
 
@@ -361,9 +341,7 @@ static void test_populate_nbr_cache(void)
 
 static void test_route_add(void)
 {
-	entry = net_route_add(my_iface,
-			      &dest_addr, 128,
-			      &peer_addr);
+	entry = net_route_add(my_iface, &dest_addr, 128, &peer_addr);
 
 	zassert_not_null(entry, "Route add failed");
 }
@@ -372,11 +350,8 @@ static void test_route_update(void)
 {
 	struct net_route_entry *update_entry;
 
-	update_entry = net_route_add(my_iface,
-				     &dest_addr, 128,
-				     &peer_addr);
-	zassert_equal_ptr(update_entry, entry,
-			  "Route add again failed");
+	update_entry = net_route_add(my_iface, &dest_addr, 128, &peer_addr);
+	zassert_equal_ptr(update_entry, entry, "Route add again failed");
 }
 
 static void test_route_del(void)
@@ -416,8 +391,7 @@ static void test_route_lookup_ok(void)
 	struct net_route_entry *entry;
 
 	entry = net_route_lookup(my_iface, &dest_addr);
-	zassert_not_null(entry,
-			 "Route lookup failed");
+	zassert_not_null(entry, "Route lookup failed");
 }
 
 static void test_route_lookup_fail(void)
@@ -425,8 +399,7 @@ static void test_route_lookup_fail(void)
 	struct net_route_entry *entry;
 
 	entry = net_route_lookup(my_iface, &peer_addr);
-	zassert_is_null(entry,
-			"Route lookup failed for peer address");
+	zassert_is_null(entry, "Route lookup failed for peer address");
 }
 
 static void test_route_del_nexthop(void)
@@ -454,11 +427,10 @@ static void test_route_add_many(void)
 	for (i = 0; i < max_routes; i++) {
 		DBG("Adding route %d addr %s\n", i + 1,
 		    net_sprint_ipv6_addr(&dest_addresses[i]));
-		test_routes[i] = net_route_add(my_iface,
-					  &dest_addresses[i], 128,
-					  &peer_addr);
+		test_routes[i] = net_route_add(my_iface, &dest_addresses[i],
+					       128, &peer_addr);
 		zassert_not_null(test_routes[i], "Route add failed");
-		}
+	}
 }
 
 static void test_route_del_many(void)
@@ -476,22 +448,21 @@ static void test_route_del_many(void)
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(test_route,
-			ztest_unit_test(test_init),
-			ztest_unit_test(test_net_ctx_create),
-			ztest_unit_test(test_populate_nbr_cache),
-			ztest_unit_test(test_route_add),
-			ztest_unit_test(test_route_update),
-			ztest_unit_test(test_route_get_nexthop),
-			ztest_unit_test(test_route_lookup_ok),
-			ztest_unit_test(test_route_lookup_fail),
-			ztest_unit_test(test_route_del),
-			ztest_unit_test(test_route_add),
-			ztest_unit_test(test_route_del_nexthop),
-			ztest_unit_test(test_route_del_again),
-			ztest_unit_test(test_route_del_nexthop_again),
-			ztest_unit_test(test_populate_nbr_cache),
-			ztest_unit_test(test_route_add_many),
-			ztest_unit_test(test_route_del_many));
+	ztest_test_suite(test_route, ztest_unit_test(test_init),
+			 ztest_unit_test(test_net_ctx_create),
+			 ztest_unit_test(test_populate_nbr_cache),
+			 ztest_unit_test(test_route_add),
+			 ztest_unit_test(test_route_update),
+			 ztest_unit_test(test_route_get_nexthop),
+			 ztest_unit_test(test_route_lookup_ok),
+			 ztest_unit_test(test_route_lookup_fail),
+			 ztest_unit_test(test_route_del),
+			 ztest_unit_test(test_route_add),
+			 ztest_unit_test(test_route_del_nexthop),
+			 ztest_unit_test(test_route_del_again),
+			 ztest_unit_test(test_route_del_nexthop_again),
+			 ztest_unit_test(test_populate_nbr_cache),
+			 ztest_unit_test(test_route_add_many),
+			 ztest_unit_test(test_route_del_many));
 	ztest_run_test_suite(test_route);
 }

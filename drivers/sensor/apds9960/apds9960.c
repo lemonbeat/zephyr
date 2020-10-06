@@ -94,14 +94,11 @@ static int apds9960_sample_fetch(const struct device *dev,
 				   sizeof(data->sample_crgb))) {
 			return -EIO;
 		}
-
 	}
 
 #ifndef CONFIG_APDS9960_TRIGGER
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-				APDS9960_ENABLE_REG,
-				APDS9960_ENABLE_PON,
-				0)) {
+				APDS9960_ENABLE_REG, APDS9960_ENABLE_PON, 0)) {
 		return -EIO;
 	}
 #endif
@@ -170,23 +167,20 @@ static int apds9960_proxy_setup(const struct device *dev)
 	}
 
 	if (i2c_reg_write_byte(data->i2c, config->i2c_address,
-			       APDS9960_PPULSE_REG,
-			       config->ppcount)) {
+			       APDS9960_PPULSE_REG, config->ppcount)) {
 		LOG_ERR("Default pulse count not set ");
 		return -EIO;
 	}
 
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-				APDS9960_CONTROL_REG,
-				APDS9960_CONTROL_LDRIVE,
+				APDS9960_CONTROL_REG, APDS9960_CONTROL_LDRIVE,
 				APDS9960_DEFAULT_LDRIVE)) {
 		LOG_ERR("LED Drive Strength not set");
 		return -EIO;
 	}
 
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-				APDS9960_CONFIG2_REG,
-				APDS9960_PLED_BOOST_300,
+				APDS9960_CONFIG2_REG, APDS9960_PLED_BOOST_300,
 				config->pled_boost)) {
 		LOG_ERR("LED Drive Strength not set");
 		return -EIO;
@@ -237,8 +231,7 @@ static int apds9960_ambient_setup(const struct device *dev)
 
 	/* ALS Gain */
 	if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-				APDS9960_CONTROL_REG,
-				APDS9960_CONTROL_AGAIN,
+				APDS9960_CONTROL_REG, APDS9960_CONTROL_AGAIN,
 				(config->again & APDS9960_AGAIN_64X))) {
 		LOG_ERR("Ambient Gain is not set");
 		return -EIO;
@@ -246,16 +239,16 @@ static int apds9960_ambient_setup(const struct device *dev)
 
 	th = sys_cpu_to_le16(APDS9960_DEFAULT_AILT);
 	if (i2c_burst_write(data->i2c, config->i2c_address,
-			    APDS9960_INT_AILTL_REG,
-			    (uint8_t *)&th, sizeof(th))) {
+			    APDS9960_INT_AILTL_REG, (uint8_t *)&th,
+			    sizeof(th))) {
 		LOG_ERR("ALS low threshold not set");
 		return -EIO;
 	}
 
 	th = sys_cpu_to_le16(APDS9960_DEFAULT_AIHT);
 	if (i2c_burst_write(data->i2c, config->i2c_address,
-			    APDS9960_INT_AIHTL_REG,
-			    (uint8_t *)&th, sizeof(th))) {
+			    APDS9960_INT_AIHTL_REG, (uint8_t *)&th,
+			    sizeof(th))) {
 		LOG_ERR("ALS low threshold not set");
 		return -EIO;
 	}
@@ -278,8 +271,8 @@ static int apds9960_sensor_setup(const struct device *dev)
 	struct apds9960_data *data = dev->data;
 	uint8_t chip_id;
 
-	if (i2c_reg_read_byte(data->i2c, config->i2c_address,
-			      APDS9960_ID_REG, &chip_id)) {
+	if (i2c_reg_read_byte(data->i2c, config->i2c_address, APDS9960_ID_REG,
+			      &chip_id)) {
 		LOG_ERR("Failed reading chip id");
 		return -EIO;
 	}
@@ -336,8 +329,7 @@ static int apds9960_sensor_setup(const struct device *dev)
 	}
 
 	if (i2c_reg_write_byte(data->i2c, config->i2c_address,
-			       APDS9960_PERS_REG,
-			       APDS9960_DEFAULT_PERS)) {
+			       APDS9960_PERS_REG, APDS9960_DEFAULT_PERS)) {
 		LOG_ERR("Interrupt persistence not set");
 		return -EIO;
 	}
@@ -375,8 +367,7 @@ static int apds9960_init_interrupt(const struct device *dev)
 	gpio_pin_configure(drv_data->gpio, config->gpio_pin,
 			   GPIO_INPUT | config->gpio_flags);
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   apds9960_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, apds9960_gpio_callback,
 			   BIT(config->gpio_pin));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -388,8 +379,7 @@ static int apds9960_init_interrupt(const struct device *dev)
 	drv_data->work.handler = apds9960_work_cb;
 	drv_data->dev = dev;
 	if (i2c_reg_update_byte(drv_data->i2c, config->i2c_address,
-				APDS9960_ENABLE_REG,
-				APDS9960_ENABLE_PON,
+				APDS9960_ENABLE_REG, APDS9960_ENABLE_PON,
 				APDS9960_ENABLE_PON)) {
 		LOG_ERR("Power on bit not set.");
 		return -EIO;
@@ -408,8 +398,7 @@ static int apds9960_init_interrupt(const struct device *dev)
 }
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-static int apds9960_device_ctrl(const struct device *dev,
-				uint32_t ctrl_command,
+static int apds9960_device_ctrl(const struct device *dev, uint32_t ctrl_command,
 				void *context, device_pm_cb cb, void *arg)
 {
 	const struct apds9960_config *config = dev->config;
@@ -428,15 +417,14 @@ static int apds9960_device_ctrl(const struct device *dev,
 			}
 
 		} else {
-
 			if (i2c_reg_update_byte(data->i2c, config->i2c_address,
-					APDS9960_ENABLE_REG,
-					APDS9960_ENABLE_PON, 0)) {
+						APDS9960_ENABLE_REG,
+						APDS9960_ENABLE_PON, 0)) {
 				ret = -EIO;
 			}
 
 			if (i2c_reg_write_byte(data->i2c, config->i2c_address,
-				       APDS9960_AICLEAR_REG, 0)) {
+					       APDS9960_AICLEAR_REG, 0)) {
 				ret = -EIO;
 			}
 		}
@@ -544,11 +532,11 @@ static const struct apds9960_config apds9960_config = {
 static struct apds9960_data apds9960_data;
 
 #ifndef CONFIG_DEVICE_POWER_MANAGEMENT
-DEVICE_AND_API_INIT(apds9960, DT_INST_LABEL(0), &apds9960_init,
-		    &apds9960_data, &apds9960_config, POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY, &apds9960_driver_api);
+DEVICE_AND_API_INIT(apds9960, DT_INST_LABEL(0), &apds9960_init, &apds9960_data,
+		    &apds9960_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+		    &apds9960_driver_api);
 #else
-DEVICE_DEFINE(apds9960, DT_INST_LABEL(0), apds9960_init,
-	      apds9960_device_ctrl, &apds9960_data, &apds9960_config,
-	      POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &apds9960_driver_api);
+DEVICE_DEFINE(apds9960, DT_INST_LABEL(0), apds9960_init, apds9960_device_ctrl,
+	      &apds9960_data, &apds9960_config, POST_KERNEL,
+	      CONFIG_SENSOR_INIT_PRIORITY, &apds9960_driver_api);
 #endif

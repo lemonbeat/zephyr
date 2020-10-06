@@ -70,7 +70,7 @@ bool z_x86_check_stack_bounds(uintptr_t addr, size_t size, uint16_t cs)
 		cpu_id = 0;
 #endif
 		start = (uintptr_t)Z_KERNEL_STACK_BUFFER(
-		    z_interrupt_stacks[cpu_id]);
+			z_interrupt_stacks[cpu_id]);
 		end = start + CONFIG_ISR_STACK_SIZE;
 #ifdef CONFIG_USERSPACE
 	} else if ((cs & 0x3U) == 0 &&
@@ -133,8 +133,8 @@ static void unwind_stack(uintptr_t base_ptr, uint16_t cs)
 		/* Ensure the stack frame is within the faulting context's
 		 * stack buffer
 		 */
-		if (z_x86_check_stack_bounds((uintptr_t)frame,
-					     sizeof(*frame), cs)) {
+		if (z_x86_check_stack_bounds((uintptr_t)frame, sizeof(*frame),
+					     cs)) {
 			LOG_ERR("     corrupted? (bp=%p)", frame);
 			break;
 		}
@@ -201,10 +201,10 @@ static void dump_regs(const z_arch_esf_t *esf)
 #else /* 32-bit */
 static void dump_regs(const z_arch_esf_t *esf)
 {
-	LOG_ERR("EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x",
-		esf->eax, esf->ebx, esf->ecx, esf->edx);
-	LOG_ERR("ESI: 0x%08x, EDI: 0x%08x, EBP: 0x%08x, ESP: 0x%08x",
-		esf->esi, esf->edi, esf->ebp, esf->esp);
+	LOG_ERR("EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x", esf->eax,
+		esf->ebx, esf->ecx, esf->edx);
+	LOG_ERR("ESI: 0x%08x, EDI: 0x%08x, EBP: 0x%08x, ESP: 0x%08x", esf->esi,
+		esf->edi, esf->ebp, esf->esp);
 	LOG_ERR("EFLAGS: 0x%08x CS: 0x%04x CR3: 0x%08lx", esf->eflags,
 		esf->cs & 0xFFFFU, get_cr3(esf));
 
@@ -288,20 +288,20 @@ static void log_exception(uintptr_t vector, uintptr_t code)
 }
 
 /* Page fault error code flags */
-#define PRESENT	BIT(0)
-#define WR	BIT(1)
-#define US	BIT(2)
-#define RSVD	BIT(3)
-#define ID	BIT(4)
-#define PK	BIT(5)
-#define SGX	BIT(15)
+#define PRESENT BIT(0)
+#define WR BIT(1)
+#define US BIT(2)
+#define RSVD BIT(3)
+#define ID BIT(4)
+#define PK BIT(5)
+#define SGX BIT(15)
 
 static void dump_page_fault(z_arch_esf_t *esf)
 {
 	uintptr_t err, cr2;
 
 	/* See Section 6.15 of the IA32 Software Developer's Manual vol 3 */
-	__asm__ ("mov %%cr2, %0" : "=r" (cr2));
+	__asm__("mov %%cr2, %0" : "=r"(cr2));
 
 	err = esf_get_code(esf);
 	LOG_ERR("Page fault at address 0x%lx (error code 0x%lx)", cr2, err);
@@ -314,9 +314,9 @@ static void dump_page_fault(z_arch_esf_t *esf)
 		}
 		LOG_ERR("Access violation: %s thread not allowed to %s",
 			(err & US) != 0U ? "user" : "supervisor",
-			(err & ID) != 0U ? "execute" : ((err & WR) != 0U ?
-							"write" :
-							"read"));
+			(err & ID) != 0U ?
+				      "execute" :
+				      ((err & WR) != 0U ? "write" : "read"));
 		if ((err & PK) != 0) {
 			LOG_ERR("Protection key disallowed");
 		} else if ((err & SGX) != 0) {
@@ -366,9 +366,8 @@ FUNC_NORETURN void z_x86_unhandled_cpu_exception(uintptr_t vector,
 #ifdef CONFIG_USERSPACE
 Z_EXC_DECLARE(z_x86_user_string_nlen);
 
-static const struct z_exc_handle exceptions[] = {
-	Z_EXC_HANDLE(z_x86_user_string_nlen)
-};
+static const struct z_exc_handle exceptions[] = { Z_EXC_HANDLE(
+	z_x86_user_string_nlen) };
 #endif
 
 void z_x86_page_fault_handler(z_arch_esf_t *esf)
@@ -424,8 +423,8 @@ void z_x86_do_kernel_oops(const z_arch_esf_t *esf)
 	/* User mode is only allowed to induce oopses and stack check
 	 * failures via this software interrupt
 	 */
-	if ((esf->cs & 0x3) != 0 && !(reason == K_ERR_KERNEL_OOPS ||
-				      reason == K_ERR_STACK_CHK_FAIL)) {
+	if ((esf->cs & 0x3) != 0 &&
+	    !(reason == K_ERR_KERNEL_OOPS || reason == K_ERR_STACK_CHK_FAIL)) {
 		reason = K_ERR_KERNEL_OOPS;
 	}
 #endif

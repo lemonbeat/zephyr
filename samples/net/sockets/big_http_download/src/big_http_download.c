@@ -29,22 +29,22 @@
 #include "ca_certificate.h"
 #endif
 
-#define sleep(x) k_sleep(K_MSEC((x) * MSEC_PER_SEC))
+#define sleep(x) k_sleep(K_MSEC((x)*MSEC_PER_SEC))
 
 #endif
 
-#define bytes2KiB(Bytes)	(Bytes / (1024u))
-#define bytes2MiB(Bytes)	(Bytes / (1024u * 1024u))
+#define bytes2KiB(Bytes) (Bytes / (1024u))
+#define bytes2MiB(Bytes) (Bytes / (1024u * 1024u))
 
 /* This URL is parsed in-place, so buffer must be non-const. */
 static char download_url[] =
 #if defined(CONFIG_SAMPLE_BIG_HTTP_DL_URL)
-    CONFIG_SAMPLE_BIG_HTTP_DL_URL;
+	CONFIG_SAMPLE_BIG_HTTP_DL_URL;
 #else
 #if !defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS)
-    "http://archive.ubuntu.com/ubuntu/dists/xenial/main/installer-amd64/current/images/hd-media/vmlinuz";
+	"http://archive.ubuntu.com/ubuntu/dists/xenial/main/installer-amd64/current/images/hd-media/vmlinuz";
 #else
-    "https://www.7-zip.org/a/7z1805.exe";
+	"https://www.7-zip.org/a/7z1805.exe";
 #endif /* !defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS) */
 #endif /* defined(CONFIG_SAMPLE_BIG_HTTP_DL_URL) */
 /* Quick testing. */
@@ -53,13 +53,19 @@ static char download_url[] =
 /* print("".join(["\\x%02x" % x for x in list(binascii.unhexlify("hash"))])) */
 static uint8_t download_hash[32] =
 #if !defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS)
-"\x33\x7c\x37\xd7\xec\x00\x34\x84\x14\x22\x4b\xaa\x6b\xdb\x2d\x43\xf2\xa3\x4e\xf5\x67\x6b\xaf\xcd\xca\xd9\x16\xf1\x48\xb5\xb3\x17";
+	"\x33\x7c\x37\xd7\xec\x00\x34\x84\x14\x22\x4b\xaa\x6b\xdb\x2d\x43\xf2\xa3\x4e\xf5\x67\x6b\xaf\xcd\xca\xd9\x16\xf1\x48\xb5\xb3\x17";
 #else
-"\x64\x7a\x9a\x62\x11\x62\xcd\x7a\x50\x08\x93\x4a\x08\xe2\x3f\xf7\xc1\x13\x5d\x6f\x12\x61\x68\x9f\xd9\x54\xaa\x17\xd5\x0f\x97\x29";
+	"\x64\x7a\x9a\x62\x11\x62\xcd\x7a\x50\x08\x93\x4a\x08\xe2\x3f\xf7\xc1\x13\x5d\x6f\x12\x61\x68\x9f\xd9\x54\xaa\x17\xd5\x0f\x97\x29";
 #endif /* !defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS) */
 
 #define SSTRLEN(s) (sizeof(s) - 1)
-#define CHECK(r) { if (r == -1) { printf("Error: " #r "\n"); exit(1); } }
+#define CHECK(r)                                   \
+	{                                          \
+		if (r == -1) {                     \
+			printf("Error: " #r "\n"); \
+			exit(1);                   \
+		}                                  \
+	}
 
 const char *host;
 const char *port;
@@ -144,7 +150,7 @@ void download(struct addrinfo *ai, bool is_tls)
 	if (is_tls) {
 #if defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS)
 		sock = socket(ai->ai_family, ai->ai_socktype, IPPROTO_TLS_1_2);
-# else
+#else
 		printf("TLS not supported\n");
 		return;
 #endif
@@ -160,11 +166,11 @@ void download(struct addrinfo *ai, bool is_tls)
 		sec_tag_t sec_tag_opt[] = {
 			CA_CERTIFICATE_TAG,
 		};
-		CHECK(setsockopt(sock, SOL_TLS, TLS_SEC_TAG_LIST,
-				 sec_tag_opt, sizeof(sec_tag_opt)));
+		CHECK(setsockopt(sock, SOL_TLS, TLS_SEC_TAG_LIST, sec_tag_opt,
+				 sizeof(sec_tag_opt)));
 
-		CHECK(setsockopt(sock, SOL_TLS, TLS_HOSTNAME,
-				 host, strlen(host) + 1));
+		CHECK(setsockopt(sock, SOL_TLS, TLS_HOSTNAME, host,
+				 strlen(host) + 1));
 	}
 #endif
 
@@ -199,7 +205,7 @@ void download(struct addrinfo *ai, bool is_tls)
 
 		cur_bytes += len;
 		printf("Download progress: %u Bytes; %u KiB; %u MiB\r",
-			cur_bytes, bytes2KiB(cur_bytes), bytes2MiB(cur_bytes));
+		       cur_bytes, bytes2KiB(cur_bytes), bytes2MiB(cur_bytes));
 
 		response[len] = 0;
 		/*printf("%s\n", response);*/
@@ -244,8 +250,8 @@ void main(void)
 		port = "80";
 		p = download_url + SSTRLEN("http://");
 #if defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS)
-	} else if (strncmp(download_url, "https://",
-		   SSTRLEN("https://")) == 0) {
+	} else if (strncmp(download_url, "https://", SSTRLEN("https://")) ==
+		   0) {
 		is_tls = true;
 		port = "443";
 		p = download_url + SSTRLEN("https://");
@@ -281,7 +287,7 @@ void main(void)
 	}
 
 	printf("Preparing HTTP GET request for http%s://%s:%s/%s\n",
-		       (is_tls ? "s" : ""), host, port, uri_path);
+	       (is_tls ? "s" : ""), host, port, uri_path);
 
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -319,14 +325,14 @@ void main(void)
 		if (total_iterations == 0) {
 			printf("\nIteration %u of INF\n", current_iteration);
 		} else {
-			printf("\nIteration %u of %u:\n",
-				current_iteration, total_iterations);
+			printf("\nIteration %u of %u:\n", current_iteration,
+			       total_iterations);
 		}
 		download(res, is_tls);
 
 		total_bytes += cur_bytes;
 		printf("Total downloaded so far: %u MiB\n",
-			bytes2MiB(total_bytes));
+		       bytes2MiB(total_bytes));
 
 		sleep(3);
 		current_iteration++;

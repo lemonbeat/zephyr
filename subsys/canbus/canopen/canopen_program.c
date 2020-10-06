@@ -23,25 +23,25 @@ LOG_MODULE_REGISTER(canopen_program);
 #define OD_H1F57_FLASH_STATUS 0x1F57
 
 /* Common program control commands and status */
-#define PROGRAM_CTRL_STOP           0x00
-#define PROGRAM_CTRL_START          0x01
-#define PROGRAM_CTRL_RESET          0x02
-#define PROGRAM_CTRL_CLEAR          0x03
+#define PROGRAM_CTRL_STOP 0x00
+#define PROGRAM_CTRL_START 0x01
+#define PROGRAM_CTRL_RESET 0x02
+#define PROGRAM_CTRL_CLEAR 0x03
 /* Zephyr specific program control and status */
 #define PROGRAM_CTRL_ZEPHYR_CONFIRM 0x80
 
 /* Flash status bits */
-#define FLASH_STATUS_IN_PROGRESS          BIT(0)
+#define FLASH_STATUS_IN_PROGRESS BIT(0)
 /* Flash common error bits values */
-#define FLASH_STATUS_NO_ERROR            (0U << 1U)
-#define FLASH_STATUS_NO_VALID_PROGRAM    (1U << 1U)
+#define FLASH_STATUS_NO_ERROR (0U << 1U)
+#define FLASH_STATUS_NO_VALID_PROGRAM (1U << 1U)
 #define FLASH_STATUS_DATA_FORMAT_UNKNOWN (2U << 1U)
-#define FLASH_STATUS_DATA_FORMAT_ERROR   (3U << 1U)
-#define FLASH_STATUS_FLASH_NOT_CLEARED   (4U << 1U)
-#define FLASH_STATUS_FLASH_WRITE_ERROR   (5U << 1U)
-#define FLASH_STATUS_GENERAL_ADDR_ERROR  (6U << 1U)
-#define FLASH_STATUS_FLASH_SECURED       (7U << 1U)
-#define FLASH_STATUS_UNSPECIFIED_ERROR   (63U << 1)
+#define FLASH_STATUS_DATA_FORMAT_ERROR (3U << 1U)
+#define FLASH_STATUS_FLASH_NOT_CLEARED (4U << 1U)
+#define FLASH_STATUS_FLASH_WRITE_ERROR (5U << 1U)
+#define FLASH_STATUS_GENERAL_ADDR_ERROR (6U << 1U)
+#define FLASH_STATUS_FLASH_SECURED (7U << 1U)
+#define FLASH_STATUS_UNSPECIFIED_ERROR (63U << 1)
 
 struct canopen_program_context {
 	uint32_t flash_status;
@@ -380,17 +380,17 @@ void canopen_program_download_attach(CO_NMT_t *nmt, CO_SDO_t *sdo, CO_EM_t *em)
 	ctx.nmt = nmt;
 	ctx.em = em;
 
-	CO_OD_configure(sdo, OD_H1F50_PROGRAM_DATA, canopen_odf_1f50,
-			NULL, 0U, 0U);
+	CO_OD_configure(sdo, OD_H1F50_PROGRAM_DATA, canopen_odf_1f50, NULL, 0U,
+			0U);
 
-	CO_OD_configure(sdo, OD_H1F51_PROGRAM_CTRL, canopen_odf_1f51,
-			NULL, 0U, 0U);
+	CO_OD_configure(sdo, OD_H1F51_PROGRAM_CTRL, canopen_odf_1f51, NULL, 0U,
+			0U);
 
 	if (IS_ENABLED(CONFIG_BOOTLOADER_MCUBOOT)) {
 		CO_OD_configure(sdo, OD_H1F56_PROGRAM_SWID, canopen_odf_1f56,
 				NULL, 0U, 0U);
 	}
 
-	CO_OD_configure(sdo, OD_H1F57_FLASH_STATUS, canopen_odf_1f57,
-			NULL, 0U, 0U);
+	CO_OD_configure(sdo, OD_H1F57_FLASH_STATUS, canopen_odf_1f57, NULL, 0U,
+			0U);
 }

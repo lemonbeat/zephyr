@@ -57,9 +57,8 @@ static inline void wait_for_switch(struct k_thread *thread)
  * Note that is_spinlock is a compile-time construct which will be
  * optimized out when this function is expanded.
  */
-static ALWAYS_INLINE unsigned int do_swap(unsigned int key,
-					  struct k_spinlock *lock,
-					  int is_spinlock)
+static ALWAYS_INLINE unsigned int
+do_swap(unsigned int key, struct k_spinlock *lock, int is_spinlock)
 {
 	ARG_UNUSED(lock);
 	struct k_thread *new_thread, *old_thread;
@@ -111,8 +110,7 @@ static ALWAYS_INLINE unsigned int do_swap(unsigned int key,
 		_current_cpu->current = new_thread;
 		wait_for_switch(new_thread);
 		arch_switch(new_thread->switch_handle,
-			     &old_thread->switch_handle);
-
+			    &old_thread->switch_handle);
 	}
 
 	if (is_spinlock) {
@@ -139,7 +137,7 @@ static inline void z_swap_unlocked(void)
 	struct k_spinlock lock = {};
 	k_spinlock_key_t key = k_spin_lock(&lock);
 
-	(void) z_swap(&lock, key);
+	(void)z_swap(&lock, key);
 }
 
 #else /* !CONFIG_USE_SWITCH */
@@ -166,7 +164,7 @@ static ALWAYS_INLINE int z_swap(struct k_spinlock *lock, k_spinlock_key_t key)
 
 static inline void z_swap_unlocked(void)
 {
-	(void) z_swap_irqlock(arch_irq_lock());
+	(void)z_swap_irqlock(arch_irq_lock());
 }
 
 #endif /* !CONFIG_USE_SWITCH */

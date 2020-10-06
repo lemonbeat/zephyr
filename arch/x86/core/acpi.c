@@ -19,7 +19,6 @@ static bool check_sum(struct acpi_sdt *t)
 	return sum == 0;
 }
 
-
 /* We never identity map the NULL page, but may need to read some BIOS data */
 static uint8_t *zero_page_base;
 
@@ -50,7 +49,7 @@ static void find_rsdp(void)
 
 	/* Might be nothing there, check before we inspect */
 	if (search != NULL) {
-		for (int i = 0; i < 1024/8; i++) {
+		for (int i = 0; i < 1024 / 8; i++) {
 			if (search[i] == ACPI_RSDP_SIGNATURE) {
 				rsdp = (void *)&search[i];
 				goto out;
@@ -63,7 +62,7 @@ static void find_rsdp(void)
 	 */
 	search = (uint64_t *)0xe0000;
 
-	for (int i = 0; i < 128*1024/8; i++) {
+	for (int i = 0; i < 128 * 1024 / 8; i++) {
 		if (search[i] == ACPI_RSDP_SIGNATURE) {
 			rsdp = (void *)&search[i];
 			goto out;

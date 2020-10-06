@@ -17,17 +17,17 @@ extern "C" {
 /** @brief AVDTP SEID Information */
 struct bt_avdtp_seid_info {
 	/** Stream End Point ID */
-	uint8_t id:6;
+	uint8_t id : 6;
 	/** End Point usage status */
-	uint8_t inuse:1;
+	uint8_t inuse : 1;
 	/** Reserved */
-	uint8_t rfa0:1;
+	uint8_t rfa0 : 1;
 	/** Media-type of the End Point */
-	uint8_t media_type:4;
+	uint8_t media_type : 4;
 	/** TSEP of the End Point */
-	uint8_t tsep:1;
+	uint8_t tsep : 1;
 	/** Reserved */
-	uint8_t rfa1:3;
+	uint8_t rfa1 : 3;
 } __packed;
 
 /** @brief AVDTP Local SEP*/

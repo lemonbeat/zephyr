@@ -23,28 +23,28 @@
 
 LOG_MODULE_DECLARE(LSM6DSO, CONFIG_SENSOR_LOG_LEVEL);
 
-#define LSM6DSO_SHUB_DATA_OUT				0x02
+#define LSM6DSO_SHUB_DATA_OUT 0x02
 
-#define LSM6DSO_SHUB_SLV0_ADDR				0x15
-#define LSM6DSO_SHUB_SLV0_SUBADDR			0x16
-#define LSM6DSO_SHUB_SLV0_CONFIG			0x17
-#define LSM6DSO_SHUB_SLV1_ADDR				0x18
-#define LSM6DSO_SHUB_SLV1_SUBADDR			0x19
-#define LSM6DSO_SHUB_SLV1_CONFIG			0x1A
-#define LSM6DSO_SHUB_SLV2_ADDR				0x1B
-#define LSM6DSO_SHUB_SLV2_SUBADDR			0x1C
-#define LSM6DSO_SHUB_SLV2_CONFIG			0x1D
-#define LSM6DSO_SHUB_SLV3_ADDR				0x1E
-#define LSM6DSO_SHUB_SLV3_SUBADDR			0x1F
-#define LSM6DSO_SHUB_SLV3_CONFIG			0x20
-#define LSM6DSO_SHUB_SLV0_DATAWRITE			0x21
+#define LSM6DSO_SHUB_SLV0_ADDR 0x15
+#define LSM6DSO_SHUB_SLV0_SUBADDR 0x16
+#define LSM6DSO_SHUB_SLV0_CONFIG 0x17
+#define LSM6DSO_SHUB_SLV1_ADDR 0x18
+#define LSM6DSO_SHUB_SLV1_SUBADDR 0x19
+#define LSM6DSO_SHUB_SLV1_CONFIG 0x1A
+#define LSM6DSO_SHUB_SLV2_ADDR 0x1B
+#define LSM6DSO_SHUB_SLV2_SUBADDR 0x1C
+#define LSM6DSO_SHUB_SLV2_CONFIG 0x1D
+#define LSM6DSO_SHUB_SLV3_ADDR 0x1E
+#define LSM6DSO_SHUB_SLV3_SUBADDR 0x1F
+#define LSM6DSO_SHUB_SLV3_CONFIG 0x20
+#define LSM6DSO_SHUB_SLV0_DATAWRITE 0x21
 
-#define LSM6DSO_SHUB_STATUS_MASTER			0x22
-#define LSM6DSO_SHUB_STATUS_SLV0_NACK			BIT(3)
-#define LSM6DSO_SHUB_STATUS_ENDOP			BIT(0)
+#define LSM6DSO_SHUB_STATUS_MASTER 0x22
+#define LSM6DSO_SHUB_STATUS_SLV0_NACK BIT(3)
+#define LSM6DSO_SHUB_STATUS_ENDOP BIT(0)
 
-#define LSM6DSO_SHUB_SLVX_WRITE				0x0
-#define LSM6DSO_SHUB_SLVX_READ				0x1
+#define LSM6DSO_SHUB_SLVX_WRITE 0x0
+#define LSM6DSO_SHUB_SLVX_READ 0x1
 
 static uint8_t num_ext_dev;
 static uint8_t shub_ext[LSM6DSO_SHUB_MAX_NUM_SLVS];
@@ -62,16 +62,16 @@ static void lsm6dso_shub_enable(struct lsm6dso_data *data, uint8_t enable);
  */
 #ifdef CONFIG_LSM6DSO_EXT_LIS2MDL
 
-#define LIS2MDL_CFG_REG_A		0x60
-#define LIS2MDL_CFG_REG_B		0x61
-#define LIS2MDL_CFG_REG_C		0x62
-#define LIS2MDL_STATUS_REG		0x67
+#define LIS2MDL_CFG_REG_A 0x60
+#define LIS2MDL_CFG_REG_B 0x61
+#define LIS2MDL_CFG_REG_C 0x62
+#define LIS2MDL_STATUS_REG 0x67
 
-#define LIS2MDL_SW_RESET		0x20
-#define LIS2MDL_ODR_10HZ		0x00
-#define LIS2MDL_ODR_100HZ		0x0C
-#define LIS2MDL_OFF_CANC		0x02
-#define LIS2MDL_SENSITIVITY		1500
+#define LIS2MDL_SW_RESET 0x20
+#define LIS2MDL_ODR_10HZ 0x00
+#define LIS2MDL_ODR_100HZ 0x0C
+#define LIS2MDL_OFF_CANC 0x02
+#define LIS2MDL_SENSITIVITY 1500
 
 static int lsm6dso_lis2mdl_init(struct lsm6dso_data *data, uint8_t i2c_addr)
 {
@@ -81,24 +81,24 @@ static int lsm6dso_lis2mdl_init(struct lsm6dso_data *data, uint8_t i2c_addr)
 
 	/* sw reset device */
 	mag_cfg[0] = LIS2MDL_SW_RESET;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LIS2MDL_CFG_REG_A, mag_cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LIS2MDL_CFG_REG_A, mag_cfg,
+				     1);
 
 	k_sleep(K_MSEC(10)); /* turn-on time in ms */
 
 	/* configure mag */
 	mag_cfg[0] = LIS2MDL_ODR_10HZ;
 	mag_cfg[1] = LIS2MDL_OFF_CANC;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LIS2MDL_CFG_REG_A, mag_cfg, 2);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LIS2MDL_CFG_REG_A, mag_cfg,
+				     2);
 
 	return 0;
 }
 
-static const uint16_t lis2mdl_map[] = {10, 20, 50, 100};
+static const uint16_t lis2mdl_map[] = { 10, 20, 50, 100 };
 
-static int lsm6dso_lis2mdl_odr_set(struct lsm6dso_data *data,
-				   uint8_t i2c_addr, uint16_t freq)
+static int lsm6dso_lis2mdl_odr_set(struct lsm6dso_data *data, uint8_t i2c_addr,
+				   uint16_t freq)
 {
 	uint8_t odr, cfg;
 
@@ -114,8 +114,8 @@ static int lsm6dso_lis2mdl_odr_set(struct lsm6dso_data *data,
 	}
 
 	cfg = (odr << 2);
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LIS2MDL_CFG_REG_A, &cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LIS2MDL_CFG_REG_A, &cfg,
+				     1);
 
 	lsm6dso_shub_enable(data, 1);
 	return 0;
@@ -143,14 +143,14 @@ static int lsm6dso_lis2mdl_conf(struct lsm6dso_data *data, uint8_t i2c_addr,
  */
 #ifdef CONFIG_LSM6DSO_EXT_HTS221
 
-#define HTS221_AUTOINCREMENT		BIT(7)
+#define HTS221_AUTOINCREMENT BIT(7)
 
-#define HTS221_REG_CTRL1		0x20
-#define HTS221_ODR_1HZ			0x01
-#define HTS221_BDU			0x04
-#define HTS221_PD			0x80
+#define HTS221_REG_CTRL1 0x20
+#define HTS221_ODR_1HZ 0x01
+#define HTS221_BDU 0x04
+#define HTS221_PD 0x80
 
-#define HTS221_REG_CONV_START		0x30
+#define HTS221_REG_CONV_START 0x30
 
 static int lsmdso_hts221_read_conv_data(struct lsm6dso_data *data,
 					uint8_t i2c_addr)
@@ -163,7 +163,7 @@ static int lsmdso_hts221_read_conv_data(struct lsm6dso_data *data,
 
 		if (lsm6dso_shub_read_slave_reg(data, i2c_addr,
 						(HTS221_REG_CONV_START + i) |
-						HTS221_AUTOINCREMENT,
+							HTS221_AUTOINCREMENT,
 						&buf[i], len) < 0) {
 			LOG_DBG("shub: failed to read hts221 conv data");
 			return -EIO;
@@ -184,16 +184,16 @@ static int lsm6dso_hts221_init(struct lsm6dso_data *data, uint8_t i2c_addr)
 
 	/* configure ODR and BDU */
 	hum_cfg = HTS221_ODR_1HZ | HTS221_BDU | HTS221_PD;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     HTS221_REG_CTRL1, &hum_cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, HTS221_REG_CTRL1, &hum_cfg,
+				     1);
 
 	return lsmdso_hts221_read_conv_data(data, i2c_addr);
 }
 
-static const uint16_t hts221_map[] = {0, 1, 7, 12};
+static const uint16_t hts221_map[] = { 0, 1, 7, 12 };
 
-static int lsm6dso_hts221_odr_set(struct lsm6dso_data *data,
-				   uint8_t i2c_addr, uint16_t freq)
+static int lsm6dso_hts221_odr_set(struct lsm6dso_data *data, uint8_t i2c_addr,
+				  uint16_t freq)
 {
 	uint8_t odr, cfg;
 
@@ -209,17 +209,16 @@ static int lsm6dso_hts221_odr_set(struct lsm6dso_data *data,
 	}
 
 	cfg = odr | HTS221_BDU | HTS221_PD;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     HTS221_REG_CTRL1, &cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, HTS221_REG_CTRL1, &cfg, 1);
 
 	lsm6dso_shub_enable(data, 1);
 	return 0;
 }
 
 static int lsm6dso_hts221_conf(struct lsm6dso_data *data, uint8_t i2c_addr,
-				enum sensor_channel chan,
-				enum sensor_attribute attr,
-				const struct sensor_value *val)
+			       enum sensor_channel chan,
+			       enum sensor_attribute attr,
+			       const struct sensor_value *val)
 {
 	switch (attr) {
 	case SENSOR_ATTR_SAMPLING_FREQUENCY:
@@ -238,13 +237,13 @@ static int lsm6dso_hts221_conf(struct lsm6dso_data *data, uint8_t i2c_addr,
  */
 #ifdef CONFIG_LSM6DSO_EXT_LPS22HB
 
-#define LPS22HB_CTRL_REG1		0x10
-#define LPS22HB_CTRL_REG2		0x11
+#define LPS22HB_CTRL_REG1 0x10
+#define LPS22HB_CTRL_REG2 0x11
 
-#define LPS22HB_SW_RESET		0x04
-#define LPS22HB_ODR_10HZ		0x20
-#define LPS22HB_LPF_EN			0x08
-#define LPS22HB_BDU_EN			0x02
+#define LPS22HB_SW_RESET 0x04
+#define LPS22HB_ODR_10HZ 0x20
+#define LPS22HB_LPF_EN 0x08
+#define LPS22HB_BDU_EN 0x02
 
 static int lsm6dso_lps22hb_init(struct lsm6dso_data *data, uint8_t i2c_addr)
 {
@@ -252,15 +251,15 @@ static int lsm6dso_lps22hb_init(struct lsm6dso_data *data, uint8_t i2c_addr)
 
 	/* sw reset device */
 	baro_cfg[0] = LPS22HB_SW_RESET;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LPS22HB_CTRL_REG2, baro_cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LPS22HB_CTRL_REG2,
+				     baro_cfg, 1);
 
 	k_sleep(K_MSEC(1)); /* turn-on time in ms */
 
 	/* configure device */
 	baro_cfg[0] = LPS22HB_ODR_10HZ | LPS22HB_LPF_EN | LPS22HB_BDU_EN;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LPS22HB_CTRL_REG1, baro_cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LPS22HB_CTRL_REG1,
+				     baro_cfg, 1);
 
 	return 0;
 }
@@ -271,14 +270,14 @@ static int lsm6dso_lps22hb_init(struct lsm6dso_data *data, uint8_t i2c_addr)
  */
 #ifdef CONFIG_LSM6DSO_EXT_LPS22HH
 
-#define LPS22HH_CTRL_REG1		0x10
-#define LPS22HH_CTRL_REG2		0x11
+#define LPS22HH_CTRL_REG1 0x10
+#define LPS22HH_CTRL_REG2 0x11
 
-#define LPS22HH_SW_RESET		0x04
-#define LPS22HH_IF_ADD_INC		0x10
-#define LPS22HH_ODR_10HZ		0x20
-#define LPS22HH_LPF_EN			0x08
-#define LPS22HH_BDU_EN			0x02
+#define LPS22HH_SW_RESET 0x04
+#define LPS22HH_IF_ADD_INC 0x10
+#define LPS22HH_ODR_10HZ 0x20
+#define LPS22HH_LPF_EN 0x08
+#define LPS22HH_BDU_EN 0x02
 
 static int lsm6dso_lps22hh_init(struct lsm6dso_data *data, uint8_t i2c_addr)
 {
@@ -286,27 +285,27 @@ static int lsm6dso_lps22hh_init(struct lsm6dso_data *data, uint8_t i2c_addr)
 
 	/* sw reset device */
 	baro_cfg[0] = LPS22HH_SW_RESET;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LPS22HH_CTRL_REG2, baro_cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LPS22HH_CTRL_REG2,
+				     baro_cfg, 1);
 
 	k_sleep(K_MSEC(100)); /* turn-on time in ms */
 
 	/* configure device */
 	baro_cfg[0] = LPS22HH_IF_ADD_INC;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LPS22HH_CTRL_REG2, baro_cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LPS22HH_CTRL_REG2,
+				     baro_cfg, 1);
 
 	baro_cfg[0] = LPS22HH_ODR_10HZ | LPS22HH_LPF_EN | LPS22HH_BDU_EN;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LPS22HH_CTRL_REG1, baro_cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LPS22HH_CTRL_REG1,
+				     baro_cfg, 1);
 
 	return 0;
 }
 
-static const uint16_t lps22hh_map[] = {0, 1, 10, 25, 50, 75, 100, 200};
+static const uint16_t lps22hh_map[] = { 0, 1, 10, 25, 50, 75, 100, 200 };
 
-static int lsm6dso_lps22hh_odr_set(struct lsm6dso_data *data,
-				   uint8_t i2c_addr, uint16_t freq)
+static int lsm6dso_lps22hh_odr_set(struct lsm6dso_data *data, uint8_t i2c_addr,
+				   uint16_t freq)
 {
 	uint8_t odr, cfg;
 
@@ -322,8 +321,8 @@ static int lsm6dso_lps22hh_odr_set(struct lsm6dso_data *data,
 	}
 
 	cfg = (odr << 4) | LPS22HH_LPF_EN | LPS22HH_BDU_EN;
-	lsm6dso_shub_write_slave_reg(data, i2c_addr,
-				     LPS22HH_CTRL_REG1, &cfg, 1);
+	lsm6dso_shub_write_slave_reg(data, i2c_addr, LPS22HH_CTRL_REG1, &cfg,
+				     1);
 
 	lsm6dso_shub_enable(data, 1);
 	return 0;
@@ -364,55 +363,55 @@ static struct lsm6dso_shub_slist {
 #ifdef CONFIG_LSM6DSO_EXT_LIS2MDL
 	{
 		/* LIS2MDL */
-		.type		= SENSOR_CHAN_MAGN_XYZ,
-		.i2c_addr       = { 0x1E },
-		.wai_addr       = 0x4F,
-		.wai_val        = 0x40,
-		.out_data_addr  = 0x68,
-		.out_data_len   = 0x06,
-		.dev_init       = (lsm6dso_lis2mdl_init),
-		.dev_conf       = (lsm6dso_lis2mdl_conf),
+		.type = SENSOR_CHAN_MAGN_XYZ,
+		.i2c_addr = { 0x1E },
+		.wai_addr = 0x4F,
+		.wai_val = 0x40,
+		.out_data_addr = 0x68,
+		.out_data_len = 0x06,
+		.dev_init = (lsm6dso_lis2mdl_init),
+		.dev_conf = (lsm6dso_lis2mdl_conf),
 	},
 #endif /* CONFIG_LSM6DSO_EXT_LIS2MDL */
 
 #ifdef CONFIG_LSM6DSO_EXT_HTS221
 	{
 		/* HTS221 */
-		.type		= SENSOR_CHAN_HUMIDITY,
-		.i2c_addr       = { 0x5F },
-		.wai_addr       = 0x0F,
-		.wai_val        = 0xBC,
-		.out_data_addr  = 0x28 | HTS221_AUTOINCREMENT,
-		.out_data_len   = 0x02,
-		.dev_init       = (lsm6dso_hts221_init),
-		.dev_conf       = (lsm6dso_hts221_conf),
+		.type = SENSOR_CHAN_HUMIDITY,
+		.i2c_addr = { 0x5F },
+		.wai_addr = 0x0F,
+		.wai_val = 0xBC,
+		.out_data_addr = 0x28 | HTS221_AUTOINCREMENT,
+		.out_data_len = 0x02,
+		.dev_init = (lsm6dso_hts221_init),
+		.dev_conf = (lsm6dso_hts221_conf),
 	},
 #endif /* CONFIG_LSM6DSO_EXT_HTS221 */
 
 #ifdef CONFIG_LSM6DSO_EXT_LPS22HB
 	{
 		/* LPS22HB */
-		.type		= SENSOR_CHAN_PRESS,
-		.i2c_addr       = { 0x5C, 0x5D },
-		.wai_addr       = 0x0F,
-		.wai_val        = 0xB1,
-		.out_data_addr  = 0x28,
-		.out_data_len   = 0x05,
-		.dev_init       = (lsm6dso_lps22hb_init),
+		.type = SENSOR_CHAN_PRESS,
+		.i2c_addr = { 0x5C, 0x5D },
+		.wai_addr = 0x0F,
+		.wai_val = 0xB1,
+		.out_data_addr = 0x28,
+		.out_data_len = 0x05,
+		.dev_init = (lsm6dso_lps22hb_init),
 	},
 #endif /* CONFIG_LSM6DSO_EXT_LPS22HB */
 
 #ifdef CONFIG_LSM6DSO_EXT_LPS22HH
 	{
 		/* LPS22HH */
-		.type		= SENSOR_CHAN_PRESS,
-		.i2c_addr       = { 0x5C, 0x5D },
-		.wai_addr       = 0x0F,
-		.wai_val        = 0xB3,
-		.out_data_addr  = 0x28,
-		.out_data_len   = 0x05,
-		.dev_init       = (lsm6dso_lps22hh_init),
-		.dev_conf       = (lsm6dso_lps22hh_conf),
+		.type = SENSOR_CHAN_PRESS,
+		.i2c_addr = { 0x5C, 0x5D },
+		.wai_addr = 0x0F,
+		.wai_val = 0xB3,
+		.out_data_addr = 0x28,
+		.out_data_len = 0x05,
+		.dev_init = (lsm6dso_lps22hh_init),
+		.dev_conf = (lsm6dso_lps22hh_conf),
 	},
 #endif /* CONFIG_LSM6DSO_EXT_LPS22HH */
 };
@@ -428,17 +427,17 @@ static inline void lsm6dso_shub_wait_completed(struct lsm6dso_data *data)
 static inline void lsm6dso_shub_embedded_en(struct lsm6dso_data *data, bool on)
 {
 	if (on) {
-		(void) lsm6dso_mem_bank_set(data->ctx, LSM6DSO_SENSOR_HUB_BANK);
+		(void)lsm6dso_mem_bank_set(data->ctx, LSM6DSO_SENSOR_HUB_BANK);
 	} else {
-		(void) lsm6dso_mem_bank_set(data->ctx, LSM6DSO_USER_BANK);
+		(void)lsm6dso_mem_bank_set(data->ctx, LSM6DSO_USER_BANK);
 	}
 
 	k_busy_wait(150);
 }
 
 static int lsm6dso_shub_read_embedded_regs(struct lsm6dso_data *data,
-					   uint8_t reg_addr,
-					   uint8_t *value, int len)
+					   uint8_t reg_addr, uint8_t *value,
+					   int len)
 {
 	lsm6dso_shub_embedded_en(data, true);
 
@@ -454,8 +453,8 @@ static int lsm6dso_shub_read_embedded_regs(struct lsm6dso_data *data,
 }
 
 static int lsm6dso_shub_write_embedded_regs(struct lsm6dso_data *data,
-					    uint8_t reg_addr,
-					    uint8_t *value, uint8_t len)
+					    uint8_t reg_addr, uint8_t *value,
+					    uint8_t len)
 {
 	lsm6dso_shub_embedded_en(data, true);
 
@@ -499,7 +498,7 @@ static int lsm6dso_shub_check_slv0_nack(struct lsm6dso_data *data)
 	uint8_t status;
 
 	if (lsm6dso_shub_read_embedded_regs(data, LSM6DSO_SHUB_STATUS_MASTER,
-					     &status, 1) < 0) {
+					    &status, 1) < 0) {
 		LOG_DBG("shub: error reading embedded reg");
 		return -EIO;
 	}
@@ -537,8 +536,8 @@ static int lsm6dso_shub_read_slave_reg(struct lsm6dso_data *data,
 
 	/* read data from external slave */
 	lsm6dso_shub_embedded_en(data, true);
-	if (lsm6dso_read_reg(data->ctx, LSM6DSO_SHUB_DATA_OUT,
-			     value, len) < 0) {
+	if (lsm6dso_read_reg(data->ctx, LSM6DSO_SHUB_DATA_OUT, value, len) <
+	    0) {
 		LOG_DBG("shub: error reading sensor data");
 		return -EIO;
 	}
@@ -567,17 +566,16 @@ static int lsm6dso_shub_write_slave_reg(struct lsm6dso_data *data,
 		slv_cfg[0] = (slv_addr << 1) & ~LSM6DSO_SHUB_SLVX_READ;
 		slv_cfg[1] = slv_reg + cnt;
 
-		if (lsm6dso_shub_write_embedded_regs(data,
-						     LSM6DSO_SHUB_SLV0_ADDR,
-						     slv_cfg, 2) < 0) {
+		if (lsm6dso_shub_write_embedded_regs(
+			    data, LSM6DSO_SHUB_SLV0_ADDR, slv_cfg, 2) < 0) {
 			LOG_DBG("shub: error writing embedded reg");
 			return -EIO;
 		}
 
 		slv_cfg[0] = value[cnt];
-		if (lsm6dso_shub_write_embedded_regs(data,
-					LSM6DSO_SHUB_SLV0_DATAWRITE,
-					slv_cfg, 1) < 0) {
+		if (lsm6dso_shub_write_embedded_regs(
+			    data, LSM6DSO_SHUB_SLV0_DATAWRITE, slv_cfg, 1) <
+		    0) {
 			LOG_DBG("shub: error writing embedded reg");
 			return -EIO;
 		}
@@ -632,9 +630,8 @@ static int lsm6dso_shub_set_data_channel(struct lsm6dso_data *data)
 		slv_cfg[i + 2] = sp->out_data_len;
 	}
 
-	if (lsm6dso_shub_write_embedded_regs(data,
-					     LSM6DSO_SHUB_SLV1_ADDR,
-					     slv_cfg, n*3) < 0) {
+	if (lsm6dso_shub_write_embedded_regs(data, LSM6DSO_SHUB_SLV1_ADDR,
+					     slv_cfg, n * 3) < 0) {
 		LOG_DBG("shub: error writing embedded reg");
 		return -EIO;
 	}
@@ -653,7 +650,6 @@ static int lsm6dso_shub_set_data_channel(struct lsm6dso_data *data)
 		LOG_DBG("shub: error setting write once");
 		return -EIO;
 	}
-
 
 	/* turn SH on */
 	lsm6dso_shub_enable(data, 1);
@@ -749,10 +745,9 @@ int lsm6dso_shub_init(const struct device *dev)
 		 * chip ID.
 		 */
 		for (i = 0U; i < ARRAY_SIZE(sp->i2c_addr); i++) {
-			if (lsm6dso_shub_read_slave_reg(data,
-							sp->i2c_addr[i],
-							sp->wai_addr,
-							&chip_id, 1) < 0) {
+			if (lsm6dso_shub_read_slave_reg(data, sp->i2c_addr[i],
+							sp->wai_addr, &chip_id,
+							1) < 0) {
 				LOG_DBG("shub: failed reading chip id");
 				continue;
 			}

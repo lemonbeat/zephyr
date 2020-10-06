@@ -123,8 +123,7 @@ extern "C" {
  * @return the pin cell value at index 0
  * @see DT_GPIO_PIN_BY_IDX()
  */
-#define DT_GPIO_PIN(node_id, gpio_pha) \
-	DT_GPIO_PIN_BY_IDX(node_id, gpio_pha, 0)
+#define DT_GPIO_PIN(node_id, gpio_pha) DT_GPIO_PIN_BY_IDX(node_id, gpio_pha, 0)
 
 /**
  * @brief Get a GPIO specifier's flags cell at an index
@@ -260,4 +259,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* ZEPHYR_INCLUDE_DEVICETREE_GPIO_H_ */
+#endif /* ZEPHYR_INCLUDE_DEVICETREE_GPIO_H_ */

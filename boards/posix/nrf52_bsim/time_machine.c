@@ -23,7 +23,7 @@ static enum {
 } next_timer_index = NONE;
 
 static bs_time_t *Timer_list[NUMBER_OF_TIMERS] = {
-		&timer_nrf_main_timer,
+	&timer_nrf_main_timer,
 };
 static bs_time_t next_timer_time = TIME_NEVER;
 
@@ -141,9 +141,12 @@ static void tm_sleep_until_abs_time(bs_time_t time)
 		now = time;
 	} else {
 		/* LCOV_EXCL_START */
-		bs_trace_warning_manual_time_line(now, "next_time_time "
-			"corrupted (%"PRItime"<= %"PRItime", timer idx=%i)\n",
-			time, now, next_timer_index);
+		bs_trace_warning_manual_time_line(now,
+						  "next_time_time "
+						  "corrupted (%" PRItime
+						  "<= %" PRItime
+						  ", timer idx=%i)\n",
+						  time, now, next_timer_index);
 		/* LCOV_EXCL_STOP */
 	}
 	tm_update_HW_time();
@@ -180,7 +183,7 @@ void tm_find_next_timer_to_trigger(void)
 	next_timer_time = *Timer_list[0];
 	next_timer_index = 0;
 
-	for (uint i = 1; i < NUMBER_OF_TIMERS ; i++) {
+	for (uint i = 1; i < NUMBER_OF_TIMERS; i++) {
 		if (next_timer_time > *Timer_list[i]) {
 			next_timer_time = *Timer_list[i];
 			next_timer_index = i;

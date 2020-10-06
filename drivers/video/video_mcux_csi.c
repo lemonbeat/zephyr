@@ -129,8 +129,10 @@ static int video_mcux_csi_set_fmt(const struct device *dev,
 	data->pixelformat = fmt->pixelformat;
 	data->csi_config.bytesPerPixel = bpp;
 	data->csi_config.linePitch_Bytes = fmt->pitch;
-	data->csi_config.polarityFlags = kCSI_HsyncActiveHigh | kCSI_DataLatchOnRisingEdge;
-	data->csi_config.workMode = kCSI_GatedClockMode; /* use VSYNC, HSYNC, and PIXCLK */
+	data->csi_config.polarityFlags = kCSI_HsyncActiveHigh |
+					 kCSI_DataLatchOnRisingEdge;
+	data->csi_config.workMode =
+		kCSI_GatedClockMode; /* use VSYNC, HSYNC, and PIXCLK */
 	data->csi_config.dataBus = kCSI_DataBus8Bit;
 	data->csi_config.useExtVsync = true;
 	data->csi_config.height = fmt->height;
@@ -213,10 +215,8 @@ static int video_mcux_csi_stream_stop(const struct device *dev)
 	return 0;
 }
 
-
 static int video_mcux_csi_flush(const struct device *dev,
-				enum video_endpoint_id ep,
-				bool cancel)
+				enum video_endpoint_id ep, bool cancel)
 {
 	const struct video_mcux_csi_config *config = dev->config;
 	struct video_mcux_csi_data *data = dev->data;
@@ -296,8 +296,7 @@ static int video_mcux_csi_dequeue(const struct device *dev,
 }
 
 static inline int video_mcux_csi_set_ctrl(const struct device *dev,
-					  unsigned int cid,
-					  void *value)
+					  unsigned int cid, void *value)
 {
 	struct video_mcux_csi_data *data = dev->data;
 	int ret = -ENOTSUP;
@@ -311,8 +310,7 @@ static inline int video_mcux_csi_set_ctrl(const struct device *dev,
 }
 
 static inline int video_mcux_csi_get_ctrl(const struct device *dev,
-					  unsigned int cid,
-					  void *value)
+					  unsigned int cid, void *value)
 {
 	struct video_mcux_csi_data *data = dev->data;
 	int ret = -ENOTSUP;
@@ -431,9 +429,8 @@ static int video_mcux_csi_init_0(const struct device *dev)
 	return video_mcux_csi_init(dev);
 }
 
-DEVICE_AND_API_INIT(video_mcux_csi, DT_INST_LABEL(0),
-		    &video_mcux_csi_init_0, &video_mcux_csi_data_0,
-		    &video_mcux_csi_config_0,
+DEVICE_AND_API_INIT(video_mcux_csi, DT_INST_LABEL(0), &video_mcux_csi_init_0,
+		    &video_mcux_csi_data_0, &video_mcux_csi_config_0,
 		    POST_KERNEL, CONFIG_VIDEO_INIT_PRIORITY,
 		    &video_mcux_csi_driver_api);
 #endif

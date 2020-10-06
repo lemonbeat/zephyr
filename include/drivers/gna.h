@@ -39,19 +39,19 @@ struct gna_config {
  * Describes the key parameters of the neural network model
  */
 struct gna_model_header {
-	uint32_t	labase_offset;
-	uint32_t	model_size;
-	uint32_t	gna_mode;
-	uint32_t	layer_count;
-	uint32_t	bytes_per_input;
-	uint32_t	bytes_per_output;
-	uint32_t	num_input_nodes;
-	uint32_t	num_output_nodes;
-	uint32_t	input_ptr_offset;
-	uint32_t	output_ptr_offset;
-	uint32_t	rw_region_size;
-	uint32_t	input_scaling_factor;
-	uint32_t	output_scaling_factor;
+	uint32_t labase_offset;
+	uint32_t model_size;
+	uint32_t gna_mode;
+	uint32_t layer_count;
+	uint32_t bytes_per_input;
+	uint32_t bytes_per_output;
+	uint32_t num_input_nodes;
+	uint32_t num_output_nodes;
+	uint32_t input_ptr_offset;
+	uint32_t output_ptr_offset;
+	uint32_t rw_region_size;
+	uint32_t input_scaling_factor;
+	uint32_t output_scaling_factor;
 };
 
 /**
@@ -111,22 +111,20 @@ struct gna_inference_resp {
  */
 typedef int (*gna_callback)(struct gna_inference_resp *result);
 
-typedef int (*gna_api_config)(const struct device *dev,
-			      struct gna_config *cfg);
+typedef int (*gna_api_config)(const struct device *dev, struct gna_config *cfg);
 typedef int (*gna_api_register)(const struct device *dev,
 				struct gna_model_info *model,
 				void **model_handle);
-typedef int (*gna_api_deregister)(const struct device *dev,
-				  void *model_handle);
+typedef int (*gna_api_deregister)(const struct device *dev, void *model_handle);
 typedef int (*gna_api_infer)(const struct device *dev,
 			     struct gna_inference_req *req,
 			     gna_callback callback);
 
 struct gna_driver_api {
-	gna_api_config		configure;
-	gna_api_register	register_model;
-	gna_api_deregister	deregister_model;
-	gna_api_infer		infer;
+	gna_api_config configure;
+	gna_api_register register_model;
+	gna_api_deregister deregister_model;
+	gna_api_infer infer;
 };
 
 /**

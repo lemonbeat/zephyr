@@ -53,13 +53,13 @@ struct posix_thread {
 };
 
 /* Pthread detach/joinable */
-#define PTHREAD_CREATE_JOINABLE     PTHREAD_JOINABLE
-#define PTHREAD_CREATE_DETACHED     PTHREAD_DETACHED
+#define PTHREAD_CREATE_JOINABLE PTHREAD_JOINABLE
+#define PTHREAD_CREATE_DETACHED PTHREAD_DETACHED
 
 /* Pthread cancellation */
-#define _PTHREAD_CANCEL_POS	0
-#define PTHREAD_CANCEL_ENABLE	(0U << _PTHREAD_CANCEL_POS)
-#define PTHREAD_CANCEL_DISABLE	BIT(_PTHREAD_CANCEL_POS)
+#define _PTHREAD_CANCEL_POS 0
+#define PTHREAD_CANCEL_ENABLE (0U << _PTHREAD_CANCEL_POS)
+#define PTHREAD_CANCEL_DISABLE BIT(_PTHREAD_CANCEL_POS)
 
 /* Passed to pthread_once */
 #define PTHREAD_ONCE_INIT 1
@@ -73,9 +73,9 @@ struct posix_thread {
  *
  * @param name Symbol name of the condition variable
  */
-#define PTHREAD_COND_DEFINE(name)					\
-	struct pthread_cond name = {					\
-		.wait_q = Z_WAIT_Q_INIT(&name.wait_q),			\
+#define PTHREAD_COND_DEFINE(name)                      \
+	struct pthread_cond name = {                   \
+		.wait_q = Z_WAIT_Q_INIT(&name.wait_q), \
 	}
 
 /**
@@ -163,12 +163,11 @@ static inline int pthread_condattr_destroy(pthread_condattr_t *att)
  *
  * @param name Symbol name of the mutex
  */
-#define PTHREAD_MUTEX_DEFINE(name) \
-	struct pthread_mutex name = \
-	{ \
-		.lock_count = 0, \
-		.wait_q = Z_WAIT_Q_INIT(&name.wait_q),	\
-		.owner = NULL, \
+#define PTHREAD_MUTEX_DEFINE(name)                     \
+	struct pthread_mutex name = {                  \
+		.lock_count = 0,                       \
+		.wait_q = Z_WAIT_Q_INIT(&name.wait_q), \
+		.owner = NULL,                         \
 	}
 
 /*
@@ -181,10 +180,10 @@ static inline int pthread_condattr_destroy(pthread_condattr_t *att)
  *      error is returned.
  *
  */
-#define PTHREAD_MUTEX_NORMAL        0
-#define PTHREAD_MUTEX_RECURSIVE     1
-#define PTHREAD_MUTEX_ERRORCHECK    2
-#define PTHREAD_MUTEX_DEFAULT       PTHREAD_MUTEX_NORMAL
+#define PTHREAD_MUTEX_NORMAL 0
+#define PTHREAD_MUTEX_RECURSIVE 1
+#define PTHREAD_MUTEX_ERRORCHECK 2
+#define PTHREAD_MUTEX_DEFAULT PTHREAD_MUTEX_NORMAL
 
 /*
  *  Mutex attributes - protocol
@@ -198,7 +197,7 @@ static inline int pthread_condattr_destroy(pthread_condattr_t *att)
  *      any of these mutexes).
  *  FIXME: Only PRIO_NONE is supported. Implement other protocols.
  */
-#define PTHREAD_PRIO_NONE           0
+#define PTHREAD_PRIO_NONE 0
 
 /**
  * @brief POSIX threading compatibility API
@@ -227,8 +226,7 @@ int pthread_mutex_unlock(pthread_mutex_t *m);
  * See IEEE 1003.1
  */
 
-int pthread_mutex_timedlock(pthread_mutex_t *m,
-			    const struct timespec *abstime);
+int pthread_mutex_timedlock(pthread_mutex_t *m, const struct timespec *abstime);
 
 /**
  * @brief POSIX threading compatibility API
@@ -242,8 +240,7 @@ int pthread_mutex_trylock(pthread_mutex_t *m);
  *
  * See IEEE 1003.1
  */
-int pthread_mutex_init(pthread_mutex_t *m,
-				     const pthread_mutexattr_t *att);
+int pthread_mutex_init(pthread_mutex_t *m, const pthread_mutexattr_t *att);
 
 /**
  * @brief POSIX threading compatibility API
@@ -331,10 +328,10 @@ static inline int pthread_mutexattr_destroy(pthread_mutexattr_t *m)
  * @param count Thread count, same as the "count" argument to
  *             pthread_barrier_init()
  */
-#define PTHREAD_BARRIER_DEFINE(name, count)			\
-	struct pthread_barrier name = {				\
-		.wait_q = Z_WAIT_Q_INIT(&name.wait_q),		\
-		.max = count,					\
+#define PTHREAD_BARRIER_DEFINE(name, count)            \
+	struct pthread_barrier name = {                \
+		.wait_q = Z_WAIT_Q_INIT(&name.wait_q), \
+		.max = count,                          \
 	}
 
 #define PTHREAD_BARRIER_SERIAL_THREAD 1
@@ -446,7 +443,6 @@ static inline pthread_t pthread_self(void)
 	return (pthread_t)k_current_get();
 }
 
-
 /**
  * @brief Compare thread IDs.
  *
@@ -488,8 +484,8 @@ int pthread_attr_getschedparam(const pthread_attr_t *attr,
 			       struct sched_param *schedparam);
 int pthread_getschedparam(pthread_t pthread, int *policy,
 			  struct sched_param *param);
-int pthread_attr_getstack(const pthread_attr_t *attr,
-			  void **stackaddr, size_t *stacksize);
+int pthread_attr_getstack(const pthread_attr_t *attr, void **stackaddr,
+			  size_t *stacksize);
 int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr,
 			  size_t stacksize);
 int pthread_once(pthread_once_t *once, void (*initFunc)(void));
@@ -516,8 +512,7 @@ int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
 int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
 int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
 int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
-int pthread_key_create(pthread_key_t *key,
-		void (*destructor)(void *));
+int pthread_key_create(pthread_key_t *key, void (*destructor)(void *));
 int pthread_key_delete(pthread_key_t key);
 int pthread_setspecific(pthread_key_t key, const void *value);
 void *pthread_getspecific(pthread_key_t key);

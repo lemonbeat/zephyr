@@ -59,7 +59,6 @@ size_t plain_text_put_float64fix(struct lwm2m_output_context *out,
 				 struct lwm2m_obj_path *path,
 				 float64_value_t *value);
 
-
 int do_read_op_plain_text(struct lwm2m_message *msg, int content_format);
 int do_write_op_plain_text(struct lwm2m_message *msg);
 

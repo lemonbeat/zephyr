@@ -51,7 +51,6 @@ struct bt_iso_data_path {
 	struct bt_iso_chan_path *path;
 };
 
-
 struct net_buf *bt_iso_get_rx(k_timeout_t timeout)
 {
 	struct net_buf *buf = net_buf_alloc(&iso_rx_pool, timeout);
@@ -186,8 +185,8 @@ void hci_le_cis_req(struct net_buf *buf)
 	struct bt_conn *conn, *iso;
 	int err;
 
-	BT_DBG("acl_handle %u cis_handle %u cig_id %u cis %u",
-		acl_handle, cis_handle, evt->cig_id, evt->cis_id);
+	BT_DBG("acl_handle %u cis_handle %u cig_id %u cis %u", acl_handle,
+	       cis_handle, evt->cig_id, evt->cis_id);
 
 	/* Lookup existing connection with same handle */
 	iso = bt_conn_lookup_handle(cis_handle);
@@ -276,7 +275,6 @@ void bt_iso_cleanup(struct bt_conn *conn)
 	}
 
 	bt_conn_unref(conn);
-
 }
 
 struct bt_conn *iso_new(void)
@@ -1083,9 +1081,8 @@ int bt_iso_chan_send(struct bt_iso_chan *chan, struct net_buf *buf)
 
 	hdr = net_buf_push(buf, sizeof(*hdr));
 	hdr->sn = sys_cpu_to_le16(sn++);
-	hdr->slen = sys_cpu_to_le16(bt_iso_pkt_len_pack(net_buf_frags_len(buf)
-							- sizeof(*hdr),
-							BT_ISO_DATA_VALID));
+	hdr->slen = sys_cpu_to_le16(bt_iso_pkt_len_pack(
+		net_buf_frags_len(buf) - sizeof(*hdr), BT_ISO_DATA_VALID));
 
 	return bt_conn_send(chan->conn, buf);
 }

@@ -59,13 +59,13 @@ static ssize_t write_name(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 	return len;
 }
 
-static struct bt_uuid_128 name_uuid = BT_UUID_INIT_128(
-	0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12,
-	0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
+static struct bt_uuid_128 name_uuid =
+	BT_UUID_INIT_128(0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x78,
+			 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
 
-static struct bt_uuid_128 name_enc_uuid = BT_UUID_INIT_128(
-	0xf1, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12,
-	0x78, 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
+static struct bt_uuid_128 name_enc_uuid =
+	BT_UUID_INIT_128(0xf1, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x78,
+			 0x56, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12);
 
 #define CPF_FORMAT_UTF8 0x19
 
@@ -74,16 +74,15 @@ static const struct bt_gatt_cpf name_cpf = {
 };
 
 /* Vendor Primary Service Declaration */
-BT_GATT_SERVICE_DEFINE(name_svc,
+BT_GATT_SERVICE_DEFINE(
+	name_svc,
 	/* Vendor Primary Service Declaration */
 	BT_GATT_PRIMARY_SERVICE(&name_uuid),
 	BT_GATT_CHARACTERISTIC(&name_enc_uuid.uuid,
 			       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
 			       BT_GATT_PERM_READ | BT_GATT_PERM_WRITE_ENCRYPT,
 			       read_name, write_name, NULL),
-	BT_GATT_CUD("Badge Name", BT_GATT_PERM_READ),
-	BT_GATT_CPF(&name_cpf),
-);
+	BT_GATT_CUD("Badge Name", BT_GATT_PERM_READ), BT_GATT_CPF(&name_cpf), );
 
 static void passkey_display(struct bt_conn *conn, unsigned int passkey)
 {
@@ -175,8 +174,8 @@ static void bt_ready(int err)
 
 	if (!mesh_is_initialized()) {
 		/* Start advertising */
-		err = bt_le_adv_start(BT_LE_ADV_CONN_NAME,
-				      ad, ARRAY_SIZE(ad), NULL, 0);
+		err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad),
+				      NULL, 0);
 		if (err) {
 			printk("Advertising failed to start (err %d)\n", err);
 			return;

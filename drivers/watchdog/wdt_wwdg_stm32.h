@@ -39,10 +39,8 @@ struct wwdg_stm32_data {
 #define WWDG_STM32_CFG(dev) \
 	((const struct wwdg_stm32_config *const)(dev)->config)
 
-#define WWDG_STM32_DATA(dev) \
-	((struct wwdg_stm32_data *const)(dev)->data)
+#define WWDG_STM32_DATA(dev) ((struct wwdg_stm32_data *const)(dev)->data)
 
-#define WWDG_STM32_STRUCT(dev) \
-	((WWDG_TypeDef *)(WWDG_STM32_CFG(dev))->Instance)
+#define WWDG_STM32_STRUCT(dev) ((WWDG_TypeDef *)(WWDG_STM32_CFG(dev))->Instance)
 
-#endif  /* ZEPHYR_DRIVERS_WATCHDOG_WWDG_STM32_H_ */
+#endif /* ZEPHYR_DRIVERS_WATCHDOG_WWDG_STM32_H_ */

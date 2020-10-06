@@ -40,10 +40,8 @@
 
 static int np_uart_stdin_poll_in(const struct device *dev,
 				 unsigned char *p_char);
-static int np_uart_tty_poll_in(const struct device *dev,
-			       unsigned char *p_char);
-static void np_uart_poll_out(const struct device *dev,
-				      unsigned char out_char);
+static int np_uart_tty_poll_in(const struct device *dev, unsigned char *p_char);
+static void np_uart_poll_out(const struct device *dev, unsigned char out_char);
 
 static bool auto_attach;
 static const char default_cmd[] = CONFIG_NATIVE_UART_AUTOATTACH_DEFAULT_CMD;
@@ -104,8 +102,7 @@ static void attach_to_tty(const char *slave_tty)
  * emulator to its slave side.
  */
 static int open_tty(struct native_uart_status *driver_data,
-		    const char *uart_name,
-		    bool do_auto_attach)
+		    const char *uart_name, bool do_auto_attach)
 {
 	int master_pty;
 	char *slave_pty_name;
@@ -127,7 +124,7 @@ static int open_tty(struct native_uart_status *driver_data,
 		err_nbr = errno;
 		close(master_pty);
 		ERROR("Could not grant access to the slave PTY side (%i)\n",
-			errno);
+		      errno);
 	}
 	ret = unlockpt(master_pty);
 	if (ret == -1) {
@@ -147,7 +144,7 @@ static int open_tty(struct native_uart_status *driver_data,
 		err_nbr = errno;
 		close(master_pty);
 		ERROR("Could not read the master PTY file status flags (%i)\n",
-			errno);
+		      errno);
 	}
 
 	ret = fcntl(master_pty, F_SETFL, flags | O_NONBLOCK);
@@ -155,7 +152,7 @@ static int open_tty(struct native_uart_status *driver_data,
 		err_nbr = errno;
 		close(master_pty);
 		ERROR("Could not set the master PTY as non-blocking (%i)\n",
-			errno);
+		      errno);
 	}
 
 	/*
@@ -173,16 +170,16 @@ static int open_tty(struct native_uart_status *driver_data,
 	ter.c_cc[VMIN] = 0;
 	ter.c_cc[VTIME] = 0;
 	ter.c_lflag &= ~(ICANON | ISIG | IEXTEN | ECHO);
-	ter.c_iflag &= ~(BRKINT | ICRNL | IGNBRK | IGNCR | INLCR | INPCK
-			 | ISTRIP | IXON | PARMRK);
+	ter.c_iflag &= ~(BRKINT | ICRNL | IGNBRK | IGNCR | INLCR | INPCK |
+			 ISTRIP | IXON | PARMRK);
 	ter.c_oflag &= ~OPOST;
 	ret = tcsetattr(master_pty, TCSANOW, &ter);
 	if (ret == -1) {
 		ERROR("Could not change terminal driver settings\n");
 	}
 
-	posix_print_trace("%s connected to pseudotty: %s\n",
-			  uart_name, slave_pty_name);
+	posix_print_trace("%s connected to pseudotty: %s\n", uart_name,
+			  slave_pty_name);
 
 	if (do_auto_attach) {
 		attach_to_tty(slave_pty_name);
@@ -205,14 +202,13 @@ static int np_uart_0_init(const struct device *dev)
 	d = (struct native_uart_status *)dev->data;
 
 	if (IS_ENABLED(CONFIG_NATIVE_UART_0_ON_OWN_PTY)) {
-		int tty_fn = open_tty(d, DT_INST_LABEL(0),
-				      auto_attach);
+		int tty_fn = open_tty(d, DT_INST_LABEL(0), auto_attach);
 
 		d->in_fd = tty_fn;
 		d->out_fd = tty_fn;
 		np_uart_driver_api_0.poll_in = np_uart_tty_poll_in;
 	} else { /* NATIVE_UART_0_ON_STDINOUT */
-		d->in_fd  = STDIN_FILENO;
+		d->in_fd = STDIN_FILENO;
 		d->out_fd = STDOUT_FILENO;
 		np_uart_driver_api_0.poll_in = np_uart_stdin_poll_in;
 
@@ -222,8 +218,7 @@ static int np_uart_0_init(const struct device *dev)
 			     "but stdin seems to be left attached to the shell."
 			     " This will most likely NOT behave as you want it "
 			     "to. This option is NOT meant for interactive use "
-			     "but for piping/feeding from/to files to the UART"
-			     );
+			     "but for piping/feeding from/to files to the UART");
 		}
 	}
 
@@ -257,8 +252,7 @@ static int np_uart_1_init(const struct device *dev)
  * @param dev UART device struct
  * @param out_char Character to send.
  */
-static void np_uart_poll_out(const struct device *dev,
-				      unsigned char out_char)
+static void np_uart_poll_out(const struct device *dev, unsigned char out_char)
 {
 	int ret;
 	struct native_uart_status *d;
@@ -304,7 +298,7 @@ static int np_uart_stdin_poll_in(const struct device *dev,
 	FD_ZERO(&readfds);
 	FD_SET(in_f, &readfds);
 
-	ready = select(in_f+1, &readfds, NULL, NULL, &timeout);
+	ready = select(in_f + 1, &readfds, NULL, NULL, &timeout);
 
 	if (ready == 0) {
 		return -1;
@@ -329,8 +323,7 @@ static int np_uart_stdin_poll_in(const struct device *dev,
  * @retval 0 If a character arrived and was stored in p_char
  * @retval -1 If no character was available to read
  */
-static int np_uart_tty_poll_in(const struct device *dev,
-			       unsigned char *p_char)
+static int np_uart_tty_poll_in(const struct device *dev, unsigned char *p_char)
 {
 	int n = -1;
 	int in_f = ((struct native_uart_status *)dev->data)->in_fd;
@@ -342,18 +335,15 @@ static int np_uart_tty_poll_in(const struct device *dev,
 	return 0;
 }
 
-DEVICE_AND_API_INIT(uart_native_posix0,
-	    DT_INST_LABEL(0), &np_uart_0_init,
-	    (void *)&native_uart_status_0, NULL,
-	    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-	    &np_uart_driver_api_0);
+DEVICE_AND_API_INIT(uart_native_posix0, DT_INST_LABEL(0), &np_uart_0_init,
+		    (void *)&native_uart_status_0, NULL, PRE_KERNEL_1,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &np_uart_driver_api_0);
 
 #if defined(CONFIG_UART_NATIVE_POSIX_PORT_1_ENABLE)
-DEVICE_AND_API_INIT(uart_native_posix1,
-	    CONFIG_UART_NATIVE_POSIX_PORT_1_NAME, &np_uart_1_init,
-	    (void *)&native_uart_status_1, NULL,
-	    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
-	    &np_uart_driver_api_1);
+DEVICE_AND_API_INIT(uart_native_posix1, CONFIG_UART_NATIVE_POSIX_PORT_1_NAME,
+		    &np_uart_1_init, (void *)&native_uart_status_1, NULL,
+		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+		    &np_uart_driver_api_1);
 #endif /* CONFIG_UART_NATIVE_POSIX_PORT_1_ENABLE */
 
 static void np_add_uart_options(void)
@@ -370,15 +360,13 @@ static void np_add_uart_options(void)
 		 * destination, callback,
 		 * description
 		 */
-		{false, false, true,
-		"attach_uart", "", 'b',
-		(void *)&auto_attach, NULL,
-		"Automatically attach to the UART terminal"},
-		{false, false, false,
-		"attach_uart_cmd", "\"cmd\"", 's',
-		(void *)&auto_attach_cmd, NULL,
-		"Command used to automatically attach to the terminal, by "
-		"default: '" CONFIG_NATIVE_UART_AUTOATTACH_DEFAULT_CMD "'"},
+		{ false, false, true, "attach_uart", "", 'b',
+		  (void *)&auto_attach, NULL,
+		  "Automatically attach to the UART terminal" },
+		{ false, false, false, "attach_uart_cmd", "\"cmd\"", 's',
+		  (void *)&auto_attach_cmd, NULL,
+		  "Command used to automatically attach to the terminal, by "
+		  "default: '" CONFIG_NATIVE_UART_AUTOATTACH_DEFAULT_CMD "'" },
 
 		ARG_TABLE_ENDMARKER
 	};

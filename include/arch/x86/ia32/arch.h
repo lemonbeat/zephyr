@@ -24,7 +24,7 @@
 #include <arch/x86/ia32/syscall.h>
 
 #ifndef _ASMLANGUAGE
-#include <stddef.h>	/* for size_t */
+#include <stddef.h> /* for size_t */
 
 #include <arch/common/addr_types.h>
 #include <arch/x86/ia32/segmentation.h>
@@ -32,10 +32,10 @@
 #endif /* _ASMLANGUAGE */
 
 /* GDT layout */
-#define CODE_SEG	0x08
-#define DATA_SEG	0x10
-#define MAIN_TSS	0x18
-#define DF_TSS		0x20
+#define CODE_SEG 0x08
+#define DATA_SEG 0x10
+#define MAIN_TSS 0x18
+#define DF_TSS 0x20
 
 /**
  * Macro used internally by NANO_CPU_INT_REGISTER and NANO_CPU_INT_REGISTER_ASM.
@@ -43,11 +43,10 @@
  */
 #define MK_ISR_NAME(x) __isr__##x
 
-#define Z_DYN_STUB_SIZE			4
-#define Z_DYN_STUB_OFFSET		0
-#define Z_DYN_STUB_LONG_JMP_EXTRA_SIZE	3
-#define Z_DYN_STUB_PER_BLOCK		32
-
+#define Z_DYN_STUB_SIZE 4
+#define Z_DYN_STUB_OFFSET 0
+#define Z_DYN_STUB_LONG_JMP_EXTRA_SIZE 3
+#define Z_DYN_STUB_PER_BLOCK 32
 
 #ifndef _ASMLANGUAGE
 
@@ -59,28 +58,27 @@ extern "C" {
 
 typedef struct s_isrList {
 	/** Address of ISR/stub */
-	void		*fnc;
+	void *fnc;
 	/** IRQ associated with the ISR/stub, or -1 if this is not
 	 * associated with a real interrupt; in this case vec must
 	 * not be -1
 	 */
-	unsigned int    irq;
+	unsigned int irq;
 	/** Priority associated with the IRQ. Ignored if vec is not -1 */
-	unsigned int    priority;
+	unsigned int priority;
 	/** Vector number associated with ISR/stub, or -1 to assign based
 	 * on priority
 	 */
-	unsigned int    vec;
+	unsigned int vec;
 	/** Privilege level associated with ISR/stub */
-	unsigned int    dpl;
+	unsigned int dpl;
 
 	/** If nonzero, specifies a TSS segment selector. Will configure
 	 * a task gate instead of an interrupt gate. fnc parameter will be
 	 * ignored
 	 */
-	unsigned int	tss;
+	unsigned int tss;
 } ISR_LIST;
-
 
 /**
  * @brief Connect a routine to an interrupt vector
@@ -106,17 +104,14 @@ typedef struct s_isrList {
  *
  */
 
-#define NANO_CPU_INT_REGISTER(r, n, p, v, d) \
-	 static ISR_LIST __attribute__((section(".intList"))) \
-			 __attribute__((used)) MK_ISR_NAME(r) = \
-			{ \
-				.fnc = &(r), \
-				.irq = (n), \
-				.priority = (p), \
-				.vec = (v), \
-				.dpl = (d), \
-				.tss = 0 \
-			}
+#define NANO_CPU_INT_REGISTER(r, n, p, v, d)                              \
+	static ISR_LIST __attribute__((section(".intList")))              \
+		__attribute__((used)) MK_ISR_NAME(r) = { .fnc = &(r),     \
+							 .irq = (n),      \
+							 .priority = (p), \
+							 .vec = (v),      \
+							 .dpl = (d),      \
+							 .tss = 0 }
 
 /**
  * @brief Connect an IA hardware task to an interrupt vector
@@ -132,16 +127,14 @@ typedef struct s_isrList {
  * @param dpl_p Descriptor privilege level
  */
 #define _X86_IDT_TSS_REGISTER(tss_p, irq_p, priority_p, vec_p, dpl_p) \
-	static ISR_LIST __attribute__((section(".intList"))) \
-			__attribute__((used)) MK_ISR_NAME(r) = \
-			{ \
-				.fnc = NULL, \
-				.irq = (irq_p), \
-				.priority = (priority_p), \
-				.vec = (vec_p), \
-				.dpl = (dpl_p), \
-				.tss = (tss_p) \
-			}
+	static ISR_LIST __attribute__((section(".intList")))          \
+		__attribute__((used))                                 \
+			MK_ISR_NAME(r) = { .fnc = NULL,               \
+					   .irq = (irq_p),            \
+					   .priority = (priority_p),  \
+					   .vec = (vec_p),            \
+					   .dpl = (dpl_p),            \
+					   .tss = (tss_p) }
 
 /**
  * Code snippets for populating the vector ID and priority into the intList
@@ -157,7 +150,7 @@ typedef struct s_isrList {
  *
  * These macros are only intended to be used by IRQ_CONNECT() macro.
  */
-#define _VECTOR_ARG(irq_p)	(-1)
+#define _VECTOR_ARG(irq_p) (-1)
 
 /* Internally this function does a few things:
  *
@@ -177,33 +170,31 @@ typedef struct s_isrList {
  * 4. z_irq_controller_irq_config() is called at runtime to set the mapping
  * between the vector and the IRQ line as well as triggering flags
  */
-#define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-{ \
-	__asm__ __volatile__(							\
-		".pushsection .intList\n\t" \
-		".long %c[isr]_irq%c[irq]_stub\n\t"	/* ISR_LIST.fnc */ \
-		".long %c[irq]\n\t"		/* ISR_LIST.irq */ \
-		".long %c[priority]\n\t"	/* ISR_LIST.priority */ \
-		".long %c[vector]\n\t"		/* ISR_LIST.vec */ \
-		".long 0\n\t"			/* ISR_LIST.dpl */ \
-		".long 0\n\t"			/* ISR_LIST.tss */ \
-		".popsection\n\t" \
-		".pushsection .text.irqstubs\n\t" \
-		".global %c[isr]_irq%c[irq]_stub\n\t" \
-		"%c[isr]_irq%c[irq]_stub:\n\t" \
-		"pushl %[isr_param]\n\t" \
-		"pushl %[isr]\n\t" \
-		"jmp _interrupt_enter\n\t" \
-		".popsection\n\t" \
-		: \
-		: [isr] "i" (isr_p), \
-		  [isr_param] "i" (isr_param_p), \
-		  [priority] "i" (priority_p), \
-		  [vector] "i" _VECTOR_ARG(irq_p), \
-		  [irq] "i" (irq_p)); \
-	z_irq_controller_irq_config(Z_IRQ_TO_INTERRUPT_VECTOR(irq_p), (irq_p), \
-				   (flags_p)); \
-}
+#define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p)       \
+	{                                                                      \
+		__asm__ __volatile__(                                          \
+			".pushsection .intList\n\t"                            \
+			".long %c[isr]_irq%c[irq]_stub\n\t" /* ISR_LIST.fnc */ \
+			".long %c[irq]\n\t" /* ISR_LIST.irq */                 \
+			".long %c[priority]\n\t" /* ISR_LIST.priority */       \
+			".long %c[vector]\n\t" /* ISR_LIST.vec */              \
+			".long 0\n\t" /* ISR_LIST.dpl */                       \
+			".long 0\n\t" /* ISR_LIST.tss */                       \
+			".popsection\n\t"                                      \
+			".pushsection .text.irqstubs\n\t"                      \
+			".global %c[isr]_irq%c[irq]_stub\n\t"                  \
+			"%c[isr]_irq%c[irq]_stub:\n\t"                         \
+			"pushl %[isr_param]\n\t"                               \
+			"pushl %[isr]\n\t"                                     \
+			"jmp _interrupt_enter\n\t"                             \
+			".popsection\n\t"                                      \
+			:                                                      \
+			: [isr] "i"(isr_p), [isr_param] "i"(isr_param_p),      \
+			  [priority] "i"(priority_p),                          \
+			  [vector] "i" _VECTOR_ARG(irq_p), [irq] "i"(irq_p));  \
+		z_irq_controller_irq_config(Z_IRQ_TO_INTERRUPT_VECTOR(irq_p),  \
+					    (irq_p), (flags_p));               \
+	}
 
 /* Direct interrupts won't work as expected with KPTI turned on, because
  * all non-user accessible pages in the page table are marked non-present.
@@ -213,12 +204,12 @@ typedef struct s_isrList {
  * and one might as well use a regular interrupt anyway.
  */
 #ifndef CONFIG_X86_KPTI
-#define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p) \
-{ \
-	NANO_CPU_INT_REGISTER(isr_p, irq_p, priority_p, -1, 0); \
-	z_irq_controller_irq_config(Z_IRQ_TO_INTERRUPT_VECTOR(irq_p), (irq_p), \
-				   (flags_p)); \
-}
+#define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p)            \
+	{                                                                     \
+		NANO_CPU_INT_REGISTER(isr_p, irq_p, priority_p, -1, 0);       \
+		z_irq_controller_irq_config(Z_IRQ_TO_INTERRUPT_VECTOR(irq_p), \
+					    (irq_p), (flags_p));              \
+	}
 
 #ifdef CONFIG_SYS_POWER_MANAGEMENT
 /*
@@ -239,7 +230,9 @@ static inline void arch_irq_direct_pm(void)
 
 #define ARCH_ISR_DIRECT_PM() arch_irq_direct_pm()
 #else
-#define ARCH_ISR_DIRECT_PM() do { } while (false)
+#define ARCH_ISR_DIRECT_PM() \
+	do {                 \
+	} while (false)
 #endif
 
 #define ARCH_ISR_DIRECT_HEADER() arch_isr_direct_header()
@@ -291,28 +284,26 @@ static inline void arch_isr_direct_footer(int swap)
 		unsigned int flags;
 
 		/* Fetch EFLAGS argument to z_swap() */
-		__asm__ volatile (
-			"pushfl\n\t"
-			"popl %0\n\t"
-			: "=g" (flags)
-			:
-			: "memory"
-			);
+		__asm__ volatile("pushfl\n\t"
+				 "popl %0\n\t"
+				 : "=g"(flags)
+				 :
+				 : "memory");
 
 		arch_isr_direct_footer_swap(flags);
 	}
 }
 
-#define ARCH_ISR_DIRECT_DECLARE(name) \
-	static inline int name##_body(void); \
-	__attribute__ ((interrupt)) void name(void *stack_frame) \
-	{ \
-		ARG_UNUSED(stack_frame); \
-		int check_reschedule; \
-		ISR_DIRECT_HEADER(); \
-		check_reschedule = name##_body(); \
-		ISR_DIRECT_FOOTER(check_reschedule); \
-	} \
+#define ARCH_ISR_DIRECT_DECLARE(name)                           \
+	static inline int name##_body(void);                    \
+	__attribute__((interrupt)) void name(void *stack_frame) \
+	{                                                       \
+		ARG_UNUSED(stack_frame);                        \
+		int check_reschedule;                           \
+		ISR_DIRECT_HEADER();                            \
+		check_reschedule = name##_body();               \
+		ISR_DIRECT_FOOTER(check_reschedule);            \
+	}                                                       \
 	static inline int name##_body(void)
 #endif /* !CONFIG_X86_KPTI */
 
@@ -367,18 +358,17 @@ static ALWAYS_INLINE unsigned int arch_irq_lock(void)
 {
 	unsigned int key;
 
-	__asm__ volatile ("pushfl; cli; popl %0" : "=g" (key) :: "memory");
+	__asm__ volatile("pushfl; cli; popl %0" : "=g"(key)::"memory");
 
 	return key;
 }
-
 
 /**
  * The NANO_SOFT_IRQ macro must be used as the value for the @a irq parameter
  * to NANO_CPU_INT_REGISTER when connecting to an interrupt that does not
  * correspond to any IRQ line (such as spurious vector or SW IRQ)
  */
-#define NANO_SOFT_IRQ	((unsigned int) (-1))
+#define NANO_SOFT_IRQ ((unsigned int)(-1))
 
 /**
  * @defgroup float_apis Floating Point APIs
@@ -427,15 +417,16 @@ extern void k_float_enable(struct k_thread *thread, unsigned int options);
 extern struct task_state_segment _main_tss;
 #endif
 
-#define ARCH_EXCEPT(reason_p) do { \
-	__asm__ volatile( \
-		"push %[reason]\n\t" \
-		"int %[vector]\n\t" \
-		: \
-		: [vector] "i" (Z_X86_OOPS_VECTOR), \
-		  [reason] "i" (reason_p)); \
-	CODE_UNREACHABLE; \
-} while (false)
+#define ARCH_EXCEPT(reason_p)                                                  \
+	do {                                                                   \
+		__asm__ volatile(                                              \
+			"push %[reason]\n\t"                                   \
+			"int %[vector]\n\t"                                    \
+			:                                                      \
+			: [vector] "i"(Z_X86_OOPS_VECTOR), [reason] "i"(       \
+								   reason_p)); \
+		CODE_UNREACHABLE;                                              \
+	} while (false)
 
 #ifdef __cplusplus
 }

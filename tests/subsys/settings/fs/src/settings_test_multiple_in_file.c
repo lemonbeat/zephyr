@@ -8,10 +8,12 @@
 #include "settings_test.h"
 #include "settings/settings_file.h"
 
-#define CF_MFG_TEST1 "\x0d\x00myfoo/mybar=\x01"\
-		     "\x0d\x00myfoo/mybar=\x0e"
-#define CF_MFG_TEST2 "\x0d\x00myfoo/mybar=\x01"\
-		     "\x0d\x00myfoo/mybar=\x0f"
+#define CF_MFG_TEST1               \
+	"\x0d\x00myfoo/mybar=\x01" \
+	"\x0d\x00myfoo/mybar=\x0e"
+#define CF_MFG_TEST2               \
+	"\x0d\x00myfoo/mybar=\x01" \
+	"\x0d\x00myfoo/mybar=\x0f"
 
 void test_config_multiple_in_file(void)
 {

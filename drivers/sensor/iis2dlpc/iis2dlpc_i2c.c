@@ -23,22 +23,22 @@ static uint16_t iis2dlpc_i2c_slave_addr = DT_INST_REG_ADDR(0);
 LOG_MODULE_DECLARE(IIS2DLPC, CONFIG_SENSOR_LOG_LEVEL);
 
 static int iis2dlpc_i2c_read(struct iis2dlpc_data *data, uint8_t reg_addr,
-				 uint8_t *value, uint16_t len)
+			     uint8_t *value, uint16_t len)
 {
-	return i2c_burst_read(data->bus, iis2dlpc_i2c_slave_addr,
-			      reg_addr, value, len);
+	return i2c_burst_read(data->bus, iis2dlpc_i2c_slave_addr, reg_addr,
+			      value, len);
 }
 
 static int iis2dlpc_i2c_write(struct iis2dlpc_data *data, uint8_t reg_addr,
-				  uint8_t *value, uint16_t len)
+			      uint8_t *value, uint16_t len)
 {
-	return i2c_burst_write(data->bus, iis2dlpc_i2c_slave_addr,
-			       reg_addr, value, len);
+	return i2c_burst_write(data->bus, iis2dlpc_i2c_slave_addr, reg_addr,
+			       value, len);
 }
 
 stmdev_ctx_t iis2dlpc_i2c_ctx = {
-	.read_reg = (stmdev_read_ptr) iis2dlpc_i2c_read,
-	.write_reg = (stmdev_write_ptr) iis2dlpc_i2c_write,
+	.read_reg = (stmdev_read_ptr)iis2dlpc_i2c_read,
+	.write_reg = (stmdev_write_ptr)iis2dlpc_i2c_write,
 };
 
 int iis2dlpc_i2c_init(const struct device *dev)

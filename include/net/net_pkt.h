@@ -44,7 +44,6 @@ struct net_context;
 struct canbus_net_isotp_tx_ctx;
 struct canbus_net_isotp_rx_ctx;
 
-
 /* buffer cursor used in net_pkt */
 struct net_pkt_cursor {
 	/** Current net_buf pointer by the cursor */
@@ -97,9 +96,9 @@ struct net_pkt {
 	struct net_if *orig_iface; /* Original network interface */
 #endif
 
-#if defined(CONFIG_NET_PKT_TIMESTAMP) || \
-				defined(CONFIG_NET_PKT_RXTIME_STATS) ||	\
-				defined(CONFIG_NET_PKT_TXTIME_STATS)
+#if defined(CONFIG_NET_PKT_TIMESTAMP) ||        \
+	defined(CONFIG_NET_PKT_RXTIME_STATS) || \
+	defined(CONFIG_NET_PKT_TXTIME_STATS)
 	struct {
 		/** Timestamp if available. */
 		struct net_ptp_time timestamp;
@@ -141,31 +140,31 @@ struct net_pkt {
 	};
 #endif
 
-	uint8_t ip_hdr_len;	/* pre-filled in order to avoid func call */
+	uint8_t ip_hdr_len; /* pre-filled in order to avoid func call */
 
-	uint8_t overwrite  : 1;	/* Is packet content being overwritten? */
+	uint8_t overwrite : 1; /* Is packet content being overwritten? */
 
-	uint8_t sent_or_eof: 1;	/* For outgoing packet: is this sent or not
+	uint8_t sent_or_eof : 1; /* For outgoing packet: is this sent or not
 				 * For incoming packet of a socket: last
 				 * packet before EOF
 				 * Used only if defined(CONFIG_NET_TCP)
 				 */
 	union {
-		uint8_t pkt_queued: 1; /* For outgoing packet: is this packet
+		uint8_t pkt_queued : 1; /* For outgoing packet: is this packet
 				     * queued to be sent but has not reached
 				     * the driver yet.
 				     * Used only if defined(CONFIG_NET_TCP)
 				     */
-		uint8_t gptp_pkt: 1; /* For outgoing packet: is this packet
+		uint8_t gptp_pkt : 1; /* For outgoing packet: is this packet
 				   * a GPTP packet.
 				   * Used only if defined (CONFIG_NET_GPTP)
 				   */
 	};
 
-	uint8_t forwarding : 1;	/* Are we forwarding this pkt
+	uint8_t forwarding : 1; /* Are we forwarding this pkt
 				 * Used only if defined(CONFIG_NET_ROUTE)
 				 */
-	uint8_t family     : 3;	/* IPv4 vs IPv6 */
+	uint8_t family : 3; /* IPv4 vs IPv6 */
 
 	union {
 		uint8_t ipv4_auto_arp_msg : 1; /* Is this pkt IPv4 autoconf ARP
@@ -174,17 +173,17 @@ struct net_pkt {
 					     * Note: family needs to be
 					     * AF_INET.
 					     */
-		uint8_t lldp_pkt          : 1; /* Is this pkt an LLDP message.
+		uint8_t lldp_pkt : 1; /* Is this pkt an LLDP message.
 					     * Used only if
 					     * defined(CONFIG_NET_LLDP).
 					     * Note: family needs to be
 					     * AF_UNSPEC.
 					     */
-		uint8_t ppp_msg           : 1; /* This is a PPP message */
+		uint8_t ppp_msg : 1; /* This is a PPP message */
 	};
 
 #if defined(CONFIG_NET_TCP)
-	uint8_t tcp_first_msg     : 1; /* Is this the first time this pkt is
+	uint8_t tcp_first_msg : 1; /* Is this the first time this pkt is
 					* sent, or is this a resend of a TCP
 					* segment.
 					*/
@@ -230,18 +229,18 @@ struct net_pkt {
 	uint16_t ipv6_prev_hdr_start;
 
 #if defined(CONFIG_NET_IPV6_FRAGMENT)
-	uint16_t ipv6_fragment_offset;	/* Fragment offset of this packet */
-	uint32_t ipv6_fragment_id;	/* Fragment id */
-	uint16_t ipv6_frag_hdr_start;	/* Where starts the fragment header */
+	uint16_t ipv6_fragment_offset; /* Fragment offset of this packet */
+	uint32_t ipv6_fragment_id; /* Fragment id */
+	uint16_t ipv6_frag_hdr_start; /* Where starts the fragment header */
 #endif /* CONFIG_NET_IPV6_FRAGMENT */
 
 	uint8_t ipv6_ext_opt_len; /* IPv6 ND option length */
-	uint8_t ipv6_next_hdr;	/* What is the very first next header */
+	uint8_t ipv6_next_hdr; /* What is the very first next header */
 #endif /* CONFIG_NET_IPV6 */
 
 #if defined(CONFIG_IEEE802154)
 	uint8_t ieee802154_rssi; /* Received Signal Strength Indication */
-	uint8_t ieee802154_lqi;  /* Link Quality Indicator */
+	uint8_t ieee802154_lqi; /* Link Quality Indicator */
 	uint8_t ieee802154_ack_fpb : 1; /* Frame Pending Bit was set in the ACK */
 #endif
 #if defined(CONFIG_NET_L2_CANBUS)
@@ -417,8 +416,7 @@ static inline uint8_t net_pkt_ipv4_ttl(struct net_pkt *pkt)
 	return pkt->ipv4_ttl;
 }
 
-static inline void net_pkt_set_ipv4_ttl(struct net_pkt *pkt,
-					uint8_t ttl)
+static inline void net_pkt_set_ipv4_ttl(struct net_pkt *pkt, uint8_t ttl)
 {
 	pkt->ipv4_ttl = ttl;
 }
@@ -441,8 +439,7 @@ static inline uint8_t net_pkt_ipv4_ttl(struct net_pkt *pkt)
 	return 0;
 }
 
-static inline void net_pkt_set_ipv4_ttl(struct net_pkt *pkt,
-					uint8_t ttl)
+static inline void net_pkt_set_ipv4_ttl(struct net_pkt *pkt, uint8_t ttl)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(ttl);
@@ -682,8 +679,7 @@ static inline uint8_t net_pkt_priority(struct net_pkt *pkt)
 	return pkt->priority;
 }
 
-static inline void net_pkt_set_priority(struct net_pkt *pkt,
-					uint8_t priority)
+static inline void net_pkt_set_priority(struct net_pkt *pkt, uint8_t priority)
 {
 	pkt->priority = priority;
 }
@@ -946,8 +942,7 @@ static inline uint8_t net_pkt_ieee802154_lqi(struct net_pkt *pkt)
 	return pkt->ieee802154_lqi;
 }
 
-static inline void net_pkt_set_ieee802154_lqi(struct net_pkt *pkt,
-					      uint8_t lqi)
+static inline void net_pkt_set_ieee802154_lqi(struct net_pkt *pkt, uint8_t lqi)
 {
 	pkt->ieee802154_lqi = lqi;
 }
@@ -957,8 +952,7 @@ static inline bool net_pkt_ieee802154_ack_fpb(struct net_pkt *pkt)
 	return pkt->ieee802154_ack_fpb;
 }
 
-static inline void net_pkt_set_ieee802154_ack_fpb(struct net_pkt *pkt,
-						  bool fpb)
+static inline void net_pkt_set_ieee802154_ack_fpb(struct net_pkt *pkt, bool fpb)
 {
 	pkt->ieee802154_ack_fpb = fpb;
 }
@@ -1022,8 +1016,7 @@ static inline bool net_pkt_is_ppp(struct net_pkt *pkt)
 	return pkt->ppp_msg;
 }
 
-static inline void net_pkt_set_ppp(struct net_pkt *pkt,
-				   bool is_ppp_msg)
+static inline void net_pkt_set_ppp(struct net_pkt *pkt, bool is_ppp_msg)
 {
 	pkt->ppp_msg = is_ppp_msg;
 }
@@ -1035,8 +1028,7 @@ static inline bool net_pkt_is_ppp(struct net_pkt *pkt)
 	return false;
 }
 
-static inline void net_pkt_set_ppp(struct net_pkt *pkt,
-				   bool is_ppp_msg)
+static inline void net_pkt_set_ppp(struct net_pkt *pkt, bool is_ppp_msg)
 {
 	ARG_UNUSED(pkt);
 	ARG_UNUSED(is_ppp_msg);
@@ -1048,8 +1040,7 @@ static inline void net_pkt_set_ppp(struct net_pkt *pkt,
 
 static inline void net_pkt_set_src_ipv6_addr(struct net_pkt *pkt)
 {
-	net_if_ipv6_select_src_addr(net_context_get_iface(
-					    net_pkt_context(pkt)),
+	net_if_ipv6_select_src_addr(net_context_get_iface(net_pkt_context(pkt)),
 				    &NET_IPV6_HDR(pkt)->src);
 }
 
@@ -1078,7 +1069,7 @@ static inline bool net_pkt_is_being_overwritten(struct net_pkt *pkt)
  * @param name Name of the slab.
  * @param count Number of net_pkt in this slab.
  */
-#define NET_PKT_SLAB_DEFINE(name, count)				\
+#define NET_PKT_SLAB_DEFINE(name, count) \
 	K_MEM_SLAB_DEFINE(name, sizeof(struct net_pkt), count, 4)
 
 /* Backward compatibility macro */
@@ -1097,8 +1088,8 @@ static inline bool net_pkt_is_being_overwritten(struct net_pkt *pkt)
  * @param name Name of the pool.
  * @param count Number of net_buf in this pool.
  */
-#define NET_PKT_DATA_POOL_DEFINE(name, count)				\
-	NET_BUF_POOL_DEFINE(name, count, CONFIG_NET_BUF_DATA_SIZE,	\
+#define NET_PKT_DATA_POOL_DEFINE(name, count)                      \
+	NET_BUF_POOL_DEFINE(name, count, CONFIG_NET_BUF_DATA_SIZE, \
 			    CONFIG_NET_BUF_USER_DATA_SIZE, NULL)
 
 /** @cond INTERNAL_HIDDEN */
@@ -1116,28 +1107,24 @@ static inline bool net_pkt_is_being_overwritten(struct net_pkt *pkt)
 
 struct net_buf *net_pkt_get_reserve_data_debug(struct net_buf_pool *pool,
 					       k_timeout_t timeout,
-					       const char *caller,
-					       int line);
+					       const char *caller, int line);
 
-#define net_pkt_get_reserve_data(pool, timeout)				\
+#define net_pkt_get_reserve_data(pool, timeout) \
 	net_pkt_get_reserve_data_debug(pool, timeout, __func__, __LINE__)
 
 struct net_buf *net_pkt_get_reserve_rx_data_debug(k_timeout_t timeout,
-						  const char *caller,
-						  int line);
-#define net_pkt_get_reserve_rx_data(timeout)				\
+						  const char *caller, int line);
+#define net_pkt_get_reserve_rx_data(timeout) \
 	net_pkt_get_reserve_rx_data_debug(timeout, __func__, __LINE__)
 
 struct net_buf *net_pkt_get_reserve_tx_data_debug(k_timeout_t timeout,
-						  const char *caller,
-						  int line);
-#define net_pkt_get_reserve_tx_data(timeout)				\
+						  const char *caller, int line);
+#define net_pkt_get_reserve_tx_data(timeout) \
 	net_pkt_get_reserve_tx_data_debug(timeout, __func__, __LINE__)
 
-struct net_buf *net_pkt_get_frag_debug(struct net_pkt *pkt,
-				       k_timeout_t timeout,
+struct net_buf *net_pkt_get_frag_debug(struct net_pkt *pkt, k_timeout_t timeout,
 				       const char *caller, int line);
-#define net_pkt_get_frag(pkt, timeout)					\
+#define net_pkt_get_frag(pkt, timeout) \
 	net_pkt_get_frag_debug(pkt, timeout, __func__, __LINE__)
 
 void net_pkt_unref_debug(struct net_pkt *pkt, const char *caller, int line);
@@ -1147,30 +1134,30 @@ struct net_pkt *net_pkt_ref_debug(struct net_pkt *pkt, const char *caller,
 				  int line);
 #define net_pkt_ref(pkt) net_pkt_ref_debug(pkt, __func__, __LINE__)
 
-struct net_buf *net_pkt_frag_ref_debug(struct net_buf *frag,
-				       const char *caller, int line);
+struct net_buf *net_pkt_frag_ref_debug(struct net_buf *frag, const char *caller,
+				       int line);
 #define net_pkt_frag_ref(frag) net_pkt_frag_ref_debug(frag, __func__, __LINE__)
 
-void net_pkt_frag_unref_debug(struct net_buf *frag,
-			      const char *caller, int line);
-#define net_pkt_frag_unref(frag)				\
+void net_pkt_frag_unref_debug(struct net_buf *frag, const char *caller,
+			      int line);
+#define net_pkt_frag_unref(frag) \
 	net_pkt_frag_unref_debug(frag, __func__, __LINE__)
 
 struct net_buf *net_pkt_frag_del_debug(struct net_pkt *pkt,
 				       struct net_buf *parent,
-				       struct net_buf *frag,
-				       const char *caller, int line);
-#define net_pkt_frag_del(pkt, parent, frag)				\
+				       struct net_buf *frag, const char *caller,
+				       int line);
+#define net_pkt_frag_del(pkt, parent, frag) \
 	net_pkt_frag_del_debug(pkt, parent, frag, __func__, __LINE__)
 
 void net_pkt_frag_add_debug(struct net_pkt *pkt, struct net_buf *frag,
 			    const char *caller, int line);
-#define net_pkt_frag_add(pkt, frag)				\
+#define net_pkt_frag_add(pkt, frag) \
 	net_pkt_frag_add_debug(pkt, frag, __func__, __LINE__)
 
 void net_pkt_frag_insert_debug(struct net_pkt *pkt, struct net_buf *frag,
 			       const char *caller, int line);
-#define net_pkt_frag_insert(pkt, frag)					\
+#define net_pkt_frag_insert(pkt, frag) \
 	net_pkt_frag_insert_debug(pkt, frag, __func__, __LINE__)
 #endif /* CONFIG_NET_DEBUG_NET_PKT_ALLOC ||
 	* CONFIG_NET_PKT_LOG_LEVEL >= LOG_LEVEL_DBG
@@ -1298,8 +1285,7 @@ void net_pkt_frag_unref(struct net_buf *frag);
  *         further fragments.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_buf *net_pkt_frag_del(struct net_pkt *pkt,
-				 struct net_buf *parent,
+struct net_buf *net_pkt_frag_del(struct net_pkt *pkt, struct net_buf *parent,
 				 struct net_buf *frag);
 #endif
 
@@ -1341,8 +1327,7 @@ bool net_pkt_compact(struct net_pkt *pkt);
  * @param rx_data Pointer to RX DATA pool is returned.
  * @param tx_data Pointer to TX DATA pool is returned.
  */
-void net_pkt_get_info(struct k_mem_slab **rx,
-		      struct k_mem_slab **tx,
+void net_pkt_get_info(struct k_mem_slab **rx, struct k_mem_slab **tx,
 		      struct net_buf_pool **rx_data,
 		      struct net_buf_pool **tx_data);
 
@@ -1354,14 +1339,10 @@ void net_pkt_get_info(struct k_mem_slab **rx,
  */
 void net_pkt_print(void);
 
-typedef void (*net_pkt_allocs_cb_t)(struct net_pkt *pkt,
-				    struct net_buf *buf,
-				    const char *func_alloc,
-				    int line_alloc,
-				    const char *func_free,
-				    int line_free,
-				    bool in_use,
-				    void *user_data);
+typedef void (*net_pkt_allocs_cb_t)(struct net_pkt *pkt, struct net_buf *buf,
+				    const char *func_alloc, int line_alloc,
+				    const char *func_free, int line_free,
+				    bool in_use, void *user_data);
 
 void net_pkt_allocs_foreach(net_pkt_allocs_cb_t cb, void *user_data);
 
@@ -1377,71 +1358,57 @@ const char *net_pkt_pool2str(struct net_buf_pool *pool);
  */
 #if defined(NET_PKT_DEBUG_ENABLED)
 
-struct net_pkt *net_pkt_alloc_debug(k_timeout_t timeout,
-				    const char *caller, int line);
-#define net_pkt_alloc(_timeout)					\
+struct net_pkt *net_pkt_alloc_debug(k_timeout_t timeout, const char *caller,
+				    int line);
+#define net_pkt_alloc(_timeout) \
 	net_pkt_alloc_debug(_timeout, __func__, __LINE__)
 
 struct net_pkt *net_pkt_alloc_from_slab_debug(struct k_mem_slab *slab,
 					      k_timeout_t timeout,
 					      const char *caller, int line);
-#define net_pkt_alloc_from_slab(_slab, _timeout)			\
+#define net_pkt_alloc_from_slab(_slab, _timeout) \
 	net_pkt_alloc_from_slab_debug(_slab, _timeout, __func__, __LINE__)
 
-struct net_pkt *net_pkt_rx_alloc_debug(k_timeout_t timeout,
-				       const char *caller, int line);
-#define net_pkt_rx_alloc(_timeout)				\
+struct net_pkt *net_pkt_rx_alloc_debug(k_timeout_t timeout, const char *caller,
+				       int line);
+#define net_pkt_rx_alloc(_timeout) \
 	net_pkt_rx_alloc_debug(_timeout, __func__, __LINE__)
 
 struct net_pkt *net_pkt_alloc_on_iface_debug(struct net_if *iface,
 					     k_timeout_t timeout,
-					     const char *caller,
-					     int line);
-#define net_pkt_alloc_on_iface(_iface, _timeout)			\
+					     const char *caller, int line);
+#define net_pkt_alloc_on_iface(_iface, _timeout) \
 	net_pkt_alloc_on_iface_debug(_iface, _timeout, __func__, __LINE__)
 
 struct net_pkt *net_pkt_rx_alloc_on_iface_debug(struct net_if *iface,
 						k_timeout_t timeout,
-						const char *caller,
-						int line);
-#define net_pkt_rx_alloc_on_iface(_iface, _timeout)			\
-	net_pkt_rx_alloc_on_iface_debug(_iface, _timeout,		\
-					__func__, __LINE__)
+						const char *caller, int line);
+#define net_pkt_rx_alloc_on_iface(_iface, _timeout) \
+	net_pkt_rx_alloc_on_iface_debug(_iface, _timeout, __func__, __LINE__)
 
-int net_pkt_alloc_buffer_debug(struct net_pkt *pkt,
-			       size_t size,
-			       enum net_ip_protocol proto,
-			       k_timeout_t timeout,
+int net_pkt_alloc_buffer_debug(struct net_pkt *pkt, size_t size,
+			       enum net_ip_protocol proto, k_timeout_t timeout,
 			       const char *caller, int line);
-#define net_pkt_alloc_buffer(_pkt, _size, _proto, _timeout)		\
-	net_pkt_alloc_buffer_debug(_pkt, _size, _proto, _timeout,	\
-				   __func__, __LINE__)
+#define net_pkt_alloc_buffer(_pkt, _size, _proto, _timeout)                 \
+	net_pkt_alloc_buffer_debug(_pkt, _size, _proto, _timeout, __func__, \
+				   __LINE__)
 
 struct net_pkt *net_pkt_alloc_with_buffer_debug(struct net_if *iface,
-						size_t size,
-						sa_family_t family,
+						size_t size, sa_family_t family,
 						enum net_ip_protocol proto,
 						k_timeout_t timeout,
-						const char *caller,
-						int line);
-#define net_pkt_alloc_with_buffer(_iface, _size, _family,		\
-				  _proto, _timeout)			\
-	net_pkt_alloc_with_buffer_debug(_iface, _size, _family,		\
-					_proto, _timeout,		\
-					__func__, __LINE__)
+						const char *caller, int line);
+#define net_pkt_alloc_with_buffer(_iface, _size, _family, _proto, _timeout) \
+	net_pkt_alloc_with_buffer_debug(_iface, _size, _family, _proto,     \
+					_timeout, __func__, __LINE__)
 
-struct net_pkt *net_pkt_rx_alloc_with_buffer_debug(struct net_if *iface,
-						   size_t size,
-						   sa_family_t family,
-						   enum net_ip_protocol proto,
-						   k_timeout_t timeout,
-						   const char *caller,
-						   int line);
-#define net_pkt_rx_alloc_with_buffer(_iface, _size, _family,		\
-				     _proto, _timeout)			\
-	net_pkt_rx_alloc_with_buffer_debug(_iface, _size, _family,	\
-					   _proto, _timeout,		\
-					   __func__, __LINE__)
+struct net_pkt *net_pkt_rx_alloc_with_buffer_debug(
+	struct net_if *iface, size_t size, sa_family_t family,
+	enum net_ip_protocol proto, k_timeout_t timeout, const char *caller,
+	int line);
+#define net_pkt_rx_alloc_with_buffer(_iface, _size, _family, _proto, _timeout) \
+	net_pkt_rx_alloc_with_buffer_debug(_iface, _size, _family, _proto,     \
+					   _timeout, __func__, __LINE__)
 #endif /* NET_PKT_DEBUG_ENABLED */
 /** @endcond */
 
@@ -1525,10 +1492,8 @@ struct net_pkt *net_pkt_rx_alloc_on_iface(struct net_if *iface,
  * @return 0 on success, negative errno code otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-int net_pkt_alloc_buffer(struct net_pkt *pkt,
-			 size_t size,
-			 enum net_ip_protocol proto,
-			 k_timeout_t timeout);
+int net_pkt_alloc_buffer(struct net_pkt *pkt, size_t size,
+			 enum net_ip_protocol proto, k_timeout_t timeout);
 #endif
 
 /**
@@ -1543,15 +1508,13 @@ int net_pkt_alloc_buffer(struct net_pkt *pkt,
  * @return a pointer to a newly allocated net_pkt on success, NULL otherwise.
  */
 #if !defined(NET_PKT_DEBUG_ENABLED)
-struct net_pkt *net_pkt_alloc_with_buffer(struct net_if *iface,
-					  size_t size,
+struct net_pkt *net_pkt_alloc_with_buffer(struct net_if *iface, size_t size,
 					  sa_family_t family,
 					  enum net_ip_protocol proto,
 					  k_timeout_t timeout);
 
 /* Same as above but specifically for RX packet */
-struct net_pkt *net_pkt_rx_alloc_with_buffer(struct net_if *iface,
-					     size_t size,
+struct net_pkt *net_pkt_rx_alloc_with_buffer(struct net_if *iface, size_t size,
 					     sa_family_t family,
 					     enum net_ip_protocol proto,
 					     k_timeout_t timeout);
@@ -1697,8 +1660,7 @@ int net_pkt_memset(struct net_pkt *pkt, int byte, size_t length);
  *
  * @return 0 on success, negative errno code otherwise.
  */
-int net_pkt_copy(struct net_pkt *pkt_dst,
-		 struct net_pkt *pkt_src,
+int net_pkt_copy(struct net_pkt *pkt_dst, struct net_pkt *pkt_src,
 		 size_t length);
 
 /**
@@ -1719,8 +1681,7 @@ struct net_pkt *net_pkt_clone(struct net_pkt *pkt, k_timeout_t timeout);
  *
  * @return NULL if error, cloned packet otherwise.
  */
-struct net_pkt *net_pkt_shallow_clone(struct net_pkt *pkt,
-				      k_timeout_t timeout);
+struct net_pkt *net_pkt_shallow_clone(struct net_pkt *pkt, k_timeout_t timeout);
 
 /**
  * @brief Read some data from a net_pkt
@@ -1906,26 +1867,26 @@ struct net_pkt_data_access {
 };
 
 #if defined(CONFIG_NET_HEADERS_ALWAYS_CONTIGUOUS)
-#define NET_PKT_DATA_ACCESS_DEFINE(_name, _type)		\
-	struct net_pkt_data_access _name = {			\
-		.size = sizeof(_type),				\
+#define NET_PKT_DATA_ACCESS_DEFINE(_name, _type) \
+	struct net_pkt_data_access _name = {     \
+		.size = sizeof(_type),           \
 	}
 
-#define NET_PKT_DATA_ACCESS_CONTIGUOUS_DEFINE(_name, _type)	\
+#define NET_PKT_DATA_ACCESS_CONTIGUOUS_DEFINE(_name, _type) \
 	NET_PKT_DATA_ACCESS_DEFINE(_name, _type)
 
 #else
-#define NET_PKT_DATA_ACCESS_DEFINE(_name, _type)		\
-	_type _hdr_##_name;					\
-	struct net_pkt_data_access _name = {			\
-		.data = &_hdr_##_name,				\
-		.size = sizeof(_type),				\
+#define NET_PKT_DATA_ACCESS_DEFINE(_name, _type) \
+	_type _hdr_##_name;                      \
+	struct net_pkt_data_access _name = {     \
+		.data = &_hdr_##_name,           \
+		.size = sizeof(_type),           \
 	}
 
-#define NET_PKT_DATA_ACCESS_CONTIGUOUS_DEFINE(_name, _type)	\
-	struct net_pkt_data_access _name = {			\
-		.data = NULL,					\
-		.size = sizeof(_type),				\
+#define NET_PKT_DATA_ACCESS_CONTIGUOUS_DEFINE(_name, _type) \
+	struct net_pkt_data_access _name = {                \
+		.data = NULL,                               \
+		.size = sizeof(_type),                      \
 	}
 
 #endif /* CONFIG_NET_HEADERS_ALWAYS_CONTIGUOUS */
@@ -1943,8 +1904,7 @@ struct net_pkt_data_access {
  *
  * @return a pointer to the requested contiguous data, NULL otherwise.
  */
-void *net_pkt_get_data(struct net_pkt *pkt,
-		       struct net_pkt_data_access *access);
+void *net_pkt_get_data(struct net_pkt *pkt, struct net_pkt_data_access *access);
 
 /**
  * @brief Set contiguous data into a network packet
@@ -1959,8 +1919,7 @@ void *net_pkt_get_data(struct net_pkt *pkt,
  *
  * @return 0 on success, a negative errno otherwise.
  */
-int net_pkt_set_data(struct net_pkt *pkt,
-		     struct net_pkt_data_access *access);
+int net_pkt_set_data(struct net_pkt *pkt, struct net_pkt_data_access *access);
 
 /**
  * Acknowledge previously contiguous data taken from a network packet

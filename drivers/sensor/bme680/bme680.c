@@ -24,8 +24,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(bme680, CONFIG_SENSOR_LOG_LEVEL);
 
-static int bme680_reg_read(struct bme680_data *data, uint8_t start, uint8_t *buf,
-			   int size)
+static int bme680_reg_read(struct bme680_data *data, uint8_t start,
+			   uint8_t *buf, int size)
 {
 	return i2c_burst_read(data->i2c_master, data->i2c_slave_addr, start,
 			      buf, size);
@@ -34,8 +34,8 @@ static int bme680_reg_read(struct bme680_data *data, uint8_t start, uint8_t *buf
 
 static int bme680_reg_write(struct bme680_data *data, uint8_t reg, uint8_t val)
 {
-	return i2c_reg_write_byte(data->i2c_master, data->i2c_slave_addr,
-				  reg, val);
+	return i2c_reg_write_byte(data->i2c_master, data->i2c_slave_addr, reg,
+				  val);
 	return 0;
 }
 
@@ -56,13 +56,14 @@ static void bme680_calc_press(struct bme680_data *data, uint32_t adc_press)
 	int32_t var1, var2, var3, calc_press;
 
 	var1 = (((int32_t)data->t_fine) >> 1) - 64000;
-	var2 = ((((var1 >> 2) * (var1 >> 2)) >> 11) *
-		(int32_t)data->par_p6) >> 2;
+	var2 = ((((var1 >> 2) * (var1 >> 2)) >> 11) * (int32_t)data->par_p6) >>
+	       2;
 	var2 = var2 + ((var1 * (int32_t)data->par_p5) << 1);
 	var2 = (var2 >> 2) + ((int32_t)data->par_p4 << 16);
 	var1 = (((((var1 >> 2) * (var1 >> 2)) >> 13) *
-		 ((int32_t)data->par_p3 << 5)) >> 3)
-	       + (((int32_t)data->par_p2 * var1) >> 1);
+		 ((int32_t)data->par_p3 << 5)) >>
+		3) +
+	       (((int32_t)data->par_p2 * var1) >> 1);
 	var1 = var1 >> 18;
 	var1 = ((32768 + var1) * (int32_t)data->par_p1) >> 15;
 	calc_press = 1048576 - adc_press;
@@ -78,37 +79,41 @@ static void bme680_calc_press(struct bme680_data *data, uint32_t adc_press)
 		calc_press = ((calc_press << 1) / var1);
 	}
 	var1 = ((int32_t)data->par_p9 *
-		(int32_t)(((calc_press >> 3)
-			 * (calc_press >> 3)) >> 13)) >> 12;
+		(int32_t)(((calc_press >> 3) * (calc_press >> 3)) >> 13)) >>
+	       12;
 	var2 = ((int32_t)(calc_press >> 2) * (int32_t)data->par_p8) >> 13;
-	var3 = ((int32_t)(calc_press >> 8) * (int32_t)(calc_press >> 8)
-		* (int32_t)(calc_press >> 8)
-		* (int32_t)data->par_p10) >> 17;
+	var3 = ((int32_t)(calc_press >> 8) * (int32_t)(calc_press >> 8) *
+		(int32_t)(calc_press >> 8) * (int32_t)data->par_p10) >>
+	       17;
 
-	data->calc_press = calc_press
-			   + ((var1 + var2 + var3
-			       + ((int32_t)data->par_p7 << 7)) >> 4);
+	data->calc_press =
+		calc_press +
+		((var1 + var2 + var3 + ((int32_t)data->par_p7 << 7)) >> 4);
 }
 
-static void bme680_calc_humidity(struct bme680_data *data, uint16_t adc_humidity)
+static void bme680_calc_humidity(struct bme680_data *data,
+				 uint16_t adc_humidity)
 {
 	int32_t var1, var2_1, var2_2, var2, var3, var4, var5, var6;
 	int32_t temp_scaled, calc_hum;
 
 	temp_scaled = (((int32_t)data->t_fine * 5) + 128) >> 8;
-	var1 = (int32_t)(adc_humidity - ((int32_t)((int32_t)data->par_h1 * 16))) -
-	       (((temp_scaled * (int32_t)data->par_h3)
-		 / ((int32_t)100)) >> 1);
+	var1 = (int32_t)(adc_humidity -
+			 ((int32_t)((int32_t)data->par_h1 * 16))) -
+	       (((temp_scaled * (int32_t)data->par_h3) / ((int32_t)100)) >> 1);
 	var2_1 = (int32_t)data->par_h2;
-	var2_2 = ((temp_scaled * (int32_t)data->par_h4) / (int32_t)100)
-		 + (((temp_scaled * ((temp_scaled * (int32_t)data->par_h5)
-				     / ((int32_t)100))) >> 6) / ((int32_t)100))
-		 +  (int32_t)(1 << 14);
+	var2_2 = ((temp_scaled * (int32_t)data->par_h4) / (int32_t)100) +
+		 (((temp_scaled *
+		    ((temp_scaled * (int32_t)data->par_h5) / ((int32_t)100))) >>
+		   6) /
+		  ((int32_t)100)) +
+		 (int32_t)(1 << 14);
 	var2 = (var2_1 * var2_2) >> 10;
 	var3 = var1 * var2;
 	var4 = (int32_t)data->par_h6 << 7;
-	var4 = ((var4) + ((temp_scaled * (int32_t)data->par_h7) /
-			  ((int32_t)100))) >> 4;
+	var4 = ((var4) +
+		((temp_scaled * (int32_t)data->par_h7) / ((int32_t)100))) >>
+	       4;
 	var5 = ((var3 >> 14) * (var3 >> 14)) >> 10;
 	var6 = (var4 * var5) >> 1;
 	calc_hum = (((var3 + var6) >> 10) * ((int32_t)1000)) >> 12;
@@ -122,46 +127,53 @@ static void bme680_calc_humidity(struct bme680_data *data, uint16_t adc_humidity
 	data->calc_humidity = calc_hum;
 }
 
-static void bme680_calc_gas_resistance(struct bme680_data *data, uint8_t gas_range,
-				       uint16_t adc_gas_res)
+static void bme680_calc_gas_resistance(struct bme680_data *data,
+				       uint8_t gas_range, uint16_t adc_gas_res)
 {
 	int64_t var1, var3;
 	uint64_t var2;
 
-	static const uint32_t look_up1[16] = { 2147483647, 2147483647, 2147483647,
-			       2147483647, 2147483647, 2126008810, 2147483647,
-			       2130303777, 2147483647, 2147483647, 2143188679,
-			       2136746228, 2147483647, 2126008810, 2147483647,
-			       2147483647 };
+	static const uint32_t look_up1[16] = {
+		2147483647, 2147483647, 2147483647, 2147483647,
+		2147483647, 2126008810, 2147483647, 2130303777,
+		2147483647, 2147483647, 2143188679, 2136746228,
+		2147483647, 2126008810, 2147483647, 2147483647
+	};
 
-	static const uint32_t look_up2[16] = { 4096000000, 2048000000, 1024000000,
-			       512000000, 255744255, 127110228, 64000000,
-			       32258064, 16016016, 8000000, 4000000, 2000000,
-			       1000000, 500000, 250000, 125000 };
+	static const uint32_t look_up2[16] = {
+		4096000000, 2048000000, 1024000000, 512000000,
+		255744255,  127110228,	64000000,   32258064,
+		16016016,   8000000,	4000000,    2000000,
+		1000000,    500000,	250000,	    125000
+	};
 
 	var1 = (int64_t)((1340 + (5 * (int64_t)data->range_sw_err)) *
-		       ((int64_t)look_up1[gas_range])) >> 16;
-	var2 = (((int64_t)((int64_t)adc_gas_res << 15) - (int64_t)(16777216)) + var1);
+			 ((int64_t)look_up1[gas_range])) >>
+	       16;
+	var2 = (((int64_t)((int64_t)adc_gas_res << 15) - (int64_t)(16777216)) +
+		var1);
 	var3 = (((int64_t)look_up2[gas_range] * (int64_t)var1) >> 9);
-	data->calc_gas_resistance = (uint32_t)((var3 + ((int64_t)var2 >> 1))
-					    / (int64_t)var2);
+	data->calc_gas_resistance =
+		(uint32_t)((var3 + ((int64_t)var2 >> 1)) / (int64_t)var2);
 }
 
-static uint8_t bme680_calc_res_heat(struct bme680_data *data, uint16_t heatr_temp)
+static uint8_t bme680_calc_res_heat(struct bme680_data *data,
+				    uint16_t heatr_temp)
 {
 	uint8_t heatr_res;
 	int32_t var1, var2, var3, var4, var5;
 	int32_t heatr_res_x100;
-	int32_t amb_temp = 25;    /* Assume ambient temperature to be 25 deg C */
+	int32_t amb_temp = 25; /* Assume ambient temperature to be 25 deg C */
 
 	if (heatr_temp > 400) { /* Cap temperature */
 		heatr_temp = 400;
 	}
 
 	var1 = ((amb_temp * data->par_gh3) / 1000) * 256;
-	var2 = (data->par_gh1 + 784) * (((((data->par_gh2 + 154009)
-					   * heatr_temp * 5) / 100)
-					 + 3276800) / 10);
+	var2 = (data->par_gh1 + 784) *
+	       (((((data->par_gh2 + 154009) * heatr_temp * 5) / 100) +
+		 3276800) /
+		10);
 	var3 = var1 + (var2 / 2);
 	var4 = (var3 / (data->res_heat_range + 4));
 	var5 = (131 * data->res_heat_val) + 65536;
@@ -209,12 +221,15 @@ static int bme680_sample_fetch(const struct device *dev,
 	data->new_data = buff[0] & BME680_MSK_NEW_DATA;
 	data->heatr_stab = buff[14] & BME680_MSK_HEATR_STAB;
 
-	adc_press = (uint32_t)(((uint32_t)buff[2] << 12) | ((uint32_t)buff[3] << 4)
-			    | ((uint32_t)buff[4] >> 4));
-	adc_temp = (uint32_t)(((uint32_t)buff[5] << 12) | ((uint32_t)buff[6] << 4)
-			   | ((uint32_t)buff[7] >> 4));
+	adc_press =
+		(uint32_t)(((uint32_t)buff[2] << 12) |
+			   ((uint32_t)buff[3] << 4) | ((uint32_t)buff[4] >> 4));
+	adc_temp =
+		(uint32_t)(((uint32_t)buff[5] << 12) |
+			   ((uint32_t)buff[6] << 4) | ((uint32_t)buff[7] >> 4));
 	adc_hum = (uint16_t)(((uint32_t)buff[8] << 8) | (uint32_t)buff[9]);
-	adc_gas_res = (uint16_t)((uint32_t)buff[13] << 2 | (((uint32_t)buff[14]) >> 6));
+	adc_gas_res = (uint16_t)((uint32_t)buff[13] << 2 |
+				 (((uint32_t)buff[14]) >> 6));
 	gas_range = buff[14] & BME680_MSK_GAS_RANGE;
 
 	if (data->new_data) {
@@ -321,8 +336,10 @@ static int bme680_read_compensation(struct bme680_data *data)
 	data->par_p10 = (uint8_t)(buff[22]);
 
 	/* Humidity related coefficients */
-	data->par_h1 = (uint16_t)(((uint16_t)buff[25] << 4) | (buff[24] & 0x0f));
-	data->par_h2 = (uint16_t)(((uint16_t)buff[23] << 4) | ((buff[24]) >> 4));
+	data->par_h1 =
+		(uint16_t)(((uint16_t)buff[25] << 4) | (buff[24] & 0x0f));
+	data->par_h2 =
+		(uint16_t)(((uint16_t)buff[23] << 4) | ((buff[24]) >> 4));
 	data->par_h3 = (int8_t)buff[26];
 	data->par_h4 = (int8_t)buff[27];
 	data->par_h5 = (int8_t)buff[28];
@@ -336,7 +353,8 @@ static int bme680_read_compensation(struct bme680_data *data)
 
 	data->res_heat_val = (int8_t)buff[37];
 	data->res_heat_range = ((buff[39] & BME680_MSK_RH_RANGE) >> 4);
-	data->range_sw_err = ((int8_t)(buff[41] & BME680_MSK_RANGE_SW_ERR)) / 16;
+	data->range_sw_err =
+		((int8_t)(buff[41] & BME680_MSK_RANGE_SW_ERR)) / 16;
 
 	return 0;
 }
@@ -404,11 +422,9 @@ static int bme680_init(const struct device *dev)
 {
 	struct bme680_data *data = dev->data;
 
-	data->i2c_master = device_get_binding(
-		DT_INST_BUS_LABEL(0));
+	data->i2c_master = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (!data->i2c_master) {
-		LOG_ERR("I2C master not found: %s",
-			    DT_INST_BUS_LABEL(0));
+		LOG_ERR("I2C master not found: %s", DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -428,6 +444,6 @@ static const struct sensor_driver_api bme680_api_funcs = {
 
 static struct bme680_data bme680_data;
 
-DEVICE_AND_API_INIT(bme680, DT_INST_LABEL(0), bme680_init, &bme680_data,
-		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(bme680, DT_INST_LABEL(0), bme680_init, &bme680_data, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &bme680_api_funcs);

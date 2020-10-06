@@ -97,9 +97,9 @@ enum espi_io_mode {
  */
 enum espi_channel {
 	ESPI_CHANNEL_PERIPHERAL = BIT(0),
-	ESPI_CHANNEL_VWIRE      = BIT(1),
-	ESPI_CHANNEL_OOB        = BIT(2),
-	ESPI_CHANNEL_FLASH      = BIT(3),
+	ESPI_CHANNEL_VWIRE = BIT(1),
+	ESPI_CHANNEL_OOB = BIT(2),
+	ESPI_CHANNEL_FLASH = BIT(3),
 };
 
 /**
@@ -108,34 +108,34 @@ enum espi_channel {
  * eSPI bus event to indicate events for which user can register callbacks
  */
 enum espi_bus_event {
-	ESPI_BUS_RESET                      = BIT(0),
-	ESPI_BUS_EVENT_CHANNEL_READY        = BIT(1),
-	ESPI_BUS_EVENT_VWIRE_RECEIVED       = BIT(2),
-	ESPI_BUS_EVENT_OOB_RECEIVED         = BIT(3),
-	ESPI_BUS_PERIPHERAL_NOTIFICATION    = BIT(4),
+	ESPI_BUS_RESET = BIT(0),
+	ESPI_BUS_EVENT_CHANNEL_READY = BIT(1),
+	ESPI_BUS_EVENT_VWIRE_RECEIVED = BIT(2),
+	ESPI_BUS_EVENT_OOB_RECEIVED = BIT(3),
+	ESPI_BUS_PERIPHERAL_NOTIFICATION = BIT(4),
 };
 
 /**
  * @cond INTERNAL_HIDDEN
  *
  */
-#define ESPI_PERIPHERAL_INDEX_0  0ul
-#define ESPI_PERIPHERAL_INDEX_1  1ul
-#define ESPI_PERIPHERAL_INDEX_2  2ul
+#define ESPI_PERIPHERAL_INDEX_0 0ul
+#define ESPI_PERIPHERAL_INDEX_1 1ul
+#define ESPI_PERIPHERAL_INDEX_2 2ul
 
-#define ESPI_SLAVE_TO_MASTER     0ul
-#define ESPI_MASTER_TO_SLAVE     1ul
+#define ESPI_SLAVE_TO_MASTER 0ul
+#define ESPI_MASTER_TO_SLAVE 1ul
 
-#define ESPI_VWIRE_SRC_ID0       0ul
-#define ESPI_VWIRE_SRC_ID1       1ul
-#define ESPI_VWIRE_SRC_ID2       2ul
-#define ESPI_VWIRE_SRC_ID3       3ul
-#define ESPI_VWIRE_SRC_ID_MAX    4ul
+#define ESPI_VWIRE_SRC_ID0 0ul
+#define ESPI_VWIRE_SRC_ID1 1ul
+#define ESPI_VWIRE_SRC_ID2 2ul
+#define ESPI_VWIRE_SRC_ID3 3ul
+#define ESPI_VWIRE_SRC_ID_MAX 4ul
 
-#define ESPI_PERIPHERAL_NODATA   0ul
+#define ESPI_PERIPHERAL_NODATA 0ul
 
-#define E8042_START_OPCODE      0x50
-#define E8042_MAX_OPCODE        0x5F
+#define E8042_START_OPCODE 0x50
+#define E8042_MAX_OPCODE 0x5F
 
 /** @endcond */
 
@@ -289,9 +289,9 @@ struct espi_callback;
  * @param espi_evt event details that trigger the callback handler.
  *
  */
-typedef void (*espi_callback_handler_t) (const struct device *dev,
-					 struct espi_callback *cb,
-					 struct espi_event espi_evt);
+typedef void (*espi_callback_handler_t)(const struct device *dev,
+					struct espi_callback *cb,
+					struct espi_event espi_evt);
 
 /**
  * @cond INTERNAL_HIDDEN
@@ -342,8 +342,7 @@ typedef int (*espi_api_lpc_write_request)(const struct device *dev,
 					  uint32_t *data);
 /* Logical Channel 1 APIs */
 typedef int (*espi_api_send_vwire)(const struct device *dev,
-				   enum espi_vwire_signal vw,
-				   uint8_t level);
+				   enum espi_vwire_signal vw, uint8_t level);
 typedef int (*espi_api_receive_vwire)(const struct device *dev,
 				      enum espi_vwire_signal vw,
 				      uint8_t *level);
@@ -607,8 +606,7 @@ static inline int z_impl_espi_write_lpc_request(const struct device *dev,
  * @retval -EIO General input / output error, failed to send over the bus.
  */
 __syscall int espi_send_vwire(const struct device *dev,
-			      enum espi_vwire_signal signal,
-			      uint8_t level);
+			      enum espi_vwire_signal signal, uint8_t level);
 
 static inline int z_impl_espi_send_vwire(const struct device *dev,
 					 enum espi_vwire_signal signal,
@@ -633,8 +631,7 @@ static inline int z_impl_espi_send_vwire(const struct device *dev,
  * @retval -EIO General input / output error, failed request to master.
  */
 __syscall int espi_receive_vwire(const struct device *dev,
-				 enum espi_vwire_signal signal,
-				 uint8_t *level);
+				 enum espi_vwire_signal signal, uint8_t *level);
 
 static inline int z_impl_espi_receive_vwire(const struct device *dev,
 					    enum espi_vwire_signal signal,

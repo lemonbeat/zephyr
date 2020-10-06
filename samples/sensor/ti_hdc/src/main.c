@@ -15,7 +15,8 @@
 void main(void)
 {
 	printk("Running on %s!\n", CONFIG_ARCH);
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, ti_hdc)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, ti_hdc)));
 
 	__ASSERT(dev != NULL, "Failed to get device binding");
 
@@ -31,8 +32,8 @@ void main(void)
 		sensor_channel_get(dev, SENSOR_CHAN_HUMIDITY, &humidity);
 
 		/* print the result */
-		printk("Temp = %d.%06d C, RH = %d.%06d %%\n",
-		       temp.val1, temp.val2, humidity.val1, humidity.val2);
+		printk("Temp = %d.%06d C, RH = %d.%06d %%\n", temp.val1,
+		       temp.val2, humidity.val1, humidity.val2);
 
 		/* wait for the next sample */
 		k_sleep(K_SECONDS(10));

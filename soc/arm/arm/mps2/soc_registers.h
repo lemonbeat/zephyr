@@ -42,22 +42,22 @@ struct mps2_fpgaio {
 };
 
 /* Defines for bits in fpgaio led0 register */
-#define FPGAIO_LED0_USERLED0		0
-#define FPGAIO_LED0_USERLED1		1
+#define FPGAIO_LED0_USERLED0 0
+#define FPGAIO_LED0_USERLED1 1
 
 /* Defines for bits in fpgaio button register */
-#define FPGAIO_BUTTON_USERPB0		0
-#define FPGAIO_BUTTON_USERPB1		1
+#define FPGAIO_BUTTON_USERPB0 0
+#define FPGAIO_BUTTON_USERPB1 1
 
 /* Defines for bits in fpgaio misc register */
-#define FPGAIO_MISC_CLCD_CS		0
-#define FPGAIO_MISC_SPI_SS		1
-#define FPGAIO_MISC_CLCD_RESET		3
-#define FPGAIO_MISC_CLCD_RS		4
-#define FPGAIO_MISC_CLCD_RD		5
-#define FPGAIO_MISC_CLCD_BL_CTRL	6
-#define FPGAIO_MISC_ADC_SPI_CS		7
-#define FPGAIO_MISC_SHIELD0_SPI_CS	8
-#define FPGAIO_MISC_SHIELD1_SPI_CS	9
+#define FPGAIO_MISC_CLCD_CS 0
+#define FPGAIO_MISC_SPI_SS 1
+#define FPGAIO_MISC_CLCD_RESET 3
+#define FPGAIO_MISC_CLCD_RS 4
+#define FPGAIO_MISC_CLCD_RD 5
+#define FPGAIO_MISC_CLCD_BL_CTRL 6
+#define FPGAIO_MISC_ADC_SPI_CS 7
+#define FPGAIO_MISC_SHIELD0_SPI_CS 8
+#define FPGAIO_MISC_SHIELD1_SPI_CS 9
 
 #endif /* _ARM_MPS2_REGS_H_ */

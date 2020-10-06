@@ -17,11 +17,11 @@
 #include <ztest.h>
 
 #if DT_NODE_HAS_STATUS(DT_ALIAS(i2c_0), okay)
-#define I2C_DEV_NAME	DT_LABEL(DT_ALIAS(i2c_0))
+#define I2C_DEV_NAME DT_LABEL(DT_ALIAS(i2c_0))
 #elif DT_NODE_HAS_STATUS(DT_ALIAS(i2c_1), okay)
-#define I2C_DEV_NAME	DT_LABEL(DT_ALIAS(i2c_1))
+#define I2C_DEV_NAME DT_LABEL(DT_ALIAS(i2c_1))
 #elif DT_NODE_HAS_STATUS(DT_ALIAS(i2c_2), okay)
-#define I2C_DEV_NAME	DT_LABEL(DT_ALIAS(i2c_2))
+#define I2C_DEV_NAME DT_LABEL(DT_ALIAS(i2c_2))
 #else
 #error "Please set the correct I2C device"
 #endif
@@ -76,9 +76,8 @@ static int test_gy271(void)
 		return TC_FAIL;
 	}
 
-	TC_PRINT("axis raw data: %d %d %d %d %d %d\n",
-				datas[0], datas[1], datas[2],
-				datas[3], datas[4], datas[5]);
+	TC_PRINT("axis raw data: %d %d %d %d %d %d\n", datas[0], datas[1],
+		 datas[2], datas[3], datas[4], datas[5]);
 
 	return TC_PASS;
 }
@@ -120,9 +119,8 @@ static int test_burst_gy271(void)
 		return TC_FAIL;
 	}
 
-	TC_PRINT("axis raw data: %d %d %d %d %d %d\n",
-				datas[0], datas[1], datas[2],
-				datas[3], datas[4], datas[5]);
+	TC_PRINT("axis raw data: %d %d %d %d %d %d\n", datas[0], datas[1],
+		 datas[2], datas[3], datas[4], datas[5]);
 
 	return TC_PASS;
 }

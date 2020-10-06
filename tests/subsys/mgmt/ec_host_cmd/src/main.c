@@ -54,7 +54,7 @@ struct rx_structure {
 		struct ec_params_unbounded unbounded;
 		uint8_t raw[0];
 	};
-} __packed * const host_to_dut = (void *)&host_to_dut_buffer;
+} __packed *const host_to_dut = (void *)&host_to_dut_buffer;
 
 /* Buffer used to verify expected outgoing data from EC to host. */
 static uint8_t expected_dut_to_host_buffer[256];
@@ -65,7 +65,7 @@ struct tx_structure {
 		struct ec_response_too_big too_big;
 		uint8_t raw[0];
 	};
-} __packed * const expected_dut_to_host = (void *)&expected_dut_to_host_buffer;
+} __packed *const expected_dut_to_host = (void *)&expected_dut_to_host_buffer;
 
 static void update_host_to_dut_checksum(void)
 {

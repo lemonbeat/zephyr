@@ -55,7 +55,7 @@ int cmd_ll_addr_get(const struct shell *shell, size_t argc, char *argv[])
 #if defined(CONFIG_BT_CTLR_DTM)
 #include "../controller/ll_sw/ll_test.h"
 
-int cmd_test_tx(const struct shell *shell, size_t  argc, char *argv[])
+int cmd_test_tx(const struct shell *shell, size_t argc, char *argv[])
 {
 	uint8_t chan, len, type, phy;
 	uint32_t err;
@@ -65,9 +65,9 @@ int cmd_test_tx(const struct shell *shell, size_t  argc, char *argv[])
 	}
 
 	chan = strtoul(argv[1], NULL, 16);
-	len  = strtoul(argv[2], NULL, 16);
+	len = strtoul(argv[2], NULL, 16);
 	type = strtoul(argv[3], NULL, 16);
-	phy  = strtoul(argv[4], NULL, 16);
+	phy = strtoul(argv[4], NULL, 16);
 
 	err = ll_test_tx(chan, len, type, phy);
 	if (err) {
@@ -79,7 +79,7 @@ int cmd_test_tx(const struct shell *shell, size_t  argc, char *argv[])
 	return 0;
 }
 
-int cmd_test_rx(const struct shell *shell, size_t  argc, char *argv[])
+int cmd_test_rx(const struct shell *shell, size_t argc, char *argv[])
 {
 	uint8_t chan, phy, mod_idx;
 	uint32_t err;
@@ -88,8 +88,8 @@ int cmd_test_rx(const struct shell *shell, size_t  argc, char *argv[])
 		return -EINVAL;
 	}
 
-	chan    = strtoul(argv[1], NULL, 16);
-	phy     = strtoul(argv[2], NULL, 16);
+	chan = strtoul(argv[1], NULL, 16);
+	phy = strtoul(argv[2], NULL, 16);
 	mod_idx = strtoul(argv[3], NULL, 16);
 
 	err = ll_test_rx(chan, phy, mod_idx);
@@ -102,7 +102,7 @@ int cmd_test_rx(const struct shell *shell, size_t  argc, char *argv[])
 	return 0;
 }
 
-int cmd_test_end(const struct shell *shell, size_t  argc, char *argv[])
+int cmd_test_end(const struct shell *shell, size_t argc, char *argv[])
 {
 	uint16_t num_rx;
 	uint32_t err;
@@ -138,7 +138,7 @@ int cmd_test_end(const struct shell *shell, size_t  argc, char *argv[])
 
 static const struct bt_data adv_data[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_NO_BREDR),
-	};
+};
 
 int cmd_advx(const struct shell *shell, size_t argc, char *argv[])
 {
@@ -248,9 +248,8 @@ do_enable:
 	shell_print(shell, "adv param set...");
 	err = ll_adv_params_set(handle, evt_prop, adv_interval, adv_type,
 				OWN_ADDR_TYPE, PEER_ADDR_TYPE, PEER_ADDR,
-				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR,
-				phy_p, ADV_SEC_SKIP, ADV_PHY_S, ADV_SID,
-				SCAN_REQ_NOT);
+				ADV_CHAN_MAP, FILTER_POLICY, ADV_TX_PWR, phy_p,
+				ADV_SEC_SKIP, ADV_PHY_S, ADV_SID, SCAN_REQ_NOT);
 	if (err) {
 		goto exit;
 	}
@@ -296,7 +295,7 @@ exit:
 #define SCAN_OWN_ADDR_TYPE 1
 #define SCAN_FILTER_POLICY 0
 
-int cmd_scanx(const struct shell *shell, size_t  argc, char *argv[])
+int cmd_scanx(const struct shell *shell, size_t argc, char *argv[])
 {
 	uint8_t type = 0U;
 	uint8_t enable;

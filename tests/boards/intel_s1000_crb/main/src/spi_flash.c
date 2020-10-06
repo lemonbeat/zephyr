@@ -13,10 +13,10 @@
 LOG_MODULE_REGISTER(test_flash);
 
 #define FLASH_TEST_REGION_OFFSET 0x3F0000
-#define FLASH_SECTOR_SIZE        0x10000
-#define TEST_DATA_BYTE_0         0x4f
-#define TEST_DATA_BYTE_1         0x4a
-#define TEST_DATA_LEN            128
+#define FLASH_SECTOR_SIZE 0x10000
+#define TEST_DATA_BYTE_0 0x4f
+#define TEST_DATA_BYTE_1 0x4a
+#define TEST_DATA_LEN 128
 
 int flash_region_is_empty(uint32_t off, void *dst, uint32_t len)
 {
@@ -67,8 +67,7 @@ void test_flash(void)
 
 	flash_write_protection_set(flash_dev, false);
 
-	if (flash_erase(flash_dev,
-			FLASH_TEST_REGION_OFFSET,
+	if (flash_erase(flash_dev, FLASH_TEST_REGION_OFFSET,
 			FLASH_SECTOR_SIZE) != 0) {
 		LOG_ERR("   Flash erase failed!\n");
 	} else {
@@ -78,19 +77,19 @@ void test_flash(void)
 	buf[0] = TEST_DATA_BYTE_0;
 	buf[1] = TEST_DATA_BYTE_1;
 
-	for (i = 2 ; i < TEST_DATA_LEN; i++) {
+	for (i = 2; i < TEST_DATA_LEN; i++) {
 		buf[i] = 0x63;
 	}
 
 	LOG_INF("   Attempted to write %x %x\n", buf[0], buf[1]);
 	if (flash_write(flash_dev, FLASH_TEST_REGION_OFFSET, buf,
-	    TEST_DATA_LEN) != 0) {
+			TEST_DATA_LEN) != 0) {
 		LOG_ERR("   Flash write failed!\n");
 		return;
 	}
 
 	if (flash_read(flash_dev, FLASH_TEST_REGION_OFFSET, buf,
-	    TEST_DATA_LEN) != 0) {
+		       TEST_DATA_LEN) != 0) {
 		LOG_ERR("   Flash read failed!\n");
 		return;
 	}
@@ -101,8 +100,8 @@ void test_flash(void)
 		LOG_ERR("   Data read does not match with data written!!\n");
 	}
 
-	if (flash_region_is_empty(
-			FLASH_TEST_REGION_OFFSET - 16, magic, 16) == 1) {
+	if (flash_region_is_empty(FLASH_TEST_REGION_OFFSET - 16, magic, 16) ==
+	    1) {
 		LOG_INF("   Flash region is empty. Good!!\n");
 	} else {
 		LOG_ERR("   Flash region is not empty!!\n");

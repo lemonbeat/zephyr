@@ -18,7 +18,7 @@ static struct rbtree tree;
 static struct rbnode nodes[MAX_NODES];
 
 /* Bit is set if node is in the tree */
-static unsigned int node_mask[(MAX_NODES + 31)/32];
+static unsigned int node_mask[(MAX_NODES + 31) / 32];
 
 /* Array of nodes dumed via rb_walk */
 static struct rbnode *walked_nodes[MAX_NODES];
@@ -247,7 +247,6 @@ void test_rbtree_spam(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_rbtree,
-			 ztest_unit_test(test_rbtree_spam));
+	ztest_test_suite(test_rbtree, ztest_unit_test(test_rbtree_spam));
 	ztest_run_test_suite(test_rbtree);
 }

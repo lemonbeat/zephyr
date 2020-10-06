@@ -41,9 +41,9 @@ static void np_timer_isr(const void *arg)
 	ARG_UNUSED(arg);
 
 	uint64_t now = hwm_get_time();
-	int32_t elapsed_ticks = (now - last_tick_time)/tick_period;
+	int32_t elapsed_ticks = (now - last_tick_time) / tick_period;
 
-	last_tick_time += elapsed_ticks*tick_period;
+	last_tick_time += elapsed_ticks * tick_period;
 	z_clock_announce(elapsed_ticks);
 }
 
@@ -111,9 +111,8 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
  */
 uint32_t z_clock_elapsed(void)
 {
-	return (hwm_get_time() - last_tick_time)/tick_period;
+	return (hwm_get_time() - last_tick_time) / tick_period;
 }
-
 
 #if defined(CONFIG_ARCH_HAS_CUSTOM_BUSY_WAIT)
 /**

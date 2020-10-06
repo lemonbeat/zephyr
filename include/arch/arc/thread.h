@@ -40,7 +40,6 @@ struct _callee_saved {
 typedef struct _callee_saved _callee_saved_t;
 
 struct _thread_arch {
-
 	/* one of the _CAUSE_xxxx definitions above */
 	int relinquish_cause;
 
@@ -68,6 +67,5 @@ typedef struct _thread_arch _thread_arch_t;
 #endif
 
 #endif /* _ASMLANGUAGE */
-
 
 #endif /* ZEPHYR_INCLUDE_ARCH_ARC_THREAD_H_ */

@@ -9,7 +9,6 @@
  * @brief API to the native_posix (Real) Time Clock
  */
 
-
 #ifndef _NATIVE_POSIX_RTC_H
 #define _NATIVE_POSIX_RTC_H
 
@@ -25,9 +24,9 @@ extern "C" {
  * Types of clocks this RTC provides:
  */
 /** Time since boot, cannot be offset. Microsecond resolution */
-#define RTC_CLOCK_BOOT               0
+#define RTC_CLOCK_BOOT 0
 /** Persistent clock, can be offset. Microsecond resolution */
-#define RTC_CLOCK_REALTIME           1
+#define RTC_CLOCK_REALTIME 1
 /**
  * Pseudo-host real time clock (Please see documentation).
  * Nanosecond resolution

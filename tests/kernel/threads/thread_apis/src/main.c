@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 /**
  * @brief Thread Tests
  * @defgroup kernel_thread_tests Threads
@@ -70,8 +69,8 @@ void test_systhreads_idle(void)
 {
 	k_msleep(100);
 	/** TESTPOINT: check working thread priority should */
-	zassert_true(k_thread_priority_get(k_current_get()) <
-		     K_IDLE_PRIO, NULL);
+	zassert_true(k_thread_priority_get(k_current_get()) < K_IDLE_PRIO,
+		     NULL);
 }
 
 static void customdata_entry(void *p1, void *p2, void *p3)
@@ -179,23 +178,22 @@ void test_thread_name_user_get_set(void)
 	ret = k_thread_name_set(NULL, "parent_thread");
 	zassert_equal(ret, 0, "k_thread_name_set() failed");
 	ret = k_thread_name_copy(k_current_get(), thread_name,
-				     sizeof(thread_name));
+				 sizeof(thread_name));
 	zassert_equal(ret, 0, "k_thread_name_copy() failed");
 	ret = strcmp(thread_name, "parent_thread");
 	zassert_equal(ret, 0, "parent thread name does not match");
 
 	/* memory-related cases for k_thread_name_get() */
-	ret = k_thread_name_copy(k_current_get(), too_small,
-				     sizeof(too_small));
+	ret = k_thread_name_copy(k_current_get(), too_small, sizeof(too_small));
 	zassert_equal(ret, -ENOSPC, "wrote to too-small buffer");
 	ret = k_thread_name_copy(k_current_get(), not_my_buffer,
-				     sizeof(not_my_buffer));
+				 sizeof(not_my_buffer));
 	zassert_equal(ret, -EFAULT, "wrote to buffer without permission");
 	ret = k_thread_name_copy((struct k_thread *)&sem, thread_name,
-				     sizeof(thread_name));
+				 sizeof(thread_name));
 	zassert_equal(ret, -EINVAL, "not a thread object");
 	ret = k_thread_name_copy(&z_main_thread, thread_name,
-				     sizeof(thread_name));
+				 sizeof(thread_name));
 	zassert_equal(ret, 0, "couldn't get main thread name");
 	printk("Main thread name is '%s'\n", thread_name);
 
@@ -261,10 +259,10 @@ void test_user_mode(void)
 	z_thread_essential_set();
 
 	zassert_true(z_is_thread_essential(), "Thread isn't set"
-		     " as essential\n");
+					      " as essential\n");
 
-	k_thread_user_mode_enter((k_thread_entry_t)umode_entry,
-				 k_current_get(), NULL, NULL);
+	k_thread_user_mode_enter((k_thread_entry_t)umode_entry, k_current_get(),
+				 NULL, NULL);
 }
 #else
 void test_user_mode(void)
@@ -326,7 +324,7 @@ void do_join_from_isr(const void *arg)
 	printk("isr: k_thread_join() returned with %d\n", *ret);
 }
 
-#define JOIN_TIMEOUT_MS	100
+#define JOIN_TIMEOUT_MS 100
 
 int join_scenario_interval(enum control_method m, int64_t *interval)
 {
@@ -351,8 +349,8 @@ int join_scenario_interval(enum control_method m, int64_t *interval)
 		printk("ztest_thread: create control_thread\n");
 		k_thread_create(&control_thread, control_stack, STACK_SIZE,
 				control_entry, NULL, NULL, NULL,
-				K_PRIO_PREEMPT(2),
-				K_USER | K_INHERIT_PERMS, K_NO_WAIT);
+				K_PRIO_PREEMPT(2), K_USER | K_INHERIT_PERMS,
+				K_NO_WAIT);
 		break;
 	case TIMEOUT:
 		timeout = K_MSEC(50);
@@ -411,13 +409,12 @@ void test_thread_join(void)
 	zassert_equal(join_scenario(SELF_ABORT), 0, "failed self-abort case");
 	zassert_equal(join_scenario(OTHER_ABORT), 0, "failed other-abort case");
 
-	zassert_equal(join_scenario_interval(OTHER_ABORT_TIMEOUT, &interval),
-		      0, "failed other-abort case with timeout");
+	zassert_equal(join_scenario_interval(OTHER_ABORT_TIMEOUT, &interval), 0,
+		      "failed other-abort case with timeout");
 	zassert_true(interval < JOIN_TIMEOUT_MS, "join took too long (%lld ms)",
 		     interval);
 	zassert_equal(join_scenario(ALREADY_EXIT), 0,
 		      "failed already exit case");
-
 }
 
 void test_thread_join_isr(void)
@@ -456,14 +453,14 @@ void test_thread_join_deadlock(void)
 {
 	/* Deadlock scenarios */
 	zassert_equal(k_thread_join(k_current_get(), K_FOREVER), -EDEADLK,
-				    "failed self-deadlock case");
+		      "failed self-deadlock case");
 
 	k_thread_create(&deadlock1_thread, deadlock1_stack, STACK_SIZE,
-			deadlock1_entry, NULL, NULL, NULL,
-			K_PRIO_PREEMPT(1), K_USER | K_INHERIT_PERMS, K_NO_WAIT);
+			deadlock1_entry, NULL, NULL, NULL, K_PRIO_PREEMPT(1),
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 	k_thread_create(&deadlock2_thread, deadlock2_stack, STACK_SIZE,
-			deadlock2_entry, NULL, NULL, NULL,
-			K_PRIO_PREEMPT(1), K_USER | K_INHERIT_PERMS, K_NO_WAIT);
+			deadlock2_entry, NULL, NULL, NULL, K_PRIO_PREEMPT(1),
+			K_USER | K_INHERIT_PERMS, K_NO_WAIT);
 
 	zassert_equal(k_thread_join(&deadlock1_thread, K_FOREVER), 0,
 		      "couldn't join deadlock1_thread");
@@ -473,12 +470,10 @@ void test_thread_join_deadlock(void)
 
 void test_main(void)
 {
-	k_thread_access_grant(k_current_get(), &tdata, tstack,
-			      &tdata_custom, tstack_custom,
-			      &tdata_name, tstack_name,
-			      &join_thread, join_stack,
-			      &control_thread, control_stack,
-			      &deadlock1_thread, deadlock1_stack,
+	k_thread_access_grant(k_current_get(), &tdata, tstack, &tdata_custom,
+			      tstack_custom, &tdata_name, tstack_name,
+			      &join_thread, join_stack, &control_thread,
+			      control_stack, &deadlock1_thread, deadlock1_stack,
 			      &deadlock2_thread, deadlock2_stack);
 	main_prio = k_thread_priority_get(k_current_get());
 #ifdef CONFIG_USERSPACE
@@ -486,38 +481,38 @@ void test_main(void)
 		sizeof(unreadable_string));
 #endif
 
-	ztest_test_suite(threads_lifecycle,
-			 ztest_user_unit_test(test_threads_spawn_params),
-			 ztest_unit_test(test_threads_spawn_priority),
-			 ztest_user_unit_test(test_threads_spawn_delay),
-			 ztest_unit_test(test_threads_spawn_forever),
-			 ztest_unit_test(test_thread_start),
-			 ztest_1cpu_unit_test(test_threads_suspend_resume_cooperative),
-			 ztest_user_unit_test(test_threads_suspend_resume_preemptible),
-			 ztest_unit_test(test_threads_priority_set),
-			 ztest_user_unit_test(test_threads_abort_self),
-			 ztest_user_unit_test(test_threads_abort_others),
-			 ztest_1cpu_unit_test(test_threads_abort_repeat),
-			 ztest_unit_test(test_abort_handler),
-			 ztest_1cpu_unit_test(test_delayed_thread_abort),
-			 ztest_unit_test(test_essential_thread_operation),
-			 ztest_unit_test(test_essential_thread_abort),
-			 ztest_unit_test(test_systhreads_main),
-			 ztest_unit_test(test_systhreads_idle),
-			 ztest_1cpu_unit_test(test_customdata_get_set_coop),
-			 ztest_1cpu_user_unit_test(test_customdata_get_set_preempt),
-			 ztest_1cpu_unit_test(test_k_thread_foreach),
-			 ztest_unit_test(test_thread_name_get_set),
-			 ztest_user_unit_test(test_thread_name_user_get_set),
-			 ztest_unit_test(test_user_mode),
-			 ztest_1cpu_unit_test(test_threads_cpu_mask),
-			 ztest_unit_test(test_threads_suspend_timeout),
-			 ztest_unit_test(test_threads_suspend),
-			 ztest_user_unit_test(test_thread_join),
-			 ztest_unit_test(test_thread_join_isr),
-			 ztest_user_unit_test(test_thread_join_deadlock),
-			 ztest_unit_test(test_abort_from_isr)
-			 );
+	ztest_test_suite(
+		threads_lifecycle,
+		ztest_user_unit_test(test_threads_spawn_params),
+		ztest_unit_test(test_threads_spawn_priority),
+		ztest_user_unit_test(test_threads_spawn_delay),
+		ztest_unit_test(test_threads_spawn_forever),
+		ztest_unit_test(test_thread_start),
+		ztest_1cpu_unit_test(test_threads_suspend_resume_cooperative),
+		ztest_user_unit_test(test_threads_suspend_resume_preemptible),
+		ztest_unit_test(test_threads_priority_set),
+		ztest_user_unit_test(test_threads_abort_self),
+		ztest_user_unit_test(test_threads_abort_others),
+		ztest_1cpu_unit_test(test_threads_abort_repeat),
+		ztest_unit_test(test_abort_handler),
+		ztest_1cpu_unit_test(test_delayed_thread_abort),
+		ztest_unit_test(test_essential_thread_operation),
+		ztest_unit_test(test_essential_thread_abort),
+		ztest_unit_test(test_systhreads_main),
+		ztest_unit_test(test_systhreads_idle),
+		ztest_1cpu_unit_test(test_customdata_get_set_coop),
+		ztest_1cpu_user_unit_test(test_customdata_get_set_preempt),
+		ztest_1cpu_unit_test(test_k_thread_foreach),
+		ztest_unit_test(test_thread_name_get_set),
+		ztest_user_unit_test(test_thread_name_user_get_set),
+		ztest_unit_test(test_user_mode),
+		ztest_1cpu_unit_test(test_threads_cpu_mask),
+		ztest_unit_test(test_threads_suspend_timeout),
+		ztest_unit_test(test_threads_suspend),
+		ztest_user_unit_test(test_thread_join),
+		ztest_unit_test(test_thread_join_isr),
+		ztest_user_unit_test(test_thread_join_deadlock),
+		ztest_unit_test(test_abort_from_isr));
 
 	ztest_run_test_suite(threads_lifecycle);
 }

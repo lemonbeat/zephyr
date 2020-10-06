@@ -30,7 +30,6 @@ typedef struct zsock_fd_set {
 	uint32_t bitset[(CONFIG_POSIX_MAX_FDS + 31) / 32];
 } zsock_fd_set;
 
-
 /**
  * @brief Legacy function to poll multiple sockets for events
  *

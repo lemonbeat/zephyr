@@ -15,9 +15,9 @@
  * There exist minor differences between SAM MCU family members in naming
  * of some of the registers. Check that our expectations are met.
  */
-#if (!defined(PIO_IFSCER_P0) && !defined(PIO_DIFSR_P0)) \
-	|| (!defined(PIO_IFSCDR_P0) && !defined(PIO_SCIFSR_P0)) \
-	|| (!defined(PIO_ABCDSR_P0) && !defined(PIO_ABSR_P0))
+#if (!defined(PIO_IFSCER_P0) && !defined(PIO_DIFSR_P0)) ||      \
+	(!defined(PIO_IFSCDR_P0) && !defined(PIO_SCIFSR_P0)) || \
+	(!defined(PIO_ABCDSR_P0) && !defined(PIO_ABSR_P0))
 #error "Unsupported Atmel SAM MCU series"
 #endif
 
@@ -55,7 +55,8 @@ static void configure_input_attr(Pio *pio, uint32_t mask, uint32_t flags)
 {
 	/* Configure input filter */
 	if ((flags & SOC_GPIO_IN_FILTER_MASK) != 0U) {
-		if ((flags & SOC_GPIO_IN_FILTER_MASK) == SOC_GPIO_IN_FILTER_DEBOUNCE) {
+		if ((flags & SOC_GPIO_IN_FILTER_MASK) ==
+		    SOC_GPIO_IN_FILTER_DEBOUNCE) {
 			/* Enable de-bounce, disable de-glitch */
 #if defined PIO_IFSCER_P0
 			pio->PIO_IFSCER = mask;
@@ -77,12 +78,14 @@ static void configure_input_attr(Pio *pio, uint32_t mask, uint32_t flags)
 
 	/* Configure interrupt */
 	if (flags & SOC_GPIO_INT_ENABLE) {
-		if ((flags & SOC_GPIO_INT_TRIG_MASK) == SOC_GPIO_INT_TRIG_DOUBLE_EDGE) {
+		if ((flags & SOC_GPIO_INT_TRIG_MASK) ==
+		    SOC_GPIO_INT_TRIG_DOUBLE_EDGE) {
 			/* Disable additional interrupt modes, enable the default */
 			pio->PIO_AIMDR = mask;
 		} else {
 			/* Configure additional interrupt mode */
-			if ((flags & SOC_GPIO_INT_TRIG_MASK) == SOC_GPIO_INT_TRIG_EDGE) {
+			if ((flags & SOC_GPIO_INT_TRIG_MASK) ==
+			    SOC_GPIO_INT_TRIG_EDGE) {
 				/* Select edge detection event */
 				pio->PIO_ESR = mask;
 			} else {

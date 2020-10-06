@@ -11,7 +11,7 @@
 #define INITIALIZED 1
 #define NOT_INITIALIZED 0
 
-#define CONCURRENT_READER_LIMIT  (CONFIG_MAX_PTHREAD_COUNT + 1)
+#define CONCURRENT_READER_LIMIT (CONFIG_MAX_PTHREAD_COUNT + 1)
 
 int64_t timespec_to_timeoutms(const struct timespec *abstime);
 static uint32_t read_lock_acquire(pthread_rwlock_t *rwlock, int32_t timeout);
@@ -93,7 +93,7 @@ int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock,
 		return EINVAL;
 	}
 
-	timeout = (int32_t) timespec_to_timeoutms(abstime);
+	timeout = (int32_t)timespec_to_timeoutms(abstime);
 
 	if (read_lock_acquire(rwlock, timeout) != 0U) {
 		ret = ETIMEDOUT;
@@ -155,7 +155,7 @@ int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock,
 		return EINVAL;
 	}
 
-	timeout = (int32_t) timespec_to_timeoutms(abstime);
+	timeout = (int32_t)timespec_to_timeoutms(abstime);
 
 	if (write_lock_acquire(rwlock, timeout) != 0U) {
 		ret = ETIMEDOUT;
@@ -201,7 +201,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 	} else {
 		/* Read unlock */
 		if (k_sem_count_get(&rwlock->rd_sem) ==
-				    (CONCURRENT_READER_LIMIT - 1)) {
+		    (CONCURRENT_READER_LIMIT - 1)) {
 			/* Last read lock, unlock writer */
 			k_sem_give(&rwlock->reader_active);
 		}
@@ -210,7 +210,6 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 	}
 	return 0;
 }
-
 
 static uint32_t read_lock_acquire(pthread_rwlock_t *rwlock, int32_t timeout)
 {
@@ -240,8 +239,9 @@ static uint32_t write_lock_acquire(pthread_rwlock_t *rwlock, int32_t timeout)
 		/* update remaining timeout time for 2nd sem */
 		if (timeout != SYS_FOREVER_MS) {
 			elapsed_time = k_uptime_get() - st_time;
-			timeout = timeout <= elapsed_time ? 0 :
-				  timeout - elapsed_time;
+			timeout = timeout <= elapsed_time ?
+						0 :
+						timeout - elapsed_time;
 		}
 
 		k_timeout = SYS_TIMEOUT_MS(timeout);

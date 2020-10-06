@@ -24,12 +24,9 @@ LOG_MODULE_DECLARE(power);
 
 __weak const char *const z_pm_core_devices[] = {
 #if defined(CONFIG_SOC_FAMILY_NRF)
-	"CLOCK",
-	"sys_clock",
-	"UART_0",
+	"CLOCK", "sys_clock", "UART_0",
 #elif defined(CONFIG_SOC_SERIES_CC13X2_CC26X2)
-	"sys_clock",
-	"UART_0",
+	"sys_clock", "UART_0",
 #elif defined(CONFIG_SOC_SERIES_KINETIS_K6X)
 	DT_LABEL(DT_INST(0, nxp_kinetis_ethernet)),
 #elif defined(CONFIG_NET_TEST)
@@ -92,8 +89,8 @@ static int _sys_pm_devices(uint32_t state)
 		 */
 		rc = device_set_power_state(dev, state, NULL, NULL);
 		if ((rc != -ENOTSUP) && (rc != 0)) {
-			LOG_DBG("%s did not enter %s state: %d",
-				dev->name, device_pm_state_str(state), rc);
+			LOG_DBG("%s did not enter %s state: %d", dev->name,
+				device_pm_state_str(state), rc);
 			return rc;
 		}
 
@@ -127,8 +124,7 @@ void sys_pm_resume_devices(void)
 		device_idx_t idx = pm_devices[pmi];
 
 		device_set_power_state(&all_devices[idx],
-				       DEVICE_PM_ACTIVE_STATE,
-				       NULL, NULL);
+				       DEVICE_PM_ACTIVE_STATE, NULL, NULL);
 		++pmi;
 	}
 }

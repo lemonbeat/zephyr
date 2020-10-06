@@ -85,9 +85,10 @@ static inline void unit_test_noop(void)
  * @param teardown Teardown function
  */
 
-#define ztest_unit_test_setup_teardown(fn, setup, teardown) { \
-		STRINGIFY(fn), fn, setup, teardown, 0 \
-}
+#define ztest_unit_test_setup_teardown(fn, setup, teardown) \
+	{                                                   \
+		STRINGIFY(fn), fn, setup, teardown, 0       \
+	}
 
 /**
  * @brief Define a user mode test with setup and teardown functions
@@ -102,9 +103,10 @@ static inline void unit_test_noop(void)
  * @param teardown Teardown function
  */
 
-#define ztest_user_unit_test_setup_teardown(fn, setup, teardown) { \
-		STRINGIFY(fn), fn, setup, teardown, K_USER \
-}
+#define ztest_user_unit_test_setup_teardown(fn, setup, teardown) \
+	{                                                        \
+		STRINGIFY(fn), fn, setup, teardown, K_USER       \
+	}
 
 /**
  * @brief Define a test function
@@ -142,7 +144,7 @@ __syscall void z_test_1cpu_stop(void);
  * @param fn Test function
  */
 #ifdef CONFIG_SMP
-#define ztest_1cpu_unit_test(fn)					\
+#define ztest_1cpu_unit_test(fn) \
 	ztest_unit_test_setup_teardown(fn, z_test_1cpu_start, z_test_1cpu_stop)
 #else
 #define ztest_1cpu_unit_test(fn) ztest_unit_test(fn)
@@ -157,22 +159,23 @@ __syscall void z_test_1cpu_stop(void);
  * @param fn Test function
  */
 #ifdef CONFIG_SMP
-#define ztest_1cpu_user_unit_test(fn) \
-	ztest_user_unit_test_setup_teardown(fn, z_test_1cpu_start, z_test_1cpu_stop)
+#define ztest_1cpu_user_unit_test(fn)                              \
+	ztest_user_unit_test_setup_teardown(fn, z_test_1cpu_start, \
+					    z_test_1cpu_stop)
 #else
 #define ztest_1cpu_user_unit_test(fn) ztest_user_unit_test(fn)
 #endif
 
 /* definitions for use with testing application shared memory   */
 #ifdef CONFIG_USERSPACE
-#define ZTEST_DMEM	K_APP_DMEM(ztest_mem_partition)
-#define ZTEST_BMEM	K_APP_BMEM(ztest_mem_partition)
-#define ZTEST_SECTION	K_APP_DMEM_SECTION(ztest_mem_partition)
+#define ZTEST_DMEM K_APP_DMEM(ztest_mem_partition)
+#define ZTEST_BMEM K_APP_BMEM(ztest_mem_partition)
+#define ZTEST_SECTION K_APP_DMEM_SECTION(ztest_mem_partition)
 extern struct k_mem_partition ztest_mem_partition;
 #else
 #define ZTEST_DMEM
 #define ZTEST_BMEM
-#define ZTEST_SECTION	.data
+#define ZTEST_SECTION .data
 #endif
 
 /**
@@ -191,16 +194,13 @@ extern struct k_mem_partition ztest_mem_partition;
  * @param suite Name of the testing suite
  */
 #define ztest_test_suite(suite, ...) \
-	static ZTEST_DMEM struct unit_test _##suite[] = { \
-		__VA_ARGS__, { 0 } \
-	}
+	static ZTEST_DMEM struct unit_test _##suite[] = { __VA_ARGS__, { 0 } }
 /**
  * @brief Run the specified test suite.
  *
  * @param suite Test suite to run.
  */
-#define ztest_run_test_suite(suite) \
-	z_ztest_run_test_suite(#suite, _##suite)
+#define ztest_run_test_suite(suite) z_ztest_run_test_suite(#suite, _##suite)
 
 /**
  * @}

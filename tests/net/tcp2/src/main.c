@@ -31,36 +31,36 @@ LOG_MODULE_REGISTER(net_test, CONFIG_NET_TCP_LOG_LEVEL);
 #define MY_PORT 4242
 #define PEER_PORT 4242
 
-static struct in_addr my_addr  = { { { 192, 0, 2, 1 } } };
+static struct in_addr my_addr = { { { 192, 0, 2, 1 } } };
 static struct sockaddr_in my_addr_s = {
 	.sin_family = AF_INET,
 	.sin_port = htons(PEER_PORT),
 	.sin_addr = { { { 192, 0, 2, 1 } } },
 };
 
-static struct in_addr peer_addr  = { { { 192, 0, 2, 2 } } };
+static struct in_addr peer_addr = { { { 192, 0, 2, 2 } } };
 static struct sockaddr_in peer_addr_s = {
 	.sin_family = AF_INET,
 	.sin_port = htons(PEER_PORT),
 	.sin_addr = { { { 192, 0, 2, 2 } } },
 };
 
-static struct in6_addr my_addr_v6  = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					   0, 0, 0, 0, 0, 0, 0, 0x1 } } };
+static struct in6_addr my_addr_v6 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0,
+					  0, 0, 0, 0, 0, 0, 0x1 } } };
 static struct sockaddr_in6 my_addr_v6_s = {
 	.sin6_family = AF_INET6,
 	.sin6_port = htons(PEER_PORT),
-	.sin6_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-			   0, 0, 0, 0, 0, 0, 0, 0x1 } } },
+	.sin6_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			   0, 0x1 } } },
 };
 
-static struct in6_addr peer_addr_v6  = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					     0, 0, 0, 0, 0, 0, 0, 0x2 } } };
+static struct in6_addr peer_addr_v6 = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
+					    0, 0, 0, 0, 0, 0, 0, 0x2 } } };
 static struct sockaddr_in6 peer_addr_v6_s = {
 	.sin6_family = AF_INET6,
 	.sin6_port = htons(PEER_PORT),
-	.sin6_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-			   0, 0, 0, 0, 0, 0, 0, 0x2 } } },
+	.sin6_addr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			   0, 0x2 } } },
 };
 
 static struct net_if *iface;
@@ -95,8 +95,8 @@ static void handle_syn_resend(void);
 static void handle_client_fin_wait_2_test(sa_family_t af, struct tcphdr *th);
 static void handle_client_closing_test(sa_family_t af, struct tcphdr *th);
 
-static void verify_flags(struct tcphdr *th, uint8_t flags,
-			 const char *fun, int line)
+static void verify_flags(struct tcphdr *th, uint8_t flags, const char *fun,
+			 int line)
 {
 	if (!(th && FL(&th->th_flags, ==, flags))) {
 		zassert_true(false, "%s:%d flags mismatch", fun, line);
@@ -151,11 +151,9 @@ static struct dummy_api net_tcp_if_api = {
 	.send = tester_send,
 };
 
-NET_DEVICE_INIT(net_tcp_test, "net_tcp_test",
-		net_tcp_dev_init, device_pm_control_nop,
-		&net_tcp_context_data, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&net_tcp_if_api, DUMMY_L2,
+NET_DEVICE_INIT(net_tcp_test, "net_tcp_test", net_tcp_dev_init,
+		device_pm_control_nop, &net_tcp_context_data, NULL,
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_tcp_if_api, DUMMY_L2,
 		NET_L2_GET_CTX_TYPE(DUMMY_L2), 127);
 
 static void test_sem_give(void)
@@ -173,17 +171,16 @@ static void test_sem_take(k_timeout_t timeout, int line)
 	}
 }
 
-static uint8_t tcp_options[20] = {
-	0x02, 0x04, 0x05, 0xb4, /* Max segment */
-	0x04, 0x02, /* SACK */
-	0x08, 0x0a, 0xc2, 0x7b, 0xef, 0x0f, 0x00, 0x00, 0x00, 0x00, /* Time */
-	0x01, /* NOP */
-	0x03, 0x03, 0x07 /* Win scale*/ };
+static uint8_t tcp_options[20] = { 0x02, 0x04, 0x05, 0xb4, /* Max segment */
+				   0x04, 0x02, /* SACK */
+				   0x08, 0x0a, 0xc2, 0x7b, 0xef,
+				   0x0f, 0x00, 0x00, 0x00, 0x00, /* Time */
+				   0x01, /* NOP */
+				   0x03, 0x03, 0x07 /* Win scale*/ };
 
-static struct net_pkt *tester_prepare_tcp_pkt(sa_family_t af,
-					      uint16_t src_port, uint16_t dst_port,
-					      uint8_t flags, uint8_t *data,
-					      size_t len)
+static struct net_pkt *tester_prepare_tcp_pkt(sa_family_t af, uint16_t src_port,
+					      uint16_t dst_port, uint8_t flags,
+					      uint8_t *data, size_t len)
 {
 	NET_PKT_DATA_ACCESS_DEFINE(tcp_access, struct tcphdr);
 	struct net_pkt *pkt;
@@ -290,8 +287,8 @@ static struct net_pkt *prepare_syn_packet(sa_family_t af, uint16_t src_port,
 static struct net_pkt *prepare_syn_ack_packet(sa_family_t af, uint16_t src_port,
 					      uint16_t dst_port)
 {
-	return tester_prepare_tcp_pkt(af, src_port, dst_port, SYN | ACK,
-				      NULL, 0U);
+	return tester_prepare_tcp_pkt(af, src_port, dst_port, SYN | ACK, NULL,
+				      0U);
 }
 
 static struct net_pkt *prepare_ack_packet(sa_family_t af, uint16_t src_port,
@@ -311,8 +308,8 @@ static struct net_pkt *prepare_data_packet(sa_family_t af, uint16_t src_port,
 static struct net_pkt *prepare_fin_ack_packet(sa_family_t af, uint16_t src_port,
 					      uint16_t dst_port)
 {
-	return tester_prepare_tcp_pkt(af, src_port, dst_port, FIN | ACK,
-				      NULL, 0U);
+	return tester_prepare_tcp_pkt(af, src_port, dst_port, FIN | ACK, NULL,
+				      0U);
 }
 
 static struct net_pkt *prepare_fin_packet(sa_family_t af, uint16_t src_port,
@@ -328,8 +325,8 @@ static int read_tcp_header(struct net_pkt *pkt, struct tcphdr *th)
 	net_pkt_cursor_init(pkt);
 	net_pkt_set_overwrite(pkt, true);
 
-	ret = net_pkt_skip(pkt, net_pkt_ip_hdr_len(pkt) +
-			   net_pkt_ip_opts_len(pkt));
+	ret = net_pkt_skip(pkt,
+			   net_pkt_ip_hdr_len(pkt) + net_pkt_ip_opts_len(pkt));
 	if (ret < 0) {
 		goto fail;
 	}
@@ -494,9 +491,8 @@ static void test_client_ipv4(void)
 	net_context_ref(ctx);
 
 	ret = net_context_connect(ctx, (struct sockaddr *)&peer_addr_s,
-				  sizeof(struct sockaddr_in),
-				  NULL,
-				  K_MSEC(100), NULL);
+				  sizeof(struct sockaddr_in), NULL, K_MSEC(100),
+				  NULL);
 	if (ret < 0) {
 		zassert_true(false, "Failed to connect to peer");
 	}
@@ -556,8 +552,7 @@ static void test_client_ipv6(void)
 	net_context_ref(ctx);
 
 	ret = net_context_connect(ctx, (struct sockaddr *)&peer_addr_v6_s,
-				  sizeof(struct sockaddr_in6),
-				  NULL,
+				  sizeof(struct sockaddr_in6), NULL,
 				  K_MSEC(100), NULL);
 	if (ret < 0) {
 		zassert_true(false, "Failed to connect to peer");
@@ -658,11 +653,9 @@ static void test_server_timeout(struct k_work *work)
 	}
 }
 
-static void test_tcp_recv_cb(struct net_context *context,
-			     struct net_pkt *pkt,
+static void test_tcp_recv_cb(struct net_context *context, struct net_pkt *pkt,
 			     union net_ip_header *ip_hdr,
-			     union net_proto_header *proto_hdr,
-			     int status,
+			     union net_proto_header *proto_hdr, int status,
 			     void *user_data)
 {
 	if (status && status != -ECONNRESET) {
@@ -670,11 +663,8 @@ static void test_tcp_recv_cb(struct net_context *context,
 	}
 }
 
-static void test_tcp_accept_cb(struct net_context *ctx,
-			       struct sockaddr *addr,
-			       socklen_t addrlen,
-			       int status,
-			       void *user_data)
+static void test_tcp_accept_cb(struct net_context *ctx, struct sockaddr *addr,
+			       socklen_t addrlen, int status, void *user_data)
 {
 	if (status) {
 		zassert_true(false, "failed to accept the conn");
@@ -907,9 +897,8 @@ static void test_client_syn_resend(void)
 	}
 
 	ret = net_context_connect(ctx, (struct sockaddr *)&peer_addr_s,
-				  sizeof(struct sockaddr_in),
-				  NULL,
-				  K_MSEC(300), NULL);
+				  sizeof(struct sockaddr_in), NULL, K_MSEC(300),
+				  NULL);
 
 	zassert_true(ret < 0, "Connect on no response from peer");
 
@@ -1011,9 +1000,8 @@ static void test_client_fin_wait_2_ipv4(void)
 	net_context_ref(ctx);
 
 	ret = net_context_connect(ctx, (struct sockaddr *)&peer_addr_s,
-				  sizeof(struct sockaddr_in),
-				  NULL,
-				  K_MSEC(100), NULL);
+				  sizeof(struct sockaddr_in), NULL, K_MSEC(100),
+				  NULL);
 	if (ret < 0) {
 		zassert_true(false, "Failed to connect to peer");
 	}
@@ -1132,8 +1120,7 @@ static void test_client_closing_ipv6(void)
 	net_context_ref(ctx);
 
 	ret = net_context_connect(ctx, (struct sockaddr *)&peer_addr_v6_s,
-				  sizeof(struct sockaddr_in6),
-				  NULL,
+				  sizeof(struct sockaddr_in6), NULL,
 				  K_MSEC(100), NULL);
 	if (ret < 0) {
 		zassert_true(false, "Failed to connect to peer");
@@ -1168,8 +1155,7 @@ static void test_client_closing_ipv6(void)
 /** Test case main entry */
 void test_main(void)
 {
-	ztest_test_suite(test_tcp_fn,
-			 ztest_unit_test(test_presetup),
+	ztest_test_suite(test_tcp_fn, ztest_unit_test(test_presetup),
 			 ztest_unit_test(test_client_ipv4),
 			 ztest_unit_test(test_client_ipv6),
 			 ztest_unit_test(test_server_ipv4),
@@ -1177,8 +1163,7 @@ void test_main(void)
 			 ztest_unit_test(test_server_ipv6),
 			 ztest_unit_test(test_client_syn_resend),
 			 ztest_unit_test(test_client_fin_wait_2_ipv4),
-			 ztest_unit_test(test_client_closing_ipv6)
-			 );
+			 ztest_unit_test(test_client_closing_ipv6));
 
 	ztest_run_test_suite(test_tcp_fn);
 }

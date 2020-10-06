@@ -11,7 +11,7 @@
 /* Changing this value will require manual changes to exception and IDT setup
  * in locore.S for intel64
  */
-#define Z_X86_OOPS_VECTOR	32
+#define Z_X86_OOPS_VECTOR 32
 
 #if !defined(_ASMLANGUAGE)
 
@@ -30,13 +30,13 @@ extern "C" {
 static ALWAYS_INLINE void arch_irq_unlock(unsigned int key)
 {
 	if ((key & 0x00000200U) != 0U) { /* 'IF' bit */
-		__asm__ volatile ("sti" ::: "memory");
+		__asm__ volatile("sti" ::: "memory");
 	}
 }
 
 static ALWAYS_INLINE void sys_out8(uint8_t data, io_port_t port)
 {
-	__asm__ volatile("outb %b0, %w1" :: "a"(data), "Nd"(port));
+	__asm__ volatile("outb %b0, %w1" ::"a"(data), "Nd"(port));
 }
 
 static ALWAYS_INLINE uint8_t sys_in8(io_port_t port)
@@ -50,7 +50,7 @@ static ALWAYS_INLINE uint8_t sys_in8(io_port_t port)
 
 static ALWAYS_INLINE void sys_out16(uint16_t data, io_port_t port)
 {
-	__asm__ volatile("outw %w0, %w1" :: "a"(data), "Nd"(port));
+	__asm__ volatile("outw %w0, %w1" ::"a"(data), "Nd"(port));
 }
 
 static ALWAYS_INLINE uint16_t sys_in16(io_port_t port)
@@ -64,7 +64,7 @@ static ALWAYS_INLINE uint16_t sys_in16(io_port_t port)
 
 static ALWAYS_INLINE void sys_out32(uint32_t data, io_port_t port)
 {
-	__asm__ volatile("outl %0, %w1" :: "a"(data), "Nd"(port));
+	__asm__ volatile("outl %0, %w1" ::"a"(data), "Nd"(port));
 }
 
 static ALWAYS_INLINE uint32_t sys_in32(io_port_t port)
@@ -80,7 +80,7 @@ static ALWAYS_INLINE void sys_write8(uint8_t data, mm_reg_t addr)
 {
 	__asm__ volatile("movb %0, %1"
 			 :
-			 : "q"(data), "m" (*(volatile uint8_t *)(uintptr_t) addr)
+			 : "q"(data), "m"(*(volatile uint8_t *)(uintptr_t)addr)
 			 : "memory");
 }
 
@@ -90,7 +90,7 @@ static ALWAYS_INLINE uint8_t sys_read8(mm_reg_t addr)
 
 	__asm__ volatile("movb %1, %0"
 			 : "=q"(ret)
-			 : "m" (*(volatile uint8_t *)(uintptr_t) addr)
+			 : "m"(*(volatile uint8_t *)(uintptr_t)addr)
 			 : "memory");
 
 	return ret;
@@ -100,7 +100,7 @@ static ALWAYS_INLINE void sys_write16(uint16_t data, mm_reg_t addr)
 {
 	__asm__ volatile("movw %0, %1"
 			 :
-			 : "r"(data), "m" (*(volatile uint16_t *)(uintptr_t) addr)
+			 : "r"(data), "m"(*(volatile uint16_t *)(uintptr_t)addr)
 			 : "memory");
 }
 
@@ -110,7 +110,7 @@ static ALWAYS_INLINE uint16_t sys_read16(mm_reg_t addr)
 
 	__asm__ volatile("movw %1, %0"
 			 : "=r"(ret)
-			 : "m" (*(volatile uint16_t *)(uintptr_t) addr)
+			 : "m"(*(volatile uint16_t *)(uintptr_t)addr)
 			 : "memory");
 
 	return ret;
@@ -120,7 +120,7 @@ static ALWAYS_INLINE void sys_write32(uint32_t data, mm_reg_t addr)
 {
 	__asm__ volatile("movl %0, %1"
 			 :
-			 : "r"(data), "m" (*(volatile uint32_t *)(uintptr_t) addr)
+			 : "r"(data), "m"(*(volatile uint32_t *)(uintptr_t)addr)
 			 : "memory");
 }
 
@@ -130,7 +130,7 @@ static ALWAYS_INLINE uint32_t sys_read32(mm_reg_t addr)
 
 	__asm__ volatile("movl %1, %0"
 			 : "=r"(ret)
-			 : "m" (*(volatile uint32_t *)(uintptr_t) addr)
+			 : "m"(*(volatile uint32_t *)(uintptr_t)addr)
 			 : "memory");
 
 	return ret;
@@ -139,16 +139,16 @@ static ALWAYS_INLINE uint32_t sys_read32(mm_reg_t addr)
 static ALWAYS_INLINE void sys_set_bit(mem_addr_t addr, unsigned int bit)
 {
 	__asm__ volatile("btsl %1, %0"
-			 : "+m" (*(volatile uint32_t *) (addr))
-			 : "Ir" (bit)
+			 : "+m"(*(volatile uint32_t *)(addr))
+			 : "Ir"(bit)
 			 : "memory");
 }
 
 static ALWAYS_INLINE void sys_clear_bit(mem_addr_t addr, unsigned int bit)
 {
 	__asm__ volatile("btrl %1, %0"
-			 : "+m" (*(volatile uint32_t *) (addr))
-			 : "Ir" (bit));
+			 : "+m"(*(volatile uint32_t *)(addr))
+			 : "Ir"(bit));
 }
 
 static ALWAYS_INLINE int sys_test_bit(mem_addr_t addr, unsigned int bit)
@@ -157,21 +157,20 @@ static ALWAYS_INLINE int sys_test_bit(mem_addr_t addr, unsigned int bit)
 
 	__asm__ volatile("btl %2, %1;"
 			 "sbb %0, %0"
-			 : "=r" (ret), "+m" (*(volatile uint32_t *) (addr))
-			 : "Ir" (bit));
+			 : "=r"(ret), "+m"(*(volatile uint32_t *)(addr))
+			 : "Ir"(bit));
 
 	return ret;
 }
 
-static ALWAYS_INLINE int sys_test_and_set_bit(mem_addr_t addr,
-					      unsigned int bit)
+static ALWAYS_INLINE int sys_test_and_set_bit(mem_addr_t addr, unsigned int bit)
 {
 	int ret;
 
 	__asm__ volatile("btsl %2, %1;"
 			 "sbb %0, %0"
-			 : "=r" (ret), "+m" (*(volatile uint32_t *) (addr))
-			 : "Ir" (bit));
+			 : "=r"(ret), "+m"(*(volatile uint32_t *)(addr))
+			 : "Ir"(bit));
 
 	return ret;
 }
@@ -183,8 +182,8 @@ static ALWAYS_INLINE int sys_test_and_clear_bit(mem_addr_t addr,
 
 	__asm__ volatile("btrl %2, %1;"
 			 "sbb %0, %0"
-			 : "=r" (ret), "+m" (*(volatile uint32_t *) (addr))
-			 : "Ir" (bit));
+			 : "=r"(ret), "+m"(*(volatile uint32_t *)(addr))
+			 : "Ir"(bit));
 
 	return ret;
 }
@@ -203,8 +202,7 @@ static ALWAYS_INLINE int sys_test_and_clear_bit(mem_addr_t addr,
 extern unsigned char _irq_to_interrupt_vector[];
 
 #define Z_IRQ_TO_INTERRUPT_VECTOR(irq) \
-	((unsigned int) _irq_to_interrupt_vector[irq])
-
+	((unsigned int)_irq_to_interrupt_vector[irq])
 
 #endif /* _ASMLANGUAGE */
 
@@ -251,7 +249,7 @@ static ALWAYS_INLINE uint32_t z_do_read_cpu_timestamp32(void)
 {
 	uint32_t rv;
 
-	__asm__ volatile("rdtsc" : "=a" (rv) : : "%edx");
+	__asm__ volatile("rdtsc" : "=a"(rv) : : "%edx");
 
 	return rv;
 }
@@ -263,12 +261,12 @@ static ALWAYS_INLINE uint32_t z_do_read_cpu_timestamp32(void)
 static inline uint64_t z_tsc_read(void)
 {
 	union {
-		struct  {
+		struct {
 			uint32_t lo;
 			uint32_t hi;
 		};
-		uint64_t  value;
-	}  rv;
+		uint64_t value;
+	} rv;
 
 #ifdef CONFIG_X86_64
 	/*
@@ -278,16 +276,15 @@ static inline uint64_t z_tsc_read(void)
 	 * the CPUID instruction. So use LFENCE here, as all 64-bit
 	 * CPUs have LFENCE.
 	 */
-	__asm__ volatile ("lfence");
+	__asm__ volatile("lfence");
 #else
 	/* rdtsc & cpuid clobbers eax, ebx, ecx and edx registers */
-	__asm__ volatile (/* serialize */
-		"xorl %%eax,%%eax;"
-		"cpuid"
-		:
-		:
-		: "%eax", "%ebx", "%ecx", "%edx"
-		);
+	__asm__ volatile(/* serialize */
+			 "xorl %%eax,%%eax;"
+			 "cpuid"
+			 :
+			 :
+			 : "%eax", "%ebx", "%ecx", "%edx");
 #endif
 
 #ifdef CONFIG_X86_64
@@ -295,10 +292,10 @@ static inline uint64_t z_tsc_read(void)
 	 * We cannot use "=A", since this would use %rax on x86_64 and
 	 * return only the lower 32bits of the TSC
 	 */
-	__asm__ volatile ("rdtsc" : "=a" (rv.lo), "=d" (rv.hi));
+	__asm__ volatile("rdtsc" : "=a"(rv.lo), "=d"(rv.hi));
 #else
 	/* "=A" means that value is in eax:edx pair. */
-	__asm__ volatile ("rdtsc" : "=A" (rv.value));
+	__asm__ volatile("rdtsc" : "=A"(rv.value));
 #endif
 
 	return rv.value;

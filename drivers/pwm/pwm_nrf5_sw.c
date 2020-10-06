@@ -17,9 +17,7 @@ LOG_MODULE_REGISTER(pwm_nrf5_sw);
 
 /* One compare channel is needed to set the PWM period, hence +1. */
 #if ((DT_INST_PROP(0, channel_count) + 1) > \
-	(_CONCAT( \
-		_CONCAT(TIMER, DT_INST_PROP(0, timer_instance)), \
-		_CC_NUM)))
+     (_CONCAT(_CONCAT(TIMER, DT_INST_PROP(0, timer_instance)), _CC_NUM)))
 #error "Invalid number of PWM channels configured."
 #endif
 #define PWM_0_MAP_SIZE DT_INST_PROP(0, channel_count)
@@ -126,8 +124,8 @@ static int pwm_nrf5_sw_pin_set(const struct device *dev, uint32_t pwm,
 		return -ENOMEM;
 	}
 
-	LOG_DBG("PWM %d, period %u, pulse %u", pwm,
-			period_cycles, pulse_cycles);
+	LOG_DBG("PWM %d, period %u, pulse %u", pwm, period_cycles,
+		pulse_cycles);
 
 	/* clear GPIOTE config */
 	NRF_GPIOTE->CONFIG[config->gpiote_base + channel] = 0;
@@ -172,15 +170,14 @@ static int pwm_nrf5_sw_pin_set(const struct device *dev, uint32_t pwm,
 							    (pwm << 8);
 
 	/* setup PPI */
-	NRF_PPI->CH[ppi_index].EEP = (uint32_t)
-				     &(timer->EVENTS_COMPARE[channel]);
-	NRF_PPI->CH[ppi_index].TEP = (uint32_t)
-				     &(NRF_GPIOTE->TASKS_OUT[channel]);
-	NRF_PPI->CH[ppi_index + 1].EEP = (uint32_t)
-					 &(timer->EVENTS_COMPARE[
-							 config->map_size]);
-	NRF_PPI->CH[ppi_index + 1].TEP = (uint32_t)
-					 &(NRF_GPIOTE->TASKS_OUT[channel]);
+	NRF_PPI->CH[ppi_index].EEP = (uint32_t) &
+				     (timer->EVENTS_COMPARE[channel]);
+	NRF_PPI->CH[ppi_index].TEP = (uint32_t) &
+				     (NRF_GPIOTE->TASKS_OUT[channel]);
+	NRF_PPI->CH[ppi_index + 1].EEP =
+		(uint32_t) & (timer->EVENTS_COMPARE[config->map_size]);
+	NRF_PPI->CH[ppi_index + 1].TEP = (uint32_t) &
+					 (NRF_GPIOTE->TASKS_OUT[channel]);
 	NRF_PPI->CHENSET = BIT(ppi_index) | BIT(ppi_index + 1);
 
 	/* start timer, hence PWM */
@@ -214,8 +211,7 @@ pin_set_pwm_off:
 }
 
 static int pwm_nrf5_sw_get_cycles_per_sec(const struct device *dev,
-					  uint32_t pwm,
-					  uint64_t *cycles)
+					  uint32_t pwm, uint64_t *cycles)
 {
 	const struct pwm_config *config;
 
@@ -263,11 +259,7 @@ static const struct pwm_config pwm_nrf5_sw_0_config = {
 
 static struct pwm_data pwm_nrf5_sw_0_data;
 
-DEVICE_AND_API_INIT(pwm_nrf5_sw_0,
-		    DT_INST_LABEL(0),
-		    pwm_nrf5_sw_init,
-		    &pwm_nrf5_sw_0_data,
-		    &pwm_nrf5_sw_0_config,
-		    POST_KERNEL,
+DEVICE_AND_API_INIT(pwm_nrf5_sw_0, DT_INST_LABEL(0), pwm_nrf5_sw_init,
+		    &pwm_nrf5_sw_0_data, &pwm_nrf5_sw_0_config, POST_KERNEL,
 		    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
 		    &pwm_nrf5_sw_drv_api_funcs);

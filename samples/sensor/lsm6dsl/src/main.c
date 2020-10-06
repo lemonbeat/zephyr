@@ -91,7 +91,6 @@ static void lsm6dsl_trigger_handler(const struct device *dev,
 		temp_out = temp;
 #endif
 	}
-
 }
 #endif
 
@@ -100,7 +99,8 @@ void main(void)
 	int cnt = 0;
 	char out_str[64];
 	struct sensor_value odr_attr;
-	const struct device *lsm6dsl_dev = device_get_binding(DT_LABEL(DT_INST(0, st_lsm6dsl)));
+	const struct device *lsm6dsl_dev =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lsm6dsl)));
 
 	if (lsm6dsl_dev == NULL) {
 		printk("Could not get LSM6DSL device\n");
@@ -129,7 +129,8 @@ void main(void)
 	trig.type = SENSOR_TRIG_DATA_READY;
 	trig.chan = SENSOR_CHAN_ACCEL_XYZ;
 
-	if (sensor_trigger_set(lsm6dsl_dev, &trig, lsm6dsl_trigger_handler) != 0) {
+	if (sensor_trigger_set(lsm6dsl_dev, &trig, lsm6dsl_trigger_handler) !=
+	    0) {
 		printk("Could not set sensor type and channel\n");
 		return;
 	}
@@ -147,24 +148,21 @@ void main(void)
 
 		/* lsm6dsl accel */
 		sprintf(out_str, "accel x:%f ms/2 y:%f ms/2 z:%f ms/2",
-							  out_ev(&accel_x_out),
-							  out_ev(&accel_y_out),
-							  out_ev(&accel_z_out));
+			out_ev(&accel_x_out), out_ev(&accel_y_out),
+			out_ev(&accel_z_out));
 		printk("%s\n", out_str);
 
 		/* lsm6dsl gyro */
 		sprintf(out_str, "gyro x:%f dps y:%f dps z:%f dps",
-							   out_ev(&gyro_x_out),
-							   out_ev(&gyro_y_out),
-							   out_ev(&gyro_z_out));
+			out_ev(&gyro_x_out), out_ev(&gyro_y_out),
+			out_ev(&gyro_z_out));
 		printk("%s\n", out_str);
 
 #if defined(CONFIG_LSM6DSL_EXT0_LIS2MDL)
 		/* lsm6dsl external magn */
 		sprintf(out_str, "magn x:%f gauss y:%f gauss z:%f gauss",
-							   out_ev(&magn_x_out),
-							   out_ev(&magn_y_out),
-							   out_ev(&magn_z_out));
+			out_ev(&magn_x_out), out_ev(&magn_y_out),
+			out_ev(&magn_z_out));
 		printk("%s\n", out_str);
 #endif
 

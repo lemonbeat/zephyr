@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 #if !defined(HTTP_STATUS_STR_SIZE)
-#define HTTP_STATUS_STR_SIZE	32
+#define HTTP_STATUS_STR_SIZE 32
 #endif
 
 /* Is there more data to come */
@@ -58,8 +58,7 @@ struct http_response;
  *         <0  if http_client_req() should return the error code to the
  *             caller.
  */
-typedef int (*http_payload_cb_t)(int sock,
-				 struct http_request *req,
+typedef int (*http_payload_cb_t)(int sock, struct http_request *req,
 				 void *user_data);
 
 /**
@@ -76,8 +75,7 @@ typedef int (*http_payload_cb_t)(int sock,
  *         <0  if http_client_req() should return the error code to the
  *             caller.
  */
-typedef int (*http_header_cb_t)(int sock,
-				struct http_request *req,
+typedef int (*http_header_cb_t)(int sock, struct http_request *req,
 				void *user_data);
 
 /**
@@ -282,8 +280,8 @@ struct http_request {
  *
  * @return <0 if error, >=0 amount of data sent to the server
  */
-int http_client_req(int sock, struct http_request *req,
-		    int32_t timeout, void *user_data);
+int http_client_req(int sock, struct http_request *req, int32_t timeout,
+		    void *user_data);
 
 #ifdef __cplusplus
 }

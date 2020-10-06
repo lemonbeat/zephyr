@@ -26,10 +26,9 @@ struct iwdg_stm32_data {
 	IWDG_TypeDef *Instance;
 };
 
-#define IWDG_STM32_DATA(dev)					\
-	((struct iwdg_stm32_data * const)(dev)->data)
+#define IWDG_STM32_DATA(dev) ((struct iwdg_stm32_data *const)(dev)->data)
 
-#define IWDG_STM32_STRUCT(dev)					\
+#define IWDG_STM32_STRUCT(dev) \
 	((IWDG_TypeDef *)(IWDG_STM32_DATA(dev))->Instance)
 
-#endif	/* ZEPHYR_DRIVERS_WATCHDOG_IWDG_STM32_H_ */
+#endif /* ZEPHYR_DRIVERS_WATCHDOG_IWDG_STM32_H_ */

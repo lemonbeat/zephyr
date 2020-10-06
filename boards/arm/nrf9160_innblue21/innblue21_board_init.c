@@ -7,8 +7,8 @@
 #include <init.h>
 #include <drivers/gpio.h>
 
-#define VDD_3V3_PWR_CTRL_GPIO_PIN  12   /* ENABLE_3V3_SENSOR --> i2c sensors  */
-#define VDD_5V0_PWR_CTRL_GPIO_PIN  21   /* ENABLE_5V0_BOOST  --> speed sensor */
+#define VDD_3V3_PWR_CTRL_GPIO_PIN 12 /* ENABLE_3V3_SENSOR --> i2c sensors  */
+#define VDD_5V0_PWR_CTRL_GPIO_PIN 21 /* ENABLE_5V0_BOOST  --> speed sensor */
 
 /* Configures the pin as output and sets them high. */
 static void config_pin(const struct device *gpio, int pin)

@@ -13,21 +13,21 @@
 #include <sys/util.h>
 
 /* Configuration Read Only Registers */
-#define ATAES_SERIALNUM_REG	0xF000
-#define ATAES_LOTHISTORY_REG	0xF008
-#define ATAES_JEDEC_REG		0xF010
-#define ATAES_ALGORITHM_REG	0xF015
-#define ATAES_EEPAGESIZE_REG	0xF017
-#define ATAES_ENCREADSIZE_REG	0xF018
-#define ATAES_ENCWRITESIZE_REG	0xF019
-#define ATAES_DEVICENUM_REG	0xF01A
-#define ATAES_MANUFACTID_REG	0xF02B
-#define ATAES_PERMCONFIG_REG	0xF02D
+#define ATAES_SERIALNUM_REG 0xF000
+#define ATAES_LOTHISTORY_REG 0xF008
+#define ATAES_JEDEC_REG 0xF010
+#define ATAES_ALGORITHM_REG 0xF015
+#define ATAES_EEPAGESIZE_REG 0xF017
+#define ATAES_ENCREADSIZE_REG 0xF018
+#define ATAES_ENCWRITESIZE_REG 0xF019
+#define ATAES_DEVICENUM_REG 0xF01A
+#define ATAES_MANUFACTID_REG 0xF02B
+#define ATAES_PERMCONFIG_REG 0xF02D
 
 /* Configuarion Pre-Lock Writable Registers */
-#define ATAES_I2CADDR_REG	0xF040
-#define ATAES_CHIPCONFIG_REG	0xF042
-#define ATAES_FREESPACE_ADDR	0xF180
+#define ATAES_I2CADDR_REG 0xF040
+#define ATAES_CHIPCONFIG_REG 0xF042
+#define ATAES_FREESPACE_ADDR 0xF180
 
 /**
  * Counter Config Memory Map
@@ -57,7 +57,7 @@
  * Small Zone Memory Address
  * Pre-Small Zone Lock Writable
  */
-#define ATAES_SMALLZONE_ADDR	0xF1E0
+#define ATAES_SMALLZONE_ADDR 0xF1E0
 
 /**
  * Key Memory Map
@@ -65,9 +65,9 @@
  */
 #define ATAES_KEYMEMMAP_REG(keyid) (0xF2##keyid##0)
 
-#define ATAES_COMMAND_MEM_ADDR		0xFE00
-#define ATAES_COMMAND_ADDRR_RESET	0xFFE0
-#define ATAES_STATUS_REG		0xFFF0
+#define ATAES_COMMAND_MEM_ADDR 0xFE00
+#define ATAES_COMMAND_ADDRR_RESET 0xFFE0
+#define ATAES_STATUS_REG 0xFFF0
 
 #define ATAES_STATUS_WIP BIT(0)
 #define ATAES_STATUS_WEN BIT(1)
@@ -77,41 +77,40 @@
 #define ATAES_STATUS_ERR BIT(7)
 
 #define ATAES_VOLATILE_KEYID 0xFF
-#define ATAES_VOLATILE_AUTHOK   BIT(0)
-#define ATAES_VOLATILE_ENCOK    (BIT(1) & BIT(2))
-#define ATAES_VOLATILE_DECOK    BIT(3)
-#define ATAES_VOLATILE_RNDNNC   BIT(4)
-#define ATAES_VOLATILE_AUTHCO   BIT(5)
+#define ATAES_VOLATILE_AUTHOK BIT(0)
+#define ATAES_VOLATILE_ENCOK (BIT(1) & BIT(2))
+#define ATAES_VOLATILE_DECOK BIT(3)
+#define ATAES_VOLATILE_RNDNNC BIT(4)
+#define ATAES_VOLATILE_AUTHCO BIT(5)
 #define ATAES_VOLATILE_LEGACYOK BIT(6)
 
-#define ATAES_KEYCONFIG_EXTERNAL	BIT(0)
-#define ATAES_KEYCONFIG_RAND_NONCE	BIT(2)
-#define ATAES_KEYCONFIG_LEGACYOK	BIT(3)
-#define ATAES_KEYCONFIG_AUTHKEY		BIT(4)
+#define ATAES_KEYCONFIG_EXTERNAL BIT(0)
+#define ATAES_KEYCONFIG_RAND_NONCE BIT(2)
+#define ATAES_KEYCONFIG_LEGACYOK BIT(3)
+#define ATAES_KEYCONFIG_AUTHKEY BIT(4)
 
-#define ATAES_CHIPCONFIG_LEGACYE	BIT(0)
+#define ATAES_CHIPCONFIG_LEGACYE BIT(0)
 
-#define ATAES_NONCE_OP		0x01
-#define ATAES_ENCRYPT_OP	0x06
-#define ATAES_DECRYPT_OP	0x07
-#define ATAES_INFO_OP		0x0C
-#define ATAES_LEGACY_OP		0x0F
-#define ATAES_BLOCKRD_OP	0x10
+#define ATAES_NONCE_OP 0x01
+#define ATAES_ENCRYPT_OP 0x06
+#define ATAES_DECRYPT_OP 0x07
+#define ATAES_INFO_OP 0x0C
+#define ATAES_LEGACY_OP 0x0F
+#define ATAES_BLOCKRD_OP 0x10
 
-#define ATAES_MAC_MODE_COUNTER   BIT(5)
-#define ATAES_MAC_MODE_SERIAL    BIT(6)
+#define ATAES_MAC_MODE_COUNTER BIT(5)
+#define ATAES_MAC_MODE_SERIAL BIT(6)
 #define ATAES_MAC_MODE_SMALLZONE BIT(7)
 
 #if defined(CONFIG_CRYPTO_ATAES132A_I2C_SPEED_STANDARD)
-#define ATAES132A_BUS_SPEED		I2C_SPEED_STANDARD
+#define ATAES132A_BUS_SPEED I2C_SPEED_STANDARD
 #else
-#define ATAES132A_BUS_SPEED		I2C_SPEED_FAST
+#define ATAES132A_BUS_SPEED I2C_SPEED_FAST
 #endif
 
 #define CRC16_POLY 0x8005
 
-void ataes132a_atmel_crc(uint8_t *input, uint8_t length,
-			 uint8_t *output)
+void ataes132a_atmel_crc(uint8_t *input, uint8_t length, uint8_t *output)
 {
 	int i, j;
 	uint8_t bit;
@@ -120,7 +119,7 @@ void ataes132a_atmel_crc(uint8_t *input, uint8_t length,
 	uint8_t higher_crc_bit;
 
 	for (i = 0, crc = 0U; i < length; i++) {
-		for (j = 7; j >=  0; j--) {
+		for (j = 7; j >= 0; j--) {
 			bit = !!(input[i] & BIT(j));
 			higher_crc_bit = crc >> 15;
 			double_carry = (crc & BIT(8)) << 1;
@@ -156,7 +155,6 @@ static inline int burst_write_i2c(const struct device *dev, uint16_t dev_addr,
 
 	return api->transfer(dev, msg, 2, dev_addr);
 }
-
 
 static inline int burst_read_i2c(const struct device *dev, uint16_t dev_addr,
 				 uint16_t start_addr, uint8_t *buf,
@@ -311,14 +309,13 @@ int ataes132a_init(const struct device *i2c_dev);
  *
  * @return Returns 0 in case of success and an error code otherwise.
  */
-int ataes132a_aes_ccm_decrypt(const struct device *i2c_dev,
-			      uint8_t key_id,
+int ataes132a_aes_ccm_decrypt(const struct device *i2c_dev, uint8_t key_id,
 			      struct ataes132a_mac_mode *mac_mode,
 			      struct ataes132a_mac_packet *mac_packet,
 			      struct cipher_aead_pkt *aead_op,
 			      uint8_t *nonce_buf);
 
- /**
+/**
   * @brief ATAES132A CCM encrypt function
   *
   * This function performs a CCM encrypt operation on the input buffer.
@@ -359,12 +356,10 @@ int ataes132a_aes_ccm_decrypt(const struct device *i2c_dev,
   *
   * @return Returns 0 in case of success and an error code otherwise.
   */
-int ataes132a_aes_ccm_encrypt(const struct device *i2c_dev,
-			      uint8_t key_id,
+int ataes132a_aes_ccm_encrypt(const struct device *i2c_dev, uint8_t key_id,
 			      struct ataes132a_mac_mode *mac_mode,
 			      struct cipher_aead_pkt *aead_op,
-			      uint8_t *nonce_buf,
-			      uint8_t *mac_count);
+			      uint8_t *nonce_buf, uint8_t *mac_count);
 
 /**
  * @brief ATAES132A ECM block function
@@ -387,8 +382,7 @@ int ataes132a_aes_ccm_encrypt(const struct device *i2c_dev,
  *
  * @return Returns 0 in case of success and an error code otherwise.
  */
-int ataes132a_aes_ecb_block(const struct device *i2c_dev,
-			    uint8_t key_id,
+int ataes132a_aes_ecb_block(const struct device *i2c_dev, uint8_t key_id,
 			    struct cipher_pkt *pkt);
 
 #endif /* ZEPHYR_DRIVERS_CRYPTO_CRYPTO_ATAES132A_PRIV_H_ */

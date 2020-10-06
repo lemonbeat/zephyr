@@ -31,8 +31,8 @@ static int out_func(int c, void *ctx)
 	return 0;
 }
 
-void shell_fprintf_fmt(const struct shell_fprintf *sh_fprintf,
-		       const char *fmt, va_list args)
+void shell_fprintf_fmt(const struct shell_fprintf *sh_fprintf, const char *fmt,
+		       va_list args)
 {
 	(void)z_prf(out_func, (void *)sh_fprintf, (char *)fmt, args);
 
@@ -40,7 +40,6 @@ void shell_fprintf_fmt(const struct shell_fprintf *sh_fprintf,
 		shell_fprintf_buffer_flush(sh_fprintf);
 	}
 }
-
 
 void shell_fprintf_buffer_flush(const struct shell_fprintf *sh_fprintf)
 {

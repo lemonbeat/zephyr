@@ -9,7 +9,6 @@
  * @brief Message queues.
  */
 
-
 #include <kernel.h>
 #include <kernel_structs.h>
 #include <debug/object_tracing_common.h>
@@ -36,7 +35,8 @@ static int init_msgq_module(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	Z_STRUCT_SECTION_FOREACH(k_msgq, msgq) {
+	Z_STRUCT_SECTION_FOREACH(k_msgq, msgq)
+	{
 		SYS_TRACING_OBJ_INIT(k_msgq, msgq);
 	}
 	return 0;
@@ -58,7 +58,7 @@ void k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size,
 	msgq->used_msgs = 0;
 	msgq->flags = 0;
 	z_waitq_init(&msgq->wait_q);
-	msgq->lock = (struct k_spinlock) {};
+	msgq->lock = (struct k_spinlock){};
 
 	SYS_TRACING_OBJ_INIT(k_msgq, msgq);
 
@@ -66,7 +66,7 @@ void k_msgq_init(struct k_msgq *msgq, char *buffer, size_t msg_size,
 }
 
 int z_impl_k_msgq_alloc_init(struct k_msgq *msgq, size_t msg_size,
-			    uint32_t max_msgs)
+			     uint32_t max_msgs)
 {
 	void *buffer;
 	int ret;
@@ -90,7 +90,7 @@ int z_impl_k_msgq_alloc_init(struct k_msgq *msgq, size_t msg_size,
 
 #ifdef CONFIG_USERSPACE
 int z_vrfy_k_msgq_alloc_init(struct k_msgq *q, size_t msg_size,
-			    uint32_t max_msgs)
+			     uint32_t max_msgs)
 {
 	Z_OOPS(Z_SYSCALL_OBJ_NEVER_INIT(q, K_OBJ_MSGQ));
 
@@ -101,7 +101,8 @@ int z_vrfy_k_msgq_alloc_init(struct k_msgq *q, size_t msg_size,
 
 int k_msgq_cleanup(struct k_msgq *msgq)
 {
-	CHECKIF(z_waitq_head(&msgq->wait_q) != NULL) {
+	CHECKIF(z_waitq_head(&msgq->wait_q) != NULL)
+	{
 		return -EBUSY;
 	}
 
@@ -112,8 +113,8 @@ int k_msgq_cleanup(struct k_msgq *msgq)
 	return 0;
 }
 
-
-int z_impl_k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout)
+int z_impl_k_msgq_put(struct k_msgq *msgq, const void *data,
+		      k_timeout_t timeout)
 {
 	__ASSERT(!arch_is_in_isr() || K_TIMEOUT_EQ(timeout, K_NO_WAIT), "");
 
@@ -129,7 +130,7 @@ int z_impl_k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout
 		if (pending_thread != NULL) {
 			/* give message to waiting thread */
 			(void)memcpy(pending_thread->base.swap_data, data,
-			       msgq->msg_size);
+				     msgq->msg_size);
 			/* wake up waiting thread */
 			arch_thread_return_value_set(pending_thread, 0);
 			z_ready_thread(pending_thread);
@@ -150,7 +151,7 @@ int z_impl_k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t timeout
 		result = -ENOMSG;
 	} else {
 		/* wait for put message success, failure, or timeout */
-		_current->base.swap_data = (void *) data;
+		_current->base.swap_data = (void *)data;
 		return z_pend_curr(&msgq->lock, key, &msgq->wait_q, timeout);
 	}
 
@@ -212,8 +213,9 @@ int z_impl_k_msgq_get(struct k_msgq *msgq, void *data, k_timeout_t timeout)
 		pending_thread = z_unpend_first_thread(&msgq->wait_q);
 		if (pending_thread != NULL) {
 			/* add thread's message to queue */
-			(void)memcpy(msgq->write_ptr, pending_thread->base.swap_data,
-			       msgq->msg_size);
+			(void)memcpy(msgq->write_ptr,
+				     pending_thread->base.swap_data,
+				     msgq->msg_size);
 			msgq->write_ptr += msgq->msg_size;
 			if (msgq->write_ptr == msgq->buffer_end) {
 				msgq->write_ptr = msgq->buffer_start;
@@ -293,7 +295,8 @@ void z_impl_k_msgq_purge(struct k_msgq *msgq)
 	key = k_spin_lock(&msgq->lock);
 
 	/* wake up any threads that are waiting to write */
-	while ((pending_thread = z_unpend_first_thread(&msgq->wait_q)) != NULL) {
+	while ((pending_thread = z_unpend_first_thread(&msgq->wait_q)) !=
+	       NULL) {
 		arch_thread_return_value_set(pending_thread, -ENOMSG);
 		z_ready_thread(pending_thread);
 	}

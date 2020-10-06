@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <sys/printk.h>
 
-
 static int32_t read_sensor(const struct device *sensor)
 {
 	struct sensor_value val[3];

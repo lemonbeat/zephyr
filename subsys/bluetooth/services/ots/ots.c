@@ -49,19 +49,19 @@ static ssize_t ots_feature_read(struct bt_conn *conn,
 				const struct bt_gatt_attr *attr, void *buf,
 				uint16_t len, uint16_t offset)
 {
-	struct bt_ots *ots = (struct bt_ots *) attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)attr->user_data;
 
 	LOG_DBG("OTS Feature GATT Read Operation");
 
 	return bt_gatt_attr_read(conn, attr, buf, len, offset, &ots->features,
-		sizeof(ots->features));
+				 sizeof(ots->features));
 }
 
 static ssize_t ots_obj_name_read(struct bt_conn *conn,
 				 const struct bt_gatt_attr *attr, void *buf,
 				 uint16_t len, uint16_t offset)
 {
-	struct bt_ots *ots = (struct bt_ots *) attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)attr->user_data;
 
 	LOG_DBG("OTS Object Name GATT Read Operation");
 
@@ -79,7 +79,7 @@ static ssize_t ots_obj_type_read(struct bt_conn *conn,
 				 const struct bt_gatt_attr *attr, void *buf,
 				 uint16_t len, uint16_t offset)
 {
-	struct bt_ots *ots = (struct bt_ots *) attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)attr->user_data;
 	struct bt_ots_obj_metadata *obj_meta;
 
 	LOG_DBG("OTS Object Type GATT Read Operation");
@@ -105,7 +105,7 @@ static ssize_t ots_obj_size_read(struct bt_conn *conn,
 				 const struct bt_gatt_attr *attr, void *buf,
 				 uint16_t len, uint16_t offset)
 {
-	struct bt_ots *ots = (struct bt_ots *) attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)attr->user_data;
 
 	LOG_DBG("OTS Object Size GATT Read Operation");
 
@@ -123,7 +123,7 @@ static ssize_t ots_obj_id_read(struct bt_conn *conn,
 			       const struct bt_gatt_attr *attr, void *buf,
 			       uint16_t len, uint16_t offset)
 {
-	struct bt_ots *ots = (struct bt_ots *) attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)attr->user_data;
 	uint8_t id[BT_OTS_OBJ_ID_SIZE];
 	char id_str[BT_OTS_OBJ_ID_STR_LEN];
 
@@ -136,8 +136,7 @@ static ssize_t ots_obj_id_read(struct bt_conn *conn,
 
 	sys_put_le48(ots->cur_obj->id, id);
 
-	bt_ots_obj_id_to_str(ots->cur_obj->id, id_str,
-				      sizeof(id_str));
+	bt_ots_obj_id_to_str(ots->cur_obj->id, id_str, sizeof(id_str));
 	LOG_DBG("Current Object ID: %s", log_strdup(id_str));
 
 	return bt_gatt_attr_read(conn, attr, buf, len, offset, id, sizeof(id));
@@ -147,7 +146,7 @@ static ssize_t ots_obj_prop_read(struct bt_conn *conn,
 				 const struct bt_gatt_attr *attr, void *buf,
 				 uint16_t len, uint16_t offset)
 {
-	struct bt_ots *ots = (struct bt_ots *) attr->user_data;
+	struct bt_ots *ots = (struct bt_ots *)attr->user_data;
 
 	LOG_DBG("OTS Object Properties GATT Read Operation");
 
@@ -161,8 +160,7 @@ static ssize_t ots_obj_prop_read(struct bt_conn *conn,
 				 sizeof(ots->cur_obj->metadata.props));
 }
 
-int bt_ots_obj_add(struct bt_ots *ots,
-			    struct bt_ots_obj_metadata *obj_init)
+int bt_ots_obj_add(struct bt_ots *ots, struct bt_ots_obj_metadata *obj_init)
 {
 	int err;
 	struct bt_gatt_ots_object *obj;
@@ -229,8 +227,7 @@ void *bt_ots_svc_decl_get(struct bt_ots *ots)
 }
 #endif
 
-int bt_ots_init(struct bt_ots *ots,
-		     struct bt_ots_init *ots_init)
+int bt_ots_init(struct bt_ots *ots, struct bt_ots_init *ots_init)
 {
 	int err;
 
@@ -241,14 +238,14 @@ int bt_ots_init(struct bt_ots *ots,
 	__ASSERT(ots_init->cb->obj_created,
 		 "Callback for object creation is not set");
 	__ASSERT(ots_init->cb->obj_read ||
-		 !BT_OTS_OACP_GET_FEAT_READ(ots_init->features.oacp),
+			 !BT_OTS_OACP_GET_FEAT_READ(ots_init->features.oacp),
 		 "Callback for object reading is not set");
 
 	/* Set callback structure. */
 	ots->cb = ots_init->cb;
 
 	/* Check OACP supported features against Kconfig. */
-	if (ots_init->features.oacp & (~((uint32_t) OACP_FEAT))) {
+	if (ots_init->features.oacp & (~((uint32_t)OACP_FEAT))) {
 		return -ENOTSUP;
 	}
 
@@ -256,7 +253,7 @@ int bt_ots_init(struct bt_ots *ots,
 	LOG_DBG("OACP features: 0x%04X", ots->features.oacp);
 
 	/* Check OLCP supported features against Kconfig. */
-	if (ots_init->features.olcp & (~((uint32_t) OLCP_FEAT))) {
+	if (ots_init->features.olcp & (~((uint32_t)OLCP_FEAT))) {
 		return -ENOTSUP;
 	}
 	ots->features.olcp = ots_init->features.olcp;
@@ -281,57 +278,71 @@ int bt_ots_init(struct bt_ots *ots,
 }
 
 #if defined(CONFIG_BT_OTS_SECONDARY_SVC)
-	#define BT_GATT_OTS_SERVICE	BT_GATT_SECONDARY_SERVICE
+#define BT_GATT_OTS_SERVICE BT_GATT_SECONDARY_SERVICE
 #else
-	#define BT_GATT_OTS_SERVICE	BT_GATT_PRIMARY_SERVICE
+#define BT_GATT_OTS_SERVICE BT_GATT_PRIMARY_SERVICE
 #endif
 
-#define BT_GATT_OTS_ATTRS(_ots) {					\
-	BT_GATT_OTS_SERVICE(BT_UUID_OTS),				\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_FEATURE,			\
-		BT_GATT_CHRC_READ, BT_GATT_PERM_READ,			\
-		ots_feature_read, NULL, &_ots),				\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_NAME,			\
-		BT_GATT_CHRC_READ, BT_GATT_PERM_READ,			\
-		ots_obj_name_read, NULL, &_ots),			\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_TYPE,			\
-		BT_GATT_CHRC_READ, BT_GATT_PERM_READ,			\
-		ots_obj_type_read, NULL, &_ots),			\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_SIZE,			\
-		BT_GATT_CHRC_READ, BT_GATT_PERM_READ,			\
-		ots_obj_size_read, NULL, &_ots),			\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_ID,				\
-		BT_GATT_CHRC_READ, BT_GATT_PERM_READ,			\
-		ots_obj_id_read, NULL, &_ots),				\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_PROPERTIES,			\
-		BT_GATT_CHRC_READ, BT_GATT_PERM_READ,			\
-		ots_obj_prop_read, NULL, &_ots),			\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_ACTION_CP,			\
-		BT_GATT_CHRC_WRITE | BT_GATT_CHRC_INDICATE,		\
-		BT_GATT_PERM_WRITE, NULL,				\
-		bt_gatt_ots_oacp_write, &_ots),				\
-	BT_GATT_CCC_MANAGED(&_ots.oacp_ind.ccc,				\
-		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),		\
-	BT_GATT_CHARACTERISTIC(BT_UUID_OTS_LIST_CP,			\
-		BT_GATT_CHRC_WRITE | BT_GATT_CHRC_INDICATE,		\
-		BT_GATT_PERM_WRITE, NULL,				\
-		bt_gatt_ots_olcp_write, &_ots),				\
-	BT_GATT_CCC_MANAGED(&_ots.olcp_ind.ccc,				\
-		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE)			\
-}
+#define BT_GATT_OTS_ATTRS(_ots)                                                \
+	{                                                                      \
+		BT_GATT_OTS_SERVICE(BT_UUID_OTS),                              \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_FEATURE,            \
+					       BT_GATT_CHRC_READ,              \
+					       BT_GATT_PERM_READ,              \
+					       ots_feature_read, NULL, &_ots), \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_NAME,               \
+					       BT_GATT_CHRC_READ,              \
+					       BT_GATT_PERM_READ,              \
+					       ots_obj_name_read, NULL,        \
+					       &_ots),                         \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_TYPE,               \
+					       BT_GATT_CHRC_READ,              \
+					       BT_GATT_PERM_READ,              \
+					       ots_obj_type_read, NULL,        \
+					       &_ots),                         \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_SIZE,               \
+					       BT_GATT_CHRC_READ,              \
+					       BT_GATT_PERM_READ,              \
+					       ots_obj_size_read, NULL,        \
+					       &_ots),                         \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_ID,                 \
+					       BT_GATT_CHRC_READ,              \
+					       BT_GATT_PERM_READ,              \
+					       ots_obj_id_read, NULL, &_ots),  \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_PROPERTIES,         \
+					       BT_GATT_CHRC_READ,              \
+					       BT_GATT_PERM_READ,              \
+					       ots_obj_prop_read, NULL,        \
+					       &_ots),                         \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_ACTION_CP,          \
+					       BT_GATT_CHRC_WRITE |            \
+						       BT_GATT_CHRC_INDICATE,  \
+					       BT_GATT_PERM_WRITE, NULL,       \
+					       bt_gatt_ots_oacp_write, &_ots), \
+			BT_GATT_CCC_MANAGED(&_ots.oacp_ind.ccc,                \
+					    BT_GATT_PERM_READ |                \
+						    BT_GATT_PERM_WRITE),       \
+			BT_GATT_CHARACTERISTIC(BT_UUID_OTS_LIST_CP,            \
+					       BT_GATT_CHRC_WRITE |            \
+						       BT_GATT_CHRC_INDICATE,  \
+					       BT_GATT_PERM_WRITE, NULL,       \
+					       bt_gatt_ots_olcp_write, &_ots), \
+			BT_GATT_CCC_MANAGED(&_ots.olcp_ind.ccc,                \
+					    BT_GATT_PERM_READ |                \
+						    BT_GATT_PERM_WRITE)        \
+	}
 
-#define BT_GATT_OTS_INSTANCE_LIST_SIZE	(ARRAY_SIZE(ots_instances))
-#define BT_GATT_OTS_INSTANCE_LIST_START	ots_instances
-#define BT_GATT_OTS_INSTANCE_LIST_END	\
+#define BT_GATT_OTS_INSTANCE_LIST_SIZE (ARRAY_SIZE(ots_instances))
+#define BT_GATT_OTS_INSTANCE_LIST_START ots_instances
+#define BT_GATT_OTS_INSTANCE_LIST_END \
 	(&ots_instances[BT_GATT_OTS_INSTANCE_LIST_SIZE])
 
-#define BT_GATT_OTS_SERVICE_LIST_START	ots_service_list
+#define BT_GATT_OTS_SERVICE_LIST_START ots_service_list
 
 static struct bt_ots ots_instances[CONFIG_BT_OTS_MAX_INST_CNT];
 static uint32_t instance_cnt;
 BT_GATT_SERVICE_INSTANCE_DEFINE(ots_service_list, ots_instances,
-				CONFIG_BT_OTS_MAX_INST_CNT,
-				BT_GATT_OTS_ATTRS);
+				CONFIG_BT_OTS_MAX_INST_CNT, BT_GATT_OTS_ATTRS);
 
 struct bt_ots *bt_ots_free_instance_get(void)
 {
@@ -348,8 +359,7 @@ static int bt_gatt_ots_instances_prepare(const struct device *dev)
 	struct bt_ots *instance;
 
 	for (instance = BT_GATT_OTS_INSTANCE_LIST_START, index = 0;
-	     instance != BT_GATT_OTS_INSTANCE_LIST_END;
-	     instance++, index++) {
+	     instance != BT_GATT_OTS_INSTANCE_LIST_END; instance++, index++) {
 		/* Assign an object pool to the OTS instance. */
 		instance->obj_manager = bt_gatt_ots_obj_manager_assign();
 		if (!instance->obj_manager) {

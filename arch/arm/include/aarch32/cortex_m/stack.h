@@ -42,7 +42,7 @@ static ALWAYS_INLINE void z_arm_interrupt_stack_setup(void)
 {
 	uint32_t msp =
 		(uint32_t)(Z_KERNEL_STACK_BUFFER(z_interrupt_stacks[0])) +
-			   K_KERNEL_STACK_SIZEOF(z_interrupt_stacks[0]);
+		K_KERNEL_STACK_SIZEOF(z_interrupt_stacks[0]);
 
 	__set_MSP(msp);
 #if defined(CONFIG_BUILTIN_STACK_GUARD)

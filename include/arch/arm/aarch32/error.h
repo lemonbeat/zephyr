@@ -32,27 +32,27 @@ extern "C" {
  * schedule a new thread until they are unlocked which is not what we want.
  * Force them unlocked as well.
  */
-#define ARCH_EXCEPT(reason_p) \
-register uint32_t r0 __asm__("r0") = reason_p; \
-do { \
-	__asm__ volatile ( \
-		"cpsie i\n\t" \
-		"svc %[id]\n\t" \
-		: \
-		: "r" (r0), [id] "i" (_SVC_CALL_RUNTIME_EXCEPT) \
-		: "memory"); \
-} while (false)
+#define ARCH_EXCEPT(reason_p)                                                  \
+	register uint32_t r0 __asm__("r0") = reason_p;                         \
+	do {                                                                   \
+		__asm__ volatile("cpsie i\n\t"                                 \
+				 "svc %[id]\n\t"                               \
+				 :                                             \
+				 : "r"(r0), [id] "i"(_SVC_CALL_RUNTIME_EXCEPT) \
+				 : "memory");                                  \
+	} while (false)
 #elif defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
-#define ARCH_EXCEPT(reason_p) do { \
-	__asm__ volatile ( \
-		"eors.n r0, r0\n\t" \
-		"msr BASEPRI, r0\n\t" \
-		"mov r0, %[reason]\n\t" \
-		"svc %[id]\n\t" \
-		: \
-		: [reason] "i" (reason_p), [id] "i" (_SVC_CALL_RUNTIME_EXCEPT) \
-		: "memory"); \
-} while (false)
+#define ARCH_EXCEPT(reason_p)                                         \
+	do {                                                          \
+		__asm__ volatile("eors.n r0, r0\n\t"                  \
+				 "msr BASEPRI, r0\n\t"                \
+				 "mov r0, %[reason]\n\t"              \
+				 "svc %[id]\n\t"                      \
+				 :                                    \
+				 : [reason] "i"(reason_p),            \
+				   [id] "i"(_SVC_CALL_RUNTIME_EXCEPT) \
+				 : "memory");                         \
+	} while (false)
 #elif defined(CONFIG_ARMV7_R)
 /* Pick up the default definition in kernel.h for now */
 #else

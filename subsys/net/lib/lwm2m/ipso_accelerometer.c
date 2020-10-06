@@ -27,27 +27,27 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define ADD_TIMESTAMPS 0
 #endif
 /* Server resource IDs */
-#define ACCEL_X_VALUE_ID			5702
-#define ACCEL_Y_VALUE_ID			5703
-#define ACCEL_Z_VALUE_ID			5704
-#define ACCEL_SENSOR_UNITS_ID			5701
-#define ACCEL_MIN_RANGE_VALUE_ID		5603
-#define ACCEL_MAX_RANGE_VALUE_ID		5604
+#define ACCEL_X_VALUE_ID 5702
+#define ACCEL_Y_VALUE_ID 5703
+#define ACCEL_Z_VALUE_ID 5704
+#define ACCEL_SENSOR_UNITS_ID 5701
+#define ACCEL_MIN_RANGE_VALUE_ID 5603
+#define ACCEL_MAX_RANGE_VALUE_ID 5604
 #if ADD_TIMESTAMPS
-#define ACCEL_TIMESTAMP_ID			5518
+#define ACCEL_TIMESTAMP_ID 5518
 
-#define ACCEL_MAX_ID		7
+#define ACCEL_MAX_ID 7
 #else
-#define ACCEL_MAX_ID		6
+#define ACCEL_MAX_ID 6
 #endif
 
-#define MAX_INSTANCE_COUNT	CONFIG_LWM2M_IPSO_ACCELEROMETER_INSTANCE_COUNT
+#define MAX_INSTANCE_COUNT CONFIG_LWM2M_IPSO_ACCELEROMETER_INSTANCE_COUNT
 
 /*
  * Calculate resource instances as follows:
  * start with ACCEL_MAX_ID
  */
-#define RESOURCE_INSTANCE_COUNT        (ACCEL_MAX_ID)
+#define RESOURCE_INSTANCE_COUNT (ACCEL_MAX_ID)
 
 /* resource state */
 struct ipso_accel_data {
@@ -75,8 +75,8 @@ static struct lwm2m_engine_obj_field fields[] = {
 
 static struct lwm2m_engine_obj_inst inst[MAX_INSTANCE_COUNT];
 static struct lwm2m_engine_res res[MAX_INSTANCE_COUNT][ACCEL_MAX_ID];
-static struct lwm2m_engine_res_inst
-		res_inst[MAX_INSTANCE_COUNT][RESOURCE_INSTANCE_COUNT];
+static struct lwm2m_engine_res_inst res_inst[MAX_INSTANCE_COUNT]
+					    [RESOURCE_INSTANCE_COUNT];
 
 static struct lwm2m_engine_obj_inst *accel_create(uint16_t obj_inst_id)
 {
@@ -86,7 +86,8 @@ static struct lwm2m_engine_obj_inst *accel_create(uint16_t obj_inst_id)
 	for (index = 0; index < ARRAY_SIZE(inst); index++) {
 		if (inst[index].obj && inst[index].obj_inst_id == obj_inst_id) {
 			LOG_ERR("Can not create instance - "
-				"already existing: %u", obj_inst_id);
+				"already existing: %u",
+				obj_inst_id);
 			return NULL;
 		}
 
@@ -122,16 +123,14 @@ static struct lwm2m_engine_obj_inst *accel_create(uint16_t obj_inst_id)
 	INIT_OBJ_RES_OPTDATA(ACCEL_SENSOR_UNITS_ID, res[avail], i,
 			     res_inst[avail], j);
 	INIT_OBJ_RES_DATA(ACCEL_MIN_RANGE_VALUE_ID, res[avail], i,
-			  res_inst[avail], j,
-			  &accel_data[avail].min_range,
+			  res_inst[avail], j, &accel_data[avail].min_range,
 			  sizeof(accel_data[avail].min_range));
 	INIT_OBJ_RES_DATA(ACCEL_MAX_RANGE_VALUE_ID, res[avail], i,
-			  res_inst[avail], j,
-			  &accel_data[avail].max_range,
+			  res_inst[avail], j, &accel_data[avail].max_range,
 			  sizeof(accel_data[avail].max_range));
 #if ADD_TIMESTAMPS
-	INIT_OBJ_RES_OPTDATA(ACCEL_TIMESTAMP_ID, res[avail], i,
-			     res_inst[avail], j);
+	INIT_OBJ_RES_OPTDATA(ACCEL_TIMESTAMP_ID, res[avail], i, res_inst[avail],
+			     j);
 #endif
 
 	inst[avail].resources = res[avail];

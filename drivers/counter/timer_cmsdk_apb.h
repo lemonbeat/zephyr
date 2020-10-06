@@ -27,11 +27,11 @@ struct timer_cmsdk_apb {
 	};
 };
 
-#define TIMER_CTRL_IRQ_EN       (1 << 3)
-#define TIMER_CTRL_SEL_EXT_CLK  (1 << 2)
-#define TIMER_CTRL_SEL_EXT_EN   (1 << 1)
-#define TIMER_CTRL_EN           (1 << 0)
-#define TIMER_CTRL_INT_CLEAR    (1 << 0)
+#define TIMER_CTRL_IRQ_EN (1 << 3)
+#define TIMER_CTRL_SEL_EXT_CLK (1 << 2)
+#define TIMER_CTRL_SEL_EXT_EN (1 << 1)
+#define TIMER_CTRL_EN (1 << 0)
+#define TIMER_CTRL_INT_CLEAR (1 << 0)
 
 #ifdef __cplusplus
 }

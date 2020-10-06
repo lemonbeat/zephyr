@@ -50,52 +50,52 @@ struct soc_esf {
 #endif
 
 struct __esf {
-	ulong_t ra;		/* return address */
-	ulong_t gp;		/* global pointer */
-	ulong_t tp;		/* thread pointer */
+	ulong_t ra; /* return address */
+	ulong_t gp; /* global pointer */
+	ulong_t tp; /* thread pointer */
 
-	ulong_t t0;		/* Caller-saved temporary register */
-	ulong_t t1;		/* Caller-saved temporary register */
-	ulong_t t2;		/* Caller-saved temporary register */
-	ulong_t t3;		/* Caller-saved temporary register */
-	ulong_t t4;		/* Caller-saved temporary register */
-	ulong_t t5;		/* Caller-saved temporary register */
-	ulong_t t6;		/* Caller-saved temporary register */
+	ulong_t t0; /* Caller-saved temporary register */
+	ulong_t t1; /* Caller-saved temporary register */
+	ulong_t t2; /* Caller-saved temporary register */
+	ulong_t t3; /* Caller-saved temporary register */
+	ulong_t t4; /* Caller-saved temporary register */
+	ulong_t t5; /* Caller-saved temporary register */
+	ulong_t t6; /* Caller-saved temporary register */
 
-	ulong_t a0;		/* function argument/return value */
-	ulong_t a1;		/* function argument */
-	ulong_t a2;		/* function argument */
-	ulong_t a3;		/* function argument */
-	ulong_t a4;		/* function argument */
-	ulong_t a5;		/* function argument */
-	ulong_t a6;		/* function argument */
-	ulong_t a7;		/* function argument */
+	ulong_t a0; /* function argument/return value */
+	ulong_t a1; /* function argument */
+	ulong_t a2; /* function argument */
+	ulong_t a3; /* function argument */
+	ulong_t a4; /* function argument */
+	ulong_t a5; /* function argument */
+	ulong_t a6; /* function argument */
+	ulong_t a7; /* function argument */
 
-	ulong_t mepc;		/* machine exception program counter */
-	ulong_t mstatus;	/* machine status register */
+	ulong_t mepc; /* machine exception program counter */
+	ulong_t mstatus; /* machine status register */
 
 #if defined(CONFIG_FPU) && defined(CONFIG_FPU_SHARING)
-	ulong_t fp_state;	/* Floating-point saved context state. */
-	RV_FP_TYPE ft0;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft1;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft2;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft3;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft4;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft5;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft6;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft7;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft8;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft9;		/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft10;	/* Caller-saved temporary floating register */
-	RV_FP_TYPE ft11;	/* Caller-saved temporary floating register */
-	RV_FP_TYPE fa0;		/* function argument/return value */
-	RV_FP_TYPE fa1;		/* function argument/return value */
-	RV_FP_TYPE fa2;		/* function argument */
-	RV_FP_TYPE fa3;		/* function argument */
-	RV_FP_TYPE fa4;		/* function argument */
-	RV_FP_TYPE fa5;		/* function argument */
-	RV_FP_TYPE fa6;		/* function argument */
-	RV_FP_TYPE fa7;		/* function argument */
+	ulong_t fp_state; /* Floating-point saved context state. */
+	RV_FP_TYPE ft0; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft1; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft2; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft3; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft4; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft5; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft6; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft7; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft8; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft9; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft10; /* Caller-saved temporary floating register */
+	RV_FP_TYPE ft11; /* Caller-saved temporary floating register */
+	RV_FP_TYPE fa0; /* function argument/return value */
+	RV_FP_TYPE fa1; /* function argument/return value */
+	RV_FP_TYPE fa2; /* function argument */
+	RV_FP_TYPE fa3; /* function argument */
+	RV_FP_TYPE fa4; /* function argument */
+	RV_FP_TYPE fa5; /* function argument */
+	RV_FP_TYPE fa6; /* function argument */
+	RV_FP_TYPE fa7; /* function argument */
 #endif
 
 #ifdef CONFIG_RISCV_SOC_CONTEXT_SAVE

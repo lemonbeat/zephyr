@@ -51,11 +51,11 @@ struct shell_telnet {
 	bool output_lock;
 };
 
-#define SHELL_TELNET_DEFINE(_name)					\
-	static struct shell_telnet _name##_shell_telnet;		\
-	struct shell_transport _name = {				\
-		.api = &shell_telnet_transport_api,			\
-		.ctx = (struct shell_telnet *)&_name##_shell_telnet	\
+#define SHELL_TELNET_DEFINE(_name)                                  \
+	static struct shell_telnet _name##_shell_telnet;            \
+	struct shell_transport _name = {                            \
+		.api = &shell_telnet_transport_api,                 \
+		.ctx = (struct shell_telnet *)&_name##_shell_telnet \
 	}
 
 /**

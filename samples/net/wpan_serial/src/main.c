@@ -24,8 +24,8 @@ LOG_MODULE_REGISTER(wpan_serial, CONFIG_USB_DEVICE_LOG_LEVEL);
 #include <net_private.h>
 #include <net/ieee802154_radio.h>
 
-#define SLIP_END     0300
-#define SLIP_ESC     0333
+#define SLIP_END 0300
+#define SLIP_ESC 0333
 #define SLIP_ESC_END 0334
 #define SLIP_ESC_ESC 0335
 
@@ -104,8 +104,7 @@ static int slip_process_byte(unsigned char c)
 #endif
 
 	if (!pkt_curr) {
-		pkt_curr = net_pkt_rx_alloc_with_buffer(NULL, 256,
-							AF_UNSPEC, 0,
+		pkt_curr = net_pkt_rx_alloc_with_buffer(NULL, 256, AF_UNSPEC, 0,
 							K_NO_WAIT);
 		if (!pkt_curr) {
 			LOG_ERR("No more buffers");
@@ -165,8 +164,7 @@ static void send_data(uint8_t *cfg, uint8_t *data, size_t len)
 {
 	struct net_pkt *pkt;
 
-	pkt = net_pkt_alloc_with_buffer(NULL, len + 5,
-					AF_UNSPEC, 0, K_NO_WAIT);
+	pkt = net_pkt_alloc_with_buffer(NULL, len + 5, AF_UNSPEC, 0, K_NO_WAIT);
 	if (!pkt) {
 		LOG_DBG("No pkt available");
 		return;
@@ -204,7 +202,6 @@ static void get_ieee_addr(void)
 static void process_request(struct net_buf *buf)
 {
 	uint8_t cmd = net_buf_pull_u8(buf);
-
 
 	switch (cmd) {
 	case 'M':
@@ -252,8 +249,8 @@ static void process_data(struct net_pkt *pkt)
 	}
 
 	/* Transmit data through radio */
-	ret = radio_api->tx(ieee802154_dev, IEEE802154_TX_MODE_DIRECT,
-			    pkt, buf);
+	ret = radio_api->tx(ieee802154_dev, IEEE802154_TX_MODE_DIRECT, pkt,
+			    buf);
 	if (ret) {
 		LOG_ERR("Error transmit data");
 	}
@@ -413,8 +410,8 @@ static void init_rx_queue(void)
 
 	k_thread_create(&rx_thread_data, rx_stack,
 			K_THREAD_STACK_SIZEOF(rx_stack),
-			(k_thread_entry_t)rx_thread,
-			NULL, NULL, NULL, K_PRIO_COOP(8), 0, K_NO_WAIT);
+			(k_thread_entry_t)rx_thread, NULL, NULL, NULL,
+			K_PRIO_COOP(8), 0, K_NO_WAIT);
 }
 
 static void init_tx_queue(void)
@@ -423,8 +420,8 @@ static void init_tx_queue(void)
 
 	k_thread_create(&tx_thread_data, tx_stack,
 			K_THREAD_STACK_SIZEOF(tx_stack),
-			(k_thread_entry_t)tx_thread,
-			NULL, NULL, NULL, K_PRIO_COOP(8), 0, K_NO_WAIT);
+			(k_thread_entry_t)tx_thread, NULL, NULL, NULL,
+			K_PRIO_COOP(8), 0, K_NO_WAIT);
 }
 
 /**
@@ -450,7 +447,8 @@ static bool init_ieee802154(void)
 {
 	LOG_INF("Initialize ieee802.15.4");
 
-	ieee802154_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
+	ieee802154_dev =
+		device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
 	if (!ieee802154_dev) {
 		LOG_ERR("Cannot get ieee 802.15.4 device");
 		return false;
@@ -473,14 +471,12 @@ static bool init_ieee802154(void)
 		filter.short_addr = short_addr;
 
 		radio_api->filter(ieee802154_dev, true,
-				  IEEE802154_FILTER_TYPE_SHORT_ADDR,
-				  &filter);
+				  IEEE802154_FILTER_TYPE_SHORT_ADDR, &filter);
 
 		/* Set ieee address */
 		filter.ieee_addr = mac_addr;
 		radio_api->filter(ieee802154_dev, true,
-				  IEEE802154_FILTER_TYPE_IEEE_ADDR,
-				  &filter);
+				  IEEE802154_FILTER_TYPE_IEEE_ADDR, &filter);
 
 #ifdef CONFIG_NET_CONFIG_SETTINGS
 		LOG_INF("Set panid %x", CONFIG_NET_CONFIG_IEEE802154_PAN_ID);
@@ -488,8 +484,7 @@ static bool init_ieee802154(void)
 		filter.pan_id = CONFIG_NET_CONFIG_IEEE802154_PAN_ID;
 
 		radio_api->filter(ieee802154_dev, true,
-				  IEEE802154_FILTER_TYPE_PAN_ID,
-				  &filter);
+				  IEEE802154_FILTER_TYPE_PAN_ID, &filter);
 #endif /* CONFIG_NET_CONFIG_SETTINGS */
 	}
 

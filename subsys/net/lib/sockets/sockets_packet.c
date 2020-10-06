@@ -74,11 +74,9 @@ static int zpacket_socket(int family, int type, int proto)
 	return fd;
 }
 
-static void zpacket_received_cb(struct net_context *ctx,
-				struct net_pkt *pkt,
+static void zpacket_received_cb(struct net_context *ctx, struct net_pkt *pkt,
 				union net_ip_header *ip_hdr,
-				union net_proto_header *proto_hdr,
-				int status,
+				union net_proto_header *proto_hdr, int status,
 				void *user_data)
 {
 	NET_DBG("ctx=%p, pkt=%p, st=%d, user_data=%p", ctx, pkt, status,
@@ -111,8 +109,7 @@ static void zpacket_received_cb(struct net_context *ctx,
 }
 
 static int zpacket_bind_ctx(struct net_context *ctx,
-			    const struct sockaddr *addr,
-			    socklen_t addrlen)
+			    const struct sockaddr *addr, socklen_t addrlen)
 {
 	int ret = 0;
 
@@ -162,8 +159,8 @@ ssize_t zpacket_sendto_ctx(struct net_context *ctx, const void *buf, size_t len,
 		return -1;
 	}
 
-	status = net_context_sendto(ctx, buf, len, dest_addr, addrlen,
-				    NULL, timeout, ctx->user_data);
+	status = net_context_sendto(ctx, buf, len, dest_addr, addrlen, NULL,
+				    timeout, ctx->user_data);
 	if (status < 0) {
 		errno = -status;
 		return -1;
@@ -236,7 +233,6 @@ ssize_t zpacket_recvfrom_ctx(struct net_context *ctx, void *buf, size_t max_len,
 		return -1;
 	}
 
-
 	if (IS_ENABLED(CONFIG_NET_PKT_RXTIME_STATS) &&
 	    !(flags & ZSOCK_MSG_PEEK)) {
 		net_socket_update_tc_rx_time(pkt, k_cycle_get_32());
@@ -259,15 +255,15 @@ int zpacket_getsockopt_ctx(struct net_context *ctx, int level, int optname,
 		return -1;
 	}
 
-	return sock_fd_op_vtable.getsockopt(ctx, level, optname,
-					    optval, optlen);
+	return sock_fd_op_vtable.getsockopt(ctx, level, optname, optval,
+					    optlen);
 }
 
 int zpacket_setsockopt_ctx(struct net_context *ctx, int level, int optname,
-			const void *optval, socklen_t optlen)
+			   const void *optval, socklen_t optlen)
 {
-	return sock_fd_op_vtable.setsockopt(ctx, level, optname,
-					    optval, optlen);
+	return sock_fd_op_vtable.setsockopt(ctx, level, optname, optval,
+					    optlen);
 }
 
 static ssize_t packet_sock_read_vmeth(void *obj, void *buffer, size_t count)
@@ -337,8 +333,8 @@ static ssize_t packet_sock_recvfrom_vmeth(void *obj, void *buf, size_t max_len,
 					  int flags, struct sockaddr *src_addr,
 					  socklen_t *addrlen)
 {
-	return zpacket_recvfrom_ctx(obj, buf, max_len, flags,
-				    src_addr, addrlen);
+	return zpacket_recvfrom_ctx(obj, buf, max_len, flags, src_addr,
+				    addrlen);
 }
 
 static int packet_sock_getsockopt_vmeth(void *obj, int level, int optname,

@@ -26,9 +26,9 @@ int main(void)
 		}
 
 		printf("gettimeofday(): HI(tv_sec)=%d, LO(tv_sec)=%d, "
-		       "tv_usec=%d\n\t%s\n", (unsigned int)(tv.tv_sec >> 32),
-		       (unsigned int)tv.tv_sec, (unsigned int)tv.tv_usec,
-		       asctime(&tm));
+		       "tv_usec=%d\n\t%s\n",
+		       (unsigned int)(tv.tv_sec >> 32), (unsigned int)tv.tv_sec,
+		       (unsigned int)tv.tv_usec, asctime(&tm));
 		sleep(1);
 	}
 }

@@ -24,7 +24,6 @@
 #include "sdl_events.h"
 #include <sys/util.h>
 
-
 static uint64_t simu_time; /* The actual time as known by the HW models */
 static uint64_t end_of_time = NEVER; /* When will this device stop */
 
@@ -97,28 +96,25 @@ void hwm_set_sig_handler(void)
 	PC_SAFE_CALL(sigaction(SIGINT, &act, NULL));
 }
 
-
 static void hwm_sleep_until_next_timer(void)
 {
 	if (next_timer_time >= simu_time) { /* LCOV_EXCL_BR_LINE */
 		simu_time = next_timer_time;
 	} else {
 		/* LCOV_EXCL_START */
-		posix_print_warning("next_timer_time corrupted (%"PRIu64"<= %"
-				PRIu64", timer idx=%i)\n",
-				(uint64_t)next_timer_time,
-				(uint64_t)simu_time,
-				next_timer_index);
+		posix_print_warning("next_timer_time corrupted (%" PRIu64
+				    "<= %" PRIu64 ", timer idx=%i)\n",
+				    (uint64_t)next_timer_time,
+				    (uint64_t)simu_time, next_timer_index);
 		/* LCOV_EXCL_STOP */
 	}
 
 	if (signaled_end || (simu_time > end_of_time)) {
 		posix_print_trace("\nStopped at %.3Lfs\n",
-				((long double)simu_time)/1.0e6);
+				  ((long double)simu_time) / 1.0e6);
 		posix_exit(0);
 	}
 }
-
 
 /**
  * Find in between all timers which is the next one
@@ -127,9 +123,9 @@ static void hwm_sleep_until_next_timer(void)
 void hwm_find_next_timer(void)
 {
 	next_timer_index = 0;
-	next_timer_time  = *Timer_list[0];
+	next_timer_time = *Timer_list[0];
 
-	for (unsigned int i = 1; i < NUMBER_OF_TIMERS ; i++) {
+	for (unsigned int i = 1; i < NUMBER_OF_TIMERS; i++) {
 		if (next_timer_time > *Timer_list[i]) {
 			next_timer_index = i;
 			next_timer_time = *Timer_list[i];
@@ -164,7 +160,7 @@ void hwm_main_loop(void)
 		default:
 			/* LCOV_EXCL_START */
 			posix_print_error_and_exit(
-					"next_timer_index corrupted\n");
+				"next_timer_index corrupted\n");
 			break;
 			/* LCOV_EXCL_STOP */
 		}

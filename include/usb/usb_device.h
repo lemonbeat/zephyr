@@ -50,8 +50,9 @@ extern "C" {
  */
 #define USBD_DEVICE_DESCR_DEFINE(p) \
 	static __in_section(usb, descriptor_##p, 0) __used __aligned(1)
-#define USBD_CLASS_DESCR_DEFINE(p, instance) \
-	static __in_section(usb, descriptor_##p.1, instance) __used __aligned(1)
+#define USBD_CLASS_DESCR_DEFINE(p, instance)                  \
+	static __in_section(usb, descriptor_##p .1, instance) \
+		__used __aligned(1)
 #define USBD_MISC_DESCR_DEFINE(p) \
 	static __in_section(usb, descriptor_##p, 2) __used __aligned(1)
 #define USBD_USER_DESCR_DEFINE(p) \
@@ -72,10 +73,10 @@ extern "C" {
  *  USB configuration
  **************************************************************************/
 
-#define USB_MAX_CTRL_MPS	64   /**< maximum packet size (MPS) for EP 0 */
-#define USB_MAX_FS_BULK_MPS	64   /**< full speed MPS for bulk EP */
-#define USB_MAX_FS_INT_MPS	64   /**< full speed MPS for interrupt EP */
-#define USB_MAX_FS_ISO_MPS	1023 /**< full speed MPS for isochronous EP */
+#define USB_MAX_CTRL_MPS 64 /**< maximum packet size (MPS) for EP 0 */
+#define USB_MAX_FS_BULK_MPS 64 /**< full speed MPS for bulk EP */
+#define USB_MAX_FS_INT_MPS 64 /**< full speed MPS for interrupt EP */
+#define USB_MAX_FS_ISO_MPS 1023 /**< full speed MPS for isochronous EP */
 
 /*************************************************************************
  *  USB application interface
@@ -83,11 +84,11 @@ extern "C" {
 
 /** setup packet definitions */
 struct usb_setup_packet {
-	uint8_t bmRequestType;  /**< characteristics of the specific request */
-	uint8_t bRequest;       /**< specific request */
-	uint16_t wValue;        /**< request specific parameter */
-	uint16_t wIndex;        /**< request specific parameter */
-	uint16_t wLength;       /**< length of data transferred in data phase */
+	uint8_t bmRequestType; /**< characteristics of the specific request */
+	uint8_t bRequest; /**< specific request */
+	uint16_t wValue; /**< request specific parameter */
+	uint16_t wIndex; /**< request specific parameter */
+	uint16_t wLength; /**< length of data transferred in data phase */
 };
 
 /**
@@ -114,7 +115,8 @@ typedef void (*usb_ep_callback)(uint8_t ep,
  * data to be transmitted buffer respectively.
  */
 typedef int (*usb_request_handler)(struct usb_setup_packet *setup,
-				   int32_t *transfer_len, uint8_t **payload_data);
+				   int32_t *transfer_len,
+				   uint8_t **payload_data);
 
 /**
  * @brief Function for interface runtime configuration
@@ -265,7 +267,8 @@ int usb_disable(void);
  *
  * @return 0 on success, negative errno code on fail
  */
-int usb_write(uint8_t ep, const uint8_t *data, uint32_t data_len, uint32_t *bytes_ret);
+int usb_write(uint8_t ep, const uint8_t *data, uint32_t data_len,
+	      uint32_t *bytes_ret);
 
 /**
  * @brief Read data from the specified endpoint
@@ -284,7 +287,8 @@ int usb_write(uint8_t ep, const uint8_t *data, uint32_t data_len, uint32_t *byte
  *
  * @return  0 on success, negative errno code on fail
  */
-int usb_read(uint8_t ep, uint8_t *data, uint32_t max_data_len, uint32_t *ret_bytes);
+int usb_read(uint8_t ep, uint8_t *data, uint32_t max_data_len,
+	     uint32_t *ret_bytes);
 
 /**
  * @brief Set STALL condition on the specified endpoint
@@ -333,7 +337,6 @@ int usb_ep_clear_stall(uint8_t ep);
 int usb_ep_read_wait(uint8_t ep, uint8_t *data, uint32_t max_data_len,
 		     uint32_t *read_bytes);
 
-
 /**
  * @brief Continue reading data from the endpoint
  *
@@ -355,9 +358,9 @@ int usb_ep_read_continue(uint8_t ep);
 typedef void (*usb_transfer_callback)(uint8_t ep, int tsize, void *priv);
 
 /* USB transfer flags */
-#define USB_TRANS_READ       BIT(0)   /** Read transfer flag */
-#define USB_TRANS_WRITE      BIT(1)   /** Write transfer flag */
-#define USB_TRANS_NO_ZLP     BIT(2)   /** No zero-length packet flag */
+#define USB_TRANS_READ BIT(0) /** Read transfer flag */
+#define USB_TRANS_WRITE BIT(1) /** Write transfer flag */
+#define USB_TRANS_NO_ZLP BIT(2) /** No zero-length packet flag */
 
 /**
  * @brief Transfer management endpoint callback
@@ -401,7 +404,8 @@ int usb_transfer(uint8_t ep, uint8_t *data, size_t dlen, unsigned int flags,
  *
  * @return number of bytes transferred on success, negative errno code on fail.
  */
-int usb_transfer_sync(uint8_t ep, uint8_t *data, size_t dlen, unsigned int flags);
+int usb_transfer_sync(uint8_t ep, uint8_t *data, size_t dlen,
+		      unsigned int flags);
 
 /**
  * @brief Cancel any ongoing transfer on the specified endpoint

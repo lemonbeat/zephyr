@@ -32,12 +32,10 @@ void test_nanosleep_NULL_notNULL(void)
 	int r = nanosleep(NULL, &rem);
 
 	zassert_equal(r, -1, "actual: %d expected: %d", r, -1);
-	zassert_equal(errno, EFAULT, "actual: %d expected: %d",
-	errno, EFAULT);
-	zassert_equal(rem.tv_sec, 0, "actual: %d expected: %d",
-	rem.tv_sec, 0);
-	zassert_equal(rem.tv_nsec, 0, "actual: %d expected: %d",
-	rem.tv_nsec, 0);
+	zassert_equal(errno, EFAULT, "actual: %d expected: %d", errno, EFAULT);
+	zassert_equal(rem.tv_sec, 0, "actual: %d expected: %d", rem.tv_sec, 0);
+	zassert_equal(rem.tv_nsec, 0, "actual: %d expected: %d", rem.tv_nsec,
+		      0);
 }
 
 /**
@@ -52,10 +50,9 @@ void test_nanosleep_notNULL_NULL(void)
 	errno = 0;
 	int r = nanosleep(&req, NULL);
 
-	zassert_equal(req.tv_sec, 0, "actual: %d expected: %d",
-		req.tv_sec, 0);
-	zassert_equal(req.tv_nsec, 0, "actual: %d expected: %d",
-		req.tv_nsec, 0);
+	zassert_equal(req.tv_sec, 0, "actual: %d expected: %d", req.tv_sec, 0);
+	zassert_equal(req.tv_nsec, 0, "actual: %d expected: %d", req.tv_nsec,
+		      0);
 	zassert_equal(r, 0, "actual: %d expected: %d", r, -1);
 	zassert_equal(errno, 0, "actual: %d expected: %d", errno, 0);
 }
@@ -75,14 +72,12 @@ void test_nanosleep_notNULL_notNULL(void)
 
 	zassert_equal(r, 0, "actual: %d expected: %d", r, -1);
 	zassert_equal(errno, 0, "actual: %d expected: %d", errno, 0);
-	zassert_equal(req.tv_sec, 0, "actual: %d expected: %d",
-		req.tv_sec, 0);
-	zassert_equal(req.tv_nsec, 0, "actual: %d expected: %d",
-		req.tv_nsec, 0);
-	zassert_equal(rem.tv_sec, 0, "actual: %d expected: %d",
-		rem.tv_sec, 0);
-	zassert_equal(rem.tv_nsec, 0, "actual: %d expected: %d",
-		rem.tv_nsec, 0);
+	zassert_equal(req.tv_sec, 0, "actual: %d expected: %d", req.tv_sec, 0);
+	zassert_equal(req.tv_nsec, 0, "actual: %d expected: %d", req.tv_nsec,
+		      0);
+	zassert_equal(rem.tv_sec, 0, "actual: %d expected: %d", rem.tv_sec, 0);
+	zassert_equal(rem.tv_nsec, 0, "actual: %d expected: %d", rem.tv_nsec,
+		      0);
 }
 
 /**
@@ -93,23 +88,21 @@ void test_nanosleep_notNULL_notNULL(void)
  */
 void test_nanosleep_req_is_rem(void)
 {
-	struct timespec ts = {0, 1};
+	struct timespec ts = { 0, 1 };
 
 	errno = 0;
 	int r = nanosleep(&ts, &ts);
 
 	zassert_equal(r, 0, "actual: %d expected: %d", r, -1);
 	zassert_equal(errno, 0, "actual: %d expected: %d", errno, 0);
-	zassert_equal(ts.tv_sec, 0, "actual: %d expected: %d",
-		ts.tv_sec, 0);
-	zassert_equal(ts.tv_nsec, 0, "actual: %d expected: %d",
-		ts.tv_nsec, 0);
+	zassert_equal(ts.tv_sec, 0, "actual: %d expected: %d", ts.tv_sec, 0);
+	zassert_equal(ts.tv_nsec, 0, "actual: %d expected: %d", ts.tv_nsec, 0);
 }
 
 /** req tv_sec is -1 */
 void test_nanosleep_n1_0(void)
 {
-	struct timespec req = {-1, 0};
+	struct timespec req = { -1, 0 };
 
 	errno = 0;
 	int r = nanosleep(&req, NULL);
@@ -121,7 +114,7 @@ void test_nanosleep_n1_0(void)
 /** req tv_nsec is -1 */
 void test_nanosleep_0_n1(void)
 {
-	struct timespec req = {0, -1};
+	struct timespec req = { 0, -1 };
 
 	errno = 0;
 	int r = nanosleep(&req, NULL);
@@ -133,7 +126,7 @@ void test_nanosleep_0_n1(void)
 /** req tv_sec and tv_nsec are both -1 */
 void test_nanosleep_n1_n1(void)
 {
-	struct timespec req = {-1, -1};
+	struct timespec req = { -1, -1 };
 
 	errno = 0;
 	int r = nanosleep(&req, NULL);
@@ -145,7 +138,7 @@ void test_nanosleep_n1_n1(void)
 /** req tv_sec is 0 tv_nsec is 10^9 */
 void test_nanosleep_0_1000000000(void)
 {
-	struct timespec req = {0, 1000000000};
+	struct timespec req = { 0, 1000000000 };
 
 	errno = 0;
 	int r = nanosleep(&req, NULL);
@@ -159,8 +152,8 @@ static void common(const uint32_t s, uint32_t ns)
 	uint32_t then;
 	uint32_t now;
 	int r;
-	struct timespec req = {s, ns};
-	struct timespec rem = {0, 0};
+	struct timespec req = { s, ns };
+	struct timespec rem = { 0, 0 };
 
 	errno = 0;
 	then = k_cycle_get_32();
@@ -169,14 +162,12 @@ static void common(const uint32_t s, uint32_t ns)
 
 	zassert_equal(r, 0, "actual: %d expected: %d", r, -1);
 	zassert_equal(errno, 0, "actual: %d expected: %d", errno, 0);
-	zassert_equal(req.tv_sec, s, "actual: %d expected: %d",
-		req.tv_sec, s);
-	zassert_equal(req.tv_nsec, ns, "actual: %d expected: %d",
-		req.tv_nsec, ns);
-	zassert_equal(rem.tv_sec, 0, "actual: %d expected: %d",
-	rem.tv_sec, 0);
-	zassert_equal(rem.tv_nsec, 0, "actual: %d expected: %d",
-		rem.tv_nsec, 0);
+	zassert_equal(req.tv_sec, s, "actual: %d expected: %d", req.tv_sec, s);
+	zassert_equal(req.tv_nsec, ns, "actual: %d expected: %d", req.tv_nsec,
+		      ns);
+	zassert_equal(rem.tv_sec, 0, "actual: %d expected: %d", rem.tv_sec, 0);
+	zassert_equal(rem.tv_nsec, 0, "actual: %d expected: %d", rem.tv_nsec,
+		      0);
 
 	uint64_t actual_ns = k_cyc_to_ns_ceil64((now - then));
 	uint64_t exp_ns = (uint64_t)s * NSEC_PER_SEC + ns;
@@ -184,8 +175,8 @@ static void common(const uint32_t s, uint32_t ns)
 	exp_ns = ceiling_fraction(exp_ns, NSEC_PER_USEC) * NSEC_PER_USEC;
 
 	/* lower bounds check */
-	zassert_true(actual_ns >= exp_ns,
-		"actual: %llu expected: %llu", actual_ns, exp_ns);
+	zassert_true(actual_ns >= exp_ns, "actual: %llu expected: %llu",
+		     actual_ns, exp_ns);
 
 	/* TODO: Upper bounds check when hr timers are available */
 }

@@ -62,8 +62,8 @@ int arch_float_disable(struct k_thread *thread)
 #endif /* CONFIG_FPU && CONFIG_FPU_SHARING */
 
 void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
-		     char *stack_ptr, k_thread_entry_t entry,
-		     void *p1, void *p2, void *p3)
+		     char *stack_ptr, k_thread_entry_t entry, void *p1,
+		     void *p2, void *p3)
 {
 	void *swap_entry;
 	struct _x86_initial_frame *initial_frame;
@@ -79,8 +79,8 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
 #endif
 
 	/* Create an initial context on the stack expected by z_swap() */
-	initial_frame = Z_STACK_PTR_TO_FRAME(struct _x86_initial_frame,
-					     stack_ptr);
+	initial_frame =
+		Z_STACK_PTR_TO_FRAME(struct _x86_initial_frame, stack_ptr);
 
 	/* z_thread_entry() arguments */
 	initial_frame->entry = entry;
@@ -115,14 +115,13 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
 void arch_switch_to_main_thread(struct k_thread *main_thread, char *stack_ptr,
 				k_thread_entry_t _main)
 {
-	struct k_thread *dummy_thread = (struct k_thread *)
-		ROUND_UP(Z_KERNEL_STACK_BUFFER(z_interrupt_stacks[0]),
-			 FP_REG_SET_ALIGN);
+	struct k_thread *dummy_thread = (struct k_thread *)ROUND_UP(
+		Z_KERNEL_STACK_BUFFER(z_interrupt_stacks[0]), FP_REG_SET_ALIGN);
 
 	__ASSERT(((uintptr_t)(&dummy_thread->arch.preempFloatReg) %
 		  FP_REG_SET_ALIGN) == 0,
-		 "unaligned dummy thread %p float member %p",
-		 dummy_thread, &dummy_thread->arch.preempFloatReg);
+		 "unaligned dummy thread %p float member %p", dummy_thread,
+		 &dummy_thread->arch.preempFloatReg);
 
 	z_dummy_thread_init(dummy_thread);
 	z_swap_unlocked();

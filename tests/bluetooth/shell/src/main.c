@@ -36,14 +36,13 @@ static bool hrs_simulate;
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
+	BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
 };
 
-static int cmd_hrs_simulate(const struct shell *shell,
-			    size_t argc, char *argv[])
+static int cmd_hrs_simulate(const struct shell *shell, size_t argc,
+			    char *argv[])
 {
 	static bool hrs_registered;
 	int err;
@@ -55,8 +54,10 @@ static int cmd_hrs_simulate(const struct shell *shell,
 			err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad,
 					      ARRAY_SIZE(ad), NULL, 0);
 			if (err) {
-				shell_error(shell, "Advertising failed to start"
-					    " (err %d)\n", err);
+				shell_error(shell,
+					    "Advertising failed to start"
+					    " (err %d)\n",
+					    err);
 				return -ENOEXEC;
 			}
 
@@ -86,14 +87,15 @@ static int cmd_hrs_simulate(const struct shell *shell,
 #define HELP_NONE "[none]"
 #define HELP_ADDR_LE "<address: XX:XX:XX:XX:XX:XX> <type: (public|random)>"
 
-SHELL_STATIC_SUBCMD_SET_CREATE(hrs_cmds,
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	hrs_cmds,
 #if defined(CONFIG_BT_HRS)
-	SHELL_CMD_ARG(simulate, NULL,
+	SHELL_CMD_ARG(
+		simulate, NULL,
 		"register and simulate Heart Rate Service <value: on, off>",
 		cmd_hrs_simulate, 2, 0),
 #endif /* CONFIG_BT_HRS*/
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_SUBCMD_SET_END);
 
 static int cmd_hrs(const struct shell *shell, size_t argc, char **argv)
 {

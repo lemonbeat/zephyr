@@ -18,13 +18,13 @@
  * all available CPU cores and provides a synchronized timer under SMP.
  */
 
-#define TIMER		0
-#define TIMER_IRQ	DSP_WCT_IRQ(TIMER)
-#define CYC_PER_TICK	(CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC	\
-			/ CONFIG_SYS_CLOCK_TICKS_PER_SEC)
-#define MAX_CYC		0xFFFFFFFFUL
-#define MAX_TICKS	((MAX_CYC - CYC_PER_TICK) / CYC_PER_TICK)
-#define MIN_DELAY	(CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC / 100000)
+#define TIMER 0
+#define TIMER_IRQ DSP_WCT_IRQ(TIMER)
+#define CYC_PER_TICK \
+	(CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC / CONFIG_SYS_CLOCK_TICKS_PER_SEC)
+#define MAX_CYC 0xFFFFFFFFUL
+#define MAX_TICKS ((MAX_CYC - CYC_PER_TICK) / CYC_PER_TICK)
+#define MIN_DELAY (CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC / 100000)
 
 BUILD_ASSERT(MIN_DELAY < CYC_PER_TICK);
 
@@ -172,9 +172,9 @@ void smp_timer_init(void)
 	 * FIXME: Done in this way because we don't have an API
 	 * to enable interrupts per CPU.
 	 */
-	sys_set_bit(DT_REG_ADDR(DT_NODELABEL(cavs0))
-			+ CAVS_ICTL_INT_CPU_OFFSET(arch_curr_cpu()->id)
-			+ 0x04,
+	sys_set_bit(DT_REG_ADDR(DT_NODELABEL(cavs0)) +
+			    CAVS_ICTL_INT_CPU_OFFSET(arch_curr_cpu()->id) +
+			    0x04,
 		    22 + TIMER);
 	irq_enable(XTENSA_IRQ_NUMBER(TIMER_IRQ));
 }

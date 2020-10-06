@@ -20,12 +20,12 @@ LOG_MODULE_REGISTER(kscan_mchp_xec);
 #define MAX_MATRIX_KEY_COLS CONFIG_KSCAN_XEC_COLUMN_SIZE
 #define MAX_MATRIX_KEY_ROWS CONFIG_KSCAN_XEC_ROW_SIZE
 
-#define KEYBOARD_COLUMN_DRIVE_ALL       -2
-#define KEYBOARD_COLUMN_DRIVE_NONE      -1
+#define KEYBOARD_COLUMN_DRIVE_ALL -2
+#define KEYBOARD_COLUMN_DRIVE_NONE -1
 
 /* Poll period/debouncing rely onthe 32KHz clock with 30 usec clock cycles */
 #define CLOCK_32K_HW_CYCLES_TO_US(X) \
-	(uint32_t)((((uint64_t)(X) * 1000000U) / sys_clock_hw_cycles_per_sec()))
+	(uint32_t)((((uint64_t)(X)*1000000U) / sys_clock_hw_cycles_per_sec()))
 /* Milliseconds in microseconds */
 #define MSEC_PER_MS 1000U
 /* Number of tracked scan times */
@@ -57,8 +57,7 @@ struct kscan_xec_data {
 	K_KERNEL_STACK_MEMBER(thread_stack, TASK_STACK_SIZE);
 };
 
-static KSCAN_Type *base = (KSCAN_Type *)
-	(DT_INST_REG_ADDR(0));
+static KSCAN_Type *base = (KSCAN_Type *)(DT_INST_REG_ADDR(0));
 
 static struct kscan_xec_data kbd_data;
 
@@ -102,11 +101,11 @@ static bool is_matrix_ghosting(const uint8_t *state)
 	 * w, q and a simultaneously. A block can also be formed,
 	 * with not adjacent columns.
 	 */
-	for (int c = 0; c <  MAX_MATRIX_KEY_COLS; c++) {
+	for (int c = 0; c < MAX_MATRIX_KEY_COLS; c++) {
 		if (!state[c])
 			continue;
 
-		for (int c_n = c + 1; c_n <  MAX_MATRIX_KEY_COLS; c_n++) {
+		for (int c_n = c + 1; c_n < MAX_MATRIX_KEY_COLS; c_n++) {
 			/* we and the columns to detect a "block".
 			 * this is an indication of ghosting, due to current
 			 * flowing from a key which was never pressed. in our
@@ -157,9 +156,9 @@ static void scan_matrix_xec_isr(const void *arg)
 
 static bool check_key_events(const struct device *dev)
 {
-	uint8_t matrix_new_state[MAX_MATRIX_KEY_COLS] = {0U};
+	uint8_t matrix_new_state[MAX_MATRIX_KEY_COLS] = { 0U };
 	bool key_pressed = false;
-	uint32_t cycles_now  = k_cycle_get_32();
+	uint32_t cycles_now = k_cycle_get_32();
 
 	if (++kbd_data.scan_cycles_idx >= SCAN_OCURRENCES)
 		kbd_data.scan_cycles_idx = 0U;
@@ -183,7 +182,7 @@ static bool check_key_events(const struct device *dev)
 	for (int c = 0; c < MAX_MATRIX_KEY_COLS; c++) {
 		/* Check if there was an update from the previous scan */
 		row_changed = matrix_new_state[c] ^
-					kbd_data.matrix_previous_state[c];
+			      kbd_data.matrix_previous_state[c];
 
 		if (!row_changed)
 			continue;
@@ -217,12 +216,14 @@ static bool check_key_events(const struct device *dev)
 				continue;
 
 			/* Convert the clock cycle differences to usec */
-			uint32_t debt = CLOCK_32K_HW_CYCLES_TO_US(cycles_now -
-			kbd_data.scan_clk_cycle[kbd_data.scan_cycle_idx[c][r]]);
+			uint32_t debt = CLOCK_32K_HW_CYCLES_TO_US(
+				cycles_now -
+				kbd_data.scan_clk_cycle
+					[kbd_data.scan_cycle_idx[c][r]]);
 
 			/* Does the key requires more time to be debounced? */
 			if (debt < (row_bit ? kbd_data.deb_time_press :
-						kbd_data.deb_time_rel)) {
+						    kbd_data.deb_time_rel)) {
 				/* Need more time to debounce */
 				continue;
 			}
@@ -230,11 +231,10 @@ static bool check_key_events(const struct device *dev)
 			kbd_data.matrix_unstable_state[c] &= ~row_bit;
 
 			/* Check if there was a change in the stable state */
-			if ((kbd_data.matrix_stable_state[c] & mask)
-								== row_bit) {
+			if ((kbd_data.matrix_stable_state[c] & mask) ==
+			    row_bit) {
 				/* Key state did not change */
 				continue;
-
 			}
 
 			/* The current row has been debounced, therefore update
@@ -244,7 +244,7 @@ static bool check_key_events(const struct device *dev)
 			kbd_data.matrix_stable_state[c] ^= mask;
 			if (atomic_get(&kbd_data.enable_scan) == 1U) {
 				kbd_data.callback(dev, r, c,
-					      row_bit ? true : false);
+						  row_bit ? true : false);
 			}
 		}
 	}
@@ -259,14 +259,13 @@ static bool poll_expired(uint32_t start_cycles, int64_t *timeout)
 	uint32_t microsecs_spent;
 
 	stop_cycles = k_cycle_get_32();
-	cycles_spent =  stop_cycles - start_cycles;
+	cycles_spent = stop_cycles - start_cycles;
 	microsecs_spent = CLOCK_32K_HW_CYCLES_TO_US(cycles_spent);
 
 	/* Update the timeout value */
 	*timeout -= microsecs_spent;
 
 	return *timeout >= 0;
-
 }
 
 void polling_task(void *dummy1, void *dummy2, void *dummy3)
@@ -299,7 +298,7 @@ void polling_task(void *dummy1, void *dummy2, void *dummy3)
 				local_poll_timeout = kbd_data.poll_timeout;
 				start_poll_cycles = k_cycle_get_32();
 			} else if (!poll_expired(start_poll_cycles,
-					      &local_poll_timeout)) {
+						 &local_poll_timeout)) {
 				break;
 			}
 
@@ -309,8 +308,8 @@ void polling_task(void *dummy1, void *dummy2, void *dummy3)
 			 */
 			current_cycles = k_cycle_get_32();
 			cycles_diff = current_cycles - start_period_cycles;
-			wait_period =  kbd_data.poll_period -
-				CLOCK_32K_HW_CYCLES_TO_US(cycles_diff);
+			wait_period = kbd_data.poll_period -
+				      CLOCK_32K_HW_CYCLES_TO_US(cycles_diff);
 
 			/* Override wait_period in case it is less than 1 ms */
 			if (wait_period < MSEC_PER_MS)
@@ -333,7 +332,7 @@ void polling_task(void *dummy1, void *dummy2, void *dummy3)
 }
 
 static int kscan_xec_configure(const struct device *dev,
-				 kscan_callback_t callback)
+			       kscan_callback_t callback)
 {
 	ARG_UNUSED(dev);
 
@@ -374,12 +373,9 @@ static const struct kscan_driver_api kscan_xec_driver_api = {
 
 static int kscan_xec_init(const struct device *dev);
 
-DEVICE_AND_API_INIT(kscan_xec, DT_INST_LABEL(0),
-		    &kscan_xec_init,
-		    NULL, NULL,
+DEVICE_AND_API_INIT(kscan_xec, DT_INST_LABEL(0), &kscan_xec_init, NULL, NULL,
 		    POST_KERNEL, CONFIG_KSCAN_INIT_PRIORITY,
 		    &kscan_xec_driver_api);
-
 
 static int kscan_xec_init(const struct device *dev)
 {
@@ -392,20 +388,19 @@ static int kscan_xec_init(const struct device *dev)
 	base->KSI_IEN = MCHP_KSCAN_KSI_IEN_REG_MASK;
 
 	/* Time figures are transformed from msec to usec */
-	kbd_data.deb_time_press = (uint32_t)
-		(CONFIG_KSCAN_XEC_DEBOUNCE_DOWN * MSEC_PER_MS);
-	kbd_data.deb_time_rel = (uint32_t)
-		(CONFIG_KSCAN_XEC_DEBOUNCE_UP * MSEC_PER_MS);
-	kbd_data.poll_period = (uint32_t)
-		(CONFIG_KSCAN_XEC_POLL_PERIOD * MSEC_PER_MS);
+	kbd_data.deb_time_press =
+		(uint32_t)(CONFIG_KSCAN_XEC_DEBOUNCE_DOWN * MSEC_PER_MS);
+	kbd_data.deb_time_rel =
+		(uint32_t)(CONFIG_KSCAN_XEC_DEBOUNCE_UP * MSEC_PER_MS);
+	kbd_data.poll_period =
+		(uint32_t)(CONFIG_KSCAN_XEC_POLL_PERIOD * MSEC_PER_MS);
 	kbd_data.poll_timeout = 100 * MSEC_PER_MS;
 
 	k_sem_init(&kbd_data.poll_lock, 0, 1);
 	atomic_set(&kbd_data.enable_scan, 1);
 
 	k_thread_create(&kbd_data.thread, kbd_data.thread_stack,
-			TASK_STACK_SIZE,
-			polling_task, NULL, NULL, NULL,
+			TASK_STACK_SIZE, polling_task, NULL, NULL, NULL,
 			K_PRIO_COOP(4), 0, K_NO_WAIT);
 
 	/* Interrupts are enabled in the thread function */

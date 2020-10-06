@@ -42,8 +42,8 @@ extern int z_clock_driver_init(const struct device *device);
  * if undefined in the clock driver.
  */
 extern int z_clock_device_ctrl(const struct device *device,
-			       uint32_t ctrl_command,
-			       void *context, device_pm_cb cb, void *arg);
+			       uint32_t ctrl_command, void *context,
+			       device_pm_cb cb, void *arg);
 
 /**
  * @brief Set system clock timeout

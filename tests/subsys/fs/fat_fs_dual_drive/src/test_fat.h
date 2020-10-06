@@ -9,16 +9,16 @@
 #include <fs/fs.h>
 
 /* Make sure to match the drive name to ELM FAT Lib volume strings */
-#define FATFS_MNTP	"/RAM:"
-#define TEST_FILE	FATFS_MNTP"/testfile.txt"
-#define TEST_DIR	FATFS_MNTP"/testdir"
-#define TEST_DIR_FILE	FATFS_MNTP"/testdir/testfile.txt"
+#define FATFS_MNTP "/RAM:"
+#define TEST_FILE FATFS_MNTP "/testfile.txt"
+#define TEST_DIR FATFS_MNTP "/testdir"
+#define TEST_DIR_FILE FATFS_MNTP "/testdir/testfile.txt"
 
 /* Make sure to match the drive name to ELM FAT Lib volume strings */
-#define FATFS_MNTP1	"/CF:"
-#define TEST_FILE1	FATFS_MNTP1"/testfile.txt"
-#define TEST_DIR1	FATFS_MNTP1"/testdir"
-#define TEST_DIR_FILE1	FATFS_MNTP1"/testdir/testfile.txt"
+#define FATFS_MNTP1 "/CF:"
+#define TEST_FILE1 FATFS_MNTP1 "/testfile.txt"
+#define TEST_DIR1 FATFS_MNTP1 "/testdir"
+#define TEST_DIR_FILE1 FATFS_MNTP1 "/testdir/testfile.txt"
 
 extern struct fs_file_t filep;
 extern const char test_str[];

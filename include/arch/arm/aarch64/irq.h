@@ -55,17 +55,17 @@ void z_soc_irq_enable(unsigned int irq);
 void z_soc_irq_disable(unsigned int irq);
 int z_soc_irq_is_enabled(unsigned int irq);
 
-void z_soc_irq_priority_set(
-	unsigned int irq, unsigned int prio, unsigned int flags);
+void z_soc_irq_priority_set(unsigned int irq, unsigned int prio,
+			    unsigned int flags);
 
 unsigned int z_soc_irq_get_active(void);
 void z_soc_irq_eoi(unsigned int irq);
 
-#define arch_irq_enable(irq)		z_soc_irq_enable(irq)
-#define arch_irq_disable(irq)		z_soc_irq_disable(irq)
-#define arch_irq_is_enabled(irq)	z_soc_irq_is_enabled(irq)
+#define arch_irq_enable(irq) z_soc_irq_enable(irq)
+#define arch_irq_disable(irq) z_soc_irq_disable(irq)
+#define arch_irq_is_enabled(irq) z_soc_irq_is_enabled(irq)
 
-#define z_arm64_irq_priority_set(irq, prio, flags)	\
+#define z_arm64_irq_priority_set(irq, prio, flags) \
 	z_soc_irq_priority_set(irq, prio, flags)
 
 #endif /* !CONFIG_ARM_CUSTOM_INTERRUPT_CONTROLLER */
@@ -83,16 +83,16 @@ extern void z_arm64_interrupt_init(void);
  * runtime.
  */
 #define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-{ \
-	Z_ISR_DECLARE(irq_p, 0, isr_p, isr_param_p); \
-	z_arm64_irq_priority_set(irq_p, priority_p, flags_p); \
-}
+	{                                                                \
+		Z_ISR_DECLARE(irq_p, 0, isr_p, isr_param_p);             \
+		z_arm64_irq_priority_set(irq_p, priority_p, flags_p);    \
+	}
 
-#define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p) \
-{ \
-	Z_ISR_DECLARE(irq_p, ISR_FLAG_DIRECT, isr_p, NULL); \
-	z_arm64_irq_priority_set(irq_p, priority_p, flags_p); \
-}
+#define ARCH_IRQ_DIRECT_CONNECT(irq_p, priority_p, isr_p, flags_p)    \
+	{                                                             \
+		Z_ISR_DECLARE(irq_p, ISR_FLAG_DIRECT, isr_p, NULL);   \
+		z_arm64_irq_priority_set(irq_p, priority_p, flags_p); \
+	}
 
 /* Spurious interrupt handler. Throws an error if called */
 extern void z_irq_spurious(const void *unused);

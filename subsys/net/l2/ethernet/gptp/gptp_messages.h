@@ -28,12 +28,9 @@ extern "C" {
 #define GPTP_SIGNALING(pkt) ((struct gptp_signaling *)gptp_data(pkt))
 #define GPTP_SYNC(pkt) ((struct gptp_sync *)gptp_data(pkt))
 #define GPTP_FOLLOW_UP(pkt) ((struct gptp_follow_up *)gptp_data(pkt))
-#define GPTP_DELAY_REQ(pkt) \
-	((struct gptp_delay_req *)gptp_data(pkt))
-#define GPTP_PDELAY_REQ(pkt) \
-	((struct gptp_pdelay_req *)gptp_data(pkt))
-#define GPTP_PDELAY_RESP(pkt) \
-	((struct gptp_pdelay_resp *)gptp_data(pkt))
+#define GPTP_DELAY_REQ(pkt) ((struct gptp_delay_req *)gptp_data(pkt))
+#define GPTP_PDELAY_REQ(pkt) ((struct gptp_pdelay_req *)gptp_data(pkt))
+#define GPTP_PDELAY_RESP(pkt) ((struct gptp_pdelay_resp *)gptp_data(pkt))
 #define GPTP_PDELAY_RESP_FOLLOWUP(pkt) \
 	((struct gptp_pdelay_resp_follow_up *)gptp_data(pkt))
 
@@ -45,11 +42,9 @@ extern "C" {
 #define GPTP_PACKET_LEN(pkt) net_pkt_get_len(pkt)
 #define GPTP_VALID_LEN(pkt, len) \
 	(len > (NET_ETH_MINIMAL_FRAME_SIZE - GPTP_L2_HDR_LEN(pkt)))
-#define GPTP_L2_HDR_LEN(pkt) \
-	((long)GPTP_HDR(pkt) - (long)NET_ETH_HDR(pkt))
+#define GPTP_L2_HDR_LEN(pkt) ((long)GPTP_HDR(pkt) - (long)NET_ETH_HDR(pkt))
 
-#define GPTP_SYNC_LEN \
-	(sizeof(struct gptp_hdr) + sizeof(struct gptp_sync))
+#define GPTP_SYNC_LEN (sizeof(struct gptp_hdr) + sizeof(struct gptp_sync))
 #define GPTP_FOLLOW_UP_LEN \
 	(sizeof(struct gptp_hdr) + sizeof(struct gptp_follow_up))
 #define GPTP_PDELAY_REQ_LEN \
@@ -65,55 +60,55 @@ extern "C" {
  * indicates the length of the TLV not accounting for tlvType and lengthField
  * which are 4 bytes.
  */
-#define GPTP_ANNOUNCE_LEN(pkt) \
-	(sizeof(struct gptp_hdr) + sizeof(struct gptp_announce) \
-	 + ntohs(GPTP_ANNOUNCE(pkt)->tlv.len) \
-	 - sizeof(struct gptp_path_trace_tlv) + 4)
+#define GPTP_ANNOUNCE_LEN(pkt)                                    \
+	(sizeof(struct gptp_hdr) + sizeof(struct gptp_announce) + \
+	 ntohs(GPTP_ANNOUNCE(pkt)->tlv.len) -                     \
+	 sizeof(struct gptp_path_trace_tlv) + 4)
 
 #define GPTP_CHECK_LEN(pkt, len) \
 	((GPTP_PACKET_LEN(pkt) != len) && (GPTP_VALID_LEN(pkt, len)))
-#define GPTP_ANNOUNCE_CHECK_LEN(pkt) \
+#define GPTP_ANNOUNCE_CHECK_LEN(pkt)                         \
 	((GPTP_PACKET_LEN(pkt) != GPTP_ANNOUNCE_LEN(pkt)) && \
 	 (GPTP_VALID_LEN(pkt, GPTP_ANNOUNCE_LEN(pkt))))
 
 /* Header Flags. Byte 0. */
-#define GPTP_FLAG_ALT_MASTER        BIT(0)
-#define GPTP_FLAG_TWO_STEP          BIT(1)
-#define GPTP_FLAG_UNICAST           BIT(2)
+#define GPTP_FLAG_ALT_MASTER BIT(0)
+#define GPTP_FLAG_TWO_STEP BIT(1)
+#define GPTP_FLAG_UNICAST BIT(2)
 #define GPTP_FLAG_PROFILE_SPECIFIC1 BIT(5)
 #define GPTP_FLAG_PROFILE_SPECIFIC2 BIT(6)
 
 /* Header Flags. Byte 1. */
-#define GPTP_FLAG_LEAP61            BIT(0)
-#define GPTP_FLAG_LEAP59            BIT(1)
+#define GPTP_FLAG_LEAP61 BIT(0)
+#define GPTP_FLAG_LEAP59 BIT(1)
 #define GPTP_FLAG_CUR_UTC_OFF_VALID BIT(2)
-#define GPTP_FLAG_PTP_TIMESCALE     BIT(3)
-#define GPTP_FLAG_TIME_TRACEABLE    BIT(4)
-#define GPTP_FLAG_FREQ_TRACEABLE    BIT(5)
+#define GPTP_FLAG_PTP_TIMESCALE BIT(3)
+#define GPTP_FLAG_TIME_TRACEABLE BIT(4)
+#define GPTP_FLAG_FREQ_TRACEABLE BIT(5)
 
 /* Signaling Interval Flags. */
 #define GPTP_FLAG_COMPUTE_NEIGHBOR_RATE_RATIO 0x1
 #define GPTP_FLAG_COMPUTE_NEIGHBOR_PROP_DELAY 0x2
 
 /* Signaling Interval Values. */
-#define GPTP_ITV_KEEP               -128
-#define GPTP_ITV_SET_TO_INIT        126
-#define GPTP_ITV_STOP               127
+#define GPTP_ITV_KEEP -128
+#define GPTP_ITV_SET_TO_INIT 126
+#define GPTP_ITV_STOP 127
 
 /* Control. Only set for header compatibility with v1. */
-#define GPTP_SYNC_CONTROL_VALUE     0x0
-#define GPTP_FUP_CONTROL_VALUE      0x2
-#define GPTP_OTHER_CONTROL_VALUE    0x5
+#define GPTP_SYNC_CONTROL_VALUE 0x0
+#define GPTP_FUP_CONTROL_VALUE 0x2
+#define GPTP_OTHER_CONTROL_VALUE 0x5
 
 /* Other default values. */
-#define GPTP_RESP_LOG_MSG_ITV           0x7F
+#define GPTP_RESP_LOG_MSG_ITV 0x7F
 #define GPTP_ANNOUNCE_MSG_PATH_SEQ_TYPE htons(0x8)
 
 /* Organization Id used for TLV. */
-#define GPTP_FUP_TLV_ORG_ID_BYTE_0  0x00
-#define GPTP_FUP_TLV_ORG_ID_BYTE_1  0x80
-#define GPTP_FUP_TLV_ORG_ID_BYTE_2  0xC2
-#define GPTP_FUP_TLV_ORG_SUB_TYPE   0x01
+#define GPTP_FUP_TLV_ORG_ID_BYTE_0 0x00
+#define GPTP_FUP_TLV_ORG_ID_BYTE_1 0x80
+#define GPTP_FUP_TLV_ORG_ID_BYTE_2 0xC2
+#define GPTP_FUP_TLV_ORG_SUB_TYPE 0x01
 
 /**
  * @brief gPTP Clock Quality
@@ -157,7 +152,7 @@ struct gptp_path_trace_tlv {
 	uint16_t len;
 
 	/** ClockIdentity array of the successive time-aware systems. */
-	uint8_t  path_sequence[1][8];
+	uint8_t path_sequence[1][8];
 } __packed;
 
 struct gptp_announce {
@@ -292,8 +287,8 @@ struct gptp_message_itv_req_tlv {
 	/** Flags (computeNeighborRateRatio and computeNeighborPropDelay). */
 	union {
 		struct {
-		    uint8_t compute_neighbor_rate_ratio : 1;
-		    uint8_t compute_neighbor_prop_delay : 1;
+			uint8_t compute_neighbor_rate_ratio : 1;
+			uint8_t compute_neighbor_prop_delay : 1;
 		};
 		uint8_t flags;
 	};
@@ -358,8 +353,7 @@ struct net_pkt *gptp_prepare_pdelay_req(int port);
  *
  * @return Pointer to the prepared Network Buffer.
  */
-struct net_pkt *gptp_prepare_pdelay_resp(int port,
-		struct net_pkt *req);
+struct net_pkt *gptp_prepare_pdelay_resp(int port, struct net_pkt *req);
 
 /**
  * @brief Prepare Announce message.
@@ -378,8 +372,7 @@ struct net_pkt *gptp_prepare_announce(int port);
  *
  * @return Pointer to the prepared Network Buffer.
  */
-struct net_pkt *gptp_prepare_pdelay_follow_up(int port,
-		struct net_pkt *resp);
+struct net_pkt *gptp_prepare_pdelay_follow_up(int port, struct net_pkt *resp);
 
 /* Functions to handle received messages. */
 

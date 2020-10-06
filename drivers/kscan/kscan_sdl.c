@@ -97,7 +97,6 @@ static int sdl_init(const struct device *dev)
 	return 0;
 }
 
-
 static const struct kscan_driver_api sdl_driver_api = {
 	.config = sdl_configure,
 	.enable_callback = sdl_enable_callback,
@@ -106,7 +105,6 @@ static const struct kscan_driver_api sdl_driver_api = {
 
 static struct sdl_data sdl_data;
 
-DEVICE_AND_API_INIT(sdl, CONFIG_SDL_POINTER_KSCAN_DEV_NAME, sdl_init,
-		    &sdl_data, NULL,
-		    POST_KERNEL, CONFIG_KSCAN_INIT_PRIORITY,
+DEVICE_AND_API_INIT(sdl, CONFIG_SDL_POINTER_KSCAN_DEV_NAME, sdl_init, &sdl_data,
+		    NULL, POST_KERNEL, CONFIG_KSCAN_INIT_PRIORITY,
 		    &sdl_driver_api);

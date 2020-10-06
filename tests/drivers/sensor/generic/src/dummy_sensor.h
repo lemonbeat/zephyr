@@ -10,8 +10,8 @@
 #include <zephyr.h>
 #include <device.h>
 #include <drivers/sensor.h>
-#define DUMMY_SENSOR_NAME	"dummy_sensor"
-#define SENSOR_CHANNEL_NUM	5
+#define DUMMY_SENSOR_NAME "dummy_sensor"
+#define SENSOR_CHANNEL_NUM 5
 
 struct dummy_sensor_data {
 	sensor_trigger_handler_t handler;

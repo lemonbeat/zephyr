@@ -37,8 +37,8 @@
 static ALWAYS_INLINE void clock_init(void)
 {
 #if defined(CONFIG_SOC_LPC55S16) || defined(CONFIG_SOC_LPC55S69_CPU0)
-    /*!< Set up the clock sources */
-    /*!< Configure FRO192M */
+	/*!< Set up the clock sources */
+	/*!< Configure FRO192M */
 	/*!< Ensure FRO is on  */
 	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);
 	/*!< Set up FRO to the 12 MHz, just for sure */
@@ -52,14 +52,14 @@ static ALWAYS_INLINE void clock_init(void)
 	/*!< Set FLASH wait states for core */
 	CLOCK_SetFLASHAccessCyclesForFreq(96000000U);
 
-    /*!< Set up dividers */
+	/*!< Set up dividers */
 	CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false);
 
-    /*!< Set up clock selectors - Attach clocks to the peripheries */
+	/*!< Set up clock selectors - Attach clocks to the peripheries */
 	CLOCK_AttachClk(kFRO_HF_to_MAIN_CLK);
 
 	/* Enables the clock for the I/O controller.: Enable Clock. */
-    CLOCK_EnableClock(kCLOCK_Iocon);
+	CLOCK_EnableClock(kCLOCK_Iocon);
 
 #if DT_NODE_HAS_COMPAT_STATUS(DT_NODELABEL(flexcomm4), nxp_lpc_i2c, okay)
 	/* attach 12 MHz clock to FLEXCOMM4 */

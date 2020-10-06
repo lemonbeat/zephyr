@@ -35,8 +35,7 @@ static const char *now_str(void)
 	now /= 60U;
 	h = now;
 
-	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u",
-		 h, min, s, ms);
+	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u", h, min, s, ms);
 	return buf;
 }
 static void trigger_handler(const struct device *dev,
@@ -91,8 +90,7 @@ static int sensor_set_window(const struct device *dev,
 
 	if (rc == 0) {
 		printk("Alert on temp outside [%d, %d] mCel\n",
-		       low_ucel / UCEL_PER_MCEL,
-		       high_ucel / UCEL_PER_MCEL);
+		       low_ucel / UCEL_PER_MCEL, high_ucel / UCEL_PER_MCEL);
 	}
 
 	return rc;
@@ -149,7 +147,6 @@ static void process(const struct device *dev)
 		       sensor_value_to_double(&temp_val),
 		       reset_window ? ": NEED RESET" : "");
 
-
 		if (IS_ENABLED(CONFIG_ADT7420_TRIGGER)) {
 			if (reset_window) {
 				ret = sensor_set_window(dev, &temp_val);
@@ -171,7 +168,8 @@ static void process(const struct device *dev)
 
 void main(void)
 {
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, adi_adt7420)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, adi_adt7420)));
 
 	if (dev == NULL) {
 		printf("Failed to get device binding\n");

@@ -13,9 +13,9 @@
 
 #include "f32.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)120)
-#define REL_ERROR_THRESH	(1.0e-6)
-#define ABS_ERROR_THRESH	(1.0e-5)
+#define SNR_ERROR_THRESH ((float32_t)120)
+#define REL_ERROR_THRESH (1.0e-6)
+#define ABS_ERROR_THRESH (1.0e-5)
 
 static void test_arm_cos_f32(void)
 {
@@ -33,15 +33,13 @@ static void test_arm_cos_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref_cos,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref_cos,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref_cos,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref_cos,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -63,15 +61,13 @@ static void test_arm_sin_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref_sin,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref_sin,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref_sin,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref_sin,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -90,37 +86,36 @@ static void test_arm_sqrt_f32(void)
 
 	/* Run test function */
 	for (index = 0; index < length; index++) {
-		status = arm_sqrt_f32(
-			((float32_t *)in_sqrt)[index], &output[index]);
+		status = arm_sqrt_f32(((float32_t *)in_sqrt)[index],
+				      &output[index]);
 
 		/* Validate operation status */
 		if (((float32_t *)in_sqrt)[index] < 0.0f) {
-			zassert_equal(status, ARM_MATH_ARGUMENT_ERROR,
+			zassert_equal(
+				status, ARM_MATH_ARGUMENT_ERROR,
 				"square root did fail with an input value "
 				"of '0'");
 		} else {
 			zassert_equal(status, ARM_MATH_SUCCESS,
-				"square root operation did not succeed");
+				      "square root operation did not succeed");
 		}
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref_sqrt,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref_sqrt,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref_sqrt,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref_sqrt,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
 }
 
-static void test_arm_vlog_f32(
-	const uint32_t *input1, const uint32_t *ref, size_t length)
+static void test_arm_vlog_f32(const uint32_t *input1, const uint32_t *ref,
+			      size_t length)
 {
 	float32_t *output;
 
@@ -132,15 +127,13 @@ static void test_arm_vlog_f32(
 	arm_vlog_f32((float32_t *)input1, output, length);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -151,8 +144,8 @@ DEFINE_TEST_VARIANT3(arm_vlog_f32, 3, in_log, ref_log, 3);
 DEFINE_TEST_VARIANT3(arm_vlog_f32, 8, in_log, ref_log, 8);
 DEFINE_TEST_VARIANT3(arm_vlog_f32, 11, in_log, ref_log, 11);
 
-static void test_arm_vexp_f32(
-	const uint32_t *input1, const uint32_t *ref, size_t length)
+static void test_arm_vexp_f32(const uint32_t *input1, const uint32_t *ref,
+			      size_t length)
 {
 	float32_t *output;
 
@@ -164,15 +157,13 @@ static void test_arm_vexp_f32(
 	arm_vexp_f32((float32_t *)input1, output, length);
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free output buffer */
 	free(output);
@@ -185,19 +176,17 @@ DEFINE_TEST_VARIANT3(arm_vexp_f32, 11, in_exp, ref_exp, 11);
 
 void test_fastmath_f32(void)
 {
-	ztest_test_suite(fastmath_f32,
-		ztest_unit_test(test_arm_cos_f32),
-		ztest_unit_test(test_arm_sin_f32),
-		ztest_unit_test(test_arm_sqrt_f32),
-		ztest_unit_test(test_arm_vlog_f32_all),
-		ztest_unit_test(test_arm_vlog_f32_3),
-		ztest_unit_test(test_arm_vlog_f32_8),
-		ztest_unit_test(test_arm_vlog_f32_11),
-		ztest_unit_test(test_arm_vexp_f32_all),
-		ztest_unit_test(test_arm_vexp_f32_3),
-		ztest_unit_test(test_arm_vexp_f32_8),
-		ztest_unit_test(test_arm_vexp_f32_11)
-		);
+	ztest_test_suite(fastmath_f32, ztest_unit_test(test_arm_cos_f32),
+			 ztest_unit_test(test_arm_sin_f32),
+			 ztest_unit_test(test_arm_sqrt_f32),
+			 ztest_unit_test(test_arm_vlog_f32_all),
+			 ztest_unit_test(test_arm_vlog_f32_3),
+			 ztest_unit_test(test_arm_vlog_f32_8),
+			 ztest_unit_test(test_arm_vlog_f32_11),
+			 ztest_unit_test(test_arm_vexp_f32_all),
+			 ztest_unit_test(test_arm_vexp_f32_3),
+			 ztest_unit_test(test_arm_vexp_f32_8),
+			 ztest_unit_test(test_arm_vexp_f32_11));
 
 	ztest_run_test_suite(fastmath_f32);
 }

@@ -12,7 +12,7 @@
 LOG_MODULE_REGISTER(ipsp);
 
 /* Preventing log module registration in net_core.h */
-#define NET_LOG_ENABLED	0
+#define NET_LOG_ENABLED 0
 
 #include <zephyr.h>
 #include <linker/sections.h>
@@ -26,14 +26,28 @@ LOG_MODULE_REGISTER(ipsp);
 #include <net/udp.h>
 
 /* admin-local, dynamically allocated multicast address */
-#define MCAST_IP6ADDR { { { 0xff, 0x02, 0, 0, 0, 0, 0, 0, \
-			    0, 0, 0, 0, 0, 0, 0, 0x1 } } }
+#define MCAST_IP6ADDR                                                        \
+	{                                                                    \
+		{                                                            \
+			{                                                    \
+				0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+					0, 0, 0x1                            \
+			}                                                    \
+		}                                                            \
+	}
 
 struct in6_addr in6addr_mcast = MCAST_IP6ADDR;
 
 /* Define my IP address where to expect messages */
-#define MY_IP6ADDR { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, \
-			 0, 0, 0, 0, 0, 0, 0, 0x1 } } }
+#define MY_IP6ADDR                                                           \
+	{                                                                    \
+		{                                                            \
+			{                                                    \
+				0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, \
+					0, 0, 0, 0, 0x1                      \
+			}                                                    \
+		}                                                            \
+	}
 #define MY_PREFIX_LEN 64
 
 static struct in6_addr in6addr_my = MY_IP6ADDR;
@@ -74,8 +88,7 @@ static inline void init_app(void)
 
 	k_sem_init(&quit_lock, 0, UINT_MAX);
 
-	if (net_addr_pton(AF_INET6,
-			  CONFIG_NET_CONFIG_MY_IPV6_ADDR,
+	if (net_addr_pton(AF_INET6, CONFIG_NET_CONFIG_MY_IPV6_ADDR,
 			  &in6addr_my) < 0) {
 		LOG_ERR("Invalid IPv6 address %s",
 			CONFIG_NET_CONFIG_MY_IPV6_ADDR);
@@ -84,8 +97,8 @@ static inline void init_app(void)
 	do {
 		struct net_if_addr *ifaddr;
 
-		ifaddr = net_if_ipv6_addr_add(net_if_get_default(),
-					      &in6addr_my, NET_ADDR_MANUAL, 0);
+		ifaddr = net_if_ipv6_addr_add(net_if_get_default(), &in6addr_my,
+					      NET_ADDR_MANUAL, 0);
 	} while (0);
 
 	net_if_ipv6_maddr_add(net_if_get_default(), &in6addr_mcast);
@@ -158,9 +171,7 @@ static inline bool get_context(struct net_context **udp_recv6,
 	return true;
 }
 
-static int build_reply(const char *name,
-		       struct net_pkt *pkt,
-		       uint8_t *buf)
+static int build_reply(const char *name, struct net_pkt *pkt, uint8_t *buf)
 {
 	int reply_len = net_pkt_remaining_data(pkt);
 	int ret;
@@ -178,8 +189,7 @@ static int build_reply(const char *name,
 	return reply_len;
 }
 
-static inline void pkt_sent(struct net_context *context,
-			    int status,
+static inline void pkt_sent(struct net_context *context, int status,
 			    void *user_data)
 {
 	if (status >= 0) {
@@ -187,23 +197,19 @@ static inline void pkt_sent(struct net_context *context,
 	}
 }
 
-static inline void set_dst_addr(sa_family_t family,
-				struct net_pkt *pkt,
+static inline void set_dst_addr(sa_family_t family, struct net_pkt *pkt,
 				struct net_ipv6_hdr *ipv6_hdr,
 				struct net_udp_hdr *udp_hdr,
 				struct sockaddr *dst_addr)
 {
-	net_ipaddr_copy(&net_sin6(dst_addr)->sin6_addr,
-			&ipv6_hdr->src);
+	net_ipaddr_copy(&net_sin6(dst_addr)->sin6_addr, &ipv6_hdr->src);
 	net_sin6(dst_addr)->sin6_family = AF_INET6;
 	net_sin6(dst_addr)->sin6_port = udp_hdr->src_port;
 }
 
-static void udp_received(struct net_context *context,
-			 struct net_pkt *pkt,
+static void udp_received(struct net_context *context, struct net_pkt *pkt,
 			 union net_ip_header *ip_hdr,
-			 union net_proto_header *proto_hdr,
-			 int status,
+			 union net_proto_header *proto_hdr, int status,
 			 void *user_data)
 {
 	struct sockaddr dst_addr;
@@ -226,8 +232,8 @@ static void udp_received(struct net_context *context,
 
 	ret = net_context_sendto(context, buf_tx, ret, &dst_addr,
 				 family == AF_INET6 ?
-				 sizeof(struct sockaddr_in6) :
-				 sizeof(struct sockaddr_in),
+					       sizeof(struct sockaddr_in6) :
+					       sizeof(struct sockaddr_in),
 				 pkt_sent, K_NO_WAIT, user_data);
 	if (ret < 0) {
 		LOG_ERR("Cannot send data to peer (%d)", ret);
@@ -244,11 +250,9 @@ static void setup_udp_recv(struct net_context *udp_recv6)
 	}
 }
 
-static void tcp_received(struct net_context *context,
-			 struct net_pkt *pkt,
+static void tcp_received(struct net_context *context, struct net_pkt *pkt,
 			 union net_ip_header *ip_hdr,
-			 union net_proto_header *proto_hdr,
-			 int status,
+			 union net_proto_header *proto_hdr, int status,
 			 void *user_data)
 {
 	static char dbg[MAX_DBG_PRINT + 1];
@@ -273,19 +277,15 @@ static void tcp_received(struct net_context *context,
 
 	net_pkt_unref(pkt);
 
-	ret = net_context_send(context, buf_tx, ret, pkt_sent,
-			       K_NO_WAIT, NULL);
+	ret = net_context_send(context, buf_tx, ret, pkt_sent, K_NO_WAIT, NULL);
 	if (ret < 0) {
 		LOG_ERR("Cannot send data to peer (%d)", ret);
 		quit();
 	}
 }
 
-static void tcp_accepted(struct net_context *context,
-			 struct sockaddr *addr,
-			 socklen_t addrlen,
-			 int error,
-			 void *user_data)
+static void tcp_accepted(struct net_context *context, struct sockaddr *addr,
+			 socklen_t addrlen, int error, void *user_data)
 {
 	int ret;
 
@@ -340,6 +340,6 @@ void main(void)
 	init_app();
 
 	k_thread_create(&thread_data, thread_stack, STACKSIZE,
-			(k_thread_entry_t)listen,
-			NULL, NULL, NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+			(k_thread_entry_t)listen, NULL, NULL, NULL,
+			K_PRIO_COOP(7), 0, K_NO_WAIT);
 }

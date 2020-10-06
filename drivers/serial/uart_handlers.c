@@ -7,18 +7,18 @@
 #include <drivers/uart.h>
 #include <syscall_handler.h>
 
-#define UART_SIMPLE(op_) \
+#define UART_SIMPLE(op_)                                              \
 	static inline int z_vrfy_uart_##op_(const struct device *dev) \
-	{							\
-		Z_OOPS(Z_SYSCALL_DRIVER_UART(dev, op_)); \
-		return z_impl_uart_ ## op_(dev); \
+	{                                                             \
+		Z_OOPS(Z_SYSCALL_DRIVER_UART(dev, op_));              \
+		return z_impl_uart_##op_(dev);                        \
 	}
 
-#define UART_SIMPLE_VOID(op_) \
+#define UART_SIMPLE_VOID(op_)                                          \
 	static inline void z_vrfy_uart_##op_(const struct device *dev) \
-	{							 \
-		Z_OOPS(Z_SYSCALL_DRIVER_UART(dev, op_)); \
-		z_impl_uart_ ## op_(dev); \
+	{                                                              \
+		Z_OOPS(Z_SYSCALL_DRIVER_UART(dev, op_));               \
+		z_impl_uart_##op_(dev);                                \
 	}
 
 UART_SIMPLE(err_check)
@@ -80,8 +80,7 @@ static inline int z_vrfy_uart_tx(const struct device *dev, const uint8_t *buf,
 UART_SIMPLE(tx_abort);
 #include <syscalls/uart_tx_abort_mrsh.c>
 
-static inline int z_vrfy_uart_rx_enable(const struct device *dev,
-					uint8_t *buf,
+static inline int z_vrfy_uart_rx_enable(const struct device *dev, uint8_t *buf,
 					size_t len, int32_t timeout)
 {
 	Z_OOPS(Z_SYSCALL_DRIVER_UART(dev, rx_enable));
@@ -118,8 +117,7 @@ static inline int z_vrfy_uart_line_ctrl_set(const struct device *dev,
 					    uint32_t ctrl, uint32_t val)
 {
 	Z_OOPS(Z_SYSCALL_DRIVER_UART(dev, line_ctrl_set));
-	return z_impl_uart_line_ctrl_set((const struct device *)dev, ctrl,
-					 val);
+	return z_impl_uart_line_ctrl_set((const struct device *)dev, ctrl, val);
 }
 #include <syscalls/uart_line_ctrl_set_mrsh.c>
 

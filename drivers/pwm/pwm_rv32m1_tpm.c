@@ -48,7 +48,8 @@ static int rv32m1_tpm_pin_set(const struct device *dev, uint32_t pwm,
 
 	if ((period_cycles == 0U) || (pulse_cycles > period_cycles)) {
 		LOG_ERR("Invalid combination: period_cycles=%d, "
-			    "pulse_cycles=%d", period_cycles, pulse_cycles);
+			"pulse_cycles=%d",
+			period_cycles, pulse_cycles);
 		return -EINVAL;
 	}
 
@@ -83,8 +84,8 @@ static int rv32m1_tpm_pin_set(const struct device *dev, uint32_t pwm,
 
 		data->period_cycles = period_cycles;
 
-		pwm_freq = (data->clock_freq >> config->prescale) /
-			   period_cycles;
+		pwm_freq =
+			(data->clock_freq >> config->prescale) / period_cycles;
 
 		LOG_DBG("pwm_freq=%d, clock_freq=%d", pwm_freq,
 			data->clock_freq);
@@ -115,8 +116,7 @@ static int rv32m1_tpm_pin_set(const struct device *dev, uint32_t pwm,
 	return 0;
 }
 
-static int rv32m1_tpm_get_cycles_per_sec(const struct device *dev,
-					 uint32_t pwm,
+static int rv32m1_tpm_get_cycles_per_sec(const struct device *dev, uint32_t pwm,
 					 uint64_t *cycles)
 {
 	const struct rv32m1_tpm_config *config = dev->config;
@@ -179,26 +179,23 @@ static const struct pwm_driver_api rv32m1_tpm_driver_api = {
 	.get_cycles_per_sec = rv32m1_tpm_get_cycles_per_sec,
 };
 
-#define TPM_DEVICE(n) \
-	static const struct rv32m1_tpm_config rv32m1_tpm_config_##n = { \
-		.base =	(TPM_Type *) \
-			DT_INST_REG_ADDR(n), \
-		.clock_name = \
-			DT_INST_CLOCKS_LABEL(n), \
-		.clock_subsys = (clock_control_subsys_t) \
-			DT_INST_CLOCKS_CELL(n, name), \
-		.tpm_clock_source = kTPM_SystemClock, \
-		.prescale = kTPM_Prescale_Divide_16, \
-		.channel_count = FSL_FEATURE_TPM_CHANNEL_COUNTn((TPM_Type *) \
-			DT_INST_REG_ADDR(n)), \
-		.mode = kTPM_EdgeAlignedPwm, \
-	}; \
-	static struct rv32m1_tpm_data rv32m1_tpm_data_##n; \
-	DEVICE_AND_API_INIT(rv32m1_tpm_##n, \
-			    DT_INST_LABEL(n), \
-			    &rv32m1_tpm_init, &rv32m1_tpm_data_##n, \
-			    &rv32m1_tpm_config_##n, \
-			    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE, \
+#define TPM_DEVICE(n)                                                         \
+	static const struct rv32m1_tpm_config rv32m1_tpm_config_##n = {       \
+		.base = (TPM_Type *)DT_INST_REG_ADDR(n),                      \
+		.clock_name = DT_INST_CLOCKS_LABEL(n),                        \
+		.clock_subsys =                                               \
+			(clock_control_subsys_t)DT_INST_CLOCKS_CELL(n, name), \
+		.tpm_clock_source = kTPM_SystemClock,                         \
+		.prescale = kTPM_Prescale_Divide_16,                          \
+		.channel_count = FSL_FEATURE_TPM_CHANNEL_COUNTn(              \
+			(TPM_Type *)DT_INST_REG_ADDR(n)),                     \
+		.mode = kTPM_EdgeAlignedPwm,                                  \
+	};                                                                    \
+	static struct rv32m1_tpm_data rv32m1_tpm_data_##n;                    \
+	DEVICE_AND_API_INIT(rv32m1_tpm_##n, DT_INST_LABEL(n),                 \
+			    &rv32m1_tpm_init, &rv32m1_tpm_data_##n,           \
+			    &rv32m1_tpm_config_##n, POST_KERNEL,              \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEVICE,               \
 			    &rv32m1_tpm_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(TPM_DEVICE)

@@ -28,24 +28,24 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #endif
 
 /* resource IDs */
-#define BUTTON_DIGITAL_STATE_ID		5500
-#define BUTTON_DIGITAL_INPUT_COUNTER_ID	5501
-#define BUTTON_APPLICATION_TYPE_ID	5750
+#define BUTTON_DIGITAL_STATE_ID 5500
+#define BUTTON_DIGITAL_INPUT_COUNTER_ID 5501
+#define BUTTON_APPLICATION_TYPE_ID 5750
 #if ADD_TIMESTAMPS
-#define BUTTON_TIMESTAMP_ID		5518
+#define BUTTON_TIMESTAMP_ID 5518
 
-#define BUTTON_MAX_ID			4
+#define BUTTON_MAX_ID 4
 #else
-#define BUTTON_MAX_ID			3
+#define BUTTON_MAX_ID 3
 #endif
 
-#define MAX_INSTANCE_COUNT	CONFIG_LWM2M_IPSO_PUSH_BUTTON_INSTANCE_COUNT
+#define MAX_INSTANCE_COUNT CONFIG_LWM2M_IPSO_PUSH_BUTTON_INSTANCE_COUNT
 
 /*
  * Calculate resource instances as follows:
  * start with BUTTON_MAX_ID
  */
-#define RESOURCE_INSTANCE_COUNT        (BUTTON_MAX_ID)
+#define RESOURCE_INSTANCE_COUNT (BUTTON_MAX_ID)
 
 /* resource state */
 struct ipso_button_data {
@@ -69,8 +69,8 @@ static struct lwm2m_engine_obj_field fields[] = {
 
 static struct lwm2m_engine_obj_inst inst[MAX_INSTANCE_COUNT];
 static struct lwm2m_engine_res res[MAX_INSTANCE_COUNT][BUTTON_MAX_ID];
-static struct lwm2m_engine_res_inst
-			res_inst[MAX_INSTANCE_COUNT][RESOURCE_INSTANCE_COUNT];
+static struct lwm2m_engine_res_inst res_inst[MAX_INSTANCE_COUNT]
+					    [RESOURCE_INSTANCE_COUNT];
 
 static int get_button_index(uint16_t obj_inst_id)
 {
@@ -88,10 +88,10 @@ static int get_button_index(uint16_t obj_inst_id)
 	return ret;
 }
 
-static int state_post_write_cb(uint16_t obj_inst_id,
-			       uint16_t res_id, uint16_t res_inst_id,
-			       uint8_t *data, uint16_t data_len,
-			       bool last_block, size_t total_size)
+static int state_post_write_cb(uint16_t obj_inst_id, uint16_t res_id,
+			       uint16_t res_inst_id, uint8_t *data,
+			       uint16_t data_len, bool last_block,
+			       size_t total_size)
 {
 	int i;
 
@@ -117,7 +117,8 @@ static struct lwm2m_engine_obj_inst *button_create(uint16_t obj_inst_id)
 	for (index = 0; index < ARRAY_SIZE(inst); index++) {
 		if (inst[index].obj && inst[index].obj_inst_id == obj_inst_id) {
 			LOG_ERR("Can not create instance - "
-				"already existing: %u", obj_inst_id);
+				"already existing: %u",
+				obj_inst_id);
 			return NULL;
 		}
 
@@ -142,14 +143,12 @@ static struct lwm2m_engine_obj_inst *button_create(uint16_t obj_inst_id)
 	init_res_instance(res_inst[avail], ARRAY_SIZE(res_inst[avail]));
 
 	/* initialize instance resource data */
-	INIT_OBJ_RES(BUTTON_DIGITAL_STATE_ID, res[avail], i,
-		     res_inst[avail], j, 1, true,
-		     &button_data[avail].state,
-		     sizeof(button_data[avail].state),
-		     NULL, NULL, state_post_write_cb, NULL);
+	INIT_OBJ_RES(BUTTON_DIGITAL_STATE_ID, res[avail], i, res_inst[avail], j,
+		     1, true, &button_data[avail].state,
+		     sizeof(button_data[avail].state), NULL, NULL,
+		     state_post_write_cb, NULL);
 	INIT_OBJ_RES_DATA(BUTTON_DIGITAL_INPUT_COUNTER_ID, res[avail], i,
-			  res_inst[avail], j,
-			  &button_data[avail].counter,
+			  res_inst[avail], j, &button_data[avail].counter,
 			  sizeof(button_data[avail].counter));
 	INIT_OBJ_RES_OPTDATA(BUTTON_APPLICATION_TYPE_ID, res[avail], i,
 			     res_inst[avail], j);

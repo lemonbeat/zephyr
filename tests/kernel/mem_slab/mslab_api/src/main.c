@@ -17,8 +17,7 @@ extern void test_mslab_used_get(void);
 /*test case main entry*/
 void test_main(void)
 {
-	ztest_test_suite(mslab_api,
-			 ztest_unit_test(test_mslab_kinit),
+	ztest_test_suite(mslab_api, ztest_unit_test(test_mslab_kinit),
 			 ztest_unit_test(test_mslab_kdefine),
 			 ztest_unit_test(test_mslab_kdefine_extern),
 			 ztest_unit_test(test_mslab_alloc_free_thread),

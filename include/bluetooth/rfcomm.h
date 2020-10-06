@@ -74,28 +74,28 @@ typedef enum bt_rfcomm_role {
 /** @brief RFCOMM DLC structure. */
 struct bt_rfcomm_dlc {
 	/* Response Timeout eXpired (RTX) timer */
-	struct k_delayed_work      rtx_work;
+	struct k_delayed_work rtx_work;
 
 	/* Queue for outgoing data */
-	struct k_fifo              tx_queue;
+	struct k_fifo tx_queue;
 
 	/* TX credits, Reuse as a binary sem for MSC FC if CFC is not enabled */
-	struct k_sem               tx_credits;
+	struct k_sem tx_credits;
 
-	struct bt_rfcomm_session  *session;
-	struct bt_rfcomm_dlc_ops  *ops;
-	struct bt_rfcomm_dlc      *_next;
+	struct bt_rfcomm_session *session;
+	struct bt_rfcomm_dlc_ops *ops;
+	struct bt_rfcomm_dlc *_next;
 
-	bt_security_t              required_sec_level;
-	bt_rfcomm_role_t           role;
+	bt_security_t required_sec_level;
+	bt_rfcomm_role_t role;
 
-	uint16_t                      mtu;
-	uint8_t                       dlci;
-	uint8_t                       state;
-	uint8_t                       rx_credit;
+	uint16_t mtu;
+	uint8_t dlci;
+	uint8_t state;
+	uint8_t rx_credit;
 
 	/* Stack & kernel data for TX thread */
-	struct k_thread            tx_thread;
+	struct k_thread tx_thread;
 	K_KERNEL_STACK_MEMBER(stack, 256);
 };
 
@@ -115,7 +115,7 @@ struct bt_rfcomm_server {
 	 */
 	int (*accept)(struct bt_conn *conn, struct bt_rfcomm_dlc **dlc);
 
-	struct bt_rfcomm_server	*_next;
+	struct bt_rfcomm_server *_next;
 };
 
 /** @brief Register RFCOMM server

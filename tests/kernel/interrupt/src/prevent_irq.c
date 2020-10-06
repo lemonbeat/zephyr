@@ -7,8 +7,8 @@
 #include <ztest.h>
 #include "interrupt_util.h"
 
-#define DURATION	5
-#define HANDLER_TOKEN	0xDEADBEEF
+#define DURATION 5
+#define HANDLER_TOKEN 0xDEADBEEF
 
 static struct k_timer irqlock_timer;
 volatile uint32_t handler_result;
@@ -47,7 +47,8 @@ void test_prevent_interruption(void)
 	 */
 	k_timer_start(&irqlock_timer, K_MSEC(DURATION), K_NO_WAIT);
 	k_busy_wait(MS_TO_US(1000));
-	zassert_not_equal(handler_result, HANDLER_TOKEN,
+	zassert_not_equal(
+		handler_result, HANDLER_TOKEN,
 		"timer interrupt was serviced while interrupts are locked");
 
 	printk("unlocking interrupts\n");
@@ -55,8 +56,7 @@ void test_prevent_interruption(void)
 
 	k_busy_wait(MS_TO_US(1000));
 
-	zassert_equal(handler_result, HANDLER_TOKEN,
-		"timer should have fired");
+	zassert_equal(handler_result, HANDLER_TOKEN, "timer should have fired");
 
 	k_timer_stop(&irqlock_timer);
 }

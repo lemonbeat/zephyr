@@ -58,11 +58,10 @@ timing_t timing_counter_get(void)
 }
 
 uint64_t timing_cycles_get(volatile timing_t *const start,
-				  volatile timing_t *const end)
+			   volatile timing_t *const end)
 {
 	return (*end - *start);
 }
-
 
 uint64_t timing_freq_get(void)
 {

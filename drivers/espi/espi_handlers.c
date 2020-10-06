@@ -7,15 +7,13 @@
 #include <drivers/espi.h>
 #include <syscall_handler.h>
 
-
 static inline int z_vrfy_espi_config(const struct device *dev,
 				     struct espi_cfg *cfg)
 {
-	struct  espi_cfg cfg_copy;
+	struct espi_cfg cfg_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, config));
-	Z_OOPS(z_user_from_copy(&cfg_copy, cfg,
-				sizeof(struct espi_cfg)));
+	Z_OOPS(z_user_from_copy(&cfg_copy, cfg, sizeof(struct espi_cfg)));
 
 	return z_impl_espi_config(dev, &cfg_copy);
 }
@@ -89,7 +87,7 @@ static inline int z_vrfy_espi_read_request(const struct device *dev,
 					   struct espi_request_packet *req)
 {
 	int ret;
-	struct  espi_request_packet req_copy;
+	struct espi_request_packet req_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, read_request));
 	Z_OOPS(z_user_from_copy(&req_copy, req,
@@ -109,7 +107,7 @@ static inline int z_vrfy_espi_write_request(const struct device *dev,
 					    struct espi_request_packet *req)
 {
 	int ret;
-	struct  espi_request_packet req_copy;
+	struct espi_request_packet req_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, write_request));
 	Z_OOPS(Z_SYSCALL_MEMORY_READ(req->data, req->len));
@@ -126,7 +124,7 @@ static inline int z_vrfy_espi_send_oob(const struct device *dev,
 				       struct espi_oob_packet *pckt)
 {
 	int ret;
-	struct  espi_oob_packet pckt_copy;
+	struct espi_oob_packet pckt_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, send_oob));
 	Z_OOPS(Z_SYSCALL_MEMORY_READ(pckt->buf, pckt->len));
@@ -143,7 +141,7 @@ static inline int z_vrfy_espi_receive_oob(const struct device *dev,
 					  struct espi_oob_packet *pckt)
 {
 	int ret;
-	struct  espi_oob_packet pckt_copy;
+	struct espi_oob_packet pckt_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, receive_oob));
 	Z_OOPS(z_user_from_copy(&pckt_copy, pckt,
@@ -162,7 +160,7 @@ static inline int z_vrfy_espi_read_flash(const struct device *dev,
 					 struct espi_flash_packet *pckt)
 {
 	int ret;
-	struct  espi_flash_packet pckt_copy;
+	struct espi_flash_packet pckt_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, flash_read));
 	Z_OOPS(z_user_from_copy(&pckt_copy, pckt,
@@ -181,7 +179,7 @@ static inline int z_vrfy_espi_write_flash(const struct device *dev,
 					  struct espi_flash_packet *pckt)
 {
 	int ret;
-	struct  espi_flash_packet pckt_copy;
+	struct espi_flash_packet pckt_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, flash_write));
 	Z_OOPS(z_user_from_copy(&pckt_copy, pckt,
@@ -198,7 +196,7 @@ static inline int z_vrfy_espi_flash_erase(const struct device *dev,
 					  struct espi_flash_packet *pckt)
 {
 	int ret;
-	struct  espi_flash_packet pckt_copy;
+	struct espi_flash_packet pckt_copy;
 
 	Z_OOPS(Z_SYSCALL_DRIVER_ESPI(dev, flash_write));
 	Z_OOPS(z_user_from_copy(&pckt_copy, pckt,

@@ -65,7 +65,9 @@ static void test_device_id_get(void)
 	}
 }
 #else
-static void test_device_id_get(void) {}
+static void test_device_id_get(void)
+{
+}
 #endif /* CONFIG_HWINFO_HAS_DRIVER */
 
 #ifndef CONFIG_HWINFO_HAS_DRIVER
@@ -79,19 +81,20 @@ static void test_device_id_enotsup(void)
 	 * should be -ENOTSUP
 	 */
 	zassert_equal(ret, -ENOTSUP,
-		      "hwinfo_get_device_id returned % instead of %d",
-		      ret, -ENOTSUP);
+		      "hwinfo_get_device_id returned % instead of %d", ret,
+		      -ENOTSUP);
 }
 #else
-static void test_device_id_enotsup(void) {}
+static void test_device_id_enotsup(void)
+{
+}
 #endif /* CONFIG_HWINFO_HAS_DRIVER not defined*/
 
 void test_main(void)
 {
 	ztest_test_suite(hwinfo_device_id_api,
 			 ztest_unit_test(test_device_id_get),
-			 ztest_unit_test(test_device_id_enotsup)
-			);
+			 ztest_unit_test(test_device_id_enotsup));
 
 	ztest_run_test_suite(hwinfo_device_id_api);
 }

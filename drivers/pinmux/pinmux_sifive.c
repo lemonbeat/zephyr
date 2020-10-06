@@ -22,20 +22,16 @@ struct pinmux_sifive_regs_t {
 	uint32_t iof_sel;
 };
 
-#define DEV_CFG(dev)					\
-	((const struct pinmux_sifive_config * const)	\
-	 (dev)->config)
+#define DEV_CFG(dev) ((const struct pinmux_sifive_config *const)(dev)->config)
 
-#define DEV_PINMUX(dev)						\
-	((struct pinmux_sifive_regs_t *)(DEV_CFG(dev))->base)
+#define DEV_PINMUX(dev) ((struct pinmux_sifive_regs_t *)(DEV_CFG(dev))->base)
 
 static int pinmux_sifive_set(const struct device *dev, uint32_t pin,
 			     uint32_t func)
 {
 	volatile struct pinmux_sifive_regs_t *pinmux = DEV_PINMUX(dev);
 
-	if (func > SIFIVE_PINMUX_IOF1 ||
-	    pin >= SIFIVE_PINMUX_PINS)
+	if (func > SIFIVE_PINMUX_IOF1 || pin >= SIFIVE_PINMUX_PINS)
 		return -EINVAL;
 
 	if (func == SIFIVE_PINMUX_IOF1)
@@ -54,12 +50,12 @@ static int pinmux_sifive_get(const struct device *dev, uint32_t pin,
 {
 	volatile struct pinmux_sifive_regs_t *pinmux = DEV_PINMUX(dev);
 
-	if (pin >= SIFIVE_PINMUX_PINS ||
-	    func == NULL)
+	if (pin >= SIFIVE_PINMUX_PINS || func == NULL)
 		return -EINVAL;
 
 	*func = (pinmux->iof_sel & (SIFIVE_PINMUX_IOF1 << pin)) ?
-		SIFIVE_PINMUX_IOF1 : SIFIVE_PINMUX_IOF0;
+			      SIFIVE_PINMUX_IOF1 :
+			      SIFIVE_PINMUX_IOF0;
 
 	return 0;
 }
@@ -98,7 +94,6 @@ static const struct pinmux_sifive_config pinmux_sifive_0_config = {
 };
 
 DEVICE_AND_API_INIT(pinmux_sifive_0, CONFIG_PINMUX_SIFIVE_0_NAME,
-		    &pinmux_sifive_init, NULL,
-		    &pinmux_sifive_0_config,
+		    &pinmux_sifive_init, NULL, &pinmux_sifive_0_config,
 		    PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
 		    &pinmux_sifive_driver_api);

@@ -23,11 +23,9 @@ void crp_test_rng(void)
 {
 	psa_status_t status;
 	uint8_t outbuf[256] = { 0 };
-	struct sf_hex_tbl_fmt fmt = {
-		.ascii = true,
-		.addr_label = true,
-		.addr = 0
-	};
+	struct sf_hex_tbl_fmt fmt = { .ascii = true,
+				      .addr_label = true,
+				      .addr = 0 };
 
 	status = al_psa_status(psa_generate_random(outbuf, 256), __func__);
 	LOG_INF("Generating 256 bytes of random data.");
@@ -63,9 +61,8 @@ void crp_test_sha256(void)
 	/* Update object with all the message chunks. */
 	for (idx = 0; idx < msg_num; idx++) {
 		status = al_psa_status(
-			psa_hash_update(
-				&handle,
-				(const uint8_t *)msg[idx], msg_size[idx]),
+			psa_hash_update(&handle, (const uint8_t *)msg[idx],
+					msg_size[idx]),
 			__func__);
 		if (status != PSA_SUCCESS) {
 			goto err;
@@ -73,22 +70,17 @@ void crp_test_sha256(void)
 	}
 
 	/* Finalize the hash calculation. */
-	status = al_psa_status(
-		psa_hash_finish(&handle,
-				hash_val,
-				sizeof(hash_val),
-				&hash_len),
-		__func__);
+	status = al_psa_status(psa_hash_finish(&handle, hash_val,
+					       sizeof(hash_val), &hash_len),
+			       __func__);
 	if (status != PSA_SUCCESS) {
 		goto err;
 	}
 
 	/* Display the SHA-256 hash for debug purposes */
-	struct sf_hex_tbl_fmt fmt = {
-		.ascii = false,
-		.addr_label = true,
-		.addr = 0
-	};
+	struct sf_hex_tbl_fmt fmt = { .ascii = false,
+				      .addr_label = true,
+				      .addr = 0 };
 	sf_hex_tabulate_16(&fmt, hash_val, (size_t)(PSA_HASH_SIZE(alg)));
 
 	return;

@@ -34,37 +34,41 @@
 #define LPN_AUTO_TIMEOUT 0
 #endif
 
-#define LPN_RECV_DELAY            CONFIG_BT_MESH_LPN_RECV_DELAY
-#define SCAN_LATENCY              MIN(CONFIG_BT_MESH_LPN_SCAN_LATENCY, \
-				      LPN_RECV_DELAY)
+#define LPN_RECV_DELAY CONFIG_BT_MESH_LPN_RECV_DELAY
+#define SCAN_LATENCY MIN(CONFIG_BT_MESH_LPN_SCAN_LATENCY, LPN_RECV_DELAY)
 
-#define FRIEND_REQ_RETRY_TIMEOUT  K_SECONDS(CONFIG_BT_MESH_LPN_RETRY_TIMEOUT)
+#define FRIEND_REQ_RETRY_TIMEOUT K_SECONDS(CONFIG_BT_MESH_LPN_RETRY_TIMEOUT)
 
-#define FRIEND_REQ_WAIT           100
-#define FRIEND_REQ_SCAN           (1 * MSEC_PER_SEC)
-#define FRIEND_REQ_TIMEOUT        (FRIEND_REQ_WAIT + FRIEND_REQ_SCAN)
+#define FRIEND_REQ_WAIT 100
+#define FRIEND_REQ_SCAN (1 * MSEC_PER_SEC)
+#define FRIEND_REQ_TIMEOUT (FRIEND_REQ_WAIT + FRIEND_REQ_SCAN)
 
-#define POLL_RETRY_TIMEOUT        100
+#define POLL_RETRY_TIMEOUT 100
 
-#define REQ_RETRY_DURATION(lpn)   (LPN_RECV_DELAY + (lpn)->adv_duration + \
-				      (lpn)->recv_win + POLL_RETRY_TIMEOUT)
+#define REQ_RETRY_DURATION(lpn)                                   \
+	(LPN_RECV_DELAY + (lpn)->adv_duration + (lpn)->recv_win + \
+	 POLL_RETRY_TIMEOUT)
 
-#define POLL_TIMEOUT_INIT         (CONFIG_BT_MESH_LPN_INIT_POLL_TIMEOUT * 100)
+#define POLL_TIMEOUT_INIT (CONFIG_BT_MESH_LPN_INIT_POLL_TIMEOUT * 100)
 
-#define REQ_ATTEMPTS_MAX          6
-#define REQ_ATTEMPTS(lpn)         MIN(REQ_ATTEMPTS_MAX, \
-			  POLL_TIMEOUT_INIT / REQ_RETRY_DURATION(lpn))
+#define REQ_ATTEMPTS_MAX 6
+#define REQ_ATTEMPTS(lpn) \
+	MIN(REQ_ATTEMPTS_MAX, POLL_TIMEOUT_INIT / REQ_RETRY_DURATION(lpn))
 
-#define POLL_TIMEOUT_MAX(lpn)     (POLL_TIMEOUT_INIT - \
-			  (REQ_ATTEMPTS(lpn) * REQ_RETRY_DURATION(lpn)))
+#define POLL_TIMEOUT_MAX(lpn) \
+	(POLL_TIMEOUT_INIT - (REQ_ATTEMPTS(lpn) * REQ_RETRY_DURATION(lpn)))
 
-#define CLEAR_ATTEMPTS            3
+#define CLEAR_ATTEMPTS 3
 
-#define LPN_CRITERIA ((CONFIG_BT_MESH_LPN_MIN_QUEUE_SIZE) | \
-		      (CONFIG_BT_MESH_LPN_RSSI_FACTOR << 3) | \
-		      (CONFIG_BT_MESH_LPN_RECV_WIN_FACTOR << 5))
+#define LPN_CRITERIA                             \
+	((CONFIG_BT_MESH_LPN_MIN_QUEUE_SIZE) |   \
+	 (CONFIG_BT_MESH_LPN_RSSI_FACTOR << 3) | \
+	 (CONFIG_BT_MESH_LPN_RECV_WIN_FACTOR << 5))
 
-#define POLL_TO(to) { (uint8_t)((to) >> 16), (uint8_t)((to) >> 8), (uint8_t)(to) }
+#define POLL_TO(to)                                                        \
+	{                                                                  \
+		(uint8_t)((to) >> 16), (uint8_t)((to) >> 8), (uint8_t)(to) \
+	}
 #define LPN_POLL_TO POLL_TO(CONFIG_BT_MESH_LPN_POLL_TIMEOUT)
 
 /* 2 transmissions, 20ms interval */
@@ -175,10 +179,10 @@ static const struct bt_mesh_send_cb clear_sent_cb = {
 static int send_friend_clear(void)
 {
 	struct bt_mesh_msg_ctx ctx = {
-		.net_idx     = bt_mesh.sub[0].net_idx,
-		.app_idx     = BT_MESH_KEY_UNUSED,
-		.addr        = bt_mesh.lpn.frnd,
-		.send_ttl    = 0,
+		.net_idx = bt_mesh.sub[0].net_idx,
+		.app_idx = BT_MESH_KEY_UNUSED,
+		.addr = bt_mesh.lpn.frnd,
+		.send_ttl = 0,
 	};
 	struct bt_mesh_net_tx tx = {
 		.sub = &bt_mesh.sub[0],
@@ -187,7 +191,7 @@ static int send_friend_clear(void)
 		.xmit = bt_mesh_net_transmit_get(),
 	};
 	struct bt_mesh_ctl_friend_clear req = {
-		.lpn_addr    = sys_cpu_to_be16(tx.src),
+		.lpn_addr = sys_cpu_to_be16(tx.src),
 		.lpn_counter = sys_cpu_to_be16(bt_mesh.lpn.counter),
 	};
 
@@ -289,9 +293,9 @@ static int send_friend_req(struct bt_mesh_lpn *lpn)
 {
 	const struct bt_mesh_comp *comp = bt_mesh_comp_get();
 	struct bt_mesh_msg_ctx ctx = {
-		.net_idx  = bt_mesh.sub[0].net_idx,
-		.app_idx  = BT_MESH_KEY_UNUSED,
-		.addr     = BT_MESH_ADDR_FRIENDS,
+		.net_idx = bt_mesh.sub[0].net_idx,
+		.app_idx = BT_MESH_KEY_UNUSED,
+		.addr = BT_MESH_ADDR_FRIENDS,
 		.send_ttl = 0,
 	};
 	struct bt_mesh_net_tx tx = {
@@ -301,18 +305,18 @@ static int send_friend_req(struct bt_mesh_lpn *lpn)
 		.xmit = POLL_XMIT,
 	};
 	struct bt_mesh_ctl_friend_req req = {
-		.criteria    = LPN_CRITERIA,
-		.recv_delay  = LPN_RECV_DELAY,
-		.poll_to     = LPN_POLL_TO,
-		.prev_addr   = sys_cpu_to_be16(lpn->old_friend),
-		.num_elem    = comp->elem_count,
+		.criteria = LPN_CRITERIA,
+		.recv_delay = LPN_RECV_DELAY,
+		.poll_to = LPN_POLL_TO,
+		.prev_addr = sys_cpu_to_be16(lpn->old_friend),
+		.num_elem = comp->elem_count,
 		.lpn_counter = sys_cpu_to_be16(lpn->counter),
 	};
 
 	BT_DBG("");
 
-	return bt_mesh_ctl_send(&tx, TRANS_CTL_OP_FRIEND_REQ, &req,
-				sizeof(req), &friend_req_sent_cb, NULL);
+	return bt_mesh_ctl_send(&tx, TRANS_CTL_OP_FRIEND_REQ, &req, sizeof(req),
+				&friend_req_sent_cb, NULL);
 }
 
 static void req_sent(uint16_t duration, int err, void *user_data)
@@ -320,8 +324,8 @@ static void req_sent(uint16_t duration, int err, void *user_data)
 	struct bt_mesh_lpn *lpn = &bt_mesh.lpn;
 
 #if defined(CONFIG_BT_MESH_DEBUG_LOW_POWER)
-	BT_DBG("req 0x%02x duration %u err %d state %s",
-	       lpn->sent_req, duration, err, state2str(lpn->state));
+	BT_DBG("req 0x%02x duration %u err %d state %s", lpn->sent_req,
+	       duration, err, state2str(lpn->state));
 #endif
 
 	if (err) {
@@ -342,9 +346,9 @@ static void req_sent(uint16_t duration, int err, void *user_data)
 		k_delayed_work_submit(&lpn->timer,
 				      K_MSEC(LPN_RECV_DELAY - SCAN_LATENCY));
 	} else {
-		k_delayed_work_submit(&lpn->timer,
-				      K_MSEC(LPN_RECV_DELAY + duration +
-					     lpn->recv_win));
+		k_delayed_work_submit(
+			&lpn->timer,
+			K_MSEC(LPN_RECV_DELAY + duration + lpn->recv_win));
 	}
 }
 
@@ -355,10 +359,10 @@ static const struct bt_mesh_send_cb req_sent_cb = {
 static int send_friend_poll(void)
 {
 	struct bt_mesh_msg_ctx ctx = {
-		.net_idx     = bt_mesh.sub[0].net_idx,
-		.app_idx     = BT_MESH_KEY_UNUSED,
-		.addr        = bt_mesh.lpn.frnd,
-		.send_ttl    = 0,
+		.net_idx = bt_mesh.sub[0].net_idx,
+		.app_idx = BT_MESH_KEY_UNUSED,
+		.addr = bt_mesh.lpn.frnd,
+		.send_ttl = 0,
 	};
 	struct bt_mesh_net_tx tx = {
 		.sub = &bt_mesh.sub[0],
@@ -637,10 +641,10 @@ static bool sub_update(uint8_t op)
 	struct bt_mesh_lpn *lpn = &bt_mesh.lpn;
 	int added_count = group_popcount(lpn->added);
 	struct bt_mesh_msg_ctx ctx = {
-		.net_idx     = bt_mesh.sub[0].net_idx,
-		.app_idx     = BT_MESH_KEY_UNUSED,
-		.addr        = lpn->frnd,
-		.send_ttl    = 0,
+		.net_idx = bt_mesh.sub[0].net_idx,
+		.app_idx = BT_MESH_KEY_UNUSED,
+		.addr = lpn->frnd,
+		.send_ttl = 0,
 	};
 	struct bt_mesh_net_tx tx = {
 		.sub = &bt_mesh.sub[0],
@@ -693,8 +697,8 @@ static bool sub_update(uint8_t op)
 
 	req.xact = lpn->xact_next++;
 
-	if (bt_mesh_ctl_send(&tx, op, &req, 1 + g * 2,
-			     &req_sent_cb, NULL) < 0) {
+	if (bt_mesh_ctl_send(&tx, op, &req, 1 + g * 2, &req_sent_cb, NULL) <
+	    0) {
 		group_zero(lpn->pending);
 		return false;
 	}
@@ -845,8 +849,8 @@ static int32_t poll_timeout(struct bt_mesh_lpn *lpn)
 
 	if (lpn->poll_timeout < POLL_TIMEOUT_MAX(lpn)) {
 		lpn->poll_timeout *= 2;
-		lpn->poll_timeout = MIN(lpn->poll_timeout,
-					POLL_TIMEOUT_MAX(lpn));
+		lpn->poll_timeout =
+			MIN(lpn->poll_timeout, POLL_TIMEOUT_MAX(lpn));
 	}
 
 	BT_DBG("Poll Timeout is %ums", lpn->poll_timeout);
@@ -873,8 +877,8 @@ int bt_mesh_lpn_friend_sub_cfm(struct bt_mesh_net_rx *rx,
 	}
 
 	if (msg->xact != lpn->xact_pending) {
-		BT_WARN("Transaction mismatch (0x%02x != 0x%02x)",
-			msg->xact, lpn->xact_pending);
+		BT_WARN("Transaction mismatch (0x%02x != 0x%02x)", msg->xact,
+			lpn->xact_pending);
 		return 0;
 	}
 
@@ -974,8 +978,8 @@ int bt_mesh_lpn_friend_update(struct bt_mesh_net_rx *rx,
 		}
 
 		/* Set initial poll timeout */
-		lpn->poll_timeout = MIN(POLL_TIMEOUT_MAX(lpn),
-					POLL_TIMEOUT_INIT);
+		lpn->poll_timeout =
+			MIN(POLL_TIMEOUT_MAX(lpn), POLL_TIMEOUT_INIT);
 	}
 
 	friend_response_received(lpn);

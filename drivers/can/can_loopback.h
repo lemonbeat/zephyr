@@ -11,8 +11,7 @@
 #include <drivers/can.h>
 
 #define DEV_DATA(dev) ((struct can_loopback_data *const)(dev)->data)
-#define DEV_CFG(dev) \
-	((const struct can_loopback_config *const)(dev)->config)
+#define DEV_CFG(dev) ((const struct can_loopback_config *const)(dev)->config)
 
 struct can_loopback_filter {
 	can_rx_callback_t rx_cb;

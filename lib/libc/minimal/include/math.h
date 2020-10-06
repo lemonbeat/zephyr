@@ -16,22 +16,22 @@ extern "C" {
 #endif
 
 #if defined FLT_EVAL_METHOD
-	#if FLT_EVAL_METHOD == 0
-		typedef float  float_t;
-		typedef double double_t;
-	#elif FLT_EVAL_METHOD == 1
-		typedef double float_t;
-		typedef double double_t;
-	#elif FLT_EVAL_METHOD == 2
-		typedef long double float_t;
-		typedef long double double_t;
-	#else
-		/* Implementation-defined.  Assume float_t and double_t have
-		 * already been defined */
-	#endif
+#if FLT_EVAL_METHOD == 0
+typedef float float_t;
+typedef double double_t;
+#elif FLT_EVAL_METHOD == 1
+typedef double float_t;
+typedef double double_t;
+#elif FLT_EVAL_METHOD == 2
+typedef long double float_t;
+typedef long double double_t;
 #else
-	typedef float  float_t;
-	typedef double double_t;
+/* Implementation-defined.  Assume float_t and double_t have
+		 * already been defined */
+#endif
+#else
+typedef float float_t;
+typedef double double_t;
 #endif
 
 #ifdef __cplusplus

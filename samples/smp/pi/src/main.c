@@ -8,22 +8,21 @@
 #include <stdio.h>
 
 /* Amount of execution threads to create and run */
-#define THREADS_NUM	16
+#define THREADS_NUM 16
 
 /*
  * Amount of digits of Pi to calculate, must be a multiple of 4,
  * as used algorythm spits 4 digits on every iteration.
  */
-#define DIGITS_NUM	240
+#define DIGITS_NUM 240
 
-#define LENGTH		((DIGITS_NUM / 4) * 14)
-#define STACK_SIZE	((LENGTH * sizeof(int) + 512) + \
-			 CONFIG_TEST_EXTRA_STACKSIZE)
+#define LENGTH ((DIGITS_NUM / 4) * 14)
+#define STACK_SIZE ((LENGTH * sizeof(int) + 512) + CONFIG_TEST_EXTRA_STACKSIZE)
 
 #ifdef CONFIG_SMP
-#define CORES_NUM	CONFIG_MP_NUM_CPUS
+#define CORES_NUM CONFIG_MP_NUM_CPUS
 #else
-#define CORES_NUM	1
+#define CORES_NUM 1
 #endif
 
 static K_THREAD_STACK_ARRAY_DEFINE(tstack, THREADS_NUM, STACK_SIZE);
@@ -38,7 +37,7 @@ void test_thread(void *arg1, void *arg2, void *arg3)
 
 	ARG_UNUSED(arg3);
 
-	/*
+/*
 	 * Adapted and improved (for random number of digits) version of Pi
 	 * calculation program initially proposed by Dik T. Winter as:
 	 * -------------------------------->8--------------------------------
@@ -47,8 +46,8 @@ void test_thread(void *arg1, void *arg2, void *arg3)
 	 * f[b]=d%--g,d/=g--,--b;d*=b);}
 	 * -------------------------------->8--------------------------------
 	 */
-	#define NEW_BASE	10000
-	#define ARRAY_INIT	2000
+#define NEW_BASE 10000
+#define ARRAY_INIT 2000
 
 	int array[LENGTH + 1] = {};
 	int carry = 0;
@@ -90,9 +89,9 @@ void main(void)
 
 	for (i = 0; i < THREADS_NUM; i++) {
 		k_thread_create(&tthread[i], tstack[i], STACK_SIZE,
-			       (k_thread_entry_t)test_thread,
-			       (void *)&counter, (void *)buffer[i], NULL,
-			       K_PRIO_COOP(10), 0, K_NO_WAIT);
+				(k_thread_entry_t)test_thread, (void *)&counter,
+				(void *)buffer[i], NULL, K_PRIO_COOP(10), 0,
+				K_NO_WAIT);
 	}
 
 	/* Wait for all workers to finish their calculations */

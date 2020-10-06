@@ -46,36 +46,33 @@ static ALWAYS_INLINE unsigned int arch_irq_lock(void)
 
 #if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE)
 	__asm__ volatile("mrs %0, PRIMASK;"
-		"cpsid i"
-		: "=r" (key)
-		:
-		: "memory");
+			 "cpsid i"
+			 : "=r"(key)
+			 :
+			 : "memory");
 #elif defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
 	unsigned int tmp;
 
-	__asm__ volatile(
-		"mov %1, %2;"
-		"mrs %0, BASEPRI;"
-		"msr BASEPRI, %1;"
-		"isb;"
-		: "=r"(key), "=r"(tmp)
-		: "i"(_EXC_IRQ_DEFAULT_PRIO)
-		: "memory");
+	__asm__ volatile("mov %1, %2;"
+			 "mrs %0, BASEPRI;"
+			 "msr BASEPRI, %1;"
+			 "isb;"
+			 : "=r"(key), "=r"(tmp)
+			 : "i"(_EXC_IRQ_DEFAULT_PRIO)
+			 : "memory");
 #elif defined(CONFIG_ARMV7_R)
-	__asm__ volatile(
-		"mrs %0, cpsr;"
-		"and %0, #" TOSTR(I_BIT) ";"
-		"cpsid i;"
-		: "=r" (key)
-		:
-		: "memory", "cc");
+	__asm__ volatile("mrs %0, cpsr;"
+			 "and %0, #" TOSTR(I_BIT) ";"
+						  "cpsid i;"
+			 : "=r"(key)
+			 :
+			 : "memory", "cc");
 #else
 #error Unknown ARM architecture
 #endif /* CONFIG_ARMV6_M_ARMV8_M_BASELINE */
 
 	return key;
 }
-
 
 /* On Cortex-M0/M0+, this enables all interrupts if they were not
  * previously disabled.
@@ -87,22 +84,22 @@ static ALWAYS_INLINE void arch_irq_unlock(unsigned int key)
 	if (key) {
 		return;
 	}
-	__asm__ volatile(
-		"cpsie i;"
-		"isb"
-		: : : "memory");
+	__asm__ volatile("cpsie i;"
+			 "isb"
+			 :
+			 :
+			 : "memory");
 #elif defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
-	__asm__ volatile(
-		"msr BASEPRI, %0;"
-		"isb;"
-		:  : "r"(key) : "memory");
+	__asm__ volatile("msr BASEPRI, %0;"
+			 "isb;"
+			 :
+			 : "r"(key)
+			 : "memory");
 #elif defined(CONFIG_ARMV7_R)
 	if (key) {
 		return;
 	}
-	__asm__ volatile(
-		"cpsie i;"
-		: : : "memory", "cc");
+	__asm__ volatile("cpsie i;" : : : "memory", "cc");
 #else
 #error Unknown ARM architecture
 #endif /* CONFIG_ARMV6_M_ARMV8_M_BASELINE */

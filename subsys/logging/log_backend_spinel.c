@@ -28,8 +28,7 @@ static inline bool is_panic_mode(void)
 	return panic_mode;
 }
 
-static void put(const struct log_backend *const backend,
-		struct log_msg *msg)
+static void put(const struct log_backend *const backend, struct log_msg *msg)
 {
 	/* prevent adding CRLF, which may crash spinel decoding */
 	uint32_t flag = LOG_OUTPUT_FLAG_CRLF_NONE;
@@ -40,8 +39,8 @@ static void put(const struct log_backend *const backend,
 }
 
 static void sync_string(const struct log_backend *const backend,
-			 struct log_msg_ids src_level, uint32_t timestamp,
-			 const char *fmt, va_list ap)
+			struct log_msg_ids src_level, uint32_t timestamp,
+			const char *fmt, va_list ap)
 {
 	/* prevent adding CRLF, which may crash spinel decoding */
 	uint32_t flag = LOG_OUTPUT_FLAG_CRLF_NONE;
@@ -119,10 +118,10 @@ static int write(uint8_t *data, size_t length, void *ctx)
 
 const struct log_backend_api log_backend_spinel_api = {
 	.put = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : put,
-	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_string : NULL,
-	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_hexdump : NULL,
+	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_string :
+								    NULL,
+	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_hexdump :
+								     NULL,
 	.panic = panic,
 	.init = log_backend_spinel_init,
 	.dropped = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : dropped,

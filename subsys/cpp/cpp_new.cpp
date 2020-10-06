@@ -12,33 +12,33 @@
 #define NOEXCEPT noexcept
 #endif /* __cplusplus */
 
-void* operator new(size_t size)
+void *operator new(size_t size)
 {
 	return malloc(size);
 }
 
-void* operator new[](size_t size)
+void *operator new[](size_t size)
 {
 	return malloc(size);
 }
 
-void operator delete(void* ptr) NOEXCEPT
+void operator delete(void *ptr)NOEXCEPT
 {
 	free(ptr);
 }
 
-void operator delete[](void* ptr) NOEXCEPT
+void operator delete[](void *ptr) NOEXCEPT
 {
 	free(ptr);
 }
 
 #if (__cplusplus > 201103L)
-void operator delete(void* ptr, size_t) NOEXCEPT
+void operator delete(void *ptr, size_t)NOEXCEPT
 {
 	free(ptr);
 }
 
-void operator delete[](void* ptr, size_t) NOEXCEPT
+void operator delete[](void *ptr, size_t) NOEXCEPT
 {
 	free(ptr);
 }

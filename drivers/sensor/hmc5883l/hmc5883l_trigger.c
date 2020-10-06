@@ -51,8 +51,7 @@ static void hmc5883l_gpio_callback(const struct device *dev,
 
 	ARG_UNUSED(pins);
 
-	gpio_pin_interrupt_configure(dev,
-				     DT_INST_GPIO_PIN(0, int_gpios),
+	gpio_pin_interrupt_configure(dev, DT_INST_GPIO_PIN(0, int_gpios),
 				     GPIO_INT_DISABLE);
 
 #if defined(CONFIG_HMC5883L_TRIGGER_OWN_THREAD)
@@ -101,21 +100,17 @@ int hmc5883l_init_interrupt(const struct device *dev)
 	struct hmc5883l_data *drv_data = dev->data;
 
 	/* setup data ready gpio interrupt */
-	drv_data->gpio = device_get_binding(
-		DT_INST_GPIO_LABEL(0, int_gpios));
+	drv_data->gpio = device_get_binding(DT_INST_GPIO_LABEL(0, int_gpios));
 	if (drv_data->gpio == NULL) {
 		LOG_ERR("Failed to get pointer to %s device.",
 			DT_INST_GPIO_LABEL(0, int_gpios));
 		return -EINVAL;
 	}
 
-	gpio_pin_configure(drv_data->gpio,
-			   DT_INST_GPIO_PIN(0, int_gpios),
-			   GPIO_INPUT |
-			   DT_INST_GPIO_FLAGS(0, int_gpios));
+	gpio_pin_configure(drv_data->gpio, DT_INST_GPIO_PIN(0, int_gpios),
+			   GPIO_INPUT | DT_INST_GPIO_FLAGS(0, int_gpios));
 
-	gpio_init_callback(&drv_data->gpio_cb,
-			   hmc5883l_gpio_callback,
+	gpio_init_callback(&drv_data->gpio_cb, hmc5883l_gpio_callback,
 			   BIT(DT_INST_GPIO_PIN(0, int_gpios)));
 
 	if (gpio_add_callback(drv_data->gpio, &drv_data->gpio_cb) < 0) {
@@ -130,10 +125,9 @@ int hmc5883l_init_interrupt(const struct device *dev)
 
 	k_thread_create(&drv_data->thread, drv_data->thread_stack,
 			CONFIG_HMC5883L_THREAD_STACK_SIZE,
-			(k_thread_entry_t)hmc5883l_thread,
-			drv_data, NULL, NULL,
-			K_PRIO_COOP(CONFIG_HMC5883L_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)hmc5883l_thread, drv_data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_HMC5883L_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #elif defined(CONFIG_HMC5883L_TRIGGER_GLOBAL_THREAD)
 	drv_data->work.handler = hmc5883l_work_cb;
 #endif

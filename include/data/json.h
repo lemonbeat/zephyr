@@ -21,7 +21,6 @@ extern "C" {
  * @defgroup structured_data Structured Data
  */
 
-
 /**
  * @defgroup json JSON
  * @ingroup structured_data
@@ -98,12 +97,13 @@ struct json_obj_descr {
  * error (which will be propagated to the return value of
  * json_obj_encode()), or 0 on success.
  */
-typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
-				   void *data);
+typedef int (*json_append_bytes_t)(const char *bytes, size_t len, void *data);
 
-#define Z_ALIGN_SHIFT(type)	(__alignof__(type) == 1 ? 0 : \
-				 __alignof__(type) == 2 ? 1 : \
-				 __alignof__(type) == 4 ? 2 : 3)
+#define Z_ALIGN_SHIFT(type)           \
+	(__alignof__(type) == 1 ? 0 : \
+	 __alignof__(type) == 2 ? 1 : \
+	 __alignof__(type) == 4 ? 2 : \
+					3)
 
 /**
  * @brief Helper macro to declare a descriptor for supported primitive
@@ -127,13 +127,12 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *         JSON_OBJ_DESCR_PRIM(struct foo, some_int, JSON_TOK_NUMBER),
  *     };
  */
-#define JSON_OBJ_DESCR_PRIM(struct_, field_name_, type_) \
-	{ \
-		.field_name = (#field_name_), \
-		.align_shift = Z_ALIGN_SHIFT(struct_), \
-		.field_name_len = sizeof(#field_name_) - 1, \
-		.type = type_, \
-		.offset = offsetof(struct_, field_name_), \
+#define JSON_OBJ_DESCR_PRIM(struct_, field_name_, type_)                   \
+	{                                                                  \
+		.field_name = (#field_name_),                              \
+		.align_shift = Z_ALIGN_SHIFT(struct_),                     \
+		.field_name_len = sizeof(#field_name_) - 1, .type = type_, \
+		.offset = offsetof(struct_, field_name_),                  \
 	}
 
 /**
@@ -163,7 +162,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *      };
  */
 #define JSON_OBJ_DESCR_OBJECT(struct_, field_name_, sub_descr_) \
-	{ \
+	{                                                       \
 		.field_name = (#field_name_), \
 		.align_shift = Z_ALIGN_SHIFT(struct_), \
 		.field_name_len = (sizeof(#field_name_) - 1), \
@@ -174,7 +173,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
 				.sub_descr = sub_descr_, \
 				.sub_descr_len = ARRAY_SIZE(sub_descr_), \
 			}, \
-		}, \
+		},                 \
 	}
 
 /**
@@ -203,9 +202,9 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *                                JSON_TOK_NUMBER)
  *      };
  */
-#define JSON_OBJ_DESCR_ARRAY(struct_, field_name_, max_len_, \
-			     len_field_, elem_type_) \
-	{ \
+#define JSON_OBJ_DESCR_ARRAY(struct_, field_name_, max_len_, len_field_, \
+			     elem_type_)                                 \
+	{                                                                \
 		.field_name = (#field_name_), \
 		.align_shift = Z_ALIGN_SHIFT(struct_), \
 		.field_name_len = sizeof(#field_name_) - 1, \
@@ -223,7 +222,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
 				} }, \
 				.n_elements = (max_len_), \
 			}, \
-		}, \
+		},                          \
 	}
 
 /**
@@ -265,9 +264,9 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *                                    ARRAY_SIZE(person_height_descr)),
  *      };
  */
-#define JSON_OBJ_DESCR_OBJ_ARRAY(struct_, field_name_, max_len_, \
-				 len_field_, elem_descr_, elem_descr_len_) \
-	{ \
+#define JSON_OBJ_DESCR_OBJ_ARRAY(struct_, field_name_, max_len_, len_field_, \
+				 elem_descr_, elem_descr_len_)               \
+	{                                                                    \
 		.field_name = (#field_name_), \
 		.align_shift = Z_ALIGN_SHIFT(struct_), \
 		.field_name_len = sizeof(#field_name_) - 1, \
@@ -292,7 +291,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
 				} }, \
 				.n_elements = (max_len_), \
 			}, \
-		}, \
+		},                              \
 	}
 
 /**
@@ -344,8 +343,8 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *      };
  */
 #define JSON_OBJ_DESCR_ARRAY_ARRAY(struct_, field_name_, max_len_, len_field_, \
-				   elem_descr_, elem_descr_len_) \
-	{ \
+				   elem_descr_, elem_descr_len_)               \
+	{                                                                      \
 		.field_name = (#field_name_), \
 		.align_shift = Z_ALIGN_SHIFT(struct_), \
 		.field_name_len = sizeof(#field_name_) - 1, \
@@ -370,7 +369,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
 				} }, \
 				.n_elements = (max_len_), \
 			}, \
-		}, \
+		},                                \
 	}
 
 /**
@@ -390,14 +389,13 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *
  * @see JSON_OBJ_DESCR_PRIM
  */
-#define JSON_OBJ_DESCR_PRIM_NAMED(struct_, json_field_name_, \
-				  struct_field_name_, type_) \
-	{ \
-		.field_name = (json_field_name_), \
-		.align_shift = Z_ALIGN_SHIFT(struct_), \
-		.field_name_len = sizeof(json_field_name_) - 1, \
-		.type = type_, \
-		.offset = offsetof(struct_, struct_field_name_), \
+#define JSON_OBJ_DESCR_PRIM_NAMED(struct_, json_field_name_,                   \
+				  struct_field_name_, type_)                   \
+	{                                                                      \
+		.field_name = (json_field_name_),                              \
+		.align_shift = Z_ALIGN_SHIFT(struct_),                         \
+		.field_name_len = sizeof(json_field_name_) - 1, .type = type_, \
+		.offset = offsetof(struct_, struct_field_name_),               \
 	}
 
 /**
@@ -416,9 +414,9 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *
  * @see JSON_OBJ_DESCR_OBJECT
  */
-#define JSON_OBJ_DESCR_OBJECT_NAMED(struct_, json_field_name_, \
+#define JSON_OBJ_DESCR_OBJECT_NAMED(struct_, json_field_name_,      \
 				    struct_field_name_, sub_descr_) \
-	{ \
+	{                                                           \
 		.field_name = (json_field_name_), \
 		.align_shift = Z_ALIGN_SHIFT(struct_), \
 		.field_name_len = (sizeof(json_field_name_) - 1), \
@@ -429,7 +427,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
 				.sub_descr = sub_descr_, \
 				.sub_descr_len = ARRAY_SIZE(sub_descr_), \
 			}, \
-		}, \
+		},                 \
 	}
 
 /**
@@ -453,10 +451,10 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *
  * @see JSON_OBJ_DESCR_ARRAY
  */
-#define JSON_OBJ_DESCR_ARRAY_NAMED(struct_, json_field_name_,\
+#define JSON_OBJ_DESCR_ARRAY_NAMED(struct_, json_field_name_,                \
 				   struct_field_name_, max_len_, len_field_, \
-				   elem_type_) \
-	{ \
+				   elem_type_)                               \
+	{                                                                    \
 		.field_name = (json_field_name_), \
 		.align_shift = Z_ALIGN_SHIFT(struct_), \
 		.field_name_len = sizeof(json_field_name_) - 1, \
@@ -473,7 +471,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
 				} }, \
 				.n_elements = (max_len_), \
 			}, \
-		}, \
+		},                          \
 	}
 
 /**
@@ -522,11 +520,11 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  *                                          ARRAY_SIZE(person_height_descr)),
  *      };
  */
-#define JSON_OBJ_DESCR_OBJ_ARRAY_NAMED(struct_, json_field_name_, \
+#define JSON_OBJ_DESCR_OBJ_ARRAY_NAMED(struct_, json_field_name_,    \
 				       struct_field_name_, max_len_, \
-				       len_field_, elem_descr_, \
-				       elem_descr_len_) \
-	{ \
+				       len_field_, elem_descr_,      \
+				       elem_descr_len_)              \
+	{                                                            \
 		.field_name = json_field_name_, \
 		.align_shift = Z_ALIGN_SHIFT(struct_), \
 		.field_name_len = sizeof(json_field_name_) - 1, \
@@ -551,7 +549,7 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
 				} }, \
 				.n_elements = (max_len_), \
 			}, \
-		}, \
+		},                    \
 	}
 
 /**
@@ -588,9 +586,8 @@ typedef int (*json_append_bytes_t)(const char *bytes, size_t len,
  * @return < 0 if error, bitmap of decoded fields on success (bit 0
  * is set if first field in the descriptor has been properly decoded, etc).
  */
-int json_obj_parse(char *json, size_t len,
-	const struct json_obj_descr *descr, size_t descr_len,
-	void *val);
+int json_obj_parse(char *json, size_t len, const struct json_obj_descr *descr,
+		   size_t descr_len, void *val);
 
 /**
  * @brief Escapes the string so it can be used to encode JSON objects

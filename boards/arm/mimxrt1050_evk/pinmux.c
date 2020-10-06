@@ -10,11 +10,10 @@
 #include <soc.h>
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(enet), okay) && CONFIG_NET_L2_ETHERNET
-static gpio_pin_config_t enet_gpio_config = {
-	.direction = kGPIO_DigitalOutput,
-	.outputLogic = 0,
-	.interruptMode = kGPIO_NoIntmode
-};
+static gpio_pin_config_t enet_gpio_config = { .direction = kGPIO_DigitalOutput,
+					      .outputLogic = 0,
+					      .interruptMode =
+						      kGPIO_NoIntmode };
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(usdhc1), okay) && CONFIG_DISK_ACCESS_USDHC1
@@ -28,76 +27,55 @@ static gpio_pin_config_t enet_gpio_config = {
  *Hyst. Enable Field: Hysteresis Enabled.
  */
 
-static void mimxrt1050_evk_usdhc_pinmux(
-	uint16_t nusdhc, bool init,
-	uint32_t speed, uint32_t strength)
+static void mimxrt1050_evk_usdhc_pinmux(uint16_t nusdhc, bool init,
+					uint32_t speed, uint32_t strength)
 {
 	uint32_t cmd_data = IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) |
-				IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
-				IOMUXC_SW_PAD_CTL_PAD_DSE(strength);
+			    IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
+			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
+			    IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
+			    IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
+			    IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
+			    IOMUXC_SW_PAD_CTL_PAD_DSE(strength);
 	uint32_t clk = IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) |
-				IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
-				IOMUXC_SW_PAD_CTL_PAD_PUS(0) |
-				IOMUXC_SW_PAD_CTL_PAD_DSE(strength);
+		       IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
+		       IOMUXC_SW_PAD_CTL_PAD_HYS_MASK |
+		       IOMUXC_SW_PAD_CTL_PAD_PUS(0) |
+		       IOMUXC_SW_PAD_CTL_PAD_DSE(strength);
 
 	if (nusdhc == 0) {
 		if (init) {
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_AD_B0_05_GPIO1_IO05,
-				0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_05_GPIO1_IO05, 0U);
 			IOMUXC_SetPinMux(/*SD_CD*/
-				IOMUXC_GPIO_B1_12_GPIO2_IO28,
-				0U);
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_B1_14_USDHC1_VSELECT,
-				0U);
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_SD_B0_00_USDHC1_CMD,
-				0U);
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_SD_B0_01_USDHC1_CLK,
-				0U);
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0,
-				0U);
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_SD_B0_03_USDHC1_DATA1,
-				0U);
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_SD_B0_04_USDHC1_DATA2,
-				0U);
-			IOMUXC_SetPinMux(
-				IOMUXC_GPIO_SD_B0_05_USDHC1_DATA3,
-				0U);
+					 IOMUXC_GPIO_B1_12_GPIO2_IO28, 0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_B1_14_USDHC1_VSELECT, 0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD, 0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK, 0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0, 0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_03_USDHC1_DATA1, 0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_04_USDHC1_DATA2, 0U);
+			IOMUXC_SetPinMux(IOMUXC_GPIO_SD_B0_05_USDHC1_DATA3, 0U);
 
-			IOMUXC_SetPinConfig(
-				IOMUXC_GPIO_AD_B0_05_GPIO1_IO05,
-				0x10B0u);
+			IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_05_GPIO1_IO05,
+					    0x10B0u);
 			IOMUXC_SetPinConfig(/*SD0_CD_SW*/
-				IOMUXC_GPIO_B1_12_GPIO2_IO28,
-				0x017089u);
+					    IOMUXC_GPIO_B1_12_GPIO2_IO28,
+					    0x017089u);
 			IOMUXC_SetPinConfig(/*SD0_VSELECT*/
-				IOMUXC_GPIO_B1_14_USDHC1_VSELECT,
-				0x0170A1u);
+					    IOMUXC_GPIO_B1_14_USDHC1_VSELECT,
+					    0x0170A1u);
 		}
 
-		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD,
-			cmd_data);
-		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK,
-			clk);
+		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD, cmd_data);
+		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK, clk);
 		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0,
-			cmd_data);
+				    cmd_data);
 		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_03_USDHC1_DATA1,
-			cmd_data);
+				    cmd_data);
 		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_04_USDHC1_DATA2,
-			cmd_data);
+				    cmd_data);
 		IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_05_USDHC1_DATA3,
-			cmd_data);
+				    cmd_data);
 	}
 }
 #endif
@@ -114,8 +92,8 @@ static int mimxrt1050_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_11_GPIO1_IO11,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if !CONFIG_NET_L2_ETHERNET
@@ -124,8 +102,8 @@ static int mimxrt1050_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_09_GPIO1_IO09,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	/* SW0 */
 	IOMUXC_SetPinMux(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 0);
@@ -138,13 +116,13 @@ static int mimxrt1050_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_12_LPUART1_TX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_LPUART1_RX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpuart3), okay) && CONFIG_SERIAL
@@ -154,13 +132,13 @@ static int mimxrt1050_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_06_LPUART3_TX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_07_LPUART3_RX,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpi2c1), okay) && CONFIG_I2C
@@ -170,17 +148,17 @@ static int mimxrt1050_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL,
 			    IOMUXC_SW_PAD_CTL_PAD_PUS(3) |
-			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA,
 			    IOMUXC_SW_PAD_CTL_PAD_PUS(3) |
-			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_ODE_MASK |
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lpspi3), okay) && CONFIG_SPI
@@ -192,23 +170,23 @@ static int mimxrt1050_evk_init(const struct device *dev)
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_00_LPSPI3_SCK,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_01_LPSPI3_SDO,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_02_LPSPI3_SDI,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_03_LPSPI3_PCS0,
 			    IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-			    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
-			    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
+				    IOMUXC_SW_PAD_CTL_PAD_SPEED(2) |
+				    IOMUXC_SW_PAD_CTL_PAD_DSE(6));
 #endif
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(enet), okay) && CONFIG_NET_L2_ETHERNET
@@ -303,7 +281,8 @@ static int mimxrt1050_evk_init(const struct device *dev)
 	IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_15_GPIO2_IO31, 0x10B0u);
 
 	gpio_pin_config_t config = {
-		kGPIO_DigitalOutput, 0,
+		kGPIO_DigitalOutput,
+		0,
 	};
 
 	config.outputLogic = 1;

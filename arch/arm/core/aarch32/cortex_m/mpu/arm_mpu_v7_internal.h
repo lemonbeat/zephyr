@@ -8,7 +8,6 @@
 #ifndef ZEPHYR_ARCH_ARM_CORE_AARCH32_CORTEX_M_MPU_ARM_MPU_V7_INTERNAL_H_
 #define ZEPHYR_ARCH_ARM_CORE_AARCH32_CORTEX_M_MPU_ARM_MPU_V7_INTERNAL_H_
 
-
 #include <sys/math_extras.h>
 
 #define LOG_LEVEL CONFIG_MPU_LOG_LEVEL
@@ -26,16 +25,16 @@ static void mpu_init(void)
  *   The caller must provide a valid region index.
  */
 static void region_init(const uint32_t index,
-	const struct arm_mpu_region *region_conf)
+			const struct arm_mpu_region *region_conf)
 {
 	/* Select the region you want to access */
 	MPU->RNR = index;
 	/* Configure the region */
-	MPU->RBAR = (region_conf->base & MPU_RBAR_ADDR_Msk)
-				| MPU_RBAR_VALID_Msk | index;
+	MPU->RBAR = (region_conf->base & MPU_RBAR_ADDR_Msk) |
+		    MPU_RBAR_VALID_Msk | index;
 	MPU->RASR = region_conf->attr.rasr | MPU_RASR_ENABLE_Msk;
-	LOG_DBG("[%d] 0x%08x 0x%08x",
-		index, region_conf->base, region_conf->attr.rasr);
+	LOG_DBG("[%d] 0x%08x 0x%08x", index, region_conf->base,
+		region_conf->attr.rasr);
 }
 
 /* @brief Partition sanity check
@@ -54,10 +53,8 @@ static int mpu_partition_is_valid(const struct k_mem_partition *part)
 	 * partition must align with size.
 	 */
 	int partition_is_valid =
-		((part->size & (part->size - 1U)) == 0U)
-		&&
-		(part->size >= CONFIG_ARM_MPU_REGION_MIN_ALIGN_AND_SIZE)
-		&&
+		((part->size & (part->size - 1U)) == 0U) &&
+		(part->size >= CONFIG_ARM_MPU_REGION_MIN_ALIGN_AND_SIZE) &&
 		((part->start & (part->size - 1U)) == 0U);
 
 	return partition_is_valid;
@@ -88,7 +85,7 @@ static inline uint32_t size_to_mpu_rasr_size(uint32_t size)
 	}
 
 	return ((32 - __builtin_clz(size - 1U) - 2 + 1) << MPU_RASR_SIZE_Pos) &
-		MPU_RASR_SIZE_Msk;
+	       MPU_RASR_SIZE_Msk;
 }
 
 /**
@@ -96,14 +93,15 @@ static inline uint32_t size_to_mpu_rasr_size(uint32_t size)
  * region attribute configuration and size and fill-in a driver-specific
  * structure with the correct MPU region configuration.
  */
-static inline void get_region_attr_from_k_mem_partition_info(
-	arm_mpu_region_attr_t *p_attr,
-	const k_mem_partition_attr_t *attr, uint32_t base, uint32_t size)
+static inline void
+get_region_attr_from_k_mem_partition_info(arm_mpu_region_attr_t *p_attr,
+					  const k_mem_partition_attr_t *attr,
+					  uint32_t base, uint32_t size)
 {
 	/* in ARMv7-M MPU the base address is not required
 	 * to determine region attributes
 	 */
-	(void) base;
+	(void)base;
 
 	p_attr->rasr = attr->rasr_attr | size_to_mpu_rasr_size(size);
 }
@@ -140,7 +138,8 @@ static inline uint32_t mpu_region_get_base(uint32_t index)
 static inline uint32_t mpu_region_get_size(uint32_t index)
 {
 	MPU->RNR = index;
-	uint32_t rasr_size = (MPU->RASR & MPU_RASR_SIZE_Msk) >> MPU_RASR_SIZE_Pos;
+	uint32_t rasr_size = (MPU->RASR & MPU_RASR_SIZE_Msk) >>
+			     MPU_RASR_SIZE_Pos;
 
 	return mpu_rasr_size_to_size(rasr_size);
 }
@@ -215,8 +214,7 @@ static inline int is_in_region(uint32_t r_index, uint32_t start, uint32_t size)
 	irq_unlock(key);
 
 	r_addr_start = rbar & MPU_RBAR_ADDR_Msk;
-	r_size_lshift = ((rasr & MPU_RASR_SIZE_Msk) >>
-			MPU_RASR_SIZE_Pos) + 1U;
+	r_size_lshift = ((rasr & MPU_RASR_SIZE_Msk) >> MPU_RASR_SIZE_Pos) + 1U;
 	r_addr_end = r_addr_start + (1UL << r_size_lshift) - 1UL;
 
 	size = size == 0U ? 0U : size - 1U;
@@ -241,7 +239,6 @@ static inline int is_user_accessible_region(uint32_t r_index, int write)
 {
 	uint32_t r_ap = get_region_ap(r_index);
 
-
 	if (write) {
 		return r_ap == P_RW_U_RW;
 	}
@@ -258,7 +255,7 @@ static inline int mpu_buffer_validate(void *addr, size_t size, int write)
 	int32_t r_index;
 
 	/* Iterate all mpu regions in reversed order */
-	for (r_index = get_num_regions() - 1U; r_index >= 0;  r_index--) {
+	for (r_index = get_num_regions() - 1U; r_index >= 0; r_index--) {
 		if (!is_enabled_region(r_index) ||
 		    !is_in_region(r_index, (uint32_t)addr, size)) {
 			continue;
@@ -277,17 +274,16 @@ static inline int mpu_buffer_validate(void *addr, size_t size, int write)
 	}
 
 	return -EPERM;
-
 }
 
 #endif /* CONFIG_USERSPACE */
 
 static int mpu_configure_region(const uint8_t index,
-	const struct k_mem_partition *new_region);
+				const struct k_mem_partition *new_region);
 
-static int mpu_configure_regions(const struct k_mem_partition
-	*regions[], uint8_t regions_num, uint8_t start_reg_index,
-	bool do_sanity_check);
+static int mpu_configure_regions(const struct k_mem_partition *regions[],
+				 uint8_t regions_num, uint8_t start_reg_index,
+				 bool do_sanity_check);
 
 /* This internal function programs the static MPU regions.
  *
@@ -297,10 +293,11 @@ static int mpu_configure_regions(const struct k_mem_partition
  * If the static MPU regions configuration has not been successfully
  * performed, the error signal is propagated to the caller of the function.
  */
-static int mpu_configure_static_mpu_regions(const struct k_mem_partition
-	*static_regions[], const uint8_t regions_num,
-	const uint32_t background_area_base,
-	const uint32_t background_area_end)
+static int
+mpu_configure_static_mpu_regions(const struct k_mem_partition *static_regions[],
+				 const uint8_t regions_num,
+				 const uint32_t background_area_base,
+				 const uint32_t background_area_end)
 {
 	int mpu_reg_index = static_regions_num;
 
@@ -310,8 +307,8 @@ static int mpu_configure_static_mpu_regions(const struct k_mem_partition
 	ARG_UNUSED(background_area_base);
 	ARG_UNUSED(background_area_end);
 
-	mpu_reg_index = mpu_configure_regions(static_regions,
-		regions_num, mpu_reg_index, true);
+	mpu_reg_index = mpu_configure_regions(static_regions, regions_num,
+					      mpu_reg_index, true);
 
 	static_regions_num = mpu_reg_index;
 
@@ -326,8 +323,8 @@ static int mpu_configure_static_mpu_regions(const struct k_mem_partition
  * If the dynamic MPU regions configuration has not been successfully
  * performed, the error signal is propagated to the caller of the function.
  */
-static int mpu_configure_dynamic_mpu_regions(const struct k_mem_partition
-	*dynamic_regions[], uint8_t regions_num)
+static int mpu_configure_dynamic_mpu_regions(
+	const struct k_mem_partition *dynamic_regions[], uint8_t regions_num)
 {
 	int mpu_reg_index = static_regions_num;
 
@@ -335,11 +332,10 @@ static int mpu_configure_dynamic_mpu_regions(const struct k_mem_partition
 	 * programmed on top of existing SRAM region configuration.
 	 */
 
-	mpu_reg_index = mpu_configure_regions(dynamic_regions,
-		regions_num, mpu_reg_index, false);
+	mpu_reg_index = mpu_configure_regions(dynamic_regions, regions_num,
+					      mpu_reg_index, false);
 
 	if (mpu_reg_index != -EINVAL) {
-
 		/* Disable the non-programmed MPU regions. */
 		for (int i = mpu_reg_index; i < get_num_regions(); i++) {
 			ARM_MPU_ClrRegion(i);
@@ -349,4 +345,4 @@ static int mpu_configure_dynamic_mpu_regions(const struct k_mem_partition
 	return mpu_reg_index;
 }
 
-#endif	/* ZEPHYR_ARCH_ARM_CORE_AARCH32_CORTEX_M_MPU_ARM_MPU_V7_INTERNAL_H_ */
+#endif /* ZEPHYR_ARCH_ARM_CORE_AARCH32_CORTEX_M_MPU_ARM_MPU_V7_INTERNAL_H_ */

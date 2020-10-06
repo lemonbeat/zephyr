@@ -34,8 +34,8 @@ struct net_nbr_lladdr {
 	uint8_t ref;
 };
 
-#define NET_NBR_LLADDR_INIT(_name, _count)	\
-	struct net_nbr_lladdr _name[_count] = { }
+#define NET_NBR_LLADDR_INIT(_name, _count) \
+	struct net_nbr_lladdr _name[_count] = {}
 
 /* Alignment needed for various parts of the neighbor definition */
 #define __net_nbr_align __aligned(sizeof(int))
@@ -75,17 +75,18 @@ struct net_nbr {
 };
 
 /* This is an array of struct net_nbr + some additional data */
-#define NET_NBR_POOL_INIT(_name, _count, _size, _remove, _extra_size)	\
-	struct {							\
-		struct net_nbr nbr;					\
-		uint8_t data[ROUND_UP(_size, 4)] __net_nbr_align;	\
-		uint8_t extra[ROUND_UP(_extra_size, 4)] __net_nbr_align;\
-	} _name[_count] = {						\
-		[0 ... (_count - 1)] = { .nbr = {			\
-			.idx = NET_NBR_LLADDR_UNKNOWN,			\
-			.remove = _remove,				\
-			.size = ROUND_UP(_size, 4),			\
-			.extra_data_size = ROUND_UP(_extra_size, 4) } },\
+#define NET_NBR_POOL_INIT(_name, _count, _size, _remove, _extra_size)         \
+	struct {                                                              \
+		struct net_nbr nbr;                                           \
+		uint8_t data[ROUND_UP(_size, 4)] __net_nbr_align;             \
+		uint8_t extra[ROUND_UP(_extra_size, 4)] __net_nbr_align;      \
+	} _name[_count] = {                                                   \
+		[0 ...(_count -                                               \
+		       1)] = { .nbr = { .idx = NET_NBR_LLADDR_UNKNOWN,        \
+					.remove = _remove,                    \
+					.size = ROUND_UP(_size, 4),           \
+					.extra_data_size =                    \
+						ROUND_UP(_extra_size, 4) } }, \
 	}
 
 struct net_nbr_table {
@@ -104,16 +105,14 @@ struct net_nbr_table {
 
 /* Type of the table can be NET_NBR_LOCAL or NET_NBR_GLOBAL
  */
-#define NET_NBR_TABLE_INIT(_type, _name, _pool, _clear)			\
-	_type struct net_nbr_table_##_name {				\
-		struct net_nbr_table table;				\
-	} net_##_name __used = {					\
-		.table = {						\
-			.clear = _clear,				\
-			.nbr = (struct net_nbr *)_pool,			\
-			.nbr_count = ARRAY_SIZE(_pool),			\
-		}							\
-	}
+#define NET_NBR_TABLE_INIT(_type, _name, _pool, _clear)                  \
+	_type struct net_nbr_table_##_name {                             \
+		struct net_nbr_table table;                              \
+	} net_##_name __used = { .table = {                              \
+					 .clear = _clear,                \
+					 .nbr = (struct net_nbr *)_pool, \
+					 .nbr_count = ARRAY_SIZE(_pool), \
+				 } }
 
 /**
  *  @brief Get a pointer to the extra data of a neighbor entry.

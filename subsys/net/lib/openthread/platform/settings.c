@@ -78,11 +78,9 @@ static int ot_setting_delete_subtree(int key, int index)
 {
 	int ret;
 	char subtree[OT_SETTINGS_MAX_PATH_LEN];
-	struct ot_setting_delete_ctx delete_ctx = {
-		.subtree = subtree,
-		.status = -ENOENT,
-		.target_index = index
-	};
+	struct ot_setting_delete_ctx delete_ctx = { .subtree = subtree,
+						    .status = -ENOENT,
+						    .target_index = index };
 
 	if (key == -1) {
 		ret = snprintk(subtree, sizeof(subtree), "%s",

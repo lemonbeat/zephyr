@@ -67,7 +67,7 @@ int check_result(int i, uint32_t t)
 	if (bench_test_end() != 0) {
 		fprintf(output_file, sz_case_result_fmt, sz_fail);
 		fprintf(output_file, sz_case_details_fmt,
-				"timer tick happened. Results are inaccurate");
+			"timer tick happened. Results are inaccurate");
 		fprintf(output_file, sz_case_end_fmt);
 		return 0;
 	}
@@ -80,9 +80,9 @@ int check_result(int i, uint32_t t)
 	}
 	fprintf(output_file, sz_case_result_fmt, sz_success);
 	fprintf(output_file, sz_case_details_fmt,
-			"Average time for 1 iteration: ");
+		"Average time for 1 iteration: ");
 	fprintf(output_file, sz_case_timing_fmt,
-			SYS_CLOCK_HW_CYCLES_TO_NS_AVG(t, number_of_loops));
+		SYS_CLOCK_HW_CYCLES_TO_NS_AVG(t, number_of_loops));
 
 	fprintf(output_file, sz_case_end_fmt);
 	return 1;
@@ -107,7 +107,6 @@ void init_output(int *continuously)
 	output_file = stdout;
 }
 
-
 /**
  *
  * @brief Close output for the test
@@ -126,8 +125,8 @@ void output_close(void)
  */
 void main(void)
 {
-	int	    continuously = 0;
-	int	    test_result;
+	int continuously = 0;
+	int test_result;
 
 	number_of_loops = NUMBER_OF_LOOPS;
 
@@ -147,11 +146,8 @@ void main(void)
 	init_output(&continuously);
 	bench_test_init();
 
-
-
 	do {
-		fprintf(output_file, sz_module_title_fmt,
-			"kernel API test");
+		fprintf(output_file, sz_module_title_fmt, "kernel API test");
 		fprintf(output_file, sz_kernel_ver_fmt,
 			sys_kernel_version_get());
 		fprintf(output_file,

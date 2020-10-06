@@ -24,18 +24,18 @@
 extern "C" {
 #endif
 
-#define MODEM_PIN(name_, pin_, flags_) { \
-	.dev_name = name_, \
-	.pin = pin_, \
-	.init_flags = flags_ \
-}
+#define MODEM_PIN(name_, pin_, flags_)                               \
+	{                                                            \
+		.dev_name = name_, .pin = pin_, .init_flags = flags_ \
+	}
 
 struct modem_iface {
 	const struct device *dev;
 
 	int (*read)(struct modem_iface *iface, uint8_t *buf, size_t size,
 		    size_t *bytes_read);
-	int (*write)(struct modem_iface *iface, const uint8_t *buf, size_t size);
+	int (*write)(struct modem_iface *iface, const uint8_t *buf,
+		     size_t size);
 
 	/* implementation data */
 	void *iface_data;
@@ -66,7 +66,7 @@ struct modem_context {
 	char *data_imsi;
 	char *data_iccid;
 #endif
-	int   data_rssi;
+	int data_rssi;
 
 	/* pin config */
 	struct modem_pin *pins;

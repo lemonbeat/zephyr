@@ -54,9 +54,10 @@ static struct sockaddr_in any_addr4;
 static const struct in_addr sin_addr_any = INADDR_ANY_INIT;
 
 static struct in6_addr my_v6_inaddr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					  0, 0, 0, 0, 0, 0, 0, 0x2a } } };
+					    0, 0, 0, 0, 0, 0, 0, 0x2a } } };
 static struct in6_addr peer_v6_inaddr = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0,
-				      0, 0, 0, 0, 0x4e, 0x11, 0, 0, 0xa2 } } };
+					      0, 0, 0, 0, 0x4e, 0x11, 0, 0,
+					      0xa2 } } };
 static struct sockaddr_in6 my_v6_addr;
 static struct sockaddr_in6 peer_v6_addr;
 
@@ -104,8 +105,7 @@ static void net_tcp_iface_init(struct net_if *iface)
 		mac_addr_1[4] = 0x53;
 		mac_addr_1[5] = 0x01;
 
-		net_if_set_link_addr(iface, mac_addr_1, 6,
-				     NET_LINK_ETHERNET);
+		net_if_set_link_addr(iface, mac_addr_1, 6, NET_LINK_ETHERNET);
 	}
 
 	if (mac_addr_2[0] == 0U) {
@@ -116,8 +116,7 @@ static void net_tcp_iface_init(struct net_if *iface)
 		mac_addr_2[4] = 0x53;
 		mac_addr_2[5] = 0x02;
 
-		net_if_set_link_addr(iface, mac_addr_2, 6,
-				     NET_LINK_ETHERNET);
+		net_if_set_link_addr(iface, mac_addr_2, 6, NET_LINK_ETHERNET);
 	}
 
 	return;
@@ -139,8 +138,8 @@ struct net_tcp_hdr *net_tcp_get_hdr(struct net_pkt *pkt,
 	net_pkt_cursor_backup(pkt, &backup);
 	net_pkt_cursor_init(pkt);
 
-	if (net_pkt_skip(pkt, net_pkt_ip_hdr_len(pkt) +
-			 net_pkt_ipv6_ext_len(pkt))) {
+	if (net_pkt_skip(pkt,
+			 net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt))) {
 		tcp_hdr = NULL;
 		goto out;
 	}
@@ -168,8 +167,8 @@ struct net_tcp_hdr *net_tcp_set_hdr(struct net_pkt *pkt,
 	net_pkt_cursor_backup(pkt, &backup);
 	net_pkt_cursor_init(pkt);
 
-	if (net_pkt_skip(pkt, net_pkt_ip_hdr_len(pkt) +
-			 net_pkt_ipv6_ext_len(pkt))) {
+	if (net_pkt_skip(pkt,
+			 net_pkt_ip_hdr_len(pkt) + net_pkt_ipv6_ext_len(pkt))) {
 		tcp_hdr = NULL;
 		goto out;
 	}
@@ -197,9 +196,8 @@ static void v6_send_syn_ack(struct net_pkt *req)
 	int ret;
 
 	ret = net_tcp_prepare_segment(reply_v6_ctx->tcp,
-				      NET_TCP_SYN | NET_TCP_ACK, NULL, 0,
-				      NULL, (struct sockaddr *)&my_v6_addr,
-				      &rsp);
+				      NET_TCP_SYN | NET_TCP_ACK, NULL, 0, NULL,
+				      (struct sockaddr *)&my_v6_addr, &rsp);
 	if (ret) {
 		DBG("TCP packet creation failed\n");
 		return;
@@ -227,7 +225,7 @@ static void v6_send_syn_ack(struct net_pkt *req)
 	net_pkt_hexdump(req, "request TCPv6");
 	net_pkt_hexdump(rsp, "reply   TCPv6");
 
-	ret =  net_recv_data(iface, rsp);
+	ret = net_recv_data(iface, rsp);
 	if (!ret) {
 		net_pkt_unref(rsp);
 	}
@@ -273,11 +271,11 @@ static inline struct in_addr *if_get_addr(struct net_if *iface)
 	for (i = 0; i < NET_IF_MAX_IPV4_ADDR; i++) {
 		if (iface->config.ip.ipv4->unicast[i].is_used &&
 		    iface->config.ip.ipv4->unicast[i].address.family ==
-								AF_INET &&
+			    AF_INET &&
 		    iface->config.ip.ipv4->unicast[i].addr_state ==
-							NET_ADDR_PREFERRED) {
-			return
-			    &iface->config.ip.ipv4->unicast[i].address.in_addr;
+			    NET_ADDR_PREFERRED) {
+			return &iface->config.ip.ipv4->unicast[i]
+					.address.in_addr;
 		}
 	}
 
@@ -295,8 +293,7 @@ struct ud {
 
 static struct ud *returned_ud;
 
-static enum net_verdict test_ok(struct net_conn *conn,
-				struct net_pkt *pkt,
+static enum net_verdict test_ok(struct net_conn *conn, struct net_pkt *pkt,
 				union net_ip_header *ip_hdr,
 				union net_proto_header *proto_hdr,
 				void *user_data)
@@ -322,8 +319,7 @@ static enum net_verdict test_ok(struct net_conn *conn,
 	return NET_OK;
 }
 
-static enum net_verdict test_fail(struct net_conn *conn,
-				  struct net_pkt *pkt,
+static enum net_verdict test_fail(struct net_conn *conn, struct net_pkt *pkt,
 				  union net_ip_header *ip_hdr,
 				  union net_proto_header *proto_hdr,
 				  void *user_data)
@@ -341,14 +337,13 @@ static uint8_t data[] = { 'f', 'o', 'o', 'b', 'a', 'r' };
 static struct net_pkt *setup_ipv6_tcp(struct net_if *iface,
 				      struct in6_addr *remote_addr,
 				      struct in6_addr *local_addr,
-				      uint16_t remote_port,
-				      uint16_t local_port)
+				      uint16_t remote_port, uint16_t local_port)
 {
 	struct net_pkt *pkt;
 	struct net_tcp_hdr tcp_hdr = { 0 };
 
-	pkt = net_pkt_alloc_with_buffer(iface, sizeof(data),
-					AF_INET6, IPPROTO_TCP, K_FOREVER);
+	pkt = net_pkt_alloc_with_buffer(iface, sizeof(data), AF_INET6,
+					IPPROTO_TCP, K_FOREVER);
 	if (!pkt) {
 		return NULL;
 	}
@@ -373,14 +368,13 @@ static struct net_pkt *setup_ipv6_tcp(struct net_if *iface,
 static struct net_pkt *setup_ipv4_tcp(struct net_if *iface,
 				      struct in_addr *remote_addr,
 				      struct in_addr *local_addr,
-				      uint16_t remote_port,
-				      uint16_t local_port)
+				      uint16_t remote_port, uint16_t local_port)
 {
 	struct net_pkt *pkt;
 	struct net_tcp_hdr tcp_hdr = { 0 };
 
-	pkt = net_pkt_alloc_with_buffer(iface, sizeof(data),
-					AF_INET, IPPROTO_TCP, K_FOREVER);
+	pkt = net_pkt_alloc_with_buffer(iface, sizeof(data), AF_INET,
+					IPPROTO_TCP, K_FOREVER);
 	if (!pkt) {
 		return NULL;
 	}
@@ -403,30 +397,86 @@ static struct net_pkt *setup_ipv4_tcp(struct net_if *iface,
 }
 
 uint8_t ipv6_hop_by_hop_ext_hdr[] = {
-/* Next header TCP */
-0x06,
-/* Length (multiple of 8 octets) */
-0x08,
-/* Experimental extension */
-0x3e,
-/* Length in bytes */
-0x20,
-0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-0x49, 0x4A, 0x4B, 0x4C, 0x4E, 0x4F, 0x50, 0x51,
-0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59,
-0x5A, 0x5B, 0x5C, 0x5D, 0x5F, 0x60, 0x61, 0x62,
-/* Another experimental extension */
-0x3e,
-/* Length in bytes */
-0x20,
-0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A,
-0x6B, 0x6C, 0x6D, 0x6F, 0x70, 0x71, 0x72, 0x73,
-0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A, 0x7B,
-0x7C, 0x7D, 0x7E, 0x21, 0x22, 0x23, 0x24, 0x25,
-/* Padding */
-0x00,
-/* Padding */
-0x00,
+	/* Next header TCP */
+	0x06,
+	/* Length (multiple of 8 octets) */
+	0x08,
+	/* Experimental extension */
+	0x3e,
+	/* Length in bytes */
+	0x20,
+	0x41,
+	0x42,
+	0x43,
+	0x44,
+	0x45,
+	0x46,
+	0x47,
+	0x48,
+	0x49,
+	0x4A,
+	0x4B,
+	0x4C,
+	0x4E,
+	0x4F,
+	0x50,
+	0x51,
+	0x52,
+	0x53,
+	0x54,
+	0x55,
+	0x56,
+	0x57,
+	0x58,
+	0x59,
+	0x5A,
+	0x5B,
+	0x5C,
+	0x5D,
+	0x5F,
+	0x60,
+	0x61,
+	0x62,
+	/* Another experimental extension */
+	0x3e,
+	/* Length in bytes */
+	0x20,
+	0x63,
+	0x64,
+	0x65,
+	0x66,
+	0x67,
+	0x68,
+	0x69,
+	0x6A,
+	0x6B,
+	0x6C,
+	0x6D,
+	0x6F,
+	0x70,
+	0x71,
+	0x72,
+	0x73,
+	0x74,
+	0x75,
+	0x76,
+	0x77,
+	0x78,
+	0x79,
+	0x7A,
+	0x7B,
+	0x7C,
+	0x7D,
+	0x7E,
+	0x21,
+	0x22,
+	0x23,
+	0x24,
+	0x25,
+	/* Padding */
+	0x00,
+	/* Padding */
+	0x00,
 };
 
 static struct net_pkt *setup_ipv6_tcp_long(struct net_if *iface,
@@ -438,9 +488,9 @@ static struct net_pkt *setup_ipv6_tcp_long(struct net_if *iface,
 	struct net_pkt *pkt;
 	struct net_tcp_hdr tcp_hdr = { 0 };
 
-	pkt = net_pkt_alloc_with_buffer(iface, sizeof(ipv6_hop_by_hop_ext_hdr) +
-					sizeof(data),
-					AF_INET6, IPPROTO_TCP, K_FOREVER);
+	pkt = net_pkt_alloc_with_buffer(
+		iface, sizeof(ipv6_hop_by_hop_ext_hdr) + sizeof(data), AF_INET6,
+		IPPROTO_TCP, K_FOREVER);
 	if (!pkt) {
 		return NULL;
 	}
@@ -469,12 +519,9 @@ static struct net_pkt *setup_ipv6_tcp_long(struct net_if *iface,
 
 #define TIMEOUT K_MSEC(200)
 
-static bool send_ipv6_tcp_msg(struct net_if *iface,
-			      struct in6_addr *src,
-			      struct in6_addr *dst,
-			      uint16_t src_port,
-			      uint16_t dst_port,
-			      struct ud *ud,
+static bool send_ipv6_tcp_msg(struct net_if *iface, struct in6_addr *src,
+			      struct in6_addr *dst, uint16_t src_port,
+			      uint16_t dst_port, struct ud *ud,
 			      bool expect_failure)
 {
 	struct net_pkt *pkt;
@@ -509,12 +556,9 @@ static bool send_ipv6_tcp_msg(struct net_if *iface,
 	return !fail;
 }
 
-static bool send_ipv4_tcp_msg(struct net_if *iface,
-			      struct in_addr *src,
-			      struct in_addr *dst,
-			      uint16_t src_port,
-			      uint16_t dst_port,
-			      struct ud *ud,
+static bool send_ipv4_tcp_msg(struct net_if *iface, struct in_addr *src,
+			      struct in_addr *dst, uint16_t src_port,
+			      uint16_t dst_port, struct ud *ud,
 			      bool expect_failure)
 {
 	struct net_pkt *pkt;
@@ -549,12 +593,9 @@ static bool send_ipv4_tcp_msg(struct net_if *iface,
 	return !fail;
 }
 
-static bool send_ipv6_tcp_long_msg(struct net_if *iface,
-				   struct in6_addr *src,
-				   struct in6_addr *dst,
-				   uint16_t src_port,
-				   uint16_t dst_port,
-				   struct ud *ud,
+static bool send_ipv6_tcp_long_msg(struct net_if *iface, struct in6_addr *src,
+				   struct in6_addr *dst, uint16_t src_port,
+				   uint16_t dst_port, struct ud *ud,
 				   bool expect_failure)
 {
 	struct net_pkt *pkt;
@@ -590,26 +631,23 @@ static bool send_ipv6_tcp_long_msg(struct net_if *iface,
 }
 
 static void set_port(sa_family_t family, struct sockaddr *raddr,
-		     struct sockaddr *laddr, uint16_t rport,
-		     uint16_t lport)
+		     struct sockaddr *laddr, uint16_t rport, uint16_t lport)
 {
 	if (family == AF_INET6) {
 		if (raddr) {
-			((struct sockaddr_in6 *)raddr)->
-				sin6_port = htons(rport);
+			((struct sockaddr_in6 *)raddr)->sin6_port =
+				htons(rport);
 		}
 		if (laddr) {
-			((struct sockaddr_in6 *)laddr)->
-				sin6_port = htons(lport);
+			((struct sockaddr_in6 *)laddr)->sin6_port =
+				htons(lport);
 		}
 	} else if (family == AF_INET) {
 		if (raddr) {
-			((struct sockaddr_in *)raddr)->
-				sin_port = htons(rport);
+			((struct sockaddr_in *)raddr)->sin_port = htons(rport);
 		}
 		if (laddr) {
-			((struct sockaddr_in *)laddr)->
-				sin_port = htons(lport);
+			((struct sockaddr_in *)laddr)->sin_port = htons(lport);
 		}
 	}
 }
@@ -629,7 +667,8 @@ static bool test_register(void)
 
 	struct sockaddr_in6 peer_addr6;
 	struct in6_addr in6addr_peer = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					  0, 0, 0, 0x4e, 0x11, 0, 0, 0x2 } } };
+					     0, 0, 0, 0x4e, 0x11, 0, 0,
+					     0x2 } } };
 
 	struct sockaddr_in my_addr4;
 	struct in_addr in4addr_my = { { { 192, 0, 2, 1 } } };
@@ -671,106 +710,90 @@ static bool test_register(void)
 	 * These tests are similar as when testing UDP.
 	 */
 
-#define REGISTER(family, raddr, laddr, rport, lport)			\
-	({								\
-		static struct ud user_data;				\
-									\
-		user_data.remote_addr = (struct sockaddr *)raddr;	\
-		user_data.local_addr =  (struct sockaddr *)laddr;	\
-		user_data.remote_port = rport;				\
-		user_data.local_port = lport;				\
-		user_data.test = #raddr"-"#laddr"-"#rport"-"#lport;	\
-									\
-		set_port(family, (struct sockaddr *)raddr,		\
-			 (struct sockaddr *)laddr, rport, lport);	\
-									\
-		ret = net_tcp_register(family,				\
-				       (struct sockaddr *)raddr,	\
-				       (struct sockaddr *)laddr,	\
-				       rport, lport,			\
-				       test_ok, &user_data,		\
-				       &handlers[i]);			\
-		if (ret) {						\
-			DBG("TCP register %s failed (%d)\n",		\
-			    user_data.test, ret);			\
-			return false;					\
-		}							\
-		user_data.handle = handlers[i++];			\
-		&user_data;						\
+#define REGISTER(family, raddr, laddr, rport, lport)                           \
+	({                                                                     \
+		static struct ud user_data;                                    \
+                                                                               \
+		user_data.remote_addr = (struct sockaddr *)raddr;              \
+		user_data.local_addr = (struct sockaddr *)laddr;               \
+		user_data.remote_port = rport;                                 \
+		user_data.local_port = lport;                                  \
+		user_data.test = #raddr "-" #laddr "-" #rport "-" #lport;      \
+                                                                               \
+		set_port(family, (struct sockaddr *)raddr,                     \
+			 (struct sockaddr *)laddr, rport, lport);              \
+                                                                               \
+		ret = net_tcp_register(family, (struct sockaddr *)raddr,       \
+				       (struct sockaddr *)laddr, rport, lport, \
+				       test_ok, &user_data, &handlers[i]);     \
+		if (ret) {                                                     \
+			DBG("TCP register %s failed (%d)\n", user_data.test,   \
+			    ret);                                              \
+			return false;                                          \
+		}                                                              \
+		user_data.handle = handlers[i++];                              \
+		&user_data;                                                    \
 	})
 
-#define REGISTER_FAIL(raddr, laddr, rport, lport)			\
-	ret = net_tcp_register(AF_INET,					\
-			       (struct sockaddr *)raddr,		\
-			       (struct sockaddr *)laddr,		\
-			       rport, lport,				\
-			       test_fail, INT_TO_POINTER(0), NULL);	\
-	if (!ret) {							\
-		DBG("TCP register invalid match %s failed\n",		\
-		    #raddr"-"#laddr"-"#rport"-"#lport);			\
-		return false;						\
+#define REGISTER_FAIL(raddr, laddr, rport, lport)                      \
+	ret = net_tcp_register(AF_INET, (struct sockaddr *)raddr,      \
+			       (struct sockaddr *)laddr, rport, lport, \
+			       test_fail, INT_TO_POINTER(0), NULL);    \
+	if (!ret) {                                                    \
+		DBG("TCP register invalid match %s failed\n",          \
+		    #raddr "-" #laddr "-" #rport "-" #lport);          \
+		return false;                                          \
 	}
 
-#define UNREGISTER(ud)							\
-	ret = net_tcp_unregister(ud->handle);				\
-	if (ret) {							\
-		DBG("TCP unregister %p failed (%d)\n", ud->handle,	\
-		    ret);						\
-		return false;						\
+#define UNREGISTER(ud)                                                   \
+	ret = net_tcp_unregister(ud->handle);                            \
+	if (ret) {                                                       \
+		DBG("TCP unregister %p failed (%d)\n", ud->handle, ret); \
+		return false;                                            \
 	}
 
-#define TEST_IPV6_OK(ud, raddr, laddr, rport, lport)			\
-	st = send_ipv6_tcp_msg(iface, raddr, laddr, rport, lport, ud,	\
-			       false);					\
-	if (!st) {							\
-		DBG("%d: TCP test \"%s\" fail\n", __LINE__,		\
-		    ud->test);						\
-		return false;						\
+#define TEST_IPV6_OK(ud, raddr, laddr, rport, lport)                          \
+	st = send_ipv6_tcp_msg(iface, raddr, laddr, rport, lport, ud, false); \
+	if (!st) {                                                            \
+		DBG("%d: TCP test \"%s\" fail\n", __LINE__, ud->test);        \
+		return false;                                                 \
 	}
 
-#define TEST_IPV4_OK(ud, raddr, laddr, rport, lport)			\
-	st = send_ipv4_tcp_msg(iface, raddr, laddr, rport, lport, ud,	\
-			       false);					\
-	if (!st) {							\
-		DBG("%d: TCP test \"%s\" fail\n", __LINE__,		\
-		    ud->test);						\
-		return false;						\
+#define TEST_IPV4_OK(ud, raddr, laddr, rport, lport)                          \
+	st = send_ipv4_tcp_msg(iface, raddr, laddr, rport, lport, ud, false); \
+	if (!st) {                                                            \
+		DBG("%d: TCP test \"%s\" fail\n", __LINE__, ud->test);        \
+		return false;                                                 \
 	}
 
-#define TEST_IPV6_LONG_OK(ud, raddr, laddr, rport, lport)		\
-	st = send_ipv6_tcp_long_msg(iface, raddr, laddr, rport, lport, ud, \
-			       false);					\
-	if (!st) {							\
-		DBG("%d: TCP long test \"%s\" fail\n", __LINE__,	\
-		    ud->test);						\
-		return false;						\
+#define TEST_IPV6_LONG_OK(ud, raddr, laddr, rport, lport)                   \
+	st = send_ipv6_tcp_long_msg(iface, raddr, laddr, rport, lport, ud,  \
+				    false);                                 \
+	if (!st) {                                                          \
+		DBG("%d: TCP long test \"%s\" fail\n", __LINE__, ud->test); \
+		return false;                                               \
 	}
 
-#define TEST_IPV4_LONG_OK(ud, raddr, laddr, rport, lport)		\
-	st = send_ipv4_tcp_long_msg(iface, raddr, laddr, rport, lport, ud, \
-			       false);					\
-	if (!st) {							\
-		DBG("%d: TCP long_test \"%s\" fail\n", __LINE__,	\
-		    ud->test);						\
-		return false;						\
+#define TEST_IPV4_LONG_OK(ud, raddr, laddr, rport, lport)                   \
+	st = send_ipv4_tcp_long_msg(iface, raddr, laddr, rport, lport, ud,  \
+				    false);                                 \
+	if (!st) {                                                          \
+		DBG("%d: TCP long_test \"%s\" fail\n", __LINE__, ud->test); \
+		return false;                                               \
 	}
 
-#define TEST_IPV6_FAIL(ud, raddr, laddr, rport, lport)			\
-	st = send_ipv6_tcp_msg(iface, raddr, laddr, rport, lport, ud,	\
-			       true);					\
-	if (!st) {							\
-		DBG("%d: TCP neg test \"%s\" fail\n", __LINE__,		\
-		    ud->test);						\
-		return false;						\
+#define TEST_IPV6_FAIL(ud, raddr, laddr, rport, lport)                       \
+	st = send_ipv6_tcp_msg(iface, raddr, laddr, rport, lport, ud, true); \
+	if (!st) {                                                           \
+		DBG("%d: TCP neg test \"%s\" fail\n", __LINE__, ud->test);   \
+		return false;                                                \
 	}
 
-#define TEST_IPV4_FAIL(ud, raddr, laddr, rport, lport)			\
-	st = send_ipv4_tcp_msg(iface, raddr, laddr, rport, lport, ud,	\
-			       true);					\
-	if (!st) {							\
-		DBG("%d: TCP neg test \"%s\" fail\n", __LINE__,		\
-		    ud->test);						\
-		return false;						\
+#define TEST_IPV4_FAIL(ud, raddr, laddr, rport, lport)                       \
+	st = send_ipv4_tcp_msg(iface, raddr, laddr, rport, lport, ud, true); \
+	if (!st) {                                                           \
+		DBG("%d: TCP neg test \"%s\" fail\n", __LINE__, ud->test);   \
+		return false;                                                \
 	}
 
 	ud = REGISTER(AF_INET6, &any_addr6, &any_addr6, 1234, 4242);
@@ -888,32 +911,28 @@ static bool v6_check_port_and_address(char *test_str, struct net_pkt *pkt,
 
 	if (!net_ipv6_addr_cmp(&NET_IPV6_HDR(pkt)->src,
 			       &my_v6_addr.sin6_addr)) {
-		DBG("%s: IPv6 source address mismatch, should be %s ",
-		    test_str, net_sprint_ipv6_addr(&my_v6_addr.sin6_addr));
-		DBG("was %s\n",
-		    net_sprint_ipv6_addr(&NET_IPV6_HDR(pkt)->src));
+		DBG("%s: IPv6 source address mismatch, should be %s ", test_str,
+		    net_sprint_ipv6_addr(&my_v6_addr.sin6_addr));
+		DBG("was %s\n", net_sprint_ipv6_addr(&NET_IPV6_HDR(pkt)->src));
 		return false;
 	}
 
 	if (tcp_hdr->src_port != my_v6_addr.sin6_port) {
-		DBG("%s: IPv6 source port mismatch, %d vs %d\n",
-		    test_str, ntohs(tcp_hdr->src_port),
-		    ntohs(my_v6_addr.sin6_port));
+		DBG("%s: IPv6 source port mismatch, %d vs %d\n", test_str,
+		    ntohs(tcp_hdr->src_port), ntohs(my_v6_addr.sin6_port));
 		return false;
 	}
 
 	if (!net_ipv6_addr_cmp(expected_dst_addr, &NET_IPV6_HDR(pkt)->dst)) {
 		DBG("%s: IPv6 destination address mismatch, should be %s ",
 		    test_str, net_sprint_ipv6_addr(expected_dst_addr));
-		DBG("was %s\n",
-		    net_sprint_ipv6_addr(&NET_IPV6_HDR(pkt)->dst));
+		DBG("was %s\n", net_sprint_ipv6_addr(&NET_IPV6_HDR(pkt)->dst));
 		return false;
 	}
 
 	if (tcp_hdr->dst_port != htons(expected_dst_port)) {
-		DBG("%s: IPv6 destination port mismatch, %d vs %d\n",
-		    test_str, ntohs(tcp_hdr->dst_port),
-		    expected_dst_port);
+		DBG("%s: IPv6 destination port mismatch, %d vs %d\n", test_str,
+		    ntohs(tcp_hdr->dst_port), expected_dst_port);
 		return false;
 	}
 
@@ -928,34 +947,29 @@ static bool v4_check_port_and_address(char *test_str, struct net_pkt *pkt,
 
 	tcp_hdr = net_tcp_get_hdr(pkt, NULL);
 
-	if (!net_ipv4_addr_cmp(&NET_IPV4_HDR(pkt)->src,
-			       &my_v4_addr.sin_addr)) {
-		DBG("%s: IPv4 source address mismatch, should be %s ",
-		    test_str, net_sprint_ipv4_addr(&my_v4_addr.sin_addr));
-		DBG("was %s\n",
-		    net_sprint_ipv4_addr(&NET_IPV4_HDR(pkt)->src));
+	if (!net_ipv4_addr_cmp(&NET_IPV4_HDR(pkt)->src, &my_v4_addr.sin_addr)) {
+		DBG("%s: IPv4 source address mismatch, should be %s ", test_str,
+		    net_sprint_ipv4_addr(&my_v4_addr.sin_addr));
+		DBG("was %s\n", net_sprint_ipv4_addr(&NET_IPV4_HDR(pkt)->src));
 		return false;
 	}
 
 	if (tcp_hdr->src_port != my_v4_addr.sin_port) {
-		DBG("%s: IPv4 source port mismatch, %d vs %d\n",
-		    test_str, ntohs(tcp_hdr->src_port),
-		    ntohs(my_v4_addr.sin_port));
+		DBG("%s: IPv4 source port mismatch, %d vs %d\n", test_str,
+		    ntohs(tcp_hdr->src_port), ntohs(my_v4_addr.sin_port));
 		return false;
 	}
 
 	if (!net_ipv4_addr_cmp(expected_dst_addr, &NET_IPV4_HDR(pkt)->dst)) {
 		DBG("%s: IPv4 destination address mismatch, should be %s ",
 		    test_str, net_sprint_ipv4_addr(expected_dst_addr));
-		DBG("was %s\n",
-		    net_sprint_ipv4_addr(&NET_IPV4_HDR(pkt)->dst));
+		DBG("was %s\n", net_sprint_ipv4_addr(&NET_IPV4_HDR(pkt)->dst));
 		return false;
 	}
 
 	if (tcp_hdr->dst_port != htons(expected_dst_port)) {
-		DBG("%s: IPv4 destination port mismatch, %d vs %d\n",
-		    test_str, ntohs(tcp_hdr->dst_port),
-		    expected_dst_port);
+		DBG("%s: IPv4 destination port mismatch, %d vs %d\n", test_str,
+		    ntohs(tcp_hdr->dst_port), expected_dst_port);
 		return false;
 	}
 
@@ -989,8 +1003,8 @@ static bool test_create_v6_reset_packet(void)
 		return false;
 	}
 
-	if (!v6_check_port_and_address("TCP reset", pkt,
-				       &peer_v6_inaddr, PEER_TCP_PORT)) {
+	if (!v6_check_port_and_address("TCP reset", pkt, &peer_v6_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1026,8 +1040,8 @@ static bool test_create_v4_reset_packet(void)
 		return false;
 	}
 
-	if (!v4_check_port_and_address("TCP reset", pkt,
-				       &peer_v4_inaddr, PEER_TCP_PORT)) {
+	if (!v4_check_port_and_address("TCP reset", pkt, &peer_v4_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1063,8 +1077,8 @@ static bool test_create_v6_syn_packet(void)
 		return false;
 	}
 
-	if (!v6_check_port_and_address("TCP syn", pkt,
-				       &peer_v6_inaddr, PEER_TCP_PORT)) {
+	if (!v6_check_port_and_address("TCP syn", pkt, &peer_v6_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1100,8 +1114,8 @@ static bool test_create_v4_syn_packet(void)
 		return false;
 	}
 
-	if (!v4_check_port_and_address("TCP syn", pkt,
-				       &peer_v4_inaddr, PEER_TCP_PORT)) {
+	if (!v4_check_port_and_address("TCP syn", pkt, &peer_v4_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1138,8 +1152,8 @@ static bool test_create_v6_synack_packet(void)
 		return false;
 	}
 
-	if (!v6_check_port_and_address("TCP synack", pkt,
-				       &peer_v6_inaddr, PEER_TCP_PORT)) {
+	if (!v6_check_port_and_address("TCP synack", pkt, &peer_v6_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1176,8 +1190,8 @@ static bool test_create_v4_synack_packet(void)
 		return false;
 	}
 
-	if (!v4_check_port_and_address("TCP synack", pkt,
-				       &peer_v4_inaddr, PEER_TCP_PORT)) {
+	if (!v4_check_port_and_address("TCP synack", pkt, &peer_v4_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1213,8 +1227,8 @@ static bool test_create_v6_fin_packet(void)
 		return false;
 	}
 
-	if (!v6_check_port_and_address("TCP fin", pkt,
-				       &peer_v6_inaddr, PEER_TCP_PORT)) {
+	if (!v6_check_port_and_address("TCP fin", pkt, &peer_v6_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1250,8 +1264,8 @@ static bool test_create_v4_fin_packet(void)
 		return false;
 	}
 
-	if (!v4_check_port_and_address("TCP fin", pkt,
-				       &peer_v4_inaddr, PEER_TCP_PORT)) {
+	if (!v4_check_port_and_address("TCP fin", pkt, &peer_v4_inaddr,
+				       PEER_TCP_PORT)) {
 		return false;
 	}
 
@@ -1280,13 +1294,10 @@ static bool test_v6_seq_check(void)
 
 	net_pkt_hexdump(pkt, "TCPv6");
 
-	seq = tcp_hdr->seq[0] << 24 |
-		tcp_hdr->seq[1] << 16 |
-		tcp_hdr->seq[2] << 8 |
-		tcp_hdr->seq[3];
+	seq = tcp_hdr->seq[0] << 24 | tcp_hdr->seq[1] << 16 |
+	      tcp_hdr->seq[2] << 8 | tcp_hdr->seq[3];
 	if (seq != tcp->send_seq) {
-		DBG("Seq does not match (%u vs %u)\n",
-		    seq, tcp->send_seq);
+		DBG("Seq does not match (%u vs %u)\n", seq, tcp->send_seq);
 		return false;
 	}
 
@@ -1315,13 +1326,10 @@ static bool test_v4_seq_check(void)
 
 	net_pkt_hexdump(pkt, "TCPv4");
 
-	seq = tcp_hdr->seq[0] << 24 |
-		tcp_hdr->seq[1] << 16 |
-		tcp_hdr->seq[2] << 8 |
-		tcp_hdr->seq[3];
+	seq = tcp_hdr->seq[0] << 24 | tcp_hdr->seq[1] << 16 |
+	      tcp_hdr->seq[2] << 8 | tcp_hdr->seq[3];
 	if (seq != tcp->send_seq) {
-		DBG("Seq does not match (%u vs %u)\n",
-		    seq, tcp->send_seq);
+		DBG("Seq does not match (%u vs %u)\n", seq, tcp->send_seq);
 		return false;
 	}
 
@@ -1383,18 +1391,17 @@ static struct dummy_api net_tcp_if_api_peer = {
 #define _ETH_L2_LAYER DUMMY_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
-NET_DEVICE_INIT_INSTANCE(net_tcp_test, "net_tcp_test", host,
-			 net_tcp_dev_init, device_pm_control_nop,
-			 &net_tcp_context_data, NULL,
-			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_tcp_if_api, _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
+NET_DEVICE_INIT_INSTANCE(net_tcp_test, "net_tcp_test", host, net_tcp_dev_init,
+			 device_pm_control_nop, &net_tcp_context_data, NULL,
+			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_tcp_if_api,
+			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 NET_DEVICE_INIT_INSTANCE(net_tcp_test_peer, "net_tcp_test_peer", peer,
 			 net_tcp_dev_init, device_pm_control_nop,
 			 &net_tcp_context_data_peer, NULL,
 			 CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			 &net_tcp_if_api_peer,
-			 _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
+			 &net_tcp_if_api_peer, _ETH_L2_LAYER, _ETH_L2_CTX_TYPE,
+			 127);
 
 static bool test_init_tcp_context(void)
 {
@@ -1402,19 +1409,17 @@ static bool test_init_tcp_context(void)
 	struct net_if_addr *ifaddr;
 	int ret;
 
-	ifaddr = net_if_ipv6_addr_add(iface, &my_v6_inaddr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface, &my_v6_inaddr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add %s to interface %p\n",
-		       net_sprint_ipv6_addr(&my_v6_inaddr), iface);
+		    net_sprint_ipv6_addr(&my_v6_inaddr), iface);
 		return false;
 	}
 
-	ifaddr = net_if_ipv4_addr_add(iface, &my_v4_inaddr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv4_addr_add(iface, &my_v4_inaddr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		DBG("Cannot add %s to interface %p\n",
-		       net_sprint_ipv4_addr(&my_v4_inaddr), iface);
+		    net_sprint_ipv4_addr(&my_v4_inaddr), iface);
 		return false;
 	}
 
@@ -1508,8 +1513,7 @@ static bool test_tcp_seq_validity(void)
 		return false;
 	}
 
-	tcp->send_ack = sys_get_be32(tcp_hdr->seq) -
-		get_recv_wnd(tcp) / 2U;
+	tcp->send_ack = sys_get_be32(tcp_hdr->seq) - get_recv_wnd(tcp) / 2U;
 	if (!net_tcp_validate_seq(tcp, tcp_hdr)) {
 		DBG("1) Sequence validation failed (send_ack %u vs seq %u)\n",
 		    tcp->send_ack, sys_get_be32(tcp_hdr->seq));
@@ -1523,16 +1527,14 @@ static bool test_tcp_seq_validity(void)
 		return false;
 	}
 
-	tcp->send_ack = sys_get_be32(tcp_hdr->seq) +
-		get_recv_wnd(tcp) * 2U;
+	tcp->send_ack = sys_get_be32(tcp_hdr->seq) + get_recv_wnd(tcp) * 2U;
 	if (net_tcp_validate_seq(tcp, tcp_hdr)) {
 		DBG("3) Sequence validation failed (send_ack %u vs seq %u)\n",
 		    tcp->send_ack, sys_get_be32(tcp_hdr->seq));
 		return false;
 	}
 
-	tcp->send_ack = sys_get_be32(tcp_hdr->seq) -
-		get_recv_wnd(tcp) * 2U;
+	tcp->send_ack = sys_get_be32(tcp_hdr->seq) - get_recv_wnd(tcp) * 2U;
 	if (net_tcp_validate_seq(tcp, tcp_hdr)) {
 		DBG("4) Sequence validation failed (send_ack %u vs seq %u)\n",
 		    tcp->send_ack, sys_get_be32(tcp_hdr->seq));
@@ -1583,8 +1585,7 @@ static bool test_init_tcp_reply_context(void)
 		return false;
 	}
 
-	ret = net_context_get(AF_INET, SOCK_STREAM, IPPROTO_TCP,
-			      &reply_v4_ctx);
+	ret = net_context_get(AF_INET, SOCK_STREAM, IPPROTO_TCP, &reply_v4_ctx);
 	if (ret != 0) {
 		TC_ERROR("Context get reply v4 test failed.\n");
 		return false;
@@ -1605,20 +1606,14 @@ static bool test_init_tcp_reply_context(void)
 	return true;
 }
 
-static void accept_v6_cb(struct net_context *new_context,
-			 struct sockaddr *addr,
-			 socklen_t addrlen,
-			 int error,
-			 void *user_data)
+static void accept_v6_cb(struct net_context *new_context, struct sockaddr *addr,
+			 socklen_t addrlen, int error, void *user_data)
 {
 	DBG("error %d\n", error);
 }
 
-static void accept_v4_cb(struct net_context *new_context,
-			 struct sockaddr *addr,
-			 socklen_t addrlen,
-			 int error,
-			 void *user_data)
+static void accept_v4_cb(struct net_context *new_context, struct sockaddr *addr,
+			 socklen_t addrlen, int error, void *user_data)
 {
 	DBG("error %d\n", error);
 }
@@ -1759,8 +1754,7 @@ static bool test_init(void)
 
 	iface = my_iface;
 
-	ifaddr = net_if_ipv6_addr_add(iface, &my_v6_inaddr,
-				      NET_ADDR_MANUAL, 0);
+	ifaddr = net_if_ipv6_addr_add(iface, &my_v6_inaddr, NET_ADDR_MANUAL, 0);
 	if (!ifaddr) {
 		TC_ERROR("Cannot add address\n");
 		return false;

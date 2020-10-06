@@ -30,9 +30,9 @@ static int sm351lt_trigger_set(const struct device *dev,
 
 	if (trig->chan == SENSOR_CHAN_PROX) {
 		data->changed_handler = handler;
-		ret = gpio_pin_interrupt_configure(data->bus, config->gpio_pin,
-						   (handler ? data->trigger_type
-							    : GPIO_INT_DISABLE));
+		ret = gpio_pin_interrupt_configure(
+			data->bus, config->gpio_pin,
+			(handler ? data->trigger_type : GPIO_INT_DISABLE));
 
 		if (ret < 0) {
 			return ret;
@@ -135,8 +135,7 @@ static int sm351lt_channel_get(const struct device *dev,
 }
 
 #if CONFIG_SM351LT_TRIGGER
-static int sm351lt_attr_set(const struct device *dev,
-			    enum sensor_channel chan,
+static int sm351lt_attr_set(const struct device *dev, enum sensor_channel chan,
 			    enum sensor_attribute attr,
 			    const struct sensor_value *val)
 {
@@ -156,8 +155,7 @@ static int sm351lt_attr_set(const struct device *dev,
 	return 0;
 }
 
-static int sm351lt_attr_get(const struct device *dev,
-			    enum sensor_channel chan,
+static int sm351lt_attr_get(const struct device *dev, enum sensor_channel chan,
 			    enum sensor_attribute attr,
 			    struct sensor_value *val)
 {
@@ -216,9 +214,9 @@ static int sm351lt_init(const struct device *dev)
 
 	k_thread_create(&data->thread, data->thread_stack,
 			CONFIG_SM351LT_THREAD_STACK_SIZE,
-			(k_thread_entry_t)sm351lt_thread, data, NULL,
-			NULL, K_PRIO_COOP(CONFIG_SM351LT_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			(k_thread_entry_t)sm351lt_thread, data, NULL, NULL,
+			K_PRIO_COOP(CONFIG_SM351LT_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 
 #if defined(CONFIG_THREAD_NAME) && defined(CONFIG_THREAD_MAX_NAME_LEN)
 	/* Sets up thread name as the device name */
@@ -247,23 +245,18 @@ static int sm351lt_init(const struct device *dev)
 }
 
 /* Instantiation macros for each individual device. */
-#define SM351LT_DEFINE(inst)					     \
-	static struct sm351lt_data sm351lt_data_##inst;		     \
-	static const struct sm351lt_config sm351lt_config_##inst = { \
-		.bus_name =   DT_INST_GPIO_LABEL(inst, gpios),	     \
-		.gpio_pin =   DT_INST_GPIO_PIN(inst, gpios),	     \
-		.gpio_flags = DT_INST_GPIO_FLAGS(inst, gpios),	     \
-	};							     \
-								     \
-	DEVICE_AND_API_INIT(sm351lt_##inst,			     \
-			    DT_INST_LABEL(inst),		     \
-			    sm351lt_init,			     \
-			    &sm351lt_data_##inst,		     \
-			    &sm351lt_config_##inst,		     \
-			    POST_KERNEL,			     \
-			    CONFIG_SENSOR_INIT_PRIORITY,	     \
+#define SM351LT_DEFINE(inst)                                                   \
+	static struct sm351lt_data sm351lt_data_##inst;                        \
+	static const struct sm351lt_config sm351lt_config_##inst = {           \
+		.bus_name = DT_INST_GPIO_LABEL(inst, gpios),                   \
+		.gpio_pin = DT_INST_GPIO_PIN(inst, gpios),                     \
+		.gpio_flags = DT_INST_GPIO_FLAGS(inst, gpios),                 \
+	};                                                                     \
+                                                                               \
+	DEVICE_AND_API_INIT(sm351lt_##inst, DT_INST_LABEL(inst), sm351lt_init, \
+			    &sm351lt_data_##inst, &sm351lt_config_##inst,      \
+			    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,          \
 			    &sm351lt_api_funcs);
-
 
 /* Main instantiation macro for every configured device in DTS. */
 DT_INST_FOREACH_STATUS_OKAY(SM351LT_DEFINE)

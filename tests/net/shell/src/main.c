@@ -114,11 +114,11 @@ static inline struct in_addr *if_get_addr(struct net_if *iface)
 	for (i = 0; i < NET_IF_MAX_IPV4_ADDR; i++) {
 		if (iface->config.ip.ipv4->unicast[i].is_used &&
 		    iface->config.ip.ipv4->unicast[i].address.family ==
-								AF_INET &&
+			    AF_INET &&
 		    iface->config.ip.ipv4->unicast[i].addr_state ==
-							NET_ADDR_PREFERRED) {
-			return
-			    &iface->config.ip.ipv4->unicast[i].address.in_addr;
+			    NET_ADDR_PREFERRED) {
+			return &iface->config.ip.ipv4->unicast[i]
+					.address.in_addr;
 		}
 	}
 
@@ -135,11 +135,10 @@ static struct dummy_api net_udp_if_api = {
 #define _ETH_L2_LAYER DUMMY_L2
 #define _ETH_L2_CTX_TYPE NET_L2_GET_CTX_TYPE(DUMMY_L2)
 
-NET_DEVICE_INIT(net_udp_test, "net_udp_test",
-		net_udp_dev_init, device_pm_control_nop,
-		&net_udp_context_data, NULL,
-		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		&net_udp_if_api, _ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
+NET_DEVICE_INIT(net_udp_test, "net_udp_test", net_udp_dev_init,
+		device_pm_control_nop, &net_udp_context_data, NULL,
+		CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &net_udp_if_api,
+		_ETH_L2_LAYER, _ETH_L2_CTX_TYPE, 127);
 
 static void test_setup(void)
 {
@@ -155,7 +154,8 @@ static void test_setup(void)
 
 	struct sockaddr_in6 peer_addr6;
 	struct in6_addr in6addr_peer = { { { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
-					  0, 0, 0, 0x4e, 0x11, 0, 0, 0x2 } } };
+					     0, 0, 0, 0x4e, 0x11, 0, 0,
+					     0x2 } } };
 
 	struct sockaddr_in any_addr4;
 	const struct in_addr in4addr_any = { { { 0 } } };
@@ -218,8 +218,7 @@ static void test_net_shell(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_net_shell_usability,
-			 ztest_unit_test(test_setup),
+	ztest_test_suite(test_net_shell_usability, ztest_unit_test(test_setup),
 			 ztest_unit_test(test_net_shell));
 	ztest_run_test_suite(test_net_shell_usability);
 }

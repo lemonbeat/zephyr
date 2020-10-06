@@ -38,8 +38,8 @@ K_SEM_DEFINE(coop_sem2, 0, 1);
 volatile int coop_cnt1;
 volatile int coop_cnt2;
 
-#define WAIT_MS  10 /* Time to wait/sleep between actions */
-#define LOOP_CNT  4 /* Number of times low priority thread waits */
+#define WAIT_MS 10 /* Time to wait/sleep between actions */
+#define LOOP_CNT 4 /* Number of times low priority thread waits */
 
 /* Meta-IRQ thread */
 void metairq_thread(void)
@@ -129,15 +129,12 @@ void coop_thread2(void)
 	k_sem_give(&coop_sem2);
 }
 
-K_THREAD_DEFINE(metairq_thread_id, 1024,
-		metairq_thread, 0, 0, 0,
+K_THREAD_DEFINE(metairq_thread_id, 1024, metairq_thread, 0, 0, 0,
 		K_PRIO_COOP(0), 0, 0);
-K_THREAD_DEFINE(coop_thread1_id, 1024,
-		coop_thread1, 0, 0, 0,
-		K_PRIO_COOP(1), 0, 0);
-K_THREAD_DEFINE(coop_thread2_id, 1024,
-		coop_thread2, 0, 0, 0,
-		K_PRIO_COOP(2), 0, 0);
+K_THREAD_DEFINE(coop_thread1_id, 1024, coop_thread1, 0, 0, 0, K_PRIO_COOP(1), 0,
+		0);
+K_THREAD_DEFINE(coop_thread2_id, 1024, coop_thread2, 0, 0, 0, K_PRIO_COOP(2), 0,
+		0);
 
 void test_preempt(void)
 {
@@ -152,7 +149,6 @@ void test_preempt(void)
 
 void test_main(void)
 {
-	ztest_test_suite(suite_preempt,
-			 ztest_unit_test(test_preempt));
+	ztest_test_suite(suite_preempt, ztest_unit_test(test_preempt));
 	ztest_run_test_suite(suite_preempt);
 }

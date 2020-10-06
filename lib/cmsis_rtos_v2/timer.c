@@ -34,8 +34,8 @@ static void zephyr_timer_wrapper(struct k_timer *timer)
 /**
  * @brief Create a Timer
  */
-osTimerId_t osTimerNew(osTimerFunc_t func, osTimerType_t type,
-		       void *argument, const osTimerAttr_t *attr)
+osTimerId_t osTimerNew(osTimerFunc_t func, osTimerType_t type, void *argument,
+		       const osTimerAttr_t *attr)
 {
 	struct cv2_timer *timer;
 
@@ -51,7 +51,8 @@ osTimerId_t osTimerNew(osTimerFunc_t func, osTimerType_t type,
 		attr = &init_timer_attrs;
 	}
 
-	if (k_mem_slab_alloc(&cv2_timer_slab, (void **)&timer, K_MSEC(100)) == 0) {
+	if (k_mem_slab_alloc(&cv2_timer_slab, (void **)&timer, K_MSEC(100)) ==
+	    0) {
 		(void)memset(timer, 0, sizeof(struct cv2_timer));
 	} else {
 		return NULL;
@@ -92,8 +93,7 @@ osStatus_t osTimerStart(osTimerId_t timer_id, uint32_t ticks)
 	if (timer->type == osTimerOnce) {
 		k_timer_start(&timer->z_timer, K_TICKS(ticks), K_NO_WAIT);
 	} else if (timer->type == osTimerPeriodic) {
-		k_timer_start(&timer->z_timer,
-			      K_TICKS(ticks), K_TICKS(ticks));
+		k_timer_start(&timer->z_timer, K_TICKS(ticks), K_TICKS(ticks));
 	}
 
 	timer->status = ACTIVE;
@@ -129,7 +129,7 @@ osStatus_t osTimerStop(osTimerId_t timer_id)
  */
 osStatus_t osTimerDelete(osTimerId_t timer_id)
 {
-	struct cv2_timer *timer = (struct cv2_timer *) timer_id;
+	struct cv2_timer *timer = (struct cv2_timer *)timer_id;
 
 	if (timer == NULL) {
 		return osErrorParameter;
@@ -144,7 +144,7 @@ osStatus_t osTimerDelete(osTimerId_t timer_id)
 		timer->status = NOT_ACTIVE;
 	}
 
-	k_mem_slab_free(&cv2_timer_slab, (void *) &timer);
+	k_mem_slab_free(&cv2_timer_slab, (void *)&timer);
 	return osOK;
 }
 

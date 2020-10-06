@@ -22,16 +22,16 @@
 /**
  * USB endpoint direction and number.
  */
-#define USB_EP_DIR_MASK		0x80U
-#define USB_EP_DIR_IN		0x80U
-#define USB_EP_DIR_OUT		0x00U
+#define USB_EP_DIR_MASK 0x80U
+#define USB_EP_DIR_IN 0x80U
+#define USB_EP_DIR_OUT 0x00U
 
 /** Get endpoint index (number) from endpoint address */
 #define USB_EP_GET_IDX(ep) ((ep) & ~USB_EP_DIR_MASK)
 /** Get direction from endpoint address */
-#define USB_EP_GET_DIR(ep) ((ep) & USB_EP_DIR_MASK)
+#define USB_EP_GET_DIR(ep) ((ep)&USB_EP_DIR_MASK)
 /** Get endpoint address from endpoint index and direction */
-#define USB_EP_GET_ADDR(idx, dir) ((idx) | ((dir) & USB_EP_DIR_MASK))
+#define USB_EP_GET_ADDR(idx, dir) ((idx) | ((dir)&USB_EP_DIR_MASK))
 /** True if the endpoint is an IN endpoint */
 #define USB_EP_DIR_IS_IN(ep) (USB_EP_GET_DIR(ep) == USB_EP_DIR_IN)
 /** True if the endpoint is an OUT endpoint */
@@ -227,7 +227,7 @@ void usb_dc_set_status_callback(const usb_dc_status_callback cb);
  *
  * @return 0 on success, negative errno code on fail.
  */
-int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data * const cfg);
+int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data *const cfg);
 
 /**
  * @brief Configure endpoint
@@ -240,7 +240,7 @@ int usb_dc_ep_check_cap(const struct usb_dc_ep_cfg_data * const cfg);
  *
  * @return 0 on success, negative errno code on fail.
  */
-int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const cfg);
+int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data *const cfg);
 
 /**
  * @brief Set stall condition for the selected endpoint
@@ -342,7 +342,7 @@ int usb_dc_ep_flush(const uint8_t ep);
  * @return 0 on success, negative errno code on fail.
  */
 int usb_dc_ep_write(const uint8_t ep, const uint8_t *const data,
-		    const uint32_t data_len, uint32_t * const ret_bytes);
+		    const uint32_t data_len, uint32_t *const ret_bytes);
 
 /**
  * @brief Read data from the specified endpoint

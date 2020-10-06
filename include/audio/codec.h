@@ -32,32 +32,32 @@ extern "C" {
  * PCM audio sample rates
  */
 typedef enum {
-	AUDIO_PCM_RATE_8K	= 8000,
-	AUDIO_PCM_RATE_16K	= 16000,
-	AUDIO_PCM_RATE_24K	= 24000,
-	AUDIO_PCM_RATE_32K	= 32000,
-	AUDIO_PCM_RATE_44P1K	= 44100,
-	AUDIO_PCM_RATE_48K	= 48000,
-	AUDIO_PCM_RATE_96K	= 96000,
-	AUDIO_PCM_RATE_192K	= 192000,
+	AUDIO_PCM_RATE_8K = 8000,
+	AUDIO_PCM_RATE_16K = 16000,
+	AUDIO_PCM_RATE_24K = 24000,
+	AUDIO_PCM_RATE_32K = 32000,
+	AUDIO_PCM_RATE_44P1K = 44100,
+	AUDIO_PCM_RATE_48K = 48000,
+	AUDIO_PCM_RATE_96K = 96000,
+	AUDIO_PCM_RATE_192K = 192000,
 } audio_pcm_rate_t;
 
 /**
  * PCM audio sample bit widths
  */
 typedef enum {
-	AUDIO_PCM_WIDTH_16_BITS	= 16,
-	AUDIO_PCM_WIDTH_20_BITS	= 20,
-	AUDIO_PCM_WIDTH_24_BITS	= 24,
-	AUDIO_PCM_WIDTH_32_BITS	= 32,
+	AUDIO_PCM_WIDTH_16_BITS = 16,
+	AUDIO_PCM_WIDTH_20_BITS = 20,
+	AUDIO_PCM_WIDTH_24_BITS = 24,
+	AUDIO_PCM_WIDTH_32_BITS = 32,
 } audio_pcm_width_t;
 
 /**
  * Digital Audio Interface (DAI) type
  */
 typedef enum {
-	AUDIO_DAI_TYPE_I2S,	/* I2S Interface */
-	AUDIO_DAI_TYPE_INVALID,	/* Other interfaces can be added here */
+	AUDIO_DAI_TYPE_I2S, /* I2S Interface */
+	AUDIO_DAI_TYPE_INVALID, /* Other interfaces can be added here */
 } audio_dai_type_t;
 
 /**
@@ -89,25 +89,25 @@ typedef enum {
  * Configuration is dependent on DAI type
  */
 typedef union {
-	struct i2s_config i2s;	/* I2S configuration */
-				/* Other DAI types go here */
+	struct i2s_config i2s; /* I2S configuration */
+	/* Other DAI types go here */
 } audio_dai_cfg_t;
 
 /**
  * Codec configuration parameters
  */
 struct audio_codec_cfg {
-	uint32_t			mclk_freq;	/* MCLK input frequency in Hz */
-	audio_dai_type_t	dai_type;	/* Digital interface type */
-	audio_dai_cfg_t		dai_cfg;	/* DAI configuration info */
+	uint32_t mclk_freq; /* MCLK input frequency in Hz */
+	audio_dai_type_t dai_type; /* Digital interface type */
+	audio_dai_cfg_t dai_cfg; /* DAI configuration info */
 };
 
 /**
  * Codec property values
  */
 typedef union {
-	int 	vol;	/* Volume level in 0.5dB resolution */
-	bool 	mute;	/* mute if true, unmute if false */
+	int vol; /* Volume level in 0.5dB resolution */
+	bool mute; /* mute if true, unmute if false */
 } audio_property_value_t;
 
 /**
@@ -116,12 +116,10 @@ typedef union {
  * For internal use only, skip these in public documentation.
  */
 struct audio_codec_api {
-	int (*configure)(const struct device *dev,
-			 struct audio_codec_cfg *cfg);
+	int (*configure)(const struct device *dev, struct audio_codec_cfg *cfg);
 	void (*start_output)(const struct device *dev);
 	void (*stop_output)(const struct device *dev);
-	int (*set_property)(const struct device *dev,
-			    audio_property_t property,
+	int (*set_property)(const struct device *dev, audio_property_t property,
 			    audio_channel_t channel,
 			    audio_property_value_t val);
 	int (*apply_properties)(const struct device *dev);

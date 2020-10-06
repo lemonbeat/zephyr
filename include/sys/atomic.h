@@ -44,19 +44,18 @@ typedef void *atomic_ptr_t;
  */
 #ifdef CONFIG_ATOMIC_OPERATIONS_BUILTIN
 static inline bool atomic_cas(atomic_t *target, atomic_val_t old_value,
-			  atomic_val_t new_value)
+			      atomic_val_t new_value)
 {
-	return __atomic_compare_exchange_n(target, &old_value, new_value,
-					   0, __ATOMIC_SEQ_CST,
-					   __ATOMIC_SEQ_CST);
+	return __atomic_compare_exchange_n(target, &old_value, new_value, 0,
+					   __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 #elif defined(CONFIG_ATOMIC_OPERATIONS_C)
 __syscall bool atomic_cas(atomic_t *target, atomic_val_t old_value,
-			 atomic_val_t new_value);
+			  atomic_val_t new_value);
 
 #else
 extern bool atomic_cas(atomic_t *target, atomic_val_t old_value,
-		      atomic_val_t new_value);
+		       atomic_val_t new_value);
 #endif
 
 /**
@@ -76,9 +75,8 @@ extern bool atomic_cas(atomic_t *target, atomic_val_t old_value,
 static inline bool atomic_ptr_cas(atomic_ptr_t *target, void *old_value,
 				  void *new_value)
 {
-	return __atomic_compare_exchange_n(target, &old_value, new_value,
-					   0, __ATOMIC_SEQ_CST,
-					   __ATOMIC_SEQ_CST);
+	return __atomic_compare_exchange_n(target, &old_value, new_value, 0,
+					   __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 #elif defined(CONFIG_ATOMIC_OPERATIONS_C)
 __syscall bool atomic_ptr_cas(atomic_ptr_t *target, void *old_value,
@@ -142,7 +140,8 @@ extern atomic_val_t atomic_sub(atomic_t *target, atomic_val_t value);
  *
  * @return Previous value of @a target.
  */
-#if defined(CONFIG_ATOMIC_OPERATIONS_BUILTIN) || defined (CONFIG_ATOMIC_OPERATIONS_C)
+#if defined(CONFIG_ATOMIC_OPERATIONS_BUILTIN) || \
+	defined(CONFIG_ATOMIC_OPERATIONS_C)
 static inline atomic_val_t atomic_inc(atomic_t *target)
 {
 	return atomic_add(target, 1);
@@ -161,7 +160,8 @@ extern atomic_val_t atomic_inc(atomic_t *target);
  *
  * @return Previous value of @a target.
  */
-#if defined(CONFIG_ATOMIC_OPERATIONS_BUILTIN) || defined (CONFIG_ATOMIC_OPERATIONS_C)
+#if defined(CONFIG_ATOMIC_OPERATIONS_BUILTIN) || \
+	defined(CONFIG_ATOMIC_OPERATIONS_C)
 static inline atomic_val_t atomic_dec(atomic_t *target)
 {
 	return atomic_sub(target, 1);
@@ -269,7 +269,8 @@ extern void *atomic_ptr_set(atomic_ptr_t *target, void *value);
  *
  * @return Previous value of @a target.
  */
-#if defined(CONFIG_ATOMIC_OPERATIONS_BUILTIN) || defined (CONFIG_ATOMIC_OPERATIONS_C)
+#if defined(CONFIG_ATOMIC_OPERATIONS_BUILTIN) || \
+	defined(CONFIG_ATOMIC_OPERATIONS_C)
 static inline atomic_val_t atomic_clear(atomic_t *target)
 {
 	return atomic_set(target, 0);
@@ -290,7 +291,7 @@ extern atomic_val_t atomic_clear(atomic_t *target);
  * @return Previous value of @a target.
  */
 #if defined(CONFIG_ATOMIC_OPERATIONS_BUILTIN) || \
-	defined (CONFIG_ATOMIC_OPERATIONS_C)
+	defined(CONFIG_ATOMIC_OPERATIONS_C)
 static inline void *atomic_ptr_clear(atomic_ptr_t *target)
 {
 	return atomic_ptr_set(target, NULL);
@@ -392,7 +393,6 @@ __syscall atomic_val_t atomic_nand(atomic_t *target, atomic_val_t value);
 extern atomic_val_t atomic_nand(atomic_t *target, atomic_val_t value);
 #endif
 
-
 /**
  * @brief Initialize an atomic variable.
  *
@@ -429,7 +429,7 @@ extern atomic_val_t atomic_nand(atomic_t *target, atomic_val_t value);
  * @param num_bits Number of bits needed.
  */
 #define ATOMIC_DEFINE(name, num_bits) \
-	atomic_t name[1 + ((num_bits) - 1) / ATOMIC_BITS]
+	atomic_t name[1 + ((num_bits)-1) / ATOMIC_BITS]
 
 /**
  * @brief Atomically test a bit.

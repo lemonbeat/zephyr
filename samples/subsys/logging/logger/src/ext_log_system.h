@@ -21,8 +21,8 @@ enum ext_log_level {
 };
 
 /** Log message handler type. */
-typedef void (*ext_log_handler)(enum ext_log_level level,
-				const char *format, ...);
+typedef void (*ext_log_handler)(enum ext_log_level level, const char *format,
+				...);
 
 /** @brief Set log handler function.
  *

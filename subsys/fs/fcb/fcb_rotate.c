@@ -8,8 +8,7 @@
 #include <fs/fcb.h>
 #include "fcb_priv.h"
 
-int
-fcb_rotate(struct fcb *fcb)
+int fcb_rotate(struct fcb *fcb)
 {
 	struct flash_sector *sector;
 	int rc = 0;

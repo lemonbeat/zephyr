@@ -38,9 +38,14 @@
 /* HTTP path to request */
 #define HTTP_PATH "/"
 
-
 #define SSTRLEN(s) (sizeof(s) - 1)
-#define CHECK(r) { if (r == -1) { printf("Error: " #r "\n"); exit(1); } }
+#define CHECK(r)                                   \
+	{                                          \
+		if (r == -1) {                     \
+			printf("Error: " #r "\n"); \
+			exit(1);                   \
+		}                                  \
+	}
 
 #define REQUEST "GET " HTTP_PATH " HTTP/1.0\r\nHost: " HTTP_HOST "\r\n\r\n"
 
@@ -99,11 +104,11 @@ void main(void)
 	sec_tag_t sec_tag_opt[] = {
 		CA_CERTIFICATE_TAG,
 	};
-	CHECK(setsockopt(sock, SOL_TLS, TLS_SEC_TAG_LIST,
-			 sec_tag_opt, sizeof(sec_tag_opt)));
+	CHECK(setsockopt(sock, SOL_TLS, TLS_SEC_TAG_LIST, sec_tag_opt,
+			 sizeof(sec_tag_opt)));
 
-	CHECK(setsockopt(sock, SOL_TLS, TLS_HOSTNAME,
-			 HTTP_HOST, sizeof(HTTP_HOST)))
+	CHECK(setsockopt(sock, SOL_TLS, TLS_HOSTNAME, HTTP_HOST,
+			 sizeof(HTTP_HOST)))
 #endif
 
 	CHECK(connect(sock, res->ai_addr, res->ai_addrlen));

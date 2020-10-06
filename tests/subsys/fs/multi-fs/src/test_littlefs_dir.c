@@ -10,7 +10,6 @@
 #include "test_littlefs.h"
 #include "test_littlefs_priv.h"
 
-
 void test_littlefs_mkdir(void)
 {
 	zassert_true(test_mkdir(TEST_DIR_PATH, TEST_FILE) == TC_PASS, NULL);

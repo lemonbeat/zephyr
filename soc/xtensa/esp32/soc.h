@@ -24,8 +24,7 @@ static inline void esp32_clear_mask32(uint32_t v, uint32_t mem_addr)
 	sys_write32(sys_read32(mem_addr) & ~v, mem_addr);
 }
 
-extern int esp32_rom_intr_matrix_set(int cpu_no,
-				     int interrupt_src,
+extern int esp32_rom_intr_matrix_set(int cpu_no, int interrupt_src,
 				     int interrupt_line);
 
 extern int esp32_rom_gpio_matrix_in(uint32_t gpio, uint32_t signal_index,
@@ -44,7 +43,9 @@ extern void esp32_rom_Cache_Read_Enable(int cpu);
 extern void esp32_rom_ets_set_appcpu_boot_addr(void *addr);
 
 /* ROM functions which read/write internal i2c control bus for PLL, APLL */
-extern uint8_t esp32_rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
-extern void esp32_rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
+extern uint8_t esp32_rom_i2c_readReg(uint8_t block, uint8_t host_id,
+				     uint8_t reg_add);
+extern void esp32_rom_i2c_writeReg(uint8_t block, uint8_t host_id,
+				   uint8_t reg_add, uint8_t data);
 
 #endif /* __SOC_H__ */

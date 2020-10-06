@@ -44,7 +44,7 @@ void test_mempool(void)
 	 */
 	addr_list[i] = (struct mem_block *)osPoolAlloc(mempool_id);
 	zassert_true(addr_list[i] == NULL, "allocation happened."
-			" Something's wrong!");
+					   " Something's wrong!");
 
 	for (i = 0; i < MAX_BLOCKS; i++) {
 		status_list[i] = osPoolFree(mempool_id, addr_list[i]);
@@ -55,7 +55,7 @@ void test_mempool(void)
 		addr_list[i] = (struct mem_block *)osPoolCAlloc(mempool_id);
 		zassert_true(addr_list[i] != NULL, "mempool allocation failed");
 		zassert_true(memcmp(addr_list[i], &zeroblock,
-					sizeof(struct mem_block)) == 0,
+				    sizeof(struct mem_block)) == 0,
 			     "osPoolCAlloc didn't set mempool to 0");
 	}
 

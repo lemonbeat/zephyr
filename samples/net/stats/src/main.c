@@ -33,30 +33,24 @@ static void print_stats(struct net_if *iface, struct net_stats *data)
 
 #if defined(CONFIG_NET_IPV6)
 	printk("IPv6 recv      %d\tsent\t%d\tdrop\t%d\tforwarded\t%d\n",
-	       GET_STAT(iface, ipv6.recv),
-	       GET_STAT(iface, ipv6.sent),
-	       GET_STAT(iface, ipv6.drop),
-	       GET_STAT(iface, ipv6.forwarded));
+	       GET_STAT(iface, ipv6.recv), GET_STAT(iface, ipv6.sent),
+	       GET_STAT(iface, ipv6.drop), GET_STAT(iface, ipv6.forwarded));
 #if defined(CONFIG_NET_IPV6_ND)
 	printk("IPv6 ND recv   %d\tsent\t%d\tdrop\t%d\n",
-	       GET_STAT(iface, ipv6_nd.recv),
-	       GET_STAT(iface, ipv6_nd.sent),
+	       GET_STAT(iface, ipv6_nd.recv), GET_STAT(iface, ipv6_nd.sent),
 	       GET_STAT(iface, ipv6_nd.drop));
 #endif /* CONFIG_NET_IPV6_ND */
 #if defined(CONFIG_NET_STATISTICS_MLD)
 	printk("IPv6 MLD recv  %d\tsent\t%d\tdrop\t%d\n",
-	       GET_STAT(iface, ipv6_mld.recv),
-	       GET_STAT(iface, ipv6_mld.sent),
+	       GET_STAT(iface, ipv6_mld.recv), GET_STAT(iface, ipv6_mld.sent),
 	       GET_STAT(iface, ipv6_mld.drop));
 #endif /* CONFIG_NET_STATISTICS_MLD */
 #endif /* CONFIG_NET_IPV6 */
 
 #if defined(CONFIG_NET_IPV4)
 	printk("IPv4 recv      %d\tsent\t%d\tdrop\t%d\tforwarded\t%d\n",
-	       GET_STAT(iface, ipv4.recv),
-	       GET_STAT(iface, ipv4.sent),
-	       GET_STAT(iface, ipv4.drop),
-	       GET_STAT(iface, ipv4.forwarded));
+	       GET_STAT(iface, ipv4.recv), GET_STAT(iface, ipv4.sent),
+	       GET_STAT(iface, ipv4.drop), GET_STAT(iface, ipv4.forwarded));
 #endif /* CONFIG_NET_IPV4 */
 
 	printk("IP vhlerr      %d\thblener\t%d\tlblener\t%d\n",
@@ -69,20 +63,16 @@ static void print_stats(struct net_if *iface, struct net_stats *data)
 	       GET_STAT(iface, ip_errors.protoerr));
 
 	printk("ICMP recv      %d\tsent\t%d\tdrop\t%d\n",
-	       GET_STAT(iface, icmp.recv),
-	       GET_STAT(iface, icmp.sent),
+	       GET_STAT(iface, icmp.recv), GET_STAT(iface, icmp.sent),
 	       GET_STAT(iface, icmp.drop));
-	printk("ICMP typeer    %d\tchkerr\t%d\n",
-	       GET_STAT(iface, icmp.typeerr),
+	printk("ICMP typeer    %d\tchkerr\t%d\n", GET_STAT(iface, icmp.typeerr),
 	       GET_STAT(iface, icmp.chkerr));
 
 #if defined(CONFIG_NET_UDP)
 	printk("UDP recv       %d\tsent\t%d\tdrop\t%d\n",
-	       GET_STAT(iface, udp.recv),
-	       GET_STAT(iface, udp.sent),
+	       GET_STAT(iface, udp.recv), GET_STAT(iface, udp.sent),
 	       GET_STAT(iface, udp.drop));
-	printk("UDP chkerr     %d\n",
-	       GET_STAT(iface, udp.chkerr));
+	printk("UDP chkerr     %d\n", GET_STAT(iface, udp.chkerr));
 #endif
 
 #if defined(CONFIG_NET_STATISTICS_TCP)
@@ -90,20 +80,16 @@ static void print_stats(struct net_if *iface, struct net_stats *data)
 	       GET_STAT(iface, tcp.bytes.received),
 	       GET_STAT(iface, tcp.bytes.sent));
 	printk("TCP seg recv   %d\tsent\t%d\tdrop\t%d\n",
-	       GET_STAT(iface, tcp.recv),
-	       GET_STAT(iface, tcp.sent),
+	       GET_STAT(iface, tcp.recv), GET_STAT(iface, tcp.sent),
 	       GET_STAT(iface, tcp.drop));
 	printk("TCP seg resent %d\tchkerr\t%d\tackerr\t%d\n",
-	       GET_STAT(iface, tcp.resent),
-	       GET_STAT(iface, tcp.chkerr),
+	       GET_STAT(iface, tcp.resent), GET_STAT(iface, tcp.chkerr),
 	       GET_STAT(iface, tcp.ackerr));
 	printk("TCP seg rsterr %d\trst\t%d\tre-xmit\t%d\n",
-	       GET_STAT(iface, tcp.rsterr),
-	       GET_STAT(iface, tcp.rst),
+	       GET_STAT(iface, tcp.rsterr), GET_STAT(iface, tcp.rst),
 	       GET_STAT(iface, tcp.rexmit));
 	printk("TCP conn drop  %d\tconnrst\t%d\n",
-	       GET_STAT(iface, tcp.conndrop),
-	       GET_STAT(iface, tcp.connrst));
+	       GET_STAT(iface, tcp.conndrop), GET_STAT(iface, tcp.connrst));
 #endif
 
 	printk("Bytes received %u\n", GET_STAT(iface, bytes.received));

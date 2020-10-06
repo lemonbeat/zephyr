@@ -26,7 +26,7 @@ void main(void)
 	const struct device *lora_dev;
 	struct lora_modem_config config;
 	int ret, len;
-	uint8_t data[MAX_DATA_LEN] = {0};
+	uint8_t data[MAX_DATA_LEN] = { 0 };
 	int16_t rssi;
 	int8_t snr;
 
@@ -52,8 +52,8 @@ void main(void)
 
 	while (1) {
 		/* Block until data arrives */
-		len = lora_recv(lora_dev, data, MAX_DATA_LEN, K_FOREVER,
-				&rssi, &snr);
+		len = lora_recv(lora_dev, data, MAX_DATA_LEN, K_FOREVER, &rssi,
+				&snr);
 		if (len < 0) {
 			LOG_ERR("LoRa receive failed");
 			return;

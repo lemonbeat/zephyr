@@ -38,13 +38,13 @@ int atoi(const char *s)
 	case '-':
 		neg = 1;
 		s++;
-		break;	/* artifact to quiet coverity warning */
+		break; /* artifact to quiet coverity warning */
 	case '+':
 		s++;
 	}
 	/* Compute n as a negative number to avoid overflow on INT_MIN */
 	while (isdigit(*s)) {
-		n = 10*n - (*s++ - '0');
+		n = 10 * n - (*s++ - '0');
 	}
 	return neg ? n : -n;
 }

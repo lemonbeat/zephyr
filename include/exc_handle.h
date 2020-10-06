@@ -34,12 +34,14 @@ struct z_exc_handle {
 	void *fixup;
 };
 
-#define Z_EXC_HANDLE(name) \
-	{ name ## _fault_start, name ## _fault_end, name ## _fixup }
+#define Z_EXC_HANDLE(name)                                         \
+	{                                                          \
+		name##_fault_start, name##_fault_end, name##_fixup \
+	}
 
-#define Z_EXC_DECLARE(name)          \
-	void name ## _fault_start(void); \
-	void name ## _fault_end(void);   \
-	void name ## _fixup(void)
+#define Z_EXC_DECLARE(name)            \
+	void name##_fault_start(void); \
+	void name##_fault_end(void);   \
+	void name##_fixup(void)
 
 #endif /* ZEPHYR_INCLUDE_EXC_HANDLE_H_ */

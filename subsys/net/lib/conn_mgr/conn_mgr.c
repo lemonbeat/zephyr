@@ -130,7 +130,7 @@ static void conn_mgr_initial_state(struct net_if *iface)
 		if (net_if_ipv6_get_global_addr(NET_ADDR_PREFERRED, &iface)) {
 			NET_DBG("IPv6 addr set");
 			iface_states[idx] |= NET_STATE_IPV6_ADDR_SET |
-						NET_STATE_IPV6_DAD_OK;
+					     NET_STATE_IPV6_DAD_OK;
 		} else if (net_if_ipv6_get_global_addr(NET_ADDR_TENTATIVE,
 						       &iface)) {
 			iface_states[idx] |= NET_STATE_IPV6_ADDR_SET;
@@ -142,7 +142,6 @@ static void conn_mgr_initial_state(struct net_if *iface)
 			NET_DBG("IPv4 addr set");
 			iface_states[idx] |= NET_STATE_IPV4_ADDR_SET;
 		}
-
 	}
 
 	iface_states[idx] |= NET_STATE_CHANGED;
@@ -171,8 +170,8 @@ static void conn_mgr(void)
 }
 
 K_THREAD_DEFINE(conn_mgr_thread, CONFIG_NET_CONNECTION_MANAGER_STACK_SIZE,
-		(k_thread_entry_t)conn_mgr, NULL, NULL, NULL,
-		K_PRIO_COOP(2), 0, 0);
+		(k_thread_entry_t)conn_mgr, NULL, NULL, NULL, K_PRIO_COOP(2), 0,
+		0);
 
 void net_conn_mgr_resend_status(void)
 {

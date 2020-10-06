@@ -20,7 +20,10 @@
 #include <devicetree.h>
 
 /* ARM GPRs are often designated by two different names */
-#define sys_define_gpr_with_alias(name1, name2) union { uint32_t name1, name2; }
+#define sys_define_gpr_with_alias(name1, name2) \
+	union {                                 \
+		uint32_t name1, name2;          \
+	}
 
 #include <arch/arm/aarch32/thread.h>
 #include <arch/arm/aarch32/exc.h>
@@ -130,8 +133,8 @@ extern "C" {
  * upon exception entry. Therefore, a wide guard region is required to
  * guarantee that stack-overflow detection will always be successful.
  */
-#if defined(CONFIG_FPU) && defined(CONFIG_FPU_SHARING) \
-	&& defined(CONFIG_MPU_STACK_GUARD)
+#if defined(CONFIG_FPU) && defined(CONFIG_FPU_SHARING) && \
+	defined(CONFIG_MPU_STACK_GUARD)
 #define MPU_GUARD_ALIGN_AND_SIZE_FLOAT CONFIG_MPU_STACK_GUARD_MIN_SIZE_FLOAT
 #else
 #define MPU_GUARD_ALIGN_AND_SIZE_FLOAT 0
@@ -145,8 +148,8 @@ extern "C" {
  * requirement.
  */
 #if defined(CONFIG_MPU_REQUIRES_POWER_OF_TWO_ALIGNMENT)
-#define Z_MPU_GUARD_ALIGN (MAX(MPU_GUARD_ALIGN_AND_SIZE, \
-	MPU_GUARD_ALIGN_AND_SIZE_FLOAT))
+#define Z_MPU_GUARD_ALIGN \
+	(MAX(MPU_GUARD_ALIGN_AND_SIZE, MPU_GUARD_ALIGN_AND_SIZE_FLOAT))
 #else
 #define Z_MPU_GUARD_ALIGN MPU_GUARD_ALIGN_AND_SIZE
 #endif
@@ -158,11 +161,11 @@ extern "C" {
  * user-accessible stack buffer, we size/align to match. The privilege
  * mode stack is generated elsewhere in memory.
  */
-#define ARCH_THREAD_STACK_OBJ_ALIGN(size)	Z_POW2_CEIL(size)
-#define ARCH_THREAD_STACK_SIZE_ADJUST(size)	Z_POW2_CEIL(size)
+#define ARCH_THREAD_STACK_OBJ_ALIGN(size) Z_POW2_CEIL(size)
+#define ARCH_THREAD_STACK_SIZE_ADJUST(size) Z_POW2_CEIL(size)
 #else
-#define ARCH_THREAD_STACK_OBJ_ALIGN(size)	MAX(Z_THREAD_MIN_STACK_ALIGN, \
-						    Z_MPU_GUARD_ALIGN)
+#define ARCH_THREAD_STACK_OBJ_ALIGN(size) \
+	MAX(Z_THREAD_MIN_STACK_ALIGN, Z_MPU_GUARD_ALIGN)
 #ifdef CONFIG_USERSPACE
 #define ARCH_THREAD_STACK_SIZE_ADJUST(size) \
 	ROUND_UP(size, CONFIG_ARM_MPU_REGION_MIN_ALIGN_AND_SIZE)
@@ -173,8 +176,8 @@ extern "C" {
 /* Kernel-only stacks need an MPU guard region programmed at the beginning of
  * the stack object, so align the object appropriately.
  */
-#define ARCH_KERNEL_STACK_RESERVED	MPU_GUARD_ALIGN_AND_SIZE
-#define ARCH_KERNEL_STACK_OBJ_ALIGN	Z_MPU_GUARD_ALIGN
+#define ARCH_KERNEL_STACK_RESERVED MPU_GUARD_ALIGN_AND_SIZE
+#define ARCH_KERNEL_STACK_OBJ_ALIGN Z_MPU_GUARD_ALIGN
 #endif
 
 /* On arm, all MPU guards are carve-outs. */

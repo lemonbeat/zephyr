@@ -31,14 +31,14 @@ extern "C" {
 #endif
 
 enum http_parser_url_fields {
-	  UF_SCHEMA           = 0
-	, UF_HOST             = 1
-	, UF_PORT             = 2
-	, UF_PATH             = 3
-	, UF_QUERY            = 4
-	, UF_FRAGMENT         = 5
-	, UF_USERINFO         = 6
-	, UF_MAX              = 7
+	UF_SCHEMA = 0,
+	UF_HOST = 1,
+	UF_PORT = 2,
+	UF_PATH = 3,
+	UF_QUERY = 4,
+	UF_FRAGMENT = 5,
+	UF_USERINFO = 6,
+	UF_MAX = 7
 };
 
 /* Result structure for http_parser_url_fields().
@@ -49,14 +49,14 @@ enum http_parser_url_fields {
  * a uint16_t.
  */
 struct http_parser_url {
-	uint16_t field_set;           /* Bitmask of (1 << UF_*) values */
-	uint16_t port;                /* Converted UF_PORT string */
+	uint16_t field_set; /* Bitmask of (1 << UF_*) values */
+	uint16_t port; /* Converted UF_PORT string */
 
 	struct {
-		uint16_t off;               /* Offset into buffer in which field
+		uint16_t off; /* Offset into buffer in which field
 					  * starts
 					  */
-		uint16_t len;               /* Length of run in buffer */
+		uint16_t len; /* Length of run in buffer */
 	} field_data[UF_MAX];
 };
 
@@ -66,8 +66,8 @@ enum state parse_url_char(enum state s, const char ch);
 void http_parser_url_init(struct http_parser_url *u);
 
 /* Parse a URL; return nonzero on failure */
-int http_parser_parse_url(const char *buf, size_t buflen,
-			  int is_connect, struct http_parser_url *u);
+int http_parser_parse_url(const char *buf, size_t buflen, int is_connect,
+			  struct http_parser_url *u);
 
 #ifdef __cplusplus
 }

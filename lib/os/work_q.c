@@ -6,7 +6,7 @@
  */
 
 #include <kernel.h>
-#define WORKQUEUE_THREAD_NAME	"workqueue"
+#define WORKQUEUE_THREAD_NAME "workqueue"
 
 void z_work_q_main(void *work_q_ptr, void *p2, void *p3)
 {

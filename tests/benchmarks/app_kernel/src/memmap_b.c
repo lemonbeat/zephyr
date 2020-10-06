@@ -11,7 +11,6 @@
 
 #ifdef MEMMAP_BENCH
 
-
 /**
  *
  * @brief Memory map get/free test

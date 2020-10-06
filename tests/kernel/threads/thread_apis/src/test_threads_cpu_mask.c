@@ -49,11 +49,10 @@ void test_threads_cpu_mask(void)
 		 */
 		prio = k_thread_priority_get(k_current_get());
 		zassert_true(prio > K_HIGHEST_APPLICATION_THREAD_PRIO, "");
-		thread = k_thread_create(&child_thread,
-					 tstack, tstack_size,
+		thread = k_thread_create(&child_thread, tstack, tstack_size,
 					 child_fn, NULL, NULL, NULL,
-					 K_HIGHEST_APPLICATION_THREAD_PRIO,
-					 0, K_FOREVER);
+					 K_HIGHEST_APPLICATION_THREAD_PRIO, 0,
+					 K_FOREVER);
 
 		/* Set up the CPU mask */
 		if (pass == 0) {

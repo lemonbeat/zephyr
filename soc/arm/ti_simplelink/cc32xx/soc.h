@@ -21,21 +21,21 @@ typedef uint32_t IRQn_Type;
 
 /* Need to keep the remaining from cmsis.h, as Zephyr expects these. */
 typedef enum {
-	Reset_IRQn                    = -15,
-	NonMaskableInt_IRQn           = -14,
-	HardFault_IRQn                = -13,
-	MemoryManagement_IRQn         = -12,
-	BusFault_IRQn                 = -11,
-	UsageFault_IRQn               = -10,
-	SVCall_IRQn                   =  -5,
-	DebugMonitor_IRQn             =  -4,
-	PendSV_IRQn                   =  -2,
-	SysTick_IRQn                  =  -1,
+	Reset_IRQn = -15,
+	NonMaskableInt_IRQn = -14,
+	HardFault_IRQn = -13,
+	MemoryManagement_IRQn = -12,
+	BusFault_IRQn = -11,
+	UsageFault_IRQn = -10,
+	SVCall_IRQn = -5,
+	DebugMonitor_IRQn = -4,
+	PendSV_IRQn = -2,
+	SysTick_IRQn = -1,
 } CMSIS_IRQn_Type;
 
-#define __CM4_REV        0
-#define __MPU_PRESENT                  0 /* Zephyr has no MPU support */
-#define __NVIC_PRIO_BITS               NUM_IRQ_PRIO_BITS
-#define __Vendor_SysTickConfig         0 /* Default to standard SysTick */
+#define __CM4_REV 0
+#define __MPU_PRESENT 0 /* Zephyr has no MPU support */
+#define __NVIC_PRIO_BITS NUM_IRQ_PRIO_BITS
+#define __Vendor_SysTickConfig 0 /* Default to standard SysTick */
 
 #endif /* TI_SIMPLELINK_CC32XX_SOC_H_ */

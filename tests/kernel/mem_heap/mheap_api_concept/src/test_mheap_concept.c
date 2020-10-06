@@ -134,8 +134,8 @@ void test_mheap_block_desc(void)
 	}
 }
 
-#define NMEMB   8
-#define SIZE    16
+#define NMEMB 8
+#define SIZE 16
 /**
  * @brief Verify a region would be released back to
  * heap memory pool using k_free function.

@@ -28,8 +28,7 @@ void settings_line_io_init(int (*read_cb)(void *ctx, off_t off, char *buf,
 					  size_t *len),
 			   int (*write_cb)(void *ctx, off_t off,
 					   char const *buf, size_t len),
-			   size_t (*get_len_cb)(void *ctx),
-			   uint8_t io_rwbs);
+			   size_t (*get_len_cb)(void *ctx), uint8_t io_rwbs);
 
 int settings_line_write(const char *name, const char *value, size_t val_len,
 			off_t w_loc, void *cb_arg);
@@ -38,13 +37,13 @@ int settings_line_write(const char *name, const char *value, size_t val_len,
 int settings_line_len_calc(const char *name, size_t val_len);
 
 int settings_line_dup_check_cb(const char *name, void *val_read_cb_ctx,
-				off_t off, void *cb_arg);
+			       off_t off, void *cb_arg);
 
-int settings_line_load_cb(const char *name, void *val_read_cb_ctx,
-			   off_t off, void *cb_arg);
+int settings_line_load_cb(const char *name, void *val_read_cb_ctx, off_t off,
+			  void *cb_arg);
 
-typedef int (*line_load_cb)(const char *name, void *val_read_cb_ctx,
-			     off_t off, void *cb_arg);
+typedef int (*line_load_cb)(const char *name, void *val_read_cb_ctx, off_t off,
+			    void *cb_arg);
 
 struct settings_line_read_value_cb_ctx {
 	void *read_cb_ctx;
@@ -111,15 +110,13 @@ int settings_line_name_read(char *out, size_t len_req, size_t *len_read,
 size_t settings_line_val_get_len(off_t val_off, void *read_cb_ctx);
 
 int settings_line_entry_copy(void *dst_ctx, off_t dst_off, void *src_ctx,
-			off_t src_off, size_t len);
+			     off_t src_off, size_t len);
 
 void settings_line_io_init(int (*read_cb)(void *ctx, off_t off, char *buf,
 					  size_t *len),
-			  int (*write_cb)(void *ctx, off_t off, char const *buf,
-					  size_t len),
-			  size_t (*get_len_cb)(void *ctx),
-			  uint8_t io_rwbs);
-
+			   int (*write_cb)(void *ctx, off_t off,
+					   char const *buf, size_t len),
+			   size_t (*get_len_cb)(void *ctx), uint8_t io_rwbs);
 
 extern sys_slist_t settings_load_srcs;
 extern sys_slist_t settings_handlers;

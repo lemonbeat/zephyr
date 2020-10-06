@@ -103,8 +103,7 @@ static void run_tests_on_eeprom(const char *label)
 	zassert_not_null(eeprom, "Unable to get EEPROM device");
 	k_object_access_grant(eeprom, k_current_get());
 	eeprom_label = label;
-	ztest_test_suite(eeprom_api,
-			 ztest_user_unit_test(test_size),
+	ztest_test_suite(eeprom_api, ztest_user_unit_test(test_size),
 			 ztest_user_unit_test(test_out_of_bounds),
 			 ztest_user_unit_test(test_write_and_verify),
 			 ztest_user_unit_test(test_zero_length_write));
@@ -118,5 +117,4 @@ void test_main(void)
 #ifdef DT_N_ALIAS_eeprom_1
 	run_tests_on_eeprom(DT_LABEL(DT_ALIAS(eeprom_1)));
 #endif
-
 }

@@ -33,5 +33,4 @@ static int board_pinmux_init(const struct device *device)
 	return 0;
 }
 
-
 SYS_INIT(board_pinmux_init, PRE_KERNEL_1, CONFIG_PINMUX_INIT_PRIORITY);

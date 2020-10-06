@@ -42,9 +42,10 @@ static struct bt_mesh_cfg_srv cfg_srv = {
 };
 
 static int fault_get_cur(struct bt_mesh_model *model, uint8_t *test_id,
-			 uint16_t *company_id, uint8_t *faults, uint8_t *fault_count)
+			 uint16_t *company_id, uint8_t *faults,
+			 uint8_t *fault_count)
 {
-	uint8_t reg_faults[MAX_FAULT] = { [0 ... (MAX_FAULT - 1)] = 0xff };
+	uint8_t reg_faults[MAX_FAULT] = { [0 ...(MAX_FAULT - 1)] = 0xff };
 
 	printk("fault_get_cur() has_reg_fault %u\n", has_reg_fault);
 
@@ -57,7 +58,8 @@ static int fault_get_cur(struct bt_mesh_model *model, uint8_t *test_id,
 }
 
 static int fault_get_reg(struct bt_mesh_model *model, uint16_t company_id,
-			 uint8_t *test_id, uint8_t *faults, uint8_t *fault_count)
+			 uint8_t *test_id, uint8_t *faults,
+			 uint8_t *fault_count)
 {
 	if (company_id != BT_COMP_ID_LF) {
 		return -EINVAL;
@@ -68,7 +70,8 @@ static int fault_get_reg(struct bt_mesh_model *model, uint16_t company_id,
 	*test_id = 0x00;
 
 	if (has_reg_fault) {
-		uint8_t reg_faults[MAX_FAULT] = { [0 ... (MAX_FAULT - 1)] = 0xff };
+		uint8_t reg_faults[MAX_FAULT] = { [0 ...(MAX_FAULT - 1)] =
+							  0xff };
 
 		memcpy(faults, reg_faults, sizeof(reg_faults));
 		*fault_count = sizeof(reg_faults);

@@ -13,25 +13,25 @@
 #define LED0_NODE DT_ALIAS(led0)
 
 #if DT_NODE_HAS_STATUS(LED0_NODE, okay)
-#define LED0    DT_GPIO_LABEL(LED0_NODE, gpios)
-#define PIN     DT_GPIO_PIN(LED0_NODE, gpios)
+#define LED0 DT_GPIO_LABEL(LED0_NODE, gpios)
+#define PIN DT_GPIO_PIN(LED0_NODE, gpios)
 #if DT_PHA_HAS_CELL(LED0_NODE, gpios, flags)
-#define FLAGS   DT_GPIO_FLAGS(LED0_NODE, gpios)
+#define FLAGS DT_GPIO_FLAGS(LED0_NODE, gpios)
 #endif
 #else
 #error "BOARD does not define a debug LED"
-#define LED0    ""
-#define PIN     0
+#define LED0 ""
+#define PIN 0
 #endif
 
 #ifndef FLAGS
-#define FLAGS   0
+#define FLAGS 0
 #endif
 
-#define SLEEP_TIME_MS                  (5)
-#define CNT_PER_SEC                    (1000 / SLEEP_TIME_MS)
-#define COMMAND_WAIT_TIME_SEC          (10)
-#define COMMAND_WAIT_COUNT             (COMMAND_WAIT_TIME_SEC * CNT_PER_SEC)
+#define SLEEP_TIME_MS (5)
+#define CNT_PER_SEC (1000 / SLEEP_TIME_MS)
+#define COMMAND_WAIT_TIME_SEC (10)
+#define COMMAND_WAIT_COUNT (COMMAND_WAIT_TIME_SEC * CNT_PER_SEC)
 
 enum osdp_pd_e {
 	OSDP_PD_0,
@@ -48,8 +48,8 @@ int card_read_callback(int pd, int format, uint8_t *data, int len)
 {
 	int i;
 
-	printk("CP PD[%d] card read - fmt: %d len: %d card_data: [ ",
-	       pd, format, len);
+	printk("CP PD[%d] card read - fmt: %d len: %d card_data: [ ", pd,
+	       format, len);
 
 	for (i = 0; i < len; i++) {
 		printk("0x%02x ", data[i]);
@@ -65,9 +65,9 @@ void main(void)
 	uint32_t cnt = 0;
 	const struct device *dev;
 	struct osdp_cmd_output pulse_output = {
-		.output_no = 0,     /* First output */
-		.control_code = 5,  /* Temporarily turn on output */
-		.timer_count = 10,    /* Timer: 10 * 100ms = 1 second */
+		.output_no = 0, /* First output */
+		.control_code = 5, /* Temporarily turn on output */
+		.timer_count = 10, /* Timer: 10 * 100ms = 1 second */
 	};
 
 	dev = device_get_binding(LED0);

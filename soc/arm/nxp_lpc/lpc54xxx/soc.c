@@ -37,7 +37,6 @@
 
 static ALWAYS_INLINE void clock_init(void)
 {
-
 #ifdef CONFIG_SOC_LPC54114_M4
 	/* Set up the clock sources */
 
@@ -128,7 +127,6 @@ static int nxp_lpc54114_init(const struct device *arg)
 
 SYS_INIT(nxp_lpc54114_init, PRE_KERNEL_1, 0);
 
-
 #ifdef CONFIG_SLAVE_CORE_MCUX
 
 #define CORE_M0_BOOT_ADDRESS (void *)CONFIG_SLAVE_BOOT_ADDRESS_MCUX
@@ -167,17 +165,17 @@ int _slave_init(const struct device *arg)
 	 * appropriate and shareable with the Cortex-M0 core!
 	 */
 	SYSCON->CPBOOT = SYSCON_CPBOOT_BOOTADDR(
-			*(uint32_t *)((uint8_t *)CORE_M0_BOOT_ADDRESS + 0x4));
-	SYSCON->CPSTACK = SYSCON_CPSTACK_STACKADDR(
-			*(uint32_t *)CORE_M0_BOOT_ADDRESS);
+		*(uint32_t *)((uint8_t *)CORE_M0_BOOT_ADDRESS + 0x4));
+	SYSCON->CPSTACK =
+		SYSCON_CPSTACK_STACKADDR(*(uint32_t *)CORE_M0_BOOT_ADDRESS);
 
 	/* Reset the secondary core and start its clocks */
 	temp = SYSCON->CPUCTRL;
 	temp |= 0xc0c48000;
-	SYSCON->CPUCTRL = (temp | SYSCON_CPUCTRL_CM0CLKEN_MASK
-					| SYSCON_CPUCTRL_CM0RSTEN_MASK);
-	SYSCON->CPUCTRL = (temp | SYSCON_CPUCTRL_CM0CLKEN_MASK)
-					& (~SYSCON_CPUCTRL_CM0RSTEN_MASK);
+	SYSCON->CPUCTRL = (temp | SYSCON_CPUCTRL_CM0CLKEN_MASK |
+			   SYSCON_CPUCTRL_CM0RSTEN_MASK);
+	SYSCON->CPUCTRL = (temp | SYSCON_CPUCTRL_CM0CLKEN_MASK) &
+			  (~SYSCON_CPUCTRL_CM0RSTEN_MASK);
 
 	return 0;
 }

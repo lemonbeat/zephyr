@@ -9,7 +9,7 @@
 #include <logging/log.h>
 #include <hal/nrf_ecb.h>
 
-#define ECB_AES_KEY_SIZE   16
+#define ECB_AES_KEY_SIZE 16
 #define ECB_AES_BLOCK_SIZE 16
 
 LOG_MODULE_REGISTER(crypto_nrf_ecb, CONFIG_CRYPTO_LOG_LEVEL);
@@ -80,14 +80,12 @@ static int nrf_ecb_query_caps(const struct device *dev)
 }
 
 static int nrf_ecb_session_setup(const struct device *dev,
-				 struct cipher_ctx *ctx,
-				 enum cipher_algo algo, enum cipher_mode mode,
-				 enum cipher_op op_type)
+				 struct cipher_ctx *ctx, enum cipher_algo algo,
+				 enum cipher_mode mode, enum cipher_op op_type)
 {
 	ARG_UNUSED(dev);
 
-	if ((algo != CRYPTO_CIPHER_ALGO_AES) ||
-	    !(ctx->flags & CAP_SYNC_OPS) ||
+	if ((algo != CRYPTO_CIPHER_ALGO_AES) || !(ctx->flags & CAP_SYNC_OPS) ||
 	    (ctx->keylen != ECB_AES_KEY_SIZE) ||
 	    (op_type != CRYPTO_CIPHER_OP_ENCRYPT) ||
 	    (mode != CRYPTO_CIPHER_MODE_ECB)) {
@@ -138,6 +136,5 @@ static const struct crypto_driver_api crypto_enc_funcs = {
 };
 
 DEVICE_AND_API_INIT(nrf_ecb, CONFIG_CRYPTO_NRF_ECB_DRV_NAME,
-		    nrf_ecb_driver_init, NULL, NULL,
-		    POST_KERNEL, CONFIG_CRYPTO_INIT_PRIORITY,
-		    &crypto_enc_funcs);
+		    nrf_ecb_driver_init, NULL, NULL, POST_KERNEL,
+		    CONFIG_CRYPTO_INIT_PRIORITY, &crypto_enc_funcs);

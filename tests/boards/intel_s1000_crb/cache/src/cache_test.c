@@ -10,14 +10,14 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(cache_test);
 
-#define LP_SRAM_BASE		0xBE800000
-#define LP_SRAM_BASE_UNCACHED	0x9E800000
+#define LP_SRAM_BASE 0xBE800000
+#define LP_SRAM_BASE_UNCACHED 0x9E800000
 
-#define CACHE_TEST_BUFFER_SIZE	256
+#define CACHE_TEST_BUFFER_SIZE 256
 
 struct test_buffer {
-	uint8_t	flush[CACHE_TEST_BUFFER_SIZE];
-	uint8_t	invalidate[CACHE_TEST_BUFFER_SIZE];
+	uint8_t flush[CACHE_TEST_BUFFER_SIZE];
+	uint8_t invalidate[CACHE_TEST_BUFFER_SIZE];
 };
 
 static struct test_buffer *cached_buffer = (struct test_buffer *)LP_SRAM_BASE;
@@ -44,7 +44,7 @@ static void cache_flush_test(void)
 
 	LOG_INF("Comparing contents of cached memory vs main memory ...");
 	if (memcmp(mem_buffer->flush, cached_buffer->flush,
-				CACHE_TEST_BUFFER_SIZE)) {
+		   CACHE_TEST_BUFFER_SIZE)) {
 		LOG_INF("Contents mismatch. This is expected");
 	} else {
 		LOG_ERR("Contents match. Is Cache configured write-through?");
@@ -52,11 +52,11 @@ static void cache_flush_test(void)
 
 	LOG_INF("Flushing cache to commit contents to main memory ...");
 	xthal_dcache_region_writeback(cached_buffer->flush,
-			CACHE_TEST_BUFFER_SIZE);
+				      CACHE_TEST_BUFFER_SIZE);
 
 	LOG_INF("Comparing contents of cached memory vs main memory ...");
 	if (memcmp(mem_buffer->flush, cached_buffer->flush,
-				CACHE_TEST_BUFFER_SIZE)) {
+		   CACHE_TEST_BUFFER_SIZE)) {
 		LOG_ERR("Contents mismatch. Cache flush test Failed");
 	} else {
 		LOG_INF("Contents match. Cache flush test Passed");
@@ -73,7 +73,7 @@ static void cache_invalidation_test(void)
 
 	LOG_INF("Comparing contents of cached memory vs main memory ...");
 	if (memcmp(mem_buffer->invalidate, cached_buffer->invalidate,
-				CACHE_TEST_BUFFER_SIZE)) {
+		   CACHE_TEST_BUFFER_SIZE)) {
 		LOG_INF("Contents mismatch. This is expected");
 	} else {
 		LOG_ERR("Contents match. This is unexpected");
@@ -81,11 +81,11 @@ static void cache_invalidation_test(void)
 
 	LOG_INF("Invalidating cache to read contents from main memory ...");
 	xthal_dcache_region_invalidate(cached_buffer->invalidate,
-			CACHE_TEST_BUFFER_SIZE);
+				       CACHE_TEST_BUFFER_SIZE);
 
 	LOG_INF("Comparing contents of cached memory vs main memory ...");
 	if (memcmp(mem_buffer->invalidate, cached_buffer->invalidate,
-				CACHE_TEST_BUFFER_SIZE)) {
+		   CACHE_TEST_BUFFER_SIZE)) {
 		LOG_ERR("Contents mismatch. Cache invalidation test Failed");
 	} else {
 		LOG_INF("Contents match. Cache invalidation test Passed");

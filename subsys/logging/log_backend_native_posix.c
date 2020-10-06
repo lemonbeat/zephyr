@@ -57,8 +57,7 @@ static int char_out(uint8_t *data, size_t length, void *ctx)
 
 LOG_OUTPUT_DEFINE(log_output_posix, char_out, buf, sizeof(buf));
 
-static void put(const struct log_backend *const backend,
-		struct log_msg *msg)
+static void put(const struct log_backend *const backend, struct log_msg *msg)
 {
 	log_msg_get(msg);
 
@@ -77,7 +76,6 @@ static void put(const struct log_backend *const backend,
 	log_output_msg_process(&log_output_posix, msg, flags);
 
 	log_msg_put(msg);
-
 }
 
 static void panic(struct log_backend const *const backend)
@@ -93,8 +91,8 @@ static void dropped(const struct log_backend *const backend, uint32_t cnt)
 }
 
 static void sync_string(const struct log_backend *const backend,
-		     struct log_msg_ids src_level, uint32_t timestamp,
-		     const char *fmt, va_list ap)
+			struct log_msg_ids src_level, uint32_t timestamp,
+			const char *fmt, va_list ap)
 {
 	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL | LOG_OUTPUT_FLAG_TIMESTAMP;
 	uint32_t key;
@@ -108,14 +106,15 @@ static void sync_string(const struct log_backend *const backend,
 	}
 
 	key = irq_lock();
-	log_output_string(&log_output_posix, src_level,
-			  timestamp, fmt, ap, flags);
+	log_output_string(&log_output_posix, src_level, timestamp, fmt, ap,
+			  flags);
 	irq_unlock(key);
 }
 
 static void sync_hexdump(const struct log_backend *const backend,
 			 struct log_msg_ids src_level, uint32_t timestamp,
-			 const char *metadata, const uint8_t *data, uint32_t length)
+			 const char *metadata, const uint8_t *data,
+			 uint32_t length)
 {
 	uint32_t flags = LOG_OUTPUT_FLAG_LEVEL | LOG_OUTPUT_FLAG_TIMESTAMP;
 	uint32_t key;
@@ -129,21 +128,20 @@ static void sync_hexdump(const struct log_backend *const backend,
 	}
 
 	key = irq_lock();
-	log_output_hexdump(&log_output_posix, src_level, timestamp,
-			metadata, data, length, flags);
+	log_output_hexdump(&log_output_posix, src_level, timestamp, metadata,
+			   data, length, flags);
 	irq_unlock(key);
 }
 
 const struct log_backend_api log_backend_native_posix_api = {
 	.put = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : put,
-	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_string : NULL,
-	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ?
-			sync_hexdump : NULL,
+	.put_sync_string = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_string :
+								    NULL,
+	.put_sync_hexdump = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? sync_hexdump :
+								     NULL,
 	.panic = panic,
 	.dropped = IS_ENABLED(CONFIG_LOG_IMMEDIATE) ? NULL : dropped,
 };
 
-LOG_BACKEND_DEFINE(log_backend_native_posix,
-		   log_backend_native_posix_api,
+LOG_BACKEND_DEFINE(log_backend_native_posix, log_backend_native_posix_api,
 		   true);

@@ -13,20 +13,20 @@
 #include <spinlock.h>
 #include <drivers/timer/system_timer.h>
 
-#define TIMER_BASE	        DT_INST_REG_ADDR(0)
-#define TIMER_LOAD_ADDR		((TIMER_BASE) + 0x00)
-#define TIMER_RELOAD_ADDR	((TIMER_BASE) + 0x10)
-#define TIMER_EN_ADDR		((TIMER_BASE) + 0x20)
-#define TIMER_EV_PENDING_ADDR	((TIMER_BASE) + 0x3c)
-#define TIMER_EV_ENABLE_ADDR	((TIMER_BASE) + 0x40)
-#define TIMER_TOTAL_UPDATE	((TIMER_BASE) + 0x44)
-#define TIMER_TOTAL		((TIMER_BASE) + 0x48)
+#define TIMER_BASE DT_INST_REG_ADDR(0)
+#define TIMER_LOAD_ADDR ((TIMER_BASE) + 0x00)
+#define TIMER_RELOAD_ADDR ((TIMER_BASE) + 0x10)
+#define TIMER_EN_ADDR ((TIMER_BASE) + 0x20)
+#define TIMER_EV_PENDING_ADDR ((TIMER_BASE) + 0x3c)
+#define TIMER_EV_ENABLE_ADDR ((TIMER_BASE) + 0x40)
+#define TIMER_TOTAL_UPDATE ((TIMER_BASE) + 0x44)
+#define TIMER_TOTAL ((TIMER_BASE) + 0x48)
 
-#define TIMER_EV	0x1
-#define TIMER_IRQ	DT_INST_IRQN(0)
-#define TIMER_DISABLE	0x0
-#define TIMER_ENABLE	0x1
-#define UPDATE_TOTAL	0x1
+#define TIMER_EV 0x1
+#define TIMER_IRQ DT_INST_IRQN(0)
+#define TIMER_DISABLE 0x0
+#define TIMER_ENABLE 0x1
+#define UPDATE_TOTAL 0x1
 
 static void litex_timer_irq_handler(const void *device)
 {
@@ -63,16 +63,16 @@ int z_clock_driver_init(const struct device *device)
 {
 	ARG_UNUSED(device);
 	IRQ_CONNECT(TIMER_IRQ, DT_INST_IRQ(0, priority),
-			litex_timer_irq_handler, NULL, 0);
+		    litex_timer_irq_handler, NULL, 0);
 	irq_enable(TIMER_IRQ);
 
 	sys_write8(TIMER_DISABLE, TIMER_EN_ADDR);
 
 	for (int i = 0; i < 4; i++) {
 		sys_write8(k_ticks_to_cyc_floor32(1) >> (24 - i * 8),
-				TIMER_RELOAD_ADDR + i * 0x4);
+			   TIMER_RELOAD_ADDR + i * 0x4);
 		sys_write8(k_ticks_to_cyc_floor32(1) >> (24 - i * 8),
-				TIMER_LOAD_ADDR + i * 0x4);
+			   TIMER_LOAD_ADDR + i * 0x4);
 	}
 
 	sys_write8(TIMER_ENABLE, TIMER_EN_ADDR);

@@ -10,17 +10,17 @@
 #include <fs/fcb.h>
 #include "fcb_priv.h"
 
-int
-fcb_getnext_in_sector(struct fcb *fcb, struct fcb_entry *loc)
+int fcb_getnext_in_sector(struct fcb *fcb, struct fcb_entry *loc)
 {
 	int rc;
 
 	rc = fcb_elem_info(fcb, loc);
 	if (rc == 0 || rc == -EBADMSG) {
 		do {
-			loc->fe_elem_off = loc->fe_data_off +
-			  fcb_len_in_flash(fcb, loc->fe_data_len) +
-			  fcb_len_in_flash(fcb, FCB_CRC_SZ);
+			loc->fe_elem_off =
+				loc->fe_data_off +
+				fcb_len_in_flash(fcb, loc->fe_data_len) +
+				fcb_len_in_flash(fcb, FCB_CRC_SZ);
 			rc = fcb_elem_info(fcb, loc);
 			if (rc != -EBADMSG) {
 				break;
@@ -30,8 +30,8 @@ fcb_getnext_in_sector(struct fcb *fcb, struct fcb_entry *loc)
 	return rc;
 }
 
-struct flash_sector *
-fcb_getnext_sector(struct fcb *fcb, struct flash_sector *sector)
+struct flash_sector *fcb_getnext_sector(struct fcb *fcb,
+					struct flash_sector *sector)
 {
 	sector++;
 	if (sector >= &fcb->f_sectors[fcb->f_sector_cnt]) {
@@ -40,8 +40,7 @@ fcb_getnext_sector(struct fcb *fcb, struct flash_sector *sector)
 	return sector;
 }
 
-int
-fcb_getnext_nolock(struct fcb *fcb, struct fcb_entry *loc)
+int fcb_getnext_nolock(struct fcb *fcb, struct fcb_entry *loc)
 {
 	int rc;
 
@@ -84,11 +83,12 @@ fcb_getnext_nolock(struct fcb *fcb, struct fcb_entry *loc)
 			/*
 			 * Moving to next sector.
 			 */
-next_sector:
+		next_sector:
 			if (loc->fe_sector == fcb->f_active.fe_sector) {
 				return -ENOTSUP;
 			}
-			loc->fe_sector = fcb_getnext_sector(fcb, loc->fe_sector);
+			loc->fe_sector =
+				fcb_getnext_sector(fcb, loc->fe_sector);
 			loc->fe_elem_off = sizeof(struct fcb_disk_area);
 			rc = fcb_elem_info(fcb, loc);
 			switch (rc) {
@@ -105,8 +105,7 @@ next_sector:
 	return 0;
 }
 
-int
-fcb_getnext(struct fcb *fcb, struct fcb_entry *loc)
+int fcb_getnext(struct fcb *fcb, struct fcb_entry *loc)
 {
 	int rc;
 

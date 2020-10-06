@@ -49,17 +49,14 @@ extern "C" {
 #define GPTP_PROPERTIES_DS() (&gptp_domain.properties_ds)
 #define GPTP_STATE() (&gptp_domain.state)
 
-#define GPTP_PORT_DS(port) \
-	(&gptp_domain.port_ds[port - GPTP_PORT_START])
-#define GPTP_PORT_STATE(port) \
-	(&gptp_domain.port_state[port - GPTP_PORT_START])
+#define GPTP_PORT_DS(port) (&gptp_domain.port_ds[port - GPTP_PORT_START])
+#define GPTP_PORT_STATE(port) (&gptp_domain.port_state[port - GPTP_PORT_START])
 #define GPTP_PORT_BMCA_DATA(port) \
 	(&gptp_domain.port_bmca_data[port - GPTP_PORT_START])
-#define GPTP_PORT_IFACE(port) \
-	gptp_domain.iface[port - GPTP_PORT_START]
+#define GPTP_PORT_IFACE(port) gptp_domain.iface[port - GPTP_PORT_START]
 
 #if defined(CONFIG_NET_GPTP_STATISTICS)
-#define GPTP_PORT_PARAM_DS(port)				\
+#define GPTP_PORT_PARAM_DS(port) \
 	(&gptp_domain.port_param_ds[port - GPTP_PORT_START])
 #endif
 
@@ -87,17 +84,17 @@ extern struct gptp_domain gptp_domain;
  */
 enum gptp_tlv_type {
 	GPTP_TLV_MGNT = 0x0001,
-	GPTP_TLV_MGNT_ERR_STATUS              = 0x0002,
-	GPTP_TLV_ORGANIZATION_EXT             = 0x0003,
-	GPTP_TLV_REQ_UNICAST_TX               = 0x0004,
-	GPTP_TLV_GRANT_UNICAST_TX             = 0x0005,
-	GPTP_TLV_CANCEL_UNICAST_TX            = 0x0006,
-	GPTP_TLV_ACK_CANCEL_UNICAST_TX        = 0x0007,
-	GPTP_TLV_PATH_TRACE                   = 0x0008,
-	GPTP_TLV_ALT_TIME_OFFSET_INDICATOR    = 0x0009,
-	GPTP_TLV_AUTH                         = 0x2000,
-	GPTP_TLV_AUTH_CHALLENGE               = 0x2001,
-	GPTP_TLV_SECURITY_ASSOC_UPDATE        = 0x2002,
+	GPTP_TLV_MGNT_ERR_STATUS = 0x0002,
+	GPTP_TLV_ORGANIZATION_EXT = 0x0003,
+	GPTP_TLV_REQ_UNICAST_TX = 0x0004,
+	GPTP_TLV_GRANT_UNICAST_TX = 0x0005,
+	GPTP_TLV_CANCEL_UNICAST_TX = 0x0006,
+	GPTP_TLV_ACK_CANCEL_UNICAST_TX = 0x0007,
+	GPTP_TLV_PATH_TRACE = 0x0008,
+	GPTP_TLV_ALT_TIME_OFFSET_INDICATOR = 0x0009,
+	GPTP_TLV_AUTH = 0x2000,
+	GPTP_TLV_AUTH_CHALLENGE = 0x2001,
+	GPTP_TLV_SECURITY_ASSOC_UPDATE = 0x2002,
 	GPTP_TLV_CUM_FREQ_SCALE_FACTOR_OFFSET = 0x2003,
 };
 
@@ -106,15 +103,15 @@ enum gptp_tlv_type {
  * This is used when determining the Grand Master.
  */
 enum gptp_clock_class {
-	GPTP_CLASS_PRIMARY                 = 6,
-	GPTP_CLASS_APP_SPECIFIC            = 13,
-	GPTP_CLASS_APP_SPECIFIC_LOST       = 14,
-	GPTP_CLASS_PRIMARY_DEGRADED_A      = 52,
+	GPTP_CLASS_PRIMARY = 6,
+	GPTP_CLASS_APP_SPECIFIC = 13,
+	GPTP_CLASS_APP_SPECIFIC_LOST = 14,
+	GPTP_CLASS_PRIMARY_DEGRADED_A = 52,
 	GPTP_CLASS_APP_SPECIFIC_DEGRADED_A = 58,
-	GPTP_CLASS_PRIMARY_DEGRADED_B      = 187,
+	GPTP_CLASS_PRIMARY_DEGRADED_B = 187,
 	GPTP_CLASS_APP_SPECIFIC_DEGRADED_B = 193,
-	GPTP_CLASS_OTHER                   = 248,
-	GPTP_CLASS_SLAVE_ONLY              = 255,
+	GPTP_CLASS_OTHER = 248,
+	GPTP_CLASS_SLAVE_ONLY = 255,
 };
 
 /*

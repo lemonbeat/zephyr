@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <kernel.h>
 #include <string.h>
 #include <sys/math_extras.h>
@@ -47,12 +46,12 @@ LOG_MODULE_DECLARE(os);
  * not.
  */
 #ifdef CONFIG_DYNAMIC_OBJECTS
-static struct k_spinlock lists_lock;       /* kobj rbtree/dlist */
-static struct k_spinlock objfree_lock;     /* k_object_free */
+static struct k_spinlock lists_lock; /* kobj rbtree/dlist */
+static struct k_spinlock objfree_lock; /* k_object_free */
 #endif
-static struct k_spinlock obj_lock;         /* kobj struct data */
+static struct k_spinlock obj_lock; /* kobj struct data */
 
-#define MAX_THREAD_BITS		(CONFIG_MAX_THREAD_BYTES * 8)
+#define MAX_THREAD_BITS (CONFIG_MAX_THREAD_BYTES * 8)
 
 #ifdef CONFIG_DYNAMIC_OBJECTS
 extern uint8_t _thread_idx_map[CONFIG_MAX_THREAD_BYTES];
@@ -103,8 +102,7 @@ uint8_t *z_priv_stack_find(k_thread_stack_t *stack)
 	struct z_object *obj = z_object_find(stack);
 
 	__ASSERT(obj != NULL, "stack object not found");
-	__ASSERT(obj->type == K_OBJ_THREAD_STACK_ELEMENT,
-		 "bad stack object");
+	__ASSERT(obj->type == K_OBJ_THREAD_STACK_ELEMENT, "bad stack object");
 
 	return obj->data.stack_data->priv;
 }
@@ -120,7 +118,7 @@ struct dyn_obj {
 
 extern struct z_object *z_object_gperf_find(const void *obj);
 extern void z_object_gperf_wordlist_foreach(_wordlist_cb_func_t func,
-					     void *context);
+					    void *context);
 
 static bool node_lessthan(struct rbnode *a, struct rbnode *b);
 
@@ -128,9 +126,7 @@ static bool node_lessthan(struct rbnode *a, struct rbnode *b);
  * Red/black tree of allocated kernel objects, for reasonably fast lookups
  * based on object pointer values.
  */
-static struct rbtree obj_rb_tree = {
-	.lessthan_fn = node_lessthan
-};
+static struct rbtree obj_rb_tree = { .lessthan_fn = node_lessthan };
 
 /*
  * Linked list of allocated kernel objects, for iteration over all allocated
@@ -224,7 +220,7 @@ static bool thread_idx_alloc(uintptr_t *tidx)
 
 			/* Clear permission from all objects */
 			z_object_wordlist_foreach(clear_perms_cb,
-						   (void *)*tidx);
+						  (void *)*tidx);
 
 			return true;
 		}
@@ -295,10 +291,10 @@ void *z_impl_k_object_alloc(enum k_objects otype)
 		}
 		break;
 	/* The following are currently not allowed at all */
-	case K_OBJ_FUTEX:			/* Lives in user memory */
-	case K_OBJ_SYS_MUTEX:			/* Lives in user memory */
-	case K_OBJ_THREAD_STACK_ELEMENT:	/* No aligned allocator */
-	case K_OBJ_NET_SOCKET:			/* Indeterminate size */
+	case K_OBJ_FUTEX: /* Lives in user memory */
+	case K_OBJ_SYS_MUTEX: /* Lives in user memory */
+	case K_OBJ_THREAD_STACK_ELEMENT: /* No aligned allocator */
+	case K_OBJ_NET_SOCKET: /* Indeterminate size */
 		LOG_ERR("forbidden object type '%s' requested",
 			otype_to_str(otype));
 		return NULL;
@@ -414,8 +410,7 @@ static void unref_check(struct z_object *ko, uintptr_t index)
 	sys_bitfield_clear_bit((mem_addr_t)&ko->perms, index);
 
 #ifdef CONFIG_DYNAMIC_OBJECTS
-	struct dyn_obj *dyn =
-			CONTAINER_OF(ko, struct dyn_obj, kobj);
+	struct dyn_obj *dyn = CONTAINER_OF(ko, struct dyn_obj, kobj);
 
 	if ((ko->flags & K_OBJ_FLAG_ALLOC) == 0U) {
 		goto out;
@@ -460,18 +455,15 @@ static void wordlist_cb(struct z_object *ko, void *ctx_ptr)
 	struct perm_ctx *ctx = (struct perm_ctx *)ctx_ptr;
 
 	if (sys_bitfield_test_bit((mem_addr_t)&ko->perms, ctx->parent_id) &&
-				  (struct k_thread *)ko->name != ctx->parent) {
+	    (struct k_thread *)ko->name != ctx->parent) {
 		sys_bitfield_set_bit((mem_addr_t)&ko->perms, ctx->child_id);
 	}
 }
 
 void z_thread_perms_inherit(struct k_thread *parent, struct k_thread *child)
 {
-	struct perm_ctx ctx = {
-		thread_index_get(parent),
-		thread_index_get(child),
-		parent
-	};
+	struct perm_ctx ctx = { thread_index_get(parent),
+				thread_index_get(child), parent };
 
 	if ((ctx.parent_id != -1) && (ctx.child_id != -1)) {
 		z_object_wordlist_foreach(wordlist_cb, &ctx);
@@ -531,14 +523,13 @@ static int thread_perms_test(struct z_object *ko)
 static void dump_permission_error(struct z_object *ko)
 {
 	int index = thread_index_get(_current);
-	LOG_ERR("thread %p (%d) does not have permission on %s %p",
-		_current, index,
-		otype_to_str(ko->type), ko->name);
+	LOG_ERR("thread %p (%d) does not have permission on %s %p", _current,
+		index, otype_to_str(ko->type), ko->name);
 	LOG_HEXDUMP_ERR(ko->perms, sizeof(ko->perms), "permission bitmap");
 }
 
 void z_dump_object_error(int retval, const void *obj, struct z_object *ko,
-			enum k_objects otype)
+			 enum k_objects otype)
 {
 	switch (retval) {
 	case -EBADF:
@@ -598,10 +589,10 @@ void k_object_access_all_grant(const void *object)
 }
 
 int z_object_validate(struct z_object *ko, enum k_objects otype,
-		       enum _obj_init_check init)
+		      enum _obj_init_check init)
 {
 	if (unlikely((ko == NULL) ||
-		(otype != K_OBJ_ANY && ko->type != otype))) {
+		     (otype != K_OBJ_ANY && ko->type != otype))) {
 		return -EBADF;
 	}
 
@@ -708,7 +699,7 @@ static int user_copy(void *dst, const void *src, size_t size, bool to_user)
 
 	/* Does the caller in user mode have access to this memory? */
 	if (to_user ? Z_SYSCALL_MEMORY_WRITE(dst, size) :
-			Z_SYSCALL_MEMORY_READ(src, size)) {
+			    Z_SYSCALL_MEMORY_READ(src, size)) {
 		goto out_err;
 	}
 
@@ -807,7 +798,7 @@ static int app_shmem_bss_zero(const struct device *unused)
 	end = (struct z_app_region *)&__app_shmem_regions_end;
 	region = (struct z_app_region *)&__app_shmem_regions_start;
 
-	for ( ; region < end; region++) {
+	for (; region < end; region++) {
 		(void)memset(region->bss_start, 0, region->bss_size);
 	}
 
@@ -822,8 +813,7 @@ SYS_INIT(app_shmem_bss_zero, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 
 static uintptr_t handler_bad_syscall(uintptr_t bad_id, uintptr_t arg2,
 				     uintptr_t arg3, uintptr_t arg4,
-				     uintptr_t arg5, uintptr_t arg6,
-				     void *ssf)
+				     uintptr_t arg5, uintptr_t arg6, void *ssf)
 {
 	LOG_ERR("Bad system call id %" PRIuPTR " invoked", bad_id);
 	arch_syscall_oops(ssf);

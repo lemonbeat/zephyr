@@ -13,18 +13,18 @@
 
 #include "binary_f32.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)120)
-#define REL_ERROR_THRESH	(1.0e-6)
-#define ABS_ERROR_THRESH	(1.0e-5)
+#define SNR_ERROR_THRESH ((float32_t)120)
+#define REL_ERROR_THRESH (1.0e-6)
+#define ABS_ERROR_THRESH (1.0e-5)
 
-#define NUM_MATRICES		(ARRAY_SIZE(in_dims) / 3)
-#define MAX_MATRIX_DIM		(40)
+#define NUM_MATRICES (ARRAY_SIZE(in_dims) / 3)
+#define MAX_MATRIX_DIM (40)
 
-#define OP2_MULT		(0)
-#define OP2C_CMPLX_MULT		(0)
+#define OP2_MULT (0)
+#define OP2C_CMPLX_MULT (0)
 
 static void test_op2(int op, const uint32_t *input1, const uint32_t *input2,
-	const uint32_t *ref, size_t length)
+		     const uint32_t *ref, size_t length)
 {
 	size_t index;
 	uint16_t *dims = (uint16_t *)in_dims;
@@ -87,15 +87,13 @@ static void test_op2(int op, const uint32_t *input1, const uint32_t *input2,
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output, (float32_t *)ref,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output, (float32_t *)ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -103,13 +101,11 @@ static void test_op2(int op, const uint32_t *input1, const uint32_t *input2,
 	free(output);
 }
 
-DEFINE_TEST_VARIANT5(
-	op2, arm_mat_mult_f32, OP2_MULT,
-	in_mult1, in_mult2, ref_mult,
-	ARRAY_SIZE(ref_mult));
+DEFINE_TEST_VARIANT5(op2, arm_mat_mult_f32, OP2_MULT, in_mult1, in_mult2,
+		     ref_mult, ARRAY_SIZE(ref_mult));
 
 static void test_op2c(int op, const uint32_t *input1, const uint32_t *input2,
-	const uint32_t *ref, size_t length)
+		      const uint32_t *ref, size_t length)
 {
 	size_t index;
 	uint16_t *dims = (uint16_t *)in_dims;
@@ -172,15 +168,13 @@ static void test_op2c(int op, const uint32_t *input1, const uint32_t *input2,
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(2 * length, output, (float32_t *)ref,
-			SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(2 * length, output, (float32_t *)ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_close_error_f32(length, output, (float32_t *)ref,
-			ABS_ERROR_THRESH, REL_ERROR_THRESH),
-		ASSERT_MSG_ERROR_LIMIT_EXCEED);
+	zassert_true(test_close_error_f32(length, output, (float32_t *)ref,
+					  ABS_ERROR_THRESH, REL_ERROR_THRESH),
+		     ASSERT_MSG_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(tmp1);
@@ -188,17 +182,15 @@ static void test_op2c(int op, const uint32_t *input1, const uint32_t *input2,
 	free(output);
 }
 
-DEFINE_TEST_VARIANT5(
-	op2c, arm_mat_cmplx_mult_f32, OP2C_CMPLX_MULT,
-	in_cmplx_mult1, in_cmplx_mult2, ref_cmplx_mult,
-	ARRAY_SIZE(ref_cmplx_mult) / 2);
+DEFINE_TEST_VARIANT5(op2c, arm_mat_cmplx_mult_f32, OP2C_CMPLX_MULT,
+		     in_cmplx_mult1, in_cmplx_mult2, ref_cmplx_mult,
+		     ARRAY_SIZE(ref_cmplx_mult) / 2);
 
 void test_matrix_binary_f32(void)
 {
 	ztest_test_suite(matrix_binary_f32,
-		ztest_unit_test(test_op2_arm_mat_mult_f32),
-		ztest_unit_test(test_op2c_arm_mat_cmplx_mult_f32)
-		);
+			 ztest_unit_test(test_op2_arm_mat_mult_f32),
+			 ztest_unit_test(test_op2c_arm_mat_cmplx_mult_f32));
 
 	ztest_run_test_suite(matrix_binary_f32);
 }

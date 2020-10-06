@@ -35,8 +35,8 @@ struct timespec {
 };
 
 struct itimerspec {
-	struct timespec it_interval;  /* Timer interval */
-	struct timespec it_value;     /* Timer expiration */
+	struct timespec it_interval; /* Timer interval */
+	struct timespec it_value; /* Timer expiration */
 };
 
 #ifdef __cplusplus
@@ -48,12 +48,12 @@ struct itimerspec {
 
 #else /* CONFIG_NEWLIB_LIBC */
 /* Not Newlib */
-# ifdef CONFIG_ARCH_POSIX
-#  include <bits/types/struct_timespec.h>
-#  include <bits/types/struct_itimerspec.h>
-# else
-#  include <sys/timespec.h>
-# endif
+#ifdef CONFIG_ARCH_POSIX
+#include <bits/types/struct_timespec.h>
+#include <bits/types/struct_itimerspec.h>
+#else
+#include <sys/timespec.h>
+#endif
 #endif /* CONFIG_NEWLIB_LIBC */
 
 #include <kernel.h>

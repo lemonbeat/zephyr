@@ -42,12 +42,10 @@ static struct k_spinlock lock;
 
 static void lptim_irq_handler(const struct device *unused)
 {
-
 	ARG_UNUSED(unused);
 
-	if ((LL_LPTIM_IsActiveFlag_ARRM(LPTIM1) != 0)
-		&& LL_LPTIM_IsEnabledIT_ARRM(LPTIM1) != 0) {
-
+	if ((LL_LPTIM_IsActiveFlag_ARRM(LPTIM1) != 0) &&
+	    LL_LPTIM_IsEnabledIT_ARRM(LPTIM1) != 0) {
 		k_spinlock_key_t key = k_spin_lock(&lock);
 
 		/* do not change ARR yet, z_clock_announce will do */
@@ -64,12 +62,13 @@ static void lptim_irq_handler(const struct device *unused)
 		k_spin_unlock(&lock, key);
 
 		/* announce the elapsed time in ms (count register is 16bit) */
-		uint32_t dticks = (autoreload
-				* CONFIG_SYS_CLOCK_TICKS_PER_SEC)
-				/ LPTIM_CLOCK;
+		uint32_t dticks =
+			(autoreload * CONFIG_SYS_CLOCK_TICKS_PER_SEC) /
+			LPTIM_CLOCK;
 
-		z_clock_announce(IS_ENABLED(CONFIG_TICKLESS_KERNEL)
-				? dticks : (dticks > 0));
+		z_clock_announce(IS_ENABLED(CONFIG_TICKLESS_KERNEL) ?
+					       dticks :
+					       (dticks > 0));
 	}
 }
 
@@ -115,8 +114,8 @@ int z_clock_driver_init(const struct device *device)
 
 	/* Clear the event flag and possible pending interrupt */
 	IRQ_CONNECT(DT_IRQN(DT_NODELABEL(lptim1)),
-		    DT_IRQ(DT_NODELABEL(lptim1), priority),
-		    lptim_irq_handler, 0, 0);
+		    DT_IRQ(DT_NODELABEL(lptim1), priority), lptim_irq_handler,
+		    0, 0);
 	irq_enable(DT_IRQN(DT_NODELABEL(lptim1)));
 
 	/* configure the LPTIM1 counter */
@@ -220,8 +219,8 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 
 	uint32_t autoreload = LL_LPTIM_GetAutoReload(LPTIM1);
 
-	if (LL_LPTIM_IsActiveFlag_ARRM(LPTIM1)
-	    || ((autoreload - lp_time) < LPTIM_GUARD_VALUE)) {
+	if (LL_LPTIM_IsActiveFlag_ARRM(LPTIM1) ||
+	    ((autoreload - lp_time) < LPTIM_GUARD_VALUE)) {
 		/* interrupt happens or happens soon.
 		 * It's impossible to set autoreload value.
 		 */
@@ -233,12 +232,14 @@ void z_clock_set_timeout(int32_t ticks, bool idle)
 	 * adjust the next ARR match value to align on Ticks
 	 * from the current counter value to first next Tick
 	 */
-	next_arr = (((lp_time * CONFIG_SYS_CLOCK_TICKS_PER_SEC)
-			/ LPTIM_CLOCK) + 1) * LPTIM_CLOCK
-			/ (CONFIG_SYS_CLOCK_TICKS_PER_SEC);
+	next_arr = (((lp_time * CONFIG_SYS_CLOCK_TICKS_PER_SEC) / LPTIM_CLOCK) +
+		    1) *
+		   LPTIM_CLOCK / (CONFIG_SYS_CLOCK_TICKS_PER_SEC);
 	/* add count unit from the expected nb of Ticks */
-	next_arr = next_arr + ((uint32_t)(ticks) * LPTIM_CLOCK)
-			/ CONFIG_SYS_CLOCK_TICKS_PER_SEC - 1;
+	next_arr = next_arr +
+		   ((uint32_t)(ticks)*LPTIM_CLOCK) /
+			   CONFIG_SYS_CLOCK_TICKS_PER_SEC -
+		   1;
 
 	/* maximise to TIMEBASE */
 	if (next_arr > LPTIM_TIMEBASE) {
@@ -276,8 +277,8 @@ uint32_t z_clock_elapsed(void)
 	/* In case of counter roll-over, add this value,
 	 * even if the irq has not yet been handled
 	 */
-	if ((LL_LPTIM_IsActiveFlag_ARRM(LPTIM1) != 0)
-	  && LL_LPTIM_IsEnabledIT_ARRM(LPTIM1) != 0) {
+	if ((LL_LPTIM_IsActiveFlag_ARRM(LPTIM1) != 0) &&
+	    LL_LPTIM_IsEnabledIT_ARRM(LPTIM1) != 0) {
 		lp_time += LL_LPTIM_GetAutoReload(LPTIM1) + 1;
 	}
 
@@ -302,8 +303,8 @@ uint32_t z_timer_cycle_get_32(void)
 	/* In case of counter roll-over, add this value,
 	 * even if the irq has not yet been handled
 	 */
-	if ((LL_LPTIM_IsActiveFlag_ARRM(LPTIM1) != 0)
-	  && LL_LPTIM_IsEnabledIT_ARRM(LPTIM1) != 0) {
+	if ((LL_LPTIM_IsActiveFlag_ARRM(LPTIM1) != 0) &&
+	    LL_LPTIM_IsEnabledIT_ARRM(LPTIM1) != 0) {
 		lp_time += LL_LPTIM_GetAutoReload(LPTIM1) + 1;
 	}
 

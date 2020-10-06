@@ -38,8 +38,8 @@
 #include <string.h>
 
 #if defined(CONFIG_SW_VECTOR_RELAY) || defined(CONFIG_SW_VECTOR_RELAY_CLIENT)
-Z_GENERIC_SECTION(.vt_pointer_section) __attribute__((used))
-void *_vector_table_pointer;
+Z_GENERIC_SECTION(.vt_pointer_section)
+__attribute__((used)) void *_vector_table_pointer;
 #endif
 
 #ifdef CONFIG_CPU_CORTEX_M_HAS_VTOR
@@ -63,7 +63,7 @@ static inline void relocate_vector_table(void)
 void __weak relocate_vector_table(void)
 {
 #if defined(CONFIG_XIP) && (CONFIG_FLASH_BASE_ADDRESS != 0) || \
-    !defined(CONFIG_XIP) && (CONFIG_SRAM_BASE_ADDRESS != 0)
+	!defined(CONFIG_XIP) && (CONFIG_SRAM_BASE_ADDRESS != 0)
 	size_t vector_size = (size_t)_vector_end - (size_t)_vector_start;
 	(void)memcpy(VECTOR_ADDRESS, _vector_start, vector_size);
 #elif defined(CONFIG_SW_VECTOR_RELAY) || defined(CONFIG_SW_VECTOR_RELAY_CLIENT)

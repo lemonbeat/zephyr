@@ -41,7 +41,7 @@ static void prdec(struct _pfr *r, long v)
 		v = -v;
 	}
 
-	char digs[11 * sizeof(long)/4];
+	char digs[11 * sizeof(long) / 4];
 	int i = sizeof(digs) - 1;
 
 	digs[i--] = 0;
@@ -110,10 +110,10 @@ static int vpf(struct _pfr *r, const char *f, va_list ap)
 			islong = sizeof(long) > 4;
 		case 'x': {
 			int sig = 0;
-			unsigned long v = islong ? va_arg(ap, unsigned long)
-				: va_arg(ap, unsigned int);
-			for (int i = 2*sizeof(long) - 1; i >= 0; i--) {
-				int d = (v >> (i*4)) & 0xf;
+			unsigned long v = islong ? va_arg(ap, unsigned long) :
+							 va_arg(ap, unsigned int);
+			for (int i = 2 * sizeof(long) - 1; i >= 0; i--) {
+				int d = (v >> (i * 4)) & 0xf;
 
 				sig += !!d;
 				if (sig || i == 0)
@@ -133,10 +133,10 @@ static int vpf(struct _pfr *r, const char *f, va_list ap)
 	return r->idx;
 }
 
-#define CALL_VPF(rec)				\
-	va_list ap;				\
-	va_start(ap, f);			\
-	ret = vpf(&r, f, ap);			\
+#define CALL_VPF(rec)         \
+	va_list ap;           \
+	va_start(ap, f);      \
+	ret = vpf(&r, f, ap); \
 	va_end(ap);
 
 static inline int snprintf(char *buf, unsigned long len, const char *f, ...)
@@ -160,7 +160,7 @@ static inline int sprintf(char *buf, const char *f, ...)
 static inline int printf(const char *f, ...)
 {
 	int ret = 0;
-	struct _pfr r = {0};
+	struct _pfr r = { 0 };
 
 	CALL_VPF(&r);
 	return ret;

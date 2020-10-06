@@ -11,9 +11,8 @@
 
 K_MUTEX_DEFINE(tfm_mutex);
 
-int32_t tfm_ns_interface_dispatch(veneer_fn fn,
-				uint32_t arg0, uint32_t arg1,
-				uint32_t arg2, uint32_t arg3)
+int32_t tfm_ns_interface_dispatch(veneer_fn fn, uint32_t arg0, uint32_t arg1,
+				  uint32_t arg2, uint32_t arg3)
 {
 	int32_t result;
 

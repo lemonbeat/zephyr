@@ -14,23 +14,23 @@ LOG_MODULE_REGISTER(nrf5340pdk_nrf5340_cpuapp, CONFIG_LOG_DEFAULT_LEVEL);
 
 /* Shared memory definitions */
 #if DT_HAS_CHOSEN(zephyr_ipc_shm)
-#define SHM_NODE            DT_CHOSEN(zephyr_ipc_shm)
-#define SHM_BASE_ADDRESS    DT_REG_ADDR(SHM_NODE)
-#define SHM_SIZE            DT_REG_SIZE(SHM_NODE)
+#define SHM_NODE DT_CHOSEN(zephyr_ipc_shm)
+#define SHM_BASE_ADDRESS DT_REG_ADDR(SHM_NODE)
+#define SHM_SIZE DT_REG_SIZE(SHM_NODE)
 #endif
 
 #if !defined(CONFIG_TRUSTED_EXECUTION_NONSECURE)
 
 /* This should come from DTS, possibly an overlay. */
 #if defined(CONFIG_BOARD_NRF5340PDK_NRF5340_CPUAPP)
-#define CPUNET_UARTE_PIN_TX  25
-#define CPUNET_UARTE_PIN_RX  26
+#define CPUNET_UARTE_PIN_TX 25
+#define CPUNET_UARTE_PIN_RX 26
 #define CPUNET_UARTE_PORT_TRX NRF_P0
 #define CPUNET_UARTE_PIN_RTS 10
 #define CPUNET_UARTE_PIN_CTS 12
 #elif defined(CONFIG_BOARD_NRF5340DK_NRF5340_CPUAPP)
-#define CPUNET_UARTE_PIN_TX  1
-#define CPUNET_UARTE_PIN_RX  0
+#define CPUNET_UARTE_PIN_TX 1
+#define CPUNET_UARTE_PIN_RX 0
 #define CPUNET_UARTE_PORT_TRX NRF_P1
 #define CPUNET_UARTE_PIN_RTS 11
 #define CPUNET_UARTE_PIN_CTS 10
@@ -49,13 +49,13 @@ static void remoteproc_mgr_config(void)
 	 * nRF5340 Network MCU.
 	 */
 	CPUNET_UARTE_PORT_TRX->PIN_CNF[CPUNET_UARTE_PIN_TX] =
-	GPIO_PIN_CNF_MCUSEL_NetworkMCU << GPIO_PIN_CNF_MCUSEL_Pos;
+		GPIO_PIN_CNF_MCUSEL_NetworkMCU << GPIO_PIN_CNF_MCUSEL_Pos;
 	CPUNET_UARTE_PORT_TRX->PIN_CNF[CPUNET_UARTE_PIN_RX] =
-	GPIO_PIN_CNF_MCUSEL_NetworkMCU << GPIO_PIN_CNF_MCUSEL_Pos;
-	NRF_P0->PIN_CNF[CPUNET_UARTE_PIN_RTS] =
-	GPIO_PIN_CNF_MCUSEL_NetworkMCU << GPIO_PIN_CNF_MCUSEL_Pos;
-	NRF_P0->PIN_CNF[CPUNET_UARTE_PIN_CTS] =
-	GPIO_PIN_CNF_MCUSEL_NetworkMCU << GPIO_PIN_CNF_MCUSEL_Pos;
+		GPIO_PIN_CNF_MCUSEL_NetworkMCU << GPIO_PIN_CNF_MCUSEL_Pos;
+	NRF_P0->PIN_CNF[CPUNET_UARTE_PIN_RTS] = GPIO_PIN_CNF_MCUSEL_NetworkMCU
+						<< GPIO_PIN_CNF_MCUSEL_Pos;
+	NRF_P0->PIN_CNF[CPUNET_UARTE_PIN_CTS] = GPIO_PIN_CNF_MCUSEL_NetworkMCU
+						<< GPIO_PIN_CNF_MCUSEL_Pos;
 
 	/* Route Bluetooth Controller Debug Pins */
 	DEBUG_SETUP();
@@ -89,7 +89,7 @@ static int remoteproc_mgr_boot(const struct device *dev)
 	 * assumed that the application image has access to the shared
 	 * memory at this point (see #24147).
 	 */
-	memset((void *) SHM_BASE_ADDRESS, 0, SHM_SIZE);
+	memset((void *)SHM_BASE_ADDRESS, 0, SHM_SIZE);
 #endif
 
 	/* Release the Network MCU, 'Release force off signal' */

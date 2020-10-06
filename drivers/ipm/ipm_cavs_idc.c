@@ -22,8 +22,8 @@ extern void z_sched_ipi(void);
 #endif
 
 struct cavs_idc_data {
-	ipm_callback_t	cb;
-	void		*user_data;
+	ipm_callback_t cb;
+	void *user_data;
 };
 
 DEVICE_DECLARE(cavs_idc);
@@ -157,8 +157,7 @@ static uint32_t cavs_idc_max_id_val_get(const struct device *dev)
 }
 
 static void cavs_idc_register_callback(const struct device *dev,
-				       ipm_callback_t cb,
-				       void *user_data)
+				       ipm_callback_t cb, void *user_data)
 {
 	struct cavs_idc_data *drv_data = dev->data;
 
@@ -195,7 +194,7 @@ static int cavs_idc_set_enabled(const struct device *dev, int enable)
 
 		/* FIXME: when we have API to enable IRQ on specific core. */
 		sys_set_bit(DT_REG_ADDR(DT_NODELABEL(cavs0)) + 0x04 +
-			    CAVS_ICTL_INT_CPU_OFFSET(i),
+				    CAVS_ICTL_INT_CPU_OFFSET(i),
 			    CAVS_IRQ_NUMBER(DT_INST_IRQN(0)));
 	}
 
@@ -204,9 +203,8 @@ static int cavs_idc_set_enabled(const struct device *dev, int enable)
 
 static int cavs_idc_init(const struct device *dev)
 {
-	IRQ_CONNECT(DT_INST_IRQN(0),
-		    DT_INST_IRQ(0, priority),
-		    cavs_idc_isr, DEVICE_GET(cavs_idc), 0);
+	IRQ_CONNECT(DT_INST_IRQN(0), DT_INST_IRQ(0, priority), cavs_idc_isr,
+		    DEVICE_GET(cavs_idc), 0);
 
 	irq_enable(DT_INST_IRQN(0));
 
@@ -221,11 +219,9 @@ static const struct ipm_driver_api cavs_idc_driver_api = {
 	.set_enabled = cavs_idc_set_enabled,
 };
 
-DEVICE_AND_API_INIT(IPM_CAVS_IDC_DEV_NAME,
-		    DT_INST_LABEL(0),
-		    &cavs_idc_init, &cavs_idc_device_data, NULL,
-		    PRE_KERNEL_2, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-		    &cavs_idc_driver_api);
+DEVICE_AND_API_INIT(IPM_CAVS_IDC_DEV_NAME, DT_INST_LABEL(0), &cavs_idc_init,
+		    &cavs_idc_device_data, NULL, PRE_KERNEL_2,
+		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &cavs_idc_driver_api);
 
 #ifdef CONFIG_SCHED_IPI_SUPPORTED
 static int cavs_idc_smp_init(const struct device *dev)

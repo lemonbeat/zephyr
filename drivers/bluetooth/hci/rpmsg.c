@@ -194,12 +194,12 @@ static int bt_rpmsg_open(void)
 }
 
 static const struct bt_hci_driver drv = {
-	.name		= "RPMsg",
-	.open		= bt_rpmsg_open,
-	.send		= bt_rpmsg_send,
-	.bus		= BT_HCI_DRIVER_BUS_IPM,
+	.name = "RPMsg",
+	.open = bt_rpmsg_open,
+	.send = bt_rpmsg_send,
+	.bus = BT_HCI_DRIVER_BUS_IPM,
 #if defined(BT_DRIVER_QUIRK_NO_AUTO_DLE)
-	.quirks         = BT_QUIRK_NO_AUTO_DLE,
+	.quirks = BT_QUIRK_NO_AUTO_DLE,
 #endif
 };
 

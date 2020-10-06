@@ -30,8 +30,7 @@ static const char *now_str(void)
 	now /= 60U;
 	h = now;
 
-	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u",
-		 h, min, s, ms);
+	snprintf(buf, sizeof(buf), "%u:%02u:%02u.%03u", h, min, s, ms);
 	return buf;
 }
 
@@ -58,8 +57,8 @@ static int do_fetch(const struct device *dev)
 		sensor_channel_get(dev, SENSOR_CHAN_VOC, &tvoc);
 		sensor_channel_get(dev, SENSOR_CHAN_VOLTAGE, &voltage);
 		sensor_channel_get(dev, SENSOR_CHAN_CURRENT, &current);
-		printk("\n[%s]: CCS811: %u ppm eCO2; %u ppb eTVOC\n",
-		       now_str(), co2.val1, tvoc.val1);
+		printk("\n[%s]: CCS811: %u ppm eCO2; %u ppb eTVOC\n", now_str(),
+		       co2.val1, tvoc.val1);
 		printk("Voltage: %d.%06dV; Current: %d.%06dA\n", voltage.val1,
 		       voltage.val2, current.val1, current.val2);
 #ifdef CONFIG_APP_MONITOR_BASELINE
@@ -113,7 +112,8 @@ static void do_main(const struct device *dev)
 
 void main(void)
 {
-	const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, ams_ccs811)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, ams_ccs811)));
 	struct ccs811_configver_type cfgver;
 	int rc;
 
@@ -137,8 +137,8 @@ void main(void)
 	struct sensor_value humidity = { CONFIG_APP_ENV_HUMIDITY };
 
 	rc = ccs811_envdata_update(dev, &temp, &humidity);
-	printk("ENV_DATA set for %d Cel, %d %%RH got %d\n",
-	       temp.val1, humidity.val1, rc);
+	printk("ENV_DATA set for %d Cel, %d %%RH got %d\n", temp.val1,
+	       humidity.val1, rc);
 #endif
 
 #ifdef CONFIG_CCS811_TRIGGER
@@ -151,8 +151,7 @@ void main(void)
 			.val1 = CONFIG_APP_CO2_MEDIUM_PPM,
 		};
 		rc = sensor_attr_set(dev, SENSOR_CHAN_CO2,
-				     SENSOR_ATTR_LOWER_THRESH,
-				     &thr);
+				     SENSOR_ATTR_LOWER_THRESH, &thr);
 		printk("L/M threshold to %d got %d\n", thr.val1, rc);
 	}
 	if (rc == 0) {
@@ -160,8 +159,7 @@ void main(void)
 			.val1 = CONFIG_APP_CO2_HIGH_PPM,
 		};
 		rc = sensor_attr_set(dev, SENSOR_CHAN_CO2,
-				     SENSOR_ATTR_UPPER_THRESH,
-				     &thr);
+				     SENSOR_ATTR_UPPER_THRESH, &thr);
 		printk("M/H threshold to %d got %d\n", thr.val1, rc);
 	}
 	trig.type = SENSOR_TRIG_THRESHOLD;

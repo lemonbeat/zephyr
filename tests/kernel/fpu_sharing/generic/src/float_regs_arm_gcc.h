@@ -39,11 +39,11 @@
 
 static inline void _load_all_float_registers(struct fp_register_set *regs)
 {
-	__asm__ volatile (
-		"vldmia %0, {s0-s15};\n\t"
-		"vldmia %1, {s16-s31};\n\t"
-		: : "r" (&regs->fp_volatile), "r" (&regs->fp_non_volatile)
-		);
+	__asm__ volatile("vldmia %0, {s0-s15};\n\t"
+			 "vldmia %1, {s16-s31};\n\t"
+			 :
+			 : "r"(&regs->fp_volatile),
+			   "r"(&regs->fp_non_volatile));
 }
 
 /**
@@ -60,12 +60,11 @@ static inline void _load_all_float_registers(struct fp_register_set *regs)
 
 static inline void _store_all_float_registers(struct fp_register_set *regs)
 {
-	__asm__ volatile (
-		"vstmia %0, {s0-s15};\n\t"
-		"vstmia %1, {s16-s31};\n\t"
-		: : "r" (&regs->fp_volatile), "r" (&regs->fp_non_volatile)
-		: "memory"
-		);
+	__asm__ volatile("vstmia %0, {s0-s15};\n\t"
+			 "vstmia %1, {s16-s31};\n\t"
+			 :
+			 : "r"(&regs->fp_volatile), "r"(&regs->fp_non_volatile)
+			 : "memory");
 }
 
 /**
@@ -82,8 +81,8 @@ static inline void _store_all_float_registers(struct fp_register_set *regs)
  * @return N/A
  */
 
-static inline void _load_then_store_all_float_registers(struct fp_register_set
-							*regs)
+static inline void
+_load_then_store_all_float_registers(struct fp_register_set *regs)
 {
 	_load_all_float_registers(regs);
 	_store_all_float_registers(regs);

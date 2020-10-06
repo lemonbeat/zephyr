@@ -22,7 +22,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief IPv6 over CAN library
  * @defgroup net_can Network Core Library
@@ -52,22 +51,24 @@ extern "C" {
 #define NET_CAN_MTU 0x0FFF
 
 /* 0x3DFF - bit 4 to 10 must not be zero. Also prevent stuffing bit*/
-#define NET_CAN_MULTICAST_ADDR      0x3DFF
-#define NET_CAN_DAD_ADDR            0x3DFE
+#define NET_CAN_MULTICAST_ADDR 0x3DFF
+#define NET_CAN_DAD_ADDR 0x3DFE
 #define NET_CAN_ETH_TRANSLATOR_ADDR 0x3DF0
-#define NET_CAN_MAX_ADDR            0x3DEF
-#define NET_CAN_MIN_ADDR            0x0100
+#define NET_CAN_MAX_ADDR 0x3DEF
+#define NET_CAN_MIN_ADDR 0x0100
 
-#define CAN_NET_IF_ADDR_MASK       0x3FFF
-#define CAN_NET_IF_ADDR_BYTE_LEN   2U
-#define CAN_NET_IF_ADDR_DEST_POS   14U
-#define CAN_NET_IF_ADDR_DEST_MASK  (CAN_NET_IF_ADDR_MASK << CAN_NET_IF_ADDR_DEST_POS)
-#define CAN_NET_IF_ADDR_SRC_POS    0U
-#define CAN_NET_IF_ADDR_SRC_MASK   (CAN_NET_IF_ADDR_MASK << CAN_NET_IF_ADDR_SRC_POS)
-#define CAN_NET_IF_ADDR_MCAST_POS  28U
+#define CAN_NET_IF_ADDR_MASK 0x3FFF
+#define CAN_NET_IF_ADDR_BYTE_LEN 2U
+#define CAN_NET_IF_ADDR_DEST_POS 14U
+#define CAN_NET_IF_ADDR_DEST_MASK \
+	(CAN_NET_IF_ADDR_MASK << CAN_NET_IF_ADDR_DEST_POS)
+#define CAN_NET_IF_ADDR_SRC_POS 0U
+#define CAN_NET_IF_ADDR_SRC_MASK \
+	(CAN_NET_IF_ADDR_MASK << CAN_NET_IF_ADDR_SRC_POS)
+#define CAN_NET_IF_ADDR_MCAST_POS 28U
 #define CAN_NET_IF_ADDR_MCAST_MASK (1UL << CAN_NET_IF_ADDR_MCAST_POS)
 
-#define CAN_NET_IF_IS_MCAST_BIT    (1U << 14)
+#define CAN_NET_IF_IS_MCAST_BIT (1U << 14)
 
 #define CAN_NET_FILTER_NOT_SET -1
 
@@ -117,7 +118,7 @@ BUILD_ASSERT(offsetof(struct net_can_api, iface_api) == 0);
 
 /** @cond INTERNAL_HIDDEN */
 
-#define CANBUS_L2_CTX_TYPE	struct net_canbus_context *
+#define CANBUS_L2_CTX_TYPE struct net_canbus_context *
 
 /**
  * Context for canbus net device.

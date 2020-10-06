@@ -10,9 +10,11 @@
 
 static int board_pinmux_init(const struct device *dev)
 {
-	const struct device *muxa = device_get_binding(DT_LABEL(DT_NODELABEL(pinmux_a)));
+	const struct device *muxa =
+		device_get_binding(DT_LABEL(DT_NODELABEL(pinmux_a)));
 #if (ATMEL_SAM0_DT_SERCOM_CHECK(4, atmel_sam0_spi) && CONFIG_SPI_SAM0)
-	const struct device *muxb = device_get_binding(DT_LABEL(DT_NODELABEL(pinmux_b)));
+	const struct device *muxb =
+		device_get_binding(DT_LABEL(DT_NODELABEL(pinmux_b)));
 #endif
 	ARG_UNUSED(dev);
 

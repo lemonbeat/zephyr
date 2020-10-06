@@ -34,8 +34,7 @@ static int dummy_open(const struct device *dev)
 
 	do {
 		(void)k_poll(&async_evt, 1, K_FOREVER);
-		k_poll_signal_check(&dev->pm->signal,
-						&signaled, &result);
+		k_poll_signal_check(&dev->pm->signal, &signaled, &result);
 	} while (!signaled);
 
 	async_evt.state = K_POLL_STATE_NOT_READY;
@@ -114,8 +113,7 @@ static int dummy_resume_from_suspend(const struct device *dev)
 	return 0;
 }
 
-static int dummy_device_pm_ctrl(const struct device *dev,
-				uint32_t ctrl_command,
+static int dummy_device_pm_ctrl(const struct device *dev, uint32_t ctrl_command,
 				void *context, device_pm_cb cb, void *arg)
 {
 	int ret = 0;
@@ -133,7 +131,6 @@ static int dummy_device_pm_ctrl(const struct device *dev,
 		break;
 	default:
 		ret = -EINVAL;
-
 	}
 
 	cb(dev, ret, context, arg);
@@ -159,10 +156,10 @@ int dummy_init(const struct device *dev)
 	device_power_state = DEVICE_PM_ACTIVE_STATE;
 
 	k_poll_event_init(&async_evt, K_POLL_TYPE_SIGNAL,
-			K_POLL_MODE_NOTIFY_ONLY, &dev->pm->signal);
+			  K_POLL_MODE_NOTIFY_ONLY, &dev->pm->signal);
 	return 0;
 }
 
 DEVICE_DEFINE(dummy_driver, DUMMY_DRIVER_NAME, &dummy_init,
-		    dummy_device_pm_ctrl, NULL, NULL, APPLICATION,
-		    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs);
+	      dummy_device_pm_ctrl, NULL, NULL, APPLICATION,
+	      CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &funcs);

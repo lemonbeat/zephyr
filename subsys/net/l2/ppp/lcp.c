@@ -51,8 +51,7 @@ static enum net_verdict lcp_handle_ext(struct ppp_fsm *fsm,
 }
 
 static enum net_verdict lcp_handle(struct ppp_context *ctx,
-				   struct net_if *iface,
-				   struct net_pkt *pkt)
+				   struct net_if *iface, struct net_pkt *pkt)
 {
 	return ppp_fsm_input(&ctx->lcp.fsm, PPP_LCP, pkt);
 }
@@ -82,7 +81,7 @@ static int lcp_auth_proto_parse(struct ppp_fsm *fsm, struct net_pkt *pkt,
 	}
 
 	NET_DBG("[LCP] Received auth protocol %x (%s)",
-		(unsigned int) data->auth_proto,
+		(unsigned int)data->auth_proto,
 		ppp_proto2str(data->auth_proto));
 
 	for (i = 0; i < ARRAY_SIZE(lcp_supported_auth_protos); i++) {
@@ -108,13 +107,11 @@ static const struct ppp_peer_option_info lcp_peer_options[] = {
 			lcp_auth_proto_nack),
 };
 
-static int lcp_config_info_req(struct ppp_fsm *fsm,
-			       struct net_pkt *pkt,
-			       uint16_t length,
-			       struct net_pkt *ret_pkt)
+static int lcp_config_info_req(struct ppp_fsm *fsm, struct net_pkt *pkt,
+			       uint16_t length, struct net_pkt *ret_pkt)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       lcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, lcp.fsm);
 	struct lcp_option_data data = {
 		.auth_proto_present = false,
 	};
@@ -122,8 +119,7 @@ static int lcp_config_info_req(struct ppp_fsm *fsm,
 
 	ret = ppp_config_info_req(fsm, pkt, length, ret_pkt, PPP_LCP,
 				  lcp_peer_options,
-				  ARRAY_SIZE(lcp_peer_options),
-				  &data);
+				  ARRAY_SIZE(lcp_peer_options), &data);
 	if (ret != PPP_CONFIGURE_ACK) {
 		/* There are some issues with configuration still */
 		return ret;
@@ -133,7 +129,7 @@ static int lcp_config_info_req(struct ppp_fsm *fsm,
 
 	if (data.auth_proto_present) {
 		NET_DBG("Authentication protocol negotiated: %x (%s)",
-			(unsigned int) data.auth_proto,
+			(unsigned int)data.auth_proto,
 			ppp_proto2str(data.auth_proto));
 	}
 
@@ -166,8 +162,8 @@ static void lcp_close(struct ppp_context *ctx, const uint8_t *reason)
 
 static void lcp_down(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       lcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, lcp.fsm);
 
 	memset(&ctx->lcp.peer_options.auth_proto, 0,
 	       sizeof(ctx->lcp.peer_options.auth_proto));
@@ -179,8 +175,8 @@ static void lcp_down(struct ppp_fsm *fsm)
 
 static void lcp_up(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       lcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, lcp.fsm);
 
 	/* TODO: Set MRU/MTU of the network interface here */
 
@@ -189,16 +185,16 @@ static void lcp_up(struct ppp_fsm *fsm)
 
 static void lcp_starting(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       lcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, lcp.fsm);
 
 	ppp_link_needed(ctx);
 }
 
 static void lcp_finished(struct ppp_fsm *fsm)
 {
-	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
-					       lcp.fsm);
+	struct ppp_context *ctx =
+		CONTAINER_OF(fsm, struct ppp_context, lcp.fsm);
 
 	ppp_link_terminated(ctx);
 }
@@ -224,7 +220,5 @@ static void lcp_init(struct ppp_context *ctx)
 	ctx->lcp.fsm.cb.proto_extension = lcp_handle_ext;
 }
 
-PPP_PROTOCOL_REGISTER(LCP, PPP_LCP,
-		      lcp_init, lcp_handle,
-		      lcp_lower_up, lcp_lower_down,
-		      lcp_open, lcp_close);
+PPP_PROTOCOL_REGISTER(LCP, PPP_LCP, lcp_init, lcp_handle, lcp_lower_up,
+		      lcp_lower_down, lcp_open, lcp_close);

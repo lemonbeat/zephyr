@@ -30,7 +30,7 @@ const char *bt_hex_real(const void *buf, size_t len)
 	len = MIN(len, (sizeof(str) - 1) / 2);
 
 	for (i = 0; i < len; i++) {
-		str[i * 2]     = hex[b[i] >> 4];
+		str[i * 2] = hex[b[i] >> 4];
 		str[i * 2 + 1] = hex[b[i] & 0xf];
 	}
 

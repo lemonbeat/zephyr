@@ -42,7 +42,7 @@ BUILD_ASSERT((sizeof(union log_msg_head_data) ==
 
 struct k_mem_slab log_msg_pool;
 static uint8_t __noinit __aligned(sizeof(void *))
-		log_msg_pool_buf[CONFIG_LOG_BUFFER_SIZE];
+	log_msg_pool_buf[CONFIG_LOG_BUFFER_SIZE];
 
 void log_msg_pool_init(void)
 {
@@ -74,10 +74,11 @@ static bool block_on_alloc(void)
 union log_msg_chunk *log_msg_chunk_alloc(void)
 {
 	union log_msg_chunk *msg = NULL;
-	int err = k_mem_slab_alloc(&log_msg_pool, (void **)&msg,
-		   block_on_alloc()
-		   ? K_MSEC(CONFIG_LOG_BLOCK_IN_THREAD_TIMEOUT_MS)
-		   : K_NO_WAIT);
+	int err = k_mem_slab_alloc(
+		&log_msg_pool, (void **)&msg,
+		block_on_alloc() ?
+			      K_MSEC(CONFIG_LOG_BLOCK_IN_THREAD_TIMEOUT_MS) :
+			      K_NO_WAIT);
 
 	if (err != 0) {
 		msg = log_msg_no_space_handle();
@@ -123,8 +124,7 @@ static void msg_free(struct log_msg *msg)
 					 * log message is being dropped.
 					 */
 					smask = z_log_get_s_mask(
-							log_msg_str_get(msg),
-							nargs);
+						log_msg_str_get(msg), nargs);
 					if (smask == 0) {
 						/* if no string argument is
 						 * detected then stop searching
@@ -168,15 +168,13 @@ union log_msg_chunk *log_msg_no_space_handle(void)
 		do {
 			more = log_process(true);
 			log_dropped();
-			err = k_mem_slab_alloc(&log_msg_pool,
-					       (void **)&msg,
+			err = k_mem_slab_alloc(&log_msg_pool, (void **)&msg,
 					       K_NO_WAIT);
 		} while ((err != 0) && more);
 	} else {
 		log_dropped();
 	}
 	return msg;
-
 }
 void log_msg_put(struct log_msg *msg)
 {
@@ -199,7 +197,6 @@ static log_arg_t cont_arg_get(struct log_msg *msg, uint32_t arg_idx)
 	if (arg_idx < LOG_MSG_NARGS_HEAD_CHUNK) {
 		return msg->payload.ext.data.args[arg_idx];
 	}
-
 
 	cont = msg->payload.ext.next;
 	arg_idx -= LOG_MSG_NARGS_HEAD_CHUNK;
@@ -249,7 +246,7 @@ static struct log_msg *msg_alloc(uint32_t nargs)
 {
 	struct log_msg_cont *cont;
 	struct log_msg_cont **next;
-	struct  log_msg *msg = z_log_msg_std_alloc();
+	struct log_msg *msg = z_log_msg_std_alloc();
 	int n = (int)nargs;
 
 	if ((msg == NULL) || nargs <= LOG_MSG_NARGS_SINGLE_CHUNK) {
@@ -279,19 +276,20 @@ static struct log_msg *msg_alloc(uint32_t nargs)
 	return msg;
 }
 
-static void copy_args_to_msg(struct  log_msg *msg, log_arg_t *args, uint32_t nargs)
+static void copy_args_to_msg(struct log_msg *msg, log_arg_t *args,
+			     uint32_t nargs)
 {
 	struct log_msg_cont *cont = msg->payload.ext.next;
 
 	if (nargs > LOG_MSG_NARGS_SINGLE_CHUNK) {
 		(void)memcpy(msg->payload.ext.data.args, args,
-		       LOG_MSG_NARGS_HEAD_CHUNK * sizeof(log_arg_t));
+			     LOG_MSG_NARGS_HEAD_CHUNK * sizeof(log_arg_t));
 		nargs -= LOG_MSG_NARGS_HEAD_CHUNK;
 		args += LOG_MSG_NARGS_HEAD_CHUNK;
 	} else {
 		(void)memcpy(msg->payload.single.args, args,
 			     nargs * sizeof(log_arg_t));
-		nargs  = 0U;
+		nargs = 0U;
 	}
 
 	while (nargs != 0U) {
@@ -305,11 +303,12 @@ static void copy_args_to_msg(struct  log_msg *msg, log_arg_t *args, uint32_t nar
 	}
 }
 
-struct log_msg *log_msg_create_n(const char *str, log_arg_t *args, uint32_t nargs)
+struct log_msg *log_msg_create_n(const char *str, log_arg_t *args,
+				 uint32_t nargs)
 {
 	__ASSERT_NO_MSG(nargs < LOG_MAX_NARGS);
 
-	struct  log_msg *msg = NULL;
+	struct log_msg *msg = NULL;
 
 	msg = msg_alloc(nargs);
 
@@ -322,8 +321,7 @@ struct log_msg *log_msg_create_n(const char *str, log_arg_t *args, uint32_t narg
 	return msg;
 }
 
-struct log_msg *log_msg_hexdump_create(const char *str,
-				       const uint8_t *data,
+struct log_msg *log_msg_hexdump_create(const char *str, const uint8_t *data,
 				       uint32_t length)
 {
 	struct log_msg_cont **prev_cont;
@@ -333,7 +331,8 @@ struct log_msg *log_msg_hexdump_create(const char *str,
 
 	/* Saturate length. */
 	length = (length > LOG_MSG_HEXDUMP_MAX_LENGTH) ?
-		 LOG_MSG_HEXDUMP_MAX_LENGTH : length;
+			       LOG_MSG_HEXDUMP_MAX_LENGTH :
+			       length;
 
 	msg = (struct log_msg *)log_msg_chunk_alloc();
 	if (msg == NULL) {
@@ -346,11 +345,9 @@ struct log_msg *log_msg_hexdump_create(const char *str,
 	msg->hdr.params.hexdump.length = length;
 	msg->str = str;
 
-
 	if (length > LOG_MSG_HEXDUMP_BYTES_SINGLE_CHUNK) {
-		(void)memcpy(msg->payload.ext.data.bytes,
-		       data,
-		       LOG_MSG_HEXDUMP_BYTES_HEAD_CHUNK);
+		(void)memcpy(msg->payload.ext.data.bytes, data,
+			     LOG_MSG_HEXDUMP_BYTES_HEAD_CHUNK);
 		msg->payload.ext.next = NULL;
 		msg->hdr.params.generic.ext = 1;
 
@@ -376,7 +373,8 @@ struct log_msg *log_msg_hexdump_create(const char *str,
 		prev_cont = &cont->next;
 
 		chunk_length = (length > HEXDUMP_BYTES_CONT_MSG) ?
-			       HEXDUMP_BYTES_CONT_MSG : length;
+					     HEXDUMP_BYTES_CONT_MSG :
+					     length;
 
 		(void)memcpy(cont->payload.bytes, data, chunk_length);
 		data += chunk_length;
@@ -386,11 +384,8 @@ struct log_msg *log_msg_hexdump_create(const char *str,
 	return msg;
 }
 
-static void log_msg_hexdump_data_op(struct log_msg *msg,
-				    uint8_t *data,
-				    size_t *length,
-				    size_t offset,
-				    bool put_op)
+static void log_msg_hexdump_data_op(struct log_msg *msg, uint8_t *data,
+				    size_t *length, size_t offset, bool put_op)
 {
 	uint32_t available_len = msg->hdr.params.hexdump.length;
 	struct log_msg_cont *cont = NULL;
@@ -417,7 +412,6 @@ static void log_msg_hexdump_data_op(struct log_msg *msg,
 	} else {
 		head_data = msg->payload.single.bytes;
 		chunk_len = available_len;
-
 	}
 
 	if (offset < chunk_len) {
@@ -449,8 +443,8 @@ static void log_msg_hexdump_data_op(struct log_msg *msg,
 		cpy_len = req_len > chunk_len ? chunk_len : req_len;
 
 		if (put_op) {
-			(void)memcpy(&cont->payload.bytes[offset],
-				     data, cpy_len);
+			(void)memcpy(&cont->payload.bytes[offset], data,
+				     cpy_len);
 		} else {
 			(void)memcpy(data, &cont->payload.bytes[offset],
 				     cpy_len);
@@ -463,18 +457,14 @@ static void log_msg_hexdump_data_op(struct log_msg *msg,
 	}
 }
 
-void log_msg_hexdump_data_put(struct log_msg *msg,
-			      uint8_t *data,
-			      size_t *length,
-			      size_t offset)
+void log_msg_hexdump_data_put(struct log_msg *msg, uint8_t *data,
+			      size_t *length, size_t offset)
 {
 	log_msg_hexdump_data_op(msg, data, length, offset, true);
 }
 
-void log_msg_hexdump_data_get(struct log_msg *msg,
-			      uint8_t *data,
-			      size_t *length,
-			      size_t offset)
+void log_msg_hexdump_data_get(struct log_msg *msg, uint8_t *data,
+			      size_t *length, size_t offset)
 {
 	log_msg_hexdump_data_op(msg, data, length, offset, false);
 }

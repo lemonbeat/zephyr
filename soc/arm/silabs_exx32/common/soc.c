@@ -50,13 +50,15 @@ static ALWAYS_INLINE void clock_init(void)
 		 * See AN0016.2
 		 */
 		if ((DEVINFO->MODULEINFO & DEVINFO_MODULEINFO_HFXOCALVAL) ==
-				DEVINFO_MODULEINFO_HFXOCALVAL_VALID) {
-			hfxoInit.ctuneXoAna = (DEVINFO->MODXOCAL
-				& _DEVINFO_MODXOCAL_HFXOCTUNEXOANA_MASK)
-				>> _DEVINFO_MODXOCAL_HFXOCTUNEXOANA_SHIFT;
-			hfxoInit.ctuneXiAna = (DEVINFO->MODXOCAL
-				& _DEVINFO_MODXOCAL_HFXOCTUNEXIANA_MASK)
-				>> _DEVINFO_MODXOCAL_HFXOCTUNEXIANA_SHIFT;
+		    DEVINFO_MODULEINFO_HFXOCALVAL_VALID) {
+			hfxoInit.ctuneXoAna =
+				(DEVINFO->MODXOCAL &
+				 _DEVINFO_MODXOCAL_HFXOCTUNEXOANA_MASK) >>
+				_DEVINFO_MODXOCAL_HFXOCTUNEXOANA_SHIFT;
+			hfxoInit.ctuneXiAna =
+				(DEVINFO->MODXOCAL &
+				 _DEVINFO_MODXOCAL_HFXOCTUNEXIANA_MASK) >>
+				_DEVINFO_MODXOCAL_HFXOCTUNEXIANA_SHIFT;
 		}
 
 		CMU_HFXOInit(&hfxoInit);
@@ -82,10 +84,11 @@ static ALWAYS_INLINE void clock_init(void)
 		 * See AN0016.2
 		 */
 		if ((DEVINFO->MODULEINFO & DEVINFO_MODULEINFO_LFXOCALVAL) ==
-				DEVINFO_MODULEINFO_LFXOCALVAL_VALID) {
-			lfxoInit.capTune = (DEVINFO->MODXOCAL
-				& _DEVINFO_MODXOCAL_LFXOCAPTUNE_MASK)
-				>> _DEVINFO_MODXOCAL_LFXOCAPTUNE_SHIFT;
+		    DEVINFO_MODULEINFO_LFXOCALVAL_VALID) {
+			lfxoInit.capTune =
+				(DEVINFO->MODXOCAL &
+				 _DEVINFO_MODXOCAL_LFXOCAPTUNE_MASK) >>
+				_DEVINFO_MODXOCAL_LFXOCAPTUNE_SHIFT;
 		}
 	}
 
@@ -118,11 +121,11 @@ static ALWAYS_INLINE void clock_init(void)
 #endif
 
 #if defined(_SILICON_LABS_32B_SERIES_2)
-		/* Enable the High Frequency Peripheral Clock */
-		CMU_ClockEnable(cmuClock_PCLK, true);
+	/* Enable the High Frequency Peripheral Clock */
+	CMU_ClockEnable(cmuClock_PCLK, true);
 #else
-		/* Enable the High Frequency Peripheral Clock */
-		CMU_ClockEnable(cmuClock_HFPER, true);
+	/* Enable the High Frequency Peripheral Clock */
+	CMU_ClockEnable(cmuClock_HFPER, true);
 #endif /* _SILICON_LABS_32B_SERIES_2 */
 
 #if defined(CONFIG_GPIO_GECKO) || defined(CONFIG_LOG_BACKEND_SWO)
@@ -135,7 +138,8 @@ static ALWAYS_INLINE void dcdc_init(void)
 {
 #if defined(CONFIG_SOC_GECKO_EMU_DCDC_MODE_UNCONFIGURED)
 	/* Nothing to do, leave DC/DC converter in unconfigured, safe state. */
-#elif defined(CONFIG_SOC_GECKO_EMU_DCDC_MODE_ON) || defined(CONFIG_SOC_GECKO_EMU_DCDC_MODE_BYPASS)
+#elif defined(CONFIG_SOC_GECKO_EMU_DCDC_MODE_ON) || \
+	defined(CONFIG_SOC_GECKO_EMU_DCDC_MODE_BYPASS)
 	EMU_DCDCInit_TypeDef init_cfg = EMU_DCDCINIT_DEFAULT;
 #if defined(CONFIG_SOC_GECKO_EMU_DCDC_MODE_BYPASS)
 	init_cfg.dcdcMode = emuDcdcMode_Bypass;
@@ -164,8 +168,7 @@ static void swo_init(void)
 	/* Enable Serial wire output pin */
 	GPIO->ROUTEPEN |= GPIO_ROUTEPEN_SWVPEN;
 	/* Set SWO location */
-	GPIO->ROUTELOC0 =
-		SWO_LOCATION << _GPIO_ROUTELOC0_SWVLOC_SHIFT;
+	GPIO->ROUTELOC0 = SWO_LOCATION << _GPIO_ROUTELOC0_SWVLOC_SHIFT;
 #else
 	GPIO->ROUTE = GPIO_ROUTE_SWOPEN | (SWO_LOCATION << 8);
 #endif

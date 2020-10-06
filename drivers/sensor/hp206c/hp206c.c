@@ -39,8 +39,8 @@ static int hp206c_read(const struct device *dev, uint8_t cmd, uint8_t *data,
 
 	hp206c_bus_config(dev);
 
-	if (i2c_burst_read(hp206c->i2c, HP206C_I2C_ADDRESS,
-			   cmd, data, len) < 0) {
+	if (i2c_burst_read(hp206c->i2c, HP206C_I2C_ADDRESS, cmd, data, len) <
+	    0) {
 		return -EIO;
 	}
 
@@ -62,8 +62,8 @@ static int hp206c_write(const struct device *dev, uint8_t cmd, uint8_t *data,
 
 	hp206c_bus_config(dev);
 
-	if (i2c_burst_write(hp206c->i2c, HP206C_I2C_ADDRESS,
-			    cmd, data, len) < 0) {
+	if (i2c_burst_write(hp206c->i2c, HP206C_I2C_ADDRESS, cmd, data, len) <
+	    0) {
 		return -EIO;
 	}
 
@@ -95,13 +95,13 @@ static int hp206c_cmd_send(const struct device *dev, uint8_t cmd)
  * precision computation takes 131.1ms.
  */
 static uint8_t hp206c_adc_time_ms[] = {
-/*	conversion time(ms),   OSR  */
-	132,		    /* 4096 */
-	66,		    /* 2048 */
-	34,		    /* 1024 */
-	17,		    /* 512  */
-	9,		    /* 256  */
-	5,		    /* 128  */
+	/*	conversion time(ms),   OSR  */
+	132, /* 4096 */
+	66, /* 2048 */
+	34, /* 1024 */
+	17, /* 512  */
+	9, /* 256  */
+	5, /* 128  */
 };
 
 static int hp206c_osr_set(const struct device *dev, uint16_t osr)
@@ -163,8 +163,7 @@ static int hp206c_attr_set(const struct device *dev, enum sensor_channel chan,
 	return -ENOTSUP;
 }
 
-static int hp206c_wait_dev_ready(const struct device *dev,
-				 uint32_t timeout_ms)
+static int hp206c_wait_dev_ready(const struct device *dev, uint32_t timeout_ms)
 {
 	struct hp206c_device_data *hp206c = dev->data;
 	uint8_t int_src;
@@ -208,8 +207,8 @@ static int32_t hp206c_buf_convert(uint8_t *buf, bool signed_val)
 	return tmp;
 }
 
-static int hp206c_val_get(const struct device *dev,
-			  uint8_t cmd, struct sensor_value *val)
+static int hp206c_val_get(const struct device *dev, uint8_t cmd,
+			  struct sensor_value *val)
 {
 	uint8_t buf[3];
 	int32_t temp = 0;
@@ -318,7 +317,5 @@ static int hp206c_init(const struct device *dev)
 
 static struct hp206c_device_data hp206c_data;
 
-DEVICE_AND_API_INIT(hp206c, DT_INST_LABEL(0),
-		    hp206c_init, &hp206c_data,
-		    NULL, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
-		    &hp206c_api);
+DEVICE_AND_API_INIT(hp206c, DT_INST_LABEL(0), hp206c_init, &hp206c_data, NULL,
+		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &hp206c_api);

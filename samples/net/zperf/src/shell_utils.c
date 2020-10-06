@@ -47,7 +47,7 @@ void print_number(const struct shell *shell, uint32_t value,
 }
 
 long parse_number(const char *string, const uint32_t *divisor,
-		const char **units)
+		  const char **units)
 {
 	const char **unit;
 	const uint32_t *div;

@@ -67,28 +67,22 @@ static void fs_teardown(void)
  */
 void test_main(void)
 {
-	ztest_test_suite(fat_fs_basic_test,
-			 ztest_unit_test(test_fs_register),
-			 ztest_unit_test_setup_teardown(test_mount,
-							fs_setup,
-							dummy_teardown),
-			 ztest_unit_test(test_file_statvfs),
-			 ztest_unit_test(test_mkdir),
-			 ztest_unit_test(test_opendir),
-			 ztest_unit_test(test_closedir),
-			 ztest_unit_test(test_lsdir),
-			 ztest_unit_test(test_file_open),
-			 ztest_unit_test(test_file_write),
-			 ztest_unit_test(test_file_read),
-			 ztest_unit_test(test_file_truncate),
-			 ztest_unit_test(test_file_close),
-			 ztest_unit_test(test_file_sync),
-			 ztest_unit_test(test_file_rename),
-			 ztest_unit_test(test_file_stat),
-			 ztest_unit_test(test_file_unlink),
-			 ztest_unit_test_setup_teardown(test_unmount,
-							dummy_setup,
-							fs_teardown)
-			 );
+	ztest_test_suite(
+		fat_fs_basic_test, ztest_unit_test(test_fs_register),
+		ztest_unit_test_setup_teardown(test_mount, fs_setup,
+					       dummy_teardown),
+		ztest_unit_test(test_file_statvfs), ztest_unit_test(test_mkdir),
+		ztest_unit_test(test_opendir), ztest_unit_test(test_closedir),
+		ztest_unit_test(test_lsdir), ztest_unit_test(test_file_open),
+		ztest_unit_test(test_file_write),
+		ztest_unit_test(test_file_read),
+		ztest_unit_test(test_file_truncate),
+		ztest_unit_test(test_file_close),
+		ztest_unit_test(test_file_sync),
+		ztest_unit_test(test_file_rename),
+		ztest_unit_test(test_file_stat),
+		ztest_unit_test(test_file_unlink),
+		ztest_unit_test_setup_teardown(test_unmount, dummy_setup,
+					       fs_teardown));
 	ztest_run_test_suite(fat_fs_basic_test);
 }

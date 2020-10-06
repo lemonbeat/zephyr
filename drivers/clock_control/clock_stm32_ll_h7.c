@@ -13,25 +13,25 @@
 #include "stm32_hsem.h"
 
 /* Macros to fill up prescaler values */
-#define z_hsi_divider(v) LL_RCC_HSI_DIV ## v
+#define z_hsi_divider(v) LL_RCC_HSI_DIV##v
 #define hsi_divider(v) z_hsi_divider(v)
 
-#define z_sysclk_prescaler(v) LL_RCC_SYSCLK_DIV_ ## v
+#define z_sysclk_prescaler(v) LL_RCC_SYSCLK_DIV_##v
 #define sysclk_prescaler(v) z_sysclk_prescaler(v)
 
-#define z_ahb_prescaler(v) LL_RCC_AHB_DIV_ ## v
+#define z_ahb_prescaler(v) LL_RCC_AHB_DIV_##v
 #define ahb_prescaler(v) z_ahb_prescaler(v)
 
-#define z_apb1_prescaler(v) LL_RCC_APB1_DIV_ ## v
+#define z_apb1_prescaler(v) LL_RCC_APB1_DIV_##v
 #define apb1_prescaler(v) z_apb1_prescaler(v)
 
-#define z_apb2_prescaler(v) LL_RCC_APB2_DIV_ ## v
+#define z_apb2_prescaler(v) LL_RCC_APB2_DIV_##v
 #define apb2_prescaler(v) z_apb2_prescaler(v)
 
-#define z_apb3_prescaler(v) LL_RCC_APB3_DIV_ ## v
+#define z_apb3_prescaler(v) LL_RCC_APB3_DIV_##v
 #define apb3_prescaler(v) z_apb3_prescaler(v)
 
-#define z_apb4_prescaler(v) LL_RCC_APB4_DIV_ ## v
+#define z_apb4_prescaler(v) LL_RCC_APB4_DIV_##v
 #define apb4_prescaler(v) z_apb4_prescaler(v)
 
 /* Macro to check for clock feasability */
@@ -43,26 +43,26 @@
 /* Suppress the cast to uint32_t which */
 /* prevents from compare with #if > operator*/
 /* original defines in stm32h7xx_hal_conf.h*/
-#define HSI_FREQ 64000000UL	/* HSI_VALUE ((uint32_t)64000000) */
+#define HSI_FREQ 64000000UL /* HSI_VALUE ((uint32_t)64000000) */
 /* HSE_VALUE overridden by the build system without C cast to uint*/
 /* Build system doesn't provide the UL type suffix for HSE_VALUE */
 /* Force HSE_FREQ to be cast to preprocessor UL to prevent overflow*/
 /* Only use these constants in preprocessor expressions */
 #define HSE_FREQ HSE_VALUE
-#define CSI_FREQ 4000000UL	/* CSI_VALUE ((uint32_t)4000000) */
+#define CSI_FREQ 4000000UL /* CSI_VALUE ((uint32_t)4000000) */
 
 /* Choose PLL SRC */
 #ifdef CONFIG_CLOCK_STM32_PLL_SRC_HSI
-#define PLLSRC_FREQ  ((HSI_FREQ)/(CONFIG_CLOCK_STM32_HSI_DIVISOR))
+#define PLLSRC_FREQ ((HSI_FREQ) / (CONFIG_CLOCK_STM32_HSI_DIVISOR))
 #elif defined(CONFIG_CLOCK_STM32_PLL_SRC_CSI)
-#define PLLSRC_FREQ  CSI_FREQ
+#define PLLSRC_FREQ CSI_FREQ
 #elif defined(CONFIG_CLOCK_STM32_PLL_SRC_HSE)
-#define PLLSRC_FREQ  HSE_FREQ
+#define PLLSRC_FREQ HSE_FREQ
 #else
 #define PLLSRC_FREQ 0
 #endif
 
-#define VCO_FREQ	(PLLSRC_FREQ / CONFIG_CLOCK_STM32_PLL_M_DIVISOR)
+#define VCO_FREQ (PLLSRC_FREQ / CONFIG_CLOCK_STM32_PLL_M_DIVISOR)
 
 #if (1000000UL <= VCO_FREQ && VCO_FREQ <= 2000000UL)
 #define VCO_INPUT_RANGE LL_RCC_PLLINPUTRANGE_1_2
@@ -77,39 +77,38 @@
 #endif
 
 /* Given source clock and dividers, computed the output frequency of PLLP */
-#define PLLP_FREQ(pllsrc_freq, divm, divn, divp)	(((pllsrc_freq)*\
-							(divn))/((divm)*(divp)))
+#define PLLP_FREQ(pllsrc_freq, divm, divn, divp) \
+	(((pllsrc_freq) * (divn)) / ((divm) * (divp)))
 
 /* PLL P output frequency value */
-#define PLLP_VALUE	PLLP_FREQ(\
-				PLLSRC_FREQ,\
-				CONFIG_CLOCK_STM32_PLL_M_DIVISOR,\
-				CONFIG_CLOCK_STM32_PLL_N_MULTIPLIER,\
-				CONFIG_CLOCK_STM32_PLL_P_DIVISOR)
+#define PLLP_VALUE                                               \
+	PLLP_FREQ(PLLSRC_FREQ, CONFIG_CLOCK_STM32_PLL_M_DIVISOR, \
+		  CONFIG_CLOCK_STM32_PLL_N_MULTIPLIER,           \
+		  CONFIG_CLOCK_STM32_PLL_P_DIVISOR)
 
 /* SYSCLKSRC before the D1CPRE prescaler */
 #ifdef CONFIG_CLOCK_STM32_SYSCLK_SRC_PLL
-#define SYSCLKSRC_FREQ	PLLP_VALUE
+#define SYSCLKSRC_FREQ PLLP_VALUE
 #elif defined(CONFIG_CLOCK_STM32_SYSCLK_SRC_HSI)
-#define SYSCLKSRC_FREQ	((HSI_FREQ)/(CONFIG_CLOCK_STM32_HSI_DIVISOR))
+#define SYSCLKSRC_FREQ ((HSI_FREQ) / (CONFIG_CLOCK_STM32_HSI_DIVISOR))
 #elif defined(CONFIG_CLOCK_STM32_SYSCLK_SRC_CSI)
-#define SYSCLKSRC_FREQ	CSI_FREQ
+#define SYSCLKSRC_FREQ CSI_FREQ
 #elif defined(CONFIG_CLOCK_STM32_SYSCLK_SRC_HSE)
-#define SYSCLKSRC_FREQ	HSE_FREQ
+#define SYSCLKSRC_FREQ HSE_FREQ
 #endif
 
 /* ARM Sys CPU Clock before HPRE prescaler */
-#define SYSCLK_FREQ	((SYSCLKSRC_FREQ)/(CONFIG_CLOCK_STM32_D1CPRE))
-#define AHB_FREQ	((SYSCLK_FREQ)/(CONFIG_CLOCK_STM32_HPRE))
-#define APB1_FREQ	((AHB_FREQ)/(CONFIG_CLOCK_STM32_D2PPRE1))
-#define APB2_FREQ	((AHB_FREQ)/(CONFIG_CLOCK_STM32_D2PPRE2))
-#define APB3_FREQ	((AHB_FREQ)/(CONFIG_CLOCK_STM32_D1PPRE))
-#define APB4_FREQ	((AHB_FREQ)/(CONFIG_CLOCK_STM32_D3PPRE))
+#define SYSCLK_FREQ ((SYSCLKSRC_FREQ) / (CONFIG_CLOCK_STM32_D1CPRE))
+#define AHB_FREQ ((SYSCLK_FREQ) / (CONFIG_CLOCK_STM32_HPRE))
+#define APB1_FREQ ((AHB_FREQ) / (CONFIG_CLOCK_STM32_D2PPRE1))
+#define APB2_FREQ ((AHB_FREQ) / (CONFIG_CLOCK_STM32_D2PPRE2))
+#define APB3_FREQ ((AHB_FREQ) / (CONFIG_CLOCK_STM32_D1PPRE))
+#define APB4_FREQ ((AHB_FREQ) / (CONFIG_CLOCK_STM32_D3PPRE))
 
 /* Datasheet maximum frequency definitions */
-#define SYSCLK_FREQ_MAX	480000000UL
-#define AHB_FREQ_MAX	240000000UL
-#define APBx_FREQ_MAX	120000000UL
+#define SYSCLK_FREQ_MAX 480000000UL
+#define AHB_FREQ_MAX 240000000UL
+#define APBx_FREQ_MAX 120000000UL
 
 #if SYSCLK_FREQ > SYSCLK_FREQ_MAX
 #error "SYSCLK frequency is too high, max is 480MHz"
@@ -137,7 +136,6 @@ CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC"
 
 /* end of clock feasability check */
 #endif /* CONFIG_CPU_CORTEX_M7 */
-
 
 #if defined(CONFIG_CPU_CORTEX_M7)
 #if CONFIG_CLOCK_STM32_D1CPRE > 1
@@ -199,7 +197,7 @@ static uint32_t get_hclk_frequency(void)
 	/* Get the current system clock source */
 	switch (LL_RCC_GetSysClkSource()) {
 	case LL_RCC_SYS_CLKSOURCE_STATUS_HSI:
-		sysclk = HSI_VALUE/hsidiv;
+		sysclk = HSI_VALUE / hsidiv;
 		break;
 	case LL_RCC_SYS_CLKSOURCE_STATUS_CSI:
 		sysclk = CSI_VALUE;
@@ -208,10 +206,8 @@ static uint32_t get_hclk_frequency(void)
 		sysclk = HSE_VALUE;
 		break;
 	case LL_RCC_SYS_CLKSOURCE_STATUS_PLL1:
-		sysclk = PLLP_FREQ(get_pllsrc_frequency(),
-				   LL_RCC_PLL1_GetM(),
-				   LL_RCC_PLL1_GetN(),
-				   LL_RCC_PLL1_GetP());
+		sysclk = PLLP_FREQ(get_pllsrc_frequency(), LL_RCC_PLL1_GetM(),
+				   LL_RCC_PLL1_GetN(), LL_RCC_PLL1_GetP());
 		break;
 	}
 	/* AHB/HCLK clock is sysclk/HPRE AHB prescaler*/
@@ -261,7 +257,6 @@ static int32_t prepare_regulator_voltage_scale(void)
 
 static int32_t optimize_regulator_voltage_scale(uint32_t sysclk_freq)
 {
-
 	/* After sysclock is configured, tweak the voltage scale down */
 	/* to reduce power consumption */
 
@@ -274,7 +269,7 @@ static int32_t optimize_regulator_voltage_scale(uint32_t sysclk_freq)
 	return 0;
 }
 
-#if defined(CONFIG_CLOCK_STM32_PLL_SRC_HSE) || \
+#if defined(CONFIG_CLOCK_STM32_PLL_SRC_HSE) ||     \
 	defined(CONFIG_CLOCK_STM32_PLL_SRC_HSI) || \
 	defined(CONFIG_CLOCK_STM32_PLL_SRC_CSI)
 
@@ -387,9 +382,10 @@ static inline int stm32_clock_control_off(const struct device *dev,
 	return rc;
 }
 
-static int stm32_clock_control_get_subsys_rate(const struct device *clock,
-					       clock_control_subsys_t sub_system,
-					       uint32_t *rate)
+static int
+stm32_clock_control_get_subsys_rate(const struct device *clock,
+				    clock_control_subsys_t sub_system,
+				    uint32_t *rate)
 {
 	struct stm32_pclken *pclken = (struct stm32_pclken *)(sub_system);
 	/*
@@ -401,17 +397,17 @@ static int stm32_clock_control_get_subsys_rate(const struct device *clock,
 #if defined(CONFIG_CPU_CORTEX_M4)
 	uint32_t ahb_clock = SystemCoreClock;
 #else
-	uint32_t ahb_clock = get_bus_clock(SystemCoreClock,
-				CONFIG_CLOCK_STM32_HPRE);
+	uint32_t ahb_clock =
+		get_bus_clock(SystemCoreClock, CONFIG_CLOCK_STM32_HPRE);
 #endif
-	uint32_t apb1_clock = get_bus_clock(ahb_clock,
-				CONFIG_CLOCK_STM32_D2PPRE1);
-	uint32_t apb2_clock = get_bus_clock(ahb_clock,
-				CONFIG_CLOCK_STM32_D2PPRE2);
-	uint32_t apb3_clock = get_bus_clock(ahb_clock,
-				CONFIG_CLOCK_STM32_D1PPRE);
-	uint32_t apb4_clock = get_bus_clock(ahb_clock,
-				CONFIG_CLOCK_STM32_D3PPRE);
+	uint32_t apb1_clock =
+		get_bus_clock(ahb_clock, CONFIG_CLOCK_STM32_D2PPRE1);
+	uint32_t apb2_clock =
+		get_bus_clock(ahb_clock, CONFIG_CLOCK_STM32_D2PPRE2);
+	uint32_t apb3_clock =
+		get_bus_clock(ahb_clock, CONFIG_CLOCK_STM32_D1PPRE);
+	uint32_t apb4_clock =
+		get_bus_clock(ahb_clock, CONFIG_CLOCK_STM32_D3PPRE);
 
 	ARG_UNUSED(clock);
 
@@ -450,12 +446,11 @@ static struct clock_control_driver_api stm32_clock_control_api = {
 
 static int stm32_clock_control_init(const struct device *dev)
 {
-
 #if !defined(CONFIG_CPU_CORTEX_M4)
 	uint32_t old_hclk_freq = 0;
 	uint32_t new_hclk_freq = 0;
 
-#if defined(CONFIG_CLOCK_STM32_PLL_SRC_HSE) || \
+#if defined(CONFIG_CLOCK_STM32_PLL_SRC_HSE) ||     \
 	defined(CONFIG_CLOCK_STM32_PLL_SRC_HSI) || \
 	defined(CONFIG_CLOCK_STM32_PLL_SRC_CSI)
 
@@ -538,7 +533,7 @@ static int stm32_clock_control_init(const struct device *dev)
 #endif
 
 	/* Configure the PLL dividers/multipliers only if PLL source is configured */
-#if defined(CONFIG_CLOCK_STM32_PLL_SRC_HSE) || \
+#if defined(CONFIG_CLOCK_STM32_PLL_SRC_HSE) ||     \
 	defined(CONFIG_CLOCK_STM32_PLL_SRC_HSI) || \
 	defined(CONFIG_CLOCK_STM32_PLL_SRC_CSI)
 
@@ -567,11 +562,9 @@ static int stm32_clock_control_init(const struct device *dev)
 	LL_RCC_PLL1_SetQ(CONFIG_CLOCK_STM32_PLL_Q_DIVISOR);
 	LL_RCC_PLL1_SetR(CONFIG_CLOCK_STM32_PLL_R_DIVISOR);
 
-
 #else
 	/* PLL will stay in reset state configuration */
 #endif /* CONFIG_CLOCK_STM32_PLL_SRC_* */
-
 
 	/* Preset the prescalers prior to chosing SYSCLK */
 	/* Prevents APB clock to go over limits */
@@ -582,7 +575,6 @@ static int stm32_clock_control_init(const struct device *dev)
 	LL_RCC_SetAPB2Prescaler(apb2_prescaler(CONFIG_CLOCK_STM32_D2PPRE2));
 	LL_RCC_SetAPB3Prescaler(apb3_prescaler(CONFIG_CLOCK_STM32_D1PPRE));
 	LL_RCC_SetAPB4Prescaler(apb4_prescaler(CONFIG_CLOCK_STM32_D3PPRE));
-
 
 #if defined(CONFIG_CLOCK_STM32_SYSCLK_SRC_PLL)
 
@@ -663,8 +655,6 @@ static int stm32_clock_control_init(const struct device *dev)
  * that the device init runs just after SOC init
  */
 DEVICE_AND_API_INIT(rcc_stm32, STM32_CLOCK_CONTROL_NAME,
-		    &stm32_clock_control_init,
-		    NULL, NULL,
-		    PRE_KERNEL_1,
+		    &stm32_clock_control_init, NULL, NULL, PRE_KERNEL_1,
 		    CONFIG_CLOCK_CONTROL_STM32_DEVICE_INIT_PRIORITY,
 		    &stm32_clock_control_api);

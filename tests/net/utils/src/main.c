@@ -130,25 +130,24 @@ static ZTEST_DMEM struct net_addr_test_data ipv6_pton_4 = {
 	.family = AF_INET6,
 	.pton = true,
 	.ipv6.c_addr = "2001:db8::1",
-	.ipv6.verify.s6_addr16 = { htons(0x2001), htons(0xdb8),
-				   0, 0, 0, 0, 0, htons(1) },
+	.ipv6.verify.s6_addr16 = { htons(0x2001), htons(0xdb8), 0, 0, 0, 0, 0,
+				   htons(1) },
 };
 
 static ZTEST_DMEM struct net_addr_test_data ipv6_pton_5 = {
 	.family = AF_INET6,
 	.pton = true,
 	.ipv6.c_addr = "2001:db8::2:1",
-	.ipv6.verify.s6_addr16 = { htons(0x2001), htons(0xdb8),
-				   0, 0, 0, 0, htons(2), htons(1) },
+	.ipv6.verify.s6_addr16 = { htons(0x2001), htons(0xdb8), 0, 0, 0, 0,
+				   htons(2), htons(1) },
 };
 
 static ZTEST_DMEM struct net_addr_test_data ipv6_pton_6 = {
 	.family = AF_INET6,
 	.pton = true,
 	.ipv6.c_addr = "ff08:1122:3344:5566:7788:9900:aabb:ccdd",
-	.ipv6.verify.s6_addr16 = { htons(0xff08), htons(0x1122),
-				   htons(0x3344), htons(0x5566),
-				   htons(0x7788), htons(0x9900),
+	.ipv6.verify.s6_addr16 = { htons(0xff08), htons(0x1122), htons(0x3344),
+				   htons(0x5566), htons(0x7788), htons(0x9900),
 				   htons(0xaabb), htons(0xccdd) },
 };
 
@@ -234,25 +233,24 @@ static ZTEST_DMEM struct net_addr_test_data ipv6_ntop_4 = {
 	.family = AF_INET6,
 	.pton = false,
 	.ipv6.c_verify = "2001:db8::1",
-	.ipv6.addr.s6_addr16 = { htons(0x2001), htons(0xdb8),
-				 0, 0, 0, 0, 0, htons(1) },
+	.ipv6.addr.s6_addr16 = { htons(0x2001), htons(0xdb8), 0, 0, 0, 0, 0,
+				 htons(1) },
 };
 
 static ZTEST_DMEM struct net_addr_test_data ipv6_ntop_5 = {
 	.family = AF_INET6,
 	.pton = false,
 	.ipv6.c_verify = "2001:db8::2:1",
-	.ipv6.addr.s6_addr16 = { htons(0x2001), htons(0xdb8),
-				 0, 0, 0, 0, htons(2), htons(1) },
+	.ipv6.addr.s6_addr16 = { htons(0x2001), htons(0xdb8), 0, 0, 0, 0,
+				 htons(2), htons(1) },
 };
 
 static ZTEST_DMEM struct net_addr_test_data ipv6_ntop_6 = {
 	.family = AF_INET6,
 	.pton = false,
 	.ipv6.c_verify = "ff08:1122:3344:5566:7788:9900:aabb:ccdd",
-	.ipv6.addr.s6_addr16 = { htons(0xff08), htons(0x1122),
-				 htons(0x3344), htons(0x5566),
-				 htons(0x7788), htons(0x9900),
+	.ipv6.addr.s6_addr16 = { htons(0xff08), htons(0x1122), htons(0x3344),
+				 htons(0x5566), htons(0x7788), htons(0x9900),
 				 htons(0xaabb), htons(0xccdd) },
 };
 
@@ -261,40 +259,40 @@ static const struct {
 	struct net_addr_test_data *data;
 } tests[] = {
 	/* IPv4 net_addr_pton */
-	{ "test_ipv4_pton_1", &ipv4_pton_1},
-	{ "test_ipv4_pton_2", &ipv4_pton_2},
-	{ "test_ipv4_pton_3", &ipv4_pton_3},
-	{ "test_ipv4_pton_4", &ipv4_pton_4},
-	{ "test_ipv4_pton_5", &ipv4_pton_5},
-	{ "test_ipv4_pton_6", &ipv4_pton_6},
-	{ "test_ipv4_pton_7", &ipv4_pton_7},
-	{ "test_ipv4_pton_8", &ipv4_pton_8},
+	{ "test_ipv4_pton_1", &ipv4_pton_1 },
+	{ "test_ipv4_pton_2", &ipv4_pton_2 },
+	{ "test_ipv4_pton_3", &ipv4_pton_3 },
+	{ "test_ipv4_pton_4", &ipv4_pton_4 },
+	{ "test_ipv4_pton_5", &ipv4_pton_5 },
+	{ "test_ipv4_pton_6", &ipv4_pton_6 },
+	{ "test_ipv4_pton_7", &ipv4_pton_7 },
+	{ "test_ipv4_pton_8", &ipv4_pton_8 },
 
 	/* IPv6 net_addr_pton */
-	{ "test_ipv6_pton_1", &ipv6_pton_1},
-	{ "test_ipv6_pton_2", &ipv6_pton_2},
-	{ "test_ipv6_pton_3", &ipv6_pton_3},
-	{ "test_ipv6_pton_4", &ipv6_pton_4},
-	{ "test_ipv6_pton_5", &ipv6_pton_5},
-	{ "test_ipv6_pton_6", &ipv6_pton_6},
+	{ "test_ipv6_pton_1", &ipv6_pton_1 },
+	{ "test_ipv6_pton_2", &ipv6_pton_2 },
+	{ "test_ipv6_pton_3", &ipv6_pton_3 },
+	{ "test_ipv6_pton_4", &ipv6_pton_4 },
+	{ "test_ipv6_pton_5", &ipv6_pton_5 },
+	{ "test_ipv6_pton_6", &ipv6_pton_6 },
 
 	/* IPv4 net_addr_ntop */
-	{ "test_ipv4_ntop_1", &ipv4_ntop_1},
-	{ "test_ipv4_ntop_2", &ipv4_ntop_2},
-	{ "test_ipv4_ntop_3", &ipv4_ntop_3},
-	{ "test_ipv4_ntop_4", &ipv4_ntop_4},
-	{ "test_ipv4_ntop_5", &ipv4_ntop_5},
-	{ "test_ipv4_ntop_6", &ipv4_ntop_6},
-	{ "test_ipv4_ntop_7", &ipv4_ntop_7},
-	{ "test_ipv4_ntop_8", &ipv4_ntop_8},
+	{ "test_ipv4_ntop_1", &ipv4_ntop_1 },
+	{ "test_ipv4_ntop_2", &ipv4_ntop_2 },
+	{ "test_ipv4_ntop_3", &ipv4_ntop_3 },
+	{ "test_ipv4_ntop_4", &ipv4_ntop_4 },
+	{ "test_ipv4_ntop_5", &ipv4_ntop_5 },
+	{ "test_ipv4_ntop_6", &ipv4_ntop_6 },
+	{ "test_ipv4_ntop_7", &ipv4_ntop_7 },
+	{ "test_ipv4_ntop_8", &ipv4_ntop_8 },
 
 	/* IPv6 net_addr_ntop */
-	{ "test_ipv6_ntop_1", &ipv6_ntop_1},
-	{ "test_ipv6_ntop_2", &ipv6_ntop_2},
-	{ "test_ipv6_ntop_3", &ipv6_ntop_3},
-	{ "test_ipv6_ntop_4", &ipv6_ntop_4},
-	{ "test_ipv6_ntop_5", &ipv6_ntop_5},
-	{ "test_ipv6_ntop_6", &ipv6_ntop_6},
+	{ "test_ipv6_ntop_1", &ipv6_ntop_1 },
+	{ "test_ipv6_ntop_2", &ipv6_ntop_2 },
+	{ "test_ipv6_ntop_3", &ipv6_ntop_3 },
+	{ "test_ipv6_ntop_4", &ipv6_ntop_4 },
+	{ "test_ipv6_ntop_5", &ipv6_ntop_5 },
+	{ "test_ipv6_ntop_6", &ipv6_ntop_6 },
 };
 
 static bool check_net_addr(struct net_addr_test_data *data)
@@ -330,8 +328,7 @@ static bool check_net_addr(struct net_addr_test_data *data)
 			if (strcmp(data->ipv4.c_addr, data->ipv4.c_verify)) {
 				printk("Failed to verify %s\n",
 				       data->ipv4.c_addr);
-				printk("against %s\n",
-				       data->ipv4.c_verify);
+				printk("against %s\n", data->ipv4.c_verify);
 
 				return false;
 			}
@@ -355,7 +352,7 @@ static bool check_net_addr(struct net_addr_test_data *data)
 				       net_sprint_ipv6_addr(&data->ipv6.addr));
 				printk("against %s\n",
 				       net_sprint_ipv6_addr(
-							&data->ipv6.verify));
+					       &data->ipv6.verify));
 
 				return false;
 			}
@@ -372,12 +369,10 @@ static bool check_net_addr(struct net_addr_test_data *data)
 			if (strcmp(data->ipv6.c_addr, data->ipv6.c_verify)) {
 				printk("Failed to verify %s\n",
 				       data->ipv6.c_addr);
-				printk("against %s\n",
-				       data->ipv6.c_verify);
+				printk("against %s\n", data->ipv6.c_verify);
 
 				return false;
 			}
-
 		}
 
 		break;
@@ -416,140 +411,85 @@ void test_addr_parse(void)
 		struct sockaddr_in result;
 		bool verdict;
 	} parse_ipv4_entries[] = {
-		{
-			.address = "192.0.2.1:80",
-			.len = sizeof("192.0.2.1:80") - 1,
-			.result = {
-				.sin_family = AF_INET,
-				.sin_port = htons(80),
-				.sin_addr = {
-					.s4_addr[0] = 192,
-					.s4_addr[1] = 0,
-					.s4_addr[2] = 2,
-					.s4_addr[3] = 1
-				}
-			},
-			.verdict = true
-		},
-		{
-			.address = "192.0.2.2",
-			.len = sizeof("192.0.2.2") - 1,
-			.result = {
-				.sin_family = AF_INET,
-				.sin_port = 0,
-				.sin_addr = {
-					.s4_addr[0] = 192,
-					.s4_addr[1] = 0,
-					.s4_addr[2] = 2,
-					.s4_addr[3] = 2
-				}
-			},
-			.verdict = true
-		},
-		{
-			.address = "192.0.2.3/foobar",
-			.len = sizeof("192.0.2.3/foobar") - 8,
-			.result = {
-				.sin_family = AF_INET,
-				.sin_port = 0,
-				.sin_addr = {
-					.s4_addr[0] = 192,
-					.s4_addr[1] = 0,
-					.s4_addr[2] = 2,
-					.s4_addr[3] = 3
-				}
-			},
-			.verdict = true
-		},
-		{
-			.address = "255.255.255.255:0",
-			.len = sizeof("255.255.255.255:0") - 1,
-			.result = {
-				.sin_family = AF_INET,
-				.sin_port = 0,
-				.sin_addr = {
-					.s4_addr[0] = 255,
-					.s4_addr[1] = 255,
-					.s4_addr[2] = 255,
-					.s4_addr[3] = 255
-				}
-			},
-			.verdict = true
-		},
-		{
-			.address = "127.0.0.42:65535",
-			.len = sizeof("127.0.0.42:65535") - 1,
-			.result = {
-				.sin_family = AF_INET,
-				.sin_port = htons(65535),
-				.sin_addr = {
-					.s4_addr[0] = 127,
-					.s4_addr[1] = 0,
-					.s4_addr[2] = 0,
-					.s4_addr[3] = 42
-				}
-			},
-			.verdict = true
-		},
-		{
-			.address = "192.0.2.3:80/foobar",
-			.len = sizeof("192.0.2.3:80/foobar") - 1,
-			.verdict = false
-		},
-		{
-			.address = "192.168.1.1:65536/foobar",
-			.len = sizeof("192.168.1.1:65536") - 1,
-			.verdict = false
-		},
-		{
-			.address = "192.0.2.3:80/foobar",
-			.len = sizeof("192.0.2.3") - 1,
-			.result = {
-				.sin_family = AF_INET,
-				.sin_port = 0,
-				.sin_addr = {
-					.s4_addr[0] = 192,
-					.s4_addr[1] = 0,
-					.s4_addr[2] = 2,
-					.s4_addr[3] = 3
-				}
-			},
-			.verdict = true
-		},
-		{
-			.address = "192.0.2.3/foobar",
-			.len = sizeof("192.0.2.3/foobar") - 1,
-			.verdict = false
-		},
-		{
-			.address = "192.0.2.3:80:80",
-			.len = sizeof("192.0.2.3:80:80") - 1,
-			.verdict = false
-		},
-		{
-			.address = "192.0.2.1:80000",
-			.len = sizeof("192.0.2.1:80000") - 1,
-			.verdict = false
-		},
-		{
-			.address = "192.168.0.1",
-			.len = sizeof("192.168.0.1:80000") - 1,
-			.result = {
-				.sin_family = AF_INET,
-				.sin_port = 0,
-				.sin_addr = {
-					.s4_addr[0] = 192,
-					.s4_addr[1] = 168,
-					.s4_addr[2] = 0,
-					.s4_addr[3] = 1
-				}
-			},
-			.verdict = true
-		},
-		{
-			.address = "a.b.c.d",
-			.verdict = false
-		},
+		{ .address = "192.0.2.1:80",
+		  .len = sizeof("192.0.2.1:80") - 1,
+		  .result = { .sin_family = AF_INET,
+			      .sin_port = htons(80),
+			      .sin_addr = { .s4_addr[0] = 192,
+					    .s4_addr[1] = 0,
+					    .s4_addr[2] = 2,
+					    .s4_addr[3] = 1 } },
+		  .verdict = true },
+		{ .address = "192.0.2.2",
+		  .len = sizeof("192.0.2.2") - 1,
+		  .result = { .sin_family = AF_INET,
+			      .sin_port = 0,
+			      .sin_addr = { .s4_addr[0] = 192,
+					    .s4_addr[1] = 0,
+					    .s4_addr[2] = 2,
+					    .s4_addr[3] = 2 } },
+		  .verdict = true },
+		{ .address = "192.0.2.3/foobar",
+		  .len = sizeof("192.0.2.3/foobar") - 8,
+		  .result = { .sin_family = AF_INET,
+			      .sin_port = 0,
+			      .sin_addr = { .s4_addr[0] = 192,
+					    .s4_addr[1] = 0,
+					    .s4_addr[2] = 2,
+					    .s4_addr[3] = 3 } },
+		  .verdict = true },
+		{ .address = "255.255.255.255:0",
+		  .len = sizeof("255.255.255.255:0") - 1,
+		  .result = { .sin_family = AF_INET,
+			      .sin_port = 0,
+			      .sin_addr = { .s4_addr[0] = 255,
+					    .s4_addr[1] = 255,
+					    .s4_addr[2] = 255,
+					    .s4_addr[3] = 255 } },
+		  .verdict = true },
+		{ .address = "127.0.0.42:65535",
+		  .len = sizeof("127.0.0.42:65535") - 1,
+		  .result = { .sin_family = AF_INET,
+			      .sin_port = htons(65535),
+			      .sin_addr = { .s4_addr[0] = 127,
+					    .s4_addr[1] = 0,
+					    .s4_addr[2] = 0,
+					    .s4_addr[3] = 42 } },
+		  .verdict = true },
+		{ .address = "192.0.2.3:80/foobar",
+		  .len = sizeof("192.0.2.3:80/foobar") - 1,
+		  .verdict = false },
+		{ .address = "192.168.1.1:65536/foobar",
+		  .len = sizeof("192.168.1.1:65536") - 1,
+		  .verdict = false },
+		{ .address = "192.0.2.3:80/foobar",
+		  .len = sizeof("192.0.2.3") - 1,
+		  .result = { .sin_family = AF_INET,
+			      .sin_port = 0,
+			      .sin_addr = { .s4_addr[0] = 192,
+					    .s4_addr[1] = 0,
+					    .s4_addr[2] = 2,
+					    .s4_addr[3] = 3 } },
+		  .verdict = true },
+		{ .address = "192.0.2.3/foobar",
+		  .len = sizeof("192.0.2.3/foobar") - 1,
+		  .verdict = false },
+		{ .address = "192.0.2.3:80:80",
+		  .len = sizeof("192.0.2.3:80:80") - 1,
+		  .verdict = false },
+		{ .address = "192.0.2.1:80000",
+		  .len = sizeof("192.0.2.1:80000") - 1,
+		  .verdict = false },
+		{ .address = "192.168.0.1",
+		  .len = sizeof("192.168.0.1:80000") - 1,
+		  .result = { .sin_family = AF_INET,
+			      .sin_port = 0,
+			      .sin_addr = { .s4_addr[0] = 192,
+					    .s4_addr[1] = 168,
+					    .s4_addr[2] = 0,
+					    .s4_addr[3] = 1 } },
+		  .verdict = true },
+		{ .address = "a.b.c.d", .verdict = false },
 	};
 #endif
 #if defined(CONFIG_NET_IPV6)
@@ -776,28 +716,28 @@ void test_addr_parse(void)
 	for (i = 0; i < ARRAY_SIZE(parse_ipv4_entries) - 1; i++) {
 		(void)memset(&addr, 0, sizeof(addr));
 
-		ret = net_ipaddr_parse(
-			parse_ipv4_entries[i].address,
-			parse_ipv4_entries[i].len,
-			&addr);
+		ret = net_ipaddr_parse(parse_ipv4_entries[i].address,
+				       parse_ipv4_entries[i].len, &addr);
 		if (ret != parse_ipv4_entries[i].verdict) {
 			printk("IPv4 entry [%d] \"%s\" failed\n", i,
-				parse_ipv4_entries[i].address);
+			       parse_ipv4_entries[i].address);
 			zassert_true(false, "failure");
 		}
 
 		if (ret == true) {
 			zassert_true(
 				net_ipv4_addr_cmp(
-				      &net_sin(&addr)->sin_addr,
-				      &parse_ipv4_entries[i].result.sin_addr),
+					&net_sin(&addr)->sin_addr,
+					&parse_ipv4_entries[i].result.sin_addr),
 				parse_ipv4_entries[i].address);
-			zassert_true(net_sin(&addr)->sin_port ==
-				     parse_ipv4_entries[i].result.sin_port,
-				     "IPv4 port");
-			zassert_true(net_sin(&addr)->sin_family ==
-				     parse_ipv4_entries[i].result.sin_family,
-				     "IPv4 family");
+			zassert_true(
+				net_sin(&addr)->sin_port ==
+					parse_ipv4_entries[i].result.sin_port,
+				"IPv4 port");
+			zassert_true(
+				net_sin(&addr)->sin_family ==
+					parse_ipv4_entries[i].result.sin_family,
+				"IPv4 family");
 		}
 	}
 #endif
@@ -805,10 +745,8 @@ void test_addr_parse(void)
 	for (i = 0; i < ARRAY_SIZE(parse_ipv6_entries) - 1; i++) {
 		(void)memset(&addr, 0, sizeof(addr));
 
-		ret = net_ipaddr_parse(
-			parse_ipv6_entries[i].address,
-			parse_ipv6_entries[i].len,
-			&addr);
+		ret = net_ipaddr_parse(parse_ipv6_entries[i].address,
+				       parse_ipv6_entries[i].len, &addr);
 		if (ret != parse_ipv6_entries[i].verdict) {
 			printk("IPv6 entry [%d] \"%s\" failed\n", i,
 			       parse_ipv6_entries[i].address);
@@ -818,15 +756,17 @@ void test_addr_parse(void)
 		if (ret == true) {
 			zassert_true(
 				net_ipv6_addr_cmp(
-				      &net_sin6(&addr)->sin6_addr,
-				      &parse_ipv6_entries[i].result.sin6_addr),
+					&net_sin6(&addr)->sin6_addr,
+					&parse_ipv6_entries[i].result.sin6_addr),
 				parse_ipv6_entries[i].address);
-			zassert_true(net_sin6(&addr)->sin6_port ==
-				     parse_ipv6_entries[i].result.sin6_port,
-				     "IPv6 port");
-			zassert_true(net_sin6(&addr)->sin6_family ==
-				     parse_ipv6_entries[i].result.sin6_family,
-				     "IPv6 family");
+			zassert_true(
+				net_sin6(&addr)->sin6_port ==
+					parse_ipv6_entries[i].result.sin6_port,
+				"IPv6 port");
+			zassert_true(
+				net_sin6(&addr)->sin6_family ==
+					parse_ipv6_entries[i].result.sin6_family,
+				"IPv6 family");
 		}
 	}
 #endif
@@ -834,8 +774,7 @@ void test_addr_parse(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_utils_fn,
-			 ztest_user_unit_test(test_net_addr),
+	ztest_test_suite(test_utils_fn, ztest_user_unit_test(test_net_addr),
 			 ztest_unit_test(test_addr_parse));
 
 	ztest_run_test_suite(test_utils_fn);

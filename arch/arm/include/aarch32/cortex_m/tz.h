@@ -39,12 +39,11 @@ typedef struct tz_nonsecure_setup_conf {
 	uint32_t psp_ns;
 	uint32_t vtor_ns;
 	struct {
-		uint32_t npriv:1;
-		uint32_t spsel:1;
-		uint32_t reserved:30;
+		uint32_t npriv : 1;
+		uint32_t spsel : 1;
+		uint32_t reserved : 30;
 	} control_ns;
 } tz_nonsecure_setup_conf_t;
-
 
 /**
  *
@@ -241,12 +240,11 @@ uint32_t tz_sau_number_of_regions_get(void);
  */
 typedef struct {
 	uint8_t region_num;
-	uint8_t enable:1;
-	uint8_t nsc:1;
+	uint8_t enable : 1;
+	uint8_t nsc : 1;
 	uint32_t base_addr;
 	uint32_t limit_addr;
 } tz_sau_conf_t;
-
 
 /**
  *
@@ -281,13 +279,13 @@ int tz_sau_region_configure(tz_sau_conf_t *p_sau_conf);
  * This is a consequence of separating secure and non-secure code into
  * separate executable files.
  */
-typedef void __attribute__((cmse_nonsecure_call)) (*tz_ns_func_ptr_t) (void);
+typedef void __attribute__((cmse_nonsecure_call)) (*tz_ns_func_ptr_t)(void);
 
 /* Required for C99 compilation (required for GCC-8.x version,
  * where typeof is used instead of __typeof__)
  */
 #ifndef typeof
-#define typeof  __typeof__
+#define typeof __typeof__
 #endif
 
 #if defined(CONFIG_ARM_FIRMWARE_HAS_SECURE_ENTRY_FUNCS)
@@ -338,8 +336,7 @@ typedef void __attribute__((cmse_nonsecure_call)) (*tz_ns_func_ptr_t) (void);
  * @return non-zero if pointer can be of non-secure function type
  *         (i.e. with LSB unset), zero otherwise.
  */
-#define TZ_NONSECURE_FUNC_PTR_IS_NS(fptr) \
-	cmse_is_nsfptr(fptr)
+#define TZ_NONSECURE_FUNC_PTR_IS_NS(fptr) cmse_is_nsfptr(fptr)
 
 #ifdef __cplusplus
 }

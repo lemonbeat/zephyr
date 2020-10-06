@@ -28,38 +28,37 @@ LOG_MODULE_REGISTER(sx126x, CONFIG_LORA_LOG_LEVEL);
 #endif
 
 BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(semtech_sx1261) +
-	     DT_NUM_INST_STATUS_OKAY(semtech_sx1262) <= 1,
+			     DT_NUM_INST_STATUS_OKAY(semtech_sx1262) <=
+		     1,
 	     "Multiple SX12xx instances in DT");
 
-#define HAVE_GPIO_CS		DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
-#define HAVE_GPIO_ANTENNA_ENABLE			\
-	DT_INST_NODE_HAS_PROP(0, antenna_enable_gpios)
-#define HAVE_GPIO_TX_ENABLE	DT_INST_NODE_HAS_PROP(0, tx_enable_gpios)
-#define HAVE_GPIO_RX_ENABLE	DT_INST_NODE_HAS_PROP(0, rx_enable_gpios)
+#define HAVE_GPIO_CS DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
+#define HAVE_GPIO_ANTENNA_ENABLE DT_INST_NODE_HAS_PROP(0, antenna_enable_gpios)
+#define HAVE_GPIO_TX_ENABLE DT_INST_NODE_HAS_PROP(0, tx_enable_gpios)
+#define HAVE_GPIO_RX_ENABLE DT_INST_NODE_HAS_PROP(0, rx_enable_gpios)
 
-#define GPIO_CS_LABEL		DT_INST_SPI_DEV_CS_GPIOS_LABEL(0)
-#define GPIO_CS_PIN		DT_INST_SPI_DEV_CS_GPIOS_PIN(0)
-#define GPIO_CS_FLAGS		DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0)
+#define GPIO_CS_LABEL DT_INST_SPI_DEV_CS_GPIOS_LABEL(0)
+#define GPIO_CS_PIN DT_INST_SPI_DEV_CS_GPIOS_PIN(0)
+#define GPIO_CS_FLAGS DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0)
 
-#define GPIO_RESET_PIN		DT_INST_GPIO_PIN(0, reset_gpios)
-#define GPIO_BUSY_PIN		DT_INST_GPIO_PIN(0, busy_gpios)
-#define GPIO_DIO1_PIN		DT_INST_GPIO_PIN(0, dio1_gpios)
-#define GPIO_ANTENNA_ENABLE_PIN	DT_INST_GPIO_PIN(0, antenna_enable_gpios)
-#define GPIO_TX_ENABLE_PIN	DT_INST_GPIO_PIN(0, tx_enable_gpios)
-#define GPIO_RX_ENABLE_PIN	DT_INST_GPIO_PIN(0, rx_enable_gpios)
+#define GPIO_RESET_PIN DT_INST_GPIO_PIN(0, reset_gpios)
+#define GPIO_BUSY_PIN DT_INST_GPIO_PIN(0, busy_gpios)
+#define GPIO_DIO1_PIN DT_INST_GPIO_PIN(0, dio1_gpios)
+#define GPIO_ANTENNA_ENABLE_PIN DT_INST_GPIO_PIN(0, antenna_enable_gpios)
+#define GPIO_TX_ENABLE_PIN DT_INST_GPIO_PIN(0, tx_enable_gpios)
+#define GPIO_RX_ENABLE_PIN DT_INST_GPIO_PIN(0, rx_enable_gpios)
 
 #define DIO2_TX_ENABLE DT_INST_PROP(0, dio2_tx_enable)
 
-#define HAVE_DIO3_TCXO		DT_INST_NODE_HAS_PROP(0, dio3_tcxo_voltage)
+#define HAVE_DIO3_TCXO DT_INST_NODE_HAS_PROP(0, dio3_tcxo_voltage)
 #if HAVE_DIO3_TCXO
-#define TCXO_DIO3_VOLTAGE	DT_INST_PROP(0, dio3_tcxo_voltage)
+#define TCXO_DIO3_VOLTAGE DT_INST_PROP(0, dio3_tcxo_voltage)
 #endif
 
 #if DT_INST_NODE_HAS_PROP(0, tcxo_power_startup_delay_ms)
-#define TCXO_POWER_STARTUP_DELAY_MS			\
-	DT_INST_PROP(0, tcxo_power_startup_delay_ms)
+#define TCXO_POWER_STARTUP_DELAY_MS DT_INST_PROP(0, tcxo_power_startup_delay_ms)
 #else
-#define TCXO_POWER_STARTUP_DELAY_MS	0
+#define TCXO_POWER_STARTUP_DELAY_MS 0
 #endif
 
 #define SX126X_CALIBRATION_ALL 0x7f
@@ -88,19 +87,12 @@ struct sx126x_data {
 	RadioOperatingModes_t mode;
 } dev_data;
 
-
 void SX126xWaitOnBusy(void);
 
 #define MODE(m) [MODE_##m] = #m
 static const char *const mode_names[] = {
-	MODE(SLEEP),
-	MODE(STDBY_RC),
-	MODE(STDBY_XOSC),
-	MODE(FS),
-	MODE(TX),
-	MODE(RX),
-	MODE(RX_DC),
-	MODE(CAD),
+	MODE(SLEEP), MODE(STDBY_RC), MODE(STDBY_XOSC), MODE(FS),
+	MODE(TX),    MODE(RX),	     MODE(RX_DC),      MODE(CAD),
 };
 #undef MODE
 
@@ -121,37 +113,25 @@ static int sx126x_spi_transceive(uint8_t *req_tx, uint8_t *req_rx,
 {
 	int ret;
 
-	const struct spi_buf tx_buf[] = {
-		{
-			.buf = req_tx,
-			.len = req_len,
-		},
-		{
-			.buf = data_tx,
-			.len = data_len
-		}
-	};
+	const struct spi_buf tx_buf[] = { {
+						  .buf = req_tx,
+						  .len = req_len,
+					  },
+					  { .buf = data_tx, .len = data_len } };
 
-	const struct spi_buf rx_buf[] = {
-		{
-			.buf = req_rx,
-			.len = req_len,
-		},
-		{
-			.buf = data_rx,
-			.len = data_len
-		}
-	};
+	const struct spi_buf rx_buf[] = { {
+						  .buf = req_rx,
+						  .len = req_len,
+					  },
+					  { .buf = data_rx, .len = data_len } };
 
 	const struct spi_buf_set tx = {
 		.buffers = tx_buf,
 		.count = ARRAY_SIZE(tx_buf),
 	};
 
-	const struct spi_buf_set rx = {
-		.buffers = rx_buf,
-		.count = ARRAY_SIZE(rx_buf)
-	};
+	const struct spi_buf_set rx = { .buffers = rx_buf,
+					.count = ARRAY_SIZE(rx_buf) };
 
 	/* Wake the device if necessary */
 	SX126xCheckDeviceReady();
@@ -159,8 +139,7 @@ static int sx126x_spi_transceive(uint8_t *req_tx, uint8_t *req_rx,
 	if (!req_rx && !data_rx) {
 		ret = spi_write(dev_data.spi, &dev_data.spi_cfg, &tx);
 	} else {
-		ret = spi_transceive(dev_data.spi, &dev_data.spi_cfg,
-				     &tx, &rx);
+		ret = spi_transceive(dev_data.spi, &dev_data.spi_cfg, &tx, &rx);
 	}
 
 	if (ret < 0) {
@@ -209,14 +188,14 @@ void SX126xWriteRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 		address & 0xff,
 	};
 
-	LOG_DBG("Writing %" PRIu16 " registers @ 0x%" PRIx16
-		": 0x%" PRIx8 " , ...",
+	LOG_DBG("Writing %" PRIu16 " registers @ 0x%" PRIx16 ": 0x%" PRIx8
+		" , ...",
 		size, address, buffer[0]);
 	sx126x_spi_transceive(req, NULL, sizeof(req), buffer, NULL, size);
 }
 
-uint8_t SX126xReadCommand(RadioCommands_t opcode,
-			  uint8_t *buffer, uint16_t size)
+uint8_t SX126xReadCommand(RadioCommands_t opcode, uint8_t *buffer,
+			  uint16_t size)
 {
 	uint8_t tx_req[] = {
 		opcode,
@@ -225,10 +204,9 @@ uint8_t SX126xReadCommand(RadioCommands_t opcode,
 
 	uint8_t rx_req[sizeof(tx_req)];
 
-	LOG_DBG("Issuing opcode 0x%x (data size: %" PRIx16 ")",
-		opcode, size);
-	sx126x_spi_transceive(tx_req, rx_req, sizeof(rx_req),
-			      NULL, buffer, size);
+	LOG_DBG("Issuing opcode 0x%x (data size: %" PRIx16 ")", opcode, size);
+	sx126x_spi_transceive(tx_req, rx_req, sizeof(rx_req), NULL, buffer,
+			      size);
 	LOG_DBG("-> status: 0x%" PRIx8, rx_req[1]);
 	return rx_req[1];
 }
@@ -239,8 +217,8 @@ void SX126xWriteCommand(RadioCommands_t opcode, uint8_t *buffer, uint16_t size)
 		opcode,
 	};
 
-	LOG_DBG("Issuing opcode 0x%x w. %" PRIu16 " bytes of data",
-		opcode, size);
+	LOG_DBG("Issuing opcode 0x%x w. %" PRIu16 " bytes of data", opcode,
+		size);
 	sx126x_spi_transceive(req, NULL, sizeof(req), buffer, NULL, size);
 }
 
@@ -252,8 +230,8 @@ void SX126xReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 		0x00,
 	};
 
-	LOG_DBG("Reading buffers @ 0x%" PRIx8 " (%" PRIu8 " bytes)",
-		offset, size);
+	LOG_DBG("Reading buffers @ 0x%" PRIx8 " (%" PRIu8 " bytes)", offset,
+		size);
 	sx126x_spi_transceive(req, NULL, sizeof(req), NULL, buffer, size);
 }
 
@@ -264,8 +242,8 @@ void SX126xWriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 		offset,
 	};
 
-	LOG_DBG("Writing buffers @ 0x%" PRIx8 " (%" PRIu8 " bytes)",
-		offset, size);
+	LOG_DBG("Writing buffers @ 0x%" PRIx8 " (%" PRIu8 " bytes)", offset,
+		size);
 	sx126x_spi_transceive(req, NULL, sizeof(req), buffer, NULL, size);
 }
 
@@ -479,7 +457,7 @@ static int sx126x_lora_init(const struct device *dev)
 	dev_data.spi = device_get_binding(DT_INST_BUS_LABEL(0));
 	if (!dev_data.spi) {
 		LOG_ERR("Cannot get pointer to %s device",
-			    DT_INST_BUS_LABEL(0));
+			DT_INST_BUS_LABEL(0));
 		return -EINVAL;
 	}
 
@@ -518,7 +496,6 @@ static const struct lora_driver_api sx126x_lora_api = {
 	.test_cw = sx12xx_lora_test_cw,
 };
 
-DEVICE_AND_API_INIT(sx126x_lora, DT_INST_LABEL(0),
-		    &sx126x_lora_init, NULL,
+DEVICE_AND_API_INIT(sx126x_lora, DT_INST_LABEL(0), &sx126x_lora_init, NULL,
 		    NULL, POST_KERNEL, CONFIG_LORA_INIT_PRIORITY,
 		    &sx126x_lora_api);

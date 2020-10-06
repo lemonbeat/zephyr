@@ -85,10 +85,8 @@ static int ms5607_read_prom(const struct ms5607_data *data, uint8_t cmd,
 	return 0;
 }
 
-static int ms5607_get_measurement(const struct ms5607_data *data,
-				  uint32_t *val,
-				  uint8_t cmd,
-				  uint8_t delay)
+static int ms5607_get_measurement(const struct ms5607_data *data, uint32_t *val,
+				  uint8_t cmd, uint8_t delay)
 {
 	int err;
 
@@ -118,16 +116,14 @@ static int ms5607_sample_fetch(const struct device *dev,
 
 	__ASSERT_NO_MSG(channel == SENSOR_CHAN_ALL);
 
-	err = ms5607_get_measurement(data,
-				     &adc_pressure,
+	err = ms5607_get_measurement(data, &adc_pressure,
 				     data->pressure_conv_cmd,
 				     data->pressure_conv_delay);
 	if (err < 0) {
 		return err;
 	}
 
-	err = ms5607_get_measurement(data,
-				     &adc_temperature,
+	err = ms5607_get_measurement(data, &adc_temperature,
 				     data->temperature_conv_cmd,
 				     data->temperature_conv_delay);
 	if (err < 0) {
@@ -250,7 +246,6 @@ static int ms5607_init(const struct device *dev)
 	data->pressure = 0;
 	data->temperature = 0;
 
-
 	val.val1 = MS5607_PRES_OVER_DEFAULT;
 	err = ms5607_attr_set(dev, SENSOR_CHAN_PRESS, SENSOR_ATTR_OVERSAMPLING,
 			      &val);
@@ -328,11 +323,6 @@ static const struct sensor_driver_api ms5607_api_funcs = {
 
 static struct ms5607_data ms5607_data;
 
-DEVICE_AND_API_INIT(ms5607,
-		    DT_INST_LABEL(0),
-		    ms5607_init,
-		    &ms5607_data,
-		    &ms5607_config,
-		    POST_KERNEL,
-		    CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(ms5607, DT_INST_LABEL(0), ms5607_init, &ms5607_data,
+		    &ms5607_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &ms5607_api_funcs);

@@ -11,6 +11,6 @@ extern void test_arm_runtime_nmi(void);
 void test_main(void)
 {
 	ztest_test_suite(arm_runtime_nmi_fn,
-		ztest_unit_test(test_arm_runtime_nmi));
+			 ztest_unit_test(test_arm_runtime_nmi));
 	ztest_run_test_suite(arm_runtime_nmi_fn);
 }

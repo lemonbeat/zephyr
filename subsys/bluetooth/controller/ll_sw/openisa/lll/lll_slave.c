@@ -77,7 +77,7 @@ void lll_slave_prepare(void *param)
 
 	/* Accumulate window widening */
 	lll->slave.window_widening_prepare_us +=
-	    lll->slave.window_widening_periodic_us * elapsed;
+		lll->slave.window_widening_periodic_us * elapsed;
 	if (lll->slave.window_widening_prepare_us >
 	    lll->slave.window_widening_max_us) {
 		lll->slave.window_widening_prepare_us =
@@ -150,8 +150,7 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 	}
 
 	/* current window size */
-	lll->slave.window_size_event_us +=
-		lll->slave.window_size_prepare_us;
+	lll->slave.window_size_event_us += lll->slave.window_size_prepare_us;
 	lll->slave.window_size_prepare_us = 0;
 
 	/* Start setting up Radio h/w */
@@ -217,14 +216,12 @@ static int prepare_cb(struct lll_prepare_param *prepare_param)
 				 radio_rx_ready_delay_get(lll->phy_rx, 1) -
 				 CONFIG_BT_CTLR_GPIO_LNA_OFFSET);
 #else /* !CONFIG_BT_CTLR_PHY */
-	radio_gpio_pa_lna_enable(remainder_us +
-				 radio_rx_ready_delay_get(0, 0) -
+	radio_gpio_pa_lna_enable(remainder_us + radio_rx_ready_delay_get(0, 0) -
 				 CONFIG_BT_CTLR_GPIO_LNA_OFFSET);
 #endif /* !CONFIG_BT_CTLR_PHY */
 #endif /* CONFIG_BT_CTLR_GPIO_LNA_PIN */
 
-#if defined(CONFIG_BT_CTLR_PROFILE_ISR) || \
-	defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
+#if defined(CONFIG_BT_CTLR_PROFILE_ISR) || defined(CONFIG_BT_CTLR_GPIO_PA_PIN)
 	radio_tmr_end_capture();
 #endif /* CONFIG_BT_CTLR_PROFILE_ISR */
 

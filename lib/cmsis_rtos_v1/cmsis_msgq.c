@@ -11,7 +11,7 @@
  * @brief Create and Initialize Message queue.
  */
 osMessageQId osMessageCreate(const osMessageQDef_t *queue_def,
-				osThreadId thread_id)
+			     osThreadId thread_id)
 {
 	if (queue_def == NULL) {
 		return NULL;
@@ -21,8 +21,8 @@ osMessageQId osMessageCreate(const osMessageQDef_t *queue_def,
 		return NULL;
 	}
 
-	k_msgq_init(queue_def->msgq, queue_def->pool,
-			queue_def->item_sz, queue_def->queue_sz);
+	k_msgq_init(queue_def->msgq, queue_def->pool, queue_def->item_sz,
+		    queue_def->queue_sz);
 	return (osMessageQId)(queue_def);
 }
 
@@ -63,7 +63,7 @@ osEvent osMessageGet(osMessageQId queue_id, uint32_t millisec)
 {
 	osMessageQDef_t *queue_def = (osMessageQDef_t *)queue_id;
 	uint32_t info;
-	osEvent evt = {0};
+	osEvent evt = { 0 };
 	int retval;
 
 	if (queue_def == NULL) {

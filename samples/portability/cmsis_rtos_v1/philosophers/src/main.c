@@ -96,10 +96,8 @@ static void print_phil_state(int id, const char *fmt, int32_t delay)
 
 	set_phil_state_pos(id);
 
-	printk("Philosopher %d [%s:%s%d] ",
-	       id, prio < 0 ? "C" : "P",
-	       prio < 0 ? "" : " ",
-	       prio);
+	printk("Philosopher %d [%s:%s%d] ", id, prio < 0 ? "C" : "P",
+	       prio < 0 ? "" : " ", prio);
 
 	if (delay) {
 		printk(fmt, delay < 1000 ? " " : "", delay);
@@ -166,7 +164,6 @@ void philosopher(void const *id)
 		print_phil_state(my_id, " THINKING [ %s%d ms ] ", delay);
 		osDelay(delay);
 	}
-
 }
 
 osThreadDef(philosopher, osPriorityLow, 6, STACK_SIZE);
@@ -191,15 +188,16 @@ static void start_threads(void)
 	}
 }
 
-#define DEMO_DESCRIPTION							\
-	"\x1b[2J\x1b[15;1H"							\
-	"Demo Description\n"							\
-	"----------------\n"							\
-	"An implementation of a solution to the Dining Philosophers\n"		\
-	"problem (a classic multi-thread synchronization problem) using\n"	\
-	"CMSIS RTOS V1 APIs. This particular implementation demonstrates the\n"	\
-	"usage of multiple preemptible threads of differing\n"			\
-	"priorities, as well as %s and thread sleeping.\n", fork_type_str
+#define DEMO_DESCRIPTION                                                        \
+	"\x1b[2J\x1b[15;1H"                                                     \
+	"Demo Description\n"                                                    \
+	"----------------\n"                                                    \
+	"An implementation of a solution to the Dining Philosophers\n"          \
+	"problem (a classic multi-thread synchronization problem) using\n"      \
+	"CMSIS RTOS V1 APIs. This particular implementation demonstrates the\n" \
+	"usage of multiple preemptible threads of differing\n"                  \
+	"priorities, as well as %s and thread sleeping.\n",                     \
+		fork_type_str
 
 static void display_demo_description(void)
 {

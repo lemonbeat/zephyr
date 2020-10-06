@@ -83,7 +83,8 @@ void test_intmath(void)
 	ba = 0x00000012ABCDEF12ULL;
 	bb = 0x0000001000000111ULL;
 	bignum = ba * bb;
-	zassert_true((bignum == 0xbcdf0509369bf232ULL), "64-bit multiplication failed");
+	zassert_true((bignum == 0xbcdf0509369bf232ULL),
+		     "64-bit multiplication failed");
 
 	a = 30000U;
 	b = 5872U;
@@ -99,13 +100,9 @@ void test_intmath(void)
  * @}
  */
 
-
-
 void test_main(void)
 {
-	ztest_test_suite(intmath,
-			 ztest_unit_test(test_intmath)
-			 );
+	ztest_test_suite(intmath, ztest_unit_test(test_intmath));
 
 	ztest_run_test_suite(intmath);
 }

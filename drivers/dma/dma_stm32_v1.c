@@ -15,19 +15,14 @@
 LOG_MODULE_REGISTER(dma_stm32_v1);
 
 /* DMA burst length */
-#define BURST_TRANS_LENGTH_1			0
+#define BURST_TRANS_LENGTH_1 0
 
 uint32_t dma_stm32_id_to_stream(uint32_t id)
 {
 	static const uint32_t stream_nr[] = {
-		LL_DMA_STREAM_0,
-		LL_DMA_STREAM_1,
-		LL_DMA_STREAM_2,
-		LL_DMA_STREAM_3,
-		LL_DMA_STREAM_4,
-		LL_DMA_STREAM_5,
-		LL_DMA_STREAM_6,
-		LL_DMA_STREAM_7,
+		LL_DMA_STREAM_0, LL_DMA_STREAM_1, LL_DMA_STREAM_2,
+		LL_DMA_STREAM_3, LL_DMA_STREAM_4, LL_DMA_STREAM_5,
+		LL_DMA_STREAM_6, LL_DMA_STREAM_7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(stream_nr));
@@ -38,14 +33,9 @@ uint32_t dma_stm32_id_to_stream(uint32_t id)
 uint32_t dma_stm32_slot_to_channel(uint32_t slot)
 {
 	static const uint32_t channel_nr[] = {
-		LL_DMA_CHANNEL_0,
-		LL_DMA_CHANNEL_1,
-		LL_DMA_CHANNEL_2,
-		LL_DMA_CHANNEL_3,
-		LL_DMA_CHANNEL_4,
-		LL_DMA_CHANNEL_5,
-		LL_DMA_CHANNEL_6,
-		LL_DMA_CHANNEL_7,
+		LL_DMA_CHANNEL_0, LL_DMA_CHANNEL_1, LL_DMA_CHANNEL_2,
+		LL_DMA_CHANNEL_3, LL_DMA_CHANNEL_4, LL_DMA_CHANNEL_5,
+		LL_DMA_CHANNEL_6, LL_DMA_CHANNEL_7,
 	};
 
 	__ASSERT_NO_MSG(slot < ARRAY_SIZE(channel_nr));
@@ -56,14 +46,10 @@ uint32_t dma_stm32_slot_to_channel(uint32_t slot)
 void dma_stm32_clear_ht(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_clear_flag_func func[] = {
-		LL_DMA_ClearFlag_HT0,
-		LL_DMA_ClearFlag_HT1,
-		LL_DMA_ClearFlag_HT2,
-		LL_DMA_ClearFlag_HT3,
-		LL_DMA_ClearFlag_HT4,
-		LL_DMA_ClearFlag_HT5,
-		LL_DMA_ClearFlag_HT6,
-		LL_DMA_ClearFlag_HT7,
+		LL_DMA_ClearFlag_HT0, LL_DMA_ClearFlag_HT1,
+		LL_DMA_ClearFlag_HT2, LL_DMA_ClearFlag_HT3,
+		LL_DMA_ClearFlag_HT4, LL_DMA_ClearFlag_HT5,
+		LL_DMA_ClearFlag_HT6, LL_DMA_ClearFlag_HT7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -74,14 +60,10 @@ void dma_stm32_clear_ht(DMA_TypeDef *DMAx, uint32_t id)
 void dma_stm32_clear_tc(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_clear_flag_func func[] = {
-		LL_DMA_ClearFlag_TC0,
-		LL_DMA_ClearFlag_TC1,
-		LL_DMA_ClearFlag_TC2,
-		LL_DMA_ClearFlag_TC3,
-		LL_DMA_ClearFlag_TC4,
-		LL_DMA_ClearFlag_TC5,
-		LL_DMA_ClearFlag_TC6,
-		LL_DMA_ClearFlag_TC7,
+		LL_DMA_ClearFlag_TC0, LL_DMA_ClearFlag_TC1,
+		LL_DMA_ClearFlag_TC2, LL_DMA_ClearFlag_TC3,
+		LL_DMA_ClearFlag_TC4, LL_DMA_ClearFlag_TC5,
+		LL_DMA_ClearFlag_TC6, LL_DMA_ClearFlag_TC7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -92,14 +74,10 @@ void dma_stm32_clear_tc(DMA_TypeDef *DMAx, uint32_t id)
 bool dma_stm32_is_ht_active(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_check_flag_func func[] = {
-		LL_DMA_IsActiveFlag_HT0,
-		LL_DMA_IsActiveFlag_HT1,
-		LL_DMA_IsActiveFlag_HT2,
-		LL_DMA_IsActiveFlag_HT3,
-		LL_DMA_IsActiveFlag_HT4,
-		LL_DMA_IsActiveFlag_HT5,
-		LL_DMA_IsActiveFlag_HT6,
-		LL_DMA_IsActiveFlag_HT7,
+		LL_DMA_IsActiveFlag_HT0, LL_DMA_IsActiveFlag_HT1,
+		LL_DMA_IsActiveFlag_HT2, LL_DMA_IsActiveFlag_HT3,
+		LL_DMA_IsActiveFlag_HT4, LL_DMA_IsActiveFlag_HT5,
+		LL_DMA_IsActiveFlag_HT6, LL_DMA_IsActiveFlag_HT7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -110,14 +88,10 @@ bool dma_stm32_is_ht_active(DMA_TypeDef *DMAx, uint32_t id)
 bool dma_stm32_is_tc_active(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_check_flag_func func[] = {
-		LL_DMA_IsActiveFlag_TC0,
-		LL_DMA_IsActiveFlag_TC1,
-		LL_DMA_IsActiveFlag_TC2,
-		LL_DMA_IsActiveFlag_TC3,
-		LL_DMA_IsActiveFlag_TC4,
-		LL_DMA_IsActiveFlag_TC5,
-		LL_DMA_IsActiveFlag_TC6,
-		LL_DMA_IsActiveFlag_TC7,
+		LL_DMA_IsActiveFlag_TC0, LL_DMA_IsActiveFlag_TC1,
+		LL_DMA_IsActiveFlag_TC2, LL_DMA_IsActiveFlag_TC3,
+		LL_DMA_IsActiveFlag_TC4, LL_DMA_IsActiveFlag_TC5,
+		LL_DMA_IsActiveFlag_TC6, LL_DMA_IsActiveFlag_TC7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -128,14 +102,10 @@ bool dma_stm32_is_tc_active(DMA_TypeDef *DMAx, uint32_t id)
 void dma_stm32_clear_te(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_clear_flag_func func[] = {
-		LL_DMA_ClearFlag_TE0,
-		LL_DMA_ClearFlag_TE1,
-		LL_DMA_ClearFlag_TE2,
-		LL_DMA_ClearFlag_TE3,
-		LL_DMA_ClearFlag_TE4,
-		LL_DMA_ClearFlag_TE5,
-		LL_DMA_ClearFlag_TE6,
-		LL_DMA_ClearFlag_TE7,
+		LL_DMA_ClearFlag_TE0, LL_DMA_ClearFlag_TE1,
+		LL_DMA_ClearFlag_TE2, LL_DMA_ClearFlag_TE3,
+		LL_DMA_ClearFlag_TE4, LL_DMA_ClearFlag_TE5,
+		LL_DMA_ClearFlag_TE6, LL_DMA_ClearFlag_TE7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -146,14 +116,10 @@ void dma_stm32_clear_te(DMA_TypeDef *DMAx, uint32_t id)
 void dma_stm32_clear_dme(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_clear_flag_func func[] = {
-		LL_DMA_ClearFlag_DME0,
-		LL_DMA_ClearFlag_DME1,
-		LL_DMA_ClearFlag_DME2,
-		LL_DMA_ClearFlag_DME3,
-		LL_DMA_ClearFlag_DME4,
-		LL_DMA_ClearFlag_DME5,
-		LL_DMA_ClearFlag_DME6,
-		LL_DMA_ClearFlag_DME7,
+		LL_DMA_ClearFlag_DME0, LL_DMA_ClearFlag_DME1,
+		LL_DMA_ClearFlag_DME2, LL_DMA_ClearFlag_DME3,
+		LL_DMA_ClearFlag_DME4, LL_DMA_ClearFlag_DME5,
+		LL_DMA_ClearFlag_DME6, LL_DMA_ClearFlag_DME7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -164,14 +130,10 @@ void dma_stm32_clear_dme(DMA_TypeDef *DMAx, uint32_t id)
 void dma_stm32_clear_fe(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_clear_flag_func func[] = {
-		LL_DMA_ClearFlag_FE0,
-		LL_DMA_ClearFlag_FE1,
-		LL_DMA_ClearFlag_FE2,
-		LL_DMA_ClearFlag_FE3,
-		LL_DMA_ClearFlag_FE4,
-		LL_DMA_ClearFlag_FE5,
-		LL_DMA_ClearFlag_FE6,
-		LL_DMA_ClearFlag_FE7,
+		LL_DMA_ClearFlag_FE0, LL_DMA_ClearFlag_FE1,
+		LL_DMA_ClearFlag_FE2, LL_DMA_ClearFlag_FE3,
+		LL_DMA_ClearFlag_FE4, LL_DMA_ClearFlag_FE5,
+		LL_DMA_ClearFlag_FE6, LL_DMA_ClearFlag_FE7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -182,14 +144,10 @@ void dma_stm32_clear_fe(DMA_TypeDef *DMAx, uint32_t id)
 bool dma_stm32_is_te_active(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_check_flag_func func[] = {
-		LL_DMA_IsActiveFlag_TE0,
-		LL_DMA_IsActiveFlag_TE1,
-		LL_DMA_IsActiveFlag_TE2,
-		LL_DMA_IsActiveFlag_TE3,
-		LL_DMA_IsActiveFlag_TE4,
-		LL_DMA_IsActiveFlag_TE5,
-		LL_DMA_IsActiveFlag_TE6,
-		LL_DMA_IsActiveFlag_TE7,
+		LL_DMA_IsActiveFlag_TE0, LL_DMA_IsActiveFlag_TE1,
+		LL_DMA_IsActiveFlag_TE2, LL_DMA_IsActiveFlag_TE3,
+		LL_DMA_IsActiveFlag_TE4, LL_DMA_IsActiveFlag_TE5,
+		LL_DMA_IsActiveFlag_TE6, LL_DMA_IsActiveFlag_TE7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -200,14 +158,10 @@ bool dma_stm32_is_te_active(DMA_TypeDef *DMAx, uint32_t id)
 bool dma_stm32_is_dme_active(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_check_flag_func func[] = {
-		LL_DMA_IsActiveFlag_DME0,
-		LL_DMA_IsActiveFlag_DME1,
-		LL_DMA_IsActiveFlag_DME2,
-		LL_DMA_IsActiveFlag_DME3,
-		LL_DMA_IsActiveFlag_DME4,
-		LL_DMA_IsActiveFlag_DME5,
-		LL_DMA_IsActiveFlag_DME6,
-		LL_DMA_IsActiveFlag_DME7,
+		LL_DMA_IsActiveFlag_DME0, LL_DMA_IsActiveFlag_DME1,
+		LL_DMA_IsActiveFlag_DME2, LL_DMA_IsActiveFlag_DME3,
+		LL_DMA_IsActiveFlag_DME4, LL_DMA_IsActiveFlag_DME5,
+		LL_DMA_IsActiveFlag_DME6, LL_DMA_IsActiveFlag_DME7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -218,14 +172,10 @@ bool dma_stm32_is_dme_active(DMA_TypeDef *DMAx, uint32_t id)
 bool dma_stm32_is_fe_active(DMA_TypeDef *DMAx, uint32_t id)
 {
 	static const dma_stm32_check_flag_func func[] = {
-		LL_DMA_IsActiveFlag_FE0,
-		LL_DMA_IsActiveFlag_FE1,
-		LL_DMA_IsActiveFlag_FE2,
-		LL_DMA_IsActiveFlag_FE3,
-		LL_DMA_IsActiveFlag_FE4,
-		LL_DMA_IsActiveFlag_FE5,
-		LL_DMA_IsActiveFlag_FE6,
-		LL_DMA_IsActiveFlag_FE7,
+		LL_DMA_IsActiveFlag_FE0, LL_DMA_IsActiveFlag_FE1,
+		LL_DMA_IsActiveFlag_FE2, LL_DMA_IsActiveFlag_FE3,
+		LL_DMA_IsActiveFlag_FE4, LL_DMA_IsActiveFlag_FE5,
+		LL_DMA_IsActiveFlag_FE6, LL_DMA_IsActiveFlag_FE7,
 	};
 
 	__ASSERT_NO_MSG(id < ARRAY_SIZE(func));
@@ -332,10 +282,11 @@ void stm32_dma_disable_fifo_irq(DMA_TypeDef *dma, uint32_t id)
 	LL_DMA_DisableIT_FE(dma, dma_stm32_id_to_stream(id));
 }
 
-void stm32_dma_config_channel_function(DMA_TypeDef *dma, uint32_t id, uint32_t slot)
+void stm32_dma_config_channel_function(DMA_TypeDef *dma, uint32_t id,
+				       uint32_t slot)
 {
 	LL_DMA_SetChannelSelection(dma, dma_stm32_id_to_stream(id),
-			dma_stm32_slot_to_channel(slot));
+				   dma_stm32_slot_to_channel(slot));
 }
 
 uint32_t stm32_dma_get_mburst(struct dma_config *config, bool source_periph)

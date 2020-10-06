@@ -26,15 +26,27 @@
 #ifdef CONFIG_GPIO_GECKO
 /* Serial Wire Output (SWO) */
 #if (SWO_LOCATION == 0)
-#define PIN_SWO {gpioPortF, 2, gpioModePushPull, 1}
+#define PIN_SWO                                   \
+	{                                         \
+		gpioPortF, 2, gpioModePushPull, 1 \
+	}
 #elif (SWO_LOCATION == 1)
-#define PIN_SWO {gpioPortC, 15, gpioModePushPull, 1}
+#define PIN_SWO                                    \
+	{                                          \
+		gpioPortC, 15, gpioModePushPull, 1 \
+	}
 #elif (SWO_LOCATION == 2)
-#define PIN_SWO {gpioPortD, 1, gpioModePushPull, 1}
+#define PIN_SWO                                   \
+	{                                         \
+		gpioPortD, 1, gpioModePushPull, 1 \
+	}
 #elif (SWO_LOCATION == 3)
-#define PIN_SWO {gpioPortD, 2, gpioModePushPull, 1}
+#define PIN_SWO                                   \
+	{                                         \
+		gpioPortD, 2, gpioModePushPull, 1 \
+	}
 #elif (SWO_LOCATION >= 4)
-#error ("Invalid SWO pin location")
+#error("Invalid SWO pin location")
 #endif
 #endif /* CONFIG_GPIO_GECKO */
 

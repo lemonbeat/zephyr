@@ -28,7 +28,8 @@ void tmpool_alloc_free(const void *data)
 		 * memory block.
 		 */
 		zassert_true(k_mem_pool_alloc(&kmpool, &block[i], BLK_SIZE_MIN,
-					      K_NO_WAIT) == 0, NULL);
+					      K_NO_WAIT) == 0,
+			     NULL);
 		zassert_not_null(block[i].data, NULL);
 	}
 
@@ -47,7 +48,8 @@ void tmpool_alloc_free(const void *data)
 	 */
 	for (int i = 0; i < BLK_NUM_MAX; i++) {
 		zassert_true(k_mem_pool_alloc(&kmpool, &block[i], BLK_SIZE_MAX,
-					      K_NO_WAIT) == 0, NULL);
+					      K_NO_WAIT) == 0,
+			     NULL);
 		zassert_not_null(block[i].data, NULL);
 	}
 
@@ -115,7 +117,8 @@ void test_mpool_alloc_size(void)
 	 */
 	while (size >= BLK_SIZE_MIN) {
 		zassert_true(k_mem_pool_alloc(&kmpool, &block[i], size,
-					      K_NO_WAIT) == 0, NULL);
+					      K_NO_WAIT) == 0,
+			     NULL);
 		zassert_not_null(block[i].data, NULL);
 		zassert_true((uintptr_t)(block[i].data) % BLK_ALIGN == 0, NULL);
 		i++;
@@ -133,7 +136,8 @@ void test_mpool_alloc_size(void)
 	 */
 	while (size <= BLK_SIZE_MAX) {
 		zassert_true(k_mem_pool_alloc(&kmpool, &block[i], size,
-					      K_NO_WAIT) == 0, NULL);
+					      K_NO_WAIT) == 0,
+			     NULL);
 		zassert_not_null(block[i].data, NULL);
 		zassert_true((uintptr_t)(block[i].data) % BLK_ALIGN == 0, NULL);
 		i++;
@@ -178,7 +182,8 @@ void test_mpool_alloc_timeout(void)
 	/** TESTPOINT: Use K_NO_WAIT to return without waiting*/
 	/** TESTPOINT: @retval -ENOMEM Returned without waiting*/
 	zassert_equal(k_mem_pool_alloc(&kmpool, &fblock, BLK_SIZE_MIN,
-				       K_NO_WAIT), -ENOMEM, NULL);
+				       K_NO_WAIT),
+		      -ENOMEM, NULL);
 	/** TESTPOINT: @retval -EAGAIN Waiting period timed out*/
 	tms = k_uptime_get();
 	zassert_equal(k_mem_pool_alloc(&kmpool, &fblock, BLK_SIZE_MIN, TIMEOUT),
@@ -209,10 +214,10 @@ void test_sys_heap_mem_pool_assign(void)
 	void *ptr;
 
 	k_thread_system_pool_assign(k_current_get());
-	ptr = (char *)z_thread_malloc(BLK_SIZE_MIN/2);
+	ptr = (char *)z_thread_malloc(BLK_SIZE_MIN / 2);
 	zassert_not_null(ptr, "bytes allocation failed from system pool");
 	k_free(ptr);
 
 	zassert_is_null((char *)z_thread_malloc(BLK_SIZE_MAX * 2),
-						"overflow check failed");
+			"overflow check failed");
 }

@@ -44,9 +44,9 @@ LOG_MODULE_REGISTER(modem_hl7800, CONFIG_MODEM_LOG_LEVEL);
 #include "modem_receiver.h"
 #include <drivers/modem/hl7800.h>
 
-#define PREFIXED_SWITCH_CASE_RETURN_STRING(prefix, val)                        \
-	case prefix##_##val: {                                                 \
-		return #val;                                                   \
+#define PREFIXED_SWITCH_CASE_RETURN_STRING(prefix, val) \
+	case prefix##_##val: {                          \
+		return #val;                            \
 	}
 
 /* Uncomment the #define below to enable a hexdump of all incoming
@@ -61,28 +61,28 @@ LOG_MODULE_REGISTER(modem_hl7800, CONFIG_MODEM_LOG_LEVEL);
 /* #define HL7800_TX_LOCK_LOG 1 */
 /* #define HL7800_IO_LOG 1 */
 
-#define HL7800_RX_LOCK_DBG_LOG(fmt, ...)                                       \
-	do {                                                                   \
-		if (IS_ENABLED(HL7800_RX_LOCK_LOG)) {                          \
-			LOG_DBG(fmt, ##__VA_ARGS__);                           \
-		}                                                              \
+#define HL7800_RX_LOCK_DBG_LOG(fmt, ...)              \
+	do {                                          \
+		if (IS_ENABLED(HL7800_RX_LOCK_LOG)) { \
+			LOG_DBG(fmt, ##__VA_ARGS__);  \
+		}                                     \
 	} while (false)
 
-#define HL7800_TX_LOCK_DBG_LOG(fmt, ...)                                       \
-	do {                                                                   \
-		if (IS_ENABLED(HL7800_TX_LOCK_LOG)) {                          \
-			LOG_DBG(fmt, ##__VA_ARGS__);                           \
-		}                                                              \
+#define HL7800_TX_LOCK_DBG_LOG(fmt, ...)              \
+	do {                                          \
+		if (IS_ENABLED(HL7800_TX_LOCK_LOG)) { \
+			LOG_DBG(fmt, ##__VA_ARGS__);  \
+		}                                     \
 	} while (false)
 
-#define HL7800_IO_DBG_LOG(fmt, ...)                                            \
-	do {                                                                   \
-		if (IS_ENABLED(HL7800_IO_LOG)) {                               \
-			LOG_DBG(fmt, ##__VA_ARGS__);                           \
-		}                                                              \
+#define HL7800_IO_DBG_LOG(fmt, ...)                  \
+	do {                                         \
+		if (IS_ENABLED(HL7800_IO_LOG)) {     \
+			LOG_DBG(fmt, ##__VA_ARGS__); \
+		}                                    \
 	} while (false)
 
-#if ((LOG_LEVEL == LOG_LEVEL_DBG) &&                                           \
+#if ((LOG_LEVEL == LOG_LEVEL_DBG) && \
      defined(CONFIG_MODEM_HL7800_LOW_POWER_MODE))
 #define PRINT_AWAKE_MSG LOG_WRN("awake")
 #define PRINT_NOT_AWAKE_MSG LOG_WRN("NOT awake")
@@ -136,9 +136,9 @@ struct mdm_control_pinconfig {
 	gpio_flags_t config;
 };
 
-#define PINCONFIG(name_, pin_, config_)                                        \
-	{                                                                      \
-		.dev_name = name_, .pin = pin_, .config = config_              \
+#define PINCONFIG(name_, pin_, config_)                           \
+	{                                                         \
+		.dev_name = name_, .pin = pin_, .config = config_ \
 	}
 
 /* pin settings */
@@ -269,10 +269,10 @@ static const struct mdm_control_pinconfig pinconfig[] = {
 
 #define SIZE_WITHOUT_NUL(v) (sizeof(v) - SIZE_OF_NUL)
 
-#define CMD_HANDLER(cmd_, cb_)                                                 \
-	{                                                                      \
-		.cmd = cmd_, .cmd_len = (uint16_t)sizeof(cmd_) - 1,            \
-		.func = on_cmd_##cb_                                           \
+#define CMD_HANDLER(cmd_, cb_)                                      \
+	{                                                           \
+		.cmd = cmd_, .cmd_len = (uint16_t)sizeof(cmd_) - 1, \
+		.func = on_cmd_##cb_                                \
 	}
 
 #define MDM_MANUFACTURER_LENGTH 16
@@ -308,14 +308,14 @@ static const struct mdm_control_pinconfig pinconfig[] = {
 #define COPS_RESPONSE_NUM_DELIMS 2
 #define KCELLMEAS_RESPONSE_NUM_DELIMS 4
 
-#define PROFILE_LINE_1                                                         \
+#define PROFILE_LINE_1 \
 	"E1 Q0 V1 X4 &C1 &D1 &R1 &S0 +IFC=2,2 &K3 +IPR=115200 +FCLASS0\r\n"
-#define PROFILE_LINE_2                                                         \
+#define PROFILE_LINE_2 \
 	"S00:255 S01:255 S03:255 S04:255 S05:255 S07:255 S08:255 S10:255\r\n"
 
 #define SETUP_GPRS_CONNECTION_CMD "AT+KCNXCFG=1,\"GPRS\",\"\",,,\"IPV4V6\""
 
-#define MAX_PROFILE_LINE_LENGTH                                                \
+#define MAX_PROFILE_LINE_LENGTH \
 	MAX(sizeof(PROFILE_LINE_1), sizeof(PROFILE_LINE_2))
 
 #ifdef CONFIG_NEWLIB_LIBC
@@ -339,44 +339,44 @@ static const char TIME_STRING_FORMAT[] = "\"yy/MM/dd,hh:mm:ss?zz\"";
 #define SECONDS_PER_QUARTER_HOUR (15 * 60)
 #endif
 
-#define SEND_AT_CMD_ONCE_EXPECT_OK(c)                                          \
-	do {                                                                   \
-		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT, 0, false);  \
-		if (ret < 0) {                                                 \
-			LOG_ERR("%s result:%d", (c), ret);                     \
-			goto error;                                            \
-		}                                                              \
+#define SEND_AT_CMD_ONCE_EXPECT_OK(c)                                         \
+	do {                                                                  \
+		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT, 0, false); \
+		if (ret < 0) {                                                \
+			LOG_ERR("%s result:%d", (c), ret);                    \
+			goto error;                                           \
+		}                                                             \
 	} while (0)
 
-#define SEND_AT_CMD_IGNORE_ERROR(c)                                            \
-	do {                                                                   \
-		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT, 0, false);  \
-		if (ret < 0) {                                                 \
-			LOG_ERR("%s result:%d", (c), ret);                     \
-		}                                                              \
+#define SEND_AT_CMD_IGNORE_ERROR(c)                                           \
+	do {                                                                  \
+		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT, 0, false); \
+		if (ret < 0) {                                                \
+			LOG_ERR("%s result:%d", (c), ret);                    \
+		}                                                             \
 	} while (0)
 
-#define SEND_AT_CMD_EXPECT_OK(c)                                               \
-	do {                                                                   \
-		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT,             \
-				  MDM_DEFAULT_AT_CMD_RETRIES, false);          \
-		if (ret < 0) {                                                 \
-			LOG_ERR("%s result:%d", (c), ret);                     \
-			goto error;                                            \
-		}                                                              \
+#define SEND_AT_CMD_EXPECT_OK(c)                                      \
+	do {                                                          \
+		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT,    \
+				  MDM_DEFAULT_AT_CMD_RETRIES, false); \
+		if (ret < 0) {                                        \
+			LOG_ERR("%s result:%d", (c), ret);            \
+			goto error;                                   \
+		}                                                     \
 	} while (0)
 
 /* Complex has "no_id_resp" set to true because the sending command
  * is the command used to process the respone
  */
-#define SEND_COMPLEX_AT_CMD(c)                                                 \
-	do {                                                                   \
-		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT,             \
-				  MDM_DEFAULT_AT_CMD_RETRIES, true);           \
-		if (ret < 0) {                                                 \
-			LOG_ERR("%s result:%d", (c), ret);                     \
-			goto error;                                            \
-		}                                                              \
+#define SEND_COMPLEX_AT_CMD(c)                                       \
+	do {                                                         \
+		ret = send_at_cmd(NULL, (c), MDM_CMD_SEND_TIMEOUT,   \
+				  MDM_DEFAULT_AT_CMD_RETRIES, true); \
+		if (ret < 0) {                                       \
+			LOG_ERR("%s result:%d", (c), ret);           \
+			goto error;                                  \
+		}                                                    \
 	} while (0)
 
 NET_BUF_POOL_DEFINE(mdm_recv_pool, MDM_RECV_MAX_BUF, MDM_RECV_BUF_SIZE, 0,
@@ -3147,10 +3147,10 @@ static size_t hl7800_read_rx(struct net_buf **buf)
 			}
 		}
 
-		rx_len =
-			net_buf_append_bytes(*buf, bytes_read, uart_buffer,
-					     BUF_ALLOC_TIMEOUT,
-					     read_rx_allocator, &mdm_recv_pool);
+		rx_len = net_buf_append_bytes(*buf, bytes_read, uart_buffer,
+					      BUF_ALLOC_TIMEOUT,
+					      read_rx_allocator,
+					      &mdm_recv_pool);
 		if (rx_len < bytes_read) {
 			LOG_ERR("Data was lost! read %u of %u!", rx_len,
 				bytes_read);
@@ -3398,9 +3398,9 @@ static void hl7800_rx(void)
 							  handlers[i].cmd,
 							  handlers[i].cmd_len);
 				} else {
-					cmp_res =
-						strncmp(rx_msg, handlers[i].cmd,
-							handlers[i].cmd_len);
+					cmp_res = strncmp(rx_msg,
+							  handlers[i].cmd,
+							  handlers[i].cmd_len);
 				}
 
 				if (cmp_res == 0) {

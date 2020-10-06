@@ -39,7 +39,7 @@ struct k_thread;
  * programmed using the available number of HW MPU regions.
  */
 #define ARM_CORE_MPU_MAX_DOMAIN_PARTITIONS_GET(mpu_regions_num) \
-	(mpu_regions_num/2)
+	(mpu_regions_num / 2)
 #else
 /*
  * For ARM MPU architectures, where the domain partitions can be defined
@@ -76,8 +76,8 @@ struct k_thread;
  *        memory region for a (supervisor) Thread Stack Guard.
  */
 #if (defined(CONFIG_MPU_REQUIRES_NON_OVERLAPPING_REGIONS) && \
-		defined(CONFIG_MPU_GAP_FILLING)) \
-	|| defined(CONFIG_CPU_HAS_NXP_MPU)
+     defined(CONFIG_MPU_GAP_FILLING)) ||                     \
+	defined(CONFIG_CPU_HAS_NXP_MPU)
 /*
  * When dynamic regions may not be defined on top of statically
  * allocated memory regions, defining a region for a supervisor
@@ -100,7 +100,6 @@ struct k_thread;
 #endif /* CONFIG_MPU_REQUIRES_NON_OVERLAPPING_REGIONS || CPU_HAS_NXP_MPU */
 
 #endif /* CONFIG_USERSPACE */
-
 
 /* ARM Core MPU Driver API */
 
@@ -133,8 +132,9 @@ struct k_thread;
  *   requirements of the MPU hardware.
  */
 void arm_core_mpu_configure_static_mpu_regions(
-	const struct k_mem_partition *static_regions[], const uint8_t regions_num,
-	const uint32_t background_area_start, const uint32_t background_area_end);
+	const struct k_mem_partition *static_regions[],
+	const uint8_t regions_num, const uint32_t background_area_start,
+	const uint32_t background_area_end);
 
 #if defined(CONFIG_MPU_REQUIRES_NON_OVERLAPPING_REGIONS)
 
@@ -202,9 +202,8 @@ void arm_core_mpu_configure_dynamic_mpu_regions(
  * The function shall assert if the operation cannot be not performed
  * successfully (e.g. the given partition can not be found).
  */
-void arm_core_mpu_mem_partition_config_update(
-	struct k_mem_partition *partition,
-	k_mem_partition_attr_t *new_attr);
+void arm_core_mpu_mem_partition_config_update(struct k_mem_partition *partition,
+					      k_mem_partition_attr_t *new_attr);
 
 #endif /* CONFIG_USERSPACE */
 

@@ -15,23 +15,23 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define DEADBEEF  0xdeadbeef
+#define DEADBEEF 0xdeadbeef
 
-#define DEADBEEF_LHEX_ALT_STR  "0xdeadbeef"
-#define DEADBEEF_UHEX_ALT_STR  "0XDEADBEEF"
-#define DEADBEEF_LHEX_STR      "deadbeef"
-#define DEADBEEF_UHEX_STR      "DEADBEEF"
-#define DEADBEEF_UNSIGNED_STR  "3735928559"
-#define DEADBEEF_SIGNED_STR    "-559038737"
-#define DEADBEEF_OCTAL_STR     "33653337357"
+#define DEADBEEF_LHEX_ALT_STR "0xdeadbeef"
+#define DEADBEEF_UHEX_ALT_STR "0XDEADBEEF"
+#define DEADBEEF_LHEX_STR "deadbeef"
+#define DEADBEEF_UHEX_STR "DEADBEEF"
+#define DEADBEEF_UNSIGNED_STR "3735928559"
+#define DEADBEEF_SIGNED_STR "-559038737"
+#define DEADBEEF_OCTAL_STR "33653337357"
 #define DEADBEEF_OCTAL_ALT_STR "033653337357"
-#define DEADBEEF_PTR_STR       "0xdeadbeef"
+#define DEADBEEF_PTR_STR "0xdeadbeef"
 
 /*
  * A really long string (330 characters + NULL).
  * The underlying sprintf() architecture will truncate it.
  */
-#define REALLY_LONG_STRING		     \
+#define REALLY_LONG_STRING                   \
 	"1111111111111111111111111111111111" \
 	"1111111111111111111111111111111"    \
 	"22222222222222222222222222222222"   \
@@ -48,8 +48,8 @@
 union raw_double_u {
 	double d;
 	struct {
-		uint32_t u1;       /* This part contains the exponent */
-		uint32_t u2;       /* This part contains the fraction */
+		uint32_t u1; /* This part contains the exponent */
+		uint32_t u2; /* This part contains the fraction */
 	};
 };
 
@@ -70,7 +70,7 @@ void test_sprintf_double(void)
 #endif
 
 	var.u1 = 0x00000000;
-	var.u2 = 0x7ff00000;    /* Bit pattern for +INF (double) */
+	var.u2 = 0x7ff00000; /* Bit pattern for +INF (double) */
 	sprintf(buffer, "%e", var.d);
 	zassert_true((strcmp(buffer, "inf") == 0),
 		     "sprintf(inf) - incorrect output '%s'\n", buffer);
@@ -96,7 +96,7 @@ void test_sprintf_double(void)
 		     "sprintf(INF) - incorrect output '%s'\n", buffer);
 
 	var.u1 = 0x00000000;
-	var.u2 = 0xfff00000;    /* Bit pattern for -INF (double) */
+	var.u2 = 0xfff00000; /* Bit pattern for -INF (double) */
 	sprintf(buffer, "%e", var.d);
 	zassert_true((strcmp(buffer, "-inf") == 0),
 		     "sprintf(-INF) - incorrect output '%s'\n", buffer);
@@ -126,7 +126,7 @@ void test_sprintf_double(void)
 		     "sprintf(      +inf) - incorrect output '%s'\n", buffer);
 
 	var.u1 = 0x00000000;
-	var.u2 = 0x7ff80000;    /* Bit pattern for NaN (double) */
+	var.u2 = 0x7ff80000; /* Bit pattern for NaN (double) */
 	sprintf(buffer, "%e", var.d);
 	zassert_true((strcmp(buffer, "nan") == 0),
 		     "sprintf(nan) - incorrect output '%s'\n", buffer);
@@ -156,7 +156,7 @@ void test_sprintf_double(void)
 		     "sprintf(    +nan) - incorrect output '%s'\n", buffer);
 
 	var.u1 = 0x00000000;
-	var.u2 = 0xfff80000;    /* Bit pattern for -NaN (double) */
+	var.u2 = 0xfff80000; /* Bit pattern for -NaN (double) */
 	sprintf(buffer, "%e", var.d);
 	zassert_true((strcmp(buffer, "-nan") == 0),
 		     "sprintf(-nan) - incorrect output '%s'\n", buffer);
@@ -197,22 +197,26 @@ void test_sprintf_double(void)
 	sprintf(buffer, "%.*f", 11, var.d);
 	zassert_true((strcmp(buffer, "1.00000000000") == 0),
 		     "sprintf(1.00000000000) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	sprintf(buffer, "%12f", var.d);
 	zassert_true((strcmp(buffer, "    1.000000") == 0),
 		     "sprintf(    1.000000) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	sprintf(buffer, "%-12f", var.d);
 	zassert_true((strcmp(buffer, "1.000000    ") == 0),
 		     "sprintf(1.000000    ) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	sprintf(buffer, "%012f", var.d);
 	zassert_true((strcmp(buffer, "00001.000000") == 0),
 		     "sprintf(00001.000000) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	var.d = -1.0;
 	sprintf(buffer, "%f", var.d);
@@ -235,100 +239,115 @@ void test_sprintf_double(void)
 	zassert_true((strlen(buffer) == 382),
 		     "sprintf(<large output>) - incorrect length %d\n",
 		     strlen(buffer));
-	buffer[10] = 0;  /* log facility doesn't support %.10s */
+	buffer[10] = 0; /* log facility doesn't support %.10s */
 	zassert_true((strcmp(buffer, "6668014432") == 0),
 		     "sprintf(<large output>) - starts with \"%s\" "
-		     "expected \"6668014432\"\n", buffer);
+		     "expected \"6668014432\"\n",
+		     buffer);
 	zassert_true((buffer[241] == '.'),
-		      "sprintf(<large output>) - expected '.' got '%c'\n",
-		      buffer[241]);
+		     "sprintf(<large output>) - expected '.' got '%c'\n",
+		     buffer[241]);
 
 	var.d = 0x1p-400;
 	sprintf(buffer, "% .380f", var.d);
 	zassert_true((strlen(buffer) == 383),
 		     "sprintf(<large output>) - incorrect length %d\n",
 		     strlen(buffer));
-	buffer[10] = 0;  /* log facility doesn't support %.10s */
+	buffer[10] = 0; /* log facility doesn't support %.10s */
 	zassert_true((strcmp(buffer, " 0.0000000") == 0),
 		     "sprintf(<large output>) - starts with \"%s\" "
-		     "expected \" 0.0000000\"\n", buffer);
-	buffer[119 + 10] = 0;  /* log facility doesn't support %.10s */
+		     "expected \" 0.0000000\"\n",
+		     buffer);
+	buffer[119 + 10] = 0; /* log facility doesn't support %.10s */
 	zassert_true((strcmp(buffer + 119, "0000387259") == 0),
-		      "sprintf(<large output>) - got \"%s\" "
-		      "while expecting \"0000387259\"\n", buffer + 119);
+		     "sprintf(<large output>) - got \"%s\" "
+		     "while expecting \"0000387259\"\n",
+		     buffer + 119);
 
 	/*******************/
 	var.d = 1234.0;
 	sprintf(buffer, "%e", var.d);
 	zassert_true((strcmp(buffer, "1.234000e+03") == 0),
 		     "sprintf(1.234000e+03) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	sprintf(buffer, "%E", var.d);
 	zassert_true((strcmp(buffer, "1.234000E+03") == 0),
 		     "sprintf(1.234000E+03) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	/*******************/
 	var.d = 0.1234;
 	sprintf(buffer, "%e", var.d);
 	zassert_true((strcmp(buffer, "1.234000e-01") == 0),
 		     "sprintf(1.234000e-01) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	sprintf(buffer, "%E", var.d);
 	zassert_true((strcmp(buffer, "1.234000E-01") == 0),
 		     "sprintf(1.234000E-01) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	/*******************/
 	var.d = 1234000000.0;
 	sprintf(buffer, "%g", var.d);
 	zassert_true((strcmp(buffer, "1.234e+09") == 0),
 		     "sprintf(1.234e+09) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	sprintf(buffer, "%G", var.d);
 	zassert_true((strcmp(buffer, "1.234E+09") == 0),
 		     "sprintf(1.234E+09) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	var.d = 150.0;
 	sprintf(buffer, "%#.3g", var.d);
 	zassert_true((strcmp(buffer, "150.") == 0),
 		     "sprintf(150.) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	var.d = 150.1;
 	sprintf(buffer, "%.2g", var.d);
 	zassert_true((strcmp(buffer, "1.5e+02") == 0),
 		     "sprintf(1.5e+02) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	var.d = 150.567;
 	sprintf(buffer, "%.3g", var.d);
 	zassert_true((strcmp(buffer, "151") == 0),
 		     "sprintf(151) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	var.d = 15e-5;
 	sprintf(buffer, "%#.3g", var.d);
 	zassert_true((strcmp(buffer, "0.000150") == 0),
 		     "sprintf(0.000150) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	var.d = 1505e-7;
 	sprintf(buffer, "%.4g", var.d);
 	zassert_true((strcmp(buffer, "0.0001505") == 0),
 		     "sprintf(0.0001505) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 
 	var.u1 = 0x00000001;
-	var.u2 = 0x00000000;    /* smallest denormal value */
+	var.u2 = 0x00000000; /* smallest denormal value */
 	sprintf(buffer, "%g", var.d);
 	zassert_true((strcmp(buffer, "4.94066e-324") == 0),
 		     "sprintf(4.94066e-324) - incorrect "
-		     "output '%s'\n", buffer);
+		     "output '%s'\n",
+		     buffer);
 }
 
 /**
@@ -370,8 +389,7 @@ void test_vsnprintf(void)
 		     strlen(DEADBEEF_LHEX_STR), len);
 
 	zassert_true((strcmp(buffer, "") == 0),
-		     "vsnprintf(%%x).  Expected '%s', got '%s'\n",
-		     "", buffer);
+		     "vsnprintf(%%x).  Expected '%s', got '%s'\n", "", buffer);
 
 	/*******************/
 	len = tvsnprintf(buffer, 4, "%x", DEADBEEF);
@@ -380,9 +398,8 @@ void test_vsnprintf(void)
 		     strlen(DEADBEEF_LHEX_STR), len);
 
 	zassert_true((strcmp(buffer, "dea") == 0),
-		     "vsnprintf(%%x).  Expected '%s', got '%s'\n",
-		     "dea", buffer);
-
+		     "vsnprintf(%%x).  Expected '%s', got '%s'\n", "dea",
+		     buffer);
 }
 
 /**
@@ -464,8 +481,7 @@ void test_snprintf(void)
 		     strlen(DEADBEEF_LHEX_STR), len);
 
 	zassert_true((strcmp(buffer, "") == 0),
-		     "snprintf(%%x).  Expected '%s', got '%s'\n",
-		     "", buffer);
+		     "snprintf(%%x).  Expected '%s', got '%s'\n", "", buffer);
 	/*******************/
 	len = snprintf(buffer, 4, "%x", DEADBEEF);
 	zassert_true((len == strlen(DEADBEEF_LHEX_STR)),
@@ -473,8 +489,8 @@ void test_snprintf(void)
 		     strlen(DEADBEEF_LHEX_STR), len);
 
 	zassert_true((strcmp(buffer, "dea") == 0),
-		     "snprintf(%%x).  Expected '%s', got '%s'\n",
-		     "dea", buffer);
+		     "snprintf(%%x).  Expected '%s', got '%s'\n", "dea",
+		     buffer);
 
 #if defined(__GNUC__) && __GNUC__ >= 7
 #pragma GCC diagnostic pop
@@ -493,13 +509,15 @@ void test_sprintf_misc(void)
 	char buffer[100];
 
 	/*******************/
-	sprintf(buffer, "%p", (void *) DEADBEEF);
+	sprintf(buffer, "%p", (void *)DEADBEEF);
 	zassert_false((strcmp(buffer, DEADBEEF_PTR_STR) != 0),
-		      "sprintf(%%p).  Expected '%s', got '%s'", DEADBEEF_PTR_STR, buffer);
+		      "sprintf(%%p).  Expected '%s', got '%s'",
+		      DEADBEEF_PTR_STR, buffer);
 	/*******************/
 	sprintf(buffer, "test data %n test data", &count);
-	zassert_false((count != 10), "sprintf(%%n).  Expected count to be %d, not %d",
-		      10, count);
+	zassert_false((count != 10),
+		      "sprintf(%%n).  Expected count to be %d, not %d", 10,
+		      count);
 
 	zassert_false((strcmp(buffer, "test data  test data") != 0),
 		      "sprintf(%%p).  Expected '%s', got '%s'",
@@ -508,20 +526,19 @@ void test_sprintf_misc(void)
 	/*******************/
 	sprintf(buffer, "%*d", 10, 1234);
 	zassert_true((strcmp(buffer, "      1234") == 0),
-		     "sprintf(%%p).  Expected '%s', got '%s'",
-		     "      1234", buffer);
+		     "sprintf(%%p).  Expected '%s', got '%s'", "      1234",
+		     buffer);
 
 	/*******************/
 	sprintf(buffer, "%*d", -10, 1234);
 	zassert_true((strcmp(buffer, "1234      ") == 0),
-		     "sprintf(%%p).  Expected '%s', got '%s'",
-		     "1234      ", buffer);
+		     "sprintf(%%p).  Expected '%s', got '%s'", "1234      ",
+		     buffer);
 
 	/*******************/
 	sprintf(buffer, "% d", 1234);
 	zassert_true((strcmp(buffer, " 1234") == 0),
-		     "sprintf(%% d). Expected '%s', got '%s'",
-		     " 1234", buffer);
+		     "sprintf(%% d). Expected '%s', got '%s'", " 1234", buffer);
 
 	/*******************/
 	sprintf(buffer, "%hx", (unsigned short)1234);
@@ -532,7 +549,6 @@ void test_sprintf_misc(void)
 	sprintf(buffer, "%lx", 1234ul);
 	zassert_true((strcmp("4d2", buffer) == 0),
 		     "sprintf(%%lx).  Expected '4d2', got '%s'", buffer);
-
 }
 
 /**
@@ -551,11 +567,13 @@ void test_sprintf_integer(void)
 	len = sprintf(buffer, "%x", 0x11);
 	zassert_true((len == 2),
 		     "sprintf(%%x). "
-		     "Expected 2 bytes written, not %d", len);
+		     "Expected 2 bytes written, not %d",
+		     len);
 
 	zassert_true((strcmp(buffer, "11") == 0),
 		     "sprintf(%%x). "
-		     "Expected '%s', got '%s'", "11", buffer);
+		     "Expected '%s', got '%s'",
+		     "11", buffer);
 
 	/*******************/
 	len = sprintf(buffer, "%x", DEADBEEF);
@@ -587,7 +605,7 @@ void test_sprintf_integer(void)
 		     DEADBEEF_UNSIGNED_STR, buffer);
 
 	/*******************/
-	len = sprintf(buffer, "%d", (int) DEADBEEF);
+	len = sprintf(buffer, "%d", (int)DEADBEEF);
 	zassert_true((len == strlen(DEADBEEF_SIGNED_STR)),
 		     "sprintf(%%d).  Expected %zu bytes written, not %d\n",
 		     strlen(DEADBEEF_SIGNED_STR), len);
@@ -640,12 +658,11 @@ void test_sprintf_integer(void)
 
 	len = sprintf(buffer, "%+d", 1);
 	zassert_true((len == 2),
-		     "sprintf(%%+d).  Expected %d bytes written, not %d\n",
-		     2, len);
+		     "sprintf(%%+d).  Expected %d bytes written, not %d\n", 2,
+		     len);
 
 	zassert_true((strcmp(buffer, "+1") == 0),
 		     "sprintf(%%+d). Expected '+1', got '%s'\n", buffer);
-
 }
 
 /**
@@ -669,7 +686,8 @@ void test_sprintf_string(void)
 	sprintf(buffer, "%s", "short string");
 	zassert_true((strcmp(buffer, "short string") == 0),
 		     "sprintf(%%s). "
-		     "Expected 'short string', got '%s'\n", buffer);
+		     "Expected 'short string', got '%s'\n",
+		     buffer);
 
 	sprintf(buffer, "%s", REALLY_LONG_STRING);
 	zassert_true((strcmp(buffer, REALLY_LONG_STRING) == 0),
@@ -685,8 +703,7 @@ void test_sprintf_string(void)
 
 void test_main(void)
 {
-	ztest_test_suite(test_sprintf,
-			 ztest_unit_test(test_sprintf_double),
+	ztest_test_suite(test_sprintf, ztest_unit_test(test_sprintf_double),
 			 ztest_unit_test(test_sprintf_integer),
 			 ztest_unit_test(test_vsprintf),
 			 ztest_unit_test(test_vsnprintf),

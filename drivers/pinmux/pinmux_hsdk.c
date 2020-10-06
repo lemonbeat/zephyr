@@ -9,7 +9,7 @@
 #include <drivers/pinmux.h>
 #include <soc.h>
 
-#define creg_gpio_mux_reg	(*(volatile uint32_t *)CREG_GPIO_MUX_BASE_ADDR)
+#define creg_gpio_mux_reg (*(volatile uint32_t *)CREG_GPIO_MUX_BASE_ADDR)
 
 void _arc_sync(void)
 {
@@ -19,7 +19,6 @@ void _arc_sync(void)
 static int pinmux_hsdk_set(const struct device *dev, uint32_t pin,
 			   uint32_t func)
 {
-
 	if (func >= HSDK_PINMUX_FUNS || pin >= HSDK_PINMUX_SELS)
 		return -EINVAL;
 
@@ -34,7 +33,6 @@ static int pinmux_hsdk_set(const struct device *dev, uint32_t pin,
 static int pinmux_hsdk_get(const struct device *dev, uint32_t pin,
 			   uint32_t *func)
 {
-
 	if (pin >= HSDK_PINMUX_SELS || func == NULL)
 		return -EINVAL;
 
@@ -68,7 +66,6 @@ static const struct pinmux_driver_api pinmux_hsdk_driver_api = {
 	.input = pinmux_hsdk_input,
 };
 
-DEVICE_AND_API_INIT(pinmux_hsdk, CONFIG_PINMUX_NAME,
-			&pinmux_hsdk_init, NULL, NULL,
-			PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
-			&pinmux_hsdk_driver_api);
+DEVICE_AND_API_INIT(pinmux_hsdk, CONFIG_PINMUX_NAME, &pinmux_hsdk_init, NULL,
+		    NULL, PRE_KERNEL_1, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,
+		    &pinmux_hsdk_driver_api);

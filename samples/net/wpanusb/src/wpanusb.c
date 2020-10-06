@@ -19,13 +19,13 @@ LOG_MODULE_REGISTER(wpanusb);
 
 #include "wpanusb.h"
 
-#define WPANUSB_SUBCLASS	0
-#define WPANUSB_PROTOCOL	0
+#define WPANUSB_SUBCLASS 0
+#define WPANUSB_PROTOCOL 0
 
 /* Max packet size for endpoints */
-#define WPANUSB_BULK_EP_MPS		64
+#define WPANUSB_BULK_EP_MPS 64
 
-#define WPANUSB_IN_EP_IDX		0
+#define WPANUSB_IN_EP_IDX 0
 
 static struct ieee802154_radio_api *radio_api;
 static const struct device *ieee802154_dev;
@@ -41,27 +41,21 @@ uint8_t tx_buf[IEEE802154_MTU + 1 + 1];
 static K_THREAD_STACK_DEFINE(tx_stack, 1024);
 static struct k_thread tx_thread_data;
 
-#define INITIALIZER_IF(num_ep, iface_class)				\
-	{								\
-		.bLength = sizeof(struct usb_if_descriptor),		\
-		.bDescriptorType = USB_INTERFACE_DESC,			\
-		.bInterfaceNumber = 0,					\
-		.bAlternateSetting = 0,					\
-		.bNumEndpoints = num_ep,				\
-		.bInterfaceClass = iface_class,				\
-		.bInterfaceSubClass = 0,				\
-		.bInterfaceProtocol = 0,				\
-		.iInterface = 0,					\
+#define INITIALIZER_IF(num_ep, iface_class)                                   \
+	{                                                                     \
+		.bLength = sizeof(struct usb_if_descriptor),                  \
+		.bDescriptorType = USB_INTERFACE_DESC, .bInterfaceNumber = 0, \
+		.bAlternateSetting = 0, .bNumEndpoints = num_ep,              \
+		.bInterfaceClass = iface_class, .bInterfaceSubClass = 0,      \
+		.bInterfaceProtocol = 0, .iInterface = 0,                     \
 	}
 
-#define INITIALIZER_IF_EP(addr, attr, mps, interval)			\
-	{								\
-		.bLength = sizeof(struct usb_ep_descriptor),		\
-		.bDescriptorType = USB_ENDPOINT_DESC,			\
-		.bEndpointAddress = addr,				\
-		.bmAttributes = attr,					\
-		.wMaxPacketSize = sys_cpu_to_le16(mps),			\
-		.bInterval = interval,					\
+#define INITIALIZER_IF_EP(addr, attr, mps, interval)                           \
+	{                                                                      \
+		.bLength = sizeof(struct usb_ep_descriptor),                   \
+		.bDescriptorType = USB_ENDPOINT_DESC,                          \
+		.bEndpointAddress = addr, .bmAttributes = attr,                \
+		.wMaxPacketSize = sys_cpu_to_le16(mps), .bInterval = interval, \
 	}
 
 USBD_CLASS_DESCR_DEFINE(primary, 0) struct {
@@ -115,15 +109,15 @@ static void wpanusb_status_cb(struct usb_cfg_data *cfg,
 	default:
 		LOG_DBG("USB unknown state");
 		break;
-		}
+	}
 }
 
 /**
  * Vendor handler is executed in the ISR context, queue data for
  * later processing
  */
-static int wpanusb_vendor_handler(struct usb_setup_packet *setup,
-				  int32_t *len, uint8_t **data)
+static int wpanusb_vendor_handler(struct usb_setup_packet *setup, int32_t *len,
+				  uint8_t **data)
 {
 	struct net_pkt *pkt;
 
@@ -199,7 +193,6 @@ static int set_short_addr(void *data, int len)
 	struct set_short_addr *req = data;
 
 	LOG_DBG("len %u", len);
-
 
 	if (IEEE802154_HW_FILTER &
 	    radio_api->get_capabilities(ieee802154_dev)) {
@@ -339,8 +332,8 @@ static void init_tx_queue(void)
 
 	k_thread_create(&tx_thread_data, tx_stack,
 			K_THREAD_STACK_SIZEOF(tx_stack),
-			(k_thread_entry_t)tx_thread,
-			NULL, NULL, NULL, K_PRIO_COOP(8), 0, K_NO_WAIT);
+			(k_thread_entry_t)tx_thread, NULL, NULL, NULL,
+			K_PRIO_COOP(8), 0, K_NO_WAIT);
 }
 
 /**
@@ -405,7 +398,8 @@ void main(void)
 	int ret;
 	LOG_INF("Starting wpanusb");
 
-	ieee802154_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
+	ieee802154_dev =
+		device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
 	if (!ieee802154_dev) {
 		LOG_ERR("Cannot get IEEE802.15.4 device");
 		return;

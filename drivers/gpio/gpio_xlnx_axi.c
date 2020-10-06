@@ -13,13 +13,13 @@
 #include "gpio_utils.h"
 
 /* AXI GPIO v2 register offsetd (See Xilinx PG144 for details) */
-#define GPIO_DATA_OFFSET  0x0000
-#define GPIO_TRI_OFFSET   0x0004
+#define GPIO_DATA_OFFSET 0x0000
+#define GPIO_TRI_OFFSET 0x0004
 #define GPIO2_DATA_OFFSET 0x0008
-#define GPIO2_TRI_OFFSET  0x000c
-#define GIER_OFFSET       0x011c
-#define IPISR_OFFSET      0x0120
-#define IPIER_OFFSET      0x0128
+#define GPIO2_TRI_OFFSET 0x000c
+#define GIER_OFFSET 0x011c
+#define IPISR_OFFSET 0x0120
+#define IPIER_OFFSET 0x0128
 
 /* GIER bit definitions */
 #define GIER_GIE BIT(31)
@@ -70,8 +70,7 @@ static inline void gpio_xlnx_axi_write_tri(const struct device *dev,
 	sys_write32(val, config->base + GPIO_TRI_OFFSET);
 }
 
-static int gpio_xlnx_axi_pin_configure(const struct device *dev,
-				       gpio_pin_t pin,
+static int gpio_xlnx_axi_pin_configure(const struct device *dev, gpio_pin_t pin,
 				       gpio_flags_t flags)
 {
 	const struct gpio_xlnx_axi_config *config = dev->config;
@@ -210,8 +209,7 @@ static int gpio_xlnx_axi_pin_interrupt_configure(const struct device *dev,
 }
 
 static int gpio_xlnx_axi_manage_callback(const struct device *dev,
-					 struct gpio_callback *cb,
-					 bool set)
+					 struct gpio_callback *cb, bool set)
 {
 	ARG_UNUSED(dev);
 	ARG_UNUSED(cb);
@@ -247,28 +245,23 @@ static const struct gpio_driver_api gpio_xlnx_axi_driver_api = {
 	.get_pending_int = gpio_xlnx_axi_get_pending_int,
 };
 
-#define GPIO_XLNX_AXI_GPIO2_HAS_COMPAT_STATUS_OKAY(n)			\
-	UTIL_AND(							\
-		DT_NODE_HAS_COMPAT(DT_CHILD(DT_DRV_INST(n), gpio2),	\
-				   xlnx_xps_gpio_1_00_a_gpio2),		\
-		DT_NODE_HAS_STATUS(DT_CHILD(DT_DRV_INST(n), gpio2),	\
-				   okay)				\
-		)
+#define GPIO_XLNX_AXI_GPIO2_HAS_COMPAT_STATUS_OKAY(n)                \
+	UTIL_AND(DT_NODE_HAS_COMPAT(DT_CHILD(DT_DRV_INST(n), gpio2), \
+				    xlnx_xps_gpio_1_00_a_gpio2),     \
+		 DT_NODE_HAS_STATUS(DT_CHILD(DT_DRV_INST(n), gpio2), okay))
 
-#define GPIO_XLNX_AXI_GPIO2_COND_INIT(n)				\
-	IF_ENABLED(UTIL_AND(						\
-			DT_INST_PROP_OR(n, xlnx_is_dual, 1),		\
-			GPIO_XLNX_AXI_GPIO2_HAS_COMPAT_STATUS_OKAY(n)	\
-			),						\
-		(GPIO_XLNX_AXI_GPIO2_INIT(n)));
+#define GPIO_XLNX_AXI_GPIO2_COND_INIT(n)                                    \
+	IF_ENABLED(UTIL_AND(DT_INST_PROP_OR(n, xlnx_is_dual, 1),            \
+			    GPIO_XLNX_AXI_GPIO2_HAS_COMPAT_STATUS_OKAY(n)), \
+		   (GPIO_XLNX_AXI_GPIO2_INIT(n)));
 
-#define GPIO_XLNX_AXI_GPIO2_INIT(n)					\
-	static struct gpio_xlnx_axi_data gpio_xlnx_axi_##n##_2_data = {	\
-		.dout = DT_INST_PROP_OR(n, xlnx_dout_default_2, 0),	\
-		.tri = DT_INST_PROP_OR(n, xlnx_tri_default_2,		\
-				       GENMASK(MAX_GPIOS - 1, 0)),	\
-	};								\
-									\
+#define GPIO_XLNX_AXI_GPIO2_INIT(n)                                           \
+	static struct gpio_xlnx_axi_data gpio_xlnx_axi_##n##_2_data = {       \
+		.dout = DT_INST_PROP_OR(n, xlnx_dout_default_2, 0),           \
+		.tri = DT_INST_PROP_OR(n, xlnx_tri_default_2,                 \
+				       GENMASK(MAX_GPIOS - 1, 0)),            \
+	};                                                                    \
+                                                                              \
 	static const struct gpio_xlnx_axi_config			\
 		gpio_xlnx_axi_##n##_2_config = {			\
 		.common = {						\
@@ -279,24 +272,22 @@ static const struct gpio_driver_api gpio_xlnx_axi_driver_api = {
 		.base = DT_INST_REG_ADDR(n) + GPIO2_DATA_OFFSET,	\
 		.all_inputs = DT_INST_PROP_OR(n, xlnx_all_inputs2, 0),	\
 		.all_outputs = DT_INST_PROP_OR(n, xlnx_all_outputs2, 0),\
-	};								\
-									\
-	DEVICE_AND_API_INIT(gpio_xlnx_axi_##n##_2,			\
-			DT_LABEL(DT_CHILD(DT_DRV_INST(n), gpio2)),	\
-			&gpio_xlnx_axi_init,				\
-			&gpio_xlnx_axi_##n##_2_data,			\
-			&gpio_xlnx_axi_##n##_2_config,			\
-			POST_KERNEL,					\
-			CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,		\
-			&gpio_xlnx_axi_driver_api);
+	};                          \
+                                                                              \
+	DEVICE_AND_API_INIT(gpio_xlnx_axi_##n##_2,                            \
+			    DT_LABEL(DT_CHILD(DT_DRV_INST(n), gpio2)),        \
+			    &gpio_xlnx_axi_init, &gpio_xlnx_axi_##n##_2_data, \
+			    &gpio_xlnx_axi_##n##_2_config, POST_KERNEL,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,              \
+			    &gpio_xlnx_axi_driver_api);
 
-#define GPIO_XLNX_AXI_INIT(n)						\
-	static struct gpio_xlnx_axi_data gpio_xlnx_axi_##n##_data = {	\
-		.dout = DT_INST_PROP_OR(n, xlnx_dout_default, 0),	\
-		.tri = DT_INST_PROP_OR(n, xlnx_tri_default,		\
-				       GENMASK(MAX_GPIOS - 1, 0)),	\
-	};								\
-									\
+#define GPIO_XLNX_AXI_INIT(n)                                               \
+	static struct gpio_xlnx_axi_data gpio_xlnx_axi_##n##_data = {       \
+		.dout = DT_INST_PROP_OR(n, xlnx_dout_default, 0),           \
+		.tri = DT_INST_PROP_OR(n, xlnx_tri_default,                 \
+				       GENMASK(MAX_GPIOS - 1, 0)),          \
+	};                                                                  \
+                                                                            \
 	static const struct gpio_xlnx_axi_config			\
 		gpio_xlnx_axi_##n##_config = {				\
 		.common = {						\
@@ -307,15 +298,13 @@ static const struct gpio_driver_api gpio_xlnx_axi_driver_api = {
 		.base = DT_INST_REG_ADDR(n),				\
 		.all_inputs = DT_INST_PROP_OR(n, xlnx_all_inputs, 0),	\
 		.all_outputs = DT_INST_PROP_OR(n, xlnx_all_outputs, 0),	\
-	};								\
-									\
-	DEVICE_AND_API_INIT(gpio_xlnx_axi_##n, DT_INST_LABEL(n),	\
-			&gpio_xlnx_axi_init,				\
-			&gpio_xlnx_axi_##n##_data,			\
-			&gpio_xlnx_axi_##n##_config,			\
-			POST_KERNEL,					\
-			CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,		\
-			&gpio_xlnx_axi_driver_api);			\
+	};                        \
+                                                                            \
+	DEVICE_AND_API_INIT(gpio_xlnx_axi_##n, DT_INST_LABEL(n),            \
+			    &gpio_xlnx_axi_init, &gpio_xlnx_axi_##n##_data, \
+			    &gpio_xlnx_axi_##n##_config, POST_KERNEL,       \
+			    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,            \
+			    &gpio_xlnx_axi_driver_api);                     \
 	GPIO_XLNX_AXI_GPIO2_COND_INIT(n);
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_XLNX_AXI_INIT)

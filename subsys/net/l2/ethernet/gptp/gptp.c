@@ -88,10 +88,8 @@ static void gptp_compute_clock_identity(int port)
  * msg variable is always a const string that is not allocated from the stack.
  * If this changes at some point, then add log_strdup(msg) here.
  */
-#define PRINT_INFO(msg, hdr, pkt)				\
-	NET_DBG("Received %s seq %d pkt %p", msg,		\
-		ntohs(hdr->sequence_id), pkt)			\
-
+#define PRINT_INFO(msg, hdr, pkt) \
+	NET_DBG("Received %s seq %d pkt %p", msg, ntohs(hdr->sequence_id), pkt)
 
 static bool gptp_handle_critical_msg(struct net_if *iface, struct net_pkt *pkt)
 {
@@ -104,8 +102,7 @@ static bool gptp_handle_critical_msg(struct net_if *iface, struct net_pkt *pkt)
 		if (GPTP_CHECK_LEN(pkt, GPTP_PDELAY_REQ_LEN)) {
 			NET_WARN("Invalid length for %s packet "
 				 "should have %zd bytes but has %zd bytes",
-				 "PDELAY_REQ",
-				 GPTP_PDELAY_REQ_LEN,
+				 "PDELAY_REQ", GPTP_PDELAY_REQ_LEN,
 				 GPTP_PACKET_LEN(pkt));
 			break;
 		}
@@ -119,7 +116,7 @@ static bool gptp_handle_critical_msg(struct net_if *iface, struct net_pkt *pkt)
 		}
 
 		if (GPTP_PORT_STATE(port)->pdelay_resp.state !=
-						GPTP_PDELAY_RESP_NOT_ENABLED) {
+		    GPTP_PDELAY_RESP_NOT_ENABLED) {
 			gptp_handle_pdelay_req(port, pkt);
 		}
 
@@ -156,9 +153,7 @@ static void gptp_handle_msg(struct net_pkt *pkt)
 		if (GPTP_CHECK_LEN(pkt, GPTP_SYNC_LEN)) {
 			NET_WARN("Invalid length for %s packet "
 				 "should have %zd bytes but has %zd bytes",
-				 "SYNC",
-				 GPTP_SYNC_LEN,
-				 GPTP_PACKET_LEN(pkt));
+				 "SYNC", GPTP_SYNC_LEN, GPTP_PACKET_LEN(pkt));
 			GPTP_STATS_INC(port, rx_ptp_packet_discard_count);
 			break;
 		}
@@ -198,8 +193,7 @@ static void gptp_handle_msg(struct net_pkt *pkt)
 		if (GPTP_CHECK_LEN(pkt, GPTP_PDELAY_RESP_LEN)) {
 			NET_WARN("Invalid length for %s packet "
 				 "should have %zd bytes but has %zd bytes",
-				 "PDELAY_RESP",
-				 GPTP_PDELAY_RESP_LEN,
+				 "PDELAY_RESP", GPTP_PDELAY_RESP_LEN,
 				 GPTP_PACKET_LEN(pkt));
 			GPTP_STATS_INC(port, rx_ptp_packet_discard_count);
 			break;
@@ -223,8 +217,7 @@ static void gptp_handle_msg(struct net_pkt *pkt)
 		if (GPTP_CHECK_LEN(pkt, GPTP_FOLLOW_UP_LEN)) {
 			NET_WARN("Invalid length for %s packet "
 				 "should have %zd bytes but has %zd bytes",
-				 "FOLLOWUP",
-				 GPTP_FOLLOW_UP_LEN,
+				 "FOLLOWUP", GPTP_FOLLOW_UP_LEN,
 				 GPTP_PACKET_LEN(pkt));
 			GPTP_STATS_INC(port, rx_ptp_packet_discard_count);
 			break;
@@ -249,8 +242,7 @@ static void gptp_handle_msg(struct net_pkt *pkt)
 		if (GPTP_CHECK_LEN(pkt, GPTP_PDELAY_RESP_FUP_LEN)) {
 			NET_WARN("Invalid length for %s packet "
 				 "should have %zd bytes but has %zd bytes",
-				 "PDELAY_FOLLOWUP",
-				 GPTP_PDELAY_RESP_FUP_LEN,
+				 "PDELAY_FOLLOWUP", GPTP_PDELAY_RESP_FUP_LEN,
 				 GPTP_PACKET_LEN(pkt));
 			GPTP_STATS_INC(port, rx_ptp_packet_discard_count);
 			break;
@@ -276,8 +268,7 @@ static void gptp_handle_msg(struct net_pkt *pkt)
 		if (GPTP_ANNOUNCE_CHECK_LEN(pkt)) {
 			NET_WARN("Invalid length for %s packet "
 				 "should have %zd bytes but has %zd bytes",
-				 "ANNOUNCE",
-				 GPTP_ANNOUNCE_LEN(pkt),
+				 "ANNOUNCE", GPTP_ANNOUNCE_LEN(pkt),
 				 GPTP_PACKET_LEN(pkt));
 			GPTP_STATS_INC(port, rx_ptp_packet_discard_count);
 			break;
@@ -289,7 +280,7 @@ static void gptp_handle_msg(struct net_pkt *pkt)
 		bmca_data = GPTP_PORT_BMCA_DATA(port);
 
 		if (pa_rcv_state->rcvd_announce == false &&
-				bmca_data->rcvd_announce_ptr == NULL) {
+		    bmca_data->rcvd_announce_ptr == NULL) {
 			pa_rcv_state->rcvd_announce = true;
 			bmca_data->rcvd_announce_ptr = pkt;
 			net_pkt_ref(pkt);
@@ -302,8 +293,7 @@ static void gptp_handle_msg(struct net_pkt *pkt)
 		if (GPTP_CHECK_LEN(pkt, GPTP_SIGNALING_LEN)) {
 			NET_WARN("Invalid length for %s packet "
 				 "should have %zd bytes but has %zd bytes",
-				 "SIGNALING",
-				 GPTP_SIGNALING_LEN,
+				 "SIGNALING", GPTP_SIGNALING_LEN,
 				 GPTP_PACKET_LEN(pkt));
 			GPTP_STATS_INC(port, rx_ptp_packet_discard_count);
 			break;
@@ -331,7 +321,7 @@ enum net_verdict net_gptp_recv(struct net_if *iface, struct net_pkt *pkt)
 	struct gptp_hdr *hdr = GPTP_HDR(pkt);
 
 	if ((hdr->ptp_version != GPTP_VERSION) ||
-			(hdr->transport_specific != GPTP_TRANSPORT_802_1_AS)) {
+	    (hdr->transport_specific != GPTP_TRANSPORT_802_1_AS)) {
 		/* The stack only supports PTP V2 and transportSpecific set
 		 * to 1 with IEEE802.1AS-2011.
 		 */
@@ -376,8 +366,7 @@ static void gptp_init_clock_ds(void)
 
 	default_ds->gm_capable = IS_ENABLED(CONFIG_NET_GPTP_GM_CAPABLE);
 	default_ds->clk_quality.clock_class = GPTP_CLASS_OTHER;
-	default_ds->clk_quality.clock_accuracy =
-		CONFIG_NET_GPTP_CLOCK_ACCURACY;
+	default_ds->clk_quality.clock_accuracy = CONFIG_NET_GPTP_CLOCK_ACCURACY;
 	default_ds->clk_quality.offset_scaled_log_var =
 		GPTP_OFFSET_SCALED_LOG_VAR_UNKNOWN;
 
@@ -568,7 +557,6 @@ static void gptp_thread(void)
 	}
 }
 
-
 static void gptp_add_port(struct net_if *iface, void *user_data)
 {
 	int *num_ports = user_data;
@@ -583,8 +571,8 @@ static void gptp_add_port(struct net_if *iface, void *user_data)
 	    CONFIG_NET_GPTP_VLAN_TAG < NET_VLAN_TAG_UNSPEC) {
 		struct net_if *vlan_iface;
 
-		vlan_iface = net_eth_get_vlan_iface(iface,
-						    CONFIG_NET_GPTP_VLAN_TAG);
+		vlan_iface =
+			net_eth_get_vlan_iface(iface, CONFIG_NET_GPTP_VLAN_TAG);
 		if (vlan_iface != iface) {
 			return;
 		}
@@ -600,8 +588,7 @@ static void gptp_add_port(struct net_if *iface, void *user_data)
 	}
 }
 
-void gptp_set_time_itv(struct gptp_uscaled_ns *interval,
-		       uint16_t seconds,
+void gptp_set_time_itv(struct gptp_uscaled_ns *interval, uint16_t seconds,
 		       int8_t log_msg_interval)
 {
 	int i;
@@ -623,11 +610,10 @@ void gptp_set_time_itv(struct gptp_uscaled_ns *interval,
 		return;
 	}
 
-
 	/* NSEC_PER_SEC is between 2^30 and 2^31, seconds is less thant 2^16,
 	 * thus the computation will be less than 2^63.
 	 */
-	interval->low =	(seconds * (uint64_t)NSEC_PER_SEC) << 16;
+	interval->low = (seconds * (uint64_t)NSEC_PER_SEC) << 16;
 
 	if (log_msg_interval <= 0) {
 		interval->low >>= -log_msg_interval;
@@ -645,8 +631,8 @@ void gptp_set_time_itv(struct gptp_uscaled_ns *interval,
 			interval->low = UINT64_MAX;
 			interval->high = UINT32_MAX;
 		} else {
-			interval->high =
-				interval->low >> (64 - log_msg_interval);
+			interval->high = interval->low >>
+					 (64 - log_msg_interval);
 
 			/* << operator is undefined if the shift value is equal
 			 * to the number of bits in the left expression’s type
@@ -680,7 +666,6 @@ int32_t gptp_uscaled_ns_to_timer_ms(struct gptp_uscaled_ns *usns)
 	}
 
 	return (tmp & INT32_MAX);
-
 }
 
 static int32_t timer_get_remaining_and_stop(struct k_timer *timer)
@@ -698,11 +683,9 @@ static int32_t timer_get_remaining_and_stop(struct k_timer *timer)
 	return timer_value;
 }
 
-static int32_t update_itv(struct gptp_uscaled_ns *itv,
-			 int8_t *cur_log_itv,
-			 int8_t *ini_log_itv,
-			 int8_t new_log_itv,
-			 int8_t correction_log_itv)
+static int32_t update_itv(struct gptp_uscaled_ns *itv, int8_t *cur_log_itv,
+			  int8_t *ini_log_itv, int8_t new_log_itv,
+			  int8_t correction_log_itv)
 {
 	switch (new_log_itv) {
 	case GPTP_ITV_KEEP:
@@ -735,11 +718,9 @@ void gptp_update_pdelay_req_interval(int port, int8_t log_val)
 	old_itv = gptp_uscaled_ns_to_timer_ms(&port_ds->pdelay_req_itv);
 	new_itv = update_itv(&port_ds->pdelay_req_itv,
 			     &port_ds->cur_log_pdelay_req_itv,
-			     &port_ds->ini_log_pdelay_req_itv,
-			     log_val,
-			     0);
+			     &port_ds->ini_log_pdelay_req_itv, log_val, 0);
 
-	new_itv -= (old_itv-remaining);
+	new_itv -= (old_itv - remaining);
 	if (new_itv <= 0) {
 		new_itv = 1;
 	}
@@ -757,15 +738,12 @@ void gptp_update_sync_interval(int port, int8_t log_val)
 
 	port_ds = GPTP_PORT_DS(port);
 	state_pss_send = &GPTP_PORT_STATE(port)->pss_send;
-	remaining =
-		timer_get_remaining_and_stop(
-				&state_pss_send->half_sync_itv_timer);
+	remaining = timer_get_remaining_and_stop(
+		&state_pss_send->half_sync_itv_timer);
 	old_itv = gptp_uscaled_ns_to_timer_ms(&port_ds->half_sync_itv);
 	new_itv = update_itv(&port_ds->half_sync_itv,
 			     &port_ds->cur_log_half_sync_itv,
-			     &port_ds->ini_log_half_sync_itv,
-			     log_val,
-			     -1);
+			     &port_ds->ini_log_half_sync_itv, log_val, -1);
 	period = new_itv;
 
 	/* Get the time spent from the start of the timer. */
@@ -810,16 +788,14 @@ void gptp_update_announce_interval(int port, int8_t log_val)
 	state_ann = &GPTP_PORT_STATE(port)->pa_transmit;
 	bmca_data = GPTP_PORT_BMCA_DATA(port);
 	remaining = timer_get_remaining_and_stop(
-			&state_ann->ann_send_periodic_timer);
+		&state_ann->ann_send_periodic_timer);
 
 	old_itv = gptp_uscaled_ns_to_timer_ms(&bmca_data->announce_interval);
 	new_itv = update_itv(&bmca_data->announce_interval,
 			     &port_ds->cur_log_announce_itv,
-			     &port_ds->ini_log_announce_itv,
-			     log_val,
-			     0);
+			     &port_ds->ini_log_announce_itv, log_val, 0);
 
-	new_itv -= (old_itv-remaining);
+	new_itv -= (old_itv - remaining);
 	if (new_itv <= 0) {
 		new_itv = 1;
 	}
@@ -853,10 +829,7 @@ static void gptp_get_port(struct net_if *iface, void *user_data)
 
 void gptp_foreach_port(gptp_port_cb_t cb, void *user_data)
 {
-	struct port_user_data ud = {
-		.cb = cb,
-		.user_data = user_data
-	};
+	struct port_user_data ud = { .cb = cb, .user_data = user_data };
 
 	net_if_foreach(gptp_get_port, &ud);
 }
@@ -866,8 +839,7 @@ struct gptp_domain *gptp_get_domain(void)
 	return &gptp_domain;
 }
 
-int gptp_get_port_data(struct gptp_domain *domain,
-		       int port,
+int gptp_get_port_data(struct gptp_domain *domain, int port,
 		       struct gptp_port_ds **port_ds,
 		       struct gptp_port_param_ds **port_param_ds,
 		       struct gptp_port_states **port_state,
@@ -918,8 +890,8 @@ static void init_ports(void)
 
 	tid = k_thread_create(&gptp_thread_data, gptp_stack,
 			      K_KERNEL_STACK_SIZEOF(gptp_stack),
-			      (k_thread_entry_t)gptp_thread,
-			      NULL, NULL, NULL, K_PRIO_COOP(5), 0, K_NO_WAIT);
+			      (k_thread_entry_t)gptp_thread, NULL, NULL, NULL,
+			      K_PRIO_COOP(5), 0, K_NO_WAIT);
 	k_thread_name_set(&gptp_thread_data, "gptp");
 }
 
@@ -940,9 +912,7 @@ static void disable_port(int port)
 
 static void vlan_enabled(struct k_work *work)
 {
-	struct vlan_work *vlan = CONTAINER_OF(work,
-					      struct vlan_work,
-					      work);
+	struct vlan_work *vlan = CONTAINER_OF(work, struct vlan_work, work);
 	if (tid) {
 		int port;
 
@@ -962,9 +932,7 @@ static void vlan_enabled(struct k_work *work)
 
 static void vlan_disabled(struct k_work *work)
 {
-	struct vlan_work *vlan = CONTAINER_OF(work,
-					      struct vlan_work,
-					      work);
+	struct vlan_work *vlan = CONTAINER_OF(work, struct vlan_work, work);
 	int port;
 
 	port = gptp_get_port_number(vlan->iface);
@@ -977,8 +945,7 @@ static void vlan_disabled(struct k_work *work)
 }
 
 static void vlan_event_handler(struct net_mgmt_event_callback *cb,
-			       uint32_t mgmt_event,
-			       struct net_if *iface)
+			       uint32_t mgmt_event, struct net_if *iface)
 {
 	uint16_t tag;
 
@@ -1020,9 +987,10 @@ static void vlan_event_handler(struct net_mgmt_event_callback *cb,
 
 static void setup_vlan_events_listener(void)
 {
-	net_mgmt_init_event_callback(&vlan_cb, vlan_event_handler,
-				     NET_EVENT_ETHERNET_VLAN_TAG_ENABLED |
-				     NET_EVENT_ETHERNET_VLAN_TAG_DISABLED);
+	net_mgmt_init_event_callback(
+		&vlan_cb, vlan_event_handler,
+		NET_EVENT_ETHERNET_VLAN_TAG_ENABLED |
+			NET_EVENT_ETHERNET_VLAN_TAG_DISABLED);
 	net_mgmt_add_event_callback(&vlan_cb);
 }
 #endif /* CONFIG_NET_GPTP_VLAN */

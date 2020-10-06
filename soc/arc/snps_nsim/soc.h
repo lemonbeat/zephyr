@@ -17,18 +17,18 @@
 #include <sys/util.h>
 
 /* ARC EM Core IRQs */
-#define IRQ_TIMER0				16
-#define IRQ_TIMER1				17
+#define IRQ_TIMER0 16
+#define IRQ_TIMER1 17
 
-#define IRQ_SEC_TIMER0			20
+#define IRQ_SEC_TIMER0 20
 
 #ifndef _ASMLANGUAGE
 
 #include <sys/util.h>
 #include <random/rand32.h>
 
-#define INT_ENABLE_ARC				~(0x00000001 << 8)
-#define INT_ENABLE_ARC_BIT_POS			(8)
+#define INT_ENABLE_ARC ~(0x00000001 << 8)
+#define INT_ENABLE_ARC_BIT_POS (8)
 
 #endif /* !_ASMLANGUAGE */
 

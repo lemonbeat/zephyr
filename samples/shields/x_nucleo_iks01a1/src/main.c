@@ -25,10 +25,14 @@ void main(void)
 {
 	struct sensor_value temp, hum, press;
 	struct sensor_value magn_xyz[3], accel_xyz[3];
-	const struct device *hts221 = device_get_binding(DT_LABEL(DT_INST(0, st_hts221)));
-	const struct device *lis3mdl = device_get_binding(DT_LABEL(DT_INST(0, st_lis3mdl_magn)));
-	const struct device *lsm6ds0 = device_get_binding(DT_LABEL(DT_INST(0, st_lsm6ds0)));
-	const struct device *lps25hb = device_get_binding(DT_LABEL(DT_INST(0, st_lps25hb_press)));
+	const struct device *hts221 =
+		device_get_binding(DT_LABEL(DT_INST(0, st_hts221)));
+	const struct device *lis3mdl =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lis3mdl_magn)));
+	const struct device *lsm6ds0 =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lsm6ds0)));
+	const struct device *lps25hb =
+		device_get_binding(DT_LABEL(DT_INST(0, st_lps25hb_press)));
 #if defined(CONFIG_LIS3MDL_TRIGGER)
 	struct sensor_trigger trig;
 	int cnt = 1;
@@ -58,7 +62,6 @@ void main(void)
 #endif
 
 	while (1) {
-
 		/* Get sensor samples */
 
 		if (sensor_sample_fetch(hts221) < 0) {
@@ -108,19 +111,16 @@ void main(void)
 		       sensor_value_to_double(&press));
 
 		/* magneto data */
-		printf(
-		 "LIS3MDL: Magnetic field (gauss): x: %.1f, y: %.1f, z: %.1f\n",
-		 sensor_value_to_double(&magn_xyz[0]),
-		 sensor_value_to_double(&magn_xyz[1]),
-		 sensor_value_to_double(&magn_xyz[2]));
+		printf("LIS3MDL: Magnetic field (gauss): x: %.1f, y: %.1f, z: %.1f\n",
+		       sensor_value_to_double(&magn_xyz[0]),
+		       sensor_value_to_double(&magn_xyz[1]),
+		       sensor_value_to_double(&magn_xyz[2]));
 
 		/* acceleration */
-		printf(
-		   "LSM6DS0: Acceleration (m.s-2): x: %.1f, y: %.1f, z: %.1f\n",
-		   sensor_value_to_double(&accel_xyz[0]),
-		   sensor_value_to_double(&accel_xyz[1]),
-		   sensor_value_to_double(&accel_xyz[2]));
-
+		printf("LSM6DS0: Acceleration (m.s-2): x: %.1f, y: %.1f, z: %.1f\n",
+		       sensor_value_to_double(&accel_xyz[0]),
+		       sensor_value_to_double(&accel_xyz[1]),
+		       sensor_value_to_double(&accel_xyz[2]));
 
 #if defined(CONFIG_LIS3MDL_TRIGGER)
 		printk("%d:: lis3mdl trig %d\n", cnt, lis3mdl_trig_cnt);

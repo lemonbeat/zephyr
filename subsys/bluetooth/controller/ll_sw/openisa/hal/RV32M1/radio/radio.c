@@ -25,7 +25,7 @@
 #include "hal/cntr.h"
 #include "hal/ticker.h"
 #include "hal/swi.h"
-#include "fsl_cau3_ble.h"	/* must be after irq.h */
+#include "fsl_cau3_ble.h" /* must be after irq.h */
 
 #define BT_DBG_ENABLED IS_ENABLED(CONFIG_BT_DEBUG_HCI_DRIVER)
 #define LOG_MODULE_NAME bt_openisa_radio
@@ -38,28 +38,29 @@ static void *isr_cb_param;
 
 #define RADIO_AESCCM_HDR_MASK 0xE3 /* AES-CCM: NESN, SN, MD bits masked to 0 */
 #define RADIO_PDU_LEN_MAX (BIT(8) - 1)
-#define BYTES_TO_USEC(bytes, bits_per_usec)	\
-		((bytes) * 8 >> (__builtin_ffs(bits_per_usec) - 1))
+#define BYTES_TO_USEC(bytes, bits_per_usec) \
+	((bytes)*8 >> (__builtin_ffs(bits_per_usec) - 1))
 
 /* us values */
-#define MIN_CMD_TIME 10		/* Minimum interval for a delayed radio cmd */
+#define MIN_CMD_TIME 10 /* Minimum interval for a delayed radio cmd */
 #define RX_MARGIN 8
 #define TX_MARGIN 0
-#define RX_WTMRK 5		/* (AA + PDU header) - 1 */
-#define AA_OVHD_1MBPS 27	/* AA playback overhead for 1 Mbps PHY */
-#define AA_OVHD_2MBPS 10	/* AA playback overhead for 2 Mbps PHY */
-#define RX_OVHD 32		/* Rx overhead */
+#define RX_WTMRK 5 /* (AA + PDU header) - 1 */
+#define AA_OVHD_1MBPS 27 /* AA playback overhead for 1 Mbps PHY */
+#define AA_OVHD_2MBPS 10 /* AA playback overhead for 2 Mbps PHY */
+#define RX_OVHD 32 /* Rx overhead */
 
-#define PB_RX 544	/* half of PB (packet buffer) */
+#define PB_RX 544 /* half of PB (packet buffer) */
 
 /* The PDU in packet buffer starts after the Access Address which is 4 octets */
-#define PB_RX_PDU (PB_RX + 2)	/* Rx PDU offset (in halfwords) in PB */
-#define PB_TX_PDU 2		/* Tx PDU offset (in halfwords) in packet
+#define PB_RX_PDU (PB_RX + 2) /* Rx PDU offset (in halfwords) in PB */
+#define PB_TX_PDU \
+	2 /* Tx PDU offset (in halfwords) in packet
 				 * buffer
 				 */
 
 #define RADIO_ACTIVE_MASK 0x1fff
-#define RADIO_DISABLE_TMR 4		/* us */
+#define RADIO_DISABLE_TMR 4 /* us */
 
 /* Delay needed in order to enter Manual DSM.
  * Must be at least 4 ticks ahead of DSM_TIMER (from RM).
@@ -74,9 +75,10 @@ static void *isr_cb_param;
 #define DSM_EXIT_DELAY_TICKS 30
 
 /* Mask to determine the state of DSM machine */
-#define MAN_DSM_ON (RSIM_DSM_CONTROL_MAN_DEEP_SLEEP_STATUS_MASK \
-		| RSIM_DSM_CONTROL_DSM_MAN_READY_MASK \
-		| RSIM_DSM_CONTROL_MAN_SLEEP_REQUEST_MASK) \
+#define MAN_DSM_ON                                     \
+	(RSIM_DSM_CONTROL_MAN_DEEP_SLEEP_STATUS_MASK | \
+	 RSIM_DSM_CONTROL_DSM_MAN_READY_MASK |         \
+	 RSIM_DSM_CONTROL_MAN_SLEEP_REQUEST_MASK)
 
 static uint32_t dsm_ref; /* DSM reference counter */
 
@@ -90,21 +92,21 @@ static uint32_t delayed_hcto;
 static uint32_t rtc_start;
 static uint32_t rtc_diff_start_us;
 
-static uint32_t tmr_aa;		/* AA (Access Address) timestamp saved value */
-static uint32_t tmr_aa_save;	/* save AA timestamp */
-static uint32_t tmr_ready;		/* radio ready for Tx/Rx timestamp */
-static uint32_t tmr_end;		/* Tx/Rx end timestamp saved value */
-static uint32_t tmr_end_save;	/* save Tx/Rx end timestamp */
+static uint32_t tmr_aa; /* AA (Access Address) timestamp saved value */
+static uint32_t tmr_aa_save; /* save AA timestamp */
+static uint32_t tmr_ready; /* radio ready for Tx/Rx timestamp */
+static uint32_t tmr_end; /* Tx/Rx end timestamp saved value */
+static uint32_t tmr_end_save; /* save Tx/Rx end timestamp */
 static uint32_t tmr_tifs;
 
 static uint32_t rx_wu;
 static uint32_t tx_wu;
 
-static uint8_t phy_mode;		/* Current PHY mode (DR_1MBPS or DR_2MBPS) */
-static uint8_t bits_per_usec;	/* This saves the # of bits per usec,
+static uint8_t phy_mode; /* Current PHY mode (DR_1MBPS or DR_2MBPS) */
+static uint8_t bits_per_usec; /* This saves the # of bits per usec,
 				 * depending on the PHY mode
 				 */
-static uint8_t phy_aa_ovhd;	/* This saves the AA overhead, depending on the
+static uint8_t phy_aa_ovhd; /* This saves the AA overhead, depending on the
 				 * PHY mode
 				 */
 
@@ -122,9 +124,10 @@ static uint8_t *rx_pkt_ptr;
 static uint32_t payload_max_size;
 
 static uint8_t MALIGN(4) _pkt_empty[PDU_EM_LL_SIZE_MAX];
-static uint8_t MALIGN(4) _pkt_scratch[
-			((RADIO_PDU_LEN_MAX + 3) > PDU_AC_LL_SIZE_MAX) ?
-			(RADIO_PDU_LEN_MAX + 3) : PDU_AC_LL_SIZE_MAX];
+static uint8_t
+	MALIGN(4) _pkt_scratch[((RADIO_PDU_LEN_MAX + 3) > PDU_AC_LL_SIZE_MAX) ?
+					     (RADIO_PDU_LEN_MAX + 3) :
+					     PDU_AC_LL_SIZE_MAX];
 
 static int8_t rssi;
 
@@ -132,19 +135,19 @@ static struct {
 	union {
 		uint64_t counter;
 		uint8_t bytes[CAU3_AES_BLOCK_SIZE - 1 - 2];
-	} nonce;	/* used by the B0 format but not in-situ */
+	} nonce; /* used by the B0 format but not in-situ */
 	struct pdu_data *rx_pkt_out;
 	struct pdu_data *rx_pkt_in;
 	uint8_t auth_mic_valid;
 	uint8_t empty_pdu_rxed;
 } ctx_ccm;
 
-#define RPA_NO_IRK_MATCH 0xFF	/* No IRK match in AR table */
+#define RPA_NO_IRK_MATCH 0xFF /* No IRK match in AR table */
 
 static struct {
 	uint8_t ar_enable;
 	uint32_t irk_idx;
-} radio_ar_ctx = {0U, RPA_NO_IRK_MATCH};
+} radio_ar_ctx = { 0U, RPA_NO_IRK_MATCH };
 
 static void tmp_cb(void *param)
 {
@@ -171,7 +174,8 @@ static void get_isr_latency(void)
 	irq_disable(LL_RADIO_IRQn_2nd_lvl);
 }
 
-static uint32_t radio_tmr_start_hlp(uint8_t trx, uint32_t ticks_start, uint32_t remainder);
+static uint32_t radio_tmr_start_hlp(uint8_t trx, uint32_t ticks_start,
+				    uint32_t remainder);
 static void radio_tmr_hcto_configure_hlp(uint32_t hcto);
 static void radio_config_after_wake(void)
 {
@@ -182,7 +186,7 @@ static void radio_config_after_wake(void)
 
 	delayed_radio_start = 0;
 	radio_tmr_start_hlp(delayed_trx, delayed_ticks_start,
-				delayed_remainder);
+			    delayed_remainder);
 
 	if (delayed_radio_stop) {
 		delayed_radio_stop = 0;
@@ -210,9 +214,9 @@ static void ar_execute(void *pkt)
 
 		/* CAUv3 needs hash & prand in le format, right-justified */
 		status = CAU3_RPAtableSearch(CAU3, (*prand & 0xFFFFFF),
-					(*hash & 0xFFFFFF),
-					&radio_ar_ctx.irk_idx,
-					kCAU3_TaskDoneEvent);
+					     (*hash & 0xFFFFFF),
+					     &radio_ar_ctx.irk_idx,
+					     kCAU3_TaskDoneEvent);
 		if (status != kStatus_Success) {
 			radio_ar_ctx.irk_idx = RPA_NO_IRK_MATCH;
 			BT_ERR("CAUv3 RPA table search failed %d", status);
@@ -233,7 +237,7 @@ static void pkt_rx(void)
 
 	/* payload length */
 	len = (GENFSK->XCVR_CTRL & GENFSK_XCVR_CTRL_LENGTH_EXT_MASK) >>
-			GENFSK_XCVR_CTRL_LENGTH_EXT_SHIFT;
+	      GENFSK_XCVR_CTRL_LENGTH_EXT_SHIFT;
 
 	if (len > payload_max_size) {
 		/* Unexpected size */
@@ -287,7 +291,7 @@ static void pkt_rx(void)
 	/* Copy last byte */
 	if (len & 0x1) {
 		tmp = pb[len / 2];
-		rx_pkt_ptr[len - 1] =  ((uint8_t *)&tmp)[0];
+		rx_pkt_ptr[len - 1] = ((uint8_t *)&tmp)[0];
 	}
 
 #if defined(CONFIG_BT_CTLR_PRIVACY)
@@ -300,10 +304,10 @@ static void pkt_rx(void)
 	force_bad_crc = 0;
 }
 
-#define IRQ_MASK ~(GENFSK_IRQ_CTRL_T2_IRQ_MASK | \
-		   GENFSK_IRQ_CTRL_RX_WATERMARK_IRQ_MASK | \
-		   GENFSK_IRQ_CTRL_TX_IRQ_MASK | \
-		   GENFSK_IRQ_CTRL_WAKE_IRQ_MASK)
+#define IRQ_MASK                                  \
+	~(GENFSK_IRQ_CTRL_T2_IRQ_MASK |           \
+	  GENFSK_IRQ_CTRL_RX_WATERMARK_IRQ_MASK | \
+	  GENFSK_IRQ_CTRL_TX_IRQ_MASK | GENFSK_IRQ_CTRL_WAKE_IRQ_MASK)
 void isr_radio(void *arg)
 {
 	ARG_UNUSED(arg);
@@ -351,8 +355,8 @@ void isr_radio(void *arg)
 		GENFSK->XCVR_CTRL = GENFSK_XCVR_CTRL_SEQCMD(0xa);
 		GENFSK->T2_CMP &= ~GENFSK_T2_CMP_T2_CMP_EN_MASK;
 
-		GENFSK->IRQ_CTRL &= (IRQ_MASK |
-				     GENFSK_IRQ_CTRL_RX_WATERMARK_IRQ_MASK);
+		GENFSK->IRQ_CTRL &=
+			(IRQ_MASK | GENFSK_IRQ_CTRL_RX_WATERMARK_IRQ_MASK);
 		GENFSK->T1_CMP &= ~GENFSK_T1_CMP_T1_CMP_EN_MASK;
 
 		/* Fix reported AA time */
@@ -364,11 +368,11 @@ void isr_radio(void *arg)
 		/* Copy the PDU as it arrives, calculates Rx end */
 		pkt_rx();
 		if (tmr_end_save) {
-			tmr_end = isr_tmr_end;	/* from pkt_rx() */
+			tmr_end = isr_tmr_end; /* from pkt_rx() */
 		}
 		radio_trx = 1;
 		rssi = (GENFSK->XCVR_STS & GENFSK_XCVR_STS_RSSI_MASK) >>
-					GENFSK_XCVR_STS_RSSI_SHIFT;
+		       GENFSK_XCVR_STS_RSSI_SHIFT;
 	}
 
 	if (irq & GENFSK_IRQ_CTRL_T2_IRQ_MASK) {
@@ -412,8 +416,8 @@ void radio_isr_set(radio_isr_cb_t cb, void *param)
 #define DISABLE_HPMCAL
 
 #ifdef DISABLE_HPMCAL
-#define WU_OPTIM            26  /* 34: quite ok, 36 few ok */
-#define USE_FIXED_HPMCAL    563
+#define WU_OPTIM 26 /* 34: quite ok, 36 few ok */
+#define USE_FIXED_HPMCAL 563
 
 static void hpmcal_disable(void)
 {
@@ -446,37 +450,39 @@ static void hpmcal_disable(void)
 		while (GENFSK->XCVR_CTRL & GENFSK_XCVR_CTRL_XCVR_BUSY_MASK)
 			;
 
-		hpmcal_vals[i] = (XCVR_PLL_DIG->HPMCAL_CTRL &
-				XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_MASK) >>
-				XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_SHIFT;
+		hpmcal_vals[i] =
+			(XCVR_PLL_DIG->HPMCAL_CTRL &
+			 XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_MASK) >>
+			XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_SHIFT;
 	}
 
 	hpmcal = hpmcal_vals[20];
 #endif
 
-	XCVR_PLL_DIG->HPMCAL_CTRL = (XCVR_PLL_DIG->HPMCAL_CTRL &
-			~XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_MANUAL_MASK) +
-			XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_MANUAL(hpmcal) +
-			XCVR_PLL_DIG_HPMCAL_CTRL_HP_CAL_DISABLE_MASK +
-			0x00000000;
+	XCVR_PLL_DIG->HPMCAL_CTRL =
+		(XCVR_PLL_DIG->HPMCAL_CTRL &
+		 ~XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_MANUAL_MASK) +
+		XCVR_PLL_DIG_HPMCAL_CTRL_HPM_CAL_FACTOR_MANUAL(hpmcal) +
+		XCVR_PLL_DIG_HPMCAL_CTRL_HP_CAL_DISABLE_MASK + 0x00000000;
 
 	/* Move the sigma_delta_en signal to be 1us after pll_dig_en */
-	int pll_dig_en  = (XCVR_TSM->TIMING34 &
-			XCVR_TSM_TIMING34_PLL_DIG_EN_TX_HI_MASK) >>
-			XCVR_TSM_TIMING34_PLL_DIG_EN_TX_HI_SHIFT;
+	int pll_dig_en = (XCVR_TSM->TIMING34 &
+			  XCVR_TSM_TIMING34_PLL_DIG_EN_TX_HI_MASK) >>
+			 XCVR_TSM_TIMING34_PLL_DIG_EN_TX_HI_SHIFT;
 
-	XCVR_TSM->TIMING38 = (XCVR_TSM->TIMING38 &
-			~XCVR_TSM_TIMING38_SIGMA_DELTA_EN_TX_HI_MASK) +
-			XCVR_TSM_TIMING38_SIGMA_DELTA_EN_TX_HI(pll_dig_en+1);
-			/* sigma_delta_en */
+	XCVR_TSM->TIMING38 =
+		(XCVR_TSM->TIMING38 &
+		 ~XCVR_TSM_TIMING38_SIGMA_DELTA_EN_TX_HI_MASK) +
+		XCVR_TSM_TIMING38_SIGMA_DELTA_EN_TX_HI(pll_dig_en + 1);
+	/* sigma_delta_en */
 
-	XCVR_TSM->TIMING19   -= B1(WU_OPTIM); /* sy_pd_filter_charge_en */
-	XCVR_TSM->TIMING24   -= B1(WU_OPTIM); /* sy_divn_cal_en */
-	XCVR_TSM->TIMING13   -= B1(WU_OPTIM); /* sy_vco_autotune_en */
-	XCVR_TSM->TIMING17   -= B0(WU_OPTIM); /* sy_lo_tx_buf_en */
-	XCVR_TSM->TIMING26   -= B0(WU_OPTIM); /* tx_pa_en */
-	XCVR_TSM->TIMING35   -= B0(WU_OPTIM); /* tx_dig_en */
-	XCVR_TSM->TIMING14   -= B0(WU_OPTIM); /* sy_pd_cycle_slip_ld_ft_en */
+	XCVR_TSM->TIMING19 -= B1(WU_OPTIM); /* sy_pd_filter_charge_en */
+	XCVR_TSM->TIMING24 -= B1(WU_OPTIM); /* sy_divn_cal_en */
+	XCVR_TSM->TIMING13 -= B1(WU_OPTIM); /* sy_vco_autotune_en */
+	XCVR_TSM->TIMING17 -= B0(WU_OPTIM); /* sy_lo_tx_buf_en */
+	XCVR_TSM->TIMING26 -= B0(WU_OPTIM); /* tx_pa_en */
+	XCVR_TSM->TIMING35 -= B0(WU_OPTIM); /* tx_dig_en */
+	XCVR_TSM->TIMING14 -= B0(WU_OPTIM); /* sy_pd_cycle_slip_ld_ft_en */
 
 	XCVR_TSM->END_OF_SEQ -= B1(WU_OPTIM) + B0(WU_OPTIM);
 }
@@ -517,10 +523,12 @@ void radio_setup(void)
 	GENFSK->PB_PARTITION = GENFSK_PB_PARTITION_PB_PARTITION(PB_RX);
 
 	/* Get warmpup times. They are used in TIFS calculations */
-	rx_wu = (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK)
-				>> XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
-	tx_wu = (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_MASK)
-				>> XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_SHIFT;
+	rx_wu = (XCVR_TSM->END_OF_SEQ &
+		 XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >>
+		XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
+	tx_wu = (XCVR_TSM->END_OF_SEQ &
+		 XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_MASK) >>
+		XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_SHIFT;
 
 	/* IRQ config, clear pending interrupts */
 	irq_disable(LL_RADIO_IRQn_2nd_lvl);
@@ -638,11 +646,11 @@ void radio_freq_chan_set(uint32_t chan)
 	GENFSK->CHANNEL_NUM = GENFSK_CHANNEL_NUM_CHANNEL_NUM(40 + chan);
 }
 
-#define GENFSK_BLE_WHITEN_START			1	/* after H0 */
-#define GENFSK_BLE_WHITEN_END			1	/* at the end of CRC */
-#define GENFSK_BLE_WHITEN_POLY_TYPE		0	/* Galois poly type */
-#define GENFSK_BLE_WHITEN_SIZE			7	/* poly order */
-#define GENFSK_BLE_WHITEN_POLY			0x04
+#define GENFSK_BLE_WHITEN_START 1 /* after H0 */
+#define GENFSK_BLE_WHITEN_END 1 /* at the end of CRC */
+#define GENFSK_BLE_WHITEN_POLY_TYPE 0 /* Galois poly type */
+#define GENFSK_BLE_WHITEN_SIZE 7 /* poly order */
+#define GENFSK_BLE_WHITEN_POLY 0x04
 
 void radio_whiten_iv_set(uint32_t iv)
 {
@@ -659,17 +667,18 @@ void radio_whiten_iv_set(uint32_t iv)
 				GENFSK_WHITEN_CFG_WHITEN_INIT_MASK);
 
 	GENFSK->WHITEN_CFG |=
-	    GENFSK_WHITEN_CFG_WHITEN_START(GENFSK_BLE_WHITEN_START) |
-	    GENFSK_WHITEN_CFG_WHITEN_END(GENFSK_BLE_WHITEN_END) |
-	    GENFSK_WHITEN_CFG_WHITEN_B4_CRC(0) |
-	    GENFSK_WHITEN_CFG_WHITEN_POLY_TYPE(GENFSK_BLE_WHITEN_POLY_TYPE) |
-	    GENFSK_WHITEN_CFG_WHITEN_REF_IN(0) |
-	    GENFSK_WHITEN_CFG_WHITEN_PAYLOAD_REINIT(0) |
-	    GENFSK_WHITEN_CFG_WHITEN_SIZE(GENFSK_BLE_WHITEN_SIZE) |
-	    GENFSK_WHITEN_CFG_MANCHESTER_EN(0) |
-	    GENFSK_WHITEN_CFG_MANCHESTER_INV(0) |
-	    GENFSK_WHITEN_CFG_MANCHESTER_START(0) |
-	    GENFSK_WHITEN_CFG_WHITEN_INIT(iv | 0x40);
+		GENFSK_WHITEN_CFG_WHITEN_START(GENFSK_BLE_WHITEN_START) |
+		GENFSK_WHITEN_CFG_WHITEN_END(GENFSK_BLE_WHITEN_END) |
+		GENFSK_WHITEN_CFG_WHITEN_B4_CRC(0) |
+		GENFSK_WHITEN_CFG_WHITEN_POLY_TYPE(
+			GENFSK_BLE_WHITEN_POLY_TYPE) |
+		GENFSK_WHITEN_CFG_WHITEN_REF_IN(0) |
+		GENFSK_WHITEN_CFG_WHITEN_PAYLOAD_REINIT(0) |
+		GENFSK_WHITEN_CFG_WHITEN_SIZE(GENFSK_BLE_WHITEN_SIZE) |
+		GENFSK_WHITEN_CFG_MANCHESTER_EN(0) |
+		GENFSK_WHITEN_CFG_MANCHESTER_INV(0) |
+		GENFSK_WHITEN_CFG_MANCHESTER_START(0) |
+		GENFSK_WHITEN_CFG_WHITEN_INIT(iv | 0x40);
 
 	GENFSK->WHITEN_POLY =
 		GENFSK_WHITEN_POLY_WHITEN_POLY(GENFSK_BLE_WHITEN_POLY);
@@ -687,8 +696,8 @@ void radio_aa_set(uint8_t *aa)
 	GENFSK->NTW_ADR_CTRL |= GENFSK_NTW_ADR_CTRL_NTW_ADR0_SZ(3) |
 				GENFSK_NTW_ADR_CTRL_NTW_ADR_THR0(0);
 
-	GENFSK->NTW_ADR_CTRL |= (uint32_t) ((1 << 0) <<
-			GENFSK_NTW_ADR_CTRL_NTW_ADR_EN_SHIFT);
+	GENFSK->NTW_ADR_CTRL |=
+		(uint32_t)((1 << 0) << GENFSK_NTW_ADR_CTRL_NTW_ADR_EN_SHIFT);
 
 	/*
 	 * The Access Address must be written in the packet buffer
@@ -698,14 +707,15 @@ void radio_aa_set(uint8_t *aa)
 	GENFSK->PACKET_BUFFER[1] = (aa[3] << 8) + aa[2];
 }
 
-#define GENFSK_BLE_CRC_SZ	3 /* 3 bytes */
-#define GENFSK_BLE_PREAMBLE_SZ	0 /* 1 byte of preamble, depends on PHY type */
-#define GENFSK_BLE_LEN_BIT_ORD	0 /* LSB */
-#define GENFSK_BLE_SYNC_ADDR_SZ	3 /* 4 bytes, Access Address */
-#define GENFSK_BLE_LEN_ADJ_SZ	GENFSK_BLE_CRC_SZ /* adjust length with CRC
+#define GENFSK_BLE_CRC_SZ 3 /* 3 bytes */
+#define GENFSK_BLE_PREAMBLE_SZ 0 /* 1 byte of preamble, depends on PHY type */
+#define GENFSK_BLE_LEN_BIT_ORD 0 /* LSB */
+#define GENFSK_BLE_SYNC_ADDR_SZ 3 /* 4 bytes, Access Address */
+#define GENFSK_BLE_LEN_ADJ_SZ \
+	GENFSK_BLE_CRC_SZ /* adjust length with CRC
 						   * size
 						   */
-#define GENFSK_BLE_H0_SZ	8 /* 8 bits */
+#define GENFSK_BLE_H0_SZ 8 /* 8 bits */
 
 void radio_pkt_configure(uint8_t bits_len, uint8_t max_len, uint8_t flags)
 {
@@ -714,32 +724,30 @@ void radio_pkt_configure(uint8_t bits_len, uint8_t max_len, uint8_t flags)
 	payload_max_size = max_len;
 
 	GENFSK->XCVR_CFG &= ~GENFSK_XCVR_CFG_PREAMBLE_SZ_MASK;
-	GENFSK->XCVR_CFG |=
-		GENFSK_XCVR_CFG_PREAMBLE_SZ(GENFSK_BLE_PREAMBLE_SZ);
+	GENFSK->XCVR_CFG |= GENFSK_XCVR_CFG_PREAMBLE_SZ(GENFSK_BLE_PREAMBLE_SZ);
 
-	GENFSK->PACKET_CFG &= ~(GENFSK_PACKET_CFG_LENGTH_SZ_MASK |
-			GENFSK_PACKET_CFG_LENGTH_BIT_ORD_MASK |
-			GENFSK_PACKET_CFG_SYNC_ADDR_SZ_MASK |
-			GENFSK_PACKET_CFG_LENGTH_ADJ_MASK |
-			GENFSK_PACKET_CFG_H0_SZ_MASK |
-			GENFSK_PACKET_CFG_H1_SZ_MASK);
+	GENFSK->PACKET_CFG &=
+		~(GENFSK_PACKET_CFG_LENGTH_SZ_MASK |
+		  GENFSK_PACKET_CFG_LENGTH_BIT_ORD_MASK |
+		  GENFSK_PACKET_CFG_SYNC_ADDR_SZ_MASK |
+		  GENFSK_PACKET_CFG_LENGTH_ADJ_MASK |
+		  GENFSK_PACKET_CFG_H0_SZ_MASK | GENFSK_PACKET_CFG_H1_SZ_MASK);
 
-	GENFSK->PACKET_CFG |= GENFSK_PACKET_CFG_LENGTH_SZ(bits_len) |
+	GENFSK->PACKET_CFG |=
+		GENFSK_PACKET_CFG_LENGTH_SZ(bits_len) |
 		GENFSK_PACKET_CFG_LENGTH_BIT_ORD(GENFSK_BLE_LEN_BIT_ORD) |
 		GENFSK_PACKET_CFG_SYNC_ADDR_SZ(GENFSK_BLE_SYNC_ADDR_SZ) |
 		GENFSK_PACKET_CFG_LENGTH_ADJ(GENFSK_BLE_LEN_ADJ_SZ) |
 		GENFSK_PACKET_CFG_H0_SZ(GENFSK_BLE_H0_SZ) |
 		GENFSK_PACKET_CFG_H1_SZ((8 - bits_len));
 
-	GENFSK->H0_CFG &= ~(GENFSK_H0_CFG_H0_MASK_MASK |
-			    GENFSK_H0_CFG_H0_MATCH_MASK);
-	GENFSK->H0_CFG |= GENFSK_H0_CFG_H0_MASK(0) |
-			  GENFSK_H0_CFG_H0_MATCH(0);
+	GENFSK->H0_CFG &=
+		~(GENFSK_H0_CFG_H0_MASK_MASK | GENFSK_H0_CFG_H0_MATCH_MASK);
+	GENFSK->H0_CFG |= GENFSK_H0_CFG_H0_MASK(0) | GENFSK_H0_CFG_H0_MATCH(0);
 
-	GENFSK->H1_CFG &= ~(GENFSK_H1_CFG_H1_MASK_MASK |
-			    GENFSK_H1_CFG_H1_MATCH_MASK);
-	GENFSK->H1_CFG |= GENFSK_H1_CFG_H1_MASK(0) |
-			  GENFSK_H1_CFG_H1_MATCH(0);
+	GENFSK->H1_CFG &=
+		~(GENFSK_H1_CFG_H1_MASK_MASK | GENFSK_H1_CFG_H1_MATCH_MASK);
+	GENFSK->H1_CFG |= GENFSK_H1_CFG_H1_MASK(0) | GENFSK_H1_CFG_H1_MATCH(0);
 
 	/* set Rx watermak to AA + PDU header */
 	GENFSK->RX_WATERMARK = GENFSK_RX_WATERMARK_RX_WATERMARK(RX_WTMRK);
@@ -787,9 +795,8 @@ uint32_t radio_rx_chain_delay_get(uint8_t phy, uint8_t flags)
 	/* PDU header (assume 2 bytes) => 16us, depends on PHY type */
 	/* 2 * RX_OVHD = RX_WATERMARK_IRQ time - TIMESTAMP - isr_latency */
 	/* The rest is Rx margin that for now isn't well defined */
-	return BYTES_TO_USEC(2, bits_per_usec) + 2 * RX_OVHD +
-					RX_MARGIN + isr_latency +
-					RX_OVHD;
+	return BYTES_TO_USEC(2, bits_per_usec) + 2 * RX_OVHD + RX_MARGIN +
+	       isr_latency + RX_OVHD;
 }
 
 void radio_rx_enable(void)
@@ -869,8 +876,8 @@ uint32_t radio_is_idle(void)
 	return 1;
 }
 
-#define GENFSK_BLE_CRC_START_BYTE	4 /* After Access Address */
-#define GENFSK_BLE_CRC_BYTE_ORD		0 /* LSB */
+#define GENFSK_BLE_CRC_START_BYTE 4 /* After Access Address */
+#define GENFSK_BLE_CRC_BYTE_ORD 0 /* LSB */
 
 void radio_crc_configure(uint32_t polynomial, uint32_t iv)
 {
@@ -881,10 +888,10 @@ void radio_crc_configure(uint32_t polynomial, uint32_t iv)
 			     GENFSK_CRC_CFG_CRC_REF_IN_MASK |
 			     GENFSK_CRC_CFG_CRC_REF_OUT_MASK |
 			     GENFSK_CRC_CFG_CRC_BYTE_ORD_MASK);
-	GENFSK->CRC_CFG |= GENFSK_CRC_CFG_CRC_SZ(GENFSK_BLE_CRC_SZ) |
+	GENFSK->CRC_CFG |=
+		GENFSK_CRC_CFG_CRC_SZ(GENFSK_BLE_CRC_SZ) |
 		GENFSK_CRC_CFG_CRC_START_BYTE(GENFSK_BLE_CRC_START_BYTE) |
-		GENFSK_CRC_CFG_CRC_REF_IN(0) |
-		GENFSK_CRC_CFG_CRC_REF_OUT(0) |
+		GENFSK_CRC_CFG_CRC_REF_IN(0) | GENFSK_CRC_CFG_CRC_REF_OUT(0) |
 		GENFSK_CRC_CFG_CRC_BYTE_ORD(GENFSK_BLE_CRC_BYTE_ORD);
 
 	GENFSK->CRC_INIT = (iv << ((4U - GENFSK_BLE_CRC_SZ) << 3));
@@ -903,8 +910,9 @@ uint32_t radio_crc_is_valid(void)
 	if (force_bad_crc)
 		return 0;
 
-	uint32_t radio_crc = (GENFSK->XCVR_STS & GENFSK_XCVR_STS_CRC_VALID_MASK) >>
-						GENFSK_XCVR_STS_CRC_VALID_SHIFT;
+	uint32_t radio_crc =
+		(GENFSK->XCVR_STS & GENFSK_XCVR_STS_CRC_VALID_MASK) >>
+		GENFSK_XCVR_STS_CRC_VALID_SHIFT;
 	return radio_crc;
 }
 
@@ -927,8 +935,8 @@ void radio_switch_complete_and_rx(uint8_t phy_rx)
 	next_wu = rx_wu + RX_MARGIN;
 }
 
-void radio_switch_complete_and_tx(uint8_t phy_rx, uint8_t flags_rx, uint8_t phy_tx,
-				  uint8_t flags_tx)
+void radio_switch_complete_and_tx(uint8_t phy_rx, uint8_t flags_rx,
+				  uint8_t phy_tx, uint8_t flags_tx)
 {
 	/*  0b0010..TX Start @ T1 Timer Compare Match (EVENT_TMR = T1_CMP) */
 	next_radio_cmd = GENFSK_XCVR_CTRL_SEQCMD(0x2);
@@ -1017,7 +1025,8 @@ void radio_tmr_tifs_set(uint32_t tifs)
 }
 
 /* Start the radio after ticks_start (ticks) + remainder (us) time */
-static uint32_t radio_tmr_start_hlp(uint8_t trx, uint32_t ticks_start, uint32_t remainder)
+static uint32_t radio_tmr_start_hlp(uint8_t trx, uint32_t ticks_start,
+				    uint32_t remainder)
 {
 	uint32_t radio_start_now_cmd = 0;
 
@@ -1150,7 +1159,6 @@ static void radio_tmr_hcto_configure_hlp(uint32_t hcto)
 	GENFSK->XCVR_CTRL = GENFSK_XCVR_CTRL_SEQCMD(0x9);
 	GENFSK->T2_CMP = GENFSK_T2_CMP_T2_CMP(hcto) |
 			 GENFSK_T2_CMP_T2_CMP_EN(1);
-
 }
 
 /* Header completion time out */
@@ -1226,10 +1234,9 @@ void *radio_ccm_rx_pkt_set_ut(struct ccm *ccm, uint8_t phy, void *pkt)
 	 * :0x66:0xC6:0xC2:0x27:0x8E:0x3B:0x8E:0x05
 	 * :0x3E:0x7E:0xA3:0x26:0x52:0x1B:0xAD:0x99
 	 */
-	uint8_t key_local[16] __aligned(4) = {
-		0x99, 0xad, 0x1b, 0x52, 0x26, 0xa3, 0x7e, 0x3e,
-		0x05, 0x8e, 0x3b, 0x8e, 0x27, 0xc2, 0xc6, 0x66
-	};
+	uint8_t key_local[16] __aligned(
+		4) = { 0x99, 0xad, 0x1b, 0x52, 0x26, 0xa3, 0x7e, 0x3e,
+		       0x05, 0x8e, 0x3b, 0x8e, 0x27, 0xc2, 0xc6, 0x66 };
 	void *result;
 
 	/* ccm.key[16] is stored in MSO format, as retrieved from e function */
@@ -1272,10 +1279,8 @@ void *radio_ccm_rx_pkt_set(struct ccm *ccm, uint8_t phy, void *pkt)
 {
 	uint8_t key_local[16] __aligned(4);
 	status_t status;
-	cau3_handle_t handle = {
-			.keySlot = kCAU3_KeySlot2,
-			.taskDone = kCAU3_TaskDonePoll
-	};
+	cau3_handle_t handle = { .keySlot = kCAU3_KeySlot2,
+				 .taskDone = kCAU3_TaskDonePoll };
 	ARG_UNUSED(phy);
 
 	/* ccm.key[16] is stored in MSO format, as retrieved from e function */
@@ -1284,7 +1289,7 @@ void *radio_ccm_rx_pkt_set(struct ccm *ccm, uint8_t phy, void *pkt)
 	ctx_ccm.empty_pdu_rxed = 0;
 	ctx_ccm.rx_pkt_in = (struct pdu_data *)_pkt_scratch;
 	ctx_ccm.rx_pkt_out = (struct pdu_data *)pkt;
-	ctx_ccm.nonce.counter = ccm->counter;	/* LSO to MSO, counter is LE */
+	ctx_ccm.nonce.counter = ccm->counter; /* LSO to MSO, counter is LE */
 	/* The directionBit set to 1 for Data Physical Chan PDUs sent by
 	 * the master and set to 0 for Data Physical Chan PDUs sent by the slave
 	 */
@@ -1307,32 +1312,27 @@ void *radio_ccm_tx_pkt_set_ut(struct ccm *ccm, void *pkt)
 	 * 06 1b 17 00 37 36 35 34 33 32 31 30 41 42 43
 	 * 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f 50 51
 	 */
-	uint8_t data_in[29] = {
-		0x06, 0x1b, 0x17, 0x00, 0x37, 0x36, 0x35, 0x34,
-		0x33, 0x32, 0x31, 0x30, 0x41, 0x42, 0x43, 0x44,
-		0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c,
-		0x4d, 0x4e, 0x4f, 0x50, 0x51
-	};
+	uint8_t data_in[29] = { 0x06, 0x1b, 0x17, 0x00, 0x37, 0x36, 0x35, 0x34,
+				0x33, 0x32, 0x31, 0x30, 0x41, 0x42, 0x43, 0x44,
+				0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c,
+				0x4d, 0x4e, 0x4f, 0x50, 0x51 };
 	/* LL_DATA2:
 	 * 06 1f f3 88 81 e7 bd 94 c9 c3 69 b9 a6 68 46
 	 * dd 47 86 aa 8c 39 ce 54 0d 0d ae 3a dc df 89 b9 60 88
 	 */
-	uint8_t data_ref_out[33] = {
-		0x06, 0x1f, 0xf3, 0x88, 0x81, 0xe7, 0xbd, 0x94,
-		0xc9, 0xc3, 0x69, 0xb9, 0xa6, 0x68, 0x46, 0xdd,
-		0x47, 0x86, 0xaa, 0x8c, 0x39, 0xce, 0x54, 0x0d,
-		0x0d, 0xae, 0x3a, 0xdc, 0xdf,
-		0x89, 0xb9, 0x60, 0x88
-	};
+	uint8_t data_ref_out[33] = { 0x06, 0x1f, 0xf3, 0x88, 0x81, 0xe7, 0xbd,
+				     0x94, 0xc9, 0xc3, 0x69, 0xb9, 0xa6, 0x68,
+				     0x46, 0xdd, 0x47, 0x86, 0xaa, 0x8c, 0x39,
+				     0xce, 0x54, 0x0d, 0x0d, 0xae, 0x3a, 0xdc,
+				     0xdf, 0x89, 0xb9, 0x60, 0x88 };
 	/* Saved by LL as MSO to LSO in the ccm->key
 	 * SK (LSO to MSO)
 	 * :0x66:0xC6:0xC2:0x27:0x8E:0x3B:0x8E:0x05
 	 * :0x3E:0x7E:0xA3:0x26:0x52:0x1B:0xAD:0x99
 	 */
-	uint8_t key_local[16] __aligned(4) = {
-		0x99, 0xad, 0x1b, 0x52, 0x26, 0xa3, 0x7e, 0x3e,
-		0x05, 0x8e, 0x3b, 0x8e, 0x27, 0xc2, 0xc6, 0x66
-	};
+	uint8_t key_local[16] __aligned(
+		4) = { 0x99, 0xad, 0x1b, 0x52, 0x26, 0xa3, 0x7e, 0x3e,
+		       0x05, 0x8e, 0x3b, 0x8e, 0x27, 0xc2, 0xc6, 0x66 };
 	void *result;
 
 	/* ccm.key[16] is stored in MSO format, as retrieved from e function */
@@ -1370,10 +1370,8 @@ void *radio_ccm_tx_pkt_set(struct ccm *ccm, void *pkt)
 	uint8_t aad;
 	uint8_t *auth_mic;
 	status_t status;
-	cau3_handle_t handle = {
-			.keySlot = kCAU3_KeySlot2,
-			.taskDone = kCAU3_TaskDonePoll
-	};
+	cau3_handle_t handle = { .keySlot = kCAU3_KeySlot2,
+				 .taskDone = kCAU3_TaskDonePoll };
 
 	/* Test for Empty PDU and bypass encryption */
 	if (((struct pdu_data *)pkt)->len == 0) {
@@ -1382,7 +1380,7 @@ void *radio_ccm_tx_pkt_set(struct ccm *ccm, void *pkt)
 
 	/* ccm.key[16] is stored in MSO format, as retrieved from e function */
 	memcpy(key_local, ccm->key, sizeof(key_local));
-	ctx_ccm.nonce.counter = ccm->counter;	/* LSO to MSO, counter is LE */
+	ctx_ccm.nonce.counter = ccm->counter; /* LSO to MSO, counter is LE */
 	/* The directionBit set to 1 for Data Physical Chan PDUs sent by
 	 * the master and set to 0 for Data Physical Chan PDUs sent by the slave
 	 */
@@ -1399,11 +1397,11 @@ void *radio_ccm_tx_pkt_set(struct ccm *ccm, void *pkt)
 	auth_mic = _pkt_scratch + 2 + ((struct pdu_data *)pkt)->len;
 	aad = *(uint8_t *)pkt & RADIO_AESCCM_HDR_MASK;
 
-	status = CAU3_AES_CCM_EncryptTag(CAU3, &handle,
-				 (uint8_t *)pkt + 2, ((struct pdu_data *)pkt)->len,
-				 _pkt_scratch + 2,
-				 ctx_ccm.nonce.bytes, 13,
-				 &aad, 1, auth_mic, CAU3_BLE_MIC_SIZE);
+	status = CAU3_AES_CCM_EncryptTag(CAU3, &handle, (uint8_t *)pkt + 2,
+					 ((struct pdu_data *)pkt)->len,
+					 _pkt_scratch + 2, ctx_ccm.nonce.bytes,
+					 13, &aad, 1, auth_mic,
+					 CAU3_BLE_MIC_SIZE);
 	if (status != kStatus_Success) {
 		BT_ERR("CAUv3 AES CCM decrypt failed %d", status);
 		return 0;
@@ -1420,21 +1418,19 @@ uint32_t radio_ccm_is_done(void)
 	status_t status;
 	uint8_t *auth_mic;
 	uint8_t aad;
-	cau3_handle_t handle = {
-			.keySlot = kCAU3_KeySlot2,
-			.taskDone = kCAU3_TaskDonePoll
-	};
+	cau3_handle_t handle = { .keySlot = kCAU3_KeySlot2,
+				 .taskDone = kCAU3_TaskDonePoll };
 
 	if (ctx_ccm.rx_pkt_in->len > CAU3_BLE_MIC_SIZE) {
 		auth_mic = (uint8_t *)ctx_ccm.rx_pkt_in + 2 +
-				ctx_ccm.rx_pkt_in->len - CAU3_BLE_MIC_SIZE;
+			   ctx_ccm.rx_pkt_in->len - CAU3_BLE_MIC_SIZE;
 		aad = *(uint8_t *)ctx_ccm.rx_pkt_in & RADIO_AESCCM_HDR_MASK;
-		status = CAU3_AES_CCM_DecryptTag(CAU3, &handle,
-				(uint8_t *)ctx_ccm.rx_pkt_in + 2,
-				(uint8_t *)ctx_ccm.rx_pkt_out + 2,
-				ctx_ccm.rx_pkt_in->len - CAU3_BLE_MIC_SIZE,
-				ctx_ccm.nonce.bytes, 13,
-				&aad, 1, auth_mic, CAU3_BLE_MIC_SIZE);
+		status = CAU3_AES_CCM_DecryptTag(
+			CAU3, &handle, (uint8_t *)ctx_ccm.rx_pkt_in + 2,
+			(uint8_t *)ctx_ccm.rx_pkt_out + 2,
+			ctx_ccm.rx_pkt_in->len - CAU3_BLE_MIC_SIZE,
+			ctx_ccm.nonce.bytes, 13, &aad, 1, auth_mic,
+			CAU3_BLE_MIC_SIZE);
 		if (status != kStatus_Success) {
 			BT_ERR("CAUv3 AES CCM decrypt failed %d", status);
 			return 0;
@@ -1449,7 +1445,7 @@ uint32_t radio_ccm_is_done(void)
 		ctx_ccm.auth_mic_valid = 1;
 		ctx_ccm.empty_pdu_rxed = 1;
 	} else {
-		return 0;   /* length only allowed 0, not 1,2,3,4 */
+		return 0; /* length only allowed 0, not 1,2,3,4 */
 	}
 
 	return 1;
@@ -1518,7 +1514,6 @@ uint32_t radio_ar_has_match(void)
 
 uint32_t radio_sleep(void)
 {
-
 	if (dsm_ref == 0) {
 		return -EALREADY;
 	}
@@ -1536,7 +1531,6 @@ uint32_t radio_sleep(void)
 #error "Missing atomic operation in radio_sleep()"
 #endif
 	if (localref == 0) {
-
 		uint32_t status = (RSIM->DSM_CONTROL & MAN_DSM_ON);
 
 		if (status) {
@@ -1551,8 +1545,8 @@ uint32_t radio_sleep(void)
 		uint32_t dsm_timer = RSIM->DSM_TIMER;
 
 		/* Set Sleep time after DSM_ENTER_DELAY */
-		RSIM->MAN_SLEEP = RSIM_MAN_SLEEP_MAN_SLEEP_TIME(dsm_timer +
-				DSM_ENTER_DELAY_TICKS);
+		RSIM->MAN_SLEEP = RSIM_MAN_SLEEP_MAN_SLEEP_TIME(
+			dsm_timer + DSM_ENTER_DELAY_TICKS);
 
 		/* Set Wake time to max, we use DSM early exit */
 		RSIM->MAN_WAKE = RSIM_MAN_WAKE_MAN_WAKE_TIME(dsm_timer - 1);
@@ -1585,7 +1579,6 @@ uint32_t radio_wake(void)
 #error "Missing atomic operation in radio_wake()"
 #endif
 	if (localref == 1) {
-
 		uint32_t status = (RSIM->DSM_CONTROL & MAN_DSM_ON);
 
 		if (!status) {
@@ -1597,8 +1590,8 @@ uint32_t radio_wake(void)
 		uint32_t dsm_timer = RSIM->DSM_TIMER;
 
 		/* Set Wake time after DSM_ENTER_DELAY */
-		RSIM->MAN_WAKE = RSIM_MAN_WAKE_MAN_WAKE_TIME(dsm_timer +
-				DSM_EXIT_DELAY_TICKS);
+		RSIM->MAN_WAKE = RSIM_MAN_WAKE_MAN_WAKE_TIME(
+			dsm_timer + DSM_EXIT_DELAY_TICKS);
 	}
 
 	return 0;

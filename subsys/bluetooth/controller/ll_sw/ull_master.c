@@ -57,15 +57,16 @@ static inline void conn_release(struct ll_scan_set *scan);
 
 #if defined(CONFIG_BT_CTLR_ADV_EXT)
 uint8_t ll_create_connection(uint16_t scan_interval, uint16_t scan_window,
-			  uint8_t filter_policy, uint8_t peer_addr_type,
-			  uint8_t const *const peer_addr, uint8_t own_addr_type,
-			  uint16_t interval, uint16_t latency, uint16_t timeout,
-			  uint8_t phy)
+			     uint8_t filter_policy, uint8_t peer_addr_type,
+			     uint8_t const *const peer_addr,
+			     uint8_t own_addr_type, uint16_t interval,
+			     uint16_t latency, uint16_t timeout, uint8_t phy)
 #else /* !CONFIG_BT_CTLR_ADV_EXT */
 uint8_t ll_create_connection(uint16_t scan_interval, uint16_t scan_window,
-			  uint8_t filter_policy, uint8_t peer_addr_type,
-			  uint8_t const *const peer_addr, uint8_t own_addr_type,
-			  uint16_t interval, uint16_t latency, uint16_t timeout)
+			     uint8_t filter_policy, uint8_t peer_addr_type,
+			     uint8_t const *const peer_addr,
+			     uint8_t own_addr_type, uint16_t interval,
+			     uint16_t latency, uint16_t timeout)
 #endif /* !CONFIG_BT_CTLR_ADV_EXT */
 {
 	struct lll_conn *conn_lll;
@@ -219,12 +220,11 @@ uint8_t ll_create_connection(uint16_t scan_interval, uint16_t scan_window,
 	conn->connect_expire = 6U;
 	conn->supervision_expire = 0U;
 	conn_interval_us = (uint32_t)interval * 1250U;
-	conn->supervision_reload = RADIO_CONN_EVENTS(timeout * 10000U,
-							 conn_interval_us);
+	conn->supervision_reload =
+		RADIO_CONN_EVENTS(timeout * 10000U, conn_interval_us);
 
 	conn->procedure_expire = 0U;
-	conn->procedure_reload = RADIO_CONN_EVENTS(40000000,
-						       conn_interval_us);
+	conn->procedure_reload = RADIO_CONN_EVENTS(40000000, conn_interval_us);
 
 #if defined(CONFIG_BT_CTLR_LE_PING)
 	conn->apto_expire = 0U;
@@ -235,9 +235,10 @@ uint8_t ll_create_connection(uint16_t scan_interval, uint16_t scan_window,
 	 * before 30s timeout
 	 * TODO: "peer listens to" is greater than 30s due to latency
 	 */
-	conn->appto_reload = (conn->apto_reload > (conn_lll->latency + 6)) ?
-			     (conn->apto_reload - (conn_lll->latency + 6)) :
-			     conn->apto_reload;
+	conn->appto_reload =
+		(conn->apto_reload > (conn_lll->latency + 6)) ?
+			      (conn->apto_reload - (conn_lll->latency + 6)) :
+			      conn->apto_reload;
 #endif /* CONFIG_BT_CTLR_LE_PING */
 
 	conn->common.fex_valid = 0U;
@@ -290,8 +291,8 @@ uint8_t ll_create_connection(uint16_t scan_interval, uint16_t scan_window,
 	conn->phy_pref_flags = 0U;
 #endif /* CONFIG_BT_CTLR_PHY */
 
-	conn->tx_head = conn->tx_ctrl = conn->tx_ctrl_last =
-	conn->tx_data = conn->tx_data_last = 0;
+	conn->tx_head = conn->tx_ctrl = conn->tx_ctrl_last = conn->tx_data =
+		conn->tx_data_last = 0;
 
 	lll->conn = conn_lll;
 
@@ -306,13 +307,12 @@ conn_is_valid:
 	lll->rpa_gen = 0;
 	if (!filter_policy && ull_filter_lll_rl_enabled()) {
 		/* Look up the resolving list */
-		lll->rl_idx = ull_filter_rl_find(peer_addr_type, peer_addr,
-						 NULL);
+		lll->rl_idx =
+			ull_filter_rl_find(peer_addr_type, peer_addr, NULL);
 	}
 
 	if (own_addr_type == BT_ADDR_LE_PUBLIC_ID ||
 	    own_addr_type == BT_ADDR_LE_RANDOM_ID) {
-
 		/* Generate RPAs if required */
 		ull_filter_rpa_update(false);
 		own_addr_type &= 0x1;
@@ -353,8 +353,7 @@ uint8_t ll_connect_enable(uint8_t is_coded_included)
 		return BT_HCI_ERR_HW_FAILURE;
 	}
 
-	if (!is_coded_included ||
-	    (scan->lll.phy & BIT(0))) {
+	if (!is_coded_included || (scan->lll.phy & BIT(0))) {
 		err = ull_scan_enable(scan);
 		if (err) {
 			return err;
@@ -455,7 +454,7 @@ uint8_t ll_chm_update(uint8_t const *const chm)
 
 #if defined(CONFIG_BT_CTLR_LE_ENC)
 uint8_t ll_enc_req_send(uint16_t handle, uint8_t const *const rand,
-		     uint8_t const *const ediv, uint8_t const *const ltk)
+			uint8_t const *const ediv, uint8_t const *const ltk)
 {
 	struct ll_conn *conn;
 	struct node_tx *tx;
@@ -488,8 +487,7 @@ uint8_t ll_enc_req_send(uint16_t handle, uint8_t const *const rand,
 				sizeof(struct pdu_data_llctrl_enc_req);
 			pdu_data_tx->llctrl.opcode =
 				PDU_DATA_LLCTRL_TYPE_ENC_REQ;
-			enc_req = (void *)
-				&pdu_data_tx->llctrl.enc_req;
+			enc_req = (void *)&pdu_data_tx->llctrl.enc_req;
 			memcpy(enc_req->rand, rand, sizeof(enc_req->rand));
 			enc_req->ediv[0] = ediv[0];
 			enc_req->ediv[1] = ediv[1];
@@ -503,8 +501,8 @@ uint8_t ll_enc_req_send(uint16_t handle, uint8_t const *const rand,
 			conn->llcp_enc.ediv[1] = ediv[1];
 
 			pdu_data_tx->ll_id = PDU_DATA_LLID_CTRL;
-			pdu_data_tx->len = offsetof(struct pdu_data_llctrl,
-						    enc_req);
+			pdu_data_tx->len =
+				offsetof(struct pdu_data_llctrl, enc_req);
 			pdu_data_tx->llctrl.opcode =
 				PDU_DATA_LLCTRL_TYPE_PAUSE_ENC_REQ;
 		} else {
@@ -626,9 +624,9 @@ void ull_master_setup(memq_link_t *link, struct node_rx_hdr *rx,
 
 		if (chan_sel) {
 			uint16_t aa_ls = ((uint16_t)lll->access_addr[1] << 8) |
-				      lll->access_addr[0];
+					 lll->access_addr[0];
 			uint16_t aa_ms = ((uint16_t)lll->access_addr[3] << 8) |
-				      lll->access_addr[2];
+					 lll->access_addr[2];
 
 			lll->data_chan_sel = 1;
 			lll->data_chan_id = aa_ms ^ aa_ls;
@@ -643,8 +641,8 @@ void ull_master_setup(memq_link_t *link, struct node_rx_hdr *rx,
 	ll_rx_sched();
 
 #if defined(CONFIG_BT_CTLR_PHY)
-	ready_delay_us = lll_radio_tx_ready_delay_get(lll->phy_tx,
-						      lll->phy_flags);
+	ready_delay_us =
+		lll_radio_tx_ready_delay_get(lll->phy_tx, lll->phy_flags);
 #else
 	ready_delay_us = lll_radio_tx_ready_delay_get(0, 0);
 #endif
@@ -655,10 +653,9 @@ void ull_master_setup(memq_link_t *link, struct node_rx_hdr *rx,
 		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_XTAL_US);
 	conn->evt.ticks_preempt_to_start =
 		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_PREEMPT_MIN_US);
-	conn->evt.ticks_slot =
-		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_START_US +
-				       ready_delay_us +
-				       328 + EVENT_IFS_US + 328);
+	conn->evt.ticks_slot = HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_START_US +
+						      ready_delay_us + 328 +
+						      EVENT_IFS_US + 328);
 
 	ticks_slot_offset = MAX(conn->evt.ticks_active_to_start,
 				conn->evt.ticks_xtal_to_start);
@@ -685,8 +682,8 @@ void ull_master_setup(memq_link_t *link, struct node_rx_hdr *rx,
 	/* Stop Scanner */
 	ticker_id_scan = TICKER_ID_SCAN_BASE + ull_scan_handle_get(scan);
 	ticker_status = ticker_stop(TICKER_INSTANCE_ID_CTLR,
-				    TICKER_USER_ID_ULL_HIGH,
-				    ticker_id_scan, ticker_op_stop_scan_cb,
+				    TICKER_USER_ID_ULL_HIGH, ticker_id_scan,
+				    ticker_op_stop_scan_cb,
 				    (void *)(uint32_t)ticker_id_scan);
 	ticker_op_stop_scan_cb(ticker_status, (void *)(uint32_t)ticker_id_scan);
 
@@ -699,18 +696,14 @@ void ull_master_setup(memq_link_t *link, struct node_rx_hdr *rx,
 
 	/* Start master */
 	ticker_id_conn = TICKER_ID_CONN_BASE + ll_conn_handle_get(conn);
-	ticker_status = ticker_start(TICKER_INSTANCE_ID_CTLR,
-				     TICKER_USER_ID_ULL_HIGH,
-				     ticker_id_conn,
-				     ftr->ticks_anchor - ticks_slot_offset,
-				     HAL_TICKER_US_TO_TICKS(conn_offset_us),
-				     HAL_TICKER_US_TO_TICKS(conn_interval_us),
-				     HAL_TICKER_REMAINDER(conn_interval_us),
-				     TICKER_NULL_LAZY,
-				     (conn->evt.ticks_slot +
-				      ticks_slot_overhead),
-				     ull_master_ticker_cb, conn, ticker_op_cb,
-				     (void *)__LINE__);
+	ticker_status = ticker_start(
+		TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_ULL_HIGH,
+		ticker_id_conn, ftr->ticks_anchor - ticks_slot_offset,
+		HAL_TICKER_US_TO_TICKS(conn_offset_us),
+		HAL_TICKER_US_TO_TICKS(conn_interval_us),
+		HAL_TICKER_REMAINDER(conn_interval_us), TICKER_NULL_LAZY,
+		(conn->evt.ticks_slot + ticks_slot_overhead),
+		ull_master_ticker_cb, conn, ticker_op_cb, (void *)__LINE__);
 	LL_ASSERT((ticker_status == TICKER_STATUS_SUCCESS) ||
 		  (ticker_status == TICKER_STATUS_BUSY));
 
@@ -722,11 +715,11 @@ void ull_master_setup(memq_link_t *link, struct node_rx_hdr *rx,
 #endif
 }
 
-void ull_master_ticker_cb(uint32_t ticks_at_expire, uint32_t remainder, uint16_t lazy,
-			  void *param)
+void ull_master_ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
+			  uint16_t lazy, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, lll_master_prepare};
+	static struct mayfly mfy = { 0, 0, &link, NULL, lll_master_prepare };
 	static struct lll_prepare_param p;
 	struct ll_conn *conn;
 	uint32_t err;
@@ -776,8 +769,8 @@ void ull_master_ticker_cb(uint32_t ticks_at_expire, uint32_t remainder, uint16_t
 	mfy.param = &p;
 
 	/* Kick LLL prepare */
-	err = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL,
-			     0, &mfy);
+	err = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL, 0,
+			     &mfy);
 	LL_ASSERT(!err);
 
 	/* De-mux remaining tx nodes from FIFO */

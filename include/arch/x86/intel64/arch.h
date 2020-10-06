@@ -22,9 +22,9 @@ static ALWAYS_INLINE unsigned int arch_irq_lock(void)
 {
 	unsigned long key;
 
-	__asm__ volatile ("pushfq; cli; popq %0" : "=g" (key) : : "memory");
+	__asm__ volatile("pushfq; cli; popq %0" : "=g"(key) : : "memory");
 
-	return (unsigned int) key;
+	return (unsigned int)key;
 }
 
 /*
@@ -82,14 +82,14 @@ struct x86_ssf {
 	unsigned long rsp;
 };
 
-#define ARCH_EXCEPT(reason_p) do { \
-	__asm__ volatile( \
-		"movq %[reason], %%rax\n\t" \
-		"int $32\n\t" \
-		: \
-		: [reason] "i" (reason_p)); \
-	CODE_UNREACHABLE; \
-} while (false)
+#define ARCH_EXCEPT(reason_p)                                \
+	do {                                                 \
+		__asm__ volatile("movq %[reason], %%rax\n\t" \
+				 "int $32\n\t"               \
+				 :                           \
+				 : [reason] "i"(reason_p));  \
+		CODE_UNREACHABLE;                            \
+	} while (false)
 
 #endif /* _ASMLANGUAGE */
 
@@ -97,9 +97,9 @@ struct x86_ssf {
  * All Intel64 interrupts are dynamically connected.
  */
 
-#define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p) \
-	arch_irq_connect_dynamic(irq_p, priority_p,			\
-				 (void (*)(const void *))isr_p,		\
-				 isr_param_p, flags_p)
+#define ARCH_IRQ_CONNECT(irq_p, priority_p, isr_p, isr_param_p, flags_p)     \
+	arch_irq_connect_dynamic(irq_p, priority_p,                          \
+				 (void (*)(const void *))isr_p, isr_param_p, \
+				 flags_p)
 
 #endif /* ZEPHYR_INCLUDE_ARCH_X86_INTEL64_ARCH_H_ */

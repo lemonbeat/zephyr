@@ -22,10 +22,10 @@ K_APPMEM_PARTITION_DEFINE(app_part);
 static struct k_mem_domain app_domain;
 static struct k_mem_partition *app_parts[] = {
 #ifdef Z_LIBC_PARTITION_EXISTS
-		/* C library globals, stack canary storage, etc */
-		&z_libc_partition,
+	/* C library globals, stack canary storage, etc */
+	&z_libc_partition,
 #endif
-		&app_part
+	&app_part
 };
 #endif /* CONFIG_USERSPACE */
 
@@ -71,10 +71,9 @@ static uint32_t timestamp_freq(void)
  */
 static int log_source_id_get(const char *name)
 {
-
 	for (int i = 0; i < log_src_cnt_get(CONFIG_LOG_DOMAIN_ID); i++) {
-		if (strcmp(log_source_name_get(CONFIG_LOG_DOMAIN_ID, i), name)
-		    == 0) {
+		if (strcmp(log_source_name_get(CONFIG_LOG_DOMAIN_ID, i),
+			   name) == 0) {
 			return i;
 		}
 	}
@@ -97,7 +96,7 @@ static void module_logging_showcase(void)
 
 	if (IS_ENABLED(CONFIG_LOG_RUNTIME_FILTERING)) {
 		printk("Disabling logging in the %s module\n",
-					sample_module_name_get());
+		       sample_module_name_get());
 
 		log_filter_set(NULL, 0,
 			       log_source_id_get(sample_module_name_get()),
@@ -131,10 +130,10 @@ static void instance_logging_showcase(void)
 
 	if (IS_ENABLED(CONFIG_LOG_RUNTIME_FILTERING)) {
 		printk("Changing filter to warning on %s instance.\n",
-								INST1_NAME);
+		       INST1_NAME);
 
-		log_filter_set(NULL, 0,
-			       log_source_id_get(INST1_NAME), LOG_LEVEL_WRN);
+		log_filter_set(NULL, 0, log_source_id_get(INST1_NAME),
+			       LOG_LEVEL_WRN);
 
 		sample_instance_inline_call(&inst1);
 		sample_instance_call(&inst1);
@@ -143,12 +142,10 @@ static void instance_logging_showcase(void)
 
 		printk("Disabling logging on both instances.\n");
 
-		log_filter_set(NULL, 0,
-			       log_source_id_get(INST1_NAME),
+		log_filter_set(NULL, 0, log_source_id_get(INST1_NAME),
 			       LOG_LEVEL_NONE);
 
-		log_filter_set(NULL, 0,
-			       log_source_id_get(INST2_NAME),
+		log_filter_set(NULL, 0, log_source_id_get(INST2_NAME),
 			       LOG_LEVEL_NONE);
 
 		sample_instance_inline_call(&inst1);
@@ -212,9 +209,9 @@ static void performance_showcase(void)
 
 	volatile uint32_t current_timestamp;
 	volatile uint32_t start_timestamp;
-	uint32_t limit = COND_CODE_1(CONFIG_LOG_IMMEDIATE,
-			     (LOG_IMMEDIATE_TEST_MESSAGES_LIMIT),
-			     (CONFIG_LOG_BUFFER_SIZE / sizeof(struct log_msg)));
+	uint32_t limit = COND_CODE_1(
+		CONFIG_LOG_IMMEDIATE, (LOG_IMMEDIATE_TEST_MESSAGES_LIMIT),
+		(CONFIG_LOG_BUFFER_SIZE / sizeof(struct log_msg)));
 	uint32_t per_sec;
 	uint32_t cnt = 0U;
 	uint32_t window = 2U;
@@ -227,9 +224,9 @@ static void performance_showcase(void)
 		start_timestamp = timestamp_get();
 
 		while (start_timestamp == timestamp_get()) {
-	#if (CONFIG_ARCH_POSIX)
+#if (CONFIG_ARCH_POSIX)
 			k_busy_wait(100);
-	#endif
+#endif
 		}
 
 		start_timestamp = timestamp_get();
@@ -238,9 +235,9 @@ static void performance_showcase(void)
 			LOG_INF("performance test - log message %d", cnt);
 			cnt++;
 			current_timestamp = timestamp_get();
-	#if (CONFIG_ARCH_POSIX)
+#if (CONFIG_ARCH_POSIX)
 			k_busy_wait(100);
-	#endif
+#endif
 		} while (current_timestamp < (start_timestamp + window));
 
 		wait_on_log_flushed();
@@ -283,7 +280,7 @@ static void log_demo_thread(void *p1, void *p2, void *p3)
 	k_sleep(K_MSEC(100));
 
 	printk("\n\t---=< RUNNING LOGGER DEMO FROM %s THREAD >=---\n\n",
-		(usermode) ? "USER" : "KERNEL");
+	       (usermode) ? "USER" : "KERNEL");
 
 	module_logging_showcase();
 
@@ -297,12 +294,10 @@ static void log_demo_thread(void *p1, void *p2, void *p3)
 		       CONFIG_LOG_DEFAULT_LEVEL);
 
 	log_filter_set(NULL, CONFIG_LOG_DOMAIN_ID,
-		       log_source_id_get(INST1_NAME),
-		       CONFIG_LOG_DEFAULT_LEVEL);
+		       log_source_id_get(INST1_NAME), CONFIG_LOG_DEFAULT_LEVEL);
 
 	log_filter_set(NULL, CONFIG_LOG_DOMAIN_ID,
-		       log_source_id_get(INST2_NAME),
-		       CONFIG_LOG_DEFAULT_LEVEL);
+		       log_source_id_get(INST2_NAME), CONFIG_LOG_DEFAULT_LEVEL);
 
 	wait_on_log_flushed();
 
@@ -319,7 +314,6 @@ static void log_demo_thread(void *p1, void *p2, void *p3)
 		 */
 		performance_showcase();
 		wait_on_log_flushed();
-
 	}
 
 	external_log_system_showcase();
@@ -340,6 +334,5 @@ static void log_demo_supervisor(void *p1, void *p2, void *p3)
 #endif
 }
 
-K_THREAD_DEFINE(log_demo_thread_id, STACKSIZE, log_demo_supervisor,
-		NULL, NULL, NULL,
-		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 1);
+K_THREAD_DEFINE(log_demo_thread_id, STACKSIZE, log_demo_supervisor, NULL, NULL,
+		NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0, 1);

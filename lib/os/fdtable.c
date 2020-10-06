@@ -36,21 +36,15 @@ static struct fd_entry fdtable[CONFIG_POSIX_MAX_FDS] = {
 	/*
 	 * Predefine entries for stdin/stdout/stderr.
 	 */
-	{
-		/* STDIN */
-		.vtable = &stdinout_fd_op_vtable,
-		.refcount = ATOMIC_INIT(1)
-	},
-	{
-		/* STDOUT */
-		.vtable = &stdinout_fd_op_vtable,
-		.refcount = ATOMIC_INIT(1)
-	},
-	{
-		/* STDERR */
-		.vtable = &stdinout_fd_op_vtable,
-		.refcount = ATOMIC_INIT(1)
-	},
+	{ /* STDIN */
+	  .vtable = &stdinout_fd_op_vtable,
+	  .refcount = ATOMIC_INIT(1) },
+	{ /* STDOUT */
+	  .vtable = &stdinout_fd_op_vtable,
+	  .refcount = ATOMIC_INIT(1) },
+	{ /* STDERR */
+	  .vtable = &stdinout_fd_op_vtable,
+	  .refcount = ATOMIC_INIT(1) },
 #endif
 };
 
@@ -248,7 +242,8 @@ int fsync(int fd)
 		return -1;
 	}
 
-	return z_fdtable_call_ioctl(fdtable[fd].vtable, fdtable[fd].obj, ZFD_IOCTL_FSYNC);
+	return z_fdtable_call_ioctl(fdtable[fd].vtable, fdtable[fd].obj,
+				    ZFD_IOCTL_FSYNC);
 }
 
 off_t lseek(int fd, off_t offset, int whence)
@@ -257,8 +252,8 @@ off_t lseek(int fd, off_t offset, int whence)
 		return -1;
 	}
 
-	return z_fdtable_call_ioctl(fdtable[fd].vtable, fdtable[fd].obj, ZFD_IOCTL_LSEEK,
-			  offset, whence);
+	return z_fdtable_call_ioctl(fdtable[fd].vtable, fdtable[fd].obj,
+				    ZFD_IOCTL_LSEEK, offset, whence);
 }
 FUNC_ALIAS(lseek, _lseek, off_t);
 
@@ -330,7 +325,6 @@ static int stdinout_ioctl_vmeth(void *obj, unsigned int request, va_list args)
 	errno = EINVAL;
 	return -1;
 }
-
 
 static const struct fd_op_vtable stdinout_fd_op_vtable = {
 	.read = stdinout_read_vmeth,

@@ -27,8 +27,8 @@ void main(void)
 		sensor_channel_get(dev, SENSOR_CHAN_HUMIDITY, &humidity);
 		sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP, &temperature);
 		printk("Temperature: %d.%06d C; Humidity: %d.%06d%%\n",
-			temperature.val1, temperature.val2,
-			humidity.val1, humidity.val2);
+		       temperature.val1, temperature.val2, humidity.val1,
+		       humidity.val2);
 
 		k_sleep(K_MSEC(1000));
 	}

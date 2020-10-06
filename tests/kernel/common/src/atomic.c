@@ -34,7 +34,7 @@ void test_atomic(void)
 	atomic_val_t oldvalue;
 	void *ptr_value, *old_ptr_value;
 
-	ATOMIC_DEFINE(flag_bits, NUM_FLAG_BITS) = {0};
+	ATOMIC_DEFINE(flag_bits, NUM_FLAG_BITS) = { 0 };
 
 	target = 4;
 	value = 5;
@@ -114,33 +114,33 @@ void test_atomic(void)
 
 	/* atomic_or() */
 	target = 0xFF00;
-	value  = 0x0F0F;
+	value = 0x0F0F;
 	zassert_true((atomic_or(&target, value) == 0xFF00), "atomic_or");
 	zassert_true((target == 0xFF0F), "atomic_or");
 
 	/* atomic_xor() */
 	target = 0xFF00;
-	value  = 0x0F0F;
+	value = 0x0F0F;
 	zassert_true((atomic_xor(&target, value) == 0xFF00), "atomic_xor");
 	zassert_true((target == 0xF00F), "atomic_xor");
 
 	/* atomic_and() */
 	target = 0xFF00;
-	value  = 0x0F0F;
+	value = 0x0F0F;
 	zassert_true((atomic_and(&target, value) == 0xFF00), "atomic_and");
 	zassert_true((target == 0x0F00), "atomic_and");
 
-
 	/* atomic_nand() */
 	target = 0xFF00;
-	value  = 0x0F0F;
+	value = 0x0F0F;
 	zassert_true((atomic_nand(&target, value) == 0xFF00), "atomic_nand");
 	zassert_true((target == 0xFFFFF0FF), "atomic_nand");
 
 	/* atomic_test_bit() */
 	for (i = 0; i < 32; i++) {
 		target = 0x0F0F0F0F;
-		zassert_true(!!(atomic_test_bit(&target, i) == !!(target & (1 << i))),
+		zassert_true(!!(atomic_test_bit(&target, i) ==
+				!!(target & (1 << i))),
 			     "atomic_test_bit");
 	}
 
@@ -148,18 +148,22 @@ void test_atomic(void)
 	for (i = 0; i < 32; i++) {
 		orig = 0x0F0F0F0F;
 		target = orig;
-		zassert_true(!!(atomic_test_and_clear_bit(&target, i)) == !!(orig & (1 << i)),
+		zassert_true(!!(atomic_test_and_clear_bit(&target, i)) ==
+				     !!(orig & (1 << i)),
 			     "atomic_test_and_clear_bit");
-		zassert_true(target == (orig & ~(1 << i)), "atomic_test_and_clear_bit");
+		zassert_true(target == (orig & ~(1 << i)),
+			     "atomic_test_and_clear_bit");
 	}
 
 	/* atomic_test_and_set_bit() */
 	for (i = 0; i < 32; i++) {
 		orig = 0x0F0F0F0F;
 		target = orig;
-		zassert_true(!!(atomic_test_and_set_bit(&target, i)) == !!(orig & (1 << i)),
+		zassert_true(!!(atomic_test_and_set_bit(&target, i)) ==
+				     !!(orig & (1 << i)),
 			     "atomic_test_and_set_bit");
-		zassert_true(target == (orig | (1 << i)), "atomic_test_and_set_bit");
+		zassert_true(target == (orig | (1 << i)),
+			     "atomic_test_and_set_bit");
 	}
 
 	/* atomic_clear_bit() */
@@ -197,10 +201,12 @@ void test_atomic(void)
 	/* ATOMIC_DEFINE */
 	for (i = 0; i < NUM_FLAG_BITS; i++) {
 		atomic_set_bit(flag_bits, i);
-		zassert_true(!!atomic_test_bit(flag_bits, i) == !!(1),
+		zassert_true(
+			!!atomic_test_bit(flag_bits, i) == !!(1),
 			"Failed to set a single bit in an array of atomic variables");
 		atomic_clear_bit(flag_bits, i);
-		zassert_true(!!atomic_test_bit(flag_bits, i) == !!(0),
+		zassert_true(
+			!!atomic_test_bit(flag_bits, i) == !!(0),
 			"Failed to clear a single bit in an array of atomic variables");
 	}
 }

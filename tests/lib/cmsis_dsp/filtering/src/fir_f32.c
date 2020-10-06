@@ -13,8 +13,8 @@
 
 #include "fir_f32.pat"
 
-#define SNR_ERROR_THRESH	((float32_t)120)
-#define REL_ERROR_THRESH	(3.0e-5)
+#define SNR_ERROR_THRESH ((float32_t)120)
+#define REL_ERROR_THRESH (3.0e-5)
 
 static void test_arm_fir_f32(void)
 {
@@ -68,13 +68,13 @@ static void test_arm_fir_f32(void)
 	}
 
 	/* Validate output */
-	zassert_true(
-		test_snr_error_f32(length, output_buf, ref, SNR_ERROR_THRESH),
-		ASSERT_MSG_SNR_LIMIT_EXCEED);
+	zassert_true(test_snr_error_f32(length, output_buf, ref,
+					SNR_ERROR_THRESH),
+		     ASSERT_MSG_SNR_LIMIT_EXCEED);
 
-	zassert_true(
-		test_rel_error_f32(length, output_buf, ref, REL_ERROR_THRESH),
-		ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
+	zassert_true(test_rel_error_f32(length, output_buf, ref,
+					REL_ERROR_THRESH),
+		     ASSERT_MSG_REL_ERROR_LIMIT_EXCEED);
 
 	/* Free buffers */
 	free(state);
@@ -83,9 +83,7 @@ static void test_arm_fir_f32(void)
 
 void test_filtering_fir_f32(void)
 {
-	ztest_test_suite(filtering_fir_f32,
-		ztest_unit_test(test_arm_fir_f32)
-		);
+	ztest_test_suite(filtering_fir_f32, ztest_unit_test(test_arm_fir_f32));
 
 	ztest_run_test_suite(filtering_fir_f32);
 }

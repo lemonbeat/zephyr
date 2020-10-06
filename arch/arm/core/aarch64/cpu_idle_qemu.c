@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
- /**
+/**
   * @file
   *
   * @brief Workaround aarch64 QEMU not responding to host OS signals
@@ -21,7 +21,8 @@ void arch_cpu_idle(void)
 	 */
 
 	__asm__ volatile("msr daifclr, %0\n\t"
-			 : : "i" (DAIFSET_IRQ)
+			 :
+			 : "i"(DAIFSET_IRQ)
 			 : "memory", "cc");
 }
 

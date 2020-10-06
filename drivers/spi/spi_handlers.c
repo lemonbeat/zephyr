@@ -11,9 +11,8 @@
 /* This assumes that bufs and buf_copy are copies from the values passed
  * as syscall arguments.
  */
-static struct spi_buf_set *copy_and_check(struct spi_buf_set *bufs,
-					  struct spi_buf *buf_copy,
-					  int writable)
+static struct spi_buf_set *
+copy_and_check(struct spi_buf_set *bufs, struct spi_buf *buf_copy, int writable)
 {
 	size_t i;
 
@@ -23,15 +22,13 @@ static struct spi_buf_set *copy_and_check(struct spi_buf_set *bufs,
 	}
 
 	/* Validate the array of struct spi_buf instances */
-	Z_OOPS(Z_SYSCALL_MEMORY_ARRAY_READ(bufs->buffers,
-					   bufs->count,
+	Z_OOPS(Z_SYSCALL_MEMORY_ARRAY_READ(bufs->buffers, bufs->count,
 					   sizeof(struct spi_buf)));
 
 	/* Not worried about overflow here: _SYSCALL_MEMORY_ARRAY_READ()
 	 * takes care of it.
 	 */
-	bufs->buffers = memcpy(buf_copy,
-			       bufs->buffers,
+	bufs->buffers = memcpy(buf_copy, bufs->buffers,
 			       bufs->count * sizeof(struct spi_buf));
 
 	for (i = 0; i < bufs->count; i++) {
@@ -114,8 +111,7 @@ static inline int z_vrfy_spi_transceive(const struct device *dev,
 	}
 
 	return copy_bufs_and_transceive((const struct device *)dev,
-					&config_copy,
-					&tx_bufs_copy,
+					&config_copy, &tx_bufs_copy,
 					&rx_bufs_copy);
 }
 #include <syscalls/spi_transceive_mrsh.c>

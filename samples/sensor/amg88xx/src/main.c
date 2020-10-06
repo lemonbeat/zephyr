@@ -24,7 +24,6 @@ static void trigger_handler(const struct device *dev,
 }
 #endif
 
-
 void print_buffer(void *ptr, size_t l)
 {
 	struct sensor_value *tv = ptr;
@@ -51,8 +50,8 @@ void print_buffer(void *ptr, size_t l)
 void main(void)
 {
 	int ret;
-	const struct device *dev = device_get_binding(
-				DT_LABEL(DT_INST(0, panasonic_amg88xx)));
+	const struct device *dev =
+		device_get_binding(DT_LABEL(DT_INST(0, panasonic_amg88xx)));
 
 	if (dev == NULL) {
 		printk("Could not get AMG88XX device\n");

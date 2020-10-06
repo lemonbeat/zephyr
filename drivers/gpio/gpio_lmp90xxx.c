@@ -34,8 +34,8 @@ struct gpio_lmp90xxx_data {
 	const struct device *parent;
 };
 
-static int gpio_lmp90xxx_config(const struct device *dev,
-				gpio_pin_t pin, gpio_flags_t flags)
+static int gpio_lmp90xxx_config(const struct device *dev, gpio_pin_t pin,
+				gpio_flags_t flags)
 {
 	struct gpio_lmp90xxx_data *data = dev->data;
 	int err = 0;
@@ -162,27 +162,23 @@ static const struct gpio_driver_api gpio_lmp90xxx_api = {
 };
 
 BUILD_ASSERT(CONFIG_GPIO_LMP90XXX_INIT_PRIORITY >
-	     CONFIG_ADC_LMP90XXX_INIT_PRIORITY,
+		     CONFIG_ADC_LMP90XXX_INIT_PRIORITY,
 	     "LMP90xxx GPIO driver must be initialized after LMP90xxx ADC "
 	     "driver");
 
-#define GPIO_LMP90XXX_DEVICE(id)					\
-	static const struct gpio_lmp90xxx_config gpio_lmp90xxx_##id##_cfg = {\
-		.common = {                                             \
-			.port_pin_mask =                                \
-				 GPIO_PORT_PIN_MASK_FROM_DT_INST(id)	\
-		},                                                      \
-		.parent_dev_name = DT_INST_BUS_LABEL(id),		\
-	};								\
-									\
-	static struct gpio_lmp90xxx_data gpio_lmp90xxx_##id##_data;	\
-									\
-	DEVICE_AND_API_INIT(gpio_lmp90xxx_##id,				\
-			    DT_INST_LABEL(id),				\
-			    &gpio_lmp90xxx_init,			\
-			    &gpio_lmp90xxx_##id##_data,			\
-			    &gpio_lmp90xxx_##id##_cfg, POST_KERNEL,	\
-			    CONFIG_GPIO_LMP90XXX_INIT_PRIORITY,		\
+#define GPIO_LMP90XXX_DEVICE(id)                                              \
+	static const struct gpio_lmp90xxx_config gpio_lmp90xxx_##id##_cfg = { \
+		.common = { .port_pin_mask =                                  \
+				    GPIO_PORT_PIN_MASK_FROM_DT_INST(id) },    \
+		.parent_dev_name = DT_INST_BUS_LABEL(id),                     \
+	};                                                                    \
+                                                                              \
+	static struct gpio_lmp90xxx_data gpio_lmp90xxx_##id##_data;           \
+                                                                              \
+	DEVICE_AND_API_INIT(gpio_lmp90xxx_##id, DT_INST_LABEL(id),            \
+			    &gpio_lmp90xxx_init, &gpio_lmp90xxx_##id##_data,  \
+			    &gpio_lmp90xxx_##id##_cfg, POST_KERNEL,           \
+			    CONFIG_GPIO_LMP90XXX_INIT_PRIORITY,               \
 			    &gpio_lmp90xxx_api);
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_LMP90XXX_DEVICE)

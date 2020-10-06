@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <drivers/i2c.h>
 #include <dt-bindings/i2c/i2c.h>
 #include <nrfx_twim.h>
@@ -13,7 +12,7 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(i2c_nrfx_twim, CONFIG_I2C_LOG_LEVEL);
 
-#define I2C_TRANSFER_TIMEOUT_MSEC		K_MSEC(500)
+#define I2C_TRANSFER_TIMEOUT_MSEC K_MSEC(500)
 
 struct i2c_nrfx_twim_data {
 	struct k_sem transfer_sync;
@@ -37,23 +36,21 @@ static inline struct i2c_nrfx_twim_data *get_dev_data(const struct device *dev)
 	return dev->data;
 }
 
-static inline
-const struct i2c_nrfx_twim_config *get_dev_config(const struct device *dev)
+static inline const struct i2c_nrfx_twim_config *
+get_dev_config(const struct device *dev)
 {
 	return dev->config;
 }
 
 static int i2c_nrfx_twim_transfer(const struct device *dev,
-				  struct i2c_msg *msgs,
-				  uint8_t num_msgs, uint16_t addr)
+				  struct i2c_msg *msgs, uint8_t num_msgs,
+				  uint16_t addr)
 {
 	int ret = 0;
 	uint32_t concat_len = 0;
 	uint8_t *concat_buf = get_dev_data(dev)->concat_buf;
 	uint16_t concat_buf_size = get_dev_data(dev)->concat_buf_size;
-	nrfx_twim_xfer_desc_t cur_xfer = {
-		.address = addr
-	};
+	nrfx_twim_xfer_desc_t cur_xfer = { .address = addr };
 
 	k_sem_take(&(get_dev_data(dev)->transfer_sync), K_FOREVER);
 
@@ -73,12 +70,12 @@ static int i2c_nrfx_twim_transfer(const struct device *dev,
 		 * the next one doesn't start a bus transaction, and the
 		 * direction of the next fragment is the same as this one.
 		 */
-		bool concat_next = (concat_buf_size > 0)
-			&& ((i + 1) < num_msgs)
-			&& !(msgs[i].flags & I2C_MSG_STOP)
-			&& !(msgs[i + 1].flags & I2C_MSG_RESTART)
-			&& ((msgs[i].flags & I2C_MSG_READ)
-			    == (msgs[i + 1].flags & I2C_MSG_READ));
+		bool concat_next = (concat_buf_size > 0) &&
+				   ((i + 1) < num_msgs) &&
+				   !(msgs[i].flags & I2C_MSG_STOP) &&
+				   !(msgs[i + 1].flags & I2C_MSG_RESTART) &&
+				   ((msgs[i].flags & I2C_MSG_READ) ==
+				    (msgs[i + 1].flags & I2C_MSG_READ));
 
 		/* If we need to concatenate the next message, or we've
 		 * already committed to concatenate this message, add it to
@@ -87,13 +84,13 @@ static int i2c_nrfx_twim_transfer(const struct device *dev,
 		if (concat_next || (concat_len != 0)) {
 			if ((concat_len + msgs[i].len) > concat_buf_size) {
 				LOG_ERR("concat-buf overflow: %u + %u > %u",
-					concat_len, msgs[i].len, concat_buf_size);
+					concat_len, msgs[i].len,
+					concat_buf_size);
 				ret = -ENOSPC;
 				break;
 			}
 			if (!(msgs[i].flags & I2C_MSG_READ)) {
-				memcpy(concat_buf + concat_len,
-				       msgs[i].buf,
+				memcpy(concat_buf + concat_len, msgs[i].buf,
 				       msgs[i].len);
 			}
 			concat_len += msgs[i].len;
@@ -111,12 +108,14 @@ static int i2c_nrfx_twim_transfer(const struct device *dev,
 			cur_xfer.primary_length = concat_len;
 		}
 		cur_xfer.type = (msgs[i].flags & I2C_MSG_READ) ?
-			NRFX_TWIM_XFER_RX : NRFX_TWIM_XFER_TX;
+					      NRFX_TWIM_XFER_RX :
+					      NRFX_TWIM_XFER_TX;
 
-		nrfx_err_t res = nrfx_twim_xfer(&get_dev_config(dev)->twim,
-						&cur_xfer,
-						(msgs[i].flags & I2C_MSG_STOP) ?
-						 0 : NRFX_TWIM_FLAG_TX_NO_STOP);
+		nrfx_err_t res =
+			nrfx_twim_xfer(&get_dev_config(dev)->twim, &cur_xfer,
+				       (msgs[i].flags & I2C_MSG_STOP) ?
+						     0 :
+						     NRFX_TWIM_FLAG_TX_NO_STOP);
 		if (res != NRFX_SUCCESS) {
 			if (res == NRFX_ERROR_BUSY) {
 				ret = -EBUSY;
@@ -156,18 +155,16 @@ static int i2c_nrfx_twim_transfer(const struct device *dev,
 		/* If concatenated messages were I2C_MSG_READ type, then
 		 * content of concatenation buffer has to be copied back into
 		 * buffers provided by user. */
-		if ((msgs[i].flags & I2C_MSG_READ)
-		    && cur_xfer.p_primary_buf == concat_buf) {
+		if ((msgs[i].flags & I2C_MSG_READ) &&
+		    cur_xfer.p_primary_buf == concat_buf) {
 			int j = i;
 
 			while (concat_len >= msgs[j].len) {
 				concat_len -= msgs[j].len;
-				memcpy(msgs[j].buf,
-				       concat_buf + concat_len,
+				memcpy(msgs[j].buf, concat_buf + concat_len,
 				       msgs[j].len);
 				j--;
 			}
-
 		}
 
 		concat_len = 0;
@@ -228,7 +225,7 @@ static int i2c_nrfx_twim_configure(const struct device *dev,
 
 static const struct i2c_driver_api i2c_nrfx_twim_driver_api = {
 	.configure = i2c_nrfx_twim_configure,
-	.transfer  = i2c_nrfx_twim_transfer,
+	.transfer = i2c_nrfx_twim_transfer,
 };
 
 static int init_twim(const struct device *dev)
@@ -236,11 +233,9 @@ static int init_twim(const struct device *dev)
 	struct i2c_nrfx_twim_data *dev_data = get_dev_data(dev);
 	nrfx_err_t result = nrfx_twim_init(&get_dev_config(dev)->twim,
 					   &get_dev_config(dev)->config,
-					   event_handler,
-					   dev_data);
+					   event_handler, dev_data);
 	if (result != NRFX_SUCCESS) {
-		LOG_ERR("Failed to initialize device: %s",
-			dev->name);
+		LOG_ERR("Failed to initialize device: %s", dev->name);
 		return -EBUSY;
 	}
 
@@ -252,8 +247,7 @@ static int init_twim(const struct device *dev)
 }
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-static int twim_nrfx_pm_control(const struct device *dev,
-				uint32_t ctrl_command,
+static int twim_nrfx_pm_control(const struct device *dev, uint32_t ctrl_command,
 				void *context, device_pm_cb cb, void *arg)
 {
 	int ret = 0;
@@ -276,7 +270,8 @@ static int twim_nrfx_pm_control(const struct device *dev,
 			case DEVICE_PM_LOW_POWER_STATE:
 			case DEVICE_PM_SUSPEND_STATE:
 			case DEVICE_PM_OFF_STATE:
-				if (pm_current_state != DEVICE_PM_ACTIVE_STATE) {
+				if (pm_current_state !=
+				    DEVICE_PM_ACTIVE_STATE) {
 					break;
 				}
 				nrfx_twim_uninit(&get_dev_config(dev)->twim);
@@ -302,62 +297,60 @@ static int twim_nrfx_pm_control(const struct device *dev,
 }
 #endif /* CONFIG_DEVICE_POWER_MANAGEMENT */
 
-#define I2C_NRFX_TWIM_INVALID_FREQUENCY  ((nrf_twim_frequency_t)-1)
-#define I2C_NRFX_TWIM_FREQUENCY(bitrate)				       \
-	 (bitrate == I2C_BITRATE_STANDARD ? NRF_TWIM_FREQ_100K		       \
-	: bitrate == 250000               ? NRF_TWIM_FREQ_250K		       \
-	: bitrate == I2C_BITRATE_FAST     ? NRF_TWIM_FREQ_400K		       \
-					  : I2C_NRFX_TWIM_INVALID_FREQUENCY)
+#define I2C_NRFX_TWIM_INVALID_FREQUENCY ((nrf_twim_frequency_t)-1)
+#define I2C_NRFX_TWIM_FREQUENCY(bitrate)                        \
+	(bitrate == I2C_BITRATE_STANDARD ? NRF_TWIM_FREQ_100K : \
+	 bitrate == 250000		 ? NRF_TWIM_FREQ_250K : \
+	 bitrate == I2C_BITRATE_FAST	 ? NRF_TWIM_FREQ_400K : \
+						 I2C_NRFX_TWIM_INVALID_FREQUENCY)
 
 #define I2C(idx) DT_NODELABEL(i2c##idx)
-#define I2C_FREQUENCY(idx)						       \
+#define I2C_FREQUENCY(idx) \
 	I2C_NRFX_TWIM_FREQUENCY(DT_PROP(I2C(idx), clock_frequency))
 
 #define CONCAT_BUF_SIZE(idx) DT_PROP(I2C(idx), zephyr_concat_buf_size)
 
-#define I2C_CONCAT_BUF(idx)						       \
-	COND_CODE_1(DT_NODE_HAS_PROP(I2C(idx), zephyr_concat_buf_size),	       \
-	(.concat_buf = twim_##idx##_concat_buf,				       \
-	.concat_buf_size = CONCAT_BUF_SIZE(idx),), ())
+#define I2C_CONCAT_BUF(idx)                                             \
+	COND_CODE_1(DT_NODE_HAS_PROP(I2C(idx), zephyr_concat_buf_size), \
+		    (.concat_buf = twim_##idx##_concat_buf,             \
+		     .concat_buf_size = CONCAT_BUF_SIZE(idx), ),        \
+		    ())
 
-#define I2C_NRFX_TWIM_DEVICE(idx)					       \
-	BUILD_ASSERT(I2C_FREQUENCY(idx) !=				       \
-		     I2C_NRFX_TWIM_INVALID_FREQUENCY,			       \
-		     "Wrong I2C " #idx " frequency setting in dts");	       \
-	static int twim_##idx##_init(const struct device *dev)		       \
-	{								       \
-		IRQ_CONNECT(DT_IRQN(I2C(idx)), DT_IRQ(I2C(idx), priority),     \
-			    nrfx_isr, nrfx_twim_##idx##_irq_handler, 0);       \
-		return init_twim(dev);					       \
-	}								       \
-	COND_CODE_1(DT_NODE_HAS_PROP(I2C(idx), zephyr_concat_buf_size),	       \
-	(static uint8_t twim_##idx##_concat_buf[CONCAT_BUF_SIZE(idx)];),       \
-	())								       \
-									       \
-	static struct i2c_nrfx_twim_data twim_##idx##_data = {		       \
-		.transfer_sync = Z_SEM_INITIALIZER(                            \
-			twim_##idx##_data.transfer_sync, 1, 1),                \
-		.completion_sync = Z_SEM_INITIALIZER(                          \
-			twim_##idx##_data.completion_sync, 0, 1),              \
-		I2C_CONCAT_BUF(idx)					       \
-	};								       \
-	static const struct i2c_nrfx_twim_config twim_##idx##z_config = {      \
-		.twim = NRFX_TWIM_INSTANCE(idx),			       \
-		.config = {						       \
-			.scl       = DT_PROP(I2C(idx), scl_pin),	       \
-			.sda       = DT_PROP(I2C(idx), sda_pin),	       \
-			.frequency = I2C_FREQUENCY(idx),		       \
-		}							       \
-	};								       \
-	DEVICE_DEFINE(twim_##idx,					       \
-		      DT_LABEL(I2C(idx)),				       \
-		      twim_##idx##_init,				       \
-		      twim_nrfx_pm_control,				       \
-		      &twim_##idx##_data,				       \
-		      &twim_##idx##z_config,				       \
-		      POST_KERNEL,					       \
-		      CONFIG_I2C_INIT_PRIORITY,				       \
-		      &i2c_nrfx_twim_driver_api)
+#define I2C_NRFX_TWIM_DEVICE(idx)                                             \
+	BUILD_ASSERT(I2C_FREQUENCY(idx) != I2C_NRFX_TWIM_INVALID_FREQUENCY,   \
+		     "Wrong I2C " #idx " frequency setting in dts");          \
+	static int twim_##idx##_init(const struct device *dev)                \
+	{                                                                     \
+		IRQ_CONNECT(DT_IRQN(I2C(idx)), DT_IRQ(I2C(idx), priority),    \
+			    nrfx_isr, nrfx_twim_##idx##_irq_handler, 0);      \
+		return init_twim(dev);                                        \
+	}                                                                     \
+	COND_CODE_1(DT_NODE_HAS_PROP(I2C(idx), zephyr_concat_buf_size),       \
+		    (static uint8_t                                           \
+			     twim_##idx##_concat_buf[CONCAT_BUF_SIZE(idx)];), \
+		    ())                                                       \
+                                                                              \
+	static struct i2c_nrfx_twim_data twim_##idx##_data = {                \
+		.transfer_sync = Z_SEM_INITIALIZER(                           \
+			twim_##idx##_data.transfer_sync, 1, 1),               \
+		.completion_sync = Z_SEM_INITIALIZER(                         \
+			twim_##idx##_data.completion_sync, 0, 1),             \
+		I2C_CONCAT_BUF(idx)                                           \
+	};                                                                    \
+	static const struct i2c_nrfx_twim_config                              \
+		twim_##idx##z_config = { .twim = NRFX_TWIM_INSTANCE(idx),     \
+					 .config = {                          \
+						 .scl = DT_PROP(I2C(idx),     \
+								scl_pin),     \
+						 .sda = DT_PROP(I2C(idx),     \
+								sda_pin),     \
+						 .frequency =                 \
+							 I2C_FREQUENCY(idx),  \
+					 } };                                 \
+	DEVICE_DEFINE(twim_##idx, DT_LABEL(I2C(idx)), twim_##idx##_init,      \
+		      twim_nrfx_pm_control, &twim_##idx##_data,               \
+		      &twim_##idx##z_config, POST_KERNEL,                     \
+		      CONFIG_I2C_INIT_PRIORITY, &i2c_nrfx_twim_driver_api)
 
 #ifdef CONFIG_I2C_0_NRF_TWIM
 I2C_NRFX_TWIM_DEVICE(0);

@@ -26,10 +26,8 @@ void mempool_test(void)
 	PRINT_STRING(dashline, output_file);
 	et = BENCH_START();
 	for (i = 0; i < NR_OF_POOL_RUNS; i++) {
-		return_value |= k_mem_pool_alloc(&DEMOPOOL,
-						&block,
-						16,
-						K_FOREVER);
+		return_value |=
+			k_mem_pool_alloc(&DEMOPOOL, &block, 16, K_FOREVER);
 		k_mem_pool_free(&block);
 	}
 	et = TIME_STAMP_DELTA_GET(et);

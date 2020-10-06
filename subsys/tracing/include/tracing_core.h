@@ -14,9 +14,16 @@
 extern "C" {
 #endif
 
-#define TRACING_LOCK()		{ int key; key = irq_lock()
+#define TRACING_LOCK()   \
+	{                \
+		int key; \
+		key = irq_lock()
 
-#define TRACING_UNLOCK()	{ irq_unlock(key); } }
+#define TRACING_UNLOCK()         \
+	{                        \
+		irq_unlock(key); \
+	}                        \
+	}
 
 /**
  * @brief Check tracing enabled or not.

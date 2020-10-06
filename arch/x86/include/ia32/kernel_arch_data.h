@@ -59,8 +59,8 @@ extern "C" {
 #endif
 
 #ifdef _THREAD_WRAPPER_REQUIRED
-extern void z_x86_thread_entry_wrapper(k_thread_entry_t entry,
-				      void *p1, void *p2, void *p3);
+extern void z_x86_thread_entry_wrapper(k_thread_entry_t entry, void *p1,
+				       void *p2, void *p3);
 #endif /* _THREAD_WRAPPER_REQUIRED */
 
 #ifdef __cplusplus

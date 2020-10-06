@@ -10,9 +10,9 @@
 
 #include "footprint.h"
 
-#define DURATION	100
-#define PERIOD		50
-#define EXPIRE_TIMES	4
+#define DURATION 100
+#define PERIOD 50
+#define EXPIRE_TIMES 4
 
 struct timer_data {
 	uint32_t expire_cnt;
@@ -48,7 +48,7 @@ static void timer_expire(struct k_timer *timer)
 
 static void busy_wait_ms(int32_t ms)
 {
-	k_busy_wait(ms*1000);
+	k_busy_wait(ms * 1000);
 }
 
 static void thread_fn(void *arg1, void *arg2, void *arg3)
@@ -84,16 +84,14 @@ void run_timer(void)
 
 	timer_init(&timer0, timer_expire, timer_stop);
 
-	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
-			      thread_fn, NULL, NULL, NULL,
-			      0, 0, K_NO_WAIT);
+	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE, thread_fn,
+			      NULL, NULL, NULL, 0, 0, K_NO_WAIT);
 
 	k_thread_join(tid, K_FOREVER);
 
 #ifdef CONFIG_USERSPACE
-	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE,
-			      thread_fn, NULL, NULL, NULL,
-			      0, K_USER, K_NO_WAIT);
+	tid = k_thread_create(&my_thread, my_stack_area, STACK_SIZE, thread_fn,
+			      NULL, NULL, NULL, 0, K_USER, K_NO_WAIT);
 
 	k_mem_domain_add_thread(&footprint_mem_domain, tid);
 

@@ -19,15 +19,15 @@
 /** @def BT_UUID_SERVICE_B_3
  *  @brief UUID for the Service B.3
  */
-#define BT_UUID_SERVICE_B_3             BT_UUID_DECLARE_16(0xa00b)
+#define BT_UUID_SERVICE_B_3 BT_UUID_DECLARE_16(0xa00b)
 
 /** @def BT_UUID_VALUE_V6
  *  @brief UUID for the Value V6 Characteristic
  */
-#define BT_UUID_VALUE_V6                BT_UUID_DECLARE_16(0xb006)
+#define BT_UUID_VALUE_V6 BT_UUID_DECLARE_16(0xb006)
 
-static uint8_t   value_v6_value = 0x06;
-static bool   value_v6_ntf_active;
+static uint8_t value_v6_value = 0x06;
+static bool value_v6_ntf_active;
 
 /**
  * @brief Attribute read call back for the Value V6 attribute
@@ -94,16 +94,17 @@ static void value_v6_ccc_cfg_changed(const struct bt_gatt_attr *attr,
 
 static struct bt_gatt_attr service_b_3_1_attrs[] = {
 	BT_GATT_H_PRIMARY_SERVICE(BT_UUID_SERVICE_B_3, 0x50),
-	BT_GATT_H_CHARACTERISTIC(BT_UUID_VALUE_V6,
+	BT_GATT_H_CHARACTERISTIC(
+		BT_UUID_VALUE_V6,
 		BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE_WITHOUT_RESP |
-		BT_GATT_CHRC_WRITE | BT_GATT_CHRC_NOTIFY,
-		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-		read_value_v6, write_value_v6, &value_v6_value, 0x51),
+			BT_GATT_CHRC_WRITE | BT_GATT_CHRC_NOTIFY,
+		BT_GATT_PERM_READ | BT_GATT_PERM_WRITE, read_value_v6,
+		write_value_v6, &value_v6_value, 0x51),
 	BT_GATT_H_CCC(value_v6_ccc_cfg, value_v6_ccc_cfg_changed, 0x53)
 };
 
 static struct bt_gatt_service service_b_3_1_svc =
-		    BT_GATT_SERVICE(service_b_3_1_attrs);
+	BT_GATT_SERVICE(service_b_3_1_attrs);
 
 /**
  * @brief Register the Service B.3 and all its Characteristics...

@@ -21,8 +21,8 @@ static uint16_t chan_prn(uint16_t counter, uint16_t chan_id);
 #endif /* CONFIG_BT_CTLR_CHAN_SEL_2 */
 
 #if defined(CONFIG_BT_CONN)
-uint8_t lll_chan_sel_1(uint8_t *chan_use, uint8_t hop, uint16_t latency, uint8_t *chan_map,
-		    uint8_t chan_count)
+uint8_t lll_chan_sel_1(uint8_t *chan_use, uint8_t hop, uint16_t latency,
+		       uint8_t *chan_map, uint8_t chan_count)
 {
 	uint8_t chan_next;
 
@@ -45,7 +45,7 @@ uint8_t lll_chan_sel_1(uint8_t *chan_use, uint8_t hop, uint16_t latency, uint8_t
 
 #if defined(CONFIG_BT_CTLR_CHAN_SEL_2)
 uint8_t lll_chan_sel_2(uint16_t counter, uint16_t chan_id, uint8_t *chan_map,
-		    uint8_t chan_count)
+		       uint8_t chan_count)
 {
 	uint8_t chan_next;
 	uint16_t prn_e;
@@ -105,8 +105,8 @@ static uint8_t chan_sel_remap(uint8_t *chan_map, uint8_t chan_index)
 #if defined(RADIO_UNIT_TEST)
 void lll_chan_sel_2_ut(void)
 {
-	uint8_t chan_map_1[] = {0xFF, 0xFF, 0xFF, 0xFF, 0x1F};
-	uint8_t chan_map_2[] = {0x00, 0x06, 0xE0, 0x00, 0x1E};
+	uint8_t chan_map_1[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0x1F };
+	uint8_t chan_map_2[] = { 0x00, 0x06, 0xE0, 0x00, 0x1E };
 	uint8_t m;
 
 	m = chan_sel_2(1, 0x305F, chan_map_1, 37);
@@ -135,7 +135,9 @@ void lll_chan_sel_2_ut(void)
 static uint8_t chan_rev_8(uint8_t b)
 {
 	b = (((uint32_t)b * 0x0802LU & 0x22110LU) |
-	     ((uint32_t)b * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16;
+	     ((uint32_t)b * 0x8020LU & 0x88440LU)) *
+		    0x10101LU >>
+	    16;
 
 	return b;
 }

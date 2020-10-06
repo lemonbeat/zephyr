@@ -36,7 +36,7 @@
  */
 #define HAL_RADIO_NRF52832_TXEN_TXIDLE_TX_1M_DEFAULT_NO_HW_TIFS_NS 130000
 #define HAL_RADIO_NRF52832_TXEN_TXIDLE_TX_1M_DEFAULT_NO_HW_TIFS_US \
-	HAL_RADIO_NS2US_ROUND( \
+	HAL_RADIO_NS2US_ROUND(                                     \
 		HAL_RADIO_NRF52832_TXEN_TXIDLE_TX_1M_DEFAULT_NO_HW_TIFS_NS)
 
 /* TXEN->TXIDLE + TXIDLE->TX (with fast Radio ramp-up mode)
@@ -58,7 +58,7 @@
  */
 #define HAL_RADIO_NRF52832_TXEN_TXIDLE_TX_2M_DEFAULT_NO_HW_TIFS_NS 129000
 #define HAL_RADIO_NRF52832_TXEN_TXIDLE_TX_2M_DEFAULT_NO_HW_TIFS_US \
-	HAL_RADIO_NS2US_ROUND( \
+	HAL_RADIO_NS2US_ROUND(                                     \
 		HAL_RADIO_NRF52832_TXEN_TXIDLE_TX_2M_DEFAULT_NO_HW_TIFS_NS)
 
 /* RXEN->RXIDLE + RXIDLE->RX (with fast Radio ramp-up mode)
@@ -80,7 +80,7 @@
  */
 #define HAL_RADIO_NRF52832_RXEN_RXIDLE_RX_1M_DEFAULT_NO_HW_TIFS_NS 129000
 #define HAL_RADIO_NRF52832_RXEN_RXIDLE_RX_1M_DEFAULT_NO_HW_TIFS_US \
-	HAL_RADIO_NS2US_CEIL( \
+	HAL_RADIO_NS2US_CEIL(                                      \
 		HAL_RADIO_NRF52832_RXEN_RXIDLE_RX_1M_DEFAULT_NO_HW_TIFS_NS)
 
 /* RXEN->RXIDLE + RXIDLE->RX (with fast Radio ramp-up mode)
@@ -102,18 +102,18 @@
  */
 #define HAL_RADIO_NRF52832_RXEN_RXIDLE_RX_2M_DEFAULT_NO_HW_TIFS_NS 129000
 #define HAL_RADIO_NRF52832_RXEN_RXIDLE_RX_2M_DEFAULT_NO_HW_TIFS_US \
-	HAL_RADIO_NS2US_CEIL(\
+	HAL_RADIO_NS2US_CEIL(                                      \
 		HAL_RADIO_NRF52832_RXEN_RXIDLE_RX_2M_DEFAULT_NO_HW_TIFS_NS)
 
-#define HAL_RADIO_NRF52832_TX_CHAIN_DELAY_NS     1000
+#define HAL_RADIO_NRF52832_TX_CHAIN_DELAY_NS 1000
 #define HAL_RADIO_NRF52832_TX_CHAIN_DELAY_US \
 	HAL_RADIO_NS2US_CEIL(HAL_RADIO_NRF52832_TX_CHAIN_DELAY_NS)
 
-#define HAL_RADIO_NRF52832_RX_CHAIN_DELAY_1M_NS  9000
+#define HAL_RADIO_NRF52832_RX_CHAIN_DELAY_1M_NS 9000
 #define HAL_RADIO_NRF52832_RX_CHAIN_DELAY_1M_US \
 	HAL_RADIO_NS2US_CEIL(HAL_RADIO_NRF52832_RX_CHAIN_DELAY_1M_NS)
 
-#define HAL_RADIO_NRF52832_RX_CHAIN_DELAY_2M_NS  5000
+#define HAL_RADIO_NRF52832_RX_CHAIN_DELAY_2M_NS 5000
 #define HAL_RADIO_NRF52832_RX_CHAIN_DELAY_2M_US \
 	HAL_RADIO_NS2US_CEIL(HAL_RADIO_NRF52832_RX_CHAIN_DELAY_2M_NS)
 
@@ -203,7 +203,6 @@ static inline void hal_radio_reset(void)
 
 static inline void hal_radio_ram_prio_setup(void)
 {
-
 }
 
 static inline uint32_t hal_radio_phy_mode_get(uint8_t phy, uint8_t flags)
@@ -276,7 +275,8 @@ static inline uint32_t hal_radio_tx_power_floor(int8_t tx_power_lvl)
 	return RADIO_TXPOWER_TXPOWER_Neg40dBm;
 }
 
-static inline uint32_t hal_radio_tx_ready_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_ready_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(flags);
 
@@ -289,7 +289,8 @@ static inline uint32_t hal_radio_tx_ready_delay_us_get(uint8_t phy, uint8_t flag
 	}
 }
 
-static inline uint32_t hal_radio_rx_ready_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_ready_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(flags);
 
@@ -302,7 +303,8 @@ static inline uint32_t hal_radio_rx_ready_delay_us_get(uint8_t phy, uint8_t flag
 	}
 }
 
-static inline uint32_t hal_radio_tx_chain_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_chain_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
@@ -310,7 +312,8 @@ static inline uint32_t hal_radio_tx_chain_delay_us_get(uint8_t phy, uint8_t flag
 	return HAL_RADIO_NRF52832_TX_CHAIN_DELAY_US;
 }
 
-static inline uint32_t hal_radio_rx_chain_delay_us_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_chain_delay_us_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(flags);
 
@@ -323,7 +326,8 @@ static inline uint32_t hal_radio_rx_chain_delay_us_get(uint8_t phy, uint8_t flag
 	}
 }
 
-static inline uint32_t hal_radio_tx_ready_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_ready_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(flags);
 
@@ -336,7 +340,8 @@ static inline uint32_t hal_radio_tx_ready_delay_ns_get(uint8_t phy, uint8_t flag
 	}
 }
 
-static inline uint32_t hal_radio_rx_ready_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_ready_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(flags);
 
@@ -349,7 +354,8 @@ static inline uint32_t hal_radio_rx_ready_delay_ns_get(uint8_t phy, uint8_t flag
 	}
 }
 
-static inline uint32_t hal_radio_tx_chain_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_tx_chain_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(phy);
 	ARG_UNUSED(flags);
@@ -357,7 +363,8 @@ static inline uint32_t hal_radio_tx_chain_delay_ns_get(uint8_t phy, uint8_t flag
 	return HAL_RADIO_NRF52832_TX_CHAIN_DELAY_US;
 }
 
-static inline uint32_t hal_radio_rx_chain_delay_ns_get(uint8_t phy, uint8_t flags)
+static inline uint32_t hal_radio_rx_chain_delay_ns_get(uint8_t phy,
+						       uint8_t flags)
 {
 	ARG_UNUSED(flags);
 

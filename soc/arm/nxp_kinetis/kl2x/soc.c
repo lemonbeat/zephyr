@@ -12,7 +12,7 @@
 #include <fsl_clock.h>
 #include <arch/cpu.h>
 
-#define LPSCI0SRC_MCGFLLCLK	(1)
+#define LPSCI0SRC_MCGFLLCLK (1)
 
 /*******************************************************************************
  * Variables
@@ -20,15 +20,18 @@
 
 static ALWAYS_INLINE void clock_init(void)
 {
-   /*
+	/*
     * Core clock: 48MHz
     * Bus clock: 24MHz
     */
 	const mcg_pll_config_t pll0Config = {
-	.enableMode = 0U, .prdiv = CONFIG_MCG_PRDIV0, .vdiv = CONFIG_MCG_VDIV0,
+		.enableMode = 0U,
+		.prdiv = CONFIG_MCG_PRDIV0,
+		.vdiv = CONFIG_MCG_VDIV0,
 	};
 	const sim_clock_config_t simConfig = {
-		.pllFllSel = DT_PROP(DT_INST(0, nxp_kinetis_sim), pllfll_select),
+		.pllFllSel =
+			DT_PROP(DT_INST(0, nxp_kinetis_sim), pllfll_select),
 		.er32kSrc = DT_PROP(DT_INST(0, nxp_kinetis_sim), er32k_select),
 		.clkdiv1 = 0x10010000U, /* SIM_CLKDIV1. */
 	};
@@ -46,8 +49,8 @@ static ALWAYS_INLINE void clock_init(void)
 #endif
 				.oscerConfig = {
 				.enableMode = kOSC_ErClkEnable,
-#if (defined(FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER) &&	\
-	FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
+#if (defined(FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER) && \
+     FSL_FEATURE_OSC_HAS_EXT_REF_CLOCK_DIVIDER)
 				.erclkDiv = 0U,
 #endif
 				} };

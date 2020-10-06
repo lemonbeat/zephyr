@@ -4,25 +4,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include "test_gpio.h"
 
 static struct drv_data data;
 static int cb_cnt;
 
-static void callback(const struct device *dev,
-		     struct gpio_callback *gpio_cb, uint32_t pins)
+static void callback(const struct device *dev, struct gpio_callback *gpio_cb,
+		     uint32_t pins)
 {
-	const struct drv_data *dd = CONTAINER_OF(gpio_cb,
-						 struct drv_data, gpio_cb);
+	const struct drv_data *dd =
+		CONTAINER_OF(gpio_cb, struct drv_data, gpio_cb);
 
 	/*= checkpoint: pins should be marked with correct pin number bit =*/
-	zassert_equal(pins, BIT(PIN_IN),
-		      "unexpected pins %x", pins);
+	zassert_equal(pins, BIT(PIN_IN), "unexpected pins %x", pins);
 	++cb_cnt;
 	TC_PRINT("callback triggered: %d\n", cb_cnt);
-	if ((cb_cnt == 1)
-	    && (dd->mode == GPIO_INT_EDGE_BOTH)) {
+	if ((cb_cnt == 1) && (dd->mode == GPIO_INT_EDGE_BOTH)) {
 		gpio_pin_toggle(dev, PIN_OUT);
 	}
 	if (cb_cnt >= MAX_INT_CNT) {

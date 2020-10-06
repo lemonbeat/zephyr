@@ -26,9 +26,21 @@ LOG_MODULE_REGISTER(main);
 #define DELAY_TIME K_MSEC(40)
 
 static const struct led_rgb colors[] = {
-	{ .r = 0xff, .g = 0x00, .b = 0x00, }, /* red */
-	{ .r = 0x00, .g = 0xff, .b = 0x00, }, /* green */
-	{ .r = 0x00, .g = 0x00, .b = 0xff, }, /* blue */
+	{
+		.r = 0xff,
+		.g = 0x00,
+		.b = 0x00,
+	}, /* red */
+	{
+		.r = 0x00,
+		.g = 0xff,
+		.b = 0x00,
+	}, /* green */
+	{
+		.r = 0x00,
+		.g = 0x00,
+		.b = 0xff,
+	}, /* blue */
 };
 
 static const struct led_rgb black = {

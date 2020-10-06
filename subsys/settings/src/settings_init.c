@@ -15,7 +15,6 @@
 #include "settings/settings_file.h"
 #include <zephyr.h>
 
-
 bool settings_subsys_initialized;
 
 void settings_init(void);
@@ -24,7 +23,6 @@ int settings_backend_init(void);
 
 int settings_subsys_init(void)
 {
-
 	int err = 0;
 
 	if (settings_subsys_initialized) {

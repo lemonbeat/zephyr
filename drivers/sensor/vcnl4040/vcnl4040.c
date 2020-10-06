@@ -22,8 +22,8 @@ int vcnl4040_read(const struct device *dev, uint8_t reg, uint16_t *out)
 	uint8_t buff[2] = { 0 };
 	int ret = 0;
 
-	ret = i2c_write_read(data->i2c, config->i2c_address,
-			     &reg, sizeof(reg), buff, sizeof(buff));
+	ret = i2c_write_read(data->i2c, config->i2c_address, &reg, sizeof(reg),
+			     buff, sizeof(buff));
 
 	if (!ret)
 		*out = sys_get_le16(buff);
@@ -64,8 +64,7 @@ static int vcnl4040_sample_fetch(const struct device *dev,
 	int ret = 0;
 
 #ifdef CONFIG_VCNL4040_ENABLE_ALS
-	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL ||
-			chan == SENSOR_CHAN_PROX ||
+	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_PROX ||
 			chan == SENSOR_CHAN_LIGHT);
 #else
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_PROX);
@@ -82,8 +81,7 @@ static int vcnl4040_sample_fetch(const struct device *dev,
 	}
 #ifdef CONFIG_VCNL4040_ENABLE_ALS
 	if (chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_LIGHT) {
-		ret = vcnl4040_read(dev, VCNL4040_REG_ALS_DATA,
-				    &data->light);
+		ret = vcnl4040_read(dev, VCNL4040_REG_ALS_DATA, &data->light);
 		if (ret < 0) {
 			LOG_ERR("Could not fetch ambient light");
 		}
@@ -218,9 +216,8 @@ static int vcnl4040_ambient_setup(const struct device *dev)
 #endif
 
 #ifdef CONFIG_DEVICE_POWER_MANAGEMENT
-static int vcnl4040_device_ctrl(const struct device *dev,
-				uint32_t ctrl_command, void *context,
-				device_pm_cb cb, void *arg)
+static int vcnl4040_device_ctrl(const struct device *dev, uint32_t ctrl_command,
+				void *context, device_pm_cb cb, void *arg)
 {
 	int ret = 0;
 
@@ -268,9 +265,7 @@ static int vcnl4040_device_ctrl(const struct device *dev,
 			als_conf |= VCNL4040_ALS_SD_MASK;
 
 			ret = vcnl4040_write(dev, VCNL4040_REG_ALS_CONF,
-					     als_conf)
-			if (ret < 0)
-				return ret;
+					     als_conf) if (ret < 0) return ret;
 #endif
 		}
 
@@ -371,12 +366,11 @@ static const struct vcnl4040_config vcnl4040_config = {
 static struct vcnl4040_data vcnl4040_data;
 
 #ifndef CONFIG_DEVICE_POWER_MANAGEMENT
-DEVICE_AND_API_INIT(vcnl4040, DT_INST_LABEL(0), vcnl4040_init,
-		    &vcnl4040_data, &vcnl4040_config,
-		    POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
+DEVICE_AND_API_INIT(vcnl4040, DT_INST_LABEL(0), vcnl4040_init, &vcnl4040_data,
+		    &vcnl4040_config, POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY,
 		    &vcnl4040_driver_api);
 #else
-DEVICE_DEFINE(vcnl4040, DT_INST_LABEL(0), vcnl4040_init,
-	      vcnl4040_device_ctrl, &vcnl4040_data, &vcnl4040_config,
-	      POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &vcnl4040_driver_api);
+DEVICE_DEFINE(vcnl4040, DT_INST_LABEL(0), vcnl4040_init, vcnl4040_device_ctrl,
+	      &vcnl4040_data, &vcnl4040_config, POST_KERNEL,
+	      CONFIG_SENSOR_INIT_PRIORITY, &vcnl4040_driver_api);
 #endif

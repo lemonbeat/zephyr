@@ -27,25 +27,19 @@ void __attribute__((section(".iram1"))) __start(void)
 {
 	volatile uint32_t *wdt_rtc_reg = (uint32_t *)RTC_CNTL_WDTCONFIG0_REG;
 	volatile uint32_t *wdt_timg_reg = (uint32_t *)TIMG_WDTCONFIG0_REG(0);
-	volatile uint32_t *app_cpu_config_reg = (uint32_t *)DPORT_APPCPU_CTRL_B_REG;
+	volatile uint32_t *app_cpu_config_reg =
+		(uint32_t *)DPORT_APPCPU_CTRL_B_REG;
 	extern uint32_t _init_start;
 	extern uint32_t _bss_start;
 	extern uint32_t _bss_end;
 
 	/* Move the exception vector table to IRAM. */
-	__asm__ __volatile__ (
-		"wsr %0, vecbase"
-		:
-		: "r"(&_init_start));
+	__asm__ __volatile__("wsr %0, vecbase" : : "r"(&_init_start));
 
 	/* Zero out BSS.  Clobber _bss_start to avoid memset() elision. */
 	(void)memset(&_bss_start, 0,
 		     (&_bss_end - &_bss_start) * sizeof(_bss_start));
-	__asm__ __volatile__ (
-		""
-		:
-		: "g"(&_bss_start)
-		: "memory");
+	__asm__ __volatile__("" : : "g"(&_bss_start) : "memory");
 
 	/* The watchdog timer is enabled in the bootloader.  We're done booting,
 	 * so disable it.
@@ -54,7 +48,7 @@ void __attribute__((section(".iram1"))) __start(void)
 	*wdt_timg_reg &= ~TIMG_WDT_FLASHBOOT_MOD_EN;
 
 	/* Disable normal interrupts. */
-	__asm__ __volatile__ (
+	__asm__ __volatile__(
 		"wsr %0, PS"
 		:
 		: "r"(PS_INTLEVEL(XCHAL_EXCM_LEVEL) | PS_UM | PS_WOE));
@@ -67,7 +61,6 @@ void __attribute__((section(".iram1"))) __start(void)
 	 * arch_kernel_init() is invoked.
 	 */
 	__asm__ volatile("wsr.MISC0 %0; rsync" : : "r"(&_kernel.cpus[0]));
-
 
 	/* Start Zephyr */
 	z_cstart();

@@ -54,8 +54,9 @@ static int eswifi_shell_atcmd(const struct shell *shell, size_t argc,
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(eswifi_shell,
-	SHELL_CMD(atcmd, NULL, "<atcmd>", eswifi_shell_atcmd),
-	SHELL_SUBCMD_SET_END /* Array terminated. */
+			       SHELL_CMD(atcmd, NULL, "<atcmd>",
+					 eswifi_shell_atcmd),
+			       SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 
 SHELL_CMD_REGISTER(eswifi, &eswifi_shell, "esWiFi debug shell", NULL);

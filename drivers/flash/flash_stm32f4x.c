@@ -13,11 +13,10 @@
 
 #include "flash_stm32.h"
 
-#define STM32F4X_SECTOR_MASK		((uint32_t) 0xFFFFFF07)
+#define STM32F4X_SECTOR_MASK ((uint32_t)0xFFFFFF07)
 
 bool flash_stm32_valid_range(const struct device *dev, off_t offset,
-			     uint32_t len,
-			     bool write)
+			     uint32_t len, bool write)
 {
 	ARG_UNUSED(write);
 
@@ -58,7 +57,7 @@ static int write_byte(const struct device *dev, off_t offset, uint8_t val)
 	/* flush the register write */
 	tmp = regs->CR;
 
-	*((uint8_t *) offset + CONFIG_FLASH_BASE_ADDRESS) = val;
+	*((uint8_t *)offset + CONFIG_FLASH_BASE_ADDRESS) = val;
 
 	rc = flash_stm32_wait_flash_idle(dev);
 	regs->CR &= (~FLASH_CR_PG);
@@ -106,8 +105,7 @@ static int erase_sector(const struct device *dev, uint32_t sector)
 	return rc;
 }
 
-int flash_stm32_block_erase_loop(const struct device *dev,
-				 unsigned int offset,
+int flash_stm32_block_erase_loop(const struct device *dev, unsigned int offset,
 				 unsigned int len)
 {
 	struct flash_pages_info info;
@@ -142,7 +140,7 @@ int flash_stm32_write_range(const struct device *dev, unsigned int offset,
 	int i, rc = 0;
 
 	for (i = 0; i < len; i++, offset++) {
-		rc = write_byte(dev, offset, ((const uint8_t *) data)[i]);
+		rc = write_byte(dev, offset, ((const uint8_t *)data)[i]);
 		if (rc < 0) {
 			return rc;
 		}
@@ -165,19 +163,19 @@ int flash_stm32_write_range(const struct device *dev, unsigned int offset,
  */
 #ifndef FLASH_SECTOR_TOTAL
 #error "Unknown flash layout"
-#else  /* defined(FLASH_SECTOR_TOTAL) */
+#else /* defined(FLASH_SECTOR_TOTAL) */
 #if FLASH_SECTOR_TOTAL == 5
 static const struct flash_pages_layout stm32f4_flash_layout[] = {
 	/* RM0401, table 5: STM32F410Tx, STM32F410Cx, STM32F410Rx */
-	{.pages_count = 4, .pages_size = KB(16)},
-	{.pages_count = 1, .pages_size = KB(64)},
+	{ .pages_count = 4, .pages_size = KB(16) },
+	{ .pages_count = 1, .pages_size = KB(64) },
 };
 #elif FLASH_SECTOR_TOTAL == 6
 static const struct flash_pages_layout stm32f4_flash_layout[] = {
 	/* RM0368, table 5: STM32F401xC */
-	{.pages_count = 4, .pages_size = KB(16)},
-	{.pages_count = 1, .pages_size = KB(64)},
-	{.pages_count = 1, .pages_size = KB(128)},
+	{ .pages_count = 4, .pages_size = KB(16) },
+	{ .pages_count = 1, .pages_size = KB(64) },
+	{ .pages_count = 1, .pages_size = KB(128) },
 };
 #elif FLASH_SECTOR_TOTAL == 8
 static const struct flash_pages_layout stm32f4_flash_layout[] = {
@@ -186,9 +184,9 @@ static const struct flash_pages_layout stm32f4_flash_layout[] = {
 	 * RM0383, table 4: STM32F411xE
 	 * RM0390, table 4: STM32F446xx
 	 */
-	{.pages_count = 4, .pages_size = KB(16)},
-	{.pages_count = 1, .pages_size = KB(64)},
-	{.pages_count = 3, .pages_size = KB(128)},
+	{ .pages_count = 4, .pages_size = KB(16) },
+	{ .pages_count = 1, .pages_size = KB(64) },
+	{ .pages_count = 3, .pages_size = KB(128) },
 };
 #elif FLASH_SECTOR_TOTAL == 12
 static const struct flash_pages_layout stm32f4_flash_layout[] = {
@@ -196,16 +194,16 @@ static const struct flash_pages_layout stm32f4_flash_layout[] = {
 	 * RM0090, table 5: STM32F405xx, STM32F415xx, STM32F407xx, STM32F417xx
 	 * RM0402, table 5: STM32F412Zx, STM32F412Vx, STM32F412Rx, STM32F412Cx
 	 */
-	{.pages_count = 4, .pages_size = KB(16)},
-	{.pages_count = 1, .pages_size = KB(64)},
-	{.pages_count = 7, .pages_size = KB(128)},
+	{ .pages_count = 4, .pages_size = KB(16) },
+	{ .pages_count = 1, .pages_size = KB(64) },
+	{ .pages_count = 7, .pages_size = KB(128) },
 };
 #elif FLASH_SECTOR_TOTAL == 16
 static const struct flash_pages_layout stm32f4_flash_layout[] = {
 	/* RM0430, table 5.: STM32F413xx, STM32F423xx */
-	{.pages_count = 4, .pages_size = KB(16)},
-	{.pages_count = 1, .pages_size = KB(64)},
-	{.pages_count = 11, .pages_size = KB(128)},
+	{ .pages_count = 4, .pages_size = KB(16) },
+	{ .pages_count = 1, .pages_size = KB(64) },
+	{ .pages_count = 11, .pages_size = KB(128) },
 };
 #elif FLASH_SECTOR_TOTAL == 24
 static const struct flash_pages_layout stm32f4_flash_layout[] = {
@@ -213,17 +211,17 @@ static const struct flash_pages_layout stm32f4_flash_layout[] = {
 	 * RM0090, table 6: STM32F427xx, STM32F437xx, STM32F429xx, STM32F439xx
 	 * RM0386, table 4: STM32F469xx, STM32F479xx
 	 */
-	{.pages_count = 4, .pages_size = KB(16)},
-	{.pages_count = 1, .pages_size = KB(64)},
-	{.pages_count = 7, .pages_size = KB(128)},
-	{.pages_count = 4, .pages_size = KB(16)},
-	{.pages_count = 1, .pages_size = KB(64)},
-	{.pages_count = 7, .pages_size = KB(128)},
+	{ .pages_count = 4, .pages_size = KB(16) },
+	{ .pages_count = 1, .pages_size = KB(64) },
+	{ .pages_count = 7, .pages_size = KB(128) },
+	{ .pages_count = 4, .pages_size = KB(16) },
+	{ .pages_count = 1, .pages_size = KB(64) },
+	{ .pages_count = 7, .pages_size = KB(128) },
 };
 #else
 #error "Unknown flash layout"
 #endif /* FLASH_SECTOR_TOTAL == 5 */
-#endif/* !defined(FLASH_SECTOR_TOTAL) */
+#endif /* !defined(FLASH_SECTOR_TOTAL) */
 
 void flash_stm32_page_layout(const struct device *dev,
 			     const struct flash_pages_layout **layout,

@@ -20,7 +20,8 @@
 LOG_MODULE_DECLARE(SX9500, CONFIG_SENSOR_LOG_LEVEL);
 
 #ifdef CONFIG_SX9500_TRIGGER_OWN_THREAD
-static K_KERNEL_STACK_DEFINE(sx9500_thread_stack, CONFIG_SX9500_THREAD_STACK_SIZE);
+static K_KERNEL_STACK_DEFINE(sx9500_thread_stack,
+			     CONFIG_SX9500_THREAD_STACK_SIZE);
 static struct k_thread sx9500_thread;
 #endif
 
@@ -32,8 +33,7 @@ int sx9500_trigger_set(const struct device *dev,
 
 	switch (trig->type) {
 	case SENSOR_TRIG_DATA_READY:
-		if (i2c_reg_update_byte(data->i2c_master,
-					data->i2c_slave_addr,
+		if (i2c_reg_update_byte(data->i2c_master, data->i2c_slave_addr,
 					SX9500_REG_IRQ_MSK,
 					SX9500_CONV_DONE_IRQ,
 					SX9500_CONV_DONE_IRQ) < 0) {
@@ -44,10 +44,8 @@ int sx9500_trigger_set(const struct device *dev,
 		break;
 
 	case SENSOR_TRIG_NEAR_FAR:
-		if (i2c_reg_update_byte(data->i2c_master,
-					data->i2c_slave_addr,
-					SX9500_REG_IRQ_MSK,
-					SX9500_NEAR_FAR_IRQ,
+		if (i2c_reg_update_byte(data->i2c_master, data->i2c_slave_addr,
+					SX9500_REG_IRQ_MSK, SX9500_NEAR_FAR_IRQ,
 					SX9500_NEAR_FAR_IRQ) < 0) {
 			return -EIO;
 		}
@@ -84,8 +82,8 @@ static void sx9500_gpio_thread_cb(const struct device *dev)
 
 #ifdef CONFIG_SX9500_TRIGGER_OWN_THREAD
 
-static void sx9500_gpio_cb(const struct device *port,
-			   struct gpio_callback *cb, uint32_t pins)
+static void sx9500_gpio_cb(const struct device *port, struct gpio_callback *cb,
+			   uint32_t pins)
 {
 	struct sx9500_data *data =
 		CONTAINER_OF(cb, struct sx9500_data, gpio_cb);
@@ -105,8 +103,8 @@ static void sx9500_thread_main(struct sx9500_data *data)
 
 #else /* CONFIG_SX9500_TRIGGER_GLOBAL_THREAD */
 
-static void sx9500_gpio_cb(const struct device *port,
-			   struct gpio_callback *cb, uint32_t pins)
+static void sx9500_gpio_cb(const struct device *port, struct gpio_callback *cb,
+			   uint32_t pins)
 {
 	struct sx9500_data *data =
 		CONTAINER_OF(cb, struct sx9500_data, gpio_cb);
@@ -120,8 +118,7 @@ static void sx9500_gpio_cb(const struct device *port,
 #ifdef CONFIG_SX9500_TRIGGER_GLOBAL_THREAD
 static void sx9500_work_cb(struct k_work *work)
 {
-	struct sx9500_data *data =
-		CONTAINER_OF(work, struct sx9500_data, work);
+	struct sx9500_data *data = CONTAINER_OF(work, struct sx9500_data, work);
 
 	sx9500_gpio_thread_cb(data->dev);
 }
@@ -143,15 +140,14 @@ int sx9500_setup_interrupt(const struct device *dev)
 	gpio = device_get_binding(DT_INST_GPIO_LABEL(0, int_gpios));
 	if (!gpio) {
 		LOG_DBG("sx9500: gpio controller %s not found",
-			    DT_INST_GPIO_LABEL(0, int_gpios));
+			DT_INST_GPIO_LABEL(0, int_gpios));
 		return -EINVAL;
 	}
 
 	gpio_pin_configure(gpio, DT_INST_GPIO_PIN(0, int_gpios),
 			   GPIO_INPUT | DT_INST_GPIO_FLAGS(0, int_gpios));
 
-	gpio_init_callback(&data->gpio_cb,
-			   sx9500_gpio_cb,
+	gpio_init_callback(&data->gpio_cb, sx9500_gpio_cb,
 			   BIT(DT_INST_GPIO_PIN(0, int_gpios)));
 
 	gpio_add_callback(gpio, &data->gpio_cb);
@@ -162,8 +158,8 @@ int sx9500_setup_interrupt(const struct device *dev)
 	k_thread_create(&sx9500_thread, sx9500_thread_stack,
 			CONFIG_SX9500_THREAD_STACK_SIZE,
 			(k_thread_entry_t)sx9500_thread_main, data, 0, NULL,
-			K_PRIO_COOP(CONFIG_SX9500_THREAD_PRIORITY),
-			0, K_NO_WAIT);
+			K_PRIO_COOP(CONFIG_SX9500_THREAD_PRIORITY), 0,
+			K_NO_WAIT);
 #endif
 
 	return 0;

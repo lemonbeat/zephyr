@@ -78,7 +78,7 @@ void ull_slave_setup(memq_link_t *link, struct node_rx_hdr *rx,
 	memcpy(&lll->data_chan_map[0], &pdu_adv->connect_ind.chan_map[0],
 	       sizeof(lll->data_chan_map));
 	lll->data_chan_count = util_ones_count_get(&lll->data_chan_map[0],
-			       sizeof(lll->data_chan_map));
+						   sizeof(lll->data_chan_map));
 	if (lll->data_chan_count < 2) {
 		return;
 	}
@@ -101,9 +101,11 @@ void ull_slave_setup(memq_link_t *link, struct node_rx_hdr *rx,
 	lll->slave.window_widening_periodic_us =
 		(((lll_conn_ppm_local_get() +
 		   lll_conn_ppm_get(conn->slave.sca)) *
-		  conn_interval_us) + (1000000 - 1)) / 1000000U;
-	lll->slave.window_widening_max_us = (conn_interval_us >> 1) -
-					    EVENT_IFS_US;
+		  conn_interval_us) +
+		 (1000000 - 1)) /
+		1000000U;
+	lll->slave.window_widening_max_us =
+		(conn_interval_us >> 1) - EVENT_IFS_US;
 	lll->slave.window_size_event_us = pdu_adv->connect_ind.win_size * 1250U;
 
 	/* procedure timeouts */
@@ -115,15 +117,15 @@ void ull_slave_setup(memq_link_t *link, struct node_rx_hdr *rx,
 
 #if defined(CONFIG_BT_CTLR_LE_PING)
 	/* APTO in no. of connection events */
-	conn->apto_reload = RADIO_CONN_EVENTS((30 * 1000 * 1000),
-					      conn_interval_us);
+	conn->apto_reload =
+		RADIO_CONN_EVENTS((30 * 1000 * 1000), conn_interval_us);
 	/* Dispatch LE Ping PDU 6 connection events (that peer would
 	 * listen to) before 30s timeout
 	 * TODO: "peer listens to" is greater than 30s due to latency
 	 */
 	conn->appto_reload = (conn->apto_reload > (lll->latency + 6)) ?
-			     (conn->apto_reload - (lll->latency + 6)) :
-			     conn->apto_reload;
+					   (conn->apto_reload - (lll->latency + 6)) :
+					   conn->apto_reload;
 #endif /* CONFIG_BT_CTLR_LE_PING */
 
 	memcpy((void *)&conn->slave.force, &lll->access_addr[0],
@@ -203,9 +205,9 @@ void ull_slave_setup(memq_link_t *link, struct node_rx_hdr *rx,
 
 		if (chan_sel) {
 			uint16_t aa_ls = ((uint16_t)lll->access_addr[1] << 8) |
-				      lll->access_addr[0];
+					 lll->access_addr[0];
 			uint16_t aa_ms = ((uint16_t)lll->access_addr[3] << 8) |
-				      lll->access_addr[2];
+					 lll->access_addr[2];
 
 			lll->data_chan_sel = 1;
 			lll->data_chan_id = aa_ms ^ aa_ls;
@@ -250,10 +252,9 @@ void ull_slave_setup(memq_link_t *link, struct node_rx_hdr *rx,
 		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_XTAL_US);
 	conn->evt.ticks_preempt_to_start =
 		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_PREEMPT_MIN_US);
-	conn->evt.ticks_slot =
-		HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_START_US +
-				       ready_delay_us +
-				       328 + EVENT_IFS_US + 328);
+	conn->evt.ticks_slot = HAL_TICKER_US_TO_TICKS(EVENT_OVERHEAD_START_US +
+						      ready_delay_us + 328 +
+						      EVENT_IFS_US + 328);
 
 	ticks_slot_offset = MAX(conn->evt.ticks_active_to_start,
 				conn->evt.ticks_xtal_to_start);
@@ -283,8 +284,8 @@ void ull_slave_setup(memq_link_t *link, struct node_rx_hdr *rx,
 	/* Stop Advertiser */
 	ticker_id_adv = TICKER_ID_ADV_BASE + ull_adv_handle_get(adv);
 	ticker_status = ticker_stop(TICKER_INSTANCE_ID_CTLR,
-				    TICKER_USER_ID_ULL_HIGH,
-				    ticker_id_adv, ticker_op_stop_adv_cb, adv);
+				    TICKER_USER_ID_ULL_HIGH, ticker_id_adv,
+				    ticker_op_stop_adv_cb, adv);
 	ticker_op_stop_adv_cb(ticker_status, adv);
 
 	/* Stop Direct Adv Stop */
@@ -299,22 +300,19 @@ void ull_slave_setup(memq_link_t *link, struct node_rx_hdr *rx,
 
 	/* Start Slave */
 	ticker_id_conn = TICKER_ID_CONN_BASE + ll_conn_handle_get(conn);
-	ticker_status = ticker_start(TICKER_INSTANCE_ID_CTLR,
-				     TICKER_USER_ID_ULL_HIGH,
-				     ticker_id_conn,
-				     ftr->ticks_anchor - ticks_slot_offset,
-				     HAL_TICKER_US_TO_TICKS(conn_offset_us),
-				     HAL_TICKER_US_TO_TICKS(conn_interval_us),
-				     HAL_TICKER_REMAINDER(conn_interval_us),
+	ticker_status = ticker_start(
+		TICKER_INSTANCE_ID_CTLR, TICKER_USER_ID_ULL_HIGH,
+		ticker_id_conn, ftr->ticks_anchor - ticks_slot_offset,
+		HAL_TICKER_US_TO_TICKS(conn_offset_us),
+		HAL_TICKER_US_TO_TICKS(conn_interval_us),
+		HAL_TICKER_REMAINDER(conn_interval_us),
 #if defined(CONFIG_BT_CTLR_CONN_META)
-				     TICKER_LAZY_MUST_EXPIRE,
+		TICKER_LAZY_MUST_EXPIRE,
 #else
-				     TICKER_NULL_LAZY,
+		TICKER_NULL_LAZY,
 #endif /* CONFIG_BT_CTLR_CONN_META */
-				     (conn->evt.ticks_slot +
-				      ticks_slot_overhead),
-				     ull_slave_ticker_cb, conn, ticker_op_cb,
-				     (void *)__LINE__);
+		(conn->evt.ticks_slot + ticks_slot_overhead),
+		ull_slave_ticker_cb, conn, ticker_op_cb, (void *)__LINE__);
 	LL_ASSERT((ticker_status == TICKER_STATUS_SUCCESS) ||
 		  (ticker_status == TICKER_STATUS_BUSY));
 
@@ -343,29 +341,25 @@ void ull_slave_done(struct node_rx_event_done *done, uint32_t *ticks_drift_plus,
 
 	start_to_address_actual_us =
 		done->extra.slave.start_to_address_actual_us;
-	window_widening_event_us =
-		done->extra.slave.window_widening_event_us;
-	preamble_to_addr_us =
-		done->extra.slave.preamble_to_addr_us;
+	window_widening_event_us = done->extra.slave.window_widening_event_us;
+	preamble_to_addr_us = done->extra.slave.preamble_to_addr_us;
 
-	start_to_address_expected_us = EVENT_JITTER_US +
-				       EVENT_TICKER_RES_MARGIN_US +
-				       window_widening_event_us +
-				       preamble_to_addr_us;
+	start_to_address_expected_us =
+		EVENT_JITTER_US + EVENT_TICKER_RES_MARGIN_US +
+		window_widening_event_us + preamble_to_addr_us;
 
 	if (start_to_address_actual_us <= start_to_address_expected_us) {
 		*ticks_drift_plus =
 			HAL_TICKER_US_TO_TICKS(window_widening_event_us);
 		*ticks_drift_minus =
 			HAL_TICKER_US_TO_TICKS((start_to_address_expected_us -
-					       start_to_address_actual_us));
+						start_to_address_actual_us));
 	} else {
 		*ticks_drift_plus =
 			HAL_TICKER_US_TO_TICKS(start_to_address_actual_us);
-		*ticks_drift_minus =
-			HAL_TICKER_US_TO_TICKS(EVENT_JITTER_US +
-					       EVENT_TICKER_RES_MARGIN_US +
-					       preamble_to_addr_us);
+		*ticks_drift_minus = HAL_TICKER_US_TO_TICKS(
+			EVENT_JITTER_US + EVENT_TICKER_RES_MARGIN_US +
+			preamble_to_addr_us);
 	}
 }
 
@@ -373,7 +367,7 @@ void ull_slave_ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 			 uint16_t lazy, void *param)
 {
 	static memq_link_t link;
-	static struct mayfly mfy = {0, 0, &link, NULL, lll_slave_prepare};
+	static struct mayfly mfy = { 0, 0, &link, NULL, lll_slave_prepare };
 	static struct lll_prepare_param p;
 	struct ll_conn *conn;
 	uint32_t err;
@@ -417,8 +411,8 @@ void ull_slave_ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 	mfy.param = &p;
 
 	/* Kick LLL prepare */
-	err = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL,
-			     0, &mfy);
+	err = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH, TICKER_USER_ID_LLL, 0,
+			     &mfy);
 	LL_ASSERT(!err);
 
 	/* De-mux remaining tx nodes from FIFO */
@@ -432,7 +426,7 @@ void ull_slave_ticker_cb(uint32_t ticks_at_expire, uint32_t remainder,
 
 #if defined(CONFIG_BT_CTLR_LE_ENC)
 uint8_t ll_start_enc_req_send(uint16_t handle, uint8_t error_code,
-			    uint8_t const *const ltk)
+			      uint8_t const *const ltk)
 {
 	struct ll_conn *conn;
 
@@ -444,7 +438,7 @@ uint8_t ll_start_enc_req_send(uint16_t handle, uint8_t error_code,
 	if (error_code) {
 		if (conn->llcp_enc.refresh == 0U) {
 			if ((conn->llcp_req == conn->llcp_ack) ||
-			     (conn->llcp_type != LLCP_ENCRYPTION)) {
+			    (conn->llcp_type != LLCP_ENCRYPTION)) {
 				return BT_HCI_ERR_CMD_DISALLOWED;
 			}
 
@@ -462,12 +456,11 @@ uint8_t ll_start_enc_req_send(uint16_t handle, uint8_t error_code,
 		}
 	} else {
 		if ((conn->llcp_req == conn->llcp_ack) ||
-		     (conn->llcp_type != LLCP_ENCRYPTION)) {
+		    (conn->llcp_type != LLCP_ENCRYPTION)) {
 			return BT_HCI_ERR_CMD_DISALLOWED;
 		}
 
-		memcpy(&conn->llcp_enc.ltk[0], ltk,
-		       sizeof(conn->llcp_enc.ltk));
+		memcpy(&conn->llcp_enc.ltk[0], ltk, sizeof(conn->llcp_enc.ltk));
 
 		conn->llcp.encryption.error_code = 0U;
 		conn->llcp.encryption.state = LLCP_ENC_STATE_INPROG;

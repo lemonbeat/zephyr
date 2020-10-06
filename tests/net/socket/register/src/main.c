@@ -212,14 +212,14 @@ static bool is_ip(int family, int type, int proto)
 	return true;
 }
 
-NET_SOCKET_REGISTER(af_inet,   AF_INET,   is_ip,      socket_test);
-NET_SOCKET_REGISTER(af_inet6,  AF_INET6,  is_ip,      socket_test);
-NET_SOCKET_REGISTER(af_can2,   AF_CAN,    is_ip,      socket_test);
+NET_SOCKET_REGISTER(af_inet, AF_INET, is_ip, socket_test);
+NET_SOCKET_REGISTER(af_inet6, AF_INET6, is_ip, socket_test);
+NET_SOCKET_REGISTER(af_can2, AF_CAN, is_ip, socket_test);
 
 /* For these socket families, we return ok always for now */
-NET_SOCKET_REGISTER(tls,       AF_UNSPEC, is_tls,    socket_test_ok);
+NET_SOCKET_REGISTER(tls, AF_UNSPEC, is_tls, socket_test_ok);
 NET_SOCKET_REGISTER(af_packet, AF_PACKET, is_packet, socket_test_ok);
-NET_SOCKET_REGISTER(af_can,    AF_CAN,    is_can,    socket_test_ok);
+NET_SOCKET_REGISTER(af_can, AF_CAN, is_can, socket_test_ok);
 
 void test_create_sockets(void)
 {
@@ -239,12 +239,12 @@ void test_create_sockets(void)
 
 		zassert_equal(fd, expected_result[i].result,
 			      "[%d] Invalid result (expecting %d got %d, "
-			      "errno %d)", i, expected_result[i].result, fd,
-			      errno);
+			      "errno %d)",
+			      i, expected_result[i].result, fd, errno);
 		if (expected_result[i].result < 0) {
 			zassert_equal(errno, expected_result[i].error,
-				      "[%d] Invalid errno (%d vs %d)", i,
-				      errno, expected_result[i].error);
+				      "[%d] Invalid errno (%d vs %d)", i, errno,
+				      expected_result[i].error);
 		}
 
 		if (expected_result[i].result == 0) {
@@ -265,8 +265,7 @@ void test_create_sockets(void)
 
 void test_main(void)
 {
-	ztest_test_suite(socket_register,
-			 ztest_unit_test(test_create_sockets));
+	ztest_test_suite(socket_register, ztest_unit_test(test_create_sockets));
 
 	ztest_run_test_suite(socket_register);
 }

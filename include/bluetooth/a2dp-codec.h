@@ -31,14 +31,14 @@ extern "C" {
 #define A2DP_SBC_SAMP_FREQ_48000 BIT(4)
 
 /* Channel Mode */
-#define A2DP_SBC_CH_MODE_MONO  BIT(3)
-#define A2DP_SBC_CH_MODE_DUAL  BIT(2)
+#define A2DP_SBC_CH_MODE_MONO BIT(3)
+#define A2DP_SBC_CH_MODE_DUAL BIT(2)
 #define A2DP_SBC_CH_MODE_STREO BIT(1)
 #define A2DP_SBC_CH_MODE_JOINT BIT(0)
 
 /* Block Length */
-#define A2DP_SBC_BLK_LEN_4  BIT(7)
-#define A2DP_SBC_BLK_LEN_8  BIT(6)
+#define A2DP_SBC_BLK_LEN_4 BIT(7)
+#define A2DP_SBC_BLK_LEN_8 BIT(6)
 #define A2DP_SBC_BLK_LEN_12 BIT(5)
 #define A2DP_SBC_BLK_LEN_16 BIT(4)
 
@@ -47,14 +47,14 @@ extern "C" {
 #define A2DP_SBC_SUBBAND_8 BIT(2)
 
 /* Allocation Method */
-#define A2DP_SBC_ALLOC_MTHD_SNR      BIT(1)
+#define A2DP_SBC_ALLOC_MTHD_SNR BIT(1)
 #define A2DP_SBC_ALLOC_MTHD_LOUDNESS BIT(0)
 
-#define BT_A2DP_SBC_SAMP_FREQ(preset)    ((preset->config[0] >> 4) & 0x0f)
-#define BT_A2DP_SBC_CHAN_MODE(preset)    ((preset->config[0]) & 0x0f)
-#define BT_A2DP_SBC_BLK_LEN(preset)      ((preset->config[1] >> 4) & 0x0f)
-#define BT_A2DP_SBC_SUB_BAND(preset)     ((preset->config[1] >> 2) & 0x03)
-#define BT_A2DP_SBC_ALLOC_MTHD(preset)   ((preset->config[1]) & 0x03)
+#define BT_A2DP_SBC_SAMP_FREQ(preset) ((preset->config[0] >> 4) & 0x0f)
+#define BT_A2DP_SBC_CHAN_MODE(preset) ((preset->config[0]) & 0x0f)
+#define BT_A2DP_SBC_BLK_LEN(preset) ((preset->config[1] >> 4) & 0x0f)
+#define BT_A2DP_SBC_SUB_BAND(preset) ((preset->config[1] >> 2) & 0x03)
+#define BT_A2DP_SBC_ALLOC_MTHD(preset) ((preset->config[1]) & 0x03)
 
 /** @brief SBC Codec */
 struct bt_a2dp_codec_sbc_params {

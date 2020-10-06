@@ -11,12 +11,11 @@
 
 #ifdef PIPE_BENCH
 
-
 /*
  * Function prototypes.
  */
-int pipeget(struct k_pipe *pipe, enum pipe_options option,
-			int size, int count, unsigned int *time);
+int pipeget(struct k_pipe *pipe, enum pipe_options option, int size, int count,
+	    unsigned int *time);
 
 /*
  * Function declarations.
@@ -44,8 +43,8 @@ void piperecvtask(void)
 	for (getsize = 8; getsize <= MESSAGE_SIZE_PIPE; getsize <<= 1) {
 		for (pipe = 0; pipe < 3; pipe++) {
 			getcount = NR_OF_PIPE_RUNS;
-			pipeget(test_pipes[pipe], _ALL_N, getsize,
-				getcount, &gettime);
+			pipeget(test_pipes[pipe], _ALL_N, getsize, getcount,
+				&gettime);
 			getinfo.time = gettime;
 			getinfo.size = getsize;
 			getinfo.count = getcount;
@@ -56,23 +55,22 @@ void piperecvtask(void)
 
 	for (prio = 0; prio < 2; prio++) {
 		/* non-matching (1_TO_N) */
-	for (getsize = (MESSAGE_SIZE_PIPE); getsize >= 8; getsize >>= 1) {
-		getcount = MESSAGE_SIZE_PIPE / getsize;
-		for (pipe = 0; pipe < 3; pipe++) {
-			/* size*count == MESSAGE_SIZE_PIPE */
-			pipeget(test_pipes[pipe], _1_TO_N,
-					getsize, getcount, &gettime);
-			getinfo.time = gettime;
-			getinfo.size = getsize;
-			getinfo.count = getcount;
-			/* acknowledge to master */
-			k_msgq_put(&CH_COMM, &getinfo, K_FOREVER);
+		for (getsize = (MESSAGE_SIZE_PIPE); getsize >= 8;
+		     getsize >>= 1) {
+			getcount = MESSAGE_SIZE_PIPE / getsize;
+			for (pipe = 0; pipe < 3; pipe++) {
+				/* size*count == MESSAGE_SIZE_PIPE */
+				pipeget(test_pipes[pipe], _1_TO_N, getsize,
+					getcount, &gettime);
+				getinfo.time = gettime;
+				getinfo.size = getsize;
+				getinfo.count = getcount;
+				/* acknowledge to master */
+				k_msgq_put(&CH_COMM, &getinfo, K_FOREVER);
+			}
 		}
 	}
-	}
-
 }
-
 
 /**
  *
@@ -87,7 +85,7 @@ void piperecvtask(void)
  * @param time     Total write time.
  */
 int pipeget(struct k_pipe *pipe, enum pipe_options option, int size, int count,
-			unsigned int *time)
+	    unsigned int *time)
 {
 	int i;
 	unsigned int t;
@@ -102,14 +100,14 @@ int pipeget(struct k_pipe *pipe, enum pipe_options option, int size, int count,
 		size_t size2xfer = MIN(size, size2xfer_total - sizexferd_total);
 		int ret;
 
-		ret = k_pipe_get(pipe, data_recv, size2xfer,
-				 &sizexferd, option, K_FOREVER);
+		ret = k_pipe_get(pipe, data_recv, size2xfer, &sizexferd, option,
+				 K_FOREVER);
 
 		if (ret != 0) {
 			return 1;
 		}
 
-		if (option == _ALL_N  && sizexferd != size2xfer) {
+		if (option == _ALL_N && sizexferd != size2xfer) {
 			return 1;
 		}
 
@@ -128,15 +126,14 @@ int pipeget(struct k_pipe *pipe, enum pipe_options option, int size, int count,
 	if (bench_test_end() < 0) {
 		if (high_timer_overflow()) {
 			PRINT_STRING("| Timer overflow. "
-			"Results are invalid            ",
-						 output_file);
+				     "Results are invalid            ",
+				     output_file);
 		} else {
 			PRINT_STRING("| Tick occurred. "
-			"Results may be inaccurate       ",
-						 output_file);
+				     "Results may be inaccurate       ",
+				     output_file);
 		}
-		PRINT_STRING("                             |\n",
-					 output_file);
+		PRINT_STRING("                             |\n", output_file);
 	}
 	return 0;
 }

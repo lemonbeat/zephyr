@@ -12,14 +12,12 @@
 #include <cmsis_os2.h>
 
 /* specify delay between greetings (in ms); compute equivalent in ticks */
-#define TIMER_TICKS  50
+#define TIMER_TICKS 50
 #define MSGLEN 12
 #define Q_LEN 1
 #define INITIAL_DATA_VALUE 5
 
-const osTimerAttr_t timer_attr = {
-	"myTimer", 0, NULL, 0U
-};
+const osTimerAttr_t timer_attr = { "myTimer", 0, NULL, 0U };
 
 osMessageQueueId_t message_id;
 
@@ -41,8 +39,7 @@ void read_msg_callback(void *arg)
 	uint32_t read_msg;
 	osStatus_t status;
 
-	status = osMessageQueueGet(message_id, (void *)&read_msg,
-				   NULL, 0);
+	status = osMessageQueueGet(message_id, (void *)&read_msg, NULL, 0);
 	if (status == osOK) {
 		printk("Read from message queue: %d\n\n", read_msg);
 	} else {

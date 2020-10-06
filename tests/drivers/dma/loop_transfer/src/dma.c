@@ -27,16 +27,15 @@ static __aligned(16) char rx_data[TRANSFER_LOOPS][RX_BUFF_SIZE] __used
 	__attribute__((__section__(".nocache.dma")));
 #else
 /* this src memory shall be in RAM to support usingas a DMA source pointer.*/
-static char tx_data[] =
-	"The quick brown fox jumps over the lazy dog ....";
+static char tx_data[] = "The quick brown fox jumps over the lazy dog ....";
 static __aligned(16) char rx_data[TRANSFER_LOOPS][RX_BUFF_SIZE] = { { 0 } };
 #endif
 
 #define DMA_DEVICE_NAME CONFIG_DMA_LOOP_TRANSFER_DRV_NAME
 
 volatile uint8_t transfer_count;
-static struct dma_config dma_cfg = {0};
-static struct dma_block_config dma_block_cfg = {0};
+static struct dma_config dma_cfg = { 0 };
+static struct dma_block_config dma_block_cfg = { 0 };
 
 static void test_transfer(const struct device *dev, uint32_t id)
 {

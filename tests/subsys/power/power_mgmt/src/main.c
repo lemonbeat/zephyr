@@ -120,7 +120,6 @@ void sys_pm_notify_power_state_exit(enum power_states state)
 	device_get_power_state(dev, &device_power_state);
 	zassert_equal(device_power_state, DEVICE_PM_ACTIVE_STATE, NULL);
 	leave_idle = true;
-
 }
 
 /*
@@ -211,14 +210,11 @@ void test_teardown(void)
 
 void test_main(void)
 {
-	ztest_test_suite(power_management_test,
-			 ztest_1cpu_unit_test(test_power_idle),
-			 ztest_unit_test_setup_teardown(test_power_state_trans,
-							test_setup,
-							test_teardown),
-			 ztest_unit_test_setup_teardown(
-						test_power_state_notification,
-						test_setup,
-						test_teardown));
+	ztest_test_suite(
+		power_management_test, ztest_1cpu_unit_test(test_power_idle),
+		ztest_unit_test_setup_teardown(test_power_state_trans,
+					       test_setup, test_teardown),
+		ztest_unit_test_setup_teardown(test_power_state_notification,
+					       test_setup, test_teardown));
 	ztest_run_test_suite(power_management_test);
 }

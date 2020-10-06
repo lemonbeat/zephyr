@@ -12,24 +12,21 @@
 NET_BUF_POOL_DEFINE(pkt_pool, CONFIG_MCUMGR_BUF_COUNT, CONFIG_MCUMGR_BUF_SIZE,
 		    CONFIG_MCUMGR_BUF_USER_DATA_SIZE, NULL);
 
-struct net_buf *
-mcumgr_buf_alloc(void)
+struct net_buf *mcumgr_buf_alloc(void)
 {
 	return net_buf_alloc(&pkt_pool, K_NO_WAIT);
 }
 
-void
-mcumgr_buf_free(struct net_buf *nb)
+void mcumgr_buf_free(struct net_buf *nb)
 {
 	net_buf_unref(nb);
 }
 
-static uint8_t
-cbor_nb_reader_get8(struct cbor_decoder_reader *d, int offset)
+static uint8_t cbor_nb_reader_get8(struct cbor_decoder_reader *d, int offset)
 {
 	struct cbor_nb_reader *cnr;
 
-	cnr = (struct cbor_nb_reader *) d;
+	cnr = (struct cbor_nb_reader *)d;
 
 	if (offset < 0 || offset >= cnr->nb->len) {
 		return UINT8_MAX;
@@ -38,13 +35,12 @@ cbor_nb_reader_get8(struct cbor_decoder_reader *d, int offset)
 	return cnr->nb->data[offset];
 }
 
-static uint16_t
-cbor_nb_reader_get16(struct cbor_decoder_reader *d, int offset)
+static uint16_t cbor_nb_reader_get16(struct cbor_decoder_reader *d, int offset)
 {
 	struct cbor_nb_reader *cnr;
 	uint16_t val;
 
-	cnr = (struct cbor_nb_reader *) d;
+	cnr = (struct cbor_nb_reader *)d;
 
 	if (offset < 0 || offset > cnr->nb->len - (int)sizeof(val)) {
 		return UINT16_MAX;
@@ -54,13 +50,12 @@ cbor_nb_reader_get16(struct cbor_decoder_reader *d, int offset)
 	return cbor_ntohs(val);
 }
 
-static uint32_t
-cbor_nb_reader_get32(struct cbor_decoder_reader *d, int offset)
+static uint32_t cbor_nb_reader_get32(struct cbor_decoder_reader *d, int offset)
 {
 	struct cbor_nb_reader *cnr;
 	uint32_t val;
 
-	cnr = (struct cbor_nb_reader *) d;
+	cnr = (struct cbor_nb_reader *)d;
 
 	if (offset < 0 || offset > cnr->nb->len - (int)sizeof(val)) {
 		return UINT32_MAX;
@@ -70,13 +65,12 @@ cbor_nb_reader_get32(struct cbor_decoder_reader *d, int offset)
 	return cbor_ntohl(val);
 }
 
-static uint64_t
-cbor_nb_reader_get64(struct cbor_decoder_reader *d, int offset)
+static uint64_t cbor_nb_reader_get64(struct cbor_decoder_reader *d, int offset)
 {
 	struct cbor_nb_reader *cnr;
 	uint64_t val;
 
-	cnr = (struct cbor_nb_reader *) d;
+	cnr = (struct cbor_nb_reader *)d;
 
 	if (offset < 0 || offset > cnr->nb->len - (int)sizeof(val)) {
 		return UINT64_MAX;
@@ -86,13 +80,12 @@ cbor_nb_reader_get64(struct cbor_decoder_reader *d, int offset)
 	return cbor_ntohll(val);
 }
 
-static uintptr_t
-cbor_nb_reader_cmp(struct cbor_decoder_reader *d, char *buf, int offset,
-		   size_t len)
+static uintptr_t cbor_nb_reader_cmp(struct cbor_decoder_reader *d, char *buf,
+				    int offset, size_t len)
 {
 	struct cbor_nb_reader *cnr;
 
-	cnr = (struct cbor_nb_reader *) d;
+	cnr = (struct cbor_nb_reader *)d;
 
 	if (offset < 0 || offset > cnr->nb->len - (int)len) {
 		return -1;
@@ -101,13 +94,12 @@ cbor_nb_reader_cmp(struct cbor_decoder_reader *d, char *buf, int offset,
 	return memcmp(cnr->nb->data + offset, buf, len);
 }
 
-static uintptr_t
-cbor_nb_reader_cpy(struct cbor_decoder_reader *d, char *dst, int offset,
-		   size_t len)
+static uintptr_t cbor_nb_reader_cpy(struct cbor_decoder_reader *d, char *dst,
+				    int offset, size_t len)
 {
 	struct cbor_nb_reader *cnr;
 
-	cnr = (struct cbor_nb_reader *) d;
+	cnr = (struct cbor_nb_reader *)d;
 
 	if (offset < 0 || offset > cnr->nb->len - (int)len) {
 		return -1;
@@ -116,9 +108,7 @@ cbor_nb_reader_cpy(struct cbor_decoder_reader *d, char *dst, int offset,
 	return (uintptr_t)memcpy(dst, cnr->nb->data + offset, len);
 }
 
-void
-cbor_nb_reader_init(struct cbor_nb_reader *cnr,
-		    struct net_buf *nb)
+void cbor_nb_reader_init(struct cbor_nb_reader *cnr, struct net_buf *nb)
 {
 	cnr->r.get8 = &cbor_nb_reader_get8;
 	cnr->r.get16 = &cbor_nb_reader_get16;
@@ -131,12 +121,12 @@ cbor_nb_reader_init(struct cbor_nb_reader *cnr,
 	cnr->r.message_size = nb->len;
 }
 
-static int
-cbor_nb_write(struct cbor_encoder_writer *writer, const char *data, int len)
+static int cbor_nb_write(struct cbor_encoder_writer *writer, const char *data,
+			 int len)
 {
 	struct cbor_nb_writer *cnw;
 
-	cnw = (struct cbor_nb_writer *) writer;
+	cnw = (struct cbor_nb_writer *)writer;
 	if (len > net_buf_tailroom(cnw->nb)) {
 		return CborErrorOutOfMemory;
 	}
@@ -147,8 +137,7 @@ cbor_nb_write(struct cbor_encoder_writer *writer, const char *data, int len)
 	return CborNoError;
 }
 
-void
-cbor_nb_writer_init(struct cbor_nb_writer *cnw, struct net_buf *nb)
+void cbor_nb_writer_init(struct cbor_nb_writer *cnw, struct net_buf *nb)
 {
 	cnw->nb = nb;
 	cnw->enc.bytes_written = 0;
